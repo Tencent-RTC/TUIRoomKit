@@ -1,0 +1,12 @@
+/* 
+  MeetingLocalized.strings
+  TUIMeetingApp
+
+  Created by adams on 2021/6/7.
+  
+*/
+
+"App.PortalViewController.areyousureloginout" = "Are you sure you want to log out?";
+"App.PortalViewController.cancel" = "Cancel";
+"App.PortalViewController.determine" = "Yes";
+"Video Conferencing" = "Video Conferencing";

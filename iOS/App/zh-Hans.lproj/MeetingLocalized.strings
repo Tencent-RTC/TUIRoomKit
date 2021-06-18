@@ -1,0 +1,12 @@
+/* 
+  MeetingLocalized.strings
+  TUIMeetingApp
+
+  Created by adams on 2021/6/7.
+  
+*/
+
+"App.PortalViewController.areyousureloginout" = "确定要退出登录吗？";
+"App.PortalViewController.cancel" = "取消";
+"App.PortalViewController.determine" = "确定";
+"Video Conferencing" = "多人视频会议";
