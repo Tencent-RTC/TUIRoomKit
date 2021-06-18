@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Meeting</string>
+    <string name="toast_login_success">Logged in</string>
+    <string name="toast_login_fail">Login failed [%d]%s</string>
+    <string name="working">Running</string>
+</resources>

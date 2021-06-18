@@ -1,19 +1,5 @@
 # 多人视频会议
 
-
-## 效果演示
-
-<table>
-     <tr>
-         <th>进入会议</th>  
-         <th>屏幕分享</th>  
-     </tr>
-<tr>
-<td><img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/meeting1.gif" width="300px" height="640px"/></td>
-<td><img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/screencapture.gif" width="300px" height="640px"/></td>
-</tr>
-</table>
-
 ## 应用地址
 
 ### iOS

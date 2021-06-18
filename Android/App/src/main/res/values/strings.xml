@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">视频会议</string>
+    <string name="toast_login_success">登录成功</string>
+    <string name="toast_login_fail">登录IM失败，所有功能不可用[%d]%s</string>
+    <string name="working">正在运行中</string>
+</resources>

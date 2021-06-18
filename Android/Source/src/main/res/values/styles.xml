@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TRTCMeetingButtonTheme">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+
+    <style name="TRTCMeetingBaseFragmentDialogTheme" parent="@android:style/Theme.Holo.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowBackground">@color/trtcmeeting_color_bg_dialog</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="TRTCMeetingBaseTabFragmentTabText" parent="TextAppearance.AppCompat.Button">
+        <item name="android:textSize">18sp</item>
+        <item name="textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="tabPaddingStart">12dp</item>
+        <item name="tabPaddingEnd">12dp</item>
+    </style>
+
+    <style name="TRTCMeetingSpinnerPopTheme">
+        <item name="android:background">@color/trtcmeeting_color_white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="MeetingCreateRadioButtonStyle">
+        <item name="android:button">@null</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">@dimen/trtcmeeting_ItemTitleSize</item>
+    </style>
+
+</resources>
