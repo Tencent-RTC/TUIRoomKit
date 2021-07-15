@@ -32,6 +32,7 @@ import com.tencent.liteav.demo.beauty.BeautyParams;
 import com.tencent.liteav.demo.beauty.view.BeautyPanel;
 import com.tencent.liteav.demo.trtc.R;
 import com.tencent.liteav.login.model.ProfileManager;
+import com.tencent.liteav.login.model.UserModel;
 import com.tencent.liteav.meeting.model.TRTCMeeting;
 import com.tencent.liteav.meeting.model.TRTCMeetingCallback;
 import com.tencent.liteav.meeting.model.TRTCMeetingDef;
@@ -131,6 +132,7 @@ public class MeetingMainActivity extends AppCompatActivity implements TRTCMeetin
         super.onCreate(savedInstanceState);
         // 应用运行时，保持不锁屏、全屏化
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        ProfileManager.getInstance().getUserModel().userType = UserModel.UserType.MEETING;
         StateBarUtils.setDarkStatusBar(this);
         setContentView(R.layout.trtcmeeting_activity_meeting_main);
         initData();
@@ -169,6 +171,7 @@ public class MeetingMainActivity extends AppCompatActivity implements TRTCMeetin
         mTRTCMeeting.stopScreenCapture();
         mTRTCMeeting.stopCameraPreview();
         super.onDestroy();
+        ProfileManager.getInstance().getUserModel().userType = UserModel.UserType.NONE;
     }
 
     @Override

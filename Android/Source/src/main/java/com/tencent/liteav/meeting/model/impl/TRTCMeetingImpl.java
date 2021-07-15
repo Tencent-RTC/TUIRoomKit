@@ -65,7 +65,6 @@ public class TRTCMeetingImpl extends TRTCMeeting implements ITXTRTCMeetingDelega
     }
 
     private void clear() {
-        mIsUseFrontCamera = false;
         mRecordingAudioPath = null;
         mRoomId = 0;
         mSubStreamMap.clear();
@@ -77,6 +76,7 @@ public class TRTCMeetingImpl extends TRTCMeeting implements ITXTRTCMeetingDelega
     private void destroy() {
         clear();
         TRTCCloud.destroySharedInstance();
+        mIsUseFrontCamera = false;
     }
 
     private void runOnMainThread(Runnable runnable) {

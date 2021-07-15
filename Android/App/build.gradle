@@ -1,17 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion COMPILE_SDK_VERSION as Integer
+    buildToolsVersion BUILD_TOOLS_VERSION
 
     defaultConfig {
         applicationId 'com.tencent.liteav.tuimeeting'
         versionName VERSION_NAME
         versionCode VERSION_CODE as Integer
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-
+        minSdkVersion MIN_SDK_VERSION as Integer
+        targetSdkVersion TARGET_SDK_VERSION as Integer
         multiDexEnabled true
     }
 

@@ -4,11 +4,12 @@
 
 ```
 TUIMeeting
-├─ App							// 主面板，各种场景入口
-├─ Beauty						// 美颜面板，包含美颜，滤镜，动效等效果
-├─ Debug						// 调试相关
-├─ Login						// 登录相关
-└─ Source						// 视频会议业务逻辑
+├─ App          // 主面板，各种场景入口
+├─ Basic        // 基础库
+├─ Beauty       // 美颜面板，包含美颜，滤镜，动效等效果
+├─ Debug        // 调试相关
+├─ Login        // 登录相关
+└─ Source       // 视频会议业务逻辑
 ```
 
 ## 环境准备
@@ -34,6 +35,7 @@ TUIMeeting
 <ul style="margin:0"><li/>SDKAPPID：默认为占位符（PLACEHOLDER），请设置为实际的 SDKAppID。
 <li/>SECRETKEY：默认为占位符（PLACEHOLDER），请设置为实际的密钥信息。</ul>
 <img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/sdkappid_secretkey.png">
+
 4. 返回实时音视频控制台，单击【粘贴完成，下一步】。
 5. 单击【关闭指引，进入控制台管理应用】。
 
