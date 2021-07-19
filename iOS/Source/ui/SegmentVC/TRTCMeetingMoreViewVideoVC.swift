@@ -107,7 +107,7 @@ class TRTCMeetingMoreViewVideoVC: UIViewController, UIPickerViewDelegate, UIPick
         TRTCMeetingBitrateTable(resolutionName: "540 * 960", resolution: TRTCVideoResolution._960_540.rawValue, defaultBitrate: 900, minBitrate: 400, maxBitrate: 1600, stepBitrate: 50),
         TRTCMeetingBitrateTable(resolutionName: "720 * 1280", resolution: TRTCVideoResolution._1280_720.rawValue, defaultBitrate: 1250, minBitrate: 500, maxBitrate: 2000, stepBitrate: 50)
     )
-    var bitrateIndex = 3 // 默认540 * 960
+    var bitrateIndex = 2 // 默认为 360 * 640
     
     // 码率SliderView
     lazy var bitrateSlider: UISlider = {

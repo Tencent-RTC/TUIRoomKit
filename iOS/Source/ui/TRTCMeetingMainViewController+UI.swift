@@ -291,11 +291,11 @@ extension TRTCMeetingMainViewController {
             if needDelay {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     let localPreviewView = self.getRenderView(userId: self.selfUserId)!
-                    TRTCMeeting.sharedInstance().startCameraPreview(true, view: localPreviewView)
+                    TRTCMeeting.sharedInstance().startCameraPreview(self.isFrontCamera, view: localPreviewView)
                 }
             } else {
                 let localPreviewView = self.getRenderView(userId: self.selfUserId)!
-                TRTCMeeting.sharedInstance().startCameraPreview(true, view: localPreviewView)
+                TRTCMeeting.sharedInstance().startCameraPreview(self.isFrontCamera, view: localPreviewView)
             }
             
         } else {
