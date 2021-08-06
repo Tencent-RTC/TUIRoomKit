@@ -43,7 +43,7 @@
 "Demo.TRTC.LiveRoom.noanchor" = "暂无主播";
 "Demo.TRTC.LiveRoom.notice" = "通知";
 "Demo.TRTC.LiveRoom.originalsound" = "原声";
-"Demo.TRTC.LiveRoom.ktv" = "KTV";
+"Demo.TRTC.LiveRoom.ktv" = "Karaoke";
 "Demo.TRTC.LiveRoom.room" = "房间";
 "Demo.TRTC.LiveRoom.hall" = "会堂";
 "Demo.TRTC.LiveRoom.muffled" = "低沉";
@@ -399,7 +399,7 @@
 "ASKit.MenuItem.Robot" = "重机械";
 "ASKit.MenuItem.Ethereal voice" = "空灵";
 "ASKit.MenuItem.No effect" = "无效果";
-"ASKit.MenuItem.Karaoke room" = "KTV";
+"ASKit.MenuItem.Karaoke room" = "Karaoke";
 "ASKit.MenuItem.Small room" = "小房间";
 "ASKit.MenuItem.Big hall" = "大会堂";
 "ASKit.MenuItem.Deep" = "低沉";
