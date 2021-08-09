@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
-import com.tencent.liteav.login.model.ProfileManager;
-import com.tencent.liteav.login.ui.LoginActivity;
+import com.tencent.liteav.basic.UserModelManager;
 
 public class SplashActivity extends Activity {
 
@@ -19,18 +19,14 @@ public class SplashActivity extends Activity {
     }
 
     private void navigationMain() {
-        final Intent enterIntent = getIntent();
-        if ((enterIntent.getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
-            finish();
+        UserModelManager userModelManager = UserModelManager.getInstance();
+        if (TextUtils.isEmpty(userModelManager.getUserModel().userId)) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
         } else {
-            if (!ProfileManager.getInstance().isLogin()) {
-                Intent intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);
-            } else {
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-            }
-            finish();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         }
+        finish();
     }
 }

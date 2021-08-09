@@ -21,7 +21,8 @@ android {
 
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
-    api project(':Basic')
     api rootProject.ext.liteavSdk
+    api "com.google.code.gson:gson:$GSON_VERSION"
+    api "com.android.support:design:$DESIGN_VERSION"
 }
 

@@ -1,5 +1,6 @@
 package com.tencent.liteav.meeting.ui;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,11 +29,11 @@ import android.widget.TextView;
 import com.blankj.utilcode.constant.PermissionConstants;
 import com.blankj.utilcode.util.PermissionUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.tencent.liteav.basic.UserModel;
+import com.tencent.liteav.basic.UserModelManager;
 import com.tencent.liteav.demo.beauty.BeautyParams;
 import com.tencent.liteav.demo.beauty.view.BeautyPanel;
 import com.tencent.liteav.demo.trtc.R;
-import com.tencent.liteav.login.model.ProfileManager;
-import com.tencent.liteav.login.model.UserModel;
 import com.tencent.liteav.meeting.model.TRTCMeeting;
 import com.tencent.liteav.meeting.model.TRTCMeetingCallback;
 import com.tencent.liteav.meeting.model.TRTCMeetingDef;
@@ -46,7 +47,9 @@ import com.tencent.liteav.meeting.ui.widget.page.MeetingPageLayoutManager;
 import com.tencent.liteav.meeting.ui.widget.page.PagerSnapHelper;
 import com.tencent.trtc.TRTCCloudDef;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,17 +135,17 @@ public class MeetingMainActivity extends AppCompatActivity implements TRTCMeetin
         super.onCreate(savedInstanceState);
         // 应用运行时，保持不锁屏、全屏化
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        ProfileManager.getInstance().getUserModel().userType = UserModel.UserType.MEETING;
+        UserModelManager.getInstance().getUserModel().userType = UserModel.UserType.MEETING;
         StateBarUtils.setDarkStatusBar(this);
         setContentView(R.layout.trtcmeeting_activity_meeting_main);
         initData();
         initView();
-        ProfileManager.getInstance().checkNeedShowSecurityTips(MeetingMainActivity.this);
+        checkNeedShowSecurityTips();
         PermissionUtils.permission(PermissionConstants.CAMERA, PermissionConstants.MICROPHONE).callback(new PermissionUtils.FullCallback() {
             @Override
             public void onGranted(List<String> permissionsGranted) {
                 startCreateOrEnterMeeting();
-                ProfileManager.getInstance().checkNeedShowSecurityTips(MeetingMainActivity.this);
+                checkNeedShowSecurityTips();
             }
 
             @Override
@@ -151,6 +154,17 @@ public class MeetingMainActivity extends AppCompatActivity implements TRTCMeetin
                 finish();
             }
         }).request();
+    }
+
+    // 首次TRTC打开摄像头提示"Demo特别配置了无限期云端存储"
+    private void checkNeedShowSecurityTips() {
+        if (UserModelManager.getInstance().needShowSecurityTips()) {
+            AlertDialog.Builder normalDialog = new AlertDialog.Builder(this);
+            normalDialog.setMessage(getResources().getString(R.string.trtcmeeting_first_enter_room_tips));
+            normalDialog.setCancelable(false);
+            normalDialog.setPositiveButton(getResources().getString(R.string.trtcmeeting_dialog_ok), null);
+            normalDialog.show();
+        }
     }
 
     @Override
@@ -171,7 +185,7 @@ public class MeetingMainActivity extends AppCompatActivity implements TRTCMeetin
         mTRTCMeeting.stopScreenCapture();
         mTRTCMeeting.stopCameraPreview();
         super.onDestroy();
-        ProfileManager.getInstance().getUserModel().userType = UserModel.UserType.NONE;
+        UserModelManager.getInstance().getUserModel().userType = UserModel.UserType.NONE;
     }
 
     @Override

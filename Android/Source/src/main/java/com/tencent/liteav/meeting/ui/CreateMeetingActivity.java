@@ -14,9 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.tencent.liteav.basic.UserModel;
+import com.tencent.liteav.basic.UserModelManager;
 import com.tencent.liteav.demo.trtc.R;
-import com.tencent.liteav.login.model.ProfileManager;
-import com.tencent.liteav.login.model.UserModel;
 import com.tencent.liteav.meeting.ui.utils.StateBarUtils;
 import com.tencent.liteav.meeting.ui.widget.settingitem.BaseSettingItem;
 import com.tencent.liteav.meeting.ui.widget.settingitem.SwitchSettingItem;
@@ -93,7 +93,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
     }
 
     private void enterMeeting(final String roomId) {
-        UserModel userModel  = ProfileManager.getInstance().getUserModel();
+        UserModel userModel  = UserModelManager.getInstance().getUserModel();
         String    userId     = userModel.userId;
         String    userAvatar = userModel.userAvatar;
         String     userName  = userModel.userName;

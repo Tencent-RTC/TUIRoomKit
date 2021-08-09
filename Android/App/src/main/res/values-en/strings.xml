@@ -4,4 +4,7 @@
     <string name="toast_login_success">Logged in</string>
     <string name="toast_login_fail">Login failed [%d]%s</string>
     <string name="working">Running</string>
+    <string name="user_id">Username</string>
+    <string name="hint_user_id">Enter a userId</string>
+    <string name="btn_login">Log In</string>
 </resources>

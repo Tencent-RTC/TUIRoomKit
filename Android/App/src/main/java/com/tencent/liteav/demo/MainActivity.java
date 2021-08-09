@@ -6,9 +6,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.tencent.liteav.basic.UserModel;
+import com.tencent.liteav.basic.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
-import com.tencent.liteav.login.model.ProfileManager;
-import com.tencent.liteav.login.model.UserModel;
 import com.tencent.liteav.meeting.model.TRTCMeeting;
 import com.tencent.liteav.meeting.model.TRTCMeetingCallback;
 import com.tencent.liteav.meeting.ui.CreateMeetingActivity;
@@ -26,11 +26,22 @@ public class MainActivity extends Activity {
     }
 
     private void initMeetingData() {
-        final UserModel userModel = ProfileManager.getInstance().getUserModel();
-        TRTCMeeting.sharedInstance(this).login(GenerateTestUserSig.SDKAPPID, userModel.userId, userModel.userSig, new TRTCMeetingCallback.ActionCallback() {
+        final UserModel userModel = UserModelManager.getInstance().getUserModel();
+        final TRTCMeeting trtcMeeting = TRTCMeeting.sharedInstance(this);
+        trtcMeeting.login(GenerateTestUserSig.SDKAPPID, userModel.userId, userModel.userSig, new TRTCMeetingCallback.ActionCallback() {
             @Override
             public void onCallback(int code, String msg) {
                 Log.d(TAG, "code: "+code + " msg:"+msg);
+                if (code == 0) {
+                    trtcMeeting.setSelfProfile(userModel.userName, userModel.userAvatar, new TRTCMeetingCallback.ActionCallback() {
+                        @Override
+                        public void onCallback(int code, String msg) {
+                            if (code == 0) {
+                                Log.d(TAG, "setSelfProfile success");
+                            }
+                        }
+                    });
+                }
             }
         });
     }

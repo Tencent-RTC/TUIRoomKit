@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.tencent.liteav.basic.ImageLoader;
 import com.tencent.liteav.demo.trtc.R;
 import com.tencent.liteav.meeting.ui.MemberEntity;
 
@@ -55,14 +55,10 @@ public class RemoteUserListAdapter extends
             mVideoImg = (AppCompatImageButton) itemView.findViewById(R.id.img_video);
         }
 
-        public void bind(final MemberEntity model,
+        public void bind(Context context, final MemberEntity model,
                          final boolean isSelf,
                          final OnItemClickListener listener) {
-            if (!TextUtils.isEmpty(model.getUserAvatar())){
-                Picasso.get().load(model.getUserAvatar()).placeholder(R.drawable.trtcmeeting_meeting_head).error(R.drawable.trtcmeeting_meeting_head).into(mHeadImg);
-            } else {
-                mHeadImg.setImageResource(R.drawable.trtcmeeting_meeting_head);
-            }
+            ImageLoader.loadImage(context, mHeadImg, model.getUserAvatar(), R.drawable.trtcmeeting_meeting_head);
             if (isSelf) {
                 mUserNameTv.setText(mUserNameTv.getResources().getString(R.string.trtcmeeting_tv_me, model.getUserName()));
                 mAudioImg.setVisibility(View.GONE);
@@ -106,7 +102,7 @@ public class RemoteUserListAdapter extends
     public void onBindViewHolder(ViewHolder holder, int position) {
         MemberEntity item = list.get(position);
         //第一个是自己
-        holder.bind(item, position == 0, onItemClickListener);
+        holder.bind(context, item, position == 0, onItemClickListener);
     }
 
 

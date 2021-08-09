@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.tencent.liteav.basic.ImageLoader;
 import com.tencent.liteav.demo.trtc.R;
 import com.tencent.liteav.meeting.model.TRTCMeeting;
 
@@ -201,10 +201,7 @@ public class MemberListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                          final ListCallback listener) {
             mMemberEntity = model;
             mUserNameTv.setText(model.getUserName());
-            if (!TextUtils.isEmpty(model.getUserAvatar())) {
-                Picasso.get().load(model.getUserAvatar()).placeholder(R.drawable.trtcmeeting_meeting_head).into(mUserHeadImg);
-            }
-            //            addVideoView();
+            ImageLoader.loadImage(context, mUserHeadImg, model.getUserAvatar(), R.drawable.trtcmeeting_meeting_head);
             mMemberEntity.getMeetingVideoView().setWaitBindGroup(mVideoContainer);
             mVideoContainer.removeAllViews();
             if (model.isVideoAvailable() && !model.isMuteVideo()) {
@@ -328,11 +325,7 @@ public class MemberListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             }
             mVideoContainer.removeAllViews();
             //展示其他数据
-            if (!TextUtils.isEmpty(model.getUserAvatar())) {
-                Picasso.get().load(model.getUserAvatar()).placeholder(R.drawable.trtcmeeting_meeting_head).into(mUserHeadImg);
-            } else {
-                mUserHeadImg.setImageResource(R.drawable.trtcmeeting_meeting_head);
-            }
+            ImageLoader.loadImage(context, mUserHeadImg, model.getUserAvatar(), R.drawable.trtcmeeting_meeting_head);
             mUserNameTv.setText(model.getUserName());
             if (model.getQuality() == MemberEntity.QUALITY_GOOD) {
                 mUserSignal.setVisibility(View.VISIBLE);
