@@ -4,7 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 
 public class ResourceUtils {
 

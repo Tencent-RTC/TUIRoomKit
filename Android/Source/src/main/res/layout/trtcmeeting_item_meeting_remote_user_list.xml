@@ -22,14 +22,14 @@
         android:text="@string/trtcmeeting_tv_tools_user_name"
         android:textColor="@color/trtcmeeting_TextColorSecond"/>
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/img_audio"
         android:layout_width="45dp"
         android:layout_height="45dp"
         style="@style/TRTCMeetingButtonTheme"
         android:src="@drawable/trtcmeeting_ic_meeting_audio" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/img_video"
         android:layout_width="45dp"
         android:layout_height="45dp"

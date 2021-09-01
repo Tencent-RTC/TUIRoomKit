@@ -1,7 +1,7 @@
 package com.tencent.liteav.meeting.ui.widget.settingitem;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;

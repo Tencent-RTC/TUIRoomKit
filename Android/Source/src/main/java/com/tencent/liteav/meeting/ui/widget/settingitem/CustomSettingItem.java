@@ -1,9 +1,9 @@
 package com.tencent.liteav.meeting.ui.widget.settingitem;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.Guideline;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.Guideline;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;

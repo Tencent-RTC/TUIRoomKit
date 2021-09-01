@@ -1,8 +1,8 @@
 package com.tencent.liteav.demo.beauty;
 
 import android.graphics.Bitmap;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
 
 import com.tencent.liteav.beauty.TXBeautyManager;
 import com.tencent.liteav.demo.beauty.model.BeautyInfo;

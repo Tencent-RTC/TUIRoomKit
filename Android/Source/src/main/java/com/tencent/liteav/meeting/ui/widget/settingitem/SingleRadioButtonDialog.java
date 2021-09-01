@@ -2,7 +2,7 @@ package com.tencent.liteav.meeting.ui.widget.settingitem;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.design.widget.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;

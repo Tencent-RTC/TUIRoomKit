@@ -2,16 +2,13 @@ package com.tencent.liteav.demo.beauty.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+
 import android.view.View;
 import android.view.Window;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -21,7 +18,6 @@ import com.tencent.liteav.demo.beauty.Beauty;
 import com.tencent.liteav.demo.beauty.BeautyImpl;
 import com.tencent.liteav.demo.beauty.adapter.ItemAdapter;
 import com.tencent.liteav.demo.beauty.adapter.TabAdapter;
-import com.tencent.liteav.demo.beauty.constant.BeautyConstants;
 import com.tencent.liteav.demo.beauty.model.BeautyInfo;
 import com.tencent.liteav.demo.beauty.model.ItemInfo;
 import com.tencent.liteav.demo.beauty.model.TabInfo;

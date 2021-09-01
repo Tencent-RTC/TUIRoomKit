@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.tencent.liteav.meeting.ui.MeetingMainActivity">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent" />
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/group_bottom_tool_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
         android:visibility="gone"
         tools:visibility="visible"/>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/group_screen_capture"
         android:visibility="gone"
         android:background="#AAAAAA"
@@ -59,7 +59,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_screen_capture_tag" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.tencent.liteav.meeting.ui.MeetingHeadBarView
         android:id="@+id/view_meeting_head_bar"
@@ -87,7 +87,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tool_bar_view" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/img_audio"
         style="@style/TRTCMeetingButtonTheme"
         android:layout_marginBottom="15dp"
@@ -97,7 +97,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/img_video"
         style="@style/TRTCMeetingButtonTheme"
         android:src="@drawable/trtcmeeting_ic_video"
@@ -106,7 +106,7 @@
         app:layout_constraintStart_toEndOf="@+id/img_audio"
         app:layout_constraintTop_toTopOf="@+id/img_audio" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/img_beauty"
         style="@style/TRTCMeetingButtonTheme"
         android:src="@drawable/trtcmeeting_ic_meeting_beauty"
@@ -115,7 +115,7 @@
         app:layout_constraintStart_toEndOf="@+id/img_video"
         app:layout_constraintTop_toTopOf="@+id/img_video" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/img_member"
         style="@style/TRTCMeetingButtonTheme"
         android:src="@drawable/trtcmeeting_ic_member"
@@ -124,7 +124,7 @@
         app:layout_constraintStart_toEndOf="@+id/img_beauty"
         app:layout_constraintTop_toTopOf="@+id/img_beauty" />
 
-    <android.support.v7.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/img_more"
         style="@style/TRTCMeetingButtonTheme"
         android:src="@drawable/trtcmeeting_ic_more"
@@ -139,4 +139,4 @@
         android:layout_height="match_parent"
         android:layout="@layout/trtcmeeting_viewstub_remote_user_list" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
