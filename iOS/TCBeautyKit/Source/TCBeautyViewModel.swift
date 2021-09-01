@@ -70,6 +70,8 @@ public class TCBeautyViewModel: NSObject {
                     if item.index <= 4 {
                         beautyStyle = item.index < 3 ? item.index : 2
                         item.sendAction([item.currentValue, beautyStyle, beautyLevel, whiteLevel, ruddyLevel])
+                    } else {
+                        item.sendAction([0])
                     }
                 case .filter:
                     if !item.isClear {
