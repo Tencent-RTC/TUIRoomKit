@@ -37,6 +37,15 @@ extension TRTCMeetingNewViewController {
         item.tintColor = .black
         navigationItem.leftBarButtonItem = item
         
+        let helpBtn = UIButton(type: .custom)
+        helpBtn.setImage(UIImage(named: "help_small"), for: .normal)
+        helpBtn.addTarget(self, action: #selector(connectWeb), for: .touchUpInside)
+        helpBtn.sizeToFit()
+        let rightItem = UIBarButtonItem(customView: helpBtn)
+        rightItem.tintColor = .black
+        self.navigationItem.rightBarButtonItem = rightItem
+        
+        
         // input Panel
         let inputPanel = UIView()
         inputPanel.backgroundColor = UIColor(hex: "F4F5F9")
@@ -127,7 +136,7 @@ extension TRTCMeetingNewViewController {
         enterBtn.setTitleColor(.white, for: .normal)
         view.addSubview(enterBtn)
         enterBtn.snp.makeConstraints { (make) in
-            make.bottom.equalToSuperview().offset(-50-kDeviceSafeBottomHeight)
+            make.top.equalTo(openMicSwitch).offset(52)
             make.centerX.equalToSuperview()
             make.width.equalToSuperview().multipliedBy(0.4)
             make.height.equalTo(52)
@@ -158,6 +167,13 @@ extension TRTCMeetingNewViewController {
         if let videoQuality = UserDefaults.standard.object(forKey: TRTCMeetingVideoQualityKey) as? Int {
             // 初始化设置视频质量参数
             setVideoQuality(videoQuality: videoQuality)
+        }
+    }
+    
+    /// 连接官方文档
+    @objc func connectWeb() {
+        if let url = URL(string: "https://cloud.tencent.com/document/product/647/45681") {
+            UIApplication.shared.openURL(url)
         }
     }
     

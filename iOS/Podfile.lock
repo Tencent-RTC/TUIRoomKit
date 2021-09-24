@@ -1,10 +1,10 @@
 PODS:
-  - Alamofire (5.4.1)
-  - Kingfisher (6.3.0)
-  - MJExtension (3.2.2)
-  - MJRefresh (3.5.0)
+  - Alamofire (5.4.3)
+  - Kingfisher (6.3.1)
+  - MJExtension (3.3.0)
+  - MJRefresh (3.7.2)
   - SnapKit (5.0.1)
-  - SSZipArchive (2.2.3)
+  - SSZipArchive (2.4.2)
   - TCBeautyKit (1.0.0):
     - SSZipArchive
     - Toast-Swift
@@ -18,16 +18,16 @@ PODS:
     - TCBeautyKit
     - Toast-Swift
     - TXAppBasic
-    - TXIMSDK_Plus_iOS
+    - TXIMSDK_Plus_iOS (= 5.5.897)
     - TXLiteAVSDK_TRTC
   - TXAppBasic (1.0.0)
-  - TXIMSDK_Plus_iOS (5.4.666)
-  - TXLiteAVSDK_TRTC (8.1.9719)
+  - TXIMSDK_Plus_iOS (5.5.897)
+  - TXLiteAVSDK_TRTC (9.1.10564)
 
 DEPENDENCIES:
-  - TCBeautyKit (from `../TCBeautyKit/`)
+  - TCBeautyKit (from `TCBeautyKit/`)
   - TUIMeeting/TRTC (from `./`)
-  - TXAppBasic (from `../TXAppBasic/`)
+  - TXAppBasic (from `TXAppBasic/`)
   - TXLiteAVSDK_TRTC
 
 SPEC REPOS:
@@ -44,26 +44,26 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   TCBeautyKit:
-    :path: "../TCBeautyKit/"
+    :path: TCBeautyKit/
   TUIMeeting:
     :path: "./"
   TXAppBasic:
-    :path: "../TXAppBasic/"
+    :path: TXAppBasic/
 
 SPEC CHECKSUMS:
-  Alamofire: 2291f7d21ca607c491dd17642e5d40fdcda0e65c
-  Kingfisher: 6c3df386db71d82c0817a429d2c9421a77396529
-  MJExtension: d9b9c74cbdeb724c1e9ecbb157b318276e62e876
-  MJRefresh: 6afc955813966afb08305477dd7a0d9ad5e79a16
+  Alamofire: e447a2774a40c996748296fa2c55112fdbbc42f9
+  Kingfisher: 016c8b653a35add51dd34a3aba36b580041acc74
+  MJExtension: 01704cca2b60a214c10761b6491eab74069d68a9
+  MJRefresh: 30997d30b347c8e9508a4db11e3a690da0c9b85a
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
-  SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
+  SSZipArchive: e7b4f3d9e780c2acc1764cd88fbf2de28f26e5b2
   TCBeautyKit: d7182c484218f88461680fa7dd14706efb660215
   Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
-  TUIMeeting: 6ec25752b8edac2dcfed847357a4cc2632fa4a8e
+  TUIMeeting: a50977461ef02ec7f1695c74aadc8df6dc3b14c5
   TXAppBasic: f72fd658cb2cec20f0368158752b82226cb6cdec
-  TXIMSDK_Plus_iOS: 4db13c8646d4f58d8ae558488f9523a2efd4ef6a
-  TXLiteAVSDK_TRTC: dd581804b8badfffaf1d00856d7f2812eb8a47d4
+  TXIMSDK_Plus_iOS: 88a0b007c1bc653fad6ea707dd3c23425ba9ba7c
+  TXLiteAVSDK_TRTC: a67553f7b1f6157439cd771f18b6fb2b8860ec81
 
-PODFILE CHECKSUM: 9818c070f257fc07c1211854b62186f4b7896fbc
+PODFILE CHECKSUM: 1b304cdf1462713026c1e1d784e2f7e80093b20e
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.11.1

@@ -11,14 +11,6 @@ import Kingfisher
 
 class TRTCRegisterRootView: UIView {
     
-    lazy var titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = UIFont.systemFont(ofSize: 20)
-        label.textColor = UIColor(hex: "333333") ?? .black
-        label.text = .titleText
-        return label
-    }()
-    
     lazy var headImageView: UIImageView = {
         let imageView = UIImageView(frame: .zero)
         imageView.contentMode = .scaleAspectFill
@@ -147,7 +139,6 @@ class TRTCRegisterRootView: UIView {
     }
     
     func constructViewHierarchy() {
-        addSubview(titleLabel)
         addSubview(headImageView)
         addSubview(textField)
         addSubview(textFieldSpacingLine)
@@ -155,13 +146,9 @@ class TRTCRegisterRootView: UIView {
         addSubview(registBtn)
     }
     func activateConstraints() {
-        titleLabel.snp.makeConstraints { (make) in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(kDeviceSafeTopHeight+10)
-        }
         headImageView.snp.makeConstraints { (make) in
             make.centerX.equalToSuperview()
-            make.top.equalTo(titleLabel.snp_bottom).offset(40)
+            make.top.equalToSuperview().offset(kDeviceSafeTopHeight + 70)
             make.size.equalTo(CGSize(width: 100, height: 100))
         }
         textField.snp.makeConstraints { (make) in
@@ -261,7 +248,6 @@ extension TRTCRegisterRootView : UITextFieldDelegate {
 
 /// MARK: - internationalization string
 fileprivate extension String {
-    static let titleText = LoginLocalize(key:"Demo.TRTC.Login.regist")
     static let nicknamePlaceholderText = LoginLocalize(key:"Demo.TRTC.Login.enterusername")
     static let descText = LoginLocalize(key:"Demo.TRTC.Login.limit20count")
     static let registText = LoginLocalize(key:"Demo.TRTC.Login.regist")
