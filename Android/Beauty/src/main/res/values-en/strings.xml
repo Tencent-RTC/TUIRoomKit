@@ -4,7 +4,7 @@
     <string name="beauty_cancel">Cancel</string>
     <string name="beauty_close">Close</string>
     <string name="beauty_strength">Strength</string>
-    <string name="beauty_setup">Setup</string>
+    <string name="beauty_setup">Beauty Setup</string>
     <string name="beauty_common_none">None</string>
     <string name="beauty_palm_out">Palm out</string>
 
@@ -14,7 +14,7 @@
     <string name="beauty_setting_panel_dynamic_effect">Dynamic effect</string>
     <string name="beauty_setting_panel_key">Blend Pic</string>
     <string name="beauty_setting_panel_green_screen">Green screen</string>
-    <string name="beauty_setting_panel_facebeauty">Face beauty</string>
+    <string name="beauty_setting_panel_facebeauty">Cosmetic</string>
     <string name="beauty_setting_panel_gesture">Gesture</string>
 
     <string name="beauty_panel_style_smooth">Smooth</string>
@@ -76,7 +76,7 @@
     <string name="beauty_effect_flower_faerie">Floral Fairy</string>
     <string name="beauty_effect_princess">Little princess</string>
 
-    <string name="beauty_cutout_background_ai">AI Scratch</string>
+    <string name="beauty_cutout_background_ai">Blend pic</string>
 
     <string name="beauty_good_luck">Good luck</string>
 

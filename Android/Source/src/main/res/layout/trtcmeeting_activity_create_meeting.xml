@@ -82,7 +82,6 @@
             app:layout_constraintStart_toEndOf="@+id/room_id_tag"
             app:layout_constraintTop_toTopOf="@+id/room_id_tag" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout

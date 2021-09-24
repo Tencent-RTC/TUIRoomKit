@@ -1,6 +1,6 @@
 <resources>
     <string name="trtcmeeting_share">Share</string>
-    <string name="trtcmeeting_enter_tag_normal">Enter a valid conference ID</string>
+    <string name="trtcmeeting_enter_tag_normal">Join</string>
     <string name="trtcmeeting_rb_voice">Voice</string>
     <string name="trtcmeeting_rb_normal">Standard</string>
     <string name="trtcmeeting_rb_music">Music</string>

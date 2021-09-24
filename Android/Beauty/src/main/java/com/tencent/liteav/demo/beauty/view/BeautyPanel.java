@@ -285,7 +285,7 @@ public class BeautyPanel extends BottomSheetDialog {
     }
 
     private void setBeautyTitle(String title) {
-        mTextTitle.setText(ResourceUtils.getString(title) + ResourceUtils.getString(R.string.beauty_setup));
+        mTextTitle.setText(ResourceUtils.getString(R.string.beauty_setup));
     }
 
     public void setDismissListener(OnDismissListener listener) {
