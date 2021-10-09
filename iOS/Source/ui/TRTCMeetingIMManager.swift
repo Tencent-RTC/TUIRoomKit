@@ -26,7 +26,7 @@ class TRTCMeetingIMManager: NSObject {
                 return
             }
             self.isLoaded = true
-            self.curUserName = info.nickName
+            self.curUserName = info.nickName ?? ""
             self.curUserAvatar = info.faceURL
             
         }, fail: { (code, msg) in

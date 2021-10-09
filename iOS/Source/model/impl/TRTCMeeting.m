@@ -234,8 +234,16 @@ typedef void (^block)(TRTCMeeting *self);
     params.userSig = self.userSig;
     params.role = TRTCRoleAnchor; // 主播角色
     params.streamId = self.streamId;
-    
+    [self setFramework:5];
     [[TRTCCloud sharedInstance] enterRoom:params appScene:TRTCAppSceneVideoCall];
+}
+
+- (void)setFramework:(int)framework {
+    NSDictionary *jsonDic = @{@"api": @"setFramework",
+                              @"params":@{@"framework": @(framework)}};
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:jsonDic options:NSJSONWritingPrettyPrinted error:nil];
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    [[TRTCCloud sharedInstance] callExperimentalAPI: jsonString];
 }
 
 - (void)leaveMeeting:(TRTCMeetingCallback)callback {
