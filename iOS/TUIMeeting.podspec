@@ -22,7 +22,7 @@ Pod::Spec.new do |spec|
  spec.dependency 'MJRefresh'
  spec.dependency 'MJExtension'
  spec.dependency 'TXAppBasic'
- spec.dependency 'TXIMSDK_Plus_iOS', '5.5.897'
+ spec.dependency 'TXIMSDK_Plus_iOS', '~> 5.7.1435'
  spec.dependency 'TCBeautyKit'
 
 # spec.requires_arc = true
