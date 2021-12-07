@@ -97,8 +97,8 @@
 "Demo.TRTC.LiveRoom.micconnectionrefusedandinpk" = "连麦请求拒绝，正在进行PK操作";
 "Demo.TRTC.LiveRoom.prompt" = "提示";
 "Demo.TRTC.LiveRoom.xxinitiateamicconnectionreq" = "xxx向您发起连麦请求";
-"Demo.TRTC.LiveRoom.accept" = "接受";
-"Demo.TRTC.LiveRoom.refuse" = "拒绝";
+"Demo.TRTC.LiveRoom.accept" = "确定";
+"Demo.TRTC.LiveRoom.refuse" = "取消";
 "Demo.TRTC.LiveRoom.refusemicconnectionreq" = "主播拒绝了您的连麦请求";
 "Demo.TRTC.LiveRoom.xxmicconnectiontimeout" = "xxx连麦超时";
 "Demo.TRTC.LiveRoom.dealmicconnectionreqtimeout" = "处理连麦请求超时";
@@ -171,7 +171,7 @@
 "Demo.TRTC.VoiceRoom.saysomething" = "说点什么";
 "Demo.TRTC.Salon.close" = "关闭";
 "Demo.TRTC.VoiceRoom.exit" = "退出";
-"Demo.TRTC.VoiceRoom.isvoicingandsuretoexit" = "当前正在音频互动，是否退出";
+"Demo.TRTC.VoiceRoom.isvoicingandsuretoexit" = "离开会解散房间，确认离开吗？";
 "Demo.TRTC.Salon.roomid" = "房间号";
 "Demo.TRTC.Salon.seatmuted" = "被房主禁言";
 "Demo.TRTC.Salon.seatunmuted" = "被房主解禁";
@@ -301,9 +301,9 @@
 "Demo.TRTC.Salon.dismiss" = "忽略";
 "Demo.TRTC.Salon.appliestobecomeaspeaker" = "申请成为主播";
 "Demo.TRTC.Salon.raisedhandandwaitmanageraccept" = "举手成功！等待管理员通过~";
-"Demo.TRTC.Salon.surewanttoleaveroom" = "确认离开房间吗";
+"Demo.TRTC.Salon.surewanttoleaveroom" = "确认离开房间吗？";
 "Demo.TRTC.Salon.audienceconfirm" = "确认";
-"Demo.TRTC.Salon.waitabit" = "再等等";
+"Demo.TRTC.Salon.waitabit" = "取消";
 "Demo.TRTC.Salon.waitinghostconsent" = "正在等待房主同意";
 "Demo.TRTC.Salon.failedsenthandupmessage" = "举手信息发送失败：";
 "Demo.TRTC.Salon.movetotheaudience" = "要求下麦";
@@ -379,7 +379,7 @@
 "ASKit.MainMenu.VoiceChangeTitle" = "变声";
 "ASKit.MainMenu.Reverberation" = "混响";
 
-"ASKit.MusicSelectMenu.Title" = "背景音乐";
+"ASKit.MusicSelectMenu.Title" = "音乐试听";
 
 "ASKit.MenuItem.Surround sound test 1" = "环绕声测试1";
 "ASKit.MenuItem.Surround sound test 2" = "环绕声测试2";

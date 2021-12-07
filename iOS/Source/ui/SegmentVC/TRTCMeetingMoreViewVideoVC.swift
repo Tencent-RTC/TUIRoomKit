@@ -32,7 +32,7 @@ class TRTCMeetingBitrateTable : NSObject {
 class TRTCMeetingMoreViewVideoVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     let TAG_RESOLUTION = 100
     let TAG_FPS = 200
-    
+    weak var resolutionAlert:TRTCMeetingResolutionAlert?
     var resolutionTextField = UITextField()
     var fpsTextField = UITextField()
     
@@ -150,7 +150,7 @@ class TRTCMeetingMoreViewVideoVC: UIViewController, UIPickerViewDelegate, UIPick
     var frameIndex = 0
 
     @objc func resolutionDidClick() {
-        guard let window = UIApplication.shared.windows.first else {
+        guard let window = ((self.view.window != nil) ? self.view.window : UIApplication.shared.windows.first) else {
             return
         }
         let alert = TRTCMeetingResolutionAlert()
@@ -167,10 +167,11 @@ class TRTCMeetingMoreViewVideoVC: UIViewController, UIPickerViewDelegate, UIPick
             self.updateResolution(index: index)
             alert.dismiss()
         }
+        resolutionAlert = alert
     }
     
     @objc func frameDidClick() {
-        guard let window = UIApplication.shared.windows.first else {
+        guard let window = ((self.view.window != nil) ? self.view.window : UIApplication.shared.windows.first) else {
             return
         }
         
@@ -335,6 +336,10 @@ class TRTCMeetingMoreViewVideoVC: UIViewController, UIPickerViewDelegate, UIPick
     //点击空白处隐藏编辑状态
     @objc func hideKeyboard(tapG:UITapGestureRecognizer){
         self.view.endEditing(true)
+    }
+    
+    deinit {
+        resolutionAlert?.dismiss()
     }
 }
 

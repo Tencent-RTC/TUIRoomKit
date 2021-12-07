@@ -70,7 +70,7 @@
 "Demo.TRTC.LiveRoom.accompanimentvolume" = "Music Volume";
 "Demo.TRTC.LiveRoom.vocalvolume" = "Voice Volume";
 "Demo.TRTC.LiveRoom.accompanimentfastforward" = "Fast Forward Music";
-"Demo.TRTC.LiveRoom.interactioninprogress" = "Are you sure you want to exit the live stream?";
+"Demo.TRTC.LiveRoom.interactioninprogress" = "The room will close after you leave. Leave?";
 "Demo.TRTC.LiveRoom.joininteraction" = "joined the live stream";
 "Demo.TRTC.LiveRoom.exitinteraction" = "exited the live stream";
 "Demo.TRTC.LiveRoom.clicklike" = "gave a like";
@@ -98,8 +98,8 @@
 // TODO: 文档第 90 行字符未使用，需要确认
 "Demo.TRTC.LiveRoom.prompt" = "Information";
 "Demo.TRTC.LiveRoom.xxinitiateamicconnectionreq" = "xxx requested to co-anchor";
-"Demo.TRTC.LiveRoom.accept" = "Accept";
-"Demo.TRTC.LiveRoom.refuse" = "Decline";
+"Demo.TRTC.LiveRoom.accept" = "Confirm";
+"Demo.TRTC.LiveRoom.refuse" = "Cancel";
 "Demo.TRTC.LiveRoom.refusemicconnectionreq" = "The anchor declined your request to co-anchor.";
 "Demo.TRTC.LiveRoom.xxmicconnectiontimeout" = "Co-anchoring by xxx timed out.";
 "Demo.TRTC.LiveRoom.dealmicconnectionreqtimeout" = "Co-anchoring request handling timed out.";
@@ -172,7 +172,7 @@
 "Demo.TRTC.VoiceRoom.saysomething" = "Send a message";
 "Demo.TRTC.Salon.close" = "Hide";
 "Demo.TRTC.VoiceRoom.exit" = "Exit";
-"Demo.TRTC.VoiceRoom.isvoicingandsuretoexit" = "Are you sure you want to exit the live stream?";
+"Demo.TRTC.VoiceRoom.isvoicingandsuretoexit" = "The room will close after you leave. Leave?";
 "Demo.TRTC.Salon.roomid" = "Room ID";
 "Demo.TRTC.Salon.seatmuted" = "Muted by room owner";
 "Demo.TRTC.Salon.seatunmuted" = "Unmuted by room owner";
@@ -302,7 +302,7 @@
 "Demo.TRTC.Salon.dismiss" = "Dismiss";
 "Demo.TRTC.Salon.appliestobecomeaspeaker" = "applies to become a speaker";
 "Demo.TRTC.Salon.raisedhandandwaitmanageraccept" = "You raised your hand! We'll let the speakers know you want to talk~";
-"Demo.TRTC.Salon.surewanttoleaveroom" = "You want to leave the room?";
+"Demo.TRTC.Salon.surewanttoleaveroom" = "Are you sure you want to leave?";
 "Demo.TRTC.Salon.audienceconfirm" = "Confirm";
 "Demo.TRTC.Salon.waitabit" = "Wait a bit";
 "Demo.TRTC.Salon.waitinghostconsent" = "waiting for host's consent";
@@ -337,7 +337,7 @@
 "ASKit.MainMenu.VoiceChangeTitle" = "Voice changing";
 "ASKit.MainMenu.Reverberation" = "Reverb";
 
-"ASKit.MusicSelectMenu.Title" = "Background music";
+"ASKit.MusicSelectMenu.Title" = "Music";
 
 "ASKit.MenuItem.Surround sound test 1" = "Surround sound test 1";
 "ASKit.MenuItem.Surround sound test 2" = "Surround sound test 2";

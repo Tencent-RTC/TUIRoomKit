@@ -2,7 +2,7 @@ Pod::Spec.new do |spec|
  spec.name			= 'TUIMeeting'
  spec.version		= '1.0.0'
  spec.platform		= :ios
- spec.ios.deployment_target = '12.0'
+ spec.ios.deployment_target = '11.0'
  spec.license		= { :type => 'Proprietary',
  	:text => <<-LICENSE
  	  copyright 2017 tencent Ltd. All rights reserved.
