@@ -13,7 +13,6 @@ import com.tencent.imsdk.v2.V2TIMGroupMemberInfo;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.imsdk.v2.V2TIMSDKConfig;
-import com.tencent.imsdk.v2.V2TIMSDKListener;
 import com.tencent.imsdk.v2.V2TIMSimpleMsgListener;
 import com.tencent.imsdk.v2.V2TIMUserFullInfo;
 import com.tencent.imsdk.v2.V2TIMUserInfo;
@@ -83,20 +82,7 @@ public class TXRoomService implements ITXRoomService {
         if (!mIsInitIMSDK) {
             V2TIMSDKConfig config = new V2TIMSDKConfig();
             config.setLogLevel(V2TIMSDKConfig.V2TIM_LOG_DEBUG);
-            mIsInitIMSDK = V2TIMManager.getInstance().initSDK(mContext, sdkAppId, config, new V2TIMSDKListener() {
-                @Override
-                public void onConnecting() {
-                }
-
-                @Override
-                public void onConnectSuccess() {
-                }
-
-                @Override
-                public void onConnectFailed(int code, String error) {
-                    TRTCLogger.e(TAG, "init im sdk error.");
-                }
-            });
+            mIsInitIMSDK = V2TIMManager.getInstance().initSDK(mContext, sdkAppId, config);
 
             if (!mIsInitIMSDK) {
                 TRTCLogger.e(TAG, "init im sdk error.");
@@ -107,21 +93,14 @@ public class TXRoomService implements ITXRoomService {
             }
         }
         // 登陆到 IM
-        String loginedUserId = V2TIMManager.getInstance().getLoginUser();
-        if (loginedUserId != null && loginedUserId.equals(userId)) {
+        String loggedUserId = V2TIMManager.getInstance().getLoginUser();
+        if (loggedUserId != null && loggedUserId.equals(userId)) {
             // 已经登录过了
             mIsLogin = true;
             mSelfUserId = userId;
             TRTCLogger.i(TAG, "login im success.");
             if (callback != null) {
                 callback.onCallback(0, "login im success.");
-            }
-            return;
-        }
-        if (isLogin()) {
-            TRTCLogger.e(TAG, "start login fail, you have been login, can't login twice.");
-            if (callback != null) {
-                callback.onCallback(CODE_ERROR, "start login fail, you have been login, can't login twice.");
             }
             return;
         }
@@ -163,6 +142,8 @@ public class TXRoomService implements ITXRoomService {
             return;
         }
 
+        mIsLogin = false;
+        mSelfUserId = "";
         V2TIMManager.getInstance().logout(new V2TIMCallback() {
             @Override
             public void onError(int i, String s) {
@@ -174,8 +155,6 @@ public class TXRoomService implements ITXRoomService {
 
             @Override
             public void onSuccess() {
-                mIsLogin = false;
-                mSelfUserId = "";
                 TRTCLogger.i(TAG, "logout im success.");
                 if (callback != null) {
                     callback.onCallback(0, "login im success.");

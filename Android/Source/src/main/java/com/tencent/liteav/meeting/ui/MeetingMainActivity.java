@@ -156,7 +156,7 @@ public class MeetingMainActivity extends AppCompatActivity implements TRTCMeetin
 
     // 首次TRTC打开摄像头提示"Demo特别配置了无限期云端存储"
     private void checkNeedShowSecurityTips() {
-        if (UserModelManager.getInstance().needShowSecurityTips()) {
+        if (UserModelManager.getInstance().needShowSecurityTips() && !isFinishing()) {
             AlertDialog.Builder normalDialog = new AlertDialog.Builder(this);
             normalDialog.setMessage(getResources().getString(R.string.trtcmeeting_first_enter_room_tips));
             normalDialog.setCancelable(false);
