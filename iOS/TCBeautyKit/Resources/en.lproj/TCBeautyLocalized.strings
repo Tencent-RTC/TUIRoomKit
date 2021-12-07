@@ -55,15 +55,15 @@
 "TC.BeautySettingPanel.ToothWhiten" = "Teeth whitening";
 "TC.BeautySettingPanel.WrinkleRemove" = "Wrinkle-removal";
 "TC.BeautySettingPanel.PounchRemove" = "Eye bag removal";
-"TC.BeautySettingPanel.SmileLinesRemove" = "Smile Lines Removal";
+"TC.BeautySettingPanel.SmileLinesRemove" = "Smile line removal";
 "TC.BeautySettingPanel.Forehead" = "Hairline";
-"TC.BeautySettingPanel.EyeDistance" = "Eye Distance";
+"TC.BeautySettingPanel.EyeDistance" = "Eye distance";
 "TC.BeautySettingPanel.EyeAngle" = "Eye corners";
-"TC.BeautySettingPanel.MouthShape" = "Mouth Shape";
-"TC.BeautySettingPanel.NoseWing" = "Nose Wing";
-"TC.BeautySettingPanel.NosePosition" = "Nose Position";
-"TC.BeautySettingPanel.LipsThickness" = "Lips Thickness";
-"TC.BeautySettingPanel.FaceBeauty" = "Face Beauty";
+"TC.BeautySettingPanel.MouthShape" = "Mouth shape";
+"TC.BeautySettingPanel.NoseWing" = "Nose wing";
+"TC.BeautySettingPanel.NosePosition" = "Nose position";
+"TC.BeautySettingPanel.LipsThickness" = "Lip thickness";
+"TC.BeautySettingPanel.FaceBeauty" = "Face shape";
 // new
 "TC.BeautySettingPanel.Confirm" = "Confirm";
 "TC.BeautySettingPanel.Cancel" = "Cancel";
@@ -75,7 +75,7 @@
 "TC.BeautySettingPanel.Style" = "Style";
 "TC.BeautySettingPanel.Beauty" = "Beauty";
 "TC.BeautySettingPanel.Filter" = "Filter";
-"TC.BeautySettingPanel.Dynamic effect" = "Dynamic effect";
+"TC.BeautySettingPanel.Dynamic effect" = "Animated Effect";
 "TC.BeautySettingPanel.Blend Pic" = "Blend Pic";
 "TC.BeautySettingPanel.Green screen" = "Green screen";
 "TC.BeautySettingPanel.Face beauty" = "Face beauty";

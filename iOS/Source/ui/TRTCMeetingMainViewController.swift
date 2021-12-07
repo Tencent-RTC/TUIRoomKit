@@ -167,6 +167,7 @@ class TRTCMeetingMainViewController: UIViewController, TRTCMeetingDelegate,
     }
     
     deinit {
+        moreSettingVC.presentBottomShouldHide()
         UIApplication.shared.isIdleTimerDisabled = false
         debugPrint("deinit \(self)")
     }
