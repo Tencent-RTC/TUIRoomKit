@@ -1,0 +1,66 @@
+QCheckBox, QToolButton, QPushButton, QProgressBar, QRadioButton {
+	font-size: 14px;
+	font-family: "Microsoft YaHei";
+}
+QPushButton#close_btn {
+	border-image : url(:/MainWindow/MainWindow/close_h.png);
+}
+QPushButton#close_btn:hover {
+	border-image: url(:/MainWindow/MainWindow/close.png)
+}
+
+QPushButton#btn_language {
+	background: transparent;
+	color: white;
+}
+QPushButton#btn_language:hover, QPushButton#btn_language:pressed {
+	background:transparent ;
+	color: #FFA500;
+}
+
+QWidget#background_widget {
+	border-image : url(:/LoginViewController/LoginViewController/login.png);
+	background : white;
+}
+
+QPushButton#enter_room_btn, QPushButton#enter_room_btn:pressed {
+	border : 1px solid #2F79FF;
+	color : white;
+	background-color: #2F79FF;
+	font-size : 16px;
+	border-radius :16px;
+}
+QPushButton#enter_room_btn:hover {
+	background-color: #0A64FF;
+    border-color: #0A64FF;
+	color: #FFFFFF;
+}
+QPushButton#enter_room_btn:disabled {
+    color: 	#D2D2D2;
+}
+
+QLabel {
+	color: #6D727D;
+	font-family :"Microsoft YaHei";
+	font-size: 18px;
+}
+
+QLineEdit {
+	border: 0px solid transparent;
+	outline: none;
+	color : #6D727D;
+	font-family: "Microsoft YaHei";
+	font-size: 18px;
+}
+
+QWidget#room_id_widget {
+	border : 1px solid #0069FF;
+	background: white;
+	border-radius : 4px;
+}
+
+QWidget#name_widget {
+	border : 1px solid #0069FF;
+	background: white;
+	border-radius : 4px;
+}
