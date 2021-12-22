@@ -1,0 +1,35 @@
+QLabel, QCheckBox, QComboBox, QLineEdit, QToolButton, QPushButton, QProgressBar, QRadioButton {
+	font-size: 14px;
+	font-family: "Microsoft YaHei";
+}
+QWidget {
+	background: transparent;
+}
+[ver_direction=true] QWidget#pop_widget {
+	background-color: qlineargradient(spread:pad, x1:0, y1:0.960091, x2:0.975, y2:0.949, stop:0 rgba(23, 33, 50, 255), stop:1 rgba(0, 0, 0, 255));
+}
+[ver_direction=false] QWidget#pop_widget {
+	background-color: qlineargradient(spread:pad, x1:0.96, y1:0.0112273, x2:0.97, y2:0.960364, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(23, 33, 50, 255));
+}
+[ver_direction=true] QWidget#stage_list {
+	background-color: qlineargradient(spread:pad, x1:0, y1:0.960091, x2:0.975, y2:0.949, stop:0 rgba(23, 33, 50, 255), stop:1 rgba(0, 0, 0, 255));
+}
+[ver_direction=false] QWidget#stage_list {
+	background-color: qlineargradient(spread:pad, x1:0.96, y1:0.0112273, x2:0.97, y2:0.960364, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(23, 33, 50, 255));
+}
+
+QPushButton#previous_page_left {
+	border-image : url(:/StageListController/StageListViewControl/left.png);
+}
+
+QPushButton#next_page_right {
+	border-image : url(:/StageListController/StageListViewControl/right.png);
+}
+
+QPushButton#previous_page_up {
+	border-image : url(:/StageListController/StageListViewControl/up.png);
+}
+
+QPushButton#next_page_down {
+	border-image : url(:/StageListController/StageListViewControl/down.png);
+}

@@ -1,0 +1,16 @@
+QLabel, QCheckBox, QComboBox, QLineEdit, QToolButton, QPushButton, QProgressBar, QRadioButton {
+	font-size: 14px;
+	font-family: "Microsoft YaHei";
+}
+QLabel#background_label {
+	border-image:url(:/VideoRenderView/VideoRenderView/background.png);
+}
+
+QWidget#background_widget {
+    background-color : #0C0F1A;
+}
+
+QWidget#widget_back {
+	border : 1px solid rgb(94, 97, 102);
+	border-radius:5px
+}
