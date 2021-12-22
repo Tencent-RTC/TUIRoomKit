@@ -34,9 +34,9 @@
 
 ## 文档资源
 
-| iOS                                                          | Android                                                      | Windows |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ------- |
-| [多人视频会议（iOS）](https://cloud.tencent.com/document/product/647/45681) | [多人视频会议（Android）](https://cloud.tencent.com/document/product/647/45667) | [多人音视频房间(Windows)](https://cloud.tencent.com/document/product/647/63494) |
+| iOS                                                          | Android                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [多人视频会议（iOS）](https://cloud.tencent.com/document/product/647/45681) | [多人视频会议（Android）](https://cloud.tencent.com/document/product/647/45667) |
 ## 其他
 
 ### 交流&反馈
