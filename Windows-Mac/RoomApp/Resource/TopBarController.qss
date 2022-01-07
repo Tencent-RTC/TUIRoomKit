@@ -1,0 +1,49 @@
+QLabel, QLineEdit, QToolButton, QPushButton, QProgressBar, QRadioButton {
+    border: none;
+    background: transparent;
+	color: white;
+	font-size: 14px;
+	font-family: "Microsoft YaHei";
+}
+QToolTip {
+	font-size: 13px;
+}
+QWidget#widget_bg {
+	background-color: rgb(23, 28, 43);
+}
+
+QPushButton#btn_switch_layout {
+	border-image:url(:/TopBarController/MainWindow/switch_layout.png);
+}
+QPushButton#btn_switch_layout:hover {
+	border-image: url(:/TopBarController/MainWindow/switch_layout_h.png);
+}
+QPushButton#btn_switch_layout:pressed {
+	border-image: url(:/TopBarController/MainWindow/switch_layout_h.png);
+}
+
+QPushButton#btn_roomInfo {
+	border-image: url(:/RoomTipsView/RoomTipsView/info.png);
+}
+QPushButton#btn_roomInfo:hover, QPushButton#btn_roomInfo:pressed {
+	border-image: url(:/RoomTipsView/RoomTipsView/info_hover.png);
+}
+
+QFrame#line {
+	border-top: 1px solid gray;
+	background-color: gray;
+}
+QPushButton#btn_ShowDebugInfo {
+	color: white;
+	background-color: transparent;
+	border-image: url(:/SettingView/SettingViewController/switch_off.png);
+}
+QPushButton#btn_ShowDebugInfo:checked {
+	border-image: url(:/SettingView/SettingViewController/switch_on.png);
+}
+QPushButton#btn_ShowDebugInfo:checked:hover {
+	border-image: url(:/SettingView/SettingViewController/switch_on_hover.png);
+}
+QPushButton#btn_ShowDebugInfo:!checked:hover {
+	border-image: url(:/SettingView/SettingViewController/switch_off_hover.png);
+}
