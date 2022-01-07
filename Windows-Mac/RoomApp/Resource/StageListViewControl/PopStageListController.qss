@@ -1,0 +1,50 @@
+QLabel, QCheckBox, QComboBox, QLineEdit, QToolButton, QPushButton, QProgressBar, QRadioButton {
+	font-size: 14px;
+	font-family: "Microsoft YaHei";
+}
+QWidget#PopStageListController, QWidget#widget_bg {
+	background: rgb(22,32,49);
+	border: 1px solid rgb(94, 97, 102);
+}
+QWidget#widget_content {
+	background-color: qlineargradient(spread:pad, x1:0, y1:0.960091, x2:0.975, y2:0.949, stop:0 rgba(23, 33, 50, 255), stop:1 rgba(0, 0, 0, 255));
+}
+
+QPushButton#previous_page_left {
+	border-image : url(:/StageListController/StageListViewControl/left.png);
+}
+
+QPushButton#next_page_right {
+	border-image : url(:/StageListController/StageListViewControl/right.png);
+}
+
+QPushButton#previous_page_up {
+	border-image : url(:/StageListController/StageListViewControl/up.png);
+}
+
+QPushButton#next_page_down {
+	border-image : url(:/StageListController/StageListViewControl/down.png);
+}
+QPushButton#btn_min {
+	border-image: url(:/MainWindow/MainWindow/min.png)
+}
+QPushButton#btn_min:hover {
+	border-image: url(:/MainWindow/MainWindow/min_h.png)
+}
+QPushButton#btn_min:pressed {
+	border-image: url(:/MainWindow/MainWindow/min_h.png)
+}
+
+QPushButton#btn_max {
+	border-image : url(:/LoginViewController/LoginViewController/max.png);
+}
+QLabel {
+	color:white;
+}
+QPushButton#btn_collapse {
+	border-image: url(:/StageListController/StageListViewControl/collapse.png);
+}
+QPushButton#btn_collapse:hover {
+	border-image: url(:/StageListController/StageListViewControl/collapse_h.png);
+}
+

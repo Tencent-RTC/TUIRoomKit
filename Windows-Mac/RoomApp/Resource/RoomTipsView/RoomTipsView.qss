@@ -1,0 +1,16 @@
+QLabel, QLineEdit, QToolButton, QPushButton, QProgressBar, QRadioButton {
+    border: none;
+    background: transparent;
+	color: white;
+	font-size: 14px;
+	font-family: "Microsoft YaHei";
+}
+QWidget#widget_bg {
+	background-color: rgb(28, 33, 49);
+}
+QPushButton#btn_clipboard {
+	border-image:url(:/RoomTipsView/RoomTipsView/copy.png);
+}
+QPushButton#btn_clipboard:hover {
+	border-image:url(:/RoomTipsView/RoomTipsView/copy_hover.png);
+}
