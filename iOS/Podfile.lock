@@ -25,9 +25,9 @@ PODS:
   - TXLiteAVSDK_TRTC (9.4.10918)
 
 DEPENDENCIES:
-  - TCBeautyKit (from `TCBeautyKit/`)
+  - TCBeautyKit (from `../TCBeautyKit/`)
   - TUIMeeting/TRTC (from `./`)
-  - TXAppBasic (from `TXAppBasic/`)
+  - TXAppBasic (from `../TXAppBasic/`)
   - TXLiteAVSDK_TRTC
 
 SPEC REPOS:
@@ -44,11 +44,11 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   TCBeautyKit:
-    :path: TCBeautyKit/
+    :path: "../TCBeautyKit/"
   TUIMeeting:
     :path: "./"
   TXAppBasic:
-    :path: TXAppBasic/
+    :path: "../TXAppBasic/"
 
 SPEC CHECKSUMS:
   Alamofire: f3b09a368f1582ab751b3fff5460276e0d2cf5c9
@@ -64,6 +64,6 @@ SPEC CHECKSUMS:
   TXIMSDK_Plus_iOS: 4b7c1097ea9899f7bf95fa90e2cb4471389f93dd
   TXLiteAVSDK_TRTC: afb4dfb50cf544505c748760fc97355e6927faec
 
-PODFILE CHECKSUM: 1b304cdf1462713026c1e1d784e2f7e80093b20e
+PODFILE CHECKSUM: 9818c070f257fc07c1211854b62186f4b7896fbc
 
 COCOAPODS: 1.11.2
