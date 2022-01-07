@@ -21,7 +21,7 @@ android {
 
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
-    api rootProject.ext.liteavSdk
+    api(name: 'LiteAVSDK_Enterprise', ext: 'aar')
     api "com.google.code.gson:gson:$GSON_VERSION"
     api 'com.google.android.material:material:1.0.0'
 }

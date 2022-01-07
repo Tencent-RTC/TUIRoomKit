@@ -5,7 +5,7 @@
     <string name="beauty_close">Close</string>
     <string name="beauty_strength">Strength</string>
     <string name="beauty_setup">Beauty Setup</string>
-    <string name="beauty_common_none">None</string>
+    <string name="beauty_common_none">Clear</string>
     <string name="beauty_palm_out">Palm out</string>
 
     <string name="beauty_setting_panel_style">Style</string>
@@ -31,7 +31,7 @@
     <string name="beauty_panel_faceshort">Face shortening</string>
     <string name="beauty_panel_noseslim">Nose slimming</string>
     <string name="beauty_panel_eyelighten">Eye brightening</string>
-    <string name="beauty_panel_toothwhite">Tooth whitening</string>
+    <string name="beauty_panel_toothwhite">Teeth whitening</string>
     <string name="beauty_panel_pounchremove">Eye bag removal</string>
     <string name="beauty_panel_smilelinesremove">Smile lines removal</string>
     <string name="beauty_panel_wrinkleremove">Wrinkle-removal</string>
@@ -41,7 +41,7 @@
     <string name="beauty_panel_mouthshape">Mouth shape</string>
     <string name="beauty_panel_nosewing">Nose wing</string>
     <string name="beauty_panel_noseposition">Nose position</string>
-    <string name="beauty_panel_mousewidth">Lip thickness</string>
+    <string name="beauty_panel_mousewidth">Lip Thickness</string>
     <string name="beauty_panel_faceshape">Face Beauty</string>
 
     <string name="beauty_panel_filter_standard">Standard</string>
