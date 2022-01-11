@@ -90,3 +90,10 @@ FORMS += ../Common/Form/TXMessageBox.ui \
     ./App/Form/TransferUserItem.ui
 	
 RESOURCES += Resource/RoomApp.qrc
+
+win32{
+    HEADERS +=../utils/BugReport/crash_dump.h \
+              ../utils/usersig/win/GenerateTestUsersig.h
+    SOURCES +=../utils/BugReport/crash_dump.cc \
+              ../utils/usersig/win/GenerateTestUsersig.cpp
+}
