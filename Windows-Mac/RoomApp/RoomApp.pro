@@ -41,10 +41,25 @@ QMAKE_CFLAGS_RELEASE   = $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
 QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS_RELEASE_WITH_DEBUGINFO
 QMAKE_LFLAGS_RELEASE   = $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
 
+win32{
+INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win32/include/
+INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win32/include/TRTC
+INCLUDEPATH += $$PWD/../SDK/ImSDK/Win/include/
+INCLUDEPATH += $$PWD/../utils/BugReport/
+INCLUDEPATH += $$PWD/3rdParty/zlib/include/
+INCLUDEPATH += $$PWD/../utils/usersig/win/include
+DEPENDPATH += $$PWD/../utils/usersig/win/include
+
+LIBS += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win32/lib/liteav.lib \
+        $$PWD/../SDK/ImSDK/Win/lib/Win32/imsdk.lib \
+        $$PWD/3rdParty/zlib/x86/zlibstatic.lib
+LIBS += -lgdi32 -luser32
+}
+
 macx {
 QMAKE_INFO_PLIST += Info.plist
 
-# ÃÌº”ø‚“¿¿µ
+# Ê∑ªÂä†Â∫ì‰æùËµñ
 LIBS += "-F$$PWD/../utils/usersig/mac"
 LIBS += "-F$$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac"
 LIBS += "-F$$PWD/../SDK/ImSDK/Mac"
@@ -57,11 +72,11 @@ LIBS += -lresolv
 #without c++11 & AppKit library compiler can't solve address for symbols
 LIBS += -framework AppKit
 
-# ÃÌº”TXLiteAVSDK_TRTC_Mac.frameworkÕ∑Œƒº˛
+# Ê∑ªÂä†TXLiteAVSDK_TRTC_Mac.frameworkÂ§¥Êñá‰ª∂
 INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXLiteAVSDK_TRTC_Mac.framework/Headers/cpp_interface
 INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXLiteAVSDK_TRTC_Mac.framework/Headers
 
-# ÃÌº”ImSDKForMac.frameworkÕ∑Œƒº˛
+# Ê∑ªÂä†ImSDKForMac.frameworkÂ§¥Êñá‰ª∂
 INCLUDEPATH += $$PWD/../SDK/ImSDK/Mac/ImSDKForMac_CPP.framework/Headers
 
 macx: LIBS += -L$$PWD/../utils/usersig/mac -lTXLiteAVTestUserSig
