@@ -1,0 +1,46 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '11.0'
+source 'https://github.com/CocoaPods/Specs.git'
+
+# UI库
+def ui
+  pod 'SnapKit'
+  pod 'Kingfisher'
+  pod 'Toast-Swift'
+end
+
+# 工具库
+def tool
+  pod 'Alamofire'
+end
+
+# 本地依赖库
+def local
+  pod 'TXAppBasic', :path => "../LocalSpecLib/TXAppBasic/"
+  pod 'TCBeautyKit', :path => "../LocalSpecLib/TCBeautyKit/"
+  pod 'TXLiteAVSDK_TRTC',:path => "../LocalSpecLib/"
+end
+
+def pod_local(type)
+  loadLocalPod('TUIRoom', type)
+end
+
+def loadLocalPod(name, type)
+    pod "#{name}/#{type}", :path => "../"
+end
+
+target 'DemoApp' do
+  use_frameworks!
+  ui
+  tool
+  local
+  pod_local('TRTC')
+end
+
+post_install do |installer|
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['ENABLE_BITCODE'] = 'NO'
+      end
+    end
+end
