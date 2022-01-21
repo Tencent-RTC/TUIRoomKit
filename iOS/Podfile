@@ -1,8 +1,0 @@
-
-target 'TUIMeetingApp' do
- use_frameworks!
- pod 'TXAppBasic', :path => "TXAppBasic/"
- pod 'TCBeautyKit', :path => "TCBeautyKit/"
- pod 'TXLiteAVSDK_TRTC'
- pod 'TUIMeeting', :path => "./", :subspecs => ["TRTC"]
-end

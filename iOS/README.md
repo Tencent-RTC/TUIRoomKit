@@ -3,20 +3,18 @@
 ## 目录结构
 	
 ```
-TUIMeeting
-├─ App              // 视频会议主页UI代码以及用到的图片及国际化字符串资源文件夹
-├─ Debug            // 工程调试运行所需的关键业务代码文件夹
-├─ LoginMock        // 登录UI及业务逻辑代码文件夹
-├─ Resources        // 视频会议功能所需的图片、国际化字符串资源文件夹
-├─ Source           // 视频会议播核心业务逻辑代码文件夹
-├─ TCBeautyKit      // 美颜功能核心组件
-└─ TXAppBasic       // 工程依赖的基础组件
+TUIRoom
+├─ Example              // 工程模块，主要提供 TUIRoom 的测试页面
+├─ LocalSpecLib         // 依赖的本地库
+├─ Resources            // TUIRoom 中所用的资源文件
+├─ Source               // TUIRoom 组件的逻辑封装
+└─ TUIRoom.podspec      // TUIRoom 组件 pod 接入文件
 
 ```
 	
 ## 环境准备
 - Xcode 11.0及以上版本
-- 最低支持系统：iOS 13.0
+- 最低支持系统：iOS 12.0
 - 请确保您的项目已设置有效的开发者签名
 	
 ## 运行示例
@@ -27,7 +25,7 @@ TUIMeeting
 ### 申请 SDKAPPID 和 SECRETKEY
 1. 登录实时音视频控制台，选择【开发辅助】>【[快速跑通Demo](https://console.cloud.tencent.com/trtc/quickstart)】。
 2. 单击【立即开始】，输入您的应用名称，例如`TestTRTC`，单击【创建应用】。
-<img src="https://main.qcloudimg.com/raw/169391f6711857dca6ed8cfce7b391bd.png" width="650" height="295"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/45fe6938bb28349458c3b6d2ad0549ff.png" width="650"/>
 3. 创建应用完成后，单击【我已下载，下一步】，可以查看 SDKAppID 和密钥信息。
 
 ### 集成SDK
@@ -35,8 +33,8 @@ TUIMeeting
 2. SDK集成方式默认使用`Cocoapods`，工程目录下`Podfile`文件内已帮您添加了SDK的依赖`pod 'TXLiteAVSDK_TRTC'`，您只需要打开终端进入到工程目录下执行`pod install`，SDK就会自动集成。
 
 ### 配置工程文件
-1. 使用Xcode(11.0及以上)打开源码工程`TUIMeetingApp.xcworkspace`。
-2. 工程内找到`TUIMeeting/Debug/GenerateTestUserSig.swift`文件 。
+1. 使用Xcode(11.0及以上)打开源码工程`TUIRoomApp.xcworkspace`。
+2. 工程内找到`TUIRoom/Debug/GenerateTestUserSig.swift`文件 。
 3. 设置`GenerateTestUserSig.swift`文件中的相关参数：
 <ul>
 <li>SDKAPPID：默认为 0 ，请设置为实际申请的SDKAPPID。</li>
@@ -51,30 +49,46 @@ TUIMeeting
 
 ### 运行 App
 
-使用 Xcode（11.0及以上的版本）打开源码工程 `TUIMeeting/TUIMeetingApp.xcworkspace`，单击【运行】即可开始调试本 App。
+使用 Xcode（11.0及以上的版本）打开源码工程 `TUIRoom/Example/DemoApp.xcworkspace`，单击【运行】即可开始调试本 App。
 
 ### 体验应用（**体验应用至少需要两台设备**）
 #### 用户 A
 
 步骤1、输入用户名(<font color=red>请确保用户名唯一性，不能与其他用户重复</font>)，如图示：
 
-<img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/user_a_ios.png" width="320"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/1414c36436df13a0366b59f22024a23c.png" width="320"/>
 
-步骤2、输入会议号，点击进入会议，如下图示：
+步骤2、点击“创建房间”，如下图示：
 
-<img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/tuimeeting_enter_room_ios.png" width="320"/>
+<table>
+<tr>
+<td><img src="https://qcloudimg.tencent-cloud.cn/raw/85ab7ea0a66aba5b9ddf23594bf04ea0.png" width="320"/></td>
+<td><img src="https://qcloudimg.tencent-cloud.cn/raw/b36383baff761bdaf26da5f191902800.png" width="320"/></td>
+</tr>
+</table>
 
-步骤3、输入房间主题，点击开始交谈；
+步骤3、进入房间后，复制房间号给“用户B”，待进入后就可以开始聊天了；
+
+<img src="https://qcloudimg.tencent-cloud.cn/raw/5f8b51e76d044c03af9e579a66fcaa1a.png" width="320"/>
 
 #### 用户 B
 
 步骤1、输入用户名(<font color=red>请确保用户名唯一性，不能与其他用户重复</font>)，如图示：
 
-<img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/user_b_ios.png" width="320"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/2119f9db193a76f3aad4a770e473b59e.png" width="320"/>
 
-步骤2、输入用户 A 创建的会议号，点击加入会议；
+步骤2、点击“加入房间”，输入用户 A 创建的房间号，加入房间；
 
-<img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/tuimeeting_enter_room_ios.png" width="320"/>
+<table>
+<tr>
+<td><img src="https://qcloudimg.tencent-cloud.cn/raw/0349a16cf0f442016d1262d602327a67.png" width="320"/></td>
+<td><img src="https://qcloudimg.tencent-cloud.cn/raw/a5f86a91670b56ed39bb40d6d4ea0d24.png" width="320"/></td>
+</tr>
+</table>
+
+步骤3、进入房间后，就可以开始聊天了；
+
+<img src="https://qcloudimg.tencent-cloud.cn/raw/10d10b336d262f004cf9571ef92056f4.png" width="320"/>
 
 ## 常见问题
 #### 1. 查看密钥时只能获取公钥和私钥信息，该如何获取密钥？
@@ -101,7 +115,7 @@ TRTC SDK 6.6 版本（2019年08月）开始启用新的签名算法 HMAC-SHA256�
 #### 2. 两台手机同时运行工程，为什么看不到彼此的画面？
 请确保两台手机在运行工程时使用的是不同的 UserID，TRTC 不支持同一个 UserID （除非 SDKAppID 不同）在两个终端同时使用。
 
-<img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/login_userid_ios.png" width="320"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/66f0acbe733d8ed4a8829f84d23c1813.png" width="320"/>
 
 #### 3. 防火墙有什么限制？
 由于 SDK 使用 UDP 协议进行音视频传输，所以在对 UDP 有拦截的办公网络下无法使用。如遇到类似问题，请参考 [应对公司防火墙限制](https://cloud.tencent.com/document/product/647/34399) 排查并解决。

@@ -1,0 +1,72 @@
+//
+//  TUIRoomLocalized.strings
+//  TUIRoom
+//
+//  Created by WesleyLei on 2021/12/15.
+//  Copyright © 2021 Tencent. All rights reserved.
+//
+
+"TUIRoom.create.title" = "多人音视频房间";
+"TUIRoom.create.room" = "创建房间";
+"TUIRoom.quick.join" = "加入房间";
+"TUIRoom.room.num" = "房间号";
+"TUIRoom.open.camera" = "开启摄像头";
+"TUIRoom.open.mic" = "开启麦克风";
+"TUIRoom.not.login.toast" = "请登录";
+"TUIRoom.input.room.num" = "请输入房间号";
+"TUIRoom.input.error.room.num.toast" = "请输入正确房间号";
+"TUIRoom.logout.room" = "退出房间";
+"TUIRoom.sure.destroy.room" = "你确定要解散房间吗？";
+"TUIRoom.sure.leave.room" = "你确定要离开房间吗？";
+"TUIRoom.destroy.room.ok" = "解散房间";
+"TUIRoom.destroy.room.cancel" = "再等等";
+"TUIRoom.ok" = "确定";
+"TUIRoom.cancel" = "取消";
+"TUIRoom.logout.member.list" = "成员列表";
+"TUIRoom.Beauty.Setup.Strength" = "强度";
+"TUIRoom.Beauty.Setup" = "美颜设置";
+"TUIRoom.resolution" = "分辨率";
+"TUIRoom.room.destroy" = "房间已被销毁";
+"TUIRoom.all.stop.picture" = "全体禁画";
+"TUIRoom.all.open.picture" = "解除全体禁画";
+"TUIRoom.all.mute" = "全体静音";
+"TUIRoom.all.unmute" = "解除全体静音";
+"TUIRoom.kick.off.title" = "你已经被主持人移除";
+"TUIRoom.kick.off.error.toast" = "xxx被移除失败";
+"TUIRoom.suer.kick.off.xxx" = "你确定要移除\"xxx\"吗？";
+"TUIRoom.mute.audio.mute.error.toast" = "针对\"xxx\"设置麦克风失败";
+"TUIRoom.mute.video.mute.error.toast" = "针对\"xxx\"设置摄像头失败";
+"TUIRoom.mute.audio.success.toast" = "解除禁音成功";
+"TUIRoom.mute.video.success.toast" = "解除禁画成功";
+"TUIRoom.user.name" = "用户名";
+"TUIRoom.copy.success" = "房间号复制成功";
+"TUIRoom.homeowners.notice.camera.turned.off" = "您已被关闭摄像头";
+"TUIRoom.homeowners.notice.camera.turned.on" = "主持人解禁了你的摄像头";
+"TUIRoom.homeowners.notice.microphone.turned.off" = "您已被关闭麦克风";
+"TUIRoom.homeowners.notice.microphone.turned.on" = "主持人解禁了你的麦克风";
+"TUIRoom.mute.audio.error.toast" = "禁麦失败";
+"TUIRoom.mute.video.error.toast" = "禁画失败";
+"TUIRoom.error.logout.room.num" = "异常退出房间:\"xxx\"";
+"TUIRoom.no.login" = "不进入";
+"TUIRoom.enter.again" = "再次进入";
+
+"TUIRoom.prompt" = "提示";
+"TUIRoom.recording.save.path" = "录音保存路径：";
+"TUIRoom.end.recording" = "结束录制";
+"TUIRoom.start.recording" = "开始录制";
+"TUIRoom.volume.prompt.switch" = "音量提示切换:";
+"TUIRoom.audio.recording" = "音频录制";
+"TUIRoom.volume.prompt" = "音量提示";
+"TUIRoom.capture.volume" = "采集音量";
+"TUIRoom.play.volume" = "播放音量";
+"TUIRoom.share" = "共享屏幕";
+"TUIRoom.video" = "视频";
+"TUIRoom.audio" = "音频";
+"TUIRoom.setting" = "设置";
+"TUIRoom.resolution" = "分辨率";
+"TUIRoom.framerate" = "帧率";
+"TUIRoom.bitrate" = "码率";
+"TUIRoom.localmirror" = "本地镜像";
+"TUIRoom.resolutionselected" = "分辨率选择完毕";
+"TUIRoom.framerateselected" = "帧率选择完毕";
+"TUIRoom.version.too.low" = "系统版本低于12.0，请升级系统";

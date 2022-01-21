@@ -1,0 +1,11 @@
+/*
+  ReplayKitLocalized.strings
+  TXLiteAVDemo
+
+  Created by adams on 2021/3/22.
+  Copyright © 2021 Tencent. All rights reserved.
+*/
+
+"TUIRoom.ScreenAnchor.liveStop" = "Screen sharing ended";
+"TUIRoom.ScreenAnchor.appReset" = "App was disconnected";
+"TUIRoom.ScreenAnchor.sdkError" = "Integration error (SDK version mismatch)";
