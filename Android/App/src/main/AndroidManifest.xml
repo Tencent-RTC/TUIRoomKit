@@ -26,6 +26,11 @@
             android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
+        <activity
+            android:name=".ProfileActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
         <activity android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"

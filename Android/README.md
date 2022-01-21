@@ -1,13 +1,14 @@
-本文档主要介绍如何快速集成实时音视频（TRTC）SDK，运行 TRTC 场景化解决方案，实现多人视频会议。
+本文档主要介绍如何快速集成实时音视频（TRTC）SDK，运行 TRTC 场景化解决方案，实现多人音视频房间。
 
 ## 目录结构
 
 ```
-TUIMeeting
+TUIRoom
 ├─ App          // 主面板，各种场景入口
 ├─ Beauty       // 美颜面板，包含美颜，滤镜，动效等效果
 ├─ Debug        // 调试相关
-└─ Source       // 视频会议业务逻辑
+├─ Source       // 多人音视频业务逻辑
+└─ TUICore      // IM登录等相关业务
 ```
 
 ## 环境准备
@@ -28,7 +29,7 @@ TUIMeeting
 
 ### 配置工程文件
 1. 使用 Android Studio（3.5及以上的版本）打开源码工程`TUIMeeting `。
-2. 找到并打开`TUIMeeting/Debug/src/main/java/com/tencent/liteav/debug/GenerateTestUserSig.java`文件。
+2. 找到并打开`TUIRoom/Debug/src/main/java/com/tencent/liteav/debug/GenerateTestUserSig.java`文件。
 3. 设置`GenerateTestUserSig.java`文件中的相关参数：
 <ul style="margin:0"><li/>SDKAPPID：默认为占位符（PLACEHOLDER），请设置为实际的 SDKAppID。
 <li/>SECRETKEY：默认为占位符（PLACEHOLDER），请设置为实际的密钥信息。</ul>
@@ -122,28 +123,43 @@ defaultConfig {
 
 
 ### 体验应用（**体验应用至少需要两台设备**）
-
 #### 用户 A
 
 步骤1、输入用户名(<font color=red>请确保用户名唯一性，不能与其他用户重复</font>)，如图示：
 
-<img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/user_a.png" width="320"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/1414c36436df13a0366b59f22024a23c.png" width="320"/>
 
-步骤2、输入会议号，点击进入会议，如下图示：
+步骤2、点击“创建房间”，如下图示：
 
-<img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/tuimeeting_enter_room.png" width="320"/>
+<table>
+<tr>
+<td><img src="https://qcloudimg.tencent-cloud.cn/raw/85ab7ea0a66aba5b9ddf23594bf04ea0.png" width="320"/></td>
+<td><img src="https://qcloudimg.tencent-cloud.cn/raw/b36383baff761bdaf26da5f191902800.png" width="320"/></td>
+</tr>
+</table>
 
-步骤3、输入房间主题，点击开始交谈；
+步骤3、进入房间后，复制房间号给“用户B”，待进入后就可以开始聊天了；
+
+<img src="https://qcloudimg.tencent-cloud.cn/raw/5f8b51e76d044c03af9e579a66fcaa1a.png" width="320"/>
 
 #### 用户 B
 
 步骤1、输入用户名(<font color=red>请确保用户名唯一性，不能与其他用户重复</font>)，如图示：
 
-<img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/user_b.png" width="320"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/2119f9db193a76f3aad4a770e473b59e.png" width="320"/>
 
-步骤2、输入用户 A 创建的会议号，点击加入会议；
+步骤2、点击“加入房间”，输入用户 A 创建的房间号，加入房间；
 
-<img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/tuimeeting_enter_room.png" width="320"/>
+<table>
+<tr>
+<td><img src="https://qcloudimg.tencent-cloud.cn/raw/0349a16cf0f442016d1262d602327a67.png" width="320"/></td>
+<td><img src="https://qcloudimg.tencent-cloud.cn/raw/a5f86a91670b56ed39bb40d6d4ea0d24.png" width="320"/></td>
+</tr>
+</table>
+
+步骤3、进入房间后，就可以开始聊天了；
+
+<img src="https://qcloudimg.tencent-cloud.cn/raw/10d10b336d262f004cf9571ef92056f4.png" width="320"/>
 
 ## 常见问题
 #### 1. 查看密钥时只能获取公钥和私钥信息，该如何获取密钥？

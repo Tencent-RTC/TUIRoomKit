@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F5F9"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:layout_marginTop="28dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/tuiroom_ic_back">
+
+        <TextView
+            android:id="@+id/main_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="true"
+            android:text="@string/tuiroom_tv_member_list"
+            android:textColor="@color/tuiroom_color_black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_user_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/tuiroom_bg_member_info"
+        app:layout_constraintBottom_toTopOf="@+id/btn_mute_audio_all"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <TextView
+        android:id="@+id/btn_mute_audio_all"
+        android:layout_width="148dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="22dp"
+        android:background="@drawable/tuiroom_bg_mute_all_audio"
+        android:gravity="center"
+        android:paddingLeft="38dp"
+        android:paddingTop="14dp"
+        android:paddingRight="38dp"
+        android:paddingBottom="14dp"
+        android:text="@string/tuiroom_toast_mute_all_audio"
+        android:textColor="@color/tuiroom_color_green"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/btn_mute_video_all"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/btn_mute_video_all"
+        android:layout_width="148dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="22dp"
+        android:background="@drawable/tuiroom_bg_mute_all_video"
+        android:gravity="center"
+        android:paddingLeft="38dp"
+        android:paddingRight="38dp"
+        android:text="@string/tuiroom_toast_mute_all_video"
+        android:textColor="@color/tuiroom_color_blue"
+        android:textSize="16sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btn_mute_audio_all" />
+
+    <TextView
+        android:id="@+id/btn_confirm"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="22dp"
+        android:background="@drawable/tuiroom_btn_join"
+        android:gravity="center"
+        android:text="@string/tuiroom_confirm"
+        android:textColor="@color/tuiroom_color_white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+</merge>

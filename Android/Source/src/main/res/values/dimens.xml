@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="trtcmeeting_ItemTitleSize">16sp</dimen>
+    <dimen name="tuiroom_ItemTitleSize">14sp</dimen>
 </resources>

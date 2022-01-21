@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/img_head"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="12dp"
+        android:src="@drawable/tuiroom_head" />
+
+    <TextView
+        android:id="@+id/tv_user_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_weight="1"
+        android:text="@string/tuiroom_tv_tools_user_name"
+        android:textColor="@color/tuiroom_color_main_text"
+        android:textSize="14sp" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/img_audio"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginRight="6dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/tuiroom_ic_member_list_audio" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/img_video"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="12dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/tuiroom_ic_member_list_video" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/img_kick_user"
+        style="@style/TUIRoomButtonTheme"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginRight="12dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/tuiroom_ic_list_kick_user" />
+</LinearLayout>

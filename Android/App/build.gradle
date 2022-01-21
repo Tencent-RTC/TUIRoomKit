@@ -5,7 +5,7 @@ android {
     buildToolsVersion BUILD_TOOLS_VERSION
 
     defaultConfig {
-        applicationId 'com.tencent.liteav.tuimeeting'
+        applicationId 'com.tencent.liteav.tuiroom'
         versionName VERSION_NAME
         versionCode VERSION_CODE as Integer
         minSdkVersion MIN_SDK_VERSION as Integer
