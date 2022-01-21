@@ -32,7 +32,7 @@
 
 | iOS                                                          | Android                                                      |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ![](https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/app_download_ios.png) | ![](https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/app_download_android.png) |
+| ![](https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/app_download_ios.png) | ![](https://main.qcloudimg.com/raw/8a603ced0a61983018c794df842f7029.png) |
 
 ## 文档资源
 
