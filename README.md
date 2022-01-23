@@ -1,12 +1,12 @@
 
-# 多人音视频房间
+# 多人音视频互动
 
 ## 概述
 
 **TUI组件化解决方案**是腾讯云TRTC针对直播、语聊、视频通话等推出的低代码解决方案，依托腾讯在音视频&通信领域的技术积累，帮助开发者快速实现相关业务场景，聚焦核心业务，助力业务起飞！
 
 - [视频互动直播-TUILiveRoom](https://github.com/tencentyun/TUILiveRoom/)
-- [多人音视频房间-TUIRoom](https://github.com/tencentyun/TUIRoom/)
+- [多人音视频互动-TUIRoom](https://github.com/tencentyun/TUIRoom/)
 - [实时语音/视频通话-TUICalling](https://github.com/tencentyun/TUICalling/)
 - [语音聊天室-TUIVoiceRoom](https://github.com/tencentyun/TUIVoiceRoom/)
 - [语音沙龙-TUIChatSalon](https://github.com/tencentyun/TUIChatSalon/)
@@ -38,7 +38,7 @@
 
 | iOS                                                          | Android                                                      | Windows&Mac |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ----------- |
-| [多人音视频房间（iOS）](https://cloud.tencent.com/document/product/647/45681) | [多人音视频房间（Android）](https://cloud.tencent.com/document/product/647/45667) | [多人音视频房间(Windows&Mac)](https://cloud.tencent.com/document/product/647/63494) |
+| [多人音视频互动（iOS）](https://cloud.tencent.com/document/product/647/45681) | [多人音视频互动（Android）](https://cloud.tencent.com/document/product/647/45667) | [多人音视频互动(Windows&Mac)](https://cloud.tencent.com/document/product/647/63494) |
 ## 其他
 
 ### 交流&反馈
