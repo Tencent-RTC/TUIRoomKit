@@ -5,7 +5,7 @@
 ```
 TUIRoom
 ├─ Example              // 工程模块，主要提供 TUIRoom 的测试页面
-├─ LocalSpecLib         // 依赖的本地库
+├─ SDK                  // 依赖的本地库
 ├─ Resources            // TUIRoom 中所用的资源文件
 ├─ Source               // TUIRoom 组件的逻辑封装
 └─ TUIRoom.podspec      // TUIRoom 组件 pod 接入文件
