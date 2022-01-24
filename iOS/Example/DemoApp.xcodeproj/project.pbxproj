@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5299BA6C01D2DF74B1BA845A /* Pods_DemoApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4CD7F588EA29064C4C9474A /* Pods_DemoApp.framework */; };
 		C11C13AE27858B4B001D39CB /* AppMainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11C13AD27858B4B001D39CB /* AppMainViewController.swift */; };
+		C13127C5279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C13127C4279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		C18CE615279005D10071C120 /* ReplayKitLocalized.m in Sources */ = {isa = PBXBuildFile; fileRef = C18CE607279005D10071C120 /* ReplayKitLocalized.m */; };
 		C18CE616279005D10071C120 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE608279005D10071C120 /* InfoPlist.strings */; };
 		C18CE617279005D10071C120 /* ReplayKitLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE60A279005D10071C120 /* ReplayKitLocalized.strings */; };
@@ -17,7 +18,6 @@
 		C1F2C76A278FD4E000216EB8 /* TXReplayKit_Screen.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C1F2C760278FD4E000216EB8 /* TXReplayKit_Screen.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C1F2C776278FD65300216EB8 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C1F2C775278FD65300216EB8 /* libc++.tbd */; };
 		C1F2C778278FD65C00216EB8 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1F2C777278FD65C00216EB8 /* Accelerate.framework */; };
-		C1F2C780278FD6E800216EB8 /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1F2C77F278FD6E800216EB8 /* TXLiteAVSDK_ReplayKitExt.framework */; };
 		C1F47FB02714107B00E4BBC3 /* TRTCRegisterRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F47FA22714107B00E4BBC3 /* TRTCRegisterRootView.swift */; };
 		C1F47FB12714107B00E4BBC3 /* TRTCLoginRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F47FA32714107B00E4BBC3 /* TRTCLoginRootView.swift */; };
 		C1F47FB32714107B00E4BBC3 /* LoginLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1F47FA62714107B00E4BBC3 /* LoginLocalized.strings */; };
@@ -73,6 +73,7 @@
 		9A118A5B5DE110B8217C48CB /* Pods-DemoApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp.release.xcconfig"; path = "Target Support Files/Pods-DemoApp/Pods-DemoApp.release.xcconfig"; sourceTree = "<group>"; };
 		9CA7D17F6CB864C86F7B41C8 /* Pods-DemoApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp.debug.xcconfig"; path = "Target Support Files/Pods-DemoApp/Pods-DemoApp.debug.xcconfig"; sourceTree = "<group>"; };
 		C11C13AD27858B4B001D39CB /* AppMainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppMainViewController.swift; sourceTree = "<group>"; };
+		C13127C4279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TXLiteAVSDK_ReplayKitExt.framework; sourceTree = "<group>"; };
 		C18CE607279005D10071C120 /* ReplayKitLocalized.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplayKitLocalized.m; sourceTree = "<group>"; };
 		C18CE609279005D10071C120 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		C18CE60B279005D10071C120 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ReplayKitLocalized.strings"; sourceTree = "<group>"; };
@@ -86,7 +87,6 @@
 		C1F2C767278FD4E000216EB8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C1F2C775278FD65300216EB8 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		C1F2C777278FD65C00216EB8 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
-		C1F2C77F278FD6E800216EB8 /* TXLiteAVSDK_ReplayKitExt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TXLiteAVSDK_ReplayKitExt.framework; sourceTree = "<group>"; };
 		C1F47FA22714107B00E4BBC3 /* TRTCRegisterRootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TRTCRegisterRootView.swift; sourceTree = "<group>"; };
 		C1F47FA32714107B00E4BBC3 /* TRTCLoginRootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TRTCLoginRootView.swift; sourceTree = "<group>"; };
 		C1F47FA72714107B00E4BBC3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LoginLocalized.strings"; sourceTree = "<group>"; };
@@ -128,8 +128,8 @@
 			files = (
 				C1F2C778278FD65C00216EB8 /* Accelerate.framework in Frameworks */,
 				C1F2C776278FD65300216EB8 /* libc++.tbd in Frameworks */,
-				C1F2C780278FD6E800216EB8 /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */,
 				C1F2C762278FD4E000216EB8 /* ReplayKit.framework in Frameworks */,
+				C13127C5279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,6 +153,15 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		C13127C3279E9E9200B50DCB /* SDK */ = {
+			isa = PBXGroup;
+			children = (
+				C13127C4279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework */,
+			);
+			name = SDK;
+			path = ../SDK;
+			sourceTree = "<group>";
+		};
 		C18CE606279005D10071C120 /* Localized */ = {
 			isa = PBXGroup;
 			children = (
@@ -173,14 +182,6 @@
 				C1F2C767278FD4E000216EB8 /* Info.plist */,
 			);
 			path = TXReplayKit_Screen;
-			sourceTree = "<group>";
-		};
-		C1F2C77E278FD6E800216EB8 /* SDK */ = {
-			isa = PBXGroup;
-			children = (
-				C1F2C77F278FD6E800216EB8 /* TXLiteAVSDK_ReplayKitExt.framework */,
-			);
-			path = SDK;
 			sourceTree = "<group>";
 		};
 		C1F47FA12714107B00E4BBC3 /* LoginMock */ = {
@@ -210,7 +211,7 @@
 		C65978FC268078E100CCAA4C = {
 			isa = PBXGroup;
 			children = (
-				C1F2C77E278FD6E800216EB8 /* SDK */,
+				C13127C3279E9E9200B50DCB /* SDK */,
 				C659794D268079CD00CCAA4C /* Debug */,
 				C6597933268079C500CCAA4C /* App */,
 				C1F2C763278FD4E000216EB8 /* TXReplayKit_Screen */,
@@ -616,7 +617,7 @@
 				DEVELOPMENT_TEAM = F8A3GH6Q4W;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/SDK",
+					"$(PROJECT_DIR)/../SDK",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TXReplayKit_Screen/Info.plist;
@@ -648,7 +649,7 @@
 				DEVELOPMENT_TEAM = 5GHU44CJHG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/SDK",
+					"$(PROJECT_DIR)/../SDK",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TXReplayKit_Screen/Info.plist;
