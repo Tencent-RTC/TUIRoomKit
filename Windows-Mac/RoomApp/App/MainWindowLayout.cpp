@@ -92,7 +92,7 @@ void MainWindowLayout::InitLayout() {
 
 void MainWindowLayout::InitConnect() {
     connect(bottom_menu_bar_, &BottomBarController::SignalShowSetting, this, &MainWindowLayout::SlotShowSetting);
-    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserScreenVideoAvailable, this, &MainWindowLayout::SlotOnRemoteUserScreenVideoAvailable);
+    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserScreenAvailable, this, &MainWindowLayout::SlotOnRemoteUserScreenAvailable);
     connect(stage_list_view_control_, &StageListController::SignalShowVideoOnMainScreen, this, &MainWindowLayout::SlotShowVideoOnMainScreen);
     connect(chat_room_view_control_, &ChatRoomViewController::SignalShowChatRoom, this, &MainWindowLayout::SlotShowChatRoom);
 
@@ -479,7 +479,7 @@ void MainWindowLayout::SlotShowVideoOnMainScreen(const std::string& user_id) {
     }
 }
 
-void MainWindowLayout::SlotOnRemoteUserScreenVideoAvailable(const QString& user_id, bool available) {
+void MainWindowLayout::SlotOnRemoteUserScreenAvailable(const QString& user_id, bool available) {
     if (available) {
         if (bottom_menu_bar_) {
             bottom_menu_bar_->SetCurrentScreenShower(user_id);

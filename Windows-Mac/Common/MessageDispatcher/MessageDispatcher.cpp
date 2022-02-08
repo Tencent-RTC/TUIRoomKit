@@ -64,8 +64,8 @@ void MessageDispatcher::OnRemoteUserCameraAvailable(const std::string& user_id, 
 	emit SignalOnRemoteUserCameraAvailable(QString::fromStdString(user_id), available);
 }
 
-void MessageDispatcher::OnRemoteUserScreenVideoAvailable(const std::string& user_id, bool available) {
-	emit SignalOnRemoteUserScreenVideoAvailable(QString::fromStdString(user_id), available);
+void MessageDispatcher::OnRemoteUserScreenAvailable(const std::string& user_id, bool available) {
+	emit SignalOnRemoteUserScreenAvailable(QString::fromStdString(user_id), available);
 }
 
 void MessageDispatcher::OnRemoteUserAudioAvailable(const std::string& user_id, bool available) {

@@ -188,8 +188,8 @@ class ITRTCCloud
      * 也就是说，您可以使用该接口让身处两个不同房间中的主播进行跨房间的音视频流分享，从而让每个房间中的观众都能观看到这两个主播的音视频。该功能可以用来实现主播之间的 PK 功能。
      * 跨房通话的请求结果会通过 {@link TRTCCloudDelegate} 中的 onConnectOtherRoom() 回调通知给您。
      * 例如：当房间“101”中的主播 A 通过 connectOtherRoom() 跟房间“102”中的主播 B 建立跨房通话后，
-     * - 房间“101”中的用户都会收到主播 B 的 onRemoteUserEnterRoom(B) 和 onUserVideoAvailable(B,true) 这两个事件回调，即房间“101”中的用户都可以订阅主播 B 的音视频。
-     * - 房间“102”中的用户都会收到主播 A 的 onRemoteUserEnterRoom(A) 和 onUserVideoAvailable(A,true) 这两个事件回调，即房间“102”中的用户都可以订阅主播 A 的音视频。
+     * - 房间“101”中的用户都会收到主播 B 的 onRemoteUserEnterRoom(B) 和 onUserVideoAvailable(B,YES) 这两个事件回调，即房间“101”中的用户都可以订阅主播 B 的音视频。
+     * - 房间“102”中的用户都会收到主播 A 的 onRemoteUserEnterRoom(A) 和 onUserVideoAvailable(A,YES) 这两个事件回调，即房间“102”中的用户都可以订阅主播 A 的音视频。
      *
      * <pre>
      *                 房间 101                     房间 102
@@ -250,8 +250,8 @@ class ITRTCCloud
      *
      * 在绝大多数场景下，用户进入房间后都会订阅房间中所有主播的音视频流，因此 TRTC 默认采用了自动订阅模式，以求得最佳的“秒开体验”。
      * 如果您的应用场景中每个房间同时会有很多路音视频流在发布，而每个用户只想选择性地订阅其中的 1-2 路，则推荐使用“手动订阅”模式以节省流量费用。
-     * @param autoRecvAudio true：自动订阅音频；false：需手动调用 muteRemoteAudio(false) 订阅音频。默认值：true。
-     * @param autoRecvVideo true：自动订阅视频；false：需手动调用 startRemoteView 订阅视频。默认值：true。
+     * @param autoRecvAudio YES：自动订阅音频；NO：需手动调用 muteRemoteAudio(false) 订阅音频。默认值：YES。
+     * @param autoRecvVideo YES：自动订阅视频；NO：需手动调用 startRemoteView 订阅视频。默认值：YES。
      * @note
      * 1. 需要在进入房间（enterRoom）前调用该接口，设置才能生效。
      * 2. 在自动订阅模式下，如果用户在进入房间后没有调用  {@startRemoteView} 订阅视频流，SDK 会自动停止订阅视频流，以便达到节省流量的目的。
@@ -373,7 +373,6 @@ class ITRTCCloud
      * </pre>
      * @param config 如果 config 不为空，则开启云端混流，如果 config 为空则停止云端混流。详情请参考 {@link TRTCTranscodingConfig} 。
      * @note 关于云端混流的注意事项：
-     *   - 混流转码为收费功能，调用接口将产生云端混流转码费用，详见 https://cloud.tencent.com/document/product/647/49446 。
      *   - 调用该接口的用户，如果没设定 config 参数中的 streamId 字段，TRTC 会将房间中的多路画面混合到当前用户所对应的音视频流上，即 A + B => A。
      *   - 调用该接口的用户，如果设定了 config 参数中的 streamId 字段，TRTC 会将房间中的多路画面混合到您指定的 streamId 上，即 A + B => streamId。
      *   - 请注意，若您还在房间中且不再需要混流，请务必再次调用本接口并将 config 设置为空以进行取消，不及时取消混流可能会引起不必要的计费损失。
@@ -396,7 +395,7 @@ class ITRTCCloud
  * 在 enterRoom 之前调用此函数，SDK 只会开启摄像头，并一直等到您调用 enterRoom 之后才开始推流。
  * 在 enterRoom 之后调用此函数，SDK 会开启摄像头并自动开始视频推流。
  * 当开始渲染首帧摄像头画面时，您会收到 {@link TRTCCloudDelegate} 中的 onCameraDidReady 回调通知。
- * @param frontCamera true：前置摄像头；false：后置摄像头。
+ * @param frontCamera YES：前置摄像头；NO：后置摄像头。
  * @param view 承载视频画面的控件
  * @note 如果希望开播前预览摄像头画面并通过 BeautyManager 调节美颜参数，您可以：
  *  - 方案一：在调用 enterRoom 之前调用 startLocalPreview
@@ -750,14 +749,6 @@ class ITRTCCloud
     virtual void stopLocalRecording() = 0;
 #endif
 
-    /**
-     * 5.18 设置远端音频流智能并发播放策略
-     *
-     * 设置远端音频流智能并发播放策略，适用于上麦人数比较多的场景。
-     * @param params 音频并发参数，请参考 {@link TRTCAudioParallelParams}
-     */
-    virtual void setRemoteAudioParallelParams(const TRTCAudioParallelParams& params) = 0;
-
     /// @}
     /////////////////////////////////////////////////////////////////////////////////
     //
@@ -953,7 +944,7 @@ class ITRTCCloud
 #endif
 
 /**
- * 9.7 设置屏幕分享（即辅路）的视频编码参数（桌面系统和移动系统均已支持）
+ * 9.7 设置屏幕分享（即辅路）的视频编码参数（该接口仅支持桌面系统）
  *
  * 该接口可以设定远端用户所看到的屏幕分享（即辅路）的画面质量，同时也能决定云端录制出的视频文件中屏幕分享的画面质量。
  * 请注意如下两个接口的差异：
@@ -1326,7 +1317,7 @@ class ITRTCCloud
      * 1. 发送消息到房间内所有用户（暂时不支持 Web/小程序端），每秒最多能发送30条消息。
      * 2. 每个包最大为 1KB，超过则很有可能会被中间路由器或者服务器丢弃。
      * 3. 每个客户端每秒最多能发送总计 8KB 数据。
-     * 4. 请将 reliable 和 ordered 同时设置为 true 或同时设置为 false，暂不支持交叉设置。
+     * 4. 请将 reliable 和 ordered 同时设置为 true 或同时设置为 flase，暂不支持交叉设置。
      * 5. 强烈建议您将不同类型的消息设定为不同的 cmdID，这样可以在要求有序的情况下减小消息时延。
      */
     virtual bool sendCustomCmdMsg(uint32_t cmdId, const uint8_t* data, uint32_t dataSize, bool reliable, bool ordered) = 0;
@@ -1342,7 +1333,7 @@ class ITRTCCloud
      * 房间中的其他用户可以通过 {@link TRTCCloudDelegate} 中的 onRecvSEIMsg 回调接收消息。
      * @param data 待发送的数据，最大支持 1KB（1000字节）的数据大小
      * @param repeatCount 发送数据次数
-     * @return true：消息已通过限制，等待后续视频帧发送；false：消息被限制发送
+     * @return YES：消息已通过限制，等待后续视频帧发送；NO：消息被限制发送
      * @note 本接口有以下限制：
      * 1. 数据在接口调用完后不会被即时发送出去，而是从下一帧视频帧开始带在视频帧中发送。
      * 2. 发送消息到房间内所有用户，每秒最多能发送 30 条消息（与 sendCustomCmdMsg 共享限制）。
@@ -1368,7 +1359,7 @@ class ITRTCCloud
      * @param params 测速选项
      * @return 接口调用结果，< 0：失败
      * @note
-     * 1. 测速过程将产生少量的基础服务费用，详见 [计费概述 > 基础服务](https://cloud.tencent.com/document/product/647/17157#.E5.9F.BA.E7.A1.80.E6.9C.8D.E5.8A.A1) 文档说明。
+     * 1. 带宽测试本身会消耗一定的流量，所以也会产生少量额外的流量费用。
      * 2. 请在进入房间前进行网速测试，在房间中网速测试会影响正常的音视频传输效果，而且由于干扰过多，网速测试结果也不准确。
      * 3. 同一时间只允许一项网速测试任务运行。
      */

@@ -290,9 +290,6 @@
     <ClInclude Include="..\Module\TUIRoomCoreImpl.h">
       <Filter>Module</Filter>
     </ClInclude>
-    <ClInclude Include="..\utils\BugReport\crash_agent.h">
-      <Filter>utils\BugReport</Filter>
-    </ClInclude>
     <ClInclude Include="..\utils\BugReport\crash_dump.h">
       <Filter>utils\BugReport</Filter>
     </ClInclude>

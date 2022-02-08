@@ -1094,7 +1094,7 @@ struct TRTCMixUser {
     TRTCVideoStreamType streamType;
 
     ///【字段含义】指定该路流是不是只混合声音
-    ///【推荐取值】默认值：false
+    ///【推荐取值】默认值：NO
     ///【特别说明】已废弃，推荐使用8.5版本开始新引入的字段：inputType。
     bool pureAudio;
 
@@ -1173,13 +1173,6 @@ struct TRTCTranscodingConfig {
     ///【推荐取值】默认值：1，代表单声道。可设定的数值只有两个数字：1-单声道，2-双声道。
     uint32_t audioChannels;
 
-    ///【字段含义】指定云端转码的输出流音频编码类型
-    ///【推荐取值】默认值：0，代表LC-AAC。可设定的数值只有三个数字：0 - LC-AAC，1 - HE-AAC，2 - HE-AACv2。
-    ///【特别说明】HE-AAC 和 HE-AACv2 支持的输出流音频采样率范围为[48000, 44100, 32000, 24000, 16000]
-    ///【特别说明】当音频编码设置为 HE-AACv2 时，只支持输出流音频声道数为双声道。
-    ///【特别说明】HE-AAC 和 HE-AACv2 取值仅在输出流为您额外设置的 streamId 上时才生效。
-    uint32_t audioCodec;
-
     ///【字段含义】指定云端混流中每一路视频画面的位置、大小、图层以及流类型等信息
     ///【推荐取值】该字段是一个 TRTCMixUser 类型的数组，数组中的每一个元素都用来代表每一路画面的信息。
     TRTCMixUser *mixUsersArray;
@@ -1205,7 +1198,6 @@ struct TRTCTranscodingConfig {
           audioSampleRate(48000),
           audioBitrate(64),
           audioChannels(1),
-          audioCodec(0),
           mixUsersArray(nullptr),
           mixUsersArraySize(0),
           backgroundColor(0),
@@ -1234,11 +1226,7 @@ struct TRTCPublishCDNParam {
     ///【特别说明】推流 URL 必须为 RTMP 格式，必须符合您的目标直播服务商的规范要求，否则目标服务商会拒绝来自 TRTC 后台服务的推流请求。
     const char *url;
 
-    ///【字段含义】需要转推的 streamId
-    ///【推荐取值】默认值：空值。如果不填写，则默认转推调用者的旁路流。
-    const char *streamId;
-
-    TRTCPublishCDNParam() : url(nullptr), streamId(nullptr), appId(0), bizId(0) {
+    TRTCPublishCDNParam() : url(nullptr), appId(0), bizId(0) {
     }
 };
 
@@ -1303,7 +1291,7 @@ struct TRTCAudioEffectParam {
     int loopCount;
 
     ///【字段含义】音效是否上行
-    ///【推荐取值】true：音效在本地播放的同时，会上行至云端，因此远端用户也能听到该音效；false：音效不会上行至云端，因此只能在本地听到该音效。默认值：false
+    ///【推荐取值】YES：音效在本地播放的同时，会上行至云端，因此远端用户也能听到该音效；NO：音效不会上行至云端，因此只能在本地听到该音效。默认值：NO
     bool publish;
 
     ///【字段含义】音效音量
@@ -1464,28 +1452,6 @@ struct TRTCScreenCaptureProperty {
 typedef ITXDeviceCollection ITRTCDeviceCollection;
 typedef ITXDeviceInfo ITRTCDeviceInfo;
 
-/**
- * 5.24 远端音频流智能并发播放策略的参数
- *
- * 该参数用于设置远端音频流智能并发播放策略。
- */
-struct TRTCAudioParallelParams {
-    ///【字段含义】最大并发播放数。默认值：0
-    ///如果 maxCount > 0，且实际人数 > maxCount，会实时智能选出 maxCount 路数据进行播放，这会极大的降低性能消耗。
-    ///如果 maxCount = 0，SDK 不限制并发播放数，在上麦人数比较多的房间可能会引发性能问题。
-    uint32_t maxCount;
-
-    ///【字段含义】指定用户必定能并发播放。
-    ///【特殊说明】指定必定并发播放的用户 ID 列表。这些用户不参与智能选择。
-    /// includeUsers 的数量必须小于 maxCount，否则本次并发播放设置失效。
-    /// includeUsers 仅在 maxCount > 0 时有效。当 includeUsers 生效时，参与智能并发选择的最大播放数 = maxCount - 有效 includeUsers 的数量。
-    char **includeUsers;
-    uint32_t includeUsersCount;
-
-    TRTCAudioParallelParams() : maxCount(0), includeUsers(nullptr), includeUsersCount(0) {
-    }
-};
-
 /// @}
 }  // namespace liteav
 
@@ -1496,5 +1462,5 @@ namespace trtc = liteav;
 using namespace liteav;
 #endif
 
-#endif /* __TRTCCLOUDDEF_H__ */
+#endif / *__TRTCCLOUDDEF_H__ * /
 /// @}

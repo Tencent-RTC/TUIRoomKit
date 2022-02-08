@@ -20,18 +20,24 @@ class IMParser{
     static std::string GenerateMuteUserCameraJson(const std::string& room_id, const std::string& user_id, bool mute);
     static std::string GenerateSendSpeechInvitationJson(const std::string& room_id, const std::string& user_id);
     static std::string GenerateSendOffSpeakerJson(const std::string& room_id, const std::string& user_id);
+    static std::string GenerateSendOffAllSpeakerJson(const std::string& room_id, const std::vector<std::string>& user_id_array);
     static std::string GenerateSendSpeechApplicationJson(const std::string& room_id, const std::string& user_id);
     static std::string GenerateKickOffUserJson(const std::string& room_id, const std::string& user_id);
+    static std::string GenerateReplyCallingRollJson(const std::string& room_id, const std::string& sender_id);
 
     static bool ParserNotificationToMuteAllCamera(const std::string& notification);
     static bool ParserNotificationToMuteAllMic(const std::string& notification);
     static bool ParserNotificationToMuteChat(const std::string& notification);
     static bool ParserNotificationToSpeechForbidden(const std::string& notification);
     static bool ParserNotificationToSpeechMode(const std::string& notification, std::string& speech_mode);
+    static bool ParserNotificationToStartTime(const std::string& notification, long long & start_time);
+    static bool ParserNotificationToIsCallingRoll(const std::string& notification);
 
     static bool ParserDataToMute(const std::string& data);
     static bool ParserDataToUserId(const std::string& data, std::string& user_id);
     static bool ParserDataToSenderId(const std::string& data, std::string& sender_id);
+    static bool ParserDataToReveiverId(const std::string& data, std::string& receiver_id);
+    static bool ParserDataToAgree(const std::string& data, bool& agree);
     static bool ParserDataCmdToType(const std::string& data, CallBackType& type);
 
 private:

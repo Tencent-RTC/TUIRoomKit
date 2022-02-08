@@ -434,67 +434,68 @@ enum V2TXLivePushStatus {
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//          (五) 公共配置组件
+//          (五) 音视频状态有关的枚举值的定义
+//
+/////////////////////////////////////////////////////////////////////////////////
+
+/// @name 音视频状态有关的枚举值的定义
+/// @{
+
+/**
+ * @brief 直播流的播放状态。
+ */
+enum V2TXLivePlayStatus {
+
+    /// 播放停止
+    V2TXLivePlayStatusStopped,
+
+    /// 正在播放
+    V2TXLivePlayStatusPlaying,
+
+    /// 正在缓冲(首次加载不会抛出 Loading 事件)
+    V2TXLivePlayStatusLoading,
+
+};
+
+/**
+ * @brief 直播流的播放状态变化原因
+ */
+enum V2TXLiveStatusChangeReason {
+
+    /// 内部原因
+    V2TXLiveStatusChangeReasonInternal,
+
+    /// 开始网络缓冲
+    V2TXLiveStatusChangeReasonBufferingBegin,
+
+    /// 结束网络缓冲
+    V2TXLiveStatusChangeReasonBufferingEnd,
+
+    /// 本地启动播放
+    V2TXLiveStatusChangeReasonLocalStarted,
+
+    /// 本地停止播放
+    V2TXLiveStatusChangeReasonLocalStopped,
+
+    /// 远端可播放
+    V2TXLiveStatusChangeReasonRemoteStarted,
+
+    /// 远端流停止或中断
+    V2TXLiveStatusChangeReasonRemoteStopped,
+
+    /// 远端流离线
+    V2TXLiveStatusChangeReasonRemoteOffline,
+
+};
+/// @}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//          (六) 公共配置组件
 //
 /////////////////////////////////////////////////////////////////////////////////
 /// @name 公共配置组件有关的枚举值的定义
 /// @{
-
-/**
- * @brief 日志级别枚举值
- */
-enum V2TXLiveLogLevel {
-
-    /// 输出所有级别的 log
-    V2TXLiveLogLevelAll = 0,
-
-    /// 输出 DEBUG，INFO，WARNING，ERROR 和 FATAL 级别的 log
-    V2TXLiveLogLevelDebug = 1,
-
-    /// 输出 INFO，WARNING，ERROR 和 FATAL 级别的 log
-    V2TXLiveLogLevelInfo = 2,
-
-    /// 只输出 WARNING，ERROR 和 FATAL 级别的 log
-    V2TXLiveLogLevelWarning = 3,
-
-    /// 只输出 ERROR 和 FATAL 级别的 log
-    V2TXLiveLogLevelError = 4,
-
-    /// 只输出 FATAL 级别的 log
-    V2TXLiveLogLevelFatal = 5,
-
-    /// 不输出任何 sdk log
-    V2TXLiveLogLevelNULL = 6,
-
-};
-
-struct V2TXLiveLogConfig {
-    /// 【字段含义】设置 Log 级别
-    /// 【推荐取值】默认值：V2TXLiveLogLevelAll
-    V2TXLiveLogLevel logLevel;
-
-    /// 【字段含义】是否通过 V2TXLivePremierObserver 接收要打印的 Log 信息
-    /// 【特殊说明】如果您希望自己实现 Log 写入，可以打开此开关，Log 信息会通过 V2TXLivePremierObserver#onLog 回调给您。
-    /// 【推荐取值】默认值：false
-    bool enableObserver;
-
-    /// 【字段含义】是否允许 SDK 在编辑器（XCoder、Android Studio、Visual Studio 等）的控制台上打印 Log
-    /// 【推荐取值】默认值：false
-    bool enableConsole;
-
-    /// 【字段含义】是否启用本地 Log 文件
-    /// 【特殊说明】如非特殊需要，请不要关闭本地 Log 文件，否则腾讯云技术团队将无法在出现问题时进行跟踪和定位。
-    /// 【推荐取值】默认值：true
-    bool enableLogFile;
-
-    /// 【字段含义】设置本地 Log 的存储目录，默认 Log 存储位置：
-    ///  Windows：%appdata%/liteav/log
-    const char* logPath;
-
-    V2TXLiveLogConfig() : logLevel(V2TXLiveLogLevelAll), enableObserver(false), enableConsole(false), enableLogFile(true), logPath(nullptr) {
-    }
-};
-/// @}
 
 /**
  * 图片类型.
@@ -532,6 +533,7 @@ struct V2TXLiveImage {
 
     V2TXLiveImage() : imageSrc(nullptr), imageType(V2TXLiveImageTypeBGRA32), imageWidth(0), imageHeight(0), imageLength(0){};
 };
+/// @}
 
 /// @name 屏幕分享有关的定义
 /// @{

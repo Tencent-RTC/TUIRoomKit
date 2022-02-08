@@ -5,7 +5,7 @@ TXImageButton::TXImageButton(QWidget *parent)
     : QWidget(parent) {
     ui.setupUi(this);
 
-    this->setStyleSheet("QLabel{background:transparent;} QPushButton{background:transparent;}");
+    this->setStyleSheet("QWidget{background:transparent;} QLabel{background:transparent;} QPushButton{background:transparent;}");
     ui.left_widget->installEventFilter(this);
 
     connect(ui.btn_operate, &QPushButton::clicked, this, &TXImageButton::SignalSetClicked);
@@ -19,7 +19,7 @@ void TXImageButton::SetText(QString text) {
     ui.lb_text->setText(text);
     SetTextColor("white");
 }
-void TXImageButton::SetButtonImage(QString image, QString hover_image, QString checked_image) {
+void TXImageButton::SetButtonImage(QString image, QString hover_image, QString checked_image, QString disable_image) {
     if (!image.isEmpty()) {
         button_image_ = image;
         SetImage(button_image_);
@@ -34,11 +34,17 @@ void TXImageButton::SetButtonImage(QString image, QString hover_image, QString c
     } else {
         button_checked_image_ = button_image_;
     }
+    if (!disable_image.isEmpty()) {
+        button_disable_image_ = disable_image;
+    } else {
+        button_disable_image_ = button_image_;
+    }
 }
-void TXImageButton::SetButtonTextColor(QString sheet_color_normal, QString sheet_color_hover, QString sheet_color_checked) {
+void TXImageButton::SetButtonTextColor(QString sheet_color_normal, QString sheet_color_hover, QString sheet_color_checked, QString sheet_color_disable) {
     sheet_color_normal_ = sheet_color_normal;
     sheet_color_hover_ = sheet_color_hover;
     sheet_color_checked_ = sheet_color_checked;
+    sheet_color_disable_ = sheet_color_disable;
 }
 void TXImageButton::SetChecked(bool checked) {
     checked_ = checked;
@@ -67,7 +73,10 @@ void TXImageButton::SetTextColor(QString sheet_color) {
 }
 bool TXImageButton::eventFilter(QObject *watched, QEvent *event) {
     if (watched == ui.left_widget) {
-        if ((event->type() == QEvent::Enter || event->type() == QEvent::MouseMove) && !checked_) {
+        if (!this->isEnabled()) {
+            SetImage(button_disable_image_);
+            SetTextColor(sheet_color_disable_);
+        } else if ((event->type() == QEvent::Enter || event->type() == QEvent::MouseMove) && !checked_) {
             SetImage(button_hover_image_);
             SetTextColor(sheet_color_hover_);
         } else if (event->type() == QEvent::Leave && !checked_) {
@@ -76,7 +85,11 @@ bool TXImageButton::eventFilter(QObject *watched, QEvent *event) {
         }
 
         if (event->type() == QEvent::MouseButtonPress) {
-            checked_ = !checked_;
+            if (!this->isEnabled())
+                checked_ = false;
+            else
+                checked_ = !checked_;
+
             emit clicked(checked_);
         } else if (event->type() == QEvent::MouseButtonRelease) {
             SetImage(checked_ ? button_checked_image_ : button_hover_image_);

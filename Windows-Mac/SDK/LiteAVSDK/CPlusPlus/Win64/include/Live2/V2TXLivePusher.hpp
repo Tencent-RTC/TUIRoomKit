@@ -358,8 +358,8 @@ class V2TXLivePusher {
      * 开启/关闭自定义视频采集。
      *
      * 在自定义视频采集模式下，SDK 不再从摄像头采集图像，只保留编码和发送能力。
-     * @note  需要在 [startPush](@ref V2TXLivePusher#startPush:) 之前调用，才会生效。
-     * @param enable true：开启自定义采集；false：关闭自定义采集。【默认值】：false
+     * @note  需要在 {@link V2TXLivePusher#startPush(String)} 之前调用，才会生效。
+     * @param enable true: 开启自定义采集; false: 关闭自定义采集。【默认值】: false
      * @return 返回值 {@link V2TXLiveCode}
      *         - V2TXLIVE_OK: 成功
      */

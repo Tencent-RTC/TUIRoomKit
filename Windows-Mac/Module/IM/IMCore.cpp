@@ -277,11 +277,21 @@ void IMCore::OnIMInterfaceCallback(CallBackType type, int code, const std::strin
     if (notification.find("isSpeechApplicationForbidden") != std::string::npos) {
         room_info.is_speech_application_forbidden = IMParser::ParserNotificationToSpeechForbidden(result[0].info.notification.CString());
     }
+    if (notification.find("startTime") != std::string::npos) {
+        long long start_time = 0;
+        bool b = IMParser::ParserNotificationToStartTime(result[0].info.notification.CString(), start_time);
+        if (b) {
+            room_info.start_time = start_time;
+        }
+    }
     if (notification.find("speechMode") != std::string::npos) {
         std::string speechMode;
         IMParser::ParserNotificationToSpeechMode(result[0].info.notification.CString(), speechMode);
           TUISpeechMode speech_mode = (speechMode == "FreeSpeech" ? TUISpeechMode::kFreeSpeech : TUISpeechMode::kApplySpeech);
           room_info.mode = speech_mode;
+    }
+    if (notification.find("isCallingRoll") != std::string::npos) {
+        room_info.is_callingroll = IMParser::ParserNotificationToIsCallingRoll(result[0].info.notification.CString());
     }
 
     callback_->OnIMGetRoomInfo(room_info);
@@ -446,6 +456,21 @@ void IMCore::CancelSpeechInvitation(const std::string& room_id, const std::strin
 
 void IMCore::ReplySpeechInvitation(const std::string& room_id, const std::string& sender_id, const std::string& user_id,
     bool agree, Callback callback) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto iter = map_signaling_.find(sender_id);
+    if (iter != map_signaling_.end()) {
+        std::vector<SignalingInfo> vec_signaling = iter->second;
+        for (auto item : vec_signaling) {
+            if (item.user_id == sender_id && item.type == kSendSpeechInvitation) {
+                if (agree) {
+                    V2TIMManager::GetInstance()->GetSignalingManager()->Accept(item.invite_id.c_str(), "", nullptr);
+                } else {
+                    V2TIMManager::GetInstance()->GetSignalingManager()->Reject(item.invite_id.c_str(), "", nullptr);
+                }
+                NOTIFY_CALLBACK(callback, 0, "");
+            }
+        }
+    }
     // TODO
 }
 
@@ -471,7 +496,25 @@ void IMCore::SendOffSpeaker(const std::string& room_id, const std::string& sende
     }
 }
 void IMCore::SendOffAllSpeakers(const std::string& room_id, const std::string& sender_id, const std::vector<std::string>& user_id_array, Callback callback) {
-    // TODO
+    std::string signaling = IMParser::GenerateSendOffAllSpeakerJson(room_id, user_id_array);
+    V2TIMString data = signaling.c_str();
+    V2TIMString groupId = room_id.c_str();
+    V2TIMStringVector inviteeList;
+    for (auto user : user_id_array) {
+        inviteeList.PushBack(user.c_str());
+    }
+    V2TIMOfflinePushInfo offlinePushInfo;
+    IMInterfaceCallback* send_off_all_speaker_callback = new(std::nothrow) IMInterfaceCallback(kSendOffAllSpeakers, this, callback);
+    if (send_off_all_speaker_callback != nullptr) {
+        V2TIMString inviteID = V2TIMManager::GetInstance()->GetSignalingManager()->InviteInGroup(groupId, inviteeList, data, true, 0, send_off_all_speaker_callback);
+        if (inviteID.Empty()) {
+            LINFO("SendOffAllSpeaker failed");
+            NOTIFY_CALLBACK(callback, -1, "SendOffSpeaker failed");
+        }
+    } else {
+        LINFO("SendOffAllSpeaker failed");
+        NOTIFY_CALLBACK(callback, -2, "SendOffSpeaker failed, alloc failed");
+    }
 }
 void IMCore::SendSpeechApplication(const std::string& room_id, const std::string& sender_id, const std::string& user_id, Callback callback){
     std::string signaling = IMParser::GenerateSendSpeechApplicationJson(room_id, sender_id);
@@ -480,7 +523,8 @@ void IMCore::SendSpeechApplication(const std::string& room_id, const std::string
     V2TIMOfflinePushInfo offlinePushInfo;
     IMInterfaceCallback* send_speech_application_callback = new(std::nothrow) IMInterfaceCallback(kSendSpeechApplication, this, callback);
     if (send_speech_application_callback != nullptr) {
-        V2TIMString inviteID = V2TIMManager::GetInstance()->GetSignalingManager()->Invite(userID, data, true, offlinePushInfo, kInviteTimeout, send_speech_application_callback);
+        // 成员申请发言，需要老师同意/拒绝操作，超时设置 4 * 15 = 1min。
+        V2TIMString inviteID = V2TIMManager::GetInstance()->GetSignalingManager()->Invite(userID, data, true, offlinePushInfo, 4 * kInviteTimeout, send_speech_application_callback);
         if (!inviteID.Empty()) {
             std::string invite_id(inviteID.CString());
             AddSignalingInfo(user_id, invite_id, kSendSpeechApplication);
@@ -495,11 +539,39 @@ void IMCore::SendSpeechApplication(const std::string& room_id, const std::string
     }
 }
 void IMCore::CancelSpeechApplication(const std::string& room_id, const std::string& sender_id, const std::string& user_id, Callback callback) {
-    // TODO
+    std::string signaling = IMParser::GenerateSendSpeechApplicationJson(room_id, sender_id);
+    V2TIMString userID = user_id.c_str();
+    V2TIMString data = signaling.c_str();
+    V2TIMOfflinePushInfo offlinePushInfo;
+    IMInterfaceCallback* speech_application_cancel_callback = new(std::nothrow) IMInterfaceCallback(kCancelSpeechApplication, this, callback);
+    std::lock_guard<std::mutex> lock(mutex_);
+	auto user_signal = map_signaling_.find(user_id);
+    if (user_signal != map_signaling_.end()) {
+        for (auto item : user_signal->second) {
+            if (item.user_id == user_id && item.type == kSendSpeechApplication) {
+                V2TIMString inviteID = item.invite_id.c_str();
+                V2TIMManager::GetInstance()->GetSignalingManager()->Cancel(inviteID, data, speech_application_cancel_callback);
+            }
+        }
+    }
 }
 void IMCore::ReplySpeechApplication(const std::string& room_id, const std::string& sender_id, const std::string& user_id,
     bool agree, Callback callback) {
-    // TODO
+	std::lock_guard<std::mutex> lock(mutex_);
+    auto iter = map_signaling_.find(user_id);
+    if (iter != map_signaling_.end()) {
+        std::vector<SignalingInfo> vec_signaling = iter->second;
+        for (auto item : vec_signaling) {
+            if (item.user_id == user_id && item.type == kSendSpeechApplication) {
+                if (agree) {
+                    V2TIMManager::GetInstance()->GetSignalingManager()->Accept(item.invite_id.c_str(), "", nullptr);
+                } else {
+                    V2TIMManager::GetInstance()->GetSignalingManager()->Reject(item.invite_id.c_str(), "", nullptr);
+                }
+                NOTIFY_CALLBACK(callback, 0, "");
+            }
+        }
+    }
 }
 
 void IMCore::ForbidSpeechApplication(const std::string& room_id, bool forbidden) {
@@ -513,13 +585,44 @@ void IMCore::ForbidSpeechApplication(const std::string& room_id, bool forbidden)
 }
 
 void IMCore::StartCallingRoll(const std::string& room_id) {
-    // TODO
+    V2TIMGroupInfo info;
+    info.modifyFlag = V2TIM_GROUP_INFO_MODIFY_FLAG_NOTIFICATION;
+    info.groupID = room_id.c_str();
+    room_info_.is_callingroll = true;
+    info.notification = IMParser::GenerateModifyGroupNotification(room_info_).c_str();
+    IMInterfaceCallback* modify_group_info_callback = new(std::nothrow) IMInterfaceCallback(kStartCallingRoll, this, nullptr);
+    V2TIMManager::GetInstance()->GetGroupManager()->SetGroupInfo(info, modify_group_info_callback);
 }
 void IMCore::StopCallingRoll(const std::string& room_id) {
-    // TODO
+    V2TIMGroupInfo info;
+    info.modifyFlag = V2TIM_GROUP_INFO_MODIFY_FLAG_NOTIFICATION;
+    info.groupID = room_id.c_str();
+    room_info_.is_callingroll = false;
+    info.notification = IMParser::GenerateModifyGroupNotification(room_info_).c_str();
+    IMInterfaceCallback* modify_group_info_callback = new(std::nothrow) IMInterfaceCallback(kStopCallingRoll, this, nullptr);
+    V2TIMManager::GetInstance()->GetGroupManager()->SetGroupInfo(info, modify_group_info_callback);
 }
-void IMCore::ReplyCallingRoll(const std::string& room_id, const std::string& sender_id, Callback callback) {
-    // TODO
+void IMCore::ReplyCallingRoll(const std::string& room_id, const std::string& sender_id, const std::string& user_id, Callback callback) {
+    std::string signaling = IMParser::GenerateReplyCallingRollJson(room_id, sender_id);
+    V2TIMString userID = user_id.c_str();
+    V2TIMString data = signaling.c_str();
+    V2TIMOfflinePushInfo offlinePushInfo;
+    IMInterfaceCallback* reply_calling_roll_callback = new(std::nothrow) IMInterfaceCallback(kReplyCallingRoll, this, callback);
+    if (reply_calling_roll_callback != nullptr) {
+        // 发送信令
+        V2TIMString inviteID = V2TIMManager::GetInstance()->GetSignalingManager()->Invite(userID, data, true, offlinePushInfo, 0, reply_calling_roll_callback);
+        if (!inviteID.Empty()) {
+            std::string invite_id(inviteID.CString());
+            AddSignalingInfo(user_id, invite_id, kReplyCallingRoll);
+            AddSignalingCallback(inviteID.CString(), callback);
+        } else {
+            LINFO("ReplyCallingRoll failed, sender_id : %s", user_id.c_str());
+            NOTIFY_CALLBACK(callback, -1, "ReplyCallingRoll failed");
+        }
+    } else {
+        LINFO("ReplyCallingRoll failed, sender_id : %s", user_id.c_str());
+        NOTIFY_CALLBACK(callback, -2, "ReplyCallingRoll failed, alloc failed");
+    }
 }
 void IMCore::OnReceiveNewInvitation(const V2TIMString &inviteID, const V2TIMString &inviter,
     const V2TIMString &groupID,
@@ -559,6 +662,61 @@ void IMCore::OnReceiveNewInvitation(const V2TIMString &inviteID, const V2TIMStri
                 callback_->OnIMCameraMuted(mute);
         }
             break;
+        case kSendSpeechApplication: {
+            // 收到申请上台通知
+            std::string sender_id;
+            bool b = IMParser::ParserDataToSenderId(str_data, sender_id);
+            if (b && callback_ != nullptr) {
+                std::string invite_id(inviteID.CString());
+                AddSignalingInfo(sender_id, invite_id, kSendSpeechApplication);
+
+                callback_->OnIMReceiveSpeechApplication(sender_id);
+            }
+        }
+            break;
+        case kSendOffSpeaker: {
+            // 收到下台通知
+            V2TIMManager::GetInstance()->GetSignalingManager()->Accept(inviteID, "", nullptr);
+            std::string receiver_id;
+            bool b = IMParser::ParserDataToReveiverId(str_data, receiver_id);
+            if (b && callback_ != nullptr) {
+                std::string invite_id(inviteID.CString());
+                AddSignalingInfo(receiver_id, invite_id, kSendOffSpeaker);
+
+                callback_->OnIMOrderedToExitSpeechkState();
+            }
+        }
+            break;
+        case kSendSpeechInvitation: {
+            // 收到邀请上台
+            std::string receiver_id;
+            bool b = IMParser::ParserDataToReveiverId(str_data, receiver_id);
+            if (b && callback_ != nullptr) {
+                std::string invite_id(inviteID.CString());
+                AddSignalingInfo(receiver_id, invite_id, kSendSpeechInvitation);
+
+                callback_->OnIMReceiveSpeechInvitation();
+            }
+        }
+            break;
+        case kSendOffAllSpeakers: {
+            V2TIMManager::GetInstance()->GetSignalingManager()->Accept(inviteID, "", nullptr);
+            if (callback_ != nullptr) {
+                callback_->OnIMOrderedToExitSpeechkState();
+            }
+        }
+            break;
+        case kReplyCallingRoll: {
+            V2TIMManager::GetInstance()->GetSignalingManager()->Accept(inviteID, "", nullptr);
+            if (callback_ != nullptr) {
+                std::string sender_id;
+                bool b = IMParser::ParserDataToSenderId(str_data, sender_id);
+                if (b) {
+                    callback_->OnIMMemberReplyCallingRoll(sender_id);
+                }
+            }
+        }
+            break;
         default:
             break;
         }
@@ -566,18 +724,44 @@ void IMCore::OnReceiveNewInvitation(const V2TIMString &inviteID, const V2TIMStri
 }
 
 void IMCore::OnInviteeAccepted(const V2TIMString &inviteID, const V2TIMString &invitee, const V2TIMString &data) {
+    std::string invite_user = invitee.CString();
+    if (invite_user == user_id_)
+        return;
+
     std::string str_data = data.CString();
     CallBackType type;
     if (IMParser::ParserDataCmdToType(str_data, type)) {
+        if (type == kSendSpeechApplication) {
+            callback_->OnIMReceiveReplyToSpeechApplication(true);
+        } else if (type == kSendSpeechInvitation) {
+            std::string receiver_id;
+            bool b = IMParser::ParserDataToReveiverId(str_data, receiver_id);
+            if (b && callback_ != nullptr) {
+                callback_->OnIMReceiveReplyToSpeechInvitation(receiver_id, true);
+            }
+        }
         // TODO
         RemoveSignalingInfo(invitee.CString(), inviteID.CString());
         RemoveSignalingCallback(inviteID.CString());
     }
 }
 void IMCore::OnInviteeRejected(const V2TIMString &inviteID, const V2TIMString &invitee, const V2TIMString &data) {
+    std::string invite_user = invitee.CString();
+    if (invite_user == user_id_)
+        return;
+
     std::string str_data = data.CString();
     CallBackType type;
     if (IMParser::ParserDataCmdToType(str_data, type)) {
+        if (type == kSendSpeechApplication) {
+            callback_->OnIMReceiveReplyToSpeechApplication(false);
+        } else if (type == kSendSpeechInvitation) {
+            std::string receiver_id;
+            bool b = IMParser::ParserDataToReveiverId(str_data, receiver_id);
+            if (b && callback_ != nullptr) {
+                callback_->OnIMReceiveReplyToSpeechInvitation(receiver_id, false);
+            }
+        }
         // TODO
         RemoveSignalingInfo(invitee.CString(), inviteID.CString());
         RemoveSignalingCallback(inviteID.CString());
@@ -587,6 +771,11 @@ void IMCore::OnInvitationCancelled(const V2TIMString &inviteID, const V2TIMStrin
     std::string str_data = data.CString();
     CallBackType type;
     if (IMParser::ParserDataCmdToType(str_data, type)) {
+        if (type == kSendSpeechApplication) {
+            std::string user_id;
+            IMParser::ParserDataToSenderId(str_data, user_id);
+            callback_->OnIMSpeechApplicationCancelled(user_id);
+        }
         // TODO
         RemoveSignalingInfo(inviter.CString(), inviteID.CString());
         RemoveSignalingCallback(inviteID.CString());
@@ -595,6 +784,18 @@ void IMCore::OnInvitationCancelled(const V2TIMString &inviteID, const V2TIMStrin
 void IMCore::OnInvitationTimeout(const V2TIMString &inviteID, const V2TIMStringVector &inviteeList) {
     if (inviteID.Empty() || inviteeList.Size() <= 0 || callback_ == nullptr)
         return;
+
+    // 学生申请发言请求超时，通知老师上层界面变更
+	{
+		std::lock_guard<std::mutex> lock(mutex_);
+    	for (auto item_user : map_signaling_) {
+        	for (auto item_inviate : item_user.second) {
+            	if (item_inviate.invite_id == std::string(inviteID.CString()) && item_inviate.type == kSendSpeechApplication) {
+                	callback_->OnIMSpeechApplicationCancelled(item_inviate.user_id);
+            	}
+        	}
+    	}
+	}
 
     // 发送方超时，inviteeList包含对方ID
     // 接收方超时没响应，自己会收到超时，inviteeList包含自己
@@ -651,6 +852,14 @@ void IMCore::OnGroupInfoChanged(const V2TIMString &groupID, const V2TIMGroupChan
                     bool muteChat = IMParser::ParserNotificationToMuteChat(group_notification);
                     callback_->OnIMChatRoomMuted(muteChat);
                 }
+
+                if (group_notification.find("isCallingRoll") != std::string::npos) {
+                    bool isCallingRoll = IMParser::ParserNotificationToIsCallingRoll(group_notification);
+                    if (isCallingRoll)
+                        callback_->OnIMCallingRollStarted();
+                    else
+                        callback_->OnIMCallingRollStopped();
+                }
                 break;
             } else if (changeInfos[i].type == V2TIM_GROUP_INFO_CHANGE_TYPE_OWNER) {
                 std::string user_id = changeInfos[i].value.CString();
@@ -666,14 +875,14 @@ void IMCore::AddSignalingInfo(const std::string& user_id, const std::string& inv
     info.user_id = user_id;
     info.type = type;
     std::lock_guard<std::mutex> lock(mutex_);
-    auto signaling_array = map_signaling_[user_id_];
+    auto signaling_array = map_signaling_[user_id];
     signaling_array.push_back(info);
     map_signaling_[user_id] = signaling_array;
 }
 
 void IMCore::RemoveSignalingInfo(const std::string& user_id, const std::string& invite_id) {
     std::lock_guard<std::mutex> lock(mutex_);
-    auto signaling_array = map_signaling_[user_id_];
+    auto signaling_array = map_signaling_[user_id];
     for (auto iter = signaling_array.begin(); iter != signaling_array.end(); ++iter) {
         if (iter->invite_id == invite_id) {
             signaling_array.erase(iter);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 Tencent. All rights reserved.
+// Copyright (c) 2021 Tencent. All rights reserved.
 
 #include "crash_dump.h"
 
@@ -10,7 +10,6 @@
 #include <DbgHelp.h>
 #include <shellapi.h>
 
-#include "crash_agent.h"
 #include "CommonDef.h"
 #include <memory>
 
@@ -67,24 +66,15 @@ CrashDump::~CrashDump() {
   }
 }
 
-
-void CrashDump::Init(int major_ver, int minor_ver, int build_no) {
-  if (LoadBugReportDll() == false) {
+void CrashDump::Init(const std::string& appinfo, const std::string& version) {
+  if (InitCrashSight(appinfo, version) == false) {
     InitAttachExceptionFilter();
-  } else {
-    InitBugReport(L"TRTC_APP", UTF82Wide(kAppName).c_str(), major_ver, minor_ver,
-                  build_no);
   }
 }
 
-bool CrashDump::LoadBugReportDll() {
-  if (CreateCrashAgent("bugreport.dll", &crash_agent_) ==
-      CrashAgentResult::kSuccess && crash_agent_ != nullptr) {
-    return true;
-  }
-  return false;
+bool CrashDump::InitCrashSight(const std::string& appinfo, const std::string& version) {
+    return false;
 }
-
 
 void CrashDump::InitAttachExceptionFilter() {
   // 堆异常
@@ -136,19 +126,6 @@ void CrashDump::InitAttachExceptionFilter() {
               .c_str());
     }
   }
-}
-
-bool CrashDump::InitBugReport(std::wstring product_name,
-                              std::wstring process_name,
-                              int major_ver,
-                              int minor_ver,
-                              int build_no) {
-  if (crash_agent_) {
-    crash_agent_->Install(product_name.c_str(), process_name.c_str(), major_ver,
-                          minor_ver, build_no);
-    return true;
-  }
-  return false;
 }
 
 LONG WINAPI CrashDump::UnhandledExceptionFilter(

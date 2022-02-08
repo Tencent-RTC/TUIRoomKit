@@ -29,8 +29,6 @@ class ITRTCVideoRenderCallback;
 /**
  * 系统音量类型（仅适用于移动设备）
  *
- * @deprecated v9.5 版本开始不推荐使用。
- *
  * 现代智能手机中一般都具备两套系统音量类型，即“通话音量”和“媒体音量”。
  * - 通话音量：手机专门为接打电话所设计的音量类型，自带回声抵消（AEC）功能，并且支持通过蓝牙耳机上的麦克风进行拾音，缺点是音质比较一般。
  *            当您通过手机侧面的音量按键下调手机音量时，如果无法将其调至零（也就是无法彻底静音），说明您的手机当前出于通话音量。
@@ -41,13 +39,17 @@ class ITRTCVideoRenderCallback;
  */
 enum TXSystemVolumeType {
 
-    ///自动切换模式
+    ///自动切换模式：
+    ///也被称为“麦上通话，麦下媒体”，即主播上麦时使用通话音量，观众不上麦则使用媒体音量，适合在线直播场景。
     TXSystemVolumeTypeAuto = 0,
 
-    ///全程媒体音量
+    ///全程媒体音量：
+    ///通话全程使用媒体音量，并不是非常常用的音量类型，适用于对音质要求比较苛刻的音乐场景中。
+    ///如果您的用户大都使用外接设备（比如外接声卡）为主，可以使用该模式，否则请慎用。
     TXSystemVolumeTypeMedia = 1,
 
-    ///全程通话音量
+    ///全程通话音量：
+    ///该方案的优势在于用户在上下麦时音频模块无需切换工作模式，可以做到无缝上下麦，适合于用户需要频繁上下麦的应用场景。
     TXSystemVolumeTypeVOIP = 2,
 
 };
@@ -312,6 +314,11 @@ class ITXDeviceManager {
      * 设置音频路由为扬声器时，声音比较大，不用将手机贴脸也能听清，因此可以实现“免提”的功能。
      */
     virtual int setAudioRoute(TXAudioRoute route) = 0;
+
+    /**
+     * 1.10 设置系统音量类型（仅适用于移动端）
+     */
+    virtual int setSystemVolumeType(TXSystemVolumeType type) = 0;
 #endif
 
 /// @}
@@ -471,24 +478,6 @@ class ITXDeviceManager {
     virtual void setDeviceObserver(ITXDeviceObserver* observer) = 0;
 #endif
 
-/// @}
-/////////////////////////////////////////////////////////////////////////////////
-//
-//                    弃用接口（建议使用对应的新接口）
-//
-/////////////////////////////////////////////////////////////////////////////////
-/// @name 弃用接口（建议使用对应的新接口）
-/// @{
-
-/**
- * 设置系统音量类型（仅适用于移动端）
- *
- * @deprecated v9.5 版本开始不推荐使用，建议使用 {@link TRTCCloud} 中的 startLocalAudio(quality) 接口替代之，通过 quality 参数来决策音质。
- */
-#if __ANDROID__ || (__APPLE__ && TARGET_OS_IOS)
-    virtual int setSystemVolumeType(TXSystemVolumeType type) = 0;
-#endif
-
     /// @}
 };  // End of class ITXDeviceManager
 }  // namespace liteav
@@ -500,5 +489,5 @@ namespace trtc = liteav;
 using namespace liteav;
 #endif
 
-#endif /* __ITXDEVICEMANAGER_H__ */
+#endif / *__ITXDEVICEMANAGER_H__* /
 /// @}

@@ -145,13 +145,13 @@
        <widget class="QWidget" name="forbid_mic_widget" native="true">
         <property name="minimumSize">
          <size>
-          <width>135</width>
+          <width>150</width>
           <height>30</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>135</width>
+          <width>150</width>
           <height>30</height>
          </size>
         </property>
@@ -209,13 +209,13 @@
        <widget class="QWidget" name="forbid_camera_widget" native="true">
         <property name="minimumSize">
          <size>
-          <width>135</width>
+          <width>150</width>
           <height>30</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>135</width>
+          <width>150</width>
           <height>30</height>
          </size>
         </property>
