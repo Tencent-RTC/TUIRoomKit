@@ -15,7 +15,7 @@ TXMessageBox::TXMessageBox()
     QString sheet = "QLabel#label_title{font-weight:bold;font-size:16px;}\
                     QLabel#label_content{font-size:14px;}\
                     QPushButton#btn_close{background:transparent; border:none; padding:0px; \
-                    border-image: url(:/LoginController/LoginController/close.png);}\
+                    border-image: url(:/Common/Common/close.png);}\
                     QPushButton#btn_cancel{\
                         border: 2px solid #D3D3D3;\
                         padding: 4px;\

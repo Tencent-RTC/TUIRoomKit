@@ -44,10 +44,10 @@ BottomBarController::BottomBarController(QWidget *parent)
     connect(&StatusUpdateCenter::Instance(), &StatusUpdateCenter::SignalUpdateUserInfo, this, &BottomBarController::SlotUpdateUserInfo);
 
     QString sheet = "QLabel{color:white; background-color:red; border-radius:10;}";
-    label_member_num_ = new QLabel(ui.widget_num);
+    label_member_num_ = new QLabel(ui.widget_member);
     label_member_num_->setStyleSheet(sheet);
     label_member_num_->resize(20, 20);
-    label_member_num_->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    label_member_num_->setAlignment(Qt::AlignCenter);
     label_member_num_->hide();
 
     ui.widget_bg->setProperty("screen_sharing", false);
@@ -121,8 +121,9 @@ void BottomBarController::IncreaseHandsupNum() {
     if (label_member_num_ != nullptr) {
         int num = label_member_num_->text().isEmpty() ? 0 : label_member_num_->text().toInt();
 
-        label_member_num_->move(0, 3);
+        label_member_num_->move(ui.widget_member->width() - label_member_num_->width() - 5, 0);
         label_member_num_->show();
+        label_member_num_->raise();
         label_member_num_->setText(QString::number(num + 1));
     }
 }

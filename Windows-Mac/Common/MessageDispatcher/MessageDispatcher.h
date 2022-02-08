@@ -35,7 +35,7 @@ public:
 
 	void OnRemoteUserCameraAvailable(const std::string& user_id, bool available) override;
 
-	void OnRemoteUserScreenVideoAvailable(const std::string& user_id, bool available) override;
+	void OnRemoteUserScreenAvailable(const std::string& user_id, bool available) override;
 
 	void OnRemoteUserAudioAvailable(const std::string& user_id, bool available) override;
 
@@ -119,7 +119,7 @@ signals:
 
 	void SignalOnRemoteUserCameraAvailable(const QString& user_id, bool available);
 
-	void SignalOnRemoteUserScreenVideoAvailable(const QString& user_id, bool available);
+	void SignalOnRemoteUserScreenAvailable(const QString& user_id, bool available);
 
 	void SignalOnRemoteUserAudioAvailable(const QString& user_id, bool available);
 

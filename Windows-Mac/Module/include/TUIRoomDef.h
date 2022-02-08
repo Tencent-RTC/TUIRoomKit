@@ -175,7 +175,8 @@ struct TUIRoomInfo {
         , is_speech_application_forbidden(false)
         , is_all_camera_muted(false)
         , is_all_microphone_muted(false)
-        , is_callingroll(false) {
+        , is_callingroll(false)
+        , start_time(0) {
     }
 };
 

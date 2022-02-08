@@ -84,7 +84,6 @@
     <ClInclude Include="..\Module\include\TUIRoomDef.h" />
     <ClInclude Include="..\Module\ScreenShareManager.h" />
     <ClInclude Include="..\Module\TUIRoomCoreImpl.h" />
-    <ClInclude Include="..\utils\BugReport\crash_agent.h" />
     <ClInclude Include="..\utils\BugReport\crash_dump.h" />
     <ClInclude Include="..\utils\json.h" />
     <ClInclude Include="..\utils\log.h" />
@@ -249,7 +248,7 @@
       <Command>xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win64\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.exe $(OutputPath)
-xcopy /y $(ProjectDir)3rdParty\BugReport\x64\*.* $(Outputpath)
+xcopy /y /e $(ProjectDir)3rdParty\BugReport\x64 $(Outputpath)
 xcopy /y $(QtDir)\bin\Qt5Gui.dll $(OutputPath)
 xcopy /y $(QtDir)\bin\Qt5Widgets.dll $(OutputPath)
 xcopy /y $(QtDir)\bin\Qt5Core.dll $(OutputPath)
@@ -280,7 +279,7 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
       <Command>xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win32\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.exe $(OutputPath)
-xcopy /y $(ProjectDir)3rdParty\BugReport\x86\*.* $(Outputpath)
+xcopy /y /e $(ProjectDir)3rdParty\BugReport\x86 $(Outputpath)
 xcopy /y $(QtDir)\bin\Qt5Gui.dll $(OutputPath)
 xcopy /y $(QtDir)\bin\Qt5Widgets.dll $(OutputPath)
 xcopy /y $(QtDir)\bin\Qt5Core.dll $(OutputPath)
@@ -311,7 +310,7 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
       <Command>xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win64\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.exe $(OutputPath)
-xcopy /y $(ProjectDir)3rdParty\BugReport\x64\*.* $(Outputpath)
+xcopy /y /e $(ProjectDir)3rdParty\BugReport\x64 $(Outputpath)
 xcopy /y $(QtDir)\bin\Qt5Guid.dll $(OutputPath)
 xcopy /y $(QtDir)\bin\Qt5Widgetsd.dll $(OutputPath)
 xcopy /y $(QtDir)\bin\Qt5Cored.dll $(OutputPath)
@@ -342,7 +341,7 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
       <Command>xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win32\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.exe $(OutputPath)
-xcopy /y $(ProjectDir)3rdParty\BugReport\x86\*.* $(Outputpath)
+xcopy /y /e $(ProjectDir)3rdParty\BugReport\x86 $(Outputpath)
 xcopy /y $(QtDir)\bin\Qt5Guid.dll $(OutputPath)
 xcopy /y $(QtDir)\bin\Qt5Widgetsd.dll $(OutputPath)
 xcopy /y $(QtDir)\bin\Qt5Cored.dll $(OutputPath)

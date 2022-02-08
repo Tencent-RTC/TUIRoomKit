@@ -32,13 +32,6 @@ class V2_API V2TXLivePremier {
     static void setObserver(V2TXLivePremierObserver* observer);
 #endif
 
-/**
- * 设置 Log 的配置信息
- */
-#ifdef _WIN32
-    static int32_t setLogConfig(const V2TXLiveLogConfig& config);
-#endif
-
     /**
      * 设置 SDK 接入环境
      *
@@ -85,11 +78,6 @@ class V2TXLivePremierObserver {
    public:
     virtual ~V2TXLivePremierObserver() {
     }
-
-    /**
-     * 自定义 Log 输出回调接口
-     */
-    virtual void onLog(V2TXLiveLogLevel level, const char* log){};
 
     /**
      * 本地麦克风采集到的音频数据回调

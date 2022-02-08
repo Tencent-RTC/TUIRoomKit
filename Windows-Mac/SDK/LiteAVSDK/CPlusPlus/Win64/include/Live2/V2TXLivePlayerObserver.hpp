@@ -42,46 +42,24 @@ class V2TXLivePlayerObserver {
     virtual void onWarning(V2TXLivePlayer* player, int32_t code, const char* msg, void* extraInfo){};
 
     /**
-     * 已经成功连接到服务器
+     * 直播播放器视频状态变化通知
      *
      * @param player    回调该通知的播放器对象
+     * @param status    状态码 {@link V2TXLivePlayStatus}
+     * @param reason    状态对应的原因 {@link V2TXLiveStatusChangeReason}
      * @param extraInfo 扩展信息
      */
-    virtual void onConnected(V2TXLivePlayer* player, void* extraInfo){};
+    virtual void onVideoPlayStatusUpdate(V2TXLivePlayer* player, V2TXLivePlayStatus status, V2TXLiveStatusChangeReason reason, void* extraInfo){};
 
     /**
-     * 视频播放事件
+     * 直播播放器音频状态变化通知
      *
      * @param player    回调该通知的播放器对象
-     * @param firstPlay 第一次播放标志
+     * @param status    状态码 {@link V2TXLivePlayStatus}
+     * @param reason    状态对应的原因 {@link V2TXLiveStatusChangeReason}
      * @param extraInfo 扩展信息
      */
-    virtual void onVideoPlaying(V2TXLivePlayer* player, bool firstPlay, void* extraInfo){};
-
-    /**
-     * 音频播放事件
-     *
-     * @param player    回调该通知的播放器对象
-     * @param firstPlay 第一次播放标志
-     * @param extraInfo 扩展信息
-     */
-    virtual void onAudioPlaying(V2TXLivePlayer* player, bool firstPlay, void* extraInfo){};
-
-    /**
-     * 视频加载事件
-     *
-     * @param player    回调该通知的播放器对象
-     * @param extraInfo 扩展信息
-     */
-    virtual void onVideoLoading(V2TXLivePlayer* player, void* extraInfo){};
-
-    /**
-     * 音频加载事件
-     *
-     * @param player    回调该通知的播放器对象
-     * @param extraInfo 扩展信息
-     */
-    virtual void onAudioLoading(V2TXLivePlayer* player, void* extraInfo){};
+    virtual void onAudioPlayStatusUpdate(V2TXLivePlayer* player, V2TXLivePlayStatus status, V2TXLiveStatusChangeReason reason, void* extraInfo){};
 
     /**
      * 播放器音量大小回调

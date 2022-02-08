@@ -36,11 +36,15 @@ enum CallBackType {
     kMuteAllUserMicrophone,
     kMuteUserCamera,
     kMuteAllUserCamera,
+    kStartCallingRoll,
+    kStopCallingRoll,
+    kReplyCallingRoll,
     kSendMessage,
     kSendSpeechInvitation,
     kCancelSpeechInvitation,
     kReplySpeechInvitation,
     kSendOffSpeaker,
+    kSendOffAllSpeakers,
     kSendSpeechApplication,
     kCancelSpeechApplication,
     kReplySpeechApplication,
@@ -96,7 +100,7 @@ public:
     // 禁用用户摄像头
     void MuteUserCamera(const std::string& room_id, const std::string& sender_id, const std::string& user_id, bool mute, Callback callback);
     // 回复主持人点名
-    void ReplyCallingRoll(const std::string& room_id, const std::string& sender_id, Callback callback);
+    void ReplyCallingRoll(const std::string& room_id, const std::string& sender_id, const std::string& user_id, Callback callback);
 
     // 命令停止发言
     void SendOffSpeaker(const std::string& room_id, const std::string& sender_id, const std::string& user_id, Callback callback);

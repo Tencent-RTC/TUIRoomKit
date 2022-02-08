@@ -386,7 +386,7 @@ CPU：%3%
     </message>
     <message>
         <source>forbid all mic</source>
-        <translation>全员闭麦</translation>
+        <translation>全员禁麦</translation>
     </message>
     <message>
         <source>forbid all video</source>
@@ -394,11 +394,11 @@ CPU：%3%
     </message>
     <message>
         <source>open all mic</source>
-        <translation>全员开麦</translation>
+        <translation>取消全员禁麦</translation>
     </message>
     <message>
         <source>open all video</source>
-        <translation>全员开视频</translation>
+        <translation type="unfinished">取消全员禁视频</translation>
     </message>
 </context>
 <context>

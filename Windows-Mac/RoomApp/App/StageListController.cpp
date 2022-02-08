@@ -90,7 +90,7 @@ void StageListController::InitConnect() {
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserLeave, this, &StageListController::SlotOnRemoteUserLeaveRoom);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserCameraAvailable, this, &StageListController::SlotOnRemoteUserVideoOpen);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserAudioAvailable, this, &StageListController::SlotOnRemoteUserAudioOpen);
-    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserScreenVideoAvailable, this, &StageListController::SlotOnRemoteUserScreenVideoOpen);
+    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserScreenAvailable, this, &StageListController::SlotOnRemoteUserScreenVideoOpen);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserEnterSpeechState, this, &StageListController::SlotOnRemoteUserEnterSpeechState);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserExitSpeechState, this, &StageListController::SlotOnRemoteUserExitSpeechState);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRoomMasterChanged, this, &StageListController::SlotOnRoomMasterChanged);

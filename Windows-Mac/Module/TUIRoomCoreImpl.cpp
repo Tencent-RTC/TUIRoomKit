@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 Tencent. All rights reserved.
+// Copyright (c) 2021 Tencent. All rights reserved.
 #include <regex>
 #include <algorithm>
 #include <cstdlib>
@@ -153,7 +153,10 @@ int TUIRoomCoreImpl::EnterRoom(const std::string& room_id) {
         LINFO("User EnterRoom(kAudience), user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_id.c_str());
         room_info_.room_id = room_id;
         room_info_.room_name = room_id;
-        local_user_info_.role = TUIRole::kAudience;
+        if (room_info_.mode == TUISpeechMode::kApplySpeech)
+            local_user_info_.role = TUIRole::kAudience;
+        else
+            local_user_info_.role = TUIRole::kAnchor;
         room_user_map_[local_user_info_.user_id] = local_user_info_;
         // 调用【IM入群】信令，成功后进入TRTC房间
         if (im_core_ != nullptr) {
@@ -461,7 +464,12 @@ int TUIRoomCoreImpl::StopCallingRoll() {
 int TUIRoomCoreImpl::ReplyCallingRoll(Callback callback) {
     LINFO("ReplyCallingRoll");
     if (im_core_ != nullptr) {
-        im_core_->ReplyCallingRoll(room_info_.room_id, local_user_info_.user_id, callback);
+        auto iter = find_if(room_user_map_.begin(), room_user_map_.end(), [](std::unordered_map<std::string, TUIUserInfo>::value_type info) {
+            return info.second.role == TUIRole::kMaster;
+        });
+        if (iter != room_user_map_.end()) {
+            im_core_->ReplyCallingRoll(room_info_.room_id, local_user_info_.user_id, iter->second.user_id, callback);
+        }
     }
     return 0;
 }
@@ -491,6 +499,11 @@ int TUIRoomCoreImpl::ReplySpeechInvitation(bool agree, Callback callback) {
         auto iter = find_if(room_user_map_.begin(), room_user_map_.end(), [](std::unordered_map<std::string,TUIUserInfo>::value_type info) {
             return info.second.role == TUIRole::kMaster;
         });
+        if (agree && local_user_info_.role != TUIRole::kMaster) {
+            local_user_info_.role = TUIRole::kAnchor;
+            room_user_map_[local_user_info_.user_id] = local_user_info_;
+            trtc_cloud_->switchRole(liteav::TRTCRoleAnchor);
+        }
         if (iter != room_user_map_.end()) {
             im_core_->ReplySpeechInvitation(room_info_.room_id, local_user_info_.user_id, iter->second.user_id, agree, callback);
         }
@@ -576,13 +589,16 @@ int TUIRoomCoreImpl::ExitSpeechState() {
     trtc_cloud_->stopLocalPreview();
     trtc_cloud_->stopLocalAudio();
 
-    if (local_user_info_.role != TUIRole::kMaster) {
+    if (local_user_info_.role != TUIRole::kMaster &&  local_user_info_.role != TUIRole::kAudience) {
         trtc_cloud_->switchRole(liteav::TRTCRoleAudience);
         local_user_info_.role = TUIRole::kAudience;
     }
     local_user_info_.has_screen_stream = false;
+    local_user_info_.has_subscribed_screen_stream = false;
     local_user_info_.has_audio_stream = false;
+    local_user_info_.has_subscribed_audio_stream = false;
     local_user_info_.has_video_stream = false;
+    local_user_info_.has_subscribed_video_stream = false;
     room_user_map_[local_user_info_.user_id] = local_user_info_;
     return 0;
 }
@@ -658,10 +674,6 @@ void TUIRoomCoreImpl::onEnterRoom(int result) {
     if (result > 0) {
         LINFO("User onEnterRoom,cost time :%d,current role : %d", result, local_user_info_.role);
         enter_room_success_ = true;
-        if (local_user_info_.role == TUIRole::kAudience) {
-            local_user_info_.role = TUIRole::kAnchor;
-            room_user_map_[local_user_info_.user_id] = local_user_info_;
-        }
         LINFO("User onEnterRoom after cost time :%d,current role : %d", result, local_user_info_.role);
     }
     if (room_core_callback_ != nullptr) {
@@ -707,7 +719,7 @@ void TUIRoomCoreImpl::onUserSubStreamAvailable(const char* user_id, bool availab
     std::string remote_user_id = user_id;
     if (room_core_callback_ != nullptr) {
         // 通知上层，让上层拉取user_id用户的音视频流并显示
-        room_core_callback_->OnRemoteUserScreenVideoAvailable(remote_user_id, available);
+        room_core_callback_->OnRemoteUserScreenAvailable(remote_user_id, available);
     }
 }
 void TUIRoomCoreImpl::onScreenCaptureStoped(int reason) {
@@ -797,6 +809,10 @@ void TUIRoomCoreImpl::onRemoteUserLeaveRoom(const char* user_id, int reason) {
         }
         room_user_map_.erase(remote_user_id);
     } else if (iter->second.role == TUIRole::kAnchor) {
+        LINFO("User Leave Room,user_id :%s user_name:%s ,role: %d", user_id, iter->second.user_name.c_str(), iter->second.role);
+        if (iter->second.role == TUIRole::kAnchor) {
+            iter->second.role = TUIRole::kAudience;
+        }
         if (room_core_callback_ != nullptr) {
             room_core_callback_->OnRemoteUserExitSpeechState(remote_user_id);
         }
@@ -972,6 +988,9 @@ void TUIRoomCoreImpl::OnIMCreateRoom(int code, const std::string& message) {
     } else if (code == 0) { // 成功建群
         if (room_core_callback_ != nullptr) {
             room_core_callback_->OnCreateRoom(code, message);
+            std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch());
+            room_info_.start_time = ms.count();
         }
     }
 }
@@ -990,7 +1009,7 @@ void TUIRoomCoreImpl::OnIMEnterRoom(int code, const std::string& message) {
     // 登录成功，立即调用【IM获取成员列表】信令
     // 如果是成员，需要先获取群列表和群信息，才能进房间
     LINFO("OnIMEnterRoom code :%d, message %s,role: %d", code, message.c_str(), local_user_info_.role);
-    if (im_core_ != nullptr && local_user_info_.role == TUIRole::kAudience) {
+    if (im_core_ != nullptr && local_user_info_.role != TUIRole::kMaster) {
         im_core_->GetRoomInfo(room_info_.room_id);
         im_core_->GetRoomMemberInfoList(room_info_.room_id);
     } else {
@@ -1023,6 +1042,10 @@ void TUIRoomCoreImpl::OnIMUserExitRoom(int code, const std::string& user_id) {
 
 void TUIRoomCoreImpl::OnIMRoomMasterChanged(const std::string& user_id){
     LINFO("OnIMRoomMasterChanged user_id %s", user_id.c_str());
+    if (user_id == room_info_.owner_id) {
+        LINFO("Current master is %s,don't need change", user_id.c_str());
+        return;
+    }
     auto iter = room_user_map_.begin();
     for (; iter != room_user_map_.end(); iter++) {
         if (iter->second.role == TUIRole::kMaster) {
@@ -1030,9 +1053,16 @@ void TUIRoomCoreImpl::OnIMRoomMasterChanged(const std::string& user_id){
             break;
         }
     }
-    if (local_user_info_.user_id == user_id && local_user_info_.role == TUIRole::kAnchor) {
+    iter = room_user_map_.begin();
+    for (; iter != room_user_map_.end(); iter++) {
+        if (iter->second.role == TUIRole::kAnchor && iter->second.user_id == user_id) {
+            iter->second.role = TUIRole::kMaster;
+            break;
+        }
+    }
+    room_info_.owner_id = user_id;
+    if (local_user_info_.user_id == user_id) {
         local_user_info_.role = TUIRole::kMaster;
-        room_user_map_[local_user_info_.user_id] = local_user_info_;
     }
     if (room_core_callback_ != nullptr) {
         room_core_callback_->OnRoomMasterChanged(user_id);
@@ -1101,6 +1131,8 @@ void TUIRoomCoreImpl::OnIMGetRoomInfo(const TUIRoomInfo& info) {
     room_info_.is_speech_application_forbidden = info.is_speech_application_forbidden;
     room_info_.is_callingroll = info.is_callingroll;
     room_info_.mode = info.mode;
+    room_info_.start_time = info.start_time;
+    room_info_.owner_id = info.owner_id;
     LINFO("OnIMGetRoomInfo,is_all_camera_muted:%d,is_all_microphone_muted:%d,is_chat_room_muted:%d,"
         "stage_forbidden:%d,mode:%d,is_callingroll:%d",
         info.is_all_camera_muted, info.is_all_microphone_muted, info.is_chat_room_muted,
@@ -1164,7 +1196,7 @@ void TUIRoomCoreImpl::OnIMOrderedToExitSpeechkState() {
         room_core_callback_->OnOrderedToExitSpeechState();
     }
     // 被房主请停止发言，成员需要转换自己的身份为观众
-    if (trtc_cloud_ != nullptr && local_user_info_.role != TUIRole::kMaster) {
+    if (trtc_cloud_ != nullptr && local_user_info_.role != TUIRole::kMaster && local_user_info_.role != TUIRole::kAudience) {
         trtc_cloud_->switchRole(liteav::TRTCRoleAudience);
         local_user_info_.role = TUIRole::kAudience;
         room_user_map_[local_user_info_.user_id] = local_user_info_;
@@ -1243,7 +1275,7 @@ void TUIRoomCoreImpl::OnIMAllUsersMicrophoneMuted(bool muted) {
     if (local_user_info_.role == TUIRole::kMaster) {
         return;
     }
-    if (room_core_callback_ != nullptr) {
+    if (room_core_callback_ != nullptr && muted) {
         room_core_callback_->OnMicrophoneMuted(muted);
     }
 }
@@ -1260,7 +1292,7 @@ void TUIRoomCoreImpl::OnIMAllUsersCameraMuted(bool muted) {
         return;
     }
     room_info_.is_all_camera_muted = muted;
-    if (room_core_callback_ != nullptr) {
+    if (room_core_callback_ != nullptr && muted) {
         room_core_callback_->OnCameraMuted(muted);
     }
 }

@@ -147,6 +147,21 @@ std::string IMParser::GenerateSendOffSpeakerJson(const std::string& room_id, con
 
     return std::move(cmd_json);
 }
+std::string IMParser::GenerateSendOffAllSpeakerJson(const std::string& room_id, const std::vector<std::string>& user_id_array) {
+    /*
+    {
+        "cmd": "SendOffAllSpeakers",
+        "room_id": "Room_123456",
+    }
+    */
+    Json::Value json_value_param;
+    json_value_param["cmd"] = "SendOffAllSpeakers";
+    json_value_param["room_id"] = room_id.c_str();
+
+    std::string cmd_json = GenerateCmdJson(json_value_param);
+
+    return std::move(cmd_json);
+}
 std::string IMParser::GenerateSendSpeechApplicationJson(const std::string& room_id, const std::string& user_id) {
     /*
     {
@@ -177,6 +192,23 @@ std::string IMParser::GenerateKickOffUserJson(const std::string& room_id, const 
     json_value_param["cmd"] = "KickOffUser";
     json_value_param["room_id"] = room_id.c_str();
     json_value_param["receiver_id"] = user_id.c_str();
+
+    std::string cmd_json = GenerateCmdJson(json_value_param);
+
+    return std::move(cmd_json);
+}
+std::string IMParser::GenerateReplyCallingRollJson(const std::string& room_id, const std::string& sender_id) {
+    /*
+    {
+        "cmd": "ReplyCallingRoll",
+        "room_id": "Room_123456",
+        "sender_id":"test_user_id",
+    }
+    */
+    Json::Value json_value_param;
+    json_value_param["cmd"] = "ReplyCallingRoll";
+    json_value_param["room_id"] = room_id.c_str();
+    json_value_param["sender_id"] = sender_id.c_str();
 
     std::string cmd_json = GenerateCmdJson(json_value_param);
 
@@ -245,6 +277,26 @@ bool IMParser::ParserNotificationToSpeechMode(const std::string& notification, s
 
     return true;
 }
+bool IMParser::ParserNotificationToStartTime(const std::string& notification, long long& start_time) {
+    Json::Value json_value;
+    Json::Reader reader;
+    if (!reader.parse(notification, json_value)) {
+        return false;
+    }
+    start_time = json_value["startTime"].asInt64();
+
+    return true;
+}
+bool IMParser::ParserNotificationToIsCallingRoll(const std::string& notification) {
+    Json::Value json_value;
+    Json::Reader reader;
+    if (!reader.parse(notification, json_value)) {
+        return false;
+    }
+    bool is_calling_roll = json_value["isCallingRoll"].asBool();
+
+    return is_calling_roll;
+}
 
 bool IMParser::ParserDataToMute(const std::string& data) {
     /*
@@ -301,7 +353,12 @@ bool IMParser::ParserDataCmdToType(const std::string& data, CallBackType& type) 
         type = kSendSpeechInvitation;
     } else if ("KickOffUser" == cmd) {
         type = kKickOffUser;
+    } else if ("SendOffSpeaker" == cmd) {
+        type = kSendOffSpeaker;
+    } else if ("SendOffAllSpeakers" == cmd) {
+        type = kSendOffAllSpeakers;
     }
+
     return true;
 }
 bool IMParser::ParserDataToUserId(const std::string& data, std::string& user_id) {
@@ -334,5 +391,37 @@ bool IMParser::ParserDataToSenderId(const std::string& data, std::string& sender
     }
 
     sender_id = data_json_value["sender_id"].asString();
+    return true;
+}
+bool IMParser::ParserDataToReveiverId(const std::string& data, std::string& receiver_id) {
+    Json::Value json_value;
+    Json::Reader reader;
+    if (!reader.parse(data, json_value)) {
+        return false;
+    }
+
+    std::string strdata = json_value["data"].toStyledString();
+    Json::Value data_json_value;
+    if (!reader.parse(strdata, data_json_value)) {
+        return false;
+    }
+
+    receiver_id = data_json_value["receiver_id"].asString();
+    return true;
+}
+bool IMParser::ParserDataToAgree(const std::string& data, bool& agree) {
+    Json::Value json_value;
+    Json::Reader reader;
+    if (!reader.parse(data, json_value)) {
+        return false;
+    }
+
+    std::string strdata = json_value["data"].toStyledString();
+    Json::Value data_json_value;
+    if (!reader.parse(strdata, data_json_value)) {
+        return false;
+    }
+
+    agree = data_json_value["agree"].asBool();
     return true;
 }

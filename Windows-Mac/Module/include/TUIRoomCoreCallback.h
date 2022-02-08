@@ -177,12 +177,12 @@ public:
     /**
      * 3.4 远端用户是否开启屏幕分享
      *
-     * 当您收到 OnRemoteUserScreenVideoAvailable(user_id, true) 通知时，表示该用户开启了屏幕分享，有可用的屏幕分享流数据帧到达。
+     * 当您收到 OnRemoteUserScreenAvailable(user_id, true) 通知时，表示该用户开启了屏幕分享，有可用的屏幕分享流数据帧到达。
      *
      * @param user_id 	用户ID
      * @param available  是否有屏幕分享流数据
      */
-    virtual void OnRemoteUserScreenVideoAvailable(const std::string& user_id, bool available) = 0;
+    virtual void OnRemoteUserScreenAvailable(const std::string& user_id, bool available) = 0;
 
     /**
      * 3.5 远端用户是否开启音频上行

@@ -58,8 +58,8 @@ MainWindow::MainWindow(TUISpeechMode speech_mode, QWidget *parent)
             stage_list_view_control_->ShowVideoTip(true);
     });
 
-
-    TUIRoomCore::GetInstance()->GetDeviceManager()->setDeviceObserver(&MessageDispatcher::Instance());
+    if (TUIRoomCore::GetInstance()->GetDeviceManager() != nullptr)
+        TUIRoomCore::GetInstance()->GetDeviceManager()->setDeviceObserver(&MessageDispatcher::Instance());
     // 回调事件
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnCreateRoom, this, &MainWindow::SlotOnCreateRoom);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnEnterRoom, this, &MainWindow::SlotOnEnterRoom);
@@ -323,9 +323,11 @@ void MainWindow::SlotShowChatRoom(bool show) {
 }
 
 void MainWindow::SlotClose() {
+    LINFO("MainWindow::SlotClose , enter_room_success_ : %d", enter_room_success_);
     if (enter_room_success_) {
         auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
         if (local_user == nullptr) {
+            LERROR("MainWindow::SlotClose, local_user is nullptr");
             return;
         }
         if (local_user->role == TUIRole::kMaster) {

@@ -184,8 +184,9 @@ void DataStore::ParseLaunchParam(QStringList params) {
     user_login_info_.user_id = user_id;
     user_login_info_.user_sig = user_sig;
     user_login_info_.sdk_app_id = sdk_app_id;
-    current_language_ = is_language_zh ? Language::kChinese : Language::kEnglish;
 
 	auto recent_user_info = GetRecentUserInfo();
-	user_login_info_.name = recent_user_info.name;
+    user_login_info_.name = recent_user_info.name;
+
+    current_language_ = is_language_zh ? Language::kChinese : Language::kEnglish;
 }

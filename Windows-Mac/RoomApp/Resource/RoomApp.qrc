@@ -151,4 +151,15 @@
         <file>RoomTipsView/info.png</file>
         <file>RoomTipsView/info_hover.png</file>
     </qresource>
+    <qresource prefix="/Common">
+        <file>Common/close.png</file>
+        <file>Common/close_h.png</file>
+        <file>Common/close_p.png</file>
+        <file>Common/max.png</file>
+        <file>Common/max_h.png</file>
+        <file>Common/max_normal.png</file>
+        <file>Common/max_normal_h.png</file>
+        <file>Common/min.png</file>
+        <file>Common/min_h.png</file>
+    </qresource>
 </RCC>

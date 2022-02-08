@@ -13,6 +13,7 @@ signals:
     void SignalStageListLayoutChanged(StageListDirection direction);
     void SignalCloseMainWindow(TUIExitRoomType type);
     void SignalMainWindowActive();
+    void SignalShowMemberListView(bool show);
 private:
     StatusUpdateCenter(QObject *parent);
 	~StatusUpdateCenter();
