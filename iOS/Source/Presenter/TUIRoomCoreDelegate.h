@@ -103,7 +103,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onRemoteUserExitSpeechState:(NSString *)userId;
 
 /**
- * 收到自定义消息回调
+ * 收到文本消息回调
  *
  * @param userId 用户ID
  * @param message   自定义消息内容

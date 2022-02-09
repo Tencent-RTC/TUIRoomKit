@@ -374,18 +374,6 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
     }
 
     /**
-     * 主持人收到用户同意邀请发言的回调
-     *
-     * 用户调用replySpeechInvitation接口回应主持人发言邀请时，主持人收到的回调
-     *
-     * @param userId  用户ID
-     * @param agree   是否同意发言 true为同意， false为不同意
-     */
-    func onReceiveReply(toSpeechInvitation userId: String, agree: Bool) {
-        debugPrint("onReceiveReply:\(agree)")
-    }
-
-    /**
      * 用户申请发言回调
      *
      * TUIRoomCoreDef.SpeechMode.APPLY_SPEECH，用户调用sendSpeechApplication接口向主持人申请发言时，
@@ -407,18 +395,6 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
         debugPrint("onSpeechApplicationCancelled:\(userId)")
     }
     
-    /**
-     * 主持人同意发言申请回调
-     *
-     * 在TUIRoomCoreDef.SpeechMode.APPLY_SPEECH模式下，主持人调用replySpeechApplication接口回应用户申请发言时，
-     * 用户收到的回调，用户根据主持人是否同意决定是否可以发言
-     *
-     * @param agree  是否同意发言 true为同意， false为不同意
-     */
-    func onReceiveReply(toSpeechApplication agree: Bool, userId: String) {
-        debugPrint("onReceiveReply:\(agree)")
-    }
-
     /**
      * 主持人禁止申请发言回调
      *
