@@ -567,19 +567,26 @@ static dispatch_once_t gOnceToken;
  * 成员同意/拒绝主持人的申请发言
  *
  * 在TUIRoomCoreDef.SpeechMode.APPLY_SPEECH模式，成员同意/拒绝主持人邀请发言需要调用此接口
- * 主持人会收到onReceiveReplyToSpeechInvitation回调通知
  *
  * @param agree    YES：同意；NO：拒绝
  * @param callback 结果回调，成功时 code 为0
  */
 - (void)replySpeechInvitation:(BOOL)agree
                      callback:(TUIRoomActionCallback)callback {
-    NSString *currentUserId = [TUIRoomUserManage currentUserId];
-    NSString *key = [TUIROOM_SIGNALING_KEY_CMD_INVITE_SPEAKER stringByAppendingString:currentUserId];
+    NSString *key = TUIROOM_SIGNALING_KEY_CMD_INVITE_SPEAKER;
     NSString *inviteID = [self.inviteCache objectForKey:key];
     if (inviteID) {
         [self.inviteCache removeObjectForKey:key];
-        [self.imService acceptInvitation:agree inviteID:inviteID callback:callback];
+        __weak typeof(self) wealSelf = self;
+        [self.imService acceptInvitation:agree inviteID:inviteID callback:^(NSInteger code, NSString * _Nonnull message) {
+            __strong typeof(wealSelf) strongSelf = wealSelf;
+            if ((code == 0) && agree) {
+                [strongSelf.trtcService switchToAnchor:nil];
+            }
+            if (callback) {
+                callback(code,message);
+            }
+        }];
     } else {
         if (callback) {
             callback(TUIRoomErrorParamInvalid,agree ? @"accept invatiaon failed":@"reject invatiaon failed");
@@ -596,9 +603,18 @@ static dispatch_once_t gOnceToken;
  */
 - (void)sendSpeechApplication:(TUIRoomInviteeCallback)callback {
     TUIRoomInfo *roomInfo = [self.imService getRoomInfo];
+    __weak typeof(self) wealSelf = self;
     [self.imService sendSpeechApplication:roomInfo.ownerId
                                     param:[TUIRoomIMProtocol applyForSpeech:roomInfo.roomId receiverId:roomInfo.ownerId]
-                                 callback:callback];
+                                 callback:^(TUIRoomInviteeCallBackType type, NSString * _Nonnull message) {
+        __strong typeof(wealSelf) strongSelf = wealSelf;
+        if (type == TUIRoomInviteeAccepted) {
+            [strongSelf.trtcService switchToAnchor:nil];
+        }
+        if (callback) {
+            callback(type,message);
+        }
+    }];
 }
 
 /**
@@ -628,7 +644,7 @@ static dispatch_once_t gOnceToken;
     NSString *inviteID = [self.inviteCache objectForKey:key];
     if (inviteID) {
         [self.inviteCache removeObjectForKey:key];
-        [self.imService acceptInvitation:agree inviteID:userId callback:callback];
+        [self.imService acceptInvitation:agree inviteID:inviteID callback:callback];
     } else {
         if (callback) {
             callback(TUIRoomErrorParamInvalid,agree ? @"accept invatiaon failed":@"reject invatiaon failed");
@@ -687,6 +703,12 @@ static dispatch_once_t gOnceToken;
  * @param callback 结果回调
  */
 - (void)exitSpeechState:(TUIRoomActionCallback)callback {
+    NSString *key = TUIROOM_SIGNALING_KEY_CMD_SEND_OFF_SPEAKER;
+    NSString *inviteID = [self.inviteCache objectForKey:key];
+    if (inviteID) {
+        [self.inviteCache removeObjectForKey:key];
+        [self.imService acceptInvitation:YES inviteID:inviteID callback:callback];
+    }
     [self.trtcService switchToAudience:callback];
 }
 
@@ -860,7 +882,7 @@ static dispatch_once_t gOnceToken;
     switch (type) {
         case TUIRoomSignalingInviteSpeaker: {// 主持人邀请观众发言
                 if ([self.delegate respondsToSelector:@selector(onReceiveSpeechInvitation:)]) {
-                    NSString *key = [TUIROOM_SIGNALING_KEY_CMD_INVITE_SPEAKER stringByAppendingString:[TUIRoomUserManage currentUserId]];
+                    NSString *key = TUIROOM_SIGNALING_KEY_CMD_INVITE_SPEAKER;
                     [self.inviteCache setObject:inviteID forKey:key];
                     [self.delegate onReceiveSpeechInvitation:inviter];
                 }
@@ -868,7 +890,7 @@ static dispatch_once_t gOnceToken;
             break;
         case TUIRoomSignalingSendOffSpeaker: {// 主持人邀请观众下台
                 if ([self.delegate respondsToSelector:@selector(onOrderedToExitSpeechState:)]) {
-                    NSString *key = [TUIROOM_SIGNALING_KEY_CMD_SEND_OFF_SPEAKER stringByAppendingString:[TUIRoomUserManage currentUserId]];
+                    NSString *key = TUIROOM_SIGNALING_KEY_CMD_SEND_OFF_SPEAKER;
                     [self.inviteCache setObject:inviteID forKey:key];
                     [self.delegate onOrderedToExitSpeechState:inviter];
                 }
@@ -876,7 +898,7 @@ static dispatch_once_t gOnceToken;
             break;
         case TUIRoomSignalingApplyForSpeech: {// 观众申请发言
                 if ([self.delegate respondsToSelector:@selector(onReceiveSpeechApplication:)]) {
-                    NSString *key = [TUIROOM_SIGNALING_KEY_CMD_APPLY_FOR_SPEECH stringByAppendingString:[TUIRoomUserManage currentUserId]];
+                    NSString *key = [TUIROOM_SIGNALING_KEY_CMD_APPLY_FOR_SPEECH stringByAppendingString:inviter];
                     [self.inviteCache setObject:inviteID forKey:key];
                     [self.delegate onReceiveSpeechApplication:inviter];
                 }
@@ -904,8 +926,6 @@ static dispatch_once_t gOnceToken;
             break;
         case TUIRoomSignalingReplyCallingRoll: {// 回复主持人点名
                 if ([self.delegate respondsToSelector:@selector(onMemberReplyCallingRoll:)]) {
-                    NSString *key = [TUIROOM_SIGNALING_KEY_CMD_REPLY_CALLING_ROLL stringByAppendingString:[TUIRoomUserManage currentUserId]];
-                    [self.inviteCache setObject:inviteID forKey:key];
                     [self.delegate onMemberReplyCallingRoll:inviter];
                 }
                 [self.imService acceptInvitation:YES inviteID:inviteID callback:^(NSInteger code, NSString * _Nonnull message) {
@@ -924,8 +944,6 @@ static dispatch_once_t gOnceToken;
             break;
         case TUIRoomSignalingSendOffAllSpeaker: {// 邀请全体麦上成员下麦
             if ([self.delegate respondsToSelector:@selector(onOrderedToExitSpeechState:)]) {
-                    NSString *key = [TUIROOM_SIGNALING_KEY_CMD_SEND_OFF_ALL_SPEAKER stringByAppendingString:[TUIRoomUserManage currentUserId]];
-                    [self.inviteCache setObject:inviteID forKey:key];
                     [self.delegate onOrderedToExitSpeechState:inviter];
                 }
             }
@@ -950,18 +968,22 @@ static dispatch_once_t gOnceToken;
     switch (type) {
         case TUIRoomSignalingInviteSpeaker: {// 主持人邀请观众发言
                 if ([self.delegate respondsToSelector:@selector(onReceiveSpeechInvitation:)]) {
-                    NSString *key = [TUIROOM_SIGNALING_KEY_CMD_INVITE_SPEAKER stringByAppendingString:[TUIRoomUserManage currentUserId]];
+                    NSString *key = TUIROOM_SIGNALING_KEY_CMD_INVITE_SPEAKER;
                     [self.inviteCache removeObjectForKey:key];
-                    [self.delegate onReceiveInvitationCancelled:inviter];
+                    if (![inviter isEqualToString:[TUIRoomUserManage currentUserId]] ) {
+                        [self.delegate onReceiveInvitationCancelled:inviter];
+                    }
                 }
             }
             break;
        
         case TUIRoomSignalingApplyForSpeech: {// 观众申请发言
                 if ([self.delegate respondsToSelector:@selector(onReceiveSpeechApplication:)]) {
-                    NSString *key = [TUIROOM_SIGNALING_KEY_CMD_APPLY_FOR_SPEECH stringByAppendingString:[TUIRoomUserManage currentUserId]];
+                    NSString *key = [TUIROOM_SIGNALING_KEY_CMD_APPLY_FOR_SPEECH stringByAppendingString:inviter];
                     [self.inviteCache removeObjectForKey:key];
-                    [self.delegate onSpeechApplicationCancelled:inviter];
+                    if (![inviter isEqualToString:[TUIRoomUserManage currentUserId]] ) {
+                        [self.delegate onSpeechApplicationCancelled:inviter];
+                    }
                 }
             }
             break;
@@ -969,6 +991,7 @@ static dispatch_once_t gOnceToken;
             break;
     }
 }
+
 /**
  * 房间被销毁，当主播调用destroyRoom后，观众会收到该回调
  *

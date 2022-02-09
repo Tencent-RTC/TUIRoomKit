@@ -327,7 +327,6 @@ NS_ASSUME_NONNULL_BEGIN
  * 成员同意/拒绝主持人的申请发言
  *
  * 在TUIRoomCoreDef.SpeechMode.APPLY_SPEECH模式，成员同意/拒绝主持人邀请发言需要调用此接口
- * 主持人会收到onReceiveReplyToSpeechInvitation回调通知
  *
  * @param agree    YES：同意；NO：拒绝
  * @param callback 结果回调，成功时 code 为0
