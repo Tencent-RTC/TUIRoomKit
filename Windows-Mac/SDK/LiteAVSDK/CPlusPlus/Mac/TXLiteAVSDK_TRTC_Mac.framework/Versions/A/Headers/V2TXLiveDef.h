@@ -265,7 +265,6 @@ typedef NS_ENUM(NSInteger, V2TXLiveBufferType) {
 
 @end
 
-/// @}
 /////////////////////////////////////////////////////////////////////////////////
 //
 //          （二）音频相关类型定义
@@ -372,8 +371,8 @@ typedef NS_ENUM(NSInteger, V2TXLiveAudioQuality) {
 @property(nonatomic, assign) NSUInteger audioBitrate;
 
 @end
-
 /// @}
+
 /////////////////////////////////////////////////////////////////////////////////
 //
 //          （四）连接状态相关枚举值定义
@@ -398,63 +397,6 @@ typedef NS_ENUM(NSInteger, V2TXLivePushStatus) {
 
     /// 重连服务器中
     V2TXLivePushStatusReconnecting,
-
-};
-
-/// @}
-/////////////////////////////////////////////////////////////////////////////////
-//
-//          (五) 音视频状态有关的枚举值的定义
-//
-/////////////////////////////////////////////////////////////////////////////////
-
-/// @name 音视频状态有关的枚举值的定义
-/// @{
-
-/**
- * @brief 音视频状态
- */
-typedef NS_ENUM(NSInteger, V2TXLivePlayStatus) {
-
-    /// 播放停止
-    V2TXLivePlayStatusStopped,
-
-    /// 正在播放
-    V2TXLivePlayStatusPlaying,
-
-    /// 正在缓冲(首次加载不会抛出 Loading 事件)
-    V2TXLivePlayStatusLoading,
-
-};
-
-/**
- * @brief 音视频状态对应的原因
- */
-typedef NS_ENUM(NSInteger, V2TXLiveStatusChangeReason) {
-
-    /// 内部原因
-    V2TXLiveStatusChangeReasonInternal,
-
-    /// 开始网络缓冲
-    V2TXLiveStatusChangeReasonBufferingBegin,
-
-    /// 结束网络缓冲
-    V2TXLiveStatusChangeReasonBufferingEnd,
-
-    /// 本地启动播放
-    V2TXLiveStatusChangeReasonLocalStarted,
-
-    /// 本地停止播放
-    V2TXLiveStatusChangeReasonLocalStopped,
-
-    /// 远端可播放
-    V2TXLiveStatusChangeReasonRemoteStarted,
-
-    /// 远端流停止或中断
-    V2TXLiveStatusChangeReasonRemoteStopped,
-
-    /// 远端流离线
-    V2TXLiveStatusChangeReasonRemoteOffline,
 
 };
 /// @}
@@ -580,7 +522,7 @@ typedef NS_ENUM(NSInteger, V2TXLiveMixInputType) {
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//          (六) 公共配置组件
+//          (五) 公共配置组件
 //
 /////////////////////////////////////////////////////////////////////////////////
 /// @name 公共配置组件有关的枚举值的定义
@@ -641,4 +583,5 @@ typedef NS_ENUM(NSInteger, V2TXLiveLogLevel) {
 @end
 /// @}
 
+/// @}
 /// @}

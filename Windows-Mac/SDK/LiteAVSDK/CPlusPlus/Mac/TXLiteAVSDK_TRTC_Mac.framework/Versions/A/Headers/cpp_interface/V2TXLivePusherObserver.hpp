@@ -14,6 +14,12 @@ class V2TXLivePusherObserver {
    public:
     virtual ~V2TXLivePusherObserver(){};
 
+    /////////////////////////////////////////////////////////////////////////////////
+    //
+    //                   直播推流器事件回调
+    //
+    /////////////////////////////////////////////////////////////////////////////////
+
     /**
      * 直播推流器错误通知，推流器出现错误时，会回调该通知
      *
@@ -82,7 +88,7 @@ class V2TXLivePusherObserver {
     /**
      * 自定义视频渲染回调
      *
-     * @note  调用 [enableCustomRendering](@ref V2TXLivePusher#enableCustomRendering) 开启本地视频自定义渲染之后，会收到这个回调通知
+     * @note  调用 [enableCustomVideoRender](@ref V2TXLivePusher#enableCustomVideoRender) 开启本地视频自定义渲染之后，会收到这个回调通知
      *
      * @param videoFrame 视频帧数据 {@link V2TXLiveVideoFrame}
      */

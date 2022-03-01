@@ -23,6 +23,12 @@
 
 @protocol V2TXLivePusher <NSObject>
 
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                    推流器相关接口
+//
+/////////////////////////////////////////////////////////////////////////////////
+
 /**
  * 设置推流器回调。
  *
@@ -276,6 +282,17 @@
 - (V2TXLiveCode)setVideoQuality:(V2TXLiveVideoEncoderParam *)param;
 
 /**
+ * 获取音效管理对象 {@link TXAudioEffectManager}。
+ *
+ * 通过音效管理，您可以使用以下功能：
+ * - 调整麦克风收集的人声音量。
+ * - 设置混响和变声效果。
+ * - 开启耳返，设置耳返音量。
+ * - 添加背景音乐，调整背景音乐的播放效果。
+ */
+- (TXAudioEffectManager *)getAudioEffectManager;
+
+/**
  * 获取美颜管理对象 {@link TXBeautyManager}。
  *
  * 通过美颜管理，您可以使用以下功能：
@@ -286,17 +303,6 @@
  * - 进行手势识别。
  */
 - (TXBeautyManager *)getBeautyManager;
-
-/**
- * 获取音效管理对象 {@link TXAudioEffectManager}。
- *
- * 通过音效管理，您可以使用以下功能：
- * - 调整麦克风收集的人声音量。
- * - 设置混响和变声效果。
- * - 开启耳返，设置耳返音量。
- * - 添加背景音乐，调整背景音乐的播放效果。
- */
-- (TXAudioEffectManager *)getAudioEffectManager;
 
 /**
  * 获取设备管理对象 {@link TXDeviceManager}。
@@ -367,6 +373,18 @@
 - (V2TXLiveCode)enableCustomVideoCapture:(BOOL)enable;
 
 /**
+ * 开启/关闭自定义音频采集
+ *
+ *  @brief 开启/关闭自定义音频采集。<br/>
+ *         在自定义音频采集模式下，SDK 不再从麦克风采集声音，只保留编码和发送能力。
+ *  @note   需要在 [startPush]({@link V2TXLivePusher#startPush(String)}) 前调用才会生效。
+ *  @param enable YES: 开启自定义采集; NO: 关闭自定义采集。【默认值】: NO
+ *  @return 返回值 {@link V2TXLiveCode}
+ *          - V2TXLIVE_OK: 成功
+ */
+- (V2TXLiveCode)enableCustomAudioCapture:(BOOL)enable;
+
+/**
  * 在自定义视频采集模式下，将采集的视频数据发送到SDK。
  *
  * 在自定义视频采集模式下，SDK不再采集摄像头数据，仅保留编码和发送功能。
@@ -380,18 +398,6 @@
  *         - V2TXLIVE_ERROR_REFUSED: 您必须先调用 enableCustomVideoCapture 开启自定义视频采集。
  */
 - (V2TXLiveCode)sendCustomVideoFrame:(V2TXLiveVideoFrame *)videoFrame;
-
-/**
- * 开启/关闭自定义音频采集
- *
- *  @brief 开启/关闭自定义音频采集。<br/>
- *         在自定义音频采集模式下，SDK 不再从麦克风采集声音，只保留编码和发送能力。
- *  @note   需要在 [startPush]({@link V2TXLivePusher#startPush(String)}) 前调用才会生效。
- *  @param enable true: 开启自定义采集; false: 关闭自定义采集。【默认值】: false
- *  @return 返回值 {@link V2TXLiveCode}
- *          - V2TXLIVE_OK: 成功
- */
-- (V2TXLiveCode)enableCustomAudioCapture:(BOOL)enable;
 
 /**
  * 在自定义音频采集模式下，将采集的音频数据发送到SDK
@@ -432,7 +438,7 @@
  * @param value 调用 key 所对应的高级 API 时，需要的参数。
  * @return 返回值 {@link V2TXLiveCode}
  *         - V2TXLIVE_OK: 成功
- *         - V2TXLIVE_ERROR_INVALID_PARAMETER: 操作失败，key 不允许为空
+ *         - V2TXLIVE_ERROR_INVALID_PARAMETER: 操作失败，key 不允许为 nil
  */
 - (V2TXLiveCode)setProperty:(NSString *)key value:(NSObject *)value;
 

@@ -19,7 +19,7 @@
  * 1.1 混响特效
  *
  * 混响特效可以作用于人声之上，通过声学算法对声音进行叠加处理，模拟出各种不同环境下的临场感受，目前支持如下几种混响效果：
- * 0：关闭；1：KTV；2：小房间；3：大会堂；4：低沉；5：洪亮；6：金属声；7：磁性；8：空灵；9：录音棚；10：悠扬。
+ * 0：关闭；1：KTV；2：小房间；3：大会堂；4：低沉；5：洪亮；6：金属声；7：磁性；8：空灵；9：录音棚；10：悠扬；11：留声机；12：自然。
  */
 typedef NS_ENUM(NSInteger, TXVoiceReverbType) {
     TXVoiceReverbType_0 = 0,    ///< disable
@@ -33,6 +33,8 @@ typedef NS_ENUM(NSInteger, TXVoiceReverbType) {
     TXVoiceReverbType_8 = 8,    ///< ethereal
     TXVoiceReverbType_9 = 9,    ///< studio
     TXVoiceReverbType_10 = 10,  ///< melodious
+    TXVoiceReverbType_11 = 11,  ///< phonograph
+    TXVoiceReverbType_12 = 12,  ///< nature
 };
 
 /**
@@ -148,7 +150,7 @@ typedef void (^TXAudioMusicCompleteBlock)(NSInteger errCode);
  * 同时也需要注意，并非所有的手机开启此特效后都能达到优秀的耳返效果，我们已经对部分耳返效果不佳的手机屏蔽了该特效。
  *
  * @note 仅在主播佩戴耳机时才能开启此特效，同时请您提示主播佩戴有线耳机。
- * @param enable true：开启；false：关闭。
+ * @param enable YES：开启；NO：关闭。
  */
 - (void)enableVoiceEarMonitor:(BOOL)enable;
 

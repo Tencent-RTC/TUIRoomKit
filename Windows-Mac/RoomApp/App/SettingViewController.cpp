@@ -306,7 +306,7 @@ void SettingViewController::InitConnect() {
     connect(ui.hSlider_microphone, SIGNAL(valueChanged(int)), this, SLOT(OnMicrophoneValueChanged(int)));
     connect(ui.hSlider_speaker, SIGNAL(valueChanged(int)), this, SLOT(OnSpeakerValueChanged(int)));
 }
-void SettingViewController::ResetDeviceList(const QString& deviceId, TXMediaDeviceType type, TXMediaDeviceState state) {
+void SettingViewController::ResetDeviceList(const QString& deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) {
     if (state == TXMediaDeviceStateAdd || state == TXMediaDeviceStateRemove) {
         ui.comboBox_camera->clear();
         ui.comboBox_microphone->clear();

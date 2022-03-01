@@ -316,6 +316,16 @@ class ITRTCCloudCallback {
     virtual void onStatistics(const TRTCStatistics& statistics) {
     }
 
+    /**
+     * 4.3 网速测试的结果回调
+     *
+     * 该统计回调由 {@link startSpeedTest:} 触发。
+     *
+     * @param result 网速测试数据数据，包括丢包、往返延迟、上下行的带宽速率，详情请参考 {@link TRTCSpeedTestResult}。
+     */
+    virtual void onSpeedTestResult(const TRTCSpeedTestResult& result) {
+    }
+
     /// @}
     /////////////////////////////////////////////////////////////////////////////////
     //
@@ -354,18 +364,6 @@ class ITRTCCloudCallback {
      * SDK 会在跟云端的连接断开时抛出 {@link onConnectionLost}，之后会努力跟云端重新建立连接并抛出{@link onTryToReconnect}，连接恢复后会抛出本事件回调。
      */
     virtual void onConnectionRecovery() {
-    }
-
-    /**
-     * 5.4 服务器测速的结果回调
-     *
-     * 当您调用 {@link startSpeedTest} 启动服务器测速后，SDK 多次抛出测速的结果回调。
-     * SDK 会对多台云端服务器的 IP 进行测速，每个 IP 对应的测速结果都会通过本回调接口通知给您。
-     * @param currentResult 当前完成的测速结果
-     * @param finishedCount 已完成测速的服务器数量
-     * @param totalCount 需要测速的服务器总数量
-     */
-    virtual void onSpeedTest(const TRTCSpeedTestResult& currentResult, uint32_t finishedCount, uint32_t totalCount) {
     }
 
     /// @}
@@ -800,6 +798,23 @@ class ITRTCCloudCallback {
     }
 #endif
 
+/**
+ * 服务器测速的结果回调（已废弃）
+ *
+ * @deprecated 新版本开始不推荐使用，建议使用 {@link onSpeedTestResult:} 接口替代之。
+ */
+#ifdef _WIN32
+    virtual __declspec(deprecated("use onSpeedTestResult instead")) void onSpeedTest(const TRTCSpeedTestResult& currentResult, uint32_t finishedCount, uint32_t totalCount) {
+    }
+#elif defined(__APPLE__)
+    virtual void onSpeedTest(const TRTCSpeedTestResult& currentResult, uint32_t finishedCount, uint32_t totalCount) {
+    }
+    __attribute__((deprecated("use onSpeedTestResult instead")));
+#else
+    virtual void onSpeedTest(const TRTCSpeedTestResult& currentResult, uint32_t finishedCount, uint32_t totalCount) {
+    }
+#endif
+
     /// @}
 };  // End of interface ITRTCCloudCallback
 
@@ -883,9 +898,9 @@ class ITRTCAudioFrameCallback {
     }
 
     /**
-     * 本地麦克风采集到的原始音频数据回调
+     * 本地采集并经过音频模块前处理后的音频数据回调
      *
-     * 当您设置完音频数据自定义回调之后，SDK 内部会把刚从麦克风采集到的原始音频数据，以 PCM 格式的形式通过本接口回调给您。
+     * 当您设置完音频数据自定义回调之后，SDK 内部会把刚采集到并经过前处理(ANS、AEC、AGC）之后的数据，以 PCM 格式的形式通过本接口回调给您。
      * - 此接口回调出的音频时间帧长固定为0.02s，格式为 PCM 格式。
      * - 由时间帧长转化为字节帧长的公式为【采样率 × 时间帧长 × 声道数 × 采样点位宽】。
      * - 以 TRTC 默认的音频录制格式48000采样率、单声道、16采样点位宽为例，字节帧长为【48000 × 0.02s × 1 × 16bit = 15360bit = 1920字节】。
@@ -894,14 +909,14 @@ class ITRTCAudioFrameCallback {
      * @note
      * 1. 请不要在此回调函数中做任何耗时操作，由于 SDK 每隔 20ms 就要处理一帧音频数据，如果您的处理时间超过 20ms，就会导致声音异常。
      * 2. 此接口回调出的音频数据是可读写的，也就是说您可以在回调函数中同步修改音频数据，但请保证处理耗时。
-     * 3. 此接口回调出的音频数据**不包含**背景音、音效、混响等前处理效果，延迟极低。
+     * 3. 此接口回调出的音频数据已经经过了前处理(ANS、AEC、AGC），但**不包含**背景音、音效、混响等前处理效果，延迟较低。
      */
     virtual void onCapturedRawAudioFrame(TRTCAudioFrame* frame){};
 
     /**
-     * 本地采集并经过音频模块前处理后的音频数据回调
+     * 本地采集并经过音频模块前处理、音效处理和混 BGM 后的音频数据回调
      *
-     * 当您设置完音频数据自定义回调之后，SDK 内部会把刚采集到并经过前处理(ANS、AEC、AGC）之后的数据，以 PCM 格式的形式通过本接口回调给您。
+     * 当您设置完音频数据自定义回调之后，SDK 内部会把刚采集到并经过前处理、音效处理和混 BGM 之后的数据，在最终进行网络编码之前，以 PCM 格式的形式通过本接口回调给您。
      * - 此接口回调出的音频时间帧长固定为0.02s，格式为 PCM 格式。
      * - 由时间帧长转化为字节帧长的公式为【采样率 × 时间帧长 × 声道数 × 采样点位宽】。
      * - 以 TRTC 默认的音频录制格式48000采样率、单声道、16采样点位宽为例，字节帧长为【48000 × 0.02s × 1 × 16bit = 15360bit = 1920字节】。
@@ -915,7 +930,7 @@ class ITRTCAudioFrameCallback {
      * @note
      * 1. 请不要在此回调函数中做任何耗时操作，由于 SDK 每隔 20ms 就要处理一帧音频数据，如果您的处理时间超过 20ms，就会导致声音异常。
      * 2. 此接口回调出的音频数据是可读写的，也就是说您可以在回调函数中同步修改音频数据，但请保证处理耗时。
-     * 3. 此接口回调出的数据已经经过了回声抑制（AEC）处理，但声音的延迟相比于 {@link onCapturedRawAudioFrame} 要高一些。
+     * 3. 此接口回调出的数据已经经过了前处理(ANS、AEC、AGC）、音效和混 BGM 处理，声音的延迟相比于 {@link onCapturedRawAudioFrame} 要高一些。
      */
     virtual void onLocalProcessedAudioFrame(TRTCAudioFrame* frame){};
 

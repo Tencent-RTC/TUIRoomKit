@@ -46,7 +46,7 @@ protected:
     void showEvent(QShowEvent *event);
 private:
     void InitConnect();
-    void ResetDeviceList(const QString& deviceId, TXMediaDeviceType type, TXMediaDeviceState state);
+    void ResetDeviceList(const QString& deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state);
 
 private:
     Ui::PresetDeviceController ui;

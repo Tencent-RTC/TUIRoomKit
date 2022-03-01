@@ -213,8 +213,8 @@ void PresetDeviceController::InitConnect() {
         ui.btn_start->setEnabled(false);
     });
 
-    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalDeviceChanged, this, [=](const QString& deviceId, TXMediaDeviceType type, \
-        TXMediaDeviceState state) {
+    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalDeviceChanged, this, [=](const QString& deviceId, liteav::TXMediaDeviceType type, \
+        liteav::TXMediaDeviceState state) {
         ResetDeviceList(deviceId, type, state);
     });
 }

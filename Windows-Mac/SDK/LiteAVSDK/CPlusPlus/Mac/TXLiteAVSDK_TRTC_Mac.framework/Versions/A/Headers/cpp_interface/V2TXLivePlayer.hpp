@@ -24,6 +24,12 @@ extern "C" {
 /// @{
 #ifdef __ANDROID__
 
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                    播放器相关接口
+//
+/////////////////////////////////////////////////////////////////////////////////
+
 /**
  * 用于动态加载 dll 时，获取 V2TXLivePlayer 对象指针
  *
@@ -202,9 +208,9 @@ class V2TXLivePlayer {
     virtual int32_t snapshot() = 0;
 
     /**
-     * 设置视频自定义渲染回调。
+     * 开启/关闭对视频帧的监听回调。
      *
-     * 通过该方法，可以获取解码后的每一帧视频画面，进行自定义渲染处理，添加自定义显示效果。
+     * SDK 在您开启次此开关后将不再渲染视频画面，您可以通过 V2TXLivePlayerObserver 获得视频帧，并执行自定义的渲染逻辑。
      *
      * @param enable      是否开启自定义渲染。【默认值】：false
      * @param pixelFormat 自定义渲染回调的视频像素格式 {@link V2TXLivePixelFormat}。
@@ -213,7 +219,7 @@ class V2TXLivePlayer {
      *         - V2TXLIVE_OK: 成功
      *         - V2TXLIVE_ERROR_NOT_SUPPORTED: 像素格式或者数据格式不支持
      */
-    virtual int32_t enableCustomRendering(bool enable, V2TXLivePixelFormat pixelFormat, V2TXLiveBufferType bufferType) = 0;
+    virtual int32_t enableObserveVideoFrame(bool enable, V2TXLivePixelFormat pixelFormat, V2TXLiveBufferType bufferType) = 0;
 
     /**
      * 开启接收 SEI 消息
@@ -232,6 +238,20 @@ class V2TXLivePlayer {
      * @param isShow 是否显示。【默认值】：false
      */
     virtual void showDebugView(bool isShow) = 0;
+
+/**
+ * 调用 V2TXLivePlayer 的高级 API 接口。
+ *
+ * @note  该接口用于调用一些高级功能。
+ * @param key   高级 API 对应的 key。
+ * @param value 调用 key 所对应的高级 API 时，需要的参数。
+ * @return 返回值 {@link V2TXLiveCode}
+ *         - V2TXLIVE_OK: 成功
+ *         - V2TXLIVE_ERROR_INVALID_PARAMETER: 操作失败，key 不允许为 nullptr
+ */
+#ifdef _WIN32
+    virtual int32_t setProperty(const char* key, const void* value) = 0;
+#endif
 
    protected:
     virtual ~V2TXLivePlayer(){};
