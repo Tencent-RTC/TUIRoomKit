@@ -46,7 +46,7 @@ TUIRoom
 ### 配置工程文件
 #### Windows端的配置如下：
 1. 使用Visual Studio(VS 2015及以上)打开源码工程`RoomApp.vcxproj`。
-2. 工程内找到`TUIRoom/Windows-Mac/utils/usersig/win/GenerateTestUserSig.h`文件 。
+2. 工程内找到`TUIRoom/RoomApp/utils/usersig/win/GenerateTestUserSig.h`文件 。
 3. 设置`GenerateTestUserSig.h`文件中的相关参数：
 <ul>
 <li>SDKAPPID：默认为 0 ，请设置为实际申请的SDKAPPID。</li>
@@ -60,7 +60,7 @@ TUIRoom
 
 #### Mac端的配置如下：
 1. 使用QtCreator开发源码工程的`RoomApp.pro`。
-2. 工程内找到`TUIRoom/Windows-Mac/utils/usersig/mac/UserSigConfig.h`文件 。
+2. 工程内找到`Windows\RoomApp\utils\usersig\mac\UserSigConfig.h`文件 。
 3. 设置`UserSigConfig.h`文件中的相关参数：
 <ul>
 <li>SDKAPPID_：默认为 0 ，请设置为实际申请的SDKAPPID。</li>
@@ -75,7 +75,7 @@ TUIRoom
 
 ### 运行 App
 - Windows端使用Visual Studio（VS 2015及以上版本）打开源码工程 `RoomApp.vcxproj`，单击【运行】即可开始调试运行本 App。
-- Mac端先配置系统环境变量 QTDIR 指向QT的安装目录，然后使用QtCreator打开源码工程`RoomApp.pro`，构建成功后，进入 `TUIRoom/Windows-Mac/package/mac/` 目录，执行脚本 `mac_config_RoomApp.sh` 对依赖库进行拷贝和配置，然后即可运行本App。
+- Mac端先配置系统环境变量 QTDIR 指向QT的安装目录，然后使用QtCreator打开源码工程`RoomApp.pro`，构建并运行本App。
 
 ### 体验应用（**体验应用至少需要两台设备**）
 #### 用户 A
