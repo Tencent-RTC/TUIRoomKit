@@ -26,7 +26,7 @@ class AudioMusicParam;
  * 1.1 混响特效
  *
  * 混响特效可以作用于人声之上，通过声学算法对声音进行叠加处理，模拟出各种不同环境下的临场感受，目前支持如下几种混响效果：
- * 0：关闭；1：KTV；2：小房间；3：大会堂；4：低沉；5：洪亮；6：金属声；7：磁性；8：空灵；9：录音棚；10：悠扬。
+ * 0：关闭；1：KTV；2：小房间；3：大会堂；4：低沉；5：洪亮；6：金属声；7：磁性；8：空灵；9：录音棚；10：悠扬；11：留声机；12：自然。
  */
 enum TXVoiceReverbType {
     TXLiveVoiceReverbType_0 = 0,    ///< disable
@@ -40,6 +40,8 @@ enum TXVoiceReverbType {
     TXLiveVoiceReverbType_8 = 8,    ///< ethereal
     TXLiveVoiceReverbType_9 = 9,    ///< studio
     TXLiveVoiceReverbType_10 = 10,  ///< melodious
+    TXLiveVoiceReverbType_11 = 11,  ///< phonograph
+    TXLiveVoiceReverbType_12 = 12,  ///< nature
 };
 
 /// @}
@@ -98,11 +100,11 @@ class AudioMusicParam {
     int loopCount;
 
     ///【字段含义】是否将音乐传到远端 <br/>
-    ///【推荐取值】YES：音乐在本地播放的同时，远端用户也能听到该音乐；NO：主播只能在本地听到该音乐，远端观众听不到。默认值：NO。
+    ///【推荐取值】true：音乐在本地播放的同时，远端用户也能听到该音乐；false：主播只能在本地听到该音乐，远端观众听不到。默认值：false。
     bool publish;
 
     ///【字段含义】播放的是否为短音乐文件 <br/>
-    ///【推荐取值】YES：需要重复播放的短音乐文件；NO：正常的音乐文件。默认值：NO
+    ///【推荐取值】true：需要重复播放的短音乐文件；false：正常的音乐文件。默认值：false
     bool isShortFile;
 
     ///【字段含义】音乐开始播放时间点，单位：毫秒。

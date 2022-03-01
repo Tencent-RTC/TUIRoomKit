@@ -35,6 +35,9 @@ enum V2TXLiveCode {
     /// 服务器无法处理您的请求
     V2TXLIVE_ERROR_SERVER_PROCESS_FAILED = -7,
 
+    /// 连接断开
+    V2TXLIVE_ERROR_DISCONNECTED = -8,
+
     /////////////////////////////////////////////////////////////////////////////////
     //
     //      网络相关的警告码
@@ -93,7 +96,6 @@ enum V2TXLiveCode {
     V2TXLIVE_WARNING_SCREEN_CAPTURE_INTERRUPTED = -7001,
 
 };
-/// @}
 
 }  // namespace liteav
 

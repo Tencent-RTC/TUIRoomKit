@@ -95,7 +95,7 @@ public:
 
     void OnUserVoiceVolume(const std::string& user_id, int volume) override;
 
-    void onDeviceChanged(const char* deviceId, TXMediaDeviceType type, TXMediaDeviceState state) override;
+    void onDeviceChanged(const char* deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) override;
 signals:
 	void SignalOnError(int code, const QString& message);
 
@@ -183,7 +183,7 @@ signals:
 
     void SignalOnUserVoiceVolume(const QString& user_id, int volume);
 
-    void SignalDeviceChanged(const QString& deviceId, TXMediaDeviceType type, TXMediaDeviceState state);
+    void SignalDeviceChanged(const QString& deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state);
 private:
 
 	MessageDispatcher(QObject *parent);

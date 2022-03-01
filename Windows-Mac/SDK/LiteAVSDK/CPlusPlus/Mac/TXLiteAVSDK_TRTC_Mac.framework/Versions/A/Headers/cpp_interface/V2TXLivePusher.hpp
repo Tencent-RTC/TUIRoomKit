@@ -26,6 +26,12 @@ extern "C" {
 /// @{
 #ifdef __ANDROID__
 
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                    推流器相关接口
+//
+/////////////////////////////////////////////////////////////////////////////////
+
 /**
  * 用于动态加载 dll 时，获取 V2TXLivePusher 对象指针。
  *
@@ -352,12 +358,50 @@ class V2TXLivePusher {
      * 开启/关闭自定义视频采集。
      *
      * 在自定义视频采集模式下，SDK 不再从摄像头采集图像，只保留编码和发送能力。
-     * @note  需要在 {@link V2TXLivePusher#startPush(String)} 之前调用，才会生效。
-     * @param enable true: 开启自定义采集; false: 关闭自定义采集。【默认值】: false
+     * @note  需要在 [startPush](@ref V2TXLivePusher#startPush:) 之前调用，才会生效。
+     * @param enable true：开启自定义采集；false：关闭自定义采集。【默认值】：false
      * @return 返回值 {@link V2TXLiveCode}
      *         - V2TXLIVE_OK: 成功
      */
     virtual int32_t enableCustomVideoCapture(bool enable) = 0;
+
+    /**
+     * 开启/关闭视频自定义预处理
+     *
+     * @param enable      是否开启自定义视频预处理。【默认值】：false
+     * @param pixelFormat 自定义视频预处理回调的视频像素格式 {@link V2TXLivePixelFormat}
+     * @param bufferType  自定义视频预处理的视频数据格式 {@link V2TXLiveBufferType}
+     */
+    virtual int32_t enableCustomVideoProcess(bool enable, V2TXLivePixelFormat pixelFormat, V2TXLiveBufferType bufferType) = 0;
+
+/**
+ * 设置本地视频自定义渲染回调。
+ *
+ * 通过该方法，可以获取解码后的每一帧视频画面，进行自定义渲染处理，添加自定义显示效果。
+ *
+ * @param enable      是否开启自定义渲染。【默认值】：false
+ * @param pixelFormat 自定义渲染回调的视频像素格式 {@link V2TXLivePixelFormat}。
+ * @param bufferType  自定义渲染回调的视频数据格式 {@link V2TXLiveBufferType}。
+ * @return 返回值 {@link V2TXLiveCode}
+ *         - V2TXLIVE_OK: 成功
+ */
+#ifdef _WIN32
+    virtual int32_t enableCustomVideoRender(bool enable, V2TXLivePixelFormat pixelFormat, V2TXLiveBufferType bufferType) = 0;
+#endif
+
+/**
+ * 开启/关闭自定义音频采集
+ *
+ *  @brief 开启/关闭自定义音频采集。<br/>
+ *         在自定义音频采集模式下，SDK 不再从麦克风采集声音，只保留编码和发送能力。
+ *  @note   需要在 [startPush]({@link V2TXLivePusher#startPush(String)}) 前调用才会生效。
+ *  @param enable true: 开启自定义采集; false: 关闭自定义采集。【默认值】: false
+ *  @return 返回值 {@link V2TXLiveCode}
+ *          - V2TXLIVE_OK: 成功
+ */
+#ifdef _WIN32
+    virtual int32_t enableCustomAudioCapture(bool enable) = 0;
+#endif
 
     /**
      * 在自定义视频采集模式下，将采集的视频数据发送到SDK。
@@ -374,35 +418,6 @@ class V2TXLivePusher {
     virtual int32_t sendCustomVideoFrame(V2TXLiveVideoFrame* videoFrame) = 0;
 
 /**
- * 设置本地视频自定义渲染回调。
- *
- * 通过该方法，可以获取解码后的每一帧视频画面，进行自定义渲染处理，添加自定义显示效果。
- *
- * @param enable      是否开启自定义渲染。【默认值】：false
- * @param pixelFormat 自定义渲染回调的视频像素格式 {@link V2TXLivePixelFormat}。
- * @param bufferType  自定义渲染回调的视频数据格式 {@link V2TXLiveBufferType}。
- * @return 返回值 {@link V2TXLiveCode}
- *         - V2TXLIVE_OK: 成功
- */
-#ifdef _WIN32
-    virtual int32_t enableCustomRendering(bool enable, V2TXLivePixelFormat pixelFormat, V2TXLiveBufferType bufferType) = 0;
-#endif
-
-/**
- * 开启/关闭自定义音频采集
- *
- *  @brief 开启/关闭自定义音频采集。<br/>
- *         在自定义音频采集模式下，SDK 不再从麦克风采集声音，只保留编码和发送能力。
- *  @note   需要在 [startPush]({@link V2TXLivePusher#startPush(String)}) 前调用才会生效。
- *  @param enable true: 开启自定义采集; false: 关闭自定义采集。【默认值】: false
- *  @return 返回值 {@link V2TXLiveCode}
- *          - V2TXLIVE_OK: 成功
- */
-#ifdef _WIN32
-    virtual int enableCustomAudioCapture(bool enable) = 0;
-#endif
-
-/**
  * 在自定义音频采集模式下，将采集的音频数据发送到SDK
  *
  *  @brief 在自定义音频采集模式下，将采集的音频数据发送到SDK，SDK不再采集麦克风数据，仅保留编码和发送功能。
@@ -413,7 +428,7 @@ class V2TXLivePusher {
  *            - V2TXLIVE_ERROR_REFUSED: 发送失败，您必须先调用 enableCustomAudioCapture 开启自定义音频采集
  */
 #ifdef _WIN32
-    virtual int sendCustomAudioFrame(V2TXLiveAudioFrame* audioFrame) = 0;
+    virtual int32_t sendCustomAudioFrame(V2TXLiveAudioFrame* audioFrame) = 0;
 #endif
 
     /**
@@ -453,29 +468,20 @@ class V2TXLivePusher {
      */
     virtual int32_t stopSystemAudioLoopback() = 0;
 
-    /**
-     * 开启/关闭视频自定义预处理
-     *
-     * @param enable      是否开启自定义视频预处理。【默认值】：false
-     * @param pixelFormat 自定义视频预处理回调的视频像素格式 {@link V2TXLivePixelFormat}
-     * @param bufferType  自定义视频预处理的视频数据格式 {@link V2TXLiveBufferType}
-     */
-    virtual int32_t enableCustomVideoProcess(bool enable, V2TXLivePixelFormat pixelFormat, V2TXLiveBufferType bufferType) = 0;
-
 /**
  * 启动屏幕分享
  *
  * @note startVirtualCamera，startCamera，startScreenCapture，同一 Pusher 实例下，仅有一个能上行，三者为覆盖关系。例如先调用 startCamera，后调用 startVirtualCamera。此时表现为暂停摄像头推流，开启图片推流
  */
 #ifdef _WIN32
-    virtual void startScreenCapture() = 0;
+    virtual int32_t startScreenCapture() = 0;
 #endif
 
 /**
  * 停止屏幕采集
  */
 #ifdef _WIN32
-    virtual void stopScreenCapture() = 0;
+    virtual int32_t stopScreenCapture() = 0;
 #endif
 
 /**
@@ -518,7 +524,7 @@ class V2TXLivePusher {
  * @note 设置高亮边框颜色、宽度参数在 Mac 平台不生效
  */
 #ifdef _WIN32
-    virtual void setScreenCaptureSource(const V2TXLiveScreenCaptureSourceInfo& source, const RECT& captureRect, const V2TXLiveScreenCaptureProperty& property) = 0;
+    virtual int32_t setScreenCaptureSource(const V2TXLiveScreenCaptureSourceInfo& source, const RECT& captureRect, const V2TXLiveScreenCaptureProperty& property) = 0;
 #endif
 
 #endif
@@ -529,6 +535,20 @@ class V2TXLivePusher {
      * @param isShow 是否显示。【默认值】：false
      */
     virtual void showDebugView(bool isShow) = 0;
+
+/**
+ * 调用 V2TXLivePusher 的高级 API 接口。
+ *
+ * @note  该接口用于调用一些高级功能。
+ * @param key   高级 API 对应的 key。
+ * @param value 调用 key 所对应的高级 API 时，需要的参数。
+ * @return 返回值 {@link V2TXLiveCode}
+ *         - V2TXLIVE_OK: 成功
+ *         - V2TXLIVE_ERROR_INVALID_PARAMETER: 操作失败，key 不允许为 nullptr
+ */
+#ifdef _WIN32
+    virtual int32_t setProperty(const char* key, const void* value) = 0;
+#endif
 
    protected:
     virtual ~V2TXLivePusher(){};

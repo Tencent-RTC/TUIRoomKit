@@ -1,7 +1,7 @@
 /**
  * Module:   TRTCCloud @ TXLiteAVSDK
  * Function: 腾讯云 TRTC 主功能接口
- * Version: 9.2.10637
+ * Version: 9.5.11233
  */
 #import <Foundation/Foundation.h>
 #import <VideoToolbox/VideoToolbox.h>
@@ -200,11 +200,11 @@
  *
  * 您可以通过该接口在“自动订阅”和“手动订阅”两种模式下进行切换：
  * - 自动订阅：默认模式，用户在进入房间后会立刻接收到该房间中的音视频流，音频会自动播放，视频会自动开始解码（依然需要您通过 startRemoteView 接口绑定渲染控件）。
- * - 手动订阅：在用户进入房间后，需要手动调用 {@startRemoteView} 接口才能启动视频流的订阅和解码，需要手动调用 {@muteRemoteAudio} (false) 接口才能启动声音的播放。
+ * - 手动订阅：在用户进入房间后，需要手动调用 {@startRemoteView} 接口才能启动视频流的订阅和解码，需要手动调用 {@muteRemoteAudio} (NO) 接口才能启动声音的播放。
  *
  * 在绝大多数场景下，用户进入房间后都会订阅房间中所有主播的音视频流，因此 TRTC 默认采用了自动订阅模式，以求得最佳的“秒开体验”。
  * 如果您的应用场景中每个房间同时会有很多路音视频流在发布，而每个用户只想选择性地订阅其中的 1-2 路，则推荐使用“手动订阅”模式以节省流量费用。
- * @param autoRecvAudio YES：自动订阅音频；NO：需手动调用 muteRemoteAudio(false) 订阅音频。默认值：YES。
+ * @param autoRecvAudio YES：自动订阅音频；NO：需手动调用 muteRemoteAudio(NO) 订阅音频。默认值：YES。
  * @param autoRecvVideo YES：自动订阅视频；NO：需手动调用 startRemoteView 订阅视频。默认值：YES。
  * @note
  * 1. 需要在进入房间（enterRoom）前调用该接口，设置才能生效。
@@ -226,15 +226,15 @@
  *     //...
  *     //Switch the role from "anchor" to "audience" in your own room
  *     [mainCloud switchRole:TRTCRoleAudience];
- *     [mainCloud muteLocalVideo:true];
- *     [mainCloud muteLocalAudio:true];
+ *     [mainCloud muteLocalVideo:YES];
+ *     [mainCloud muteLocalAudio:YES];
  *     //...
  *     //Use subcloud to enter another room and switch the role from "audience" to "anchor"
  *     TRTCCloud *subCloud = [mainCloud createSubCloud];
  *     [subCloud enterRoom:params2 appScene:TRTCAppSceneLIVE)];
  *     [subCloud switchRole:TRTCRoleAnchor];
- *     [subCloud muteLocalVideo:false];
- *     [subCloud muteLocalAudio:false];
+ *     [subCloud muteLocalVideo:NO];
+ *     [subCloud muteLocalAudio:NO];
  *     //...
  *     //Exit from new room and release it.
  *     [subCloud exitRoom];
@@ -331,6 +331,7 @@
  * </pre>
  * @param config 如果 config 不为空，则开启云端混流，如果 config 为空则停止云端混流。详情请参考 {@link TRTCTranscodingConfig} 。
  * @note 关于云端混流的注意事项：
+ *   - 混流转码为收费功能，调用接口将产生云端混流转码费用，详见 https://cloud.tencent.com/document/product/647/49446 。
  *   - 调用该接口的用户，如果没设定 config 参数中的 streamId 字段，TRTC 会将房间中的多路画面混合到当前用户所对应的音视频流上，即 A + B => A。
  *   - 调用该接口的用户，如果设定了 config 参数中的 streamId 字段，TRTC 会将房间中的多路画面混合到您指定的 streamId 上，即 A + B => streamId。
  *   - 请注意，若您还在房间中且不再需要混流，请务必再次调用本接口并将 config 设置为空以进行取消，不及时取消混流可能会引起不必要的计费损失。
@@ -357,7 +358,7 @@
  * @param view 承载视频画面的控件
  * @note 如果希望开播前预览摄像头画面并通过 BeautyManager 调节美颜参数，您可以：
  *  - 方案一：在调用 enterRoom 之前调用 startLocalPreview
- *  - 方案二：在调用 enterRoom 之后调用 startLocalPreview + muteLocalVideo(true)
+ *  - 方案二：在调用 enterRoom 之后调用 startLocalPreview + muteLocalVideo(YES)
  */
 #if TARGET_OS_IPHONE
 - (void)startLocalPreview:(BOOL)frontCamera view:(TXView *)view;
@@ -373,7 +374,7 @@
  * @param view 承载视频画面的控件
  * @note 如果希望开播前预览摄像头画面并通过 BeautyManager 调节美颜参数，您可以：
  * - 方案一：在调用 enterRoom 之前调用 startLocalPreview
- * - 方案二：在调用 enterRoom 之后调用 startLocalPreview + muteLocalVideo(true)
+ * - 方案二：在调用 enterRoom 之后调用 startLocalPreview + muteLocalVideo(YES)
  */
 #if !TARGET_OS_IPHONE && TARGET_OS_MAC
 - (void)startLocalPreview:(TXView *)view;
@@ -399,14 +400,14 @@
  * 当暂停/恢复发布指定 TRTCVideoStreamTypeBig 后，同一房间中的其他用户将会收到 onUserVideoAvailable 回调通知。
  * 当暂停/恢复发布指定 TRTCVideoStreamTypeSub 后，同一房间中的其他用户将会收到 onUserSubStreamAvailable 回调通知。
  * @param streamType 要暂停/恢复的视频流类型（仅支持 {@link TRTCVideoStreamTypeBig} 和 {@link TRTCVideoStreamTypeSub}）
- * @param mute true：暂停；false：恢复。
+ * @param mute YES：暂停；NO：恢复。
  */
 - (void)muteLocalVideo:(TRTCVideoStreamType)streamType mute:(BOOL)mute;
 
 /**
  * 4.6 设置本地画面被暂停期间的替代图片
  *
- * 当您调用 muteLocalVideo(true) 暂停本地画面时，您可以通过调用本接口设置一张替代图片，设置后，房间中的其他用户会看到这张替代图片，而不是黑屏画面。
+ * 当您调用 muteLocalVideo(YES) 暂停本地画面时，您可以通过调用本接口设置一张替代图片，设置后，房间中的其他用户会看到这张替代图片，而不是黑屏画面。
  * @param image 设置替代图片，空值代表在 muteLocalVideo 之后不再发送视频流数据，默认值为空。
  * @param fps 设置替代图片帧率，最小值为5，最大值为10，默认5。
  */
@@ -533,7 +534,7 @@
  * 4.18 设置编码器输出的画面镜像模式
  *
  * 该设置不影响本地画面的镜像模式，但会影响房间中其他用户所观看到（以及云端录制文件）的镜像模式。
- * @param mirror 是否开启远端镜像，true：开启远端画面镜像；false：关闭远端画面镜像，默认值：false。
+ * @param mirror 是否开启远端镜像，YES：开启远端画面镜像；NO：关闭远端画面镜像，默认值：NO。
  */
 - (void)setVideoEncoderMirror:(BOOL)mirror;
 
@@ -553,7 +554,7 @@
  * 开启双路编码模式后，当前用户的编码器会同时输出【高清大画面】和【低清小画面】两路视频流（但只有一路音频流）。
  * 如此以来，房间中的其他用户就可以根据自身的网络情况或屏幕大小选择订阅【高清大画面】或是【低清小画面】。
  * @note 双路编码开启后，会消耗更多的 CPU 和 网络带宽，所以 Mac、Windows 或者高性能 Pad 可以考虑开启，不建议手机端开启。
- * @param enable 是否开启小画面编码，默认值：false
+ * @param enable 是否开启小画面编码，默认值：NO
  * @param smallVideoEncParam 小流的视频参数
  * @return 0：成功；-1：当前大画面已被设置为较低画质，开启双路编码已无必要。
  */
@@ -594,7 +595,7 @@
  * 5.1 开启本地音频的采集和发布
  *
  * SDK 默认不开启麦克风，当用户需要发布本地音频时，需要调用该接口开启麦克风采集，并将音频编码并发布到当前的房间中。
- * 开启本地音频的采集和发布后，房间中的其他用户会收到 {@link onUserAudioAvailable}(userId, true) 的通知。
+ * 开启本地音频的采集和发布后，房间中的其他用户会收到 {@link onUserAudioAvailable}(userId, YES) 的通知。
  * @param quality 声音音质
  *   - {@link TRTCAudioQualitySpeech}，流畅：采样率：16k；单声道；音频裸码率：16kbps；适合语音通话为主的场景，比如在线会议，语音通话。
  *   - {@link TRTCAudioQualityDefault}，默认：采样率：48k；单声道；音频裸码率：50kbps；SDK 默认的音频质量，如无特殊需求推荐选择之。
@@ -606,19 +607,19 @@
 /**
  * 5.2 停止本地音频的采集和发布
  *
- * 停止本地音频的采集和发布后，房间中的其他用户会收到 {@link onUserAudioAvailable}(userId, false) 的通知。
+ * 停止本地音频的采集和发布后，房间中的其他用户会收到 {@link onUserAudioAvailable}(userId, NO) 的通知。
  */
 - (void)stopLocalAudio;
 
 /**
  * 5.3 暂停/恢复发布本地的音频流
  *
- * 当您暂停发布本地音频流之后，房间中的其他他用户会收到 {@link onUserAudioAvailable}(userId, false) 的通知。
- * 当您恢复发布本地音频流之后，房间中的其他他用户会收到 {@link onUserAudioAvailable}(userId, true) 的通知。
- * 与 {@link stopLocalAudio} 的不同之处在于，muteLocalAudio(true) 并不会释放麦克风权限，而是继续发送码率极低的静音包。
+ * 当您暂停发布本地音频流之后，房间中的其他他用户会收到 {@link onUserAudioAvailable}(userId, NO) 的通知。
+ * 当您恢复发布本地音频流之后，房间中的其他他用户会收到 {@link onUserAudioAvailable}(userId, YES) 的通知。
+ * 与 {@link stopLocalAudio} 的不同之处在于，muteLocalAudio(YES) 并不会释放麦克风权限，而是继续发送码率极低的静音包。
  * 这对于需要云端录制的场景非常适用，因为 MP4 等格式的视频文件，对于音频数据的连续性要求很高，使用 {@link stopLocalAudio} 会导致录制出的 MP4 文件不易播放。
  * 因此在对录制文件的质量要求较高的场景中，建议选择 muteLocalAudio 而不建议使用 stopLocalAudio。
- * @param mute true：静音；false：恢复。
+ * @param mute YES：静音；NO：恢复。
  */
 - (void)muteLocalAudio:(BOOL)mute;
 
@@ -627,8 +628,8 @@
  *
  * 当您静音某用户的远端音频时，SDK 会停止播放指定用户的声音，同时也会停止拉取该用户的音频数据数据。
  * @param userId 用于指定远端用户的 ID。
- * @param mute true：静音；false：取消静音。
- * @note 在进入房间（enterRoom）之前或之后调用本接口均生效，静音状态在退出房间（exitRoom） 之后会被重置为 false。
+ * @param mute YES：静音；NO：取消静音。
+ * @note 在进入房间（enterRoom）之前或之后调用本接口均生效，静音状态在退出房间（exitRoom） 之后会被重置为 NO。
  */
 - (void)muteRemoteAudio:(NSString *)userId mute:(BOOL)mute;
 
@@ -636,8 +637,8 @@
  * 5.5 暂停/恢复播放所有远端用户的音频流
  *
  * 当您静音所有用户的远端音频时，SDK 会停止播放所有来自远端的音频流，同时也会停止拉取所有用户的音频数据。
- * @param mute true：静音；false：取消静音。
- * @note 在进入房间（enterRoom）之前或之后调用本接口均生效，静音状态在退出房间（exitRoom） 之后会被重置为 false。
+ * @param mute YES：静音；NO：取消静音。
+ * @note 在进入房间（enterRoom）之前或之后调用本接口均生效，静音状态在退出房间（exitRoom） 之后会被重置为 NO。
  */
 - (void)muteAllRemoteAudio:(BOOL)mute;
 
@@ -731,6 +732,14 @@
  */
 - (void)stopLocalRecording;
 
+/**
+ * 5.18 设置远端音频流智能并发播放策略
+ *
+ * 设置远端音频流智能并发播放策略，适用于上麦人数比较多的场景。
+ * @param params 音频并发参数，请参考 {@link TRTCAudioParallelParams}
+ */
+- (void)setRemoteAudioParallelParams:(TRTCAudioParallelParams *)params;
+
 /// @}
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -803,7 +812,7 @@
  * - 耳机耳返：麦克风捕捉的声音实时通过耳机播放，常用于音乐直播。
  * - 混响效果：KTV、小房间、大会堂、低沉、洪亮...
  * - 变声特效：萝莉、大叔、重金属...
- * - 短音效：鼓掌声、欢笑声等简短的音效文件（对于小于10秒的文件，请将 isShortFile 参数设置为 true）。
+ * - 短音效：鼓掌声、欢笑声等简短的音效文件（对于小于10秒的文件，请将 isShortFile 参数设置为 YES）。
  */
 - (TXAudioEffectManager *)getAudioEffectManager;
 
@@ -947,7 +956,7 @@
 #endif
 
 /**
- * 9.7 设置屏幕分享（即辅路）的视频编码参数（该接口仅支持桌面系统）
+ * 9.7 设置屏幕分享（即辅路）的视频编码参数（桌面系统和移动系统均已支持）
  *
  * 该接口可以设定远端用户所看到的屏幕分享（即辅路）的画面质量，同时也能决定云端录制出的视频文件中屏幕分享的画面质量。
  * 请注意如下两个接口的差异：
@@ -1048,7 +1057,7 @@
  * 开启该模式后，SDK 不在运行原有的视频采集流程，即不再继续从摄像头采集数据和美颜，而是只保留视频编码和发送能力。
  * 您需要通过 {@link sendCustomVideoData} 不断地向 SDK 塞入自己采集的视频画面。
  * @param streamType 用于指定视频流类型，{@link TRTCVideoStreamTypeBig}：高清大画面；{@link TRTCVideoStreamTypeSub}：辅路画面。
- * @param enable 是否启用，默认值：false。
+ * @param enable 是否启用，默认值：NO。
  */
 - (void)enableCustomVideoCapture:(TRTCVideoStreamType)streamType enable:(BOOL)enable;
 
@@ -1080,7 +1089,7 @@
  *
  * 开启该模式后，SDK 不在运行原有的音频采集流程，即不再继续从麦克风采集音频数据，而是只保留音频编码和发送能力。
  * 您需要通过 {@link sendCustomAudioData} 不断地向 SDK 塞入自己采集的音频数据。
- * @param enable 是否启用，默认值：false。
+ * @param enable 是否启用，默认值：NO。
  * @note 由于回声抵消（AEC）需要严格的控制声音采集和播放的时间，所以开启自定义音频采集后，AEC 能力可能会失效。
  */
 - (void)enableCustomAudioCapture:(BOOL)enable;
@@ -1105,9 +1114,9 @@
  * 10.5 启用/关闭自定义音轨
  *
  * 开启后，您可以通过本接口向 SDK 混入一条自定义的音轨。通过两个布尔型参数，您可以控制该音轨是否要在远端和本地播放。
- * @param enablePublish 控制混入的音轨是否要在远端播放，默认值：false。
- * @param enablePlayout 控制混入的音轨是否要在本地播放，默认值：false。
- * @note 如果您指定参数 enablePublish 和 enablePlayout 均为 false，代表完全关闭您的自定义音轨。
+ * @param enablePublish 控制混入的音轨是否要在远端播放，默认值：NO。
+ * @param enablePlayout 控制混入的音轨是否要在本地播放，默认值：NO。
+ * @note 如果您指定参数 enablePublish 和 enablePlayout 均为 NO，代表完全关闭您的自定义音轨。
  */
 - (void)enableMixExternalAudioFrame:(BOOL)enablePublish playout:(BOOL)enablePlayout;
 
@@ -1310,12 +1319,12 @@
  * @param data 待发送的消息，单个消息的最大长度被限制为 1KB。
  * @param reliable 是否可靠发送，可靠发送可以获得更高的发送成功率，但可靠发送比不可靠发送会带来更大的接收延迟。
  * @param ordered 是否要求有序，即是否要求接收端的数据包顺序和发送端的数据包顺序一致（这会带来一定的接收延时）。
- * @return true：消息已经发出；false：消息发送失败。
+ * @return YES：消息已经发出；NO：消息发送失败。
  * @note
  * 1. 发送消息到房间内所有用户（暂时不支持 Web/小程序端），每秒最多能发送30条消息。
  * 2. 每个包最大为 1KB，超过则很有可能会被中间路由器或者服务器丢弃。
  * 3. 每个客户端每秒最多能发送总计 8KB 数据。
- * 4. 请将 reliable 和 ordered 同时设置为 true 或同时设置为 flase，暂不支持交叉设置。
+ * 4. 请将 reliable 和 ordered 同时设置为 YES 或同时设置为 NO，暂不支持交叉设置。
  * 5. 强烈建议您将不同类型的消息设定为不同的 cmdID，这样可以在要求有序的情况下减小消息时延。
  */
 - (BOOL)sendCustomCmdMsg:(NSInteger)cmdID data:(NSData *)data reliable:(BOOL)reliable ordered:(BOOL)ordered;
@@ -1352,19 +1361,16 @@
 /// @{
 
 /**
- * 12.1 开始进行网络测速（进入房间前使用）
+ * 12.1 开始进行网速测试（进入房间前使用）
  *
- * TRTC 由于涉及的是对传输时延要求很苛刻的实时音视频传输服务，因此对网络的稳定性要求会比较高。
- * 很多用户在网络环境达不到 TRTC 的最低使用门槛时，直接进入房间可能会导致非常不好的用户体验。
- * 推荐的做法是在用户进入房间前进行网络测速，当用户网络较差时通过 UI 交互提醒用户切换到更加稳定的网络（比如 WiFi 切换到 4G ）后再进入房间。
+ * @param params 测速选项
+ * @return 接口调用结果，< 0：失败
  * @note
- * 1. 测速本身会消耗一定的流量，所以也会产生少量额外的流量费用。
- * 2. 请在进入房间前进行测速，在房间中测速会影响正常的音视频传输效果，而且由于干扰过多，测速结果也不准确。
- * @param sdkAppId 应用标识，请参考 {@link TRTCParams} 中的相关说明。
- * @param userId 用户标识，请参考 {@link TRTCParams} 中的相关说明。
- * @param userSig 用户签名，请参考 {@link TRTCParams} 中的相关说明。
+ * 1. 测速过程将产生少量的基础服务费用，详见 [计费概述 > 基础服务](https://cloud.tencent.com/document/product/647/17157#.E5.9F.BA.E7.A1.80.E6.9C.8D.E5.8A.A1) 文档说明。
+ * 2. 请在进入房间前进行网速测试，在房间中网速测试会影响正常的音视频传输效果，而且由于干扰过多，网速测试结果也不准确。
+ * 3. 同一时间只允许一项网速测试任务运行。
  */
-- (void)startSpeedTest:(uint32_t)sdkAppId userId:(NSString *)userId userSig:(NSString *)userSig completion:(void (^)(TRTCSpeedTestResult *result, NSInteger completedCount, NSInteger totalCount))completion;
+- (int)startSpeedTest:(TRTCSpeedTestParams *)params;
 
 /**
  * 12.2 停止网络测速
@@ -2104,9 +2110,9 @@
 /**
  * 设置系统音量类型
  *
- * @deprecated v8.0 版本开始不推荐使用，建议使用 {@link TXDeviceManager} 中的 setSystemVolumeType  接口替代之。
+ * @deprecated v8.0 版本开始不推荐使用，建议使用 {@link startLocalAudio:}(quality) 替代之，通过 quality 参数来决策音质。
  */
-- (void)setSystemVolumeType:(TRTCSystemVolumeType)type __attribute__((deprecated("use getDeviceManager instead")));
+- (void)setSystemVolumeType:(TRTCSystemVolumeType)type __attribute__((deprecated("use startLocalAudio:quality instead")));
 
 /**
  * 视频截图
@@ -2156,6 +2162,16 @@
  * @deprecated v8.9 版本开始不推荐使用，建议使用 muteRemoteVideoStream(userId, streamType, mute) 接口替代之。
  */
 - (void)muteRemoteVideoStream:(NSString *)userId mute:(BOOL)mute __attribute__((deprecated("use muteRemoteVideoStream:userid,streamType:mute: instead")));
+
+/**
+ *  开始进行网络测速（进入房间前使用）
+ *
+ * @deprecated v9.2 版本开始不推荐使用，建议使用 startSpeedTest(params) 接口替代之。
+ */
+- (void)startSpeedTest:(uint32_t)sdkAppId
+                userId:(NSString *)userId
+               userSig:(NSString *)userSig
+            completion:(void (^)(TRTCSpeedTestResult *result, NSInteger completedCount, NSInteger totalCount))completion __attribute__((deprecated("use startSpeedTest: instead")));
 
 /// @}
 @end

@@ -327,7 +327,7 @@ void MainWindow::SlotClose() {
     if (enter_room_success_) {
         auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
         if (local_user == nullptr) {
-            LERROR("MainWindow::SlotClose, local_user is nullptr");
+            LINFO("MainWindow::SlotClose, local_user is nullptr");
             return;
         }
         if (local_user->role == TUIRole::kMaster) {

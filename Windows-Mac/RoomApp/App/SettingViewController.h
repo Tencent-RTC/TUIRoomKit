@@ -53,7 +53,7 @@ private slots:
 private:
     void InitUi();
     void InitConnect();
-    void ResetDeviceList(const QString& deviceId, TXMediaDeviceType type, TXMediaDeviceState state);
+    void ResetDeviceList(const QString& deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state);
 
     int GetAppMemoryUsage();
     void GetTotalMemory();

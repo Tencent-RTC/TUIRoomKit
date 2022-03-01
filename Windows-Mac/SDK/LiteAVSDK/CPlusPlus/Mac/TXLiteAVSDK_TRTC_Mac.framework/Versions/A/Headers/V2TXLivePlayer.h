@@ -20,6 +20,12 @@
 
 @protocol V2TXLivePlayer <NSObject>
 
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                    播放器相关接口
+//
+/////////////////////////////////////////////////////////////////////////////////
+
 /**
  * 设置播放器回调。
  *
@@ -165,9 +171,9 @@
 - (V2TXLiveCode)snapshot;
 
 /**
- * 设置视频自定义渲染回调。
+ * 开启/关闭对视频帧的监听回调。
  *
- * 通过该方法，可以获取解码后的每一帧视频画面，进行自定义渲染处理，添加自定义显示效果。
+ * SDK 在您开启次此开关后将不再渲染视频画面，您可以通过 V2TXLivePlayerObserver 获得视频帧，并执行自定义的渲染逻辑。
  *
  * @param enable      是否开启自定义渲染。【默认值】：NO
  * @param pixelFormat 自定义渲染回调的视频像素格式 {@link V2TXLivePixelFormat}。
@@ -176,12 +182,12 @@
  *         - V2TXLIVE_OK: 成功
  *         - V2TXLIVE_ERROR_NOT_SUPPORTED: 像素格式或者数据格式不支持
  */
-- (V2TXLiveCode)enableCustomRendering:(BOOL)enable pixelFormat:(V2TXLivePixelFormat)pixelFormat bufferType:(V2TXLiveBufferType)bufferType;
+- (V2TXLiveCode)enableObserveVideoFrame:(BOOL)enable pixelFormat:(V2TXLivePixelFormat)pixelFormat bufferType:(V2TXLiveBufferType)bufferType;
 
 /**
  * 开启接收 SEI 消息
  *
- * @param enable      true: 开启接收 SEI 消息; false: 关闭接收 SEI 消息。【默认值】: false
+ * @param enable      YES: 开启接收 SEI 消息; NO: 关闭接收 SEI 消息。【默认值】: NO
  * @param payloadType 指定接收 SEI 消息的 payloadType，支持 5、242，请与发送端的 payloadType 保持一致。
  *
  * @return 返回值 {@link V2TXLiveCode}

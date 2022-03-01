@@ -82,6 +82,8 @@ typedef NS_ENUM(NSInteger, TX_Enum_PlayerType) {
 
 @property NSString *overlayIv;            /// HLS EXT-X-KEY 加密Iv
 
+@property NSDictionary *extInfoMap;       // 设置一些不必周知的特殊配置
+
 @end
 
 /// @}

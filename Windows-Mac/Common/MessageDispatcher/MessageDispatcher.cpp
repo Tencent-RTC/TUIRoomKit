@@ -262,6 +262,6 @@ void MessageDispatcher::OnUserVoiceVolume(const std::string& user_id, int volume
     emit SignalOnUserVoiceVolume(QString::fromStdString(user_id), volume);
 }
 
-void MessageDispatcher::onDeviceChanged(const char* deviceId, TXMediaDeviceType type, TXMediaDeviceState state) {
+void MessageDispatcher::onDeviceChanged(const char* deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) {
     emit SignalDeviceChanged(deviceId, type, state);
 }
