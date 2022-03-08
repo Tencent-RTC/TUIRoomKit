@@ -1,0 +1,14 @@
+<view class="box">
+    <block wx:for="{{itemList}}" wx:key="navigateTo">
+        <view class="item-box" bindtap="entryTap" data-url="{{item.navigateTo}}">
+            <view class="box-title">
+                <image class="icon" src="{{item.iconUrl}}" mode="aspectFit">
+                </image>
+                {{item.title}}
+            </view>
+            <image class="right-icon" src="https://qcloudimg.tencent-cloud.cn/raw/50b541d2f835ae049b2cda460da6c22f.svg"
+                mode="aspectFit">
+            </image>
+        </view>
+    </block>
+</view>

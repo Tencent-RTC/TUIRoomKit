@@ -1,0 +1,15 @@
+.page-container {
+    background-color: #f6f8fa;
+    height: 100%;
+    padding: 20rpx 0;
+    box-sizing: border-box;
+    .cell-group{
+        margin-bottom: 20rpx;
+    }
+    .create-room{
+        background-color: #006eff;
+        border-radius: 50px;
+        width: 30%;
+        margin-top: 100rpx;
+    }
+}

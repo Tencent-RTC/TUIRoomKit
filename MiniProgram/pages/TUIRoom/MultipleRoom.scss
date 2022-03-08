@@ -1,0 +1,36 @@
+.box {
+    padding: 20rpx 40rpx;
+
+    .item-box {
+        height: 200rpx;
+        background-color: #2b6eff;
+        margin-bottom: 20rpx;
+        border-radius: 26rpx;
+        line-height: 200rpx;
+        color: #fff;
+        display: flex;
+        align-items: center;
+    }
+
+    .box-title {
+        flex: 90%;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        margin-left: 30rpx;
+
+        .icon {
+            margin-right: 18rpx;
+            height: 38%;
+            width: 76rpx;
+        }
+    }
+
+    .right-icon {
+        flex: 10%;
+        height: 38%;
+        text-align: center;
+        align-items: center;
+    }
+
+}
