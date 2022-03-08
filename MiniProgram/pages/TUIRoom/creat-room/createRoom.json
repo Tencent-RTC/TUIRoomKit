@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "创建房间",
+  "usingComponents": {
+    "van-field": "/components/@vant/field/index",
+    "van-cell-group": "/components/@vant/cell-group/index",
+    "van-cell": "/components/@vant/cell/index",
+    "van-icon": "/components/@vant/icon/index"
+  }
+}
