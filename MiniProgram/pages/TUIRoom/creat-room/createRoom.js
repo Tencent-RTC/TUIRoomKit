@@ -25,7 +25,7 @@ Page({
       wx.aegis.reportEvent({
         name: 'login',
         ext1: 'login-success',
-        ext2: 'wx-TUIRoom',
+        ext2: 'wxTUIRoomExternal',
         ext3: sdkAppID,
       })
       wx.$TUIRoomCore

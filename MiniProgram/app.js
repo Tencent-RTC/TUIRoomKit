@@ -12,7 +12,7 @@ App({
     wx.aegis.reportEvent({
       name: 'onLaunch',
       ext1: 'onLaunch-success',
-      ext2: 'wx-TUIRoom',
+      ext2: 'wxTUIRoomExternal',
       ext3: genTestUserSig('').sdkAppID,
     })
   },
