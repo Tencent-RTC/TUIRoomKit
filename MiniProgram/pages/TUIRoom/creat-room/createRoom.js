@@ -1,4 +1,5 @@
 import TUIRoomCore from '../../../lib/TUIRoom/lib/index';
+import {genTestUserSig} from "../../../debug/GenerateTestUserSig";
 Page({
   data: {
     userName: '',
@@ -21,6 +22,12 @@ Page({
       }
       wx.$TUIRoomCore = new TUIRoomCore();
       await wx.$TUIRoomCore.login(sdkAppID, this.data.userName, userSig);
+      wx.aegis.reportEvent({
+        name: 'login',
+        ext1: 'login-success',
+        ext2: 'wx-TUIRoom',
+        ext3: sdkAppID,
+      })
       wx.$TUIRoomCore
         .createRoom(String(this.data.roomId))
         .then(() => {
