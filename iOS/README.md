@@ -48,8 +48,7 @@ TUIRoom
 >正确的 UserSig 签发方式是将 UserSig 的计算代码集成到您的服务端，并提供面向 App 的接口，在需要 UserSig 时由您的 App 向业务服务器发起请求获取动态 UserSig。更多详情请参见 [服务端生成 UserSig](https://cloud.tencent.com/document/product/647/17275#Server)。
 
 ### 运行 App
-
-使用 Xcode（11.0及以上的版本）打开源码工程 `TUIRoom/Example/DemoApp.xcworkspace`，单击【运行】即可开始调试本 App。
+下载TXLiteAVSDK_TRTC.framework与TXLiteAVSDK_ReplayKitExt.framework放到SDK目录下，cd到Example目录下，执行pod install，请使用 Xcode（11.0及以上的版本）打开源码工程 `TUIRoom/Example/DemoApp.xcworkspace`，单击【运行】即可开始调试本 App。
 
 ### 体验应用（**体验应用至少需要两台设备**）
 #### 用户 A
