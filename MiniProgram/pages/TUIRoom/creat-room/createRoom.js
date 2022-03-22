@@ -21,20 +21,26 @@ Page({
       }
       wx.$TUIRoomCore = new TUIRoomCore();
       await wx.$TUIRoomCore.login(sdkAppID, this.data.userName, userSig);
+      wx.aegis.reportEvent({
+        name: 'login',
+        ext1: 'login-success',
+        ext2: 'wxTUIRoomExternal',
+        ext3: sdkAppID,
+      })
       wx.$TUIRoomCore
-        .createRoom(String(this.data.roomId))
-        .then(() => {
-          wx.navigateTo({
-            url: `../room/room?roomId=${this.data.roomId}&enableCamera=${this.data.enableCamera}&enableMic=${this.data.enableMic}`,
+          .createRoom(String(this.data.roomId))
+          .then(() => {
+            wx.navigateTo({
+              url: `../room/room?roomId=${this.data.roomId}&enableCamera=${this.data.enableCamera}&enableMic=${this.data.enableMic}`,
+            });
+          })
+          .catch((e) => {
+            console.dir(e);
+            wx.showToast({
+              title: e.message,
+              icon: 'none',
+            });
           });
-        })
-        .catch((e) => {
-          console.dir(e);
-          wx.showToast({
-            title: e.message,
-            icon: 'none',
-          });
-        });
     }
   },
   checkParams() {
