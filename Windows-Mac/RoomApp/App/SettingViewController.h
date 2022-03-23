@@ -50,6 +50,9 @@ private slots:
 
     void OnStatistics(const liteav::TRTCStatistics& statis);
     void OnNetQuality(UserNetQualityInfo local_user_quality, std::vector<UserNetQualityInfo> remote_users_quality);
+
+    void OnAudioQualityIndexChanged(int index);
+    void OnAINoiseReductionChecked(bool checked);
 private:
     void InitUi();
     void InitConnect();

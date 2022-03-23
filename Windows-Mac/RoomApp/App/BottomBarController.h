@@ -9,6 +9,7 @@
 #include <QCheckBox>
 #include <QTimer>
 #include <QPainter>
+#include <QButtonGroup>
 #include "ViewDragger.h"
 #include "TXMessageBox.h"
 #include "ui_BottomBarController.h"

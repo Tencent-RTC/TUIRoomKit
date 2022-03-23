@@ -55,13 +55,15 @@ class TUIRoomCoreImpl : public TUIRoomCore
     int StartSystemAudioLoopback() override;
     int StopSystemAudioLoopback() override;
     int SetVideoMirror(bool mirror) override;
+    int OpenAINoiseReduction() override;
+    int CloseAINoiseReduction() override;
 
     /*************************
     * 远端用户接口。
     *************************/
     int StartRemoteView(const std::string& user_id, const liteav::TXView& view, TUIStreamType type = TUIStreamType::kStreamTypeCamera) override;
     int StopRemoteView(const std::string& user_id, TUIStreamType type = TUIStreamType::kStreamTypeCamera) override;
-    int UpdateRemoteView(const std::string& user_id, TUIStreamType type, liteav::TXView& view) override;
+    int UpdateRemoteView(const std::string& user_id, TUIStreamType type, const liteav::TXView& view) override;
     /*************************
     * 发送消息。
     *************************/
@@ -230,6 +232,7 @@ class TUIRoomCoreImpl : public TUIRoomCore
     int             sdk_app_id_;
     std::string     user_sig_;
     std::string     sdk_version_;
+    liteav::TRTCAudioQuality audio_quality_ = liteav::TRTCAudioQualityDefault;
 };
 
 #endif  //  MODULE_TUIROOMCOREIMPL_H_

@@ -64,8 +64,10 @@ void MemberItemView::UpdateUserInfo(const std::string& user_id) {
     user_info_.has_subscribed_video_stream = user_info->has_subscribed_video_stream;
     if (user_info->user_name.length() != 0) {
         ui_->member_name_label->setText(QString::fromStdString(user_info->user_name));
+        ui_->member_name_label->setToolTip(QString::fromStdString(user_info->user_name));
     } else {
         ui_->member_name_label->setText(QString::fromStdString(user_info->user_id));
+        ui_->member_name_label->setToolTip(QString::fromStdString(user_info->user_id));
     }
     ui_->mic_btn->setStyle(QApplication::style());
     ui_->cam_btn->setStyle(QApplication::style());

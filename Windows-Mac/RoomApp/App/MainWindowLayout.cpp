@@ -18,6 +18,10 @@ MainWindowLayout::~MainWindowLayout() {
         setting_->close();
         DELETE_OBJECT(setting_);
     }
+    const std::vector<std::string>& screen_share_users = DataStore::Instance()->GetScreenShareUsers();
+    for (auto user : screen_share_users) {
+      DataStore::Instance()->RemoveScreenShareUser(user);
+    }
 
     DELETE_OBJECT(bottom_menu_bar_);
 }
@@ -63,7 +67,7 @@ void MainWindowLayout::InitLayout() {
     main_widget_control_ = new VideoRenderView(main_window_ui_->content_widget);
     main_widget_control_->InitMainVideo();
     main_widget_control_->show();
-    stage_list_view_control_->AddMainVideo(main_widget_control_);
+    stage_list_view_control_->SetMainWindowView(main_widget_control_);
     chat_room_view_control_ = new ChatRoomViewController(*local_user, main_window_);
     chat_room_view_control_->show();
     if (main_window_ui_->chat_widget->layout() != nullptr) {
@@ -93,7 +97,6 @@ void MainWindowLayout::InitLayout() {
 void MainWindowLayout::InitConnect() {
     connect(bottom_menu_bar_, &BottomBarController::SignalShowSetting, this, &MainWindowLayout::SlotShowSetting);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserScreenAvailable, this, &MainWindowLayout::SlotOnRemoteUserScreenAvailable);
-    connect(stage_list_view_control_, &StageListController::SignalShowVideoOnMainScreen, this, &MainWindowLayout::SlotShowVideoOnMainScreen);
     connect(chat_room_view_control_, &ChatRoomViewController::SignalShowChatRoom, this, &MainWindowLayout::SlotShowChatRoom);
 
     connect(&StatusUpdateCenter::Instance(), &StatusUpdateCenter::SignalStageListLayoutChanged, this, &MainWindowLayout::SlotStageListLayoutChanged);
@@ -138,9 +141,6 @@ void MainWindowLayout::mouseDoubleClickEvent(QMouseEvent *event) {
     view_dragger_.mouseDoubleClick(event);
 }
 void MainWindowLayout::showEvent(QShowEvent* event) {
-    if (stage_list_view_control_ != NULL && main_window_->isVisible() && !main_window_->isMinimized())
-        stage_list_view_control_->ShowVideoTip(true);
-
     if (bottom_menu_bar_ == nullptr)
         return;
 
@@ -310,7 +310,6 @@ void MainWindowLayout::Region(const QPoint& current_global_point) {
     }
 }
 void MainWindowLayout::SlotStageListLayoutChanged(StageListDirection direction) {
-    stage_list_view_control_->ShowVideoTip(false);
     main_window_ui_->content_widget->hide();
     stage_list_view_control_->SetStageListDirection(direction);
     if (direction == StageListDirection::kVerDirection) {
@@ -339,7 +338,6 @@ void MainWindowLayout::SlotStageListLayoutChanged(StageListDirection direction) 
         main_window_ui_->content_widget->setLayout(main_layout);
     }
     main_window_ui_->content_widget->show();
-    stage_list_view_control_->ShowVideoTip(true);
 }
 void MainWindowLayout::PopUpBottomBar(bool popups) {
     if (popups) {
@@ -465,19 +463,6 @@ void MainWindowLayout::SlotShowChatRoom(bool show) {
         }
     }
 }
-void MainWindowLayout::SlotShowVideoOnMainScreen(const std::string& user_id) {
-    main_widget_control_->ShowUserVideo(user_id);
-    auto window_handle = main_widget_control_->GetPlayWindow();
-    auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
-    if (local_user == nullptr) {
-        return;
-    }
-    if (local_user->user_id == user_id) {
-        TUIRoomCore::GetInstance()->StartCameraPreview(window_handle);
-    } else {
-        TUIRoomCore::GetInstance()->StartRemoteView(user_id, window_handle, TUIStreamType::kStreamTypeCamera);
-    }
-}
 
 void MainWindowLayout::SlotOnRemoteUserScreenAvailable(const QString& user_id, bool available) {
     if (available) {
@@ -495,12 +480,21 @@ void MainWindowLayout::SlotOnRemoteUserScreenAvailable(const QString& user_id, b
 }
 
 void MainWindowLayout::RemoteUserScreenOpen(const std::string& user_id) {
-    main_widget_control_->UserStartScreenShare(user_id);
+    std::string current_main_window_users = DataStore::Instance()->GetCurrentMainWindowUser();
+    if (current_main_window_users.empty()) {
+        main_widget_control_->UserStartScreenShare(user_id);
+        DataStore::Instance()->SetCurrentMainWindowUser(user_id);
+    }
+    DataStore::Instance()->AddScreenShareUser(user_id);
 }
 
 void MainWindowLayout::RemoteUserScreenClose(const std::string& user_id) {
-    main_widget_control_->UserStopScreenShare();
-    TUIRoomCore::GetInstance()->StopRemoteView(user_id, TUIStreamType::kStreamTypeScreen);
+    DataStore::Instance()->RemoveScreenShareUser(user_id);
+    if (DataStore::Instance()->GetCurrentMainWindowUser() == user_id && main_widget_control_->IsScreenShareWindow()) {
+        main_widget_control_->InitMainVideo();
+        DataStore::Instance()->SetCurrentMainWindowUser("");
+        TUIRoomCore::GetInstance()->StopRemoteView(user_id, TUIStreamType::kStreamTypeScreen);
+    }
 }
 void MainWindowLayout::ShowTransferRoomWindow() {
     if (transfer_room_window_ == nullptr) {

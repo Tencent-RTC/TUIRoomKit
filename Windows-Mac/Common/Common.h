@@ -1,4 +1,5 @@
 #pragma once
+#include <QFile>
 
 enum class Language {
     kChinese = 0,  // жпнд

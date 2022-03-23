@@ -45,8 +45,6 @@ MainWindow::MainWindow(TUISpeechMode speech_mode, QWidget *parent)
     connect(ui.btn_close, &QPushButton::clicked, this, &MainWindow::SlotClose);
     connect(ui.btn_min, &QPushButton::clicked, this, [&]() {
         this->showMinimized();
-        if (stage_list_view_control_ != NULL)
-            stage_list_view_control_->ShowVideoTip(false, true);
     });
     connect(ui.btn_max, &QPushButton::clicked, this, [&]() {
         if (this->isMaximized()) {
@@ -54,8 +52,6 @@ MainWindow::MainWindow(TUISpeechMode speech_mode, QWidget *parent)
         } else {
             this->showMaximized();
         }
-        if (stage_list_view_control_ != NULL)
-            stage_list_view_control_->ShowVideoTip(true);
     });
 
     if (TUIRoomCore::GetInstance()->GetDeviceManager() != nullptr)
@@ -122,8 +118,6 @@ void MainWindow::showEvent(QShowEvent* event) {
     return QMainWindow::showEvent(event);
 }
 void MainWindow::hideEvent(QHideEvent* event) {
-    if (stage_list_view_control_ != NULL)
-        stage_list_view_control_->ShowVideoTip(false, true);
     return QMainWindow::hideEvent(event);
 }
 void MainWindow::resizeEvent(QResizeEvent *event) {
@@ -268,7 +262,7 @@ void MainWindow::ShowUserList() {
             MemberListAddMember(*iter);
         }
         if (local_user->role != TUIRole::kMaster && iter->role == TUIRole::kMaster && stage_list_view_control_ != nullptr) {
-            stage_list_view_control_->InsertUser(*iter);
+            stage_list_view_control_->InsertUser(*iter, false);
         }
     }
 }
@@ -327,12 +321,18 @@ void MainWindow::SlotClose() {
     if (enter_room_success_) {
         auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
         if (local_user == nullptr) {
-            LINFO("MainWindow::SlotClose, local_user is nullptr");
+            LINFO("Error: MainWindow::SlotClose, local_user is nullptr");
             return;
         }
         if (local_user->role == TUIRole::kMaster) {
-            TXMessageBox::DialogInstance().ShowMultiButtonDialog(kCancel | kDestoryRoom | kLeaveRoom, \
-                tr("Are you sure to leave the room ?"));
+            auto user_count = TUIRoomCore::GetInstance()->GetRoomUsers().size();
+            if (user_count > 1) {
+                TXMessageBox::DialogInstance().ShowMultiButtonDialog(kCancel | kDestoryRoom | kLeaveRoom, \
+                    tr("Are you sure to leave the room ?"));
+            } else {
+                TXMessageBox::DialogInstance().ShowMultiButtonDialog(kCancel | kDestoryRoom, \
+                    tr("Are you sure to leave the room ?"));
+            }
         } else {
             TXMessageBox::DialogInstance().ShowMultiButtonDialog(kCancel | kLeaveRoom, \
                 tr("Are you sure to leave the room ?"));
@@ -416,12 +416,12 @@ void MainWindow::CloseMainWindow() {
 void MainWindow::StageAddMember(const TUIUserInfo& user_info) {
     LINFO("StageAddMember, user_id :%s, user_name:%s",user_info.user_id.c_str(), user_info.user_name.c_str());
     if (stage_list_view_control_ != nullptr) {
-        stage_list_view_control_->InsertUser(user_info);
+        stage_list_view_control_->InsertUser(user_info, false);
     }
 }
 void MainWindow::StageRemoveMember(const std::string& user_id) {
     if (stage_list_view_control_ != nullptr) {
-        stage_list_view_control_->RemoveUser(user_id);
+        stage_list_view_control_->RemoveUser(user_id, false);
     }
 }
 
@@ -441,13 +441,13 @@ void MainWindow::StartLocalCamera() {
         return;
     }
     liteav::TXView play_window = stage_list_view_control_->GetPlayWindow(local_user->user_id);
-    if (play_window == NULL) {
-        StageAddMember(*local_user);
-        play_window = stage_list_view_control_->GetPlayWindow(local_user->user_id);
-    }
-    if (play_window) {
+    if (play_window != nullptr) {
         TUIRoomCore::GetInstance()->StartCameraPreview(play_window);
+    } else if (main_window_layout_->GetMainWidgetController()->GetUserId()\
+        == DataStore::Instance()->GetCurrentUserInfo().user_id) {
+        TUIRoomCore::GetInstance()->StartCameraPreview(main_window_layout_->GetMainWidgetController()->GetPlayWindow());
     }
+
     emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*local_user);
 }
 
@@ -463,7 +463,7 @@ void MainWindow::StopLocalCamera() {
 
 void MainWindow::StartLocalMicrophone() {
     LINFO("StartLocalMicrophone");
-    TUIRoomCore::GetInstance()->StartLocalAudio(liteav::TRTCAudioQualitySpeech);
+    TUIRoomCore::GetInstance()->StartLocalAudio(DataStore::Instance()->GetAudioQuality());
     auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
     if (local_user == nullptr) {
         return;
@@ -498,9 +498,7 @@ void MainWindow::SlotBottomMenuMuteCamera(bool) {
                 tr("The master has set video ban for all staff, you cannot open the video temporarily."));
             return;
         }
-        if (stage_list_view_control_ != nullptr && stage_list_view_control_->IsOnStage(local_user->user_id)) {
-            StartLocalCamera();
-        }
+        StartLocalCamera();
     }
 }
 
@@ -521,9 +519,7 @@ void MainWindow::SlotBottomMenuMuteMicrophone(bool) {
                 tr("The master has set audio ban for all staff, you cannot open the audio temporarily."));
             return;
         }
-        if (stage_list_view_control_->IsOnStage(local_user->user_id)) {
-            StartLocalMicrophone();
-        }
+        StartLocalMicrophone();
     }
 }
 void MainWindow::StageUp() {
@@ -542,20 +538,28 @@ void MainWindow::StageUp() {
         if (!room_info.is_all_camera_muted) {
             if (!is_default_close_camera_) {
                 StartLocalCamera();
+            } else {
+                StopLocalCamera();
             }
         }
         if (!room_info.is_all_microphone_muted) {
             if (!is_default_close_mic_) {
                 StartLocalMicrophone();
+            } else {
+                StopLocalMicrophone();
             }
         }
     } else if (local_user->role == TUIRole::kMaster) {
         LINFO("Master StageUp, user_id :%s, user_id :%s, role :%d", local_user->user_id.c_str(), local_user->user_name.c_str(), local_user->role);
         if (!is_default_close_camera_) {
             StartLocalCamera();
+        } else {
+            StopLocalCamera();
         }
         if (!is_default_close_mic_) {
             StartLocalMicrophone();
+        } else {
+            StopLocalMicrophone();
         }
     }
 
@@ -613,7 +617,6 @@ void MainWindow::SlotOnError(int code, const QString& message) {
         break;
     case TUIRoomError::kErrorCreateRoomFailed:
         TUIRoomCore::GetInstance()->EnterRoom(room_id_);
-        return;
         break;
     case TUIRoomError::kErrorStartCameraFailed:
         TXMessageBox::Instance().AddLineTextMessage(tr("Failed to open the camera"));
@@ -646,7 +649,6 @@ void MainWindow::SlotOnError(int code, const QString& message) {
             tr("Open microphone failed"));
         break;
     default:
-        return;
         break;
     }
 }

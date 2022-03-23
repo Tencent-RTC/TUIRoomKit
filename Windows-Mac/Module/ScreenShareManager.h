@@ -60,7 +60,7 @@ class ScreenShareManager :
     * @param source                 指定分享源
     * @param captureRect            指定捕获的区域
     */
-    virtual void SelectScreenCaptureTarget(const ScreenCaptureSourceInfo& source, const RECT& capture_rect);
+    virtual void SelectScreenCaptureTarget(const ScreenCaptureSourceInfo& source, const RECT& capture_rect, const ScreenCaptureProperty& property);
 
     /**
     * @desc 设置屏幕分享的混音音量大小

@@ -54,9 +54,14 @@ void IMCore::OnConnectSuccess() {
     }
 }
 void IMCore::OnConnectFailed(int error_code, const V2TIMString &error_message) {
-    init_sdk_success_ = false;
-    if (callback_ != nullptr) {
-        callback_->OnIMError(static_cast<int>(TUIRoomError::kErrorLoginFailed), error_message.CString());
+    if (init_sdk_success_ == true) {
+        if (callback_ != nullptr) {
+            callback_->OnIMExitRoom(TUIExitRoomType::kNetworkAnomaly, error_message.CString());
+        }
+    } else {
+        if (callback_ != nullptr) {
+            callback_->OnIMError(static_cast<int>(TUIRoomError::kErrorLoginFailed), error_message.CString());
+        }
     }
 }
 void IMCore::OnKickedOffline() {
@@ -75,14 +80,17 @@ void IMCore::OnIMInterfaceCallback(CallBackType type, int code, const std::strin
     LINFO("OnIMInterfaceCallback type = %d, code = %d, message = %s", (int)type, code, message.c_str());
     switch (type) {
     case kLogin:
-        callback_->OnIMLogin(code, message);
+        if (ERR_SUCC == code) {
+            callback_->OnIMLogin(code, message);
+        } else {
+            callback_->OnIMError(static_cast<int>(TUIRoomError::kErrorLoginFailed), message);
+        }
         break;
     case kLoginOut:
         callback_->OnIMLogout(code, message);
         break;
     case kCreateGroup:
-        // ERR_SVR_GROUP_GROUPID_IN_USED 10021
-        if (ERR_SVR_GROUP_GROUPID_IN_USED != code)
+        if (ERR_SVR_GROUP_GROUPID_IN_USED_FOR_SUPER == code || ERR_SUCC == code)
             callback_->OnIMCreateRoom(code, message);
         else
             callback_->OnIMError(static_cast<int>(TUIRoomError::kErrorCreateRoomFailed), message);
@@ -91,7 +99,11 @@ void IMCore::OnIMInterfaceCallback(CallBackType type, int code, const std::strin
         callback_->OnIMDestroyRoom(code, message);
         break;
     case kJoinGroup:
-        callback_->OnIMEnterRoom(code, message);
+        if (ERR_SUCC == code || ERR_SVR_GROUP_ALLREADY_MEMBER == code) {
+            callback_->OnIMEnterRoom(code, message);
+        } else {
+            callback_->OnIMError(static_cast<int>(TUIRoomError::kErrorEnterRoomFailed), message);
+        }
         break;
     case kQuitGroup:
         if (ERR_SUCC == code) {
@@ -225,7 +237,7 @@ void IMCore::OnIMInterfaceCallback(CallBackType type, int code, const std::strin
             TUIUserInfo info;
             info.user_id = result.memberInfoList[i].userID.CString();
             info.user_name = result.memberInfoList[i].nickName.CString();
-            info.role = result.memberInfoList[i].role == V2TIM_GROUP_MEMBER_ROLE_SUPER ? TUIRole::kMaster : TUIRole::kAnchor;
+            info.role = result.memberInfoList[i].role == V2TIM_GROUP_MEMBER_ROLE_SUPER ? TUIRole::kMaster : (room_info_.mode == TUISpeechMode::kFreeSpeech ? TUIRole::kAnchor : TUIRole::kAudience);
             member_array_.push_back(info);
         }
         IMValueInterfaceCallback<V2TIMGroupMemberInfoResult>* get_members_callback = \
@@ -238,7 +250,7 @@ void IMCore::OnIMInterfaceCallback(CallBackType type, int code, const std::strin
             TUIUserInfo info;
             info.user_id = result.memberInfoList[i].userID.CString();
             info.user_name = result.memberInfoList[i].nickName.CString();
-            info.role = result.memberInfoList[i].role == V2TIM_GROUP_MEMBER_ROLE_SUPER ? TUIRole::kMaster : TUIRole::kAnchor;
+            info.role = result.memberInfoList[i].role == V2TIM_GROUP_MEMBER_ROLE_SUPER ? TUIRole::kMaster : (room_info_.mode == TUISpeechMode::kFreeSpeech ? TUIRole::kAnchor:TUIRole::kAudience);
             member_array_.push_back(info);
         }
         LINFO("IMCore::OnIMInterfaceCallback GetGroupMemberList Size = %d", member_array_.size());
