@@ -68,9 +68,9 @@ std::string UserDirectory::GetUserDownloadFilePath() {
     // QStandardPaths::HomeLocation + "/AppData/Roaming/liteav/" + APP_NAME + "/setup.exe";
     char appdata_path[MAX_PATH];
     GetEnvironmentVariableA("appdata", appdata_path, MAX_PATH);
-    download_file_path = std::string(appdata_path) + "/liteav/" + kAppName + "/setup.exe";
+    download_file_path = std::string(appdata_path) + "/liteav/" + kAppName + "/";
 #else
-    download_file_path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString() + "/log/setup.dmg";
+    download_file_path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString() + "/log/";
 #endif
     return std::move(download_file_path);
 }

@@ -1,4 +1,5 @@
 #include <QPainter>
+#include <QStyleOption>
 #include "VideoRenderViewInfo.h"
 #include "MessageDispatcher/MessageDispatcher.h"
 #include "DataStore.h"
@@ -38,11 +39,11 @@ void VideoRenderViewInfo::SetVoiceLevel(int voice_level) {
 
     QString voice_image_ = QString(":/VoiceLevel/VoiceLevel/mic_on_%1.png").arg(voice_level);
 
-    QString styleSheet = QString("[has_mic=\"true\"] QPushButton#mic_btn {\
+    QString style_sheet = QString("[has_mic=\"true\"] QPushButton#mic_btn {\
             border-image:url(%1);\
         }").arg(voice_image_);
 
-    ui_->mic_btn->setStyleSheet(styleSheet);
+    ui_->mic_btn->setStyleSheet(style_sheet);
     ui_->mic_btn->setStyle(QApplication::style());
 }
 

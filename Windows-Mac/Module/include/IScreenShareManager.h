@@ -47,6 +47,35 @@ class IScreenShareManager {
         }
     };
 
+    // 屏幕分享控制参数
+    struct ScreenCaptureProperty {
+        ///【字段含义】是否采集目标内容的同时采集鼠标，默认为 true。
+        bool enableCaptureMouse;
+
+        ///【字段含义】是否高亮正在共享的窗口（在被分享目标周围绘制一个边框），默认为 true。
+        bool enableHighLight;
+
+        ///【字段含义】是否开启高性能模式（只会在分享屏幕时会生效），默认为 true。
+        ///【特殊说明】开启后屏幕采集性能最佳，但会丧失抗遮挡能力，如果您同时开启 enableHighLight + enableHighPerformance，远端用户可以看到高亮的边框。
+        bool enableHighPerformance;
+
+        ///【字段含义】指定高亮边框的颜色，RGB 格式，传入 0 时代表采用默认颜色，默认颜色为 #8CBF26。
+        int highLightColor;
+
+        ///【字段含义】指定高亮边框的宽度，传入0时采用默认描边宽度，默认宽度为 5px，您可以设置的最大值为 50。
+        int highLightWidth;
+
+        ///【字段含义】窗口采集时是否采集子窗口（需要子窗口与被采集窗口具有 Owner 或 Popup 属性），默认为 false。
+        bool enableCaptureChildWindow;
+        ScreenCaptureProperty() : enableCaptureMouse(true)
+            , enableHighLight(true)
+            , enableHighPerformance(true)
+            , highLightColor(0)
+            , highLightWidth(0)
+            , enableCaptureChildWindow(false) {
+        }
+    };
+
  public:
     virtual ~IScreenShareManager() {}
 
@@ -91,9 +120,10 @@ class IScreenShareManager {
      * @desc 设置屏幕分享参数，该方法在屏幕分享过程中也可以调用
      *
      * @param source                 指定分享源
-     * @param capture_rect            指定捕获的区域
+     * @param capture_rect           指定捕获的区域
+     * @param property               指定分享的属性
      */
-    virtual void SelectScreenCaptureTarget(const ScreenCaptureSourceInfo& source, const RECT& capture_rect) = 0;
+    virtual void SelectScreenCaptureTarget(const ScreenCaptureSourceInfo& source, const RECT& capture_rect, const ScreenCaptureProperty& property) = 0;
 
     /**
      * @desc 设置屏幕分享的混音音量大小

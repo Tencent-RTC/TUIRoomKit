@@ -39,6 +39,9 @@ public slots:
     void OnBuffingValueChanged(int value);
     void OnWhiteningValueChanged(int value);
     void OnRadioButtonChanged();
+
+    void OnAudioQualityIndexChanged(int index);
+    void OnAINoiseReductionChecked(bool checked);
 signals:
     void SignalCloseWnd();
     void SignalEndDetection();

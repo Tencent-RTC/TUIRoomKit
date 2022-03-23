@@ -32,6 +32,10 @@ HEADERS += ../utils/json.h \
     ./App/LoginViewController.h \
     ./App/PresetDeviceController.h \
     ./App/TransferRoomController.h
+win32{
+    HEADERS +=../utils/BugReport/crash_dump.h \
+              ../utils/usersig/win/GenerateTestUsersig.h
+}
 
 SOURCES += ../utils/jsoncpp.cpp \
     ../utils/log.cpp \
@@ -65,6 +69,10 @@ SOURCES += ../utils/jsoncpp.cpp \
     ./App/VideoRenderViewInfo.cpp \
     ./App/VideoRenderView.cpp \
     ./App/TransferRoomController.cpp
+win32{
+    SOURCES +=../utils/BugReport/crash_dump.cc \
+              ../utils/usersig/win/GenerateTestUsersig.cpp
+}
 
 FORMS += ../Common/Form/TXMessageBox.ui \
     ../Common/Form/TXImageButton.ui \

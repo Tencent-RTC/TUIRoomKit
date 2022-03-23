@@ -3,19 +3,20 @@
 #include <QDesktopWidget>
 #include <QBitmap>
 #include <QPainter>
+#include <QStyleOption>
 #include "TUIRoomCore.h"
 #include "DataStore.h"
 #include "StatusUpdateCenter.h"
 #include "MessageDispatcher/MessageDispatcher.h"
 #include "log.h"
 
-BottomBarController::BottomBarController(QWidget *parent)
+BottomBarController::BottomBarController(QWidget* parent)
     : QWidget(parent)
     , view_dragger_(this)
 {
     ui.setupUi(this);
     this->setMouseTracking(true);
-        
+
     LOAD_STYLE_SHEET(":/MainWindow/BottomBarController.qss");
     auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
     if (local_user == nullptr) {
@@ -55,7 +56,7 @@ BottomBarController::BottomBarController(QWidget *parent)
 
     InitUI();
 }
-BottomBarController::~BottomBarController(){
+BottomBarController::~BottomBarController() {
     hide_bar_timer_.stop();
     if (screen_share_window_ != nullptr) {
         screen_share_window_->close();
@@ -63,7 +64,7 @@ BottomBarController::~BottomBarController(){
         screen_share_window_ = nullptr;
     }
     ClearCameraMenu();
-	ClearAudioMenu();
+    ClearAudioMenu();
     if (pAction_share_screen_ != NULL) {
         delete pAction_share_screen_;
         pAction_share_screen_ = NULL;
@@ -181,7 +182,7 @@ void BottomBarController::InitCameraDeviceItem() {
 
     if (pMenu_camera_ == NULL) {
         pMenu_camera_ = new QMenu(this);
-        // …Ë÷√‘≤Ω«“™”√µΩµƒ≤Œ ˝
+        // ËÆæÁΩÆÂúÜËßíË¶ÅÁî®Âà∞ÁöÑÂèÇÊï∞
         pMenu_camera_->setWindowFlag(Qt::FramelessWindowHint);
         pMenu_camera_->setAttribute(Qt::WA_TranslucentBackground);
         TUIRoomCore::GetInstance()->GetScreenShareManager()->AddExcludedShareWindow((void*)pMenu_camera_->winId());
@@ -223,7 +224,7 @@ void BottomBarController::ClearCameraMenu() {
     }
 }
 void BottomBarController::InitAudioDeviceItem() {
-    // —Ô…˘∆˜
+    // Êâ¨Â£∞Âô® 
     liteav::ITRTCDeviceInfo* activeSpeaker = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeSpeaker);
     liteav::ITXDeviceCollection* speaker_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeSpeaker);
     if (speaker_list != nullptr) {
@@ -251,7 +252,7 @@ void BottomBarController::InitAudioDeviceItem() {
     }
     activeSpeaker->release();
 
-    // ¬ÛøÀ∑Á
+    // È∫¶ÂÖãÈ£é 
     liteav::ITRTCDeviceInfo* activeMic = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeMic);
     liteav::ITXDeviceCollection* microphone_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeMic);
     if (microphone_list != nullptr) {
@@ -284,10 +285,10 @@ void BottomBarController::InitAudioDeviceItem() {
         pAction_audio_set_ = new QAction(tr("audio setting"));
         connect(pAction_audio_set_, SIGNAL(triggered(bool)), this, SLOT(OnAudioSetTriggered(bool)));
     }
-    
+
     if (pMenu_audio_ == NULL) {
         pMenu_audio_ = new QMenu(this);
-        // …Ë÷√‘≤Ω«“™”√µΩµƒ≤Œ ˝
+        // ËÆæÁΩÆÂúÜËßíË¶ÅÁî®Âà∞ÁöÑÂèÇÊï∞
         pMenu_audio_->setWindowFlag(Qt::FramelessWindowHint);
         pMenu_audio_->setAttribute(Qt::WA_TranslucentBackground);
         TUIRoomCore::GetInstance()->GetScreenShareManager()->AddExcludedShareWindow((void*)pMenu_audio_->winId());
@@ -342,10 +343,9 @@ void BottomBarController::SetShareScreenStyle(bool is_sharing_screen) {
         ui.widget_share_button->SetText(tr("NewShare"));
         ui.btn_end->setText(tr("end share"));
         ui.horizontalLayout_2->setContentsMargins(0, 5, 0, 5);
-        //“˛≤ÿ”Î÷√∂•¬ﬂº≠
+        //ÈöêËóè‰∏éÁΩÆÈ°∂ÈÄªËæë
         ShowTopWidget();
-    }
-    else {
+    } else {
         ui.widget_share_button->SetText(tr("Share"));
         if (share_top_widget_ != nullptr) {
             share_top_widget_->hide();
@@ -368,7 +368,7 @@ void BottomBarController::ShowTopWidget() {
         connect(share_top_widget_, &SmallTopBarController::SignalCloseWnd, this, [=]() {
             ui.widget_share_button->SetChecked(false);
             OnStartScreenShare(false);
-        });
+            });
     }
     share_top_widget_->setWindowTitle(kAppName);
     share_top_widget_->resize(260, 35);
@@ -383,12 +383,12 @@ void BottomBarController::ShowTopWidget() {
     connect(share_top_widget_, &SmallTopBarController::SignalStopSharing, this, [=]() {
         ui.widget_share_button->SetChecked(false);
         OnStartScreenShare(false);
-    });
+        });
     connect(share_top_widget_, &SmallTopBarController::SignalShowTopBar, this, [=]() {
         this->show();
         this->raise();
         hide_bar_timer_.start(5000);
-    });
+        });
     share_top_widget_->hide();
     hide_bar_timer_.start(5000);
 }
@@ -406,7 +406,7 @@ void BottomBarController::mousePressEvent(QMouseEvent* event) {
 void BottomBarController::mouseReleaseEvent(QMouseEvent* event) {
     QWidget::mouseReleaseEvent(event);
 }
-void BottomBarController::closeEvent(QCloseEvent *event) {
+void BottomBarController::closeEvent(QCloseEvent* event) {
     ui.widget_share_button->SetChecked(false);
     OnStartScreenShare(false);
 }
@@ -441,7 +441,7 @@ void BottomBarController::CloseWin() {
 }
 
 void BottomBarController::MoveToTop(QWidget* main_widget) {
-    QDesktopWidget *desk = QApplication::desktop();
+    QDesktopWidget* desk = QApplication::desktop();
     QRect main_rect = desk->availableGeometry(main_widget);
     this->resize(main_rect.width() > 1000 ? 1000 : main_rect.width() / 2, 55);
     this->move(main_rect.x() + (main_rect.width() - this->width()) / 2, 0);
@@ -463,7 +463,7 @@ void BottomBarController::OnStartScreenShare(bool checked) {
     if (checked) {
 #ifdef _WIN32
         SIZE thumb_size{ kShareItemWidth - kShareItemMargin, kShareItemHeight - kShareItemMargin };
-        SIZE icon_size { kShareIconWidth, kShareIconHeight };
+        SIZE icon_size{ kShareIconWidth, kShareIconHeight };
 #else
         liteav::SIZE thumb_size;
         thumb_size.width = kShareItemWidth - kShareItemMargin;
@@ -478,7 +478,7 @@ void BottomBarController::OnStartScreenShare(bool checked) {
         TUIRoomCore::GetInstance()->GetScreenShareManager()->RemoveAllExcludedShareWindow();
 
         std::vector<IScreenShareManager::ScreenCaptureSourceInfo>::iterator iter = source.begin();
-        while(iter != source.end()) {
+        while (iter != source.end()) {
             std::string src_name = iter->source_name;
             if (src_name.find(kAppName) != std::string::npos) {
                 if (iter->source_id != NULL)
@@ -494,10 +494,12 @@ void BottomBarController::OnStartScreenShare(bool checked) {
         }
         screen_share_window_->InitShow(source);
         screen_share_window_->show();
-    }
-    else {
+    } else {
         LINFO("StopScreenCapture...");
-		TUIRoomCore::GetInstance()->GetScreenShareManager()->StopScreenCapture();
+        TUIRoomCore::GetInstance()->GetScreenShareManager()->StopScreenCapture();
+        auto local_user = DataStore::Instance()->GetCurrentUserInfo().user_id;
+        DataStore::Instance()->RemoveScreenShareUser(local_user);
+        DataStore::Instance()->SetCurrentMainWindowUser("");
         if (DataStore::Instance()->IsShareScreenVoice()) {
             TUIRoomCore::GetInstance()->StopSystemAudioLoopback();
             DataStore::Instance()->SetShareScreenVoice(false);
@@ -508,7 +510,7 @@ void BottomBarController::OnStartScreenShare(bool checked) {
 }
 void BottomBarController::OnConfirmShareScreen(bool share) {
     if (!share || !screen_shower_id_.empty()) {
-        //»°œ˚∑÷œÌ
+        //ÂèñÊ∂àÂàÜ‰∫´
         if (!is_sharing_screen_) {
             this->hide();
             ui.widget_share_button->SetChecked(false);
@@ -540,7 +542,9 @@ void BottomBarController::OnConfirmShareScreen(bool share) {
 #else
     RECT rect;
 #endif
-    TUIRoomCore::GetInstance()->GetScreenShareManager()->SelectScreenCaptureTarget(source_info, rect);
+    IScreenShareManager::ScreenCaptureProperty property;
+    property.enableCaptureChildWindow = true;
+    TUIRoomCore::GetInstance()->GetScreenShareManager()->SelectScreenCaptureTarget(source_info, rect, property);
     TUIRoomCore::GetInstance()->GetScreenShareManager()->ReleaseScreenCaptureSources();
 
     screen_share_window_->close();
@@ -550,8 +554,15 @@ void BottomBarController::OnConfirmShareScreen(bool share) {
     if (!is_sharing_screen_) {
         LINFO("start StartScreenCapture...");
         TUIRoomCore::GetInstance()->GetScreenShareManager()->StartScreenCapture(nullptr);
-        
+        auto local_user = DataStore::Instance()->GetCurrentUserInfo().user_id;
+        DataStore::Instance()->AddScreenShareUser(local_user);
+        DataStore::Instance()->SetCurrentMainWindowUser(local_user);
         emit SignalStartScreen(true);
+    }
+    if (DataStore::Instance()->IsShareScreenVoice()) {
+        TUIRoomCore::GetInstance()->StartSystemAudioLoopback();
+    } else {
+        TUIRoomCore::GetInstance()->StopSystemAudioLoopback();
     }
 }
 
@@ -594,25 +605,23 @@ void BottomBarController::OnCameraSetClicked(bool checked) {
     ClearCameraMenu();
     InitCameraDeviceItem();
 
-   QPoint btm_menu_pos = this->mapToGlobal(QPoint(0, 0));
-   QPoint camera_set_pos = ui.widget_camera_button->mapToGlobal(QPoint(0, 0));
-   int x = camera_set_pos.x() + ui.widget_camera_button->width() / 2;
-   int y = btm_menu_pos.y() - pAction_camera_list_.size() * 40 - 20 - 40 * 2 - 10 - 15;
-   if (y < 0)
-       y = btm_menu_pos.y() + this->height();
+    QPoint btm_menu_pos = this->mapToGlobal(QPoint(0, 0));
+    QPoint camera_set_pos = ui.widget_camera_button->mapToGlobal(QPoint(0, 0));
+    int x = camera_set_pos.x() + ui.widget_camera_button->width() / 2;
+    int y = btm_menu_pos.y() - pAction_camera_list_.size() * 40 - 20 - 40 * 2 - 10 - 15;
+    if (y < 0)
+        y = btm_menu_pos.y() + this->height();
 
-   pMenu_camera_->move(x, y);
-   pMenu_camera_->show();
+    pMenu_camera_->move(x, y);
+    pMenu_camera_->show();
 }
 void BottomBarController::OnCameraMenuTriggered(bool checked) {
     QObject* obj = sender();
     if (obj == pAction_camera_set_) {
         emit SignalShowSetting(0);
-    }
-    else if (obj == pAction_beauty_set_) {
+    } else if (obj == pAction_beauty_set_) {
         emit SignalShowSetting(1);
-    }
-    else {
+    } else {
         if (map_menu_ckbox_.contains((QCheckBox*)obj)) {
             QString device_id = map_menu_ckbox_[(QCheckBox*)obj];
             TUIRoomCore::GetInstance()->GetDeviceManager()->setCurrentDevice(liteav::TXMediaDeviceTypeCamera, device_id.toStdString().c_str());
@@ -626,7 +635,7 @@ void BottomBarController::OnAudioSetClicked(bool checked) {
     QPoint btm_menu_pos = this->mapToGlobal(QPoint(0, 0));
     QPoint audio_set_pos = ui.widget_audio_button->mapToGlobal(QPoint(0, 0));
     int x = audio_set_pos.x() + ui.widget_audio_button->width() / 2;
-    // Œª÷√À„∑®£∫BottomBarController.pos - QCheckBox.size * 40 - QLabel.size * 20 - menu.item * 40 - margin * 2 - spaceline * 10
+    // ‰ΩçÁΩÆÁÆóÊ≥ïÔºöBottomBarController.pos - QCheckBox.size * 40 - QLabel.size * 20 - menu.item * 40 - margin * 2 - spaceline * 10
     int y = btm_menu_pos.y() - (pAction_microphone_list_.size() + pAction_speaker_list_.size()) * 40 - 20 * 2 - 40 - 10 * 2 - 15;
     if (y < 0)
         y = btm_menu_pos.y() + this->height();
@@ -671,7 +680,7 @@ void BottomBarController::OnScreenShareSetClicked(bool checked) {
             QMenu::item:selected{ background-color: #2dabf9; }\
             QMenu::icon{width: 25px;height: 25px;}";
         pMenu_share_->setStyleSheet(style);
-        // …Ë÷√‘≤Ω«“™”√µΩµƒ≤Œ ˝
+        // ËÆæÁΩÆÂúÜËßíË¶ÅÁî®Âà∞ÁöÑÂèÇÊï∞
         pMenu_share_->setWindowFlag(Qt::FramelessWindowHint);
         pMenu_share_->setAttribute(Qt::WA_TranslucentBackground);
         TUIRoomCore::GetInstance()->GetScreenShareManager()->AddExcludedShareWindow((void*)pMenu_share_->winId());
@@ -723,11 +732,11 @@ void BottomBarController::SetChatRoomBtnStatus(bool show) {
 }
 
 void BottomBarController::SlotScreenCaptureStopped(int reason) {
-	bool is_sharing = ui.widget_share_button->isChecked();
+    bool is_sharing = ui.widget_share_button->isChecked();
     ui.widget_share_button->SetChecked(!is_sharing);
-	OnStartScreenShare(false);
+    OnStartScreenShare(false);
 
-	if (0 != reason && this->isVisible()) {
+    if (0 != reason && this->isVisible()) {
         TXMessageBox::Instance().AddLineTextMessage(tr("Screen Capture Stopped."));
-	}
+    }
 }

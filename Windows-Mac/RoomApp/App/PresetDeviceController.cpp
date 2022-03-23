@@ -7,15 +7,19 @@
 #include "DataStore.h"
 #include "TXMessageBox.h"
 
-PresetDeviceController::PresetDeviceController(QWidget *parent)
+PresetDeviceController::PresetDeviceController(QWidget* parent)
     : QWidget(parent) {
     ui.setupUi(this);
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
-    
+
     movie_ = new QMovie(":/ImageResource/Loading_Video.gif");
     movie_->setScaledSize(QSize(50, 50));
     ui.loading->setMovie(movie_);
     movie_->start();
+
+#ifndef _WIN32
+    ui.widget_audioQuality->hide();
+#endif // !_WIN32
 
     InitConnect();
 }
@@ -28,7 +32,7 @@ void PresetDeviceController::MoveEvent(QMouseEvent* event) {
     this->move(this->parentWidget()->x() + (this->parentWidget()->width() - this->width()) / 2, this->parentWidget()->y() + (this->parentWidget()->height() - this->height()) / 2);
 }
 
-void PresetDeviceController::showEvent(QShowEvent *event) {
+void PresetDeviceController::showEvent(QShowEvent* event) {
     QBitmap bmp(this->size());
     bmp.fill();
     QPainter p(&bmp);
@@ -133,6 +137,7 @@ void PresetDeviceController::InitUi() {
     ui.comboBox_camera->setItemDelegate(item_delegate_);
     ui.comboBox_microphone->setItemDelegate(item_delegate_);
     ui.comboBox_speaker->setItemDelegate(item_delegate_);
+    ui.comboBox_audio_quality->setItemDelegate(item_delegate_);
 
     // 默认打开美颜
     // 美颜设置
@@ -153,6 +158,22 @@ void PresetDeviceController::InitUi() {
     ui.hSlider_Whitening->setSingleStep(10);
     ui.hSlider_Whitening->setTickInterval(10);
     OnBeautyClicked(beauty_config.open_beauty);
+
+    liteav::TRTCAudioQuality audio_quality = DataStore::Instance()->GetAudioQuality();
+    if (audio_quality == TRTCAudioQualitySpeech) {
+        ui.comboBox_audio_quality->setCurrentIndex(0);
+    } else if (audio_quality == TRTCAudioQualityDefault) {
+        ui.comboBox_audio_quality->setCurrentIndex(1);
+    } else if (audio_quality == TRTCAudioQualityMusic) {
+        ui.comboBox_audio_quality->setCurrentIndex(2);
+    } else {
+        ui.comboBox_audio_quality->setCurrentIndex(0);
+    }
+    bool open_ai_noise_reduction = DataStore::Instance()->GetAINoiseReduction();
+    ui.checkBox_noise_reduction->setChecked(open_ai_noise_reduction);
+    if (open_ai_noise_reduction) {
+        TUIRoomCore::GetInstance()->OpenAINoiseReduction();
+    }
 }
 void PresetDeviceController::InitConnect() {
     connect(ui.btn_testMic, SIGNAL(clicked()), this, SLOT(OnTestMic()));
@@ -174,51 +195,54 @@ void PresetDeviceController::InitConnect() {
 
     connect(ui.ckbox_default_close_mic, &QCheckBox::clicked, this, [=](bool checked) {
         DataStore::Instance()->SetDefaultCloseMic(checked);
-    });
+        });
     connect(ui.ckbox_default_close_camera, &QCheckBox::clicked, this, [=](bool checked) {
         DataStore::Instance()->SetDefaultCloseCamera(checked);
-    });
+        });
 
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnTestSpeakerVolume, this, [=](uint32_t volume) {
         ui.progressBar_speaker->setValue(volume);
-    });
+        });
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnTestMicrophoneVolume, this, [=](uint32_t volume) {
         ui.progressBar_microphone->setValue(volume);
-    });
+        });
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalAudioDeviceCaptureVolumeChanged, this,
         [=](uint32_t volume, bool muted) {
-        if (muted)
-            ui.slider_microphone->setValue(0);
-        else
-            ui.slider_microphone->setValue(volume);
-    });
+            if (muted)
+                ui.slider_microphone->setValue(0);
+            else
+                ui.slider_microphone->setValue(volume);
+        });
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalAudioDevicePlayoutVolumeChanged, this,
         [=](uint32_t volume, bool muted) {
-        if (muted)
-            ui.slider_speaker->setValue(0);
-        else
-            ui.slider_speaker->setValue(volume);
-    });
+            if (muted)
+                ui.slider_speaker->setValue(0);
+            else
+                ui.slider_speaker->setValue(volume);
+        });
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnFirstVideoFrame, this,
         [=](const QString& user_id, const TUIStreamType streamType) {
-        if (user_id.isEmpty() && streamType == TUIStreamType::kStreamTypeCamera) {
-            movie_->stop();
-            ui.loading->hide();
-        }
-    });
+            if (user_id.isEmpty() && streamType == TUIStreamType::kStreamTypeCamera) {
+                movie_->stop();
+                ui.loading->hide();
+            }
+        });
 
     connect(ui.btn_start, &QPushButton::clicked, this, [=]() {
         emit SignalEndDetection();
         ui.btn_start->setText(tr("Entering..."));
         ui.btn_start->setEnabled(false);
-    });
+        });
 
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalDeviceChanged, this, [=](const QString& deviceId, liteav::TXMediaDeviceType type, \
         liteav::TXMediaDeviceState state) {
-        ResetDeviceList(deviceId, type, state);
-    });
+            ResetDeviceList(deviceId, type, state);
+        });
+
+    connect(ui.comboBox_audio_quality, SIGNAL(currentIndexChanged(int)), this, SLOT(OnAudioQualityIndexChanged(int)));
+    connect(ui.checkBox_noise_reduction, SIGNAL(clicked(bool)), this, SLOT(OnAINoiseReductionChecked(bool)));
 }
-void PresetDeviceController::ResetDeviceList(const QString& deviceId, TXMediaDeviceType type, TXMediaDeviceState state) {
+void PresetDeviceController::ResetDeviceList(const QString& deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) {
     if (state == TXMediaDeviceStateAdd || state == TXMediaDeviceStateRemove) {
         ui.comboBox_camera->clear();
         ui.comboBox_microphone->clear();
@@ -335,8 +359,7 @@ void PresetDeviceController::OnTestMic() {
             TUIRoomCore::GetInstance()->GetDeviceManager()->startMicDeviceTest(200);
         }
         mic_list->release();
-    }
-    else {
+    } else {
         TUIRoomCore::GetInstance()->GetDeviceManager()->stopMicDeviceTest();
         ui.btn_testMic->setText(tr("Test"));
         ui.progressBar_microphone->setValue(0);
@@ -358,14 +381,12 @@ void PresetDeviceController::OnTestSpeaker() {
                 ui.btn_testSpeaker->setChecked(false);
                 ui.btn_testSpeaker->setText(tr("Test"));
                 TXMessageBox::Instance().AddLineTextMessage(tr("Not find test file in trtcres directory!"));
-            }
-            else {
+            } else {
                 int ret = TUIRoomCore::GetInstance()->GetDeviceManager()->startSpeakerDeviceTest(file_path.toStdString().c_str());
             }
         }
         speaker_list->release();
-    }
-    else {
+    } else {
         TUIRoomCore::GetInstance()->GetDeviceManager()->stopSpeakerDeviceTest();
         ui.btn_testSpeaker->setText(tr("Test"));
         ui.progressBar_speaker->setValue(0);
@@ -385,8 +406,7 @@ void PresetDeviceController::OnBeautyClicked(bool checked) {
     if (checked) {
         TUIRoomCore::GetInstance()->SetBeautyStyle(beauty_config.beauty_style, beauty_config.beauty_value,
             beauty_config.white_value, beauty_config.ruddiness_value);
-    }
-    else {
+    } else {
         TUIRoomCore::GetInstance()->SetBeautyStyle(beauty_config.beauty_style, 0, 0, 0);
     }
 }
@@ -411,12 +431,40 @@ void PresetDeviceController::OnRadioButtonChanged() {
     TUIBeautyConfig beauty_config = DataStore::Instance()->GetBeautyParam();
     if (obj == ui.radioButton_smooth) {
         beauty_config.beauty_style = liteav::TRTCBeautyStyle::TRTCBeautyStyleSmooth;
-    }
-    else if (obj == ui.radioButton_natural) {
+    } else if (obj == ui.radioButton_natural) {
         beauty_config.beauty_style = liteav::TRTCBeautyStyle::TRTCBeautyStyleNature;
     }
     DataStore::Instance()->SetBeautyParam(beauty_config);
 
     TUIRoomCore::GetInstance()->SetBeautyStyle(beauty_config.beauty_style, beauty_config.beauty_value,
         beauty_config.white_value, beauty_config.ruddiness_value);
+}
+
+void PresetDeviceController::OnAudioQualityIndexChanged(int index) {
+    liteav::TRTCAudioQuality audio_quality;
+    switch (index)
+    {
+    case 0:
+        audio_quality = TRTCAudioQualitySpeech;
+        break;
+    case 1:
+        audio_quality = TRTCAudioQualityDefault;
+        break;
+    case 2:
+        audio_quality = TRTCAudioQualityMusic;
+        break;
+    default:
+        audio_quality = TRTCAudioQualityDefault;
+        break;
+    }
+    DataStore::Instance()->SetAudioQuality(audio_quality);
+}
+
+void PresetDeviceController::OnAINoiseReductionChecked(bool checked) {
+    if (checked) {
+        TUIRoomCore::GetInstance()->OpenAINoiseReduction();
+    } else {
+        TUIRoomCore::GetInstance()->CloseAINoiseReduction();
+    }
+    DataStore::Instance()->OpenAINoiseReduction(checked);
 }

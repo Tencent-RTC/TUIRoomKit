@@ -186,6 +186,20 @@ class TUIRoomCore {
      */
     virtual int SetVideoMirror(bool mirror) = 0;
 
+    /**
+     * 2.9 开启AI降噪
+     * 
+     * 开启AI降噪
+     */
+    virtual int OpenAINoiseReduction() = 0;
+
+    /**
+     * 2.10 关闭AI降噪
+     *
+     * 关闭AI降噪
+     */
+    virtual int CloseAINoiseReduction() = 0;
+
     /////////////////////////////////////////////////////////////////////////////////
     //
     //                                （三）远端用户接口
@@ -221,7 +235,7 @@ class TUIRoomCore {
      * @ param view 承载预览画面的控件。
      * @ param view 承载预览画面的控件。
      */
-    virtual int UpdateRemoteView(const std::string& user_id, TUIStreamType type, liteav::TXView& view) = 0;
+    virtual int UpdateRemoteView(const std::string& user_id, TUIStreamType type, const liteav::TXView& view) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //

@@ -53,7 +53,6 @@ public slots:
     void SlotShowSetting(int index);
     void SlotShowChatRoom(bool show);
     void SlotOnRemoteUserScreenAvailable(const QString& user_id, bool available);
-    void SlotShowVideoOnMainScreen(const std::string& user_id);
     void SlotStageListLayoutChanged(StageListDirection direction);
 private:
     QMainWindow*    main_window_ = nullptr;

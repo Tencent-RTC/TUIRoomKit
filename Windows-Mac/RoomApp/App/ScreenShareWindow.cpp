@@ -7,7 +7,7 @@
 #include "DataStore.h"
 #include "TUIRoomCore.h"
 
-ScreenShareWindow::ScreenShareWindow(QWidget *parent)
+ScreenShareWindow::ScreenShareWindow(QWidget* parent)
     : QDialog(parent)
     , view_dragger_(this) {
     ui.setupUi(this);
@@ -26,13 +26,11 @@ ScreenShareWindow::ScreenShareWindow(QWidget *parent)
     connect(ui.ckbox_Smooth, SIGNAL(clicked(bool)), this, SLOT(OnVideoFluencyPreferred(bool)));
     connect(ui.ckbox_share_voice, &QCheckBox::clicked, this, [](bool checked) {
         if (checked) {
-            TUIRoomCore::GetInstance()->StartSystemAudioLoopback();
             DataStore::Instance()->SetShareScreenVoice(true);
         } else {
-            TUIRoomCore::GetInstance()->StopSystemAudioLoopback();
             DataStore::Instance()->SetShareScreenVoice(false);
         }
-    });
+        });
 }
 
 ScreenShareWindow::~ScreenShareWindow() {
@@ -40,14 +38,16 @@ ScreenShareWindow::~ScreenShareWindow() {
 void ScreenShareWindow::InitShow(const std::vector<IScreenShareManager::ScreenCaptureSourceInfo>& source_info) {
     LayoutScreen(source_info);
     LayoutWindow(source_info);
-
-    ui.ckbox_share_voice->setChecked(false);
-    // ª≠÷ ∆´∫√£®∆Ωª¨∫Õ«ÂŒ˙£©…Ë÷√
+    if (DataStore::Instance()->IsShareScreenVoice()) {
+        ui.ckbox_share_voice->setChecked(true);
+    } else {
+        ui.ckbox_share_voice->setChecked(false);
+    }
+    // ÁîªË¥®ÂÅèÂ•ΩÔºàÂπ≥ÊªëÂíåÊ∏ÖÊô∞ÔºâËÆæÁΩÆ 
     TUIVideoQosPreference preference = DataStore::Instance()->GetQosPreference();
     if (preference == TUIVideoQosPreference::kSmooth) {
         ui.ckbox_Smooth->setChecked(true);
-    }
-    else {
+    } else {
         ui.ckbox_Smooth->setChecked(false);
     }
     this->raise();
@@ -67,7 +67,7 @@ void ScreenShareWindow::LayoutScreen(const std::vector<IScreenShareManager::Scre
 
     ui.scrollArea_desktop->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui.scrollArea_desktop->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    
+
     ui.scrollAreaWidget_desktop->setFixedSize(col * kShareItemWidth + (col - 1) * kShareItemSpace, row * kShareItemHeight + (row - 1) * kShareItemSpace);
     pScreenLayout_ = new QGridLayout;
     pScreenLayout_->setSpacing(kShareItemSpace);
@@ -75,21 +75,20 @@ void ScreenShareWindow::LayoutScreen(const std::vector<IScreenShareManager::Scre
     LINFO("LayoutScreen start, size=%d", source_screen.size());
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
-            if ((i*col + j) < source_screen.size()) {
+            if ((i * col + j) < source_screen.size()) {
                 ScreenShareItem* item = new ScreenShareItem(ui.scrollAreaWidget_desktop, (i == 0 && j == 0) ? true : false);
                 connect(item, SIGNAL(SignalChecked(void*, bool)), this, SLOT(OnSelectChanged(void*, bool)));
                 item->setFixedSize(kShareItemWidth, kShareItemHeight);
-                IScreenShareManager::ScreenCaptureSourceInfo info = source_screen.at(i*col + j);
+                IScreenShareManager::ScreenCaptureSourceInfo info = source_screen.at(i * col + j);
                 QString file_name = QString::fromStdString(info.source_name);
                 //LINFO("------Drew Screen Image:name=%s src-wid=%d,hei=%d --- wid=%d,hei=%d", file_name.toStdString().c_str(), info.thumb_bgra.width, info.thumb_bgra.height, kShareItemWidth - kShareItemMargin, kShareItemHeight - kShareItemMargin);
-                QImage img((const uchar *)info.thumb_bgra.buffer, info.thumb_bgra.width, info.thumb_bgra.height, QImage::Format_ARGB32);
+                QImage img((const uchar*)info.thumb_bgra.buffer, info.thumb_bgra.width, info.thumb_bgra.height, QImage::Format_ARGB32);
                 item->SetInfo(info.source_id, info.type, QString::fromStdString(info.source_name), QPixmap::fromImage(img));
                 pScreenLayout_->addWidget(item, i, j);
                 vec_item_.push_back(item);
                 if (last_selected_source_id == nullptr)
                     last_selected_source_id = info.source_id;
-            }
-            else {
+            } else {
                 QWidget* pNullWgt = new QWidget(ui.scrollAreaWidget_desktop);
                 pNullWgt->setFixedSize(kShareItemWidth, kShareItemHeight);
                 pScreenLayout_->addWidget(pNullWgt, i, j);
@@ -123,11 +122,11 @@ void ScreenShareWindow::LayoutWindow(const std::vector<IScreenShareManager::Scre
     IScreenShareManager::ImageBuffer image_buffer;
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
-            if ((i*col + j) < source_window.size()) {
+            if ((i * col + j) < source_window.size()) {
                 ScreenShareItem* item = new ScreenShareItem(ui.scrollAreaWidgetContents);
                 connect(item, SIGNAL(SignalChecked(void*, bool)), this, SLOT(OnSelectChanged(void*, bool)));
                 item->setFixedSize(kShareItemWidth, kShareItemHeight);
-                IScreenShareManager::ScreenCaptureSourceInfo info = source_window.at(i*col + j);
+                IScreenShareManager::ScreenCaptureSourceInfo info = source_window.at(i * col + j);
                 QString file_name = QString::fromStdString(info.source_name);
                 if (info.is_minimized) {
                     image_buffer = info.icon_bgra;
@@ -135,12 +134,11 @@ void ScreenShareWindow::LayoutWindow(const std::vector<IScreenShareManager::Scre
                     image_buffer = info.thumb_bgra;
                 }
                 //LINFO("------Drew Window Image:name=%s src-wid=%d,hei=%d --- wid=%d,hei=%d", file_name.toStdString().c_str(), image_buffer.width, image_buffer.height, kShareItemWidth - kShareItemMargin, kShareItemHeight - kShareItemMargin);
-                QImage img((const uchar *)image_buffer.buffer, image_buffer.width, image_buffer.height, QImage::Format_ARGB32);
+                QImage img((const uchar*)image_buffer.buffer, image_buffer.width, image_buffer.height, QImage::Format_ARGB32);
                 item->SetInfo(info.source_id, info.type, QString::fromStdString(info.source_name), QPixmap::fromImage(img));
                 pLayout_->addWidget(item, i, j);
                 vec_item_.push_back(item);
-            }
-            else {
+            } else {
                 QWidget* pNullWgt = new QWidget(ui.scrollAreaWidget_desktop);
                 pNullWgt->setFixedSize(kShareItemWidth, kShareItemHeight);
                 pLayout_->addWidget(pNullWgt, i, j);
@@ -235,7 +233,7 @@ void ScreenShareWindow::showEvent(QShowEvent* event) {
     QWidget::showEvent(event);
 }
 void ScreenShareWindow::OnVideoFluencyPreferred(bool checked) {
-    //…Ë÷√ª≠÷ ≤Œ ˝
+    //ËÆæÁΩÆÁîªË¥®ÂèÇÊï∞
     TUIVideoQosPreference preference = TUIVideoQosPreference::kSmooth;
     if (!checked)
         preference = TUIVideoQosPreference::kClear;

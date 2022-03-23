@@ -1,13 +1,14 @@
-#pragma once
+ï»¿#pragma once
 #include <QFile>
 #include <QString>
 #include "Common.h"
 
-// ÉèÖÃAppÃû³Æ
+// è®¾ç½®Appåç§°
 static constexpr char kAppName[] = "RoomApp";
 static constexpr char kRoomType[] = "Room_";
+static constexpr char kAppVersion[] = "1.0.0.0";
 
-// ÆÁÄ»·ÖÏíÍ¼Æ¬µÄ¿í¸ß
+// å±å¹•åˆ†äº«å›¾ç‰‡çš„å®½é«˜
 static constexpr int kShareItemWidth  = 200;
 static constexpr int kShareItemHeight = 150;
 static constexpr int kShareItemSpace  = 30;
@@ -15,7 +16,7 @@ static constexpr int kShareItemMargin = 40;
 static constexpr int kShareIconWidth  = 80;
 static constexpr int kShareIconHeight = 80;
 
-// ³ÉÔ±ÁĞ±íµÄ²Ù×÷£º1½ûÂó 2½ûÊÓÆµ 3ÉÏÏÂÌ¨ 4TÈË
+// æˆå‘˜åˆ—è¡¨çš„æ“ä½œï¼š1ç¦éº¦ 2ç¦è§†é¢‘ 3ä¸Šä¸‹å° 4Täºº
 enum class MemberOperate {
     kMuteMicrophone = 1,
     kMuteCamera = 2,
@@ -48,25 +49,25 @@ enum class MemberStatus {
 };
 
 enum class StageListDirection {
-    kHorDirection = 1,  //Ë®Æ½
-    kVerDirection = 2   //´¹Ö±
+    kHorDirection = 1,  //æ°´å¹³
+    kVerDirection = 2   //å‚ç›´
 };
 
 class NetToolTip {
  public:
-    int app_cpu = 0;    // µ±Ç°App CPUÕ¼ÓÃÂÊ
-    int rtt = 0;        // ÍøÂçÑÓÊ±
-    int downLoss = 0;   // ÏÂĞĞ¶ª°üÂÊ
+    int app_cpu = 0;    // å½“å‰App CPUå ç”¨ç‡
+    int rtt = 0;        // ç½‘ç»œå»¶æ—¶
+    int downLoss = 0;   // ä¸‹è¡Œä¸¢åŒ…ç‡
 };
 struct UserNetQualityInfo {
-	///ÓÃ»§ ID
+	///ç”¨æˆ· ID
 	std::string user_id;
-	///ÍøÂçÖÊÁ¿£¬²Î¼û TRTCTypeDef.h µÄ TRTCQuality Ã¶¾Ù
+	///ç½‘ç»œè´¨é‡ï¼Œå‚è§ TRTCTypeDef.h çš„ TRTCQuality æšä¸¾
 	int quality;
     UserNetQualityInfo() : quality(0) {}
 };
 
-// µÇÂ¼ÓÃ»§ĞÅÏ¢
+// ç™»å½•ç”¨æˆ·ä¿¡æ¯
 struct UserLoginInfo {
     std::string user_id;
     std::string user_sig;

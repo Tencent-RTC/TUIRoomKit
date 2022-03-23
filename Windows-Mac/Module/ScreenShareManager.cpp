@@ -78,7 +78,7 @@ void ScreenShareManager::ReleaseScreenCaptureSources() {
         source_window_list_ = nullptr;
     }
 }
-void ScreenShareManager::SelectScreenCaptureTarget(const ScreenCaptureSourceInfo& source, const RECT& capture_rect) {
+void ScreenShareManager::SelectScreenCaptureTarget(const ScreenCaptureSourceInfo& source, const RECT& capture_rect, const ScreenCaptureProperty& property) {
     liteav::TRTCScreenCaptureSourceInfo src;
     src.iconBGRA.buffer = source.icon_bgra.buffer;
     src.iconBGRA.length = source.icon_bgra.length;
@@ -111,15 +111,15 @@ void ScreenShareManager::SelectScreenCaptureTarget(const ScreenCaptureSourceInfo
     rect.right = capture_rect.right;
     rect.top = capture_rect.top;
 
-    liteav::TRTCScreenCaptureProperty property;
-    property.enableCaptureChildWindow = true;
-    property.enableCaptureMouse = true;
-    property.enableHighLight = true;
-    property.enableHighPerformance = true;
-    property.highLightColor = 0;
-    property.highLightWidth = 0;
+    liteav::TRTCScreenCaptureProperty capture_property;
+    capture_property.enableCaptureChildWindow = property.enableCaptureChildWindow;
+    capture_property.enableCaptureMouse = property.enableCaptureMouse;
+    capture_property.enableHighLight = property.enableHighLight;
+    capture_property.enableHighPerformance = property.enableHighPerformance;
+    capture_property.highLightColor = property.highLightColor;
+    capture_property.highLightWidth = property.highLightWidth;
 
-    trtc_cloud_->selectScreenCaptureTarget(src, rect, property);
+    trtc_cloud_->selectScreenCaptureTarget(src, rect, capture_property);
 }
 void ScreenShareManager::AddExcludedShareWindow(void* window) {
     if (window != NULL && trtc_cloud_ != nullptr)
