@@ -1,4 +1,4 @@
-import { TRTCEvents, TUIRoomRole, TUIRoomEvents } from '../../../lib/TUIRoom/lib/index';
+import { TRTCEvents, TUIRoomRole, TUIRoomEvents } from '../../../../lib/TUIRoom/lib/index';
 Page({
   data: {
     roomInfo: {},
@@ -24,16 +24,17 @@ Page({
       { imageUrl: '../../../assets/images/beauty_yinghong.png', des: '樱红', value: 'cerisered' },
     ],
     indicatorDots: true,
-    swiperCurrent: 0,
     list: [],
     listMap: {},
-    userList: {},
+    userList: { share_user_33394221: { nick: 'share_user_33394221' } },
     roomDestroy: false,
     kickOff: false,
+    isFullScreen: false,
   },
   onLoad(options) {
     const { roomId, enableMic, enableCamera } = options;
-    (this.data.roomInfo = wx.$TUIRoomCore.getRoomInfo()), wx.$TUIRoomCore.initTRTCService(this);
+    this.data.roomInfo = wx.$TUIRoomCore.getRoomInfo();
+    wx.$TUIRoomCore.initTRTCService(this);
     this.bindTRTCEvent();
     this.bindCoordinaEvent();
     const pusher = wx.$TUIRoomCore.enterTRTCRoom(
@@ -212,10 +213,7 @@ Page({
 
     // 本地音量变化
     wx.$TUIRoomCore.on(TRTCEvents.LOCAL_AUDIO_VOLUME_UPDATE, (event) => {
-      // console.log('* room LOCAL_AUDIO_VOLUME_UPDATE', event)
       const { pusher } = event.data;
-      // this.setPusherAttributesHandler({});
-
       this.data.list[0] = pusher;
       this.setData({
         list: this.data.list,
@@ -226,6 +224,27 @@ Page({
     this.setData({
       roomInfo: wx.$TUIRoomCore.getRoomInfo(),
       currentUser: wx.$TUIRoomCore.getCurrentUser(),
+    });
+  },
+  requestFullScreen(e) {
+    if (this.data.isFullScreen) return;
+    console.log(e);
+    const { id, streamid: streamID, mutevideo: muteVideo } = e.currentTarget.dataset;
+    if (muteVideo) return;
+    wx.createLivePlayerContext(id, this).requestFullScreen({
+      success: () => {
+        this.setData({ isFullScreen: true });
+        this.setPlayerAttributesHandler({ streamID }, { objectFit: 'contain', orientation: 'horizontal' });
+      },
+    });
+  },
+  exitFullScreen(e) {
+    const { id, streamid: streamID } = e.currentTarget.dataset;
+    wx.createLivePlayerContext(id, this).exitFullScreen({
+      success: () => {
+        this.setData({ isFullScreen: false });
+        this.setPlayerAttributesHandler({ streamID }, { objectFit: 'fillCrop', orientation: 'vertical' });
+      },
     });
   },
   // 房间内事件绑定
@@ -350,7 +369,6 @@ Page({
     this.data.list = [this.data.list[0], ...wx.$TUIRoomCore.setPlayerAttributes(player.streamID, options)];
     this.setData({
       list: this.data.list,
-      swiperCurrent: 0,
       listMap: this.arrayTransformToMap(this.data.list, 'userID'),
     });
   },
@@ -379,6 +397,7 @@ Page({
     wx.$TUIRoomCore.playerEventHandler(event);
   },
   _playerFullscreenChange(event) {
+    this.setData({ isFullScreen: event.detail.fullScreen }); // 防止通过系统返回退出全屏导致按钮状态未变更
     wx.$TUIRoomCore.playerFullscreenChange(event);
   },
   _playerNetStatus(event) {
