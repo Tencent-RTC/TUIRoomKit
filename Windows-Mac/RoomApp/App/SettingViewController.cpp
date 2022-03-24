@@ -12,15 +12,18 @@
 
 SettingViewController::SettingViewController(QWidget *parent)
     : QWidget(parent)
-    , view_dragger_(this)
-{
+    , view_dragger_(this) {
     ui.setupUi(this);
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
 
     ui.widget_video_bg->hide();
     ui.widget_bottom_operate->hide();
     ui.radioButton_smooth->setChecked(true);
-    
+
+#ifndef _WIN32
+    ui.widget_audioQuality->hide();
+#endif // !_WIN32
+
     QBitmap bmp(this->size());
     bmp.fill();
     QPainter p(&bmp);
@@ -35,8 +38,7 @@ SettingViewController::SettingViewController(QWidget *parent)
     movie_ = new QMovie(":/ImageResource/Loading_Video.gif");
     movie_->setScaledSize(QSize(50, 50));
 }
-SettingViewController::~SettingViewController()
-{
+SettingViewController::~SettingViewController() {
     if (item_delegate_ != nullptr) {
         delete item_delegate_;
         item_delegate_ = nullptr;
@@ -202,15 +204,6 @@ void SettingViewController::InitUi() {
     activeSpeaker->release();
     speaker_list->release();
 
-    // 画质偏好（平滑和清晰）设置
-    TUIVideoQosPreference preference = DataStore::Instance()->GetQosPreference();
-    if (preference == TUIVideoQosPreference::kClear) {
-        //ui.radioButton_clear->setChecked(true);
-    }
-    else {
-        //ui.radioButton_smooth->setChecked(true);
-    }
-
     // 镜像设置
     bool is_mirror = DataStore::Instance()->GetMirror();
     ui.ckbox_mirror->setChecked(is_mirror);
@@ -243,6 +236,16 @@ void SettingViewController::InitUi() {
     ui.hSlider_microphone->setValue(mic_value);
     int speaker_value = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDeviceVolume(liteav::TRTCDeviceTypeSpeaker);
     ui.hSlider_speaker->setValue(speaker_value);
+
+    liteav::TRTCAudioQuality audio_quality = DataStore::Instance()->GetAudioQuality();
+    if (audio_quality == TRTCAudioQualitySpeech) {
+        ui.comboBox_audio_quality->setCurrentIndex(0);
+    } else if (audio_quality == TRTCAudioQualityDefault) {
+        ui.comboBox_audio_quality->setCurrentIndex(1);
+    } else {
+        ui.comboBox_audio_quality->setCurrentIndex(2);
+    }
+    ui.checkBox_noise_reduction->setChecked(DataStore::Instance()->GetAINoiseReduction());
 }
 
 void SettingViewController::InitConnect() {
@@ -264,6 +267,7 @@ void SettingViewController::InitConnect() {
     ui.comboBox_camera->setItemDelegate(item_delegate_);
     ui.comboBox_microphone->setItemDelegate(item_delegate_);
     ui.comboBox_speaker->setItemDelegate(item_delegate_);
+    ui.comboBox_audio_quality->setItemDelegate(item_delegate_);
 
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnTestSpeakerVolume, this, [=](uint32_t volume) {
         ui.progressBar_speaker->setValue(volume);
@@ -287,8 +291,8 @@ void SettingViewController::InitConnect() {
         else
             ui.hSlider_speaker->setValue(volume);
     });
-    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalDeviceChanged, this, [=](const QString& deviceId, TXMediaDeviceType type,\
-        TXMediaDeviceState state) {
+    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalDeviceChanged, this, [=](const QString& deviceId, liteav::TXMediaDeviceType type,\
+        liteav::TXMediaDeviceState state) {
         ResetDeviceList(deviceId, type, state);
     });
 
@@ -305,6 +309,9 @@ void SettingViewController::InitConnect() {
 
     connect(ui.hSlider_microphone, SIGNAL(valueChanged(int)), this, SLOT(OnMicrophoneValueChanged(int)));
     connect(ui.hSlider_speaker, SIGNAL(valueChanged(int)), this, SLOT(OnSpeakerValueChanged(int)));
+
+    connect(ui.comboBox_audio_quality, SIGNAL(currentIndexChanged(int)), this, SLOT(OnAudioQualityIndexChanged(int)));
+    connect(ui.checkBox_noise_reduction, SIGNAL(clicked(bool)), this, SLOT(OnAINoiseReductionChecked(bool)));
 }
 void SettingViewController::ResetDeviceList(const QString& deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) {
     if (state == TXMediaDeviceStateAdd || state == TXMediaDeviceStateRemove) {
@@ -601,6 +608,37 @@ void SettingViewController::OnNetQuality(UserNetQualityInfo local_user_quality, 
 
     ui.lb_net_status->setText(net_quality);
 }
+
+void SettingViewController::OnAudioQualityIndexChanged(int index) {
+    liteav::TRTCAudioQuality audio_quality;
+    switch (index)
+    {
+    case 0:
+        audio_quality = TRTCAudioQualitySpeech;
+        break;
+    case 1:
+        audio_quality = TRTCAudioQualityDefault;
+        break;
+    case 2:
+        audio_quality = TRTCAudioQualityMusic;
+        break;
+    default:
+        audio_quality = TRTCAudioQualityDefault;
+        break;
+    }
+    DataStore::Instance()->SetAudioQuality(audio_quality);
+    TXMessageBox::Instance().AddLineTextMessage(tr("The selection of sound quality will take effect the next time you enter the room!"));
+}
+
+void SettingViewController::OnAINoiseReductionChecked(bool checked) {
+    if (checked) {
+        TUIRoomCore::GetInstance()->OpenAINoiseReduction();
+    } else {
+        TUIRoomCore::GetInstance()->CloseAINoiseReduction();
+    }
+    DataStore::Instance()->OpenAINoiseReduction(checked);
+}
+
 #ifdef _WIN32
 #include <Psapi.h>
 int SettingViewController::GetAppMemoryUsage() {
@@ -622,9 +660,7 @@ void SettingViewController::GetTotalMemory() {
         long total_memory_MB = memory_status.ullTotalPhys / (1024 * 1024);
         long total_memory_GB = total_memory_MB / 1024;
         ui.lb_memory_total->setText(QString::number(total_memory_GB + 1) + " G");
-        //return total_memory_GB;
-    }
-    else {
+    } else {
         printf("Unknown RAM");
     }
 }

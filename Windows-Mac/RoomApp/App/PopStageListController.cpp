@@ -70,6 +70,7 @@ PopStageListController::PopStageListController(QWidget *parent)
         this->show();
         this->setFixedHeight(normal_height_);
         ui.widget_content->show();
+        ui.widget_content->activateWindow();
         QDesktopWidget* desk = QApplication::desktop();
         QRect main_rect = desk->availableGeometry(this);
         this->move((main_rect.width() - this->width() - 10), (main_rect.height() - this->height()) / 2);

@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.CollectionUtils;
 import com.tencent.liteav.tuiroom.R;
-import com.tencent.rtmp.TXLog;
+import com.tencent.liteav.tuiroom.model.impl.base.TRTCLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +82,7 @@ public class RadioButtonSettingItem extends BaseSettingItem {
             mItemRg = (RadioGroup) itemView.findViewById(R.id.rg_item);
 
             if (mItemText == null) {
-                TXLog.e(TAG, "item text get null here");
+                TRTCLogger.e(TAG, "item text get null here");
                 return;
             }
 
@@ -107,7 +107,7 @@ public class RadioButtonSettingItem extends BaseSettingItem {
                         return;
                     }
                     mSelectedIndex = checkedId - mItemRg.hashCode() - 1;
-                    TXLog.d(TAG, mTitle.getText() + " select " + mSelectedIndex);
+                    TRTCLogger.d(TAG, mTitle.getText() + " select " + mSelectedIndex);
                     if (mSelectedListener != null) {
                         mSelectedListener.onSelected(mSelectedIndex);
                     }

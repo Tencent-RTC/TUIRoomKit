@@ -10,7 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Guideline;
 
 import com.tencent.liteav.tuiroom.R;
-import com.tencent.rtmp.TXLog;
+import com.tencent.liteav.tuiroom.model.impl.base.TRTCLogger;
 
 import java.util.List;
 
@@ -72,7 +72,7 @@ public class CustomSettingItem extends BaseSettingItem {
             mEndGl = (Guideline) itemView.findViewById(R.id.gl_end);
 
             if (mItemText == null) {
-                TXLog.e(TAG, "item text get null here");
+                TRTCLogger.e(TAG, "item text get null here");
                 return;
             }
 

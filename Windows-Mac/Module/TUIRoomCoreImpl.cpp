@@ -2,6 +2,7 @@
 #include <regex>
 #include <algorithm>
 #include <cstdlib>
+#include <sstream>
 #include "TUIRoomCoreImpl.h"
 #include "ITRTCCloud.h"
 #ifdef _WIN32
@@ -92,13 +93,17 @@ int TUIRoomCoreImpl::Login(int sdk_appid, const std::string& user_id, const std:
             screen_share_manager_ = new (std::nothrow)ScreenShareManager(trtc_cloud_);
             trtc_cloud_->addCallback(this);
             trtc_cloud_->enableAudioVolumeEvaluation(100);
+            // 登录IM
+            if (im_core_ != nullptr) {
+                im_core_->Login(sdk_appid, user_id, user_sig);
+                return 0;
+            }
+        } else {
+            LINFO("getTRTCShareInstance error,trtc_cloud is null");
+            return -1;
         }
     }
-    // 登录IM
-    if (im_core_ != nullptr) {
-        im_core_->Login(sdk_appid, user_id, user_sig);
-    }
-    return 0;
+    return -1;
 }
 
 int TUIRoomCoreImpl::Logout() {
@@ -217,7 +222,7 @@ int TUIRoomCoreImpl::TransferRoomMaster(const std::string& user_id) {
 }
 
 int TUIRoomCoreImpl::StartCameraPreview(const liteav::TXView& view) {
-    if (view == NULL || trtc_cloud_ == nullptr) {
+    if (trtc_cloud_ == nullptr) {
         return -1;
     }
     if (local_user_info_.role != TUIRole::kMaster) {
@@ -252,7 +257,7 @@ int TUIRoomCoreImpl::StopCameraPreview() {
     return 0;
 }
 int TUIRoomCoreImpl::UpdateCameraPreview(const liteav::TXView& view) {
-    if (view == NULL || trtc_cloud_ == nullptr) {
+    if (trtc_cloud_ == nullptr) {
         return -1;
     }
     trtc_cloud_->updateLocalView((liteav::TXView)(view));
@@ -265,6 +270,7 @@ int TUIRoomCoreImpl::StartLocalAudio(const liteav::TRTCAudioQuality& quality) {
     }
     LINFO("StartLocalAudio");
     trtc_cloud_->startLocalAudio(quality);
+    audio_quality_ = quality;
     local_user_info_.has_audio_stream = true;
     local_user_info_.has_subscribed_audio_stream = true;
     room_user_map_[local_user_info_.user_id] = local_user_info_;
@@ -301,7 +307,7 @@ int TUIRoomCoreImpl::StopSystemAudioLoopback() {
 }
 
 int TUIRoomCoreImpl::StartRemoteView(const std::string& user_id, const liteav::TXView& view, TUIStreamType type) {
-    if (view == NULL || trtc_cloud_ == nullptr) {
+    if (trtc_cloud_ == nullptr) {
         return -1;
     }
     auto iter = room_user_map_.find(user_id);
@@ -344,8 +350,8 @@ int TUIRoomCoreImpl::StopRemoteView(const std::string& user_id, TUIStreamType ty
     return 0;
 }
 
-int TUIRoomCoreImpl::UpdateRemoteView(const std::string& user_id, TUIStreamType type, liteav::TXView& view) {
-    if (view == NULL || trtc_cloud_ == nullptr) {
+int TUIRoomCoreImpl::UpdateRemoteView(const std::string& user_id, TUIStreamType type, const liteav::TXView& view) {
+    if (trtc_cloud_ == nullptr) {
         return -1;
     }
     liteav::TRTCVideoStreamType stream_type;
@@ -604,9 +610,15 @@ int TUIRoomCoreImpl::ExitSpeechState() {
 }
 
 liteav::ITXDeviceManager* TUIRoomCoreImpl::GetDeviceManager() {
+    if (device_manager_ == nullptr) {
+        device_manager_ = trtc_cloud_->getDeviceManager();
+    }
     return device_manager_;
 }
 IScreenShareManager* TUIRoomCoreImpl::GetScreenShareManager() {
+    if (screen_share_manager_ == nullptr) {
+        screen_share_manager_ = new (std::nothrow)ScreenShareManager(trtc_cloud_);
+    }
     return screen_share_manager_;
 }
 
@@ -655,6 +667,32 @@ int TUIRoomCoreImpl::SetVideoMirror(bool mirror) {
     trtc_cloud_->setLocalRenderParams(render_params);
     trtc_cloud_->setVideoEncoderMirror(mirror);
     camera_mirror_ = mirror;
+    return 0;
+}
+
+int TUIRoomCoreImpl::OpenAINoiseReduction() {
+    std::stringstream ans_level;
+    ans_level << "{\"api\":\"enableAudioANS\",\"params\":{\"enable\":1,\"level\":120}}";
+    if (trtc_cloud_ != nullptr) {
+        trtc_cloud_->callExperimentalAPI(ans_level.str().c_str());
+    }
+    return 0;
+}
+
+int TUIRoomCoreImpl::CloseAINoiseReduction() {
+    std::stringstream ans_level;
+    int level = 120;
+    if (audio_quality_ == TRTCAudioQualitySpeech) {
+        level = 120;
+    } else if(audio_quality_ == TRTCAudioQualityDefault) {
+        level = 60;
+    } else {
+        level = 20;
+    }
+    ans_level << "{\"api\":\"enableAudioANS\",\"params\":{\"enable\":1,\"level\":" << level <<"}}";
+    if (trtc_cloud_ != nullptr) {
+        trtc_cloud_->callExperimentalAPI(ans_level.str().c_str());
+    }
     return 0;
 }
 
@@ -761,9 +799,30 @@ void TUIRoomCoreImpl::onFirstVideoFrame(const char* user_id, const liteav::TRTCV
         break;
     }
     LINFO("onFirstVideoFrame,user_id :%s,stream_type :%d, width:%d, height:%d", user_id, stream_type, width, height);
-    std::string remote_user_id(user_id);
+
+    std::string str_user_id(user_id);
+    if (str_user_id.empty()) {
+        if (stream_type == TRTCVideoStreamTypeBig) {
+            local_user_info_.has_video_stream = true;
+            local_user_info_.has_subscribed_video_stream = true;
+        } else if (stream_type == TRTCVideoStreamTypeSub) {
+            local_user_info_.has_screen_stream = true;
+            local_user_info_.has_subscribed_screen_stream = true;
+        }
+        room_user_map_[local_user_info_.user_id] = local_user_info_;
+    } else {
+        if (room_user_map_.find(str_user_id) != room_user_map_.end()) {
+            if (stream_type == TRTCVideoStreamTypeBig) {
+                room_user_map_[str_user_id].has_video_stream = true;
+                room_user_map_[str_user_id].has_subscribed_video_stream = true;
+            } else if (stream_type == TRTCVideoStreamTypeSub) {
+                room_user_map_[str_user_id].has_screen_stream = true;
+                room_user_map_[str_user_id].has_subscribed_screen_stream = true;
+            }
+        }
+    }
     if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnFirstVideoFrame(remote_user_id, type);
+        room_core_callback_->OnFirstVideoFrame(str_user_id, type);
     }
 }
 
@@ -1050,16 +1109,11 @@ void TUIRoomCoreImpl::OnIMRoomMasterChanged(const std::string& user_id){
     for (; iter != room_user_map_.end(); iter++) {
         if (iter->second.role == TUIRole::kMaster) {
             iter->second.role = TUIRole::kAnchor;
-            break;
-        }
-    }
-    iter = room_user_map_.begin();
-    for (; iter != room_user_map_.end(); iter++) {
-        if (iter->second.role == TUIRole::kAnchor && iter->second.user_id == user_id) {
+        } else if (iter->second.user_id == user_id) {
             iter->second.role = TUIRole::kMaster;
-            break;
         }
     }
+
     room_info_.owner_id = user_id;
     if (local_user_info_.user_id == user_id) {
         local_user_info_.role = TUIRole::kMaster;

@@ -41,6 +41,38 @@ QMAKE_CFLAGS_RELEASE   = $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
 QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS_RELEASE_WITH_DEBUGINFO
 QMAKE_LFLAGS_RELEASE   = $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
 
+win32 {
+contains(QT_ARCH,i386) {
+INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win32/include/
+INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win32/include/TRTC
+
+LIBS += -L"$(ProjectDir)../SDK/LiteAVSDK/CPlusPlus/Win32/lib" \
+    -L"$(ProjectDir)../SDK/ImSDK/Win/lib/Win32" \
+    -L"$(ProjectDir)3rdParty/zlib/x86" \
+    -L"$(ProjectDir)bin" \
+    -lliteav \
+    -lImSDK \
+    -lzlibstatic
+} else {
+INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win64/include/
+INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win64/include/TRTC
+
+LIBS += -L"$(ProjectDir)../SDK/LiteAVSDK/CPlusPlus/Win64/lib" \
+    -L"$(ProjectDir)../SDK/ImSDK/Win/lib/Win64" \
+    -L"$(ProjectDir)3rdParty/zlib/x86_64" \
+    -L"$(ProjectDir)bin" \
+    -lliteav \
+    -lImSDK \
+    -lzlibstatic
+}
+
+INCLUDEPATH += $$PWD/../SDK/ImSDK/Win/include/
+INCLUDEPATH += $$PWD/../utils/BugReport/
+INCLUDEPATH += $$PWD/3rdParty/zlib/include/
+INCLUDEPATH += $$PWD/../utils/usersig/win/include
+DEPENDPATH += $$PWD/../utils/usersig/win/include
+}
+
 macx {
 QMAKE_INFO_PLIST += Info.plist
 
@@ -56,6 +88,19 @@ LIBS += -lbz2
 LIBS += -lresolv
 #without c++11 & AppKit library compiler can't solve address for symbols
 LIBS += -framework AppKit
+
+QMAKE_CXXFLAGS += -x objective-c++
+LIBS += -framework Foundation
+LIBS += -framework CoreFoundation
+LIBS += -framework Cocoa
+
+LIBS += -framework Security
+LIBS += -framework SystemConfiguration
+LIBS += -framework JavaScriptCore
+
+LIBS += "-F$$PWD/3rdParty/BugReport/Mac"
+LIBS += -framework BuglyOAMac
+INCLUDEPATH += $$PWD/3rdParty/BugReport/Mac/BuglyOAMac.framework/Headers
 
 # 添加TXLiteAVSDK_TRTC_Mac.framework头文件
 INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXLiteAVSDK_TRTC_Mac.framework/Headers/cpp_interface

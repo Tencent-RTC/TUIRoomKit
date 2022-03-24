@@ -93,7 +93,7 @@ void DataStore::SaveUserLoginInfo() {
     QString config_file = QString::fromStdString(UserDirectory::GetUserConfigFile(is_app_launch_));
     QSettings setting(config_file, QSettings::IniFormat);
     setting.setValue("name", user_login_info_.name.c_str());
-    setting.setValue("Language/language", (int)current_language_);
+    setting.setValue("Language/language", static_cast<int>(current_language_));
     setting.sync();
 }
 
@@ -123,7 +123,7 @@ bool DataStore::IsAppLaunch() const{
 }
 
 /*
-APP∆Ù∂Ø≤Œ ˝–≠“È£∫
+APPÂêØÂä®ÂèÇÊï∞ÂçèËÆÆÔºö
 AppLaunch:true
 sdk_app_id:123456
 user_id:test1
@@ -189,4 +189,46 @@ void DataStore::ParseLaunchParam(QStringList params) {
     user_login_info_.name = recent_user_info.name;
 
     current_language_ = is_language_zh ? Language::kChinese : Language::kEnglish;
+}
+
+void DataStore::SetAudioQuality(liteav::TRTCAudioQuality audio_quality) {
+    audio_quality_ = audio_quality;
+}
+
+liteav::TRTCAudioQuality DataStore::GetAudioQuality() {
+    return audio_quality_;
+}
+
+void DataStore::OpenAINoiseReduction(bool open) {
+    ai_noise_reduction_opened_ = open;
+}
+
+bool DataStore::GetAINoiseReduction() {
+    return ai_noise_reduction_opened_;
+}
+
+std::vector<std::string> DataStore::GetScreenShareUsers() {
+    return screen_share_user_;
+}
+
+void DataStore::AddScreenShareUser(const std::string& user_id) {
+    auto user = find(screen_share_user_.begin(), screen_share_user_.end(), user_id);
+    if (user == screen_share_user_.end()) {
+        screen_share_user_.push_back(user_id);
+    }
+}
+
+void DataStore::RemoveScreenShareUser(const std::string& user_id) {
+    auto user = find(screen_share_user_.begin(), screen_share_user_.end(), user_id);
+    if (user != screen_share_user_.end()) {
+        screen_share_user_.erase(user);
+    }
+}
+
+void DataStore::SetCurrentMainWindowUser(const std::string& user_id) {
+    current_main_window_user_ = user_id;
+}
+
+std::string DataStore::GetCurrentMainWindowUser() {
+    return current_main_window_user_;
 }

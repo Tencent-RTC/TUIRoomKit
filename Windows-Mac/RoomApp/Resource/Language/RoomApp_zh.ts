@@ -398,7 +398,7 @@ CPU：%3%
     </message>
     <message>
         <source>open all video</source>
-        <translation type="unfinished">取消全员禁视频</translation>
+        <translation>取消全员禁视频</translation>
     </message>
 </context>
 <context>
@@ -505,6 +505,26 @@ CPU：%3%
     <message>
         <source>Entering...</source>
         <translation>正在进入...</translation>
+    </message>
+    <message>
+        <source>AudioQuality</source>
+        <translation>音质</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation>人声模式</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>默认模式</translation>
+    </message>
+    <message>
+        <source>Music</source>
+        <translation>音乐模式</translation>
+    </message>
+    <message>
+        <source>AI Noise Reduction</source>
+        <translation>AI降噪</translation>
     </message>
 </context>
 <context>
@@ -657,10 +677,6 @@ CPU：%3%
     <message>
         <source>Default Close Microphone</source>
         <translation>默认关闭麦克风</translation>
-    </message>
-    <message>
-        <source>AI Denoise</source>
-        <translation type="vanished">AI智能降噪</translation>
     </message>
     <message>
         <source>Speaker</source>
@@ -829,6 +845,30 @@ CPU：%3%
     <message>
         <source>TRTCRoom</source>
         <translation>TRTCRoom</translation>
+    </message>
+    <message>
+        <source>AudioQuality</source>
+        <translation>音质</translation>
+    </message>
+    <message>
+        <source>Speech</source>
+        <translation>人声模式</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>默认模式</translation>
+    </message>
+    <message>
+        <source>Music</source>
+        <translation>音乐模式</translation>
+    </message>
+    <message>
+        <source>AI Noise Reduction</source>
+        <translation>AI降噪</translation>
+    </message>
+    <message>
+        <source>The selection of sound quality will take effect the next time you enter the room!</source>
+        <translation>音质选择将在下次进房时生效</translation>
     </message>
 </context>
 <context>

@@ -1,4 +1,4 @@
-#include <QApplication>
+﻿#include <QApplication>
 #include <QDir>
 #include <QIcon>
 #include <QTextStream>
@@ -19,12 +19,12 @@ int main(int argc, char* args[]) {
 #ifdef _WIN32
     //crash
     std::unique_ptr<CrashDump> crash_dump = std::make_unique<CrashDump>();
+    QString sdk_version = TUIRoomCore::GetInstance()->GetSDKVersion();
     if (crash_dump) {
-        QString sdk_version = TUIRoomCore::GetInstance()->GetSDKVersion();
 #ifdef _WIN64
-        std::string app_info = "Rooms_x64";
+        std::string app_info = std::string("Rooms_x64_") + kAppVersion;
 #else
-        std::string app_info = "Rooms_x86";
+        std::string app_info = std::string("Rooms_x86_") + kAppVersion;
 #endif  // _WIN64
         crash_dump->Init(app_info,sdk_version.toStdString());
     }
@@ -34,6 +34,7 @@ int main(int argc, char* args[]) {
     ReleaseDC(NULL, screen);
     QString scale = QString("%0").arg(ScreenCenter::Instance()->GetScaleByDpi(dpi));
     qputenv("QT_SCALE_FACTOR", scale.toStdString().c_str());
+    LINFO("App version :%s, SDK version:%s", kAppVersion, sdk_version.toStdString().c_str());
 #endif
     QApplication::setAttribute(Qt::AA_UseOpenGLES);
     QApplication a(argc, args);
@@ -44,9 +45,6 @@ int main(int argc, char* args[]) {
     QDir::setCurrent(workDir); 
     QApplication::addLibraryPath(workDir);
     a.setWindowIcon(QIcon(":/ImageResource/trtc.ico"));
-
-    LINFO("This is Main Function");
-    LINFO("This is log path %s", log_path.c_str());
 
     qApp->setStyleSheet("QLabel, QLineEdit, QToolButton, QPushButton, QProgressBar, QRadioButton {font-size: 14px;}");
 

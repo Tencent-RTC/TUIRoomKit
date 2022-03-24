@@ -20,7 +20,7 @@
     </message>
     <message>
         <location filename="../../App/BottomBarController.cpp" line="104"/>
-        <location filename="../../App/BottomBarController.cpp" line="349"/>
+        <location filename="../../App/BottomBarController.cpp" line="348"/>
         <source>Share</source>
         <translation>Share</translation>
     </message>
@@ -88,8 +88,8 @@
         <translation type="vanished">%1 Sharing screen...</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="459"/>
-        <location filename="../../App/BottomBarController.cpp" line="518"/>
+        <location filename="../../App/BottomBarController.cpp" line="458"/>
+        <location filename="../../App/BottomBarController.cpp" line="516"/>
         <source>Other users are sharing screens</source>
         <translation>Other user is sharing screens</translation>
     </message>
@@ -263,42 +263,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="619"/>
+        <location filename="../../App/MainWindow.cpp" line="618"/>
         <source>Failed to open the camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="623"/>
+        <location filename="../../App/MainWindow.cpp" line="622"/>
         <source>Failed to turn on the microphone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="627"/>
+        <location filename="../../App/MainWindow.cpp" line="626"/>
         <source>Other users are sharing screens</source>
         <translation type="unfinished">Other user is sharing screens</translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="633"/>
+        <location filename="../../App/MainWindow.cpp" line="632"/>
         <source>Mute chat room failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="636"/>
+        <location filename="../../App/MainWindow.cpp" line="635"/>
         <source>Change speech mode failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="639"/>
+        <location filename="../../App/MainWindow.cpp" line="638"/>
         <source>Enter room failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="646"/>
+        <location filename="../../App/MainWindow.cpp" line="645"/>
         <source>Open microphone failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="645"/>
+        <location filename="../../App/MainWindow.cpp" line="644"/>
         <source>This application doesn&apos;t have microphone authorization</source>
         <translation type="unfinished"></translation>
     </message>
@@ -547,9 +547,9 @@
     <message>
         <location filename="../../App/Form/PresetDeviceController.ui" line="798"/>
         <location filename="../../App/Form/PresetDeviceController.ui" line="1086"/>
-        <location filename="../../App/PresetDeviceController.cpp" line="341"/>
-        <location filename="../../App/PresetDeviceController.cpp" line="359"/>
-        <location filename="../../App/PresetDeviceController.cpp" line="370"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="360"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="378"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="387"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
@@ -559,24 +559,49 @@
         <translation>Speaker</translation>
     </message>
     <message>
-        <location filename="../../App/Form/PresetDeviceController.ui" line="1176"/>
-        <location filename="../../App/PresetDeviceController.cpp" line="280"/>
+        <location filename="../../App/Form/PresetDeviceController.ui" line="1126"/>
+        <source>AudioQuality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/PresetDeviceController.ui" line="1143"/>
+        <source>Speech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/PresetDeviceController.ui" line="1148"/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/PresetDeviceController.ui" line="1153"/>
+        <source>Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/PresetDeviceController.ui" line="1174"/>
+        <source>AI Noise Reduction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/PresetDeviceController.ui" line="1258"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="300"/>
         <source>EnterRoom</source>
         <translation>Enter Room</translation>
     </message>
     <message>
-        <location filename="../../App/PresetDeviceController.cpp" line="212"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="229"/>
         <source>Entering...</source>
         <translation>Entering...</translation>
     </message>
     <message>
-        <location filename="../../App/PresetDeviceController.cpp" line="328"/>
-        <location filename="../../App/PresetDeviceController.cpp" line="347"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="348"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="366"/>
         <source>Stop</source>
         <translation>Stop</translation>
     </message>
     <message>
-        <location filename="../../App/PresetDeviceController.cpp" line="360"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="379"/>
         <source>Not find test file in trtcres directory!</source>
         <translation>Not find test file in trtcres directory!</translation>
     </message>
@@ -751,9 +776,9 @@
     <message>
         <location filename="../../App/Form/SettingViewController.ui" line="927"/>
         <location filename="../../App/Form/SettingViewController.ui" line="1164"/>
-        <location filename="../../App/SettingViewController.cpp" line="469"/>
-        <location filename="../../App/SettingViewController.cpp" line="486"/>
-        <location filename="../../App/SettingViewController.cpp" line="498"/>
+        <location filename="../../App/SettingViewController.cpp" line="472"/>
+        <location filename="../../App/SettingViewController.cpp" line="489"/>
+        <location filename="../../App/SettingViewController.cpp" line="501"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
@@ -775,79 +800,100 @@
         <translation>Default Close Microphone</translation>
     </message>
     <message>
-        <source>AI Denoise</source>
-        <translation type="vanished">AI Denoise</translation>
-    </message>
-    <message>
         <location filename="../../App/Form/SettingViewController.ui" line="1135"/>
         <source>Speaker</source>
         <translation>Speaker</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1462"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1332"/>
+        <source>AudioQuality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/SettingViewController.ui" line="1349"/>
+        <source>Speech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/SettingViewController.ui" line="1354"/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/SettingViewController.ui" line="1359"/>
+        <source>Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/SettingViewController.ui" line="1380"/>
+        <source>AI Noise Reduction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/SettingViewController.ui" line="1523"/>
         <source>CPU</source>
         <translation>CPU</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1491"/>
-        <location filename="../../App/Form/SettingViewController.ui" line="1662"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1552"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1723"/>
         <source>TRTCRoom</source>
         <translation>TRTCRoom</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1517"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1578"/>
         <source>Other</source>
         <translation>Other</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1633"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1694"/>
         <source>Memory</source>
         <translation>Memory</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1688"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1749"/>
         <source>total</source>
         <translation>Total</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1813"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1874"/>
         <source>Network</source>
         <translation>Network</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1820"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1881"/>
         <source>delay 0ms</source>
         <translation>delay 0ms</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1881"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1942"/>
         <source>Band Width</source>
         <translation>Band Width</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1910"/>
-        <location filename="../../App/Form/SettingViewController.ui" line="1936"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1971"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="1997"/>
         <source>0kbps</source>
         <translation>0kbps</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1964"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2025"/>
         <source>Loss Rate</source>
         <translation>Loss Rate</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="1993"/>
-        <location filename="../../App/Form/SettingViewController.ui" line="2019"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2054"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2080"/>
         <source>0%</source>
         <translation>0%</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="2035"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2096"/>
         <source>Net Status:</source>
         <translation>Net Status:</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="2112"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2173"/>
         <source>AudioAndVideoInfo</source>
         <translation>Video And Audio</translation>
     </message>
@@ -856,10 +902,10 @@
         <translation type="vanished">Net Status</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="2045"/>
-        <location filename="../../App/SettingViewController.cpp" line="575"/>
-        <location filename="../../App/SettingViewController.cpp" line="579"/>
-        <location filename="../../App/SettingViewController.cpp" line="633"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2106"/>
+        <location filename="../../App/SettingViewController.cpp" line="578"/>
+        <location filename="../../App/SettingViewController.cpp" line="582"/>
+        <location filename="../../App/SettingViewController.cpp" line="665"/>
         <source>Unknow</source>
         <translation>Unknow</translation>
     </message>
@@ -868,27 +914,27 @@
         <translation type="vanished">Audio</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="2180"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2241"/>
         <source>Audio Bitrate:</source>
         <translation>Audio Bitrate:</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="2190"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2251"/>
         <source>0 Kbps</source>
         <translation>0 Kbps</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="2230"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2291"/>
         <source>Video Frame Rate:</source>
         <translation>Video Frame Rate:</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="2280"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2341"/>
         <source>Share Frame Rate:</source>
         <translation>Share Frame Rate:</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="2354"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2415"/>
         <source>Video</source>
         <translation>Video</translation>
     </message>
@@ -897,8 +943,8 @@
         <translation type="vanished">Frame Rate:</translation>
     </message>
     <message>
-        <location filename="../../App/Form/SettingViewController.ui" line="2240"/>
-        <location filename="../../App/Form/SettingViewController.ui" line="2290"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2301"/>
+        <location filename="../../App/Form/SettingViewController.ui" line="2351"/>
         <source>0 FPS</source>
         <translation>0 FPS</translation>
     </message>
@@ -907,24 +953,24 @@
         <translation type="vanished">Screen Share</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="455"/>
-        <location filename="../../App/SettingViewController.cpp" line="474"/>
+        <location filename="../../App/SettingViewController.cpp" line="458"/>
+        <location filename="../../App/SettingViewController.cpp" line="477"/>
         <source>Stop</source>
         <translation>Stop</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="487"/>
+        <location filename="../../App/SettingViewController.cpp" line="490"/>
         <source>Not find test file in trtcres directory!</source>
         <translation>Not find test file in trtcres directory!</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="522"/>
+        <location filename="../../App/SettingViewController.cpp" line="525"/>
         <source>delay %1ms</source>
         <translation>delay %1ms</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="526"/>
-        <location filename="../../App/SettingViewController.cpp" line="530"/>
+        <location filename="../../App/SettingViewController.cpp" line="529"/>
+        <location filename="../../App/SettingViewController.cpp" line="533"/>
         <source> %1%</source>
         <translation> %1%</translation>
     </message>
@@ -933,47 +979,52 @@
         <translation type="vanished"> %1kbps</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="557"/>
-        <location filename="../../App/SettingViewController.cpp" line="564"/>
+        <location filename="../../App/SettingViewController.cpp" line="560"/>
+        <location filename="../../App/SettingViewController.cpp" line="567"/>
         <source> %1FPS</source>
         <translation> %1FPS</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="538"/>
-        <location filename="../../App/SettingViewController.cpp" line="546"/>
-        <location filename="../../App/SettingViewController.cpp" line="559"/>
+        <location filename="../../App/SettingViewController.cpp" line="541"/>
+        <location filename="../../App/SettingViewController.cpp" line="549"/>
+        <location filename="../../App/SettingViewController.cpp" line="562"/>
         <source> %1Kbps</source>
         <translation> %1Kbp</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="582"/>
+        <location filename="../../App/SettingViewController.cpp" line="585"/>
         <source>Excellent</source>
         <translation>Excellent</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="585"/>
+        <location filename="../../App/SettingViewController.cpp" line="588"/>
         <source>Good</source>
         <translation>Good</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="588"/>
+        <location filename="../../App/SettingViewController.cpp" line="591"/>
         <source>Poor</source>
         <translation>Poor</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="591"/>
+        <location filename="../../App/SettingViewController.cpp" line="594"/>
         <source>Bad</source>
         <translation>Bad</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="594"/>
+        <location filename="../../App/SettingViewController.cpp" line="597"/>
         <source>Very bad</source>
         <translation>Very bad</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="597"/>
+        <location filename="../../App/SettingViewController.cpp" line="600"/>
         <source>Down</source>
         <translation>Down</translation>
+    </message>
+    <message>
+        <location filename="../../App/SettingViewController.cpp" line="626"/>
+        <source>The selection of sound quality will take effect the next time you enter the room!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

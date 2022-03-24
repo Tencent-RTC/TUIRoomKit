@@ -300,7 +300,7 @@
          <item>
           <widget class="QStackedWidget" name="stackedWidget">
            <property name="currentIndex">
-            <number>0</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="page_video">
             <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1303,7 +1303,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QWidget" name="widget_13" native="true">
+                 <widget class="QWidget" name="widget_audioQuality" native="true">
                   <layout class="QHBoxLayout" name="horizontalLayout_21">
                    <property name="spacing">
                     <number>5</number>
@@ -1320,6 +1320,67 @@
                    <property name="bottomMargin">
                     <number>0</number>
                    </property>
+                   <item>
+                    <widget class="QLabel" name="label_22">
+                     <property name="minimumSize">
+                      <size>
+                       <width>90</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>AudioQuality</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="comboBox_audio_quality">
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>30</height>
+                      </size>
+                     </property>
+                     <property name="currentIndex">
+                      <number>1</number>
+                     </property>
+                     <item>
+                      <property name="text">
+                       <string>Speech</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Default</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Music</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_7">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>204</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_noise_reduction">
+                     <property name="text">
+                      <string>AI Noise Reduction</string>
+                     </property>
+                    </widget>
+                   </item>
                   </layout>
                  </widget>
                 </item>
@@ -1364,7 +1425,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>563</width>
+                  <width>283</width>
                   <height>550</height>
                  </rect>
                 </property>
