@@ -6,8 +6,8 @@
          <th>非房主操作</th>  
      </tr>
 <tr>
-<td><img src="./TUIRoom_creat.gif"/></td>
-<td><img src="./TUIRoom_join.gif"/></td>
+<td><img src="../Mini_TUIRoom_creat.gif"/></td>
+<td><img src="../Mini_TUIRoom_join.gif"/></td>
 </tr>
 </table>
 
