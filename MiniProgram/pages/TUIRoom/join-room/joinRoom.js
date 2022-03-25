@@ -21,6 +21,7 @@ Page({
       }
       wx.$TUIRoomCore = new TUIRoomCore();
       await wx.$TUIRoomCore.login(sdkAppID, this.data.userName, userSig);
+      getApp().aegisReportEvent('login', 'login-success');
       wx.$TUIRoomCore
         .enterRoom(this.data.roomId)
         .then((e) => {
