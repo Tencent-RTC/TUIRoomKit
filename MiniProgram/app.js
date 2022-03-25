@@ -9,12 +9,7 @@ App({
       TUIScene: 'TUIRoom',
     };
     this.aegisInit()
-    wx.aegis.reportEvent({
-      name: 'onLaunch',
-      ext1: 'onLaunch-success',
-      ext2: 'wxTUIRoomExternal',
-      ext3: genTestUserSig('').sdkAppID,
-    })
+    this.aegisReportEvent('onLaunch', 'onLaunch-success')
   },
   aegisInit() {
     wx.aegis = new Aegis({
@@ -23,5 +18,17 @@ App({
       reportAssetSpeed: true, // 静态资源测速
       pagePerformance: true, // 开启页面测速
     });
+  },
+  aegisReportEvent(name, ext1) {
+    if (!this.aegisReportEvent[name] || !this.aegisReportEvent[name][ext1]) {
+      wx.aegis.reportEvent({
+        name,
+        ext1,
+        ext2: 'wxTRTCMiniprogram',
+        ext3: genTestUserSig('').sdkAppID,
+      });
+      this.aegisReportEvent[name] = {};
+      this.aegisReportEvent[name][ext1] = true;
+    }
   },
 });
