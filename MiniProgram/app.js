@@ -27,7 +27,9 @@ App({
         ext2: 'wxTRTCMiniprogram',
         ext3: genTestUserSig('').sdkAppID,
       });
-      this.aegisReportEvent[name] = {};
+      if(typeof this.aegisReportEvent[name] !== 'object') {
+        this.aegisReportEvent[name] = {};
+      }
       this.aegisReportEvent[name][ext1] = true;
     }
   },
