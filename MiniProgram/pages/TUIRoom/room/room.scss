@@ -101,6 +101,7 @@
         height: 100%;
         width: 100%;
         background-color: black;
+        position: relative;
     }
 
     .player-control {
@@ -136,6 +137,22 @@
                 margin-right: 10rpx;
             }
         }
+    }
+}
+
+.switch-fullscreen {
+    flex-direction: row;
+    text-align: end;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 40%;
+    position: absolute;
+    bottom: 40rpx;
+    right: 30rpx;
+    .button-image {
+        width: 36rpx;
+        height: 36rpx;
     }
 }
 
@@ -182,6 +199,13 @@
             border-radius: 50%;
             margin-right: 10rpx;
         }
+    }
+
+    .user-name {
+        max-width: 66%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .handle-button {

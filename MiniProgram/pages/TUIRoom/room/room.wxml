@@ -13,15 +13,15 @@
         </view>
     </van-nav-bar>
     <swiper indicator-dots="{{list.length/4 > 1}}" class="swiper" indicator-color='rgba(255, 255, 255, .3)'
-        indicator-active-color='#fff' current='{{swiperCurrent}}'>
+        indicator-active-color='#fff'>
         <block wx:for="{{(list.length)/4}}" wx:key="*this" wx:for-index="pos">
             <swiper-item>
                 <van-grid column-num="{{list.length > 2 ? 2 : 1}}" border="{{ false }}" gutter="{{ 0 }}"
                     custom-class='grid-container'>
                     <van-grid-item content-class='grid-content'
                         custom-class="grid-item {{list.length===1 ? 'one-player' : ''}} {{item.fullScreen ? 'full-screen' : ''}}"
-                        use-slot wx:for="{{ list }}" wx:key="index" wx:if="{{index >= pos*4 && index < pos*4+4}}">
-                        <view class="player-container">
+                        use-slot wx:for="{{ list }}" wx:key="streamID" wx:if="{{index >= pos*4 && index < pos*4+4}}">
+                        <view class="player-container" bindtap="requestFullScreen" data-id="{{item.id}}" data-streamID="{{item.streamID}}" data-muteVideo="{{item.muteVideo}}">
                             <live-pusher wx:if="{{index === 0}}" class="player" url="{{item.url}}" mode="{{item.mode}}"
                                 autopush="{{item.autopush}}" enable-camera="{{item.enableCamera}}"
                                 enable-mic="{{item.enableMic}}" muted="{{!item.enableMic}}"
@@ -40,8 +40,10 @@
                                 bindstatechange="_pusherStateChangeHandler" bindnetstatus="_pusherNetStatusHandler"
                                 binderror="_pusherErrorHandler" bindbgmstart="_pusherBGMStartHandler"
                                 bindbgmprogress="_pusherBGMProgressHandler" bindbgmcomplete="_pusherBGMCompleteHandler"
-                                bindaudiovolumenotify="_pusherAudioVolumeNotify" />
-                            <live-player wx:else class="player" id="{{item.id}}" data-userid="{{item.userID}}"
+                                bindaudiovolumenotify="_pusherAudioVolumeNotify">
+                            </live-pusher>
+
+                            <live-player wx:elif="{{item.muteVideo === false || item.muteAudio === false}}" class="player" id="{{item.id}}" data-userid="{{item.userID}}"
                                 data-streamid="{{item.streamID}}" data-streamtype="{{item.streamType}}"
                                 src="{{item.src}}" mode="{{item.mode}}" autoplay="{{item.autoplay}}"
                                 mute-audio="{{item.muteAudio}}" mute-video="{{item.muteVideo}}"
@@ -52,7 +54,11 @@
                                 auto-pause-if-navigate="{{item.autoPauseIfNavigate}}"
                                 auto-pause-if-open-native="{{item.autoPauseIfOpenNative}}" debug="{{debug}}"
                                 bindstatechange="_playerStateChange" bindfullscreenchange="_playerFullscreenChange"
-                                bindnetstatus="_playerNetStatus" bindaudiovolumenotify="_playerAudioVolumeNotify" />
+                                bindnetstatus="_playerNetStatus" bindaudiovolumenotify="_playerAudioVolumeNotify">
+                                <cover-view wx:if="{{isFullScreen}}" class="switch-fullscreen" style="flex-direction:row;">
+                                    <cover-image class="button-image" data-id="{{item.id}}" data-streamID="{{item.streamID}}" bindtap="exitFullScreen" src="../../../assets/images/shrink.png"></cover-image>
+                                </cover-view>
+                            </live-player>
                             <view class="no-video" wx:if="{{(!item.enableCamera&&index===0) || item.muteVideo}}">
                                 <image class="image"
                                     src="{{userList[item.userID].avatar || 'https://web.sdk.qcloud.com/component/miniApp/resources/default_avatar.png'}}">
@@ -133,7 +139,7 @@
                             src="{{item.avatar || 'https://web.sdk.qcloud.com/component/miniApp/resources/default_avatar.png'}}"
                             mode="aspectFit"></image>
                     </van-col>
-                    <van-col>{{item.nick || item.ID}}{{item.ID === currentUser.ID?'（我）':''}}</van-col>
+                    <van-col custom-class="user-name">{{item.nick || item.ID}}{{item.ID === currentUser.ID?'（我）':''}}</van-col>
                 </van-col>
                 <van-col span="10" custom-class="handle-button" wx:if="{{item.ID!==currentUser.ID}}">
                     <image wx:if="{{userList[item.ID].isMicrophoneMuted}}"
