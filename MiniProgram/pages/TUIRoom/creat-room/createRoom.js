@@ -21,12 +21,7 @@ Page({
       }
       wx.$TUIRoomCore = new TUIRoomCore();
       await wx.$TUIRoomCore.login(sdkAppID, this.data.userName, userSig);
-      wx.aegis.reportEvent({
-        name: 'login',
-        ext1: 'login-success',
-        ext2: 'wxTUIRoomExternal',
-        ext3: sdkAppID,
-      })
+      getApp().aegisReportEvent('login', 'login-success')
       wx.$TUIRoomCore
           .createRoom(String(this.data.roomId))
           .then(() => {
@@ -35,7 +30,6 @@ Page({
             });
           })
           .catch((e) => {
-            console.dir(e);
             wx.showToast({
               title: e.message,
               icon: 'none',
