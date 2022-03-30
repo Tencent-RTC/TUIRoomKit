@@ -1,124 +1,89 @@
-本文档主要介绍如何快速集成实时音视频（TRTC）SDK，运行 TRTC 场景化解决方案，实现视频会议。
-	
+# TUIRoom iOS 示例工程快速跑通
+
+本文档主要介绍如何快速跑通TUIRoom 示例工程，体验多人音视频互动，更详细的TUIRoom组件接入流程，请点击腾讯云官网文档： [**TUIRoom 组件 iOS 接入说明** ](https://cloud.tencent.com/document/product/647/45681)
+
+
 ## 目录结构
-	
-```
-TUIRoom
-├─ Example              // 工程模块，主要提供 TUIRoom 的测试页面
-├─ SDK                  // 依赖的本地库
-├─ Resources            // TUIRoom 中所用的资源文件
-├─ Source               // TUIRoom 组件的逻辑封装
-└─ TUIRoom.podspec      // TUIRoom 组件 pod 接入文件
 
 ```
-	
+TUIMeeting
+├─ App              // 视频会议主页UI代码以及用到的图片及国际化字符串资源文件夹
+├─ Debug            // 工程调试运行所需的关键业务代码文件夹
+├─ LoginMock        // 登录UI及业务逻辑代码文件夹
+├─ Resources        // 视频会议功能所需的图片、国际化字符串资源文件夹
+├─ Source           // 视频会议播核心业务逻辑代码文件夹
+├─ TCBeautyKit      // 美颜功能核心组件
+└─ TXAppBasic       // 工程依赖的基础组件
+
+```
+
 ## 环境准备
 - Xcode 11.0及以上版本
-- 最低支持系统：iOS 12.0
+- 最低支持系统：iOS 11.0
 - 请确保您的项目已设置有效的开发者签名
-	
+  
 ## 运行示例
-	
-### 前提条件
+
+### 第一步：创建TRTC的应用
 - 您已 [注册腾讯云](https://cloud.tencent.com/document/product/378/17985) 账号，并完成 [实名认证](https://cloud.tencent.com/document/product/378/3629)。
-	
+  
 ### 申请 SDKAPPID 和 SECRETKEY
 1. 登录实时音视频控制台，选择【开发辅助】>【[快速跑通Demo](https://console.cloud.tencent.com/trtc/quickstart)】。
 2. 单击【立即开始】，输入您的应用名称，例如`TestTRTC`，单击【创建应用】。
-<img src="https://qcloudimg.tencent-cloud.cn/raw/45fe6938bb28349458c3b6d2ad0549ff.png" width="650"/>
-3. 创建应用完成后，单击【我已下载，下一步】，可以查看 SDKAppID 和密钥信息。
+<img src="https://main.qcloudimg.com/raw/169391f6711857dca6ed8cfce7b391bd.png" width="650" height="295"/>
+3. 创建应用完成后，单击【我已下载，下一步】，可以查看 SDKAppID 和SECRETKEY。
 
-### 集成SDK
-1. 工程默认集成的是`TXLiteAVSDK_TRTC`精简版SDK，您可通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】了解此版本SDK的具体功能。
-2. SDK集成方式默认使用`Cocoapods`，工程目录下`Podfile`文件内已帮您添加了SDK的依赖`pod 'TXLiteAVSDK_TRTC'`，您只需要打开终端进入到工程目录下执行`pod install`，SDK就会自动集成。
+### 第二步：下载源码，配置工程
 
-### 配置工程文件
-1. 使用Xcode(11.0及以上)打开源码工程`TUIRoomApp.xcworkspace`。
-2. 工程内找到`TUIRoom/Debug/GenerateTestUserSig.swift`文件 。
-3. 设置`GenerateTestUserSig.swift`文件中的相关参数：
+1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
+2. 工程默认集成的是`TXLiteAVSDK_TRTC`精简版SDK，您可通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】了解此版本SDK的具体功能。
+3. 通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】去下载TXLiteAVSDK_ReplayKitExt.framework，然后放到SDK目录下
+4. 工程目录下`Podfile`文件内已帮您添加了SDK的依赖`pod 'TXLiteAVSDK_TRTC'`，您只需要打开终端进入到工程目录下执行`pod install`，SDK就会自动集成。
+5. 使用Xcode(11.0及以上)打开源码工程`TUIMeetingApp.xcworkspace`。
+6. 工程内找到`TUIMeeting/Debug/GenerateTestUserSig.swift`文件 。
+7. 设置`GenerateTestUserSig.swift`文件中的相关参数：
+
 <ul>
 <li>SDKAPPID：默认为 0 ，请设置为实际申请的SDKAPPID。</li>
 <li>SECRETKEY：默认为空字符串，请设置为实际申请的SECRETKEY。</li>
 </ul>
 <img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/sdkappid_secretkey_ios.png" width="650" height="295"/>
-4. 返回实时音视频控制台，单击【粘贴完成，下一步】。
-5. 单击【关闭指引，进入控制台管理应用】。
 
 >!本文提到的生成 UserSig 的方案是在客户端代码中配置 SECRETKEY，该方法中 SECRETKEY 很容易被反编译逆向破解，一旦您的密钥泄露，攻击者就可以盗用您的腾讯云流量，因此**该方法仅适合本地跑通工程和功能调试**。
 >正确的 UserSig 签发方式是将 UserSig 的计算代码集成到您的服务端，并提供面向 App 的接口，在需要 UserSig 时由您的 App 向业务服务器发起请求获取动态 UserSig。更多详情请参见 [服务端生成 UserSig](https://cloud.tencent.com/document/product/647/17275#Server)。
 
-### 运行 App
-下载TXLiteAVSDK_TRTC.framework与TXLiteAVSDK_ReplayKitExt.framework放到SDK目录下，cd到Example目录下，执行pod install，请使用 Xcode（11.0及以上的版本）打开源码工程 `TUIRoom/Example/DemoApp.xcworkspace`，单击【运行】即可开始调试本 App。
+### 第三步：编译运行
 
-### 体验应用（**体验应用至少需要两台设备**）
-#### 用户 A
+使用 Xcode（11.0及以上的版本）打开源码工程 `TUIMeeting/TUIMeetingApp.xcworkspace`，单击【运行】即可开始调试本 App。
 
-步骤1、输入用户名(<font color=red>请确保用户名唯一性，不能与其他用户重复</font>)，如图示：
+Tips：
 
-<img src="https://qcloudimg.tencent-cloud.cn/raw/1414c36436df13a0366b59f22024a23c.png" width="320"/>
+TUIRoom 使用体验，至少需要两台设备，如果用户A/B分别代表两台不同的设备：
 
-步骤2、点击“创建房间”，如下图示：
+userId字符串类型，长度不超过32字节，不支持使用特殊字符，建议使用英文或数字，可结合业务实际账号体系自行设置
 
-<table>
-<tr>
-<td><img src="https://qcloudimg.tencent-cloud.cn/raw/85ab7ea0a66aba5b9ddf23594bf04ea0.png" width="320"/></td>
-<td><img src="https://qcloudimg.tencent-cloud.cn/raw/b36383baff761bdaf26da5f191902800.png" width="320"/></td>
-</tr>
-</table>
+**设备 A（userId：111）**
 
-步骤3、进入房间后，复制房间号给“用户B”，待进入后就可以开始聊天了；
+- 步骤1、在欢迎页，输入用户名(请确保用户名唯一性，不能与其他用户重复)，比如111；
+- 步骤2、点击创建房间；
+- 步骤3、进入到创建房间界面，可以将创建的房间号记录下来；
+- 步骤4、进入房间;
 
-<img src="https://qcloudimg.tencent-cloud.cn/raw/5f8b51e76d044c03af9e579a66fcaa1a.png" width="320"/>
+| 步骤1 | 步骤2 | 步骤3 | 步骤4 |
+|---------|---------|---------|---------|
+| <img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/user_a.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/85ab7ea0a66aba5b9ddf23594bf04ea0.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/b36383baff761bdaf26da5f191902800.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/5f8b51e76d044c03af9e579a66fcaa1a.png" width="320"/> |
 
-#### 用户 B
+**设备 B（userId：222）**
 
-步骤1、输入用户名(<font color=red>请确保用户名唯一性，不能与其他用户重复</font>)，如图示：
+- 步骤1：输入用户名(请确保用户名唯一性，不能与其他用户重复)，比如222；
+- 步骤2、点击“加入房间”，输入用户 A 创建的房间号（设备A第3步记录的房间号），加入房间；
 
-<img src="https://qcloudimg.tencent-cloud.cn/raw/2119f9db193a76f3aad4a770e473b59e.png" width="320"/>
-
-步骤2、点击“加入房间”，输入用户 A 创建的房间号，加入房间；
-
-<table>
-<tr>
-<td><img src="https://qcloudimg.tencent-cloud.cn/raw/0349a16cf0f442016d1262d602327a67.png" width="320"/></td>
-<td><img src="https://qcloudimg.tencent-cloud.cn/raw/a5f86a91670b56ed39bb40d6d4ea0d24.png" width="320"/></td>
-</tr>
-</table>
-
-步骤3、进入房间后，就可以开始聊天了；
-
-<img src="https://qcloudimg.tencent-cloud.cn/raw/10d10b336d262f004cf9571ef92056f4.png" width="320"/>
-
+| 步骤1 | 步骤2 |
+|---------|---------|
+|<img src="https://qcloudimg.tencent-cloud.cn/raw/0349a16cf0f442016d1262d602327a67.png" width="320"/>|<img src="https://qcloudimg.tencent-cloud.cn/raw/a5f86a91670b56ed39bb40d6d4ea0d24.png" width="320"/>|
 ## 常见问题
-#### 1. 查看密钥时只能获取公钥和私钥信息，该如何获取密钥？
-TRTC SDK 6.6 版本（2019年08月）开始启用新的签名算法 HMAC-SHA256。在此之前已创建的应用，需要先升级签名算法才能获取新的加密密钥。如不升级，您也可以继续使用 [老版本算法 ECDSA-SHA256](https://cloud.tencent.com/document/product/647/17275#.E8.80.81.E7.89.88.E6.9C.AC.E7.AE.97.E6.B3.95)，如已升级，您按需切换为新旧算法。
 
-升级/切换操作：
+- [TUI 场景化解决方案常见问题](https://cloud.tencent.com/developer/article/1952880)
+- 欢迎加入 QQ 群：592465424，进行技术交流和反馈~
 
- 1. 登录 [实时音视频控制台](https://console.cloud.tencent.com/trtc)。
- 2. 在左侧导航栏选择【应用管理】，单击目标应用所在行的【应用信息】。
- 3. 选择【快速上手】页签，单击【第二步 获取签发UserSig的密钥】区域的【点此升级】、【非对称式加密】或【HMAC-SHA256】。
-  
-  - 升级：
-   
-   ![](https://main.qcloudimg.com/raw/69bd0957c99e6a6764368d7f13c6a257.png)
-   
-  - 切换回老版本算法 ECDSA-SHA256：
-  
-   ![](https://main.qcloudimg.com/raw/f89c00f4a98f3493ecc1fe89bea02230.png)
-   
-  - 切换为新版本算法 HMAC-SHA256：
-  
-   ![](https://main.qcloudimg.com/raw/b0412153935704abc9e286868ad8a916.png)
-   
-#### 2. 两台手机同时运行工程，为什么看不到彼此的画面？
-请确保两台手机在运行工程时使用的是不同的 UserID，TRTC 不支持同一个 UserID （除非 SDKAppID 不同）在两个终端同时使用。
-
-<img src="https://qcloudimg.tencent-cloud.cn/raw/66f0acbe733d8ed4a8829f84d23c1813.png" width="320"/>
-
-#### 3. 防火墙有什么限制？
-由于 SDK 使用 UDP 协议进行音视频传输，所以在对 UDP 有拦截的办公网络下无法使用。如遇到类似问题，请参考 [应对公司防火墙限制](https://cloud.tencent.com/document/product/647/34399) 排查并解决。
-
-
-
-	
+    
