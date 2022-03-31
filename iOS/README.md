@@ -6,14 +6,12 @@
 ## 目录结构
 
 ```
-TUIMeeting
-├─ App              // 视频会议主页UI代码以及用到的图片及国际化字符串资源文件夹
-├─ Debug            // 工程调试运行所需的关键业务代码文件夹
-├─ LoginMock        // 登录UI及业务逻辑代码文件夹
-├─ Resources        // 视频会议功能所需的图片、国际化字符串资源文件夹
-├─ Source           // 视频会议播核心业务逻辑代码文件夹
-├─ TCBeautyKit      // 美颜功能核心组件
-└─ TXAppBasic       // 工程依赖的基础组件
+TUIRoom
+├─ Example              // 工程模块，主要提供 TUIRoom 的测试页面
+├─ Resources            // TUIRoom 中所用的资源文件
+├─ SDK                  // 依赖的本地库
+├─ Source               // TUIRoom 组件的逻辑封装
+└─ TUIRoom.podspec      // TUIRoom 组件 pod 接入文件
 
 ```
 
@@ -39,8 +37,8 @@ TUIMeeting
 2. 工程默认集成的是`TXLiteAVSDK_TRTC`精简版SDK，您可通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】了解此版本SDK的具体功能。
 3. 通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】去下载TXLiteAVSDK_ReplayKitExt.framework，然后放到SDK目录下
 4. 工程目录下`Podfile`文件内已帮您添加了SDK的依赖`pod 'TXLiteAVSDK_TRTC'`，您只需要打开终端进入到工程目录下执行`pod install`，SDK就会自动集成。
-5. 使用Xcode(11.0及以上)打开源码工程`TUIMeetingApp.xcworkspace`。
-6. 工程内找到`TUIMeeting/Debug/GenerateTestUserSig.swift`文件 。
+5. 使用Xcode(11.0及以上)打开源码工程`DemoApp.xcworkspace`。
+6. 工程内找到`TUIRoom/Debug/GenerateTestUserSig.swift`文件 。
 7. 设置`GenerateTestUserSig.swift`文件中的相关参数：
 
 <ul>
@@ -54,7 +52,7 @@ TUIMeeting
 
 ### 第三步：编译运行
 
-使用 Xcode（11.0及以上的版本）打开源码工程 `TUIMeeting/TUIMeetingApp.xcworkspace`，单击【运行】即可开始调试本 App。
+使用 Xcode（11.0及以上的版本）打开源码工程 `Example/DemoApp.xcworkspace`，单击【运行】即可开始调试本 App。
 
 Tips：
 
