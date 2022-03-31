@@ -29,11 +29,11 @@ extension TUIRoomMainViewController {
             return
         }
         if roomIdLabel.tag == 0 {
-            TRTCCloud.sharedInstance()?.setDebugViewMargin(currentUser.userId(), margin: TXEdgeInsets(top: 70, left: 10, bottom: 30, right: 10))
-            TRTCCloud.sharedInstance()?.showDebugView(2) // 显示全量版的Log视图
+            TRTCCloud.sharedInstance().setDebugViewMargin(currentUser.userId(), margin: TXEdgeInsets(top: 70, left: 10, bottom: 30, right: 10))
+            TRTCCloud.sharedInstance().showDebugView(2) // 显示全量版的Log视图
             roomIdLabel.tag = 1
         } else {
-            TRTCCloud.sharedInstance()?.showDebugView(0) // 关闭全量版的Log视图
+            TRTCCloud.sharedInstance().showDebugView(0) // 关闭全量版的Log视图
             roomIdLabel.tag = 0
         }
     }
