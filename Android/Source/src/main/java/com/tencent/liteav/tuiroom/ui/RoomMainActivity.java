@@ -95,6 +95,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     private TextView                     mStopScreenCaptureTv;
     private View                         mFloatingWindow;
     private boolean                      isScreenCapture;
+    private boolean                      mIsPaused = false;
 
     public static void enterRoom(Context context,
                                  boolean isCreate,
@@ -385,8 +386,8 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
                 MemberEntity entity = mStringMemberEntityMap.get(userId);
                 if (entity != null) {
                     entity.getRoomVideoView().setPlayingWithoutSetVisible(false);
-                    TUIRoomCoreDef.SteamType steamType = entity.isSharingScreen() ? TUIRoomCoreDef.SteamType.SCREE :
-                            TUIRoomCoreDef.SteamType.CAMERA;
+                    TUIRoomCoreDef.SteamType steamType = entity.isScreenShareAvailable()
+                            ? TUIRoomCoreDef.SteamType.SCREE : TUIRoomCoreDef.SteamType.CAMERA;
                     mTUIRoomCore.stopRemoteView(userId, steamType, null);
                 }
             }
@@ -519,12 +520,12 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
             return;
         }
         entity.setCameraAvailable(available);
-        if (entity.isSharingScreen()) {
+        if (entity.isScreenShareAvailable()) {
             Log.d(TAG, "camera available in screen capture， ignore");
             return;
         }
         entity.setNeedFresh(true);
-        boolean isVideoAvailable = entity.isScreenAvailable() || entity.isCameraAvailable();
+        boolean isVideoAvailable = entity.isScreenShareAvailable() || entity.isCameraAvailable();
         entity.setVideoAvailable(isVideoAvailable);
         entity.getRoomVideoView().setNeedAttach(available);
         mRemoteUserView.updateRemoteUserVideo(userId, available);
@@ -553,14 +554,13 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         }
         final MemberEntity entity = mStringMemberEntityMap.get(userId);
         if (entity != null) {
-            boolean isVideoAvailable = entity.isScreenAvailable() || entity.isCameraAvailable();
+            entity.setScreenShareAvailable(available);
+            boolean isVideoAvailable = entity.isScreenShareAvailable() || entity.isCameraAvailable();
             if (isVideoAvailable) {
                 final RoomVideoView roomVideoView = new RoomVideoView(RoomMainActivity.this);
                 roomVideoView.setUserId(userId);
                 entity.setRoomVideoView(roomVideoView);
             }
-            entity.setScreenAvailable(available);
-            entity.setSharingScreen(available);
             entity.setNeedFresh(true);
             entity.setVideoAvailable(isVideoAvailable);
             entity.getRoomVideoView().setNeedAttach(isVideoAvailable);
@@ -1245,6 +1245,10 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     }
 
     private void showSingleConfirmDialog(String message) {
+        if (mIsPaused) {
+            finish();
+            return;
+        }
         final ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment();
         dialogFragment.setCancelable(true);
         dialogFragment.setMessage(message);
@@ -1263,4 +1267,16 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         dialogFragment.show(getFragmentManager(), "ConfirmDialogFragment");
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mIsPaused = false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mIsPaused = true;
+    }
 }

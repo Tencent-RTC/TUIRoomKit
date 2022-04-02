@@ -19,15 +19,11 @@ public class MemberEntity {
     private boolean isShowOutSide;
     private boolean isVideoAvailable;
     //是否打开了屏幕共享
-    private boolean isScreenAvailable;
+    private boolean isScreenShareAvailable;
     // 用户是否打开了视频
     private boolean isCameraAvailable;
-
     // 用户是否打开音频
     private boolean isAudioAvailable;
-
-    //是否在分享屏幕
-    private boolean isSharingScreen;
 
     private RoomVideoView mRoomVideoView;
     private boolean       needFresh;
@@ -44,15 +40,6 @@ public class MemberEntity {
 
     private boolean             isSelf;
     private TUIRoomCoreDef.Role role;
-
-
-    public boolean isSharingScreen() {
-        return isSharingScreen;
-    }
-
-    public void setSharingScreen(boolean sharingScreen) {
-        isSharingScreen = sharingScreen;
-    }
 
     public TUIRoomCoreDef.Role getRole() {
         return role;
@@ -159,12 +146,12 @@ public class MemberEntity {
         return isTalk;
     }
 
-    public boolean isScreenAvailable() {
-        return isScreenAvailable;
+    public boolean isScreenShareAvailable() {
+        return isScreenShareAvailable;
     }
 
-    public void setScreenAvailable(boolean screenAvailable) {
-        isScreenAvailable = screenAvailable;
+    public void setScreenShareAvailable(boolean available) {
+        this.isScreenShareAvailable = available;
     }
 
     public boolean isCameraAvailable() {
