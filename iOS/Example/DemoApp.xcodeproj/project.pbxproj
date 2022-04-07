@@ -13,6 +13,7 @@
 		C18CE615279005D10071C120 /* ReplayKitLocalized.m in Sources */ = {isa = PBXBuildFile; fileRef = C18CE607279005D10071C120 /* ReplayKitLocalized.m */; };
 		C18CE616279005D10071C120 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE608279005D10071C120 /* InfoPlist.strings */; };
 		C18CE617279005D10071C120 /* ReplayKitLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE60A279005D10071C120 /* ReplayKitLocalized.strings */; };
+		C1E771D227F4058700A3E80C /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1E771D127F4058700A3E80C /* VideoToolbox.framework */; };
 		C1F2C762278FD4E000216EB8 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1F2C761278FD4E000216EB8 /* ReplayKit.framework */; };
 		C1F2C766278FD4E000216EB8 /* SampleHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = C1F2C765278FD4E000216EB8 /* SampleHandler.m */; };
 		C1F2C76A278FD4E000216EB8 /* TXReplayKit_Screen.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C1F2C760278FD4E000216EB8 /* TXReplayKit_Screen.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -56,6 +57,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		C1E771CE27F4042B00A3E80C /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C1F2C76B278FD4E000216EB8 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -80,6 +91,7 @@
 		C18CE60C279005D10071C120 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C18CE60D279005D10071C120 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ReplayKitLocalized.strings; sourceTree = "<group>"; };
 		C18CE60E279005D10071C120 /* ReplayKitLocalized.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplayKitLocalized.h; sourceTree = "<group>"; };
+		C1E771D127F4058700A3E80C /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
 		C1F2C760278FD4E000216EB8 /* TXReplayKit_Screen.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TXReplayKit_Screen.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1F2C761278FD4E000216EB8 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 		C1F2C764278FD4E000216EB8 /* SampleHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SampleHandler.h; sourceTree = "<group>"; };
@@ -128,6 +140,7 @@
 			files = (
 				C1F2C778278FD65C00216EB8 /* Accelerate.framework in Frameworks */,
 				C1F2C776278FD65300216EB8 /* libc++.tbd in Frameworks */,
+				C1E771D227F4058700A3E80C /* VideoToolbox.framework in Frameworks */,
 				C1F2C762278FD4E000216EB8 /* ReplayKit.framework in Frameworks */,
 				C13127C5279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */,
 			);
@@ -307,6 +320,7 @@
 		F6F6B85282DF8397356DE795 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C1E771D127F4058700A3E80C /* VideoToolbox.framework */,
 				C1F2C777278FD65C00216EB8 /* Accelerate.framework */,
 				C1F2C775278FD65300216EB8 /* libc++.tbd */,
 				E4CD7F588EA29064C4C9474A /* Pods_DemoApp.framework */,
@@ -346,6 +360,7 @@
 				BEEBF9DEEBA7ECA612C2B72A /* [CP] Embed Pods Frameworks */,
 				813CE8E421B021F6521A9D1A /* [CP] Copy Pods Resources */,
 				C1F2C76B278FD4E000216EB8 /* Embed App Extensions */,
+				C1E771CE27F4042B00A3E80C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -615,6 +630,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F8A3GH6Q4W;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../SDK",
@@ -647,6 +663,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5GHU44CJHG;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../SDK",

@@ -1,16 +1,13 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion COMPILE_SDK_VERSION as Integer
-    buildToolsVersion BUILD_TOOLS_VERSION
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
-        minSdkVersion MIN_SDK_VERSION as Integer
-        targetSdkVersion TARGET_SDK_VERSION as Integer
-        versionName VERSION_NAME
-        versionCode VERSION_CODE as Integer
+        minSdkVersion 17
+        targetSdkVersion 26
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -22,7 +19,7 @@ android {
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     api rootProject.ext.liteavSdk
-    api "com.google.code.gson:gson:$GSON_VERSION"
+    api "com.google.code.gson:gson:2.3.1"
     api 'com.google.android.material:material:1.0.0'
 }
 

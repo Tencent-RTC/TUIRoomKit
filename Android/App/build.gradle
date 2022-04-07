@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion COMPILE_SDK_VERSION as Integer
-    buildToolsVersion BUILD_TOOLS_VERSION
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId 'com.tencent.liteav.tuiroom'
-        versionName VERSION_NAME
-        versionCode VERSION_CODE as Integer
-        minSdkVersion MIN_SDK_VERSION as Integer
-        targetSdkVersion TARGET_SDK_VERSION as Integer
+        versionName "1.0"
+        versionCode 1
+        minSdkVersion 17
+        targetSdkVersion 26
         multiDexEnabled true
     }
 
@@ -24,4 +24,5 @@ android {
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
     api project(":Source")
+    api project(':Debug')
 }

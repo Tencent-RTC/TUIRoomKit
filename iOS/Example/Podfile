@@ -12,13 +12,13 @@ end
 # 工具库
 def tool
   pod 'Alamofire'
+  pod 'TXLiteAVSDK_TRTC'
 end
 
 # 本地依赖库
 def local
   pod 'TXAppBasic', :path => "../SDK/TXAppBasic/"
   pod 'TCBeautyKit', :path => "../SDK/TCBeautyKit/"
-  pod 'TXLiteAVSDK_TRTC',:path => "../SDK/"
 end
 
 def pod_local(type)

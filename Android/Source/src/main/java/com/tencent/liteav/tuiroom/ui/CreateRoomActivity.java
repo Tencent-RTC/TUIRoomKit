@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.tencent.liteav.basic.IntentUtils;
 import com.tencent.liteav.basic.UserModel;
 import com.tencent.liteav.basic.UserModelManager;
 import com.tencent.liteav.tuiroom.R;
@@ -117,7 +118,7 @@ public class CreateRoomActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("https://cloud.tencent.com/document/product/647/45667"));
-                startActivity(intent);
+                IntentUtils.safeStartActivity(CreateRoomActivity.this, intent);
             }
         });
 

@@ -438,13 +438,13 @@ public class AnchorListView extends RelativeLayout {
                 roomVideoView.setPlaying(true);
                 if (mListener != null) {
                     mListener.onViewStart(entity.getUserId(), entity.getRoomVideoView().getPlayVideoView(),
-                            entity.isSharingScreen());
+                            entity.isScreenShareAvailable());
                 }
             } else {
                 if (roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(false);
                     if (mListener != null) {
-                        mListener.onViewStop(entity.getUserId(), entity.isSharingScreen());
+                        mListener.onViewStop(entity.getUserId(), entity.isScreenShareAvailable());
                     }
                 }
             }
@@ -459,7 +459,7 @@ public class AnchorListView extends RelativeLayout {
                     roomVideoView.setPlaying(true);
                     if (mListener != null) {
                         mListener.onViewStart(entity.getUserId(), entity.getRoomVideoView().getPlayVideoView(),
-                                entity.isSharingScreen());
+                                entity.isScreenShareAvailable());
                     }
                     roomVideoView.refreshParent();
                 }
@@ -467,7 +467,7 @@ public class AnchorListView extends RelativeLayout {
                 if (roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(false);
                     if (mListener != null) {
-                        mListener.onViewStop(entity.getUserId(), entity.isSharingScreen());
+                        mListener.onViewStop(entity.getUserId(), entity.isScreenShareAvailable());
                     }
                 }
             }
@@ -476,7 +476,7 @@ public class AnchorListView extends RelativeLayout {
                 if (roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(false);
                     if (mListener != null) {
-                        mListener.onViewStop(entity.getUserId(), entity.isSharingScreen());
+                        mListener.onViewStop(entity.getUserId(), entity.isScreenShareAvailable());
                     }
                 }
             }
@@ -665,7 +665,7 @@ public class AnchorListView extends RelativeLayout {
                 mUserSignal.setVisibility(View.GONE);
             }
             mIvMaster.setVisibility(model.getRole() == TUIRoomCoreDef.Role.MASTER ? VISIBLE : GONE);
-            mUserInfoGroup.setVisibility(model.isSharingScreen() ? GONE : VISIBLE);
+            mUserInfoGroup.setVisibility(model.isScreenShareAvailable() ? GONE : VISIBLE);
         }
     }
 
@@ -720,7 +720,7 @@ public class AnchorListView extends RelativeLayout {
                 mUserSignal.setVisibility(View.GONE);
             }
             mIvMaster.setVisibility(model.getRole() == TUIRoomCoreDef.Role.MASTER ? VISIBLE : GONE);
-            mUserInfoGroup.setVisibility(model.isSharingScreen() ? GONE : VISIBLE);
+            mUserInfoGroup.setVisibility(model.isScreenShareAvailable() ? GONE : VISIBLE);
         }
     }
 
