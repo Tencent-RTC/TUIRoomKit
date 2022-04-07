@@ -89,9 +89,9 @@ TUIRoom
 
 ### 体验应用（**体验应用至少需要两台设备**）
 
-<img src="https://qcloudimg.tencent-cloud.cn/raw/13e8da39567148855f38bb9c4542f87e.png" width="600" height="300"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/bf53f125f17bf697080752eebfe91df4.png" width="600" height="300"/>
 
-<img src="https://qcloudimg.tencent-cloud.cn/raw/b1ea46a940b51ed51a5ef8ba350f9a34.png" width="600" height="340"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/1d3a03bed647d33bf1ea91f8333da921.png" width="600" height="340"/>
 
 #### 用户 A
 - 步骤一：登录输入用户名与房间号，点击进入房间按钮。(用户名请保证唯一性，例如：user_A，房间号为数字组合，最多不超过9位，例如：123456)
