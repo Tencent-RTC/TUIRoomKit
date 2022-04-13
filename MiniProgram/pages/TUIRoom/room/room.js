@@ -29,7 +29,7 @@ Page({
     userList: {},
     roomDestroy: false,
     kickOff: false,
-    isFullScreen: false,
+    isFullScreen: {},
   },
   onLoad(options) {
     const { roomId, enableMic, enableCamera } = options;
@@ -38,12 +38,12 @@ Page({
     this.bindTRTCEvent();
     this.bindCoordinaEvent();
     const pusher = wx.$TUIRoomCore.enterTRTCRoom(
-      roomId,
-      {
-        enableMic: enableMic === 'true' && !this.data.roomInfo.roomConfig.isAllMicrophoneMuted,
-        enableCamera: enableCamera === 'true' && !this.data.roomInfo.roomConfig.isAllCameraMuted,
-      },
-      this,
+        roomId,
+        {
+          enableMic: enableMic === 'true' && !this.data.roomInfo.roomConfig.isAllMicrophoneMuted,
+          enableCamera: enableCamera === 'true' && !this.data.roomInfo.roomConfig.isAllCameraMuted,
+        },
+        this,
     );
     this.data.listMap[pusher.userID] = pusher;
     this.setData({
@@ -227,13 +227,13 @@ Page({
     });
   },
   requestFullScreen(e) {
-    if (this.data.isFullScreen) return;
-    console.log(e);
     const { id, streamid: streamID, mutevideo: muteVideo } = e.currentTarget.dataset;
+    if (this.data.isFullScreen[id]) return;
     if (muteVideo) return;
     wx.createLivePlayerContext(id, this).requestFullScreen({
       success: () => {
-        this.setData({ isFullScreen: true });
+        this.data.isFullScreen[id] = true;
+        this.setData({ isFullScreen: this.data.isFullScreen });
         this.setPlayerAttributesHandler({ streamID }, { objectFit: 'contain', orientation: 'horizontal' });
       },
     });
@@ -242,7 +242,7 @@ Page({
     const { id, streamid: streamID } = e.currentTarget.dataset;
     wx.createLivePlayerContext(id, this).exitFullScreen({
       success: () => {
-        this.setData({ isFullScreen: false });
+        this.setData({ isFullScreen: {} });
         this.setPlayerAttributesHandler({ streamID }, { objectFit: 'fillCrop', orientation: 'vertical' });
       },
     });
@@ -397,7 +397,9 @@ Page({
     wx.$TUIRoomCore.playerEventHandler(event);
   },
   _playerFullscreenChange(event) {
-    this.setData({ isFullScreen: event.detail.fullScreen }); // 防止通过系统返回退出全屏导致按钮状态未变更
+    const { detail, target } = event;
+    this.data.isFullScreen[target.id] = detail.fullScreen;
+    this.setData({ isFullScreen: this.data.isFullScreen }); // 防止通过系统返回退出全屏导致按钮状态未变更
     wx.$TUIRoomCore.playerFullscreenChange(event);
   },
   _playerNetStatus(event) {
