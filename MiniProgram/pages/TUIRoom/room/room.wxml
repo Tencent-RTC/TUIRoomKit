@@ -3,86 +3,86 @@
         <view class="nav-bar" slot="title">
             {{roomInfo.roomID}}
             <van-icon class="copy" name="https://qcloudimg.tencent-cloud.cn/raw/5b2d912756874df8d391795fcc7460cd.png"
-                size='24' bind:click="copyRoomId" />
+                      size='24' bind:click="copyRoomId" />
         </view>
         <view class="nav-bar" slot="left">
             <van-icon name="arrow-left" size='24' bind:click="back" />
             <van-icon class="switch-camera"
-                name="https://qcloudimg.tencent-cloud.cn/raw/3d0345bd5424d693a288a5fa2c0716ef/switch_camera.svg"
-                size='50rpx' wx:if="{{list[0].enableCamera}}" bind:click="switchCamera" />
+                      name="https://qcloudimg.tencent-cloud.cn/raw/3d0345bd5424d693a288a5fa2c0716ef/switch_camera.svg"
+                      size='50rpx' wx:if="{{list[0].enableCamera}}" bind:click="switchCamera" />
         </view>
     </van-nav-bar>
     <swiper indicator-dots="{{list.length/4 > 1}}" class="swiper" indicator-color='rgba(255, 255, 255, .3)'
-        indicator-active-color='#fff'>
+            indicator-active-color='#fff'>
         <block wx:for="{{(list.length)/4}}" wx:key="*this" wx:for-index="pos">
             <swiper-item>
                 <van-grid column-num="{{list.length > 2 ? 2 : 1}}" border="{{ false }}" gutter="{{ 0 }}"
-                    custom-class='grid-container'>
+                          custom-class='grid-container'>
                     <van-grid-item content-class='grid-content'
-                        custom-class="grid-item {{list.length===1 ? 'one-player' : ''}} {{item.fullScreen ? 'full-screen' : ''}}"
-                        use-slot wx:for="{{ list }}" wx:key="streamID" wx:if="{{index >= pos*4 && index < pos*4+4}}">
+                                   custom-class="grid-item {{list.length===1 ? 'one-player' : ''}} {{item.fullScreen ? 'full-screen' : ''}}"
+                                   use-slot wx:for="{{ list }}" wx:key="streamID" wx:if="{{index >= pos*4 && index < pos*4+4}}">
                         <view class="player-container" bindtap="requestFullScreen" data-id="{{item.id}}" data-streamID="{{item.streamID}}" data-muteVideo="{{item.muteVideo}}">
                             <live-pusher wx:if="{{index === 0}}" class="player" url="{{item.url}}" mode="{{item.mode}}"
-                                autopush="{{item.autopush}}" enable-camera="{{item.enableCamera}}"
-                                enable-mic="{{item.enableMic}}" muted="{{!item.enableMic}}"
-                                enable-agc="{{item.enableAgc}}" enable-ans="{{item.enableAns}}"
-                                enable-ear-monitor="{{item.enableEarMonitor}}" auto-focus="{{item.enableAutoFocus}}"
-                                zoom="{{item.enableZoom}}" min-bitrate="{{item.minBitrate}}"
-                                max-bitrate="{{item.maxBitrate}}" video-width="{{item.videoWidth}}"
-                                video-height="{{item.videoHeight}}" beauty="{{item.beautyLevel}}"
-                                whiteness="{{item.whitenessLevel}}" orientation="{{item.videoOrientation}}"
-                                aspect="{{item.videoAspect}}" device-position="{{item.frontCamera}}"
-                                remote-mirror="{{item.enableRemoteMirror}}" local-mirror="{{item.localMirror}}"
-                                background-mute="{{item.enableBackgroundMute}}" audio-quality="{{item.audioQuality}}"
-                                audio-volume-type="{{item.audioVolumeType}}"
-                                audio-reverb-type="{{item.audioReverbType}}" waiting-image="{{item.waitingImage}}"
-                                beauty-style="{{item.beautyStyle}}" filter="{{item.filter}}"
-                                bindstatechange="_pusherStateChangeHandler" bindnetstatus="_pusherNetStatusHandler"
-                                binderror="_pusherErrorHandler" bindbgmstart="_pusherBGMStartHandler"
-                                bindbgmprogress="_pusherBGMProgressHandler" bindbgmcomplete="_pusherBGMCompleteHandler"
-                                bindaudiovolumenotify="_pusherAudioVolumeNotify">
+                                         autopush="{{item.autopush}}" enable-camera="{{item.enableCamera}}"
+                                         enable-mic="{{item.enableMic}}" muted="{{!item.enableMic}}"
+                                         enable-agc="{{item.enableAgc}}" enable-ans="{{item.enableAns}}"
+                                         enable-ear-monitor="{{item.enableEarMonitor}}" auto-focus="{{item.enableAutoFocus}}"
+                                         zoom="{{item.enableZoom}}" min-bitrate="{{item.minBitrate}}"
+                                         max-bitrate="{{item.maxBitrate}}" video-width="{{item.videoWidth}}"
+                                         video-height="{{item.videoHeight}}" beauty="{{item.beautyLevel}}"
+                                         whiteness="{{item.whitenessLevel}}" orientation="{{item.videoOrientation}}"
+                                         aspect="{{item.videoAspect}}" device-position="{{item.frontCamera}}"
+                                         remote-mirror="{{item.enableRemoteMirror}}" local-mirror="{{item.localMirror}}"
+                                         background-mute="{{item.enableBackgroundMute}}" audio-quality="{{item.audioQuality}}"
+                                         audio-volume-type="{{item.audioVolumeType}}"
+                                         audio-reverb-type="{{item.audioReverbType}}" waiting-image="{{item.waitingImage}}"
+                                         beauty-style="{{item.beautyStyle}}" filter="{{item.filter}}"
+                                         bindstatechange="_pusherStateChangeHandler" bindnetstatus="_pusherNetStatusHandler"
+                                         binderror="_pusherErrorHandler" bindbgmstart="_pusherBGMStartHandler"
+                                         bindbgmprogress="_pusherBGMProgressHandler" bindbgmcomplete="_pusherBGMCompleteHandler"
+                                         bindaudiovolumenotify="_pusherAudioVolumeNotify">
                             </live-pusher>
 
                             <live-player wx:elif="{{item.muteVideo === false || item.muteAudio === false}}" class="player" id="{{item.id}}" data-userid="{{item.userID}}"
-                                data-streamid="{{item.streamID}}" data-streamtype="{{item.streamType}}"
-                                src="{{item.src}}" mode="{{item.mode}}" autoplay="{{item.autoplay}}"
-                                mute-audio="{{item.muteAudio}}" mute-video="{{item.muteVideo}}"
-                                orientation="{{item.orientation}}" object-fit="{{item.objectFit}}"
-                                background-mute="{{item.enableBackgroundMute}}" min-cache="{{item.minCache}}"
-                                max-cache="{{item.maxCache}}" sound-mode="{{item.soundMode}}"
-                                enable-recv-message="{{item.enableRecvMessage}}"
-                                auto-pause-if-navigate="{{item.autoPauseIfNavigate}}"
-                                auto-pause-if-open-native="{{item.autoPauseIfOpenNative}}" debug="{{debug}}"
-                                bindstatechange="_playerStateChange" bindfullscreenchange="_playerFullscreenChange"
-                                bindnetstatus="_playerNetStatus" bindaudiovolumenotify="_playerAudioVolumeNotify">
-                                <cover-view wx:if="{{isFullScreen}}" class="switch-fullscreen" style="flex-direction:row;">
+                                         data-streamid="{{item.streamID}}" data-streamtype="{{item.streamType}}"
+                                         src="{{item.src}}" mode="{{item.mode}}" autoplay="{{item.autoplay}}"
+                                         mute-audio="{{item.muteAudio}}" mute-video="{{item.muteVideo}}"
+                                         orientation="{{item.orientation}}" object-fit="{{item.objectFit}}"
+                                         background-mute="{{item.enableBackgroundMute}}" min-cache="{{item.minCache}}"
+                                         max-cache="{{item.maxCache}}" sound-mode="{{item.soundMode}}"
+                                         enable-recv-message="{{item.enableRecvMessage}}"
+                                         auto-pause-if-navigate="{{item.autoPauseIfNavigate}}"
+                                         auto-pause-if-open-native="{{item.autoPauseIfOpenNative}}" debug="{{debug}}"
+                                         bindstatechange="_playerStateChange" bindfullscreenchange="_playerFullscreenChange"
+                                         bindnetstatus="_playerNetStatus" bindaudiovolumenotify="_playerAudioVolumeNotify">
+                                <cover-view wx:if="{{isFullScreen[item.id]}}" class="switch-fullscreen" style="flex-direction:row;">
                                     <cover-image class="button-image" data-id="{{item.id}}" data-streamID="{{item.streamID}}" bindtap="exitFullScreen" src="../../../assets/images/shrink.png"></cover-image>
                                 </cover-view>
                             </live-player>
                             <view class="no-video" wx:if="{{(!item.enableCamera&&index===0) || item.muteVideo}}">
                                 <image class="image"
-                                    src="{{userList[item.userID].avatar || 'https://web.sdk.qcloud.com/component/miniApp/resources/default_avatar.png'}}">
+                                       src="{{userList[item.userID].avatar || 'https://web.sdk.qcloud.com/component/miniApp/resources/default_avatar.png'}}">
                                 </image>
                             </view>
                             <view class="player-control">
                                 <image wx:if="{{item.userID === roomInfo.ownerID}}"
-                                    src="https://qcloudimg.tencent-cloud.cn/raw/6e774711fa1ed485709485f6b3759711.png">
+                                       src="https://qcloudimg.tencent-cloud.cn/raw/6e774711fa1ed485709485f6b3759711.png">
                                 </image>
                                 <view class="name">{{userList[item.userID].nick || item.userID}}{{index===0?'（我）':''}}
                                 </view>
                                 <view class="no-audio audio-volume"
-                                    wx:if="{{(!item.enableMic&&index===0) || item.muteAudio }}">
+                                      wx:if="{{(!item.enableMic&&index===0) || item.muteAudio }}">
                                     <image class="image"
-                                        src="https://qcloudimg.tencent-cloud.cn/raw/705b30caa359c78edbcf543974c046fd.png">
+                                           src="https://qcloudimg.tencent-cloud.cn/raw/705b30caa359c78edbcf543974c046fd.png">
                                     </image>
                                 </view>
                                 <view class="audio-volume" wx:else>
                                     <image class="image"
-                                        src="https://qcloudimg.tencent-cloud.cn/raw/4ae18ec17c3bd19398d85c492623a1f2.png">
+                                           src="https://qcloudimg.tencent-cloud.cn/raw/4ae18ec17c3bd19398d85c492623a1f2.png">
                                     </image>
                                     <view class="audio-active" style="height:{{item.volume}}%">
                                         <image class="image"
-                                            src="https://qcloudimg.tencent-cloud.cn/raw/803c2a2b24deaad2d94819e9010f11c5.png">
+                                               src="https://qcloudimg.tencent-cloud.cn/raw/803c2a2b24deaad2d94819e9010f11c5.png">
                                         </image>
                                     </view>
                                 </view>
@@ -95,30 +95,30 @@
     </swiper>
     <van-grid column-num="4" border="{{ false }}" gutter="{{ 0 }}" custom-class='button-group'>
         <van-grid-item use-slot content-class='button-group-content' custom-class='button-group-item'
-            bind:click="enableMicChange">
+                       bind:click="enableMicChange">
             <image style="width: 50px; height: 50px;" wx:if="{{currentUser.isMicrophoneMuted}}"
-                src="../../../assets/images/mic-mute.png" />
+                   src="../../../assets/images/mic-mute.png" />
             <image style="width: 50px; height: 50px;" wx:elif="{{list[0].enableMic}}"
-                src="../../../assets/images/mic-on.png" />
+                   src="../../../assets/images/mic-on.png" />
             <image style="width: 50px; height: 50px;" wx:else src="../../../assets/images/mic-off.png" />
         </van-grid-item>
         <van-grid-item use-slot content-class='button-group-content' custom-class='button-group-item'
-            bind:click="enableCameraChange">
+                       bind:click="enableCameraChange">
             <image style="width: 50px; height: 50px;" wx:if="{{currentUser.isCameraMuted}}"
-                src="../../../assets/images/camera-mute.png" />
+                   src="../../../assets/images/camera-mute.png" />
             <image style="width: 50px; height: 50px;" wx:elif="{{list[0].enableCamera}}"
-                src="../../../assets/images/camera-on.png" />
+                   src="../../../assets/images/camera-on.png" />
             <image style="width: 50px; height: 50px;" wx:else src="../../../assets/images/camera-off.png" />
         </van-grid-item>
         <van-grid-item use-slot content-class='button-group-content' custom-class='button-group-item'
-            bind:click="beautyPanelShow">
+                       bind:click="beautyPanelShow">
             <image style="width: 50px; height: 50px;"
-                src="https://qcloudimg.tencent-cloud.cn/raw/72830523b64c626e5feddb2c20ec6e04/filter@3x.png" />
+                   src="https://qcloudimg.tencent-cloud.cn/raw/72830523b64c626e5feddb2c20ec6e04/filter@3x.png" />
         </van-grid-item>
         <van-grid-item use-slot content-class='button-group-content' custom-class='button-group-item'
-            bind:click="userListPanelShow">
+                       bind:click="userListPanelShow">
             <image style="width: 50px; height: 50px;"
-                src="https://qcloudimg.tencent-cloud.cn/raw/686f81a6c21e0fb1894f080e66153ae3/user-list@3x.png" />
+                   src="https://qcloudimg.tencent-cloud.cn/raw/686f81a6c21e0fb1894f080e66153ae3/user-list@3x.png" />
         </van-grid-item>
         <!-- 更多设置（暂定不开发） -->
         <!-- <van-grid-item use-slot content-class='button-group-content' custom-class='button-group-item'>
@@ -127,7 +127,7 @@
         </van-grid-item> -->
     </van-grid>
     <van-popup show="{{ userListShow }}" round position="bottom"
-        custom-style="z-index:999;max-height: 80%;padding: 20rpx" bind:close="userListPanelClose">
+               custom-style="z-index:999;max-height: 80%;padding: 20rpx" bind:close="userListPanelClose">
         <van-nav-bar title="成员列表" custom-style="padding-top: 0;">
             <van-icon name="cross" size='20' bind:click="userListPanelClose" slot="left" />
         </van-nav-bar>
@@ -136,54 +136,54 @@
                 <van-col span="14">
                     <van-col custom-class='avatar-col'>
                         <image class="avatar-image"
-                            src="{{item.avatar || 'https://web.sdk.qcloud.com/component/miniApp/resources/default_avatar.png'}}"
-                            mode="aspectFit"></image>
+                               src="{{item.avatar || 'https://web.sdk.qcloud.com/component/miniApp/resources/default_avatar.png'}}"
+                               mode="aspectFit"></image>
                     </van-col>
                     <van-col custom-class="user-name">{{item.nick || item.ID}}{{item.ID === currentUser.ID?'（我）':''}}</van-col>
                 </van-col>
                 <van-col span="10" custom-class="handle-button" wx:if="{{item.ID!==currentUser.ID}}">
                     <image wx:if="{{userList[item.ID].isMicrophoneMuted}}"
-                        src="../../../assets/images/userlist-mic-mute.png" mode="aspectFit" data-mute="{{false}}"
-                        data-userid="{{item.ID}}" bindtap="muteUserMicrophone">
+                           src="../../../assets/images/userlist-mic-mute.png" mode="aspectFit" data-mute="{{false}}"
+                           data-userid="{{item.ID}}" bindtap="muteUserMicrophone">
                     </image>
                     <image wx:elif="{{listMap[item.ID] && listMap[item.ID].hasAudio}}"
-                        src="../../../assets/images/userlist-mic-on.png" mode="aspectFit" data-mute="{{true}}"
-                        data-userid="{{item.ID}}" bindtap="muteUserMicrophone">
+                           src="../../../assets/images/userlist-mic-on.png" mode="aspectFit" data-mute="{{true}}"
+                           data-userid="{{item.ID}}" bindtap="muteUserMicrophone">
                     </image>
                     <image wx:else src="../../../assets/images/mic-off.png" mode="aspectFit" class="bg"
-                        data-mute="{{true}}" data-userid="{{item.ID}}" bindtap="muteUserMicrophone">
+                           data-mute="{{true}}" data-userid="{{item.ID}}" bindtap="muteUserMicrophone">
                     </image>
                     <image wx:if="{{userList[item.ID].isCameraMuted}}"
-                        src="../../../assets/images/userlist-camera-mute.png" mode="aspectFit" data-mute="{{false}}"
-                        data-userid="{{item.ID}}" bindtap="muteUserCamera">
+                           src="../../../assets/images/userlist-camera-mute.png" mode="aspectFit" data-mute="{{false}}"
+                           data-userid="{{item.ID}}" bindtap="muteUserCamera">
                     </image>
                     <image wx:elif="{{listMap[item.ID] && listMap[item.ID].hasVideo}}"
-                        src="../../../assets/images/userlist-camera-on.png" mode="aspectFit" data-mute="{{true}}"
-                        data-userid="{{item.ID}}" bindtap="muteUserCamera">
+                           src="../../../assets/images/userlist-camera-on.png" mode="aspectFit" data-mute="{{true}}"
+                           data-userid="{{item.ID}}" bindtap="muteUserCamera">
                     </image>
                     <image wx:else src="../../../assets/images/camera-off.png" mode="aspectFit" class="bg"
-                        data-mute="{{true}}" data-userid="{{item.ID}}" bindtap="muteUserCamera">
+                           data-mute="{{true}}" data-userid="{{item.ID}}" bindtap="muteUserCamera">
                     </image>
                     <image wx:if="{{currentUser.ID === roomInfo.ownerID}}"
-                        src="../../../assets/images/userlist-kickoff.png" mode="aspectFit" data-userid="{{item.ID}}"
-                        bindtap="kickOffUser"></image>
+                           src="../../../assets/images/userlist-kickoff.png" mode="aspectFit" data-userid="{{item.ID}}"
+                           bindtap="kickOffUser"></image>
                 </van-col>
             </van-row>
         </block>
         <view class="all-control" wx:if="{{currentUser.ID === roomInfo.ownerID}}">
             <view class="buttons green" wx:if="{{!roomInfo.roomConfig.isAllMicrophoneMuted}}" data-mute="{{true}}"
-                bindtap="muteAllUsersMicrophone">全体静音
+                  bindtap="muteAllUsersMicrophone">全体静音
             </view>
             <view class="buttons green-remove" wx:else data-mute="{{false}}" bindtap="muteAllUsersMicrophone">解除全体静音
             </view>
             <view class="buttons blue" wx:if="{{!roomInfo.roomConfig.isAllCameraMuted}}" data-mute="{{true}}"
-                bindtap="muteAllUsersCamera">全体禁画</view>
+                  bindtap="muteAllUsersCamera">全体禁画</view>
             <view class="buttons green-remove" wx:else data-mute="{{false}}" bindtap="muteAllUsersCamera">解除全体禁画</view>
         </view>
     </van-popup>
 
     <van-popup show="{{ beautyPanel }}" round position="bottom"
-        custom-style="z-index:999;max-height: 80%;padding: 20rpx 20rpx 30rpx" bind:close="beautyPanelClose">
+               custom-style="z-index:999;max-height: 80%;padding: 20rpx 20rpx 30rpx" bind:close="beautyPanelClose">
         <van-nav-bar title="美颜设置" custom-style="padding-top: 0;">
             <van-icon name="cross" size='20' bind:click="beautyPanelClose" slot="left" />
         </van-nav-bar>
@@ -191,14 +191,14 @@
             <van-col span="3">美颜</van-col>
             <van-col span="21" custom-class='beauty-container'>
                 <slider class="beauty-slider" activeColor="#006EFF" value="{{beautyLevel}}"
-                    bindchange="onBeautyLevelDrag" max="9" show-value />
+                        bindchange="onBeautyLevelDrag" max="9" show-value />
             </van-col>
         </van-row>
         <van-row custom-class="beauty-item">
             <van-col span="3">美白</van-col>
             <van-col span="21" custom-class='beauty-container'>
                 <slider class="beauty-slider" activeColor="#006EFF" value="{{whitenessLevel}}"
-                    bindchange="onWhitenessLevelDrag" max="9" show-value />
+                        bindchange="onWhitenessLevelDrag" max="9" show-value />
             </van-col>
         </van-row>
         <van-row custom-class="beauty-item">
@@ -226,7 +226,7 @@
                 <scroll-view class="filter-scroll" scroll-x="true" enhanced="true" show-scrollbar="{{false}}">
                     <block wx:for="{{filterList}}" wx:key="index">
                         <view class="filter-item {{item.selected ? 'selected' : ''}}" data-value="{{item.value}}"
-                            data-index="{{index}}" bindtap="filterSelect">
+                              data-index="{{index}}" bindtap="filterSelect">
                             <image class="filter-image" src="{{item.imageUrl}}" mode="aspectFit"></image>
                             <view class="filter-des">{{item.des}}</view>
                         </view>
