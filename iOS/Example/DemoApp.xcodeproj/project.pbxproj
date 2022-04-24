@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		5299BA6C01D2DF74B1BA845A /* Pods_DemoApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4CD7F588EA29064C4C9474A /* Pods_DemoApp.framework */; };
 		C11C13AE27858B4B001D39CB /* AppMainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11C13AD27858B4B001D39CB /* AppMainViewController.swift */; };
-		C13127C5279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C13127C4279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		C18CE615279005D10071C120 /* ReplayKitLocalized.m in Sources */ = {isa = PBXBuildFile; fileRef = C18CE607279005D10071C120 /* ReplayKitLocalized.m */; };
 		C18CE616279005D10071C120 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE608279005D10071C120 /* InfoPlist.strings */; };
 		C18CE617279005D10071C120 /* ReplayKitLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE60A279005D10071C120 /* ReplayKitLocalized.strings */; };
@@ -44,6 +43,7 @@
 		C685C0F626A67931007A7A6F /* DemoLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = C685C0EE26A67931007A7A6F /* DemoLocalized.strings */; };
 		C685C0F726A67931007A7A6F /* DemoLocalized.swift in Sources */ = {isa = PBXBuildFile; fileRef = C685C0F126A67931007A7A6F /* DemoLocalized.swift */; };
 		C685C0F826A67931007A7A6F /* KaraokeAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C685C0F326A67931007A7A6F /* KaraokeAssets.xcassets */; };
+		ED77028F86C7FC2A08F2EF9D /* Pods_TXReplayKit_Screen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88907227B0B9560C8EF3D06 /* Pods_TXReplayKit_Screen.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,10 +81,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		36E4EB26BA02B1AA9E0C80DC /* Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig"; path = "Target Support Files/Pods-DemoApp-TXReplayKit_Screen/Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig"; sourceTree = "<group>"; };
+		5086082BB3ED002B1AD4FCBD /* Pods-TXReplayKit_Screen.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TXReplayKit_Screen.debug.xcconfig"; path = "Target Support Files/Pods-TXReplayKit_Screen/Pods-TXReplayKit_Screen.debug.xcconfig"; sourceTree = "<group>"; };
+		634E61B149DF21D1AF6B1A61 /* Pods-DemoApp-TXReplayKit_Screen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp-TXReplayKit_Screen.release.xcconfig"; path = "Target Support Files/Pods-DemoApp-TXReplayKit_Screen/Pods-DemoApp-TXReplayKit_Screen.release.xcconfig"; sourceTree = "<group>"; };
+		63F1C48EB2BD2368C88496FC /* Pods-TXReplayKit_Screen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TXReplayKit_Screen.release.xcconfig"; path = "Target Support Files/Pods-TXReplayKit_Screen/Pods-TXReplayKit_Screen.release.xcconfig"; sourceTree = "<group>"; };
 		9A118A5B5DE110B8217C48CB /* Pods-DemoApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp.release.xcconfig"; path = "Target Support Files/Pods-DemoApp/Pods-DemoApp.release.xcconfig"; sourceTree = "<group>"; };
 		9CA7D17F6CB864C86F7B41C8 /* Pods-DemoApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp.debug.xcconfig"; path = "Target Support Files/Pods-DemoApp/Pods-DemoApp.debug.xcconfig"; sourceTree = "<group>"; };
+		A88907227B0B9560C8EF3D06 /* Pods_TXReplayKit_Screen.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TXReplayKit_Screen.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C11C13AD27858B4B001D39CB /* AppMainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppMainViewController.swift; sourceTree = "<group>"; };
-		C13127C4279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TXLiteAVSDK_ReplayKitExt.framework; sourceTree = "<group>"; };
 		C18CE607279005D10071C120 /* ReplayKitLocalized.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplayKitLocalized.m; sourceTree = "<group>"; };
 		C18CE609279005D10071C120 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		C18CE60B279005D10071C120 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ReplayKitLocalized.strings"; sourceTree = "<group>"; };
@@ -142,7 +146,7 @@
 				C1F2C776278FD65300216EB8 /* libc++.tbd in Frameworks */,
 				C1E771D227F4058700A3E80C /* VideoToolbox.framework in Frameworks */,
 				C1F2C762278FD4E000216EB8 /* ReplayKit.framework in Frameworks */,
-				C13127C5279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */,
+				ED77028F86C7FC2A08F2EF9D /* Pods_TXReplayKit_Screen.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -162,17 +166,12 @@
 			children = (
 				9CA7D17F6CB864C86F7B41C8 /* Pods-DemoApp.debug.xcconfig */,
 				9A118A5B5DE110B8217C48CB /* Pods-DemoApp.release.xcconfig */,
+				36E4EB26BA02B1AA9E0C80DC /* Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig */,
+				634E61B149DF21D1AF6B1A61 /* Pods-DemoApp-TXReplayKit_Screen.release.xcconfig */,
+				5086082BB3ED002B1AD4FCBD /* Pods-TXReplayKit_Screen.debug.xcconfig */,
+				63F1C48EB2BD2368C88496FC /* Pods-TXReplayKit_Screen.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		C13127C3279E9E9200B50DCB /* SDK */ = {
-			isa = PBXGroup;
-			children = (
-				C13127C4279E9EEE00B50DCB /* TXLiteAVSDK_ReplayKitExt.framework */,
-			);
-			name = SDK;
-			path = ../SDK;
 			sourceTree = "<group>";
 		};
 		C18CE606279005D10071C120 /* Localized */ = {
@@ -224,7 +223,6 @@
 		C65978FC268078E100CCAA4C = {
 			isa = PBXGroup;
 			children = (
-				C13127C3279E9E9200B50DCB /* SDK */,
 				C659794D268079CD00CCAA4C /* Debug */,
 				C6597933268079C500CCAA4C /* App */,
 				C1F2C763278FD4E000216EB8 /* TXReplayKit_Screen */,
@@ -325,6 +323,7 @@
 				C1F2C775278FD65300216EB8 /* libc++.tbd */,
 				E4CD7F588EA29064C4C9474A /* Pods_DemoApp.framework */,
 				C1F2C761278FD4E000216EB8 /* ReplayKit.framework */,
+				A88907227B0B9560C8EF3D06 /* Pods_TXReplayKit_Screen.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -336,6 +335,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C1F2C76E278FD4E000216EB8 /* Build configuration list for PBXNativeTarget "TXReplayKit_Screen" */;
 			buildPhases = (
+				F618C3A8F33AADEAE87B2C12 /* [CP] Check Pods Manifest.lock */,
 				C1F2C75C278FD4E000216EB8 /* Sources */,
 				C1F2C75D278FD4E000216EB8 /* Frameworks */,
 				C1F2C75E278FD4E000216EB8 /* Resources */,
@@ -498,6 +498,28 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		F618C3A8F33AADEAE87B2C12 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-TXReplayKit_Screen-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -624,6 +646,7 @@
 /* Begin XCBuildConfiguration section */
 		C1F2C76C278FD4E000216EB8 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5086082BB3ED002B1AD4FCBD /* Pods-TXReplayKit_Screen.debug.xcconfig */;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -657,6 +680,7 @@
 		};
 		C1F2C76D278FD4E000216EB8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 63F1C48EB2BD2368C88496FC /* Pods-TXReplayKit_Screen.release.xcconfig */;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_IDENTITY = "iPhone Developer";

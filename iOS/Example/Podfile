@@ -12,7 +12,7 @@ end
 # 工具库
 def tool
   pod 'Alamofire'
-  pod 'TXLiteAVSDK_TRTC'
+  pod 'TXLiteAVSDK_TRTC', '9.6.11411'
 end
 
 # 本地依赖库
@@ -35,6 +35,11 @@ target 'DemoApp' do
   tool
   local
   pod_local('TRTC')
+
+  target 'TXReplayKit_Screen' do
+    inherit! :search_paths
+    pod 'TXLiteAVSDK_TRTC/ReplayKitExt', '9.6.11411'
+  end
 end
 
 post_install do |installer|
