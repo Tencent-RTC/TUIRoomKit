@@ -190,6 +190,7 @@ void IMCore::EnterRoom(const std::string& room_id, const std::string& user_id){
     if (join_group_callback != nullptr) {
         V2TIMManager::GetInstance()->JoinGroup(groupID, "JoinGroup", join_group_callback);
     }
+    member_list_request_done_ = true;
 }
 void IMCore::LeaveRoom(const std::string& room_id){
     V2TIMString groupID = room_id.c_str();
@@ -299,8 +300,8 @@ void IMCore::OnIMInterfaceCallback(CallBackType type, int code, const std::strin
     if (notification.find("speechMode") != std::string::npos) {
         std::string speechMode;
         IMParser::ParserNotificationToSpeechMode(result[0].info.notification.CString(), speechMode);
-          TUISpeechMode speech_mode = (speechMode == "FreeSpeech" ? TUISpeechMode::kFreeSpeech : TUISpeechMode::kApplySpeech);
-          room_info.mode = speech_mode;
+        TUISpeechMode speech_mode = (speechMode == "FreeSpeech" ? TUISpeechMode::kFreeSpeech : TUISpeechMode::kApplySpeech);
+        room_info.mode = speech_mode;
     }
     if (notification.find("isCallingRoll") != std::string::npos) {
         room_info.is_callingroll = IMParser::ParserNotificationToIsCallingRoll(result[0].info.notification.CString());

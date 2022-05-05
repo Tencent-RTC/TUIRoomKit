@@ -169,6 +169,9 @@
     <ClCompile Include="..\Common\MessageDispatcher\MessageDispatcher.cpp">
       <Filter>App\MessageDispatcher</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\DataReport.cpp">
+      <Filter>App\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="App\MainWindow.h">
@@ -251,6 +254,9 @@
     </QtMoc>
     <QtMoc Include="..\Common\MessageDispatcher\MessageDispatcher.h">
       <Filter>App\MessageDispatcher</Filter>
+    </QtMoc>
+    <QtMoc Include="..\Common\DataReport.h">
+      <Filter>App\Common</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

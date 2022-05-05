@@ -98,9 +98,6 @@ LIBS += -framework Security
 LIBS += -framework SystemConfiguration
 LIBS += -framework JavaScriptCore
 
-LIBS += "-F$$PWD/3rdParty/BugReport/Mac"
-LIBS += -framework BuglyOAMac
-INCLUDEPATH += $$PWD/3rdParty/BugReport/Mac/BuglyOAMac.framework/Headers
 
 # 添加TXLiteAVSDK_TRTC_Mac.framework头文件
 INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXLiteAVSDK_TRTC_Mac.framework/Headers/cpp_interface
@@ -108,6 +105,7 @@ INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXLiteAVSDK_TRTC_Mac.framewo
 
 # 添加ImSDKForMac.framework头文件
 INCLUDEPATH += $$PWD/../SDK/ImSDK/Mac/ImSDKForMac_CPP.framework/Headers
+QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../
 
 macx: LIBS += -L$$PWD/../utils/usersig/mac -lTXLiteAVTestUserSig
 macx: PRE_TARGETDEPS += $$PWD/../utils/usersig/mac/libTXLiteAVTestUserSig.a

@@ -2,6 +2,7 @@
 #include "MessageDispatcher/MessageDispatcher.h"
 #include "StatusUpdateCenter.h"
 #include "DataStore.h"
+#include "DataReport.h"
 
 MainWindowLayout::MainWindowLayout(QMainWindow* main_window)
     : main_window_(main_window)
@@ -110,6 +111,7 @@ void MainWindowLayout::SlotShowSetting(int index) {
         setting_->SetCurrentPage(index);
         setting_->show();
         setting_->raise();
+        DataReport::Instance()->OperateReport(ReportType::kOpenSetting);
     }
 }
 
@@ -430,6 +432,7 @@ void MainWindowLayout::SlotShowChatRoom(bool show) {
             share_menu_bar_->SetChatRoomBtnStatus(show);
         } else {
             main_window_ui_->chat_widget->show();
+            DataReport::Instance()->OperateReport(ReportType::kOpenChatRoom);
             QDesktopWidget* desktop = QApplication::desktop();
             bool size_beyond_border = main_window_->width() + main_window_ui_->chat_widget->width() > desktop->screenGeometry(main_window_).width();
             need_resize = !(main_window_->isMaximized() || size_beyond_border);
@@ -506,4 +509,15 @@ void MainWindowLayout::ShowTransferRoomWindow() {
     }
     transfer_room_window_->show();
     transfer_room_window_->raise();
+}
+
+void MainWindowLayout::TransferRoomToOther() {
+    auto member_list = TUIRoomCore::GetInstance()->GetRoomUsers();
+    for (int i = 0; i < member_list.size(); i++) {
+        auto member = member_list.at(i);
+        if (member.role == TUIRole::kAnchor) {
+            TUIRoomCore::GetInstance()->TransferRoomMaster(member.user_id);
+            return;
+        }
+    }
 }

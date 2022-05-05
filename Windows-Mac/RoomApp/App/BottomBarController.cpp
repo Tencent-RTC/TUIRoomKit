@@ -6,6 +6,7 @@
 #include <QStyleOption>
 #include "TUIRoomCore.h"
 #include "DataStore.h"
+#include "DataReport.h"
 #include "StatusUpdateCenter.h"
 #include "MessageDispatcher/MessageDispatcher.h"
 #include "log.h"
@@ -554,6 +555,7 @@ void BottomBarController::OnConfirmShareScreen(bool share) {
     if (!is_sharing_screen_) {
         LINFO("start StartScreenCapture...");
         TUIRoomCore::GetInstance()->GetScreenShareManager()->StartScreenCapture(nullptr);
+        DataReport::Instance()->OperateReport(ReportType::kStartScreenSharing);
         auto local_user = DataStore::Instance()->GetCurrentUserInfo().user_id;
         DataStore::Instance()->AddScreenShareUser(local_user);
         DataStore::Instance()->SetCurrentMainWindowUser(local_user);

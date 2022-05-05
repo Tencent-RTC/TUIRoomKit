@@ -44,7 +44,7 @@ QSize ChatMessageView::GetFontSize(QString message) {
     // 用户名位置
     QSize user_name_size = GetUserNameString(user_name_);
     user_name_left_rect_ = QRect(icon_space_width, text_space_height, user_name_size.width() + text_space_width, user_name_size.height());
-    user_name_right_rect_ = QRect(this->width() - icon_space_width - user_name_size.width(), text_space_height, user_name_size.width() + text_space_width, user_name_size.height());
+    user_name_right_rect_ = QRect(this->width() - icon_space_width - user_name_size.width() - text_space_width, text_space_height, user_name_size.width() + text_space_width, user_name_size.height());
 
     QSize size = GetMessageString(message_); // 整个的size
 
