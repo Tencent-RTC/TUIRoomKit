@@ -573,12 +573,18 @@ void StageListController::SlotOnRemoteUserLeaveRoom(const QString& user_id) {
 }
 
 void StageListController::SlotOnRemoteUserVideoOpen(const QString& user_id, bool available) {
+    LINFO("SlotOnRemoteUserVideoOpen, user_id：%s, available : %d", user_id.toStdString().c_str(), available);
     auto user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id.toStdString());
     if (user_info == nullptr) {
         return;
     }
     if (!available) {
-        TUIRoomCore::GetInstance()->StopRemoteView(user_id.toStdString());
+        if (!main_window_view_->IsScreenShareWindow() &&
+            DataStore::Instance()->GetCurrentMainWindowUser() == user_id.toStdString()) {
+            SlotRemoveVideoFromMainScreen(user_id.toStdString());
+        } else {
+            TUIRoomCore::GetInstance()->StopRemoteView(user_id.toStdString());
+        }
     } else {
         for (auto item : current_page_video_view_list_) {
             if (item->GetUserId() == user_id.toStdString() && !item->IsScreenShareWindow()) {
@@ -599,6 +605,7 @@ void StageListController::SlotOnRemoteUserAudioOpen(const QString& user_id, bool
 }
 
 void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id, bool available) {
+    LINFO("SlotOnRemoteUserScreenVideoOpen, user_id：%s, available : %d", user_id.toStdString().c_str(), available);
     auto user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id.toStdString());
     if (user_info == nullptr) {
         return;
@@ -614,6 +621,12 @@ void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id
                 if (all_video_userid_list_.contains(user_id.toStdString())) {
                     all_video_userid_list_.removeOne(user_id.toStdString());
                     all_video_userid_list_.push_front(user_id.toStdString());
+
+                    // 麦上列表的排列顺序发生改变，此时先停止当前页的拉流
+                    for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+                        VideoRenderView* item = current_page_video_view_list_.at(i);
+                        item->StopCurrentVideo();
+                    }
                 }
                 UpdateCurrentVideoPage();
             }
@@ -624,13 +637,25 @@ void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id
                 all_video_userid_list_.removeOne(user_id.toStdString());
                 int insert_index = all_video_userid_list_.indexOf(DataStore::Instance()->GetCurrentUserInfo().user_id);
                 all_video_userid_list_.insert(insert_index + 1, user_id.toStdString());
+
+                // 麦上列表的排列顺序发生改变，此时先停止当前页的拉流
+                for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+                    VideoRenderView* item = current_page_video_view_list_.at(i);
+                    item->StopCurrentVideo();
+                }
+                UpdateCurrentVideoPage();
             }
-            UpdateCurrentVideoPage();
         }
     } else {
         if (all_video_userid_list_.contains(user_id.toStdString())) {
             all_video_userid_list_.removeOne(user_id.toStdString());
             all_video_userid_list_.push_front(user_id.toStdString());
+
+            // 麦上列表的排列顺序发生改变，此时先停止当前页的拉流
+            for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+                VideoRenderView* item = current_page_video_view_list_.at(i);
+                item->StopCurrentVideo();
+            }
         }
         UpdateCurrentVideoPage();
     }
@@ -685,22 +710,26 @@ void StageListController::SlotShowVideoOnMainScreen(const std::string user_id, b
             const TUIUserInfo* user_info = TUIRoomCore::GetInstance()->GetUserInfo(current_main_window_user);
             if (user_info->role == TUIRole::kMaster || user_info->has_screen_stream) {
                 all_video_userid_list_.push_front(current_main_window_user);
-            } else if (current_main_window_user == DataStore::Instance()->GetCurrentUserInfo().user_id) {
-                bool self_flag = false;
-                for (int i = 0; i < current_page_video_view_list_.size(); i++) {
-                    std::string user_id = current_page_video_view_list_.at(i)->GetUserId();
+            } else {
+                bool insert_flag = false;
+                for (int i = 0; i < all_video_userid_list_.size(); i++) {
+                    std::string user_id = all_video_userid_list_.at(i);
                     if (TUIRoomCore::GetInstance()->GetUserInfo(user_id)->role != TUIRole::kMaster &&
                         !TUIRoomCore::GetInstance()->GetUserInfo(user_id)->has_screen_stream) {
-                        all_video_userid_list_.insert(i, current_main_window_user);
-                        self_flag = true;
-                        break;
+                        if (current_main_window_user == DataStore::Instance()->GetCurrentUserInfo().user_id) {
+                            all_video_userid_list_.insert(i, current_main_window_user);
+                            insert_flag = true;
+                            break;
+                        } else if (user_id == DataStore::Instance()->GetCurrentUserInfo().user_id){
+                            all_video_userid_list_.insert(i, current_main_window_user);
+                            insert_flag = true;
+                            break;
+                        }
                     }
                 }
-                if (self_flag == false) {
+                if (insert_flag == false) {
                     all_video_userid_list_.push_front(current_main_window_user);
                 }
-            } else {
-                all_video_userid_list_.push_back(current_main_window_user);
             }
         }
     } else if (all_video_userid_list_.size() + all_screen_share_userid_list_.size() < page_size_) {
@@ -737,7 +766,7 @@ void StageListController::SlotRemoveVideoFromMainScreen(const std::string user_i
         LINFO("User Show Screen Share On Main Screen, user_id：%s", all_screen_share_userid_list_[0].c_str());
         SlotShowVideoOnMainScreen(all_screen_share_userid_list_[0], true);
     } else {
-        // 用户显示在麦上列表
+        main_window_view_->StopCurrentVideo();
         main_window_view_->InitMainVideo();
         DataStore::Instance()->SetCurrentMainWindowUser("");
     }

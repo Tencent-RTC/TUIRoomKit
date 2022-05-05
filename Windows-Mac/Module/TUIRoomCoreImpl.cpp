@@ -93,6 +93,8 @@ int TUIRoomCoreImpl::Login(int sdk_appid, const std::string& user_id, const std:
             screen_share_manager_ = new (std::nothrow)ScreenShareManager(trtc_cloud_);
             trtc_cloud_->addCallback(this);
             trtc_cloud_->enableAudioVolumeEvaluation(100);
+            std::string json_api ="{\"api\": \"setFramework\", \"params\": {\"framework\": 1, \"component\": 5}}";
+            trtc_cloud_->callExperimentalAPI(json_api.c_str());
             // 登录IM
             if (im_core_ != nullptr) {
                 im_core_->Login(sdk_appid, user_id, user_sig);
@@ -1013,6 +1015,7 @@ void TUIRoomCoreImpl::EnterTRTCRoom() {
 //                        IM回调函数
 //////////////////////////////////////////////////////////////////////////
 void TUIRoomCoreImpl::OnIMError(int code, const std::string& message) {
+    LINFO("OnIMError error :%d, message %s", code, message.c_str());
 	TUIRoomError error = static_cast<TUIRoomError>(code);
     if (error == TUIRoomError::kErrorCreateRoomFailed) {
         // 创建房间失败
@@ -1020,7 +1023,11 @@ void TUIRoomCoreImpl::OnIMError(int code, const std::string& message) {
         local_user_info_.role = TUIRole::kAudience;
         room_user_map_[local_user_info_.user_id] = local_user_info_;
     }
-    LINFO("OnIMError error :%d, message %s", code, message.c_str());
+    if (error == TUIRoomError::kErrorTransferRoomFailed) {
+        // 转让房间失败,解散房间
+        LINFO("User Transfer Room Failed");
+        im_core_->DestroyRoom(room_info_.room_id);
+    }
     if (room_core_callback_ != nullptr) {
         room_core_callback_->OnError(code, message);
     }

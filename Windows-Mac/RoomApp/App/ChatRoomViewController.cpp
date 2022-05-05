@@ -4,6 +4,7 @@
 #include "ChatRoomViewController.h"
 #include "MessageDispatcher/MessageDispatcher.h"
 #include "CommonDef.h"
+#include "DataReport.h"
 #include "log.h"
 
 ChatRoomViewController::ChatRoomViewController(TUIUserInfo user_info, QWidget *parent)
@@ -122,6 +123,7 @@ void ChatRoomViewController::SlotSendChatMessage() {
         item->setFlags(Qt::NoItemFlags);
         handleMessageText(message_view, item, QString::fromStdString(user_info_.user_name), message, curTime, ChatMessageView::kUserSelf);
         TUIRoomCore::GetInstance()->SendChatMessage(message.toStdString());
+        DataReport::Instance()->OperateReport(ReportType::kSendChatMessage);
         LINFO("SendChatMessage message :%s", message.toStdString().c_str());
     }
 }

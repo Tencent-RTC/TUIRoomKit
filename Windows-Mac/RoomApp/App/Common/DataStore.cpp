@@ -13,6 +13,7 @@ const char* kUserId = "user_id";
 const char* kUserSig = "user_sig";
 const char* kSDKAppId = "sdk_app_id";
 const char* kLanguageZh = "is_language_zh";
+const char* kOnLine = "is_online";
 
 DataStore* DataStore::instance_ = nullptr;
 std::mutex DataStore::mutex_;
@@ -129,20 +130,23 @@ sdk_app_id:123456
 user_id:test1
 user_sig:user_sig
 is_language_zh:true
+is_online:true
 */
 void DataStore::ParseStartParam(int argc, char** argv) {
-    if (argc == 6) {
+    if (argc == 7) {
         std::string app_launch = argv[1];
         std::string sdk_app_id = argv[2];
         std::string user_id = argv[3];
         std::string user_sig = argv[4];
         std::string is_language_zh = argv[5];
+        std::string is_online = argv[6];
         QStringList params;
         params.push_back(QString::fromStdString(app_launch));
         params.push_back(QString::fromStdString(sdk_app_id));
         params.push_back(QString::fromStdString(user_id));
         params.push_back(QString::fromStdString(user_sig));
         params.push_back(QString::fromStdString(is_language_zh));
+        params.push_back(QString::fromStdString(is_online));
         ParseLaunchParam(params);
     } else {
         user_login_info_ = GetRecentUserInfo();
@@ -157,6 +161,7 @@ void DataStore::ParseStartParam(int argc, char** argv) {
 void DataStore::ParseLaunchParam(QStringList params) {
     bool is_app_launch;
     bool is_language_zh;
+    bool is_online;
     int sdk_app_id;
     std::string user_id;
     std::string user_sig;
@@ -174,12 +179,14 @@ void DataStore::ParseLaunchParam(QStringList params) {
                 sdk_app_id = string_list[1].toInt();
             } else if (string_list[0] == kLanguageZh) {
                 is_language_zh = string_list[1].toInt();
+            } else if (string_list[0] == kOnLine) {
+                is_online = string_list[1].toInt();
             }
         }
     }
 
-    LINFO("is_app_launch: %d, app_sdk_id: %d, user_id: %s, user_sig: %s, is_language: %d",
-        is_app_launch, sdk_app_id, user_id.c_str(), user_sig.c_str(), is_language_zh);
+    LINFO("is_app_launch: %d, app_sdk_id: %d, user_id: %s, user_sig: %s, is_language: %d, is_online: %d",
+        is_app_launch, sdk_app_id, user_id.c_str(), user_sig.c_str(), is_language_zh, is_online);
     is_app_launch_ = is_app_launch;
     user_login_info_.user_id = user_id;
     user_login_info_.user_sig = user_sig;
@@ -189,6 +196,7 @@ void DataStore::ParseLaunchParam(QStringList params) {
     user_login_info_.name = recent_user_info.name;
 
     current_language_ = is_language_zh ? Language::kChinese : Language::kEnglish;
+    is_online_ = is_online;
 }
 
 void DataStore::SetAudioQuality(liteav::TRTCAudioQuality audio_quality) {
@@ -205,6 +213,10 @@ void DataStore::OpenAINoiseReduction(bool open) {
 
 bool DataStore::GetAINoiseReduction() {
     return ai_noise_reduction_opened_;
+}
+
+bool DataStore::IsOnlineVersion() {
+    return is_online_;
 }
 
 std::vector<std::string> DataStore::GetScreenShareUsers() {

@@ -7,6 +7,7 @@
 #include "CommonDef.h"
 #include "ScreenCenter.h"
 #include "DataStore.h"
+#include "DataReport.h"
 #include "../utils/UserDirectory.h"
 #include "../utils/log.h"
 #ifdef _WIN32
@@ -40,6 +41,9 @@ int main(int argc, char* args[]) {
     QApplication a(argc, args);
     a.setApplicationName(kAppName);
     DataStore::Instance()->ParseStartParam(argc, args);
+    auto user = DataStore::Instance()->GetCurrentUserInfo();
+    DataReport::Instance()->SetSdkAppId(user.sdk_app_id, DataStore::Instance()->IsOnlineVersion());
+    DataReport::Instance()->OperateReport(ReportType::kRoomLaunch);
     ScreenCenter::Instance()->GetAllScreens();
 	QString workDir = QCoreApplication::applicationDirPath();
     QDir::setCurrent(workDir); 
@@ -47,7 +51,6 @@ int main(int argc, char* args[]) {
     a.setWindowIcon(QIcon(":/ImageResource/trtc.ico"));
 
     qApp->setStyleSheet("QLabel, QLineEdit, QToolButton, QPushButton, QProgressBar, QRadioButton {font-size: 14px;}");
-
     LoginViewController* login_view_controller = new LoginViewController;
     login_view_controller->show();
 
