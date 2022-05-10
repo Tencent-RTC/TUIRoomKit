@@ -17,7 +17,9 @@ class StateStore {
     this.userMap = new Map<string, TUIRoomUser>();
     this.roomInfo = new TUIRoomInfo();
   }
-
+  userMapReset() {
+    this.userMap = new Map<string, TUIRoomUser>();
+  }
   reset() {
     this.init();
   }
