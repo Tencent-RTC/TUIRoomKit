@@ -251,6 +251,7 @@
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win64\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.exe $(OutputPath)
 xcopy /y /e $(ProjectDir)3rdParty\BugReport\x64 $(Outputpath)
+xcopy /y /e $(ProjectDir)3rdParty\openssl\x64 $(Outputpath)
 $(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
 rd /s /q $(Outputpath)translations
 xcopy /y $(ProjectDir)Resource\trtcres\*.* $(Outputpath)trtcres\
@@ -274,6 +275,7 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win32\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.exe $(OutputPath)
 xcopy /y /e $(ProjectDir)3rdParty\BugReport\x86 $(Outputpath)
+xcopy /y /e $(ProjectDir)3rdParty\openssl\x86 $(Outputpath)
 $(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
 rd /s /q $(Outputpath)translations
 xcopy /y $(ProjectDir)Resource\trtcres\*.* $(Outputpath)trtcres\
@@ -297,6 +299,7 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win64\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.exe $(OutputPath)
 xcopy /y /e $(ProjectDir)3rdParty\BugReport\x64 $(Outputpath)
+xcopy /y /e $(ProjectDir)3rdParty\openssl\x64 $(Outputpath)
 $(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
 rd /s /q $(Outputpath)translations
 xcopy /y $(ProjectDir)Resource\trtcres\*.* $(Outputpath)trtcres\
@@ -320,6 +323,7 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win32\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.exe $(OutputPath)
 xcopy /y /e $(ProjectDir)3rdParty\BugReport\x86 $(Outputpath)
+xcopy /y /e $(ProjectDir)3rdParty\openssl\x86 $(Outputpath)
 $(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
 rd /s /q $(Outputpath)translations
 xcopy /y $(ProjectDir)Resource\trtcres\*.* $(Outputpath)trtcres\
