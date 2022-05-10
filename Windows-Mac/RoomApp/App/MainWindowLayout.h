@@ -49,6 +49,7 @@ public:
     void RemoteUserScreenClose(const std::string& user_id);
 
     void ShowTransferRoomWindow();
+    void TransferRoomToOther();
 public slots:
     void SlotShowSetting(int index);
     void SlotShowChatRoom(bool show);

@@ -1,4 +1,7 @@
 # TUIRoom Window-Mac 示例工程快速跑通
+
+_[English](README.en.md) | 简体中文_
+
 本文档主要介绍如何快速跑通TUIRoom 示例工程，多人音视频通话，更详细的TUIRoom组件接入流程，请点击腾讯云官网文档:
 [TUIRoom组件Windows-Mac接入说明](https://cloud.tencent.com/document/product/647/63494)
 
@@ -43,7 +46,7 @@ TUIRoom
 
 ### 集成SDK
 1. 工程默认集成了Windows/Mac端的SDK，您可通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】了解此版本SDK的具体功能。
-2. 从官网下载了其他版本的SDK后，需要将其放到工程下SDK文件夹对应的目录里。
+2. 从官网下载了Windows/Mac端最新版本的SDK后，需要将其放到工程下SDK文件夹对应的目录里。
 
 ### 下载源码，配置工程文件
 克隆或者直接下载此仓库源码，欢迎 Star，感谢~~
@@ -105,4 +108,4 @@ TUIRoom
 
 ## 常见问题
 
->? 更多帮助信息，详见 [TUI 场景化解决方案常见问题](https://cloud.tencent.com/developer/article/1952880)，欢迎加入 QQ 群：592465424，进行技术交流和反馈~
+>? 更多帮助信息，详见 [TUI 场景化解决方案常见问题](https://cloud.tencent.com/developer/article/1952880)，欢迎加入 QQ 群：876797387，进行技术交流和反馈~

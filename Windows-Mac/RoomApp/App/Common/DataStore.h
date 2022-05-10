@@ -48,6 +48,8 @@ public:
     void OpenAINoiseReduction(bool open);
     bool GetAINoiseReduction();
 
+    bool IsOnlineVersion();
+
     std::vector<std::string> GetScreenShareUsers();
     void AddScreenShareUser(const std::string& user_id);
     void RemoveScreenShareUser(const std::string& user_id);
@@ -74,6 +76,7 @@ private:
     bool            share_pc_voice_ = false;    //  屏幕共享时分享PC系统声音
     bool            is_app_launch_ = false;     //  TRTCApp启动
     bool            ai_noise_reduction_opened_ = true; // 是否开启AI降噪
+    bool            is_online_ = false;
     Language        current_language_ = Language::kChinese;
     liteav::TRTCAudioQuality audio_quality_ = liteav::TRTCAudioQualitySpeech;
 };

@@ -6,6 +6,11 @@ enum class Language {
     kEnglish = 1   // Ó¢ÎÄ
 };
 
+enum class LoginMode {
+    kPhone = 0,    // ÊÖ»úµÇÂ¼
+    kEmail = 1     // ÓÊÏäµÇÂ¼
+};
+
 enum TXMessageType {
     kNoButton     =   0x0000,
     kOk           =   0x0001,

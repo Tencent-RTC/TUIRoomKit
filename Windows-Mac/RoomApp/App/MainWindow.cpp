@@ -11,6 +11,7 @@
 #include "ScreenCenter.h"
 #include "StatusUpdateCenter.h"
 #include "log.h"
+#include "DataReport.h"
 
 const int kSizeDecrease = 100;
 MainWindow::MainWindow(TUISpeechMode speech_mode, QWidget *parent)
@@ -222,7 +223,7 @@ void MainWindow::SlotOnCreateRoom(int code, const QString& message) {
 void MainWindow::SlotOnEnterRoom(int code, const QString& message) {
     if (main_window_layout_ == nullptr)
         return;
-
+    DataReport::Instance()->OperateReport(ReportType::kEnterRoom, 0);
     if (device_preview_ != nullptr) {
         device_preview_->OnCloseWnd();
         DELETE_OBJECT(device_preview_);
@@ -289,6 +290,7 @@ void MainWindow::InitUi() {
             if (member_list_view_control_ != nullptr) {
                 member_list_view_control_->show();
                 member_list_view_control_->raise();
+                DataReport::Instance()->OperateReport(ReportType::kOpenMemberlist);
             }
         });
         connect(bottom_menu_bar, &BottomBarController::SignalCameraClicked, this, &MainWindow::SlotBottomMenuMuteCamera);
@@ -325,8 +327,11 @@ void MainWindow::SlotClose() {
             return;
         }
         if (local_user->role == TUIRole::kMaster) {
-            auto user_count = TUIRoomCore::GetInstance()->GetRoomUsers().size();
-            if (user_count > 1) {
+            auto room_members = TUIRoomCore::GetInstance()->GetRoomUsers();
+            auto new_master = std::find_if(room_members.begin(), room_members.end(), [=](const TUIUserInfo& user) {
+                return user.role == TUIRole::kAnchor && user.user_id != local_user->user_id;
+                });
+            if (new_master != room_members.end()) {
                 TXMessageBox::DialogInstance().ShowMultiButtonDialog(kCancel | kDestoryRoom | kLeaveRoom, \
                     tr("Are you sure to leave the room ?"));
             } else {
@@ -342,7 +347,12 @@ void MainWindow::SlotClose() {
         });
         connect(&TXMessageBox::DialogInstance(), &TXMessageBox::SignalLeaveRoom, this, [=]() {
             if (local_user->role == TUIRole::kMaster && main_window_layout_ != nullptr) {
-                main_window_layout_->ShowTransferRoomWindow();
+                // 如果需要指定将房间转让给某用户，使用以下方法
+                //main_window_layout_->ShowTransferRoomWindow();
+                // 列表中寻找一个默认的用户进行转让
+                main_window_layout_->TransferRoomToOther();
+                type_exit_room_ = TUIExitRoomType::kTransferRoom;
+                this->close();
             } else {
                 this->close();
             }
@@ -434,6 +444,7 @@ void MainWindow::MemberListAddMember(const TUIUserInfo& user_info) {
 
 void MainWindow::StartLocalCamera() {
     LINFO("StartLocalCamera");
+    DataReport::Instance()->OperateReport(ReportType::kOpenCamera);
     if (stage_list_view_control_ == nullptr)
         return;
     auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
@@ -463,6 +474,7 @@ void MainWindow::StopLocalCamera() {
 
 void MainWindow::StartLocalMicrophone() {
     LINFO("StartLocalMicrophone");
+    DataReport::Instance()->OperateReport(ReportType::kOpenMicrophone);
     TUIRoomCore::GetInstance()->StartLocalAudio(DataStore::Instance()->GetAudioQuality());
     auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
     if (local_user == nullptr) {
@@ -640,6 +652,7 @@ void MainWindow::SlotOnError(int code, const QString& message) {
         break;
     case TUIRoomError::kErrorEnterRoomFailed:
         TXMessageBox::Instance().AddLineTextMessage(tr("Enter room failed"), tr("Enter room failed"));
+        DataReport::Instance()->OperateReport(ReportType::kEnterRoom, code);
         if (device_preview_ != nullptr) {
             device_preview_->ResetStart();
         }

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\DataReport.cpp" />
     <ClCompile Include="..\Common\MessageDispatcher\MessageDispatcher.cpp" />
     <ClCompile Include="..\Common\ScreenCenter.cpp" />
     <ClCompile Include="..\Common\StatusUpdateCenter.cpp" />
@@ -73,6 +74,7 @@
     <QtMoc Include="..\Common\TXImageButton.h" />
     <QtMoc Include="..\Common\TXMessageBox.h" />
     <QtMoc Include="..\Common\MessageDispatcher\MessageDispatcher.h" />
+    <QtMoc Include="..\Common\DataReport.h" />
     <ClInclude Include="..\Common\ViewDragger.h" />
     <ClInclude Include="..\Module\IM\IMCore.h" />
     <ClInclude Include="..\Module\IM\IMCoreCallback.h" />
@@ -178,22 +180,22 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>msvc_qt5.14_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;network;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="QtSettings">
     <QtInstall>msvc_qt5.14_32</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;network;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="QtSettings">
     <QtInstall>msvc_qt5.14_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;network;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="QtSettings">
     <QtInstall>msvc_qt5.14_32</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;network;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -249,16 +251,8 @@
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win64\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.exe $(OutputPath)
 xcopy /y /e $(ProjectDir)3rdParty\BugReport\x64 $(Outputpath)
-xcopy /y $(QtDir)\bin\Qt5Gui.dll $(OutputPath)
-xcopy /y $(QtDir)\bin\Qt5Widgets.dll $(OutputPath)
-xcopy /y $(QtDir)\bin\Qt5Core.dll $(OutputPath)
-xcopy /y $(QtDir)\plugins\platforms\qdirect2d.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qminimal.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qoffscreen.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qwindows.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\imageformats\qgif.dll $(Outputpath)imageformats\
-xcopy /y $(QtDir)\plugins\imageformats\qico.dll $(Outputpath)imageformats\
-xcopy /y $(QtDir)\plugins\imageformats\qjpeg.dll $(Outputpath)imageformats\
+$(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
+rd /s /q $(Outputpath)translations
 xcopy /y $(ProjectDir)Resource\trtcres\*.* $(Outputpath)trtcres\
 if exist $(TargetDir)*.lib del $(TargetDir)*.lib
 if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
@@ -280,16 +274,8 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win32\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.exe $(OutputPath)
 xcopy /y /e $(ProjectDir)3rdParty\BugReport\x86 $(Outputpath)
-xcopy /y $(QtDir)\bin\Qt5Gui.dll $(OutputPath)
-xcopy /y $(QtDir)\bin\Qt5Widgets.dll $(OutputPath)
-xcopy /y $(QtDir)\bin\Qt5Core.dll $(OutputPath)
-xcopy /y $(QtDir)\plugins\platforms\qdirect2d.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qminimal.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qoffscreen.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qwindows.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\imageformats\qgif.dll $(Outputpath)imageformats\
-xcopy /y $(QtDir)\plugins\imageformats\qico.dll $(Outputpath)imageformats\
-xcopy /y $(QtDir)\plugins\imageformats\qjpeg.dll $(Outputpath)imageformats\
+$(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
+rd /s /q $(Outputpath)translations
 xcopy /y $(ProjectDir)Resource\trtcres\*.* $(Outputpath)trtcres\
 if exist $(TargetDir)*.lib del $(TargetDir)*.lib
 if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
@@ -311,16 +297,8 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win64\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.exe $(OutputPath)
 xcopy /y /e $(ProjectDir)3rdParty\BugReport\x64 $(Outputpath)
-xcopy /y $(QtDir)\bin\Qt5Guid.dll $(OutputPath)
-xcopy /y $(QtDir)\bin\Qt5Widgetsd.dll $(OutputPath)
-xcopy /y $(QtDir)\bin\Qt5Cored.dll $(OutputPath)
-xcopy /y $(QtDir)\plugins\platforms\qdirect2d.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qminimal.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qoffscreen.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qwindows.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\imageformats\qgif.dll $(Outputpath)imageformats\
-xcopy /y $(QtDir)\plugins\imageformats\qico.dll $(Outputpath)imageformats\
-xcopy /y $(QtDir)\plugins\imageformats\qjpeg.dll $(Outputpath)imageformats\
+$(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
+rd /s /q $(Outputpath)translations
 xcopy /y $(ProjectDir)Resource\trtcres\*.* $(Outputpath)trtcres\
 if exist $(TargetDir)*.lib del $(TargetDir)*.lib
 if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
@@ -342,16 +320,8 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
 xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win32\*.dll $(OutputPath)
 xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.exe $(OutputPath)
 xcopy /y /e $(ProjectDir)3rdParty\BugReport\x86 $(Outputpath)
-xcopy /y $(QtDir)\bin\Qt5Guid.dll $(OutputPath)
-xcopy /y $(QtDir)\bin\Qt5Widgetsd.dll $(OutputPath)
-xcopy /y $(QtDir)\bin\Qt5Cored.dll $(OutputPath)
-xcopy /y $(QtDir)\plugins\platforms\qdirect2dd.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qminimald.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qoffscreend.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\platforms\qwindowsd.dll $(Outputpath)platforms\
-xcopy /y $(QtDir)\plugins\imageformats\qgifd.dll $(Outputpath)imageformats\
-xcopy /y $(QtDir)\plugins\imageformats\qicod.dll $(Outputpath)imageformats\
-xcopy /y $(QtDir)\plugins\imageformats\qjpegd.dll $(Outputpath)imageformats\
+$(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
+rd /s /q $(Outputpath)translations
 xcopy /y $(ProjectDir)Resource\trtcres\*.* $(Outputpath)trtcres\
 if exist $(TargetDir)*.lib del $(TargetDir)*.lib
 if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
