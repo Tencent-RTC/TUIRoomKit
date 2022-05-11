@@ -135,6 +135,7 @@ class TUIRoomLifecycle {
       });
       this.state.roomInfo.reset();
       this.state.currentUser.reset();
+      this.state.userMapReset();
 
       return TUIRoomResponse.success(responseData);
     } catch (error: any) {
@@ -173,6 +174,7 @@ class TUIRoomLifecycle {
       });
       this.state.roomInfo.reset();
       this.state.currentUser.reset();
+      this.state.userMapReset();
 
       return TUIRoomResponse.success(responseData);
     } catch (error: any) {
