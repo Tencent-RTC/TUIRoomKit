@@ -414,7 +414,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     };
     this.emitter?.emit(TUIRoomEvents.onCameraMuted, mute);
     await this.tsignalingService.accept(inviterID, message);
-    this.state.currentUser.isMicrophoneMuted = mute;
+    this.state.currentUser.isCameraMuted = mute;
   }
 
   private async onKickOff(event: any) {
