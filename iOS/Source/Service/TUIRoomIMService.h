@@ -209,7 +209,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * 成员申请发言
  *
- * 调用该接口，主持人邀请成员发言，成员端会收到onReceiveSpeechInvitation()回调通知
+ * 调用该接口，成员申请发言，主持人端会收到onReceiveSpeechApplication回调通知
  *
  * @param userId   用户ID
  * @param param     数据
