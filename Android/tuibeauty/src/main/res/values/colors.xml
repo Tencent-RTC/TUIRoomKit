@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tuibeauty_color_white">#FFFFFFFF</color>
+    <color name="tuibeauty_color_black">#000000</color>
+    <color name="tuibeauty_color_bg_dialog">#66000000</color>
+    <color name="tuibeauty_color_blue_seekbar">#338BFF</color>
+    <color name="tuibeauty_color_gray_panel">#FF999999</color>
+    <color name="tuibeauty_color_text">#333333</color>
+    <color name="tuibeauty_color_blue">#006EFF</color>
+    <color name="tuibeauty_color_gray">#666666</color>
+    <color name="tuibeauty_color_gray_text">#999999</color>
+</resources>

@@ -1,0 +1,45 @@
+material {
+    name : transparentColor,
+    parameters : [
+        {
+           type : sampler2d,
+           name : depth
+        },
+        {
+           type : sampler2d,
+           name : depthOpaque
+        },
+         {
+            type : sampler2d,
+            precision :high,
+            name : color
+         }
+    ],
+    doubleSided : true,
+    blending : masked,
+    transparency : twoPassesOneSide,
+    culling : none,
+    depthCulling : true,
+    depthWrite : true,
+    shadingModel : unlit,
+    flipUV:false,
+    requires : [
+        uv0
+    ]
+}
+
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        vec3 coord = getNormalizedViewportCoord();
+        if (coord.z >= texture(materialParams_depthOpaque, uvToRenderTargetUV(coord.xy)).r) {
+            discard;
+        }
+        if (coord.z <= texture(materialParams_depth, uvToRenderTargetUV(coord.xy)).r) {
+            discard;
+        } else {
+            material.baseColor = texture(materialParams_color, getUV0());
+            material.baseColor.rgb *= material.baseColor.a;
+        }
+    }
+}

@@ -1,0 +1,506 @@
+{
+   "cheekboneThin": 0,
+   "chin": 0,
+   "componentID": -1232,
+   "editMode": false,
+   "enabled": true,
+   "enlargeEye": 0.2,
+   "entityId": -1034,
+   "eyeAngle": 0,
+   "eyeDistance": 0,
+   "foreHead": 0,
+   "height": 2048,
+   "lastPoints": [],
+   "mouthHeight": 0,
+   "mouthPosition": 0,
+   "mouthSize": 0,
+   "mouthWidth": 0,
+   "noseHeight": 0,
+   "noseSize": 0.3,
+   "noseWing": 0,
+   "basicFaceEyelarge": 0,
+   "overallFactor": 0.4,
+   "pinchFaceEnabled": true,
+   "reformSubType": "femaleGod",
+   "points": [
+      {
+         "positionX": 403.1646728515625,
+         "positionY": 976.7918090820312,
+         "fixed": true
+      },
+      {
+         "positionX": 413.9551086425781,
+         "positionY": 1178.6097412109375,
+         "fixed": true
+      },
+      {
+         "positionX": 505.1136169433594,
+         "positionY": 1308.6165771484375,
+         "fixed": true
+      },
+      {
+         "positionX": 585.596435546875,
+         "positionY": 1414.51904296875,
+         "fixed": true
+      },
+      {
+         "positionX": 665.2039794921875,
+         "positionY": 1460.8314208984375,
+         "fixed": true
+      },
+      {
+         "positionX": 768.2893676757812,
+         "positionY": 1536.94140625,
+         "fixed": true
+      },
+      {
+         "positionX": 870.7962646484375,
+         "positionY": 1460.8316650390625,
+         "fixed": true
+      },
+      {
+         "positionX": 950.4036865234375,
+         "positionY": 1414.51953125,
+         "fixed": true
+      },
+      {
+         "positionX": 1030.8876953125,
+         "positionY": 1308.6168212890625,
+         "fixed": true
+      },
+      {
+         "positionX": 1122.04541015625,
+         "positionY": 1178.6097412109375,
+         "fixed": true
+      },
+      {
+         "positionX": 1132.8358154296875,
+         "positionY": 976.7918090820312,
+         "fixed": true
+      },
+      {
+         "positionX": 420,
+         "positionY": 855,
+         "fixed": true
+      },
+      {
+         "positionX": 506,
+         "positionY": 843,
+         "fixed": true
+      },
+      {
+         "positionX": 700,
+         "positionY": 864,
+         "fixed": true
+      },
+      {
+         "positionX": 499,
+         "positionY": 806,
+         "fixed": true
+      },
+      {
+         "positionX": 1116,
+         "positionY": 855,
+         "fixed": true
+      },
+      {
+         "positionX": 1030,
+         "positionY": 843,
+         "fixed": true
+      },
+      {
+         "positionX": 836,
+         "positionY": 864,
+         "fixed": true
+      },
+      {
+         "positionX": 1037,
+         "positionY": 806,
+         "fixed": true
+      },
+      {
+         "positionX": 507.84814453125,
+         "positionY": 938.6270141601562,
+         "fixed": true
+      },
+      {
+         "positionX": 544,
+         "positionY": 962,
+         "fixed": true
+      },
+      {
+         "positionX": 582,
+         "positionY": 971,
+         "fixed": true
+      },
+      {
+         "positionX": 623,
+         "positionY": 969,
+         "fixed": true
+      },
+      {
+         "positionX": 666,
+         "positionY": 966,
+         "fixed": true
+      },
+      {
+         "positionX": 634,
+         "positionY": 926,
+         "fixed": true
+      },
+      {
+         "positionX": 595,
+         "positionY": 907,
+         "fixed": true
+      },
+      {
+         "positionX": 550,
+         "positionY": 913,
+         "fixed": true
+      },
+      {
+         "positionX": 1028.1517333984375,
+         "positionY": 938.6270141601562,
+         "fixed": true
+      },
+      {
+         "positionX": 992,
+         "positionY": 962,
+         "fixed": true
+      },
+      {
+         "positionX": 954,
+         "positionY": 971,
+         "fixed": true
+      },
+      {
+         "positionX": 913,
+         "positionY": 969,
+         "fixed": true
+      },
+      {
+         "positionX": 870,
+         "positionY": 966,
+         "fixed": true
+      },
+      {
+         "positionX": 902,
+         "positionY": 926,
+         "fixed": true
+      },
+      {
+         "positionX": 941,
+         "positionY": 907,
+         "fixed": true
+      },
+      {
+         "positionX": 986,
+         "positionY": 913,
+         "fixed": true
+      },
+      {
+         "positionX": 719,
+         "positionY": 966,
+         "fixed": true
+      },
+      {
+         "positionX": 708,
+         "positionY": 1092,
+         "fixed": true
+      },
+      {
+         "positionX": 662.095458984375,
+         "positionY": 1195.4093017578125,
+         "fixed": true
+      },
+      {
+         "positionX": 705.095458984375,
+         "positionY": 1217.4093017578125,
+         "fixed": true
+      },
+      {
+         "positionX": 767.0284423828125,
+         "positionY": 1229.10107421875,
+         "fixed": true
+      },
+      {
+         "positionX": 830.904541015625,
+         "positionY": 1217.4093017578125,
+         "fixed": true
+      },
+      {
+         "positionX": 873.904541015625,
+         "positionY": 1195.4093017578125,
+         "fixed": true
+      },
+      {
+         "positionX": 828,
+         "positionY": 1092,
+         "fixed": true
+      },
+      {
+         "positionX": 817,
+         "positionY": 966,
+         "fixed": true
+      },
+      {
+         "positionX": 768,
+         "positionY": 1148,
+         "fixed": true
+      },
+      {
+         "positionX": 623.2008666992188,
+         "positionY": 1271.1868896484375,
+         "fixed": true
+      },
+      {
+         "positionX": 912.7991333007812,
+         "positionY": 1271.1868896484375,
+         "fixed": true
+      },
+      {
+         "positionX": 768.7493286132812,
+         "positionY": 1359.647705078125,
+         "fixed": true
+      },
+      {
+         "positionX": 840.2135009765625,
+         "positionY": 1304.823486328125,
+         "fixed": true
+      },
+      {
+         "positionX": 767.8036499023438,
+         "positionY": 1323.7269287109375,
+         "fixed": true
+      },
+      {
+         "positionX": 695.7864990234375,
+         "positionY": 1304.823486328125,
+         "fixed": true
+      },
+      {
+         "positionX": 674.81591796875,
+         "positionY": 1272.4888916015625,
+         "fixed": true
+      },
+      {
+         "positionX": 725.8011474609375,
+         "positionY": 1268.4599609375,
+         "fixed": true
+      },
+      {
+         "positionX": 810.1988525390625,
+         "positionY": 1268.4599609375,
+         "fixed": true
+      },
+      {
+         "positionX": 861.18408203125,
+         "positionY": 1272.4888916015625,
+         "fixed": true
+      },
+      {
+         "positionX": 839.4693603515625,
+         "positionY": 1288.410888671875,
+         "fixed": true
+      },
+      {
+         "positionX": 767.1473388671875,
+         "positionY": 1300.8702392578125,
+         "fixed": true
+      },
+      {
+         "positionX": 696.5306396484375,
+         "positionY": 1288.410888671875,
+         "fixed": true
+      },
+      {
+         "positionX": 768,
+         "positionY": 966,
+         "fixed": true
+      },
+      {
+         "positionX": 768,
+         "positionY": 864,
+         "fixed": true
+      },
+      {
+         "positionX": 580,
+         "positionY": 550,
+         "fixed": true
+      },
+      {
+         "positionX": 956,
+         "positionY": 550,
+         "fixed": true
+      },
+      {
+         "positionX": 768,
+         "positionY": 538,
+         "fixed": true
+      },
+      {
+         "positionX": 418,
+         "positionY": 655,
+         "fixed": true
+      },
+      {
+         "positionX": 1118,
+         "positionY": 655,
+         "fixed": true
+      },
+      {
+         "positionX": 529,
+         "positionY": 1148,
+         "fixed": true
+      },
+      {
+         "positionX": 1007,
+         "positionY": 1148,
+         "fixed": true
+      },
+      {
+         "positionX": 595.9595947265625,
+         "positionY": 1344.4459228515625,
+         "fixed": true
+      },
+      {
+         "positionX": 940.0404052734375,
+         "positionY": 1344.4459228515625,
+         "fixed": true
+      },
+      {
+         "positionX": 768,
+         "positionY": 1056,
+         "fixed": true
+      },
+      {
+         "positionX": 670,
+         "positionY": 683,
+         "fixed": true
+      },
+      {
+         "positionX": 866,
+         "positionY": 683,
+         "fixed": true
+      },
+      {
+         "positionX": 559,
+         "positionY": 721,
+         "fixed": true
+      },
+      {
+         "positionX": 977,
+         "positionY": 721,
+         "fixed": true
+      },
+      {
+         "positionX": 692.3292846679688,
+         "positionY": 1332.155517578125,
+         "fixed": true
+      },
+      {
+         "positionX": 843.6707153320312,
+         "positionY": 1332.155517578125,
+         "fixed": true
+      },
+      {
+         "positionX": 767.8294677734375,
+         "positionY": 1273.6622314453125,
+         "fixed": true
+      },
+      {
+         "positionX": 679.9474487304688,
+         "positionY": 1398.2969970703125,
+         "fixed": true
+      },
+      {
+         "positionX": 856.0525512695312,
+         "positionY": 1398.2969970703125,
+         "fixed": true
+      },
+      {
+         "positionX": 768.5877685546875,
+         "positionY": 1434.13330078125,
+         "fixed": true
+      },
+      {
+         "positionX": 407.2588806152344,
+         "positionY": 1088.2255859375,
+         "fixed": true
+      },
+      {
+         "positionX": 459.90338134765625,
+         "positionY": 1229.6201171875,
+         "fixed": true
+      },
+      {
+         "positionX": 536.1611938476562,
+         "positionY": 1368.84619140625,
+         "fixed": true
+      },
+      {
+         "positionX": 447.3035583496094,
+         "positionY": 954.446044921875,
+         "fixed": true
+      },
+      {
+         "positionX": 478.5321960449219,
+         "positionY": 1048.0111083984375,
+         "fixed": true
+      },
+      {
+         "positionX": 1128.7423095703125,
+         "positionY": 1088.2257080078125,
+         "fixed": true
+      },
+      {
+         "positionX": 1076.0972900390625,
+         "positionY": 1229.6202392578125,
+         "fixed": true
+      },
+      {
+         "positionX": 999.839599609375,
+         "positionY": 1368.8463134765625,
+         "fixed": true
+      },
+      {
+         "positionX": 1088.696044921875,
+         "positionY": 954.446044921875,
+         "fixed": true
+      },
+      {
+         "positionX": 1057.4674072265625,
+         "positionY": 1048.0111083984375,
+         "fixed": true
+      },
+      {
+         "positionX": 356.3348388671875,
+         "positionY": 880.8341064453125,
+         "fixed": true
+      },
+      {
+         "positionX": 1179.6658935546875,
+         "positionY": 880.8341064453125,
+         "fixed": true
+      },
+      {
+         "positionX": 411.6866455078125,
+         "positionY": 786.33203125,
+         "fixed": true
+      },
+      {
+         "positionX": 1124.3143310546875,
+         "positionY": 786.33203125,
+         "fixed": true
+      }
+   ],
+   "strength": 100,
+   "stretchEnabled": false,
+   "symmetry": true,
+   "thinFace": 0,
+   "type": "FacialReform",
+   "vFace": 0,
+   "version": 2521,
+   "width": 1536,
+   "reformFacialType": 0
+}

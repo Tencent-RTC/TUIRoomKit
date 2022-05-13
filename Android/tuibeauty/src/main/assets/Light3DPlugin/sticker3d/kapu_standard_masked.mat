@@ -1,0 +1,117 @@
+material {
+    name : pbr,
+    shadingModel : lit,
+    blending : masked,
+    doubleSided: true,
+    transparency : default,
+    parameters : [
+
+        { type : sampler2d, name : baseColorMap },
+        { type : sampler2d, name : normalMap },
+        { type : sampler2d, name : roughnessMap },
+        { type : sampler2d, name : metallicMap },
+        {
+            type : bool,
+            name : alphaPremultiplied
+        },
+        {
+            type : sampler2d,
+            name : baseColorMap_Alpha
+        },
+        {
+            type : bool,
+            name : hasAlphaMap
+        },
+        {
+            type : bool,
+            name : hasNormalMap
+        },
+        {
+            type : float,
+            name : metallic
+        },
+        {
+            type : float,
+            name : roughness
+        },
+        {
+            type : bool,
+            name : hasRoughnessMap
+        },
+        {
+            type : bool,
+            name : hasMetallicMap
+        },
+        {
+            type : sampler2d,
+            name : emissionMap
+        },
+        {
+            type : bool,
+            name : hasEmissionMap
+        },
+        {
+            type: float4,
+            name: emissionColor
+        },
+        {
+            type: bool,
+            name: isEtcImage
+        }
+    ],
+    requires : [
+        uv0, tangents
+    ],
+
+    flipUV:true
+}
+
+fragment {
+    float lerp(float a, float b, float w) {
+        return a + w * (b-a);
+    }
+    vec3 lerpv(vec3 a, vec3 b, float w) {
+        return a + w * (b-a);
+    }
+
+    void material(inout MaterialInputs material) {
+        float2 uv = getUV0();
+        if (materialParams.isEtcImage) {
+            uv.y = 1.0 - uv.y;
+        }
+        if (materialParams.hasNormalMap) {
+            material.normal = texture(materialParams_normalMap, uv).xyz * 2.0 - 1.0;
+        }
+
+        prepareMaterial(material);
+
+        float4 emission = vec4(0.0, 0.0, 0.0, 0.0);
+        if (materialParams.hasEmissionMap) {
+            emission = texture(materialParams_emissionMap, uv);
+        }
+        material.emissive = emission * materialParams.emissionColor;
+
+        float4 albedoColor = texture(materialParams_baseColorMap, uv);
+        if(materialParams.hasAlphaMap) {
+            albedoColor.a = texture(materialParams_baseColorMap_Alpha, uv).r;
+        }
+        if (!materialParams.alphaPremultiplied) {
+            albedoColor.rgb *= albedoColor.a;
+        }
+        material.baseColor.rgb = saturate(albedoColor.rgb);
+        material.baseColor.a = albedoColor.a;
+
+        if (materialParams.hasRoughnessMap) {
+            vec4 roughnessColor = texture(materialParams_roughnessMap, uv);
+            material.roughness = lerp(roughnessColor.r, 1.0, materialParams.roughness); //mrs.g * materialParams.roughnessFactor;
+        } else {
+            material.roughness = materialParams.roughness;
+        }
+        if (materialParams.hasMetallicMap) {
+            vec4 metallicColor = texture(materialParams_metallicMap, uv);
+            material.metallic = lerp(metallicColor.r, 1.0, materialParams.metallic); //mrs.r * materialParams.metallicFactor;
+        } else {
+            material.metallic = materialParams.metallic;
+        }
+    }
+}

@@ -1,0 +1,60 @@
+{
+    "distortionList": [
+        {
+            "radius": 360,
+            "distortion": 3,
+            "strength": 0.05,
+            "position": 64,
+            "direction": 2
+        },
+        {
+            "radius": 200,
+            "distortion": 3,
+            "strength": 0.04,
+            "position": 64,
+            "direction": 2
+        },
+        {
+            "radius": 700,
+            "distortion": 3,
+            "strength": 0.04,
+            "position": 81,
+            "direction": 2
+        },
+        {
+            "radius": 300,
+            "distortion": 3,
+            "strength": 0.06,
+            "position": 69,
+            "direction": 2
+        },
+        {
+            "radius": 620,
+            "distortion": 2,
+            "strength": 0.03,
+            "position": 69,
+            "direction": 0
+        },
+        {
+            "radius": 320,
+            "distortion": 3,
+            "strength": 0.16,
+            "position": 9,
+            "direction": 2
+        },
+        {
+            "radius": 320,
+            "distortion": 3,
+            "strength": 0.08,
+            "position": 5,
+            "direction": 2
+        },
+        {
+            "radius": 320,
+            "distortion": 3,
+            "strength": 0.08,
+            "position": 13,
+            "direction": 2
+        }
+    ]
+}

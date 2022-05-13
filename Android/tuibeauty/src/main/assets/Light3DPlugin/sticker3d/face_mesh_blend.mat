@@ -1,0 +1,105 @@
+material {
+    name : face_mesh_blend,
+    shadingModel : unlit,
+    depthWrite: true,
+    depthCulling: false,
+    parameters : [
+        {
+           type : sampler2d,
+           name : texture
+        },
+        {
+            type : sampler2d,
+            name : color
+        },
+        {
+            type : sampler2d,
+            name : secondary
+        },
+        {
+            type : float,
+            name : sigma
+        },
+        {
+            type : float,
+            name : offset
+        },
+        {
+            type : sampler2d,
+            name : camera
+        },
+        {
+           type : mat4,
+           name : mvpMatrix
+        },
+        {
+            type : float,
+            name : scale
+        },
+        {
+             type : mat4,
+             name : oldTransform
+         },
+         {
+             type : mat4,
+             name : newTransform
+         },
+         {
+            type : mat4,
+            name : scaleTransform
+         },
+         {
+            type : sampler2d,
+            name : blendTex,
+         },
+         {
+            type : sampler2d,
+            name : roughnessMap
+         },
+         {
+             type : float,
+             name : renderTime,
+         },
+        {
+          type : float,
+          name : blendWeight,
+        }
+    ],
+    requires: [
+        uv0
+    ],
+    variables : [
+         pos,color_s
+    ]
+}
+
+vertex {
+    void materialVertex(inout MaterialVertexInputs material) {
+        vec4 xPos = materialParams.mvpMatrix * materialParams.scaleTransform *getPosition();
+        float width = getResolution().x * materialParams.scale;
+        float height = getResolution().y * materialParams.scale;
+        xPos.x = xPos.x / width * 2.0 - 1.0;
+        xPos.y = xPos.y / height * 2.0 - 1.0;
+        float depth = max(width, height);
+        xPos.z = -xPos.z / depth;
+        material.worldPosition = inverse(getClipFromWorldMatrix()) * xPos;
+    }
+}
+
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        float2 uv = uvToRenderTargetUV(getUV0());
+        vec4 color1 = texture(materialParams_texture, float2(uv.x, 1.0 - uv.y));
+        uv = getUV0();
+        vec4 color2 = texture(materialParams_blendTex, float2(uv.x, 1.0 - uv.y));
+
+        //float alpha = (materialParams.renderTime - (4.0 * floor(materialParams.renderTime / 4.0))) / 4.0;
+        float alpha = materialParams.blendWeight;
+        alpha *= color2.a;
+        vec4 color;
+        color.rgb = color1.rgb * color1.a * (1.0 - alpha) + color2.rgb * alpha;
+        color.a = alpha + color1.a * (1.0 - alpha);
+        material.baseColor = color;
+    }
+}

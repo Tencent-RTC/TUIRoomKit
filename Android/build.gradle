@@ -7,12 +7,12 @@ buildscript {
         google()
         mavenCentral()
         //tpns接入
-        maven { url 'http://developer.huawei.com/repo/' }
+        
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
         //tpns集成插件
-        classpath "com.tencent.android.tpns:tpnsplugin:1.8.0"
+        
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -22,12 +22,13 @@ buildscript {
 allprojects {
     repositories {
         flatDir {
-            dirs project(':App').file('libs')
+            dirs project(':app').file('libs')
+            dirs project(':tuibeauty').file('libs')
         }
         jcenter()
         google()
         mavenCentral()
-        maven { url 'http://developer.huawei.com/repo/' } // 华为仓，如果不集成华为可以不加
+         // 华为仓，如果不集成华为可以不加
     }
 }
 
