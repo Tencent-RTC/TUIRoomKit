@@ -7,11 +7,10 @@ This document describes how to quickly run the TUIRoom demo project to try out m
 
 ```
 TUIRoom
-├─ App          // Main panel, which is the entry of the multi-person audio/video interaction scenario
-├─ Debug        // Debugging code
-├─ Source       // Multi-person audio/video interaction business logic
-├─ Beauty       // Beauty filter panel, which provides effects such as beauty filters, filters, and animated effect
-└─ TUICore      // Basic communication component
+├─ app          // Main panel, which is the entry of the multi-person audio/video interaction scenario
+├─ debug        // Debugging code
+├─ tuibeauty    // Beauty filter panel, which provides effects such as beauty filters, filters, and animated effect
+└─ tuiroom      // Multi-person audio/video interaction business logic
 ```
 
 ## Environment Requirements
@@ -33,7 +32,7 @@ TUIRoom
 [](id:ui.step2)
 ### Step 2. Download the source code and configure the project
 1. Clone or directly download the source code in the repository. **Feel free to star our project if you like it.**
-2. Find and open the `Android/Debug/src/main/java/com/tencent/liteav/debug/GenerateTestUserSig.java` file.
+2. Find and open the `Android/debug/src/main/java/com/tencent/liteav/debug/GenerateTestUserSig.java` file.
 3. Set parameters in `GenerateTestUserSig.java`:
 	<img src="https://main.qcloudimg.com/raw/f9b23b8632058a75b78d1f6fdcdca7da.png" width="900">
 	- SDKAPPID: A placeholder by default. Set it to the `SDKAppID` that you noted down in step 1.

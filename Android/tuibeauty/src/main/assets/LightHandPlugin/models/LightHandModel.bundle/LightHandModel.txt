@@ -1,0 +1,7 @@
+"predetect" = "20191231_blazenet_thin_maxpool_preDet_binaryhand_multiscale_softmax_ckpt_99.onnx.opt.onnx"
+"detect_veryhigh" = "0328_centernet_29M_submit"
+"detect_high" = "未分类_handDet_43ea36ce992d11eb9b9c16092c74a2f2.opt.tnnm.wmc"
+"detect" = "0328_centernet_14M_submit"
+"track" = "tracking_v1.onnx.opt.onnx"
+"keypoint" = "hand_keypoint_v3.5_single.onnx.opt.onnx"
+"classify" = "test_newbackbone3_cleandata_112.onnx.opt.onnx"

@@ -1,0 +1,26 @@
+material {
+    name : test,
+    shadingModel : unlit,
+    requires : [tangents],
+    culling : front,
+    variables : [
+        norm
+    ]
+}
+
+vertex {
+    void materialVertex(inout MaterialVertexInputs material) {
+        float3 normal = normalize(inverse(getWorldFromModelNormalMatrix()) * material.worldNormal);
+        material.norm.xyz = -normalize(normal) * 0.5 + 0.5;
+    }
+}
+
+fragment {
+
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        float3 nor = -normalize(getWorldNormalVector()) * 0.5 + 0.5;
+        material.baseColor.rgb = variable_norm.xyz;
+        material.baseColor.a = 1.0;
+    }
+}

@@ -1,0 +1,152 @@
+material {
+    name : test,
+    shadingModel : unlit,
+    blending : transparent,
+    parameters : [
+        {
+           type : samplerCubemap,
+           name : refractTex
+        },
+        {
+           type : sampler2d,
+           name : fakeTex
+        },
+        {
+           type : float3,
+           name : refractIndex
+        },
+        {
+           type : float3,
+           name : refractSpeed
+        },
+        {
+           type : float4,
+           name : baseColor
+        },
+        {
+           type : float4,
+           name : mixFactor
+        },
+        {
+           type : float,
+           name : maxBounce
+        },
+        {
+           type : float,
+           name : finalAlpha
+        }
+    ],
+    requires : [uv0, color, tangents],
+    variables : [
+      norm, view
+    ]
+}
+
+vertex {
+  void materialVertex(inout MaterialVertexInputs material) {
+        float3 normal = normalize(material.worldNormal);
+        float3 viewDir = -normalize(getWorldCameraPosition() - material.worldPosition.xyz);
+
+        material.view.xyz = viewDir.xyz;
+        material.norm.xyz = normal.xyz;
+  }
+}
+
+fragment {
+    vec3 getColor(vec3 dir) {
+      float rx = abs(dir.x);
+      float ry = abs(dir.y);
+      float rz = abs(dir.z);
+      if (rx >= ry && rx >= rz) {
+        float ma = 1.0 / abs(dir.x);
+        if(dir.x > 0.0) {
+          float sc = -dir.z;
+          float tc = -dir.y;
+          vec2 addr= vec2((sc * ma + 1.0) * 0.5, (tc * ma + 1.0f) * 0.5);
+          return texture(materialParams_fakeTex, addr).rgb;
+        } else {
+          float sc = dir.z;
+          float tc = -dir.y;
+          vec2 addr= vec2((sc * ma + 1.0) * 0.5, (tc * ma + 1.0f) * 0.5);
+          return texture(materialParams_fakeTex, addr).rgb;
+        }
+      } else if (ry >= rx && ry >= rz) {
+        float ma = 1.0 / abs(dir.y);
+        if(dir.y > 0.0) {
+          float sc = dir.x;
+          float tc = dir.z;
+          vec2 addr= vec2((sc * ma + 1.0) * 0.5, (tc * ma + 1.0f) * 0.5);
+          return texture(materialParams_fakeTex, addr).rgb;
+        } else {
+          float sc = dir.x;
+          float tc = -dir.z;
+          vec2 addr= vec2((sc * ma + 1.0) * 0.5, (tc * ma + 1.0f) * 0.5);
+          return texture(materialParams_fakeTex, addr).rgb;
+        }
+      } else {
+        float ma = 1.0 / abs(dir.z);
+        if(dir.z > 0.0) {
+          float sc = dir.x;
+          float tc = -dir.y;
+          vec2 addr= vec2((sc * ma + 1.0) * 0.5, (tc * ma + 1.0f) * 0.5);
+          return texture(materialParams_fakeTex, addr).rgb;
+        } else {
+          float sc = -dir.x;
+          float tc = -dir.y;
+          vec2 addr= vec2((sc * ma + 1.0) * 0.5, (tc * ma + 1.0f) * 0.5);
+          return texture(materialParams_fakeTex, addr).rgb;
+        }
+      }
+      return vec3(1.0, 0.0, 0.0);
+    }
+
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+
+        float COS_CRITICAL_ANGLE = sqrt(1.0 - 1.0/(materialParams.refractIndex.r * materialParams.refractIndex.r));
+
+        float3 viewDir = -getWorldViewVector();
+        float3 normal = getWorldNormalVector();
+        float fresnelFactor = pow(1.0 - abs(dot(viewDir, normal)), 2.0);
+        float3 color = texture(materialParams_refractTex, viewDir).rgb * 2.0 - 1.0;
+
+        float3 inDir = refract(viewDir, normal, 1.0/materialParams.refractIndex.r);
+        float3 inDirR, inDirG, inDirB;
+        for (float bounce = 0.0; bounce < materialParams.maxBounce; bounce++)
+        {
+          float3 inN = texture(materialParams_refractTex, inDir).rgb * 2.0 - 1.0;
+          if (abs(dot(-inDir, inN)) > COS_CRITICAL_ANGLE) {
+            inDirR.rgb = refract(inDir, inN, materialParams.refractIndex.r);
+            inDirG.rgb = refract(inDir, inN, materialParams.refractIndex.g + bounce * materialParams.refractSpeed.g);
+            inDirB.rgb = refract(inDir, inN, materialParams.refractIndex.b + bounce * materialParams.refractSpeed.b);
+            break;
+          }
+
+          if (bounce == materialParams.maxBounce-1.0) {
+            inDirR.rgb = refract(inDir, inN, 1.0/ materialParams.refractIndex.r);
+            inDirG.rgb = refract(inDir, inN, 1.0/ (materialParams.refractIndex.g + bounce * materialParams.refractSpeed.g));
+            inDirB.rgb = refract(inDir, inN, 1.0/ (materialParams.refractIndex.b + bounce * materialParams.refractSpeed.b));
+            break;
+          }
+          inDir = reflect(inDir, inN);
+        }
+
+        //float2 uv = gl_FragCoord.xy * getResolution().zw; uv.y = 1.0 - uv.y;
+        //float3 dir = float3(1.0, uv.x * 2.0 - 1.0, uv.y * 2.0 - 1.0); // select POSITIVE_Y
+        //material.baseColor.rgb = texture(materialParams_specCube, dir).rgb;
+
+        material.baseColor.rgb = getColor(getWorldReflectedVector());
+        material.baseColor.rgb = material.baseColor.rgb * fresnelFactor;
+        material.baseColor.r += getColor(inDirR.rgb).r * (1.0 - fresnelFactor);
+        material.baseColor.g += getColor(inDirG.rgb).g * (1.0 - fresnelFactor);
+        material.baseColor.b += getColor(inDirB.rgb).b * (1.0 - fresnelFactor);
+
+        material.baseColor.r = mix(material.baseColor.r, materialParams.baseColor.r, materialParams.mixFactor.r);
+        material.baseColor.g = mix(material.baseColor.g, materialParams.baseColor.g, materialParams.mixFactor.g);
+        material.baseColor.b = mix(material.baseColor.b, materialParams.baseColor.b, materialParams.mixFactor.b);
+
+        //material.baseColor.rgb = color.rgb;
+        material.baseColor.a = materialParams.finalAlpha;
+        material.baseColor.rgb *= material.baseColor.a;
+    }
+}

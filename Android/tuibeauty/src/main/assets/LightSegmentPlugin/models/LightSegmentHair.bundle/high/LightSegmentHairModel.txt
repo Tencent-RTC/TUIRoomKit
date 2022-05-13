@@ -1,0 +1,1 @@
+头发分割_hairseg_v3.2_2020.11.23_mbnv2-256x256-big-4_input_iaa3_1e-4_MobileNetV2_Depthwise_SADv4_92-postv4.opt.tnnm.wmc

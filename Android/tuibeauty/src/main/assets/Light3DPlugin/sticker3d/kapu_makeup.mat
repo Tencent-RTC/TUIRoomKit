@@ -1,0 +1,316 @@
+material {
+    name : bakedTexture,
+    parameters : [
+        {
+            type : int,
+            name : beautyCount
+        },
+        {
+            type : sampler2d,
+            name : map
+        },
+        {
+            type : float3,
+            name : hsv
+        },
+        {
+            type : sampler2d,
+            name : beautyMap1
+        },
+        {
+            type : float3,
+            name : beautyHsv1
+        },
+        {
+            type : float2,
+            name : beautyLocation1
+        },
+        {
+            type : float2,
+            name : beautySize1
+        },
+        {
+            type : sampler2d,
+            name : beautyMap2
+        },
+        {
+            type : float3,
+            name : beautyHsv2
+        },
+        {
+            type : float2,
+            name : beautyLocation2
+        },
+        {
+            type : float2,
+            name : beautySize2
+        },
+        {
+            type : sampler2d,
+            name : beautyMap3
+        },
+        {
+            type : float3,
+            name : beautyHsv3
+        },
+        {
+            type : float2,
+            name : beautyLocation3
+        },
+        {
+            type : float2,
+            name : beautySize3
+        },
+        {
+            type : sampler2d,
+            name : beautyMap4
+        },
+        {
+            type : float3,
+            name : beautyHsv4
+        },
+        {
+            type : float2,
+            name : beautyLocation4
+        },
+        {
+            type : float2,
+            name : beautySize4
+        },
+        {
+            type : sampler2d,
+            name : beautyMap5
+        },
+        {
+            type : float3,
+            name : beautyHsv5
+        },
+        {
+            type : float2,
+            name : beautyLocation5
+        },
+        {
+            type : float2,
+            name : beautySize5
+        },
+        {
+            type : sampler2d,
+            name : beautyMap6
+        },
+        {
+            type : float3,
+            name : beautyHsv6
+        },
+        {
+            type : float2,
+            name : beautyLocation6
+        },
+        {
+            type : float2,
+            name : beautySize6
+        },
+        {
+            type : sampler2d,
+            name : beautyMap7
+        },
+        {
+            type : float3,
+            name : beautyHsv7
+        },
+        {
+            type : float2,
+            name : beautyLocation7
+        },
+        {
+            type : float2,
+            name : beautySize7
+        }
+    ],
+    requires : [
+        uv0
+    ],
+    shadingModel : unlit,
+    blending : fade,
+    doubleSided: true,
+    flipUV: true
+}
+
+fragment {
+    vec3 rgb2hsv(vec3 c)
+    {
+        vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+        vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+        vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+        float d = q.x - min(q.w, q.y);
+        float e = 0.0001;
+        return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+    }
+
+
+    vec3 hsv2rgb(vec3 c)
+    {
+        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    }
+
+
+    vec4 applyHSV(vec4 color, vec3 deltaHSV)
+    {
+        if (deltaHSV.x != 0.0)
+        {
+            vec3 hsv = rgb2hsv(color.rgb);
+            hsv.x += deltaHSV.x;
+            if (hsv.x > 6.0) {
+                hsv.x = hsv.x - 6.0;
+            } else if (hsv.x < 0.0) {
+                hsv.x = hsv.x + 6.0;
+            }
+            color.rgb = hsv2rgb(hsv);
+        }
+
+        if (deltaHSV.y != 0.0)
+        {
+            float c_max = max(color.r, max(color.g, color.b));
+            float c_min = min(color.r, min(color.g, color.b));
+            float delta = c_max - c_min;
+            if (delta != 0.0)
+            {
+                float v = c_max + c_min;
+                float l = v * 0.5;
+                float s = l < 0.5 ? (delta / v) : ((delta) / (2.0 - v));
+                if (deltaHSV.y >= 0.0)
+                {
+                    float alpha = (deltaHSV.y + s) >= 1.0 ? s : (1.0 - deltaHSV.y);
+                    alpha = 1.0 / alpha - 1.0;
+                    color.rgb = color.rgb + (color.rgb - l) * alpha;
+                }
+                else
+                {
+                    float alpha = deltaHSV.y;
+                    color.rgb = l + (color.rgb - l) * (1.0 + alpha);
+                }
+            }
+        }
+
+        if (deltaHSV.z != 0.0)
+        {
+            color.rgb = deltaHSV.z > 0.0 ? (color.rgb * (1.0 - deltaHSV.z) + deltaHSV.z) : (color.rgb + color.rgb * deltaHSV.z);
+        }
+        return color;
+    }
+
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        vec2 v_TexCoord = uvToRenderTargetUV(getUV0());
+        vec4 mc = texture(materialParams_map, vec2(v_TexCoord.x, 1.0 - v_TexCoord.y));
+        mc.a = 1.0;
+        mc = applyHSV(mc, materialParams.hsv);
+        if (materialParams.beautyCount >= 1)
+        {
+            vec2 cl = materialParams.beautyLocation1;
+            vec2 cs = materialParams.beautySize1;
+            if(v_TexCoord.x >= cl.x && v_TexCoord.x <= (cl.x + cs.x) && v_TexCoord.y >= cl.y && v_TexCoord.y <= (cl.y + cs.y) )
+            {
+                vec2 localUV = vec2((v_TexCoord.x - cl.x) / (cs.x) ,(v_TexCoord.y - cl.y) / (cs.y) );
+                vec4 c = texture(materialParams_beautyMap1, localUV);
+                c = applyHSV(c, materialParams.beautyHsv1);
+                mc = mc * ( 1.0- c.a) + vec4(c.rgb,1.0) * c.a;
+            }
+        }
+
+        if (materialParams.beautyCount >= 1)
+        {
+            vec2 cl = materialParams.beautyLocation1;
+            vec2 cs = materialParams.beautySize1;
+            if(v_TexCoord.x >= cl.x && v_TexCoord.x <= (cl.x + cs.x) && v_TexCoord.y >= cl.y && v_TexCoord.y <= (cl.y + cs.y) )
+            {
+                vec2 localUV = vec2((v_TexCoord.x - cl.x) / (cs.x) ,(v_TexCoord.y - cl.y) / (cs.y) );
+                vec4 c = texture(materialParams_beautyMap1, localUV);
+                c = applyHSV(c, materialParams.beautyHsv1);
+                mc = mc * ( 1.0- c.a) + vec4(c.rgb,1.0) * c.a;
+            }
+        }
+
+        if (materialParams.beautyCount >= 2)
+        {
+            vec2 cl = materialParams.beautyLocation2;
+            vec2 cs = materialParams.beautySize2;
+            if(v_TexCoord.x >= cl.x && v_TexCoord.x <= (cl.x + cs.x) && v_TexCoord.y >= cl.y && v_TexCoord.y <= (cl.y + cs.y) )
+            {
+                vec2 localUV = vec2((v_TexCoord.x - cl.x) / (cs.x) ,(v_TexCoord.y - cl.y) / (cs.y) );
+                vec4 c = texture(materialParams_beautyMap2, localUV);
+                c = applyHSV(c, materialParams.beautyHsv2);
+                mc = mc * ( 1.0- c.a) + vec4(c.rgb,1.0) * c.a;
+            }
+        }
+
+        if (materialParams.beautyCount >= 3)
+        {
+            vec2 cl = materialParams.beautyLocation3;
+            vec2 cs = materialParams.beautySize3;
+            if(v_TexCoord.x >= cl.x && v_TexCoord.x <= (cl.x + cs.x) && v_TexCoord.y >= cl.y && v_TexCoord.y <= (cl.y + cs.y) )
+            {
+                vec2 localUV = vec2((v_TexCoord.x - cl.x) / (cs.x) ,(v_TexCoord.y - cl.y) / (cs.y) );
+                vec4 c = texture(materialParams_beautyMap3, localUV);
+                c = applyHSV(c, materialParams.beautyHsv3);
+                mc = mc * ( 1.0- c.a) + vec4(c.rgb,1.0) * c.a;
+            }
+        }
+
+        if (materialParams.beautyCount >= 4)
+        {
+            vec2 cl = materialParams.beautyLocation4;
+            vec2 cs = materialParams.beautySize4;
+            if(v_TexCoord.x >= cl.x && v_TexCoord.x <= (cl.x + cs.x) && v_TexCoord.y >= cl.y && v_TexCoord.y <= (cl.y + cs.y) )
+            {
+                vec2 localUV = vec2((v_TexCoord.x - cl.x) / (cs.x) ,(v_TexCoord.y - cl.y) / (cs.y) );
+                vec4 c = texture(materialParams_beautyMap4, localUV);
+                c = applyHSV(c, materialParams.beautyHsv4);
+                mc = mc * ( 1.0- c.a) + vec4(c.rgb,1.0) * c.a;
+            }
+        }
+
+        if (materialParams.beautyCount >= 5)
+        {
+            vec2 cl = materialParams.beautyLocation5;
+            vec2 cs = materialParams.beautySize5;
+            if(v_TexCoord.x >= cl.x && v_TexCoord.x <= (cl.x + cs.x) && v_TexCoord.y >= cl.y && v_TexCoord.y <= (cl.y + cs.y) )
+            {
+                vec2 localUV = vec2((v_TexCoord.x - cl.x) / (cs.x) ,(v_TexCoord.y - cl.y) / (cs.y) );
+                vec4 c = texture(materialParams_beautyMap5, localUV);
+                c = applyHSV(c, materialParams.beautyHsv5);
+                mc = mc * ( 1.0- c.a) + vec4(c.rgb,1.0) * c.a;
+            }
+        }
+
+        if (materialParams.beautyCount >= 6)
+        {
+            vec2 cl = materialParams.beautyLocation6;
+            vec2 cs = materialParams.beautySize6;
+            if(v_TexCoord.x >= cl.x && v_TexCoord.x <= (cl.x + cs.x) && v_TexCoord.y >= cl.y && v_TexCoord.y <= (cl.y + cs.y) )
+            {
+                vec2 localUV = vec2((v_TexCoord.x - cl.x) / (cs.x) ,(v_TexCoord.y - cl.y) / (cs.y) );
+                vec4 c = texture(materialParams_beautyMap6, localUV);
+                c = applyHSV(c, materialParams.beautyHsv6);
+                mc = mc * ( 1.0- c.a) + vec4(c.rgb,1.0) * c.a;
+            }
+        }
+
+        if (materialParams.beautyCount >= 7)
+        {
+            vec2 cl = materialParams.beautyLocation7;
+            vec2 cs = materialParams.beautySize7;
+            if(v_TexCoord.x >= cl.x && v_TexCoord.x <= (cl.x + cs.x) && v_TexCoord.y >= cl.y && v_TexCoord.y <= (cl.y + cs.y) )
+            {
+                vec2 localUV = vec2((v_TexCoord.x - cl.x) / (cs.x) ,(v_TexCoord.y - cl.y) / (cs.y) );
+                vec4 c = texture(materialParams_beautyMap7, localUV);
+                c = applyHSV(c, materialParams.beautyHsv7);
+                mc = mc * ( 1.0- c.a) + vec4(c.rgb,1.0) * c.a;
+            }
+        }
+
+        material.baseColor = mc;
+    }
+}

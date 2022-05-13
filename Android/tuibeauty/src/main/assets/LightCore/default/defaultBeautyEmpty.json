@@ -1,0 +1,160 @@
+{
+   "root": {
+      "id": 1016,
+      "name": "拍摄模板",
+      "children": [
+         {
+            "id": 1024,
+            "name": "摄像头",
+            "children": [
+            ],
+            "enabled": true,
+            "version": 0,
+            "components": [
+               {
+                  "type": "ScreenTransform",
+                  "position": {
+                     "x": 0,
+                     "y": 0,
+                     "z": 0
+                  },
+                  "rotation": {
+                     "x": 0,
+                     "y": 0,
+                     "z": 0,
+                     "w": 1
+                  },
+                  "scale": {
+                     "x": 1,
+                     "y": 1,
+                     "z": 1
+                  },
+                  "anchor": {
+                     "left": 0,
+                     "right": 0,
+                     "top": 0,
+                     "bottom": 0
+                  },
+                  "offset": {
+                     "left": -360,
+                     "right": 360,
+                     "top": 640,
+                     "bottom": -640
+                  },
+                  "pivot": {
+                     "x": 0,
+                     "y": 0
+                  },
+                  "ePinToEdge": 0,
+                  "eFixSize": 3,
+                  "eEditingMode": 0,
+                  "eKeepRatio": false,
+                  "enabled": true,
+                  "entityId": 1024,
+                  "componentID": 1217,
+                  "objectEnabled": true
+               },
+               {
+                  "componentID": 1218,
+                  "enabled": true,
+                  "entityId": 1024,
+                  "renderTargetKey": "RenderTarget",
+                  "type": "Camera",
+                  "version": 8
+               },
+               {
+                  "type": "EntityIdentifier",
+                  "name": "摄像头",
+                  "id": 1024
+               }
+            ]
+         }
+      ],
+      "components": [
+         {
+            "anchor": {
+               "bottom": 0,
+               "left": 0,
+               "right": 0,
+               "top": 0
+            },
+            "offset": {
+               "bottom": 0,
+               "left": 0,
+               "right": 0,
+               "top": 0
+            },
+            "pivot": {
+               "x": 0,
+               "y": 0
+            },
+            "ePinToEdge": 0,
+            "eFixSize": 3,
+            "eEditingMode": 0,
+            "eKeepRatio": false,
+            "position": {
+               "x": 0,
+               "y": 0,
+               "z": 0
+            },
+            "scale": {
+               "x": 1,
+               "y": 1,
+               "z": 1
+            },
+            "rotation": {
+               "w": 0,
+               "x": 0,
+               "y": 0,
+               "z": 0
+            },
+            "entityId": 1016,
+            "componentID": 1219,
+            "type": "ScreenTransform",
+            "enabled": true,
+            "version": 2,
+            "objectEnabled": true
+         },
+         {
+            "enabled": true,
+            "entityId": 1016,
+            "tips": "提示语",
+            "type": "Tips",
+            "version": 17,
+            "image": "",
+            "componentID": 1230
+         },
+         {
+            "type": "EntityIdentifier",
+            "name": "拍摄模板",
+            "id": 1016
+         }
+      ],
+      "enabled": true,
+      "version": 0,
+      "inputFormats": [
+         {
+            "key": "DeviceCameraTexture",
+            "type": "TextureData",
+            "properties": {}
+         }
+      ]
+   },
+   "inputSources": {
+      "RenderTarget": {
+         "key": "RenderTarget",
+         "path": "RenderTarget.rdt",
+         "hash": "1007a798a17b0b0b3b7e21c6a2e8b805",
+         "label": "RenderTarget.rdt",
+         "type": "RenderTarget",
+         "inputKey": "DeviceCameraTexture"
+      },
+      "DeviceCameraTexture": {
+         "key": "DeviceCameraTexture",
+         "path": "DeviceCameraTexture.tex",
+         "hash": "18167426118cbf6da2972283f3318e72",
+         "label": "DeviceCameraTexture.tex",
+         "type": "TextureData"
+      }
+   }
+}

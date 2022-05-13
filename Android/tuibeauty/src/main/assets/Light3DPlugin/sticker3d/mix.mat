@@ -1,0 +1,32 @@
+material {
+    name : mix,
+    shadingModel : unlit,
+    depthWrite: false,
+    depthCulling: false,
+    blending: transparent,
+    parameters : [
+        {
+            type : sampler2d,
+            name : color
+        },
+        {
+            type : sampler2d,
+            name : secondary
+         }
+    ],
+    requires: [
+        uv0
+    ],
+}
+fragment {
+     void material(inout MaterialInputs material) {
+         prepareMaterial(material);
+         vec2 uv = uvToRenderTargetUV(getUV0());
+         vec4 primary = texture(materialParams_color, uv);
+         vec4 blurred = texture(materialParams_secondary, uv);
+         material.baseColor = mix(primary, blurred, blurred.a);
+         if (material.baseColor.a > 0.01) {
+            material.baseColor *= (max(primary.a, blurred.a) / material.baseColor.a);
+         }
+     }
+}
