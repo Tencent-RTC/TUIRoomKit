@@ -3,7 +3,7 @@
 //  TRTCScenesDemo
 //
 //  Created by J J on 2020/5/14.
-//  Copyright © 2020 xcoderliu. All rights reserved.
+//  Copyright © 2022 Tencent. All rights reserved.
 //
 
 import Foundation

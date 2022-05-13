@@ -1,0 +1,77 @@
+
+material {
+    name : bloom_mix,
+    shadingModel : unlit,
+    depthWrite: false,
+    depthCulling: false,
+    parameters : [
+        {
+            type : sampler2d,
+            name : color
+        },
+        {
+            type : sampler2d,
+            name : secondary
+        },
+        {
+            type : sampler2d,
+            name : bloom
+        },
+        {
+            type : float,
+            name : mixAlpha
+        },
+        {
+            type : int,
+            name : type
+        }
+    ],
+    requires: [
+        uv0
+    ]
+}
+
+fragment {
+
+    const float kReinhardWeight = 5.0;
+    const float minAlpha = 0.0;
+    
+    vec3 Tonemap_ReinhardWeighted(const vec3 x, float weight) {
+        // Weighted Reinhard tone-mapping operator designed for post-processing
+        // This tone-mapping operator is invertible
+        return x * (weight / (max3(x) + 1.0));
+    }
+
+    vec3 Tonemap_ReinhardWeighted_Invert(const vec3 x) {
+        // Inverse Reinhard tone-mapping operator, designed to be used in conjunction
+        // with the weighted Reinhard tone-mapping operator
+        return x / (1.0 - max3(x));
+    }
+    
+    float when_eq(float x, float y) {
+        return 1.0 - abs(sign(x - y));
+    }
+
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        float mixAlpha = materialParams.mixAlpha;
+        vec2 uv = uvToRenderTargetUV(getUV0());
+        vec4 primary = texture(materialParams_color, uv);    // 所有 entity 都有的初始 view
+        vec4 blurred = texture(materialParams_secondary, uv);   // 对 bloom view 做完 blur 后的 view
+        vec4 bloom = texture(materialParams_bloom, uv);     // 只有指定做 bloom entity 的 view
+        // HACK: this is a crude bloom effect
+        //float L = max(0.0, max(blurred.r, max(blurred.g, blurred.b)));
+        
+        // 只有 blur.a > 0 时才做 mix
+        mixAlpha = (1.0-step(blurred.a, 0.0)) * mixAlpha;
+        // type = 1 时 bloom 的 entity 不 mix, 保持原来颜色
+        if (materialParams.type > 0 && bloom.a > 0.0) {
+            mixAlpha = 0.0;
+        }
+        material.baseColor = mix(primary, blurred, mixAlpha);
+        // blur 的 entity 与不做 bloom 的 entity 重叠部分颜色采用相加模式
+        if(primary.a*blurred.a > 0.0 && bloom.a <= 0.0) {
+            material.baseColor = blurred * mixAlpha + primary;
+        }
+    }
+}

@@ -1,0 +1,99 @@
+{
+   "defaultValueItems": [
+      {
+         "key": "mopi",
+         "description": "磨皮",
+         "defaultValue": 0.6
+      },
+      {
+         "key": "ziranmeixing",
+         "description": "自然美型",
+         "defaultValue": 0.4
+      },
+      {
+         "key": "nvshenmeixing",
+         "description": "女神美型",
+         "defaultValue": 0.4
+      },
+      {
+         "key": "nanshenmeixing",
+         "description": "男神美型",
+         "defaultValue": 0.4
+      },
+      {
+         "key": "dayan",
+         "description": "大眼",
+         "defaultValue": 0.3
+      },
+      {
+         "key": "qingxi",
+         "description": "清晰",
+         "defaultValue": 0.2
+      },
+      {
+         "key": "meibai",
+         "description": "美白",
+         "defaultValue": 0.3
+      },
+      {
+         "key": "xiaolian",
+         "description": "小脸",
+         "defaultValue": 0.0
+      },
+      {
+         "key": "zhailian",
+         "description": "窄脸",
+         "defaultValue": 0.0
+      },
+      {
+         "key": "shouquangu",
+         "description": "瘦颧骨",
+         "defaultValue": 0.2
+      },
+      {
+         "key": "shoubi",
+         "description": "瘦鼻",
+         "defaultValue": 0.3
+      },
+      {
+         "key": "zuixing",
+         "description": "嘴型",
+         "defaultValue": 0.0
+      },
+      {
+         "key": "etou",
+         "description": "额头",
+         "defaultValue": 0.0
+      },
+      {
+         "key": "kouhong",
+         "description": "口红",
+         "defaultValue": 0.3
+      },
+      {
+         "key": "saihong",
+         "description": "腮红",
+         "defaultValue": 0.2
+      },
+      {
+         "key": "wuguanliti",
+         "description": "五官立体",
+         "defaultValue": 0.4
+      },
+      {
+         "key": "baiya",
+         "description": "白牙",
+         "defaultValue": 0.2
+      },
+      {
+         "key": "heiyanquan",
+         "description": "黑眼圈",
+         "defaultValue": 0.5
+      },
+      {
+         "key": "falingwen",
+         "description": "法令纹",
+         "defaultValue": 0.3
+      }
+   ]
+}

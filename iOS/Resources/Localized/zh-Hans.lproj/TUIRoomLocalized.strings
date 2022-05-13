@@ -49,6 +49,7 @@
 "TUIRoom.error.logout.room.num" = "异常退出房间:\"xxx\"";
 "TUIRoom.no.login" = "不进入";
 "TUIRoom.enter.again" = "再次进入";
+"TUIRoom.enter.error.already" = "你已经在房间了";
 
 "TUIRoom.prompt" = "提示";
 "TUIRoom.recording.save.path" = "录音保存路径：";

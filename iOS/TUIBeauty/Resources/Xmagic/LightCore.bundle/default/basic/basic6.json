@@ -1,0 +1,575 @@
+{
+    "distortionList" : [
+      {
+        "radius" : 500,
+        "distortion" : 3,
+        "strength" : 0.01,
+        "position" : 9,
+        "direction" : 2
+      },
+      {
+        "radius" : 70,
+        "distortion" : 3,
+        "strength" : 0,
+        "dx" : -10,
+        "position" : 35,
+        "direction" : 1
+      },
+      {
+        "radius" : 70,
+        "distortion" : 3,
+        "strength" : 0,
+        "dx" : 10,
+        "position" : 45,
+        "direction" : 3
+      },
+      {
+        "radius" : 80,
+        "distortion" : 3,
+        "strength" : 0.10000000149011612,
+        "dx" : 10,
+        "position" : 41,
+        "direction" : 2
+      },
+      {
+        "radius" : 80,
+        "distortion" : 3,
+        "strength" : 0.10000000149011612,
+        "dx" : -10,
+        "position" : 51,
+        "direction" : 2
+      },
+      {
+        "radius" : 90,
+        "distortion" : 3,
+        "strength" : 0.059999998658895493,
+        "dx" : 0,
+        "position" : 37,
+        "direction" : 8
+      },
+      {
+        "radius" : 90,
+        "distortion" : 3,
+        "strength" : 0.059999998658895493,
+        "dx" : 0,
+        "position" : 47,
+        "direction" : 7
+      },
+      {
+        "radius" : 80,
+        "distortion" : 3,
+        "strength" : 0.079999998211860657,
+        "position" : 42,
+        "direction" : 2
+      },
+      {
+        "radius" : 80,
+        "distortion" : 3,
+        "strength" : 0.079999998211860657,
+        "position" : 52,
+        "direction" : 2
+      },
+      {
+        "radius" : 110,
+        "position" : 43,
+        "dy" : 5,
+        "distortion" : 1,
+        "strength" : 0.059999998658895493,
+        "direction" : 0,
+        "dx" : -10
+      },
+      {
+        "radius" : 110,
+        "position" : 53,
+        "dy" : 5,
+        "distortion" : 1,
+        "strength" : 0.059999998658895493,
+        "direction" : 0,
+        "dx" : 10
+      },
+      {
+        "radius" : 70,
+        "position" : 39,
+        "dy" : 5,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.10000000149011612,
+        "direction" : 3,
+        "dx" : 10,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 70,
+        "position" : 49,
+        "dy" : 5,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.10000000149011612,
+        "direction" : 1,
+        "dx" : -10,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 80,
+        "position" : 36,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.079999998211860657,
+        "direction" : 4,
+        "dx" : -10,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 80,
+        "position" : 46,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.079999998211860657,
+        "direction" : 4,
+        "dx" : 10,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 120,
+        "position" : 57,
+        "dy" : -60,
+        "distortion" : 3,
+        "strength" : 0.15000000596046448,
+        "direction" : 3,
+        "dx" : 10
+      },
+      {
+        "radius" : 120,
+        "position" : 61,
+        "dy" : -60,
+        "distortion" : 3,
+        "strength" : 0.15000000596046448,
+        "direction" : 1,
+        "dx" : -10
+      },
+      {
+        "radius" : 220,
+        "position" : 2,
+        "dy" : -10,
+        "distortion" : 3,
+        "strength" : 0.059999998658895493,
+        "direction" : 6,
+        "dx" : 0
+      },
+      {
+        "radius" : 220,
+        "position" : 16,
+        "dy" : -10,
+        "distortion" : 3,
+        "strength" : 0.059999998658895493,
+        "direction" : 5,
+        "dx" : 0
+      },
+      {
+        "radius" : 240,
+        "position" : 5,
+        "dy" : -5,
+        "distortion" : 3,
+        "strength" : 0.05000000074505806,
+        "direction" : 6,
+        "dx" : -10
+      },
+      {
+        "radius" : 240,
+        "position" : 13,
+        "dy" : -5,
+        "distortion" : 3,
+        "strength" : 0.05000000074505806,
+        "direction" : 5,
+        "dx" : 10
+      },
+      {
+        "radius" : 150,
+        "position" : 7,
+        "dy" : -10,
+        "distortion" : 3,
+        "strength" : 0.11999999731779099,
+        "direction" : 6,
+        "dx" : -10
+      },
+      {
+        "radius" : 150,
+        "position" : 11,
+        "dy" : -10,
+        "distortion" : 3,
+        "strength" : 0.11999999731779099,
+        "direction" : 5,
+        "dx" : 10
+      },
+      {
+        "radius" : 120,
+        "position" : 5,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.15000000596046448,
+        "direction" : 6,
+        "dx" : 10,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 120,
+        "position" : 13,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.15000000596046448,
+        "direction" : 5,
+        "dx" : -10,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 220,
+        "position" : 9,
+        "dy" : -20,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.25,
+        "direction" : 2,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 120,
+        "position" : 68,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.15000000596046448,
+        "direction" : 2,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 120,
+        "position" : 70,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.15000000596046448,
+        "direction" : 2,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 180,
+        "position" : 9,
+        "dy" : 15,
+        "targetDx" : 0,
+        "distortion" : 2,
+        "strength" : 0,
+        "direction" : 0,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 120,
+        "position" : 64,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 2,
+        "strength" : 0.059999998658895493,
+        "direction" : 0,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 600,
+        "position" : 83,
+        "dy" : -50,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.029999999329447746,
+        "direction" : 2,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 150,
+        "position" : 4,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.039999999105930328,
+        "direction" : 6,
+        "dx" : -10,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 150,
+        "position" : 14,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.039999999105930328,
+        "direction" : 5,
+        "dx" : 10,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 140,
+        "distortion" : 3,
+        "strength" : 0.18000000715255737,
+        "dx" : -20,
+        "position" : 0,
+        "direction" : 3
+      },
+      {
+        "radius" : 140,
+        "distortion" : 3,
+        "strength" : 0.18000000715255737,
+        "dx" : 20,
+        "position" : 18,
+        "direction" : 1
+      },
+      {
+        "radius" : 120,
+        "position" : 1,
+        "dy" : -5,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.10000000149011612,
+        "direction" : 3,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 120,
+        "position" : 17,
+        "dy" : -5,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.10000000149011612,
+        "direction" : 1,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 90,
+        "position" : 56,
+        "dy" : -15,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.25,
+        "direction" : 3,
+        "dx" : -20,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 90,
+        "position" : 62,
+        "dy" : -15,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.25,
+        "direction" : 1,
+        "dx" : 20,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 220,
+        "position" : 5,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.18000000715255737,
+        "direction" : 2,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 220,
+        "position" : 13,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.18000000715255737,
+        "direction" : 2,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 80,
+        "position" : 0,
+        "dy" : 30,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.029999999329447746,
+        "direction" : 1,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 80,
+        "position" : 18,
+        "dy" : 30,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.029999999329447746,
+        "direction" : 3,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 100,
+        "position" : 3,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.10000000149011612,
+        "direction" : 3,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 100,
+        "position" : 15,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.10000000149011612,
+        "direction" : 1,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 80,
+        "position" : 0,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.079999998211860657,
+        "direction" : 3,
+        "dx" : -5,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 80,
+        "position" : 18,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.079999998211860657,
+        "direction" : 1,
+        "dx" : 5,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 200,
+        "position" : 0,
+        "dy" : 100,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.070000000298023224,
+        "direction" : 3,
+        "dx" : -20,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 200,
+        "position" : 18,
+        "dy" : 100,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.070000000298023224,
+        "direction" : 1,
+        "dx" : 20,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 120,
+        "position" : 43,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.059999998658895493,
+        "direction" : 3,
+        "dx" : 5,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 120,
+        "position" : 53,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.059999998658895493,
+        "direction" : 1,
+        "dx" : -5,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 100,
+        "position" : 1,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.11999999731779099,
+        "direction" : 3,
+        "dx" : -10,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 100,
+        "position" : 17,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.11999999731779099,
+        "direction" : 1,
+        "dx" : 10,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 120,
+        "position" : 2,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0,
+        "direction" : 3,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 120,
+        "position" : 16,
+        "dy" : 0,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0,
+        "direction" : 1,
+        "dx" : 0,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 220,
+        "position" : 4,
+        "dy" : 5,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.05000000074505806,
+        "direction" : 3,
+        "dx" : -20,
+        "targetDy" : 0
+      },
+      {
+        "radius" : 220,
+        "position" : 14,
+        "dy" : 5,
+        "targetDx" : 0,
+        "distortion" : 3,
+        "strength" : 0.05000000074505806,
+        "direction" : 1,
+        "dx" : 20,
+        "targetDy" : 0
+      }
+    ]
+  }

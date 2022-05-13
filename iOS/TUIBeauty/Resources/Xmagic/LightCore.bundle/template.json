@@ -1,0 +1,149 @@
+{
+    "root": {
+        "id": 16,
+        "name": "拍摄模板",
+        "children": [
+            {
+                "id": 17,
+                "name": "2D画板",
+                "children": [],
+                "enabled": true,
+                "version": 0,
+                "components": [
+                    {
+                        "anchor": {
+                            "bottom": -1,
+                            "left": -1,
+                            "right": 1,
+                            "top": 1
+                        },
+                        "offset": {
+                            "bottom": 0,
+                            "left": 0,
+                            "right": 0,
+                            "top": 0
+                        },
+                        "pivot": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "ePinToEdge": 15,
+                        "eFixSize": 0,
+                        "eEditingMode": 1,
+                        "eKeepRatio": false,
+                        "position": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 0
+                        },
+                        "scale": {
+                            "x": 1,
+                            "y": 1,
+                            "z": 1
+                        },
+                        "rotation": {
+                            "w": 0,
+                            "x": 0,
+                            "y": 0,
+                            "z": 0
+                        },
+                        "entityId": 17,
+                        "componentID": 2,
+                        "type": "ScreenTransform",
+                        "enabled": true,
+                        "version": 2,
+                        "objectEnabled": true
+                    },
+                    {
+                        "componentID": 3,
+                        "enabled": true,
+                        "entityId": 17,
+                        "renderTargetKey": "RenderTarget",
+                        "type": "Camera",
+                        "version": 2
+                    },
+                    {
+                        "type": "EntityIdentifier",
+                        "name": "2D画板",
+                        "id": 17
+                    }
+                ]
+            }
+        ],
+        "components": [
+            {
+                "anchor": {
+                    "bottom": -1,
+                    "left": -1,
+                    "right": 1,
+                    "top": 1
+                },
+                "offset": {
+                    "bottom": 0,
+                    "left": 0,
+                    "right": 0,
+                    "top": 0
+                },
+                "pivot": {
+                    "x": 0,
+                    "y": 0
+                },
+                "ePinToEdge": 15,
+                "eFixSize": 0,
+                "eEditingMode": 1,
+                "eKeepRatio": false,
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1,
+                    "z": 1
+                },
+                "rotation": {
+                    "w": 0,
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "entityId": 16,
+                "componentID": 1,
+                "type": "ScreenTransform",
+                "enabled": true,
+                "version": 2,
+                "objectEnabled": true
+            },
+            {
+                "type": "EntityIdentifier",
+                "name": "拍摄模板",
+                "id": 16
+            }
+        ],
+        "enabled": true,
+        "version": 0,
+        "inputFormats": [
+            {
+                "key": "DeviceCameraTexture",
+                "type": "TextureData",
+                "properties": {}
+            }
+        ]
+    },
+    "inputSources": {
+        "RenderTarget": {
+            "key": "RenderTarget",
+            "path": "RenderTarget.rdt",
+            "label": "RenderTarget.rdt",
+            "type": "RenderTarget",
+            "inputKey": "DeviceCameraTexture"
+        },
+        "DeviceCameraTexture": {
+            "key": "DeviceCameraTexture",
+            "path": "DeviceCameraTexture.tex",
+            "label": "DeviceCameraTexture.tex",
+            "type": "TextureData"
+        }
+    }
+}

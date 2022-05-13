@@ -1,0 +1,276 @@
+material {
+    name : pbr,
+    shadingModel : lit,
+    blending : fade,
+    doubleSided: true,
+    transparency : twoPassesTwoSides,
+    parameters : [
+
+        { type : sampler2d, name : baseColorMap },
+        { type : sampler2d, name : normalMap },
+        { type : sampler2d, name : metallicRoughnessSpecularMap },
+        { type : sampler2d, name : skinMaskMap },
+        { type : sampler2d, name : roughnessMap },
+        { type : sampler2d, name : metallicMap },
+        {
+            type : bool,
+            name : alphaPremultiplied
+        },
+        {
+            type : sampler2d,
+            name : baseColorMap_Alpha
+        },
+        {
+            type : bool,
+            name : hasAlphaMap
+        },
+        {
+            type: float3,
+            name: hsvColor
+        },
+        {
+            type : float,
+            name : metallic
+        },
+        {
+            type : float,
+            name : roughness
+        },
+        {
+            type : float,
+            name : specular
+        },
+        {
+            type : float,
+            name : anisotropy
+        },
+        {
+            type : float3,
+            name : anisotropyDirection
+        },
+        {
+            type : bool,
+            name : hasNormalMap
+        },
+        {
+            type : bool,
+            name : hasMRSMap
+        },
+        {
+            type : bool,
+            name : hasMaskMap
+        },
+        {
+            type: bool,
+            name: isEtcImage
+        },
+        {
+            type : bool,
+            name : hasRoughnessMap
+        },
+        {
+            type : bool,
+            name : hasMetallicMap
+        },
+        {
+            type: float3,
+            name: deltaHSV
+        },
+        {
+            type: float4,
+            name: emissionColor
+        },
+        {
+            type : float,
+            name : specularIntensity
+        }
+    ],
+    requires : [
+        uv0, tangents
+    ],
+
+    flipUV:true
+}
+
+fragment {
+    float lerp(float a, float b, float w) {
+        return a + w * (b-a);
+    }
+    vec3 lerpv(vec3 a, vec3 b, float w) {
+        return a + w * (b-a);
+    }
+
+    vec3 rgb2hsv(vec3 c) {
+        vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+        vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+        vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+        float d = q.x - min(q.w, q.y);
+        float e = 0.0001;
+
+        return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+    }
+
+    vec3 hsv2rgb(vec3 c) {
+        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    }
+
+    vec3 blend2(vec3 left, vec3 right, float pos){
+        return vec3(left.r * (1.0-pos) + right.r * pos, left.g * (1.0-pos) + right.g * pos, left.b * (1.0-pos) + right.b * pos);
+    }
+
+    vec3 blend3(vec3 left, vec3 main, vec3 right,float pos)
+    {
+        if (pos < 0.0){
+            return blend2(left, main, pos + 1.0);
+        }
+        else if (pos > 0.0){
+            return blend2(main, right, pos);
+        }
+        else{
+            return main;
+        }
+    }
+
+    // deltaH scaled from 0~1 , deltaS:0~1  deltaV:-1~1
+    vec4 applyColorizeHSV(vec4 mainColor, vec3 deltaHSV)
+    {
+        float deltaH = deltaHSV.x;
+        vec3 hueRGB =  hsv2rgb(vec3(deltaH,1.0,1.0));
+        float saturation = deltaHSV.y;
+        float lightness = deltaHSV.z;
+        float value = rgb2hsv(mainColor.rgb).z;
+
+        vec3 cc = blend2(vec3(0.5, 0.5, 0.5), hueRGB, saturation);
+        if (lightness <= -1.0){
+            return vec4(0,0,0,mainColor.a);
+        }
+        else if (lightness >= 1.0){
+            return vec4(1,1,1,mainColor.a);
+        }
+        else if (lightness >= 0.0){
+            vec3 c =  blend3(vec3(0.0,0.0,0.0), cc, vec3(1.0, 1.0, 1.0), 2.0* (1.0 - lightness) * (value - 1.0) + 1.0);
+            return vec4(c.rgb,mainColor.a);
+        }
+        else{
+            vec3 c = blend3(vec3(0.0,0.0,0.0), cc, vec3(1.0, 1.0, 1.0), 2.0* (1.0 + lightness) * (value) - 1.0);
+            return vec4(c.rgb,mainColor.a);
+        }
+    }
+
+    vec4 applyHSV(vec4 color, vec3 deltaHSV) {
+        if (deltaHSV.x != 0.0) {
+            vec3 hsv = rgb2hsv(color.rgb);
+            hsv.x += deltaHSV.x;
+            if (hsv.x > 6.0) {
+                hsv.x = hsv.x - 6.0;
+            } else if (hsv.x < 0.0) {
+                hsv.x = hsv.x + 6.0;
+            }
+            color.rgb = hsv2rgb(hsv);
+        }
+
+        if (deltaHSV.y != 0.0) {
+            float c_max = max(color.r, max(color.g, color.b));
+            float c_min = min(color.r, min(color.g, color.b));
+            float delta = c_max - c_min;
+            if (delta != 0.0) {
+                float v = c_max + c_min;
+                float l = v * 0.5;
+                float s = l < 0.5 ? (delta / v) : ((delta) / (2.0 - v));
+                if (deltaHSV.y >= 0.0) {
+                    float alpha = (deltaHSV.y + s) >= 1.0 ? s : (1.0 - deltaHSV.y);
+                    alpha = 1.0 / alpha - 1.0;
+                    color.rgb = color.rgb + (color.rgb - l) * alpha;
+                }
+                else {
+                    float alpha = deltaHSV.y;
+                    color.rgb = l + (color.rgb - l) * (1.0 + alpha);
+                }
+            }
+        }
+
+        if (deltaHSV.z != 0.0) {
+            color.rgb = deltaHSV.z > 0.0 ? (color.rgb * (1.0 - deltaHSV.z) + deltaHSV.z) : (color.rgb + color.rgb * deltaHSV.z);
+        }
+        return color;
+    }
+
+    mediump vec4 HSVColorizeABSCore(mediump vec4 mainColor, mediump float deltaH, mediump float deltaS, mediump float deltaV) {
+        mediump vec3 hueRGB = hsv2rgb(vec3(deltaH / 360.0, 1.0, 1.0));
+        mediump float saturation = deltaS / 100.0;
+        mediump float lightness = clamp(deltaV / 100.0, -1.0, 1.0);
+        mediump float value = rgb2hsv(mainColor.rgb).z;
+
+        mediump vec3 cc = blend2(vec3(0.5, 0.5, 0.5), hueRGB, saturation);
+        return lightness >= 0.0 ? vec4(blend3(vec3(0.0, 0.0, 0.0), cc, vec3(1.0, 1.0, 1.0), 2.0 * (1.0 - lightness) * (value - 1.0) + 1.0), mainColor.a) :
+            vec4(blend3(vec3(0.0, 0.0, 0.0), cc, vec3(1.0, 1.0, 1.0), 2.0 * (1.0 + lightness) * (value) - 1.0), mainColor.a);
+    }
+
+    mediump vec4 HSVColorizeABS(mediump vec4 mainColor, mediump vec4 hsvColor) {
+        vec4 result = HSVColorizeABSCore(mainColor, hsvColor.x, hsvColor.y, hsvColor.z);
+        return result;
+    }
+
+    void material(inout MaterialInputs material) {
+        float2 uv = getUV0();
+        if (materialParams.isEtcImage) {
+            uv.y = 1.0 - uv.y;
+        }
+        if (materialParams.hasNormalMap) {
+            material.normal = texture(materialParams_normalMap, uv).xyz * 2.0 - 1.0;
+        }
+        prepareMaterial(material);
+
+        float3 deltaHSV = materialParams.deltaHSV;
+        lowp float skinFactor = 0.0;
+        if (materialParams.hasMaskMap) {
+            lowp float skinMask = texture(materialParams_skinMaskMap, uv).r;
+            skinFactor = step(1e-2, skinMask);
+        }
+        float4 albedoColor = texture(materialParams_baseColorMap, uv);
+        if(materialParams.hasAlphaMap) {
+            albedoColor.a = texture(materialParams_baseColorMap_Alpha, uv).r;
+        }
+        if (!materialParams.alphaPremultiplied) {
+            albedoColor.rgb *= albedoColor.a;
+        }
+        float4 hsv = vec4(materialParams.hsvColor, 1.0);
+        float4 hsvColor = HSVColorizeABS(albedoColor, hsv);
+        float4 newColor = albedoColor * (1.0 - skinFactor) + hsvColor * skinFactor;
+
+        if(deltaHSV.x != 0.0 || deltaHSV.y != 0.0 || deltaHSV.z != 0.0) {
+            if (skinFactor > 0.1) {
+                newColor = applyHSV(newColor, deltaHSV);
+            }
+        }
+        material.baseColor = vec4(newColor.rgb, albedoColor.a);
+
+        float metallic = lerp(materialParams.metallic, 0.0, skinFactor);
+        float roughness = lerp(materialParams.roughness, 0.25, skinFactor);
+        float reflectance = lerp(materialParams.specular, 0.0, skinFactor);
+        if (materialParams.hasMRSMap) {
+            vec4 metalRoughSpec = texture(materialParams_metallicRoughnessSpecularMap, uv);
+            metallic = lerp(lerp(metalRoughSpec.r, 1.0, materialParams.metallic), 0.0, skinFactor); //mrs.r * materialParams.metallicFactor;
+            roughness = lerp(lerp(metalRoughSpec.g, 1.0, materialParams.roughness), 0.25, skinFactor); //mrs.g * materialParams.roughnessFactor;
+            reflectance = lerp(lerp(metalRoughSpec.b, 1.0, materialParams.specular), 0.0, skinFactor); //mrs.b * materialParams.reflectanceFactor;
+        }
+        if (materialParams.hasMetallicMap) {
+            vec4 metallicColor = texture(materialParams_metallicMap, uv);
+            metallic = lerp(lerp(metallicColor.r, 1.0, materialParams.metallic), 0.0, skinFactor);
+        }
+        if (materialParams.hasRoughnessMap) {
+            vec4 roughnessColor = texture(materialParams_roughnessMap, uv);
+            roughness = lerp(lerp(roughnessColor.r, 1.0, materialParams.roughness), 0.25, skinFactor);
+        }
+        material.metallic = metallic;
+        // 经验值，不加0.2这些素材感觉都高光过强
+        material.roughness = saturate(roughness + 0.2);
+        material.reflectance = reflectance * materialParams.specularIntensity;
+
+        material.anisotropy = lerp(materialParams.anisotropy, 0.0, skinFactor); //materialParams.anisotropy;
+        material.anisotropyDirection = lerpv(materialParams.anisotropyDirection, float3(1.0, 0.0, 0.0), skinFactor);
+    }
+}

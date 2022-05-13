@@ -1,0 +1,753 @@
+{
+   "root": {
+      "id": -1016,
+      "name": "拍摄模板",
+      "children": [
+         {
+            "id": -1024,
+            "name": "摄像头",
+            "children": [
+               {
+                  "id": -1031,
+                  "name": "去噪",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "eEuler": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "anchor": {
+                           "top": 1,
+                           "bottom": -1,
+                           "left": -1,
+                           "right": 1
+                        },
+                        "offset": {
+                           "top": 0,
+                           "bottom": 0,
+                           "left": 0,
+                           "right": 0
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": false,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1031,
+                        "componentID": -1231
+                     },
+                     {
+                        "componentID": -1232,
+                        "effectStrength": 0,
+                        "effectType": "denoise",
+                        "enabled": true,
+                        "entityId": -1031,
+                        "subEffectType": "",
+                        "type": "PostEffect",
+                        "version": 8
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "去噪",
+                        "id": -1031
+                     }
+                  ]
+               },
+               {
+                  "id": -1025,
+                  "name": "磨皮",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": false,
+                        "enabled": true,
+                        "entityId": -1025,
+                        "componentID": -1203,
+                        "objectEnabled": true
+                     },
+                     {
+                        "smoothVersion": "v7",
+                        "componentID": -1204,
+                        "curveAdjustAlpha": 1,
+                        "enabled": true,
+                        "entityId": -1025,
+                        "faceColorAlpha": 1,
+                        "sharpenStrength": 0.05,
+                        "smooth": 0.6,
+                        "type": "Smooth",
+                        "version": 7
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "磨皮",
+                        "id": -1025
+                     }
+                  ]
+               },
+               {
+                  "id": -1026,
+                  "name": "美型",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": false,
+                        "enabled": true,
+                        "entityId": -1026,
+                        "componentID": -1233,
+                        "objectEnabled": true
+                     },
+                     {
+                        "alignPoints": [
+                           64
+                        ],
+                        "faceIndex": [
+                           0,
+                           1,
+                           2,
+                           3,
+                           4
+                        ],
+                        "isAllFrameFaceDetect": false,
+                        "isRefine": true,
+                        "isWaitFirstFrameDetect": false,
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 18,
+                        "type": "FaceTracking",
+                        "enabled": true,
+                        "version": 1,
+                        "entityId": -1026,
+                        "componentID": -1234
+                     },
+                     {
+                        "basicFace": 0,
+                        "chin": 0,
+                        "componentID": -1205,
+                        "enabled": true,
+                        "enlargeEye": 0,
+                        "entityId": -1026,
+                        "eyeAngle": 0,
+                        "eyeDistance": 0,
+                        "foreHead": 0,
+                        "mouthHeight": 0,
+                        "mouthSize": 0,
+                        "mouthWidth": 0,
+                        "cheekboneThin": 0,
+                        "noseHeight": 0,
+                        "noseSize": 0,
+                        "noseWing": 0,
+                        "shortFace": 0,
+                        "thinFace": 0,
+                        "type": "Stretch",
+                        "vFace": 0,
+                        "version": 91
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "美型",
+                        "id": -1026
+                     }
+                  ]
+               },
+               {
+                  "id": -1027,
+                  "name": "形变",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": false,
+                        "enabled": true,
+                        "entityId": -1027,
+                        "componentID": -1206,
+                        "objectEnabled": true
+                     },
+                     {
+                        "alignPoints": [
+                           64
+                        ],
+                        "faceIndex": [
+                           0,
+                           1,
+                           2,
+                           3,
+                           4
+                        ],
+                        "isAllFrameFaceDetect": false,
+                        "isRefine": true,
+                        "isWaitFirstFrameDetect": false,
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 18,
+                        "type": "FaceTracking",
+                        "enabled": true,
+                        "version": 1,
+                        "entityId": -1027,
+                        "componentID": -1207
+                     },
+                     {
+                        "componentID": -1208,
+                        "enabled": true,
+                        "entityId": -1027,
+                        "resourcePath": "",
+                        "strength": 1,
+                        "type": "Liquefaction",
+                        "version": 3
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "形变",
+                        "id": -1027
+                     }
+                  ]
+               },
+               {
+                  "id": -1028,
+                  "name": "美体",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": true,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1028,
+                        "componentID": -1209
+                     },
+                     {
+                        "alignPoints": [
+                           0
+                        ],
+                        "isBodyDetectSmooth": true,
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 1,
+                        "type": "BodyTracking",
+                        "enabled": false,
+                        "version": 1,
+                        "entityId": -1028,
+                        "componentID": -1210
+                     },
+                     {
+                        "longLegStrength": 0,
+                        "slimWaistStrength": 0,
+                        "thinBodyStrength": 0,
+                        "thinShoulderStrength": 0,
+                        "type": "BeautyBody",
+                        "enabled": true,
+                        "version": 1,
+                        "entityId": -1028,
+                        "componentID": -1211
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "美体",
+                        "id": -1028
+                     }
+                  ]
+               },
+               {
+                  "id": -1029,
+                  "name": "滤镜",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "eEuler": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": true,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1029,
+                        "componentID": -1212
+                     },
+                     {
+                        "enabled": true,
+                        "entityId": -1029,
+                        "src": "",
+                        "type": "LUTFilter",
+                        "version": 2,
+                        "componentID": -1213,
+                        "intensity": 1
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "滤镜",
+                        "id": -1029
+                     }
+                  ]
+               },
+               {
+                  "id": -1030,
+                  "name": "美颜",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "eEuler": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": true,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1030,
+                        "componentID": -1235
+                     },
+                     {
+                        "alignPoints": [
+                           64
+                        ],
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 18,
+                        "faceIndex": [
+                           0,
+                           1,
+                           2,
+                           3,
+                           4
+                        ],
+                        "isRefine": true,
+                        "isWaitFirstFrameDetect": false,
+                        "isAllFrameFaceDetect": false,
+                        "type": "FaceTracking",
+                        "enabled": true,
+                        "entityId": -1030,
+                        "componentID": -1214
+                     },
+                     {
+                        "componentID": -1215,
+                        "deepSmoothAlpha": 0,
+                        "beautyVersion": "v7",
+                        "eBuiltInMode": "custom",
+                        "enabled": true,
+                        "entityId": -1030,
+                        "eyeLightenAlpha": 0,
+                        "eyePouchAlpha": 0.5,
+                        "eyebrowContrastAlpha": 0,
+                        "faceFeatureBlendFaceAlpha": 0,
+                        "faceFeatureTeethLutAlpha": 0.2,
+                        "faceFeatureBlendFaceAlphaSoftlight": 0.4,
+                        "lipsType": 0,
+                        "lipsMaskPath": "images/beauty/lips_shanhuse.png",
+                        "beautyMultiplyPath": "images/beauty/multiply_dongshang_1.png",
+                        "softLightPath": "images/beauty/softlight_jianling.png",
+                        "faceFeatureBlendFaceAlphaRedCheek": 0.2,
+                        "faceFeatureLipsLutAlpha": 0.3,
+                        "imageContrastAlpha": 0,
+                        "lutClearAlpha": 0.2,
+                        "lutFoundationAlpha": 0.3,
+                        "skinColorSlider": 0,
+                        "type": "Beauty",
+                        "wrinkleAlpha": 0.3,
+                        "version": 16
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "美颜",
+                        "id": -1030
+                     }
+                  ]
+               }
+            ],
+            "enabled": true,
+            "version": 0,
+            "components": [
+               {
+                  "type": "ScreenTransform",
+                  "position": {
+                     "x": 0,
+                     "y": 0,
+                     "z": 0
+                  },
+                  "rotation": {
+                     "x": 0,
+                     "y": 0,
+                     "z": 0,
+                     "w": 1
+                  },
+                  "scale": {
+                     "x": 1,
+                     "y": 1,
+                     "z": 1
+                  },
+                  "anchor": {
+                     "left": 0,
+                     "right": 0,
+                     "top": 0,
+                     "bottom": 0
+                  },
+                  "offset": {
+                     "left": -360,
+                     "right": 360,
+                     "top": 640,
+                     "bottom": -640
+                  },
+                  "pivot": {
+                     "x": 0,
+                     "y": 0
+                  },
+                  "ePinToEdge": 0,
+                  "eFixSize": 3,
+                  "eEditingMode": 0,
+                  "eKeepRatio": false,
+                  "enabled": true,
+                  "entityId": -1024,
+                  "componentID": -1217,
+                  "objectEnabled": true
+               },
+               {
+                  "componentID": -1218,
+                  "enabled": true,
+                  "entityId": -1024,
+                  "renderTargetKey": "RenderTarget",
+                  "type": "Camera",
+                  "version": 8
+               },
+               {
+                  "type": "EntityIdentifier",
+                  "name": "摄像头",
+                  "id": -1024
+               }
+            ]
+         }
+      ],
+      "components": [
+         {
+            "anchor": {
+               "bottom": 0,
+               "left": 0,
+               "right": 0,
+               "top": 0
+            },
+            "offset": {
+               "bottom": 0,
+               "left": 0,
+               "right": 0,
+               "top": 0
+            },
+            "pivot": {
+               "x": 0,
+               "y": 0
+            },
+            "ePinToEdge": 0,
+            "eFixSize": 3,
+            "eEditingMode": 0,
+            "eKeepRatio": false,
+            "position": {
+               "x": 0,
+               "y": 0,
+               "z": 0
+            },
+            "scale": {
+               "x": 1,
+               "y": 1,
+               "z": 1
+            },
+            "rotation": {
+               "w": 0,
+               "x": 0,
+               "y": 0,
+               "z": 0
+            },
+            "entityId": -1016,
+            "componentID": -1219,
+            "type": "ScreenTransform",
+            "enabled": true,
+            "version": 2,
+            "objectEnabled": true
+         },
+         {
+            "enabled": true,
+            "entityId": -1016,
+            "tips": "提示语",
+            "type": "Tips",
+            "version": 17,
+            "image": "",
+            "componentID": -1230
+         },
+         {
+            "type": "EntityIdentifier",
+            "name": "拍摄模板",
+            "id": -1016
+         }
+      ],
+      "enabled": true,
+      "version": 0,
+      "inputFormats": [
+         {
+            "key": "DeviceCameraTexture",
+            "type": "TextureData",
+            "properties": {}
+         }
+      ]
+   },
+   "inputSources": {
+      "RenderTarget": {
+         "key": "RenderTarget",
+         "path": "RenderTarget.rdt",
+         "hash": "1007a798a17b0b0b3b7e21c6a2e8b805",
+         "label": "RenderTarget.rdt",
+         "type": "RenderTarget",
+         "inputKey": "DeviceCameraTexture"
+      },
+      "DeviceCameraTexture": {
+         "key": "DeviceCameraTexture",
+         "path": "DeviceCameraTexture.tex",
+         "hash": "18167426118cbf6da2972283f3318e72",
+         "label": "DeviceCameraTexture.tex",
+         "type": "TextureData"
+      }
+   }
+}

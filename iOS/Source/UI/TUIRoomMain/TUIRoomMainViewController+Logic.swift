@@ -35,8 +35,10 @@ extension TUIRoomMainViewController {
         } else {
             TUIRoomCore.shareInstance().stopCameraPreview()
         }
-        TUIRoomCore.shareInstance().startLocalAudio(.speech)
-        if !currentUser.isAudioOpen() {
+        
+        if currentUser.isAudioOpen() {
+            TUIRoomCore.shareInstance().startLocalAudio(.speech)
+        } else {
             TUIRoomCore.shareInstance().stopLocalAudio()
         }
         // Video

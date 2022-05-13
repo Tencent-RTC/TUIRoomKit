@@ -14,6 +14,10 @@ import TXAppBasic
 import UIKit
 
 public class TUIRoomEntranceViewController: UIViewController {
+    // XMagic 美颜 【可选】
+    public var xMagicLicenseURL: String = ""
+    public var xMagicLicenseKey: String = ""
+    
     let loading = UIActivityIndicatorView(style: .gray)
     lazy var backButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -170,6 +174,8 @@ public class TUIRoomEntranceViewController: UIViewController {
         }
 
         let vc = TUIRoomCreateViewController()
+        vc.xMagicLicenseURL = xMagicLicenseURL
+        vc.xMagicLicenseKey = xMagicLicenseKey
         navigationController?.pushViewController(vc, animated: true)
     }
 
@@ -180,6 +186,8 @@ public class TUIRoomEntranceViewController: UIViewController {
         }
 
         let vc = TUIRoomJoinViewController()
+        vc.xMagicLicenseURL = xMagicLicenseURL
+        vc.xMagicLicenseKey = xMagicLicenseKey
         navigationController?.pushViewController(vc, animated: true)
     }
 

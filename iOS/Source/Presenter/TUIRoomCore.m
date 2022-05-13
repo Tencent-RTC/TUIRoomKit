@@ -102,7 +102,7 @@ static dispatch_once_t gOnceToken;
         TUIRoomInfo *roomInfo = [[TUIRoomInfo alloc]init];
         roomInfo.ownerId = [TUIRoomUserManage currentUserId];
         roomInfo.speechMode = (speechMode == TUIRoomFreeSpeech) ? TUIROOM_DATA_FREE_SPEECH : TUIROOM_DATA_APPLY_SPEECH;
-        roomInfo.roomId = [TUIROOM_PREFIX_ID stringByAppendingString:roomId];
+        roomInfo.roomId = roomId;
         roomInfo.roomName = roomId;
         __weak typeof(self) wealSelf = self;
         [self.imService createRoom:roomInfo
@@ -163,7 +163,7 @@ static dispatch_once_t gOnceToken;
         }
         return;
     }
-    [self.imService enterRoom:[TUIROOM_PREFIX_ID stringByAppendingString:roomId]
+    [self.imService enterRoom:roomId
                      callback:^(NSInteger code, NSString * _Nonnull message) {
         TRTCLog(@"im enter room (code=%d message=%@)",code,message);
         if (code == TUIRoomSuccessCode) {

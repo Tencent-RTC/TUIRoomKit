@@ -129,7 +129,6 @@ typedef void (^TUIRoomInviteeCallback)(TUIRoomInviteeCallBackType type, NSString
 #define TUIROOM_SIGNALING_KEY_CMD_KICK_OFF_USER @"KickOffUser"
 #define TUIROOM_SIGNALING_KEY_CMD_SEND_OFF_ALL_SPEAKER @"SendOffAllSpeakers"
 
-#define TUIROOM_PREFIX_ID @"Room_"
 
 #define GetTUIRoomStreamType(type) ((type == TUIRoomStreamCamera) ? TRTCVideoStreamTypeBig : TRTCVideoStreamTypeSub)
 
