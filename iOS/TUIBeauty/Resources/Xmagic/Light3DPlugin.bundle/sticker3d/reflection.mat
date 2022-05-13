@@ -1,0 +1,91 @@
+material {
+    name : reflection,
+    parameters : [
+        {
+            type : sampler2d,
+            name : baseColorMap
+        },
+        {
+            type : sampler2d,
+            name : reflectMap
+        },
+        {
+            type : float,
+            name : zNormalScale
+        },
+        {
+            type : float,
+            name : blendFactor
+        },
+        {
+            type : float2,
+            name : reflectOffset
+        },
+        {
+            type : int,
+            name : blendMode
+        },
+        {
+             type : float,
+             name : modulateAlpha
+        }
+    ],
+    requires : [
+        uv0, tangents
+    ],
+    shadingModel : unlit,
+    blending : transparent,
+    flipUV : false
+}
+
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+
+        //float zNormalScale = 1.0;
+        //float blendFactor = 0.5;
+
+        vec3 cameraDirection = getWorldCameraPosition() - getWorldPosition();
+        vec3 normalVector = getWorldGeometricNormalVector();
+        vec3 I = normalize(cameraDirection * -1.0);
+        vec3 adjustNormal = vec3(normalVector.x, normalVector.y, normalVector.z * materialParams.zNormalScale);
+        vec3 R = reflect(I, normalize(adjustNormal));
+        //R = getWorldReflectedVector();
+        //R.z *= materialParams.zNormalScale;
+
+        float vp1 = 0.0;
+        float vp2 = 0.0;
+        float vp3 = -1.0;
+        float n1 = 0.0;
+        float n2 = 0.0;
+        float n3 = 0.5;
+        float v1 = R.x;
+        float v2 = R.y;
+        float v3 = R.z;
+        float m1 = 0.0;
+        float m2 = 0.0;
+        float m3 = 0.0;
+        float vpt = v1 * vp1 + v2 * vp2 + v3 * vp3;
+        float t = ((n1 - m1) * vp1 + (n2 - m2) * vp2 + (n3 - m3) * vp3) / vpt;
+        float r = m1 + v1 * t;
+        float g = m2 + v2 * t;
+
+        vec4 baseColor = texture(materialParams_baseColorMap, getUV0());
+        //baseColor = vec4(inverseTonemapSRGB(baseColor.rgb), baseColor.a);
+
+        vec4 reflectColor = texture(materialParams_reflectMap, vec2(r + 0.5, 0.5 - g) + materialParams.reflectOffset);
+        //reflectColor = vec4(inverseTonemapSRGB(reflectColor.rgb), reflectColor.a);
+
+        if(materialParams.blendMode > 0)
+        {
+            vec3 vOne = vec3(1.0, 1.0, 1.0);
+            baseColor = vec4(vOne - (vOne - baseColor.rgb) * (vOne - reflectColor.rgb), baseColor.a);
+        }
+
+        //adjustNormal *= 100000.0;
+
+        //material.baseColor = vec4(adjustNormal, 1.0);//mix(baseColor, reflectColor, materialParams.blendFactor);
+        material.baseColor = mix(baseColor, reflectColor, materialParams.blendFactor);
+        material.baseColor.a *= materialParams.modulateAlpha;
+    }
+}

@@ -10,9 +10,10 @@ This document describes how to quickly run the TUIRoom demo project to try out m
 TUIRoom
 ├─ Example              // Project module, which provides the TUIRoom testing page
 ├─ Resources            // Resource files used in TUIRoom
-├─ SDK                  // Dependent local library
 ├─ Source               // Encapsulated TUIRoom component logic
-└─ TUIRoom.podspec      // Pod connection file of the TUIRoom component
+├─ TUIBeauty            // Core beauty filter component
+├─ TXAppBasic           // Dependent basic components of the project
+└─ TUIRoom.podspec      // CocoaPods podspec file of the TUIRoom component
 
 ```
 
@@ -37,9 +38,9 @@ TUIRoom
 1. Clone or directly download the source code in the repository. **Feel free to star our project if you like it.**
 2. The project integrates the `TXLiteAVSDK_TRTC` lite SDK by default. For more information on the specific SDK features, see [SDK Download](https://cloud.tencent.com/document/product/647/32689).
 3. Download `TXLiteAVSDK_ReplayKitExt.framework` [here](https://cloud.tencent.com/document/product/647/32689) and place it in the SDK directory.
-4. `pod 'TXLiteAVSDK_TRTC'` depended on by the SDK has been added to the `Podfile` file in the project directory. You only need to open Terminal, enter the project directory, and run `pod install`, and the SDK will be automatically integrated.
-5. Open the demo project `DemoApp.xcworkspace` with Xcode 11.0 or later.
-6. Find the `TUIRoom/Debug/GenerateTestUserSig.swift` file in the project.
+4. `pod 'TXLiteAVSDK_TRTC'` depended on by the SDK has been added to the `Example/Podfile` file in the project directory. You only need to open Terminal, enter the project directory, and run `pod install`, and the SDK will be automatically integrated.
+5. Open the demo project `Example/DemoApp.xcworkspace` with Xcode 11.0 or later.
+6. Find the `Example/Debug/GenerateTestUserSig.swift` file in the project.
 7. Set parameters in `GenerateTestUserSig.swift`:
 
 <ul>
@@ -84,3 +85,5 @@ You need to prepare at least two devices to try out TUIRoom. Here, users A and B
 
 - [FAQs About TUI Scenario-Specific Solution](https://cloud.tencent.com/developer/article/1952880)
 - If you have any questions or feedback, feel free to [contact us](https://intl.cloud.tencent.com/contact-us).
+
+    

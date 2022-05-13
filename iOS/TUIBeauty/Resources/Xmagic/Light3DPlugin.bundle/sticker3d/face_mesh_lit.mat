@@ -1,0 +1,79 @@
+// Simple unlit material that uses the colors associated with each vertex.
+//
+// This source material must be compiled to a binary material using the matc tool.
+// The command used to compile this material is:
+// matc -p mobile -a opengl -o app/src/main/assets/baked_color.filamat app/src/materials/baked_color.mat
+//
+// See build.gradle for an example of how to compile materials automatically
+// Please refer to the documentation for more information about matc and the materials system.
+
+material {
+    name : face_mesh_lit,
+    shadingModel : lit,
+    parameters : [
+        { type : sampler2d, name : texture },
+        { type : sampler2d, name : positionTex },
+
+        { type : mat4, name : oldTransform },
+        { type : mat4, name : newTransformInverse },
+
+        { type : float, name : blendFactor },
+        { type : float4, name : baseColorFactor },
+        { type : sampler2d, name : baseColorMap },
+
+        { type : float, name : metallicFactor },
+        { type : float, name : roughnessFactor },
+        { type : float, name : ambientOcclusionFactor },
+        { type : sampler2d, name : occlusionMetallicRoughnessMap }
+    ],
+    requires : [uv0, color],
+    variables : [
+         color1
+    ]
+}
+
+vertex {
+    void materialVertex(inout MaterialVertexInputs material) {
+        float4 p0 = texture(materialParams_positionTex, vec2(material.uv0.x + 0.001, material.uv0.y + 0.001));
+        float4 p1 = texture(materialParams_positionTex, vec2(material.uv0.x + 0.001, material.uv0.y - 0.001));
+        float4 p2 = texture(materialParams_positionTex, vec2(material.uv0.x - 0.001, material.uv0.y + 0.001));
+        float4 p3 = texture(materialParams_positionTex, vec2(material.uv0.x - 0.001, material.uv0.y - 0.001));
+        //getWorldFromModelMatrix() = rootWorldTransform * materialParams.newTransform
+        float4 p = getClipFromWorldMatrix() * getWorldFromModelMatrix() * materialParams.newTransformInverse * materialParams.oldTransform * getPosition();
+        float3 pos = p.xyz / p.w;
+        pos = pos * 0.5 + 0.5;
+        material.color1 = vec4(pos.xy, 0.0, 1.0);
+        //material.worldPosition.xyz += (getWorldFromModelMatrix() * vec4(0.5, 0.5, 0.0, 1.0)).xyz;
+    }
+}
+
+fragment {
+    vec3 powv(vec3 color, float value){
+        return vec3(pow(color.r, value), pow(color.g, value), pow(color.b, value));
+    }
+
+    float sRGB_to_linear(float color) {
+        return color <= 0.04045 ? color / 12.92 : pow((color + 0.055) / 1.055, 2.4);
+    }
+
+    vec3 GTLSpace (vec3 sRGB)
+    {
+        return vec3(sRGB_to_linear(sRGB.r), sRGB_to_linear(sRGB.g), sRGB_to_linear(sRGB.b));
+    }
+
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        float2 uv0 = getUV0();
+
+        vec4 color1 = texture(materialParams_texture, vec2(variable_color1.x, 1.0 - variable_color1.y)); // color1 is from camera texture
+        color1.rgb = GTLSpace(color1.rgb);
+        vec4 color2 = materialParams.baseColorFactor;
+        color2 *= texture(materialParams_baseColorMap, uv0);
+        material.baseColor = mix(color1, color2, materialParams.blendFactor);
+
+        vec4 mr = texture(materialParams_occlusionMetallicRoughnessMap, uv0);
+        material.ambientOcclusion = materialParams.ambientOcclusionFactor * mr.r;
+        material.roughness = materialParams.roughnessFactor * mr.g;
+        material.metallic = materialParams.metallicFactor * mr.b;
+    }
+}

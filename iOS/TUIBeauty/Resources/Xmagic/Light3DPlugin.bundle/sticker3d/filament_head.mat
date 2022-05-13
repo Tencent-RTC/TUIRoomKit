@@ -1,0 +1,24 @@
+// Simple unlit material that uses the colors associated with each vertex.
+//
+// This source material must be compiled to a binary material using the matc tool.
+// The command used to compile this material is:
+// matc -p mobile -a opengl -o app/src/main/assets/baked_color.filamat app/src/materials/baked_color.mat
+//
+// See build.gradle for an example of how to compile materials automatically
+// Please refer to the documentation for more information about matc and the materials system.
+
+material {
+    name : filament_head,
+    shadingModel : unlit,
+    shadowMultiplier : true,
+    blending : opaque
+}
+
+// These are used for face shadow, Please not delete these codes.
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        // baseColor defines the color and opacity of the final shadow
+        material.baseColor = vec4(0.0, 0.0, 0.0, 0.7);
+    }
+}

@@ -109,7 +109,10 @@ extension TUIRoomEntranceViewController {
     }
 
     func enterMainViewController(_ roomId: Int32) {
-        let vc = TUIRoomMainViewController(roomId: roomId, isVideoOn: true, isAudioOn: true)
+        let vc = TUIRoomMainViewController(roomId: "\(roomId)", isVideoOn: true, isAudioOn: true)
+        // XMagic 美颜设置【可选】       
+        vc.xMagicLicenseURL = xMagicLicenseURL
+        vc.xMagicLicenseKey = xMagicLicenseKey
         TUIRoomCore.shareInstance().setDelegate(vc)
         navigationController?.pushViewController(vc, animated: true)
     }

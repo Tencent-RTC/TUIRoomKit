@@ -10,8 +10,9 @@ _中文 | [English](README.en.md)_
 TUIRoom
 ├─ Example              // 工程模块，主要提供 TUIRoom 的测试页面
 ├─ Resources            // TUIRoom 中所用的资源文件
-├─ SDK                  // 依赖的本地库
 ├─ Source               // TUIRoom 组件的逻辑封装
+├─ TUIBeauty            // 美颜功能核心组件
+├─ TXAppBasic           // 工程依赖的基础组件
 └─ TUIRoom.podspec      // TUIRoom 组件 pod 接入文件
 
 ```
@@ -37,9 +38,9 @@ TUIRoom
 1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
 2. 工程默认集成的是`TXLiteAVSDK_TRTC`精简版SDK，您可通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】了解此版本SDK的具体功能。
 3. 通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】去下载TXLiteAVSDK_ReplayKitExt.framework，然后放到SDK目录下
-4. 工程目录下`Podfile`文件内已帮您添加了SDK的依赖`pod 'TXLiteAVSDK_TRTC'`，您只需要打开终端进入到工程目录下执行`pod install`，SDK就会自动集成。
-5. 使用Xcode(11.0及以上)打开源码工程`DemoApp.xcworkspace`。
-6. 工程内找到`TUIRoom/Debug/GenerateTestUserSig.swift`文件 。
+4. 工程目录下`Example/Podfile`文件内已帮您添加了SDK的依赖`pod 'TXLiteAVSDK_TRTC'`，您只需要打开终端进入到工程目录下执行`pod install`，SDK就会自动集成。
+5. 使用Xcode(11.0及以上)打开源码工程`Example/DemoApp.xcworkspace`。
+6. 工程内找到`Example/Debug/GenerateTestUserSig.swift`文件 。
 7. 设置`GenerateTestUserSig.swift`文件中的相关参数：
 
 <ul>

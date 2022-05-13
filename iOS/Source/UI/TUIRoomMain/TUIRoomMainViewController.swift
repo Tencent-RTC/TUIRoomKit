@@ -7,22 +7,27 @@
 //
 
 import SnapKit
-import TCBeautyKit
 import TXAppBasic
 import UIKit
+import TUICore
+
 public let isOpenTUIRoomTest: Bool = false
 
 class TUIRoomMainViewController: UIViewController {
+    // XMagic 美颜 【可选】
+    var xMagicLicenseURL: String = ""
+    var xMagicLicenseKey: String = ""
+    
     weak var setViewController: TUIRoomSetViewController?
     var isViewDidLoad: Bool = false
-    var roomId: Int32 = 0
+    var roomId: String = ""
     var isVideoOn: Bool = true
     var isAudioOn: Bool = true
     // |renderMapView|和|attendeeList|的第一个元素表示自己
     var renderMapView: [String: TUIRoomAttendeeRenderView] = [:]
     var attendeeList: [TUIRoomAttendeeModel] = []
     var attendeeMap: [String: TUIRoomAttendeeModel] = [:]
-
+    
     // |renderrenderShareMapViewsViews|和|shareAttendeeList|
     var renderShareMapViews: [String: TUIRoomAttendeeRenderView] = [:]
     // 分享用户+self
@@ -34,11 +39,6 @@ class TUIRoomMainViewController: UIViewController {
 
     lazy var videoModel: TUIRoomSetVideoModel = {
         let model = TUIRoomSetVideoModel()
-        return model
-    }()
-
-    lazy var beautyViewModel: TCBeautyViewModel = {
-        let model = TCBeautyViewModel(viewModel: TUIRoomCore.shareInstance())
         return model
     }()
 
@@ -193,7 +193,9 @@ class TUIRoomMainViewController: UIViewController {
         return button
     }()
 
-    init(roomId: Int32, isVideoOn: Bool, isAudioOn: Bool) {
+    var beautyView: UIView? = nil
+    
+    init(roomId: String, isVideoOn: Bool, isAudioOn: Bool) {
         super.init(nibName: nil, bundle: nil)
         self.roomId = roomId
         self.isVideoOn = isVideoOn
@@ -260,6 +262,8 @@ class TUIRoomMainViewController: UIViewController {
             muteVideoButton.isEnabled = true
             muteVideoButton.isSelected = !currentUser.isVideoOpen()
         }
+        // Load beautyView
+        loadBeautyView()
     }
 
     func activateConstraints() { // 布局
@@ -351,6 +355,45 @@ class TUIRoomMainViewController: UIViewController {
         TUIRoomCore.destroyInstance()
         UIApplication.shared.isIdleTimerDisabled = false
         debugPrint("deinit \(self)")
+    }
+}
+
+// MARK: - Load BeautyView
+extension TUIRoomMainViewController {
+    
+    private func loadBeautyView() {
+        TUICore.callService(TUICore_TUIBeautyService,
+                            method: TUICore_TUIBeautyService_SetLicense,
+                            param: [
+                                TUICore_TUIBeautyExtension_BeautyView_LicenseUrl: xMagicLicenseURL,
+                                TUICore_TUIBeautyExtension_BeautyView_LicenseKey: xMagicLicenseKey])
+        let beautyManager = TUIRoomCore.shareInstance().getBeautyManager()
+        let beautyInfo = TUICore.getExtensionInfo(TUICore_TUIBeautyExtension_BeautyView,
+                                                  param: [
+                                                    TUICore_TUIBeautyExtension_BeautyView_BeautyManager: beautyManager])
+        if let view = beautyInfo[TUICore_TUIBeautyExtension_BeautyView_View] as? UIView {
+            beautyView = view
+            if !xMagicLicenseURL.isEmpty, !xMagicLicenseKey.isEmpty {
+                TRTCCloud.sharedInstance().setLocalVideoProcessDelegete(self, pixelFormat: ._Texture_2D, bufferType: .texture)
+            }
+        }
+    }
+}
+
+// MARK: - TRTCVideoFrameDelegate
+extension TUIRoomMainViewController: TRTCVideoFrameDelegate {
+    
+    public func onProcessVideoFrame(_ srcFrame: TRTCVideoFrame, dstFrame: TRTCVideoFrame) -> UInt32 {
+        if let dstTextureId = TUICore.callService(TUICore_TUIBeautyService,
+                                                  method: TUICore_TUIBeautyService_ProcessVideoFrame,
+                                                  param: [
+                                                      TUICore_TUIBeautyService_ProcessVideoFrame_SRCTextureIdKey: srcFrame.textureId,
+                                                      TUICore_TUIBeautyService_ProcessVideoFrame_SRCFrameWidthKey: srcFrame.width,
+                                                      TUICore_TUIBeautyService_ProcessVideoFrame_SRCFrameHeightKey: srcFrame.height
+                                                         ]) as? GLuint {
+            dstFrame.textureId = dstTextureId
+        }
+        return 0
     }
 }
 

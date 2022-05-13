@@ -1,0 +1,2469 @@
+{
+   "root": {
+      "id": -1016,
+      "name": "拍摄模板",
+      "children": [
+         {
+            "id": -1024,
+            "name": "摄像头",
+            "children": [
+               {
+                  "id": -1031,
+                  "name": "去噪",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "eEuler": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "anchor": {
+                           "top": 1,
+                           "bottom": -1,
+                           "left": -1,
+                           "right": 1
+                        },
+                        "offset": {
+                           "top": 0,
+                           "bottom": 0,
+                           "left": 0,
+                           "right": 0
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": false,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1031,
+                        "componentID": -1201
+                     },
+                     {
+                        "componentID": -1202,
+                        "effectStrength": 0,
+                        "effectType": "denoise",
+                        "enabled": true,
+                        "entityId": -1031,
+                        "subEffectType": "",
+                        "type": "PostEffect",
+                        "version": 8
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "去噪",
+                        "id": -1031
+                     }
+                  ]
+               },
+               {
+                  "id": -1025,
+                  "name": "磨皮",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": false,
+                        "enabled": true,
+                        "entityId": -1025,
+                        "componentID": -1203,
+                        "objectEnabled": true
+                     },
+                     {
+                        "smoothVersion": "v7",
+                        "componentID": -1204,
+                        "curveAdjustAlpha": 1,
+                        "enabled": true,
+                        "entityId": -1025,
+                        "faceColorAlpha": 1,
+                        "sharpenStrength": 0.05,
+                        "smooth": 0.6,
+                        "type": "Smooth",
+                        "version": 7
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "磨皮",
+                        "id": -1025
+                     }
+                  ]
+               },
+               {
+                  "id": -1027,
+                  "name": "形变",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": false,
+                        "enabled": true,
+                        "entityId": -1027,
+                        "componentID": -1206,
+                        "objectEnabled": true
+                     },
+                     {
+                        "alignPoints": [
+                           64
+                        ],
+                        "faceIndex": [
+                           0,
+                           1,
+                           2,
+                           3,
+                           4
+                        ],
+                        "isAllFrameFaceDetect": false,
+                        "isRefine": true,
+                        "isWaitFirstFrameDetect": false,
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 18,
+                        "type": "FaceTracking",
+                        "enabled": true,
+                        "version": 1,
+                        "entityId": -1027,
+                        "componentID": -1207
+                     },
+                     {
+                        "componentID": -1208,
+                        "enabled": true,
+                        "entityId": -1027,
+                        "resourcePath": "",
+                        "strength": 1,
+                        "type": "Liquefaction",
+                        "version": 3
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "形变",
+                        "id": -1027
+                     }
+                  ]
+               },
+               {
+                  "id": -1028,
+                  "name": "美体",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": true,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1028,
+                        "componentID": -1208
+                     },
+                     {
+                        "alignPoints": [
+                           0
+                        ],
+                        "isBodyDetectSmooth": true,
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 1,
+                        "type": "BodyTracking",
+                        "enabled": false,
+                        "version": 1,
+                        "entityId": -1028,
+                        "componentID": -1209
+                     },
+                     {
+                        "longLegStrength": 0,
+                        "slimWaistStrength": 0,
+                        "thinBodyStrength": 0,
+                        "thinShoulderStrength": 0,
+                        "bodyVersion": "v2",
+                        "type": "BeautyBody",
+                        "enabled": true,
+                        "version": 1,
+                        "entityId": -1028,
+                        "componentID": -1210
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "美体",
+                        "id": -1028
+                     }
+                  ]
+               },
+               {
+                  "id": -1029,
+                  "name": "滤镜",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "eEuler": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": true,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1029,
+                        "componentID": -1211
+                     },
+                     {
+                        "enabled": true,
+                        "entityId": -1029,
+                        "src": "",
+                        "type": "LUTFilter",
+                        "version": 2,
+                        "componentID": -1212,
+                        "intensity": 1
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "滤镜",
+                        "id": -1029
+                     }
+                  ]
+               },
+               {
+                  "id": -1030,
+                  "name": "美颜",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "eEuler": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": true,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1030,
+                        "componentID": -1213
+                     },
+                     {
+                        "alignPoints": [
+                           64
+                        ],
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 18,
+                        "faceIndex": [
+                           0,
+                           1,
+                           2,
+                           3,
+                           4
+                        ],
+                        "isRefine": true,
+                        "isWaitFirstFrameDetect": false,
+                        "isAllFrameFaceDetect": false,
+                        "type": "FaceTracking",
+                        "enabled": true,
+                        "entityId": -1030,
+                        "componentID": -1214
+                     },
+                     {
+                        "componentID": -1215,
+                        "deepSmoothAlpha": 0,
+                        "beautyVersion": "v7",
+                        "eBuiltInMode": "custom",
+                        "enabled": true,
+                        "entityId": -1030,
+                        "eyeLightenAlpha": 0,
+                        "eyePouchAlpha": 0.5,
+                        "eyebrowContrastAlpha": 0,
+                        "faceFeatureBlendFaceAlpha": 0,
+                        "faceFeatureTeethLutAlpha": 0.2,
+                        "faceFeatureBlendFaceAlphaSoftlight": 0.4,
+                        "lipsType": 2,
+                        "lipsMaskPath": "images/beauty/lips_mitaose.png",
+                        "beautyMultiplyPath": "images/beauty/saihong_jianyue.png",
+                        "softLightPath": "images/beauty/liti_ziran.png",
+                        "faceFeatureBlendFaceAlphaRedCheek": 0.2,
+                        "faceFeatureLipsLutAlpha": 0.3,
+                        "imageContrastAlpha": 0,
+                        "lutClearAlpha": 0.2,
+                        "lutFoundationAlpha": 0.3,
+                        "skinColorSlider": 0,
+                        "type": "Beauty",
+                        "wrinkleAlpha": 0.3,
+                        "version": 16
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "美颜",
+                        "id": -1030
+                     }
+                  ]
+               },
+               {
+                  "id": -1040,
+                  "name": "大眼",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "eEuler": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": true,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1040,
+                        "componentID": -1216
+                     },
+                     {
+                        "alignPoints": [
+                           64
+                        ],
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 18,
+                        "faceIndex": [
+                           0,
+                           1,
+                           2,
+                           3,
+                           4
+                        ],
+                        "isRefine": true,
+                        "isWaitFirstFrameDetect": false,
+                        "isAllFrameFaceDetect": false,
+                        "xAxisTrack": true,
+                        "yAxisTrack": true,
+                        "xAxisRotateTrack": true,
+                        "yAxisRotateTrack": true,
+                        "zAxisRotateTrack": true,
+                        "xAxisScale": true,
+                        "yAxisScale": true,
+                        "genderBinding": "",
+                        "type": "FaceTracking",
+                        "enabled": true,
+                        "entityId": -1040,
+                        "componentID": -1217
+                     },
+                     {
+                        "componentID": -1218,
+                        "eSelectedIndex": 0,
+                        "editMode": false,
+                        "enabled": true,
+                        "entityId": -1040,
+                        "enlargeeyeFactor": 0.3,
+                        "liquefactionParams": [
+                           {
+                              "direction": 0,
+                              "keepRatio": false,
+                              "positionX": 364,
+                              "positionY": 592,
+                              "radiusX": 80,
+                              "radiusY": 70,
+                              "strength": 6,
+                              "symmetry": true,
+                              "visible": true
+                           }
+                        ],
+                        "type": "LiquefactionV6",
+                        "version": 375
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "大眼",
+                        "id": -1040
+                     }
+                  ]
+               },
+               {
+                  "id": -1033,
+                  "name": "小脸",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "eEuler": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": true,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1033,
+                        "componentID": -1219
+                     },
+                     {
+                        "cheekboneThin": 0,
+                        "chin": 0,
+                        "componentID": -1220,
+                        "editMode": false,
+                        "enabled": true,
+                        "enlargeEye": 0,
+                        "entityId": -1033,
+                        "eyeAngle": 0,
+                        "eyeDistance": 0,
+                        "foreHead": 0,
+                        "height": 2048,
+                        "lastPoints": [],
+                        "mouthHeight": 0,
+                        "mouthPosition": 0,
+                        "mouthSize": 0,
+                        "mouthWidth": 0,
+                        "noseHeight": 0,
+                        "noseSize": 0,
+                        "noseWing": 0,
+                        "overallFactor": 0,
+                        "pinchFaceEnabled": true,
+                        "points": [
+                           {
+                              "positionX": 377.0940246582031,
+                              "positionY": 974.9481201171875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 414.4358825683594,
+                              "positionY": 1168.5355224609375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 479.2079162597656,
+                              "positionY": 1305.097412109375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 571.539306640625,
+                              "positionY": 1419.6964111328125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 646.6416015625,
+                              "positionY": 1466.5675048828125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 767.4573974609375,
+                              "positionY": 1516.9371337890625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 889.3583984375,
+                              "positionY": 1466.5675048828125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 964.4608764648438,
+                              "positionY": 1419.696533203125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1056.7938232421875,
+                              "positionY": 1305.0975341796875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1121.5655517578125,
+                              "positionY": 1168.5355224609375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1158.906982421875,
+                              "positionY": 974.9480590820312,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 420,
+                              "positionY": 855,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 506,
+                              "positionY": 843,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 700,
+                              "positionY": 864,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 499,
+                              "positionY": 806,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1116,
+                              "positionY": 855,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1030,
+                              "positionY": 843,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 836,
+                              "positionY": 864,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1037,
+                              "positionY": 806,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 512,
+                              "positionY": 939,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 544,
+                              "positionY": 962,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 582,
+                              "positionY": 971,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 623,
+                              "positionY": 969,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 666,
+                              "positionY": 966,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 634,
+                              "positionY": 926,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 595,
+                              "positionY": 907,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 550,
+                              "positionY": 913,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1024,
+                              "positionY": 939,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 992,
+                              "positionY": 962,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 954,
+                              "positionY": 971,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 913,
+                              "positionY": 969,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 870,
+                              "positionY": 966,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 902,
+                              "positionY": 926,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 941,
+                              "positionY": 907,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 986,
+                              "positionY": 913,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 719,
+                              "positionY": 966,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 708,
+                              "positionY": 1092,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 662.1005859375,
+                              "positionY": 1187.38427734375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 705.1005859375,
+                              "positionY": 1209.38427734375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 767.6176147460938,
+                              "positionY": 1220.7552490234375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 830.8994140625,
+                              "positionY": 1209.38427734375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 873.8994140625,
+                              "positionY": 1187.38427734375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 828,
+                              "positionY": 1092,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 817,
+                              "positionY": 966,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1148,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 613.1290283203125,
+                              "positionY": 1278.2718505859375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 922.8709716796875,
+                              "positionY": 1278.2718505859375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 766.826904296875,
+                              "positionY": 1382.09619140625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 843.4019775390625,
+                              "positionY": 1315.479248046875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 767.7726440429688,
+                              "positionY": 1326.3831787109375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 692.5980224609375,
+                              "positionY": 1315.479248046875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 670.0049438476562,
+                              "positionY": 1271.65576171875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 722.720458984375,
+                              "positionY": 1264.085205078125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 813.279541015625,
+                              "positionY": 1264.085205078125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 865.9950561523438,
+                              "positionY": 1271.65576171875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 838.5339965820312,
+                              "positionY": 1291.795654296875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 767.968994140625,
+                              "positionY": 1297.7489013671875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 697.4660034179688,
+                              "positionY": 1291.795654296875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 966,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 864,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 580,
+                              "positionY": 550,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 956,
+                              "positionY": 550,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 538,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 418,
+                              "positionY": 655,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1118,
+                              "positionY": 655,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 529,
+                              "positionY": 1148,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1007,
+                              "positionY": 1148,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 593.6622314453125,
+                              "positionY": 1340.677001953125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 942.3377685546875,
+                              "positionY": 1340.677001953125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1056,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 670,
+                              "positionY": 683,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 866,
+                              "positionY": 683,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 559,
+                              "positionY": 721,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 977,
+                              "positionY": 721,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 678.6865234375,
+                              "positionY": 1352.2061767578125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 857.3134765625,
+                              "positionY": 1352.2061767578125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 766.418701171875,
+                              "positionY": 1266.2930908203125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 664.6406860351562,
+                              "positionY": 1397.7801513671875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 871.3593139648438,
+                              "positionY": 1397.7801513671875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 767.3281860351562,
+                              "positionY": 1432.434814453125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 390.493896484375,
+                              "positionY": 1088.270751953125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 443.5300598144531,
+                              "positionY": 1235.6744384765625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 520.4048461914062,
+                              "positionY": 1372.5152587890625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 437,
+                              "positionY": 956,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 462.1441345214844,
+                              "positionY": 1049.9522705078125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1145.5072021484375,
+                              "positionY": 1088.270751953125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1092.4725341796875,
+                              "positionY": 1235.6744384765625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1015.59619140625,
+                              "positionY": 1372.515380859375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1099,
+                              "positionY": 956,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1073.856201171875,
+                              "positionY": 1049.9522705078125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 365.8800964355469,
+                              "positionY": 891.4121704101562,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1170.1202392578125,
+                              "positionY": 891.4121704101562,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 420,
+                              "positionY": 787,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1116,
+                              "positionY": 787,
+                              "fixed": true
+                           }
+                        ],
+                        "strength": 100,
+                        "stretchEnabled": false,
+                        "symmetry": true,
+                        "thinFace": 0,
+                        "type": "FacialReform",
+                        "vFace": 0,
+                        "version": 2074,
+                        "width": 1536
+                     },
+                     {
+                        "alignPoints": [
+                           64
+                        ],
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 18,
+                        "faceIndex": [
+                           0,
+                           1,
+                           2,
+                           3,
+                           4
+                        ],
+                        "isRefine": true,
+                        "isWaitFirstFrameDetect": false,
+                        "isAllFrameFaceDetect": false,
+                        "xAxisTrack": true,
+                        "yAxisTrack": true,
+                        "xAxisRotateTrack": true,
+                        "yAxisRotateTrack": true,
+                        "zAxisRotateTrack": true,
+                        "xAxisScale": true,
+                        "yAxisScale": true,
+                        "genderBinding": "",
+                        "type": "FaceTracking",
+                        "enabled": true,
+                        "entityId": -1033,
+                        "componentID": -1221
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "小脸",
+                        "id": -1033,
+                        "enabled": true
+                     }
+                  ]
+               },
+               {
+                  "id": -1032,
+                  "name": "人脸形变v7",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "eEuler": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": true,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1032,
+                        "componentID": -1222
+                     },
+                     {
+                        "overallFactor": 1,
+                        "vFace": 0,
+                        "chin": 0,
+                        "thinFace": 0,
+                        "cheekboneThin": 1,
+                        "enlargeEye": 0,
+                        "noseSize": 0.3,
+                        "foreHead": 0,
+                        "eyeDistance": 0,
+                        "shortFace": 0,
+                        "eyeAngle": 0,
+                        "noseWing": 0,
+                        "noseHeight": 0,
+                        "mouthSize": 0,
+                        "mouthHeight": 0,
+                        "mouthWidth": 0,
+                        "mouthPosition": 0,
+                        "points": [
+                           {
+                              "positionX": 365,
+                              "positionY": 975,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 397,
+                              "positionY": 1171,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 457,
+                              "positionY": 1323,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 559,
+                              "positionY": 1446,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 623,
+                              "positionY": 1491,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1538,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 913,
+                              "positionY": 1491,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 977,
+                              "positionY": 1446,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 1079,
+                              "positionY": 1323,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 1139,
+                              "positionY": 1171,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 1171,
+                              "positionY": 975,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 420,
+                              "positionY": 855,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 506,
+                              "positionY": 843,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 700,
+                              "positionY": 864,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 499,
+                              "positionY": 806,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1116,
+                              "positionY": 855,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1030,
+                              "positionY": 843,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 836,
+                              "positionY": 864,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 1037,
+                              "positionY": 806,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 512,
+                              "positionY": 939,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 544,
+                              "positionY": 962,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 582,
+                              "positionY": 971,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 623,
+                              "positionY": 969,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 666,
+                              "positionY": 966,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 634,
+                              "positionY": 926,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 595,
+                              "positionY": 907,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 550,
+                              "positionY": 913,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 1024,
+                              "positionY": 939,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 992,
+                              "positionY": 962,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 954,
+                              "positionY": 971,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 913,
+                              "positionY": 969,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 870,
+                              "positionY": 966,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 902,
+                              "positionY": 926,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 941,
+                              "positionY": 907,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 986,
+                              "positionY": 913,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 719,
+                              "positionY": 966,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 708,
+                              "positionY": 1092,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 661,
+                              "positionY": 1188,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 704,
+                              "positionY": 1210,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1218,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 832,
+                              "positionY": 1210,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 875,
+                              "positionY": 1188,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 828,
+                              "positionY": 1092,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 817,
+                              "positionY": 966,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1148,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 612,
+                              "positionY": 1295,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 924,
+                              "positionY": 1295,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1404,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 847,
+                              "positionY": 1331,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1348,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 689,
+                              "positionY": 1331,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 666,
+                              "positionY": 1286,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 723,
+                              "positionY": 1278,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 813,
+                              "positionY": 1278,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 870,
+                              "positionY": 1286,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 845,
+                              "positionY": 1310,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1316,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 691,
+                              "positionY": 1310,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 966,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 864,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 580,
+                              "positionY": 550,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 956,
+                              "positionY": 550,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 538,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 418,
+                              "positionY": 655,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 1118,
+                              "positionY": 655,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 529,
+                              "positionY": 1148,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1007,
+                              "positionY": 1148,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 591,
+                              "positionY": 1350,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 945,
+                              "positionY": 1350,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1056,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 670,
+                              "positionY": 683,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 866,
+                              "positionY": 683,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 559,
+                              "positionY": 721,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 977,
+                              "positionY": 721,
+                              "fixed": false
+                           },
+                           {
+                              "positionX": 674,
+                              "positionY": 1372,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 862,
+                              "positionY": 1372,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1278,
+                              "fixed": false
+                           }
+                        ],
+                        "lastPoints": [],
+                        "strength": 100,
+                        "symmetry": true,
+                        "editMode": false,
+                        "width": 1536,
+                        "height": 2048,
+                        "stretchEnabled": true,
+                        "pinchFaceEnabled": true,
+                        "type": "FacialReform",
+                        "enabled": true,
+                        "entityId": -1032,
+                        "componentID": -1223,
+                        "version": 1
+                     },
+                     {
+                        "alignPoints": [
+                           64
+                        ],
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 18,
+                        "faceIndex": [
+                           0,
+                           1,
+                           2,
+                           3,
+                           4
+                        ],
+                        "isRefine": true,
+                        "isWaitFirstFrameDetect": false,
+                        "isAllFrameFaceDetect": false,
+                        "xAxisTrack": true,
+                        "yAxisTrack": true,
+                        "xAxisRotateTrack": true,
+                        "yAxisRotateTrack": true,
+                        "zAxisRotateTrack": true,
+                        "xAxisScale": true,
+                        "yAxisScale": true,
+                        "genderBinding": "",
+                        "type": "FaceTracking",
+                        "enabled": true,
+                        "entityId": -1032,
+                        "componentID": -1224
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "人脸形变v7",
+                        "id": -1032
+                     }
+                  ]
+               },
+               {
+                  "id": -1034,
+                  "name": "自然瘦脸",
+                  "children": [],
+                  "enabled": true,
+                  "version": 0,
+                  "components": [
+                     {
+                        "type": "ScreenTransform",
+                        "position": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "rotation": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0,
+                           "w": 1
+                        },
+                        "scale": {
+                           "x": 1,
+                           "y": 1,
+                           "z": 1
+                        },
+                        "eEuler": {
+                           "x": 0,
+                           "y": 0,
+                           "z": 0
+                        },
+                        "anchor": {
+                           "left": 0,
+                           "right": 0,
+                           "top": 0,
+                           "bottom": 0
+                        },
+                        "offset": {
+                           "left": -360,
+                           "right": 360,
+                           "top": 640,
+                           "bottom": -640
+                        },
+                        "pivot": {
+                           "x": 0,
+                           "y": 0
+                        },
+                        "ePinToEdge": 0,
+                        "eFixSize": 3,
+                        "eEditingMode": 0,
+                        "eKeepRatio": true,
+                        "objectEnabled": true,
+                        "enabled": true,
+                        "entityId": -1034,
+                        "componentID": -1225
+                     },
+                     {
+                        "cheekboneThin": 0,
+                        "chin": 0,
+                        "componentID": -1226,
+                        "editMode": false,
+                        "enabled": true,
+                        "enlargeEye": 0.30000000000000004,
+                        "entityId": -1034,
+                        "eyeAngle": 0.10000000000000009,
+                        "eyeDistance": 0.25,
+                        "foreHead": 0,
+                        "height": 2048,
+                        "lastPoints": [],
+                        "mouthHeight": 0,
+                        "mouthPosition": 0,
+                        "mouthSize": 0,
+                        "mouthWidth": 0,
+                        "noseHeight": 0.2,
+                        "noseSize": 0.40000000000000013,
+                        "noseWing": 0,
+                        "overallFactor": 0.4,
+                        "basicFaceEyelarge": 0,
+                        "pinchFaceEnabled": true,
+                        "points": [
+                           {
+                              "positionX": 392.0104064941406,
+                              "positionY": 966.646728515625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 424.6899108886719,
+                              "positionY": 1160.541259765625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 511.9487609863281,
+                              "positionY": 1306.074462890625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 596.3385620117188,
+                              "positionY": 1381.8641357421875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 660.0175170898438,
+                              "positionY": 1412.9744873046875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 767.317138671875,
+                              "positionY": 1491.4183349609375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 875.8718872070312,
+                              "positionY": 1412.962158203125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 935.34716796875,
+                              "positionY": 1379.32421875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1029.7938232421875,
+                              "positionY": 1297.689208984375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1107.4666748046875,
+                              "positionY": 1157.3028564453125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1143.990478515625,
+                              "positionY": 966.646728515625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 420,
+                              "positionY": 855,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 506,
+                              "positionY": 839.6893920898438,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 692.8929443359375,
+                              "positionY": 857.0098266601562,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 499,
+                              "positionY": 802.6893920898438,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1116,
+                              "positionY": 855,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1030,
+                              "positionY": 839.6893920898438,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 843.1070556640625,
+                              "positionY": 857.0098266601562,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1037,
+                              "positionY": 802.6893920898438,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 513.1281127929688,
+                              "positionY": 950.0679321289062,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 544.6527709960938,
+                              "positionY": 970.9148559570312,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 585.5798950195312,
+                              "positionY": 972.0882568359375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 626.4053344726562,
+                              "positionY": 968.7205810546875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 666.3204345703125,
+                              "positionY": 968.0636596679688,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 642.5635375976562,
+                              "positionY": 922.6239013671875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 599.7583618164062,
+                              "positionY": 911.7972412109375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 558.2445068359375,
+                              "positionY": 923.4270629882812,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1022.8718872070312,
+                              "positionY": 950.0679321289062,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 991.3472290039062,
+                              "positionY": 970.9148559570312,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 950.4201049804688,
+                              "positionY": 972.0882568359375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 909.5946655273438,
+                              "positionY": 968.7205810546875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 869.6795654296875,
+                              "positionY": 968.0636596679688,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 893.4364624023438,
+                              "positionY": 922.6239013671875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 936.2416381835938,
+                              "positionY": 911.7972412109375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 977.7554931640625,
+                              "positionY": 923.4270629882812,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 719,
+                              "positionY": 966,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 714.8593139648438,
+                              "positionY": 1102.2347412109375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 673.3064575195312,
+                              "positionY": 1182.699951171875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 711.4496459960938,
+                              "positionY": 1203.6878662109375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 767.4188842773438,
+                              "positionY": 1216.0704345703125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 824.5503540039062,
+                              "positionY": 1203.6878662109375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 862.6935424804688,
+                              "positionY": 1182.699951171875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 821.1406860351562,
+                              "positionY": 1102.2347412109375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 817,
+                              "positionY": 966,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 767.7044067382812,
+                              "positionY": 1138.598876953125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 614.888671875,
+                              "positionY": 1251.9876708984375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 921.111328125,
+                              "positionY": 1251.9876708984375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 766.4959716796875,
+                              "positionY": 1357.30322265625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 852.8787841796875,
+                              "positionY": 1291.0240478515625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 766.7779541015625,
+                              "positionY": 1307.046630859375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 683.1212158203125,
+                              "positionY": 1291.0240478515625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 668.7772827148438,
+                              "positionY": 1245.9910888671875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 727.4692993164062,
+                              "positionY": 1244.43408203125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 808.5307006835938,
+                              "positionY": 1244.43408203125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 867.2227172851562,
+                              "positionY": 1245.9910888671875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 851.04150390625,
+                              "positionY": 1268.3397216796875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 766.278076171875,
+                              "positionY": 1280.4998779296875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 684.95849609375,
+                              "positionY": 1268.3397216796875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 966,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768.2948608398438,
+                              "positionY": 860.6826782226562,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 580,
+                              "positionY": 550,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 956,
+                              "positionY": 550,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 538,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 418,
+                              "positionY": 655,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1118,
+                              "positionY": 655,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 526.6063232421875,
+                              "positionY": 1138.6806640625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1010.621826171875,
+                              "positionY": 1138.8995361328125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 607.0260620117188,
+                              "positionY": 1309.3126220703125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 923.7181396484375,
+                              "positionY": 1317.06689453125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 768,
+                              "positionY": 1056,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 670,
+                              "positionY": 683,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 866,
+                              "positionY": 683,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 559,
+                              "positionY": 721,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 977,
+                              "positionY": 721,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 672.9261474609375,
+                              "positionY": 1331.5426025390625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 863.0738525390625,
+                              "positionY": 1331.5426025390625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 766.568603515625,
+                              "positionY": 1248.2060546875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 672.6199340820312,
+                              "positionY": 1371.67333984375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 860.5969848632812,
+                              "positionY": 1369.945556640625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 766.186767578125,
+                              "positionY": 1416.3792724609375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 412.3116455078125,
+                              "positionY": 1086.68603515625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 465.0056457519531,
+                              "positionY": 1225.9320068359375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 567.286865234375,
+                              "positionY": 1357.969970703125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 447.096435546875,
+                              "positionY": 952.1060180664062,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 468.86627197265625,
+                              "positionY": 1047.931884765625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1118.267578125,
+                              "positionY": 1087.3438720703125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1074.6417236328125,
+                              "positionY": 1228.001220703125,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 964.3988037109375,
+                              "positionY": 1355.176513671875,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1088.9036865234375,
+                              "positionY": 952.1060180664062,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1065.43310546875,
+                              "positionY": 1049.132568359375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 367.8214111328125,
+                              "positionY": 890.7825927734375,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1168.2286376953125,
+                              "positionY": 890.78759765625,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 420,
+                              "positionY": 787,
+                              "fixed": true
+                           },
+                           {
+                              "positionX": 1116,
+                              "positionY": 787,
+                              "fixed": true
+                           }
+                        ],
+                        "strength": 100,
+                        "stretchEnabled": false,
+                        "symmetry": true,
+                        "thinFace": 0,
+                        "shortFace": 0,
+                        "reformSubType": "nature",
+                        "type": "FacialReform",
+                        "vFace": 0,
+                        "version": 5665,
+                        "width": 1536
+                     },
+                     {
+                        "alignPoints": [
+                           64
+                        ],
+                        "scalePivotPoint1": 0,
+                        "scalePivotPoint2": 18,
+                        "faceIndex": [
+                           0,
+                           1,
+                           2,
+                           3,
+                           4
+                        ],
+                        "isRefine": true,
+                        "isWaitFirstFrameDetect": false,
+                        "isAllFrameFaceDetect": false,
+                        "xAxisTrack": true,
+                        "yAxisTrack": true,
+                        "xAxisRotateTrack": true,
+                        "yAxisRotateTrack": true,
+                        "zAxisRotateTrack": true,
+                        "xAxisScale": true,
+                        "yAxisScale": true,
+                        "genderBinding": "",
+                        "type": "FaceTracking",
+                        "enabled": true,
+                        "entityId": -1034,
+                        "componentID": -1227
+                     },
+                     {
+                        "type": "EntityIdentifier",
+                        "name": "自然瘦脸",
+                        "id": -1034,
+                        "enabled": true
+                     }
+                  ]
+               }
+            ],
+            "enabled": true,
+            "version": 0,
+            "components": [
+               {
+                  "type": "ScreenTransform",
+                  "position": {
+                     "x": 0,
+                     "y": 0,
+                     "z": 0
+                  },
+                  "rotation": {
+                     "x": 0,
+                     "y": 0,
+                     "z": 0,
+                     "w": 1
+                  },
+                  "scale": {
+                     "x": 1,
+                     "y": 1,
+                     "z": 1
+                  },
+                  "anchor": {
+                     "left": 0,
+                     "right": 0,
+                     "top": 0,
+                     "bottom": 0
+                  },
+                  "offset": {
+                     "left": -360,
+                     "right": 360,
+                     "top": 640,
+                     "bottom": -640
+                  },
+                  "pivot": {
+                     "x": 0,
+                     "y": 0
+                  },
+                  "ePinToEdge": 0,
+                  "eFixSize": 3,
+                  "eEditingMode": 0,
+                  "eKeepRatio": false,
+                  "enabled": true,
+                  "entityId": -1024,
+                  "componentID": -1301,
+                  "objectEnabled": true
+               },
+               {
+                  "componentID": -1302,
+                  "enabled": true,
+                  "entityId": -1024,
+                  "renderTargetKey": "RenderTarget",
+                  "type": "Camera",
+                  "version": 8
+               },
+               {
+                  "type": "EntityIdentifier",
+                  "name": "摄像头",
+                  "id": -1024
+               }
+            ]
+         }
+      ],
+      "components": [
+         {
+            "anchor": {
+               "bottom": 0,
+               "left": 0,
+               "right": 0,
+               "top": 0
+            },
+            "offset": {
+               "bottom": 0,
+               "left": 0,
+               "right": 0,
+               "top": 0
+            },
+            "pivot": {
+               "x": 0,
+               "y": 0
+            },
+            "ePinToEdge": 0,
+            "eFixSize": 3,
+            "eEditingMode": 0,
+            "eKeepRatio": false,
+            "position": {
+               "x": 0,
+               "y": 0,
+               "z": 0
+            },
+            "scale": {
+               "x": 1,
+               "y": 1,
+               "z": 1
+            },
+            "rotation": {
+               "w": 0,
+               "x": 0,
+               "y": 0,
+               "z": 0
+            },
+            "entityId": -1016,
+            "componentID": -1303,
+            "type": "ScreenTransform",
+            "enabled": true,
+            "version": 2,
+            "objectEnabled": true
+         },
+         {
+            "enabled": true,
+            "entityId": -1016,
+            "tips": "提示语",
+            "type": "Tips",
+            "version": 17,
+            "image": "",
+            "componentID": -1304
+         },
+         {
+            "type": "EntityIdentifier",
+            "name": "拍摄模板",
+            "id": -1016
+         }
+      ],
+      "enabled": true,
+      "version": 0,
+      "inputFormats": [
+         {
+            "key": "DeviceCameraTexture",
+            "type": "TextureData",
+            "properties": {}
+         }
+      ]
+   },
+   "inputSources": {
+      "RenderTarget": {
+         "key": "RenderTarget",
+         "path": "RenderTarget.rdt",
+         "hash": "1007a798a17b0b0b3b7e21c6a2e8b805",
+         "label": "RenderTarget.rdt",
+         "type": "RenderTarget",
+         "inputKey": "DeviceCameraTexture"
+      },
+      "DeviceCameraTexture": {
+         "key": "DeviceCameraTexture",
+         "path": "DeviceCameraTexture.tex",
+         "hash": "18167426118cbf6da2972283f3318e72",
+         "label": "DeviceCameraTexture.tex",
+         "type": "TextureData"
+      }
+   }
+}

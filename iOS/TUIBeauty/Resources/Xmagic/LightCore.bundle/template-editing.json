@@ -1,0 +1,164 @@
+{
+   "componentLevel": 2,
+   "madeIn": "LightStudio",
+   "root": {
+      "name": "一键出片模版",
+      "id": 1,
+      "components": [
+         {
+            "anchor": {
+               "bottom": 0,
+               "left": 0,
+               "right": 0,
+               "top": 0
+            },
+            "enabled": true,
+            "entityId": 1,
+            "offset": {
+               "bottom": -640.5,
+               "left": -360,
+               "right": 360,
+               "top": 640.5
+            },
+            "pivot": {
+               "x": 0,
+               "y": 0
+            },
+            "position": {
+               "x": 0,
+               "y": 0,
+               "z": 0
+            },
+            "rotation": {
+               "w": 1,
+               "x": 0,
+               "y": 0,
+               "z": 0
+            },
+            "scale": {
+               "x": 1,
+               "y": 1,
+               "z": 1
+            },
+            "type": "ScreenTransform",
+            "version": 2,
+            "componentID": 0,
+            "objectEnabled": true
+         },
+         {
+            "enabled": true,
+            "entityId": 1,
+            "renderTargetKey": "RenderTarget",
+            "type": "Camera",
+            "version": 3,
+            "componentID": 1
+         },
+         {
+            "type": "EntityIdentifier",
+            "name": "一键出片模版",
+            "id": 1
+         }
+      ],
+      "children": [
+         {
+            "name": "用户素材",
+            "id": 8,
+            "components": [
+               {
+                  "type": "ScreenTransform",
+                  "anchor": {
+                     "bottom": 0,
+                     "left": 0,
+                     "right": 0,
+                     "top": 0
+                  },
+                  "offset": {
+                     "bottom": -640,
+                     "left": -360,
+                     "right": 360,
+                     "top": 640
+                  },
+                  "pivot": {
+                     "x": 0,
+                     "y": 0
+                  },
+                  "position": {
+                     "x": 0,
+                     "y": 0,
+                     "z": 1
+                  },
+                  "rotation": {
+                     "x": 0,
+                     "y": 0,
+                     "z": 0,
+                     "w": 1
+                  },
+                  "scale": {
+                     "x": 1,
+                     "y": 1,
+                     "z": 1
+                  },
+                  "enabled": true,
+                  "entityId": 8,
+                  "componentID": 2,
+                  "objectEnabled": true
+               },
+               {
+                  "backgroundColor": "#ffffffff",
+                  "backgroundFillMode": 0,
+                  "enabled": true,
+                  "entityId": 8,
+                  "fillScale": 0.5625,
+                  "imageEffect": true,
+                  "scaleMode": 2,
+                  "size": {
+                     "height": 1280,
+                     "width": 720
+                  },
+                  "speed": 1,
+                  "src": "videoSource",
+                  "type": "MultiMedia",
+                  "version": 13,
+                  "volume": 1,
+                  "volumeEffects": [],
+                  "componentID": 3,
+                  "imageDurations": {
+                     "maxDuration": 5000000,
+                     "minDuration": 4000000
+                  },
+                  "maxSourceCount": 10,
+                  "minDuration": 1000000,
+                  "minSourceCount": 0
+               },
+               {
+                  "type": "EntityIdentifier",
+                  "name": "用户素材",
+                  "id": 8
+               }
+            ]
+         }
+      ],
+      "inputFormats": []
+   },
+   "preset": {},
+   "properties": {
+      "layout": {
+         "width": 720,
+         "height": 1281
+      },
+      "boundsTrackerPlaceHolders": [],
+      "musicIDs": [],
+      "fonts": [],
+      "movieConfig": {
+         "sourceType": 2,
+         "minClipAssetCount": 1,
+         "maxClipAssetCount": 999,
+         "minImageDuration": 1000000,
+         "maxImageDuration": 10000000,
+         "minVideoDuration": 2000000,
+         "preferredCoverTime": 1000000,
+         "originVolume": 1
+      },
+      "resourceIDs": []
+   }
+}

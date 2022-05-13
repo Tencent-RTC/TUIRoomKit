@@ -118,8 +118,6 @@
  * @return 房间号
  */
 - (UInt32)getTRTCRoomId {
-	NSString *roomid = [self.roomId stringByReplacingOccurrencesOfString:
-	                    TUIROOM_PREFIX_ID withString:@""];
-	return [roomid intValue];
+	return [self.roomId intValue];
 }
 @end

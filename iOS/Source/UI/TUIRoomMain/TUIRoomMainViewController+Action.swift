@@ -12,6 +12,7 @@ import SnapKit
 import Toast_Swift
 import TXAppBasic
 import UIKit
+import TUIBeauty
 
 extension TUIRoomMainViewController {
     @objc func switchAudioButtonClick() { // 扬声器切换
@@ -55,6 +56,7 @@ extension TUIRoomMainViewController {
         let sureAction = UIAlertAction(title: roomInfo.isHomeowner() ?.destroyRoomOkTitle : .logoutOkText, style: .default) { [weak self] _ in
             guard let self = self else { return }
             self.exitRoomLogic(roomInfo.isHomeowner())
+            TUIRoom.sharedInstance.isEnterRoom = false
         }
         sureAction.setTextColor(UIColor.red)
         alertVC.addAction(cancelAction)
@@ -97,12 +99,10 @@ extension TUIRoomMainViewController {
     }
 
     @objc func beautyButtonClick() { // 美颜
-        let alert = TUIRoomBeautyAlert(viewModel: beautyViewModel)
-        view.addSubview(alert)
-        alert.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        if let view = beautyView, view.superview == nil {
+            self.view.addSubview(view)
         }
-        alert.show()
+        beautyView?.isHidden = false
     }
 
     @objc func membersButtonClick() { // 成员列表
@@ -125,15 +125,24 @@ extension TUIRoomMainViewController {
     /// 退房
     private func exitRoomLogic(_ isHomeowner: Bool) {
         TUIRoomCore.shareInstance().stopScreenCapture()
+        TRTCCloud.sharedInstance().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
         if isHomeowner {
             TUIRoomCore.shareInstance().destroyRoom { [weak self] _, _ in
                 guard let self = self else { return }
-                self.navigationController?.popViewController(animated: true)
+                if self.navigationController?.viewControllers.first == self {
+                    self.dismiss(animated: true)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
             }
         } else {
             TUIRoomCore.shareInstance().leaveRoom { [weak self] _, _ in
                 guard let self = self else { return }
-                self.navigationController?.popViewController(animated: true)
+                if self.navigationController?.viewControllers.first == self {
+                    self.dismiss(animated: true)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
             }
         }
     }

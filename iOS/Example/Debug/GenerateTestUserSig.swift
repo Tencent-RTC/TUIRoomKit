@@ -37,6 +37,14 @@ let EXPIRETIME: Int = 604800
  */
 let SECRETKEY = ""
 
+/**
+ * XMagic 美颜设置【可选】
+ * 美颜配置授权，更多细节见文档：https://cloud.tencent.com/document/product/616/65878
+ */
+let XMagicLicenseURL = ""
+let XMagicLicenseKey = ""
+
+
 class GenerateTestUserSig {
     
     class func genTestUserSig(identifier: String) -> String {
