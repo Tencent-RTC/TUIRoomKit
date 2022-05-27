@@ -70,7 +70,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     public static final String KEY_VIDEO_QUALITY  = "video_quality";
     public static final String KEY_IS_CREATE_ROOM = "is_create_room";
 
-    private String                    mRoomId;
+    private int                       mRoomId;
     private String                    mUserId;
     private String                    mUserAvatar;
     private boolean                   mIsCreateRoom; //是否是创建房间
@@ -109,7 +109,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
 
     public static void enterRoom(Context context,
                                  boolean isCreate,
-                                 String roomId,
+                                 int roomId,
                                  TUIRoomCoreDef.SpeechMode speechMode,
                                  String userId,
                                  String userName,
@@ -357,7 +357,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         mMemberEntityList = new ArrayList<>();
         //从外界获取数据源
         Intent starter = getIntent();
-        mRoomId = starter.getStringExtra(KEY_ROOM_ID);
+        mRoomId = starter.getIntExtra(KEY_ROOM_ID, 0);
         mSpeechMode = (TUIRoomCoreDef.SpeechMode) starter.getSerializableExtra(KEY_SPEECH_MODE);
         mUserId = starter.getStringExtra(KEY_USER_ID);
         mUserName = starter.getStringExtra(KEY_USER_NAME);

@@ -42,7 +42,7 @@ public abstract class TUIRoomCore {
      *                   申请发言模式
      * @param callback   创建房间的结果回调，成功时 code 为0
      */
-    public abstract void createRoom(String roomId, TUIRoomCoreDef.SpeechMode speechMode,
+    public abstract void createRoom(int roomId, TUIRoomCoreDef.SpeechMode speechMode,
                                     TUIRoomCoreCallback.ActionCallback callback);
 
     /**
@@ -62,7 +62,7 @@ public abstract class TUIRoomCore {
      * @param roomId   房间标识，需要由您分配并进行统一管理
      * @param callback 结果回调，成功时 code 为0
      */
-    public abstract void enterRoom(String roomId, TUIRoomCoreCallback.ActionCallback callback);
+    public abstract void enterRoom(int roomId, TUIRoomCoreCallback.ActionCallback callback);
 
     /**
      * 离开房间（进入房间成员调用）

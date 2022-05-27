@@ -33,9 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * TUIRoomCore 的实现类
- */
 public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, ImServiceListener {
     private static final String TAG = "TUIRoomCoreImpl";
 
@@ -44,7 +41,6 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
 
     private static TUIRoomCoreImpl     sInstance;
     private        TUIRoomCoreListener mTUIRoomCoreListener;
-    // 所有调用都切到主线程使用，保证内部多线程安全问题
     private        Handler             mMainHandler;
     private        IMService           mIMService;
     private        TRTCService         mTRTCService;
@@ -52,7 +48,7 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
     private Set<String>                          mAnchorList;
     private List<TUIRoomCoreDef.UserInfo>        mUserInfoList;
     private Map<String, TUIRoomCoreDef.UserInfo> mUserInfoMap;
-    private String                               mSelfUserId;//自己的userId
+    private String                               mSelfUserId;
 
     private TUIRoomCoreDef.SpeechMode mSpeechMode = TUIRoomCoreDef.SpeechMode.FREE_SPEECH;
     private boolean                   mIsUseFrontCamera;
@@ -97,7 +93,7 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
     }
 
     @Override
-    public void createRoom(final String roomId, final TUIRoomCoreDef.SpeechMode speechMode,
+    public void createRoom(final int roomId, final TUIRoomCoreDef.SpeechMode speechMode,
                            final TUIRoomCoreCallback.ActionCallback callback) {
         runOnMainThread(new Runnable() {
             @Override
@@ -114,15 +110,14 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
                     }
                     return;
                 }
-                if (TextUtils.isEmpty(roomId)) {
+                if (roomId == 0) {
                     TRTCLogger.i(TAG, "enterRoom, roomId: " + roomId);
                     callback.onCallback(CODE_ERROR, "room id is empty");
                     return;
                 }
                 clear();
                 mSelfUserId = userId;
-                //IM 先创建房间
-                mIMService.createRoom(roomId, speechMode, String.valueOf(roomId),
+                mIMService.createRoom(String.valueOf(roomId), speechMode, String.valueOf(roomId),
                         new TUIRoomCoreCallback.ActionCallback() {
                             @Override
                             public void onCallback(int code, String msg) {
@@ -130,8 +125,7 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
                                 if (code == CODE_SUCCESS) {
                                     initUserInfoList();
                                     initGroupNotification();
-                                    // IM 创建房间成功进入trtc房间
-                                    mTRTCService.enterRoom(sdkAppId, String.valueOf(roomId), userId, userSig,
+                                    mTRTCService.enterRoom(sdkAppId, roomId, userId, userSig,
                                             TRTCCloudDef.TRTCRoleAnchor, new TUIRoomCoreCallback.ActionCallback() {
                                                 @Override
                                                 public void onCallback(int code, String msg) {
@@ -197,7 +191,7 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
     }
 
     @Override
-    public void enterRoom(final String roomId, final TUIRoomCoreCallback.ActionCallback callback) {
+    public void enterRoom(final int roomId, final TUIRoomCoreCallback.ActionCallback callback) {
         runOnMainThread(new Runnable() {
             @Override
             public void run() {
@@ -209,15 +203,10 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
                     }
                     return;
                 }
-                if (TextUtils.isEmpty(roomId)) {
-                    TRTCLogger.i(TAG, "enterRoom, roomId: " + roomId);
-                    callback.onCallback(CODE_ERROR, "room id is empty");
-                    return;
-                }
                 clear();
                 final String userId = TUILogin.getUserId();
                 mSelfUserId = userId;
-                mIMService.enterRoom(roomId, new TUIRoomCoreCallback.ActionCallback() {
+                mIMService.enterRoom(String.valueOf(roomId), new TUIRoomCoreCallback.ActionCallback() {
                     @Override
                     public void onCallback(int code, String msg) {
                         if (code == CODE_SUCCESS) {
@@ -225,8 +214,8 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
                             initGroupNotification();
                             int role = mSpeechMode == TUIRoomCoreDef.SpeechMode.FREE_SPEECH
                                     ? TRTCCloudDef.TRTCRoleAnchor : TRTCCloudDef.TRTCRoleAudience;
-                            mTRTCService.enterRoom(TUILogin.getSdkAppId(), String.valueOf(roomId),
-                                    userId, TUILogin.getUserSig(), role, new TUIRoomCoreCallback.ActionCallback() {
+                            mTRTCService.enterRoom(TUILogin.getSdkAppId(), roomId, userId, TUILogin.getUserSig(),
+                                    role, new TUIRoomCoreCallback.ActionCallback() {
                                         @Override
                                         public void onCallback(int code, String msg) {
                                             if (callback != null) {
@@ -445,7 +434,7 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
     }
 
     @Override
-    public void stopRemoteView(final String userId,  final TUIRoomCoreDef.SteamType steamType,
+    public void stopRemoteView(final String userId, final TUIRoomCoreDef.SteamType steamType,
                                final TUIRoomCoreCallback.ActionCallback callback) {
         runOnMainThread(new Runnable() {
             @Override
@@ -524,7 +513,6 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
             }
         });
     }
-
 
     @Override
     public void muteUserCamera(final String userId, final boolean mute,

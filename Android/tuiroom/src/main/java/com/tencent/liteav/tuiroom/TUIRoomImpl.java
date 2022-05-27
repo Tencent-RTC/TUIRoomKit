@@ -38,7 +38,7 @@ public class TUIRoomImpl extends TUIRoom {
     }
 
     @Override
-    public void createRoom(String roomId, TUIRoomCoreDef.SpeechMode speechMode, boolean isOpenCamera,
+    public void createRoom(int roomId, TUIRoomCoreDef.SpeechMode speechMode, boolean isOpenCamera,
                            boolean isOpenMicrophone) {
         if (mContext == null) {
             TRTCLogger.e(TAG, "context is null");
@@ -48,7 +48,7 @@ public class TUIRoomImpl extends TUIRoom {
             return;
         }
 
-        if (TextUtils.isEmpty(roomId)) {
+        if (roomId == 0) {
             TRTCLogger.e(TAG, "roomId is empty");
             if (mListener != null) {
                 mListener.onRoomCreate(-1, "roomId is empty");
@@ -75,7 +75,7 @@ public class TUIRoomImpl extends TUIRoom {
     }
 
     @Override
-    public void enterRoom(String strRoomId, boolean isOpenCamera, boolean isOpenMicrophone) {
+    public void enterRoom(int roomId, boolean isOpenCamera, boolean isOpenMicrophone) {
         if (mContext == null) {
             TRTCLogger.e(TAG, "context is null");
             if (mListener != null) {
@@ -84,7 +84,7 @@ public class TUIRoomImpl extends TUIRoom {
             return;
         }
 
-        if (TextUtils.isEmpty(strRoomId)) {
+        if (roomId == 0) {
             TRTCLogger.e(TAG, "roomId is empty");
             if (mListener != null) {
                 mListener.onRoomEnter(-1, "roomId is empty");
@@ -102,7 +102,7 @@ public class TUIRoomImpl extends TUIRoom {
         String userId = TUILogin.getUserId();
         String userName = TUILogin.getNickName();
         String userAvatar = TUILogin.getFaceUrl();
-        RoomMainActivity.enterRoom(mContext, false, strRoomId, null, userId, userName, userAvatar,
+        RoomMainActivity.enterRoom(mContext, false, roomId, null, userId, userName, userAvatar,
                 isOpenCamera, isOpenMicrophone, TRTC_AUDIO_QUALITY_SPEECH, VIDEO_QUALITY_HD);
     }
 
