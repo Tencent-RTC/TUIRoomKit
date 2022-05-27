@@ -16,7 +16,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.tencent.liteav.basic.IntentUtils;
 import com.tencent.liteav.tuiroom.TUIRoom;
-import com.tencent.liteav.tuiroom.TUIRoomImpl;
 import com.tencent.liteav.tuiroom.ui.utils.StateBarUtils;
 import com.tencent.liteav.tuiroom.ui.widget.settingitem.BaseSettingItem;
 import com.tencent.liteav.tuiroom.ui.widget.settingitem.SwitchSettingItem;
@@ -89,7 +88,7 @@ public class JoinRoomActivity extends AppCompatActivity {
 
     private void enterMeeting(String roomId) {
         TUIRoom tuiRoom = TUIRoom.sharedInstance(this);
-        tuiRoom.enterRoom(roomId, mOpenCamera, mOpenAudio);
+        tuiRoom.enterRoom(Integer.parseInt(roomId), mOpenCamera, mOpenAudio);
     }
 
     private void initView() {

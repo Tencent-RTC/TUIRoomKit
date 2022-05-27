@@ -61,10 +61,9 @@ public class TRTCService extends TRTCCloudListener {
         mDelegate = delegate;
     }
 
-    public void enterRoom(int sdkAppId, String roomId, String userId, String userSign, int role,
+    public void enterRoom(int sdkAppId, int roomId, String userId, String userSign, int role,
                           TUIRoomCoreCallback.ActionCallback callback) {
-        if (sdkAppId == 0 || TextUtils.isEmpty(roomId) || TextUtils.isEmpty(userId) || TextUtils.isEmpty(userSign)) {
-            // 参数非法，可能执行了退房，或者登出
+        if (sdkAppId == 0 || TextUtils.isEmpty(userId) || TextUtils.isEmpty(userSign)) {
             TRTCLogger.e(TAG, "enter trtc room fail. params invalid. room id:" + roomId
                     + " user id:" + userId + " sign is empty:" + TextUtils.isEmpty(userSign));
             if (callback != null) {
@@ -73,8 +72,6 @@ public class TRTCService extends TRTCCloudListener {
             }
             return;
         }
-        mUserId = userId;
-        mRoomId = roomId;
         mStreamId = sdkAppId + "_" + roomId + "_" + userId + "_main";
         TRTCLogger.i(TAG, "enter room, app id:" + sdkAppId + " room id:" + roomId + " user id:"
                 + userId + " sign:" + TextUtils.isEmpty(userId) + " role:" + role);
@@ -85,8 +82,7 @@ public class TRTCService extends TRTCCloudListener {
         mTRTCParams.userSig = userSign;
         mTRTCParams.role = role;
         mTRTCParams.streamId = mStreamId;
-        // 字符串房间号逻辑
-        mTRTCParams.roomId = Integer.valueOf(roomId);
+        mTRTCParams.roomId = roomId;
         internalEnterRoom();
     }
 

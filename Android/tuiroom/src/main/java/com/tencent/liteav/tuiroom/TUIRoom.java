@@ -22,7 +22,7 @@ public abstract class TUIRoom {
      * @param isOpenCamera     是否打开摄像头
      * @param isOpenMicrophone 是否打开麦克风
      */
-    public abstract void createRoom(String roomId, TUIRoomCoreDef.SpeechMode speechMode, boolean isOpenCamera,
+    public abstract void createRoom(int roomId, TUIRoomCoreDef.SpeechMode speechMode, boolean isOpenCamera,
                                     boolean isOpenMicrophone);
 
     /**
@@ -32,7 +32,7 @@ public abstract class TUIRoom {
      * @param isOpenCamera     是否打开摄像头
      * @param isOpenMicrophone 是否打开麦克风
      */
-    public abstract void enterRoom(String roomId, boolean isOpenCamera, boolean isOpenMicrophone);
+    public abstract void enterRoom(int roomId, boolean isOpenCamera, boolean isOpenMicrophone);
 
     /**
      * @param listener 事件监听

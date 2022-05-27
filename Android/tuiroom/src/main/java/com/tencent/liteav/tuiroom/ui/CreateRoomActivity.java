@@ -19,7 +19,6 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.tencent.liteav.basic.IntentUtils;
 import com.tencent.liteav.tuiroom.R;
 import com.tencent.liteav.tuiroom.TUIRoom;
-import com.tencent.liteav.tuiroom.TUIRoomImpl;
 import com.tencent.liteav.tuiroom.model.TUIRoomCoreDef;
 import com.tencent.liteav.tuiroom.ui.utils.StateBarUtils;
 import com.tencent.liteav.tuiroom.ui.widget.settingitem.BaseSettingItem;
@@ -62,7 +61,7 @@ public class CreateRoomActivity extends AppCompatActivity {
     }
 
     private void enterRoom() {
-        String roomId = String.valueOf(getRoomId(TUILogin.getUserId()));
+        int roomId = getRoomId(TUILogin.getUserId());
         TUIRoom tuiRoom = TUIRoom.sharedInstance(this);
         tuiRoom.createRoom(roomId, TUIRoomCoreDef.SpeechMode.FREE_SPEECH, mOpenCamera, mOpenAudio);
     }
