@@ -21,11 +21,11 @@
 {
 	dispatch_queue_t _queue;
 }
-/// 全部用户缓存
+
 @property (nonatomic, strong) NSMutableDictionary<NSString *,TUIRoomUserInfo *> *userCacheMap;
-/// 上麦用户缓存
+
 @property (nonatomic, strong) NSMutableDictionary<NSString *,TUIRoomUserInfo *> *userSpeechCacheMap;
-/// 房间号
+
 @property (nonatomic, strong) NSString *roomId;
 
 @end
@@ -35,7 +35,7 @@
 static TUIRoomUserManage *gInstance = nil;
 static dispatch_once_t gOnceToken;
 
-#pragma mark 初始化
+#pragma mark - init
 - (instancetype)init {
 	self = [super init];
 	if (self) {
@@ -46,56 +46,28 @@ static dispatch_once_t gOnceToken;
 	return self;
 }
 
-#pragma mark public function
-
-/**
- * 清理缓存
- */
+#pragma mark - public function
 + (void)clearCache {
 	[[TUIRoomUserManage shareInstance] deleteCache];
 }
 
-/**
- * 销毁 TUIRoom 单例对象
- *
- */
 + (void)destroyInstance {
 	gInstance = nil;
     gOnceToken = 0;
 }
 
-/**
- * 缓存roomId
- *
- * @param roomId roomId
- */
 + (void)cacheRoomId:(NSString *)roomId {
 	[TUIRoomUserManage shareInstance].roomId = roomId;
 }
 
-/**
- * 缓存用户
- *
- * @param userInfo userInfo
- */
 + (void)cacheUser:(TUIRoomUserInfo *)userInfo {
 	[[TUIRoomUserManage shareInstance] saveUser:userInfo];
 }
 
-/**
- * 缓存麦上用户
- *
- * @param userInfo userInfo
- */
 + (void)cacheSpeechUser:(TUIRoomUserInfo *)userInfo {
 	[[TUIRoomUserManage shareInstance] saveSpeechUser:userInfo];
 }
 
-/**
- * 获取用户
- *
- * @param userId userId
- */
 + (nullable TUIRoomUserInfo *)getUser:(NSString *)userId {
 	if (userId) {
 		return [[TUIRoomUserManage shareInstance] getUser:userId];
@@ -104,39 +76,18 @@ static dispatch_once_t gOnceToken;
 	}
 }
 
-/**
- * 获取用户列表
- *
- * @return userList
- */
 + (NSArray<TUIRoomUserInfo *> *)userList {
 	return [[TUIRoomUserManage shareInstance] getUserList];
 }
 
-/**
- * 获取用户ID列表
- *
- * @return userList
- */
 + (NSArray<NSString *> *)userIdList {
 	return [[TUIRoomUserManage shareInstance] getUserIdList];
 }
 
-/**
- * 获取麦上用户ID列表
- *
- * @return userList
- */
 + (NSArray<NSString *> *)speechUserIdList {
 	return [[TUIRoomUserManage shareInstance] getUserIdSpeechList];
 }
 
-/**
- *  获取用户资料
- *
- *  @param userId userId
- *  @param callback callback
- */
 + (void)getUserInfo:(NSString *)userId callback:(TUIRoomUserInfoCallback)callback {
     NSString *roomId = [TUIRoomUserManage shareInstance].roomId;
     if (!userId || !roomId) {
@@ -176,66 +127,37 @@ static dispatch_once_t gOnceToken;
     }];
 }
 
-/**
- * 删除用户
- *
- * @param userId userId
- */
 + (void)removeUser:(NSString *)userId {
 	if (userId) {
 		[[TUIRoomUserManage shareInstance] deleteUser:userId];
 	}
 }
 
-/**
- * 删除麦上用户
- *
- * @param userId userId
- */
 + (void)removeSpeechUser:(NSString *)userId {
 	if (userId) {
 		[[TUIRoomUserManage shareInstance] deleteSpeechUser:userId];
 	}
 }
 
-/**
- * 当前用户id
- *
- * @return 用户id
- */
 + (NSString *)currentUserId {
 	return [TUILogin getUserID] ? : @"";
 }
 
-/**
- * 当前用户nickName
- *
- * @return 用户nickName
- */
 + (NSString *)currentNickName {
 	return [TUILogin getNickName] ? : @"";
 }
 
-/**
- * 当前用户faceUrl
- *
- * @return 用户faceUrl
- */
 + (NSString *)currentFaceUrl {
 	return [TUILogin getFaceUrl] ? : @"";
 }
 
-/**
- * 刷新个人信息
- *
- */
 + (void)updateSelfUserInfo {
 	if ([TUILogin getUserID].length > 0) {
 		[TUILogin getSelfUserInfo];
 	}
 }
 
-#pragma mark private function
+#pragma mark - private function
 
 + (instancetype)shareInstance {
 	dispatch_once(&gOnceToken, ^{
@@ -346,7 +268,6 @@ static dispatch_once_t gOnceToken;
 	}];
 }
 
-//同步
 - (void)syncRun:(os_block_t)block {
 	if (_queue) {
 		dispatch_sync(_queue, ^{

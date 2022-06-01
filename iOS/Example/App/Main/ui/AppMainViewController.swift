@@ -19,7 +19,7 @@ class AppMainViewController: UIViewController {
         navigationController?.navigationBar.barTintColor = .white
         initNavigationItemTitleView()
         let vc = TUIRoomEntranceViewController()
-        // 美颜License设置 【可选】
+        // XMagic License [Optional]
         vc.xMagicLicenseURL = XMagicLicenseURL
         vc.xMagicLicenseKey = XMagicLicenseKey
         addChild(vc)

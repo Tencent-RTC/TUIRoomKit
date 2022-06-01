@@ -9,7 +9,7 @@
 import Foundation
 import Toast_Swift
 import WebKit
-import ImSDK_Plus
+import TUICore
 
 class TRTCLoginViewController: UIViewController {
     
@@ -75,8 +75,7 @@ class TRTCLoginViewController: UIViewController {
     func loginIM(complete: @escaping (_ success: Bool)->Void) {
         guard let userID = ProfileManager.shared.curUserID() else { return }
         let userSig = ProfileManager.shared.curUserSig()
-        V2TIMManager.sharedInstance()
-        if V2TIMManager.sharedInstance()?.getLoginUser() != userID {
+        if TUILogin.getUserID() != userID {
             ProfileManager.shared.IMLogin(userSig: userSig) {
                 debugPrint("IM login success.")
                 complete(true)

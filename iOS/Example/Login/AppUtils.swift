@@ -5,12 +5,11 @@
 //  Created by xcoderliu on 12/24/19.
 //  Copyright © 2019 xcoderliu. All rights reserved.
 //
-// 用于TRTC_SceneDemo
 
 import UIKit
 import ImSDK_Plus
 
-//推送证书 ID
+// IMSDK APNS ID
 #if DEBUG
     let timSdkBusiId: UInt32 = 18069
 #else
@@ -41,7 +40,6 @@ class AppUtils: NSObject {
     }
     
     @objc func alertUserTips(_ vc: UIViewController) {
-        // 提醒用户不要用Demo App来做违法的事情
-        // 外发代码不需要提示
+        
     }
 }

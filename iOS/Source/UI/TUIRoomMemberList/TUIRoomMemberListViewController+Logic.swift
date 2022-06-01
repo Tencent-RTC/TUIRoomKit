@@ -77,7 +77,6 @@ extension TUIRoomMemberListViewController {
         return block
     }
 
-    // 人员变动通知刷新
     @objc func memberListRefresh() {
         attendeeList = delegate?.getAttendeeList() ?? []
         attendeeList = attendeeList.filter { (model) -> Bool in
@@ -86,12 +85,10 @@ extension TUIRoomMemberListViewController {
         reloadData()
     }
 
-    // 人员状态通知刷新
     @objc func memberStateRefresh() {
         reloadData()
     }
 
-    // 成为房主
     @objc func resetView() {
         reloadData()
         updateView()

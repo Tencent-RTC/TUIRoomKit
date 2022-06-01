@@ -9,7 +9,7 @@
 import UIKit
 
 class UserAgreementViewController: UIViewController {
-    static let UserAgreeKey = "UserAgreeKey"  // 用户协议，登录或注册后第一次弹出
+    static let UserAgreeKey = "UserAgreeKey"
     
     typealias Completion = () -> Void
     var completion: Completion? = nil
