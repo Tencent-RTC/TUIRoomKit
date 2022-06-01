@@ -11,40 +11,27 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
-  用户信息对象
- */
 @interface TUIRoomUserInfo : NSObject
 
-/// 用户ID
+/// User ID
 @property (nonatomic, strong) NSString *userId;
-/// 用户Name
+/// Username
 @property (nonatomic, strong) NSString *userName;
-/// 用户Avatar
+/// User profile photo URL
 @property (nonatomic, strong) NSString *userAvatar;
-/// 用户角色
+/// User role
 @property (nonatomic, assign) TUIRoomRole role;
-/// 用户是否打开了视频
+/// Whether the user's video is enabled
 @property (nonatomic, assign) BOOL isVideoAvailable;
-/// 用户是否打开音频
+/// Whether the user's audio is enabled
 @property (nonatomic, assign) BOOL isAudioAvailable;
-/// 是否对远端用户静画
+/// Whether the remote user's video is enabled
 @property (nonatomic, assign) BOOL isRemoteVideoMuted;
-/// 是否对远端用户静音
+/// Whether the remote user's audio is enabled
 @property (nonatomic, assign) BOOL isRemoteAudioMuted;
 
-/**
- * 用户音频是否打开
- *
- * @return yes打开 no 关闭
- */
 - (BOOL)isAudioOpen;
 
-/**
- * 用户视频是否打开
- *
- * @return yes打开 no 关闭
- */
 - (BOOL)isVideoOpen;
 
 @end

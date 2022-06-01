@@ -13,40 +13,23 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
     
     
     /// TUIRoomMemberVCDelegate
-    /**
-     * 踢人
-     *
-     */
     func onKickOffUser(userInfo: TUIRoomUserInfo) {
-        // 被踢者，会主动下麦
+        // The removed user will become a listener
     }
-
-    /**
-     * 获取列表
-     *
-     */
+    
     func getAttendeeList() -> [TUIRoomAttendeeModel] {
         return attendeeList
     }
-
+    
     // TUIRoomCellDelegate
-    /**
-     * 获取view
-     *
-     */
     func getRenderView(model: TUIRoomAttendeeModel, type: TUIRoomStreamType = .camera) -> TUIRoomAttendeeRenderView? {
         return getRenderViewByUserid(userId: model.userId(), type: type)
     }
-
+    
     // TUIRoomCoreDelegate
-
     func onError(_ code: Int, message: String) {
     }
-
-    /**
-     * 房间被销毁的回调，主持人退房时，房间内的所有用户都会收到此通知
-     *
-     */
+    
     func onDestroyRoom() {
         interruptClearRoom()
         let alertVC = UIAlertController(title: .destroyAlertText, message: nil, preferredStyle: .alert)
@@ -57,13 +40,20 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
         sureAction.setTextColor(UIColor.red)
         alertVC.addAction(sureAction)
         UIViewController.getCurrentViewController()?.present(alertVC, animated: true, completion: nil)
+#if RTCube_APPSTORE
+        guard roomInfo.ownerId == currentUser.userId() else { return }
+        let selector = NSSelectorFromString("showAlertUserLiveTimeOut")
+        if UIViewController.responds(to: selector) {
+            UIViewController.perform(selector)
+        }
+#endif
     }
-
+    
     /**
-     * 用户音量大小回调通知
+     * Callback for user volume level
      *
-     * @param userId 本地或远端的用户标识。
-     * @param volume 用户的音量大小，取值范围 0 - 100。
+     * - parameter userId Local or remote user ID
+     * - parameter volume User volume level. Value range: 0–100
      */
     func onUserVoiceVolume(_ userId: String, volume: Int) {
         let render = getRenderViewByUserid(userId: userId)
@@ -74,19 +64,20 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
             render?.refreshVolumeProgress()
         }
     }
-
+    
+    
     /**
-     * 主持人更改回调
+     * The host was changed.
      *
-     * @param previousUserId 更改前的主持人
-     * @param currentUserId  更改后的主持人
+     * - parameter previousUserId Original host
+     * - parameter currentUserId  New host
      */
     func onRoomMasterChanged(_ previousUserId: String, currentUserId: String) {
-        // 清理上一个房主状态
+        // Clear the status of the previous room owner
         if let homeownerModel = attendeeMap[previousUserId] {
             homeownerModel.userInfo.role = .anchor
         }
-        // 更新当前房主状态
+        // Update the status of the current room owner
         if roomInfo.isHomeowner() {
             currentUser.userInfo.isRemoteVideoMuted = false
             currentUser.userInfo.isRemoteAudioMuted = false
@@ -102,30 +93,30 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
         }
         reloadData()
     }
-
+    
     /**
-     * 远端用户进入房间回调
+     * A remote user entered the room.
      *
-     * @param userId 新进房成员 ID
+     * - parameter userId User ID of new member
      */
     func onRemoteUserEnter(_ userId: String) {
         userEnterRoom(userId)
     }
-
+    
     /**
-     * 成员退房通知
+     * A user exited the room
      *
-     * @param userId 退房成员 ID
+     * - parameter userId User ID of exiting member
      */
     func onRemoteUserLeave(_ userId: String) {
         onUserLeaveRoom(userId)
     }
-
+    
     /**
-     * 成员 开启/关闭 摄像头的通知
+     * A user enabled/disabled the camera
      *
-     * @param userId    用户ID
-     * @param available  true：用户打开摄像头；false：用户关闭摄像头
+     * - parameter userId    User ID
+     * - parameter available  true: The camera is enabled; false: The camera is disabled
      */
     func onRemoteUserCameraAvailable(_ userId: String, available: Bool) {
         let noti = Notification(name: Notification.Name("kMemberStateRefresh"))
@@ -146,12 +137,12 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
         }
         renderView?.refreshVideo(isVideoAvailable: available)
     }
-
+    
     /**
-     * 成员 开启/关闭 视频分享的通知
+     * A user enabled/disabled screen sharing.
      *
-     * @param userId    用户ID
-     * @param available 是否有屏幕分享流数据
+     * - parameter userId    User ID
+     * - parameter available Whether screen sharing data is available
      */
     func onRemoteUserScreenVideoAvailable(_ userId: String, available: Bool) {
         if available {
@@ -178,12 +169,12 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
             reloadData()
         }
     }
-
+    
     /**
-     * 成员开启/关闭麦克风的通知
+     * A user enabled/disabled the mic.
      *
-     * @param userId    用户ID
-     * @param available 是否有音频数据
+     * - parameter userId    User ID
+     * - parameter available Whether audio data is available
      */
     func onRemoteUserAudioAvailable(_ userId: String, available: Bool) {
         let noti = Notification(name: Notification.Name("kMemberStateRefresh"))
@@ -191,39 +182,39 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
         let renderView = getRenderViewByUserid(userId: userId)
         renderView?.refreshAudio(isAudioAvailable: available)
     }
-
+    
     /**
-     * 远端用户开始发言（即麦上）
+     * A remote user started speaking (or became a speaker)
      *
-     * 当您收到此通知时，表示该用户发言成功
+     * This notification will be received if a user speaks.
      *
-     * @param userId 用户ID
+     * - parameter userId User ID
      */
     func onRemoteUserEnterSpeechState(_ userId: String) {
         enterSpeechState(userId)
         let noti = Notification(name: Notification.Name("kMemberListRefresh"))
         NotificationCenter.default.post(noti)
     }
-
+    
     /**
-     * 远端用户结束发言
+     * A remote user stopped speaking
      *
-     * 当您收到此通知时，表示该用户已经下麦。
+     * This notification will be received after a user stops speaking.
      *
-     * @param userId 用户ID
+     * - parameter userId User ID
      */
     func onRemoteUserExitSpeechState(_ userId: String) {
         exitSpeechState(userId)
         let noti = Notification(name: Notification.Name("kMemberListRefresh"))
         NotificationCenter.default.post(noti)
     }
-
+    
     /**
-     * 主持人设置禁用麦克风回调
+     * The host disabled the mic
      *
-     * @param muted  true,用户麦克风被禁用  false用户麦克风打开
+     * - parameter muted  true: The user's mic is disabled; false: The user's mic is enabled
      *
-     * @param userId 主持人用户ID
+     * - parameter userId User ID of host
      */
     func onMicrophoneMuted(_ muted: Bool, userId: String) {
         currentUser.userInfo.isRemoteAudioMuted = muted
@@ -245,13 +236,13 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
             muteAudioButton.isSelected = true
         }
     }
-
+    
     /**
-     * 主持人设置禁用摄像头回调
+     * The host disabled the camera
      *
-     * @param muted  true,用户摄像头被禁用  false用户摄像头打开
+     * - parameter muted  true: The user's camera is disabled; false: The user's camera is enabled
      *
-     * @param userId 主持人用户ID
+     * - parameter userId User ID of host
      */
     func onCameraMuted(_ muted: Bool, userId: String) {
         currentUser.userInfo.isRemoteVideoMuted = muted
@@ -272,11 +263,11 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
             muteVideoButton.isSelected = true
         }
     }
-
+    
     /**
-     * 主持人踢人的回调，主持人/管理员 调用kickOffUser，用户接收到踢人事件的回调
+     * Callback for user removed by host. The user will receive this callback after the host/admin calls `kickOffUser`.
      *
-     * @param userId 主持人/管理员 userId
+     * - parameter userId Host/Admin user ID
      */
     func onReceiveKickedOff(_ userId: String) {
         interruptClearRoom()
@@ -288,12 +279,12 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
         alertVC.addAction(sureAction)
         UIViewController.getCurrentViewController()?.present(alertVC, animated: true, completion: nil)
     }
-
+    
     /**
-     * 网络质量回调
+     * Callback for network quality
      *
-     * @param localQuality  上行网络质量
-     * @param remoteQuality 下行网络质量
+     * - parameter localQuality  Upstream network quality
+     * - parameter remoteQuality Downstream network quality
      */
     func onNetworkQuality(_ localQuality: TRTCQualityInfo, remoteQuality: [TRTCQualityInfo]) {
         let render = getRenderViewByUserid(userId: currentUser.userId())
@@ -305,9 +296,9 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
             render?.refreshSignalView()
         }
     }
-
+    
     /**
-     * 录屏开始通知
+     * Screen sharing started
      */
     func onScreenCaptureStarted() {
         TUIRoomCore.shareInstance().stopCameraPreview()
@@ -316,11 +307,11 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
         let renderView = getRenderViewByUserid(userId: currentUser.userId())
         renderView?.refreshVideo(isVideoAvailable: false)
     }
-
+    
     /**
-     * 录屏停止通知
+     * Screen sharing stopped
      *
-     * @param reason 停止原因，0：用户主动停止；1：被其他应用抢占导致停止
+     * - parameter reason Reason for stop. 0: The user stopped screen sharing; 1: Screen sharing stopped due to preemption by another application
      */
     func onScreenCaptureStopped(_ reason: Int) {
         if #available(iOS 11.0, *) {
@@ -336,12 +327,12 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
             TUIRoomCore.shareInstance().startCameraPreview(!switchCameraButton.isSelected, view: renderView)
         }
     }
-
+    
     /**
-     * 收到文本消息
+     * A text message was received.
      *
-     * @param userId 用户ID
-     * @param message  文本消息
+     * - parameter userId User ID
+     * - parameter message  Text chat message
      */
     func onReceiveChatMessage(_ userId: String, message: String) {
         guard let userInfo = TUIRoomUserManage.getUser(userId) else {
@@ -349,119 +340,119 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
         }
         debugPrint("收到\"\(userInfo.userName)\"发的消息：\(message)")
     }
-
+    
     /// TUIRoomApplySpeech
     /**
-     * 用户收到主持人发言邀请回调
+     * A user received an invitation to speak from the host.
      *
-     * 主持人调用sendSpeechInvitation接口邀请用户发言后，用户收到的回调，用户需要进行发言
+     * The host called the `sendSpeechInvitation` API to invite the user to speak.
      *
-     * @param userId 主持人用户ID
+     * - parameter userId User ID of host
      */
     func onReceiveSpeechInvitation(_ userId: String) {
         debugPrint("onReceiveSpeechInvitation:\(userId)")
     }
-
+    
     /**
-     * 用户收到主持人取消发言邀请回调
+     * The host canceled the mic-on invitation.
      *
-     * 主持人调用cancelSpeechInvitation接口取消邀请用户发言后，用户收到的回调
+     * The host called the `cancelSpeechInvitation` API to cancel the invitation to speak sent to the user.
      *
-     * @param userId 主持人用户ID
+     * - parameter userId User ID of host
      */
     func onReceiveInvitationCancelled(_ userId: String) {
         debugPrint("onReceiveInvitationCancelled:\(userId)")
     }
-
+    
     /**
-     * 用户申请发言回调
+     * Callback for request to speak
      *
-     * TUIRoomCoreDef.SpeechMode.APPLY_SPEECH，用户调用sendSpeechApplication接口向主持人申请发言时，
-     * 主持人收到的回调，主持人需要操作并调用replySpeechApplication接口对申请进行回应
+     * A user called the `sendSpeechApplication` API to request to speak in `TUIRoomCoreDef.SpeechMode.APPLY_SPEECH` mode.
+     * The host needs to process the request and call the `replySpeechApplication` API to respond to the request.
      *
-     * @param userId 用户ID
+     * - parameter userId User ID
      */
     func onReceiveSpeechApplication(_ userId: String) {
         debugPrint("onReceiveSpeechApplication:\(userId)")
     }
     
     /**
-     * 用户取消申请发言回调
-     * TUIRoomCoreDef.SpeechMode.APPLY_SPEECH，用户调用cancelApplication接口取消申请发言时，主持人收到的回调
+     * A user canceled a request to speak.
+     * A user called the `cancelApplication` API to cancel their request to speak in `TUIRoomCoreDef.SpeechMode.APPLY_SPEECH` mode.
      *
-     * @param userId 用户ID
-    */
+     * - parameter userId User ID
+     */
     func onSpeechApplicationCancelled(_ userId: String) {
         debugPrint("onSpeechApplicationCancelled:\(userId)")
     }
     
     /**
-     * 主持人禁止申请发言回调
+     * The host disabled requests to speak.
      *
-     * @param isForbidden true,发言申请被禁用, false 可以申请发言
+     * - parameter isForbidden true: Users cannot request to speak; false: Requests to speak are allowed
      *
-     * @param userId 主持人用户ID
+     * - parameter userId User ID of host
      */
     func onSpeechApplicationForbidden(_ isForbidden: Bool, userId: String) {
         debugPrint("onSpeechApplicationForbidden:\(isForbidden)")
     }
-
+    
     /**
-     * 主持人更改聊天室是否禁言回调
+     * The host muted/unmuted the room
      *
-     * @param muted  true,聊天室不可以发消息  false聊天室可以发消息
+     * - parameter muted  true: No messages can be sent in the chat room; false: Messages can be sent in the chat room
      *
-     * @param userId 主持人用户ID
+     * - parameter userId User ID of host
      */
     func onChatRoomMuted(_ muted: Bool, userId: String) {
         debugPrint("onChatRoomMuted:\(muted)")
     }
-
+    
     /**
-     * 主持人开始点名，成员收到的回调
+     * The host started a roll call.
      *
-     * @param userId 主持人用户ID
+     * - parameter userId User ID of host
      */
     func onCallingRollStarted(_ userId: String) {
         debugPrint("onCallingRollStarted:\(userId)")
     }
-
+    
     /**
-     * 主持人结束点名，成员收到的回调
+     * The anchor ended a roll call.
      *
-     * @param userId 主持人用户ID
+     * - parameter userId User ID of host
      */
     func onCallingRollStopped(_ userId: String) {
         debugPrint("onCallingRollStopped:\(userId)")
     }
-
+    
     /**
-     * 成员回复点名，主持人收到的回调
+     * A user replied to a roll call.
      *
-     * @param userId 用户id
+     * - parameter userId User ID
      */
     func onMemberReplyCallingRoll(_ userId: String) {
         debugPrint("onMemberReplyCallingRoll:\(userId)")
     }
-
+    
     /**
-     * 成员被请求下麦的回调
+     * A user was asked to stop speaking.
      *
-     * 主持人调用sendOffSpeaker接口请求用户下麦后，用户收到的回调，用户需要下麦
+     * The host called the `sendOffSpeaker` API to request the user to stop speaking.
      *
-     * @param userId 主持人用户ID
+     * - parameter userId User ID of host
      */
     func onOrdered(toExitSpeechState userId: String) {
         debugPrint("onOrdered:\(userId)")
     }
     
     /**
-     * 技术指标统计回调
+     * Callback for technical metric statistics
      *
-     * 如果您是熟悉音视频领域相关术语，可以通过这个回调获取 SDK 的所有技术指标。
-     * 如果您是首次开发音视频相关项目，可以只关注 onNetworkQuality 回调，每2秒回调一次。
+     * If you are familiar with audio/video terms, you can use this callback to get all technical metrics of the SDK.
+     * If you are developing an audio/video project for the first time, you can focus only on the `onNetworkQuality` callback, which is triggered once every two seconds.
      *
-     * @param statistics 统计数据，包括本地和远程的
+     * - parameter statistics Statistics of local and remote users
      */
     func onStatistics(_ statistics: TRTCStatistics) {
         debugPrint("onStatistics:\(statistics)")
@@ -474,14 +465,13 @@ private extension String {
     static let destroyAlertText = tuiRoomLocalize("TUIRoom.room.destroy")
     static let alertOkText = tuiRoomLocalize("TUIRoom.ok")
     static let kickOffTitleText = tuiRoomLocalize("TUIRoom.kick.off.title")
-
+    
     static let noticeCameraOffTitleText = tuiRoomLocalize("TUIRoom.homeowners.notice.camera.turned.off")
     static let noticeCameraOnTitleText = tuiRoomLocalize("TUIRoom.homeowners.notice.camera.turned.on")
     static let noticeMicrophoneOffTitleText = tuiRoomLocalize("TUIRoom.homeowners.notice.microphone.turned.off")
     static let noticeMicrophoneOnTitleText = tuiRoomLocalize("TUIRoom.homeowners.notice.microphone.turned.on")
 }
 
-/// MARK: 获取当前controller
 private extension UIViewController {
     class func getCurrentViewController(base: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
         if let nav = base as? UINavigationController {

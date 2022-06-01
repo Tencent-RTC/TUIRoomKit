@@ -14,7 +14,7 @@ import TXAppBasic
 import UIKit
 
 public class TUIRoomEntranceViewController: UIViewController {
-    // XMagic 美颜 【可选】
+    // XMagic License 【Optional】
     public var xMagicLicenseURL: String = ""
     public var xMagicLicenseKey: String = ""
     

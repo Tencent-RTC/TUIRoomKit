@@ -103,10 +103,8 @@ class TUIRoomSetVideoVC: UIViewController,
         return swich
     }()
 
-    // 帧率
     let frameArray = ["15", "20"]
 
-    // 创建码表, resolution 的值详见：TRTCVideoResolution
     let bitrateTable = [TUIRoomBitrateTable](
         arrayLiteral:
         TUIRoomBitrateTable(resolutionName: "180 * 320",
@@ -140,7 +138,8 @@ class TUIRoomSetVideoVC: UIViewController,
                             maxBitrate: 2000,
                             stepBitrate: 50)
     )
-    // 码率SliderView
+
+    
     lazy var bitrateSlider: UISlider = {
         let slider = UISlider(frame:
                                 CGRect(x: UIScreen.main.bounds.size.width / 7.0 * 2.5 - 8,
@@ -156,7 +155,6 @@ class TUIRoomSetVideoVC: UIViewController,
         return slider
     }()
 
-    // 码率显示label
     lazy var bitrateShowLabel: UILabel = {
         let label = UILabel(frame:
                                 CGRect(x: UIScreen.main.bounds.size.width / 7.0 * 5.5,
@@ -170,7 +168,6 @@ class TUIRoomSetVideoVC: UIViewController,
         return label
     }()
 
-    // 本地镜像开关切换函数
     @objc func mirrorSwitchChanged(_ sw: UISwitch) {
         if sw.isOn {
             TUIRoomCore.shareInstance().setVideoMirror(.enable)
@@ -180,7 +177,6 @@ class TUIRoomSetVideoVC: UIViewController,
         videoModel.isMirror = sw.isOn
     }
 
-    // 滑动条拖动函数
     @objc func bitrateSliderChanged(_ slider: UISlider) {
         updateBitrate(bitrate: Int(slider.value * videoModel.bitrate.stepBitrate))
     }
@@ -246,11 +242,9 @@ class TUIRoomSetVideoVC: UIViewController,
         }
     }
 
-    // 创建分辨率和帧率pickView以及textField
-    @objc func setPickViewAndTextField() {
-        // 分辨率：
 
-        // 创建UITextField
+    @objc func setPickViewAndTextField() {
+
         resolutionTextField = UITextField(frame:
                                             CGRect(x: UIScreen.main.bounds.size.width / 3.0,
                                                    y: 30,
@@ -258,14 +252,13 @@ class TUIRoomSetVideoVC: UIViewController,
                                                    height: 25))
 
         resolutionTextField.tintColor = .clear
-        // 设置UITextField的tag值
+
         resolutionTextField.tag = TAG_RESOLUTION
 
         resolutionTextField.addGestureRecognizer(UITapGestureRecognizer(target:
                                                                             self,
                                                                         action: #selector(resolutionDidClick)))
 
-        // 设置textField预设内容
         resolutionTextField.text = videoModel.bitrate.resolutionName
 
         resolutionTextField.backgroundColor = .clear
@@ -275,15 +268,11 @@ class TUIRoomSetVideoVC: UIViewController,
 
         view.addSubview(resolutionTextField)
 
-        // 增加触控事件
         let tap = UITapGestureRecognizer(target: self,
                                          action: #selector(hideKeyboard(tapG:)))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
 
-        // 帧率：
-
-        // 创建UITextField
         fpsTextField = UITextField(frame:
                                     CGRect(x: UIScreen.main.bounds.size.width / 3.0,
                                            y: 80,
@@ -291,14 +280,11 @@ class TUIRoomSetVideoVC: UIViewController,
                                            height: 25))
 
         fpsTextField.tintColor = .clear
-        // 设置UITextField的tag值
         fpsTextField.tag = TAG_FPS
 
-        // 将textField视图转换成pickerView
         fpsTextField.addGestureRecognizer(UITapGestureRecognizer(target: self,
                                                                  action: #selector(frameDidClick)))
 
-        // 设置textField预设内容
         fpsTextField.text = videoModel.frameText
 
         fpsTextField.backgroundColor = .clear
@@ -368,14 +354,12 @@ class TUIRoomSetVideoVC: UIViewController,
         videoModel.bitrateIndex = index
         videoModel.bitrate = bitrateTable[index]
         let item = videoModel.bitrate
-        // 更新分辨率
         resolutionTextField.text = item.resolutionName
         guard let resolution = TRTCVideoResolution(rawValue: item.resolution) else {
             return
         }
         TUIRoomCore.shareInstance().setVideoResolution(resolution)
 
-        // 设置码率进度条 && 更新码率
         bitrateSlider.minimumValue = item.minBitrate / item.stepBitrate
         bitrateSlider.maximumValue = item.maxBitrate / item.stepBitrate
         bitrateSlider.value = item.defaultBitrate / item.stepBitrate
@@ -401,7 +385,6 @@ class TUIRoomSetVideoVC: UIViewController,
         super.viewWillAppear(animated)
     }
 
-    // 点击空白处隐藏编辑状态
     @objc func hideKeyboard(tapG: UITapGestureRecognizer) {
         view.endEditing(true)
     }

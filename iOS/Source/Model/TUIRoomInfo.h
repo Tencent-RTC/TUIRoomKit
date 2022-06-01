@@ -10,70 +10,67 @@
 #import "TUIRoomDefine.h"
 
 NS_ASSUME_NONNULL_BEGIN
-/**
-  房间信息对象
- */
+
 @interface TUIRoomInfo : NSObject<NSCopying>
 
-/// 房间ID
+/// Room ID
 @property (nonatomic, strong) NSString *roomId;
-/// 群拥有者ID
+/// Group owner ID
 @property (nonatomic, strong) NSString *ownerId;
-/// 房间名
+/// Room name
 @property (nonatomic, strong) NSString *roomName;
-/// 成员个数
+/// Number of members
 @property (nonatomic, assign) NSInteger roomMemberNum;
-/// 是否在分享屏幕
+
 @property (nonatomic, assign) BOOL isSharingScreen;
 
-// 群Notification属性
-/// 发言模式
+/// Speech mode
 @property (nonatomic, strong) NSString *speechMode;
-/// 开始时间
+/// Start time
 @property (nonatomic, assign) long startTime;
-/// 聊天室是否可以发消息
+/// Whether messages can be sent in the chat room
 @property (nonatomic, assign) BOOL isChatRoomMuted;
-/// 是否禁止申请发言
+/// Whether speech is disabled
 @property (nonatomic, assign) BOOL isSpeechApplicationForbidden;
-/// 是否全体禁视频
+/// Whether the video of all members is disabled
 @property (nonatomic, assign) BOOL isAllCameraMuted;
-/// 是否全体禁麦克风
+/// Whether the mic of all members is disabled
 @property (nonatomic, assign) BOOL isAllMicMuted;
-/// 是否正在点名
+/// Whether a roll call is ongoing
 @property (nonatomic, assign) BOOL isCallingRoll;
 
 /**
- * 是否是房主
+ * Get Room Owner Status
  *
  * @return yes/no
  */
 - (BOOL)isHomeowner;
 
 /**
- * 获取TUIRoomSpeechMode
+ * Get Speech Mode
  *
  * @return TUIRoomSpeechMode
  */
 - (TUIRoomSpeechMode)getSpeechModeType;
 
 /**
- * 获取群公告
+ * Get Group Notification
  *
  * @return str
  */
 - (NSString *)getNotification;
 
 /**
- * 更新群信息
+ * Update Group Notification
  *
  * @param dict dict
  */
 - (void)updateNotification:(NSDictionary *)dict;
 
 /**
- * 获取TRTC房间号
+ * Get TRTC RoomId
  *
- * @return 房间号
+ * @return UInt32 roomId
  */
 - (UInt32)getTRTCRoomId;
 

@@ -10,7 +10,7 @@ import TXAppBasic
 import UIKit
 
 class TUIRoomViewController: UIViewController {
-    // XMagic 美颜 【可选】
+    // XMagic License 【Optional】
     var xMagicLicenseURL: String = ""
     var xMagicLicenseKey: String = ""
     

@@ -58,7 +58,6 @@ class TUIRoomSetShareScreenVC: UIViewController {
 
     @objc func startBtnClick() {
         if #available(iOS 12.0, *) {
-            // 屏幕分享
             let params = TRTCVideoEncParam()
             params.videoResolution = TRTCVideoResolution._1280_720
             params.resMode = TRTCVideoResolutionMode.portrait
@@ -72,7 +71,6 @@ class TUIRoomSetShareScreenVC: UIViewController {
         }
     }
 
-    // 有人分享
     @objc func otherShareScreen() {
         startBtn.isEnabled = false
     }

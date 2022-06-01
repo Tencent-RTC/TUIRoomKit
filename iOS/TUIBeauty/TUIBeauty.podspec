@@ -3,11 +3,7 @@ Pod::Spec.new do |spec|
   spec.version      = '1.0.0'
   spec.platform     = :ios
   spec.ios.deployment_target = '9.0'
-  spec.license      = { :type => 'Proprietary',
-      :text => <<-LICENSE
-        copyright 2017 tencent Ltd. All rights reserved.
-        LICENSE
-       }
+  spec.license      = { :type => 'MIT', :file => 'LICENSE' }
   spec.homepage     = 'https://cloud.tencent.com/document/product/269/3794'
   spec.documentation_url = 'https://cloud.tencent.com/document/product/269/9147'
   spec.authors      = 'tencent video cloud'

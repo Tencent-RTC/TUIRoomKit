@@ -46,11 +46,6 @@
 	return self;
 }
 
-/**
- * 是否是房主
- *
- * @return yes/no
- */
 - (BOOL)isHomeowner {
 	NSString *currentUserId = [TUILogin getUserID];
 	if ((currentUserId.length > 0) && [currentUserId isEqualToString:self.ownerId?:@""]) {
@@ -59,11 +54,6 @@
 	return NO;
 }
 
-/**
- * 获取TUIRoomSpeechMode
- *
- * @return TUIRoomSpeechMode
- */
 - (TUIRoomSpeechMode)getSpeechModeType {
 	if ([self.speechMode isEqual:TUIROOM_DATA_FREE_SPEECH]) {
 		return TUIRoomFreeSpeech;
@@ -73,11 +63,6 @@
 	return TUIRoomUnknownSpeech;
 }
 
-/**
- * 获取群公告
- *
- * @return str
- */
 - (NSString *)getNotification {
 	NSMutableDictionary *msgDict = [[NSMutableDictionary alloc] initWithCapacity:3];
 	[msgDict setValue:self.speechMode
@@ -97,11 +82,6 @@
 	return [msgDict mj_JSONString];
 }
 
-/**
- * 更新群信息
- *
- * @param dict dict
- */
 - (void)updateNotification:(NSDictionary *)dict {
 	self.speechMode = [dict objectForKey:TUIROOM_SIGNALING_KEY_SPEECH_MODE]?:self.speechMode;
 	self.isChatRoomMuted = [[dict objectForKey:TUIROOM_SIGNALING_KEY_IS_CHAT_ROOM_MUTED]boolValue];
@@ -112,11 +92,6 @@
 	self.startTime = [[dict objectForKey:TUIROOM_SIGNALING_KEY_START_TIME]longLongValue];
 }
 
-/**
- * 获取TRTC房间号
- *
- * @return 房间号
- */
 - (UInt32)getTRTCRoomId {
 	return [self.roomId intValue];
 }

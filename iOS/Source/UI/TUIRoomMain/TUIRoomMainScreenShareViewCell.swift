@@ -23,7 +23,6 @@ class TUIRoomMainScreenShareViewCell: UICollectionViewCell {
     }
 
     func resetView() {
-        // 删掉所有subview，不然刷新的时候会有残留画面
         for view in subviews {
             view.removeFromSuperview()
         }

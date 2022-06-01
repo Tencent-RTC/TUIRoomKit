@@ -30,7 +30,7 @@ TUIBeauty
 3. [配置推拉流域名](https://console.cloud.tencent.com/live/domainmanage)
 
 ### 配置工程文件
-1. 使用终端，cd 到 TUIBeauty/Example 路径，使用命令 "sh init.sh" 下载 SDK 及 Pod 更新
+1. 使用终端，cd 到 TUIBeauty/Example 路径，使用命令 "pod install" 更新Pod。
 2. 使用 Xcode（11.0及以上的版本）打开源码工程`TUIBeautyApp.xcworkspace`。
 3. 找到并打开`TUIBeauty/Debug/GenerateTestUserSig.swift`文件。
 4. 设置`GenerateTestUserSig.swift`文件中的相关参数：
@@ -45,22 +45,26 @@ TUIBeauty
 用 Xcode 打开该项目，连上 iOS 设备，编译并运行。
 
 
-## 集成TUIBeauty
+## 快速集成TUIBeauty
 如果需要将 TUIBeauty 组件集成到自己的项目中，可按如下步骤接入
 
-### 工程配置
-1. 将 `TUIBeauty/Resources`、`TUIBeauty/Source`、`TUIBeauty/TUIBeauty.podspec` 模块导入到自己的工程中
-2. 在项目的 `Podfile` 文件中添加我们的 TUIBeauty 模块
+### 步骤一：导入 TUIBeauty 组件
 
+**通过 cocoapods 导入组件**，具体步骤如下：
+1. 在您的工程 `Podfile` 文件同一级目录下创建 `TUIBeauty` 文件夹。
+2. 单击进入 [**Github/XiaoZhiBo**](https://github.com/tencentyun/XiaoZhiBo) ，选择克隆/下载代码，然后将 [**iOS/TUIBeauty/**](https://github.com/tencentyun/XiaoZhiBo/tree/main/iOS/TUIBeauty) 目录下的 `Source`、`Resources` 文件夹 和 `TUIBeauty.podspec` 文件拷贝到您在 `第一步` 创建的 TUIBeauty 文件夹下。
+3. 在您的 Podfile 文件中添加以下依赖，之后执行 `pod install` 命令，完成导入。
 ```
-pod 'TUIBeauty', :path => "../"
+# :path => "指向TUIBeauty.podspec的相对路径"
+pod 'TUIBeauty', :path => "TUIBeauty/TUIBeauty.podspec"
 ```
-3. 进入`Podfile`文件所在目录，执行`pod install` 
 
-### 功能使用
+>!  `Source`、`Resources` 文件夹 和`TUIBeauty.podspec`文件必需在同一目录下。
 
-1. [XMagic License 授权](https://cloud.tencent.com/document/product/616/65878)
 
+### 步骤二：创建并初始化组件
+
+1. XMagic License 授权，[点击获取XMagic License](https://cloud.tencent.com/document/product/616/65878)。
 ```
 [[TUIBeautyView getBeautyService] setLicenseUrl:@"" key:@"" completion:^(NSInteger authResult, NSString * _Nonnull errorMsg) {
     if (authResult == 0) {
@@ -71,23 +75,20 @@ pod 'TUIBeauty', :path => "../"
 }];
 ```
 2. 创建 `TUIBeautyView`
-
 ```
 TUIBeautyView *mBeautyView = [[TUIBeautyView alloc] initWithBeautyManager:beautyManager];
 
 ```
 
 3. 弹出美颜面板
-
 ```
 [mBeautyView show];
 ```
 
-#### 开启自定义美颜 - V2TXLivePusher
-我们在自己的[小直播](git地址)工程中也使用了该TUIBeauty组件，可以参考。
+### 步骤三: 开启自定义美颜 
 
+#### 如果您使用 V2TXLivePusher， 可参考以下设置：
 1. 开启自定义美颜
-
 ```
 V2TXLivePusher *pusher = [[V2TXLivePusher alloc] init];
 [pusher enableCustomVideoProcess:YES pixelFormat:V2TXLivePixelFormatTexture2D bufferType:V2TXLiveBufferTypeTexture];
@@ -95,23 +96,20 @@ V2TXLivePusher *pusher = [[V2TXLivePusher alloc] init];
 ```
 
 2. 实现自定义美颜回调
-
 ```
  - (void)onProcessVideoFrame:(V2TXLiveVideoFrame *)srcFrame dstFrame:(V2TXLiveVideoFrame *)dstFrame {
     dstFrame.textureId = [[TUIBeautyView getBeautyService] processVideoFrameWithTextureId:srcFrame.textureId textureWidth:srcFrame.width textureHeight:srcFrame.height];
 }
 ```
 
-####  开启自定义美颜 - TRTCCloud
+####  如果您使用 TRTCCloud， 可参考以下设置：
 
 1. 开启自定义美颜
-
 ```
 [[TRTCCloud sharedInstance] setLocalVideoProcessDelegete:self pixelFormat:TRTCVideoPixelFormat_Texture_2D bufferType:TRTCVideoBufferType_Texture];
 ```
 
 2. 实现自定义美颜回调
-
 ```
 - (uint32_t)onProcessVideoFrame:(TRTCVideoFrame *)srcFrame dstFrame:(TRTCVideoFrame *)dstFrame {
     dstFrame.textureId = [[TUIBeautyView getBeautyService] processVideoFrameWithTextureId:srcFrame.textureId textureWidth:srcFrame.width textureHeight:srcFrame.height];

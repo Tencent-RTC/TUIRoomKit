@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 
-// 定义获取高度协议
 public protocol TUIRoomPresentBottomVCProtocol {
     var controllerHeight: CGFloat { get }
 }

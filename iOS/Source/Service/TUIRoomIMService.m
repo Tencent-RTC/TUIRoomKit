@@ -19,11 +19,11 @@
 @interface TUIRoomIMService ()<V2TIMGroupListener,V2TIMSignalingListener,V2TIMSimpleMsgListener> {
     NSDictionary *_signalingMap;
 }
-/// 是否成功进房
+
 @property (nonatomic, assign) BOOL mIsEnterRoom;
-/// 房间ID
+
 @property (nonatomic, strong) NSString *mRoomId;
-/// 房间信息
+
 @property (nonatomic, strong) TUIRoomInfo *roomInfo;
 /// Invite Block Cache
 @property (nonatomic, strong) NSCache *inviteBlockCache;
@@ -35,7 +35,7 @@
 
 @implementation TUIRoomIMService
 
-#pragma mark 初始化
+#pragma mark - init
 - (instancetype)init {
 	self = [super init];
 	if (self) {
@@ -63,13 +63,6 @@
 
 #pragma mark public function
 
-/**
- * 设置用户信息
- *
- * @param userName userName
- * @param avatarURL avatarURL
- * @param callback 事件回调
- */
 - (void)setSelfProfile:(NSString *)userName
              avatarURL:(NSString *)avatarURL
               callback:(TUIRoomActionCallback)callback {
@@ -88,12 +81,6 @@
     }];
 }
 
-/**
- * 将群转交给其他用户
- *
- * @param userId 转交的用户id
- * @param callback 结果回调，成功时 code 为0.
- */
 - (void)transferRoomMaster:(NSString *)userId
                   callback:(TUIRoomActionCallback)callback {
     [V2TIMManager.sharedInstance transferGroupOwner:self.mRoomId member:userId succ:^{
@@ -108,12 +95,6 @@
     }];
 }
 
-/**
- * 创建房间
- *
- * @param roomInfo roomInfo
- * @param callback 事件回调
- */
 - (void)createRoom:(TUIRoomInfo *)roomInfo
           callback:(TUIRoomActionCallback)callback {
     if (self.isEnterRoom) {
@@ -136,7 +117,6 @@
     info.groupAddOpt = V2TIM_GROUP_ADD_ANY;
     [[V2TIMManager sharedInstance] createGroup:info memberList:nil succ:^(NSString *groupID) {
         __strong typeof(wealSelf) strongSelf = wealSelf;
-        // 房间创建成功
         if (callback) {
             strongSelf.roomInfo = roomInfo;
             strongSelf.mIsEnterRoom = YES;
@@ -147,7 +127,6 @@
         }
     } fail:^(int code, NSString *desc) {
         if (code == ERR_SVR_GROUP_GROUPID_IN_USED_FOR_SUPER) {
-            // 房间是自己创建的
             [[V2TIMManager sharedInstance] joinGroup:roomInfo.roomId msg:nil succ:^{
                 if (getGroupInfoBlock) {
                     getGroupInfoBlock();
@@ -171,12 +150,6 @@
     }];
 }
 
-/**
- * 获取群组信息
- *
- * @param roomInfo roomInfo
- * @param callback 事件回调
- */
 - (void)groupsInfo:(TUIRoomInfo *)roomInfo
           callback:(TUIRoomActionCallback)callback {
     __weak typeof(self) wealSelf = self;
@@ -217,12 +190,6 @@
     }];
 }
 
-/**
- * 进入房间
- *
- * @param roomId roomId
- * @param callback 事件回调
-*/
 - (void)enterRoom:(NSString *)roomId
          callback:(TUIRoomActionCallback)callback {
     __weak typeof(self) wealSelf = self;
@@ -281,11 +248,6 @@
     }];
 }
 
-/**
- * 退出房间
- *
- * @param callback 事件回调
- */
 - (void)leaveRoom:(TUIRoomActionCallback)callback {
     
     if (!self.isEnterRoom) {
@@ -315,11 +277,6 @@
     }];
 }
 
-/**
- * 销毁房间
- *
- * @param callback 事件回调
-*/
 - (void)destroyRoom:(TUIRoomActionCallback)callback {
     
     if (!self.isEnterRoom) {
@@ -336,34 +293,34 @@
         return;
     }
     
-    __weak typeof(self) wealSelf = self;
+    __weak typeof(self) weakSelf = self;
     [V2TIMManager.sharedInstance dismissGroup:self.mRoomId succ:^{
-        __strong typeof(wealSelf) strongSelf = wealSelf;
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        [strongSelf unInitIMListener];
         [strongSelf cleanRoomInfo];
         if (callback) {
             callback(TUIRoomSuccessCode, @"destroy room success.");
         }
     } fail:^(int code, NSString *desc) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        [strongSelf unInitIMListener];
+        [strongSelf cleanRoomInfo];
         if (callback) {
             callback(code, desc);
         }
     }];
 }
 
-/**
- * 获取成员列表
- *
- * @return memberList
- */
 - (NSArray<TUIRoomUserInfo *> *)getMemberList {
     return [TUIRoomUserManage userList];
 }
 
-/**
- * 获取房间信息
- *
- * @param callback 事件回调
-*/
 - (void)getRoomInfo:(TUIRoomRoomInfoCallback)callback {
     if (![self isEnterRoom] || !self.mRoomId) {
         if (callback) {
@@ -410,14 +367,6 @@
 }
 
 #pragma mark invite
-/**
- * 邀请群内的某些人
- *
- * @param roomId     发起邀请所在群组
- * @param inviteeList 被邀请人列表
- * @param param     信息
- * @param callback 事件回调
- */
 - (void)onInviteGroup:(NSString *)roomId
           inviteeList:(NSArray *)inviteeList
                 param:(NSDictionary<NSString *,id> *)param
@@ -425,15 +374,6 @@
     [self inviteGroup:roomId inviteeList:inviteeList param:param callback:callback];
 }
 
-/**
- * 主持人邀请成员发言
- *
- * 调用该接口，主持人邀请成员发言，成员端会收到onReceiveSpeechInvitation()回调通知
- *
- * @param userId   用户ID
- * @param param     数据
- * @param callback 结果回调，成功时 code 为0
- */
 - (void)sendSpeechInvitation:(NSString *)userId
                        param:(NSDictionary<NSString *,id> *)param
                     callback:(TUIRoomInviteeCallback)callback {
@@ -465,14 +405,6 @@
     }
 }
 
-/**
- * 主持人取消邀请成员发言
- *
- * 调用该接口，主持人取消邀请成员发言，成员端会收到onReceiveInvitationCancelled()回调通知
- *
- * @param userId   用户ID
- * @param callback 结果回调，成功时 code 为0
- */
 - (void)cancelSpeechInvitation:(NSString *)userId
                          param:(NSDictionary<NSString *,id> *)param
                       callback:(TUIRoomActionCallback)callback {
@@ -506,15 +438,6 @@
     }
 }
 
-/**
- * 成员申请发言
- *
- * 调用该接口，成员申请发言，主持人端会收到onReceiveSpeechApplication回调通知
- *
- * @param userId   用户ID
- * @param param     数据
- * @param callback 结果回调，成功时 code 为0
- */
 - (void)sendSpeechApplication:(NSString *)userId
                         param:(NSDictionary<NSString *,id> *)param
                      callback:(TUIRoomInviteeCallback)callback {
@@ -544,13 +467,6 @@
     self.speechInviteID = inviteID;
 }
 
-/**
- * 成员取消申请发言
- *
- * 调用该接口，成员取消申请发言，主持人端会收到onSpeechApplicationCancelled回调通知
- * @param param     数据
- * @param callback 结果回调，成功时 code 为0
- */
 - (void)cancelSpeechApplication:(NSDictionary<NSString *,id> *)param
                        callback:(TUIRoomActionCallback)callback {
     
@@ -581,25 +497,13 @@
         }
     }
 }
-/**
- * 邀请群内的某个人
- *
- * @param userId    邀请人ID
- * @param param     信息
- * @param callback 事件回调
- */
+
 - (void)onInviteUser:(NSString *)userId
                param:(NSDictionary<NSString *,id> *)param
             callback:(TUIRoomInviteeCallback)callback {
     [self inviteUser:userId param:param callback:callback];
 }
 
-/**
- * 在房间中广播文本消息，一般用于文本聊天
- *
- * @param message  文本消息
- * @param callback 发送结果回调
-*/
 - (void)sendChatMessage:(NSString *)message
                callback:(TUIRoomActionCallback)callback {
     
@@ -623,11 +527,6 @@
     }];
 }
 
-/**
- *  更新群公告
- * @param notification  群公告
- * @param callback 发送结果回调
- */
 - (void)updateGroupNotification:(NSString *)notification
                        callback:(TUIRoomActionCallback)callback {
     V2TIMGroupInfo *info = [[V2TIMGroupInfo alloc] init];
@@ -645,12 +544,6 @@
     }];
 }
 
-/**
- * 同意/拒绝邀请
- * @param isAgree  是否同意
- * @param inviteID  inviteID
- * @param callback 结果回调
- */
 - (void)acceptInvitation:(BOOL)isAgree
                 inviteID:(NSString *)inviteID
                 callback:(TUIRoomActionCallback)callback {
@@ -680,29 +573,14 @@
 }
 
 #pragma mark status
-/**
- * 是否进入房间
- *
- * @return yes/no
- */
 - (BOOL)isEnterRoom {
 	return self.mIsEnterRoom;
 }
 
-/**
- * 房间信息
- *
- * @return roomInfo
- */
 - (nullable TUIRoomInfo *)getRoomInfo {
     return self.roomInfo;
 }
 
-/**
- * 资源释放
- *
- * @note 持有此对象，在dealloc时候调用此方法
- */
 - (void)releaseResources {
 	[[V2TIMManager sharedInstance] removeSignalingListener:self];
 	[[V2TIMManager sharedInstance] removeGroupListener:self];
@@ -717,6 +595,12 @@
 	self.mIsEnterRoom = NO;
 	self.mRoomId = @"";
     self.roomInfo = nil;
+}
+
+- (void)unInitIMListener {
+    [[V2TIMManager sharedInstance] setGroupListener:nil];
+    [[V2TIMManager sharedInstance] removeSignalingListener:self];
+    [[V2TIMManager sharedInstance] removeSimpleMsgListener:self];
 }
 
 - (void)memberList:(NSInteger)nextSeq callback:(TUIRoomUserListCallback)callback {
@@ -832,8 +716,6 @@
 }
 
 #pragma mark - V2TIMGroupListener
-
-/// 有新成员加入群（该群所有的成员都能收到）
 - (void)onMemberEnter:(NSString *)groupID
            memberList:(NSArray<V2TIMGroupMemberInfo *>*)memberList {
     if (groupID && [self.mRoomId isEqualToString:groupID]) {
@@ -856,7 +738,6 @@
     
 }
 
-/// 有成员离开群（该群所有的成员都能收到）
 - (void)onMemberLeave:(NSString *)groupID
                member:(V2TIMGroupMemberInfo *)member {
     TUIRoomUserInfo *userInfo = [TUIRoomUserManage getUser:member.userID];
@@ -868,22 +749,17 @@
     }
 }
 
-/// 某个已加入的群被解散了（该群所有的成员都能收到）
 - (void)onGroupDismissed:(NSString *)groupID
                   opUser:(V2TIMGroupMemberInfo *)opUser {
     if (groupID && [self.mRoomId isEqualToString:groupID]) {
-        __weak typeof(self) wealSelf = self;
-        [self leaveRoom:^(NSInteger code, NSString *msg) {
-            __strong typeof(wealSelf) strongSelf = wealSelf;
-            [strongSelf cleanRoomInfo];
-            if ([strongSelf.delegate respondsToSelector:@selector(onRoomDestroy)]) {
-                [strongSelf.delegate onRoomDestroy];
-            }
-        }];
+        [self unInitIMListener];
+        [self cleanRoomInfo];
+        if ([self.delegate respondsToSelector:@selector(onRoomDestroy)]) {
+            [self.delegate onRoomDestroy];
+        }
     }
 }
 
-/// 某个已加入的群的信息被修改了（该群所有的成员都能收到）
 - (void)onGroupInfoChanged:(NSString *)groupID
             changeInfoList:(NSArray <V2TIMGroupChangeInfo *> *)changeInfoList {
     if (groupID && [self.mRoomId isEqualToString:groupID]) {
@@ -957,7 +833,6 @@
 }
 
 #pragma mark - V2TIMSignalingListener
-/// 收到邀请的回调
 - (void)onReceiveNewInvitation:(NSString *)inviteID
                       inviter:(NSString *)inviter
                       groupID:(NSString *)groupID
@@ -987,21 +862,18 @@
     }
 }
 
-/// 被邀请者接受邀请
 - (void)onInviteeAccepted:(NSString *)inviteID
                   invitee:(NSString *)invitee
                      data:(NSString * __nullable)data {
     [self invitationCallback:TUIRoomInviteeAccepted inviteID:inviteID];
 }
 
-/// 被邀请者拒绝邀请
 - (void)onInviteeRejected:(NSString *)inviteID
                   invitee:(NSString *)invitee
                      data:(NSString * __nullable)data {
     [self invitationCallback:TUIRoomInviteeRejected inviteID:inviteID];
 }
 
-/// 邀请被取消
 - (void)onInvitationCancelled:(NSString *)inviteID
                       inviter:(NSString *)inviter
                          data:(NSString * __nullable)data {
@@ -1027,15 +899,12 @@
     [self invitationCallback:TUIRoomInviteeCancelled inviteID:inviteID];
 }
 
-/// 邀请超时
 - (void)onInvitationTimeout:(NSString *)inviteID
                 inviteeList:(NSArray<NSString *> *)inviteeList {
     [self invitationCallback:TUIRoomInviteeTimeout inviteID:inviteID];
 }
 
 #pragma mark - V2TIMSimpleMsgListener
-
-/// 收到群文本消息
 - (void)onRecvGroupTextMessage:(NSString *)msgID
                        groupID:(NSString *)groupID
                         sender:(V2TIMGroupMemberInfo *)info

@@ -11,100 +11,100 @@
 
 NS_ASSUME_NONNULL_BEGIN
 /**
- IMP协议
+ IM protocol
  */
 @interface TUIRoomIMProtocol : NSObject
 
 /**
- * 获取信令数据
+ * Get the signaling data
  *
  */
 + (NSMutableDictionary *)getMsgDict;
 
 #pragma mark 1->1
 /**
- * 主持人邀请观众发言
+ * The host invites an audience member to speak
  *
- * @param roomId 房间id
- * @param receiverId 接收者用户id
- * @return 信令数据
+ * @param roomId Room ID
+ * @param receiverId Target user ID
+ * @return Signaling data
  */
 + (NSMutableDictionary *)inviteSpeaker:(NSString *)roomId
                             receiverId:(NSString *)receiverId;
 
 /**
- * 主持人邀请观众下台
+ * The host requests the audience member to mic off
  *
- * @param roomId 房间id
- * @param receiverId 接收者用户id
- * @return 信令数据
+ * @param roomId Room ID
+ * @param receiverId Target user ID
+ * @return Signaling data
  */
 + (NSMutableDictionary *)sendOffSpeaker:(NSString *)roomId
                              receiverId:(NSString *)receiverId;
 
 /**
- * 观众申请发言
+ * An audience member requests to speak
  *
- * @param roomId 房间id
- * @param receiverId 接收者用户id
- * @return 信令数据
+ * @param roomId Room ID
+ * @param receiverId Target user ID
+ * @return Signaling data
  */
 + (NSMutableDictionary *)applyForSpeech:(NSString *)roomId
                              receiverId:(NSString *)receiverId;
 
 /**
- * 主持人禁用观众麦克风
+ * The host disables the mic of an audience member
  *
- * @param roomId 房间id
- * @param receiverId 接收者用户id
+ * @param roomId Room ID
+ * @param receiverId Target user ID
  * @param mute true/false
- * @return 信令数据
- * @note 不可拒绝，只能接受
+ * @return Signaling data
+ * @note The request cannot be rejected
  */
 + (NSMutableDictionary *)muteMicrophone:(NSString *)roomId
                              receiverId:(NSString *)receiverId
                                    mute:(Boolean)mute;
 
 /**
- * 主持人禁用观众摄像头
+ * The host disables the camera of an audience member
  *
- * @param roomId 房间id
- * @param receiverId 接收者用户id
+ * @param roomId Room ID
+ * @param receiverId Target user ID
  * @param mute true/false
- * @return 信令数据
- * @note 不可拒绝，只能接受
+ * @return Signaling data
+ * @note The request cannot be rejected
  */
 + (NSMutableDictionary *)muteCamera:(NSString *)roomId
                          receiverId:(NSString *)receiverId
                                mute:(Boolean)mute;
 
 /**
- * 观众回复点名（签到）
+ * An audience member replies to roll call
  *
- * @param roomId 房间id
- * @param senderId 邀请者用户id
- * @return 信令数据
+ * @param roomId Room ID
+ * @param senderId Inviter's user ID
+ * @return Signaling data
  */
 + (NSMutableDictionary *)replyCallingRoll:(NSString *)roomId
                                  senderId:(NSString *)senderId;
 
 /**
- * 主持人踢人出房间，不可拒绝，只能接受
+ * The host removes a user from the room, which cannot be rejected
  *
- * @param roomId 房间id
- * @param receiverId 接收者用户id
- * @return 信令数据
+ * @param roomId Room ID
+ * @param receiverId Target user ID
+ * @return Signaling data
  */
 + (NSMutableDictionary *)kickOffUser:(NSString *)roomId
                           receiverId:(NSString *)receiverId;
 
 #pragma mark 1->n
 /**
- * 邀请全体麦上成员下麦
+ * Request all mic-on members to mic off
  *
- * @param roomId 房间id
- * @return 信令数据
- * @note 麦上所有成员下麦，不可拒绝，只能接受
+ * @param roomId Room ID
+ * @return Signaling data
+ * @note This API is used to request all mic-on members to mic off, which cannot be rejected
  */
 + (NSMutableDictionary *)sendOffAllSpeaker:(NSString *)roomId;
 

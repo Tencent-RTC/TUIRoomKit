@@ -13,19 +13,12 @@ import Toast_Swift
 import TXAppBasic
 import UIKit
 
-/**
- * 触发信号后操作
- *
- */
 func SignalExceptionHandler(signal: Int32) {
     TUIRoomEntranceViewController.tuiRoomExit()
 }
 
 extension TUIRoomEntranceViewController {
-    /**
-     * 注册信号
-     *
-     */
+
     func registerSignalHandler() {
         signal(SIGABRT, SignalExceptionHandler)
         signal(SIGSEGV, SignalExceptionHandler)
@@ -39,10 +32,6 @@ extension TUIRoomEntranceViewController {
         signal(SIGPIPE, SignalExceptionHandler)
     }
 
-    /**
-     * 清理信号
-     *
-     */
     func unregisterSignalHandler() {
         signal(SIGABRT, SIG_DFL)
         signal(SIGSEGV, SIG_DFL)
@@ -56,12 +45,7 @@ extension TUIRoomEntranceViewController {
         signal(SIGPIPE, SIG_DFL)
     }
 
-    /**
-     * 监听退出
-     *
-     */
     public static func tuiRoomExit() {
-        // 记录当前房间号与时间
         guard let roomInfo = TUIRoomCore.shareInstance().getRoomInfo() else {
             return
         }
@@ -72,10 +56,6 @@ extension TUIRoomEntranceViewController {
         }
     }
 
-    /**
-     * 恢复
-     *
-     */
     func tuiRestore() {
         guard let roomId = UserDefaults.standard.object(forKey: "TUIRoomLastRoomId") as? Int32 else {
             return
@@ -110,7 +90,7 @@ extension TUIRoomEntranceViewController {
 
     func enterMainViewController(_ roomId: Int32) {
         let vc = TUIRoomMainViewController(roomId: "\(roomId)", isVideoOn: true, isAudioOn: true)
-        // XMagic 美颜设置【可选】       
+        // XMagic License 【Optional】
         vc.xMagicLicenseURL = xMagicLicenseURL
         vc.xMagicLicenseKey = xMagicLicenseKey
         TUIRoomCore.shareInstance().setDelegate(vc)
