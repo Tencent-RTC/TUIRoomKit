@@ -27,6 +27,7 @@ void ChatMessageView::SendChatMessage(const QString& message, const QString& tim
 
 QSize ChatMessageView::GetFontSize(QString message) {
     // right计算自己聊天显示的位置，left计算别人聊天显示的位置
+    // right: Calculate the position of yourself during chat. left: Calculate the position of other users during chat
     message_ = message;
     int min_height = 50;
     int name_height = 20;
@@ -42,6 +43,7 @@ QSize ChatMessageView::GetFontSize(QString message) {
     space_width_ = this->width() - text_width_;
 
     // 用户名位置
+    // Username position
     QSize user_name_size = GetUserNameString(user_name_);
     user_name_left_rect_ = QRect(icon_space_width, text_space_height, user_name_size.width() + text_space_width, user_name_size.height());
     user_name_right_rect_ = QRect(this->width() - icon_space_width - user_name_size.width() - text_space_width, text_space_height, user_name_size.width() + text_space_width, user_name_size.height());
@@ -52,11 +54,13 @@ QSize ChatMessageView::GetFontSize(QString message) {
     name_height = line_height_;
 
     // 三角形
+    // Triangle
     triangle_left_rect_ = QRect(icon_width + icon_space_width + icon_rect_width, line_height_ / 4 + name_height, triangle_width, height - line_height_ / 2);
     triangle_right_rect_ = QRect(this->width() - icon_rect_width - icon_width - icon_space_width - triangle_width, line_height_ / 4 + name_height,
         triangle_width, height - line_height_ / 2);
 
     // 计算文字边框的位置
+    // Calculate the text frame position
     if (size.width() < (text_width_ + space_width_)) {
         frame_left_rect_.setRect(triangle_left_rect_.x() + triangle_left_rect_.width(), line_height_ / 2 + name_height,
             size.width() - space_width_ + 2 * text_space_width, height - line_height_ / 2);
@@ -70,6 +74,7 @@ QSize ChatMessageView::GetFontSize(QString message) {
     }
 
     // 计算文字显示的位置
+    // Calculate the text display position
     text_left_rect_.setRect(frame_left_rect_.x() + text_space_width, frame_left_rect_.y() + text_space_height,
         frame_left_rect_.width() - 2 * text_space_width, frame_left_rect_.height() - 2 * text_space_height);
     text_right_rect_.setRect(frame_right_rect_.x() + text_space_width, frame_right_rect_.y() + text_space_height,
@@ -133,20 +138,17 @@ void ChatMessageView::paintEvent(QPaintEvent* event)
     painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     painter.setPen(Qt::NoPen);
     painter.setBrush(QBrush(Qt::gray));
-    // 用户
+
     if (message_type_ == MessageContextType::kUserOther) {
-        // 框加边
         QColor col_KuangB(234, 234, 234);
         painter.setBrush(QBrush(col_KuangB));
         painter.drawRoundedRect(frame_left_rect_.x() - 1, frame_left_rect_.y() - 1,
             frame_left_rect_.width() + 2, frame_left_rect_.height() + 2, 4, 4);
 
-        // 框
         QColor color_frame(255, 255, 255);
         painter.setBrush(QBrush(color_frame));
         painter.drawRoundedRect(frame_left_rect_, 4, 4);
 
-        // 三角
         QPointF points[3] = { QPointF(triangle_left_rect_.x(), 25 + line_height_),
             QPointF(triangle_left_rect_.x() + triangle_left_rect_.width(), 20 + line_height_),
             QPointF(triangle_left_rect_.x() + triangle_left_rect_.width(), 30 + line_height_) };
@@ -155,7 +157,6 @@ void ChatMessageView::paintEvent(QPaintEvent* event)
         painter.setPen(pen);
         painter.drawPolygon(points, 3);
 
-        // 内容
         QPen pen_text;
         pen_text.setColor(QColor(51, 51, 51));
         painter.setPen(pen_text);
@@ -164,19 +165,16 @@ void ChatMessageView::paintEvent(QPaintEvent* event)
         painter.setFont(this->font());
         painter.drawText(text_left_rect_, message_, option);
 
-        // 用户名
         QPen pen_user_name;
         pen_user_name.setColor(Qt::white);
         painter.setPen(pen_user_name);
         painter.setFont(this->font());
         painter.drawText(user_name_left_rect_, user_name_, option);
     } else if (message_type_ == MessageContextType::kUserSelf) {
-        // 框
         QColor col_Kuang(75, 164, 242);
         painter.setBrush(QBrush(col_Kuang));
         painter.drawRoundedRect(frame_right_rect_, 4, 4);
 
-        // 三角
         QPointF points[3] = { QPointF(triangle_right_rect_.x() + triangle_right_rect_.width(), 25 + line_height_),
             QPointF(triangle_right_rect_.x(), 20 + line_height_),
             QPointF(triangle_right_rect_.x(), 30 + line_height_) };
@@ -185,7 +183,6 @@ void ChatMessageView::paintEvent(QPaintEvent* event)
         painter.setPen(pen);
         painter.drawPolygon(points, 3);
 
-        // 内容
         QPen pen_text;
         pen_text.setColor(Qt::white);
         painter.setPen(pen_text);
@@ -194,14 +191,12 @@ void ChatMessageView::paintEvent(QPaintEvent* event)
         painter.setFont(this->font());
         painter.drawText(text_right_rect_, message_, option);
 
-        // 用户名
         QPen pen_user_name;
         pen_user_name.setColor(Qt::white);
         painter.setPen(pen_user_name);
         painter.setFont(this->font());
         painter.drawText(user_name_right_rect_, user_name_, option);
     } else if (message_type_ == MessageContextType::kTime) {
-        // 时间
         QPen pen_text;
         pen_text.setColor(QColor(153, 153, 153));
         painter.setPen(pen_text);

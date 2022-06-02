@@ -30,6 +30,7 @@ int main(int argc, char* args[]) {
         crash_dump->Init(app_info,sdk_version.toStdString());
     }
     // 确定缩放比例，适应高dpi显示
+    // Determine the zooming ratio to adapt to high-DPI display
     HDC screen = GetDC(NULL);
     double dpi = GetDeviceCaps(screen, LOGPIXELSX);
     ReleaseDC(NULL, screen);

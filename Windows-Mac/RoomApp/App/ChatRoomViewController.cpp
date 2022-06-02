@@ -51,7 +51,6 @@ void ChatRoomViewController::InitConnect() {
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnChatRoomMuted, this, &ChatRoomViewController::SlotOnChatMute);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnEnterRoom, this, [=](int code, const QString& message) {
         TUIRoomInfo room_info = TUIRoomCore::GetInstance()->GetRoomInfo();
-        // 聊天室模式
         this->SlotOnChatMute(room_info.is_chat_room_muted);
     });
     connect(ui_->all_mute_box, &QCheckBox::clicked, this, [=](bool checked) {
@@ -91,7 +90,6 @@ void ChatRoomViewController::paintEvent(QPaintEvent* event) {
 
 bool ChatRoomViewController::eventFilter(QObject* watched, QEvent* event) {
     if (watched == ui_->message_edit) {
-        //先检测Ctrl键是否按下
         if (event->type() == QEvent::KeyPress) {
             QKeyEvent* key_event = static_cast<QKeyEvent*>(event);
             if (key_event->key() == Qt::Key_Enter || key_event->key() == Qt::Key_Return) {
@@ -181,7 +179,7 @@ void ChatRoomViewController::handleMessageTime(QString message_time) {
 
         int last_time = message_view->GetTimeInfo().toInt();
         int current_time = message_time.toInt();
-        is_show_time = ((current_time - last_time) > 60); // 两个消息相差一分钟
+        is_show_time = ((current_time - last_time) > 60);
     } else {
         is_show_time = true;
     }

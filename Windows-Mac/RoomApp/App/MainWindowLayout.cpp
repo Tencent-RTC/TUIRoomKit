@@ -58,7 +58,6 @@ VideoRenderView* MainWindowLayout::GetMainWidgetController() {
 void MainWindowLayout::InitLayout() {
     if (top_menu_bar_ != nullptr)
         top_menu_bar_->show();
-    // 根据房间类型生成不同的布局
     auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
     if (local_user == nullptr) {
         return;
@@ -67,10 +66,8 @@ void MainWindowLayout::InitLayout() {
     stage_list_view_control_ = new StageListController(main_window_ui_->content_widget);
     main_widget_control_ = new VideoRenderView(main_window_ui_->content_widget);
     main_widget_control_->InitMainVideo();
-    main_widget_control_->show();
     stage_list_view_control_->SetMainWindowView(main_widget_control_);
     chat_room_view_control_ = new ChatRoomViewController(*local_user, main_window_);
-    chat_room_view_control_->show();
     if (main_window_ui_->chat_widget->layout() != nullptr) {
         main_window_ui_->chat_widget->layout()->addWidget(chat_room_view_control_);
     }
@@ -188,7 +185,7 @@ void MainWindowLayout::ResizeMove(QMouseEvent* event) {
                 switch (resize_dir_) {
                 case LEFT:
                     if (right_bottom.x() - global_point.x() <= main_window_->minimumWidth()) {
-                        new_rect.setLeft(top_left.x());  //只改变左边界，小于界面的最小宽度时，设置为左上角横坐标为窗口x
+                        new_rect.setLeft(top_left.x());
                     } else {
                         new_rect.setLeft(global_point.x());
                     }
@@ -261,9 +258,10 @@ void MainWindowLayout::ResizeMove(QMouseEvent* event) {
 
 void MainWindowLayout::Region(const QPoint& current_global_point) {
     // 获取窗体在屏幕上的位置区域，topLeft为坐上角点，rightButton为右下角点
+    // Get the position area of the window on the screen. `topLeft` is the top-left corner, and `rightButton` is the button-right corner
     QRect rect = main_window_->rect();
 
-    QPoint top_left = main_window_->mapToGlobal(rect.topLeft()); //将左上角的(0,0)转化为全局坐标
+    QPoint top_left = main_window_->mapToGlobal(rect.topLeft());
     QPoint right_bottom = main_window_->mapToGlobal(rect.bottomRight());
 
     int x = current_global_point.x();
@@ -271,42 +269,33 @@ void MainWindowLayout::Region(const QPoint& current_global_point) {
 
     if (((top_left.x() + PADDING >= x) && (top_left.x() <= x))
         && ((top_left.y() + PADDING >= y) && (top_left.y() <= y))) {
-        // 左上角
         resize_dir_ = LEFTTOP;
         main_window_->setCursor(QCursor(Qt::SizeFDiagCursor));
     } else if (((x >= right_bottom.x() - PADDING) && (x <= right_bottom.x()))
         && ((y >= right_bottom.y() - PADDING) && (y <= right_bottom.y()))) {
-        // 右下角
         resize_dir_ = RIGHTBOTTOM;
         main_window_->setCursor(QCursor(Qt::SizeFDiagCursor));
     } else if (((x <= top_left.x() + PADDING) && (x >= top_left.x()))
         && ((y >= right_bottom.y() - PADDING) && (y <= right_bottom.y()))) {
-        //左下角
         resize_dir_ = LEFTBOTTOM;
         main_window_->setCursor(QCursor(Qt::SizeBDiagCursor));
     } else if (((x <= right_bottom.x()) && (x >= right_bottom.x() - PADDING))
         && ((y >= top_left.y()) && (y <= top_left.y() + PADDING))) {
-        // 右上角
         resize_dir_ = RIGHTTOP;
         main_window_->setCursor(QCursor(Qt::SizeBDiagCursor));
     } else if ((x <= top_left.x() + PADDING) && (x >= top_left.x())) {
-        // 左边
         resize_dir_ = LEFT;
         main_window_->setCursor(QCursor(Qt::SizeHorCursor));
     } else if ((x <= right_bottom.x()) && (x >= right_bottom.x() - PADDING)) {
-        // 右边
         resize_dir_ = RIGHT;
         main_window_->setCursor(QCursor(Qt::SizeHorCursor));
     } else if ((y >= top_left.y()) && (y <= top_left.y() + PADDING)) {
-        // 上边
         resize_dir_ = UP;
         main_window_->setCursor(QCursor(Qt::SizeVerCursor));
     } else if ((y <= right_bottom.y()) && (y >= right_bottom.y() - PADDING)) {
-        // 下边
         resize_dir_ = DOWN;
         main_window_->setCursor(QCursor(Qt::SizeVerCursor));
     } else {
-        // 默认
         resize_dir_ = NONE;
         main_window_->setCursor(QCursor(Qt::ArrowCursor));
     }
@@ -399,12 +388,6 @@ void MainWindowLayout::PopUpBottomBar(bool popups) {
             PopUpChatRoom(false);
         }
         DELETE_OBJECT(share_menu_bar_);
-
-        auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
-        if (local_user == nullptr) {
-            return;
-        }
-        emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*local_user);
         if (bottom_menu_bar_ != nullptr) {
             bottom_menu_bar_->SetShareScreenStyle(false);
         }
@@ -427,6 +410,7 @@ void MainWindowLayout::SlotShowChatRoom(bool show) {
     static bool need_resize = false;
     if (show) {
         // 当正在屏幕分享时，需要把聊天室弹出
+        // Pop up the chat room when a user is sharing the screen
         if (share_menu_bar_ != nullptr) {
             PopUpChatRoom(true);
             share_menu_bar_->SetChatRoomBtnStatus(show);
@@ -448,6 +432,7 @@ void MainWindowLayout::SlotShowChatRoom(bool show) {
         }
     } else {
         // 当正在屏幕分享时，需要把聊天室复原
+        // Restore the chat room when a user is sharing the screen
         if (share_menu_bar_ != nullptr) {
             PopUpChatRoom(false);
             share_menu_bar_->SetChatRoomBtnStatus(show);

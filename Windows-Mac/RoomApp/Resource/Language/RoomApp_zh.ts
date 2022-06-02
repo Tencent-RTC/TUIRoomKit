@@ -87,6 +87,22 @@
         <source>Screen Capture Stopped.</source>
         <translation>屏幕分享已停止。</translation>
     </message>
+    <message>
+        <source>Warning</source>
+        <translation>提示</translation>
+    </message>
+    <message>
+        <source>You need to enable the system screen recording permission to share the screen</source>
+        <translation>需要开启系统录屏权限，才能分享屏幕</translation>
+    </message>
+    <message>
+        <source>Go to system settings</source>
+        <translation>前往系统设置</translation>
+    </message>
+    <message>
+        <source>cancel</source>
+        <translation>取消</translation>
+    </message>
 </context>
 <context>
     <name>ChatRoomViewController</name>
@@ -399,6 +415,14 @@ CPU：%3%
     <message>
         <source>open all video</source>
         <translation>取消全员禁视频</translation>
+    </message>
+    <message>
+        <source>Members:</source>
+        <translation>成员数量:</translation>
+    </message>
+    <message>
+        <source>%1</source>
+        <translation>%1 位</translation>
     </message>
 </context>
 <context>

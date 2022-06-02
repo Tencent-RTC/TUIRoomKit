@@ -54,7 +54,7 @@ private:
     void TransferRoomMaster(std::string user_id);
     bool IsUserInRoom(const std::string& user_id);
 
-    std::string new_master_id_; // 新的主持人的用户id
+    std::string new_master_id_;
     Ui::TransferRoomController ui_;
     ViewDragger view_dragger_;
 };

@@ -2,13 +2,8 @@
 #include <QFile>
 
 enum class Language {
-    kChinese = 0,  // 中文
-    kEnglish = 1   // 英文
-};
-
-enum class LoginMode {
-    kPhone = 0,    // 手机登录
-    kEmail = 1     // 邮箱登录
+    kChinese = 0,
+    kEnglish = 1
 };
 
 enum TXMessageType {

@@ -7,7 +7,9 @@
 #include "CommonDef.h"
 
 // 该类用户保存界面相关持久化数据（生命周期随应用程序）
+// This class is used to store persistent data of UI (the lifecycle follows the application)
 // 如需本地持久化，可在该类中进行本地文件写入
+// To persistently store the local data, you can write to local files in this class
 class DataStore final
 {
 public:
@@ -73,12 +75,12 @@ private:
     bool            is_mirror_ = false;
     bool            is_default_close_mic_ = false;
     bool            is_default_close_camera_ = false;
-    bool            share_pc_voice_ = false;    //  屏幕共享时分享PC系统声音
-    bool            is_app_launch_ = false;     //  TRTCApp启动
-    bool            ai_noise_reduction_opened_ = true; // 是否开启AI降噪
+    bool            share_pc_voice_ = false;
+    bool            is_app_launch_ = false;
+    bool            ai_noise_reduction_opened_ = true;
     bool            is_online_ = false;
     Language        current_language_ = Language::kChinese;
-    liteav::TRTCAudioQuality audio_quality_ = liteav::TRTCAudioQualitySpeech;
+    liteav::TRTCAudioQuality audio_quality_ = liteav::TRTCAudioQualityMusic;
 };
 
 #endif  //  !__DATA_CENTER_H__

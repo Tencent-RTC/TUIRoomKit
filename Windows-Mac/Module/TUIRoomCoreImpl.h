@@ -20,12 +20,12 @@ class TUIRoomCoreImpl : public TUIRoomCore
     ~TUIRoomCoreImpl() override;
 
     /*************************
-    * 回调事件接口。
+    * 回调事件接口。(Callback event APIs)
     *************************/
     void SetCallback(TUIRoomCoreCallback* callback) override;
 
     /*************************
-    * 基础接口。
+    * 基础接口。(Basic APIs)
     *************************/
     int Login(int sdk_appid, const std::string& user_id, const std::string& user_sig) override;
     int Logout() override;
@@ -39,14 +39,14 @@ class TUIRoomCoreImpl : public TUIRoomCore
     int SetSelfProfile(const std::string& user_name, const std::string& avatar_url) override;
     int TransferRoomMaster(const std::string& user_id) override;
 
-    /*************************
-    * 获取SDK版本。
-    *************************/
+    /***************************************
+    * 获取SDK版本。(Get the SDK version)
+    ***************************************/
     const char* GetSDKVersion() override;
 
-    /*************************
-    * 本地推流接口。
-    *************************/
+    /**************************************
+    * 本地用户接口。(Local user APIs)
+    **************************************/
     int StartCameraPreview(const liteav::TXView& view) override;
     int StopCameraPreview() override;
     int UpdateCameraPreview(const liteav::TXView& view) override;
@@ -58,95 +58,113 @@ class TUIRoomCoreImpl : public TUIRoomCore
     int OpenAINoiseReduction() override;
     int CloseAINoiseReduction() override;
 
-    /*************************
-    * 远端用户接口。
-    *************************/
+    /************************************
+    * 远端用户接口。(Remote user APIs)
+    ************************************/
     int StartRemoteView(const std::string& user_id, const liteav::TXView& view, TUIStreamType type = TUIStreamType::kStreamTypeCamera) override;
     int StopRemoteView(const std::string& user_id, TUIStreamType type = TUIStreamType::kStreamTypeCamera) override;
     int UpdateRemoteView(const std::string& user_id, TUIStreamType type, const liteav::TXView& view) override;
-    /*************************
-    * 发送消息。
-    *************************/
+    /***********************************
+    * 发送消息。(Message sending APIs)
+    ***********************************/
     int SendChatMessage(const std::string& message) override;
     int SendCustomMessage(const std::string& message) override;
 
-    /*************************
-    * 场控相关。
-    *************************/
+    /*************************************
+    * 场控相关。(Room control APIs)
+    *************************************/
     // 主持人禁成员麦克风，成员端回收到OnMuteMic回调。
+    // When the host calls this API to disable the mic of a member, the member will receive the `OnMuteMic` callback.
     int MuteUserMicrophone(const std::string& user_id, bool mute, Callback callback) override;
     int MuteAllUsersMicrophone(bool mute) override;
 
     // 禁用禁成员摄像头，成员端回收到OnMuteCamera回调。
+    // When the host calls this API to disable the camera of a member, the member will receive the `OnMuteCamera` callback.
     int MuteUserCamera(const std::string& user_id, bool mute, Callback callback) override;
     int MuteAllUsersCamera(bool mute) override;
 
     // 主持人禁止房间内IM聊天，成员端会收到OnMuteChatMessage回调。
+    // When the host calls this API to disable IM chat in the room, the members will receive the `OnMuteChatMessage` callback.
     int MuteChatRoom(bool mute) override;
 
     // 主持人踢人，成员端会收到OnExitRoom(1, "")回调。
+    // When the host calls this API to remove a member, the member will receive the `OnExitRoom(1, "")` callback.
     int KickOffUser(const std::string& user_id, Callback callback) override;
 
     // 主持人点名
+    // This API is used by the host to start a roll call.
     int StartCallingRoll() override;
     int StopCallingRoll() override;
 
     // 成员回复主持人点名
+    // This API is used by a member to reply to roll call.
     int ReplyCallingRoll(Callback callback) override;
 
     // 主持人邀请成员发言。
+    // This API is used by the host to invite a member to speak.
     int SendSpeechInvitation(const std::string& user_id, Callback callback) override;
     // 主持人取消邀请成员发言。
+    // This API is used by the anchor to cancel the mic-on invitation sent to a member.
     int CancelSpeechInvitation(const std::string& user_id, Callback callback) override;
     // 成员同意/拒绝主持人的发言邀请
+    // This API is used by a member to accept/reject the invitation to speak from the host.
     int ReplySpeechInvitation(bool agree, Callback callback) override;
 
     // 成员申请发言
+    // This API is used by a member to request to speak.
     int SendSpeechApplication(Callback callback) override;
     // 成员取消申请发言
+    // This API is used by a member to cancel their request to speak.
     int CancelSpeechApplication(Callback callback) override;
     // 主持人回复成员的发言申请
+    // This API is used by the host to reply to a member's request to speak.
     int ReplySpeechApplication(const std::string& user_id, bool agree, Callback callback) override;
     // 主持人禁止申请发言
+    // This API is used by the host to disable requests to speak.
     int ForbidSpeechApplication(bool forbid) override;
 
     // 主持人令成员停止发言
+    // This API is used by the host to exit speech state of the specified member.
     int SendOffSpeaker(const std::string& user_id, Callback callback) override;
     // 主持人令所有成员停止发言
+    // This API is used by the host to exit speech state of all members.
     int SendOffAllSpeakers(Callback callback) override;
 
     // 成员直接停止发言，如果成员在台上，则直接停止发言。
+    // This API is used by a member to exit speech state.
     int ExitSpeechState() override;
 
-    /*************************
-    * 基础组件接口。
-    *************************/
+    /******************************************
+    * 基础组件接口。(Basic component APIs)
+    *******************************************/
     liteav::ITXDeviceManager* GetDeviceManager() override;
     IScreenShareManager* GetScreenShareManager() override;
 
-    /*************************
-    * 云录制接口。
-    *************************/
+    /*****************************************
+    * 云录制接口。(On-cloud recording APIs)
+    *****************************************/
     int StartCloudRecord() override;
     int StopCloudRecord() override;
 
-    /*************************
-    * 美颜功能接口。
-    *************************/
+    /***************************************
+    * 美颜功能接口。(Beauty filter APIs)
+    ***************************************/
     int SetBeautyStyle(liteav::TRTCBeautyStyle style, uint32_t beauty_level,
         uint32_t whiteness_level, uint32_t ruddiness_level) override;
 
     /*************************
     * 设置网络流控相关参数（例如弱网下是“保清晰”还是“保流畅”）。
+    * Set QoS parameters (for example, whether to prioritize clarity or smoothness under poor network conditions)
     *************************/
     int SetVideoQosPreference(TUIVideoQosPreference preference) override;
 
     /*************************
     * 设置显示仪表盘。
+    * Set whether to display the dashboard
     *************************/
-    int ShowDebugView(int showType) override;
+    int ShowDebugView(int show_type) override;
  public:
-    // TRTC回调函数
+    // TRTC callback functions
     void onEnterRoom(int result) override;
     void onExitRoom(int reason) override;
 
@@ -173,7 +191,7 @@ class TUIRoomCoreImpl : public TUIRoomCore
         uint32_t remote_quality_count) override;
     void onStatistics(const liteav::TRTCStatistics& statistics) override;
 
-    // IM回调函数
+    // IM callback functions
     void OnIMError(int code, const std::string& message) override;
     void OnIMLogin(int code, const std::string& message) override;
     void OnIMLogout(int code, const std::string& message) override;
@@ -191,19 +209,19 @@ class TUIRoomCoreImpl : public TUIRoomCore
     void OnIMReceiveCustomMessage(const std::string& user_id, const std::string& message) override;
     void OnIMChatRoomMuted(bool muted) override;
 
-    // 邀请相关
+    // Invitation
     void OnIMReceiveSpeechInvitation() override;
     void OnIMReceiveInvitationCancelled() override;
     void OnIMReceiveReplyToSpeechInvitation(const std::string& user_id, bool agree) override;
 
-    // 申请相关
+    // Application
     void OnIMReceiveSpeechApplication(const std::string& user_id) override;
     void OnIMSpeechApplicationCancelled(const std::string& user_id) override;
     void OnIMReceiveReplyToSpeechApplication(bool agree) override;
     void OnIMSpeechApplicationForbidden(bool forbidden) override;
 
     void OnIMOrderedToExitSpeechkState() override;
-    // 点名相关
+    // Roll call
     void OnIMCallingRollStarted() override;
     void OnIMCallingRollStopped() override;
     void OnIMMemberReplyCallingRoll(const std::string& user_id) override;

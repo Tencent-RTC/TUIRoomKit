@@ -100,6 +100,20 @@ QLabel#master_name_label {
 	background: #262C3E;
 }
 
+QLabel#count_label {
+	color: #FFFFFF;
+	font-family: "Microsoft YaHei";
+	font-size: 12px;
+	background: #262C3E;
+}
+
+QLabel#member_count_label {
+	color: #FFFFFF;
+	font-family: "Microsoft YaHei";
+	font-size: 12px;
+	background: #262C3E;
+}
+
 QLabel#speech_mode_label {
 	color: #FFFFFF;
 	font-family: "Microsoft YaHei";

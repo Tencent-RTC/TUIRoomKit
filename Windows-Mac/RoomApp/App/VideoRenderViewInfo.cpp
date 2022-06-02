@@ -96,31 +96,31 @@ void VideoRenderViewInfo::OnNetQuality(UserNetQualityInfo local_user_quality, \
         }
     }
     switch (quality) {
-    case liteav::TRTCQuality_Unknown:///未定义
+    case liteav::TRTCQuality_Unknown:
         net_quality_ = tr("Unknow");
         ui_->net_btn->setStyleSheet("QPushButton{border-image: url(:/MainWindow/MainWindow/network.png);}");
         break;
-    case liteav::TRTCQuality_Excellent:///当前网络非常好
+    case liteav::TRTCQuality_Excellent:
         net_quality_ = tr("Excellent");
         ui_->net_btn->setStyleSheet("QPushButton{border-image: url(:/MainWindow/MainWindow/net_full.png);}");
         break;
-    case liteav::TRTCQuality_Good:///当前网络比较好
+    case liteav::TRTCQuality_Good:
         net_quality_ = tr("Good");
         ui_->net_btn->setStyleSheet("QPushButton{border-image: url(:/MainWindow/MainWindow/net_good.png);}");
         break;
-    case liteav::TRTCQuality_Poor:///当前网络一般
+    case liteav::TRTCQuality_Poor:
         net_quality_ = tr("Poor");
         ui_->net_btn->setStyleSheet("QPushButton{border-image: url(:/MainWindow/MainWindow/net_poor.png);}");
         break;
-    case liteav::TRTCQuality_Bad:///当前网络较差
+    case liteav::TRTCQuality_Bad:
         net_quality_ = tr("Bad");
         ui_->net_btn->setStyleSheet("QPushButton{border-image: url(:/MainWindow/MainWindow/net_normal.png);}");
         break;
-    case liteav::TRTCQuality_Vbad:///当前网络很差
+    case liteav::TRTCQuality_Vbad:
         net_quality_ = tr("Very bad");
         ui_->net_btn->setStyleSheet("QPushButton{border-image: url(:/MainWindow/MainWindow/net_normal.png);}");
         break;
-    case liteav::TRTCQuality_Down:///当前网络不满足 TRTC 的最低要求
+    case liteav::TRTCQuality_Down:
         net_quality_ = tr("Down");
         ui_->net_btn->setStyleSheet("QPushButton{border-image: url(:/MainWindow/MainWindow/net_bad.png);}");
         break;

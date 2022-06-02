@@ -95,7 +95,7 @@ int TUIRoomCoreImpl::Login(int sdk_appid, const std::string& user_id, const std:
             trtc_cloud_->enableAudioVolumeEvaluation(100);
             std::string json_api ="{\"api\": \"setFramework\", \"params\": {\"framework\": 1, \"component\": 5}}";
             trtc_cloud_->callExperimentalAPI(json_api.c_str());
-            // 登录IM
+            // IM Login
             if (im_core_ != nullptr) {
                 im_core_->Login(sdk_appid, user_id, user_sig);
                 return 0;
@@ -110,13 +110,13 @@ int TUIRoomCoreImpl::Login(int sdk_appid, const std::string& user_id, const std:
 
 int TUIRoomCoreImpl::Logout() {
     LINFO("User Logout, user_id : %s", local_user_info_.user_id.c_str());
-    local_user_info_.user_id = "";                    // 用户ID
-    local_user_info_.role = TUIRole::kMaster;         // 用户角色
-    local_user_info_.user_name = "";                  // 用户名
-    local_user_info_.has_audio_stream = false;        // 是否有音频流
-    local_user_info_.has_video_stream = false;        // 是否有视频主流
-    local_user_info_.has_screen_stream = false;       // 是否有屏幕分享流
-    // 登出IM
+    local_user_info_.user_id = "";
+    local_user_info_.role = TUIRole::kMaster;
+    local_user_info_.user_name = "";
+    local_user_info_.has_audio_stream = false;
+    local_user_info_.has_video_stream = false;
+    local_user_info_.has_screen_stream = false;
+    // IM Logout
     if (im_core_ != nullptr) {
         im_core_->Logout();
     }
@@ -128,6 +128,7 @@ const char* TUIRoomCoreImpl::GetSDKVersion() {
 }
 int TUIRoomCoreImpl::CreateRoom(const std::string& room_id, TUISpeechMode speech_mode) {
     // 创建房间者为房主角色
+    // The room creator is the room owner
     local_user_info_.role = TUIRole::kMaster;
     room_info_.room_id = room_id;
     room_info_.room_name = room_id;
@@ -136,13 +137,13 @@ int TUIRoomCoreImpl::CreateRoom(const std::string& room_id, TUISpeechMode speech
     LINFO("User CreateRoom, user_id : %s,room_id :%s,speech_mode : %d",
         local_user_info_.user_id.c_str(), room_id.c_str(), speech_mode);
     // 调用【IM创建群】信令，成功后进入TRTC房间
+    // Call the **IM CreateRoomn** API and enter the TRTC room after the successful creation
     if (im_core_ != nullptr) {
         im_core_->CreateRoom(room_id, speech_mode);
     }
     return 0;
 }
 int TUIRoomCoreImpl::DestroyRoom() {
-    // IM信令销毁房间
     LINFO("User DestroyRoom, user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_info_.room_id.c_str());
     if (im_core_ != nullptr) {
         im_core_->DestroyRoom(room_info_.room_id);
@@ -152,7 +153,6 @@ int TUIRoomCoreImpl::DestroyRoom() {
 }
 
 int TUIRoomCoreImpl::EnterRoom(const std::string& room_id) {
-    // 进入房间者为成员角色
     if (local_user_info_.role == TUIRole::kMaster) {
         LINFO("User EnterRoom(Master), user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_id.c_str());
         EnterTRTCRoom();
@@ -166,6 +166,7 @@ int TUIRoomCoreImpl::EnterRoom(const std::string& room_id) {
             local_user_info_.role = TUIRole::kAnchor;
         room_user_map_[local_user_info_.user_id] = local_user_info_;
         // 调用【IM入群】信令，成功后进入TRTC房间
+        // Call the **IM EnterRoom** API and enter the TRTC room after enter room successfully
         if (im_core_ != nullptr) {
             LINFO("User EnterRoom(kAudience), user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_id.c_str());
             im_core_->EnterRoom(room_id, local_user_info_.user_id);
@@ -174,7 +175,6 @@ int TUIRoomCoreImpl::EnterRoom(const std::string& room_id) {
     return 0;
 }
 int TUIRoomCoreImpl::LeaveRoom() {
-    // 调用IM退群
     LINFO("User LeaveRoom, user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_info_.room_id.c_str());
     if (im_core_ != nullptr) {
         im_core_->LeaveRoom(room_info_.room_id);
@@ -373,6 +373,7 @@ int TUIRoomCoreImpl::UpdateRemoteView(const std::string& user_id, TUIStreamType 
 
 int TUIRoomCoreImpl::SendChatMessage(const std::string& message) {
     // 调用【IM发送消息】
+    // Call the **IM SendChatMessage** API
     if (im_core_ != nullptr) {
         LINFO("SendChatMessage , message : %s", message.c_str());
         im_core_->SendChatMessage(room_info_.room_id, local_user_info_.user_id, message);
@@ -381,7 +382,6 @@ int TUIRoomCoreImpl::SendChatMessage(const std::string& message) {
 }
 
 int TUIRoomCoreImpl::SendCustomMessage(const std::string& message) {
-    // 调用【IM发送消息】
     if (im_core_ != nullptr) {
         LINFO("SendChatMessage , message : %s", message.c_str());
         im_core_->SendChatMessage(room_info_.room_id, local_user_info_.user_id, message);
@@ -395,7 +395,6 @@ int TUIRoomCoreImpl::MuteUserMicrophone(const std::string& user_id, bool mute, C
     }
     LINFO("MuteUserMicrophone , user_id : %s, mute : %d", user_id.c_str(), mute);
     if (im_core_ != nullptr) {
-        // 调用【IM的禁止/启用某人麦克风】信令给user_id用户，使其关闭上行自己的音频
         im_core_->MuteUserMicrophone(room_info_.room_id, local_user_info_.user_id, user_id, mute, callback);
     }
     return 0;
@@ -417,7 +416,6 @@ int TUIRoomCoreImpl::MuteUserCamera(const std::string& user_id, bool mute, Callb
     }
     LINFO("MuteUserCamera , user_id : %s, mute : %d", user_id.c_str(), mute);
     if (im_core_ != nullptr) {
-        // 调用【IM的禁止/启用某人摄像头】信令给user_id用户，使其关闭上行自己的视频
         im_core_->MuteUserCamera(room_info_.room_id, local_user_info_.user_id, user_id, mute, callback);
     }
     return 0;
@@ -437,14 +435,12 @@ int TUIRoomCoreImpl::MuteChatRoom(bool mute) {
     room_info_.is_chat_room_muted = mute;
     LINFO("MuteChatRoom, mute : %d", mute);
     if (local_user_info_.role == TUIRole::kMaster && im_core_ != nullptr) {
-        // 调用【IM禁言】信令
         im_core_->MuteRoomChat(room_info_.room_id, mute);
     }
     return 0;
 }
 
 int TUIRoomCoreImpl::KickOffUser(const std::string& user_id, Callback callback) {
-    // 发送【IM踢人】群信令
     if (im_core_ != nullptr) {
         LINFO("KickOffUser user_id : %s", user_id.c_str());
         im_core_->KickOffUser(room_info_.room_id, user_id, callback);
@@ -452,7 +448,6 @@ int TUIRoomCoreImpl::KickOffUser(const std::string& user_id, Callback callback) 
     return 0;
 }
 
-// 主持人点名相关
 int TUIRoomCoreImpl::StartCallingRoll() {
     LINFO("StartCallingRoll");
     if (im_core_ != nullptr) {
@@ -482,10 +477,8 @@ int TUIRoomCoreImpl::ReplyCallingRoll(Callback callback) {
     return 0;
 }
 
-// 邀请发言相关
 int TUIRoomCoreImpl::SendSpeechInvitation(const std::string& user_id, Callback callback) {
     LINFO("SendSpeechInvitation user_id : %s", user_id.c_str());
-    // 发送【IM邀请发言】信令给user_id用户，使其上行自己的音视频。
     if (im_core_ != nullptr) {
         im_core_->SendSpeechInvitation(room_info_.room_id, local_user_info_.user_id, user_id, callback);
     }
@@ -500,7 +493,6 @@ int TUIRoomCoreImpl::CancelSpeechInvitation(const std::string& user_id, Callback
     return 0;
 }
 
-// 成员同意/拒绝房主的发言邀请
 int TUIRoomCoreImpl::ReplySpeechInvitation(bool agree, Callback callback) {
     LINFO("User ReplySpeechInvitation agree : %d", agree);
     if (im_core_ != nullptr) {
@@ -519,9 +511,7 @@ int TUIRoomCoreImpl::ReplySpeechInvitation(bool agree, Callback callback) {
     return 0;
 }
 
-// 申请发言相关
 int TUIRoomCoreImpl::SendSpeechApplication(Callback callback) {
-    // 发送【IM申请发言】信令给房主
     LINFO("User SendSpeechApplication");
     if (im_core_ != nullptr) {
         auto iter = find_if(room_user_map_.begin(), room_user_map_.end(), [](std::unordered_map<std::string, TUIUserInfo>::value_type info) {
@@ -548,9 +538,7 @@ int TUIRoomCoreImpl::CancelSpeechApplication(Callback callback) {
 }
 
 int TUIRoomCoreImpl::ReplySpeechApplication(const std::string& user_id, bool agree, Callback callback) {
-    // 房主同意/拒绝成员发言，拉取/停止该成员的音视频流
     LINFO("Master ReplySpeechApplication user_id :%s,agree : %d", user_id.c_str(), agree);
-    // 房主同意或拒绝发言，发送【IM同意/拒绝发言】信令user_id成员使其发言
     if (im_core_ != nullptr) {
         im_core_->ReplySpeechApplication(room_info_.room_id, local_user_info_.user_id, user_id, agree, callback);
     }
@@ -567,7 +555,6 @@ int TUIRoomCoreImpl::ForbidSpeechApplication(bool forbid) {
 
 int TUIRoomCoreImpl::SendOffSpeaker(const std::string& user_id, Callback callback) {
     LINFO("SendOffSpeaker user_id : %s", user_id.c_str());
-    // 发送【IM邀请停止发言】信令给user_id用户，使其关闭上行自己的音视频。
     if (im_core_ != nullptr) {
         im_core_->SendOffSpeaker(room_info_.room_id, local_user_info_.user_id, user_id, callback);
     }
@@ -593,7 +580,6 @@ int TUIRoomCoreImpl::ExitSpeechState() {
         return -1;
     }
     LINFO("User StopSpeaking");
-    // 成员停止发言，关闭本地视音频，其他成员收到trtc的onUserVideoAvailable()回调后做关闭处理
     trtc_cloud_->stopLocalPreview();
     trtc_cloud_->stopLocalAudio();
 
@@ -698,17 +684,17 @@ int TUIRoomCoreImpl::CloseAINoiseReduction() {
     return 0;
 }
 
-int TUIRoomCoreImpl::ShowDebugView(int showType) {
+int TUIRoomCoreImpl::ShowDebugView(int show_type) {
     if (trtc_cloud_ == nullptr) {
         return -1;
     }
 
-    trtc_cloud_->showDebugView(showType);
+    trtc_cloud_->showDebugView(show_type);
     return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
-//                        TRTC回调函数
+//                        TRTC callback functions
 //////////////////////////////////////////////////////////////////////////
 void TUIRoomCoreImpl::onEnterRoom(int result) {
     if (result > 0) {
@@ -739,7 +725,6 @@ void TUIRoomCoreImpl::onUserVideoAvailable(const char* user_id, bool available) 
 
     std::string remote_user_id = user_id;
     if (room_core_callback_ != nullptr) {
-        // 通知上层，让上层拉取user_id用户的视频流并显示
         room_core_callback_->OnRemoteUserCameraAvailable(remote_user_id, available);
     }
 }
@@ -758,13 +743,11 @@ void TUIRoomCoreImpl::onUserSubStreamAvailable(const char* user_id, bool availab
 
     std::string remote_user_id = user_id;
     if (room_core_callback_ != nullptr) {
-        // 通知上层，让上层拉取user_id用户的音视频流并显示
         room_core_callback_->OnRemoteUserScreenAvailable(remote_user_id, available);
     }
 }
 void TUIRoomCoreImpl::onScreenCaptureStoped(int reason) {
     if (room_core_callback_ != nullptr) {
-		// 屏幕分享意外终止，通知上层停止屏幕分享
         room_core_callback_->OnScreenCaptureStopped(reason);
 	}
     local_user_info_.has_screen_stream = false;
@@ -785,7 +768,6 @@ void TUIRoomCoreImpl::onUserAudioAvailable(const char* user_id, bool available) 
     LINFO("onUserAudioAvailable,user_id :%s, user_name:%s, available :%d", user_id, iter->second.user_name.c_str(), available);
     std::string remote_user_id = user_id;
     if (room_core_callback_ != nullptr) {
-        // 通知上层，让上层拉取user_id用户的音频流并播放
         room_core_callback_->OnRemoteUserAudioAvailable(remote_user_id, available);
     }
 }
@@ -803,7 +785,7 @@ void TUIRoomCoreImpl::onFirstVideoFrame(const char* user_id, const liteav::TRTCV
     LINFO("onFirstVideoFrame,user_id :%s,stream_type :%d, width:%d, height:%d", user_id, stream_type, width, height);
 
     std::string str_user_id(user_id);
-    if (str_user_id.empty()) {
+    if (str_user_id.empty() && enter_room_success_) {
         if (stream_type == TRTCVideoStreamTypeBig) {
             local_user_info_.has_video_stream = true;
             local_user_info_.has_subscribed_video_stream = true;
@@ -833,6 +815,7 @@ void TUIRoomCoreImpl::onRemoteUserEnterRoom(const char* user_id) {
     auto iter = room_user_map_.find(user_id);
     LINFO("onRemoteUserEnterRoom,user_id :%s", user_id);
     // 已经进入im房间的成员转换为kAnchor角色
+    // Members already in the IM room will be converted to the `kAnchor` role
     if (iter != room_user_map_.end()) {
         LINFO("User Enter IM before TRTC,user_id :%s user_name:%s ,role: %d", user_id, iter->second.user_name.c_str(), iter->second.role);
         if (iter->second.role == TUIRole::kAudience) {
@@ -846,10 +829,11 @@ void TUIRoomCoreImpl::onRemoteUserEnterRoom(const char* user_id) {
     }
 
     // TRTC用户 或 成员先进入了TRTC房间，才进入IM群聊，先认为是其他用户
+    // A TRTC user or member enters the TRTC room first and then the IM group chat as a `Other` user by default
     LINFO("User Enter TRTC before IM or Other Member,user_id :%s", user_id);
     TUIUserInfo user;
     user.user_id = remote_user_id;
-    user.role = TUIRole::kOther;    // 其他用户
+    user.role = TUIRole::kOther;
     room_user_map_[remote_user_id] = user;
     if (room_core_callback_ != nullptr) {
         room_core_callback_->OnRemoteUserEnter(remote_user_id);
@@ -864,11 +848,12 @@ void TUIRoomCoreImpl::onRemoteUserLeaveRoom(const char* user_id, int reason) {
     }
     LINFO("onRemoteUserLeaveRoom,user_id :%s, role: %d, reason :%d", user_id, iter->second.role, reason);
     // TRTC用户退房
+    // A TRTC user exits the room
     if (iter->second.role == TUIRole::kOther) {
+        room_user_map_.erase(remote_user_id);
         if (room_core_callback_ != nullptr) {
             room_core_callback_->OnRemoteUserLeave(remote_user_id);
         }
-        room_user_map_.erase(remote_user_id);
     } else if (iter->second.role == TUIRole::kAnchor) {
         LINFO("User Leave Room,user_id :%s user_name:%s ,role: %d", user_id, iter->second.user_name.c_str(), iter->second.role);
         if (iter->second.role == TUIRole::kAnchor) {
@@ -882,6 +867,7 @@ void TUIRoomCoreImpl::onRemoteUserLeaveRoom(const char* user_id, int reason) {
 
 void TUIRoomCoreImpl::onUserVoiceVolume(liteav::TRTCVolumeInfo* user_volumes, uint32_t user_volumes_count, uint32_t total_volume) {
     // 当没有人说话时，userVolumes 为空，totalVolume 为 0。
+    // If there is no one speaking, `userVolumes` will be empty, and `totalVolume` will be `0`
     if (user_volumes == NULL)
         return;
 
@@ -927,7 +913,9 @@ void TUIRoomCoreImpl::onError(TXLiteAVError error_code, const char* error_messag
     }
 }
 void TUIRoomCoreImpl::onWarning(TXLiteAVWarning warning_code, const char* warning_message, void* extra_info) {
-    //关闭了那个麦克风后 SDK 会回调  WARNING_AUDIO_DEVICE_CAPTURE_STOP_FAILED WARNING_MICROPHONE_NOT_AUTHORIZED 这两个事件
+    // 关闭了那个麦克风后 SDK 会回调  WARNING_AUDIO_DEVICE_CAPTURE_STOP_FAILED WARNING_MICROPHONE_NOT_AUTHORIZED 这两个事件
+    // After the microphone is disabled, the SDK will call back the 
+    // `WARNING_AUDIO_DEVICE_CAPTURE_STOP_FAILED` and `WARNING_MICROPHONE_NOT_AUTHORIZED` events
     LINFO("onWarning, warning : %d, warning_message: %s", warning_code, warning_message);
     if (warning_code == WARNING_MICROPHONE_NOT_AUTHORIZED) {
         static bool is_first = true;
@@ -937,6 +925,12 @@ void TUIRoomCoreImpl::onWarning(TXLiteAVWarning warning_code, const char* warnin
             room_core_callback_->OnError(static_cast<int>(TUIRoomError::kErrorMicrophoneNotAuthorized), warning_message);
         }
         is_first = false;
+    } else if (warning_code == WARNING_SCREEN_CAPTURE_NOT_AUTHORIZED) {
+        // 用户未授权当前应用使用屏幕录制
+        // The user does not authorize the current application to use screen recording
+        if (room_core_callback_ != nullptr) {
+            room_core_callback_->OnError(static_cast<int>(TUIRoomError::kErrorScreenCaptrueNotAuthoized), warning_message);
+        }
     }
 }
 void TUIRoomCoreImpl::onLog(const char* log, liteav::TRTCLogLevel level, const char* module) {
@@ -979,7 +973,9 @@ void TUIRoomCoreImpl::onStatistics(const liteav::TRTCStatistics& statistics) {
 
 void TUIRoomCoreImpl::EnterTRTCRoom() {
     // 创建群成功(角色是房主) 或 进入群成功（角色是成员）
+    // Created a group (as the room owner) or entered a group (as a member) successfully
     // 进入TRTC房间
+    // Enter a TRTC room
     if (trtc_cloud_ == nullptr) {
         return;
     }
@@ -1012,19 +1008,21 @@ void TUIRoomCoreImpl::EnterTRTCRoom() {
 }
 
 //////////////////////////////////////////////////////////////////////////
-//                        IM回调函数
+//              IM回调函数 (IM callback functions)
 //////////////////////////////////////////////////////////////////////////
 void TUIRoomCoreImpl::OnIMError(int code, const std::string& message) {
     LINFO("OnIMError error :%d, message %s", code, message.c_str());
 	TUIRoomError error = static_cast<TUIRoomError>(code);
     if (error == TUIRoomError::kErrorCreateRoomFailed) {
         // 创建房间失败
+        // Failed to create the room.
         LINFO("User Create Room Failed");
         local_user_info_.role = TUIRole::kAudience;
         room_user_map_[local_user_info_.user_id] = local_user_info_;
     }
     if (error == TUIRoomError::kErrorTransferRoomFailed) {
         // 转让房间失败,解散房间
+        // Failed to transfer the room. Dismiss the room
         LINFO("User Transfer Room Failed");
         im_core_->DestroyRoom(room_info_.room_id);
     }
@@ -1033,7 +1031,6 @@ void TUIRoomCoreImpl::OnIMError(int code, const std::string& message) {
     }
 }
 void TUIRoomCoreImpl::OnIMLogin(int code, const std::string& message) {
-    // 登录成功，立即调用【IM获取成员列表】信令
     LINFO("OnIMLogin code :%d, message %s", code, message.c_str());
     if (room_core_callback_ != nullptr) {
         room_core_callback_->OnLogin(code, message);
@@ -1047,11 +1044,12 @@ void TUIRoomCoreImpl::OnIMLogout(int code, const std::string& message) {
 }
 void TUIRoomCoreImpl::OnIMCreateRoom(int code, const std::string& message) {
     // 群已经存在，当房主被异地登出后，重新登录需要获取房间成员列表
+    // The group already exists. After being logged out remotely, the room owner needs to get the room member list after re-login
     LINFO("OnIMCreateRoom code :%d, message %s", code, message.c_str());
     if (code != 0 && im_core_ != nullptr) {
         im_core_->GetRoomInfo(room_info_.room_id);
         im_core_->GetRoomMemberInfoList(room_info_.room_id);
-    } else if (code == 0) { // 成功建群
+    } else if (code == 0) {
         if (room_core_callback_ != nullptr) {
             room_core_callback_->OnCreateRoom(code, message);
             std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -1071,9 +1069,10 @@ void TUIRoomCoreImpl::OnIMDestroyRoom(int code, const std::string& message) {
     ClearRoomInfo();
 }
 void TUIRoomCoreImpl::OnIMEnterRoom(int code, const std::string& message) {
-    // IM进群的回调
     // 登录成功，立即调用【IM获取成员列表】信令
+    // Login succeeded. Call the **GetRoomMemberInfoList** signaling immediately
     // 如果是成员，需要先获取群列表和群信息，才能进房间
+    // If the user is a member, the user needs to get the group list and information to enter the room
     LINFO("OnIMEnterRoom code :%d, message %s,role: %d", code, message.c_str(), local_user_info_.role);
     if (im_core_ != nullptr && local_user_info_.role != TUIRole::kMaster) {
         im_core_->GetRoomInfo(room_info_.room_id);
@@ -1084,11 +1083,13 @@ void TUIRoomCoreImpl::OnIMEnterRoom(int code, const std::string& message) {
 }
 void TUIRoomCoreImpl::OnIMExitRoom(TUIExitRoomType code, const std::string& message) {
     // 自己收到该回调，调用TRTC的退出房间接口
+    // Receive the callback and call the TRTC exit room API
     LINFO("OnIMExitRoom code :%d, message %s,role: %d", code, message.c_str(), local_user_info_.role);
     if (!enter_room_success_ && code != TUIExitRoomType::kKickOffLine) {
         return;
     }
     // 主持人不响应房间销毁和被踢出房间消息
+    // The host does not respond to room termination and user removal messages
     if (local_user_info_.role == TUIRole::kMaster && 
         (code == TUIExitRoomType::kRoomDestoryed || code == TUIExitRoomType::kKickOff)) {
         return;
@@ -1100,10 +1101,10 @@ void TUIRoomCoreImpl::OnIMExitRoom(TUIExitRoomType code, const std::string& mess
 }
 void TUIRoomCoreImpl::OnIMUserExitRoom(int code, const std::string& user_id) {
     LINFO("OnIMUserExitRoom code :%d, user_id %s", code, user_id.c_str());
+    room_user_map_.erase(user_id);
     if (room_core_callback_ != nullptr) {
         room_core_callback_->OnRemoteUserLeave(user_id);
     }
-    room_user_map_.erase(user_id);
 }
 
 void TUIRoomCoreImpl::OnIMRoomMasterChanged(const std::string& user_id){
@@ -1137,7 +1138,8 @@ void TUIRoomCoreImpl::OnIMUserEnterRoom(int code, const std::string& user_id, co
     }
     auto iter = room_user_map_.find(user_id);
     if (iter != room_user_map_.end()) {
-        // 说明成员先进入的trtc房间才进入的im房间，更改身份
+        // 成员先进入的trtc房间才进入的im房间，更改身份
+        // The member entered the TRTC room first and then the IM room. Change the role
         LINFO("User Enter TRTC before IM, user_id %s ,user_name : %s,role : %d",
             user_id.c_str(), user_name.c_str(), iter->second.role);
         if (iter->second.role == TUIRole::kOther) {
@@ -1150,7 +1152,8 @@ void TUIRoomCoreImpl::OnIMUserEnterRoom(int code, const std::string& user_id, co
             room_core_callback_->OnRemoteUserEnterSpeechState(user_id);
         }
     } else {
-        // 说明成员先进入的im房间
+        // 成员先进入的im房间
+        // The member entered the IM room first
         LINFO("User Enter IM before TRTC, user_id %s ,user_name : %s",
             user_id.c_str(), user_name.c_str());
         TUIUserInfo user;
@@ -1179,7 +1182,10 @@ void TUIRoomCoreImpl::OnIMGetRoomMemberInfoList(const std::vector<TUIUserInfo>& 
     }
     if (local_user_info_.role != TUIRole::kMaster) {
         EnterTRTCRoom();
-    } else { //房主创房时房间已存在，主要是房主异常情况退出
+    } else { 
+        // 房主创房时房间已存在，主要是房主异常情况退出
+        // The room already exists when the room owner tries to create a room.
+        // This error occurs mainly because the owner exited the room due to an exception
         if (room_core_callback_ != nullptr) {
             room_core_callback_->OnCreateRoom(0, "");
         }
@@ -1199,8 +1205,10 @@ void TUIRoomCoreImpl::OnIMGetRoomInfo(const TUIRoomInfo& info) {
         info.is_all_camera_muted, info.is_all_microphone_muted, info.is_chat_room_muted,
         info.is_speech_application_forbidden, info.mode,info.is_callingroll);
     // 用户为房主的情况，房主创房时房间已存在，房主异常情况退出才会出现
+    // If the user is the room owner, the error occurs only if the user exits the room due to an error and tries to create a room again.
     if (info.owner_id == local_user_info_.user_id) {
         // 房主错误以成员身份登录
+        // The room owner logs in as a member by mistake
         if (local_user_info_.role != TUIRole::kMaster) {
             local_user_info_.role = TUIRole::kMaster;
             room_user_map_[local_user_info_.user_id] = local_user_info_;
@@ -1257,6 +1265,7 @@ void TUIRoomCoreImpl::OnIMOrderedToExitSpeechkState() {
         room_core_callback_->OnOrderedToExitSpeechState();
     }
     // 被房主请停止发言，成员需要转换自己的身份为观众
+    // The room owner requests the member to stop speaking, and the member needs to become an audience member
     if (trtc_cloud_ != nullptr && local_user_info_.role != TUIRole::kMaster && local_user_info_.role != TUIRole::kAudience) {
         trtc_cloud_->switchRole(liteav::TRTCRoleAudience);
         local_user_info_.role = TUIRole::kAudience;
@@ -1303,6 +1312,7 @@ void TUIRoomCoreImpl::OnIMReceiveReplyToSpeechApplication(bool agree) {
     LINFO("OnIMAgreeSpeechApplication, agree :%d", agree);
     if (agree && trtc_cloud_ != nullptr && local_user_info_.role != TUIRole::kMaster) {
         // 房主同意了发言请求，成员需要转换自己的身份为主播
+        // The room owner approves the microphone-on request, and the member becomes an anchor
         trtc_cloud_->switchRole(liteav::TRTCRoleAnchor);
         local_user_info_.role = TUIRole::kAnchor;
         room_user_map_[local_user_info_.user_id] = local_user_info_;
@@ -1312,7 +1322,6 @@ void TUIRoomCoreImpl::OnIMReceiveReplyToSpeechApplication(bool agree) {
     }
 }
 
-// 房主端收到成员同意/拒绝邀请的回调
 void TUIRoomCoreImpl::OnIMReceiveReplyToSpeechInvitation(const std::string& user_id, bool agree) {
     LINFO("OnIMReceiveReplyToSpeechInvitation, user_id :%s,agree :%d", user_id.c_str(), agree);
     auto iter = room_user_map_.find(user_id);

@@ -77,14 +77,12 @@ bool CrashDump::InitCrashSight(const std::string& appinfo, const std::string& ve
 }
 
 void CrashDump::InitAttachExceptionFilter() {
-  // 堆异常
   BOOL bRet = ::HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption,
                                    nullptr, 0);
   ::OutputDebugStringW(
       format(L"HeapSetInformation, bRet: <%lu, %lu>.\n", bRet, ::GetLastError())
           .c_str());
 
-  // DEP策略
   bRet = ::SetProcessDEPPolicy(PROCESS_DEP_ENABLE |
                                PROCESS_DEP_DISABLE_ATL_THUNK_EMULATION);
   ::OutputDebugStringW(format(L"SetProcessDEPPolicy, bRet: <%lu, %lu>.\n", bRet,
@@ -175,7 +173,7 @@ LONG WINAPI CrashDump::UnhandledExceptionFilter(
   std::wstring exeDirPath(fullPath, lastSlash - fullPath + 1);
 
   WCHAR filePath[MAX_PATH] = {0};
-  for (int i = 0;; ++i)  // 避免同名
+  for (int i = 0;; ++i)
   {
     SYSTEMTIME sys_time = {0};
     ::GetLocalTime(&sys_time);

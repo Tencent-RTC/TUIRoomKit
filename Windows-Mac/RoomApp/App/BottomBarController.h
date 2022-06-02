@@ -53,6 +53,11 @@ private:
     void ClearAudioMenu();
     void ShowTopWidget();
     void UpdateStatus(const TUIUserInfo& info);
+#ifdef __APPLE__
+    bool IsScreenRecordAuthorized();
+    void RequestScreenRecordAccess(QString title, QString message);
+#endif
+
 public slots:
     void OnCameraClicked(bool checked);
     void OnAudioClicked(bool checked);

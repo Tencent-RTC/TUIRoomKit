@@ -10,11 +10,9 @@ typedef enum LOGGER_LEVEL
 {
     kTrackLevel      = 0,
     kInfoLevel       = 1,
-    kWarningLevel = 2,
-    kErrorLevel = 3,
-    kFatalLevel = 4,
-
-    // 标识函数进入和退出
+    kWarningLevel    = 2,
+    kErrorLevel      = 3,
+    kFatalLevel      = 4,
     kInLevel         = 5,
     kOutLevel        = 6
 } ENM_LOGGER_LEVEL;

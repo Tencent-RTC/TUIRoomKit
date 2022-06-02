@@ -5,13 +5,21 @@
 
 const static int kProtocolVersion = 1;
 std::string IMParser::GenerateCmdJson(Json::Value json_data) {
-    // 公共头字段
+    // 公共头字段 (Common header fields)
     /*
-    version	业务协议版本号	int
-    businessID	业务模块标识	string
-    platform	所属软件平台	string
-    extraInfo	扩展字段，备用	string
-    data	场景业务字段，如下	jsonString
+    version	    业务协议版本号	    int
+    businessID	业务模块标识	    string
+    platform	所属软件平台	    string
+    extraInfo	扩展字段，备用	    string
+    data	    场景业务字段，如下	jsonString
+    */
+
+    /*
+    version	    Business protocol version number	        int
+    businessID	Business module ID	                        string
+    platform	Software platform	                        string
+    extraInfo	Extended field, which is reserved	        string
+    data	    Scenario's business fields, as shown below	jsonString
     */
     Json::Value json_common_param;
 
@@ -37,6 +45,18 @@ std::string IMParser::GenerateGroupNotification(bool mute_chat, bool mute_all_ca
         "isAllCameraMuted" : false,             //  全员开/关视频，此控制用于自由发言模式
         "isAllMicMuted" : false,                //  全员开/禁麦
         "isCallingRoll": true/false,            //  主持人点名
+        "startTime: 1637062121090
+    }
+    */
+
+    /*
+    {
+        "speechMode" : "FreeSpeech",            //  Speech mode: `ApplySpeech` and `FreeSpeech`
+        "isChatRoomMuted" : false,              //  Whether to disable chat. It is used to control the IM chat room
+        "isSpeechApplicationForbidden" : false, //  Whether to disable speaking. After speaking is disabled, all speakers will become listeners and cannot speak again
+        "isAllCameraMuted" : false,             //  Whether to enable/disable the video of all members. It is used to control the free speech mode
+        "isAllMicMuted" : false,                //  Whether to enable/disable the mic of all members
+        "isCallingRoll": true/false,            //  This API is used by the host to start a roll call.
         "startTime: 1637062121090
     }
     */
@@ -218,13 +238,26 @@ std::string IMParser::GenerateReplyCallingRollJson(const std::string& room_id, c
 bool IMParser::ParserNotificationToMuteAllCamera(const std::string& notification) {
     /*
     {
-        "version" : 1                      //  协议版本号
-        "speechMode" : "FreeSpeech",       //  发言模式: "ApplySpeech" 和 "FreeSpeech"
-        "isChatRoomMuted" : false,           //  是否禁止聊天，用于控制IM聊天室
-        "isSpeechApplicationForbidden" : false, //  是否禁止上台，禁止上台后，所有在麦上列表的成员全部下台，并且之后成员不能上台
-        "isAllCameraMuted" : false,        //  全员开/关视频，此控制用于自由发言模式
-        "isAllMicMuted" : false,           //  全员开/禁麦
-        "isCallingRoll": true/false,       //  主持人点名
+        "version" : 1                           // 业务协议版本号
+        "speechMode" : "FreeSpeech",            // 发言模式: "ApplySpeech" 和 "FreeSpeech"
+        "isChatRoomMuted" : false,              // 是否禁止聊天，用于控制IM聊天室
+        "isSpeechApplicationForbidden" : false, // 是否禁止上台，禁止上台后，所有在麦上列表的成员全部下台，并且之后成员不能上台
+        "isAllCameraMuted" : false,             // 全员开/关视频，此控制用于自由发言模式
+        "isAllMicMuted" : false,                // 全员开/禁麦
+        "isCallingRoll": true/false,            // 主持人点名
+        "startTime: 1637062121090
+    }
+    */
+
+    /*
+    {
+        "version" : 1                           // Business protocol version number
+        "speechMode" : "FreeSpeech",            // Speech mode: `ApplySpeech` and `FreeSpeech`
+        "isChatRoomMuted" : false,              // Whether to disable chat. It is used to control the IM chat room
+        "isSpeechApplicationForbidden" : false, // Whether to disable speaking. After speaking is disabled, all speakers will become listeners and cannot speak again
+        "isAllCameraMuted" : false,             // Whether to enable/disable the video of all members. It is used to control the free speech mode
+        "isAllMicMuted" : false,                // Whether to enable/disable the mic of all members
+        "isCallingRoll": true/false,            // This API is used by the host to start a roll call.
         "startTime: 1637062121090
     }
     */
@@ -301,12 +334,27 @@ bool IMParser::ParserNotificationToIsCallingRoll(const std::string& notification
 bool IMParser::ParserDataToMute(const std::string& data) {
     /*
     {
-    "version":1, // 协议版本信息
-    "businessID":"RoomApp", // 会议场景
-    "platform":"Windows", // platform
-    "extraInfo":"", // 扩展字段，暂不使用
+    "version":1,                // 协议版本号
+    "businessID":"RoomApp",     // 会议场景
+    "platform":"Windows",       // platform
+    "extraInfo":"",             // 扩展字段，暂不使用
     "data":"{
-            "cmd":"MuteMic", //  信令协议
+            "cmd":"MuteMic",    //  信令协议
+            "room_id":"Room_123456",
+            "receiver_id":"test_user_id",
+            "mute":true
+        }"
+    }
+    */
+
+    /*
+    {
+    "version":1,                // Business protocol version number
+    "businessID":"RoomApp",     // Meeting scenario
+    "platform":"Windows",       // platform
+    "extraInfo":"",             // Extended field, which is reserved currently
+    "data":"{
+            "cmd":"MuteMic",    // Signaling protocol
             "room_id":"Room_123456",
             "receiver_id":"test_user_id",
             "mute":true

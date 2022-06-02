@@ -154,7 +154,6 @@ void SettingViewController::InitUi() {
     ui.stackedWidget->setCurrentIndex(0);
 
     liteav::ITRTCDeviceInfo* activeCam = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeCamera);
-    //获取摄像头列表
     liteav::ITXDeviceCollection* camera_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeCamera);
     if (camera_list == nullptr) {
         return;
@@ -171,7 +170,6 @@ void SettingViewController::InitUi() {
     camera_list->release();
 
     liteav::ITRTCDeviceInfo* activeMic = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeMic);
-    //获取麦克风列表
     liteav::ITXDeviceCollection* mic_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeMic);
     if (mic_list == nullptr) {
         return;
@@ -188,7 +186,6 @@ void SettingViewController::InitUi() {
     mic_list->release();
 
     liteav::ITRTCDeviceInfo* activeSpeaker = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeSpeaker);
-    //获取扬声器列表
     liteav::ITXDeviceCollection* speaker_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeSpeaker);
     if (speaker_list == nullptr) {
         return;
@@ -204,13 +201,11 @@ void SettingViewController::InitUi() {
     activeSpeaker->release();
     speaker_list->release();
 
-    // 镜像设置
     bool is_mirror = DataStore::Instance()->GetMirror();
     ui.ckbox_mirror->setChecked(is_mirror);
     if (is_mirror)
         TUIRoomCore::GetInstance()->SetVideoMirror(is_mirror);
 
-    // 美颜设置
     TUIBeautyConfig beauty_config = DataStore::Instance()->GetBeautyParam();
     ui.ckbox_beauty->setChecked(beauty_config.open_beauty);
     ui.radioButton_natural->setEnabled(beauty_config.open_beauty);
@@ -228,7 +223,6 @@ void SettingViewController::InitUi() {
     ui.hSlider_Whitening->setSingleStep(10);
     ui.hSlider_Whitening->setTickInterval(10);
 
-    // 音频设置
     bool is_default_close_mic = DataStore::Instance()->IsDefaultCloseMic();
     ui.ckbox_default_close_mic->setChecked(is_default_close_mic);
 
@@ -320,7 +314,6 @@ void SettingViewController::ResetDeviceList(const QString& deviceId, liteav::TXM
         ui.comboBox_speaker->clear();
 
         liteav::ITRTCDeviceInfo* activeCam = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeCamera);
-        //获取摄像头列表
         liteav::ITXDeviceCollection* camera_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeCamera);
         if (camera_list == nullptr) {
             return;
@@ -337,7 +330,6 @@ void SettingViewController::ResetDeviceList(const QString& deviceId, liteav::TXM
         camera_list->release();
 
         liteav::ITRTCDeviceInfo* activeMic = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeMic);
-        //获取麦克风列表
         liteav::ITXDeviceCollection* mic_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeMic);
         if (mic_list == nullptr) {
             return;
@@ -354,7 +346,6 @@ void SettingViewController::ResetDeviceList(const QString& deviceId, liteav::TXM
         mic_list->release();
 
         liteav::ITRTCDeviceInfo* activeSpeaker = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeSpeaker);
-        //获取扬声器列表
         liteav::ITXDeviceCollection* speaker_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeSpeaker);
         if (speaker_list == nullptr) {
             return;
@@ -513,31 +504,24 @@ void SettingViewController::OnSpeakerValueChanged(int value) {
 }
 
 void SettingViewController::OnStatistics(const liteav::TRTCStatistics& statis) {
-    // 当前系统 CPU占用率
     QString system_cpu_info = QString("%1%").arg(statis.systemCpu);
     ui.lb_cpu->setText(system_cpu_info);
 
-    // 当前App CPU占用率
     QString app_cpu_info = QString("%1%").arg(statis.appCpu);
     ui.lb_cpu_app->setText(app_cpu_info);
 
-    // 其他App CPU占用率
     QString other_cpu_info = QString("%1%").arg(statis.systemCpu - statis.appCpu);
     ui.lb_cpu_other->setText(other_cpu_info);
 
-    // 网络延时
     QString rtt = QString(tr("delay %1ms")).arg(statis.rtt);
     ui.lb_network->setText(rtt);
 
-    // 上行丢包率
     QString upLoss = QString(tr(" %1%")).arg(statis.upLoss);
     ui.lb_upLoss->setText(upLoss);
 
-    // 下行丢包率
     QString downLoss = QString(tr(" %1%")).arg(statis.downLoss);
     ui.lb_downLoss->setText(downLoss);
 
-    // 上行数据为本地视频帧和音频帧数据和
     int send_bitrate = 0;
     for (int i = 0; i < statis.localStatisticsArraySize; ++i) {
         send_bitrate += (statis.localStatisticsArray[i].audioBitrate + statis.localStatisticsArray[i].videoBitrate);
@@ -545,7 +529,6 @@ void SettingViewController::OnStatistics(const liteav::TRTCStatistics& statis) {
     QString bandWidthUp = QString(tr(" %1Kbps")).arg(send_bitrate);
     ui.lb_band_width_up->setText(bandWidthUp);
 
-    // 下行数据为所有远端用户视频帧和音频帧数据和
     int receive_bitrate = 0;
     for (int i = 0; i < statis.remoteStatisticsArraySize; ++i) {
         receive_bitrate += (statis.remoteStatisticsArray[i].audioBitrate + statis.remoteStatisticsArray[i].videoBitrate);
@@ -553,7 +536,6 @@ void SettingViewController::OnStatistics(const liteav::TRTCStatistics& statis) {
     QString bandWidthDown = QString(tr(" %1Kbps")).arg(receive_bitrate);
     ui.lb_band_width_down->setText(bandWidthDown);
 
-    //qDebug() << QString("sentBytes : %1, receivedBytes : %2 ").arg(send_bitrate).arg(receive_bitrate);
     QString str_video_frame_rate = " 0FPS";
     QString str_audio_bitrate = " 0Kbps";
     QString str_share_screen_frame_rate = " 0FPS";
@@ -566,7 +548,6 @@ void SettingViewController::OnStatistics(const liteav::TRTCStatistics& statis) {
             str_audio_bitrate = QString(tr(" %1Kbps")).arg(audio_bitrate);
         }
         else if (statis.localStatisticsArray[i].streamType == liteav::TRTCVideoStreamTypeSub) {
-            // 屏幕分享
             int frame_rate = statis.localStatisticsArray[i].frameRate;
             str_share_screen_frame_rate = QString(tr(" %1FPS")).arg(frame_rate);
         } 
@@ -582,25 +563,25 @@ void SettingViewController::OnNetQuality(UserNetQualityInfo local_user_quality, 
     QString net_quality = tr("Unknow");
     if (std::string(local_user_quality.user_id).empty()) {
         switch (local_user_quality.quality) {
-        case liteav::TRTCQuality_Unknown:///未定义
+        case liteav::TRTCQuality_Unknown:
             net_quality = tr("Unknow");
             break;
-        case liteav::TRTCQuality_Excellent:///当前网络非常好
+        case liteav::TRTCQuality_Excellent:
             net_quality = tr("Excellent");
             break;
-        case liteav::TRTCQuality_Good:///当前网络比较好
+        case liteav::TRTCQuality_Good:
             net_quality = tr("Good");
             break;
-        case liteav::TRTCQuality_Poor:///当前网络一般
+        case liteav::TRTCQuality_Poor:
             net_quality = tr("Poor");
             break;
-        case liteav::TRTCQuality_Bad:///当前网络较差
+        case liteav::TRTCQuality_Bad:
             net_quality = tr("Bad");
             break;
-        case liteav::TRTCQuality_Vbad:///当前网络很差
+        case liteav::TRTCQuality_Vbad:
             net_quality = tr("Very bad");
             break;
-        case liteav::TRTCQuality_Down:///当前网络不满足 TRTC 的最低要求
+        case liteav::TRTCQuality_Down:
             net_quality = tr("Down");
             break;
         }

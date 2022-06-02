@@ -124,7 +124,7 @@ bool DataStore::IsAppLaunch() const{
 }
 
 /*
-APP启动参数协议：
+APP启动参数协议(App start parameter protocol)：
 AppLaunch:true
 sdk_app_id:123456
 user_id:test1
