@@ -316,7 +316,6 @@ void IMCore::KickOffUser(const std::string& room_id, const std::string& user_id,
     V2TIMOfflinePushInfo offlinePushInfo;
     IMInterfaceCallback* kick_off_user_callback = new(std::nothrow) IMInterfaceCallback(kKickOffUser, this, callback);
     if (kick_off_user_callback != nullptr) {
-        // 发送信令
         V2TIMString inviteID = V2TIMManager::GetInstance()->GetSignalingManager()->Invite(userID, data, true, offlinePushInfo, kInviteTimeout, kick_off_user_callback);
         if (!inviteID.Empty()) {
             std::string invite_id(inviteID.CString());
@@ -447,7 +446,6 @@ void IMCore::SendSpeechInvitation(const std::string& room_id, const std::string&
     V2TIMOfflinePushInfo offlinePushInfo;
     IMInterfaceCallback* send_speech_invitation_callback = new(std::nothrow) IMInterfaceCallback(kSendSpeechInvitation, this, callback);
     if (send_speech_invitation_callback != nullptr) {
-        // 发送邀请信令
         V2TIMString inviteID = V2TIMManager::GetInstance()->GetSignalingManager()->Invite(userID, data, true, offlinePushInfo, kInviteTimeout, send_speech_invitation_callback);
         if (!inviteID.Empty()) {
             std::string invite_id(inviteID.CString());
@@ -484,7 +482,6 @@ void IMCore::ReplySpeechInvitation(const std::string& room_id, const std::string
             }
         }
     }
-    // TODO
 }
 
 void IMCore::SendOffSpeaker(const std::string& room_id, const std::string& sender_id, const std::string& user_id, Callback callback) {
@@ -536,7 +533,8 @@ void IMCore::SendSpeechApplication(const std::string& room_id, const std::string
     V2TIMOfflinePushInfo offlinePushInfo;
     IMInterfaceCallback* send_speech_application_callback = new(std::nothrow) IMInterfaceCallback(kSendSpeechApplication, this, callback);
     if (send_speech_application_callback != nullptr) {
-        // 成员申请发言，需要老师同意/拒绝操作，超时设置 4 * 15 = 1min。
+        // 成员申请发言，需要老师同意/拒绝操作，超时设置 4 * 15s = 1min。
+        // A member requests to speak, and the teacher needs to accept/reject the request. The timeout period is one minute
         V2TIMString inviteID = V2TIMManager::GetInstance()->GetSignalingManager()->Invite(userID, data, true, offlinePushInfo, 4 * kInviteTimeout, send_speech_application_callback);
         if (!inviteID.Empty()) {
             std::string invite_id(inviteID.CString());
@@ -622,7 +620,6 @@ void IMCore::ReplyCallingRoll(const std::string& room_id, const std::string& sen
     V2TIMOfflinePushInfo offlinePushInfo;
     IMInterfaceCallback* reply_calling_roll_callback = new(std::nothrow) IMInterfaceCallback(kReplyCallingRoll, this, callback);
     if (reply_calling_roll_callback != nullptr) {
-        // 发送信令
         V2TIMString inviteID = V2TIMManager::GetInstance()->GetSignalingManager()->Invite(userID, data, true, offlinePushInfo, 0, reply_calling_roll_callback);
         if (!inviteID.Empty()) {
             std::string invite_id(inviteID.CString());
@@ -676,7 +673,6 @@ void IMCore::OnReceiveNewInvitation(const V2TIMString &inviteID, const V2TIMStri
         }
             break;
         case kSendSpeechApplication: {
-            // 收到申请上台通知
             std::string sender_id;
             bool b = IMParser::ParserDataToSenderId(str_data, sender_id);
             if (b && callback_ != nullptr) {
@@ -688,7 +684,6 @@ void IMCore::OnReceiveNewInvitation(const V2TIMString &inviteID, const V2TIMStri
         }
             break;
         case kSendOffSpeaker: {
-            // 收到下台通知
             V2TIMManager::GetInstance()->GetSignalingManager()->Accept(inviteID, "", nullptr);
             std::string receiver_id;
             bool b = IMParser::ParserDataToReveiverId(str_data, receiver_id);
@@ -701,7 +696,6 @@ void IMCore::OnReceiveNewInvitation(const V2TIMString &inviteID, const V2TIMStri
         }
             break;
         case kSendSpeechInvitation: {
-            // 收到邀请上台
             std::string receiver_id;
             bool b = IMParser::ParserDataToReveiverId(str_data, receiver_id);
             if (b && callback_ != nullptr) {
@@ -799,6 +793,7 @@ void IMCore::OnInvitationTimeout(const V2TIMString &inviteID, const V2TIMStringV
         return;
 
     // 学生申请发言请求超时，通知老师上层界面变更
+    // The student's mic-on request timed out. Inform the teacher of upper-layer UI change
 	{
 		std::lock_guard<std::mutex> lock(mutex_);
     	for (auto item_user : map_signaling_) {
@@ -811,7 +806,9 @@ void IMCore::OnInvitationTimeout(const V2TIMString &inviteID, const V2TIMStringV
 	}
 
     // 发送方超时，inviteeList包含对方ID
+    // The sender timed out, and `inviteeList` contains the ID of the target user
     // 接收方超时没响应，自己会收到超时，inviteeList包含自己
+    // The recipient timed out and didn't response. The recipient will receive a timeout message and be included in `inviteeList`
     NotifySignalingTimeOut(inviteID.CString());
     RemoveSignalingCallback(inviteID.CString());
     RemoveSignalingInfoByInviteId(inviteID.CString());
@@ -848,7 +845,6 @@ void IMCore::OnGroupInfoChanged(const V2TIMString &groupID, const V2TIMGroupChan
     if (callback_ != nullptr) {
         for (int i = 0; i < changeInfos.Size(); i++) {
             if (changeInfos[i].type == V2TIM_GROUP_INFO_CHANGE_TYPE_NOTIFICATION) {
-                //群公共变更
                 std::string group_notification = changeInfos[i].value.CString();
                 LINFO("IMCore::OnGroupInfoChanged: notification = %s", group_notification.c_str());
                 if (group_notification.find("isAllCameraMuted") != std::string::npos) {

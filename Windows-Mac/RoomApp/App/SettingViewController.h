@@ -21,7 +21,6 @@ public:
     SettingViewController(QWidget *parent = Q_NULLPTR);
     ~SettingViewController();
 
-    // index为0-4：0视频 1美颜 2声音 3统计
     void SetCurrentPage(int index);
 signals:
     void SignalClose();

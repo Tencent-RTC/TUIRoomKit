@@ -42,7 +42,6 @@ MainWindow::MainWindow(TUISpeechMode speech_mode, QWidget *parent)
     ui.chat_widget->hide();
     ui.content_widget->installEventFilter(this);
 
-    // 点击关闭按钮
     connect(ui.btn_close, &QPushButton::clicked, this, &MainWindow::SlotClose);
     connect(ui.btn_min, &QPushButton::clicked, this, [&]() {
         this->showMinimized();
@@ -57,7 +56,7 @@ MainWindow::MainWindow(TUISpeechMode speech_mode, QWidget *parent)
 
     if (TUIRoomCore::GetInstance()->GetDeviceManager() != nullptr)
         TUIRoomCore::GetInstance()->GetDeviceManager()->setDeviceObserver(&MessageDispatcher::Instance());
-    // 回调事件
+
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnCreateRoom, this, &MainWindow::SlotOnCreateRoom);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnEnterRoom, this, &MainWindow::SlotOnEnterRoom);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnError, this, &MainWindow::SlotOnError);
@@ -201,7 +200,6 @@ void MainWindow::InitShow(bool show_preview_wnd) {
         }
         room_id_ = login_view_->GetRoomID().toStdString();
         ui.top_menu_bar->SetRoomID(room_id_);
-        room_id_ = kRoomType + room_id_;
         device_preview_->show();
         device_preview_->InitUi();
         device_preview_->StartPreview();
@@ -242,7 +240,6 @@ void MainWindow::SlotOnEnterRoom(int code, const QString& message) {
     ShowUserList();
     StageUp();
 
-    //初始化画质参数
     TUIVideoQosPreference preference = DataStore::Instance()->GetQosPreference();
     DataStore::Instance()->SetQosPreference(preference);
     TUIRoomCore::GetInstance()->SetVideoQosPreference(preference);
@@ -282,7 +279,6 @@ void MainWindow::InitUi() {
     top_menu_bar_ = main_window_layout_->GetTopBarController();
     main_widget_control_ = main_window_layout_->GetMainWidgetController();
     
-    // 底部按钮事件
     BottomBarController* bottom_menu_bar = main_window_layout_->GetBottomBarController();
     if (bottom_menu_bar) {
         connect(bottom_menu_bar, &BottomBarController::SignalStartScreen, this, &MainWindow::PopupBottomBar, Qt::QueuedConnection);
@@ -348,8 +344,10 @@ void MainWindow::SlotClose() {
         connect(&TXMessageBox::DialogInstance(), &TXMessageBox::SignalLeaveRoom, this, [=]() {
             if (local_user->role == TUIRole::kMaster && main_window_layout_ != nullptr) {
                 // 如果需要指定将房间转让给某用户，使用以下方法
-                //main_window_layout_->ShowTransferRoomWindow();
+                // You can transfer the room to the specified user as follows:
+                // main_window_layout_->ShowTransferRoomWindow();
                 // 列表中寻找一个默认的用户进行转让
+                // Find the default user in the list for transfer
                 main_window_layout_->TransferRoomToOther();
                 type_exit_room_ = TUIExitRoomType::kTransferRoom;
                 this->close();
@@ -373,7 +371,6 @@ void MainWindow::PopupBottomBar(bool checked) {
     }
 
     if (share_menu_bar != nullptr) {
-        // 顶部按钮事件
         connect(share_menu_bar, &BottomBarController::SignalStartScreen, this, &MainWindow::PopupBottomBar, Qt::QueuedConnection);
         connect(share_menu_bar, &BottomBarController::SignalShowMemberList, this, [=]() {
             if (member_list_view_control_ != nullptr) {
@@ -505,7 +502,8 @@ void MainWindow::SlotBottomMenuMuteCamera(bool) {
     } else {
         if (room_info.is_all_camera_muted && local_user->role != TUIRole::kMaster) {
             emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*local_user);
-            // 主持人已设置全员禁视频，您暂时无法打开视频。 
+            // 主持人已设置全员禁视频，您暂时无法打开视频。
+            // The host has disabled the video of all members, so you cannot enable the video
             TXMessageBox::Instance().AddLineTextMessage(\
                 tr("The master has set video ban for all staff, you cannot open the video temporarily."));
             return;
@@ -526,7 +524,8 @@ void MainWindow::SlotBottomMenuMuteMicrophone(bool) {
     } else {
         if (room_info.is_all_microphone_muted && local_user->role != TUIRole::kMaster) {
             emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*local_user);
-            // 主持人已设置全员禁麦，您暂时无法打开麦克风。 
+            // 主持人已设置全员禁麦，您暂时无法打开麦克风。
+            // The host has disabled the mic of all members, so you cannot enable the microphone
             TXMessageBox::Instance().AddLineTextMessage(\
                 tr("The master has set audio ban for all staff, you cannot open the audio temporarily."));
             return;
@@ -535,7 +534,6 @@ void MainWindow::SlotBottomMenuMuteMicrophone(bool) {
     }
 }
 void MainWindow::StageUp() {
-    //开始上传本地
     LINFO("Start StageUp");
     auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
     if (local_user == nullptr) {
@@ -545,6 +543,7 @@ void MainWindow::StageUp() {
     StageAddMember(*local_user);
 
     // 成员需要判断是否开启了全员禁麦克风/摄像头
+    // The member needs to consider whether the microphone/camera of all members is disabled
     if (local_user->role == TUIRole::kAnchor) {
         LINFO("Anchor StageUp, user_id :%s, user_name :%s, role :%d", local_user->user_id.c_str(), local_user->user_name.c_str(), local_user->role);
         if (!room_info.is_all_camera_muted) {
@@ -608,6 +607,7 @@ void MainWindow::DealStartCameraError() {
     if (local_user == nullptr) {
         return;
     }
+    StopLocalCamera();
     emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*local_user);
 }
 
@@ -617,6 +617,7 @@ void MainWindow::DealStartMicError() {
     if (local_user == nullptr) {
         return;
     }
+    StopLocalMicrophone();
     emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*local_user);
 }
 

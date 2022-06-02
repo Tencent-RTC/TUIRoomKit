@@ -121,6 +121,10 @@ void ScreenShareManager::SelectScreenCaptureTarget(const ScreenCaptureSourceInfo
 
     trtc_cloud_->selectScreenCaptureTarget(src, rect, capture_property);
 }
+void ScreenShareManager::SetSubStreamMixVolume(uint32_t volume) {
+    if (trtc_cloud_ != nullptr)
+        trtc_cloud_->setSubStreamMixVolume(volume);
+}
 void ScreenShareManager::AddExcludedShareWindow(void* window) {
     if (window != NULL && trtc_cloud_ != nullptr)
         trtc_cloud_->addExcludedShareWindow((liteav::TXView)window);

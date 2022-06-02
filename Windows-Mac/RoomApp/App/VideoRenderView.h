@@ -18,8 +18,10 @@ public:
     void InitUi();
     void InitConnect();
     // 关闭原始View上面的拉流
+    // Disable stream pull on the original view
     void StopCurrentVideo();
-    // 在首帧么上来前，显示默认背景贴图
+    // 在首帧视频画面未上来前，显示默认背景贴图
+    // Display the default background image before the first frame of video image is displayed
     void ResetBackgroundImage();
 
     std::string GetUserId();
@@ -55,6 +57,6 @@ private:
 
     VideoRenderViewInfo* video_head_ = nullptr;
     TUIUserInfo user_info_;
-    bool is_main_window_ = false;         // 是否为主视频页窗口
-    bool is_screen_share_window_ = false; // 是 屏幕分享 还是 摄像头
+    bool is_main_window_ = false;         // 是否为主视频页窗口 (Whether it is the main video page window)
+    bool is_screen_share_window_ = false; // 是 屏幕分享 还是 摄像头 (Whether it is screen sharing or camera video)
 };

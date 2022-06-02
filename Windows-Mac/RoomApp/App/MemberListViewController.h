@@ -29,6 +29,7 @@ private:
     void InitUi();
     void InitConnect();
     void UpdateMaster(const std::string& user_id);
+    void ShowMemberCount();
 
     void MemberListMuteUserMic(const std::string& user_id);
     void MemberListMuteUserCamera(const std::string& user_id);

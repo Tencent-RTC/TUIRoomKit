@@ -31,11 +31,9 @@ public:
     void PopVideoTip(bool top);
     void SetMainWindowView(VideoRenderView* video_view);
 private:
-    // 初始化相关
     void InitUi();
     void InitConnect();
 
-    // Ui相关
     void ReSizeRoomStage();
     void ChangeButtonsStatus();
     void ShowPreviousPage();
@@ -78,7 +76,7 @@ private:
     QVBoxLayout* stage_vertical_layout_ = nullptr;
 
     QList<std::string> all_video_userid_list_;
-    QList<std::string> all_screen_share_userid_list_;   // 不包括正在主窗口显示的辅流
+    QList<std::string> all_screen_share_userid_list_;   // 不包括正在主窗口显示的辅流 (The substream displayed in the main window is not included)
     QList<VideoRenderView*> current_page_video_view_list_;
 
     VideoRenderView* main_window_view_ = nullptr;

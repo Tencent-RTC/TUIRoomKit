@@ -3,12 +3,9 @@
 #include <QString>
 #include "Common.h"
 
-// 设置App名称
 static constexpr char kAppName[] = "RoomApp";
-static constexpr char kRoomType[] = "Room_";
 static constexpr char kAppVersion[] = "1.0.0.0";
 
-// 屏幕分享图片的宽高
 static constexpr int kShareItemWidth  = 200;
 static constexpr int kShareItemHeight = 150;
 static constexpr int kShareItemSpace  = 30;
@@ -16,7 +13,6 @@ static constexpr int kShareItemMargin = 40;
 static constexpr int kShareIconWidth  = 80;
 static constexpr int kShareIconHeight = 80;
 
-// 成员列表的操作：1禁麦 2禁视频 3上下台 4T人
 enum class MemberOperate {
     kMuteMicrophone = 1,
     kMuteCamera = 2,
@@ -25,7 +21,7 @@ enum class MemberOperate {
     kAgreeSpeak = 5,
     kDisAgreeSpeak = 6,
     kForbidSpeak = 7,
-    kForbidMicrophone   = 8,
+    kForbidMicrophone = 8,
     kForbidCamera = 9
 };
 
@@ -49,25 +45,24 @@ enum class MemberStatus {
 };
 
 enum class StageListDirection {
-    kHorDirection = 1,  //水平
-    kVerDirection = 2   //垂直
+    kHorDirection = 1,
+    kVerDirection = 2
 };
 
 class NetToolTip {
  public:
-    int app_cpu = 0;    // 当前App CPU占用率
-    int rtt = 0;        // 网络延时
-    int downLoss = 0;   // 下行丢包率
+    int app_cpu = 0;    // 当前App CPU占用率 (Current app's CPU utilization)
+    int rtt = 0;        // 网络延时 (Network latency)
+    int downLoss = 0;   // 下行丢包率 (Downstream packet loss rate)
 };
 struct UserNetQualityInfo {
-	///用户 ID
 	std::string user_id;
-	///网络质量，参见 TRTCTypeDef.h 的 TRTCQuality 枚举
+	// 网络质量，参见 TRTCTypeDef.h 的 TRTCQuality 枚举
+    // Network quality. For more information, see `TRTCQuality` enumerations of `TRTCTypeDef.h`
 	int quality;
     UserNetQualityInfo() : quality(0) {}
 };
 
-// 登录用户信息
 struct UserLoginInfo {
     std::string user_id;
     std::string user_sig;

@@ -227,12 +227,14 @@ void VideoRenderView::UserStartScreenShare(const std::string& user_id) {
 
 void VideoRenderView::mouseDoubleClickEvent(QMouseEvent* event) {
     // 如果自己正在屏幕分享，则不响应。
+    // Don't respond if you are sharing the screen
     const TUIUserInfo* local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
     if (local_user->has_screen_stream) {
         return QWidget::mouseDoubleClickEvent(event);
     }
 
     // 当用户没有视频时，不显示在大画面
+    // If a user has no video, the user will not be displayed on the primary image
     if (!is_screen_share_window_ && !user_info_.has_video_stream) {
         return QWidget::mouseDoubleClickEvent(event);
     }
@@ -302,7 +304,6 @@ void VideoRenderView::StopPreview() {
 
 void VideoRenderView::UpdateUserInfo(const TUIUserInfo& user_info) {
     user_info_ = user_info;
-
     if (user_info.has_video_stream || (is_screen_share_window_ && user_info.has_screen_stream)) {
         ui_->stackedWidget->setCurrentIndex(1);
         ui_->video_view->setUpdatesEnabled(false);
@@ -338,6 +339,9 @@ liteav::TXView VideoRenderView::GetPlayWindow() {
 
 void VideoRenderView::SlotOnFirstVideoFrame(const QString& user_id, const TUIStreamType streamType) {
     if (streamType == TUIStreamType::kStreamTypeScreen && user_id.toStdString() == user_info_.user_id) {
+        if (user_id.isEmpty()) {
+            return;
+        }
         ui_->stackedWidget->setCurrentIndex(1);
         ui_->video_view->setUpdatesEnabled(false);
         if (video_head_ != nullptr) {
@@ -346,6 +350,7 @@ void VideoRenderView::SlotOnFirstVideoFrame(const QString& user_id, const TUIStr
         return;
     }
     // 当前窗口用户还未设置，或屏幕分享的流不显示
+    // The user hasn't set the current window, or the screen sharing stream is not displayed
     if (user_info_.user_id == "" || streamType != TUIStreamType::kStreamTypeCamera) {
         return;
     }
@@ -377,9 +382,7 @@ void VideoRenderView::SlotOnUserVoiceVolume(const QString& user_id, int volume) 
 void VideoRenderView::OnNetStatistics(const liteav::TRTCStatistics& statis) {
     if (video_head_ != nullptr) {
         NetToolTip net_tooltip;
-        // 网络延时
         net_tooltip.rtt = statis.rtt;
-        // 下行丢包率
         net_tooltip.downLoss = statis.downLoss;
 
         std::string local_user_id = DataStore::Instance()->GetCurrentUserInfo().user_id;

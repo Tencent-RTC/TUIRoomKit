@@ -32,19 +32,13 @@ protected:
     void resizeEvent(QResizeEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
 private:
-    // 麦上成员
     void StageAddMember(const TUIUserInfo& user_info);
     void StageRemoveMember(const std::string& user_id);
-    // 成员列表用户
     void MemberListAddMember(const TUIUserInfo& user_info);
-
-    // 本地音视频操作
     void StartLocalCamera();
     void StopLocalCamera();
     void StartLocalMicrophone();
     void StopLocalMicrophone();
-
-    // 界面操作相关
     void InitUi();
     void CloseMainWindow();
     void StageUp();
@@ -58,23 +52,12 @@ signals:
     void SignalShowLoginWind(TUIExitRoomType type_exit_room);
 
 private slots :
-    // 界面操作相关
     void SlotClose();
-
-    // 底端按钮控制本地
     void SlotBottomMenuMuteCamera(bool);
     void SlotBottomMenuMuteMicrophone(bool);
-
-    // 顶部按钮操作
     void SlotShowChatRoom(bool);
-
-    // 错误提示回调
     void SlotOnError(int code, const QString& message);
-
-    // 退出相关回调
     void SlotOnExitRoom(TUIExitRoomType code, const QString& message);
-
-    // 场控相关事件回调
     void SlotOnCameraMuted(bool mute);
     void SlotOnMicrophoneMuted(bool mute);
 
@@ -95,7 +78,7 @@ private:
     TUISpeechMode speech_mode_;
 
     LoginViewController* login_view_ = nullptr;
-    TUIExitRoomType type_exit_room_ = TUIExitRoomType::kNormal; // 退出房间的方式
+    TUIExitRoomType type_exit_room_ = TUIExitRoomType::kNormal;
     PresetDeviceController* device_preview_ = nullptr;
     bool enter_room_success_ = false;
     bool is_default_close_camera_ = false;

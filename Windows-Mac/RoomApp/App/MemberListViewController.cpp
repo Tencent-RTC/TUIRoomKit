@@ -45,11 +45,11 @@ void MemberListViewController::InitUi() {
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::WindowCloseButtonHint | Qt::Tool);
     ui_->member_list_widget->setFocusPolicy(Qt::NoFocus);
     // 成员端不显示操作功能
+    // The operation feature is not displayed on the member's client
     if (user_info_.role != TUIRole::kMaster) {
         ui_->control_widget->hide();
         ui_->opeate_widget->hide();
         
-        // 显示主持人姓名
         auto member_list = TUIRoomCore::GetInstance()->GetRoomUsers();
         auto it = find_if(member_list.begin(), member_list.end(), [](const TUIUserInfo& user_info) {
             return user_info.role == TUIRole::kMaster;
@@ -76,6 +76,7 @@ void MemberListViewController::InitUi() {
         this->setMaximumWidth(kMasterWidth);
         this->setMinimumWidth(kMasterWidth);
     }
+    ShowMemberCount();
     this->raise();
 }
 
@@ -170,6 +171,7 @@ void MemberListViewController::MemberListMuteUserCamera(const std::string& user_
     bool mute = remote_user_info->has_video_stream && remote_user_info->has_subscribed_video_stream;
     if (remote_user_info->role == TUIRole::kAnchor) {
         // 关闭时直接设置状态， 打开时按照流的状态回调里设置
+        // Disabled: Directly set the status. Enabled: Set the status according to the stream status callback
         if (mute) {
             TUIRoomCore::GetInstance()->MuteUserCamera(user_id, mute, callback);
             emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*remote_user_info);
@@ -265,10 +267,12 @@ void MemberListViewController::SlotOnRemoteUserEnterRoom(const QString& user_id)
         return;
     }
     InsertUser(*user_info);
+    ShowMemberCount();
 }
 
 void MemberListViewController::SlotOnRemoteUserLeaveRoom(const QString& user_id) {
     RemoveUser(user_id.toStdString());
+    ShowMemberCount();
 }
 
 void MemberListViewController::SlotOnRemoteUserVideoOpen(const QString& user_id, bool available) {
@@ -337,4 +341,9 @@ void MemberListViewController::SlotForbidCamera(bool checked) {
         ui_->forbid_camera_btn->setText(tr("forbid all video"));
     }
     TUIRoomCore::GetInstance()->MuteAllUsersCamera(checked);
+}
+
+void MemberListViewController::ShowMemberCount() {
+    int member_count = TUIRoomCore::GetInstance()->GetRoomUsers().size();
+    ui_->member_count_label->setText(QString(tr("%1")).arg(member_count));
 }

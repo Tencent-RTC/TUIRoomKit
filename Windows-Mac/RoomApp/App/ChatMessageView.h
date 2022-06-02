@@ -10,9 +10,9 @@ class ChatMessageView : public QWidget
 
 public:
     enum MessageContextType {
-        kUserSelf,   // 自己
-        kUserOther,  // 其他用户
-        kTime        // 时间
+        kUserSelf,   // self
+        kUserOther,  // other user
+        kTime        // time
     };
 
     explicit ChatMessageView(TUIUserInfo user_info, QWidget* parent = nullptr);

@@ -43,7 +43,7 @@ void ScreenShareWindow::InitShow(const std::vector<IScreenShareManager::ScreenCa
     } else {
         ui.ckbox_share_voice->setChecked(false);
     }
-    // 画质偏好（平滑和清晰）设置 
+
     TUIVideoQosPreference preference = DataStore::Instance()->GetQosPreference();
     if (preference == TUIVideoQosPreference::kSmooth) {
         ui.ckbox_Smooth->setChecked(true);
@@ -81,7 +81,6 @@ void ScreenShareWindow::LayoutScreen(const std::vector<IScreenShareManager::Scre
                 item->setFixedSize(kShareItemWidth, kShareItemHeight);
                 IScreenShareManager::ScreenCaptureSourceInfo info = source_screen.at(i * col + j);
                 QString file_name = QString::fromStdString(info.source_name);
-                //LINFO("------Drew Screen Image:name=%s src-wid=%d,hei=%d --- wid=%d,hei=%d", file_name.toStdString().c_str(), info.thumb_bgra.width, info.thumb_bgra.height, kShareItemWidth - kShareItemMargin, kShareItemHeight - kShareItemMargin);
                 QImage img((const uchar*)info.thumb_bgra.buffer, info.thumb_bgra.width, info.thumb_bgra.height, QImage::Format_ARGB32);
                 item->SetInfo(info.source_id, info.type, QString::fromStdString(info.source_name), QPixmap::fromImage(img));
                 pScreenLayout_->addWidget(item, i, j);
@@ -133,7 +132,6 @@ void ScreenShareWindow::LayoutWindow(const std::vector<IScreenShareManager::Scre
                 } else {
                     image_buffer = info.thumb_bgra;
                 }
-                //LINFO("------Drew Window Image:name=%s src-wid=%d,hei=%d --- wid=%d,hei=%d", file_name.toStdString().c_str(), image_buffer.width, image_buffer.height, kShareItemWidth - kShareItemMargin, kShareItemHeight - kShareItemMargin);
                 QImage img((const uchar*)image_buffer.buffer, image_buffer.width, image_buffer.height, QImage::Format_ARGB32);
                 item->SetInfo(info.source_id, info.type, QString::fromStdString(info.source_name), QPixmap::fromImage(img));
                 pLayout_->addWidget(item, i, j);
@@ -233,7 +231,6 @@ void ScreenShareWindow::showEvent(QShowEvent* event) {
     QWidget::showEvent(event);
 }
 void ScreenShareWindow::OnVideoFluencyPreferred(bool checked) {
-    //设置画质参数
     TUIVideoQosPreference preference = TUIVideoQosPreference::kSmooth;
     if (!checked)
         preference = TUIVideoQosPreference::kClear;

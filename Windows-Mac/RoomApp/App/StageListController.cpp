@@ -187,9 +187,7 @@ void StageListController::SetVideoViewLayout(StageListDirection direction) {
 }
 
 void StageListController::ReSizeRoomStage() {
-    // 计算大小
     if (stage_list_direction_ == StageListDirection::kVerDirection || is_popup_list_) {
-        // 屏幕分享时按照桌面高度来计算
         QDesktopWidget* desk = QApplication::desktop();
         int max_height = desk->availableGeometry().height() - 200;
         int total_view_height = max_height - 2 * kVerticalButtonHeight;
@@ -286,14 +284,17 @@ void StageListController::ChangeButtonsStatus() {
         current_page_video_view_list_.size() < (all_screen_share_userid_list_.size()\
             + all_video_userid_list_.size())) {
         // 计算可以滚动的视频位个数
+        // Calculate the number of videos that can be scrolled
         int scroll_count = (page_size_ - all_screen_share_userid_list_.size());
 
         // 上一页按钮
+        // Previous page button
         if (last_video_index_ == 0) {
             ui_->previous_page_left->hide();
             ui_->previous_page_up->hide();
         } else {
-            // 屏幕分享时候
+            // 屏幕分享
+            // Screen sharing
             if (stage_list_direction_ == StageListDirection::kVerDirection || is_popup_list_) {
                 ui_->previous_page_up->show();
             } else {
@@ -301,6 +302,7 @@ void StageListController::ChangeButtonsStatus() {
             }
         }
         // 下一页按钮
+        // Next page button
         if (last_video_index_ + scroll_count >= all_video_userid_list_.size()) {
             ui_->next_page_down->hide();
             ui_->next_page_right->hide();
@@ -335,8 +337,10 @@ void StageListController::InsertUser(const TUIUserInfo& user_info, bool is_scree
         user_info.user_id.c_str(), user_info.user_name.c_str(), user_info.role);
 
     // 如果当前页还可以展示视频
+    // If the current page can still display video
     if (current_page_video_view_list_.size() < page_size_) {
         // 麦上列表的显示顺序：[ 屏幕分享(者) | 主持人 | 自己 | 其他成员 ]
+        // Display order of the mic-on list: [ Screen sharer | Host | You | Other members ]
         if (is_screen_share) {
             all_screen_share_userid_list_.push_back(user_info.user_id);
             if (all_video_userid_list_.contains(user_info.user_id)) {
@@ -346,9 +350,11 @@ void StageListController::InsertUser(const TUIUserInfo& user_info, bool is_scree
         } else {
             if (user_info.has_screen_stream) {
                 // 屏幕分享者
+                // Screen sharer
                 all_video_userid_list_.push_front(user_info.user_id);
             } else if (user_info.role == TUIRole::kMaster) {
                 // 主持人
+                // Host
                 int i = 0;
                 for (; i < all_video_userid_list_.size() && i < page_size_; i++) {
                     const TUIUserInfo* user = TUIRoomCore::GetInstance()->GetUserInfo(all_video_userid_list_.at(i));
@@ -360,6 +366,7 @@ void StageListController::InsertUser(const TUIUserInfo& user_info, bool is_scree
                 all_video_userid_list_.insert(i, user_info.user_id);
             } else if (DataStore::Instance()->GetCurrentUserInfo().user_id == user_info.user_id) {
                 // 成员自己
+                // Member-self
                 int i = 0;
                 for (; i < all_video_userid_list_.size() && i < page_size_; i++) {
                     const TUIUserInfo* user = TUIRoomCore::GetInstance()->GetUserInfo(all_video_userid_list_.at(i));
@@ -380,7 +387,6 @@ void StageListController::InsertUser(const TUIUserInfo& user_info, bool is_scree
         }
         connect(video_view, &VideoRenderView::SignalShowVideoOnMainScreen, this, &StageListController::SlotShowVideoOnMainScreen);
         current_page_video_view_list_.push_back(video_view);
-
         video_view->UpdateUserInfo(user_info);
 
         for (int i = 0; i < current_page_video_view_list_.size(); i++) {
@@ -536,9 +542,9 @@ void StageListController::ShowNextPage() {
 void StageListController::ClearCurrentPageVideoView() {
     auto it = current_page_video_view_list_.begin();
     for (; it != current_page_video_view_list_.end(); ++it) {
-            (*it)->StopPreview();
-            stage_layout_->removeWidget(*it);
-            delete (*it);
+        (*it)->StopPreview();
+        stage_layout_->removeWidget(*it);
+        delete (*it);
     }
     current_page_video_view_list_.clear();
 }
@@ -605,7 +611,7 @@ void StageListController::SlotOnRemoteUserAudioOpen(const QString& user_id, bool
 }
 
 void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id, bool available) {
-    LINFO("SlotOnRemoteUserScreenVideoOpen, user_id：%s, available : %d", user_id.toStdString().c_str(), available);
+    LINFO("SlotOnRemoteUserScreenVideoOpen, user_id : %s, available : %d", user_id.toStdString().c_str(), available);
     auto user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id.toStdString());
     if (user_info == nullptr) {
         return;
@@ -623,6 +629,7 @@ void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id
                     all_video_userid_list_.push_front(user_id.toStdString());
 
                     // 麦上列表的排列顺序发生改变，此时先停止当前页的拉流
+                    // The order of the mic-on list changed. Stop the stream pull on the current page first
                     for (int i = 0; i < current_page_video_view_list_.size(); i++) {
                         VideoRenderView* item = current_page_video_view_list_.at(i);
                         item->StopCurrentVideo();
@@ -639,6 +646,7 @@ void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id
                 all_video_userid_list_.insert(insert_index + 1, user_id.toStdString());
 
                 // 麦上列表的排列顺序发生改变，此时先停止当前页的拉流
+                // The order of the mic-on list changed. Stop the stream pull on the current page first
                 for (int i = 0; i < current_page_video_view_list_.size(); i++) {
                     VideoRenderView* item = current_page_video_view_list_.at(i);
                     item->StopCurrentVideo();
@@ -652,6 +660,7 @@ void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id
             all_video_userid_list_.push_front(user_id.toStdString());
 
             // 麦上列表的排列顺序发生改变，此时先停止当前页的拉流
+            // The order of the mic-on list changed. Stop the stream pull on the current page first
             for (int i = 0; i < current_page_video_view_list_.size(); i++) {
                 VideoRenderView* item = current_page_video_view_list_.at(i);
                 item->StopCurrentVideo();
@@ -683,6 +692,7 @@ void StageListController::SlotOnRemoteUserExitSpeechState(const QString& user_id
 
 void StageListController::SlotShowVideoOnMainScreen(const std::string user_id, bool is_screen_share_window) {
     // 从麦上列表移出被双击的用户（该用户肯定是正在显示的用户）
+    // Move the double-clicked user from the mic-on list (the user is being displayed)
     LINFO("User ShowVideoOnMainScreen, user_id：%s, is_screen_share_window : %d", user_id.c_str(), is_screen_share_window);
     main_window_view_->StopCurrentVideo();
     main_window_view_->ResetBackgroundImage();
@@ -696,10 +706,8 @@ void StageListController::SlotShowVideoOnMainScreen(const std::string user_id, b
 
     std::string current_main_window_user = DataStore::Instance()->GetCurrentMainWindowUser();
     if (is_screen_share_window) {
-        // 双击的是屏幕分享
         all_screen_share_userid_list_.removeOne(user_id);
     } else {
-        // 双击的是视频
         all_video_userid_list_.removeOne(user_id);
     }
 
@@ -738,6 +746,7 @@ void StageListController::SlotShowVideoOnMainScreen(const std::string user_id, b
     UpdateCurrentVideoPage();
     ChangeButtonsStatus();
     // 将其视频显示到主窗口
+    // Display the video in the main window
     const TUIUserInfo* user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id);
     if (user_info == nullptr)
         return;
@@ -763,6 +772,7 @@ void StageListController::SlotRemoveVideoFromMainScreen(const std::string user_i
     }
     if (!all_screen_share_userid_list_.empty()) {
         // 如果有人在屏幕分享，则显示在主窗口
+        // Display the shared screen in the main window
         LINFO("User Show Screen Share On Main Screen, user_id：%s", all_screen_share_userid_list_[0].c_str());
         SlotShowVideoOnMainScreen(all_screen_share_userid_list_[0], true);
     } else {

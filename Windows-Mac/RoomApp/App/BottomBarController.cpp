@@ -11,6 +11,14 @@
 #include "MessageDispatcher/MessageDispatcher.h"
 #include "log.h"
 
+#ifdef __APPLE__
+#include <libproc.h>
+
+#import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
+#import <Cocoa/Cocoa.h>
+#endif
+
 BottomBarController::BottomBarController(QWidget* parent)
     : QWidget(parent)
     , view_dragger_(this)
@@ -183,7 +191,6 @@ void BottomBarController::InitCameraDeviceItem() {
 
     if (pMenu_camera_ == NULL) {
         pMenu_camera_ = new QMenu(this);
-        // 设置圆角要用到的参数
         pMenu_camera_->setWindowFlag(Qt::FramelessWindowHint);
         pMenu_camera_->setAttribute(Qt::WA_TranslucentBackground);
         TUIRoomCore::GetInstance()->GetScreenShareManager()->AddExcludedShareWindow((void*)pMenu_camera_->winId());
@@ -225,7 +232,6 @@ void BottomBarController::ClearCameraMenu() {
     }
 }
 void BottomBarController::InitAudioDeviceItem() {
-    // 扬声器 
     liteav::ITRTCDeviceInfo* activeSpeaker = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeSpeaker);
     liteav::ITXDeviceCollection* speaker_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeSpeaker);
     if (speaker_list != nullptr) {
@@ -253,7 +259,6 @@ void BottomBarController::InitAudioDeviceItem() {
     }
     activeSpeaker->release();
 
-    // 麦克风 
     liteav::ITRTCDeviceInfo* activeMic = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeMic);
     liteav::ITXDeviceCollection* microphone_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeMic);
     if (microphone_list != nullptr) {
@@ -289,7 +294,6 @@ void BottomBarController::InitAudioDeviceItem() {
 
     if (pMenu_audio_ == NULL) {
         pMenu_audio_ = new QMenu(this);
-        // 设置圆角要用到的参数
         pMenu_audio_->setWindowFlag(Qt::FramelessWindowHint);
         pMenu_audio_->setAttribute(Qt::WA_TranslucentBackground);
         TUIRoomCore::GetInstance()->GetScreenShareManager()->AddExcludedShareWindow((void*)pMenu_audio_->winId());
@@ -344,7 +348,6 @@ void BottomBarController::SetShareScreenStyle(bool is_sharing_screen) {
         ui.widget_share_button->SetText(tr("NewShare"));
         ui.btn_end->setText(tr("end share"));
         ui.horizontalLayout_2->setContentsMargins(0, 5, 0, 5);
-        //隐藏与置顶逻辑
         ShowTopWidget();
     } else {
         ui.widget_share_button->SetText(tr("Share"));
@@ -466,6 +469,18 @@ void BottomBarController::OnStartScreenShare(bool checked) {
         SIZE thumb_size{ kShareItemWidth - kShareItemMargin, kShareItemHeight - kShareItemMargin };
         SIZE icon_size{ kShareIconWidth, kShareIconHeight };
 #else
+        bool is_screen_record_authorized = IsScreenRecordAuthorized();
+        if (!is_screen_record_authorized) {
+            this->hide();
+            ui.widget_share_button->SetChecked(false);
+            this->show();
+
+            // "提示":"需要开启系统录屏权限，才能分享屏幕"
+            // "Tip ":" You need to enable system recording permission to share the screen"
+            RequestScreenRecordAccess(tr("Warning"), tr("You need to enable the system screen recording permission to share the screen"));
+            return;
+        }
+
         liteav::SIZE thumb_size;
         thumb_size.width = kShareItemWidth - kShareItemMargin;
         thumb_size.height = kShareItemHeight - kShareItemMargin;
@@ -509,9 +524,61 @@ void BottomBarController::OnStartScreenShare(bool checked) {
         emit SignalStartScreen(false);
     }
 }
+#ifdef __APPLE__
+bool BottomBarController::IsScreenRecordAuthorized() {
+    // Mac10.15及以上才有屏幕录制授权
+    // Mac10.15 and above are required for screen recording authorization
+    if (@available(macos 10.15, *)) {
+        bool bRet = false;
+        CFArrayRef list = CGWindowListCopyWindowInfo(kCGWindowListOptionAll, kCGNullWindowID);
+        if (list) {
+            int n = (int)(CFArrayGetCount(list));
+            for (int i = 0; i < n; i++) {
+                NSDictionary* info = (NSDictionary*)(CFArrayGetValueAtIndex(list, (CFIndex)i));
+                NSString* name = info[(id)kCGWindowName];
+                NSNumber* pid = info[(id)kCGWindowOwnerPID];
+                if (pid != nil && name != nil) {
+                    int nPid = [pid intValue];
+                    char path[PROC_PIDPATHINFO_MAXSIZE + 1];
+                    int lenPath = proc_pidpath(nPid, path, PROC_PIDPATHINFO_MAXSIZE);
+                    if (lenPath > 0) {
+                        path[lenPath] = 0;
+                        if (strcmp(path, "/System/Library/CoreServices/SystemUIServer.app/Contents/MacOS/SystemUIServer") == 0) {
+                            bRet = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            CFRelease(list);
+        }
+        return bRet;
+    } else {
+        return true;
+    }
+}
+void BottomBarController::RequestScreenRecordAccess(QString title, QString message) {
+    // "前往系统设置" 和 "取消" 按钮
+    // "Go to System Settings" and "Cancel" buttons
+    QString btn_go = tr("Go to system settings");
+    QString btn_cancel = tr("cancel");
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:title.toNSString()];
+    [alert setInformativeText:message.toNSString()];
+    [alert addButtonWithTitle:btn_go.toNSString()];
+    [alert addButtonWithTitle:btn_cancel.toNSString()];
+    [alert setAlertStyle:NSAlertStyleWarning];
+    NSWindow *window = [NSApplication sharedApplication].keyWindow;
+    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+        if (returnCode == NSAlertFirstButtonReturn) {
+            NSURL *URL = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"];
+            [[NSWorkspace sharedWorkspace] openURL:URL];
+        }
+    }];
+}
+#endif
 void BottomBarController::OnConfirmShareScreen(bool share) {
     if (!share || !screen_shower_id_.empty()) {
-        //取消分享
         if (!is_sharing_screen_) {
             this->hide();
             ui.widget_share_button->SetChecked(false);
@@ -637,7 +704,7 @@ void BottomBarController::OnAudioSetClicked(bool checked) {
     QPoint btm_menu_pos = this->mapToGlobal(QPoint(0, 0));
     QPoint audio_set_pos = ui.widget_audio_button->mapToGlobal(QPoint(0, 0));
     int x = audio_set_pos.x() + ui.widget_audio_button->width() / 2;
-    // 位置算法：BottomBarController.pos - QCheckBox.size * 40 - QLabel.size * 20 - menu.item * 40 - margin * 2 - spaceline * 10
+    // Position algorithm：BottomBarController.pos - QCheckBox.size * 40 - QLabel.size * 20 - menu.item * 40 - margin * 2 - spaceline * 10
     int y = btm_menu_pos.y() - (pAction_microphone_list_.size() + pAction_speaker_list_.size()) * 40 - 20 * 2 - 40 - 10 * 2 - 15;
     if (y < 0)
         y = btm_menu_pos.y() + this->height();
@@ -682,14 +749,12 @@ void BottomBarController::OnScreenShareSetClicked(bool checked) {
             QMenu::item:selected{ background-color: #2dabf9; }\
             QMenu::icon{width: 25px;height: 25px;}";
         pMenu_share_->setStyleSheet(style);
-        // 设置圆角要用到的参数
         pMenu_share_->setWindowFlag(Qt::FramelessWindowHint);
         pMenu_share_->setAttribute(Qt::WA_TranslucentBackground);
         TUIRoomCore::GetInstance()->GetScreenShareManager()->AddExcludedShareWindow((void*)pMenu_share_->winId());
     }
     if (pAction_share_screen_ == NULL) {
         pAction_share_screen_ = new QAction(tr("screen share"));
-        //pAction_share_screen_->setIcon(QIcon(":/BottomBarController/BottomBarController/share_menu.png"));
         connect(pAction_share_screen_, SIGNAL(triggered()), this, SLOT(OnScreenShareMenuTriggered()));
         pMenu_share_->addAction(pAction_share_screen_);
     }
@@ -734,11 +799,12 @@ void BottomBarController::SetChatRoomBtnStatus(bool show) {
 }
 
 void BottomBarController::SlotScreenCaptureStopped(int reason) {
-    bool is_sharing = ui.widget_share_button->isChecked();
-    ui.widget_share_button->SetChecked(!is_sharing);
-    OnStartScreenShare(false);
-
     if (0 != reason && this->isVisible()) {
+        bool is_sharing = ui.widget_share_button->isChecked();
+        ui.widget_share_button->SetChecked(!is_sharing);
+        if (reason != 0) {
+            OnStartScreenShare(false);
+        }
         TXMessageBox::Instance().AddLineTextMessage(tr("Screen Capture Stopped."));
     }
 }

@@ -124,8 +124,6 @@ FILE* Log::_CreateFile() {
 }
 
 std::string Log::_GetShortFuncName(const std::string& function_name) {
-    // 只包含类名和函数名
-
     if (function_name.size() <= 2) {
         return function_name;
     }
