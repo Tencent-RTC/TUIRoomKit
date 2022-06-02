@@ -43,9 +43,6 @@ import java.util.Set;
 public class IMService {
     private static final String TAG = "TuiIMService";
 
-    /**
-     * 超时时间，单位秒
-     */
     private static final int    CODE_SUCCESS         = 0;
     private static final int    CODE_ERROR           = -1;
     public static final  int    TIME_OUT_COUNT_LONG  = 30;
@@ -129,7 +126,6 @@ public class IMService {
 
     public void createRoom(final String roomId, final TUIRoomCoreDef.SpeechMode speechMode, final String roomName,
                            final TUIRoomCoreCallback.ActionCallback callback) {
-        // 如果已经在一个房间了，则不允许再次进入
         if (isEnterRoom()) {
             TRTCLogger.e(TAG, "you have been in room:" + mRoomId + " can't create another room:" + roomId);
             if (callback != null) {
@@ -145,7 +141,7 @@ public class IMService {
             }
             return;
         }
-        cleanStatus();
+        resetStatus();
         mRoomId = roomId;
         mRoomName = roomName;
         mSelfUserId = TUILogin.getUserId();
@@ -165,7 +161,7 @@ public class IMService {
                     msg = mContext.getString(R.string.tuiroom_group_member_limit);
                 }
                 if (code == 10025) {
-                    // 10025 表明群主是自己，那么认为创建房间成功
+                    // 10025 indicates that you are the group owner, and the room is created successfully.
                     getRoomNotification(roomId, new TUIRoomCoreCallback.ActionCallback() {
                         @Override
                         public void onCallback(int code, String msg) {
@@ -199,6 +195,7 @@ public class IMService {
             @Override
             public void onError(int i, String s) {
                 TRTCLogger.e(TAG, "destroy room fail, code:" + i + " msg:" + s);
+                resetStatus();
                 if (callback != null) {
                     callback.onCallback(i, s);
                 }
@@ -208,9 +205,7 @@ public class IMService {
             public void onSuccess() {
                 TRTCLogger.i(TAG, "destroyRoom remove GroupListener roomId: " + mRoomId
                         + " mGroupListener: " + mGroupListener.hashCode());
-                V2TIMManager.getInstance().removeSimpleMsgListener(mSimpleListener);
-                V2TIMManager.getInstance().removeGroupListener(mGroupListener);
-                cleanStatus();
+                resetStatus();
                 TRTCLogger.i(TAG, "destroy room success.");
                 if (callback != null) {
                     callback.onCallback(0, "destroy room success.");
@@ -219,14 +214,19 @@ public class IMService {
         });
     }
 
+    private void unInitImListener() {
+        V2TIMManager.getInstance().removeSimpleMsgListener(mSimpleListener);
+        V2TIMManager.getInstance().removeGroupListener(mGroupListener);
+    }
+
     public void enterRoom(final String roomId, final TUIRoomCoreCallback.ActionCallback callback) {
         TRTCLogger.i(TAG, "enterRoom");
-        cleanStatus();
+        resetStatus();
         mSelfUserId = TUILogin.getUserId();
         V2TIMManager.getInstance().joinGroup(roomId, "", new V2TIMCallback() {
             @Override
             public void onError(int i, String s) {
-                // 已经是群成员了，可以继续操作
+                // The user is already a group member.
                 if (i == 10013) {
                     onSuccess();
                 } else {
@@ -263,6 +263,7 @@ public class IMService {
                                         final String notification =
                                                 v2TIMGroupInfoResult.getGroupInfo().getNotification();
                                         TRTCLogger.i(TAG, "get group notification:" + notification);
+                                        mRoomId = v2TIMGroupInfoResult.getGroupInfo().getGroupID();
                                         mOwnerUserId = ownerUserId;
                                         mRoomName = groupName;
                                         mGroupNotificationData =
@@ -313,6 +314,7 @@ public class IMService {
             @Override
             public void onError(int i, String s) {
                 TRTCLogger.e(TAG, "exit room fail, code:" + i + " msg:" + s);
+                resetStatus();
                 if (callback != null) {
                     callback.onCallback(i, s);
                 }
@@ -321,10 +323,7 @@ public class IMService {
             @Override
             public void onSuccess() {
                 TRTCLogger.i(TAG, "exit room success.");
-                V2TIMManager.getInstance().removeSimpleMsgListener(mSimpleListener);
-                V2TIMManager.getInstance().removeGroupListener(mGroupListener);
-                cleanStatus();
-
+                resetStatus();
                 if (callback != null) {
                     callback.onCallback(0, "exit room success.");
                 }
@@ -1088,7 +1087,7 @@ public class IMService {
     }
 
     private void sendGroupInvite(final String cmd, String groupId, Set<String> inviteeList, String data, int timeout,
-                                   final TUIRoomCoreCallback.ActionCallback callback) {
+                                 final TUIRoomCoreCallback.ActionCallback callback) {
         TRTCLogger.i(TAG, String.format("sendGroupInvite, groupId=%s, inviteeList=%s, data=%s", groupId,
                 Arrays.toString(inviteeList.toArray()), data));
         final CmdInvitation cmdInvitation = new CmdInvitation();
@@ -1445,7 +1444,7 @@ public class IMService {
         }
     }
 
-    private void cleanStatus() {
+    private void resetStatus() {
         mIsEnterRoom = false;
         mInvitationIdMap.clear();
         mUserInfoList.clear();
@@ -1459,6 +1458,7 @@ public class IMService {
         mRoomName = "";
         mSelfUserId = "";
         mOwnerUserId = "";
+        unInitImListener();
     }
 
     private class RoomSimpleMsgListener extends V2TIMSimpleMsgListener {
@@ -1528,21 +1528,16 @@ public class IMService {
         @Override
         public void onGroupDismissed(String groupID, V2TIMGroupMemberInfo opUser) {
             TRTCLogger.i(TAG, "receive room destroy msg");
-            // 这里房主 IM 也会收到消息，但是由于我在 destroyGroup 成功的时候，把消息监听移除了，所以房主是不会走到这里的
-            // 因此不需要做逻辑拦截。
-
-            // 如果发现房间已经解散，那么内部退一次房间
             exitRoom(new TUIRoomCoreCallback.ActionCallback() {
                 @Override
                 public void onCallback(int code, String msg) {
                     TRTCLogger.i(TAG, "recv room destroy msg, exit room inner, code:" + code + " msg:" + msg);
-                    // 无论结果是否成功，都清空状态，并且回调出去
                     String roomId = mRoomId;
-                    cleanStatus();
                     ImServiceListener delegate = mListener;
                     if (delegate != null) {
                         delegate.onRoomDestroy(roomId);
                     }
+                    resetStatus();
                 }
             });
         }

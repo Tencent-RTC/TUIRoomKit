@@ -14,10 +14,10 @@
 
     <com.tencent.liteav.tuiroom.ui.widget.page.CircleIndicator
         android:id="@+id/simple_view"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="75dp"
         android:layout_width="match_parent"
-        android:layout_height="20dp" />
+        android:layout_height="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="75dp" />
 
     <LinearLayout
         android:id="@+id/multi_conversation"

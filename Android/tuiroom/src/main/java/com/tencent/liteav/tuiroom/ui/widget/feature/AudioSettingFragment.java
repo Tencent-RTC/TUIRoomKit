@@ -25,9 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 音频相关的设置页
- */
 public class AudioSettingFragment extends BaseSettingFragment {
     private LinearLayout          mContentItem;
     private List<BaseSettingItem> mSettingItemList;
@@ -92,7 +89,6 @@ public class AudioSettingFragment extends BaseSettingFragment {
             @Override
             public void onSwitchChecked(boolean isChecked) {
                 if (isChecked) {
-                    // 这里开始录制进行操作
                     if (!mFeatureConfig.isRecording()) {
                         mFeatureConfig.setRecording(true);
                         createFile(mRecordFilePath);
@@ -102,7 +98,6 @@ public class AudioSettingFragment extends BaseSettingFragment {
                         ToastUtils.showShort(getString(R.string.tuiroom_btn_start_recording));
                     }
                 } else {
-                    // 这里停止录制进行操作
                     if (mFeatureConfig.isRecording()) {
                         mTUIRoomCore.stopFileDumping();
                         mFeatureConfig.setRecording(false);
@@ -121,7 +116,6 @@ public class AudioSettingFragment extends BaseSettingFragment {
         mSettingItemList.add(mRecordItem);
         updateItem();
 
-        // 将这些view添加到对应的容器中
         for (BaseSettingItem item : mSettingItemList) {
             View view = item.getView();
             view.setPadding(0, SizeUtils.dp2px(12), 0, SizeUtils.dp2px(12));
@@ -145,7 +139,6 @@ public class AudioSettingFragment extends BaseSettingFragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 这里开始录制进行操作
                 if (!mFeatureConfig.isRecording()) {
                     mFeatureConfig.setRecording(true);
                     createFile(mRecordFilePath);

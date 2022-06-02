@@ -10,9 +10,6 @@ import androidx.annotation.NonNull;
 import com.tencent.liteav.tuiroom.R;
 import com.tencent.liteav.tuiroom.model.impl.base.TRTCLogger;
 
-/**
- * 带seekbar的item
- */
 public class SeekBarSettingItem extends BaseSettingItem {
     private static final String TAG = SeekBarSettingItem.class.getName();
 

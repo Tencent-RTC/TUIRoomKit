@@ -2,43 +2,45 @@ package com.tencent.liteav.tuiroom.model;
 
 public class TUIRoomCoreDef {
     /**
-     * 发言模式
+     * Speech mode
      */
     public enum SpeechMode {
-        FREE_SPEECH, // 自由发言模式，成员进入房间后以主播身份进入TRTC房间
-        APPLY_SPEECH // 申请发言模式，成员进入房间后以听众身份进入TRTC房间，申请发言成功后以主播身份进入TRTC房间
+        FREE_SPEECH, // Free speech mode: Members enter a TRTC room as an anchor
+        APPLY_SPEECH // Mic-on request mode: Members enter a TRTC room as listeners and can become anchors after
+        // requesting to speak
     }
 
     /**
-     * 角色类型
+     * Role type
      */
     public enum Role {
-        MASTER,  // 主持人，具有房间麦控管理能力，聊天能力和音视频能力
-        MANAGER, // 管理员，不具有音视频能力，具有群管理能力，无转交群能力。
-        ANCHOR,  // 主播，有聊天能力和音视频能力
-        AUDIENCE // 观众，仅有聊天能力
+        MASTER,  // Host: Has room mic control, chat, and audio/video capabilities
+        MANAGER, // Admin: Has audio/video and group management capabilities but has no group ownership transfer
+        // capabilities
+        ANCHOR,  // Anchor: Has chat and audio/video capabilities
+        AUDIENCE // Audience: Has only chat capabilities
     }
 
     /**
-     * 发言模式
+     * Speech mode
      */
     public enum SteamType {
-        CAMERA, // 主画面视频流
-        SCREE   // 屏幕分享流
+        CAMERA, // Primary video stream
+        SCREE   // Screen sharing stream
     }
 
     public static class RoomInfo {
-        public String     roomId;       //房间ID
-        public String     ownerId;     // 群拥有者ID
-        public String     roomName;    // 房间名
-        public SpeechMode speechMode;  // 发言模式
-        public long       startTime;   // 开始时间
-        public int        roomMemberNum;     // 成员个数
-        public boolean    isChatRoomMuted;   // 聊天室是否可以发消息
-        public boolean    isSpeechForbidden; // 是否禁止发言
-        public boolean    isAllCameraMuted;  // 是否全体禁视频
-        public boolean    isAllMicMuted;     // 是否全体禁麦克风
-        public boolean    isCallingRoll;     // 是否正在点名
+        public String     roomId;       // Room ID
+        public String     ownerId;     // Group owner ID
+        public String     roomName;    // Room name
+        public SpeechMode speechMode;  // Speech mode
+        public long       startTime;   // Start time
+        public int        roomMemberNum;     // Number of members
+        public boolean    isChatRoomMuted;   // Whether messages can be sent in the chat room
+        public boolean    isSpeechForbidden; // Whether speech is disabled
+        public boolean    isAllCameraMuted;  // Whether the video of all members is disabled
+        public boolean    isAllMicMuted;     // Whether the mic of all members is disabled
+        public boolean    isCallingRoll;     // Whether a roll call is ongoing
 
         @Override
         public String toString() {
@@ -59,13 +61,13 @@ public class TUIRoomCoreDef {
     }
 
     public static class UserInfo {
-        public String  userId;               // 用户ID
-        public String  userName;             // 用户名
-        public String  userAvatar;           // 用户头像url
-        public Role    role = Role.AUDIENCE; // 用户角色
-        public boolean isVideoAvailable;     // 用户是否打开了视频
-        public boolean isAudioAvailable;     // 用户是否打开音频
-        public boolean isSharingScreen;      // 是否在分享屏幕
+        public String  userId;               // User ID
+        public String  userName;             // Username
+        public String  userAvatar;           // User profile photo URL
+        public Role    role = Role.AUDIENCE; // User role
+        public boolean isVideoAvailable;     // Whether the user's video is enabled
+        public boolean isAudioAvailable;     // Whether the user's audio is enabled
+        public boolean isSharingScreen;      // Whether the screen is being shared
 
         @Override
         public String toString() {

@@ -16,11 +16,6 @@ import com.tencent.liteav.tuiroom.R;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 带tab的用户设置页基类
- * {@link BaseTabSettingFragmentDialog#getTitleList()} 和 {@link BaseTabSettingFragmentDialog#getFragments()}
- * 这两个返回的顺序在界面中是一一对应的，比如title list是 {"视频","音频"} 那fragment 应该是 {videofragment, audiofragment}
- */
 public abstract class BaseTabSettingFragmentDialog extends BaseSettingFragmentDialog {
     private TabLayout      mTopTl;
     private ViewPager      mContentVp;
@@ -80,14 +75,7 @@ public abstract class BaseTabSettingFragmentDialog extends BaseSettingFragmentDi
         mContentVp = (ViewPager) itemView.findViewById(R.id.vp_content);
     }
 
-    /**
-     * @return 这里返回对应的fragment
-     */
     protected abstract List<Fragment> getFragments();
 
-
-    /**
-     * @return 这里返回对应的标题列表
-     */
     protected abstract List<String> getTitleList();
 }

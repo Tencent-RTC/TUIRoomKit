@@ -7,229 +7,233 @@ import java.util.List;
 
 public interface TUIRoomCoreListener {
     /**
-     * 组件出错错误事件回调
+     * Callback for component error event
      *
-     * @param code    错误码
-     * @param message 错误内容
+     * @param code    Error code
+     * @param message Error content
      */
     void onError(int code, String message);
 
     /**
-     * 房间被销毁的回调，主持人退房时，房间内的所有用户都会收到此通知
+     * Callback for room termination. When the host leaves the room, all users in the room will receive this callback
      */
     void onDestroyRoom();
 
     /**
-     * 用户音量大小回调通知
+     * Callback for user volume level
      *
-     * @param userId 本地或远端的用户标识。
-     * @param volume 用户的音量大小，取值范围 0 - 100。
+     * @param userId Local or remote user ID
+     * @param volume User volume level. Value range: 0–100
      */
     void onUserVoiceVolume(String userId, int volume);
 
     /**
-     * 主持人更改回调
+     * The host was changed.
      *
-     * @param previousUserId 更改前的主持人
-     * @param currentUserId  更改后的主持人
+     * @param previousUserId Original host
+     * @param currentUserId  New host
      */
     void onRoomMasterChanged(String previousUserId, String currentUserId);
 
     /**
-     * 远端用户进入房间回调
+     * A remote user entered the room.
      *
-     * @param userId 新进房成员 ID
+     * @param userId User ID of new member
      */
     void onRemoteUserEnter(String userId);
 
     /**
-     * 远端用户离开房间回调
+     * A remote user exited the room.
      *
-     * @param userId 退房成员 ID
+     * @param userId User ID of exiting member
      */
     void onRemoteUserLeave(String userId);
 
     /**
-     * 远端用户是否开启摄像头视频回调
+     * Whether a remote user is sending video data.
      *
-     * @param userId    用户信息
-     * @param available 是否有视频数据
+     * @param userId    User ID
+     * @param available Whether video data is available
      */
     void onRemoteUserCameraAvailable(String userId, boolean available);
 
     /**
-     * 成员 开启/关闭 视频分享的通知
+     * A user enabled/disabled screen sharing.
      *
-     * @param userId    用户ID
-     * @param available 是否有屏幕分享流数据
+     * @param userId    User ID
+     * @param available Whether screen sharing data is available
      */
     void onRemoteUserScreenVideoAvailable(String userId, boolean available);
 
     /**
-     * 远端用户是否开启音频上行回调
+     * Whether a remote user is sending audio.
      *
-     * @param userId    用户ID
-     * @param available 是否有音频数据
+     * @param userId    User ID
+     * @param available Whether audio data is available
      */
     void onRemoteUserAudioAvailable(String userId, boolean available);
 
     /**
-     * 远端用户开始发言回调
-     * 当您收到此通知时，表示该用户发言成功
+     * A remote user started speaking.
+     * This notification will be received if a user speaks.
      *
-     * @param userId 用户ID
+     * @param userId User ID
      */
     void onRemoteUserEnterSpeechState(String userId);
 
     /**
-     * 远端用户结束发言回调
-     * 当您收到此通知时，表示该用户下麦成功
+     * A remote user stopped speaking.
+     * This notification will be received after a user stops speaking.
      *
-     * @param userId 用户ID
+     * @param userId User ID
      */
     void onRemoteUserExitSpeechState(String userId);
 
     /**
-     * 收到文本消息回调
+     * A text chat message was received.
      *
-     * @param userId  用户ID
-     * @param message 文本消息
+     * @param userId  User ID
+     * @param message Text chat message
      */
     void onReceiveChatMessage(String userId, String message);
 
     /**
-     * 收到自定义消息回调
+     * A custom message was received.
      *
-     * @param userId 用户ID
-     * @param data   自定义消息内容
+     * @param userId User ID
+     * @param data   Custom message content
      */
     void onReceiveRoomCustomMsg(String userId, String data);
 
     /**
-     * 用户收到主持人发言邀请回调
-     * 主持人调用sendSpeechInvitation接口邀请用户发言后，用户收到的回调，用户需要进行发言
+     * A user received an invitation to speak from the host.
+     * The host called the `sendSpeechInvitation` API to invite the user to speak.
      *
-     * @param userId 主持人用户ID
+     * @param userId User ID of host
      */
     void onReceiveSpeechInvitation(String userId);
 
     /**
-     * 用户收到主持人取消发言邀请回调
-     * 主持人调用cancelSpeechInvitation接口取消邀请用户发言后，用户收到的回调
+     * The host canceled the mic-on invitation.
+     * The host called the `cancelSpeechInvitation` API to cancel the mic-on invitation sent to the user.
      *
-     * @param userId 主持人用户ID
+     * @param userId User ID of host
      */
     void onReceiveInvitationCancelled(String userId);
 
     /**
-     * 主持人收到用户发言申请的回调
-     * TUIRoomCoreDef.SpeechMode.APPLY_SPEECH，用户调用sendSpeechApplication接口向主持人申请发言时，
-     * 主持人收到的回调，主持人需要操作并调用agreeSpeechApplication接口对申请进行回应
+     * The host received a request to speak from a member.
+     * A user called the `sendSpeechApplication` API to request to speak in `TUIRoomCoreDef.SpeechMode.APPLY_SPEECH` 
+     * mode.
+     * The host needs to process the request and call the `agreeSpeechApplication` API to respond to the request.
      *
-     * @param userId 用户ID
+     * @param userId User ID
      */
     void onReceiveSpeechApplication(String userId);
 
     /**
-     * 用户取消申请发言回调
-     * TUIRoomCoreDef.SpeechMode.APPLY_SPEECH，用户调用cancelApplication接口取消申请发言时，主持人收到的回调
+     * A user canceled a request to speak.
+     * A user called the `cancelApplication` API to cancel their request to speak in `TUIRoomCoreDef.SpeechMode
+     * .APPLY_SPEECH` mode.
      *
-     * @param userId 用户ID
+     * @param userId User ID
      */
     void onSpeechApplicationCancelled(String userId);
 
     /**
-     * 主持人禁止申请发言回调
+     * The host disabled requests to speak.
      *
-     * @param isForbidden true,发言申请被禁用, false 可以申请发言
+     * @param isForbidden true: Users cannot request to speak; false: Requests to speak are enabled.
      */
     void onSpeechApplicationForbidden(boolean isForbidden);
 
     /**
-     * 成员被请求停止发言的回调
-     * 主持人调用sendOffSpeaker接口请求用户停止发言后，用户收到的回调，用户需要停止发言
+     * A member was asked to stop speaking.
+     * The host called the `sendOffSpeaker` API to request the user to stop speaking.
      *
-     * @param userId 主持人用户ID
+     * @param userId User ID of host
      */
     void onOrderedToExitSpeechState(String userId);
 
     /**
-     * 主持人开始点名，成员收到的回调
+     * The host started a roll call.
      *
-     * @param userId 主持人用户ID
+     * @param userId User ID of host
      */
     void onCallingRollStarted(String userId);
 
     /**
-     * 主持人结束点名，成员收到的回调
+     * The anchor ended a roll call.
      *
-     * @param userId 主持人用户ID
+     * @param userId User ID of host
      */
     void onCallingRollStopped(String userId);
 
     /**
-     * 成员回复点名，主持人收到的回调
+     * A user replied to a roll call.
      *
-     * @param userId 用户id
+     * @param userId User ID
      */
     void onMemberReplyCallingRoll(String userId);
 
     /**
-     * 主持人更改聊天室是否禁言回调
+     * The host muted/unmuted the room
      *
-     * @param muted true,聊天室不可以发消息  false聊天室可以发消息
+     * @param muted true: No messages can be sent in the chat room; false: Messages can be sent in the chat room
      */
     void onChatRoomMuted(boolean muted);
 
     /**
-     * 主持人设置禁用麦克风回调
+     * The host disabled the mic
      *
-     * @param muted true,用户麦克风被禁用  false用户麦克风打开
+     * @param muted true: The user's mic is disabled; false: The user's mic is enabled
      */
     void onMicrophoneMuted(boolean muted);
 
     /**
-     * 主持人设置禁用摄像头回调
+     * The host disabled the camera
      *
-     * @param muted true,用户摄像头被禁用  false用户摄像头打开
+     * @param muted true: The user's camera is disabled; false: The user's camera is enabled
      */
     void onCameraMuted(boolean muted);
 
     /**
-     * 主持人踢人的回调，主持人/管理员 调用kickOffUser，用户接收到踢人事件的回调
+     * Callback for user removed by host. The user will receive this callback after the host/admin calls `kickOffUser`.
      *
-     * @param userId 主持人/管理员 用户ID
+     * @param userId Host/Admin user ID
      */
     void onReceiveKickedOff(String userId);
 
     /**
-     * 技术指标统计回调
+     * Callback for technical metric statistics
+     * 
+     * If you are familiar with audio/video terms, you can use this callback to get all technical metrics of the SDK.
+     * If you are developing an audio/video project for the first time, you can focus only on the `onNetworkQuality` 
+     * callback, which is triggered once every two seconds.
      *
-     * 如果您是熟悉音视频领域相关术语，可以通过这个回调获取 SDK 的所有技术指标。
-     * 如果您是首次开发音视频相关项目，可以只关注 onNetworkQuality 回调，每2秒回调一次。
-     *
-     * @param statistics 统计数据，包括本地和远程的
+     * @param statistics Statistics of local and remote users
      */
     void onStatistics(TRTCStatistics statistics);
 
     /**
-     * 网络质量回调
+     * Callback for network quality
      *
-     * @param localQuality  上行网络质量
-     * @param remoteQuality 下行网络质量
+     * @param localQuality  Upstream network quality
+     * @param remoteQuality Downstream network quality
      */
 
     void onNetworkQuality(TRTCCloudDef.TRTCQuality localQuality, List<TRTCCloudDef.TRTCQuality> remoteQuality);
 
     /**
-     * 开始屏幕分享回调
+     * Screen sharing started
      */
     void onScreenCaptureStarted();
 
     /**
-     * 停止屏幕分享回调
+     * Screen sharing stopped
      *
-     * @param reason 停止原因，0：用户主动停止；1：被其他应用抢占导致停止
+     * @param reason Reason for stop. 0: The user stopped screen sharing; 1: Screen sharing stopped due to preemption
+     *              by another application
      */
     void onScreenCaptureStopped(int reason);
 }

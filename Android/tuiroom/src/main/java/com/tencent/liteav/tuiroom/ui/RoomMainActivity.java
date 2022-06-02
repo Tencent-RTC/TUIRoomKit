@@ -26,6 +26,7 @@ import com.blankj.utilcode.util.PermissionUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.tencent.liteav.basic.UserModel;
 import com.tencent.liteav.basic.UserModelManager;
+import com.tencent.liteav.debug.BuildConfig;
 import com.tencent.liteav.tuiroom.R;
 import com.tencent.liteav.tuiroom.TUIRoomImpl;
 import com.tencent.liteav.tuiroom.model.TUIRoomCore;
@@ -73,7 +74,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     private int                       mRoomId;
     private String                    mUserId;
     private String                    mUserAvatar;
-    private boolean                   mIsCreateRoom; //是否是创建房间
+    private boolean                   mIsCreateRoom;
     private boolean                   mOpenCamera;
     private boolean                   mOpenAudio;
     private int                       mAudioQuality;
@@ -98,7 +99,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     private TUIBeautyView                mBeautyView;
     private ViewStub                     mStubRemoteUserView;
     private RemoteUserListView           mRemoteUserView;
-    private FeatureSettingFragmentDialog mFeatureSettingFragmentDialog; //更多设置面板
+    private FeatureSettingFragmentDialog mFeatureSettingFragmentDialog;
     private View                         mScreenCaptureGroup;
     private Group                        mBottomToolBarGroup;
     private TextView                     mStopScreenCaptureTv;
@@ -136,7 +137,6 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
-        // 应用运行时，保持不锁屏、全屏化
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         UserModelManager.getInstance().getUserModel().userType = UserModel.UserType.ROOM;
         StateBarUtils.setDarkStatusBar(this);
@@ -330,13 +330,11 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
 
     private void startCreateOrEnterRoom() {
         initRoomView();
-        //设置默认状态
         FeatureConfig.getInstance().setRecording(false);
         FeatureConfig.getInstance().setAudioVolumeEvaluation(true);
         mTUIRoomCore.setListener(this);
         mRoomHeadBarView.setTitle(getString(R.string.tuiroom_title_entering));
         createRoom();
-        // 根据外面传入的设置，选择是否打开相应的功能
         mTUIRoomCore.setAudioQuality(mAudioQuality);
         if (mOpenAudio) {
             mTUIRoomCore.startLocalAudio(mAudioQuality);
@@ -396,7 +394,6 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
                         onShareScreenClick();
                     }
                 });
-        // 设置界面UI
         mRoomHeadBarView.setTitle(String.valueOf(mRoomId));
         mRoomHeadBarView.setHeadBarCallback(new RoomHeadBarView.HeadBarCallback() {
             @Override
@@ -416,14 +413,21 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
             public void onExitClick() {
                 preExitRoom();
             }
+
+            @Override
+            public void onReportBtnClick() {
+                showReportDialog();
+            }
         });
         mScreenCaptureGroup = findViewById(R.id.group_screen_capture);
         mBottomToolBarGroup = (Group) findViewById(R.id.group_bottom_tool_bar);
         mStopScreenCaptureTv = (TextView) findViewById(R.id.tv_stop_screen_capture);
+        if (!mIsCreateRoom && BuildConfig.RTCube_APPSTORE) {
+            mRoomHeadBarView.showReportView(true);
+        }
     }
 
     private void initRoomView() {
-        //创建自己的 MemberEntity
         RoomVideoView roomVideoView = new RoomVideoView(this);
         roomVideoView.setSelfView(true);
         roomVideoView.setUserId(mUserId);
@@ -491,8 +495,26 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
 
     @Override
     public void onDestroyRoom() {
-        ToastUtils.showShort(getString(R.string.tuiroom_toast_end_room));
-        showSingleConfirmDialog(getString(R.string.tuiroom_room_room_destroyed));
+        Log.e(TAG, "onRoomDestroy");
+        if (mIsCreateRoom) {
+            mTUIRoomCore.destroyRoom(null);
+            if (!isFinishing()) {
+                showDestroyDialog();
+            }
+        } else {
+            ToastUtils.showShort(getString(R.string.tuiroom_toast_end_room));
+            showSingleConfirmDialog(getString(R.string.tuiroom_room_room_destroyed));
+        }
+    }
+
+    private void showDestroyDialog() {
+        try {
+            Class clz = Class.forName("com.tencent.liteav.privacy.util.RTCubeAppLegalUtils");
+            Method method = clz.getDeclaredMethod("showRoomDestroyTips", Context.class);
+            method.invoke(null, this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -814,15 +836,11 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         if (entity == null) {
             return;
         }
-        int oldQulity = entity.getQuality();
+        int oldQuality = entity.getQuality();
         switch (trtcQuality.quality) {
             case TRTCCloudDef.TRTC_QUALITY_Excellent:
             case TRTCCloudDef.TRTC_QUALITY_Good:
                 entity.setQuality(MemberEntity.QUALITY_GOOD);
-                break;
-            case TRTCCloudDef.TRTC_QUALITY_Poor:
-            case TRTCCloudDef.TRTC_QUALITY_Bad:
-                entity.setQuality(MemberEntity.QUALITY_NORMAL);
                 break;
             case TRTCCloudDef.TRTC_QUALITY_Vbad:
             case TRTCCloudDef.TRTC_QUALITY_Down:
@@ -832,7 +850,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
                 entity.setQuality(MemberEntity.QUALITY_NORMAL);
                 break;
         }
-        if (oldQulity != entity.getQuality()) {
+        if (oldQuality != entity.getQuality()) {
             mAnchorListView.notifyItemChanged(mMemberEntityList.indexOf(entity), MemberListAdapter.QUALITY);
         }
     }
@@ -862,7 +880,6 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
             qosParam.preference = TRTCCloudDef.TRTC_VIDEO_QOS_PREFERENCE_SMOOTH;
             mTUIRoomCore.setVideoQosPreference(qosParam);
             if (mMemberEntityList.size() < 5) {
-                // 包括自己，一共四个人，选择360p分辨率
                 mTUIRoomCore.setVideoResolution(TRTCCloudDef.TRTC_VIDEO_RESOLUTION_640_360);
                 mTUIRoomCore.setVideoFps(15);
                 mTUIRoomCore.setVideoBitrate(700);
@@ -942,8 +959,6 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
 
                             }
                         });
-
-
             }
             mAudioImg.setSelected(!isAudioOn);
             mOpenAudio = !isAudioOn;
@@ -1079,11 +1094,9 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         if (windowManager == null) {
             return;
         }
-        //TYPE_TOAST仅适用于4.4+系统，假如要支持更低版本使用TYPE_SYSTEM_ALERT(需要在manifest中声明权限)
-        //7.1（包含）及以上系统对TYPE_TOAST做了限制
         int type = WindowManager.LayoutParams.TYPE_TOAST;
         if (Build.VERSION.SDK_INT >= 26) {
-            type = 2038; // WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
             type = WindowManager.LayoutParams.TYPE_PHONE;
         }
@@ -1109,9 +1122,6 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         mFloatingWindow = null;
     }
 
-    /**
-     * 展示dialog界面
-     */
     private void showDialogFragment(DialogFragment dialogFragment, String tag) {
         if (dialogFragment != null) {
             if (dialogFragment.isVisible()) {
@@ -1131,7 +1141,6 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     private void initRemoteMemberView() {
         mRemoteUserView.init(mUserId, mIsCreateRoom);
         mRemoteUserView.setVisibility(View.GONE);
-        // 监听成员列表的变化
         mRemoteUserView.setRemoteUserListCallback(new RemoteUserListView.RemoteUserListCallback() {
             @Override
             public void onFinishClick() {
@@ -1258,9 +1267,6 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         mRemoteUserView.setRemoteUser(mMemberEntityList);
     }
 
-    /**
-     * 处理成员列表
-     */
     private void handleMemberListView() {
         if (mRemoteUserView.isShown()) {
             mRemoteUserView.setVisibility(View.GONE);
@@ -1288,12 +1294,6 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         return -1;
     }
 
-    /**
-     * 显示确认消息
-     *
-     * @param msg     消息内容
-     * @param isError true错误消息（必须退出） false提示消息（可选择是否退出）
-     */
     private void showExitInfoDialog(String msg, Boolean isError) {
         final ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment();
         dialogFragment.setCancelable(true);
@@ -1313,7 +1313,6 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
                     finish();
                 }
             });
-
             dialogFragment.setNegativeClickListener(new ConfirmDialogFragment.NegativeClickListener() {
                 @Override
                 public void onClick() {
@@ -1321,7 +1320,6 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
                 }
             });
         } else {
-            //当情况为错误的时候，直接停止推流
             dialogFragment.setPositiveText(getString(R.string.tuiroom_dialog_ok));
             dialogFragment.setPositiveClickListener(new ConfirmDialogFragment.PositiveClickListener() {
                 @Override
@@ -1409,6 +1407,16 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     protected void onPause() {
         super.onPause();
         mIsPaused = true;
+    }
+
+    private void showReportDialog() {
+        try {
+            Class clz = Class.forName("com.tencent.liteav.demo.report.ReportDialog");
+            Method method = clz.getDeclaredMethod("showReportDialog", Context.class, String.class);
+            method.invoke(null, this, String.valueOf(mRoomId));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private TUILoginListener mTUILoginListener = new TUILoginListener() {

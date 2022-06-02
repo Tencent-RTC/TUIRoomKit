@@ -8,11 +8,11 @@
 
     <TextView
         android:id="@+id/tv_message"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
         android:textColor="@color/tuiroom_color_black"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -70,6 +70,5 @@
             app:layout_constraintRight_toRightOf="@id/cl_button_panel" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -141,8 +141,8 @@ public class CreateRoomActivity extends AppCompatActivity {
     }
 
     private int getRoomId(String userId) {
-        // 这里我们用简单的 userId hashcode，然后取余
-        // 您的room id应该是您后台生成的唯一值
+        // Here, a simple `userId` hashcode is used. Get the remainder of the `userId` hashcode, and the unique value
+        // generated on the backend will be your room ID.
         return (userId + "_voice_room").hashCode() & 0x3B9AC9FF;
     }
 }

@@ -12,9 +12,6 @@ import androidx.fragment.app.DialogFragment;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.tencent.liteav.tuiroom.R;
 
-/**
- * 用户设置页的基类
- */
 public abstract class BaseSettingFragmentDialog extends BottomSheetDialogFragment {
     public static final String DATA = "data";
 
@@ -30,27 +27,12 @@ public abstract class BaseSettingFragmentDialog extends BottomSheetDialogFragmen
         return inflater.inflate(getLayoutId(), container, false);
     }
 
-    /**
-     * @return layout的resId
-     */
     protected abstract int getLayoutId();
 
-    /**
-     * 可以通过覆盖这个函数达到改变弹窗大小的效果
-     *
-     * @param dm DisplayMetrics
-     * @return 界面宽度
-     */
     protected int getWidth(DisplayMetrics dm) {
         return (int) (dm.widthPixels * 0.9);
     }
 
-    /**
-     * 可以通过覆盖这个函数达到改变弹窗大小的效果
-     *
-     * @param dm DisplayMetrics
-     * @return 界面高度
-     */
     protected int getHeight(DisplayMetrics dm) {
         return (int) (dm.heightPixels * 0.8);
     }

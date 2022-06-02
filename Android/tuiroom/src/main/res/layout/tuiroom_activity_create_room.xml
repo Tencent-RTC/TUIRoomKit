@@ -108,12 +108,12 @@
 
             <ImageButton
                 android:id="@+id/copy_room_id"
-                android:padding="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="2dp"
                 android:background="@null"
+                android:padding="10dp"
                 android:src="@drawable/tuiroom_ic_copy" />
 
         </LinearLayout>

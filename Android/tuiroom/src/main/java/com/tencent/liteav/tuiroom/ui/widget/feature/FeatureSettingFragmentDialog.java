@@ -15,13 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * 点击设置后弹出的dialog
- */
 public class FeatureSettingFragmentDialog extends BaseTabSettingFragmentDialog {
-    /**
-     * 控件布局相关
-     */
     private String[]                   mTitleList;
     private VideoSettingFragment       mVideoSettingFragment;
     private AudioSettingFragment       mAudioSettingFragment;

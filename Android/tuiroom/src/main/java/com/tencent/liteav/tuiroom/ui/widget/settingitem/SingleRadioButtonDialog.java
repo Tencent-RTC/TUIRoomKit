@@ -16,7 +16,7 @@ import com.tencent.liteav.tuiroom.R;
 import java.util.List;
 
 public class SingleRadioButtonDialog extends BottomSheetDialog {
-    private Context mContext;
+    private Context    mContext;
     private RadioGroup mRadioGroup;
     private TextView   mTitle;
 

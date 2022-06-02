@@ -63,10 +63,6 @@ public class RemoteUserListView extends ConstraintLayout {
         setOwner(mIsOwner);
     }
 
-
-    /**
-     * 防止界面点击被透传
-     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
@@ -219,7 +215,7 @@ public class RemoteUserListView extends ConstraintLayout {
             mRemoteUserListAdapter.setMemberList(mRemoteEntityList);
         }
     }
-    
+
     public void addRemoteUser(MemberEntity memberEntity) {
         if (memberEntity.getUserId().equals(mSelfUserId)) {
             return;
@@ -239,7 +235,7 @@ public class RemoteUserListView extends ConstraintLayout {
             mRemoteUserListAdapter.notifyDataSetChanged();
         }
     }
-    
+
     public void removeRemoteUser(String userId) {
         RemoteEntity remoteEntity = findRemoteEntity(userId);
         if (remoteEntity == null) {
@@ -300,7 +296,7 @@ public class RemoteUserListView extends ConstraintLayout {
         }
         return null;
     }
-    
+
     private RemoteEntity createRemoteUser(MemberEntity entity) {
         RemoteEntity remoteEntity = new RemoteEntity();
         remoteEntity.userId = entity.getUserId();
@@ -311,7 +307,7 @@ public class RemoteUserListView extends ConstraintLayout {
         remoteEntity.isMaster = entity.getRole() == TUIRoomCoreDef.Role.MASTER;
         return remoteEntity;
     }
-    
+
     public void setRemoteUserListCallback(RemoteUserListCallback remoteUserListCallback) {
         mRemoteUserListCallback = remoteUserListCallback;
     }

@@ -19,14 +19,8 @@ import com.tencent.trtc.TRTCCloudDef;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 视频设置页
- */
 public class VideoSettingFragment extends BaseSettingFragment {
     private static final String                TAG = VideoSettingFragment.class.getName();
-    /**
-     * 界面相关
-     */
     private              LinearLayout          mContentItem;
     private              List<BaseSettingItem> mSettingItemList;
     private              SelectionSettingItem  mResolutionItem;
@@ -44,7 +38,6 @@ public class VideoSettingFragment extends BaseSettingFragment {
         super.onCreate(savedInstanceState);
         initData();
     }
-
 
     private void initData() {
         boolean isVideoCall = mAppScene == TRTCCloudDef.TRTC_APP_SCENE_VIDEOCALL;
@@ -67,8 +60,9 @@ public class VideoSettingFragment extends BaseSettingFragment {
         mSettingItemList = new ArrayList<>();
         mFeatureConfig = FeatureConfig.getInstance();
         /**
-         * 界面中的码率会和选择的分辨率\帧率相关，在选择对应的分辨率之后，要设置对应的码率
-         * 所以要在一开始先初始化码率的item，不然会出现null的情况
+         * The bitrate on the UI is related to the selected resolution/bitrate. After selecting the resolution,
+         * the bitrate is set. Therefor, you should initialize the bitrate item first;
+         * otherwise,the value will be `null`.
          */
         BaseSettingItem.ItemText itemText = new BaseSettingItem.ItemText(getString(R.string.tuiroom_title_bitrate), "");
         mBitrateItem = new SeekBarSettingItem(getContext(), itemText, new SeekBarSettingItem.Listener() {
@@ -83,7 +77,6 @@ public class VideoSettingFragment extends BaseSettingFragment {
             }
         });
 
-        // 分辨率相关
         mCurRes = getResolutionPos(mFeatureConfig.getVideoResolution());
         itemText = new BaseSettingItem.ItemText(getString(R.string.tuiroom_title_resolution),
                 getResources().getStringArray(R.array.solution));
@@ -104,7 +97,6 @@ public class VideoSettingFragment extends BaseSettingFragment {
         mTUIRoomCore.setVideoResolution(getResolution(mCurRes));
         mSettingItemList.add(mResolutionItem);
 
-        //帧率
         itemText = new BaseSettingItem.ItemText(getString(R.string.tuiroom_title_frame_rate),
                 getResources().getStringArray(R.array.video_fps));
         mVideoFpsItem = new SelectionSettingItem(getContext(), itemText,
@@ -122,9 +114,6 @@ public class VideoSettingFragment extends BaseSettingFragment {
         mTUIRoomCore.setVideoFps(getFps(mVideoFpsItem.getSelected()));
         mSettingItemList.add(mVideoFpsItem);
 
-        /**
-         * 这里更新码率的界面并且加入到ItemList中
-         */
         updateSolution(mCurRes);
         mBitrateItem.setProgress(getBitrateProgress(mFeatureConfig.getVideoBitrate(), mCurRes));
         mBitrateItem.setTips(getBitrate(mFeatureConfig.getVideoBitrate(), mCurRes) + "kbps");
@@ -137,7 +126,6 @@ public class VideoSettingFragment extends BaseSettingFragment {
         mMirrorTypeItem = new SwitchSettingItem(getContext(), itemText, new SwitchSettingItem.Listener() {
             @Override
             public void onSwitchChecked(boolean isChecked) {
-                //设置本地
                 mFeatureConfig.setMirror(isChecked);
                 mTUIRoomCore.setVideoMirror(isChecked ? TRTCCloudDef.TRTC_VIDEO_MIRROR_TYPE_ENABLE :
                         TRTCCloudDef.TRTC_VIDEO_MIRROR_TYPE_DISABLE);
@@ -147,7 +135,6 @@ public class VideoSettingFragment extends BaseSettingFragment {
 
         updateItem();
 
-        // 将这些view添加到对应的容器中
         for (BaseSettingItem item : mSettingItemList) {
             View view = item.getView();
             view.setPadding(0, SizeUtils.dp2px(12), 0, SizeUtils.dp2px(12));
@@ -170,7 +157,7 @@ public class VideoSettingFragment extends BaseSettingFragment {
 
         int stepBitrate = getStepBitrate(pos);
         int max = (maxBitrate - minBitrate) / stepBitrate;
-        if (mBitrateItem.getMax() != max) {    // 有变更时设置默认值
+        if (mBitrateItem.getMax() != max) {
             mBitrateItem.setMax(max);
             int defBitrate = getDefBitrate(pos);
             mBitrateItem.setProgress(getBitrateProgress(defBitrate, pos));
@@ -234,9 +221,6 @@ public class VideoSettingFragment extends BaseSettingFragment {
         return 400;
     }
 
-    /**
-     * 获取当前精度
-     */
     private int getStepBitrate(int pos) {
         if (pos >= 0 && pos < mParamArray.size()) {
             return mParamArray.get(pos).step;

@@ -23,7 +23,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class TRTCService extends TRTCCloudListener {
@@ -32,13 +31,10 @@ public class TRTCService extends TRTCCloudListener {
 
     private TRTCCloud                                       mTRTCCloud;
     private TXBeautyManager                                 mTXBeautyManager;
-    // 一开始进房的角色
     private TUIRoomCoreCallback.ActionCallback              mEnterRoomCallback;
     private TUIRoomCoreCallback.ActionCallback              mExitRoomCallback;
     private boolean                                         mIsInRoom;
     private TXTRTCRoomListener                              mDelegate;
-    private String                                          mUserId;
-    private String                                          mRoomId;
     private TRTCCloudDef.TRTCParams                         mTRTCParams;
     private Map<String, TUIRoomCoreCallback.ActionCallback> mPlayCallbackMap;
     private Map<String, Runnable>                           mPlayTimeoutRunnable;
@@ -100,7 +96,6 @@ public class TRTCService extends TRTCCloudListener {
     }
 
     private void internalEnterRoom() {
-        // 进房前设置一下监听，不然可能会被其他信息打断
         if (mTRTCParams == null) {
             return;
         }
@@ -108,7 +103,6 @@ public class TRTCService extends TRTCCloudListener {
         mTRTCCloud.setListener(this);
         mTRTCCloud.enterRoom(mTRTCParams, TRTCCloudDef.TRTC_APP_SCENE_LIVE);
     }
-
 
     private void setVideoEncoderParam() {
         TRTCCloudDef.TRTCVideoEncParam param = new TRTCCloudDef.TRTCVideoEncParam();
@@ -123,20 +117,17 @@ public class TRTCService extends TRTCCloudListener {
     @Override
     public void onFirstVideoFrame(String userId, int streamType, int width, int height) {
         TRTCLogger.i(TAG, "onFirstVideoFrame:" + userId);
-        if (userId == null) {
-            // userId 为 null，代表开始渲染本地采集的摄像头画面
-        } else {
+        if (userId != null) {
             stopTimeoutRunnable(userId);
             TUIRoomCoreCallback.ActionCallback callback = mPlayCallbackMap.remove(userId);
             if (callback != null) {
-                callback.onCallback(0, userId + "播放成功");
+                callback.onCallback(0, userId + "played back successfully");
             }
         }
     }
 
     public void exitRoom(TUIRoomCoreCallback.ActionCallback callback) {
         TRTCLogger.i(TAG, "exit room.");
-        mUserId = null;
         mTRTCParams = null;
         mExitRoomCallback = callback;
         mPlayCallbackMap.clear();
@@ -177,7 +168,8 @@ public class TRTCService extends TRTCCloudListener {
 
                     @Override
                     public void onGLContextDestory() {
-
+                        TUICore.callService(TUIConstants.TUIBeauty.SERVICE_NAME,
+                                TUIConstants.TUIBeauty.METHOD_DESTROY_XMAGIC, null);
                     }
                 });
         if (callback != null) {
@@ -222,149 +214,6 @@ public class TRTCService extends TRTCCloudListener {
         return mIsInRoom;
     }
 
-    public void setMixConfig(List<TXTRTCMixUser> list) {
-        if (list == null) {
-            mTRTCCloud.setMixTranscodingConfig(null);
-        } else {
-            // 背景大画面宽高
-            int videoWidth = 720;
-            int videoHeight = 1280;
-
-            // 小画面宽高
-            int subWidth = 180;
-            int subHeight = 320;
-
-            int offsetX = 5;
-            int offsetY = 50;
-
-            int bitrate = 200;
-
-            int resolution = TRTCCloudDef.TRTC_VIDEO_RESOLUTION_960_540;
-            switch (resolution) {
-                case TRTCCloudDef.TRTC_VIDEO_RESOLUTION_160_160: {
-                    videoWidth = 160;
-                    videoHeight = 160;
-                    subWidth = 32;
-                    subHeight = 48;
-                    offsetY = 10;
-                    bitrate = 200;
-                    break;
-                }
-                case TRTCCloudDef.TRTC_VIDEO_RESOLUTION_320_180: {
-                    videoWidth = 192;
-                    videoHeight = 336;
-                    subWidth = 54;
-                    subHeight = 96;
-                    offsetY = 30;
-                    bitrate = 400;
-                    break;
-                }
-                case TRTCCloudDef.TRTC_VIDEO_RESOLUTION_320_240: {
-                    videoWidth = 240;
-                    videoHeight = 320;
-                    subWidth = 54;
-                    subHeight = 96;
-                    offsetY = 30;
-                    bitrate = 400;
-                    break;
-                }
-                case TRTCCloudDef.TRTC_VIDEO_RESOLUTION_480_480: {
-                    videoWidth = 480;
-                    videoHeight = 480;
-                    subWidth = 72;
-                    subHeight = 128;
-                    bitrate = 600;
-                    break;
-                }
-                case TRTCCloudDef.TRTC_VIDEO_RESOLUTION_640_360: {
-                    videoWidth = 368;
-                    videoHeight = 640;
-                    subWidth = 90;
-                    subHeight = 160;
-                    bitrate = 800;
-                    break;
-                }
-                case TRTCCloudDef.TRTC_VIDEO_RESOLUTION_640_480: {
-                    videoWidth = 480;
-                    videoHeight = 640;
-                    subWidth = 90;
-                    subHeight = 160;
-                    bitrate = 800;
-                    break;
-                }
-                case TRTCCloudDef.TRTC_VIDEO_RESOLUTION_960_540: {
-                    videoWidth = 544;
-                    videoHeight = 960;
-                    subWidth = 160;
-                    subHeight = 288;
-                    bitrate = 1000;
-                    break;
-                }
-                case TRTCCloudDef.TRTC_VIDEO_RESOLUTION_1280_720: {
-                    videoWidth = 720;
-                    videoHeight = 1280;
-                    subWidth = 192;
-                    subHeight = 336;
-                    bitrate = 1500;
-                    break;
-                }
-                default:
-                    break;
-            }
-
-            TRTCCloudDef.TRTCTranscodingConfig config = new TRTCCloudDef.TRTCTranscodingConfig();
-            config.videoWidth = videoWidth;
-            config.videoHeight = videoHeight;
-            config.videoGOP = 1;
-            config.videoFramerate = 15;
-            config.videoBitrate = bitrate;
-            config.audioSampleRate = 48000;
-            config.audioBitrate = 64;
-            config.audioChannels = 1;
-
-            // 设置混流后主播的画面位置
-            TRTCCloudDef.TRTCMixUser mixUser = new TRTCCloudDef.TRTCMixUser();
-            mixUser.userId = mUserId; // 以主播uid为broadcaster为例
-            mixUser.roomId = mRoomId;
-            mixUser.zOrder = 1;
-            mixUser.x = 0;
-            mixUser.y = 0;
-            mixUser.width = videoWidth;
-            mixUser.height = videoHeight;
-
-            config.mixUsers = new ArrayList<>();
-            config.mixUsers.add(mixUser);
-
-            // 设置混流后各个小画面的位置
-            int index = 0;
-            for (TXTRTCMixUser txtrtcMixUser : list) {
-                TRTCCloudDef.TRTCMixUser subMixUser = new TRTCCloudDef.TRTCMixUser();
-                subMixUser.userId = txtrtcMixUser.userId;
-                subMixUser.roomId = txtrtcMixUser.roomId == null ? mRoomId : txtrtcMixUser.roomId;
-                subMixUser.streamType = TRTCCloudDef.TRTC_VIDEO_STREAM_TYPE_BIG;
-                subMixUser.zOrder = 2 + index;
-                if (index < 3) {
-                    // 前三个小画面靠右从下往上铺
-                    subMixUser.x = videoWidth - offsetX - subWidth;
-                    subMixUser.y = videoHeight - offsetY - index * subHeight - subHeight;
-                    subMixUser.width = subWidth;
-                    subMixUser.height = subHeight;
-                } else if (index < 6) {
-                    // 后三个小画面靠左从下往上铺
-                    subMixUser.x = offsetX;
-                    subMixUser.y = videoHeight - offsetY - (index - 3) * subHeight - subHeight;
-                    subMixUser.width = subWidth;
-                    subMixUser.height = subHeight;
-                } else {
-                    // 最多只叠加六个小画面
-                }
-                config.mixUsers.add(subMixUser);
-                ++index;
-            }
-            mTRTCCloud.setMixTranscodingConfig(config);
-        }
-    }
-
     public void startScreenCapture(TRTCCloudDef.TRTCVideoEncParam param,
                                    TRTCCloudDef.TRTCScreenShareParams screenShareParams) {
         mTRTCCloud.startScreenCapture(TRTCCloudDef.TRTC_VIDEO_STREAM_TYPE_SUB, param, screenShareParams);
@@ -397,7 +246,6 @@ public class TRTCService extends TRTCCloudListener {
         TRTCCloudDef.TRTCRenderParams params = new TRTCCloudDef.TRTCRenderParams();
         params.fillMode = TRTCCloudDef.TRTC_VIDEO_RENDER_MODE_FIT;
         mTRTCCloud.setRemoteRenderParams(userId, TRTCCloudDef.TRTC_VIDEO_STREAM_TYPE_BIG, params);
-        //停掉上一次超时
         stopTimeoutRunnable(userId);
         Runnable runnable = new Runnable() {
             @Override

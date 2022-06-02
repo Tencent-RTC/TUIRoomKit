@@ -1,5 +1,4 @@
 include ':tuibeauty'
-include ':tuibeauty'
 include ':app'
 include ':tuiroom'
 include ':debug'

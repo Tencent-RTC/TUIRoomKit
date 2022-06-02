@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tencent.qcloud.tuikit.tuibeauty.R;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyItemInfo;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyTabInfo;
-import com.tencent.qcloud.tuikit.tuibeauty.model.utils.ResourceUtils;
+import com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyResourceUtils;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyResourceParse;
 import com.tencent.xmagic.XmagicProperty;
 
@@ -103,7 +103,7 @@ public class TUIBeautyItemAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
         final TUIBeautyItemInfo TUIBeautyItemInfo = getItem(position);
-        TUIBeautyResourceParse.setTextViewText(holder.title, ResourceUtils.getString(TUIBeautyItemInfo.getItemName()));
+        TUIBeautyResourceParse.setTextViewText(holder.title, TUIBeautyResourceUtils.getString(TUIBeautyItemInfo.getItemName()));
         TUIBeautyResourceParse.setTextViewSize(holder.title, mTUIBeautyTabInfo.getTabItemNameSize());
         if (mSelectPos == position) {
             TUIBeautyResourceParse.setTextViewColor(holder.title, mTUIBeautyTabInfo.getTabItemNameColorSelect());

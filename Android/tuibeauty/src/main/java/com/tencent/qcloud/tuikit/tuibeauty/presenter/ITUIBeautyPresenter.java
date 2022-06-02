@@ -16,11 +16,10 @@ public interface ITUIBeautyPresenter {
      * 设置美颜效果
      *
      * @param tabInfo      tab信息,包括:美颜,滤镜,动效,美妆,手势,AI抠背,绿幕等
-     * @param tabPosition  tab位置
      * @param itemInfo     每个分类里面的不同type,比如,美颜包括:光滑,自然,美白,红润等等
      * @param itemPosition item位置
      */
-    void setBeautySpecialEffects(TUIBeautyTabInfo tabInfo, @IntRange(from = 0) int tabPosition, TUIBeautyItemInfo itemInfo, @IntRange(from = 0) int itemPosition);
+    void setBeautySpecialEffects(TUIBeautyTabInfo tabInfo, TUIBeautyItemInfo itemInfo, @IntRange(from = 0) int itemPosition);
 
     /**
      * 设置美颜类型
@@ -43,16 +42,9 @@ public interface ITUIBeautyPresenter {
     void clear();
 
     /**
-     * 更新Xmagic property
-     *
-     * @param itemInfo 美颜itemInfo
-     */
-    void updateProperty(TUIBeautyItemInfo itemInfo);
-
-    /**
      * 获取美颜数据
      */
-    TUIBeautyInfo getDefaultBeauty(Context context);
+    TUIBeautyInfo getDefaultBeauty( );
 
     /**
      * 更新property当前effValue
@@ -62,11 +54,4 @@ public interface ITUIBeautyPresenter {
      * @return 更新后的property
      */
     XmagicProperty<XmagicProperty.XmagicPropertyValues> setCurrentDisPlayValue(XmagicProperty<XmagicProperty.XmagicPropertyValues> property, int value);
-
-    /**
-     * 美颜强度变化监听
-     */
-    interface OnFilterChangeListener {
-        void onChanged(Bitmap filterImage, int index);
-    }
 }

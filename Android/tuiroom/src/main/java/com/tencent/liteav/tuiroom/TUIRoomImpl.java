@@ -84,13 +84,6 @@ public class TUIRoomImpl extends TUIRoom {
             return;
         }
 
-        if (roomId == 0) {
-            TRTCLogger.e(TAG, "roomId is empty");
-            if (mListener != null) {
-                mListener.onRoomEnter(-1, "roomId is empty");
-            }
-            return;
-        }
 
         if (!TUILogin.isUserLogined()) {
             TRTCLogger.e(TAG, "user not login");

@@ -8,9 +8,9 @@
         android:id="@+id/img_qr"
         android:layout_width="84dp"
         android:layout_height="90dp"
-        android:src="@drawable/tuiroom_ic_share_screen"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="60dp" />
+        android:layout_marginTop="60dp"
+        android:src="@drawable/tuiroom_ic_share_screen" />
 
     <Button
         android:id="@+id/share"
@@ -21,8 +21,8 @@
         android:background="@drawable/tuiroom_btn_border"
         android:gravity="center"
         android:paddingLeft="38dp"
-        android:paddingRight="38dp"
         android:paddingTop="14dp"
+        android:paddingRight="38dp"
         android:paddingBottom="14dp"
         android:text="@string/tuiroom_title_sharing"
         android:textColor="@color/tuiroom_color_white"

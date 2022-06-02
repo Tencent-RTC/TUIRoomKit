@@ -10,13 +10,12 @@ import android.view.View;
 import com.blankj.utilcode.util.SizeUtils;
 
 public class CircleIndicator extends View {
-    Paint circlePaint;
+    private Paint circlePaint;
 
     private int   mPageNum;
     private float mScrollPercent = 0f;
     private int   mCurrentPosition;
     private int   mGapSize;
-
 
     private float mRadius;
     private int   mColorOn;
@@ -73,7 +72,7 @@ public class CircleIndicator extends View {
             canvas.drawCircle(left + i * mGapSize, height, mRadius, circlePaint);
         }
         circlePaint.setColor(mColorOn);
-        canvas.drawCircle(left + mCurrentPosition * mGapSize + mGapSize * mScrollPercent,height, mRadius,
+        canvas.drawCircle(left + mCurrentPosition * mGapSize + mGapSize * mScrollPercent, height, mRadius,
                 circlePaint);
     }
 

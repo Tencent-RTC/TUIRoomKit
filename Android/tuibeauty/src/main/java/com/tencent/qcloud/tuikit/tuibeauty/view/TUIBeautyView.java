@@ -10,16 +10,17 @@ import android.widget.TextView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tencent.liteav.beauty.TXBeautyManager;
 import com.tencent.qcloud.tuikit.tuibeauty.R;
+import com.tencent.qcloud.tuikit.tuibeauty.model.ITUIBeautyService;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyInfo;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyItemInfo;
-import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyManager;
+import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyService;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyTabInfo;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyResourceParse;
 import com.tencent.qcloud.tuikit.tuibeauty.presenter.ITUIBeautyPresenter;
 import com.tencent.qcloud.tuikit.tuibeauty.presenter.TUIBeautyPresenter;
 import com.tencent.qcloud.tuikit.tuibeauty.view.adapter.TUIBeautyItemAdapter;
 import com.tencent.qcloud.tuikit.tuibeauty.view.adapter.TUIBeautyTabAdapter;
-import com.tencent.qcloud.tuikit.tuibeauty.view.internal.TCHorizontalScrollView;
+import com.tencent.qcloud.tuikit.tuibeauty.view.internal.TUIBeautyHorizontalScrollView;
 
 import static com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyConstants.TAB_TYPE_LUT;
 
@@ -29,13 +30,13 @@ import static com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyConstants.TAB_T
 public class TUIBeautyView extends BottomSheetDialog {
     private static final String TAG = "TUIBeautyView";
 
-    private Context                mContext;
-    private TCHorizontalScrollView mScrollTabView;
-    private TCHorizontalScrollView mScrollItemView;
-    private LinearLayout           mRelativeSeekBarLayout;
-    private SeekBar                mSeekBarLevel;
-    private TextView               mTextLevelHint;
-    private TextView               mTextLevelValue;
+    private Context                       mContext;
+    private TUIBeautyHorizontalScrollView mScrollTabView;
+    private TUIBeautyHorizontalScrollView mScrollItemView;
+    private LinearLayout                  mRelativeSeekBarLayout;
+    private SeekBar                       mSeekBarLevel;
+    private TextView                      mTextLevelHint;
+    private TextView                      mTextLevelValue;
 
     private TUIBeautyInfo       mTUIBeautyInfo;
     private TUIBeautyTabInfo    mCurrentTabInfo;
@@ -44,27 +45,36 @@ public class TUIBeautyView extends BottomSheetDialog {
     private int[]               mCurrentItemPosition;
     private OnBeautyListener    mOnBeautyListener;
     private ITUIBeautyPresenter mPresenter;
-    private TXBeautyManager mBeautyManager;
+    private TXBeautyManager     mBeautyManager;
 
-    public TUIBeautyView(Context context,TXBeautyManager beautyManager) {
+    public TUIBeautyView(Context context, TXBeautyManager beautyManager) {
         super(context, R.style.TUIBeautyDialogTheme);
         setContentView(R.layout.tuibeauty_view_panel);
         this.mContext = context;
-        mBeautyManager=beautyManager;
+        mBeautyManager = beautyManager;
         Window window = getWindow();
         if (window != null) {
             window.findViewById(R.id.design_bottom_sheet).setBackgroundResource(android.R.color.transparent);
         }
         initPresenter();
-        initView(context);
+        initView();
+    }
+
+    public static ITUIBeautyService getBeautyService() {
+        return TUIBeautyService.getInstance();
+    }
+
+    @Override
+    public void dismiss() {
+        super.dismiss();
     }
 
     private void initPresenter() {
         if (mPresenter == null) {
-            mPresenter = new TUIBeautyPresenter(mContext,mBeautyManager);
+            mPresenter = new TUIBeautyPresenter(mContext, mBeautyManager);
         }
         mPresenter.clear();
-        mTUIBeautyInfo = mPresenter.getDefaultBeauty(mContext);
+        mTUIBeautyInfo = mPresenter.getDefaultBeauty();
         initData();
         //本地路径
         mPresenter.fillingMaterialPath(mTUIBeautyInfo);
@@ -81,16 +91,15 @@ public class TUIBeautyView extends BottomSheetDialog {
             mCurrentItemPosition[i] = TUIBeautyTabInfo.getTabItemListDefaultSelectedIndex();
             mCurrentItemInfo[i] = TUIBeautyTabInfo.getTabItemList()
                     .get(TUIBeautyTabInfo.getTabItemListDefaultSelectedIndex());
-            mPresenter.setBeautySpecialEffects(TUIBeautyTabInfo, i, mCurrentItemInfo[i], mCurrentItemPosition[i]);
+            mPresenter.setBeautySpecialEffects(TUIBeautyTabInfo, mCurrentItemInfo[i], mCurrentItemPosition[i]);
         }
     }
 
-    private void initView(Context context) {
+    private void initView() {
         mRelativeSeekBarLayout = (LinearLayout) findViewById(R.id.beauty_rl_seek_bar);
         mSeekBarLevel = (SeekBar) findViewById(R.id.beauty_seek_bar_third);
         mTextLevelHint = (TextView) findViewById(R.id.beauty_tv_seek_bar_hint);
         mTextLevelValue = (TextView) findViewById(R.id.beauty_tv_seek_bar_value);
-        TextView textTitle = (TextView) findViewById(R.id.beauty_tv_title);
         mSeekBarLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -105,9 +114,8 @@ public class TUIBeautyView extends BottomSheetDialog {
                 mCurrentItemInfo[mCurrentTabPosition].setProperty(mPresenter.setCurrentDisPlayValue(mCurrentItemInfo[mCurrentTabPosition].getProperty(), progress));
                 if (mOnBeautyListener == null || !mOnBeautyListener.onLevelChanged(mCurrentTabInfo, mCurrentTabPosition,
                         mCurrentItemInfo[mCurrentTabPosition], mCurrentItemPosition[mCurrentTabPosition], progress)) {
-                    mPresenter.setBeautySpecialEffects(mCurrentTabInfo, mCurrentTabPosition,
+                    mPresenter.setBeautySpecialEffects(mCurrentTabInfo,
                             mCurrentItemInfo[mCurrentTabPosition], mCurrentItemPosition[mCurrentTabPosition]);
-                    mPresenter.updateProperty(mCurrentItemInfo[mCurrentTabPosition]);
                 }
             }
 
@@ -122,8 +130,8 @@ public class TUIBeautyView extends BottomSheetDialog {
             }
         });
 
-        mScrollTabView = (TCHorizontalScrollView) findViewById(R.id.beauty_horizontal_picker_view_first);
-        mScrollItemView = (TCHorizontalScrollView) findViewById(R.id.beauty_horizontal_picker_second);
+        mScrollTabView = (TUIBeautyHorizontalScrollView) findViewById(R.id.beauty_horizontal_picker_view_first);
+        mScrollItemView = (TUIBeautyHorizontalScrollView) findViewById(R.id.beauty_horizontal_picker_second);
 
         createTabList();
     }
@@ -131,7 +139,7 @@ public class TUIBeautyView extends BottomSheetDialog {
     //创建美颜面板
     private void createTabList() {
         if (mTUIBeautyInfo == null) {
-            mTUIBeautyInfo = mPresenter.getDefaultBeauty(mContext);
+            mTUIBeautyInfo = mPresenter.getDefaultBeauty();
         }
         TUIBeautyTabAdapter TUIBeautyTabAdapter = new TUIBeautyTabAdapter(mContext, mTUIBeautyInfo);
         mScrollTabView.setAdapter(TUIBeautyTabAdapter);
@@ -166,8 +174,7 @@ public class TUIBeautyView extends BottomSheetDialog {
                 createSeekBar(tabInfo, itemInfo);
                 if (mOnBeautyListener == null
                         || !mOnBeautyListener.onClick(tabInfo, tabPosition, itemInfo, position)) {
-                    mPresenter.setBeautySpecialEffects(tabInfo, tabPosition, itemInfo, position);
-                    TUIBeautyManager.getInstance().updateProperty(mCurrentItemInfo[mCurrentTabPosition]);
+                    mPresenter.setBeautySpecialEffects(tabInfo, itemInfo, position);
                 }
             }
         });
@@ -175,8 +182,6 @@ public class TUIBeautyView extends BottomSheetDialog {
         mCurrentItemInfo[tabPosition] = TUIBeautyItemInfo;
         createSeekBar(tabInfo, TUIBeautyItemInfo);
     }
-
-    public static TUIBeautyItemInfo sItemInfo;
 
     // 创建强度视图
     private void createSeekBar(TUIBeautyTabInfo TUIBeautyTabInfo, TUIBeautyItemInfo TUIBeautyItemInfo) {

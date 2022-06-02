@@ -16,30 +16,35 @@ import com.tencent.qcloud.tuikit.tuibeauty.R;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyConstants;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyInfo;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyItemInfo;
-import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyManager;
+import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyService;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyParams;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyTabInfo;
-import com.tencent.qcloud.tuikit.tuibeauty.model.TUIMotionModel;
-import com.tencent.qcloud.tuikit.tuibeauty.model.download.DownloadConfig;
-import com.tencent.qcloud.tuikit.tuibeauty.model.download.DownloadListener;
-import com.tencent.qcloud.tuikit.tuibeauty.model.download.MaterialDownloader;
-import com.tencent.qcloud.tuikit.tuibeauty.view.internal.ProgressDialog;
-import com.tencent.qcloud.tuikit.tuibeauty.model.utils.ResourceUtils;
-import com.tencent.qcloud.tuikit.tuibeauty.model.utils.SPUtils;
+import com.tencent.qcloud.tuikit.tuibeauty.model.download.TUIBeautyDownloadListener;
+import com.tencent.qcloud.tuikit.tuibeauty.model.download.TUIBeautyMaterialDownloader;
+import com.tencent.qcloud.tuikit.tuibeauty.view.internal.TUIBeautyProgressDialog;
+import com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyResourceUtils;
+import com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautySPUtils;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyResourceParse;
 import com.tencent.xmagic.XmagicProperty;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.List;
 
 public class TUIBeautyPresenter implements ITUIBeautyPresenter {
-
     private static final String TAG = "TUIBeautyPresenter";
 
-    private Context                mContext;
-    private TUIBeautyParams        mTUIBeautyParams;
-    private TXBeautyManager        mBeautyManager;
-    private OnFilterChangeListener mOnFilterChangeListener;
+    private static final int DEFAULT_BEAUTY_LEVEL = 6;
+    private static final int BEAUTY_STYLE_SMOOTH  = 0;
+    private static final int BEAUTY_STYLE_NATURE  = 1;
+    private static final int BEAUTY_STYLE_PITU    = 2;
+
+    private Context         mContext;
+    private TUIBeautyParams mTUIBeautyParams;
+    private TXBeautyManager mBeautyManager;
+
 
     public TUIBeautyPresenter(Context context, TXBeautyManager beautyManager) {
         mContext = context;
@@ -47,11 +52,10 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
         mBeautyManager = beautyManager;
     }
 
-
     @Override
-    public void setBeautySpecialEffects(TUIBeautyTabInfo tabInfo, @IntRange(from = 0) int tabPosition,
+    public void setBeautySpecialEffects(TUIBeautyTabInfo tabInfo,
                                         TUIBeautyItemInfo itemInfo, @IntRange(from = 0) int itemPosition) {
-        dispatchEffects(tabInfo, tabPosition, itemInfo, itemPosition);
+        dispatchEffects(tabInfo, itemInfo, itemPosition);
     }
 
     @Override
@@ -73,9 +77,6 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
         mTUIBeautyParams.mFilterIndex = index;
         if (mBeautyManager != null) {
             mBeautyManager.setFilter(filterImage);
-            if (mOnFilterChangeListener != null) {
-                mOnFilterChangeListener.onChanged(filterImage, index);
-            }
         }
     }
 
@@ -142,13 +143,12 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
         }
     }
 
-
     @Override
     public void fillingMaterialPath(TUIBeautyInfo beautyInfo) {
         for (TUIBeautyTabInfo tabInfo : beautyInfo.getBeautyTabList()) {
             List<TUIBeautyItemInfo> tabItemList = tabInfo.getTabItemList();
             for (TUIBeautyItemInfo itemInfo : tabItemList) {
-                String materialValue = SPUtils.get().getString(getMaterialPathKey(itemInfo));
+                String materialValue = TUIBeautySPUtils.get().getString(getMaterialPathKey(itemInfo));
                 if (TextUtils.isEmpty(materialValue)) {
                     continue;
                 }
@@ -159,14 +159,10 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
         }
     }
 
-    @Override
-    public void updateProperty(TUIBeautyItemInfo itemInfo) {
-        TUIBeautyManager.getInstance().updateProperty(itemInfo);
-    }
 
     @Override
     public XmagicProperty<XmagicProperty.XmagicPropertyValues> setCurrentDisPlayValue(XmagicProperty<XmagicProperty.XmagicPropertyValues> property, int value) {
-        return TUIBeautyManager.getInstance().setCurrentDisPlayValue(property, value);
+        return TUIBeautyService.getInstance().setCurrentDisPlayValue(property, value);
     }
 
     /**
@@ -179,45 +175,23 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
         if (mBeautyManager != null) {
             mBeautyManager.setFilter(mTUIBeautyParams.mFilterBmp);
             mBeautyManager.setFilterStrength(mTUIBeautyParams.mFilterMixLevel);
-            mBeautyManager.setGreenScreenFile(mTUIBeautyParams.mGreenFile);
             mBeautyManager.setBeautyStyle(mTUIBeautyParams.mBeautyStyle);
             mBeautyManager.setBeautyLevel(mTUIBeautyParams.mBeautyLevel);
             mBeautyManager.setWhitenessLevel(mTUIBeautyParams.mWhiteLevel);
             mBeautyManager.setRuddyLevel(mTUIBeautyParams.mRuddyLevel);
-            mBeautyManager.setEyeScaleLevel(mTUIBeautyParams.mBigEyeLevel);
-            mBeautyManager.setFaceSlimLevel(mTUIBeautyParams.mFaceSlimLevel);
-            mBeautyManager.setFaceVLevel(mTUIBeautyParams.mFaceVLevel);
-            mBeautyManager.setChinLevel(mTUIBeautyParams.mChinSlimLevel);
-            mBeautyManager.setFaceShortLevel(mTUIBeautyParams.mFaceShortLevel);
-            mBeautyManager.setNoseSlimLevel(mTUIBeautyParams.mNoseSlimLevel);
-            mBeautyManager.setEyeLightenLevel(mTUIBeautyParams.mEyeLightenLevel);
-            mBeautyManager.setToothWhitenLevel(mTUIBeautyParams.mToothWhitenLevel);
-            mBeautyManager.setWrinkleRemoveLevel(mTUIBeautyParams.mWrinkleRemoveLevel);
-            mBeautyManager.setPounchRemoveLevel(mTUIBeautyParams.mPounchRemoveLevel);
-            mBeautyManager.setSmileLinesRemoveLevel(mTUIBeautyParams.mSmileLinesRemoveLevel);
-            mBeautyManager.setForeheadLevel(mTUIBeautyParams.mForeheadLevel);
-            mBeautyManager.setEyeDistanceLevel(mTUIBeautyParams.mEyeDistanceLevel);
-            mBeautyManager.setEyeAngleLevel(mTUIBeautyParams.mEyeAngleLevel);
-            mBeautyManager.setMouthShapeLevel(mTUIBeautyParams.mMouthShapeLevel);
-            mBeautyManager.setNoseWingLevel(mTUIBeautyParams.mNoseWingLevel);
-            mBeautyManager.setNosePositionLevel(mTUIBeautyParams.mNosePositionLevel);
-            mBeautyManager.setLipsThicknessLevel(mTUIBeautyParams.mLipsThicknessLevel);
-            mBeautyManager.setFaceBeautyLevel(mTUIBeautyParams.mFaceBeautyLevel);
-            mBeautyManager.setMotionTmpl(mTUIBeautyParams.mMotionTmplPath);
         }
     }
 
-
     @Override
-    public TUIBeautyInfo getDefaultBeauty(Context context) {
-        setBeautyStyleAndLevel(0, 6);
-        setBeautyStyleAndLevel(1, 6);
-        setBeautyStyleAndLevel(2, 6);
-        setWhitenessLevel(6);
-        return TUIBeautyResourceParse.getDefaultBeautyInfo(context);
+    public TUIBeautyInfo getDefaultBeauty() {
+        setBeautyStyleAndLevel(BEAUTY_STYLE_SMOOTH, DEFAULT_BEAUTY_LEVEL);
+        setBeautyStyleAndLevel(BEAUTY_STYLE_NATURE, DEFAULT_BEAUTY_LEVEL);
+        setBeautyStyleAndLevel(BEAUTY_STYLE_PITU, DEFAULT_BEAUTY_LEVEL);
+        setWhitenessLevel(DEFAULT_BEAUTY_LEVEL);
+        return TUIBeautyResourceParse.getDefaultBeautyInfo();
     }
 
-    private void dispatchEffects(TUIBeautyTabInfo tabInfo, @IntRange(from = 0) int tabPosition, TUIBeautyItemInfo itemInfo, @IntRange(from = 0) int itemPosition) {
+    private void dispatchEffects(TUIBeautyTabInfo tabInfo, TUIBeautyItemInfo itemInfo, @IntRange(from = 0) int itemPosition) {
         int tabType = tabInfo.getTabType();
         switch (tabType) {
             case TUIBeautyConstants.TAB_TYPE_BEAUTY:
@@ -229,33 +203,32 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
             case TUIBeautyConstants.TAB_TYPE_MOTION:
             case TUIBeautyConstants.TAB_TYPE_MAKEUP:
             case TUIBeautyConstants.TAB_TYPE_SEGMENTATION:
-                downloadVideoMaterial(tabInfo, itemInfo);
+                downloadVideoMaterial(itemInfo);
                 break;
             default:
                 break;
         }
     }
 
-    private void downloadVideoMaterial(final TUIBeautyTabInfo tabInfo, final TUIBeautyItemInfo itemInfo) {
+    private void downloadVideoMaterial(final TUIBeautyItemInfo itemInfo) {
+        if (itemInfo==null){
+            return;
+        }
+        if ("ID_NONE".equals(itemInfo.getItemXmagicId())){
+            TUIBeautyService.getInstance().updateProperty(itemInfo);
+            return;
+        }
+        if ( TextUtils.isEmpty(itemInfo.getMaterialUrl())) {
+            return;
+        }
         if (!TextUtils.isEmpty(itemInfo.getProperty().resPath)) {
-            TUIBeautyManager.getInstance().updateProperty(itemInfo);
+            TUIBeautyService.getInstance().updateProperty(itemInfo);
             return;
         }
-        String s = "";
-        List<TUIMotionModel> list = DownloadConfig.getMotionList();
-        for (TUIMotionModel model :
-                list) {
-            if (model.getName().equals(itemInfo.getProperty().id)) {
-                s = model.getUrl();
-            }
-        }
-        if (s.equals("")) {
-            return;
-        }
-        MaterialDownloader materialDownloader = new MaterialDownloader(mContext, itemInfo.getProperty().id, s);
-        materialDownloader.start(new DownloadListener() {
+        TUIBeautyMaterialDownloader materialDownloader = new TUIBeautyMaterialDownloader(mContext, itemInfo.getProperty().id, itemInfo.getMaterialUrl());
+        materialDownloader.start(new TUIBeautyDownloadListener() {
 
-            private ProgressDialog mProgressDialog;
+            private TUIBeautyProgressDialog mProgressDialog;
 
             @Override
             public void onDownloadFail(final String errorMsg) {
@@ -277,7 +250,7 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
                     public void run() {
                         Log.i(TAG, "onDownloadProgress, progress = " + progress);
                         if (mProgressDialog == null) {
-                            mProgressDialog = new ProgressDialog();
+                            mProgressDialog = new TUIBeautyProgressDialog();
                             mProgressDialog.createLoadingDialog(mContext);
                             mProgressDialog.setCancelable(false);               // 设置是否可以通过点击Back键取消
                             mProgressDialog.setCanceledOnTouchOutside(false);   // 设置在点击Dialog外是否取消Dialog进度条
@@ -297,9 +270,9 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
                             mProgressDialog.dismiss();
                             mProgressDialog = null;
                         }
-                        SPUtils.get().put(getMaterialPathKey(itemInfo), filePath);
+                        TUIBeautySPUtils.get().put(getMaterialPathKey(itemInfo), filePath);
                         createItemInfo(itemInfo.getProperty().id, filePath, itemInfo);
-                        TUIBeautyManager.getInstance().updateProperty(itemInfo);
+                        TUIBeautyService.getInstance().updateProperty(itemInfo);
                     }
                 });
             }
@@ -321,13 +294,13 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
         int level = itemInfo.getItemLevel();
         switch (itemType) {
             case TUIBeautyConstants.ITEM_TYPE_BEAUTY_SMOOTH:           // 光滑
-                setBeautyStyleAndLevel(0, level);
+                setBeautyStyleAndLevel(BEAUTY_STYLE_SMOOTH, level);
                 break;
             case TUIBeautyConstants.ITEM_TYPE_BEAUTY_NATURAL:          // 自然
-                setBeautyStyleAndLevel(1, level);
+                setBeautyStyleAndLevel(BEAUTY_STYLE_NATURE, level);
                 break;
             case TUIBeautyConstants.ITEM_TYPE_BEAUTY_PITU:             // 天天p图
-                setBeautyStyleAndLevel(2, level);
+                setBeautyStyleAndLevel(BEAUTY_STYLE_PITU, level);
                 break;
             case TUIBeautyConstants.ITEM_TYPE_BEAUTY_WHITE:            // 美白
                 setWhitenessLevel(level);
@@ -336,7 +309,7 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
                 setRuddyLevel(level);
                 break;
             default:
-                TUIBeautyManager.getInstance().updateProperty(itemInfo);
+                TUIBeautyService.getInstance().updateProperty(itemInfo);
         }
     }
 
@@ -421,10 +394,10 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
 
     private Bitmap decodeResource(int id) {
         TypedValue value = new TypedValue();
-        ResourceUtils.getResources().openRawResource(id, value);
+        TUIBeautyResourceUtils.getResources().openRawResource(id, value);
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inTargetDensity = value.density;
-        return BitmapFactory.decodeResource(ResourceUtils.getResources(), id, opts);
+        return BitmapFactory.decodeResource(TUIBeautyResourceUtils.getResources(), id, opts);
     }
 
     private String getMaterialPathKey(TUIBeautyItemInfo itemInfo) {

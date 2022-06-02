@@ -36,7 +36,7 @@ import static com.tencent.liteav.tuiroom.ui.MemberListAdapter.VOLUME;
 
 public class AnchorListView extends RelativeLayout {
     private static final String  TAG            = "AnchorListView";
-    private static final int     MAX_ITEM_COUNT = 6;  //listview 一页最多显示多少个数据
+    private static final int     MAX_ITEM_COUNT = 6;
     private              Context mContext;
 
     private RecyclerView      mRecyclerView;
@@ -388,9 +388,9 @@ public class AnchorListView extends RelativeLayout {
     }
 
     /**
-     * 处理页面中需要展示的item
-     * 如果滑动到新的页面，旧的页面所有item需要停止播放
-     * 新的页面根据是否打开了video来判断需要播放页面
+     * Process items to be displayed on the page. If you scroll to a new page, the playback of all items on the
+     * previous page needs to be stopped. Whether a playback page is required for the new page is determined based on
+     * whether video is enabled.
      *
      * @param fromItem
      * @param toItem
@@ -704,7 +704,6 @@ public class AnchorListView extends RelativeLayout {
                 videoView.setWaitBindGroup(mVideoContainer);
             }
             mVideoContainer.removeAllViews();
-            //展示其他数据
             ImageLoader.loadImage(mContext, mUserHeadImg, model.getUserAvatar(), R.drawable.tuiroom_head);
             mUserNameTv.setText(model.getUserName());
             if (model.getQuality() == MemberEntity.QUALITY_GOOD) {

@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import com.tencent.liteav.basic.log.TXCLog;
 import com.tencent.xmagic.XmagicProperty;
 
-import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.FileUtils.getResPath;
+import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.getResPath;
 
 /**
  * 美颜面板 item 相关属性
@@ -24,13 +24,12 @@ public class TUIBeautyItemInfo {
     private int item_inner_max_value;
 
     private String item_name;           // string, item 名称
-    private String item_material_url;   // string, 素材 url
-    private String item_material_path;  // string, 素材本地路径
     private String item_icon_normal;    // drawable, item 常规 icon
     private String item_icon_select;    // drawable, item 选中 icon
     private String item_key;
     private String item_xmagic_id;
     private String item_res_name;
+    private String item_material_url;
     private int    item_category;
 
     private XmagicProperty<XmagicProperty.XmagicPropertyValues> property;
@@ -45,20 +44,16 @@ public class TUIBeautyItemInfo {
         return item_id;
     }
 
+    public String getMaterialUrl() {
+        return item_material_url;
+    }
+
     public int getItemType() {
         return item_type;
     }
 
-    public void setItemIcNormal(String itemIconNormal) {
-        this.item_icon_normal = itemIconNormal;
-    }
-
     public String getItemName() {
         return item_name;
-    }
-
-    public void setItemName(String itemName) {
-        this.item_name = itemName;
     }
 
     public String getItemIconNormal() {
@@ -69,24 +64,16 @@ public class TUIBeautyItemInfo {
         return item_icon_select;
     }
 
+    public String getItemXmagicId() {
+        return item_xmagic_id;
+    }
+
     public void setItemLevel(int item_level) {
         this.item_level = item_level;
     }
 
     public int getItemLevel() {
         return item_level;
-    }
-
-    public String getItemMaterialUrl() {
-        return item_material_url;
-    }
-
-    public String getItemMaterialPath() {
-        return item_material_path;
-    }
-
-    public void setItemMaterialPath(String item_material_path) {
-        this.item_material_path = item_material_path;
     }
 
     public void setItemCategory(int item_category) {
@@ -102,12 +89,14 @@ public class TUIBeautyItemInfo {
 
     public void createProperty() {
         XmagicProperty.Category category = null;
+        XmagicProperty.XmagicPropertyValues values = null;
         String effDirs = "/images/beauty/";
         String resPath = null;
         switch (item_category) {
             case TUIBeautyConstants.TAB_TYPE_BEAUTY:
                 category = XmagicProperty.Category.BEAUTY;
                 resPath = TextUtils.isEmpty(item_res_name) ? null : effDirs + item_res_name;
+                values = new XmagicProperty.XmagicPropertyValues(item_display_min_value, item_display_max_value, item_display_default_value, item_inner_min_value, item_inner_max_value);
                 break;
             case TUIBeautyConstants.TAB_TYPE_LUT:
                 category = XmagicProperty.Category.LUT;
@@ -125,8 +114,6 @@ public class TUIBeautyItemInfo {
                 TXCLog.e("TUIBeautyItemInfo", "switch category failed!,item category:" + item_category);
                 break;
         }
-        XmagicProperty.XmagicPropertyValues values = new XmagicProperty.XmagicPropertyValues(item_display_min_value, item_display_max_value, item_display_default_value, item_inner_min_value, item_inner_max_value);
-
         property = new XmagicProperty<>(category, item_xmagic_id, resPath, item_key, values);
     }
 
@@ -142,13 +129,12 @@ public class TUIBeautyItemInfo {
                 ", item_display_default_value=" + item_display_default_value +
                 ", item_inner_max_value=" + item_inner_max_value +
                 ", item_name='" + item_name + '\'' +
-                ", item_material_url='" + item_material_url + '\'' +
-                ", item_material_path='" + item_material_path + '\'' +
                 ", item_icon_normal='" + item_icon_normal + '\'' +
                 ", item_icon_select='" + item_icon_select + '\'' +
                 ", item_key='" + item_key + '\'' +
                 ", item_xmagic_id='" + item_xmagic_id + '\'' +
                 ", item_res_name='" + item_res_name + '\'' +
+                ", item_material_url='" + item_material_url + '\'' +
                 ", item_category=" + item_category +
                 ", property=" + property +
                 '}';

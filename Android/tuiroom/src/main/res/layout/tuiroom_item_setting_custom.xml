@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_l"
         android:layout_width="wrap_content"
@@ -35,8 +34,8 @@
         android:layout_marginStart="10dp"
         android:layout_marginLeft="10dp"
         android:textColor="@color/tuiroom_color_second_text"
-        android:textStyle="bold"
         android:textSize="@dimen/tuiroom_ItemTitleSize"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
