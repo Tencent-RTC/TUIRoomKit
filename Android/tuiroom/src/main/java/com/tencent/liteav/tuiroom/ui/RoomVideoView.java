@@ -8,9 +8,6 @@ import android.view.ViewGroup;
 
 import com.tencent.rtmp.ui.TXCloudVideoView;
 
-/**
- * 用来展示自己和远端的 TXCloudVideoView
- */
 public class RoomVideoView extends TXCloudVideoView {
     private static final String TAG = "RoomVideoView";
 

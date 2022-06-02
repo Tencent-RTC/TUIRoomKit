@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/tuiroom_color_black"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/tuiroom_color_black">
 
     <com.tencent.liteav.tuiroom.ui.widget.page.AnchorListView
         android:id="@+id/anchor_list"
@@ -22,14 +22,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/group_screen_capture"
-        android:visibility="gone"
-        android:background="@color/tuiroom_color_black"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/tuiroom_color_black"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/tv_screen_capture_tag"
@@ -64,9 +64,9 @@
         android:id="@+id/view_head_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:layout_marginTop="28dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

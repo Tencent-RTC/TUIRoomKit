@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_l"
         android:layout_width="wrap_content"
@@ -50,7 +49,7 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/gl_end"
         app:layout_constraintStart_toStartOf="@id/gl_l"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent">
 
         <EditText
             android:id="@+id/et_message"

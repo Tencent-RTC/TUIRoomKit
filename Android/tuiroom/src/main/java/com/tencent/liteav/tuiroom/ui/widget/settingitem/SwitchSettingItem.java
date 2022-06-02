@@ -10,9 +10,6 @@ import androidx.appcompat.widget.SwitchCompat;
 
 import com.tencent.liteav.tuiroom.R;
 
-/**
- * 带seekbar的item
- */
 public class SwitchSettingItem extends BaseSettingItem {
     private static final String TAG = SwitchSettingItem.class.getName();
 

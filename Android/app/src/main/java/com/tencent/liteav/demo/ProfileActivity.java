@@ -30,14 +30,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ProfileActivity extends AppCompatActivity {
-    private static final String    TAG               = "ProfileActivity";
+    private static final String    TAG = "ProfileActivity";
     private              ImageView mImageAvatar;
     private              EditText  mEditUserName;
     private              Button    mButtonRegister;
-    private              TextView  mTvInputTips;     //昵称限制提示
-    private              String    mAvatarUrl;       //用户头像
-    //自定义随机登录名
-    private static final int[]     CUSTOM_NAME_ARRAY = {
+    private              TextView  mTvInputTips;
+    private              String    mAvatarUrl;
+
+    private static final int[] CUSTOM_NAME_ARRAY = {
             R.string.app_custom_name_1,
             R.string.app_custom_name_2,
             R.string.app_custom_name_3,
@@ -98,7 +98,6 @@ public class ProfileActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence text, int start, int before, int count) {
                 mButtonRegister.setEnabled(text.length() != 0);
                 String editable = mEditUserName.getText().toString();
-                //匹配字母,数字,中文,下划线,以及限制输入长度为2-20.
                 Pattern p = Pattern.compile("^[a-z0-9A-Z\\u4e00-\\u9fa5\\_]{2,20}$");
                 Matcher m = p.matcher(editable);
                 if (!m.matches()) {
@@ -133,7 +132,6 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onError(int code, String desc) {
                 Log.e(TAG, "set profile failed errorCode : " + code + " errorMsg : " + desc);
-                //头像和昵称设置失败,也可以进入到主界面(头像和昵称都用默认值),不影响功能
                 ToastUtils.showLong(getString(R.string.app_toast_failed_to_set, desc));
                 startMainActivity();
                 finish();

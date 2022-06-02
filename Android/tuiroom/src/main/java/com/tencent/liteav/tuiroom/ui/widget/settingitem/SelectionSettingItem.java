@@ -12,9 +12,6 @@ import com.tencent.liteav.tuiroom.model.impl.base.TRTCLogger;
 
 import java.util.List;
 
-/**
- * 带selection的item
- */
 public class SelectionSettingItem extends BaseSettingItem {
     private static final String TAG = SelectionSettingItem.class.getName();
 

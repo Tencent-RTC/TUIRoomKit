@@ -20,7 +20,7 @@ public final class TUIBeautyProvider extends ContentProvider {
     public boolean onCreate() {
         Log.d(TAG, "TUIBeautyProvider onCreate");
         TUICore.registerExtension(TUIBeautyExtension.OBJECT_TUI_BEAUTY, new TUIBeautyExtension());
-        TUICore.registerService(TUIConstants.TUIBeauty.SERVICE_NAME, TUIBeautyService.shareInstance());
+        TUICore.registerService(TUIConstants.TUIBeauty.SERVICE_NAME, TUIBeautyCallService.shareInstance());
         return false;
     }
 

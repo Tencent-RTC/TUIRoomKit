@@ -9,7 +9,6 @@ public class MemberEntity {
     public static final int QUALITY_NORMAL = 2;
     public static final int QUALITY_BAD    = 1;
 
-
     private String  userId;
     private String  userName;
     private String  userAvatar;
@@ -18,16 +17,12 @@ public class MemberEntity {
     private boolean isShowAudioEvaluation;
     private boolean isShowOutSide;
     private boolean isVideoAvailable;
-    //是否打开了屏幕共享
     private boolean isScreenShareAvailable;
-    // 用户是否打开了视频
     private boolean isCameraAvailable;
-    // 用户是否打开音频
     private boolean isAudioAvailable;
 
     private RoomVideoView mRoomVideoView;
     private boolean       needFresh;
-    //是否在说话
     private boolean       isTalk;
 
     public boolean isSelf() {

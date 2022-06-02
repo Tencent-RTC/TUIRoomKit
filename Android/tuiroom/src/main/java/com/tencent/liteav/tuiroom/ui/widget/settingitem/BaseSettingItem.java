@@ -9,9 +9,6 @@ import androidx.annotation.NonNull;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * 通用设置项的基类
- */
 public abstract class BaseSettingItem {
     protected Context        mContext;
     protected LayoutInflater mInflater;

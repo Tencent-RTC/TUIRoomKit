@@ -15,16 +15,13 @@ import androidx.annotation.NonNull;
 import com.blankj.utilcode.util.ToastUtils;
 import com.tencent.liteav.tuiroom.R;
 
-
-/**
- * 头部view
- */
 public class RoomHeadBarView extends RelativeLayout {
     private ImageView       mHeadsetImg;
     private ImageView       mCameraSwitchImg;
+    private ImageView       mBtnReport;
     private TextView        mTitleTv;
     private TextView        mExitTv;
-    private ImageButton mCopyRoomIdIb;
+    private ImageButton     mCopyRoomIdIb;
     private HeadBarCallback mHeadBarCallback;
 
     public RoomHeadBarView(Context context) {
@@ -62,6 +59,16 @@ public class RoomHeadBarView extends RelativeLayout {
             }
         });
 
+        mBtnReport = (ImageView) itemView.findViewById(R.id.btn_report);
+        mBtnReport.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mHeadBarCallback != null) {
+                    mHeadBarCallback.onReportBtnClick();
+                }
+            }
+        });
+
         mExitTv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,6 +84,10 @@ public class RoomHeadBarView extends RelativeLayout {
                 copyContentToClipboard(mTitleTv.getText().toString());
             }
         });
+    }
+
+    public void showReportView(boolean isShow) {
+        mBtnReport.setVisibility(isShow ? VISIBLE : GONE);
     }
 
     private void copyContentToClipboard(String content) {
@@ -108,5 +119,7 @@ public class RoomHeadBarView extends RelativeLayout {
         void onSwitchCameraClick();
 
         void onExitClick();
+
+        void onReportBtnClick();
     }
 }

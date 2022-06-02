@@ -26,7 +26,7 @@ public class RemoteUserListAdapter extends
     private Context             mContext;
     private List<RemoteEntity>  mList = new ArrayList<>();
     private OnItemClickListener mOnItemClickListener;
-    private boolean         mIsOwner;
+    private boolean             mIsOwner;
 
     public RemoteUserListAdapter(Context context, OnItemClickListener onItemClickListener) {
         this.mContext = context;

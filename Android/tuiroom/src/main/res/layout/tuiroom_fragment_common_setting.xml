@@ -8,8 +8,8 @@
         android:id="@+id/item_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
         android:layout_marginTop="16dp"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" />
 </ScrollView>

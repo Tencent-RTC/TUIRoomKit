@@ -73,5 +73,4 @@
         app:layout_constraintTop_toBottomOf="@id/item1"
         app:layout_constraintVertical_weight="1" />
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>

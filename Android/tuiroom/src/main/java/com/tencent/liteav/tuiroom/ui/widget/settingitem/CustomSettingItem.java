@@ -14,9 +14,6 @@ import com.tencent.liteav.tuiroom.model.impl.base.TRTCLogger;
 
 import java.util.List;
 
-/**
- * 可自己定制的settingitem
- */
 public class CustomSettingItem extends BaseSettingItem {
     public static final  int        ALIGN_LEFT   = 1;
     public static final  int        ALIGN_RIGHT  = 2;
@@ -36,13 +33,6 @@ public class CustomSettingItem extends BaseSettingItem {
         );
     }
 
-    /**
-     * 对齐模式，xml中默认是right
-     * 界面中的 ll_item 按如下分布
-     * gl_l   gl_r    gl_end
-     * | left | right |
-     * |    center    |
-     */
     public void setAlign(int align) {
         mItemViewHolder.setAlign(align);
     }

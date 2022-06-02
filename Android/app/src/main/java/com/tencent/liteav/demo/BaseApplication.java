@@ -2,12 +2,12 @@ package com.tencent.liteav.demo;
 
 import android.os.Build;
 import android.os.StrictMode;
+
 import androidx.multidex.MultiDexApplication;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
 
 public class BaseApplication extends MultiDexApplication {
     private static String TAG = "BaseApplication";

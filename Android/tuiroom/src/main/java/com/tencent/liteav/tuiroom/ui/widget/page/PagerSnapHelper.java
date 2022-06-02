@@ -12,10 +12,10 @@ public class PagerSnapHelper extends SnapHelper {
     private RecyclerView mRecyclerView;
 
     /**
-     * 用于将滚动工具和 Recycler 绑定
+     * Binds the scroll tool to Recycler
      *
      * @param recyclerView RecyclerView
-     * @throws IllegalStateException 状态异常
+     * @throws IllegalStateException Abnormal status
      */
     @Override
     public void attachToRecyclerView(@Nullable RecyclerView recyclerView) throws
@@ -25,11 +25,11 @@ public class PagerSnapHelper extends SnapHelper {
     }
 
     /**
-     * 计算需要滚动的向量，用于页面自动回滚对齐
+     * Calculates the scroll vector for automatic page rollback and alignment
      *
-     * @param layoutManager 布局管理器
-     * @param targetView    目标控件
-     * @return 需要滚动的距离
+     * @param layoutManager Layout manager
+     * @param targetView    Target control
+     * @return Distance to be scrolled
      */
     @Nullable
     @Override
@@ -45,10 +45,10 @@ public class PagerSnapHelper extends SnapHelper {
     }
 
     /**
-     * 获得需要对齐的View，对于分页布局来说，就是页面第一个
+     * Gets the view that is to be aligned, which is the first one on the page for the paged layout
      *
-     * @param layoutManager 布局管理器
-     * @return 目标控件
+     * @param layoutManager Layout manager
+     * @return Target control
      */
     @Nullable
     @Override
@@ -61,13 +61,13 @@ public class PagerSnapHelper extends SnapHelper {
     }
 
     /**
-     * 获取目标控件的位置下标
-     * (获取滚动后第一个View的下标)
+     * Gets the subscript of the target control position
+     * Gets the subscript of the first view after scroll
      *
-     * @param layoutManager 布局管理器
-     * @param velocityX     X 轴滚动速率
-     * @param velocityY     Y 轴滚动速率
-     * @return 目标控件的下标
+     * @param layoutManager Layout manager
+     * @param velocityX     Scroll speed on the X axis
+     * @param velocityY     Scroll speed on the Y axis
+     * @return Target control subscript
      */
     @Override
     public int findTargetSnapPosition(RecyclerView.LayoutManager layoutManager,
@@ -93,11 +93,11 @@ public class PagerSnapHelper extends SnapHelper {
     }
 
     /**
-     * 一扔(快速滚动)
+     * Quick scroll
      *
-     * @param velocityX X 轴滚动速率
-     * @param velocityY Y 轴滚动速率
-     * @return 是否消费该事件
+     * @param velocityX Scroll speed on the X axis
+     * @param velocityY Scroll speed on the Y axis
+     * @return Whether to consume the event
      */
     @Override
     public boolean onFling(int velocityX, int velocityY) {
@@ -115,12 +115,12 @@ public class PagerSnapHelper extends SnapHelper {
     }
 
     /**
-     * 快速滚动的具体处理方案
+     * Specific scheme for processing quick scroll
      *
-     * @param layoutManager 布局管理器
-     * @param velocityX     X 轴滚动速率
-     * @param velocityY     Y 轴滚动速率
-     * @return 是否消费该事件
+     * @param layoutManager Layout manager
+     * @param velocityX     Scroll speed on the X axis
+     * @param velocityY     Scroll speed on the Y axis
+     * @return Whether to consume the event
      */
     private boolean snapFromFling(@NonNull RecyclerView.LayoutManager layoutManager, int velocityX,
                                   int velocityY) {
@@ -144,10 +144,10 @@ public class PagerSnapHelper extends SnapHelper {
     }
 
     /**
-     * 通过自定义 LinearSmoothScroller 来控制速度
+     * Customizes `LinearSmoothScroller` to control the speed
      *
-     * @param layoutManager 布局故哪里去
-     * @return 自定义 LinearSmoothScroller
+     * @param layoutManager Layout manager
+     * @return Custom `LinearSmoothScroller`
      */
     protected LinearSmoothScroller createSnapScroller(RecyclerView.LayoutManager layoutManager) {
         if (!(layoutManager instanceof RecyclerView.SmoothScroller.ScrollVectorProvider)) {
@@ -156,14 +156,15 @@ public class PagerSnapHelper extends SnapHelper {
         return new PagerGridSmoothScroller(mRecyclerView);
     }
 
-    //--- 公开方法 ----------------------------------------------------------------------------------
+    //--- Public method ----------------------------------------------------------------------------------
 
     /**
-     * 设置滚动阀值
+     * Sets the scroll threshold
      *
-     * @param threshold 滚动阀值
+     * @param threshold Scroll threshold
      */
     public void setFlingThreshold(int threshold) {
         PagerConfig.setFlingThreshold(threshold);
     }
+
 }

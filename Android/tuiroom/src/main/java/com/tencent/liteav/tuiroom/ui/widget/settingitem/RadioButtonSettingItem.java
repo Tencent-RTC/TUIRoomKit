@@ -18,9 +18,6 @@ import com.tencent.liteav.tuiroom.model.impl.base.TRTCLogger;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 带RadioButton的item
- */
 public class RadioButtonSettingItem extends BaseSettingItem {
     private static final String TAG = RadioButtonSettingItem.class.getName();
 

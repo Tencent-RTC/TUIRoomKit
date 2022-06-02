@@ -7,7 +7,7 @@ import android.widget.FrameLayout;
 
 import com.tencent.liteav.beauty.TXBeautyManager;
 import com.tencent.qcloud.tuikit.tuibeauty.R;
-import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyManager;
+import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyService;
 
 /**
  * 美颜功能展开按钮
@@ -36,15 +36,5 @@ public class TUIBeautyButton extends FrameLayout {
                 }
             }
         });
-    }
-
-    public TUIBeautyManager getTUIBeautyManager() {
-        return TUIBeautyManager.getInstance();
-    }
-
-    @Override
-    public void onDetachedFromWindow() {
-        TUIBeautyManager.getInstance().destroy();
-        super.onDetachedFromWindow();
     }
 }

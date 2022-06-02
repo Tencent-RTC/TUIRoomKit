@@ -10,9 +10,6 @@ import androidx.fragment.app.Fragment;
 
 import com.tencent.liteav.tuiroom.model.TUIRoomCore;
 
-/**
- * 设置fragment的基类
- */
 public abstract class BaseSettingFragment extends Fragment {
     protected TUIRoomCore mTUIRoomCore;
 

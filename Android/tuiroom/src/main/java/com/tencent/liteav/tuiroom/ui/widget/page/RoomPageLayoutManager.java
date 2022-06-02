@@ -19,48 +19,41 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         RecyclerView.SmoothScroller.ScrollVectorProvider {
     private static final String TAG = RoomPageLayoutManager.class.getName();
 
-    public static final int VERTICAL   = 0;           // 垂直滚动
-    public static final int HORIZONTAL = 1;           // 水平滚动
+    public static final int VERTICAL   = 0;
+    public static final int HORIZONTAL = 1;
     private             int mFirstVisiblePosition;
 
 
     @IntDef({VERTICAL, HORIZONTAL})
     public @interface OrientationType {
-    }            // 滚动类型
+    }
 
     @OrientationType
-    private int mOrientation;                       // 默认水平滚动
+    private int mOrientation;
 
-    private int mOffsetX = 0;                       // 水平滚动距离(偏移量)
-    private int mOffsetY = 0;                       // 垂直滚动距离(偏移量)
+    private int mOffsetX = 0;
+    private int mOffsetY = 0;
 
-    private int mRows;                              // 行数
-    private int mColumns;                           // 列数
-    private int mOnePageSize;                       // 一页的条目数量
+    private int mRows;
+    private int mColumns;
+    private int mOnePageSize;
 
-    private SparseArray<Rect> mItemFrames;          // 条目的显示区域
+    private SparseArray<Rect> mItemFrames;
 
-    private int mItemWidth  = 0;                     // 条目宽度
-    private int mItemHeight = 0;                    // 条目高度
+    private int mItemWidth  = 0;
+    private int mItemHeight = 0;
 
-    private int mWidthUsed  = 0;                     // 已经使用空间，用于测量View
-    private int mHeightUsed = 0;                    // 已经使用空间，用于测量View
+    private int mWidthUsed  = 0;
+    private int mHeightUsed = 0;
 
-    private int mMaxScrollX;                        // 最大允许滑动的宽度
-    private int mMaxScrollY;                        // 最大允许滑动的高度
-    private int mScrollState = SCROLL_STATE_IDLE;   // 滚动状态
+    private int mMaxScrollX;
+    private int mMaxScrollY;
+    private int mScrollState = SCROLL_STATE_IDLE;
 
-    private boolean mAllowContinuousScroll = true;  // 是否允许连续滚动
+    private boolean mAllowContinuousScroll = true;
 
     private RecyclerView mRecyclerView;
 
-    /**
-     * 构造函数
-     *
-     * @param rows        行数
-     * @param columns     列数
-     * @param orientation 方向
-     */
     public RoomPageLayoutManager(@IntRange(from = 1, to = 100) int rows,
                                  @IntRange(from = 1, to = 100) int columns,
                                  @OrientationType int orientation) {
@@ -77,30 +70,19 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         mRecyclerView = view;
     }
 
-    //--- 处理布局 ----------------------------------------------------------------------------------
-
-    /**
-     * 布局子View
-     *
-     * @param recycler Recycler
-     * @param state    State
-     */
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-        // 如果是 preLayout 则不重新布局
         if (state.isPreLayout() || getUsableWidth() == 0) {
             return;
         }
 
-        // 这里应该增加一个 spansizelookup 实现复杂的布局，时间原因下次应进行优化
         if (getItemCount() == 0) {
             removeAndRecycleAllViews(recycler);
-            // 页面变化回调
             setPageCount(0);
             setPageIndex(0, false);
             return;
         } else if (getItemCount() == 1) {
-            detachAndScrapAttachedViews(recycler); // 移除所有View
+            detachAndScrapAttachedViews(recycler);
             View scrap = recycler.getViewForPosition(0);
             measureChildWithMargins(scrap, 0, 0);
             addView(scrap);
@@ -114,7 +96,7 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
             }
             return;
         } else if (getItemCount() == 2) {
-            detachAndScrapAttachedViews(recycler); // 移除所有View
+            detachAndScrapAttachedViews(recycler);
             View scrap = recycler.getViewForPosition(0);
             int heightUse = getUsableHeight() / 2;
             measureChildWithMargins(scrap, 0, heightUse);
@@ -141,13 +123,11 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
             setPageIndex(getPageIndexByOffset(), false);
         }
 
-        // 计算页面数量
         int mPageCount = getItemCount() / mOnePageSize;
         if (getItemCount() % mOnePageSize != 0) {
             mPageCount++;
         }
 
-        // 计算可以滚动的最大数值，并对滚动距离进行修正
         if (canScrollHorizontally()) {
             mMaxScrollX = (mPageCount - 1) * getUsableWidth();
             mMaxScrollY = 0;
@@ -162,10 +142,6 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
             }
         }
 
-        // 接口回调
-        // setPageCount(mPageCount);
-        // setPageIndex(mCurrentPageIndex, false);
-
         PagerConfig.info("count = " + getItemCount());
 
         if (mItemWidth <= 0) {
@@ -178,20 +154,13 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         mWidthUsed = getUsableWidth() - mItemWidth;
         mHeightUsed = getUsableHeight() - mItemHeight;
 
-        // 预存储两页的View显示区域
         for (int i = 0; i < mOnePageSize * 2; i++) {
             getItemFrameByPosition(i);
         }
 
-        // 回收和填充布局
         recycleAndFillItems(recycler, state, true);
     }
 
-    /**
-     * 布局结束
-     *
-     * @param state State
-     */
     @Override
     public void onLayoutCompleted(RecyclerView.State state) {
         super.onLayoutCompleted(state);
@@ -203,13 +172,6 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         setPageIndex(getPageIndexByOffset(), false);
     }
 
-    /**
-     * 回收和填充布局
-     *
-     * @param recycler Recycler
-     * @param state    State
-     * @param isStart  是否从头开始，用于控制View遍历方向，true 为从头到尾，false 为从尾到头
-     */
     private void recycleAndFillItems(RecyclerView.Recycler recycler, RecyclerView.State state,
                                      boolean isStart) {
         if (state.isPreLayout()) {
@@ -219,15 +181,13 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         PagerConfig.info("mOffsetX = " + mOffsetX);
         PagerConfig.info("mOffsetY = " + mOffsetY);
 
-        // 计算显示区域区前后多存储一列或则一行
         Rect displayRect = new Rect(mOffsetX - mItemWidth, mOffsetY - mItemHeight,
                 getUsableWidth() + mOffsetX + mItemWidth, getUsableHeight() + mOffsetY + mItemHeight);
-        // 对显显示区域进行修正(计算当前显示区域和最大显示区域对交集)
         displayRect.intersect(0, 0, mMaxScrollX + getUsableWidth(), mMaxScrollY
                 + getUsableHeight());
         PagerConfig.error("displayRect = " + displayRect.toString());
 
-        int startPos = 0;                  // 获取第一个条目的Pos
+        int startPos;
         int pageIndex = getPageIndexByOffset();
         startPos = pageIndex * mOnePageSize;
         PagerConfig.info("startPos = " + startPos);
@@ -243,7 +203,7 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         PagerConfig.error("startPos = " + startPos);
         PagerConfig.error("stopPos = " + stopPos);
 
-        detachAndScrapAttachedViews(recycler); // 移除所有View
+        detachAndScrapAttachedViews(recycler);
 
         if (isStart) {
             for (int i = startPos; i < stopPos; i++) {
@@ -271,18 +231,11 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return mFirstVisiblePosition;
     }
 
-    /**
-     * 添加或者移除条目
-     *
-     * @param recycler    RecyclerView
-     * @param displayRect 显示区域
-     * @param i           条目下标
-     */
     private void addOrRemove(RecyclerView.Recycler recycler, Rect displayRect, int i) {
         View child = recycler.getViewForPosition(i);
         Rect rect = getItemFrameByPosition(i);
         if (!Rect.intersects(displayRect, rect)) {
-            removeAndRecycleView(child, recycler);   // 回收入暂存区
+            removeAndRecycleView(child, recycler);
         } else {
             addView(child);
             measureChildWithMargins(child, mWidthUsed, mHeightUsed);
@@ -295,17 +248,6 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         }
     }
 
-
-    //--- 处理滚动 ----------------------------------------------------------------------------------
-
-    /**
-     * 水平滚动
-     *
-     * @param dx       滚动距离
-     * @param recycler 回收器
-     * @param state    滚动状态
-     * @return 实际滚动距离
-     */
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State
             state) {
@@ -324,14 +266,6 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return result;
     }
 
-    /**
-     * 垂直滚动
-     *
-     * @param dy       滚动距离
-     * @param recycler 回收器
-     * @param state    滚动状态
-     * @return 实际滚动距离
-     */
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State
             state) {
@@ -353,11 +287,6 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return result;
     }
 
-    /**
-     * 监听滚动状态，滚动结束后通知当前选中的页面
-     *
-     * @param state 滚动状态
-     */
     @Override
     public void onScrollStateChanged(int state) {
         PagerConfig.info("onScrollStateChanged = " + state);
@@ -368,25 +297,11 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         }
     }
 
-
-    //--- 私有方法 ----------------------------------------------------------------------------------
-
-    /**
-     * 获取条目显示区域
-     *
-     * @param pos 位置下标
-     * @return 显示区域
-     */
     private Rect getItemFrameByPosition(int pos) {
         Rect rect = mItemFrames.get(pos);
         if (null == rect) {
             rect = new Rect();
-            // 计算显示区域 Rect
-
-            // 1. 获取当前View所在页数
             int page = pos / mOnePageSize;
-
-            // 2. 计算当前页数左上角的总偏移量
             int offsetX = 0;
             int offsetY = 0;
             if (canScrollHorizontally()) {
@@ -395,57 +310,31 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
                 offsetY += getUsableHeight() * page;
             }
 
-            // 3. 根据在当前页面中的位置确定具体偏移量
-            int pagePos = pos % mOnePageSize;       // 在当前页面中是第几个
-            int row = pagePos / mColumns;           // 获取所在行
-            int col = pagePos - (row * mColumns);   // 获取所在列
+            int pagePos = pos % mOnePageSize;
+            int row = pagePos / mColumns;
+            int col = pagePos - (row * mColumns);
 
             offsetX += col * mItemWidth;
             offsetY += row * mItemHeight;
-
-            // 状态输出，用于调试
-            PagerConfig.info("pagePos = " + pagePos);
-            PagerConfig.info("行 = " + row);
-            PagerConfig.info("列 = " + col);
-
-            PagerConfig.info("offsetX = " + offsetX);
-            PagerConfig.info("offsetY = " + offsetY);
 
             rect.left = offsetX;
             rect.top = offsetY;
             rect.right = offsetX + mItemWidth;
             rect.bottom = offsetY + mItemHeight;
 
-            // 存储
             mItemFrames.put(pos, rect);
         }
         return rect;
     }
 
-    /**
-     * 获取可用的宽度
-     *
-     * @return 宽度 - padding
-     */
     private int getUsableWidth() {
         return getWidth() - getPaddingLeft() - getPaddingRight();
     }
 
-    /**
-     * 获取可用的高度
-     *
-     * @return 高度 - padding
-     */
     private int getUsableHeight() {
         return getHeight() - getPaddingTop() - getPaddingBottom();
     }
 
-
-    //--- 页面相关(私有) -----------------------------------------------------------------------------
-
-    /**
-     * 获取总页数
-     */
     private int getTotalPageCount() {
         if (getItemCount() <= 0) {
             return 0;
@@ -457,21 +346,10 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return totalCount;
     }
 
-    /**
-     * 根据pos，获取该View所在的页面
-     *
-     * @param pos position
-     * @return 页面的页码
-     */
     private int getPageIndexByPos(int pos) {
         return pos / mOnePageSize;
     }
 
-    /**
-     * 根据 offset 获取页面Index
-     *
-     * @return 页面 Index
-     */
     private int getPageIndexByOffset() {
         int pageIndex;
         if (canScrollVertically()) {
@@ -499,39 +377,22 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return pageIndex;
     }
 
-
-    //--- 公开方法 ----------------------------------------------------------------------------------
-
-    /**
-     * 创建默认布局参数
-     *
-     * @return 默认布局参数
-     */
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
         return new RecyclerView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
-    /**
-     * 处理测量逻辑
-     *
-     * @param recycler          RecyclerView
-     * @param state             状态
-     * @param widthMeasureSpec  宽度属性
-     * @param heightMeasureSpec 高估属性
-     */
     @Override
     public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthMeasureSpec,
                           int heightMeasureSpec) {
         super.onMeasure(recycler, state, widthMeasureSpec, heightMeasureSpec);
-        int widthsize = View.MeasureSpec.getSize(widthMeasureSpec);      //取出宽度的确切数值
-        int widthmode = View.MeasureSpec.getMode(widthMeasureSpec);      //取出宽度的测量模式
+        int widthsize = View.MeasureSpec.getSize(widthMeasureSpec);
+        int widthmode = View.MeasureSpec.getMode(widthMeasureSpec);
 
-        int heightsize = View.MeasureSpec.getSize(heightMeasureSpec);    //取出高度的确切数值
-        int heightmode = View.MeasureSpec.getMode(heightMeasureSpec);    //取出高度的测量模式
+        int heightsize = View.MeasureSpec.getSize(heightMeasureSpec);
+        int heightmode = View.MeasureSpec.getMode(heightMeasureSpec);
 
-        // 将 wrap_content 转换为 match_parent
         if (widthmode != EXACTLY && widthsize > 0) {
             widthmode = EXACTLY;
         }
@@ -542,31 +403,16 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
                 View.MeasureSpec.makeMeasureSpec(heightsize, heightmode));
     }
 
-    /**
-     * 是否可以水平滚动
-     *
-     * @return true 是，false 不是。
-     */
     @Override
     public boolean canScrollHorizontally() {
         return mOrientation == HORIZONTAL;
     }
 
-    /**
-     * 是否可以垂直滚动
-     *
-     * @return true 是，false 不是。
-     */
     @Override
     public boolean canScrollVertically() {
         return mOrientation == VERTICAL;
     }
 
-    /**
-     * 找到下一页第一个条目的位置
-     *
-     * @return 第一个搞条目的位置
-     */
     int findNextPageFirstPos() {
         int page = mLastPageIndex;
         page++;
@@ -577,13 +423,8 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return page * mOnePageSize;
     }
 
-    /**
-     * 找到上一页的第一个条目的位置
-     *
-     * @return 第一个条目的位置
-     */
+
     int findPrePageFirstPos() {
-        // 在获取时由于前一页的View预加载出来了，所以获取到的直接就是前一页
         int page = mLastPageIndex;
         page--;
         PagerConfig.error("computeScrollVectorForPosition pre = " + page);
@@ -594,33 +435,15 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return page * mOnePageSize;
     }
 
-    /**
-     * 获取当前 X 轴偏移量
-     *
-     * @return X 轴偏移量
-     */
     public int getOffsetX() {
         return mOffsetX;
     }
 
-    /**
-     * 获取当前 Y 轴偏移量
-     *
-     * @return Y 轴偏移量
-     */
     public int getOffsetY() {
         return mOffsetY;
     }
 
 
-    //--- 页面对齐 ----------------------------------------------------------------------------------
-
-    /**
-     * 计算到目标位置需要滚动的距离{@link RecyclerView.SmoothScroller.ScrollVectorProvider}
-     *
-     * @param targetPosition 目标控件
-     * @return 需要滚动的距离
-     */
     @Override
     public PointF computeScrollVectorForPosition(int targetPosition) {
         PointF vector = new PointF();
@@ -630,12 +453,6 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return vector;
     }
 
-    /**
-     * 获取偏移量(为PagerGridSnapHelper准备)
-     * 用于分页滚动，确定需要滚动的距离。
-     *
-     * @param targetPosition 条目下标
-     */
     int[] getSnapOffset(int targetPosition) {
         int[] offset = new int[2];
         int[] pos = getPageLeftTopByPosition(targetPosition);
@@ -644,12 +461,6 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return offset;
     }
 
-    /**
-     * 根据条目下标获取该条目所在页面的左上角位置
-     *
-     * @param pos 条目下标
-     * @return 左上角位置
-     */
     private int[] getPageLeftTopByPosition(int pos) {
         int[] leftTop = new int[2];
         int page = getPageIndexByPos(pos);
@@ -663,11 +474,6 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return leftTop;
     }
 
-    /**
-     * 获取需要对齐的View
-     *
-     * @return 需要对齐的View
-     */
     public View findSnapView() {
         if (null != getFocusedChild()) {
             return getFocusedChild();
@@ -685,18 +491,10 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return getChildAt(0);
     }
 
+    private boolean mChangeSelectInScrolling = true;
+    private int     mLastPageCount           = -1;
+    private int     mLastPageIndex           = -1;
 
-    //--- 处理页码变化 -------------------------------------------------------------------------------
-
-    private boolean mChangeSelectInScrolling = true;    // 是否在滚动过程中对页面变化回调
-    private int     mLastPageCount           = -1;                    // 上次页面总数
-    private int     mLastPageIndex           = -1;                    // 上次页面下标
-
-    /**
-     * 设置页面总数
-     *
-     * @param pageCount 页面总数
-     */
     private void setPageCount(int pageCount) {
         if (pageCount >= 0) {
             if (mPageListener != null && pageCount != mLastPageCount) {
@@ -706,22 +504,14 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         }
     }
 
-    /**
-     * 设置当前选中页面
-     *
-     * @param pageIndex   页面下标
-     * @param isScrolling 是否处于滚动状态
-     */
     private void setPageIndex(int pageIndex, boolean isScrolling) {
         PagerConfig.error("setPageIndex = " + pageIndex + ":" + isScrolling);
         if (pageIndex == mLastPageIndex) {
             return;
         }
-        // 如果允许连续滚动，那么在滚动过程中就会更新页码记录
         if (isAllowContinuousScroll()) {
             mLastPageIndex = pageIndex;
         } else {
-            // 否则，只有等滚动停下时才会更新页码记录
             if (!isScrolling) {
                 mLastPageIndex = pageIndex;
             }
@@ -736,21 +526,10 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         }
     }
 
-    /**
-     * 设置是否在滚动状态更新选中页码
-     *
-     * @param changeSelectInScrolling true：更新、false：不更新
-     */
     public void setChangeSelectInScrolling(boolean changeSelectInScrolling) {
         mChangeSelectInScrolling = changeSelectInScrolling;
     }
 
-    /**
-     * 设置滚动方向
-     *
-     * @param orientation 滚动方向
-     * @return 最终的滚动方向
-     */
     @OrientationType
     public int setOrientationType(@OrientationType int orientation) {
         if (mOrientation == orientation || mScrollState != SCROLL_STATE_IDLE) {
@@ -769,33 +548,20 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         return mOrientation;
     }
 
-    //--- 滚动到指定位置 -----------------------------------------------------------------------------
-
     @Override
     public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
         int targetPageIndex = getPageIndexByPos(position);
         smoothScrollToPage(targetPageIndex);
     }
 
-    /**
-     * 平滑滚动到上一页
-     */
     public void smoothPrePage() {
         smoothScrollToPage(getPageIndexByOffset() - 1);
     }
 
-    /**
-     * 平滑滚动到下一页
-     */
     public void smoothNextPage() {
         smoothScrollToPage(getPageIndexByOffset() + 1);
     }
 
-    /**
-     * 平滑滚动到指定页面
-     *
-     * @param pageIndex 页面下标
-     */
     public void smoothScrollToPage(int pageIndex) {
         if (pageIndex < 0 || pageIndex >= mLastPageCount) {
             Log.e(TAG, "pageIndex is outOfIndex, must in [0, " + mLastPageCount + ").");
@@ -806,8 +572,6 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
             return;
         }
 
-        // 如果滚动到页面之间距离过大，先直接滚动到目标页面到临近页面，在使用 smoothScroll 最终滚动到目标
-        // 否则在滚动距离很大时，会导致滚动耗费的时间非常长
         int currentPageIndex = getPageIndexByOffset();
         if (Math.abs(pageIndex - currentPageIndex) > 3) {
             if (pageIndex > currentPageIndex) {
@@ -817,14 +581,11 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
             }
         }
 
-        // 具体执行滚动
         LinearSmoothScroller smoothScroller = new PagerGridSmoothScroller(mRecyclerView);
         int position = pageIndex * mOnePageSize;
         smoothScroller.setTargetPosition(position);
         startSmoothScroll(smoothScroller);
     }
-
-    //=== 直接滚动 ===
 
     @Override
     public void scrollToPosition(int position) {
@@ -832,25 +593,14 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         scrollToPage(pageIndex);
     }
 
-    /**
-     * 上一页
-     */
     public void prePage() {
         scrollToPage(getPageIndexByOffset() - 1);
     }
 
-    /**
-     * 下一页
-     */
     public void nextPage() {
         scrollToPage(getPageIndexByOffset() + 1);
     }
 
-    /**
-     * 滚动到指定页面
-     *
-     * @param pageIndex 页面下标
-     */
     public void scrollToPage(int pageIndex) {
         if (pageIndex < 0 || pageIndex >= mLastPageCount) {
             Log.e(TAG, "pageIndex = " + pageIndex + " is out of bounds, mast in [0, " + mLastPageCount + ")");
@@ -877,25 +627,13 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
         setPageIndex(pageIndex, false);
     }
 
-    /**
-     * 是否允许连续滚动，默认为允许
-     *
-     * @return true 允许， false 不允许
-     */
     public boolean isAllowContinuousScroll() {
         return mAllowContinuousScroll;
     }
 
-    /**
-     * 设置是否允许连续滚动
-     *
-     * @param allowContinuousScroll true 允许，false 不允许
-     */
     public void setAllowContinuousScroll(boolean allowContinuousScroll) {
         mAllowContinuousScroll = allowContinuousScroll;
     }
-
-    //--- 对外接口 ----------------------------------------------------------------------------------
 
     private PageListener mPageListener = null;
 
@@ -904,18 +642,9 @@ public class RoomPageLayoutManager extends RecyclerView.LayoutManager implements
     }
 
     public interface PageListener {
-        /**
-         * 页面总数量变化
-         *
-         * @param pageSize 页面总数
-         */
+
         void onPageSizeChanged(int pageSize);
 
-        /**
-         * 页面被选中
-         *
-         * @param pageIndex 选中的页面
-         */
         void onPageSelect(int pageIndex);
 
         void onItemVisible(int fromItem, int toItem);

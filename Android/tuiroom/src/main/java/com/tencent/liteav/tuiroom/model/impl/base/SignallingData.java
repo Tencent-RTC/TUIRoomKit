@@ -66,7 +66,7 @@ public class SignallingData {
         private String senderId;
 
         @SerializedName("receiver_id")
-        private String  receiverId;
+        private String receiverId;
 
         private Boolean agree;
 

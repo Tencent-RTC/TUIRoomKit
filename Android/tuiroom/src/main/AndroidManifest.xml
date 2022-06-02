@@ -25,7 +25,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
-
     </application>
 
 </manifest>

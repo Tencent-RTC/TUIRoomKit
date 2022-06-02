@@ -6,36 +6,38 @@ import com.tencent.liteav.tuiroom.model.TUIRoomCoreDef;
 
 public abstract class TUIRoom {
     /**
-     * 获取 TUIRoom 单例对象
+     * Get a `TUIRoom` singleton object
      *
-     * @return 返回 TUIRoom 单例对象
+     * @return Return the `TUIRoom` singleton object.
      */
     public static TUIRoom sharedInstance(Context context) {
         return TUIRoomImpl.sharedInstance(context);
     }
 
     /**
-     * 创建房间
+     * Create a room
      *
-     * @param roomId           字符串房间id
-     * @param speechMode       发言模式：自由发言，申请发言
-     * @param isOpenCamera     是否打开摄像头
-     * @param isOpenMicrophone 是否打开麦克风
+     * @param roomId           Room ID. You need to assign and manage the IDs in a centralized manner
+     * @param speechMode       Speech mode. Valid values:
+     *                         TUIRoomCoreDef.SpeechMode.FREE_SPEECH: Users can speak freely;
+     *                         TUIRoomDef.SpeechMode.APPLY_SPEECH: Users need permission to speak.
+     * @param isOpenCamera     whether to open the camera
+     * @param isOpenMicrophone whether to open the microphone
      */
     public abstract void createRoom(int roomId, TUIRoomCoreDef.SpeechMode speechMode, boolean isOpenCamera,
                                     boolean isOpenMicrophone);
 
     /**
-     * 进入已创建的房间
+     * Enter a room
      *
-     * @param roomId           字符串房间id
-     * @param isOpenCamera     是否打开摄像头
-     * @param isOpenMicrophone 是否打开麦克风
+     * @param roomId           Room ID. You need to assign and manage the IDs in a centralized manner
+     * @param isOpenCamera     whether to open the camera
+     * @param isOpenMicrophone whether to open the microphone
      */
     public abstract void enterRoom(int roomId, boolean isOpenCamera, boolean isOpenMicrophone);
 
     /**
-     * @param listener 事件监听
+     * @param listener Set the event callbacks of the component
      */
     public abstract void setListener(TUIRoomListener listener);
 }

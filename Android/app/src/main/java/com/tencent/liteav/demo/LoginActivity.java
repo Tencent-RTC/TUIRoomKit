@@ -34,8 +34,8 @@ import java.util.Random;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = LoginActivity.class.getName();
 
-    private EditText          mEditUserId;
-    private Button            mButtonLogin;
+    private EditText mEditUserId;
+    private Button   mButtonLogin;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -103,7 +103,6 @@ public class LoginActivity extends AppCompatActivity {
     private void getUserInfo() {
         final UserModelManager manager = UserModelManager.getInstance();
         final UserModel userModel = manager.getUserModel();
-        //先查询用户是否存在
         List<String> userIdList = new ArrayList<>();
         userIdList.add(userModel.userId);
         Log.d(TAG, "setUserInfo: userIdList = " + userIdList);
@@ -123,20 +122,17 @@ public class LoginActivity extends AppCompatActivity {
                 String userName = result.getNickName();
                 String userAvatar = result.getFaceUrl();
                 Log.d(TAG, "onSuccess: userName = " + userName + " , userAvatar = " + userAvatar);
-                //如果用户名和头像为空,则跳转设置界面进行设置
                 if (TextUtils.isEmpty(userName) || TextUtils.isEmpty(userAvatar)) {
                     Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
                     startActivity(intent);
-                    finish();
                 } else {
                     userModel.userAvatar = userAvatar;
                     userModel.userName = userName;
                     manager.setUserModel(userModel);
-                    //如果用户信息不为空,则直接进入主界面
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
-                    finish();
                 }
+                finish();
             }
         });
     }

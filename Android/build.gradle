@@ -6,12 +6,10 @@ buildscript {
         jcenter()
         google()
         mavenCentral()
-        //tpns接入
         
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
-        //tpns集成插件
         
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -28,7 +26,7 @@ allprojects {
         jcenter()
         google()
         mavenCentral()
-         // 华为仓，如果不集成华为可以不加
+        
     }
 }
 

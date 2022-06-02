@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
- * 作用：用于处理平滑滚动
- * 摘要：用于用户手指抬起后页面对齐或者 Fling 事件。
+ * Description: It is used to process smooth scroll.
+ * Summary: It is used for page alignment and fling events after the user lifts their finger.
  */
 public class PagerGridSmoothScroller extends LinearSmoothScroller {
     private RecyclerView mRecyclerView;

@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/tuiroom_bg_item_no_content">
 
-
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_user_head"
         android:layout_width="50dp"
@@ -74,9 +73,9 @@
 
     <FrameLayout
         android:id="@+id/talk_view"
-        android:visibility="gone"
-        android:background="@drawable/tuiroom_bg_talk_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="@drawable/tuiroom_bg_talk_view"
+        android:visibility="gone" />
 
 </RelativeLayout>

@@ -1,9 +1,9 @@
 package com.tencent.liteav.tuiroom.model.impl.base;
 
 public class TXUserInfo {
-    public String userId;
-    public String userName;
-    public String avatarURL;
+    public String  userId;
+    public String  userName;
+    public String  avatarURL;
     public boolean isOwner;
 
     @Override

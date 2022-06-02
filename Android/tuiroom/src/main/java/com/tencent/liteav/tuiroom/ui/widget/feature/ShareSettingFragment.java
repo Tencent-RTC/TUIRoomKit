@@ -6,9 +6,6 @@ import android.widget.Button;
 import com.tencent.liteav.tuiroom.ui.widget.base.BaseSettingFragment;
 import com.tencent.liteav.tuiroom.R;
 
-/**
- * 分享相关配置
- */
 public class ShareSettingFragment extends BaseSettingFragment {
     private static final String TAG = ShareSettingFragment.class.getName();
 

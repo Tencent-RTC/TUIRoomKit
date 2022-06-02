@@ -11,14 +11,14 @@ public class GroupNotificationData {
      * startTime : 1637062121090
      */
 
-    private int     version    = SignallingConstant.VALUE_VERSION;
-    private String  speechMode = SignallingConstant.VALUE_FREE_SPEECH;
-    private Boolean isChatRoomMuted = false;
+    private int     version                      = SignallingConstant.VALUE_VERSION;
+    private String  speechMode                   = SignallingConstant.VALUE_FREE_SPEECH;
+    private Boolean isChatRoomMuted              = false;
     private Boolean isSpeechApplicationForbidden = false;
-    private Boolean isAllCameraMuted = false;
-    private Boolean isAllMicMuted = false;
-    private Boolean isCallingRoll = false;
-    private Long    startTime = 0L;
+    private Boolean isAllCameraMuted             = false;
+    private Boolean isAllMicMuted                = false;
+    private Boolean isCallingRoll                = false;
+    private Long    startTime                    = 0L;
 
     public String getSpeechMode() {
         return speechMode;

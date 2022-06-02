@@ -1,7 +1,9 @@
 package com.tencent.liteav.tuiroom.ui;
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
+
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,9 +12,6 @@ import android.widget.TextView;
 
 import com.tencent.liteav.tuiroom.R;
 
-/**
- * 头部view
- */
 public class TUIRoomHeadBarView extends RelativeLayout {
     private ImageView       mHeadsetImg;
     private ImageView       mCameraSwitchImg;

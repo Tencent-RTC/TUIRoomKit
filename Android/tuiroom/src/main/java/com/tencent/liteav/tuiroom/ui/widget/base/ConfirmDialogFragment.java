@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.tencent.liteav.tuiroom.R;
 
-
 public class ConfirmDialogFragment extends DialogFragment {
 
     private PositiveClickListener mPositiveClickListener;

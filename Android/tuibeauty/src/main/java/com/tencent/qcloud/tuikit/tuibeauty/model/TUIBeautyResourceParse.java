@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
-import com.tencent.qcloud.tuikit.tuibeauty.model.utils.ResourceUtils;
+import com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyResourceUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -44,7 +44,7 @@ public class TUIBeautyResourceParse {
     private static Application sApplication;
 
 
-    public static TUIBeautyInfo getDefaultBeautyInfo(Context context) {
+    public static TUIBeautyInfo getDefaultBeautyInfo() {
         TUIBeautyInfo beautyInfo = createBeautyInfo(readAssetsFile(DEFAULT_BEAUTY_DATA));
         return beautyInfo;
     }
@@ -60,11 +60,11 @@ public class TUIBeautyResourceParse {
     }
 
     public static void setTextViewText(TextView textView, String resName) {
-        textView.setText(ResourceUtils.getString(resName));
+        textView.setText(TUIBeautyResourceUtils.getString(resName));
     }
 
     public static void setTextViewColor(TextView textView, String resName) {
-        textView.setTextColor(ResourceUtils.getColor(resName));
+        textView.setTextColor(TUIBeautyResourceUtils.getColor(resName));
     }
 
     public static void setTextViewSize(TextView textView, int size) {
@@ -72,7 +72,7 @@ public class TUIBeautyResourceParse {
     }
 
     public static void setImageResource(ImageView imageView, String res) {
-        imageView.setImageResource(ResourceUtils.getDrawableId(res));
+        imageView.setImageResource(TUIBeautyResourceUtils.getDrawableId(res));
     }
 
     public static String readAssetsFile(String fileName) {

@@ -86,7 +86,7 @@
         android:layout_below="@+id/beauty_rl_seek_bar"
         android:orientation="horizontal">
 
-        <com.tencent.qcloud.tuikit.tuibeauty.view.internal.TCHorizontalScrollView
+        <com.tencent.qcloud.tuikit.tuibeauty.view.internal.TUIBeautyHorizontalScrollView
             android:id="@+id/beauty_horizontal_picker_second"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal" />
-        </com.tencent.qcloud.tuikit.tuibeauty.view.internal.TCHorizontalScrollView>
+        </com.tencent.qcloud.tuikit.tuibeauty.view.internal.TUIBeautyHorizontalScrollView>
     </RelativeLayout>
 
     <LinearLayout
@@ -113,7 +113,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <com.tencent.qcloud.tuikit.tuibeauty.view.internal.TCHorizontalScrollView
+        <com.tencent.qcloud.tuikit.tuibeauty.view.internal.TUIBeautyHorizontalScrollView
             android:id="@+id/beauty_horizontal_picker_view_first"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -125,6 +125,6 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="horizontal" />
-        </com.tencent.qcloud.tuikit.tuibeauty.view.internal.TCHorizontalScrollView>
+        </com.tencent.qcloud.tuikit.tuibeauty.view.internal.TUIBeautyHorizontalScrollView>
     </LinearLayout>
 </RelativeLayout>
