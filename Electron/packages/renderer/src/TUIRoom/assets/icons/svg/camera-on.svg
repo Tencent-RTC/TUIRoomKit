@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="design-iconfont">
+  <defs>
+    <filter color-interpolation-filters="auto" id="ev82jyuj3a">
+      <feColorMatrix in="SourceGraphic" values="0 0 0 0 0.678431 0 0 0 0 0.713725 0 0 0 0 0.800000 0 0 0 1.000000 0"/>
+    </filter>
+  </defs>
+  <g filter="url(#ev82jyuj3a)" fill="none" fill-rule="evenodd">
+    <path d="M23.8985477,1.67119321 L23.9989084,12.269122 L19,9.86074311 L19,4.1281602 L23.8985477,1.67119321 Z" stroke="#CFD4E6" stroke-width="2" transform="translate(4 9)"/>
+    <path d="M16,-1 C16.8284271,-1 17.5784271,-0.664213562 18.1213203,-0.121320344 C18.6642136,0.421572875 19,1.17157288 19,2 L19,2 L19,12 C19,12.8284271 18.6642136,13.5784271 18.1213203,14.1213203 C17.5784271,14.6642136 16.8284271,15 16,15 L16,15 L2,15 C1.17157288,15 0.421572875,14.6642136 -0.121320344,14.1213203 C-0.664213562,13.5784271 -1,12.8284271 -1,12 L-1,12 L-1,2 C-1,1.17157288 -0.664213562,0.421572875 -0.121320344,-0.121320344 C0.421572875,-0.664213562 1.17157288,-1 2,-1 L2,-1 L16,-1 Z" stroke="#CFD4E6" stroke-width="2" stroke-linecap="round" transform="translate(4 9)"/>
+    <path fill="#CFD4E6" d="M3.5 2A1.5 1.5 0 1 0 3.5 5A1.5 1.5 0 1 0 3.5 2Z" transform="translate(4 9)"/>
+  </g>
+</svg>
