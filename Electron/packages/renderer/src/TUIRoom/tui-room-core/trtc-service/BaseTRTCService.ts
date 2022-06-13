@@ -10,6 +10,8 @@ import TRTCCloud, {
   TRTCDeviceInfo,
   TRTCVideoQosPreference,
   TRTCVideoMirrorType,
+  TRTCVideoRotation,
+  TRTCVideoFillMode
 } from 'trtc-electron-sdk';
 import logger from '../common/logger';
 import { ETUIRoomEvents, ETUIStreamType } from '../types.d';
@@ -256,7 +258,9 @@ class BaseTRTCService {
 
   setVideoMirror(mirror: boolean) {
     this.rtcCloud?.setLocalRenderParams({
-      mirrorType: mirror ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable
+      mirrorType: mirror ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+      rotation:TRTCVideoRotation.TRTCVideoRotation0,
+      fillMode:TRTCVideoFillMode.TRTCVideoFillMode_Fit
     });
   }
 
