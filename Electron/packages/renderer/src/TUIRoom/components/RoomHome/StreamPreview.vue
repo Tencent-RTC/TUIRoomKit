@@ -45,10 +45,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import TUIRoomCore, { ETUIRoomEvents } from '../../tui-room-core';
 import IconButton from '../common/IconButton.vue';
-import { onBeforeRouteLeave } from 'vue-router';
 import { SettingMode } from '../../constants/render';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
 import VideoSettingTab from '../base/VideoSettingTab.vue';
@@ -116,7 +115,7 @@ onMounted(async () => {
   TUIRoomCore.on(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);
 });
 
-onBeforeRouteLeave(async () => {
+onBeforeUnmount(async () => {
   await TUIRoomCore.stopCameraPreview();
   await TUIRoomCore.stopMicrophone();
   TUIRoomCore.off(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);
