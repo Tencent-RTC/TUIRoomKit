@@ -12,6 +12,7 @@ end
 # 工具库
 def tool
   pod 'Alamofire'
+  pod 'TUICore', '6.2.2363patch1'
   pod 'TXLiteAVSDK_TRTC', '9.9.11217'
 end
 
