@@ -1,0 +1,336 @@
+{
+    "package": "beauty",
+    "item": [{
+            "title": "TC.BeautySettingPanel.BeautySmooth",
+            "normalIcon": "smooth_nor",
+            "selIcon": "smooth_sel",
+            "currentValue": 6,
+            "isXmagic": 0
+          },
+          {
+            "title": "TC.BeautySettingPanel.Beauty-Natural",
+            "normalIcon": "natural_nor",
+            "selIcon": "natural_sel",
+            "currentValue": 6,
+            "isXmagic": 0
+          },
+          {
+            "title": "TC.BeautySettingPanel.Beauty-P",
+            "normalIcon": "ps_nor",
+            "selIcon": "ps_sel",
+            "currentValue": 6,
+            "isXmagic": 0
+          },
+          {
+            "title": "TC.BeautySettingPanel.White",
+            "normalIcon": "whitness_nor",
+            "selIcon": "whitness_sel",
+            "currentValue": 6,
+            "isXmagic": 0
+          },
+          {
+            "title": "TC.BeautySettingPanel.Ruddy",
+            "normalIcon": "ruddy_nor",
+            "selIcon": "ruddy_sel",
+            "currentValue": 0,
+            "isXmagic": 0
+         },
+        {
+            "title": "TC.BeautySettingPanel.beauty.contrast",
+            "key": "image.contrast",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.saturation",
+            "key": "image.saturation",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.sharpen",
+            "key": "image.sharpen",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.enlarge.eye",
+            "key": "beauty.enlarge.eye",
+            "beautyValue": 20,
+            "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.thin.face1",
+          "key" : "beauty.thin.face1",
+          "beautyValue" : 30,
+          "extraConfig" : {
+            "reshape.basicFaceSubType" : "nature"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.thin.face2",
+          "key" : "beauty.thin.face2",
+          "beautyValue" : 0,
+          "extraConfig" : {
+            "reshape.basicFaceSubType" : "femaleGod"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.thin.face3",
+          "key" : "beauty.thin.face3",
+          "beautyValue" : 0,
+          "extraConfig" : {
+            "reshape.basicFaceSubType" : "maleGod"
+          },
+          "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.v.face",
+            "key": "beauty.v.face",
+            "beautyValue": 30,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.narrow.face",
+            "key": "beauty.narrow.face",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.short.face",
+            "key": "beauty.short.face",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.basic.face",
+            "key": "beauty.basic.face",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.lips1",
+          "key" : "beauty.lips",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.lips.lipsType" : "2",
+            "beauty.lips.lipsMask" : "images\/beauty\/lips_fuguhong.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.lips2",
+          "key" : "beauty.lips",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.lips.lipsType" : "2",
+            "beauty.lips.lipsMask" : "images\/beauty\/lips_mitaose.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.lips3",
+          "key" : "beauty.lips",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.lips.lipsType" : "2",
+            "beauty.lips.lipsMask" : "images\/beauty\/lips_shanhuju.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.lips4",
+          "key" : "beauty.lips",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.lips.lipsType" : "2",
+            "beauty.lips.lipsMask" : "images\/beauty\/lips_wenroufen.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.lips5",
+          "key" : "beauty.lips",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.lips.lipsType" : "2",
+            "beauty.lips.lipsMask" : "images\/beauty\/lips_huolicheng.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.redcheeks1",
+          "key" : "beauty.redcheeks",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.makeupMultiply.multiplyMask" : "images\/beauty\/saihong_jianyue.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.redcheeks2",
+          "key" : "beauty.redcheeks",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.makeupMultiply.multiplyMask" : "images\/beauty\/saihong_shengxia.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.redcheeks3",
+          "key" : "beauty.redcheeks",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.makeupMultiply.multiplyMask" : "images\/beauty\/saihong_haixiu.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.redcheeks4",
+          "key" : "beauty.redcheeks",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.makeupMultiply.multiplyMask" : "images\/beauty\/saihong_chengshu.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.redcheeks4",
+          "key" : "beauty.redcheeks",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.makeupMultiply.multiplyMask" : "images\/beauty\/saihong_queban.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.liti1",
+          "key" : "beauty.liti",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.softLight.softLightMask" : "images\/beauty\/liti_junlang.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.liti2",
+          "key" : "beauty.liti",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.softLight.softLightMask" : "images\/beauty\/liti_ziran.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.liti3",
+          "key" : "beauty.liti",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.softLight.softLightMask" : "images\/beauty\/liti_guangmang.png"
+          },
+          "isXmagic": 1
+        },
+        {
+          "title" : "TC.BeautySettingPanel.beauty.liti4",
+          "key" : "beauty.liti",
+          "beautyValue" : 50,
+          "extraConfig" : {
+            "beauty.softLight.softLightMask" : "images\/beauty\/liti_qingxin.png"
+          },
+          "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.thin.cheek",
+            "key": "beauty.thin.cheek",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.chin",
+            "key": "beauty.chin",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.forehead",
+            "key": "beauty.forehead",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.eye.lighten",
+            "key": "beauty.eye.lighten",
+            "beautyValue": 30,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.eye.distance",
+            "key": "beauty.eye.distance",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.eye.angle",
+            "key": "beauty.eye.angle",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.thin.nose",
+            "key": "beauty.thin.nose",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.nose.wing",
+            "key": "beauty.nose.wing",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.nose.position",
+            "key": "beauty.nose.position",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.tooth.beauty",
+            "key": "beauty.tooth.beauty",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.remove.pounch",
+            "key": "beauty.remove.pounch",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.wrinkle.smooth",
+            "key": "beauty.wrinkle.smooth",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.remove.eye.pouch",
+            "key": "beauty.remove.eye.pouch",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.mouth.size",
+            "key": "beauty.mouth.size",
+            "beautyValue": 0,
+            "isXmagic": 1
+        },
+        {
+            "title": "TC.BeautySettingPanel.beauty.mouth.height",
+            "key": "beauty.mouth.height",
+            "beautyValue": 0,
+            "isXmagic": 1
+        }
+
+    ]
+}

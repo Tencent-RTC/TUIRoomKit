@@ -44,7 +44,6 @@ class TUIRoomBroadcastExtensionLauncher: NSObject {
     }
 
     func launch() {
-        // iOS 12 上弹出比较慢，如果快速点击会Crash
         let now = CFAbsoluteTimeGetCurrent()
         if now - prevLaunchEventTime < 1.0 {
             return

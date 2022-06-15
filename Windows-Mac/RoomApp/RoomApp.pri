@@ -9,7 +9,8 @@ HEADERS += ../utils/json.h \
     ../Common/TXMessageBox.h \
     ../Common/TXImageButton.h \
     ../Common/StatusUpdateCenter.h \
-	./App/Common/DataStore.h \
+    ../Common/DataReport.h \
+    ./App/Common/DataStore.h \
     ./App/CommonDef.h \
     ./App/BottomBarController.h \
     ./App/ChatRoomViewController.h \
@@ -46,14 +47,15 @@ SOURCES += ../utils/jsoncpp.cpp \
     ../Common/TXImageButton.cpp \
     ../Common/ViewDragger.cpp \
     ../Common/StatusUpdateCenter.cpp \
-	./App/Common/DataStore.cpp \
+    ../Common/DataReport.cpp \
+    ./App/Common/DataStore.cpp \
     ./App/BottomBarController.cpp \
     ./App/ChatMessageView.cpp \
     ./App/ChatRoomViewController.cpp \
     ./App/MainWindowLayout.cpp \
     ./App/PresetDeviceController.cpp \
     ./App/LayoutSelectView.cpp \
-	./App/RoomTipsView.cpp \
+    ./App/RoomTipsView.cpp \
     ./App/LoginViewController.cpp \
     ./App/main.cpp \
     ./App/MainWindow.cpp \
@@ -76,11 +78,11 @@ win32{
 
 FORMS += ../Common/Form/TXMessageBox.ui \
     ../Common/Form/TXImageButton.ui \
-	./App/Form/BottomBarController.ui \
+    ./App/Form/BottomBarController.ui \
     ./App/Form/ChatRoomViewController.ui \
     ./App/Form/PresetDeviceController.ui \
     ./App/Form/LayoutSelectView.ui \
-	./App/Form/RoomTipsView.ui \
+    ./App/Form/RoomTipsView.ui \
     ./App/Form/LoginViewController.ui \
     ./App/Form/MainWindow.ui \
     ./App/Form/MemberItemView.ui \

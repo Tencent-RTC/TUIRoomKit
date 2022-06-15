@@ -14,87 +14,87 @@
 @class TUIRoomUserInfo;
 
 typedef NS_ENUM (NSInteger, TUIRoomSpeechMode) {
-	TUIRoomUnknownSpeech = 0,    // 未知类型
-	TUIRoomFreeSpeech    = 1,// 自由模式，成员进入房间后以主播身份进入TRTC房间
-	TUIRoomApplySpeech   = 2,// 申请模式，成员进入房间后以听众身份进入TRTC房间，申请发言成功后以主播身份进入TRTC房间
+	TUIRoomUnknownSpeech = 0,
+	TUIRoomFreeSpeech    = 1,    // Free speech mode: Members enter a TRTC room as an anchor
+	TUIRoomApplySpeech   = 2,    // Mic-on request mode: Members enter a TRTC room as listeners and can become anchors after requesting to speak
 };
 
 typedef NS_ENUM (NSInteger, TUIRoomInviteeCallBackType) {
-	TUIRoomInviteeFailed    = -1,// 失败
-	TUIRoomInviteeAccepted  = 1,// 接受
-	TUIRoomInviteeRejected  = 2,// 拒绝
-	TUIRoomInviteeCancelled = 3,// 取消
-	TUIRoomInviteeTimeout   = 4,// 超时
+	TUIRoomInviteeFailed    = -1,
+	TUIRoomInviteeAccepted  = 1,
+	TUIRoomInviteeRejected  = 2,
+	TUIRoomInviteeCancelled = 3,
+	TUIRoomInviteeTimeout   = 4,
 };
 
 /**
  * 错误码
  */
 typedef NS_ENUM (NSInteger, TUIRoomError) {
-	TUIRoomSuccessCode                              = 0, // 成功
-	TUIRoomErrorParamInvalid                      = -999,// 无效参数
-	TUIRoomErrorCreateRoomFailed                  = -1002,// 创建房间失败
-	TUIRoomErrorDestoryRoomFailed                 = -1003,// 销毁房间失败
-	TUIRoomErrorEnterRoomFailed                   = -1004,// 进入房间失败
-	TUIRoomErrorExitRoomFailed                    = -1005,// 退出房间失败
-	TUIRoomErrorKickOffUserFailed                 = -1006,// 踢出用户失败
-	TUIRoomErrorChangeRoomInfoFailed              = -1007,// 修改群信息失败
-	TUIRoomErrorGetRoomInfoFailed                 = -1008,// 获取群信息失败
-	TUIRoomErrorGetRoomMemberFailed               = -1009,// 获取房间成员失败
-	TUIRoomErrorSendChatMessageFailed             = -1010,// 发送消息失败
-	TUIRoomErrorSetSelfProfileFailed              = -1023,// 设置个人信息失败
-	TUIRoomErrorTransferRoomFailed                = -1024,// 转交群失败
-	TUIRoomErrorReplyRollCallFailed               = -1026,// 成员回复主持人点名失败
+	TUIRoomSuccessCode                              = 0,
+	TUIRoomErrorParamInvalid                      = -999,   // Invalid parameter
+	TUIRoomErrorCreateRoomFailed                  = -1002,  // Failed to create the room
+	TUIRoomErrorDestoryRoomFailed                 = -1003,  // Failed to terminate the room
+	TUIRoomErrorEnterRoomFailed                   = -1004,  // Failed to enter the room
+	TUIRoomErrorExitRoomFailed                    = -1005,  // Failed to exit the room
+	TUIRoomErrorKickOffUserFailed                 = -1006,  // Failed to remove a user
+	TUIRoomErrorChangeRoomInfoFailed              = -1007,  // Failed to modify the group information
+	TUIRoomErrorGetRoomInfoFailed                 = -1008,  // Failed to get the group information
+	TUIRoomErrorGetRoomMemberFailed               = -1009,  // ailed to get room members
+	TUIRoomErrorSendChatMessageFailed             = -1010,  // Failed to send a message
+	TUIRoomErrorSetSelfProfileFailed              = -1023,  // Failed to set the personal information
+	TUIRoomErrorTransferRoomFailed                = -1024,  // Failed to transfer the group ownership
+	TUIRoomErrorReplyRollCallFailed               = -1026,  // The member failed to reply to the host's roll call
 };
 
 /**
  * 角色类型
  */
 typedef NS_ENUM (NSUInteger, TUIRoomRole) {
-	TUIRoomMaster   = 1,// 主持人，具有房间麦控管理能力，聊天能力和音视频能力
-	TUIRoomManager  = 2,// 管理员，不具有音视频能力，具有群管理能力，无转交群能力。
-	TUIRoomAnchor   = 3,// 主播，有聊天能力和音视频能力
-	TUIRoomAudience = 4, // 观众，仅有聊天能力
+	TUIRoomMaster   = 1,   // Host: Has room mic control, chat, and audio/video capabilities
+	TUIRoomManager  = 2,   // Admin: Has audio/video and group management capabilities but has no group transfer capabilities
+	TUIRoomAnchor   = 3,   // Anchor: Has has chat and audio/video capabilities
+	TUIRoomAudience = 4,   // Audience: Has only chat capabilities
 };
 
 typedef NS_ENUM (NSInteger, TUIRoomSignalingType) {
-	TUIRoomSignalingUnknown = 0, // 未知
-	TUIRoomSignalingInviteSpeaker,    // 主持人邀请观众发言
-	TUIRoomSignalingSendOffSpeaker,  // 主持人邀请观众下台
-	TUIRoomSignalingApplyForSpeech, // 观众申请发言
-	TUIRoomSignalingMuteMicrophone, // 主持人禁用观众麦克风
-	TUIRoomSignalingMuteCamera, // 主持人禁用观众摄像头
-	TUIRoomSignalingReplyCallingRoll, // 回复主持人点名
-	TUIRoomSignalingKickOffUser, // 主持人踢人出房间
-	TUIRoomSignalingSendOffAllSpeaker, // 邀请全体麦上成员下麦
-	//群公告
-	TUIRoomSignalingMuteRoomChat, // 主持人设置是否禁止IM聊天
-	TUIRoomSignalingForbidStage, // 主持人设置是否禁止申请发言
-	TUIRoomSignalingMuteAllCamera, // 主持人设置全员开/禁摄像头
-	TUIRoomSignalingMuteAllMic, // 主持人设置开/禁麦克风
-	TUIRoomSignalingCallingRoll, // 主持人发起点名/或结束点名
-	TUIRoomSignalingStartTime, // 开始时间
+	TUIRoomSignalingUnknown = 0,
+	TUIRoomSignalingInviteSpeaker,
+	TUIRoomSignalingSendOffSpeaker,
+	TUIRoomSignalingApplyForSpeech,
+	TUIRoomSignalingMuteMicrophone,
+	TUIRoomSignalingMuteCamera,
+	TUIRoomSignalingReplyCallingRoll,
+	TUIRoomSignalingKickOffUser,
+	TUIRoomSignalingSendOffAllSpeaker,
+	
+	TUIRoomSignalingMuteRoomChat,
+	TUIRoomSignalingForbidStage,
+	TUIRoomSignalingMuteAllCamera,
+	TUIRoomSignalingMuteAllMic,
+	TUIRoomSignalingCallingRoll,
+	TUIRoomSignalingStartTime,
 };
 
 typedef NS_ENUM (NSInteger, TUIRoomStreamType) {
-	TUIRoomStreamCamera, // 主画面视频流
-	TUIRoomStreamScreen, // 屏幕分享
+	TUIRoomStreamCamera, // Primary video stream
+	TUIRoomStreamScreen, // Screen sharing stream
 };
 
-/// 事件回调
+/// Event Callback
 typedef void (^TUIRoomActionCallback)(NSInteger code, NSString * _Nonnull message);
-/// 获取成员信息回调
+
 typedef void (^TUIRoomUserInfoCallback)(NSInteger code, NSString * _Nonnull message, TUIRoomUserInfo * _Nullable userInfo);
-/// 获取成员信息列表回调
+
 typedef void (^TUIRoomUserListCallback)(NSInteger code, NSString * _Nonnull message, NSArray<TUIRoomUserInfo *> * _Nullable userList);
-/// 获取房间信息回调
+
 typedef void (^TUIRoomRoomInfoCallback)(NSInteger code, NSString * _Nonnull message, TUIRoomInfo * _Nullable userInfo);
 /// Invitation Callback
 typedef void (^TUIRoomInviteeCallback)(TUIRoomInviteeCallBackType type, NSString * _Nonnull message);
 
 
 #define TUIROOM_SIGNALING_EXTRA_KEY_TIME_OUT 30
-/// 信令Key
+
 #define TUIROOM_SIGNALING_KEY_VERSION @"version"
 #define TUIROOM_SIGNALING_KEY_BUSINESS_ID @"businessID"
 #define TUIROOM_SIGNALING_KEY_PLATFORM  @"platform"
@@ -112,14 +112,12 @@ typedef void (^TUIRoomInviteeCallback)(TUIRoomInviteeCallBackType type, NSString
 #define TUIROOM_SIGNALING_KEY_IS_CALLING_ROLL @"isCallingRoll"
 #define TUIROOM_SIGNALING_KEY_START_TIME @"startTime"
 
-/// 信令Value
 #define TUIROOM_DATA_VERSION @"1"
 #define TUIROOM_DATA_PLATFORM @"iOS"
 #define TUIROOM_DATA_BUSINESS_ID @"TUIRoom"
 #define TUIROOM_DATA_FREE_SPEECH @"FreeSpeech"
 #define TUIROOM_DATA_APPLY_SPEECH @"ApplySpeech"
 
-/// 信令CMD
 #define TUIROOM_SIGNALING_KEY_CMD_INVITE_SPEAKER @"SendSpeechInvitation"
 #define TUIROOM_SIGNALING_KEY_CMD_SEND_OFF_SPEAKER @"SendOffSpeaker"
 #define TUIROOM_SIGNALING_KEY_CMD_APPLY_FOR_SPEECH @"SendSpeechApplication"
@@ -129,7 +127,6 @@ typedef void (^TUIRoomInviteeCallback)(TUIRoomInviteeCallBackType type, NSString
 #define TUIROOM_SIGNALING_KEY_CMD_KICK_OFF_USER @"KickOffUser"
 #define TUIROOM_SIGNALING_KEY_CMD_SEND_OFF_ALL_SPEAKER @"SendOffAllSpeakers"
 
-#define TUIROOM_PREFIX_ID @"Room_"
 
 #define GetTUIRoomStreamType(type) ((type == TUIRoomStreamCamera) ? TRTCVideoStreamTypeBig : TRTCVideoStreamTypeSub)
 

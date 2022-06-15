@@ -91,11 +91,11 @@ void MemberItemView::UpdateMaster() {
 
 void MemberItemView::SlotMemberOperate() {
     // 成员列表操作，只有主持人有权限
+    // Member list operation. Only the host has the permission
     if (role_ != TUIRole::kMaster) {
         return;
     }
     QObject* obj = sender();
-    // 成员操作信号：oper 1禁麦 2禁视频 3上下台 4T人
     if (obj == ui_->mic_btn) {
         emit SignalMemberOperate(MemberOperate::kMuteMicrophone, user_info_.user_id);
     } else if (obj == ui_->cam_btn) {

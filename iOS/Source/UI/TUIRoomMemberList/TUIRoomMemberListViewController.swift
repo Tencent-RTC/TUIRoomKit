@@ -11,16 +11,9 @@ import TXAppBasic
 import UIKit
 
 protocol TUIRoomMemberVCDelegate: AnyObject {
-    /**
-     * 踢人
-     *
-     */
+    
     func onKickOffUser(userInfo: TUIRoomUserInfo)
 
-    /**
-     * 获取列表
-     *
-     */
     func getAttendeeList() -> [TUIRoomAttendeeModel]
 }
 
@@ -29,9 +22,9 @@ public typealias TUIRoomMuteBlock = (_ userInfo: TUIRoomUserInfo, _ mute: Bool, 
 
 class TUIRoomMemberListViewController: UIViewController {
     weak var delegate: TUIRoomMemberVCDelegate?
-    // 缓存用户列表
+    
     var attendeeList: [TUIRoomAttendeeModel] = []
-    // 全体静音
+    
     lazy var muteAllAudioButton: UIButton = {
         let button = UIButton(type: .custom)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
@@ -56,7 +49,7 @@ class TUIRoomMemberListViewController: UIViewController {
         button.adjustsImageWhenHighlighted = false
         return button
     }()
-    // 全体禁画
+    
     lazy var muteAllVideoButton: UIButton = {
         let button = UIButton(type: .custom)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
@@ -203,17 +196,17 @@ class TUIRoomMemberListViewController: UIViewController {
         muteAllVideoButton.addTarget(self, action: #selector(muteAllVideoButtonClick), for: .touchUpInside)
         muteAllAudioButton.addTarget(self, action: #selector(muteAllAudioButtonClick), for: .touchUpInside)
         okButton.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
-        // 人员变动通知刷新
+        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(memberStateRefresh),
                                                name: NSNotification.Name("kMemberStateRefresh"),
                                                object: nil)
-        // 人员状态通知刷新
+        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(memberListRefresh),
                                                name: NSNotification.Name("kMemberListRefresh"),
                                                object: nil)
-        // 成为房主
+        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(resetView),
                                                name: NSNotification.Name("kResetView"),

@@ -1,0 +1,74 @@
+// Simple unlit material that uses the colors associated with each vertex.
+//
+// This source material must be compiled to a binary material using the matc tool.
+// The command used to compile this material is:
+// matc -p mobile -a opengl -o app/src/main/assets/baked_color.filamat app/src/materials/baked_color.mat
+//
+// See build.gradle for an example of how to compile materials automatically
+// Please refer to the documentation for more information about matc and the materials system.
+
+material {
+    name : filament_head,
+    shadingModel : lit,
+    parameters : [
+        { type : sampler2d, name : baseColorMap },
+        { type : sampler2d, name : mrMap },
+        { type : sampler2d, name : cameraTexture },
+
+        {
+            type : float,
+            name : blendFactor
+        },
+        {
+            type : float,
+            name : metallicFactor
+        },
+        {
+            type : float,
+            name : roughnessFactor
+        },
+        {
+            type : float,
+            name : ambientOcclusionFactor
+        },
+        {
+            type : float,
+            name : reflectance
+        },
+        {
+            type : float,
+            name : anisotropy
+        },
+        {
+            type : float3,
+            name : anisotropyDirection
+        }
+    ],
+    requires : [
+        uv0
+    ],
+}
+// These are used for face shadow, Please not delete these codes.
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        vec2 uv = getUV0();
+        vec2 screenUV = gl_FragCoord.xy * getResolution().zw;
+        screenUV.y = 1.0 - screenUV.y;
+
+        // baseColor defines the color and opacity of the final shadow
+        float4 baseColor = texture(materialParams_baseColorMap, uv);
+        float4 screenColor = texture(materialParams_cameraTexture, screenUV);
+        material.baseColor = mix(screenColor, baseColor, materialParams.blendFactor);
+
+        float3 mra = texture(materialParams_mrMap, uv).rgb;
+
+        material.roughness = materialParams.roughnessFactor;
+        material.metallic = materialParams.metallicFactor;
+        material.reflectance = materialParams.reflectance;
+        material.anisotropy = materialParams.anisotropy;
+        material.anisotropyDirection = materialParams.anisotropyDirection;
+
+        //material.ambientOcclusion = materialParams.ambientOcclusionFactor;
+    }
+}

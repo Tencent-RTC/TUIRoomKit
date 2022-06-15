@@ -36,28 +36,28 @@
 
 - (void)setIsRemoteAudioMuted:(BOOL)isRemoteAudioMuted {
 	_isRemoteAudioMuted = isRemoteAudioMuted;
-	if (_isRemoteAudioMuted) {//远端禁用 本地肯定关闭，
+	if (_isRemoteAudioMuted) {
 		_isAudioAvailable = NO;
 	}
 }
 
 - (void)setIsRemoteVideoMuted:(BOOL)isRemoteVideoMuted {
 	_isRemoteVideoMuted = isRemoteVideoMuted;
-	if (_isRemoteVideoMuted) {//远端禁用 本地肯定关闭，
+	if (_isRemoteVideoMuted) {
 		_isVideoAvailable = NO;
 	}
 }
 
 - (void)setIsAudioAvailable:(BOOL)isAudioAvailable {
 	_isAudioAvailable = isAudioAvailable;
-	if (isAudioAvailable) {//本地开启了，远端控制状态肯定为NO
+	if (isAudioAvailable) {
 		_isRemoteAudioMuted = NO;
 	}
 }
 
 - (void)setIsVideoAvailable:(BOOL)isVideoAvailable {
 	_isVideoAvailable = isVideoAvailable;
-	if (isVideoAvailable) {//本地开启了，远端控制状态肯定为NO
+	if (isVideoAvailable) {
 		_isRemoteVideoMuted = NO;
 	}
 }

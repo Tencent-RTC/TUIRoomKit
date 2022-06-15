@@ -1,0 +1,17 @@
+{
+    "bundle" : "pitu",
+    "package" : {
+        "motion" : [
+            
+        ],
+        "cosmetic" : [
+            
+        ],
+        "gesture" : [
+            
+        ],
+        "bgremove" : [
+            
+        ]
+    }
+}

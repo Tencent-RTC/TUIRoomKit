@@ -49,6 +49,7 @@
 "TUIRoom.error.logout.room.num" = "You were forced out of room \"xxx\" due to an error";
 "TUIRoom.no.login" = "OK";
 "TUIRoom.enter.again" = "Reenter";               
+"TUIRoom.enter.error.already" = "you are already in the room.";
 
 "TUIRoom.capture.volume" = "Collection Volume";
 "TUIRoom.play.volume" = "Playback Volume";

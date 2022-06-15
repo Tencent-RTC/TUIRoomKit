@@ -1,0 +1,277 @@
+material {
+    name : pbr,
+    shadingModel : lit,
+    blending : opaque,
+    doubleSided: true,
+    transparency : default,
+    parameters : [
+        {
+            type : sampler2d,
+            name : baseColorMap
+        },
+        {
+            type : sampler2d,
+            name : baseColorMap_Alpha
+        },
+        {
+            type : bool,
+            name : alphaPremultiplied
+        },
+        {
+            type : bool,
+            name : hasAlphaMap
+        },
+        {
+            type : sampler2d,
+            name : normalMap
+        },
+        {
+            type : bool,
+            name : hasNormalMap
+        },
+
+        {
+            type : sampler2d,
+            name : specularMap
+        },
+        {
+            type : bool,
+            name : hasSpecularMap
+        },
+
+        {
+            type : sampler2d,
+            name : skinMaskMap
+        },
+        {
+            type : bool,
+            name : hasMaskMap
+        },
+
+        {
+            type : sampler2d,
+            name : metallicMap
+        },
+        {
+            type : bool,
+            name : hasMetallicMap
+        },
+
+        {
+            type : sampler2d,
+            name : emissionMap
+        },
+        {
+            type : bool,
+            name : hasEmissionMap
+        },
+
+        {
+            type : float,
+            name : glossiness
+        },
+        {
+            type: float3,
+            name: diffuseColor
+        },
+        {
+            type: float,
+            name: diffuseFactor
+        },
+        {
+            type: bool,
+            name: isEtcImage
+        },
+        {
+            type: bool,
+            name: colorize
+        },
+        {
+            type: float3,
+            name: deltaHSV
+        },
+        {
+            type: float4,
+            name: emissionColor
+        },
+        {
+            type: bool,
+            name: negNormal
+        }
+    ],
+    requires : [
+        uv0, tangents
+    ],
+
+    flipUV:true
+}
+
+fragment {
+    float lerp(float a, float b, float w) {
+        return a + w * (b-a);
+    }
+    vec3 lerpv(vec3 a, vec3 b, float w) {
+        return a + w * (b-a);
+    }
+
+    vec3 rgb2hsv(vec3 c) {
+        vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+        vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+        vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+        float d = q.x - min(q.w, q.y);
+        float e = 0.0001;
+
+        return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+    }
+
+    vec3 hsv2rgb(vec3 c) {
+        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    }
+
+    vec3 blend2(vec3 left, vec3 right, float pos){
+        return vec3(left.r * (1.0-pos) + right.r * pos, left.g * (1.0-pos) + right.g * pos, left.b * (1.0-pos) + right.b * pos);
+    }
+
+    vec3 blend3(vec3 left, vec3 main, vec3 right,float pos)
+    {
+        if (pos < 0.0){
+            return blend2(left, main, pos + 1.0);
+        }
+        else if (pos > 0.0){
+            return blend2(main, right, pos);
+        }
+        else{
+            return main;
+        }
+    }
+
+    // deltaH scaled from 0~1 , deltaS:0~1  deltaV:-1~1
+    vec4 applyColorizeHSV(vec4 mainColor, vec3 deltaHSV)
+    {
+        float deltaH = deltaHSV.x;
+        vec3 hueRGB =  hsv2rgb(vec3(deltaH,1.0,1.0));
+        float saturation = deltaHSV.y;
+        float lightness = deltaHSV.z;
+        float value = rgb2hsv(mainColor.rgb).z;
+
+        vec3 cc = blend2(vec3(0.5, 0.5, 0.5), hueRGB, saturation);
+        if (lightness <= -1.0){
+            return vec4(0,0,0,mainColor.a);
+        }
+        else if (lightness >= 1.0){
+            return vec4(1,1,1,mainColor.a);
+        }
+        else if (lightness >= 0.0){
+            vec3 c =  blend3(vec3(0.0,0.0,0.0), cc, vec3(1.0, 1.0, 1.0), 2.0* (1.0 - lightness) * (value - 1.0) + 1.0);
+            return vec4(c.rgb,mainColor.a);
+        }
+        else{
+            vec3 c = blend3(vec3(0.0,0.0,0.0), cc, vec3(1.0, 1.0, 1.0), 2.0* (1.0 + lightness) * (value) - 1.0);
+            return vec4(c.rgb,mainColor.a);
+        }
+    }
+
+    vec4 applyHSV(vec4 color, vec3 deltaHSV) {
+        if (deltaHSV.x != 0.0) {
+            vec3 hsv = rgb2hsv(color.rgb);
+            hsv.x += deltaHSV.x;
+            if (hsv.x > 6.0) {
+                hsv.x = hsv.x - 6.0;
+            } else if (hsv.x < 0.0) {
+                hsv.x = hsv.x + 6.0;
+            }
+            color.rgb = hsv2rgb(hsv);
+        }
+
+        if (deltaHSV.y != 0.0) {
+            float c_max = max(color.r, max(color.g, color.b));
+            float c_min = min(color.r, min(color.g, color.b));
+            float delta = c_max - c_min;
+            if (delta != 0.0) {
+                float v = c_max + c_min;
+                float l = v * 0.5;
+                float s = l < 0.5 ? (delta / v) : ((delta) / (2.0 - v));
+                if (deltaHSV.y >= 0.0) {
+                    float alpha = (deltaHSV.y + s) >= 1.0 ? s : (1.0 - deltaHSV.y);
+                    alpha = 1.0 / alpha - 1.0;
+                    color.rgb = color.rgb + (color.rgb - l) * alpha;
+                }
+                else {
+                    float alpha = deltaHSV.y;
+                    color.rgb = l + (color.rgb - l) * (1.0 + alpha);
+                }
+            }
+        }
+
+        if (deltaHSV.z != 0.0) {
+            color.rgb = deltaHSV.z > 0.0 ? (color.rgb * (1.0 - deltaHSV.z) + deltaHSV.z) : (color.rgb + color.rgb * deltaHSV.z);
+        }
+        return color;
+    }
+
+    void material(inout MaterialInputs material) {
+        float2 uv = getUV0();
+        if (materialParams.isEtcImage) {
+            uv.y = 1.0 - uv.y;
+        }
+        if (materialParams.hasNormalMap) {
+            float3 normal = texture(materialParams_normalMap, uv).xyz * 2.0 - 1.0;
+            if (materialParams.negNormal) {
+                normal = -normal;
+            }
+            material.normal = normal;
+        }
+        prepareMaterial(material);
+
+        float4 albedo = texture(materialParams_baseColorMap, uv);
+        if(materialParams.hasAlphaMap) {
+            albedo.a = texture(materialParams_baseColorMap_Alpha, uv).r;
+        }
+        if (!materialParams.alphaPremultiplied) {
+            albedo.rgb *= albedo.a;
+        }
+        lowp float skinMask = 0.0;
+        float3 deltaHSV = materialParams.deltaHSV;
+
+        if (materialParams.hasMaskMap) {
+            skinMask = texture(materialParams_skinMaskMap, uv).r;
+        }
+        float4 color = albedo;
+        if (materialParams.colorize) {
+            if (skinMask > 0.1) {
+                color = applyColorizeHSV(albedo, deltaHSV);
+            }
+        } else {
+            if(deltaHSV.x != 0.0 || deltaHSV.y != 0.0 || deltaHSV.z != 0.0) {
+                if (skinMask > 0.1) {
+                    color = applyHSV(albedo, deltaHSV);
+                }
+            }
+        }
+        float4 diffuse = vec4(materialParams.diffuseColor, 1.0);
+        float4 emission = vec4(0.0, 0.0, 0.0, 0.0);
+        if (materialParams.hasEmissionMap) {
+            emission = texture(materialParams_emissionMap, uv);
+        }
+        material.emissive = emission * materialParams.emissionColor;
+        material.baseColor = saturate(color * diffuse * materialParams.diffuseFactor);
+        material.baseColor.a = albedo.a;
+
+        float metallic = 0.0;
+        float roughness = lerp(materialParams.glossiness, 0.25, skinMask);
+        if (materialParams.hasMetallicMap) {
+            float metallicColor = texture(materialParams_metallicMap, uv).r;
+            metallic = lerp(metallicColor, 0.0, skinMask);
+        }
+        if (materialParams.hasSpecularMap) {
+            float roughnessColor = texture(materialParams_specularMap, uv).r;
+            roughness = lerp(roughnessColor, 0.25, skinMask);
+        }
+        material.metallic = metallic;
+        // 经验值，不加0.2这些素材感觉都高光过强
+        material.roughness = saturate(roughness + 0.2);
+    }
+}

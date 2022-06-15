@@ -7,25 +7,30 @@
 //
 
 import SnapKit
-import TCBeautyKit
 import TXAppBasic
 import UIKit
+import TUICore
+
 public let isOpenTUIRoomTest: Bool = false
 
 class TUIRoomMainViewController: UIViewController {
+    // XMagic License 【Optional】
+    var xMagicLicenseURL: String = ""
+    var xMagicLicenseKey: String = ""
+    
     weak var setViewController: TUIRoomSetViewController?
     var isViewDidLoad: Bool = false
-    var roomId: Int32 = 0
+    var roomId: String = ""
     var isVideoOn: Bool = true
     var isAudioOn: Bool = true
-    // |renderMapView|和|attendeeList|的第一个元素表示自己
+    
     var renderMapView: [String: TUIRoomAttendeeRenderView] = [:]
     var attendeeList: [TUIRoomAttendeeModel] = []
     var attendeeMap: [String: TUIRoomAttendeeModel] = [:]
-
-    // |renderrenderShareMapViewsViews|和|shareAttendeeList|
+    
+    
     var renderShareMapViews: [String: TUIRoomAttendeeRenderView] = [:]
-    // 分享用户+self
+    
     var shareAttendeeList: [TUIRoomAttendeeModel] = []
     lazy var audioModel: TUIRoomSetAudioModel = {
         let model = TUIRoomSetAudioModel()
@@ -34,11 +39,6 @@ class TUIRoomMainViewController: UIViewController {
 
     lazy var videoModel: TUIRoomSetVideoModel = {
         let model = TUIRoomSetVideoModel()
-        return model
-    }()
-
-    lazy var beautyViewModel: TCBeautyViewModel = {
-        let model = TCBeautyViewModel(viewModel: TUIRoomCore.shareInstance())
         return model
     }()
 
@@ -103,13 +103,11 @@ class TUIRoomMainViewController: UIViewController {
         return collection
     }()
 
-    // 背景
     lazy var backView: UIView = {
         self.view
     }()
 
-    // 顶部空间
-    lazy var switchAudioRouteButton: UIButton = { // 扬声器切换
+    lazy var switchAudioRouteButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_speaker", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
         button.setImage(UIImage(named: "tuiroom_earphone", in: tuiRoomBundle(), compatibleWith: nil), for: .selected)
@@ -117,15 +115,21 @@ class TUIRoomMainViewController: UIViewController {
         return button
     }()
 
-    lazy var switchCameraButton: UIButton = { // 摄像头切换
+    lazy var switchCameraButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_switch_camera", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
         button.setImage(UIImage(named: "tuiroom_switch_camera", in: tuiRoomBundle(), compatibleWith: nil), for: .selected)
         button.sizeToFit()
         return button
     }()
+    
+    lazy var reportButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "tuiroom_report", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
+        return button
+    }()
 
-    lazy var roomIdLabel: UILabel = { // 房间号label
+    lazy var roomIdLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.text = "\(self.roomId)".addIntervalSpace(intervalStr: " ", interval: 3)
@@ -143,7 +147,7 @@ class TUIRoomMainViewController: UIViewController {
         return button
     }()
 
-    lazy var exitButton: UIButton = { // 退出
+    lazy var exitButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitle(.logoutButtonText, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
@@ -153,8 +157,7 @@ class TUIRoomMainViewController: UIViewController {
         return button
     }()
 
-    // 底部空间
-    lazy var muteAudioButton: UIButton = { // 开关麦克风
+    lazy var muteAudioButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_mic_open", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
         button.setImage(UIImage(named: "tuiroom_mic_close", in: tuiRoomBundle(), compatibleWith: nil), for: .selected)
@@ -163,7 +166,7 @@ class TUIRoomMainViewController: UIViewController {
         return button
     }()
 
-    lazy var muteVideoButton: UIButton = { // 开关摄像头
+    lazy var muteVideoButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_camera_open", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
         button.setImage(UIImage(named: "tuiroom_camera_close", in: tuiRoomBundle(), compatibleWith: nil), for: .selected)
@@ -172,28 +175,30 @@ class TUIRoomMainViewController: UIViewController {
         return button
     }()
 
-    lazy var beautyButton: UIButton = { // 美颜
+    lazy var beautyButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_beauty", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
         button.sizeToFit()
         return button
     }()
 
-    lazy var membersButton: UIButton = { // 成员列表
+    lazy var membersButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_member", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
         button.sizeToFit()
         return button
     }()
 
-    lazy var moreSettingButton: UIButton = { // 更多设置按钮
+    lazy var moreSettingButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_more", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
         button.sizeToFit()
         return button
     }()
 
-    init(roomId: Int32, isVideoOn: Bool, isAudioOn: Bool) {
+    var beautyView: UIView? = nil
+    
+    init(roomId: String, isVideoOn: Bool, isAudioOn: Bool) {
         super.init(nibName: nil, bundle: nil)
         self.roomId = roomId
         self.isVideoOn = isVideoOn
@@ -217,6 +222,13 @@ class TUIRoomMainViewController: UIViewController {
         bindInteraction()
         applyConfigs()
         reloadData()
+#if RTCube_APPSTORE
+        let selector = NSSelectorFromString("showAlertUserLiveTips")
+        if responds(to: selector) {
+            perform(selector)
+        }
+#endif
+        TUILogin.add(self)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -244,7 +256,11 @@ class TUIRoomMainViewController: UIViewController {
         backView.addSubview(beautyButton)
         backView.addSubview(membersButton)
         backView.addSubview(moreSettingButton)
-
+#if RTCube_APPSTORE
+        if roomInfo.ownerId != currentUser.userId() {
+            backView.addSubview(reportButton)
+        }
+#endif
         if currentUser.userInfo.isRemoteAudioMuted {
             muteVideoButton.isSelected = false
             muteAudioButton.isEnabled = false
@@ -260,21 +276,29 @@ class TUIRoomMainViewController: UIViewController {
             muteVideoButton.isEnabled = true
             muteVideoButton.isSelected = !currentUser.isVideoOpen()
         }
+        // Load beautyView
+        loadBeautyView()
     }
 
-    func activateConstraints() { // 布局
+    func activateConstraints() {
         switchAudioRouteButton.snp.remakeConstraints { make in
-            make.leading.equalTo(12)
+            make.leading.equalTo(10)
             make.top.equalTo(topPadding + 12)
             make.width.height.equalTo(32)
         }
 
         switchCameraButton.snp.remakeConstraints { make in
-            make.leading.equalTo(switchAudioRouteButton.snp.trailing).offset(12)
+            make.leading.equalTo(switchAudioRouteButton.snp.trailing).offset(10)
             make.centerY.equalTo(switchAudioRouteButton)
             make.width.height.equalTo(32)
         }
-
+        if reportButton.superview != nil {
+            reportButton.snp.makeConstraints { make in
+                make.leading.equalTo(switchCameraButton.snp.trailing).offset(10)
+                make.centerY.equalTo(switchCameraButton)
+                make.width.height.equalTo(32)
+            }
+        }
         roomIdLabel.snp.remakeConstraints { make in
             make.centerY.equalTo(switchAudioRouteButton)
             make.centerX.equalToSuperview()
@@ -332,7 +356,7 @@ class TUIRoomMainViewController: UIViewController {
         }
     }
 
-    func bindInteraction() { // 点击事件添加
+    func bindInteraction() {
         exitButton.addTarget(self, action: #selector(exitButtonClick), for: .touchUpInside)
         switchAudioRouteButton.addTarget(self, action: #selector(switchAudioButtonClick), for: .touchUpInside)
         switchCameraButton.addTarget(self, action: #selector(switchCameraButtonClick), for: .touchUpInside)
@@ -345,12 +369,53 @@ class TUIRoomMainViewController: UIViewController {
         beautyButton.addTarget(self, action: #selector(beautyButtonClick), for: .touchUpInside)
         membersButton.addTarget(self, action: #selector(membersButtonClick), for: .touchUpInside)
         moreSettingButton.addTarget(self, action: #selector(moreSettingButtonClick), for: .touchUpInside)
+        reportButton.addTarget(self, action: #selector(reportClick), for: .touchUpInside)
     }
 
     deinit {
+        TUILogin.remove(self)
         TUIRoomCore.destroyInstance()
         UIApplication.shared.isIdleTimerDisabled = false
         debugPrint("deinit \(self)")
+    }
+}
+
+// MARK: - Load BeautyView
+extension TUIRoomMainViewController {
+    
+    private func loadBeautyView() {
+        if !xMagicLicenseURL.isEmpty, !xMagicLicenseKey.isEmpty {
+            TUICore.callService(TUICore_TUIBeautyService,
+                                method: TUICore_TUIBeautyService_SetLicense,
+                                param: [
+                                    TUICore_TUIBeautyExtension_BeautyView_LicenseUrl: xMagicLicenseURL,
+                                    TUICore_TUIBeautyExtension_BeautyView_LicenseKey: xMagicLicenseKey])
+        }
+        let beautyManager = TUIRoomCore.shareInstance().getBeautyManager()
+        let beautyInfo = TUICore.getExtensionInfo(TUICore_TUIBeautyExtension_BeautyView,
+                                                  param: [
+                                                    TUICore_TUIBeautyExtension_BeautyView_BeautyManager: beautyManager])
+        if let view = beautyInfo[TUICore_TUIBeautyExtension_BeautyView_View] as? UIView {
+            beautyView = view
+            TRTCCloud.sharedInstance().setLocalVideoProcessDelegete(self, pixelFormat: ._Texture_2D, bufferType: .texture)
+        }
+    }
+}
+
+// MARK: - TRTCVideoFrameDelegate
+extension TUIRoomMainViewController: TRTCVideoFrameDelegate {
+    
+    public func onProcessVideoFrame(_ srcFrame: TRTCVideoFrame, dstFrame: TRTCVideoFrame) -> UInt32 {
+        if let dstTextureId = TUICore.callService(TUICore_TUIBeautyService,
+                                                  method: TUICore_TUIBeautyService_ProcessVideoFrame,
+                                                  param: [
+                                                      TUICore_TUIBeautyService_ProcessVideoFrame_SRCTextureIdKey: srcFrame.textureId,
+                                                      TUICore_TUIBeautyService_ProcessVideoFrame_SRCFrameWidthKey: srcFrame.width,
+                                                      TUICore_TUIBeautyService_ProcessVideoFrame_SRCFrameHeightKey: srcFrame.height
+                                                         ]) as? GLuint {
+            dstFrame.textureId = dstTextureId
+        }
+        return 0
     }
 }
 

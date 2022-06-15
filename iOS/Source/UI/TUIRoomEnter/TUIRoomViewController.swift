@@ -10,6 +10,10 @@ import TXAppBasic
 import UIKit
 
 class TUIRoomViewController: UIViewController {
+    // XMagic License 【Optional】
+    var xMagicLicenseURL: String = ""
+    var xMagicLicenseKey: String = ""
+    
     let loading = UIActivityIndicatorView(style: .gray)
     let screenHeight = UIScreen.main.bounds.size.height
 
@@ -274,7 +278,9 @@ class TUIRoomViewController: UIViewController {
     }
 
     func enterMainViewController(_ roomId: Int32) {
-        let vc = TUIRoomMainViewController(roomId: roomId, isVideoOn: openCameraSwitch.isOn, isAudioOn: openMicSwitch.isOn)
+        let vc = TUIRoomMainViewController(roomId: "\(roomId)", isVideoOn: openCameraSwitch.isOn, isAudioOn: openMicSwitch.isOn)
+        vc.xMagicLicenseURL = xMagicLicenseURL
+        vc.xMagicLicenseKey = xMagicLicenseKey
         TUIRoomCore.shareInstance().setDelegate(vc)
         navigationController?.pushViewController(vc, animated: true)
     }

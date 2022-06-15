@@ -19,6 +19,9 @@ class AppMainViewController: UIViewController {
         navigationController?.navigationBar.barTintColor = .white
         initNavigationItemTitleView()
         let vc = TUIRoomEntranceViewController()
+        // XMagic License [Optional]
+        vc.xMagicLicenseURL = XMagicLicenseURL
+        vc.xMagicLicenseKey = XMagicLicenseKey
         addChild(vc)
         view.addSubview(vc.view)
         vc.view.mm_y = 64 + kDeviceSafeTopHeight

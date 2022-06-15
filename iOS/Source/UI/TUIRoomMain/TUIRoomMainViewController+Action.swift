@@ -12,39 +12,40 @@ import SnapKit
 import Toast_Swift
 import TXAppBasic
 import UIKit
+import TUICore
 
 extension TUIRoomMainViewController {
-    @objc func switchAudioButtonClick() { // 扬声器切换
+    @objc func switchAudioButtonClick() {
         switchAudioRouteButton.isSelected = !switchAudioRouteButton.isSelected
         TUIRoomCore.shareInstance().setSpeaker(!switchAudioRouteButton.isSelected)
     }
 
-    @objc func switchCameraButtonClick() { // 摄像头切换
+    @objc func switchCameraButtonClick() {
         switchCameraButton.isSelected = !switchCameraButton.isSelected
         TUIRoomCore.shareInstance().switchCamera(!switchCameraButton.isSelected)
     }
 
-    @objc func showLogView(gesture: UILongPressGestureRecognizer) { // 房间号label，log打印展示
+    @objc func showLogView(gesture: UILongPressGestureRecognizer) {
         if gesture.state != UIGestureRecognizer.State.began {
             return
         }
         if roomIdLabel.tag == 0 {
             TRTCCloud.sharedInstance().setDebugViewMargin(currentUser.userId(), margin: TXEdgeInsets(top: 70, left: 10, bottom: 30, right: 10))
-            TRTCCloud.sharedInstance().showDebugView(2) // 显示全量版的Log视图
+            TRTCCloud.sharedInstance().showDebugView(2)
             roomIdLabel.tag = 1
         } else {
-            TRTCCloud.sharedInstance().showDebugView(0) // 关闭全量版的Log视图
+            TRTCCloud.sharedInstance().showDebugView(0)
             roomIdLabel.tag = 0
         }
     }
 
-    @objc func copyButtonClick() { // copy房间号
+    @objc func copyButtonClick() {
         let pas = UIPasteboard.general
         pas.string = roomIdLabel.text
         view.makeToast(.copySuccessText)
     }
 
-    @objc func exitButtonClick() { // 退出
+    @objc func exitButtonClick() {
         guard let roomInfo = TUIRoomCore.shareInstance().getRoomInfo() else {
             return
         }
@@ -55,6 +56,7 @@ extension TUIRoomMainViewController {
         let sureAction = UIAlertAction(title: roomInfo.isHomeowner() ?.destroyRoomOkTitle : .logoutOkText, style: .default) { [weak self] _ in
             guard let self = self else { return }
             self.exitRoomLogic(roomInfo.isHomeowner())
+            TUIRoom.sharedInstance.isEnterRoom = false
         }
         sureAction.setTextColor(UIColor.red)
         alertVC.addAction(cancelAction)
@@ -62,7 +64,7 @@ extension TUIRoomMainViewController {
         present(alertVC, animated: true, completion: nil)
     }
 
-    @objc func muteAudioButtonClick() { // 开关麦克风
+    @objc func muteAudioButtonClick() {
         muteAudioButton.isSelected = !muteAudioButton.isSelected
         guard let localPreviewView = getRenderViewByUserid(userId: TUIRoomUserManage.currentUserId()) else {
             return
@@ -78,7 +80,7 @@ extension TUIRoomMainViewController {
         }
     }
 
-    @objc func muteVideoButtonClick() { // 开关摄像头
+    @objc func muteVideoButtonClick() {
         guard let localPreviewView = getRenderViewByUserid(userId: TUIRoomUserManage.currentUserId()) else {
             return
         }
@@ -96,22 +98,20 @@ extension TUIRoomMainViewController {
         localPreviewView.refreshVideo(isVideoAvailable: !muteVideoButton.isSelected)
     }
 
-    @objc func beautyButtonClick() { // 美颜
-        let alert = TUIRoomBeautyAlert(viewModel: beautyViewModel)
-        view.addSubview(alert)
-        alert.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+    @objc func beautyButtonClick() {
+        if let view = beautyView, view.superview == nil {
+            self.view.addSubview(view)
         }
-        alert.show()
+        beautyView?.isHidden = false
     }
 
-    @objc func membersButtonClick() { // 成员列表
+    @objc func membersButtonClick() {
         let vc = TUIRoomMemberListViewController()
         vc.delegate = self
         navigationController?.pushViewController(vc, animated: true)
     }
 
-    @objc func moreSettingButtonClick() { // 更多设置按钮
+    @objc func moreSettingButtonClick() {
         let vc = TUIRoomSetViewController()
         vc.isSomeoneSharing = shareAttendeeList.count >= 1
         vc.audioModel = audioModel
@@ -122,20 +122,60 @@ extension TUIRoomMainViewController {
         setViewController = vc
     }
 
-    /// 退房
     private func exitRoomLogic(_ isHomeowner: Bool) {
         TUIRoomCore.shareInstance().stopScreenCapture()
+        TRTCCloud.sharedInstance().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
         if isHomeowner {
             TUIRoomCore.shareInstance().destroyRoom { [weak self] _, _ in
                 guard let self = self else { return }
-                self.navigationController?.popViewController(animated: true)
+                if self.navigationController?.viewControllers.first == self {
+                    self.dismiss(animated: true)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
             }
         } else {
             TUIRoomCore.shareInstance().leaveRoom { [weak self] _, _ in
                 guard let self = self else { return }
-                self.navigationController?.popViewController(animated: true)
+                if self.navigationController?.viewControllers.first == self {
+                    self.dismiss(animated: true)
+                } else {
+                    self.navigationController?.popViewController(animated: true)
+                }
             }
         }
+    }
+    
+    @objc
+    func reportClick() {
+        let selector = NSSelectorFromString("showReportAlertWithRoomId:")
+        if self.responds(to: selector) {
+            self.perform(selector, with: roomId)
+        }
+    }
+}
+
+// MARK: - TUILoginListener
+extension TUIRoomMainViewController: TUILoginListener {
+    func onConnecting() {
+        
+    }
+    
+    func onConnectSuccess() {
+        
+    }
+    
+    func onConnectFailed(_ code: Int32, err: String!) {
+        
+    }
+    
+    func onKickedOffline() {
+        exitRoomLogic(roomInfo.isHomeowner())
+        TUIRoom.sharedInstance.isEnterRoom = false
+    }
+    
+    func onUserSigExpired() {
+        
     }
 }
 
@@ -150,7 +190,7 @@ private extension String {
     static let copySuccessText = tuiRoomLocalize("TUIRoom.copy.success")
 }
 
-/// MARK: - 颜色扩展
+/// MARK: - Color
 extension UIAlertAction {
     static var propertyNames: [String] {
         var outCount: UInt32 = 0

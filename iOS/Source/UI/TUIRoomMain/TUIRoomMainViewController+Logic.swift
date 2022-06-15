@@ -26,7 +26,6 @@ extension TUIRoomMainViewController {
     }
 
     func applyConfigs() {
-        // 开启摄像头和麦克风
         TUIRoomCore.shareInstance().enableAudioEvaluation(true)
         if currentUser.isVideoOpen() {
             if let localPreviewView = getRenderViewByUserid(userId: currentUser.userId()) {
@@ -35,8 +34,10 @@ extension TUIRoomMainViewController {
         } else {
             TUIRoomCore.shareInstance().stopCameraPreview()
         }
-        TUIRoomCore.shareInstance().startLocalAudio(.speech)
-        if !currentUser.isAudioOpen() {
+        
+        if currentUser.isAudioOpen() {
+            TUIRoomCore.shareInstance().startLocalAudio(.speech)
+        } else {
             TUIRoomCore.shareInstance().stopLocalAudio()
         }
         // Video
@@ -58,13 +59,6 @@ extension TUIRoomMainViewController {
         reloadData()
     }
 
-    /**
-     * 远端用户开始发言
-     *
-     * 当您收到此通知时，表示该用户发言成功
-     *
-     * @param userId 用户ID
-     */
     func enterSpeechState(_ userId: String) {
         clearUserSource(userId)
         if let userInfo = TUIRoomUserManage.getUser(userId) {
@@ -82,24 +76,12 @@ extension TUIRoomMainViewController {
         debugPrint("------enter renderMapView:\(renderMapView.count)  attendeeList:\(attendeeList.count)")
     }
 
-    /**
-     * 远端用户下麦
-     *
-     * 当您收到此通知时，表示该用户已经下麦
-     *
-     * @param userId 用户ID
-     */
     func exitSpeechState(_ userId: String) {
         clearUserSource(userId)
         reloadData()
         debugPrint("------exit renderMapView:\(renderMapView.count)  attendeeList:\(attendeeList.count)")
     }
 
-    /**
-     * 清理麦上用户资源
-     *
-     * @param userId 用户ID
-     */
     func clearUserSource(_ userId: String, type: TUIRoomStreamType = .camera) {
         let renderView = getRenderViewByUserid(userId: userId, type: type)
         renderView?.removeFromSuperview()
@@ -117,10 +99,6 @@ extension TUIRoomMainViewController {
         }
     }
 
-    /**
-     * 中断清理
-     *
-     */
     func interruptClearRoom() {
         if #available(iOS 11.0, *) {
             TUIRoomCore.shareInstance().stopScreenCapture()
@@ -129,10 +107,6 @@ extension TUIRoomMainViewController {
         }
     }
 
-    /**
-     * 中断退出页面
-     *
-     */
     func interruptQuitRoom() {
         setViewController?.dismiss(animated: false, completion: nil)
         navigationController?.popToRootViewController(animated: true)

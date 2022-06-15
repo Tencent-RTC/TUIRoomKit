@@ -1,0 +1,209 @@
+material {
+    name : pbr,
+    shadingModel : lit,
+    blending : opaque,
+    doubleSided: true,
+    depthWrite: true,
+    transparency : default,
+    parameters : [
+        {
+            type : float,
+            name : specular
+        },
+        {
+            type : float,
+            name : specularIntensity
+        },
+        {
+            type : float,
+            name : roughness
+        },
+        {
+            type : float,
+            name : anisotropy
+        },
+        {
+            type : float3,
+            name : anisotropyDirection
+        },
+        {
+            type : float,
+            name : metallic
+        },
+        {
+            type: float3,
+            name: hsvColor
+        },
+
+        {
+            type : sampler2d,
+            name : baseColorMap
+        },
+        {
+            type : sampler2d,
+            name : baseColorMap_Alpha
+        },
+        {
+            type : bool,
+            name : hasAlphaMap
+        },
+        // normal map
+        {
+            type : sampler2d,
+            name : normalMap
+        },
+
+        // ambient occlusion map
+        {
+            type: sampler2d,
+            name: aoMap
+        },
+        {
+            type: float,
+            name: aoIntensity
+        },
+        {
+            type : bool,
+            name : hasAoMap
+        },
+
+        {
+            type : sampler2d,
+            name : metallicRoughnessSpecularMap
+        },
+        {
+            type : bool,
+            name : hasMRSMap
+        },
+
+        {
+            type : sampler2d,
+            name : hairMaskMap
+        },
+        {
+            type : bool,
+            name : hasHairMap
+        },
+        {
+            type : bool,
+            name : hasNormalMap
+        },
+        {
+            type : bool,
+            name : alphaPremultiplied
+        },
+        {
+            type: float4,
+            name: emissionColor
+        },
+        {
+            type: bool,
+            name: isEtcImage
+        }
+    ],
+    requires : [
+        uv0, tangents
+    ],
+
+    flipUV:true
+}
+
+fragment {
+    float lerp(float a, float b, float w) {
+        return a + w * (b-a);
+    }
+    vec3 lerpv(vec3 a, vec3 b, float w) {
+        return a + w * (b-a);
+    }
+
+    mediump vec3 Blend2(mediump vec3 left, mediump vec3 right, mediump float pos) {
+        return vec3(left.r * (1.0-pos) + right.r * pos, left.g * (1.0-pos) + right.g * pos, left.b * (1.0-pos) + right.b * pos);
+    }
+
+    mediump vec3 Blend3(mediump vec3 left, mediump vec3 main, mediump vec3 right, mediump float pos) {
+        return pos < 0.0 ?  Blend2(left, main, 1.0 + pos) : Blend2(main, right, pos);
+    }
+
+    mediump vec3 RGBtoHSV(mediump vec3 c) {
+        mediump vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+        mediump vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+        mediump vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+        mediump float d = q.x - min(q.w, q.y);
+        mediump float e = 0.0001;
+
+        return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+    }
+
+    mediump vec3 HSVtoRGB(mediump vec3 c) {
+        mediump vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+        mediump vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    }
+
+    mediump vec4 HSVColorizeABSCore(mediump vec4 mainColor, mediump float deltaH, mediump float deltaS, mediump float deltaV) {
+        mediump vec3 hueRGB = HSVtoRGB(vec3(deltaH / 360.0, 1.0, 1.0));
+        mediump float saturation = deltaS / 100.0;
+        mediump float lightness = clamp(deltaV / 100.0, -1.0, 1.0);
+        mediump float value = RGBtoHSV(mainColor.rgb).z;
+
+        mediump vec3 cc = Blend2(vec3(0.5, 0.5, 0.5), hueRGB, saturation);
+        return lightness >= 0.0 ? vec4(Blend3(vec3(0.0, 0.0, 0.0), cc, vec3(1.0, 1.0, 1.0), 2.0 * (1.0 - lightness) * (value - 1.0) + 1.0), mainColor.a) :
+            vec4(Blend3(vec3(0.0, 0.0, 0.0), cc, vec3(1.0, 1.0, 1.0), 2.0 * (1.0 + lightness) * (value) - 1.0), mainColor.a);
+    }
+
+    mediump vec4 HSVColorizeABS(mediump vec4 mainColor, mediump vec4 hsvColor) {
+        vec4 result = HSVColorizeABSCore(mainColor, hsvColor.x, hsvColor.y, hsvColor.z);
+        return result;
+    }
+
+    void material(inout MaterialInputs material) {
+        float2 uv = getUV0();
+        if (materialParams.isEtcImage) {
+            uv.y = 1.0 - uv.y;
+        }
+        if (materialParams.hasNormalMap) {
+            material.normal = texture(materialParams_normalMap, uv).xyz * 2.0 - 1.0;
+        }
+        prepareMaterial(material);
+
+        float4 albedo = texture(materialParams_baseColorMap, uv);
+        if(materialParams.hasAlphaMap) {
+            albedo.a = texture(materialParams_baseColorMap_Alpha, uv).r;
+        }
+        if (!materialParams.alphaPremultiplied) {
+            albedo.rgb *= albedo.a;
+        }
+        float4 hsv = vec4(materialParams.hsvColor, 1.0);
+        float4 oldColor = albedo;
+        lowp float hairMask = 1.0;
+        if (materialParams.hasHairMap) {
+            hairMask = texture(materialParams_hairMaskMap, uv).r;
+        }
+        albedo.rgb = hairMask * albedo.rgb;
+        albedo = HSVColorizeABS(albedo, hsv);
+
+        albedo.rgb = lerpv(oldColor.rgb, albedo.rgb, hairMask);
+        material.baseColor = float4(albedo.rgb, oldColor.a);
+
+        if (materialParams.hasMRSMap) {
+            vec4 metalRoughSpec = texture(materialParams_metallicRoughnessSpecularMap, uv);
+            material.metallic = lerp(metalRoughSpec.r, 1.0, materialParams.metallic);
+            material.roughness = lerp(metalRoughSpec.g, 1.0, materialParams.roughness);
+            material.reflectance = lerp(metalRoughSpec.b, 1.0, materialParams.specular) * materialParams.specularIntensity;
+        } else {
+            material.metallic = materialParams.metallic;
+            material.roughness = materialParams.roughness;
+            material.reflectance = materialParams.specular * materialParams.specularIntensity;
+        }
+
+        mediump float ao = 1.0;
+        if (materialParams.hasAoMap) {
+            ao = texture(materialParams_aoMap, uv).r * materialParams.aoIntensity;
+        }
+        material.ambientOcclusion = ao;
+
+        material.anisotropy = materialParams.anisotropy;
+        material.anisotropyDirection = materialParams.anisotropyDirection;
+    }
+}

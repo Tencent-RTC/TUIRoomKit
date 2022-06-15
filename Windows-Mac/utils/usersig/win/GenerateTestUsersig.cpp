@@ -1,8 +1,6 @@
 /*
-* Module:   TRTCGetUserIDAndUserSig
-*
-* Function: 用于获取组装 TRTCParam 所必须的 UserSig，腾讯云使用 UserSig 进行安全校验，保护您的 TRTC 流量不被盗用
-*/
+ * Module:   TRTCGetUserIDAndUserSig
+ */
 
 #include "GenerateTestUserSig.h"
 
@@ -42,8 +40,6 @@ GenerateTestUserSigImpl::GenerateTestUserSigImpl(uint32_t SDKAppID, const std::s
     , m_expireTime(expireTime)
     , m_secretKey(secretKey)
 {
-    // 参数检测，请先给 GenerateTestUserSig 类的 _SDKAppID 、_EXPIRETIME 和 _SECRETKEY 成员变量赋值，避免触发 DEBUG 版本的断言框。
-
     assert(m_SDKAppID > 0);
     assert(m_currTime > 0);
     assert(m_expireTime > 0);
@@ -57,15 +53,17 @@ GenerateTestUserSigImpl::~GenerateTestUserSigImpl()
 
 std::string GenerateTestUserSigImpl::genTestUserSig(const std::string& userId)
 {
-    // 参数检测，请传入非空的 userId 参数。
     assert(!userId.empty());
 
     std::string sig = genHMACSHA256(userId);
 
-    size_t dataBufferLen = userId.size() + 256; // userId长度 + 其他字段的长度（不超过256）
+    // userId长度 + 其他字段的长度（不超过256）
+    // UserId length + length of other fields (up to 256)
+    size_t dataBufferLen = userId.size() + 256; 
     std::unique_ptr<char[]> dataBuffer(new char[dataBufferLen]);
 
     // 为避免引入 json 库，直接拼接 json 形式的字符串。
+    // To avoid importing json libraries, concatenate json strings directly 
 
     int count = ::sprintf_s(dataBuffer.get(), dataBufferLen,
         "{"
@@ -81,7 +79,7 @@ std::string GenerateTestUserSigImpl::genTestUserSig(const std::string& userId)
         return "";
     }
 
-    // json 数据压缩
+    // json data compression
 
     uLong upperBound = compressBound(count);
     std::unique_ptr<Bytef[]> zipDest(new Bytef[count]);
@@ -92,7 +90,7 @@ std::string GenerateTestUserSigImpl::genTestUserSig(const std::string& userId)
         return "";
     }
 
-    // base64 编码
+    // base64 encode
 
     size_t base64Len = (zipDestLen / 3 + 1) * 4 + 1;
     std::unique_ptr<char[]> base64Buffer(new char[base64Len]);
@@ -120,8 +118,6 @@ std::string GenerateTestUserSigImpl::genTestUserSig(const std::string& userId)
     return result;
 }
 
-// 资源清理函数
-
 static void closeAlgHandle(BCRYPT_ALG_HANDLE* p)
 {
     if (*p)
@@ -143,6 +139,7 @@ static void closeHashHandle(BCRYPT_HASH_HANDLE* p)
 std::string GenerateTestUserSigImpl::genHMACSHA256(const std::string& userId)
 {
     // 拼接用于生成 HMACSHA256 的字符串。
+    // Concatenate the string used to generate HMACSHA256
 
     size_t dataBufferLen = userId.size() + 256;
     std::unique_ptr<char[]> dataBuffer(new char[dataBufferLen]);
@@ -160,6 +157,7 @@ std::string GenerateTestUserSigImpl::genHMACSHA256(const std::string& userId)
     std::string data(dataBuffer.get(), count);
 
     // 打开加密算法的句柄。
+    // Opens a handle to the encryption algorithm
     BCRYPT_ALG_HANDLE alg = NULL;
     NTSTATUS status = BCryptOpenAlgorithmProvider(
         &alg,
@@ -173,9 +171,11 @@ std::string GenerateTestUserSigImpl::genHMACSHA256(const std::string& userId)
     }
 
     // 资源托管，自动释放
+    // Resource hosting, automatic release
     std::unique_ptr<BCRYPT_ALG_HANDLE, decltype(closeAlgHandle)*> algAutoDel(&alg, closeAlgHandle);
 
     // 计算存放 hashBuffer 对象的 dataBuffer 大小。
+    // Calculates the dataBuffer size to hold the hashBuffer object
     DWORD cbHashObject = 0;
     DWORD cbData = 0;
     status = BCryptGetProperty(
@@ -192,6 +192,7 @@ std::string GenerateTestUserSigImpl::genHMACSHA256(const std::string& userId)
     }
 
     // 分配 hashBuffer 对象的内存
+    // Allocate memory for the hashBuffer object
     std::unique_ptr<BYTE[]> hashObject(new BYTE[cbHashObject]);
     if (!hashObject.get())
     {
@@ -200,6 +201,7 @@ std::string GenerateTestUserSigImpl::genHMACSHA256(const std::string& userId)
     }
 
     // 计算 hashBuffer 的长度。
+    // Calculates the length of the hashBuffer.
     DWORD cbHash = 0;
     status = BCryptGetProperty(
         alg,
@@ -215,6 +217,7 @@ std::string GenerateTestUserSigImpl::genHMACSHA256(const std::string& userId)
     }
 
     // 分配 hashBuffer dataBuffer 的内存
+    // Allocate memory for hashBuffer dataBuffer
     std::unique_ptr<BYTE[]> hashBuffer(new BYTE[cbHash]);
     if (!hashBuffer.get())
     {
@@ -223,6 +226,7 @@ std::string GenerateTestUserSigImpl::genHMACSHA256(const std::string& userId)
     }
 
     // 创建 hashBuffer 对象。
+    // Create a hashBuffer object
     BCRYPT_HASH_HANDLE hash = NULL;
     status = BCryptCreateHash(
         alg,
@@ -239,9 +243,11 @@ std::string GenerateTestUserSigImpl::genHMACSHA256(const std::string& userId)
     }
 
     // 资源托管，自动释放
+    // Resource hosting, automatic release
     std::unique_ptr<BCRYPT_HASH_HANDLE, decltype(closeHashHandle)*> hashAutoDel(&hash, closeHashHandle);
 
     // 生成 hashBuffer 值。
+    // Generate hashBuffer value
     status = BCryptHashData(
         hash,
         (PBYTE)data.c_str(),
@@ -254,6 +260,7 @@ std::string GenerateTestUserSigImpl::genHMACSHA256(const std::string& userId)
     }
 
     // 关闭 hashBuffer 对象
+    // Close the hashBuffer object
     status = BCryptFinishHash(
         hash,
         hashBuffer.get(),
@@ -265,7 +272,7 @@ std::string GenerateTestUserSigImpl::genHMACSHA256(const std::string& userId)
         return "";
     }
 
-    // base64 编码
+    // base64 encode
     size_t base64Len = (cbHash / 3 + 1) * 4 + 1;
     std::unique_ptr<char[]> base64Buffer(new char[base64Len + 1]);
     base64Enc(base64Buffer.get(), hashBuffer.get(), cbHash);
@@ -317,6 +324,7 @@ void GenerateTestUserSigImpl::base64Enc(char *dest, const void *src, uint32_t le
     }
 
     // 尾部添加结束符
+    // Add terminator to tail
     *dest = '\0';
 }
 

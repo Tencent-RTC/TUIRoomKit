@@ -67,7 +67,6 @@ void PresetDeviceController::InitUi() {
     ui.btn_start->setStyle(QApplication::style());
 
     liteav::ITRTCDeviceInfo* activeCam = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeCamera);
-    //获取摄像头列表
     liteav::ITXDeviceCollection* camera_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeCamera);
     if (camera_list == nullptr) {
         return;
@@ -84,7 +83,6 @@ void PresetDeviceController::InitUi() {
     camera_list->release();
 
     liteav::ITRTCDeviceInfo* activeMic = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeMic);
-    //获取麦克风列表
     liteav::ITXDeviceCollection* mic_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeMic);
     if (mic_list == nullptr) {
         return;
@@ -122,7 +120,6 @@ void PresetDeviceController::InitUi() {
     bool is_default_close_mic = DataStore::Instance()->IsDefaultCloseMic();
     ui.ckbox_default_close_mic->setChecked(is_default_close_mic);
 
-    // 镜像设置
     bool is_mirror = DataStore::Instance()->GetMirror();
     ui.ckbox_mirror->setChecked(is_mirror);
     TUIRoomCore::GetInstance()->SetVideoMirror(is_mirror);
@@ -139,8 +136,6 @@ void PresetDeviceController::InitUi() {
     ui.comboBox_speaker->setItemDelegate(item_delegate_);
     ui.comboBox_audio_quality->setItemDelegate(item_delegate_);
 
-    // 默认打开美颜
-    // 美颜设置
     TUIBeautyConfig beauty_config = DataStore::Instance()->GetBeautyParam();
     ui.ckbox_beauty->setChecked(beauty_config.open_beauty);
     ui.radioButton_natural->setEnabled(beauty_config.open_beauty);
@@ -266,7 +261,6 @@ void PresetDeviceController::ResetDeviceList(const QString& deviceId, liteav::TX
         camera_list->release();
 
         liteav::ITRTCDeviceInfo* activeMic = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeMic);
-        //获取麦克风列表
         liteav::ITXDeviceCollection* mic_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeMic);
         if (mic_list == nullptr) {
             return;
@@ -283,7 +277,6 @@ void PresetDeviceController::ResetDeviceList(const QString& deviceId, liteav::TX
         mic_list->release();
 
         liteav::ITRTCDeviceInfo* activeSpeaker = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeSpeaker);
-        //获取扬声器列表
         liteav::ITXDeviceCollection* speaker_list = TUIRoomCore::GetInstance()->GetDeviceManager()->getDevicesList(liteav::TXMediaDeviceTypeSpeaker);
         if (speaker_list == nullptr) {
             return;

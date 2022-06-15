@@ -17,29 +17,23 @@ enum TUIRoomMainViewCellType: NSInteger {
     case four
     case five
     case six
-    case more // 大于6个
+    case more
 }
 
 enum TUIRoomAttendeeRenderViewType: Int8 {
-    case bigShare = 0 // 大画面
-    case big = 1 // 大画面
-    case small // 小画面
-    case suspension // 悬浮画面
+    case bigShare = 0
+    case big = 1
+    case small
+    case suspension
 }
 
 protocol TUIRoomCellDelegate: AnyObject {
-    /**
-     * 获取view
-     *
-     */
+
     func getRenderView(model: TUIRoomAttendeeModel, type: TUIRoomStreamType) -> TUIRoomAttendeeRenderView?
 }
 
 protocol TUIRoomAttendeeRenderViewDelegate: AnyObject {
-    /**
-     * 双人 大小窗切换
-     *
-     */
+
     func suspensionSwitchBigClick()
 }
 
@@ -63,10 +57,7 @@ class TUIRoomAttendeeModel {
 }
 
 class TUIRoomMainViewCell: UICollectionViewCell, TUIRoomAttendeeRenderViewDelegate {
-    /**
-     * 双人 大小窗切换
-     *
-     */
+   
     func suspensionSwitchBigClick() {
         if attendeeModels.count == 2 {
             exchangeValue(&attendeeModels, 0, 1)
@@ -90,7 +81,6 @@ class TUIRoomMainViewCell: UICollectionViewCell, TUIRoomAttendeeRenderViewDelega
     }
 
     func resetView() {
-        // 删掉所有subview，不然刷新的时候会有残留画面
         for view in subviews {
             view.removeFromSuperview()
         }
@@ -291,26 +281,26 @@ class TUIRoomAttendeeRenderView: UIView {
     weak var delegate: TUIRoomAttendeeRenderViewDelegate?
     var attendeeModel = TUIRoomAttendeeModel()
     var styleType: TUIRoomAttendeeRenderViewType = .big
-    lazy var avatarImageView: UIImageView = { // 头像
+    lazy var avatarImageView: UIImageView = {
         let imageView = UIImageView()
         addSubview(imageView)
         imageView.layer.masksToBounds = true
         return imageView
     }()
 
-    lazy var bgView: UIView = { // 用户名与信号背景
+    lazy var bgView: UIView = {
         let view = UIView()
         addSubview(view)
         return view
     }()
 
-    lazy var protectiveImageView: UIImageView = { // .big 遮照
+    lazy var protectiveImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "tuiroom_protective_bg_icon", in: tuiRoomBundle(), compatibleWith: nil))
         addSubview(imageView)
         return imageView
     }()
 
-    lazy var userLabel: UILabel = { // 用户名
+    lazy var userLabel: UILabel = {
         let user = UILabel()
         user.textColor = .white
         user.backgroundColor = UIColor.clear
@@ -320,13 +310,13 @@ class TUIRoomAttendeeRenderView: UIView {
         return user
     }()
 
-    lazy var signalImageView: UIImageView = { // 信号
+    lazy var signalImageView: UIImageView = {
         let imageView = UIImageView()
         bgView.addSubview(imageView)
         return imageView
     }()
 
-    lazy var homeownersImageView: UIImageView = { // 房主
+    lazy var homeownersImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "tuiroom_homeowners_icon", in: tuiRoomBundle(), compatibleWith: nil))
         bgView.addSubview(imageView)
         return imageView
@@ -335,9 +325,8 @@ class TUIRoomAttendeeRenderView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         protectiveImageView.isHidden = true
-        // 添加双击手势，双击view将其放大到全屏
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapTheRenderView(tap:)))
-        tap.numberOfTapsRequired = 1 // 双击
+        tap.numberOfTapsRequired = 1
         isUserInteractionEnabled = true
         addGestureRecognizer(tap)
     }
@@ -360,7 +349,6 @@ class TUIRoomAttendeeRenderView: UIView {
 
     func updateView() {
         backgroundColor = UIColor(hex: "2A2A2A")
-        // 头像
         avatarImageView.snp.remakeConstraints { make in
             make.width.height.equalTo((self.styleType == .big) ? 100 : 60)
             make.centerX.equalTo(self)
@@ -487,12 +475,12 @@ class TUIRoomAttendeeRenderView: UIView {
         return image
     }
 
-    func refreshSignalView() { // 信号
+    func refreshSignalView() {
         signalImageView.image = getSignalImageView(networkQuality: attendeeModel.networkQuality)
         refreshName()
     }
 
-    func refreshVideo(isVideoAvailable: Bool) { // Video状态
+    func refreshVideo(isVideoAvailable: Bool) {
         attendeeModel.userInfo.isVideoAvailable = isVideoAvailable
         avatarImageView.isHidden = attendeeModel.userInfo.isVideoOpen()
         if styleType == .suspension {
@@ -507,7 +495,7 @@ class TUIRoomAttendeeRenderView: UIView {
         refreshProtective()
     }
 
-    func refreshVolumeProgress() { // 音量
+    func refreshVolumeProgress() {
         if attendeeModel.volumeState {
             layer.borderColor = UIColor(hex: "006EFF")?.cgColor
             layer.borderWidth = 2
@@ -573,12 +561,12 @@ class TUIRoomAttendeeRenderView: UIView {
         }
     }
 
-    func refreshAudio(isAudioAvailable: Bool) { // 麦克风状态
+    func refreshAudio(isAudioAvailable: Bool) {
         attendeeModel.userInfo.isAudioAvailable = isAudioAvailable
         refreshName()
     }
 
-    func refreshProtective() { // 遮照
+    func refreshProtective() {
         if !avatarImageView.isHidden {
             if styleType == .big {
                 let top = 56 + kDeviceSafeTopHeight

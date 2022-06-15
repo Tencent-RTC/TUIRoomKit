@@ -11,97 +11,102 @@
 
 NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT void tuiRoomLog(NSString *format, ...);
-// 使用TRTCCloud apiLog，日志会写入本地
+/// If `TRTCCloud apiLog` is used, logs will be written locally
 #define TRTCLog(fmt, ...) tuiRoomLog((@"TUIRoom:%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 /**
  TRTC Service Delegate
  */
 @protocol TUIRoomTRTCServiceDelegate <NSObject>
-/// 错误回调
-/// @param code 错误码
-/// @param message 错误信息
+
+/**
+ * Callback for error
+ *
+ * @param code Error code
+ * @param message Error message
+ */
 - (void)onTRTCError:(int)code
             message:(NSString*)message;
 
 /**
-* 新成员进房回调
-*
-* @param userId 用户ID
-*/
+ * A new user entered the room.
+ *
+ * @param userId User ID
+ */
 - (void)onUserEnterTRTCRoom:(NSString *)userId;
 
 /**
-* 成员离开房间回调
-*
-* @param userInfo 离开房间成员
-*/
+ * A user exited the room.
+ *
+ * @param userInfo User exiting the room
+ */
 - (void)onUserLeaveTRTCRoom:(TUIRoomUserInfo *)userInfo;
 
+
 /**
- * 远端用户发布/取消了主路视频画面回调
+ * A remote user published/unpublished the primary stream video
  *
- * @param userInfo 远端用户
- * @param available 该用户是否发布（或取消发布）了主路视频画面，YES: 发布；NO：取消发布。
+ * @param userInfo Remote user
+ * @param available Whether the user published (or unpublished) primary stream video. Valid values: YES: Published; NO: Unpublished
  */
 - (void)onUserVideoAvailable:(TUIRoomUserInfo *)userInfo
                    available:(BOOL)available;
 
 /**
- * 远端用户发布/取消了自己的音频
+ * A remote user published/unpublished the audio
  *
- * @param userId 远端用户的用户标识
- * @param available 该用户是否发布（或取消发布）了自己的音频，YES: 发布；NO：取消发布。
+ * @param userId Remote user ID
+ * @param available Whether the user published (or unpublished) audio. Valid values: YES: Published; NO: Unpublished
  */
 - (void)onUserAudioAvailable:(NSString *)userId
                    available:(BOOL)available;
 
 /**
- * 网络质量的实时统计回调
+ * Callback for real-time network quality
  *
- * @param localQuality 上行网络质量
- * @param remoteQuality 下行网络质量
+ * @param localQuality Upstream network quality
+ * @param remoteQuality Downstream network quality
  */
 - (void)onNetworkQuality:(TRTCQualityInfo *)localQuality
            remoteQuality:(NSArray<TRTCQualityInfo *> *)remoteQuality;
 
 /**
- * 音量大小的反馈回调
+ * Callback for volume level
  *
- * @param userId 远端用户的用户标识
- * @param totalVolume 所有远端用户的总音量大小, 取值范围 0 - 100。
+ * @param userId Remote user ID
+ * @param totalVolume Total volume of all remote users. Value range: 0–100
  */
 - (void)onUserVoiceVolume:(NSString *)userId
               totalVolume:(NSInteger)totalVolume;
 
 /**
- * 录屏开始通知
+ * Screen sharing started
  */
 - (void)onScreenCaptureStarted;
 
 /**
- * 录屏停止通知
+ * Screen sharing stoppped
  *
- * @param reason 停止原因，0：用户主动停止；1：被其他应用抢占导致停止
+ * @param reason Reason for stop. 0: The user stopped screen sharing; 1: Screen sharing stopped due to preemption by another application
  */
 - (void)onScreenCaptureStopped:(NSInteger)reason;
 
 /**
- * 成员 开启/关闭 视频分享的通知
+ * A user enabled/disabled screen sharing.
  *
- * @param userId    用户ID
- * @param available 是否有屏幕分享流数据
+ * @param userId    User ID
+ * @param available Whether screen sharing data is available
  */
 - (void)onRemoteUserScreenVideoAvailable:(NSString *)userId
                                available:(BOOL)available;
 
 /**
- * 技术指标统计回调
+ * Callback for technical metric statistics
  *
- * 如果您是熟悉音视频领域相关术语，可以通过这个回调获取 SDK 的所有技术指标。
- * 如果您是首次开发音视频相关项目，可以只关注 onNetworkQuality 回调，每2秒回调一次。
+ * If you are familiar with audio/video terms, you can use this callback to get all technical metrics of the SDK.
+ * If you are developing an audio/video project for the first time, you can focus only on the `onNetworkQuality` callback, which is triggered once every two seconds.
  *
- * @param statistics 统计数据，包括本地和远程的
+ * @param statistics Statistics of local and remote users
  */
 - (void)onStatistics:(TRTCStatistics *)statistics;
 
@@ -113,51 +118,52 @@ FOUNDATION_EXPORT void tuiRoomLog(NSString *format, ...);
 @interface TUIRoomTRTCService : NSObject
 
 /**
- * 设置回调
+ * Set callback
  *
  */
 @property(nonatomic, weak) id<TUIRoomTRTCServiceDelegate> delegate;
 
 
 /**
- * 进入会议（其他参会者调用）
+ * Enter a meeting (called by other participants)
  *
- * @param roomInfo roomInfo
- * @param callback 结果回调，成功时 code 为0.
+ * @param roomInfo Room information
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)enterRTCRoom:(TUIRoomInfo *)roomInfo
             callback:(TUIRoomActionCallback)callback;
 
+
 /**
- * 退出房间
+ * Exits a room
  *
- * @param callback 事件回调
-*/
+ * @param callback Event callback
+ */
 - (void)leaveRoom:(nullable TUIRoomActionCallback)callback;
 
 
 /**
- * 角色切换成主播
+ * Switch the role to anchor
  *
- * @param callback 事件回调
-*/
+ * @param callback Event callback
+ */
 - (void)switchToAnchor:(nullable TUIRoomActionCallback)callback;
 
 /**
- * 角色切换成观众
+ * Switch the role to audience
  *
- * @param callback 事件回调
-*/
+ * @param callback Event callback
+ */
 - (void)switchToAudience:(nullable TUIRoomActionCallback)callback;
 
 /**
- * 播放远端视频画面
+ * Play the video of a remote user
  *
- * @param userId 需要观看的用户id
- * @param view 承载视频画面的 view 控件
- * @param type 流类型
- * @param callback 操作回调
- * @note 在 onUserVideoAvailable 为 true 回调时，调用这个接口
+ * @param userId ID of the user whose video is to be played
+ * @param view `view` control that carries the video image
+ * @param type Stream type
+ * @param callback Callback for the operation
+ * @note Call this API if `true` is returned in the `onUserVideoAvailable` callback.
  */
 - (void)startRemoteView:(NSString *)userId
                    view:(UIView *)view
@@ -166,11 +172,11 @@ FOUNDATION_EXPORT void tuiRoomLog(NSString *format, ...);
 
 
 /**
- * 取消订阅远端用户的视频流
+ * Unsubscribe from the video stream of a remote user
  *
- * @param userId 对方的用户信息
- * @param type 流类型
- * @param callback 操作回调
+ * @param userId Remote user ID
+ * @param type Stream type
+ * @param callback Callback for the operation
  *
  */
 - (void)stopRemoteView:(NSString *)userId
@@ -178,142 +184,142 @@ FOUNDATION_EXPORT void tuiRoomLog(NSString *format, ...);
               callback:(TUIRoomActionCallback)callback;
 
 /**
- * 暂停/恢复订阅远端用户的视频流
+ * Pause/Resume subscribing to a remote user's video stream
  *
- * @param userId 用户id
- * @param mute true：暂停  false：恢复
+ * @param userId User ID
+ * @param mute true: Pause it; false: Resume it
  */
 - (void)muteRemoteVideoStream:(NSString *)userId
                          type:(TUIRoomStreamType)type
                          mute:(BOOL)mute;
 
 /**
- * 切换前后摄像头
+ * Switches between the front and rear cameras
  *
- * @param isFront true：前置摄像头；false：后置摄像头。
+ * @param isFront true:Front camera; false: Rear camera
  */
 - (void)switchCamera:(BOOL)isFront;
 
 /**
- * 判断当前是否为前置摄像头
+ * Query whether the current camera is the front camera
  * @return yes/no
  */
 - (BOOL)isFrontCamera;
 
 /**
- * 设置分辨率
+ * Sets the resolution
  *
- * @param resolution 视频分辨率
+ * @param resolution Video resolution
  */
 - (void)setVideoResolution:(TRTCVideoResolution)resolution;
 
 /**
- * 设置帧率
+ * Sets the frame rate
  *
- * @param fps 帧率数
+ * @param fps Frame rate in FPS
  */
 - (void)setVideoFps:(int)fps;
 
 /**
- * 设置码率
+ * Sets the bitrate
  *
- * @param bitrate 码率，单位：kbps
+ * @param bitrate Bitrate in Kbps
  */
 - (void)setVideoBitrate:(int)bitrate;
 
 /**
- * 设置本地画面镜像预览模式
+ * Set the mirror mode of the local preview
  *
- * @param type 本地视频预览镜像类型
+ * @param type Mirror mode of the local video preview
  */
 - (void)setLocalViewMirror:(TRTCVideoMirrorType)type;
 
 /**
- * 设置网络qos参数
+ * Set the network QoS parameter
  *
- * @param preference 网络流控策略
+ * @param preference The QoS control policy
  */
 - (void)setVideoQosPreference:(TRTCNetworkQosParam *)preference;
     
 /**
- * 开启麦克风采集
+ * Starts mic capturing
  */
 - (void)startMicrophone;
 
 /**
- * 停止麦克风采集
+ * Stops mic capturing
  */
 - (void)stopMicrophone;
 
 /**
- * 设置音质
+ * Sets the audio quality
  *
- * @param quality 音质
+ * @param quality Audio quality
  */
 - (void)setAudioQuality:(TRTCAudioQuality)quality;
 
 /**
- * 开启本地静音
+ * Mute local audio
  *
- * @param mute 是否静音
+ * @param mute Whether to mute
  */
 - (void)muteLocalAudio:(BOOL)mute;
 
 /**
- * 设置开启扬声器
+ * Sets whether to use the device’s speaker or receiver
  *
- * @param useSpeaker true：扬声器 false：听筒
+ * @param useSpeaker true: Speaker; false: Receiver
  */
 - (void)setSpeaker:(BOOL)useSpeaker;
 
 /**
- * 设置麦克风采集音量
+ * Sets the mic capturing volume level
  *
- * @param volume 采集音量 0-100
+ * @param volume Capturing volume level. Value range: 0–100
  */
 - (void)setAudioCaptureVolume:(NSInteger)volume;
 
 /**
- * 设置播放音量
+ * Sets the playback volume level
  *
- * @param volume 播放音量 0-100
+ * @param volume Playback volume level. Value range: 0–100
  */
 - (void)setAudioPlayoutVolume:(NSInteger)volume;
 
 /**
- * 开始录音
+ * Start audio recording
  *
- * 该方法调用后， SDK 会将通话过程中的所有音频（包括本地音频，远端音频，BGM 等）录制到一个文件里。
- * 无论是否进房，调用该接口都生效。
- * 如果调用 exitMeeting 时还在录音，录音会自动停止。
- * @param params 录音参数
+ * After this API is called, the SDK will record all audios (such as local audio, remote audio, and background music) in the current call to a file.
+ * No matter whether room entry is performed, this API will take effect once called.
+ * When `exitMeeting` is called, audio recording will stop automatically.
+ * @param params Audio recording parameters
  */
 - (void)startFileDumping:(TRTCAudioRecordingParams *)params;
 
 /**
- * 停止录音
+ * Stop audio recording
  *
- * 如果调用 exitMeeting 时还在录音，录音会自动停止。
+ * When `exitMeeting` is called, audio recording will stop automatically.
  */
 - (void)stopFileDumping;
 
 /**
- * 启用音量大小提示
+ * Enable the volume level reminder
  *
- * 开启后会在 onUserVolumeUpdate 中获取到 SDK 对音量大小值的评估。
- * @param enable true：打开  false：关闭
+ * After this feature is enabled, the evaluation result of the volume level by the SDK will be obtained in `onUserVolumeUpdate`.
+ * @param enable true: Enable;  false: Disable
  */
 - (void)enableAudioEvaluation:(BOOL)enable;
 
 /**
- * 资源释放
+ * Release the resource
  *
- * @note 持有此对象，在dealloc时候调用此方法
+ * @note Call this method with the corresponding object during `dealloc`
  */
 - (void)releaseResources;
 
 /**
- * 获取getStreamId
+ * Get `getStreamId`
  *
  */
 - (NSString *)getStreamId;

@@ -1,0 +1,231 @@
+{
+  "componentLevel": 1,
+  "madeIn": "LightStudio",
+  "root": {
+    "id": -2016,
+    "name": "拍摄模板",
+    "children": [
+      {
+        "id": -2017,
+        "name": "2D画板",
+        "children": [
+          {
+            "id": -2018,
+            "name": "空对象",
+            "children": [],
+            "enabled": true,
+            "version": 0,
+            "components": [
+              {
+                "type": "ScreenTransform",
+                "position": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                },
+                "rotation": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0,
+                  "w": 1
+                },
+                "scale": {
+                  "x": 1,
+                  "y": 1,
+                  "z": 1
+                },
+                "anchor": {
+                  "left": 0,
+                  "right": 0,
+                  "top": 0,
+                  "bottom": 0
+                },
+                "offset": {
+                  "left": -360,
+                  "right": 360,
+                  "top": 640,
+                  "bottom": -640
+                },
+                "pivot": {
+                  "x": 0,
+                  "y": 0
+                },
+                "ePinToEdge": 0,
+                "eFixSize": 3,
+                "eEditingMode": 0,
+                "eKeepRatio": true,
+                "objectEnabled": true,
+                "enabled": true,
+                "entityId": -2018,
+                "componentID": -2000
+              },
+              {
+                "key": "default_external_render",
+                "data": "",
+                "type": "ExternalRender",
+                "enabled": true,
+                "version": 1,
+                "entityId": -2018,
+                "componentID": -2004
+              },
+              {
+                "type": "EntityIdentifier",
+                "name": "空对象",
+                "id": -2018
+              }
+            ]
+          }
+        ],
+        "enabled": true,
+        "version": 0,
+        "components": [
+          {
+            "anchor": {
+              "bottom": -1,
+              "left": -1,
+              "right": 1,
+              "top": 1
+            },
+            "offset": {
+              "bottom": 0,
+              "left": 0,
+              "right": 0,
+              "top": 0
+            },
+            "pivot": {
+              "x": 0,
+              "y": 0
+            },
+            "ePinToEdge": 15,
+            "eFixSize": 0,
+            "eEditingMode": 1,
+            "eKeepRatio": false,
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "w": 1,
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "entityId": -2017,
+            "componentID": -2002,
+            "type": "ScreenTransform",
+            "enabled": true,
+            "version": 2,
+            "objectEnabled": true
+          },
+          {
+            "componentID": -2003,
+            "enabled": true,
+            "entityId": -2017,
+            "renderTargetKey": "RenderTarget",
+            "type": "Camera",
+            "version": 2
+          },
+          {
+            "type": "EntityIdentifier",
+            "name": "2D画板",
+            "id": -2017
+          }
+        ]
+      }
+    ],
+    "components": [
+      {
+        "anchor": {
+          "bottom": -1,
+          "left": -1,
+          "right": 1,
+          "top": 1
+        },
+        "offset": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "pivot": {
+          "x": 0,
+          "y": 0
+        },
+        "ePinToEdge": 15,
+        "eFixSize": 0,
+        "eEditingMode": 1,
+        "eKeepRatio": false,
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "entityId": -2016,
+        "componentID": -2001,
+        "type": "ScreenTransform",
+        "enabled": true,
+        "version": 2,
+        "objectEnabled": true
+      },
+      {
+        "type": "EntityIdentifier",
+        "name": "拍摄模板",
+        "id": -2016
+      }
+    ],
+    "enabled": true,
+    "version": 0
+  },
+  "inputSources": {
+    "RenderTarget": {
+      "key": "RenderTarget",
+      "type": "RenderTarget",
+      "path": "RenderTarget.rdt",
+      "label": "RenderTarget.rdt",
+      "inputKey": "DeviceCameraTexture"
+    },
+    "DeviceCameraTexture": {
+      "key": "DeviceCameraTexture",
+      "type": "TextureData",
+      "path": "DeviceCameraTexture.tex",
+      "label": "DeviceCameraTexture.tex"
+    }
+  },
+  "preset": {},
+  "properties": {
+    "layout": {
+      "width": 720,
+      "height": 1280
+    },
+    "boundsTrackerPlaceHolders": [],
+    "musicIDs": [],
+    "fonts": [],
+    "movieConfig": {
+      "sourceType": 2,
+      "minClipAssetCount": 1,
+      "maxClipAssetCount": 999,
+      "minImageDuration": 1000000,
+      "maxImageDuration": 10000000,
+      "minVideoDuration": 2000000,
+      "preferredCoverTime": 1000000
+    },
+    "resourceIDs": []
+  }
+}

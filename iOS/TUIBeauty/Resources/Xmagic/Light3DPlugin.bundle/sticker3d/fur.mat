@@ -1,0 +1,230 @@
+material {
+    name : fur,
+    parameters : [
+        {
+           type : sampler2d,
+           name : texture
+        },
+        {
+           type : sampler2d,
+           name : fur
+        },
+        {
+            type : float,
+            name : offset
+        },
+        {
+            type : float,
+            name : time
+        },
+        {
+            type : float,
+            name : furLength
+        },
+        {
+            type : float,
+            name : tming
+        },
+        {
+            type : float,
+            name : dming
+        },
+        {
+            type : float,
+            name : fresnelLv
+        },
+        {
+            type : float,
+            name : spacing
+        },
+        {
+            type : float4,
+            name : gravity
+        },
+        {
+            type : float4,
+            name : wind
+        }
+    ],
+    requires : [
+        uv0, position, color, tangents
+    ],
+    variables : [
+        vertex, lights, specular
+    ],
+    shadingModel : unlit,
+    blending : transparent,
+    flipUV:false
+}
+
+vertex {
+
+    const float _SHExposure = 1.0;
+    const float _FurSHExposure = 1.0;
+    const vec4 _Color = vec4(1.0,1.0,1.0,1);
+    const float _DirLightExposure = 1.0;
+    const vec4 _DirLightColor = vec4(1, 1, 1, 1);
+
+    vec3 GammaToLinearSpace (vec3 sRGB)
+    {
+        return sRGB * (sRGB * (sRGB * 0.305306011 + 0.682171111) + 0.012522878);
+    }
+
+    vec3 CalcEnvDiffuseBrdf(vec3 normal)
+    {
+        //vec4 n = _envRot * vec4(normal, 1.0);
+        //vec3 envDiffuse = vec3(dot(n, _envSHR * n), dot(n, _envSHG * n), dot(n, _envSHB * n));
+        //return (envDiffuse) * _EnvExposure;
+        vec3 envDiffuse = vec3(1, 1, 1);
+        return GammaToLinearSpace( envDiffuse ) * _SHExposure * _FurSHExposure;
+    }
+
+    vec3 powv(vec3 color, float value){
+        return vec3(pow(color.r, value), pow(color.g, value), pow(color.b, value));
+    }
+
+    vec3 lerpv(vec3 a, vec3 b, float w) {
+        return a + w * (b-a);
+    }
+
+    //vec3 SH(vec3 ref_dir)
+    //{
+
+    //    mat4 sh_r = mat4(vec4(-0.033192723, -0.001821944, 0.207927387, 0.018505111),
+    //        vec4(0.000000000, 0.033192723, -0.116561720, 0.125891055),
+    //        vec4(0.000000000, 0.000000000, -0.004179386, -0.119403430),
+    //        vec4(0.000000000, 0.000000000, 0.000000000, 0.727640226));
+
+    //    mat4 sh_g = mat4(vec4(-0.040833838, -0.005019249, 0.209770154, 0.001172696),
+    //        vec4(0.000000000, 0.040833838, -0.119359312, 0.165181556),
+    //        vec4(0.000000000, 0.000000000, -0.010006203, -0.124774773),
+    //        vec4(0.000000000, 0.000000000, 0.000000000, 0.725567236));
+
+    //    mat4 sh_b = mat4(vec4(-0.051333459, 0.000662888, 0.191847408, -0.016157521),
+    //        vec4(0.000000000, 0.051333459, -0.120322257, 0.227566714),
+    //        vec4(0.000000000, 0.000000000, -0.024883129, -0.127375589),
+    //        vec4(0.000000000, 0.000000000, 0.000000000, 0.695387512));
+
+    //    float env_rot = 0.0;
+
+    //    float PIX2 = 6.283185307179586476925286766559f;
+    //    float rot = env_rot * PIX2   ;
+
+    //    float cos_env_rot = cos(rot);
+    //    float sin_env_rot = sin(rot);
+
+    //    vec4 irrad_dir = vec4(normalize(float3(cos_env_rot * ref_dir.x + sin_env_rot * ref_dir.z, ref_dir.y, -sin_env_rot * ref_dir.x + cos_env_rot * ref_dir.z)), 1.0f);
+
+    //    float r = dot(irrad_dir, sh_r * irrad_dir);
+    //    float g = dot(irrad_dir, sh_g * irrad_dir);
+    //    float b = dot(irrad_dir, sh_b * irrad_dir);
+
+    //    return powv(float3(r, g, b),1.33) * _SHExposure *_FurSHExposure;
+    //}
+
+    void materialVertex(inout MaterialVertexInputs material) {
+        const vec4 _UVoffset = vec4(0, 0, 0, 0);
+        float FUR_OFFSET = materialParams.offset;
+        //const vec4 _Gravity = vec4(0.0, 0.0, 0.0, 0.3);
+        //float spacing = materialParams.furLength * 0.1;
+        //const vec4 _Wind = vec4(5, 50, 50, 0.2);
+        float spacing = materialParams.furLength * materialParams.spacing;
+        vec4 _Gravity = materialParams.gravity;
+        vec4 _Wind = materialParams.wind;
+
+        vec3 forceDirection = vec3(0.0, 0.0, 0.0);
+        // Wind 低配可以去掉
+        forceDirection.x = sin(materialParams.time * 1.5 * _Wind.x + material.worldPosition.x * 0.5*_Wind.z) * _Wind.w;
+        forceDirection.y = cos(materialParams.time * 0.5 * _Wind.x + material.worldPosition.y * 0.4*_Wind.y) * _Wind.w;
+        forceDirection.z = sin(materialParams.time * 0.7 * _Wind.x + material.worldPosition.y * 0.3*_Wind.y) * _Wind.w;
+
+        // 顶点offset
+        vec3 displacement = forceDirection + _Gravity.xyz; //顶点方向
+        float displacementFactor = FUR_OFFSET * FUR_OFFSET;
+
+        vec3 aNormal = material.worldNormal.xyz;
+        aNormal.xyz += (displacement * displacementFactor * aNormal.z);
+        vec3 n = aNormal * FUR_OFFSET * (spacing * saturate(1.0+_Gravity.w)); //spacing顶点色alpha通道控制毛发扩展长度
+
+        vec4 wpos =  vec4(material.worldPosition.xyz + n.xyz, 1.0);
+        material.worldPosition = wpos;
+
+        // uv offuse
+        vec2 uvoffset = _UVoffset.xy * FUR_OFFSET + (forceDirection.xy * _UVoffset.zw * FUR_OFFSET);
+        uvoffset *=  0.1; // 尺寸太小不好调整 缩小精度。
+
+        vec2 uv1 = material.uv0 + uvoffset;
+        vec2 uv2 = material.uv0 + uvoffset;
+        material.vertex = vec4(uv1, uv2);   // ???
+
+        //坐标
+        //vec3 N = material.worldNormal.xyz;
+
+        //vec3 V = normalize(getWorldCameraPosition() - material.worldPosition.xyz);
+        //vec3 L = normalize(vec3(0, -2, -6));
+        //vec3 R = normalize(V + L);
+
+        // 灯光
+        //float NoV = saturate(dot(N,V));
+        //float NoL = dot(L,N);
+        //float Occlusion = FUR_OFFSET*FUR_OFFSET;
+
+        // 轮廓光
+        //float RimLight = (1.0 - NoV ) ;//*fresnelLv ;
+        //RimLight *= Occlusion;
+        //RimLight *= (RimLight+(1.0 - NoV));
+        //RimLight *= materialParams.fresnelLv;
+
+        // 环境光
+        //vec3 SHL = CalcEnvDiffuseBrdf(N);  //环境颜色 可以用单色替代
+        //SHL = SH(N);
+        //SHL *= _SHExposure; //环境光转到线性空间 简易
+        //SHL = lerpv (SHL, _Color.xyz * SHL, 1.0 - Occlusion * _Color.a); //环境颜色与AO颜色
+        //SHL += SHL*RimLight;
+
+        // 平行光
+        //float FurFilter = materialParams.furLength * 0.5;
+        //float DirLight = saturate(NoL + Occlusion*FurFilter);
+        //vec3 diffuseSum = SHL + DirLight*_DirLightExposure *_DirLightColor.xyz; //灯光与环境合并
+
+        //material.lights = vec4(diffuseSum, 1.0);
+        //material.specular = vec4(saturate(NoL));
+    }
+}
+
+fragment {
+
+    vec3 powv(vec3 color, float value){
+        return vec3(pow(color.r, value), pow(color.g, value), pow(color.b, value));
+    }
+
+    void material(inout MaterialInputs material) {
+
+        float FUR_OFFSET = materialParams.offset;
+        float2 uv = getUV0().xy;
+
+        prepareMaterial(material);
+
+        //贴图计算
+        float Noise = texture(materialParams_texture, variable_vertex.zw).r;
+        vec4 color1 = texture(materialParams_fur, variable_vertex.xy);
+        color1.rgb *= color1.rgb;
+        //贴图计算 END
+        //float vcolormask = saturate(variable_lights.a);
+
+        //color1.rgb = color1.rgb * variable_lights.rgb + variable_specular.xyz;
+        //color1.rgb *= (1.0 + (1.0-vcolormask));
+
+        //float furMask = 1.0 - materialParams.dming * vcolormask;
+        float furMask = 1.0 - materialParams.dming;
+        float alpha = saturate((Noise*2.0 - (FUR_OFFSET*FUR_OFFSET+(FUR_OFFSET*furMask*5.0))) * materialParams.tming);
+        alpha *= color1.a;
+        color1.a = alpha;
+
+        color1.rgb = powv(color1.rgb, 0.4545);
+
+        color1.rgb *= alpha;
+
+        material.baseColor = color1;
+    }
+}

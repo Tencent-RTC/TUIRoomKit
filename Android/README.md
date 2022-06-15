@@ -9,11 +9,10 @@ _中文 | [English](README.en.md)_
 
 ```
 TUIRoom
-├─ App          // 主面板，多人音视频互动场景入口
-├─ Debug        // 调试相关
-├─ Source       // 多人音视频互动业务逻辑
-├─ Beauty       // 美颜面板，包含美颜，滤镜，动效等效果
-└─ TUICore      // 基础通信组件
+├─ app          // 主面板，多人音视频互动场景入口
+├─ debug        // 调试相关
+├─ tuibeauty    // 美颜面板，包含美颜，滤镜，动效等效果
+└─ tuiroom      // 多人音视频互动业务逻辑
 ```
 
 ## 环境准备
@@ -35,7 +34,7 @@ TUIRoom
 [](id:ui.step2)
 ### 第二步：下载源码，配置工程
 1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
-2. 找到并打开 `Android/Debug/src/main/java/com/tencent/liteav/debug/GenerateTestUserSig.java` 文件。
+2. 找到并打开 `Android/debug/src/main/java/com/tencent/liteav/debug/GenerateTestUserSig.java` 文件。
 3. 配置 `GenerateTestUserSig.java` 文件中的相关参数：
 	<img src="https://main.qcloudimg.com/raw/f9b23b8632058a75b78d1f6fdcdca7da.png" width="900">
 	- SDKAPPID：默认为占位符（PLACEHOLDER），请设置为步第一步中记录下的 SDKAppID。

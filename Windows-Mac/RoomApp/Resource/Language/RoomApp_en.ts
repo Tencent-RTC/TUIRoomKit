@@ -9,23 +9,23 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="92"/>
+        <location filename="../../App/BottomBarController.cpp" line="94"/>
         <source>Camera</source>
         <translation>Camera</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="98"/>
+        <location filename="../../App/BottomBarController.cpp" line="100"/>
         <source>Audio</source>
         <translation>Audio</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="104"/>
-        <location filename="../../App/BottomBarController.cpp" line="348"/>
+        <location filename="../../App/BottomBarController.cpp" line="106"/>
+        <location filename="../../App/BottomBarController.cpp" line="350"/>
         <source>Share</source>
         <translation>Share</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="110"/>
+        <location filename="../../App/BottomBarController.cpp" line="112"/>
         <source>Member</source>
         <translation>Member</translation>
     </message>
@@ -34,7 +34,7 @@
         <translation type="vanished">Handsup</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="114"/>
+        <location filename="../../App/BottomBarController.cpp" line="116"/>
         <source>ChatRoom</source>
         <translation>Chat</translation>
     </message>
@@ -44,42 +44,42 @@
         <translation>Leave Room</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="168"/>
+        <location filename="../../App/BottomBarController.cpp" line="170"/>
         <source>Camera Select</source>
         <translation>Camera Select</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="174"/>
+        <location filename="../../App/BottomBarController.cpp" line="176"/>
         <source>camera setting</source>
         <translation>Video</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="178"/>
+        <location filename="../../App/BottomBarController.cpp" line="180"/>
         <source>beauty setting</source>
         <translation>Beauty Filters</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="247"/>
+        <location filename="../../App/BottomBarController.cpp" line="249"/>
         <source>Speaker Select</source>
         <translation>Speaker Select</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="276"/>
+        <location filename="../../App/BottomBarController.cpp" line="278"/>
         <source>Microphone Select</source>
         <translation>Microphone Select</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="284"/>
+        <location filename="../../App/BottomBarController.cpp" line="286"/>
         <source>audio setting</source>
         <translation>Audio</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="342"/>
+        <location filename="../../App/BottomBarController.cpp" line="344"/>
         <source>NewShare</source>
         <translation>New Share</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="731"/>
+        <location filename="../../App/BottomBarController.cpp" line="743"/>
         <source>Screen Capture Stopped.</source>
         <translation>Screen Capture Stopped.</translation>
     </message>
@@ -88,20 +88,20 @@
         <translation type="vanished">%1 Sharing screen...</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="458"/>
-        <location filename="../../App/BottomBarController.cpp" line="516"/>
+        <location filename="../../App/BottomBarController.cpp" line="460"/>
+        <location filename="../../App/BottomBarController.cpp" line="521"/>
         <source>Other users are sharing screens</source>
         <translation>Other user is sharing screens</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="680"/>
-        <location filename="../../App/BottomBarController.cpp" line="689"/>
+        <location filename="../../App/BottomBarController.cpp" line="691"/>
+        <location filename="../../App/BottomBarController.cpp" line="700"/>
         <source>screen share</source>
         <translation>Screen Share</translation>
     </message>
     <message>
-        <location filename="../../App/BottomBarController.cpp" line="343"/>
-        <location filename="../../App/BottomBarController.cpp" line="687"/>
+        <location filename="../../App/BottomBarController.cpp" line="345"/>
+        <location filename="../../App/BottomBarController.cpp" line="698"/>
         <source>end share</source>
         <translation>End Share</translation>
     </message>
@@ -120,7 +120,7 @@
     </message>
     <message>
         <location filename="../../App/Form/ChatRoomViewController.ui" line="127"/>
-        <location filename="../../App/ChatRoomViewController.cpp" line="165"/>
+        <location filename="../../App/ChatRoomViewController.cpp" line="167"/>
         <source>All Mute</source>
         <translation>All Mute</translation>
     </message>
@@ -244,61 +244,62 @@
     <message>
         <location filename="../../App/MainWindow.cpp" line="335"/>
         <location filename="../../App/MainWindow.cpp" line="338"/>
+        <location filename="../../App/MainWindow.cpp" line="342"/>
         <source>Are you sure to leave the room ?</source>
         <translation>Are you sure to leave the room ?</translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="498"/>
+        <location filename="../../App/MainWindow.cpp" line="509"/>
         <source>The master has set video ban for all staff, you cannot open the video temporarily.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="521"/>
+        <location filename="../../App/MainWindow.cpp" line="530"/>
         <source>The master has set audio ban for all staff, you cannot open the audio temporarily.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="612"/>
+        <location filename="../../App/MainWindow.cpp" line="627"/>
         <source>Send the messgae failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="618"/>
+        <location filename="../../App/MainWindow.cpp" line="633"/>
         <source>Failed to open the camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="622"/>
+        <location filename="../../App/MainWindow.cpp" line="637"/>
         <source>Failed to turn on the microphone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="626"/>
+        <location filename="../../App/MainWindow.cpp" line="641"/>
         <source>Other users are sharing screens</source>
         <translation type="unfinished">Other user is sharing screens</translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="632"/>
+        <location filename="../../App/MainWindow.cpp" line="647"/>
         <source>Mute chat room failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="635"/>
+        <location filename="../../App/MainWindow.cpp" line="650"/>
         <source>Change speech mode failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="638"/>
+        <location filename="../../App/MainWindow.cpp" line="653"/>
         <source>Enter room failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="645"/>
+        <location filename="../../App/MainWindow.cpp" line="661"/>
         <source>Open microphone failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="644"/>
+        <location filename="../../App/MainWindow.cpp" line="660"/>
         <source>This application doesn&apos;t have microphone authorization</source>
         <translation type="unfinished"></translation>
     </message>
@@ -382,31 +383,36 @@
         <translation type="vanished">Master</translation>
     </message>
     <message>
-        <location filename="../../App/Form/MemberListViewController.ui" line="195"/>
-        <location filename="../../App/MemberListViewController.cpp" line="307"/>
-        <location filename="../../App/MemberListViewController.cpp" line="327"/>
+        <location filename="../../App/Form/MemberListViewController.ui" line="106"/>
+        <source>Members:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/Form/MemberListViewController.ui" line="236"/>
+        <location filename="../../App/MemberListViewController.cpp" line="310"/>
+        <location filename="../../App/MemberListViewController.cpp" line="330"/>
         <source>forbid all mic</source>
         <translation>Forbid All Mic</translation>
     </message>
     <message>
-        <location filename="../../App/Form/MemberListViewController.ui" line="262"/>
-        <location filename="../../App/MemberListViewController.cpp" line="300"/>
-        <location filename="../../App/MemberListViewController.cpp" line="337"/>
+        <location filename="../../App/Form/MemberListViewController.ui" line="303"/>
+        <location filename="../../App/MemberListViewController.cpp" line="303"/>
+        <location filename="../../App/MemberListViewController.cpp" line="340"/>
         <source>forbid all video</source>
         <translation>Forbid All Video</translation>
     </message>
     <message>
-        <location filename="../../App/Form/MemberListViewController.ui" line="341"/>
+        <location filename="../../App/Form/MemberListViewController.ui" line="382"/>
         <source>Member</source>
         <translation>Member</translation>
     </message>
     <message>
-        <location filename="../../App/Form/MemberListViewController.ui" line="366"/>
+        <location filename="../../App/Form/MemberListViewController.ui" line="407"/>
         <source>Mic</source>
         <translation>Mic</translation>
     </message>
     <message>
-        <location filename="../../App/Form/MemberListViewController.ui" line="391"/>
+        <location filename="../../App/Form/MemberListViewController.ui" line="432"/>
         <source>Camera</source>
         <translation>Camera</translation>
     </message>
@@ -415,7 +421,7 @@
         <translation type="vanished">Status</translation>
     </message>
     <message>
-        <location filename="../../App/Form/MemberListViewController.ui" line="434"/>
+        <location filename="../../App/Form/MemberListViewController.ui" line="475"/>
         <source>Opeate</source>
         <translation>Opeate</translation>
     </message>
@@ -436,14 +442,19 @@
         <translation type="vanished">Open All Camera</translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="305"/>
-        <location filename="../../App/MemberListViewController.cpp" line="325"/>
+        <location filename="../../App/MemberListViewController.cpp" line="308"/>
+        <location filename="../../App/MemberListViewController.cpp" line="328"/>
         <source>open all mic</source>
         <translation>Cancel Forbid All Mic</translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="298"/>
-        <location filename="../../App/MemberListViewController.cpp" line="335"/>
+        <location filename="../../App/MemberListViewController.cpp" line="347"/>
+        <source>%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/MemberListViewController.cpp" line="301"/>
+        <location filename="../../App/MemberListViewController.cpp" line="338"/>
         <source>open all video</source>
         <translation>Cancel Forbid All Video</translation>
     </message>
@@ -461,7 +472,7 @@
         <translation>Member List</translation>
     </message>
     <message>
-        <location filename="../../App/PopStageListController.cpp" line="47"/>
+        <location filename="../../App/PopStageListController.cpp" line="45"/>
         <source>collapse to the upper right corner of the screen</source>
         <translation>Collapse to the upper right corner of the screen</translation>
     </message>
@@ -547,9 +558,9 @@
     <message>
         <location filename="../../App/Form/PresetDeviceController.ui" line="798"/>
         <location filename="../../App/Form/PresetDeviceController.ui" line="1086"/>
-        <location filename="../../App/PresetDeviceController.cpp" line="360"/>
-        <location filename="../../App/PresetDeviceController.cpp" line="378"/>
-        <location filename="../../App/PresetDeviceController.cpp" line="387"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="364"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="382"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="391"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
@@ -585,23 +596,23 @@
     </message>
     <message>
         <location filename="../../App/Form/PresetDeviceController.ui" line="1258"/>
-        <location filename="../../App/PresetDeviceController.cpp" line="300"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="304"/>
         <source>EnterRoom</source>
         <translation>Enter Room</translation>
     </message>
     <message>
-        <location filename="../../App/PresetDeviceController.cpp" line="229"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="233"/>
         <source>Entering...</source>
         <translation>Entering...</translation>
     </message>
     <message>
-        <location filename="../../App/PresetDeviceController.cpp" line="348"/>
-        <location filename="../../App/PresetDeviceController.cpp" line="366"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="352"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="370"/>
         <source>Stop</source>
         <translation>Stop</translation>
     </message>
     <message>
-        <location filename="../../App/PresetDeviceController.cpp" line="379"/>
+        <location filename="../../App/PresetDeviceController.cpp" line="383"/>
         <source>Not find test file in trtcres directory!</source>
         <translation>Not find test file in trtcres directory!</translation>
     </message>
@@ -776,9 +787,9 @@
     <message>
         <location filename="../../App/Form/SettingViewController.ui" line="927"/>
         <location filename="../../App/Form/SettingViewController.ui" line="1164"/>
-        <location filename="../../App/SettingViewController.cpp" line="472"/>
-        <location filename="../../App/SettingViewController.cpp" line="489"/>
-        <location filename="../../App/SettingViewController.cpp" line="501"/>
+        <location filename="../../App/SettingViewController.cpp" line="476"/>
+        <location filename="../../App/SettingViewController.cpp" line="493"/>
+        <location filename="../../App/SettingViewController.cpp" line="505"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
@@ -903,9 +914,9 @@
     </message>
     <message>
         <location filename="../../App/Form/SettingViewController.ui" line="2106"/>
-        <location filename="../../App/SettingViewController.cpp" line="578"/>
         <location filename="../../App/SettingViewController.cpp" line="582"/>
-        <location filename="../../App/SettingViewController.cpp" line="665"/>
+        <location filename="../../App/SettingViewController.cpp" line="586"/>
+        <location filename="../../App/SettingViewController.cpp" line="669"/>
         <source>Unknow</source>
         <translation>Unknow</translation>
     </message>
@@ -953,24 +964,24 @@
         <translation type="vanished">Screen Share</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="458"/>
-        <location filename="../../App/SettingViewController.cpp" line="477"/>
+        <location filename="../../App/SettingViewController.cpp" line="462"/>
+        <location filename="../../App/SettingViewController.cpp" line="481"/>
         <source>Stop</source>
         <translation>Stop</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="490"/>
+        <location filename="../../App/SettingViewController.cpp" line="494"/>
         <source>Not find test file in trtcres directory!</source>
         <translation>Not find test file in trtcres directory!</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="525"/>
+        <location filename="../../App/SettingViewController.cpp" line="529"/>
         <source>delay %1ms</source>
         <translation>delay %1ms</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="529"/>
         <location filename="../../App/SettingViewController.cpp" line="533"/>
+        <location filename="../../App/SettingViewController.cpp" line="537"/>
         <source> %1%</source>
         <translation> %1%</translation>
     </message>
@@ -979,50 +990,50 @@
         <translation type="vanished"> %1kbps</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="560"/>
-        <location filename="../../App/SettingViewController.cpp" line="567"/>
+        <location filename="../../App/SettingViewController.cpp" line="564"/>
+        <location filename="../../App/SettingViewController.cpp" line="571"/>
         <source> %1FPS</source>
         <translation> %1FPS</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="541"/>
-        <location filename="../../App/SettingViewController.cpp" line="549"/>
-        <location filename="../../App/SettingViewController.cpp" line="562"/>
+        <location filename="../../App/SettingViewController.cpp" line="545"/>
+        <location filename="../../App/SettingViewController.cpp" line="553"/>
+        <location filename="../../App/SettingViewController.cpp" line="566"/>
         <source> %1Kbps</source>
         <translation> %1Kbp</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="585"/>
+        <location filename="../../App/SettingViewController.cpp" line="589"/>
         <source>Excellent</source>
         <translation>Excellent</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="588"/>
+        <location filename="../../App/SettingViewController.cpp" line="592"/>
         <source>Good</source>
         <translation>Good</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="591"/>
+        <location filename="../../App/SettingViewController.cpp" line="595"/>
         <source>Poor</source>
         <translation>Poor</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="594"/>
+        <location filename="../../App/SettingViewController.cpp" line="598"/>
         <source>Bad</source>
         <translation>Bad</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="597"/>
+        <location filename="../../App/SettingViewController.cpp" line="601"/>
         <source>Very bad</source>
         <translation>Very bad</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="600"/>
+        <location filename="../../App/SettingViewController.cpp" line="604"/>
         <source>Down</source>
         <translation>Down</translation>
     </message>
     <message>
-        <location filename="../../App/SettingViewController.cpp" line="626"/>
+        <location filename="../../App/SettingViewController.cpp" line="630"/>
         <source>The selection of sound quality will take effect the next time you enter the room!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1043,7 +1054,7 @@
 <context>
     <name>StageListController</name>
     <message>
-        <location filename="../../App/StageListController.cpp" line="888"/>
+        <location filename="../../App/StageListController.cpp" line="783"/>
         <source>You have become the new master.</source>
         <translation>You have become the new master.</translation>
     </message>
@@ -1235,8 +1246,8 @@ Current Role: %1.</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../App/VideoRenderViewInfo.cpp" line="8"/>
-        <location filename="../../App/VideoRenderViewInfo.cpp" line="99"/>
+        <location filename="../../App/VideoRenderViewInfo.cpp" line="9"/>
+        <location filename="../../App/VideoRenderViewInfo.cpp" line="100"/>
         <source>Unknow</source>
         <translation>Unknow</translation>
     </message>
@@ -1249,7 +1260,7 @@ NetStatus: %2
 		</translation>
     </message>
     <message>
-        <location filename="../../App/VideoRenderViewInfo.cpp" line="59"/>
+        <location filename="../../App/VideoRenderViewInfo.cpp" line="60"/>
         <source>downloss: %1%
 NetStatus: %2
 </source>
@@ -1257,37 +1268,37 @@ NetStatus: %2
 NetStatus: %2</translation>
     </message>
     <message>
-        <location filename="../../App/VideoRenderViewInfo.cpp" line="103"/>
+        <location filename="../../App/VideoRenderViewInfo.cpp" line="104"/>
         <source>Excellent</source>
         <translation>Excellent</translation>
     </message>
     <message>
-        <location filename="../../App/VideoRenderViewInfo.cpp" line="107"/>
+        <location filename="../../App/VideoRenderViewInfo.cpp" line="108"/>
         <source>Good</source>
         <translation>Good</translation>
     </message>
     <message>
-        <location filename="../../App/VideoRenderViewInfo.cpp" line="111"/>
+        <location filename="../../App/VideoRenderViewInfo.cpp" line="112"/>
         <source>Poor</source>
         <translation>Poor</translation>
     </message>
     <message>
-        <location filename="../../App/VideoRenderViewInfo.cpp" line="115"/>
+        <location filename="../../App/VideoRenderViewInfo.cpp" line="116"/>
         <source>Bad</source>
         <translation>Bad</translation>
     </message>
     <message>
-        <location filename="../../App/VideoRenderViewInfo.cpp" line="119"/>
+        <location filename="../../App/VideoRenderViewInfo.cpp" line="120"/>
         <source>Very bad</source>
         <translation>Very bad</translation>
     </message>
     <message>
-        <location filename="../../App/VideoRenderViewInfo.cpp" line="123"/>
+        <location filename="../../App/VideoRenderViewInfo.cpp" line="124"/>
         <source>Down</source>
         <translation>Down</translation>
     </message>
     <message>
-        <location filename="../../App/VideoRenderViewInfo.cpp" line="156"/>
+        <location filename="../../App/VideoRenderViewInfo.cpp" line="157"/>
         <source>%0 is sharing</source>
         <translation>%0 is sharing</translation>
     </message>

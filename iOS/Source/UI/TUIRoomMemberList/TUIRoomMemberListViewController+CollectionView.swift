@@ -3,7 +3,7 @@
 //  TRTCScenesDemo
 //
 //  Created by lijie on 2020/5/7.
-//  Copyright © 2020 xcoderliu. All rights reserved.
+//  Copyright © 2022 Tencent. All rights reserved.
 //
 
 import Foundation
@@ -42,7 +42,7 @@ class TUIRoomMemberCell: UICollectionViewCell {
         return label
     }()
 
-    lazy var muteAudioButton: UIButton = { /// 禁麦
+    lazy var muteAudioButton: UIButton = {
         let button = UIButton()
         button.addTarget(self, action: #selector(muteAudioBtnClick), for: .touchUpInside)
         button.setImage(UIImage(named: "tuiroom_mic_on", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
@@ -50,7 +50,7 @@ class TUIRoomMemberCell: UICollectionViewCell {
         return button
     }()
 
-    lazy var muteVideoButton: UIButton = { /// 禁画
+    lazy var muteVideoButton: UIButton = {
         let button = UIButton(type: .custom)
         button.addTarget(self, action: #selector(muteVideoBtnClick), for: .touchUpInside)
         button.setImage(UIImage(named: "tuiroom_camera_on", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
@@ -58,7 +58,7 @@ class TUIRoomMemberCell: UICollectionViewCell {
         return button
     }()
 
-    lazy var kickOffButton: UIButton = { /// 踢出
+    lazy var kickOffButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_kick_off", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
         button.sizeToFit()
@@ -91,7 +91,7 @@ class TUIRoomMemberCell: UICollectionViewCell {
 
         muteAudioButton.isSelected = !model.userInfo.isAudioOpen()
         muteVideoButton.isSelected = !model.userInfo.isVideoOpen()
-        if model.userInfo.userId == curUserID { // 是自己
+        if model.userInfo.userId == curUserID {
             muteAudioButton.isHidden = true
             muteVideoButton.isHidden = true
             kickOffButton.isHidden = true
@@ -109,7 +109,7 @@ class TUIRoomMemberCell: UICollectionViewCell {
                 muteAudioButton.isUserInteractionEnabled = false
                 muteVideoButton.isUserInteractionEnabled = false
             }
-            if roomInfo.isHomeowner() { // 是房主
+            if roomInfo.isHomeowner() {
                 kickOffButton.isHidden = false
             } else {
                 kickOffButton.isHidden = true
@@ -122,15 +122,15 @@ class TUIRoomMemberCell: UICollectionViewCell {
     }
 
     func setupUI() {
-        // 头像图标
+        
         addSubview(avatarImageView)
-        // 用户ID_label
+        
         addSubview(userLabel)
-        // 静音按钮
+        
         addSubview(muteAudioButton)
-        // 禁画按钮
+        
         addSubview(muteVideoButton)
-        // 踢出按钮
+
         addSubview(kickOffButton)
     }
 

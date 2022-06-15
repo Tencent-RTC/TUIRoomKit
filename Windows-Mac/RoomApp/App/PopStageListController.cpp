@@ -17,8 +17,7 @@ PopStageListController::PopStageListController(QWidget *parent)
             normal_height_ = this->height();
             this->setFixedHeight(50);
             ui.widget_content->hide();
-        }
-        else {
+        } else {
             this->setFixedHeight(normal_height_);
             ui.widget_content->show();
             QDesktopWidget* desk = QApplication::desktop();
@@ -33,8 +32,7 @@ PopStageListController::PopStageListController(QWidget *parent)
             normal_height_ = this->height();
             int height = main_rect.height() - 10;
             this->setFixedHeight(height);
-        }
-        else {
+        } else {
             this->setFixedHeight(normal_height_);
         }
         this->move((main_rect.width() - this->width() - 10), (main_rect.height() - this->height()) / 2);

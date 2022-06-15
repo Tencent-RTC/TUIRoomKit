@@ -19,165 +19,164 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TUIRoomCore : NSObject
 /**
- * 获取 TUIRoom 单例对象
+ * Get the object pointer of `TUIRoomCore`.
  *
- * @return 返回 TUIRoomCore 单例对象，需要调用 destroyInstance 释放单例对象。
+ * @return Return the pointer of the `TUIRoomCore` singleton object. You need to call `DestroyInstance` to release the singleton pointer object.
  */
 + (instancetype)shareInstance;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * 销毁 TUIRoom 单例对象
+ * Release a `TUIRoomCore` singleton object
  */
 + (void)destroyInstance;
 
 /**
- * 设置组件回调接口
+ * Set the `TUIRoomCoreDelegate` API
  *
- * 您可以通过 TUIRoomCoreDelegate 获得各种状态通知
+ * You can use `TUIRoomCoreDelegate` to get various status notifications. For more information, see the definition in `TUIRoomCoreDelegate.h`.
  *
- * @param delegate 回调接口
- * @note TUIRoom 中的事件，默认是在 Main Thread 中回调给您
+ * @param delegate TUIRoomCoreDelegate
+ *
  */
 - (void)setDelegate:(id<TUIRoomCoreDelegate>)delegate;
 
 /**
- * 创建房间（主持人调用）
+ * Create a room (called by host)
  *
- * @param roomId     房间标识，需要由您分配并进行统一管理
- * @param speechMode 发言模式
- * @param callback   创建房间的结果回调，成功时 code 为0
+ * @param roomId     Room ID. You need to assign and manage the IDs in a centralized manner
+ * @param speechMode Speech mode. Valid values:
+ *                    - TUIRoomFreeSpeech Users can speak freely;
+ *                    - TUIRoomApplySpeech: Users need permission to speak.
+ * @param callback   Callback for room creation result. The `code` will be 0 if the operation succeeds.
  */
 - (void)createRoom:(NSString *)roomId
         speechMode:(TUIRoomSpeechMode)speechMode
         callback:(TUIRoomActionCallback)callback;
 
 /**
- * 销毁房间（主持人调用）
+ * Terminate a room (called by host)
  *
- * 主持人在创建房间后，可以调用这个函数来销毁房间
+ * After creating a room, the host can call this API to terminate it.
  *
- * 调用销毁房间接口后，其它成员会收到来自TUIRoomCoreListener的onDestroyRoom()回调通知
+ * After calling the room termination API, other members will receive the `onDestroyRoom()` callback from `TUIRoomCoreDelegate`.
  *
- * @param callback 销毁房间的结果回调，成功时 code 为0.
- * @note 仅仅主持人调用
+ * @param callback Callback for room termination result. The `code` will be 0 if the operation succeeds.
  */
 - (void)destroyRoom:(TUIRoomActionCallback)callback;
 
 /**
- * 进入房间（进入房间成员调用）
+ * Enter a room (called by member)
  *
- * @param roomId   房间标识，需要由您分配并进行统一管理
- * @param callback 结果回调，成功时 code 为0
+ * @param roomId   Room ID. You need to assign and manage the IDs in a centralized manner
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)enterRoom:(NSString *)roomId
         callback:(TUIRoomActionCallback)callback;
 
 /**
- * 离开房间（进入房间成员调用）
+ * Exit a room (called by member)
  *
- * @param callback 结果回调，成功时 code 为0.
- * @note 成员调用
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)leaveRoom:(TUIRoomActionCallback)callback;
 
 /**
- * 获取房间信息
- * 该接口用于获取房间的ID、房间名称、发言模式以及开始时间等信息
+ * Get the room information
+ * This API is used to get information such as room ID, name, speech mode, and start time.
  *
- * @return 返回房间信息
+ * @return Return Room information
  */
 - (nullable TUIRoomInfo *)getRoomInfo;
 
 /**
- * 获取房间内所有成员信息
+ * Get the information of all members in the room
+ * This API is used to get the list of information of members in the room.
  *
- * 调用该接口可以获取房间内的成员列表信息
- *
- * @return 返回房间人员信息列表
+ * @return Return Room member information list
  */
 - (nullable NSArray<TUIRoomUserInfo *> *)getRoomUsers;
 
 /**
- * 获取房间成员信息
+ * Get the information of a room member
  *
- * 调用该接口可以获取房间内指定userId的用户信息
+ * This API is used to get the user information of the specified `userId` in the room.
  *
- * @param userId  用户id
- * @param callback  房间人员详细信息回调
+ * @param userId  User ID
+ * @param callback  Callback for room member details
  */
 - (void)getUserInfo:(NSString *)userId
            callback:(TUIRoomUserInfoCallback)callback;
 
 /**
- * 将群转交给其他用户
+ * Transfer the group to another user
  *
- * @param userId   转交的用户id
- * @param callback 结果回调，成功时 code 为0
+ * @param userId   ID of the target user
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)transferRoomMaster:(NSString *)userId
                   callback:(TUIRoomActionCallback)callback;
 
 /**
- * 设置用户信息，您设置的用户信息会被存储于腾讯云 IM 云服务中
+ * Set user information. The user information you set will be stored in Tencent Cloud IM.
  *
- * @param userName  用户昵称
- * @param avatarURL 用户头像
- * @param callback  是否设置成功的结果回调
- */
+ * @param userName  Username
+ * @param avatarURL User profile photo
+ * @param callback  Result callback for whether the setting succeeds
+*/
 - (void)setSelfProfile:(NSString *)userName
              avatarURL:(NSString *)avatarURL
               callback:(TUIRoomActionCallback)callback;
 
 /**
- * 开启本地视频的预览画面
+ * Enables local video preview
  *
- * @param isFront true：前置摄像头；false：后置摄像头
- * @param view    承载视频画面的控件
+ * @param isFront true: Front camera; false: Rear camera
+ * @param view    The control that carries the video image
  */
 - (void)startCameraPreview:(BOOL)isFront
                       view:(UIView *)view;
 
 /**
- * 停止本地视频采集及预览
+ * Stops local video capturing and preview
  */
 - (void)stopCameraPreview;
 
 /**
- * 开启麦克风采集
+ * Starts mic capturing
  *
- * @param quality 采集的声音音质 TRTC_AUDIO_QUALITY_MUSIC/TRTC_AUDIO_QUALITY_DEFAULT/TRTC_AUDIO_QUALITY_SPEECH
+ * @param quality Captured audio quality. Valid values: TRTC_AUDIO_QUALITY_MUSIC, TRTC_AUDIO_QUALITY_DEFAULT, and TRTC_AUDIO_QUALITY_SPEECH
  */
 - (void)startLocalAudio:(TRTCAudioQuality)quality;
 
 /**
- * 停止麦克风采集
+ * Stops mic capturing
  */
 - (void)stopLocalAudio;
 
 /**
- * 设置本地画面镜像预览模式
+ * Set the mirror mode for the local preview
  *
- * @param type 本地视频预览镜像类型
- */
-
+ * @param type Mirror type. Valid values: TRTCVideoMirrorTypeAuto, TRTCVideoMirrorTypeEnable,
+ *             and TRTCVideoMirrorTypeDisable.
+*/
 - (void)setVideoMirror:(TRTCVideoMirrorType)type;
 
 /**
- * 设置开启扬声器
+ * Sets whether to use the device’s speaker or receiver
  *
- * @param isUseSpeaker YES：扬声器 NO：听筒
+ * @param isUseSpeaker YES: Speaker; NO: Receiver
  */
 - (void)setSpeaker:(BOOL)isUseSpeaker;
 
 /**
- * 订阅远端用户的视频流
+ * Subscribe to the video stream of a remote user
  *
- * @param userId     需要观看的用户id
- * @param view       承载视频画面的 view 控件
- * @param streamType 流类型
- * @param callback   结果回调
+ * @param userId     ID of the user whose video is to be played
+ * @param view      The control that carries the video image
+ * @param streamType Stream type
+ * @param callback   Result callback
  */
 - (void)startRemoteView:(NSString *)userId
                    view:(UIView *)view
@@ -185,329 +184,333 @@ NS_ASSUME_NONNULL_BEGIN
                callback:(TUIRoomActionCallback)callback;
 
 /**
- * 取消订阅远端用户的视频流
+ * Unsubscribe from the video stream of a remote user
  *
- * @param userId   需要停止播放的用户id
- * @param streamType 流类型
- * @param callback 结果回调
+ * @param userId   ID of the user whose video playback needs to be stopped
+ * @param streamType Stream type
+ * @param callback Result callback
  */
 - (void)stopRemoteView:(NSString *)userId
             streamType:(TUIRoomStreamType)streamType
               callback:(TUIRoomActionCallback)callback;
 
 /**
- * 切换前后摄像头
+ * Switches between the front and rear cameras
  *
- * @param isFront YES：前置摄像头；NO：后置摄像头。
+ * @param isFront YES: front camera; NO: rear camera
  */
 - (void)switchCamera:(BOOL)isFront;
 
 /**
- * 在房间中广播文本消息，一般用于文本聊天
+ * Broadcast a text chat message in the room. This API is generally used for text chat
  *
- * @param message  文本消息
- * @param callback 发送结果回调
+ * @param message  Message content
+ * @param callback Callback for the sending result
  */
 - (void)sendChatMessage:(NSString *)message
                callback:(TUIRoomActionCallback)callback;
 
 /**
- * 禁用/恢复某用户的麦克风
- * 调用该接口，主持人禁用/恢复成员麦克风，成员端回收到onMicrophoneMuted()回调。
+ * Enable/Disable the mic of the specified user
+ * When the host calls this API to disable/enable the mic of a member, the member will receive the `onMicrophoneMuted()` callback.
  *
- * @param userId   用户id
- * @param mute     YES：禁用房间用户麦克风；NO：恢复用户麦克风
- * @param callback 结果回调，成功时 code 为0.
+ * @param userId   User ID
+ * @param mute     true: Disable the mic of a user; false: Enable the mic of a user
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)muteUserMicrophone:(NSString *)userId
                       mute:(BOOL)mute
                   callback:(TUIRoomActionCallback)callback;
 
 /**
- * 禁用/恢复所有用户的麦克风，并且状态会同步到房间信息中
- * 调用该接口，主持人禁用/恢复所有成员麦克风，成员端回收到onMicrophoneMuted()回调
+ * Disable/Enable the mic of all users and sync the status to room information
+ * When the host calls this API to disable/enable the mic of all members, the members will receive the `onMicrophoneMuted()` callback.
  *
- * @param mute     YES：禁用所有用户麦克风；NO：恢复所有用户麦克风
- * @param callback 结果回调，成功时 code 为0.
+ * @param mute     true: Disable the mic of all users; false: Enable the mic of all users
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)muteAllUsersMicrophone:(BOOL)mute
                       callback:(TUIRoomActionCallback)callback;
 
 /**
- * 禁用/恢复某用户的摄像头
+ * Enable/Disable the camera of the specified user
  *
- * 调用该接口，主持人禁用/恢复成员摄像头，成员端回收到onCameraMuted回调
+ * When the host calls this API to disable/enable the camera of a member, the member will receive the `onCameraMuted` callback.
  *
- * @param userId   用户id
- * @param mute     YES：禁用房间用户摄像头；NO：恢复用户ID为user_id的用户摄像头
- * @param callback 结果回调，成功时 code 为0.
+ * @param userId   User ID
+ * @param mute     true: Disable the user camera; false: Enable the camera of the user whose ID is `user_id`
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)muteUserCamera:(NSString *)userId
                   mute:(BOOL)mute
               callback:(TUIRoomActionCallback)callback;
 
 /**
- * 禁用/恢复所有用户的摄像头，并且状态会同步到房间信息中
- * 调用该接口，主持人禁用/恢复所有成员麦克风，成员端回收到onCameraMuted回调
+ * Disable/Enable the camera of all users and sync the status to room information
+ * When the host calls this API to disable/enable the camera of all members, the members will receive the `onCameraMuted` callback.
  *
- * @param mute     YES：禁用所有用户摄像头；NO：恢复所有用户摄像头
- * @param callback 结果回调，成功时 code 为0.
+ * @param mute     true: Disable the camera of all users; false: Enable the camera of all users
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)muteAllUsersCamera:(BOOL)mute
                   callback:(TUIRoomActionCallback)callback;
 
 /**
- * 禁言/恢复文字聊天
+ * Disable/Enable text chat
+ * When the host calls this API to disable/enable IM chat in the room, the members will receive the `onChatRoomMuted()` callback.
  *
- * 调用该接口，主持人可以禁言/恢复房间内IM聊天
- * @param mute  mute YES：禁言；NO：恢复禁言。
- * @param callback 结果回调，成功时 code 为0.
+ * @param mute     mute true: Disable chat; false: Enable chat
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)muteChatRoom:(BOOL)mute
             callback:(TUIRoomActionCallback)callback;
 
 /**
- * 主持人踢人
+ * Remove a user by the host
+ * When the host calls this API to remove a member, the member will receive the `onReceiveKickedOff()` callback.
  *
- * 调用该接口，主持人踢人
- * @param userId 用户ID。
- * @param callback 结果回调，成功时 code 为0.
+ * @param userId   User ID
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)kickOffUser:(NSString *)userId
            callback:(TUIRoomActionCallback)callback;
 
 /**
- * 主持人开始点名
+ * The host starts roll call
  *
- * 主持人开始点名，成员端会收到onCallingRollStarted()回调
+ * When the host calls this API to start a roll call, the members will receive the `onCallingRollStarted()` callback.
  *
- * @param callback 结果回调，成功时 code 为0
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)startCallingRoll:(TUIRoomActionCallback)callback;
 
 /**
- * 主持人结束点名
+ * The host stops roll call
  *
- * @param callback 结果回调，成功时 code 为0
- * @note 主持人结束点名，成员端会收到onCallingRollStopped()回调
+ * When the host calls this API to end a roll call, the members will receive the `onCallingRollStopped()` callback.
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)stopCallingRoll:(TUIRoomActionCallback)callback;
 
 /**
- * 成员回复主持人点名
+ * A member replied to a roll call.
  *
- * 成员回复主持人点名，主持人会收到onMemberReplyCallingRoll()回调
- * @param callback 结果回调，成功时 code 为0
+ * When a member replies to the roll call started by the host, the host will receive the `onMemberReplyCallingRoll()` callback.
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)replyCallingRoll:(TUIRoomActionCallback)callback;
 
+
 /**
- * 主持人邀请成员发言
+ * The host invites a user to speak
  *
- * 调用该接口，主持人邀请成员发言，成员端会收到onReceiveSpeechInvitation()回调通知
+ * When the host calls this API to invite a user to speak, the user will receive the `onReceiveSpeechInvitation()` callback.
  *
- * @param userId   用户ID
- * @param callback 结果回调，成功时 code 为0
+ * @param userId   User ID
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)sendSpeechInvitation:(NSString *)userId
                     callback:(TUIRoomInviteeCallback)callback;
 
 /**
- * 主持人取消邀请成员发言
+ * The host cancels the invitation to speak sent to a user
  *
- * 调用该接口，主持人取消邀请成员发言，成员端会收到onReceiveInvitationCancelled()回调通知
+ * When the host calls this API to cancel the mic-on invitation to a user, the user will receive the `onReceiveInvitationCancelled()` callback.
  *
- * @param userId   用户ID
- * @param callback 结果回调，成功时 code 为0
+ * @param userId   User ID
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)cancelSpeechInvitation:(NSString *)userId
                       callback:(TUIRoomActionCallback)callback;
 
 /**
- * 成员同意/拒绝主持人的申请发言
+ * A user accepts/rejects the host's mic-on invitation
  *
- * 在TUIRoomCoreDef.SpeechMode.APPLY_SPEECH模式，成员同意/拒绝主持人邀请发言需要调用此接口
+ * A user needs to call this API to accept/reject the mic-on invitation from the host in `TUIRoomApplySpeech` mode.
+ * The host will receive the `onReceiveReplyToSpeechInvitation` callback.
  *
- * @param agree    YES：同意；NO：拒绝
- * @param callback 结果回调，成功时 code 为0
+ * @param agree    YES: Accept; NO: Reject
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)replySpeechInvitation:(BOOL)agree
                      callback:(TUIRoomActionCallback)callback;
 
 /**
- * 成员申请发言
+ * A user requests to speak.
  *
- * 调用该接口，成员申请发言，主持人端会收到onReceiveSpeechApplication回调通知
+ * When a member calls this API to request to speak, the host will receive the `onReceiveSpeechApplication` callback.
  *
- * @param callback 结果回调，成功时 code 为0
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)sendSpeechApplication:(TUIRoomInviteeCallback)callback;
 
 /**
- * 成员取消申请发言
+ * A member cancels the request to speak.
  *
- * 调用该接口，成员取消申请发言，主持人端会收到onSpeechApplicationCancelled回调通知
- * @param callback 结果回调，成功时 code 为0
+ * When a member calls this API to cancel their request to speak, the host will receive the `onSpeechApplicationCancelled` callback.
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)cancelSpeechApplication:(TUIRoomActionCallback)callback;
 
 /**
- * 主持人同意/拒绝成员的申请发言
+ * The host approves/rejects a user’s request to speak
  *
- * 在TUIRoomCoreDef.SpeechMode.APPLY_SPEECH模式，主持人同意/拒绝成员的申请需要调用此接口
+ * The host needs to call this API to approve/reject a user’s request in `TUIRoomCoreDef.SpeechMode.APPLY_SPEECH` mode.
+ * The user will receive the `onReceiveReplyToSpeechApplication` callback.
  *
- * @param agree    YES：同意；NO：拒绝
- * @param userId   用户ID
- * @param callback 结果回调，成功时 code 为0
+ * @param agree    YES: Accept; NO: Reject
+ * @param userId   User ID
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)replySpeechApplication:(BOOL)agree
                         userId:(NSString *)userId
                       callback:(TUIRoomActionCallback)callback;
 
 /**
- * 主持人禁止申请发言
+ * The host disables requests to speak
  *
- * @param forbid YES：禁止申请；NO：取消禁止
- * @param callback 结果回调，成功时 code 为0
- * @note 主持人禁止申请发言，成员端会收到onSpeechApplicationForbidden回调
+ * When the host calls this API, the members will receive the `onSpeechApplicationForbidden` callback.
+ *
+ * @param forbid YES: Disable requests; NO: Enable requests
+ * @param callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)forbidSpeechApplication:(BOOL)forbid
                        callback:(TUIRoomActionCallback)callback;
 
 /**
- * 主持人令成员停止发言
+ * The host notifies a user to stop speaking
  *
- * 调用该接口，主持人邀请成员停止发言，成员端会收到onOrderedToExitSpeechState()回调通知
+ * When the host calls this API to stop the speech of a user, the user will receive the `onOrderedToExitSpeechState()` callback notification.
  *
- * @param  userId 用户ID。
- * @param  callback 结果回调，成功时 code 为0
+ * @param  userId User ID
+ * @param  callback Result callback. The `code` will be 0 if the operation succeeds.
  */
 - (void)sendOffSpeaker:(NSString *)userId
               callback:(TUIRoomInviteeCallback)callback;
 
 /**
- * 主持人令全体停止发言
+ * The host requests all users to stop speaking
  *
- * @param callback 结果回调
+ * @param callback Result callback
  */
 - (void)sendOffAllSpeakers:(TUIRoomInviteeCallback)callback;
 
 /**
- * 成员停止发言,转变为观众
- * 如果成员在发言，调用该接口，则停止发言，转变为观众
+ * A user stops speaking and becomes an audience member
+ * This API is used by a member to stop speaking and change their role to audience.
  *
- * @param callback 结果回调
+ * @param callback Result callback
  */
 - (void)exitSpeechState:(TUIRoomActionCallback)callback;
 
 /**
- * 启动屏幕分享
+ * Start screen sharing
  *
- * 手机的屏幕分享的推荐配置参数：
- * - 分辨率(videoResolution)：1280 x 720
- * - 帧率(videoFps)：10 FPS
- * - 码率(videoBitrate)：1200 kbps
- * - 分辨率自适应(enableAdjustRes)：false
+ * Recommended configuration parameters for screen sharing on Android phones:
+ * - Resolution (videoResolution): 1280x720
+ * - Frame rate (videoFps): 10 fps
+ * - Bitrate (videoBitrate): 1200 Kbps
+ * - Resolution adaption (enableAdjustRes): false
  *
- * @param encParam 设置屏幕分享时的编码参数，推荐采用上述推荐配置，如果您指定 encParams 为 null，则使用您调用 startScreenCapture 之前的编码参数设置。
+ * @param encParam         Screen sharing encoding parameters. We recommend you use the above configuration. If you set `encParams` to `null`, the encoding parameter settings before `startScreenCapture` is called will be used
  */
 - (void)startScreenCapture:(TRTCVideoEncParam *)encParam API_AVAILABLE(ios(11.0));
 
 /**
- * 停止屏幕共享
+ * Stop screen sharing
  */
 - (void)stopScreenCapture API_AVAILABLE(ios(11.0));
 
 /**
- * 获取美颜管理对象
+ * Get the beauty filter management object
  *
- * 通过美颜管理，您可以使用以下功能：
- * - 设置"磨皮"、“美白”、“红润”等美颜特效。
- * - 设置“大眼”、“瘦脸”、“V脸”、“下巴”、“短脸”、“小鼻”、“亮眼”、“白牙”、“祛眼袋”、“祛皱纹”、“祛法令纹”等修脸特效。
- * - 设置“发际线”、“眼间距”、“眼角”、“嘴形”、“鼻翼”、“鼻子位置”、“嘴唇厚度”、“脸型”等修脸特效。
- * - 设置"眼影"、“腮红”等美妆特效。
- * - 设置动态贴纸和人脸挂件等动画特效。
+ * You can do the following using TXBeautyManager:
+ * - Set the beauty filter style and apply effects including skin brightening, rosy skin, eye enlarging, face slimming, chin slimming, chin lengthening/shortening, face shortening, nose narrowing, eye brightening, teeth whitening, eye bag removal, wrinkle removal, and smile line removal.
+ * - Adjust the hairline, eye spacing, eye corners, lip shape, nose wings, nose position, lip thickness, and face shape.
+ * - Apply animated effects such as face widgets (materials).
+ * - Add makeup effects.
+ * - Recognize gestures.
+ *
  * @return TXBeautyManager
  */
 - (TXBeautyManager *)getBeautyManager;
 
 /**
- * 设置网络qos参数
+ * Set the network QoS parameter
  *
- * @param preference 网络流控策略
+ * @param preference The QoS control policy
  */
 - (void)setVideoQosPreference:(TRTCNetworkQosParam *)preference;
 
 /**
- * 设置音质
+ * Sets the audio quality
  *
- * @param quality 音质
+ * @param quality TRTCAudioQualitySpeech/TRTCAudioQualityDefault/TRTCAudioQualityMusic
  */
 - (void)setAudioQuality:(TRTCAudioQuality)quality;
 
 /**
- * 设置分辨率
+ * Sets the resolution
  *
- * @param resolution 视频分辨率
+ * @param resolution For the specific settings, see `TRTCVideoResolution_xx_xx`.
  */
 - (void)setVideoResolution:(TRTCVideoResolution)resolution;
 
 /**
- * 设置帧率
+ * Sets the frame rate
  *
- * @param fps 帧率数
+ * @param fps int
  */
 - (void)setVideoFps:(int)fps;
 
 /**
- * 设置码率
+ * Sets the bitrate
  *
- * @param bitrate 码率，单位：kbps
+ * @param bitrate Bitrate
  */
 - (void)setVideoBitrate:(int)bitrate;
 
 /**
- * 启用音量大小提示
+ * Enable the volume level reminder
+ * After this feature is enabled, the evaluation result of the volume level by the SDK will be obtained in `onUserVolumeUpdate`.
  *
- * 开启后会在 onUserVolumeUpdate 中获取到 SDK 对音量大小值的评估。
- * @param enable true：打开  false：关闭
+ * @param enable YES: Enable; NO: Disable
  */
 - (void)enableAudioEvaluation:(BOOL)enable;
 
 /**
- * 设置播放音量
+ * Sets the playback volume
  *
- * @param volume 播放音量 0-100
+ * @param volume Playback volume. Value range: 0-100
  */
 - (void)setAudioPlayVolume:(NSInteger)volume;
 
 /**
- * 设置麦克风采集音量
+ * Sets the mic capturing volume
  *
- * @param volume 采集音量 0-100
+ * @param volume Capturing volume. Value range: 0-100
  */
 - (void)setAudioCaptureVolume:(NSInteger)volume;
 
 /**
- * 开始录音
+ * Start audio recording
+ * After this API is called, the SDK will record all audios (such as local audio, remote audio, and background music) in the current call to a file.
+ * No matter whether room entry is performed, this API will take effect once called.
+ * When `leaveRoom` is called, audio recording will stop automatically.
  *
- * 该方法调用后， SDK 会将通话过程中的所有音频（包括本地音频，远端音频，BGM 等）录制到一个文件里。
- * 无论是否进房，调用该接口都生效。
- * 如果调用 exitMeeting 时还在录音，录音会自动停止。
- * @param params 录音参数
+ * @param params `TRTCAudioRecordingParams`
  */
 - (void)startFileDumping:(TRTCAudioRecordingParams *)params;
 
 /**
- * 停止录音
- *
- * 如果调用 exitMeeting 时还在录音，录音会自动停止。
+ * Stop audio recording
+ * When `leaveRoom` is called, audio recording will stop automatically.
  */
 - (void)stopFileDumping;
 
 /**
- * 获取 SDK 版本接口函数
- * @return SDK版本号
+ * Get the SDK version
+ * @return SDK version number
  */
 - (NSInteger)getSdkVersion;
 

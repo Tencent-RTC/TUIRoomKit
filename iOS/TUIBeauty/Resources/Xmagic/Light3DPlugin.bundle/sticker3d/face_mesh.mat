@@ -1,0 +1,85 @@
+// Simple unlit material that uses the colors associated with each vertex.
+//
+// This source material must be compiled to a binary material using the matc tool.
+// The command used to compile this material is:
+// matc -p mobile -a opengl -o app/src/main/assets/baked_color.filamat app/src/materials/baked_color.mat
+//
+// See build.gradle for an example of how to compile materials automatically
+// Please refer to the documentation for more information about matc and the materials system.
+
+material {
+    name : face_mesh,
+    shadingModel : unlit,
+    parameters : [
+        {
+           type : sampler2d,
+           name : texture
+        },
+        {
+           type : sampler2d,
+           name : positionTex,
+        },
+        {
+            type : mat4,
+            name : oldTransform
+        },
+        {
+            type : mat4,
+            name : newTransformInverse
+        }
+    ],
+    requires : [uv0, color],
+    variables : [
+         color1
+    ]
+}
+
+vertex {
+    void materialVertex(inout MaterialVertexInputs material) {
+        float4 p0 = texture(materialParams_positionTex, vec2(material.uv0.x + 0.001, material.uv0.y + 0.001));
+        float4 p1 = texture(materialParams_positionTex, vec2(material.uv0.x + 0.001, material.uv0.y - 0.001));
+        float4 p2 = texture(materialParams_positionTex, vec2(material.uv0.x - 0.001, material.uv0.y + 0.001));
+        float4 p3 = texture(materialParams_positionTex, vec2(material.uv0.x - 0.001, material.uv0.y - 0.001));
+        //getWorldFromModelMatrix() = rootWorldTransform * materialParams.newTransform
+        float4 p = getClipFromWorldMatrix() * getWorldFromModelMatrix() * materialParams.newTransformInverse * materialParams.oldTransform * getPosition();
+        float3 pos = p.xyz / p.w;
+        pos = pos * 0.5 + 0.5;
+        material.color1 = vec4(pos.xy, 0.0, 1.0);
+        //material.worldPosition.xyz += (getWorldFromModelMatrix() * vec4(0.5, 0.5, 0.0, 1.0)).xyz;
+    }
+}
+
+fragment {
+    vec3 GammaToLinearSpace (vec3 sRGB)
+    {
+        return sRGB * (sRGB * (sRGB * 0.305306011 + 0.682171111) + 0.012522878);
+    }
+
+    vec3 powv(vec3 color, float value){
+        return vec3(pow(color.r, value), pow(color.g, value), pow(color.b, value));
+    }
+
+    vec3 LinearToGammaSpace (vec3 linRGB)
+    {
+        return max(1.055 * powv(linRGB, 0.416666667) - 0.055, 0.0);
+    }
+
+    float sRGB_to_linear(float color) {
+        return color <= 0.04045 ? color / 12.92 : pow((color + 0.055) / 1.055, 2.4);
+    }
+
+    vec3 GTLSpace (vec3 sRGB)
+    {
+        return vec3(sRGB_to_linear(sRGB.r), sRGB_to_linear(sRGB.g), sRGB_to_linear(sRGB.b));
+    }
+
+
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+        //material.baseColor = variable_color1;
+        vec4 color1 = texture(materialParams_texture, vec2(variable_color1.x, 1.0 - variable_color1.y));
+        color1.rgb = GTLSpace(color1.rgb);
+        material.baseColor = color1;
+        //material.baseColor.rgb /= 3.0;
+    }
+}

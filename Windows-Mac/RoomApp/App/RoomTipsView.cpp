@@ -35,7 +35,6 @@ void RoomTipsView::InitUI() {
     ui.label_sdkVersion->setToolTip(QString::fromStdString(sdk_version));
     ui.label_sdkVersion->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 
-    // 提示：复制此信息到剪切板 
     ui.btn_clipboard->setToolTip(tr("Copy this information to the clipboard"));
     connect(ui.btn_clipboard, &QPushButton::clicked, this, &RoomTipsView::SlotOnClipboardClicked);
 
@@ -69,6 +68,5 @@ void RoomTipsView::SlotOnClipboardClicked() {
 
     emit SignalCloseView();
 
-    // 提示：信息已复制到剪切板
     TXMessageBox::Instance().AddLineTextMessage(tr("The information is copied to the clipboard"));
 }

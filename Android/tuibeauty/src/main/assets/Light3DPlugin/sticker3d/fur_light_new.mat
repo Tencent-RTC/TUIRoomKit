@@ -1,0 +1,285 @@
+material {
+    name : fur_light,
+    parameters : [
+        {
+            type : float,
+            name : offset
+        },
+        {
+            type : float,
+            name : time
+        },
+        {
+            type : float4,
+            name : _BaseColor
+        },
+        {
+            type : float4,
+            name : shadowColor
+        },
+        {
+           type : sampler2d,
+           name : fur
+        },
+        {
+           type : sampler2d,
+           name : texture
+        },
+        // Light ===============================================
+        {
+            type : float4,
+            name : _DirLightColor
+        },
+        {
+            type : float,
+            name : _DirLightExposure
+        },
+        {
+            type : float,
+            name : _FurDirLightExposure
+        },
+        {
+            type : float3,
+            name : SHL
+        },
+        {
+            type : float,
+            name : _LightFilter
+        },
+        {
+            type : float,
+            name : _FresnelLV
+        },
+        {
+            type : float3,
+            name : _SPColor1
+        },
+        {
+            type : float3,
+            name : _SPColor2
+        },
+        {
+            type : float,
+            name : _glossiness_1
+        },
+        {
+            type : float,
+            name : _glossiness_2
+        },
+        {
+            type : float,
+            name : _specOff
+        },
+        {
+            type : float3,
+            name : lightDirection
+        },
+        // FurAlpha ===============================================
+        {
+            type : float4,
+            name : _SubTexUV
+        },
+        {
+            type : float4,
+            name : uvOffset
+        },
+        {
+            type : float,
+            name : tming
+        },
+        {
+            type : float,
+            name : dming
+        },
+        // FurVertex ===============================================
+        {
+            type : float,
+            name : furLength
+        },
+        {
+            type : float4,
+            name : gravity
+        },
+        {
+            type : float4,
+            name : wind
+        },
+        // obsolete ===============================================
+        {
+            type : float,
+            name : spacing
+        },
+        {
+            type : float,
+            name : roughness
+        },
+        {
+            type : float,
+            name : reflectance
+        },
+        {
+            type : float,
+            name : anisotropy
+        },
+        {
+            type : float3,
+            name : anisotropyDirection
+        },
+        {
+            type : float4,
+            name : shiftTexTilingOffset
+        },
+        {
+            type : bool,
+            name : enableLight
+        }
+    ],
+    requires : [
+        uv0, tangents
+    ],
+    variables : [
+        uv, lights, Specular
+    ],
+    shadingModel : lit,
+    blending : transparent,
+    postLightingBlending : multiply,
+    flipUV:false
+}
+
+vertex {
+    float3 lerpv(float3 a, float3 b, float w) {
+        return a + w * (b-a);
+    }
+    float StrandSpecular(float3 T, float3 V, float3 L, float exponent){
+        float3 H = normalize(V + L);
+        float dotTH = dot(T, H);
+        float sinTH = sqrt(1.0 - dotTH * dotTH);
+        float dirAtten = smoothstep(-1.0, 0.0, dotTH);
+        return dirAtten * pow(sinTH, exponent);
+    }
+    void materialVertex(inout MaterialVertexInputs material) {
+        float FUR_OFFSET = materialParams.offset;
+
+        float spacing = materialParams.furLength * 0.1;
+        float4 _Gravity = materialParams.gravity;
+        float4 _Wind = materialParams.wind;
+        float4 _UVoffset = materialParams.uvOffset;
+        float4 _SubTexUV = materialParams._SubTexUV;
+
+        float3 forceDirection = float3(0.0, 0.0, 0.0);
+        float3 position = material.worldPosition.xyz;
+
+        // Wind 低配可以去掉===============================================
+        forceDirection.x = sin(materialParams.time * 1.5 * _Wind.x + position.x * 0.5*_Wind.z) * _Wind.w;
+        forceDirection.y = cos(materialParams.time * 0.5 * _Wind.x + position.y * 0.4*_Wind.y) * _Wind.w;
+        forceDirection.z = sin(materialParams.time * 0.7 * _Wind.x + position.y * 0.3*_Wind.y) * _Wind.w;
+
+        // 顶点offset===============================================
+        float3 displacement = forceDirection + _Gravity.xyz; //顶点方向
+        float displacementFactor = FUR_OFFSET * FUR_OFFSET;
+
+        float3 aNormal = material.worldNormal.xyz;
+        aNormal.xyz += displacement * displacementFactor;
+        float3 n = aNormal * FUR_OFFSET * (spacing * saturate(1.0 + _Gravity.w)); //spacing顶点色alpha通道控制毛发扩展长度
+
+        material.worldPosition = float4(position + n, 1.0);
+
+        // uv offuse===============================================
+        float2 uvoffset = _UVoffset.xy * FUR_OFFSET + (forceDirection.xy * _UVoffset.zw *FUR_OFFSET) ;
+        uvoffset *=  0.1; // 尺寸太小不好调整 缩小精度。
+        float2 flowmap = float2(_SubTexUV.w * FUR_OFFSET * 0.1); //flowmap
+
+        float2 uv1 = material.uv0 + (uvoffset + flowmap) * (float2(1.0, 1.0) / _SubTexUV.xy);
+        float2 uv2 = material.uv0 *_SubTexUV.xy + uvoffset + flowmap;
+        material.uv = float4(uv1.x, uv1.y, uv2.x, uv2.y);
+
+        //坐标===============================================
+        float3 N = material.worldNormal;
+        float3 T = vertex_worldTangent.xyz;
+        float3 BT = normalize(cross(N,T) * vertex_worldTangent.w);
+
+        float3 V = normalize(-position.xyz);
+        float3 L = normalize(materialParams.lightDirection.xyz);
+
+        //灯光 ===============================================
+        float NoV = saturate(dot(N,V));
+        float NoL = dot(L,N); 
+        float Occlusion =FUR_OFFSET*FUR_OFFSET;
+
+        float _FresnelLV = materialParams._FresnelLV;//0.2;
+
+        float4 _Color = materialParams.shadowColor;
+
+        float _LightFilter = materialParams._LightFilter;//0.0;
+        float _DirLightExposure = materialParams._DirLightExposure;//1.0;
+        float _FurDirLightExposure = materialParams._FurDirLightExposure;//1.0;
+        float4 _DirLightColor = materialParams._DirLightColor;//float4(1.0, 1.0, 1.0, 1.0);
+
+        float _glossiness_1 = materialParams._glossiness_1;//2.0;
+        float _glossiness_2 = materialParams._glossiness_2;//55.0;
+        float _specOff = materialParams._specOff;//0.0;
+        float3 _SPColor1 = materialParams._SPColor1;//float3(1, 0, 0);
+        float3 _SPColor2 = materialParams._SPColor2;//float3(0, 1, 0);
+
+        //轮廓光------------------
+        float RimLight = (1.0- NoV ) ;//*_FresnelLV ;
+        RimLight *=Occlusion;
+        RimLight *=RimLight+(1.0- NoV);
+        RimLight *=_FresnelLV;
+
+        //环境光------------------  
+        float3 SHL = materialParams.SHL;//CalcEnvDiffuseBrdf(N);  //环境颜色 可以用单色替代
+        //SHL *= _SHExposure; //环境光转到线性空间 简易
+        SHL = lerpv(SHL, _Color.rgb * SHL, 1.0 - Occlusion * _Color.a); //环境颜色与AO颜色
+        SHL += SHL * RimLight;
+        //平行光------------------
+        float FurFilter =(materialParams.furLength * 0.5);
+        float DirLight = saturate(NoL * (1.0 + _LightFilter) + _LightFilter*0.5 + Occlusion*FurFilter);//saturate(Occlusion *_LightFilter+(1-_LightFilter)*0.5);//丰富灯光细节
+        //DirLight= saturate (DirLight);
+        float3 diffuseSum =SHL + DirLight*_FurDirLightExposure* _DirLightExposure *_DirLightColor.rgb  ; //灯光与环境合并
+        material.lights.rgb = diffuseSum;
+        material.lights.a = 1.0;
+
+        //Sp_Anisotropy 
+        float2 Roughness = float2(_glossiness_1,_glossiness_2);
+        float3 T1 = normalize(_specOff*N+BT);
+        float SPec1 =StrandSpecular (T1,V,L,Roughness.x);//*FUR_OFFSET;
+        float SPec2 =StrandSpecular (T1,V,L,Roughness.y) *FUR_OFFSET;
+        material.Specular.rgb = saturate(SPec1*_SPColor1 + SPec2*_SPColor2) * saturate(NoL);
+    }
+}
+
+fragment {
+    float3 powv(float3 color, float value){
+        return float3(pow(color.r, value), pow(color.g, value), pow(color.b, value));
+    }
+    void material(inout MaterialInputs material) {
+
+        float FUR_OFFSET = materialParams.offset;
+        float4 shadowColor = materialParams.shadowColor;
+
+        prepareMaterial(material);
+
+        float4 _BaseColor = materialParams._BaseColor;//float4(1.0, 1.0, 1.0, 1.0);
+        float4 _SubTexUV = materialParams._SubTexUV;//float4(4.0, 8.0, 1.0, 0);
+
+        //贴图计算
+        float Noise = texture(materialParams_texture, variable_uv.zw).r;
+        float4 color = texture(materialParams_fur, variable_uv.xy);
+        color.rgb *=_BaseColor.rgb;
+        color.rgb *= color.rgb;
+        //贴图计算 END      
+        float3 Lights = variable_lights.rgb;
+        float vcolormask = saturate(variable_lights.a + _SubTexUV.z);
+
+        color.rgb =color.rgb * Lights + variable_Specular.rgb;
+        color.rgb *= 1.0 + (1.0 -vcolormask);
+
+        float FurMask = 1.0 - materialParams.dming * vcolormask ;
+        float alpha = saturate(Noise*2.0 - (sq(FUR_OFFSET) + (FUR_OFFSET*FurMask*5.0))) * materialParams.tming;
+
+        material.baseColor.a  = alpha;
+        material.baseColor.rgb = powv(color.rgb,1.0/2.2);
+        material.postLightingColor = float4(alpha, alpha, alpha, 1.0);
+    }
+}
