@@ -66,7 +66,7 @@ export const TUIRoomErrorMessage = {
 };
 
 export const CommonConstant = {
-  groupIDPrefix: 'Room_',
+  groupIDPrefix: '',
 };
 
 export const TSignalingConfig = {
