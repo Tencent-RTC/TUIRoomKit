@@ -14,7 +14,7 @@
   TRTCBeautyStyle,
   TRTCVideoQosPreference,
   TRTCVideoEncParam,
-} from './trtc_define';
+} from 'trtc-electron-sdk';
 import { ETUISpeechMode, ETUIStreamType } from './types.d';
 import TUIRoomInfo from './base/TUIRoomInfo';
 import TUIRoomUser from './base/TUIRoomUser';

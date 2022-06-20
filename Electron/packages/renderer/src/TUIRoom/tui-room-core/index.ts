@@ -16,4 +16,4 @@ export {
   ETUISpeechMode
 } from './types.d';
 
-export * from './trtc_define';
+export * from 'trtc-electron-sdk';
