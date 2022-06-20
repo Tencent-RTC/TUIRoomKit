@@ -13,7 +13,7 @@ import {
   TRTCDeviceState,
   TRTCQualityInfo,
   TRTCStatistics,
-} from './trtc_define';
+} from 'trtc-electron-sdk';
 // @ts-ignore
 import TIM from 'tim-js-sdk';
 import logger from './common/logger';
