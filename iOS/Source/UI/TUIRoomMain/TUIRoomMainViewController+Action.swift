@@ -148,9 +148,9 @@ extension TUIRoomMainViewController {
     
     @objc
     func reportClick() {
-        let selector = NSSelectorFromString("showReportAlertWithRoomId:")
+        let selector = NSSelectorFromString("showReportAlertWithRoomId:ownerId:")
         if self.responds(to: selector) {
-            self.perform(selector, with: roomId)
+            self.perform(selector, with: roomInfo.roomId, with: roomInfo.ownerId)
         }
     }
 }
