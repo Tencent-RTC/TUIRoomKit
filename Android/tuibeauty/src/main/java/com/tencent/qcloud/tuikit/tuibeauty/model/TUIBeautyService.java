@@ -85,7 +85,10 @@ public class TUIBeautyService implements ITUIBeautyService {
     }
 
     public void updateProperty(TUIBeautyItemInfo itemInfo) {
-        if (mXmagicApi == null) {
+        if (mXmagicApi == null || itemInfo == null) {
+            return;
+        }
+        if (itemInfo.getProperty() == null || itemInfo.getProperty().category == null) {
             return;
         }
         mXmagicApi.updateProperty(itemInfo.getProperty());

@@ -1412,8 +1412,8 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     private void showReportDialog() {
         try {
             Class clz = Class.forName("com.tencent.liteav.demo.report.ReportDialog");
-            Method method = clz.getDeclaredMethod("showReportDialog", Context.class, String.class);
-            method.invoke(null, this, String.valueOf(mRoomId));
+            Method method = clz.getDeclaredMethod("showReportDialog", Context.class, String.class, String.class);
+            method.invoke(null, this, String.valueOf(mRoomId), mTUIRoomCore.getRoomInfo().ownerId);
         } catch (Exception e) {
             e.printStackTrace();
         }

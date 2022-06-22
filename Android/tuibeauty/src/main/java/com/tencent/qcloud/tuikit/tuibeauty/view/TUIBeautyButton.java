@@ -7,13 +7,13 @@ import android.widget.FrameLayout;
 
 import com.tencent.liteav.beauty.TXBeautyManager;
 import com.tencent.qcloud.tuikit.tuibeauty.R;
-import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyService;
+
+import java.lang.reflect.Method;
 
 /**
  * 美颜功能展开按钮
  */
 public class TUIBeautyButton extends FrameLayout {
-    private static final String TAG = "TUIBeautyButton";
 
     private TUIBeautyView   mBeautyPanel;
     private TXBeautyManager mBeautyManager;
@@ -31,10 +31,24 @@ public class TUIBeautyButton extends FrameLayout {
         findViewById(R.id.iv_link_dialog).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mBeautyPanel.isShowing()) {
-                    mBeautyPanel.show();
-                }
+                showBeautyDialog();
             }
         });
     }
+
+    private void showBeautyDialog() {
+        boolean isAuth = true;
+        try {
+            Class clz = Class.forName("com.tencent.liteav.privacy.util.RTCubeAppLegalUtils");
+            Method method = clz.getDeclaredMethod("showBeautyAuthDialog", Context.class);
+            isAuth = (Boolean) method.invoke(null, getContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (isAuth && !mBeautyPanel.isShowing()) {
+                mBeautyPanel.show();
+            }
+        }
+    }
+
 }

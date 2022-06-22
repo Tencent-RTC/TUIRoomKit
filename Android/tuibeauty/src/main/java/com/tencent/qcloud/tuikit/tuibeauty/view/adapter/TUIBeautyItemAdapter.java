@@ -50,11 +50,6 @@ public class TUIBeautyItemAdapter extends BaseAdapter {
         }
         mTUIBeautyItemInfoList.clear();
         mTUIBeautyItemInfoList.addAll(TUIBeautyTabInfo.getTabItemList());
-        List<XmagicProperty<?>> propertyList = new ArrayList<>();
-        for (TUIBeautyItemInfo info :
-                mTUIBeautyItemInfoList) {
-            propertyList.add(info.getProperty());
-        }
         notifyDataSetChanged();
     }
 
