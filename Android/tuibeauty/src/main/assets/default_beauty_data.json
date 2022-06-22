@@ -30,8 +30,9 @@
           "item_level": 6,
           "item_icon_normal": "@tuibeauty_beauty_smooth",
           "item_icon_select": "@tuibeauty_beauty_smooth",
-          "item_res_path": null,
-          "item_xmagic_id": null
+          "item_display_min_value": 0,
+          "item_display_max_value": 9,
+          "item_display_default_value": 6
         },
         {
           "item_id": 2,
@@ -40,8 +41,9 @@
           "item_level": 6,
           "item_icon_normal": "@tuibeauty_beauty_natural",
           "item_icon_select": "@tuibeauty_beauty_natural",
-          "item_res_name": null,
-          "item_xmagic_id": null
+          "item_display_min_value": 0,
+          "item_display_max_value": 9,
+          "item_display_default_value": 6
         },
         {
           "item_id": 3,
@@ -50,8 +52,9 @@
           "item_level": 6,
           "item_icon_normal": "@tuibeauty_beauty_pitu",
           "item_icon_select": "@tuibeauty_beauty_pitu",
-          "item_res_name": null,
-          "item_xmagic_id": null
+          "item_display_min_value": 0,
+          "item_display_max_value": 9,
+          "item_display_default_value": 6
         },
         {
           "item_id": 4,
@@ -60,8 +63,9 @@
           "item_level": 6,
           "item_icon_normal": "@tuibeauty_beauty_whiten",
           "item_icon_select": "@tuibeauty_beauty_whiten",
-          "item_res_name": null,
-          "item_xmagic_id": null
+          "item_display_min_value": 0,
+          "item_display_max_value": 9,
+          "item_display_default_value": 6
         },
         {
           "item_id": 5,
@@ -70,8 +74,9 @@
           "item_level": 0,
           "item_icon_normal": "@tuibeauty_beauty_ruddy",
           "item_icon_select": "@tuibeauty_beauty_ruddy",
-          "item_res_name": null,
-          "item_xmagic_id": null
+          "item_display_min_value": 0,
+          "item_display_max_value": 9,
+          "item_display_default_value": 6
         },
         {
           "item_id": 6,
@@ -81,7 +86,6 @@
           "item_icon_normal": "@tuibeauty_image_contrast",
           "item_icon_select": "@tuibeauty_image_contrast",
           "item_key": "beauty.imageContrastAlpha",
-          "item_xmagic_id": "",
           "item_res_name": null,
           "item_display_min_value": -100,
           "item_display_max_value": 100,
@@ -97,7 +101,6 @@
           "item_icon_normal": "@tuibeauty_image_saturation",
           "item_icon_select": "@tuibeauty_image_saturation",
           "item_key": "smooth.saturation",
-          "item_xmagic_id": null,
           "item_display_min_value": -100,
           "item_display_max_value": 100,
           "item_inner_min_value": -1,
@@ -713,8 +716,7 @@
           "item_name": "@tuibeauty_common_none",
           "item_level": -1,
           "item_icon_normal": "@tuibeauty_common_none",
-          "item_icon_select": "@tuibeauty_common_none",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_common_none"
         },
         {
           "item_id": 2,
@@ -722,8 +724,7 @@
           "item_name": "@tuibeauty_panel_filter_baixi",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_baixi",
-          "item_icon_select": "@tuibeauty_panel_filter_baixi",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_baixi"
         },
         {
           "item_id": 3,
@@ -731,8 +732,7 @@
           "item_name": "@tuibeauty_panel_filter_standard",
           "item_level": 4,
           "item_icon_normal": "@tuibeauty_panel_filter_standard",
-          "item_icon_select": "@tuibeauty_panel_filter_standard",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_standard"
         },
         {
           "item_id": 4,
@@ -740,8 +740,7 @@
           "item_name": "@tuibeauty_panel_filter_ziran",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_ziran",
-          "item_icon_select": "@tuibeauty_panel_filter_ziran",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_ziran"
         },
         {
           "item_id": 5,
@@ -749,8 +748,7 @@
           "item_name": "@tuibeauty_panel_filter_cherry",
           "item_level": 8,
           "item_icon_normal": "@tuibeauty_panel_filter_cherry",
-          "item_icon_select": "@tuibeauty_panel_filter_cherry",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_cherry"
         },
         {
           "item_id": 6,
@@ -758,8 +756,7 @@
           "item_name": "@tuibeauty_panel_filter_cloud",
           "item_level": 8,
           "item_icon_normal": "@tuibeauty_panel_filter_cloud",
-          "item_icon_select": "@tuibeauty_panel_filter_cloud",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_cloud"
         },
         {
           "item_id": 7,
@@ -767,8 +764,7 @@
           "item_name": "@tuibeauty_panel_filter_pure",
           "item_level": 8,
           "item_icon_normal": "@tuibeauty_panel_filter_pure",
-          "item_icon_select": "@tuibeauty_panel_filter_pure",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_pure"
         },
         {
           "item_id": 8,
@@ -776,8 +772,7 @@
           "item_name": "@tuibeauty_panel_filter_orchid",
           "item_level": 9,
           "item_icon_normal": "@tuibeauty_panel_filter_orchid",
-          "item_icon_select": "@tuibeauty_panel_filter_orchid",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_orchid"
         },
         {
           "item_id": 9,
@@ -785,8 +780,7 @@
           "item_name": "@tuibeauty_panel_filter_vitality",
           "item_level": 8,
           "item_icon_normal": "@tuibeauty_panel_filter_vitality",
-          "item_icon_select": "@tuibeauty_panel_filter_vitality",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_vitality"
         },
         {
           "item_id": 10,
@@ -794,8 +788,7 @@
           "item_name": "@tuibeauty_panel_filter_super",
           "item_level": 9,
           "item_icon_normal": "@tuibeauty_panel_filter_super",
-          "item_icon_select": "@tuibeauty_panel_filter_super",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_super"
         },
         {
           "item_id": 11,
@@ -803,8 +796,7 @@
           "item_name": "@tuibeauty_panel_filter_fragrance",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_fragrance",
-          "item_icon_select": "@tuibeauty_panel_filter_fragrance",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_fragrance"
         },
         {
           "item_id": 12,
@@ -812,8 +804,7 @@
           "item_name": "@tuibeauty_panel_filter_white",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_white",
-          "item_icon_select": "@tuibeauty_panel_filter_white",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_white"
         },
         {
           "item_id": 13,
@@ -821,8 +812,7 @@
           "item_name": "@tuibeauty_panel_filter_romantic",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_romantic",
-          "item_icon_select": "@tuibeauty_panel_filter_romantic",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_romantic"
         },
         {
           "item_id": 14,
@@ -830,8 +820,7 @@
           "item_name": "@tuibeauty_panel_filter_fresh",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_fresh",
-          "item_icon_select": "@tuibeauty_panel_filter_fresh",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_fresh"
         },
         {
           "item_id": 15,
@@ -839,8 +828,7 @@
           "item_name": "@tuibeauty_panel_filter_beautiful",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_beautiful",
-          "item_icon_select": "@tuibeauty_panel_filter_beautiful",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_beautiful"
         },
         {
           "item_id": 16,
@@ -848,8 +836,7 @@
           "item_name": "@tuibeauty_panel_filter_pink",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_pink",
-          "item_icon_select": "@tuibeauty_panel_filter_pink",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_pink"
         },
         {
           "item_id": 17,
@@ -857,8 +844,7 @@
           "item_name": "@tuibeauty_panel_filter_reminiscence",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_reminiscence",
-          "item_icon_select": "@tuibeauty_panel_filter_reminiscence",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_reminiscence"
         },
         {
           "item_id": 18,
@@ -866,8 +852,7 @@
           "item_name": "@tuibeauty_panel_filter_blues",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_blues",
-          "item_icon_select": "@tuibeauty_panel_filter_blues",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_blues"
         },
         {
           "item_id": 19,
@@ -875,8 +860,7 @@
           "item_name": "@tuibeauty_panel_filter_cool",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_cool",
-          "item_icon_select": "@tuibeauty_panel_filter_cool",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_cool"
         },
         {
           "item_id": 20,
@@ -884,8 +868,7 @@
           "item_name": "@tuibeauty_panel_filter_japanese",
           "item_level": 5,
           "item_icon_normal": "@tuibeauty_panel_filter_japanese",
-          "item_icon_select": "@tuibeauty_panel_filter_japanese",
-          "item_xmagic_id": null
+          "item_icon_select": "@tuibeauty_panel_filter_japanese"
         }
       ]
     },
@@ -1007,7 +990,13 @@
           "item_icon_normal": "@tuibeauty_ic_makeup_fenfenxia",
           "item_icon_select": "@tuibeauty_ic_makeup_fenfenxia",
           "item_res_name": "",
-          "item_xmagic_id": "video_fenfenxia"
+          "item_xmagic_id": "video_fenfenxia",
+          "item_key": "makeup.strength",
+          "item_display_min_value": 0,
+          "item_display_max_value": 100,
+          "item_inner_min_value": 0,
+          "item_display_default_value": 60,
+          "item_inner_max_value": 1
         },
         {
           "item_id": 3,
@@ -1018,7 +1007,13 @@
           "item_icon_normal": "@tuibeauty_ic_makeup_video_shaishangzhuang",
           "item_icon_select": "@tuibeauty_ic_makeup_video_shaishangzhuang",
           "item_res_name": "",
-          "item_xmagic_id": "video_shaishangzhuang"
+          "item_xmagic_id": "video_shaishangzhuang",
+          "item_key": "makeup.strength",
+          "item_display_min_value": 0,
+          "item_display_max_value": 100,
+          "item_inner_min_value": 0,
+          "item_display_default_value": 60,
+          "item_inner_max_value": 1
         }
       ]
     },

@@ -1,6 +1,7 @@
 package com.tencent.qcloud.tuikit.tuibeauty.view;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
@@ -91,7 +92,6 @@ public class TUIBeautyView extends BottomSheetDialog {
             mCurrentItemPosition[i] = TUIBeautyTabInfo.getTabItemListDefaultSelectedIndex();
             mCurrentItemInfo[i] = TUIBeautyTabInfo.getTabItemList()
                     .get(TUIBeautyTabInfo.getTabItemListDefaultSelectedIndex());
-            mPresenter.setBeautySpecialEffects(TUIBeautyTabInfo, mCurrentItemInfo[i], mCurrentItemPosition[i]);
         }
     }
 
@@ -108,7 +108,6 @@ public class TUIBeautyView extends BottomSheetDialog {
                     mSeekBarLevel.setMax(100);
                     mTextLevelValue.setText(String.valueOf(progress / 100.0));
                 } else {
-                    mSeekBarLevel.setMax(100);
                     mTextLevelValue.setText(String.valueOf(progress));
                 }
                 mCurrentItemInfo[mCurrentTabPosition].setProperty(mPresenter.setCurrentDisPlayValue(mCurrentItemInfo[mCurrentTabPosition].getProperty(), progress));
@@ -190,8 +189,12 @@ public class TUIBeautyView extends BottomSheetDialog {
             visibility = View.GONE;
         } else {
             visibility = View.VISIBLE;
-            mTextLevelValue.setText(String.valueOf(TUIBeautyItemInfo.getItemLevel()));
-            mSeekBarLevel.setProgress(TUIBeautyItemInfo.getItemLevel());
+            mTextLevelValue.setText(String.valueOf(TUIBeautyItemInfo.getItemDisplayDefaultValue()));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mSeekBarLevel.setMin(TUIBeautyItemInfo.getItemDisplayMinValue());
+            }
+            mSeekBarLevel.setMax(TUIBeautyItemInfo.getItemDisplayMaxValue());
+            mSeekBarLevel.setProgress(TUIBeautyItemInfo.getItemDisplayDefaultValue());
             TUIBeautyResourceParse.setTextViewSize(mTextLevelHint, TUIBeautyTabInfo.getTabItemLevelHintSize());
             TUIBeautyResourceParse.setTextViewColor(mTextLevelHint, TUIBeautyTabInfo.getTabItemLevelHintColor());
             TUIBeautyResourceParse.setTextViewSize(mTextLevelValue, TUIBeautyTabInfo.getTabItemLevelValueSize());

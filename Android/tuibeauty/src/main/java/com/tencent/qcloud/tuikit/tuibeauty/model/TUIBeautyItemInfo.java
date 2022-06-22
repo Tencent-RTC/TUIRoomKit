@@ -80,6 +80,22 @@ public class TUIBeautyItemInfo {
         this.item_category = item_category;
     }
 
+    public int getItemCategory() {
+        return item_category;
+    }
+
+    public int getItemDisplayMaxValue() {
+        return item_display_max_value;
+    }
+
+    public int getItemDisplayMinValue() {
+        return item_display_min_value;
+    }
+
+    public int getItemDisplayDefaultValue() {
+        return item_display_default_value;
+    }
+
     public XmagicProperty<XmagicProperty.XmagicPropertyValues> getProperty() {
         if (property == null || property.category == null) {
             createProperty();
@@ -109,9 +125,11 @@ public class TUIBeautyItemInfo {
             case TUIBeautyConstants.TAB_TYPE_MAKEUP:
                 category = XmagicProperty.Category.MAKEUP;
                 resPath = TextUtils.isEmpty(item_res_name) ? null : getResPath() + item_res_name;
+                if (!"ID_NONE".equals(item_xmagic_id)) {
+                    values = new XmagicProperty.XmagicPropertyValues(item_display_min_value, item_display_max_value, item_display_default_value, item_inner_min_value, item_inner_max_value);
+                }
                 break;
             default:
-                TXCLog.e("TUIBeautyItemInfo", "switch category failed!,item category:" + item_category);
                 break;
         }
         property = new XmagicProperty<>(category, item_xmagic_id, resPath, item_key, values);

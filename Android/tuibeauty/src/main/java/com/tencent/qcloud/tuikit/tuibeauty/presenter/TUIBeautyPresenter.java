@@ -1,5 +1,6 @@
 package com.tencent.qcloud.tuikit.tuibeauty.presenter;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -26,9 +27,6 @@ import com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyResourceUtils;
 import com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautySPUtils;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyResourceParse;
 import com.tencent.xmagic.XmagicProperty;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.util.List;
@@ -211,14 +209,14 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
     }
 
     private void downloadVideoMaterial(final TUIBeautyItemInfo itemInfo) {
-        if (itemInfo==null){
+        if (itemInfo == null) {
             return;
         }
-        if ("ID_NONE".equals(itemInfo.getItemXmagicId())){
+        if ("ID_NONE".equals(itemInfo.getItemXmagicId())) {
             TUIBeautyService.getInstance().updateProperty(itemInfo);
             return;
         }
-        if ( TextUtils.isEmpty(itemInfo.getMaterialUrl())) {
+        if (TextUtils.isEmpty(itemInfo.getMaterialUrl())) {
             return;
         }
         if (!TextUtils.isEmpty(itemInfo.getProperty().resPath)) {
@@ -283,8 +281,16 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
         if (id == null || resPath == null || info == null) {
             return;
         }
+        XmagicProperty.Category category = null;
+        if (info.getItemCategory() == TUIBeautyConstants.TAB_TYPE_MOTION
+                || info.getItemCategory() == TUIBeautyConstants.TAB_TYPE_SEGMENTATION) {
+            category = XmagicProperty.Category.MOTION;
+        }
+        if (info.getItemCategory() == TUIBeautyConstants.TAB_TYPE_MAKEUP) {
+            category = XmagicProperty.Category.MAKEUP;
+        }
         String materialPath = resPath + File.separator + id;
-        XmagicProperty<XmagicProperty.XmagicPropertyValues> property = new XmagicProperty<>(XmagicProperty.Category.MOTION, id, materialPath, null, null);
+        XmagicProperty<XmagicProperty.XmagicPropertyValues> property = new XmagicProperty<>(category, id, materialPath, info.getProperty().effKey, info.getProperty().effValue);
         info.setItemLevel(-1);
         info.setProperty(property);
     }
