@@ -78,6 +78,26 @@
 }
 
 - (void)show {
+#ifdef RTCube_APPSTORE
+    SEL checkAuthSEL = NSSelectorFromString(@"checkBeautyAuthWithCompletion:");
+    if (checkAuthSEL) {
+        __weak typeof(self) weakSelf = self;
+        id completion = ^(BOOL isAllow){
+            if (!weakSelf) {
+                return;
+            }
+            if (isAllow) {
+                [weakSelf internalShow];
+            }
+        };
+        [UIViewController performSelector:checkAuthSEL withObject:completion];
+        return;
+    }
+#endif
+    [self internalShow];
+}
+
+- (void)internalShow {
     _isShow = YES;
     LOGD("【Beauty】show");
     [UIView animateWithDuration:0.3 animations:^{
