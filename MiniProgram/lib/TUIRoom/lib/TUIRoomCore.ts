@@ -206,7 +206,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     speechMode?: TUISpeechMode;
     isChatRoomMuted?: boolean;
     isAllCameraMuted?: boolean;
-    isAllMicrophoneMuted?: boolean;
+    isAllMicMuted?: boolean;
     startTime?: number;
   }) {
     this.state.roomInfo.roomConfig = Object.assign(
