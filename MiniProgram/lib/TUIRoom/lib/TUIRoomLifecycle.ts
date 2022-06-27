@@ -102,7 +102,7 @@ class TUIRoomLifecycle {
       this.state.roomInfo.ownerID = groupInfo.ownerID;
       this.state.currentUser.role = groupInfo.ownerID === userID ? TUIRoomRole.MASTER : TUIRoomRole.ANCHOR;
       this.state.currentUser.isCameraMuted = this.state.roomInfo.roomConfig.isAllCameraMuted;
-      this.state.currentUser.isMicrophoneMuted = this.state.roomInfo.roomConfig.isAllMicrophoneMuted;
+      this.state.currentUser.isMicrophoneMuted = this.state.roomInfo.roomConfig.isAllMicMuted;
       return TUIRoomResponse.success(
         simpleClone({
           room: this.state.roomInfo,

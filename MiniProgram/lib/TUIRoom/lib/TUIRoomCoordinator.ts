@@ -160,7 +160,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
           groupID: this.groupID,
           notification: JSON.stringify({
             ...this.state.roomInfo.roomConfig,
-            isAllMicrophoneMuted: mute,
+            isAllMicMuted: mute,
           }),
         });
         this.resolveRejectCache.set(TUIRoomCoordinatorConfig.isAllMicMuted, resolve);

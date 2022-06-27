@@ -40,7 +40,7 @@ Page({
     const pusher = wx.$TUIRoomCore.enterTRTCRoom(
         roomId,
         {
-          enableMic: enableMic === 'true' && !this.data.roomInfo.roomConfig.isAllMicrophoneMuted,
+          enableMic: enableMic === 'true' && !this.data.roomInfo.roomConfig.isAllMicMuted,
           enableCamera: enableCamera === 'true' && !this.data.roomInfo.roomConfig.isAllCameraMuted,
         },
         this,
@@ -84,7 +84,7 @@ Page({
   },
   // 主持人禁用观众麦克风，不可拒绝，只能接受
   async muteUserMicrophone(event) {
-    if (this.data.roomInfo.roomConfig.isAllMicrophoneMuted) return;
+    if (this.data.roomInfo.roomConfig.isAllMicMuted) return;
     if (this.data.currentUser.role !== TUIRoomRole.MASTER) return;
     const { userid: userID, mute } = event.currentTarget.dataset;
     if (this.data.currentUser.ID === userID) return;

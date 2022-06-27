@@ -171,7 +171,7 @@
             </van-row>
         </block>
         <view class="all-control" wx:if="{{currentUser.ID === roomInfo.ownerID}}">
-            <view class="buttons green" wx:if="{{!roomInfo.roomConfig.isAllMicrophoneMuted}}" data-mute="{{true}}"
+            <view class="buttons green" wx:if="{{!roomInfo.roomConfig.isAllMicMuted}}" data-mute="{{true}}"
                   bindtap="muteAllUsersMicrophone">全体静音
             </view>
             <view class="buttons green-remove" wx:else data-mute="{{false}}" bindtap="muteAllUsersMicrophone">解除全体静音

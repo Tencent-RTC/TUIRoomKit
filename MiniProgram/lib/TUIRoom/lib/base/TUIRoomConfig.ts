@@ -7,7 +7,7 @@ class TUIRoomConfig {
 
   isAllCameraMuted = false; // 是否全员禁摄像头
 
-  isAllMicrophoneMuted = false; // 是否开启全员禁麦
+  isAllMicMuted = false; // 是否开启全员禁麦
 
   startTime = 0; // 开始时间
 
@@ -15,7 +15,7 @@ class TUIRoomConfig {
     this.speechMode = TUISpeechMode.FREE_SPEECH;
     this.isChatRoomMuted = false;
     this.isAllCameraMuted = false;
-    this.isAllMicrophoneMuted = false;
+    this.isAllMicMuted = false;
     this.startTime = 0;
   }
 }

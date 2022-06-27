@@ -150,7 +150,7 @@ export enum TUIRoomCoordinatorConfig {
   speechMode = 'speechMode',
   isChatRoomMuted = 'isChatRoomMuted',
   isAllCameraMuted = 'isAllCameraMuted',
-  isAllMicMuted = 'isAllMicrophoneMuted',
+  isAllMicMuted = 'isAllMicMuted',
   startTime = 'startTime',
 }
 
