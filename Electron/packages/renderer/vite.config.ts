@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import resolve from 'vite-plugin-resolve'
+import resolve, { lib2esm } from 'vite-plugin-resolve'
 import electron from 'vite-plugin-electron/renderer'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
@@ -26,54 +26,11 @@ export default defineConfig({
     electron(),
     resolve(
       {
-        "trtc-electron-sdk": `
-          const TRTCCloud = require("trtc-electron-sdk");
-          const TRTCParams = TRTCCloud.TRTCParams;
-          const TRTCAppScene = TRTCCloud.TRTCAppScene;
-          const TRTCVideoStreamType = TRTCCloud.TRTCVideoStreamType;
-          const TRTCScreenCaptureSourceType = TRTCCloud.TRTCScreenCaptureSourceType;
-          const TRTCVideoEncParam = TRTCCloud.TRTCVideoEncParam;
-          const Rect = TRTCCloud.Rect;
-          const TRTCAudioQuality = TRTCCloud.TRTCAudioQuality;
-          const TRTCScreenCaptureSourceInfo = TRTCCloud.TRTCScreenCaptureSourceInfo;
-          const TRTCDeviceInfo = TRTCCloud.TRTCDeviceInfo;
-          const TRTCVideoQosPreference = TRTCCloud.TRTCVideoQosPreference;
-          const TRTCQualityInfo = TRTCCloud.TRTCQualityInfo;
-          const TRTCStatistics = TRTCCloud.TRTCStatistics;
-          const TRTCVolumeInfo = TRTCCloud.TRTCVolumeInfo;
-          const TRTCDeviceType = TRTCCloud.TRTCDeviceType;
-          const TRTCDeviceState = TRTCCloud.TRTCDeviceState;
-          const TRTCBeautyStyle = TRTCCloud.TRTCBeautyStyle;
-          const TRTCVideoResolution = TRTCCloud.TRTCVideoResolution;
-          const TRTCVideoResolutionMode = TRTCCloud.TRTCVideoResolutionMode;
-          const TRTCVideoMirrorType = TRTCCloud.TRTCVideoMirrorType;
-          const TRTCVideoRotation = TRTCCloud.TRTCVideoRotation;
-          const TRTCVideoFillMode = TRTCCloud.TRTCVideoFillMode;
-          export { 
-            TRTCParams,
-            TRTCAppScene,
-            TRTCVideoStreamType,
-            TRTCScreenCaptureSourceType,
-            TRTCVideoEncParam,
-            Rect,
-            TRTCAudioQuality,
-            TRTCScreenCaptureSourceInfo,
-            TRTCDeviceInfo,
-            TRTCVideoQosPreference,
-            TRTCQualityInfo,
-            TRTCStatistics,
-            TRTCVolumeInfo,
-            TRTCDeviceType,
-            TRTCDeviceState,
-            TRTCBeautyStyle,
-            TRTCVideoResolution,
-            TRTCVideoResolutionMode,
-            TRTCVideoMirrorType,
-            TRTCVideoRotation,
-            TRTCVideoFillMode,
-          };
-          export default TRTCCloud.default;
-        `,
+        'trtc-electron-sdk': lib2esm(
+          'trtc-electron-sdk',
+          Object.keys(require('trtc-electron-sdk')),
+          { format: 'cjs' },
+        ),
       }
     ),
     createSvg(path.join(path.resolve(__dirname, 'src/TUIRoom/assets/icons/svg/'), '/')),
