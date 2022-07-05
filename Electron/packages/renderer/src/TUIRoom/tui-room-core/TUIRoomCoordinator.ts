@@ -8,6 +8,7 @@ import {
   TUIRoomErrorCode,
   TUIRoomErrorMessage,
   TSignalingConfig,
+  TIM_ROOM_PREFIX,
 } from './constant';
 import ITUIRoomCoordinator from './ITUIRoomCoordinator';
 import logger from './common/logger';
@@ -20,6 +21,7 @@ import {
   TTUIRoomConfig,
   TTUIRoomTSBase,
   ETUIRoomRole,
+  ETUIRoomMuteType
 } from './types.d';
 
 import { safelyParseJSON, simpleClone } from './utils/utils';
@@ -38,6 +40,8 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
   private emitter: Emitter | null;
 
   private tSignalingService: any;
+  private isBindTimEvent: boolean;
+  private isBindTSignalingEvent: boolean;
 
   constructor(state: StateStore, tSignalingService: TSignalingService) {
     if (!state || !tSignalingService) {
@@ -48,6 +52,8 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     }
     this.state = state;
     this.tSignalingService = tSignalingService;
+    this.isBindTimEvent = false;
+    this.isBindTSignalingEvent = false;
 
     this.emitter = new Emitter();
   }
@@ -58,8 +64,14 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
   init(options: { roomId: number; tim: any }) {
     const { roomId, tim } = options;
     this.roomId = roomId;
-    this.groupId = `${roomId}`;
+    this.groupId = `${TIM_ROOM_PREFIX}${roomId}`;
     this.tim = tim;
+    if (this.isBindTimEvent) {
+      this.unbindTIMEvent();
+    }
+    if (this.isBindTSignalingEvent) {
+      this.unbindTSignalingEvent();
+    }
     this.bindTIMEvent();
     this.bindTSignalingEvent();
     this.handleInitNotification(this.state.roomInfo.roomConfig);
@@ -67,7 +79,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
 
   // 进入房间，处理初始化的公告
   private handleInitNotification(roomConfig: TTUIRoomConfig) {
-    const { isCallingRoll, isAllMicMuted } = roomConfig;
+    const { isCallingRoll, isAllMicMuted, isAllCameraMuted } = roomConfig;
     if (isCallingRoll) {
       this.emitter?.emit(
         ETUIRoomEvents.onCallingRollStarted,
@@ -78,7 +90,21 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
       if (this.state.currentUser.role !== ETUIRoomRole.MASTER) {
         this.emitter?.emit(
           ETUIRoomEvents.onMicrophoneMuted,
-          roomConfig.isAllMicMuted
+          {
+            mute: roomConfig.isAllMicMuted,
+            muteType: ETUIRoomMuteType.MasterMuteAll
+          }
+        );
+      }
+    }
+    if (isAllCameraMuted) {
+      if (this.state.currentUser.role !== ETUIRoomRole.MASTER) {
+        this.emitter?.emit(
+          ETUIRoomEvents.onCameraMuted,
+          {
+            mute: roomConfig.isAllCameraMuted,
+            muteType: ETUIRoomMuteType.MasterMuteAll
+          }
         );
       }
     }
@@ -94,7 +120,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     );
     try {
       await this.tim.updateGroupProfile({
-        groupId: this.groupId,
+        groupID: this.groupId,
         notification: JSON.stringify(roomConfig),
       });
       return TUIRoomResponse.success(roomConfig);
@@ -179,7 +205,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     );
     try {
       await this.tim.updateGroupProfile({
-        groupId: this.groupId,
+        groupID: this.groupId,
         notification: JSON.stringify({
           ...this.state.roomInfo.roomConfig,
           isAllMicMuted: mute,
@@ -206,7 +232,28 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
       `${TUIRoomCoordinator.logPrefix}muteUserCamera userId: ${userId} mute: ${mute}`,
       this
     );
-    return TUIRoomResponse.success();
+    try {
+      const message = {
+        cmd: ETUIRoomCoordinatorCommand.MuteUserCamera,
+        room_id: this.roomId,
+        receiver_id: userId,
+        mute,
+      };
+      const tsResponse = await this.tSignalingService.invite(
+        userId,
+        message,
+        TSignalingConfig.timeout
+      );
+      if (tsResponse.code === 0) {
+        return TUIRoomResponse.success(tsResponse.data);
+      }
+      return TUIRoomResponse.fail(tsResponse.code, '', tsResponse.data);
+    } catch (error: any) {
+      throw TUIRoomError.error(
+        TUIRoomErrorCode.SEND_CUSTOM_MESSAGE_ERROR,
+        TUIRoomErrorMessage.SEND_CUSTOM_MESSAGE_ERROR
+      );
+    }
   }
 
   async muteAllUsersCamera(mute: boolean): Promise<TUIRoomResponse<any>> {
@@ -214,6 +261,25 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
       `${TUIRoomCoordinator.logPrefix}muteAllUsersCamera mute: ${mute}`,
       this
     );
+    try {
+      await this.tim.updateGroupProfile({
+        groupID: this.groupId,
+        notification: JSON.stringify({
+          ...this.state.roomInfo.roomConfig,
+          isAllCameraMuted: mute,
+        }),
+      });
+      return TUIRoomResponse.success();
+    } catch (error: any) {
+      logger.error(
+        `${TUIRoomCoordinator.logPrefix}muteAllUsersCamera error:`,
+        error
+      );
+      throw TUIRoomError.error(
+        TUIRoomErrorCode.CHANGE_ALL_CAMERA_MUTE_ERROR,
+        TUIRoomErrorMessage.CHANGE_ALL_CAMERA_MUTE_ERROR
+      );
+    }
     return TUIRoomResponse.success();
   }
 
@@ -225,12 +291,68 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     return TUIRoomResponse.success();
   }
 
+  async muteUserChatRoom(userId: string, mute: boolean): Promise<TUIRoomResponse<any>> {
+    logger.debug(
+      `${TUIRoomCoordinator.logPrefix}muteUserChatRoom userId: ${userId} mute: ${mute}`,
+      this
+    );
+    try {
+      const message = {
+        cmd: ETUIRoomCoordinatorCommand.MuteUserChatRoom,
+        room_id: this.roomId,
+        receiver_id: userId,
+        mute,
+      };
+      const tsResponse = await this.tSignalingService.invite(
+        userId,
+        message,
+        TSignalingConfig.timeout
+      );
+      const ONE_DAY = 60 * 60 * 24;
+      if (tsResponse.code === 0) {
+        const muteTime = mute ? ONE_DAY : 0;
+        this.tim.setGroupMemberMuteTime({
+          groupID: this.groupId,
+          userID: userId,
+          muteTime: muteTime
+        });
+        return TUIRoomResponse.success(tsResponse.data);
+      }
+      return TUIRoomResponse.fail(tsResponse.code, '', tsResponse.data);
+    } catch (error: any) {
+      throw TUIRoomError.error(
+        TUIRoomErrorCode.SEND_CUSTOM_MESSAGE_ERROR,
+        TUIRoomErrorMessage.SEND_CUSTOM_MESSAGE_ERROR
+      );
+    }
+  }
+
   async kickOffUser(userId: string): Promise<TUIRoomResponse<any>> {
     logger.debug(
       `${TUIRoomCoordinator.logPrefix}kickOffUser userId: ${userId}`,
       this
     );
-    return TUIRoomResponse.success();
+    try {
+      const message = {
+        cmd: ETUIRoomCoordinatorCommand.KickOffUser,
+        room_id: this.roomId,
+        receiver_id: userId,
+      };
+      const tsResponse = await this.tSignalingService.invite(
+        userId,
+        message,
+        TSignalingConfig.timeout
+      );
+      if (tsResponse.code === 0) {
+        return TUIRoomResponse.success(tsResponse.data);
+      }
+      return TUIRoomResponse.fail(tsResponse.code, '', tsResponse.data);
+    } catch (error: any) {
+      throw TUIRoomError.error(
+        TUIRoomErrorCode.SEND_CUSTOM_MESSAGE_ERROR,
+        TUIRoomErrorMessage.SEND_CUSTOM_MESSAGE_ERROR
+      );
+    }
   }
 
   /**
@@ -543,11 +665,13 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
 
   // 事件绑定
   private bindTIMEvent() {
+    this.isBindTimEvent = true;
     this.tim.on(TIM.EVENT.MESSAGE_RECEIVED, this.onMessageReceived, this);
   }
 
   // 解除事件绑定
   private unbindTIMEvent() {
+    this.isBindTimEvent = false;
     this.tim.off(TIM.EVENT.MESSAGE_RECEIVED, this.onMessageReceived, this);
   }
 
@@ -615,14 +739,32 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
             break;
           case ETUIRoomCoordinatorConfig.isAllMicMuted:
             logger.warn(
-              `${TUIRoomCoordinator.logPrefix}.handleGroupProfileUpdate mute all`,
+              `${TUIRoomCoordinator.logPrefix}.handleGroupProfileUpdate mute all mic`,
               notification[key]
             );
             this.state.roomInfo.roomConfig[key] = notification[key];
             if (this.state.currentUser.role !== ETUIRoomRole.MASTER) {
               this.emitter?.emit(
                 ETUIRoomEvents.onMicrophoneMuted,
-                notification[key]
+                {
+                  mute: notification[key],
+                  muteType: ETUIRoomMuteType.MasterMuteAll
+                }
+              );
+            }
+            break;
+          case ETUIRoomCoordinatorConfig.isAllCameraMuted:
+            logger.warn(
+              `${TUIRoomCoordinator.logPrefix}.handleGroupProfileUpdate mute all camera`,
+              notification[key]
+            );
+            this.state.roomInfo.roomConfig[key] = notification[key];
+            if (this.state.currentUser.role !== ETUIRoomRole.MASTER) {
+              this.emitter?.emit(
+                ETUIRoomEvents.onCameraMuted, {
+                  mute: notification[key],
+                  muteType: ETUIRoomMuteType.MasterMuteAll
+                }
               );
             }
             break;
@@ -646,6 +788,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
    */
   // 事件绑定
   private bindTSignalingEvent() {
+    this.isBindTSignalingEvent = true;
     this.tSignalingService.on(
       ETUIRoomEvents.onUserReplyCallingRoll,
       this.onUserReplyCallingRoll,
@@ -684,12 +827,28 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     this.tSignalingService.on(
       ETUIRoomEvents.onMicrophoneMuted,
       this.onMicrophoneMuted,
+      this
+    );
+    this.tSignalingService.on(
+      ETUIRoomEvents.onCameraMuted,
+      this.onCameraMuted,
+      this
+    );
+    this.tSignalingService.on(
+      ETUIRoomEvents.onUserChatRoomMuted,
+      this.onUserChatRoomMuted,
+      this
+    );
+    this.tSignalingService.on(
+      ETUIRoomEvents.onUserKickOff,
+      this.onUserKickOff,
       this
     );
   }
 
   // 解除事件绑定
   private unbindTSignalingEvent() {
+    this.isBindTSignalingEvent = false;
     this.tSignalingService.off(
       ETUIRoomEvents.onUserReplyCallingRoll,
       this.onUserReplyCallingRoll,
@@ -728,6 +887,21 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     this.tSignalingService.off(
       ETUIRoomEvents.onMicrophoneMuted,
       this.onMicrophoneMuted,
+      this
+    );
+    this.tSignalingService.off(
+      ETUIRoomEvents.onCameraMuted,
+      this.onCameraMuted,
+      this
+    );
+    this.tSignalingService.off(
+      ETUIRoomEvents.onUserChatRoomMuted,
+      this.onUserChatRoomMuted,
+      this
+    );
+    this.tSignalingService.off(
+      ETUIRoomEvents.onUserKickOff,
+      this.onUserKickOff,
       this
     );
   }
@@ -839,11 +1013,9 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     this.emitter?.emit(ETUIRoomEvents.onSpeechApplicationTimeout, inviterId);
   }
 
-  private async onMicrophoneMuted(event: any) {
-    const { eventCode, data } = event;
+  private async onMicrophoneMuted(data: { inviterId: string; type: ETUIRoomCoordinatorCommand; mute: boolean }) {
     logger.log(
-      `${TUIRoomCoordinator.logPrefix}onMicrophoneMuted event:`,
-      eventCode,
+      `${TUIRoomCoordinator.logPrefix}onMicrophoneMuted data:`,
       data
     );
     const { mute, inviterId } = data;
@@ -853,7 +1025,63 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
       receiver_id: this.state.currentUser.userId,
       mute,
     };
-    this.emitter?.emit(ETUIRoomEvents.onMicrophoneMuted, mute);
+    this.emitter?.emit(ETUIRoomEvents.onMicrophoneMuted, {
+      mute,
+      muteType: ETUIRoomMuteType.MasterMuteCurrentUser
+    });
+    await this.tSignalingService.accept(inviterId, message);
+  }
+
+  private async onCameraMuted(data: { inviterId: string; type: ETUIRoomCoordinatorCommand; mute: boolean }) {
+    logger.log(
+      `${TUIRoomCoordinator.logPrefix}onCameraMuted data:`,
+      data
+    );
+    const { mute, inviterId } = data;
+    const message = {
+      cmd: ETUIRoomCoordinatorCommand.MuteUserCamera,
+      room_id: this.roomId,
+      receiver_id: this.state.currentUser.userId,
+      mute,
+    };
+    this.emitter?.emit(ETUIRoomEvents.onCameraMuted, {
+      mute,
+      muteType: ETUIRoomMuteType.MasterMuteCurrentUser
+    });
+    await this.tSignalingService.accept(inviterId, message);
+  }
+
+  private async onUserChatRoomMuted(data: { inviterId: string; type: ETUIRoomCoordinatorCommand; mute: boolean }) {
+    logger.log(
+      `${TUIRoomCoordinator.logPrefix}onUserChatRoomMuted data:`,
+      data
+    );
+    const { mute, inviterId } = data;
+    const message = {
+      cmd: ETUIRoomCoordinatorCommand.MuteUserChatRoom,
+      room_id: this.roomId,
+      receiver_id: this.state.currentUser.userId,
+      mute,
+    };
+    this.emitter?.emit(ETUIRoomEvents.onUserChatRoomMuted, {
+      mute,
+      muteType: ETUIRoomMuteType.MasterMuteCurrentUser
+    });
+    await this.tSignalingService.accept(inviterId, message);
+  }
+
+  private async onUserKickOff(data: { inviterId: string; type: ETUIRoomCoordinatorCommand }) {
+    logger.log(
+      `${TUIRoomCoordinator.logPrefix}onUserKickOff data:`,
+      data
+    );
+    const { inviterId } = data;
+    const message = {
+      cmd: ETUIRoomCoordinatorCommand.KickOffUser,
+      room_id: this.roomId,
+      receiver_id: this.state.currentUser.userId
+    };
+    this.emitter?.emit(ETUIRoomEvents.onUserKickOff, {});
     await this.tSignalingService.accept(inviterId, message);
   }
 

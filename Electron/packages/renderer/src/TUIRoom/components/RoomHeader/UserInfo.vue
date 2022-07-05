@@ -15,6 +15,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import defaultAvatar from '../../assets/imgs/avatar.png';
+import { ICON_NAME } from '../../constants/icon';
 
 interface Props {
   userId: string,
@@ -27,7 +28,7 @@ defineEmits(['logOut']);
 
 const userInfoRef = ref();
 const showUserControl = ref(false);
-const iconName = computed(() => (showUserControl.value ? 'line-arrow-up' : 'line-arrow-down'));
+const iconName = computed(() => (showUserControl.value ? ICON_NAME.LineArrowUp : ICON_NAME.LineArrowDown));
 
 function handleUserControl() {
   showUserControl.value = !showUserControl.value;

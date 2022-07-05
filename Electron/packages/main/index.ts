@@ -1,6 +1,8 @@
 import { app, BrowserWindow, shell, screen, systemPreferences } from 'electron'
 import { release } from 'os'
-import { join } from 'path'
+import path from 'path'
+
+const PROTOCOL = 'tuiroom';
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
@@ -15,6 +17,35 @@ if (!app.requestSingleInstanceLock()) {
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 let win: BrowserWindow | null = null
+let schemeRoomId = '';
+
+function registerScheme() {
+  const args = [];
+  if (!app.isPackaged) {
+    // 如果是开发阶段，需要把我们的脚本的绝对路径加入参数中
+    args.push(path.resolve(process.argv[1]));
+  }
+  // 加一个 `--` 以确保后面的参数不被 Electron 处理
+  args.push('--');
+  app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, args);
+  handleArgv(process.argv);
+}
+
+function handleArgv(argv: string[]) {
+  const prefix = `${PROTOCOL}:`;
+  // 开发阶段，跳过前两个参数（`electron.exe .`）
+  // 打包后，跳过第一个参数（`myapp.exe`）
+  const offset = app.isPackaged ? 1 : 2;
+  const url = argv.find((arg, i) => i >= offset && arg.startsWith(prefix));
+  if (url) handleUrl(url);
+}
+
+function handleUrl(url: string) {
+  // tuiroom://joinroom?roomId=123
+  const urlObj = new URL(url);
+  const { searchParams } = urlObj;
+  schemeRoomId = searchParams.get('roomId') || '';
+}
 
 async function checkAndApplyDevicePrivilege() {
   const cameraPrivilege = systemPreferences.getMediaAccessStatus('camera');
@@ -43,14 +74,20 @@ async function createWindow() {
     minWidth: 1200,
     minHeight: 640,
     webPreferences: {
-      preload: join(__dirname, '../preload/index.cjs'),
+      preload: path.join(__dirname, '../preload/index.cjs'),
       nodeIntegration: true,
       contextIsolation: false,
     },
   })
 
   if (app.isPackaged) {
-    win.loadFile(join(__dirname, '../renderer/index.html'))
+    if (schemeRoomId) {
+      win.loadFile(path.join(__dirname, `../renderer/index.html`), {
+        hash: `home?roomId=${schemeRoomId}`
+      });
+    } else {
+      win.loadFile(path.join(__dirname, '../renderer/index.html'))
+    }
   } else {
     // 🚧 Use ['ENV_NAME'] avoid vite:define plugin
     const url = `http://${process.env['VITE_DEV_SERVER_HOST']}:${process.env['VITE_DEV_SERVER_PORT']}/#/room`
@@ -71,6 +108,7 @@ async function createWindow() {
   })
 }
 
+registerScheme();
 app.whenReady().then(createWindow)
 
 app.on('window-all-closed', () => {
@@ -78,7 +116,11 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-app.on('second-instance', () => {
+app.on('second-instance', (event, argv) => {
+  if (process.platform === 'win32') {
+    // Windows
+    handleArgv(argv);
+  }
   if (win) {
     // Focus on the main window if the user tried to open another
     if (win.isMinimized()) win.restore()
@@ -94,3 +136,8 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+// macOS 下通过协议URL启动时，主实例会通过 open-url 事件接收这个 URL
+app.on('open-url', (event, urlStr) => {
+  handleUrl(urlStr);
+});

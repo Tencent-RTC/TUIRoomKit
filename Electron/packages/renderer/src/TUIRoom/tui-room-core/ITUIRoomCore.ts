@@ -14,7 +14,8 @@
   TRTCBeautyStyle,
   TRTCVideoQosPreference,
   TRTCVideoEncParam,
-} from 'trtc-electron-sdk';
+  TRTCVideoFillMode,
+} from './trtc_define';
 import { ETUISpeechMode, ETUIStreamType } from './types.d';
 import TUIRoomInfo from './base/TUIRoomInfo';
 import TUIRoomUser from './base/TUIRoomUser';
@@ -223,6 +224,14 @@ export default interface ITUIRoomCore {
    * @param mirror   true开启镜像, false 关闭镜像。
    */
   setVideoMirror: (mirror: boolean) => void;
+
+  /**
+   * 渲染模式设置：设置远端视频渲染模式
+   * @param userId 用户 Id
+   * @param streamType 流类型
+   * @param fillMode 填充模式
+   */
+  setRemoteVideoFillMode: (userId: string, streamType: string, fillMode: TRTCVideoFillMode) => void;
 
   /**
    * 静默或取消静默本地摄像头

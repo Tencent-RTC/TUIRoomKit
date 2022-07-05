@@ -17,7 +17,7 @@
       :teleported="false"
     >
       <el-button text @click="openStopConfirmDialog">
-        <svg-icon :icon-name="stopIconName" />
+        <svg-icon :icon-name="ICON_NAME.ScreenShareStopped" />
         结束共享
       </el-button>
     </el-popover>
@@ -60,6 +60,7 @@ import TUIRoomCore, {
 } from '../../../tui-room-core';
 import ScreenWindowSelectDialog from './ScreenWindowSelectDialog.vue';
 import SvgIcon from '../../common/SvgIcon.vue';
+import { ICON_NAME } from '../../../constants/icon';
 
 const btnStopRef = ref();
 const popoverRef = ref();
@@ -68,8 +69,7 @@ const dialogVisible: Ref<boolean> = ref(false);
 
 const title = computed(() => (isSharing.value ? '屏幕共享中' : '共享屏幕'));
 
-const startIconName = computed(() => (isSharing.value ? 'screen-sharing' : 'screen-share'));
-const stopIconName = 'screen-share-stopped';
+const startIconName = computed(() => (isSharing.value ? ICON_NAME.ScreenSharing : ICON_NAME.ScreenShare));
 
 const selectDialogVisible: Ref<boolean> = ref(false);
 const screenList: Ref<Array<TRTCScreenCaptureSourceInfo>> = ref([]);
@@ -84,7 +84,7 @@ async function startScreenShare() {
     );
     windowList.value = screenCaptureList.filter(
       (screen: TRTCScreenCaptureSourceInfo) =>
-        screen.type === TRTCScreenCaptureSourceType.TRTCScreenCaptureSourceTypeWindow 
+        screen.type === TRTCScreenCaptureSourceType.TRTCScreenCaptureSourceTypeWindow
           && !screen.isMinimizeWindow // eslint-disable-line
     );
     selectDialogVisible.value = true;

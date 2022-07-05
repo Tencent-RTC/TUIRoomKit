@@ -264,6 +264,14 @@ class BaseTRTCService {
     });
   }
 
+  setRemoteVideoFillMode(userId: string, streamType: string, fillMode: TRTCVideoFillMode) {
+    this.rtcCloud?.setRemoteRenderParams(userId, streamType, {
+      mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+      rotation: TRTCVideoRotation.TRTCVideoRotation0,
+      fillMode: fillMode,
+    });
+  }
+
   muteLocalVideo(mute: boolean) {
     this.rtcCloud?.muteLocalVideo(mute);
   }

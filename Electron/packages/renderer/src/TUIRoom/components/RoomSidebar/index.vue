@@ -12,6 +12,8 @@
     >
       <chat v-if="sidebarName == 'chat'"></chat>
       <room-invite v-if="sidebarName == 'invite'"></room-invite>
+      <room-more v-if="sidebarName == 'more'"></room-more>
+      <manage-member v-if="sidebarName == 'manage-member'"></manage-member>
     </el-drawer>
   </div>
 </template>
@@ -22,6 +24,8 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import Chat from '../Chat/index.vue';
 import RoomInvite from '../RoomInvite/index.vue';
+import RoomMore from '../RoomMore/index.vue';
+import ManageMember from '../ManageMember/index.vue';
 
 const basicStore = useBasicStore();
 const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
@@ -29,8 +33,15 @@ const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
 const title = computed((): string | undefined => {
   if (sidebarName.value === 'chat') {
     return '聊天';
-  } if (sidebarName.value === 'invite') {
+  }
+  if (sidebarName.value === 'invite') {
     return '邀请成员';
+  }
+  if (sidebarName.value === 'more') {
+    return '联系我们';
+  }
+  if (sidebarName.value === 'manage-member') {
+    return '成员管理';
   }
   return '';
 });

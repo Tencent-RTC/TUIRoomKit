@@ -19,10 +19,10 @@
 </template>
 
 <script setup lang="ts">
-import UserInfo from '@/TUIRoom/components/RoomHeader/UserInfo.vue';
-import StreamPreview from '@/TUIRoom/components/RoomHome/StreamPreview.vue';
-import RoomControl from '@/TUIRoom/components/RoomHome/RoomControl.vue';
-import TUIRoomCore from '@/TUIRoom/tui-room-core';
+import UserInfo from '@TUIRoom/components/RoomHeader/UserInfo.vue';
+import StreamPreview from '@TUIRoom/components/RoomHome/StreamPreview.vue';
+import RoomControl from '@TUIRoom/components/RoomHome/RoomControl.vue';
+import TUIRoomCore from '@TUIRoom/tui-room-core';
 import router from '@/router';
 import { useRoute } from 'vue-router';
 import { onMounted, Ref, ref } from 'vue';
