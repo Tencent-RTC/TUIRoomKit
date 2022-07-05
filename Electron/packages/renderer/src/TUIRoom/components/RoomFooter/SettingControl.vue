@@ -13,11 +13,12 @@ import { computed } from 'vue';
 import IconButton from '../common/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
+import { ICON_NAME } from '../../constants/icon';
 
 const basicStore = useBasicStore();
 const { showSettingDialog } = storeToRefs(basicStore);
 
-const iconName = computed(() => (showSettingDialog.value ? 'setting-active' : 'setting'));
+const iconName = computed(() => (showSettingDialog.value ? ICON_NAME.SettingActive : ICON_NAME.Setting));
 
 function handleShowSettingDialog() {
   basicStore.setShowSettingDialog(!basicStore.showSettingDialog);

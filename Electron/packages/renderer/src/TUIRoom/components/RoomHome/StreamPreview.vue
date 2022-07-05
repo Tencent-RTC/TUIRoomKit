@@ -54,6 +54,7 @@ import VideoSettingTab from '../base/VideoSettingTab.vue';
 import AudioIcon from '../base/AudioIcon.vue';
 import { useStreamStore } from '../../stores/stream';
 import { storeToRefs } from 'pinia';
+import { ICON_NAME } from '../../constants/icon';
 
 const streamStore = useStreamStore();
 const { localStream } = storeToRefs(streamStore);
@@ -76,7 +77,7 @@ const loading = ref(true);
 const isMicMuted = ref(false);
 const isCameraMuted = ref(false);
 
-const cameraIconName = computed(() => (isCameraMuted.value ? 'camera-off' : 'camera-on'));
+const cameraIconName = computed(() => (isCameraMuted.value ? ICON_NAME.CameraOff : ICON_NAME.CameraOn));
 
 function toggleMuteAudio() {
   isMicMuted.value = !isMicMuted.value;
@@ -85,8 +86,12 @@ function toggleMuteAudio() {
 
 function toggleMuteVideo() {
   isCameraMuted.value = !isCameraMuted.value;
-  TUIRoomCore.muteLocalCamera(isCameraMuted.value);
   tuiRoomParam.isOpenCamera = !isCameraMuted.value;
+  if (isCameraMuted.value) {
+    TUIRoomCore.stopCameraDeviceTest();
+  } else {
+    TUIRoomCore.startCameraDeviceTest(streamPreviewRef.value);
+  }
 }
 
 function getRoomParam() {
@@ -108,7 +113,7 @@ onMounted(async () => {
   streamStore.setCurrentSpeakerId(microphoneList[0].deviceId);
   TUIRoomCore.setCurrentCamera(cameraList[0].deviceId);
   TUIRoomCore.setCurrentMicrophone(microphoneList[0].deviceId);
-  await TUIRoomCore.startCameraPreview(streamPreviewRef.value);
+  await TUIRoomCore.startCameraDeviceTest(streamPreviewRef.value);
   TUIRoomCore.enableAudioVolumeEvaluation(100);
   await TUIRoomCore.startMicrophone();
   loading.value = false;

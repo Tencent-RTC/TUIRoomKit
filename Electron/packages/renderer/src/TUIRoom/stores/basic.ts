@@ -2,6 +2,8 @@ import { defineStore } from 'pinia';
 import { ETUISpeechMode, ETUIRoomRole, TRTCStatistics, TRTCVideoStreamType } from '../tui-room-core';
 import { LAYOUT } from '../constants/render';
 
+type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | '';
+
 interface BasicState {
   sdkAppId: number,
   userId: string,
@@ -18,11 +20,15 @@ interface BasicState {
   activeSettingTab: string,
   layout: LAYOUT,
   isLocalStreamMirror: boolean,
-  sidebarName: 'chat' | 'invite' | '',
+  sidebarName: SideBarType,
   role: ETUIRoomRole | null,
   masterUserId: string,
   localQuality: number,
   statistics: TRTCStatistics,
+  isMuteAllAudio: boolean,
+  isMuteAllVideo: boolean,
+  canControlSelfAudio: boolean,
+  canControlSelfVideo: boolean,
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -59,6 +65,11 @@ export const useBasicStore = defineStore('basic', {
       systemCpu: 0,
       upLoss: 0,
     },
+    isMuteAllAudio: false,
+    isMuteAllVideo: false,
+    // 主持人全员禁麦，但是单独取消某个用户音视频禁止状态的时候，是可以自己 unmute audio/video 的
+    canControlSelfAudio: true,
+    canControlSelfVideo: true,
   }),
   getters: {
     localVideoBitrate: (state) => {
@@ -76,6 +87,15 @@ export const useBasicStore = defineStore('basic', {
         return localStatistics.frameRate;
       }
       return 0;
+    },
+    isMaster(state) {
+      return state.userId === state.masterUserId;
+    },
+    isLocalAudioIconDisable(state) {
+      return state.userId !== state.masterUserId && !state.canControlSelfAudio;
+    },
+    isLocalVideoIconDisable(state) {
+      return state.userId !== state.masterUserId && !state.canControlSelfVideo;
     },
   },
   actions: {
@@ -110,7 +130,7 @@ export const useBasicStore = defineStore('basic', {
     setSidebarOpenStatus(isOpen: boolean) {
       this.isSidebarOpen = isOpen;
     },
-    setSidebarName(name: 'chat' | 'invite' | '') {
+    setSidebarName(name: SideBarType) {
       this.sidebarName = name;
     },
     setLayout(layout: LAYOUT) {
@@ -142,11 +162,34 @@ export const useBasicStore = defineStore('basic', {
     setMasterUserId(userId: string) {
       this.masterUserId = userId;
     },
+    setRoomInfo(roomInfo: { ownerId: string, roomConfig: { isAllMicMuted: boolean, isAllCameraMuted: boolean } }) {
+      this.masterUserId = roomInfo.ownerId;
+      this.isMuteAllAudio = roomInfo.roomConfig.isAllMicMuted;
+      this.isMuteAllVideo = roomInfo.roomConfig.isAllCameraMuted;
+      if (this.isMuteAllAudio) {
+        this.canControlSelfAudio = false;
+      }
+      if (this.isMuteAllVideo) {
+        this.canControlSelfVideo = false;
+      }
+    },
     setLocalQuality(quality: number) {
       this.localQuality = quality;
     },
     setStatistics(statistics: TRTCStatistics) {
       this.statistics = statistics;
+    },
+    setIsMuteAllAudio(isMuteAllAudio: boolean) {
+      this.isMuteAllAudio = isMuteAllAudio;
+    },
+    setIsMuteAllVideo(isMuteAllVideo: boolean) {
+      this.isMuteAllVideo = isMuteAllVideo;
+    },
+    setCanControlSelfAudio(capability: boolean) {
+      this.canControlSelfAudio = capability;
+    },
+    setCanControlSelfVideo(capability: boolean) {
+      this.canControlSelfVideo = capability;
     },
     reset() {
       this.isSidebarOpen = false;
@@ -157,6 +200,8 @@ export const useBasicStore = defineStore('basic', {
       this.sidebarName = '';
       this.masterUserId = '';
       this.localQuality = 0;
+      this.isMuteAllAudio = false;
+      this.isMuteAllVideo = false;
     },
   },
 });

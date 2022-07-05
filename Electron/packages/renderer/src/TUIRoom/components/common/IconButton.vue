@@ -8,7 +8,7 @@
   * 在 template 中使用 <icon-button />
 -->
 <template>
-  <div :class="['icon-box', `${!hideHoverEffect && 'hover-effect'}`]">
+  <div :class="['icon-box', `${!hideHoverEffect && 'hover-effect'}`, `${disabled && 'disabled'}`]">
     <span class="icon-content" @click="$emit('clickIcon')">
       <svg-icon v-if="iconName" :icon-name="iconName" />
       <slot></slot>
@@ -27,7 +27,8 @@ interface Props {
   title: string,
   iconName?: string,
   hasMore?: boolean,
-  hideHoverEffect?:boolean,
+  hideHoverEffect?: boolean,
+  disabled?: boolean,
 }
 
 defineProps<Props>();
@@ -45,6 +46,11 @@ defineEmits(['clickIcon', 'clickMore']);
   display: flex;
   cursor: pointer;
   padding: 10px 0;
+  &.disabled {
+    * {
+      color: $disabledColor;
+    }
+  }
   &.hover-effect:hover {
     &:before{
       content: '';

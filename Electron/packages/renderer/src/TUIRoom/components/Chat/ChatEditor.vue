@@ -1,13 +1,16 @@
 <template>
-  <div class="chat-editor">
+  <div
+    :class="['chat-editor', chatStore.isMuteChatByMater ? 'disable-editor': '']"
+  >
     <textarea
       ref="editorInputEle"
       v-model="sendMsg"
-      className="content-bottom-input"
-      placeholder="说点什么"
+      class="content-bottom-input"
+      :disabled="chatStore.isMuteChatByMater"
+      :placeholder="chatStore.isMuteChatByMater ? '已被主持人禁言' : '说点什么'"
       @keyup.enter="sendMessage"
     />
-    <div class="chat-editor-toolbar">
+    <div v-if="!chatStore.isMuteChatByMater" class="chat-editor-toolbar">
       <div class="left-section">
         <emoji @choose-emoji="handleChooseEmoji"></emoji>
       </div>
@@ -60,6 +63,10 @@ const handleChooseEmoji = (emojiName: string) => {
     height: 188px;
     background: #2E323D;
     box-sizing: border-box;
+    &.disable-editor {
+      textarea {
+      }
+    }
     textarea {
       height: 138px;
       color: #ffff;

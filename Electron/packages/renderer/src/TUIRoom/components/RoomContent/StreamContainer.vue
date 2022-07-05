@@ -11,6 +11,7 @@
       <div ref="streamListRef" class="stream-list">
         <stream-region
           v-for="(stream, index) in streamList"
+          v-show="showStreamList.indexOf(stream) > -1"
           :key="index"
           :stream="stream"
           :enlarge-dom-id="enlargeDomId"
@@ -20,14 +21,32 @@
         ></stream-region>
       </div>
     </div>
+    <!-- 侧边栏和上边栏箭头 -->
     <div v-if="showIconControl && showRoomTool" :class="arrowClass" @click="handleClickIcon">
       <svg-icon icon-name="line-arrow-up" size="medium"></svg-icon>
+    </div>
+    <!-- 九宫格左右翻页控制栏 -->
+    <div v-if="showTurnPageControl && showRoomTool" class="turn-page-container">
+      <div
+        v-show="showTurnPageLeftArrow"
+        class="turn-page-arrow-container left-container"
+        @click="handleTurnPageLeft"
+      >
+        <div class="turn-page-arrow"></div>
+      </div>
+      <div
+        v-show="showTurnPageRightArrow"
+        class="turn-page-arrow-container right-container"
+        @click="handleTurnPageRight"
+      >
+        <div class="turn-page-arrow turn-page-right"></div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, Ref, watch, nextTick, computed } from 'vue';
+import { ref, onMounted, onUnmounted, Ref, ComputedRef, watch, nextTick, computed } from 'vue';
 import TUIRoomCore, {
   TRTCVideoResolution,
   ETUIRoomEvents,
@@ -51,11 +70,46 @@ const enlargedStreamStyle: Ref<Record<string, any>> = ref({});
 const streamStore = useStreamStore();
 const { streamList, streamNumber } = storeToRefs(streamStore);
 const basicStore = useBasicStore();
-const { layout } = storeToRefs(basicStore);
+const { layout, isMaster, isMuteAllAudio, isMuteAllVideo } = storeToRefs(basicStore);
 const showSideList = ref(true);
 
 const enlargeStream: Ref<StreamInfo | null> = ref(null);
 const enlargeDomId = computed(() => (enlargeStream.value ? `${enlargeStream.value.userId}_${enlargeStream.value.type}` : ''));
+
+// ----- 以下处理九宫格翻页逻辑 -----
+const currentPageIndex = ref(0);
+const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
+  if (layout.value !== LAYOUT.NINE_EQUAL_POINTS) {
+    return streamList.value;
+  }
+  return streamList.value.slice(currentPageIndex.value * 9, currentPageIndex.value * 9 + 9);
+});
+
+watch(streamNumber, (val) => {
+  if (currentPageIndex.value > Math.ceil(val / 9) - 1) {
+    currentPageIndex.value = Math.ceil(val / 9) - 1;
+    handleNineEqualPointsLayout();
+  }
+});
+
+// 显示左右翻页图标
+const showTurnPageControl = computed(() => layout.value === LAYOUT.NINE_EQUAL_POINTS && streamNumber.value > 9);
+// 是否展示九宫格朝左翻页按钮
+const showTurnPageLeftArrow = computed(() => currentPageIndex.value > 0);
+// 是否展示九宫格朝右翻页按钮
+const showTurnPageRightArrow = computed(() => streamNumber.value > currentPageIndex.value * 9 + 9);
+
+// 九宫格布局朝左翻页
+function handleTurnPageLeft() {
+  currentPageIndex.value = currentPageIndex.value - 1;
+  handleNineEqualPointsLayout();
+}
+
+// 九宫格布局朝右翻页
+function handleTurnPageRight() {
+  currentPageIndex.value = currentPageIndex.value + 1;
+  handleNineEqualPointsLayout();
+}
 
 // ----- 以下处理流布局 ---------
 const streamContainerClass = ref('');
@@ -78,7 +132,7 @@ function handleClickIcon() {
   if (!showSideList.value) {
     let width = 0;
     let height = 0;
-    const containerWidth = document.getElementById('roomContainer')!.offsetHeight;
+    const containerWidth = document.getElementById('roomContainer')!.offsetWidth;
     const containerHeight = document.getElementById('roomContainer')!.offsetHeight;
     const scaleWidth = containerWidth / 16;
     const scaleHeight = containerHeight / 9;
@@ -129,7 +183,7 @@ async function handleNineEqualPointsLayout() {
 
   await nextTick();
 
-  const number = streamNumber.value;
+  const number = showStreamList.value.length;
   let width = 0;
   let height = 0;
   const roomContainerElement = document.getElementById('roomContainer');
@@ -228,29 +282,39 @@ function handleEnlargeStreamRegion(stream: StreamInfo) {
   enlargeStream.value = stream;
 }
 
-function handleResize() {
+// 页面加载或者 layout 改变时，处理页面布局
+function handleLayout() {
   switch (layout.value as any) {
     case LAYOUT.NINE_EQUAL_POINTS:
-      if (streamListRef.value) {
-        streamListRef.value.style.maxWidth = '100%';
-        streamListRef.value.style.maxHeight = '100%';
-      }
       handleNineEqualPointsLayout();
       break;
     case LAYOUT.RIGHT_SIDE_LIST:
       showSideList.value = true;
       enlargedContainerRef.value.style.width = 'calc(100% - 260px)';
       enlargedContainerRef.value.style.height = '100%';
-      streamListRef.value.style.maxWidth = '100%';
-      streamListRef.value.style.maxHeight = `${document.getElementById('roomContainer')!.offsetHeight - 128}px`;
       handleRightSideListLayout();
       break;
     case LAYOUT.TOP_SIDE_LIST:
       showSideList.value = true;
       enlargedContainerRef.value.style.width = '100%';
       enlargedContainerRef.value.style.height = 'calc(100% - 175px)';
-      streamListRef.value.style.maxHeight = '100%';
-      streamListRef.value.style.maxWidth = `${document.getElementById('roomContainer')!.offsetWidth - 80}px`;
+      handleTopSideListLayout();
+      break;
+    default:
+      break;
+  }
+}
+
+// 页面 resize 时，处理流窗口尺寸
+function handleResize() {
+  switch (layout.value as any) {
+    case LAYOUT.NINE_EQUAL_POINTS:
+      handleNineEqualPointsLayout();
+      break;
+    case LAYOUT.RIGHT_SIDE_LIST:
+      handleRightSideListLayout();
+      break;
+    case LAYOUT.TOP_SIDE_LIST:
       handleTopSideListLayout();
       break;
     default:
@@ -259,7 +323,7 @@ function handleResize() {
 }
 
 onMounted(() => {
-  handleResize();
+  handleLayout();
   ['resize', 'pageshow'].forEach((event) => {
     window.addEventListener(event, handleResize);
   });
@@ -278,7 +342,7 @@ watch(streamNumber, () => {
 });
 
 watch(layout, () => {
-  handleResize();
+  handleLayout();
 });
 
 const showIconControl = computed(() => [LAYOUT.RIGHT_SIDE_LIST, LAYOUT.TOP_SIDE_LIST].indexOf(layout.value) >= 0);
@@ -286,6 +350,14 @@ const showIconControl = computed(() => [LAYOUT.RIGHT_SIDE_LIST, LAYOUT.TOP_SIDE_
 // --- 以下处理流事件 ----
 
 const onUserEnterRoom = (streamInfo: any) => {
+  // 本端为主持人，则记录用户禁言禁画信息
+  if (isMaster.value) {
+    Object.assign(streamInfo, {
+      isAudioMutedByMaster: isMuteAllAudio,
+      isVideoMutedByMaster: isMuteAllVideo,
+      isChatMutedByMaster: false,
+    });
+  }
   streamStore.addRemoteUser(streamInfo);
 };
 
@@ -311,6 +383,11 @@ const onUserVideoAvailable = (eventInfo: { userId: string, available: number, st
       if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
         basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
       }
+      return;
+    }
+    // 当远端流视频位 available 为 true，主持人端修改该用户的禁画提示为【禁画】
+    if (basicStore.isMaster && available) {
+      streamStore.setMuteUserVideo(userId, false);
     }
   } else if (streamType === ETUIStreamType.SCREEN) {
     streamStore.updateRemoteScreenStream(eventInfo);
@@ -329,12 +406,17 @@ const onUserAudioAvailable = (eventInfo: { userId: string, available: number}) =
     return;
   }
   streamStore.updateRemoteAudioStream(eventInfo);
+  // 当远端流音频位 available 为 true，主持人端修改该用户的禁画提示为【禁言】
+  if (basicStore.isMaster && available) {
+    streamStore.setMuteUserAudio(userId, false);
+  }
 };
 
 const { isDefaultOpenCamera, isDefaultOpenMicrophone } = storeToRefs(streamStore);
+const { isLocalAudioIconDisable, isLocalVideoIconDisable } = storeToRefs(basicStore);
 
 watch(isDefaultOpenCamera, async (val) => {
-  if (val) {
+  if (val && !isLocalVideoIconDisable.value) {
     const previewDom = document.getElementById(`${streamStore.localStream.userId}_main`);
     if (previewDom) {
       // 设置设备id
@@ -360,7 +442,7 @@ watch(isDefaultOpenCamera, async (val) => {
 });
 
 watch(isDefaultOpenMicrophone, async (val) => {
-  if (val) {
+  if (val && !isLocalAudioIconDisable.value) {
     const microphoneList = await TUIRoomCore.getMicrophoneList();
     if (!streamStore.currentMicrophoneId) {
       streamStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
@@ -385,7 +467,7 @@ onUnmounted(() => {
   TUIRoomCore.off(ETUIRoomEvents.onUserEnterRoom, onUserEnterRoom);
   TUIRoomCore.off(ETUIRoomEvents.onUserLeaveRoom, onUserLeaveRoom);
   TUIRoomCore.off(ETUIRoomEvents.onUserVideoAvailable, onUserVideoAvailable);
-  TUIRoomCore.on(ETUIRoomEvents.onUserAudioAvailable, onUserAudioAvailable);
+  TUIRoomCore.off(ETUIRoomEvents.onUserAudioAvailable, onUserAudioAvailable);
 });
 </script>
 
@@ -500,6 +582,8 @@ onUnmounted(() => {
     .stream-list {
       display: flex;
       overflow-x: scroll;
+      max-width: 100%;
+      max-height: 100%;
       &::-webkit-scrollbar {
         display: none;
       }
@@ -557,6 +641,8 @@ onUnmounted(() => {
     }
   }
   .stream-list {
+    max-width: 100%;
+    max-height: 100%;
     overflow-y: scroll;
     padding: 10px 0;
     &::-webkit-scrollbar {
@@ -571,6 +657,44 @@ onUnmounted(() => {
         margin-top: 14px;
       }
     }
+  }
+}
+
+.turn-page-container {
+  width: 100%;
+  height: 86px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  .turn-page-arrow-container {
+    width: 40px;
+    height: 86px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 4.21px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  .left-container {
+    position: absolute;
+    left: 24px;
+  }
+  .right-container {
+    position: absolute;
+    right: 24px;
+  }
+  .turn-page-arrow {
+    background-image: url(../../assets/icons/svg/turn-page-arrow-left.svg);
+    width: 14px;
+    height: 23px;
+    background-size: 100% 100%;
+  }
+  .turn-page-right {
+    transform: rotateY(180deg);
   }
 }
 </style>

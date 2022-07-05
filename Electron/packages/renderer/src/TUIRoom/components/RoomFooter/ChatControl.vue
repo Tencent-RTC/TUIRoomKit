@@ -13,11 +13,12 @@ import { computed } from 'vue';
 import IconButton from '../common/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
+import { ICON_NAME } from '../../constants/icon';
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);
 
-const iconName = computed(() => (sidebarName.value === 'chat' ? 'chat-active' : 'chat'));
+const iconName = computed(() => (sidebarName.value === 'chat' ? ICON_NAME.ChatActive : ICON_NAME.Chat));
 
 function toggleChatSidebar() {
   if (basicStore.setSidebarOpenStatus && basicStore.sidebarName === 'chat') {

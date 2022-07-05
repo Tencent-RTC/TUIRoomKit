@@ -63,7 +63,7 @@ export const EXPIRETIME = 604800;
  */
 export const userInfo = {
   // 用户Id
-  userId: 'user_1234567',
+  userId: `user_${Math.ceil(Math.random() * 100000)}`,
   // 用户昵称
   userName: 'myName',
   // 用户头像

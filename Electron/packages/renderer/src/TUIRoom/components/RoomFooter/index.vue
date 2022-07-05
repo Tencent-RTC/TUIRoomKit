@@ -7,10 +7,10 @@
     <div class="center-container">
       <screen-share-control></screen-share-control>
       <full-screen-control></full-screen-control>
-      <!-- <manage-member-control></manage-member-control> -->
+      <manage-member-control v-if="basicStore.role === ETUIRoomRole.MASTER"></manage-member-control>
       <invite-control></invite-control>
       <chat-control></chat-control>
-      <!-- <more-control></more-control> -->
+      <more-control></more-control>
       <setting-control></setting-control>
     </div>
     <div class="right-container">
@@ -23,23 +23,25 @@
 </template>
 
 <script setup lang="ts">
+import { ETUIRoomRole } from '../../tui-room-core';
 import AudioControl from './AudioControl.vue';
 import ScreenShareControl from './ScreenShareControl/Index.vue';
 import FullScreenControl from './FullScreenControl.vue';
 import InviteControl from './InviteControl.vue';
 import VideoControl from './VideoControl.vue';
-// TODO:【成员管理】功能待完善
-// import ManageMemberControl from './ManageMemberControl.vue';
+import ManageMemberControl from './ManageMemberControl.vue';
 import ChatControl from './ChatControl.vue';
 // TODO:【更多】功能待完善
-// import MoreControl from './MoreControl.vue';
+import MoreControl from './MoreControl.vue';
 import SettingControl from './SettingControl.vue';
 import EndControl from './EndControl.vue';
+
+import { useBasicStore } from '../../stores/basic';
 
 // const props = defineProps({
 //   roomRef: HTMLElement,
 // });
-
+const basicStore = useBasicStore();
 const emit = defineEmits(['onRoomDestroy', 'onRoomExit']);
 
 const onRoomDestroy = (info: { code: number; message: string }) => {
