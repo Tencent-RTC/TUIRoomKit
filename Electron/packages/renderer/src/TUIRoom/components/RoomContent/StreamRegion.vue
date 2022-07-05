@@ -35,7 +35,7 @@
 import { ref, watch, nextTick, computed } from 'vue';
 import { StreamInfo } from '../../stores/stream';
 import defaultAvatar from '../../assets/imgs/avatar.png';
-import TUIRoomCore, { ETUIStreamType } from '../../tui-room-core';
+import TUIRoomCore, { ETUIStreamType, TRTCVideoFillMode } from '../../tui-room-core';
 import { useBasicStore } from '../../stores/basic';
 import logger from '../../tui-room-core/common/logger';
 import AudioIcon from '../base/AudioIcon.vue';
@@ -72,8 +72,9 @@ const userInfo = computed(() => {
 
 watch(
   () => props.stream.isAudioStreamAvailable,
-  (val) => {
+  async (val) => {
     if (val && props.stream.userId !== basicStore.userId) {
+      await nextTick();
       const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
       if (userIdEl) {
         logger.debug(`${logPrefix}watch isAudioStreamAvailable:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
@@ -86,12 +87,21 @@ watch(
 
 watch(
   () => props.stream.isVideoStreamAvailable,
-  (val) => {
+  async (val) => {
     if (val && props.stream.userId !== basicStore.userId) {
+      await nextTick();
       const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
       if (userIdEl) {
         logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
         TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
+        // Web 端屏幕分享使用 contain 模式播放
+        if (isScreenStream.value) {
+          TUIRoomCore.setRemoteVideoFillMode(
+            props.stream.userId as string,
+            props.stream.type as string,
+            TRTCVideoFillMode.TRTCVideoFillMode_Fit,
+          );
+        }
       }
     }
   },

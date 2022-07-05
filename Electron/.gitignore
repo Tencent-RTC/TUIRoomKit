@@ -4,10 +4,21 @@ dist
 dist-ssr
 *.local
 .debug.env
+.idea
 
 tmp
 **/.tmp
 release
+
+## files copied fron 'Web TUIRoom'
+# packages/renderer/public
+# packages/renderer/src/api
+# packages/renderer/src/assets
+# packages/renderer/src/config
+# packages/renderer/src/router
+# packages/renderer/src/TUIRoom
+# packages/renderer/src/views
+# packages/renderer/src/App.vue
 
 # files auto generated
 packages/renderer/auto-imports.d.ts

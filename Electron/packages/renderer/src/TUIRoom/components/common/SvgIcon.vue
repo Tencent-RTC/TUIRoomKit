@@ -2,14 +2,11 @@
   * 名称：SvgIcon
   * @param name String required
   * @param size String 'large'|'medium'|'small'
-  * 依赖：src/assets/icons/index.js 需要在 vite 中配置
   * 使用方式：
   * 在 template 中使用 <svg-icon icon-name="star"/>
 -->
 <template>
-  <svg :class="svgClass" aria-hidden="true" v-on="$attrs">
-    <use :xlink:href="svgName" />
-  </svg>
+  <div :class="svgClass"></div>
 </template>
 
 <script setup lang="ts">
@@ -21,18 +18,21 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const svgName = computed((): string => `#icon-${props.iconName}`);
+const svgName = computed((): string => `${props.iconName}`);
 const svgClass = computed((): string => {
   const validate = props.size && ['large', 'medium', 'small'].includes(props.size);
   const size = validate ? props.size : 'large';
-  return `svg-icon ${size}-icon`;
+  return `svg-icon ${size}-icon ${svgName.value}`;
 });
 </script>
 
 <style scoped>
+@import '../../assets/style/svg.scss';
 .svg-icon {
   fill: currentColor;
   overflow: hidden;
+  display: inline-block;
+  background-size: contain;
 }
 .small-icon {
   width: 12px;

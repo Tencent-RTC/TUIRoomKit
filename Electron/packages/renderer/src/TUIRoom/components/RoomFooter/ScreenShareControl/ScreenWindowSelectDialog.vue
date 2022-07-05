@@ -45,6 +45,7 @@ import { ref, Ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { TRTCScreenCaptureSourceInfo } from '../../../tui-room-core';
 import ScreenWindowPreviewer from './ScreenWindowPreviewer.vue';
+import { MESSAGE_DURATION } from '../../../constants/message';
 
 interface Props {
   visible: boolean;
@@ -70,7 +71,7 @@ function start() {
     ElMessage({
       type: 'warning',
       message: '请选择要分享的屏幕或者窗口',
-      duration: 5000,
+      duration: MESSAGE_DURATION.LONG,
     });
   }
 }
