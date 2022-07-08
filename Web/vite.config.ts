@@ -3,7 +3,6 @@ import vue from '@vitejs/plugin-vue';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
-import { createSvg } from './src/TUIRoom/assets/icons/index';
 const path = require('path');
 
 // https://vitejs.dev/config/
@@ -21,7 +20,6 @@ export default defineConfig({
       // 说明：解决了引入生成userSig 文件的问题
       // reactivityTransform: true,
     }),
-    createSvg('./src/TUIRoom/assets/icons/svg/'),
     AutoImport({
       resolvers: [ElementPlusResolver()],
     }),

@@ -8,7 +8,7 @@
       @click="toggleScreenShare"
     />
     <div v-if="showStopShareRegion" class="stop-share-region" @click="openStopConfirmDialog">
-      <svg-icon class="stop-share-icon" :icon-name="stopIconName" />
+      <svg-icon class="stop-share-icon" :icon-name="ICON_NAME.ScreenShareStopped" />
       <span>结束共享</span>
     </div>
     <el-dialog
@@ -39,6 +39,8 @@ import TUIRoomCore, { ETUIRoomEvents } from '../../../tui-room-core';
 import { useBasicStore } from '../../../stores/basic';
 import logger from '../../../tui-room-core/common/logger';
 import SvgIcon from '../../common/SvgIcon.vue';
+import { ICON_NAME } from '../../../constants/icon';
+import { MESSAGE_DURATION } from '../../../constants/message';
 
 const logPrefix = '[ScreenShareControl]';
 
@@ -55,8 +57,7 @@ const dialogVisible: Ref<boolean> = ref(false);
 
 const title = computed(() => (isSharing.value ? '屏幕共享中' : '共享屏幕'));
 
-const startIconName = computed(() => (isSharing.value ? 'screen-sharing' : 'screen-share'));
-const stopIconName = 'screen-share-stopped';
+const startIconName = computed(() => (isSharing.value ? ICON_NAME.ScreenSharing : ICON_NAME.ScreenShare));
 
 onMounted(() => {
   TUIRoomCore.on(ETUIRoomEvents.onWebScreenSharingStopped, stopScreenShare);
@@ -83,7 +84,7 @@ async function toggleScreenShare() {
       ElMessage({
         type: 'warning',
         message: tuiResponse.message,
-        duration: 5000,
+        duration: MESSAGE_DURATION.LONG,
       });
     }
   } catch (error: any) {

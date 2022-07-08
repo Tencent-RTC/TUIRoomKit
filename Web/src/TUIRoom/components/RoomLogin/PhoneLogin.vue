@@ -1,6 +1,6 @@
 <template>
   <div class="phone-login">
-    <input class="input" :placeholder="placeholder" auto-complete="true" v-model="phoneNumber">
+    <input v-model="phoneNumber" class="input" :placeholder="placeholder" auto-complete="true">
     <div class="area-container">
       <svg-icon icon-name="phone-icon" size="medium"></svg-icon>
     </div>
@@ -9,14 +9,13 @@
 
 <script setup lang="ts">
 import SvgIcon from '../common/SvgIcon.vue';
-import VerifyCode from './VerifyCode.vue';
-import { ref,watch} from 'vue';
-const emit = defineEmits(["updatePhoneNumber"]);
-const placeholder = "请输入您的手机号";
+import { ref, watch } from 'vue';
+const emit = defineEmits(['updatePhoneNumber']);
+const placeholder = '请输入您的手机号';
 const phoneNumber = ref('');
 watch(() => phoneNumber.value, (val) => {
   phoneNumber.value = val.replace(/\D/g, '');
-  emit("updatePhoneNumber",phoneNumber.value);
+  emit('updatePhoneNumber', phoneNumber.value);
 });
 </script>
 

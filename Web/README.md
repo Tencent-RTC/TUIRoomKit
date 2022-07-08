@@ -66,8 +66,6 @@
 
 注意：因 TUIRoom 按需引入 element-plus 组件，会导致开发环境路由页面第一次加载时反应较慢，等待 element-plus 按需加载完成即可正常使用。element-plus 按需加载不会影响打包之后的页面加载。
 
-Tips：TUIRoom 完整功能体验，至少需要两个 userId 不同的用户。需要您在两台设备上参考第二步配置 TUIRoom 示例工程并运行代码：
-
 **主持人（userId：anchor）**
 
 - 步骤1、在 home 页面，点击【创建房间】按钮；

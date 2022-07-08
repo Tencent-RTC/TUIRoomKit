@@ -142,7 +142,9 @@ export enum ETUIRoomEvents {
   onUserReplyCallingRoll = 'onUserReplyCallingRoll',  // supported
   onChatRoomMuted = 'onChatRoomMuted',
   onMicrophoneMuted = 'onMicrophoneMuted', // supported
-  onCameraMuted = 'onCameraMuted',
+  onCameraMuted = 'onCameraMuted', // supported
+  onUserChatRoomMuted = 'onUserChatRoomMuted', // supported
+  onUserKickOff = 'onUserKickOff', // supported
 }
 
 /**
@@ -167,6 +169,7 @@ export enum ETUIRoomCoordinatorCommand {
   SendSpeechApplication = 'SendSpeechApplication', // 观众申请上台
   MuteUserMicrophone = 'MuteUserMicrophone', // 主持人禁用观众麦克风，不可拒绝，只能接受
   MuteUserCamera = 'MuteUserCamera', //	主持人禁用观众摄像头，不可拒绝，只能接受
+  MuteUserChatRoom = 'MuteUserChatRoom', // 主持人禁用观众文字聊天，不可拒绝，只能接受
   ReplyCallingRoll = 'ReplyCallingRoll', // 观众回复点名（签到）
   KickOffUser	= 'KickOffUser', //	主持人踢人出房间，不可拒绝，只能接受
 }
@@ -191,8 +194,8 @@ export type TTUIInvitationReceivedParams = {
     inviter: string;
     inviteeList: string[];
     data: string;
-    inviteId: string;
-    groupId: string;
+    inviteID: string;
+    groupID: string;
   };
 }
 
@@ -264,4 +267,12 @@ export type TTUIInvitationTimeoutParams = {
  export type TTUIMethodDataParams = {
   cmd: string,
   [propName: string]: any;
+}
+
+/**
+ * 被 mute 的场景, 主持人全员禁麦/画还是单独禁麦/画
+ */
+export enum ETUIRoomMuteType {
+  MasterMuteAll = 'MasterMuteAll',
+  MasterMuteCurrentUser = 'MasterMuteCurrentUser'
 }

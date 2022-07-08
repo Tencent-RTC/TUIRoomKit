@@ -13,11 +13,13 @@ interface MessageItem {
 
 interface ChatState {
   messageList: MessageItem[];
+  isMuteChatByMater: boolean;
 }
 
 export const useChatStore = defineStore('chat', {
   state: (): ChatState => ({
     messageList: [],
+    isMuteChatByMater: false
   }),
   getters: {
 
@@ -25,6 +27,9 @@ export const useChatStore = defineStore('chat', {
   actions: {
     updateMessageList(message: MessageItem) {
       this.messageList = this.messageList.concat([message]);
+    },
+    setIsMuteChatByMater(isMuteChatByMater: boolean) {
+      this.isMuteChatByMater = isMuteChatByMater;
     },
     reset() {
       this.messageList = [];

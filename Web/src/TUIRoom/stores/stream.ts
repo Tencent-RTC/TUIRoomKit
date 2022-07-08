@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { useBasicStore } from './basic';
 
 export type StreamInfo = {
   userId?: string,
@@ -9,6 +10,10 @@ export type StreamInfo = {
   isScreenStreamAvailable?: boolean,
   audioVolume?: number,
   type?: string,
+  // 主持人侧 remoteStream 有以下属性，用来标示主持人是否对该用户禁画/静音/禁止发文字消息
+  isAudioMutedByMaster?: boolean,
+  isVideoMutedByMaster?: boolean,
+  isChatMutedByMaster?: boolean,
 }
 
 interface StreamState {
@@ -16,6 +21,8 @@ interface StreamState {
   remoteStreamMap: Map<string, StreamInfo>,
   isDefaultOpenCamera: boolean,
   isDefaultOpenMicrophone: boolean,
+  isLocalAudioMuted: boolean,
+  isLocalVideoMuted: boolean,
   hasStartedCamera: boolean,
   hasStartedMicrophone: boolean,
   currentCameraId: string,
@@ -32,6 +39,8 @@ export const useStreamStore = defineStore('stream', {
     remoteStreamMap: new Map(),
     isDefaultOpenCamera: false,
     isDefaultOpenMicrophone: false,
+    isLocalAudioMuted: false,
+    isLocalVideoMuted: false,
     hasStartedCamera: false,
     hasStartedMicrophone: false,
     currentCameraId: '',
@@ -47,16 +56,30 @@ export const useStreamStore = defineStore('stream', {
   },
   actions: {
     addLocalStream(obj: Record<string, any>) {
-      this.localStream = { ...obj, type: 'main' };
+      Object.assign(this.localStream, { ...obj, type: 'main' });
     },
     updateLocalStream(obj: Record<string, any>) {
-      this.localStream = { ...this.localStream, ...obj };
+      Object.assign(this.localStream, obj);
     },
-    addRemoteUser(streamInfo: any) {
+    addRemoteUser(streamInfo: {
+      userId: string,
+      name: string,
+      avatar: string,
+      isAudioStreamAvailable: boolean,
+      isVideoStreamAvailable: boolean,
+      isAudioMutedByMaster: boolean,
+      isVideoMutedByMaster: boolean,
+      isChatMutedByMaster: boolean,
+    }) {
       const {
         userId,
         name,
         avatar,
+        isAudioStreamAvailable,
+        isVideoStreamAvailable,
+        isAudioMutedByMaster,
+        isVideoMutedByMaster,
+        isChatMutedByMaster,
       } = streamInfo;
       if (!userId || userId === this.localStream.userId || userId === `share_${this.localStream.userId}`) {
         return;
@@ -65,8 +88,11 @@ export const useStreamStore = defineStore('stream', {
         userId,
         userName: name,
         userAvatar: avatar,
-        isAudioStreamAvailable: false,
-        isVideoStreamAvailable: false,
+        isAudioStreamAvailable,
+        isVideoStreamAvailable,
+        isAudioMutedByMaster: !!isAudioMutedByMaster,
+        isVideoMutedByMaster: !!isVideoMutedByMaster,
+        isChatMutedByMaster: !!isChatMutedByMaster,
         type: 'main',
       });
     },
@@ -79,10 +105,7 @@ export const useStreamStore = defineStore('stream', {
       if (!originData) {
         return;
       }
-      this.remoteStreamMap.set(`${userId}_main`, {
-        ...originData,
-        isAudioStreamAvailable: available,
-      });
+      this.remoteStreamMap.set(`${userId}_main`, Object.assign(originData, { isAudioStreamAvailable: !!available }));
     },
 
     updateRemoteVideoStream(eventInfo: any) {
@@ -94,10 +117,7 @@ export const useStreamStore = defineStore('stream', {
       if (!originData) {
         return;
       }
-      this.remoteStreamMap.set(`${userId}_main`, {
-        ...originData,
-        isVideoStreamAvailable: available,
-      });
+      this.remoteStreamMap.set(`${userId}_main`, Object.assign(originData, { isVideoStreamAvailable: !!available }));
     },
 
     updateRemoteScreenStream(eventInfo: any) {
@@ -152,18 +172,31 @@ export const useStreamStore = defineStore('stream', {
       if (!roomParam) {
         return;
       }
+      const basicStore = useBasicStore();
       const { isOpenCamera, isOpenMicrophone, defaultCameraId, defaultMicrophoneId, defaultSpeakerId } = roomParam;
       defaultCameraId && this.setCurrentCameraId(defaultCameraId);
       defaultMicrophoneId && this.setCurrentMicrophoneId(defaultMicrophoneId);
       defaultSpeakerId && this.setCurrentSpeakerId(defaultSpeakerId);
-      typeof isOpenCamera === 'boolean' && (this.isDefaultOpenCamera = isOpenCamera);
-      typeof isOpenMicrophone === 'boolean' && (this.isDefaultOpenMicrophone = isOpenMicrophone);
+      // 如果已经开启全员禁言，则忽略默认打开麦克风的设置
+      if (basicStore.isMaster || !basicStore.isMuteAllAudio) {
+        typeof isOpenMicrophone === 'boolean' && (this.isDefaultOpenMicrophone = isOpenMicrophone);
+      }
+      // 如果已经开启全员禁画，则忽略默认打开摄像头的设置
+      if (basicStore.isMaster || !basicStore.isMuteAllVideo) {
+        typeof isOpenCamera === 'boolean' && (this.isDefaultOpenCamera = isOpenCamera);
+      }
     },
     setHasStartedCamera(state: boolean) {
       this.hasStartedCamera = state;
     },
     setHasStartedMicrophone(state: boolean) {
       this.hasStartedMicrophone = state;
+    },
+    setIsLocalAudioMuted(isLocalAudioMuted: boolean) {
+      this.isLocalAudioMuted = isLocalAudioMuted;
+    },
+    setIsLocalVideoMuted(isLocalVideoMuted: boolean) {
+      this.isLocalVideoMuted = isLocalVideoMuted;
     },
     setCameraList(deviceList: {deviceId: string, deviceName: string}[]) {
       this.cameraList = deviceList;
@@ -183,10 +216,51 @@ export const useStreamStore = defineStore('stream', {
         this.setCurrentSpeakerId(deviceList[0].deviceId);
       }
     },
+    // 主持人单个修改用户的音频 mute 状态
+    setMuteUserAudio(userId: string, muted: boolean) {
+      const originData = this.remoteStreamMap.get(`${userId}_main`);
+      if (!originData) {
+        return;
+      }
+      this.remoteStreamMap.set(`${userId}_main`, Object.assign(originData, { isAudioMutedByMaster: muted }));
+    },
+    // 全员禁麦时设置所有人的禁麦状态
+    setMuteAllAudio(muted: boolean) {
+      const remoteStreamList = Array.from(this.remoteStreamMap.values());
+      remoteStreamList.forEach((remoteStream) => {
+        Object.assign(remoteStream, { isAudioMutedByMaster: muted });
+      });
+    },
+    // 主持人单个修改用户的视频 mute 状态
+    setMuteUserVideo(userId: string, muted: boolean) {
+      const originData = this.remoteStreamMap.get(`${userId}_main`);
+      if (!originData) {
+        return;
+      }
+      this.remoteStreamMap.set(`${userId}_main`, Object.assign(originData, { isVideoMutedByMaster: muted }));
+    },
+    // 全员禁画时设置所有人的禁画状态
+    setMuteAllVideo(muted: boolean) {
+      const remoteStreamList = Array.from(this.remoteStreamMap.values());
+      remoteStreamList.forEach((remoteStream) => {
+        Object.assign(remoteStream, { isVideoMutedByMaster: muted });
+      });
+    },
+    // 主持人单个修改用户的发文字消息 mute 状态
+    setMuteUserChat(userId: string, muted: boolean) {
+      const originData = this.remoteStreamMap.get(`${userId}_main`);
+      if (!originData) {
+        return;
+      }
+      this.remoteStreamMap.set(`${userId}_main`, Object.assign(originData, { isChatMutedByMaster: muted }));
+    },
     reset() {
+      this.localStream = {};
       this.remoteStreamMap = new Map();
       this.isDefaultOpenCamera = false;
       this.isDefaultOpenMicrophone = false;
+      this.isLocalAudioMuted = false;
+      this.isLocalVideoMuted = false;
       this.hasStartedCamera = false;
       this.hasStartedMicrophone = false;
     },

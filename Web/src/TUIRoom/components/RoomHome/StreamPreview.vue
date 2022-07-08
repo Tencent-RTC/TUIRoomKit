@@ -45,16 +45,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import TUIRoomCore, { ETUIRoomEvents } from '../../tui-room-core';
 import IconButton from '../common/IconButton.vue';
-import { onBeforeRouteLeave } from 'vue-router';
 import { SettingMode } from '../../constants/render';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
 import VideoSettingTab from '../base/VideoSettingTab.vue';
 import AudioIcon from '../base/AudioIcon.vue';
 import { useStreamStore } from '../../stores/stream';
 import { storeToRefs } from 'pinia';
+import { ICON_NAME } from '../../constants/icon';
 
 const streamStore = useStreamStore();
 const { localStream } = storeToRefs(streamStore);
@@ -77,7 +77,7 @@ const loading = ref(true);
 const isMicMuted = ref(false);
 const isCameraMuted = ref(false);
 
-const cameraIconName = computed(() => (isCameraMuted.value ? 'camera-off' : 'camera-on'));
+const cameraIconName = computed(() => (isCameraMuted.value ? ICON_NAME.CameraOff : ICON_NAME.CameraOn));
 
 function toggleMuteAudio() {
   isMicMuted.value = !isMicMuted.value;
@@ -86,8 +86,12 @@ function toggleMuteAudio() {
 
 function toggleMuteVideo() {
   isCameraMuted.value = !isCameraMuted.value;
-  TUIRoomCore.muteLocalCamera(isCameraMuted.value);
   tuiRoomParam.isOpenCamera = !isCameraMuted.value;
+  if (isCameraMuted.value) {
+    TUIRoomCore.stopCameraPreview();
+  } else {
+    TUIRoomCore.startCameraPreview(streamPreviewRef.value);
+  }
 }
 
 function getRoomParam() {
@@ -116,7 +120,7 @@ onMounted(async () => {
   TUIRoomCore.on(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);
 });
 
-onBeforeRouteLeave(async () => {
+onBeforeUnmount(async () => {
   await TUIRoomCore.stopCameraPreview();
   await TUIRoomCore.stopMicrophone();
   TUIRoomCore.off(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);

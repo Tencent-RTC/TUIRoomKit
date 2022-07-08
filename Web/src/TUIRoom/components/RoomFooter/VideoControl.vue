@@ -12,6 +12,7 @@
       title="摄像头"
       :icon-name="iconName"
       :has-more="true"
+      :disabled="isLocalVideoIconDisable"
       @click-icon="toggleMuteVideo"
       @click-more="handleMore"
     />
@@ -24,39 +25,64 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, watch, onMounted, onUnmounted, Ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { ElMessage } from 'element-plus';
+
 import IconButton from '../common/IconButton.vue';
 import VideoSettingTab from '../base/VideoSettingTab.vue';
-import { ref, computed, watch, onMounted, onUnmounted, Ref } from 'vue';
 import TUIRoomCore from '../../tui-room-core';
-import { useStreamStore } from '../../stores/stream';
-import { storeToRefs } from 'pinia';
 
+import { useBasicStore } from '../../stores/basic';
+import { useStreamStore } from '../../stores/stream';
+import { ICON_NAME } from '../../constants/icon';
+import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
+
+const basicStore = useBasicStore();
 const streamStore = useStreamStore();
 
-const { isDefaultOpenCamera, hasStartedCamera } = storeToRefs(streamStore);
+const { isDefaultOpenCamera, hasStartedCamera, localStream, isLocalVideoMuted } = storeToRefs(streamStore);
+const { isLocalVideoIconDisable } = storeToRefs(basicStore);
 
-const isMuted: Ref<boolean> = ref(false);
 const showVideoSettingTab: Ref<boolean> = ref(false);
 const videoIconButtonRef = ref<InstanceType<typeof IconButton>>();
 const videoSettingRef = ref<InstanceType<typeof VideoSettingTab>>();
 
-const iconName = computed((): string => (isMuted.value ? 'camera-off' : 'camera-on'));
+const iconName = computed(() => {
+  if (isLocalVideoIconDisable.value) {
+    return ICON_NAME.CameraOffDisabled;
+  }
+  return isLocalVideoMuted.value ? ICON_NAME.CameraOff : ICON_NAME.CameraOn;
+});
 
 watch(isDefaultOpenCamera, (val) => {
-  isMuted.value = !val;
+  isLocalVideoMuted.value = !val;
+}, { immediate: true });
+
+watch(localStream, (val) => {
+  isLocalVideoMuted.value = !val.isVideoStreamAvailable;
 }, { immediate: true });
 
 function toggleMuteVideo() {
-  isMuted.value = !isMuted.value;
-  if (!isMuted.value && !hasStartedCamera.value) {
-    const previewDom = document.getElementById(`${streamStore.localStream.userId}_main`);
-    previewDom && TUIRoomCore.startCameraPreview(previewDom);
-    streamStore.setHasStartedCamera(true);
+  if (isLocalVideoIconDisable.value) {
+    ElMessage({
+      type: 'warning',
+      message: WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_MUTE_ALL,
+      duration: MESSAGE_DURATION.NORMAL,
+    });
     return;
   }
-  TUIRoomCore.muteLocalCamera(isMuted.value);
+
+  streamStore.setIsLocalVideoMuted(!isLocalVideoMuted.value);
+  // 关闭本地摄像头的时候应该熄灭摄像头灯，使用 stopCameraPreview 方法
+  if (isLocalVideoMuted.value) {
+    TUIRoomCore.stopCameraPreview();
+  } else {
+    const previewDom = document.getElementById(`${streamStore.localStream.userId}_main`);
+    previewDom && TUIRoomCore.startCameraPreview(previewDom);
+  }
   streamStore.updateLocalStream({
-    isVideoStreamAvailable: !isMuted.value,
+    isVideoStreamAvailable: !isLocalVideoMuted.value,
   });
   showVideoSettingTab.value = false;
 }

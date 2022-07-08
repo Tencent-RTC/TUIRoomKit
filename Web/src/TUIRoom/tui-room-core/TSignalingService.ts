@@ -182,11 +182,11 @@ class TSignalingService {
         })
         .then((tsResponse: Record<string, any>) => {
           logger.log(
-            `${TSignalingService.logPrefix}invite cache resolve/reject`
+            `${TSignalingService.logPrefix}invite cache resolve/reject: ${JSON.stringify(tsResponse)}`
           );
           const value: TTUIInviteInfo = {
             type: data?.cmd,
-            inviteId: tsResponse.inviteId,
+            inviteId: tsResponse.inviteID,
             resolve,
             reject,
           };
@@ -219,7 +219,7 @@ class TSignalingService {
       );
       const inviteId = this.inviteInfoMap?.get(key)?.inviteId;
       const tsResponse = await this.tsignaling.accept({
-        inviteId,
+        inviteID: inviteId,
         data: this.setTSignalingData(data),
       });
       this.inviteInfoMap?.delete(key);
@@ -423,14 +423,19 @@ class TSignalingService {
 
   // 信令---新的邀请
   private onNewInvitationReceived(event: TTUIInvitationReceivedParams) {
+    logger.debug(`${TSignalingService.logPrefix}onNewInvitationReceived: ${JSON.stringify(event)}`);
     const {
-      data: { inviteId, data, inviter },
+      data: {
+        inviteID,
+        data,
+        inviter
+      }
     } = event;
     const inviteData = safelyParseJSON(data);
     const key = this.getInviteInfoMapKey(inviter, inviteData?.data?.cmd);
     const value = {
       type: inviteData?.data?.cmd,
-      inviteId,
+      inviteId: inviteID,
       resolve: () => {},
       reject: () => {},
     };
@@ -464,6 +469,29 @@ class TSignalingService {
           mute: inviteData?.data?.mute,
         });
         break;
+      case ETUIRoomCoordinatorCommand.MuteUserCamera:
+        this.inviteInfoMap.set(key, value);
+        this.emitter?.emit(ETUIRoomEvents.onCameraMuted, {
+          inviterId: inviter,
+          type: inviteData?.data?.cmd,
+          mute: inviteData?.data?.mute,
+        });
+        break;
+      case ETUIRoomCoordinatorCommand.MuteUserChatRoom:
+        this.inviteInfoMap.set(key, value);
+        this.emitter?.emit(ETUIRoomEvents.onUserChatRoomMuted, {
+          inviterId: inviter,
+          type: inviteData?.data?.cmd,
+          mute: inviteData?.data?.mute,
+        });
+        break;
+      case ETUIRoomCoordinatorCommand.KickOffUser:
+        this.inviteInfoMap.set(key, value);
+        this.emitter?.emit(ETUIRoomEvents.onUserKickOff, {
+          inviterId: inviter,
+          type: inviteData?.data?.cmd,
+        });
+        break;
       default:
         logger.warn(
           `${TSignalingService.logPrefix}onNewInvitationReceived ignored cmd:`,
@@ -475,7 +503,7 @@ class TSignalingService {
 
   // 信令---对方已接受
   private onInviteeAccepted(event: TTUIInviteeAcceptedParams) {
-    logger.warn(`${TSignalingService.logPrefix}onInviteeAccepted:`, this);
+    logger.warn(`${TSignalingService.logPrefix}onInviteeAccepted:`, JSON.stringify(event));
     const {
       data: { data, invitee },
     } = event;
@@ -487,6 +515,9 @@ class TSignalingService {
       case ETUIRoomCoordinatorCommand.SendSpeechInvitation:
       case ETUIRoomCoordinatorCommand.SendSpeechApplication:
       case ETUIRoomCoordinatorCommand.MuteUserMicrophone:
+      case ETUIRoomCoordinatorCommand.MuteUserCamera:
+      case ETUIRoomCoordinatorCommand.MuteUserChatRoom:
+      case ETUIRoomCoordinatorCommand.KickOffUser:
         tsResponse = {
           code: ETUISignalStatus.ACCEPTED,
           data: {

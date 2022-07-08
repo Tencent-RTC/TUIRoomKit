@@ -19,6 +19,8 @@ declare module 'tim-js-sdk' {
   export default TIM;
 }
 
+declare const Aegis: any;
+
 interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string;
   readonly VITE_RUNTIME_ENV: string;

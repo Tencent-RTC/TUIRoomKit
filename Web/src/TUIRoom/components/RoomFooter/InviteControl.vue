@@ -13,11 +13,12 @@ import { computed } from 'vue';
 import IconButton from '../common/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
+import { ICON_NAME } from '../../constants/icon';
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);
 
-const iconName = computed(() => (sidebarName.value === 'invite' ? 'invite-active' : 'invite'));
+const iconName = computed(() => (sidebarName.value === 'invite' ? ICON_NAME.InviteActive : ICON_NAME.Invite));
 
 function toggleInviteSidebar() {
   if (basicStore.setSidebarOpenStatus && basicStore.sidebarName === 'invite') {

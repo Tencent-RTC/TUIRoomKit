@@ -10,13 +10,12 @@
 <script setup lang="ts">
 import { ref, watch} from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
-import VerifyCode from './VerifyCode.vue';
 
 const emit = defineEmits(["updateMailAddress"]);
 const placeholder = "请输入邮箱";
 const mailAddress = ref('');
 watch(() => mailAddress.value, (val) => {
-  emit("updateMailAddress",val);
+  emit("updateMailAddress", val);
 });
 </script>
 

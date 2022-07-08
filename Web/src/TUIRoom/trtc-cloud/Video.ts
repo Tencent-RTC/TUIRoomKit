@@ -69,7 +69,7 @@ class Video extends MixinsClass(BaseCommon) {
         }
         if (this.localStream) {
           const tempStream = this.TRTC.createStream(streamConfig);
-          this.videoEncodeParam && tempStream.setVideoProfile(this.videoEncodeParam);
+          this.videoEncodeParam && await tempStream.setVideoProfile(this.videoEncodeParam);
           await tempStream.initialize();
           const localVideoTrack = tempStream.getVideoTrack();
           await this.localStream.addTrack(localVideoTrack);
@@ -177,7 +177,7 @@ class Video extends MixinsClass(BaseCommon) {
             this.client && this.client.setRemoteVideoStreamType(remoteStream, tempStreamType);
           }
           if (remoteStream) {
-            remoteStream.play(view);
+            this.playStream(remoteStream, view);
           }
         }
       } else {
@@ -278,6 +278,13 @@ class Video extends MixinsClass(BaseCommon) {
     }
   }
 
+  /**
+   * 设置本地流渲染参数
+   * @param {TRTCRenderParams} params 本地流渲染参数
+   * @param {TRTCVideoRotation} rotation 旋转角度
+   * @param {TRTCVideoFillMode} fillMode 填充模式
+   * @param {TRTCVideoMirrorType} mirrorType 画面渲染镜像
+   */
   setLocalRenderParams(params: TRTCRenderParams) {
     try {
       const playOption: PlayOption = {};
@@ -302,6 +309,38 @@ class Video extends MixinsClass(BaseCommon) {
       }
     } catch (error) {
       this.callFunctionErrorManage(error, 'setLocalRenderParams');
+    }
+  }
+
+  /**
+   * 设置远端流渲染参数
+   * @param userId 流 userId
+   * @param streamType 流类型
+   * @param {TRTCRenderParams} params 远端流渲染参数
+   * @param {TRTCVideoRotation} rotation 旋转角度
+   * @param {TRTCVideoFillMode} fillMode 填充模式
+   * @param {TRTCVideoMirrorType} mirrorType 画面渲染镜像
+   */
+  setRemoteRenderParams(userId: string, streamType: string, params: TRTCRenderParams) {
+    try {
+      const playOption: PlayOption = {};
+      if (params.mirrorType === TRTCVideoMirrorType.TRTCVideoMirrorType_Enable) {
+        playOption.mirror = true;
+      }
+      if (params.mirrorType === TRTCVideoMirrorType.TRTCVideoMirrorType_Disable) {
+        playOption.mirror = false;
+      }
+      if (params.fillMode === TRTCVideoFillMode.TRTCVideoFillMode_Fill) {
+        playOption.objectFit = 'cover';
+      }
+      if (params.fillMode === TRTCVideoFillMode.TRTCVideoFillMode_Fit) {
+        playOption.objectFit = 'contain';
+      }
+      const view = this.playViewMap.get(`${userId}_${streamType}`);
+      const remoteStream = this.remoteStreamMap.get(`${userId}-${streamType}`);
+      this.playStream(remoteStream, view, playOption);
+    } catch (error) {
+      this.callFunctionErrorManage(error, 'setRemoteRenderParams');
     }
   }
 
