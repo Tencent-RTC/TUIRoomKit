@@ -353,8 +353,8 @@ const onUserEnterRoom = (streamInfo: any) => {
   // 本端为主持人，则记录用户禁言禁画信息
   if (isMaster.value) {
     Object.assign(streamInfo, {
-      isAudioMutedByMaster: isMuteAllAudio,
-      isVideoMutedByMaster: isMuteAllVideo,
+      isAudioMutedByMaster: isMuteAllAudio.value,
+      isVideoMutedByMaster: isMuteAllVideo.value,
       isChatMutedByMaster: false,
     });
   }
@@ -443,6 +443,9 @@ watch(isDefaultOpenCamera, async (val) => {
 
 watch(isDefaultOpenMicrophone, async (val) => {
   if (val && !isLocalAudioIconDisable.value) {
+    // 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
+    await TUIRoomCore.startMicrophone();
+    streamStore.setHasStartedMicrophone(true);
     const microphoneList = await TUIRoomCore.getMicrophoneList();
     if (!streamStore.currentMicrophoneId) {
       streamStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
@@ -451,8 +454,6 @@ watch(isDefaultOpenMicrophone, async (val) => {
       streamStore.setCurrentSpeakerId(microphoneList[0].deviceId);
     }
     await TUIRoomCore.setCurrentMicrophone(streamStore.currentMicrophoneId);
-    await TUIRoomCore.startMicrophone();
-    streamStore.setHasStartedMicrophone(true);
   }
 });
 
@@ -522,7 +523,7 @@ onUnmounted(() => {
   transform: translate(-50%);
   top: 48px;
   border-radius: 0 0 4px 4px;
-  svg {
+  * {
     transform: rotate(180deg);
   }
 }
@@ -534,7 +535,7 @@ onUnmounted(() => {
   transform: translate(-50%);
   top: calc((100% - 148px) / 2 + 58px);
   border-radius: 4px 0 0 4px;
-  svg {
+  * {
     transform: rotate(90deg);
   }
 }
@@ -546,7 +547,7 @@ onUnmounted(() => {
   transform: translate(-50%);
   top: calc((100% - 148px) / 2 + 58px);
   border-radius: 4px 0 0 4px;
-  svg {
+  * {
     transform: rotate(270deg);
   }
 }

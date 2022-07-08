@@ -69,7 +69,7 @@ class Video extends MixinsClass(BaseCommon) {
         }
         if (this.localStream) {
           const tempStream = this.TRTC.createStream(streamConfig);
-          this.videoEncodeParam && tempStream.setVideoProfile(this.videoEncodeParam);
+          this.videoEncodeParam && await tempStream.setVideoProfile(this.videoEncodeParam);
           await tempStream.initialize();
           const localVideoTrack = tempStream.getVideoTrack();
           await this.localStream.addTrack(localVideoTrack);

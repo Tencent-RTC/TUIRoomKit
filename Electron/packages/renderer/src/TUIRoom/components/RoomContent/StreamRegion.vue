@@ -94,14 +94,11 @@ watch(
       if (userIdEl) {
         logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
         TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
-        // Web 端屏幕分享使用 contain 模式播放
-        if (isScreenStream.value) {
-          TUIRoomCore.setRemoteVideoFillMode(
-            props.stream.userId as string,
-            props.stream.type as string,
-            TRTCVideoFillMode.TRTCVideoFillMode_Fit,
-          );
-        }
+        TUIRoomCore.setRemoteVideoFillMode(
+          props.stream.userId as string,
+          props.stream.type as string,
+          TRTCVideoFillMode.TRTCVideoFillMode_Fit,
+        );
       }
     }
   },
@@ -132,7 +129,10 @@ watch(
       const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
       if (userIdEl) {
         if (basicStore.userId === props.stream.userId) {
-          TUIRoomCore.startCameraPreview(userIdEl);
+          // 只有当本地视频流是打开状态的时候，才重新播放本地流
+          if (props.stream.isVideoStreamAvailable) {
+            TUIRoomCore.startCameraPreview(userIdEl);
+          }
         } else {
           if (props.stream.type === 'main') {
             logger.debug(`${logPrefix}watch enlargeDomId:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);

@@ -33,7 +33,7 @@ import TUIRoomCore, {
 
 import { debounce, throttle } from './utils/utils';
 import logger from './tui-room-core/common/logger';
-import { isUploadAegis, aegisId } from './utils/aegis';
+import TUIRoomAegis from './utils/aegis';
 import { MESSAGE_DURATION } from './constants/message';
 
 defineExpose({
@@ -151,6 +151,7 @@ async function createRoom(
     code: 0,
     message: 'create room success',
   });
+  TUIRoomAegis.reportEvent({ name: 'createRoom', ext1: 'createRoom-success' });
 }
 
 async function enterRoom(roomId: number, roomParam?: RoomParam) {
@@ -166,6 +167,7 @@ async function enterRoom(roomId: number, roomParam?: RoomParam) {
     code: 0,
     message: 'enter room success',
   });
+  TUIRoomAegis.reportEvent({ name: 'enterRoom', ext1: 'enterRoom-success' });
 }
 
 const onUserVoiceVolume = (eventInfo: []) => {
@@ -232,8 +234,11 @@ const onMicrophoneMuted = (data: {mute: boolean, muteType: ETUIRoomMuteType}) =>
     if (data.mute) {
       streamStore.setIsLocalAudioMuted(true);
       TUIRoomCore.muteLocalMicrophone(true);
+      // 主持人开启全员禁言时，单独打开再关闭单人的麦克风，此时对应用户的麦克风状态为无法操作
+      basicStore.setCanControlSelfAudio(!basicStore.isMuteAllAudio);
+    } else {
+      basicStore.setCanControlSelfAudio(true);
     }
-    basicStore.setCanControlSelfAudio(true);
   }
 };
 
@@ -264,8 +269,11 @@ const onCameraMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
     if (data.mute) {
       streamStore.setIsLocalVideoMuted(true);
       TUIRoomCore.muteLocalCamera(true);
+      // 主持人开启全员禁画时，单独打开再关闭单人的摄像头，此时对应用户的摄像头状态为无法操作
+      basicStore.setCanControlSelfVideo(!basicStore.isMuteAllVideo);
+    } else {
+      basicStore.setCanControlSelfVideo(true);
     }
-    basicStore.setCanControlSelfVideo(true);
   }
 };
 
@@ -281,7 +289,7 @@ const onUserChatRoomMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) 
   }
 };
 
-const onUserKickOff = async (data: {}) => {
+const onUserKickOff = async () => {
   try {
     const response = await TUIRoomCore.exitRoom();
     await TUIRoomCore.logout();
@@ -321,44 +329,12 @@ onUnmounted(async () => {
   TUIRoomCore.off(ETUIRoomEvents.onUserKickOff, onUserKickOff);
 });
 
-let TUIRoomAegis: any = null;
-
-onMounted(() => {
-  if (!isUploadAegis) {
-    return;
-  }
-  const script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = 'https://cdn-go.cn/aegis/aegis-sdk/latest/aegis.min.js';
-  document.getElementsByTagName('head')[0].appendChild(script);
-
-  script.onload = () => {
-    // eslint-disable-next-line no-undef
-    TUIRoomAegis = new Aegis({
-      id: aegisId,
-      uin: '',
-      reportApiSpeed: true, // 接口测速
-      reportAssetSpeed: true, // 静态资源测速
-      spa: true, // spa 页面开启
-    });
-    if (sdkAppId.value) {
-      TUIRoomAegis.reportEvent({
-        name: 'loaded',
-        ext1: 'loaded-success',
-        ext2: 'webTUIRoom',
-        ext3: sdkAppId.value,
-      });
-    }
-  };
-});
-
 watch(sdkAppId, (val) => {
-  if (!val && TUIRoomAegis) {
+  if (val) {
+    TUIRoomAegis.setSdkAppId(val);
     TUIRoomAegis.reportEvent({
       name: 'loaded',
       ext1: 'loaded-success',
-      ext2: 'webTUIRoom',
-      ext3: val,
     });
   }
 });
