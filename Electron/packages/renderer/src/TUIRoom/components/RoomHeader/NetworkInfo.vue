@@ -35,6 +35,7 @@
 import { ref, Ref } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
+import TUIRoomAegis from '../../utils/aegis';
 
 const networkDes = ['状态未知', '状态极佳', '状态较好', '状态一般', '状态差', '状态极差', '断开连接'];
 
@@ -59,6 +60,7 @@ function handleClickNetworkIcon() {
     document.removeEventListener('click', handleDocumentClick, false);
     showNetworkInfo.value = false;
   }
+  TUIRoomAegis.reportEvent({ name: 'networkInfo', ext1: 'networkInfo' });
 }
 
 function handleDocumentClick(event: MouseEvent) {

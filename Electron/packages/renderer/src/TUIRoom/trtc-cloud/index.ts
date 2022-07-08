@@ -531,10 +531,19 @@ class TRTCCloud extends MixinsClass(
   handleStreamRemoved(event: {
     stream: {
       getUserId: () => string;
+      getType: () => string;
     };
   }) {
-    const userId = event.stream.getUserId();
-    this.emit('onUserVideoAvailable', userId, 0);
+    const remoteStream =  event.stream;
+    const userId = remoteStream.getUserId();
+    const streamType = remoteStream.getType();
+    if (streamType === 'main') {
+      this.emit('onUserAudioAvailable', userId, 0);
+      this.emit('onUserVideoAvailable', userId, 0);
+    } else if (streamType === 'auxiliary') {
+      this.emit('onUserSubStreamAvailable', userId, 0);
+    }
+    this.remoteStreamMap.delete(`${userId}-${streamType}`);
   }
 
   handleStreamUpdated(event: {

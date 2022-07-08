@@ -1,6 +1,6 @@
 # TUIRoom Electron 示例工程快速跑通
 
-本文档主要介绍如何快速跑通 TUIRoom Electron 示例工程，体验多人音视频互动
+本文档主要介绍如何快速跑通 TUIRoom Electron 示例工程，体验多人音视频互动，更详细的TUIRoom Electron组件接入流程，请点击腾讯云官网文档：[TUIRoom 组件 Web 接入说明](https://cloud.tencent.com/document/product/647/75694)...
 
 ## 目录结构
 

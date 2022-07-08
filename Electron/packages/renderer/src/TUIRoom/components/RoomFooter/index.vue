@@ -1,17 +1,20 @@
 <template>
   <div class="footer-container">
     <div class="left-container">
-      <audio-control></audio-control>
-      <video-control></video-control>
+      <audio-control @click="report('audioControl')"></audio-control>
+      <video-control @click="report('videoControl')"></video-control>
     </div>
     <div class="center-container">
-      <screen-share-control></screen-share-control>
-      <full-screen-control></full-screen-control>
-      <manage-member-control v-if="basicStore.role === ETUIRoomRole.MASTER"></manage-member-control>
-      <invite-control></invite-control>
-      <chat-control></chat-control>
-      <more-control></more-control>
-      <setting-control></setting-control>
+      <screen-share-control @click="report('screenShareControl')"></screen-share-control>
+      <full-screen-control @click="report('fullScreenControl')"></full-screen-control>
+      <manage-member-control
+        v-if="basicStore.role === ETUIRoomRole.MASTER"
+        @click="report('manageMemberControl')"
+      ></manage-member-control>
+      <invite-control @click="report('inviteControl')"></invite-control>
+      <chat-control @click="report('chatControl')"></chat-control>
+      <more-control @click="report('moreControl')"></more-control>
+      <setting-control @click="report('settingControl')"></setting-control>
     </div>
     <div class="right-container">
       <end-control
@@ -37,6 +40,7 @@ import SettingControl from './SettingControl.vue';
 import EndControl from './EndControl.vue';
 
 import { useBasicStore } from '../../stores/basic';
+import TUIRoomAegis from '../../utils/aegis';
 
 // const props = defineProps({
 //   roomRef: HTMLElement,
@@ -46,11 +50,17 @@ const emit = defineEmits(['onRoomDestroy', 'onRoomExit']);
 
 const onRoomDestroy = (info: { code: number; message: string }) => {
   emit('onRoomDestroy', info);
+  TUIRoomAegis.reportEvent({ name: 'destroyRoom', ext1: 'destroyRoom-success' });
 };
 
 const onRoomExit = (info: { code: number; message: string }) => {
   emit('onRoomExit', info);
+  TUIRoomAegis.reportEvent({ name: 'exitRoom', ext1: 'exitRoom-success' });
 };
+
+function report(name: string) {
+  TUIRoomAegis.reportEvent({ name, ext1: name });
+}
 </script>
 
 <style lang="scss" scoped>

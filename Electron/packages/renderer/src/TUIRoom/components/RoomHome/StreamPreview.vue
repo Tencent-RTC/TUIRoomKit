@@ -88,9 +88,9 @@ function toggleMuteVideo() {
   isCameraMuted.value = !isCameraMuted.value;
   tuiRoomParam.isOpenCamera = !isCameraMuted.value;
   if (isCameraMuted.value) {
-    TUIRoomCore.stopCameraDeviceTest();
+    TUIRoomCore.stopCameraPreview();
   } else {
-    TUIRoomCore.startCameraDeviceTest(streamPreviewRef.value);
+    TUIRoomCore.startCameraPreview(streamPreviewRef.value);
   }
 }
 
@@ -113,7 +113,7 @@ onMounted(async () => {
   streamStore.setCurrentSpeakerId(microphoneList[0].deviceId);
   TUIRoomCore.setCurrentCamera(cameraList[0].deviceId);
   TUIRoomCore.setCurrentMicrophone(microphoneList[0].deviceId);
-  await TUIRoomCore.startCameraDeviceTest(streamPreviewRef.value);
+  await TUIRoomCore.startCameraPreview(streamPreviewRef.value);
   TUIRoomCore.enableAudioVolumeEvaluation(100);
   await TUIRoomCore.startMicrophone();
   loading.value = false;

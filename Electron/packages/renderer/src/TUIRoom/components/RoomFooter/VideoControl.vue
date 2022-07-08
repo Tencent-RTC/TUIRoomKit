@@ -74,13 +74,13 @@ function toggleMuteVideo() {
   }
 
   streamStore.setIsLocalVideoMuted(!isLocalVideoMuted.value);
-  if (!isLocalVideoMuted.value && !hasStartedCamera.value) {
+  // 关闭本地摄像头的时候应该熄灭摄像头灯，使用 stopCameraPreview 方法
+  if (isLocalVideoMuted.value) {
+    TUIRoomCore.stopCameraPreview();
+  } else {
     const previewDom = document.getElementById(`${streamStore.localStream.userId}_main`);
     previewDom && TUIRoomCore.startCameraPreview(previewDom);
-    streamStore.setHasStartedCamera(true);
-    return;
   }
-  TUIRoomCore.muteLocalCamera(isLocalVideoMuted.value);
   streamStore.updateLocalStream({
     isVideoStreamAvailable: !isLocalVideoMuted.value,
   });
