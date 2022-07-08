@@ -13,13 +13,14 @@ import {
   TRTCDeviceState,
   TRTCQualityInfo,
   TRTCStatistics,
+  TRTCVideoFillMode,
 } from './trtc_define';
 // @ts-ignore
 import TIM from 'tim-js-sdk';
 import logger from './common/logger';
 import Event from './common/emitter/event';
 import { safelyParseJSON, simpleClone } from './utils/utils';
-import { ETUISpeechMode, ETUIStreamType, ETUIRoomEvents, ETUIRoomRole } from './types.d';
+import { ETUISpeechMode, ETUIStreamType, ETUIRoomEvents, ETUIRoomRole, ETUIRoomMuteType } from './types.d';
 import { TUIRoomErrorCode, TUIRoomErrorMessage } from './constant';
 import TUIRoomUser from './base/TUIRoomUser';
 import TUIRoomError from './base/TUIRoomError';
@@ -125,6 +126,9 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     this.onCallingRollStopped = this.onCallingRollStopped.bind(this);
     this.onUserReplyCallingRoll = this.onUserReplyCallingRoll.bind(this);
     this.onMicrophoneMuted = this.onMicrophoneMuted.bind(this);
+    this.onCameraMuted = this.onCameraMuted.bind(this);
+    this.onUserChatRoomMuted = this.onUserChatRoomMuted.bind(this);
+    this.onUserKickOff = this.onUserKickOff.bind(this);
     this.onReceiveSpeechInvitation = this.onReceiveSpeechInvitation.bind(this);
     this.onReceiveInvitationCancelled =
       this.onReceiveInvitationCancelled.bind(this);
@@ -287,7 +291,6 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
       roomId,
       mode,
     });
-
     // 初始化 Room Coordinator
     this.roomCoordinator.init({ roomId, tim: this.tim });
 
@@ -553,6 +556,16 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   setVideoMirror(mirror: boolean) {
     this.trtcService.setVideoMirror(mirror);
   }
+
+  /**
+   * 渲染模式设置：设置远端视频渲染模式
+   * @param userId 用户 Id
+   * @param streamType 流类型
+   * @param fillMode 填充模式
+   */
+   setRemoteVideoFillMode(userId: string, streamType: string, fillMode: TRTCVideoFillMode) {
+    this.trtcService.setRemoteVideoFillMode(userId, streamType, fillMode);
+   }
 
   /**
    * 静默或取消静默本地摄像头
@@ -946,11 +959,15 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     logger.log(
       `${TUIRoomCore.logPrefix}onRemoteUserEnterRoom userId: ${userId}`
     );
-    const newUser = new TUIRoomUser();
-    newUser.userId = userId;
-
     const userProfile = await this.timService.getGroupMemberProfile([userId]);
     const userInfo = userProfile.data[0];
+
+    let newUser  = this.state.userMap.get(userId);
+    if (!newUser) {
+      newUser = new TUIRoomUser();
+      newUser.userId = userId;
+    }
+
     if (userInfo) {
       newUser.name = userInfo.nick;
       newUser.avatar = userInfo.avatar;
@@ -1206,6 +1223,10 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     return this.roomCoordinator.muteChatRoom(mute);
   }
 
+  async muteUserChatRoom(userId: string, mute: boolean): Promise<TUIRoomResponse<any>> {
+    return this.roomCoordinator.muteUserChatRoom(userId, mute);
+  }
+
   async kickOffUser(userId: string): Promise<TUIRoomResponse<any>> {
     return this.roomCoordinator.kickOffUser(userId);
   }
@@ -1297,6 +1318,18 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
       this.onMicrophoneMuted
     );
     this.roomCoordinator.on(
+      ETUIRoomEvents.onCameraMuted,
+      this.onCameraMuted
+    );
+    this.roomCoordinator.on(
+      ETUIRoomEvents.onUserChatRoomMuted,
+      this.onUserChatRoomMuted
+    );
+    this.roomCoordinator.on(
+      ETUIRoomEvents.onUserKickOff,
+      this.onUserKickOff
+    );
+    this.roomCoordinator.on(
       ETUIRoomEvents.onReceiveSpeechInvitation,
       this.onReceiveSpeechInvitation
     );
@@ -1334,6 +1367,18 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     this.roomCoordinator.off(
       ETUIRoomEvents.onMicrophoneMuted,
       this.onMicrophoneMuted
+    );
+    this.roomCoordinator.off(
+      ETUIRoomEvents.onCameraMuted,
+      this.onCameraMuted
+    );
+    this.roomCoordinator.off(
+      ETUIRoomEvents.onUserChatRoomMuted,
+      this.onUserChatRoomMuted
+    );
+    this.roomCoordinator.off(
+      ETUIRoomEvents.onUserKickOff,
+      this.onUserKickOff
     );
     this.roomCoordinator.off(
       ETUIRoomEvents.onReceiveSpeechInvitation,
@@ -1385,12 +1430,37 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   }
 
   // 开启/关闭麦克风
-  private onMicrophoneMuted(event: Record<string, any>) {
-    logger.log(`${TUIRoomCore.logPrefix}onMicrophoneMuted`, event);
-    this.muteLocalMicrophone(event.data);
+  private onMicrophoneMuted(data: { mute: boolean; muteType: ETUIRoomMuteType }) {
+    logger.log(`${TUIRoomCore.logPrefix}onMicrophoneMuted`, JSON.stringify(data));
     this.emitter.emit(
       ETUIRoomEvents.onMicrophoneMuted,
-      simpleClone(event.data)
+      data
+    );
+  }
+
+  // 开启/关闭麦摄像头画面
+  private onCameraMuted(data: { mute: boolean; muteType: ETUIRoomMuteType }) {
+    logger.log(`${TUIRoomCore.logPrefix}onCameraMuted`, JSON.stringify(data));
+    this.emitter.emit(
+      ETUIRoomEvents.onCameraMuted,
+      data
+    );
+  }
+
+  // 开启/禁用文字聊天
+  private onUserChatRoomMuted(data: { mute: boolean; muteType: ETUIRoomMuteType }) {
+    logger.log(`${TUIRoomCore.logPrefix}onUserChatRoomMuted`, JSON.stringify(data));
+    this.emitter.emit(
+      ETUIRoomEvents.onUserChatRoomMuted,
+      data
+    );
+  }
+
+  // 被踢出房间
+  private onUserKickOff(data: {}) {
+    this.emitter.emit(
+      ETUIRoomEvents.onUserKickOff,
+      data
     );
   }
 

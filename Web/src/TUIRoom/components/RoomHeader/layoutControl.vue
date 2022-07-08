@@ -74,6 +74,7 @@ import { LAYOUT } from '../../constants/render';
 import { useBasicStore } from '../../stores/basic';
 import { useStreamStore } from '../../stores/stream';
 import { storeToRefs } from 'pinia';
+import TUIRoomAegis from '../../utils/aegis';
 
 const basicStore = useBasicStore();
 const { layout } = storeToRefs(basicStore);
@@ -85,6 +86,7 @@ const layoutList:Ref<Node|null> = ref(null);
 
 function handleClick(layout: any) {
   basicStore.setLayout(layout);
+  TUIRoomAegis.reportEvent({ name: 'layout', ext1: layout });
 }
 
 function handleClickLayoutIcon() {

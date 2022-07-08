@@ -25,6 +25,7 @@ export const TUIRoomErrorCode = {
   WEB_SCREEN_SHARE_USER_DENY: -1023,
   WEB_SCREEN_SHARE_UNKNOWN: -1024,
   GET_GROUP_MEMBER_PROFILE_ERROR: -1025,
+  CHANGE_ALL_CAMERA_MUTE_ERROR: -1026,
   ROOM_BEEN_DESTROYED: -1997,
   NO_PRIVILEGE: -1998,
   UNKNOWN_ERROR: -1999,
@@ -63,6 +64,7 @@ export const TUIRoomErrorMessage = {
   SET_ROOM_CONTROL_CONFIG_ERROR: '设置房间控制配置失败',
   GROUP_NOT_EXIST_ERROR: '群组不存在',
   CHANGE_ALL_MIC_MUTE_ERROR: '修改全员禁麦克风状态失败',
+  CHANGE_ALL_CAMERA_MUTE_ERROR: '修改全员禁画状态失败',
   CHANGE_GROUP_OWNER: '转移群失败',
   WEB_SCREEN_SHARE_SYSTEM_DENY: '系统禁止当前浏览器获取屏幕内容',
   WEB_SCREEN_SHARE_USER_DENY: '用户拒绝/取消屏幕分享',
@@ -84,3 +86,5 @@ export const TUIRoomErrorMessage = {
 export const TSignalingConfig = {
   timeout: 60,
 };
+
+export const TIM_ROOM_PREFIX = '';

@@ -12,10 +12,15 @@
       title="麦克风"
       :has-more="true"
       :show-more="showAudioSettingTab"
+      :disabled="isLocalAudioIconDisable"
       @click-icon="toggleMuteAudio"
       @click-more="handleMore"
     >
-      <audio-icon :audio-volume="localStream.audioVolume" :is-muted="isMuted"></audio-icon>
+      <audio-icon
+        :audio-volume="localStream.audioVolume"
+        :is-muted="isLocalAudioMuted"
+        :is-disabled="isLocalAudioIconDisable"
+      ></audio-icon>
     </icon-button>
     <audio-setting-tab
       v-show="showAudioSettingTab"
@@ -26,36 +31,54 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, Ref, onUnmounted, watch } from 'vue';
+import { storeToRefs } from 'pinia';
+import { ElMessage } from 'element-plus';
+
+import TUIRoomCore from '../../tui-room-core';
 import IconButton from '../common/IconButton.vue';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
-import { ref, onMounted, Ref, onUnmounted, watch } from 'vue';
-import TUIRoomCore from '../../tui-room-core';
+import { useBasicStore } from '../../stores/basic';
 import { useStreamStore } from '../../stores/stream';
 import AudioIcon from '../base/AudioIcon.vue';
-import { storeToRefs } from 'pinia';
+import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 
+const basicStore = useBasicStore();
 const streamStore = useStreamStore();
-const { localStream, isDefaultOpenMicrophone, hasStartedMicrophone } = storeToRefs(streamStore);
+const { localStream, isDefaultOpenMicrophone, hasStartedMicrophone, isLocalAudioMuted } = storeToRefs(streamStore);
+const { isLocalAudioIconDisable } = storeToRefs(basicStore);
 
-const isMuted: Ref<boolean> = ref(false);
 const showAudioSettingTab: Ref<boolean> = ref(false);
 const audioIconButtonRef = ref<InstanceType<typeof IconButton>>();
 const audioSettingRef = ref<InstanceType<typeof AudioSettingTab>>();
 
 watch(isDefaultOpenMicrophone, (val) => {
-  isMuted.value = !val;
+  streamStore.setIsLocalAudioMuted(!val);
+}, { immediate: true });
+
+watch(localStream, (val) => {
+  streamStore.setIsLocalAudioMuted(!val.isAudioStreamAvailable);
 }, { immediate: true });
 
 function toggleMuteAudio() {
-  isMuted.value = !isMuted.value;
-  if (!isMuted.value && !hasStartedMicrophone.value) {
+  if (isLocalAudioIconDisable.value) {
+    ElMessage({
+      type: 'warning',
+      message: WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_MUTE_ALL,
+      duration: MESSAGE_DURATION.NORMAL,
+    });
+    return;
+  }
+
+  streamStore.setIsLocalAudioMuted(!isLocalAudioMuted.value);
+  if (!isLocalAudioMuted.value && !hasStartedMicrophone.value) {
     TUIRoomCore.startMicrophone();
     streamStore.setHasStartedMicrophone(true);
     return;
   }
-  TUIRoomCore.muteLocalMicrophone(isMuted.value);
+  TUIRoomCore.muteLocalMicrophone(isLocalAudioMuted.value);
   streamStore.updateLocalStream({
-    isAudioStreamAvailable: !isMuted.value,
+    isAudioStreamAvailable: !isLocalAudioMuted.value,
   });
   showAudioSettingTab.value = false;
 }

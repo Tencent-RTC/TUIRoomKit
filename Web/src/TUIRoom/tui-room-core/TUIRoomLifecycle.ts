@@ -49,19 +49,59 @@ class TUIRoomLifecycle {
   > {
     logger.debug(`${TUIRoomLifecycle.logPrefix}createRoom options:`, options);
     const { sdkAppId, userId, userSig, roomId, mode } = options;
+    const groupId = `${roomId}`;
+    let groupInfo = null;
     try {
       // 设置开始时间
       this.state.roomInfo.roomConfig.startTime = new Date().getTime();
-      // 新建 IM 群
-      const timResponse = await this.timService.createGroup(
-        roomId,
-        this.state.roomInfo.roomConfig
-      );
-      const { data: groupInfo } = timResponse;
-      logger.debug(
-        `${TUIRoomLifecycle.logPrefix}createRoom createGroup response:`,
-        groupInfo
-      );
+      // 检查群是否已经存在
+      const timResponse = await this.timService.checkGroupExistence(groupId);
+      groupInfo = timResponse.data;
+      if (groupInfo) {
+        if (groupInfo.ownerID === userId) {
+          logger.log(
+            `${TIMService.logPrefix}createGroup: group exist and current user is owner.`,
+            groupInfo
+          );
+          // 更新 timService 内部信息
+          this.timService.setGroupId(groupId);
+          // 获取群组的详细信息，包括群公告
+          const timResponse = await this.timService.getGroupProfile(groupId);
+          groupInfo = timResponse.data;
+          // 提取房间控制参数（通过IM群公告实现）
+          if (groupInfo.notification) {
+            try {
+              this.state.roomInfo.roomConfig = Object.assign( 
+                this.state.roomInfo.roomConfig,
+                safelyParseJSON(groupInfo.notification),
+              );
+            } catch (error: any) {
+              logger.error(
+                `${TUIRoomLifecycle.logPrefix}createRoom parse group notification error:`,
+                groupInfo.notification
+              );
+            }
+          }
+        } else {
+          // 群已存在，当前用户不是群主，说明房间已存在，不能创建
+          throw TUIRoomError.error(
+            TUIRoomErrorCode.ROOM_EXISTED,
+            TUIRoomErrorMessage.ROOM_EXISTED
+          );
+        }
+      } else {
+        // 新建 IM 群
+        const timResponse = await this.timService.createGroup(
+          roomId,
+          this.state.roomInfo.roomConfig
+        );
+        const { data: groupInfo } = timResponse;
+        logger.debug(
+          `${TUIRoomLifecycle.logPrefix}createRoom createGroup response:`,
+          groupInfo
+        );
+      }
+
       // 进入 TRTC 房间
       await this.trtcService.enterRoom({
         sdkAppId,
@@ -70,7 +110,7 @@ class TUIRoomLifecycle {
         roomId,
       });
       this.state.roomInfo.roomId = roomId;
-      this.state.roomInfo.ownerId = groupInfo.ownerID;
+      this.state.roomInfo.ownerId = userId;
       this.state.currentUser.role = ETUIRoomRole.MASTER;
 
       return TUIRoomResponse.success(
@@ -107,12 +147,15 @@ class TUIRoomLifecycle {
     const { sdkAppId, userId, userSig, roomId } = options;
     try {
       // 加入 IM 群
-      const timResponse = await this.timService.joinGroup(roomId);
+      await this.timService.joinGroup(roomId);
+      // getGroupProfile 才能拿到详细的 groupProfile
+      const timResponse = await this.timService.getGroupProfile(roomId);
       const { data: groupInfo } = timResponse;
       logger.debug(
         `${TUIRoomLifecycle.logPrefix}enterRoom joinGroup:`,
         groupInfo
       );
+
       // 提取房间控制参数（通过IM群公告实现）
       if (groupInfo.notification) {
         try {

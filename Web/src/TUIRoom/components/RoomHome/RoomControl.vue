@@ -63,7 +63,6 @@ function enterRoom() {
 
 <style lang="scss" scoped>
 @import '../../assets/style/var.scss';
-
 .control-container {
   width: 430px;
   height: 476px;

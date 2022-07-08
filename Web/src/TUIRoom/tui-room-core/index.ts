@@ -8,12 +8,15 @@ export { TUIRoomResponse, TUIRoomError, TUIRoomInfo, TUIRoomUser, TUIRoomCore };
 
 export default TUIRoomCore.getInstance();
 
+(window as any).roomcore = TUIRoomCore.getInstance();
+
 export {
   ETUIRoomRole,
   ETUIStreamType,
   ETUIRoomEvents,
   ETUISignalStatus,
-  ETUISpeechMode
+  ETUISpeechMode,
+  ETUIRoomMuteType
 } from './types.d';
 
 export * from './trtc_define';

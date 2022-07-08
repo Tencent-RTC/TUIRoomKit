@@ -10,15 +10,15 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch,ref} from 'vue';
+import { reactive, watch } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
-const emit = defineEmits(["updateVerifyCode","sendVerifyCode"]);
+const emit = defineEmits(['updateVerifyCode', 'sendVerifyCode']);
 interface VerifyStates{
-  countdown: number, 
+  countdown: number,
   timer: number,
   verifyCode: string,
 }
-const placeholder="请输入验证码";
+const placeholder = '请输入验证码';
 const verifyStates:VerifyStates = reactive({
   countdown: 0,
   timer: 0,
@@ -27,26 +27,26 @@ const verifyStates:VerifyStates = reactive({
 watch(() => verifyStates.verifyCode, (val) => {
   verifyStates.verifyCode = val.replace(/\D/g, '');
   // 获取到验证码
-  emit("updateVerifyCode",verifyStates.verifyCode);
+  emit('updateVerifyCode', verifyStates.verifyCode);
 });
-function startCountDown() {  
+function startCountDown() {
   verifyStates.countdown = 60;
   verifyStates.timer = window.setInterval(() => {
     verifyStates.countdown = verifyStates.countdown - 1;
     if (verifyStates.countdown <= 0) {
       clearInterval(verifyStates.timer);
-    } 
+    }
   }, 1000);
 }
 function sendVerifyCode() {
-    emit("sendVerifyCode");
+  emit('sendVerifyCode');
 }
 
 function clear() {
   verifyStates.countdown = 0;
 }
 
-defineExpose({startCountDown,clear});
+defineExpose({ startCountDown, clear });
 
 </script>
 

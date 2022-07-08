@@ -10,6 +10,7 @@ import { ETUIRoomEvents } from './types.d';
 import {
   TUIRoomErrorCode,
   TUIRoomErrorMessage,
+  TIM_ROOM_PREFIX,
 } from './constant';
 import { simpleClone } from './utils/utils';
 import TUIRoomConfig from './base/TUIRoomConfig';
@@ -87,6 +88,10 @@ class TIMService {
     }
   }
 
+  setGroupId(groupId: string) {
+    this.groupId = `${TIM_ROOM_PREFIX}${groupId}`;
+  }
+
   /**
    * /////////////////////////////////////////////////////////////////////////////////
    * //
@@ -109,50 +114,20 @@ class TIMService {
   ): Promise<TUIRoomResponse<any>> {
     logger.debug(`${TIMService.logPrefix}.createGroup groupId: ${groupId}`);
     this.preCheckMethodCall();
-
-    this.groupId = `${groupId}`;
+    this.groupId = `${TIM_ROOM_PREFIX}${groupId}`;
     let groupInfo = null;
-    let isGroupExist = false;
     let timResponse = null;
+
     try {
-      timResponse = await this.tim.searchGroupByID(this.groupId);
+      timResponse = await this.tim.createGroup({
+        type: TIM.TYPES.GRP_PUBLIC,
+        name: this.groupId,
+        groupID: this.groupId,
+        joinOption: TIM.TYPES.JOIN_OPTIONS_FREE_ACCESS, // 允许自由加入
+        notification: JSON.stringify(roomConfig),
+      });
       groupInfo = timResponse.data.group;
-      isGroupExist = true;
-    } catch (error: any) {
-      // 群不存在，需要新建
-    }
-    try {
-      // 群存在
-      if (isGroupExist) {
-        if (groupInfo.ownerID === this.userId) {
-          logger.log(
-            `${TIMService.logPrefix}createGroup: group exist and current user is owner.`,
-            groupInfo
-          );
-          timResponse = await this.tim.updateGroupProfile({
-            groupID: this.groupId,
-            notification: JSON.stringify(roomConfig),
-          });
-          groupInfo = timResponse.data.group;
-        } else {
-          // 群已存在，当前用户不是群主，说明房间已存在，不能创建
-          throw TUIRoomError.error(
-            TUIRoomErrorCode.ROOM_EXISTED,
-            TUIRoomErrorMessage.ROOM_EXISTED
-          );
-        }
-      } else {
-        // 群不存在，新建，Public 群创建后会直接加入
-        timResponse = await this.tim.createGroup({
-          type: TIM.TYPES.GRP_PUBLIC,
-          name: this.groupId,
-          groupID: this.groupId,
-          joinOption: TIM.TYPES.JOIN_OPTIONS_FREE_ACCESS, // 允许自由加入
-          notification: JSON.stringify(roomConfig),
-        });
-        groupInfo = timResponse.data.group;
-        logger.log(`${TIMService.logPrefix}createGroup response:`, timResponse);
-      }
+      logger.log(`${TIMService.logPrefix}createGroup response:`, timResponse);
       return TUIRoomResponse.success(groupInfo);
     } catch (error: any) {
       if (error instanceof TUIRoomError) {
@@ -186,7 +161,7 @@ class TIMService {
     logger.debug(`${TIMService.logPrefix}.joinGroup groupID: ${groupId}`);
     this.preCheckMethodCall();
 
-    this.groupId = `${groupId}`;
+    this.groupId = `${TIM_ROOM_PREFIX}${groupId}`;
     try {
       let groupInfo = null;
       const imResponse = await this.tim.joinGroup({
@@ -238,14 +213,34 @@ class TIMService {
     this.preCheckMethodCall();
 
     let groupInfo = null;
-    const realGroupId = `${groupId}`;
+    const realGroupId = `${TIM_ROOM_PREFIX}${groupId}`;
     try {
       const response = await this.tim.searchGroupByID(realGroupId);
       groupInfo = response.data.group;
     } catch (error: any) {
       // 群不存在
+      return TUIRoomResponse.success(null);
     }
     return TUIRoomResponse.success(groupInfo);
+  }
+
+  async getGroupProfile(groupId: string, groupCustomFieldFilter: Array<String>): Promise<TUIRoomResponse<any>> {
+    logger.debug(
+      `${TIMService.logPrefix}.getGroupProfile groupId: ${groupId}`
+    );
+    const realGroupId = `${TIM_ROOM_PREFIX}${groupId}`;
+    try {
+      const options = { groupID: realGroupId };
+      if (groupCustomFieldFilter) {
+        Object.assign(options, { groupCustomFieldFilter })
+      }
+      const response = await this.tim.getGroupProfile(options);
+      const groupInfo = response.data.group;
+      return TUIRoomResponse.success(groupInfo);
+    } catch (error: any) {
+      // 获取群信息失败
+      return TUIRoomResponse.fail(error.code, error.message);
+    }
   }
 
   async changeGroupOwner(userId: string) {

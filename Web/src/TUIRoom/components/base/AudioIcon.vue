@@ -15,16 +15,23 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
+import { ICON_NAME } from '../../constants/icon';
 
 interface Props {
   audioVolume?: number,
   isMuted?: boolean,
   size?: string,
+  isDisabled?: boolean,
 }
 
 const props = defineProps<Props>();
 
-const iconName = computed(() => (props.isMuted ? 'mic-off' : 'mic-on'));
+const iconName = computed(() => {
+  if (props.isDisabled) {
+    return ICON_NAME.MicOffDisabled;
+  }
+  return props.isMuted ? ICON_NAME.MicOff : ICON_NAME.MicOn;
+});
 
 const showAudioLevel = computed(() => {
   if (props.isMuted || !props.audioVolume) {
