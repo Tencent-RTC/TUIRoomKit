@@ -17,6 +17,6 @@ export {
   ETUISignalStatus,
   ETUISpeechMode,
   ETUIRoomMuteType
-} from './types.d';
+} from './types';
 
 export * from './trtc_define';

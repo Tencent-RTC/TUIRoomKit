@@ -20,7 +20,7 @@ import TIM from 'tim-js-sdk';
 import logger from './common/logger';
 import Event from './common/emitter/event';
 import { safelyParseJSON, simpleClone } from './utils/utils';
-import { ETUISpeechMode, ETUIStreamType, ETUIRoomEvents, ETUIRoomRole, ETUIRoomMuteType } from './types.d';
+import { ETUISpeechMode, ETUIStreamType, ETUIRoomEvents, ETUIRoomRole, ETUIRoomMuteType } from './types';
 import { TUIRoomErrorCode, TUIRoomErrorMessage } from './constant';
 import TUIRoomUser from './base/TUIRoomUser';
 import TUIRoomError from './base/TUIRoomError';

@@ -6,7 +6,7 @@ import logger from './common/logger';
 import Event from './common/emitter/event';
 import TUIRoomError from './base/TUIRoomError';
 import TUIRoomResponse from './base/TUIRoomResponse';
-import { ETUIRoomEvents } from './types.d';
+import { ETUIRoomEvents } from './types';
 import {
   TUIRoomErrorCode,
   TUIRoomErrorMessage,

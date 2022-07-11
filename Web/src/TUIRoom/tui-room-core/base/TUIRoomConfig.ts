@@ -1,4 +1,4 @@
-import { ETUIRoomRole, ETUISpeechMode } from '../types.d';
+import { ETUIRoomRole, ETUISpeechMode } from '../types';
 
 class TUIRoomConfig {
   speechMode = ETUISpeechMode.APPLY_SPEECH; // 发言模式
