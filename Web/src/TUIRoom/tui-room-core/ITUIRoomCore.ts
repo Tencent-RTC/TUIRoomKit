@@ -16,7 +16,7 @@
   TRTCVideoEncParam,
   TRTCVideoFillMode,
 } from './trtc_define';
-import { ETUISpeechMode, ETUIStreamType } from './types.d';
+import { ETUISpeechMode, ETUIStreamType } from './types';
 import TUIRoomInfo from './base/TUIRoomInfo';
 import TUIRoomUser from './base/TUIRoomUser';
 import TUIRoomResponse from './base/TUIRoomResponse';

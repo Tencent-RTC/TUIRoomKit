@@ -14,7 +14,7 @@ import TRTCCloud, {
   TRTCVideoFillMode
 } from '../../trtc-cloud';
 import logger from '../common/logger';
-import { ETUIRoomEvents, ETUIStreamType } from '../types.d';
+import { ETUIRoomEvents, ETUIStreamType } from '../types';
 import TUIRoomError from '../base/TUIRoomError';
 import TUIRoomResponse from '../base/TUIRoomResponse';
 import { TUIRoomErrorCode, TUIRoomErrorMessage } from '../constant';

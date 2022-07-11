@@ -22,7 +22,7 @@ import {
   TTUIRoomTSBase,
   ETUIRoomRole,
   ETUIRoomMuteType
-} from './types.d';
+} from './types';
 
 import { safelyParseJSON, simpleClone } from './utils/utils';
 

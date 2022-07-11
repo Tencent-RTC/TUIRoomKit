@@ -15,7 +15,7 @@ import {
   ETUIRoomCoordinatorCommand,
   TTUIInviteInfo,
   ETUIRoomEvents,
-} from './types.d';
+} from './types';
 import Emitter from './common/emitter/event';
 import { safelyParseJSON } from './utils/utils';
 

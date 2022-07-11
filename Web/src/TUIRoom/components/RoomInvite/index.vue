@@ -34,17 +34,16 @@ import { useBasicStore } from '../../stores/basic';
 import { ElMessage } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import SvgIcon from '../common/SvgIcon.vue';
-const runtimeEnv = import.meta.env.VITE_RUNTIME_ENV;
 
 const basicStore = useBasicStore();
 const { roomId } = storeToRefs(basicStore);
 
 const { origin, pathname } = location;
 const inviteLink = computed(() => {
-  if (runtimeEnv === 'browser') {
-    return `${origin}${pathname}#/home?roomId=${roomId.value}`;
+  if ((window as any).__TRTCElectron) {
+    return `https://web.sdk.qcloud.com/#/home?roomId=${roomId.value}`;
   }
-  return `https://web.sdk.qcloud.com/#/home?roomId=${roomId.value}`;
+  return `${origin}${pathname}#/home?roomId=${roomId.value}`;
 });
 
 const schemeLink = computed(() => {

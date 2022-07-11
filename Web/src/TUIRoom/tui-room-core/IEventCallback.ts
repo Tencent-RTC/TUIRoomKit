@@ -5,7 +5,7 @@ import {
   TRTCDeviceType,
   TRTCDeviceState,
 } from './trtc_define';
-import { ETUIStreamType, TTUIUser, TTUIRoomError } from './types.d';
+import { ETUIStreamType, TTUIUser, TTUIRoomError } from './types';
 
 export default interface EventCallback {
   /**

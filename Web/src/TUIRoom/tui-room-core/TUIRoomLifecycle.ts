@@ -1,6 +1,6 @@
 import logger from './common/logger';
 import { safelyParseJSON, simpleClone } from './utils/utils';
-import { ETUISpeechMode, ETUIRoomRole } from './types.d';
+import { ETUISpeechMode, ETUIRoomRole } from './types';
 import TUIRoomResponse from './base/TUIRoomResponse';
 import TUIRoomError from './base/TUIRoomError';
 import TUIRoomInfo from './base/TUIRoomInfo';
