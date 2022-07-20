@@ -56,7 +56,6 @@ extension TUIRoomMainViewController {
         let sureAction = UIAlertAction(title: roomInfo.isHomeowner() ?.destroyRoomOkTitle : .logoutOkText, style: .default) { [weak self] _ in
             guard let self = self else { return }
             self.exitRoomLogic(roomInfo.isHomeowner())
-            TUIRoom.sharedInstance.isEnterRoom = false
         }
         sureAction.setTextColor(UIColor.red)
         alertVC.addAction(cancelAction)
@@ -122,7 +121,7 @@ extension TUIRoomMainViewController {
         setViewController = vc
     }
 
-    private func exitRoomLogic(_ isHomeowner: Bool) {
+    func exitRoomLogic(_ isHomeowner: Bool) {
         TUIRoomCore.shareInstance().stopScreenCapture()
         TRTCCloud.sharedInstance().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
         if isHomeowner {
@@ -144,6 +143,7 @@ extension TUIRoomMainViewController {
                 }
             }
         }
+        TUIRoom.sharedInstance.isEnterRoom = false
     }
     
     @objc
@@ -171,7 +171,6 @@ extension TUIRoomMainViewController: TUILoginListener {
     
     func onKickedOffline() {
         exitRoomLogic(roomInfo.isHomeowner())
-        TUIRoom.sharedInstance.isEnterRoom = false
     }
     
     func onUserSigExpired() {

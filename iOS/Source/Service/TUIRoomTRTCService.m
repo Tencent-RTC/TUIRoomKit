@@ -315,7 +315,8 @@ void tuiRoomLog(NSString *format, ...) {
             if (result >= 0) {
                 self.enterRoomCallback(TUIRoomSuccessCode,@"enter room succeed");
             } else {
-                self.enterRoomCallback(result, @"enter room failed");
+                NSString *errorMsg = (result == ERR_TRTC_USER_SIG_CHECK_FAILED ? @"userSig invalid, please login again.":@"enter trtc room fail.");
+                self.enterRoomCallback(result, errorMsg);
             }
             self.enterRoomCallback = NULL;
         }

@@ -277,12 +277,17 @@ class TUIRoomViewController: UIViewController {
         copyButton.addTarget(self, action: #selector(copyButtonClick), for: .touchUpInside)
     }
 
-    func enterMainViewController(_ roomId: Int32) {
-        let vc = TUIRoomMainViewController(roomId: "\(roomId)", isVideoOn: openCameraSwitch.isOn, isAudioOn: openMicSwitch.isOn)
-        vc.xMagicLicenseURL = xMagicLicenseURL
-        vc.xMagicLicenseKey = xMagicLicenseKey
-        TUIRoomCore.shareInstance().setDelegate(vc)
-        navigationController?.pushViewController(vc, animated: true)
+    func enterMainViewController(_ roomId: Int32, isCreate: Bool) {
+        if isCreate {
+            TUIRoom.sharedInstance.createRoom(roomId: Int(roomId),
+                                              speechMode: .freeSpeech,
+                                              isOpenCamera: openCameraSwitch.isOn,
+                                              isOpenMicrophone: openMicSwitch.isOn)
+        } else {
+            TUIRoom.sharedInstance.enterRoom(roomId: Int(roomId),
+                                             isOpenCamera: openCameraSwitch.isOn,
+                                             isOpenMicrophone: openMicSwitch.isOn)
+        }
     }
 
     @objc func backButtonClick() {

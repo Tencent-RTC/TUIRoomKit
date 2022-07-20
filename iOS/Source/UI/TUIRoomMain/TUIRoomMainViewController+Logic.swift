@@ -23,6 +23,7 @@ extension TUIRoomMainViewController {
         }
         attendeeList = [currentUser]
         attendeeMap[currentUser.userId()] = currentUser
+        attendeeCollectionView.reloadData()
     }
 
     func applyConfigs() {
@@ -105,11 +106,16 @@ extension TUIRoomMainViewController {
         }
         TUIRoomCore.shareInstance().leaveRoom { _, _ in
         }
+        TUIRoom.sharedInstance.isEnterRoom = false
     }
 
     func interruptQuitRoom() {
         setViewController?.dismiss(animated: false, completion: nil)
-        navigationController?.popToRootViewController(animated: true)
+        if navigationController?.viewControllers.first == self {
+            dismiss(animated: true)
+        } else {
+            navigationController?.popViewController(animated: true)
+        }
     }
 
     func getRenderViewByUserid(userId: String, type: TUIRoomStreamType = .camera) -> TUIRoomAttendeeRenderView? {
