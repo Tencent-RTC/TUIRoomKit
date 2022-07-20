@@ -76,25 +76,7 @@ extension TUIRoomEntranceViewController {
     }
 
     func enterRoom(_ roomId: Int32) {
-        loading.startAnimating()
-        TUIRoomCore.shareInstance().enterRoom("\(roomId)", callback: { [weak self] code, message in
-            guard let self = self else { return }
-            self.loading.stopAnimating()
-            if code == 0 {
-                self.enterMainViewController(roomId)
-            } else {
-                self.view.makeToast(message)
-            }
-        })
-    }
-
-    func enterMainViewController(_ roomId: Int32) {
-        let vc = TUIRoomMainViewController(roomId: "\(roomId)", isVideoOn: true, isAudioOn: true)
-        // XMagic License 【Optional】
-        vc.xMagicLicenseURL = xMagicLicenseURL
-        vc.xMagicLicenseKey = xMagicLicenseKey
-        TUIRoomCore.shareInstance().setDelegate(vc)
-        navigationController?.pushViewController(vc, animated: true)
+        TUIRoom.sharedInstance.enterRoom(roomId: Int(roomId), isOpenCamera: true, isOpenMicrophone: true)
     }
 }
 

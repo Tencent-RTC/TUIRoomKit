@@ -62,16 +62,7 @@ class TUIRoomJoinViewController: TUIRoomViewController {
             return
         }
         roomId = roomID
-        loading.startAnimating()
-        TUIRoomCore.shareInstance().enterRoom("\(roomId)", callback: { [weak self] code, message in
-            guard let self = self else { return }
-            self.loading.stopAnimating()
-            if code == 0 {
-                self.enterMainViewController(self.roomId)
-            } else {
-                self.view.makeToast(message)
-            }
-        })
+        enterMainViewController(roomID, isCreate: false)
     }
 
     override func activateConstraints() {

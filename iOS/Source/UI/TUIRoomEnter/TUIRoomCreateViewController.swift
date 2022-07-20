@@ -28,18 +28,7 @@ class TUIRoomCreateViewController: TUIRoomViewController {
     }
 
     @objc override func enterButtonClick() {
-        loading.startAnimating()
-        TUIRoomCore.shareInstance().createRoom("\(roomId)",
-                                               speechMode: .freeSpeech,
-                                               callback: { [weak self] code, message in
-                                                   guard let self = self else { return }
-                                                   self.loading.stopAnimating()
-                                                   if code == 0 {
-                                                       self.enterMainViewController(self.roomId)
-                                                   } else {
-                                                       self.view.makeToast(message)
-                                                   }
-                                               })
+        enterMainViewController(roomId, isCreate: true)
     }
 
     override func activateConstraints() {

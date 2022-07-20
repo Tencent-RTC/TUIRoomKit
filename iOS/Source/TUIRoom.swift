@@ -67,15 +67,12 @@ public class TUIRoom: NSObject {
             delegate?.onRoomCreate?(code: -1, message: .enterRoomIdErrorToast)
             return
         }
-        TUIRoomCore.shareInstance().createRoom(String(roomId), speechMode: speechMode) { [weak self] (code, message) in
-            guard let self = self else { return }
-            if code == 0 {
-                let vc = TUIRoomMainViewController(roomId: String(roomId), isVideoOn: isOpenCamera, isAudioOn: isOpenMicrophone)
-                TUIRoomCore.shareInstance().setDelegate(vc)
-                self.presentRoomController(vc: vc)
-            }
-            self.delegate?.onRoomCreate?(code: code, message: message)
-        }
+        let vc = TUIRoomMainViewController(roomId: String(roomId),
+                                           isCreate: true,
+                                           isVideoOn: isOpenCamera,
+                                           isAudioOn: isOpenMicrophone,
+                                           speechMode: speechMode)
+        presentRoomController(vc: vc)
     }
     
     /// EnterRoom
@@ -100,15 +97,11 @@ public class TUIRoom: NSObject {
             delegate?.onRoomEnter?(code: -1, message: .enterRoomIdErrorToast)
             return
         }
-        TUIRoomCore.shareInstance().enterRoom(String(roomId), callback: { [weak self] (code, message) in
-            guard let self = self else { return }
-            if code == 0 {
-                let vc = TUIRoomMainViewController(roomId: String(roomId), isVideoOn: isOpenCamera, isAudioOn: isOpenMicrophone)
-                TUIRoomCore.shareInstance().setDelegate(vc)
-                self.presentRoomController(vc: vc)
-            }
-            self.delegate?.onRoomEnter?(code: code, message: message)
-        })
+        let vc = TUIRoomMainViewController(roomId: String(roomId),
+                                           isCreate: false,
+                                           isVideoOn: isOpenCamera,
+                                           isAudioOn: isOpenMicrophone)
+        presentRoomController(vc: vc)
     }
     
 }

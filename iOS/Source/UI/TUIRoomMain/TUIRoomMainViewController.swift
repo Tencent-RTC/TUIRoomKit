@@ -197,17 +197,21 @@ class TUIRoomMainViewController: UIViewController {
     }()
 
     var beautyView: UIView? = nil
-    
-    init(roomId: String, isVideoOn: Bool, isAudioOn: Bool) {
+    var isCreateRoom: Bool = false
+    var speechMode: TUIRoomSpeechMode = .freeSpeech
+    init(roomId: String,
+         isCreate: Bool,
+         isVideoOn: Bool,
+         isAudioOn: Bool,
+         speechMode: TUIRoomSpeechMode? = nil) {
         super.init(nibName: nil, bundle: nil)
         self.roomId = roomId
+        self.isCreateRoom = isCreate
         self.isVideoOn = isVideoOn
         self.isAudioOn = isAudioOn
-        guard let roomInfo = TUIRoomCore.shareInstance().getRoomInfo() else {
-            return
+        if let speechMode = speechMode {
+            self.speechMode = speechMode
         }
-        self.roomInfo = roomInfo
-        initAttendeeList()
     }
 
     required init?(coder: NSCoder) {
@@ -220,8 +224,6 @@ class TUIRoomMainViewController: UIViewController {
         setupUI()
         activateConstraints()
         bindInteraction()
-        applyConfigs()
-        reloadData()
 #if RTCube_APPSTORE
         let selector = NSSelectorFromString("showAlertUserLiveTips")
         if responds(to: selector) {
@@ -229,6 +231,12 @@ class TUIRoomMainViewController: UIViewController {
         }
 #endif
         TUILogin.add(self)
+        TUIRoomCore.shareInstance().setDelegate(self)
+        if isCreateRoom {
+            createRoom()
+        } else {
+            enterRoom()
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -257,27 +265,10 @@ class TUIRoomMainViewController: UIViewController {
         backView.addSubview(membersButton)
         backView.addSubview(moreSettingButton)
 #if RTCube_APPSTORE
-        if roomInfo.ownerId != currentUser.userId() {
+        if !isCreateRoom {
             backView.addSubview(reportButton)
         }
 #endif
-        if currentUser.userInfo.isRemoteAudioMuted {
-            muteVideoButton.isSelected = false
-            muteAudioButton.isEnabled = false
-        } else {
-            muteAudioButton.isEnabled = true
-            muteAudioButton.isSelected = !currentUser.isAudioOpen()
-        }
-
-        if currentUser.userInfo.isRemoteVideoMuted {
-            muteVideoButton.isSelected = false
-            muteVideoButton.isEnabled = false
-        } else {
-            muteVideoButton.isEnabled = true
-            muteVideoButton.isSelected = !currentUser.isVideoOpen()
-        }
-        // Load beautyView
-        loadBeautyView()
     }
 
     func activateConstraints() {
@@ -375,8 +366,65 @@ class TUIRoomMainViewController: UIViewController {
     deinit {
         TUILogin.remove(self)
         TUIRoomCore.destroyInstance()
+        TUIRoom.sharedInstance.isEnterRoom = false
         UIApplication.shared.isIdleTimerDisabled = false
         debugPrint("deinit \(self)")
+    }
+}
+
+// MARK: - CreateRoom、EnterRoom
+extension TUIRoomMainViewController {
+    
+    private func createRoom() {
+        TUIRoomCore.shareInstance().createRoom(roomId, speechMode: speechMode) { [weak self] (code, message) in
+            guard let self = self else { return }
+            if code == 0, let roomInfo = TUIRoomCore.shareInstance().getRoomInfo() {
+                self.roomInfo = roomInfo
+                self.initRoomData()
+            } else {
+                self.view.makeToast(message, duration: 1.0) { [weak self] (didTap) in
+                    guard let self = self else { return }
+                    self.exitRoomLogic(self.isCreateRoom)
+                }
+            }
+        }
+    }
+    
+    private func enterRoom() {
+        TUIRoomCore.shareInstance().enterRoom(roomId, callback: { [weak self] (code, message) in
+            guard let self = self else { return }
+            if code == 0, let roomInfo = TUIRoomCore.shareInstance().getRoomInfo() {
+                self.roomInfo = roomInfo
+                self.initRoomData()
+            } else {
+                self.view.makeToast(message, duration: 1.0) { [weak self] (didTap) in
+                    guard let self = self else { return }
+                    self.exitRoomLogic(self.isCreateRoom)
+                }
+            }
+        })
+    }
+    
+    private func initRoomData() {
+        initAttendeeList()
+        applyConfigs()
+        reloadData()
+        if currentUser.userInfo.isRemoteAudioMuted {
+            muteAudioButton.isSelected = false
+            muteAudioButton.isEnabled = false
+        } else {
+            muteAudioButton.isEnabled = true
+            muteAudioButton.isSelected = !currentUser.isAudioOpen()
+        }
+        if currentUser.userInfo.isRemoteVideoMuted {
+            muteVideoButton.isSelected = false
+            muteVideoButton.isEnabled = false
+        } else {
+            muteVideoButton.isEnabled = true
+            muteVideoButton.isSelected = !currentUser.isVideoOpen()
+        }
+        // Load beautyView
+        loadBeautyView()
     }
 }
 
