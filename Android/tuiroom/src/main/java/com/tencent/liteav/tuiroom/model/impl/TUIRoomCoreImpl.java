@@ -155,7 +155,9 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
                 TRTCLogger.i(TAG, "destroyRoom");
                 if (!mIMService.isOwner()) {
                     TRTCLogger.e(TAG, "you are not the room owner");
-                    callback.onCallback(CODE_ERROR, "you are not the room owner");
+                    if (callback != null) {
+                        callback.onCallback(CODE_ERROR, "you are not the room owner");
+                    }
                     return;
                 }
                 mTRTCService.exitRoom(new TUIRoomCoreCallback.ActionCallback() {

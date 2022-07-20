@@ -24,9 +24,9 @@ import androidx.fragment.app.DialogFragment;
 
 import com.blankj.utilcode.util.PermissionUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.tencent.liteav.basic.RTCubeUtils;
 import com.tencent.liteav.basic.UserModel;
 import com.tencent.liteav.basic.UserModelManager;
-import com.tencent.liteav.debug.BuildConfig;
 import com.tencent.liteav.tuiroom.R;
 import com.tencent.liteav.tuiroom.TUIRoomImpl;
 import com.tencent.liteav.tuiroom.model.TUIRoomCore;
@@ -422,7 +422,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         mScreenCaptureGroup = findViewById(R.id.group_screen_capture);
         mBottomToolBarGroup = (Group) findViewById(R.id.group_bottom_tool_bar);
         mStopScreenCaptureTv = (TextView) findViewById(R.id.tv_stop_screen_capture);
-        if (!mIsCreateRoom && BuildConfig.RTCube_APPSTORE) {
+        if (!mIsCreateRoom && RTCubeUtils.isRTCubeApp(this)) {
             mRoomHeadBarView.showReportView(true);
         }
     }
