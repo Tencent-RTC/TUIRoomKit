@@ -55,7 +55,7 @@ import TUIRoomCore, {
   TRTCVideoEncParam,
 } from '../../tui-room-core';
 import { storeToRefs } from 'pinia';
-import { StreamInfo, useStreamStore } from '../../stores/stream';
+import { StreamInfo, useRoomStore } from '../../stores/room';
 import { useBasicStore } from '../../stores/basic';
 import { LAYOUT } from '../../constants/render';
 import StreamRegion from './StreamRegion.vue';
@@ -67,10 +67,10 @@ defineProps<{
 
 const streamStyle: Ref<Record<string, any>> = ref({});
 const enlargedStreamStyle: Ref<Record<string, any>> = ref({});
-const streamStore = useStreamStore();
-const { streamList, streamNumber } = storeToRefs(streamStore);
+const roomStore = useRoomStore();
+const { streamList, streamNumber } = storeToRefs(roomStore);
 const basicStore = useBasicStore();
-const { layout, isMaster, isMuteAllAudio, isMuteAllVideo } = storeToRefs(basicStore);
+const { layout } = storeToRefs(basicStore);
 const showSideList = ref(true);
 
 const enlargeStream: Ref<StreamInfo | null> = ref(null);
@@ -350,20 +350,22 @@ const showIconControl = computed(() => [LAYOUT.RIGHT_SIDE_LIST, LAYOUT.TOP_SIDE_
 // --- 以下处理流事件 ----
 
 const onUserEnterRoom = (streamInfo: any) => {
-  // 本端为主持人，则记录用户禁言禁画信息
-  if (isMaster.value) {
-    Object.assign(streamInfo, {
-      isAudioMutedByMaster: isMuteAllAudio.value,
-      isVideoMutedByMaster: isMuteAllVideo.value,
-      isChatMutedByMaster: false,
-    });
-  }
-  streamStore.addRemoteUser(streamInfo);
+  roomStore.addRemoteUser(streamInfo);
 };
 
-const onUserLeaveRoom = (streamInfo: any) => {
-  streamStore.removeRemoteUser(streamInfo);
-  if (streamInfo.userId === enlargeStream.value?.userId || streamStore.remoteStreamMap.size === 0) {
+const onUserLeaveRoom = (streamInfo: { userId: string }) => {
+  roomStore.removeRemoteUser(streamInfo.userId);
+};
+
+// 收到远端 trtc 的 peer-join 事件
+const onUserAVEnabled = (userInfo: any) => {
+  roomStore.updateUserAVAbility(userInfo, true);
+};
+
+// 收到远端 trtc 的 peer-leave 事件
+const onUserAVDisabled = (userInfo: any) => {
+  roomStore.updateUserAVAbility(userInfo, false);
+  if (userInfo.userId === enlargeStream.value?.userId || roomStore.remoteStreamList.length === 0) {
     basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
     enlargeStream.value = null;
   }
@@ -372,14 +374,14 @@ const onUserLeaveRoom = (streamInfo: any) => {
 const onUserVideoAvailable = (eventInfo: { userId: string, available: number, streamType: number }) => {
   const { userId, available, streamType } = eventInfo;
   if (userId === basicStore.userId) {
-    streamStore.updateLocalStream({ isVideoStreamAvailable: available });
+    roomStore.updateLocalStream({ isVideoStreamAvailable: !!available });
     return;
   }
   if (streamType === ETUIStreamType.CAMERA) {
-    streamStore.updateRemoteVideoStream(eventInfo);
+    roomStore.updateRemoteVideoStream(eventInfo);
     // 处理 web 端屏幕分享
     if (userId.indexOf('share_') === 0 && userId !== `share_${basicStore.userId}`) {
-      enlargeStream.value = streamStore.remoteStreamMap.get(`${userId}_main`) as StreamInfo;
+      enlargeStream.value = roomStore.remoteStreamMap.get(`${userId}_main`) as StreamInfo;
       if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
         basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
       }
@@ -387,11 +389,11 @@ const onUserVideoAvailable = (eventInfo: { userId: string, available: number, st
     }
     // 当远端流视频位 available 为 true，主持人端修改该用户的禁画提示为【禁画】
     if (basicStore.isMaster && available) {
-      streamStore.setMuteUserVideo(userId, false);
+      roomStore.setMuteUserVideo(userId, false);
     }
   } else if (streamType === ETUIStreamType.SCREEN) {
-    streamStore.updateRemoteScreenStream(eventInfo);
-    enlargeStream.value = streamStore.remoteStreamMap.get(`${userId}_screen`) as StreamInfo;
+    roomStore.updateRemoteScreenStream(eventInfo);
+    enlargeStream.value = roomStore.remoteStreamMap.get(`${userId}_screen`) as StreamInfo;
     if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
       basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
     }
@@ -402,29 +404,29 @@ const onUserVideoAvailable = (eventInfo: { userId: string, available: number, st
 const onUserAudioAvailable = (eventInfo: { userId: string, available: number}) => {
   const { userId, available } = eventInfo;
   if (userId === basicStore.userId) {
-    streamStore.updateLocalStream({ isAudioStreamAvailable: available });
+    roomStore.updateLocalStream({ isAudioStreamAvailable: !!available });
     return;
   }
-  streamStore.updateRemoteAudioStream(eventInfo);
+  roomStore.updateRemoteAudioStream(eventInfo);
   // 当远端流音频位 available 为 true，主持人端修改该用户的禁画提示为【禁言】
   if (basicStore.isMaster && available) {
-    streamStore.setMuteUserAudio(userId, false);
+    roomStore.setMuteUserAudio(userId, false);
   }
 };
 
-const { isDefaultOpenCamera, isDefaultOpenMicrophone } = storeToRefs(streamStore);
+const { isDefaultOpenCamera, isDefaultOpenMicrophone } = storeToRefs(roomStore);
 const { isLocalAudioIconDisable, isLocalVideoIconDisable } = storeToRefs(basicStore);
 
 watch(isDefaultOpenCamera, async (val) => {
   if (val && !isLocalVideoIconDisable.value) {
-    const previewDom = document.getElementById(`${streamStore.localStream.userId}_main`);
+    const previewDom = document.getElementById(`${roomStore.localStream.userId}_main`);
     if (previewDom) {
       // 设置设备id
-      if (!streamStore.currentCameraId) {
+      if (!roomStore.currentCameraId) {
         const cameraList = await TUIRoomCore.getCameraList();
-        streamStore.setCurrentCameraId(cameraList[0].deviceId);
+        roomStore.setCurrentCameraId(cameraList[0].deviceId);
       }
-      await TUIRoomCore.setCurrentCamera(streamStore.currentCameraId);
+      await TUIRoomCore.setCurrentCamera(roomStore.currentCameraId);
       // 设置视频参数
       const param = new TRTCVideoEncParam();
       param.videoResolution = TRTCVideoResolution.TRTCVideoResolution_1280_720;
@@ -436,7 +438,7 @@ watch(isDefaultOpenCamera, async (val) => {
       TUIRoomCore.setVideoEncoderParam(param);
       // 开启本地摄像头
       await TUIRoomCore.startCameraPreview(previewDom);
-      streamStore.setHasStartedCamera(true);
+      roomStore.setHasStartedCamera(true);
     }
   }
 });
@@ -445,21 +447,23 @@ watch(isDefaultOpenMicrophone, async (val) => {
   if (val && !isLocalAudioIconDisable.value) {
     // 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
     await TUIRoomCore.startMicrophone();
-    streamStore.setHasStartedMicrophone(true);
+    roomStore.setHasStartedMicrophone(true);
     const microphoneList = await TUIRoomCore.getMicrophoneList();
-    if (!streamStore.currentMicrophoneId) {
-      streamStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
+    if (!roomStore.currentMicrophoneId) {
+      roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
     }
-    if (!streamStore.currentSpeakerId) {
-      streamStore.setCurrentSpeakerId(microphoneList[0].deviceId);
+    if (!roomStore.currentSpeakerId) {
+      roomStore.setCurrentSpeakerId(microphoneList[0].deviceId);
     }
-    await TUIRoomCore.setCurrentMicrophone(streamStore.currentMicrophoneId);
+    await TUIRoomCore.setCurrentMicrophone(roomStore.currentMicrophoneId);
   }
 });
 
 onMounted(async () => {
   TUIRoomCore.on(ETUIRoomEvents.onUserEnterRoom, onUserEnterRoom);
   TUIRoomCore.on(ETUIRoomEvents.onUserLeaveRoom, onUserLeaveRoom);
+  TUIRoomCore.on(ETUIRoomEvents.onUserAVEnabled, onUserAVEnabled);
+  TUIRoomCore.on(ETUIRoomEvents.onUserAVDisabled, onUserAVDisabled);
   TUIRoomCore.on(ETUIRoomEvents.onUserVideoAvailable, onUserVideoAvailable);
   TUIRoomCore.on(ETUIRoomEvents.onUserAudioAvailable, onUserAudioAvailable);
 });
@@ -467,6 +471,8 @@ onMounted(async () => {
 onUnmounted(() => {
   TUIRoomCore.off(ETUIRoomEvents.onUserEnterRoom, onUserEnterRoom);
   TUIRoomCore.off(ETUIRoomEvents.onUserLeaveRoom, onUserLeaveRoom);
+  TUIRoomCore.off(ETUIRoomEvents.onUserAVEnabled, onUserAVEnabled);
+  TUIRoomCore.off(ETUIRoomEvents.onUserAVDisabled, onUserAVDisabled);
   TUIRoomCore.off(ETUIRoomEvents.onUserVideoAvailable, onUserVideoAvailable);
   TUIRoomCore.off(ETUIRoomEvents.onUserAudioAvailable, onUserAudioAvailable);
 });

@@ -13,6 +13,10 @@
       ></manage-member-control>
       <invite-control @click="report('inviteControl')"></invite-control>
       <chat-control @click="report('chatControl')"></chat-control>
+      <apply-control
+        v-if="basicStore.roomMode === ETUISpeechMode.APPLY_SPEECH"
+        @click="report('applyControl')"
+      ></apply-control>
       <more-control @click="report('moreControl')"></more-control>
       <setting-control @click="report('settingControl')"></setting-control>
     </div>
@@ -26,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ETUIRoomRole } from '../../tui-room-core';
+import { ETUIRoomRole, ETUISpeechMode } from '../../tui-room-core';
 import AudioControl from './AudioControl.vue';
 import ScreenShareControl from './ScreenShareControl/Index.vue';
 import FullScreenControl from './FullScreenControl.vue';
@@ -34,7 +38,7 @@ import InviteControl from './InviteControl.vue';
 import VideoControl from './VideoControl.vue';
 import ManageMemberControl from './ManageMemberControl.vue';
 import ChatControl from './ChatControl.vue';
-// TODO:【更多】功能待完善
+import ApplyControl from './ApplyControl/Index.vue';
 import MoreControl from './MoreControl.vue';
 import SettingControl from './SettingControl.vue';
 import EndControl from './EndControl.vue';

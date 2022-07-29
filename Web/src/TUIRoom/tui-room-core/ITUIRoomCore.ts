@@ -124,9 +124,9 @@ export default interface ITUIRoomCore {
    * 获取指定用户信息
    *
    * @param {string} userId 成员Id
-   * @returns {TUIRoomUser | null}
+   * @returns {Promise<Object | null>}
    */
-  getUserInfo: (userId: string) => TUIRoomUser | null;
+  getUserInfo: (userId: string) => Promise<Object | null>;
 
   /**
    * 设置用户名和头像
@@ -139,7 +139,7 @@ export default interface ITUIRoomCore {
   /**
    * 将房间转交给其他成员
    *
-   * @param {string} userId 主持人将房间控制权转交给其他成员
+   * @param {string} userId 主持人将房间控制权转交给其他成员, 观众端会收到事件通知 onRoomMasterChanged.
    * @returns {Promise}
    */
   transferRoomMaster: (userId: string) => Promise<TUIRoomResponse<any>>;

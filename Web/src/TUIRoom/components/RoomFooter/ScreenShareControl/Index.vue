@@ -1,10 +1,10 @@
 <template>
-  <div v-if="!screenShareDisabled" class="screen-share-control-container">
+  <div v-if="showScreenShareIcon" class="screen-share-control-container">
     <icon-button
       ref="btnStopRef"
-      :disabled="screenShareDisabled"
+      :disabled="isAudience"
       :title="title"
-      :icon-name="startIconName"
+      :icon-name="iconName"
       @click="toggleScreenShare"
     />
     <div v-if="showStopShareRegion" class="stop-share-region" @click="openStopConfirmDialog">
@@ -13,6 +13,7 @@
     </div>
     <el-dialog
       v-model="dialogVisible"
+      class="custom-element-class"
       width="420px"
       title="是否停止屏幕共享？"
       :modal="true"
@@ -31,11 +32,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, Ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessage } from 'element-plus';
 import IconButton from '../../common/IconButton.vue';
-import TUIRoomCore, { ETUIRoomEvents } from '../../../tui-room-core';
+import TUIRoomCore, { ETUIRoomEvents, ETUIRoomRole } from '../../../tui-room-core';
 import { useBasicStore } from '../../../stores/basic';
 import logger from '../../../tui-room-core/common/logger';
 import SvgIcon from '../../common/SvgIcon.vue';
@@ -44,11 +45,9 @@ import { MESSAGE_DURATION } from '../../../constants/message';
 
 const logPrefix = '[ScreenShareControl]';
 
-const basicInfo = useBasicStore();
-const { shareUserId, shareUserSig } = storeToRefs(basicInfo);
-
-const screenShareDisabled = computed(() => !shareUserId.value && !shareUserSig?.value);
-logger.debug(`${logPrefix}screenShareDisabled: ${screenShareDisabled.value}`);
+const basicStore = useBasicStore();
+const { shareUserId, shareUserSig, isAudience, role } = storeToRefs(basicStore);
+const showScreenShareIcon = computed(() => shareUserId.value && shareUserSig?.value);
 
 const btnStopRef = ref();
 const isSharing: Ref<boolean> = ref(false);
@@ -56,8 +55,18 @@ const showStopShareRegion: Ref<boolean> = ref(false);
 const dialogVisible: Ref<boolean> = ref(false);
 
 const title = computed(() => (isSharing.value ? '屏幕共享中' : '共享屏幕'));
+const iconName = computed(() => {
+  if (isAudience.value) {
+    return ICON_NAME.ScreenShareDisabled;
+  }
+  return isSharing.value ? ICON_NAME.ScreenSharing : ICON_NAME.ScreenShare;
+});
 
-const startIconName = computed(() => (isSharing.value ? ICON_NAME.ScreenSharing : ICON_NAME.ScreenShare));
+watch(role, (val: any, oldVal: any) => {
+  if (oldVal === ETUIRoomRole.ANCHOR && val === ETUIRoomRole.AUDIENCE && isSharing.value) {
+    stopScreenShare();
+  }
+});
 
 onMounted(() => {
   TUIRoomCore.on(ETUIRoomEvents.onWebScreenSharingStopped, stopScreenShare);
@@ -68,6 +77,14 @@ onUnmounted(() => {
 });
 
 async function toggleScreenShare() {
+  if (isAudience.value) {
+    ElMessage({
+      type: 'warning',
+      message: '您当前没有共享权限，请先举手申请上台获取共享权限',
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
+  }
   if (isSharing.value) {
     showStopShareRegion.value = true;
     return;
@@ -119,6 +136,7 @@ async function stopScreenShare() {
 
 <style lang="scss" scoped>
 @import '../../../assets/style/var.scss';
+@import '../../../assets/style/element-custom.scss';
 
 .screen-share-control-container {
   position: relative;

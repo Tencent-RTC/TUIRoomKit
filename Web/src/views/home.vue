@@ -41,11 +41,11 @@ userName.value = basicInfo?.userName;
 userAvatar.value = basicInfo?.userAvatar;
 userId.value = basicInfo?.userId;
 
-function setTUIRoomData(action: string) {
+function setTUIRoomData(action: string, mode?: string) {
   const roomParam = streamPreviewRef.value.getRoomParam();
   const roomData = {
     action,
-    roomMode: 'FreeSpeech',
+    roomMode: mode || 'FreeSpeech',
     roomParam,
   };
   sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(roomData));
@@ -62,8 +62,8 @@ async function generateRoomId(): Promise<number> {
 }
 
 // 处理点击【创建房间】
-async function handleCreateRoom() {
-  setTUIRoomData('createRoom');
+async function handleCreateRoom(mode: string) {
+  setTUIRoomData('createRoom', mode);
   const roomId = await generateRoomId();
   router.replace({
     path: 'room',

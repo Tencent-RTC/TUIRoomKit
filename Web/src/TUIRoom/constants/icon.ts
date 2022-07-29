@@ -9,6 +9,7 @@ export enum ICON_NAME {
   ScreenSharing = 'screen-sharing',
   ScreenShare = 'screen-share',
   ScreenShareStopped = 'screen-share-stopped',
+  ScreenShareDisabled = 'screen-share-disabled',
   ChatActive = 'chat-active',
   Chat = 'chat',
   ExitFullScreen = 'exit-fullscreen',
@@ -22,5 +23,8 @@ export enum ICON_NAME {
   SettingActive = 'setting-active',
   Setting = 'setting',
   LineArrowUp = 'line-arrow-up',
-  LineArrowDown = 'line-arrow-down'
+  LineArrowDown = 'line-arrow-down',
+  ApplyOnSeat = 'apply',
+  ApplyActive = 'apply-active',
+  GoOffSeat = 'go-off-seat',
 }

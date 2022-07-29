@@ -85,4 +85,11 @@
 | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-home.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room.png" width="320"/> |
 ## 常见问题
 
+### Q：项目打包之后部署到测试/生产环境，无法正常使用麦克风和摄像头是什么原因呢？
+
+A: 请检查部署的链接是否为 https 协议，出于对用户安全、隐私等问题的考虑，浏览器限制网页在 https 协议下才能正常使用 TRTC Web SDK（WebRTC）的全部功能。
+
+
+## 其他
+
 - 欢迎加入 QQ 群：592465424，进行技术交流和反馈~

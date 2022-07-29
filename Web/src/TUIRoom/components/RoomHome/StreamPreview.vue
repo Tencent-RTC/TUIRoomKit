@@ -52,12 +52,12 @@ import { SettingMode } from '../../constants/render';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
 import VideoSettingTab from '../base/VideoSettingTab.vue';
 import AudioIcon from '../base/AudioIcon.vue';
-import { useStreamStore } from '../../stores/stream';
+import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
 
-const streamStore = useStreamStore();
-const { localStream } = storeToRefs(streamStore);
+const roomStore = useRoomStore();
+const { localStream } = storeToRefs(roomStore);
 
 defineExpose({
   getRoomParam,
@@ -95,22 +95,22 @@ function toggleMuteVideo() {
 }
 
 function getRoomParam() {
-  tuiRoomParam.defaultCameraId = streamStore.currentCameraId;
-  tuiRoomParam.defaultMicrophoneId = streamStore.currentMicrophoneId;
-  tuiRoomParam.defaultSpeakerId = streamStore.currentSpeakerId;
+  tuiRoomParam.defaultCameraId = roomStore.currentCameraId;
+  tuiRoomParam.defaultMicrophoneId = roomStore.currentMicrophoneId;
+  tuiRoomParam.defaultSpeakerId = roomStore.currentSpeakerId;
   return tuiRoomParam;
 }
 
 const onUserVoiceVolume = (eventInfo: []) => {
-  streamStore.setAudioVolume(eventInfo);
+  roomStore.setAudioVolume(eventInfo);
 };
 
 onMounted(async () => {
   const cameraList = await TUIRoomCore.getCameraList();
   const microphoneList = await TUIRoomCore.getMicrophoneList();
-  streamStore.setCurrentCameraId(cameraList[0].deviceId);
-  streamStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
-  streamStore.setCurrentSpeakerId(microphoneList[0].deviceId);
+  roomStore.setCurrentCameraId(cameraList[0].deviceId);
+  roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
+  roomStore.setCurrentSpeakerId(microphoneList[0].deviceId);
   TUIRoomCore.setCurrentCamera(cameraList[0].deviceId);
   TUIRoomCore.setCurrentMicrophone(microphoneList[0].deviceId);
   await TUIRoomCore.startCameraPreview(streamPreviewRef.value);

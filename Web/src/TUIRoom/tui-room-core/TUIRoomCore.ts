@@ -35,6 +35,7 @@ import StateStore from './StateStore';
 import TUIRoomLifecycle from './TUIRoomLifecycle';
 import TUIRoomAuth from './TUIRoomAuth';
 import TSignalingService from './TSignalingService';
+import { TRTCRoleType } from '../trtc-cloud';
 
 class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   static logPrefix = '[TUIRoomCore]';
@@ -106,6 +107,8 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
 
     this.onRemoteUserEnterRoom = this.onRemoteUserEnterRoom.bind(this);
     this.onRemoteUserLeaveRoom = this.onRemoteUserLeaveRoom.bind(this);
+    this.onRemoteUserAVEnabled = this.onRemoteUserAVEnabled.bind(this);
+    this.onRemoteUserAVDisabled = this.onRemoteUserAVDisabled.bind(this);
     this.onUserVideoAvailable = this.onUserVideoAvailable.bind(this);
     this.onUserSubStreamAvailable = this.onUserSubStreamAvailable.bind(this);
     this.onUserAudioAvailable = this.onUserAudioAvailable.bind(this);
@@ -120,6 +123,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     this.onReceiveChatMessage = this.onReceiveChatMessage.bind(this);
     this.onReceiveCustomMessage = this.onReceiveCustomMessage.bind(this);
     this.onRoomDestroyed = this.onRoomDestroyed.bind(this);
+    this.onRoomMasterChanged = this.onRoomMasterChanged.bind(this);
     this.bindIMEvent();
 
     this.onCallingRollStarted = this.onCallingRollStarted.bind(this);
@@ -136,8 +140,12 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
       this.onReceiveInvitationTimeout.bind(this);
     this.onReceiveSpeechApplication =
       this.onReceiveSpeechApplication.bind(this);
+    this.onSpeechApplicationCancelled = this.onSpeechApplicationCancelled.bind(this);
     this.onSpeechApplicationTimeout =
       this.onSpeechApplicationTimeout.bind(this);
+
+    this.onUserKickOffStage = this.onUserKickOffStage.bind(this);
+
     this.bindCoordinatorEvent();
   }
 
@@ -296,6 +304,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
 
     const { room, user } = tuiResponse.data;
     this.emitter.emit(ETUIRoomEvents.onUserEnterRoom, user);
+    this.getRoomMemberList();
     return TUIRoomResponse.success(room);
   }
 
@@ -307,7 +316,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
    * @returns {Promise}
    */
   async destroyRoom(): Promise<TUIRoomResponse<any>> {
-    logger.debug(`${TUIRoomCore}destroyRoom`);
+    logger.debug(`${TUIRoomCore.logPrefix}destroyRoom`);
     this.checkLogin();
     const tuiResponse = await this.roomLifecycle.destroyRoom();
     const { user } = tuiResponse.data;
@@ -339,6 +348,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
 
     const { room, user } = tuiResponse.data;
     this.emitter.emit(ETUIRoomEvents.onUserEnterRoom, user);
+    this.getRoomMemberList();
     return TUIRoomResponse.success(room);
   }
 
@@ -388,12 +398,17 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
    * 获取指定用户信息
    *
    * @param {string} userId 成员Id
-   * @returns {TUIRoomUser | null}
+   * @returns {Promise<Object | null>}
    */
-  getUserInfo(userId: string): TUIRoomUser | null {
+  async getUserInfo(userId: string): Promise<Object | null> {
     if (this.state.userMap.has(userId)) {
       const user = this.state.userMap.get(userId) as TUIRoomUser;
       return simpleClone(user);
+    }
+    const response = await this.timService.getGroupMemberProfile([userId]);
+    if (response.data.length > 0) {
+      const { userID: userId, avatar, nick: name } = response.data[0];
+      return { userId, avatar, name }
     }
     return null;
   }
@@ -462,9 +477,9 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   /**
    * 关闭本地摄像头
    */
-  stopCameraPreview() {
+  async stopCameraPreview() {
     logger.debug(`${TUIRoomCore.logPrefix}stopCameraPreview`);
-    this.trtcService.stopLocalVideo();
+    await this.trtcService.stopLocalVideo();
     this.state.currentUser.isVideoStreamAvailable = false;
     this.emitter.emit(ETUIRoomEvents.onUserVideoAvailable, {
       userId: this.state.currentUser.userId,
@@ -482,9 +497,9 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
    *
    * @param {TRTCAudioQuality} quality 音频采集质量
    */
-  startMicrophone(quality?: TRTCAudioQuality) {
+  async startMicrophone(quality?: TRTCAudioQuality) {
     logger.debug(`${TUIRoomCore.logPrefix}startMicrophone`);
-    this.trtcService.startLocalAudio(quality);
+    await this.trtcService.startLocalAudio(quality);
     this.state.currentUser.isAudioStreamAvailable = true;
     this.emitter.emit(ETUIRoomEvents.onUserAudioAvailable, {
       userId: this.state.currentUser.userId,
@@ -499,9 +514,9 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   /**
    * 关闭本地麦克风
    */
-  stopMicrophone() {
+  async stopMicrophone() {
     logger.debug(`${TUIRoomCore.logPrefix}stopMicrophone`);
-    this.trtcService.stopLocalAudio();
+    await this.trtcService.stopLocalAudio();
     this.state.currentUser.isAudioStreamAvailable = false;
     this.emitter.emit(ETUIRoomEvents.onUserAudioAvailable, {
       userId: this.state.currentUser.userId,
@@ -927,8 +942,8 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
    * /////////////////////////////////////////////////////////////////////////////////
    */
   bindTRTCEvent() {
-    this.trtcService.on('onRemoteUserEnterRoom', this.onRemoteUserEnterRoom);
-    this.trtcService.on('onRemoteUserLeaveRoom', this.onRemoteUserLeaveRoom);
+    this.trtcService.on('onRemoteUserEnterRoom', this.onRemoteUserAVEnabled);
+    this.trtcService.on('onRemoteUserLeaveRoom', this.onRemoteUserAVDisabled);
     this.trtcService.on('onUserVideoAvailable', this.onUserVideoAvailable);
     this.trtcService.on('onUserSubStreamAvailable', this.onUserSubStreamAvailable); // eslint-disable-line
     this.trtcService.on('onUserAudioAvailable', this.onUserAudioAvailable);
@@ -942,8 +957,8 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   }
 
   unbindTRTCEvent() {
-    this.trtcService.off('onRemoteUserEnterRoom', this.onRemoteUserEnterRoom);
-    this.trtcService.off('onRemoteUserLeaveRoom', this.onRemoteUserLeaveRoom);
+    this.trtcService.off('onRemoteUserEnterRoom', this.onRemoteUserAVEnabled);
+    this.trtcService.off('onRemoteUserLeaveRoom', this.onRemoteUserAVDisabled);
     this.trtcService.off('onUserVideoAvailable', this.onUserVideoAvailable);
     this.trtcService.off('onUserSubStreamAvailable', this.onUserSubStreamAvailable); // eslint-disable-line
     this.trtcService.off('onUserAudioAvailable', this.onUserAudioAvailable);
@@ -977,6 +992,33 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     this.emitter.emit(ETUIRoomEvents.onUserEnterRoom, simpleClone(newUser));
   }
 
+  async onRemoteUserAVEnabled(userId: string) {
+    logger.log(
+      `${TUIRoomCore.logPrefix}onRemoteUserAVEnabled userId: ${userId}`
+    );
+    let userProfile = null;
+    if (userId.indexOf('share_') === 0) {
+      userProfile = await this.timService.getGroupMemberProfile([userId.slice(6)]);
+    } else {
+      userProfile = await this.timService.getGroupMemberProfile([userId]);
+    }
+    const userInfo = userProfile.data[0];
+
+    let newUser  = this.state.userMap.get(userId);
+    if (!newUser) {
+      newUser = new TUIRoomUser();
+      newUser.userId = userId;
+    }
+
+    if (userInfo) {
+      newUser.name = userInfo.nick;
+      newUser.avatar = userInfo.avatar;
+    }
+
+    this.state.userMap.set(userId, newUser);
+    this.emitter.emit(ETUIRoomEvents.onUserAVEnabled, simpleClone(newUser));
+  }
+
   onRemoteUserLeaveRoom(userId: string, reason: number) {
     logger.log(
       `${TUIRoomCore.logPrefix}onRemoteUserLeaveRoom userId: ${userId} reason: ${reason}`
@@ -985,6 +1027,16 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
       const user = this.state.userMap.get(userId) as TUIRoomUser;
       this.state.userMap.delete(userId);
       this.emitter.emit(ETUIRoomEvents.onUserLeaveRoom, simpleClone(user));
+    }
+  }
+
+  onRemoteUserAVDisabled(userId: string, reason: number) {
+    logger.log(
+      `${TUIRoomCore.logPrefix}onRemoteUserAVDisabled userId: ${userId} reason: ${reason}`
+    );
+    if (this.state.userMap.has(userId)) {
+      const user = this.state.userMap.get(userId) as TUIRoomUser;
+      this.emitter.emit(ETUIRoomEvents.onUserAVDisabled, simpleClone(user));
     }
   }
 
@@ -1151,6 +1203,38 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   /**
    * /////////////////////////////////////////////////////////////////////////////////
    * //
+   * //                                    IM 群资料相关接口
+   * //
+   * /////////////////////////////////////////////////////////////////////////////////
+   */
+  /**
+   * 获取群人数
+   *
+   * @param {string} Object - 获取房间列表
+   * @returns {Promise}
+   */
+  async getRoomMemberList() {
+    const response = await this.timService.getGroupMemberList()
+    response.data.forEach((item: { userID: string; nick: string; avatar: string; }) => {
+      const { userID: userId, nick, avatar } = item;
+      if (userId === this.state.currentUser.userId) {
+        return;
+      }
+      let newUser  = this.state.userMap.get(userId);
+      if (!newUser) {
+        newUser = new TUIRoomUser();
+        newUser.userId = userId;
+      }
+      newUser.name = nick;
+      newUser.avatar = avatar;
+      this.state.userMap.set(userId, newUser);
+      this.emitter.emit(ETUIRoomEvents.onUserEnterRoom, simpleClone(newUser));
+    })
+  }
+
+  /**
+   * /////////////////////////////////////////////////////////////////////////////////
+   * //
    * //                                    IM 事件处理
    * //
    * /////////////////////////////////////////////////////////////////////////////////
@@ -1159,12 +1243,18 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     this.timService.onRoomEvent(ETUIRoomEvents.onReceiveChatMessage, this.onReceiveChatMessage); // eslint-disable-line
     this.timService.onRoomEvent(ETUIRoomEvents.onReceiveCustomMessage, this.onReceiveCustomMessage); // eslint-disable-line
     this.timService.onRoomEvent(ETUIRoomEvents.onRoomDestroyed, this.onRoomDestroyed); // eslint-disable-line
+    this.timService.onRoomEvent(ETUIRoomEvents.onRoomMasterChanged, this.onRoomMasterChanged);// eslint-disable-line
+    this.timService.onRoomEvent('onRemoteUserEnterRoom', this.onRemoteUserEnterRoom);
+    this.timService.onRoomEvent('onRemoteUserLeaveRoom', this.onRemoteUserLeaveRoom);
   }
 
   private unbindIMEvent() {
     this.timService.offRoomEvent(ETUIRoomEvents.onReceiveChatMessage, this.onReceiveChatMessage); // eslint-disable-line
     this.timService.offRoomEvent(ETUIRoomEvents.onReceiveCustomMessage, this.onReceiveCustomMessage); // eslint-disable-line
     this.timService.offRoomEvent(ETUIRoomEvents.onRoomDestroyed, this.onRoomDestroyed); // eslint-disable-line
+    this.timService.offRoomEvent(ETUIRoomEvents.onRoomMasterChanged, this.onRoomMasterChanged);// eslint-disable-line
+    this.timService.offRoomEvent('onRemoteUserEnterRoom', this.onRemoteUserEnterRoom);
+    this.timService.offRoomEvent('onRemoteUserLeaveRoom', this.onRemoteUserLeaveRoom);
   }
 
   // 处理聊天消息接收事件
@@ -1187,6 +1277,14 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     this.trtcService.exitRoom();
     this.state.reset();
     this.emitter.emit(ETUIRoomEvents.onRoomDestroyed, null);
+  }
+  private onRoomMasterChanged (ownerID: string){
+    logger.log(`${TUIRoomCore.logPrefix}onRoomMasterChangd`, ownerID,this.state);
+    if(this.state.currentUser.userId === ownerID) {
+      this.state.currentUser.role = ETUIRoomRole.MASTER;
+      this.emitter.emit(ETUIRoomEvents.onUserStateChange, simpleClone(this.state.currentUser));
+    }
+    this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged,ownerID); 
   }
 
   /**
@@ -1243,6 +1341,31 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     return this.roomCoordinator.replyCallingRoll();
   }
 
+  // // 新信令：申请上麦
+  // async applyTakeSeat(): Promise<TUIRoomResponse<any>> {
+  //   return this.roomCoordinator.applyTakeSeat();
+  // }
+
+  // // 新信令：邀请上麦
+  // async pickUserSeat(userId: string): Promise<TUIRoomResponse<any>> {
+  //   return this.roomCoordinator.applyTakeSeat();
+  // }
+
+  // // 新信令：邀请上麦
+  // async kickUserSeat(): Promise<TUIRoomResponse<any>> {
+  //   return this.roomCoordinator.applyTakeSeat();
+  // }  
+
+  // // 处理远端的响应
+  // async responseRemoteRequest(userId: string, agree: boolean) {
+  //   return this.roomCoordinator.replySpeechApplication(userId, agree);
+  // }
+
+  // // 取消某个请求
+  // async cancelRequest(requestId: string) {
+    
+  // }
+
   async sendSpeechInvitation(userId: string): Promise<TUIRoomResponse<any>> {
     return this.roomCoordinator.sendSpeechInvitation(userId);
   }
@@ -1252,22 +1375,41 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   }
 
   async replySpeechInvitation(agree: boolean): Promise<TUIRoomResponse<any>> {
-    return this.roomCoordinator.replySpeechInvitation(agree);
+    const response = await this.roomCoordinator.replySpeechInvitation(agree);
+    // 同意邀请上麦之后切换为主播身份
+    agree && this.trtcService.switchRole(TRTCRoleType.TRTCRoleAnchor);
+    return response;
   }
 
+  async kickUserOffStage(userId: string): Promise<TUIRoomResponse<any>> {
+    return this.roomCoordinator.kickUserOffStage(userId);
+  }
+
+  // 发送上麦申请
   async sendSpeechApplication(): Promise<TUIRoomResponse<any>> {
     const tuiResponse = await this.roomCoordinator.sendSpeechApplication();
     const { code } = tuiResponse;
     if (code === 0) {
-      this.muteLocalMicrophone(false);
+      // 切换 audience 为 anchor
+      this.trtcService.switchRole(TRTCRoleType.TRTCRoleAnchor);
     }
     return tuiResponse;
   }
 
+  // 取消上麦申请
   async cancelSpeechApplication(): Promise<TUIRoomResponse<any>> {
     return this.roomCoordinator.cancelSpeechApplication();
   }
 
+  // 下麦
+  async sendOffSpeaker(): Promise<TUIRoomResponse<any>> {
+    await this.stopCameraPreview();
+    await this.stopMicrophone();
+    await this.trtcService.switchRole(TRTCRoleType.TRTCRoleAudience);
+    return TUIRoomResponse.success();
+  }
+
+  // master 处理用户上麦申请
   async replySpeechApplication(
     userId: string,
     agree: boolean
@@ -1279,10 +1421,6 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     forbid: boolean
   ): Promise<TUIRoomResponse<any>> {
     return this.roomCoordinator.forbidSpeechApplication(forbid);
-  }
-
-  async sendOffSpeaker(userId: string): Promise<TUIRoomResponse<any>> {
-    return this.roomCoordinator.sendOffSpeaker(userId);
   }
 
   async sendOffAllSpeakers(): Promise<TUIRoomResponse<any>> {
@@ -1346,9 +1484,17 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
       this.onReceiveSpeechApplication
     );
     this.roomCoordinator.on(
+      ETUIRoomEvents.onSpeechApplicationCancelled,
+      this.onSpeechApplicationCancelled
+    );
+    this.roomCoordinator.on(
       ETUIRoomEvents.onSpeechApplicationTimeout,
       this.onSpeechApplicationTimeout
     );
+    this.roomCoordinator.on(
+      ETUIRoomEvents.onUserKickOffStage,
+      this.onUserKickOffStage
+    )
   }
 
   private unbindCoordinatorEvent() {
@@ -1397,9 +1543,17 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
       this.onReceiveSpeechApplication
     );
     this.roomCoordinator.off(
+      ETUIRoomEvents.onSpeechApplicationCancelled,
+      this.onSpeechApplicationCancelled
+    );
+    this.roomCoordinator.off(
       ETUIRoomEvents.onSpeechApplicationTimeout,
       this.onSpeechApplicationTimeout
     );
+    this.roomCoordinator.off(
+      ETUIRoomEvents.onUserKickOffStage,
+      this.onUserKickOffStage
+    )
   }
 
   // 开始点名
@@ -1485,13 +1639,25 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   // 老师监听到学生举手
   private onReceiveSpeechApplication(event: Record<string, any>) {
     logger.log(`${TUIRoomCore.logPrefix}onReceiveSpeechApplication`, event);
-    this.emitter.emit(ETUIRoomEvents.onReceiveSpeechApplication, event.data);
+    this.emitter.emit(ETUIRoomEvents.onReceiveSpeechApplication, event);
+  }
+
+  // 取消上麦申请
+  private onSpeechApplicationCancelled(event: Record<string, any>) {
+    logger.log(`${TUIRoomCore.logPrefix}onReceiveSpeechApplication`, event);
+    this.emitter.emit(ETUIRoomEvents.onSpeechApplicationCancelled, event);
   }
 
   // 老师响应学生举手申请超时
   private onSpeechApplicationTimeout(event: Record<string, any>) {
     logger.log(`${TUIRoomCore.logPrefix}onSpeechApplicationTimeout`, event);
-    this.emitter.emit(ETUIRoomEvents.onSpeechApplicationTimeout, event.data);
+    this.emitter.emit(ETUIRoomEvents.onSpeechApplicationTimeout, event);
+  }
+
+  // 主持人将用户踢下麦
+  private onUserKickOffStage(event: Record<string, any>) {
+    logger.log(`${TUIRoomCore.logPrefix} onUserKickOffStage`, event);
+    this.emitter.emit(ETUIRoomEvents.onUserKickOffStage, event.data);
   }
   /**
    * /////////////////////////////////////////////////////////////////////////////////
