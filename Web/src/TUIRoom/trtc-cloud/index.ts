@@ -2,8 +2,8 @@
 import { EventEmitter } from 'events';
 // import IDLogger from './utils/log/id-logger';
 // import log from './utils/log/logger';
-import { TRTCAppScene, TRTCParams, TRTCQualityInfo, TRTCStatistics, TRTCVideoStreamType, TRTCLocalStatistics } from './common/trtc_define';
-import { EnterRoomFailure, roleMap, joinSceneMap, liveMode, audienceRole, ExitRoomCode, ON_ERROR, auxiliaryStream } from './common/constants';
+import { TRTCAppScene, TRTCParams, TRTCQualityInfo, TRTCStatistics, TRTCVideoStreamType, TRTCLocalStatistics, TRTCRoleType } from './common/trtc_define';
+import { EnterRoomFailure, roleMap, joinSceneMap, rtcMode, liveMode, audienceRole, ExitRoomCode, ON_ERROR, auxiliaryStream } from './common/constants';
 // @ts-ignore
 import { MixinsClass, isString, isUndefined, performanceNow } from './utils/utils';
 import { BaseCommon } from './BaseCommon';
@@ -195,6 +195,7 @@ class TRTCCloud extends MixinsClass(
    * 否则可能会遇到如摄像头、麦克风设备被强占等各种异常问题。
    */
   async exitRoom() {
+    this.log_.info(`(exitRoom) exitRoom, isJoined: ${this.isJoined}; isPublished: ${this.isPublished}`);
     try {
       if (!this.isJoined || this.isExiting) {
         this.log_.error(`(exitRoom) failed - ${exitRoomError.message} isJoined: ${this.isJoined} isExiting: ${this.isExiting}`);
@@ -219,6 +220,18 @@ class TRTCCloud extends MixinsClass(
       this.isExiting = false;
       this.callFunctionErrorManage(error, 'exitRoom');
     }
+  }
+
+  /**
+   * 切换角色
+   */
+  async switchRole(role: TRTCRoleType) {
+    if (this.mode === rtcMode) {
+      this.log_.info(`(publishLocalStream) failed - mode = ${this.mode}, role = ${role}`);
+      return;
+    }
+    await this.client.switchRole(role === TRTCRoleType.TRTCRoleAnchor ? 'anchor' : 'audience');
+    this.role = roleMap[role];
   }
 
   // ///////////////////////////////////////////////////////////////////////////////
@@ -295,8 +308,10 @@ class TRTCCloud extends MixinsClass(
   }
   // 停止推流
   async unPublishStream() {
-    if (this.localStream) {
+    this.log_.info('(unPublishStream) unPublishStream', this.localStream);
+    if (this.isPublished && this.localStream) {
       await this.client.unpublish(this.localStream);
+      this.isPublished = false;
     }
   }
   // 设置 video 参数

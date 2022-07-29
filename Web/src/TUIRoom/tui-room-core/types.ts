@@ -145,6 +145,11 @@ export enum ETUIRoomEvents {
   onCameraMuted = 'onCameraMuted', // supported
   onUserChatRoomMuted = 'onUserChatRoomMuted', // supported
   onUserKickOff = 'onUserKickOff', // supported
+
+  onUserAVEnabled = 'onUserAVEnabled', // 远端用户可推流, 主播身份进入 trtc 房间
+  onUserAVDisabled = 'onUserAVDisabled', // 远端用户不可推流，退出 trtc 房间
+
+  onUserKickOffStage = 'onUserKickOffStage', // 主播被主持人提下麦
 }
 
 /**
@@ -164,14 +169,15 @@ export enum ETUIRoomCoordinatorConfig {
 * 信令事件枚举常量1v1
 */
 export enum ETUIRoomCoordinatorCommand {
-  SendSpeechInvitation = 'SendSpeechInvitation', // 主持人邀请观众上台
-  SendOffSpeaker = 'SendOffSpeaker', // 主持人邀请观众下台
-  SendSpeechApplication = 'SendSpeechApplication', // 观众申请上台
   MuteUserMicrophone = 'MuteUserMicrophone', // 主持人禁用观众麦克风，不可拒绝，只能接受
   MuteUserCamera = 'MuteUserCamera', //	主持人禁用观众摄像头，不可拒绝，只能接受
   MuteUserChatRoom = 'MuteUserChatRoom', // 主持人禁用观众文字聊天，不可拒绝，只能接受
   ReplyCallingRoll = 'ReplyCallingRoll', // 观众回复点名（签到）
   KickOffUser	= 'KickOffUser', //	主持人踢人出房间，不可拒绝，只能接受
+
+  TakeSeat = 'TakeSeat', // 申请上麦, 观众申请上台
+  PickSeat = 'PickSeat', // 抱人上麦, 主持人邀请观众上台
+  KickSeat = 'KickSeat', // 踢人下麦, 主持人邀请观众下台
 }
 
 

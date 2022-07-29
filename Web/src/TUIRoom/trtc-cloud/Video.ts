@@ -100,7 +100,7 @@ class Video extends MixinsClass(BaseCommon) {
       this.log_.info('(stopLocalPreview) stop - local preview has not been started');
       return;
     }
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         if (this.localStream) {
           const audioTrack = this.localStream.getAudioTrack();
@@ -115,6 +115,7 @@ class Video extends MixinsClass(BaseCommon) {
               });
             }
           } else {
+            await this.unPublishStream();
             this.localStream.stop();
             this.localStream.close();
             this.localStream = null;

@@ -26,10 +26,10 @@ const svgClass = computed((): string => {
 });
 </script>
 
-<style scoped>
-@import '../../assets/style/svg.scss';
+<style lang="scss" scoped>
+@import url(../../assets/style/svg.scss);
+
 .svg-icon {
-  fill: currentColor;
   overflow: hidden;
   display: inline-block;
   background-size: contain;

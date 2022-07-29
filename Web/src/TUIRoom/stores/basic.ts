@@ -17,6 +17,7 @@ interface BasicState {
   roomMode: ETUISpeechMode,
   isSidebarOpen: boolean,
   showSettingDialog: boolean,
+  showApplyUserList: boolean,
   activeSettingTab: string,
   layout: LAYOUT,
   isLocalStreamMirror: boolean,
@@ -46,6 +47,7 @@ export const useBasicStore = defineStore('basic', {
     isSidebarOpen: false,
     layout: LAYOUT.NINE_EQUAL_POINTS,
     showSettingDialog: false,
+    showApplyUserList: false,
     activeSettingTab: 'audio',
     isLocalStreamMirror: true,
     sidebarName: '',
@@ -89,13 +91,27 @@ export const useBasicStore = defineStore('basic', {
       return 0;
     },
     isMaster(state) {
-      return state.userId === state.masterUserId;
+      return state.role === ETUIRoomRole.MASTER;
+    },
+    isAnchor(state) {
+      return state.role === ETUIRoomRole.ANCHOR;
+    },
+    isAudience(state) {
+      return state.role === ETUIRoomRole.AUDIENCE;
     },
     isLocalAudioIconDisable(state) {
-      return state.userId !== state.masterUserId && !state.canControlSelfAudio;
+      // 全员禁麦状态
+      const micForbidden = state.userId !== state.masterUserId && !state.canControlSelfAudio;
+      // 举手发言麦下模式
+      const audienceRole = state.roomMode === ETUISpeechMode.APPLY_SPEECH && state.role === ETUIRoomRole.AUDIENCE;
+      return micForbidden || audienceRole;
     },
     isLocalVideoIconDisable(state) {
-      return state.userId !== state.masterUserId && !state.canControlSelfVideo;
+      // 全员禁画状态
+      const cameraForbidden = state.userId !== state.masterUserId && !state.canControlSelfVideo;
+      // 举手发言麦下模式
+      const audienceRole = state.roomMode === ETUISpeechMode.APPLY_SPEECH && state.role === ETUIRoomRole.AUDIENCE;
+      return cameraForbidden || audienceRole;
     },
   },
   actions: {
@@ -139,6 +155,9 @@ export const useBasicStore = defineStore('basic', {
     setShowSettingDialog(show: boolean) {
       this.showSettingDialog = show;
     },
+    setShowApplyUserList(show: boolean) {
+      this.showApplyUserList = show;
+    },
     setActiveSettingTab(tabName: string) {
       this.activeSettingTab = tabName;
     },
@@ -162,16 +181,30 @@ export const useBasicStore = defineStore('basic', {
     setMasterUserId(userId: string) {
       this.masterUserId = userId;
     },
-    setRoomInfo(roomInfo: { ownerId: string, roomConfig: { isAllMicMuted: boolean, isAllCameraMuted: boolean } }) {
-      this.masterUserId = roomInfo.ownerId;
-      this.isMuteAllAudio = roomInfo.roomConfig.isAllMicMuted;
-      this.isMuteAllVideo = roomInfo.roomConfig.isAllCameraMuted;
+    setRoomInfo(roomInfo: {
+      ownerId: string,
+      roomConfig: {
+        isAllMicMuted: boolean,
+        isAllCameraMuted: boolean,
+        speechMode: ETUISpeechMode
+      }
+    }) {
+      const { ownerId, roomConfig: { isAllMicMuted, isAllCameraMuted, speechMode } } = roomInfo;
+      this.masterUserId = ownerId;
+      if (this.userId === ownerId) {
+        this.role = ETUIRoomRole.MASTER;
+      } else {
+        this.role = speechMode === ETUISpeechMode.APPLY_SPEECH ? ETUIRoomRole.AUDIENCE : ETUIRoomRole.ANCHOR;
+      }
+      this.isMuteAllAudio = isAllMicMuted;
+      this.isMuteAllVideo = isAllCameraMuted;
       if (this.isMuteAllAudio) {
         this.canControlSelfAudio = false;
       }
       if (this.isMuteAllVideo) {
         this.canControlSelfVideo = false;
       }
+      this.roomMode = speechMode;
     },
     setLocalQuality(quality: number) {
       this.localQuality = quality;

@@ -34,15 +34,15 @@ import VideoSettingTab from '../base/VideoSettingTab.vue';
 import TUIRoomCore from '../../tui-room-core';
 
 import { useBasicStore } from '../../stores/basic';
-import { useStreamStore } from '../../stores/stream';
+import { useRoomStore } from '../../stores/room';
 import { ICON_NAME } from '../../constants/icon';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 
 const basicStore = useBasicStore();
-const streamStore = useStreamStore();
+const roomStore = useRoomStore();
 
-const { isDefaultOpenCamera, hasStartedCamera, localStream, isLocalVideoMuted } = storeToRefs(streamStore);
-const { isLocalVideoIconDisable } = storeToRefs(basicStore);
+const { isDefaultOpenCamera, localStream, isLocalVideoMuted } = storeToRefs(roomStore);
+const { isLocalVideoIconDisable, isMuteAllVideo, isAudience } = storeToRefs(basicStore);
 
 const showVideoSettingTab: Ref<boolean> = ref(false);
 const videoIconButtonRef = ref<InstanceType<typeof IconButton>>();
@@ -65,25 +65,28 @@ watch(localStream, (val) => {
 
 function toggleMuteVideo() {
   if (isLocalVideoIconDisable.value) {
+    let warningMessage = '';
+    if (isMuteAllVideo.value) {
+      warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_MUTE_ALL;
+    } else if (isAudience.value) {
+      warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_AUDIENCE;
+    }
     ElMessage({
       type: 'warning',
-      message: WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_MUTE_ALL,
+      message: warningMessage,
       duration: MESSAGE_DURATION.NORMAL,
     });
     return;
   }
 
-  streamStore.setIsLocalVideoMuted(!isLocalVideoMuted.value);
+  roomStore.setIsLocalVideoMuted(!isLocalVideoMuted.value);
   // 关闭本地摄像头的时候应该熄灭摄像头灯，使用 stopCameraPreview 方法
   if (isLocalVideoMuted.value) {
     TUIRoomCore.stopCameraPreview();
   } else {
-    const previewDom = document.getElementById(`${streamStore.localStream.userId}_main`);
+    const previewDom = document.getElementById(`${roomStore.localStream.userId}_main`);
     previewDom && TUIRoomCore.startCameraPreview(previewDom);
   }
-  streamStore.updateLocalStream({
-    isVideoStreamAvailable: !isLocalVideoMuted.value,
-  });
   showVideoSettingTab.value = false;
 }
 

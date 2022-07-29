@@ -75,7 +75,7 @@
 <script setup lang="ts">
 import { ref, computed, onBeforeUnmount } from 'vue';
 import DeviceSelect from './DeviceSelect.vue';
-import { useStreamStore } from '../../stores/stream';
+import { useRoomStore } from '../../stores/room';
 import { SettingMode } from '../../constants/render';
 
 interface Props {
@@ -86,13 +86,13 @@ const settingMode = props.mode || SettingMode.SIMPLE;
 const isSampleMode = computed(() => settingMode === SettingMode.SIMPLE);
 const isDetailMode = computed(() => settingMode === SettingMode.DETAIL);
 
-const streamStore = useStreamStore();
+const roomStore = useRoomStore();
 // const inputAudioLevel = ref(0);
 // const outputAudioLevel = ref(100);
 
 const volumeTotalNum = computed(() => (isDetailMode.value ? 36 : 28));
 
-const volumeNum = computed(() => (streamStore.localStream.audioVolume || 0) * volumeTotalNum.value / 100);
+const volumeNum = computed(() => (roomStore.localStream.audioVolume || 0) * volumeTotalNum.value / 100);
 
 const showVolume = computed(() => isSampleMode.value || (isDetailMode.value && isTestingMicrophone.value));
 

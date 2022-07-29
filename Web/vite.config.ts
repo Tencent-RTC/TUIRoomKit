@@ -34,7 +34,6 @@ export default defineConfig({
       scss: {
         additionalData: `
           @use "./src/assets/style/global.scss" as *;
-          @use "./src/TUIRoom/assets/style/element.scss" as *;
         `,
       },
     },

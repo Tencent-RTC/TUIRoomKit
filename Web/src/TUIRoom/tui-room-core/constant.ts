@@ -26,6 +26,8 @@ export const TUIRoomErrorCode = {
   WEB_SCREEN_SHARE_UNKNOWN: -1024,
   GET_GROUP_MEMBER_PROFILE_ERROR: -1025,
   CHANGE_ALL_CAMERA_MUTE_ERROR: -1026,
+  GET_GROUP_MEMBER_LIST_ERROR: -1027,
+
   ROOM_BEEN_DESTROYED: -1997,
   NO_PRIVILEGE: -1998,
   UNKNOWN_ERROR: -1999,
@@ -70,6 +72,7 @@ export const TUIRoomErrorMessage = {
   WEB_SCREEN_SHARE_USER_DENY: '用户拒绝/取消屏幕分享',
   WEB_SCREEN_SHARE_UNKNOWN: '屏幕分享遇到未知错误',
   GET_GROUP_MEMBER_PROFILE_ERROR: '获取群成员信息失败',
+  GET_GROUP_MEMBER_LIST_ERROR: '获取群成员列表失败',
   NO_PRIVILEGE: '无权限',
   UNKNOWN_ERROR: '未知错误',
 
@@ -84,7 +87,7 @@ export const TUIRoomErrorMessage = {
 };
 
 export const TSignalingConfig = {
-  timeout: 60,
+  timeout: 0,
 };
 
 export const TIM_ROOM_PREFIX = '';
