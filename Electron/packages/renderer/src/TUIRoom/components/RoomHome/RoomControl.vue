@@ -12,9 +12,27 @@
       </div>
       <!-- query 中没有 roomId -->
       <div v-else class="control-region">
-        <div class="button create-room-button" type="primary" @click="createRoom">
-          <svg-icon icon-name="add-icon"></svg-icon>
-          <span class="title">新建房间</span>
+        <div
+          type="primary"
+          class="button create-room-button"
+          @mouseenter="handleMouseEnter"
+          @mouseleave="handleMouseLeave"
+        >
+          <div class="create-room">
+            <svg-icon icon-name="add-icon"></svg-icon>
+            <span class="title">新建房间</span>
+          </div>
+          <div class="connect-region"></div>
+          <div v-show="showCreateRoomOption" class="create-room-mode">
+            <div class="create-room-option" @click="createRoom('FreeSpeech')">
+              <svg-icon class="icon" icon-name="free-speech-icon"></svg-icon>
+              <span class="title">自由发言房间</span>
+            </div>
+            <div class="create-room-option" @click="createRoom('ApplySpeech')">
+              <svg-icon class="icon" icon-name="apply-speech-icon"></svg-icon>
+              <span class="title">举手发言房间</span>
+            </div>
+          </div>
         </div>
         <div class="button join-room-button" type="primary" @click="enterRoom">
           <input v-model="roomId" class="input" placeholder="输入房间号" maxlength="10" @click.stop="">
@@ -37,6 +55,15 @@ const props = defineProps<{
 const hasGivenRoomId = typeof props.givenRoomId === 'string' && props.givenRoomId !== '';
 
 const roomId = ref('');
+const showCreateRoomOption = ref(false);
+
+function handleMouseEnter() {
+  showCreateRoomOption.value = true;
+}
+
+function handleMouseLeave() {
+  showCreateRoomOption.value = false;
+}
 
 watch(roomId, (val) => {
   roomId.value = val.replace(/[^\d]/g, '');
@@ -48,8 +75,8 @@ function enterGivenRoom() {
   emit('enterRoom', props.givenRoomId);
 }
 
-function createRoom() {
-  emit('createRoom');
+function createRoom(mode: string) {
+  emit('createRoom', mode);
 }
 
 function enterRoom() {
@@ -120,7 +147,6 @@ function enterRoom() {
     background-image: linear-gradient(-45deg, #006EFF 0%, #0C59F2 100%);
     box-shadow: 0 2px 4px 0 rgba(0,0,0,0.20);
     border-radius: 8px;
-    padding: 2px;
     cursor: pointer;
     .title {
       font-size: 22px;
@@ -138,16 +164,60 @@ function enterRoom() {
   }
 
   .create-room-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     position: absolute;
     top: 214px;
+    .create-room {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .create-room-mode {
+      width: 100%;
+      position: absolute;
+      top: calc(100% + 4px);
+      z-index: 10;
+      background-color: #1D2437;
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 1px 10px 0 #091D3B;
+      border-radius: 8px;
+      padding: 4px 0;
+    }
+    .connect-region {
+      width: 100%;
+      height: 6px;
+    }
+    .create-room-option {
+      height: 48px;
+      padding-left: 32px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      &:hover {
+        background-color: rgba(50,59,84,0.60);
+        .title {
+          color: $whiteColor;
+        }
+        .icon {
+          background-color: $whiteColor;
+        }
+      }
+      .icon {
+        background-color: #CFD4E6;
+      }
+      .title {
+        font-weight: 400;
+        font-size: 14px;
+        color: #CFD4E6;
+      }
+    }
   }
 
   .join-room-button {
     position: absolute;
     bottom: 50px;
+    padding: 2px;
     .input {
       width: 212px;
       height: 100%;

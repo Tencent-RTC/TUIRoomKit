@@ -4,6 +4,7 @@
   >
     <el-drawer
       v-model="isSidebarOpen"
+      custom-class="custom-element-class"
       :modal="false"
       :title="title"
       direction="rtl"
@@ -54,12 +55,15 @@ function handleClose(done: any) {
 </script>
 
 <style lang="scss">
+@import '../../assets/style/element-custom.scss';
+
   .sidebar-container > div {
     inset: inherit !important;
     width: 480px !important;
     right: 0 !important;
     top: 0 !important;
     height: 100%;
+    position: absolute !important;
   }
   .sidebar-container .el-drawer__header {
     height: 88px;

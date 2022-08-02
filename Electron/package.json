@@ -27,7 +27,7 @@
       "qs": "^6.10.3",
       "rtc-beauty-plugin": "^0.1.0",
       "tim-js-sdk": "^2.18.0",
-      "trtc-electron-sdk": "^9.3.8-beta.9",
+      "trtc-electron-sdk": "latest",
       "trtc-js-sdk": "^4.12.2",
       "tsignaling": "^0.10.0",
       "vue": "^3.2.31",
@@ -68,5 +68,5 @@
       "vue3",
       "vue"
     ]
-  }
+}
   

@@ -39,47 +39,50 @@ import TUIRoomCore from '../../tui-room-core';
 import IconButton from '../common/IconButton.vue';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
 import { useBasicStore } from '../../stores/basic';
-import { useStreamStore } from '../../stores/stream';
+import { useRoomStore } from '../../stores/room';
 import AudioIcon from '../base/AudioIcon.vue';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 
 const basicStore = useBasicStore();
-const streamStore = useStreamStore();
-const { localStream, isDefaultOpenMicrophone, hasStartedMicrophone, isLocalAudioMuted } = storeToRefs(streamStore);
-const { isLocalAudioIconDisable } = storeToRefs(basicStore);
+const roomStore = useRoomStore();
+const { localStream, isDefaultOpenMicrophone, hasStartedMicrophone, isLocalAudioMuted } = storeToRefs(roomStore);
+const { isLocalAudioIconDisable, isMuteAllAudio, isAudience } = storeToRefs(basicStore);
 
 const showAudioSettingTab: Ref<boolean> = ref(false);
 const audioIconButtonRef = ref<InstanceType<typeof IconButton>>();
 const audioSettingRef = ref<InstanceType<typeof AudioSettingTab>>();
 
 watch(isDefaultOpenMicrophone, (val) => {
-  streamStore.setIsLocalAudioMuted(!val);
+  roomStore.setIsLocalAudioMuted(!val);
 }, { immediate: true });
 
 watch(localStream, (val) => {
-  streamStore.setIsLocalAudioMuted(!val.isAudioStreamAvailable);
+  roomStore.setIsLocalAudioMuted(!val.isAudioStreamAvailable);
 }, { immediate: true });
 
 function toggleMuteAudio() {
   if (isLocalAudioIconDisable.value) {
+    let warningMessage = '';
+    if (isMuteAllAudio.value) {
+      warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_MUTE_ALL;
+    } else if (isAudience.value) {
+      warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_AUDIENCE;
+    }
     ElMessage({
       type: 'warning',
-      message: WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_MUTE_ALL,
+      message: warningMessage,
       duration: MESSAGE_DURATION.NORMAL,
     });
     return;
   }
 
-  streamStore.setIsLocalAudioMuted(!isLocalAudioMuted.value);
+  roomStore.setIsLocalAudioMuted(!isLocalAudioMuted.value);
   if (!isLocalAudioMuted.value && !hasStartedMicrophone.value) {
     TUIRoomCore.startMicrophone();
-    streamStore.setHasStartedMicrophone(true);
+    roomStore.setHasStartedMicrophone(true);
     return;
   }
   TUIRoomCore.muteLocalMicrophone(isLocalAudioMuted.value);
-  streamStore.updateLocalStream({
-    isAudioStreamAvailable: !isLocalAudioMuted.value,
-  });
   showAudioSettingTab.value = false;
 }
 

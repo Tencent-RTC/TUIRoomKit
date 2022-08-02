@@ -159,7 +159,7 @@ class Audio extends MixinsClass(BaseCommon) {
       this.log_.info('(stopLocalAudio) stop - local audio has not been started');
       return;
     }
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         if (this.localStream) {
           this.enableAudioVolumeTimer && clearInterval(this.enableAudioVolumeTimer);
@@ -172,6 +172,7 @@ class Audio extends MixinsClass(BaseCommon) {
               resolve(1);
             }
           } else {
+            await this.unPublishStream();
             this.localStream.stop();
             this.localStream.close();
             this.clearTempAudioContainer('localAudio');

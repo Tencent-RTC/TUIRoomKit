@@ -11,10 +11,11 @@ import TRTCCloud, {
   TRTCVideoQosPreference,
   TRTCVideoMirrorType,
   TRTCVideoRotation,
-  TRTCVideoFillMode
+  TRTCVideoFillMode,
+  TRTCRoleType,
 } from 'trtc-electron-sdk';
 import logger from '../common/logger';
-import { ETUIRoomEvents, ETUIStreamType } from '../types.d';
+import { ETUIRoomEvents, ETUIStreamType } from '../types';
 import TUIRoomError from '../base/TUIRoomError';
 import TUIRoomResponse from '../base/TUIRoomResponse';
 import { TUIRoomErrorCode, TUIRoomErrorMessage } from '../constant';
@@ -25,6 +26,7 @@ type TRTCEnterRoomParams = {
   roomId: number;
   userId: string;
   userSig: string;
+  role: TRTCRoleType;
 };
 
 type ResolveRejectRecord = {
@@ -49,6 +51,8 @@ class BaseTRTCService {
   protected userSig = '';
 
   protected isInRoom = false;
+
+  protected role = 0;
 
   protected rtcCloud: TRTCCloud | null;
 
@@ -149,7 +153,8 @@ class BaseTRTCService {
    */
 
   public async enterRoom(
-    params: TRTCEnterRoomParams
+    params: TRTCEnterRoomParams,
+    scene: TRTCAppScene,
   ): Promise<TUIRoomResponse<any>> {
     return new Promise((resolve, reject) => {
       const list =
@@ -160,11 +165,11 @@ class BaseTRTCService {
       });
       this.methodResolveRejectMap.set(METHOD_NAME.ENTER_ROOM, list);
 
-      this.innerEnterRoom(params);
+      this.innerEnterRoom(params, scene);
     });
   }
 
-  private innerEnterRoom(params: TRTCEnterRoomParams) {
+  private innerEnterRoom(params: TRTCEnterRoomParams, scene: TRTCAppScene) {
     if (!this.rtcCloud) {
       throw new TUIRoomError(
         TUIRoomErrorCode.TRTC_NOT_EXIST_ERROR,
@@ -172,11 +177,12 @@ class BaseTRTCService {
       );
     }
 
-    const { sdkAppId, roomId, userId, userSig } = params;
+    const { sdkAppId, roomId, userId, userSig, role } = params;
     this.sdkAppId = sdkAppId;
     this.roomId = roomId;
     this.userId = userId;
     this.userSig = userSig;
+    this.role = role;
 
     const param = new TRTCParams();
     param.sdkAppId = sdkAppId;
@@ -184,8 +190,9 @@ class BaseTRTCService {
     param.userId = userId;
     param.userSig = userSig;
     param.userDefineRecordId = ''; // 云端录制
+    param.role = role;
     // this.rtcCloud.setDefaultStreamRecvMode(true, false); // 默认接收音频，不接收视频
-    this.rtcCloud.enterRoom(param, TRTCAppScene.TRTCAppSceneVideoCall);
+    this.rtcCloud.enterRoom(param, scene);
 
     // todo: electron 特有，web 端不支持
     // this.rtcCloud.setRenderMode(2); // 1-webgl 2-yuvcanvs
@@ -221,6 +228,17 @@ class BaseTRTCService {
     this.rtcCloud.exitRoom();
   }
 
+  async switchRole(role: TRTCRoleType) {
+    if (!this.rtcCloud) {
+      throw new TUIRoomError(
+        TUIRoomErrorCode.TRTC_NOT_EXIST_ERROR,
+        TUIRoomErrorMessage.TRTC_NOT_EXIST_ERROR
+      );
+    }
+
+    await this.rtcCloud.switchRole(role);
+  }
+
   /**
    * /////////////////////////////////////////////////////////////////////////////////
    * //
@@ -236,16 +254,16 @@ class BaseTRTCService {
     await this.rtcCloud?.startLocalPreview(view);
   }
 
-  stopLocalVideo() {
-    this.rtcCloud?.stopLocalPreview();
+  async stopLocalVideo() {
+    await this.rtcCloud?.stopLocalPreview();
   }
 
-  startLocalAudio(quality?: TRTCAudioQuality) {
-    this.rtcCloud?.startLocalAudio(quality);
+  async startLocalAudio(quality?: TRTCAudioQuality) {
+    await this.rtcCloud?.startLocalAudio(quality);
   }
 
-  stopLocalAudio() {
-    this.rtcCloud?.stopLocalAudio();
+  async stopLocalAudio() {
+    await this.rtcCloud?.stopLocalAudio();
   }
 
   startSystemAudioLoopback() {
@@ -265,7 +283,7 @@ class BaseTRTCService {
   }
 
   setRemoteVideoFillMode(userId: string, streamType: string, fillMode: TRTCVideoFillMode) {
-    this.rtcCloud?.setRemoteRenderParams(userId, streamType, {
+    this.rtcCloud?.setRemoteRenderParams(userId, streamType as any, {
       mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
       rotation: TRTCVideoRotation.TRTCVideoRotation0,
       fillMode: fillMode,

@@ -16,8 +16,9 @@ import BaseTRTCService from "./BaseTRTCService";
 
 window.__TRTCElectron = {
   componentName: 'TUIRoom'
-};
+}
 window.localStorage.setItem('__TRTCElectron', JSON.stringify(window.__TRTCElectron));
+
 
 class ElectronTRTCService extends BaseTRTCService {
   constructor(){

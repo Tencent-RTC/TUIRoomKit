@@ -6,6 +6,7 @@
     @on-enter-room="onEnterRoom"
     @on-room-exit="onRoomExit"
     @on-room-destroy="onRoomDestroy"
+    @on-kick-off="onKickOff"
   ></Room>
 </template>
 
@@ -72,6 +73,13 @@ const onRoomExit = (info: { code: number; message: string }) => {
   console.debug('onRoomExit:', info);
   router.replace({ path: '/home' });
 };
+
+// 普通成员被主持人踢出房间
+const onKickOff = (info: { code: number; message: string }) => {
+  console.debug('onKickOff:', info);
+  router.replace({ path: '/home' });
+};
+
 </script>
 
 <style lang="scss">
