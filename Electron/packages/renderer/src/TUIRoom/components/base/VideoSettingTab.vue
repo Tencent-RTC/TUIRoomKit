@@ -21,7 +21,7 @@
         <el-checkbox
           v-if="isDetailMode"
           v-model="isLocalStreamMirror"
-          class="mirror-checkbox"
+          class="mirror-checkbox custom-element-class"
           label="翻转镜像"
         />
       </div>
@@ -42,7 +42,7 @@ import { ref, computed, Ref, watch, onMounted, onUnmounted } from 'vue';
 import DeviceSelect from './DeviceSelect.vue';
 import VideoProfile from './VideoProfile.vue';
 import { useBasicStore } from '../../stores/basic';
-import { useStreamStore } from '../../stores/stream';
+import { useRoomStore } from '../../stores/room';
 import TUIRoomCore from '../../tui-room-core';
 import { storeToRefs } from 'pinia';
 import { SettingMode } from '../../constants/render';
@@ -65,8 +65,8 @@ watch(isLocalStreamMirror, (val: boolean) => {
   basicStore.setIsLocalStreamMirror(val);
 });
 
-const streamStore = useStreamStore();
-const { currentCameraId } = storeToRefs(streamStore);
+const roomStore = useRoomStore();
+const { currentCameraId } = storeToRefs(roomStore);
 
 // 点击【更多摄像头设置】
 function handleMoreCameraSetting() {
@@ -92,6 +92,7 @@ if (isDetailMode.value) {
 
 <style lang="scss" scoped>
 @import '../../assets/style/var.scss';
+@import '../../assets/style/element-custom.scss';
 
 .video-tab {
   border-radius: 4px;

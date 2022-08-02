@@ -9,7 +9,7 @@
   <el-select
     v-model="currentDeviceId"
     placeholder="placeholder"
-    class="select"
+    class="select custom-element-class"
     :disabled="disabled"
     :teleported="false"
     @change="handleChange"
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { ref, Ref, watch, onMounted, onUnmounted } from 'vue';
 import TUIRoomCore, { TRTCDeviceInfo } from '../../tui-room-core';
-import { useStreamStore } from '../../stores/stream';
+import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
 
 interface Props {
@@ -37,9 +37,9 @@ interface Props {
 // eslint-disable-next-line vue/no-setup-props-destructure
 const { deviceType, onChange, disabled = false } = defineProps<Props>();
 
-const streamStore = useStreamStore();
+const roomStore = useRoomStore();
 
-const { currentCameraId, currentMicrophoneId, currentSpeakerId } = storeToRefs(streamStore);
+const { currentCameraId, currentMicrophoneId, currentSpeakerId } = storeToRefs(roomStore);
 
 function getInitDeviceId() {
   if (deviceType === 'camera') {
@@ -63,15 +63,15 @@ watch(
     switch (deviceType) {
       case 'camera':
         await TUIRoomCore.setCurrentCamera(deviceId);
-        streamStore.setCurrentCameraId(deviceId);
+        roomStore.setCurrentCameraId(deviceId);
         break;
       case 'microphone':
         await TUIRoomCore.setCurrentMicrophone(deviceId);
-        streamStore.setCurrentMicrophoneId(deviceId);
+        roomStore.setCurrentMicrophoneId(deviceId);
         break;
       case 'speaker':
         await TUIRoomCore.setCurrentSpeaker(deviceId);
-        streamStore.setCurrentSpeakerId(deviceId);
+        roomStore.setCurrentSpeakerId(deviceId);
         break;
       default:
         break;
@@ -111,6 +111,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@import '../../assets/style/element-custom.scss';
 .select {
   width: 280px;
   height: 32px;

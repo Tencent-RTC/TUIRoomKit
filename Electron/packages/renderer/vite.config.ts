@@ -49,6 +49,7 @@ export default defineConfig({
           const TRTCVideoMirrorType = TRTCCloud.TRTCVideoMirrorType;
           const TRTCVideoRotation = TRTCCloud.TRTCVideoRotation;
           const TRTCVideoFillMode = TRTCCloud.TRTCVideoFillMode;
+          const TRTCRoleType = TRTCCloud.TRTCRoleType;
           export { 
             TRTCParams,
             TRTCAppScene,
@@ -71,6 +72,7 @@ export default defineConfig({
             TRTCVideoMirrorType,
             TRTCVideoRotation,
             TRTCVideoFillMode,
+            TRTCRoleType,
           };
           export default TRTCCloud.default;
         `,
@@ -91,7 +93,6 @@ export default defineConfig({
       scss: {
         additionalData: `
           @use "@/assets/style/global.scss" as *;
-          @use "@/TUIRoom/assets/style/element.scss" as *;
         `,
       },
     },

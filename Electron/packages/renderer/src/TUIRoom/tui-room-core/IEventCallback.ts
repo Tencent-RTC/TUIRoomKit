@@ -4,8 +4,8 @@ import {
   TRTCVolumeInfo,
   TRTCDeviceType,
   TRTCDeviceState,
-} from './trtc_define';
-import { ETUIStreamType, TTUIUser, TTUIRoomError } from './types.d';
+} from 'trtc-electron-sdk';
+import { ETUIStreamType, TTUIUser, TTUIRoomError } from './types';
 
 export default interface EventCallback {
   /**

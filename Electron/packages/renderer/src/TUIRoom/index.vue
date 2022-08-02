@@ -24,7 +24,7 @@ import RoomFooter from './components/RoomFooter/index.vue';
 import RoomSidebar from './components/RoomSidebar/index.vue';
 import RoomSetting from './components/RoomSetting/index.vue';
 import { useBasicStore } from './stores/basic';
-import { useStreamStore } from './stores/stream';
+import { useRoomStore } from './stores/room';
 import { useChatStore } from './stores/chat';
 
 import TUIRoomCore, {
@@ -50,7 +50,7 @@ const emit = defineEmits([
 const logPrefix = '[Room]';
 
 const basicStore = useBasicStore();
-const streamStore = useStreamStore();
+const roomStore = useRoomStore();
 const chatStore = useChatStore();
 
 const { sdkAppId } = storeToRefs(basicStore);
@@ -122,7 +122,7 @@ interface RoomInitData {
 
 async function init(option: RoomInitData) {
   basicStore.setBasicInfo(option);
-  streamStore.addLocalStream(option);
+  roomStore.setLocalUser(option);
 
   const { sdkAppId, userId, userSig, userName, userAvatar } = option;
 
@@ -146,7 +146,7 @@ async function createRoom(
   const roomInfo = await TUIRoomCore.getRoomInfo();
   basicStore.setRoomInfo(roomInfo);
   // setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
-  streamStore.setRoomParam(roomParam);
+  roomStore.setRoomParam(roomParam);
   emit('onCreateRoom', {
     code: 0,
     message: 'create room success',
@@ -156,13 +156,12 @@ async function createRoom(
 
 async function enterRoom(roomId: number, roomParam?: RoomParam) {
   basicStore.setRoomId(roomId);
-  basicStore.setRole(ETUIRoomRole.ANCHOR);
   logger.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
   await TUIRoomCore.enterRoom(roomId);
   const roomInfo = await TUIRoomCore.getRoomInfo();
   basicStore.setRoomInfo(roomInfo);
   // setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
-  streamStore.setRoomParam(roomParam);
+  roomStore.setRoomParam(roomParam);
   emit('onEnterRoom', {
     code: 0,
     message: 'enter room success',
@@ -171,7 +170,7 @@ async function enterRoom(roomId: number, roomParam?: RoomParam) {
 }
 
 const onUserVoiceVolume = (eventInfo: []) => {
-  streamStore.setAudioVolume(eventInfo);
+  roomStore.setAudioVolume(eventInfo);
 };
 
 const onNetworkQuality = (localQuality: Record<string, any>) => {
@@ -189,7 +188,7 @@ const onReceivedChatMessage = (message: any) => {
 function resetStore() {
   basicStore.reset();
   chatStore.reset();
-  streamStore.reset();
+  roomStore.reset();
 }
 
 const logOut = () => {
@@ -218,7 +217,7 @@ const onMicrophoneMuted = (data: {mute: boolean, muteType: ETUIRoomMuteType}) =>
     basicStore.setIsMuteAllAudio(data.mute);
     // 如果主持人解除全员禁言，不主动调起用户麦克风
     if (data.mute) {
-      streamStore.setIsLocalAudioMuted(true);
+      roomStore.setIsLocalAudioMuted(true);
       TUIRoomCore.muteLocalMicrophone(true);
     }
     basicStore.setCanControlSelfAudio(!data.mute);
@@ -232,7 +231,7 @@ const onMicrophoneMuted = (data: {mute: boolean, muteType: ETUIRoomMuteType}) =>
       duration: MESSAGE_DURATION.NORMAL,
     });
     if (data.mute) {
-      streamStore.setIsLocalAudioMuted(true);
+      roomStore.setIsLocalAudioMuted(true);
       TUIRoomCore.muteLocalMicrophone(true);
       // 主持人开启全员禁言时，单独打开再关闭单人的麦克风，此时对应用户的麦克风状态为无法操作
       basicStore.setCanControlSelfAudio(!basicStore.isMuteAllAudio);
@@ -253,8 +252,8 @@ const onCameraMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
     });
     // 如果主持人解除全员禁画，不主动调起用户摄像头
     if (data.mute) {
-      streamStore.setIsLocalVideoMuted(true);
-      TUIRoomCore.muteLocalCamera(true);
+      roomStore.setIsLocalVideoMuted(true);
+      TUIRoomCore.stopCameraPreview();
     }
     basicStore.setCanControlSelfVideo(!data.mute);
   }
@@ -267,8 +266,8 @@ const onCameraMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
       duration: MESSAGE_DURATION.NORMAL,
     });
     if (data.mute) {
-      streamStore.setIsLocalVideoMuted(true);
-      TUIRoomCore.muteLocalCamera(true);
+      roomStore.setIsLocalVideoMuted(true);
+      TUIRoomCore.stopCameraPreview();
       // 主持人开启全员禁画时，单独打开再关闭单人的摄像头，此时对应用户的摄像头状态为无法操作
       basicStore.setCanControlSelfVideo(!basicStore.isMuteAllVideo);
     } else {
@@ -278,7 +277,7 @@ const onCameraMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
 };
 
 const onUserChatRoomMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
-  const tipMessage = data.mute ? '您被主持人禁文字聊天' : '您被主持人解除禁文字聊天';
+  const tipMessage = data.mute ? '您被主持人禁止文字聊天' : '您被主持人允许文字聊天';
   ElMessage({
     type: 'warning',
     message: tipMessage,
@@ -306,6 +305,17 @@ const onUserKickOff = async () => {
   }
 };
 
+function handlePageLeave() {
+  if (!basicStore.isMaster) {
+    TUIRoomCore.exitRoom();
+  }
+}
+
+// 页面刷新或者管理
+function beforeunloadFn() {
+  handlePageLeave();
+}
+
 onMounted(async () => {
   TUIRoomCore.enableAudioVolumeEvaluation(100);
   TUIRoomCore.on(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);
@@ -316,9 +326,11 @@ onMounted(async () => {
   TUIRoomCore.on(ETUIRoomEvents.onCameraMuted, onCameraMuted);
   TUIRoomCore.on(ETUIRoomEvents.onUserChatRoomMuted, onUserChatRoomMuted);
   TUIRoomCore.on(ETUIRoomEvents.onUserKickOff, onUserKickOff);
+  window.addEventListener('beforeunload', beforeunloadFn);
 });
 
-onUnmounted(async () => {
+onUnmounted(() => {
+  handlePageLeave();
   TUIRoomCore.off(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);
   TUIRoomCore.off(ETUIRoomEvents.onNetworkQuality, onNetworkQuality);
   TUIRoomCore.off(ETUIRoomEvents.onStatistics, onStatistics);
@@ -327,6 +339,7 @@ onUnmounted(async () => {
   TUIRoomCore.off(ETUIRoomEvents.onCameraMuted, onCameraMuted);
   TUIRoomCore.off(ETUIRoomEvents.onUserChatRoomMuted, onUserChatRoomMuted);
   TUIRoomCore.off(ETUIRoomEvents.onUserKickOff, onUserKickOff);
+  window.removeEventListener('beforeunload', beforeunloadFn);
 });
 
 watch(sdkAppId, (val) => {

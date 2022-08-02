@@ -15,7 +15,7 @@ import {
   ETUIRoomCoordinatorCommand,
   TTUIInviteInfo,
   ETUIRoomEvents,
-} from './types.d';
+} from './types';
 import Emitter from './common/emitter/event';
 import { safelyParseJSON } from './utils/utils';
 
@@ -167,12 +167,12 @@ class TSignalingService {
     timeout?: number
   ): Promise<TUIRoomResponse<any>> {
     const key = this.getInviteInfoMapKey(userId, data?.cmd);
-    if (this.inviteInfoMap?.has(key)) {
-      throw new TUIRoomError(
-        TUIRoomErrorCode.TS_INVITE_ERROR,
-        TUIRoomErrorMessage.TS_INVITE_ERROR
-      );
-    }
+    // if (this.inviteInfoMap?.has(key)) {
+    //   throw new TUIRoomError(
+    //     TUIRoomErrorCode.TS_INVITE_ERROR,
+    //     TUIRoomErrorMessage.TS_INVITE_ERROR
+    //   );
+    // }
     return new Promise((resolve, reject) => {
       this.tsignaling
         .invite({
@@ -249,7 +249,7 @@ class TSignalingService {
       );
       const inviteId = this.inviteInfoMap?.get(key)?.inviteId;
       const tsResponse = await this.tsignaling.cancel({
-        inviteId,
+        inviteID: inviteId,
         data: this.setTSignalingData(data),
       });
       const tsData = {
@@ -287,7 +287,7 @@ class TSignalingService {
       );
       const inviteId = this.inviteInfoMap?.get(key)?.inviteId;
       const tsResponse = await this.tsignaling.reject({
-        inviteId,
+        inviteID: inviteId,
         data: this.setTSignalingData(data),
       });
       this.inviteInfoMap?.delete(key);
@@ -447,16 +447,23 @@ class TSignalingService {
           type: inviteData?.data?.cmd,
         });
         break;
-      case ETUIRoomCoordinatorCommand.SendSpeechInvitation:
+      case ETUIRoomCoordinatorCommand.PickSeat:
         this.inviteInfoMap.set(key, value);
         this.emitter?.emit(ETUIRoomEvents.onReceiveSpeechInvitation, {
           inviterId: inviter,
           type: inviteData?.data?.cmd,
         });
         break;
-      case ETUIRoomCoordinatorCommand.SendSpeechApplication:
+      case ETUIRoomCoordinatorCommand.TakeSeat:
         this.inviteInfoMap.set(key, value);
         this.emitter?.emit(ETUIRoomEvents.onReceiveSpeechApplication, {
+          inviterId: inviter,
+          type: inviteData?.data?.cmd,
+        });
+        break;
+      case ETUIRoomCoordinatorCommand.KickSeat:
+        this.inviteInfoMap.set(key, value);
+        this.emitter?.emit(ETUIRoomEvents.onUserKickOffStage, {
           inviterId: inviter,
           type: inviteData?.data?.cmd,
         });
@@ -512,8 +519,9 @@ class TSignalingService {
     let tsResponse = {};
     switch (acceptData?.data?.cmd) {
       case ETUIRoomCoordinatorCommand.ReplyCallingRoll:
-      case ETUIRoomCoordinatorCommand.SendSpeechInvitation:
-      case ETUIRoomCoordinatorCommand.SendSpeechApplication:
+      case ETUIRoomCoordinatorCommand.PickSeat:
+      case ETUIRoomCoordinatorCommand.TakeSeat:
+      case ETUIRoomCoordinatorCommand.KickSeat:
       case ETUIRoomCoordinatorCommand.MuteUserMicrophone:
       case ETUIRoomCoordinatorCommand.MuteUserCamera:
       case ETUIRoomCoordinatorCommand.MuteUserChatRoom:
@@ -546,8 +554,8 @@ class TSignalingService {
     const key = this.getInviteInfoMapKey(invitee, rejectData?.data?.cmd);
     let tsResponse = {};
     switch (rejectData?.data?.cmd) {
-      case ETUIRoomCoordinatorCommand.SendSpeechInvitation:
-      case ETUIRoomCoordinatorCommand.SendSpeechApplication:
+      case ETUIRoomCoordinatorCommand.PickSeat:
+      case ETUIRoomCoordinatorCommand.TakeSeat:
         tsResponse = {
           code: ETUISignalStatus.REJECTED,
           data: {
@@ -575,8 +583,15 @@ class TSignalingService {
     const cancelData = safelyParseJSON(data);
     const key = this.getInviteInfoMapKey(inviter, cancelData?.data?.cmd);
     switch (cancelData?.data?.cmd) {
-      case ETUIRoomCoordinatorCommand.SendSpeechInvitation:
+      case ETUIRoomCoordinatorCommand.PickSeat:
         this.emitter?.emit(ETUIRoomEvents.onReceiveInvitationCancelled, {
+          inviterId: inviter,
+          type: cancelData?.data?.cmd,
+        });
+        this.inviteInfoMap?.delete(key);
+        break;
+      case ETUIRoomCoordinatorCommand.TakeSeat:
+        this.emitter?.emit(ETUIRoomEvents.onSpeechApplicationCancelled, {
           inviterId: inviter,
           type: cancelData?.data?.cmd,
         });
@@ -621,13 +636,13 @@ class TSignalingService {
           // 表示收到信令事件方，监听超时，返回超时事件
           // 接收方
           switch (value?.type) {
-            case ETUIRoomCoordinatorCommand.SendSpeechInvitation:
+            case ETUIRoomCoordinatorCommand.PickSeat:
               this.emitter?.emit(ETUIRoomEvents.onReceiveInvitationTimeout, {
                 inviterId: inviter,
               });
               this.inviteInfoMap?.delete(key);
               break;
-            case ETUIRoomCoordinatorCommand.SendSpeechApplication:
+            case ETUIRoomCoordinatorCommand.TakeSeat:
               this.emitter?.emit(ETUIRoomEvents.onSpeechApplicationTimeout, {
                 inviterId: inviter,
               });

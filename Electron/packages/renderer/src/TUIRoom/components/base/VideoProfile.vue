@@ -9,7 +9,7 @@
   <el-select
     v-model="videoProfile"
     placeholder="placeholder"
-    class="select"
+    class="select custom-element-class"
     :teleported="false"
   >
     <el-option
@@ -48,6 +48,8 @@ watch(videoProfile, (val: string) => {
 </script>
 
 <style lang="scss" scoped>
+@import '../../assets/style/element-custom.scss';
+
 .select {
   width: 280px;
   height: 32px;

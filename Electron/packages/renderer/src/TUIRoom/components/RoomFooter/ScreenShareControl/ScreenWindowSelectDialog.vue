@@ -6,7 +6,7 @@
     :append-to-body="true"
     :before-close="cancel"
     width="65%"
-    custom-class="screen-window-select-dialog"
+    custom-class="screen-window-select-dialog custom-element-class"
   >
     <div class="content">
       <h3>屏幕</h3>
@@ -83,6 +83,7 @@ function cancel() {
 
 <style lang="scss">
 @import '../../../assets/style/var.scss';
+@import '../../../assets/style/element-custom.scss';
 
 .screen-window-select-dialog {
   .el-dialog__body {

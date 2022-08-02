@@ -22,7 +22,7 @@ import {
   TTUIRoomTSBase,
   ETUIRoomRole,
   ETUIRoomMuteType
-} from './types.d';
+} from './types';
 
 import { safelyParseJSON, simpleClone } from './utils/utils';
 
@@ -468,7 +468,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     );
     try {
       const message = {
-        cmd: ETUIRoomCoordinatorCommand.SendSpeechInvitation,
+        cmd: ETUIRoomCoordinatorCommand.PickSeat,
         room_id: this.roomId,
         receiver_id: userId,
       };
@@ -501,7 +501,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     );
     try {
       const message = {
-        cmd: ETUIRoomCoordinatorCommand.SendSpeechInvitation,
+        cmd: ETUIRoomCoordinatorCommand.PickSeat,
         room_id: this.roomId,
         receiver_id: userId,
       };
@@ -527,7 +527,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     );
     try {
       const message = {
-        cmd: ETUIRoomCoordinatorCommand.SendSpeechInvitation,
+        cmd: ETUIRoomCoordinatorCommand.PickSeat,
         room_id: this.roomId,
         receiver_id: this.state.currentUser.userId,
       };
@@ -552,13 +552,45 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     }
   }
 
+  /**
+   * 主持人将普通成员踢下麦
+   * @returns 
+   */
+  async kickUserOffStage(userId: string) {
+    logger.debug(
+      `${TUIRoomCoordinator.logPrefix}kickUserOffStage userId: ${userId}`,
+      this
+    );
+    try {
+      const message = {
+        cmd: ETUIRoomCoordinatorCommand.KickSeat,
+        room_id: this.roomId,
+        receiver_id: userId,
+      };
+      const tsResponse = await this.tSignalingService.invite(
+        userId,
+        message,
+        TSignalingConfig.timeout
+      );
+      if (tsResponse.code === 0) {
+        return TUIRoomResponse.success(tsResponse.data);
+      }
+      return TUIRoomResponse.fail(tsResponse.code, '', tsResponse.data);
+    } catch (tsError) {
+      throw TUIRoomError.error(
+        TUIRoomErrorCode.SEND_CUSTOM_MESSAGE_ERROR,
+        TUIRoomErrorMessage.SEND_CUSTOM_MESSAGE_ERROR
+      );
+    }
+  }
+
   async sendSpeechApplication(): Promise<TUIRoomResponse<any>> {
     logger.debug(`${TUIRoomCoordinator.logPrefix}sendSpeechApplication`, this);
     try {
       const message = {
-        cmd: ETUIRoomCoordinatorCommand.SendSpeechApplication,
+        cmd: ETUIRoomCoordinatorCommand.TakeSeat,
         room_id: this.roomId,
-        sender_id: this.state.currentUser.userId,
+        seat_number: -1,
       };
       const tsResponse = await this.tSignalingService.invite(
         this.state.roomInfo.ownerId,
@@ -570,6 +602,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
       }
       return TUIRoomResponse.fail(tsResponse.code, '', tsResponse.data);
     } catch (error) {
+      logger.debug(`${TUIRoomCoordinator.logPrefix} sendSpeechApplication error`, error);
       throw TUIRoomError.error(
         TUIRoomErrorCode.SEND_CUSTOM_MESSAGE_ERROR,
         TUIRoomErrorMessage.SEND_CUSTOM_MESSAGE_ERROR
@@ -584,12 +617,12 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     );
     try {
       const message = {
-        cmd: ETUIRoomCoordinatorCommand.SendSpeechApplication,
+        cmd: ETUIRoomCoordinatorCommand.TakeSeat,
         room_id: this.roomId,
-        sender_id: this.state.currentUser.userId,
+        seat_number: -1,
       };
       const imResponse = await this.tSignalingService.cancel(
-        this.state.currentUser.userId,
+        this.state.roomInfo.ownerId,
         message
       );
       return TUIRoomResponse.success(imResponse.data);
@@ -607,10 +640,9 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
   ): Promise<TUIRoomResponse<any>> {
     try {
       const message = {
-        cmd: ETUIRoomCoordinatorCommand.SendSpeechApplication,
+        cmd: ETUIRoomCoordinatorCommand.TakeSeat,
         room_id: this.roomId,
-        sender_id: userId,
-        agree,
+        seat_number: -1,
       };
       let tsResponse = null;
       if (agree) {
@@ -726,7 +758,7 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
       notification
     );
     Object.keys(this.state.roomInfo.roomConfig).forEach((key) => {
-      if (this.state.roomInfo.roomConfig[key] !== notification[key]) {
+      if (typeof notification[key] !== 'undefined' && this.state.roomInfo.roomConfig[key] !== notification[key]) {
         switch (key) {
           case ETUIRoomCoordinatorConfig.isCallingRoll:
             this.emitter?.emit(
@@ -844,6 +876,11 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
       this.onUserKickOff,
       this
     );
+    this.tSignalingService.on(
+      ETUIRoomEvents.onUserKickOffStage,
+      this.onUserKickOffStage,
+      this
+    );
   }
 
   // 解除事件绑定
@@ -904,6 +941,11 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
       this.onUserKickOff,
       this
     );
+    this.tSignalingService.off(
+      ETUIRoomEvents.onUserKickOffStage,
+      this.onUserKickOffStage,
+      this
+    );
   }
 
   // 学生签到
@@ -928,14 +970,10 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
   }
 
   // 邀请上台发言
-  private async onReceiveSpeechInvitation(event: TTUIRoomTSBase) {
-    const {
-      eventCode,
-      data: { inviterId, type },
-    } = event;
+  private async onReceiveSpeechInvitation(data: { inviterId: string; type: ETUIRoomCoordinatorCommand }) {
+    const { inviterId, type } = data;
     logger.log(
       `${TUIRoomCoordinator.logPrefix}onReceiveSpeechInvitation event:`,
-      eventCode,
       inviterId,
       type
     );
@@ -943,14 +981,10 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
   }
 
   // 取消邀请上台发言
-  private async onReceiveInvitationCancelled(event: TTUIRoomTSBase) {
-    const {
-      eventCode,
-      data: { inviterId, type },
-    } = event;
+  private async onReceiveInvitationCancelled(data: { inviterId: string; type: ETUIRoomCoordinatorCommand }) {
+    const { inviterId, type } = data;
     logger.log(
       `${TUIRoomCoordinator.logPrefix}onReceiveInvitationCancelled event:`,
-      eventCode,
       inviterId,
       type
     );
@@ -971,32 +1005,20 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
     this.emitter?.emit(ETUIRoomEvents.onReceiveInvitationTimeout, inviterId);
   }
 
-  async onReceiveSpeechApplication(event: TTUIRoomTSBase) {
-    const {
-      eventCode,
-      data: { inviterId, type },
-    } = event;
+  async onReceiveSpeechApplication(data: { inviterId: string; type: ETUIRoomCoordinatorCommand }) {
+    const { inviterId, type } = data;
     logger.log(
-      `${TUIRoomCoordinator.logPrefix}onReceiveSpeechApplication event:`,
-      eventCode,
-      type,
-      inviterId
+      `${TUIRoomCoordinator.logPrefix}onReceiveSpeechApplication event:`, type, inviterId
     );
-    this.emitter?.emit(ETUIRoomEvents.onReceiveSpeechApplication, inviterId);
+    this.emitter?.emit(ETUIRoomEvents.onReceiveSpeechApplication, { userId: data.inviterId });
   }
 
-  async onSpeechApplicationCancelled(event: TTUIRoomTSBase) {
-    const {
-      eventCode,
-      data: { inviterId, type },
-    } = event;
+  async onSpeechApplicationCancelled(data: { inviterId: string; type: ETUIRoomCoordinatorCommand }) {
+    const { inviterId, type } = data;
     logger.log(
-      `${TUIRoomCoordinator.logPrefix}onSpeechApplicationCancelled event:`,
-      eventCode,
-      type,
-      inviterId
+      `${TUIRoomCoordinator.logPrefix}onSpeechApplicationCancelled event:`, type, inviterId
     );
-    this.emitter?.emit(ETUIRoomEvents.onSpeechApplicationCancelled, inviterId);
+    this.emitter?.emit(ETUIRoomEvents.onSpeechApplicationCancelled, { userId: data.inviterId });
   }
 
   async onSpeechApplicationTimeout(event: TTUIRoomTSBase) {
@@ -1082,6 +1104,21 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
       receiver_id: this.state.currentUser.userId
     };
     this.emitter?.emit(ETUIRoomEvents.onUserKickOff, {});
+    await this.tSignalingService.accept(inviterId, message);
+  }
+
+  private async onUserKickOffStage(data: { inviterId: string; inviter: string, type: ETUIRoomCoordinatorCommand }) {
+    logger.log(
+      `${TUIRoomCoordinator.logPrefix}onUserKickOffStage data:`,
+      data
+    );
+    const { inviterId } = data;
+    const message = {
+      cmd: ETUIRoomCoordinatorCommand.KickSeat,
+      room_id: this.roomId,
+      receiver_id: inviterId
+    };
+    this.emitter?.emit(ETUIRoomEvents.onUserKickOffStage, {});
     await this.tSignalingService.accept(inviterId, message);
   }
 

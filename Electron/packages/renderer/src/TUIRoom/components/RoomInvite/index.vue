@@ -9,7 +9,7 @@
           <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(roomId)"></svg-icon>
         </div>
       </div>
-      <div class="invite-item">
+      <div class="invite-item" v-if="roomLinkDisplay">
         <span class="invite-title">通过房间链接邀请</span>
         <div class="input-area">
           <input class="input" type="text" :value="inviteLink">
@@ -29,22 +29,28 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { ElMessage } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import SvgIcon from '../common/SvgIcon.vue';
-const runtimeEnv = import.meta.env.VITE_RUNTIME_ENV;
+
+const roomLinkDisplay = ref(true);
 
 const basicStore = useBasicStore();
 const { roomId } = storeToRefs(basicStore);
 
 const { origin, pathname } = location;
-const inviteLink = computed(() => {
-  if (runtimeEnv === 'browser') {
-    return `${origin}${pathname}#/home?roomId=${roomId.value}`;
+
+onMounted(() => {
+  if ((window as any).__TRTCElectron) {
+    roomLinkDisplay.value = false; 
   }
-  return `https://web.sdk.qcloud.com/#/home?roomId=${roomId.value}`;
+})
+
+
+const inviteLink = computed(() => {
+  return `${origin}${pathname}#/home?roomId=${roomId.value}`;
 });
 
 const schemeLink = computed(() => {

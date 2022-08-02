@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from 'vue';
-import { StreamInfo } from '../../stores/stream';
+import { StreamInfo } from '../../stores/room';
 import defaultAvatar from '../../assets/imgs/avatar.png';
 import TUIRoomCore, { ETUIStreamType, TRTCVideoFillMode } from '../../tui-room-core';
 import { useBasicStore } from '../../stores/basic';

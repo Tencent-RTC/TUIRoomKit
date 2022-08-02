@@ -1,6 +1,19 @@
 .add-icon {
   background: url(../icons/svg/add-icon.svg);
 }
+.apply-active {
+  background: url(../icons/svg/apply-active.svg);
+}
+.apply-big-icon {
+  background: url(../icons/svg/apply-big-icon.svg);
+}
+.apply-speech-icon {
+  -webkit-mask-image: url(../icons/svg/apply-speech-icon.svg);
+  mask-image: url(../icons/svg/apply-speech-icon.svg);
+}
+.apply {
+  background: url(../icons/svg/apply.svg);
+}
 .arrow-up{
   background: url(../icons/svg/arrow-up.svg);
 }
@@ -37,6 +50,10 @@
 .exit-fullscreen{
   background: url(../icons/svg/exit-fullscreen.svg);
 }
+.free-speech-icon {
+  -webkit-mask-image: url(../icons/svg/free-speech-icon.svg);
+  mask-image: url(../icons/svg/free-speech-icon.svg);
+}
 .mic-on {
   background: url(../icons/svg/mic-on.svg);
 }
@@ -48,6 +65,9 @@
 }
 .full-screen{
   background: url(../icons/svg/full-screen.svg);
+}
+.go-off-seat {
+  background: url(../icons/svg/go-off-seat.svg);
 }
 .info{
   background: url(../icons/svg/info.svg);
@@ -93,6 +113,9 @@
 }
 .phone-icon{
   background: url(../icons/svg/phone-icon.svg);
+}
+.screen-share-disabled{
+  background: url(../icons/svg/screen-share-disabled.svg);
 }
 .screen-share-stopped{
   background: url(../icons/svg/screen-share-stopped.svg);

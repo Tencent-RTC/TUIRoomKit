@@ -1,6 +1,6 @@
 import logger from './common/logger';
 import { safelyParseJSON, simpleClone } from './utils/utils';
-import { ETUISpeechMode, ETUIRoomRole } from './types.d';
+import { ETUISpeechMode, ETUIRoomRole } from './types';
 import TUIRoomResponse from './base/TUIRoomResponse';
 import TUIRoomError from './base/TUIRoomError';
 import TUIRoomInfo from './base/TUIRoomInfo';
@@ -9,6 +9,7 @@ import { TUIRoomErrorCode, TUIRoomErrorMessage } from './constant';
 import TIMService from './TIMService';
 import TRTCService from './trtc-service';
 import StateStore from './StateStore';
+import { TRTCAppScene, TRTCRoleType } from 'trtc-electron-sdk';
 
 class TUIRoomLifecycle {
   static logPrefix = '[TUIRoomLifecycle]';
@@ -54,6 +55,7 @@ class TUIRoomLifecycle {
     try {
       // 设置开始时间
       this.state.roomInfo.roomConfig.startTime = new Date().getTime();
+      this.state.roomInfo.roomConfig.speechMode = mode;
       // 检查群是否已经存在
       const timResponse = await this.timService.checkGroupExistence(groupId);
       groupInfo = timResponse.data;
@@ -102,13 +104,16 @@ class TUIRoomLifecycle {
         );
       }
 
+      const scene = mode === ETUISpeechMode.APPLY_SPEECH ? TRTCAppScene.TRTCAppSceneLIVE : TRTCAppScene.TRTCAppSceneVideoCall;
+
       // 进入 TRTC 房间
       await this.trtcService.enterRoom({
         sdkAppId,
         userId,
         userSig,
         roomId,
-      });
+        role: TRTCRoleType.TRTCRoleAnchor
+      }, scene);
       this.state.roomInfo.roomId = roomId;
       this.state.roomInfo.ownerId = userId;
       this.state.currentUser.role = ETUIRoomRole.MASTER;
@@ -170,16 +175,23 @@ class TUIRoomLifecycle {
           );
         }
       }
+      const scene = this.state.roomInfo.roomConfig.speechMode === ETUISpeechMode.FREE_SPEECH ? TRTCAppScene.TRTCAppSceneVideoCall : TRTCAppScene.TRTCAppSceneLIVE;
+      const role = scene === TRTCAppScene.TRTCAppSceneVideoCall ? TRTCRoleType.TRTCRoleAnchor : TRTCRoleType.TRTCRoleAudience;
       // 进入 TRTC 房间
       await this.trtcService.enterRoom({
         sdkAppId,
         userId,
         userSig,
         roomId,
-      });
+        role,
+      }, scene);
       this.state.roomInfo.roomId = roomId;
       this.state.roomInfo.ownerId = groupInfo.ownerID;
-      this.state.currentUser.role = ETUIRoomRole.ANCHOR;
+      if(this.state.currentUser.userId === this.state.roomInfo.ownerId) {
+        this.state.currentUser.role = ETUIRoomRole.MASTER;
+      } else {
+        this.state.currentUser.role = ETUIRoomRole.ANCHOR;
+      }
 
       return TUIRoomResponse.success(
         simpleClone({
@@ -237,7 +249,7 @@ class TUIRoomLifecycle {
       user: TUIRoomUser;
     }>
   > {
-    logger.debug(`${TUIRoomResponse}destroyRoom`);
+    logger.debug(`${TUIRoomResponse}destroyRoom`,this.state.currentUser);
     // 检查当前用户是否有权限销毁房间
     if (
       this.state.currentUser.role !== ETUIRoomRole.MANAGER &&

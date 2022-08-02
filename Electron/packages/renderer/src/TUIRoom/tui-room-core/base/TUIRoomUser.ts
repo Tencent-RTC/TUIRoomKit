@@ -1,4 +1,4 @@
-import { ETUIRoomRole } from '../types.d';
+import { ETUIRoomRole } from '../types';
 
 class TUIRoomUser {
   userId = ''; // 用户Id

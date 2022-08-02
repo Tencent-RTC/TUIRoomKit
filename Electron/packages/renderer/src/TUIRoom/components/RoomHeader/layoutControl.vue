@@ -72,14 +72,14 @@ import { ref, Ref } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import { LAYOUT } from '../../constants/render';
 import { useBasicStore } from '../../stores/basic';
-import { useStreamStore } from '../../stores/stream';
+import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
 import TUIRoomAegis from '../../utils/aegis';
 
 const basicStore = useBasicStore();
 const { layout } = storeToRefs(basicStore);
-const streamStore = useStreamStore();
-const { streamNumber } = storeToRefs(streamStore);
+const roomStore = useRoomStore();
+const { streamNumber } = storeToRefs(roomStore);
 
 const showLayoutList:Ref<boolean> = ref(false);
 const layoutList:Ref<Node|null> = ref(null);

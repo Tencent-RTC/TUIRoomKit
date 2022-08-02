@@ -4,12 +4,14 @@
       ref="btnStopRef"
       :class="{ outlined: isSharing }"
       :title="title"
-      :icon-name="startIconName"
+      :disabled="isAudience"
+      :icon-name="iconName"
       @click="startScreenShare"
     />
     <el-popover
       v-if="isSharing"
       ref="popoverRef"
+      class="custom-element-class"
       :virtual-ref="btnStopRef"
       trigger="click"
       placement="top-start"
@@ -48,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, computed } from 'vue';
+import { ref, Ref, watch, computed } from 'vue';
 import IconButton from '../../common/IconButton.vue';
 import TUIRoomCore, {
   TRTCScreenCaptureSourceType,
@@ -57,19 +59,35 @@ import TUIRoomCore, {
   TRTCVideoEncParam,
   TRTCVideoResolution,
   TRTCVideoResolutionMode,
+  ETUIRoomRole,
 } from '../../../tui-room-core';
 import ScreenWindowSelectDialog from './ScreenWindowSelectDialog.vue';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ICON_NAME } from '../../../constants/icon';
+import { useBasicStore } from '../../../stores/basic';
+import { storeToRefs } from 'pinia';
+
+const basicInfo = useBasicStore();
+const { isAudience, role } = storeToRefs(basicInfo);
 
 const btnStopRef = ref();
 const popoverRef = ref();
 const isSharing: Ref<boolean> = ref(false);
 const dialogVisible: Ref<boolean> = ref(false);
 
-const title = computed(() => (isSharing.value ? '屏幕共享中' : '共享屏幕'));
+watch(role, (val: any, oldVal: any) => {
+  if (oldVal === ETUIRoomRole.ANCHOR && val === ETUIRoomRole.AUDIENCE && isSharing.value) {
+    stopScreenShare();
+  }
+});
 
-const startIconName = computed(() => (isSharing.value ? ICON_NAME.ScreenSharing : ICON_NAME.ScreenShare));
+const title = computed(() => (isSharing.value ? '屏幕共享中' : '共享屏幕'));
+const iconName = computed(() => {
+  if (isAudience.value) {
+    return ICON_NAME.ScreenShareDisabled;
+  }
+  return isSharing.value ? ICON_NAME.ScreenSharing : ICON_NAME.ScreenShare;
+});
 
 const selectDialogVisible: Ref<boolean> = ref(false);
 const screenList: Ref<Array<TRTCScreenCaptureSourceInfo>> = ref([]);
@@ -130,3 +148,7 @@ async function stopScreenShare() {
   dialogVisible.value = false;
 }
 </script>
+
+<style lang="scss">
+@import '../../../assets/style/element-custom.scss'
+</style>

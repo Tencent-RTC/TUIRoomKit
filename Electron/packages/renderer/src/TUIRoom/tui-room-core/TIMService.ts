@@ -6,7 +6,7 @@ import logger from './common/logger';
 import Event from './common/emitter/event';
 import TUIRoomError from './base/TUIRoomError';
 import TUIRoomResponse from './base/TUIRoomResponse';
-import { ETUIRoomEvents } from './types.d';
+import { ETUIRoomEvents } from './types';
 import {
   TUIRoomErrorCode,
   TUIRoomErrorMessage,
@@ -192,6 +192,7 @@ class TIMService {
   }
 
   async quitGroup(): Promise<TUIRoomResponse<any>> {
+    logger.debug(`${TIMService.logPrefix}.quitGroup`);
     this.preCheckMethodCall();
 
     try {
@@ -279,6 +280,27 @@ class TIMService {
       throw TUIRoomError.error(
         TUIRoomErrorCode.GET_GROUP_MEMBER_PROFILE_ERROR,
         TUIRoomErrorMessage.GET_GROUP_MEMBER_PROFILE_ERROR
+      );
+    }
+  }
+
+  async getGroupMemberList() {
+    logger.debug(
+      `${TIMService.logPrefix}.getGroupMemberList`
+    );
+    try {
+      const memberListResponse = await this.tim.getGroupMemberList({
+        groupID: this.groupId,
+        count: 100,
+        offset: 0,
+      });
+      const { memberList } = memberListResponse.data;
+      return TUIRoomResponse.success(memberList);
+    } catch (error) {
+      logger.error(`${TIMService.logPrefix}getGroupMemberList error:`, error);
+      throw TUIRoomError.error(
+        TUIRoomErrorCode.GET_GROUP_MEMBER_LIST_ERROR,
+        TUIRoomErrorMessage.GET_GROUP_MEMBER_LIST_ERROR
       );
     }
   }
@@ -411,28 +433,35 @@ class TIMService {
 
   private handleGroupTip(message: Record<string, any>) {
     logger.log(`${TIMService.logPrefix}handleGroupTip message:`, message);
-    const { operationType } = message.payload;
+    const { payload: { operatorID, operationType } } = message;
     switch (operationType) {
       // 处理成员加入群
       case TIM.TYPES.GRP_TIP_MBR_JOIN:
-        const { avatar, nick, payload: { operatorID } } = message;
-        if (operatorID === this.userId) {
-          const newUserInfo = {
-            userAvatar: avatar,
-            userId: operatorID,
-            userName: nick,
-          };
-          this.emitter.emit('onRemoteUserEnterRoom', simpleClone(newUserInfo));
-        }
+        this.emitter.emit('onRemoteUserEnterRoom', operatorID);
+        break;
+      // 处理成员退出群
+      case TIM.TYPES.GRP_TIP_MBR_QUIT:
+        this.emitter.emit('onRemoteUserLeaveRoom', operatorID);
         break;
       // 处理群主转移
-      // case TIM.TYPES.GRP_TIP_MBR_SET_ADMIN:
-      //   console.error('================');
-      //   break;
+      case TIM.TYPES.GRP_TIP_GRP_PROFILE_UPDATED: 
+        this.handleGroupProfileUpdate(message.payload);
+        break;
       default:
         break;
     }
   }
+
+  private handleGroupProfileUpdate(message: Record<string, any>) {
+    logger.log(`${TIMService.logPrefix}handleGroupProfileUpdate message:`, message);
+    const { newGroupProfile } = message;
+    // 判断是否为群主移交权限
+    if(newGroupProfile.ownerID) {
+      this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged,newGroupProfile.ownerID);
+    }
+  }
+
+
 
   /**
    * /////////////////////////////////////////////////////////////////////////////////
