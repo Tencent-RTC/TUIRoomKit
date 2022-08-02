@@ -32,11 +32,11 @@ Pod::Spec.new do |spec|
   spec.default_subspec = 'Default'
 
   spec.subspec 'Default' do |default|
-    default.dependency 'XMagic'
+    default.dependency 'XMagic', '2.4.1.69.2'
   end
   
   spec.subspec 'Smart' do |smart|
-    smart.dependency 'XMagic_Smart'
+    smart.dependency 'XMagic_Smart', '2.4.1.69.2'
   end
   
 end
