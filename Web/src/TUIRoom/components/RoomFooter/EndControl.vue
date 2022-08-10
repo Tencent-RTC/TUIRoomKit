@@ -29,7 +29,7 @@
     <template #footer>
       <div v-if="currentDialogType === DialogType.BasicDialog">
         <el-button v-if="basicInfo.role === ETUIRoomRole.MASTER" type="primary" @click="dismissRoom">解散房间</el-button>
-        <el-button v-if="(basicInfo.role === ETUIRoomRole.MASTER && remoteAnchorList.length > 0) || basicInfo.role !== ETUIRoomRole.MASTER" type="primary" @click="leaveRoom">离开房间</el-button>
+        <el-button v-if="showLeaveRoom" type="primary" @click="leaveRoom">离开房间</el-button>
         <el-button @click="cancel">取消</el-button>
       </div>
       <div v-if="currentDialogType === DialogType.TransferDialog">
@@ -58,7 +58,7 @@ enum DialogType {
 }
 const currentDialogType = ref(DialogType.BasicDialog);
 
-const emit = defineEmits(['onRoomExit', 'onRoomDestroy']);
+const emit = defineEmits(['onExitRoom', 'onDestroyRoom']);
 
 const visible: Ref<boolean> = ref(false);
 const basicInfo = useBasicStore();
@@ -68,6 +68,10 @@ const roomStore = useRoomStore();
 const { remoteAnchorList } = storeToRefs(roomStore);
 
 const title = computed(() => (currentDialogType.value === DialogType.BasicDialog ? '是否要离开房间' : '请选择新的房间主持人'));
+
+const showLeaveRoom = computed(() => (
+  basicInfo.role ===  ETUIRoomRole.MASTER && remoteAnchorList.value.length > 0)
+  || basicInfo.role !== ETUIRoomRole.MASTER);
 
 const selectedUser: Ref<string> = ref('');
 const roomMember = ref(TUIRoomCore.getRoomUsers());
@@ -97,7 +101,7 @@ async function dismissRoom() {
     await TUIRoomCore.logout();
     logger.log(`${logPrefix}dismissRoom:`, response);
     resetState();
-    emit('onRoomDestroy', { code: 0, message: '' });
+    emit('onDestroyRoom', { code: 0, message: '' });
   } catch (error) {
     logger.error(`${logPrefix}dismissRoom error:`, error);
   }
@@ -114,7 +118,7 @@ async function leaveRoom() { // eslint-disable-line
     await TUIRoomCore.logout();
     logger.log(`${logPrefix}leaveRoom:`, response);
     resetState();
-    emit('onRoomExit', { code: 0, message: '' });
+    emit('onExitRoom', { code: 0, message: '' });
   } catch (error) {
     logger.error(`${logPrefix}leaveRoom error:`, error);
   }
@@ -131,7 +135,7 @@ async function transferAndLeave() {
     response = await TUIRoomCore.exitRoom();
     logger.log(`${logPrefix}transferAndLeave:`, response);
     resetState();
-    emit('onRoomExit', { code: 0, message: '' });
+    emit('onExitRoom', { code: 0, message: '' });
   } catch (error) {
     logger.error(`${logPrefix}transferAndLeave error:`, error);
   }
@@ -147,7 +151,7 @@ const onRoomDestroyed = async () => {
       confirmButtonText: '确认',
       callback: () => {
         resetState();
-        emit('onRoomDestroy', { code: 0, message: '' });
+        emit('onDestroyRoom', { code: 0, message: '' });
       },
     });
   } catch (error) {
@@ -165,6 +169,8 @@ const onRoomMasterChanged = async (newOwnerID:string) => {
   basicInfo.masterUserId = newOwnerID;
   if (basicInfo.userId === basicInfo.masterUserId) {
     basicInfo.role = ETUIRoomRole.MASTER;
+  } else {
+    roomStore.setRemoteUserRole(newOwnerID, ETUIRoomRole.MASTER);
   }
   resetState();
 };

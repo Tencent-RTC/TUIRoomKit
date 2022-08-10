@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { ETUIRoomRole, ETUISpeechMode } from '../tui-room-core';
 import { useBasicStore } from './basic';
-const basicStore = useBasicStore();
 
 export type StreamInfo = {
   userId?: string,
@@ -123,6 +122,7 @@ export const useRoomStore = defineStore('room', {
       avatar: string,
     }) {
       const { userId, name, avatar } = userInfo;
+      const basicStore = useBasicStore();
       if (!userId || userId === basicStore.userId || userId === `share_${basicStore.userId}`) {
         return;
       }
@@ -152,6 +152,7 @@ export const useRoomStore = defineStore('room', {
       avatar: string,
     }, enabled: Boolean) {
       const { userId, name, avatar } = userInfo;
+      const basicStore = useBasicStore();
       if (!userId || userId === basicStore.userId || userId === `share_${basicStore.userId}`) {
         return;
       }
@@ -240,6 +241,7 @@ export const useRoomStore = defineStore('room', {
     },
 
     removeRemoteUser(userId: string) {
+      const basicStore = useBasicStore();
       if (!userId || userId === basicStore.userId || userId === `share_${basicStore.userId}`) {
         return;
       }
@@ -247,6 +249,7 @@ export const useRoomStore = defineStore('room', {
     },
 
     setAudioVolume(audioVolumeArray: []) {
+      const basicStore = useBasicStore();
       audioVolumeArray.forEach((audioVolumeItem: any) => {
         const { userId, audioVolume } = audioVolumeItem;
         if ((userId === basicStore.userId || userId === 'local') && this.localStream) {
@@ -349,6 +352,12 @@ export const useRoomStore = defineStore('room', {
       const remoteUserInfo = this.remoteUserMap.get(userId);
       if (remoteUserInfo) {
         remoteUserInfo.isChatMutedByMaster = muted;
+      }
+    },
+    setRemoteUserRole(userId: string, role: ETUIRoomRole) {
+      const remoteUserInfo = this.remoteUserMap.get(userId);
+      if (remoteUserInfo) {
+        remoteUserInfo.role = role;
       }
     },
     addApplyToAnchorUser(userId: string) {

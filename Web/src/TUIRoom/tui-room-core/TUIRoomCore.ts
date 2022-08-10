@@ -1278,13 +1278,18 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     this.state.reset();
     this.emitter.emit(ETUIRoomEvents.onRoomDestroyed, null);
   }
-  private onRoomMasterChanged (ownerID: string){
-    logger.log(`${TUIRoomCore.logPrefix}onRoomMasterChangd`, ownerID,this.state);
-    if(this.state.currentUser.userId === ownerID) {
-      this.state.currentUser.role = ETUIRoomRole.MASTER;
-      this.emitter.emit(ETUIRoomEvents.onUserStateChange, simpleClone(this.state.currentUser));
+
+  // 监听群主移交事件
+  private onRoomMasterChanged (ownerId: string){
+    logger.log(`${TUIRoomCore.logPrefix}onRoomMasterChangd`, ownerId,this.state);
+    this.state.roomInfo.ownerId = ownerId;
+    this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged, ownerId); 
+    // 普通成员收到消息,获取新的群主成员信息
+    const user = this.state.currentUser.userId === ownerId ? this.state.currentUser : this.state.userMap.get(ownerId);
+    if (user) {
+      user.role = ETUIRoomRole.MASTER;
+      this.emitter.emit(ETUIRoomEvents.onUserStateChange, simpleClone(user));
     }
-    this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged,ownerID); 
   }
 
   /**
