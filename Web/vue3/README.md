@@ -33,7 +33,7 @@
 
 ### 第二步：下载源码，配置工程
 1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
-2. 找到并打开 `Web/src/config/basic-info-config.js` 文件。
+2. 找到并打开 `Web/vue3/src/config/basic-info-config.js` 文件。
 3. 配置 `basic-info-config.js` 文件中的相关参数：
 	<img src="https://qcloudimg.tencent-cloud.cn/raw/d05a18af04758e352f9afcb0925d105c.png" width="900">
 	- SDKAPPID：默认为 0，请设置为步第一步中记录下的 SDKAppID。
