@@ -5,8 +5,8 @@
     <room-footer
       v-show="showRoomTool"
       class="footer"
-      @on-room-destroy="onRoomDestroy"
-      @on-room-exit="onRoomExit"
+      @on-destroy-room="onDestroyRoom"
+      @on-exit-room="onExitRoom"
     />
     <room-sidebar></room-sidebar>
     <room-setting></room-setting>
@@ -44,7 +44,7 @@ defineExpose({
 
 const emit = defineEmits([
   'onLogOut', 'onCreateRoom', 'onEnterRoom',
-  'onRoomExit', 'onRoomDestroy', 'onKickOff',
+  'onExitRoom', 'onDestroyRoom', 'onKickOff',
 ]);
 
 const logPrefix = '[Room]';
@@ -196,14 +196,14 @@ const logOut = () => {
   emit('onLogOut');
 };
 
-const onRoomDestroy = (info: { code: number; message: string }) => {
+const onDestroyRoom = (info: { code: number; message: string }) => {
   resetStore();
-  emit('onRoomDestroy', info);
+  emit('onDestroyRoom', info);
 };
 
-const onRoomExit = (info: { code: number; message: string }) => {
+const onExitRoom = (info: { code: number; message: string }) => {
   resetStore();
-  emit('onRoomExit', info);
+  emit('onExitRoom', info);
 };
 
 const onMicrophoneMuted = (data: {mute: boolean, muteType: ETUIRoomMuteType}) => {

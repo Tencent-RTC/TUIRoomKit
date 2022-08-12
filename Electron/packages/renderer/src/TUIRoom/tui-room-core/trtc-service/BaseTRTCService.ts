@@ -202,6 +202,7 @@ class BaseTRTCService {
     if (!this.isInRoom) {
       return TUIRoomResponse.success();
     }
+    logger.debug(`${BaseTRTCService.logPrefix}exitRoom`);
     return new Promise((resolve, reject) => {
       const list = this.methodResolveRejectMap.get(METHOD_NAME.EXIT_ROOM) || [];
       list.push({
@@ -283,7 +284,7 @@ class BaseTRTCService {
   }
 
   setRemoteVideoFillMode(userId: string, streamType: string, fillMode: TRTCVideoFillMode) {
-    this.rtcCloud?.setRemoteRenderParams(userId, streamType as any, {
+    this.rtcCloud?.setRemoteRenderParams(userId, streamType, {
       mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
       rotation: TRTCVideoRotation.TRTCVideoRotation0,
       fillMode: fillMode,

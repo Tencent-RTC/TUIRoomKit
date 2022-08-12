@@ -14,6 +14,7 @@ import {
   TRTCQualityInfo,
   TRTCStatistics,
   TRTCVideoFillMode,
+  TRTCRoleType,
 } from 'trtc-electron-sdk';
 // @ts-ignore
 import TIM from 'tim-js-sdk';
@@ -35,7 +36,6 @@ import StateStore from './StateStore';
 import TUIRoomLifecycle from './TUIRoomLifecycle';
 import TUIRoomAuth from './TUIRoomAuth';
 import TSignalingService from './TSignalingService';
-import { TRTCRoleType } from 'trtc-electron-sdk';
 
 class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   static logPrefix = '[TUIRoomCore]';
@@ -82,6 +82,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   public static destroyInstance() {
     if (TUIRoomCore.instance !== null) {
       TUIRoomCore.instance.destroy();
+      TUIRoomCore.instance = null;
     }
   }
 
@@ -1730,7 +1731,8 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
       this.unbindIMEvent();
       this.timService.destroy();
     } catch (error: any) {
-      throw error as TUIRoomError;
+      logger.error(`${TUIRoomCore.logPrefix}destroy error:`, error);
+      throw error;
     }
   }
 }

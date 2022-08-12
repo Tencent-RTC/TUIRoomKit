@@ -22,8 +22,8 @@
     </div>
     <div class="right-container">
       <end-control
-        @on-room-destroy="onRoomDestroy"
-        @on-room-exit="onRoomExit"
+        @on-destroy-room="onDestroyRoom"
+        @on-exit-room="onExitRoom"
       />
     </div>
   </div>
@@ -50,15 +50,15 @@ import TUIRoomAegis from '../../utils/aegis';
 //   roomRef: HTMLElement,
 // });
 const basicStore = useBasicStore();
-const emit = defineEmits(['onRoomDestroy', 'onRoomExit']);
+const emit = defineEmits(['onDestroyRoom', 'onExitRoom']);
 
-const onRoomDestroy = (info: { code: number; message: string }) => {
-  emit('onRoomDestroy', info);
+const onDestroyRoom = (info: { code: number; message: string }) => {
+  emit('onDestroyRoom', info);
   TUIRoomAegis.reportEvent({ name: 'destroyRoom', ext1: 'destroyRoom-success' });
 };
 
-const onRoomExit = (info: { code: number; message: string }) => {
-  emit('onRoomExit', info);
+const onExitRoom = (info: { code: number; message: string }) => {
+  emit('onExitRoom', info);
   TUIRoomAegis.reportEvent({ name: 'exitRoom', ext1: 'exitRoom-success' });
 };
 
