@@ -58,7 +58,7 @@ enum DialogType {
 }
 const currentDialogType = ref(DialogType.BasicDialog);
 
-const emit = defineEmits(['onRoomExit', 'onRoomDestroy']);
+const emit = defineEmits(['onExitRoom', 'onDestroyRoom']);
 
 const visible: Ref<boolean> = ref(false);
 const basicInfo = useBasicStore();
@@ -101,7 +101,7 @@ async function dismissRoom() {
     await TUIRoomCore.logout();
     logger.log(`${logPrefix}dismissRoom:`, response);
     resetState();
-    emit('onRoomDestroy', { code: 0, message: '' });
+    emit('onDestroyRoom', { code: 0, message: '' });
   } catch (error) {
     logger.error(`${logPrefix}dismissRoom error:`, error);
   }
@@ -118,7 +118,7 @@ async function leaveRoom() { // eslint-disable-line
     await TUIRoomCore.logout();
     logger.log(`${logPrefix}leaveRoom:`, response);
     resetState();
-    emit('onRoomExit', { code: 0, message: '' });
+    emit('onExitRoom', { code: 0, message: '' });
   } catch (error) {
     logger.error(`${logPrefix}leaveRoom error:`, error);
   }
@@ -135,7 +135,7 @@ async function transferAndLeave() {
     response = await TUIRoomCore.exitRoom();
     logger.log(`${logPrefix}transferAndLeave:`, response);
     resetState();
-    emit('onRoomExit', { code: 0, message: '' });
+    emit('onExitRoom', { code: 0, message: '' });
   } catch (error) {
     logger.error(`${logPrefix}transferAndLeave error:`, error);
   }
@@ -151,7 +151,7 @@ const onRoomDestroyed = async () => {
       confirmButtonText: '确认',
       callback: () => {
         resetState();
-        emit('onRoomDestroy', { code: 0, message: '' });
+        emit('onDestroyRoom', { code: 0, message: '' });
       },
     });
   } catch (error) {

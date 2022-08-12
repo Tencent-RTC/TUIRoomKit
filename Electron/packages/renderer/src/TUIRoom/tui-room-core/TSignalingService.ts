@@ -140,6 +140,7 @@ class TSignalingService {
 
   public async logout(): Promise<TUIRoomResponse<any>> {
     try {
+      logger.debug(`${TSignalingService.logPrefix}logout`);
       const imResponse: {
         code: number;
         data: any;

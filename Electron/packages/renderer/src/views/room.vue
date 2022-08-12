@@ -4,8 +4,8 @@
     @on-log-out="handleLogOut"
     @on-create-room="onCreateRoom"
     @on-enter-room="onEnterRoom"
-    @on-room-exit="onRoomExit"
-    @on-room-destroy="onRoomDestroy"
+    @on-exit-room="onExitRoom"
+    @on-destroy-room="onDestroyRoom"
     @on-kick-off="onKickOff"
   ></Room>
 </template>
@@ -63,14 +63,14 @@ function onEnterRoom(info: { code: number; message: string }) {
 }
 
 // 主持人销毁房间回调
-const onRoomDestroy = (info: { code: number; message: string }) => {
-  console.debug('onRoomDestroy:', info);
+const onDestroyRoom = (info: { code: number; message: string }) => {
+  console.debug('onDestroyRoom:', info);
   router.replace({ path: '/home' });
 };
 
 // 普通成员退出房间回调
-const onRoomExit = (info: { code: number; message: string }) => {
-  console.debug('onRoomExit:', info);
+const onExitRoom = (info: { code: number; message: string }) => {
+  console.debug('onExitRoom:', info);
   router.replace({ path: '/home' });
 };
 
