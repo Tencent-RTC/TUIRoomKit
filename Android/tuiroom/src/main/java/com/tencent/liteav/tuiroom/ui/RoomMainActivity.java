@@ -153,6 +153,8 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
                             mOpenAudio = true;
                             if (mOpenCamera) {
                                 requestCameraPermission();
+                            } else {
+                                startCreateOrEnterRoom();
                             }
                         }
 
