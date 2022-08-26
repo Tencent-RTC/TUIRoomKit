@@ -16,9 +16,6 @@ import { simpleClone } from './utils/utils';
 import TUIRoomConfig from './base/TUIRoomConfig';
 
 class TIMService {
-  getChatMessageList(nextReqMessageID: string) {
-    throw new Error('Method not implemented.');
-  }
   static logPrefix = '[TIMService]';
 
   private sdkAppId = 0;
@@ -447,7 +444,7 @@ class TIMService {
         this.emitter.emit('onRemoteUserLeaveRoom', operatorID);
         break;
       // 处理群主转移
-      case TIM.TYPES.GRP_TIP_GRP_PROFILE_UPDATED: 
+      case TIM.TYPES.GRP_TIP_GRP_PROFILE_UPDATED:
         this.handleGroupProfileUpdate(message.payload);
         break;
       default:
@@ -531,6 +528,49 @@ class TIMService {
         TUIRoomErrorMessage.SEND_CUSTOM_MESSAGE_ERROR
       );
     }
+  }
+
+  /**
+   * /////////////////////////////////////////////////////////////////////////////////
+   * //
+   * //                                    IM 历史消息
+   * //
+   * /////////////////////////////////////////////////////////////////////////////////
+   */
+  async getChatMessageList(nextReqMessageID: string) {
+    this.preCheckMethodCall();
+    if (!this.groupId) {
+      logger.error(`${TIMService.logPrefix}getChatMessageList invalid groupId`);
+      return TUIRoomResponse.success({
+        messageList: [],
+        nextReqMessageID: '',
+        isCompleted: true
+      });
+    }
+    logger.debug(`${TIMService.logPrefix}.getChatMessageList groupId: ${this.groupId}, nextReqMessageID: ${nextReqMessageID}`);
+    let imResponse;
+    const conversationID = `GROUP${this.groupId}`;
+    if (!nextReqMessageID) {
+      imResponse = await this.tim.getMessageList({
+        conversationID: conversationID,
+        count: 15
+      });
+    } else {
+      imResponse = await this.tim.getMessageList({
+        conversationID: conversationID,
+        nextReqMessageID: nextReqMessageID,
+        count: 15
+      });
+    }
+
+    const messageList = imResponse.data.messageList.filter((message: any) => {
+      return message.type === TIM.TYPES.MSG_TEXT;
+    });
+    return TUIRoomResponse.success({
+      messageList: messageList,
+      nextReqMessageID: imResponse.data.nextReqMessageID,
+      isCompleted: imResponse.data.isCompleted
+    });
   }
 
   /**

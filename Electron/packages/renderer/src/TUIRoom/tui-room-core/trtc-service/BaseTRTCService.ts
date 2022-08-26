@@ -380,8 +380,8 @@ class BaseTRTCService {
     return this.rtcCloud?.getCurrentMicDevice();
   }
 
-  async setCurrentMicrophone(deviceId: string) {	
-    await this.rtcCloud?.setCurrentMicDevice(deviceId);	
+  async setCurrentMicrophone(deviceId: string) {
+    await this.rtcCloud?.setCurrentMicDevice(deviceId);
   }
 
   async getCameraList(): Promise<Array<TRTCDeviceInfo>> {
@@ -392,8 +392,8 @@ class BaseTRTCService {
     return this.rtcCloud?.getCurrentCameraDevice();
   }
 
-  async setCurrentCamera(deviceId: string) {	
-    await this.rtcCloud?.setCurrentCameraDevice(deviceId);	
+  async setCurrentCamera(deviceId: string) {
+    await this.rtcCloud?.setCurrentCameraDevice(deviceId);
   }
 
   getSpeakerList(): Array<TRTCDeviceInfo> {
@@ -404,8 +404,8 @@ class BaseTRTCService {
     return this.rtcCloud?.getCurrentSpeakerDevice();
   }
 
-  async setCurrentSpeaker(deviceId: string) {	
-    await this.rtcCloud?.setCurrentSpeakerDevice(deviceId);	
+  async setCurrentSpeaker(deviceId: string) {
+    await this.rtcCloud?.setCurrentSpeakerDevice(deviceId);
   }
 
   /**
