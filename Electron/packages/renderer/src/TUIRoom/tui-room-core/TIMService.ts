@@ -16,6 +16,9 @@ import { simpleClone } from './utils/utils';
 import TUIRoomConfig from './base/TUIRoomConfig';
 
 class TIMService {
+  getChatMessageList(nextReqMessageID: string) {
+    throw new Error('Method not implemented.');
+  }
   static logPrefix = '[TIMService]';
 
   private sdkAppId = 0;

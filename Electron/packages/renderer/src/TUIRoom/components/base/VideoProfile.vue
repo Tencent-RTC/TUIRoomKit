@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import TUIRoomCore, { TRTCVideoResolution } from '../../tui-room-core';
+import TUIRoomCore, { TRTCVideoResolution} from '../../tui-room-core';
 
 const videoProfile = ref('720P');
 

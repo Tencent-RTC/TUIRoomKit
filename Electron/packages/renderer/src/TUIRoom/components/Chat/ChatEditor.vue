@@ -1,16 +1,16 @@
 <template>
   <div
-    :class="['chat-editor', chatStore.isMuteChatByMater ? 'disable-editor': '']"
+    :class="['chat-editor', isMuteChatByMater ? 'disable-editor': '']"
   >
     <textarea
       ref="editorInputEle"
       v-model="sendMsg"
       class="content-bottom-input"
-      :disabled="chatStore.isMuteChatByMater"
-      :placeholder="chatStore.isMuteChatByMater ? '已被主持人禁言' : '说点什么'"
+      :disabled="isMuteChatByMater"
+      :placeholder="isMuteChatByMater ? '已被主持人禁言' : '说点什么'"
       @keyup.enter="sendMessage"
     />
-    <div v-if="!chatStore.isMuteChatByMater" class="chat-editor-toolbar">
+    <div v-if="!isMuteChatByMater" class="chat-editor-toolbar">
       <div class="left-section">
         <emoji @choose-emoji="handleChooseEmoji"></emoji>
       </div>
@@ -20,16 +20,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
+import { ElMessage } from 'element-plus';
+
 import TUIRoomCore from '../../tui-room-core';
 import { useChatStore } from '../../stores/chat';
-import { ElMessage } from 'element-plus';
 import emoji from './EditorTools/emoji.vue';
 
-const editorInputEle = ref();
-
 const chatStore = useChatStore();
+
+const { isMuteChatByMater } = storeToRefs(chatStore);
+const editorInputEle = ref();
 const sendMsg = ref('');
+
+watch(isMuteChatByMater, (value) => {
+  if (value) {
+    sendMsg.value = '';
+  }
+});
+
 const sendMessage = async () => {
   const msg = sendMsg.value.replace('\n', '');
   sendMsg.value = '';

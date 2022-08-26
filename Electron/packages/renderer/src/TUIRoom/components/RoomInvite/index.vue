@@ -9,7 +9,7 @@
           <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(roomId)"></svg-icon>
         </div>
       </div>
-      <div class="invite-item" v-if="roomLinkDisplay">
+      <div v-if="roomLinkDisplay" class="invite-item">
         <span class="invite-title">通过房间链接邀请</span>
         <div class="input-area">
           <input class="input" type="text" :value="inviteLink">
@@ -43,19 +43,16 @@ const { roomId } = storeToRefs(basicStore);
 const { origin, pathname } = location;
 
 onMounted(() => {
+  // eslint-disable-next-line no-underscore-dangle
   if ((window as any).__TRTCElectron) {
-    roomLinkDisplay.value = false; 
+    roomLinkDisplay.value = false;
   }
-})
-
-
-const inviteLink = computed(() => {
-  return `${origin}${pathname}#/home?roomId=${roomId.value}`;
 });
 
-const schemeLink = computed(() => {
-  return `tuiroom://joinroom?roomId=${roomId.value}`;
-});
+
+const inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);
+
+const schemeLink = computed(() => `tuiroom://joinroom?roomId=${roomId.value}`);
 
 function onCopy(value: string | number) {
   navigator.clipboard.writeText(`${value}`);
