@@ -283,7 +283,7 @@ class BaseTRTCService {
     });
   }
 
-  setRemoteVideoFillMode(userId: string, streamType: string, fillMode: TRTCVideoFillMode) {
+  setRemoteVideoFillMode(userId: string, streamType: TRTCVideoStreamType, fillMode: TRTCVideoFillMode) {
     this.rtcCloud?.setRemoteRenderParams(userId, streamType, {
       mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
       rotation: TRTCVideoRotation.TRTCVideoRotation0,

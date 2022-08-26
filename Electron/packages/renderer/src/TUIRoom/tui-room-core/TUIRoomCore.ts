@@ -15,6 +15,7 @@ import {
   TRTCStatistics,
   TRTCVideoFillMode,
   TRTCRoleType,
+  TRTCVideoResolutionMode,
 } from 'trtc-electron-sdk';
 // @ts-ignore
 import TIM from 'tim-js-sdk';
@@ -452,7 +453,17 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
    * 设置视频编码参数
    */
   setVideoEncoderParam(paramObj: TRTCVideoEncParam) {
-    this.trtcService.setVideoEncoderParam(paramObj);
+    const param =  (window as any).__TRTCElectron ? new TRTCVideoEncParam() : paramObj;
+    if(param) {
+      param.videoResolution = paramObj.videoResolution;
+      param.videoFps = (paramObj as any).fps || 15;
+      param.videoBitrate = (paramObj as any).bitrate || 900;
+      param.resMode = TRTCVideoResolutionMode.TRTCVideoResolutionModeLandscape;
+      param.minVideoBitrate = 0;
+      param.enableAdjustRes = false;
+    }
+    logger.debug(`${TUIRoomCore.logPrefix}setVideoEncoderParam`, param);
+    this.trtcService.setVideoEncoderParam(param);
   }
 
   /**
@@ -1204,6 +1215,23 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   /**
    * /////////////////////////////////////////////////////////////////////////////////
    * //
+   * //                                    IM 历史消息
+   * //
+   * /////////////////////////////////////////////////////////////////////////////////
+   */
+  /**
+   * 获取聊天历史消息
+   *
+   * @param {string} nextReqMessageID - 用于向上续拉消息，分页续拉时需传入该字段, 拉最新消息传默认值 ''。
+   * @returns {Promise}
+   */
+  async getChatMessageList(nextReqMessageID = '') {
+    return this.timService.getChatMessageList(nextReqMessageID);
+  }
+
+  /**
+   * /////////////////////////////////////////////////////////////////////////////////
+   * //
    * //                                    IM 群资料相关接口
    * //
    * /////////////////////////////////////////////////////////////////////////////////
@@ -1284,7 +1312,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   private onRoomMasterChanged (ownerId: string){
     logger.log(`${TUIRoomCore.logPrefix}onRoomMasterChangd`, ownerId,this.state);
     this.state.roomInfo.ownerId = ownerId;
-    this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged, ownerId); 
+    this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged, ownerId);
     // 普通成员收到消息,获取新的群主成员信息
     const user = this.state.currentUser.userId === ownerId ? this.state.currentUser : this.state.userMap.get(ownerId);
     if (user) {
@@ -1360,7 +1388,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   // // 新信令：邀请上麦
   // async kickUserSeat(): Promise<TUIRoomResponse<any>> {
   //   return this.roomCoordinator.applyTakeSeat();
-  // }  
+  // }
 
   // // 处理远端的响应
   // async responseRemoteRequest(userId: string, agree: boolean) {
@@ -1369,7 +1397,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
 
   // // 取消某个请求
   // async cancelRequest(requestId: string) {
-    
+
   // }
 
   async sendSpeechInvitation(userId: string): Promise<TUIRoomResponse<any>> {

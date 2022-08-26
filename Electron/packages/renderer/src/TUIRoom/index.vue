@@ -183,6 +183,9 @@ const onStatistics = (statistics: TRTCStatistics) => {
 
 const onReceivedChatMessage = (message: any) => {
   chatStore.updateMessageList(message);
+  if (!basicStore.isSidebarOpen || basicStore.sidebarName != 'chat') {
+    chatStore.updateUnReadCount(++chatStore.unReadCount);
+  }
 };
 
 function resetStore() {
