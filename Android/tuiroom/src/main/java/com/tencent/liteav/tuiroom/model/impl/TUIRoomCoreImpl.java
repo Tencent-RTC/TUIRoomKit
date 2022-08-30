@@ -155,7 +155,9 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
                 TRTCLogger.i(TAG, "destroyRoom");
                 if (!mIMService.isOwner()) {
                     TRTCLogger.e(TAG, "you are not the room owner");
-                    callback.onCallback(CODE_ERROR, "you are not the room owner");
+                    if (callback != null) {
+                        callback.onCallback(CODE_ERROR, "you are not the room owner");
+                    }
                     return;
                 }
                 mTRTCService.exitRoom(new TUIRoomCoreCallback.ActionCallback() {
@@ -303,11 +305,11 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
                 } else {
                     mIMService.getUserInfo(userId, new TXUserInfoCallback() {
                         @Override
-                        public void onCallback(int code, String msg, final TXUserInfo userInfo) {
+                        public void onCallback(final int code, final String msg, final TXUserInfo userInfo) {
                             runOnMainThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    TUIRoomCoreDef.UserInfo tuiUserInfo = new TUIRoomCoreDef.UserInfo();
+                                    final TUIRoomCoreDef.UserInfo tuiUserInfo = new TUIRoomCoreDef.UserInfo();
                                     tuiUserInfo.userId = userInfo.userId;
                                     tuiUserInfo.userName = userInfo.userName;
                                     tuiUserInfo.userAvatar = userInfo.avatarURL;
@@ -316,9 +318,10 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
                                     } else {
                                         tuiUserInfo.role = TUIRoomCoreDef.Role.AUDIENCE;
                                     }
-                                    TRTCLogger.i(TAG, "getUserInfo : " + userInfo);
+                                    TRTCLogger.i(TAG, "getUserInfo code : " + code + " userInfo: " + userInfo);
                                     mUserInfoList.add(tuiUserInfo);
                                     mUserInfoMap.put(userInfo.userId, tuiUserInfo);
+                                    callback.onCallback(code, msg, tuiUserInfo);
                                 }
                             });
                         }
@@ -419,10 +422,6 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
             @Override
             public void run() {
                 TRTCLogger.i(TAG, "startRemoteView userId: " + userId + " steamType:" + steamType);
-                TUIRoomCoreDef.UserInfo userInfo = mUserInfoMap.get(userId);
-                if (userInfo == null) {
-                    return;
-                }
                 if (steamType == TUIRoomCoreDef.SteamType.SCREE) {
                     mTRTCService.startPlaySubStream(userId, view, callback);
                 } else {
@@ -906,37 +905,19 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
             public void run() {
                 TRTCLogger.i(TAG, "onTRTCAnchorEnter userId : " + userId);
                 mAnchorList.add(userId);
-                final TUIRoomCoreDef.UserInfo tuiUserInfo = mUserInfoMap.get(userId);
-                if (tuiUserInfo != null) {
-                    if (tuiUserInfo.role != TUIRoomCoreDef.Role.MASTER) {
-                        tuiUserInfo.role = TUIRoomCoreDef.Role.ANCHOR;
-                    }
-                } else {
-                    mIMService.getUserInfo(userId, new TXUserInfoCallback() {
-                        @Override
-                        public void onCallback(int code, String msg, final TXUserInfo userInfo) {
-                            runOnMainThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    TUIRoomCoreDef.UserInfo tuiUserInfo = new TUIRoomCoreDef.UserInfo();
-                                    tuiUserInfo.userId = userInfo.userId;
-                                    tuiUserInfo.userName = userInfo.userName;
-                                    tuiUserInfo.userAvatar = userInfo.avatarURL;
-                                    if (userInfo.isOwner) {
-                                        tuiUserInfo.role = TUIRoomCoreDef.Role.MASTER;
-                                    } else {
-                                        tuiUserInfo.role = TUIRoomCoreDef.Role.ANCHOR;
-                                    }
-                                    mUserInfoList.add(tuiUserInfo);
-                                    mUserInfoMap.put(userInfo.userId, tuiUserInfo);
-                                }
-                            });
+                getUserInfo(userId, new TUIRoomCoreCallback.UserInfoCallback() {
+                    @Override
+                    public void onCallback(int code, String msg, TUIRoomCoreDef.UserInfo userInfo) {
+                        if (code == CODE_SUCCESS) {
+                            if (userInfo.role != TUIRoomCoreDef.Role.MASTER) {
+                                userInfo.role = TUIRoomCoreDef.Role.ANCHOR;
+                            }
+                            if (mTUIRoomCoreListener != null) {
+                                mTUIRoomCoreListener.onRemoteUserEnterSpeechState(userId);
+                            }
                         }
-                    });
-                }
-                if (mTUIRoomCoreListener != null) {
-                    mTUIRoomCoreListener.onRemoteUserEnterSpeechState(userId);
-                }
+                    }
+                });
             }
         });
     }
@@ -950,15 +931,19 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
                 runOnMainThread(new Runnable() {
                     @Override
                     public void run() {
-                        TUIRoomCoreDef.UserInfo tuiUserInfo = mUserInfoMap.get(userId);
-                        if (tuiUserInfo != null) {
-                            if (tuiUserInfo.role != TUIRoomCoreDef.Role.MASTER) {
-                                tuiUserInfo.role = TUIRoomCoreDef.Role.AUDIENCE;
+                        getUserInfo(userId, new TUIRoomCoreCallback.UserInfoCallback() {
+                            @Override
+                            public void onCallback(int code, String msg, TUIRoomCoreDef.UserInfo userInfo) {
+                                if (code == CODE_SUCCESS) {
+                                    if (userInfo.role != TUIRoomCoreDef.Role.MASTER) {
+                                        userInfo.role = TUIRoomCoreDef.Role.AUDIENCE;
+                                    }
+                                    if (mTUIRoomCoreListener != null) {
+                                        mTUIRoomCoreListener.onRemoteUserExitSpeechState(userId);
+                                    }
+                                }
                             }
-                        }
-                        if (mTUIRoomCoreListener != null) {
-                            mTUIRoomCoreListener.onRemoteUserExitSpeechState(userId);
-                        }
+                        });
                     }
                 });
             }
@@ -971,17 +956,14 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
             @Override
             public void run() {
                 TRTCLogger.i(TAG, "onTRTCVideoAvailable userId : " + userId + " available: " + available);
-                final TUIRoomCoreDef.UserInfo userInfo = mUserInfoMap.get(userId);
-                if (userInfo == null) {
-                    TRTCLogger.i(TAG, "userInfo is null");
-                    return;
-                }
-                userInfo.isVideoAvailable = available;
-                runOnMainThread(new Runnable() {
+                getUserInfo(userId, new TUIRoomCoreCallback.UserInfoCallback() {
                     @Override
-                    public void run() {
-                        if (mTUIRoomCoreListener != null) {
-                            mTUIRoomCoreListener.onRemoteUserCameraAvailable(userId, available);
+                    public void onCallback(int code, String msg, TUIRoomCoreDef.UserInfo userInfo) {
+                        if (code == CODE_SUCCESS) {
+                            userInfo.isVideoAvailable = available;
+                            if (mTUIRoomCoreListener != null) {
+                                mTUIRoomCoreListener.onRemoteUserCameraAvailable(userId, available);
+                            }
                         }
                     }
                 });
@@ -995,17 +977,14 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
             @Override
             public void run() {
                 TRTCLogger.i(TAG, "onTRTCAudioAvailable userId : " + userId + " available: " + available);
-                final TUIRoomCoreDef.UserInfo userInfo = mUserInfoMap.get(userId);
-                if (userInfo == null) {
-                    TRTCLogger.i(TAG, "userInfo is null");
-                    return;
-                }
-                userInfo.isAudioAvailable = available;
-                runOnMainThread(new Runnable() {
+                getUserInfo(userId, new TUIRoomCoreCallback.UserInfoCallback() {
                     @Override
-                    public void run() {
-                        if (mTUIRoomCoreListener != null) {
-                            mTUIRoomCoreListener.onRemoteUserAudioAvailable(userId, available);
+                    public void onCallback(int code, String msg, TUIRoomCoreDef.UserInfo userInfo) {
+                        if (code == CODE_SUCCESS) {
+                            userInfo.isAudioAvailable = available;
+                            if (mTUIRoomCoreListener != null) {
+                                mTUIRoomCoreListener.onRemoteUserAudioAvailable(userId, available);
+                            }
                         }
                     }
                 });
@@ -1070,35 +1049,17 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
         runOnMainThread(new Runnable() {
             @Override
             public void run() {
-                final TUIRoomCoreDef.UserInfo tuiUserInfo = mUserInfoMap.get(userId);
-                if (tuiUserInfo == null) {
-                    mIMService.getUserInfo(userId, new TXUserInfoCallback() {
-                        @Override
-                        public void onCallback(int code, String msg, final TXUserInfo userInfo) {
-                            runOnMainThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    TUIRoomCoreDef.UserInfo tuiUserInfo = new TUIRoomCoreDef.UserInfo();
-                                    tuiUserInfo.userId = userInfo.userId;
-                                    tuiUserInfo.userName = userInfo.userName;
-                                    tuiUserInfo.userAvatar = userInfo.avatarURL;
-                                    tuiUserInfo.role = TUIRoomCoreDef.Role.MASTER;
-                                    mUserInfoList.add(tuiUserInfo);
-                                    mUserInfoMap.put(userInfo.userId, tuiUserInfo);
-                                    tuiUserInfo.isSharingScreen = available;
-                                    if (mTUIRoomCoreListener != null) {
-                                        mTUIRoomCoreListener.onRemoteUserScreenVideoAvailable(userId, available);
-                                    }
-                                }
-                            });
+                getUserInfo(userId, new TUIRoomCoreCallback.UserInfoCallback() {
+                    @Override
+                    public void onCallback(int code, String msg, TUIRoomCoreDef.UserInfo userInfo) {
+                        if (code == CODE_SUCCESS) {
+                            userInfo.isSharingScreen = available;
+                            if (mTUIRoomCoreListener != null) {
+                                mTUIRoomCoreListener.onRemoteUserScreenVideoAvailable(userId, available);
+                            }
                         }
-                    });
-                } else {
-                    tuiUserInfo.isSharingScreen = available;
-                    if (mTUIRoomCoreListener != null) {
-                        mTUIRoomCoreListener.onRemoteUserScreenVideoAvailable(userId, available);
                     }
-                }
+                });
             }
         });
     }
