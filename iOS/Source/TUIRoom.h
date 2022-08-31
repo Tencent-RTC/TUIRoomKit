@@ -3,6 +3,7 @@
 //  Pods
 //
 //  Created by jack on 2022/4/28.
+//  Copyright © 2022 Tencent. All rights reserved.
 //
 
 #ifndef TUIRoom_h
