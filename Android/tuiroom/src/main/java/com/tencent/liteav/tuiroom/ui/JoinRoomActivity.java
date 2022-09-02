@@ -87,6 +87,9 @@ public class JoinRoomActivity extends AppCompatActivity {
     }
 
     private void enterMeeting(String roomId) {
+        if (TextUtils.isEmpty(roomId)) {
+            return;
+        }
         TUIRoom tuiRoom = TUIRoom.sharedInstance(this);
         tuiRoom.enterRoom(Integer.parseInt(roomId), mOpenCamera, mOpenAudio);
     }

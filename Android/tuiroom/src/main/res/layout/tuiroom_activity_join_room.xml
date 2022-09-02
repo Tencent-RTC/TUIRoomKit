@@ -137,7 +137,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="70dp"
         android:background="@drawable/tuiroom_btn_join"
-        android:enabled="true"
+        android:enabled="false"
         android:gravity="center"
         android:text="@string/tuiroom_enter_tag_normal"
         android:textColor="@color/tuiroom_color_white"
