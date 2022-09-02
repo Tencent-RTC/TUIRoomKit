@@ -190,6 +190,7 @@ static TUIBeautyService *sharedService = nil;
                                      @"plugin_segment": @"LightSegmentPlugin.bundle",
                                      @"beauty_config": beautyConfigJson};
         _xMagicKit = [[XMagic alloc] initWithRenderSize:_renderSize assetsDict:assetsDict];
+        [_xMagicKit configPropertyWithType:@"beauty" withName:@"beauty.smooth" withData:@"0.0" withExtraInfo:nil];
     }
     return _xMagicKit;
 }
