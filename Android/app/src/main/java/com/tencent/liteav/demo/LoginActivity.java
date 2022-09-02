@@ -24,7 +24,7 @@ import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.tencent.liteav.basic.AvatarConstant;
 import com.tencent.liteav.basic.UserModel;
 import com.tencent.liteav.basic.UserModelManager;
-import com.tencent.liteav.debug.GenerateGlobalConfig;
+import com.tencent.liteav.debug.GenerateTestUserSig;
 import com.tencent.qcloud.tuicore.TUILogin;
 
 import java.util.ArrayList;
@@ -68,12 +68,12 @@ public class LoginActivity extends AppCompatActivity {
         int index = new Random().nextInt(AvatarConstant.USER_AVATAR_ARRAY.length);
         String coverUrl = AvatarConstant.USER_AVATAR_ARRAY[index];
         userModel.userAvatar = coverUrl;
-        userModel.userSig = GenerateGlobalConfig.genTestUserSig(userId);
+        userModel.userSig = GenerateTestUserSig.genTestUserSig(userId);
         final UserModelManager manager = UserModelManager.getInstance();
         manager.setUserModel(userModel);
         V2TIMSDKConfig config = new V2TIMSDKConfig();
         config.setLogLevel(V2TIMSDKConfig.V2TIM_LOG_DEBUG);
-        TUILogin.init(this, GenerateGlobalConfig.SDKAPPID, null, new V2TIMSDKListener() {
+        TUILogin.init(this, GenerateTestUserSig.SDKAPPID, null, new V2TIMSDKListener() {
 
             @Override
             public void onKickedOffline() {

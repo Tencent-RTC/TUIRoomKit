@@ -54,6 +54,7 @@ public class UserModelManager {
             String json = SPUtils.getInstance(PER_DATA).getString(PER_USER_MODEL);
             mUserModel = GsonUtils.fromJson(json, UserModel.class);
         } catch (Exception e) {
+            Log.d(TAG, "loadUserModel failed:" + e.getMessage());
         }
     }
 
@@ -77,6 +78,7 @@ public class UserModelManager {
         try {
             SPUtils.getInstance(PER_DATA).put(PER_USER_DATE, mUserPubishVideoDate);
         } catch (Exception e) {
+            Log.d(TAG, "setUserPublishVideoDate failed:" + e.getMessage());
         }
     }
 
