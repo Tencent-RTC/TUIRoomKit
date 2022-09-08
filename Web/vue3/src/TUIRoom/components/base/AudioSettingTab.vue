@@ -9,7 +9,7 @@
   <div class="audio-setting-tab">
     <div :class="['item-setting-container', isSampleMode && 'hasDividingLine']">
       <div class="item-setting">
-        <span class="title">麦克风</span>
+        <span class="title">{{ t('Mic') }}</span>
         <div class="flex">
           <device-select
             :class="isDetailMode ? 'detail-select' : ''"
@@ -20,12 +20,12 @@
             class="button"
             @click="handleMicrophoneTest"
           >
-            {{ isTestingMicrophone ? '停止测试' : '测试' }}
+            {{ isTestingMicrophone ? t('Stop') : t('Test') }}
           </div>
         </div>
       </div>
       <div class="item-setting">
-        <span class="title">输出</span>
+        <span class="title">{{ t('Output') }}</span>
         <div class="mic-bar-container">
           <div
             v-for="(item, index) in new Array(volumeTotalNum).fill('')"
@@ -46,7 +46,7 @@
 
     <div :class="['item-setting-container', isSampleMode && 'hasDividingLine']">
       <div class="item-setting">
-        <span class="title">扬声器</span>
+        <span class="title">{{ t('Speaker') }}</span>
         <div class="flex">
           <device-select
             :class="isDetailMode ? 'detail-select' : ''"
@@ -57,7 +57,7 @@
             class="button"
             @click="handleSpeakerTest"
           >
-            {{ isTestingSpeaker ? '停止测试' : '测试' }}
+            {{ isTestingSpeaker ? t('Stop') : t('Test') }}
           </div>
         </div>
       </div>
@@ -77,6 +77,8 @@ import { ref, computed, onBeforeUnmount } from 'vue';
 import DeviceSelect from './DeviceSelect.vue';
 import { useRoomStore } from '../../stores/room';
 import { SettingMode } from '../../constants/render';
+import { useI18n } from 'vue-i18n';
+
 
 interface Props {
   mode?: SettingMode,
@@ -104,6 +106,8 @@ function handleMicrophoneTest() {
 
 const isTestingSpeaker = ref(false);
 const audioPlayer = document.createElement('audio');
+const { t } = useI18n();
+
 // 点击扬声器【测试】按钮
 function handleSpeakerTest() {
   if (isTestingSpeaker.value) {

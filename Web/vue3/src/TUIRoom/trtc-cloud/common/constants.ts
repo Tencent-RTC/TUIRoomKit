@@ -1,24 +1,36 @@
 /* eslint-disable no-unused-vars */
 // --------------------------------常量--------------------------------
 export const EnterRoomFailure: number = -1;
-export const ON_ERROR: string = 'onError';
 // kibana 日志上报
 // eslint-disable-next-line import/no-mutable-exports
 export let loggerProxy = '';
 export const loggerDomain = 'https://yun.tim.qq.com';
 export const setLoggerProxy = (domain: any) => (loggerProxy = domain);
-// 应用场景
-export const liveMode = 'live'; // 互动直播
-export const rtcMode = 'rtc'; // 实时音视频通话模式
-export const anchorRole = 'anchor';
-export const audienceRole = 'audience';
-// audio profile
-const AudioStandard = 'standard'; // 标准 audio: 48000	单声道	40
-const AudioHighQuality = 'high'; // 高质量 audio: 48000	单声道	128
-// 大小流
-export const smallStream = 'small';
-export const bigStream = 'big';
-export const auxiliaryStream = 'auxiliary';
+
+export const NAME = {
+  DEFAULT: 'default',
+  VIDEO: 'video',
+  AUDIO: 'audio',
+  ON_ERROR: 'onError',
+  MAIN: 'main',
+  // 场景：音视频、直播
+  RTC: 'rtc',
+  LIVE: 'live',
+  // 用户角色
+  ANCHOR: 'anchor',
+  AUDIENCE: 'audience',
+  // 音频 profile
+  AUDIO_STANDARD: 'standard',
+  AUDIO_HIGH: 'high',
+  AUDIO_STANDARD_STEREO: 'standard_stereo',
+  AUDIO_HIGH_STEREO: 'high_stereo',
+  // 音频 profile
+  SMALL: 'small',
+  BIG: 'big',
+  AUXILIARY: 'auxiliary',
+  // 屏幕分享用户名的前缀
+  SCREEN_SHARE_USER_ID_PREFIX: 'share_',
+};
 
 // 网络类型与仪表盘传参的对应关系
 export const NETWORK_TYPE = {
@@ -34,8 +46,8 @@ interface IRoleMap {
 }
 // webRTC 仅在 'live' 模式下有意义, 仅支持以下两种角色. TRTCRoleAnchor = 20, TRTCRoleAudience = 21,
 export const roleMap: IRoleMap = {
-  20: anchorRole,
-  21: audienceRole,
+  20: NAME.ANCHOR,
+  21: NAME.AUDIENCE,
 };
 // TRTCAppSceneVideoCall = 0, 视频通话场景
 // TRTCAppSceneLIVE = 1, 视频互动直播
@@ -43,23 +55,24 @@ export const roleMap: IRoleMap = {
 // TRTCAppSceneVoiceChatRoom = 3, 语音互动直播
 // webRTC 仅在 'live' 模式下有意义, 仅支持以下两种角色
 export const joinSceneMap = {
-  0: rtcMode,
-  1: liveMode,
-  2: rtcMode,
-  3: liveMode,
+  0: NAME.RTC,
+  1: NAME.LIVE,
+  2: NAME.RTC,
+  3: NAME.LIVE,
 };
 
-// webRTC 音频码率和 TRTCCloud 的映射关系 TRTCAudioQualitySpeech = 1, TRTCAudioQualityDefault = 2, TRTCAudioQualityMusic = 3
+// webRTC 音频 https://web.sdk.qcloud.com/trtc/webrtc/doc/zh-cn/LocalStream.html#setAudioProfile
 export const audioQualityMap = {
-  1: AudioStandard,
-  2: AudioStandard,
-  3: AudioHighQuality,
+  0: NAME.AUDIO_STANDARD,
+  1: NAME.AUDIO_HIGH,
+  2: NAME.AUDIO_STANDARD_STEREO,
+  3: NAME.AUDIO_HIGH_STEREO,
 };
-
+// webRTC 视频
 export const streamTypeMap = {
-  0: bigStream,
-  1: smallStream,
-  2: auxiliaryStream,
+  0: NAME.BIG,
+  1: NAME.SMALL,
+  2: NAME.AUXILIARY,
 };
 
 //  * WebRTC 视频分辨率和 TRTCCloud 的映射关系

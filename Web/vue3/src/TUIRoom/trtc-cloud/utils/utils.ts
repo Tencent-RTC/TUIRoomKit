@@ -1,4 +1,4 @@
-import { loggerProxy, loggerDomain, auxiliaryStream } from '../common/constants';
+import { loggerProxy, loggerDomain, NAME } from '../common/constants';
 
 /**
  * 获取向下取整的 performance.now() 值
@@ -33,10 +33,10 @@ export const isNumber = (param: any) => typeof param === 'number';
 export const isBoolean = (param: any) => typeof param === 'boolean';
 
 export function userIdMain(userId: string): string {
-  return `${userId}-main`;
+  return `${userId}-${NAME.MAIN}`;
 }
 export function userIdAuxiliary(userId: string): string {
-  return `${userId}-${auxiliaryStream}`;
+  return `${userId}-${NAME.AUXILIARY}`;
 }
 
 /**
@@ -73,4 +73,36 @@ function copyProperties(target: any, source: any) {
       Object.defineProperty(target, key, desc);
     }
   }
+}
+/**
+ * userId 和屏幕分享 shareUserId 是否相互包含
+ * shareUserId 要求格式：`share_${userId}`，否则无法解析出来
+ * @param {String} userId 用户 userId
+ * @param {String} shareUserId 用户屏幕分享的 userId
+ * @return {Boolean}
+ */
+export function isContained(userId: string = '', shareUserId: string) {
+  if (shareUserId === `share_${userId}`) {
+    return true;
+  }
+  return false;
+}
+/**
+ * 防抖函数
+ * @param {Function} fn 要执行的函数
+ * @param {Number} delay 间隔时间, 毫秒
+ * @returns function
+ */
+// eslint-disable-next-line no-unused-vars
+export function debounce(fn: { apply: (arg0: any, arg1: any) => void; }, delay: number | undefined) {
+  let timer: number;
+  return function (this:any, ...args: any) {
+    if (timer > 0) {
+      clearTimeout(timer);
+    }
+    timer = window.setTimeout(() => {
+      fn.apply(this, args);
+      timer = -1;
+    }, delay);
+  };
 }

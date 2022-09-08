@@ -1,8 +1,10 @@
 <template>
   <div class="manage-member-container">
     <div v-if="applyToAnchorList.length > 0" class="apply-on-stage-info">
-      <div class="apply-info">{{ `${applyToAnchorList[0].userName || applyToAnchorList[0].userId} 正在申请上台` }}</div>
-      <div class="button" @click="showApplyUserLit">查看</div>
+      <div class="apply-info">
+        {{ `${applyToAnchorList[0].userName || applyToAnchorList[0].userId} ${t('Applying for the stage')}` }}
+      </div>
+      <div class="button" @click="showApplyUserLit">{{ t('Check') }}</div>
     </div>
     <div class="global-setting">
       <div class="setting-item">
@@ -10,7 +12,7 @@
           <svg-icon
             class="setting-icon" :icon-name="ICON_NAME.MicOn" size="large"
           />
-          <span class="setting-name">禁言所有人</span>
+          <span class="setting-name">{{ t('Disable all audios') }}</span>
         </div>
         <div class="item-right-section">
           <el-switch :value="basicStore.isMuteAllAudio" @change="toggleAllAudio" />
@@ -21,7 +23,7 @@
           <svg-icon
             class="setting-icon" :icon-name="ICON_NAME.CameraOn" size="large"
           />
-          <span class="setting-name">禁画所有人</span>
+          <span class="setting-name">{{ t('Disable all videos') }}</span>
         </div>
         <div class="item-right-section">
           <el-switch :value="basicStore.isMuteAllVideo" @change="toggleAllVideo" />
@@ -30,7 +32,10 @@
     </div>
     <div class="divide-line"></div>
     <div class="member-list-container">
-      <div class="member-list-header">成员列表<span class="member-count">({{ userNumber }}人)</span></div>
+      <div class="member-list-header">
+        {{ t('Member List') }}
+        <span class="member-count">({{ userNumber }}{{ t('members') }})</span>
+      </div>
       <div class="member-list-content">
         <member-item v-for="(userInfo) in userList" :key="userInfo.userId" :user-info="userInfo"></member-item>
       </div>
@@ -46,6 +51,9 @@ import { useRoomStore } from '../../stores/room';
 import { useBasicStore } from '../../stores/basic';
 import { ICON_NAME } from '../../constants/icon';
 import MemberItem from './MemberItem/index.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();

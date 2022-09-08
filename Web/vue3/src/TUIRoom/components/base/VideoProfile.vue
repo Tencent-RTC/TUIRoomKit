@@ -24,14 +24,17 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import TUIRoomCore, { TRTCVideoResolution } from '../../tui-room-core';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const videoProfile = ref('720P');
 
 const videoProfileList = [
-  { label: '流畅（360P，15FPS）', value: '360P' },
-  { label: '标清（540P，15FPS）', value: '540P' },
-  { label: '高清（720P，30FPS）', value: '720P' },
-  { label: '超清（1080P，30FPS）', value: '1080P' }];
+  { label: t('Smooth (360p, 15 fps)'), value: '360P' },
+  { label: t('SD (540p, 15 fps)'), value: '540P' },
+  { label: t('HD (720p, 30 fps)'), value: '720P' },
+  { label: t('FHD (1080p, 30 fps)'), value: '1080P' }];
 
 const videoProfileMap: Record<string, any> = {
   '360P': { videoResolution: TRTCVideoResolution.TRTCVideoResolution_640_360, fps: 15, bitrate: 800 },
@@ -43,7 +46,7 @@ const videoProfileMap: Record<string, any> = {
 watch(videoProfile, (val: string) => {
   const currentVideoProfileObj = videoProfileMap[val];
   TUIRoomCore.setVideoEncoderParam(currentVideoProfileObj);
-});
+}, { immediate: true });
 
 </script>
 

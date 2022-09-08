@@ -9,7 +9,7 @@
   <div class="audio-control-container">
     <icon-button
       ref="audioIconButtonRef"
-      title="麦克风"
+      :title="t('Mic')"
       :has-more="true"
       :show-more="showAudioSettingTab"
       :disabled="isLocalAudioIconDisable"
@@ -42,6 +42,7 @@ import { useBasicStore } from '../../stores/basic';
 import { useRoomStore } from '../../stores/room';
 import AudioIcon from '../base/AudioIcon.vue';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
+import { useI18n } from 'vue-i18n';
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
@@ -51,6 +52,7 @@ const { isLocalAudioIconDisable, isMuteAllAudio, isAudience } = storeToRefs(basi
 const showAudioSettingTab: Ref<boolean> = ref(false);
 const audioIconButtonRef = ref<InstanceType<typeof IconButton>>();
 const audioSettingRef = ref<InstanceType<typeof AudioSettingTab>>();
+const { t } = useI18n();
 
 watch(isDefaultOpenMicrophone, (val) => {
   roomStore.setIsLocalAudioMuted(!val);

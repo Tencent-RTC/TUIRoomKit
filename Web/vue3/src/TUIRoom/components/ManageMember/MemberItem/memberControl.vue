@@ -8,7 +8,7 @@
     </div>
     <div class="more-container">
       <div class="more-btn" @click="toggleClickMoreBtn">
-        更多
+        {{ t('More') }}
         <svg-icon class="more-icon" :icon-name="ICON_NAME.ArrowBorderDown"></svg-icon>
       </div>
       <div v-show="showMoreControl" class="user-operate-list">
@@ -33,6 +33,9 @@ import TUIRoomCore, { ETUIRoomRole, ETUISpeechMode } from '../../../tui-room-cor
 import { useBasicStore } from '../../../stores/basic';
 import SvgIcon from '../../common/SvgIcon.vue';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
@@ -55,6 +58,7 @@ const showMoreControl = ref(false);
 const isMe = computed(() => basicStore.userId === props.userInfo.userId);
 const isAnchor = computed(() => props.userInfo.role === ETUIRoomRole.ANCHOR);
 const isAudience = computed(() => props.userInfo.role === ETUIRoomRole.AUDIENCE);
+const isFreeSpeechMode = computed(() => basicStore.roomMode === ETUISpeechMode.FREE_SPEECH);
 const isApplyRoomMode = computed(() => basicStore.roomMode === ETUISpeechMode.APPLY_SPEECH);
 
 // 控制元素的集中匹配情况
@@ -83,37 +87,43 @@ const isApplyRoomMode = computed(() => basicStore.roomMode === ETUISpeechMode.AP
 const singleControl = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const control = { title: '', func: (userInfo: UserInfo) => {} };
-  if (isAnchor.value) {
-    control.title = props.userInfo.isAudioMutedByMaster ? '解除禁言' : '禁言';
+  if (isFreeSpeechMode.value) {
+    control.title = props.userInfo.isAudioMutedByMaster ? t('Unmute') : t('Mute');
     control.func = muteUserAudio;
-  } else if (isAudience.value) {
-    if (props.userInfo.isUserApplyingToAnchor) {
-      control.title = '同意上台';
-      control.func = agreeUserOnStage;
-    } else {
-      control.title = props.userInfo.isInvitingUserToAnchor ? '取消邀请上台' : '邀请上台';
-      control.func = toggleInviteUserOnStage;
+  } else if (isApplyRoomMode.value) {
+    if (isAnchor.value) {
+      control.title = props.userInfo.isAudioMutedByMaster ? t('Unmute') : t('Mute');
+      control.func = muteUserAudio;
+    } else if (isAudience.value) {
+      if (props.userInfo.isUserApplyingToAnchor) {
+        control.title = t('Agree to the stage');
+        control.func = agreeUserOnStage;
+      } else {
+        control.title = props.userInfo.isInvitingUserToAnchor ?  t('Cancel stage') : t('Invite stage');
+        control.func = toggleInviteUserOnStage;
+      }
     }
   }
   return control;
 });
 
-const denyOnStage = { title: '拒绝上台', func: denyUserOnStage };
-const makeOffStage = { title: '邀请下台', func: kickUserOffStage };
+const denyOnStage = { title: t('Refuse stage'), func: denyUserOnStage };
+const makeOffStage = { title: t('Step down'), func: kickUserOffStage };
 
-const videoControlTitle = computed(() => (props.userInfo.isVideoMutedByMaster ? '解除禁画' : '禁画'));
+const videoControlTitle = computed(() => (props.userInfo.isVideoMutedByMaster ? t('Enable video') : t('Disable video')));
 const videoControl = computed(() => ({ title: videoControlTitle.value, func: muteUserVideo }));
 
-const chatControlTitle = computed(() => (props.userInfo.isChatMutedByMaster ? '允许文字聊天' : '禁止文字聊天'));
+const chatControlTitle = computed(() => (props.userInfo.isChatMutedByMaster ? t('Enable chat') : t('Disable chat')));
 const forbidChat = computed(() => ({ title: chatControlTitle.value, func: muteUserChat }));
 
-const kickUser = { title: '踢出房间', func: kickOffUser };
+const kickUser = { title: t('Kick out'), func: kickOffUser };
 const controlList = computed(() => {
   const list = [forbidChat.value, kickUser];
-  if (isAnchor.value) {
+  if (isFreeSpeechMode.value) {
     list.unshift(videoControl.value);
   }
   if (isAnchor.value && isApplyRoomMode.value) {
+    list.unshift(videoControl.value);
     list.splice(1, 0, makeOffStage);
   }
   if (isAudience.value && props.userInfo.isUserApplyingToAnchor) {
@@ -202,7 +212,7 @@ function kickOffUser(userInfo: UserInfo) {
       padding: 4px 0;
       top: calc(100% + 10px);
       right: 0;
-      min-width: 124px;
+      min-width: 140px;
       background: #1D2029;
       border-radius: 4px;
       box-shadow: 0 1px 10px 0 rgba(0,0,0,0.30);

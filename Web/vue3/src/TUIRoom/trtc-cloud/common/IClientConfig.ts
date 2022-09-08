@@ -6,7 +6,7 @@ interface IClientConfig {
   useStringRoomId?: boolean;
   privateMapKey?: string;
   streamId?: string;
-  frameWorkType?:number;
+  frameWorkType?: number;
 }
 
 export { IClientConfig };

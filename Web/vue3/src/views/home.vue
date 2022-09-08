@@ -8,6 +8,7 @@
         :user-avatar="userAvatar"
         @log-out="handleLogOut"
       ></user-info>
+      <language-icon class="header-item language"></language-icon>
     </div>
     <stream-preview ref="streamPreviewRef"></stream-preview>
     <room-control
@@ -22,19 +23,24 @@
 import UserInfo from '@TUIRoom/components/RoomHeader/UserInfo.vue';
 import StreamPreview from '@TUIRoom/components/RoomHome/StreamPreview.vue';
 import RoomControl from '@TUIRoom/components/RoomHome/RoomControl.vue';
+import LanguageIcon from '@/TUIRoom/components/RoomHeader/Language.vue';
+import { checkNumber } from '@/TUIRoom/utils/common';
 import TUIRoomCore from '@TUIRoom/tui-room-core';
 import router from '@/router';
 import { useRoute } from 'vue-router';
 import { onMounted, Ref, ref } from 'vue';
 import { getBasicInfo } from '@/config/basic-info-config';
+import { useI18n } from 'vue-i18n';
 
 const route = useRoute();
 const streamPreviewRef = ref();
 const userName = ref();
 const userAvatar = ref();
 const userId = ref();
+const { t } = useI18n();
 
-const givenRoomId: Ref<string> = ref((route.query.roomId || '') as string);
+const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId : '';
+const givenRoomId: Ref<string> = ref((roomId) as string);
 
 const basicInfo = getBasicInfo();
 userName.value = basicInfo?.userName;
@@ -77,7 +83,7 @@ async function handleCreateRoom(mode: string) {
 async function handleEnterRoom(roomId: number) {
   const isRoomExist = await TUIRoomCore.checkRoomExistence(roomId);
   if (!isRoomExist) {
-    alert('房间不存在，请确认房间号或创建房间！');
+    alert(t('The room does not exist, please confirm the room number or create a room!'));
     return;
   }
   setTUIRoomData('enterRoom');
@@ -126,6 +132,9 @@ onMounted(async () => {
     .header-item {
       &:not(:first-child) {
         margin-left: 16px;
+      }
+      .language{
+        cursor: pointer;
       }
     }
   }

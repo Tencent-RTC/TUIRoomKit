@@ -1,34 +1,33 @@
-import { TRTCDeviceInfo } from './common/trtc_define';
+import { TRTCDeviceInfo, TRTCDeviceType, TRTCDeviceState } from './common/trtc_define';
 import { BaseCommon } from './BaseCommon';
 import { MixinsClass } from './utils/utils';
+import { NAME } from './common/constants';
 
-// eslint-disable-next-line new-cap
+/**
+ * 摄像头相关接口<br>
+ * @memberof TRTCClouds
+ */
 class Camera extends MixinsClass(BaseCommon) {
-  // ///////////////////////////////////////////////////////////////////////////////
-  //
-  //                      （五）摄像头相关接口函数
-  //
-  // ///////////////////////////////////////////////////////////////////////////////
   /**
-   * 5.1 获取摄像头设备列表
-   *
+   * 获取摄像头设备列表<br>
+   * @returns {Promise(Array<TRTCDeviceInfo>)} 摄像头管理器列表
+   * @memberof TRTCCloud
    * @example
-   * var cameralist = this.rtcCloud.getCameraDevicesList();
-   * for (i=0;i<cameralist.length;i++) {
+   * var cameralist = await trtcCloud.getCameraDevicesList();
+   * for (i = 0; i < cameralist.length; i++) {
    *    var camera = cameralist[i];
    *    console.info("camera deviceName: " + camera.deviceName + " deviceId:" + camera.deviceId);
    * }
-   * @return {TRTCDeviceInfo[]} 摄像头管理器列表 Attention: return Promise
    */
   async getCameraDevicesList(): Promise<TRTCDeviceInfo[]> {
     try {
       const cameraList = await this.TRTC.getCameras();
-      this.cameraList = cameraList.map((item: { deviceId: string; label: string; }) => ({
-        deviceId: item.deviceId,
-        deviceName: item.label,
+      this.cameraList = cameraList.map((item: TRTCDeviceInfo) => ({
+        ...item,
+        deviceName: item.label, // 就是 deviceName
       }));
       return Promise.resolve(this.cameraList);
-    } catch (error) {
+    } catch (error: any) {
       this.callFunctionErrorManage(error, 'getCameraDevicesList');
       this.cameraList = [];
       return Promise.resolve([]);
@@ -36,10 +35,10 @@ class Camera extends MixinsClass(BaseCommon) {
   }
 
   /**
-   * 5.2 设置要使用的摄像头
-   *
+   * 设置要使用的摄像头<br>
    * @param {String} deviceId - 从 getCameraDevicesList 中得到的设备 ID
-   * Attention: return Promise, https://web.sdk.qcloud.com/trtc/webrtc/doc/zh-cn/LocalStream.html#switchDevice
+   * @returns {Promise}
+   * @memberof TRTCCloud
    */
   async setCurrentCameraDevice(deviceId: string): Promise<boolean> {
     try {
@@ -48,13 +47,14 @@ class Camera extends MixinsClass(BaseCommon) {
       }
       this.currentCameraId = deviceId || '';
       if (this.localStream) {
-        await this.localStream.switchDevice('video', deviceId);
+        await this.localStream.switchDevice(NAME.VIDEO, deviceId);
+        this.emitOnDeviceChange(deviceId, TRTCDeviceType.TRTCDeviceTypeCamera, TRTCDeviceState.TRTCDeviceStateActive);
       }
       if (this.testCameraStream) {
         await this.testCameraStream.switchDevice('video', deviceId);
       }
       return Promise.resolve(true);
-    } catch (error) {
+    } catch (error: any) {
       this.callFunctionErrorManage(error, 'setCurrentCameraDevice');
       this.cameraList = [];
       return Promise.resolve(false);
@@ -62,9 +62,9 @@ class Camera extends MixinsClass(BaseCommon) {
   }
 
   /**
-   * 5.3 获取当前使用的摄像头
-   *
-   * @return {TRTCDeviceInfo} 设备信息，能获取设备 ID 和设备名称
+   * 获取当前使用的摄像头<br>
+   * @memberof TRTCCloud
+   * @returns {TRTCDeviceInfo} 设备信息，能获取设备 ID 和设备名称
    */
   getCurrentCameraDevice(): TRTCDeviceInfo {
     return (this.cameraList || []).filter((obj: any) => obj.deviceId === this.currentCameraId)[0] || {};

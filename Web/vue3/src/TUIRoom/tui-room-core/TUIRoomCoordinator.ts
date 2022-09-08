@@ -698,13 +698,17 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
   // 事件绑定
   private bindTIMEvent() {
     this.isBindTimEvent = true;
-    this.tim.on(TIM.EVENT.MESSAGE_RECEIVED, this.onMessageReceived, this);
+    if (this.tim) {
+      this.tim.on(TIM.EVENT.MESSAGE_RECEIVED, this.onMessageReceived, this);
+    }
   }
 
   // 解除事件绑定
   private unbindTIMEvent() {
     this.isBindTimEvent = false;
-    this.tim.off(TIM.EVENT.MESSAGE_RECEIVED, this.onMessageReceived, this);
+    if (this.tim) {
+      this.tim.off(TIM.EVENT.MESSAGE_RECEIVED, this.onMessageReceived, this);
+    }
   }
 
   // 处理消息接收事件
@@ -1141,14 +1145,14 @@ class TUIRoomCoordinator implements ITUIRoomCoordinator {
   }
 
   destroy() {
+    this.unbindTSignalingEvent();
+    this.tSignalingService = null;
+    this.unbindTIMEvent();
+    this.tim = null;
     this.groupId = '';
     this.roomId = 0;
     this.state = null;
-    this.tim = null;
     this.emitter = null;
-    this.tSignalingService = null;
-    this.unbindTSignalingEvent();
-    this.unbindTIMEvent();
   }
 }
 

@@ -21,6 +21,7 @@
     "trtc-js-sdk": "^4.12.7",
     "tsignaling": "^0.10.0",
     "vue": "^3.2.25",
+    "vue-i18n": "^9.2.2",
     "vue-router": "^4.0.14"
   },
   "devDependencies": {
