@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { ref, Ref, watch, onMounted, onUnmounted } from 'vue';
-import TUIRoomCore, { TRTCDeviceInfo } from '../../tui-room-core';
+import TUIRoomCore, { TRTCDeviceInfo, ETUIRoomEvents, TRTCDeviceType, TRTCDeviceState } from '../../tui-room-core';
 import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
 
@@ -99,14 +99,42 @@ async function getDeviceInfo() {
   }
 }
 
+// 设备变化：设备切换、设备插拔事件
+async function onDeviceChange(deviceData: {deviceId: string, type: number, state: number}) {
+  const stateList = ['add', 'remove', 'active'];
+  const { deviceId, type, state } = deviceData;
+  if (type === TRTCDeviceType.TRTCDeviceTypeMic && deviceType === 'microphone') {
+    console.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
+    deviceList.value = await TUIRoomCore.getMicrophoneList();
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentMicrophoneId(deviceId);
+    }
+    return;
+  }
+  if (type === TRTCDeviceType.TRTCDeviceTypeSpeaker && deviceType === 'speaker') {
+    console.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
+    deviceList.value = await TUIRoomCore.getSpeakerList();
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentSpeakerId(deviceId);
+    }
+    return;
+  }
+  if (type === TRTCDeviceType.TRTCDeviceTypeCamera && deviceType === 'camera') {
+    console.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
+    deviceList.value = await TUIRoomCore.getCameraList();
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentCameraId(deviceId);
+    }
+  }
+}
+
 onMounted(() => {
-  // TODO: devicechange 应该监听 TUIRoomCore 的事件
-  navigator.mediaDevices.addEventListener('devicechange', getDeviceInfo);
+  TUIRoomCore.on(ETUIRoomEvents.onDeviceChange, onDeviceChange);
   getDeviceInfo();
 });
 
 onUnmounted(() => {
-  navigator.mediaDevices.removeEventListener('devicechange', getDeviceInfo);
+  TUIRoomCore.off(ETUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 </script>
 

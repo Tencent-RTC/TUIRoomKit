@@ -21,8 +21,14 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
+import { ElMessage } from 'element-plus';
+
+import TUIRoomCore from '../../tui-room-core';
 import { useChatStore } from '../../stores/chat';
 import MessageText from './MessageTypes/MessageText.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const chatStore = useChatStore();
 const { messageList } = storeToRefs(chatStore);
@@ -57,7 +63,24 @@ watch(messageList, async (newMessageList, oldMessageList) => { // eslint-disable
   messageBottomEl.value && messageBottomEl.value.scrollIntoView();
 });
 
+async function fetchChatHistoryMessage(nextReqMessageID: string, isCompleted: boolean) {
+  try {
+    if (isCompleted) {
+      return;
+    }
+    const response = await TUIRoomCore.getChatMessageList(nextReqMessageID);
+    if (response.code === 0 && response.data) {
+      const { messageList, nextReqMessageID, isCompleted } = response.data;
+      chatStore.addHistoryMessages(messageList);
+      await fetchChatHistoryMessage(nextReqMessageID, isCompleted);
+    }
+  } catch (e) {
+    ElMessage.error(t('Failed to get chat message'));
+  }
+}
+
 onMounted(() => {
+  fetchChatHistoryMessage('', false);
   window.addEventListener('scroll', handleMessageListScroll, true);
 });
 

@@ -14,17 +14,17 @@
       </div>
     </div>
     <div v-if="showNetworkInfo" ref="networkBoard" class="network-info-board">
-      <div class="network-state">{{ `网络${networkDes[localQuality]}` }}</div>
+      <div class="network-state">{{ `${t('Network ')}${networkDes[localQuality]}` }}</div>
       <div class="network-detail-item">
-        <span>网络延迟：</span>
+        <span>{{ t('Latency: ') }}</span>
         <span>{{ `${statistics.rtt} ms` }}</span>
       </div>
       <div class="network-detail-item">
-        <span>帧率：</span>
+        <span>{{ t('Frame rate: ') }}</span>
         <span>{{ `${localFrameRate} fps` }}</span>
       </div>
       <div class="network-detail-item">
-        <span>码率：</span>
+        <span>{{ t('Bitrate: ') }}</span>
         <span>{{ `${localVideoBitrate} Kbps` }}</span>
       </div>
     </div>
@@ -32,12 +32,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from 'vue';
+import { ref, Ref, computed } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import TUIRoomAegis from '../../utils/aegis';
+import { useI18n } from 'vue-i18n';
 
-const networkDes = ['状态未知', '状态极佳', '状态较好', '状态一般', '状态差', '状态极差', '断开连接'];
+const { t } = useI18n();
+
+const networkDes = computed(() => [t('Unknown'), t('Excellent'), t('Good'), t('Fair'), t('Poor'), t('Very poor'), t('Disconnected')]);
 
 const basicStore = useBasicStore();
 const { localQuality, statistics, localVideoBitrate, localFrameRate } = storeToRefs(basicStore);

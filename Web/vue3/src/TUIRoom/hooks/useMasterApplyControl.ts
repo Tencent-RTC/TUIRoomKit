@@ -7,10 +7,13 @@ import { ElMessage } from 'element-plus';
 import { MESSAGE_DURATION } from '../constants/message';
 import { useRoomStore, UserInfo } from '../stores/room';
 import { storeToRefs } from 'pinia';
+import { useI18n } from 'vue-i18n';
+
 
 export default function () {
   const roomStore = useRoomStore();
   const { applyToAnchorList } = storeToRefs(roomStore);
+  const { t } = useI18n();
 
   // ------ 以下处理普通用户操作 ---------
 
@@ -47,11 +50,24 @@ export default function () {
   }
 
   // 拒绝全部用户上麦请求
-  function denyAllUserApply() {
-    applyToAnchorList.value.forEach((item) => {
-      TUIRoomCore.replySpeechApplication(item.userId, false);
-      roomStore.removeApplyToAnchorUser(item.userId);
-    });
+  async function denyAllUserApply() {
+    const applyUserList = applyToAnchorList.value.map(item => ({ userId: item.userId, userName: item.userName }));
+    let index = 0;
+    while (index >= 0 && index < applyUserList.length) {
+      const { userId, userName } = applyUserList[index];
+      try {
+        await TUIRoomCore.replySpeechApplication(userId, false);
+        roomStore.removeApplyToAnchorUser(userId);
+      } catch (error) {
+        console.error(`拒绝 ${userName || userId} 上台申请失败，请重试！`);
+        ElMessage({
+          type: 'warning',
+          message: t('Reject on Stage failed, please retry', { userName: userName || userId }),
+          duration: MESSAGE_DURATION.NORMAL,
+        });
+      }
+      index += 1;
+    }
   }
 
   onMounted(() => {
@@ -74,7 +90,7 @@ export default function () {
       case ETUISignalStatus.ACCEPTED:
         ElMessage({
           type: 'success',
-          message: `${userName || userId} 接受了上台邀请`,
+          message: `${userName || userId} ${t('accepted the invitation to the stage')}`,
           duration: MESSAGE_DURATION.NORMAL,
         });
         roomStore.removeInviteToAnchorUser(userId);
@@ -82,7 +98,7 @@ export default function () {
       case ETUISignalStatus.REJECTED:
         ElMessage({
           type: 'warning',
-          message: `${userName || userId} 拒绝了上台邀请`,
+          message: `${userName || userId} ${t('declined the invitation to the stage')}`,
           duration: MESSAGE_DURATION.NORMAL,
         });
         roomStore.removeInviteToAnchorUser(userId);

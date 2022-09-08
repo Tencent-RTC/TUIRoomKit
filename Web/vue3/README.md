@@ -44,7 +44,7 @@
 1. 安装依赖
 
    ```bash
-   cd TUIRoom/Web
+   cd TUIRoom/Web/vue3
    
    npm install
    ```

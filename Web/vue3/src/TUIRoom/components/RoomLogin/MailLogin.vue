@@ -1,6 +1,6 @@
 <template>
   <div class="mail-login">
-    <input class="input" :placeholder="placeholder" v-model="mailAddress">
+    <input v-model="mailAddress" class="input" :placeholder="t('Email address')">
     <div class="area-container">
       <svg-icon icon-name="mail-icon" size="medium"></svg-icon>
     </div>
@@ -8,14 +8,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch} from 'vue';
+import { ref, watch } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 
-const emit = defineEmits(["updateMailAddress"]);
-const placeholder = "请输入邮箱";
+const emit = defineEmits(['updateMailAddress']);
 const mailAddress = ref('');
 watch(() => mailAddress.value, (val) => {
-  emit("updateMailAddress", val);
+  emit('updateMailAddress', val);
 });
 </script>
 

@@ -21,6 +21,7 @@ import logger from './common/logger';
 import Event from './common/emitter/event';
 import { safelyParseJSON, simpleClone } from './utils/utils';
 import { ETUISpeechMode, ETUIStreamType, ETUIRoomEvents, ETUIRoomRole, ETUIRoomMuteType } from './types';
+import { TRTCVideoResolutionMode } from './trtc_define';
 import { TUIRoomErrorCode, TUIRoomErrorMessage } from './constant';
 import TUIRoomUser from './base/TUIRoomUser';
 import TUIRoomError from './base/TUIRoomError';
@@ -82,6 +83,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   public static destroyInstance() {
     if (TUIRoomCore.instance !== null) {
       TUIRoomCore.instance.destroy();
+      TUIRoomCore.instance = null;
     }
   }
 
@@ -451,7 +453,17 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
    * 设置视频编码参数
    */
   setVideoEncoderParam(paramObj: TRTCVideoEncParam) {
-    this.trtcService.setVideoEncoderParam(paramObj);
+    const param =  (window as any).__TRTCElectron ? new TRTCVideoEncParam() : paramObj;
+    if(param) {
+      param.videoResolution = paramObj.videoResolution;
+      param.videoFps = (paramObj as any).fps || 15;
+      param.videoBitrate = (paramObj as any).bitrate || 900;
+      param.resMode = TRTCVideoResolutionMode.TRTCVideoResolutionModeLandscape;
+      param.minVideoBitrate = 0;
+      param.enableAdjustRes = false;
+    }
+    logger.debug(`${TUIRoomCore.logPrefix}setVideoEncoderParam`, param);
+    this.trtcService.setVideoEncoderParam(param);
   }
 
   /**
@@ -568,8 +580,8 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
    *
    * @param mirror   true开启镜像, false 关闭镜像。
    */
-  setVideoMirror(mirror: boolean) {
-    this.trtcService.setVideoMirror(mirror);
+  async setVideoMirror(mirror: boolean) {
+    await this.trtcService.setVideoMirror(mirror);
   }
 
   /**
@@ -578,9 +590,9 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
    * @param streamType 流类型
    * @param fillMode 填充模式
    */
-   setRemoteVideoFillMode(userId: string, streamType: string, fillMode: TRTCVideoFillMode) {
-    this.trtcService.setRemoteVideoFillMode(userId, streamType, fillMode);
-   }
+  async setRemoteVideoFillMode(userId: string, streamType: ETUIStreamType, fillMode: TRTCVideoFillMode) {
+    await this.trtcService.setRemoteVideoFillMode(userId, streamType, fillMode);
+  }
 
   /**
    * 静默或取消静默本地摄像头
@@ -625,12 +637,12 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
    * @param {HTMLDivElement} view 显示远端视频流的 div 元素
    * @param {ETUIStreamType} streamType 视频流类型：摄像头或者屏幕分享
    */
-  startRemoteView(
+  async startRemoteView(
     userId: string,
     view: HTMLDivElement,
     streamType: ETUIStreamType
   ) {
-    this.trtcService.startRemoteView(userId, view, streamType);
+    await this.trtcService.startRemoteView(userId, view, streamType);
   }
 
   /**
@@ -639,8 +651,8 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
    * @param {string} userId 成员Id
    * @param {ETUIStreamType} streamType 视频流类型：摄像头或者屏幕分享
    */
-  stopRemoteView(userId: string, streamType: ETUIStreamType) {
-    this.trtcService.stopRemoteView(userId, streamType);
+  async stopRemoteView(userId: string, streamType: ETUIStreamType) {
+    await this.trtcService.stopRemoteView(userId, streamType);
   }
 
   /**
@@ -996,26 +1008,16 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     logger.log(
       `${TUIRoomCore.logPrefix}onRemoteUserAVEnabled userId: ${userId}`
     );
-    let userProfile = null;
-    if (userId.indexOf('share_') === 0) {
-      userProfile = await this.timService.getGroupMemberProfile([userId.slice(6)]);
-    } else {
-      userProfile = await this.timService.getGroupMemberProfile([userId]);
-    }
-    const userInfo = userProfile.data[0];
 
-    let newUser  = this.state.userMap.get(userId);
+    let newUser = this.state.userMap.get(userId);
     if (!newUser) {
       newUser = new TUIRoomUser();
       newUser.userId = userId;
+      this.state.userMap.set(userId, newUser);
+      // 兼容未加入 TIM 群组，直接进入 rtc 房间的情况
+      this.emitter.emit(ETUIRoomEvents.onUserEnterRoom, simpleClone(newUser));
     }
 
-    if (userInfo) {
-      newUser.name = userInfo.nick;
-      newUser.avatar = userInfo.avatar;
-    }
-
-    this.state.userMap.set(userId, newUser);
     this.emitter.emit(ETUIRoomEvents.onUserAVEnabled, simpleClone(newUser));
   }
 
@@ -1030,13 +1032,22 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     }
   }
 
-  onRemoteUserAVDisabled(userId: string, reason: number) {
+  async onRemoteUserAVDisabled(userId: string, reason: number) {
     logger.log(
       `${TUIRoomCore.logPrefix}onRemoteUserAVDisabled userId: ${userId} reason: ${reason}`
     );
     if (this.state.userMap.has(userId)) {
       const user = this.state.userMap.get(userId) as TUIRoomUser;
       this.emitter.emit(ETUIRoomEvents.onUserAVDisabled, simpleClone(user));
+    }
+    const userProfile = await this.timService.getGroupMemberProfile([userId]);
+    // 兼容未加入 TIM 群组，直接退出 rtc 房间的情况
+    if (userProfile.data.length === 0) {
+      const user = this.state.userMap.get(userId) as TUIRoomUser;
+      if (user) {
+        this.state.userMap.delete(userId);
+        this.emitter.emit(ETUIRoomEvents.onUserLeaveRoom, simpleClone(user));
+      }
     }
   }
 
@@ -1203,6 +1214,23 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   /**
    * /////////////////////////////////////////////////////////////////////////////////
    * //
+   * //                                    IM 历史消息
+   * //
+   * /////////////////////////////////////////////////////////////////////////////////
+   */
+  /**
+   * 获取聊天历史消息
+   *
+   * @param {string} nextReqMessageID - 用于向上续拉消息，分页续拉时需传入该字段, 拉最新消息传默认值 ''。
+   * @returns {Promise}
+   */
+  async getChatMessageList(nextReqMessageID = '') {
+    return this.timService.getChatMessageList(nextReqMessageID);
+  }
+
+  /**
+   * /////////////////////////////////////////////////////////////////////////////////
+   * //
    * //                                    IM 群资料相关接口
    * //
    * /////////////////////////////////////////////////////////////////////////////////
@@ -1283,7 +1311,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   private onRoomMasterChanged (ownerId: string){
     logger.log(`${TUIRoomCore.logPrefix}onRoomMasterChangd`, ownerId,this.state);
     this.state.roomInfo.ownerId = ownerId;
-    this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged, ownerId); 
+    this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged, ownerId);
     // 普通成员收到消息,获取新的群主成员信息
     const user = this.state.currentUser.userId === ownerId ? this.state.currentUser : this.state.userMap.get(ownerId);
     if (user) {
@@ -1359,7 +1387,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
   // // 新信令：邀请上麦
   // async kickUserSeat(): Promise<TUIRoomResponse<any>> {
   //   return this.roomCoordinator.applyTakeSeat();
-  // }  
+  // }
 
   // // 处理远端的响应
   // async responseRemoteRequest(userId: string, agree: boolean) {
@@ -1368,7 +1396,7 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
 
   // // 取消某个请求
   // async cancelRequest(requestId: string) {
-    
+
   // }
 
   async sendSpeechInvitation(userId: string): Promise<TUIRoomResponse<any>> {
@@ -1730,7 +1758,8 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
       this.unbindIMEvent();
       this.timService.destroy();
     } catch (error: any) {
-      throw error as TUIRoomError;
+      logger.error(`${TUIRoomCore.logPrefix}destroy error:`, error);
+      throw error;
     }
   }
 }

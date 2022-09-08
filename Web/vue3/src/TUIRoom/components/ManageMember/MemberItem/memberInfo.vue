@@ -4,13 +4,13 @@
     <img class="user-avatar" :src="userInfo.userAvatar || defaultAvatar">
     <div class="user-name">{{ userInfo.userName || userInfo.userId }}</div>
     <div v-if="isMaster && isMe" class="user-extra-info">
-      主持人, 我
+      {{ t('Host') }}, {{ t('Me') }}
     </div>
     <div v-else-if="isMe" class="user-extra-info">
-      我
+      {{ t('Me') }}
     </div>
     <div v-else-if="basicStore.masterUserId === userInfo.userId" class="user-extra-info">
-      主持人
+      {{ t('Host') }}
     </div>
   </div>
   <!-- 用户音视频状态信息 -->
@@ -54,6 +54,9 @@ import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../../constants/icon';
 import { ETUIRoomRole } from '../../../tui-room-core';
 import SvgIcon from '../../common/SvgIcon.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 interface Props {
   userInfo: UserInfo,

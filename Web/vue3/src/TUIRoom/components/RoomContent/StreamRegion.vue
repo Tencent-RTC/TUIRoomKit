@@ -40,8 +40,11 @@ import { useBasicStore } from '../../stores/basic';
 import logger from '../../tui-room-core/common/logger';
 import AudioIcon from '../base/AudioIcon.vue';
 import SvgIcon from '../common/SvgIcon.vue';
+import { useI18n } from 'vue-i18n';
 const logPrefix = '[StreamRegion]';
 const basicStore = useBasicStore();
+
+const { t } = useI18n();
 
 interface Props {
   stream: StreamInfo,
@@ -65,25 +68,10 @@ const userInfo = computed(() => {
     if (props.stream.userId?.indexOf('share_') === 0 && userInfo === props.stream.userId) {
       userInfo = userInfo.slice(6);
     }
-    return `${userInfo} 的屏幕分享`;
+    return `${userInfo} ${t('is sharing their screen')}`;
   }
   return userInfo;
 });
-
-watch(
-  () => props.stream.isAudioStreamAvailable,
-  async (val) => {
-    if (val && props.stream.userId !== basicStore.userId) {
-      await nextTick();
-      const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
-      if (userIdEl) {
-        logger.debug(`${logPrefix}watch isAudioStreamAvailable:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
-        TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
-      }
-    }
-  },
-  { immediate: true },
-);
 
 watch(
   () => props.stream.isVideoStreamAvailable,
@@ -93,10 +81,10 @@ watch(
       const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
       if (userIdEl) {
         logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
-        TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
-        TUIRoomCore.setRemoteVideoFillMode(
+        await TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
+        await TUIRoomCore.setRemoteVideoFillMode(
           props.stream.userId as string,
-          props.stream.type as string,
+          ETUIStreamType.CAMERA,
           TRTCVideoFillMode.TRTCVideoFillMode_Fit,
         );
       }
@@ -113,7 +101,12 @@ watch(
       const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
       if (userIdEl) {
         logger.debug(`${logPrefix}watch isScreenStreamAvailable:`, props.stream.userId, userIdEl, ETUIStreamType.SCREEN);
-        TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.SCREEN);
+        await TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.SCREEN);
+        await TUIRoomCore.setRemoteVideoFillMode(
+          props.stream.userId as string,
+          ETUIStreamType.SCREEN,
+          TRTCVideoFillMode.TRTCVideoFillMode_Fit,
+        );
       }
     }
   },
@@ -155,7 +148,7 @@ watch(
     if (userIdEl) {
       if (basicStore.userId !== props.stream.userId) {
         if (props.stream.type === 'main') {
-          logger.debug(`${logPrefix}watch playRegionDomId:`, props.stream.userId, userIdEl, ETUIStreamType.SCREEN);
+          logger.debug(`${logPrefix}watch playRegionDomId:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
           TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
         } else if (props.stream.type === 'screen') {
           logger.debug(`${logPrefix}watch playRegionDomId:`, props.stream.userId, userIdEl, ETUIStreamType.SCREEN);

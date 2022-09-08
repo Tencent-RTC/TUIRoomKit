@@ -1,24 +1,25 @@
 <template>
   <div class="verify-input">
-    <input v-model="verifyStates.verifyCode" class="input" :placeholder="placeholder">
+    <input v-model="verifyStates.verifyCode" class="input" :placeholder="t('Verification code')">
     <div class="area-container">
       <svg-icon icon-name="verify-code" size="medium"></svg-icon>
     </div>
-    <span v-if="verifyStates.countdown <= 0" class="text send-btn" @click="sendVerifyCode">获取验证码</span>
-    <span v-else class="text static">{{ `倒计时${verifyStates.countdown} s` }}</span>
+    <span v-if="verifyStates.countdown <= 0" class="text send-btn" @click="sendVerifyCode">{{ t('SEND') }}</span>
+    <span v-else class="text static"> {{ t('') }} {{ `${verifyStates.countdown} s` }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 const emit = defineEmits(['updateVerifyCode', 'sendVerifyCode']);
 interface VerifyStates{
   countdown: number,
   timer: number,
   verifyCode: string,
 }
-const placeholder = '请输入验证码';
 const verifyStates:VerifyStates = reactive({
   countdown: 0,
   timer: 0,
@@ -90,6 +91,7 @@ defineExpose({ startCountDown, clear });
         &.send-btn{
             cursor:pointer;
             color:#4791FF;
+            font-size: 16px;
         }
         &.static{
             color:#ccc;

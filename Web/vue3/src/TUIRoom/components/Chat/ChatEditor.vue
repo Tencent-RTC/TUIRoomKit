@@ -1,35 +1,48 @@
 <template>
   <div
-    :class="['chat-editor', chatStore.isMuteChatByMater ? 'disable-editor': '']"
+    :class="['chat-editor', isMuteChatByMater ? 'disable-editor': '']"
   >
     <textarea
       ref="editorInputEle"
       v-model="sendMsg"
       class="content-bottom-input"
-      :disabled="chatStore.isMuteChatByMater"
-      :placeholder="chatStore.isMuteChatByMater ? '已被主持人禁言' : '说点什么'"
+      :disabled="isMuteChatByMater"
+      :placeholder="isMuteChatByMater ? t('Muted by the moderator') : t('Type a message')"
       @keyup.enter="sendMessage"
     />
-    <div v-if="!chatStore.isMuteChatByMater" class="chat-editor-toolbar">
+    <div v-if="!isMuteChatByMater" class="chat-editor-toolbar">
       <div class="left-section">
         <emoji @choose-emoji="handleChooseEmoji"></emoji>
       </div>
-      <div :class="['send-btn', `${sendMsg.length > 0 ? 'active' : ''}`]" @click="sendMessage">发送</div>
+      <div :class="['send-btn', `${sendMsg.length > 0 ? 'active' : ''}`]" @click="sendMessage">{{ t('Send') }}</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
+import { ElMessage } from 'element-plus';
+
+
 import TUIRoomCore from '../../tui-room-core';
 import { useChatStore } from '../../stores/chat';
-import { ElMessage } from 'element-plus';
 import emoji from './EditorTools/emoji.vue';
+import { useI18n } from 'vue-i18n';
 
-const editorInputEle = ref();
-
+const { t } = useI18n();
 const chatStore = useChatStore();
+
+const { isMuteChatByMater } = storeToRefs(chatStore);
+const editorInputEle = ref();
 const sendMsg = ref('');
+
+watch(isMuteChatByMater, (value) => {
+  if (value) {
+    sendMsg.value = '';
+  }
+});
+
 const sendMessage = async () => {
   const msg = sendMsg.value.replace('\n', '');
   sendMsg.value = '';
@@ -45,7 +58,7 @@ const sendMessage = async () => {
     }
   } catch (e) {
     // 消息发送失败
-    ElMessage.error('发送消息失败');
+    ElMessage.error(t('Failed to send the message'));
   }
 };
 

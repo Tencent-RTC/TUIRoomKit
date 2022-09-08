@@ -1,6 +1,6 @@
 <template>
   <div class="phone-login">
-    <input v-model="phoneNumber" class="input" :placeholder="placeholder" auto-complete="true">
+    <input v-model="phoneNumber" class="input" :placeholder="t('Mobile number')" auto-complete="true">
     <div class="area-container">
       <svg-icon icon-name="phone-icon" size="medium"></svg-icon>
     </div>
@@ -10,8 +10,9 @@
 <script setup lang="ts">
 import SvgIcon from '../common/SvgIcon.vue';
 import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 const emit = defineEmits(['updatePhoneNumber']);
-const placeholder = '请输入您的手机号';
 const phoneNumber = ref('');
 watch(() => phoneNumber.value, (val) => {
   phoneNumber.value = val.replace(/\D/g, '');

@@ -1,23 +1,23 @@
 <template>
   <div class="invite-container">
-    <div class="invite-notice">您可以通过复制房间号或者邀请链接的方式邀请更多人加入房间</div>
+    <div class="invite-notice">{{ t('Share the room ID or invite link') }}</div>
     <div class="invite-content">
       <div class="invite-item">
-        <span class="invite-title">通过房间号邀请</span>
+        <span class="invite-title">{{ t('Invite by room number') }}</span>
         <div class="input-area">
           <input class="input" type="text" :value="roomId">
           <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(roomId)"></svg-icon>
         </div>
       </div>
-      <div class="invite-item" v-if="roomLinkDisplay">
-        <span class="invite-title">通过房间链接邀请</span>
+      <div v-if="roomLinkDisplay" class="invite-item">
+        <span class="invite-title">{{ t('Invite via room link') }}</span>
         <div class="input-area">
           <input class="input" type="text" :value="inviteLink">
           <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(inviteLink)"></svg-icon>
         </div>
       </div>
       <div class="invite-item">
-        <span class="invite-title">通过客户端 scheme 邀请</span>
+        <span class="invite-title">{{ t('Invite via client scheme') }}</span>
         <div class="input-area">
           <input class="input" type="text" :value="schemeLink">
           <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(schemeLink)"></svg-icon>
@@ -34,6 +34,9 @@ import { useBasicStore } from '../../stores/basic';
 import { ElMessage } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import SvgIcon from '../common/SvgIcon.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const roomLinkDisplay = ref(true);
 
@@ -43,24 +46,21 @@ const { roomId } = storeToRefs(basicStore);
 const { origin, pathname } = location;
 
 onMounted(() => {
+  // eslint-disable-next-line no-underscore-dangle
   if ((window as any).__TRTCElectron) {
-    roomLinkDisplay.value = false; 
+    roomLinkDisplay.value = false;
   }
-})
-
-
-const inviteLink = computed(() => {
-  return `${origin}${pathname}#/home?roomId=${roomId.value}`;
 });
 
-const schemeLink = computed(() => {
-  return `tuiroom://joinroom?roomId=${roomId.value}`;
-});
+
+const inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);
+
+const schemeLink = computed(() => `tuiroom://joinroom?roomId=${roomId.value}`);
 
 function onCopy(value: string | number) {
   navigator.clipboard.writeText(`${value}`);
   ElMessage({
-    message: '复制成功',
+    message: t('Copied successfully'),
     type: 'success',
   });
 }

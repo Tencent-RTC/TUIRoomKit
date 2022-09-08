@@ -15,15 +15,19 @@ import { ref, onMounted } from 'vue';
 import Room from '@/TUIRoom/index.vue';
 import { useRoute } from 'vue-router';
 import router from '@/router';
+import { checkNumber } from '@/TUIRoom/utils/common';
 
 const route = useRoute();
 
 const roomInfo = sessionStorage.getItem('tuiRoom-roomInfo');
 const userInfo = sessionStorage.getItem('tuiRoom-userInfo');
 
-const roomId = route.query?.roomId;
-if (!roomId || !roomInfo) {
+const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId : '';
+
+if (!roomId) {
   router.push({ path: 'home' });
+} else if (!roomInfo) {
+  router.push({ path: 'home', query: { roomId } });
 }
 
 const TUIRoomRef = ref();
@@ -65,18 +69,21 @@ function onEnterRoom(info: { code: number; message: string }) {
 // 主持人销毁房间回调
 const onDestroyRoom = (info: { code: number; message: string }) => {
   console.debug('onDestroyRoom:', info);
+  sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });
 };
 
 // 普通成员退出房间回调
 const onExitRoom = (info: { code: number; message: string }) => {
   console.debug('onExitRoom:', info);
+  sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });
 };
 
 // 普通成员被主持人踢出房间
 const onKickOff = (info: { code: number; message: string }) => {
   console.debug('onKickOff:', info);
+  sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });
 };
 

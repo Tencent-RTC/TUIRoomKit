@@ -9,22 +9,23 @@
     />
     <div v-if="showStopShareRegion" class="stop-share-region" @click="openStopConfirmDialog">
       <svg-icon class="stop-share-icon" :icon-name="ICON_NAME.ScreenShareStopped" />
-      <span>结束共享</span>
+      <span>{{ t('End sharing') }}</span>
     </div>
     <el-dialog
       v-model="dialogVisible"
-      class="custom-element-class"
+      custom-class="custom-element-class"
       width="420px"
-      title="是否停止屏幕共享？"
+      :title="t('Stop sharing?') "
       :modal="true"
       :append-to-body="true"
       :before-close="cancelStop"
     >
-      <span>是否结束当前的共享屏幕，停止后所有人将无法继续观看屏幕内容</span>
+      <span>
+        {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
       <template #footer>
         <span>
-          <el-button type="primary" @click="stopScreenShare">停止共享</el-button>
-          <el-button type="default" @click="cancelStop">取消</el-button>
+          <el-button type="primary" @click="stopScreenShare">{{ t('Stop sharing') }}</el-button>
+          <el-button type="default" @click="cancelStop">{{ t('Cancel') }}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -42,19 +43,21 @@ import logger from '../../../tui-room-core/common/logger';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ICON_NAME } from '../../../constants/icon';
 import { MESSAGE_DURATION } from '../../../constants/message';
+import { useI18n } from 'vue-i18n';
 
 const logPrefix = '[ScreenShareControl]';
 
 const basicStore = useBasicStore();
 const { shareUserId, shareUserSig, isAudience, role } = storeToRefs(basicStore);
 const showScreenShareIcon = computed(() => shareUserId.value && shareUserSig?.value);
+const { t } = useI18n();
 
 const btnStopRef = ref();
 const isSharing: Ref<boolean> = ref(false);
 const showStopShareRegion: Ref<boolean> = ref(false);
 const dialogVisible: Ref<boolean> = ref(false);
 
-const title = computed(() => (isSharing.value ? '屏幕共享中' : '共享屏幕'));
+const title = computed(() => (isSharing.value ? t('Sharing') : t('Share screen')));
 const iconName = computed(() => {
   if (isAudience.value) {
     return ICON_NAME.ScreenShareDisabled;
@@ -80,7 +83,7 @@ async function toggleScreenShare() {
   if (isAudience.value) {
     ElMessage({
       type: 'warning',
-      message: '您当前没有共享权限，请先举手申请上台获取共享权限',
+      message: t('You currently do not have sharing permission, please raise your hand to apply for sharing permission first'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
