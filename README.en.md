@@ -1,4 +1,5 @@
-Group Audio/Video Room
+# Group Audio/Video Room
+
 _[中文](README.md) | English_
 
 ## Overview
@@ -38,9 +39,7 @@ The main features of the component include:
 - AI noise reduction: TRTC can intelligently detect and remove the noise mixed in the transmitted signal, so as to enhance the audio clarity and improve the sound quality.
 [Apply for beta test eligibility](https://cloud.tencent.com/apply/p/9q0qt0bg5l4)
 
-
-Currently, TUIRoom can run on mobile devices and PCs. The component features are as shown below. If you have any questions or feedback, feel free to [contact us](https://intl.cloud.tencent.com/contact-us).
-<img src="https://imgcache.qq.com/operation/dianshi/other/TUIRoom.354deff3e238839ef51bb02527ef81bfb808a9d0.png">
+<img src="https://qcloudimg.tencent-cloud.cn/raw/6548148ec6990bed6e7ffa8c421cca58.png">
 
 ## Use Cases
 
@@ -105,7 +104,7 @@ The TUIRoom component supports custom layout and can be applied in various scena
 
 ## Tryout and Demo Run
 
-You can directly scan the QR codes below or click [Integrating TUIRoom (iOS)](https://cloud.tencent.com/document/product/647/45681), [Integrating TUIRoom (Android)](https://cloud.tencent.com/document/product/647/45667), or [Integrating TUIRoom (Windows and macOS)](https://cloud.tencent.com/document/product/647/63494) to try out the component. You can also click [TUIRoom](https://github.com/tencentyun/TUIRoom) to view the source code at GitHub.
+You can directly scan the QR codes below or click `Documentation` to try out the component. You can also click [TUIRoom](https://github.com/tencentyun/TUIRoom) to view the source code at GitHub.
 <table>
 <tr>
 <th>iOS</th><th>Android</th>
@@ -114,39 +113,20 @@ You can directly scan the QR codes below or click [Integrating TUIRoom (iOS)](ht
 <td><img style="width:150px;" src="https://imgcache.qq.com/operation/dianshi/other/androiderercrcode.b8a053599ac9f16ccb0ad3328f1f015054170efe.png" data-nonescope="true"></td>
 
 <td><img style="width:150px;" src="https://imgcache.qq.com/operation/dianshi/other/crcode_android.fa3232dcf5c64a5184c5e9e0357674c6b3b601ac.png" data-nonescope="true"></td>
-
-
-
-
-</button></a></td>
-</tr>
 </table>
 
 ## Documentation
 
 | iOS                                                          | Android                                                      | Windows and macOS |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ----------- |
-| [Integrating TUIRoom (iOS)](https://cloud.tencent.com/document/product/647/45681) | [Integrating TUIRoom (Android)](https://cloud.tencent.com/document/product/647/45667) | [Integrating TUIRoom (Windows and macOS)](https://cloud.tencent.com/document/product/647/63494) |
+| [Integrating TUIRoom (iOS)](https://www.tencentcloud.com/document/product/647/37284) | [Integrating TUIRoom (Android)](https://www.tencentcloud.com/document/product/647/37283) | [Integrating TUIRoom (Windows and macOS)](https://www.tencentcloud.com/document/product/647/44071) |
 
 
-## Questions and Feedback
+## Have any questions?
+Welcome to join our Telegram Group to communicate with our professional engineers! We are more than happy to hear from you~
+Click to join: https://t.me/+EPk6TMZEZMM5OGY1
+Or scan the QR code
 
-If you have any questions or feedback, feel free to [contact us](https://intl.cloud.tencent.com/contact-us).
+<img src="https://qcloudimg.tencent-cloud.cn/raw/9c67ed5746575e256b81ce5a60216c5a.jpg" width="320"/>
 
-<img src="https://camo.githubusercontent.com/9548733e5a0a8f874b595b3240ad3ffc8902871c074ad6e1037093391829ce87/68747470733a2f2f6d61696e2e71636c6f7564696d672e636f6d2f7261772f31656133616231666633366433376338383966343134303439393538356134612e706e67">
-
-
-## References
-
-If your access to GitHub is slow, you can use the following download addresses. Tencent Cloud provides solutions for various platforms. For more information, see [SDK Download](https://cloud.tencent.com/document/product/647/32689).
-
-| Platform | ZIP Package Download | SDK Integration Guide | API List |
-|:---------:| :--------:|:--------:|:--------:|
-| iOS | [Download](https://liteav.sdk.qcloud.com/download/latest/TXLiteAVSDK_TRTC_iOS_latest.zip)|[Doc](https://cloud.tencent.com/document/product/647/32173) | [API](https://cloud.tencent.com/document/product/647/32258) |
-| Android | [Download](https://liteav.sdk.qcloud.com/download/latest/TXLiteAVSDK_TRTC_Android_latest.zip)| [Doc](https://cloud.tencent.com/document/product/647/32175) | [API](https://cloud.tencent.com/document/product/647/32267) |
-| Windows (C++)| [Download](https://liteav.sdk.qcloud.com/download/latest/TXLiteAVSDK_TRTC_Win_latest.zip)| [Doc](https://cloud.tencent.com/document/product/647/32178) | [API](https://cloud.tencent.com/document/product/647/32268) |
-| Windows (C#)| [Download](https://liteav.sdk.qcloud.com/download/latest/TXLiteAVSDK_TRTC_Win_latest.zip)| [DOC](https://cloud.tencent.com/document/product/647/32178) | [API](https://cloud.tencent.com/document/product/647/36776) |
-| macOS | [Download](https://liteav.sdk.qcloud.com/download/latest/TXLiteAVSDK_TRTC_Mac_latest.tar.bz2)| [Doc](https://cloud.tencent.com/document/product/647/32176) |[API](https://cloud.tencent.com/document/product/647/32258) |
-| Web | [Download](https://web.sdk.qcloud.com/trtc/webrtc/download/webrtc_latest.zip)| [Doc](https://cloud.tencent.com/document/product/647/16863) |[API](https://cloud.tencent.com/document/product/647/17249) |
-| Electron | [Download](https://web.sdk.qcloud.com/trtc/electron/download/TXLiteAVSDK_TRTC_Electron_latest.zip) | [Doc](https://cloud.tencent.com/document/product/647/38549) |[API](https://cloud.tencent.com/document/product/647/38551) |
-| WeChat Mini Program | [Download](https://web.sdk.qcloud.com/trtc/miniapp/download/trtc-room.zip) | [Doc](https://cloud.tencent.com/document/product/647/32183) |[API](https://cloud.tencent.com/document/product/647/17018) |
+    
