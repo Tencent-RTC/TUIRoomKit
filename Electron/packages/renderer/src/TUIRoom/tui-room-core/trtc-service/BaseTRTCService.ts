@@ -2,11 +2,8 @@ import TRTCCloud, {
   TRTCParams,
   TRTCAppScene,
   TRTCVideoStreamType,
-  TRTCScreenCaptureSourceType,
   TRTCVideoEncParam,
-  Rect,
   TRTCAudioQuality,
-  TRTCScreenCaptureSourceInfo,
   TRTCDeviceInfo,
   TRTCVideoQosPreference,
   TRTCVideoMirrorType,
@@ -192,6 +189,10 @@ class BaseTRTCService {
     param.userDefineRecordId = ''; // 云端录制
     param.role = role;
     // this.rtcCloud.setDefaultStreamRecvMode(true, false); // 默认接收音频，不接收视频
+    if (!(window as any).__TRTCElectron) {
+      // @ts-ignores
+      param.frameWorkType = 38;
+    }
     this.rtcCloud.enterRoom(param, scene);
 
     // todo: electron 特有，web 端不支持
@@ -275,19 +276,23 @@ class BaseTRTCService {
     this.rtcCloud?.stopSystemAudioLoopback();
   }
 
-  setVideoMirror(mirror: boolean) {
-    this.rtcCloud?.setLocalRenderParams({
+  async setVideoMirror(mirror: boolean) {
+    await this.rtcCloud?.setLocalRenderParams({
       mirrorType: mirror ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-      rotation:TRTCVideoRotation.TRTCVideoRotation0,
-      fillMode:TRTCVideoFillMode.TRTCVideoFillMode_Fit
+      rotation: TRTCVideoRotation.TRTCVideoRotation0,
+      fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fit
     });
   }
 
-  setRemoteVideoFillMode(userId: string, streamType: TRTCVideoStreamType, fillMode: TRTCVideoFillMode) {
-    this.rtcCloud?.setRemoteRenderParams(userId, streamType, {
+  async setRemoteVideoFillMode(userId: string, streamType: ETUIStreamType, fillMode: TRTCVideoFillMode) {
+    let type = TRTCVideoStreamType.TRTCVideoStreamTypeBig;
+    if (streamType === ETUIStreamType.SCREEN) {
+      type = TRTCVideoStreamType.TRTCVideoStreamTypeSub;
+    }
+    await this.rtcCloud?.setRemoteRenderParams(userId, type, {
       mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
       rotation: TRTCVideoRotation.TRTCVideoRotation0,
-      fillMode: fillMode,
+      fillMode,
     });
   }
 
@@ -307,19 +312,19 @@ class BaseTRTCService {
     this.rtcCloud?.stopCameraDeviceTest();
   }
 
-  startRemoteView(
+  async startRemoteView(
     userId: string,
     view: HTMLDivElement,
     streamType: ETUIStreamType
   ) {
     if (streamType === ETUIStreamType.CAMERA) {
-      this.rtcCloud?.startRemoteView(
+      await this.rtcCloud?.startRemoteView(
         userId,
         view,
         TRTCVideoStreamType.TRTCVideoStreamTypeBig
       );
     } else if (streamType === ETUIStreamType.SCREEN) {
-      this.rtcCloud?.startRemoteView(
+      await this.rtcCloud?.startRemoteView(
         userId,
         view,
         TRTCVideoStreamType.TRTCVideoStreamTypeSub
@@ -327,14 +332,14 @@ class BaseTRTCService {
     }
   }
 
-  stopRemoteView(userId: string, streamType: ETUIStreamType) {
+  async stopRemoteView(userId: string, streamType: ETUIStreamType) {
     if (streamType === ETUIStreamType.CAMERA) {
-      this.rtcCloud?.stopRemoteView(
+      await this.rtcCloud?.stopRemoteView(
         userId,
         TRTCVideoStreamType.TRTCVideoStreamTypeBig
       );
     } else if (streamType === ETUIStreamType.SCREEN) {
-      this.rtcCloud?.stopRemoteView(
+      await this.rtcCloud?.stopRemoteView(
         userId,
         TRTCVideoStreamType.TRTCVideoStreamTypeSub
       );
@@ -380,8 +385,8 @@ class BaseTRTCService {
     return this.rtcCloud?.getCurrentMicDevice();
   }
 
-  async setCurrentMicrophone(deviceId: string) {
-    await this.rtcCloud?.setCurrentMicDevice(deviceId);
+  async setCurrentMicrophone(deviceId: string) {	
+    await this.rtcCloud?.setCurrentMicDevice(deviceId);	
   }
 
   async getCameraList(): Promise<Array<TRTCDeviceInfo>> {
@@ -392,8 +397,8 @@ class BaseTRTCService {
     return this.rtcCloud?.getCurrentCameraDevice();
   }
 
-  async setCurrentCamera(deviceId: string) {
-    await this.rtcCloud?.setCurrentCameraDevice(deviceId);
+  async setCurrentCamera(deviceId: string) {	
+    await this.rtcCloud?.setCurrentCameraDevice(deviceId);	
   }
 
   getSpeakerList(): Array<TRTCDeviceInfo> {
@@ -404,8 +409,8 @@ class BaseTRTCService {
     return this.rtcCloud?.getCurrentSpeakerDevice();
   }
 
-  async setCurrentSpeaker(deviceId: string) {
-    await this.rtcCloud?.setCurrentSpeakerDevice(deviceId);
+  async setCurrentSpeaker(deviceId: string) {	
+    await this.rtcCloud?.setCurrentSpeakerDevice(deviceId);	
   }
 
   /**

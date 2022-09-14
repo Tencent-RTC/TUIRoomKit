@@ -5,14 +5,14 @@
       :value="chatStore.unReadCount > 10 ? '10+' : chatStore.unReadCount"
     >
       <icon-button
-        title="聊天"
+        :title="t('Chat')"
         :icon-name="iconName"
         @click-icon="toggleChatSidebar"
       />
     </el-badge>
     <icon-button
       v-else
-      title="聊天"
+      :title="t('Chat')"
       :icon-name="iconName"
       @click-icon="toggleChatSidebar"
     />
@@ -26,6 +26,9 @@ import { useBasicStore } from '../../stores/basic';
 import { useChatStore } from '../../stores/chat';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const chatStore = useChatStore();

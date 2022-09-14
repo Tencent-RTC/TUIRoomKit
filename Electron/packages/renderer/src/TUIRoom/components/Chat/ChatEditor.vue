@@ -7,14 +7,14 @@
       v-model="sendMsg"
       class="content-bottom-input"
       :disabled="isMuteChatByMater"
-      :placeholder="isMuteChatByMater ? '已被主持人禁言' : '说点什么'"
+      :placeholder="isMuteChatByMater ? t('Muted by the moderator') : t('Type a message')"
       @keyup.enter="sendMessage"
     />
     <div v-if="!isMuteChatByMater" class="chat-editor-toolbar">
       <div class="left-section">
         <emoji @choose-emoji="handleChooseEmoji"></emoji>
       </div>
-      <div :class="['send-btn', `${sendMsg.length > 0 ? 'active' : ''}`]" @click="sendMessage">发送</div>
+      <div :class="['send-btn', `${sendMsg.length > 0 ? 'active' : ''}`]" @click="sendMessage">{{ t('Send') }}</div>
     </div>
   </div>
 </template>
@@ -24,10 +24,13 @@ import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessage } from 'element-plus';
 
+
 import TUIRoomCore from '../../tui-room-core';
 import { useChatStore } from '../../stores/chat';
 import emoji from './EditorTools/emoji.vue';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const chatStore = useChatStore();
 
 const { isMuteChatByMater } = storeToRefs(chatStore);
@@ -55,7 +58,7 @@ const sendMessage = async () => {
     }
   } catch (e) {
     // 消息发送失败
-    ElMessage.error('发送消息失败');
+    ElMessage.error(t('Failed to send the message'));
   }
 };
 

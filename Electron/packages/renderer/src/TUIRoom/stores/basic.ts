@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ETUISpeechMode, ETUIRoomRole, TRTCStatistics, TRTCVideoStreamType } from '../tui-room-core';
+import { getLanguage } from '../utils/common';
 import { LAYOUT } from '../constants/render';
 
 type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | '';
@@ -30,6 +31,7 @@ interface BasicState {
   isMuteAllVideo: boolean,
   canControlSelfAudio: boolean,
   canControlSelfVideo: boolean,
+  lang: string,
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -72,6 +74,7 @@ export const useBasicStore = defineStore('basic', {
     // 主持人全员禁麦，但是单独取消某个用户音视频禁止状态的时候，是可以自己 unmute audio/video 的
     canControlSelfAudio: true,
     canControlSelfVideo: true,
+    lang: getLanguage(),
   }),
   getters: {
     localVideoBitrate: (state) => {
@@ -223,6 +226,9 @@ export const useBasicStore = defineStore('basic', {
     },
     setCanControlSelfVideo(capability: boolean) {
       this.canControlSelfVideo = capability;
+    },
+    setLang(lang: string) {
+      this.lang = lang;
     },
     reset() {
       this.isSidebarOpen = false;

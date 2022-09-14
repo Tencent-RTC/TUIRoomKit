@@ -6,7 +6,7 @@
       <svg-icon class="down-icon" :icon-name="iconName" size="medium"></svg-icon>
     </div>
     <div v-if="showUserControl" class="user-control-container">
-      <div class="user-control-item" @click="$emit('logOut')">退出登录</div>
+      <div class="user-control-item" @click="$emit('logOut')">{{ t('Log out') }}</div>
     </div>
   </div>
 </template>
@@ -16,6 +16,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import defaultAvatar from '../../assets/imgs/avatar.png';
 import { ICON_NAME } from '../../constants/icon';
+import { useI18n } from 'vue-i18n';
 
 interface Props {
   userId: string,
@@ -29,6 +30,7 @@ defineEmits(['logOut']);
 const userInfoRef = ref();
 const showUserControl = ref(false);
 const iconName = computed(() => (showUserControl.value ? ICON_NAME.LineArrowUp : ICON_NAME.LineArrowDown));
+const { t } = useI18n();
 
 function handleUserControl() {
   showUserControl.value = !showUserControl.value;

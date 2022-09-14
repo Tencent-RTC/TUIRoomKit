@@ -22,7 +22,7 @@ export const useChatStore = defineStore('chat', {
   state: (): ChatState => ({
     messageList: [],
     isMuteChatByMater: false,
-    unReadCount: 0
+    unReadCount: 0,
   }),
   getters: {
 
@@ -30,7 +30,7 @@ export const useChatStore = defineStore('chat', {
   actions: {
     updateMessageList(message: MessageItem) {
       const messageIds = this.messageList.map(message => message.ID);
-      if (messageIds.indexOf(message.ID) == -1) {
+      if (messageIds.indexOf(message.ID) === -1) {
         this.messageList = this.messageList.concat([message]);
       }
     },
@@ -39,12 +39,9 @@ export const useChatStore = defineStore('chat', {
     },
     addHistoryMessages(messageList: MessageItem[]) {
       const messageIds = this.messageList.map(message => message.ID);
-      const filteredMessageList = messageList.filter(message => {
-        return messageIds.indexOf(message.ID) == -1;
-      })
-      this.messageList = filteredMessageList.concat(this.messageList).sort((messageA: MessageItem, messageB: MessageItem) => {
-        return messageA.sequence - messageB.sequence;
-      });
+      const filteredMessageList = messageList.filter(message => messageIds.indexOf(message.ID) === -1);
+      this.messageList = filteredMessageList.concat(
+        this.messageList).sort((messageA: MessageItem, messageB: MessageItem) => messageA.sequence - messageB.sequence);
     },
     setIsMuteChatByMater(isMuteChatByMater: boolean) {
       this.isMuteChatByMater = isMuteChatByMater;

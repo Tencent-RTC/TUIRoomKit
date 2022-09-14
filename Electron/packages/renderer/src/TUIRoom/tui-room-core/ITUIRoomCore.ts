@@ -231,7 +231,7 @@ export default interface ITUIRoomCore {
    * @param streamType 流类型
    * @param fillMode 填充模式
    */
-  setRemoteVideoFillMode: (userId: string, streamType: string, fillMode: TRTCVideoFillMode) => void;
+  setRemoteVideoFillMode: (userId: string, streamType: ETUIStreamType, fillMode: TRTCVideoFillMode) => void;
 
   /**
    * 静默或取消静默本地摄像头

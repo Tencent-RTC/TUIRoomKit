@@ -1,7 +1,7 @@
 <template>
   <div class="invite-control-container">
     <icon-button
-      title="管理成员"
+      :title="t('Members')"
       :icon-name="iconName"
       @click-icon="toggleMangeMemberSidebar"
     />
@@ -14,6 +14,9 @@ import { storeToRefs } from 'pinia';
 import IconButton from '../common/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
 import { ICON_NAME } from '../../constants/icon';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);

@@ -4,17 +4,29 @@
 {
   "appId": "com.tencent.cloud.trtc.tuiroom.electron",
   "asar": true,
+  "asarUnpack": "**\\*.{node,dll}",
   "directories": {
     "output": "release/${version}"
   },
   "files": [
-    "dist"
+    "dist",
+    "!node_modules/trtc-electron-sdk/build/mac-framework"
   ],
   "mac": {
     "artifactName": "${productName}_${version}.${ext}",
+    "extraFiles": [
+      {
+        "from": "node_modules/trtc-electron-sdk/build/Release/${arch}/trtc_electron_sdk.node",
+        "to": "./Resources/app.asar.unpacked/node_modules/trtc-electron-sdk/build/Release"
+      },
+      {
+        "from": "node_modules/trtc-electron-sdk/build/mac-framework/${arch}/",
+        "to": "./Frameworks"
+      }
+    ],
     "target": [
       "dmg"
-    ]
+    ],
   },
   "win": {
     "target": [

@@ -1,6 +1,29 @@
-import { app, BrowserWindow, shell, screen, systemPreferences } from 'electron'
+import { app, BrowserWindow, shell, screen, systemPreferences, crashReporter } from 'electron'
 import { release } from 'os'
 import path from 'path'
+
+// 开启crash捕获
+crashReporter.start({
+  productName: 'trtc-tuiroom-electron',
+  companyName: 'Tencent Cloud',
+  submitURL: 'https://www.xxx.com',
+  uploadToServer: false,
+  ignoreSystemCrashHandler: false,
+});
+
+let crashFilePath = '';
+let crashDumpsDir = '';
+try {
+  // electron 低版本
+  crashFilePath = path.join(app.getPath('temp'), app.getName() + ' Crashes');
+  console.log('————————crash path:', crashFilePath); 
+
+  // electron 高版本
+  crashDumpsDir = app.getPath('crashDumps');
+  console.log('————————crashDumpsDir:', crashDumpsDir);
+} catch (e) {
+  console.error('获取奔溃文件路径失败', e);
+}
 
 const PROTOCOL = 'tuiroom';
 
@@ -99,6 +122,8 @@ async function createWindow() {
   // Test active push message to Renderer-process
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
+
+    win?.webContents.send('crash-file-path', `${crashFilePath}|${crashDumpsDir}`);
   })
 
   // Make all links open with the browser, not with the application
@@ -141,3 +166,20 @@ app.on('activate', () => {
 app.on('open-url', (event, urlStr) => {
   handleUrl(urlStr);
 });
+
+app.on('gpu-process-crashed', (event, kill) => {
+  console.warn('app:gpu-process-crashed', event, kill);
+});
+
+app.on('renderer-process-crashed', (event, webContents, kill) => {
+  console.warn('app:renderer-process-crashed', event, webContents, kill);
+});
+
+app.on('render-process-gone', (event, webContents, details) => {
+  console.warn('app:render-process-gone', event, webContents, details);
+});
+
+app.on('child-process-gone', (event, details) => {
+  console.warn('app:child-process-gone', event, details);
+});
+

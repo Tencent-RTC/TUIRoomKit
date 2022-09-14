@@ -9,30 +9,30 @@
   <div class="video-tab">
     <div :class="['item-setting-container', isSampleMode && 'hasDividingLine']">
       <div class="item-setting">
-        <span class="title">摄像头</span>
+        <span class="title">{{ t('Camera') }}</span>
         <device-select
           :class="isDetailMode ? 'detail-select' : ''"
           device-type="camera"
         ></device-select>
       </div>
       <div v-if="isDetailMode" class="item-setting">
-        <span class="title">视频画面</span>
+        <span class="title">{{ t('Preview') }}</span>
         <div ref="testCameraPreviewRef" class="video-preview"></div>
         <el-checkbox
           v-if="isDetailMode"
           v-model="isLocalStreamMirror"
           class="mirror-checkbox custom-element-class"
-          label="翻转镜像"
+          :label="t('Mirror')"
         />
       </div>
     </div>
     <div v-if="isSampleMode" :class="['item-setting-container', isSampleMode && 'hasDividingLine']">
-      <span class="title">分辨率</span>
+      <span class="title">{{ t('Resolution') }}</span>
       <video-profile></video-profile>
     </div>
     <div v-if="isSampleMode" :class="['item-setting-container', isSampleMode && 'hasDividingLine']">
       <!-- TODO: <div class="item">美颜与虚拟背景</div> -->
-      <div class="item" @click="handleMoreCameraSetting">更多摄像头设置</div>
+      <div class="item" @click="handleMoreCameraSetting">{{ t('More Camera Settings') }}</div>
     </div>
   </div>
 </template>
@@ -46,6 +46,7 @@ import { useRoomStore } from '../../stores/room';
 import TUIRoomCore from '../../tui-room-core';
 import { storeToRefs } from 'pinia';
 import { SettingMode } from '../../constants/render';
+import { useI18n } from 'vue-i18n';
 
 interface Props {
   mode?: SettingMode,
@@ -67,6 +68,8 @@ watch(isLocalStreamMirror, (val: boolean) => {
 
 const roomStore = useRoomStore();
 const { currentCameraId } = storeToRefs(roomStore);
+
+const { t } = useI18n();
 
 // 点击【更多摄像头设置】
 function handleMoreCameraSetting() {

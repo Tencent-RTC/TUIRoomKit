@@ -83,10 +83,10 @@ export const useRoomStore = defineStore('room', {
       [...state.remoteUserMap.values()].forEach((userInfo) => {
         const { userId, userAvatar, userName, mainStreamInfo, screenStreamInfo } = userInfo;
         if (mainStreamInfo) {
-          map.set(`${userId}_main`, { userId, userAvatar, userName, ...mainStreamInfo });
+          map.set(`${userId}_main`, Object.assign(mainStreamInfo, { userId, userAvatar, userName }));
         }
         if (screenStreamInfo) {
-          map.set(`${userId}_screen`, { userId, userAvatar, userName, ...screenStreamInfo });
+          map.set(`${userId}_screen`, Object.assign(screenStreamInfo, { userId, userAvatar, userName }));
         }
       });
       return map;
@@ -251,13 +251,13 @@ export const useRoomStore = defineStore('room', {
     setAudioVolume(audioVolumeArray: []) {
       const basicStore = useBasicStore();
       audioVolumeArray.forEach((audioVolumeItem: any) => {
-        const { userId, audioVolume } = audioVolumeItem;
-        if ((userId === basicStore.userId || userId === 'local') && this.localStream) {
-          this.localStream.audioVolume = audioVolume;
+        const { userId, volume } = audioVolumeItem;
+        if ((userId === basicStore.userId || userId === '') && this.localStream) {
+          this.localStream.audioVolume = volume;
         } else {
           const remoteUserInfo = this.remoteUserMap.get(userId);
           if (remoteUserInfo && remoteUserInfo.mainStreamInfo) {
-            remoteUserInfo.mainStreamInfo.audioVolume = audioVolume;
+            remoteUserInfo.mainStreamInfo.audioVolume = volume;
           }
         }
       });

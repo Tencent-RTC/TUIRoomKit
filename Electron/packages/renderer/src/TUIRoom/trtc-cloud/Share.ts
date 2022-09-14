@@ -1,19 +1,29 @@
-import { TRTCVideoStreamType } from './common/trtc_define';
+/* eslint-disable no-underscore-dangle */
 import { BaseCommon } from './BaseCommon';
 import { MixinsClass } from './utils/utils';
+import { ScreenShareUserIdError, NotSupportError, NotSupportBeforeJoinRoomError } from './common/trtcCode';
+import { NAME } from './common/constants';
+import { TRTCVideoEncParam } from './common/trtc_define';
 
-// eslint-disable-next-line new-cap
+/**
+ * 屏幕分享相关接口<br>
+ * @memberof TRTCClouds
+ */
 class Share extends MixinsClass(BaseCommon) {
-  // ///////////////////////////////////////////////////////////////////////////////
-  //
-  //                      （八）辅流相关接口函数（屏幕共享，播片等）
-  //
-  // ///////////////////////////////////////////////////////////////////////////////
+  startScreenCapture() {
+    this.emitError(NotSupportError);
+  }
+  pauseScreenCapture() {
+    this.emitError(NotSupportError);
+  }
+  resumeScreenCapture() {
+    this.emitError(NotSupportError);
+  }
   getScreenCaptureSources() {
-    return;
+    this.emitError(NotSupportError);
   }
   selectScreenCaptureTarget() {
-    return;
+    this.emitError(NotSupportError);
   }
   /**
    * SDK  不支持屏幕分享, 需要用户自己实现: https://www.electronjs.org/docs/api/desktop-capturer
@@ -28,48 +38,48 @@ class Share extends MixinsClass(BaseCommon) {
    * @param {TRTCVideoEncParam} params 屏幕分享的画面编码参数，可以设置为 null，表示让 SDK 选择最佳的编码参数（分辨率、码率等）。
    *        即使在调用 startScreenCapture 时设置 type=TRTCVideoStreamTypeBig，依然可以使用此接口更新屏幕分享的编码参数。
    */
-  // eslint-disable-next-line
-  async startScreenCapture(view: HTMLElement, type: TRTCVideoStreamType.TRTCVideoStreamTypeSub, params: any) {
-    return;
-    // // 屏幕分享使用的线路, 可以使用主路、或者辅路, 默认使用辅路
-    // if((type !== TRTCVideoStreamType.TRTCVideoStreamTypeSub && type !== TRTCVideoStreamType.TRTCVideoStreamTypeBig)){
-    //   type = TRTCVideoStreamType.TRTCVideoStreamTypeSub;
-    // }
-    // if (params && !(params instanceof TRTCVideoEncParam)) {
-    //   console.error('startScreenCapture, params is not instanceof TRTCVideoEncParam!');
-    //   return;
-    // }
+  // async startScreenCapture(view: HTMLElement, type: TRTCVideoStreamType.TRTCVideoStreamTypeSub, params: any) {
+  //   this.emitError(NotSupportError);
+  //   return;
+  //   // 屏幕分享使用的线路, 可以使用主路、或者辅路, 默认使用辅路
+  //   if((type !== TRTCVideoStreamType.TRTCVideoStreamTypeSub && type !== TRTCVideoStreamType.TRTCVideoStreamTypeBig)){
+  //     type = TRTCVideoStreamType.TRTCVideoStreamTypeSub;
+  //   }
+  //   if (params && !(params instanceof TRTCVideoEncParam)) {
+  //     console.error('startScreenCapture, params is not instanceof TRTCVideoEncParam!');
+  //     return;
+  //   }
 
-    // const shareClientConfig = {
-    //   sdkAppId: this.sdkAppId,
-    //   userId: this.userId,
-    //   userSig: this.userSig,
-    //   mode: this.shareClientMode,
-    //   autoSubscribe: false,
-    // };
-    // this.shareClient = await this.TRTC.createClient(shareClientConfig);
-    // await this.shareClient.join({ roomId: this.roomId });
-    // this.shareClientLocalStream = await this.TRTC.createStream({
-    //   userId: this.client && this.client.userId || 'initial share userId',
-    //   screen: true,
-    //   audio: false,
-    // });
+  //   const shareClientConfig = {
+  //     sdkAppId: this.sdkAppId,
+  //     userId: this.userId,
+  //     userSig: this.userSig,
+  //     mode: this.shareClientMode,
+  //     autoSubscribe: false,
+  //   };
+  //   this.shareClient = await this.TRTC.createClient(shareClientConfig);
+  //   await this.shareClient.join({ roomId: this.roomId });
+  //   this.shareClientLocalStream = await this.TRTC.createStream({
+  //     userId: this.client && this.client.userId || 'initial share userId',
+  //     screen: true,
+  //     audio: false,
+  //   });
 
-    // try {
-    //   this.shareClientLocalStream.setScreenProfile({
-    //     width: params && params.videoResolution || 1920,
-    //     height: params && params.videoResolution || 1080,
-    //     // params.resMode, // TRTCCloud 分辨率模式(横屏、竖屏) WebRTC 暂不支持
-    //     frameRate: params && params.videoFps || 5,
-    //     bitrate: params && params.videoBitrate || 1600,
-    //     // params.minVideoBitrate, // TRTCCloud 最低视频码率 WebRTC 暂不支持
-    //     // params.enableAdjustRes, // TRTCCloud 是否允许调整分辨率 WebRTC 暂不支持
-    //   });
-    //   await this.shareClientLocalStream.initialize();
-    //   await this.shareClient.publish(this.shareClientLocalStream);
-    // } catch (error) {
-    // }
-  }
+  //   try {
+  //     this.shareClientLocalStream.setScreenProfile({
+  //       width: params && params.videoResolution || 1920,
+  //       height: params && params.videoResolution || 1080,
+  //       // params.resMode, // TRTCCloud 分辨率模式(横屏、竖屏) WebRTC 暂不支持
+  //       frameRate: params && params.videoFps || 5,
+  //       bitrate: params && params.videoBitrate || 1600,
+  //       // params.minVideoBitrate, // TRTCCloud 最低视频码率 WebRTC 暂不支持
+  //       // params.enableAdjustRes, // TRTCCloud 是否允许调整分辨率 WebRTC 暂不支持
+  //     });
+  //     await this.shareClientLocalStream.initialize();
+  //     await this.shareClient.publish(this.shareClientLocalStream);
+  //   } catch (error: any) {
+  //   }
+  // }
 
   /**
    * 初始化屏幕分享的客户端对象
@@ -90,21 +100,18 @@ class Share extends MixinsClass(BaseCommon) {
       throw error;
     }
   }
-
+  // 注册事件监听
   private installShareClientEventHandlers() {
     this.shareClient.on('error', this.handleShareClientError.bind(this));
     this.shareClient.on('client-banned', this.handleShareClientBanned.bind(this));
     this.shareClient.on('stream-subscribed', this.handleShareClientStreamSubscribed.bind(this));
   }
-
   private handleShareClientError(error: any) {
     console.error('ShareClient error:', error);
   }
-
   private handleShareClientBanned(error: any) {
     console.error('ShareClient has been banned for:', error);
   }
-
   private handleShareClientStreamSubscribed(event: any) {
     const remoteStream = event.stream;
     const id = remoteStream.getId();
@@ -113,20 +120,15 @@ class Share extends MixinsClass(BaseCommon) {
 
     this.shareClient.unsubscribe(remoteStream);
   }
-
+  // 初始化 stream
   private async initShareStream() {
     try {
       this.shareStream = this.TRTC.createStream({
         audio: false,
         screen: true,
-        userId: this.userId,
+        userId: this.shareUserId,
       });
-      this.shareStream.setScreenProfile({
-        width: 1920,
-        height: 1080,
-        frameRate: 15,
-        bitrate: 1500,
-      });
+      this.shareStream.setScreenProfile(this.screenShareParams);
       await this.shareStream.initialize();
       this.shareStream.on('screen-sharing-stopped', () => {
         console.log('ShareStream video track ended');
@@ -140,7 +142,7 @@ class Share extends MixinsClass(BaseCommon) {
       throw error;
     }
   }
-
+  // 进房
   private async shareClientJoin(shareUserId: string, shareUserSig: string) {
     try {
       if (!this.shareClient) {
@@ -153,7 +155,7 @@ class Share extends MixinsClass(BaseCommon) {
       throw error;
     }
   }
-
+  // 推流
   private async shareClientPublish() {
     if (!this.isShareClientJoined) {
       console.warn('ShareClient cannot publish() - please join() firstly');
@@ -172,7 +174,7 @@ class Share extends MixinsClass(BaseCommon) {
       throw error;
     }
   }
-
+  // 停止推流
   private async shareClientUnpublish() {
     if (!this.isShareClientJoined) {
       console.warn('ShareClient cannot unpublish() - please join() firstly');
@@ -193,7 +195,7 @@ class Share extends MixinsClass(BaseCommon) {
       throw error;
     }
   }
-
+  // 退房
   private async shareClientLeave() {
     if (!this.isShareClientJoined) {
       console.warn('ShareClient cannot leave() - please join() firstly');
@@ -225,8 +227,37 @@ class Share extends MixinsClass(BaseCommon) {
     }
   }
 
-  async startScreenShare(options: { shareUserId: string; shareUserSig: string; }) {
-    const { shareUserId, shareUserSig } = options;
+  /**
+   * 开始屏幕分享<br>
+   * **Note:**
+   * - **屏幕分享 ID 的命名规则：'share_jack'，也即当前用户的 ID 加上 'share_' 前缀后得到屏幕分享的 ID**
+   * @param {Object} options 屏幕分享参数
+   * @param {String} options.shareUserId 屏幕分享传入的 ID
+   * @param {String} options.shareUserSig 屏幕分享的签名 userSig
+   * **Note:**
+   * - shareUserId 屏幕分享 ID 的命名规则：'share_jack'，也即当前用户的 ID 加上 'share_' 前缀后得到屏幕分享的 ID
+   * @returns {Promise}
+   * @memberof TRTCCloud
+   * @example
+   *  const options = {
+   *    shareUserId: 'share_jack',
+   *    shareUserSig: 'xxxx',
+   *  };
+   *  await trtcCloud.startScreenShare(options);
+   */
+  async startScreenShare(options: { shareUserId: string, shareUserSig: string }) {
+    if (!this.isJoined || this.isJoining) {
+      this.emitError(NotSupportBeforeJoinRoomError);
+      return;
+    }
+    const { shareUserId = '', shareUserSig = '' } = options;
+    if (!shareUserId || !shareUserSig || shareUserId.slice(0, 6) !== NAME.SCREEN_SHARE_USER_ID_PREFIX) {
+      // this.log_.error(`(startScreenShare) failed - ${ScreenShareUserIdError.message} userId: ${shareUserId}`);
+      this.emitError(ScreenShareUserIdError);
+      return;
+    }
+    this.shareUserId = shareUserId;
+    this.shareUserSig = shareUserSig;
     try {
       await this.initShareStream();
       await this.shareClientJoin(shareUserId, shareUserSig);
@@ -238,7 +269,46 @@ class Share extends MixinsClass(BaseCommon) {
       throw error;
     }
   }
-
+  /**
+   * 设置屏幕分享的视频编码参数<br>
+   * **Note:**
+   * - setSubStreamEncoderParam 需在调用 {@link TRTCCloud#startScreenShare startScreenShare()} 进行屏幕分享之前调用
+   * - 默认分辨率：1920*1080，视频采集帧率：15fps，视频码率：1500kps
+   * @memberof TRTCCloud
+   * @param {TRTCVideoEncParam} params 屏幕分享视频编码参数
+   * @param {TRTCVideoResolution} params.videoResolution 视频分辨率
+   * @param {Number} params.videoFps 视频采集帧率
+   * @param {Number} params.videoBitrate 视频码率
+   * @example
+   *  import { TRTCVideoResolution } from 'trtc-cloud-js-sdk';
+   *  const params = {
+   *    videoResolution: TRTCVideoResolution.TRTCVideoResolution_640_480,
+   *    videoFps: 15,
+   *    videoBitrate: 1500,
+   *  };
+   *  trtcCloud.setSubStreamEncoderParam(params);
+   */
+  setSubStreamEncoderParam(params: TRTCVideoEncParam) {
+    const { videoResolution, videoFps, videoBitrate } = params;
+    try {
+      const resolutionObject = this.getResolution(videoResolution);
+      this.screenShareParams = {
+        width: resolutionObject.width,
+        height: resolutionObject.height,
+        frameRate: videoFps,
+        bitrate: videoBitrate,
+      };
+    } catch (error: any) {
+      throw error;
+    }
+  }
+  /**
+   * 停止屏幕分享
+   * @returns {Promise}
+   * @memberof TRTCCloud
+   * @example
+   *  await trtcCloud.stopScreenShare();
+   */
   async stopScreenShare() {
     try {
       await this.shareClientUnpublish();

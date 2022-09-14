@@ -20,22 +20,22 @@
     >
       <el-button text @click="openStopConfirmDialog">
         <svg-icon :icon-name="ICON_NAME.ScreenShareStopped" />
-        结束共享
+        {{ t('End sharing') }}
       </el-button>
     </el-popover>
     <el-dialog
       v-model="dialogVisible"
       width="420px"
-      title="是否停止屏幕共享？"
+      :title="t('Stop sharing?') "
       :modal="true"
       :append-to-body="true"
       :before-close="cancelStop"
     >
-      <span>停止后所有人将无法继续观看屏幕内容</span>
+      <span>{{ t('Others will no longer see your screen after you stop sharing.') }}</span>
       <template #footer>
         <span>
-          <el-button type="primary" @click="stopScreenShare">停止共享</el-button>
-          <el-button type="default" @click="cancelStop">取消</el-button>
+          <el-button type="primary" @click="stopScreenShare">{{ t('Stop sharing') }}</el-button>
+          <el-button type="default" @click="cancelStop">{{ t('Cancel') }}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -66,6 +66,9 @@ import SvgIcon from '../../common/SvgIcon.vue';
 import { ICON_NAME } from '../../../constants/icon';
 import { useBasicStore } from '../../../stores/basic';
 import { storeToRefs } from 'pinia';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const basicInfo = useBasicStore();
 const { isAudience, role } = storeToRefs(basicInfo);
@@ -81,7 +84,7 @@ watch(role, (val: any, oldVal: any) => {
   }
 });
 
-const title = computed(() => (isSharing.value ? '屏幕共享中' : '共享屏幕'));
+const title = computed(() => (isSharing.value ? t('Sharing') : t('Share screen')));
 const iconName = computed(() => {
   if (isAudience.value) {
     return ICON_NAME.ScreenShareDisabled;
