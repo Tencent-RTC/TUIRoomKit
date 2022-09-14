@@ -85,23 +85,6 @@ The TUIRoom component supports custom layout and can be applied in various scena
 </tr>
 </table>
 
-
-## Demonstration
-
-<table>
-<tr>
-<th>iOS and Android</th><th>Windows and macOS</th>
-</tr>
-<tr>
-<td><img style="width:300px;" src="https://imgcache.qq.com/operation/dianshi/other/TUIRoom_android.eb0d2a78455d5a9e86ca1c0505f35259728bf232.png" data-nonescope="true"></td>
-
-
-<td><img style="width:800px;" src="https://imgcache.qq.com/operation/dianshi/other/tuiroomwindows.704c48031da2fd6e00837ae8e7475e7120c94743.png" data-nonescope="true"></td>
-
-</tr>
-</table>
-
-
 ## Tryout and Demo Run
 
 You can directly scan the QR codes below or click `Documentation` to try out the component. You can also click [TUIRoom](https://github.com/tencentyun/TUIRoom) to view the source code at GitHub.
