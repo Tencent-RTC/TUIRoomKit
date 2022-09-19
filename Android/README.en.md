@@ -1,7 +1,7 @@
 # Quick Run of TUIRoom Demo for Android
 _[中文](README.md) | English_
 
-This document describes how to quickly run the TUIRoom demo project to try out multi-person audio/video interactions. For more information on the TUIRoom component connection process, see **[Integrating TUIRoom (Android)](https://www.tencentcloud.com/document/product/647/37283)**.
+This document describes how to quickly run the TUIRoom demo project to try out multi-person audio/video interactions. For more information on the TUIRoom component connection process, see **[Integrating TUIRoom (Android)](https://cloud.tencent.com/document/product/647/45667)**.
 
 ## Directory Structure
 
@@ -26,7 +26,7 @@ TUIRoom
 3. On the application information page, note down the `SDKAppID` and key as shown below:
     <img src="https://qcloudimg.tencent-cloud.cn/raw/bea06852e22a33c77cb41d287cac25db.png" width="900">
 
->! This feature uses two basic PaaS services of Tencent Cloud: [TRTC](https://www.tencentcloud.com/document/product/647/35078) and [IM](https://www.tencentcloud.com/document/product/1047/33513). When you activate TRTC, IM will be activated automatically. IM is a value-added service.
+>! This feature uses two basic PaaS services of Tencent Cloud: [TRTC](https://cloud.tencent.com/document/product/647/16788) and [IM](https://cloud.tencent.com/document/product/269). When you activate TRTC, IM will be activated automatically. IM is a value-added service. See [Pricing](https://cloud.tencent.com/document/product/269/11673) for its billing details.
 
 
 [](id:ui.step2)
@@ -52,10 +52,18 @@ Note: You need to prepare at least two devices to try out TUIRoom. Here, users A
 - Step 3: Enter the room creation page. Note down the ID of the newly created room.
 - Step 4: Enter the room.
 
+| Step 1 | Step 2 | Step 3 | Step 4 |
+|---------|---------|---------|---------|
+| <img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/user_a.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/85ab7ea0a66aba5b9ddf23594bf04ea0.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/b36383baff761bdaf26da5f191902800.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/5f8b51e76d044c03af9e579a66fcaa1a.png" width="320"/> |
+
 **Device B (userId: 222)**
 
 - Step 1: Enter the username (which must be unique), such as `222`.
 - Step 2: Click **Enter Room** and enter the ID of the room created by user A (the room ID that you noted down in step 3 on device A) to enter the room.
+
+| Step 1 | Step 2 |
+|---------|---------|
+|<img src="https://qcloudimg.tencent-cloud.cn/raw/0349a16cf0f442016d1262d602327a67.png" width="320"/>|<img src="https://qcloudimg.tencent-cloud.cn/raw/a5f86a91670b56ed39bb40d6d4ea0d24.png" width="320"/>|
 
 ## Have any questions?
 Welcome to join our Telegram Group to communicate with our professional engineers! We are more than happy to hear from you~
