@@ -423,7 +423,7 @@ public class IMService {
                 });
     }
 
-    public void transferRoomMaster(final TUIRoomCoreCallback.ActionCallback callback) {
+    public void transferRoomMaster(String userId, final TUIRoomCoreCallback.ActionCallback callback) {
         if (!isEnterRoom()) {
             TRTCLogger.e(TAG, "transfer room master fail, not enter room yet.");
             if (callback != null) {
@@ -438,7 +438,7 @@ public class IMService {
             }
             return;
         }
-        V2TIMManager.getGroupManager().transferGroupOwner(mRoomId, mSelfUserId, new V2TIMCallback() {
+        V2TIMManager.getGroupManager().transferGroupOwner(mRoomId, userId, new V2TIMCallback() {
             @Override
             public void onSuccess() {
                 callback.onCallback(0, "success");
