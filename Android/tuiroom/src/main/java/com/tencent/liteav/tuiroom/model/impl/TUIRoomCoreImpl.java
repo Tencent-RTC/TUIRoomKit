@@ -337,7 +337,7 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
         runOnMainThread(new Runnable() {
             @Override
             public void run() {
-                TRTCLogger.i(TAG, "setSelfProfile userName: " + userName + "avatarURL: " + avatarURL);
+                TRTCLogger.i(TAG, "setSelfProfile userName: " + userName + "avatarUL: " + avatarURL);
                 mIMService.setSelfProfile(userName, avatarURL, callback);
             }
         });
@@ -349,7 +349,7 @@ public class TUIRoomCoreImpl extends TUIRoomCore implements TXTRTCRoomListener, 
             @Override
             public void run() {
                 TRTCLogger.i(TAG, "transferRoomMaster userId: " + userId);
-                mIMService.transferRoomMaster(callback);
+                mIMService.transferRoomMaster(userId, callback);
             }
         });
     }
