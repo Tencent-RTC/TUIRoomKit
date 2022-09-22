@@ -1,0 +1,7 @@
+<resources>
+    <string name="tuibarrage_input_hint">请输入弹幕</string>
+    <string name="tuibarrage_btn_send">发送</string>
+    <string name="tuibarrage_me">我</string>
+    <string name="tuibarrage_agree">同意</string>
+    <string name="tuibarrage_warning_not_empty">输入不能为空</string>
+</resources>

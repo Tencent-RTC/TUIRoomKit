@@ -38,4 +38,5 @@ dependencies {
     api project(':tuibeauty')
     api 'com.tencent.liteav.tuikit:tuicore:latest.release'
     api project(':debug')
+    api project(':tuibarrage')
 }
