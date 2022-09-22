@@ -19,6 +19,7 @@ Pod::Spec.new do |spec|
  spec.dependency 'MJExtension'
  spec.dependency 'TXAppBasic'
  
+ spec.dependency 'TUIBarrage'
  spec.dependency 'TUICore'
  spec.dependency 'TUIBeauty'
  spec.dependency 'TXIMSDK_Plus_iOS', '>= 5.7.1435'

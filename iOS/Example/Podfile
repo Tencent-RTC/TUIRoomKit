@@ -19,6 +19,7 @@ end
 def local
   pod 'TXAppBasic', :path => "../TXAppBasic/"
   pod 'TUIBeauty', :path => "../TUIBeauty/"
+  pod 'TUIBarrage', :path => "../TUIBarrage/"
 end
 
 def pod_local(type)
