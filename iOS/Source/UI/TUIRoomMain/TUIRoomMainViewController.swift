@@ -10,6 +10,7 @@ import SnapKit
 import TXAppBasic
 import UIKit
 import TUICore
+import TUIBarrage
 
 public let isOpenTUIRoomTest: Bool = false
 
@@ -115,6 +116,16 @@ class TUIRoomMainViewController: UIViewController {
         return button
     }()
 
+    lazy var barrageSendView: UIView = {
+        let view = TUIBarrageSendPlugView(frame: self.view.frame, groupId: self.roomId)
+        return view
+    }()
+    
+    lazy var barragePlayView: UIView = {
+        let view = TUIBarrageDisplayView(frame: self.view.frame, groupId: self.roomId)
+        return view
+    }()
+    
     lazy var switchCameraButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_switch_camera", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
@@ -166,6 +177,12 @@ class TUIRoomMainViewController: UIViewController {
         return button
     }()
 
+    lazy var msgInputButton: UIButton = {
+        let button = TUIBarrageExtension.getEnterButton()
+        button.sizeToFit()
+        return button
+    }()
+    
     lazy var muteVideoButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_camera_open", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
@@ -237,6 +254,10 @@ class TUIRoomMainViewController: UIViewController {
         } else {
             enterRoom()
         }
+        
+        if let view =  barragePlayView as? TUIBarrageDisplayBaseView {
+            TUIBarrageExtension.setDisplayViewByGroupId(view, groupId: self.roomId)
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -253,6 +274,7 @@ class TUIRoomMainViewController: UIViewController {
         UIApplication.shared.isIdleTimerDisabled = true
         backView.backgroundColor = .clear
         backView.addSubview(attendeeCollectionView)
+        backView.addSubview(barragePlayView)
         backView.addSubview(pageControl)
         backView.addSubview(switchAudioRouteButton)
         backView.addSubview(switchCameraButton)
@@ -264,6 +286,8 @@ class TUIRoomMainViewController: UIViewController {
         backView.addSubview(beautyButton)
         backView.addSubview(membersButton)
         backView.addSubview(moreSettingButton)
+        backView.addSubview(msgInputButton)
+        backView.addSubview(barrageSendView)
 #if RTCube_APPSTORE
         if !isCreateRoom {
             backView.addSubview(reportButton)
@@ -299,7 +323,18 @@ class TUIRoomMainViewController: UIViewController {
             make.left.equalTo(roomIdLabel.snp.right).offset(3)
             make.width.height.equalTo(32)
         }
+        
+        barrageSendView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
 
+        barragePlayView.snp.makeConstraints { make in
+            make.width.equalTo(self.view.mm_w - 40)
+            make.height.equalTo(300)
+            make.left.equalToSuperview().offset(20)
+            make.top.equalToSuperview().offset(self.view.mm_h - 300 - 120)
+        }
+        
         exitButton.snp.remakeConstraints { make in
             let width = exitButton.frame.size.width + 12 * 2
             make.trailing.equalTo(-12)
@@ -309,35 +344,41 @@ class TUIRoomMainViewController: UIViewController {
         }
 
         let bottomOffset = -kDeviceSafeBottomHeight - 20
-        let leftOffset = (view.mm_w - 284) / 4.0
-        muteAudioButton.snp.remakeConstraints { make in
+        let leftOffset = (view.frame.size.width - 284) / 5.5
+        msgInputButton.snp.remakeConstraints { make in
             make.left.equalTo(view).offset(12)
             make.bottom.equalTo(view).offset(bottomOffset)
-            make.width.height.equalTo(52)
+            make.width.height.equalTo(45)
+        }
+        
+        muteAudioButton.snp.remakeConstraints { make in
+            make.left.equalTo(msgInputButton.snp.right).offset(leftOffset)
+            make.bottom.equalTo(view).offset(bottomOffset)
+            make.width.height.equalTo(45)
         }
 
         muteVideoButton.snp.remakeConstraints { make in
             make.left.equalTo(muteAudioButton.snp.right).offset(leftOffset)
             make.bottom.equalTo(view).offset(bottomOffset)
-            make.width.height.equalTo(52)
+            make.width.height.equalTo(45)
         }
 
         beautyButton.snp.remakeConstraints { make in
             make.left.equalTo(muteVideoButton.snp.right).offset(leftOffset)
             make.bottom.equalTo(view).offset(bottomOffset)
-            make.width.height.equalTo(52)
+            make.width.height.equalTo(45)
         }
 
         membersButton.snp.remakeConstraints { make in
             make.left.equalTo(beautyButton.snp.right).offset(leftOffset)
             make.bottom.equalTo(view).offset(bottomOffset)
-            make.width.height.equalTo(52)
+            make.width.height.equalTo(45)
         }
 
         moreSettingButton.snp.remakeConstraints { make in
             make.left.equalTo(membersButton.snp.right).offset(leftOffset)
             make.bottom.equalTo(view).offset(bottomOffset)
-            make.width.height.equalTo(52)
+            make.width.height.equalTo(45)
         }
 
         pageControl.snp.makeConstraints { make in
@@ -361,6 +402,7 @@ class TUIRoomMainViewController: UIViewController {
         membersButton.addTarget(self, action: #selector(membersButtonClick), for: .touchUpInside)
         moreSettingButton.addTarget(self, action: #selector(moreSettingButtonClick), for: .touchUpInside)
         reportButton.addTarget(self, action: #selector(reportClick), for: .touchUpInside)
+        msgInputButton.addTarget(self, action: #selector(exitMsgButtonClick(sender:)), for: .touchUpInside)
     }
 
     deinit {

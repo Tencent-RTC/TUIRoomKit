@@ -146,6 +146,10 @@ extension TUIRoomMainViewController {
         TUIRoom.sharedInstance.isEnterRoom = false
     }
     
+    @objc func exitMsgButtonClick(sender: UIButton) {
+        barrageSendView.isHidden = false
+    }
+    
     @objc
     func reportClick() {
         let selector = NSSelectorFromString("showReportAlertWithRoomId:ownerId:")
