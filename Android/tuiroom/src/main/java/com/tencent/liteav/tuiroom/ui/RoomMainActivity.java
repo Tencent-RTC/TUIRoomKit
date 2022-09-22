@@ -2,6 +2,7 @@ package com.tencent.liteav.tuiroom.ui;
 
 import static com.tencent.liteav.debug.GenerateTestUserSig.XMAGIC_LICENSE_KEY;
 import static com.tencent.liteav.debug.GenerateTestUserSig.XMAGIC_LICENSE_URL;
+import static com.tencent.qcloud.tuicore.util.ScreenUtil.dip2px;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,8 +14,10 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -103,6 +106,8 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     private View                         mScreenCaptureGroup;
     private Group                        mBottomToolBarGroup;
     private TextView                     mStopScreenCaptureTv;
+    private RelativeLayout               mLayoutBarrageSend;
+    private RelativeLayout               mLayoutBarrageShow;
     private View                         mFloatingWindow;
     private Context                      mContext;
     private boolean                      isScreenCapture;
@@ -385,6 +390,8 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         mStubRemoteUserView = (ViewStub) findViewById(R.id.view_stub_remote_user);
         mStubRemoteUserView.inflate();
         mRemoteUserView = (RemoteUserListView) findViewById(R.id.view_remote_user);
+        mLayoutBarrageSend = findViewById(R.id.rl_barrage_send);
+        mLayoutBarrageShow = findViewById(R.id.rl_barrage_show);
         initRemoteMemberView();
         mFeatureSettingFragmentDialog = new FeatureSettingFragmentDialog();
         mFeatureSettingFragmentDialog.setTUIRoomCore(mTUIRoomCore);
@@ -481,6 +488,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         map.put(TUIConstants.TUIBeauty.PARAM_NAME_LICENSE_URL, XMAGIC_LICENSE_URL);
         map.put(TUIConstants.TUIBeauty.PARAM_NAME_LICENSE_KEY, XMAGIC_LICENSE_KEY);
         TUICore.callService(TUIConstants.TUIBeauty.SERVICE_NAME, TUIConstants.TUIBeauty.METHOD_INIT_XMAGIC, map);
+        initBarrage(String.valueOf(mRoomId));
     }
 
     @Override
@@ -1428,4 +1436,44 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
             finish();
         }
     };
+
+    private void initBarrage(String groupId) {
+        HashMap<String, Object> barrageParaMap = new HashMap<>();
+        barrageParaMap.put("context", this);
+        barrageParaMap.put("groupId", groupId);
+        Map<String, Object> barrageRetMap = TUICore.getExtensionInfo(
+                "com.tencent.qcloud.tuikit.tuibarrage.core.TUIBarrageExtension", barrageParaMap);
+        if (barrageRetMap != null && barrageRetMap.size() > 0) {
+            Object barrageSendView = barrageRetMap.get("TUIBarrageButton");
+            if (barrageSendView instanceof View) {
+                setBarrageSend((View) barrageSendView);
+            } else {
+                Log.i(TAG, "TUIBarrage barrageSendView getExtensionInfo not find");
+            }
+
+            Object barrageDisplayView = barrageRetMap.get("TUIBarrageDisplayView");
+            if (barrageDisplayView instanceof View) {
+                setBarrageShow((View) barrageDisplayView);
+                Log.i(TAG, "TUIBarrage TUIBarrageDisplayView getExtensionInfo success");
+            } else {
+                Log.i(TAG, "TUIBarrage TUIBarrageDisplayView getExtensionInfo not find");
+            }
+        } else {
+            Log.i(TAG, "TUIBarrage getExtensionInfo null");
+        }
+    }
+
+    private void setBarrageSend(View view) {
+        RelativeLayout.LayoutParams params = new RelativeLayout
+                .LayoutParams(dip2px(getResources().getDimensionPixelSize(R.dimen.tuiroom_icon_width)),
+                dip2px(getResources().getDimensionPixelSize(R.dimen.tuiroom_icon_height)));
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        mLayoutBarrageSend.addView(view, params);
+    }
+
+    private void setBarrageShow(View view) {
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        mLayoutBarrageShow.addView(view, params);
+    }
 }

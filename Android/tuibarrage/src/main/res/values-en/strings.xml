@@ -1,0 +1,7 @@
+<resources>
+    <string name="tuibarrage_input_hint">Please enter barrage</string>
+    <string name="tuibarrage_btn_send">Send</string>
+    <string name="tuibarrage_me">Me</string>
+    <string name="tuibarrage_agree">Agree</string>
+    <string name="tuibarrage_warning_not_empty">"input can't be empty!"</string>
+</resources>

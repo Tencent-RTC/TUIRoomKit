@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tuibarrage_color_white">#FFFFFFFF</color>
+    <color name="tuibarrage_color_black">#000000</color>
+    <color name="tuibarrage_color_half_black">#44777777</color>
+    <color name="tuibarrage_bg_send_view">#B4FFFFFF</color>
+    <color name="tuichorus_transparent">#00000000</color>
+
+    <!--    消息的颜色-->
+    <color name="tuibarrage_color_msg_1">#3074FD</color>
+    <color name="tuibarrage_color_msg_2">#3CCFA5</color>
+    <color name="tuibarrage_color_msg_3">#FF8607</color>
+    <color name="tuibarrage_color_msg_4">#F7AF97</color>
+    <color name="tuibarrage_color_msg_5">#FF8BB7</color>
+    <color name="tuibarrage_color_msg_6">#FC6091</color>
+    <color name="tuibarrage_color_msg_7">#FCAF41</color>
+</resources>
