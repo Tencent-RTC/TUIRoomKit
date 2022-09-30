@@ -34,6 +34,7 @@ export type UserInfo = {
 
 interface RoomState {
   localUser: UserInfo,
+  localStream: StreamInfo,
   remoteUserObj: Record<string, UserInfo>,
   isDefaultOpenCamera: boolean,
   isDefaultOpenMicrophone: boolean,
@@ -63,6 +64,14 @@ export const useRoomStore = defineStore('room', {
       },
       screenStreamInfo: null,
     },
+    localStream: {
+      isAudioStreamAvailable: false,
+      isVideoStreamAvailable: false,
+      type: 'main',
+      userAvatar: '',
+      userId: '',
+      userName: '',
+    },
     remoteUserObj: {},
     isDefaultOpenCamera: false,
     isDefaultOpenMicrophone: false,
@@ -78,10 +87,10 @@ export const useRoomStore = defineStore('room', {
     speakerList: [],
   }),
   getters: {
-    localStream: (state) => {
-      const { userId, userAvatar, userName, mainStreamInfo } = state.localUser;
-      return { userId, userAvatar, userName, ...mainStreamInfo };
-    },
+    // localStream: (state) => {
+    //   const { userId, userAvatar, userName, mainStreamInfo } = state.localUser;
+    //   return { userId, userAvatar, userName, ...mainStreamInfo };
+    // },
     remoteUserList: (state) => {
       return Object.values(state.remoteUserObj);
     },
@@ -117,10 +126,10 @@ export const useRoomStore = defineStore('room', {
   actions: {
     setLocalUser(obj: Record<string, any>) {
       Object.assign(this.localUser, obj);
+      Object.assign(this.localStream, obj);
     },
     updateLocalStream(obj: StreamInfo) {
-      console.log('lixin-debug this.localUser.mainStreamInfo', this.localUser, this.localUser.mainStreamInfo, obj);
-      Object.assign(this.localUser.mainStreamInfo as StreamInfo, obj);
+      Object.assign(this.localStream, obj);
     },
     // 远端用户进入房间（IM事件）
     addRemoteUser(userInfo: {

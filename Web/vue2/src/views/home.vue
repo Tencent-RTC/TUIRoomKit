@@ -52,11 +52,11 @@ export default {
     }
   },
   methods: {
-    setTUIRoomData(action) {
+    setTUIRoomData(action, mode) {
       const roomParam = this.$refs.streamPreviewRef.getRoomParam();
       const roomData = {
         action,
-        roomMode: 'FreeSpeech',
+        roomMode: mode || 'FreeSpeech',
         roomParam,
       };
       sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(roomData));
@@ -71,8 +71,8 @@ export default {
       return roomId;
     },
     // 处理点击【创建房间】
-    async handleCreateRoom() {
-      this.setTUIRoomData('createRoom');
+    async handleCreateRoom(mode) {
+      this.setTUIRoomData('createRoom', mode);
       const roomId = await this.generateRoomId();
       this.$router.push({ path: 'room', query: { roomId } });
     },
