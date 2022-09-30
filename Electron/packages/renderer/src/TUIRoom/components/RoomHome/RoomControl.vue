@@ -4,10 +4,10 @@
       <img class="logo" :src="logo">
       <!-- query 中存在 roomId -->
       <div v-if="hasGivenRoomId" class="control-region">
-        <span class="invite-title">是否进入房间？</span>
-        <span class="invite-info">{{ `您被邀请进入 ${givenRoomId} 房间` }}</span>
+        <span class="invite-title">{{ t('Join the room ?') }}</span>
+        <span class="invite-info">{{ t('You are invited to room ') }}{{ `${givenRoomId} ` }}{{ t('Room') }}</span>
         <div class="button enter-given-room-button" @click="enterGivenRoom">
-          <span class="title">确定进入</span>
+          <span class="title">{{ t('Join') }}</span>
         </div>
       </div>
       <!-- query 中没有 roomId -->
@@ -20,23 +20,23 @@
         >
           <div class="create-room">
             <svg-icon icon-name="add-icon"></svg-icon>
-            <span class="title">新建房间</span>
+            <span class="title">{{ t('New Room') }}</span>
           </div>
           <div class="connect-region"></div>
           <div v-show="showCreateRoomOption" class="create-room-mode">
             <div class="create-room-option" @click="createRoom('FreeSpeech')">
               <svg-icon class="icon" icon-name="free-speech-icon"></svg-icon>
-              <span class="title">自由发言房间</span>
+              <span class="title">{{ t('Free Speech Room') }}</span>
             </div>
             <div class="create-room-option" @click="createRoom('ApplySpeech')">
               <svg-icon class="icon" icon-name="apply-speech-icon"></svg-icon>
-              <span class="title">举手发言房间</span>
+              <span class="title">{{ t('Raise Hand Room') }}</span>
             </div>
           </div>
         </div>
         <div class="button join-room-button" type="primary" @click="enterRoom">
-          <input v-model="roomId" class="input" placeholder="输入房间号" maxlength="10" @click.stop="">
-          <span class="title">进入房间</span>
+          <input v-model="roomId" class="input" :placeholder="t('Enter room ID')" maxlength="10" @click.stop="">
+          <span class="title">{{ t('Join Room') }}</span>
         </div>
       </div>
     </div>
@@ -44,9 +44,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import logo from '../../assets/imgs/logo.png';
+import { ref, watch, computed } from 'vue';
+import logoCn from '../../assets/imgs/logo.png';
+import logoEn from '../../assets/imgs/logo-en.png';
 import SvgIcon from '../common/SvgIcon.vue';
+import i18n from '../../../TUIRoom/locales/index';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
   givenRoomId: string | null,
@@ -54,8 +57,12 @@ const props = defineProps<{
 
 const hasGivenRoomId = typeof props.givenRoomId === 'string' && props.givenRoomId !== '';
 
+const logo = computed(() => (i18n.global.locale.value === 'zh-CN' ? logoCn : logoEn));
+
 const roomId = ref('');
 const showCreateRoomOption = ref(false);
+
+const { t } = useI18n();
 
 function handleMouseEnter() {
   showCreateRoomOption.value = true;
@@ -110,7 +117,6 @@ function enterRoom() {
     top: 78px;
     left: 50%;
     width: 318px;
-    height: 42px;
     transform: translate(-50%);
   }
   .control-region {
@@ -232,8 +238,10 @@ function enterRoom() {
       padding: 0 20px;
     }
     .title {
-      margin-left: 28px;
       cursor: pointer;
+      text-align: center;
+      display: inline-block;
+      width: 135px;
     }
   }
 }

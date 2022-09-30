@@ -10,6 +10,7 @@
       "dev": "node scripts/watch.mjs",
       "prebuild": "node scripts/build.mjs",
       "build": "electron-builder",
+      "build:mac-universal": "electron-builder build --mac --universal",
       "init": "git config core.hooksPath .git/hooks/ && rm -rf .git/hooks && npx simple-git-hooks",
       "test:e2e": "npx playwright test",
       "test:e2e:headless": "npx playwright test --headed"
@@ -40,8 +41,8 @@
       "@typescript-eslint/eslint-plugin": "^5.19.0",
       "@typescript-eslint/parser": "^5.19.0",
       "@vitejs/plugin-vue": "^2.1.0",
-      "electron": "18.0.2",
-      "electron-builder": "^23.0.3",
+      "electron": "^18.3.9",
+      "electron-builder": "^23.3.3",
       "eslint": "^8.13.0",
       "eslint-config-tencent": "^1.0.4",
       "eslint-plugin-import": "^2.26.0",

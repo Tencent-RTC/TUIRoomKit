@@ -1,22 +1,28 @@
 <template>
-  <div class="end-button" tabindex="1" @click="stopMeeting">结束会议</div>
+  <div class="end-button" tabindex="1" @click="stopMeeting">{{ t('End') }}</div>
   <el-dialog
     :model-value="visible"
     custom-class="custom-element-class"
     :title="title"
     :modal="true"
-    :append-to-body="true"
+    :append-to-body="false"
     width="420px"
     :before-close="cancel"
   >
     <div v-if="currentDialogType === DialogType.BasicDialog">
-      <span v-if="basicInfo.role === ETUIRoomRole.MASTER">您当前是房间主持人，请选择相应操作。若选择“离开房间”，则房间不会解散，您需要指定新主持人。</span>
-      <span v-else>确定离开房间吗？</span>
+      <span v-if="basicInfo.role === ETUIRoomRole.MASTER">
+        <!-- eslint-disable-next-line max-len -->
+        {{ t('You are currently the room host, please select the appropriate action.If you select "Leave Room", the room will not be dissolved and you will need to appoint a new host.') }}
+      </span>
+      <span v-else>{{ t('Are you sure you want to leave this room?') }}</span>
     </div>
     <div v-if="currentDialogType === DialogType.TransferDialog">
-      <div>选择主持人</div>
+      <div>{{ t('New host') }}</div>
       <div>
-        <el-select v-model="selectedUser">
+        <el-select
+          v-model="selectedUser"
+          :teleported="false"
+        >
           <el-option
             v-for="user in remoteAnchorList"
             :key="user.userId"
@@ -28,13 +34,15 @@
     </div>
     <template #footer>
       <div v-if="currentDialogType === DialogType.BasicDialog">
-        <el-button v-if="basicInfo.role === ETUIRoomRole.MASTER" type="primary" @click="dismissRoom">解散房间</el-button>
-        <el-button v-if="showLeaveRoom" type="primary" @click="leaveRoom">离开房间</el-button>
-        <el-button @click="cancel">取消</el-button>
+        <el-button v-if="basicInfo.role === ETUIRoomRole.MASTER" type="primary" @click="dismissRoom">
+          {{ t('Dismiss') }}
+        </el-button>
+        <el-button v-if="showLeaveRoom" type="primary" @click="leaveRoom">{{ t('Leave') }}</el-button>
+        <el-button @click="cancel">{{ t('Cancel') }}</el-button>
       </div>
       <div v-if="currentDialogType === DialogType.TransferDialog">
-        <el-button type="primary" @click="transferAndLeave">移交并离开</el-button>
-        <el-button @click="cancel">取消</el-button>
+        <el-button type="primary" @click="transferAndLeave">{{ t('Transfer and leave') }}</el-button>
+        <el-button @click="cancel">{{ t('Cancel') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -49,6 +57,9 @@ import { useBasicStore } from '../../stores/basic';
 import { useRoomStore } from '../../stores/room';
 import { computed } from '@vue/reactivity';
 import { storeToRefs } from 'pinia';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const logPrefix = '[EndControl]';
 
@@ -67,8 +78,7 @@ logger.log(`${logPrefix} basicInfo:`, basicInfo);
 const roomStore = useRoomStore();
 const { remoteAnchorList } = storeToRefs(roomStore);
 
-const title = computed(() => (currentDialogType.value === DialogType.BasicDialog ? '是否要离开房间' : '请选择新的房间主持人'));
-
+const title = computed(() => (currentDialogType.value === DialogType.BasicDialog ? t('Leave room?') : t('Select a new host')));
 const showLeaveRoom = computed(() => (
   basicInfo.role ===  ETUIRoomRole.MASTER && remoteAnchorList.value.length > 0)
   || basicInfo.role !== ETUIRoomRole.MASTER);
@@ -133,7 +143,8 @@ async function transferAndLeave() {
     let response = await TUIRoomCore.transferRoomMaster(userId);
     logger.log(`${logPrefix}transferAndLeave:`, response);
     response = await TUIRoomCore.exitRoom();
-    logger.log(`${logPrefix}transferAndLeave:`, response);
+    await TUIRoomCore.logout();
+    logger.log(`${logPrefix}exitRoom:`, response);
     resetState();
     emit('onExitRoom', { code: 0, message: '' });
   } catch (error) {
@@ -147,10 +158,12 @@ const onRoomDestroyed = async () => {
     return;
   }
   try {
-    ElMessageBox.alert('主持人结束会议，已解散房间', '通知', {
-      confirmButtonText: '确认',
-      callback: () => {
+    ElMessageBox.alert(t('The host closed the room.'), t('Note'), {
+      customClass: 'custom-element-class',
+      confirmButtonText: t('Confirm'),
+      callback: async () => {
         resetState();
+        await TUIRoomCore.logout();
         emit('onDestroyRoom', { code: 0, message: '' });
       },
     });
@@ -159,18 +172,21 @@ const onRoomDestroyed = async () => {
   }
 };
 // 收到主持人移交权限通知
-const onRoomMasterChanged = async (newOwnerID:string) => {
+const onRoomMasterChanged = async (newOwner: { newOwnerId: string, newOwnerName: string }) => {
   // 新主持人
-  const tipMessage =  `主持人已变更为${newOwnerID}`;
+  const newOwnerId = newOwner?.newOwnerId;
+  const newOwnerName = newOwner?.newOwnerName;
+  const newName = newOwnerName || newOwnerId;
+  const tipMessage =  `${t('Moderator changed to ')}${newName}`;
   ElMessage({
     type: 'success',
     message: tipMessage,
   });
-  basicInfo.masterUserId = newOwnerID;
+  basicInfo.masterUserId = newOwnerId;
   if (basicInfo.userId === basicInfo.masterUserId) {
     basicInfo.role = ETUIRoomRole.MASTER;
   } else {
-    roomStore.setRemoteUserRole(newOwnerID, ETUIRoomRole.MASTER);
+    roomStore.setRemoteUserRole(newOwnerId, ETUIRoomRole.MASTER);
   }
   resetState();
 };
@@ -190,7 +206,6 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 @import '../../assets/style/var.scss';
 @import '../../assets/style/element-custom.scss';
-
   .end-button {
     width: 90px;
     height: 40px;

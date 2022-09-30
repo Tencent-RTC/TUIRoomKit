@@ -4,37 +4,41 @@ import { BaseCommon } from './BaseCommon';
 import { MixinsClass } from './utils/utils';
 import { ParametersError, conditionsError } from './common/trtcCode';
 
-// eslint-disable-next-line new-cap
+/**
+ * CDN 相关接口<br>
+ * @memberof TRTCClouds
+ */
 class MixCDN extends MixinsClass(BaseCommon) {
-  // ///////////////////////////////////////////////////////////////////////////////
-  //
-  //                      （二）CDN 相关接口函数
-  //
-  // ///////////////////////////////////////////////////////////////////////////////
   /**
-   * 2.1 开始向腾讯云的直播 CDN 推流
-   *
+   * 开始向腾讯云的直播 CDN 推流<br>
    * 该接口会指定当前用户的音视频流在腾讯云 CDN 所对应的 StreamId，进而可以指定当前用户的 CDN 播放地址。
    *
    * 例如：如果我们采用如下代码设置当前用户的主画面 StreamId 为 user_stream_001，那么该用户主画面对应的 CDN 播放地址为：
-   * “http://yourdomain/live/user_stream_001.flv”，其中 yourdomain 为您自己备案的播放域名，
+   * `http://yourdomain/live/user_stream_001.flv`，其中 yourdomain 为您自己备案的播放域名，
    * 您可以在直播[控制台](https://console.cloud.tencent.com/live) 配置您的播放域名，腾讯云不提供默认的播放域名。
    *
    * 您也可以在设置 enterRoom 的参数 TRTCParams 时指定 streamId, 而且我们更推荐您采用这种方案。
    *
    * 注意：您需要先在实时音视频 [控制台](https://console.cloud.tencent.com/trtc/) 中的功能配置页开启“启动自动旁路直播”才能生效。
    *
-   * @example
-   * let trtcCloud = TRTCCloud.getTRTCShareInstance();
-   * trtcCloud.enterRoom(params, TRTCAppScene.TRTCAppSceneLIVE);
-   * trtcCloud.startLocalPreview(view);
-   * trtcCloud.startLocalAudio(TRTCAudioQuality.TRTCAudioQualityDefault);
-   * trtcCloud.startPublishing("user_stream_001", TRTCVideoStreamType.TRTCVideoStreamTypeBig);
-   *
-   *
    * @param {String} streamId - 自定义流 ID。
    * @param {TRTCVideoStreamType} type - 仅支持 TRTCVideoStreamTypeBig 和 TRTCVideoStreamTypeSub。
-   * TODO: type 在 WebRTC 中没有意义
+   * @memberof TRTCCloud
+   * @returns {Promise}
+   * @example
+   * import TRTCCloud, { TRTCAppScene, WebRTCAudioQuality, TRTCVideoStreamType } from 'trtc-cloud-js-sdk';
+   * const trtcCloud = TRTCCloud.getTRTCShareInstance();
+   * const params = {
+   *   sdkAppId: 0,
+   *   userId: 'denny',
+   *   roomId: 12345,
+   *   userSig: 'xxx'
+   * };
+   * trtcCloud.enterRoom(params, TRTCAppScene.TRTCAppSceneVideoCall);
+   * const view = document.createElement('local-view');
+   * trtcCloud.startLocalPreview(view);
+   * trtcCloud.startLocalAudio(WebRTCAudioQuality.WebRTCAudioQualityStandard);
+   * trtcCloud.startPublishing("user_stream_001", TRTCVideoStreamType.TRTCVideoStreamTypeBig);
    */
   // eslint-disable-next-line
   async startPublishing(streamId: string, type: TRTCVideoStreamType) {
@@ -57,12 +61,14 @@ class MixCDN extends MixinsClass(BaseCommon) {
       }
       const options = { streamId };
       await this.client.startPublishCDNStream(options);
-    } catch (error) {
+    } catch (error: any) {
       this.callFunctionErrorManage(error, 'startPublishing');
     }
   }
   /**
-   * 2.2 停止向腾讯云的直播 CDN 推流
+   * 停止向腾讯云的直播 CDN 推流<br>
+   * @returns {Promise}
+   * @memberof TRTCCloud
    */
   async stopPublishing() {
     try {
@@ -75,13 +81,12 @@ class MixCDN extends MixinsClass(BaseCommon) {
         return;
       }
       await this.client.stopPublishCDNStream();
-    } catch (error) {
+    } catch (error: any) {
       this.callFunctionErrorManage(error, 'stopPublishing');
     }
   }
   /**
-   * 2.3 开始向非腾讯云的直播 CDN 转推
-   *
+   * 开始向非腾讯云的直播 CDN 转推<br>
    * 该接口跟 startPublishing() 类似，但 startPublishCDNStream() 支持向非腾讯云的直播 CDN 转推。
    * 使用 startPublishing() 绑定腾讯云直播 CDN 不收取额外的费用。
    * 使用 startPublishCDNStream() 绑定非腾讯云直播 CDN 需要收取转推费用，且需要通过工单联系我们开通。
@@ -90,6 +95,8 @@ class MixCDN extends MixinsClass(BaseCommon) {
    * @param {Number} param.appId - 腾讯云 AppID
    * @param {Number} param.bizId - 腾讯云直播 bizId
    * @param {String} param.url   - 旁路转推的 URL
+   * @returns {Promise}
+   * @memberof TRTCCloud
    */
   async startPublishCDNStream(param: any) {
     try {
@@ -107,12 +114,14 @@ class MixCDN extends MixinsClass(BaseCommon) {
         this.log_.error(`(startPublishCDNStream) failed - ${JSON.stringify(param)}`);
         this.emitError(ParametersError);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.callFunctionErrorManage(error, 'startPublishCDNStream');
     }
   }
   /**
-   * 2.4 停止向非腾讯云的直播 CDN 推流
+   * 停止向非腾讯云的直播 CDN 推流<br>
+   * @returns {Promise}
+   * @memberof TRTCCloud
    */
   async stopPublishCDNStream() {
     try {
@@ -125,7 +134,7 @@ class MixCDN extends MixinsClass(BaseCommon) {
         return;
       }
       await this.client.stopPublishCDNStream();
-    } catch (error) {
+    } catch (error: any) {
       this.callFunctionErrorManage(error, 'stopPublishCDNStream');
     }
   }

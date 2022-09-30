@@ -1,16 +1,16 @@
 <template>
   <div class="more-container">
-    <div class="more-notice">如果有任何问题欢迎加入我们的QQ群或者发送邮件</div>
+    <div class="more-notice">{{ t('Join our QQ group chat or email us.') }}</div>
     <div class="more-content">
       <div class="more-item">
-        <span class="more-title">QQ群</span>
+        <span class="more-title">QQ {{ t('group chat') }}</span>
         <div class="input-area">
           <input class="input" type="text" :value="groupNumber">
           <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(groupNumber)"></svg-icon>
         </div>
       </div>
       <div class="more-item">
-        <span class="more-title">邮箱地址</span>
+        <span class="more-title">{{ t('Email') }}</span>
         <div class="input-area">
           <input class="input" type="text" :value="email">
           <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(email)"></svg-icon>
@@ -21,11 +21,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useBasicStore } from '../../stores/basic';
 import { ElMessage } from 'element-plus';
+import { useI18n } from 'vue-i18n';
+import SvgIcon from '../common/SvgIcon.vue';
 
-const basicStore = useBasicStore();
+const { t } = useI18n();
 
 const groupNumber = '592465424';
 const email = 'tylerding@tencent.com';
@@ -33,7 +33,7 @@ const email = 'tylerding@tencent.com';
 function onCopy(value: string | number) {
   navigator.clipboard.writeText(`${value}`);
   ElMessage({
-    message: '复制成功',
+    message: t('Copied successfully'),
     type: 'success',
   });
 }

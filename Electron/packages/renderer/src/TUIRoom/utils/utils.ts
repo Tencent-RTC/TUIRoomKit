@@ -84,3 +84,48 @@ export function exitFullScreen() {
     exitFullScreenDocument.webkitExitFullscreen();
   }
 }
+
+
+/**
+ * 从 window.location.href 中获取指定key的value
+ * @param {*} key 要获取的 key
+ * @returns window.location.href 中指定key对应的value
+ * @example
+ * const value = getUrlParam(key);
+ */
+export function getUrlParam(key: string) {
+  const url = window.location.href.replace(/^[^?]*\?/, '');
+  const regexp = new RegExp(`(^|&)${key}=([^&#]*)(&|$|)`, 'i');
+  const paramMatch = url.match(regexp);
+
+  return paramMatch ? paramMatch[2] : null;
+}
+
+
+/**
+ * 深拷贝
+ * @param data 任意类型的 data 原数据
+ * @returns 深拷贝之后的数据
+ */
+export function deepClone(data: any) {
+  let res: any = null;
+  const reference = [Date, RegExp, Set, WeakSet, Map, WeakMap, Error];
+  if (reference.includes(data?.constructor)) {
+    res = new data.constructor(data);
+  } else if (Array.isArray(data)) {
+    res = [];
+    data.forEach((e, i) => {
+      res[i] = deepClone(e);
+    });
+  } else if (typeof data === 'object' && data !== null) {
+    res = {};
+    Object.keys(data).forEach((key) => {
+      if (Object.hasOwnProperty.call(data, key)) {
+        res[key] = deepClone(data[key]);
+      }
+    });
+  } else {
+    res = data;
+  }
+  return res;
+}

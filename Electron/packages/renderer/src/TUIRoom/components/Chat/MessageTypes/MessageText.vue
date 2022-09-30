@@ -1,19 +1,16 @@
 <template>
   <template v-for="(item, index) in handleTextMessageShowContext(props.data)" :key="index">
-    <span class="text-box" v-if="item.name === 'text'">{{ item.text }}</span>
-    <img class="text-img" v-else-if="item.name === 'img'" :src="item.src"/>
+    <span v-if="item.name === 'text'" class="text-box">{{ item.text }}</span>
+    <img v-else-if="item.name === 'img'" class="text-img" :src="item.src" />
   </template>
 </template>
 
 <script setup lang="ts">
-  import { decodeMessageText } from '../util';
+import { decodeMessageText } from '../util';
 
-  const props = defineProps(['data'])
+const props = defineProps(['data']);
 
-  const handleTextMessageShowContext = (text: string) => {
-    let result = decodeMessageText(text);
-    return result;
-  }
+const handleTextMessageShowContext = (text: string) => decodeMessageText(text);
 
 </script>
 

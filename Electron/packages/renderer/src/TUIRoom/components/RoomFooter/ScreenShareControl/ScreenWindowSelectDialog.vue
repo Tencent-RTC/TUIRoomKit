@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :model-value="visible"
-    title="选择屏幕/窗口"
+    :title="t('Select a screen or window first')"
     :modal="true"
     :append-to-body="true"
     :before-close="cancel"
@@ -9,7 +9,7 @@
     custom-class="screen-window-select-dialog custom-element-class"
   >
     <div class="content">
-      <h3>屏幕</h3>
+      <h3>{{ t('Screen') }}</h3>
       <ul class="screen-list">
         <screen-window-previewer
           v-for="item in screenList"
@@ -20,7 +20,7 @@
           @click="onSelect(item)"
         />
       </ul>
-      <h3>窗口</h3>
+      <h3>{{ t('Window') }}</h3>
       <ul class="window-list">
         <screen-window-previewer
           v-for="item in windowList"
@@ -34,8 +34,8 @@
     </div>
     <template #footer>
       <span>
-        <el-button type="primary" @click="start">开始分享</el-button>
-        <el-button type="default" @click="cancel">取消</el-button>
+        <el-button type="primary" @click="start">{{ t('Share') }}</el-button>
+        <el-button type="default" @click="cancel">{{ t('Cancel') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -46,6 +46,9 @@ import { ElMessage } from 'element-plus';
 import { TRTCScreenCaptureSourceInfo } from '../../../tui-room-core';
 import ScreenWindowPreviewer from './ScreenWindowPreviewer.vue';
 import { MESSAGE_DURATION } from '../../../constants/message';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 interface Props {
   visible: boolean;
@@ -70,7 +73,7 @@ function start() {
   } else {
     ElMessage({
       type: 'warning',
-      message: '请选择要分享的屏幕或者窗口',
+      message: t('Select a screen or window first'),
       duration: MESSAGE_DURATION.LONG,
     });
   }

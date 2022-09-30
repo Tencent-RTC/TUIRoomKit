@@ -1,19 +1,16 @@
-/* eslint-disable no-underscore-dangle */
 import { TRTCBeautyStyle } from './common/trtc_define';
 import { BaseCommon } from './BaseCommon';
 import { MixinsClass } from './utils/utils';
 // @ts-ignore
 import RTCBeautyPlugin from 'rtc-beauty-plugin';
 
-// eslint-disable-next-line new-cap
+/**
+ * 美颜相关接口<br>
+ * @memberof TRTCClouds
+ */
 class Beauty extends MixinsClass(BaseCommon) {
-  // ///////////////////////////////////////////////////////////////////////////////
-  //
-  //                      （七）图像前处理相关接口函数
-  //
-  // ///////////////////////////////////////////////////////////////////////////////
   /**
-   * 7.1 设置美颜、美白、红润效果级别
+   * 设置美颜、美白、红润效果级别
    *
    * SDK 内部集成了两套风格不同的磨皮算法，一套我们取名叫“光滑”，适用于美女秀场，效果比较明显。
    * 另一套我们取名“自然”，磨皮算法更多地保留了面部细节，主观感受上会更加自然。
@@ -24,6 +21,9 @@ class Beauty extends MixinsClass(BaseCommon) {
    * @param {Number} beauty    - 美颜级别，取值范围0 - 9，0表示关闭，1 - 9值越大，效果越明显
    * @param {Number} white     - 美白级别，取值范围0 - 9，0表示关闭，1 - 9值越大，效果越明显
    * @param {Number} ruddiness - 红润级别，取值范围0 - 9，0表示关闭，1 - 9值越大，效果越明显，该参数 windows 平台暂未生效
+   *
+   * @returns {Promise}
+   * @memberof TRTCCloud
    */
   async setBeautyStyle(style: TRTCBeautyStyle, beauty: number, white: number, ruddiness: number) {
     try {
@@ -43,7 +43,7 @@ class Beauty extends MixinsClass(BaseCommon) {
         ruddy: ruddiness * factor || this.beautyDefaultRuddy,
       };
       this.beautyPlugin.setBeautyParam(params);
-    } catch (error) {
+    } catch (error: any) {
       this.callFunctionErrorManage(error, 'setBeautyStyle');
     }
   }
@@ -53,7 +53,7 @@ class Beauty extends MixinsClass(BaseCommon) {
       if (this.beautyPlugin) {
         this.beautyPlugin.destroy();
       }
-    } catch (error) {
+    } catch (error: any) {
       this.callFunctionErrorManage(error, 'destroyBeautyPlugin');
     }
   }

@@ -2,7 +2,7 @@
   <div class="apply-control-container">
     <icon-button
       ref="masterApplyControlRef"
-      title="举手"
+      :title="t('Raise hand')"
       :icon-name="ICON_NAME.ApplyOnSeat"
       @click-icon="toggleApplySpeech"
     />
@@ -12,23 +12,23 @@
     </div>
     <div v-show="showApplyUserList" ref="masterApplyListRef" class="apply-list-container">
       <div class="title-container">
-        <span class="title">请求上台申请</span>
+        <span class="title">{{ t('Apply to stage application') }}</span>
         <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyList"></svg-icon>
       </div>
       <div class="apply-list">
         <div v-for="(item, index) in applyToAnchorList" :key="index" class="apply-item">
           <div class="user-info">
-            <img class="user-avatar" :src="item.userAvatar">
-            <span class="user-name">{{ item.userName || item.userId }}</span>
+            <img class="user-avatar" :src="item.userAvatar || defaultAvatar">
+            <span class="user-name" :title="item.userName || item.userId">{{ item.userName || item.userId }}</span>
           </div>
           <div class="control-container">
-            <div class="button primary" @click="handleUserApply(item.userId, true)">同意</div>
-            <div class="button outline" @click="handleUserApply(item.userId, false)">拒绝</div>
+            <div class="button primary" @click="handleUserApply(item.userId, true)">{{ t('Agree') }}</div>
+            <div class="button outline" @click="handleUserApply(item.userId, false)">{{ t('Reject') }}</div>
           </div>
         </div>
       </div>
       <div class="apply-footer">
-        <div class="button outline deny-all" @click="denyAllUserApply">全部拒绝</div>
+        <div class="button outline deny-all" @click="denyAllUserApply">{{ t('Reject All') }}</div>
       </div>
     </div>
   </div>
@@ -43,6 +43,10 @@ import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
+import { useI18n } from 'vue-i18n';
+import defaultAvatar from '../../../assets/imgs/avatar.png';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
@@ -175,6 +179,10 @@ onBeforeUnmount(() => {
             color: #7C85A6;
             line-height: 22px;
             margin-left: 9px;
+            max-width: 180px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
           }
         }
         .control-container {

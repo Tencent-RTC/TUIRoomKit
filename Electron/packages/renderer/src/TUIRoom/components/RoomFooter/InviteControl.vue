@@ -1,7 +1,7 @@
 <template>
   <div class="invite-control-container">
     <icon-button
-      title="邀请成员"
+      :title="t('Invite')"
       :icon-name="iconName"
       @click-icon="toggleInviteSidebar"
     />
@@ -14,9 +14,11 @@ import IconButton from '../common/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
+import { useI18n } from 'vue-i18n';
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);
+const { t } = useI18n();
 
 const iconName = computed(() => (sidebarName.value === 'invite' ? ICON_NAME.InviteActive : ICON_NAME.Invite));
 

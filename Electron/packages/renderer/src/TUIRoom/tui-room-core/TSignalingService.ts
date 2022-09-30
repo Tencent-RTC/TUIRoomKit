@@ -195,6 +195,7 @@ class TSignalingService {
           return null;
         })
         .catch((tsError: any) => {
+          logger.error(`${TSignalingService.logPrefix} invite error`, tsError);
           reject(tsError);
         });
     });
@@ -226,6 +227,7 @@ class TSignalingService {
       this.inviteInfoMap?.delete(key);
       return TUIRoomResponse.success(tsResponse);
     } catch (tsError: any) {
+      logger.error(`${TSignalingService.logPrefix} accept error`, tsError);
       throw new TUIRoomError(TUIRoomErrorCode.TIM_ERROR, tsError.message);
     }
   }
@@ -264,6 +266,7 @@ class TSignalingService {
       this.inviteInfoMap?.delete(key);
       return TUIRoomResponse.success(tsResponse);
     } catch (tsError: any) {
+      logger.error(`${TSignalingService.logPrefix} cancel error`, tsError);
       throw new TUIRoomError(TUIRoomErrorCode.TIM_ERROR, tsError.message);
     }
   }
@@ -294,6 +297,7 @@ class TSignalingService {
       this.inviteInfoMap?.delete(key);
       return TUIRoomResponse.success(tsResponse);
     } catch (tsError: any) {
+      logger.error(`${TSignalingService.logPrefix} reject error`, tsError);
       throw new TUIRoomError(TUIRoomErrorCode.TIM_ERROR, tsError.message);
     }
   }

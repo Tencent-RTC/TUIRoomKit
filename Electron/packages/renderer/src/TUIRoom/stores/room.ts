@@ -58,7 +58,9 @@ export const useRoomStore = defineStore('room', {
       mainStreamInfo: null,
       screenStreamInfo: null,
     },
-    localStream: {},
+    localStream: {
+      type: 'main',
+    },
     remoteUserMap: new Map(),
     isDefaultOpenCamera: false,
     isDefaultOpenMicrophone: false,
@@ -83,10 +85,10 @@ export const useRoomStore = defineStore('room', {
       [...state.remoteUserMap.values()].forEach((userInfo) => {
         const { userId, userAvatar, userName, mainStreamInfo, screenStreamInfo } = userInfo;
         if (mainStreamInfo) {
-          map.set(`${userId}_main`, { userId, userAvatar, userName, ...mainStreamInfo });
+          map.set(`${userId}_main`, Object.assign(mainStreamInfo, { userId, userAvatar, userName }));
         }
         if (screenStreamInfo) {
-          map.set(`${userId}_screen`, { userId, userAvatar, userName, ...screenStreamInfo });
+          map.set(`${userId}_screen`, Object.assign(screenStreamInfo, { userId, userAvatar, userName }));
         }
       });
       return map;
@@ -110,7 +112,7 @@ export const useRoomStore = defineStore('room', {
   actions: {
     setLocalUser(obj: Record<string, any>) {
       Object.assign(this.localUser, obj);
-      this.localStream = { type: 'main', ...obj };
+      Object.assign(this.localStream, obj);
     },
     updateLocalStream(obj: StreamInfo) {
       Object.assign(this.localStream, obj);
@@ -126,7 +128,7 @@ export const useRoomStore = defineStore('room', {
       if (!userId || userId === basicStore.userId || userId === `share_${basicStore.userId}`) {
         return;
       }
-      const newUser = {
+      let newUser: UserInfo = {
         userId,
         userName: name || '',
         userAvatar: avatar || '',
@@ -134,6 +136,13 @@ export const useRoomStore = defineStore('room', {
         screenStreamInfo: null,
         role: ETUIRoomRole.AUDIENCE,
       };
+      if (this.remoteUserMap.get(userId)) {
+        // addRemoteUser 会多次触发, 如果已存在时需保留已设置的状态。修复 Electron 端 bug
+        newUser = {
+          ...newUser,
+          ...this.remoteUserMap.get(userId)
+        };
+      }
       // 本端为主持人，则记录用户禁言禁画, 申请发言等信息
       if (basicStore.role === ETUIRoomRole.MASTER) {
         Object.assign(newUser, {
@@ -145,6 +154,14 @@ export const useRoomStore = defineStore('room', {
         });
       }
       this.remoteUserMap.set(userId, newUser);
+    },
+    updateRemoteUser(userId: string, newUserInfo: { nick: string, avatar: string }) {
+      const remoteUser = this.remoteUserMap.get(userId);
+      if (!remoteUser) {
+        return;
+      }
+      const { nick, avatar } = newUserInfo;
+      Object.assign(remoteUser, { userName: nick, userAvatar: avatar });
     },
     updateUserAVAbility(userInfo: {
       userId: string,
@@ -251,13 +268,13 @@ export const useRoomStore = defineStore('room', {
     setAudioVolume(audioVolumeArray: []) {
       const basicStore = useBasicStore();
       audioVolumeArray.forEach((audioVolumeItem: any) => {
-        const { userId, audioVolume } = audioVolumeItem;
-        if ((userId === basicStore.userId || userId === 'local') && this.localStream) {
-          this.localStream.audioVolume = audioVolume;
+        const { userId, volume } = audioVolumeItem;
+        if ((userId === basicStore.userId || userId === '') && this.localStream) {
+          this.localStream.audioVolume = volume;
         } else {
           const remoteUserInfo = this.remoteUserMap.get(userId);
           if (remoteUserInfo && remoteUserInfo.mainStreamInfo) {
-            remoteUserInfo.mainStreamInfo.audioVolume = audioVolume;
+            remoteUserInfo.mainStreamInfo.audioVolume = volume;
           }
         }
       });
@@ -391,6 +408,9 @@ export const useRoomStore = defineStore('room', {
         userName: '',
         mainStreamInfo: null,
         screenStreamInfo: null,
+      };
+      this.localStream = {
+        type: 'main',
       };
       this.remoteUserMap = new Map();
       this.isDefaultOpenCamera = false;

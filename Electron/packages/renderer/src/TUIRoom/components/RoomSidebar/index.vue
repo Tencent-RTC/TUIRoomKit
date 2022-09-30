@@ -27,22 +27,25 @@ import Chat from '../Chat/index.vue';
 import RoomInvite from '../RoomInvite/index.vue';
 import RoomMore from '../RoomMore/index.vue';
 import ManageMember from '../ManageMember/index.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
 
 const title = computed((): string | undefined => {
   if (sidebarName.value === 'chat') {
-    return '聊天';
+    return t('Chat');
   }
   if (sidebarName.value === 'invite') {
-    return '邀请成员';
+    return t('Invite');
   }
   if (sidebarName.value === 'more') {
-    return '联系我们';
+    return t('Contact us');
   }
   if (sidebarName.value === 'manage-member') {
-    return '成员管理';
+    return t('Member management');
   }
   return '';
 });

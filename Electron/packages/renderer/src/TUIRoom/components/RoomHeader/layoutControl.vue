@@ -25,7 +25,7 @@
           >
           </div>
         </div>
-        <span class="layout-title">一屏九等分</span>
+        <span class="layout-title">{{ t('Grid') }}</span>
       </div>
       <!-- 右侧成员列表 -->
       <div
@@ -43,7 +43,7 @@
             </div>
           </div>
         </div>
-        <span class="layout-title">右侧成员列表</span>
+        <span class="layout-title">{{ t('Gallery on right') }}</span>
       </div>
       <!-- 顶部成员列表 -->
       <div
@@ -61,7 +61,7 @@
           </div>
           <div class="bottom-container"></div>
         </div>
-        <span class="layout-title">顶部成员列表</span>
+        <span class="layout-title">{{ t('Gallery at top') }}</span>
       </div>
     </div>
   </div>
@@ -75,6 +75,9 @@ import { useBasicStore } from '../../stores/basic';
 import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
 import TUIRoomAegis from '../../utils/aegis';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const { layout } = storeToRefs(basicStore);

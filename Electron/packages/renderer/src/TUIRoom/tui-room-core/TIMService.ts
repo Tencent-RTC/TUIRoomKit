@@ -14,6 +14,7 @@ import {
 } from './constant';
 import { simpleClone } from './utils/utils';
 import TUIRoomConfig from './base/TUIRoomConfig';
+import { updateUserName } from '@/api/http';
 
 class TIMService {
   static logPrefix = '[TIMService]';
@@ -447,6 +448,10 @@ class TIMService {
       case TIM.TYPES.GRP_TIP_GRP_PROFILE_UPDATED:
         this.handleGroupProfileUpdate(message.payload);
         break;
+      // 处理群成员信息修改
+      case TIM.TYPES.GRP_TIP_MBR_PROFILE_UPDATED:
+        this.handleGroupMemberProfileUpdate(message.payload);
+        break;
       default:
         break;
     }
@@ -457,12 +462,16 @@ class TIMService {
     const { newGroupProfile } = message;
     // 判断是否为群主移交权限
     if(newGroupProfile.ownerID) {
-      this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged,newGroupProfile.ownerID);
+      const newOwnerInfo = message.memberList.find((item:any) => item.userID === newGroupProfile.ownerID);
+      this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged, { newOwnerId: newGroupProfile.ownerID, newOwnerName: newOwnerInfo.nick });
     }
   }
 
-
-
+  // todo: 处理群成员信息修改
+  private handleGroupMemberProfileUpdate(message: Record<string, any>) {
+    logger.log(`${TIMService.logPrefix}handleGroupMemberProfileUpdate message:`, message);
+  }
+  
   /**
    * /////////////////////////////////////////////////////////////////////////////////
    * //
@@ -498,20 +507,20 @@ class TIMService {
     }
   }
 
-  async sendCustomMessage(
-    type: string,
-    data: string
-  ): Promise<TUIRoomResponse<any>> {
+  async sendCustomMessage(options: {
+    data: string,
+    description: string,
+    extension?: string,
+  }): Promise<TUIRoomResponse<any>> {
     this.preCheckMethodCall();
+    if (!this.groupId) {
+      return TUIRoomResponse.success();
+    }
     try {
       const message = this.tim.createCustomMessage({
         to: this.groupId,
         conversationType: TIM.TYPES.CONV_GROUP,
-        payload: {
-          data,
-          description: type,
-          extension: '',
-        },
+        payload: options,
       });
       const imResponse = await this.tim.sendMessage(message);
       if (imResponse.code === 0) {
@@ -652,7 +661,7 @@ class TIMService {
    * @param {string} Object - 个人信息
    * @returns {Promise}
    */
-  updateMyProfile(options: {nick: string; avatar: string;}) {
+  updateMyProfile(options: {nick?: string; avatar?: string;}) {
     return this.tim.updateMyProfile(options);
   }
 

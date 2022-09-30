@@ -13,3 +13,10 @@ const { appendLoading, removeLoading } = useLoading();
 window.removeLoading = removeLoading;
 
 domReady().then(appendLoading);
+
+const { ipcRenderer } = require('electron');
+
+ipcRenderer.on('crash-file-path', (event, args) => {
+  console.warn('crash-file-path:', args);
+});
+window.ipcRenderer = ipcRenderer;

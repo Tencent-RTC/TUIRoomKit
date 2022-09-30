@@ -21,3 +21,19 @@ export const conditionsError: IError = {
   code: -1004,
   message: '调用该函数所需要条件不满足',
 };
+export const NotSupportError: IError = {
+  code: -1005,
+  message: 'not supported',
+};
+export const NotSupportBeforeJoinRoomError: IError = {
+  code: -1006,
+  message: 'not supported before join room',
+};
+export const EnterRoomUserIdError: IError = {
+  code: -1007,
+  message: '进房 userId 不能包含前缀 share_',
+};
+export const ScreenShareUserIdError: IError = {
+  code: -1008,
+  message: '屏幕分享 userId 必须包含前缀 share_',
+};
