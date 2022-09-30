@@ -17,7 +17,7 @@
       width="420px"
       :title="t('Stop sharing?') "
       :modal="true"
-      :append-to-body="true"
+      :append-to-body="false"
       :before-close="cancelStop"
     >
       <span>

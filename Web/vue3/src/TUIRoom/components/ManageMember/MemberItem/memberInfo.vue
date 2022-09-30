@@ -87,7 +87,7 @@ const isMe = computed(() => basicStore.userId === props.userInfo.userId);
     font-size: 14px;
     color: #7C85A6;
     line-height: 22px;
-    max-width: 180px;
+    max-width: 110px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;

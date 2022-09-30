@@ -30,6 +30,7 @@ export const NAME = {
   AUXILIARY: 'auxiliary',
   // 屏幕分享用户名的前缀
   SCREEN_SHARE_USER_ID_PREFIX: 'share_',
+  NUMBER: 'number',
 };
 
 // 网络类型与仪表盘传参的对应关系
