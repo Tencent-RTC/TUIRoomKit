@@ -18,7 +18,7 @@
       <div class="apply-list">
         <div v-for="(item, index) in applyToAnchorList" :key="index" class="apply-item">
           <div class="user-info">
-            <img class="user-avatar" :src="item.userAvatar">
+            <img class="user-avatar" :src="item.userAvatar || defaultAvatar">
             <span class="user-name">{{ item.userName || item.userId }}</span>
           </div>
           <div class="control-container">
@@ -43,6 +43,7 @@ import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
+import defaultAvatar from '../../../assets/imgs/avatar.png';
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
