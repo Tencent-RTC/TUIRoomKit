@@ -1,6 +1,6 @@
 import logger from './common/logger';
 import { safelyParseJSON, simpleClone } from './utils/utils';
-import { ETUISpeechMode, ETUIRoomRole } from './types';
+import { ETUISpeechMode, ETUIRoomRole, EInnerTUIRoomEvents } from './types';
 import TUIRoomResponse from './base/TUIRoomResponse';
 import TUIRoomError from './base/TUIRoomError';
 import TUIRoomInfo from './base/TUIRoomInfo';
@@ -10,6 +10,7 @@ import TIMService from './TIMService';
 import TRTCService from './trtc-service';
 import StateStore from './StateStore';
 import { TRTCAppScene, TRTCRoleType } from 'trtc-electron-sdk';
+import Event from './common/emitter/event';
 
 class TUIRoomLifecycle {
   static logPrefix = '[TUIRoomLifecycle]';
@@ -19,6 +20,8 @@ class TUIRoomLifecycle {
   private timService: any;
 
   private trtcService: any;
+
+  public emitter = new Event();
 
   constructor(
     state: StateStore,
@@ -106,6 +109,8 @@ class TUIRoomLifecycle {
 
       const scene = mode === ETUISpeechMode.APPLY_SPEECH ? TRTCAppScene.TRTCAppSceneLIVE : TRTCAppScene.TRTCAppSceneVideoCall;
 
+      await this.getRoomMemberList();
+
       // 进入 TRTC 房间
       await this.trtcService.enterRoom({
         sdkAppId,
@@ -177,6 +182,9 @@ class TUIRoomLifecycle {
       }
       const scene = this.state.roomInfo.roomConfig.speechMode === ETUISpeechMode.FREE_SPEECH ? TRTCAppScene.TRTCAppSceneVideoCall : TRTCAppScene.TRTCAppSceneLIVE;
       const role = scene === TRTCAppScene.TRTCAppSceneVideoCall ? TRTCRoleType.TRTCRoleAnchor : TRTCRoleType.TRTCRoleAudience;
+      
+      await this.getRoomMemberList();
+
       // 进入 TRTC 房间
       await this.trtcService.enterRoom({
         sdkAppId,
@@ -190,7 +198,9 @@ class TUIRoomLifecycle {
       if(this.state.currentUser.userId === this.state.roomInfo.ownerId) {
         this.state.currentUser.role = ETUIRoomRole.MASTER;
       } else {
-        this.state.currentUser.role = ETUIRoomRole.ANCHOR;
+        if (role === TRTCRoleType.TRTCRoleAnchor) {
+          this.state.currentUser.role = ETUIRoomRole.ANCHOR;
+        }
       }
 
       return TUIRoomResponse.success(
@@ -282,6 +292,50 @@ class TUIRoomLifecycle {
         );
       }
     }
+  }
+
+  /**
+   * 获取群人数
+   *
+   * @param {string} Object - 获取房间列表
+   * @returns {Promise}
+   */
+  async getRoomMemberList() {
+    const response = await this.timService.getGroupMemberList();
+    const memberList: Record<string, any> = [];  
+    response.data.forEach((item: { userID: string; nick: string; avatar: string; }) => {
+      const { userID: userId, nick, avatar } = item;
+      if (userId !== this.state.currentUser.userId) {
+        let newUser  = this.state.userMap.get(userId);
+        if (!newUser) {
+          newUser = new TUIRoomUser();
+          newUser.userId = userId;
+        }
+        newUser.name = nick;
+        newUser.avatar = avatar;
+        this.state.userMap.set(userId, newUser);
+        memberList.push(newUser);
+      }
+    })
+    this.emitter?.emit(EInnerTUIRoomEvents.onRoomMemberList, simpleClone(memberList));
+  }
+
+  /**
+   * 注册事件监听
+   */
+  on(
+    eventName: string,
+    handler: (...args: any) => void,
+    ctx?: Record<string, any>
+  ) {
+    this.emitter?.on(eventName, handler, ctx);
+  }
+
+  /**
+   * 取消事件监听
+   */
+  off(eventName: string, handler: (...args: any) => void) {
+    this.emitter?.off(eventName as string, handler);
   }
 
   public destroy() {

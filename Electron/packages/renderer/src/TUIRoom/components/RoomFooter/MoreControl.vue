@@ -1,7 +1,7 @@
 <template>
   <div class="more-control-container">
     <icon-button
-      title="更多"
+      :title="t('More')"
       :icon-name="iconName"
       @click-icon="toggleMoreSidebar"
     />
@@ -14,6 +14,9 @@ import { ICON_NAME } from '../../constants/icon';
 import { computed } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);

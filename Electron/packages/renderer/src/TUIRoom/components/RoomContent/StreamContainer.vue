@@ -48,11 +48,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, Ref, ComputedRef, watch, nextTick, computed } from 'vue';
 import TUIRoomCore, {
-  TRTCVideoResolution,
   ETUIRoomEvents,
-  TRTCVideoResolutionMode,
   ETUIStreamType,
-  TRTCVideoEncParam,
 } from '../../tui-room-core';
 import { storeToRefs } from 'pinia';
 import { StreamInfo, useRoomStore } from '../../stores/room';
@@ -275,6 +272,7 @@ async function handleTopSideListLayout() {
   }
 }
 
+// 双击切换流到放大区域
 function handleEnlargeStreamRegion(stream: StreamInfo) {
   if (layout.value === LAYOUT.NINE_EQUAL_POINTS) {
     return;
@@ -365,9 +363,12 @@ const onUserAVEnabled = (userInfo: any) => {
 // 收到远端 trtc 的 peer-leave 事件
 const onUserAVDisabled = (userInfo: any) => {
   roomStore.updateUserAVAbility(userInfo, false);
-  if (userInfo.userId === enlargeStream.value?.userId || roomStore.remoteStreamList.length === 0) {
+  // 远端流离开的时候，重新设置流播放布局
+  if (roomStore.remoteStreamList.length === 0) {
     basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
     enlargeStream.value = null;
+  } else if (userInfo.userId === enlargeStream.value?.userId) {
+    [enlargeStream.value] = roomStore.remoteStreamList;
   }
 };
 
@@ -393,9 +394,19 @@ const onUserVideoAvailable = (eventInfo: { userId: string, available: number, st
     }
   } else if (streamType === ETUIStreamType.SCREEN) {
     roomStore.updateRemoteScreenStream(eventInfo);
-    enlargeStream.value = roomStore.remoteStreamMap.get(`${userId}_screen`) as StreamInfo;
-    if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
-      basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
+    if (available) {
+      enlargeStream.value = roomStore.remoteStreamMap.get(`${userId}_screen`) as StreamInfo;
+      if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
+        basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
+      }
+    } else {
+      // 远端屏幕分享流停止的时候，重新设置流播放布局
+      if (roomStore.remoteStreamList.length === 0) {
+        basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
+        enlargeStream.value = null;
+      } else if (userId === enlargeStream.value?.userId) {
+        [enlargeStream.value] = roomStore.remoteStreamList;
+      }
     }
   }
 };
@@ -427,15 +438,6 @@ watch(isDefaultOpenCamera, async (val) => {
         roomStore.setCurrentCameraId(cameraList[0].deviceId);
       }
       await TUIRoomCore.setCurrentCamera(roomStore.currentCameraId);
-      // 设置视频参数
-      const param = new TRTCVideoEncParam();
-      param.videoResolution = TRTCVideoResolution.TRTCVideoResolution_1280_720;
-      param.videoFps = 15;
-      param.videoBitrate = 1500;
-      param.resMode = TRTCVideoResolutionMode.TRTCVideoResolutionModeLandscape;
-      param.minVideoBitrate = 0;
-      param.enableAdjustRes = true;
-      TUIRoomCore.setVideoEncoderParam(param);
       // 开启本地摄像头
       await TUIRoomCore.startCameraPreview(previewDom);
       roomStore.setHasStartedCamera(true);
@@ -449,23 +451,31 @@ watch(isDefaultOpenMicrophone, async (val) => {
     await TUIRoomCore.startMicrophone();
     roomStore.setHasStartedMicrophone(true);
     const microphoneList = await TUIRoomCore.getMicrophoneList();
+    const speakerList = await TUIRoomCore.getSpeakerList();
     if (!roomStore.currentMicrophoneId) {
       roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
     }
     if (!roomStore.currentSpeakerId) {
-      roomStore.setCurrentSpeakerId(microphoneList[0].deviceId);
+      roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
     }
     await TUIRoomCore.setCurrentMicrophone(roomStore.currentMicrophoneId);
   }
 });
 
-onMounted(async () => {
+// 远端用户信息更新
+function onUserInfoUpdated(data: { userId: string, nick: string, avatar: string }) {
+  const { userId, nick, avatar } = data;
+  roomStore.updateRemoteUser(userId, { nick, avatar });
+}
+
+onMounted(() => {
   TUIRoomCore.on(ETUIRoomEvents.onUserEnterRoom, onUserEnterRoom);
   TUIRoomCore.on(ETUIRoomEvents.onUserLeaveRoom, onUserLeaveRoom);
   TUIRoomCore.on(ETUIRoomEvents.onUserAVEnabled, onUserAVEnabled);
   TUIRoomCore.on(ETUIRoomEvents.onUserAVDisabled, onUserAVDisabled);
   TUIRoomCore.on(ETUIRoomEvents.onUserVideoAvailable, onUserVideoAvailable);
   TUIRoomCore.on(ETUIRoomEvents.onUserAudioAvailable, onUserAudioAvailable);
+  TUIRoomCore.on(ETUIRoomEvents.onUserInfoUpdated, onUserInfoUpdated);
 });
 
 onUnmounted(() => {
@@ -475,6 +485,7 @@ onUnmounted(() => {
   TUIRoomCore.off(ETUIRoomEvents.onUserAVDisabled, onUserAVDisabled);
   TUIRoomCore.off(ETUIRoomEvents.onUserVideoAvailable, onUserVideoAvailable);
   TUIRoomCore.off(ETUIRoomEvents.onUserAudioAvailable, onUserAudioAvailable);
+  TUIRoomCore.off(ETUIRoomEvents.onUserInfoUpdated, onUserInfoUpdated);
 });
 </script>
 

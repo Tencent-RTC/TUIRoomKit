@@ -1,7 +1,7 @@
 <template>
   <div class="setting-control-container">
     <icon-button
-      title="设置"
+      :title="t('Settings')"
       :icon-name="iconName"
       @click="handleShowSettingDialog"
     />
@@ -14,6 +14,9 @@ import IconButton from '../common/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const { showSettingDialog } = storeToRefs(basicStore);

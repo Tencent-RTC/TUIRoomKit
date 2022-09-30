@@ -74,11 +74,18 @@
    ```
 
 3. 构建安装包、运行
+   - 构建符合当前机器 CPU 类型的安装包。适合 Windows 和 Mac 操作系统。
 
    ```bash
    npm run build
    ```
-   > 注意：只能使用 Mac 电脑构建 Mac 安装包，使用 Windows 电脑构建 Windows 安装包。
+
+   - Mac 下构建同时支持 X64 和 ARM64 芯片架构的安装包。应用安装后，在 X64 芯片下运行 X64 指令集，在 ARM64 芯片下运行 ARM64 指令集，充分发挥硬件优势。仅支持 Electron 11 及以上版本。
+   ```bash
+   npm run build:mac-universal
+   ```
+
+   > 注意：构建好的安装包位于 release 目录下。只能使用 Mac 电脑构建 Mac 安装包，使用 Windows 电脑构建 Windows 安装包。
 ### 第四步：示例体验
 
 开发环境运行示例工程后，可直接体验 TUIRoom 功能。

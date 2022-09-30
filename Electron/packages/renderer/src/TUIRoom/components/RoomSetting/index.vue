@@ -1,7 +1,7 @@
 <template>
   <div v-if="showSettingDialog" class="setting-dialog">
     <div class="dialog-tabs">
-      <span class="dialog-title">设置</span>
+      <span class="dialog-title">{{ t('Settings') }}</span>
       <div
         v-for="(item, index) in settingTabsTitleList"
         :key="index"
@@ -32,19 +32,22 @@ import VideoSettingTab from '../base/VideoSettingTab.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { SettingMode } from '../../constants/render';
+import { useI18n } from 'vue-i18n';
+import { computed } from 'vue';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 
 const { showSettingDialog, activeSettingTab } = storeToRefs(basicStore);
 // TODO: 完善其余设置 Tab
-const settingTabsTitleList = [
-  { label: '声音设置', value: 'audio' },
-  { label: '摄像头设置', value: 'video' },
+const settingTabsTitleList = computed(() => [
+  { label: t('Audio settings'), value: 'audio' },
+  { label: t('Camera settings'), value: 'video' },
   // { label: '美颜和虚拟设置', value: 'beauty' },
   // { label: '统计功能', value: 'static' },
   // { label: '录制', value: 'record' },
-];
-
+]);
 
 function handleUpdateActiveTab(tabTitle: string) {
   basicStore.setActiveSettingTab(tabTitle);

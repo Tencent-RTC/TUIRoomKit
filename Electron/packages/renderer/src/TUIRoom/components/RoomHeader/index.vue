@@ -8,7 +8,7 @@
         :user-avatar="userAvatar"
         @log-out="$emit('logOut')"
       ></user-info>
-      <!-- <language class="header-item language"></language> -->
+      <language class="header-item language"></language>
     </div>
     <div class="right-container">
       <network-info></network-info>
@@ -20,8 +20,7 @@
 
 <script setup lang="ts">
 import UserInfo from './UserInfo.vue';
-// 【language】功能待完善
-// import Language from './Language.vue';
+import Language from './Language.vue';
 import NetworkInfo from './NetworkInfo.vue';
 // 【info】功能待完善
 // import InfoControl from './InfoControl.vue';

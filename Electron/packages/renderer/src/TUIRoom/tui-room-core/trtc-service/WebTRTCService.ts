@@ -60,7 +60,7 @@ class WebTRTCService extends BaseTRTCService {
   }
 
   // 开始屏幕分享
-  async startScreenShare(options: { shareUserId: string; shareUserSig: string; }) {
+  async startScreenShare(options: { shareUserId: string; shareUserSig: string; screenAudio?: boolean }) {
     if (!options.shareUserId || !options.shareUserSig) {
       return TUIRoomResponse.fail(TUIRoomErrorCode.INVALID_PARAM_ERROR, TUIRoomErrorMessage.INVALID_PARAM_ERROR);
     }

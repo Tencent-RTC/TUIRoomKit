@@ -6,13 +6,14 @@
       @click-icon="toggleApplySpeech"
     />
     <div v-show="showMemberApplyAttention" class="attention member-attention">
-      <span class="info">如果您想发言请先举手申请上麦</span>
+      <span class="info">{{ t('Please raise your hand to apply') }}</span>
       <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyAttention"></svg-icon>
     </div>
   </div>
   <el-dialog
     v-model="showInviteDialog"
-    title="主持人邀请您上台发言"
+    :title="t('The host invites you to speak on stage')"
+    custom-class="custom-element-class"
     :modal="false"
     :show-close="false"
     :append-to-body="true"
@@ -20,11 +21,13 @@
     :close-on-press-escape="false"
     width="500px"
   >
-    <span>同意上台后可打开摄像头和麦克风，是否同意上台？</span>
+    <span>
+      {{ t('After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?') }}
+    </span>
     <template #footer>
       <span class="dialog-footer">
-        <el-button type="primary" @click="handleInvite(true)">同意</el-button>
-        <el-button @click="handleInvite(false)">取消</el-button>
+        <el-button type="primary" @click="handleInvite(true)">{{ t('Agree') }}</el-button>
+        <el-button @click="handleInvite(false)">{{ t('Cancel') }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -40,9 +43,14 @@ import { ElMessage } from 'element-plus';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
+import { useI18n } from 'vue-i18n';
+import { storeToRefs } from 'pinia';
+
+const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
+const { lang } = storeToRefs(basicStore);
 
 enum STATE {
   OffSeat = 'offSeat',
@@ -56,18 +64,19 @@ const iconName: Ref<string> = ref('');
 const iconTitle: Ref<string> = ref('');
 const showInviteDialog: Ref<Boolean> = ref(false);
 
-watch(userState, (val) => {
-  if (val === STATE.OffSeat) {
+
+watch([userState, lang], ([userState]) => {
+  if (userState === STATE.OffSeat) {
     iconName.value = ICON_NAME.ApplyOnSeat;
-    iconTitle.value = '举手';
+    iconTitle.value = t('Raise hand');
   }
-  if (userState.value === STATE.Applying) {
+  if (userState === STATE.Applying) {
     iconName.value = ICON_NAME.ApplyActive;
-    iconTitle.value = '手放下';
+    iconTitle.value = t('Hand down');
   }
-  if (userState.value === STATE.OnSeat) {
+  if (userState === STATE.OnSeat) {
     iconName.value = ICON_NAME.GoOffSeat;
-    iconTitle.value = '下台';
+    iconTitle.value = t('Step down');
   }
 }, { immediate: true });
 
@@ -141,7 +150,7 @@ function handleApplyAccepted() {
   basicStore.setRole(ETUIRoomRole.ANCHOR);
   ElMessage({
     type: 'success',
-    message: '主持人同意了你的上台申请',
+    message: t('The host has approved your application'),
     duration: MESSAGE_DURATION.NORMAL,
   });
 }
@@ -151,7 +160,7 @@ function handleApplyRejected() {
   userState.value = STATE.OffSeat;
   ElMessage({
     type: 'warning',
-    message: '主持人拒绝了你的上台申请',
+    message: t('The host has rejected your application for the stage'),
     duration: MESSAGE_DURATION.NORMAL,
   });
 }
@@ -173,7 +182,7 @@ function onReceiveInvitationCancelled() {
 function onUserKickOffStage() {
   ElMessage({
     type: 'warning',
-    message: '您已被主持人邀请下台，需要发言请先举手',
+    message: t('You have been invited by the host to step down, please raise your hand if you need to speak'),
     duration: MESSAGE_DURATION.NORMAL,
   });
   // 被主持踢下麦
@@ -227,6 +236,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss">
+@import '../../../assets/style/element-custom.scss';
+
 .apply-control-container {
   position: relative;
   .attention {

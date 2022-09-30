@@ -2,12 +2,12 @@
   <div v-loading="loading" element-loading-background="#000000" class="stream-container">
     <div ref="streamPreviewRef" class="stream-preview"></div>
     <div v-if="isCameraMuted" class="stream-info">
-      <span class="info">摄像头已关闭</span>
+      <span class="info">{{ t('Off Camera') }}</span>
     </div>
     <div class="control-region">
       <icon-button
         ref="audioIconButtonRef"
-        title="麦克风"
+        :title="t('Mic')"
         :hide-hover-effect="true"
         :has-more="true"
         @click-icon="toggleMuteAudio"
@@ -18,7 +18,7 @@
       <icon-button
         ref="videoIconButtonRef"
         class="icon"
-        title="摄像头"
+        :title="t('Camera')"
         :icon-name="cameraIconName"
         :hide-hover-effect="true"
         :has-more="true"
@@ -31,12 +31,11 @@
     <el-drawer
       v-model="isSettingOpen"
       :modal="false"
-      :title="settingTitle"
+      :title="t(settingTitle)"
       direction="rtl"
       custom-class="room-sidebar"
       :before-close="handleDrawerClose"
       :size="480"
-      style="pointer-events: none"
     >
       <audio-setting-tab v-if="settingTab === 'audio'" :mode="SettingMode.DETAIL"></audio-setting-tab>
       <video-setting-tab v-if="settingTab === 'video'" :mode="SettingMode.DETAIL"></video-setting-tab>
@@ -55,9 +54,11 @@ import AudioIcon from '../base/AudioIcon.vue';
 import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
+import { useI18n } from 'vue-i18n';
 
 const roomStore = useRoomStore();
 const { localStream } = storeToRefs(roomStore);
+const { t } = useI18n();
 
 defineExpose({
   getRoomParam,
@@ -108,11 +109,13 @@ const onUserVoiceVolume = (eventInfo: []) => {
 onMounted(async () => {
   const cameraList = await TUIRoomCore.getCameraList();
   const microphoneList = await TUIRoomCore.getMicrophoneList();
+  const speakerList = await TUIRoomCore.getSpeakerList();
   roomStore.setCurrentCameraId(cameraList[0].deviceId);
   roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
-  roomStore.setCurrentSpeakerId(microphoneList[0].deviceId);
+  roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
   TUIRoomCore.setCurrentCamera(cameraList[0].deviceId);
   TUIRoomCore.setCurrentMicrophone(microphoneList[0].deviceId);
+  TUIRoomCore.setCurrentSpeaker(speakerList[0].deviceId);
   await TUIRoomCore.startCameraPreview(streamPreviewRef.value);
   TUIRoomCore.enableAudioVolumeEvaluation(100);
   await TUIRoomCore.startMicrophone();
@@ -134,14 +137,14 @@ const settingTab = ref('');
 // 处理音频设备设置
 function handleMicSetting() {
   isSettingOpen.value = true;
-  settingTitle.value = '麦克风设置';
+  settingTitle.value = 'Mic settings';
   settingTab.value = 'audio';
 }
 
 // 处理视频设备设置
 function handleCameraSetting() {
   isSettingOpen.value = true;
-  settingTitle.value = '摄像头设置';
+  settingTitle.value = 'Camera settings';
   settingTab.value = 'video';
 }
 

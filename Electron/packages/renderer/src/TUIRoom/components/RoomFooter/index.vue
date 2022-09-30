@@ -87,9 +87,8 @@ function report(name: string) {
     height: 100%;
     display: flex;
     align-items: center;
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%);
+    position: relative;
+    margin: 0 auto;
   }
   .right-container {
     height: 100%;

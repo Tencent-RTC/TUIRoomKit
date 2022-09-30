@@ -35,6 +35,9 @@ import { debounce, throttle } from './utils/utils';
 import logger from './tui-room-core/common/logger';
 import TUIRoomAegis from './utils/aegis';
 import { MESSAGE_DURATION } from './constants/message';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineExpose({
   init,
@@ -128,7 +131,7 @@ async function init(option: RoomInitData) {
 
   await TUIRoomCore.login(sdkAppId, userId, userSig);
 
-  TUIRoomCore.updateMyProfile({
+  await TUIRoomCore.updateMyProfile({
     nick: userName,
     avatar: userAvatar || '',
   });
@@ -183,7 +186,8 @@ const onStatistics = (statistics: TRTCStatistics) => {
 
 const onReceivedChatMessage = (message: any) => {
   chatStore.updateMessageList(message);
-  if (!basicStore.isSidebarOpen || basicStore.sidebarName != 'chat') {
+  if (!basicStore.isSidebarOpen || basicStore.sidebarName !== 'chat') {
+    // eslint-disable-next-line no-plusplus
     chatStore.updateUnReadCount(++chatStore.unReadCount);
   }
 };
@@ -211,7 +215,7 @@ const onExitRoom = (info: { code: number; message: string }) => {
 
 const onMicrophoneMuted = (data: {mute: boolean, muteType: ETUIRoomMuteType}) => {
   if (data.muteType === ETUIRoomMuteType.MasterMuteAll) {
-    const tipMessage = data.mute ? '主持人已开启全体静音' : '主持人已解除全体静音';
+    const tipMessage = data.mute ? t('The host has muted all') : t('The host has unmuted all');
     ElMessage({
       type: 'warning',
       message: tipMessage,
@@ -227,7 +231,7 @@ const onMicrophoneMuted = (data: {mute: boolean, muteType: ETUIRoomMuteType}) =>
   }
 
   if (data.muteType === ETUIRoomMuteType.MasterMuteCurrentUser) {
-    const tipMessage = data.mute ? '主持人已关闭您的麦克风' : '主持人已允许您开启麦克风';
+    const tipMessage = data.mute ? t('The host has turned off your microphone') : t('The host has allowed you to turn on the microphone');
     ElMessage({
       type: 'warning',
       message: tipMessage,
@@ -247,7 +251,7 @@ const onMicrophoneMuted = (data: {mute: boolean, muteType: ETUIRoomMuteType}) =>
 const onCameraMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
   if (data.muteType === ETUIRoomMuteType.MasterMuteAll) {
     basicStore.setIsMuteAllVideo(data.mute);
-    const tipMessage = data.mute ? '主持人已开启全体禁画' : '主持人已解除全体禁画';
+    const tipMessage = data.mute ? t('The host has turned on the ban on all paintings') : t('The host has lifted the ban on all paintings');
     ElMessage({
       type: 'warning',
       message: tipMessage,
@@ -262,7 +266,7 @@ const onCameraMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
   }
 
   if (data.muteType === ETUIRoomMuteType.MasterMuteCurrentUser) {
-    const tipMessage = data.mute ? '主持人已关闭您的摄像头' : '主持人已允许你开启摄像头';
+    const tipMessage = data.mute ? t('The host has turned off your camera') : t('The host has allowed you to turn on the camera');
     ElMessage({
       type: 'warning',
       message: tipMessage,
@@ -280,7 +284,7 @@ const onCameraMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
 };
 
 const onUserChatRoomMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
-  const tipMessage = data.mute ? '您被主持人禁止文字聊天' : '您被主持人允许文字聊天';
+  const tipMessage = data.mute ? t('You have been banned from text chat by the host') : t('You are allowed to text chat by the host');
   ElMessage({
     type: 'warning',
     message: tipMessage,
@@ -297,8 +301,8 @@ const onUserKickOff = async () => {
     await TUIRoomCore.logout();
     logger.log(`${logPrefix}leaveRoom:`, response);
     resetStore();
-    ElMessageBox.alert('被主持人踢出房间', '通知', {
-      confirmButtonText: '确认',
+    ElMessageBox.alert(t('kicked out of the room by the host'), t('Note'), {
+      confirmButtonText: t('Confirm'),
       callback: async () => {
         emit('onKickOff', { code: 0, message: '' });
       },
@@ -356,7 +360,7 @@ watch(sdkAppId, (val) => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import './assets/style/var.scss';
 
 .tui-room {

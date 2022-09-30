@@ -9,7 +9,7 @@
   <div class="video-control-container">
     <icon-button
       ref="videoIconButtonRef"
-      title="摄像头"
+      :title="t('Camera')"
       :icon-name="iconName"
       :has-more="true"
       :disabled="isLocalVideoIconDisable"
@@ -37,12 +37,14 @@ import { useBasicStore } from '../../stores/basic';
 import { useRoomStore } from '../../stores/room';
 import { ICON_NAME } from '../../constants/icon';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
+import { useI18n } from 'vue-i18n';
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 
 const { isDefaultOpenCamera, localStream, isLocalVideoMuted } = storeToRefs(roomStore);
 const { isLocalVideoIconDisable, isMuteAllVideo, isAudience } = storeToRefs(basicStore);
+const { t } = useI18n();
 
 const showVideoSettingTab: Ref<boolean> = ref(false);
 const videoIconButtonRef = ref<InstanceType<typeof IconButton>>();
@@ -73,7 +75,7 @@ function toggleMuteVideo() {
     }
     ElMessage({
       type: 'warning',
-      message: warningMessage,
+      message: t(warningMessage),
       duration: MESSAGE_DURATION.NORMAL,
     });
     return;
