@@ -400,6 +400,7 @@ export class TRTCParams {
   // public businessInfo: null | string;
   public streamId: null | string;
   public userDefineRecordId: null | string;
+  public frameWorkType: number;
   constructor(
     sdkAppId = 0,
     userId = '',
@@ -411,6 +412,7 @@ export class TRTCParams {
     businessInfo: null | string = null,
     streamId: null | string = null,
     userDefineRecordId: null | string = null,
+    frameWorkType: number = 40,
   ) {
     this.sdkAppId = sdkAppId;
     this.userId = userId;
@@ -422,6 +424,7 @@ export class TRTCParams {
     // this.businessInfo = businessInfo;
     this.streamId = streamId;
     this.userDefineRecordId = userDefineRecordId;
+    this.frameWorkType = frameWorkType;
   }
 }
 /**
@@ -471,19 +474,19 @@ export class TRTCVideoEncParam {
  */
  const TRTCVideoRotation_HACK_JSDOC = {
   /** 顺时针旋转0度 */
-  TRTCVideoRotation_0: 0,
+  TRTCVideoRotation0: 0,
   /** 顺时针旋转90度 */
-  TRTCVideoRotation_90: 1,
+  TRTCVideoRotation90: 1,
   /** 顺时针旋转180度 */
-  TRTCVideoRotation_180: 2,
+  TRTCVideoRotation180: 2,
   /** 顺时针旋转270度 */
-  TRTCVideoRotation_270: 3,
+  TRTCVideoRotation270: 3,
 };
 export enum TRTCVideoRotation {
-  TRTCVideoRotation_0 = 0,
-  TRTCVideoRotation_90 = 1,
-  TRTCVideoRotation_180 = 2,
-  TRTCVideoRotation_270 = 3,
+  TRTCVideoRotation0 = 0,
+  TRTCVideoRotation90 = 1,
+  TRTCVideoRotation180 = 2,
+  TRTCVideoRotation270 = 3,
 }
 /**
  * 画面渲染参数<br>
@@ -496,7 +499,7 @@ export class TRTCRenderParams {
   public rotation: TRTCVideoRotation;
   public fillMode: TRTCVideoFillMode;
   public mirrorType: TRTCVideoMirrorType;
-  constructor(rotation = TRTCVideoRotation.TRTCVideoRotation_0, fillMode = TRTCVideoFillMode.TRTCVideoFillMode_Fit, mirrorType = TRTCVideoMirrorType.TRTCVideoMirrorType_Disable) {
+  constructor(rotation = TRTCVideoRotation.TRTCVideoRotation0, fillMode = TRTCVideoFillMode.TRTCVideoFillMode_Fit, mirrorType = TRTCVideoMirrorType.TRTCVideoMirrorType_Disable) {
     this.rotation = rotation;
     this.fillMode = fillMode;
     this.mirrorType = mirrorType;

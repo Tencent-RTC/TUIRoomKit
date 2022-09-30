@@ -126,17 +126,12 @@ class TRTCCloud extends MixinsClass(
     }
   }
   /**
-   * 设置 frameWorkType 值
-   * @param {Number} frameWorkType
+   * 获取 SDK 版本信息
+   * @memberof TRTCCloud
+   * @return {String}
    */
-  setFrameWorkType(frameWorkType: number) {
-    this.frameWorkType = frameWorkType;
-  }
-  /**
-   * 获取 frameWorkType 的值
-   */
-  getFrameWorkType() {
-    return this.frameWorkType;
+  getSDKVersion(): string {
+    return this.VERSION || '';
   }
   /**
    * 绑定事件<br>
@@ -232,6 +227,7 @@ class TRTCCloud extends MixinsClass(
         role,
         privateMapKey,
         streamId,
+        frameWorkType,
       } = params;
       this.sdkAppId = sdkAppId;
       this.userId = userId;
@@ -241,6 +237,9 @@ class TRTCCloud extends MixinsClass(
       this.mode = joinSceneMap[scene];
       this.role = roleMap[role];
       this.remoteUserAvailable = new Map();
+      if (frameWorkType && typeof frameWorkType === NAME.NUMBER) {
+        this.frameWorkType = frameWorkType;
+      }
       if (this.isSharedStream(userId)) {
         this.log_.error(`(enterRoom) failed - ${EnterRoomUserIdError.message} userId: ${this.userId}`);
         this.emitError(EnterRoomUserIdError);

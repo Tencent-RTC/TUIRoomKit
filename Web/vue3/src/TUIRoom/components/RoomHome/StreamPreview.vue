@@ -31,7 +31,7 @@
     <el-drawer
       v-model="isSettingOpen"
       :modal="false"
-      :title="settingTitle"
+      :title="t(settingTitle)"
       direction="rtl"
       custom-class="room-sidebar"
       :before-close="handleDrawerClose"
@@ -109,11 +109,13 @@ const onUserVoiceVolume = (eventInfo: []) => {
 onMounted(async () => {
   const cameraList = await TUIRoomCore.getCameraList();
   const microphoneList = await TUIRoomCore.getMicrophoneList();
+  const speakerList = await TUIRoomCore.getSpeakerList();
   roomStore.setCurrentCameraId(cameraList[0].deviceId);
   roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
-  roomStore.setCurrentSpeakerId(microphoneList[0].deviceId);
+  roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
   TUIRoomCore.setCurrentCamera(cameraList[0].deviceId);
   TUIRoomCore.setCurrentMicrophone(microphoneList[0].deviceId);
+  TUIRoomCore.setCurrentSpeaker(speakerList[0].deviceId);
   await TUIRoomCore.startCameraPreview(streamPreviewRef.value);
   TUIRoomCore.enableAudioVolumeEvaluation(100);
   await TUIRoomCore.startMicrophone();
@@ -135,14 +137,14 @@ const settingTab = ref('');
 // 处理音频设备设置
 function handleMicSetting() {
   isSettingOpen.value = true;
-  settingTitle.value = t('Mic settings');
+  settingTitle.value = 'Mic settings';
   settingTab.value = 'audio';
 }
 
 // 处理视频设备设置
 function handleCameraSetting() {
   isSettingOpen.value = true;
-  settingTitle.value = t('Camera Settings');
+  settingTitle.value = 'Camera settings';
   settingTab.value = 'video';
 }
 

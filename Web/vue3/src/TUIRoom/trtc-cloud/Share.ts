@@ -121,12 +121,13 @@ class Share extends MixinsClass(BaseCommon) {
     this.shareClient.unsubscribe(remoteStream);
   }
   // 初始化 stream
-  private async initShareStream() {
+  private async initShareStream(screenAudio: boolean) {
     try {
       this.shareStream = this.TRTC.createStream({
         audio: false,
         screen: true,
         userId: this.shareUserId,
+        screenAudio,
       });
       this.shareStream.setScreenProfile(this.screenShareParams);
       await this.shareStream.initialize();
@@ -234,6 +235,10 @@ class Share extends MixinsClass(BaseCommon) {
    * @param {Object} options 屏幕分享参数
    * @param {String} options.shareUserId 屏幕分享传入的 ID
    * @param {String} options.shareUserSig 屏幕分享的签名 userSig
+   * @param {Boolean=} options.screenAudio 屏幕分享是否采集系统音频
+   * **Note:**
+   * - 采集系统声音只支持 Chrome M74+ ，在 Windows 和 Chrome OS 上，可以捕获整个系统的音频
+   * 在 Linux 和 Mac 上，只能捕获选项卡的音频。其它 Chrome 版本、其它系统、其它浏览器均不支持。
    * **Note:**
    * - shareUserId 屏幕分享 ID 的命名规则：'share_jack'，也即当前用户的 ID 加上 'share_' 前缀后得到屏幕分享的 ID
    * @returns {Promise}
@@ -242,15 +247,16 @@ class Share extends MixinsClass(BaseCommon) {
    *  const options = {
    *    shareUserId: 'share_jack',
    *    shareUserSig: 'xxxx',
+   *    screenAudio: true,
    *  };
    *  await trtcCloud.startScreenShare(options);
    */
-  async startScreenShare(options: { shareUserId: string, shareUserSig: string }) {
+  async startScreenShare(options: { shareUserId: string, shareUserSig: string, screenAudio?: boolean }) {
     if (!this.isJoined || this.isJoining) {
       this.emitError(NotSupportBeforeJoinRoomError);
       return;
     }
-    const { shareUserId = '', shareUserSig = '' } = options;
+    const { shareUserId = '', shareUserSig = '', screenAudio = false } = options;
     if (!shareUserId || !shareUserSig || shareUserId.slice(0, 6) !== NAME.SCREEN_SHARE_USER_ID_PREFIX) {
       // this.log_.error(`(startScreenShare) failed - ${ScreenShareUserIdError.message} userId: ${shareUserId}`);
       this.emitError(ScreenShareUserIdError);
@@ -259,7 +265,7 @@ class Share extends MixinsClass(BaseCommon) {
     this.shareUserId = shareUserId;
     this.shareUserSig = shareUserSig;
     try {
-      await this.initShareStream();
+      await this.initShareStream(!!screenAudio);
       await this.shareClientJoin(shareUserId, shareUserSig);
       await this.shareClientPublish();
       console.log('Start share screen success');

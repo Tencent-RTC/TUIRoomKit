@@ -17,7 +17,8 @@
         size="small"
       ></audio-icon>
       <svg-icon v-if="isScreenStream" icon-name="screen-share" class="screen-icon"></svg-icon>
-      <span class="user-name">{{ userInfo }}</span>
+      <span class="user-name" :title="userInfo">{{ userInfo }}</span>
+      <span v-if="isScreenStream"> {{ t('is sharing their screen') }} </span>
     </div>
     <!-- <div v-if="stream.isVideoMuted" ref="centerUserInfoRef" class="center-user-info-container">
       <div class="user-info">
@@ -68,7 +69,7 @@ const userInfo = computed(() => {
     if (props.stream.userId?.indexOf('share_') === 0 && userInfo === props.stream.userId) {
       userInfo = userInfo.slice(6);
     }
-    return `${userInfo} ${t('is sharing their screen')}`;
+    return `${userInfo}`;
   }
   return userInfo;
 });
@@ -206,6 +207,10 @@ watch(
     font-size: 14px;
     > *{
       margin-left: 8px;
+      max-width: 160px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
     .master-icon {
       margin-left: 0;

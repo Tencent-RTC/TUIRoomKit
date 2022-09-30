@@ -5,7 +5,7 @@
     custom-class="custom-element-class"
     :title="title"
     :modal="true"
-    :append-to-body="true"
+    :append-to-body="false"
     width="420px"
     :before-close="cancel"
   >
@@ -19,7 +19,10 @@
     <div v-if="currentDialogType === DialogType.TransferDialog">
       <div>{{ t('New host') }}</div>
       <div>
-        <el-select v-model="selectedUser">
+        <el-select
+          v-model="selectedUser"
+          :teleported="false"
+        >
           <el-option
             v-for="user in remoteAnchorList"
             :key="user.userId"
@@ -76,7 +79,6 @@ const roomStore = useRoomStore();
 const { remoteAnchorList } = storeToRefs(roomStore);
 
 const title = computed(() => (currentDialogType.value === DialogType.BasicDialog ? t('Leave room?') : t('Select a new host')));
-
 const showLeaveRoom = computed(() => (
   basicInfo.role ===  ETUIRoomRole.MASTER && remoteAnchorList.value.length > 0)
   || basicInfo.role !== ETUIRoomRole.MASTER);
@@ -141,7 +143,8 @@ async function transferAndLeave() {
     let response = await TUIRoomCore.transferRoomMaster(userId);
     logger.log(`${logPrefix}transferAndLeave:`, response);
     response = await TUIRoomCore.exitRoom();
-    logger.log(`${logPrefix}transferAndLeave:`, response);
+    await TUIRoomCore.logout();
+    logger.log(`${logPrefix}exitRoom:`, response);
     resetState();
     emit('onExitRoom', { code: 0, message: '' });
   } catch (error) {
@@ -158,8 +161,9 @@ const onRoomDestroyed = async () => {
     ElMessageBox.alert(t('The host closed the room.'), t('Note'), {
       customClass: 'custom-element-class',
       confirmButtonText: t('Confirm'),
-      callback: () => {
+      callback: async () => {
         resetState();
+        await TUIRoomCore.logout();
         emit('onDestroyRoom', { code: 0, message: '' });
       },
     });
@@ -168,18 +172,21 @@ const onRoomDestroyed = async () => {
   }
 };
 // 收到主持人移交权限通知
-const onRoomMasterChanged = async (newOwnerID:string) => {
+const onRoomMasterChanged = async (newOwner: { newOwnerId: string, newOwnerName: string }) => {
   // 新主持人
-  const tipMessage =  `${t('Moderator changed to ')}${newOwnerID}`;
+  const newOwnerId = newOwner?.newOwnerId;
+  const newOwnerName = newOwner?.newOwnerName;
+  const newName = newOwnerName || newOwnerId;
+  const tipMessage =  `${t('Moderator changed to ')}${newName}`;
   ElMessage({
     type: 'success',
     message: tipMessage,
   });
-  basicInfo.masterUserId = newOwnerID;
+  basicInfo.masterUserId = newOwnerId;
   if (basicInfo.userId === basicInfo.masterUserId) {
     basicInfo.role = ETUIRoomRole.MASTER;
   } else {
-    roomStore.setRemoteUserRole(newOwnerID, ETUIRoomRole.MASTER);
+    roomStore.setRemoteUserRole(newOwnerId, ETUIRoomRole.MASTER);
   }
   resetState();
 };
@@ -199,7 +206,6 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 @import '../../assets/style/var.scss';
 @import '../../assets/style/element-custom.scss';
-
   .end-button {
     width: 90px;
     height: 40px;

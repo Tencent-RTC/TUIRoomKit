@@ -451,15 +451,22 @@ watch(isDefaultOpenMicrophone, async (val) => {
     await TUIRoomCore.startMicrophone();
     roomStore.setHasStartedMicrophone(true);
     const microphoneList = await TUIRoomCore.getMicrophoneList();
+    const speakerList = await TUIRoomCore.getSpeakerList();
     if (!roomStore.currentMicrophoneId) {
       roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
     }
     if (!roomStore.currentSpeakerId) {
-      roomStore.setCurrentSpeakerId(microphoneList[0].deviceId);
+      roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
     }
     await TUIRoomCore.setCurrentMicrophone(roomStore.currentMicrophoneId);
   }
 });
+
+// 远端用户信息更新
+function onUserInfoUpdated(data: { userId: string, nick: string, avatar: string }) {
+  const { userId, nick, avatar } = data;
+  roomStore.updateRemoteUser(userId, { nick, avatar });
+}
 
 onMounted(() => {
   TUIRoomCore.on(ETUIRoomEvents.onUserEnterRoom, onUserEnterRoom);
@@ -468,6 +475,7 @@ onMounted(() => {
   TUIRoomCore.on(ETUIRoomEvents.onUserAVDisabled, onUserAVDisabled);
   TUIRoomCore.on(ETUIRoomEvents.onUserVideoAvailable, onUserVideoAvailable);
   TUIRoomCore.on(ETUIRoomEvents.onUserAudioAvailable, onUserAudioAvailable);
+  TUIRoomCore.on(ETUIRoomEvents.onUserInfoUpdated, onUserInfoUpdated);
 });
 
 onUnmounted(() => {
@@ -477,6 +485,7 @@ onUnmounted(() => {
   TUIRoomCore.off(ETUIRoomEvents.onUserAVDisabled, onUserAVDisabled);
   TUIRoomCore.off(ETUIRoomEvents.onUserVideoAvailable, onUserVideoAvailable);
   TUIRoomCore.off(ETUIRoomEvents.onUserAudioAvailable, onUserAudioAvailable);
+  TUIRoomCore.off(ETUIRoomEvents.onUserInfoUpdated, onUserInfoUpdated);
 });
 </script>
 

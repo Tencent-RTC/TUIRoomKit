@@ -72,7 +72,7 @@ function toggleMuteAudio() {
     }
     ElMessage({
       type: 'warning',
-      message: warningMessage,
+      message: t(warningMessage),
       duration: MESSAGE_DURATION.NORMAL,
     });
     return;
