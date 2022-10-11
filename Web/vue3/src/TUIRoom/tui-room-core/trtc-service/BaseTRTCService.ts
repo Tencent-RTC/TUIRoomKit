@@ -189,8 +189,9 @@ class BaseTRTCService {
     param.userDefineRecordId = ''; // 云端录制
     param.role = role;
     // this.rtcCloud.setDefaultStreamRecvMode(true, false); // 默认接收音频，不接收视频
-    if (this.rtcCloud.setFrameWorkType) {
-      this.rtcCloud.setFrameWorkType(38);
+    if (!(window as any).__TRTCElectron) {
+      // @ts-ignore
+      param.frameWorkType = 38;
     }
     this.rtcCloud.enterRoom(param, scene);
 
@@ -278,7 +279,7 @@ class BaseTRTCService {
   async setVideoMirror(mirror: boolean) {
     await this.rtcCloud?.setLocalRenderParams({
       mirrorType: mirror ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-      rotation: TRTCVideoRotation.TRTCVideoRotation_0,
+      rotation: TRTCVideoRotation.TRTCVideoRotation0,
       fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fit
     });
   }
@@ -290,7 +291,7 @@ class BaseTRTCService {
     }
     await this.rtcCloud?.setRemoteRenderParams(userId, type, {
       mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-      rotation: TRTCVideoRotation.TRTCVideoRotation_0,
+      rotation: TRTCVideoRotation.TRTCVideoRotation0,
       fillMode,
     });
   }

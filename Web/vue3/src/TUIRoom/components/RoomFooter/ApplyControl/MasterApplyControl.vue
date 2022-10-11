@@ -19,7 +19,7 @@
         <div v-for="(item, index) in applyToAnchorList" :key="index" class="apply-item">
           <div class="user-info">
             <img class="user-avatar" :src="item.userAvatar || defaultAvatar">
-            <span class="user-name">{{ item.userName || item.userId }}</span>
+            <span class="user-name" :title="item.userName || item.userId">{{ item.userName || item.userId }}</span>
           </div>
           <div class="control-container">
             <div class="button primary" @click="handleUserApply(item.userId, true)">{{ t('Agree') }}</div>
@@ -179,6 +179,10 @@ onBeforeUnmount(() => {
             color: #7C85A6;
             line-height: 22px;
             margin-left: 9px;
+            max-width: 180px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
           }
         }
         .control-container {

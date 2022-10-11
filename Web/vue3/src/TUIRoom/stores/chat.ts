@@ -48,6 +48,8 @@ export const useChatStore = defineStore('chat', {
     },
     reset() {
       this.messageList = [];
+      this.unReadCount = 0;
+      this.isMuteChatByMater = false;
     },
   },
 });

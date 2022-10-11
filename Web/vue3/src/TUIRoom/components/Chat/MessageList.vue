@@ -6,7 +6,7 @@
         :key="item.ID"
         :class="['message-item', `${'out' === item.flow ? 'is-me' : ''}`]"
       >
-        <div class="message-header">
+        <div class="message-header" :title="item.nick || item.from">
           {{ item.nick || item.from }}
         </div>
         <div class="message-body">
@@ -29,7 +29,6 @@ import MessageText from './MessageTypes/MessageText.vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
-
 const chatStore = useChatStore();
 const { messageList } = storeToRefs(chatStore);
 const messageBottomEl = ref<HTMLInputElement | null>(null);
@@ -113,12 +112,17 @@ onUnmounted(() => {
       align-items: end;
       .message-body {
         background-color: #373D4D;
+        min-width: 24px;
       }
     }
     .message-header {
       font-size: 14px;
       color: #7C85A6;
       margin-bottom: 10px;
+      max-width: 180px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
     .message-body {
       background-color: #1883FF;

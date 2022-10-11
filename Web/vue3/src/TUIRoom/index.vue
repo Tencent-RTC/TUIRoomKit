@@ -131,7 +131,7 @@ async function init(option: RoomInitData) {
 
   await TUIRoomCore.login(sdkAppId, userId, userSig);
 
-  TUIRoomCore.updateMyProfile({
+  await TUIRoomCore.updateMyProfile({
     nick: userName,
     avatar: userAvatar || '',
   });

@@ -35,7 +35,7 @@
           </div>
         </div>
         <div class="button join-room-button" type="primary" @click="enterRoom">
-          <input v-model="roomId" class="input" :placeholder="t('Enter a room ID')" maxlength="10" @click.stop="">
+          <input v-model="roomId" class="input" :placeholder="t('Enter room ID')" maxlength="10" @click.stop="">
           <span class="title">{{ t('Join Room') }}</span>
         </div>
       </div>
