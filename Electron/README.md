@@ -1,65 +1,67 @@
-# TUIRoom Electron 示例工程快速跑通
+# TUIRoom Electron sample project quick run-through
 
-本文档主要介绍如何快速跑通 TUIRoom Electron 示例工程，体验多人音视频互动，更详细的TUIRoom Electron组件接入流程，请点击腾讯云官网文档：[TUIRoom 组件 Web 接入说明](https://cloud.tencent.com/document/product/647/75694)...
+_English | [简体中文](README.zh.md)_
 
-## 目录结构
+This document mainly introduces how to quickly run through the TUIRoom Electron sample project to experience multiplayer audio and video interaction, more detailed TUIRoom Electron component access process, please click the Tencent Cloud official website documentation: [TUIRoom component Electron access instructions](https://www.tencentcloud.com/document/product/647/48416)
+
+## Directory structure
 
 ```
 .
-├── dist                      构建后，根据 packages 目录生成
-|   ├── main
-|   ├── preload
-|   └── renderer
-|
+├── dist is built and generated from the packages directory
+| ├── main
+| ├── preload
+| └── renderer
+|├─ renderer
 ├── scripts
-|   ├── build.mjs             项目开发脚本 npm run build
-|   └── watch.mjs             项目开发脚本 npm run dev
-|
+| ├── build.mjs project development script npm run build
+| └── watch.mjs project development script npm run dev
+|npm run dev
 ├── packages
-|   ├── main                  主进程源码
-|   |   |── vite.config.ts
-|   |   └── index.ts
-|   ├── preload               预加载脚本源码
-|   |   ├── vite.config.ts
-|   |   ├── index.ts
-|   |   ├── loading.ts
-|   |   └── utils.ts
-|   └── renderer              渲染进程源码
-|       ├── auto-imports.d.ts
-|       ├── components.d.ts
-|       ├── index.html
-|       ├── src
-│       |   ├── App.vue   // 示例工程主页面
-│       |   ├── TUIRoom   // TUIRoom UI 组件源文件
-│       |   ├── assets    // 公共资源
-│       |   ├── config    // TUIRoom 配置文件
-│       |   ├── env.d.ts
-│       |   ├── main.ts   // 示例工程入口文件
-│       |   ├── router    // 示例工程路由配置
-│       |   └── views     // 示例工程路由页面
-|       └── vite.config.ts
+| ├── main main process source code
+| |── vite.config.ts
+| └── index.ts
+| ├── preload preload script source code
+| ├── vite.config.ts
+| ├── index.ts
+| ├─ loading.ts
+| └── utils.ts
+| └── renderer rendering process source code
+| ├── auto-imports.d.ts
+| ├── components.d.ts
+| ├── index.html
+| ├── src
+│ | ├─ App.vue // main page of the sample project
+│ | ├── TUIRoom // TUIRoom UI component source files
+│ | ├── assets // public resources
+│ ├── config // TUIRoom configuration file
+│ ├── env.d.ts
+│ ├── main.ts // sample project entry file
+│ ├── router // Example project routing configuration
+│ └── views // Example project routing page
+| └── vite.config.ts
 ```
-### 第一步：创建TRTC的应用
+### Step 1: Create the TRTC application
 
-1. 进入腾讯云实时音视频控制台的 [应用管理](https://console.cloud.tencent.com/trtc/app) 界面，选择创建应用，输入应用名称，例如 `TUIKitDemo` ，单击 **创建**；
-2. 点击对应应用条目后**应用信息**，具体位置如下下图所示：
-    <img src="https://qcloudimg.tencent-cloud.cn/raw/62f58d310dde3de2d765e9a460b8676a.png" width="900">
-3. 进入应用信息后，按下图操作，记录SDKAppID和密钥：
-    <img src="https://qcloudimg.tencent-cloud.cn/raw/bea06852e22a33c77cb41d287cac25db.png" width="900">
+1. Enter the [Application Management](https://www.tencentcloud.com/account/login) interface of the Tencent Cloud Live Audio/Video Console, select Create Application, enter the application name,click **Create Application**.
+2. Click on the corresponding application entry and **Application Information**, as shown in the following image.
+    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a12607f338b311ed8088525400463ef7.png" width="900">
+3. Once in the application information, record the SDKAppID and key as shown below.
+    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a0eb96e038b311ed8088525400463ef7.png" width="900">
 
->! 本功能同时使用了腾讯云 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788) 和 [即时通信 IM](https://cloud.tencent.com/document/product/269) 两个基础 PaaS 服务，开通实时音视频后会同步开通即时通信 IM 服务。 即时通信 IM 属于增值服务，详细计费规则请参见 [即时通信 IM 价格说明](https://cloud.tencent.com/document/product/269/11673)。
+>! This function uses both Tencent Cloud [Real-time Audio and Video TRTC](https://www.tencentcloud.com/document/product/647/35078) and [Instant Messaging IM](https://www.tencentcloud.com/document/product/1047) two basic PaaS services, and the instant messaging IM service will be opened simultaneously after real-time audio and video is opened. IM is a value-added service, please refer to [IM Price Description](https://www.tencentcloud.com/document/product/1047/34350) for detailed billing rules.
 
-### 第二步：下载源码，配置工程
-1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
-2. 找到并打开 ` Electron/packages/renderer/src/config/basic-info-config.js` 文件。
-3. 配置 `basic-info-config.js` 文件中的相关参数：
+### Step 2: Download the source code and configure the project
+1. Clone or directly download this repository source code, **Welcome Star**, thanks~~
+2. Find and open the ` Electron/packages/renderer/src/config/basic-info-config.js` file. 3.
+3. Configure the relevant parameters in the `basic-info-config.js` file.
 	<img src="https://qcloudimg.tencent-cloud.cn/raw/d05a18af04758e352f9afcb0925d105c.png" width="900">
-	- SDKAPPID：默认为 0，请设置为步骤一中记录下的 SDKAppID。
-	- SECRETKEY：默认为 ''，请设置为步骤一中记录下的密钥信息。
+	- SDKAPPID: default is 0, please set it to the SDKAppID recorded in step 1.
+	- SECRETKEY: default is '', please set it to the key information recorded in step 1.
 
-### 第三步：运行示例
+### Step 3: Run the example
 
-1. 安装依赖
+1. Install the dependencies
 
    ```bash
    cd TUIRoom/Electron
@@ -67,49 +69,61 @@
    npm install
    ```
 
-2. 开发环境运行示例工程
+2. Run the sample project in the development environment
 
    ```bash
    npm run dev
    ```
 
-3. 构建安装包、运行
-   - 构建符合当前机器 CPU 类型的安装包。适合 Windows 和 Mac 操作系统。
+3. Build the installer and run it
+   - Build an installer that matches the CPU type of the current machine. Suitable for Windows and Mac operating systems.
 
    ```bash
    npm run build
    ```
 
-   - Mac 下构建同时支持 X64 和 ARM64 芯片架构的安装包。应用安装后，在 X64 芯片下运行 X64 指令集，在 ARM64 芯片下运行 ARM64 指令集，充分发挥硬件优势。仅支持 Electron 11 及以上版本。
+   - Build installers for Mac that support both X64 and ARM64 chip architectures. Once installed, the application runs the X64 instruction set on an X64 chip and the ARM64 instruction set on an ARM64 chip to take full advantage of the hardware. Only Electron 11 and above are supported.
    ```bash
    npm run build:mac-universal
    ```
 
-   > 注意：构建好的安装包位于 release 目录下。只能使用 Mac 电脑构建 Mac 安装包，使用 Windows 电脑构建 Windows 安装包。
-### 第四步：示例体验
+   > Note: The built installer is located in the release directory. You can only build the Mac installer with a Mac computer, and the Windows installer with a Windows computer.
 
-开发环境运行示例工程后，可直接体验 TUIRoom 功能。
+### Step 4: Sample experience
 
-注意：因 TUIRoom 按需引入 element-plus 组件，会导致开发环境路由页面第一次加载时反应较慢，等待 element-plus 按需加载完成即可正常使用。element-plus 按需加载不会影响打包之后的页面加载。
+After running the sample project in the development environment, you can directly experience the TUIRoom functionality.
 
-Tips：TUIRoom 完整功能体验，至少需要两个 userId 不同的用户。需要您在两台设备上参考第二步配置 TUIRoom 示例工程并运行代码：
+Note: Because TUIRoom introduces element-plus components on-demand, the development environment will be slow to load the routing page for the first time, wait until element-plus is loaded on-demand. element-plus loading on-demand will not affect the page loading after packaging.
 
-**主持人（userId：anchor）**
-- 步骤1、在 home 页面，点击【创建房间】按钮；
-- 步骤2、进入 TUIRoom 房间；
+Tips：TUIRoom requires at least two users with different userId to experience the full functionality. You need to configure the TUIRoom sample project and run the code in step 2 on both devices as follows
 
-| 步骤1 | 步骤2 |
+**Moderator (userId:anchor)**
+
+- Step 1: In the home page, click the [Create Room] button.
+- Step 2. enter the TUIRoom room.
+
+| Step 1 | Step 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/8acad0f524c325e1f62ca0fcf9e9f54b.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room.png" width="320"/> |
+| <img src="https://qcloudimg.tencent-cloud.cn/raw/4eb4ddf45906edf9d2bf3f604531653f.jpg" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/0148dda4945ec2b4adf277fde30c0ff8.jpg" width="320"/> |
 
-**普通成员（userId：audience）**
+**General member (userId: audience)**
 
-- 步骤1、在 home 页面，输入主持人创建的房间 Id，点击【加入房间】按钮；
-- 步骤2、加入房间；
+- Step 1. On the home page, enter the room Id created by the host and click the [Join Room] button.
+- Step 2. join the room.
 
-| 步骤1 | 步骤2 |
+| Step 1 | Step 2 |
 |---------|---------|
-| <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-home.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room.png" width="320"/> |
-## 常见问题
+| <img src="https://qcloudimg.tencent-cloud.cn/raw/35a7890d45ef7decd8b3e439e51d753b.jpg" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/0148dda4945ec2b4adf277fde30c0ff8.jpg" width="320"/> |
+## Frequently Asked Questions
 
-- 欢迎加入 QQ 群：695855795，进行技术交流和反馈~
+### Q: What is the reason why the microphone and camera are not working properly after the project is packaged and deployed to the test/production environment?
+
+A: Please check if the deployment link is https protocol, for user security, privacy and other issues, the browser restricts the web page under https protocol to use all the functions of TRTC Web SDK (WebRTC) normally.
+
+
+## Other
+
+- Welcome to join our Telegram Group to communicate with our professional engineers! We are more than happy to hear from you~
+Click to join: [https://t.me/+EPk6TMZEZMM5OGY1](https://t.me/+EPk6TMZEZMM5OGY1)   
+Or scan the QR code   
+  <img src="https://qcloudimg.tencent-cloud.cn/raw/79cbfd13877704ff6e17f30de09002dd.jpg" width="300px">    
