@@ -87,15 +87,16 @@ The TUIRoom component supports custom layout and can be applied in various scena
 
 ## Tryout and Demo Run
 
-You can directly scan the QR code below and click to experience it, or click to jump to [ios](https://www.tencentcloud.com/document/product/647/37284), [android](https://www.tencentcloud.com/document/product/647/37283), [win or mac](https://www.tencentcloud.com/document/product/647/44071), [web](https://www.tencentcloud.com/document/product/647/47636), and [Electron](https://www.tencentcloud.com/document/product/647/48416) for experience links. You can also click [TUIRoom](https://github.com/tencentyun/TUIRoom) to view the source code at GitHub.
+You can directly scan the QR code below or click to experience it, or click to jump to [ios](https://www.tencentcloud.com/document/product/647/37284), [android](https://www.tencentcloud.com/document/product/647/37283), [win or mac](https://www.tencentcloud.com/document/product/647/44071), [web](https://www.tencentcloud.com/document/product/647/47636), and [Electron](https://www.tencentcloud.com/document/product/647/48416) for experience links. You can also click [TUIRoom](https://github.com/tencentyun/TUIRoom) to view the source code at GitHub.
 <table>
 <tr>
-<th>iOS</th><th>Android</th>
+<th>iOS</th><th>Android</th><th>Web</th>
 </tr>
 <tr>
 <td><img style="width:150px;" src="https://imgcache.qq.com/operation/dianshi/other/androiderercrcode.b8a053599ac9f16ccb0ad3328f1f015054170efe.png" data-nonescope="true"></td>
 
 <td><img style="width:150px;" src="https://imgcache.qq.com/operation/dianshi/other/crcode_android.fa3232dcf5c64a5184c5e9e0357674c6b3b601ac.png" data-nonescope="true"></td>
+<td><a style=" color: #fff;background-color: #00a4ff;height: 40px;display:inline-block;text-align:center;line-height: 40px;border-radius:20px;width:150px;" target="_blank" href="https://web.sdk.qcloud.com/component/tuiroom/index.html?lang=en" name="demo-click-web">TUIRoom</a></td>
 </table>
 
 ## Documentation

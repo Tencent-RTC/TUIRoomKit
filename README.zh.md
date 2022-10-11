@@ -106,15 +106,16 @@ TUIRoom组件支持自定义布局，适用于多个场景：
 
 ## 体验并跑通
 
-可以直接扫描下方二维码点击体验，或者点击跳转[ios](https://cloud.tencent.com/document/product/647/45681)、[android](https://cloud.tencent.com/document/product/647/45667)、[win或mac](https://cloud.tencent.com/document/product/647/63494)、[Web](https://cloud.tencent.com/document/product/647/74765)、[Electron](https://cloud.tencent.com/document/product/647/75694)的体验链接。点击[TUIRoom](https://github.com/tencentyun/TUIRoom)可查看Github源码。
+可以直接扫描下方二维码或点击体验，或者点击跳转[ios](https://cloud.tencent.com/document/product/647/45681)、[android](https://cloud.tencent.com/document/product/647/45667)、[win或mac](https://cloud.tencent.com/document/product/647/63494)、[Web](https://cloud.tencent.com/document/product/647/74765)、[Electron](https://cloud.tencent.com/document/product/647/75694)的体验链接。点击[TUIRoom](https://github.com/tencentyun/TUIRoom)可查看Github源码。
 <table>
 <tr>
-<th>iOS</th><th>Android</th>
+<th>iOS</th><th>Android</th><th>Web</th>
 </tr>
 <tr>
 <td><img style="width:150px;" src="https://imgcache.qq.com/operation/dianshi/other/androiderercrcode.b8a053599ac9f16ccb0ad3328f1f015054170efe.png" data-nonescope="true"></td>
 
 <td><img style="width:150px;" src="https://imgcache.qq.com/operation/dianshi/other/crcode_android.fa3232dcf5c64a5184c5e9e0357674c6b3b601ac.png" data-nonescope="true"></td>
+<td><a style=" color: #fff;background-color: #00a4ff;height: 40px;display:inline-block;text-align:center;line-height: 40px;border-radius:20px;width:150px;" target="_blank" href="https://web.sdk.qcloud.com/component/tuiroom/index.html" name="demo-click-web">TUIRoom</a></td>
 
 
 
