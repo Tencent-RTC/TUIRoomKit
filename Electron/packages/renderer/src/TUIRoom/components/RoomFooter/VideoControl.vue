@@ -2,6 +2,12 @@
   * 名称: IconButton
   * @param name String required
   * @param size String 'large'|'medium'|'small'
+  * Usage:
+  * Use <audio-control /> in the template
+  *
+  * Name: IconButton
+  * @param name String required
+  * @param size String 'large'|'medium'|'small'
   * 使用方式：
   * 在 template 中使用 <audio-control />
 -->
@@ -82,7 +88,11 @@ function toggleMuteVideo() {
   }
 
   roomStore.setIsLocalVideoMuted(!isLocalVideoMuted.value);
-  // 关闭本地摄像头的时候应该熄灭摄像头灯，使用 stopCameraPreview 方法
+  /**
+   * When closing the local camera you should turn off the camera light and use the stopCameraPreview method
+   *
+   * 关闭本地摄像头的时候应该熄灭摄像头灯，使用 stopCameraPreview 方法
+  **/
   if (isLocalVideoMuted.value) {
     TUIRoomCore.stopCameraPreview();
   } else {

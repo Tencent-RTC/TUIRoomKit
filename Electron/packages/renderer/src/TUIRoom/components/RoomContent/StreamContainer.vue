@@ -21,11 +21,19 @@
         ></stream-region>
       </div>
     </div>
-    <!-- 侧边栏和上边栏箭头 -->
+    <!--
+    *Sidebar and upper sidebar arrows
+    *
+    *侧边栏和上边栏箭头
+    -->
     <div v-if="showIconControl && showRoomTool" :class="arrowClass" @click="handleClickIcon">
       <svg-icon icon-name="line-arrow-up" size="medium"></svg-icon>
     </div>
-    <!-- 九宫格左右翻页控制栏 -->
+    <!--
+    *Nine-pane left and right page flip control bar
+    *
+    *九宫格左右翻页控制栏
+    -->
     <div v-if="showTurnPageControl && showRoomTool" class="turn-page-container">
       <div
         v-show="showTurnPageLeftArrow"
@@ -73,7 +81,11 @@ const showSideList = ref(true);
 const enlargeStream: Ref<StreamInfo | null> = ref(null);
 const enlargeDomId = computed(() => (enlargeStream.value ? `${enlargeStream.value.userId}_${enlargeStream.value.type}` : ''));
 
-// ----- 以下处理九宫格翻页逻辑 -----
+/**
+ * ----- The following handles the nine-pane page flip logic -----
+ *
+ * ----- 以下处理九宫格翻页逻辑 -----
+**/
 const currentPageIndex = ref(0);
 const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
   if (layout.value !== LAYOUT.NINE_EQUAL_POINTS) {
@@ -89,26 +101,50 @@ watch(streamNumber, (val) => {
   }
 });
 
-// 显示左右翻页图标
+/**
+ * Show left and right page flip icons
+ *
+ * 显示左右翻页图标
+**/
 const showTurnPageControl = computed(() => layout.value === LAYOUT.NINE_EQUAL_POINTS && streamNumber.value > 9);
-// 是否展示九宫格朝左翻页按钮
+/**
+ * Whether or not to show the nine-page-to-left button
+ *
+ * 是否展示九宫格朝左翻页按钮
+**/
 const showTurnPageLeftArrow = computed(() => currentPageIndex.value > 0);
-// 是否展示九宫格朝右翻页按钮
+/**
+ * Whether or not to display the nine-pane rightward-facing page button
+ *
+ * 是否展示九宫格朝右翻页按钮
+**/
 const showTurnPageRightArrow = computed(() => streamNumber.value > currentPageIndex.value * 9 + 9);
 
-// 九宫格布局朝左翻页
+/**
+ * Nine grid layout towards the left to turn the page
+ *
+ * 九宫格布局朝左翻页
+**/
 function handleTurnPageLeft() {
   currentPageIndex.value = currentPageIndex.value - 1;
   handleNineEqualPointsLayout();
 }
 
-// 九宫格布局朝右翻页
+/**
+ * Nine grid layout towards the right to turn the page
+ *
+ * 九宫格布局朝右翻页
+**/
 function handleTurnPageRight() {
   currentPageIndex.value = currentPageIndex.value + 1;
   handleNineEqualPointsLayout();
 }
 
-// ----- 以下处理流布局 ---------
+/**
+ * ----- The following processing stream layout ---------
+ *
+ * ----- 以下处理流布局 ---------
+**/
 const streamContainerClass = ref('');
 const enlargedContainerRef = ref();
 const streamListRef = ref();
@@ -143,7 +179,11 @@ function handleClickIcon() {
     }
     enlargedStreamStyle.value.width = `${width}px`;
     enlargedStreamStyle.value.height = `${height}px`;
-    // 修改 enlargedContainer 的宽和高
+    /**
+     * Modify the width and height of the enlargedContainer
+     *
+     * 修改 enlargedContainer 的宽和高
+    **/
     if (layout.value === LAYOUT.RIGHT_SIDE_LIST) {
       enlargedContainerRef.value.style.width = '100%';
       enlargedContainerRef.value.style.height = '100%';
@@ -172,7 +212,11 @@ function handleClickIcon() {
   }
 }
 
-// 处理九宫格布局
+/**
+ * Handle nine-pattern layout
+ *
+ * 处理九宫格布局
+**/
 async function handleNineEqualPointsLayout() {
   streamContainerClass.value = 'stream-container-flatten';
 
@@ -208,7 +252,11 @@ async function handleNineEqualPointsLayout() {
   streamStyle.value.height = `${height}px`;
 }
 
-// 处理侧边栏布局
+/**
+ * Handle sidebar layout
+ *
+ * 处理侧边栏布局
+**/
 async function handleRightSideListLayout() {
   streamContainerClass.value = 'stream-container-right';
 
@@ -240,7 +288,11 @@ async function handleRightSideListLayout() {
   }
 }
 
-// 处理顶部栏布局
+/**
+ * Handle top bar layout
+ *
+ * 处理顶部栏布局
+**/
 async function handleTopSideListLayout() {
   streamContainerClass.value = 'stream-container-top';
 
@@ -272,7 +324,11 @@ async function handleTopSideListLayout() {
   }
 }
 
-// 双击切换流到放大区域
+/**
+ * Double-click to switch the stream to the zoom in section
+ *
+ * 双击切换流到放大区域
+**/
 function handleEnlargeStreamRegion(stream: StreamInfo) {
   if (layout.value === LAYOUT.NINE_EQUAL_POINTS) {
     return;
@@ -280,7 +336,11 @@ function handleEnlargeStreamRegion(stream: StreamInfo) {
   enlargeStream.value = stream;
 }
 
-// 页面加载或者 layout 改变时，处理页面布局
+/**
+ * Handle the page layout when the page loads or the layout changes
+ *
+ * 页面加载或者 layout 改变时，处理页面布局
+**/
 function handleLayout() {
   switch (layout.value as any) {
     case LAYOUT.NINE_EQUAL_POINTS:
@@ -303,7 +363,11 @@ function handleLayout() {
   }
 }
 
-// 页面 resize 时，处理流窗口尺寸
+/**
+ * Processing stream window size when page rescaling
+ *
+ * 页面 resize 时，处理流窗口尺寸
+**/
 function handleResize() {
   switch (layout.value as any) {
     case LAYOUT.NINE_EQUAL_POINTS:
@@ -345,7 +409,11 @@ watch(layout, () => {
 
 const showIconControl = computed(() => [LAYOUT.RIGHT_SIDE_LIST, LAYOUT.TOP_SIDE_LIST].indexOf(layout.value) >= 0);
 
-// --- 以下处理流事件 ----
+/**
+ * --- The following processing stream events ----
+ *
+ * --- 以下处理流事件 ----
+**/
 
 const onUserEnterRoom = (streamInfo: any) => {
   roomStore.addRemoteUser(streamInfo);
@@ -355,15 +423,27 @@ const onUserLeaveRoom = (streamInfo: { userId: string }) => {
   roomStore.removeRemoteUser(streamInfo.userId);
 };
 
-// 收到远端 trtc 的 peer-join 事件
+/**
+ * Receive a peer-join event from the remote trtc
+ *
+ * 收到远端 trtc 的 peer-join 事件
+**/
 const onUserAVEnabled = (userInfo: any) => {
   roomStore.updateUserAVAbility(userInfo, true);
 };
 
-// 收到远端 trtc 的 peer-leave 事件
+/**
+ * Receive peer-leave event from remote trtc
+ *
+ * 收到远端 trtc 的 peer-leave 事件
+**/
 const onUserAVDisabled = (userInfo: any) => {
   roomStore.updateUserAVAbility(userInfo, false);
-  // 远端流离开的时候，重新设置流播放布局
+  /**
+   * Reset the stream playback layout when the remote stream leaves
+   *
+   * 远端流离开的时候，重新设置流播放布局
+  **/
   if (roomStore.remoteStreamList.length === 0) {
     basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
     enlargeStream.value = null;
@@ -380,7 +460,11 @@ const onUserVideoAvailable = (eventInfo: { userId: string, available: number, st
   }
   if (streamType === ETUIStreamType.CAMERA) {
     roomStore.updateRemoteVideoStream(eventInfo);
-    // 处理 web 端屏幕分享
+    /**
+     * Handle web-side screen sharing
+     *
+     * 处理 web 端屏幕分享】
+    **/
     if (userId.indexOf('share_') === 0 && userId !== `share_${basicStore.userId}`) {
       enlargeStream.value = roomStore.remoteStreamMap.get(`${userId}_main`) as StreamInfo;
       if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
@@ -388,7 +472,12 @@ const onUserVideoAvailable = (eventInfo: { userId: string, available: number, st
       }
       return;
     }
-    // 当远端流视频位 available 为 true，主持人端修改该用户的禁画提示为【禁画】
+    /**
+     * When the remote stream video bit available is true,
+     * the host side modifies the user's no-picture prompt to [no-picture]
+     *
+     * 当远端流视频位 available 为 true，主持人端修改该用户的禁画提示为【禁画】
+    **/
     if (basicStore.isMaster && available) {
       roomStore.setMuteUserVideo(userId, false);
     }
@@ -400,7 +489,11 @@ const onUserVideoAvailable = (eventInfo: { userId: string, available: number, st
         basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
       }
     } else {
-      // 远端屏幕分享流停止的时候，重新设置流播放布局
+      /**
+       * Reset the stream playback layout when the remote screen sharing stream is stopped
+       *
+       * 远端屏幕分享流停止的时候，重新设置流播放布局
+      **/
       if (roomStore.remoteStreamList.length === 0) {
         basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
         enlargeStream.value = null;
@@ -419,7 +512,12 @@ const onUserAudioAvailable = (eventInfo: { userId: string, available: number}) =
     return;
   }
   roomStore.updateRemoteAudioStream(eventInfo);
-  // 当远端流音频位 available 为 true，主持人端修改该用户的禁画提示为【禁言】
+  /**
+   * When the remote stream audio bit available is true,
+   * the host side modifies the user's ban prompt to make it [ban]
+   *
+   * 当远端流音频位 available 为 true，主持人端修改该用户的禁画提示为【禁言】
+  **/
   if (basicStore.isMaster && available) {
     roomStore.setMuteUserAudio(userId, false);
   }
@@ -432,13 +530,21 @@ watch(isDefaultOpenCamera, async (val) => {
   if (val && !isLocalVideoIconDisable.value) {
     const previewDom = document.getElementById(`${roomStore.localStream.userId}_main`);
     if (previewDom) {
-      // 设置设备id
+      /**
+       * Set device id
+       *
+       * 设置设备id
+      **/
       if (!roomStore.currentCameraId) {
         const cameraList = await TUIRoomCore.getCameraList();
         roomStore.setCurrentCameraId(cameraList[0].deviceId);
       }
       await TUIRoomCore.setCurrentCamera(roomStore.currentCameraId);
-      // 开启本地摄像头
+      /**
+       * Turn on the local camera
+       *
+       * 开启本地摄像头
+      **/
       await TUIRoomCore.startCameraPreview(previewDom);
       roomStore.setHasStartedCamera(true);
     }
@@ -447,7 +553,11 @@ watch(isDefaultOpenCamera, async (val) => {
 
 watch(isDefaultOpenMicrophone, async (val) => {
   if (val && !isLocalAudioIconDisable.value) {
-    // 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
+    /**
+     * Advance the timing of startMicrophone to ensure that it is executed before startCameraPreview
+     *
+     * 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
+    **/
     await TUIRoomCore.startMicrophone();
     roomStore.setHasStartedMicrophone(true);
     const microphoneList = await TUIRoomCore.getMicrophoneList();
@@ -462,7 +572,11 @@ watch(isDefaultOpenMicrophone, async (val) => {
   }
 });
 
-// 远端用户信息更新
+/**
+ * Remote user information update
+ *
+ * 远端用户信息更新
+**/
 function onUserInfoUpdated(data: { userId: string, nick: string, avatar: string }) {
   const { userId, nick, avatar } = data;
   roomStore.updateRemoteUser(userId, { nick, avatar });

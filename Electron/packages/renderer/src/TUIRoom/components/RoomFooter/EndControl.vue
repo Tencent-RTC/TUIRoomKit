@@ -95,7 +95,11 @@ function stopMeeting() {
   if (!visible.value) {
     visible.value = true;
   }
-  // 获取房间里最新成员
+  /**
+   * Get the latest members in the room
+   *
+   * 获取房间里最新成员
+  **/
   roomMember.value = TUIRoomCore.getRoomUsers();
 }
 
@@ -103,7 +107,11 @@ function cancel() {
   resetState();
 }
 
-// 主动解散房间
+/**
+ * Active room dismissal
+ *
+ * 主动解散房间
+**/
 async function dismissRoom() {
   try {
     logger.log(`${logPrefix}dismissRoom: enter`);
@@ -117,7 +125,11 @@ async function dismissRoom() {
   }
 }
 
-// 主动离开房间
+/**
+ * Leave the room voluntarily
+ *
+ * 主动离开房间
+**/
 async function leaveRoom() { // eslint-disable-line
   try {
     if (basicInfo.role === ETUIRoomRole.MASTER) {
@@ -152,7 +164,11 @@ async function transferAndLeave() {
   }
 }
 
-// 收到主持人解散房间通知
+/**
+ * notification of room dismissal from the host
+ *
+ * 收到主持人解散房间通知
+**/
 const onRoomDestroyed = async () => {
   if (basicInfo.userId === basicInfo.masterUserId) {
     return;
@@ -171,9 +187,18 @@ const onRoomDestroyed = async () => {
     logger.error(`${logPrefix}onRoomDestroyed error:`, error);
   }
 };
-// 收到主持人移交权限通知
+
+/**
+ * Receive notification of transfer of authority from the moderator
+ *
+ * 收到主持人移交权限通知
+**/
 const onRoomMasterChanged = async (newOwner: { newOwnerId: string, newOwnerName: string }) => {
-  // 新主持人
+  /**
+   * New Hosts
+   *
+   * 新主持人
+  **/
   const newOwnerId = newOwner?.newOwnerId;
   const newOwnerName = newOwner?.newOwnerName;
   const newName = newOwnerName || newOwnerId;

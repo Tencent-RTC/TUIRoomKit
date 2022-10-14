@@ -1,4 +1,12 @@
 <!--
+  * Name: IconButton
+  * @param title String required
+  * @param iconName String required
+  * @param hasMore Boolean
+  * @param hideHoverEffect Boolean
+  * Usage:
+  * Use <icon-button /> in template
+  *
   * 名称: IconButton
   * @param title String required
   * @param iconName String required

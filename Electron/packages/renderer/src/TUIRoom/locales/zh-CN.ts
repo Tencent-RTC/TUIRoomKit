@@ -14,7 +14,7 @@ export default {
   '': '倒计时',
   'The room does not exist, please confirm the room number or create a room!': '房间不存在，请确认房间号或创建房间！',
   'Log out': '退出登录',
-  'Edit information': '编辑资料',
+  'Edit profile': '编辑资料',
   'User Name': '用户名',
   'Please input user name': '请输入用户名',
   'Username length should be greater than 0': '昵称长度应该大于0',

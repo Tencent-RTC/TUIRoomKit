@@ -19,4 +19,4 @@ export {
   ETUIRoomMuteType
 } from './types';
 
-export * from 'trtc-electron-sdk';
+export * from './trtc_define';

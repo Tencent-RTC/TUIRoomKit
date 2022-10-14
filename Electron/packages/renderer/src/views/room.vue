@@ -50,37 +50,64 @@ onMounted(async () => {
     await TUIRoomRef.value?.enterRoom(Number(roomId), roomParam);
   }
 });
-
-// 处理用户点击页面左上角【退出登录】
+/**
+ * Processing users click [Logout Login] in the upper left corner of the page
+ *
+ * 处理用户点击页面左上角【退出登录】
+**/
 function handleLogOut() {
-  // 接入方处理 logout 方法
+/**
+ * The accessor handles the logout method
+ *
+ * 接入方处理 logout 方法
+**/
 }
 
-// 主持人创建房间回调
+/**
+ * Hosts create room callbacks
+ *
+ * 主持人创建房间回调
+**/
 function onCreateRoom(info: { code: number; message: string }) {
   console.debug('onEnterRoom:', info);
 }
 
-// 普通成员进入房间回调
+/**
+ * Ordinary members enter the room callback
+ *
+ * 普通成员进入房间回调
+**/
 function onEnterRoom(info: { code: number; message: string }) {
   console.debug('onCreateRoom:', info);
 }
 
-// 主持人销毁房间回调
+/**
+ * Hosts destroy room callbacks
+ *
+ * 主持人销毁房间回调
+**/
 const onDestroyRoom = (info: { code: number; message: string }) => {
   console.debug('onDestroyRoom:', info);
   sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });
 };
 
-// 普通成员退出房间回调
+/**
+ * Ordinary members exit the room callback
+ *
+ * 普通成员退出房间回调
+**/
 const onExitRoom = (info: { code: number; message: string }) => {
   console.debug('onExitRoom:', info);
   sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });
 };
 
-// 普通成员被主持人踢出房间
+/**
+ * Ordinary members were kicked out of the room by the host
+ *
+ * 普通成员被主持人踢出房间
+**/
 const onKickOff = (info: { code: number; message: string }) => {
   console.debug('onKickOff:', info);
   sessionStorage.removeItem('tuiRoom-roomInfo');

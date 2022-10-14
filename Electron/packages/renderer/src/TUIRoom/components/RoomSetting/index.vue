@@ -40,7 +40,12 @@ const { t } = useI18n();
 const basicStore = useBasicStore();
 
 const { showSettingDialog, activeSettingTab } = storeToRefs(basicStore);
-// TODO: 完善其余设置 Tab
+
+/**
+ * TODO: Refine the rest of the settings Tab
+ *
+ * TODO: 完善其余设置 Tab
+**/
 const settingTabsTitleList = computed(() => [
   { label: t('Audio settings'), value: 'audio' },
   { label: t('Camera settings'), value: 'video' },
