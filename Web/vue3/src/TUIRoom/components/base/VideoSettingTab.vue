@@ -1,4 +1,10 @@
 <!--
+  * Name: VideoTab
+  * @param name String required
+  * @param size String 'large'|'medium'|'small'
+  * Usage:
+  * Use <video-tab></video-tab> in the template
+  *
   * 名称: VideoTab
   * @param name String required
   * @param size String 'large'|'medium'|'small'
@@ -71,7 +77,11 @@ const { currentCameraId } = storeToRefs(roomStore);
 
 const { t } = useI18n();
 
-// 点击【更多摄像头设置】
+/**
+ * Click [More Camera Settings].
+ *
+ * 点击【更多摄像头设置】
+**/
 function handleMoreCameraSetting() {
   basicStore.setShowSettingDialog(true);
   basicStore.setActiveSettingTab('video');

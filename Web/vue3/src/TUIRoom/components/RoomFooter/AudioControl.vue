@@ -2,6 +2,12 @@
   * 名称: IconButton
   * @param name String required
   * @param size String 'large'|'medium'|'small'
+  * Usage:
+  * Use <audio-control /> in the template
+  *
+  * Name: IconButton
+  * @param name String required
+  * @param size String 'large'|'medium'|'small'
   * 使用方式：
   * 在 template 中使用 <audio-control />
 -->

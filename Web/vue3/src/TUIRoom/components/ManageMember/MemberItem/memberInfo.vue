@@ -1,5 +1,9 @@
 <template>
-  <!-- 用户基础信息 -->
+  <!--
+    *User base information
+    *
+    *用户基础信息
+  -->
   <div class="member-basic-info">
     <img class="user-avatar" :src="userInfo.userAvatar || defaultAvatar">
     <div class="user-name">{{ userInfo.userName || userInfo.userId }}</div>
@@ -13,7 +17,11 @@
       {{ t('Host') }}
     </div>
   </div>
-  <!-- 用户音视频状态信息 -->
+  <!--
+    *User audio and video status information
+    *
+    *用户音视频状态信息
+  -->
   <div v-if="!isMe && !showMemberControl" class="member-av-state">
     <div v-if="userInfo.role !== ETUIRoomRole.AUDIENCE">
       <svg-icon

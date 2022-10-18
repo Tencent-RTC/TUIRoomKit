@@ -32,14 +32,23 @@ const { t } = useI18n();
 const chatStore = useChatStore();
 const { messageList } = storeToRefs(chatStore);
 const messageBottomEl = ref<HTMLInputElement | null>(null);
-// 为了解决自己向上滚动浏览消息, 防止别人发的消息不停向下滚消息列表
+/**
+ * To solve the problem of scrolling up the message yourself,
+ * to prevent others from sending messages keep scrolling down the message list
+ *
+ * 为了解决自己向上滚动浏览消息, 防止别人发的消息不停向下滚消息列表
+**/
 let isScrollNotAtBottom = false;
 
 const handleMessageListScroll = (e: Event) => {
   const messageContainer = e.target as HTMLElement;
   const bottom = messageContainer.scrollHeight - messageContainer.scrollTop - messageContainer.clientHeight;
   if (bottom > 80) {
-    // 30 为判断是否向上滚动浏览消息的阈值
+    /**
+     * 30 is the threshold for determining whether to scroll up through the messages
+     *
+     * 30 为判断是否向上滚动浏览消息的阈值
+    **/
     isScrollNotAtBottom = true;
   } else {
     isScrollNotAtBottom = false;
@@ -52,13 +61,21 @@ watch(messageList, async (newMessageList, oldMessageList) => { // eslint-disable
     if (newMessageList.length >= 1) {
       const lastMessage = newMessageList[newMessageList.length - 1];
       if ((lastMessage as any).flow === 'out') {
-        // 最新一条是自己发送的
+        /**
+         * The latest one was sent by myself
+         *
+         * 最新一条是自己发送的
+        **/
         messageBottomEl.value && messageBottomEl.value.scrollIntoView();
       }
     }
     return;
   }
-  // 如果没进行滚动一直在底部, 直接展示最新消息
+  /**
+   * If you don't scroll all the way to the bottom, show the latest news directly
+   *
+   * 如果没进行滚动一直在底部, 直接展示最新消息
+  **/
   messageBottomEl.value && messageBottomEl.value.scrollIntoView();
 });
 

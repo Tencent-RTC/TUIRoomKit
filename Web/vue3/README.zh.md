@@ -85,6 +85,19 @@ _[English](README.md) | 简体中文_
 | 步骤1 | 步骤2 |
 |---------|---------|
 | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-home.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room.png" width="320"/> |
+
+### 第五步：生产环境部署
+- 步骤一：打包 dist 文件
+
+   ```bash
+   npm run build
+   ```
+- 步骤二： 部署 dist 文件到服务器上
+
+>! 生产环境要求使用 https 域名
+
+<img src="https://qcloudimg.tencent-cloud.cn/raw/a9dc181dd2c9a60852a538de7c477c3e.png" width="100%"/>
+
 ## 常见问题
 
 ### Q：项目打包之后部署到测试/生产环境，无法正常使用麦克风和摄像头是什么原因呢？

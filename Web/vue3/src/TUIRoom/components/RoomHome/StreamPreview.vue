@@ -129,19 +129,31 @@ onBeforeUnmount(async () => {
   TUIRoomCore.off(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);
 });
 
-// ----- 处理音视频设备设置
+/**
+ * Handles audio and video device settings
+ *
+ * 处理音视频设备设置
+**/
 const isSettingOpen = ref(false);
 const settingTitle = ref('');
 const settingTab = ref('');
 
-// 处理音频设备设置
+/**
+ * Handling audio device settings
+ *
+ * 处理音频设备设置
+**/
 function handleMicSetting() {
   isSettingOpen.value = true;
   settingTitle.value = 'Mic settings';
   settingTab.value = 'audio';
 }
 
-// 处理视频设备设置
+/**
+ * Handling video device settings
+ *
+ * 处理视频设备设置
+**/
 function handleCameraSetting() {
   isSettingOpen.value = true;
   settingTitle.value = 'Camera settings';

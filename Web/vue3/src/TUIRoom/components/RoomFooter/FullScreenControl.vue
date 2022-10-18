@@ -17,7 +17,11 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-// 当前是否为全屏状态, 默认为 false
+/**
+ * Whether the current state is full screen, default is false
+ *
+ * 当前是否为全屏状态, 默认为 false
+**/
 const isFullScreen = ref(false);
 
 const title = computed((): string => (isFullScreen.value ? t('Exit') : t('Full screen')));
