@@ -202,7 +202,11 @@ export const useRoomStore = defineStore('room', {
             this.remoteUserObj[userId] = newUser;
           }
         } else {
-          delete this.remoteUserObj[userId];
+          if (Vue.delete) {
+            Vue.delete(this.remoteUserObj, userId);
+          } else {
+            delete this.remoteUserObj[userId];
+          }
         }
       } else {
         const remoteUserInfo = this.remoteUserObj[userId];
@@ -271,7 +275,11 @@ export const useRoomStore = defineStore('room', {
       if (!userId || userId === basicStore.userId || userId === `share_${basicStore.userId}`) {
         return;
       }
-      delete this.remoteUserObj[userId];
+      if (Vue.delete) {
+        Vue.delete(this.remoteUserObj, userId);
+      } else {
+        delete this.remoteUserObj[userId];
+      }
     },
 
     setAudioVolume(audioVolumeArray: []) {

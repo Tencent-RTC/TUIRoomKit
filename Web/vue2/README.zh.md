@@ -2,7 +2,7 @@
 
 _[English](README.md) | 简体中文_
 
-本文档主要介绍如何快速跑通 TUIRoom Vue2 示例工程，体验多人音视频互动，更详细的TUIRoom组件接入流程，请点击腾讯云官网文档：[TUIRoom 组件 Web 接入说明](https://cloud.tencent.com/document/product/647/74765)...
+本文档主要介绍如何快速跑通 TUIRoom 示例工程，体验多人音视频互动，更详细的TUIRoom组件接入流程，请点击腾讯云官网文档：[TUIRoom 组件 Web 接入说明](https://cloud.tencent.com/document/product/647/74765)...
 
 ## 目录结构
 
@@ -20,8 +20,7 @@ _[English](README.md) | 简体中文_
 │   ├── shims-vue.d.ts
 │   └── views           // 示例工程路由页面
 ├── tsconfig.json
-├── vue.config.js
-└── yarn.lock
+└── vue.config.js      // vue 配置文件
 ```
 ### 第一步：创建TRTC的应用
 
@@ -57,7 +56,7 @@ _[English](README.md) | 简体中文_
    npm run serve
    ```
 
-3. 打包 dist 文件
+3. 打包 dist 文件夹
 
    ```bash
    npm run build
@@ -83,6 +82,19 @@ _[English](README.md) | 简体中文_
 | 步骤1 | 步骤2 |
 |---------|---------|
 | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-home.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room.png" width="320"/> |
+
+### 第五步：生产环境部署
+- 步骤一：打包 dist 文件夹
+
+   ```bash
+   npm run build
+   ```
+- 步骤二： 部署 dist 文件到服务器上
+
+>! 生产环境要求使用 https 域名
+
+<img src="https://qcloudimg.tencent-cloud.cn/raw/a9dc181dd2c9a60852a538de7c477c3e.png" width="100%"/>
+
 ## 常见问题
 
 ### Q：项目打包之后部署到测试/生产环境，无法正常使用麦克风和摄像头是什么原因呢？
