@@ -27,7 +27,11 @@ const verifyStates:VerifyStates = reactive({
 });
 watch(() => verifyStates.verifyCode, (val) => {
   verifyStates.verifyCode = val.replace(/\D/g, '');
-  // 获取到验证码
+  /**
+   * Get the verification code
+   *
+   * 获取到验证码
+  **/
   emit('updateVerifyCode', verifyStates.verifyCode);
 });
 function startCountDown() {

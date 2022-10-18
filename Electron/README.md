@@ -104,7 +104,7 @@ Tips：TUIRoom requires at least two users with different userId to experience t
 
 | Step 1 | Step 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/4eb4ddf45906edf9d2bf3f604531653f.jpg" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/0148dda4945ec2b4adf277fde30c0ff8.jpg" width="320"/> |
+| <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/home-create-en.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room-en.png" width="320"/> |
 
 **General member (userId: audience)**
 
@@ -113,7 +113,7 @@ Tips：TUIRoom requires at least two users with different userId to experience t
 
 | Step 1 | Step 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/35a7890d45ef7decd8b3e439e51d753b.jpg" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/0148dda4945ec2b4adf277fde30c0ff8.jpg" width="320"/> |
+| <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/home-join-en.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room-en.png" width="320"/> |
 ## Frequently Asked Questions
 
 ### Q: What is the reason why the microphone and camera are not working properly after the project is packaged and deployed to the test/production environment?

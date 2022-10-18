@@ -194,11 +194,11 @@ class TUIRoomCore implements ITUIRoomCore, ITUIRoomCoordinator {
     userSig: string
   ): Promise<TUIRoomResponse<any>> {
     logger.log(`${TUIRoomCore.logPrefix}.login`, sdkAppId, userId, userSig);
+    // 无论是否已经登录，都需要初始化数据
+    await this.roomAuth.init(userId, userSig);
     if (this.isLogin) {
       return TUIRoomResponse.fail(TUIRoomErrorCode.REPEAT_LOGIN_ERROR, TUIRoomErrorMessage.REPEAT_LOGIN_ERROR);
     }
-    // 无论是否已经登录，都需要初始化数据
-    await this.roomAuth.init(userId, userSig);
     if (!this.tim) {
       this.tim = TIM.create({ SDKAppID: sdkAppId });
     }

@@ -97,7 +97,11 @@ async function toggleApplySpeech() {
   }
 };
 
-// 发送上麦申请
+/**
+ * Send a request to be on the mike
+ *
+ * 发送上麦申请
+**/
 async function sendSeatApplication() {
   userState.value = STATE.Applying;
   try {
@@ -119,9 +123,13 @@ async function sendSeatApplication() {
   }
 }
 
+/**
+ * Cancellation of on-mike application
+ *
+ * 处理点击【创建房间】
+**/
 // 取消上麦申请
 async function cancelSeatApplication() {
-  // 取消上麦申请
   try {
     await TUIRoomCore.cancelSpeechApplication();
     userState.value = STATE.OffSeat;
@@ -130,7 +138,11 @@ async function cancelSeatApplication() {
   }
 }
 
-// 用户下麦
+/**
+ * User Down Mack
+ *
+ * 用户下麦
+**/
 async function leaveSeat() {
   await TUIRoomCore.sendOffSpeaker();
   userState.value = STATE.OffSeat;
@@ -144,7 +156,11 @@ async function leaveSeat() {
   roomStore.setHasStartedMicrophone(false);
 }
 
-// 处理主持人接受申请
+/**
+ * Processing facilitators accepting applications
+ *
+ * 处理主持人接受申请
+**/
 function handleApplyAccepted() {
   userState.value = STATE.OnSeat;
   basicStore.setRole(ETUIRoomRole.ANCHOR);
@@ -155,7 +171,11 @@ function handleApplyAccepted() {
   });
 }
 
-// 处理主持人拒绝申请
+/**
+ * Processing Facilitator Rejection Requests
+ *
+ * 处理主持人拒绝申请
+**/
 function handleApplyRejected() {
   userState.value = STATE.OffSeat;
   ElMessage({
@@ -170,12 +190,20 @@ function hideApplyAttention() {
 }
 
 function onReceiveSpeechInvitation() {
-  // 收到主持人邀请上麦
+  /**
+   * Received an invitation from the host to go on the microphone
+   *
+   * 收到主持人邀请上麦
+  **/
   showInviteDialog.value = true;
 }
 
 function onReceiveInvitationCancelled() {
-  // 主持人取消邀请上麦
+  /**
+   * The host canceled the invitation to the microphone
+   *
+   * 主持人取消邀请上麦
+  **/
   showInviteDialog.value = false;
 }
 
@@ -185,11 +213,19 @@ function onUserKickOffStage() {
     message: t('You have been invited by the host to step down, please raise your hand if you need to speak'),
     duration: MESSAGE_DURATION.NORMAL,
   });
-  // 被主持踢下麦
+  /**
+   * Kicked off the mic by the host
+   *
+   * 被主持踢下麦
+  **/
   leaveSeat();
 }
 
-// 用户接受/拒绝主讲人的邀请
+/**
+ * User accepts/rejects the presenter's invitation
+ *
+ * 用户接受/拒绝主讲人的邀请
+**/
 function handleInvite(agree: boolean) {
   TUIRoomCore.replySpeechInvitation(agree);
   showInviteDialog.value = false;
@@ -199,19 +235,37 @@ function handleInvite(agree: boolean) {
   }
 }
 
-// 用户进入 trtc 房间
+/**
+ * User access to trtc room
+ *
+ * 用户进入 trtc 房间
+**/
 function onUserAVEnabled(userInfo: { userId: string }) {
   const { userId } = userInfo;
-  // 主播重新进入 trtc 房间，如果之前发送过请求上麦信令需要重新发送上麦申请
+  /**
+   * If the host re-enters the trtc room, he/she needs to resend
+   * the request to go to the mike if he/she has previously sent a request to go to the mike.
+   *
+   * 主播重新进入 trtc 房间，如果之前发送过请求上麦信令需要重新发送上麦申请
+  **/
   if (userId === basicStore.masterUserId && userState.value === STATE.Applying) {
     sendSeatApplication();
   }
 }
 
-// 用户离开 trtc 房间
+/**
+ * User leaves trtc room
+ *
+ * 用户离开 trtc 房间
+**/
 function onUserAVDisabled(userInfo: { userId: string }) {
   const { userId } = userInfo;
-  // 主播离开 trtc 房间，如果正在进行上麦邀请，则不显示邀请框
+  /**
+   * If the host leaves the trtc room, the invitation box will not be displayed
+   * if the invitation is being made to the mic.
+   *
+   * 主播离开 trtc 房间，如果正在进行上麦邀请，则不显示邀请框
+  **/
   if (userId === basicStore.masterUserId && showInviteDialog.value) {
     showInviteDialog.value = false;
   }

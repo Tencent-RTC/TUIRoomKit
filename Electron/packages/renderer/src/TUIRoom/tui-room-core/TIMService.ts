@@ -14,7 +14,6 @@ import {
 } from './constant';
 import { simpleClone } from './utils/utils';
 import TUIRoomConfig from './base/TUIRoomConfig';
-import { updateUserName } from '@/api/http';
 
 class TIMService {
   static logPrefix = '[TIMService]';

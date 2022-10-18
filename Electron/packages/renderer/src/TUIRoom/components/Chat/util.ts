@@ -287,7 +287,11 @@ export const faceUrl:string = 'https://web.sdk.qcloud.com/im/assets/face-elem/';
 
 export function decodeMessageText(payload: string) {
   const renderDom = [];
-  // 文本消息
+  /**
+   * Text Message
+   *
+   * 文本消息
+  **/
   let temp = payload;
   let left = -1;
   let right = -1;

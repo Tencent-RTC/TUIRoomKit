@@ -1,4 +1,10 @@
 <!--
+  * Name: DeviceSelect
+  * @param deviceType String required
+  * @param size String 'large'|'medium'|'small'
+  * Usage:
+  * Use <device-select></device-select> in template
+  *
   * 名称: DeviceSelect
   * @param deviceType String required
   * @param size String 'large'|'medium'|'small'
@@ -99,7 +105,11 @@ async function getDeviceInfo() {
   }
 }
 
-// 设备变化：设备切换、设备插拔事件
+/**
+ * Device changes: device switching, device plugging and unplugging events
+ *
+ * 设备变化：设备切换、设备插拔事件
+**/
 async function onDeviceChange(deviceData: {deviceId: string, type: number, state: number}) {
   const stateList = ['add', 'remove', 'active'];
   const { deviceId, type, state } = deviceData;

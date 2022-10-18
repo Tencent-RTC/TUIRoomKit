@@ -22,7 +22,11 @@
 import UserInfo from './UserInfo.vue';
 import Language from './Language.vue';
 import NetworkInfo from './NetworkInfo.vue';
-// 【info】功能待完善
+/**
+ * [info] Functions to be improved
+ *
+ * 【info】功能待完善
+**/
 // import InfoControl from './InfoControl.vue';
 import LayoutControl from './LayoutControl.vue';
 import { useBasicStore } from '../../stores/basic';
