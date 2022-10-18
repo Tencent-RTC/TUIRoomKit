@@ -2,6 +2,9 @@
   * 名称：SvgIcon
   * @param name String required
   * @param size String 'large'|'medium'|'small'
+  * Usage:
+  * Use <svg-icon icon-name="star"/> in template
+
   * 使用方式：
   * 在 template 中使用 <svg-icon icon-name="star"/>
 -->

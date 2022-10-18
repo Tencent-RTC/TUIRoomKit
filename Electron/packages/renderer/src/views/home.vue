@@ -57,7 +57,11 @@ function setTUIRoomData(action: string, mode?: string) {
   sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(roomData));
 }
 
-// 创建房间时生成房间号
+/**
+ * Generate room number when creating a room
+ *
+ * 创建房间时生成房间号
+**/
 async function generateRoomId(): Promise<number> {
   const roomId = Math.ceil(Math.random() * 1000000);
   const isRoomExist = await TUIRoomCore.checkRoomExistence(roomId);
@@ -67,7 +71,11 @@ async function generateRoomId(): Promise<number> {
   return roomId;
 }
 
-// 处理点击【创建房间】
+/**
+ * Processing Click [Create Room]
+ *
+ * 处理点击【创建房间】
+**/
 async function handleCreateRoom(mode: string) {
   setTUIRoomData('createRoom', mode);
   const roomId = await generateRoomId();
@@ -79,7 +87,11 @@ async function handleCreateRoom(mode: string) {
   });
 }
 
-// 处理点击【进入房间】
+/**
+ * Processing Click [Enter Room]
+ *
+ * 处理点击【进入房间】
+**/
 async function handleEnterRoom(roomId: number) {
   const isRoomExist = await TUIRoomCore.checkRoomExistence(roomId);
   if (!isRoomExist) {
@@ -95,9 +107,17 @@ async function handleEnterRoom(roomId: number) {
   });
 }
 
-// 处理用户点击页面左上角【退出登录】
+/**
+ * Processing users click [Logout Login] in the upper left corner of the page
+ *
+ * 处理用户点击页面左上角【退出登录】
+**/
 async function handleLogOut() {
-  // 接入方处理 logout 方法
+/**
+ * The accessor handles the logout method
+ *
+ * 接入方处理 logout 方法
+**/
 }
 
 onMounted(async () => {
@@ -105,7 +125,11 @@ onMounted(async () => {
   if (currentUserInfo) {
     sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(currentUserInfo));
     const { sdkAppId, userId, userSig } = currentUserInfo;
-    // 登录 TUIRoomCore, 只有登录 TUIRoomCore 之后，才可以使用 TUIRoomCore.checkRoomExistence 方法
+    /**
+     * TUIRoomCore.checkRoomExistence method can only be used after logging into TUIRoomCore.
+     *
+     * 登录 TUIRoomCore, 只有登录 TUIRoomCore 之后，才可以使用 TUIRoomCore.checkRoomExistence 方法
+    **/
     await TUIRoomCore.login(sdkAppId, userId, userSig);
   }
 });

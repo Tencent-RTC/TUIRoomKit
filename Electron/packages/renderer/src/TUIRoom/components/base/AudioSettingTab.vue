@@ -1,4 +1,10 @@
 <!--
+  * Name: VideoTab
+  * @param name String required
+  * @param size String 'large'|'medium'|'small'
+  * Usage:
+  * Use <video-tab></video-tab> in the template
+  *
   * 名称: VideoTab
   * @param name String required
   * @param size String 'large'|'medium'|'small'
@@ -99,7 +105,12 @@ const volumeNum = computed(() => (roomStore.localStream.audioVolume || 0) * volu
 const showVolume = computed(() => isSampleMode.value || (isDetailMode.value && isTestingMicrophone.value));
 
 const isTestingMicrophone = ref(false);
-// 点击麦克风【测试】按钮
+
+/**
+ * Click on the microphone [Test] button
+ *
+ * 点击麦克风【测试】按钮
+**/
 function handleMicrophoneTest() {
   isTestingMicrophone.value = !isTestingMicrophone.value;
 }
@@ -108,7 +119,11 @@ const isTestingSpeaker = ref(false);
 const audioPlayer = document.createElement('audio');
 const { t } = useI18n();
 
-// 点击扬声器【测试】按钮
+/**
+ * Click on the speaker [Test] button
+ *
+ * 点击扬声器【测试】按钮
+**/
 function handleSpeakerTest() {
   if (isTestingSpeaker.value) {
     audioPlayer.pause();
