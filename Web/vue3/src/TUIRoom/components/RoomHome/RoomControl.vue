@@ -2,7 +2,11 @@
   <div class="control-container">
     <div class="control-content">
       <img class="logo" :src="logo">
-      <!-- query 中存在 roomId -->
+      <!--
+        *The roomId exists in the query
+        *
+        *query 中存在 roomId
+      -->
       <div v-if="hasGivenRoomId" class="control-region">
         <span class="invite-title">{{ t('Join the room ?') }}</span>
         <span class="invite-info">{{ t('You are invited to room ') }}{{ `${givenRoomId} ` }}{{ t('Room') }}</span>
@@ -10,7 +14,11 @@
           <span class="title">{{ t('Join') }}</span>
         </div>
       </div>
-      <!-- query 中没有 roomId -->
+      <!--
+        *There is no roomId in the query
+        *
+        *query 中没有 roomId
+      -->
       <div v-else class="control-region">
         <div
           type="primary"

@@ -53,11 +53,19 @@ const sendMessage = async () => {
     const tuiResponse = await TUIRoomCore.sendChatMessage(msg);
     const { code, data: message } = tuiResponse;
     if (code === 0) {
-      // 消息发送成功
+      /**
+       * Message sent successfully
+       *
+       * 消息发送成功
+      **/
       chatStore.updateMessageList(message);
     }
   } catch (e) {
-    // 消息发送失败
+    /**
+     * Message delivery failure
+     *
+     * 消息发送失败
+    **/
     ElMessage.error(t('Failed to send the message'));
   }
 };

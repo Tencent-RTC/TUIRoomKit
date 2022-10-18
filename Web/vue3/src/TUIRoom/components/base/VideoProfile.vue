@@ -1,4 +1,10 @@
 <!--
+  * Name: DeviceSelect
+  * @param deviceType String required
+  * @param size String 'large'|'medium'|'small'
+  * Usage:
+  * Use <device-select></device-select> in template
+  *
   * 名称: DeviceSelect
   * @param deviceType String required
   * @param size String 'large'|'medium'|'small'

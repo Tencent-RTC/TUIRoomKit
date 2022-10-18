@@ -13,7 +13,7 @@ export default {
   SEND: 'SEND',
   'The room does not exist, please confirm the room number or create a room!': 'The room does not exist, please confirm the room number or create a room!',
   'Log out': 'Log out',
-  'Edit information': 'Edit information',
+  'Edit profile': 'Edit profile',
   'User Name': 'User Name',
   'Please input user name': 'Please input user name',
   'Username length should be greater than 0': 'Username length should be greater than 0',

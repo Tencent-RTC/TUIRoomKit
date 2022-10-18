@@ -1,4 +1,8 @@
 <!--
+  * Name: LayoutControl
+  * Usage:
+  * Use <layout-control /> in template
+  *
   * 名称: LayoutControl
   * 使用方式：
   * 在 template 中使用 <layout-control />
@@ -12,7 +16,11 @@
       @click.stop="handleClickLayoutIcon"
     ></svg-icon>
     <div v-if="showLayoutList" ref="layoutList" class="layout-list">
-      <!-- 一屏九等分 -->
+      <!--
+        *Sidebar and upper sidebar arrows
+        *
+        *侧边栏和上边栏箭头
+      -->
       <div
         :class="['layout1', 'layout-item', `${layout === LAYOUT.NINE_EQUAL_POINTS ? 'checked' : ''}`]"
         @click="handleClick(LAYOUT.NINE_EQUAL_POINTS)"
@@ -27,7 +35,11 @@
         </div>
         <span class="layout-title">{{ t('Grid') }}</span>
       </div>
-      <!-- 右侧成员列表 -->
+      <!--
+        *Right side member list
+        *
+        *右侧成员列表
+      -->
       <div
         :class="['layout2', 'layout-item', `${layout === LAYOUT.RIGHT_SIDE_LIST ? 'checked' : ''}`]"
         @click="handleClick(LAYOUT.RIGHT_SIDE_LIST)"
@@ -45,7 +57,11 @@
         </div>
         <span class="layout-title">{{ t('Gallery on right') }}</span>
       </div>
-      <!-- 顶部成员列表 -->
+      <!--
+        *Top Member List
+        *
+        *顶部成员列表
+      -->
       <div
         :class="['layout3', 'layout-item', `${layout === LAYOUT.TOP_SIDE_LIST ? 'checked' : ''}`]"
         @click="handleClick(LAYOUT.TOP_SIDE_LIST)"

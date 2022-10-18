@@ -58,7 +58,11 @@ const chatStore = useChatStore();
 
 const { sdkAppId } = storeToRefs(basicStore);
 
-// 处理页面鼠标悬浮显示工具栏逻辑
+/**
+ * Handle page mouse hover display toolbar logic
+ *
+ * 处理页面鼠标悬浮显示工具栏逻辑
+**/
 const roomContentRef = ref<InstanceType<typeof RoomContent>>();
 const showRoomTool: Ref<boolean> = ref(true);
 const roomRef: Ref<Node | undefined> = ref();
@@ -148,7 +152,12 @@ async function createRoom(
   await TUIRoomCore.createRoom(roomId, roomMode);
   const roomInfo = await TUIRoomCore.getRoomInfo();
   basicStore.setRoomInfo(roomInfo);
-  // setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
+  /**
+   * setRoomParam must come after setRoomInfo,because roomInfo contains information
+   * about whether or not to turn on the no-mac ban.
+   *
+   * setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
+  **/
   roomStore.setRoomParam(roomParam);
   emit('onCreateRoom', {
     code: 0,
@@ -163,7 +172,12 @@ async function enterRoom(roomId: number, roomParam?: RoomParam) {
   await TUIRoomCore.enterRoom(roomId);
   const roomInfo = await TUIRoomCore.getRoomInfo();
   basicStore.setRoomInfo(roomInfo);
-  // setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
+  /**
+   * setRoomParam must come after setRoomInfo,because roomInfo contains information
+   * about whether or not to turn on the no-mac ban.
+   *
+   * setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
+  **/
   roomStore.setRoomParam(roomParam);
   emit('onEnterRoom', {
     code: 0,
@@ -222,7 +236,11 @@ const onMicrophoneMuted = (data: {mute: boolean, muteType: ETUIRoomMuteType}) =>
       duration: MESSAGE_DURATION.NORMAL,
     });
     basicStore.setIsMuteAllAudio(data.mute);
-    // 如果主持人解除全员禁言，不主动调起用户麦克风
+    /**
+     * If the host lifts the full ban and does not actively turn up the user microphone
+     *
+     * 如果主持人解除全员禁言，不主动调起用户麦克风
+    **/
     if (data.mute) {
       roomStore.setIsLocalAudioMuted(true);
       TUIRoomCore.muteLocalMicrophone(true);
@@ -240,7 +258,12 @@ const onMicrophoneMuted = (data: {mute: boolean, muteType: ETUIRoomMuteType}) =>
     if (data.mute) {
       roomStore.setIsLocalAudioMuted(true);
       TUIRoomCore.muteLocalMicrophone(true);
-      // 主持人开启全员禁言时，单独打开再关闭单人的麦克风，此时对应用户的麦克风状态为无法操作
+      /**
+       * When the host turns on a full ban, the microphone of a single person is turned on
+       * and off separately, and the microphone status of the corresponding user is inoperable at this time
+       *
+       * 主持人开启全员禁言时，单独打开再关闭单人的麦克风，此时对应用户的麦克风状态为无法操作
+      **/
       basicStore.setCanControlSelfAudio(!basicStore.isMuteAllAudio);
     } else {
       basicStore.setCanControlSelfAudio(true);
@@ -257,7 +280,11 @@ const onCameraMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
       message: tipMessage,
       duration: MESSAGE_DURATION.NORMAL,
     });
-    // 如果主持人解除全员禁画，不主动调起用户摄像头
+    /**
+     * If the host lifts the full ban on drawing and does not actively turn up the user camera
+     *
+     * 如果主持人解除全员禁画，不主动调起用户摄像头
+    **/
     if (data.mute) {
       roomStore.setIsLocalVideoMuted(true);
       TUIRoomCore.stopCameraPreview();
@@ -275,7 +302,13 @@ const onCameraMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
     if (data.mute) {
       roomStore.setIsLocalVideoMuted(true);
       TUIRoomCore.stopCameraPreview();
-      // 主持人开启全员禁画时，单独打开再关闭单人的摄像头，此时对应用户的摄像头状态为无法操作
+      /**
+       * When the moderator opens the whole staff forbidden to draw,
+       * open and then close the single person's camera alone, at this time
+       * the corresponding user's camera status for inoperable
+       *
+       * 主持人开启全员禁画时，单独打开再关闭单人的摄像头，此时对应用户的摄像头状态为无法操作
+       **/
       basicStore.setCanControlSelfVideo(!basicStore.isMuteAllVideo);
     } else {
       basicStore.setCanControlSelfVideo(true);
@@ -318,7 +351,11 @@ function handlePageLeave() {
   }
 }
 
-// 页面刷新或者管理
+/**
+ * Page refresh or administration
+ *
+ * 页面刷新或者管理
+**/
 function beforeunloadFn() {
   handlePageLeave();
 }

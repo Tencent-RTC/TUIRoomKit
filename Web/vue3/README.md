@@ -1,8 +1,8 @@
-# TUIRoom Web sample project quick run-through
+# Quick Run of TUIRoom Web Demo
 
 _English | [简体中文](README.zh.md)_
 
-This document mainly introduces how to quickly run through the TUIRoom sample project to experience multiplayer audio and video interaction, for more detailed access process of TUIRoom components, please click the Tencent Cloud official website document: [TUIRoom component Web access instructions](https://www.tencentcloud.com/document/product/647/47636)
+This document describes how to quickly run the TUIRoom demo project to try out group audio/video interaction. For detailed directions on how to integrate the TUIRoom component, see [Integrating TUIRoom (Web)](https://www.tencentcloud.com/document/product/647/47636).
 
 ## Directory structure
 
@@ -23,23 +23,22 @@ This document mainly introduces how to quickly run through the TUIRoom sample pr
 │ └── views // Example project routing page
 └── vite.config.ts
 ```
-### Step 1: Create the TRTC application
-
+### Step 1. Create a TRTC application
 1. Enter the [Application Management](https://www.tencentcloud.com/account/login) interface of the Tencent Cloud Live Audio/Video Console, select Create Application, enter the application name,click **Create Application**.
-2. Click on the corresponding application entry and **Application Information**, as shown in the following image.
+2. Find your application in the application list and Click **Application Info**.
     <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a12607f338b311ed8088525400463ef7.png" width="900">
-3. Once in the application information, record the SDKAppID and key as shown below.
+3. Follow the steps below to get the application’s `SDKAppID` and key.
     <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a0eb96e038b311ed8088525400463ef7.png" width="900">
 
->! This function uses both Tencent Cloud [Real-time Audio and Video TRTC](https://www.tencentcloud.com/document/product/647/35078) and [Instant Messaging IM](https://www.tencentcloud.com/document/product/1047) two basic PaaS services, and the instant messaging IM service will be opened simultaneously after real-time audio and video is opened. IM is a value-added service, please refer to [IM Price Description](https://www.tencentcloud.com/document/product/1047/34350) for detailed billing rules.
+>! This component uses two basic PaaS services of Tencent Cloud: [TRTC](https://intl.cloud.tencent.com/document/product/647/35078) and [IM](https://intl.cloud.tencent.com/document/product/1047). When you activate TRTC, IM will be activated automatically. For information about the billing of IM, see [Pricing](https://intl.cloud.tencent.com/document/product/1047/34350).
 
 ### Step 2: Download the source code and configure the project
-1. Clone or download this repository source code directly, **Welcome Star**, thanks~~
-2. find and open the `Web/vue3/src/config/basic-info-config.js` file.
-3. Configure the relevant parameters in the `basic-info-config.js` file.
+1. Clone or download the source code in our repository (**You can start the repository to save it**).
+2. Find and open `Web/vue3/src/config/basic-info-config.js`.
+3. Configure parameters in `basic-info-config.js`:
 	<img src="https://qcloudimg.tencent-cloud.cn/raw/d05a18af04758e352f9afcb0925d105c.png" width="900">
-	- SDKAPPID: default is 0, please set it to the SDKAppID recorded in step 1.
-	- SECRETKEY: default is '', please set it to the key information recorded in step 1.
+	- SDKAPPID: 0 by default. Set it to the `SDKAppID` obtained in step 1.
+	- SECRETKEY: '' by default. Set it to the key obtained in step 1.
 
 ### Step 3: Run the example
 
@@ -57,39 +56,52 @@ This document mainly introduces how to quickly run through the TUIRoom sample pr
    npm run dev
    ```
 
-3. package the dist file
+3. Generate a DIST file
 
    ```bash
    npm run build
    ```
-### Step 4: Sample experience
+### Step 4. Try out the demo
 
-After the development environment runs the sample project, open the page http://localhost:3000/#/home in the browser to experience the TUIRoom functionality.
+Open `http://localhost:3000/#/home` in a browser to try out TUIRoom.
 
-Note: Because TUIRoom introduces element-plus component on-demand, it will cause the development environment routing page to be slow to load for the first time, wait for element-plus on-demand loading to complete to use normally. element-plus on-demand loading will not affect the page loading after packaging.
+Because Element Plus components are imported manually, it may take a relatively long time for the page to load in the development environment for the first time. This will not be an issue after building.
 
-**Moderator (userId:anchor)**
+**Anchor (userId: anchor)**
 
-- Step 1: In the home page, click the [Create Room] button.
-- Step 2. enter the TUIRoom room.
+- 1. On the home page, click **New Room**.
+- 2. Enter a room.
 
-| Step 1 | Step 2 |
+| 1 | 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/4eb4ddf45906edf9d2bf3f604531653f.jpg" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/0148dda4945ec2b4adf277fde30c0ff8.jpg" width="320"/> |
+| <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/home-create-en.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room-en.png" width="320"/> |
 
-**General member (userId: audience)**
+**Participant (userId: audience)**
 
-- Step 1. On the home page, enter the room Id created by the host and click the [Join Room] button.
-- Step 2. join the room.
+- 1. On the home page, enter the ID of the room created by the anchor and click **Join Room**.
+- 2. Enter the room.
 
-| Step 1 | Step 2 |
+| 1 | 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/35a7890d45ef7decd8b3e439e51d753b.jpg" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/0148dda4945ec2b4adf277fde30c0ff8.jpg" width="320"/> |
-## Frequently Asked Questions
+| <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/home-join-en.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room-en.png" width="320"/> |
 
-### Q: What is the reason why the microphone and camera are not working properly after the project is packaged and deployed to the test/production environment?
+### Step 5: Production Environment Deployment
+- 1. Generate a DIST file
 
-A: Please check if the deployment link is https protocol, for user security, privacy and other issues, the browser restricts the web page under https protocol to use all the functions of TRTC Web SDK (WebRTC) normally.
+   ```bash
+   npm run build
+   ```
+- 2. Deploy the dist file to the server
+
+>! Production environments require the use of https domains
+
+<img src="https://qcloudimg.tencent-cloud.cn/raw/3af0ebbc654340a27ed4a2780f64e510.png" width="100%"/>
+
+## FAQs
+
+### I deployed the demo project in the testing/development environment. The mic and camera did not work. What should I do?
+
+Make sure you used an HTTPS URL. For the sake of data security and privacy protection, your browser may restrict HTTP URLs. To access all features of the TRTC web SDK (WebRTC), please use an HTTPS URL.
 
 
 ## Other

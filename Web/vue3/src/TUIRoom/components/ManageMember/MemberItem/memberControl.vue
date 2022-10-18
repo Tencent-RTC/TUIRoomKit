@@ -39,7 +39,11 @@ const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
-// 举手发言功能相关函数
+/**
+ * Functions related to the Raise Your Hand function
+ *
+ * 举手发言功能相关函数
+**/
 const {
   agreeUserOnStage,
   denyUserOnStage,
@@ -60,30 +64,55 @@ const isAnchor = computed(() => props.userInfo.role === ETUIRoomRole.ANCHOR);
 const isAudience = computed(() => props.userInfo.role === ETUIRoomRole.AUDIENCE);
 const isFreeSpeechMode = computed(() => basicStore.roomMode === ETUISpeechMode.FREE_SPEECH);
 const isApplyRoomMode = computed(() => basicStore.roomMode === ETUISpeechMode.APPLY_SPEECH);
-
-// 控制元素的集中匹配情况
-
-// 自由发言模式
-// 1.当前用户为主播：
-// 禁言/解除禁言  禁画/解除禁画
-//              禁止聊天
-//              踢出房间
-
-// 举手发言模式
-// 1. 当前用户为主播：
-// 禁言/解除禁言  禁画/解除禁画
-//              邀请下台
-//              禁止聊天
-//              踢出房间
-
-// 2. 观众没有申请上麦：
-// 邀请上台/取消邀请上台      禁止聊天
-//                         踢出房间
-
-// 3. 观众正在申请上麦：
-// 同意上台      拒绝上台
-//              禁止聊天
-//              踢出房间
+/**
+* Control the centralized matching of elements
+ *
+ * Free speech mode
+ * 1. Current user is the anchor.
+ * Banning/unbanning Banning/unbanning drawing
+ * Banning chat
+ * Kicked out of the room
+ *
+ * Raise hand to speak mode
+ * 1. Current user is the host.
+ * Banning/unbanning Banning/unbanning drawing
+ * Invite to step down
+ * Ban chat
+ * Kicked out of the room
+ * 2.
+ * 2. Audience did not request to be on the mic.
+ * Invite on stage / Disinvite on stage * Ban chat
+ * Kicked out of the room
+ * 3.
+ * 3. the audience is applying for the mic.
+ * Agree to go on stage Deny go on stage
+ * Ban chat
+ * Kicked out of the room
+ *
+ * 控制元素的集中匹配情况
+ *
+ * 自由发言模式
+ * 1.当前用户为主播：
+ * 禁言/解除禁言  禁画/解除禁画
+ *              禁止聊天
+ *              踢出房间
+ *
+ * 举手发言模式
+ * 1. 当前用户为主播：
+ * 禁言/解除禁言  禁画/解除禁画
+ *              邀请下台
+ *              禁止聊天
+ *              踢出房间
+ *
+ * 2. 观众没有申请上麦：
+ * 邀请上台/取消邀请上台      禁止聊天
+ *                         踢出房间
+ *
+ * 3. 观众正在申请上麦：
+ * 同意上台      拒绝上台
+ *              禁止聊天
+ *              踢出房间
+**/
 const singleControl = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const control = { title: '', func: (userInfo: UserInfo) => {} };
@@ -136,8 +165,11 @@ function toggleClickMoreBtn() {
   showMoreControl.value = !showMoreControl.value;
 }
 
-
-// 邀请上台/取消邀请上台
+/**
+ * Invitation to the stage/uninvitation to the stage
+ *
+ * 邀请上台/取消邀请上台
+**/
 async function toggleInviteUserOnStage(userInfo: UserInfo) {
   const { userId, isInvitingUserToAnchor } = userInfo;
   if (isInvitingUserToAnchor) {
@@ -149,28 +181,44 @@ async function toggleInviteUserOnStage(userInfo: UserInfo) {
   }
 }
 
-// 禁言/取消禁言
+/**
+ * Banning/Unbanning
+ *
+ * 禁言/取消禁言
+**/
 function muteUserAudio(userInfo: UserInfo) {
   const currentState = userInfo.isAudioMutedByMaster;
   roomStore.setMuteUserAudio(userInfo.userId, !currentState);
   TUIRoomCore.muteUserMicrophone(userInfo.userId, !currentState);
 }
 
-// 禁画/取消禁画
+/**
+ * Banned painting/unbanned painting
+ *
+ * 禁画/取消禁画
+**/
 function muteUserVideo(userInfo: UserInfo) {
   const currentState = userInfo.isVideoMutedByMaster;
   roomStore.setMuteUserVideo(userInfo.userId, !currentState);
   TUIRoomCore.muteUserCamera(userInfo.userId, !currentState);
 }
 
-// 允许文字聊天/取消文字聊天
+/**
+ * Allow text chat / Cancel text chat
+ *
+ * 允许文字聊天/取消文字聊天
+**/
 function muteUserChat(userInfo: UserInfo) {
   const currentState = userInfo.isChatMutedByMaster;
   roomStore.setMuteUserChat(userInfo.userId, !currentState);
   TUIRoomCore.muteUserChatRoom(userInfo.userId, !currentState);
 }
 
-// 将用户踢出房间
+/**
+ * Kick the user out of the room
+ *
+ * 将用户踢出房间
+**/
 function kickOffUser(userInfo: UserInfo) {
   TUIRoomCore.kickOffUser(userInfo.userId);
 }

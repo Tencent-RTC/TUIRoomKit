@@ -8,12 +8,12 @@
 
     <div v-if="showUserControl" class="user-control-container">
       <div v-show="showEditNameItem">
-        <div class="user-control-item-head" @click="showEditUserNameDialog">{{ t('Edit information') }}</div>
+        <div class="user-control-item-head" @click="showEditUserNameDialog">{{ t('Edit profile') }}</div>
       </div>
       <div class="user-control-item-foot" @click="$emit('logOut')">{{ t('Log out') }}</div>
     </div>
     <el-dialog
-      :title="t('Edit information')"
+      :title="t('Edit profile')"
       width="420px"
       :model-value="showUserNameEdit"
       custom-class="custom-element-class"
@@ -77,30 +77,50 @@ const roomStore = useRoomStore();
 
 const iconName = computed(() => (showUserControl.value ? ICON_NAME.LineArrowUp : ICON_NAME.LineArrowDown));
 
-
-// 是否显示用户信息操作框
+/**
+ * Whether to display the user information operation box
+ *
+ * 是否显示用户信息操作框
+**/
 function handleUserControl() {
   showUserControl.value = !showUserControl.value;
 }
 
-// 隐藏用户信息操作框
+/**
+ * Hide the user information action box
+ *
+ * 隐藏用户信息操作框
+**/
 function hideUserControl(event: Event) {
   if (!userInfoRef.value.contains(event.target)) {
     showUserControl.value = false;
   }
 }
-// 展示修改名字 dialog
+
+/**
+ * Show change name dialog
+ *
+ * 展示修改名字 dialog
+**/
 function showEditUserNameDialog() {
   showUserNameEdit.value = true;
   tempUserName.value = userName.value;
 }
 
-// 关闭修改名字的 dialog
+/**
+ * Close the modify name dialog
+ *
+ * 关闭修改名字的 dialog
+**/
 function closeEditUserNameDialog() {
   showUserNameEdit.value = false;
 }
 
-// 保存新的 userName
+/**
+ * Save the new userName
+ *
+ * 保存新的 userName
+**/
 async function handleSaveUserName(userName: string) {
   if (userName.length === 0) {
     ElMessage({
@@ -130,23 +150,23 @@ onUnmounted(() => {
 @import '../../assets/style/element-custom.scss';
 
 .dialog-content {
-	padding: 0 10px;
-	text-align: left;
-	.title {
-		font-weight: bold;
-		font-size: 16px;
-		display: inline-block;
-		margin-bottom: 14px;
-	}
-	.input-container {
-		position: relative;
-		margin-bottom: 30px;
-	}
+  padding: 0 10px;
+  text-align: left;
+  .title {
+    font-weight: bold;
+    font-size: 16px;
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+  .input-container {
+    position: relative;
+    margin-bottom: 30px;
+  }
 }
 .dialog-footer {
-	width: 100%;
-	height: 100%;
-	text-align: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
 }
 .user-info-container {
   position: relative;
