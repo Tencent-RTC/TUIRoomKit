@@ -1,5 +1,5 @@
 <!--
-  * 名称: IconButton
+  * Name: IconButton
   * @param name String required
   * @param size String 'large'|'medium'|'small'
   * Usage:

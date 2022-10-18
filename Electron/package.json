@@ -28,11 +28,12 @@
       "qs": "^6.10.3",
       "rtc-beauty-plugin": "^0.1.0",
       "tim-js-sdk": "^2.18.0",
-      "trtc-electron-sdk": "latest",
+      "trtc-electron-sdk": "^10.6.404-beta.1",
       "trtc-js-sdk": "^4.12.2",
       "tsignaling": "^0.10.0",
       "vue": "^3.2.31",
-      "vue-router": "^4.0.14"
+      "vue-router": "^4.0.14",
+      "vue-i18n": "^9.2.2"
     },
     "devDependencies": {
       "@playwright/test": "^1.20.2",
@@ -43,6 +44,7 @@
       "@vitejs/plugin-vue": "^2.1.0",
       "electron": "^18.3.9",
       "electron-builder": "^23.3.3",
+      "electron-devtools-installer": "^3.2.0",
       "eslint": "^8.13.0",
       "eslint-config-tencent": "^1.0.4",
       "eslint-plugin-import": "^2.26.0",
