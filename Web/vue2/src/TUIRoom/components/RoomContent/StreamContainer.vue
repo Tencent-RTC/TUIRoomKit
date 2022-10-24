@@ -393,9 +393,19 @@ const onUserVideoAvailable = (eventInfo: { userId: string, available: number, st
     }
   } else if (streamType === ETUIStreamType.SCREEN) {
     roomStore.updateRemoteScreenStream(eventInfo);
-    enlargeStream.value = roomStore.remoteStreamObj[`${userId}_screen`] as StreamInfo;
-    if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
-      basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
+    if (available) {
+      enlargeStream.value = roomStore.remoteStreamObj[`${userId}_screen`] as StreamInfo;
+      if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
+        basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
+      }
+    } else {
+      // 远端屏幕分享流停止的时候，重新设置流播放布局
+      if (roomStore.remoteStreamList.length === 0) {
+        basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
+        enlargeStream.value = null;
+      } else if (userId === enlargeStream.value?.userId) {
+        [enlargeStream.value] = roomStore.remoteStreamList;
+      }
     }
   }
 };

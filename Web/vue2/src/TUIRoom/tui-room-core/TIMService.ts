@@ -444,8 +444,12 @@ class TIMService {
         this.emitter.emit('onRemoteUserLeaveRoom', operatorID);
         break;
       // 处理群主转移
-      case TIM.TYPES.GRP_TIP_GRP_PROFILE_UPDATED: 
+      case TIM.TYPES.GRP_TIP_GRP_PROFILE_UPDATED:
         this.handleGroupProfileUpdate(message.payload);
+        break;
+      // 处理群成员信息修改
+      case TIM.TYPES.GRP_TIP_MBR_PROFILE_UPDATED:
+        this.handleGroupMemberProfileUpdate(message.payload);
         break;
       default:
         break;
@@ -457,12 +461,16 @@ class TIMService {
     const { newGroupProfile } = message;
     // 判断是否为群主移交权限
     if(newGroupProfile.ownerID) {
-      this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged,newGroupProfile.ownerID);
+      const newOwnerInfo = message.memberList.find((item:any) => item.userID === newGroupProfile.ownerID);
+      this.emitter.emit(ETUIRoomEvents.onRoomMasterChanged, { newOwnerId: newGroupProfile.ownerID, newOwnerName: newOwnerInfo.nick });
     }
   }
 
-
-
+  // todo: 处理群成员信息修改
+  private handleGroupMemberProfileUpdate(message: Record<string, any>) {
+    logger.log(`${TIMService.logPrefix}handleGroupMemberProfileUpdate message:`, message);
+  }
+  
   /**
    * /////////////////////////////////////////////////////////////////////////////////
    * //
@@ -498,20 +506,20 @@ class TIMService {
     }
   }
 
-  async sendCustomMessage(
-    type: string,
-    data: string
-  ): Promise<TUIRoomResponse<any>> {
+  async sendCustomMessage(options: {
+    data: string,
+    description: string,
+    extension?: string,
+  }): Promise<TUIRoomResponse<any>> {
     this.preCheckMethodCall();
+    if (!this.groupId) {
+      return TUIRoomResponse.success();
+    }
     try {
       const message = this.tim.createCustomMessage({
         to: this.groupId,
         conversationType: TIM.TYPES.CONV_GROUP,
-        payload: {
-          data,
-          description: type,
-          extension: '',
-        },
+        payload: options,
       });
       const imResponse = await this.tim.sendMessage(message);
       if (imResponse.code === 0) {
@@ -528,6 +536,49 @@ class TIMService {
         TUIRoomErrorMessage.SEND_CUSTOM_MESSAGE_ERROR
       );
     }
+  }
+
+  /**
+   * /////////////////////////////////////////////////////////////////////////////////
+   * //
+   * //                                    IM 历史消息
+   * //
+   * /////////////////////////////////////////////////////////////////////////////////
+   */
+  async getChatMessageList(nextReqMessageID: string) {
+    this.preCheckMethodCall();
+    if (!this.groupId) {
+      logger.error(`${TIMService.logPrefix}getChatMessageList invalid groupId`);
+      return TUIRoomResponse.success({
+        messageList: [],
+        nextReqMessageID: '',
+        isCompleted: true
+      });
+    }
+    logger.debug(`${TIMService.logPrefix}.getChatMessageList groupId: ${this.groupId}, nextReqMessageID: ${nextReqMessageID}`);
+    let imResponse;
+    const conversationID = `GROUP${this.groupId}`;
+    if (!nextReqMessageID) {
+      imResponse = await this.tim.getMessageList({
+        conversationID: conversationID,
+        count: 15
+      });
+    } else {
+      imResponse = await this.tim.getMessageList({
+        conversationID: conversationID,
+        nextReqMessageID: nextReqMessageID,
+        count: 15
+      });
+    }
+
+    const messageList = imResponse.data.messageList.filter((message: any) => {
+      return message.type === TIM.TYPES.MSG_TEXT;
+    });
+    return TUIRoomResponse.success({
+      messageList: messageList,
+      nextReqMessageID: imResponse.data.nextReqMessageID,
+      isCompleted: imResponse.data.isCompleted
+    });
   }
 
   /**
@@ -609,7 +660,7 @@ class TIMService {
    * @param {string} Object - 个人信息
    * @returns {Promise}
    */
-  updateMyProfile(options: {nick: string; avatar: string;}) {
+  updateMyProfile(options: {nick?: string; avatar?: string;}) {
     return this.tim.updateMyProfile(options);
   }
 

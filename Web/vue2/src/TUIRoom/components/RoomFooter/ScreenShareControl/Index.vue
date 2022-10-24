@@ -13,7 +13,8 @@
     </div>
     <el-dialog
       v-model="dialogVisible"
-      class="custom-element-class"
+      :visible.sync="dialogVisible"
+      custom-class="custom-element-class"
       width="420px"
       title="是否停止屏幕共享？"
       :modal="true"
