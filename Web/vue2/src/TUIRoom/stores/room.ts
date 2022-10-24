@@ -71,6 +71,7 @@ export const useRoomStore = defineStore('room', {
       userAvatar: '',
       userId: '',
       userName: '',
+      audioVolume: 0,
     },
     remoteUserObj: {},
     isDefaultOpenCamera: false,
@@ -192,6 +193,7 @@ export const useRoomStore = defineStore('room', {
               isAudioStreamAvailable: false,
               isVideoStreamAvailable: false,
               type: 'main',
+              audioVolume: 0,
             },
             screenStreamInfo: null,
           };
@@ -281,17 +283,16 @@ export const useRoomStore = defineStore('room', {
         delete this.remoteUserObj[userId];
       }
     },
-
     setAudioVolume(audioVolumeArray: []) {
       const basicStore = useBasicStore();
       audioVolumeArray.forEach((audioVolumeItem: any) => {
-        const { userId, audioVolume } = audioVolumeItem;
-        if ((userId === basicStore.userId || userId === 'local') && this.localUser.mainStreamInfo) {
-          this.localUser.mainStreamInfo.audioVolume = audioVolume;
+        const { userId, volume } = audioVolumeItem;
+        if ((userId === basicStore.userId || userId === '') && this.localStream) {
+          this.localStream.audioVolume = volume;
         } else {
           const remoteUserInfo = this.remoteUserObj[userId];
           if (remoteUserInfo && remoteUserInfo.mainStreamInfo) {
-            remoteUserInfo.mainStreamInfo.audioVolume = audioVolume;
+            remoteUserInfo.mainStreamInfo.audioVolume = volume;
           }
         }
       });

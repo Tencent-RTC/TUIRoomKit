@@ -231,7 +231,7 @@ export default interface ITUIRoomCore {
    * @param streamType 流类型
    * @param fillMode 填充模式
    */
-  setRemoteVideoFillMode: (userId: string, streamType: string, fillMode: TRTCVideoFillMode) => void;
+  setRemoteVideoFillMode: (userId: string, streamType: ETUIStreamType, fillMode: TRTCVideoFillMode) => void;
 
   /**
    * 静默或取消静默本地摄像头
@@ -459,16 +459,16 @@ export default interface ITUIRoomCore {
   sendChatMessage: (text: string) => Promise<TUIRoomResponse<any>>;
 
   /**
-   * 发送自定义消息
-   *
-   * @param {string} type - 自定义消息类型
-   * @param {string} data - JSON string
-   * @returns {Promise}
+   * @param {options}
+   * @param {options.data} string 发送的自定义消息内容
+   * @param {options.description} string 发送的自定义消息描述
+   * @param {options.extension} string 发送的自定义消息扩展字段
    */
-  sendCustomMessage: (
-    type: string,
-    data: string
-  ) => Promise<TUIRoomResponse<any>>;
+  sendCustomMessage: (options: {
+    data: string,
+    description: string,
+    extension?: string,
+  }) => Promise<TUIRoomResponse<any>>;
 
   /**
    * /////////////////////////////////////////////////////////////////////////////////

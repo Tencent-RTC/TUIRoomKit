@@ -1,44 +1,25 @@
 /* eslint-disable */
 import { EventEmitter } from 'events';
 import {
-  AudioMusicParam,
-  Rect,
   TRTCAppScene,
-  TRTCAudioEffectParam,
-  TRTCAudioQuality,
-  TRTCBeautyStyle,
-  TRTCDeviceState,
-  TRTCDeviceType,
+  WebRTCAudioQuality,
   TRTCLocalStatistics,
-  TRTCLogLevel,
-  TRTCNetworkQosParam,
   TRTCParams,
   TRTCPublishCDNParam,
-  TRTCRemoteStatistics,
   TRTCRenderParams,
   TRTCRoleType,
-  TRTCSpeedTestResult,
   TRTCStatistics,
-  TRTCSwitchRoomParam,
-  TRTCTranscodingConfig,
-  TRTCTranscodingConfigMode,
-  TRTCVideoBufferType,
   TRTCVideoEncParam,
   TRTCVideoFillMode,
-  TRTCVideoFrame,
   TRTCVideoMirrorType,
-  TRTCVideoPixelFormat,
-  TRTCVideoRotation,
   TRTCVideoStreamType,
   TRTCVolumeInfo,
-  TRTCWaterMarkSrcType,
-  TRTCQualityInfo,
-  PluginInfo,
   TRTCDeviceInfo,
   TRTCVideoResolution,
 } from './common/trtc_define';
-import { rtcMode, anchorRole } from './common/constants';
+import { NAME } from './common/constants';
 import { IVideoParam } from './common/IVideoParam';
+// @ts-ignore
 import TRTC from 'trtc-js-sdk';
 
 const RETRY_STATE_NOT_START = 0;
@@ -51,10 +32,11 @@ class BaseCommon extends EventEmitter {
   public startJoinTimestamp = 0;
   public joinedTimestamp = 0;
   public localStream: any;
-  public testCameraStream: any;
+  public testCameraStream: any; // Protected: 改变量用在 TUIRoom 中，不能删除
   public localStreamRenderParams: any;
   public shareStream: any;
-  public audioQuality: TRTCAudioQuality;
+  public screenShareParams: any;
+  public audioQuality: WebRTCAudioQuality;
   public priorRemoteVideoStreamType: TRTCVideoStreamType;
   public playViewMap = new Map();
 
@@ -78,12 +60,14 @@ class BaseCommon extends EventEmitter {
   public userSig: string = '';
   public roomId: number = 0;
   public strRoomId: string = '';
-  public mode: string = rtcMode;
-  public role: string = anchorRole;
+  public mode: string = NAME.RTC;
+  public role: string = NAME.ANCHOR;
   public privateMapKey: string = '255';
   public streamId: string = '';
-  public remoteStreamMap: any;
+  public remoteStreamMap: Map<string, any>;
   public isSmallStreamSupported: boolean = false;
+  public shareUserId: string = '';
+  public shareUserSig: string = '';
   public isSharing: boolean = false;
   public isShareClientJoined: boolean = false;
   public isShareStreamPublished: boolean = false;
@@ -99,6 +83,10 @@ class BaseCommon extends EventEmitter {
   public defaultVideoHeight: number = 480;
   public defaultVideoFps: number = 15;
   public defaultVideoBitRate: number = 900;
+  public defaultShareWidth: number = 1920;
+  public defaultShareHeight: number = 1080;
+  public defaultShareFrameRate: number = 15;
+  public defaultShareBitrate: number = 1500;
   // 记录上一次本地 video 参数
   public prevLocalVideoStats: Object = {
     bytesSent: 0,
@@ -120,7 +108,7 @@ class BaseCommon extends EventEmitter {
   constructor() {
     super();
 
-    this.audioQuality = TRTCAudioQuality.TRTCAudioQualityDefault;
+    this.audioQuality = WebRTCAudioQuality.WebRTCAudioQualityStandard;
     this.priorRemoteVideoStreamType = TRTCVideoStreamType.TRTCVideoStreamTypeBig;
     this.remoteStreamMap = new Map();
     this.isSmallStreamSupported = (TRTC && TRTC.isSmallStreamSupported()) || false;
@@ -129,6 +117,12 @@ class BaseCommon extends EventEmitter {
       height: this.defaultVideoHeight,
       frameRate: this.defaultVideoFps,
       bitrate: this.defaultVideoBitRate,
+    };
+    this.screenShareParams = {
+      width: this.defaultShareWidth,
+      height: this.defaultShareHeight,
+      frameRate: this.defaultShareFrameRate,
+      bitrate: this.defaultShareBitrate,
     };
   }
 
@@ -146,7 +140,7 @@ class BaseCommon extends EventEmitter {
           // 执行成功，正常返回
           retryCount = 0;
           resolve(result);
-        } catch (error) {
+        } catch (error: any) {
           // 用于停止重试
           const stopRetry = () => {
             clearTimeout(timer);
@@ -179,7 +173,7 @@ class BaseCommon extends EventEmitter {
           }
         }
       };
-  
+
       return new Promise(run);
     };
   }

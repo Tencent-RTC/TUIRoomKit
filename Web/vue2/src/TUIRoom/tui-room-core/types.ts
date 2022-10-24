@@ -150,6 +150,12 @@ export enum ETUIRoomEvents {
   onUserAVDisabled = 'onUserAVDisabled', // 远端用户不可推流，退出 trtc 房间
 
   onUserKickOffStage = 'onUserKickOffStage', // 主播被主持人提下麦
+
+  onUserInfoUpdated = 'onUserInfoUpdated', // 远端用户信息更新
+}
+
+export enum EInnerTUIRoomEvents {
+  onRoomMemberList = 'onRoomMemberList', // 获取成员列表
 }
 
 /**
