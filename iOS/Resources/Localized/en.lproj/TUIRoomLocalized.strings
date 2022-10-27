@@ -17,10 +17,15 @@
 "TUIRoom.input.error.room.num.toast" = "Enter a valid room ID.";
 "TUIRoom.logout.room" = "Leave";
 "TUIRoom.sure.destroy.room" = "Are you sure you want to close the room?";
+"TUIRoom.sure.choose.floatwindow.room" = "Are you sure you want to open the floating window？";
 "TUIRoom.sure.leave.room" = "Are you sure you want to leave the room?";
 "TUIRoom.destroy.room.ok" = "Close";
 "TUIRoom.destroy.room.cancel" = "Cancel";
+"TUIRoom.sure.create.floatwindow.room" = "Are you sure you want to create a floating window？";
 "TUIRoom.ok" = "OK";
+"TUIRoom.destroy.showFloatingView.room.cancel" = "Open a floating window";
+"TUIRoom.destroy.openFloatingView.room.cancel" = "Open a floating window";
+"TUIRoom.dstory.logout.room" = "Close the room";
 "TUIRoom.cancel" = "Cancel";
 "TUIRoom.logout.member.list" = "Participants";
 "TUIRoom.Beauty.Setup.Strength" = "Strength";

@@ -317,6 +317,7 @@ extension TUIRoomMainViewController: TUIRoomCoreDelegate, TUIRoomMemberVCDelegat
         if #available(iOS 11.0, *) {
             TUIRoomCore.shareInstance().stopScreenCapture()
         }
+        guard currentUser.userInfo.isVideoAvailable  else  { return }
         if !currentUser.userInfo.isRemoteVideoMuted {
             currentUser.userInfo.isVideoAvailable = true
             muteVideoButton.isSelected = false
