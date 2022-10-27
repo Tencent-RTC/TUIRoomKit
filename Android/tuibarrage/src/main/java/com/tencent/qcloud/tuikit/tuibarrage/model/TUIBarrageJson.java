@@ -101,30 +101,30 @@ public class TUIBarrageJson {
 
             @Override
             public String toString() {
-                return "ExtInfo{" +
-                        "userID='" + userID + '\'' +
-                        ", avatarUrl='" + avatarUrl + '\'' +
-                        ", nickName='" + nickName + '\'' +
-                        '}';
+                return "ExtInfo{"
+                        + "userID=" + userID
+                        + ", avatarUrl=" + avatarUrl
+                        + ", nickName=" + nickName
+                        + '}';
             }
         }
 
         @Override
         public String toString() {
-            return "Data{" +
-                    "extInfo=" + extInfo.toString() +
-                    ", message='" + message + '\'' +
-                    '}';
+            return "Data{"
+                    + "extInfo=" + extInfo
+                    + ", message=" + message
+                    + '}';
         }
     }
 
     @Override
     public String toString() {
-        return "TUIBarrageJson{" +
-                "data=" + data.toString() +
-                ", platform='" + platform + '\'' +
-                ", version='" + version + '\'' +
-                ", businessID='" + businessID + '\'' +
-                '}';
+        return "TUIBarrageJson{"
+                + "data=" + data
+                + ", platform=" + platform
+                + ", version=" + version
+                + ", businessID=" + businessID
+                + '}';
     }
 }

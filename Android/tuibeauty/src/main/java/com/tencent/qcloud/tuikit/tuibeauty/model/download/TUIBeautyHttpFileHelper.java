@@ -29,7 +29,8 @@ public class TUIBeautyHttpFileHelper implements Runnable {
     private long    mDownloadingSize;
     private boolean mNeedProgress;
 
-    public TUIBeautyHttpFileHelper(Context context, String materialUrl, String folder, String filename, TUIBeautyHttpFileListener listener, boolean needProgress) {
+    public TUIBeautyHttpFileHelper(Context context, String materialUrl, String folder, String filename,
+                                   TUIBeautyHttpFileListener listener, boolean needProgress) {
         mContext = context;
         mMaterialUrl = materialUrl;
         mFolder = folder;
@@ -90,11 +91,13 @@ public class TUIBeautyHttpFileHelper implements Runnable {
                     mContentLength = client.getContentLength();
                 }
                 responseIs = client.getInputStream();
-                int length = -1;
-                byte[] buffer = new byte[BUFFERED_READER_SIZE];
+
+
                 fos = new FileOutputStream(dstFile);
                 mDownloadingSize = 0;
                 mListener.onProgressUpdate(0);
+                int length = -1;
+                byte[] buffer = new byte[BUFFERED_READER_SIZE];
                 while ((length = responseIs.read(buffer)) != -1) {
                     fos.write(buffer, 0, length);
                     if (mNeedProgress) {

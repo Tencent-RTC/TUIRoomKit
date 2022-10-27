@@ -103,4 +103,9 @@ public class TUIRoomImpl extends TUIRoom {
     public void setListener(TUIRoomListener listener) {
         mListener = listener;
     }
+
+    @Override
+    public void enableFloatWindow(boolean isEnable) {
+        RoomMainActivity.enableFloatWindow(isEnable);
+    }
 }

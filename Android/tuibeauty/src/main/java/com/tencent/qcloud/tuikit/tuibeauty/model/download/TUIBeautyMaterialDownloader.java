@@ -1,5 +1,7 @@
 package com.tencent.qcloud.tuikit.tuibeauty.model.download;
 
+import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.organizeAssetsDirectory;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
@@ -17,8 +19,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.organizeAssetsDirectory;
-
 /**
  * 美颜模块素材下载
  */
@@ -35,7 +35,7 @@ public class TUIBeautyMaterialDownloader {
     private Context mContext;
     private boolean mProcessing;
 
-    private String             mURL;
+    private String                    mURL;
     private String                    mMaterialId;
     private TUIBeautyDownloadListener mListener;
     private DownloadThreadPool        mDownloadThreadPool;
@@ -54,6 +54,25 @@ public class TUIBeautyMaterialDownloader {
         mProcessing = true;
         mListener = listener;
         mListener.onDownloadProgress(0);
+
+        File onlineMaterialDir;
+        if (isLibs) {
+            onlineMaterialDir = TUIBeautyResourceParse.getExternalFilesDir(mContext, ONLINE_LIB_FOLDER);
+        } else if (isMotion) {
+            onlineMaterialDir = TUIBeautyResourceParse.getExternalFilesDir(mContext, ONLINE_MOTION_FOLDER);
+        } else {
+            onlineMaterialDir = TUIBeautyResourceParse.getExternalFilesDir(mContext, ONLINE_MATERIAL_FOLDER);
+        }
+        if (onlineMaterialDir == null || onlineMaterialDir.getName().startsWith("null")) {
+            int resId = R.string.tuibeauty_video_material_download_progress_no_enough_storage_space;
+            mListener.onDownloadFail(mContext.getString(resId));
+            stop();
+            return;
+        }
+        if (!onlineMaterialDir.exists()) {
+            onlineMaterialDir.mkdirs();
+        }
+
         TUIBeautyHttpFileListener fileListener = new TUIBeautyHttpFileListener() {
             @Override
             public void onSaveSuccess(@NonNull File file) {
@@ -69,7 +88,8 @@ public class TUIBeautyMaterialDownloader {
                 }
                 String dataDir = TUIBeautyResourceParse.unZip(file.getPath(), file.getParentFile().getPath());
                 if (TextUtils.isEmpty(dataDir)) {
-                    mListener.onDownloadFail(mContext.getString(R.string.tuibeauty_video_material_download_progress_material_unzip_failed));
+                    int resId = R.string.tuibeauty_video_material_download_progress_material_unzip_failed;
+                    mListener.onDownloadFail(mContext.getString(resId));
                     stop();
                     return;
                 }
@@ -81,7 +101,8 @@ public class TUIBeautyMaterialDownloader {
 
             @Override
             public void onSaveFailed(File file, Exception e) {
-                mListener.onDownloadFail(mContext.getString(R.string.tuibeauty_video_material_download_progress_download_failed));
+                int resId = R.string.tuibeauty_video_material_download_progress_download_failed;
+                mListener.onDownloadFail(mContext.getString(resId));
                 stop();
             }
 
@@ -96,25 +117,10 @@ public class TUIBeautyMaterialDownloader {
             }
 
         };
-        File onlineMaterialDir;
-        if (isLibs) {
-            onlineMaterialDir = TUIBeautyResourceParse.getExternalFilesDir(mContext, ONLINE_LIB_FOLDER);
-        } else if (isMotion) {
-            onlineMaterialDir = TUIBeautyResourceParse.getExternalFilesDir(mContext, ONLINE_MOTION_FOLDER);
-        } else {
-            onlineMaterialDir = TUIBeautyResourceParse.getExternalFilesDir(mContext, ONLINE_MATERIAL_FOLDER);
-        }
-        if (onlineMaterialDir == null || onlineMaterialDir.getName().startsWith("null")) {
-            mListener.onDownloadFail(mContext.getString(R.string.tuibeauty_video_material_download_progress_no_enough_storage_space));
-            stop();
-            return;
-        }
-        if (!onlineMaterialDir.exists()) {
-            onlineMaterialDir.mkdirs();
-        }
 
         ThreadPoolExecutor threadPool = getThreadExecutor();
-        threadPool.execute(new TUIBeautyHttpFileHelper(mContext, mURL, onlineMaterialDir.getPath(), mMaterialId + DOWNLOAD_FILE_POSTFIX, fileListener, true));
+        threadPool.execute(new TUIBeautyHttpFileHelper(mContext, mURL, onlineMaterialDir.getPath(),
+                mMaterialId + DOWNLOAD_FILE_POSTFIX, fileListener, true));
     }
 
     public void stop() {

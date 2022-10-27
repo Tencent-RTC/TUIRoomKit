@@ -99,22 +99,23 @@ public class TUIBeautyTabInfo {
 
     @Override
     public String toString() {
-        return "TUIBeautyTabInfo{" +
-                "tab_id=" + tab_id +
-                ", tab_name='" + tab_name + '\'' +
-                ", tab_item_name_size=" + tab_item_name_size +
-                ", tab_item_name_color_normal='" + tab_item_name_color_normal + '\'' +
-                ", tab_item_name_color_select='" + tab_item_name_color_select + '\'' +
-                ", tab_item_icon_width=" + tab_item_icon_width +
-                ", tab_item_icon_height=" + tab_item_icon_height +
-                ", tab_item_level_hint_color='" + tab_item_level_hint_color + '\'' +
-                ", tab_item_level_hint_size=" + tab_item_level_hint_size +
-                ", tab_item_level_value_color='" + tab_item_level_value_color + '\'' +
-                ", tab_item_level_value_size=" + tab_item_level_value_size +
-                ", tab_item_level_progress_drawable='" + tab_item_level_progress_drawable + '\'' +
-                ", tab_item_level_progress_thumb='" + tab_item_level_progress_thumb + '\'' +
-                ", tab_item_list_default_selected_index='" + tab_item_list_default_selected_index + '\'' +
-                ", tab_item_list=" + tab_item_list +
-                '}';
+        return "TUIBeautyTabInfo{"
+                + "tab_id=" + tab_id
+                + ", tab_type=" + tab_type
+                + ", tab_item_name_size=" + tab_item_name_size
+                + ", tab_item_icon_width=" + tab_item_icon_width
+                + ", tab_item_icon_height=" + tab_item_icon_height
+                + ", tab_item_level_hint_size=" + tab_item_level_hint_size
+                + ", tab_item_level_value_size=" + tab_item_level_value_size
+                + ", tab_name=" + tab_name
+                + ", tab_item_name_color_normal=" + tab_item_name_color_normal
+                + ", tab_item_name_color_select=" + tab_item_name_color_select
+                + ", tab_item_level_hint_color=" + tab_item_level_hint_color
+                + ", tab_item_level_value_color=" + tab_item_level_value_color
+                + ", tab_item_level_progress_drawable=" + tab_item_level_progress_drawable
+                + ", tab_item_level_progress_thumb=" + tab_item_level_progress_thumb
+                + ", tab_item_list_default_selected_index=" + tab_item_list_default_selected_index
+                + ", tab_item_list=" + tab_item_list
+                + '}';
     }
 }

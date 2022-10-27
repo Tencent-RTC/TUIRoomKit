@@ -1,11 +1,10 @@
 package com.tencent.qcloud.tuikit.tuibeauty.model;
 
+import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.getResPath;
+
 import android.text.TextUtils;
 
-import com.tencent.liteav.basic.log.TXCLog;
 import com.tencent.xmagic.XmagicProperty;
-
-import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.getResPath;
 
 /**
  * 美颜面板 item 相关属性
@@ -68,16 +67,16 @@ public class TUIBeautyItemInfo {
         return item_xmagic_id;
     }
 
-    public void setItemLevel(int item_level) {
-        this.item_level = item_level;
+    public void setItemLevel(int itemLevel) {
+        this.item_level = itemLevel;
     }
 
     public int getItemLevel() {
         return item_level;
     }
 
-    public void setItemCategory(int item_category) {
-        this.item_category = item_category;
+    public void setItemCategory(int itemCategory) {
+        this.item_category = itemCategory;
     }
 
     public int getItemCategory() {
@@ -112,7 +111,8 @@ public class TUIBeautyItemInfo {
             case TUIBeautyConstants.TAB_TYPE_BEAUTY:
                 category = XmagicProperty.Category.BEAUTY;
                 resPath = TextUtils.isEmpty(item_res_name) ? null : effDirs + item_res_name;
-                values = new XmagicProperty.XmagicPropertyValues(item_display_min_value, item_display_max_value, item_display_default_value, item_inner_min_value, item_inner_max_value);
+                values = new XmagicProperty.XmagicPropertyValues(item_display_min_value, item_display_max_value,
+                        item_display_default_value, item_inner_min_value, item_inner_max_value);
                 break;
             case TUIBeautyConstants.TAB_TYPE_LUT:
                 category = XmagicProperty.Category.LUT;
@@ -126,7 +126,8 @@ public class TUIBeautyItemInfo {
                 category = XmagicProperty.Category.MAKEUP;
                 resPath = TextUtils.isEmpty(item_res_name) ? null : getResPath() + item_res_name;
                 if (!"ID_NONE".equals(item_xmagic_id)) {
-                    values = new XmagicProperty.XmagicPropertyValues(item_display_min_value, item_display_max_value, item_display_default_value, item_inner_min_value, item_inner_max_value);
+                    values = new XmagicProperty.XmagicPropertyValues(item_display_min_value, item_display_max_value,
+                            item_display_default_value, item_inner_min_value, item_inner_max_value);
                 }
                 break;
             default:
@@ -137,24 +138,24 @@ public class TUIBeautyItemInfo {
 
     @Override
     public String toString() {
-        return "TUIBeautyItemInfo{" +
-                "item_id=" + item_id +
-                ", item_type=" + item_type +
-                ", item_level=" + item_level +
-                ", item_display_min_value=" + item_display_min_value +
-                ", item_display_max_value=" + item_display_max_value +
-                ", item_inner_min_value=" + item_inner_min_value +
-                ", item_display_default_value=" + item_display_default_value +
-                ", item_inner_max_value=" + item_inner_max_value +
-                ", item_name='" + item_name + '\'' +
-                ", item_icon_normal='" + item_icon_normal + '\'' +
-                ", item_icon_select='" + item_icon_select + '\'' +
-                ", item_key='" + item_key + '\'' +
-                ", item_xmagic_id='" + item_xmagic_id + '\'' +
-                ", item_res_name='" + item_res_name + '\'' +
-                ", item_material_url='" + item_material_url + '\'' +
-                ", item_category=" + item_category +
-                ", property=" + property +
-                '}';
+        return "TUIBeautyItemInfo{"
+                + "item_id=" + item_id
+                + ", item_type=" + item_type
+                + ", item_level=" + item_level
+                + ", item_display_min_value=" + item_display_min_value
+                + ", item_display_max_value=" + item_display_max_value
+                + ", item_inner_min_value=" + item_inner_min_value
+                + ", item_display_default_value=" + item_display_default_value
+                + ", item_inner_max_value=" + item_inner_max_value
+                + ", item_name=" + item_name
+                + ", item_icon_normal=" + item_icon_normal
+                + ", item_icon_select=" + item_icon_select
+                + ", item_key=" + item_key
+                + ", item_xmagic_id=" + item_xmagic_id
+                + ", item_res_name=" + item_res_name
+                + ", item_material_url=" + item_material_url
+                + ", item_category=" + item_category
+                + ", property=" + property
+                + '}';
     }
 }

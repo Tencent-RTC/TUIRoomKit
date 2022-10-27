@@ -40,34 +40,6 @@ public class TUIBeautyFileUtils {
         }
     }
 
-    private static boolean copyAssets(Context context, String oldPath, String newPath) {
-        try {
-            String fileNames[] = context.getAssets().list(oldPath);
-            if (fileNames.length > 0) {
-                Log.e(TAG, "copyAssets path: " + Arrays.toString(fileNames));
-                File file = new File(newPath);
-                file.mkdirs();
-                for (String fileName : fileNames) {
-                    copyAssets(context, oldPath + "/" + fileName, newPath + "/" + fileName);
-                }
-            } else {
-                InputStream is = context.getAssets().open(oldPath);
-                FileOutputStream fos = new FileOutputStream(new File(newPath));
-                byte[] buffer = new byte[1024 * 1024];
-                int byteCount = 0;
-                while ((byteCount = is.read(buffer)) != -1) {
-                    fos.write(buffer, 0, byteCount);
-                }
-                fos.flush();
-                is.close();
-                fos.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-
     private static void ensureResPathAlreadySet() {
         if (TextUtils.isEmpty(sResPath)) {
             throw new IllegalStateException("resource path not set, call setResPath() first.");
@@ -106,6 +78,35 @@ public class TUIBeautyFileUtils {
         fileOrDirectory.delete();
     }
 
+
+    private static boolean copyAssets(Context context, String oldPath, String newPath) {
+        try {
+            String[] fileNames = context.getAssets().list(oldPath);
+            if (fileNames.length > 0) {
+                Log.e(TAG, "copyAssets path: " + Arrays.toString(fileNames));
+                File file = new File(newPath);
+                file.mkdirs();
+                for (String fileName : fileNames) {
+                    copyAssets(context, oldPath + "/" + fileName, newPath + "/" + fileName);
+                }
+            } else {
+                InputStream is = context.getAssets().open(oldPath);
+                FileOutputStream fos = new FileOutputStream(new File(newPath));
+                byte[] buffer = new byte[1024 * 1024];
+                int byteCount = 0;
+                while ((byteCount = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, byteCount);
+                }
+                fos.flush();
+                is.close();
+                fos.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     private static boolean copyAssets(String parent, String oldPath, String newPath) {
         FileInputStream is = null;
         FileOutputStream fos = null;
@@ -115,7 +116,7 @@ public class TUIBeautyFileUtils {
                 return true;
             }
             if (file.isDirectory()) {
-                String fileNames[] = file.list();
+                String[] fileNames = file.list();
                 if (fileNames == null || fileNames.length <= 0) {
                     return true;
                 }

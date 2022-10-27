@@ -37,7 +37,7 @@ public class TUIBeautyCallService implements ITUIService {
             String licenseKey = (String) param.get(TUIConstants.TUIBeauty.PARAM_NAME_LICENSE_KEY);
             String licenseUrl = (String) param.get(TUIConstants.TUIBeauty.PARAM_NAME_LICENSE_URL);
             TUIBeautyView.getBeautyService().setLicense(context, licenseUrl, licenseKey);
-        }else if (TextUtils.equals(TUIConstants.TUIBeauty.METHOD_DESTROY_XMAGIC, method)){
+        } else if (TextUtils.equals(TUIConstants.TUIBeauty.METHOD_DESTROY_XMAGIC, method)) {
             TUIBeautyView.getBeautyService().destroy();
         }
         return null;

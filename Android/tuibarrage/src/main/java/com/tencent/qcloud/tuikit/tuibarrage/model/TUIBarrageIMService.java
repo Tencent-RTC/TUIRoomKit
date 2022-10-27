@@ -79,8 +79,8 @@ public class TUIBarrageIMService {
     private class SimpleListener extends V2TIMSimpleMsgListener {
         @Override
         public void onRecvGroupTextMessage(String msgID, String groupID, V2TIMGroupMemberInfo sender, String text) {
-            Log.d(TAG, "onRecvGroupCustomMessage: msgID = " + msgID + " , groupID = " + groupID +
-                    " , mGroupId = " + mGroupId + " , sender = " + sender + " , text = " + text);
+            Log.d(TAG, "onRecvGroupCustomMessage: msgID = " + msgID + " , groupID = " + groupID
+                    + " , mGroupId = " + mGroupId + " , sender = " + sender + " , text = " + text);
             if (groupID == null || !groupID.equals(mGroupId)) {
                 return;
             }
@@ -99,11 +99,6 @@ public class TUIBarrageIMService {
             if (mPresenter != null) {
                 mPresenter.receiveBarrage(model);
             }
-        }
-
-        @Override
-        public void onRecvGroupCustomMessage(String msgID, String groupID, V2TIMGroupMemberInfo sender, byte[] customData) {
-
         }
     }
 

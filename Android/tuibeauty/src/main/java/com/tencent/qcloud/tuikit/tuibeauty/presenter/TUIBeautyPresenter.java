@@ -17,15 +17,15 @@ import com.tencent.qcloud.tuikit.tuibeauty.R;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyConstants;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyInfo;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyItemInfo;
-import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyService;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyParams;
+import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyResourceParse;
+import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyService;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyTabInfo;
 import com.tencent.qcloud.tuikit.tuibeauty.model.download.TUIBeautyDownloadListener;
 import com.tencent.qcloud.tuikit.tuibeauty.model.download.TUIBeautyMaterialDownloader;
-import com.tencent.qcloud.tuikit.tuibeauty.view.internal.TUIBeautyProgressDialog;
 import com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyResourceUtils;
 import com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautySPUtils;
-import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyResourceParse;
+import com.tencent.qcloud.tuikit.tuibeauty.view.internal.TUIBeautyProgressDialog;
 import com.tencent.xmagic.XmagicProperty;
 
 import java.io.File;
@@ -151,7 +151,9 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
                     continue;
                 }
                 String materialPath = materialValue + File.separator + itemInfo.getProperty().id;
-                XmagicProperty<XmagicProperty.XmagicPropertyValues> property = new XmagicProperty<>(XmagicProperty.Category.MOTION, itemInfo.getProperty().id, materialPath, null, null);
+                XmagicProperty<XmagicProperty.XmagicPropertyValues> property =
+                        new XmagicProperty<>(XmagicProperty.Category.MOTION, itemInfo.getProperty().id, materialPath,
+                                null, null);
                 itemInfo.setProperty(property);
             }
         }
@@ -159,7 +161,8 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
 
 
     @Override
-    public XmagicProperty<XmagicProperty.XmagicPropertyValues> setCurrentDisPlayValue(XmagicProperty<XmagicProperty.XmagicPropertyValues> property, int value) {
+    public XmagicProperty<XmagicProperty.XmagicPropertyValues> setCurrentDisPlayValue(
+            XmagicProperty<XmagicProperty.XmagicPropertyValues> property, int value) {
         return TUIBeautyService.getInstance().setCurrentDisPlayValue(property, value);
     }
 
@@ -189,7 +192,8 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
         return TUIBeautyResourceParse.getDefaultBeautyInfo();
     }
 
-    private void dispatchEffects(TUIBeautyTabInfo tabInfo, TUIBeautyItemInfo itemInfo, @IntRange(from = 0) int itemPosition) {
+    private void dispatchEffects(TUIBeautyTabInfo tabInfo, TUIBeautyItemInfo itemInfo,
+                                 @IntRange(from = 0) int itemPosition) {
         int tabType = tabInfo.getTabType();
         switch (tabType) {
             case TUIBeautyConstants.TAB_TYPE_BEAUTY:
@@ -223,7 +227,8 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
             TUIBeautyService.getInstance().updateProperty(itemInfo);
             return;
         }
-        TUIBeautyMaterialDownloader materialDownloader = new TUIBeautyMaterialDownloader(mContext, itemInfo.getProperty().id, itemInfo.getMaterialUrl());
+        TUIBeautyMaterialDownloader materialDownloader = new TUIBeautyMaterialDownloader(mContext,
+                itemInfo.getProperty().id, itemInfo.getMaterialUrl());
         materialDownloader.start(new TUIBeautyDownloadListener() {
 
             private TUIBeautyProgressDialog mProgressDialog;
@@ -290,7 +295,8 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
             category = XmagicProperty.Category.MAKEUP;
         }
         String materialPath = resPath + File.separator + id;
-        XmagicProperty<XmagicProperty.XmagicPropertyValues> property = new XmagicProperty<>(category, id, materialPath, info.getProperty().effKey, info.getProperty().effValue);
+        XmagicProperty<XmagicProperty.XmagicPropertyValues> property = new XmagicProperty<>(category, id, materialPath,
+                info.getProperty().effKey, info.getProperty().effValue);
         info.setItemLevel(-1);
         info.setProperty(property);
     }
@@ -389,6 +395,8 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
                 break;
             case TUIBeautyConstants.ITEM_TYPE_FILTER_JAPANESE:
                 resId = R.drawable.tuibeauty_filter_rixi;
+                break;
+            default:
                 break;
         }
         if (resId != 0) {
