@@ -20,13 +20,14 @@ public class TUIBeautyProgressDialog {
     public void createLoadingDialog(Context context) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View v = inflater.inflate(R.layout.tuibeauty_layout_loading, null);
-        LinearLayout layout = (LinearLayout) v.findViewById(R.id.beauty_ll_progress);
 
         ImageView spaceshipImage = (ImageView) v.findViewById(R.id.beauty_iv_progress_img);
         mTextMsg = (TextView) v.findViewById(R.id.beauty_tv_msg);
-        Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(context, R.anim.tuibeauty_load_progress_animation);
+        Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(context,
+                R.anim.tuibeauty_load_progress_animation);
         spaceshipImage.startAnimation(hyperspaceJumpAnimation);
 
+        LinearLayout layout = (LinearLayout) v.findViewById(R.id.beauty_ll_progress);
         mDialog = new Dialog(context, R.style.TUIBeautyLoadingDialog);
         mDialog.setCancelable(false);
         mDialog.setContentView(layout, new RelativeLayout.LayoutParams(

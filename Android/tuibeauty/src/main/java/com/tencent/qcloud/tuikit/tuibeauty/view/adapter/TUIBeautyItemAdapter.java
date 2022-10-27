@@ -13,10 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.qcloud.tuikit.tuibeauty.R;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyItemInfo;
+import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyResourceParse;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyTabInfo;
 import com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyResourceUtils;
-import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyResourceParse;
-import com.tencent.xmagic.XmagicProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,25 +30,25 @@ public class TUIBeautyItemAdapter extends BaseAdapter {
 
 
     public interface OnItemClickListener {
-        void onItemClick(TUIBeautyItemInfo TUIBeautyItemInfo, int position);
+        void onItemClick(TUIBeautyItemInfo tuiBeautyItemInfo, int position);
     }
 
     public TUIBeautyItemAdapter(Context context) {
         mContext = context;
     }
 
-    public void setData(TUIBeautyTabInfo TUIBeautyTabInfo) {
-        setData(TUIBeautyTabInfo, 0);
+    public void setData(TUIBeautyTabInfo tuiBeautyTabInfo) {
+        setData(tuiBeautyTabInfo, 0);
     }
 
-    public void setData(TUIBeautyTabInfo TUIBeautyTabInfo, int defaultIndex) {
-        mTUIBeautyTabInfo = TUIBeautyTabInfo;
+    public void setData(TUIBeautyTabInfo tuiBeautyTabInfo, int defaultIndex) {
+        mTUIBeautyTabInfo = tuiBeautyTabInfo;
         mSelectPos = defaultIndex;
         if (mTUIBeautyItemInfoList == null) {
             mTUIBeautyItemInfoList = new ArrayList<>();
         }
         mTUIBeautyItemInfoList.clear();
-        mTUIBeautyItemInfoList.addAll(TUIBeautyTabInfo.getTabItemList());
+        mTUIBeautyItemInfoList.addAll(tuiBeautyTabInfo.getTabItemList());
         notifyDataSetChanged();
     }
 
@@ -75,7 +74,7 @@ public class TUIBeautyItemAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.tuibeauty_view_item, parent, false);
             holder = new ViewHolder(convertView);
             LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.icon.getLayoutParams();
-            int width, height;
+            int width;
             if (mTUIBeautyTabInfo.getTabItemIconWidth() == LinearLayout.LayoutParams.MATCH_PARENT) {
                 width = LinearLayout.LayoutParams.MATCH_PARENT;
             } else if (mTUIBeautyTabInfo.getTabItemIconWidth() == LinearLayout.LayoutParams.WRAP_CONTENT) {
@@ -83,6 +82,7 @@ public class TUIBeautyItemAdapter extends BaseAdapter {
             } else {
                 width = TUIBeautyResourceParse.dip2px(mContext, mTUIBeautyTabInfo.getTabItemIconWidth());
             }
+            int height;
             if (mTUIBeautyTabInfo.getTabItemIconHeight() == LinearLayout.LayoutParams.MATCH_PARENT) {
                 height = LinearLayout.LayoutParams.MATCH_PARENT;
             } else if (mTUIBeautyTabInfo.getTabItemIconHeight() == LinearLayout.LayoutParams.WRAP_CONTENT) {
@@ -98,7 +98,8 @@ public class TUIBeautyItemAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
         final TUIBeautyItemInfo TUIBeautyItemInfo = getItem(position);
-        TUIBeautyResourceParse.setTextViewText(holder.title, TUIBeautyResourceUtils.getString(TUIBeautyItemInfo.getItemName()));
+        TUIBeautyResourceParse.setTextViewText(holder.title,
+                TUIBeautyResourceUtils.getString(TUIBeautyItemInfo.getItemName()));
         TUIBeautyResourceParse.setTextViewSize(holder.title, mTUIBeautyTabInfo.getTabItemNameSize());
         if (mSelectPos == position) {
             TUIBeautyResourceParse.setTextViewColor(holder.title, mTUIBeautyTabInfo.getTabItemNameColorSelect());

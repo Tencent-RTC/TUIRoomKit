@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,6 +37,9 @@ import com.tencent.liteav.tuiroom.model.TUIRoomCore;
 import com.tencent.liteav.tuiroom.model.TUIRoomCoreCallback;
 import com.tencent.liteav.tuiroom.model.TUIRoomCoreDef;
 import com.tencent.liteav.tuiroom.model.TUIRoomCoreListener;
+import com.tencent.liteav.tuiroom.ui.floatwindow.FloatActivity;
+import com.tencent.liteav.tuiroom.ui.floatwindow.FloatWindow;
+import com.tencent.liteav.tuiroom.ui.floatwindow.PermissionListener;
 import com.tencent.liteav.tuiroom.ui.remote.RemoteUserListView;
 import com.tencent.liteav.tuiroom.ui.utils.PermissionHelper;
 import com.tencent.liteav.tuiroom.ui.utils.StateBarUtils;
@@ -73,6 +77,9 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     public static final String KEY_AUDIO_QUALITY  = "audio_quality";
     public static final String KEY_VIDEO_QUALITY  = "video_quality";
     public static final String KEY_IS_CREATE_ROOM = "is_create_room";
+
+
+    public static boolean sEnableFloatWindow = true;
 
     private int                       mRoomId;
     private String                    mUserId;
@@ -124,6 +131,10 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
                                  boolean openAudio,
                                  int audioQuality,
                                  int videoQuality) {
+        if (FloatWindow.isShowing()) {
+            ToastUtils.showLong(R.string.tuiroom_already_in_room);
+            return;
+        }
         Intent starter = new Intent(context, RoomMainActivity.class);
         starter.putExtra(KEY_ROOM_ID, roomId);
         starter.putExtra(KEY_SPEECH_MODE, speechMode);
@@ -249,7 +260,12 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
             StateBarUtils.setDarkStatusBar(RoomMainActivity.this);
             return;
         }
-        preExitRoom();
+        if (sEnableFloatWindow) {
+            preShowFloatWindow();
+        } else {
+            preExitRoom();
+        }
+
     }
 
     @Override
@@ -258,6 +274,9 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         mTUIRoomCore.setListener(null);
         mTUIRoomCore.stopScreenCapture();
         mTUIRoomCore.stopCameraPreview();
+        if (FloatWindow.isShowing()) {
+            FloatWindow.getInstance().destroy();
+        }
         super.onDestroy();
         UserModelManager.getInstance().getUserModel().userType = UserModel.UserType.NONE;
         TUILogin.removeLoginListener(mTUILoginListener);
@@ -279,6 +298,11 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
             notifyMsg = getString(R.string.tuiroom_msg_confirm_exit_room);
         }
         showExitInfoDialog(notifyMsg, false);
+    }
+
+    private void preShowFloatWindow() {
+        String notifyMsg = getString(R.string.tuiroom_show_float_window);
+        showFloatWindowDialog(notifyMsg);
     }
 
     private void exitRoomConfirm() {
@@ -421,7 +445,11 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
 
             @Override
             public void onExitClick() {
-                preExitRoom();
+                if (sEnableFloatWindow) {
+                    preShowFloatWindow();
+                } else {
+                    preExitRoom();
+                }
             }
 
             @Override
@@ -434,6 +462,22 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         mStopScreenCaptureTv = (TextView) findViewById(R.id.tv_stop_screen_capture);
         if (!mIsCreateRoom && RTCubeUtils.isRTCubeApp(this)) {
             mRoomHeadBarView.showReportView(true);
+        }
+        if (sEnableFloatWindow) {
+            FloatWindow.getInstance().destroy();
+            FloatWindow.getInstance().setCloseClickListener(new FloatWindow.OnCloseClickListener() {
+                @Override
+                public void close() {
+                    mTUIRoomCore.setListener(null);
+                    mTUIRoomCore.stopScreenCapture();
+                    mTUIRoomCore.stopCameraPreview();
+                    exitRoomConfirm();
+                    RoomMainActivity.this.finish();
+                    if (FloatWindow.isShowing()) {
+                        FloatWindow.getInstance().destroy();
+                    }
+                }
+            });
         }
     }
 
@@ -515,6 +559,9 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         } else {
             ToastUtils.showShort(getString(R.string.tuiroom_toast_end_room));
             showSingleConfirmDialog(getString(R.string.tuiroom_room_room_destroyed));
+        }
+        if (FloatWindow.isShowing()) {
+            FloatWindow.getInstance().destroy();
         }
     }
 
@@ -728,6 +775,10 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
                         }
                     }
                 });
+        if (FloatWindow.isShowing()) {
+            FloatWindow.getInstance().refreshView();
+        }
+
     }
 
     @Override
@@ -735,6 +786,9 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         int index = removeMemberEntity(userId);
         if (index >= 0) {
             mAnchorListView.notifyItemRemoved(index, userId);
+        }
+        if (FloatWindow.isShowing()) {
+            FloatWindow.getInstance().refreshView();
         }
     }
 
@@ -820,6 +874,9 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
             ToastUtils.showShort(R.string.tuiroom_un_mute_video_by_master);
             mVideoImg.setEnabled(true);
             mVideoImg.setActivated(true);
+        }
+        if (FloatWindow.isShowing()) {
+            FloatWindow.getInstance().refreshView();
         }
     }
 
@@ -1257,7 +1314,9 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
                                     }
                                 }
                             });
-
+                    if (FloatWindow.isShowing()) {
+                        FloatWindow.getInstance().refreshView();
+                    }
                 }
             }
 
@@ -1303,6 +1362,62 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
             return i;
         }
         return -1;
+    }
+
+    private void showFloatWindowDialog(String msg) {
+        final ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment();
+        dialogFragment.setCancelable(true);
+        dialogFragment.setMessage(msg);
+        if (dialogFragment.isAdded()) {
+            dialogFragment.dismiss();
+            return;
+        }
+        dialogFragment.setPositiveText(getString(R.string.tuiroom_dialog_ok));
+        dialogFragment.setNegativeText(getString(R.string.tuiroom_dialog_cancel));
+        dialogFragment.setPositiveClickListener(new ConfirmDialogFragment.PositiveClickListener() {
+            @Override
+            public void onClick() {
+                dialogFragment.dismiss();
+                if (!FloatWindow.isShowing()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(mContext)) {
+                        FloatActivity.request(mContext, new PermissionListener() {
+                            @Override
+                            public void onSuccess() {
+                                if (mIsCreateRoom) {
+                                    Intent intent = new Intent(mContext, CreateRoomActivity.class);
+                                    startActivity(intent);
+                                } else {
+                                    Intent intent = new Intent(mContext, JoinRoomActivity.class);
+                                    startActivity(intent);
+                                }
+                                showFloatWindow();
+                            }
+
+                            @Override
+                            public void onFailed() {
+                                finish();
+                            }
+                        });
+                    } else {
+                        if (mIsCreateRoom) {
+                            Intent intent = new Intent(mContext, CreateRoomActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(mContext, JoinRoomActivity.class);
+                            startActivity(intent);
+                        }
+                        showFloatWindow();
+                    }
+                }
+            }
+        });
+        dialogFragment.setNegativeClickListener(new ConfirmDialogFragment.NegativeClickListener() {
+            @Override
+            public void onClick() {
+                dialogFragment.dismiss();
+            }
+        });
+        dialogFragment.show(getFragmentManager(), "ConfirmDialogFragment");
     }
 
     private void showExitInfoDialog(String msg, Boolean isError) {
@@ -1384,6 +1499,11 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         dialogFragment.show(getFragmentManager(), "ConfirmDialogFragment");
     }
 
+    private void showFloatWindow() {
+        FloatWindow.getInstance().init(this, mSelfEntity);
+        FloatWindow.getInstance().createView();
+    }
+
     private void showSingleConfirmDialog(String message) {
         if (mIsPaused) {
             finish();
@@ -1412,6 +1532,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     protected void onResume() {
         super.onResume();
         mIsPaused = false;
+        mViewVideo.refreshParent();
     }
 
     @Override
@@ -1477,5 +1598,9 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         mLayoutBarrageShow.addView(view, params);
+    }
+
+    public static void enableFloatWindow(boolean isEnable) {
+        sEnableFloatWindow = isEnable;
     }
 }

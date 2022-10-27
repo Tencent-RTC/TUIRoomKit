@@ -7,8 +7,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyInfo;
-import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyTabInfo;
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyResourceParse;
+import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyTabInfo;
 
 public class TUIBeautyTabAdapter extends BaseAdapter implements View.OnClickListener {
 
@@ -18,12 +18,12 @@ public class TUIBeautyTabAdapter extends BaseAdapter implements View.OnClickList
     private OnTabChangeListener mTabClickListener;
 
     public interface OnTabChangeListener {
-        void onTabChange(TUIBeautyTabInfo TUIBeautyTabInfo, int position);
+        void onTabChange(TUIBeautyTabInfo tuiBeautyTabInfo, int position);
     }
 
-    public TUIBeautyTabAdapter(Context context, TUIBeautyInfo TUIBeautyInfo) {
+    public TUIBeautyTabAdapter(Context context, TUIBeautyInfo tuiBeautyInfo) {
         mContext = context;
-        mTUIBeautyInfo = TUIBeautyInfo;
+        mTUIBeautyInfo = tuiBeautyInfo;
     }
 
     @Override
@@ -49,15 +49,20 @@ public class TUIBeautyTabAdapter extends BaseAdapter implements View.OnClickList
             TUIBeautyResourceParse.setTextViewColor(tabView, mTUIBeautyInfo.getBeautyTabNameColorNormal());
             TUIBeautyResourceParse.setTextViewSize(tabView, mTUIBeautyInfo.getBeautyTabNameSize());
             TUIBeautyResourceParse.setTextViewSize(tabView, 14);
-            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(mTUIBeautyInfo.getBeautyTabNameWidth(), mTUIBeautyInfo.getBeautyTabNameHeight());
+            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(mTUIBeautyInfo.getBeautyTabNameWidth(),
+                    mTUIBeautyInfo.getBeautyTabNameHeight());
             tabView.setLayoutParams(layoutParams);
         } else {
             tabView = (TextView) convertView;
         }
         if (position == 0) {
-            tabView.setPadding(TUIBeautyResourceParse.dip2px(mContext, 20), 0, TUIBeautyResourceParse.dip2px(mContext, 11), TUIBeautyResourceParse.dip2px(mContext, 30));
+            tabView.setPadding(TUIBeautyResourceParse.dip2px(mContext, 20), 0,
+                    TUIBeautyResourceParse.dip2px(mContext, 11),
+                    TUIBeautyResourceParse.dip2px(mContext, 30));
         } else {
-            tabView.setPadding(TUIBeautyResourceParse.dip2px(mContext, 12), 0, TUIBeautyResourceParse.dip2px(mContext, 11), TUIBeautyResourceParse.dip2px(mContext, 30));
+            tabView.setPadding(TUIBeautyResourceParse.dip2px(mContext, 12), 0,
+                    TUIBeautyResourceParse.dip2px(mContext, 11),
+                    TUIBeautyResourceParse.dip2px(mContext, 30));
         }
         TUIBeautyResourceParse.setTextViewText(tabView, getItem(position).getTabName());
         tabView.setTag(position);

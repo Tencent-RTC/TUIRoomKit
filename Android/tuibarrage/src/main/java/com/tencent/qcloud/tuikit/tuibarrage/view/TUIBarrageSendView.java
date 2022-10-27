@@ -53,7 +53,8 @@ public class TUIBarrageSendView extends Dialog implements ITUIBarrageSendView {
         mEditText = (EditText) findViewById(R.id.et_input_message);
         mEditText.setInputType(InputType.TYPE_CLASS_TEXT);
         //修改下划线颜色为透明
-        mEditText.getBackground().setColorFilter(mContext.getResources().getColor(R.color.tuichorus_transparent), PorterDuff.Mode.CLEAR);
+        mEditText.getBackground().setColorFilter(mContext.getResources().getColor(R.color.tuichorus_transparent),
+                PorterDuff.Mode.CLEAR);
         mBtnSend = (Button) findViewById(R.id.btn_send);
         mLayoutOutSide = findViewById(R.id.ll_outside_view);
         mLayoutInputView = findViewById(R.id.ll_input_view);

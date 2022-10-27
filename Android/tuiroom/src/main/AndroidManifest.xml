@@ -11,16 +11,24 @@
 
         <activity
             android:name="com.tencent.liteav.tuiroom.ui.CreateRoomActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <activity
             android:name="com.tencent.liteav.tuiroom.ui.JoinRoomActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <activity
             android:name="com.tencent.liteav.tuiroom.ui.RoomMainActivity"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+        <activity
+            android:name=".ui.floatwindow.FloatActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />

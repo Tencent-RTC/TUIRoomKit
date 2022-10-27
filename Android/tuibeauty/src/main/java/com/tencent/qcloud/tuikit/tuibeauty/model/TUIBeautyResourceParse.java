@@ -42,6 +42,7 @@ public class TUIBeautyResourceParse {
 
     @SuppressLint("StaticFieldLeak")
     private static Application sApplication;
+    private static short       BUFFER = 4096;
 
 
     public static TUIBeautyInfo getDefaultBeautyInfo() {
@@ -90,8 +91,12 @@ public class TUIBeautyResourceParse {
             e.printStackTrace();
         } finally {
             try {
-                if (is != null) is.close();
-                if (br != null) br.close();
+                if (is != null) {
+                    is.close();
+                }
+                if (br != null) {
+                    br.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -100,7 +105,9 @@ public class TUIBeautyResourceParse {
     }
 
     public static Application getApplication() {
-        if (sApplication != null) return sApplication;
+        if (sApplication != null) {
+            return sApplication;
+        }
         Application app = getApplicationByReflect();
         init(app);
         return app;
@@ -153,7 +160,6 @@ public class TUIBeautyResourceParse {
                     targetFolder.mkdirs();
                 }
                 String dataDir = null;
-                short BUFFER = 4096;
                 FileInputStream fis = null;
                 ZipInputStream zis = null;
                 FileOutputStream fos = null;
@@ -234,7 +240,8 @@ public class TUIBeautyResourceParse {
     }
 
     public static boolean isNetworkAvailable(@NonNull Context context) {
-        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivity =
+                (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity == null) {
             return false;
         } else {

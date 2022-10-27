@@ -8,7 +8,7 @@ public class TUIBarrageConstants {
     public static final String KEY_USER_AVATAR = "userAvatar";
 
     //消息的颜色
-    public static final int MESSAGE_USERNAME_COLOR[] = {
+    public static final int[] MESSAGE_USERNAME_COLOR = {
             R.color.tuibarrage_color_msg_1,
             R.color.tuibarrage_color_msg_2,
             R.color.tuibarrage_color_msg_3,

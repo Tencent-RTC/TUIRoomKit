@@ -6,6 +6,7 @@ import com.tencent.liteav.beauty.TXBeautyManager;
 import com.tencent.qcloud.tuicore.interfaces.ITUIExtension;
 import com.tencent.qcloud.tuicore.interfaces.ITUIService;
 import com.tencent.qcloud.tuikit.tuibeauty.view.TUIBeautyButton;
+import com.tencent.qcloud.tuikit.tuibeauty.view.TUIBeautyView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,19 +17,27 @@ import java.util.Map;
  */
 public class TUIBeautyExtension implements ITUIExtension, ITUIService {
 
-    public static final String OBJECT_TUI_BEAUTY = TUIBeautyButton.class.getName();
-    public static final String KEY_GET_VIEW      = "TUIBeauty";
+    public static final String OBJECT_TUI_BEAUTY_BUTTON = TUIBeautyButton.class.getName();
+    public static final String OBJECT_TUI_BEAUTY_VIEW   = TUIBeautyView.class.getName();
+    public static final String KEY_GET_VIEW             = "TUIBeauty";
 
     @Override
     public Map<String, Object> onGetExtensionInfo(String key, Map<String, Object> param) {
         //这个HashMap需携带返回给TUICore的View数据
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        if (OBJECT_TUI_BEAUTY.equals(key)) {
+        if (OBJECT_TUI_BEAUTY_BUTTON.equals(key)) {
             Context context = (Context) param.get("context");
             TXBeautyManager beautyManager = (TXBeautyManager) param.get("beautyManager");
-            TUIBeautyButton beautyExtension = new TUIBeautyButton(context,beautyManager);
+            TUIBeautyButton beautyExtension = new TUIBeautyButton(context, beautyManager);
             hashMap.put(KEY_GET_VIEW, beautyExtension);
+            return hashMap;
+        }
+        if (OBJECT_TUI_BEAUTY_VIEW.equals(key)) {
+            Context context = (Context) param.get("context");
+            TXBeautyManager beautyManager = (TXBeautyManager) param.get("beautyManager");
+            TUIBeautyView beautyView = new TUIBeautyView(context, beautyManager);
+            hashMap.put(KEY_GET_VIEW, beautyView);
             return hashMap;
         }
         return null;

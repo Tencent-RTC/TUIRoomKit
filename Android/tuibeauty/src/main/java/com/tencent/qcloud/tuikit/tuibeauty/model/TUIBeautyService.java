@@ -1,14 +1,16 @@
 package com.tencent.qcloud.tuikit.tuibeauty.model;
 
+import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.copyRes;
+import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.getResPath;
+import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.setResPath;
+
 import android.app.Activity;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-
 import com.tencent.liteav.basic.log.TXCLog;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
-
 import com.tencent.qcloud.tuikit.tuibeauty.model.download.TUIBeautyDownloadListener;
 import com.tencent.qcloud.tuikit.tuibeauty.model.download.TUIBeautyMaterialDownloader;
 import com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautySPUtils;
@@ -19,15 +21,10 @@ import com.tencent.xmagic.auth.Auth;
 import com.tencent.xmagic.auth.Json;
 import com.tencent.xmagic.license.LicenceCheck;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.copyRes;
-import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.getResPath;
-import static com.tencent.qcloud.tuikit.tuibeauty.model.utils.TUIBeautyFileUtils.setResPath;
 
 
 public class TUIBeautyService implements ITUIBeautyService {
@@ -94,7 +91,8 @@ public class TUIBeautyService implements ITUIBeautyService {
         mXmagicApi.updateProperty(itemInfo.getProperty());
     }
 
-    public XmagicProperty<XmagicProperty.XmagicPropertyValues> setCurrentDisPlayValue(XmagicProperty<XmagicProperty.XmagicPropertyValues> property, int value) {
+    public XmagicProperty<XmagicProperty.XmagicPropertyValues> setCurrentDisPlayValue(
+            XmagicProperty<XmagicProperty.XmagicPropertyValues> property, int value) {
         if (property == null || property.effValue == null) {
             return property;
         }
@@ -148,7 +146,6 @@ public class TUIBeautyService implements ITUIBeautyService {
                 ((Activity) mContext).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.i(TAG, "onDownloadProgress, progress = " + progress);
                         if (mProgressDialog == null) {
                             mProgressDialog = new TUIBeautyProgressDialog();
                             mProgressDialog.createLoadingDialog(mContext);

@@ -86,4 +86,6 @@
     <string name="tuiroom_create_or_join_group_limit">The number of groups that a single user can create and join exceeds the limit, please purchase relevant packages, more details:https://cloud.tencent.com/document/product/269/11673</string>
     <string name="tuiroom_group_member_limit">The number of group members exceeds the limit, please refer to it, please purchase the relevant packages, more details:https://cloud.tencent.com/document/product/269/11673</string>
     <string name="tuiroom_first_enter_room_tips">In accordance with relevant regulations, the app forbids pornographic, abusive, violent, terrorist, and politically sensitive content. All audio/video calls and live streams are recorded and archived.</string>
+    <string name="tuiroom_show_float_window">Are you sure you want to create a floating window?</string>
+    <string name="tuiroom_already_in_room">You are already in the room</string>
 </resources>

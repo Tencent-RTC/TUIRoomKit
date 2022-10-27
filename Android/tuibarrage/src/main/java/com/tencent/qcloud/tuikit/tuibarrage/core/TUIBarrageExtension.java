@@ -21,7 +21,8 @@ public class TUIBarrageExtension implements ITUIExtension {
     private static final String TAG = "TUIBarrageExtension";
 
     public static final String OBJECT_TUI_BARRAGE = TUIBarrageExtension.class.getName();
-    public static final String KEY_SEND_VIEW      = "TUIBarrageButton";
+    public static final String KEY_SEND_BUTTON    = "TUIBarrageButton";
+    public static final String KEY_SEND_VIEW      = "TUIBarrageSendView";
     public static final String KEY_DISPLAY_VIEW   = "TUIBarrageDisplayView";
 
     @Override
@@ -51,7 +52,8 @@ public class TUIBarrageExtension implements ITUIExtension {
 
                 }
             });
-            hashMap.put(KEY_SEND_VIEW, button);
+            hashMap.put(KEY_SEND_VIEW, button.getSendView());
+            hashMap.put(KEY_SEND_BUTTON, button);
             hashMap.put(KEY_DISPLAY_VIEW, displayView);
             return hashMap;
         }

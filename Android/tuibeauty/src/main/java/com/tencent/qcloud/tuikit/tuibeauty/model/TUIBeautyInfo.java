@@ -22,8 +22,8 @@ public class TUIBeautyInfo {
         return beauty_bg;
     }
 
-    public void setBeautyBg(String beauty_bg) {
-        this.beauty_bg = beauty_bg;
+    public void setBeautyBg(String beautyBg) {
+        this.beauty_bg = beautyBg;
     }
 
     public int getBeautyTabNameWidth() {
@@ -52,14 +52,14 @@ public class TUIBeautyInfo {
 
     @Override
     public String toString() {
-        return "TUIBeautyInfo{" +
-                ", beauty_bg='" + beauty_bg + '\'' +
-                ", beauty_tab_name_width=" + beauty_tab_name_width +
-                ", beauty_tab_name_height=" + beauty_tab_name_height +
-                ", beauty_tab_name_color_normal='" + beauty_tab_name_color_normal + '\'' +
-                ", beauty_tab_name_color_select='" + beauty_tab_name_color_select + '\'' +
-                ", beauty_tab_name_size=" + beauty_tab_name_size +
-                ", beauty_tab_list=" + beauty_tab_list +
-                '}';
+        return "TUIBeautyInfo{"
+                + "beauty_tab_name_size=" + beauty_tab_name_size
+                + ", beauty_tab_name_width=" + beauty_tab_name_width
+                + ", beauty_tab_name_height=" + beauty_tab_name_height
+                + ", beauty_bg=" + beauty_bg
+                + ", beauty_tab_name_color_normal=" + beauty_tab_name_color_normal
+                + ", beauty_tab_name_color_select=" + beauty_tab_name_color_select
+                + ", beauty_tab_list=" + beauty_tab_list
+                + '}';
     }
 }

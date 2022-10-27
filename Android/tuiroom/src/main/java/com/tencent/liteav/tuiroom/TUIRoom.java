@@ -40,4 +40,9 @@ public abstract class TUIRoom {
      * @param listener Set the event callbacks of the component
      */
     public abstract void setListener(TUIRoomListener listener);
+
+    /**
+     * @param isEnable Enable floatWindow
+     */
+    public abstract void enableFloatWindow(boolean isEnable);
 }

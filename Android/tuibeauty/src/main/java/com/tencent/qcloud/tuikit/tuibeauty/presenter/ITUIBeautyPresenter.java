@@ -1,8 +1,5 @@
 package com.tencent.qcloud.tuikit.tuibeauty.presenter;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-
 import androidx.annotation.IntRange;
 
 import com.tencent.qcloud.tuikit.tuibeauty.model.TUIBeautyInfo;
@@ -19,7 +16,8 @@ public interface ITUIBeautyPresenter {
      * @param itemInfo     每个分类里面的不同type,比如,美颜包括:光滑,自然,美白,红润等等
      * @param itemPosition item位置
      */
-    void setBeautySpecialEffects(TUIBeautyTabInfo tabInfo, TUIBeautyItemInfo itemInfo, @IntRange(from = 0) int itemPosition);
+    void setBeautySpecialEffects(TUIBeautyTabInfo tabInfo, TUIBeautyItemInfo itemInfo,
+                                 @IntRange(from = 0) int itemPosition);
 
     /**
      * 设置美颜类型
@@ -44,7 +42,7 @@ public interface ITUIBeautyPresenter {
     /**
      * 获取美颜数据
      */
-    TUIBeautyInfo getDefaultBeauty( );
+    TUIBeautyInfo getDefaultBeauty();
 
     /**
      * 更新property当前effValue
@@ -53,5 +51,6 @@ public interface ITUIBeautyPresenter {
      * @param value    更新后的effValue
      * @return 更新后的property
      */
-    XmagicProperty<XmagicProperty.XmagicPropertyValues> setCurrentDisPlayValue(XmagicProperty<XmagicProperty.XmagicPropertyValues> property, int value);
+    XmagicProperty<XmagicProperty.XmagicPropertyValues> setCurrentDisPlayValue(
+            XmagicProperty<XmagicProperty.XmagicPropertyValues> property, int value);
 }
