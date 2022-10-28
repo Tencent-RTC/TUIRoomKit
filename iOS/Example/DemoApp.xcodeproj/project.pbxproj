@@ -156,7 +156,6 @@
 			children = (
 				AF54D3F70944AF446036EDF5 /* LoginLocalized.strings */,
 			);
-			name = en.lproj;
 			path = en.lproj;
 			sourceTree = "<group>";
 		};
@@ -293,7 +292,6 @@
 			children = (
 				337262222952D140EF5A7881 /* LoginLocalized.strings */,
 			);
-			name = "zh-Hans.lproj";
 			path = "zh-Hans.lproj";
 			sourceTree = "<group>";
 		};
@@ -304,7 +302,6 @@
 				36593CB214E69FEA43FCE6EE /* en.lproj */,
 				DB7F5764F3B1E4185E5CCCDB /* LoginLocalized.swift */,
 			);
-			name = AppLocalized;
 			path = AppLocalized;
 			sourceTree = "<group>";
 		};
@@ -838,6 +835,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 12015;
 				DEVELOPMENT_TEAM = F8A3GH6Q4W;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/App/Info.plist";
@@ -846,6 +844,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 10.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.tuiroom.apiexample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = abyWildcardDev;
@@ -862,6 +861,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 12015;
 				DEVELOPMENT_TEAM = 5GHU44CJHG;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/App/Info.plist";
@@ -870,6 +870,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 10.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aby.TRTCKTV;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "Wildcard Dev";
