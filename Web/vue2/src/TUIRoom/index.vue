@@ -183,6 +183,10 @@ const onStatistics = (statistics: TRTCStatistics) => {
 
 const onReceivedChatMessage = (message: any) => {
   chatStore.updateMessageList(message);
+  if (!basicStore.isSidebarOpen || basicStore.sidebarName !== 'chat') {
+    // eslint-disable-next-line no-plusplus
+    chatStore.updateUnReadCount(++chatStore.unReadCount);
+  }
 };
 
 function resetStore() {

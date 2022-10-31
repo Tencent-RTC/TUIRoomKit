@@ -135,6 +135,7 @@ async function transferAndLeave() {
     let response = await TUIRoomCore.transferRoomMaster(userId);
     logger.log(`${logPrefix}transferAndLeave:`, response);
     response = await TUIRoomCore.exitRoom();
+    await TUIRoomCore.logout();
     logger.log(`${logPrefix}transferAndLeave:`, response);
     resetState();
     emit('on-exit-room', { code: 0, message: '' });
@@ -151,8 +152,9 @@ const onRoomDestroyed = async () => {
   try {
     MessageBox.alert('主持人结束会议，已解散房间', '通知', {
       confirmButtonText: '确认',
-      callback: () => {
+      callback: async () => {
         resetState();
+        await TUIRoomCore.logout();
         emit('on-destroy-room', { code: 0, message: '' });
       },
     });
@@ -160,19 +162,22 @@ const onRoomDestroyed = async () => {
     logger.error(`${logPrefix}onRoomDestroyed error:`, error);
   }
 };
-// 收到主持人移交权限通知
-const onRoomMasterChanged = async (newOwnerID:string) => {
+
+const onRoomMasterChanged = async (newOwner: { newOwnerId: string, newOwnerName: string }) => {
   // 新主持人
-  const tipMessage =  `主持人已变更为${newOwnerID}`;
+  const newOwnerId = newOwner?.newOwnerId;
+  const newOwnerName = newOwner?.newOwnerName;
+  const newName = newOwnerName || newOwnerId;
+  const tipMessage =  `主持人已变更为 ${newName}`;
   Message({
     type: 'success',
     message: tipMessage,
   });
-  basicInfo.masterUserId = newOwnerID;
+  basicInfo.masterUserId = newOwnerId;
   if (basicInfo.userId === basicInfo.masterUserId) {
     basicInfo.role = ETUIRoomRole.MASTER;
   } else {
-    roomStore.setRemoteUserRole(newOwnerID, ETUIRoomRole.MASTER);
+    roomStore.setRemoteUserRole(newOwnerId, ETUIRoomRole.MASTER);
   }
   resetState();
 };
