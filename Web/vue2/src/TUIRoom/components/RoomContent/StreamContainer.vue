@@ -17,7 +17,7 @@
           :enlarge-dom-id="enlargeDomId"
           class="single-stream"
           :style="streamStyle"
-          @dblclick="handleEnlargeStreamRegion(stream)"
+          @dblclick.native="handleEnlargeStreamRegion(stream)"
         ></stream-region>
       </div>
     </div>
@@ -180,8 +180,6 @@ async function handleNineEqualPointsLayout() {
   streamContainerClass.value = 'stream-container-flatten';
 
   enlargeStream.value = null;
-
-  await nextTick();
 
   const number = showStreamList.value.length;
   let width = 0;
