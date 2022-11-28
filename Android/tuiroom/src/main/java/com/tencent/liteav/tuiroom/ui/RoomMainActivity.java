@@ -79,7 +79,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     public static final String KEY_IS_CREATE_ROOM = "is_create_room";
 
 
-    public static boolean sEnableFloatWindow = true;
+    public static boolean sEnableFloatWindow = false;
 
     private int                       mRoomId;
     private String                    mUserId;
@@ -1532,7 +1532,9 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     protected void onResume() {
         super.onResume();
         mIsPaused = false;
-        mViewVideo.refreshParent();
+        if (mViewVideo != null) {
+            mViewVideo.refreshParent();
+        }
     }
 
     @Override
