@@ -23,7 +23,7 @@
 
         <activity
             android:name="com.tencent.liteav.tuiroom.ui.RoomMainActivity"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
