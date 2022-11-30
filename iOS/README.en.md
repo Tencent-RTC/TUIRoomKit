@@ -82,5 +82,3 @@ Click to join: https://t.me/+EPk6TMZEZMM5OGY1
 Or scan the QR code
 
 <img src="https://qcloudimg.tencent-cloud.cn/raw/9c67ed5746575e256b81ce5a60216c5a.jpg" width="320"/>
-
-    

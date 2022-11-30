@@ -17,8 +17,13 @@
 "TUIRoom.input.error.room.num.toast" = "请输入正确房间号";
 "TUIRoom.logout.room" = "退出房间";
 "TUIRoom.sure.destroy.room" = "你确定要解散房间吗？";
+"TUIRoom.sure.choose.floatwindow.room" = "你确定要打开悬浮窗吗？";
 "TUIRoom.sure.leave.room" = "你确定要离开房间吗？";
+"TUIRoom.sure.create.floatwindow.room" = "你确定要创建悬浮窗吗？";
 "TUIRoom.destroy.room.ok" = "解散房间";
+"TUIRoom.destroy.showFloatingView.room.cancel" = "开启悬浮窗";
+"TUIRoom.destroy.openFloatingView.room.cancel" = "打开悬浮窗";
+"TUIRoom.dstory.logout.room" = "退出房间";
 "TUIRoom.destroy.room.cancel" = "再等等";
 "TUIRoom.ok" = "确定";
 "TUIRoom.cancel" = "取消";

@@ -109,7 +109,7 @@ public class TUIRoomEntranceViewController: UIViewController {
         super.viewDidAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
     }
-
+    
     func setupUI() {
         title = .titleText
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)

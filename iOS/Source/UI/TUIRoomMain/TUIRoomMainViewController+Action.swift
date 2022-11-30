@@ -49,18 +49,41 @@ extension TUIRoomMainViewController {
         guard let roomInfo = TUIRoomCore.shareInstance().getRoomInfo() else {
             return
         }
-        let alertVC = UIAlertController(title: roomInfo.isHomeowner() ? .homeownersLogoutTitle : .audienceLogoutTitle,
-                                        message: nil,
-                                        preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: .destroyRoomCancelTitle, style: .cancel, handler: nil)
-        let sureAction = UIAlertAction(title: roomInfo.isHomeowner() ?.destroyRoomOkTitle : .logoutOkText, style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            self.exitRoomLogic(roomInfo.isHomeowner())
+        TUIRoom.sharedInstance.enableFloatWindow(isEnable: false)
+        if(floatWindowState){
+            let alertVC = UIAlertController(title: roomInfo.isHomeowner() ? .homeownersFloatWindowLogoutTitle : .audienceLogoutFloatWindowTitle,
+                                            message: nil,
+                                            preferredStyle: .alert)
+            let cancelAction = UIAlertAction(title: roomInfo.isHomeowner() ? .destroyRoomCancelFloatingViewTitle :
+                                             .audienceDestroyRoomCancelFloatingViewTitle,
+                                             style: .default) { [weak self] _ in
+                  guard let self = self else { return }
+                  self.exitRoomLogic(roomInfo.isHomeowner())
+            }
+            let sureAction = UIAlertAction(title: roomInfo.isHomeowner() ? .destroyRoomShowFloatingViewTitle : .destroyRoomOpenFloatingViewTitle,
+                                           style: .default) { [weak self] _ in
+                guard let self = self else { return }
+                ShowLiveFloatingManager.shared.showFloating(from: self, roomInfo: roomInfo)
+            }
+            sureAction.setTextColor(UIColor.red)
+            alertVC.addAction(cancelAction)
+            alertVC.addAction(sureAction)
+            present(alertVC, animated: true, completion: nil)
+        } else {
+            let alertVC = UIAlertController(title: roomInfo.isHomeowner() ? .homeownersLogoutTitle : .audienceLogoutTitle,
+                                            message: nil,
+                                            preferredStyle: .alert)
+            let cancelAction = UIAlertAction(title: .destroyRoomCancelTitle, style: .cancel, handler: nil)
+            let sureAction = UIAlertAction(title: roomInfo.isHomeowner() ? .destroyRoomOkTitle : .logoutOkText,
+                                           style: .default) { [weak self] _ in
+                guard let self = self else { return }
+                self.exitRoomLogic(roomInfo.isHomeowner())
+            }
+            sureAction.setTextColor(UIColor.red)
+            alertVC.addAction(cancelAction)
+            alertVC.addAction(sureAction)
+            present(alertVC, animated: true, completion: nil)
         }
-        sureAction.setTextColor(UIColor.red)
-        alertVC.addAction(cancelAction)
-        alertVC.addAction(sureAction)
-        present(alertVC, animated: true, completion: nil)
     }
 
     @objc func muteAudioButtonClick() {
@@ -120,6 +143,10 @@ extension TUIRoomMainViewController {
         present(vc, animated: true, completion: nil)
         setViewController = vc
     }
+    
+    @objc func exitMsgButtonClick(sender: UIButton) {
+        barrageSendView.isHidden = false
+    }
 
     func exitRoomLogic(_ isHomeowner: Bool) {
         TUIRoomCore.shareInstance().stopScreenCapture()
@@ -146,8 +173,21 @@ extension TUIRoomMainViewController {
         TUIRoom.sharedInstance.isEnterRoom = false
     }
     
-    @objc func exitMsgButtonClick(sender: UIButton) {
-        barrageSendView.isHidden = false
+    func hideIcon() {
+        barragePlayView.isHidden = true
+        pageControl.isHidden = true
+        switchAudioRouteButton.isHidden = true
+        switchCameraButton.isHidden = true
+        exitButton.isHidden = true
+        roomIdLabel.isHidden = true
+        copyButton.isHidden = true
+        muteAudioButton.isHidden = true
+        muteVideoButton.isHidden = true
+        beautyButton.isHidden = true
+        membersButton.isHidden = true
+        moreSettingButton.isHidden = true
+        msgInputButton.isHidden = true
+        barrageSendView.isHidden = true
     }
     
     @objc
@@ -191,6 +231,12 @@ private extension String {
     static let logoutOkText = tuiRoomLocalize("TUIRoom.ok")
     static let logoutCancelText = tuiRoomLocalize("TUIRoom.cancel")
     static let copySuccessText = tuiRoomLocalize("TUIRoom.copy.success")
+    static let homeownersFloatWindowLogoutTitle = tuiRoomLocalize("TUIRoom.sure.choose.floatwindow.room")
+    static let audienceLogoutFloatWindowTitle = tuiRoomLocalize("TUIRoom.sure.create.floatwindow.room")
+    static let destroyRoomShowFloatingViewTitle = tuiRoomLocalize("TUIRoom.destroy.showFloatingView.room.cancel")
+    static let destroyRoomOpenFloatingViewTitle = tuiRoomLocalize("TUIRoom.destroy.openFloatingView.room.cancel")
+    static let destroyRoomCancelFloatingViewTitle = tuiRoomLocalize("TUIRoom.logout.room")
+    static let audienceDestroyRoomCancelFloatingViewTitle = tuiRoomLocalize("TUIRoom.dstory.logout.room")
 }
 
 /// MARK: - Color

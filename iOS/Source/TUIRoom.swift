@@ -104,6 +104,16 @@ public class TUIRoom: NSObject {
         presentRoomController(vc: vc)
     }
     
+    /// enableFloatWindow
+    ///
+    /// - Parameters:
+    ///   - isEnable Bool enableFloatWindow
+    @objc
+    func enableFloatWindow(isEnable: Bool) {
+        if isEnterRoom {
+            floatWindowState = isEnable
+        }
+    }
 }
 
 // MARK: - Private
