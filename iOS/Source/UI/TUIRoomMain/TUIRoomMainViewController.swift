@@ -13,6 +13,7 @@ import TUICore
 import TUIBarrage
 
 public let isOpenTUIRoomTest: Bool = false
+public var floatWindowState: Bool = false
 
 class TUIRoomMainViewController: UIViewController {
     // XMagic License 【Optional】
@@ -108,14 +109,6 @@ class TUIRoomMainViewController: UIViewController {
         self.view
     }()
 
-    lazy var switchAudioRouteButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "tuiroom_speaker", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
-        button.setImage(UIImage(named: "tuiroom_earphone", in: tuiRoomBundle(), compatibleWith: nil), for: .selected)
-        button.sizeToFit()
-        return button
-    }()
-
     lazy var barrageSendView: UIView = {
         let view = TUIBarrageSendPlugView(frame: self.view.frame, groupId: self.roomId)
         return view
@@ -126,6 +119,14 @@ class TUIRoomMainViewController: UIViewController {
         return view
     }()
     
+    lazy var switchAudioRouteButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "tuiroom_speaker", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
+        button.setImage(UIImage(named: "tuiroom_earphone", in: tuiRoomBundle(), compatibleWith: nil), for: .selected)
+        button.sizeToFit()
+        return button
+    }()
+
     lazy var switchCameraButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_switch_camera", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
@@ -176,13 +177,13 @@ class TUIRoomMainViewController: UIViewController {
         button.sizeToFit()
         return button
     }()
-
+    
     lazy var msgInputButton: UIButton = {
         let button = TUIBarrageExtension.getEnterButton()
         button.sizeToFit()
         return button
     }()
-    
+
     lazy var muteVideoButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "tuiroom_camera_open", in: tuiRoomBundle(), compatibleWith: nil), for: .normal)
@@ -387,7 +388,7 @@ class TUIRoomMainViewController: UIViewController {
             make.bottom.equalTo(beautyButton.snp.top).offset(-12)
         }
     }
-
+    
     func bindInteraction() {
         exitButton.addTarget(self, action: #selector(exitButtonClick), for: .touchUpInside)
         switchAudioRouteButton.addTarget(self, action: #selector(switchAudioButtonClick), for: .touchUpInside)
