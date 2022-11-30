@@ -146,6 +146,7 @@ public class TUIBeautyService implements ITUIBeautyService {
                 ((Activity) mContext).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Log.i(TAG, "onDownloadProgress, progress = " + progress);
                         if (mProgressDialog == null) {
                             mProgressDialog = new TUIBeautyProgressDialog();
                             mProgressDialog.createLoadingDialog(mContext);

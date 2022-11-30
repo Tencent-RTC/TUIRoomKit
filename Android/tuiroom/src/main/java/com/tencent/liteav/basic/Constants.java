@@ -15,7 +15,7 @@ public class Constants {
 
     public static boolean isNetworkConnected(Context context) {
         if (context != null) {
-            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getApplicationContext()
                     .getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
             if (mNetworkInfo != null) {

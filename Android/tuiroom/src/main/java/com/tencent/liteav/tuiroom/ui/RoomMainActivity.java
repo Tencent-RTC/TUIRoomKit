@@ -79,7 +79,7 @@ public class RoomMainActivity extends AppCompatActivity implements TUIRoomCoreLi
     public static final String KEY_IS_CREATE_ROOM = "is_create_room";
 
 
-    public static boolean sEnableFloatWindow = false;
+    public static boolean sEnableFloatWindow = true;
 
     private int                       mRoomId;
     private String                    mUserId;
