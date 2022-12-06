@@ -94,6 +94,9 @@ LIBS += -framework Foundation
 LIBS += -framework CoreFoundation
 LIBS += -framework Cocoa
 
+LIBS += -lSystem
+LIBS += -lz
+
 LIBS += -framework Security
 LIBS += -framework SystemConfiguration
 LIBS += -framework JavaScriptCore
@@ -107,15 +110,10 @@ INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXLiteAVSDK_TRTC_Mac.framewo
 INCLUDEPATH += $$PWD/../SDK/ImSDK/Mac/ImSDKForMac_CPP.framework/Headers
 QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../
 
-macx: LIBS += -L$$PWD/../utils/usersig/mac -lTXLiteAVTestUserSig
-macx: PRE_TARGETDEPS += $$PWD/../utils/usersig/mac/libTXLiteAVTestUserSig.a
 QMAKE_CXXFLAGS += -std=gnu++11
 #CONFIG += console
 
-INCLUDEPATH += $$PWD/../utils/usersig/mac/include
-DEPENDPATH += $$PWD/../utils/usersig/mac/include
-
-DISTFILES += $$PWD/../utils/usersig/mac/libTXLiteAVTestUserSig.a
+INCLUDEPATH += $$PWD/../utils/usersig/mac
 }
 
 

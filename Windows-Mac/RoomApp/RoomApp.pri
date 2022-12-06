@@ -1,8 +1,6 @@
 HEADERS += ../utils/json.h \
     ../utils/log.h \
     ../utils/UserDirectory.h \
-    ../utils/usersig/mac/include/GenerateTestUserSig.h \
-    ../utils/usersig/mac/UserSigConfig.h \
     ../Common/MessageDispatcher/MessageDispatcher.h \
     ../Common/ViewDragger.h \
     ../Common/ScreenCenter.h \
@@ -36,6 +34,9 @@ HEADERS += ../utils/json.h \
 win32{
     HEADERS +=../utils/BugReport/crash_dump.h \
               ../utils/usersig/win/GenerateTestUsersig.h
+}
+macx{
+    HEADERS +=../utils/usersig/mac/GenerateTestUserSig.h
 }
 
 SOURCES += ../utils/jsoncpp.cpp \
@@ -74,6 +75,9 @@ SOURCES += ../utils/jsoncpp.cpp \
 win32{
     SOURCES +=../utils/BugReport/crash_dump.cc \
               ../utils/usersig/win/GenerateTestUsersig.cpp
+}
+macx{
+    SOURCES +=../utils/usersig/mac/GenerateTestUserSig.m
 }
 
 FORMS += ../Common/Form/TXMessageBox.ui \

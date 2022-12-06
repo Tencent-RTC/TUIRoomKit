@@ -10,8 +10,7 @@
 #ifdef _WIN32
 #include "usersig/win/GenerateTestUserSig.h"
 #else
-#include "usersig/mac/include/GenerateTestUserSig.h"
-#include "usersig/mac/UserSigConfig.h"
+#include "usersig/mac/GenerateTestUserSig.h"
 #endif
 
 LoginViewController::LoginViewController(QWidget *parent)
@@ -147,7 +146,10 @@ void LoginViewController::SlotEnterRoom() {
 #ifdef _WIN32
         info.user_sig = GenerateTestUserSig::instance().genTestUserSig(info.user_id);
 #else
-        info.user_sig = GenerateTestUserSig::genTestUserSig(info.user_id.c_str(), UserSigConfig::instance().GetSDKAPPID(), UserSigConfig::instance().GetSecretKey().c_str());
+        NSString* ns_user_id = [[NSString alloc]initWithUTF8String:info.user_id.c_str()];
+        NSString* ns_user_sig = [GenerateTestUserSig genTestUserSig:ns_user_id];
+        const char* c_string = [ns_user_sig cString];
+        info.user_sig = std::string(c_string);
 #endif
         DataStore::Instance()->SetUserLoginInfo(info);
     }
