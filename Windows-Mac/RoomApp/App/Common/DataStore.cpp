@@ -5,7 +5,7 @@
 #ifdef _WIN32
 #include "usersig/win/GenerateTestUserSig.h"
 #else
-#include "usersig/mac/UserSigConfig.h"
+#include "usersig/mac/GenerateTestUserSig.h"
 #endif // Win32
 
 const char* kAppLaunch = "app_launch";
@@ -153,7 +153,7 @@ void DataStore::ParseStartParam(int argc, char** argv) {
 #ifdef _WIN32
         user_login_info_.sdk_app_id = GenerateTestUserSig::instance().SDKAPPID;
 #else
-        user_login_info_.sdk_app_id = UserSigConfig::instance().GetSDKAPPID();
+        user_login_info_.sdk_app_id = SDKAPPID;
 #endif // _WIN32
     }
 }
