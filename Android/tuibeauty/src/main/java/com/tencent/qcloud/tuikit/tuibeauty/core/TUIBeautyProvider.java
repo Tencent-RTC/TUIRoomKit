@@ -19,9 +19,9 @@ public final class TUIBeautyProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         Log.d(TAG, "TUIBeautyProvider onCreate");
-        TUICore.registerExtension(TUIBeautyExtension.OBJECT_TUI_BEAUTY_BUTTON, new TUIBeautyExtension());
-        TUICore.registerExtension(TUIBeautyExtension.OBJECT_TUI_BEAUTY_VIEW, new TUIBeautyExtension());
-        TUICore.registerService(TUIConstants.TUIBeauty.SERVICE_NAME, TUIBeautyCallService.shareInstance());
+        TUIBeautyExtension extension = new TUIBeautyExtension();
+        TUICore.registerExtension(TUIBeautyExtension.OBJECT_TUI_BEAUTY_BUTTON, extension);
+        TUICore.registerService(TUIConstants.TUIBeauty.SERVICE_NAME, extension);
         return false;
     }
 

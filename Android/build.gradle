@@ -17,7 +17,6 @@ allprojects {
     repositories {
         flatDir {
             dirs project(':app').file('libs')
-            dirs project(':tuibeauty').file('libs')
         }
         google()
         mavenCentral()
