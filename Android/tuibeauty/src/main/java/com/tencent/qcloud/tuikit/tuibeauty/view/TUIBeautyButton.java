@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.tencent.liteav.beauty.TXBeautyManager;
 import com.tencent.qcloud.tuikit.tuibeauty.R;
@@ -15,8 +16,10 @@ import java.lang.reflect.Method;
  */
 public class TUIBeautyButton extends FrameLayout {
 
+    private ImageView       mBeautyIcon;
     private TUIBeautyView   mBeautyPanel;
     private TXBeautyManager mBeautyManager;
+
 
     public TUIBeautyButton(Context context, TXBeautyManager beautyManager) {
         super(context);
@@ -24,11 +27,16 @@ public class TUIBeautyButton extends FrameLayout {
         initView(context);
     }
 
+    public TUIBeautyButton(Context context, TXBeautyManager beautyManager, int resId) {
+        this(context, beautyManager);
+        mBeautyIcon.setImageResource(resId);
+    }
+
     private void initView(final Context context) {
         View baseView = LayoutInflater.from(context).inflate(R.layout.tuibeauty_view_extention, this);
-
+        mBeautyIcon = findViewById(R.id.iv_link_dialog);
         mBeautyPanel = new TUIBeautyView(context, mBeautyManager);
-        findViewById(R.id.iv_link_dialog).setOnClickListener(new OnClickListener() {
+        mBeautyIcon.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showBeautyDialog();
