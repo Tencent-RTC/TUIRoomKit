@@ -100,7 +100,7 @@
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         _titleLabel.font = [UIFont fontWithName:@"PingFangSC-Medium" size:16];
-        _titleLabel.textColor = [UIColor colorWithHex:@"666666"];
+        _titleLabel.textColor = [UIColor tui_colorWithHex:@"666666"];
         _titleLabel.adjustsFontSizeToFitWidth = YES;
         _titleLabel.minimumScaleFactor = 0.5;
         _titleLabel.text = TUIBeautyLocalize(@"TC.BeautySettingPanel.Strength");
@@ -119,7 +119,7 @@
     if (!_detailLabel) {
         _detailLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         _detailLabel.font = [UIFont fontWithName:@"PingFangSC-Medium" size:16];
-        _detailLabel.textColor = [UIColor colorWithHex:@"333333"];
+        _detailLabel.textColor = [UIColor tui_colorWithHex:@"333333"];
         _detailLabel.adjustsFontSizeToFitWidth = YES;
         _detailLabel.minimumScaleFactor = 0.5;
     }
