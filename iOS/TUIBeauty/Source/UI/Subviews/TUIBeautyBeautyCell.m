@@ -30,12 +30,12 @@
 
 - (void)setSelected:(BOOL)selected {
     super.selected = selected;
-    self.titleLabel.textColor = selected ? [UIColor colorWithHex:@"006EFF"] : [UIColor colorWithHex:@"666666"];
+    self.titleLabel.textColor = selected ? [UIColor tui_colorWithHex:@"006EFF"] : [UIColor tui_colorWithHex:@"666666"];
     if (self.model != nil && self.model.selectIcon != nil) {
         self.headImageView.image = selected ? self.model.selectIcon : self.model.normalIcon;
     }
     else {
-        self.headImageView.tintColor = selected ? [UIColor colorWithHex:@"006EFF"] : [UIColor colorWithHex:@"666666"];
+        self.headImageView.tintColor = selected ? [UIColor tui_colorWithHex:@"006EFF"] : [UIColor tui_colorWithHex:@"666666"];
     }
 }
 
@@ -63,7 +63,7 @@
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         _titleLabel.font = [UIFont fontWithName:@"PingFangSC-Regular" size:12];
-        _titleLabel.textColor = [UIColor colorWithHex:@"666666"];
+        _titleLabel.textColor = [UIColor tui_colorWithHex:@"666666"];
         _titleLabel.adjustsFontSizeToFitWidth = YES;
         _titleLabel.minimumScaleFactor = 0.5;
     }

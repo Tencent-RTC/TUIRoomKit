@@ -87,7 +87,7 @@
         _textField.font =  [UIFont systemFontOfSize:14];
         _textField.placeholder = TUIBarrageLocalize(@"TUIBarrageView.Placeholder");
         _textField.delegate = self;
-        _textField.textColor = [UIColor colorWithHex:@"0x333333"];
+        _textField.textColor = [UIColor tui_colorWithHex:@"0x333333"];
     }
     return _textField;
 }
@@ -101,7 +101,7 @@
         [_sendButton addTarget:self action:@selector(sendButtonClick) forControlEvents:UIControlEventTouchUpInside];
         _sendButton.layer.masksToBounds = YES;
         _sendButton.adjustsImageWhenHighlighted = NO;
-        _sendButton.backgroundColor = [UIColor colorWithHex:@"0x29CC85"];
+        _sendButton.backgroundColor = [UIColor tui_colorWithHex:@"0x29CC85"];
     }
     return _sendButton;
 }

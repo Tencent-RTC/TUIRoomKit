@@ -17,7 +17,7 @@
 
 - (void)setSelected:(BOOL)selected {
     super.selected = selected;
-    self.titleLabel.textColor = selected ? [UIColor colorWithHex:@"006EFF"] : [UIColor colorWithHex:@"999999"];
+    self.titleLabel.textColor = selected ? [UIColor tui_colorWithHex:@"006EFF"] : [UIColor tui_colorWithHex:@"999999"];
 }
 
 + (UIFont *)titleLabelFont {
@@ -28,7 +28,7 @@
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         _titleLabel.font = [UIFont fontWithName:@"PingFangSC-Regular" size:16];
-        _titleLabel.textColor = [UIColor colorWithHex:@"999999"];
+        _titleLabel.textColor = [UIColor tui_colorWithHex:@"999999"];
         _titleLabel.adjustsFontSizeToFitWidth = YES;
         _titleLabel.minimumScaleFactor = 0.5;
     }

@@ -97,25 +97,25 @@
 - (UIColor *)getColor:(NSInteger)index {
     switch (index) {
         case 0:
-            return  [UIColor colorWithHex:@"0x3074FD"];
+            return  [UIColor tui_colorWithHex:@"0x3074FD"];
             break;
         case 1:
-            return  [UIColor colorWithHex:@"0x3CCFA5"];
+            return  [UIColor tui_colorWithHex:@"0x3CCFA5"];
             break;
         case 2:
-            return  [UIColor colorWithHex:@"0xFF8607"];
+            return  [UIColor tui_colorWithHex:@"0xFF8607"];
             break;
         case 3:
-            return  [UIColor colorWithHex:@"0xF7AF97"];
+            return  [UIColor tui_colorWithHex:@"0xF7AF97"];
             break;
         case 4:
-            return  [UIColor colorWithHex:@"0xFF8BB7"];
+            return  [UIColor tui_colorWithHex:@"0xFF8BB7"];
             break;
         case 5:
-            return  [UIColor colorWithHex:@"0xFC6091"];
+            return  [UIColor tui_colorWithHex:@"0xFC6091"];
             break;
         case 6:
-            return  [UIColor colorWithHex:@"0xFCAF41"];
+            return  [UIColor tui_colorWithHex:@"0xFCAF41"];
             break;
         default:
             break;
