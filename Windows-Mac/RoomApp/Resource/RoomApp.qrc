@@ -139,6 +139,7 @@
         <file>LayoutSelectView/flag.png</file>
         <file>LayoutSelectView/layout_right.png</file>
         <file>LayoutSelectView/layout_top.png</file>
+        <file>LayoutSelectView/layout_grid.png</file>
         <file>LayoutSelectView/LayoutSelectView.qss</file>
     </qresource>
     <qresource prefix="/TransferRoomController">

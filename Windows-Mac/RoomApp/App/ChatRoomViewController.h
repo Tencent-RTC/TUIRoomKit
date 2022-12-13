@@ -30,7 +30,7 @@ public slots:
     void SlotSendChatMessage();
     void SlotOnReceiveMessage(const QString& user_id, const QString& message);
     void SlotOnRoomMasterChanged(const QString& user_id);
-    void SlotOnChatMute(bool mute);
+    void SlotOnChatMute(uint32_t request_id, bool mute, TUIMutedReason reason);
 signals:
     void SignalShowChatRoom(bool show);
 private:

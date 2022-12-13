@@ -151,6 +151,12 @@ void SettingViewController::InitUi() {
     ui.btn_testSpeaker->setProperty("white", true);
     ui.ckbox_default_close_mic->hide();
 
+    ui.label_7->hide();
+    ui.progressBar_microphone->hide();
+    ui.label_8->hide();
+    ui.progressBar_speaker->hide();
+    ui.btn_StatisticsSetting->hide();
+
     ui.stackedWidget->setCurrentIndex(0);
 
     liteav::ITRTCDeviceInfo* activeCam = TUIRoomCore::GetInstance()->GetDeviceManager()->getCurrentDevice(liteav::TRTCDeviceTypeCamera);
@@ -561,33 +567,40 @@ void SettingViewController::OnStatistics(const liteav::TRTCStatistics& statis) {
 }
 void SettingViewController::OnNetQuality(UserNetQualityInfo local_user_quality, std::vector<UserNetQualityInfo> remote_users_quality) {
     QString net_quality = tr("Unknow");
-    if (std::string(local_user_quality.user_id).empty()) {
-        switch (local_user_quality.quality) {
-        case liteav::TRTCQuality_Unknown:
-            net_quality = tr("Unknow");
-            break;
-        case liteav::TRTCQuality_Excellent:
-            net_quality = tr("Excellent");
-            break;
-        case liteav::TRTCQuality_Good:
-            net_quality = tr("Good");
-            break;
-        case liteav::TRTCQuality_Poor:
-            net_quality = tr("Poor");
-            break;
-        case liteav::TRTCQuality_Bad:
-            net_quality = tr("Bad");
-            break;
-        case liteav::TRTCQuality_Vbad:
-            net_quality = tr("Very bad");
-            break;
-        case liteav::TRTCQuality_Down:
-            net_quality = tr("Down");
-            break;
-        }
+    switch (local_user_quality.quality) {
+    case liteav::TRTCQuality_Unknown:
+        net_quality = tr("Unknow");
+        break;
+    case liteav::TRTCQuality_Excellent:
+        net_quality = tr("Excellent");
+        break;
+    case liteav::TRTCQuality_Good:
+        net_quality = tr("Good");
+        break;
+    case liteav::TRTCQuality_Poor:
+        net_quality = tr("Poor");
+        break;
+    case liteav::TRTCQuality_Bad:
+        net_quality = tr("Bad");
+        break;
+    case liteav::TRTCQuality_Vbad:
+        net_quality = tr("Very bad");
+        break;
+    case liteav::TRTCQuality_Down:
+        net_quality = tr("Down");
+        break;
     }
 
     ui.lb_net_status->setText(net_quality);
+
+    QString rtt = QString(tr("delay %1ms")).arg(local_user_quality.delay);
+    ui.lb_network->setText(rtt);
+
+    QString upLoss = QString(tr(" %1%")).arg(local_user_quality.upLoss);
+    ui.lb_upLoss->setText(upLoss);
+
+    QString downLoss = QString(tr(" %1%")).arg(local_user_quality.downLoss);
+    ui.lb_downLoss->setText(downLoss);
 }
 
 void SettingViewController::OnAudioQualityIndexChanged(int index) {
@@ -608,7 +621,7 @@ void SettingViewController::OnAudioQualityIndexChanged(int index) {
         break;
     }
     DataStore::Instance()->SetAudioQuality(audio_quality);
-    TXMessageBox::Instance().AddLineTextMessage(tr("The selection of sound quality will take effect the next time you enter the room!"));
+    TUIRoomCore::GetInstance()->StartLocalAudio(audio_quality);
 }
 
 void SettingViewController::OnAINoiseReductionChecked(bool checked) {

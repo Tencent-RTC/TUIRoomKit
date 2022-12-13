@@ -20,6 +20,11 @@ const int kVerticalButtonHeight = 25;
 const int kHorizontalButtonWidth = 25;
 const int kHorizontalButtonHeight = 30;
 
+// 宫格布局时的单页显示最大值
+const int kGridLayoutPageSize = 36;
+// 顶部布局和垂直布局时的单页显示最大值
+const int kVerAndHorLayoutPageSize = 6;
+
 StageListController::StageListController(QWidget* parent)
     : QWidget(parent) {
     ui_ = new Ui::StageListController();
@@ -160,6 +165,9 @@ void StageListController::InsertStageList() {
 }
 
 void StageListController::SetStageListDirection(StageListDirection direction) {
+    if (stage_list_direction_ == direction)
+        return;
+
     stage_list_direction_ = direction;
     ui_->pop_widget->setStyle(QApplication::style());
     ui_->stage_list->setStyle(QApplication::style());
@@ -169,20 +177,112 @@ void StageListController::SetStageListDirection(StageListDirection direction) {
 }
 
 void StageListController::SetVideoViewLayout(StageListDirection direction) {
-    auto it = current_page_video_view_list_.begin();
-    int pos = 0;
-    for (; it != current_page_video_view_list_.end(); ++it) {
-        if (pos == 0) {
-            ++pos;
-            continue;
-        }
+    for (auto it = current_page_video_view_list_.begin();
+        it != current_page_video_view_list_.end(); ++it) {
         stage_layout_->removeWidget(*it);
-        if (stage_list_direction_ == StageListDirection::kVerDirection || is_popup_list_) {
-            stage_layout_->addWidget(*it, pos, 0);
+    }
+    bool need_update_view_list = false;
+    std::string current_main_window_user = DataStore::Instance()->GetCurrentMainWindowUser();
+    if (direction == StageListDirection::kGridDirection && !current_main_window_user.empty()) {
+        // main_widget_control_ 如果正在显示，则要添加到list中
+        if (main_window_view_->IsScreenShareWindow()) {
+            all_screen_share_userid_list_.push_back(current_main_window_user);
         } else {
+            const TUIUserInfo* user = TUIRoomCore::GetInstance()->GetUserInfo(current_main_window_user);
+            if (user->role == TUIRole::kMaster || user->user_id == DataStore::Instance()->GetCurrentUserInfo().user_id) {
+                all_video_userid_list_.push_front(current_main_window_user);
+            } else {
+                all_video_userid_list_.insert(current_page_video_view_list_.size() + 1, current_main_window_user);
+            }
+        }
+
+        main_window_view_->StopCurrentVideo();
+        main_window_view_->InitMainVideo();
+        DataStore::Instance()->SetCurrentMainWindowUser("");
+        for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+            VideoRenderView* item = current_page_video_view_list_.at(i);
+            item->StopCurrentVideo();
+        }
+        if (current_page_video_view_list_.size() < kVerAndHorLayoutPageSize) {
+            VideoRenderView* video_view = new (std::nothrow) VideoRenderView(this);
+            if (video_view != nullptr) {
+                connect(video_view, &VideoRenderView::SignalShowVideoOnMainScreen, this, &StageListController::SlotShowVideoOnMainScreen);
+                const TUIUserInfo* user = TUIRoomCore::GetInstance()->GetUserInfo(current_main_window_user);
+                video_view->UpdateUserInfo(*user);
+                current_page_video_view_list_.push_front(video_view);
+            }
+        }
+        need_update_view_list = true;
+    }
+
+    page_size_ = (direction == StageListDirection::kGridDirection ? kGridLayoutPageSize : kVerAndHorLayoutPageSize);
+    int all_user_size = all_screen_share_userid_list_.size() + all_video_userid_list_.size();
+    if (all_user_size > kVerAndHorLayoutPageSize || need_update_view_list) {
+        if (direction == StageListDirection::kGridDirection) {
+            // max size is kGridLayoutPageSize
+            int new_size = (all_user_size > kGridLayoutPageSize ? kGridLayoutPageSize - kVerAndHorLayoutPageSize
+                : all_user_size - kVerAndHorLayoutPageSize);
+            for (int i = 0; i < new_size; i++) {
+                VideoRenderView* video_view = new (std::nothrow) VideoRenderView(this);
+                if (video_view != nullptr) {
+                    connect(video_view, &VideoRenderView::SignalShowVideoOnMainScreen, this, &StageListController::SlotShowVideoOnMainScreen);
+                    current_page_video_view_list_.push_back(video_view);
+                }
+            }
+            need_update_view_list = true;
+        } else if (current_page_video_view_list_.size() > kVerAndHorLayoutPageSize) {
+            // max size is 6
+            auto view_iter = current_page_video_view_list_.begin() + kVerAndHorLayoutPageSize;
+            while (view_iter != current_page_video_view_list_.end()) {
+                VideoRenderView* view = *view_iter;
+                view_iter = current_page_video_view_list_.erase(view_iter);
+                RemoveVideoViewFromStage(view);
+            }
+        }
+    }
+
+    int pos = 0;
+    for (auto it = current_page_video_view_list_.begin();
+        it != current_page_video_view_list_.end(); ++it) {
+        if (direction == StageListDirection::kVerDirection || is_popup_list_) {
+            stage_layout_->addWidget(*it, pos, 0);
+        } else if (direction == StageListDirection::kGridDirection) {
+            int row = 1, column = 1;
+            GridLayoutDeciders(row, column);
+            stage_layout_->addWidget(*it, pos / column, pos % column);
+        } else {
+            // stage_list_direction_ == StageListDirection::kHorDirection
             stage_layout_->addWidget(*it, 0, pos);
         }
         ++pos;
+    }
+    if (need_update_view_list) {
+        UpdateCurrentVideoPage();
+    }
+}
+
+void StageListController::GridLayoutDeciders(int& row, int& column) {
+    int current_page_size = current_page_video_view_list_.size();
+    if (current_page_size <= 2) {
+        row = 1, column = (current_page_size ? current_page_size : 1);
+    } else if (current_page_size <= 4) {
+        row = 2, column = 2;
+    } else if (current_page_size <= 6) {
+        row = 2, column = 3;
+    } else if (current_page_size <= 9) {
+        row = 3, column = 3;
+    } else if (current_page_size <= 12) {
+        row = 3, column = 4;
+    } else if (current_page_size <= 16) {
+        row = 4, column = 4;
+    } else if (current_page_size <= 20) {
+        row = 4, column = 5;
+    } else if (current_page_size <= 25) {
+        row = 5, column = 5;
+    } else if (current_page_size <= 30) {
+        row = 5, column = 6;
+    } else {
+        row = 6, column = 6;
     }
 }
 
@@ -220,6 +320,28 @@ void StageListController::ReSizeRoomStage() {
         this->setMinimumWidth(kVideoViewWidth + 5);
         this->setMaximumHeight(max_height);
         this->setMinimumHeight(max_height);
+    } else if (stage_list_direction_ == StageListDirection::kGridDirection) {
+        int max_width = this->parentWidget()->width();
+        int total_view_width = max_width - 2 * kHorizontalButtonWidth;
+        int max_height = this->parentWidget()->height();
+
+        int row = 1, column = 1;
+        GridLayoutDeciders(row, column);
+        kVideoViewWidth = total_view_width / column;
+        kVideoViewHeight = max_height / row;
+
+        for (auto view : current_page_video_view_list_) {
+            view->setFixedSize(kVideoViewWidth - 5, kVideoViewHeight - 5);
+            view->show();
+        }
+        ui_->stage_widget->setMaximumSize(max_width, max_height);
+        ui_->stage_list->setMaximumSize(total_view_width, max_height);
+        ui_->stage_list->resize(total_view_width, max_height);
+        ui_->pop_widget->resize(max_width, max_height);
+        this->setMaximumHeight(max_height);
+        this->setMinimumHeight(max_height);
+        this->setMaximumWidth(max_width);
+        this->setMinimumWidth(max_width);
     } else {
         int max_width = this->parentWidget()->width();
         int total_view_width = max_width - 2 * kHorizontalButtonWidth;
@@ -247,19 +369,23 @@ void StageListController::ReSizeRoomStage() {
 
 void StageListController::ChangeCollapseButtonPosition() {
     ChangeCollapseButtonStyle();
-    if (stage_list_direction_ == StageListDirection::kVerDirection) {
+    if (stage_list_direction_ == StageListDirection::kGridDirection || is_popup_list_) {
+        btn_stage_hide_.hide();
+    } else if (stage_list_direction_ == StageListDirection::kVerDirection) {
         btn_stage_hide_.resize(15, kVerticalButtonWidth);
         btn_stage_hide_.move(this->parentWidget()->width() - (this->isVisible() ? this->width() - 2 : 15), this->parentWidget()->height() / 2 + 15);
-    } else {
+        btn_stage_hide_.show();
+        btn_stage_hide_.raise();
+    }else {
         btn_stage_hide_.resize(kHorizontalButtonHeight, 15);
         btn_stage_hide_.move(this->parentWidget()->width() / 2 -15, (this->isVisible() ? this->height() + 12 : 30));
+        btn_stage_hide_.show();
+        btn_stage_hide_.raise();
     }
-    btn_stage_hide_.show();
-    btn_stage_hide_.raise();
 }
 void StageListController::ChangeCollapseButtonStyle() {
     QString sheet = "background:transparent;background-image:url(:/StageListController/StageListViewControl/ver.png);";
-    if (stage_list_direction_ == StageListDirection::kVerDirection) {
+    if (stage_list_direction_ == StageListDirection::kVerDirection || is_popup_list_) {
         if (btn_stage_hide_.isChecked()) {
             sheet = "background:transparent;border-image:url(:/StageListController/StageListViewControl/ver_hover.png);";
             this->hide();
@@ -339,43 +465,24 @@ void StageListController::InsertUser(const TUIUserInfo& user_info, bool is_scree
     // 如果当前页还可以展示视频
     // If the current page can still display video
     if (current_page_video_view_list_.size() < page_size_) {
-        // 麦上列表的显示顺序：[ 屏幕分享(者) | 主持人 | 自己 | 其他成员 ]
+        // 麦上列表的显示顺序 : [ 屏幕分享(者) | 主持人 | 自己 | 其他成员 ]
         // Display order of the mic-on list: [ Screen sharer | Host | You | Other members ]
         if (is_screen_share) {
+            if (all_screen_share_userid_list_.contains(user_info.user_id))
+                all_screen_share_userid_list_.removeOne(user_info.user_id);
             all_screen_share_userid_list_.push_back(user_info.user_id);
             if (all_video_userid_list_.contains(user_info.user_id)) {
                 all_video_userid_list_.removeOne(user_info.user_id);
                 all_video_userid_list_.push_front(user_info.user_id);
             }
         } else {
-            if (user_info.has_screen_stream) {
-                // 屏幕分享者
-                // Screen sharer
+            if (all_video_userid_list_.contains(user_info.user_id)) {
+                all_video_userid_list_.removeOne(user_info.user_id);
+            }
+
+            if (user_info.has_screen_stream || user_info.role == TUIRole::kMaster ||
+                user_info.user_id == DataStore::Instance()->GetCurrentUserInfo().user_id) {
                 all_video_userid_list_.push_front(user_info.user_id);
-            } else if (user_info.role == TUIRole::kMaster) {
-                // 主持人
-                // Host
-                int i = 0;
-                for (; i < all_video_userid_list_.size() && i < page_size_; i++) {
-                    const TUIUserInfo* user = TUIRoomCore::GetInstance()->GetUserInfo(all_video_userid_list_.at(i));
-                    if (user->has_screen_stream)
-                        continue;
-                    else
-                        break;
-                }
-                all_video_userid_list_.insert(i, user_info.user_id);
-            } else if (DataStore::Instance()->GetCurrentUserInfo().user_id == user_info.user_id) {
-                // 成员自己
-                // Member-self
-                int i = 0;
-                for (; i < all_video_userid_list_.size() && i < page_size_; i++) {
-                    const TUIUserInfo* user = TUIRoomCore::GetInstance()->GetUserInfo(all_video_userid_list_.at(i));
-                    if (user->has_screen_stream || user->role == TUIRole::kMaster)
-                        continue;
-                    else
-                        break;
-                }
-                all_video_userid_list_.insert(i, user_info.user_id);
             } else {
                 all_video_userid_list_.push_back(user_info.user_id);
             }
@@ -395,7 +502,15 @@ void StageListController::InsertUser(const TUIUserInfo& user_info, bool is_scree
                 if (item == nullptr) {
                     stage_layout_->addWidget(current_page_video_view_list_.at(i), i, 0);
                 }
+            } else if (stage_list_direction_ == StageListDirection::kGridDirection) {
+                int row = 1, column = 1;
+                GridLayoutDeciders(row, column);
+                auto item = stage_layout_->itemAtPosition(i / column, i % column);
+                if (item == nullptr) {
+                    stage_layout_->addWidget(current_page_video_view_list_.at(i), i / column, i % column);
+                }
             } else {
+                // stage_list_direction_ == StageListDirection::kHorDirection
                 auto item = stage_layout_->itemAtPosition(0, i);
                 if (item == nullptr) {
                     stage_layout_->addWidget(current_page_video_view_list_.at(i), 0, i);
@@ -404,35 +519,54 @@ void StageListController::InsertUser(const TUIUserInfo& user_info, bool is_scree
             VideoRenderView* view = current_page_video_view_list_.at(i);
             view->StopCurrentVideo();
         }
+        UpdateCurrentVideoPage();
+        ReSizeStage();
     } else {
         if (is_screen_share) {
             if (all_screen_share_userid_list_.contains(user_info.user_id)) {
                 all_screen_share_userid_list_.removeOne(user_info.user_id);
             }
             all_screen_share_userid_list_.push_back(user_info.user_id);
+            if (all_video_userid_list_.contains(user_info.user_id)) {
+                all_video_userid_list_.removeOne(user_info.user_id);
+                all_video_userid_list_.push_front(user_info.user_id);
+            }
         } else {
             if (all_video_userid_list_.contains(user_info.user_id)) {
                 all_video_userid_list_.removeOne(user_info.user_id);
             }
-            const TUIUserInfo* user = TUIRoomCore::GetInstance()->GetUserInfo(user_info.user_id);
-            if (user->role == TUIRole::kMaster) {
-                all_video_userid_list_.insert(all_screen_share_userid_list_.size(), user_info.user_id);
-            } else if (user->has_screen_stream) {
+
+            if (user_info.has_screen_stream || user_info.role == TUIRole::kMaster ||
+                user_info.user_id == DataStore::Instance()->GetCurrentUserInfo().user_id) {
                 all_video_userid_list_.push_front(user_info.user_id);
+                for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+                    VideoRenderView* item = current_page_video_view_list_.at(i);
+                    item->StopCurrentVideo();
+                }
+                UpdateCurrentVideoPage();
             } else {
                 all_video_userid_list_.push_back(user_info.user_id);
-            }
-
-            for (int i = 0; i < current_page_video_view_list_.size(); i++) {
-                VideoRenderView* item = current_page_video_view_list_.at(i);
-                item->StopCurrentVideo();
+                bool is_need_refresh = all_screen_share_userid_list_.contains(user_info.user_id);
+                if (!is_need_refresh) {
+                    for (int i = 0; i < current_page_video_view_list_.size() - all_screen_share_userid_list_.size(); i++) {
+                        VideoRenderView* item = current_page_video_view_list_.at(i);
+                        if (item->GetUserId() == user_info.user_id) {
+                            is_need_refresh = true;
+                            break;
+                        }
+                    }
+                }
+                if (is_need_refresh) {
+                    for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+                        VideoRenderView* item = current_page_video_view_list_.at(i);
+                        item->StopCurrentVideo();
+                    }
+                    UpdateCurrentVideoPage();
+                }
             }
         }
+        ChangeButtonsStatus();
     }
-
-    UpdateCurrentVideoPage();
-    ChangeButtonsStatus();
-    ReSizeStage();
 }
 void StageListController::SlotUpdateUserInfo(const TUIUserInfo& user_info) {
     if (main_window_view_ != nullptr && main_window_view_->GetUserId() == user_info.user_id) {
@@ -456,15 +590,24 @@ void StageListController::UpdateUserInfo(const TUIUserInfo& user_info) {
 void StageListController::RemoveUser(const std::string& user_id, bool is_screen_share) {
     LINFO("RemoveUser user_id:%s", user_id.c_str());
     if (is_screen_share) {
-        all_screen_share_userid_list_.removeOne(user_id);
+        if (all_screen_share_userid_list_.contains(user_id)) {
+            all_screen_share_userid_list_.removeOne(user_id);
+        }
         if (all_video_userid_list_.contains(user_id)) {
             all_video_userid_list_.removeOne(user_id);
             int insert_index = all_video_userid_list_.indexOf(DataStore::Instance()->GetCurrentUserInfo().user_id);
-            all_video_userid_list_.insert(insert_index + 1, user_id);
+            if (insert_index != -1) {
+                all_video_userid_list_.insert(insert_index + 1, user_id);
+            } else {
+                all_video_userid_list_.push_back(user_id);
+            }
         }
     } else {
         all_video_userid_list_.removeOne(user_id);
     }
+
+    if (last_video_index_ + (page_size_ - all_screen_share_userid_list_.size()) > all_video_userid_list_.size())
+        last_video_index_ = all_video_userid_list_.size() - (page_size_ - all_screen_share_userid_list_.size());
 
     if (all_video_userid_list_.size() + all_screen_share_userid_list_.size() < page_size_) {
         for (auto view_iter = current_page_video_view_list_.begin(); view_iter != current_page_video_view_list_.end(); view_iter++) {
@@ -475,19 +618,90 @@ void StageListController::RemoveUser(const std::string& user_id, bool is_screen_
                 break;
             }
         }
+        ChangeButtonsStatus();
+        ReSizeStage();
     } else {
-        for (int i = 0; i < current_page_video_view_list_.size(); i++) {
-            VideoRenderView* item = current_page_video_view_list_.at(i);
-            item->StopCurrentVideo();
+        bool is_need_refresh = all_screen_share_userid_list_.contains(user_id);
+        if (!is_need_refresh) {
+            for (int i = 0; i < current_page_video_view_list_.size() - all_screen_share_userid_list_.size(); i++) {
+                VideoRenderView* item = current_page_video_view_list_.at(i);
+                if (item->GetUserId() == user_id) {
+                    is_need_refresh = true;
+                    break;
+                }
+            }
         }
-        if (last_video_index_ + (page_size_ - all_screen_share_userid_list_.size()) >= all_video_userid_list_.size()) {
-            last_video_index_ = all_video_userid_list_.size() - (page_size_ - all_screen_share_userid_list_.size());
-        }
-        UpdateCurrentVideoPage();
-    }
 
-    ChangeButtonsStatus();
-    ReSizeStage();
+        if (is_need_refresh) {
+            for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+                VideoRenderView* item = current_page_video_view_list_.at(i);
+                item->StopCurrentVideo();
+            }
+            UpdateCurrentVideoPage();
+        }
+        ChangeButtonsStatus();
+    }
+}
+
+void StageListController::UserExit(const std::string& user_id) {
+    LINFO("UserExit user_id:%s", user_id.c_str());
+    all_video_userid_list_.removeOne(user_id);
+    all_screen_share_userid_list_.removeOne(user_id);
+    
+    if (last_video_index_ + (page_size_ - all_screen_share_userid_list_.size()) > all_video_userid_list_.size())
+        last_video_index_ = all_video_userid_list_.size() - (page_size_ - all_screen_share_userid_list_.size());
+
+    if (all_video_userid_list_.size() + all_screen_share_userid_list_.size() < page_size_) {
+        if (stage_list_direction_ == StageListDirection::kGridDirection && !is_popup_list_) {
+            for (auto view_iter = current_page_video_view_list_.begin(); view_iter != current_page_video_view_list_.end(); view_iter++) {
+                if ((*view_iter)->GetUserId() == user_id) {
+                    VideoRenderView* view = *view_iter;
+                    current_page_video_view_list_.erase(view_iter);
+                    RemoveVideoViewFromStage(view);
+                    break;
+                }
+            }
+            int pos = 0, row = 1, column = 1;
+            GridLayoutDeciders(row, column);
+            for (auto view_iter = current_page_video_view_list_.begin();
+                view_iter != current_page_video_view_list_.end(); ++view_iter) {
+                stage_layout_->addWidget(*view_iter, pos / column, pos % column);
+                ++pos;
+            }
+            UpdateCurrentVideoPage();
+        } else {
+            for (auto view_iter = current_page_video_view_list_.begin(); view_iter != current_page_video_view_list_.end(); view_iter++) {
+                if ((*view_iter)->GetUserId() == user_id) {
+                    VideoRenderView* view = *view_iter;
+                    current_page_video_view_list_.erase(view_iter);
+                    RemoveVideoViewFromStage(view);
+                    break;
+                }
+            }
+        }
+        ChangeButtonsStatus();
+        ReSizeStage();
+    } else {
+        bool is_need_refresh = all_screen_share_userid_list_.contains(user_id);
+        if (!is_need_refresh) {
+            for (int i = 0; i < current_page_video_view_list_.size() - all_screen_share_userid_list_.size(); i++) {
+                VideoRenderView* item = current_page_video_view_list_.at(i);
+                if (item->GetUserId() == user_id) {
+                    is_need_refresh = true;
+                    break;
+                }
+            }
+        }
+
+        if (is_need_refresh) {
+            for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+                VideoRenderView* item = current_page_video_view_list_.at(i);
+                item->StopCurrentVideo();
+            }
+            UpdateCurrentVideoPage();
+        }
+        ChangeButtonsStatus();
+    }
 }
 
 liteav::TXView StageListController::GetPlayWindow(const std::string& user_id) {
@@ -517,25 +731,59 @@ void StageListController::ShowPreviousPage() {
     
     for (int i = 0; i < current_page_video_view_list_.size(); i++) {
         VideoRenderView* item = current_page_video_view_list_.at(i);
-        item->StopCurrentVideo();
+        if (!item->IsScreenShareWindow()) {
+            item->StopCurrentVideo();
+        }
     }
-    UpdateCurrentVideoPage();
 
+    const std::string local_user_id = DataStore::Instance()->GetCurrentUserInfo().user_id;
+    int new_index = last_video_index_;
+    for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+        VideoRenderView* item = current_page_video_view_list_.at(i);
+        if (!item->IsScreenShareWindow()) {
+            const TUIUserInfo* item_user = TUIRoomCore::GetInstance()->GetUserInfo(all_video_userid_list_.at(new_index++));
+            item->UpdateUserInfo(*item_user);
+            if (item_user->user_id == local_user_id) {
+                item->UpdateCameraPreview();
+            } else {
+                item->StartPreview();
+            }
+        }
+    }
+
+    //UpdateCurrentVideoPage();
     ChangeButtonsStatus();
 }
 
 void StageListController::ShowNextPage() {
     LINFO("ShowNextPage");
     last_video_index_ += (page_size_ - all_screen_share_userid_list_.size());
-    if (last_video_index_ + (page_size_ - all_screen_share_userid_list_.size()) >= all_video_userid_list_.size())
+    if (last_video_index_ + (page_size_ - all_screen_share_userid_list_.size()) > all_video_userid_list_.size())
         last_video_index_ = all_video_userid_list_.size() - (page_size_ - all_screen_share_userid_list_.size());
     
     for (int i = 0; i < current_page_video_view_list_.size(); i++) {
         VideoRenderView* item = current_page_video_view_list_.at(i);
-        item->StopCurrentVideo();
+        if (!item->IsScreenShareWindow()) {
+            item->StopCurrentVideo();
+        }
     }
-    UpdateCurrentVideoPage();
 
+    const std::string local_user_id = DataStore::Instance()->GetCurrentUserInfo().user_id;
+    int new_index = last_video_index_;
+    for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+        VideoRenderView* item = current_page_video_view_list_.at(i);
+        if (!item->IsScreenShareWindow()) {
+            const TUIUserInfo* item_user = TUIRoomCore::GetInstance()->GetUserInfo(all_video_userid_list_.at(new_index++));
+            item->UpdateUserInfo(*item_user);
+            if (item_user->user_id == local_user_id) {
+                item->UpdateCameraPreview();
+            } else {
+                item->StartPreview();
+            }
+        }
+    }
+
+    //UpdateCurrentVideoPage();
     ChangeButtonsStatus();
 }
 
@@ -553,33 +801,23 @@ void StageListController::RemoveVideoViewFromStage(VideoRenderView* video_view) 
     if (video_view == nullptr) {
         return;
     }
-    stage_layout_->removeWidget(video_view);
     video_view->StopCurrentVideo();
+    stage_layout_->removeWidget(video_view);
     video_view->close();
     delete video_view;
     video_view = nullptr;
 }
 
 void StageListController::SlotOnRemoteUserEnterRoom(const QString& user_id) {
-    auto user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id.toStdString());
-    if (user_info == nullptr) {
-        return;
-    }
-    InsertUser(*user_info, false);
+  return;
 }
 
 void StageListController::SlotOnRemoteUserLeaveRoom(const QString& user_id) {
-    if (main_window_view_->GetUserId() == user_id.toStdString() && !main_window_view_->IsScreenShareWindow()) {
-        main_window_view_->InitMainVideo();
-        DataStore::Instance()->SetCurrentMainWindowUser("");
-        TUIRoomCore::GetInstance()->StopRemoteView(user_id.toStdString(), TUIStreamType::kStreamTypeCamera);
-    } else if (all_video_userid_list_.contains(user_id.toStdString())) {
-        RemoveUser(user_id.toStdString(), false);
-    }
+  UserExit(user_id.toStdString());
 }
 
 void StageListController::SlotOnRemoteUserVideoOpen(const QString& user_id, bool available) {
-    LINFO("SlotOnRemoteUserVideoOpen, user_id：%s, available : %d", user_id.toStdString().c_str(), available);
+    LINFO("SlotOnRemoteUserVideoOpen, user_id : %s, available : %d", user_id.toStdString().c_str(), available);
     auto user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id.toStdString());
     if (user_info == nullptr) {
         return;
@@ -589,7 +827,12 @@ void StageListController::SlotOnRemoteUserVideoOpen(const QString& user_id, bool
             DataStore::Instance()->GetCurrentMainWindowUser() == user_id.toStdString()) {
             SlotRemoveVideoFromMainScreen(user_id.toStdString());
         } else {
-            TUIRoomCore::GetInstance()->StopRemoteView(user_id.toStdString());
+            for (auto item : current_page_video_view_list_) {
+                if (item->GetUserId() == user_id.toStdString() && !item->IsScreenShareWindow()) {
+                    item->StopPreview();
+                    break;
+                }
+            }
         }
     } else {
         for (auto item : current_page_video_view_list_) {
@@ -622,6 +865,8 @@ void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id
         if (available) {
             if (current_page_video_view_list_.size() < page_size_) {
                 InsertUser(*user_info, true);
+                ChangeButtonsStatus();
+                return;
             } else {
                 all_screen_share_userid_list_.push_front(user_id.toStdString());
                 if (all_video_userid_list_.contains(user_id.toStdString())) {
@@ -635,11 +880,12 @@ void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id
                         item->StopCurrentVideo();
                     }
                 }
-                UpdateCurrentVideoPage();
             }
         } else {
             if (!(user_id.toStdString() == main_window_view_->GetUserId() && main_window_view_->IsScreenShareWindow())) {
                 RemoveUser(user_id.toStdString(), true);
+                ChangeButtonsStatus();
+                return;
             } else if (all_video_userid_list_.contains(user_id.toStdString())) {
                 all_video_userid_list_.removeOne(user_id.toStdString());
                 int insert_index = all_video_userid_list_.indexOf(DataStore::Instance()->GetCurrentUserInfo().user_id);
@@ -651,11 +897,28 @@ void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id
                     VideoRenderView* item = current_page_video_view_list_.at(i);
                     item->StopCurrentVideo();
                 }
-                UpdateCurrentVideoPage();
             }
         }
     } else {
-        if (all_video_userid_list_.contains(user_id.toStdString())) {
+        if (all_screen_share_userid_list_.contains(user_id.toStdString())
+            && stage_list_direction_ == StageListDirection::kGridDirection) {
+            all_screen_share_userid_list_.removeOne(user_id.toStdString());
+            for (auto view_iter = current_page_video_view_list_.begin(); view_iter != current_page_video_view_list_.end(); view_iter++) {
+                if ((*view_iter)->GetUserId() == user_id.toStdString()) {
+                    VideoRenderView* view = *view_iter;
+                    current_page_video_view_list_.erase(view_iter);
+                    RemoveVideoViewFromStage(view);
+                    break;
+                }
+            }
+            int pos = 0, row = 1, column = 1;
+            GridLayoutDeciders(row, column);
+            for (auto view_iter = current_page_video_view_list_.begin();
+                view_iter != current_page_video_view_list_.end(); ++view_iter) {
+                stage_layout_->addWidget(*view_iter, pos / column, pos % column);
+                ++pos;
+            }
+        } else if (all_video_userid_list_.contains(user_id.toStdString())) {
             all_video_userid_list_.removeOne(user_id.toStdString());
             all_video_userid_list_.push_front(user_id.toStdString());
 
@@ -666,9 +929,9 @@ void StageListController::SlotOnRemoteUserScreenVideoOpen(const QString& user_id
                 item->StopCurrentVideo();
             }
         }
-        UpdateCurrentVideoPage();
     }
 
+    UpdateCurrentVideoPage();
     ChangeButtonsStatus();
 }
 
@@ -687,62 +950,65 @@ void StageListController::SlotOnRemoteUserExitSpeechState(const QString& user_id
     if (user_info == nullptr) {
         return;
     }
-    RemoveUser(user_id.toStdString(), false);
+    if (main_window_view_->GetUserId() == user_id.toStdString() && !main_window_view_->IsScreenShareWindow()) {
+        main_window_view_->InitMainVideo();
+        DataStore::Instance()->SetCurrentMainWindowUser("");
+        TUIRoomCore::GetInstance()->StopRemoteView(user_id.toStdString(), TUIStreamType::kStreamTypeCamera);
+    }
+
+    UserExit(user_id.toStdString());
 }
 
 void StageListController::SlotShowVideoOnMainScreen(const std::string user_id, bool is_screen_share_window) {
     // 从麦上列表移出被双击的用户（该用户肯定是正在显示的用户）
     // Move the double-clicked user from the mic-on list (the user is being displayed)
-    LINFO("User ShowVideoOnMainScreen, user_id：%s, is_screen_share_window : %d", user_id.c_str(), is_screen_share_window);
-    main_window_view_->StopCurrentVideo();
-    main_window_view_->ResetBackgroundImage();
-    for (int i = 0; i < current_page_video_view_list_.size(); i++) {
-        VideoRenderView* item = current_page_video_view_list_.at(i);
-        if (item->GetUserId() == user_id) {
-            item->StopCurrentVideo();
-            break;
-        }
-    }
+    LINFO("User ShowVideoOnMainScreen, user_id : %s, is_screen_share_window : %d", user_id.c_str(), is_screen_share_window);
 
-    std::string current_main_window_user = DataStore::Instance()->GetCurrentMainWindowUser();
     if (is_screen_share_window) {
         all_screen_share_userid_list_.removeOne(user_id);
     } else {
         all_video_userid_list_.removeOne(user_id);
     }
 
+    if (stage_list_direction_ == StageListDirection::kGridDirection) {
+        // 先切换为右侧布局，然后将双击的画面放大
+        emit StatusUpdateCenter::Instance().SignalStageListLayoutChanged(StageListDirection::kVerDirection);
+    }
+
+    std::string current_main_window_user = DataStore::Instance()->GetCurrentMainWindowUser();
     if (!current_main_window_user.empty()) {
         if (main_window_view_->IsScreenShareWindow()) {
             all_screen_share_userid_list_.push_front(current_main_window_user);
         } else {
+            // 麦上列表的显示顺序 : [ 屏幕分享(者) | 主持人 | 自己 | 其他成员 ]
+            // Display order of the mic-on list: [ Screen sharer | Host | You | Other members ]
             const TUIUserInfo* user_info = TUIRoomCore::GetInstance()->GetUserInfo(current_main_window_user);
-            if (user_info->role == TUIRole::kMaster || user_info->has_screen_stream) {
+            if (user_info == nullptr) {
+                return;
+            }
+            if (user_info->has_screen_stream || user_info->role == TUIRole::kMaster || 
+                user_info->user_id == DataStore::Instance()->GetCurrentUserInfo().user_id) {
                 all_video_userid_list_.push_front(current_main_window_user);
             } else {
-                bool insert_flag = false;
-                for (int i = 0; i < all_video_userid_list_.size(); i++) {
-                    std::string user_id = all_video_userid_list_.at(i);
-                    if (TUIRoomCore::GetInstance()->GetUserInfo(user_id)->role != TUIRole::kMaster &&
-                        !TUIRoomCore::GetInstance()->GetUserInfo(user_id)->has_screen_stream) {
-                        if (current_main_window_user == DataStore::Instance()->GetCurrentUserInfo().user_id) {
-                            all_video_userid_list_.insert(i, current_main_window_user);
-                            insert_flag = true;
-                            break;
-                        } else if (user_id == DataStore::Instance()->GetCurrentUserInfo().user_id){
-                            all_video_userid_list_.insert(i, current_main_window_user);
-                            insert_flag = true;
-                            break;
-                        }
-                    }
-                }
-                if (insert_flag == false) {
-                    all_video_userid_list_.push_front(current_main_window_user);
+                int insert_index = all_video_userid_list_.indexOf(DataStore::Instance()->GetCurrentUserInfo().user_id);
+                if (insert_index != -1) {
+                    all_video_userid_list_.insert(insert_index + 1, current_main_window_user);
+                } else {
+                    insert_index = all_screen_share_userid_list_.size();
+                    all_video_userid_list_.insert(insert_index, current_main_window_user);
                 }
             }
         }
     } else if (all_video_userid_list_.size() + all_screen_share_userid_list_.size() < page_size_) {
         RemoveUser(user_id, is_screen_share_window);
     }
+
+    main_window_view_->StopCurrentVideo();
+    for (int i = 0; i < current_page_video_view_list_.size(); i++) {
+        VideoRenderView* item = current_page_video_view_list_.at(i);
+        item->StopCurrentVideo();
+    }
+
     UpdateCurrentVideoPage();
     ChangeButtonsStatus();
     // 将其视频显示到主窗口
@@ -765,7 +1031,7 @@ void StageListController::SlotShowVideoOnMainScreen(const std::string user_id, b
 }
 
 void StageListController::SlotRemoveVideoFromMainScreen(const std::string user_id) {
-    LINFO("User RemoveVideoFromMainScreen, user_id：%s", user_id.c_str());
+    LINFO("User RemoveVideoFromMainScreen, user_id : %s", user_id.c_str());
     const TUIUserInfo* user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id);
     if (user_info == nullptr) {
         return;
@@ -773,7 +1039,7 @@ void StageListController::SlotRemoveVideoFromMainScreen(const std::string user_i
     if (!all_screen_share_userid_list_.empty()) {
         // 如果有人在屏幕分享，则显示在主窗口
         // Display the shared screen in the main window
-        LINFO("User Show Screen Share On Main Screen, user_id：%s", all_screen_share_userid_list_[0].c_str());
+        LINFO("User Show Screen Share On Main Screen, user_id : %s", all_screen_share_userid_list_[0].c_str());
         SlotShowVideoOnMainScreen(all_screen_share_userid_list_[0], true);
     } else {
         main_window_view_->StopCurrentVideo();
@@ -820,25 +1086,31 @@ void StageListController::SetMainWindowView(VideoRenderView* video_view) {
         this, &StageListController::SlotRemoveVideoFromMainScreen);
 }
 void StageListController::UpdateCurrentVideoPage() {
-    const TUIUserInfo* local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
-    int screen_user_index = 0;
-    int new_index = last_video_index_ >= 0 ? last_video_index_ : 0;
+    if (last_video_index_ + (page_size_ - all_screen_share_userid_list_.size()) > all_video_userid_list_.size()) {
+        last_video_index_ = all_video_userid_list_.size() - (page_size_ - all_screen_share_userid_list_.size());
+    }
+    int new_index = last_video_index_ >= 0 ? last_video_index_ : (last_video_index_ = 0);
 
+    int screen_user_index = 0;
+    const std::string local_user_id = DataStore::Instance()->GetCurrentUserInfo().user_id;
     for (int i = 0; i < current_page_video_view_list_.size(); i++) {
         VideoRenderView* item = current_page_video_view_list_.at(i);
-        item->ResetBackgroundImage();
         if (screen_user_index < all_screen_share_userid_list_.size()) {
             const TUIUserInfo* item_user = TUIRoomCore::GetInstance()->GetUserInfo(all_screen_share_userid_list_.at(screen_user_index++));
-            item->UpdateUserInfo(*item_user);
-            item->UserStartScreenShare(item->GetUserId());
+            if (item_user && item) {
+                item->UpdateUserInfo(*item_user);
+                item->UserStartScreenShare(item->GetUserId());
+            }
         } else {
             if (new_index < all_video_userid_list_.size()) {
                 const TUIUserInfo* item_user = TUIRoomCore::GetInstance()->GetUserInfo(all_video_userid_list_.at(new_index++));
-                item->UpdateUserInfo(*item_user);
-                if (item_user->user_id == local_user->user_id) {
-                    item->UpdateCameraPreview();
-                } else {
-                    item->StartPreview();
+                if (item_user && item) {
+                    item->UpdateUserInfo(*item_user);
+                    if (item_user->user_id == local_user_id) {
+                        item->UpdateCameraPreview();
+                    } else {
+                        item->StartPreview();
+                    }
                 }
             }
         }

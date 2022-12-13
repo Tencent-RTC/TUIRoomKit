@@ -3,14 +3,16 @@
 #define MODULE_SCREENSHAREMANAGER_H_
 
 #include "include/IScreenShareManager.h"
+#include "TUIRoomEngine.h"
 #include "ITRTCCloud.h"
 
-using namespace liteav;
+#include "TUIRoomCoreCallback.h"
+#include "TUIRoomDef.h"
 
 class ScreenShareManager :
     public IScreenShareManager {
  public:
-     explicit ScreenShareManager(liteav::ITRTCCloud* trtc_cloud);
+     ScreenShareManager(tuikit::TUIRoomEngine* room_engine, TUIRoomCoreCallback* callback);
     virtual ~ScreenShareManager();
 
     /**
@@ -24,7 +26,7 @@ class ScreenShareManager :
      *
      * @param rendView The control sustaining the preview image, which can be set to nullptr, indicating not to display the preview of the shared screen
      */
-    virtual void StartScreenCapture(void* view);
+    virtual void StartScreenCapture(void* target_id, void* view);
 
     /**
      * @desc Í£Ö¹ÆÁÄ»·ÖÏí
@@ -183,8 +185,10 @@ class ScreenShareManager :
     virtual void RemoveAllIncludedShareWindow();
 
  private:
-    ITRTCCloud* trtc_cloud_;
-    ITRTCScreenCaptureSourceList* source_window_list_ = nullptr;
+    liteav::ITRTCCloud* trtc_cloud_ = nullptr;
+    tuikit::TUIRoomEngine* room_engine_ = nullptr;
+    TUIRoomCoreCallback*   room_core_callback_;
+    liteav::ITRTCScreenCaptureSourceList* source_window_list_ = nullptr;
     std::vector<IScreenShareManager::ScreenCaptureSourceInfo> screen_window_info_list_;
 };
 #endif  //  MODULE_SCREENSHAREMANAGER_H_

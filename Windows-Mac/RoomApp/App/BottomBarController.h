@@ -53,6 +53,9 @@ private:
     void ClearAudioMenu();
     void ShowTopWidget();
     void UpdateStatus(const TUIUserInfo& info);
+
+    void StartSharing();
+    void StopSharing();
 #ifdef __APPLE__
     bool IsScreenRecordAuthorized();
     void RequestScreenRecordAccess(QString title, QString message);
@@ -62,7 +65,6 @@ public slots:
     void OnCameraClicked(bool checked);
     void OnAudioClicked(bool checked);
     void OnShareClicked(bool checked);
-    void OnStartScreenShare(bool checked);
     void OnCameraSetClicked(bool checked);
     void OnAudioSetClicked(bool checked);
     void OnScreenShareSetClicked(bool checked);

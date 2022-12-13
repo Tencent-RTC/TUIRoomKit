@@ -343,6 +343,7 @@ void BottomBarController::ClearAudioMenu() {
     }
 }
 void BottomBarController::SetShareScreenStyle(bool is_sharing_screen) {
+  LINFO("SetShareScreenStyle, is_sharing_screen:%d", is_sharing_screen);
     is_sharing_screen_ = is_sharing_screen;
     if (is_sharing_screen_) {
         ui.widget_share_button->SetText(tr("NewShare"));
@@ -367,11 +368,12 @@ void BottomBarController::SetShareScreenStyle(bool is_sharing_screen) {
     ui.widget_bg->setStyle(QApplication::style());
 }
 void BottomBarController::ShowTopWidget() {
+  LINFO("ShowTopWidget");
     if (share_top_widget_ == nullptr) {
         share_top_widget_ = new SmallTopBarController(NULL);
         connect(share_top_widget_, &SmallTopBarController::SignalCloseWnd, this, [=]() {
             ui.widget_share_button->SetChecked(false);
-            OnStartScreenShare(false);
+            StopSharing();
             });
     }
     share_top_widget_->setWindowTitle(kAppName);
@@ -386,7 +388,7 @@ void BottomBarController::ShowTopWidget() {
 
     connect(share_top_widget_, &SmallTopBarController::SignalStopSharing, this, [=]() {
         ui.widget_share_button->SetChecked(false);
-        OnStartScreenShare(false);
+        StopSharing();
         });
     connect(share_top_widget_, &SmallTopBarController::SignalShowTopBar, this, [=]() {
         this->show();
@@ -412,7 +414,7 @@ void BottomBarController::mouseReleaseEvent(QMouseEvent* event) {
 }
 void BottomBarController::closeEvent(QCloseEvent* event) {
     ui.widget_share_button->SetChecked(false);
-    OnStartScreenShare(false);
+    StopSharing();
 }
 void BottomBarController::paintEvent(QPaintEvent* event) {
     QStyleOption opt;
@@ -454,76 +456,92 @@ void BottomBarController::MoveToTop(QWidget* main_widget) {
         TUIRoomCore::GetInstance()->GetScreenShareManager()->AddExcludedShareWindow((void*)share_top_widget_->winId());
     }
 }
-void BottomBarController::OnStartScreenShare(bool checked) {
-    if (!screen_shower_id_.empty()) {
-        this->hide();
-        ui.widget_share_button->SetChecked(false);
-        this->show();
 
-        TXMessageBox::Instance().AddLineTextMessage(tr("Other users are sharing screens"));
-        return;
-    }
-    LINFO("BottomBarController::OnStartScreenShare %d", checked);
-    if (checked) {
+void BottomBarController::StartSharing() {
+  LINFO("StartSharing");
+  if (!screen_shower_id_.empty()) {
+    this->hide();
+    ui.widget_share_button->SetChecked(false);
+    this->show();
+
+    TXMessageBox::Instance().AddLineTextMessage(
+        tr("Other users are sharing screens"));
+    return;
+  }
 #ifdef _WIN32
-        SIZE thumb_size{ kShareItemWidth - kShareItemMargin, kShareItemHeight - kShareItemMargin };
-        SIZE icon_size{ kShareIconWidth, kShareIconHeight };
+  SIZE thumb_size{kShareItemWidth - kShareItemMargin,
+                  kShareItemHeight - kShareItemMargin};
+  SIZE icon_size{kShareIconWidth, kShareIconHeight};
 #else
-        bool is_screen_record_authorized = IsScreenRecordAuthorized();
-        if (!is_screen_record_authorized) {
-            this->hide();
-            ui.widget_share_button->SetChecked(false);
-            this->show();
+  bool is_screen_record_authorized = IsScreenRecordAuthorized();
+  if (!is_screen_record_authorized) {
+    this->hide();
+    ui.widget_share_button->SetChecked(false);
+    this->show();
 
-            // "提示":"需要开启系统录屏权限，才能分享屏幕"
-            // "Tip ":" You need to enable system recording permission to share the screen"
-            RequestScreenRecordAccess(tr("Warning"), tr("You need to enable the system screen recording permission to share the screen"));
-            return;
-        }
+    // "提示":"需要开启系统录屏权限，才能分享屏幕"
+    // "Tip ":" You need to enable system recording permission to share the
+    // screen"
+    RequestScreenRecordAccess(tr("Warning"),
+                              tr("You need to enable the system screen "
+                                 "recording permission to share the screen"));
+    return;
+  }
 
-        liteav::SIZE thumb_size;
-        thumb_size.width = kShareItemWidth - kShareItemMargin;
-        thumb_size.height = kShareItemHeight - kShareItemMargin;
-        liteav::SIZE icon_size;
-        icon_size.width = kShareIconWidth;
-        icon_size.height = kShareIconHeight;
+  liteav::SIZE thumb_size;
+  thumb_size.width = kShareItemWidth - kShareItemMargin;
+  thumb_size.height = kShareItemHeight - kShareItemMargin;
+  liteav::SIZE icon_size;
+  icon_size.width = kShareIconWidth;
+  icon_size.height = kShareIconHeight;
 #endif
-        std::vector<IScreenShareManager::ScreenCaptureSourceInfo> source = TUIRoomCore::GetInstance()->GetScreenShareManager()->GetScreenCaptureSources(thumb_size, icon_size);
-        LINFO("GetScreenCaptureSources size=%d", source.size());
+  std::vector<IScreenShareManager::ScreenCaptureSourceInfo> source =
+      TUIRoomCore::GetInstance()
+          ->GetScreenShareManager()
+          ->GetScreenCaptureSources(thumb_size, icon_size);
+  LINFO("GetScreenCaptureSources size=%d", source.size());
 
-        TUIRoomCore::GetInstance()->GetScreenShareManager()->RemoveAllExcludedShareWindow();
+  TUIRoomCore::GetInstance()
+      ->GetScreenShareManager()
+      ->RemoveAllExcludedShareWindow();
 
-        std::vector<IScreenShareManager::ScreenCaptureSourceInfo>::iterator iter = source.begin();
-        while (iter != source.end()) {
-            std::string src_name = iter->source_name;
-            if (src_name.find(kAppName) != std::string::npos) {
-                if (iter->source_id != NULL)
-                    TUIRoomCore::GetInstance()->GetScreenShareManager()->AddExcludedShareWindow(iter->source_id);
-                iter = source.erase(iter);
-            } else {
-                iter++;
-            }
-        }
-        if (screen_share_window_ == nullptr) {
-            screen_share_window_ = new ScreenShareWindow(this);
-            connect(screen_share_window_, SIGNAL(SignalConfirmShareScreen(bool)), this, SLOT(OnConfirmShareScreen(bool)));
-        }
-        screen_share_window_->InitShow(source);
-        screen_share_window_->show();
+  std::vector<IScreenShareManager::ScreenCaptureSourceInfo>::iterator iter =
+      source.begin();
+  while (iter != source.end()) {
+    std::string src_name = iter->source_name;
+    if (src_name.find(kAppName) != std::string::npos) {
+      if (iter->source_id != NULL)
+        TUIRoomCore::GetInstance()
+            ->GetScreenShareManager()
+            ->AddExcludedShareWindow(iter->source_id);
+      iter = source.erase(iter);
     } else {
-        LINFO("StopScreenCapture...");
-        TUIRoomCore::GetInstance()->GetScreenShareManager()->StopScreenCapture();
-        auto local_user = DataStore::Instance()->GetCurrentUserInfo().user_id;
-        DataStore::Instance()->RemoveScreenShareUser(local_user);
-        DataStore::Instance()->SetCurrentMainWindowUser("");
-        if (DataStore::Instance()->IsShareScreenVoice()) {
-            TUIRoomCore::GetInstance()->StopSystemAudioLoopback();
-            DataStore::Instance()->SetShareScreenVoice(false);
-        }
-
-        emit SignalStartScreen(false);
+      iter++;
     }
+  }
+  if (screen_share_window_ == nullptr) {
+    screen_share_window_ = new ScreenShareWindow(this);
+    connect(screen_share_window_, SIGNAL(SignalConfirmShareScreen(bool)), this,
+            SLOT(OnConfirmShareScreen(bool)));
+  }
+  screen_share_window_->InitShow(source);
+  screen_share_window_->show();
 }
+
+void BottomBarController::StopSharing() {
+  LINFO("StopScreenCapture...");
+  TUIRoomCore::GetInstance()->GetScreenShareManager()->StopScreenCapture();
+  auto local_user = DataStore::Instance()->GetCurrentUserInfo().user_id;
+  DataStore::Instance()->RemoveScreenShareUser(local_user);
+  DataStore::Instance()->SetCurrentMainWindowUser("");
+  if (DataStore::Instance()->IsShareScreenVoice()) {
+    TUIRoomCore::GetInstance()->StopSystemAudioLoopback();
+    DataStore::Instance()->SetShareScreenVoice(false);
+  }
+
+  emit SignalStartScreen(false);
+}
+
 #ifdef __APPLE__
 bool BottomBarController::IsScreenRecordAuthorized() {
     // Mac10.15及以上才有屏幕录制授权
@@ -578,6 +596,7 @@ void BottomBarController::RequestScreenRecordAccess(QString title, QString messa
 }
 #endif
 void BottomBarController::OnConfirmShareScreen(bool share) {
+  LINFO("OnConfirmShareScreen, share:%d", share);
     if (!share || !screen_shower_id_.empty()) {
         if (!is_sharing_screen_) {
             this->hide();
@@ -612,8 +631,13 @@ void BottomBarController::OnConfirmShareScreen(bool share) {
 #endif
     IScreenShareManager::ScreenCaptureProperty property;
     property.enableCaptureChildWindow = true;
-    TUIRoomCore::GetInstance()->GetScreenShareManager()->SelectScreenCaptureTarget(source_info, rect, property);
-    TUIRoomCore::GetInstance()->GetScreenShareManager()->ReleaseScreenCaptureSources();
+    IScreenShareManager* screen_manager = TUIRoomCore::GetInstance()->GetScreenShareManager();
+    if (screen_manager == nullptr) {
+        LINFO("GetScreenCaptureSources screen_manager is nullptr.");
+        return;
+    }
+    screen_manager->SelectScreenCaptureTarget(source_info, rect, property);
+    //TUIRoomCore::GetInstance()->GetScreenShareManager()->ReleaseScreenCaptureSources();
 
     screen_share_window_->close();
     delete screen_share_window_;
@@ -621,7 +645,7 @@ void BottomBarController::OnConfirmShareScreen(bool share) {
 
     if (!is_sharing_screen_) {
         LINFO("start StartScreenCapture...");
-        TUIRoomCore::GetInstance()->GetScreenShareManager()->StartScreenCapture(nullptr);
+        screen_manager->StartScreenCapture(source_info.source_id, nullptr);
         DataReport::Instance()->OperateReport(ReportType::kStartScreenSharing);
         auto local_user = DataStore::Instance()->GetCurrentUserInfo().user_id;
         DataStore::Instance()->AddScreenShareUser(local_user);
@@ -643,19 +667,15 @@ void BottomBarController::OnAudioClicked(bool checked) {
     emit SignalAudioClicked(checked);
 }
 void BottomBarController::OnShareClicked(bool checked) {
+  LINFO("OnShareClicked");
     if (screen_share_window_ != nullptr && screen_share_window_->isVisible()) {
         ui.widget_share_button->SetChecked(true);
         screen_share_window_->raise();
         return;
     }
 
-    if (is_sharing_screen_) {
-        ui.widget_share_button->SetChecked(!checked);
-        OnStartScreenShare(!checked);
-    } else {
-        ui.widget_share_button->SetChecked(checked);
-        OnStartScreenShare(checked);
-    }
+    ui.widget_share_button->SetChecked(true);
+    StartSharing();
 }
 void BottomBarController::OnMemberClicked(bool checked) {
     label_member_num_->setText("");
@@ -776,10 +796,15 @@ void BottomBarController::OnScreenShareSetClicked(bool checked) {
     pMenu_share_->show();
 }
 void BottomBarController::OnScreenShareMenuTriggered() {
-    bool is_sharing = ui.widget_share_button->isChecked();
-    ui.widget_share_button->SetChecked(!is_sharing);
+  LINFO("OnScreenShareMenuTriggered,is_sharing : %d", is_sharing_screen_);
 
-    OnStartScreenShare(!is_sharing);
+  if (is_sharing_screen_) {
+    StopSharing();
+    ui.widget_share_button->SetChecked(false);
+  } else {
+    ui.widget_share_button->SetChecked(true);
+    StartSharing();
+  }
 }
 void BottomBarController::ExcludeShareWindow() {
     TUIRoomCore::GetInstance()->GetScreenShareManager()->AddExcludedShareWindow((void*)this->winId());
@@ -788,6 +813,7 @@ void BottomBarController::SetCurrentScreenShower(QString user_id) {
     screen_shower_id_ = user_id.toStdString();
 }
 void BottomBarController::OnBtnEndClicked() {
+  LINFO("OnBtnEndClicked, is_sharing_screen_:%d", is_sharing_screen_);
     if (is_sharing_screen_) {
         OnScreenShareMenuTriggered();
     } else {
@@ -799,11 +825,12 @@ void BottomBarController::SetChatRoomBtnStatus(bool show) {
 }
 
 void BottomBarController::SlotScreenCaptureStopped(int reason) {
-    if (0 != reason && this->isVisible()) {
+    if (0 != reason && (this->isVisible() || 
+        share_top_widget_ != nullptr && share_top_widget_->isVisible())) {
         bool is_sharing = ui.widget_share_button->isChecked();
         ui.widget_share_button->SetChecked(!is_sharing);
         if (reason != 0) {
-            OnStartScreenShare(false);
+          StopSharing();
         }
         TXMessageBox::Instance().AddLineTextMessage(tr("Screen Capture Stopped."));
     }

@@ -16,7 +16,6 @@ public:
     ~PresetDeviceController();
 
     void InitUi();
-    void StartPreview();
     void OnCloseWnd();
     void ResetStart();
 

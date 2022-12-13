@@ -20,15 +20,11 @@ public:
     // 关闭原始View上面的拉流
     // Disable stream pull on the original view
     void StopCurrentVideo();
-    // 在首帧视频画面未上来前，显示默认背景贴图
-    // Display the default background image before the first frame of video image is displayed
-    void ResetBackgroundImage();
 
     std::string GetUserId();
     void UpdateUserInfo(const TUIUserInfo& user_info);
     void StartPreview();
     void StopPreview();
-    void RemoveUser();
     void UpdateCameraPreview();
 
     liteav::TXView GetPlayWindow();
@@ -46,6 +42,8 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent* event);
 public slots:
     void SlotOnFirstVideoFrame(const QString& user_id, const TUIStreamType streamType);
+    void SlotOnRemoteUserCameraAvailable(const QString& user_id, bool available);
+    void SlotOnRemoteUserScreenAvailable(const QString& user_id, bool available);
     void SlotOnUserVoiceVolume(const QString& user_id, int volume);
     void OnNetStatistics(const liteav::TRTCStatistics& statis);
 signals:

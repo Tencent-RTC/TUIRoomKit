@@ -114,6 +114,14 @@
         <source>All Mute</source>
         <translation>全体禁言</translation>
     </message>
+	<message>
+        <source>Admin forbid all users send message.</source>
+        <translation>主持人设置了全体禁言。</translation>
+    </message>
+	<message>
+        <source>Admin cancel forbid all users send message.</source>
+        <translation>主持人取消了全体禁言。</translation>
+    </message>
     <message>
         <source>Please input the message</source>
         <translation>请输入消息</translation>
@@ -139,7 +147,7 @@
     </message>
     <message>
         <source>Lecturer Layout</source>
-        <translation>演讲者试图</translation>
+        <translation>演讲者视图</translation>
     </message>
     <message>
         <source>MemberRight</source>
@@ -148,6 +156,10 @@
     <message>
         <source>MemberTop</source>
         <translation>顶部布局</translation>
+    </message>
+	<message>
+        <source>MemberGrid</source>
+        <translation>宫格布局</translation>
     </message>
 </context>
 <context>
@@ -224,9 +236,33 @@
         <source>Failed to open the camera</source>
         <translation>打开摄像头失败</translation>
     </message>
+	<message>
+        <source>Admin set all users camera muted.</source>
+        <translation>主持人设置了全员禁止打开摄像头。</translation>
+    </message>
+	<message>
+        <source>Muted camera by admin.</source>
+        <translation>主持人关闭了您的摄像头。</translation>
+    </message>
+	<message>
+        <source>Admin requests to turn on your camera, are you agree ?</source>
+        <translation>主持人请求打开您的摄像头，是否同意？</translation>
+    </message>
     <message>
         <source>Failed to turn on the microphone</source>
         <translation>打开麦克风失败</translation>
+    </message>
+	<message>
+        <source>Admin set all users microphone muted.</source>
+        <translation>主持人设置了全员禁止打开麦克风。</translation>
+    </message>
+	<message>
+        <source>Muted microphone by admin.</source>
+        <translation>主持人关闭了您的麦克风。</translation>
+    </message>
+	<message>
+        <source>Admin requests to turn on your microphone, are you agree ?</source>
+        <translation>主持人请求打开您的麦克风，是否同意？</translation>
     </message>
     <message>
         <source>Other users are sharing screens</source>
@@ -313,6 +349,10 @@ CPU：%3%
     <message>
         <source>The master has set audio ban for all staff, you cannot open the audio temporarily.</source>
         <translation>主持人已设置全体禁音频，您暂时不能打开麦克风。</translation>
+    </message>
+	<message>
+        <source>The request has timed out.</source>
+        <translation>请求已超时。</translation>
     </message>
 </context>
 <context>
@@ -423,6 +463,38 @@ CPU：%3%
     <message>
         <source>%1</source>
         <translation>%1 位</translation>
+    </message>
+	<message>
+        <source>It's already set not allowed to open microphone.</source>
+        <translation>已设置了全员禁麦。</translation>
+    </message>
+	<message>
+        <source>Request to turn on microphone rejected.</source>
+        <translation>请求开麦被拒绝。</translation>
+    </message>
+	<message>
+        <source>Request to turn on microphone timeout.</source>
+        <translation>请求开麦超时。</translation>
+    </message>
+	<message>
+        <source>Request to turn on microphone error.</source>
+        <translation>请求开麦发生错误。</translation>
+    </message>
+	<message>
+        <source>It's already set not allowed to open video.</source>
+        <translation>已设置了全员禁视频。</translation>
+    </message>
+	<message>
+        <source>Request to turn on camera rejected.</source>
+        <translation>请求开摄像头被拒绝。</translation>
+    </message>
+	<message>
+        <source>Request to turn on camera timeout.</source>
+        <translation>请求开摄像头超时。</translation>
+    </message>
+	<message>
+        <source>Request to turn on camera error.</source>
+        <translation>请求开摄像头发生错误。</translation>
     </message>
 </context>
 <context>

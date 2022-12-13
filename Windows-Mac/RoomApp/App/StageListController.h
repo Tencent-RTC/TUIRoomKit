@@ -42,9 +42,12 @@ private:
     void ClearCurrentPageVideoView();
     void SetVideoViewLayout(StageListDirection direction);
     void UpdateUserInfo(const TUIUserInfo& user_info);
+    void UserExit(const std::string& user_id);
 
     void ChangeCollapseButtonPosition();
     void ChangeCollapseButtonStyle();
+
+    void GridLayoutDeciders(int& row, int& column);
 protected:
     bool eventFilter(QObject* watched, QEvent* event);
     void showEvent(QShowEvent* event);
@@ -80,9 +83,9 @@ private:
     QList<VideoRenderView*> current_page_video_view_list_;
 
     VideoRenderView* main_window_view_ = nullptr;
-    int page_size_ = 6;
+    int page_size_ = 36;
     int last_video_index_ = 0;
-    StageListDirection stage_list_direction_ = StageListDirection::kHorDirection;
+    StageListDirection stage_list_direction_ = StageListDirection::kGridDirection;
     bool is_popup_list_ = false;
     bool is_member_screen_sharing_ = false;
     QPushButton     btn_stage_hide_;

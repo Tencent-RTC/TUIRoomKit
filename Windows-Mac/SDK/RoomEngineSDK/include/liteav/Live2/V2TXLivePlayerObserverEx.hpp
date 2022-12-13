@@ -1,0 +1,19 @@
+ï»¿#ifndef MODULE_CPP_V2TXLIVEPLAYEROBSERVER_EX_HPP_
+#define MODULE_CPP_V2TXLIVEPLAYEROBSERVER_EX_HPP_
+
+#include "V2TXLivePlayerObserver.hpp"
+
+namespace liteav {
+// Ê¹ÓÃ·½·¨:
+// V2TXLivePlayer::setProperty("setObserverEx", static_cast<V2TXLivePlayerObserverEx*>(this));
+// Èç¹ûÕâÀïÖ±½Ó¸ø this ²» static_cast<V2TXLivePlayerObserverEx*> sdk »Øµ÷»á±ÀÀ££¬
+// ÒòÎªÕâÀï void * »ñÈ¡µÄÊ×µØÖ·²»ÊÇV2TXLivePlayerObserverEx µÄ
+class V2TXLivePlayerObserverEx : public V2TXLivePlayerObserver {
+ public:
+  virtual void onNetworkQuality(int quality) {}
+  virtual void onEvent(int event, const char* msg) {}
+  virtual void onNetStatus(const char* map) {}
+};
+}  // namespace liteav
+
+#endif  // MODULE_CPP_V2TXLIVEPLAYEROBSERVER_EX_HPP_

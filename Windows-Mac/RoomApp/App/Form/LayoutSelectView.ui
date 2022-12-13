@@ -155,16 +155,16 @@
              <widget class="QWidget" name="widget_lecture_content" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_2">
                <property name="spacing">
-                <number>20</number>
+                <number>5</number>
                </property>
                <property name="leftMargin">
-                <number>10</number>
+                <number>5</number>
                </property>
                <property name="topMargin">
                 <number>0</number>
                </property>
                <property name="rightMargin">
-                <number>10</number>
+                <number>5</number>
                </property>
                <property name="bottomMargin">
                 <number>0</number>
@@ -176,13 +176,13 @@
                    <number>5</number>
                   </property>
                   <property name="leftMargin">
-                   <number>10</number>
+                   <number>5</number>
                   </property>
                   <property name="topMargin">
-                   <number>10</number>
+                   <number>5</number>
                   </property>
                   <property name="rightMargin">
-                   <number>10</number>
+                   <number>5</number>
                   </property>
                   <property name="bottomMargin">
                    <number>5</number>
@@ -226,13 +226,13 @@
                    <number>5</number>
                   </property>
                   <property name="leftMargin">
-                   <number>10</number>
+                   <number>5</number>
                   </property>
                   <property name="topMargin">
-                   <number>10</number>
+                   <number>5</number>
                   </property>
                   <property name="rightMargin">
-                   <number>10</number>
+                   <number>5</number>
                   </property>
                   <property name="bottomMargin">
                    <number>5</number>
@@ -260,6 +260,56 @@
                     </property>
                     <property name="text">
                      <string>MemberTop</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_grid_layout" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_6">
+                  <property name="spacing">
+                   <number>5</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>5</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>5</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>5</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>5</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="btn_grid">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_grid">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>25</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>MemberGrid</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>

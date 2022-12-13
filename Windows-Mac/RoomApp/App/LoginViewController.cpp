@@ -91,9 +91,9 @@ void LoginViewController::InitUi() {
 #endif
     LOAD_STYLE_SHEET(":/LoginViewController/LoginViewController/LoginViewController.qss");
 
-    QRegExp regx("[0-9]+$");
-    QValidator* validator_phone = new QRegExpValidator(regx, ui_->room_id_edit);
-    ui_->room_id_edit->setValidator(validator_phone);
+    //QRegExp regx("[0-9]+$");
+    //QValidator* validator_phone = new QRegExpValidator(regx, ui_->room_id_edit);
+    //ui_->room_id_edit->setValidator(validator_phone);
 
     UserLoginInfo info = DataStore::Instance()->GetCurrentUserInfo();
     ui_->name_edit->setText(QString::fromStdString(info.name));
