@@ -26,9 +26,6 @@
     <ClCompile Include="..\Common\TXImageButton.cpp" />
     <ClCompile Include="..\Common\TXMessageBox.cpp" />
     <ClCompile Include="..\Common\ViewDragger.cpp" />
-    <ClCompile Include="..\Module\IM\IMCore.cpp" />
-    <ClCompile Include="..\Module\IM\IMInterfaceCallback.cpp" />
-    <ClCompile Include="..\Module\IM\IMParser.cpp" />
     <ClCompile Include="..\Module\ScreenShareManager.cpp" />
     <ClCompile Include="..\Module\TUIRoomCoreImpl.cpp" />
     <ClCompile Include="..\utils\BugReport\crash_dump.cc" />
@@ -76,10 +73,6 @@
     <QtMoc Include="..\Common\MessageDispatcher\MessageDispatcher.h" />
     <QtMoc Include="..\Common\DataReport.h" />
     <ClInclude Include="..\Common\ViewDragger.h" />
-    <ClInclude Include="..\Module\IM\IMCore.h" />
-    <ClInclude Include="..\Module\IM\IMCoreCallback.h" />
-    <ClInclude Include="..\Module\IM\IMInterfaceCallback.h" />
-    <ClInclude Include="..\Module\IM\IMParser.h" />
     <ClInclude Include="..\Module\include\IScreenShareManager.h" />
     <ClInclude Include="..\Module\include\TUIRoomCore.h" />
     <ClInclude Include="..\Module\include\TUIRoomCoreCallback.h" />
@@ -240,16 +233,14 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)..\Module\include;$(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\include\TRTC;$(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\include;$(ProjectDir)..\SDK\ImSDK\Win\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)..\Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\include;$(ProjectDir)..\SDK\RoomEngineSDK\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)../SDK/LiteAVSDK/CPlusPlus/Win64/lib;$(ProjectDir)../SDK/ImSDK/Win/lib/Win64;$(ProjectDir)3rdParty/zlib/x86_64/;$(ProjectDir)bin/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>liteav.lib;ImSDK.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)3rdParty\zlib\x86_64\;$(ProjectDir)bin\;$(ProjectDir)..\SDK\RoomEngineSDK\lib\Win64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>zlibstatic.lib;TUIRoomEngine.lib;liteav.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.dll $(OutputPath)
-xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win64\*.dll $(OutputPath)
-xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.exe $(OutputPath)
+      <Command>xcopy /y $(ProjectDir)..\SDK\RoomEngineSDK\lib\Win64\*.dll $(OutputPath)
 xcopy /y /e $(ProjectDir)3rdParty\BugReport\x64 $(Outputpath)
 xcopy /y /e $(ProjectDir)3rdParty\openssl\x64 $(Outputpath)
 $(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
@@ -264,16 +255,14 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)..\Module\include;$(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\include\TRTC;$(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\include;$(ProjectDir)..\SDK\ImSDK\Win\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)..\Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\include;$(ProjectDir)..\SDK\RoomEngineSDK\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)../SDK/LiteAVSDK/CPlusPlus/Win32/lib;$(ProjectDir)../SDK/ImSDK/Win/lib/Win32;$(ProjectDir)3rdParty/zlib/x86/;$(ProjectDir)bin/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>liteav.lib;ImSDK.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)3rdParty\zlib\x86\;$(ProjectDir)bin\;$(ProjectDir)..\SDK\RoomEngineSDK\lib\Win32\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>zlibstatic.lib;TUIRoomEngine.lib;liteav.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.dll $(OutputPath)
-xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win32\*.dll $(OutputPath)
-xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.exe $(OutputPath)
+      <Command>xcopy /y $(ProjectDir)..\SDK\RoomEngineSDK\lib\Win32\*.dll $(OutputPath)
 xcopy /y /e $(ProjectDir)3rdParty\BugReport\x86 $(Outputpath)
 xcopy /y /e $(ProjectDir)3rdParty\openssl\x86 $(Outputpath)
 $(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
@@ -288,23 +277,14 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)..\Module\include;$(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\include\TRTC;$(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\include;$(ProjectDir)..\SDK\ImSDK\Win\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)..\Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\include;$(ProjectDir)..\SDK\RoomEngineSDK\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)../SDK/LiteAVSDK/CPlusPlus/Win64/lib;$(ProjectDir)../SDK/ImSDK/Win/lib/Win64;$(ProjectDir)3rdParty/zlib/x86_64/;$(ProjectDir)bin/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>liteav.lib;ImSDK.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)3rdParty\zlib\x86_64\;$(ProjectDir)bin\;$(ProjectDir)..\SDK\RoomEngineSDK\lib\Win64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>zlibstatic.lib;TUIRoomEngine.lib;liteav.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.dll $(OutputPath)
-xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win64\*.dll $(OutputPath)
-xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win64\lib\*.exe $(OutputPath)
-xcopy /y /e $(ProjectDir)3rdParty\BugReport\x64 $(Outputpath)
-xcopy /y /e $(ProjectDir)3rdParty\openssl\x64 $(Outputpath)
-$(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
-rd /s /q $(Outputpath)translations
-xcopy /y $(ProjectDir)Resource\trtcres\*.* $(Outputpath)trtcres\
-if exist $(TargetDir)*.lib del $(TargetDir)*.lib
-if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
+      <Command>xcopy /y $(ProjectDir)..\SDK\RoomEngineSDK\lib\Win64\*.dll $(OutputPath)</Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
@@ -312,23 +292,14 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)..\Module\include;$(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\include\TRTC;$(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\include;$(ProjectDir)..\SDK\ImSDK\Win\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)..\Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\include;$(ProjectDir)..\SDK\RoomEngineSDK\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)../SDK/LiteAVSDK/CPlusPlus/Win32/lib;$(ProjectDir)../SDK/ImSDK/Win/lib/Win32;$(ProjectDir)3rdParty/zlib/x86/;$(ProjectDir)bin/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>liteav.lib;ImSDK.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)3rdParty\zlib\x86\;$(ProjectDir)bin\;$(ProjectDir)..\SDK\RoomEngineSDK\lib\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>zlibstatic.lib;TUIRoomEngine.lib;liteav.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.dll $(OutputPath)
-xcopy /y $(ProjectDir)..\SDK\ImSDK\Win\lib\Win32\*.dll $(OutputPath)
-xcopy /y $(ProjectDir)..\SDK\LiteAVSDK\CPlusPlus\Win32\lib\*.exe $(OutputPath)
-xcopy /y /e $(ProjectDir)3rdParty\BugReport\x86 $(Outputpath)
-xcopy /y /e $(ProjectDir)3rdParty\openssl\x86 $(Outputpath)
-$(QtDir)\bin\windeployqt.exe $(Outputpath)RoomApp.exe
-rd /s /q $(Outputpath)translations
-xcopy /y $(ProjectDir)Resource\trtcres\*.* $(Outputpath)trtcres\
-if exist $(TargetDir)*.lib del $(TargetDir)*.lib
-if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
+      <Command>xcopy /y $(ProjectDir)..\SDK\RoomEngineSDK\lib\Win32\*.dll $(OutputPath)</Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>

@@ -46,7 +46,8 @@ enum class MemberStatus {
 
 enum class StageListDirection {
     kHorDirection = 1,
-    kVerDirection = 2
+    kVerDirection = 2,
+    kGridDirection = 3,
 };
 
 class NetToolTip {
@@ -60,6 +61,9 @@ struct UserNetQualityInfo {
 	// 网络质量，参见 TRTCTypeDef.h 的 TRTCQuality 枚举
     // Network quality. For more information, see `TRTCQuality` enumerations of `TRTCTypeDef.h`
 	int quality;
+    int upLoss;
+    int downLoss;
+    int delay;
     UserNetQualityInfo() : quality(0) {}
 };
 

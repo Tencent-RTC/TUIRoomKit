@@ -69,7 +69,6 @@ void TopBarController::OnNetStatistics(const liteav::TRTCStatistics& statis) {
     net_tooltip_.downLoss = downLoss;
 }
 void TopBarController::OnNetQuality(UserNetQualityInfo local_user_quality, std::vector<UserNetQualityInfo> remote_users_quality) {
-    if (std::string(local_user_quality.user_id).empty()) {
         switch (local_user_quality.quality) {
         case liteav::TRTCQuality_Unknown:
             net_quality_ = tr("Unknow");
@@ -100,7 +99,10 @@ void TopBarController::OnNetQuality(UserNetQualityInfo local_user_quality, std::
             ui.btn_network->setStyleSheet("QPushButton{border-image: url(:/MainWindow/MainWindow/net_bad.png);}");
             break;
         }
-    }
+
+        //net_tooltip_.app_cpu = app_cpu;
+        net_tooltip_.rtt = local_user_quality.delay;
+        net_tooltip_.downLoss = local_user_quality.downLoss;
 }
 void TopBarController::SlotOnSwitchLayout() {
     if (layout_select_view_ == nullptr) {
@@ -127,7 +129,7 @@ void TopBarController::SlotCloseSelectView() {
 
 void TopBarController::SlotOnRoomInfoView() {
     if (room_tips_view_ == nullptr) {
-        room_tips_view_ = new RoomTipsView(this);
+        room_tips_view_ = new RoomTipsView(NULL);
         room_tips_view_->SetRoomID(ui.label_room_name->text());
         connect(room_tips_view_, &RoomTipsView::SignalCloseView, this, &TopBarController::SlotCloseRoomTipsView);
     }

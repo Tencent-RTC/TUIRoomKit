@@ -5,20 +5,7 @@
 #include <functional>
 #include "TRTCTypeDef.h"
 
-/**
- * 信令接口回调定义
- * 
- * @param  error_code 错误码。 0为无错误，1为超时，负数为错误码
- * @param  error_message 错误信息描述，可以根据错误描述排查问题
- */
-
- /**
-  * Signaling API callback definitions
-  *
-  * @param  error_code Error code. Valid values: 0: No error; 1: timeout; negative value: Error code
-  * @param  error_message Error message, which can be used for troubleshooting
-  */
-using Callback = std::function<void(int error_code, const std::string& error_message)>;
+#include "TUIRoomDefine.h"
 
 /**
  * Error codes
@@ -31,7 +18,6 @@ enum class TUIRoomError {
     kErrorDestoryRoomFailed                 = -1003, // 销毁房间失败 (Failed to terminate the room)
     kErrorEnterRoomFailed                   = -1004, // 进入房间失败 (Failed to enter the room)
     kErrorExitRoomFailed                    = -1005, // 退出房间失败 (Failed to exit the room)
-    kErrorKickOffUserFailed                 = -1006, // 踢出用户失败 (Failed to remove a user)
     kErrorChangeRoomInfoFailed              = -1007, // 修改群信息失败 (Failed to modify the group information)
     kErrorGetRoomInfoFailed                 = -1008, // 获取群信息失败 (Failed to get the group information)
     kErrorGetRoomMemberFailed               = -1009, // 获取房间成员失败 (Failed to get room members)
@@ -66,6 +52,13 @@ enum class TUIExitRoomType {
     kNetworkAnomaly     = 4, // 网络异常 (Network exception)
     kTransferRoom       = 5, // 转让房间 (Room transfer)
     kOtherPlatformLogin = 6, // 其他端登录 (Login on another client)
+    kUserSigExpired     = 7, // 用户凭证过期 (user signature expired)
+};
+
+enum class TUIMutedReason {
+    kInitMute,
+    kMutedByAdmin,
+    kAdminMuteAllUsers
 };
 
 enum class TXSignalingStatus {
@@ -213,6 +206,270 @@ struct TUIRoomInfo {
         , is_callingroll(false)
         , start_time(0) {
     }
+};
+
+using RoomEngineSuccessCallback = std::function<void()>;
+using RoomEngineErrorCallback = std::function<void(const tuikit::TUIError code, const std::string& message)>;
+using RoomEngineRoomInfoCallback = std::function<void(const tuikit::TUIRoomInfo* room_info)>;
+using RoomEngineUserListCallback = std::function<void(tuikit::TUIUserListResult* user_list)>;
+using RoomEngineShareTargetListCallback = std::function<void(tuikit::TUIList<tuikit::TUIShareTarget>* target)>;
+using RoomEngineUserInfoCallback = std::function<void(tuikit::TUIUserInfo* user_info)>;
+using RoomEngineSeatListCallback = std::function<void(tuikit::TUIList<tuikit::TUISeatInfo>* list)>;
+
+enum class RequestCallbackType {
+    kRequestAccepted = 0,
+    kRequestRejected = 1,
+    kRequestTimeout = 2,
+    kRequestError = 3,
+    kRequestCancelled = 4,
+};
+using RoomEngineRequestCallback = std::function<void(RequestCallbackType type, tuikit::TUIError code, uint32_t request_id,
+    const std::string& user_id,
+    const std::string& message)>;
+
+#define TOSTRING(str) (nullptr == str ? "" : std::string(str))
+
+/**
+ * 信令接口回调定义
+ *
+ * @param  error_code 错误码。 0为无错误，1为超时，负数为错误码
+ * @param  error_message 错误信息描述，可以根据错误描述排查问题
+ */
+
+ /**
+  * Signaling API callback definitions
+  *
+  * @param  type Request callback type.
+  * @param  error_message Error message, which can be used for troubleshooting
+  */
+using Callback = std::function<void(RequestCallbackType type, const std::string& error_message)>;
+using SuccessCallback = std::function<void()>;
+using ErrorCallback = std::function<void(int code, const std::string& message)>;
+
+class TUIRoomEngineCallback : public tuikit::TUICallback {
+public:
+    TUIRoomEngineCallback() = default;
+    ~TUIRoomEngineCallback() override = default;
+
+    void SetCallback(RoomEngineSuccessCallback success_callback,
+        RoomEngineErrorCallback error_callback) {
+        success_callback_ = success_callback;
+        error_callback_ = error_callback;
+    }
+
+    void onSuccess() override {
+        if (success_callback_ != nullptr) {
+            success_callback_();
+        }
+    }
+    void onError(const tuikit::TUIError code, const char* message) override {
+        if (error_callback_ != nullptr) {
+            error_callback_(code, TOSTRING(message));
+        }
+    }
+
+private:
+    RoomEngineSuccessCallback success_callback_;
+    RoomEngineErrorCallback error_callback_;
+};
+
+class TUIRoomEngineRoomInfoCallback : public tuikit::TUIValueCallback<tuikit::TUIRoomInfo> {
+public:
+    TUIRoomEngineRoomInfoCallback() = default;
+    ~TUIRoomEngineRoomInfoCallback() override = default;
+
+    void SetCallback(RoomEngineRoomInfoCallback success_callback,
+        RoomEngineErrorCallback error_callback) {
+        success_callback_ = success_callback;
+        error_callback_ = error_callback;
+    }
+    void onSuccess(tuikit::TUIRoomInfo* value) override {
+        if (success_callback_ != nullptr) {
+            success_callback_(value);
+        }
+    }
+    void onError(const tuikit::TUIError code, const char* message) override {
+        if (error_callback_ != nullptr) {
+            error_callback_(code, TOSTRING(message));
+        }
+    }
+
+private:
+    RoomEngineRoomInfoCallback success_callback_;
+    RoomEngineErrorCallback error_callback_;
+};
+
+class TUIRoomEngineUserInfoCallback : public tuikit::TUIValueCallback<tuikit::TUIUserInfo> {
+public:
+    TUIRoomEngineUserInfoCallback() = default;
+    ~TUIRoomEngineUserInfoCallback() override = default;
+
+    void SetCallback(RoomEngineUserInfoCallback success_callback,
+        RoomEngineErrorCallback error_callback) {
+        success_callback_ = success_callback;
+        error_callback_ = error_callback;
+    }
+    void onSuccess(tuikit::TUIUserInfo* value) override {
+        if (success_callback_ != nullptr) {
+            success_callback_(value);
+        }
+    }
+    void onError(const tuikit::TUIError code, const char* message) override {
+        if (error_callback_ != nullptr) {
+            error_callback_(code, TOSTRING(message));
+        }
+    }
+
+private:
+    RoomEngineUserInfoCallback success_callback_;
+    RoomEngineErrorCallback error_callback_;
+};
+
+class TUIRoomEngineUserListCallback : public tuikit::TUIValueCallback<tuikit::TUIUserListResult> {
+public:
+    TUIRoomEngineUserListCallback() = default;
+    ~TUIRoomEngineUserListCallback() override = default;
+
+    void SetCallback(RoomEngineUserListCallback success_callback,
+        RoomEngineErrorCallback error_callback) {
+        success_callback_ = success_callback;
+        error_callback_ = error_callback;
+    }
+    void onSuccess(tuikit::TUIUserListResult* value) override {
+        if (success_callback_ != nullptr) {
+            success_callback_(value);
+        }
+    }
+    void onError(const tuikit::TUIError code, const char* message) override {
+        if (error_callback_ != nullptr) {
+            error_callback_(code, TOSTRING(message));
+        }
+    }
+
+private:
+    RoomEngineUserListCallback success_callback_;
+    RoomEngineErrorCallback error_callback_;
+};
+
+
+class TUIRoomEngineSeatListCallback : public tuikit::TUIListCallback<tuikit::TUISeatInfo> {
+public:
+    TUIRoomEngineSeatListCallback() = default;
+    ~TUIRoomEngineSeatListCallback() override = default;
+
+    void SetCallback(RoomEngineSeatListCallback success_callback,
+        RoomEngineErrorCallback error_callback) {
+        success_callback_ = success_callback;
+        error_callback_ = error_callback;
+    }
+    void onSuccess(tuikit::TUIList<tuikit::TUISeatInfo>* list) override {
+        if (success_callback_ != nullptr) {
+            success_callback_(list);
+        }
+    }
+    void onError(const tuikit::TUIError code, const char* message) override {
+        if (error_callback_ != nullptr) {
+            error_callback_(code, TOSTRING(message));
+        }
+    }
+
+private:
+    RoomEngineSeatListCallback success_callback_;
+    RoomEngineErrorCallback error_callback_;
+};
+
+
+class TUIRoomEngineGetShareTargetListCallback : public tuikit::TUIListCallback<tuikit::TUIShareTarget> {
+public:
+    TUIRoomEngineGetShareTargetListCallback() = default;
+    ~TUIRoomEngineGetShareTargetListCallback() override = default;
+
+    void SetCallback(RoomEngineShareTargetListCallback success_callback,
+        RoomEngineErrorCallback error_callback) {
+        success_callback_ = success_callback;
+        error_callback_ = error_callback;
+    }
+    void onSuccess(tuikit::TUIList<tuikit::TUIShareTarget>* value) override {
+        if (success_callback_ != nullptr) {
+            success_callback_(value);
+        }
+    }
+    void onError(const tuikit::TUIError code, const char* message) override {
+        if (error_callback_ != nullptr) {
+            error_callback_(code, TOSTRING(message));
+        }
+    }
+private:
+    RoomEngineShareTargetListCallback success_callback_;
+    RoomEngineErrorCallback error_callback_;
+};
+
+
+using OnPlayingCallback = std::function<void(const std::string& user_id)>;
+using OnLoadingCallback = std::function<void(const std::string& user_id)>;
+using OnPlayErrorCallback = std::function<void(const std::string& user_id, tuikit::TUIError code, const std::string& message)>;
+class TUIRoomEnginePlayCallback : public tuikit::TUIPlayCallback {
+public:
+    TUIRoomEnginePlayCallback() = default;
+    ~TUIRoomEnginePlayCallback() override = default;
+
+    void SetCallback(OnPlayingCallback playing,
+        OnLoadingCallback loading, OnPlayErrorCallback error) {
+        playing_ = playing;
+        loading_ = loading;
+        error_ = error;
+    }
+
+    void onPlaying(const char* userId) override {
+        playing_(TOSTRING(userId));
+    }
+    void onLoading(const char* userId)override {
+        loading_(TOSTRING(userId));
+    }
+    void onError(const char* userId,
+        const tuikit::TUIError code,
+        const char* message) override {
+        error_(TOSTRING(userId), code, TOSTRING(message));
+    }
+private:
+    OnPlayingCallback playing_;
+    OnLoadingCallback loading_;
+    OnPlayErrorCallback error_;
+};
+
+class TUIRoomEngineRequestCallback : public tuikit::TUIRequestCallback {
+public:
+    TUIRoomEngineRequestCallback() = default;
+    ~TUIRoomEngineRequestCallback() override = default;
+
+    void SetCallback(RoomEngineRequestCallback callback) {
+        callback_ = callback;
+    }
+
+    void onAccepted(uint32_t requestId, const char* userId) override {
+        callback_(RequestCallbackType::kRequestAccepted, tuikit::TUIError::ERR_SUCC, requestId, TOSTRING(userId), "");
+    }
+    void onRejected(uint32_t requestId,
+        const char* userId,
+        const char* message) override {
+        callback_(RequestCallbackType::kRequestRejected, tuikit::TUIError::ERR_SUCC, requestId, TOSTRING(userId), TOSTRING(message));
+    }
+    void onTimeout(uint32_t requestId, const char* userId) override {
+        callback_(RequestCallbackType::kRequestTimeout, tuikit::TUIError::ERR_SUCC, requestId, TOSTRING(userId), "");
+    }
+    void onError(uint32_t requestId,
+        const char* userId,
+        const tuikit::TUIError code,
+        const char* message) override {
+        callback_(RequestCallbackType::kRequestError, tuikit::TUIError::ERR_FAILED, requestId, TOSTRING(userId), TOSTRING(message));
+    }
+    void onCancelled(uint32_t requestId, const char* userId) override {
+      callback_(RequestCallbackType::kRequestCancelled,
+                tuikit::TUIError::ERR_SUCC, requestId, TOSTRING(userId), "");
+    }
+
+private:
+    RoomEngineRequestCallback callback_;
 };
 
 #endif  //  MODULE_INCLUDE_TUIROOMDEF_H_

@@ -106,8 +106,8 @@ void MemberItemView::SlotMemberOperate() {
 }
 
 void MemberItemView::SlotOnUserVoiceVolume(const QString& user_id, int volume) {
-    if ((DataStore::Instance()->GetCurrentUserInfo().user_id == user_info_.user_id && user_id.isEmpty())
-        || user_id.toStdString() == user_info_.user_id) {
+    if (DataStore::Instance()->GetCurrentUserInfo().user_id == user_info_.user_id 
+        && user_id.toStdString() == user_info_.user_id) {
         int voice_level = volume / 10 - (volume % 10 > 0 ? 1 : 0);
         voice_level = voice_level > 0 ? voice_level : 0;
         QString voice_image = QString(":/VoiceLevel/VoiceLevel/mic_on_%1.png").arg(voice_level);

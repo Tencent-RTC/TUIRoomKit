@@ -3,6 +3,7 @@
 #include <QKeyEvent>
 #include "ChatRoomViewController.h"
 #include "MessageDispatcher/MessageDispatcher.h"
+#include "TXMessageBox.h"
 #include "CommonDef.h"
 #include "DataReport.h"
 #include "log.h"
@@ -41,7 +42,7 @@ void ChatRoomViewController::InitUi() {
     ui_->message_edit->installEventFilter(this);
 
     TUIRoomInfo room_info = TUIRoomCore::GetInstance()->GetRoomInfo();
-    SlotOnChatMute(room_info.is_chat_room_muted);
+    SlotOnChatMute(0, room_info.is_chat_room_muted, TUIMutedReason::kInitMute);
 }
 
 void ChatRoomViewController::InitConnect() {
@@ -51,7 +52,7 @@ void ChatRoomViewController::InitConnect() {
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnChatRoomMuted, this, &ChatRoomViewController::SlotOnChatMute);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnEnterRoom, this, [=](int code, const QString& message) {
         TUIRoomInfo room_info = TUIRoomCore::GetInstance()->GetRoomInfo();
-        this->SlotOnChatMute(room_info.is_chat_room_muted);
+        this->SlotOnChatMute(0, room_info.is_chat_room_muted, TUIMutedReason::kInitMute);
     });
     connect(ui_->all_mute_box, &QCheckBox::clicked, this, [=](bool checked) {
         if (checked) {
@@ -156,15 +157,21 @@ void ChatRoomViewController::SlotOnRoomMasterChanged(const QString& user_id) {
     }
 }
 
-void ChatRoomViewController::SlotOnChatMute(bool mute) {
+void ChatRoomViewController::SlotOnChatMute(uint32_t request_id, bool mute, TUIMutedReason reason) {
     if (user_info_.role == TUIRole::kMaster) {
         return;
     }
     if (mute) {
+        if (reason != TUIMutedReason::kInitMute) {
+            TXMessageBox::Instance().AddLineTextMessage(tr("Admin forbid all users send message."));
+        }
         ui_->message_edit->setEnabled(false);
         ui_->message_edit->setText(tr("All Mute"));
         ui_->send_btn->setEnabled(false);
     } else {
+        if (reason != TUIMutedReason::kInitMute) {
+            TXMessageBox::Instance().AddLineTextMessage(tr("Admin cancel forbid all users send message."));
+        }
         ui_->message_edit->setEnabled(true);
         ui_->message_edit->setText(tr(""));
         ui_->send_btn->setEnabled(true);

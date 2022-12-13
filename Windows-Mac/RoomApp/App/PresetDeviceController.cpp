@@ -21,6 +21,11 @@ PresetDeviceController::PresetDeviceController(QWidget* parent)
     ui.widget_audioQuality->hide();
 #endif // !_WIN32
 
+    ui.label_9->hide();
+    ui.progressBar_microphone->hide();
+    ui.label_10->hide();
+    ui.progressBar_speaker->hide();
+
     InitConnect();
 }
 
@@ -45,11 +50,9 @@ void PresetDeviceController::showEvent(QShowEvent* event) {
 
     QWidget::showEvent(event);
 }
-void PresetDeviceController::StartPreview() {
-    CameraCurrentIndexChanged(0);
-}
+
 void PresetDeviceController::OnCloseWnd() {
-    TUIRoomCore::GetInstance()->GetDeviceManager()->stopCameraDeviceTest();
+    TUIRoomCore::GetInstance()->StartCameraDeviceTest(false);
     TUIRoomCore::GetInstance()->GetDeviceManager()->stopSpeakerDeviceTest();
     TUIRoomCore::GetInstance()->GetDeviceManager()->stopMicDeviceTest();
 
@@ -72,12 +75,14 @@ void PresetDeviceController::InitUi() {
         return;
     }
     int current_camera_index = 0;
+    QStringList camera_names;
     for (int i = 0; i < camera_list->getCount(); ++i) {
-        ui.comboBox_camera->addItem(camera_list->getDeviceName(i));
+        camera_names.push_back(camera_list->getDeviceName(i));
         if (std::string(activeCam->getDevicePID()) == std::string(camera_list->getDevicePID(i))) {
             current_camera_index = i;
         }
     }
+    ui.comboBox_camera->addItems(camera_names);
     ui.comboBox_camera->setCurrentIndex(current_camera_index);
     activeCam->release();
     camera_list->release();
@@ -217,7 +222,8 @@ void PresetDeviceController::InitConnect() {
         });
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnFirstVideoFrame, this,
         [=](const QString& user_id, const TUIStreamType streamType) {
-            if (user_id.isEmpty() && streamType == TUIStreamType::kStreamTypeCamera) {
+            if (user_id.toStdString() == DataStore::Instance()->GetCurrentUserInfo().user_id
+                && streamType == TUIStreamType::kStreamTypeCamera) {
                 movie_->stop();
                 ui.loading->hide();
             }
@@ -250,12 +256,14 @@ void PresetDeviceController::ResetDeviceList(const QString& deviceId, liteav::TX
             return;
         }
         int current_camera_index = 0;
+        QStringList camera_names;
         for (int i = 0; i < camera_list->getCount(); ++i) {
-            ui.comboBox_camera->addItem(camera_list->getDeviceName(i));
+            camera_names.push_back(camera_list->getDeviceName(i));
             if (std::string(activeCam->getDevicePID()) == std::string(camera_list->getDevicePID(i))) {
                 current_camera_index = i;
             }
         }
+        ui.comboBox_camera->addItems(camera_names);
         ui.comboBox_camera->setCurrentIndex(current_camera_index);
         activeCam->release();
         camera_list->release();
@@ -314,7 +322,7 @@ void PresetDeviceController::CameraCurrentIndexChanged(int index) {
     }
     if (index < camera_list->getCount()) {
         TUIRoomCore::GetInstance()->GetDeviceManager()->setCurrentDevice(liteav::TXMediaDeviceTypeCamera, camera_list->getDevicePID(index));
-        TUIRoomCore::GetInstance()->GetDeviceManager()->startCameraDeviceTest((TXView)ui.widget_video_view->winId());
+        TUIRoomCore::GetInstance()->StartCameraDeviceTest(true, (TXView)ui.widget_video_view->winId());
     }
     camera_list->release();
 }

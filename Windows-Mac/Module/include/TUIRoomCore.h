@@ -220,6 +220,25 @@ class TUIRoomCore {
     //                  （二）本地推流接口 (Local Push APIs)
     //
     /////////////////////////////////////////////////////////////////////////////////
+        /**
+     * 2.0 开始本地摄像头测试
+     *
+     * 该接口用于打开本地摄像头进行视频预览测试。
+     *
+     * @param start 开始测试或关闭测试。
+     * @param view 承载预览画面的控件。
+     */
+
+     /**
+      * 2.1 Starting local camera test
+      *
+      * This API is used to turn on the local camera for video test.
+      *
+      * @param start Control whether to start test
+      * @param view Control that carries the preview image
+      */
+    virtual int StartCameraDeviceTest(bool start, const liteav::TXView& view = nullptr) = 0;
+
     /**
      * 2.1 开始本地摄像头预览
      *
@@ -465,9 +484,8 @@ class TUIRoomCore {
     //
     /////////////////////////////////////////////////////////////////////////////////
     /**
-     * 5.1 禁用/恢复某用户的麦克风
+     * 5.1 主持人邀请成员关闭/打开麦克风。
      *
-     * 调用该接口，主持人禁用/恢复成员麦克风，成员端回收到OnMicrophoneMuted()回调。
      *
      * @param  user_id 用户ID。
      * @param  mute true：禁用用户ID为user_id的用户麦克风；false：恢复用户ID为user_id的用户麦克风。
@@ -475,9 +493,9 @@ class TUIRoomCore {
      */
 
     /**
-     * 5.1 Disabling/Enabling user microphone
+     * 5.1 Close / Open user microphone
      *
-     * When the host calls this API to disable/enable the microphone of a member, the member will receive the `OnMicrophoneMuted()` callback.
+     * When the host calls this API to invite a member to close / open the mic.
      *
      * @param  user_id User ID
      * @param  mute true: disable the microphone of the user whose ID is `user_id`; false: enable the microphone of the user whose ID is `user_id`
@@ -618,25 +636,6 @@ class TUIRoomCore {
     virtual int ReplyCallingRoll(Callback callback) = 0;
 
     /**
-     * 5.10 主持人邀请成员发言
-     *
-     * 调用该接口，主持人邀请成员发言，成员端会收到OnReceiveSpeechInvitation()回调通知。
-     *
-     * @param  user_id 用户ID。
-     * @param  callback 信令的回调，可以根据回调知道信令是否发送成功
-     */
-
-    /**
-     * 5.10 Inviting member to speak by host
-     *
-     * When the host calls this API to invite a member to speak, the member will receive the `OnReceiveSpeechInvitation()` callback notification.
-     *
-     * @param  user_id User ID
-     * @param  callback Signaling callback, based on which you can know whether the signaling is sent successfully
-     */
-    virtual int SendSpeechInvitation(const std::string& user_id, Callback callback) = 0;
-    
-    /**
      * 5.11 主持人取消邀请成员发言
      *
      * 调用该接口，主持人取消邀请成员发言，成员端会收到OnReceiveInvitationCancelled()回调通知。
@@ -676,7 +675,7 @@ class TUIRoomCore {
      * @param  callback Signaling callback, based on which you can know whether the signaling is sent successfully
      *
      */
-    virtual int ReplySpeechInvitation(bool agree, Callback callback) = 0;
+    virtual int ReplySpeechInvitation(uint32_t request_id, bool agree, Callback callback) = 0;
 
     /**
      * 5.13 成员申请发言
@@ -800,6 +799,8 @@ class TUIRoomCore {
      * This API is used for a member to stop speaking and change their role to audience.
      */
     virtual int ExitSpeechState() = 0;
+
+    virtual int EnterSpeechState(SuccessCallback success_callback, ErrorCallback error_callback) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //

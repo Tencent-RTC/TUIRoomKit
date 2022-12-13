@@ -71,24 +71,21 @@ void MainWindowLayout::InitLayout() {
     if (main_window_ui_->chat_widget->layout() != nullptr) {
         main_window_ui_->chat_widget->layout()->addWidget(chat_room_view_control_);
     }
-    QHBoxLayout* h_layout = new QHBoxLayout(main_window_);
-    h_layout->addWidget(main_widget_control_);
-    h_layout->setSpacing(0);
-    h_layout->setMargin(0);
+
+    // 初始布局为宫格布局
+    main_widget_control_->hide();
     QVBoxLayout* v_layout = new QVBoxLayout(main_window_);
     v_layout->addWidget(stage_list_view_control_);
-    v_layout->addLayout(h_layout);
     v_layout->setSpacing(0);
     v_layout->setMargin(0);
-
     QHBoxLayout* main_layout = new QHBoxLayout(main_window_ui_->content_widget);
     main_layout->addLayout(v_layout);
     main_layout->setSpacing(0);
     main_layout->setMargin(0);
     main_window_ui_->content_widget->setLayout(main_layout);
+
     bottom_menu_bar_ = new BottomBarController(main_window_ui_->centralWidget);
     InitConnect();
-
     SlotShowChatRoom(false);
 }
 
@@ -305,6 +302,7 @@ void MainWindowLayout::SlotStageListLayoutChanged(StageListDirection direction) 
     stage_list_view_control_->SetStageListDirection(direction);
     if (direction == StageListDirection::kVerDirection) {
         delete main_window_ui_->content_widget->layout();
+        main_widget_control_->show();
         QHBoxLayout* h_layout = new QHBoxLayout(main_window_);
         h_layout->addWidget(main_widget_control_);
         h_layout->addWidget(stage_list_view_control_);
@@ -317,9 +315,22 @@ void MainWindowLayout::SlotStageListLayoutChanged(StageListDirection direction) 
         main_window_ui_->content_widget->setLayout(main_layout);
     } else if (direction == StageListDirection::kHorDirection) {
         delete main_window_ui_->content_widget->layout();
+        main_widget_control_->show();
         QVBoxLayout* v_layout = new QVBoxLayout(main_window_);
         v_layout->addWidget(stage_list_view_control_);
         v_layout->addWidget(main_widget_control_);
+        v_layout->setSpacing(0);
+        v_layout->setMargin(0);
+        QHBoxLayout* main_layout = new QHBoxLayout(main_window_ui_->content_widget);
+        main_layout->addLayout(v_layout);
+        main_layout->setSpacing(0);
+        main_layout->setMargin(0);
+        main_window_ui_->content_widget->setLayout(main_layout);
+    } else if (direction == StageListDirection::kGridDirection) {
+        delete main_window_ui_->content_widget->layout();
+        main_widget_control_->hide();
+        QVBoxLayout* v_layout = new QVBoxLayout(main_window_);
+        v_layout->addWidget(stage_list_view_control_);
         v_layout->setSpacing(0);
         v_layout->setMargin(0);
         QHBoxLayout* main_layout = new QHBoxLayout(main_window_ui_->content_widget);

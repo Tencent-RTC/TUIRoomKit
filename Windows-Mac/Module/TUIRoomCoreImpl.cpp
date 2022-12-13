@@ -12,6 +12,11 @@
 #include "ScreenShareManager.h"
 #include "log.h"
 
+#include "json.h"
+
+#define TIMEOUT 15
+#define MAX_SEAT_COUNT 8
+
 static TUIRoomCore* room_core_ = nullptr;
 static std::mutex room_core_mutex_;
 TUIRoomCore* TUIRoomCore::GetInstance() {
@@ -33,27 +38,19 @@ void TUIRoomCore::DestroyInstance() {
 }
 
 TUIRoomCoreImpl::TUIRoomCoreImpl() {
-    if (im_core_ == nullptr) {
-        im_core_ = new(std::nothrow) IMCore();
-        if (im_core_ != nullptr) {
-            im_core_->SetCallback(this);
-        }
-    }
-#ifdef _WIN32
-    sdk_version_ = getLiteAvSDKVersion();
-    LINFO("create TUIRoomCore,SDK Version : %s", sdk_version_.c_str());
-#endif
 }
 
 TUIRoomCoreImpl::~TUIRoomCoreImpl() {
     LINFO("destory TUIRoomCore");
     room_core_callback_ = nullptr;
 
-    if (im_core_ != nullptr) {
-        delete im_core_;
-        im_core_ = nullptr;
+    if (room_engine_ != nullptr) {
+        room_engine_->removeObserver(this);
+        destroyTUIRoomEngine(room_engine_);
+        room_engine_ = nullptr;
+        device_manager_ = nullptr;
+        screen_share_manager_ = nullptr;
     }
-    ClearRoomInfo();
 }
 
 void TUIRoomCoreImpl::SetCallback(TUIRoomCoreCallback* callback) {
@@ -69,14 +66,7 @@ void TUIRoomCoreImpl::ClearRoomInfo() {
 
     room_user_map_.clear();
     enter_room_success_ = false;
-    if (trtc_cloud_ != nullptr) {
-        trtc_cloud_->exitRoom();
-        trtc_cloud_->removeCallback(this);
-        destroyTRTCShareInstance();
-        trtc_cloud_ = nullptr;
-        device_manager_ = nullptr;
-        screen_share_manager_ = nullptr;
-    }
+
     LINFO("ClearRoomInfo");
 }
 
@@ -86,44 +76,55 @@ int TUIRoomCoreImpl::Login(int sdk_appid, const std::string& user_id, const std:
     user_sig_ = user_sig;
     room_user_map_[user_id] = local_user_info_;
     LINFO("User Login,sdk_app_id : %d , user_id : %s , user_sig : %s", sdk_appid, user_id.c_str(), user_sig.c_str());
-    if (trtc_cloud_ == nullptr) {
-        trtc_cloud_ = getTRTCShareInstance();
-        if (trtc_cloud_ != nullptr) {
-            device_manager_ = trtc_cloud_->getDeviceManager();
-            screen_share_manager_ = new (std::nothrow)ScreenShareManager(trtc_cloud_);
-            trtc_cloud_->addCallback(this);
-            trtc_cloud_->enableAudioVolumeEvaluation(100);
-            std::string json_api ="{\"api\": \"setFramework\", \"params\": {\"framework\": 1, \"component\": 5}}";
-            trtc_cloud_->callExperimentalAPI(json_api.c_str());
-            // IM Login
-            if (im_core_ != nullptr) {
-                im_core_->Login(sdk_appid, user_id, user_sig);
-                return 0;
-            }
+    if (room_engine_ == nullptr) {
+      room_engine_ = createTUIRoomEngine();
+        if (room_engine_ != nullptr) {
+            trtc_cloud_ = static_cast<ITRTCCloud*>(room_engine_->getTRTCCloud());
+            room_engine_->addObserver(this);
         } else {
-            LINFO("getTRTCShareInstance error,trtc_cloud is null");
+            LINFO("getRoomEngineInstance error,trtc_cloud is null");
             return -1;
         }
     }
-    return -1;
+
+    TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+    callback->SetCallback([=]() {
+            LINFO("login success.");
+            if (room_core_callback_ != nullptr) {
+                room_core_callback_->OnLogin(0, "login success.");
+            }
+            delete callback;
+        }, [=](const tuikit::TUIError code, const std::string& message) {
+            LINFO("room engine init failed: %d %s", code, message.c_str());
+            if (room_core_callback_ != nullptr) {
+                room_core_callback_->OnError(static_cast<int>(TUIRoomError::kErrorLoginFailed), "login failed.");
+            }
+
+            delete callback;
+        });
+    tuikit::TUIRoomEngine::init(sdk_appid, user_id.c_str(), user_sig.c_str(), callback);
+
+    return 0;
 }
 
 int TUIRoomCoreImpl::Logout() {
     LINFO("User Logout, user_id : %s", local_user_info_.user_id.c_str());
     local_user_info_.user_id = "";
-    local_user_info_.role = TUIRole::kMaster;
+    local_user_info_.role = TUIRole::kOther;
     local_user_info_.user_name = "";
     local_user_info_.has_audio_stream = false;
     local_user_info_.has_video_stream = false;
     local_user_info_.has_screen_stream = false;
-    // IM Logout
-    if (im_core_ != nullptr) {
-        im_core_->Logout();
-    }
+
     ClearRoomInfo();
+    if (room_core_callback_ != nullptr) {
+        room_core_callback_->OnLogout(0, "logout success.");
+    }
+
     return 0;
 }
 const char* TUIRoomCoreImpl::GetSDKVersion() {
+    sdk_version_ = TOSTRING(getLiteAvSDKVersion());
     return sdk_version_.c_str();
 }
 int TUIRoomCoreImpl::CreateRoom(const std::string& room_id, TUISpeechMode speech_mode) {
@@ -133,57 +134,264 @@ int TUIRoomCoreImpl::CreateRoom(const std::string& room_id, TUISpeechMode speech
     room_info_.room_id = room_id;
     room_info_.room_name = room_id;
     room_info_.mode = speech_mode;
+    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch());
+    room_info_.start_time = ms.count();
     room_user_map_[local_user_info_.user_id] = local_user_info_;
     LINFO("User CreateRoom, user_id : %s,room_id :%s,speech_mode : %d",
         local_user_info_.user_id.c_str(), room_id.c_str(), speech_mode);
-    // 调用【IM创建群】信令，成功后进入TRTC房间
-    // Call the **IM CreateRoomn** API and enter the TRTC room after the successful creation
-    if (im_core_ != nullptr) {
-        im_core_->CreateRoom(room_id, speech_mode);
+
+    if (room_engine_ != nullptr) {
+        TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+        callback->SetCallback([=]() {
+            if (room_core_callback_ != nullptr) {
+                room_core_callback_->OnCreateRoom(0, "create room success.");
+            }
+            delete callback;
+            }, [=](const tuikit::TUIError code, const std::string& message) {
+                LINFO("room engine create room failed: %d %s", code, message.c_str());
+                if (room_core_callback_ != nullptr) {
+                    room_core_callback_->OnCreateRoom(-1, message);
+                }
+                delete callback;
+            });
+
+        tuikit::TUIRoomInfo roomInfo;
+        roomInfo.createTime = room_info_.start_time;
+        roomInfo.roomId = room_id.c_str();
+        roomInfo.owner = local_user_info_.user_id.c_str();
+        roomInfo.name = room_info_.room_name.c_str();
+        roomInfo.enableSeatControl = false;
+        roomInfo.maxSeatCount = MAX_SEAT_COUNT;
+        roomInfo.enableAudio = true;
+        roomInfo.enableVideo = true;
+        roomInfo.enableMessage = true;
+        roomInfo.roomType = tuikit::TUIRoomType::kGroup;
+        //roomInfo.roomType = tuikit::TUIRoomType::kOpen;
+        room_engine_->createRoom(roomInfo, callback);
     }
     return 0;
 }
 int TUIRoomCoreImpl::DestroyRoom() {
     LINFO("User DestroyRoom, user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_info_.room_id.c_str());
-    if (im_core_ != nullptr) {
-        im_core_->DestroyRoom(room_info_.room_id);
+    if (room_engine_ != nullptr) {
+        TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+        callback->SetCallback([=]() {
+            LINFO("logout success.");
+            if (room_core_callback_ != nullptr) {
+                room_core_callback_->OnDestroyRoom(0, "destroy success.");
+                ClearRoomInfo();
+            }
+            delete callback;
+            }, [=](const tuikit::TUIError code, const std::string& message) {
+                LINFO("room engine logout failed: %d %s", code, message.c_str());
+                if (room_core_callback_ != nullptr) {
+                    room_core_callback_->OnDestroyRoom(-1, "logout failed.");
+                }
+                delete callback;
+            });
+        room_engine_->destroyRoom(callback);
     }
-    ClearRoomInfo();
     return 0;
 }
+void TUIRoomCoreImpl::TakeSeat(SuccessCallback success_callback,
+                               ErrorCallback error_callback) {
+  if (room_engine_ != nullptr) {
+    TUIRoomEngineRequestCallback* callback = new TUIRoomEngineRequestCallback;
+    callback->SetCallback([=](RequestCallbackType type, tuikit::TUIError code,
+                              uint32_t request_id, const std::string& user_id,
+                              const std::string& message) {
+      LINFO("room engine TakeSeat callback.");
+      switch (type) {
+        case RequestCallbackType::kRequestAccepted:
+          if (success_callback) {
+            success_callback();
+          }
+          break;
+        case RequestCallbackType::kRequestRejected:
+          if (error_callback) {
+            error_callback(0, "take seat failed");
+          }
+          break;
+        case RequestCallbackType::kRequestTimeout:
+          if (error_callback) {
+            error_callback(0, "take seat failed");
+          }
+          break;
+        case RequestCallbackType::kRequestError:
+          if (error_callback) {
+            error_callback(0, "take seat failed");
+          }
+          break;
+        case RequestCallbackType::kRequestCancelled:
+          if (error_callback) {
+            error_callback(0, "take seat failed");
+          }
+          break;
+        default:
+          if (error_callback) {
+            error_callback(0, "take seat failed");
+          }
+          break;
+      }
+      delete callback;
+    });
+    room_engine_->takeSeat(-1, TIMEOUT, callback);
+  }
+}
 
-int TUIRoomCoreImpl::EnterRoom(const std::string& room_id) {
-    if (local_user_info_.role == TUIRole::kMaster) {
-        LINFO("User EnterRoom(Master), user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_id.c_str());
-        EnterTRTCRoom();
-    } else {
-        LINFO("User EnterRoom(kAudience), user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_id.c_str());
-        room_info_.room_id = room_id;
-        room_info_.room_name = room_id;
-        if (room_info_.mode == TUISpeechMode::kApplySpeech)
-            local_user_info_.role = TUIRole::kAudience;
-        else
-            local_user_info_.role = TUIRole::kAnchor;
-        room_user_map_[local_user_info_.user_id] = local_user_info_;
-        // 调用【IM入群】信令，成功后进入TRTC房间
-        // Call the **IM EnterRoom** API and enter the TRTC room after enter room successfully
-        if (im_core_ != nullptr) {
-            LINFO("User EnterRoom(kAudience), user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_id.c_str());
-            im_core_->EnterRoom(room_id, local_user_info_.user_id);
-        }
+void TUIRoomCoreImpl::GetSeatList() {
+    TUIRoomEngineSeatListCallback* user_list_callback = new TUIRoomEngineSeatListCallback;
+    user_list_callback->SetCallback([=](tuikit::TUIList<tuikit::TUISeatInfo>* list) {
+            for (int i = 0; i < list->getSize(); i++) {
+                const tuikit::TUISeatInfo* member_info = list->getElement(i);
+                if (std::string(member_info->userId) == local_user_info_.user_id) {
+                    continue;
+                }
+                std::string remote_user_id = TOSTRING(member_info->userId);
+
+                TUIRoomEngineUserInfoCallback* user_info_callback = new TUIRoomEngineUserInfoCallback;
+                user_info_callback->SetCallback([=](tuikit::TUIUserInfo* value) {
+                        std::string user_id = std::string(value->userId);
+                        TUIUserInfo user;
+                        user.user_id = user_id;
+                        user.role = (value->userRole == tuikit::TUIRole::kRoomOwner ? TUIRole::kMaster : TUIRole::kAnchor);
+                        user.user_name = TOSTRING(value->userName);
+                        user.avatar_url = TOSTRING(value->avatarUrl);
+                        user.has_audio_stream = value->hasAudioStream;
+                        user.has_video_stream = value->hasVideoStream;
+                        user.has_screen_stream = value->hasScreenStream;
+                        room_user_map_[user.user_id] = user;
+
+                        if (room_core_callback_ != nullptr) {
+                            room_core_callback_->OnRemoteUserEnter(user_id);
+                        }
+                        delete user_info_callback;
+                    }, [=](const tuikit::TUIError code, const std::string& message) {
+                        if (room_core_callback_ != nullptr) {
+                            room_core_callback_->OnError(static_cast<int>(TUIRoomError::kErrorGetRoomMemberFailed), "tuikit room engine: get user info failed.");
+                        }
+                        delete user_info_callback;
+                    });
+                room_engine_->getUserInfo(remote_user_id.c_str(), user_info_callback); 
+            }
+            delete user_list_callback;
+        }, [=](const tuikit::TUIError code, const std::string& message) {
+            LINFO("room engine get user list failed: %d %s", code, message.c_str());
+            delete user_list_callback;
+        });
+    if (room_engine_ != nullptr) {
+        room_engine_->getSeatList(user_list_callback);
     }
+}
+void TUIRoomCoreImpl::GetUserList(uint64_t next_sequence) {
+    TUIRoomEngineUserListCallback* user_list_callback = new TUIRoomEngineUserListCallback;
+    user_list_callback->SetCallback([=](const tuikit::TUIUserListResult* user_list) {
+        for (int i = 0; i < user_list->userInfoList->getSize(); i++) {
+            const tuikit::TUIUserInfo* member_info =
+                user_list->userInfoList->getElement(i);
+            if (std::string(member_info->userId) == local_user_info_.user_id) {
+                continue;
+            }
+            std::string remote_user_id = TOSTRING(member_info->userId);
+            TUIUserInfo user;
+            user.user_id = remote_user_id;
+            user.role = (member_info->userRole == tuikit::TUIRole::kRoomOwner ? TUIRole::kMaster : TUIRole::kAnchor);
+            user.user_name = TOSTRING(member_info->userName);
+            user.avatar_url = TOSTRING(member_info->avatarUrl);
+            user.has_audio_stream = member_info->hasAudioStream;
+            user.has_video_stream = member_info->hasVideoStream;
+            user.has_screen_stream = member_info->hasScreenStream;
+            room_user_map_[user.user_id] = user;
+        }
+        if (user_list->nextSequence) {
+            GetUserList(user_list->nextSequence);
+        }
+        delete user_list_callback;
+        }, [=](const tuikit::TUIError code, const std::string& message) {
+            LINFO("room engine get user list failed: %d %s", code, message.c_str());
+            delete user_list_callback;
+        });
+    if (room_engine_ != nullptr) {
+        room_engine_->getUserList(next_sequence, user_list_callback);
+    }
+}
+int TUIRoomCoreImpl::EnterRoom(const std::string& room_id) {
+    LINFO("User EnterRoom(kAudience), user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_id.c_str());
+    room_info_.room_id = room_id;
+    room_info_.room_name = room_id;
+    if (room_info_.mode == TUISpeechMode::kApplySpeech)
+        local_user_info_.role = TUIRole::kAudience;
+    else
+        local_user_info_.role = TUIRole::kAnchor;
+    room_user_map_[local_user_info_.user_id] = local_user_info_;
+
+    if (room_engine_ != nullptr) {
+        LINFO("User EnterRoom, user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_id.c_str());
+        TUIRoomEngineRoomInfoCallback* callback = new TUIRoomEngineRoomInfoCallback;
+        callback->SetCallback([=](const tuikit::TUIRoomInfo* room_info) {
+            LINFO("enterRoom success.");
+            enter_room_success_ = true;
+
+            room_info_.is_all_camera_muted = !room_info->enableVideo;
+            room_info_.is_all_microphone_muted = !room_info->enableAudio;
+            room_info_.is_chat_room_muted = !room_info->enableMessage;
+            room_info_.mode =
+                (room_info->enableSeatControl ? TUISpeechMode::kApplySpeech
+                                              : TUISpeechMode::kFreeSpeech);
+            room_info_.start_time = room_info->createTime;
+            room_info_.owner_id = room_info->owner;
+            room_info_.room_name = room_info->name;
+            room_info_.room_id = room_info->roomId;
+            if (room_info_.owner_id == local_user_info_.user_id) {
+                if (local_user_info_.role != TUIRole::kMaster) {
+                    local_user_info_.role = TUIRole::kMaster;
+                    room_user_map_[local_user_info_.user_id] = local_user_info_;
+                }
+            }
+            GetUserList(0);
+
+            if (room_core_callback_ != nullptr) {
+              room_core_callback_->OnEnterRoom(0, "enter room success.");
+            }
+            delete callback;
+            }, [=](const tuikit::TUIError code, const std::string& message) {
+                LINFO("room engine enterRoom failed: %d %s", code, message.c_str());
+                if (room_core_callback_ != nullptr) {
+                    room_core_callback_->OnEnterRoom(-1, "enter room failed.");
+                }
+                delete callback;
+            });
+        room_engine_->enterRoom(room_id.c_str(), callback);
+    }
+
     return 0;
 }
 int TUIRoomCoreImpl::LeaveRoom() {
     LINFO("User LeaveRoom, user_id : %s,room_id :%s", local_user_info_.user_id.c_str(), room_info_.room_id.c_str());
-    if (im_core_ != nullptr) {
-        im_core_->LeaveRoom(room_info_.room_id);
+    if (room_engine_ != nullptr) {
+        TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+        callback->SetCallback([=]() {
+            LINFO("exitRoomAsync success.");
+            enter_room_success_ = false;
+            if (room_core_callback_ != nullptr) {
+                room_core_callback_->OnExitRoom(TUIExitRoomType::kNormal, "exit room success.");
+                ClearRoomInfo();
+            }
+            delete callback;
+            }, [=](const tuikit::TUIError code, const std::string& message) {
+                LINFO("room engine exitRoomAsync failed: %d %s", code, message.c_str());
+                if (room_core_callback_ != nullptr) {
+                    room_core_callback_->OnError((int)TUIRoomError::kErrorExitRoomFailed, "exit room failed.");
+                }
+                delete callback;
+            });
+        room_engine_->exitRoom(true, callback);
     }
-    ClearRoomInfo();
     return 0;
 }
 TUIRoomInfo TUIRoomCoreImpl::GetRoomInfo() {
-    return room_info_;
+     return room_info_;
 }
 
 std::vector<TUIUserInfo> TUIRoomCoreImpl::GetRoomUsers() {
@@ -206,8 +414,16 @@ int TUIRoomCoreImpl::SetSelfProfile(const std::string& user_name, const std::str
     local_user_info_.user_name = user_name;
     room_user_map_[local_user_info_.user_id] = local_user_info_;
     LINFO("User SetSelfProfile, user_name : %s, avatar_url", user_name.c_str(), avatar_url.c_str());
-    if (im_core_ != nullptr) {
-        im_core_->SetSelfProfile(user_name, avatar_url);
+    if (room_engine_ != nullptr) {
+        TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+        callback->SetCallback([=]() {
+            LINFO("room engine SetSelfProfile success.");
+            delete callback;
+            }, [=](const tuikit::TUIError code, const std::string& message) {
+                LINFO("room engine SetSelfProfile failed: %d %s", code, message.c_str());
+                delete callback;
+            });
+        room_engine_->setSelfInfo(user_name.c_str(), avatar_url.c_str(), callback);
     }
     return 0;
 }
@@ -215,75 +431,154 @@ int TUIRoomCoreImpl::SetSelfProfile(const std::string& user_name, const std::str
 int TUIRoomCoreImpl::TransferRoomMaster(const std::string& user_id) {
     LINFO("TransferRoomMasterToOther, user_id : %s", user_id.c_str());
     auto iter = room_user_map_.find(user_id);
-    if (im_core_) {
-        if (iter != room_user_map_.end() && iter->second.role == TUIRole::kAnchor) {
-            im_core_->TransferRoomMaster(room_info_.room_id, iter->second.user_id);
+    if (iter != room_user_map_.end() && iter->second.role == TUIRole::kAnchor) {
+        if (room_engine_) {
+            TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+            callback->SetCallback([=]() {
+                    LINFO("room engine changeUserRole success.");
+                    delete callback;
+                }, [=](const tuikit::TUIError code, const std::string& message) {
+                    LINFO("room engine changeUserRole failed: %d %s", code, message.c_str());
+                    delete callback;
+                });
+            room_engine_->changeUserRole(user_id.c_str(), tuikit::TUIRole::kRoomOwner, callback);
         }
     }
     return 0;
 }
 
-int TUIRoomCoreImpl::StartCameraPreview(const liteav::TXView& view) {
-    if (trtc_cloud_ == nullptr) {
+int TUIRoomCoreImpl::StartCameraDeviceTest(bool start, const liteav::TXView& view) {
+    if (room_engine_ == nullptr) {
         return -1;
     }
-    if (local_user_info_.role != TUIRole::kMaster) {
-        local_user_info_.role = TUIRole::kAnchor;
-        trtc_cloud_->switchRole(liteav::TRTCRoleAnchor);
+    if (start) {
+        LINFO("StartCameraDeviceTest");
+        TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+        callback->SetCallback([=]() {
+            LINFO("room engine openLocalCamera success.");
+            this->OnFirstVideoFrame(local_user_info_.user_id.c_str(), TUIStreamType::kStreamTypeCamera);
+            delete callback;
+            }, [=](const tuikit::TUIError code, const std::string& message) {
+                LINFO("room engine openLocalCamera failed: %d %s", code, message.c_str());
+                delete callback;
+            });
+        room_engine_->setLocalVideoView(tuikit::TUIVideoStreamType::kCameraStream, view);
+        room_engine_->openLocalCamera(callback);
+
+        local_user_info_.has_subscribed_video_stream = true;
+    } else {
+        room_engine_->closeLocalCamera();
+        local_user_info_.has_video_stream = false;
+        local_user_info_.has_subscribed_video_stream = false;
+    }
+    room_user_map_[local_user_info_.user_id] = local_user_info_;
+
+    return 0;
+}
+
+int TUIRoomCoreImpl::StartCameraPreview(const liteav::TXView& view) {
+    if (room_engine_ == nullptr) {
+        return -1;
     }
     LINFO("StartCameraPreview");
-    liteav::TXView local_view = (liteav::TXView)(view);
-    trtc_cloud_->startLocalPreview(local_view);
+    room_engine_->setLocalVideoView(tuikit::TUIVideoStreamType::kCameraStream,
+                                    view);
+    TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+    callback->SetCallback([=]() {
+        LINFO("room engine openLocalCamera success.");
+          if (trtc_cloud_) {
+            liteav::TRTCRenderParams render_params;
+            render_params.fillMode = liteav::TRTCVideoFillMode_Fit;
+            trtc_cloud_->setLocalRenderParams(render_params);
+          }
+          room_engine_->startPushLocalVideo();
+        this->OnFirstVideoFrame(local_user_info_.user_id.c_str(), TUIStreamType::kStreamTypeCamera);
+        delete callback;
+        }, [=](const tuikit::TUIError code, const std::string& message) {
+            LINFO("room engine openLocalCamera failed: %d %s", code, message.c_str());
+            delete callback;
+        });
 
-    liteav::TRTCRenderParams param;
-    param.rotation = TRTCVideoRotation0;
-    param.fillMode = TRTCVideoFillMode_Fill;
-    param.mirrorType = camera_mirror_ ? liteav::TRTCVideoMirrorType_Enable : liteav::TRTCVideoMirrorType_Disable;
-    trtc_cloud_->setLocalRenderParams(param);
-    trtc_cloud_->setVideoEncoderMirror(camera_mirror_);
-
-    local_user_info_.has_video_stream = true;
+    room_engine_->openLocalCamera(callback);
+ 
     local_user_info_.has_subscribed_video_stream = true;
     room_user_map_[local_user_info_.user_id] = local_user_info_;
+
     return 0;
 }
 int TUIRoomCoreImpl::StopCameraPreview() {
-    if (trtc_cloud_ == nullptr) {
-        return -1; 
+    if (room_engine_ == nullptr) {
+        return -1;
     }
-    trtc_cloud_->stopLocalPreview();
     LINFO("StopCameraPreview");
+    room_engine_->stopPushLocalVideo();
+    room_engine_->closeLocalCamera();
     local_user_info_.has_video_stream = false;
     local_user_info_.has_subscribed_video_stream = false;
     room_user_map_[local_user_info_.user_id] = local_user_info_;
+
     return 0;
 }
 int TUIRoomCoreImpl::UpdateCameraPreview(const liteav::TXView& view) {
-    if (trtc_cloud_ == nullptr) {
+    if (room_engine_ == nullptr) {
         return -1;
     }
-    trtc_cloud_->updateLocalView((liteav::TXView)(view));
+    room_engine_->setLocalVideoView(tuikit::TUIVideoStreamType::kCameraStream, view);
     return 0;
 }
 
 int TUIRoomCoreImpl::StartLocalAudio(const liteav::TRTCAudioQuality& quality) {
-    if (trtc_cloud_ == nullptr) {
+    if (room_engine_ == nullptr) {
         return -1;
     }
     LINFO("StartLocalAudio");
-    trtc_cloud_->startLocalAudio(quality);
+
+    tuikit::TUIAudioProfile tui_room_audio_quality;
+    switch (quality) {
+      case liteav::TRTCAudioQuality::TRTCAudioQualityDefault:
+        tui_room_audio_quality = tuikit::TUIAudioProfile::kAudioProfileDefault;
+        break;
+      case liteav::TRTCAudioQuality::TRTCAudioQualityMusic:
+        tui_room_audio_quality = tuikit::TUIAudioProfile::kAudioProfileMusic;
+        break;
+      case liteav::TRTCAudioQuality::TRTCAudioQualitySpeech:
+        tui_room_audio_quality = tuikit::TUIAudioProfile::kAudioProfileSpeech;
+        break;
+      default:
+        tui_room_audio_quality = tuikit::TUIAudioProfile::kAudioProfileDefault;
+        break;
+    }
+    room_engine_->setLocalAudioProfile(tui_room_audio_quality);
+
+    TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+    callback->SetCallback([=]() {
+        LINFO("room engine openLocalMicrophone success.");
+          room_engine_->startPushLocalAudio();
+        delete callback;
+        }, [=](const tuikit::TUIError code, const std::string& message) {
+            LINFO("room engine openLocalMicrophone failed: %d %s", code, message.c_str());
+            delete callback;
+        });
+    room_engine_->openLocalMicrophone(callback);
+
     audio_quality_ = quality;
     local_user_info_.has_audio_stream = true;
     local_user_info_.has_subscribed_audio_stream = true;
     room_user_map_[local_user_info_.user_id] = local_user_info_;
+    if (open_ai_noise_reduction_) {
+        OpenAINoiseReduction();
+    }
     return 0;
 }
 int TUIRoomCoreImpl::StopLocalAudio() {
-    if (trtc_cloud_ == nullptr) {
+    if (room_engine_ == nullptr) {
         return -1;
     }
     LINFO("StopLocalAudio");
-    trtc_cloud_->stopLocalAudio();
+
+    room_engine_->stopPushLocalAudio();
+    room_engine_->closeLocalMicrophone();
+
     local_user_info_.has_audio_stream = false;
     local_user_info_.has_subscribed_audio_stream = false;
     room_user_map_[local_user_info_.user_id] = local_user_info_;
@@ -291,50 +586,80 @@ int TUIRoomCoreImpl::StopLocalAudio() {
 }
 
 int TUIRoomCoreImpl::StartSystemAudioLoopback() {
-    if (trtc_cloud_ != nullptr) {
-        LINFO("StartSystemAudioLoopback");
+    LINFO("StartSystemAudioLoopback");
+    if (trtc_cloud_) {
         trtc_cloud_->startSystemAudioLoopback();
-        return 0;
     }
+
     return -1;
 }
 
 int TUIRoomCoreImpl::StopSystemAudioLoopback() {
-    if (trtc_cloud_ != nullptr) {
-        LINFO("StopSystemAudioLoopback");
+    LINFO("StopSystemAudioLoopback");
+    if (trtc_cloud_) {
         trtc_cloud_->stopSystemAudioLoopback();
-        return 0;
     }
+
     return -1;
 }
 
 int TUIRoomCoreImpl::StartRemoteView(const std::string& user_id, const liteav::TXView& view, TUIStreamType type) {
-    if (trtc_cloud_ == nullptr) {
+    if (room_engine_ == nullptr) {
         return -1;
     }
     auto iter = room_user_map_.find(user_id);
     if (iter == room_user_map_.end()) {
         return -1;
     }
-    LINFO("StartRemoteView , user_id : %s, user_name : %s, stream_type : %d", user_id.c_str(),iter->second.user_name.c_str(), type);
-    liteav::TRTCVideoStreamType stream_type;
+    LINFO("StartRemoteView , user_id : %s, user_name : %s, stream_type : %d", user_id.c_str(), iter->second.user_name.c_str(), type);
+    tuikit::TUIVideoStreamType stream_type;
     switch (type) {
     case TUIStreamType::kStreamTypeCamera:
-        stream_type = liteav::TRTCVideoStreamTypeBig;
+        stream_type = tuikit::TUIVideoStreamType::kCameraStream;
         iter->second.has_subscribed_video_stream = true;
         break;
     case TUIStreamType::kStreamTypeScreen:
-        stream_type = liteav::TRTCVideoStreamTypeSub;
+        stream_type = tuikit::TUIVideoStreamType::kScreenStream;
         iter->second.has_subscribed_screen_stream = true;
         break;
     default:
         break;
     }
-    trtc_cloud_->startRemoteView(user_id.c_str(), stream_type, (liteav::TXView)(view));
+
+    TUIRoomEnginePlayCallback* callback = new TUIRoomEnginePlayCallback;
+    callback->SetCallback([=](const std::string& user_id) {
+        LINFO("room engine startPlayRemoteVideoStream playing.");
+        this->OnFirstVideoFrame(user_id.c_str(), type);
+        if (trtc_cloud_) {
+          TRTCRenderParams render_params;
+          render_params.fillMode = liteav::TRTCVideoFillMode_Fit;
+          if (type == TUIStreamType::kStreamTypeCamera)
+            trtc_cloud_->setRemoteRenderParams(
+                user_id.c_str(),
+                liteav::TRTCVideoStreamType::TRTCVideoStreamTypeBig,
+                render_params);
+          else {
+            trtc_cloud_->setRemoteRenderParams(
+                user_id.c_str(),
+                liteav::TRTCVideoStreamType::TRTCVideoStreamTypeSub,
+                render_params);
+          }
+        }
+        delete callback;
+    }, [=](const std::string& user_id) {
+        LINFO("room engine startPlayRemoteVideoStream loading.");
+
+    }, [=](const std::string& user_id, tuikit::TUIError code, const std::string& message) {
+        LINFO("room engine startPlayRemoteVideoStream failed: %d %s", code, message.c_str());
+        delete callback;
+    });
+    room_engine_->setRemoteRenderView(user_id.c_str(), stream_type, view);
+    room_engine_->startPlayRemoteVideo(user_id.c_str(), stream_type, callback);
+
     return 0;
 }
 int TUIRoomCoreImpl::StopRemoteView(const std::string& user_id, TUIStreamType type) {
-    if (trtc_cloud_ == nullptr) {
+    if (room_engine_ == nullptr) {
         return -1;
     }
     auto iter = room_user_map_.find(user_id);
@@ -343,269 +668,408 @@ int TUIRoomCoreImpl::StopRemoteView(const std::string& user_id, TUIStreamType ty
     }
     LINFO("StopRemoteView , user_id : %s, user_name : %s, stream_type : %d", user_id.c_str(), iter->second.user_name.c_str(), type);
     if (type == TUIStreamType::kStreamTypeCamera) {
-        trtc_cloud_->stopRemoteView(user_id.c_str(), liteav::TRTCVideoStreamTypeBig);
+        room_engine_->stopPlayRemoteVideo(user_id.c_str(), tuikit::TUIVideoStreamType::kCameraStream);
         iter->second.has_subscribed_video_stream = false;
     } else if (type == TUIStreamType::kStreamTypeScreen) {
-        trtc_cloud_->stopRemoteView(user_id.c_str(), liteav::TRTCVideoStreamTypeSub);
+        room_engine_->stopPlayRemoteVideo(user_id.c_str(), tuikit::TUIVideoStreamType::kScreenStream);
         iter->second.has_subscribed_screen_stream = false;
     }
     return 0;
 }
 
 int TUIRoomCoreImpl::UpdateRemoteView(const std::string& user_id, TUIStreamType type, const liteav::TXView& view) {
-    if (trtc_cloud_ == nullptr) {
+    if (room_engine_ == nullptr) {
         return -1;
     }
-    liteav::TRTCVideoStreamType stream_type;
+    auto iter = room_user_map_.find(user_id);
+    if (iter == room_user_map_.end()) {
+        return -1;
+    }
+    tuikit::TUIVideoStreamType stream_type;
     switch (type) {
     case TUIStreamType::kStreamTypeCamera:
-        stream_type = liteav::TRTCVideoStreamTypeBig;
+        stream_type = tuikit::TUIVideoStreamType::kCameraStream;
+        iter->second.has_subscribed_video_stream = true;
         break;
     case TUIStreamType::kStreamTypeScreen:
-        stream_type = liteav::TRTCVideoStreamTypeSub;
+        stream_type = tuikit::TUIVideoStreamType::kScreenStream;
+        iter->second.has_subscribed_screen_stream = true;
         break;
     default:
         break;
     }
-    trtc_cloud_->updateRemoteView(user_id.c_str(), stream_type, view);
+    room_engine_->setRemoteRenderView(user_id.c_str(), stream_type, view);
     return 0;
 }
 
 int TUIRoomCoreImpl::SendChatMessage(const std::string& message) {
-    // 调用【IM发送消息】
-    // Call the **IM SendChatMessage** API
-    if (im_core_ != nullptr) {
-        LINFO("SendChatMessage , message : %s", message.c_str());
-        im_core_->SendChatMessage(room_info_.room_id, local_user_info_.user_id, message);
+    if (room_engine_ == nullptr) {
+        return -1;
     }
+    LINFO("SendChatMessage , message : %s", message.c_str());
+    TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+    callback->SetCallback([=]() {
+        LINFO("room engine SendChatMessage success.");
+        delete callback;
+        }, [=](const tuikit::TUIError code, const std::string& message) {
+            LINFO("room engine SendChatMessage failed: %d %s", code, message.c_str());
+            delete callback;
+        });
+    room_engine_->sendTextMessage(message.c_str(), callback);
+
     return 0;
 }
 
 int TUIRoomCoreImpl::SendCustomMessage(const std::string& message) {
-    if (im_core_ != nullptr) {
-        LINFO("SendChatMessage , message : %s", message.c_str());
-        im_core_->SendChatMessage(room_info_.room_id, local_user_info_.user_id, message);
+    if (room_engine_ == nullptr) {
+        return -1;
     }
+    LINFO("SendCustomMessage , message : %s", message.c_str());
+    TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+    callback->SetCallback([=]() {
+        LINFO("room engine SendCustomMessage success.");
+        delete callback;
+        }, [=](const tuikit::TUIError code, const std::string& message) {
+            LINFO("room engine SendCustomMessage failed: %d %s", code, message.c_str());
+            delete callback;
+        });
+    room_engine_->sendCustomMessage(message.c_str(), callback);
+
     return 0;
 }
 
 int TUIRoomCoreImpl::MuteUserMicrophone(const std::string& user_id, bool mute, Callback callback) {
-    if (trtc_cloud_ == nullptr) {
-        return -1;
-    }
     LINFO("MuteUserMicrophone , user_id : %s, mute : %d", user_id.c_str(), mute);
-    if (im_core_ != nullptr) {
-        im_core_->MuteUserMicrophone(room_info_.room_id, local_user_info_.user_id, user_id, mute, callback);
+    if (room_engine_ != nullptr) {
+        if (mute) {
+          TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+          callback->SetCallback([=]() {}, [=](const tuikit::TUIError code,
+                                              const std::string& message) {});
+          room_engine_->closeRemoteMicrophone(user_id.c_str(), callback);
+        } else {
+          TUIRoomEngineRequestCallback* request_callback =
+              new TUIRoomEngineRequestCallback;
+          request_callback->SetCallback(
+              [=](RequestCallbackType type, tuikit::TUIError code,
+                  uint32_t request_id, const std::string& user_id,
+                  const std::string& message) {
+                LINFO("room engine MuteUserMicrophone callback.");
+                if (callback != nullptr) {
+                  switch (type) {
+                    case RequestCallbackType::kRequestAccepted:
+                      callback(RequestCallbackType::kRequestAccepted,
+                               "Request Accepted");
+                      break;
+                    case RequestCallbackType::kRequestRejected:
+                      callback(RequestCallbackType::kRequestRejected,
+                               "Request Rejected");
+                      break;
+                    case RequestCallbackType::kRequestTimeout:
+                      callback(RequestCallbackType::kRequestTimeout,
+                               "Request Timeout");
+                      break;
+                    case RequestCallbackType::kRequestError:
+                      callback(RequestCallbackType::kRequestError,
+                               "Request Error:" + message);
+                      break;
+                    default:
+                      break;
+                  }
+                }
+                delete request_callback;
+              });
+            room_engine_->requestToOpenRemoteMicrophone(user_id.c_str(), TIMEOUT, request_callback);
+        }
     }
     return 0;
 }
 
 int TUIRoomCoreImpl::MuteAllUsersMicrophone(bool mute) {
-    if (im_core_ == nullptr) {
-        return -1;
-    }
     LINFO("MuteAllUsersMicrophone");
-    im_core_->MuteAllUsersMicrophone(room_info_.room_id, mute);
+    bool old_is_all_microphone_muted = room_info_.is_all_microphone_muted;
     room_info_.is_all_microphone_muted = mute;
+    if (room_engine_ != nullptr) {
+        tuikit::TUIRoomInfo roomInfo;
+        roomInfo.createTime = room_info_.start_time;
+        roomInfo.enableAudio = !mute;
+        roomInfo.enableMessage = !room_info_.is_chat_room_muted;
+        roomInfo.enableVideo = !room_info_.is_all_camera_muted;
+        roomInfo.roomMemberCount = room_info_.room_member_num;
+        roomInfo.maxSeatCount = MAX_SEAT_COUNT;
+        roomInfo.name = room_info_.room_name.c_str();
+        roomInfo.owner = room_info_.owner_id.c_str();
+        roomInfo.roomId = room_info_.room_id.c_str();
+        roomInfo.enableSeatControl = (room_info_.mode == TUISpeechMode::kApplySpeech ? true : false);
+        roomInfo.roomType = tuikit::TUIRoomType::kGroup;
+
+        TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+        callback->SetCallback([=]() {
+            LINFO("room engine updateRoomInfo success.");
+            delete callback;
+            }, [=](const tuikit::TUIError code, const std::string& message) {
+                LINFO("room engine updateRoomInfo failed: %d %s", code, message.c_str());
+                room_info_.is_all_microphone_muted = old_is_all_microphone_muted;
+                delete callback;
+            });
+        room_engine_->updateRoomInfo(roomInfo, callback);
+    }
     return 0;
 }
 
 int TUIRoomCoreImpl::MuteUserCamera(const std::string& user_id, bool mute, Callback callback) {
-    if (trtc_cloud_ == nullptr) {
-        return -1;
-    }
     LINFO("MuteUserCamera , user_id : %s, mute : %d", user_id.c_str(), mute);
-    if (im_core_ != nullptr) {
-        im_core_->MuteUserCamera(room_info_.room_id, local_user_info_.user_id, user_id, mute, callback);
+    if (room_engine_ != nullptr) {
+        if (mute) {
+        TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+          callback->SetCallback([=]() {}, [=](const tuikit::TUIError code,
+                                              const std::string& message) {});
+        room_engine_->closeRemoteCamera(user_id.c_str(), callback);
+        } else {
+          TUIRoomEngineRequestCallback* request_callback =
+              new TUIRoomEngineRequestCallback;
+          request_callback->SetCallback(
+              [=](RequestCallbackType type, tuikit::TUIError code,
+                  uint32_t request_id, const std::string& user_id,
+                  const std::string& message) {
+                LINFO("room engine MuteUserMicrophone callback.");
+                if (callback != nullptr) {
+                  switch (type) {
+                    case RequestCallbackType::kRequestAccepted:
+                      callback(RequestCallbackType::kRequestAccepted,
+                               "Request Accepted");
+                      break;
+                    case RequestCallbackType::kRequestRejected:
+                      callback(RequestCallbackType::kRequestRejected,
+                               "Request Rejected");
+                      break;
+                    case RequestCallbackType::kRequestTimeout:
+                      callback(RequestCallbackType::kRequestTimeout,
+                               "Request Timeout");
+                      break;
+                    case RequestCallbackType::kRequestError:
+                      callback(RequestCallbackType::kRequestError,
+                               "Request Error:" + message);
+                      break;
+                    default:
+                      break;
+                  }
+                }
+                delete request_callback;
+              });
+            room_engine_->requestToOpenRemoteCamera(user_id.c_str(), TIMEOUT, request_callback);
+        }
     }
     return 0;
 }
 
 int TUIRoomCoreImpl::MuteAllUsersCamera(bool mute) {
-    if (im_core_ == nullptr) {
-        return -1;
-    }
     LINFO("MuteAllUsersCamera");
-    im_core_->MuteAllUsersCamera(room_info_.room_id, mute);
+    bool old_is_all_camera_muted = room_info_.is_all_camera_muted;
     room_info_.is_all_camera_muted = mute;
+    if (room_engine_ != nullptr) {
+        tuikit::TUIRoomInfo roomInfo;
+        roomInfo.createTime = room_info_.start_time;
+        roomInfo.enableAudio = !room_info_.is_all_microphone_muted;
+        roomInfo.enableMessage = !room_info_.is_chat_room_muted;
+        roomInfo.enableVideo = !mute;
+        roomInfo.roomMemberCount = room_info_.room_member_num;
+        roomInfo.maxSeatCount = MAX_SEAT_COUNT;
+        roomInfo.name = room_info_.room_name.c_str();
+        roomInfo.owner = room_info_.owner_id.c_str();
+        roomInfo.roomId = room_info_.room_id.c_str();
+        roomInfo.enableSeatControl = (room_info_.mode == TUISpeechMode::kApplySpeech ? true : false);
+        roomInfo.roomType = tuikit::TUIRoomType::kGroup;
+
+        TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+        callback->SetCallback([=]() {
+            LINFO("room engine updateRoomInfo success.");
+            delete callback;
+            }, [=](const tuikit::TUIError code, const std::string& message) {
+                LINFO("room engine updateRoomInfo failed: %d %s", code, message.c_str());
+                room_info_.is_all_camera_muted = old_is_all_camera_muted;
+                delete callback;
+            });
+        room_engine_->updateRoomInfo(roomInfo, callback);
+    }
     return 0;
 }
 
 int TUIRoomCoreImpl::MuteChatRoom(bool mute) {
-    room_info_.is_chat_room_muted = mute;
-    LINFO("MuteChatRoom, mute : %d", mute);
-    if (local_user_info_.role == TUIRole::kMaster && im_core_ != nullptr) {
-        im_core_->MuteRoomChat(room_info_.room_id, mute);
+    if (local_user_info_.role == TUIRole::kMaster) {
+        LINFO("MuteChatRoom, mute : %d", mute);
+        bool old_is_chat_room_muted = room_info_.is_chat_room_muted;
+        room_info_.is_chat_room_muted = mute;
+        if (room_engine_ != nullptr) {
+            tuikit::TUIRoomInfo roomInfo;
+            roomInfo.createTime = room_info_.start_time;
+            roomInfo.enableAudio = !room_info_.is_all_microphone_muted;
+            roomInfo.enableMessage = !mute;
+            roomInfo.enableVideo = !room_info_.is_all_camera_muted;
+            roomInfo.roomMemberCount = room_info_.room_member_num;
+            roomInfo.maxSeatCount = MAX_SEAT_COUNT;
+            roomInfo.name = room_info_.room_name.c_str();
+            roomInfo.owner = room_info_.owner_id.c_str();
+            roomInfo.roomId = room_info_.room_id.c_str();
+            roomInfo.enableSeatControl = (room_info_.mode == TUISpeechMode::kApplySpeech ? true : false);
+            roomInfo.roomType = tuikit::TUIRoomType::kGroup;
+
+            TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+            callback->SetCallback([=]() {
+                LINFO("room engine updateRoomInfo success.");
+                delete callback;
+                }, [=](const tuikit::TUIError code, const std::string& message) {
+                    LINFO("room engine updateRoomInfo failed: %d %s", code, message.c_str());
+                    room_info_.is_chat_room_muted = old_is_chat_room_muted;
+                    delete callback;
+                });
+            room_engine_->updateRoomInfo(roomInfo, callback);
+        }
     }
     return 0;
 }
 
 int TUIRoomCoreImpl::KickOffUser(const std::string& user_id, Callback callback) {
-    if (im_core_ != nullptr) {
-        LINFO("KickOffUser user_id : %s", user_id.c_str());
-        im_core_->KickOffUser(room_info_.room_id, user_id, callback);
+    LINFO("KickOffUser user_id : %s", user_id.c_str());
+    if (room_engine_ == nullptr) {
+        return -1;
     }
+    TUIRoomEngineCallback* tui_callback = new TUIRoomEngineCallback;
+    tui_callback->SetCallback([=]() {
+        LINFO("room engine kickoutRemoteUser success.");
+        if (room_core_callback_ != nullptr) {
+            room_core_callback_->OnRemoteUserLeave(user_id);
+        }
+        delete tui_callback;
+        }, [=](const tuikit::TUIError code, const std::string& message) {
+            LINFO("room engine kickoutRemoteUser failed: %d %s", code, message.c_str());
+            if (callback) {
+                callback(RequestCallbackType::kRequestError, message.c_str());
+            }
+            delete tui_callback;
+        });
+    room_engine_->kickOutRemoteUser(user_id.c_str(), tui_callback);
+
     return 0;
 }
 
 int TUIRoomCoreImpl::StartCallingRoll() {
     LINFO("StartCallingRoll");
-    if (im_core_ != nullptr) {
-        im_core_->StartCallingRoll(room_info_.room_id);
-    }
     return 0;
 }
 
 int TUIRoomCoreImpl::StopCallingRoll() {
     LINFO("StopCallingRoll");
-    if (im_core_ != nullptr) {
-        im_core_->StopCallingRoll(room_info_.room_id);
-    }
     return 0;
 }
 
 int TUIRoomCoreImpl::ReplyCallingRoll(Callback callback) {
     LINFO("ReplyCallingRoll");
-    if (im_core_ != nullptr) {
-        auto iter = find_if(room_user_map_.begin(), room_user_map_.end(), [](std::unordered_map<std::string, TUIUserInfo>::value_type info) {
-            return info.second.role == TUIRole::kMaster;
-        });
-        if (iter != room_user_map_.end()) {
-            im_core_->ReplyCallingRoll(room_info_.room_id, local_user_info_.user_id, iter->second.user_id, callback);
-        }
-    }
-    return 0;
-}
-
-int TUIRoomCoreImpl::SendSpeechInvitation(const std::string& user_id, Callback callback) {
-    LINFO("SendSpeechInvitation user_id : %s", user_id.c_str());
-    if (im_core_ != nullptr) {
-        im_core_->SendSpeechInvitation(room_info_.room_id, local_user_info_.user_id, user_id, callback);
-    }
     return 0;
 }
 
 int TUIRoomCoreImpl::CancelSpeechInvitation(const std::string& user_id, Callback callback) {
     LINFO("CancelSpeechInvitation user_id : %s", user_id.c_str());
-    if (im_core_ != nullptr) {
-        im_core_->CancelSpeechInvitation(room_info_.room_id, local_user_info_.user_id, user_id, callback);
-    }
+
     return 0;
 }
 
-int TUIRoomCoreImpl::ReplySpeechInvitation(bool agree, Callback callback) {
+int TUIRoomCoreImpl::ReplySpeechInvitation(uint32_t request_id, bool agree, Callback callback) {
     LINFO("User ReplySpeechInvitation agree : %d", agree);
-    if (im_core_ != nullptr) {
-        auto iter = find_if(room_user_map_.begin(), room_user_map_.end(), [](std::unordered_map<std::string,TUIUserInfo>::value_type info) {
-            return info.second.role == TUIRole::kMaster;
-        });
-        if (agree && local_user_info_.role != TUIRole::kMaster) {
-            local_user_info_.role = TUIRole::kAnchor;
-            room_user_map_[local_user_info_.user_id] = local_user_info_;
-            trtc_cloud_->switchRole(liteav::TRTCRoleAnchor);
+    auto iter = std::find(received_request_ids_.begin(), received_request_ids_.end(), request_id);
+    if (iter != received_request_ids_.end()) {
+        if (room_engine_ != nullptr) {
+            TUIRoomEngineCallback* request_callback = new TUIRoomEngineCallback;
+            request_callback->SetCallback([=]() {
+                    delete request_callback;
+                },
+                [=](const tuikit::TUIError code, const std::string& message) {
+                    delete request_callback;
+                });
+            room_engine_->responseRemoteRequest(request_id, agree, request_callback);
         }
-        if (iter != room_user_map_.end()) {
-            im_core_->ReplySpeechInvitation(room_info_.room_id, local_user_info_.user_id, iter->second.user_id, agree, callback);
+        if (agree && callback) {
+            callback(RequestCallbackType::kRequestAccepted, "");
         }
+        received_request_ids_.erase(iter);
+    } else if (callback) {
+        callback(RequestCallbackType::kRequestTimeout, "The request has been timeout.");
     }
     return 0;
 }
 
 int TUIRoomCoreImpl::SendSpeechApplication(Callback callback) {
     LINFO("User SendSpeechApplication");
-    if (im_core_ != nullptr) {
-        auto iter = find_if(room_user_map_.begin(), room_user_map_.end(), [](std::unordered_map<std::string, TUIUserInfo>::value_type info) {
-            return info.second.role == TUIRole::kMaster;
-        });
-        if (iter != room_user_map_.end()) {
-            im_core_->SendSpeechApplication(room_info_.room_id, local_user_info_.user_id, iter->second.user_id, callback);
-        }
-    }
+
     return 0;
 }
 
 int TUIRoomCoreImpl::CancelSpeechApplication(Callback callback) {
     LINFO("User CancelSpeechApplication");
-    if (im_core_ != nullptr) {
-        auto iter = find_if(room_user_map_.begin(), room_user_map_.end(), [](std::unordered_map<std::string, TUIUserInfo>::value_type info) {
-            return info.second.role == TUIRole::kMaster;
-            });
-        if (iter != room_user_map_.end()) {
-            im_core_->CancelSpeechApplication(room_info_.room_id, local_user_info_.user_id, iter->second.user_id, callback);
-        }
-    }
+
     return 0;
 }
 
 int TUIRoomCoreImpl::ReplySpeechApplication(const std::string& user_id, bool agree, Callback callback) {
     LINFO("Master ReplySpeechApplication user_id :%s,agree : %d", user_id.c_str(), agree);
-    if (im_core_ != nullptr) {
-        im_core_->ReplySpeechApplication(room_info_.room_id, local_user_info_.user_id, user_id, agree, callback);
-    }
+
     return 0;
 }
 
 int TUIRoomCoreImpl::ForbidSpeechApplication(bool forbid) {
-    if (im_core_ == nullptr) {
-        return -1;
-    }
-    im_core_->ForbidSpeechApplication(room_info_.room_id, forbid);
+
     return 0;
 }
 
 int TUIRoomCoreImpl::SendOffSpeaker(const std::string& user_id, Callback callback) {
     LINFO("SendOffSpeaker user_id : %s", user_id.c_str());
-    if (im_core_ != nullptr) {
-        im_core_->SendOffSpeaker(room_info_.room_id, local_user_info_.user_id, user_id, callback);
-    }
+
     return 0;
 }
 
 int TUIRoomCoreImpl::SendOffAllSpeakers(Callback callback) {
     LINFO("SendOffAllSpeakers");
-    if (im_core_ != nullptr) {
-        std::vector<std::string> users;
-        for (auto user : room_user_map_) {
-            if (user.second.user_id != local_user_info_.user_id) {
-                users.push_back(user.second.user_id);
-            }
-        }
-        im_core_->SendOffAllSpeakers(room_info_.room_id, local_user_info_.user_id, users, callback);
-    }
+
     return 0;
 }
 
 int TUIRoomCoreImpl::ExitSpeechState() {
-    if (trtc_cloud_ == nullptr) {
-        return -1;
+    if (room_engine_) {
+        TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+        callback->SetCallback(
+            [=]() {
+              local_user_info_.has_screen_stream = false;
+              local_user_info_.has_subscribed_screen_stream = false;
+              local_user_info_.has_audio_stream = false;
+              local_user_info_.has_subscribed_audio_stream = false;
+              local_user_info_.has_video_stream = false;
+              local_user_info_.has_subscribed_video_stream = false;
+              room_user_map_[local_user_info_.user_id] = local_user_info_;
+              delete callback;
+            },
+            [=](const tuikit::TUIError code, const std::string& message) {
+              delete callback;
+            });
+        room_engine_->leaveSeat(callback);
     }
-    LINFO("User StopSpeaking");
-    trtc_cloud_->stopLocalPreview();
-    trtc_cloud_->stopLocalAudio();
 
-    if (local_user_info_.role != TUIRole::kMaster &&  local_user_info_.role != TUIRole::kAudience) {
-        trtc_cloud_->switchRole(liteav::TRTCRoleAudience);
-        local_user_info_.role = TUIRole::kAudience;
-    }
-    local_user_info_.has_screen_stream = false;
-    local_user_info_.has_subscribed_screen_stream = false;
-    local_user_info_.has_audio_stream = false;
-    local_user_info_.has_subscribed_audio_stream = false;
-    local_user_info_.has_video_stream = false;
-    local_user_info_.has_subscribed_video_stream = false;
-    room_user_map_[local_user_info_.user_id] = local_user_info_;
     return 0;
+}
+
+int TUIRoomCoreImpl::EnterSpeechState(SuccessCallback success_callback,
+                                      ErrorCallback error_callback) {
+  TakeSeat(success_callback, error_callback);
+  return 0;
 }
 
 liteav::ITXDeviceManager* TUIRoomCoreImpl::GetDeviceManager() {
     if (device_manager_ == nullptr) {
-        device_manager_ = trtc_cloud_->getDeviceManager();
+        device_manager_ = room_engine_->getDeviceManager();
     }
     return device_manager_;
 }
 IScreenShareManager* TUIRoomCoreImpl::GetScreenShareManager() {
     if (screen_share_manager_ == nullptr) {
-        screen_share_manager_ = new (std::nothrow)ScreenShareManager(trtc_cloud_);
+        screen_share_manager_ = new (std::nothrow)ScreenShareManager(room_engine_, room_core_callback_);
     }
     return screen_share_manager_;
 }
@@ -659,27 +1123,39 @@ int TUIRoomCoreImpl::SetVideoMirror(bool mirror) {
 }
 
 int TUIRoomCoreImpl::OpenAINoiseReduction() {
-    std::stringstream ans_level;
-    ans_level << "{\"api\":\"enableAudioANS\",\"params\":{\"enable\":1,\"level\":120}}";
-    if (trtc_cloud_ != nullptr) {
-        trtc_cloud_->callExperimentalAPI(ans_level.str().c_str());
+    open_ai_noise_reduction_ = true;
+    if (enter_room_success_) {
+        std::stringstream ans_level;
+        if (audio_quality_ == TRTCAudioQualityMusic) {
+            ans_level << "{\"api\":\"enableAudioANS\",\"params\":{\"enable\":1,\"level\":60}}";
+        } else {
+            ans_level << "{\"api\":\"enableAudioANS\",\"params\":{\"enable\":1,\"level\":120}}";
+        }
+        if (trtc_cloud_ != nullptr) {
+            trtc_cloud_->callExperimentalAPI(ans_level.str().c_str());
+        }
+        LINFO("OpenAINoiseReduction");
     }
     return 0;
 }
 
 int TUIRoomCoreImpl::CloseAINoiseReduction() {
-    std::stringstream ans_level;
-    int level = 120;
-    if (audio_quality_ == TRTCAudioQualitySpeech) {
-        level = 120;
-    } else if(audio_quality_ == TRTCAudioQualityDefault) {
-        level = 60;
-    } else {
-        level = 20;
-    }
-    ans_level << "{\"api\":\"enableAudioANS\",\"params\":{\"enable\":1,\"level\":" << level <<"}}";
-    if (trtc_cloud_ != nullptr) {
-        trtc_cloud_->callExperimentalAPI(ans_level.str().c_str());
+    open_ai_noise_reduction_ = false;
+    if (enter_room_success_) {
+        std::stringstream ans_level;
+        int level = 120;
+        if (audio_quality_ == TRTCAudioQualitySpeech) {
+            level = 100;
+        } else if (audio_quality_ == TRTCAudioQualityDefault) {
+            level = 60;
+        } else {
+            level = 60;
+        }
+        ans_level << "{\"api\":\"enableAudioANS\",\"params\":{\"enable\":1,\"level\":" << level << "}}";
+        if (trtc_cloud_ != nullptr) {
+            trtc_cloud_->callExperimentalAPI(ans_level.str().c_str());
+        }
+        LINFO("CloseAINoiseReduction");
     }
     return 0;
 }
@@ -696,192 +1172,6 @@ int TUIRoomCoreImpl::ShowDebugView(int show_type) {
 //////////////////////////////////////////////////////////////////////////
 //                        TRTC callback functions
 //////////////////////////////////////////////////////////////////////////
-void TUIRoomCoreImpl::onEnterRoom(int result) {
-    if (result > 0) {
-        LINFO("User onEnterRoom,cost time :%d,current role : %d", result, local_user_info_.role);
-        enter_room_success_ = true;
-        LINFO("User onEnterRoom after cost time :%d,current role : %d", result, local_user_info_.role);
-    }
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnEnterRoom(result, room_info_.room_id);
-    }
-}
-void TUIRoomCoreImpl::onExitRoom(int reason) {
-    LINFO("User onExitRoom,data :%d", reason);
-    enter_room_success_ = false;
-}
-void TUIRoomCoreImpl::onUserVideoAvailable(const char* user_id, bool available) {
-    auto iter = room_user_map_.find(user_id);
-    if (iter == room_user_map_.end()) {
-        return;
-    }
-    iter->second.has_video_stream = available;
-    LINFO("onUserVideoAvailable,user_id :%s,user_name : %s,available :%d", user_id, iter->second.user_name.c_str(), available);
-    liteav::TRTCRenderParams param;
-    param.rotation = TRTCVideoRotation0;
-    param.fillMode = TRTCVideoFillMode_Fill;
-    param.mirrorType = TRTCVideoMirrorType_Disable;
-    trtc_cloud_->setRemoteRenderParams(user_id, TRTCVideoStreamTypeBig, param);
-
-    std::string remote_user_id = user_id;
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnRemoteUserCameraAvailable(remote_user_id, available);
-    }
-}
-void TUIRoomCoreImpl::onUserSubStreamAvailable(const char* user_id, bool available) {
-    auto iter = room_user_map_.find(user_id);
-    if (iter == room_user_map_.end()) {
-        return;
-    }
-    iter->second.has_screen_stream = available;
-    LINFO("onUserSubStreamAvailable,user_id :%s,user_name: %s,available :%d", user_id, iter->second.user_name.c_str(), available);
-    liteav::TRTCRenderParams param;
-    param.rotation = TRTCVideoRotation0;
-    param.fillMode = TRTCVideoFillMode_Fit;
-    param.mirrorType = TRTCVideoMirrorType_Disable;
-    trtc_cloud_->setRemoteRenderParams(user_id, TRTCVideoStreamTypeSub, param);
-
-    std::string remote_user_id = user_id;
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnRemoteUserScreenAvailable(remote_user_id, available);
-    }
-}
-void TUIRoomCoreImpl::onScreenCaptureStoped(int reason) {
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnScreenCaptureStopped(reason);
-	}
-    local_user_info_.has_screen_stream = false;
-    room_user_map_[local_user_info_.user_id] = local_user_info_;
-}
-void TUIRoomCoreImpl::onScreenCaptureStarted() {
-    LINFO("onScreenCaptureStarted");
-    local_user_info_.has_screen_stream = true;
-    room_user_map_[local_user_info_.user_id] = local_user_info_;
-}
-void TUIRoomCoreImpl::onUserAudioAvailable(const char* user_id, bool available) {
-    auto iter = room_user_map_.find(user_id);
-    if (iter == room_user_map_.end()) {
-        return;
-    }
-    iter->second.has_audio_stream = available;
-    iter->second.has_subscribed_audio_stream = available;
-    LINFO("onUserAudioAvailable,user_id :%s, user_name:%s, available :%d", user_id, iter->second.user_name.c_str(), available);
-    std::string remote_user_id = user_id;
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnRemoteUserAudioAvailable(remote_user_id, available);
-    }
-}
-void TUIRoomCoreImpl::onFirstVideoFrame(const char* user_id, const liteav::TRTCVideoStreamType stream_type,
-    const int width, const int height) {
-    TUIStreamType type;
-    switch (stream_type) {
-    case liteav::TRTCVideoStreamType::TRTCVideoStreamTypeBig:
-        type = TUIStreamType::kStreamTypeCamera;
-        break;
-    case liteav::TRTCVideoStreamType::TRTCVideoStreamTypeSub:
-        type = TUIStreamType::kStreamTypeScreen;
-        break;
-    }
-    LINFO("onFirstVideoFrame,user_id :%s,stream_type :%d, width:%d, height:%d", user_id, stream_type, width, height);
-
-    std::string str_user_id(user_id);
-    if (str_user_id.empty() && enter_room_success_) {
-        if (stream_type == TRTCVideoStreamTypeBig) {
-            local_user_info_.has_video_stream = true;
-            local_user_info_.has_subscribed_video_stream = true;
-        } else if (stream_type == TRTCVideoStreamTypeSub) {
-            local_user_info_.has_screen_stream = true;
-            local_user_info_.has_subscribed_screen_stream = true;
-        }
-        room_user_map_[local_user_info_.user_id] = local_user_info_;
-    } else {
-        if (room_user_map_.find(str_user_id) != room_user_map_.end()) {
-            if (stream_type == TRTCVideoStreamTypeBig) {
-                room_user_map_[str_user_id].has_video_stream = true;
-                room_user_map_[str_user_id].has_subscribed_video_stream = true;
-            } else if (stream_type == TRTCVideoStreamTypeSub) {
-                room_user_map_[str_user_id].has_screen_stream = true;
-                room_user_map_[str_user_id].has_subscribed_screen_stream = true;
-            }
-        }
-    }
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnFirstVideoFrame(str_user_id, type);
-    }
-}
-
-void TUIRoomCoreImpl::onRemoteUserEnterRoom(const char* user_id) {
-    std::string remote_user_id(user_id);
-    auto iter = room_user_map_.find(user_id);
-    LINFO("onRemoteUserEnterRoom,user_id :%s", user_id);
-    // 已经进入im房间的成员转换为kAnchor角色
-    // Members already in the IM room will be converted to the `kAnchor` role
-    if (iter != room_user_map_.end()) {
-        LINFO("User Enter IM before TRTC,user_id :%s user_name:%s ,role: %d", user_id, iter->second.user_name.c_str(), iter->second.role);
-        if (iter->second.role == TUIRole::kAudience) {
-            iter->second.role = TUIRole::kAnchor;
-        }
-        LINFO("User Enter IM,user_id :%s ,role: %d", user_id, iter->second.role);
-        if (room_core_callback_ != nullptr) {
-            room_core_callback_->OnRemoteUserEnterSpeechState(remote_user_id);
-        }
-        return;
-    }
-
-    // TRTC用户 或 成员先进入了TRTC房间，才进入IM群聊，先认为是其他用户
-    // A TRTC user or member enters the TRTC room first and then the IM group chat as a `Other` user by default
-    LINFO("User Enter TRTC before IM or Other Member,user_id :%s", user_id);
-    TUIUserInfo user;
-    user.user_id = remote_user_id;
-    user.role = TUIRole::kOther;
-    room_user_map_[remote_user_id] = user;
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnRemoteUserEnter(remote_user_id);
-    }
-}
-
-void TUIRoomCoreImpl::onRemoteUserLeaveRoom(const char* user_id, int reason) {
-    std::string remote_user_id(user_id);
-    auto iter = room_user_map_.find(user_id);
-    if (iter == room_user_map_.end()) {
-        return;
-    }
-    LINFO("onRemoteUserLeaveRoom,user_id :%s, role: %d, reason :%d", user_id, iter->second.role, reason);
-    // TRTC用户退房
-    // A TRTC user exits the room
-    if (iter->second.role == TUIRole::kOther) {
-        room_user_map_.erase(remote_user_id);
-        if (room_core_callback_ != nullptr) {
-            room_core_callback_->OnRemoteUserLeave(remote_user_id);
-        }
-    } else if (iter->second.role == TUIRole::kAnchor) {
-        LINFO("User Leave Room,user_id :%s user_name:%s ,role: %d", user_id, iter->second.user_name.c_str(), iter->second.role);
-        if (iter->second.role == TUIRole::kAnchor) {
-            iter->second.role = TUIRole::kAudience;
-        }
-        if (room_core_callback_ != nullptr) {
-            room_core_callback_->OnRemoteUserExitSpeechState(remote_user_id);
-        }
-    }
-}
-
-void TUIRoomCoreImpl::onUserVoiceVolume(liteav::TRTCVolumeInfo* user_volumes, uint32_t user_volumes_count, uint32_t total_volume) {
-    // 当没有人说话时，userVolumes 为空，totalVolume 为 0。
-    // If there is no one speaking, `userVolumes` will be empty, and `totalVolume` will be `0`
-    if (user_volumes == NULL)
-        return;
-
-    for (int i = 0; i < user_volumes_count; i++) {
-        liteav::TRTCVolumeInfo volume = user_volumes[i];
-        std::string user_id(volume.userId);
-        int user_voice_volume = volume.volume;
-
-        if (room_core_callback_ != nullptr) {
-            room_core_callback_->OnUserVoiceVolume(user_id, user_voice_volume);
-        }
-    }
-}
-
 void TUIRoomCoreImpl::onError(TXLiteAVError error_code, const char* error_message, void* extra_info) {
     int trtc_error_code;
 
@@ -933,444 +1223,517 @@ void TUIRoomCoreImpl::onWarning(TXLiteAVWarning warning_code, const char* warnin
         }
     }
 }
-void TUIRoomCoreImpl::onLog(const char* log, liteav::TRTCLogLevel level, const char* module) {
-}
 
-void TUIRoomCoreImpl::onTestSpeakerVolume(uint32_t volume) {
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnTestSpeakerVolume(volume);
-    }
-}
+// new private function:
+void TUIRoomCoreImpl::OnFirstVideoFrame(const char* user_id, const TUIStreamType stream_type) {
+    LINFO("onFirstVideoFrame [user_id :%s] [stream_type:%d]", user_id, stream_type);
 
-void TUIRoomCoreImpl::onTestMicVolume(uint32_t volume) {
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnTestMicrophoneVolume(volume);
-    }
-}
-void TUIRoomCoreImpl::onAudioDeviceCaptureVolumeChanged(uint32_t volume, bool muted) {
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnAudioDeviceCaptureVolumeChanged(volume, muted);
-    }
-}
-void TUIRoomCoreImpl::onAudioDevicePlayoutVolumeChanged(uint32_t volume, bool muted) {
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnAudioDevicePlayoutVolumeChanged(volume, muted);
-    }
-}
-
-void TUIRoomCoreImpl::onNetworkQuality(liteav::TRTCQualityInfo local_quality,
-    liteav::TRTCQualityInfo* remote_quality, uint32_t remote_quality_count) {
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnNetworkQuality(local_quality, remote_quality, remote_quality_count);
-    }
-}
-
-void TUIRoomCoreImpl::onStatistics(const liteav::TRTCStatistics& statistics) {
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnStatistics(statistics);
-    }
-}
-
-void TUIRoomCoreImpl::EnterTRTCRoom() {
-    // 创建群成功(角色是房主) 或 进入群成功（角色是成员）
-    // Created a group (as the room owner) or entered a group (as a member) successfully
-    // 进入TRTC房间
-    // Enter a TRTC room
-    if (trtc_cloud_ == nullptr) {
-        return;
-    }
-    liteav::TRTCParams params;
-    if (local_user_info_.role == TUIRole::kMaster || room_info_.mode == TUISpeechMode::kFreeSpeech) {
-        params.role = liteav::TRTCRoleAnchor;
-    } else {
-        params.role = liteav::TRTCRoleAudience;
-    }
-    params.sdkAppId = sdk_app_id_;
-    params.userId = local_user_info_.user_id.c_str();
-    std::string room_id(room_info_.room_id);
-    room_id = room_id.substr(room_id.find_last_of('_')+1);
-    if (room_id.length() == 0) {
-        return;
-    }
-
-    std::regex reg("[0-9]+");
-    if (std::regex_match(room_id, reg)) {
-        params.roomId = atoi(room_id.c_str());
-    } else {
-        params.roomId = 0;
-        params.strRoomId = room_id.c_str();
-    }
-    params.userSig = user_sig_.c_str();
-    LINFO("User EnterTRTCRoom, sdk_app_id : %d, user_id: %s, user_name : %s, role: %d room_id: %s",
-        sdk_app_id_, local_user_info_.user_id.c_str(), local_user_info_.user_name.c_str(),
-        local_user_info_.role, room_id.c_str());
-    trtc_cloud_->enterRoom(params, liteav::TRTCAppSceneLIVE);
-}
-
-//////////////////////////////////////////////////////////////////////////
-//              IM回调函数 (IM callback functions)
-//////////////////////////////////////////////////////////////////////////
-void TUIRoomCoreImpl::OnIMError(int code, const std::string& message) {
-    LINFO("OnIMError error :%d, message %s", code, message.c_str());
-	TUIRoomError error = static_cast<TUIRoomError>(code);
-    if (error == TUIRoomError::kErrorCreateRoomFailed) {
-        // 创建房间失败
-        // Failed to create the room.
-        LINFO("User Create Room Failed");
-        local_user_info_.role = TUIRole::kAudience;
+    std::string str_user_id = TOSTRING(user_id);
+    if (str_user_id == local_user_info_.user_id && enter_room_success_) {
+        if (stream_type == TUIStreamType::kStreamTypeCamera) {
+            local_user_info_.has_video_stream = true;
+            local_user_info_.has_subscribed_video_stream = true;
+        } else if (stream_type == TUIStreamType::kStreamTypeScreen) {
+            local_user_info_.has_screen_stream = true;
+            local_user_info_.has_subscribed_screen_stream = true;
+        }
         room_user_map_[local_user_info_.user_id] = local_user_info_;
-    }
-    if (error == TUIRoomError::kErrorTransferRoomFailed) {
-        // 转让房间失败,解散房间
-        // Failed to transfer the room. Dismiss the room
-        LINFO("User Transfer Room Failed");
-        im_core_->DestroyRoom(room_info_.room_id);
-    }
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnError(code, message);
-    }
-}
-void TUIRoomCoreImpl::OnIMLogin(int code, const std::string& message) {
-    LINFO("OnIMLogin code :%d, message %s", code, message.c_str());
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnLogin(code, message);
-    }
-}
-void TUIRoomCoreImpl::OnIMLogout(int code, const std::string& message) {
-    LINFO("OnIMLogout code :%d, message %s", code, message.c_str());
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnLogout(code, message);
-    }
-}
-void TUIRoomCoreImpl::OnIMCreateRoom(int code, const std::string& message) {
-    // 群已经存在，当房主被异地登出后，重新登录需要获取房间成员列表
-    // The group already exists. After being logged out remotely, the room owner needs to get the room member list after re-login
-    LINFO("OnIMCreateRoom code :%d, message %s", code, message.c_str());
-    if (code != 0 && im_core_ != nullptr) {
-        im_core_->GetRoomInfo(room_info_.room_id);
-        im_core_->GetRoomMemberInfoList(room_info_.room_id);
-    } else if (code == 0) {
-        if (room_core_callback_ != nullptr) {
-            room_core_callback_->OnCreateRoom(code, message);
-            std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::system_clock::now().time_since_epoch());
-            room_info_.start_time = ms.count();
+        str_user_id = local_user_info_.user_id;
+    } else {
+        if (room_user_map_.find(str_user_id) != room_user_map_.end()) {
+            if (stream_type == TUIStreamType::kStreamTypeCamera) {
+                room_user_map_[str_user_id].has_video_stream = true;
+                room_user_map_[str_user_id].has_subscribed_video_stream = true;
+            } else if (stream_type == TUIStreamType::kStreamTypeScreen) {
+                room_user_map_[str_user_id].has_screen_stream = true;
+                room_user_map_[str_user_id].has_subscribed_screen_stream = true;
+            }
         }
     }
-}
-void TUIRoomCoreImpl::OnIMDestroyRoom(int code, const std::string& message) {
-    LINFO("OnIMDestroyRoom code :%d, message %s", code, message.c_str());
-    if (!enter_room_success_ || local_user_info_.role != TUIRole::kMaster) {
-        return;
-    }
     if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnDestroyRoom(code, message);
-    }
-    ClearRoomInfo();
-}
-void TUIRoomCoreImpl::OnIMEnterRoom(int code, const std::string& message) {
-    // 登录成功，立即调用【IM获取成员列表】信令
-    // Login succeeded. Call the **GetRoomMemberInfoList** signaling immediately
-    // 如果是成员，需要先获取群列表和群信息，才能进房间
-    // If the user is a member, the user needs to get the group list and information to enter the room
-    LINFO("OnIMEnterRoom code :%d, message %s,role: %d", code, message.c_str(), local_user_info_.role);
-    if (im_core_ != nullptr && local_user_info_.role != TUIRole::kMaster) {
-        im_core_->GetRoomInfo(room_info_.room_id);
-        im_core_->GetRoomMemberInfoList(room_info_.room_id);
-    } else {
-        this->EnterTRTCRoom();
-    }
-}
-void TUIRoomCoreImpl::OnIMExitRoom(TUIExitRoomType code, const std::string& message) {
-    // 自己收到该回调，调用TRTC的退出房间接口
-    // Receive the callback and call the TRTC exit room API
-    LINFO("OnIMExitRoom code :%d, message %s,role: %d", code, message.c_str(), local_user_info_.role);
-    if (!enter_room_success_ && code != TUIExitRoomType::kKickOffLine) {
-        return;
-    }
-    // 主持人不响应房间销毁和被踢出房间消息
-    // The host does not respond to room termination and user removal messages
-    if (local_user_info_.role == TUIRole::kMaster && 
-        (code == TUIExitRoomType::kRoomDestoryed || code == TUIExitRoomType::kKickOff)) {
-        return;
-    }
-    enter_room_success_ = false;
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnExitRoom(code, message);
-    }
-}
-void TUIRoomCoreImpl::OnIMUserExitRoom(int code, const std::string& user_id) {
-    LINFO("OnIMUserExitRoom code :%d, user_id %s", code, user_id.c_str());
-    room_user_map_.erase(user_id);
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnRemoteUserLeave(user_id);
+        room_core_callback_->OnFirstVideoFrame(str_user_id, stream_type);
     }
 }
 
-void TUIRoomCoreImpl::OnIMRoomMasterChanged(const std::string& user_id){
-    LINFO("OnIMRoomMasterChanged user_id %s", user_id.c_str());
-    if (user_id == room_info_.owner_id) {
-        LINFO("Current master is %s,don't need change", user_id.c_str());
-        return;
+// TUIRoomEngine callback
+void TUIRoomCoreImpl::onError(tuikit::TUIError error_code, const char* message){}
+void TUIRoomCoreImpl::onKickedOutOfRoom(const char* room_id,const char* message) {
+  LINFO("onKickedOutOfRoom [room_id:%s] [message:%s]", room_id, message);
+    if (room_core_callback_ != nullptr) {
+        room_core_callback_->OnExitRoom(TUIExitRoomType::kKickOff, "room engine kicked out of room.");
     }
-    auto iter = room_user_map_.begin();
-    for (; iter != room_user_map_.end(); iter++) {
+}
+void TUIRoomCoreImpl::onKickedOffLine(const char* message) {
+  LINFO("onKickedOffLine [message:%s]", message);
+    if (room_core_callback_ != nullptr) {
+        room_core_callback_->OnExitRoom(TUIExitRoomType::kKickOffLine, "room engine kicked off line.");
+    }
+}
+void TUIRoomCoreImpl::onUserSigExpired() {
+  LINFO("onUserSigExpired");
+    if (room_core_callback_ != nullptr) {
+        room_core_callback_->OnExitRoom(TUIExitRoomType::kUserSigExpired, "room engine user signature expired.");
+    }
+}
+void TUIRoomCoreImpl::onRoomDismissed(const char* room_id) {
+  LINFO("onRoomDismissed [room_id:%s]", room_id);
+    if (room_engine_) {
+        TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
+        callback->SetCallback([=]() {
+                delete callback;
+            },
+            [=](const tuikit::TUIError code, const std::string& message) {
+                delete callback;
+            });
+        room_engine_->exitRoom(true, callback);
+    }
+
+    // TODO：RoomEngine 的 ExitRoom 会返回失败，这里强制界面退出
+    if (room_core_callback_ != nullptr) {
+        room_core_callback_->OnExitRoom(TUIExitRoomType::kRoomDestoryed, "room dismissed.");
+    }
+}
+void TUIRoomCoreImpl::onRoomInfoChanged(const char* room_id,
+                                        const tuikit::TUIRoomInfo& room_info) {
+  std::stringstream log_stream;
+  log_stream << "onRoomInfoChanged, [room_id:" << TOSTRING(room_id)
+             << "] [RoomInfo: room_type:"
+             << static_cast<int>(room_info.roomType)
+             << "] [owner:" << TOSTRING(room_info.owner)
+             << "] [name:" << TOSTRING(room_info.name)
+             << "] [create_time:" << room_info.createTime
+             << "] [room_member_count:" << room_info.roomMemberCount
+             << "] [max_seat_count" << room_info.maxSeatCount
+             << "] [enable_video:" << room_info.enableVideo
+             << "] [enable_audio:" << room_info.enableAudio
+             << "] [enable_message:" << room_info.enableMessage
+             << "] [enable_seat_control:" << room_info.enableSeatControl << "]";
+  LINFO(log_stream.str().c_str());
+
+  if (room_core_callback_ != nullptr) {
+    std::string new_master = TOSTRING(room_info.owner);
+    if (new_master != room_info_.owner_id) {
+      LINFO("Current master is %s,don't need change", room_info.owner);
+
+      auto iter = room_user_map_.begin();
+      for (; iter != room_user_map_.end(); iter++) {
         if (iter->second.role == TUIRole::kMaster) {
-            iter->second.role = TUIRole::kAnchor;
-        } else if (iter->second.user_id == user_id) {
-            iter->second.role = TUIRole::kMaster;
+          iter->second.role = TUIRole::kAnchor;
+        } else if (iter->second.user_id == new_master) {
+          iter->second.role = TUIRole::kMaster;
         }
+      }
+
+      room_info_.owner_id = new_master;
+      if (local_user_info_.user_id == new_master) {
+        local_user_info_.role = TUIRole::kMaster;
+      }
+      if (room_core_callback_ != nullptr) {
+        room_core_callback_->OnRoomMasterChanged(new_master);
+      }
+    } else {
+      if (room_core_callback_ != nullptr &&
+          local_user_info_.role != TUIRole::kMaster) {
+        if (!room_info.enableVideo != room_info_.is_all_camera_muted) {
+          room_info_.is_all_camera_muted = !room_info.enableVideo;
+          room_core_callback_->OnCameraMuted(
+              0, room_info_.is_all_camera_muted,
+              TUIMutedReason::kAdminMuteAllUsers);
+        }
+        if (!room_info.enableAudio != room_info_.is_all_microphone_muted) {
+          room_info_.is_all_microphone_muted = !room_info.enableAudio;
+          room_core_callback_->OnMicrophoneMuted(
+              0, room_info_.is_all_microphone_muted,
+              TUIMutedReason::kAdminMuteAllUsers);
+        }
+        if (!room_info.enableMessage != room_info_.is_chat_room_muted) {
+          room_info_.is_chat_room_muted = !room_info.enableMessage;
+          room_core_callback_->OnChatRoomMuted(
+              0, room_info_.is_chat_room_muted,
+              TUIMutedReason::kAdminMuteAllUsers);
+        }
+      }
+    }
+  }
+}
+void TUIRoomCoreImpl::onRemoteUserEnterRoom(const char* room_id, const tuikit::TUIUserInfo& user_info) {
+  std::stringstream log_stream;
+  log_stream << "onRemoteUserEnterRoom, [room_id:" << TOSTRING(room_id)
+             << "] [UserInfo, user_id:" << TOSTRING(user_info.userId)
+             << "] [user_name:" << TOSTRING(user_info.userName)
+             << "] [user_url:" << TOSTRING(user_info.avatarUrl)
+             << "] [user_role:" << static_cast<int>(user_info.userRole)
+             << "] [has_audio_stream:" << user_info.hasAudioStream
+             << "] [has_video_stream:" << user_info.hasVideoStream
+             << "] [has_screen_stream:" << user_info.hasScreenStream << "]";
+  LINFO(log_stream.str().c_str());
+  
+  std::string user_id = TOSTRING(user_info.userId);
+  if (room_user_map_.find(user_id) == room_user_map_.end()) {
+    TUIUserInfo tui_user_info;
+    tui_user_info.user_id = user_id;
+    tui_user_info.user_name = TOSTRING(user_info.userName);
+    tui_user_info.avatar_url = TOSTRING(user_info.avatarUrl);
+    tui_user_info.role = TUIRole::kAnchor;
+    tui_user_info.has_video_stream = false;
+    tui_user_info.has_subscribed_video_stream = false;
+    tui_user_info.has_audio_stream = false;
+    tui_user_info.has_subscribed_audio_stream = false;
+    tui_user_info.has_screen_stream = false;
+    tui_user_info.has_subscribed_screen_stream = false;
+
+    room_user_map_[user_id] = tui_user_info;
+  }
+  if (room_core_callback_ != nullptr) {
+    room_core_callback_->OnRemoteUserEnter(TOSTRING(user_info.userId));
+  }
+}
+void TUIRoomCoreImpl::onRemoteUserLeaveRoom(
+    const char* room_id, const tuikit::TUIUserInfo& user_info) {
+  std::stringstream log_stream;
+  log_stream << "onRemoteUserLeaveRoom, [room_id:" << TOSTRING(room_id)
+             << "] [UserInfo, user_id:" << TOSTRING(user_info.userId)
+             << "] [user_name:" << TOSTRING(user_info.userName)
+             << "] [user_url:" << TOSTRING(user_info.avatarUrl)
+             << "] [user_role:" << static_cast<int>(user_info.userRole)
+             << "] [has_audio_stream:" << user_info.hasAudioStream
+             << "] [has_video_stream:" << user_info.hasVideoStream
+             << "] [has_screen_stream:" << user_info.hasScreenStream << "]";
+  LINFO(log_stream.str().c_str());
+  std::string user_id = TOSTRING(user_info.userId);
+  auto iter = room_user_map_.find(user_id);
+  if (iter != room_user_map_.end()) {
+    room_user_map_.erase(iter);
+  }
+  if (room_core_callback_ != nullptr) {
+    room_core_callback_->OnRemoteUserLeave(TOSTRING(user_info.userId));
+  }
+}
+void TUIRoomCoreImpl::onUserRoleChanged(const char* user_id, const tuikit::TUIRole& role) {
+  LINFO("onUserRoleChanged, [user_id:%s] [role:%d]", user_id,
+        static_cast<int>(role));
+}
+void TUIRoomCoreImpl::onUserMuteStateChanged(const char* user_id, bool muted) {
+  LINFO("onUserMuteStateChanged, [user_id:%s] [muted:%d]");
+}
+void TUIRoomCoreImpl::onUserVideoStateChanged(
+    const char* user_id,
+    tuikit::TUIVideoStreamType stream_type, bool has_video,
+    tuikit::TUIChangeReason reason) {
+  std::stringstream log_stream;
+  log_stream << "onUserVideoStateChanged, [user_id:" << TOSTRING(user_id)
+             << "] [stream_type:" << static_cast<int>(stream_type)
+             << "] [has_video:" << has_video << "] [reason:"
+             << static_cast<int>(reason) << "]";
+  LINFO(log_stream.str().c_str());
+
+  if (user_id == local_user_info_.user_id) {
+    if (room_core_callback_ && has_video == false && reason == tuikit::TUIChangeReason::kChangedByAdmin) {
+      room_core_callback_->OnCameraMuted(0, true,
+                                         TUIMutedReason::kMutedByAdmin);
+    }
+      return;
+  }
+  auto iter = room_user_map_.find(TOSTRING(user_id));
+  if (iter == room_user_map_.end()) {
+    return;
+  }
+  liteav::TRTCRenderParams param;
+  param.rotation = TRTCVideoRotation0;
+  param.fillMode = TRTCVideoFillMode_Fill;
+  param.mirrorType = TRTCVideoMirrorType_Disable;
+
+  std::string str_user_id = TOSTRING(user_id);
+  if (stream_type == tuikit::TUIVideoStreamType::kScreenStream) {
+    LINFO(
+        "onUserScreenShareStateChanged,user_id :%s,user_name: %s,available "
+        ":%d",
+        user_id, iter->second.user_name.c_str(), has_video);
+
+    trtc_cloud_->setRemoteRenderParams(user_id, TRTCVideoStreamTypeSub, param);
+
+    iter->second.has_screen_stream = has_video;
+    if (room_core_callback_ != nullptr) {
+      room_core_callback_->OnRemoteUserScreenAvailable(str_user_id, has_video);
     }
 
-    room_info_.owner_id = user_id;
-    if (local_user_info_.user_id == user_id) {
-        local_user_info_.role = TUIRole::kMaster;
+    if (str_user_id == local_user_info_.user_id) {
+      if (has_video) {
+        local_user_info_.has_screen_stream = true;
+        room_user_map_[local_user_info_.user_id] = local_user_info_;
+      } else {
+        if (room_core_callback_ != nullptr) {
+          room_core_callback_->OnScreenCaptureStopped(0);
+        }
+        local_user_info_.has_screen_stream = false;
+        room_user_map_[local_user_info_.user_id] = local_user_info_;
+      }
+    }
+  } else if (stream_type ==
+             tuikit::TUIVideoStreamType::kCameraStream) {
+    LINFO("onUserVideoStateChanged,user_id :%s,user_name : %s,available :%d",
+          str_user_id.c_str(), iter->second.user_name.c_str(), has_video);
+    trtc_cloud_->setRemoteRenderParams(user_id, TRTCVideoStreamTypeBig, param);
+
+    iter->second.has_video_stream = has_video;
+    if (room_core_callback_ != nullptr) {
+      room_core_callback_->OnRemoteUserCameraAvailable(str_user_id, has_video);
+    }
+  }
+}
+void TUIRoomCoreImpl::onUserAudioStateChanged(
+    const char* user_id, bool has_audio,
+    tuikit::TUIChangeReason reason) {
+  std::stringstream log_stream;
+  log_stream << "onUserAudioStateChanged, [user_id:" << TOSTRING(user_id)
+             << "] [has_audio:" << has_audio
+             << "] [reason:" << static_cast<int>(reason) << "]";
+  LINFO(log_stream.str().c_str());
+  if (user_id == local_user_info_.user_id) {
+    if (room_core_callback_ && has_audio == false && reason == tuikit::TUIChangeReason::kChangedByAdmin) {
+      room_core_callback_->OnMicrophoneMuted(0, true,
+                                             TUIMutedReason::kMutedByAdmin);
+    }
+      return;
+  }
+  auto iter = room_user_map_.find(TOSTRING(user_id));
+  if (iter == room_user_map_.end()) {
+    return;
+  }
+  auto str_user_id = TOSTRING(user_id);
+  iter->second.has_audio_stream = has_audio;
+  iter->second.has_subscribed_audio_stream = has_audio;
+  LINFO("onUserAudioAvailable,user_id :%s, user_name:%s, available :%d",
+        str_user_id.c_str(), iter->second.user_name.c_str(), has_audio);
+  if (room_core_callback_ != nullptr) {
+    room_core_callback_->OnRemoteUserAudioAvailable(str_user_id, has_audio);
+  }
+}
+void TUIRoomCoreImpl::onUserVoiceVolumeChanged(tuikit::TUIMap<const char*, int>* volumeMap) {
+    const tuikit::TUIList<const char*>* keys = (*volumeMap).allKeys();
+    for (int i = 0; i < keys->getSize(); i++) {
+        const char* user_id = *(keys->getElement(i));
+        int volume = *((*volumeMap).getValue(user_id));
+        if (user_id == nullptr) {
+            user_id = local_user_info_.user_id.c_str();
+        }
+        if (room_core_callback_ != nullptr) {
+            room_core_callback_->OnUserVoiceVolume(user_id, volume);
+        }
+    }
+}
+void TUIRoomCoreImpl::onUserScreenCaptureStopped(int reason) {
+  LINFO("onUserScreenCaptureStopped, reason:%d", reason);
+    if (room_core_callback_ != nullptr) {
+        room_core_callback_->OnScreenCaptureStopped(reason);
+    }
+}
+void TUIRoomCoreImpl::onUserNetworkQualityChanged(tuikit::TUIList<tuikit::TUINetwork>* network_list) {
+    uint32_t i = network_list->getSize();
+    std::vector<tuikit::TUINetwork> network_item_list;
+    for (int i = 0; i < network_list->getSize(); i++) {
+        const tuikit::TUINetwork* item = network_list->getElement(i);
+        network_item_list.push_back(*item);
     }
     if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnRoomMasterChanged(user_id);
+        room_core_callback_->OnNetworkQuality(network_item_list);
+        //room_core_callback_->OnStatistics(statistics);
     }
 }
+void TUIRoomCoreImpl::onSeatControlEnabled(bool enabled, int max_seat_number) {}
+void TUIRoomCoreImpl::onSeatListChanged(
+    tuikit::TUIList<tuikit::TUISeatInfo>* seat_List,
+    tuikit::TUIList<tuikit::TUISeatInfo>* users_seated,
+    tuikit::TUIList<tuikit::TUISeatInfo>* users_left) {
+  std::stringstream log_stream;
+  if (seat_List) {
+    log_stream << "onSeatListChanged seatList:[";
+    for (int i = 0; i < seat_List->getSize(); ++i) {
+      log_stream << TOSTRING(seat_List->getElement(i)->userId);
+      if (i != seat_List->getSize() - 1) {
+        log_stream << ",";
+      }
+    }
+    log_stream << "]";
+  }
+  if (users_seated) {
+    log_stream << ",usersSeated:[";
+    for (int i = 0; i < users_seated->getSize(); ++i) {
+      log_stream << TOSTRING(users_seated->getElement(i)->userId);
+      if (i != users_seated->getSize() - 1) {
+        log_stream << ",";
+      }
+    }
+    log_stream << "],";
+  }
+  if (users_left) {
+    log_stream << ",usersLeft:[";
+    for (int i = 0; i < users_left->getSize(); ++i) {
+      log_stream << TOSTRING(users_left->getElement(i)->userId);
+      if (i != users_left->getSize() - 1) {
+        log_stream << ",";
+      }
+    }
+    log_stream << "]";
+  }
 
-void TUIRoomCoreImpl::OnIMUserEnterRoom(int code, const std::string& user_id, const std::string& user_name) {
-    LINFO("OnIMUserEnterRoom user_id %s ,user_name : %s", user_id.c_str(), user_name.c_str());
-    if (user_id == local_user_info_.user_id) {
-        return;
-    }
-    auto iter = room_user_map_.find(user_id);
-    if (iter != room_user_map_.end()) {
-        // 成员先进入的trtc房间才进入的im房间，更改身份
-        // The member entered the TRTC room first and then the IM room. Change the role
-        LINFO("User Enter TRTC before IM, user_id %s ,user_name : %s,role : %d",
-            user_id.c_str(), user_name.c_str(), iter->second.role);
-        if (iter->second.role == TUIRole::kOther) {
-            iter->second.role = TUIRole::kAnchor;
-        }
-        LINFO("User Enter IM, user_id %s ,user_name : %s,role : %d",
-            user_id.c_str(), user_name.c_str(), iter->second.role);
-        iter->second.user_name = user_name;
-        if (room_core_callback_ != nullptr) {
-            room_core_callback_->OnRemoteUserEnterSpeechState(user_id);
-        }
-    } else {
-        // 成员先进入的im房间
-        // The member entered the IM room first
-        LINFO("User Enter IM before TRTC, user_id %s ,user_name : %s",
-            user_id.c_str(), user_name.c_str());
-        TUIUserInfo user;
-        user.user_id = user_id;
-		user.user_name = user_name;
-        user.role = TUIRole::kAudience;
-        room_user_map_[user_id] = user;
-        if (room_core_callback_ != nullptr) {
-            room_core_callback_->OnRemoteUserEnter(user_id);
-        }
-    }
-}
+  LINFO(log_stream.str().c_str());
 
-void TUIRoomCoreImpl::OnIMGetRoomMemberInfoList(const std::vector<TUIUserInfo>& member_array) {
-    LINFO("OnIMGetRoomMemberInfoList member size = %d", member_array.size());
-    for (int i = 0; i < member_array.size(); i++) {
-        TUIUserInfo member_info = member_array.at(i);
-        if (member_info.user_id == local_user_info_.user_id) {
-            continue;
-        }
+  if (users_seated->getSize()) {
+    for (int i = 0; i < users_seated->getSize(); i++) {
+      auto item = users_seated->getElement(i);
+      std::string str_user_id = TOSTRING(item->userId);
+      auto iter = room_user_map_.find(str_user_id);
+      if (iter == room_user_map_.end()) {
         TUIUserInfo user;
-        user.user_id = member_info.user_id;
-        user.role = member_info.role;
-        user.user_name = member_info.user_name;
-        room_user_map_[user.user_id] = user;
-    }
-    if (local_user_info_.role != TUIRole::kMaster) {
-        EnterTRTCRoom();
-    } else { 
-        // 房主创房时房间已存在，主要是房主异常情况退出
-        // The room already exists when the room owner tries to create a room.
-        // This error occurs mainly because the owner exited the room due to an exception
-        if (room_core_callback_ != nullptr) {
-            room_core_callback_->OnCreateRoom(0, "");
-        }
-    }
-}
-void TUIRoomCoreImpl::OnIMGetRoomInfo(const TUIRoomInfo& info) {
-    room_info_.is_all_camera_muted = info.is_all_camera_muted;
-    room_info_.is_all_microphone_muted = info.is_all_microphone_muted;
-    room_info_.is_chat_room_muted = info.is_chat_room_muted;
-    room_info_.is_speech_application_forbidden = info.is_speech_application_forbidden;
-    room_info_.is_callingroll = info.is_callingroll;
-    room_info_.mode = info.mode;
-    room_info_.start_time = info.start_time;
-    room_info_.owner_id = info.owner_id;
-    LINFO("OnIMGetRoomInfo,is_all_camera_muted:%d,is_all_microphone_muted:%d,is_chat_room_muted:%d,"
-        "stage_forbidden:%d,mode:%d,is_callingroll:%d",
-        info.is_all_camera_muted, info.is_all_microphone_muted, info.is_chat_room_muted,
-        info.is_speech_application_forbidden, info.mode,info.is_callingroll);
-    // 用户为房主的情况，房主创房时房间已存在，房主异常情况退出才会出现
-    // If the user is the room owner, the error occurs only if the user exits the room due to an error and tries to create a room again.
-    if (info.owner_id == local_user_info_.user_id) {
-        // 房主错误以成员身份登录
-        // The room owner logs in as a member by mistake
-        if (local_user_info_.role != TUIRole::kMaster) {
-            local_user_info_.role = TUIRole::kMaster;
-            room_user_map_[local_user_info_.user_id] = local_user_info_;
+        user.user_id = str_user_id;
+        room_user_map_[str_user_id] = user;
+      }
+
+      TUIRoomEngineUserInfoCallback* callback =
+          new TUIRoomEngineUserInfoCallback;
+      callback->SetCallback(
+          [=](tuikit::TUIUserInfo* value) {
+            std::string user_id = std::string(value->userId);
+            if (user_id != local_user_info_.user_id) {
+              room_user_map_[user_id].has_audio_stream = value->hasAudioStream;
+              room_user_map_[user_id].has_subscribed_audio_stream =
+                  value->hasAudioStream;
+              room_user_map_[user_id].has_screen_stream =
+                  value->hasScreenStream;
+              room_user_map_[user_id].has_subscribed_screen_stream =
+                  value->hasScreenStream;
+              room_user_map_[user_id].has_video_stream = value->hasVideoStream;
+              room_user_map_[user_id].has_subscribed_video_stream =
+                  value->hasVideoStream;
+              room_user_map_[user_id].avatar_url = TOSTRING(value->avatarUrl);
+              room_user_map_[user_id].user_name = TOSTRING(value->userName);
+              room_user_map_[user_id].role =
+                  (value->userRole == tuikit::TUIRole::kRoomOwner
+                       ? TUIRole::kMaster
+                       : TUIRole::kAnchor);
+            }
             if (room_core_callback_ != nullptr) {
-                room_core_callback_->OnError(static_cast<int>(TUIRoomError::kErrorHasBeenRoomMaster), "");
+              room_core_callback_->OnRemoteUserEnterSpeechState(str_user_id);
+            }
+          },
+          [=](const tuikit::TUIError code, const std::string& message) {
+            if (room_core_callback_ != nullptr) {
+              room_core_callback_->OnRemoteUserEnterSpeechState(str_user_id);
+            }
+          });
+      room_engine_->getUserInfo(str_user_id.c_str(), callback);
+    }
+  }
+
+  if (users_left->getSize()) {
+    for (int i = 0; i < users_left->getSize(); i++) {
+      auto item = users_left->getElement(i);
+      std::string str_user_id = TOSTRING(item->userId);
+      auto iter = room_user_map_.find(str_user_id);
+      if (iter != room_user_map_.end()) {
+        if (room_core_callback_ != nullptr) {
+          room_core_callback_->OnRemoteUserExitSpeechState(str_user_id);
+        }
+        room_user_map_.erase(str_user_id);
+      }
+    }
+  }
+}
+void TUIRoomCoreImpl::onRequestReceived(const tuikit::TUIRequest* request) {
+    /*
+    * request.user_id: xxx(信令发送者)
+    * request.content:
+    {
+        "businessID" : "",
+        "data" : {
+            "cmd" : "enableUserCamera",
+            "enable" : true,
+            "receiverId" : "jovenxue（信令接收者）",
+            "roomId" : "123321"
+        },
+        "extraInfo" : "",
+        "platform" : "windows",
+        "version" : 1
+    }
+    */
+  if (request == nullptr) {
+      LINFO("onRequestReceived request is nullptr");
+    return;
+  }
+  std::stringstream log_stream;
+  log_stream << "onRequestReceived, [request_id:" << request->requestId
+             << "] [request_action:" << static_cast<int>(request->requestAction)
+             << "] [timestamp:" << request->timestamp
+             << "] [user_id:" << TOSTRING(request->userId)
+             << "] [content:" << TOSTRING(request->content) << "]";
+  LINFO(log_stream.str().c_str());
+
+    bool enable = true;
+    std::string cmd;
+    if (request->content != nullptr) {
+        Json::Reader reader;
+        Json::Value root;
+        if (!reader.parse(request->content, root)) {
+            LINFO("room engine onRequestReceived parser content failed.");
+            return;
+        }
+
+        if (root.isMember("data")) {
+            Json::Value data = root["data"];
+            if (data.isMember("enable")) {
+                enable = data["enable"].asBool();
+            }
+            if (data.isMember("cmd")) {
+                cmd = data["cmd"].asString();
+            }
+        }
+
+        if (room_core_callback_ != nullptr) {
+            if (request->requestAction ==
+                tuikit::TUIRequestAction::kRequestToOpenRemoteCamera) {
+                received_request_ids_.push_back(request->requestId);
+                room_core_callback_->OnCameraMuted(request->requestId, false, TUIMutedReason::kMutedByAdmin);
+            } else if (request->requestAction ==
+                tuikit::TUIRequestAction::kRequestToOpenRemoteMicrophone) {
+                received_request_ids_.push_back(request->requestId);
+                room_core_callback_->OnMicrophoneMuted(request->requestId, false, TUIMutedReason::kMutedByAdmin);
             }
         }
     }
 }
-
-void TUIRoomCoreImpl::OnIMReceiveChatMessage(const std::string& user_id, const std::string& message) {
-    LINFO("OnIMReceiveChatMessage, user_id %s ,messgae : %s", user_id.c_str(), message.c_str());
-    auto iter = room_user_map_.find(user_id);
+void TUIRoomCoreImpl::onRequestCancelled(uint32_t request_id, const char* user_id) {
+  LINFO("onRequestCancelled, request_id:%d", request_id);
+    auto iter = std::find(received_request_ids_.begin(), received_request_ids_.end(), request_id);
+    if (iter != received_request_ids_.end()) {
+        received_request_ids_.erase(iter);
+    }
+}
+void TUIRoomCoreImpl::onReceiveTextMessage(const char* room_id, const tuikit::TUIMessage& message) {
+    if (TOSTRING(room_id) != room_info_.room_id) {
+        LINFO("room engine onReceiveTextMessage, room_id %s ,messgae : %s", room_id, message.message);
+        return;
+    }
+    LINFO("room engine onReceiveTextMessage, user_id %s ,messgae : %s", message.userId, message.message);
+    auto iter = room_user_map_.find(TOSTRING(message.userId));
     if (iter == room_user_map_.end()) {
         return;
     }
     if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnReceiveChatMessage(user_id, message);
+        room_core_callback_->OnReceiveChatMessage(TOSTRING(message.userId), message.message);
     }
 }
-void TUIRoomCoreImpl::OnIMReceiveCustomMessage(const std::string& user_id, const std::string& message) {
-    LINFO("OnIMReceiveCustomMessage, user_id %s ,messgae : %s", user_id.c_str(), message.c_str());
-    auto iter = room_user_map_.find(user_id);
+void TUIRoomCoreImpl::onReceiveCustomMessage(const char* room_id, const tuikit::TUIMessage& message) {
+    if (TOSTRING(room_id) != room_info_.room_id) {
+        LINFO("room engine OnReceiveCustomMessage, room_id %s ,messgae : %s", room_id, message.message);
+        return;
+    }
+    LINFO("room engine onReceiveCustomMessage, user_id %s ,messgae : %s", message.userId, message);
+    auto iter = room_user_map_.find(TOSTRING(message.userId));
     if (iter == room_user_map_.end()) {
         return;
     }
     if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnReceiveCustomMessage(user_id, message);
-    }
-}
-void TUIRoomCoreImpl::OnIMChatRoomMuted(bool muted) {
-    LINFO("OnIMChatRoomMuted, mute : %d", muted);
-    room_info_.is_chat_room_muted = muted;
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnChatRoomMuted(muted);
-    }
-}
-
-void TUIRoomCoreImpl::OnIMReceiveSpeechInvitation() {
-    LINFO("OnIMReceiveSpeechInvitation");
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnReceiveSpeechInvitation();
-    }
-}
-void TUIRoomCoreImpl::OnIMReceiveInvitationCancelled() {
-    LINFO("OnIMReceiveInvitationCancelled");
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnReceiveInvitationCancelled();
-    }
-}
-void TUIRoomCoreImpl::OnIMOrderedToExitSpeechkState() {
-    LINFO("OnIMOrderedToExitSpeechkState");
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnOrderedToExitSpeechState();
-    }
-    // 被房主请停止发言，成员需要转换自己的身份为观众
-    // The room owner requests the member to stop speaking, and the member needs to become an audience member
-    if (trtc_cloud_ != nullptr && local_user_info_.role != TUIRole::kMaster && local_user_info_.role != TUIRole::kAudience) {
-        trtc_cloud_->switchRole(liteav::TRTCRoleAudience);
-        local_user_info_.role = TUIRole::kAudience;
-        room_user_map_[local_user_info_.user_id] = local_user_info_;
-    }
-}
-void TUIRoomCoreImpl::OnIMCallingRollStarted() {
-    LINFO("OnIMCallingRollStarted");
-    room_info_.is_callingroll = true;
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnCallingRollStarted();
-    }
-}
-void TUIRoomCoreImpl::OnIMCallingRollStopped() {
-    LINFO("OnIMCallingRollStopped");
-    room_info_.is_callingroll = false;
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnCallingRollStopped();
-    }
-}
-void TUIRoomCoreImpl::OnIMMemberReplyCallingRoll(const std::string& user_id) {
-    LINFO("OnIMCallingRollStopped, user_di : %s",user_id.c_str());
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnMemberReplyCallingRoll(user_id);
-    }
-}
-void TUIRoomCoreImpl::OnIMReceiveSpeechApplication(const std::string& user_id) {
-    LINFO("OnIMReceiveSpeechApplication, user_id :%s", user_id.c_str());
-
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnReceiveSpeechApplication(user_id);
-    }
-}
-
-void TUIRoomCoreImpl::OnIMSpeechApplicationCancelled(const std::string& user_id) {
-    LINFO("OnIMSpeechApplicationCancelled, user_id :%s", user_id.c_str());
-
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnSpeechApplicationCancelled(user_id);
-    }
-}
-
-void TUIRoomCoreImpl::OnIMReceiveReplyToSpeechApplication(bool agree) {
-    LINFO("OnIMAgreeSpeechApplication, agree :%d", agree);
-    if (agree && trtc_cloud_ != nullptr && local_user_info_.role != TUIRole::kMaster) {
-        // 房主同意了发言请求，成员需要转换自己的身份为主播
-        // The room owner approves the microphone-on request, and the member becomes an anchor
-        trtc_cloud_->switchRole(liteav::TRTCRoleAnchor);
-        local_user_info_.role = TUIRole::kAnchor;
-        room_user_map_[local_user_info_.user_id] = local_user_info_;
-    }
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnReceiveReplyToSpeechApplication(agree);
-    }
-}
-
-void TUIRoomCoreImpl::OnIMReceiveReplyToSpeechInvitation(const std::string& user_id, bool agree) {
-    LINFO("OnIMReceiveReplyToSpeechInvitation, user_id :%s,agree :%d", user_id.c_str(), agree);
-    auto iter = room_user_map_.find(user_id);
-    if (iter == room_user_map_.end()) {
-        return;
-    }
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnReceiveReplyToSpeechInvitation(user_id, agree);
-    }
-}
-
-void TUIRoomCoreImpl::OnIMMicrophoneMuted(bool muted) {
-    LINFO("OnIMMicrophoneMuted mute :%d", muted);
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnMicrophoneMuted(muted);
-    }
-}
-void TUIRoomCoreImpl::OnIMAllUsersMicrophoneMuted(bool muted) {
-    LINFO("OnIMMuteAllUsersMic, mute :%d", muted);
-    room_info_.is_all_microphone_muted = muted;
-    if (local_user_info_.role == TUIRole::kMaster) {
-        return;
-    }
-    if (room_core_callback_ != nullptr && muted) {
-        room_core_callback_->OnMicrophoneMuted(muted);
-    }
-}
-
-void TUIRoomCoreImpl::OnIMCameraMuted(bool muted) {
-    LINFO("OnIMMuteCamera mute :%d", muted);
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnCameraMuted(muted);
-    }
-}
-void TUIRoomCoreImpl::OnIMAllUsersCameraMuted(bool muted) {
-    LINFO("OnIMMuteAllUsersCamera, mute :%d", muted);
-    if (local_user_info_.role == TUIRole::kMaster) {
-        return;
-    }
-    room_info_.is_all_camera_muted = muted;
-    if (room_core_callback_ != nullptr && muted) {
-        room_core_callback_->OnCameraMuted(muted);
-    }
-}
-
-void TUIRoomCoreImpl::OnIMSpeechApplicationForbidden(bool forbidden) {
-    LINFO("OnIMSpeechApplicationForbidden, forbidden :%d", forbidden);
-    room_info_.is_speech_application_forbidden = forbidden;
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnSpeechApplicationForbidden(forbidden);
+        room_core_callback_->OnReceiveCustomMessage(TOSTRING(message.userId), message.message);
     }
 }

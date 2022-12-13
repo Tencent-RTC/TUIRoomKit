@@ -202,7 +202,6 @@ void MainWindow::InitShow(bool show_preview_wnd) {
         ui.top_menu_bar->SetRoomID(room_id_);
         device_preview_->show();
         device_preview_->InitUi();
-        device_preview_->StartPreview();
     }
 
 }
@@ -213,12 +212,20 @@ void MainWindow::SlotEndDetection() {
 }
 
 void MainWindow::SlotOnCreateRoom(int code, const QString& message) {
-    if (code == 0) {
-        TUIRoomCore::GetInstance()->EnterRoom(room_id_);
-    }
+    TUIRoomCore::GetInstance()->EnterRoom(room_id_);
 }
 
 void MainWindow::SlotOnEnterRoom(int code, const QString& message) {
+    this->InitUi();
+    if (code != 0) {
+        LINFO("MainWindow::SlotOnEnterRoom Error: %d %s", code, message.toStdString().c_str());
+        TXMessageBox::Instance().AddLineTextMessage(tr("Enter room failed"), tr("Enter room failed"));
+        if (device_preview_ != nullptr) {
+            device_preview_->ResetStart();
+        }
+        return;
+    }
+
     if (main_window_layout_ == nullptr)
         return;
     DataReport::Instance()->OperateReport(ReportType::kEnterRoom, 0);
@@ -233,11 +240,10 @@ void MainWindow::SlotOnEnterRoom(int code, const QString& message) {
     }
     enter_room_success_ = true;
 
-    this->InitUi();
     is_default_close_camera_ = DataStore::Instance()->IsDefaultCloseCamera();
     is_default_close_mic_ = DataStore::Instance()->IsDefaultCloseMic();
 
-    ShowUserList();
+    //ShowUserList();
     StageUp();
 
     TUIVideoQosPreference preference = DataStore::Instance()->GetQosPreference();
@@ -260,7 +266,7 @@ void MainWindow::ShowUserList() {
             MemberListAddMember(*iter);
         }
         if (local_user->role != TUIRole::kMaster && iter->role == TUIRole::kMaster && stage_list_view_control_ != nullptr) {
-            stage_list_view_control_->InsertUser(*iter, false);
+            //stage_list_view_control_->InsertUser(*iter, false);
         }
     }
 }
@@ -284,6 +290,7 @@ void MainWindow::InitUi() {
         connect(bottom_menu_bar, &BottomBarController::SignalStartScreen, this, &MainWindow::PopupBottomBar, Qt::QueuedConnection);
         connect(bottom_menu_bar, &BottomBarController::SignalShowMemberList, this, [=]() {
             if (member_list_view_control_ != nullptr) {
+                this->ShowUserList();
                 member_list_view_control_->show();
                 member_list_view_control_->raise();
                 DataReport::Instance()->OperateReport(ReportType::kOpenMemberlist);
@@ -360,6 +367,7 @@ void MainWindow::SlotClose() {
     }
 }
 void MainWindow::PopupBottomBar(bool checked) {
+  LINFO("PopupBottomBar,checked:%d", checked);
     if (main_window_layout_ == nullptr)
         return;
 
@@ -448,12 +456,13 @@ void MainWindow::StartLocalCamera() {
     if (local_user == nullptr) {
         return;
     }
-    liteav::TXView play_window = stage_list_view_control_->GetPlayWindow(local_user->user_id);
-    if (play_window != nullptr) {
-        TUIRoomCore::GetInstance()->StartCameraPreview(play_window);
-    } else if (main_window_layout_->GetMainWidgetController()->GetUserId()\
+
+    if (main_window_layout_->GetMainWidgetController()->GetUserId()\
         == DataStore::Instance()->GetCurrentUserInfo().user_id) {
         TUIRoomCore::GetInstance()->StartCameraPreview(main_window_layout_->GetMainWidgetController()->GetPlayWindow());
+    } else {
+        liteav::TXView play_window = stage_list_view_control_->GetPlayWindow(local_user->user_id);
+        TUIRoomCore::GetInstance()->StartCameraPreview(play_window);
     }
 
     emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*local_user);
@@ -539,43 +548,30 @@ void MainWindow::StageUp() {
     if (local_user == nullptr) {
         return;
     }
-    TUIRoomInfo room_info = TUIRoomCore::GetInstance()->GetRoomInfo();
+
     StageAddMember(*local_user);
-
-    // 成员需要判断是否开启了全员禁麦克风/摄像头
-    // The member needs to consider whether the microphone/camera of all members is disabled
-    if (local_user->role == TUIRole::kAnchor) {
-        LINFO("Anchor StageUp, user_id :%s, user_name :%s, role :%d", local_user->user_id.c_str(), local_user->user_name.c_str(), local_user->role);
-        if (!room_info.is_all_camera_muted) {
-            if (!is_default_close_camera_) {
-                StartLocalCamera();
-            } else {
-                StopLocalCamera();
-            }
-        }
-        if (!room_info.is_all_microphone_muted) {
-            if (!is_default_close_mic_) {
-                StartLocalMicrophone();
-            } else {
-                StopLocalMicrophone();
-            }
-        }
-    } else if (local_user->role == TUIRole::kMaster) {
-        LINFO("Master StageUp, user_id :%s, user_id :%s, role :%d", local_user->user_id.c_str(), local_user->user_name.c_str(), local_user->role);
+    auto success_callback = [=]() {
+      TUIRoomInfo room_info = TUIRoomCore::GetInstance()->GetRoomInfo();
+      if (!room_info.is_all_camera_muted) {
         if (!is_default_close_camera_) {
-            StartLocalCamera();
+          StartLocalCamera();
         } else {
-            StopLocalCamera();
+          StopLocalCamera();
         }
+      }
+      if (!room_info.is_all_microphone_muted) {
         if (!is_default_close_mic_) {
-            StartLocalMicrophone();
+          StartLocalMicrophone();
         } else {
-            StopLocalMicrophone();
+          StopLocalMicrophone();
         }
-    }
+      }
+    };
 
-    is_default_close_mic_ = false;
-    is_default_close_camera_ = false;
+    auto error_callback = [](int code, const std::string& message) {};
+
+    TUIRoomCore::GetInstance()->EnterSpeechState(success_callback,
+                                                 error_callback);
 
     if (pop_widget_ != nullptr) {
         QWidget* wid = stage_list_view_control_->PopStageListController();
@@ -672,19 +668,64 @@ void MainWindow::SlotOnExitRoom(TUIExitRoomType code, const QString& message) {
     close();
 }
 
-void MainWindow::SlotOnCameraMuted(bool mute) {
+void MainWindow::SlotOnCameraMuted(uint32_t request_id, bool mute, TUIMutedReason reason) {
     if (mute) {
+        if (reason == TUIMutedReason::kAdminMuteAllUsers) {
+            TXMessageBox::Instance().AddLineTextMessage( tr("Admin set all users camera muted."));
+        } else if (reason == TUIMutedReason::kMutedByAdmin) {
+            TXMessageBox::Instance().AddLineTextMessage(tr("Muted camera by admin."));
+        }
         StopLocalCamera();
-    } else {
-        StartLocalCamera();
+    } else if (reason == TUIMutedReason::kMutedByAdmin) {
+        TXMessageBox::DialogInstance().ShowMultiButtonDialog(kCancel | kOk, \
+            tr("Admin requests to turn on your camera, are you agree ?"));
+
+        auto callback = [=](RequestCallbackType type, const std::string& error_message) {
+            LINFO("MuteUserCamera result type : %d,error_message :%s", (int)type, error_message.c_str());
+            if (type == RequestCallbackType::kRequestAccepted) {
+                StartLocalCamera();
+            } else {
+                TXMessageBox::Instance().AddLineTextMessage(tr("The request has timed out."));
+            }
+        };
+        connect(&TXMessageBox::DialogInstance(), &TXMessageBox::SignalOk, this, [=]() {
+            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id, true, callback);
+        });
+        connect(&TXMessageBox::DialogInstance(), &TXMessageBox::SignalCancel, this, [=]() {
+            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id, false, callback);
+        });
     }
 }
 
-void MainWindow::SlotOnMicrophoneMuted(bool mute) {
+void MainWindow::SlotOnMicrophoneMuted(uint32_t request_id, bool mute, TUIMutedReason reason) {
     if (mute) {
+        if (reason == TUIMutedReason::kAdminMuteAllUsers) {
+            TXMessageBox::Instance().AddLineTextMessage(tr("Admin set all users microphone muted."));
+        } else if (reason == TUIMutedReason::kMutedByAdmin) {
+            TXMessageBox::Instance().AddLineTextMessage(tr("Muted microphone by admin."));
+        }
         StopLocalMicrophone();
-    } else {
-        StartLocalMicrophone();
+    } else if (reason == TUIMutedReason::kMutedByAdmin) {
+        TXMessageBox::DialogInstance().ShowMultiButtonDialog(kCancel | kOk, \
+            tr("Admin requests to turn on your microphone, are you agree ?"));
+
+        auto callback = [=](RequestCallbackType type, const std::string& error_message) {
+            LINFO("MuteUserCamera result type : %d,error_message :%s", (int)type, error_message.c_str());
+            if (type == RequestCallbackType::kRequestAccepted) {
+                StartLocalMicrophone();
+            } else {
+                TXMessageBox::Instance().AddLineTextMessage(tr("The request has timed out."));
+            }
+        };
+        connect(&TXMessageBox::DialogInstance(), &TXMessageBox::SignalOk, this, [=]() {
+            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id, true, callback);
+            });
+        connect(&TXMessageBox::DialogInstance(), &TXMessageBox::SignalCancel, this, [=]() {
+            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id, false, callback);
+            });
+        
+        //TXMessageBox::Instance().AddLineTextMessage(tr("Admin requests to turn on your microphone."));
+        //StartLocalMicrophone();
     }
 }
 

@@ -189,8 +189,22 @@ void DataStore::ParseLaunchParam(QStringList params) {
         is_app_launch, sdk_app_id, user_id.c_str(), user_sig.c_str(), is_language_zh, is_online);
     is_app_launch_ = is_app_launch;
     user_login_info_.user_id = user_id;
-    user_login_info_.user_sig = user_sig;
-    user_login_info_.sdk_app_id = sdk_app_id;
+    if (is_online) {
+        user_login_info_.sdk_app_id = sdk_app_id;
+        user_login_info_.user_sig = user_sig;
+    } else {
+#ifdef _WIN32
+        user_login_info_.sdk_app_id = GenerateTestUserSig::instance().SDKAPPID;
+        user_login_info_.user_sig = GenerateTestUserSig::instance().genTestUserSig(user_id);
+#else
+        user_login_info_.sdk_app_id = SDKAPPID;
+
+        NSString* ns_user_id = [[NSString alloc]initWithUTF8String:info.user_id.c_str()];
+        NSString* ns_user_sig = [GenerateTestUserSig genTestUserSig : ns_user_id];
+        const char* c_string = [ns_user_sig cString];
+        user_login_info_.user_sig = std::string(c_string);
+#endif
+    }
 
 	auto recent_user_info = GetRecentUserInfo();
     user_login_info_.name = recent_user_info.name;

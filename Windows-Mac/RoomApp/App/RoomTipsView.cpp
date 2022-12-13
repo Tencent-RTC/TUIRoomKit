@@ -9,7 +9,7 @@
 RoomTipsView::RoomTipsView(QWidget *parent)
     : QWidget(parent) {
     ui.setupUi(this);
-    setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::ToolTip);
+    setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
 
     InitUI();
 

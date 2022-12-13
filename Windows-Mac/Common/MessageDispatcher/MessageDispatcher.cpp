@@ -1,6 +1,7 @@
 #include "MessageDispatcher.h"
 #include <QMetaType>
 #include "TUIRoomCore.h"
+#include "DataStore.h"
 
 MessageDispatcher& MessageDispatcher::Instance(){
 	static MessageDispatcher instance(nullptr);
@@ -15,6 +16,7 @@ MessageDispatcher::MessageDispatcher(QObject *parent)
     qRegisterMetaType<TUIExitRoomType>("TXTypeExitRoom");
     qRegisterMetaType<liteav::TRTCStatistics>("liteav::TRTCStatistics");
     qRegisterMetaType <UserNetQualityInfo>("UserNetQualityInfo");
+    qRegisterMetaType<TUIMutedReason>("TUIMutedReason");
 }
 
 MessageDispatcher::~MessageDispatcher(){
@@ -132,16 +134,16 @@ void MessageDispatcher::OnMemberReplyCallingRoll(const std::string& user_id) {
     emit SignalOnMemberReplyCallingRoll(QString::fromStdString(user_id));
 }
 
-void MessageDispatcher::OnChatRoomMuted(bool mute) {
-	emit SignalOnChatRoomMuted(mute);
+void MessageDispatcher::OnChatRoomMuted(uint32_t request_id, bool mute, TUIMutedReason reason) {
+	emit SignalOnChatRoomMuted(request_id, mute, reason);
 }
 
-void MessageDispatcher::OnMicrophoneMuted(bool mute) {
-	emit SignalOnMicrophoneMuted(mute);
+void MessageDispatcher::OnMicrophoneMuted(uint32_t request_id, bool mute, TUIMutedReason reason) {
+	emit SignalOnMicrophoneMuted(request_id, mute, reason);
 }
 
-void MessageDispatcher::OnCameraMuted(bool mute) {
-	emit SignalOnCameraMuted(mute);
+void MessageDispatcher::OnCameraMuted(uint32_t request_id, bool mute, TUIMutedReason reason) {
+	emit SignalOnCameraMuted(request_id, mute, reason);
 }
 
 void MessageDispatcher::OnStatistics(const liteav::TRTCStatistics& statis) {
@@ -212,17 +214,25 @@ void MessageDispatcher::OnStatistics(const liteav::TRTCStatistics& statis) {
     }
 }
 
-void MessageDispatcher::OnNetworkQuality(const liteav::TRTCQualityInfo& local_quality, liteav::TRTCQualityInfo* remote_quality, uint32_t remote_quality_count) {
+void MessageDispatcher::OnNetworkQuality(const std::vector <tuikit::TUINetwork>& network_list) {
     UserNetQualityInfo local_user_quality;
-    local_user_quality.user_id = (local_quality.userId == nullptr ? "" : local_quality.userId);
-    local_user_quality.quality = local_quality.quality;
-
     std::vector<UserNetQualityInfo> remote_users_quality;
-    if (remote_quality_count > 0) {
-		for (int i = 0; i < remote_quality_count; ++i) {
-			UserNetQualityInfo tmp_remote_user_quality;
-            tmp_remote_user_quality.user_id = (remote_quality[i].userId == nullptr ? "" : remote_quality[i].userId);
-            tmp_remote_user_quality.quality = remote_quality[i].quality;
+	for (int i = 0; i < network_list.size(); ++i) {
+        std::string user_id = (network_list[i].userId == nullptr ? "" : network_list[i].userId);
+
+        if (user_id.empty() || user_id == DataStore::Instance()->GetCurrentUserInfo().user_id) {
+            local_user_quality.user_id = user_id;
+            local_user_quality.quality = static_cast<int>(network_list[i].quality);
+            local_user_quality.delay = network_list[i].delay;
+            local_user_quality.downLoss = network_list[i].downLoss;
+            local_user_quality.upLoss = network_list[i].upLoss;
+        } else {
+            UserNetQualityInfo tmp_remote_user_quality;
+            tmp_remote_user_quality.user_id = user_id;
+            tmp_remote_user_quality.quality = static_cast<int>(network_list[i].quality);
+            tmp_remote_user_quality.delay = network_list[i].delay;
+            tmp_remote_user_quality.downLoss = network_list[i].downLoss;
+            tmp_remote_user_quality.upLoss = network_list[i].upLoss;
             remote_users_quality.push_back(tmp_remote_user_quality);
         }
     }

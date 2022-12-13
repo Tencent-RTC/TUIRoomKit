@@ -14,6 +14,7 @@ public:
 public slots:
     void SlotOnRightLayoutClicked();
     void SlotOnTopLayoutClicked();
+    void SlotOnGridLayoutClicked();
 signals:
     void SignalStageListLayoutChanged(StageListDirection direction);
     void SignalCloseView();

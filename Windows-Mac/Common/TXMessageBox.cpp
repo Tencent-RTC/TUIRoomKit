@@ -57,13 +57,12 @@ TXMessageBox::TXMessageBox()
     this->setStyleSheet(sheet);
 
     connect(ui.btn_close, &QPushButton::clicked, this, [=]() {
-        this->close();
         if (button_type_ == TXMessageType::kNoButton) {
+            this->close();
             delete text_instance_;
             text_instance_ = nullptr;
         } else {
-            delete dialog_instance_;
-            dialog_instance_ = nullptr;
+            this->OnBtnClicked();
         }
     });
     connect(ui.btn_ok, &QPushButton::clicked, this, &TXMessageBox::OnBtnClicked);
@@ -141,7 +140,7 @@ void TXMessageBox::ShowMultiButtonDialog(int button_type, QString content_text, 
 }
 void TXMessageBox::OnBtnClicked() {
     QObject* obj = sender();
-    if (obj == ui.btn_cancel) {
+    if (obj == ui.btn_cancel || obj == ui.btn_close) {
         emit SignalCancel();
     }
     else if (obj == ui.btn_ok) {

@@ -101,6 +101,35 @@ LIBS += -framework Security
 LIBS += -framework SystemConfiguration
 LIBS += -framework JavaScriptCore
 
+LIBS += -framework CoreMedia
+LIBS += -framework CoreAudio
+LIBS += -framework CoreVideo
+LIBS += -framework CoreImage
+LIBS += -framework AVFoundation
+LIBS += -framework AudioToolbox
+LIBS += -framework VideoToolbox
+LIBS += -framework MetalKit
+LIBS += -lz
+LIBS += -ObjC
+LIBS += -framework Metal
+LIBS += -framework QuartzCore
+
+LIBS += -F$$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXFFmpeg.xcframework/macos-arm64_x86_64
+LIBS += -F$$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXSoundTouch.xcframework/macos-arm64_x86_64
+LIBS += -framework TXFFmpeg
+LIBS += -framework TXSoundTouch
+
+ImSDK_FRAMEWORK.files = $$PWD/../SDK/ImSDK/Mac/ImSDKForMac_CPP.framework
+ImSDK_FRAMEWORK.path = /Contents/Frameworks
+QMAKE_BUNDLE_DATA += ImSDK_FRAMEWORK
+
+TXFFmpeg_FRAMEWORK.files = $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXFFmpeg.xcframework/macos-arm64_x86_64/TXFFmpeg.framework
+TXFFmpeg_FRAMEWORK.path = /Contents/Frameworks
+QMAKE_BUNDLE_DATA += TXFFmpeg_FRAMEWORK
+
+TXSoundTouch_FRAMEWORK.files = $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXSoundTouch.xcframework/macos-arm64_x86_64/TXSoundTouch.framework
+TXSoundTouch_FRAMEWORK.path = /Contents/Frameworks
+QMAKE_BUNDLE_DATA += TXSoundTouch_FRAMEWORK
 
 # 添加TXLiteAVSDK_TRTC_Mac.framework头文件
 INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXLiteAVSDK_TRTC_Mac.framework/Headers/cpp_interface
@@ -108,7 +137,7 @@ INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXLiteAVSDK_TRTC_Mac.framewo
 
 # 添加ImSDKForMac.framework头文件
 INCLUDEPATH += $$PWD/../SDK/ImSDK/Mac/ImSDKForMac_CPP.framework/Headers
-QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../
+QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../Frameworks/
 
 QMAKE_CXXFLAGS += -std=gnu++11
 #CONFIG += console

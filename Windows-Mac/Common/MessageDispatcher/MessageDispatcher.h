@@ -69,15 +69,15 @@ public:
 
     void OnMemberReplyCallingRoll(const std::string& user_id) override;
 
-	void OnChatRoomMuted(bool mute) override;
+	void OnChatRoomMuted(uint32_t request_id, bool mute, TUIMutedReason reason) override;
 
-	void OnMicrophoneMuted(bool mute) override;
+	void OnMicrophoneMuted(uint32_t request_id, bool mute, TUIMutedReason reason) override;
 
-	void OnCameraMuted(bool mute) override;
+	void OnCameraMuted(uint32_t request_id, bool mute, TUIMutedReason reason) override;
 
     void OnStatistics(const liteav::TRTCStatistics& statis) override;
 
-    void OnNetworkQuality(const liteav::TRTCQualityInfo& local_quality, liteav::TRTCQualityInfo* remote_quality, uint32_t remote_quality_count) override;
+    void OnNetworkQuality(const std::vector <tuikit::TUINetwork>& network_list) override;
 
 	void OnScreenCaptureStarted() override;
 
@@ -153,11 +153,11 @@ signals:
 
     void SignalOnMemberReplyCallingRoll(const QString& user_id);
 
-	void SignalOnChatRoomMuted(bool mute);
+	void SignalOnChatRoomMuted(uint32_t request_id, bool mute, TUIMutedReason reason);
 
-	void SignalOnMicrophoneMuted(bool mute);
+	void SignalOnMicrophoneMuted(uint32_t request_id, bool mute, TUIMutedReason reason);
 
-	void SignalOnCameraMuted(bool mute);
+	void SignalOnCameraMuted(uint32_t request_id, bool mute, TUIMutedReason reason);
 
     void SignalOnStatistics(const liteav::TRTCStatistics& statis);
 

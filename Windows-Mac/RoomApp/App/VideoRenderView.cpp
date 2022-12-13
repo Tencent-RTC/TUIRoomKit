@@ -8,6 +8,7 @@
 #include "CommonDef.h"
 #include "DataStore.h"
 #include "MessageDispatcher/MessageDispatcher.h"
+#include "StatusUpdateCenter.h"
 
 VideoRenderView::VideoRenderView(QWidget *parent, bool is_screen_share_window)
     : QWidget(parent)
@@ -55,7 +56,7 @@ void VideoRenderView::StopCurrentVideo() {
 
     const TUIUserInfo* local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
     if (local_user->user_id == user_info_.user_id) {
-        if (local_user->has_video_stream && !is_screen_share_window_) {
+        if (!is_screen_share_window_) {
             TUIRoomCore::GetInstance()->UpdateCameraPreview(NULL);
         }
     } else {
@@ -66,10 +67,7 @@ void VideoRenderView::StopCurrentVideo() {
     ui_->video_view->setUpdatesEnabled(true);
     ui_->stackedWidget->setCurrentIndex(0);
 }
-void VideoRenderView::ResetBackgroundImage() {
-    ui_->video_view->setUpdatesEnabled(true);
-    ui_->stackedWidget->setCurrentIndex(0);
-}
+
 void VideoRenderView::UpdateCameraPreview() {
     is_screen_share_window_ = false;
     const TUIUserInfo* local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
@@ -83,15 +81,18 @@ void VideoRenderView::UpdateCameraPreview() {
             ui_->stackedWidget->setCurrentIndex(0);
         }
     }
-
-    if (video_head_ != NULL && is_main_window_) {
-        video_head_->UserStartScreenShare(user_info_.user_id, is_main_window_ && is_screen_share_window_);
+    if (video_head_ != nullptr) {
+        video_head_->UpdateUserInfo(user_info_);
     }
 }
 
 void VideoRenderView::InitConnect() {
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnFirstVideoFrame,
         this, &VideoRenderView::SlotOnFirstVideoFrame);
+    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserCameraAvailable,
+        this, &VideoRenderView::SlotOnRemoteUserCameraAvailable);
+    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserScreenAvailable,
+        this, &VideoRenderView::SlotOnRemoteUserScreenAvailable);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnUserVoiceVolume,
         this, &VideoRenderView::SlotOnUserVoiceVolume);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnStatistics, this, &VideoRenderView::OnNetStatistics);
@@ -215,6 +216,9 @@ void VideoRenderView::InitMainVideo() {
 
 void VideoRenderView::UserStartScreenShare(const std::string& user_id) {
     const TUIUserInfo* user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id);
+    if (user_info == nullptr) {
+        return;
+    }
     user_info_ = *user_info;
 
     is_screen_share_window_ = true;
@@ -277,10 +281,6 @@ void VideoRenderView::StartPreview() {
     } else {
         TUIRoomCore::GetInstance()->StartRemoteView(user_info_.user_id, play_window);
     }
-
-    if (video_head_ != NULL && is_main_window_) {
-        video_head_->UserStartScreenShare(user_info_.user_id, is_main_window_ && is_screen_share_window_);
-    }
 }
 
 void VideoRenderView::StopPreview() {
@@ -297,19 +297,16 @@ void VideoRenderView::StopPreview() {
     if (is_main_window_) {
         InitMainVideo();
     }
-    if (video_head_ != nullptr) {
-        video_head_->UserStartScreenShare(user_info_.user_id, is_main_window_ && is_screen_share_window_);
-    }
 }
 
 void VideoRenderView::UpdateUserInfo(const TUIUserInfo& user_info) {
     user_info_ = user_info;
-    if (user_info.has_video_stream || (is_screen_share_window_ && user_info.has_screen_stream)) {
-        ui_->stackedWidget->setCurrentIndex(1);
-        ui_->video_view->setUpdatesEnabled(false);
-    } else {
-        ui_->video_view->setUpdatesEnabled(true);
-        ui_->stackedWidget->setCurrentIndex(0);
+
+    if (DataStore::Instance()->GetCurrentUserInfo().user_id == user_info_.user_id) {
+        if (!user_info.has_video_stream) {
+            ui_->video_view->setUpdatesEnabled(true);
+            ui_->stackedWidget->setCurrentIndex(0);
+        }
     }
 
     if (video_head_ != NULL) {
@@ -321,47 +318,59 @@ void VideoRenderView::UpdateUserInfo(const TUIUserInfo& user_info) {
     }
 }
 
-void VideoRenderView::RemoveUser() {
-    ui_->video_view->setUpdatesEnabled(true);
-    ui_->stackedWidget->setCurrentIndex(0);
-    user_info_.user_id = "";
-    user_info_.has_audio_stream = false;
-    user_info_.has_video_stream = false;
-    user_info_.has_screen_stream = false;
-    if (video_head_ != nullptr) {
-        video_head_->UpdateUserInfo(user_info_);
-    }
-}
-
 liteav::TXView VideoRenderView::GetPlayWindow() {
     return reinterpret_cast<liteav::TXView>(ui_->video_view->winId());
 }
 
 void VideoRenderView::SlotOnFirstVideoFrame(const QString& user_id, const TUIStreamType streamType) {
-    if (streamType == TUIStreamType::kStreamTypeScreen && user_id.toStdString() == user_info_.user_id) {
-        if (user_id.isEmpty()) {
-            return;
+    const TUIUserInfo* user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id.toStdString());
+    if (user_info == nullptr) {
+        return;
+    }
+    emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*user_info);
+    if (user_id.toStdString() == user_info_.user_id && DataStore::Instance()->GetCurrentUserInfo().user_id == user_info_.user_id) {
+        // 本地用户
+        // local user
+        ui_->stackedWidget->setCurrentIndex(1);
+        ui_->video_view->setUpdatesEnabled(false);
+        if (video_head_ != nullptr) {
+            video_head_->UpdateUserInfo(user_info_);
         }
+    } else if (user_id.toStdString() == user_info_.user_id && !user_id.isEmpty() &&
+        !is_screen_share_window_ && streamType != TUIStreamType::kStreamTypeScreen) {
+        // 远端用户
+        // remote user
+        ui_->stackedWidget->setCurrentIndex(1);
+        ui_->video_view->setUpdatesEnabled(false);
+        if (video_head_ != nullptr) {
+            video_head_->UpdateUserInfo(user_info_);
+        }
+    } else if (user_id.toStdString() == user_info_.user_id && !user_id.isEmpty() &&
+        is_screen_share_window_ && streamType == TUIStreamType::kStreamTypeScreen) {
+        // 屏幕分享
+        // screen share
         ui_->stackedWidget->setCurrentIndex(1);
         ui_->video_view->setUpdatesEnabled(false);
         if (video_head_ != nullptr) {
             video_head_->UserStartScreenShare(user_id.toStdString(), is_main_window_ && is_screen_share_window_);
         }
-        return;
     }
-    // 当前窗口用户还未设置，或屏幕分享的流不显示
-    // The user hasn't set the current window, or the screen sharing stream is not displayed
-    if (user_info_.user_id == "" || streamType != TUIStreamType::kStreamTypeCamera) {
-        return;
-    }
-    if ((DataStore::Instance()->GetCurrentUserInfo().user_id == user_info_.user_id && user_id.isEmpty())
-        || user_id.toStdString() == user_info_.user_id) {
-        ui_->stackedWidget->setCurrentIndex(1);
-        ui_->video_view->setUpdatesEnabled(false);
+}
 
-        if (video_head_ != nullptr && !user_id.isEmpty() && user_id.toStdString() == user_info_.user_id) {
-            const TUIUserInfo* user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id.toStdString());
-            video_head_->UpdateUserInfo(*user_info);
+void VideoRenderView::SlotOnRemoteUserCameraAvailable(const QString& user_id, bool available) {
+    if (user_id.toStdString() == user_info_.user_id && !is_screen_share_window_) {
+        if (!available) {
+            ui_->stackedWidget->setCurrentIndex(0);
+            ui_->video_view->setUpdatesEnabled(true);
+        }
+    }
+}
+
+void VideoRenderView::SlotOnRemoteUserScreenAvailable(const QString& user_id, bool available) {
+    if (user_id.toStdString() == user_info_.user_id && is_screen_share_window_) {
+        if (!available) {
+            ui_->stackedWidget->setCurrentIndex(0);
+            ui_->video_view->setUpdatesEnabled(true);
         }
     }
 }

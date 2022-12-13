@@ -28,9 +28,6 @@
     <Filter Include="Module">
       <UniqueIdentifier>{4fd7f4eb-3e9e-4c2f-b905-457cf42d48e4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Module\IM">
-      <UniqueIdentifier>{1ee31913-9cd4-4f54-ba40-48f5b57e19c9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Module\include">
       <UniqueIdentifier>{b67cb3bb-dfc6-4bc0-a42e-a4286bdc66c1}</UniqueIdentifier>
     </Filter>
@@ -114,15 +111,6 @@
     </ClCompile>
     <ClCompile Include="App\TransferRoomController.cpp">
       <Filter>App</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Module\IM\IMCore.cpp">
-      <Filter>Module\IM</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Module\IM\IMInterfaceCallback.cpp">
-      <Filter>Module\IM</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Module\IM\IMParser.cpp">
-      <Filter>Module\IM</Filter>
     </ClCompile>
     <ClCompile Include="..\Module\ScreenShareManager.cpp">
       <Filter>Module</Filter>
@@ -265,18 +253,6 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Module\IM\IMCore.h">
-      <Filter>Module\IM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Module\IM\IMCoreCallback.h">
-      <Filter>Module\IM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Module\IM\IMInterfaceCallback.h">
-      <Filter>Module\IM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Module\IM\IMParser.h">
-      <Filter>Module\IM</Filter>
     </ClInclude>
     <ClInclude Include="..\Module\include\IScreenShareManager.h">
       <Filter>Module\include</Filter>

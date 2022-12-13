@@ -101,7 +101,7 @@ class IScreenShareManager {
      *
      * @param view Control for preview image display. This can be set to `nullptr`, indicating not to display the preview of the shared screen.
      */
-    virtual void StartScreenCapture(void* view) = 0;
+    virtual void StartScreenCapture(void* target_id, void* view) = 0;
 
     /**
      * @desc 停止屏幕分享

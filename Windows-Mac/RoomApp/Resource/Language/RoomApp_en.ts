@@ -155,12 +155,17 @@
     <message>
         <location filename="../../App/Form/LayoutSelectView.ui" line="212"/>
         <source>MemberRight</source>
-        <translation>Right</translation>
+        <translation>List on right</translation>
     </message>
     <message>
         <location filename="../../App/Form/LayoutSelectView.ui" line="262"/>
         <source>MemberTop</source>
-        <translation>Top</translation>
+        <translation>List on top</translation>
+    </message>
+	<message>
+        <location filename="../../App/Form/LayoutSelectView.ui" line="312"/>
+        <source>MemberGrid</source>
+        <translation>Grid layout</translation>
     </message>
 </context>
 <context>

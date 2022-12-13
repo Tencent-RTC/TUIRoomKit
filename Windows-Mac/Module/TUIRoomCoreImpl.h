@@ -3,18 +3,18 @@
 #define MODULE_TUIROOMCOREIMPL_H_
 
 #include "include/TUIRoomCore.h"
+
 #include "ITRTCCloud.h"
-#include "TRTCCloudCallback.h"
-#include "IM/IMCoreCallback.h"
-#include "IM/IMCore.h"
+
+#include "TUIRoomEngine.h"
+#include "TUIRoomDefine.h"
+#include "TUIRoomObserver.h"
+
 #include "CommonDef.h"
 #include <unordered_map>
 
-class TUIRoomCoreImpl : public TUIRoomCore
-    , public liteav::ITRTCCloudCallback
-    , public liteav::ITRTCLogCallback
-    , public liteav::ITRTCAudioFrameCallback
-    , public IMCoreCallback {
+class TUIRoomCoreImpl : public TUIRoomCore,
+    public tuikit::TUIRoomObserver {
  public:
     TUIRoomCoreImpl();
     ~TUIRoomCoreImpl() override;
@@ -47,6 +47,7 @@ class TUIRoomCoreImpl : public TUIRoomCore
     /**************************************
     * 本地用户接口。(Local user APIs)
     **************************************/
+    int StartCameraDeviceTest(bool start, const liteav::TXView& view = nullptr);
     int StartCameraPreview(const liteav::TXView& view) override;
     int StopCameraPreview() override;
     int UpdateCameraPreview(const liteav::TXView& view) override;
@@ -73,18 +74,18 @@ class TUIRoomCoreImpl : public TUIRoomCore
     /*************************************
     * 场控相关。(Room control APIs)
     *************************************/
-    // 主持人禁成员麦克风，成员端回收到OnMuteMic回调。
-    // When the host calls this API to disable the mic of a member, the member will receive the `OnMuteMic` callback.
+    // 主持人邀请成员关闭/打开麦克风。
+    // When the host calls this API to invite a member to close / open the mic.
     int MuteUserMicrophone(const std::string& user_id, bool mute, Callback callback) override;
     int MuteAllUsersMicrophone(bool mute) override;
 
-    // 禁用禁成员摄像头，成员端回收到OnMuteCamera回调。
-    // When the host calls this API to disable the camera of a member, the member will receive the `OnMuteCamera` callback.
+    // 主持人邀请成员关闭/打开摄像头。
+    // When the host calls this API to invite a member to close / open the camera.
     int MuteUserCamera(const std::string& user_id, bool mute, Callback callback) override;
     int MuteAllUsersCamera(bool mute) override;
 
-    // 主持人禁止房间内IM聊天，成员端会收到OnMuteChatMessage回调。
-    // When the host calls this API to disable IM chat in the room, the members will receive the `OnMuteChatMessage` callback.
+    // 主持人禁止房间内IM聊天。
+    // When the host calls this API to disable IM chat in the room.
     int MuteChatRoom(bool mute) override;
 
     // 主持人踢人，成员端会收到OnExitRoom(1, "")回调。
@@ -100,15 +101,12 @@ class TUIRoomCoreImpl : public TUIRoomCore
     // This API is used by a member to reply to roll call.
     int ReplyCallingRoll(Callback callback) override;
 
-    // 主持人邀请成员发言。
-    // This API is used by the host to invite a member to speak.
-    int SendSpeechInvitation(const std::string& user_id, Callback callback) override;
     // 主持人取消邀请成员发言。
     // This API is used by the anchor to cancel the mic-on invitation sent to a member.
     int CancelSpeechInvitation(const std::string& user_id, Callback callback) override;
     // 成员同意/拒绝主持人的发言邀请
     // This API is used by a member to accept/reject the invitation to speak from the host.
-    int ReplySpeechInvitation(bool agree, Callback callback) override;
+    int ReplySpeechInvitation(uint32_t request_id, bool agree, Callback callback) override;
 
     // 成员申请发言
     // This API is used by a member to request to speak.
@@ -133,6 +131,9 @@ class TUIRoomCoreImpl : public TUIRoomCore
     // 成员直接停止发言，如果成员在台上，则直接停止发言。
     // This API is used by a member to exit speech state.
     int ExitSpeechState() override;
+
+    int EnterSpeechState(SuccessCallback success_callback,
+                         ErrorCallback error_callback) override;
 
     /******************************************
     * 基础组件接口。(Basic component APIs)
@@ -163,94 +164,79 @@ class TUIRoomCoreImpl : public TUIRoomCore
     * Set whether to display the dashboard
     *************************/
     int ShowDebugView(int show_type) override;
- public:
-    // TRTC callback functions
-    void onEnterRoom(int result) override;
-    void onExitRoom(int reason) override;
 
-    void onUserVideoAvailable(const char* user_id, bool available) override;
-    void onUserSubStreamAvailable(const char* user_id, bool available) override;
-    void onScreenCaptureStoped(int reason) override;
-    void onScreenCaptureStarted() override;
-    void onUserAudioAvailable(const char* user_id, bool available) override;
-    void onFirstVideoFrame(const char* user_id, const liteav::TRTCVideoStreamType stream_type,
-        const int width, const int height) override;
-    void onRemoteUserEnterRoom(const char* user_id) override;
-    void onRemoteUserLeaveRoom(const char* user_id, int reason) override;
-    void onUserVoiceVolume(liteav::TRTCVolumeInfo* user_volumes, uint32_t user_volumes_count, uint32_t total_volume) override;
-    void onError(TXLiteAVError error_code, const char* error_message, void* extra_info) override;
-    void onWarning(TXLiteAVWarning warning_code, const char* warning_message, void* extra_info) override;
-    void onLog(const char* log, liteav::TRTCLogLevel level, const char* module) override;
+private:
+    void OnFirstVideoFrame(const char* user_id, const TUIStreamType stream_type);
 
-    void onTestSpeakerVolume(uint32_t volume) override;
-    void onTestMicVolume(uint32_t volume) override;
-    void onAudioDeviceCaptureVolumeChanged(uint32_t volume, bool muted) override;
-    void onAudioDevicePlayoutVolumeChanged(uint32_t volume, bool muted) override;
+private:
+    // TRTC callback
+    void onError(TXLiteAVError error_code, const char* error_message, void* extra_info);
+    void onWarning(TXLiteAVWarning warning_code, const char* warning_message, void* extra_info);
 
-    void onNetworkQuality(liteav::TRTCQualityInfo local_quality, liteav::TRTCQualityInfo* remote_quality,
-        uint32_t remote_quality_count) override;
-    void onStatistics(const liteav::TRTCStatistics& statistics) override;
+    // TUIRoomEngine callback
+    void onError(tuikit::TUIError error_code, const char* message) override;
+    void onKickedOutOfRoom(const char* room_id, const char* message) override;
+    void onKickedOffLine(const char* message) override;
 
-    // IM callback functions
-    void OnIMError(int code, const std::string& message) override;
-    void OnIMLogin(int code, const std::string& message) override;
-    void OnIMLogout(int code, const std::string& message) override;
-    void OnIMCreateRoom(int code, const std::string& message) override;
-    void OnIMDestroyRoom(int code, const std::string& message) override;
-    void OnIMEnterRoom(int code, const std::string& message) override;
-    void OnIMExitRoom(TUIExitRoomType code, const std::string& message) override;
-    void OnIMUserEnterRoom(int code, const std::string& user_id, const std::string& user_name) override;
-    void OnIMUserExitRoom(int code, const std::string& user_id) override;
-    void OnIMRoomMasterChanged(const std::string& user_id) override;
-    void OnIMGetRoomMemberInfoList(const std::vector<TUIUserInfo>& member_array) override;
-    void OnIMGetRoomInfo(const TUIRoomInfo& info) override;
+    void onUserSigExpired()override;
 
-    void OnIMReceiveChatMessage(const std::string& user_id, const std::string& message) override;
-    void OnIMReceiveCustomMessage(const std::string& user_id, const std::string& message) override;
-    void OnIMChatRoomMuted(bool muted) override;
+    void onRoomDismissed(const char* room_id)override;
+    void onRoomInfoChanged(const char* room_id,
+                           const tuikit::TUIRoomInfo& roomInfo) override;
 
-    // Invitation
-    void OnIMReceiveSpeechInvitation() override;
-    void OnIMReceiveInvitationCancelled() override;
-    void OnIMReceiveReplyToSpeechInvitation(const std::string& user_id, bool agree) override;
+    void onRemoteUserEnterRoom(const char* room_id, const tuikit::TUIUserInfo& user_info) override;
+    void onRemoteUserLeaveRoom(const char* room_id, const tuikit::TUIUserInfo& user_info) override;
 
-    // Application
-    void OnIMReceiveSpeechApplication(const std::string& user_id) override;
-    void OnIMSpeechApplicationCancelled(const std::string& user_id) override;
-    void OnIMReceiveReplyToSpeechApplication(bool agree) override;
-    void OnIMSpeechApplicationForbidden(bool forbidden) override;
+    void onUserRoleChanged(const char* user_id, const tuikit::TUIRole& user_role) override;
+    void onUserMuteStateChanged(const char* user_id, bool muted)override;
+    void onUserVideoStateChanged(const char* user_id,
+        tuikit::TUIVideoStreamType stream_type, bool has_video,
+        tuikit::TUIChangeReason reason) override;
+    void onUserAudioStateChanged(const char* user_id, bool has_audio,
+        tuikit::TUIChangeReason reason) override;
+    void onUserScreenCaptureStopped(int reason) override;;
+    void onUserVoiceVolumeChanged(tuikit::TUIMap<const char*, int>* volume_map)override;
+    void onUserNetworkQualityChanged(tuikit::TUIList<tuikit::TUINetwork>* network_list)override;
 
-    void OnIMOrderedToExitSpeechkState() override;
-    // Roll call
-    void OnIMCallingRollStarted() override;
-    void OnIMCallingRollStopped() override;
-    void OnIMMemberReplyCallingRoll(const std::string& user_id) override;
-    void OnIMMicrophoneMuted(bool muted) override;
-    void OnIMAllUsersMicrophoneMuted(bool muted) override;
-    void OnIMCameraMuted(bool muted) override;
-    void OnIMAllUsersCameraMuted(bool muted) override;
+    void onSeatControlEnabled(bool enabled, int max_seat_number);
+    void onSeatListChanged(
+        tuikit::TUIList<tuikit::TUISeatInfo>* seat_ist,
+        tuikit::TUIList<tuikit::TUISeatInfo>* users_seated,
+        tuikit::TUIList<tuikit::TUISeatInfo>*  users_left) override;
+
+    void onRequestReceived(const tuikit::TUIRequest* request)override;
+    void onRequestCancelled(uint32_t request_id, const char* user_id)override;
+
+    void onReceiveTextMessage(const char* room_id, const tuikit::TUIMessage& message) override;
+    void onReceiveCustomMessage(const char* room_id, const tuikit::TUIMessage& message) override;
 
  private:
-    void EnterTRTCRoom();
     void ClearRoomInfo();
+    void TakeSeat(SuccessCallback success_callback, ErrorCallback error_callback);
+    void GetSeatList();
+    void GetUserList(uint64_t next_sequence);
 
  private:
-    liteav::ITRTCCloud*           trtc_cloud_ = nullptr;
+    ITRTCCloud*    trtc_cloud_ = nullptr;
+    tuikit::TUIRoomEngine* room_engine_ = nullptr;
     TUIRoomCoreCallback*          room_core_callback_ = nullptr;
+    std::vector<uint32_t>         received_request_ids_;
+
     liteav::ITXDeviceManager*     device_manager_ = nullptr;
-    IScreenShareManager*          screen_share_manager_ = nullptr;
+    IScreenShareManager* screen_share_manager_ = nullptr;
+    std::vector<IScreenShareManager::ScreenCaptureSourceInfo> screen_window_info_list_;
 
     TUIUserInfo                   local_user_info_;
     TUIRoomInfo                   room_info_;
     std::unordered_map<std::string, TUIUserInfo> room_user_map_;
 
-    IMCore*         im_core_ = nullptr;
     bool            enter_room_success_ = false;
     bool            camera_mirror_ = false;
+    bool            open_ai_noise_reduction_ = false;
     int             sdk_app_id_;
     std::string     user_sig_;
     std::string     sdk_version_;
-    liteav::TRTCAudioQuality audio_quality_ = liteav::TRTCAudioQualityDefault;
+    liteav::TRTCAudioQuality audio_quality_ = liteav::TRTCAudioQualityMusic;
 };
 
 #endif  //  MODULE_TUIROOMCOREIMPL_H_
