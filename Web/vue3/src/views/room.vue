@@ -1,13 +1,15 @@
 <template>
-  <Room
+  <room
     ref="TUIRoomRef"
     @on-log-out="handleLogOut"
     @on-create-room="onCreateRoom"
     @on-enter-room="onEnterRoom"
-    @on-exit-room="onExitRoom"
     @on-destroy-room="onDestroyRoom"
-    @on-kick-off="onKickOff"
-  ></Room>
+    @on-exit-room="onExitRoom"
+    @on-kicked-out-of-room="onKickedOutOfRoom"
+    @on-kick-off-line="onKickedOffLine"
+    @on-user-sig-expired="onUserSigExpired"
+  ></room>
 </template>
 
 <script setup lang="ts">
@@ -16,6 +18,9 @@ import Room from '@/TUIRoom/index.vue';
 import { useRoute } from 'vue-router';
 import router from '@/router';
 import { checkNumber } from '@/TUIRoom/utils/common';
+import { useI18n } from 'vue-i18n';
+import { ElMessageBox } from 'element-plus';
+const { t } = useI18n();
 
 const route = useRoute();
 
@@ -34,38 +39,68 @@ const TUIRoomRef = ref();
 
 onMounted(async () => {
   const { action, roomMode, roomParam } = JSON.parse(roomInfo as string);
-  const { sdkAppId, userId, userSig, shareUserId, shareUserSig, userName, userAvatar } = JSON.parse(userInfo as string);
-  await TUIRoomRef.value?.init({
-    sdkAppId,
-    userId,
-    userSig,
-    userName,
-    userAvatar,
-    shareUserId,
-    shareUserSig,
-  });
-  if (action === 'createRoom') {
-    await TUIRoomRef.value?.createRoom(Number(roomId), roomMode, roomParam);
-  } else if (action === 'enterRoom') {
-    await TUIRoomRef.value?.enterRoom(Number(roomId), roomParam);
+  const { sdkAppId, userId, userSig, userName, avatarUrl } = JSON.parse(userInfo as string);
+  try {
+    await TUIRoomRef.value?.init({
+      sdkAppId,
+      userId,
+      userSig,
+      userName,
+      avatarUrl,
+    });
+    if (action === 'createRoom') {
+      try {
+        await TUIRoomRef.value?.createRoom({ roomId, roomName: roomId, roomMode, roomParam });
+      } catch (error: any) {
+        const message = t('Failed to enter the room.') + error.message;
+        ElMessageBox.alert(message, t('Note'), {
+          customClass: 'custom-element-class',
+          confirmButtonText: t('Confirm'),
+          callback: () => {
+            router.replace({ path: 'home' });
+          },
+        });
+      }
+    } else if (action === 'enterRoom') {
+      try {
+        await TUIRoomRef.value?.enterRoom({ roomId, roomParam });
+      } catch (error: any) {
+        const message = t('Failed to enter the room.') + error.message;
+        ElMessageBox.alert(message, t('Note'), {
+          customClass: 'custom-element-class',
+          confirmButtonText: t('Confirm'),
+          callback: () => {
+            router.replace({ path: 'home' });
+          },
+        });
+      }
+    }
+  } catch (error: any) {
+    const message = t('Failed to enter the room.') + error.message;
+    ElMessageBox.alert(message, t('Note'), {
+      customClass: 'custom-element-class',
+      confirmButtonText: t('Confirm'),
+      callback: () => {
+        sessionStorage.removeItem('tuiRoom-currentUserInfo');
+        router.replace({ path: 'home' });
+      },
+    });
   }
 });
+
 /**
  * Processing users click [Logout Login] in the upper left corner of the page
- *
  * 处理用户点击页面左上角【退出登录】
 **/
 function handleLogOut() {
 /**
  * The accessor handles the logout method
- *
  * 接入方处理 logout 方法
 **/
 }
 
 /**
  * Hosts create room callbacks
- *
  * 主持人创建房间回调
 **/
 function onCreateRoom(info: { code: number; message: string }) {
@@ -74,7 +109,6 @@ function onCreateRoom(info: { code: number; message: string }) {
 
 /**
  * Ordinary members enter the room callback
- *
  * 普通成员进入房间回调
 **/
 function onEnterRoom(info: { code: number; message: string }) {
@@ -83,7 +117,6 @@ function onEnterRoom(info: { code: number; message: string }) {
 
 /**
  * Hosts destroy room callbacks
- *
  * 主持人销毁房间回调
 **/
 const onDestroyRoom = (info: { code: number; message: string }) => {
@@ -94,7 +127,6 @@ const onDestroyRoom = (info: { code: number; message: string }) => {
 
 /**
  * Ordinary members exit the room callback
- *
  * 普通成员退出房间回调
 **/
 const onExitRoom = (info: { code: number; message: string }) => {
@@ -105,15 +137,34 @@ const onExitRoom = (info: { code: number; message: string }) => {
 
 /**
  * Ordinary members were kicked out of the room by the host
- *
  * 普通成员被主持人踢出房间
 **/
-const onKickOff = (info: { code: number; message: string }) => {
-  console.debug('onKickOff:', info);
+const onKickedOutOfRoom = (info: { roomId: string; message: string }) => {
+  console.debug('onKickedOutOfRoom:', info);
   sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });
 };
 
+/**
+ * Users are kicked offline
+ * 被踢下线
+ */
+const onKickedOffLine = (info: { message: string }) => {
+  console.debug('onKickedOffLine:', info);
+  sessionStorage.removeItem('tuiRoom-roomInfo');
+  router.replace({ path: '/home' });
+};
+
+/**
+ * Ordinary members were kicked out of the room by the host
+ * userSig 过期，需要获取新的 userSig
+ */
+const onUserSigExpired = () => {
+  console.debug('onUserSigExpired');
+  sessionStorage.removeItem('tuiRoom-roomInfo');
+  sessionStorage.removeItem('tuiRoom-currentUserInfo');
+  router.replace({ path: '/home' });
+};
 </script>
 
 <style lang="scss">

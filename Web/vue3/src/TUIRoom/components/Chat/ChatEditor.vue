@@ -1,16 +1,16 @@
 <template>
   <div
-    :class="['chat-editor', isMuteChatByMater ? 'disable-editor': '']"
+    :class="['chat-editor', cannotSendMessage ? 'disable-editor': '']"
   >
     <textarea
       ref="editorInputEle"
       v-model="sendMsg"
       class="content-bottom-input"
-      :disabled="isMuteChatByMater"
-      :placeholder="isMuteChatByMater ? t('Muted by the moderator') : t('Type a message')"
+      :disabled="cannotSendMessage"
+      :placeholder="cannotSendMessage ? t('Muted by the moderator') : t('Type a message')"
       @keyup.enter="sendMessage"
     />
-    <div v-if="!isMuteChatByMater" class="chat-editor-toolbar">
+    <div v-if="!cannotSendMessage" class="chat-editor-toolbar">
       <div class="left-section">
         <emoji @choose-emoji="handleChooseEmoji"></emoji>
       </div>
@@ -20,20 +20,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessage } from 'element-plus';
 
-
-import TUIRoomCore from '../../tui-room-core';
+import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { useChatStore } from '../../stores/chat';
+import { useRoomStore } from '../../stores/room';
 import emoji from './EditorTools/emoji.vue';
 import { useI18n } from 'vue-i18n';
 
+const roomEngine = useGetRoomEngine();
+
 const { t } = useI18n();
 const chatStore = useChatStore();
+const roomStore = useRoomStore();
 
 const { isMuteChatByMater } = storeToRefs(chatStore);
+const { enableMessage } = storeToRefs(roomStore);
 const editorInputEle = ref();
 const sendMsg = ref('');
 
@@ -43,6 +47,14 @@ watch(isMuteChatByMater, (value) => {
   }
 });
 
+watch(enableMessage, (value) => {
+  if (!value) {
+    sendMsg.value = '';
+  }
+});
+
+const cannotSendMessage = computed(() => Boolean(isMuteChatByMater.value || !enableMessage.value));
+
 const sendMessage = async () => {
   const msg = sendMsg.value.replace('\n', '');
   sendMsg.value = '';
@@ -50,16 +62,20 @@ const sendMessage = async () => {
     return;
   }
   try {
-    const tuiResponse = await TUIRoomCore.sendChatMessage(msg);
-    const { code, data: message } = tuiResponse;
-    if (code === 0) {
-      /**
-       * Message sent successfully
-       *
-       * 消息发送成功
-      **/
-      chatStore.updateMessageList(message);
-    }
+    await roomEngine.instance?.sendTextMessage({
+      messageText: msg,
+    });
+    chatStore.updateMessageList({
+      ID: Math.random().toString(),
+      type: 'TIMTextElem',
+      payload: {
+        text: msg,
+      },
+      nick: roomStore.localUser.userName || roomStore.localUser.userId,
+      from: roomStore.localUser.userId,
+      flow: 'out',
+      sequence: Math.random(),
+    });
   } catch (e) {
     /**
      * Message delivery failure

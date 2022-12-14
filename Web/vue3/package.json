@@ -1,14 +1,15 @@
 {
-  "name": "tuiroom",
+  "name": "room-uikit-vue3",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --force",
     "build": "vue-tsc --noEmit --skipLibCheck && vite build",
     "preview": "vite preview",
     "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
   },
   "dependencies": {
+    "@tencentcloud/tuiroom-engine-js": "^1.0.0",
     "axios": "^0.27.2",
     "element-plus": "^2.2.0",
     "events": "^3.3.0",
@@ -16,10 +17,6 @@
     "mitt": "^3.0.0",
     "pinia": "^2.0.13",
     "qs": "^6.10.3",
-    "rtc-beauty-plugin": "^0.1.0",
-    "tim-js-sdk": "^2.18.0",
-    "trtc-js-sdk": "^4.12.7",
-    "tsignaling": "^0.10.0",
     "vue": "^3.2.25",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.0.14"
@@ -36,6 +33,7 @@
     "eslint-config-tencent": "^1.0.4",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-vue": "^8.6.0",
+    "replace": "^1.2.1",
     "sass": "^1.50.0",
     "typescript": "^4.5.4",
     "unplugin-auto-import": "^0.7.1",

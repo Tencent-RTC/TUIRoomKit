@@ -12,7 +12,7 @@
   * 在 template 中使用 <audio-control />
 -->
 <template>
-  <div class="video-control-container">
+  <div class="video-control-container" @click="emits('click')">
     <icon-button
       ref="videoIconButtonRef"
       :title="t('Camera')"
@@ -28,28 +28,56 @@
       class="video-tab"
     ></video-setting-tab>
   </div>
+  <el-dialog
+    v-model="showRequestOpenCameraDialog"
+    class="custom-element-class"
+    title="Tips"
+    :modal="false"
+    :show-close="false"
+    :append-to-body="true"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+    width="500px"
+  >
+    <span>
+      {{ t('The host invites you to turn on the camera') }}
+    </span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="handleAccept">{{ t('Turn on the camera') }}</el-button>
+        <el-button @click="handleReject">{{ t('Keep it closed') }}</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, Ref } from 'vue';
+import { ref, computed, onMounted, onUnmounted, Ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessage } from 'element-plus';
 
 import IconButton from '../common/IconButton.vue';
 import VideoSettingTab from '../base/VideoSettingTab.vue';
-import TUIRoomCore from '../../tui-room-core';
 
-import { useBasicStore } from '../../stores/basic';
 import { useRoomStore } from '../../stores/room';
 import { ICON_NAME } from '../../constants/icon';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from 'vue-i18n';
 
-const basicStore = useBasicStore();
+import useGetRoomEngine from '../../hooks/useRoomEngine';
+import TUIRoomEngine, { TUIVideoStreamType, TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
+const roomEngine = useGetRoomEngine();
+
 const roomStore = useRoomStore();
 
-const { isDefaultOpenCamera, localStream, isLocalVideoMuted } = storeToRefs(roomStore);
-const { isLocalVideoIconDisable, isMuteAllVideo, isAudience } = storeToRefs(basicStore);
+const emits = defineEmits(['click']);
+
+const {
+  enableVideo,
+  isAudience,
+  localStream,
+  isLocalVideoIconDisable,
+} = storeToRefs(roomStore);
 const { t } = useI18n();
 
 const showVideoSettingTab: Ref<boolean> = ref(false);
@@ -60,21 +88,13 @@ const iconName = computed(() => {
   if (isLocalVideoIconDisable.value) {
     return ICON_NAME.CameraOffDisabled;
   }
-  return isLocalVideoMuted.value ? ICON_NAME.CameraOff : ICON_NAME.CameraOn;
+  return localStream.value.hasVideoStream ? ICON_NAME.CameraOn : ICON_NAME.CameraOff;
 });
-
-watch(isDefaultOpenCamera, (val) => {
-  isLocalVideoMuted.value = !val;
-}, { immediate: true });
-
-watch(localStream, (val) => {
-  isLocalVideoMuted.value = !val.isVideoStreamAvailable;
-}, { immediate: true });
 
 function toggleMuteVideo() {
   if (isLocalVideoIconDisable.value) {
     let warningMessage = '';
-    if (isMuteAllVideo.value) {
+    if (!enableVideo.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_MUTE_ALL;
     } else if (isAudience.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_AUDIENCE;
@@ -87,17 +107,20 @@ function toggleMuteVideo() {
     return;
   }
 
-  roomStore.setIsLocalVideoMuted(!isLocalVideoMuted.value);
-  /**
-   * When closing the local camera you should turn off the camera light and use the stopCameraPreview method
-   *
-   * 关闭本地摄像头的时候应该熄灭摄像头灯，使用 stopCameraPreview 方法
-  **/
-  if (isLocalVideoMuted.value) {
-    TUIRoomCore.stopCameraPreview();
+  if (localStream.value.hasVideoStream) {
+    roomEngine.instance?.closeLocalCamera();
+    roomEngine.instance?.stopPushLocalVideo();
+    // 如果是全员禁画状态下，用户主动关闭摄像头之后不能再自己打开
+    if (!roomStore.enableVideo) {
+      roomStore.setCanControlSelfVideo(false);
+    }
   } else {
-    const previewDom = document.getElementById(`${roomStore.localStream.userId}_main`);
-    previewDom && TUIRoomCore.startCameraPreview(previewDom);
+    roomEngine.instance?.setLocalRenderView({
+      view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
+      streamType: TUIVideoStreamType.kCameraStream,
+    });
+    roomEngine.instance?.openLocalCamera();
+    roomEngine.instance?.startPushLocalVideo();
   }
   showVideoSettingTab.value = false;
 }
@@ -120,12 +143,65 @@ function handleDocumentClick(event: MouseEvent) {
   }
 }
 
+// -------- 处理主持人打开/关闭摄像头信令 --------
+const showRequestOpenCameraDialog: Ref<boolean> = ref(false);
+const requestOpenCameraRequestId: Ref<number> = ref(0);
+async function onRequestReceived(eventInfo: { request: TUIRequest }) {
+  const { requestAction, requestId } = eventInfo.request;
+  // 主持人邀请打开麦克风，同意之后将会自动打开摄像头
+  if (requestAction === TUIRequestAction.kRequestToOpenRemoteCamera) {
+    requestOpenCameraRequestId.value = requestId;
+    showRequestOpenCameraDialog.value = true;
+  }
+}
+
+// 接受主持人邀请，打开摄像头
+async function handleAccept() {
+  roomStore.setCanControlSelfVideo(true);
+  roomEngine.instance?.setLocalRenderView({
+    view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
+    streamType: TUIVideoStreamType.kCameraStream,
+  });
+  await roomEngine.instance?.responseRemoteRequest({
+    requestId: requestOpenCameraRequestId.value,
+    agree: true,
+  });
+  requestOpenCameraRequestId.value = 0;
+  showRequestOpenCameraDialog.value = false;
+}
+
+// 保持静音
+async function handleReject() {
+  await roomEngine.instance?.responseRemoteRequest({
+    requestId: requestOpenCameraRequestId.value,
+    agree: false,
+  });
+  requestOpenCameraRequestId.value = 0;
+  showRequestOpenCameraDialog.value = false;
+}
+
+// 请求被取消
+async function onRequestCancelled(eventInfo: { requestId: number }) {
+  const { requestId } = eventInfo;
+  if (requestOpenCameraRequestId.value === requestId) {
+    showRequestOpenCameraDialog.value = false;
+  }
+}
+
 onMounted(() => {
   document.addEventListener('click', handleDocumentClick, true);
 });
 
+TUIRoomEngine.once('ready', () => {
+  roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
+  roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
+});
+
 onUnmounted(() => {
   document.removeEventListener('click', handleDocumentClick, true);
+
+  roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
+  roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
 });
 
 </script>
@@ -134,17 +210,14 @@ onUnmounted(() => {
 @import '../../assets/style/var.scss';
 
 $videoTabWidth: 320px;
-// $videoTabHeight: 306px;
-$videoTabHeight: 276px;
 
 .video-control-container {
   position: relative;
   .video-tab {
     position: absolute;
-    top: -($videoTabHeight + 10px);
+    bottom: 90px;
     left: -60px;
     width: $videoTabWidth;
-    height: $videoTabHeight;
     background: $toolBarBackgroundColor;
     padding: 20px;
   }

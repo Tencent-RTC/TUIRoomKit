@@ -18,7 +18,7 @@
       <div class="apply-list">
         <div v-for="(item, index) in applyToAnchorList" :key="index" class="apply-item">
           <div class="user-info">
-            <img class="user-avatar" :src="item.userAvatar || defaultAvatar">
+            <img class="avatar-url" :src="item.avatarUrl || defaultAvatar">
             <span class="user-name" :title="item.userName || item.userId">{{ item.userName || item.userId }}</span>
           </div>
           <div class="control-container">
@@ -51,8 +51,8 @@ const { t } = useI18n();
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 const { handleUserApply, denyAllUserApply } = useMasterApplyControl();
-const { isMaster, showApplyUserList } = storeToRefs(basicStore);
-const { applyToAnchorList } = storeToRefs(roomStore);
+const { showApplyUserList } = storeToRefs(basicStore);
+const { isMaster, applyToAnchorList } = storeToRefs(roomStore);
 const masterApplyControlRef = ref<InstanceType<typeof IconButton>>();
 const masterApplyListRef = ref();
 
@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
           height: 100%;
           display: flex;
           align-items: center;
-          .user-avatar {
+          .avatar-url {
             width: 48px;
             height: 48px;
             border-radius: 50%;

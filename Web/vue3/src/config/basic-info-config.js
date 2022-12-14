@@ -67,7 +67,7 @@ export const userInfo = {
   // 用户昵称
   userName: 'myName',
   // 用户头像
-  userAvatar: '',
+  avatarUrl: '',
 };
 
 export function getBasicInfo() {
@@ -77,16 +77,12 @@ export function getBasicInfo() {
   }
   const generator = new LibGenerateTestUserSig(SDKAPPID, SECRETKEY, EXPIRETIME);
   const userSig = generator.genTestUserSig(userInfo.userId);
-  const shareUserId = `share_${userInfo.userId}`;
-  const shareUserSig = generator.genTestUserSig(shareUserId);
-  const { userId, userName, userAvatar } = userInfo;
+  const { userId, userName, avatarUrl } = userInfo;
   return {
     sdkAppId: SDKAPPID,
     userId,
-    shareUserId,
     userSig,
-    shareUserSig,
     userName,
-    userAvatar,
+    avatarUrl,
   };
 };

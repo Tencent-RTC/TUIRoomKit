@@ -1,7 +1,7 @@
 <template>
   <div ref="userInfoRef" class="user-info-container">
     <div class="user-info-content" @click="handleUserControl">
-      <img class="avatar" :src="userAvatar || defaultAvatar">
+      <img class="avatar" :src="avatarUrl || defaultAvatar">
       <div class="name">{{ userName || userId }}</div>
       <svg-icon class="down-icon" :icon-name="iconName" size="medium"></svg-icon>
     </div>
@@ -16,7 +16,7 @@
       :title="t('Edit profile')"
       width="420px"
       :model-value="showUserNameEdit"
-      custom-class="custom-element-class"
+      class="custom-element-class"
       :modal="true"
       :append-to-body="false"
       :close-on-click-modal="true"
@@ -41,23 +41,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, Ref } from 'vue';
+import { ref, onMounted, computed, onUnmounted, Ref } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import defaultAvatar from '../../assets/imgs/avatar.png';
 import { ICON_NAME } from '../../constants/icon';
 import { useI18n } from 'vue-i18n';
-import { computed } from '@vue/reactivity';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { ElMessage } from 'element-plus';
 import { MESSAGE_DURATION } from '../../constants/message';
-import TUIRoomCore from '@/TUIRoom/tui-room-core';
+import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import { useRoomStore } from '../../stores/room';
 
 interface Props {
   userId: string,
   userName: string,
-  userAvatar?: string,
+  avatarUrl?: string,
 }
 defineProps<Props>();
 defineEmits(['logOut']);
@@ -131,7 +130,7 @@ async function handleSaveUserName(userName: string) {
     return;
   }
   basicStore.setUserName(userName);
-  TUIRoomCore.updateMyProfile({ nick: userName });
+  TUIRoomEngine.setSelfInfo({ userName, avatarUrl: roomStore.localUser.avatarUrl || '' });
   roomStore.setLocalUser({ userName });
   closeEditUserNameDialog();
 }

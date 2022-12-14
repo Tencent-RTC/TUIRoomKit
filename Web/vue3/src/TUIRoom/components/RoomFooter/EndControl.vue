@@ -2,7 +2,7 @@
   <div class="end-button" tabindex="1" @click="stopMeeting">{{ t('End') }}</div>
   <el-dialog
     :model-value="visible"
-    custom-class="custom-element-class"
+    class="custom-element-class"
     :title="title"
     :modal="true"
     :append-to-body="false"
@@ -10,7 +10,7 @@
     :before-close="cancel"
   >
     <div v-if="currentDialogType === DialogType.BasicDialog">
-      <span v-if="basicInfo.role === ETUIRoomRole.MASTER">
+      <span v-if="roomStore.isMaster">
         <!-- eslint-disable-next-line max-len -->
         {{ t('You are currently the room host, please select the appropriate action.If you select "Leave Room", the room will not be dissolved and you will need to appoint a new host.') }}
       </span>
@@ -34,7 +34,7 @@
     </div>
     <template #footer>
       <div v-if="currentDialogType === DialogType.BasicDialog">
-        <el-button v-if="basicInfo.role === ETUIRoomRole.MASTER" type="primary" @click="dismissRoom">
+        <el-button v-if="roomStore.isMaster" type="primary" @click="dismissRoom">
           {{ t('Dismiss') }}
         </el-button>
         <el-button v-if="showLeaveRoom" type="primary" @click="leaveRoom">{{ t('Leave') }}</el-button>
@@ -49,15 +49,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, Ref } from 'vue';
+import { onUnmounted, ref, Ref, computed, watch } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
-import TUIRoomCore, { ETUIRoomRole, ETUIRoomEvents } from '../../tui-room-core';
-import logger from '../../tui-room-core/common/logger';
+import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import { useBasicStore } from '../../stores/basic';
 import { useRoomStore } from '../../stores/room';
-import { computed } from '@vue/reactivity';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
+import useGetRoomEngine from '../../hooks/useRoomEngine';
+
+const roomEngine = useGetRoomEngine();
 
 const { t } = useI18n();
 
@@ -72,19 +73,18 @@ const currentDialogType = ref(DialogType.BasicDialog);
 const emit = defineEmits(['onExitRoom', 'onDestroyRoom']);
 
 const visible: Ref<boolean> = ref(false);
-const basicInfo = useBasicStore();
-logger.log(`${logPrefix} basicInfo:`, basicInfo);
+const basicStore = useBasicStore();
+console.log(`${logPrefix} basicStore:`, basicStore);
 
 const roomStore = useRoomStore();
-const { remoteAnchorList } = storeToRefs(roomStore);
+const { localUser, remoteAnchorList } = storeToRefs(roomStore);
 
 const title = computed(() => (currentDialogType.value === DialogType.BasicDialog ? t('Leave room?') : t('Select a new host')));
 const showLeaveRoom = computed(() => (
-  basicInfo.role ===  ETUIRoomRole.MASTER && remoteAnchorList.value.length > 0)
-  || basicInfo.role !== ETUIRoomRole.MASTER);
+  roomStore.isMaster && remoteAnchorList.value.length > 0)
+  || !roomStore.isMaster);
 
 const selectedUser: Ref<string> = ref('');
-const roomMember = ref(TUIRoomCore.getRoomUsers());
 
 function resetState() {
   visible.value = false;
@@ -95,16 +95,21 @@ function stopMeeting() {
   if (!visible.value) {
     visible.value = true;
   }
-  /**
-   * Get the latest members in the room
-   *
-   * 获取房间里最新成员
-  **/
-  roomMember.value = TUIRoomCore.getRoomUsers();
 }
 
 function cancel() {
   resetState();
+}
+
+async function closeMediaBeforeLeave() {
+  if (localUser.value.hasAudioStream) {
+    await roomEngine.instance?.closeLocalMicrophone();
+    await roomEngine.instance?.stopPushLocalAudio();
+  }
+  if (localUser.value.hasVideoStream) {
+    await roomEngine.instance?.closeLocalCamera();
+    await roomEngine.instance?.stopPushLocalVideo();
+  }
 }
 
 /**
@@ -114,14 +119,13 @@ function cancel() {
 **/
 async function dismissRoom() {
   try {
-    logger.log(`${logPrefix}dismissRoom: enter`);
-    const response = await TUIRoomCore.destroyRoom();
-    await TUIRoomCore.logout();
-    logger.log(`${logPrefix}dismissRoom:`, response);
+    console.log(`${logPrefix}dismissRoom: enter`);
+    await closeMediaBeforeLeave();
+    await roomEngine.instance?.destroyRoom();
     resetState();
     emit('onDestroyRoom', { code: 0, message: '' });
   } catch (error) {
-    logger.error(`${logPrefix}dismissRoom error:`, error);
+    console.error(`${logPrefix}dismissRoom error:`, error);
   }
 }
 
@@ -132,17 +136,17 @@ async function dismissRoom() {
 **/
 async function leaveRoom() { // eslint-disable-line
   try {
-    if (basicInfo.role === ETUIRoomRole.MASTER) {
+    if (roomStore.isMaster) {
       currentDialogType.value = DialogType.TransferDialog;
       return;
     }
-    const response = await TUIRoomCore.exitRoom();
-    await TUIRoomCore.logout();
-    logger.log(`${logPrefix}leaveRoom:`, response);
+    await closeMediaBeforeLeave();
+    const response = await roomEngine.instance?.exitRoom();
+    console.log(`${logPrefix}leaveRoom:`, response);
     resetState();
     emit('onExitRoom', { code: 0, message: '' });
   } catch (error) {
-    logger.error(`${logPrefix}leaveRoom error:`, error);
+    console.error(`${logPrefix}leaveRoom error:`, error);
   }
 }
 
@@ -152,15 +156,15 @@ async function transferAndLeave() {
   }
   try {
     const userId = selectedUser.value;
-    let response = await TUIRoomCore.transferRoomMaster(userId);
-    logger.log(`${logPrefix}transferAndLeave:`, response);
-    response = await TUIRoomCore.exitRoom();
-    await TUIRoomCore.logout();
-    logger.log(`${logPrefix}exitRoom:`, response);
+    const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({ userId, role: TUIRole.kRoomOwner });
+    console.log(`${logPrefix}transferAndLeave:`, changeUserRoleResponse);
+    await closeMediaBeforeLeave();
+    const exitRoomResponse = await roomEngine.instance?.exitRoom();
+    console.log(`${logPrefix}exitRoom:`, exitRoomResponse);
     resetState();
     emit('onExitRoom', { code: 0, message: '' });
   } catch (error) {
-    logger.error(`${logPrefix}transferAndLeave error:`, error);
+    console.error(`${logPrefix}transferAndLeave error:`, error);
   }
 }
 
@@ -169,61 +173,56 @@ async function transferAndLeave() {
  *
  * 收到主持人解散房间通知
 **/
-const onRoomDestroyed = async () => {
-  if (basicInfo.userId === basicInfo.masterUserId) {
-    return;
-  }
+const onRoomDismissed = async (eventInfo: { roomId: string}) => {
   try {
+    const { roomId } = eventInfo;
+    console.log(`${logPrefix}onRoomDismissed:`, roomId);
     ElMessageBox.alert(t('The host closed the room.'), t('Note'), {
       customClass: 'custom-element-class',
       confirmButtonText: t('Confirm'),
       callback: async () => {
         resetState();
-        await TUIRoomCore.logout();
         emit('onDestroyRoom', { code: 0, message: '' });
       },
     });
   } catch (error) {
-    logger.error(`${logPrefix}onRoomDestroyed error:`, error);
+    console.error(`${logPrefix}onRoomDestroyed error:`, error);
   }
 };
 
 /**
- * Receive notification of transfer of authority from the moderator
+ * By listening for a change in ownerId,
+ * the audience receives a notification that the host has handed over the privileges
  *
- * 收到主持人移交权限通知
+ * 通过监听ownerId发生改变，观众收到主持人移交权限通知
 **/
-const onRoomMasterChanged = async (newOwner: { newOwnerId: string, newOwnerName: string }) => {
-  /**
-   * New Hosts
-   *
-   * 新主持人
-  **/
-  const newOwnerId = newOwner?.newOwnerId;
-  const newOwnerName = newOwner?.newOwnerName;
-  const newName = newOwnerName || newOwnerId;
-  const tipMessage =  `${t('Moderator changed to ')}${newName}`;
-  ElMessage({
-    type: 'success',
-    message: tipMessage,
-  });
-  basicInfo.masterUserId = newOwnerId;
-  if (basicInfo.userId === basicInfo.masterUserId) {
-    basicInfo.role = ETUIRoomRole.MASTER;
-  } else {
-    roomStore.setRemoteUserRole(newOwnerId, ETUIRoomRole.MASTER);
+watch(() => roomStore.masterUserId, (newVal: string, oldVal: string) => {
+  // 创建房间或者进入房间时，oldVal为''
+  if (oldVal !== '' && newVal !== '' && newVal !== oldVal) {
+    let newName = roomStore.getUserName(newVal) || newVal;
+    if (newVal === localUser.value.userId) {
+      newName = t('me');
+    }
+    const tipMessage =  `${t('Moderator changed to ')}${newName}`;
+    ElMessage({
+      type: 'success',
+      message: tipMessage,
+    });
+    if (roomStore.localUser.userId === newVal) {
+      roomStore.setLocalUser({ role: TUIRole.kRoomOwner });
+    } else {
+      roomStore.setRemoteUserRole(newVal, TUIRole.kRoomOwner);
+    }
+    resetState();
   }
-  resetState();
-};
+});
 
-onMounted(() => {
-  TUIRoomCore.on(ETUIRoomEvents.onRoomDestroyed, onRoomDestroyed);
-  TUIRoomCore.on(ETUIRoomEvents.onRoomMasterChanged, onRoomMasterChanged);
+TUIRoomEngine.once('ready', () => {
+  roomEngine.instance?.on(TUIRoomEvents.onRoomDismissed, onRoomDismissed);
 });
 
 onUnmounted(() => {
-  TUIRoomCore.off(ETUIRoomEvents.onRoomDestroyed, onRoomDestroyed);
-  TUIRoomCore.off(ETUIRoomEvents.onRoomMasterChanged, onRoomMasterChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onRoomDismissed, onRoomDismissed);
 });
 
 </script>

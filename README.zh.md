@@ -112,7 +112,7 @@ TUIRoom组件支持自定义布局，适用于多个场景：
 
 ## 体验并跑通
 
-可以直接扫描下方二维码或点击体验，或者点击跳转[ios](https://cloud.tencent.com/document/product/647/45681)、[android](https://cloud.tencent.com/document/product/647/45667)、[win或mac](https://cloud.tencent.com/document/product/647/63494)、[Web](https://cloud.tencent.com/document/product/647/74765)、[Electron](https://cloud.tencent.com/document/product/647/75694)的体验链接。点击[TUIRoom](https://github.com/tencentyun/TUIRoom)可查看Github源码。
+可以直接扫描下方二维码或点击体验，或者点击跳转 [ios](https://cloud.tencent.com/document/product/647/45681)、[android](https://cloud.tencent.com/document/product/647/45667)、[win或mac](https://cloud.tencent.com/document/product/647/63494)、[Web](https://cloud.tencent.com/document/product/647/74765)、[Electron](https://cloud.tencent.com/document/product/647/75694) 的体验链接。点击 [TUIRoom](https://github.com/tencentyun/TUIRoom) 可查看Github源码。
 <table>
 <tr>
 <th>iOS</th><th>Android</th><th>Web</th>
@@ -134,7 +134,7 @@ TUIRoom组件支持自定义布局，适用于多个场景：
 
 | iOS                                                          | Android                                                      | Windows&Mac | Web | Electron |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ----------- |-----|----------|
-| [多人音视频互动（iOS）](https://cloud.tencent.com/document/product/647/45681) | [多人音视频互动（Android）](https://cloud.tencent.com/document/product/647/45667) | [多人音视频互动(Windows&Mac)](https://cloud.tencent.com/document/product/647/63494) | [多人音视频互动（Web）](https://cloud.tencent.com/document/product/647/74765) | [多人音视频互动（Electron）](https://cloud.tencent.com/document/product/647/75694)
+| [多人音视频互动（iOS）](https://cloud.tencent.com/document/product/647/45681) | [多人音视频互动（Android）](https://cloud.tencent.com/document/product/647/45667) | [多人音视频互动(Windows&Mac)](https://cloud.tencent.com/document/product/647/63494) | [多人音视频互动（Web）](https://cloud.tencent.com/document/product/647/81962) | [多人音视频互动（Electron）](https://cloud.tencent.com/document/product/647/84238)
 
 
 ## 交流 & 反馈
@@ -155,6 +155,6 @@ TUIRoom组件支持自定义布局，适用于多个场景：
 | Win(C++)| [下载](https://liteav.sdk.qcloud.com/download/latest/TXLiteAVSDK_TRTC_Win_latest.zip)| [DOC](https://cloud.tencent.com/document/product/647/32178) | [API](https://cloud.tencent.com/document/product/647/32268) |
 | Win(C#)| [下载](https://liteav.sdk.qcloud.com/download/latest/TXLiteAVSDK_TRTC_Win_latest.zip)| [DOC](https://cloud.tencent.com/document/product/647/32178) | [API](https://cloud.tencent.com/document/product/647/36776) |
 | Mac| [下载](https://liteav.sdk.qcloud.com/download/latest/TXLiteAVSDK_TRTC_Mac_latest.tar.bz2)| [DOC](https://cloud.tencent.com/document/product/647/32176) |[API](https://cloud.tencent.com/document/product/647/32258) |
-| Web | [下载](https://web.sdk.qcloud.com/trtc/webrtc/download/webrtc_latest.zip)| [DOC](https://cloud.tencent.com/document/product/647/16863) |[API](https://cloud.tencent.com/document/product/647/17249) |
-| Electron | [下载](https://web.sdk.qcloud.com/trtc/electron/download/TXLiteAVSDK_TRTC_Electron_latest.zip) | [DOC](https://cloud.tencent.com/document/product/647/38549) |[API](https://cloud.tencent.com/document/product/647/38551) |
+| Web | - | [DOC](https://cloud.tencent.com/document/product/647/81962) |[API](https://cloud.tencent.com/document/product/647/81969) |
+| Electron | - | [DOC](https://cloud.tencent.com/document/product/647/84238) |[API](https://cloud.tencent.com/document/product/647/84264) |
 | 微信小程序 | [下载](https://web.sdk.qcloud.com/trtc/miniapp/download/trtc-room.zip) | [DOC](https://cloud.tencent.com/document/product/647/32183) |[API](https://cloud.tencent.com/document/product/647/17018) |

@@ -23,7 +23,7 @@
       </div>
       <div v-if="isDetailMode" class="item-setting">
         <span class="title">{{ t('Preview') }}</span>
-        <div ref="testCameraPreviewRef" class="video-preview"></div>
+        <div id="test-camera-preview" class="video-preview"></div>
         <el-checkbox
           v-if="isDetailMode"
           v-model="isLocalStreamMirror"
@@ -48,11 +48,14 @@ import { ref, computed, Ref, watch, onMounted, onUnmounted } from 'vue';
 import DeviceSelect from './DeviceSelect.vue';
 import VideoProfile from './VideoProfile.vue';
 import { useBasicStore } from '../../stores/basic';
-import { useRoomStore } from '../../stores/room';
-import TUIRoomCore from '../../tui-room-core';
-import { storeToRefs } from 'pinia';
 import { SettingMode } from '../../constants/render';
+import { isElectronEnv } from '../../utils/utils';
 import { useI18n } from 'vue-i18n';
+
+import useGetRoomEngine from '../../hooks/useRoomEngine';
+import { TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode } from '@tencentcloud/tuiroom-engine-js';
+const roomEngine = useGetRoomEngine();
+const isElectron = isElectronEnv();
 
 interface Props {
   mode?: SettingMode,
@@ -62,18 +65,18 @@ const settingMode = props.mode || SettingMode.SIMPLE;
 const isSampleMode = computed(() => settingMode === SettingMode.SIMPLE);
 const isDetailMode = computed(() => settingMode === SettingMode.DETAIL);
 
-const testCameraPreviewRef = ref();
-
 const basicStore = useBasicStore();
 
 const isLocalStreamMirror: Ref<boolean> = ref(basicStore.isLocalStreamMirror);
-watch(isLocalStreamMirror, (val: boolean) => {
-  TUIRoomCore.setVideoMirror(val);
+watch(isLocalStreamMirror, async (val: boolean) => {
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  await trtcCloud.setLocalRenderParams({
+    mirrorType: val ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+    rotation: TRTCVideoRotation.TRTCVideoRotation0,
+    fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
+  });
   basicStore.setIsLocalStreamMirror(val);
 });
-
-const roomStore = useRoomStore();
-const { currentCameraId } = storeToRefs(roomStore);
 
 const { t } = useI18n();
 
@@ -88,16 +91,22 @@ function handleMoreCameraSetting() {
 }
 
 if (isDetailMode.value) {
-  watch(currentCameraId, (val) => {
-    TUIRoomCore.setCurrentCamera(val);
-  });
-
-  onMounted(() => {
-    TUIRoomCore.startCameraDeviceTest(testCameraPreviewRef.value);
+  onMounted(async () => {
+    roomEngine.instance?.startCameraDeviceTest({ view: 'test-camera-preview' });
+    if (isElectron) {
+      // Electron 需要首次设置 mirrorType
+      const trtcCloud = roomEngine.instance?.getTRTCCloud();
+      await trtcCloud?.setLocalRenderParams({
+        mirrorType: isLocalStreamMirror ?
+          TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+        rotation: TRTCVideoRotation.TRTCVideoRotation0,
+        fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
+      });
+    }
   });
 
   onUnmounted(() => {
-    TUIRoomCore.stopCameraDeviceTest();
+    roomEngine.instance?.stopCameraDeviceTest();
   });
 }
 

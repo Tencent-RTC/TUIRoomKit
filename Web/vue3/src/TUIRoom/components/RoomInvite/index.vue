@@ -36,6 +36,8 @@ import { storeToRefs } from 'pinia';
 import SvgIcon from '../common/SvgIcon.vue';
 import { useI18n } from 'vue-i18n';
 
+import { isElectronEnv } from '../../utils/utils';
+
 const { t } = useI18n();
 
 const roomLinkDisplay = ref(true);
@@ -44,6 +46,7 @@ const basicStore = useBasicStore();
 const { roomId } = storeToRefs(basicStore);
 
 const { origin, pathname } = location;
+const isElectron = isElectronEnv();
 
 onMounted(() => {
   // eslint-disable-next-line no-underscore-dangle
@@ -52,9 +55,14 @@ onMounted(() => {
   }
 });
 
+let inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);
+if(isElectron) {
+  inviteLink = computed(
+    () => `https://web.sdk.qcloud.com/trtc/webrtc/test/xinli-test/tuiroom-wasm/index.html#home?roomId=${roomId.value}`
+  );
+}
 
-const inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);
-
+// todo: schema 唤起
 const schemeLink = computed(() => `tuiroom://joinroom?roomId=${roomId.value}`);
 
 function onCopy(value: string | number) {
