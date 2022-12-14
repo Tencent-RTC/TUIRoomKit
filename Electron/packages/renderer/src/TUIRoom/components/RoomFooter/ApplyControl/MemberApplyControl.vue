@@ -13,7 +13,7 @@
   <el-dialog
     v-model="showInviteDialog"
     :title="t('The host invites you to speak on stage')"
-    custom-class="custom-element-class"
+    class="custom-element-class"
     :modal="false"
     :show-close="false"
     :append-to-body="true"
@@ -34,66 +34,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, Ref, watch, onBeforeUnmount } from 'vue';
 import { ICON_NAME } from '../../../constants/icon';
 import IconButton from '../../common/IconButton.vue';
 import SvgIcon from '../../common/SvgIcon.vue';
-import TUIRoomCore, { ETUIRoomEvents, ETUISignalStatus, ETUIRoomRole } from '../../../tui-room-core';
 import { ElMessage } from 'element-plus';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
+import useGetRoomEngine from '../../../hooks/useRoomEngine';
+import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-electron';
 
+const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 const { lang } = storeToRefs(basicStore);
+const { localUser } = storeToRefs(roomStore);
 
-enum STATE {
-  OffSeat = 'offSeat',
-  OnSeat = 'onSeat',
-  Applying = 'applying',
-};
-
-const userState: Ref<STATE> = ref(STATE.OffSeat);
+const isApplyingOnSeat: Ref<Boolean> = ref(false);
 const showMemberApplyAttention: Ref<boolean> = ref(true);
 const iconName: Ref<string> = ref('');
 const iconTitle: Ref<string> = ref('');
 const showInviteDialog: Ref<Boolean> = ref(false);
 
+const applyToAnchorRequestId: Ref<number> = ref(0);
+const inviteToAnchorRequestId: Ref<number> = ref(0);
 
-watch([userState, lang], ([userState]) => {
-  if (userState === STATE.OffSeat) {
-    iconName.value = ICON_NAME.ApplyOnSeat;
-    iconTitle.value = t('Raise hand');
-  }
-  if (userState === STATE.Applying) {
-    iconName.value = ICON_NAME.ApplyActive;
-    iconTitle.value = t('Hand down');
-  }
-  if (userState === STATE.OnSeat) {
+watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
+  if (localUser.onSeat) {
     iconName.value = ICON_NAME.GoOffSeat;
     iconTitle.value = t('Step down');
+  } else {
+    if (isApplyingOnSeat) {
+      iconName.value = ICON_NAME.ApplyActive;
+      iconTitle.value = t('Hand down');
+    } else {
+      iconName.value = ICON_NAME.ApplyOnSeat;
+      iconTitle.value = t('Raise hand');
+    }
   }
-}, { immediate: true });
+}, { immediate: true, deep: true });
 
 async function toggleApplySpeech() {
   hideApplyAttention();
-  switch (userState.value) {
-    case STATE.OffSeat:
-      sendSeatApplication();
-      break;
-    case STATE.Applying:
-      cancelSeatApplication();
-      break;
-    case STATE.OnSeat:
-      leaveSeat();
-      break;
-    default:
-      break;
+  if (localUser.value.onSeat) {
+    leaveSeat();
+  } else {
+    isApplyingOnSeat.value ? cancelSeatApplication() : sendSeatApplication();
   }
 };
 
@@ -103,21 +94,37 @@ async function toggleApplySpeech() {
  * 发送上麦申请
 **/
 async function sendSeatApplication() {
-  userState.value = STATE.Applying;
   try {
-    const applyResponse = await TUIRoomCore.sendSpeechApplication();
-    switch (applyResponse.code) {
-      case ETUISignalStatus.ACCEPTED:
-        handleApplyAccepted();
-        break;
-      case ETUISignalStatus.REJECTED:
-        handleApplyRejected();
-        break;
-      case ETUISignalStatus.CANCELLED:
-        break;
-      default:
-        break;
+    const requestId = await roomEngine.instance?.takeSeat({
+      seatIndex: -1,
+      timeout: 0,
+      requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType }) => {
+        isApplyingOnSeat.value = false;
+        const { requestCallbackType } = callbackInfo;
+        switch (requestCallbackType) {
+          case TUIRequestCallbackType.kRequestAccepted:
+            ElMessage({
+              type: 'success',
+              message: t('The host has approved your application'),
+              duration: MESSAGE_DURATION.NORMAL,
+            });
+            break;
+          case TUIRequestCallbackType.kRequestRejected:
+            ElMessage({
+              type: 'warning',
+              message: t('The host has rejected your application for the stage'),
+              duration: MESSAGE_DURATION.NORMAL,
+            });
+            break;
+          case TUIRequestCallbackType.kRequestTimeout:
+            break;
+        }
+      },
+    });
+    if (requestId) {
+      applyToAnchorRequestId.value = requestId;
     }
+    isApplyingOnSeat.value = true;
   } catch (error) {
     console.log('member sendSpeechApplication error', error);
   }
@@ -131,8 +138,8 @@ async function sendSeatApplication() {
 // 取消上麦申请
 async function cancelSeatApplication() {
   try {
-    await TUIRoomCore.cancelSpeechApplication();
-    userState.value = STATE.OffSeat;
+    await roomEngine.instance?.cancelRequest({ requestId: applyToAnchorRequestId.value });
+    isApplyingOnSeat.value = false;
   } catch (error) {
     console.log('member cancelSpeechApplication', error);
   }
@@ -144,81 +151,43 @@ async function cancelSeatApplication() {
  * 用户下麦
 **/
 async function leaveSeat() {
-  await TUIRoomCore.sendOffSpeaker();
-  userState.value = STATE.OffSeat;
-  basicStore.setRole(ETUIRoomRole.AUDIENCE);
-  roomStore.setIsLocalAudioMuted(true);
-  roomStore.setIsLocalVideoMuted(true);
-  roomStore.updateLocalStream({
-    isAudioStreamAvailable: false,
-    isVideoStreamAvailable: false,
-  });
-  roomStore.setHasStartedMicrophone(false);
-}
-
-/**
- * Processing facilitators accepting applications
- *
- * 处理主持人接受申请
-**/
-function handleApplyAccepted() {
-  userState.value = STATE.OnSeat;
-  basicStore.setRole(ETUIRoomRole.ANCHOR);
-  ElMessage({
-    type: 'success',
-    message: t('The host has approved your application'),
-    duration: MESSAGE_DURATION.NORMAL,
-  });
-}
-
-/**
- * Processing Facilitator Rejection Requests
- *
- * 处理主持人拒绝申请
-**/
-function handleApplyRejected() {
-  userState.value = STATE.OffSeat;
-  ElMessage({
-    type: 'warning',
-    message: t('The host has rejected your application for the stage'),
-    duration: MESSAGE_DURATION.NORMAL,
-  });
+  await roomEngine.instance?.leaveSeat();
 }
 
 function hideApplyAttention() {
   showMemberApplyAttention.value = false;
 }
 
-function onReceiveSpeechInvitation() {
-  /**
-   * Received an invitation from the host to go on the microphone
-   *
-   * 收到主持人邀请上麦
-  **/
-  showInviteDialog.value = true;
+async function onRequestReceived(eventInfo: { request: TUIRequest }) {
+  const { request: { requestId, requestAction } } = eventInfo;
+  // Received an invitation from the host to go on the microphone
+  // 收到主持人邀请上麦
+  if (requestAction === TUIRequestAction.kRequestRemoteUserOnSeat) {
+    inviteToAnchorRequestId.value = requestId;
+    showInviteDialog.value = true;
+  }
+  // todo: 需要有被踢下麦的通知
+  // else if (requestAction === TUIRequestAction.kRequestRemoteUserLeaveSeat) {
+  //   // 被主持人踢下麦
+  //   ElMessage({
+  //     type: 'warning',
+  //     message: t('You have been invited by the host to step down, please raise your hand if you need to speak'),
+  //     duration: MESSAGE_DURATION.NORMAL,
+  //   });
+  // }
 }
 
-function onReceiveInvitationCancelled() {
-  /**
+/**
    * The host canceled the invitation to the microphone
    *
    * 主持人取消邀请上麦
   **/
-  showInviteDialog.value = false;
-}
-
-function onUserKickOffStage() {
-  ElMessage({
-    type: 'warning',
-    message: t('You have been invited by the host to step down, please raise your hand if you need to speak'),
-    duration: MESSAGE_DURATION.NORMAL,
-  });
-  /**
-   * Kicked off the mic by the host
-   *
-   * 被主持踢下麦
-  **/
-  leaveSeat();
+function onRequestCancelled(eventInfo: { requestId: number, userId: string }) {
+  const { requestId } = eventInfo;
+  if (inviteToAnchorRequestId.value === requestId) {
+    inviteToAnchorRequestId.value = 0;
+    showInviteDialog.value = false;
+  }
 }
 
 /**
@@ -226,12 +195,14 @@ function onUserKickOffStage() {
  *
  * 用户接受/拒绝主讲人的邀请
 **/
-function handleInvite(agree: boolean) {
-  TUIRoomCore.replySpeechInvitation(agree);
+async function handleInvite(agree: boolean) {
+  await roomEngine.instance?.responseRemoteRequest({
+    requestId: inviteToAnchorRequestId.value,
+    agree,
+  });
   showInviteDialog.value = false;
   if (agree) {
-    userState.value = STATE.OnSeat;
-    basicStore.setRole(ETUIRoomRole.ANCHOR);
+    hideApplyAttention();
   }
 }
 
@@ -248,7 +219,7 @@ function onUserAVEnabled(userInfo: { userId: string }) {
    *
    * 主播重新进入 trtc 房间，如果之前发送过请求上麦信令需要重新发送上麦申请
   **/
-  if (userId === basicStore.masterUserId && userState.value === STATE.Applying) {
+  if (userId === basicStore.masterUserId && isApplyingOnSeat.value) {
     sendSeatApplication();
   }
 }
@@ -271,20 +242,14 @@ function onUserAVDisabled(userInfo: { userId: string }) {
   }
 }
 
-onMounted(() => {
-  TUIRoomCore.on(ETUIRoomEvents.onReceiveSpeechInvitation, onReceiveSpeechInvitation);
-  TUIRoomCore.on(ETUIRoomEvents.onReceiveInvitationCancelled, onReceiveInvitationCancelled);
-  TUIRoomCore.on(ETUIRoomEvents.onUserKickOffStage, onUserKickOffStage);
-  TUIRoomCore.on(ETUIRoomEvents.onUserAVEnabled, onUserAVEnabled);
-  TUIRoomCore.on(ETUIRoomEvents.onUserAVDisabled, onUserAVDisabled);
+TUIRoomEngine.once('ready', () => {
+  roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
+  roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
 });
 
 onBeforeUnmount(() => {
-  TUIRoomCore.off(ETUIRoomEvents.onReceiveSpeechInvitation, onReceiveSpeechInvitation);
-  TUIRoomCore.off(ETUIRoomEvents.onReceiveInvitationCancelled, onReceiveInvitationCancelled);
-  TUIRoomCore.off(ETUIRoomEvents.onUserKickOffStage, onUserKickOffStage);
-  TUIRoomCore.off(ETUIRoomEvents.onUserAVEnabled, onUserAVEnabled);
-  TUIRoomCore.off(ETUIRoomEvents.onUserAVDisabled, onUserAVDisabled);
+  roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
+  roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
 });
 
 </script>

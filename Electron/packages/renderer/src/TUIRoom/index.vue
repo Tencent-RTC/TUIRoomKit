@@ -23,19 +23,27 @@ import RoomContent from './components/RoomContent/index.vue';
 import RoomFooter from './components/RoomFooter/index.vue';
 import RoomSidebar from './components/RoomSidebar/index.vue';
 import RoomSetting from './components/RoomSetting/index.vue';
+import { isElectronEnv, debounce, throttle } from './utils/utils';
 import { useBasicStore } from './stores/basic';
 import { useRoomStore } from './stores/room';
 import { useChatStore } from './stores/chat';
 
-import TUIRoomCore, {
-  ETUIRoomEvents, ETUIRoomRole, ETUISpeechMode, TRTCStatistics, ETUIRoomMuteType,
-} from './tui-room-core';
+import TUIRoomEngine, {
+  TUIRoomEvents,
+  TUIRoomInfo,
+  TUIRoomType,
+  TRTCDeviceType,
+  TRTCDeviceState,
+} from '@tencentcloud/tuiroom-engine-electron';
 
-import { debounce, throttle } from './utils/utils';
-import logger from './tui-room-core/common/logger';
 import TUIRoomAegis from './utils/aegis';
 import { MESSAGE_DURATION } from './constants/message';
 import { useI18n } from 'vue-i18n';
+
+import useGetRoomEngine from './hooks/useRoomEngine';
+
+const isElectron = isElectronEnv();
+const roomEngine = useGetRoomEngine();
 
 const { t } = useI18n();
 
@@ -46,8 +54,17 @@ defineExpose({
 });
 
 const emit = defineEmits([
-  'onLogOut', 'onCreateRoom', 'onEnterRoom',
-  'onExitRoom', 'onDestroyRoom', 'onKickOff',
+  'onLogOut',
+  'onCreateRoom',
+  'onEnterRoom',
+  'onExitRoom',
+  'onDestroyRoom',
+  // 用户被踢出房间
+  'onKickedOutOfRoom',
+  // 用户被踢下线
+  'onKickedOffLine',
+  // 用户 userSig 过期
+  'onUserSigExpired',
 ]);
 
 const logPrefix = '[Room]';
@@ -57,6 +74,7 @@ const roomStore = useRoomStore();
 const chatStore = useChatStore();
 
 const { sdkAppId } = storeToRefs(basicStore);
+const { localUser, localVideoProfile } = storeToRefs(roomStore);
 
 /**
  * Handle page mouse hover display toolbar logic
@@ -122,36 +140,67 @@ interface RoomInitData {
   userId: string,
   userSig: string,
   userName: string,
-  userAvatar: string,
-  shareUserId?: string,
-  shareUserSig?: string,
+  avatarUrl: string,
 }
 
 async function init(option: RoomInitData) {
+  const { sdkAppId, userId, userSig, userName, avatarUrl } = option;
+  await TUIRoomEngine.init({ sdkAppId, userId, userSig });
+  await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
   basicStore.setBasicInfo(option);
   roomStore.setLocalUser(option);
-
-  const { sdkAppId, userId, userSig, userName, userAvatar } = option;
-
-  await TUIRoomCore.login(sdkAppId, userId, userSig);
-
-  await TUIRoomCore.updateMyProfile({
-    nick: userName,
-    avatar: userAvatar || '',
-  });
 }
 
-async function createRoom(
-  roomId: number,
-  roomMode: ETUISpeechMode = ETUISpeechMode.FREE_SPEECH,
+async function createRoom(options: {
+  roomId: string,
+  roomName: string,
+  roomMode: 'FreeSpeech' | 'ApplySpeech',
   roomParam?: RoomParam,
-) {
+}) {
+  const { roomId, roomName, roomMode, roomParam } = options;
+  if (!roomEngine.instance) {
+    return;
+  }
   basicStore.setRoomId(roomId);
-  basicStore.setRole(ETUIRoomRole.MASTER);
-  logger.debug(`${logPrefix}createRoom:`, roomId, roomMode, roomParam);
-  await TUIRoomCore.createRoom(roomId, roomMode);
-  const roomInfo = await TUIRoomCore.getRoomInfo();
-  basicStore.setRoomInfo(roomInfo);
+  console.debug(`${logPrefix}createRoom:`, roomId, roomMode, roomParam);
+  const roomParams = {
+    roomId,
+    name: roomName,
+    roomType: TUIRoomType.kGroup,
+  };
+  if (roomMode === 'FreeSpeech') {
+    Object.assign(roomParams, {
+      enableAudio: true,
+      enableVideo: true,
+      enableMessage: true,
+      enableSeatControl: false,
+    });
+  } else {
+    Object.assign(roomParams, {
+      enableAudio: true,
+      enableVideo: true,
+      enableMessage: true,
+      enableSeatControl: true,
+    });
+  }
+  await roomEngine.instance?.createRoom(roomParams);
+  emit('onCreateRoom', {
+    code: 0,
+    message: 'create room success',
+  });
+  await roomEngine.instance?.enterRoom({ roomId });
+  emit('onEnterRoom', {
+    code: 0,
+    message: 'enter room success',
+  });
+  const roomInfo = await roomEngine.instance?.getRoomInfo();
+  roomStore.setRoomInfo(roomInfo);
+  // 房主上麦
+  await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+  // 及时更新本地用户 onSeat 属性
+  roomStore.setLocalUser({ onSeat: true });
+  await getUserList();
+  await roomEngine.instance?.setLocalVideoProfile({ videoProfile: localVideoProfile.value });
   /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
    * about whether or not to turn on the no-mac ban.
@@ -159,19 +208,25 @@ async function createRoom(
    * setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
   **/
   roomStore.setRoomParam(roomParam);
-  emit('onCreateRoom', {
-    code: 0,
-    message: 'create room success',
-  });
   TUIRoomAegis.reportEvent({ name: 'createRoom', ext1: 'createRoom-success' });
 }
 
-async function enterRoom(roomId: number, roomParam?: RoomParam) {
+async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
+  const { roomId, roomParam } = options;
+  if (!roomEngine.instance) {
+    return;
+  }
   basicStore.setRoomId(roomId);
-  logger.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
-  await TUIRoomCore.enterRoom(roomId);
-  const roomInfo = await TUIRoomCore.getRoomInfo();
-  basicStore.setRoomInfo(roomInfo);
+  console.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
+  const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
+  roomStore.setRoomInfo(roomInfo);
+  // 自由发言模式
+  if (!roomInfo.enableSeatControl) {
+    await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+    roomStore.setLocalUser({ onSeat: true });
+  }
+  await roomEngine.instance?.setLocalVideoProfile({ videoProfile: localVideoProfile.value });
+  await getUserList();
   /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
    * about whether or not to turn on the no-mac ban.
@@ -186,25 +241,28 @@ async function enterRoom(roomId: number, roomParam?: RoomParam) {
   TUIRoomAegis.reportEvent({ name: 'enterRoom', ext1: 'enterRoom-success' });
 }
 
-const onUserVoiceVolume = (eventInfo: []) => {
-  roomStore.setAudioVolume(eventInfo);
-};
-
-const onNetworkQuality = (localQuality: Record<string, any>) => {
-  basicStore.setLocalQuality(localQuality.quality);
-};
-
-const onStatistics = (statistics: TRTCStatistics) => {
-  basicStore.setStatistics(statistics);
-};
-
-const onReceivedChatMessage = (message: any) => {
-  chatStore.updateMessageList(message);
-  if (!basicStore.isSidebarOpen || basicStore.sidebarName !== 'chat') {
-    // eslint-disable-next-line no-plusplus
-    chatStore.updateUnReadCount(++chatStore.unReadCount);
+async function getUserList() {
+  try {
+    const { userInfoList } = await roomEngine.instance?.getUserList() as any;
+    roomStore.setUserList(userInfoList);
+  } catch (error: any) {
+    console.error('TUIRoomEngine.getUserList', error.code, error.message);
   }
+}
+
+const onUserVoiceVolumeChanged = (eventInfo: { userVolumeList: []}) => {
+  const { userVolumeList } = eventInfo;
+  roomStore.setAudioVolume(userVolumeList);
 };
+
+const onUserNetworkQualityChanged = (eventInfo: { userNetworkList: [] }) => {
+  basicStore.setLocalQuality(eventInfo.userNetworkList);
+};
+
+// To do 临时注释，待放开
+// const onStatistics = (statistics: TRTCStatistics) => {
+//   basicStore.setStatistics(statistics);
+// };
 
 function resetStore() {
   basicStore.reset();
@@ -227,163 +285,201 @@ const onExitRoom = (info: { code: number; message: string }) => {
   emit('onExitRoom', info);
 };
 
-const onMicrophoneMuted = (data: {mute: boolean, muteType: ETUIRoomMuteType}) => {
-  if (data.muteType === ETUIRoomMuteType.MasterMuteAll) {
-    const tipMessage = data.mute ? t('The host has muted all') : t('The host has unmuted all');
-    ElMessage({
-      type: 'warning',
-      message: tipMessage,
-      duration: MESSAGE_DURATION.NORMAL,
-    });
-    basicStore.setIsMuteAllAudio(data.mute);
-    /**
-     * If the host lifts the full ban and does not actively turn up the user microphone
-     *
-     * 如果主持人解除全员禁言，不主动调起用户麦克风
-    **/
-    if (data.mute) {
-      roomStore.setIsLocalAudioMuted(true);
-      TUIRoomCore.muteLocalMicrophone(true);
-    }
-    basicStore.setCanControlSelfAudio(!data.mute);
-  }
+const onError = (error: any) => {
+  console.error('roomEngine.onError: ', error);
+};
 
-  if (data.muteType === ETUIRoomMuteType.MasterMuteCurrentUser) {
-    const tipMessage = data.mute ? t('The host has turned off your microphone') : t('The host has allowed you to turn on the microphone');
+const onUserMuteStateChanged = (data: { userId: string, muted: boolean }) => {
+  const { userId, muted } = data;
+  if (userId === localUser.value.userId) {
+    const tipMessage = muted ? t('You have been banned from text chat by the host') : t('You are allowed to text chat by the host');
     ElMessage({
       type: 'warning',
       message: tipMessage,
       duration: MESSAGE_DURATION.NORMAL,
     });
-    if (data.mute) {
-      roomStore.setIsLocalAudioMuted(true);
-      TUIRoomCore.muteLocalMicrophone(true);
-      /**
-       * When the host turns on a full ban, the microphone of a single person is turned on
-       * and off separately, and the microphone status of the corresponding user is inoperable at this time
-       *
-       * 主持人开启全员禁言时，单独打开再关闭单人的麦克风，此时对应用户的麦克风状态为无法操作
-      **/
-      basicStore.setCanControlSelfAudio(!basicStore.isMuteAllAudio);
-    } else {
-      basicStore.setCanControlSelfAudio(true);
-    }
+    chatStore.setIsMuteChatByMater(muted);
   }
 };
 
-const onCameraMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
-  if (data.muteType === ETUIRoomMuteType.MasterMuteAll) {
-    basicStore.setIsMuteAllVideo(data.mute);
-    const tipMessage = data.mute ? t('The host has turned on the ban on all paintings') : t('The host has lifted the ban on all paintings');
-    ElMessage({
-      type: 'warning',
-      message: tipMessage,
-      duration: MESSAGE_DURATION.NORMAL,
+const onKickedOutOfRoom = async (eventInfo: { roomId: string, message: string }) => {
+  const { roomId, message } = eventInfo;
+  try {
+    resetStore();
+    ElMessageBox.alert(t('kicked out of the room by the host'), t('Note'), {
+      confirmButtonText: t('Confirm'),
+      callback: async () => {
+        emit('onKickedOutOfRoom', { roomId, message });
+      },
     });
-    /**
-     * If the host lifts the full ban on drawing and does not actively turn up the user camera
-     *
-     * 如果主持人解除全员禁画，不主动调起用户摄像头
-    **/
-    if (data.mute) {
-      roomStore.setIsLocalVideoMuted(true);
-      TUIRoomCore.stopCameraPreview();
-    }
-    basicStore.setCanControlSelfVideo(!data.mute);
-  }
-
-  if (data.muteType === ETUIRoomMuteType.MasterMuteCurrentUser) {
-    const tipMessage = data.mute ? t('The host has turned off your camera') : t('The host has allowed you to turn on the camera');
-    ElMessage({
-      type: 'warning',
-      message: tipMessage,
-      duration: MESSAGE_DURATION.NORMAL,
-    });
-    if (data.mute) {
-      roomStore.setIsLocalVideoMuted(true);
-      TUIRoomCore.stopCameraPreview();
-      /**
-       * When the moderator opens the whole staff forbidden to draw,
-       * open and then close the single person's camera alone, at this time
-       * the corresponding user's camera status for inoperable
-       *
-       * 主持人开启全员禁画时，单独打开再关闭单人的摄像头，此时对应用户的摄像头状态为无法操作
-       **/
-      basicStore.setCanControlSelfVideo(!basicStore.isMuteAllVideo);
-    } else {
-      basicStore.setCanControlSelfVideo(true);
-    }
+  } catch (error) {
+    console.error(`${logPrefix}onKickedOutOfRoom error:`, error);
   }
 };
 
-const onUserChatRoomMuted = (data: {mute: boolean; muteType: ETUIRoomMuteType}) => {
-  const tipMessage = data.mute ? t('You have been banned from text chat by the host') : t('You are allowed to text chat by the host');
+const onUserSigExpired = () => {
+  ElMessageBox.alert('userSig 已过期', t('Note'), {
+    confirmButtonText: t('Confirm'),
+    callback: async () => {
+      emit('onUserSigExpired');
+    },
+  });
+};
+
+const onKickedOffLine = (eventInfo: { message: string }) => {
+  const { message } = eventInfo;
+  ElMessageBox.alert('系统检测到您的账号被踢下线', t('Note'), {
+    confirmButtonText: t('Confirm'),
+    callback: async () => {
+      emit('onKickedOffLine', { message });
+    },
+  });
+};
+
+// todo: 处理禁言所有人和禁画所有人
+async function handleEnableAudioChange(enableAudio: boolean) {
+  const tipMessage = enableAudio ? t('The host has unmuted all') : t('The host has muted all');
   ElMessage({
     type: 'warning',
     message: tipMessage,
     duration: MESSAGE_DURATION.NORMAL,
   });
-  if (data.muteType === ETUIRoomMuteType.MasterMuteCurrentUser) {
-    chatStore.setIsMuteChatByMater(data.mute);
+  /**
+   * If the host lifts the full ban and does not actively turn up the user microphone
+   *
+   * 如果主持人解除全员禁言，不主动调起用户麦克风
+  **/
+  if (!enableAudio) {
+    await roomEngine.instance?.closeLocalMicrophone();
+    await roomEngine.instance?.stopPushLocalAudio();
   }
+}
+
+async function handleEnableVideoChange(enableVideo: boolean) {
+  const tipMessage = enableVideo ? t('The host has lifted the ban on all paintings') : t('The host has turned on the ban on all paintings');
+  ElMessage({
+    type: 'warning',
+    message: tipMessage,
+    duration: MESSAGE_DURATION.NORMAL,
+  });
+  /**
+   * If the host lifts the full ban on drawing and does not actively turn up the user camera
+   *
+   * 如果主持人解除全员禁画，不主动调起用户摄像头
+  **/
+  if (!enableVideo) {
+    await roomEngine.instance?.closeLocalCamera();
+    await roomEngine.instance?.stopPushLocalVideo();
+  }
+}
+
+const onRoomInfoChanged = (eventInfo: { roomId: string, roomInfo: TUIRoomInfo}) => {
+  const { roomInfo } = eventInfo;
+  const { enableAudio, enableVideo } = roomInfo;
+  if (enableAudio !== roomStore.enableAudio) {
+    handleEnableAudioChange(enableAudio);
+  }
+  if (enableVideo !== roomStore.enableVideo) {
+    handleEnableVideoChange(enableVideo);
+  }
+  roomStore.setRoomInfo(roomInfo);
 };
 
-const onUserKickOff = async () => {
-  try {
-    const response = await TUIRoomCore.exitRoom();
-    await TUIRoomCore.logout();
-    logger.log(`${logPrefix}leaveRoom:`, response);
-    resetStore();
-    ElMessageBox.alert(t('kicked out of the room by the host'), t('Note'), {
-      confirmButtonText: t('Confirm'),
-      callback: async () => {
-        emit('onKickOff', { code: 0, message: '' });
-      },
-    });
-  } catch (error) {
-    logger.error(`${logPrefix}onUserKickOff error:`, error);
-  }
-};
+// 初始化获取设备列表
+async function getMediaDeviceList() {
+  const cameraList = await roomEngine.instance?.getCameraDevicesList();
+  const microphoneList = await roomEngine.instance?.getMicDevicesList();
+  const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
+  roomStore.setCameraList(cameraList);
+  roomStore.setMicrophoneList(microphoneList);
+  roomStore.setSpeakerList(speakerList);
 
-function handlePageLeave() {
-  if (!basicStore.isMaster) {
-    TUIRoomCore.exitRoom();
+  if (isElectron) {
+    const cameraInfo = roomEngine.instance?.getCurrentCameraDevice();
+    const micInfo = roomEngine.instance?.getCurrentMicDevice();
+    const speakerInfo = roomEngine.instance?.getCurrentSpeakerDevice();
+    if (cameraInfo && cameraInfo.deviceId) {
+      roomStore.setCurrentCameraId(cameraInfo.deviceId);
+    }
+    if (micInfo && micInfo.deviceId) {
+      roomStore.setCurrentMicrophoneId(micInfo.deviceId);
+    }
+    if (speakerInfo && speakerInfo.deviceId) {
+      roomStore.setCurrentSpeakerId(speakerInfo.deviceId);
+    }
+  } else {
+    if (cameraList.length > 0) {
+      await roomEngine.instance?.setCurrentCameraDevice({ deviceId: cameraList[0].deviceId });
+    }
+    if (microphoneList.length > 0) {
+      await roomEngine.instance?.setCurrentMicDevice({ deviceId: microphoneList[0].deviceId });
+    }
+    if (speakerList.length > 0) {
+      await roomEngine.instance?.setCurrentSpeakerDevice({ deviceId: speakerList[0].deviceId });
+    }
   }
 }
 
 /**
- * Page refresh or administration
+ * Device changes: device switching, device plugging and unplugging events
  *
- * 页面刷新或者管理
+ * 设备变化：设备切换、设备插拔事件
 **/
-function beforeunloadFn() {
-  handlePageLeave();
+async function onDeviceChange(eventInfo: {deviceId: string, type: number, state: number}) {
+  const stateList = ['add', 'remove', 'active'];
+  const { deviceId, type, state } = eventInfo;
+  if (type === TRTCDeviceType.TRTCDeviceTypeMic) {
+    console.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
+    const deviceList = await roomEngine.instance?.getMicDevicesList();
+    roomStore.setMicrophoneList(deviceList);
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentMicrophoneId(deviceId);
+    }
+    return;
+  }
+  if (type === TRTCDeviceType.TRTCDeviceTypeSpeaker) {
+    console.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
+    const deviceList = await roomEngine.instance?.getSpeakerDevicesList();
+    roomStore.setSpeakerList(deviceList);
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentSpeakerId(deviceId);
+    }
+    return;
+  }
+  if (type === TRTCDeviceType.TRTCDeviceTypeCamera) {
+    console.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
+    const deviceList = await roomEngine.instance?.getCameraDevicesList();
+    roomStore.setCameraList(deviceList);
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentCameraId(deviceId);
+    }
+  }
 }
 
-onMounted(async () => {
-  TUIRoomCore.enableAudioVolumeEvaluation(100);
-  TUIRoomCore.on(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);
-  TUIRoomCore.on(ETUIRoomEvents.onNetworkQuality, onNetworkQuality);
-  TUIRoomCore.on(ETUIRoomEvents.onStatistics, onStatistics);
-  TUIRoomCore.on(ETUIRoomEvents.onReceiveChatMessage, onReceivedChatMessage);
-  TUIRoomCore.on(ETUIRoomEvents.onMicrophoneMuted, onMicrophoneMuted);
-  TUIRoomCore.on(ETUIRoomEvents.onCameraMuted, onCameraMuted);
-  TUIRoomCore.on(ETUIRoomEvents.onUserChatRoomMuted, onUserChatRoomMuted);
-  TUIRoomCore.on(ETUIRoomEvents.onUserKickOff, onUserKickOff);
-  window.addEventListener('beforeunload', beforeunloadFn);
+TUIRoomEngine.once('ready', () => {
+  roomEngine.instance?.on(TUIRoomEvents.onError, onError);
+  roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolumeChanged);
+  roomEngine.instance?.on(TUIRoomEvents.onUserNetworkQualityChanged, onUserNetworkQualityChanged);
+  roomEngine.instance?.on(TUIRoomEvents.onKickedOutOfRoom, onKickedOutOfRoom);
+  roomEngine.instance?.on(TUIRoomEvents.onUserMuteStateChanged, onUserMuteStateChanged);
+  roomEngine.instance?.on(TUIRoomEvents.onUserSigExpired, onUserSigExpired);
+  roomEngine.instance?.on(TUIRoomEvents.onKickedOffLine, onKickedOffLine);
+  roomEngine.instance?.on(TUIRoomEvents.onRoomInfoChanged, onRoomInfoChanged);
+  roomEngine.instance?.on(TUIRoomEvents.onDeviceChange, onDeviceChange);
+
+  getMediaDeviceList();
 });
 
 onUnmounted(() => {
-  handlePageLeave();
-  TUIRoomCore.off(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);
-  TUIRoomCore.off(ETUIRoomEvents.onNetworkQuality, onNetworkQuality);
-  TUIRoomCore.off(ETUIRoomEvents.onStatistics, onStatistics);
-  TUIRoomCore.off(ETUIRoomEvents.onReceiveChatMessage, onReceivedChatMessage);
-  TUIRoomCore.off(ETUIRoomEvents.onMicrophoneMuted, onMicrophoneMuted);
-  TUIRoomCore.off(ETUIRoomEvents.onCameraMuted, onCameraMuted);
-  TUIRoomCore.off(ETUIRoomEvents.onUserChatRoomMuted, onUserChatRoomMuted);
-  TUIRoomCore.off(ETUIRoomEvents.onUserKickOff, onUserKickOff);
-  window.removeEventListener('beforeunload', beforeunloadFn);
+  roomEngine.instance?.off(TUIRoomEvents.onError, onError);
+  roomEngine.instance?.off(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolumeChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onUserNetworkQualityChanged, onUserNetworkQualityChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onKickedOutOfRoom, onKickedOutOfRoom);
+  roomEngine.instance?.off(TUIRoomEvents.onUserMuteStateChanged, onUserMuteStateChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onUserSigExpired, onUserSigExpired);
+  roomEngine.instance?.off(TUIRoomEvents.onKickedOffLine, onKickedOffLine);
+  roomEngine.instance?.off(TUIRoomEvents.onRoomInfoChanged, onRoomInfoChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 
 watch(sdkAppId, (val) => {

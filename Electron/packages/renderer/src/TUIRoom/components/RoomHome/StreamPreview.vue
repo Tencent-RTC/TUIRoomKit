@@ -1,6 +1,6 @@
 <template>
   <div v-loading="loading" element-loading-background="#000000" class="stream-container">
-    <div ref="streamPreviewRef" class="stream-preview"></div>
+    <div id="stream-preview" ref="streamPreviewRef" class="stream-preview"></div>
     <div v-if="isCameraMuted" class="stream-info">
       <span class="info">{{ t('Off Camera') }}</span>
     </div>
@@ -27,25 +27,23 @@
       />
     </div>
   </div>
-  <div class="drawer-container">
-    <el-drawer
-      v-model="isSettingOpen"
-      :modal="false"
-      :title="t(settingTitle)"
-      direction="rtl"
-      custom-class="room-sidebar"
-      :before-close="handleDrawerClose"
-      :size="480"
-    >
-      <audio-setting-tab v-if="settingTab === 'audio'" :mode="SettingMode.DETAIL"></audio-setting-tab>
-      <video-setting-tab v-if="settingTab === 'video'" :mode="SettingMode.DETAIL"></video-setting-tab>
-    </el-drawer>
-  </div>
+  <el-drawer
+    v-model="isSettingOpen"
+    :modal="false"
+    :title="t(settingTitle)"
+    direction="rtl"
+    custom-class="custom-element-class"
+    :before-close="handleDrawerClose"
+    :size="480"
+  >
+    <audio-setting-tab v-if="settingTab === 'audio'" :mode="SettingMode.DETAIL"></audio-setting-tab>
+    <video-setting-tab v-if="settingTab === 'video'" :mode="SettingMode.DETAIL"></video-setting-tab>
+  </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import TUIRoomCore, { ETUIRoomEvents } from '../../tui-room-core';
+import { ref, computed, onBeforeUnmount } from 'vue';
+import TUIRoomEngine, { TUIRoomEvents, TUIVideoStreamType,  TRTCDeviceType, TRTCDeviceState } from '@tencentcloud/tuiroom-engine-electron';
 import IconButton from '../common/IconButton.vue';
 import { SettingMode } from '../../constants/render';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
@@ -55,13 +53,19 @@ import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
 import { useI18n } from 'vue-i18n';
+import useGetRoomEngine from '../../hooks/useRoomEngine';
+import { isElectronEnv } from '../../utils/utils';
 
 const roomStore = useRoomStore();
 const { localStream } = storeToRefs(roomStore);
 const { t } = useI18n();
 
+const isElectron = isElectronEnv();
+const roomEngine = useGetRoomEngine();
+
 defineExpose({
   getRoomParam,
+  startStreamPreview,
 });
 
 const tuiRoomParam = {
@@ -85,13 +89,13 @@ function toggleMuteAudio() {
   tuiRoomParam.isOpenMicrophone = !isMicMuted.value;
 }
 
-function toggleMuteVideo() {
+async function toggleMuteVideo() {
   isCameraMuted.value = !isCameraMuted.value;
   tuiRoomParam.isOpenCamera = !isCameraMuted.value;
   if (isCameraMuted.value) {
-    TUIRoomCore.stopCameraPreview();
+    await roomEngine.instance?.closeLocalCamera();
   } else {
-    TUIRoomCore.startCameraPreview(streamPreviewRef.value);
+    await roomEngine.instance?.openLocalCamera();
   }
 }
 
@@ -102,38 +106,102 @@ function getRoomParam() {
   return tuiRoomParam;
 }
 
-const onUserVoiceVolume = (eventInfo: []) => {
-  roomStore.setAudioVolume(eventInfo);
+const onUserVoiceVolume = (eventInfo: { userVolumeList: [] }) => {
+  roomStore.setAudioVolume(eventInfo.userVolumeList);
 };
 
-onMounted(async () => {
-  const cameraList = await TUIRoomCore.getCameraList();
-  const microphoneList = await TUIRoomCore.getMicrophoneList();
-  const speakerList = await TUIRoomCore.getSpeakerList();
-  roomStore.setCurrentCameraId(cameraList[0].deviceId);
-  roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
-  roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
-  TUIRoomCore.setCurrentCamera(cameraList[0].deviceId);
-  TUIRoomCore.setCurrentMicrophone(microphoneList[0].deviceId);
-  TUIRoomCore.setCurrentSpeaker(speakerList[0].deviceId);
-  await TUIRoomCore.startCameraPreview(streamPreviewRef.value);
-  TUIRoomCore.enableAudioVolumeEvaluation(100);
-  await TUIRoomCore.startMicrophone();
+async function startStreamPreview() {
+  const cameraList = await roomEngine.instance?.getCameraDevicesList();
+  const microphoneList = await roomEngine.instance?.getMicDevicesList();
+  const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
+  roomStore.setCameraList(cameraList);
+  roomStore.setMicrophoneList(microphoneList);
+  roomStore.setSpeakerList(speakerList);
+
+  if (isElectron) {
+    const cameraInfo = roomEngine.instance?.getCurrentCameraDevice();
+    const micInfo = roomEngine.instance?.getCurrentMicDevice();
+    const speakerInfo = roomEngine.instance?.getCurrentSpeakerDevice();
+    if (cameraInfo && cameraInfo.deviceId) {
+      roomStore.setCurrentCameraId(cameraInfo.deviceId);
+    }
+    if (micInfo && micInfo.deviceId) {
+      roomStore.setCurrentMicrophoneId(micInfo.deviceId);
+    }
+    if (speakerInfo && speakerInfo.deviceId) {
+      roomStore.setCurrentSpeakerId(speakerInfo.deviceId);
+    }
+  } else {
+    if (cameraList.length > 0) {
+      await roomEngine.instance?.setCurrentCameraDevice({ deviceId: cameraList[0].deviceId });
+    }
+    if (microphoneList.length > 0) {
+      await roomEngine.instance?.setCurrentMicDevice({ deviceId: microphoneList[0].deviceId });
+    }
+    if (speakerList.length > 0) {
+      await roomEngine.instance?.setCurrentSpeakerDevice({ deviceId: speakerList[0].deviceId });
+    }
+  }
+
+  roomEngine.instance?.setLocalRenderView({ streamType: TUIVideoStreamType.kCameraStream, view: 'stream-preview'  });
+  await roomEngine.instance?.openLocalCamera();
+  await roomEngine.instance?.openLocalMicrophone();
+
   loading.value = false;
-  TUIRoomCore.on(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);
+}
+
+/**
+ * Device changes: device switching, device plugging and unplugging events
+ *
+ * 设备变化：设备切换、设备插拔事件
+ **/
+async function onDeviceChange(eventInfo: {deviceId: string, type: number, state: number}) {
+  const stateList = ['add', 'remove', 'active'];
+  const { deviceId, type, state } = eventInfo;
+  if (type === TRTCDeviceType.TRTCDeviceTypeMic) {
+    console.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
+    const deviceList = await roomEngine.instance?.getMicDevicesList();
+    roomStore.setMicrophoneList(deviceList);
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentMicrophoneId(deviceId);
+    }
+    return;
+  }
+  if (type === TRTCDeviceType.TRTCDeviceTypeSpeaker) {
+    console.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
+    const deviceList = await roomEngine.instance?.getSpeakerDevicesList();
+    roomStore.setSpeakerList(deviceList);
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentSpeakerId(deviceId);
+    }
+    return;
+  }
+  if (type === TRTCDeviceType.TRTCDeviceTypeCamera) {
+    console.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
+    const deviceList = await roomEngine.instance?.getCameraDevicesList();
+    roomStore.setCameraList(deviceList);
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentCameraId(deviceId);
+    }
+  }
+}
+
+TUIRoomEngine.once('ready', async () => {
+  roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
+  roomEngine.instance?.on(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 
 onBeforeUnmount(async () => {
-  await TUIRoomCore.stopCameraPreview();
-  await TUIRoomCore.stopMicrophone();
-  TUIRoomCore.off(ETUIRoomEvents.onUserVoiceVolume, onUserVoiceVolume);
+  await roomEngine.instance?.closeLocalCamera();
+  await roomEngine.instance?.closeLocalMicrophone();
+  roomEngine.instance?.off(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
 });
 
 /**
  * Handles audio and video device settings
  *
  * 处理音视频设备设置
-**/
+ **/
 const isSettingOpen = ref(false);
 const settingTitle = ref('');
 const settingTab = ref('');
@@ -142,7 +210,7 @@ const settingTab = ref('');
  * Handling audio device settings
  *
  * 处理音频设备设置
-**/
+ **/
 function handleMicSetting() {
   isSettingOpen.value = true;
   settingTitle.value = 'Mic settings';
@@ -153,7 +221,7 @@ function handleMicSetting() {
  * Handling video device settings
  *
  * 处理视频设备设置
-**/
+ **/
 function handleCameraSetting() {
   isSettingOpen.value = true;
   settingTitle.value = 'Camera settings';
@@ -168,6 +236,8 @@ function handleDrawerClose(done: any) {
 </script>
 
 <style lang="scss">
+@import '../../assets/style/element-custom.scss';
+
 .stream-container {
   width: 740px;
   height: 476px;

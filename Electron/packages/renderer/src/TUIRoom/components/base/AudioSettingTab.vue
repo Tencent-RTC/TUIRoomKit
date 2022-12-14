@@ -50,13 +50,14 @@
       </div> -->
     </div>
 
-    <div :class="['item-setting-container', isSampleMode && 'hasDividingLine']">
+    <div v-if="(speakerList.length > 0)" :class="['item-setting-container', isSampleMode && 'hasDividingLine']">
       <div class="item-setting">
         <span class="title">{{ t('Speaker') }}</span>
         <div class="flex">
           <device-select
             :class="isDetailMode ? 'detail-select' : ''"
             device-type="speaker"
+            :disabled="mode === SettingMode.DETAIL"
           ></device-select>
           <div
             v-if="isDetailMode"
@@ -84,6 +85,7 @@ import DeviceSelect from './DeviceSelect.vue';
 import { useRoomStore } from '../../stores/room';
 import { SettingMode } from '../../constants/render';
 import { useI18n } from 'vue-i18n';
+import { storeToRefs } from 'pinia';
 
 
 interface Props {
@@ -95,6 +97,7 @@ const isSampleMode = computed(() => settingMode === SettingMode.SIMPLE);
 const isDetailMode = computed(() => settingMode === SettingMode.DETAIL);
 
 const roomStore = useRoomStore();
+const { speakerList } = storeToRefs(roomStore);
 // const inputAudioLevel = ref(0);
 // const outputAudioLevel = ref(100);
 

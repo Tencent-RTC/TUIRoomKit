@@ -15,7 +15,7 @@
           <span class="setting-name">{{ t('Disable all audios') }}</span>
         </div>
         <div class="item-right-section">
-          <el-switch :value="basicStore.isMuteAllAudio" @change="toggleAllAudio" />
+          <el-switch :value="!roomStore.enableAudio" @change="toggleAllAudio" />
         </div>
       </div>
       <div class="setting-item">
@@ -26,7 +26,7 @@
           <span class="setting-name">{{ t('Disable all videos') }}</span>
         </div>
         <div class="item-right-section">
-          <el-switch :value="basicStore.isMuteAllVideo" @change="toggleAllVideo" />
+          <el-switch :value="!roomStore.enableVideo" @change="toggleAllVideo" />
         </div>
       </div>
     </div>
@@ -45,13 +45,15 @@
 
 <script setup lang='ts'>
 import { storeToRefs } from 'pinia';
-import TUIRoomCore from '../../tui-room-core';
+import useGetRoomEngine from '../../hooks/useRoomEngine';
 import SvgIcon from '../common/SvgIcon.vue';
 import { useRoomStore } from '../../stores/room';
 import { useBasicStore } from '../../stores/basic';
 import { ICON_NAME } from '../../constants/icon';
 import MemberItem from './MemberItem/index.vue';
 import { useI18n } from 'vue-i18n';
+
+const roomEngine = useGetRoomEngine();
 
 const { t } = useI18n();
 
@@ -65,17 +67,19 @@ function showApplyUserLit() {
 }
 
 async function toggleAllAudio() {
-  const newIsMuteAllAudio = !basicStore.isMuteAllAudio;
-  basicStore.setIsMuteAllAudio(newIsMuteAllAudio);
-  roomStore.setMuteAllAudio(newIsMuteAllAudio);
-  await TUIRoomCore.muteAllUsersMicrophone(newIsMuteAllAudio);
+  const newEnableAudio = !roomStore.enableAudio;
+  await roomEngine.instance?.updateRoomInfo({
+    enableAudio: newEnableAudio,
+  });
+  roomStore.setEnableAudio(newEnableAudio);
 }
 
 async function toggleAllVideo() {
-  const newIsMuteAllVideo = !basicStore.isMuteAllVideo;
-  basicStore.setIsMuteAllVideo(newIsMuteAllVideo);
-  roomStore.setMuteAllVideo(newIsMuteAllVideo);
-  await TUIRoomCore.muteAllUsersCamera(newIsMuteAllVideo);
+  const newEnableVideo = !roomStore.enableVideo;
+  await roomEngine.instance?.updateRoomInfo({
+    enableVideo: newEnableVideo,
+  });
+  roomStore.setEnableVideo(newEnableVideo);
 }
 </script>
 

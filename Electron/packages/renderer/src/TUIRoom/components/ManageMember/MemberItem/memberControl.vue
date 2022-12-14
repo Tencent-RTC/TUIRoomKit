@@ -27,14 +27,16 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
 import { UserInfo, useRoomStore } from '../../../stores/room';
 import { ICON_NAME } from '../../../constants/icon';
-import TUIRoomCore, { ETUIRoomRole, ETUISpeechMode } from '../../../tui-room-core';
+import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
 import SvgIcon from '../../common/SvgIcon.vue';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
-import { useI18n } from 'vue-i18n';
 
+const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
 const basicStore = useBasicStore();
@@ -60,10 +62,10 @@ const props = defineProps<Props>();
 
 const showMoreControl = ref(false);
 const isMe = computed(() => basicStore.userId === props.userInfo.userId);
-const isAnchor = computed(() => props.userInfo.role === ETUIRoomRole.ANCHOR);
-const isAudience = computed(() => props.userInfo.role === ETUIRoomRole.AUDIENCE);
-const isFreeSpeechMode = computed(() => basicStore.roomMode === ETUISpeechMode.FREE_SPEECH);
-const isApplyRoomMode = computed(() => basicStore.roomMode === ETUISpeechMode.APPLY_SPEECH);
+const isAnchor = computed(() => props.userInfo.onSeat === true);
+const isAudience = computed(() => props.userInfo.onSeat !== true);
+const isFreeSpeechMode = computed(() => roomStore.enableSeatControl === false);
+const isApplyRoomMode = computed(() => roomStore.enableSeatControl === true);
 /**
 * Control the centralized matching of elements
  *
@@ -93,20 +95,20 @@ const isApplyRoomMode = computed(() => basicStore.roomMode === ETUISpeechMode.AP
  *
  * 自由发言模式
  * 1.当前用户为主播：
- * 禁言/解除禁言  禁画/解除禁画
- *              禁止聊天
- *              踢出房间
+ * 禁言/解除禁言/取消解除禁言  禁画/解除禁画/取消解除禁画
+ *                         禁止聊天
+ *                         踢出房间
  *
  * 举手发言模式
  * 1. 当前用户为主播：
- * 禁言/解除禁言  禁画/解除禁画
- *              邀请下台
- *              禁止聊天
- *              踢出房间
+ * 禁言/解除禁言/取消解除禁言  禁画/解除禁画/取消解除禁画
+ *                         邀请下台
+ *                         禁止聊天
+ *                         踢出房间
  *
  * 2. 观众没有申请上麦：
- * 邀请上台/取消邀请上台      禁止聊天
- *                         踢出房间
+ * 邀请上台/取消邀请上台   禁止聊天
+ *                      踢出房间
  *
  * 3. 观众正在申请上麦：
  * 同意上台      拒绝上台
@@ -117,11 +119,11 @@ const singleControl = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const control = { title: '', func: (userInfo: UserInfo) => {} };
   if (isFreeSpeechMode.value) {
-    control.title = props.userInfo.isAudioMutedByMaster ? t('Unmute') : t('Mute');
+    control.title = props.userInfo.hasAudioStream ? t('Mute') : (props.userInfo.isRequestingUserOpenMic ? t('Cancel Unmute') : t('Unmute'));
     control.func = muteUserAudio;
   } else if (isApplyRoomMode.value) {
     if (isAnchor.value) {
-      control.title = props.userInfo.isAudioMutedByMaster ? t('Unmute') : t('Mute');
+      control.title = props.userInfo.hasAudioStream ? t('Mute') : (props.userInfo.isRequestingUserOpenMic ? t('Cancel Unmute') : t('Unmute'));
       control.func = muteUserAudio;
     } else if (isAudience.value) {
       if (props.userInfo.isUserApplyingToAnchor) {
@@ -136,27 +138,35 @@ const singleControl = computed(() => {
   return control;
 });
 
-const denyOnStage = { title: t('Refuse stage'), func: denyUserOnStage };
-const makeOffStage = { title: t('Step down'), func: kickUserOffStage };
+const denyOnStage = computed(() => ({ title: t('Refuse stage'), func: denyUserOnStage }));
+const makeOffStage = computed(() => ({ title: t('Step down'), func: kickUserOffStage }));
 
-const videoControlTitle = computed(() => (props.userInfo.isVideoMutedByMaster ? t('Enable video') : t('Disable video')));
+const videoControlTitle = computed(() => {
+  if (props.userInfo.hasVideoStream) {
+    return t('Disable video');
+  }
+  if (props.userInfo.isRequestingUserOpenCamera) {
+    return t('Cancel Enable video');
+  }
+  return t('Enable video');
+});
 const videoControl = computed(() => ({ title: videoControlTitle.value, func: muteUserVideo }));
 
 const chatControlTitle = computed(() => (props.userInfo.isChatMutedByMaster ? t('Enable chat') : t('Disable chat')));
 const forbidChat = computed(() => ({ title: chatControlTitle.value, func: muteUserChat }));
 
-const kickUser = { title: t('Kick out'), func: kickOffUser };
+const kickUser = computed(() => ({ title: t('Kick out'), func: kickOffUser }));
 const controlList = computed(() => {
-  const list = [forbidChat.value, kickUser];
+  const list = [forbidChat.value, kickUser.value];
   if (isFreeSpeechMode.value) {
     list.unshift(videoControl.value);
   }
   if (isAnchor.value && isApplyRoomMode.value) {
     list.unshift(videoControl.value);
-    list.splice(1, 0, makeOffStage);
+    list.splice(1, 0, makeOffStage.value);
   }
   if (isAudience.value && props.userInfo.isUserApplyingToAnchor) {
-    list.splice(0, 0, denyOnStage);
+    list.splice(0, 0, denyOnStage.value);
   }
   return list;
 });
@@ -171,12 +181,10 @@ function toggleClickMoreBtn() {
  * 邀请上台/取消邀请上台
 **/
 async function toggleInviteUserOnStage(userInfo: UserInfo) {
-  const { userId, isInvitingUserToAnchor } = userInfo;
+  const { isInvitingUserToAnchor } = userInfo;
   if (isInvitingUserToAnchor) {
-    roomStore.removeInviteToAnchorUser(userId);
     cancelInviteUserOnStage(userInfo);
   } else {
-    roomStore.addInviteToAnchorUser(userId);
     inviteUserOnStage(userInfo);
   }
 }
@@ -184,12 +192,30 @@ async function toggleInviteUserOnStage(userInfo: UserInfo) {
 /**
  * Banning/Unbanning
  *
- * 禁言/取消禁言
+ * 禁麦/邀请打开麦克风
 **/
-function muteUserAudio(userInfo: UserInfo) {
-  const currentState = userInfo.isAudioMutedByMaster;
-  roomStore.setMuteUserAudio(userInfo.userId, !currentState);
-  TUIRoomCore.muteUserMicrophone(userInfo.userId, !currentState);
+async function muteUserAudio(userInfo: UserInfo) {
+  if (userInfo.hasAudioStream) {
+    await roomEngine.instance?.closeRemoteMicrophone({
+      userId: userInfo.userId,
+    });
+  } else {
+    if (userInfo.isRequestingUserOpenMic) {
+      const requestId = userInfo.requestUserOpenMicRequestId;
+      requestId && await roomEngine.instance?.cancelRequest({ requestId });
+      roomStore.setRequestUserOpenMic({ userId: userInfo.userId, isRequesting: false });
+    } else {
+      const requestId = await roomEngine.instance?.requestToOpenRemoteMicrophone({
+        userId: userInfo.userId,
+        timeout: 0,
+        requestCallback: () => {
+          // 处理请求超时，应答，拒绝的情况
+          roomStore.setRequestUserOpenMic({ userId: userInfo.userId, isRequesting: false });
+        },
+      });
+      requestId && roomStore.setRequestUserOpenMic({ userId: userInfo.userId, isRequesting: true, requestId });
+    }
+  }
 }
 
 /**
@@ -197,10 +223,28 @@ function muteUserAudio(userInfo: UserInfo) {
  *
  * 禁画/取消禁画
 **/
-function muteUserVideo(userInfo: UserInfo) {
-  const currentState = userInfo.isVideoMutedByMaster;
-  roomStore.setMuteUserVideo(userInfo.userId, !currentState);
-  TUIRoomCore.muteUserCamera(userInfo.userId, !currentState);
+async function muteUserVideo(userInfo: UserInfo) {
+  if (userInfo.hasVideoStream) {
+    await roomEngine.instance?.closeRemoteCamera({
+      userId: userInfo.userId,
+    });
+  } else {
+    if (userInfo.isRequestingUserOpenCamera) {
+      const requestId = userInfo.requestUserOpenCameraRequestId;
+      requestId && await roomEngine.instance?.cancelRequest({ requestId });
+      roomStore.setRequestUserOpenCamera({ userId: userInfo.userId, isRequesting: false });
+    } else {
+      const requestId = await roomEngine.instance?.requestToOpenRemoteCamera({
+        userId: userInfo.userId,
+        timeout: 0,
+        requestCallback: () => {
+          // 处理请求超时，应答，拒绝的情况
+          roomStore.setRequestUserOpenCamera({ userId: userInfo.userId, isRequesting: false });
+        },
+      });
+      requestId && roomStore.setRequestUserOpenCamera({ userId: userInfo.userId, isRequesting: true, requestId });
+    }
+  }
 }
 
 /**
@@ -211,7 +255,16 @@ function muteUserVideo(userInfo: UserInfo) {
 function muteUserChat(userInfo: UserInfo) {
   const currentState = userInfo.isChatMutedByMaster;
   roomStore.setMuteUserChat(userInfo.userId, !currentState);
-  TUIRoomCore.muteUserChatRoom(userInfo.userId, !currentState);
+  if (currentState) {
+    roomEngine.instance?.unmuteRemoteUser({
+      userId: userInfo.userId,
+    });
+  } else {
+    roomEngine.instance?.muteRemoteUser({
+      userId: userInfo.userId,
+      duration: 24 * 60 * 60,
+    });
+  }
 }
 
 /**
@@ -220,7 +273,9 @@ function muteUserChat(userInfo: UserInfo) {
  * 将用户踢出房间
 **/
 function kickOffUser(userInfo: UserInfo) {
-  TUIRoomCore.kickOffUser(userInfo.userId);
+  roomEngine.instance?.kickOutRemoteUser({
+    userId: userInfo.userId,
+  });
 }
 
 </script>
@@ -272,6 +327,7 @@ function kickOffUser(userInfo: UserInfo) {
         color: #CFD4E6;
         height: 40px;
         line-height: 40px;
+        white-space: nowrap;
       }
     }
   }

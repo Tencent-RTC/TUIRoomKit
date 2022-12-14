@@ -6,17 +6,10 @@ console.log(`[preload] process.resourcesPath: ${process.resourcesPath}`);
 console.log(`[preload] __dirname: ${__dirname}`);
 console.log(`[preload] env.NODE_ENV: ${process.env.NODE_ENV}`);
 
-import { domReady } from './utils';
-import { useLoading } from './loading';
+import { domReady } from './utils'
+import { useLoading } from './loading'
 
-const { appendLoading, removeLoading } = useLoading();
-window.removeLoading = removeLoading;
+const { appendLoading, removeLoading } = useLoading()
+window.removeLoading = removeLoading
 
-domReady().then(appendLoading);
-
-const { ipcRenderer } = require('electron');
-
-ipcRenderer.on('crash-file-path', (event, args) => {
-  console.warn('crash-file-path:', args);
-});
-window.ipcRenderer = ipcRenderer;
+domReady().then(appendLoading)

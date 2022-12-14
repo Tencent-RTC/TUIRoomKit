@@ -6,7 +6,7 @@
     @mouseleave="handleMouseLeave"
   >
     <member-info :user-info="userInfo" :show-member-control="showMemberControl"></member-info>
-    <member-control v-if="showMemberControl" :user-info="userInfo"></member-control>
+    <member-control v-show="showMemberControl" :user-info="userInfo"></member-control>
   </div>
 </template>
 
