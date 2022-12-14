@@ -13,7 +13,7 @@
 -->
 <template>
   <el-select
-    v-model="videoProfile"
+    v-model="localVideoProfile"
     placeholder="placeholder"
     class="select custom-element-class"
     :teleported="false"
@@ -28,30 +28,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import TUIRoomCore, { TRTCVideoResolution } from '../../tui-room-core';
+import { computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+
+import { TUIVideoProfile } from '@tencentcloud/tuiroom-engine-js';
+import { useRoomStore } from '../../stores/room';
+import useGetRoomEngine from '../../hooks/useRoomEngine';
+import { storeToRefs } from 'pinia';
+
+const roomEngine = useGetRoomEngine();
+const roomStore = useRoomStore();
+const { localVideoProfile } = storeToRefs(roomStore);
 
 const { t } = useI18n();
 
-const videoProfile = ref('720P');
+const videoProfileList = computed(() => [
+  { label: t('Low Definition'), value: TUIVideoProfile.kLowDefinition },
+  { label: t('Standard Definition'), value: TUIVideoProfile.kStandardDefinition },
+  { label: t('High Definition'), value: TUIVideoProfile.kHighDefinition },
+  { label: t('Super Definition'), value: TUIVideoProfile.kSuperDefinition }]);
 
-const videoProfileList = [
-  { label: t('Smooth (360p, 15 fps)'), value: '360P' },
-  { label: t('SD (540p, 15 fps)'), value: '540P' },
-  { label: t('HD (720p, 30 fps)'), value: '720P' },
-  { label: t('FHD (1080p, 30 fps)'), value: '1080P' }];
-
-const videoProfileMap: Record<string, any> = {
-  '360P': { videoResolution: TRTCVideoResolution.TRTCVideoResolution_640_360, fps: 15, bitrate: 800 },
-  '540P': { videoResolution: TRTCVideoResolution.TRTCVideoResolution_960_540, fps: 15, bitrate: 900 },
-  '720P': { videoResolution: TRTCVideoResolution.TRTCVideoResolution_1280_720, fps: 30, bitrate: 1500 },
-  '1080P': { videoResolution: TRTCVideoResolution.TRTCVideoResolution_1920_1080, fps: 30, bitrate: 2000 },
-};
-
-watch(videoProfile, (val: string) => {
-  const currentVideoProfileObj = videoProfileMap[val];
-  TUIRoomCore.setVideoEncoderParam(currentVideoProfileObj);
+watch(localVideoProfile, (val: TUIVideoProfile) => {
+  roomEngine.instance?.setLocalVideoProfile({ videoProfile: val });
 }, { immediate: true });
 
 </script>

@@ -19,6 +19,8 @@ declare module 'tim-js-sdk' {
   export default TIM;
 }
 
+declare const TencentCaptcha: any;
+
 declare const Aegis: any;
 
 interface ImportMetaEnv {

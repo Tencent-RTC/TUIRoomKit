@@ -1,8 +1,8 @@
 <template>
-  <div v-if="showScreenShareIcon" class="screen-share-control-container">
+  <div class="screen-share-control-container">
     <icon-button
       ref="btnStopRef"
-      :disabled="isAudience"
+      :disabled="screenShareDisabled"
       :title="title"
       :icon-name="iconName"
       @click="toggleScreenShare"
@@ -13,7 +13,7 @@
     </div>
     <el-dialog
       v-model="dialogVisible"
-      custom-class="custom-element-class"
+      class="custom-element-class"
       width="420px"
       :title="t('Stop sharing?') "
       :modal="true"
@@ -33,23 +33,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, Ref, computed, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessage } from 'element-plus';
 import IconButton from '../../common/IconButton.vue';
-import TUIRoomCore, { ETUIRoomEvents, ETUIRoomRole } from '../../../tui-room-core';
-import { useBasicStore } from '../../../stores/basic';
-import logger from '../../../tui-room-core/common/logger';
+import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
+import useGetRoomEngine from '../../../hooks/useRoomEngine';
+import { useRoomStore } from '../../../stores/room';
+import logger from '../../../utils/common/logger';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ICON_NAME } from '../../../constants/icon';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useI18n } from 'vue-i18n';
 
+const roomEngine = useGetRoomEngine();
+
 const logPrefix = '[ScreenShareControl]';
 
-const basicStore = useBasicStore();
-const { shareUserId, shareUserSig, isAudience, role } = storeToRefs(basicStore);
-const showScreenShareIcon = computed(() => shareUserId.value && shareUserSig?.value);
+const roomStore = useRoomStore();
+const { isAnchor, isAudience, enableVideo } = storeToRefs(roomStore);
 const { t } = useI18n();
 
 const btnStopRef = ref();
@@ -57,26 +59,23 @@ const isSharing: Ref<boolean> = ref(false);
 const showStopShareRegion: Ref<boolean> = ref(false);
 const dialogVisible: Ref<boolean> = ref(false);
 
+// 麦下用户不能进行屏幕分享
+// 全员禁画时，普通用户不能进行屏幕分享
+const screenShareDisabled = computed(() => (
+  isAudience.value || (roomStore.localUser.userRole === TUIRole.kGeneralUser && !enableVideo.value)
+));
 const title = computed(() => (isSharing.value ? t('Sharing') : t('Share screen')));
 const iconName = computed(() => {
-  if (isAudience.value) {
+  if (screenShareDisabled.value) {
     return ICON_NAME.ScreenShareDisabled;
   }
   return isSharing.value ? ICON_NAME.ScreenSharing : ICON_NAME.ScreenShare;
 });
 
-watch(role, (val: any, oldVal: any) => {
-  if (oldVal === ETUIRoomRole.ANCHOR && val === ETUIRoomRole.AUDIENCE && isSharing.value) {
+watch(isAnchor, (val: any, oldVal: any) => {
+  if (!oldVal && val && isSharing.value) {
     stopScreenShare();
   }
-});
-
-onMounted(() => {
-  TUIRoomCore.on(ETUIRoomEvents.onWebScreenSharingStopped, stopScreenShare);
-});
-
-onUnmounted(() => {
-  TUIRoomCore.off(ETUIRoomEvents.onWebScreenSharingStopped, stopScreenShare);
 });
 
 async function toggleScreenShare() {
@@ -88,28 +87,49 @@ async function toggleScreenShare() {
     });
     return;
   }
+  if (roomStore.localUser.userRole === TUIRole.kGeneralUser && !enableVideo.value) {
+    ElMessage({
+      type: 'warning',
+      message: t('Has been full static painting, can not share your screen'),
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
+  }
   if (isSharing.value) {
     showStopShareRegion.value = true;
     return;
   }
   try {
-    const tuiResponse = await TUIRoomCore.startScreenShare({
-      shareUserId: shareUserId.value,
-      shareUserSig: shareUserSig?.value || '',
-    });
-    if (tuiResponse.code === 0) {
-      isSharing.value = true;
-    } else {
-      logger.error(`${logPrefix}startScreenShare error: ${tuiResponse.code} ${tuiResponse.message}`);
-      ElMessage({
-        type: 'warning',
-        message: tuiResponse.message,
-        duration: MESSAGE_DURATION.LONG,
-      });
-    }
+    await roomEngine.instance?.startScreenSharing();
+    isSharing.value = true;
   } catch (error: any) {
     logger.error(`${logPrefix}startScreenShare error:`, error);
-    throw error;
+    let message = '';
+    // 当屏幕分享流初始化失败时, 提醒用户并停止后续进房发布流程
+    switch (error.name) {
+      case 'NotReadableError':
+        // 提醒用户确保系统允许当前浏览器获取屏幕内容
+        message = '系统禁止当前浏览器获取屏幕内容';
+        break;
+      case 'NotAllowedError':
+        if (error.message.includes('Permission denied by system')) {
+          // 提醒用户确保系统允许当前浏览器获取屏幕内容
+          message = '系统禁止当前浏览器获取屏幕内容';
+        } else {
+          // 用户拒绝/取消屏幕分享
+          message = '用户拒绝/取消屏幕分享';
+        }
+        break;
+      default:
+        // 初始化屏幕分享流时遇到了未知错误，提醒用户重试
+        message = '屏幕分享遇到未知错误';
+        break;
+    }
+    ElMessage({
+      type: 'warning',
+      message,
+      duration: MESSAGE_DURATION.LONG,
+    });
   }
 }
 
@@ -127,7 +147,7 @@ function cancelStop() {
 async function stopScreenShare() {
   if (isSharing.value) {
     try {
-      await TUIRoomCore.stopScreenShare();
+      await roomEngine.instance?.stopScreenSharing();
       dialogVisible.value = false;
       isSharing.value = false;
     } catch (error) {
@@ -135,34 +155,46 @@ async function stopScreenShare() {
     }
   }
 }
+
+function screenCaptureStopped() {
+  isSharing.value = false;
+}
+
+TUIRoomEngine.once('ready', () => {
+  roomEngine.instance?.on(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
+});
+
+onUnmounted(() => {
+  roomEngine.instance?.off(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
+});
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
-@import '../../../assets/style/element-custom.scss';
+  @import '../../../assets/style/var.scss';
+  @import '../../../assets/style/element-custom.scss';
 
-.screen-share-control-container {
-  position: relative;
-}
-.stop-share-region {
-  width: 131px;
-  height: 48px;
-  background: $toolBarBackgroundColor;
-  border-radius: 4px;
-  position: absolute;
-  top: -58px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  font-size: 14px;
-  color: #CFD4E6;
-}
-.stop-share-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 10px;
-}
+  .screen-share-control-container {
+    position: relative;
+  }
+  .stop-share-region {
+    width: 131px;
+    height: 48px;
+    background: $toolBarBackgroundColor;
+    border-radius: 4px;
+    position: absolute;
+    top: -58px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: #CFD4E6;
+  }
+  .stop-share-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+  }
 </style>
