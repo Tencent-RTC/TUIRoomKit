@@ -1,10 +1,10 @@
-import { app, BrowserWindow, shell, screen, systemPreferences, crashReporter } from 'electron'
+import { app, BrowserWindow, shell, screen, systemPreferences, crashReporter, ipcMain } from 'electron'
 import { release } from 'os'
-import path from 'path'
+import { join } from 'path'
 
 // 开启crash捕获
 crashReporter.start({
-  productName: 'trtc-tuiroom-electron',
+  productName: 'electron-tui-room',
   companyName: 'Tencent Cloud',
   submitURL: 'https://www.xxx.com',
   uploadToServer: false,
@@ -15,7 +15,7 @@ let crashFilePath = '';
 let crashDumpsDir = '';
 try {
   // electron 低版本
-  crashFilePath = path.join(app.getPath('temp'), app.getName() + ' Crashes');
+  crashFilePath = join(app.getPath('temp'), app.getName() + ' Crashes');
   console.log('————————crash path:', crashFilePath);
 
   // electron 高版本
@@ -24,8 +24,6 @@ try {
 } catch (e) {
   console.error('获取奔溃文件路径失败', e);
 }
-
-const PROTOCOL = 'tuiroom';
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
@@ -39,40 +37,7 @@ if (!app.requestSingleInstanceLock()) {
 }
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
-let win: BrowserWindow | null = null
-let schemeRoomId = '';
-
-function registerScheme() {
-  const args = [];
-  if (!app.isPackaged) {
-    // 如果是开发阶段，需要把我们的脚本的绝对路径加入参数中
-    args.push(path.resolve(process.argv[1]));
-  }
-  // 加一个 `--` 以确保后面的参数不被 Electron 处理
-  args.push('--');
-  app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, args);
-  handleArgv(process.argv);
-}
-
-function handleArgv(argv: string[]) {
-  const prefix = `${PROTOCOL}:`;
-  // 开发阶段，跳过前两个参数（`electron.exe .`）
-  // 打包后，跳过第一个参数（`myapp.exe`）
-  const offset = app.isPackaged ? 1 : 2;
-  const url = argv.find((arg, i) => i >= offset && arg.startsWith(prefix));
-  if (url) handleUrl(url);
-}
-
-function handleUrl(url: string) {
-  // tuiroom://joinroom?roomId=123
-  const urlObj = new URL(url);
-  const { searchParams } = urlObj;
-  schemeRoomId = searchParams.get('roomId') || '';
-  if (win && win.webContents) {
-    win?.webContents.send('launch-room', schemeRoomId);
-  }
-}
-
+let isHasScreen = false;
 async function checkAndApplyDevicePrivilege() {
   const cameraPrivilege = systemPreferences.getMediaAccessStatus('camera');
 
@@ -88,7 +53,12 @@ async function checkAndApplyDevicePrivilege() {
 
   const screenPrivilege = systemPreferences.getMediaAccessStatus('screen');
   console.log(screenPrivilege);
+  if (screenPrivilege === 'granted') {
+    isHasScreen = true;
+  }
 }
+
+let win: BrowserWindow | null = null
 
 async function createWindow() {
   await checkAndApplyDevicePrivilege();
@@ -100,39 +70,33 @@ async function createWindow() {
     minWidth: 1200,
     minHeight: 640,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.cjs'),
+      preload: join(__dirname, '../preload/index.cjs'),
       nodeIntegration: true,
       contextIsolation: false,
     },
   })
 
   if (app.isPackaged) {
-    if (schemeRoomId) {
-      win.loadFile(path.join(__dirname, `../renderer/index.html`), {
-        hash: `home?roomId=${schemeRoomId}`
-      });
-    } else {
-      win.loadFile(path.join(__dirname, '../renderer/index.html'))
-    }
+    win.loadFile(join(__dirname, '../renderer/index.html'))
   } else {
+    // 🚧 Use ['ENV_NAME'] avoid vite:define plugin
     const installExtension = require('electron-devtools-installer')
     installExtension.default(installExtension.VUEJS_DEVTOOLS)
-        .then(() => {})
-        .catch((err: Error) => {
-          console.log('Unable to install `vue-devtools`: \n', err)
-        });
-    // 🚧 Use ['ENV_NAME'] avoid vite:define plugin
-    const url = `http://${process.env['VITE_DEV_SERVER_HOST']}:${process.env['VITE_DEV_SERVER_PORT']}/#/home`
+      .then(() => {})
+      .catch((err: Error) => {
+        console.log('Unable to install `vue-devtools`: \n', err)
+      });
+    const url = `http://${process.env['VITE_DEV_SERVER_HOST']}:${process.env['VITE_DEV_SERVER_PORT']}`
 
     win.loadURL(url)
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
   }
 
   // Test active push message to Renderer-process
   win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', new Date().toLocaleString())
-
-    win?.webContents.send('crash-file-path', `${crashFilePath}|${crashDumpsDir}`);
+    win?.webContents.send('main-process-message', {
+      isHasScreen
+    })
   })
 
   // Make all links open with the browser, not with the application
@@ -142,7 +106,6 @@ async function createWindow() {
   })
 }
 
-registerScheme();
 app.whenReady().then(createWindow)
 
 app.on('window-all-closed', () => {
@@ -150,11 +113,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-app.on('second-instance', (event, argv) => {
-  if (process.platform === 'win32') {
-    // Windows
-    handleArgv(argv);
-  }
+app.on('second-instance', () => {
   if (win) {
     // Focus on the main window if the user tried to open another
     if (win.isMinimized()) win.restore()
@@ -171,24 +130,22 @@ app.on('activate', () => {
   }
 })
 
-// macOS 下通过协议URL启动时，主实例会通过 open-url 事件接收这个 URL
-app.on('open-url', (event, urlStr) => {
-  handleUrl(urlStr);
-});
+// new window example arg: new windows url
+ipcMain.handle("open-win", (event, arg) => {
+  const childWindow = new BrowserWindow({
+    webPreferences: {
+      preload: join(__dirname, "../preload/index.cjs"),
+    },
+  });
 
-app.on('gpu-process-crashed', (event, kill) => {
-  console.warn('app:gpu-process-crashed', event, kill);
+  if (app.isPackaged) {
+    childWindow.loadFile(join(__dirname, `../renderer/index.html`), {
+      hash: `${arg}`,
+    })
+  } else {
+    // 🚧 Use ['ENV_NAME'] avoid vite:define plugin
+    const url = `http://${process.env["VITE_DEV_SERVER_HOST"]}:${process.env["VITE_DEV_SERVER_PORT"]}/#${arg}`
+    childWindow.loadURL(url);
+    // childWindow.webContents.openDevTools({ mode: "undocked", activate: true })
+  }
 });
-
-app.on('renderer-process-crashed', (event, webContents, kill) => {
-  console.warn('app:renderer-process-crashed', event, webContents, kill);
-});
-
-app.on('render-process-gone', (event, webContents, details) => {
-  console.warn('app:render-process-gone', event, webContents, details);
-});
-
-app.on('child-process-gone', (event, details) => {
-  console.warn('app:child-process-gone', event, details);
-});
-

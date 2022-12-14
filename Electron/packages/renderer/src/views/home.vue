@@ -5,7 +5,7 @@
         class="header-item user-info"
         :user-id="userId"
         :user-name="userName"
-        :user-avatar="userAvatar"
+        :avatar-url="avatarUrl"
         @log-out="handleLogOut"
       ></user-info>
       <language-icon class="header-item language"></language-icon>
@@ -25,26 +25,28 @@ import StreamPreview from '@TUIRoom/components/RoomHome/StreamPreview.vue';
 import RoomControl from '@TUIRoom/components/RoomHome/RoomControl.vue';
 import LanguageIcon from '@/TUIRoom/components/RoomHeader/Language.vue';
 import { checkNumber } from '@/TUIRoom/utils/common';
-import TUIRoomCore from '@/TUIRoom/tui-room-core';
 import router from '@/router';
 import { useRoute } from 'vue-router';
 import { onMounted, Ref, ref } from 'vue';
 import { getBasicInfo } from '@/config/basic-info-config';
 import { useI18n } from 'vue-i18n';
+import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
+import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
 
 const route = useRoute();
 const streamPreviewRef = ref();
 const userName = ref();
-const userAvatar = ref();
+const avatarUrl = ref();
 const userId = ref();
 const { t } = useI18n();
+const roomEngine = useGetRoomEngine();
 
 const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId : '';
 const givenRoomId: Ref<string> = ref((roomId) as string);
 
 const basicInfo = getBasicInfo();
 userName.value = basicInfo?.userName;
-userAvatar.value = basicInfo?.userAvatar;
+avatarUrl.value = basicInfo?.avatarUrl;
 userId.value = basicInfo?.userId;
 
 function setTUIRoomData(action: string, mode?: string) {
@@ -57,6 +59,18 @@ function setTUIRoomData(action: string, mode?: string) {
   sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(roomData));
 }
 
+async function checkRoomExist(roomId: string) {
+  let isRoomExist = false;
+  const tim = roomEngine.instance?.getTIM();
+  try {
+    await tim.searchGroupByID(roomId);
+    isRoomExist = true;
+  } catch (error: any) {
+    // 房间不存在
+  }
+  return isRoomExist;
+}
+
 /**
  * Generate room number when creating a room
  *
@@ -64,7 +78,7 @@ function setTUIRoomData(action: string, mode?: string) {
 **/
 async function generateRoomId(): Promise<number> {
   const roomId = Math.ceil(Math.random() * 1000000);
-  const isRoomExist = await TUIRoomCore.checkRoomExistence(roomId);
+  const isRoomExist = await checkRoomExist(String(roomId));
   if (isRoomExist) {
     return await generateRoomId();
   }
@@ -93,7 +107,7 @@ async function handleCreateRoom(mode: string) {
  * 处理点击【进入房间】
 **/
 async function handleEnterRoom(roomId: number) {
-  const isRoomExist = await TUIRoomCore.checkRoomExistence(roomId);
+  const isRoomExist = await checkRoomExist(String(roomId));
   if (!isRoomExist) {
     alert(t('The room does not exist, please confirm the room number or create a room!'));
     return;
@@ -130,7 +144,8 @@ onMounted(async () => {
      *
      * 登录 TUIRoomCore, 只有登录 TUIRoomCore 之后，才可以使用 TUIRoomCore.checkRoomExistence 方法
     **/
-    await TUIRoomCore.login(sdkAppId, userId, userSig);
+    await TUIRoomEngine.init({ sdkAppId, userId, userSig });
+    streamPreviewRef.value.startStreamPreview();
   }
 });
 
