@@ -67,8 +67,10 @@ import { useI18n } from 'vue-i18n';
 
 import TUIRoomEngine, { TUIChangeReason, TUIRoomEvents, TUIUserInfo, TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-electron';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
+import { isElectronEnv } from '../../utils/utils';
 
 const roomEngine = useGetRoomEngine();
+const isElectron = isElectronEnv();
 
 const { t } = useI18n();
 
@@ -572,6 +574,7 @@ watch(isDefaultOpenCamera, async (val) => {
   }
 });
 
+let isFirstOpenMic = true;
 
 watch(isDefaultOpenMicrophone, async (val) => {
   if (val && !isLocalAudioIconDisable.value) {
@@ -581,7 +584,15 @@ watch(isDefaultOpenMicrophone, async (val) => {
      * 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
     **/
     await roomEngine.instance?.openLocalMicrophone();
-    await roomEngine.instance?.startPushLocalAudio();
+    if (isElectron && isFirstOpenMic) {
+      // hack, fix electron 自由上麦 bug
+      isFirstOpenMic = false;
+      setTimeout(() => {
+        roomEngine.instance?.startPushLocalAudio();
+      }, 1000)
+    } else {
+      await roomEngine.instance?.startPushLocalAudio();
+    }
     const microphoneList = await roomEngine.instance?.getMicDevicesList();
     const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
     if (!roomStore.currentMicrophoneId) {

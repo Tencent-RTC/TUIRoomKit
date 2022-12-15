@@ -25,6 +25,8 @@ try {
   console.error('获取奔溃文件路径失败', e);
 }
 
+const PROTOCOL = 'tuiroom';
+
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
 
@@ -59,6 +61,38 @@ async function checkAndApplyDevicePrivilege() {
 }
 
 let win: BrowserWindow | null = null
+let schemeRoomId = '';
+
+function registerScheme() {
+  const args = [];
+  if (!app.isPackaged) {
+    // 如果是开发阶段，需要把我们的脚本的绝对路径加入参数中
+    args.push(path.resolve(process.argv[1]));
+  }
+  // 加一个 `--` 以确保后面的参数不被 Electron 处理
+  args.push('--');
+  app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, args);
+  handleArgv(process.argv);
+}
+
+function handleArgv(argv: string[]) {
+  const prefix = `${PROTOCOL}:`;
+  // 开发阶段，跳过前两个参数（`electron.exe .`）
+  // 打包后，跳过第一个参数（`myapp.exe`）
+  const offset = app.isPackaged ? 1 : 2;
+  const url = argv.find((arg, i) => i >= offset && arg.startsWith(prefix));
+  if (url) handleUrl(url);
+}
+
+function handleUrl(url: string) {
+  // tuiroom://joinroom?roomId=123
+  const urlObj = new URL(url);
+  const { searchParams } = urlObj;
+  schemeRoomId = searchParams.get('roomId') || '';
+  if (win && win.webContents) {
+    win?.webContents.send('launch-room', schemeRoomId);
+  }
+}
 
 async function createWindow() {
   await checkAndApplyDevicePrivilege();
@@ -77,7 +111,13 @@ async function createWindow() {
   })
 
   if (app.isPackaged) {
-    win.loadFile(join(__dirname, '../renderer/index.html'))
+    if (schemeRoomId) {
+      win.loadFile(join(__dirname, `../renderer/index.html`), {
+        hash: `home?roomId=${schemeRoomId}`
+      });
+    } else {
+      win.loadFile(join(__dirname, '../renderer/index.html'))
+    }
   } else {
     // 🚧 Use ['ENV_NAME'] avoid vite:define plugin
     const installExtension = require('electron-devtools-installer')
@@ -106,6 +146,7 @@ async function createWindow() {
   })
 }
 
+registerScheme();
 app.whenReady().then(createWindow)
 
 app.on('window-all-closed', () => {
@@ -129,6 +170,11 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+// macOS 下通过协议URL启动时，主实例会通过 open-url 事件接收这个 URL
+app.on('open-url', (event, urlStr) => {
+  handleUrl(urlStr);
+});
 
 // new window example arg: new windows url
 ipcMain.handle("open-win", (event, arg) => {
