@@ -22,11 +22,10 @@
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessage } from 'element-plus';
-
-import TUIRoomCore from '../../tui-room-core';
 import { useChatStore } from '../../stores/chat';
 import MessageText from './MessageTypes/MessageText.vue';
 import { useI18n } from 'vue-i18n';
+
 
 const { t } = useI18n();
 const chatStore = useChatStore();
@@ -84,16 +83,17 @@ async function fetchChatHistoryMessage(nextReqMessageID: string, isCompleted: bo
     if (isCompleted) {
       return;
     }
-    const response = await TUIRoomCore.getChatMessageList(nextReqMessageID);
-    if (response.code === 0 && response.data) {
-      const { messageList, nextReqMessageID, isCompleted } = response.data;
-      chatStore.addHistoryMessages(messageList);
-      await fetchChatHistoryMessage(nextReqMessageID, isCompleted);
-    }
+    // To do: Room Engine 没有 getChatMessageList() 接口，待确认这里如何改造。
+    // const response = await TUIRoomCore.getChatMessageList(nextReqMessageID);
+    // if (response.code === 0 && response.data) {
+    //   const { messageList, nextReqMessageID, isCompleted } = response.data;
+    //   chatStore.addHistoryMessages(messageList);
+    //   await fetchChatHistoryMessage(nextReqMessageID, isCompleted);
+    // }
   } catch (e) {
     ElMessage.error(t('Failed to get chat message'));
   }
-}
+};
 
 onMounted(() => {
   fetchChatHistoryMessage('', false);

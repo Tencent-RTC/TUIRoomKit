@@ -2,9 +2,8 @@
  * @see https://www.electron.build/configuration/configuration
  */
 {
-  "appId": "com.tencent.cloud.trtc.tuiroom.electron",
+  "appId": "YourAppID",
   "asar": true,
-  "asarUnpack": "**\\*.{node,dll}",
   "directories": {
     "output": "release/${version}"
   },
@@ -16,17 +15,13 @@
     "artifactName": "${productName}_${version}.${ext}",
     "extraFiles": [
       {
-        "from": "node_modules/trtc-electron-sdk/build/Release/${arch}/trtc_electron_sdk.node",
-        "to": "./Resources/app.asar.unpacked/node_modules/trtc-electron-sdk/build/Release"
-      },
-      {
-        "from": "node_modules/trtc-electron-sdk/build/mac-framework/${arch}/",
+        "from": "node_modules/trtc-electron-sdk/build/mac-framework/",
         "to": "./Frameworks"
       }
     ],
     "target": [
       "dmg"
-    ],
+    ]
   },
   "win": {
     "target": [

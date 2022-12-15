@@ -12,33 +12,11 @@ const isUploadLoaded = IS_LOCAL || IS_OFFICIAL_DEMO;
 
 const isUploadDetailEvent = IS_OFFICIAL_DEMO;
 
-const aegisId = 'iHWefAYqtDYnHsxOaR';
-
-const projectName = 'webTUIRoom';
-
-
 let aegis: any;
-
-const script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = 'https://cdn-go.cn/aegis/aegis-sdk/latest/aegis.min.js';
-document.getElementsByTagName('head')[0].appendChild(script);
-
-script.onload = () => {
-  // eslint-disable-next-line no-undef
-  aegis = new Aegis({
-    id: aegisId,
-    uin: '',
-    reportApiSpeed: true, // 接口测速
-    reportAssetSpeed: true, // 静态资源测速
-    spa: true, // spa 页面开启
-  });
-  if (roomAegis.storedReportEventList) {
-    roomAegis.storedReportEventList.forEach((data) => {
-      aegis.reportEvent(data);
-    });
-  }
-};
+const userAgent = navigator.userAgent.toLowerCase();
+const isElectron = userAgent.indexOf(' electron/') > -1;
+const aegisId = isElectron ? 'iHWefAYqFkuzqhhBfh' : 'iHWefAYqtDYnHsxOaR';
+const projectName = isElectron ? 'electronTUIRoom' : 'webTUIRoom';
 
 class TUIRoomAegis {
   private sdkAppId: number = 0;
@@ -74,5 +52,40 @@ class TUIRoomAegis {
 }
 
 const roomAegis = new TUIRoomAegis();
+if (isElectron) {
+  aegis = new Aegis({
+    id: aegisId,
+    uin: '',
+    reportApiSpeed: true, // 接口测速
+    reportAssetSpeed: true, // 静态资源测速
+    spa: true, // spa 页面开启
+  });
+  if (roomAegis.storedReportEventList) {
+    roomAegis.storedReportEventList.forEach((data) => {
+      aegis.reportEvent(data);
+    });
+  }
+} else {
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = 'https://cdn-go.cn/aegis/aegis-sdk/latest/aegis.min.js';
+  document.getElementsByTagName('head')[0].appendChild(script);
+
+  script.onload = () => {
+    // @ts-ignore
+    aegis = new Aegis({
+      id: aegisId,
+      uin: '',
+      reportApiSpeed: true, // 接口测速
+      reportAssetSpeed: true, // 静态资源测速
+      spa: true, // spa 页面开启
+    });
+    if (roomAegis.storedReportEventList) {
+      roomAegis.storedReportEventList.forEach((data) => {
+        aegis.reportEvent(data);
+      });
+    }
+  };
+}
 
 export default roomAegis;

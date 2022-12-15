@@ -21,16 +21,21 @@
 
 <script setup lang="ts">
 import { useBasicStore } from '../../stores/basic';
-import { computed } from 'vue';
+import { computed, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import Chat from '../Chat/index.vue';
 import RoomInvite from '../RoomInvite/index.vue';
 import RoomMore from '../RoomMore/index.vue';
 import ManageMember from '../ManageMember/index.vue';
 import { useI18n } from 'vue-i18n';
+import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
+import useGetRoomEngine from '../../hooks/useRoomEngine';
+import { useChatStore } from '../../stores/chat';
 
 const { t } = useI18n();
+const roomEngine = useGetRoomEngine();
 
+const chatStore = useChatStore();
 const basicStore = useBasicStore();
 const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
 
@@ -55,6 +60,35 @@ function handleClose(done: any) {
   basicStore.setSidebarName('');
   done();
 }
+
+/** 监听消息接收，放在这里是为了保障消息进房后立即监听消息 */
+const onReceiveTextMessage = (data: { roomId: string, message: any }) => {
+  console.warn('onReceiveTextMessage:', data);
+  const { message } = data;
+  chatStore.updateMessageList({
+    ID: message.messageId,
+    type: 'TIMTextElem',
+    payload: {
+      text: message.message,
+    },
+    nick: message?.userName || message.userId,
+    from: message.userId,
+    flow: 'in',
+    sequence: Math.random(),
+  });
+  if (!basicStore.isSidebarOpen || basicStore.sidebarName !== 'chat') {
+    // eslint-disable-next-line no-plusplus
+    chatStore.updateUnReadCount(++chatStore.unReadCount);
+  }
+};
+
+TUIRoomEngine.once('ready', () => {
+  roomEngine.instance?.on(TUIRoomEvents.onReceiveTextMessage, onReceiveTextMessage);
+});
+
+onUnmounted(() => {
+  roomEngine.instance?.off(TUIRoomEvents.onReceiveTextMessage, onReceiveTextMessage);
+});
 </script>
 
 <style lang="scss">

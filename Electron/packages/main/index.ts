@@ -1,10 +1,10 @@
-import { app, BrowserWindow, shell, screen, systemPreferences, crashReporter } from 'electron'
+import { app, BrowserWindow, shell, screen, systemPreferences, crashReporter, ipcMain } from 'electron'
 import { release } from 'os'
-import path from 'path'
+import { join } from 'path'
 
 // 开启crash捕获
 crashReporter.start({
-  productName: 'trtc-tuiroom-electron',
+  productName: 'electron-tui-room',
   companyName: 'Tencent Cloud',
   submitURL: 'https://www.xxx.com',
   uploadToServer: false,
@@ -15,7 +15,7 @@ let crashFilePath = '';
 let crashDumpsDir = '';
 try {
   // electron 低版本
-  crashFilePath = path.join(app.getPath('temp'), app.getName() + ' Crashes');
+  crashFilePath = join(app.getPath('temp'), app.getName() + ' Crashes');
   console.log('————————crash path:', crashFilePath);
 
   // electron 高版本
@@ -38,6 +38,27 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0)
 }
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+
+let isHasScreen = false;
+async function checkAndApplyDevicePrivilege() {
+  const cameraPrivilege = systemPreferences.getMediaAccessStatus('camera');
+
+  if (cameraPrivilege !== 'granted') {
+    await systemPreferences.askForMediaAccess('camera');
+  }
+
+  const micPrivilege = systemPreferences.getMediaAccessStatus('microphone');
+
+  if (micPrivilege !== 'granted') {
+    await systemPreferences.askForMediaAccess('microphone');
+  }
+
+  const screenPrivilege = systemPreferences.getMediaAccessStatus('screen');
+  console.log(screenPrivilege);
+  if (screenPrivilege === 'granted') {
+    isHasScreen = true;
+  }
+}
 
 let win: BrowserWindow | null = null
 let schemeRoomId = '';
@@ -73,23 +94,6 @@ function handleUrl(url: string) {
   }
 }
 
-async function checkAndApplyDevicePrivilege() {
-  const cameraPrivilege = systemPreferences.getMediaAccessStatus('camera');
-
-  if (cameraPrivilege !== 'granted') {
-    await systemPreferences.askForMediaAccess('camera');
-  }
-
-  const micPrivilege = systemPreferences.getMediaAccessStatus('microphone');
-
-  if (micPrivilege !== 'granted') {
-    await systemPreferences.askForMediaAccess('microphone');
-  }
-
-  const screenPrivilege = systemPreferences.getMediaAccessStatus('screen');
-  console.log(screenPrivilege);
-}
-
 async function createWindow() {
   await checkAndApplyDevicePrivilege();
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -100,7 +104,7 @@ async function createWindow() {
     minWidth: 1200,
     minHeight: 640,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.cjs'),
+      preload: join(__dirname, '../preload/index.cjs'),
       nodeIntegration: true,
       contextIsolation: false,
     },
@@ -108,31 +112,31 @@ async function createWindow() {
 
   if (app.isPackaged) {
     if (schemeRoomId) {
-      win.loadFile(path.join(__dirname, `../renderer/index.html`), {
+      win.loadFile(join(__dirname, `../renderer/index.html`), {
         hash: `home?roomId=${schemeRoomId}`
       });
     } else {
-      win.loadFile(path.join(__dirname, '../renderer/index.html'))
+      win.loadFile(join(__dirname, '../renderer/index.html'))
     }
   } else {
+    // 🚧 Use ['ENV_NAME'] avoid vite:define plugin
     const installExtension = require('electron-devtools-installer')
     installExtension.default(installExtension.VUEJS_DEVTOOLS)
-        .then(() => {})
-        .catch((err: Error) => {
-          console.log('Unable to install `vue-devtools`: \n', err)
-        });
-    // 🚧 Use ['ENV_NAME'] avoid vite:define plugin
-    const url = `http://${process.env['VITE_DEV_SERVER_HOST']}:${process.env['VITE_DEV_SERVER_PORT']}/#/home`
+      .then(() => {})
+      .catch((err: Error) => {
+        console.log('Unable to install `vue-devtools`: \n', err)
+      });
+    const url = `http://${process.env['VITE_DEV_SERVER_HOST']}:${process.env['VITE_DEV_SERVER_PORT']}`
 
     win.loadURL(url)
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
   }
 
   // Test active push message to Renderer-process
   win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', new Date().toLocaleString())
-
-    win?.webContents.send('crash-file-path', `${crashFilePath}|${crashDumpsDir}`);
+    win?.webContents.send('main-process-message', {
+      isHasScreen
+    })
   })
 
   // Make all links open with the browser, not with the application
@@ -150,11 +154,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-app.on('second-instance', (event, argv) => {
-  if (process.platform === 'win32') {
-    // Windows
-    handleArgv(argv);
-  }
+app.on('second-instance', () => {
   if (win) {
     // Focus on the main window if the user tried to open another
     if (win.isMinimized()) win.restore()
@@ -176,19 +176,22 @@ app.on('open-url', (event, urlStr) => {
   handleUrl(urlStr);
 });
 
-app.on('gpu-process-crashed', (event, kill) => {
-  console.warn('app:gpu-process-crashed', event, kill);
-});
+// new window example arg: new windows url
+ipcMain.handle("open-win", (event, arg) => {
+  const childWindow = new BrowserWindow({
+    webPreferences: {
+      preload: join(__dirname, "../preload/index.cjs"),
+    },
+  });
 
-app.on('renderer-process-crashed', (event, webContents, kill) => {
-  console.warn('app:renderer-process-crashed', event, webContents, kill);
+  if (app.isPackaged) {
+    childWindow.loadFile(join(__dirname, `../renderer/index.html`), {
+      hash: `${arg}`,
+    })
+  } else {
+    // 🚧 Use ['ENV_NAME'] avoid vite:define plugin
+    const url = `http://${process.env["VITE_DEV_SERVER_HOST"]}:${process.env["VITE_DEV_SERVER_PORT"]}/#${arg}`
+    childWindow.loadURL(url);
+    // childWindow.webContents.openDevTools({ mode: "undocked", activate: true })
+  }
 });
-
-app.on('render-process-gone', (event, webContents, details) => {
-  console.warn('app:render-process-gone', event, webContents, details);
-});
-
-app.on('child-process-gone', (event, details) => {
-  console.warn('app:child-process-gone', event, details);
-});
-

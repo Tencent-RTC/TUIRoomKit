@@ -129,3 +129,8 @@ export function deepClone(data: any) {
   }
   return res;
 }
+
+export function isElectronEnv() {
+  const userAgent = navigator.userAgent.toLowerCase();
+  return userAgent.indexOf(' electron/') > -1;
+}

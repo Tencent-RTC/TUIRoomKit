@@ -98,7 +98,7 @@ function enterRoom() {
   if (!roomId.value) {
     return;
   }
-  emit('enterRoom', Number(roomId.value));
+  emit('enterRoom', String(roomId.value));
 }
 
 </script>

@@ -19,6 +19,7 @@ module.exports = {
   ],
   rules: {
     'no-unused-vars': 'off',
+    'no-nested-ternary': 'off',
     '@typescript-eslint/no-unused-vars': ['error'],
     'vue/max-attributes-per-line': 'off',
     'vue/html-self-closing': 'off',

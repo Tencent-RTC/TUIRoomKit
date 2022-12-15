@@ -1,14 +1,16 @@
 // 举手发言逻辑
 // 主持人：同意/拒绝用户的申请发言，踢人下麦，邀请用户上麦，取消邀请用户上麦
 
-import { onMounted, onBeforeUnmount } from 'vue';
-import TUIRoomCore, { ETUIRoomEvents, ETUISignalStatus } from '../tui-room-core';
+import { onBeforeUnmount } from 'vue';
+import TUIRoomEngine, { TUIRoomEvents, TUIRequestAction, TUIRequest, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-js';
+import useGetRoomEngine from './useRoomEngine';
 import { ElMessage } from 'element-plus';
 import { MESSAGE_DURATION } from '../constants/message';
 import { useRoomStore, UserInfo } from '../stores/room';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
 
+const roomEngine = useGetRoomEngine();
 
 export default function () {
   const roomStore = useRoomStore();
@@ -17,46 +19,70 @@ export default function () {
 
   // ------ 以下处理普通用户操作 ---------
 
-  // 收到来自用户的上麦申请
-  async function onReceiveSpeechApplication(data: { userId: string }) {
-    const { userId: applyUserId } = data;
-    applyUserId && roomStore.addApplyToAnchorUser(applyUserId);
+  // new: 收到来自用户的上麦申请
+  function onRequestReceived(eventInfo: { request: TUIRequest }) {
+    const { requestAction, requestId, userId } = eventInfo.request;
+    if (requestAction === TUIRequestAction.kRequestToTakeSeat) {
+      // 用户申请上麦
+      userId && roomStore.addApplyToAnchorUser({ userId, requestId });
+    }
   }
 
   // 远端用户取消上麦申请
-  function onSpeechApplicationCancelled(data: { userId: string }) {
-    const { userId: applyUserId } = data;
-    roomStore.removeApplyToAnchorUser(applyUserId);
+  function onRequestCancelled(eventInfo: { requestId: number, userId: string }) {
+    const { userId } = eventInfo;
+    roomStore.removeApplyToAnchorUser(userId);
   }
 
   // 处理用户请求
-  function handleUserApply(applyUserId: string, agree: boolean) {
-    TUIRoomCore.replySpeechApplication(applyUserId, agree);
+  async function handleUserApply(applyUserId: string, agree: boolean) {
+    // TUIRoomCore.replySpeechApplication(applyUserId, agree);
+    const userInfo = roomStore.remoteUserMap.get(applyUserId);
+    if (userInfo) {
+      const requestId = userInfo.applyToAnchorRequestId;
+      requestId && await roomEngine.instance?.responseRemoteRequest({
+        requestId,
+        agree,
+      });
+    }
     roomStore.removeApplyToAnchorUser(applyUserId);
   }
 
   // 同意用户上台
-  function agreeUserOnStage(userInfo: UserInfo) {
-    const { userId: applyUserId } = userInfo;
-    TUIRoomCore.replySpeechApplication(applyUserId, true);
-    roomStore.removeApplyToAnchorUser(applyUserId);
+  async function agreeUserOnStage(userInfo: UserInfo) {
+    const requestId = userInfo.applyToAnchorRequestId;
+    requestId && await roomEngine.instance?.responseRemoteRequest({
+      requestId,
+      agree: true,
+    });
+    roomStore.removeApplyToAnchorUser(userInfo.userId);
   }
 
   // 拒绝用户上台
-  function denyUserOnStage(userInfo: UserInfo) {
-    const { userId: applyUserId } = userInfo;
-    TUIRoomCore.replySpeechApplication(applyUserId, false);
-    roomStore.removeApplyToAnchorUser(applyUserId);
+  async function denyUserOnStage(userInfo: UserInfo) {
+    const requestId = userInfo.applyToAnchorRequestId;
+    requestId && await roomEngine.instance?.responseRemoteRequest({
+      requestId,
+      agree: false,
+    });
+    roomStore.removeApplyToAnchorUser(userInfo.userId);
   }
 
   // 拒绝全部用户上麦请求
   async function denyAllUserApply() {
-    const applyUserList = applyToAnchorList.value.map(item => ({ userId: item.userId, userName: item.userName }));
+    const applyUserList = applyToAnchorList.value.map(item => ({
+      userId: item.userId,
+      userName: item.userName,
+      applyToAnchorRequestId: item.applyToAnchorRequestId,
+    }));
     let index = 0;
     while (index >= 0 && index < applyUserList.length) {
-      const { userId, userName } = applyUserList[index];
+      const { userId, userName, applyToAnchorRequestId } = applyUserList[index];
       try {
-        await TUIRoomCore.replySpeechApplication(userId, false);
+        applyToAnchorRequestId && await roomEngine.instance?.responseRemoteRequest({
+          requestId: applyToAnchorRequestId,
+          agree: false,
+        });
         roomStore.removeApplyToAnchorUser(userId);
       } catch (error) {
         console.error(`拒绝 ${userName || userId} 上台申请失败，请重试！`);
@@ -70,54 +96,70 @@ export default function () {
     }
   }
 
-  onMounted(() => {
-    TUIRoomCore.on(ETUIRoomEvents.onReceiveSpeechApplication, onReceiveSpeechApplication);
-    TUIRoomCore.on(ETUIRoomEvents.onSpeechApplicationCancelled, onSpeechApplicationCancelled);
+  TUIRoomEngine.once('ready', () => {
+    roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
+    roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
   });
 
   onBeforeUnmount(() => {
-    TUIRoomCore.off(ETUIRoomEvents.onReceiveSpeechApplication, onReceiveSpeechApplication);
-    TUIRoomCore.off(ETUIRoomEvents.onSpeechApplicationCancelled, onSpeechApplicationCancelled);
+    roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
+    roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
   });
 
   // --------- 以下处理主持人主动操作 ----------
 
   // 邀请用户上台
   async function inviteUserOnStage(userInfo: UserInfo) {
-    const { userId, userName } = userInfo;
-    const inviteResponse = await TUIRoomCore.sendSpeechInvitation(userId);
-    switch (inviteResponse.code) {
-      case ETUISignalStatus.ACCEPTED:
-        ElMessage({
-          type: 'success',
-          message: `${userName || userId} ${t('accepted the invitation to the stage')}`,
-          duration: MESSAGE_DURATION.NORMAL,
-        });
-        roomStore.removeInviteToAnchorUser(userId);
-        break;
-      case ETUISignalStatus.REJECTED:
-        ElMessage({
-          type: 'warning',
-          message: `${userName || userId} ${t('declined the invitation to the stage')}`,
-          duration: MESSAGE_DURATION.NORMAL,
-        });
-        roomStore.removeInviteToAnchorUser(userId);
-        break;
-      case ETUISignalStatus.CANCELLED:
-        break;
-      default:
-        break;
-    }
+    const { userId } = userInfo;
+    const requestId = await roomEngine.instance?.requestRemoteUserOnSeat({
+      seatIndex: -1,
+      userId,
+      timeout: 0,
+      requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType, userId: string }) => {
+        const { requestCallbackType, userId } = callbackInfo;
+        const userName = roomStore.getUserName(userId);
+        switch (requestCallbackType) {
+          case TUIRequestCallbackType.kRequestAccepted:
+            ElMessage({
+              type: 'success',
+              message: `${userName || userId} ${t('accepted the invitation to the stage')}`,
+              duration: MESSAGE_DURATION.NORMAL,
+            });
+            roomStore.removeInviteToAnchorUser(userId);
+            break;
+          case TUIRequestCallbackType.kRequestRejected:
+            ElMessage({
+              type: 'warning',
+              message: `${userName || userId} ${t('declined the invitation to the stage')}`,
+              duration: MESSAGE_DURATION.NORMAL,
+            });
+            roomStore.removeInviteToAnchorUser(userId);
+            break;
+          case TUIRequestCallbackType.kRequestTimeout:
+            break;
+          default:
+            break;
+        }
+      },
+    });
+    requestId && roomStore.addInviteToAnchorUser({ userId, requestId });
   }
 
   // 取消邀请用户上台
   function cancelInviteUserOnStage(userInfo: UserInfo) {
-    TUIRoomCore.cancelSpeechInvitation(userInfo.userId);
+    const { userId, inviteToAnchorRequestId } = userInfo;
+    roomStore.removeInviteToAnchorUser(userId);
+    if (inviteToAnchorRequestId) {
+      roomEngine.instance?.cancelRequest({ requestId: inviteToAnchorRequestId });
+    }
   }
 
   // 邀请下台
   function kickUserOffStage(userInfo: UserInfo) {
-    TUIRoomCore.kickUserOffStage(userInfo.userId);
+    roomEngine.instance?.kickRemoteUserOffSeat({
+      seatIndex: -1,
+      userId: userInfo.userId,
+    });
   }
 
   return {

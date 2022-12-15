@@ -8,15 +8,12 @@
       <screen-share-control @click="report('screenShareControl')"></screen-share-control>
       <full-screen-control @click="report('fullScreenControl')"></full-screen-control>
       <manage-member-control
-        v-if="basicStore.role === ETUIRoomRole.MASTER"
+        v-if="roomStore.isMaster"
         @click="report('manageMemberControl')"
       ></manage-member-control>
       <invite-control @click="report('inviteControl')"></invite-control>
       <chat-control @click="report('chatControl')"></chat-control>
-      <apply-control
-        v-if="basicStore.roomMode === ETUISpeechMode.APPLY_SPEECH"
-        @click="report('applyControl')"
-      ></apply-control>
+      <apply-control v-if="roomStore.enableSeatControl" @click="report('applyControl')"></apply-control>
       <more-control @click="report('moreControl')"></more-control>
       <setting-control @click="report('settingControl')"></setting-control>
     </div>
@@ -30,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { ETUIRoomRole, ETUISpeechMode } from '../../tui-room-core';
+import { TUIRole } from '@tencentcloud/tuiroom-engine-js';
 import AudioControl from './AudioControl.vue';
 import ScreenShareControl from './ScreenShareControl/Index.vue';
 import FullScreenControl from './FullScreenControl.vue';
@@ -43,13 +40,12 @@ import MoreControl from './MoreControl.vue';
 import SettingControl from './SettingControl.vue';
 import EndControl from './EndControl.vue';
 
-import { useBasicStore } from '../../stores/basic';
+
+import { useRoomStore } from '../../stores/room';
 import TUIRoomAegis from '../../utils/aegis';
 
-// const props = defineProps({
-//   roomRef: HTMLElement,
-// });
-const basicStore = useBasicStore();
+const roomStore = useRoomStore();
+
 const emit = defineEmits(['onDestroyRoom', 'onExitRoom']);
 
 const onDestroyRoom = (info: { code: number; message: string }) => {

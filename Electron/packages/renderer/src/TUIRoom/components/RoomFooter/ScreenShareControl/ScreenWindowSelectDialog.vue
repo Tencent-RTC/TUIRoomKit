@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { ref, Ref } from 'vue';
 import { ElMessage } from 'element-plus';
-import { TRTCScreenCaptureSourceInfo } from '../../../tui-room-core';
+import { TRTCScreenCaptureSourceInfo } from '@tencentcloud/tuiroom-engine-electron';
 import ScreenWindowPreviewer from './ScreenWindowPreviewer.vue';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useI18n } from 'vue-i18n';

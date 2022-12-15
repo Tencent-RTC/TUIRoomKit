@@ -2,18 +2,18 @@
   <div v-if="playRegionDomId !== enlargeDomId" ref="streamRegionRef" class="user-stream-container">
     <div :id="playRegionDomId" class="stream-region"></div>
     <div
-      v-if="!stream.isVideoStreamAvailable && !stream.isScreenStreamAvailable"
+      v-if="!stream.hasVideoStream && !stream.hasScreenStream"
       ref="centerUserInfoRef"
       class="center-user-info-container"
     >
-      <img class="avatar-region" :src="stream.userAvatar || defaultAvatar">
+      <img class="avatar-region" :src="stream.avatarUrl || defaultAvatar">
     </div>
     <div class="corner-user-info-container">
       <svg-icon v-if="showMasterIcon" class="master-icon" icon-name="user"></svg-icon>
       <audio-icon
         v-if="!isScreenStream"
         :audio-volume="stream.audioVolume"
-        :is-muted="!stream.isAudioStreamAvailable"
+        :is-muted="!stream.hasAudioStream"
         size="small"
       ></audio-icon>
       <svg-icon v-if="isScreenStream" icon-name="screen-share" class="screen-icon"></svg-icon>
@@ -22,7 +22,7 @@
     </div>
     <!-- <div v-if="stream.isVideoMuted" ref="centerUserInfoRef" class="center-user-info-container">
       <div class="user-info">
-        <img class="avatar-region" :src="stream.userAvatar || defaultAvatar">
+        <img class="avatar-region" :src="stream.avatarUrl || defaultAvatar">
         <div class="user-gender-name">
           <svg-icon icon-name="user" size="medium"></svg-icon>
           <span class="user-name">{{ stream.userName || stream.userId }}</span>
@@ -34,16 +34,23 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from 'vue';
-import { StreamInfo } from '../../stores/room';
+import { StreamInfo, useRoomStore } from '../../stores/room';
 import defaultAvatar from '../../assets/imgs/avatar.png';
-import TUIRoomCore, { ETUIStreamType, TRTCVideoFillMode } from '../../tui-room-core';
 import { useBasicStore } from '../../stores/basic';
-import logger from '../../tui-room-core/common/logger';
+import logger from '../../utils/common/logger';
 import AudioIcon from '../base/AudioIcon.vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import { useI18n } from 'vue-i18n';
+import { TUIVideoStreamType, TRTCVideoStreamType, TRTCVideoFillMode, TRTCVideoMirrorType, TRTCVideoRotation } from '@tencentcloud/tuiroom-engine-js';
+import useGetRoomEngine from '../../hooks/useRoomEngine';
+
+const { VITE_RUNTIME_SCENE } = import.meta.env;
+
+const roomEngine = useGetRoomEngine();
+
 const logPrefix = '[StreamRegion]';
 const basicStore = useBasicStore();
+const roomStore = useRoomStore();
 
 const { t } = useI18n();
 
@@ -57,37 +64,39 @@ const props = defineProps<Props>();
 const streamRegionRef = ref();
 const centerUserInfoRef = ref();
 
-const playRegionDomId = computed(() => `${props.stream.userId}_${props.stream.type}`);
+const playRegionDomId = computed(() => `${props.stream.userId}_${props.stream.streamType}`);
 
-const showMasterIcon = computed(() => props.stream.userId === basicStore.masterUserId && props.stream.type === 'main');
+const showMasterIcon = computed(() => {
+  const { userId, streamType } = props.stream;
+  return userId === roomStore.masterUserId && streamType === TUIVideoStreamType.kCameraStream;
+});
 
-const isScreenStream = computed(() => (props.stream.type === 'main' && props.stream.userId?.indexOf('share_') === 0) || props.stream.type === 'screen');
+const isScreenStream = computed(() => props.stream.streamType === TUIVideoStreamType.kScreenStream);
 
 const userInfo = computed(() => {
-  let userInfo = props.stream.userName || props.stream.userId;
-  if (isScreenStream.value) {
-    if (props.stream.userId?.indexOf('share_') === 0 && userInfo === props.stream.userId) {
-      userInfo = userInfo.slice(6);
-    }
-    return `${userInfo}`;
+  if (VITE_RUNTIME_SCENE === 'inner') {
+    return `${props.stream.userName} | ${props.stream.userId}` || props.stream.userId;
   }
-  return userInfo;
+  return props.stream.userName || props.stream.userId;
 });
 
 watch(
-  () => props.stream.isVideoStreamAvailable,
+  () => props.stream.hasVideoStream,
   async (val) => {
     if (val && props.stream.userId !== basicStore.userId) {
       await nextTick();
       const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
       if (userIdEl) {
-        logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
-        await TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
-        await TUIRoomCore.setRemoteVideoFillMode(
-          props.stream.userId as string,
-          ETUIStreamType.CAMERA,
-          TRTCVideoFillMode.TRTCVideoFillMode_Fit,
-        );
+        logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, userIdEl);
+        roomEngine.instance?.setRemoteRenderView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
+        await roomEngine.instance?.
+          startPlayRemoteVideo({ userId: props.stream.userId, streamType: props.stream.streamType });
+        const trtcCloud = roomEngine.instance?.getTRTCCloud();
+        await trtcCloud.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeBig, {
+          mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+          rotation: TRTCVideoRotation.TRTCVideoRotation0,
+          fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fit,
+        });
       }
     }
   },
@@ -95,19 +104,24 @@ watch(
 );
 
 watch(
-  () => props.stream.isScreenStreamAvailable,
+  () => props.stream.hasScreenStream,
   async (val) => {
     if (val) {
       await nextTick();
       const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
       if (userIdEl) {
-        logger.debug(`${logPrefix}watch isScreenStreamAvailable:`, props.stream.userId, userIdEl, ETUIStreamType.SCREEN);
-        await TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.SCREEN);
-        await TUIRoomCore.setRemoteVideoFillMode(
-          props.stream.userId as string,
-          ETUIStreamType.SCREEN,
-          TRTCVideoFillMode.TRTCVideoFillMode_Fit,
-        );
+        logger.debug(`${logPrefix}watch isScreenStreamAvailable:`, props.stream.userId, userIdEl);
+        roomEngine.instance?.setRemoteRenderView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
+        await roomEngine.instance?.startPlayRemoteVideo({
+          userId: props.stream.userId,
+          streamType: props.stream.streamType,
+        });
+        const trtcCloud = roomEngine.instance?.getTRTCCloud();
+        await trtcCloud.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeSub, {
+          mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+          rotation: TRTCVideoRotation.TRTCVideoRotation0,
+          fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fit,
+        });
       }
     }
   },
@@ -133,41 +147,42 @@ watch(
            *
            * 只有当本地视频流是打开状态的时候，才重新播放本地流
           **/
-          if (props.stream.isVideoStreamAvailable) {
-            TUIRoomCore.startCameraPreview(userIdEl);
+          if (props.stream.hasVideoStream) {
+            await roomEngine.instance?.setLocalRenderView({
+              streamType: TUIVideoStreamType.kCameraStream,
+              view: `${playRegionDomId.value}`,
+            });
           }
         } else {
-          if (props.stream.type === 'main') {
-            logger.debug(`${logPrefix}watch enlargeDomId:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
-            TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
-          } else if (props.stream.type === 'screen') {
-            logger.debug(`${logPrefix}watch enlargeDomId:`, props.stream.userId, userIdEl, ETUIStreamType.SCREEN);
-            TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.SCREEN);
-          }
+          roomEngine.instance?.setRemoteRenderView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
+          await roomEngine.instance?.startPlayRemoteVideo({
+            userId: props.stream.userId,
+            streamType: props.stream.streamType,
+          });
         };
       }
     }
   },
 );
 
-watch(
-  playRegionDomId,
-  async () => {
-    await nextTick();
-    const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
-    if (userIdEl) {
-      if (basicStore.userId !== props.stream.userId) {
-        if (props.stream.type === 'main') {
-          logger.debug(`${logPrefix}watch playRegionDomId:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
-          TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
-        } else if (props.stream.type === 'screen') {
-          logger.debug(`${logPrefix}watch playRegionDomId:`, props.stream.userId, userIdEl, ETUIStreamType.SCREEN);
-          TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.SCREEN);
-        }
-      }
-    }
-  },
-);
+// watch(
+//   playRegionDomId,
+//   async () => {
+//     await nextTick();
+//     const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
+//     if (userIdEl) {
+//       if (basicStore.userId !== props.stream.userId) {
+//         if (props.stream.type === 'main') {
+//           logger.debug(`${logPrefix}watch playRegionDomId:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
+//           TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
+//         } else if (props.stream.type === 'screen') {
+//           logger.debug(`${logPrefix}watch playRegionDomId:`, props.stream.userId, userIdEl, ETUIStreamType.SCREEN);
+//           TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.SCREEN);
+//         }
+//       }
+//     }
+//   },
+// );
 
 // watch(streamRegionRef.value.offsetWidth, () => {
 //   centerUserInfoRef.value.style.transform = `scale(${streamRegionRef.value.offsetWidth / 1280})`;
@@ -198,6 +213,7 @@ watch(
   .stream-region {
     width: 100%;
     height: 100%;
+    overflow: hidden;
   }
   .corner-user-info-container {
     position: absolute;

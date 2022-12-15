@@ -5,13 +5,13 @@
         class="header-item user-info"
         :user-id="userId"
         :user-name="userName"
-        :user-avatar="userAvatar"
+        :avatar-url="avatarUrl"
         @log-out="$emit('logOut')"
       ></user-info>
       <language class="header-item language"></language>
     </div>
     <div class="right-container">
-      <network-info></network-info>
+      <!-- <network-info></network-info> -->
       <!-- <info-control></info-control> -->
       <layout-control></layout-control>
     </div>
@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import UserInfo from './UserInfo.vue';
 import Language from './Language.vue';
-import NetworkInfo from './NetworkInfo.vue';
+// import NetworkInfo from './NetworkInfo.vue';
 /**
  * [info] Functions to be improved
  *
@@ -34,7 +34,7 @@ import { storeToRefs } from 'pinia';
 
 const basicStore = useBasicStore();
 
-const { userId, userName, userAvatar } = storeToRefs(basicStore);
+const { userId, userName, avatarUrl } = storeToRefs(basicStore);
 
 defineEmits(['logOut']);
 

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.tencent.qcloud.tuikit.tuibarrage.R;
 
@@ -18,6 +19,7 @@ public class TUIBarrageButton extends FrameLayout {
 
     private Context            mContext;
     private String             mGroupId;         //用户组ID(房间ID)
+    private ImageView          mBarrageIcon;
     private TUIBarrageSendView mBarrageSendView; //弹幕发送组件,配合输入法弹出框输入弹幕内容,并发送
 
     public TUIBarrageButton(Context context) {
@@ -39,14 +41,20 @@ public class TUIBarrageButton extends FrameLayout {
         initView(context);
     }
 
+    public TUIBarrageButton(Context context, String groupId, int resId) {
+        this(context, groupId);
+        mBarrageIcon.setImageResource(resId);
+    }
+
     public TUIBarrageSendView getSendView() {
         return mBarrageSendView;
     }
 
     private void initView(final Context context) {
         View view = LayoutInflater.from(context).inflate(R.layout.tuibarrage_view_send, this);
+        mBarrageIcon = findViewById(R.id.iv_linkto_send_dialog);
         mBarrageSendView = new TUIBarrageSendView(context, mGroupId);
-        findViewById(R.id.iv_linkto_send_dialog).setOnClickListener(new OnClickListener() {
+        mBarrageIcon.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!mBarrageSendView.isShowing()) {

@@ -13,7 +13,7 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref, Ref } from 'vue';
-import { TRTCScreenCaptureSourceInfo } from '../../../tui-room-core';
+import { TRTCScreenCaptureSourceInfo } from '@tencentcloud/tuiroom-engine-electron';
 
 interface Props {
   data: TRTCScreenCaptureSourceInfo;

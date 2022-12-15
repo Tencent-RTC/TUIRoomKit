@@ -8,7 +8,7 @@
   * 在 template 中使用 <network-info />
 -->
 <template>
-  <div class="network-info-container">
+  <!-- <div class="network-info-container">
     <div :class="['network-info-icon', `${showNetworkInfo ? 'active' : ''}`]" @click.stop="handleClickNetworkIcon">
       <div
         v-for="(item, index) in new Array(4)"
@@ -32,50 +32,51 @@
         <span>{{ `${localVideoBitrate} Kbps` }}</span>
       </div>
     </div>
-  </div>
+  </div> -->
+  <div></div>
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, computed } from 'vue';
-import { useBasicStore } from '../../stores/basic';
-import { storeToRefs } from 'pinia';
-import TUIRoomAegis from '../../utils/aegis';
-import { useI18n } from 'vue-i18n';
+// import { ref, Ref, computed } from 'vue';
+// import { useBasicStore } from '../../stores/basic';
+// import { storeToRefs } from 'pinia';
+// import TUIRoomAegis from '../../utils/aegis';
+// import { useI18n } from 'vue-i18n';
 
-const { t } = useI18n();
+// const { t } = useI18n();
 
-const networkDes = computed(() => [t('Unknown'), t('Excellent'), t('Good'), t('Fair'), t('Poor'), t('Very poor'), t('Disconnected')]);
+// const networkDes = computed(() => [t('Unknown'), t('Excellent'), t('Good'), t('Fair'), t('Poor'), t('Very poor'), t('Disconnected')]);
 
-const basicStore = useBasicStore();
-const { localQuality, statistics, localVideoBitrate, localFrameRate } = storeToRefs(basicStore);
+// const basicStore = useBasicStore();
+// const { localQuality, statistics, localVideoBitrate, localFrameRate } = storeToRefs(basicStore);
 
-const networkBoard = ref();
-const showNetworkInfo: Ref<boolean> = ref(false);
+// const networkBoard = ref();
+// const showNetworkInfo: Ref<boolean> = ref(false);
 
-function showGreen(index: number) {
-  if (localQuality.value === 0) {
-    return false;
-  }
-  return 5 - localQuality.value > index;
-}
+// function showGreen(index: number) {
+//   if (localQuality.value === 0) {
+//     return false;
+//   }
+//   return 5 - localQuality.value > index;
+// }
 
-function handleClickNetworkIcon() {
-  if (!showNetworkInfo.value) {
-    showNetworkInfo.value = true;
-    document.addEventListener('click', handleDocumentClick, false);
-  } else {
-    document.removeEventListener('click', handleDocumentClick, false);
-    showNetworkInfo.value = false;
-  }
-  TUIRoomAegis.reportEvent({ name: 'networkInfo', ext1: 'networkInfo' });
-}
+// function handleClickNetworkIcon() {
+//   if (!showNetworkInfo.value) {
+//     showNetworkInfo.value = true;
+//     document.addEventListener('click', handleDocumentClick, false);
+//   } else {
+//     document.removeEventListener('click', handleDocumentClick, false);
+//     showNetworkInfo.value = false;
+//   }
+//   TUIRoomAegis.reportEvent({ name: 'networkInfo', ext1: 'networkInfo' });
+// }
 
-function handleDocumentClick(event: MouseEvent) {
-  if (showNetworkInfo.value && networkBoard.value && !networkBoard.value.contains(event.target as Node)) {
-    document.removeEventListener('click', handleDocumentClick);
-    showNetworkInfo.value = false;
-  }
-}
+// function handleDocumentClick(event: MouseEvent) {
+//   if (showNetworkInfo.value && networkBoard.value && !networkBoard.value.contains(event.target as Node)) {
+//     document.removeEventListener('click', handleDocumentClick);
+//     showNetworkInfo.value = false;
+//   }
+// }
 
 </script>
 

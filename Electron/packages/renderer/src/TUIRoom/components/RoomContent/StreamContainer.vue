@@ -10,9 +10,9 @@
     <div :class="['stream-list-container', `${showSideList ? '' : 'hide-list'}`]">
       <div ref="streamListRef" class="stream-list">
         <stream-region
-          v-for="(stream, index) in streamList"
+          v-for="(stream) in streamList"
           v-show="showStreamList.indexOf(stream) > -1"
-          :key="index"
+          :key="`${stream.userId}_${stream.streamType}`"
           :stream="stream"
           :enlarge-dom-id="enlargeDomId"
           class="single-stream"
@@ -55,16 +55,24 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, Ref, ComputedRef, watch, nextTick, computed } from 'vue';
-import TUIRoomCore, {
-  ETUIRoomEvents,
-  ETUIStreamType,
-} from '../../tui-room-core';
 import { storeToRefs } from 'pinia';
 import { StreamInfo, useRoomStore } from '../../stores/room';
 import { useBasicStore } from '../../stores/basic';
 import { LAYOUT } from '../../constants/render';
 import StreamRegion from './StreamRegion.vue';
 import SvgIcon from '../common/SvgIcon.vue';
+import { ElMessage } from 'element-plus';
+import { MESSAGE_DURATION } from '../../constants/message';
+import { useI18n } from 'vue-i18n';
+
+import TUIRoomEngine, { TUIChangeReason, TUIRoomEvents, TUIUserInfo, TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-electron';
+import useGetRoomEngine from '../../hooks/useRoomEngine';
+import { isElectronEnv } from '../../utils/utils';
+
+const roomEngine = useGetRoomEngine();
+const isElectron = isElectronEnv();
+
+const { t } = useI18n();
 
 defineProps<{
   showRoomTool: boolean,
@@ -73,13 +81,21 @@ defineProps<{
 const streamStyle: Ref<Record<string, any>> = ref({});
 const enlargedStreamStyle: Ref<Record<string, any>> = ref({});
 const roomStore = useRoomStore();
-const { streamList, streamNumber } = storeToRefs(roomStore);
+const { streamList, streamNumber, remoteStreamList } = storeToRefs(roomStore);
 const basicStore = useBasicStore();
 const { layout } = storeToRefs(basicStore);
 const showSideList = ref(true);
 
 const enlargeStream: Ref<StreamInfo | null> = ref(null);
-const enlargeDomId = computed(() => (enlargeStream.value ? `${enlargeStream.value.userId}_${enlargeStream.value.type}` : ''));
+const enlargeDomId = computed(() => (enlargeStream.value ? `${enlargeStream.value.userId}_${enlargeStream.value.streamType}` : ''));
+
+watch(remoteStreamList, (val) => {
+  // 当没有远端流的时候，将流布局改为九宫格
+  if (val.length === 0) {
+    basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
+    enlargeStream.value = null;
+  }
+});
 
 /**
  * ----- The following handles the nine-pane page flip logic -----
@@ -261,7 +277,7 @@ async function handleRightSideListLayout() {
   streamContainerClass.value = 'stream-container-right';
 
   if (!enlargeStream.value) {
-    [enlargeStream.value] = streamList.value;
+    [enlargeStream.value] = remoteStreamList.value;
   }
 
   await nextTick();
@@ -297,7 +313,7 @@ async function handleTopSideListLayout() {
   streamContainerClass.value = 'stream-container-top';
 
   if (!enlargeStream.value) {
-    [enlargeStream.value] = streamList.value;
+    [enlargeStream.value] = remoteStreamList.value;
   }
 
   await nextTick();
@@ -331,7 +347,7 @@ async function handleTopSideListLayout() {
 **/
 function handleEnlargeStreamRegion(stream: StreamInfo) {
   if (layout.value === LAYOUT.NINE_EQUAL_POINTS) {
-    return;
+    basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
   }
   enlargeStream.value = stream;
 }
@@ -415,78 +431,70 @@ const showIconControl = computed(() => [LAYOUT.RIGHT_SIDE_LIST, LAYOUT.TOP_SIDE_
  * --- 以下处理流事件 ----
 **/
 
-const onUserEnterRoom = (streamInfo: any) => {
-  roomStore.addRemoteUser(streamInfo);
+// 远端用户进入
+const onRemoteUserEnterRoom = (eventInfo: { userInfo: TUIUserInfo }) => {
+  roomStore.addRemoteUser(eventInfo.userInfo);
 };
 
-const onUserLeaveRoom = (streamInfo: { userId: string }) => {
-  roomStore.removeRemoteUser(streamInfo.userId);
+// 远端用户离开
+const onRemoteUserLeaveRoom = (eventInfo: { userInfo: TUIUserInfo }) => {
+  roomStore.removeRemoteUser(eventInfo.userInfo.userId);
 };
 
-/**
- * Receive a peer-join event from the remote trtc
- *
- * 收到远端 trtc 的 peer-join 事件
-**/
-const onUserAVEnabled = (userInfo: any) => {
-  roomStore.updateUserAVAbility(userInfo, true);
+// 麦位变化
+const onSeatListChanged = (eventInfo: { seatList: any[], usersSeated: any[], usersLeft: any[] }) => {
+  const { seatList, usersSeated, usersLeft } = eventInfo;
+
+  roomStore.updateOnSeatList(seatList, usersSeated, usersLeft);
+  // todo: 最大屏的用户离开时，应该换一个最大屏的用户
+  // else if (userInfo.userId === enlargeStream.value?.userId) {
+  //   [enlargeStream.value] = roomStore.remoteStreamList;
+  // }
 };
 
-/**
- * Receive peer-leave event from remote trtc
- *
- * 收到远端 trtc 的 peer-leave 事件
-**/
-const onUserAVDisabled = (userInfo: any) => {
-  roomStore.updateUserAVAbility(userInfo, false);
-  /**
-   * Reset the stream playback layout when the remote stream leaves
-   *
-   * 远端流离开的时候，重新设置流播放布局
-  **/
-  if (roomStore.remoteStreamList.length === 0) {
-    basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
-    enlargeStream.value = null;
-  } else if (userInfo.userId === enlargeStream.value?.userId) {
-    [enlargeStream.value] = roomStore.remoteStreamList;
-  }
-};
+const onUserVideoStateChanged = (eventInfo: {
+  userId: string,
+  streamType: TUIVideoStreamType,
+  hasVideo: boolean,
+  reason: TUIChangeReason,
+}) => {
+  const { userId, streamType, hasVideo, reason } = eventInfo;
+  // 更新 roomStore 流状态数据
+  roomStore.updateUserVideoState(userId, streamType, hasVideo);
 
-const onUserVideoAvailable = (eventInfo: { userId: string, available: number, streamType: number }) => {
-  const { userId, available, streamType } = eventInfo;
-  if (userId === basicStore.userId) {
-    roomStore.updateLocalStream({ isVideoStreamAvailable: !!available });
-    return;
-  }
-  if (streamType === ETUIStreamType.CAMERA) {
-    roomStore.updateRemoteVideoStream(eventInfo);
-    /**
-     * Handle web-side screen sharing
-     *
-     * 处理 web 端屏幕分享】
-    **/
-    if (userId.indexOf('share_') === 0 && userId !== `share_${basicStore.userId}`) {
-      enlargeStream.value = roomStore.remoteStreamMap.get(`${userId}_main`) as StreamInfo;
-      if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
-        basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
-      }
-      return;
+  // 处理状态变更
+  if (userId === basicStore.userId && !hasVideo && reason === TUIChangeReason.kChangedByAdmin) {
+    // 主持人关闭摄像头
+    if (streamType === TUIVideoStreamType.kCameraStream) {
+      ElMessage({
+        type: 'warning',
+        message: t('The host has turned off your camera'),
+        duration: MESSAGE_DURATION.NORMAL,
+      });
+      // When the moderator opens the whole staff forbidden to draw,
+      // open and then close the single person's camera alone, at this time
+      // the corresponding user's camera status for inoperable
+      // 主持人开启全员禁画时，单独打开再关闭单人的摄像头，此时对应用户的摄像头状态为无法操作
+      roomStore.setCanControlSelfVideo(roomStore.enableVideo);
     }
-    /**
-     * When the remote stream video bit available is true,
-     * the host side modifies the user's no-picture prompt to [no-picture]
-     *
-     * 当远端流视频位 available 为 true，主持人端修改该用户的禁画提示为【禁画】
-    **/
-    if (basicStore.isMaster && available) {
-      roomStore.setMuteUserVideo(userId, false);
+    // 主持人关闭屏幕分享
+    if (streamType === TUIVideoStreamType.kScreenStream) {
+      ElMessage({
+        type: 'warning',
+        message: t('The host has turned off your screen sharing'),
+        duration: MESSAGE_DURATION.NORMAL,
+      });
     }
-  } else if (streamType === ETUIStreamType.SCREEN) {
-    roomStore.updateRemoteScreenStream(eventInfo);
-    if (available) {
-      enlargeStream.value = roomStore.remoteStreamMap.get(`${userId}_screen`) as StreamInfo;
-      if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
-        basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
+  }
+
+  // 当远端屏幕分享变化的时候，处理流布局
+  if (userId !== basicStore.userId && streamType === TUIVideoStreamType.kScreenStream) {
+    if (hasVideo) {
+      enlargeStream.value = roomStore.remoteStreamMap.get(`${userId}_${streamType}`) as StreamInfo;
+      if (enlargeStream.value) {
+        if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
+          basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
+        }
       }
     } else {
       /**
@@ -504,31 +512,42 @@ const onUserVideoAvailable = (eventInfo: { userId: string, available: number, st
   }
 };
 
+const onUserAudioStateChanged = (eventInfo: {
+  userId: string,
+  hasAudio: boolean,
+  reason: TUIChangeReason,
+}) => {
+  const { userId, hasAudio, reason } = eventInfo;
+  roomStore.updateUserAudioState(userId, hasAudio);
 
-const onUserAudioAvailable = (eventInfo: { userId: string, available: number}) => {
-  const { userId, available } = eventInfo;
-  if (userId === basicStore.userId) {
-    roomStore.updateLocalStream({ isAudioStreamAvailable: !!available });
-    return;
-  }
-  roomStore.updateRemoteAudioStream(eventInfo);
-  /**
-   * When the remote stream audio bit available is true,
-   * the host side modifies the user's ban prompt to make it [ban]
-   *
-   * 当远端流音频位 available 为 true，主持人端修改该用户的禁画提示为【禁言】
-  **/
-  if (basicStore.isMaster && available) {
-    roomStore.setMuteUserAudio(userId, false);
+  // 处理状态变更
+  if (userId === basicStore.userId && !hasAudio && reason === TUIChangeReason.kChangedByAdmin) {
+    // 主持人关闭麦克风
+    ElMessage({
+      type: 'warning',
+      message: t('The host has turned off your microphone'),
+      duration: MESSAGE_DURATION.NORMAL,
+    });
+    /**
+     * When the host turns on a full ban, the microphone of a single person is turned on
+     * and off separately, and the microphone status of the corresponding user is inoperable at this time
+     *
+     * 主持人开启全员禁言时，单独打开再关闭单人的麦克风，此时对应用户的麦克风状态为无法操作
+    **/
+    roomStore.setCanControlSelfAudio(roomStore.enableAudio);
   }
 };
 
-const { isDefaultOpenCamera, isDefaultOpenMicrophone } = storeToRefs(roomStore);
-const { isLocalAudioIconDisable, isLocalVideoIconDisable } = storeToRefs(basicStore);
+const {
+  isDefaultOpenCamera,
+  isDefaultOpenMicrophone,
+  isLocalAudioIconDisable,
+  isLocalVideoIconDisable,
+} = storeToRefs(roomStore);
 
 watch(isDefaultOpenCamera, async (val) => {
   if (val && !isLocalVideoIconDisable.value) {
-    const previewDom = document.getElementById(`${roomStore.localStream.userId}_main`);
+    const previewDom = document.getElementById(`${roomStore.localStream.userId}_${roomStore.localStream.streamType}`);
     if (previewDom) {
       /**
        * Set device id
@@ -536,20 +555,26 @@ watch(isDefaultOpenCamera, async (val) => {
        * 设置设备id
       **/
       if (!roomStore.currentCameraId) {
-        const cameraList = await TUIRoomCore.getCameraList();
+        const cameraList = await roomEngine.instance?.getCameraDevicesList();
         roomStore.setCurrentCameraId(cameraList[0].deviceId);
       }
-      await TUIRoomCore.setCurrentCamera(roomStore.currentCameraId);
+      await roomEngine.instance?.setCurrentCameraDevice({ deviceId: roomStore.currentCameraId });
       /**
        * Turn on the local camera
        *
        * 开启本地摄像头
       **/
-      await TUIRoomCore.startCameraPreview(previewDom);
-      roomStore.setHasStartedCamera(true);
+      await roomEngine.instance?.setLocalRenderView({
+        streamType: TUIVideoStreamType.kCameraStream,
+        view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
+      });
+      await roomEngine.instance?.openLocalCamera();
+      await roomEngine.instance?.startPushLocalVideo();
     }
   }
 });
+
+let isFirstOpenMic = true;
 
 watch(isDefaultOpenMicrophone, async (val) => {
   if (val && !isLocalAudioIconDisable.value) {
@@ -558,48 +583,45 @@ watch(isDefaultOpenMicrophone, async (val) => {
      *
      * 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
     **/
-    await TUIRoomCore.startMicrophone();
-    roomStore.setHasStartedMicrophone(true);
-    const microphoneList = await TUIRoomCore.getMicrophoneList();
-    const speakerList = await TUIRoomCore.getSpeakerList();
+    await roomEngine.instance?.openLocalMicrophone();
+    if (isElectron && isFirstOpenMic) {
+      // hack, fix electron 自由上麦 bug
+      isFirstOpenMic = false;
+      setTimeout(() => {
+        roomEngine.instance?.startPushLocalAudio();
+      }, 1000)
+    } else {
+      await roomEngine.instance?.startPushLocalAudio();
+    }
+    const microphoneList = await roomEngine.instance?.getMicDevicesList();
+    const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
     if (!roomStore.currentMicrophoneId) {
       roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
     }
     if (!roomStore.currentSpeakerId) {
       roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
     }
-    await TUIRoomCore.setCurrentMicrophone(roomStore.currentMicrophoneId);
+    await roomEngine.instance?.setCurrentMicDevice({ deviceId: roomStore.currentMicrophoneId });
   }
 });
 
-/**
- * Remote user information update
- *
- * 远端用户信息更新
-**/
-function onUserInfoUpdated(data: { userId: string, nick: string, avatar: string }) {
-  const { userId, nick, avatar } = data;
-  roomStore.updateRemoteUser(userId, { nick, avatar });
-}
 
-onMounted(() => {
-  TUIRoomCore.on(ETUIRoomEvents.onUserEnterRoom, onUserEnterRoom);
-  TUIRoomCore.on(ETUIRoomEvents.onUserLeaveRoom, onUserLeaveRoom);
-  TUIRoomCore.on(ETUIRoomEvents.onUserAVEnabled, onUserAVEnabled);
-  TUIRoomCore.on(ETUIRoomEvents.onUserAVDisabled, onUserAVDisabled);
-  TUIRoomCore.on(ETUIRoomEvents.onUserVideoAvailable, onUserVideoAvailable);
-  TUIRoomCore.on(ETUIRoomEvents.onUserAudioAvailable, onUserAudioAvailable);
-  TUIRoomCore.on(ETUIRoomEvents.onUserInfoUpdated, onUserInfoUpdated);
+TUIRoomEngine.once('ready', () => {
+  roomEngine.instance?.on(TUIRoomEvents.onRemoteUserEnterRoom, onRemoteUserEnterRoom);
+  roomEngine.instance?.on(TUIRoomEvents.onRemoteUserLeaveRoom, onRemoteUserLeaveRoom);
+  roomEngine.instance?.on(TUIRoomEvents.onSeatListChanged, onSeatListChanged);
+  roomEngine.instance?.on(TUIRoomEvents.onUserVideoStateChanged, onUserVideoStateChanged);
+  roomEngine.instance?.on(TUIRoomEvents.onUserAudioStateChanged, onUserAudioStateChanged);
+  // roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolumeChanged);
+  // roomEngine.instance?.on(TUIRoomEvents.onUserNetworkQualityChanged, onUserNetworkQualityChanged);
 });
 
 onUnmounted(() => {
-  TUIRoomCore.off(ETUIRoomEvents.onUserEnterRoom, onUserEnterRoom);
-  TUIRoomCore.off(ETUIRoomEvents.onUserLeaveRoom, onUserLeaveRoom);
-  TUIRoomCore.off(ETUIRoomEvents.onUserAVEnabled, onUserAVEnabled);
-  TUIRoomCore.off(ETUIRoomEvents.onUserAVDisabled, onUserAVDisabled);
-  TUIRoomCore.off(ETUIRoomEvents.onUserVideoAvailable, onUserVideoAvailable);
-  TUIRoomCore.off(ETUIRoomEvents.onUserAudioAvailable, onUserAudioAvailable);
-  TUIRoomCore.off(ETUIRoomEvents.onUserInfoUpdated, onUserInfoUpdated);
+  roomEngine.instance?.off(TUIRoomEvents.onRemoteUserEnterRoom, onRemoteUserEnterRoom);
+  roomEngine.instance?.off(TUIRoomEvents.onRemoteUserLeaveRoom, onRemoteUserLeaveRoom);
+  roomEngine.instance?.off(TUIRoomEvents.onSeatListChanged, onSeatListChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onUserVideoStateChanged, onUserVideoStateChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onUserAudioStateChanged, onUserAudioStateChanged);
 });
 </script>
 

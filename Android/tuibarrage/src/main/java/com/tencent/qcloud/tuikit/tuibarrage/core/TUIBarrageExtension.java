@@ -22,7 +22,6 @@ public class TUIBarrageExtension implements ITUIExtension {
 
     public static final String OBJECT_TUI_BARRAGE = TUIBarrageExtension.class.getName();
     public static final String KEY_SEND_BUTTON    = "TUIBarrageButton";
-    public static final String KEY_SEND_VIEW      = "TUIBarrageSendView";
     public static final String KEY_DISPLAY_VIEW   = "TUIBarrageDisplayView";
 
     @Override
@@ -30,11 +29,17 @@ public class TUIBarrageExtension implements ITUIExtension {
         //这个HashMap需携带返回给TUICore的View数据
         HashMap<String, Object> hashMap = new HashMap<>();
 
-        if (OBJECT_TUI_BARRAGE.equals(key)) {
+        if (param != null && OBJECT_TUI_BARRAGE.equals(key)) {
             Context context = (Context) param.get("context");
             final String groupId = (String) param.get("groupId");
             //弹幕发送View
-            TUIBarrageButton button = new TUIBarrageButton(context, groupId);
+            TUIBarrageButton button;
+            if (param.get("icon") == null) {
+                button = new TUIBarrageButton(context, groupId);
+            } else {
+                button = new TUIBarrageButton(context, groupId, (Integer) param.get("icon"));
+            }
+
             //弹幕显示View
             final TUIBarrageDisplayView displayView = new TUIBarrageDisplayView(context, groupId);
             button.getSendView().setBarrageListener(new ITUIBarrageListener() {
@@ -52,7 +57,6 @@ public class TUIBarrageExtension implements ITUIExtension {
 
                 }
             });
-            hashMap.put(KEY_SEND_VIEW, button.getSendView());
             hashMap.put(KEY_SEND_BUTTON, button);
             hashMap.put(KEY_DISPLAY_VIEW, displayView);
             return hashMap;

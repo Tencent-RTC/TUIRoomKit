@@ -30,10 +30,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, watch, onMounted, onUnmounted } from 'vue';
-import TUIRoomCore, { TRTCDeviceInfo, ETUIRoomEvents, TRTCDeviceType, TRTCDeviceState } from '../../tui-room-core';
+import { ref, Ref } from 'vue';
 import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
+
+import useGetRoomEngine from '../../hooks/useRoomEngine';
+import { TRTCDeviceInfo } from '@tencentcloud/tuiroom-engine-js';
+const roomEngine = useGetRoomEngine();
 
 interface Props {
   deviceType: string,
@@ -44,8 +47,17 @@ interface Props {
 const { deviceType, onChange, disabled = false } = defineProps<Props>();
 
 const roomStore = useRoomStore();
+const {
+  cameraList,
+  microphoneList,
+  speakerList,
+  currentCameraId,
+  currentMicrophoneId,
+  currentSpeakerId,
+} = storeToRefs(roomStore);
 
-const { currentCameraId, currentMicrophoneId, currentSpeakerId } = storeToRefs(roomStore);
+const deviceList: Ref<TRTCDeviceInfo[]> = ref(getDeviceList());
+const currentDeviceId = ref(getInitDeviceId());
 
 function getInitDeviceId() {
   if (deviceType === 'camera') {
@@ -60,92 +72,38 @@ function getInitDeviceId() {
   return '';
 }
 
-const deviceList: Ref<TRTCDeviceInfo[]> = ref([]);
-const currentDeviceId = ref(getInitDeviceId());
-
-watch(
-  currentDeviceId,
-  async (deviceId) => {
-    switch (deviceType) {
-      case 'camera':
-        await TUIRoomCore.setCurrentCamera(deviceId);
-        roomStore.setCurrentCameraId(deviceId);
-        break;
-      case 'microphone':
-        await TUIRoomCore.setCurrentMicrophone(deviceId);
-        roomStore.setCurrentMicrophoneId(deviceId);
-        break;
-      case 'speaker':
-        await TUIRoomCore.setCurrentSpeaker(deviceId);
-        roomStore.setCurrentSpeakerId(deviceId);
-        break;
-      default:
-        break;
-    }
-  },
-);
-
-function handleChange(deviceId: string) {
-  onChange && onChange(deviceId);
+function getDeviceList() {
+  if (deviceType === 'camera') {
+    return cameraList;
+  }
+  if (deviceType === 'microphone') {
+    return microphoneList;
+  }
+  if (deviceType === 'speaker') {
+    return speakerList;
+  }
+  return [];
 }
 
-async function getDeviceInfo() {
+async function handleChange(deviceId: string) {
+  onChange && onChange(deviceId);
   switch (deviceType) {
     case 'camera':
-      deviceList.value = await TUIRoomCore.getCameraList();
+      await roomEngine.instance?.setCurrentCameraDevice({ deviceId });
+      roomStore.setCurrentCameraId(deviceId);
       break;
     case 'microphone':
-      deviceList.value = await TUIRoomCore.getMicrophoneList();
+      await roomEngine.instance?.setCurrentMicDevice({ deviceId });
+      roomStore.setCurrentMicrophoneId(deviceId);
       break;
     case 'speaker':
-      deviceList.value = await TUIRoomCore.getSpeakerList();
+      await roomEngine.instance?.setCurrentSpeakerDevice({ deviceId });
+      roomStore.setCurrentSpeakerId(deviceId);
       break;
     default:
       break;
   }
 }
-
-/**
- * Device changes: device switching, device plugging and unplugging events
- *
- * 设备变化：设备切换、设备插拔事件
-**/
-async function onDeviceChange(deviceData: {deviceId: string, type: number, state: number}) {
-  const stateList = ['add', 'remove', 'active'];
-  const { deviceId, type, state } = deviceData;
-  if (type === TRTCDeviceType.TRTCDeviceTypeMic && deviceType === 'microphone') {
-    console.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
-    deviceList.value = await TUIRoomCore.getMicrophoneList();
-    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
-      roomStore.setCurrentMicrophoneId(deviceId);
-    }
-    return;
-  }
-  if (type === TRTCDeviceType.TRTCDeviceTypeSpeaker && deviceType === 'speaker') {
-    console.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
-    deviceList.value = await TUIRoomCore.getSpeakerList();
-    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
-      roomStore.setCurrentSpeakerId(deviceId);
-    }
-    return;
-  }
-  if (type === TRTCDeviceType.TRTCDeviceTypeCamera && deviceType === 'camera') {
-    console.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
-    deviceList.value = await TUIRoomCore.getCameraList();
-    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
-      roomStore.setCurrentCameraId(deviceId);
-    }
-  }
-}
-
-onMounted(() => {
-  TUIRoomCore.on(ETUIRoomEvents.onDeviceChange, onDeviceChange);
-  getDeviceInfo();
-});
-
-onUnmounted(() => {
-  TUIRoomCore.off(ETUIRoomEvents.onDeviceChange, onDeviceChange);
-});
 </script>
 
 <style lang="scss" scoped>

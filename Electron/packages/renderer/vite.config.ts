@@ -1,14 +1,14 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import resolve from 'vite-plugin-resolve'
-import electron from 'vite-plugin-electron/renderer'
 import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
+import electron from 'vite-plugin-electron/renderer'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import { createSvg } from './src/TUIRoom/assets/icons/index.js'
-const path = require('path')
-// @ts-ignore
+import Components from 'unplugin-vue-components/vite'
 import pkg from '../../package.json'
+import { createSvg } from './src/TUIRoom/assets/icons/index.js'
+
+const path = require('path')
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -39,6 +39,7 @@ export default defineConfig({
           const TRTCDeviceInfo = TRTCCloud.TRTCDeviceInfo;
           const TRTCVideoQosPreference = TRTCCloud.TRTCVideoQosPreference;
           const TRTCQualityInfo = TRTCCloud.TRTCQualityInfo;
+          const TRTCQuality = TRTCCloud.TRTCQuality;
           const TRTCStatistics = TRTCCloud.TRTCStatistics;
           const TRTCVolumeInfo = TRTCCloud.TRTCVolumeInfo;
           const TRTCDeviceType = TRTCCloud.TRTCDeviceType;
@@ -50,6 +51,7 @@ export default defineConfig({
           const TRTCVideoRotation = TRTCCloud.TRTCVideoRotation;
           const TRTCVideoFillMode = TRTCCloud.TRTCVideoFillMode;
           const TRTCRoleType = TRTCCloud.TRTCRoleType;
+          const TRTCScreenCaptureProperty = TRTCCloud.TRTCScreenCaptureProperty;
           export { 
             TRTCParams,
             TRTCAppScene,
@@ -73,6 +75,8 @@ export default defineConfig({
             TRTCVideoRotation,
             TRTCVideoFillMode,
             TRTCRoleType,
+            TRTCQuality,
+            TRTCScreenCaptureProperty,
           };
           export default TRTCCloud.default;
         `,
@@ -97,15 +101,17 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    include: ['@tencentcloud/tuiroom-engine-electron']
+  },
   build: {
     outDir: '../../dist/renderer',
     emptyOutDir: true,
     sourcemap: true,
-    rollupOptions: {
-      output: {
-        format: 'es'
-      }
-    }
+    commonjsOptions: {
+      exclude: ['@tencentcloud/tuiroom-engine-electron'],
+      include: [],
+    },
   },
   server: {
     host: pkg.env.VITE_DEV_SERVER_HOST,
