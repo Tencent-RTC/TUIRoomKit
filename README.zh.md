@@ -32,14 +32,14 @@ _[English](README.md) | 简体中文_
 
 ## 快速访问
 
-- 如果你遇到了困难，可以先参阅 [常见问题](https://cloud.tencent.com/document/product/647/78767)，这里整理开发者最常出现的问题，覆盖各个平台，希望可以帮助您快速解决问题
-- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](Web/)、[Android](Android/)、[iOS](iOS/)、[微信小程序]([MiniProgram](https://github.com/MinTate/TUICallKit/tree/main/MiniProgram)/)
-- 如果您想了解我们最新的一些产品特性，可以查看 [更新日志](https://cloud.tencent.com/document/product/647/80931)，这里有 TUIRoomKit 最新的功能特性，以及历史版本功能迭代
-- 完整的 API 文档见 [音视频通话 SDK API 示例](https://cloud.tencent.com/document/product/647/78748)：包含TUIRoomKit（含 UI）、TUIRoomEngine（无 UI）、以及通话事件回调等介绍。
+- 如果你遇到了困难，可以先参阅 [常见问题](https://cloud.tencent.com/document/product/647/84271)，这里整理开发者最常出现的问题，覆盖各个平台，希望可以帮助您快速解决问题
+- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](Web/)、[Android](Android/)、[iOS](iOS/)
+- 如果您想了解我们最新的一些产品特性，可以查看 [更新日志](https://cloud.tencent.com/document/product/647/81974)，这里有 TUIRoomKit 最新的功能特性，以及历史版本功能迭代
+- 完整的 API 文档见 [多人音视频 SDK API 示例](https://cloud.tencent.com/document/product/647/84244)：包含TUIRoomKit（含 UI）、TUIRoomEngine（无 UI）、以及通话事件回调等介绍。
 - 如果你想了解更多腾讯云音视频团队维护的项目，可以查看我们的 [产品官网](https://cloud.tencent.com/product/rtcube)、[Github Organizations](https://github.com/LiteAVSDK) 等
 
 
 
 ## 交流&反馈
-如果您在使用过程中有遇到什么问题，欢迎提交 [**issue**](https://github.com/tencentyun/TUICallKit/issues)，我们也欢迎您加入我们的开发者QQ群进行技术交流和反馈问题，QQ群 ID：592465424.
 
+如果您在使用过程中有遇到什么问题，欢迎提交 [**issue**](https://github.com/tencentyun/TUIRoomRoomKit/issues)，我们也欢迎您加入我们的开发者QQ群进行技术交流和反馈问题，QQ群 ID：592465424.
