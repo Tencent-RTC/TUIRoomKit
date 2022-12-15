@@ -1,115 +1,44 @@
-# Group Audio/Video Room
+_English | [简体中文](README.zh.md)_
+# Tencent Cloud UIKit for Video Conference
 
-_[中文](README.zh.md) | English_
+<img src="Preview/logo.png" align="left" width=120 height=120>  TUIRoomKit is Tencent Cloud launched a positioning enterprise meeting, online class, network salon and other scenes of the UI component, through the integration of the component, you only need to write a few lines of code can add similar video conference functions for your App, and support screen sharing, member management, ban the ban painting, chat and other functions. TUIRoomlKit supports Windows, Mac, Android, iOS, Web, Electron and other development platforms.
 
-## Overview
-
-TUIRoom is an open-source component for multi-person audio/video call. You can perform secondary development or replace the UI and customize the layout to quickly launch your business.
-Description of room roles
-
-<table>
-<tr>
-<th>Role</th><th>Description</th><th>Specific Permission</th>
-</tr>
-<tr>
-<td>Anchor</td>
-
-<td>Room creator</td>
-
-<td>- Remove members<br/>- Control the mic and camera switches of a single member or all members<br/>- Specify free speech or hand raise mode</td>
-</tr>
-<td>Member</td>
-<td>Users entering the room</td>
-<td>- Control their own camera and mic switches<br/>- Customize image layout</td>
-
-</tr>
-</table>
-
-
-The main features of the component include:
-
-- Multi-person audio/video call: One-to-one or group audio/video calls with ultra-low latency and 1080p video quality.
-
-- Custom layout: Both the anchor and members can customize the image layout.
-
-- Screen sharing: Both the anchor and members can share the specified image area. A user can share both the camera and screen video images while ensuring audio/video sync.
-
-- Quality detection: TRTC can collect the CPU and memory utilization information and detect the network latency, bandwidth, packet loss rate, audio bitrate, and video/screen sharing bitrate.
-
-- AI noise reduction: TRTC can intelligently detect and remove the noise mixed in the transmitted signal, so as to enhance the audio clarity and improve the sound quality.
-[Apply for beta test eligibility](https://cloud.tencent.com/apply/p/9q0qt0bg5l4)
-
-<img src="https://qcloudimg.tencent-cloud.cn/raw/6548148ec6990bed6e7ffa8c421cca58.png">
-
-## Use Cases
-
-The TUIRoom component supports custom layout and can be applied in various scenarios:
-
-- Online teaching: Online education, online fitness class, online study room, and remote medical education
-- Enterprise services: Video meeting, remote recruiting, video customer service, and remote court trial
-- Healthcare: Remote consultation and remote diagnosis
-- Finance services: Remote finance interview, remote loss assessment, insurance claim, and online wealth management
+<a href="https://apps.apple.com/cn/app/%E8%85%BE%E8%AE%AF%E4%BA%91%E9%9F%B3%E8%A7%86%E9%A2%91/id1400663224"><img src="Preview/app-store.svg" height=40></a> <a href="https://dldir1.qq.com/hudongzhibo/liteav/TRTCDemo.apk"><img src="Preview/play-store.svg" height=40></a> <a href="https://web.sdk.qcloud.com/trtc/webrtc/demo/api-sample/login.html"><img src="Preview/web-app.svg" height=40></a>
 
 
 
-<table>
-<tr>
-<th>Video Customer Service</th><th>Online Court Trial</th><th>Remote Recruiting</th><th >Remote Diagnosis</th>
-</tr>
-<tr>
-<td><img style="width:200px;" src="https://imgcache.qq.com/operation/dianshi/other/kefu.76e05db571dbc496abe9f6b776c86c2824047cca.png" data-nonescope="true"></td>
+## Features
 
-<td><img style="width:100px;" src="https://imgcache.qq.com/operation/dianshi/other/tingsheng.dc3e4a14ce0b4135e44bca444d3b4b998b73ea94.webp" data-nonescope="true"></td>
+<p align="center">
+  <img src="Preview/room-uikit-en.png"/>
+</p>
 
-<td><img style="width:300px;" src="https://imgcache.qq.com/operation/dianshi/other/zhaopin.9058bc65b94ea06b5d9b3926df836de5243c3988.png" data-nonescope="true"></td>
+- Easy access: Provide open source components with UI, save 90% development time, fast online video conference function.
+- Platform connectivity: TUIRoomKit components of all platforms are interconnected and accessible.
+- Screen sharing: Based on the screen acquisition capability of each platform jointly polished by 3000+ market applications, with exclusive AI coding algorithm, lower bit rate and clearer picture.
+- Member management: It supports multiple standard room management functions such as all mute, single member gag, drawing, inviting to speak, kicking out of the room, etc.
+- Other features: Support room members chat screen, music playback, sound Settings, basic beauty and other features, welcome to use.
 
-<td><img style="width:300px;" src="https://imgcache.qq.com/operation/dianshi/other/yiliao.72854345679a10152be490378b9dca4426bd454a.png" data-nonescope="true"></td>
+## Make a first video Conference 
 
-</tr>
-</table>
+Here is an example of integration with UI (ie TUIRoomKit), which is also our recommended integration method. The key steps are as follows:
+- **Step1**：Refer to the official website document to quickly connect TUIRoomKit to your project, the detailed access process of each platform/framework: [Web](https://cloud.tencent.com/document/product/1640/81132) 、[Android ](https://cloud.tencent.com/document/product/647/78729)、 [iOS](https://cloud.tencent.com/document/product/647/78730)、 [微信小程序](https://cloud.tencent.com/document/product/647/78733)、[uni-app](https://cloud.tencent.com/document/product/647/78732)
+- **Step2**：Create your first multiplayer video conference.
 
 
-<table>
-<tr>
-<th>Insurance Claim</th><th>Online Education</th><th>Video Meeting</th><th >Remote Finance Interview</th>
-</tr>
-<tr>
-<td><img style="width:300px;" src="https://imgcache.qq.com/operation/dianshi/other/baoxian.6e407da60713e0e6085bc45c740077918f63761c.png" data-nonescope="true"></td>
 
-<td><img style="width:300px;" src="https://imgcache.qq.com/operation/dianshi/other/jiaoyu.c0baa1356cfe9397d7aad9647b5196d8fc57e937.png" data-nonescope="true"></td>
+## Quick link
+- If you encounter difficulties, you can refer to [FAQs](https://cloud.tencent.com/document/product/647/78767), here are the most frequently encountered problems of developers, covering various platforms, I hope you can Help you solve problems quickly.
+- If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](Web/), [Android](Android/), [iOS](iOS/).
 
-<td><img style="width:300px;" src="https://imgcache.qq.com/operation/dianshi/other/huiyi.49f80c476411e768dd0cdffd030519e3086bcf2e.png" data-nonescope="true"></td>
+- If you would like to see some of our latest product features, you can check the [Update Log](https://cloud.tencent.com/document/product/647/80931), here are the latest features of TUICallKit, as well as the historical version features iterate
+- For complete API documentation, see [Audio Video Call SDK API Example](https://cloud.tencent.com/document/product/647/78748): including TUICallKit (with UIKit), TUICallEngine (without UIKit), and call events Callbacks, etc.
+- If you want to learn more about the projects maintained by Tencent Cloud  Media Services Team, you can check our [Product Official Website](https://cloud.tencent.com/product/rtcube), [Github Organizations](https://github .com/LiteAVSDK) etc.
 
-<td><img style="width:300px;" src="https://imgcache.qq.com/operation/dianshi/other/mianqian.2db594b6b392f61171e86d1168ca698ae73462bb.png" data-nonescope="true"></td>
 
-</tr>
-</table>
-
-## Tryout and Demo Run
-
-You can directly scan the QR code below or click to experience it, or click to jump to [ios](https://www.tencentcloud.com/document/product/647/37284), [android](https://www.tencentcloud.com/document/product/647/37283), [win or mac](https://www.tencentcloud.com/document/product/647/44071), [web](https://www.tencentcloud.com/document/product/647/47636), and [Electron](https://www.tencentcloud.com/document/product/647/48416) for experience links. You can also click [TUIRoom](https://github.com/tencentyun/TUIRoom) to view the source code at GitHub.
-<table>
-<tr>
-<th>iOS</th><th>Android</th><th>Web</th>
-</tr>
-<tr>
-<td><img style="width:150px;" src="https://imgcache.qq.com/operation/dianshi/other/androiderercrcode.b8a053599ac9f16ccb0ad3328f1f015054170efe.png" data-nonescope="true"></td>
-
-<td><img style="width:150px;" src="https://imgcache.qq.com/operation/dianshi/other/crcode_android.fa3232dcf5c64a5184c5e9e0357674c6b3b601ac.png" data-nonescope="true"></td>
-<td><a style=" color: #fff;background-color: #00a4ff;height: 40px;display:inline-block;text-align:center;line-height: 40px;border-radius:20px;width:150px;" target="_blank" href="https://web.sdk.qcloud.com/component/tuiroom/index.html?lang=en" name="demo-click-web">TUIRoom</a></td>
-</table>
-
-## Documentation
-
-| iOS                                                          | Android                                                      | Windows and macOS | Web | Electron |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ----------- |-----------|----------|
-| [Integrating TUIRoom (iOS)](https://www.tencentcloud.com/document/product/647/37284) | [Integrating TUIRoom (Android)](https://www.tencentcloud.com/document/product/647/37283) | [Integrating TUIRoom (Windows and macOS)](https://www.tencentcloud.com/document/product/647/44071) | [Integrating TUIRoom (Web)](https://www.tencentcloud.com/document/product/647/47636) | [Integrating TUIRoom (Electron)](https://www.tencentcloud.com/document/product/647/48416)
 
 ## Have any questions?
-Welcome to join our Telegram Group to communicate with our professional engineers! We are more than happy to hear from you~
-Click to join: https://t.me/+EPk6TMZEZMM5OGY1
-Or scan the QR code
-
-<img src="https://qcloudimg.tencent-cloud.cn/raw/9c67ed5746575e256b81ce5a60216c5a.jpg" width="320"/>
-
-    
+- Welcome to submit [**issue**](https://github.com/tencentyun/TUIRoomKit/issues)  
+- Welcome to join our Telegram Group to communicate with our professional engineers! We are more than happy to hear from you，Click to join: https://t.me/+EPk6TMZEZMM5OGY1
+Or scan the QR code 
+<img src="Preview/telegram-code.jpg"/>
