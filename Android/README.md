@@ -1,18 +1,22 @@
-# TUIRoom Android 示例工程快速跑通
+# TUIRoomKit Android 示例工程快速跑通
 _中文 | [English](README.en.md)_
 
-本文档主要介绍如何快速跑通TUIRoom 示例工程，体验多人音视频互动，更详细的TUIRoom组件接入流程，请点击腾讯云官网文档： [**TUIRoom 组件 Android 接入说明** ](https://cloud.tencent.com/document/product/647/45667)...
-
-
+本文档主要介绍如何快速跑通 `TUIRoomKit` 示例工程，体验多人音视频互动，更详细的 `TUIRoomKit` 组件接入流程，请点击腾讯云官网文档： [**TUIRoomKit 组件 Android 接入说明** ](https://write.woa.com/document/93119926066618368)...
+>!该产品目前处于限免公测期，暂不收取额外费用，目前服务计费与即时通信IM、实时音视频TRTC产品计费服务保持一致 ，您可限时免费下载 SDK 并接入体验多人音视频会话能力。若未来多人音视频 SDK 的计费方式、功能和限免公测时间等有所变更，我们将提前在官网发布公告进行说明，并通过站内信、短信、邮件等方式提前通知您，敬请关注。
+<img src="https://qcloudimg.tencent-cloud.cn/raw/526f1e79040089c7a7bb5f9be6f084f9.svg" width="900">
 
 ## 目录结构
 
 ```
 TUIRoom
-├─ app          // 主面板，多人音视频互动场景入口
-├─ debug        // 调试相关
-├─ tuibeauty    // 美颜面板，包含美颜，滤镜，动效等效果
-└─ tuiroom      // 多人音视频互动业务逻辑
+├─ app              // 主面板，多人音视频互动场景入口
+├─ basic            // 基础模块，包含一些基础类与方法
+├─ debug            // 调试相关
+├─ tuibeauty        // 美颜面板，包含美颜，滤镜，动效等效果
+├─ tuibarrage       // 弹幕组件，用于发送聊天消息
+├─ tuicore          // tui公共库，用于挂载tui组件
+├─ tuivideoseat     // 视频组件，用于播放视频流
+└─ tuiroomkit       // 多人音视频房间业务逻辑
 ```
 
 ## 环境准备
@@ -37,6 +41,7 @@ TUIRoom
 2. 找到并打开 `Android/debug/src/main/java/com/tencent/liteav/debug/GenerateTestUserSig.java` 文件。
 3. 配置 `GenerateTestUserSig.java` 文件中的相关参数：
 	<img src="https://main.qcloudimg.com/raw/f9b23b8632058a75b78d1f6fdcdca7da.png" width="900">
+
 	- SDKAPPID：默认为占位符（PLACEHOLDER），请设置为步第一步中记录下的 SDKAppID。
 	- SECRETKEY：默认为占位符（PLACEHOLDER），请设置为步第一步中记录下的密钥信息。
 
@@ -45,7 +50,7 @@ TUIRoom
 
 ### 第四步：示例体验
 
-Tips：TUIRoom 使用体验，至少需要两台设备，如果用户A/B分别代表两台不同的设备：
+Tips：TUIRoomKit 使用体验，至少需要两台设备，如果用户A/B分别代表两台不同的设备：
 
 **设备 A（userId：111）**
 
@@ -56,7 +61,7 @@ Tips：TUIRoom 使用体验，至少需要两台设备，如果用户A/B分别�
 
 | 步骤1 | 步骤2 | 步骤3 | 步骤4 |
 |---------|---------|---------|---------|
-| <img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/user_a.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/85ab7ea0a66aba5b9ddf23594bf04ea0.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/b36383baff761bdaf26da5f191902800.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/5f8b51e76d044c03af9e579a66fcaa1a.png" width="320"/> |
+| <img src="https://qcloudimg.tencent-cloud.cn/raw/7078de13e36acb9756cd407567b8605c.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/82912e69c5b3cb63e8d829133c900879.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/e8fbe729a8e1e0e683eb0b371a4d351d.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/4f532104baf9a13afd147f265b8e1963.png" width="320"/> |
 
 **设备 B（userId：222）**
 
@@ -65,7 +70,7 @@ Tips：TUIRoom 使用体验，至少需要两台设备，如果用户A/B分别�
 
 | 步骤1 | 步骤2 |
 |---------|---------|
-|<img src="https://qcloudimg.tencent-cloud.cn/raw/0349a16cf0f442016d1262d602327a67.png" width="320"/>|<img src="https://qcloudimg.tencent-cloud.cn/raw/a5f86a91670b56ed39bb40d6d4ea0d24.png" width="320"/>|
+|<img src="https://qcloudimg.tencent-cloud.cn/raw/e5e7fcc651f705a2d2622e9455eb896c.png" width="320"/>|<img src="https://qcloudimg.tencent-cloud.cn/raw/a49fc2f24020ca1d26ba381ef95d56d6.png" width="320"/>|
 ## 常见问题
 
 - [TUI 场景化解决方案常见问题](https://cloud.tencent.com/developer/article/1952880)

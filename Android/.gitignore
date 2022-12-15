@@ -9,5 +9,4 @@ build/
 .cxx
 *.codecc/
 /build.yml
-tuicore
 tuiofflinepush

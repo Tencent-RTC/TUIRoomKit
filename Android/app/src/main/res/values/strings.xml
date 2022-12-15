@@ -8,7 +8,6 @@
     <string name="hint_user_id">Enter a userId</string>
     <string name="btn_login">Log In</string>
     <string name="app_toast_login_fail">Login failed [%d]%s</string>
-
     <string name="welcome_tips">Welcome to Tencent\nReal-Time Communication</string>
     <string name="dialog_log_out">Are you sure you want to log out?</string>
     <string name="user_sig_expired">Your user signature information has expired. Please log in again!</string>
@@ -19,7 +18,6 @@
     <string name="app_tips_user_name">Chinese characters, letters, numbers and underscores, 2 – 20 words</string>
     <string name="app_toast_register_success_and_logging_in">Registered successfully</string>
     <string name="app_toast_failed_to_set">Failed: %s</string>
-
     <string name="app_custom_name_1">Martijn</string>
     <string name="app_custom_name_2">irfan</string>
     <string name="app_custom_name_3">Rosanna</string>
@@ -32,4 +30,14 @@
     <string name="app_custom_name_10">ivet</string>
     <string name="app_custom_name_11">clinton</string>
     <string name="app_custom_name_12">virelai</string>
+
+    <string name="app_title_turn_on_camera">Camera</string>
+    <string name="app_title_turn_on_microphone">Mic</string>
+    <string name="app_enter_tag_normal">Join</string>
+    <string name="app_tv_please_input_room_number">Enter a conference ID</string>
+    <string name="app_create_room">Create Room</string>
+    <string name="app_join_room">Join Room</string>
+    <string name="app_room_id">Room ID</string>
+    <string name="app_username">Username</string>
+    <string name="app_copy_room_id_success">Room ID copied successfully.</string>
 </resources>
