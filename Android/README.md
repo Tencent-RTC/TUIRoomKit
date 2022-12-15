@@ -73,5 +73,5 @@ Tips：TUIRoomKit 使用体验，至少需要两台设备，如果用户A/B分�
 |<img src="https://qcloudimg.tencent-cloud.cn/raw/e5e7fcc651f705a2d2622e9455eb896c.png" width="320"/>|<img src="https://qcloudimg.tencent-cloud.cn/raw/a49fc2f24020ca1d26ba381ef95d56d6.png" width="320"/>|
 ## 常见问题
 
-- [TUI 场景化解决方案常见问题](https://cloud.tencent.com/developer/article/1952880)
+- [TUI 场景化解决方案常见问题](https://cloud.tencent.com/document/product/647/84272)
 - 欢迎加入 QQ 群：592465424，进行技术交流和反馈~
