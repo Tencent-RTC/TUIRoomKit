@@ -1,6 +1,6 @@
 import { app, BrowserWindow, shell, screen, systemPreferences, crashReporter, ipcMain } from 'electron'
 import { release } from 'os'
-import { join } from 'path'
+import { join, resolve } from 'path'
 
 // 开启crash捕获
 crashReporter.start({
@@ -67,7 +67,7 @@ function registerScheme() {
   const args = [];
   if (!app.isPackaged) {
     // 如果是开发阶段，需要把我们的脚本的绝对路径加入参数中
-    args.push(path.resolve(process.argv[1]));
+    args.push(resolve(process.argv[1]));
   }
   // 加一个 `--` 以确保后面的参数不被 Electron 处理
   args.push('--');

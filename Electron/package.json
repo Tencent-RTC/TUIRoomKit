@@ -5,8 +5,8 @@
   "author": "",
   "license": "MIT",
   "scripts": {
-    "dev": "cross-env VITE_RUNTIME_SCENE=inner node scripts/watch.mjs",
-    "prebuild": "vue-tsc --noEmit --p packages/renderer/tsconfig.json && node scripts/build.mjs",
+    "dev": "node scripts/watch.mjs",
+    "prebuild": "node scripts/build.mjs",
     "build": "electron-builder"
   },
   "engines": {
