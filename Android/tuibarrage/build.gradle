@@ -27,5 +27,6 @@ dependencies {
     api "androidx.recyclerview:recyclerview:1.2.1"
     api "com.google.code.gson:gson:2.8.6"
 
-    api 'com.tencent.liteav.tuikit:tuicore:latest.release'
+    def projects = this.rootProject.getAllprojects().stream().map { project -> project.name }.collect()
+    api projects.contains("tuicore") ? project(':tuicore') : "com.tencent.liteav.tuikit:tuicore:latest.release"
 }

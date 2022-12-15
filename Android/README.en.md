@@ -1,16 +1,26 @@
 # Quick Run of TUIRoom Demo for Android
 _[中文](README.md) | English_
 
-This document describes how to quickly run the TUIRoom demo project to try out multi-person audio/video interactions. For more information on the TUIRoom component connection process, see **[Integrating TUIRoom (Android)](https://www.tencentcloud.com/document/product/647/37283)**.
+This document describes how to quickly run the `TUIRoomKit` demo project to try out multi-person audio/video interactions. For more information on the TUIRoom component connection process, see **[Integrating TUIRoomKit (Android)](https://write.woa.com/document/93119926066618368)**.
+>!This product is currently in the free public beta period, and no additional fees are charged for the time being. The current service billing is consistent with instant messaging IM, real-time audio and video TRTC product billing services.
+You can download the SDK for free for a limited time and access to experience multi-person audio and video sessions ability.
+If there are any changes in the billing method, functions, and free public beta time of the multiplayer audio and video SDK in the future,
+we will issue an announcement on the official website to explain in advance,
+and notify you in advance through in-site letters, text messages, emails, etc., so stay tuned
+<img src="https://qcloudimg.tencent-cloud.cn/raw/526f1e79040089c7a7bb5f9be6f084f9.svg" width="900">
 
 ## Directory Structure
 
 ```
 TUIRoom
-├─ app          // Main panel, which is the entry of the multi-person audio/video interaction scenario
-├─ debug        // Debugging code
-├─ tuibeauty    // Beauty filter panel, which provides effects such as beauty filters, filters, and animated effect
-└─ tuiroom      // Multi-person audio/video interaction business logic
+├─ app              // Main panel, which is the entry of the multi-person audio/video interaction scenario
+├─ basic            // basic code,contains base method and class,etc.
+├─ debug            // Debugging code
+├─ tuibeauty        // Beauty filter panel, which provides effects such as beauty filters, filters, and animated effect
+├─ tuibarrage       // Barrage panel, which provides sending chat messages
+├─ tuicore          // Public library, used to mount tui components
+├─ tuivideoseat     // Video panel，for streaming video
+└─ tuiroomkit       // Multi-person audio/video interaction business logic
 ```
 
 ## Environment Requirements
@@ -35,6 +45,7 @@ TUIRoom
 2. Find and open the `Android/debug/src/main/java/com/tencent/liteav/debug/GenerateTestUserSig.java` file.
 3. Set parameters in `GenerateTestUserSig.java`:
 	<img src="https://main.qcloudimg.com/raw/f9b23b8632058a75b78d1f6fdcdca7da.png" width="900">
+
 	- SDKAPPID: A placeholder by default. Set it to the `SDKAppID` that you noted down in step 1.
 	- SECRETKEY: A placeholder by default. Set it to the key information that you noted down in step 1.
 
@@ -43,7 +54,7 @@ You can open the source code directory `TUIRoom/Android` in Android Studio 3.5 o
 
 ### Step 4. Try out the demo
 
-Note: You need to prepare at least two devices to try out TUIRoom. Here, users A and B represent two different devices:
+Note: You need to prepare at least two devices to try out TUIRoomKit. Here, users A and B represent two different devices:
 
 **Device A (userId: 111)**
 

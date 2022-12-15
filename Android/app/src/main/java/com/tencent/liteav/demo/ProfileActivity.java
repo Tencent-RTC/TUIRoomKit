@@ -19,11 +19,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.blankj.utilcode.util.ToastUtils;
-import com.tencent.imsdk.v2.V2TIMCallback;
-import com.tencent.imsdk.v2.V2TIMManager;
-import com.tencent.imsdk.v2.V2TIMUserFullInfo;
 import com.tencent.liteav.basic.AvatarConstant;
 import com.tencent.liteav.basic.ImageLoader;
+import com.tencent.liteav.basic.UserModel;
+import com.tencent.liteav.basic.UserModelManager;
 
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -53,16 +52,14 @@ public class ProfileActivity extends AppCompatActivity {
     };
 
     private void startMainActivity() {
-        Intent intent = new Intent();
-        intent.addCategory("android.intent.category.DEFAULT");
-        intent.setAction("com.tencent.liteav.action.portal");
+        Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
         startActivity(intent);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_profile);
+        setContentView(R.layout.app_activity_login_profile);
         initStatusBar();
         initView();
     }
@@ -75,7 +72,7 @@ public class ProfileActivity extends AppCompatActivity {
         String[] avatarArr = AvatarConstant.USER_AVATAR_ARRAY;
         int index = new Random().nextInt(avatarArr.length);
         mAvatarUrl = avatarArr[index];
-        ImageLoader.loadImage(this, mImageAvatar, mAvatarUrl, R.drawable.ic_avatar);
+        ImageLoader.loadImage(this, mImageAvatar, mAvatarUrl, R.drawable.app_ic_avatar);
 
         mButtonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,26 +122,14 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
         mTvInputTips.setTextColor(getResources().getColor(R.color.text_color_hint));
-        V2TIMUserFullInfo v2TIMUserFullInfo = new V2TIMUserFullInfo();
-        v2TIMUserFullInfo.setFaceUrl(mAvatarUrl);
-        v2TIMUserFullInfo.setNickname(userName);
-        V2TIMManager.getInstance().setSelfInfo(v2TIMUserFullInfo, new V2TIMCallback() {
-            @Override
-            public void onError(int code, String desc) {
-                Log.e(TAG, "set profile failed errorCode : " + code + " errorMsg : " + desc);
-                ToastUtils.showLong(getString(R.string.app_toast_failed_to_set, desc));
-                startMainActivity();
-                finish();
-            }
-
-            @Override
-            public void onSuccess() {
-                Log.i(TAG, "set profile success.");
-                ToastUtils.showLong(getString(R.string.app_toast_register_success_and_logging_in));
-                startMainActivity();
-                finish();
-            }
-        });
+        UserModel model = UserModelManager.getInstance().getUserModel();
+        model.userName = userName;
+        model.userAvatar = mAvatarUrl;
+        UserModelManager.getInstance().setUserModel(model);
+        Log.i(TAG, "set profile success.");
+        ToastUtils.showLong(getString(R.string.app_toast_register_success_and_logging_in));
+        startMainActivity();
+        finish();
     }
 
     private void initStatusBar() {

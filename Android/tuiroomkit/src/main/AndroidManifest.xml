@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tencent.cloud.tuikit.roomkit">
+
+    <application>
+        <activity
+            android:name="com.tencent.cloud.tuikit.roomkit.MeetingActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+    </application>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+</manifest>

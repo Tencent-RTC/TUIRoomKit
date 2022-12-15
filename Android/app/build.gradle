@@ -23,5 +23,8 @@ android {
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-    api project(":tuiroom")
+    api project(':basic')
+    api project(':debug')
+    api project(':tuibarrage')
+    api project(':tuiroomkit')
 }

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
+
+    <ImageView
+        android:id="@+id/img_headset"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/tuiroomkit_ic_speaker" />
+
+    <ImageView
+        android:id="@+id/img_camera_switch"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toEndOf="@id/img_headset"
+        android:layout_toRightOf="@id/img_headset"
+        android:src="@drawable/tuiroomkit_ic_camera_switch" />
+
+    <ImageView
+        android:id="@+id/btn_report"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toEndOf="@id/img_camera_switch"
+        android:layout_toRightOf="@id/img_camera_switch"
+        android:src="@drawable/tuiroomkit_ic_report_room"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:paddingEnd="3dp"
+            android:textColor="@color/tuiroomkit_color_white"
+            android:textSize="16sp" />
+
+        <ImageButton
+            android:id="@+id/copy_room_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:background="@null"
+            android:padding="5dp"
+            android:src="@drawable/tuiroomkit_ic_copy_white" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_exit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/tuiroomkit_btn_exit"
+        android:text="@string/tuiroomkit_tv_exit_room"
+        android:textColor="@color/tuiroomkit_color_white"
+        android:textSize="14sp" />
+</RelativeLayout>
