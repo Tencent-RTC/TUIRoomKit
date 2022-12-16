@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Toast_Swift
 import TXAppBasic
 import SnapKit
 import UIKit
@@ -21,8 +20,7 @@ class TRTCRegisterViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        ToastManager.shared.position = .center
+        TUICSToastManager.setDefaultPosition(TUICSToastPositionBottom)
         title = .titleText
         view.addSubview(loading)
         loading.snp.makeConstraints { (make) in
