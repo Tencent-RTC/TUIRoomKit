@@ -1,5 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
+import Home from '@/views/home.vue';
+import Room from '@/views/room.vue';
+
 const routes = [
   {
     path: '/',
@@ -7,11 +10,11 @@ const routes = [
   },
   {
     path: '/home',
-    component: () => import('@/views/home.vue'),
+    component: Home,
   },
   {
     path: '/room',
-    component: () => import('@/views/room.vue'),
+    component: Room,
   },
 ];
 
