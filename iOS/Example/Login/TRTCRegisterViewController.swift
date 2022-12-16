@@ -12,6 +12,7 @@ import TXAppBasic
 import SnapKit
 import UIKit
 import ImSDK_Plus
+import TUICore
 
 class TRTCRegisterViewController: UIViewController {
     
@@ -35,6 +36,10 @@ class TRTCRegisterViewController: UIViewController {
         ProfileManager.shared.synchronizUserInfo()
         ProfileManager.shared.setNickName(name: nickName) { [weak self] in
             guard let `self` = self else { return }
+            let selector = NSSelectorFromString("getSelfUserInfo")
+            if TUILogin.responds(to: selector) {
+                TUILogin.perform(selector)
+            }
             self.registSuccess()
         } failed: { (err) in
             self.loading.stopAnimating()

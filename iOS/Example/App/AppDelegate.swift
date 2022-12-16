@@ -6,12 +6,20 @@
 //
 
 import ImSDK_Plus
-import TUIRoom
+import TUIRoomKit
 import UIKit
 import TUIBeauty
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    var blockRotation = false
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        if blockRotation {
+            return .allButUpsideDown
+        }
+        return .portrait
+    }
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         TUIBeautyView.getBeautyService().setLicenseUrl(XMagicLicenseURL, key: XMagicLicenseKey) { code, msg in
             debugPrint("auth result code:\(code) msg:\(msg)")

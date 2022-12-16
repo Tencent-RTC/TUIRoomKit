@@ -43,9 +43,9 @@ class TRTCRegisterRootView: UIView {
         btn.setTitleColor(.white, for: .normal)
         btn.setTitle(.registText, for: .normal)
         btn.adjustsImageWhenHighlighted = false
-        btn.setBackgroundImage(UIColor(hex: "006EFF")?.trans2Image(), for: .normal)
+        btn.setBackgroundImage(UIColor.tui_color(withHex: "006EFF").trans2Image(), for: .normal)
         btn.titleLabel?.font = UIFont(name: "PingFangSC-Medium", size: 18)
-        btn.layer.shadowColor = UIColor(hex: "006EFF")?.cgColor ?? UIColor.blue.cgColor
+        btn.layer.shadowColor = UIColor.tui_color(withHex: "006EFF").cgColor
         btn.layer.shadowOffset = CGSize(width: 0, height: 6)
         btn.layer.shadowRadius = 16
         btn.layer.shadowOpacity = 0.4
@@ -58,15 +58,20 @@ class TRTCRegisterRootView: UIView {
         let textField = UITextField(frame: .zero)
         textField.backgroundColor = .white
         textField.font = UIFont(name: "PingFangSC-Regular", size: 16)
-        textField.textColor = UIColor(hex: "333333")
-        textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [NSAttributedString.Key.font : UIFont(name: "PingFangSC-Regular", size: 16) ?? UIFont.systemFont(ofSize: 16), NSAttributedString.Key.foregroundColor : UIColor(hex: "BBBBBB") ?? .gray])
+        textField.textColor = UIColor.tui_color(withHex: "333333")
+        textField.attributedPlaceholder = NSAttributedString(string: placeholder,
+                                                             attributes: [NSAttributedString.Key.font:
+                                                                            UIFont(name: "PingFangSC-Regular", size: 16) ??
+                                                                          UIFont.systemFont(ofSize: 16),
+                                                                          NSAttributedString.Key.foregroundColor :
+                                                                            UIColor.tui_color(withHex: "BBBBBB"),])
         textField.delegate = self
         return textField
     }
     
     private func createSpacingLine() -> UIView {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "EEEEEE")
+        view.backgroundColor = UIColor.tui_color(withHex: "EEEEEE")
         return view
     }
     

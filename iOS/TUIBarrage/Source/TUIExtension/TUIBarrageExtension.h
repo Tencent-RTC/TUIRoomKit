@@ -30,6 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
 *
 */
 + (UIButton *)getEnterButton;
+/**
+* 获取实例view
+**@param image view上的图片
+*/
++ (UIButton *)getEnterButton:(UIImage *)image;
 
 @end
 

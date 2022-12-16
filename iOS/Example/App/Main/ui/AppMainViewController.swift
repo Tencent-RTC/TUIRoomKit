@@ -6,20 +6,18 @@
 //
 
 import TUICore
-import TUIRoom
+import TUIRoomKit
 import UIKit
 
 class AppMainViewController: UIViewController {
-    func enterRoom(roomId: String) {
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        TUIRoomKit.setup(sdkAppId: Int(TUILogin.getSdkAppID()), userId: TUILogin.getUserID(), userSig: TUILogin.getUserSig())
         title = .naviTitleText
         navigationController?.navigationBar.barTintColor = .white
         initNavigationItemTitleView()
         let vc = TUIRoomEntranceViewController()
-        // XMagic License [Optional]
         vc.xMagicLicenseURL = XMagicLicenseURL
         vc.xMagicLicenseKey = XMagicLicenseKey
         addChild(vc)

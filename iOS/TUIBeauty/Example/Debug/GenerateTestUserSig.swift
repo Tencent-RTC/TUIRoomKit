@@ -24,7 +24,7 @@ let SDKAPPID: Int = 0;
  *  时间单位：秒
  *  默认时间：7 x 24 x 60 x 60 = 604800 = 7 天
  */
-let EXPIRETIME: Int = 604800;
+let EXPIRETIME: Int = 0;
 
 /**
  * 计算签名用的加密密钥，获取步骤如下：

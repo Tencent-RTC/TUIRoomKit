@@ -26,6 +26,7 @@
     if (self = [super initWithFrame:frame]) {
         self.groupId = groupId;
         [self setupUI];
+        [self activateConstraints];
         [self addObserver];
     }
     return self;
@@ -48,11 +49,12 @@
     [self addSubview:self.barrageSendView];
     self.backgroundColor = [UIColor clearColor];
     self.alpha = 0;
+}
+
+- (void)activateConstraints {
     [self.barrageSendView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.height.equalTo(@(56));
-        make.width.equalTo(self);
-        make.bottom.equalTo(@(56));
-        make.left.equalTo(@(0));
+        make.bottom.leading.width.equalTo(self);
+        make.height.mas_equalTo(56);
     }];
 }
 

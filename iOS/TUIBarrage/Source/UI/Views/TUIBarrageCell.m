@@ -11,6 +11,7 @@
 #import "TUILogin.h"
 #import "TUIBarrageLocalized.h"
 #import "UIColor+TUIHexColor.h"
+#import "Masonry.h"
 
 @interface TUIBarrageCell ()<UITextFieldDelegate>
 @property (nonatomic, strong) TUIBarrageModel *barrage;

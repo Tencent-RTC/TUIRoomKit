@@ -7,12 +7,12 @@
 //
 
 #import "SampleHandler.h"
-#import "replayKitLocalized.h"
+#import "ReplayKitLocalized.h"
 @import TXLiteAVSDK_ReplayKitExt;
-
 #define APPGROUP @"com.tencent.TUIRoomTXReplayKit-Screen"
 
-@interface SampleHandler() <TXReplayKitExtDelegate>
+@protocol TXReplayKitExtDelegate;
+@interface SampleHandler()
 @end
 
 @implementation SampleHandler

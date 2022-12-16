@@ -20,4 +20,15 @@
 "App.PortalViewController.cancel" = "Cancel";
 "App.PortalViewController.determine" = "Yes";
 "Demo.TRTC.Karaoke.roomInfo" = "Room information";
-
+"TUIRoom.create.title" = "Audio/Video Room";
+"TUIRoom.create.room" = "Create Room";
+"TUIRoom.quick.join" = "Join Room";
+"TUIRoom.room.num" = "Room ID";
+"TUIRoom.open.camera" = "Turn camera on";
+"TUIRoom.open.mic" = "Turn mic on";
+"TUIRoom.not.login.toast" = "Please log in.";
+"TUIRoom.input.room.num" = "Enter a room ID";
+"TUIRoom.input.error.room.num.toast" = "Enter a valid room ID.";
+"TUIRoom.logout.room" = "Leave";
+"TUIRoom.user.name" = "Username";
+"TUIRoom.enter.again" = "Reenter";

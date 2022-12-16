@@ -199,6 +199,9 @@
 }
 
 - (void)bindInteraction {
+    [[UIDevice currentDevice]beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(didChangeOrientation:) name:UIDeviceOrientationDidChangeNotification
+                                              object:nil];
     [self.beautyCollectionView registerClass:[TUIBeautyBeautyCell class] forCellWithReuseIdentifier:@"TUIBeautyBeautyCell"];
     [self.beautyTypeCollectionView registerClass:[TUIBeautyBeautyTypeCell class] forCellWithReuseIdentifier:@"TUIBeautyBeautyTypeCell"];
     @weakify(self)
@@ -220,6 +223,13 @@
             }
         }
     };
+}
+
+- (void)didChangeOrientation:(NSNotification*)notification {
+    [self.contentView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.width.equalTo(self);
+    }];
+    [self.contentView roundedRect:UIRectCornerTopLeft | UIRectCornerTopRight withCornerRatio:12];
 }
 
 - (void)setFilterSlider:(float)value item:(TUIBeautyFilterItem *)item {
