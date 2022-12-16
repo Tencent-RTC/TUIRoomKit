@@ -22,7 +22,7 @@ typedef NS_ENUM (NSInteger, TUIBarrageStyle) {
 * @param frame 布局信息
 * @param groupId 群组id
 */
-- (instancetype)initWithFrame:(CGRect)frame groupId:(NSString*)groupId;
+- (instancetype)initWithFrame:(CGRect)frame maxHeight:(CGFloat)maxHeight groupId:(NSString*)groupId;
 /**
 * 展示弹幕消息
 *

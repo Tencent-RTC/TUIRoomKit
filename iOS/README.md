@@ -1,89 +1,80 @@
-# TUIRoom iOS 示例工程快速跑通
+# TUIRoomKit iOS 示例工程快速跑通
+
 _中文 | [English](README.en.md)_
 
-本文档主要介绍如何快速跑通TUIRoom 示例工程，体验多人音视频互动，更详细的TUIRoom组件接入流程，请点击腾讯云官网文档： [**TUIRoom 组件 iOS 接入说明** ](https://cloud.tencent.com/document/product/647/45681)
+本文档主要介绍如何快速跑通TUIRoomKit 示例工程，体验高质量多人视频会议，更详细的TUIRoomKit组件接入流程，请点击腾讯云官网文档： [**TUIRoomKit 组件 iOS 接入说明** ](https://cloud.tencent.com/document/product/647/84237)...
 
+![](https://qcloudimg.tencent-cloud.cn/raw/b847f8497287077db8909503e6880e19.svg)
 
 ## 目录结构
 
 ```
-TUIRoom
-├─ Example              // 工程模块，主要提供 TUIRoom 的测试页面
-├─ Resources            // TUIRoom 中所用的资源文件
-├─ Source               // TUIRoom 组件的逻辑封装
-├─ TUIBeauty            // 美颜功能核心组件
-├─ TXAppBasic           // 工程依赖的基础组件
-└─ TUIRoom.podspec      // TUIRoom 组件 pod 接入文件
-
+TUIRoomKit
+├─ Example                      // 多人视频会议Demo工程
+    ├─ App                      // 进入/创建多人视频会议UI代码以及用到的图片及国际化字符串资源文件夹
+    ├─ Debug                    // 工程调试运行所需的关键业务代码文件夹
+    ├─ Login                    // 登录UI及业务逻辑代码文件夹
+    └─ TXReplayKit_Screen       // 共享屏幕逻辑代码文件夹
+├─ TUIRoomKit                   // 多人视频会议主要UI代码以及所需的图片、国际化字符串资源文件夹
+├─ TUIVideoSeat                 // 多人视频会议展示视频的UI代码文件夹
+├─ TUIBarrage                   // 弹幕组件
+└─ TUIBeauty                    // 美颜组件
 ```
 
 ## 环境准备
-- Xcode 11.0及以上版本
-- 最低支持系统：iOS 11.0
-- 请确保您的项目已设置有效的开发者签名
-  
-## 运行示例
 
+iOS 12.0及更高。
+
+## 运行并体验 App
+
+[](id:ui.step1)
 ### 第一步：创建TRTC的应用
-- 您已 [注册腾讯云](https://cloud.tencent.com/document/product/378/17985) 账号，并完成 [实名认证](https://cloud.tencent.com/document/product/378/3629)。
-  
-### 申请 SDKAPPID 和 SECRETKEY
-1. 登录实时音视频控制台，选择【开发辅助】>【[快速跑通Demo](https://console.cloud.tencent.com/trtc/quickstart)】。
-2. 单击【立即开始】，输入您的应用名称，例如`TestTRTC`，单击【创建应用】。
-<img src="https://main.qcloudimg.com/raw/169391f6711857dca6ed8cfce7b391bd.png" width="650" height="295"/>
-3. 创建应用完成后，单击【我已下载，下一步】，可以查看 SDKAppID 和SECRETKEY。
 
-### 第二步：下载源码，配置工程
+TUIRoomKit 是基于腾讯云 [即时通信 IM](https://cloud.tencent.com/document/product/269/42440) 和 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788) 两项付费 PaaS 服务构建出的音视频通信组件。您可以按照如下步骤开通相关的服务：
 
-1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
-2. 工程默认集成的是`TXLiteAVSDK_TRTC`精简版SDK，您可通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】了解此版本SDK的具体功能。
-3. 通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】去下载TXLiteAVSDK_ReplayKitExt.framework，然后放到SDK目录下
-4. 工程目录下`Example/Podfile`文件内已帮您添加了SDK的依赖`pod 'TXLiteAVSDK_TRTC'`，您只需要打开终端进入到工程目录下执行`pod install`，SDK就会自动集成。
-5. 使用Xcode(11.0及以上)打开源码工程`Example/DemoApp.xcworkspace`。
-6. 工程内找到`Example/Debug/GenerateTestUserSig.swift`文件 。
-7. 设置`GenerateTestUserSig.swift`文件中的相关参数：
+1. 登录到 [即时通信 IM 控制台](https://console.cloud.tencent.com/im)，单击**创建新应用**，在弹出的对话框中输入您的应用名称，并单击**确定**。
 
-<ul>
-<li>SDKAPPID：默认为 0 ，请设置为实际申请的SDKAPPID。</li>
-<li>SECRETKEY：默认为空字符串，请设置为实际申请的SECRETKEY。</li>
-</ul>
-<img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/sdkappid_secretkey_ios.png" width="650" height="295"/>
+![](https://qcloudimg.tencent-cloud.cn/raw/07fa9407da05b76b3dbbd9d2c4714cc8.png)
+2. 单击刚刚创建出的应用，进入基本配置页面，并在页面的右下角找到开通腾讯实时音视频服务功能区，单击立即开通即可开通实时音视频TRTC 的 7 天免费试用服务。如果需要正式应用上线，可以前往[**实时音视频控制台**](https://console.cloud.tencent.com/trtc/app)付费购买正式版本。
 
->!本文提到的生成 UserSig 的方案是在客户端代码中配置 SECRETKEY，该方法中 SECRETKEY 很容易被反编译逆向破解，一旦您的密钥泄露，攻击者就可以盗用您的腾讯云流量，因此**该方法仅适合本地跑通工程和功能调试**。
->正确的 UserSig 签发方式是将 UserSig 的计算代码集成到您的服务端，并提供面向 App 的接口，在需要 UserSig 时由您的 App 向业务服务器发起请求获取动态 UserSig。更多详情请参见 [服务端生成 UserSig](https://cloud.tencent.com/document/product/647/17275#Server)。
+![](https://qcloudimg.tencent-cloud.cn/raw/daa624cbc9c87c787f2afc5b37a8f272.png)
 
+> **友情提示**：
+> 单击 **免费体验** 以后，部分之前使用过 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788) 服务的用户会提示：
+> ```java
+> [-100013]:TRTC service is  suspended. Please check if the package balance is 0 or the Tencent Cloud accountis in arrears
+> ```
+> 因为新的 IM 音视频通话能力是整合了腾讯云 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788) 和 [即时通信 IM](https://cloud.tencent.com/document/product/269/42440) 两个基础的 PaaS 服务，所以当 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788) 的免费额度（10000分钟）已经过期或者耗尽，就会导致开通此项服务失败，这里您可以单击 [TRTC 控制台](https://console.cloud.tencent.com/trtc/app)，找到对应 SDKAppID 的应用管理页，示例如图，开通后付费功能后，再次 **启用应用** 即可正常体验音视频通话能力。
+![](https://qcloudimg.tencent-cloud.cn/raw/559f87a883348cf27cf6ac202f769243.png)
+
+3. 进入应用信息后，按下图操作，记录SDKAppID和密钥：
+
+![](https://qcloudimg.tencent-cloud.cn/raw/ca696884bd53233447b22c730ed82205.png)
+
+[](id:ui.step2)
+### 第二步：配置工程
+1. 使用Xcode(12.0及以上)打开源码工程`DemoApp.xcworkspace`。
+2. 工程内找到 `iOS/Example/Debug/GenerateTestUserSig.swift` 文件。
+3. 设置 `GenerateTestUserSig.swift` 文件中的相关参数：
+<ul style="margin:0"><li/>SDKAPPID：默认为0，请设置为实际的 SDKAppID。
+<li/>SECRETKEY：默认为空字符串，请设置为实际的密钥信息。</ul>
+
+![](https://qcloudimg.tencent-cloud.cn/raw/1c4eb799c7e06aa2da54ece87ccf993e.png)
+
+[](id:ui.step3)
 ### 第三步：编译运行
 
-使用 Xcode（11.0及以上的版本）打开源码工程 `Example/DemoApp.xcworkspace`，单击【运行】即可开始调试本 App。
+1. 打开Terminal（终端）进入到工程目录下执行`pod install`指令，等待完成。
+2. Xcode（12.0及以上的版本）打开源码工程 `TUIRoomKit/iOS/Example/DemoApp.xcworkspace`，单击 **运行** 即可开始调试本 App。
 
-Tips：
+[](id:ui.step4)
 
-TUIRoom 使用体验，至少需要两台设备，如果用户A/B分别代表两台不同的设备：
+>? 如果您在使用过程中，有什么建议或者意见，欢迎您加入我们的 TUIKit 组件交流群 QQ 群：592465424，进行技术交流和产品沟通。
 
-userId字符串类型，长度不超过32字节，不支持使用特殊字符，建议使用英文或数字，可结合业务实际账号体系自行设置
 
-**设备 A（userId：111）**
 
-- 步骤1、在欢迎页，输入用户名(请确保用户名唯一性，不能与其他用户重复)，比如111；
-- 步骤2、点击创建房间；
-- 步骤3、进入到创建房间界面，可以将创建的房间号记录下来；
-- 步骤4、进入房间;
 
-| 步骤1 | 步骤2 | 步骤3 | 步骤4 |
-|---------|---------|---------|---------|
-| <img src="https://liteav.sdk.qcloud.com/doc/res/trtc/picture/zh-cn/user_a.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/85ab7ea0a66aba5b9ddf23594bf04ea0.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/b36383baff761bdaf26da5f191902800.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/5f8b51e76d044c03af9e579a66fcaa1a.png" width="320"/> |
 
-**设备 B（userId：222）**
 
-- 步骤1：输入用户名(请确保用户名唯一性，不能与其他用户重复)，比如222；
-- 步骤2、点击“加入房间”，输入用户 A 创建的房间号（设备A第3步记录的房间号），加入房间；
 
-| 步骤1 | 步骤2 |
-|---------|---------|
-|<img src="https://qcloudimg.tencent-cloud.cn/raw/0349a16cf0f442016d1262d602327a67.png" width="320"/>|<img src="https://qcloudimg.tencent-cloud.cn/raw/a5f86a91670b56ed39bb40d6d4ea0d24.png" width="320"/>|
-## 常见问题
 
-- [TUI 场景化解决方案常见问题](https://cloud.tencent.com/developer/article/1952880)
-- 欢迎加入 QQ 群：592465424，进行技术交流和反馈~
-
-    

@@ -11,8 +11,8 @@ Pod::Spec.new do |spec|
   spec.xcconfig     = { 'VALID_ARCHS' => 'armv7 arm64 x86_64' }
 
   spec.dependency 'Masonry'
-  spec.dependency 'TUICore'
   spec.dependency 'SSZipArchive'
+  spec.dependency 'TUICore/ImSDK_Scenario'
   
   spec.requires_arc = true
   spec.static_framework = true
@@ -32,11 +32,11 @@ Pod::Spec.new do |spec|
   spec.default_subspec = 'Default'
 
   spec.subspec 'Default' do |default|
-    default.dependency 'XMagic', '2.4.1.69.2'
+    default.dependency 'XMagic', '2.5.0.250'
   end
   
   spec.subspec 'Smart' do |smart|
-    smart.dependency 'XMagic_Smart', '2.4.1.69.2'
+    smart.dependency 'XMagic_Smart', '2.5.0.250'
   end
   
 end

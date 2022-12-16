@@ -43,7 +43,14 @@
 #pragma mark - TUIExtensionProtocol
 - (NSDictionary *)getExtensionInfo:(NSString *)key param:(nullable NSDictionary *)param {
     if ([key isEqualToString:TUICore_TUIBarrageExtension_GetEnterBtn]) {
-        return @{TUICore_TUIBarrageExtension_GetEnterBtn:[TUIBarrageExtension getEnterButton]};
+        UIImage *image = [UIImage imageNamed:@"barrage_enter_icon" inBundle:TUIBarrageBundle() compatibleWithTraitCollection:nil];
+        if ([param isKindOfClass:[NSDictionary class]]) {
+            UIImage *resId = param[@"icon"];
+            if ([resId isKindOfClass:[UIImage class]]) {
+                image = resId;
+            }
+        }
+        return @{TUICore_TUIBarrageExtension_GetEnterBtn:[TUIBarrageExtension getEnterButton: image]};
     } else if ([key isEqualToString:TUICore_TUIBarrageExtension_GetTUIBarrageSendView]) {
         if ([param isKindOfClass:[NSDictionary class]]) {
             NSString *frameStr = param[@"frame"];
@@ -62,12 +69,17 @@
         if ([param isKindOfClass:[NSDictionary class]]) {
             NSString *frameStr = param[@"frame"];
             NSString *groupId = param[@"groupId"];
+            NSString *maxHeightStr = param[@"maxHeight"];
             CGRect frame = CGRectZero;
+            CGFloat maxHeight = 0;
             if ([frameStr isKindOfClass:[NSString class]]) {
                 frame = CGRectFromString(frameStr);
             }
+            if ([maxHeightStr isKindOfClass:[NSString class]]) {
+                maxHeight = [maxHeightStr floatValue];
+            }
             if ([groupId isKindOfClass:[NSString class]]) {
-                TUIBarrageDisplayView *displayView = [[TUIBarrageDisplayView alloc]initWithFrame:frame groupId:groupId];
+                TUIBarrageDisplayView *displayView = [[TUIBarrageDisplayView alloc]initWithFrame:frame maxHeight:maxHeight groupId:groupId];
                 displayView.backgroundColor = [UIColor clearColor];
                 [TUIBarrageExtension setDisplayViewByGroupId:displayView groupId:groupId];
                 return @{TUICore_TUIBarrageExtension_TUIBarrageDisplayView:displayView};
@@ -90,6 +102,13 @@
 + (UIButton *)getEnterButton {
     UIButton *enterButton = [[UIButton alloc] init];
     [enterButton setImage:[UIImage imageNamed:@"barrage_enter_icon" inBundle:TUIBarrageBundle() compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+    [enterButton sizeToFit];
+    return enterButton;
+}
+
++ (UIButton *)getEnterButton:(UIImage *)image {
+    UIButton *enterButton = [[UIButton alloc] init];
+    [enterButton setImage:image forState:UIControlStateNormal];
     [enterButton sizeToFit];
     return enterButton;
 }

@@ -15,7 +15,7 @@
 
 @implementation TUIBarrageDisplayBaseView
 
-- (instancetype)initWithFrame:(CGRect)frame groupId:(NSString*)groupId {
+- (instancetype)initWithFrame:(CGRect)frame maxHeight:(CGFloat)maxHeight groupId:(NSString*)groupId {
     if (self = [super initWithFrame:frame]) {
         self.groupId = groupId;
         [self addObserver];

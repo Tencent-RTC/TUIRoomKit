@@ -42,7 +42,8 @@ class AppTUIBarrageShowViewController: UIViewController {
         self.view.addSubview(roomIdLabel)
         giftButton = TUIBarrageExtension.getEnterButton()
         barrageSendView = TUIBarrageSendPlugView.init(frame: self.view.frame, groupId: roomId)
-        barragePlayView = TUIBarrageDisplayView.init(frame: self.view.frame, groupId: roomId)
+        let frame = CGRect(x: 20, y: self.view.mm_h-300-120, width: self.view.mm_w-40, height: 300)
+        barragePlayView = TUIBarrageDisplayView.init(frame: frame, maxHeight: 0, groupId: roomId)
         constructViewHierarchy()
         activateConstraints()
     }
@@ -55,12 +56,6 @@ class AppTUIBarrageShowViewController: UIViewController {
     private func activateConstraints() {
         barrageSendView?.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-        }
-        barragePlayView?.snp.makeConstraints { make in
-            make.width.equalTo(self.view.mm_w-40)
-            make.height.equalTo(300)
-            make.left.equalToSuperview().offset(20)
-            make.top.equalToSuperview().offset(self.view.mm_h-300-120)
         }
         giftButton?.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(20)

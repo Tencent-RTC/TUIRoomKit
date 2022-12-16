@@ -94,7 +94,11 @@ static TUIBeautyService *sharedService = nil;
 
 #pragma mark - TUIBeautyService
 - (void)setLicenseUrl:(NSString *)url key:(NSString *)key completion:(void (^)(NSInteger, NSString * _Nonnull))completion {
-    [TELicenseCheck setTELicense:url key:key completion:completion];
+    if (key && [key isKindOfClass: [NSString class]]) {
+        if (key.length != 0) {
+            [TELicenseCheck setTELicense:url key:key completion:completion];
+        }
+    }
 }
 
 - (int)processVideoFrameWithTextureId:(int)textureId textureWidth:(int)textureWidth textureHeight:(int)textureHeight {
