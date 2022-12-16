@@ -7,7 +7,6 @@ platform :ios, '12.0'
 def ui
   pod 'SnapKit'
   pod 'Kingfisher'
-  pod 'Toast-Swift'
 end
 
 # 工具库

@@ -8,7 +8,6 @@
 
 import Foundation
 import SnapKit
-import Toast_Swift
 import TUICore
 import TXAppBasic
 import UIKit
@@ -121,7 +120,6 @@ public class TUIRoomEntranceViewController: UIViewController {
         view.addSubview(createButton)
         view.addSubview(quickJoinButton)
         view.addSubview(loading)
-        ToastManager.shared.position = .center
     }
 
     func activateConstraints() {

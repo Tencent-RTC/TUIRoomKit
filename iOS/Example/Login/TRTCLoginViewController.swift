@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Toast_Swift
 import WebKit
 import TUICore
 
@@ -23,7 +22,7 @@ class TRTCLoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.barTintColor = .white
-        ToastManager.shared.position = .center
+        TUICSToastManager.setDefaultPosition(TUICSToastPositionBottom)
         view.addSubview(loading)
         loading.snp.makeConstraints { (make) in
             make.width.height.equalTo(40)

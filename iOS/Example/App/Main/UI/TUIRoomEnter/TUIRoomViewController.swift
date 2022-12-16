@@ -157,6 +157,7 @@ class TUIRoomViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true
+        TUICSToastManager.setDefaultPosition(TUICSToastPositionCenter)
         setupUI()
         activateConstraints()
         bindInteraction()
@@ -323,8 +324,7 @@ extension TUIRoomViewController: TUIRoomKitListener {
                 appDelegate.blockRotation = true
             }
         } else {
-            self.view.makeToast(message, duration: 1.0) { (didTap) in
-            }
+            view.makeToast(message, duration: 1.0)
         }
     }
     func onExitRoom(code: TUIError, message: String) {
@@ -333,8 +333,7 @@ extension TUIRoomViewController: TUIRoomKitListener {
                 appDelegate.blockRotation = false
             }
         } else {
-            self.view.makeToast(message, duration: 1.0) { (didTap) in
-            }
+            view.makeToast(message, duration: 1.0)
         }
     }
 }

@@ -18,7 +18,6 @@ Pod::Spec.new do |spec|
   
   spec.dependency 'SnapKit'
   spec.dependency 'Kingfisher'
-  spec.dependency 'Toast-Swift'
   spec.dependency 'TXAppBasic'
   spec.dependency 'TUICore/ImSDK_Scenario'
   
