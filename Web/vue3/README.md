@@ -1,6 +1,6 @@
-# TUIRoom Web 示例工程快速跑通
+# TUIRoomKit Web 示例工程快速跑通
 
-本文档主要介绍如何快速跑通 TUIRoom 示例工程，体验多人音视频互动，更详细的 TUIRoom 组件接入流程，请点击腾讯云官网文档：[TUIRoom 组件 Web 接入说明](https://cloud.tencent.com/document/product/647/81962)...
+本文档主要介绍如何快速跑通 TUIRoomKit 示例工程，体验多人音视频互动，更详细的 TUIRoomKit 组件接入流程，请点击腾讯云官网文档：[TUIRoomKit 组件 Web 接入说明](https://cloud.tencent.com/document/product/647/81962)...
 
 > **限免公测说明：**
 >
@@ -52,7 +52,7 @@
 1. 安装依赖
 
    ```bash
-   cd TUIRoom/Web/vue3
+   cd TUIRoomKit/Web/vue3
    
    npm install
    ```
@@ -70,14 +70,14 @@
    ```
 ### 第四步：示例体验
 
-开发环境运行示例工程后，在浏览器中打开页面 http://localhost:3000/#/home 即可体验 TUIRoom 功能。
+开发环境运行示例工程后，在浏览器中打开页面 http://localhost:3000/#/home 即可体验 TUIRoomKit 功能。
 
-注意：因 TUIRoom 按需引入 element-plus 组件，会导致开发环境路由页面第一次加载时反应较慢，等待 element-plus 按需加载完成即可正常使用。element-plus 按需加载不会影响打包之后的页面加载。
+注意：因 TUIRoomKit 按需引入 element-plus 组件，会导致开发环境路由页面第一次加载时反应较慢，等待 element-plus 按需加载完成即可正常使用。element-plus 按需加载不会影响打包之后的页面加载。
 
 **主持人（userId：anchor）**
 
 - 步骤1、在 home 页面，点击【创建房间】按钮；
-- 步骤2、进入 TUIRoom 房间；
+- 步骤2、进入 TUIRoomKit 房间；
 
 | 步骤1 | 步骤2 |
 |---------|---------|
