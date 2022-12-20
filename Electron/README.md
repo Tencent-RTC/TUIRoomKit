@@ -1,6 +1,6 @@
-# TUIRoom Electron 示例工程快速跑通
+# TUIRoomKit Electron 示例工程快速跑通
 
-本文档主要介绍如何快速跑通 TUIRoom Electron 示例工程，体验多人音视频互动，更详细的 TUIRoom Electron 组件接入流程，请点击腾讯云官网文档：[TUIRoom 组件 Electron 接入说明](https://cloud.tencent.com/document/product/647/84238)...
+本文档主要介绍如何快速跑通 TUIRoomKit Electron 示例工程，体验多人音视频互动，更详细的 TUIRoomKit Electron 组件接入流程，请点击腾讯云官网文档：[TUIRoomKit 组件 Electron 接入说明](https://cloud.tencent.com/document/product/647/84238)...
 
 > **限免公测说明：**
 >
@@ -34,6 +34,7 @@
 |   └── renderer              渲染进程源码
 |       ├── auto-imports.d.ts
 |       ├── components.d.ts
+|       ├── tsconfig.json
 |       ├── index.html
 |       ├── src
 │       |   ├── App.vue   // 示例工程主页面
@@ -69,7 +70,7 @@
 1. 安装依赖
 
    ```bash
-   cd TUIRoom/Electron
+   cd TUIRoomKit/Electron
    
    npm install
    ```
@@ -90,11 +91,11 @@
    > 注意：构建好的安装包位于 release 目录下。只能使用 Mac 电脑构建 Mac 安装包，使用 Windows 电脑构建 Windows 安装包。
 ### 第四步：示例体验
 
-开发环境运行示例工程后，可直接体验 TUIRoom 功能。
+开发环境运行示例工程后，可直接体验 TUIRoomKit 功能。
 
-注意：因 TUIRoom 按需引入 element-plus 组件，会导致开发环境路由页面第一次加载时反应较慢，等待 element-plus 按需加载完成即可正常使用。element-plus 按需加载不会影响打包之后的页面加载。
+注意：因 TUIRoomKit 按需引入 element-plus 组件，会导致开发环境路由页面第一次加载时反应较慢，等待 element-plus 按需加载完成即可正常使用。element-plus 按需加载不会影响打包之后的页面加载。
 
-Tips：TUIRoom 完整功能体验，至少需要两个 userId 不同的用户。需要您在两台设备上参考第二步配置 TUIRoom 示例工程并运行代码：
+Tips：TUIRoomKit 完整功能体验，至少需要两个 userId 不同的用户。需要您在两台设备上参考第二步配置 TUIRoomKit 示例工程并运行代码：
 
 **主持人（userId：anchor）**
 - 步骤1、在 home 页面，点击【创建房间】按钮；

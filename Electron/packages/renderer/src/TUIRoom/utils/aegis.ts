@@ -5,18 +5,14 @@
  * aegisId: aegis Id
  * projectName: 项目名称
  */
-const IS_LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-const IS_OFFICIAL_DEMO = location.host === 'web.sdk.qcloud.com';
 
-const isUploadLoaded = IS_LOCAL || IS_OFFICIAL_DEMO;
-
-const isUploadDetailEvent = IS_OFFICIAL_DEMO;
+const { VITE_RUNTIME_ENV } = import.meta.env;
+const isUploadLoaded = ['github', 'official'].indexOf(VITE_RUNTIME_ENV) !== -1;
+const isUploadDetailEvent = VITE_RUNTIME_ENV === 'official';
 
 let aegis: any;
-const userAgent = navigator.userAgent.toLowerCase();
-const isElectron = userAgent.indexOf(' electron/') > -1;
-const aegisId = isElectron ? 'iHWefAYqFkuzqhhBfh' : 'iHWefAYqtDYnHsxOaR';
-const projectName = isElectron ? 'electronTUIRoom' : 'webTUIRoom';
+const aegisId = 'iHWefAYqooXkVQhcyK';
+const projectName = 'TUIRoomKit-Electron';
 
 class TUIRoomAegis {
   private sdkAppId: number = 0;
@@ -36,7 +32,6 @@ class TUIRoomAegis {
       return;
     }
     const { name: eventName, ext1: eventDesc } = data;
-    // 仅针对官网demo上报详细事件，计算渗透率
     if (this.isUploadDetailEvent || eventName === 'loaded') {
       const uploadData = { ...data, ext2: this.projectName, ext3: this.sdkAppId };
       if (aegis) {
@@ -52,40 +47,17 @@ class TUIRoomAegis {
 }
 
 const roomAegis = new TUIRoomAegis();
-if (isElectron) {
-  aegis = new Aegis({
-    id: aegisId,
-    uin: '',
-    reportApiSpeed: true, // 接口测速
-    reportAssetSpeed: true, // 静态资源测速
-    spa: true, // spa 页面开启
+aegis = new Aegis({
+  id: aegisId,
+  uin: '',
+  reportApiSpeed: true, // 接口测速
+  reportAssetSpeed: true, // 静态资源测速
+  spa: true, // spa 页面开启
+});
+if (roomAegis.storedReportEventList) {
+  roomAegis.storedReportEventList.forEach((data) => {
+    aegis.reportEvent(data);
   });
-  if (roomAegis.storedReportEventList) {
-    roomAegis.storedReportEventList.forEach((data) => {
-      aegis.reportEvent(data);
-    });
-  }
-} else {
-  const script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = 'https://cdn-go.cn/aegis/aegis-sdk/latest/aegis.min.js';
-  document.getElementsByTagName('head')[0].appendChild(script);
-
-  script.onload = () => {
-    // @ts-ignore
-    aegis = new Aegis({
-      id: aegisId,
-      uin: '',
-      reportApiSpeed: true, // 接口测速
-      reportAssetSpeed: true, // 静态资源测速
-      spa: true, // spa 页面开启
-    });
-    if (roomAegis.storedReportEventList) {
-      roomAegis.storedReportEventList.forEach((data) => {
-        aegis.reportEvent(data);
-      });
-    }
-  };
 }
 
 export default roomAegis;
