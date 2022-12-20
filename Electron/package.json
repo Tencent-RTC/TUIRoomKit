@@ -5,7 +5,7 @@
   "author": "",
   "license": "MIT",
   "scripts": {
-    "dev": "node scripts/watch.mjs",
+    "dev": "cross-env VITE_RUNTIME_ENV=github node scripts/watch.mjs",
     "prebuild": "node scripts/build.mjs",
     "build": "electron-builder"
   },
@@ -42,7 +42,7 @@
     "vue"
   ],
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-electron": "0.0.1",
+    "@tencentcloud/tuiroom-engine-electron": "1.0.0",
     "element-plus": "^2.2.22",
     "js-cookie": "^3.0.1",
     "pinia": "^2.0.24",
