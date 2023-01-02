@@ -36,5 +36,6 @@ public class MainActivity extends Activity {
     private void init() {
         final UserModel userModel = UserModelManager.getInstance().getUserModel();
         TUIRoomKit.sharedInstance(this).setup(GenerateTestUserSig.SDKAPPID, userModel.userId, userModel.userSig);
+        V2TIMManager.getInstance().initSDK(this, GenerateTestUserSig.SDKAPPID, null);
     }
 }

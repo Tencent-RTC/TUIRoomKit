@@ -141,6 +141,7 @@ const JS_AI_DATA_REQUIRE_BODY_POINT = "Body_Point";      // 身体点
 const JS_AI_DATA_REQUIRE_CAT_POINT = "Cat_Point";        // 猫脸点
 const JS_AI_DATA_REQUIRE_FACE_CLASSIFY = "Face_Classify";        // 敏感人物检测
 const JS_AI_DATA_REQUIRE_EMOTION_DETECT = "Emotion_Detect";      //  情绪检测
+const JS_AI_DATA_REQUIRE_EMOTION_SCORE_DETECT = "Emotion_Score";      //  情绪打分
 
 // 默认美的EntityId
 const BASIC_BEAUTY_CAMERA = -1024;
@@ -163,13 +164,85 @@ const BASIC_FACIALREFORM_MOUTHSIZE = -1039;
 const BASIC_LIQUIFYV6_ENLARGEYE = -1040;
 const BASIC_FACIALREFORM_THINNOSE = -1041;
 
+
+// copy from studio code: uuid.ts
+function uuid(len, radix) {
+    // 与cms前端保持相同的生成规则
+    const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const uuid = [];
+    let i;
+    radix = radix || chars.length;
+    if (len) {
+        for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random() * radix];
+    } else {
+        let r;
+        uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+        uuid[14] = '4';
+        for (i = 0; i < 36; i++) {
+            if (!uuid[i]) {
+                r = 0 | Math.random() * 16;
+                uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+            }
+        }
+    }
+    return uuid.join('');
+}
+
+const SUPPORT_MULTI_TEMPLATE = false;
+
 // 获取global对象
 var global = global || (function () {
     return this;
 }());
+// 当前运行时的 template 对象
+global._template = {};
+// 存储多个 template 对象，实现多 template 调用
+// 后续使用 template 的判断中，优先判断 _multiTemplateInstanceList 不为空，则运行多 template 逻辑，为空则走原有 template 逻辑
+global._multiTemplateInstanceList = {};
+
+Object.defineProperty(global, 'template', {
+    get() {
+        return this._template;
+    },
+
+    set(value) {
+        this._template = value;
+        if (SUPPORT_MULTI_TEMPLATE) {
+            value._info_ = {
+                // 记录触发加载当前 template 的 script 组件
+                scriptComponent: null,
+                // 记录触发加载当前 template 的 entity id
+                entityIDWithScriptComponent: -1
+            };
+            let template_key = uuid();
+            console.error("global.template set: " + template_key);
+            global._multiTemplateInstanceList[template_key] = value;
+        } else {
+            console.error("global.template disable multi template");
+        }
+    }
+});
+
 
 // 绑定 ai事件 与 额外响应的方法
 function bindCallbackWithAIEvent(f, eventName) {
+
+    // 多 template 逻辑
+    if (Object.keys(global._multiTemplateInstanceList).length) {
+        Object.keys(global._multiTemplateInstanceList).forEach(function (template_key) {
+            let tempTemplate = global._multiTemplateInstanceList[template_key];
+            if (!tempTemplate.mapOfCallbackAndEvent) {
+                tempTemplate.mapOfCallbackAndEvent = {};
+            }
+            if (tempTemplate.mapOfCallbackAndEvent[eventName]) {
+                tempTemplate.mapOfCallbackAndEvent[eventName].push(f);
+            } else {
+                tempTemplate.mapOfCallbackAndEvent[eventName] = [f];
+            }
+        });
+        return;
+    }
+
     // 需要存在template对象
     if (!global.template) {
         return;
@@ -186,11 +259,32 @@ function bindCallbackWithAIEvent(f, eventName) {
 
 // 根据某个事件, 触发注册进来的事件回调
 function TriggerEvent(eventName, params, entityManager, eventManager, currentTime) {
+
+    // 多 template 逻辑，先校验 list 逻辑
+    if (Object.keys(global._multiTemplateInstanceList).length) {
+        Object.keys(global._multiTemplateInstanceList).forEach(function (template_key) {
+            let tempTemplate = global._multiTemplateInstanceList[template_key];
+            if (tempTemplate.mapOfCallbackAndEvent && tempTemplate.mapOfCallbackAndEvent[eventName]) {
+                tempTemplate.mapOfCallbackAndEvent[eventName].forEach(function (callback) {
+                    let tempEntityManagerProxy = _createProxyForEntityManager(entityManager, tempTemplate);
+                    callback(params, tempEntityManagerProxy, eventManager, currentTime);
+                });
+            }
+
+            // 并且老的素材脚本订阅了某个事件
+            if (tempTemplate[eventName]) {
+                let tempEntityManagerProxy = _createProxyForEntityManager(entityManager, tempTemplate);
+                tempTemplate[eventName](params, tempEntityManagerProxy, eventManager, currentTime);
+            }
+        });
+        return;
+    }
+
     if (!global.template) {
         // console.log("js log: has no global.template when TriggerEvent(" + eventName + ", " + JSON.stringify(params) + ")");
         return;
     }
-    // console.log("js log: TriggerEvent(" + eventName + ", " + JSON.stringify(params) + ")");
+     // console.log("js log: TriggerEvent(" + eventName + ", " + JSON.stringify(params) + ")");
     // 如果有触发绑定的, 则直接
     if (global.template.mapOfCallbackAndEvent && global.template.mapOfCallbackAndEvent[eventName]) {
         global.template.mapOfCallbackAndEvent[eventName].forEach(function (callback) {
@@ -252,7 +346,7 @@ function GetAIClassDataThenFlushToJS(entityManager, eventManager, currentTime, s
                 let value = JSON.parse(eventList.get(key));
                 TriggerEvent(key, value, entityManager, eventManager, currentTime);
             }
-        }else if (aiKey == JS_AI_DATA_REQUIRE_GENDER) {
+        } else if (aiKey == JS_AI_DATA_REQUIRE_GENDER) {
             /*
                 GENDER有一段特殊逻辑需要处理，为了兼容素材里的美妆
              */
@@ -286,7 +380,16 @@ light.configure = function (entityManager, eventManager, scriptSystem) {
         let inputSources = JSON.parse(inputSourcesString);
         for ([sticker, content] of Object.entries(global.resourcePool)) {
             for ([key, info] of Object.entries(inputSources)) {
-                if (info.path === content.path) {
+                if (info.path === undefined) {
+                    // 后编辑嵌套模版下，会添加SubAsset_RenderTaget到inputsources，没有定义path字段
+                    continue;
+                } else if (info.path === content.path) {
+                    content.key = info.key;
+                    break;
+                } else if (info.path.lastIndexOf(content.path)!= -1 &&
+                    info.path.length == content.path.length + info.path.lastIndexOf(content.path)) {
+                    // 绝对路径下字符串匹配，解决经过Android cut后资源路径变化
+                    // 绝对路径下包含文件名，且文件名+绝对路径根目录的路径长度与绝对路径长度一致
                     content.key = info.key;
                     break;
                 }
@@ -294,8 +397,29 @@ light.configure = function (entityManager, eventManager, scriptSystem) {
         }
     }
 
+    // 多 template 逻辑
     // 触发老素材的onTemplateInit事件
-    if (global.template) {
+    if (Object.keys(global._multiTemplateInstanceList).length) {
+        Object.keys(global._multiTemplateInstanceList).forEach(function (template_key) {
+
+            let tempTemplate = global._multiTemplateInstanceList[template_key];
+
+            // bind scriptComponent
+            if (tempTemplate._info_ && !tempTemplate._info_.scriptComponent && tempTemplate._info_.entityIDWithScriptComponent >= 0) {
+                let entity = light._entityManager.getEntity(tempTemplate._info_.entityIDWithScriptComponent);
+                if (entity) {
+                    let tempScriptComponent = light._getComponent(entity, "Script");
+                    if (tempScriptComponent) {
+                        tempTemplate._info_.scriptComponent = tempScriptComponent;
+                    }
+                }
+            }
+
+            // onTemplateInit
+            let tempEntityManagerProxy = _createProxyForEntityManager(entityManager, tempTemplate);
+            tempTemplate.onTemplateInit(tempEntityManagerProxy, eventManager);
+        });
+    } else if (global.template) {
         // open ai , get the specified entity or component, set the value
         global.template.onTemplateInit(entityManager, eventManager);
     }
@@ -304,7 +428,7 @@ light.configure = function (entityManager, eventManager, scriptSystem) {
 // 在ScriptSystem.cpp的update函数内会调用该函数
 light.update = function (deltaTime, entityManager, eventManager) {
     // 需要存在template对象
-    if (!global.template) {
+    if (!global.template && !Object.keys(global._multiTemplateInstanceList).length) {
         return;
     }
 
@@ -332,20 +456,45 @@ light.update = function (deltaTime, entityManager, eventManager) {
     }
 }
 
+// 业务侧setAssetData可能传入非json的string，SDK内部拼接了一个key，这里取出来再传给脚本
+function convertEventData(event) {
+    var object = JSON.parse(event.json_data);
+    for (var key in object) {
+        if (object[key].hasOwnProperty("event_json_data_string_key")) {
+            object[key] = object[key]["event_json_data_string_key"];
+        }
+    }
+    return object;
+}
+
 light.receive = function (event) {
     // 需要存在template对象
-    if (!global.template) {
+    if (!global.template && !Object.keys(global._multiTemplateInstanceList).length) {
         return;
     }
     if (event.type() === "CustomDataEvent") {
-        // console.log("js log: receive event '" + event.event_type + "', and param is " + event.json_data);
-        // 兼容老的onMusicData事件
-        if (event.event_type == "RhythmEvent" && global.template && global.template.onMusicData) {
-            global.template.onMusicData(JSON.parse(event.json_data));
-        }
-        // 兼容老的onInputEvent事件
-        if (event.event_type == "UpdateInputEvent" && global.template && global.template.onInputEvent) {
-            global.template.onInputEvent(JSON.parse(event.json_data));
+        // 多 template 逻辑
+        if (Object.keys(global._multiTemplateInstanceList).length) {
+            Object.keys(global._multiTemplateInstanceList).forEach(function (template_key) {
+                let tempTemplate = global._multiTemplateInstanceList[template_key];
+                if (event.event_type == "RhythmEvent" && tempTemplate && tempTemplate.onMusicData) {
+                    tempTemplate.onMusicData(convertEventData(event));
+                }
+                // 兼容老的onInputEvent事件
+                if (event.event_type == "UpdateInputEvent" && tempTemplate && tempTemplate.onInputEvent) {
+                    tempTemplate.onInputEvent(convertEventData(event));
+                }
+            });
+        } else if (global.template) {
+            // console.log("js log: receive event '" + event.event_type + "', and param is " + event.json_data);
+            // 兼容老的onMusicData事件
+            if (event.event_type == "RhythmEvent" && global.template && global.template.onMusicData) {
+                global.template.onMusicData(convertEventData(event));
+            }
+            // 兼容老的onInputEvent事件
+            if (event.event_type == "UpdateInputEvent" && global.template && global.template.onInputEvent) {
+                global.template.onInputEvent(convertEventData(event));
+            }
         }
     }
 }
@@ -452,4 +601,44 @@ function isArrayEqual(list1, list2) {
         }
     }
     return true;
+}
+
+function _createProxyForEntityManager(entityManager, template) {
+    var proxy = new Proxy(entityManager, {
+        get: function(target, property, receiver) {
+            switch(property) {
+                case 'getEntity':
+                    return function() {
+                        console.error("template.engityManager getEntity proxy: " + JSON.stringify(arguments));
+                        if (typeof(arguments["0"]) == 'number') {
+                            let offset_id = (template && template._info_ && template._info_.scriptComponent) ? template._info_.scriptComponent.entityIDOffset : 0;
+                            let old_id = arguments["0"];
+                            let new_id = old_id + offset_id;
+                            arguments["0"] = new_id;
+                            console.error("template.engityManager getEntity proxy run: old_id: " + old_id + " offset_id: " + offset_id + " new_id: " + new_id);
+                        }
+                        return target[property].apply(target, arguments);
+                    }
+                    break
+            }
+            return target[property].bind(target);
+        }
+    });
+    return proxy;
+}
+
+// call by ScriptSystem
+function _bindCurrentTemplateWithScriptEntity_(entityIDWithScriptComponent) {
+    console.error("[_bindCurrentTemplateWithScriptEntity_]: entityIDWithScriptComponent: " + entityIDWithScriptComponent);
+    let tempTemplate = global.template;
+    if (!tempTemplate) {
+        return;
+    }
+    if (!tempTemplate._info_) {
+        return;
+    }
+    if (tempTemplate._info_.entityIDWithScriptComponent >= 0) {
+        return;
+    }
+    tempTemplate._info_.entityIDWithScriptComponent = Number(entityIDWithScriptComponent);
 }

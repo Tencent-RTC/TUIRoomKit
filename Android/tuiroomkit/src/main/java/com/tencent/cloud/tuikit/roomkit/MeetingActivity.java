@@ -45,7 +45,6 @@ public class MeetingActivity extends AppCompatActivity {
         starter.putExtra(KEY_ROOM_ID, roomId);
         starter.putExtra(KEY_OPEN_CAMERA, openCamera);
         starter.putExtra(KEY_OPEN_AUDIO, openAudio);
-        starter.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(starter);
     }
 

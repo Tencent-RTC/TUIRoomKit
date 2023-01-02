@@ -11,11 +11,9 @@ import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomObserver;
 import com.tencent.cloud.tuikit.roomkit.model.TUIRoomKitImpl;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
-import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.liteav.basic.UserModel;
 import com.tencent.liteav.basic.UserModelManager;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
-import com.tencent.liteav.debug.GenerateTestUserSig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +53,7 @@ public class RoomEngineManager extends TUIRoomObserver {
         mListener = listener;
     }
 
-    public void setup(final int sdkAppId, String userId, String userSig) {
+    public void setup(int sdkAppId, String userId, String userSig) {
         Log.i(TAG, "setup sdkAppId: " + sdkAppId + " userSig is empty: "
                 + TextUtils.isEmpty(userSig + " userId: " + userId));
         mSelfUserId = userId;
@@ -64,7 +62,6 @@ public class RoomEngineManager extends TUIRoomObserver {
             public void onSuccess() {
                 Log.i(TAG, "setup success");
                 final UserModel userModel = UserModelManager.getInstance().getUserModel();
-                V2TIMManager.getInstance().initSDK(mContext, sdkAppId, null);
                 TUIRoomEngine.setSelfInfo(userModel.userName, userModel.userAvatar, null);
             }
 
