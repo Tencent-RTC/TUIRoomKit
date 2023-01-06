@@ -1,0 +1,92 @@
+.el-input__inner{
+    height:32px !important;
+    background-color: #2E323D !important;
+    border: 1px solid #2E323D !important;   
+}
+.el-drawer__header{
+    background-color: #1D2029 !important;
+}
+.setting-item{
+    background-color: #1D2029 !important;
+}
+.member-list-header{
+    background-color: #1D2029 !important;
+}
+.member-list-container{
+    background-color: #1D2029 !important;
+}
+.el-switch__core{
+    background-color:#394156 !important;
+    border:1px solid #394156 !important;
+}
+.el-switch.is-checked .el-switch__core{
+    border-color:#006EFF !important;
+    background-color: #006EFF !important;
+}
+.el-drawer__body{
+    background-color: #1D2029 !important;
+}
+.el-select-dropdown{
+    background-color: #1D2029 !important;
+    border: 1px solid #2E323D !important;
+}
+.el-select-dropdown__list{
+    background-color: #2E323D !important;
+}
+.el-select-dropdown__item.hover{
+    background-color:#2E323D !important;
+}
+.popper__arrow::after {
+    border-bottom-color: #2E323D !important;
+}
+.el-dialog__header,.el-dialog__body,.el-dialog__footer{
+    background-color: #1D2029 !important;
+}
+.el-dialog__title{
+    color:#CFD4E6 !important;
+}
+.el-button--default{
+    background-color: #1D2029 !important; 
+    color:#FFFFFF !important;
+}
+.el-popover{
+    background-color: #2E323D !important;
+    border: 1px solid #2E323D !important;
+}
+.popper__arrow::after{
+    border-top-color:#2E323D !important;
+    border-style:solid #2E323D !important;
+}
+.el-input__icon{
+    line-height: 0 !important;
+}
+.popper__arrow{
+    border-top-color:transparent !important;
+    border-bottom-color:transparent !important;
+}
+.el-drawer{
+    background-color: #1D2029 !important;
+}
+.el-select__caret{
+    transform: rotateX(180deg) !important;
+}
+.el-select__caret.is-reverse{
+    transform:rotateZ(0) !important;
+}
+.el-drawer__header{
+    color: #CFD4E6 !important;
+}
+.el-select-dropdown__item.selected *{
+    color:#006EFF !important;
+}
+.el-button--primary {
+    background-color: #006EFF !important;
+    border-color: #006EFF !important;
+}
+.el-checkbox__input.is-checked .el-checkbox__inner {
+    background-color: #006EFF !important;
+    border-color: #006EFF !important;
+}
+.el-checkbox__input.is-checked+.el-checkbox__label {
+    color: #006EFF !important;
+}
