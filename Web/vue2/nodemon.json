@@ -1,0 +1,6 @@
+{
+  "ignore": ["node_modules", "dist"],
+  "exec": "node scripts/copyTUIRoom.js",
+  "watch": ["../tui-room-vue3/src/TUIRoom"],
+  "ext": "ts js vue svg png scss"
+}
