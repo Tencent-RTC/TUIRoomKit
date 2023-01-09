@@ -268,12 +268,14 @@ public class MeetingView extends RelativeLayout implements TopView.OnItemClickLi
         cameraItemData.setSelectItemData(camaraSelectItemData);
         list.add(cameraItemData);
 
-        BottomItemData beautyItemData = new BottomItemData();
-        beautyItemData.setType(BottomItemData.Type.BEAUTY);
-        beautyItemData.setEnable(true);
-        beautyItemData.setIconId(R.drawable.tuiroomkit_ic_beauty);
-        beautyItemData.setView(mPresenter.getBeautyView());
-        list.add(beautyItemData);
+        if (mPresenter.getBeautyView() != null) {
+            BottomItemData beautyItemData = new BottomItemData();
+            beautyItemData.setType(BottomItemData.Type.BEAUTY);
+            beautyItemData.setEnable(true);
+            beautyItemData.setIconId(R.drawable.tuiroomkit_ic_beauty);
+            beautyItemData.setView(mPresenter.getBeautyView());
+            list.add(beautyItemData);
+        }
 
         BottomItemData memberItemData = new BottomItemData();
         memberItemData.setType(BottomItemData.Type.MEMBER_LIST);
@@ -291,12 +293,14 @@ public class MeetingView extends RelativeLayout implements TopView.OnItemClickLi
         });
         list.add(memberItemData);
 
-        BottomItemData barrageItemData = new BottomItemData();
-        barrageItemData.setType(BottomItemData.Type.BARRAGE);
-        barrageItemData.setEnable(true);
-        barrageItemData.setIconId(R.drawable.tuiroomkit_barrage_icon);
-        barrageItemData.setView(mPresenter.getBarrageSendView());
-        list.add(barrageItemData);
+        if (mPresenter.getBarrageSendView() != null) {
+            BottomItemData barrageItemData = new BottomItemData();
+            barrageItemData.setType(BottomItemData.Type.BARRAGE);
+            barrageItemData.setEnable(true);
+            barrageItemData.setIconId(R.drawable.tuiroomkit_barrage_icon);
+            barrageItemData.setView(mPresenter.getBarrageSendView());
+            list.add(barrageItemData);
+        }
 
         BottomItemData extensionItemData = new BottomItemData();
         extensionItemData.setEnable(true);
