@@ -44,7 +44,7 @@ import SvgIcon from '../../common/SvgIcon.vue';
 import { ICON_NAME } from '../../../constants/icon';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useI18n } from '../../../locales';
-import Dialog from '@/TUIRoom/elementComp/Dialog.vue';
+import Dialog from '../../../elementComp/Dialog.vue';
 
 const roomEngine = useGetRoomEngine();
 

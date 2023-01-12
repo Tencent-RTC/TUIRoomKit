@@ -1,5 +1,6 @@
 /*
- * @Description: TUIRoom 应用的基础信息配置
+ * @Description: Basic information configuration for TUIRoomKit applications
+ * @Description: TUIRoomKit 应用的基础信息配置
  */
 
 import LibGenerateTestUserSig from './lib-generate-test-usersig-es.min';
