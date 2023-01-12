@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import MasterApplyControl from './MasterApplyControl.vue';
 import MemberApplyControl from './MemberApplyControl.vue';
-import { useRoomStore } from '@/TUIRoom/stores/room';
+import { useRoomStore } from '../../../stores/room';
 
 const roomStore = useRoomStore();
 

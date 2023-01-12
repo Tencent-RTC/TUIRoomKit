@@ -1,24 +1,7 @@
-/**
- * 需要配置 isUploadLoaded, aegisId, projectName
- * isUploadLoaded: 上传 loaded 事件
- * isUploadDetailEvent: 上传 loaded 及其他操作事件
- * aegisId: aegis Id
- * projectName: 项目名称
- */
-const IS_LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-const IS_OFFICIAL_DEMO = location.host === 'web.sdk.qcloud.com';
 
-const isUploadLoaded = IS_LOCAL || IS_OFFICIAL_DEMO;
-
-const isUploadDetailEvent = IS_OFFICIAL_DEMO;
-
-const aegisId = 'iHWefAYqCFrCVqqyIZ';
-
-const projectName = 'TUIRoomKit-Web';
-
+import { isUploadLoaded, isUploadDetailEvent, aegisId, projectName } from './config';
 
 let aegis: any;
-let Aegis: any;
 
 const script = document.createElement('script');
 script.type = 'text/javascript';
@@ -26,6 +9,7 @@ script.src = 'https://cdn-go.cn/aegis/aegis-sdk/latest/aegis.min.js';
 document.getElementsByTagName('head')[0].appendChild(script);
 
 script.onload = () => {
+  // @ts-ignore
   // eslint-disable-next-line no-undef
   aegis = new Aegis({
     id: aegisId,
