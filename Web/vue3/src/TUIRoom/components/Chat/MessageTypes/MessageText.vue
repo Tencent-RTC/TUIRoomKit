@@ -1,8 +1,10 @@
 <template>
-  <template v-for="(item, index) in handleTextMessageShowContext(props.data)" :key="index">
-    <span v-if="item.name === 'text'" class="text-box">{{ item.text }}</span>
-    <img v-else-if="item.name === 'img'" class="text-img" :src="item.src" />
-  </template>
+  <span>
+    <span v-for="(item, index) in handleTextMessageShowContext(props.data)" :key="index">
+      <span v-if="item.name === 'text'" class="text-box">{{ item.text }}</span>
+      <img v-else-if="item.name === 'img'" class="text-img" :src="item.src" />
+    </span>
+  </span>
 </template>
 
 <script setup lang="ts">

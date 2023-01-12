@@ -12,49 +12,51 @@
   * 在 template 中使用 <audio-control />
 -->
 <template>
-  <div class="video-control-container" @click="emits('click')">
-    <icon-button
-      ref="videoIconButtonRef"
-      :title="t('Camera')"
-      :icon-name="iconName"
-      :has-more="true"
-      :disabled="isLocalVideoIconDisable"
-      @click-icon="toggleMuteVideo"
-      @click-more="handleMore"
-    />
-    <video-setting-tab
-      v-show="showVideoSettingTab"
-      ref="videoSettingRef"
-      class="video-tab"
-    ></video-setting-tab>
-  </div>
-  <el-dialog
-    v-model="showRequestOpenCameraDialog"
-    class="custom-element-class"
-    title="Tips"
-    :modal="false"
-    :show-close="false"
-    :append-to-body="true"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    width="500px"
-  >
-    <span>
-      {{ t('The host invites you to turn on the camera') }}
-    </span>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button type="primary" @click="handleAccept">{{ t('Turn on the camera') }}</el-button>
-        <el-button @click="handleReject">{{ t('Keep it closed') }}</el-button>
+  <div>
+    <div class="video-control-container" @click="emits('click')">
+      <icon-button
+        ref="videoIconButtonRef"
+        :title="t('Camera')"
+        :icon-name="iconName"
+        :has-more="true"
+        :disabled="isLocalVideoIconDisable"
+        @click-icon="toggleMuteVideo"
+        @click-more="handleMore"
+      />
+      <video-setting-tab
+        v-show="showVideoSettingTab"
+        ref="videoSettingRef"
+        class="video-tab"
+      ></video-setting-tab>
+    </div>
+    <el-dialog
+      v-model="showRequestOpenCameraDialog"
+      class="custom-element-class"
+      title="Tips"
+      :modal="false"
+      :show-close="false"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      width="500px"
+    >
+      <span>
+        {{ t('The host invites you to turn on the camera') }}
       </span>
-    </template>
-  </el-dialog>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="handleAccept">{{ t('Turn on the camera') }}</el-button>
+          <el-button @click="handleReject">{{ t('Keep it closed') }}</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, Ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from 'element-plus';
+import { ElMessage } from '../../elementComp';
 
 import IconButton from '../common/IconButton.vue';
 import VideoSettingTab from '../base/VideoSettingTab.vue';
@@ -62,7 +64,7 @@ import VideoSettingTab from '../base/VideoSettingTab.vue';
 import { useRoomStore } from '../../stores/room';
 import { ICON_NAME } from '../../constants/icon';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import TUIRoomEngine, { TUIVideoStreamType, TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';

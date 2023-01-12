@@ -1,36 +1,40 @@
 <template>
-  <div class="apply-control-container">
-    <icon-button
-      :title="iconTitle"
-      :icon-name="iconName"
-      @click-icon="toggleApplySpeech"
-    />
-    <div v-show="showMemberApplyAttention" class="attention member-attention">
-      <span class="info">{{ t('Please raise your hand to apply') }}</span>
-      <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyAttention"></svg-icon>
+  <div>
+    <div class="apply-control-container">
+      <icon-button
+        :title="iconTitle"
+        :icon-name="iconName"
+        @click-icon="toggleApplySpeech"
+      />
+      <div v-show="showMemberApplyAttention" class="attention member-attention">
+        <span class="info">{{ t('Please raise your hand to apply') }}</span>
+        <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyAttention"></svg-icon>
+      </div>
     </div>
-  </div>
-  <el-dialog
-    v-model="showInviteDialog"
-    :title="t('The host invites you to speak on stage')"
-    class="custom-element-class"
-    :modal="false"
-    :show-close="false"
-    :append-to-body="true"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    width="500px"
-  >
-    <span>
-      {{ t('After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?') }}
-    </span>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button type="primary" @click="handleInvite(true)">{{ t('Agree') }}</el-button>
-        <el-button @click="handleInvite(false)">{{ t('Cancel') }}</el-button>
+    <el-dialog
+      v-model="showInviteDialog"
+      :title="t('The host invites you to speak on stage')"
+      class="custom-element-class"
+      :modal="false"
+      :show-close="false"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      width="500px"
+    >
+      <span>
+        {{
+          t('After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?')
+        }}
       </span>
-    </template>
-  </el-dialog>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="handleInvite(true)">{{ t('Agree') }}</el-button>
+          <el-button @click="handleInvite(false)">{{ t('Cancel') }}</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -38,11 +42,11 @@ import { ref, Ref, watch, onBeforeUnmount } from 'vue';
 import { ICON_NAME } from '../../../constants/icon';
 import IconButton from '../../common/IconButton.vue';
 import SvgIcon from '../../common/SvgIcon.vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage } from '../../../elementComp';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../../locales';
 import { storeToRefs } from 'pinia';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-js';
@@ -284,7 +288,7 @@ onBeforeUnmount(() => {
   .member-attention {
     padding: 7px 12px;
     .info {
-      width: 196px;
+      width: 210px;
       height: 20px;
       font-weight: 400;
       font-size: 14px;

@@ -6,7 +6,7 @@
         :user-id="userId"
         :user-name="userName"
         :avatar-url="avatarUrl"
-        @log-out="$emit('logOut')"
+        @log-out="$emit('log-out')"
       ></user-info>
       <language class="header-item language"></language>
     </div>
@@ -36,7 +36,7 @@ const basicStore = useBasicStore();
 
 const { userId, userName, avatarUrl } = storeToRefs(basicStore);
 
-defineEmits(['logOut']);
+defineEmits(['log-out']);
 
 </script>
 

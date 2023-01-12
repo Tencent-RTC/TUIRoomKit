@@ -46,15 +46,15 @@ import TUIRoomAegis from '../../utils/aegis';
 
 const roomStore = useRoomStore();
 
-const emit = defineEmits(['onDestroyRoom', 'onExitRoom']);
+const emit = defineEmits(['on-destroy-room', 'on-exit-room']);
 
 const onDestroyRoom = (info: { code: number; message: string }) => {
-  emit('onDestroyRoom', info);
+  emit('on-destroy-room', info);
   TUIRoomAegis.reportEvent({ name: 'destroyRoom', ext1: 'destroyRoom-success' });
 };
 
 const onExitRoom = (info: { code: number; message: string }) => {
-  emit('onExitRoom', info);
+  emit('on-exit-room', info);
   TUIRoomAegis.reportEvent({ name: 'exitRoom', ext1: 'exitRoom-success' });
 };
 

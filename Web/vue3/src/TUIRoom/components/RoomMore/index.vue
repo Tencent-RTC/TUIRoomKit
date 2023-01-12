@@ -21,8 +21,8 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from 'element-plus';
-import { useI18n } from 'vue-i18n';
+import { ElMessage } from '../../elementComp';
+import { useI18n } from '../../locales';
 import SvgIcon from '../common/SvgIcon.vue';
 
 const { t } = useI18n();

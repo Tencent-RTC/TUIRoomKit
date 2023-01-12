@@ -5,15 +5,14 @@
       :disabled="screenShareDisabled"
       :title="title"
       :icon-name="iconName"
-      @click="toggleScreenShare"
+      @click-icon="toggleScreenShare"
     />
     <div v-if="showStopShareRegion" class="stop-share-region" @click="openStopConfirmDialog">
       <svg-icon class="stop-share-icon" :icon-name="ICON_NAME.ScreenShareStopped" />
       <span>{{ t('End sharing') }}</span>
     </div>
-    <el-dialog
-      v-model="dialogVisible"
-      class="custom-element-class"
+    <Dialog
+      :model-value="dialogVisible"
       width="420px"
       :title="t('Stop sharing?') "
       :modal="true"
@@ -28,14 +27,14 @@
           <el-button type="default" @click="cancelStop">{{ t('Cancel') }}</el-button>
         </span>
       </template>
-    </el-dialog>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, Ref, computed, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from 'element-plus';
+import { ElMessage } from '../../../elementComp';
 import IconButton from '../../common/IconButton.vue';
 import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
@@ -44,7 +43,8 @@ import logger from '../../../utils/common/logger';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ICON_NAME } from '../../../constants/icon';
 import { MESSAGE_DURATION } from '../../../constants/message';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../../locales';
+import Dialog from '../../../elementComp/Dialog.vue';
 
 const roomEngine = useGetRoomEngine();
 

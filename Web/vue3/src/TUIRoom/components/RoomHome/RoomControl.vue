@@ -57,13 +57,13 @@ import logoCn from '../../assets/imgs/logo.png';
 import logoEn from '../../assets/imgs/logo-en.png';
 import SvgIcon from '../common/SvgIcon.vue';
 import i18n from '../../../TUIRoom/locales/index';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 const props = defineProps<{
   givenRoomId: string | null,
 }>();
 
-const hasGivenRoomId = typeof props.givenRoomId === 'string' && props.givenRoomId !== '';
+const hasGivenRoomId = computed(() => (typeof props.givenRoomId === 'string' && props.givenRoomId !== ''));
 
 const logo = computed(() => (i18n.global.locale.value === 'zh-CN' ? logoCn : logoEn));
 
@@ -84,21 +84,21 @@ watch(roomId, (val) => {
   roomId.value = val.replace(/[^\d]/g, '');
 });
 
-const emit = defineEmits(['createRoom', 'enterRoom']);
+const emit = defineEmits(['create-room', 'enter-room']);
 
 function enterGivenRoom() {
-  emit('enterRoom', props.givenRoomId);
+  emit('enter-room', props.givenRoomId);
 }
 
 function createRoom(mode: string) {
-  emit('createRoom', mode);
+  emit('create-room', mode);
 }
 
 function enterRoom() {
   if (!roomId.value) {
     return;
   }
-  emit('enterRoom', String(roomId.value));
+  emit('enter-room', String(roomId.value));
 }
 
 </script>

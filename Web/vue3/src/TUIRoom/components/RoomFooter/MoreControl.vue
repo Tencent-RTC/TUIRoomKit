@@ -14,7 +14,7 @@ import { ICON_NAME } from '../../constants/icon';
 import { computed } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 const { t } = useI18n();
 

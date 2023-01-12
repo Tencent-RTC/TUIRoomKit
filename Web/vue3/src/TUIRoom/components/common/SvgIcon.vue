@@ -9,7 +9,7 @@
   * 在 template 中使用 <svg-icon icon-name="star"/>
 -->
 <template>
-  <div :class="svgClass"></div>
+  <div :class="svgClass" @click="handleClick"></div>
 </template>
 
 <script setup lang="ts">
@@ -21,12 +21,17 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits(['click']);
 const svgName = computed((): string => `${props.iconName}`);
 const svgClass = computed((): string => {
   const validate = props.size && ['large', 'medium', 'small'].includes(props.size);
   const size = validate ? props.size : 'large';
   return `svg-icon ${size}-icon ${svgName.value}`;
 });
+
+function handleClick(event: Event) {
+  emit('click', event);
+}
 </script>
 
 <style lang="scss" scoped>

@@ -5,16 +5,16 @@
       <svg-icon icon-name="verify-code" size="medium"></svg-icon>
     </div>
     <span v-if="verifyStates.countdown <= 0" class="text send-btn" @click="sendVerifyCode">{{ t('SEND') }}</span>
-    <span v-else class="text static"> {{ t('') }} {{ `${verifyStates.countdown} s` }}</span>
+    <span v-else class="text static"> {{ t(' ') }} {{ `${verifyStates.countdown} s` }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 const { t } = useI18n();
-const emit = defineEmits(['updateVerifyCode', 'sendVerifyCode']);
+const emit = defineEmits(['update-verify-code', 'send-verify-code']);
 interface VerifyStates{
   countdown: number,
   timer: number,
@@ -32,7 +32,7 @@ watch(() => verifyStates.verifyCode, (val) => {
    *
    * 获取到验证码
   **/
-  emit('updateVerifyCode', verifyStates.verifyCode);
+  emit('update-verify-code', verifyStates.verifyCode);
 });
 function startCountDown() {
   verifyStates.countdown = 60;
@@ -44,7 +44,7 @@ function startCountDown() {
   }, 1000);
 }
 function sendVerifyCode() {
-  emit('sendVerifyCode');
+  emit('send-verify-code');
 }
 
 function clear() {

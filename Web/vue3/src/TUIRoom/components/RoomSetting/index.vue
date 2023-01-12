@@ -32,7 +32,7 @@ import VideoSettingTab from '../base/VideoSettingTab.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { SettingMode } from '../../constants/render';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 import { computed } from 'vue';
 
 const { t } = useI18n();

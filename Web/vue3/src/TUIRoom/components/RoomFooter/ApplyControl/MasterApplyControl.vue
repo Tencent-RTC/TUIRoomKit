@@ -43,7 +43,7 @@ import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../../locales';
 import defaultAvatar from '../../../assets/imgs/avatar.png';
 
 const { t } = useI18n();

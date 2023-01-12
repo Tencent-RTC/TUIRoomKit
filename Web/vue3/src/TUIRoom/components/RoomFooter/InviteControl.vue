@@ -14,7 +14,7 @@ import IconButton from '../common/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);

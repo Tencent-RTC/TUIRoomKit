@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if="userInfo.userId.indexOf('share_') < 0"
     class="member-item-container"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"

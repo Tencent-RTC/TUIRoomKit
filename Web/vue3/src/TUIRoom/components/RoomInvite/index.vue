@@ -31,10 +31,10 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 import { useBasicStore } from '../../stores/basic';
-import { ElMessage } from 'element-plus';
+import { ElMessage } from '../../elementComp';
 import { storeToRefs } from 'pinia';
 import SvgIcon from '../common/SvgIcon.vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 import { isElectronEnv } from '../../utils/utils';
 

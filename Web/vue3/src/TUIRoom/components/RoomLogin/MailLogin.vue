@@ -10,13 +10,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 const { t } = useI18n();
 
-const emit = defineEmits(['updateMailAddress']);
+const emit = defineEmits(['update-mail-address']);
 const mailAddress = ref('');
 watch(() => mailAddress.value, (val) => {
-  emit('updateMailAddress', val);
+  emit('update-mail-address', val);
 });
 </script>
 

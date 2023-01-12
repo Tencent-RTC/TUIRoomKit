@@ -3,7 +3,7 @@
     <icon-button
       :title="title"
       :icon-name="iconName"
-      @click="toggleScreen"
+      @click-icon="toggleScreen"
     />
   </div>
 </template>
@@ -13,7 +13,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import IconButton from '../common/IconButton.vue';
 import { setFullScreen, exitFullScreen } from '../../utils/utils';
 import { ICON_NAME } from '../../constants/icon';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 const { t } = useI18n();
 
@@ -41,11 +41,15 @@ function handleFullScreenChange() {
 }
 
 onMounted(() => {
-  document.addEventListener('fullscreenchange', handleFullScreenChange);
+  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach((item) => {
+    window.addEventListener(item, handleFullScreenChange);
+  });
 });
 
 onUnmounted(() => {
-  document.removeEventListener('fullscreenchange', handleFullScreenChange);
+  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach((item) => {
+    window.removeEventListener(item, handleFullScreenChange);
+  });
 });
 </script>
 

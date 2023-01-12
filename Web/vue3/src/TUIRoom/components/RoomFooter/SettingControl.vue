@@ -3,7 +3,7 @@
     <icon-button
       :title="t('Settings')"
       :icon-name="iconName"
-      @click="handleShowSettingDialog"
+      @click-icon="handleShowSettingDialog"
     />
   </div>
 </template>
@@ -14,7 +14,7 @@ import IconButton from '../common/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 const { t } = useI18n();
 

@@ -46,15 +46,18 @@ export function throttle(fn: { apply: (arg0: any, arg1: any[]) => void; }, delay
 export function setFullScreen(element: HTMLElement) {
   const fullScreenElement = element as HTMLElement & {
     mozRequestFullScreen(): Promise<void>;
-    webkitRequestFullscreen(): Promise<void>;
     msRequestFullscreen(): Promise<void>;
+    webkitRequestFullScreen(): Promise<void>;
   };
   if (fullScreenElement.requestFullscreen) {
     fullScreenElement.requestFullscreen();
+    // 兼容Firefox
   } else if (fullScreenElement.mozRequestFullScreen) {
     fullScreenElement.mozRequestFullScreen();
-  } else if (fullScreenElement.msRequestFullscreen) {
-    fullScreenElement.msRequestFullscreen();
+    // 兼容 chrome，safari,opera等
+  } else if (fullScreenElement.webkitRequestFullScreen) {
+    fullScreenElement.webkitRequestFullScreen();
+    // 兼容IE/Edge
   } else if (fullScreenElement.msRequestFullscreen) {
     fullScreenElement.msRequestFullscreen();
   }
@@ -66,13 +69,14 @@ export function setFullScreen(element: HTMLElement) {
  * exitFullscreen();
  */
 export function exitFullScreen() {
-  if (!document.fullscreenElement) {
+  if (!document.fullscreenElement
+    && !(document as any).webkitFullscreenElement && !(document as any).mozFullScreenElement) {
     return;
   }
   const exitFullScreenDocument  = document as Document & {
     mozCancelFullScreen(): Promise<void>;
-    webkitExitFullscreen(): Promise<void>;
     msExitFullscreen(): Promise<void>;
+    webkitExitFullscreen(): Promise<void>;
   };
   if (exitFullScreenDocument.exitFullscreen) {
     exitFullScreenDocument.exitFullscreen();

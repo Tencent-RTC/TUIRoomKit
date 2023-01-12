@@ -51,7 +51,7 @@ import { useRoomStore } from '../../stores/room';
 import { useBasicStore } from '../../stores/basic';
 import { ICON_NAME } from '../../constants/icon';
 import MemberItem from './MemberItem/index.vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 const roomEngine = useGetRoomEngine();
 

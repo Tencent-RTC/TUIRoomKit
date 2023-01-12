@@ -1,5 +1,10 @@
 <template>
-  <div v-if="playRegionDomId !== enlargeDomId" ref="streamRegionRef" class="user-stream-container">
+  <div
+    v-if="playRegionDomId !== enlargeDomId"
+    ref="streamRegionRef"
+    class="user-stream-container"
+    @dblclick="$emit('dblclick')"
+  >
     <div :id="playRegionDomId" class="stream-region"></div>
     <div
       v-if="!stream.hasVideoStream && !stream.hasScreenStream"
@@ -40,11 +45,10 @@ import { useBasicStore } from '../../stores/basic';
 import logger from '../../utils/common/logger';
 import AudioIcon from '../base/AudioIcon.vue';
 import SvgIcon from '../common/SvgIcon.vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 import { TUIVideoStreamType, TRTCVideoStreamType, TRTCVideoFillMode, TRTCVideoMirrorType, TRTCVideoRotation } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
-
-const { VITE_RUNTIME_SCENE } = import.meta.env;
+import { isInnerScene } from '../../utils/constants';
 
 const roomEngine = useGetRoomEngine();
 
@@ -61,6 +65,8 @@ interface Props {
 
 const props = defineProps<Props>();
 
+defineEmits(['dblclick']);
+
 const streamRegionRef = ref();
 const centerUserInfoRef = ref();
 
@@ -74,7 +80,7 @@ const showMasterIcon = computed(() => {
 const isScreenStream = computed(() => props.stream.streamType === TUIVideoStreamType.kScreenStream);
 
 const userInfo = computed(() => {
-  if (VITE_RUNTIME_SCENE === 'inner') {
+  if (isInnerScene) {
     return `${props.stream.userName} | ${props.stream.userId}` || props.stream.userId;
   }
   return props.stream.userName || props.stream.userId;

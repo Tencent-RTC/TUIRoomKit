@@ -35,19 +35,14 @@ import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
 
 const route = useRoute();
 const streamPreviewRef = ref();
-const userName = ref();
-const avatarUrl = ref();
-const userId = ref();
+const userName: Ref<string> = ref('');
+const avatarUrl: Ref<string> = ref('');
+const userId: Ref<string> = ref('');
 const { t } = useI18n();
 const roomEngine = useGetRoomEngine();
 
 const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId : '';
 const givenRoomId: Ref<string> = ref((roomId) as string);
-
-const basicInfo = getBasicInfo();
-userName.value = basicInfo?.userName;
-avatarUrl.value = basicInfo?.avatarUrl;
-userId.value = basicInfo?.userId;
 
 function setTUIRoomData(action: string, mode?: string) {
   const roomParam = streamPreviewRef.value.getRoomParam();
@@ -135,18 +130,24 @@ async function handleLogOut() {
 }
 
 onMounted(async () => {
-  const currentUserInfo = await getBasicInfo();
-  if (currentUserInfo) {
-    sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(currentUserInfo));
-    const { sdkAppId, userId, userSig } = currentUserInfo;
-    /**
-     * TUIRoomCore.checkRoomExistence method can only be used after logging into TUIRoomCore.
-     *
-     * 登录 TUIRoomCore, 只有登录 TUIRoomCore 之后，才可以使用 TUIRoomCore.checkRoomExistence 方法
-    **/
-    await TUIRoomEngine.init({ sdkAppId, userId, userSig });
-    streamPreviewRef.value.startStreamPreview();
+  let currentUserInfo = null;
+  if (sessionStorage.getItem('tuiRoom-userInfo')) {
+    currentUserInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo') as string);
+  } else {
+    currentUserInfo = await getBasicInfo();
+    currentUserInfo && sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(currentUserInfo));
   }
+  userName.value = currentUserInfo?.userName;
+  avatarUrl.value = currentUserInfo?.avatarUrl;
+  userId.value = currentUserInfo?.userId;
+  const { sdkAppId, userSig } = currentUserInfo;
+  /**
+   * TUIRoomCore.checkRoomExistence method can only be used after logging into TUIRoomCore.
+   *
+   * 登录 TUIRoomCore, 只有登录 TUIRoomCore 之后，才可以使用 TUIRoomCore.checkRoomExistence 方法
+  **/
+  await TUIRoomEngine.init({ sdkAppId, userId: userId.value, userSig });
+  streamPreviewRef.value.startStreamPreview();
 });
 
 </script>
