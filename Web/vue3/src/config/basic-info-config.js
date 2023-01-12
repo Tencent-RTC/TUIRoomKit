@@ -1,5 +1,6 @@
 /*
- * @Description: TUIRoom 应用的基础信息配置
+ * @Description: Basic information configuration for TUIRoomKit applications
+ * @Description: TUIRoomKit 应用的基础信息配置
  */
 
 import LibGenerateTestUserSig from './lib-generate-test-usersig-es.min';
@@ -55,11 +56,8 @@ export const EXPIRETIME = 604800;
 
 /**
  * Set user information on the push side
- * Note: The web side screen sharing stream and audio/video stream are two Clients,
- * the screen sharing stream user id is `share_${userId}`
  *
  * 设置推流端用户信息
- * 注意：web端屏幕分享流和音视频流为两个Client, 屏幕分享流用户id为`share_${userId}`
  */
 export const userInfo = {
   // 用户Id

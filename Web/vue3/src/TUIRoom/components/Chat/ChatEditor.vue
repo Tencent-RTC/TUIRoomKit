@@ -22,13 +22,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from 'element-plus';
+import { ElMessage } from '../../elementComp';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { useChatStore } from '../../stores/chat';
 import { useRoomStore } from '../../stores/room';
 import emoji from './EditorTools/emoji.vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 const roomEngine = useGetRoomEngine();
 

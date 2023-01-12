@@ -4,11 +4,11 @@
 import { onBeforeUnmount } from 'vue';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequestAction, TUIRequest, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from './useRoomEngine';
-import { ElMessage } from 'element-plus';
+import { ElMessage } from '../elementComp';
 import { MESSAGE_DURATION } from '../constants/message';
 import { useRoomStore, UserInfo } from '../stores/room';
 import { storeToRefs } from 'pinia';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../locales';
 
 const roomEngine = useGetRoomEngine();
 
@@ -37,7 +37,7 @@ export default function () {
   // 处理用户请求
   async function handleUserApply(applyUserId: string, agree: boolean) {
     // TUIRoomCore.replySpeechApplication(applyUserId, agree);
-    const userInfo = roomStore.remoteUserMap.get(applyUserId);
+    const userInfo = roomStore.remoteUserObj[applyUserId];
     if (userInfo) {
       const requestId = userInfo.applyToAnchorRequestId;
       requestId && await roomEngine.instance?.responseRemoteRequest({

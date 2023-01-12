@@ -50,7 +50,7 @@ import VideoProfile from './VideoProfile.vue';
 import { useBasicStore } from '../../stores/basic';
 import { SettingMode } from '../../constants/render';
 import { isElectronEnv } from '../../utils/utils';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode } from '@tencentcloud/tuiroom-engine-js';

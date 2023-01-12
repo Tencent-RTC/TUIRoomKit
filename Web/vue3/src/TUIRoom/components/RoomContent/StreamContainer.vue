@@ -61,16 +61,14 @@ import { useBasicStore } from '../../stores/basic';
 import { LAYOUT } from '../../constants/render';
 import StreamRegion from './StreamRegion.vue';
 import SvgIcon from '../common/SvgIcon.vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage } from '../../elementComp';
 import { MESSAGE_DURATION } from '../../constants/message';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 import TUIRoomEngine, { TUIChangeReason, TUIRoomEvents, TUIUserInfo, TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
-import { isElectronEnv } from '../../utils/utils';
 
 const roomEngine = useGetRoomEngine();
-const isElectron = isElectronEnv();
 
 const { t } = useI18n();
 
@@ -78,8 +76,8 @@ defineProps<{
   showRoomTool: boolean,
 }>();
 
-const streamStyle: Ref<Record<string, any>> = ref({});
-const enlargedStreamStyle: Ref<Record<string, any>> = ref({});
+const streamStyle: Ref<Record<string, any>> = ref({ width: '0', height: '0' });
+const enlargedStreamStyle: Ref<Record<string, any>> = ref({ width: '0', height: '0' });
 const roomStore = useRoomStore();
 const { streamList, streamNumber, remoteStreamList } = storeToRefs(roomStore);
 const basicStore = useBasicStore();
@@ -238,12 +236,13 @@ async function handleNineEqualPointsLayout() {
 
   enlargeStream.value = null;
 
-  await nextTick();
-
   const number = showStreamList.value.length;
   let width = 0;
   let height = 0;
   const roomContainerElement = document.getElementById('roomContainer');
+  if (!roomContainerElement) {
+    return;
+  }
   let containerWidth = roomContainerElement!.offsetWidth;
   let containerHeight = roomContainerElement!.offsetHeight;
   if (number <= 4) {
@@ -490,7 +489,7 @@ const onUserVideoStateChanged = (eventInfo: {
   // 当远端屏幕分享变化的时候，处理流布局
   if (userId !== basicStore.userId && streamType === TUIVideoStreamType.kScreenStream) {
     if (hasVideo) {
-      enlargeStream.value = roomStore.remoteStreamMap.get(`${userId}_${streamType}`) as StreamInfo;
+      enlargeStream.value = roomStore.remoteStreamObj[`${userId}_${streamType}`] as StreamInfo;
       if (enlargeStream.value) {
         if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
           basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
@@ -574,8 +573,6 @@ watch(isDefaultOpenCamera, async (val) => {
   }
 });
 
-let isFirstOpenMic = true;
-
 watch(isDefaultOpenMicrophone, async (val) => {
   if (val && !isLocalAudioIconDisable.value) {
     /**
@@ -584,21 +581,13 @@ watch(isDefaultOpenMicrophone, async (val) => {
      * 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
     **/
     await roomEngine.instance?.openLocalMicrophone();
-    if (isElectron && isFirstOpenMic) {
-      // hack, fix electron 自由上麦 bug
-      isFirstOpenMic = false;
-      setTimeout(() => {
-        roomEngine.instance?.startPushLocalAudio();
-      }, 1000)
-    } else {
-      await roomEngine.instance?.startPushLocalAudio();
-    }
+    await roomEngine.instance?.startPushLocalAudio();
     const microphoneList = await roomEngine.instance?.getMicDevicesList();
     const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
-    if (!roomStore.currentMicrophoneId) {
+    if (!roomStore.currentMicrophoneId && microphoneList.length > 0) {
       roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
     }
-    if (!roomStore.currentSpeakerId) {
+    if (!roomStore.currentSpeakerId && speakerList.length > 0) {
       roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
     }
     await roomEngine.instance?.setCurrentMicDevice({ deviceId: roomStore.currentMicrophoneId });

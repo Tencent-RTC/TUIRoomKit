@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../../locales';
 
 import { UserInfo, useRoomStore } from '../../../stores/room';
 import { ICON_NAME } from '../../../constants/icon';

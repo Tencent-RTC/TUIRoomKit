@@ -1,5 +1,7 @@
 # TUIRoomKit Web 示例工程快速跑通
 
+_[English](README.EN.md) | 简体中文_
+
 本文档主要介绍如何快速跑通 TUIRoomKit 示例工程，体验多人音视频互动，更详细的 TUIRoomKit 组件接入流程，请点击腾讯云官网文档：[TUIRoomKit 组件 Web 接入说明](https://cloud.tencent.com/document/product/647/81962)...
 
 > **限免公测说明：**

@@ -2,8 +2,8 @@
   <div
     class="emoji-tool"
   >
-    <el-popover
-      v-model:visible="visible"
+    <Popover
+      :visible="visible"
       popper-class="emoji-popover"
       placement="top"
       :width="400"
@@ -12,7 +12,7 @@
     >
       <template #reference>
         <svg-icon
-          v-click-outside="onClickOutside" class="arrow emoji-icon" icon-name="emoji"
+          class="arrow emoji-icon" icon-name="emoji"
           size="medium"
           @click="togglePopover"
         />
@@ -29,31 +29,25 @@
           </div>
         </div>
       </template>
-    </el-popover>
+    </Popover>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ClickOutside as vClickOutside } from 'element-plus';
 import { emojiUrl, emojiMap, emojiList } from '../util';
 import SvgIcon from '../../common/SvgIcon.vue';
+import Popover from '../../../elementComp/Popover.vue';
 
 const visible = ref(false);
 
-const emit = defineEmits(['chooseEmoji']);
+const emit = defineEmits(['choose-emoji']);
 const chooseEmoji = (itemName: string) => {
   const emojiInfo = itemName;
   closePopover();
-  emit('chooseEmoji', emojiInfo);
+  emit('choose-emoji', emojiInfo);
 };
 
-const onClickOutside = (e: Event) => {
-  const emojiPopover = (e.target as HTMLElement).closest('.emoji-popover');
-  if (!emojiPopover) {
-    closePopover();
-  }
-};
 const togglePopover = () => {
   visible.value = !visible.value;
 };

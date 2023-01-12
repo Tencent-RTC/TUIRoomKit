@@ -26,7 +26,7 @@ import { useBasicStore } from '../../stores/basic';
 import { useChatStore } from '../../stores/chat';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 const { t } = useI18n();
 

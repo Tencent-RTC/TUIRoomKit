@@ -77,6 +77,8 @@ const showAudioLevel = computed(() => {
 
   .audio-icon {
     position: absolute;
+    top: 0;
+    left: 0;
   }
 }
 

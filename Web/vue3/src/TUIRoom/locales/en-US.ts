@@ -11,6 +11,7 @@ export default {
   'Verification code': 'Verification code',
   'Email address': 'Email address',
   SEND: 'SEND',
+  ' ': ' ',
   'The room does not exist, please confirm the room number or create a room!': 'The room does not exist, please confirm the room number or create a room!',
   'Log out': 'Log out',
   'Edit profile': 'Edit profile',

@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
-import { TUIRole, TUIVideoStreamType, TUIRoomInfo, TUIUserInfo, TUIVideoProfile } from '@tencentcloud/tuiroom-engine-js';
+import { TUIRole, TUIVideoStreamType, TUIRoomInfo, TUIUserInfo, TUIVideoProfile, TUISeatInfo } from '@tencentcloud/tuiroom-engine-js';
 import { useBasicStore } from './basic';
+import { isVue3 } from '../utils/constants';
+import Vue from '../utils/vue';
 
 export type StreamInfo = {
   userId: string,
@@ -21,6 +23,7 @@ export type UserInfo = {
   hasVideoStream?: boolean,
   hasScreenStream?: boolean,
   userRole?: TUIRole,
+  // 是否在麦上
   onSeat?: boolean,
   isChatMutedByMaster?: boolean,
   // 是否正在请求用户打开麦克风
@@ -48,7 +51,7 @@ export type UserInfo = {
 
 interface RoomState {
   localUser: UserInfo,
-  remoteUserMap: Map<string, UserInfo>
+  remoteUserObj: Record<string, UserInfo>,
   isDefaultOpenCamera: boolean,
   isDefaultOpenMicrophone: boolean,
   // 主持人全员禁麦，但是单独取消某个用户音视频禁止状态的时候，是可以自己 unmute audio/video 的
@@ -77,16 +80,27 @@ export const useRoomStore = defineStore('room', {
       hasAudioStream: false,
       hasVideoStream: false,
       hasScreenStream: false,
+      userRole: TUIRole.kGeneralUser,
+      audioVolume: 0,
+      onSeat: false,
       cameraStreamInfo: {
         userId: '',
+        userName: '',
+        avatarUrl: '',
+        audioVolume: 0,
+        hasAudioStream: false,
+        hasVideoStream: false,
         streamType: TUIVideoStreamType.kCameraStream,
       },
       screenStreamInfo: {
         userId: '',
+        userName: '',
+        avatarUrl: '',
+        hasScreenStream: false,
         streamType: TUIVideoStreamType.kScreenStream,
       },
     },
-    remoteUserMap: new Map(),
+    remoteUserObj: {},
     isDefaultOpenCamera: false,
     isDefaultOpenMicrophone: false,
     canControlSelfAudio: true,
@@ -133,20 +147,15 @@ export const useRoomStore = defineStore('room', {
     },
     localStream: (state) => {
       const { userId, userName, avatarUrl, hasAudioStream, hasVideoStream, audioVolume } = state.localUser;
-      Object.assign(state.localUser.cameraStreamInfo, {
-        userId,
-        userName,
-        avatarUrl,
-        hasAudioStream,
-        hasVideoStream,
-        audioVolume,
-        streamType: TUIVideoStreamType.kCameraStream,
-      });
+      Object.assign(
+        state.localUser.cameraStreamInfo,
+        { userId, userName, avatarUrl, hasAudioStream, hasVideoStream, audioVolume },
+      );
       return state.localUser.cameraStreamInfo;
     },
-    remoteStreamMap: (state) => {
-      const map = new Map();
-      [...state.remoteUserMap.values()].forEach((userInfo) => {
+    remoteStreamObj: (state) => {
+      const obj: Record<string, StreamInfo> = {};
+      [...Object.values(state.remoteUserObj)].forEach((userInfo) => {
         const {
           userId,
           avatarUrl,
@@ -156,38 +165,36 @@ export const useRoomStore = defineStore('room', {
           hasVideoStream,
           hasScreenStream,
           audioVolume,
-          cameraStreamInfo,
-          screenStreamInfo,
         } = userInfo;
         if (onSeat) {
-          map.set(`${userId}_${TUIVideoStreamType.kCameraStream}`, Object.assign(cameraStreamInfo, { userId, avatarUrl, userName, hasAudioStream, hasVideoStream, audioVolume, streamType: TUIVideoStreamType.kCameraStream }));
+          obj[`${userId}_${TUIVideoStreamType.kCameraStream}`] = Object.assign(userInfo.cameraStreamInfo, { userId, avatarUrl, userName, hasAudioStream, hasVideoStream, audioVolume, streamType: TUIVideoStreamType.kCameraStream });
         }
         if (hasScreenStream) {
-          map.set(`${userId}_${TUIVideoStreamType.kScreenStream}`, Object.assign(screenStreamInfo, { userId, avatarUrl, userName, hasScreenStream, streamType: TUIVideoStreamType.kScreenStream }));
+          obj[`${userId}_${TUIVideoStreamType.kScreenStream}`] = Object.assign(userInfo.screenStreamInfo, { userId, avatarUrl, userName, hasScreenStream, streamType: TUIVideoStreamType.kScreenStream });
         }
       });
-      return map;
+      return obj;
     },
     remoteStreamList(): Array<StreamInfo> {
-      return [...this.remoteStreamMap.values()];
+      return [...Object.values(this.remoteStreamObj)];
     },
     streamList(): Array<StreamInfo> {
-      return [this.localStream, ...this.remoteStreamMap.values()];
+      return [this.localStream, ...Object.values(this.remoteStreamObj)];
     },
     streamNumber(): number {
       return this.streamList.length;
     },
-    remoteAnchorList: state => [...state.remoteUserMap.values()].filter(item => item.onSeat),
-    userList: state => [state.localUser, ...state.remoteUserMap.values()],
+    remoteAnchorList: state => [...Object.values(state.remoteUserObj)].filter(item => item.onSeat),
+    userList: state => [state.localUser, ...Object.values(state.remoteUserObj)],
     userNumber(): number {
       return this.userList.length;
     },
-    applyToAnchorList: state => [...state.remoteUserMap.values()].filter(item => item.isUserApplyingToAnchor) || [],
+    applyToAnchorList: state => [...Object.values(state.remoteUserObj)]
+      .filter(item => item.isUserApplyingToAnchor) || [],
   },
   actions: {
     setLocalUser(obj: Record<string, any>) {
       Object.assign(this.localUser, obj);
-      // Object.assign(this.localStream, obj);
     },
     updateLocalStream(obj: Record<string, any>) {
       Object.assign(this.localStream, obj);
@@ -196,37 +203,62 @@ export const useRoomStore = defineStore('room', {
       if (userId === this.localUser.userId) {
         return this.localUser.userName;
       }
-      return this.remoteUserMap.get(userId)?.userName;
+      return this.remoteUserObj[userId]?.userName;
+    },
+    getNewUserInfo(userId: string) {
+      const newUserInfo = {
+        userId,
+        userName: '',
+        avatarUrl: '',
+        hasAudioStream: false,
+        hasVideoStream: false,
+        hasScreenStream: false,
+        userRole: TUIRole.kGeneralUser,
+        audioVolume: 0,
+        onSeat: false,
+        cameraStreamInfo: {
+          userId,
+          userName: '',
+          avatarUrl: '',
+          audioVolume: 0,
+          hasAudioStream: false,
+          hasVideoStream: false,
+          streamType: TUIVideoStreamType.kCameraStream,
+        },
+        screenStreamInfo: {
+          userId,
+          userName: '',
+          avatarUrl: '',
+          hasScreenStream: false,
+          streamType: TUIVideoStreamType.kScreenStream,
+        },
+      };
+      // 本端为主持人，则记录用户禁言禁画, 申请发言等信息
+      if (this.isMaster) {
+        Object.assign(newUserInfo, {
+          isChatMutedByMaster: false,
+          isUserApplyingToAnchor: false,
+          isInvitingUserToAnchor: false,
+        });
+      }
+      return newUserInfo;
     },
     setUserList(userList: any[]) {
       userList.forEach((user) => {
-        Object.assign(user, {
-          onSeat: false,
-          cameraStreamInfo: {
-            userId: user.userId,
-            streamType: TUIVideoStreamType.kCameraStream,
-          },
-          screenStreamInfo: {
-            userId: user.userId,
-            streamType: TUIVideoStreamType.kScreenStream,
-          },
-        });
-        // 本端为主持人，则记录用户禁言禁画, 申请发言等信息
-        if (this.isMaster) {
-          Object.assign(user, {
-            isChatMutedByMaster: false,
-            isUserApplyingToAnchor: false,
-            isInvitingUserToAnchor: false,
-          });
-        }
         if (user.userId === this.localUser.userId) {
-          this.localUser = Object.assign(user, this.localUser);
+          Object.assign(this.localUser, user);
+          return;
+        }
+        if (this.remoteUserObj[user.userId]) {
+          Object.assign(this.remoteUserObj[user.userId], user);
         } else {
-          const currentUserInfo = this.remoteUserMap.get(user.userId);
-          this.remoteUserMap.set(
-            user.userId,
-            Object.assign(user, currentUserInfo),
-          );
+          const newUserInfo = Object.assign(this.getNewUserInfo(user.userId), user);
+          if (isVue3) {
+            this.remoteUserObj[user.userId] = newUserInfo;
+          } else {
+            // @ts-ignore
+            Vue.set(this.remoteUserObj, user.userId, newUserInfo);
+          }
         }
       });
     },
@@ -234,33 +266,23 @@ export const useRoomStore = defineStore('room', {
     addRemoteUser(userInfo: TUIUserInfo) {
       const { userId } = userInfo;
       const basicStore = useBasicStore();
-      if (!userId || userId === basicStore.userId || userId === `share_${basicStore.userId}`) {
+      if (!userId || userId === basicStore.userId) {
         return;
       }
-      // todo: 确认 electron 端要不要放开
-      // if (this.remoteUserMap.get(userId)) {
-      //   // addRemoteUser 会多次触发, 如果已存在时需保留已设置的状态。修复 Electron 端 bug
-      //   newUser = {
-      //     ...userInfo,
-      //     ...this.remoteUserMap.get(userId),
-      //   };
-      // }
-      // 本端为主持人，则记录用户禁言禁画, 申请发言等信息
-      if (this.isMaster) {
-        Object.assign(userInfo, {
-          isChatMutedByMaster: false,
-          isUserApplyingToAnchor: false,
-          isInvitingUserToAnchor: false,
-        });
+      if (this.remoteUserObj[userId]) {
+        Object.assign(this.remoteUserObj[userId], userInfo);
+      } else {
+        const newUserInfo = Object.assign(this.getNewUserInfo(userId), userInfo);
+        if (isVue3) {
+          this.remoteUserObj[userId] = newUserInfo;
+        } else {
+          // @ts-ignore
+          Vue.set(this.remoteUserObj, userId, newUserInfo);
+        }
       }
-      Object.assign(userInfo, {
-        cameraStreamInfo: {},
-        screenStreamInfo: {},
-      });
-      this.remoteUserMap.set(userId, userInfo as UserInfo);
     },
     updateRemoteUser(userId: string, newUserInfo: { nick: string, avatar: string }) {
-      const remoteUser = this.remoteUserMap.get(userId);
+      const remoteUser = this.remoteUserObj[userId];
       if (!remoteUser) {
         return;
       }
@@ -270,51 +292,39 @@ export const useRoomStore = defineStore('room', {
     // 更新 seatList 的变更
     // 进入房间后会立即通知 onSeatListChanged， onUserVideoAvailable，onUserAudioAvailable 事件，因此先更新到 userMap 中
     // 等待 getUserList 获取到全部用户列表后再做更新
-    updateOnSeatList(seatList: any[], usersSeated: any[], usersLeft: any[]) {
-      if (this.remoteUserMap.size === 0) {
+    updateOnSeatList(seatList: TUISeatInfo[], usersSeated: TUISeatInfo[], usersLeft: TUISeatInfo[]) {
+      if (JSON.stringify(this.remoteUserObj) === '{}') {
         seatList.forEach((seat) => {
-          if (seat.userId === this.localUser.userId) {
+          const { userId } = seat;
+          if (userId === this.localUser.userId) {
             Object.assign(this.localUser, { onSeat: true });
           } else {
-            this.remoteUserMap.set(
-              seat.userId,
-              {
-                userId: seat.userId,
-                onSeat: true,
-                cameraStreamInfo: {
-                  userId: seat.userId,
-                  streamType: TUIVideoStreamType.kCameraStream,
-                },
-                screenStreamInfo: {
-                  userId: seat.userId,
-                  streamType: TUIVideoStreamType.kScreenStream,
-                } },
-            );
+            const newUserInfo = Object.assign(this.getNewUserInfo(userId), { onSeat: true });
+            if (isVue3) {
+              this.remoteUserObj[userId] = newUserInfo;
+            } else {
+              // @ts-ignore
+              Vue.set(this.remoteUserObj, userId, newUserInfo);
+            }
           };
         });
       } else {
         usersSeated.forEach((seat) => {
-          if (seat.userId === this.localUser.userId) {
+          const { userId } = seat;
+          if (userId === this.localUser.userId) {
             Object.assign(this.localUser, { onSeat: true });
           } else {
-            const user = this.remoteUserMap.get(seat.userId);
+            const user = this.remoteUserObj[userId];
             if (user) {
               Object.assign(user, { onSeat: true });
             } else {
-              this.remoteUserMap.set(
-                seat.userId,
-                {
-                  userId: seat.userId,
-                  onSeat: true,
-                  cameraStreamInfo: {
-                    userId: seat.userId,
-                    streamType: TUIVideoStreamType.kCameraStream,
-                  },
-                  screenStreamInfo: {
-                    userId: seat.userId,
-                    streamType: TUIVideoStreamType.kScreenStream,
-                  } },
-              );
+              const newUserInfo = Object.assign(this.getNewUserInfo(userId), { onSeat: true });
+              if (isVue3) {
+                this.remoteUserObj[userId] = newUserInfo;
+              } else {
+                // @ts-ignore
+                Vue.set(this.remoteUserObj, userId, newUserInfo);
+              }
             }
           };
         });
@@ -322,66 +332,15 @@ export const useRoomStore = defineStore('room', {
           if (seat.userId === this.localUser.userId) {
             Object.assign(this.localUser, { onSeat: false });
           } else {
-            const user = this.remoteUserMap.get(seat.userId);
+            const user = this.remoteUserObj[seat.userId];
             user && Object.assign(user, { onSeat: false });
           };
         });
       }
     },
-    // updateUserAVAbility(userInfo: {
-    //   userId: string,
-    //   name: string,
-    //   avatar: string,
-    // }, enabled: Boolean) {
-    //   const { userId, name, avatar } = userInfo;
-    //   const basicStore = useBasicStore();
-    //   if (!userId || userId === basicStore.userId || userId === `share_${basicStore.userId}`) {
-    //     return;
-    //   }
-    //   // 处理 Web 端屏幕分享
-    //   if (userInfo.userId.indexOf('share_') === 0) {
-    //     if (!this.remoteUserMap.get(userId.slice(6))) {
-    //       return;
-    //     }
-    //     if (enabled) {
-    //       const newUser = {
-    //         userId,
-    //         userName: name || '',
-    //         avatarUrl: avatar || '',
-    //         role: ETUIRoomRole.ANCHOR,
-    //         mainStreamInfo: {
-    //           isAudioStreamAvailable: false,
-    //           isVideoStreamAvailable: false,
-    //           type: 'main',
-    //         },
-    //         screenStreamInfo: null,
-    //       };
-    //       this.remoteUserMap.set(userId, newUser);
-    //     } else {
-    //       this.remoteUserMap.delete(userId);
-    //     }
-    //   } else {
-    //     const remoteUserInfo = this.remoteUserMap.get(userId);
-    //     if (!remoteUserInfo) {
-    //       return;
-    //     }
-    //     if (enabled) {
-    //       remoteUserInfo.mainStreamInfo = {
-    //         isAudioStreamAvailable: false,
-    //         isVideoStreamAvailable: false,
-    //         audioVolume: 0,
-    //         type: 'main',
-    //       };
-    //       remoteUserInfo.role = ETUIRoomRole.ANCHOR;
-    //     } else {
-    //       remoteUserInfo.mainStreamInfo = null;
-    //       remoteUserInfo.role = ETUIRoomRole.AUDIENCE;
-    //     }
-    //   }
-    // },
     updateUserVideoState(userId: string, streamType: TUIVideoStreamType, hasVideo: boolean) {
       const basicStore = useBasicStore();
-      const user = userId === basicStore.userId ? this.localUser : this.remoteUserMap.get(userId);
+      const user = userId === basicStore.userId ? this.localUser : this.remoteUserObj[userId];
       if (!user) {
         return;
       }
@@ -393,7 +352,7 @@ export const useRoomStore = defineStore('room', {
     },
     updateUserAudioState(userId: string, hasAudio: boolean) {
       const basicStore = useBasicStore();
-      const user = userId === basicStore.userId ? this.localUser : this.remoteUserMap.get(userId);
+      const user = userId === basicStore.userId ? this.localUser : this.remoteUserObj[userId];
       if (!user) {
         return;
       }
@@ -402,10 +361,15 @@ export const useRoomStore = defineStore('room', {
 
     removeRemoteUser(userId: string) {
       const basicStore = useBasicStore();
-      if (!userId || userId === basicStore.userId || userId === `share_${basicStore.userId}`) {
+      if (!userId || userId === basicStore.userId) {
         return;
       }
-      this.remoteUserMap.delete(userId);
+      if (isVue3) {
+        delete this.remoteUserObj[userId];
+      } else {
+        // @ts-ignore
+        Vue.delete(this.remoteUserObj, userId);
+      }
     },
 
     setAudioVolume(audioVolumeArray: []) {
@@ -415,7 +379,7 @@ export const useRoomStore = defineStore('room', {
         if (userId === basicStore.userId || userId === '') {
           this.localUser.audioVolume = volume;
         } else {
-          const remoteUserInfo = this.remoteUserMap.get(userId);
+          const remoteUserInfo = this.remoteUserObj[userId];
           if (remoteUserInfo) {
             remoteUserInfo.audioVolume = volume;
           }
@@ -472,19 +436,19 @@ export const useRoomStore = defineStore('room', {
     },
     setCameraList(deviceList: {deviceId: string, deviceName: string}[]) {
       this.cameraList = deviceList;
-      if (!this.currentCameraId) {
+      if (!this.currentCameraId && deviceList.length > 0) {
         this.setCurrentCameraId(deviceList[0].deviceId);
       }
     },
     setMicrophoneList(deviceList: {deviceId: string, deviceName: string}[]) {
       this.microphoneList = deviceList;
-      if (!this.currentMicrophoneId) {
+      if (!this.currentMicrophoneId && deviceList.length > 0) {
         this.setCurrentMicrophoneId(deviceList[0].deviceId);
       }
     },
     setSpeakerList(deviceList: {deviceId: string, deviceName: string}[]) {
       this.speakerList = deviceList;
-      if (!this.currentSpeakerId) {
+      if (!this.currentSpeakerId && deviceList.length > 0) {
         this.setCurrentSpeakerId(deviceList[0].deviceId);
       }
     },
@@ -498,20 +462,20 @@ export const useRoomStore = defineStore('room', {
     },
     // 主持人单个修改用户的发文字消息 mute 状态
     setMuteUserChat(userId: string, muted: boolean) {
-      const remoteUserInfo = this.remoteUserMap.get(userId);
+      const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isChatMutedByMaster = muted;
       }
     },
     setRemoteUserRole(userId: string, role: TUIRole) {
-      const remoteUserInfo = this.remoteUserMap.get(userId);
+      const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.userRole = role;
       }
     },
     setRequestUserOpenMic(options: { userId: string, isRequesting: boolean, requestId?: number }) {
       const { userId, isRequesting, requestId } = options;
-      const remoteUserInfo = this.remoteUserMap.get(userId);
+      const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isRequestingUserOpenMic = isRequesting;
         remoteUserInfo.requestUserOpenMicRequestId = isRequesting ? requestId : 0;
@@ -519,7 +483,7 @@ export const useRoomStore = defineStore('room', {
     },
     setRequestUserOpenCamera(options: { userId: string, isRequesting: boolean, requestId?: number }) {
       const { userId, isRequesting, requestId } = options;
-      const remoteUserInfo = this.remoteUserMap.get(userId);
+      const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isRequestingUserOpenCamera = isRequesting;
         remoteUserInfo.requestUserOpenCameraRequestId = isRequesting ? requestId : 0;
@@ -527,14 +491,14 @@ export const useRoomStore = defineStore('room', {
     },
     addApplyToAnchorUser(options: { userId: string, requestId: number }) {
       const { userId, requestId } = options;
-      const remoteUserInfo = this.remoteUserMap.get(userId);
+      const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isUserApplyingToAnchor = true;
         remoteUserInfo.applyToAnchorRequestId = requestId;
       }
     },
     removeApplyToAnchorUser(userId: string) {
-      const remoteUserInfo = this.remoteUserMap.get(userId);
+      const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isUserApplyingToAnchor = false;
         remoteUserInfo.applyToAnchorRequestId = 0;
@@ -542,14 +506,14 @@ export const useRoomStore = defineStore('room', {
     },
     addInviteToAnchorUser(options: { userId: string, requestId: number }) {
       const { userId, requestId } = options;
-      const remoteUserInfo = this.remoteUserMap.get(userId);
+      const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isInvitingUserToAnchor = true;
         remoteUserInfo.inviteToAnchorRequestId = requestId;
       }
     },
     removeInviteToAnchorUser(userId: string) {
-      const remoteUserInfo = this.remoteUserMap.get(userId);
+      const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isInvitingUserToAnchor = false;
         remoteUserInfo.inviteToAnchorRequestId = 0;
@@ -564,16 +528,26 @@ export const useRoomStore = defineStore('room', {
         hasVideoStream: false,
         hasScreenStream: false,
         userRole: TUIRole.kGeneralUser,
+        audioVolume: 0,
+        onSeat: false,
         cameraStreamInfo: {
           userId: '',
+          userName: '',
+          avatarUrl: '',
+          audioVolume: 0,
+          hasAudioStream: false,
+          hasVideoStream: false,
           streamType: TUIVideoStreamType.kCameraStream,
         },
         screenStreamInfo: {
           userId: '',
+          userName: '',
+          avatarUrl: '',
+          hasScreenStream: false,
           streamType: TUIVideoStreamType.kScreenStream,
         },
       };
-      this.remoteUserMap = new Map();
+      this.remoteUserObj = {};
       this.isDefaultOpenCamera = false;
       this.isDefaultOpenMicrophone = false;
       this.canControlSelfAudio = true;

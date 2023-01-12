@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessage, ElMessageBox } from './elementComp';
 import { ref, onMounted, onUnmounted, Ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
@@ -38,7 +38,7 @@ import TUIRoomEngine, {
 
 import TUIRoomAegis from './utils/aegis';
 import { MESSAGE_DURATION } from './constants/message';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from './locales';
 
 import useGetRoomEngine from './hooks/useRoomEngine';
 
@@ -54,17 +54,17 @@ defineExpose({
 });
 
 const emit = defineEmits([
-  'onLogOut',
-  'onCreateRoom',
-  'onEnterRoom',
-  'onExitRoom',
-  'onDestroyRoom',
+  'on-log-out',
+  'on-create-room',
+  'on-enter-room',
+  'on-exit-room',
+  'on-destroy-room',
   // 用户被踢出房间
-  'onKickedOutOfRoom',
+  'on-kicked-out-of-room',
   // 用户被踢下线
-  'onKickedOffLine',
+  'on-kicked-off-line',
   // 用户 userSig 过期
-  'onUserSigExpired',
+  'on-userSig-expired',
 ]);
 
 const logPrefix = '[Room]';
@@ -184,12 +184,12 @@ async function createRoom(options: {
     });
   }
   await roomEngine.instance?.createRoom(roomParams);
-  emit('onCreateRoom', {
+  emit('on-create-room', {
     code: 0,
     message: 'create room success',
   });
   await roomEngine.instance?.enterRoom({ roomId });
-  emit('onEnterRoom', {
+  emit('on-enter-room', {
     code: 0,
     message: 'enter room success',
   });
@@ -234,7 +234,7 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
    * setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
   **/
   roomStore.setRoomParam(roomParam);
-  emit('onEnterRoom', {
+  emit('on-enter-room', {
     code: 0,
     message: 'enter room success',
   });
@@ -272,17 +272,17 @@ function resetStore() {
 
 const logOut = () => {
   resetStore();
-  emit('onLogOut');
+  emit('on-log-out');
 };
 
 const onDestroyRoom = (info: { code: number; message: string }) => {
   resetStore();
-  emit('onDestroyRoom', info);
+  emit('on-destroy-room', info);
 };
 
 const onExitRoom = (info: { code: number; message: string }) => {
   resetStore();
-  emit('onExitRoom', info);
+  emit('on-exit-room', info);
 };
 
 const onError = (error: any) => {
@@ -309,7 +309,7 @@ const onKickedOutOfRoom = async (eventInfo: { roomId: string, message: string })
     ElMessageBox.alert(t('kicked out of the room by the host'), t('Note'), {
       confirmButtonText: t('Confirm'),
       callback: async () => {
-        emit('onKickedOutOfRoom', { roomId, message });
+        emit('on-kicked-out-of-room', { roomId, message });
       },
     });
   } catch (error) {
@@ -321,7 +321,7 @@ const onUserSigExpired = () => {
   ElMessageBox.alert('userSig 已过期', t('Note'), {
     confirmButtonText: t('Confirm'),
     callback: async () => {
-      emit('onUserSigExpired');
+      emit('on-userSig-expired');
     },
   });
 };
@@ -331,7 +331,7 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
   ElMessageBox.alert('系统检测到您的账号被踢下线', t('Note'), {
     confirmButtonText: t('Confirm'),
     callback: async () => {
-      emit('onKickedOffLine', { message });
+      emit('on-kicked-off-line', { message });
     },
   });
 };
@@ -482,7 +482,7 @@ onUnmounted(() => {
   roomEngine.instance?.off(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 
-watch(sdkAppId, (val) => {
+watch(sdkAppId, (val: number) => {
   if (val) {
     TUIRoomAegis.setSdkAppId(val);
     TUIRoomAegis.reportEvent({
@@ -505,6 +505,7 @@ watch(sdkAppId, (val) => {
     box-sizing: border-box;
     text-align: start;
     user-select: none;
+    font-family: PingFangSC-Medium;
   }
   .header {
     width: 100%;

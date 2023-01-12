@@ -12,62 +12,64 @@
   * 在 template 中使用 <audio-control />
 -->
 <template>
-  <div class="audio-control-container" @click="emits('click')">
-    <icon-button
-      ref="audioIconButtonRef"
-      :title="t('Mic')"
-      :has-more="true"
-      :show-more="showAudioSettingTab"
-      :disabled="isLocalAudioIconDisable"
-      @click-icon="toggleMuteAudio"
-      @click-more="handleMore"
+  <div>
+    <div class="audio-control-container" @click="emits('click')">
+      <icon-button
+        ref="audioIconButtonRef"
+        :title="t('Mic')"
+        :has-more="true"
+        :show-more="showAudioSettingTab"
+        :disabled="isLocalAudioIconDisable"
+        @click-icon="toggleMuteAudio"
+        @click-more="handleMore"
+      >
+        <audio-icon
+          :audio-volume="localStream.audioVolume"
+          :is-muted="!localStream.hasAudioStream"
+          :is-disabled="isLocalAudioIconDisable"
+        ></audio-icon>
+      </icon-button>
+      <audio-setting-tab
+        v-show="showAudioSettingTab"
+        ref="audioSettingRef"
+        class="audio-tab"
+      ></audio-setting-tab>
+    </div>
+    <el-dialog
+      v-model="showRequestOpenMicDialog"
+      class="custom-element-class"
+      title="Tips"
+      :modal="false"
+      :show-close="false"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      width="500px"
     >
-      <audio-icon
-        :audio-volume="localStream.audioVolume"
-        :is-muted="!localStream.hasAudioStream"
-        :is-disabled="isLocalAudioIconDisable"
-      ></audio-icon>
-    </icon-button>
-    <audio-setting-tab
-      v-show="showAudioSettingTab"
-      ref="audioSettingRef"
-      class="audio-tab"
-    ></audio-setting-tab>
-  </div>
-  <el-dialog
-    v-model="showRequestOpenMicDialog"
-    class="custom-element-class"
-    title="Tips"
-    :modal="false"
-    :show-close="false"
-    :append-to-body="true"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    width="500px"
-  >
-    <span>
-      {{ t('The host invites you to turn on the microphone') }}
-    </span>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button type="primary" @click="handleAccept">{{ t('Turn on the microphone') }}</el-button>
-        <el-button @click="handleReject">{{ t('Keep it closed') }}</el-button>
+      <span>
+        {{ t('The host invites you to turn on the microphone') }}
       </span>
-    </template>
-  </el-dialog>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="handleAccept">{{ t('Turn on the microphone') }}</el-button>
+          <el-button @click="handleReject">{{ t('Keep it closed') }}</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, Ref, onUnmounted, watch } from 'vue';
+import { ref, onMounted, Ref, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from 'element-plus';
+import { ElMessage } from '../../elementComp';
 
 import IconButton from '../common/IconButton.vue';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
 import { useRoomStore } from '../../stores/room';
 import AudioIcon from '../base/AudioIcon.vue';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
 import useRoomEngine from '../../hooks/useRoomEngine';
 const roomEngine = useRoomEngine();

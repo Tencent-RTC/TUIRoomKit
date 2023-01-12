@@ -21,10 +21,10 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from 'element-plus';
+import { ElMessage } from '../../elementComp';
 import { useChatStore } from '../../stores/chat';
 import MessageText from './MessageTypes/MessageText.vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 
 
 const { t } = useI18n();
@@ -121,7 +121,7 @@ onUnmounted(() => {
     word-break: break-all;
     display: flex;
     flex-direction: column;
-    align-items: start;
+    align-items: flex-start;
     &:last-of-type {
       margin-bottom: 0;
     }

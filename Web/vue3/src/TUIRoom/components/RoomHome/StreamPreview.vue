@@ -1,44 +1,47 @@
 <template>
-  <div v-loading="loading" element-loading-background="#000000" class="stream-container">
-    <div id="stream-preview" ref="streamPreviewRef" class="stream-preview"></div>
-    <div v-if="isCameraMuted" class="stream-info">
-      <span class="info">{{ t('Off Camera') }}</span>
+  <div>
+    <div v-loading="loading" element-loading-background="#000000" class="stream-container">
+      <div id="stream-preview" ref="streamPreviewRef" class="stream-preview"></div>
+      <div v-if="isCameraMuted" class="stream-info">
+        <span class="attention-info">{{ t('Off Camera') }}</span>
+      </div>
+      <div class="control-region">
+        <icon-button
+          ref="audioIconButtonRef"
+          :title="t('Mic')"
+          :hide-hover-effect="true"
+          :has-more="true"
+          @click-icon="toggleMuteAudio"
+          @click-more="handleMicSetting"
+        >
+          <audio-icon :audio-volume="localStream.audioVolume" :is-muted="isMicMuted"></audio-icon>
+        </icon-button>
+        <icon-button
+          ref="videoIconButtonRef"
+          class="icon"
+          :title="t('Camera')"
+          :icon-name="cameraIconName"
+          :hide-hover-effect="true"
+          :has-more="true"
+          @click-icon="toggleMuteVideo"
+          @click-more="handleCameraSetting"
+        />
+      </div>
     </div>
-    <div class="control-region">
-      <icon-button
-        ref="audioIconButtonRef"
-        :title="t('Mic')"
-        :hide-hover-effect="true"
-        :has-more="true"
-        @click-icon="toggleMuteAudio"
-        @click-more="handleMicSetting"
+    <div class="drawer-container">
+      <Drawer
+        :model-value="isSettingOpen"
+        :modal="false"
+        :title="t(settingTitle)"
+        direction="rtl"
+        :before-close="handleDrawerClose"
+        :size="480"
       >
-        <audio-icon :audio-volume="localStream.audioVolume" :is-muted="isMicMuted"></audio-icon>
-      </icon-button>
-      <icon-button
-        ref="videoIconButtonRef"
-        class="icon"
-        :title="t('Camera')"
-        :icon-name="cameraIconName"
-        :hide-hover-effect="true"
-        :has-more="true"
-        @click-icon="toggleMuteVideo"
-        @click-more="handleCameraSetting"
-      />
+        <audio-setting-tab v-if="settingTab === 'audio'" :mode="SettingMode.DETAIL"></audio-setting-tab>
+        <video-setting-tab v-else-if="settingTab === 'video'" :mode="SettingMode.DETAIL"></video-setting-tab>
+      </Drawer>
     </div>
   </div>
-  <el-drawer
-    v-model="isSettingOpen"
-    :modal="false"
-    :title="t(settingTitle)"
-    direction="rtl"
-    custom-class="custom-element-class"
-    :before-close="handleDrawerClose"
-    :size="480"
-  >
-    <audio-setting-tab v-if="settingTab === 'audio'" :mode="SettingMode.DETAIL"></audio-setting-tab>
-    <video-setting-tab v-if="settingTab === 'video'" :mode="SettingMode.DETAIL"></video-setting-tab>
-  </el-drawer>
 </template>
 
 <script setup lang="ts">
@@ -52,9 +55,10 @@ import AudioIcon from '../base/AudioIcon.vue';
 import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { isElectronEnv } from '../../utils/utils';
+import Drawer from '../../elementComp/Drawer.vue';
 
 const roomStore = useRoomStore();
 const { localStream } = storeToRefs(roomStore);
@@ -230,6 +234,7 @@ function handleCameraSetting() {
 
 function handleDrawerClose(done: any) {
   settingTab.value = '';
+  isSettingOpen.value = false;
   done();
 }
 
@@ -258,7 +263,7 @@ function handleDrawerClose(done: any) {
     display: flex;
     justify-content: center;
     align-items: center;
-    .info {
+    .attention-info {
       width: 132px;
       height: 34px;
       font-family: PingFangSC-Regular;
@@ -286,13 +291,12 @@ function handleDrawerClose(done: any) {
   }
 }
 
-.drawer-container > div {
-  pointer-events: none;
+.drawer-container div {
+  pointer-events: auto;
 }
 
-.room-sidebar {
-  background-color: #1D2029;
-  pointer-events: auto;
+.drawer-container > div {
+  pointer-events: none;
 }
 
 .el-drawer__header {
@@ -306,4 +310,5 @@ function handleDrawerClose(done: any) {
 .el-drawer__body {
   padding: 32px;
 }
+
 </style>

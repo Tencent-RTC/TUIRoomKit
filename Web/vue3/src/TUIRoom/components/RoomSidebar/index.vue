@@ -2,9 +2,8 @@
   <div
     class="sidebar-container"
   >
-    <el-drawer
-      v-model="isSidebarOpen"
-      custom-class="custom-element-class"
+    <Drawer
+      :model-value="isSidebarOpen"
       :modal="false"
       :title="title"
       direction="rtl"
@@ -15,7 +14,7 @@
       <room-invite v-if="sidebarName == 'invite'"></room-invite>
       <room-more v-if="sidebarName == 'more'"></room-more>
       <manage-member v-if="sidebarName == 'manage-member'"></manage-member>
-    </el-drawer>
+    </Drawer>
   </div>
 </template>
 
@@ -27,10 +26,11 @@ import Chat from '../Chat/index.vue';
 import RoomInvite from '../RoomInvite/index.vue';
 import RoomMore from '../RoomMore/index.vue';
 import ManageMember from '../ManageMember/index.vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { useChatStore } from '../../stores/chat';
+import Drawer from '../../elementComp/Drawer.vue';
 
 const { t } = useI18n();
 const roomEngine = useGetRoomEngine();

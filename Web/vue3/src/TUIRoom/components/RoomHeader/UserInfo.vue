@@ -10,7 +10,7 @@
       <div v-show="showEditNameItem">
         <div class="user-control-item-head" @click="showEditUserNameDialog">{{ t('Edit profile') }}</div>
       </div>
-      <div class="user-control-item-foot" @click="$emit('logOut')">{{ t('Log out') }}</div>
+      <div class="user-control-item-foot" @click="$emit('log-out')">{{ t('Log out') }}</div>
     </div>
     <el-dialog
       :title="t('Edit profile')"
@@ -23,18 +23,19 @@
       @close="closeEditUserNameDialog"
     >
       <div class="dialog-content">
-        <span class="title">{{ $t('User Name') }}</span>
+        <span class="title">{{ t('User Name') }}</span>
         <div class="input-container">
           <el-input
             v-model="tempUserName"
             type="text"
             maxlength="80"
-            :placeholder="$t('Please input user name')"></el-input>
+            :placeholder="t('Please input user name')"
+          ></el-input>
         </div>
       </div>
       <div class="dialog-footer">
-        <el-button @click="closeEditUserNameDialog">{{ $t('Cancel') }}</el-button>
-        <el-button type="primary" @click="handleSaveUserName(tempUserName)">{{ $t('Save') }}</el-button>
+        <el-button @click="closeEditUserNameDialog">{{ t('Cancel') }}</el-button>
+        <el-button type="primary" @click="handleSaveUserName(tempUserName)">{{ t('Save') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -45,13 +46,14 @@ import { ref, onMounted, computed, onUnmounted, Ref } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import defaultAvatar from '../../assets/imgs/avatar.png';
 import { ICON_NAME } from '../../constants/icon';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from 'element-plus';
+import { ElMessage } from '../../elementComp';
 import { MESSAGE_DURATION } from '../../constants/message';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import { useRoomStore } from '../../stores/room';
+import { isInnerScene } from '../../utils/constants';
 
 interface Props {
   userId: string,
@@ -59,7 +61,7 @@ interface Props {
   avatarUrl?: string,
 }
 defineProps<Props>();
-defineEmits(['logOut']);
+defineEmits(['log-out']);
 
 const { t } = useI18n();
 const basicStore = useBasicStore();
@@ -69,7 +71,7 @@ const userInfoRef = ref();
 const showUserControl = ref(false);
 const showUserNameEdit: Ref<boolean> = ref(false);
 
-const showEditNameItem: Ref<boolean> = ref(import.meta.env.VITE_RUNTIME_SCENE === 'inner');
+const showEditNameItem: Ref<boolean> = ref(isInnerScene);
 
 const tempUserName = ref('');
 const roomStore = useRoomStore();

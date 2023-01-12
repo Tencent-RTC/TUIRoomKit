@@ -17,12 +17,12 @@
 -->
 <template>
   <div :class="['icon-box', `${!hideHoverEffect && 'hover-effect'}`, `${disabled && 'disabled'}`]">
-    <span class="icon-content" @click="$emit('clickIcon')">
+    <span class="icon-content" @click="$emit('click-icon')">
       <svg-icon v-if="iconName" :icon-name="iconName" />
       <slot></slot>
       <span class="title">{{ title }}</span>
     </span>
-    <span v-if="hasMore" ref="moreSpanRef" class="icon-arrow" @click="$emit('clickMore')">
+    <span v-if="hasMore" ref="moreSpanRef" class="icon-arrow" @click="$emit('click-more')">
       <svg-icon class="arrow" icon-name="arrow-up" size="small" />
     </span>
   </div>
@@ -40,7 +40,7 @@ interface Props {
 }
 
 defineProps<Props>();
-defineEmits(['clickIcon', 'clickMore']);
+defineEmits(['click-icon', 'click-more']);
 
 </script>
 

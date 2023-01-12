@@ -10,13 +10,13 @@
 <script setup lang="ts">
 import SvgIcon from '../common/SvgIcon.vue';
 import { ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 const { t } = useI18n();
-const emit = defineEmits(['updatePhoneNumber']);
+const emit = defineEmits(['update-phone-number']);
 const phoneNumber = ref('');
 watch(() => phoneNumber.value, (val) => {
   phoneNumber.value = val.replace(/\D/g, '');
-  emit('updatePhoneNumber', phoneNumber.value);
+  emit('update-phone-number', phoneNumber.value);
 });
 </script>
 

@@ -169,7 +169,7 @@ const onUserSigExpired = () => {
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: PingFangSC-Medium;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #B3B8C8;

@@ -11,7 +11,7 @@ export default {
   'Verification code': '请输入验证码',
   'Email address': '请输入邮箱',
   SEND: '获取验证码',
-  '': '倒计时',
+  ' ': '倒计时',
   'The room does not exist, please confirm the room number or create a room!': '房间不存在，请确认房间号或创建房间！',
   'Log out': '退出登录',
   'Edit profile': '编辑资料',

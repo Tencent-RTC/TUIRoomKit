@@ -84,7 +84,7 @@ import { ref, computed, onBeforeUnmount } from 'vue';
 import DeviceSelect from './DeviceSelect.vue';
 import { useRoomStore } from '../../stores/room';
 import { SettingMode } from '../../constants/render';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 import { storeToRefs } from 'pinia';
 
 

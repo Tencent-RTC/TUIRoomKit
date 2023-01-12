@@ -9,19 +9,7 @@ declare module '*.vue' {
   export default component;
 }
 
-declare module 'tsignaling/tsignaling-js' {
-  import TSignaling from 'tsignaling/tsignaling-js';
-  export default TSignaling;
-}
-
-declare module 'tim-js-sdk' {
-  import TIM from 'tim-js-sdk';
-  export default TIM;
-}
-
 declare const TencentCaptcha: any;
-
-declare const Aegis: any;
 
 interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string;
