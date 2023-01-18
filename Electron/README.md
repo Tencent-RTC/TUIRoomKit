@@ -75,6 +75,15 @@
    npm install
    ```
 
+    > **注意**
+    >
+    > 如果依赖安装过程缓慢或者出现网络超时报错，如 “ERR_SOCKET_TIMEOUT” 或者 “Error: Socket timeout”，可设置就近的 npm 库镜像和 Electron 下载镜像，中国大陆地区，可在项目根目录下创建 .npmrc 文件，文件中增加如下镜像设置。
+    > ```
+    > registry=https://registry.npmmirror.com
+    > ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/
+    > ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/
+    > ```
+
 2. 开发环境运行示例工程
 
    ```bash
@@ -87,8 +96,9 @@
    ```bash
    npm run build
    ```
+   > 注意：构建好的安装包位于 release 目录下。默认只能使用 Mac 电脑构建 Mac 安装包，使用 Windows 电脑构建 Windows 安装包。
 
-   > 注意：构建好的安装包位于 release 目录下。只能使用 Mac 电脑构建 Mac 安装包，使用 Windows 电脑构建 Windows 安装包。
+
 ### 第四步：示例体验
 
 开发环境运行示例工程后，可直接体验 TUIRoomKit 功能。
