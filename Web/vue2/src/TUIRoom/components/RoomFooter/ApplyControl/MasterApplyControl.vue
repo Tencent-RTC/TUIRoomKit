@@ -129,7 +129,7 @@ onBeforeUnmount(() => {
   .apply-list-container {
     width: 470px;
     height: 286px;
-    background: #1D2029;
+    background: var(--apply-list-container-bg-color);
     box-shadow: 0 1px 10px 0 rgba(0,0,0,0.30);
     position: absolute;
     top: -6px;
@@ -144,7 +144,7 @@ onBeforeUnmount(() => {
       .title {
         font-weight: 500;
         font-size: 16px;
-        color: #CFD4E6;
+        color: var(--apply-list-container-color);
       }
       .close {
         cursor: pointer;
@@ -204,7 +204,7 @@ onBeforeUnmount(() => {
       font-family: PingFangSC-Regular;
       font-weight: 400;
       font-size: 14px;
-      color: #FFFFFF;
+      color: var(--apply-list-container-color);
       min-width: 82px;
       text-align: center;
       cursor: pointer;

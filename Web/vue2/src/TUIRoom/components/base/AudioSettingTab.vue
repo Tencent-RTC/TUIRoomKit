@@ -157,7 +157,7 @@ onBeforeUnmount(() => {
       padding-top: 20px;
     }
     &.hasDividingLine:not(:last-child) {
-      border-bottom: 1px solid $roomBackgroundColor;
+      border-bottom: 1px solid var(--divide-line-color);
     }
     .item-setting {
       &:not(:last-child) {
@@ -189,6 +189,7 @@ onBeforeUnmount(() => {
     display: inline-block;
     margin-bottom: 10px;
     width: 100%;
+    color:var(--camera-color);
   }
   .mic-bar-container {
     width: 100%;
@@ -198,7 +199,7 @@ onBeforeUnmount(() => {
     .mic-bar {
       width: 4px;
       height: 4px;
-      background-color: $primaryColor;
+      background-color: var(--mic-bar-color);
       &.active {
         background-color: $levelHighLightColor;
       }

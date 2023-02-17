@@ -6,6 +6,9 @@
     :modal="props.modal"
     :append-to-body="props.appendToBody"
     :width="props.width"
+    :show-close="props.showClose"
+    :close-on-click-modal="props.closeOnClickModal"
+    :close-on-press-escape="props.closeOnPressEscape"
   >
     <slot></slot>
     <template #footer>
@@ -23,6 +26,9 @@ interface Props {
   modal?: boolean,
   appendToBody?: boolean,
   width?: string,
+  showClose?: boolean,
+  closeOnClickModal?: boolean,
+  closeOnPressEscape?: boolean,
 }
 
 const props = defineProps<Props>();

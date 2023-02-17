@@ -9,6 +9,7 @@
         @log-out="handleLogOut"
       ></user-info>
       <language-icon class="header-item language"></language-icon>
+      <switch-theme class="header-item theme"></switch-theme>
     </div>
     <stream-preview ref="streamPreviewRef"></stream-preview>
     <room-control
@@ -22,6 +23,7 @@
 <script>
 import UserInfo from '@/TUIRoom/components/RoomHeader/UserInfo.vue';
 import LanguageIcon from '@/TUIRoom/components/RoomHeader/Language.vue';
+import SwitchTheme from '@/TUIRoom/components/RoomHeader/SwitchTheme.vue';
 import StreamPreview from '@/TUIRoom/components/RoomHome/StreamPreview.vue';
 import RoomControl from '@/TUIRoom/components/RoomHome/RoomControl.vue';
 import { getBasicInfo } from '@/config/basic-info-config';
@@ -32,7 +34,7 @@ const roomEngine = useGetRoomEngine();
 
 export default {
   name: 'Home',
-  components: { UserInfo, LanguageIcon, StreamPreview, RoomControl },
+  components: { UserInfo, LanguageIcon, StreamPreview, RoomControl, SwitchTheme },
   data() {
     return {
       givenRoomId: '',
@@ -122,11 +124,19 @@ export default {
 };
 </script>
 
+<style>
+@import '../TUIRoom/assets/style/black-theme.scss';
+@import '../TUIRoom/assets/style/white-theme.scss';
+* {
+    transition: background-color .5s,color .5s;
+  }
+</style>
+
 <style lang="scss" scoped>
 .home-container {
   width: 100%;
   height: 100%;
-  background-color: #010101;
+  background: var(--background-color-style);
   color: #B3B8C8;
   display: flex;
   justify-content: center;
@@ -144,6 +154,9 @@ export default {
         margin-left: 16px;
       }
       .language{
+        cursor: pointer;
+      }
+      .theme{
         cursor: pointer;
       }
     }

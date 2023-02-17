@@ -98,7 +98,7 @@ watch(
         await roomEngine.instance?.
           startPlayRemoteVideo({ userId: props.stream.userId, streamType: props.stream.streamType });
         const trtcCloud = roomEngine.instance?.getTRTCCloud();
-        await trtcCloud.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeBig, {
+        await trtcCloud?.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeBig, {
           mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
           rotation: TRTCVideoRotation.TRTCVideoRotation0,
           fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fit,
@@ -123,7 +123,7 @@ watch(
           streamType: props.stream.streamType,
         });
         const trtcCloud = roomEngine.instance?.getTRTCCloud();
-        await trtcCloud.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeSub, {
+        await trtcCloud?.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeSub, {
           mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
           rotation: TRTCVideoRotation.TRTCVideoRotation0,
           fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fit,
@@ -261,7 +261,7 @@ watch(
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: $roomBackgroundColor;
+    background-color: var(--center-user-info-container-bg-color);
     .avatar-region {
         width: 130px;
         height: 130px;

@@ -301,7 +301,7 @@ function kickOffUser(userInfo: UserInfo) {
       display: flex;
       flex-direction: row;
       align-items: center;
-      background: rgba(173,182,204,0.10);
+      background: var(--more-btn-background);
       border: 1px solid #ADB6CC;
       margin-left: 12px;
       .more-icon {
@@ -316,7 +316,7 @@ function kickOffUser(userInfo: UserInfo) {
       top: calc(100% + 10px);
       right: 0;
       min-width: 140px;
-      background: #1D2029;
+      background: var(--user-operate-list);
       border-radius: 4px;
       box-shadow: 0 1px 10px 0 rgba(0,0,0,0.30);
       .user-operate-item {
@@ -324,7 +324,7 @@ function kickOffUser(userInfo: UserInfo) {
         padding: 0 20px;
         text-align: center;
         font-size: 14px;
-        color: #CFD4E6;
+        color: var(--user-operate-item);
         height: 40px;
         line-height: 40px;
         white-space: nowrap;

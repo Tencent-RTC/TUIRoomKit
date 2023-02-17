@@ -70,7 +70,7 @@ const basicStore = useBasicStore();
 const isLocalStreamMirror: Ref<boolean> = ref(basicStore.isLocalStreamMirror);
 watch(isLocalStreamMirror, async (val: boolean) => {
   const trtcCloud = roomEngine.instance?.getTRTCCloud();
-  await trtcCloud.setLocalRenderParams({
+  await trtcCloud?.setLocalRenderParams({
     mirrorType: val ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
     rotation: TRTCVideoRotation.TRTCVideoRotation0,
     fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
@@ -125,7 +125,7 @@ if (isDetailMode.value) {
       padding-top: 20px;
     }
     &.hasDividingLine:not(:last-child) {
-      border-bottom: 1px solid $roomBackgroundColor;
+      border-bottom: 1px solid var(--divide-line-color);
     }
     .item-setting {
       &:not(:last-child) {
@@ -137,6 +137,7 @@ if (isDetailMode.value) {
     display: inline-block;
     margin-bottom: 10px;
     width: 100%;
+    color:var(--camera-color);
   }
   .detail-select {
     width: 309px;
@@ -155,6 +156,7 @@ if (isDetailMode.value) {
     height: 20px;
     margin-bottom: 20px;
     cursor: pointer;
+    color:var(--camera-color);
   }
 }
 </style>

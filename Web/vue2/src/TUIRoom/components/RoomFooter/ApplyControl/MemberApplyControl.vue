@@ -11,8 +11,8 @@
         <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyAttention"></svg-icon>
       </div>
     </div>
-    <el-dialog
-      v-model="showInviteDialog"
+    <Dialog
+      :model-value="showInviteDialog"
       :title="t('The host invites you to speak on stage')"
       class="custom-element-class"
       :modal="false"
@@ -33,7 +33,7 @@
           <el-button @click="handleInvite(false)">{{ t('Cancel') }}</el-button>
         </span>
       </template>
-    </el-dialog>
+    </Dialog>
   </div>
 </template>
 
@@ -43,6 +43,7 @@ import { ICON_NAME } from '../../../constants/icon';
 import IconButton from '../../common/IconButton.vue';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ElMessage } from '../../../elementComp';
+import Dialog from '../../../elementComp/Dialog.vue';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';

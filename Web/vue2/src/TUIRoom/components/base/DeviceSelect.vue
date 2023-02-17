@@ -56,6 +56,7 @@ const {
   currentSpeakerId,
 } = storeToRefs(roomStore);
 
+// @ts-ignore
 const deviceList: Ref<TRTCDeviceInfo[]> = ref(getDeviceList());
 const currentDeviceId = ref(getInitDeviceId());
 
