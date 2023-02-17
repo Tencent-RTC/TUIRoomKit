@@ -1,0 +1,41 @@
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'primary': (
+      'base': #006EFF,
+    ),
+  ),
+  $fill-color: (
+    'light': #2E323D,
+    'blank': #2E323D,
+  ),
+  $border-color: (
+    '': #2E323D,
+    'light': #2E323D,
+  ),
+  $bg-color: (
+    'page': #ffffff,
+    'overlay': #1D2029,
+  ),
+  $text-color: (
+    'primary': #CFD4E6,
+    'regular': #7C85A6,
+  ),
+  $slider: (
+    'height': 4px,
+    'button-size': 12px,
+  ),
+  $popover: (
+    'bg-color': #1D2029,
+    'border-color': #2E323D,
+  ),
+  $drawer: (
+    'bg-color': #1D2029,
+    'padding-primary': 32px 22px 32px 32px,
+  ),
+  $dialog: (
+    'bg-color': #1D2029,
+    'box-shadow': 0 1px 10px 0 rgba(0,0,0,0.30),
+    'title-font-size': 20px,
+    'font-line-height': 22px,
+  ),
+);
