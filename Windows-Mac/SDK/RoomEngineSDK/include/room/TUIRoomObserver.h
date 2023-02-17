@@ -214,6 +214,13 @@ class TUIRoomObserver {
      * @param message 消息内容, 请参考: {@link TUIMessage} 定义
      */
     virtual void onReceiveCustomMessage(const char* roomId, const TUIMessage& message) = 0;
+
+    /**
+     * 7.3 收到用户被踢下麦事件
+     *
+     * @param userId 操作踢人的（主持人/管理员）用户id
+     */
+    virtual void onKickedOffSeat(const char* userId) = 0;
 };
 
 }  // namespace tuikit

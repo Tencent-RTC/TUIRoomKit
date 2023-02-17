@@ -1,0 +1,28 @@
+QLabel, QLineEdit, QToolButton, QPushButton, QProgressBar, QRadioButton {
+    border: none;
+    background: transparent;
+	color: white;
+	font-size: 14px;
+	font-family: "Microsoft YaHei";
+}
+QWidget#widget_bg {
+	background-color: rgb(28, 33, 49);
+}
+QWidget#widget_right_layout, QWidget#widget_top_layout {
+	border: none;
+}
+QWidget#widget_right_layout:hover, QWidget#widget_top_layout:hover, QWidget#widget_grid_layout:hover {
+	border: 2px solid rgb(0, 110, 255);
+}
+QPushButton#btn_right {
+	border-image:url(:/LayoutSelectView/LayoutSelectView/layout_right.png);
+}
+QPushButton#btn_top {
+	border-image:url(:/LayoutSelectView/LayoutSelectView/layout_top.png);
+}
+QPushButton#btn_grid {
+	border-image:url(:/LayoutSelectView/LayoutSelectView/layout_grid.png);
+}
+QPushButton#btn_select_flag {
+	border-image:url(:/LayoutSelectView/LayoutSelectView/flag.png);
+}

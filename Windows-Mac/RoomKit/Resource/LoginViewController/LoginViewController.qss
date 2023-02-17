@@ -1,0 +1,143 @@
+QCheckBox, QToolButton, QPushButton, QProgressBar, QRadioButton, QComboBox {
+	font-size: 14px;
+	font-family: "Microsoft YaHei";
+}
+QPushButton#close_btn {
+	border-image : url(:/MainWindow/MainWindow/close_h.png);
+}
+QPushButton#close_btn:hover {
+	border-image: url(:/MainWindow/MainWindow/close.png)
+}
+
+QPushButton#btn_language {
+	background: transparent;
+	color: white;
+}
+QPushButton#btn_language:hover, QPushButton#btn_language:pressed {
+	background:transparent ;
+	color: #FFA500;
+}
+
+QPushButton#btn_logout {
+	font-size: 16px;
+	background: transparent;
+	color: #2F79FF;
+}
+QPushButton#btn_logout:hover, QPushButton#btn_logout:pressed {
+	background:transparent ;
+	color: #FFA500;
+}
+
+QWidget#background_widget {
+	border-image : url(:/LoginViewController/LoginViewController/login.png);
+	background : white;
+}
+
+QPushButton#enter_room_btn, QPushButton#enter_room_btn:pressed {
+	border : 1px solid #2F79FF;
+	color : white;
+	background-color: #2F79FF;
+	font-size : 16px;
+	border-radius :16px;
+}
+QPushButton#enter_room_btn:hover {
+	background-color: #0A64FF;
+    border-color: #0A64FF;
+	color: #FFFFFF;
+}
+QPushButton#enter_room_btn:disabled {
+    color: 	#D2D2D2;
+}
+
+QLabel {
+	color: #6D727D;
+	font-family :"Microsoft YaHei";
+	font-size: 18px;
+}
+
+QLineEdit {
+	border: 0px solid transparent;
+	outline: none;
+	color : #6D727D;
+	font-family: "Microsoft YaHei";
+	font-size: 18px;
+}
+
+QWidget#room_id_widget {
+	border : 1px solid #0069FF;
+	background: white;
+	border-radius : 4px;
+}
+
+QWidget#name_widget {
+	border : 1px solid #0069FF;
+	background: white;
+	border-radius : 4px;
+}
+
+QLabel#sdkAppId_label{
+	font-size: 16px;
+}
+
+QCheckBox#stringId_checkBox {
+	color: #6D727D;
+	font-family :"Microsoft YaHei";
+	font-size: 16px;
+}
+
+QComboBox {
+	border : 1px solid #2F79FF;
+	border-radius:2px;
+	background: white;
+	padding-left: 10px;
+	color: #6D727D;
+	combobox-popup: 0;
+}
+
+QComboBox QAbstractItemView{
+    border: none;
+	background: white;
+	outline:0px;
+}
+QComboBox QAbstractItemView::item{
+	border: none;
+	height: 30px;
+	padding-left: 10px;
+	color: #6D727D;
+	background-color: transparent;
+}
+QComboBox QAbstractItemView::item:selected{
+	border: none;
+	height: 30px;
+	padding-left: 10px;
+	color: #0A64FF;
+    background: transparent;
+}
+
+QComboBox:!enabled{
+    background: #eaeaea;
+}
+
+QComboBox::drop-down {
+	subcontrol-origin: padding;
+	subcontrol-position: top right;
+	width: 15px;
+	border: 10px solid transparent;
+	border-left-width: 0px;
+	border-left-color: darkgray;
+	border-left-style: solid;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+QComboBox::down-arrow {
+	height: 15px;
+	width: 15px;
+	background: transparent;
+	image: url(:/ImageResource/arrow_on.png);
+}
+QComboBox::down-arrow:on {
+	height: 15px;
+	width: 15px;
+	background: transparent;
+	image: url(:/ImageResource/arrow_off.png);
+}

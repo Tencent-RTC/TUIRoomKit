@@ -121,6 +121,9 @@ struct TUINetwork {
 
     ///网络延迟，单位 ms
     int delay;
+
+    TUINetwork() : userId(nullptr), quality(TUINetworkQuality::kQualityUnknown), upLoss(0), downLoss(0), delay(0) {
+    }
 };
 
 /**
@@ -144,6 +147,9 @@ struct TUIMessage {
 
     ///消息发送者头像
     const char* avatarUrl;
+
+    TUIMessage() : messageId(nullptr), message(nullptr), timestamp(0), userId(nullptr), userName(nullptr), avatarUrl(nullptr) {
+    }
 };
 
 /**
@@ -161,6 +167,9 @@ struct TUIImageBuffer {
 
     ///高度
     uint32_t height;
+
+    TUIImageBuffer() : buffer(nullptr), length(0), width(0), height(0) {
+    }
 };
 
 };  // namespace tuikit
