@@ -98,7 +98,7 @@ const handleChooseEmoji = (emojiName: string) => {
 
   .chat-editor {
     height: 188px;
-    background: #2E323D;
+    background: var(--chat-editor-bg-color);
     box-sizing: border-box;
     &.disable-editor {
       textarea {
@@ -106,9 +106,9 @@ const handleChooseEmoji = (emojiName: string) => {
     }
     textarea {
       height: 138px;
-      color: #ffff;
+      color: var(--textarea-color);
       width: 100%;
-      background: #2E323D;
+      background: var(--chat-editor-bg-color);
       border: none;
       box-sizing: border-box;
       padding: 12px 14px;
@@ -120,10 +120,10 @@ const handleChooseEmoji = (emojiName: string) => {
     }
     .send-btn {
       padding: 6px 18px;
-      background: #3D4352;
+      background: var(--send-btn-color);
       border-radius: 2px;
       font-size: 14px;
-      color: #CFD4E6;
+      color: var(--send-btn);
       &:hover {
         cursor: pointer;
         background: $primaryHighLightColor;

@@ -141,14 +141,18 @@ interface RoomInitData {
   userSig: string,
   userName: string,
   avatarUrl: string,
+  theme?: {
+    defaultTheme: 'black' | 'white',
+    isSupportSwitchTheme: boolean,
+  },
 }
 
-async function init(option: RoomInitData) {
-  const { sdkAppId, userId, userSig, userName, avatarUrl } = option;
+async function init(roomData: RoomInitData) {
+  basicStore.setBasicInfo(roomData);
+  roomStore.setLocalUser(roomData);
+  const { sdkAppId, userId, userSig, userName, avatarUrl } = roomData;
   await TUIRoomEngine.init({ sdkAppId, userId, userSig });
   await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
-  basicStore.setBasicInfo(option);
-  roomStore.setLocalUser(option);
 }
 
 async function createRoom(options: {
@@ -493,6 +497,17 @@ watch(sdkAppId, (val: number) => {
 });
 </script>
 
+<style>
+@import './assets/style/black-theme.scss';
+@import './assets/style/white-theme.scss';
+.tui-room * {
+    transition: background-color .5s,color .5s;
+  }
+.tui-room [class|="el"] {
+  animation-fill-mode: forwards;
+}
+</style>
+
 <style lang="scss" scoped>
 @import './assets/style/var.scss';
 
@@ -510,7 +525,7 @@ watch(sdkAppId, (val: number) => {
   .header {
     width: 100%;
     height: 48px;
-    background-color: $toolBarBackgroundColor;
+    background-color: var(--room-header-bg-color);
     position: absolute;
     top: 0;
     left: 0;
@@ -527,7 +542,7 @@ watch(sdkAppId, (val: number) => {
     left: 0;
     width: 100%;
     height: 80px;
-    background-color: $toolBarBackgroundColor;
+    background-color: var(--room-footer-bg-color);
   }
 }
 </style>

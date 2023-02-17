@@ -83,8 +83,9 @@ function onCopy(value: string | number) {
   width: 100%;
   height: 22px;
   line-height: 22px;
+  opacity: 0.8;
   font-weight: 400;
-  color: #7C85A6;
+  color: var(--input-font-color);
   font-family: PingFangSC-Regular;
 }
 .invite-content{
@@ -96,20 +97,22 @@ function onCopy(value: string | number) {
     }
     .invite-title {
       font-size: 14px;
-      color: #CFD4E6;
+      color: var(--more-notice-color);
       width: 100%;
+      opacity: 0.8;
     }
     .input-area {
       margin-top: 10px;
       position: relative;
       .input{
         -webkit-appearance: none;
-          background-color: #2E323D;
+          background-color: var(--input-bg-color);
           background-image: none;
           border-radius: 2px;
-          border: 1px solid #2E323D;
+          border: 1px solid var(--input-border-color);
           box-sizing: border-box;
-          color: #7C85A6;
+          color: var(--input-font-color);
+          opacity: 0.8;
           display: inline-block;
           font-size: 14px;
           height: 32px;

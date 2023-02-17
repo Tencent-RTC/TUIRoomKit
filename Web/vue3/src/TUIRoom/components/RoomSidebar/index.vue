@@ -104,11 +104,11 @@ onUnmounted(() => {
   }
   .sidebar-container .el-drawer__header {
     height: 88px;
-    border-bottom: 1px solid #2f313b;
+    border-bottom: 1px solid var(--el-drawer-divide);
     box-sizing: border-box;
     margin-bottom: 0;
     font-size: 20px;
-    color: #CFD4E6;
+    color: var(--el-drawer-header-color);
     font-weight: 500;
     padding: 32px 22px 32px 32px;
   }

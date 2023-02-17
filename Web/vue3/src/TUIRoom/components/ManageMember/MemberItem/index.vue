@@ -43,7 +43,7 @@ function handleMouseLeave() {
   padding: 0 32px;
   &:hover {
     cursor: pointer;
-    background: rgba(46,50,61,0.70);
+    background: var(--member-item-container-hover-bg-color);
   }
 }
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div class="more-control-container">
     <icon-button
+      :is-active="sidebarName === 'more'"
       :title="t('More')"
       :icon-name="iconName"
       @click-icon="toggleMoreSidebar"

@@ -97,7 +97,7 @@ const isMe = computed(() => basicStore.userId === props.userInfo.userId);
   .user-name {
     margin-left: 9px;
     font-size: 14px;
-    color: #7C85A6;
+    color: var(--input-font-color);
     line-height: 22px;
     max-width: 110px;
     white-space: nowrap;
@@ -109,8 +109,8 @@ const isMe = computed(() => basicStore.userId === props.userInfo.userId);
     font-size: 12px;
     margin-left: 13px;
     padding: 2px;
-    color: #4D70FF;
-    background: #2E323D;
+    color: var(--user-extra-info-color);
+    background: var(--user-extra-info-bg-color);
     border-radius: 8px;
     padding: 0 6px;
   }

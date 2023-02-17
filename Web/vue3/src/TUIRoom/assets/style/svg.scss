@@ -12,7 +12,7 @@
   mask-image: url(../icons/svg/apply-speech-icon.svg);
 }
 .svg-icon.apply {
-  background-image: url(../icons/svg/apply.svg);
+  background-image: var(--apply-svg);
 }
 .svg-icon.arrow-up{
   background-image: url(../icons/svg/arrow-up.svg);
@@ -24,16 +24,16 @@
   background-image: url(../icons/svg/camera-off-gray.svg);
 }
 .svg-icon.camera-off{
-  background-image: url(../icons/svg/camera-off.svg);
+  background-image: var(--camera-off-svg);
 }
 .svg-icon.camera-on{
-  background-image: url(../icons/svg/camera-on.svg);
+  background-image: var(--camera-on-svg);
 }
 .svg-icon.chat-active{
-  background-image: url(../icons/svg/chat-active.svg);
+  background-image: var(--chat-active-svg);
 }
 .svg-icon.chat{
-  background-image: url(../icons/svg/chat.svg);
+  background-image: var(--chat-svg);
 }
 .svg-icon.choose-on{
   background-image: url(../icons/svg/choose-on.svg);
@@ -42,41 +42,41 @@
   background-image: url(../icons/svg/close.svg);
 }
 .svg-icon.copy-icon{
-  background-image: url(../icons/svg/copy-icon.svg);
+  background-image: var(--copy-svg);
 }
 .svg-icon.emoji{
   background-image: url(../icons/svg/emoji.svg);
 }
 .svg-icon.exit-fullscreen{
-  background-image: url(../icons/svg/exit-fullscreen.svg);
+  background-image: var(--exit-fullscreen-svg);
 }
 .svg-icon.free-speech-icon {
   -webkit-mask-image: url(../icons/svg/free-speech-icon.svg);
   mask-image: url(../icons/svg/free-speech-icon.svg);
 }
 .svg-icon.mic-on {
-  background-image: url(../icons/svg/mic-on.svg);
+  background-image: var(--mic-on-svg);
 }
 .svg-icon.mic-off {
-  background-image: url(../icons/svg/mic-off.svg);
+  background-image: var(--mic-off-svg);
 }
 .svg-icon.mic-off-gray {
   background-image: url(../icons/svg/mic-off-gray.svg);
 }
 .svg-icon.full-screen{
-  background-image: url(../icons/svg/full-screen.svg);
+  background-image: var(--full-screen-svg);
 }
 .svg-icon.go-off-seat {
-  background-image: url(../icons/svg/go-off-seat.svg);
+  background-image: var(--go-off-seat-svg);
 }
 .svg-icon.info{
   background-image: url(../icons/svg/info.svg);
 }
 .svg-icon.invite-active{
-  background-image: url(../icons/svg/invite-active.svg);
+  background-image: var(--invite-active-svg);
 }
 .svg-icon.invite{
-  background-image: url(../icons/svg/invite.svg);
+  background-image: var(--invite-svg);
 }
 .svg-icon.lang{
   background-image: url(../icons/svg/lang.svg);
@@ -97,19 +97,19 @@
   background-image: url(../icons/svg/mail-icon.svg);
 }
 .svg-icon.manage-member{
-  background-image: url(../icons/svg/manage-member.svg);
+  background-image: var(--manage-member-svg);
 }
 .svg-icon.manage-member-active{
-  background-image: url(../icons/svg/manage-member-active.svg);
+  background-image: var(--manage-member-active-svg);
 }
 .svg-icon.minimize-screen{
   background-image: url(../icons/svg/minimize-screen.svg);
 }
 .svg-icon.more-active{
-  background-image: url(../icons/svg/more-active.svg);
+  background-image: var(--more-active-svg);
 }
 .svg-icon.more{
-  background-image: url(../icons/svg/more.svg);
+  background-image: var(--more-svg);
 }
 .svg-icon.phone-icon{
   background-image: url(../icons/svg/phone-icon.svg);
@@ -118,25 +118,28 @@
   background-image: url(../icons/svg/screen-share-disabled.svg);
 }
 .svg-icon.screen-share-stopped{
-  background-image: url(../icons/svg/screen-share-stopped.svg);
+  background-image: var(--screen-share-stopped-svg);
 }
 .svg-icon.screen-share{
-  background-image: url(../icons/svg/screen-share.svg);
+  background-image: var(--screen-share-svg);
 }
 .svg-icon.screen-sharing{
-  background-image: url(../icons/svg/screen-sharing.svg);
+  background-image: var(--screen-sharing-svg);
 }
 .svg-icon.setting-active{
-  background-image: url(../icons/svg/setting-active.svg);
+  background-image: var(--setting-active-svg);
 }
 .svg-icon.setting{
-  background-image: url(../icons/svg/setting.svg);
+  background-image: var(--setting-svg);
 }
 .svg-icon.switch-language{
   background-image: url(../icons/svg/switch-language.svg);
 }
 .svg-icon.turn-page-arrow-left{
   background-image: url(../icons/svg/turn-page-arrow-left.svg);
+}
+.svg-icon.switch-theme{
+  background-image: var(--switch-theme);
 }
 .svg-icon.user{
   background-image: url(../icons/svg/user.svg);
@@ -148,5 +151,5 @@
   background-image: url(../icons/svg/voice.svg);
 }
 .svg-icon.language-icon{
-  background-image: url(../icons//svg/language-icon.svg);
+  background-image: var(--switch-language);
 }

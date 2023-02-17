@@ -1,6 +1,7 @@
 <template>
   <div class="fullscreen-control-container">
     <icon-button
+      :is-active="isFullScreen"
       :title="title"
       :icon-name="iconName"
       @click-icon="toggleScreen"
