@@ -9,6 +9,7 @@
         <icon-button
           ref="audioIconButtonRef"
           :title="t('Mic')"
+          :is-active="isMicMuted"
           :hide-hover-effect="true"
           :has-more="true"
           @click-icon="toggleMuteAudio"
@@ -20,6 +21,7 @@
           ref="videoIconButtonRef"
           class="icon"
           :title="t('Camera')"
+          :is-active="isCameraMuted"
           :icon-name="cameraIconName"
           :hide-hover-effect="true"
           :has-more="true"
@@ -250,7 +252,7 @@ function handleDrawerClose(done: any) {
   border-radius: 10px;
   position: relative;
   overflow: hidden;
-  border: 2px solid #1B1E26;
+  border: 2px solid var(--stream-container-border);
   .stream-preview {
     width: 100%;
     height: 100%;
@@ -262,6 +264,7 @@ function handleDrawerClose(done: any) {
     top: 0;
     display: flex;
     justify-content: center;
+    background-color: var(--stream-info-bg-color);
     align-items: center;
     .attention-info {
       width: 132px;
@@ -275,7 +278,7 @@ function handleDrawerClose(done: any) {
   }
   .control-region {
     height: 74px;
-    background: rgba(13,16,21,0.60);
+    background: var(--control-region-bg-color);
     border-radius: 43px;
     position: absolute;
     bottom: 24px;
@@ -301,7 +304,7 @@ function handleDrawerClose(done: any) {
 
 .el-drawer__header {
   height: 88px;
-  border-bottom: 1px solid #2f313b;
+  border-bottom: 1px solid var(--el-drawer-divide);
   box-sizing: border-box;
   margin-bottom: 0;
   padding: 32px;

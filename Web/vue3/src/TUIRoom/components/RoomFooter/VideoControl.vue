@@ -16,6 +16,7 @@
     <div class="video-control-container" @click="emits('click')">
       <icon-button
         ref="videoIconButtonRef"
+        :is-active="!localStream.hasVideoStream"
         :title="t('Camera')"
         :icon-name="iconName"
         :has-more="true"
@@ -29,8 +30,8 @@
         class="video-tab"
       ></video-setting-tab>
     </div>
-    <el-dialog
-      v-model="showRequestOpenCameraDialog"
+    <Dialog
+      :model-value="showRequestOpenCameraDialog"
       class="custom-element-class"
       title="Tips"
       :modal="false"
@@ -49,7 +50,7 @@
           <el-button @click="handleReject">{{ t('Keep it closed') }}</el-button>
         </span>
       </template>
-    </el-dialog>
+    </Dialog>
   </div>
 </template>
 
@@ -68,6 +69,7 @@ import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import TUIRoomEngine, { TUIVideoStreamType, TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
+import Dialog from '../../elementComp/Dialog.vue';
 const roomEngine = useGetRoomEngine();
 
 const roomStore = useRoomStore();
@@ -220,7 +222,7 @@ $videoTabWidth: 320px;
     bottom: 90px;
     left: -60px;
     width: $videoTabWidth;
-    background: $toolBarBackgroundColor;
+    background: var(--room-videotab-bg-color);
     padding: 20px;
   }
 }

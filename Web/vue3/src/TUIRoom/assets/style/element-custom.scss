@@ -1,19 +1,20 @@
 .custom-element-class {
   --el-color-primary: #006EFF;
-  --el-fill-color-light: #2E323D;
-  --el-fill-color-blank: #2E323D;
-  --el-border-color: #2E323D;
-  --el-border-color-light: #2E323D;
-  --el-border-color-lighter: #2E323D;
-  --el-bg-color: #1D2029;
-  --el-bg-color-page: #ffffff;
-  --el-bg-color-overlay: #1D2029;
-  --el-text-color-primary: #CFD4E6;
-  --el-text-color-regular: #7C85A6;
+  --el-fill-color-light: var(--el-fill-color-light-select);
+  --el-fill-color-blank: var(--el-fill-color-blank-select);
+  --el-border-color: var(--el-border-color-select);
+  --el-border-color-light: var(--el-border-color-light-select);
+  --el-border-color-lighter: var(--el-border-lighter);
+  --el-bg-color: var(--el-bg-color-select);
+  --el-bg-color-page: #FFFFFF;
+  --el-bg-color-overlay: var(--el-bg-color-overlay-select);
+  --el-text-color-primary: var(--el-text-color-primary-select);
+  --el-text-color-regular: var(--el-text-color-regular-select);
   --el-slider-height: 4px;
   --el-slider-button-size: 12px;
-  --el-dialog-bg-color: #1D2029;
+  --el-dialog-bg-color: var(--el-dialog-bg-color-select);
   --el-dialog-box-shadow: 0 1px 10px 0 rgba(0,0,0,0.30);
-  --el-disabled-bg-color: #606266;
-  --el-disabled-border-color: #909399;
+  --el-disabled-bg-color: var(--el-disabled-background);
+  --el-disabled-border-color: var(--el-disabled-border);
+  --el-switch-on-color: red;
 }

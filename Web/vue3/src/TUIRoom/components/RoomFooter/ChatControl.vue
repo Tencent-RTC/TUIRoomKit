@@ -12,6 +12,7 @@
     </el-badge>
     <icon-button
       v-else
+      :is-active="sidebarName === 'chat'"
       :title="t('Chat')"
       :icon-name="iconName"
       @click-icon="toggleChatSidebar"

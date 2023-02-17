@@ -2,6 +2,7 @@
   <div class="screen-share-control-container">
     <icon-button
       ref="btnStopRef"
+      :is-active="isSharing"
       :disabled="screenShareDisabled"
       :title="title"
       :icon-name="iconName"
@@ -179,7 +180,7 @@ onUnmounted(() => {
   .stop-share-region {
     width: 131px;
     height: 48px;
-    background: $toolBarBackgroundColor;
+    background: var(--stop-share-region-bg-color);
     border-radius: 4px;
     position: absolute;
     top: -58px;
@@ -190,7 +191,7 @@ onUnmounted(() => {
     align-items: center;
     cursor: pointer;
     font-size: 14px;
-    color: #CFD4E6;
+    color: var(--color-font);
   }
   .stop-share-icon {
     width: 24px;

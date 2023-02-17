@@ -1,6 +1,7 @@
 <template>
   <div class="invite-control-container">
     <icon-button
+      :is-active="sidebarName === 'manage-member'"
       :title="t('Members')"
       :icon-name="iconName"
       @click-icon="toggleMangeMemberSidebar"

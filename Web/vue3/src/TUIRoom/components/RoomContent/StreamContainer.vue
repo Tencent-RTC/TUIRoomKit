@@ -620,7 +620,7 @@ onUnmounted(() => {
 .stream-container-flatten {
   width: 100%;
   height: 100%;
-  background-color: $roomBackgroundColor;
+  background-color: var(--stream-container-flatten-bg-color);
   overflow: hidden;
   .stream-list-container {
     width: 100%;
@@ -641,7 +641,7 @@ onUnmounted(() => {
 }
 
 .icon-control {
-  background-color: $toolBarBackgroundColor;
+  background-color: var(--layout-item);
   position: absolute;
   cursor: pointer;
   display: flex;
@@ -697,7 +697,7 @@ onUnmounted(() => {
 .stream-container-top {
   width: 100%;
   height: 100%;
-  background-color: $roomBackgroundColor;
+  background-color: var(--stream-container-flatten-bg-color);
   overflow: hidden;
   position: relative;
   .enlarged-stream-container {
@@ -712,7 +712,7 @@ onUnmounted(() => {
   .stream-list-container {
     width: 100%;
     height: 175px;
-    background-color: $toolBarBackgroundColor;
+    background-color: var(--stream-list-container);
     position: absolute;
     top: 0;
     left: 0;
@@ -747,7 +747,7 @@ onUnmounted(() => {
 .stream-container-right {
   width: 100%;
   height: 100%;
-  background-color: $roomBackgroundColor;
+  background-color: var(--stream-container-flatten-bg-color);
   overflow: hidden;
   display: flex;
   flex-wrap: nowrap;
@@ -767,7 +767,7 @@ onUnmounted(() => {
     top: 0;
     right: 0;
     padding: 48px 10px 80px;
-    background-color: $toolBarBackgroundColor;
+    background-color: var(--stream-list-container);
     display: flex;
     align-items: center;
     &.hide-list {

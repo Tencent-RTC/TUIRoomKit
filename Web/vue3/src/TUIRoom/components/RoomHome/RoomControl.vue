@@ -66,7 +66,6 @@ const props = defineProps<{
 const hasGivenRoomId = computed(() => (typeof props.givenRoomId === 'string' && props.givenRoomId !== ''));
 
 const logo = computed(() => (i18n.global.locale.value === 'zh-CN' ? logoCn : logoEn));
-
 const roomId = ref('');
 const showCreateRoomOption = ref(false);
 
@@ -112,13 +111,13 @@ function enterRoom() {
   margin-left: 40px;
   position: relative;
   padding: 2px;
-  background-image: linear-gradient(230deg, rgba(61,119,255,0.53), rgba(61,143,255,0) 50%);
+  background-image:linear-gradient(230deg, var(--background-image-color), rgba(61,143,255,0) 50%);
   .control-content {
     width: 100%;
     height: 100%;
     padding: 0 40px;
     border-radius: 20px;
-    background: rgba(27, 30, 38, 0.9);
+    background: var(--control-content);
   }
   .logo {
     position: absolute;
@@ -140,7 +139,7 @@ function enterRoom() {
     display: inline-block;
     font-weight: 500;
     font-size: 28px;
-    color: $whiteColor;
+    color: var(--invite-region);
     line-height: 34px;
     position: absolute;
     top: 183px;
@@ -149,7 +148,7 @@ function enterRoom() {
     display: inline-block;
     font-weight: 400;
     font-size: 20px;
-    color: $whiteColor;
+    color: var(--invite-region);
     opacity: 0.6;
     line-height: 34px;
     position: absolute;
@@ -192,7 +191,7 @@ function enterRoom() {
       position: absolute;
       top: calc(100% + 4px);
       z-index: 10;
-      background-color: #1D2437;
+      background-color: var(--create-room-mode-color-bg);
       border: 1px solid rgba(255,255,255,0.10);
       box-shadow: 0 1px 10px 0 #091D3B;
       border-radius: 8px;
@@ -209,21 +208,21 @@ function enterRoom() {
       justify-content: flex-start;
       align-items: center;
       &:hover {
-        background-color: rgba(50,59,84,0.60);
+        background-color: var(--create-room-option);
         .title {
-          color: $whiteColor;
+          color: var(--create-room-option-color);
         }
         .icon {
-          background-color: $whiteColor;
+          background-color: var(--create-room-option-icon-color);
         }
       }
       .icon {
-        background-color: #CFD4E6;
+        background-color: var(--create-room-option-icon);
       }
       .title {
         font-weight: 400;
         font-size: 14px;
-        color: #CFD4E6;
+        color: var(--title-color-font);
       }
     }
   }
@@ -235,7 +234,7 @@ function enterRoom() {
     .input {
       width: 212px;
       height: 100%;
-      background: rgba(27,30,38,0.90);
+      background: var(--input-color);
       border-color: transparent;
       outline: none;
       border-radius: 8px;

@@ -16,6 +16,7 @@
     <div class="audio-control-container" @click="emits('click')">
       <icon-button
         ref="audioIconButtonRef"
+        :is-active="!localStream.hasAudioStream"
         :title="t('Mic')"
         :has-more="true"
         :show-more="showAudioSettingTab"
@@ -35,8 +36,8 @@
         class="audio-tab"
       ></audio-setting-tab>
     </div>
-    <el-dialog
-      v-model="showRequestOpenMicDialog"
+    <Dialog
+      :model-value="showRequestOpenMicDialog"
       class="custom-element-class"
       title="Tips"
       :modal="false"
@@ -55,7 +56,7 @@
           <el-button @click="handleReject">{{ t('Keep it closed') }}</el-button>
         </span>
       </template>
-    </el-dialog>
+    </Dialog>
   </div>
 </template>
 
@@ -72,6 +73,7 @@ import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
 import useRoomEngine from '../../hooks/useRoomEngine';
+import Dialog from '../../elementComp/Dialog.vue';
 const roomEngine = useRoomEngine();
 
 const roomStore = useRoomStore();
@@ -207,7 +209,7 @@ $audioTabWidth: 320px;
     bottom: 90px;
     left: 15px;
     width: $audioTabWidth;
-    background: $toolBarBackgroundColor;
+    background: var(--room-audiotab-bg-color);
     padding: 20px;
   }
 }
