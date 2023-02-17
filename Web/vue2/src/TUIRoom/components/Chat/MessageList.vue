@@ -110,6 +110,7 @@ onUnmounted(() => {
   height: calc(100% - 188px);
   ;
   padding: 10px 23px 10px 32px;
+  background-color: var(--message-list-color);
   overflow: auto;
 
   &::-webkit-scrollbar {
@@ -128,7 +129,7 @@ onUnmounted(() => {
     &.is-me {
       align-items: end;
       .message-body {
-        background-color: #373D4D;
+        background-color: var(--message-color);
         min-width: 24px;
       }
     }

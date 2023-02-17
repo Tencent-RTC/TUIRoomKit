@@ -1,6 +1,7 @@
 <template>
   <div class="setting-control-container">
     <icon-button
+      :is-active="showSettingDialog"
       :title="t('Settings')"
       :icon-name="iconName"
       @click-icon="handleShowSettingDialog"

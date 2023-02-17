@@ -12,7 +12,7 @@
       </div>
       <div class="user-control-item-foot" @click="$emit('log-out')">{{ t('Log out') }}</div>
     </div>
-    <el-dialog
+    <Dialog
       :title="t('Edit profile')"
       width="420px"
       :model-value="showUserNameEdit"
@@ -37,7 +37,7 @@
         <el-button @click="closeEditUserNameDialog">{{ t('Cancel') }}</el-button>
         <el-button type="primary" @click="handleSaveUserName(tempUserName)">{{ t('Save') }}</el-button>
       </div>
-    </el-dialog>
+    </Dialog>
   </div>
 </template>
 
@@ -54,6 +54,7 @@ import { MESSAGE_DURATION } from '../../constants/message';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import { useRoomStore } from '../../stores/room';
 import { isInnerScene } from '../../utils/constants';
+import Dialog from '../../elementComp/Dialog.vue';
 
 interface Props {
   userId: string,
@@ -187,13 +188,15 @@ onUnmounted(() => {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--color-font);
     }
     .down-icon {
       margin-left: 4px;
     }
   }
   .user-control-container {
-    background: rgba(46,50,61,0.60);
+    background: var(--user-control-container-color-bg);
+    color: var(--color-font);
     padding: 10px 0;
     position: absolute;
     top: calc(100% + 14px);

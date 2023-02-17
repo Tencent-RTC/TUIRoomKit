@@ -229,7 +229,6 @@ onUnmounted(() => {
 });
 
 </script>
-
 <style lang="scss" scoped>
 @import '../../assets/style/var.scss';
   .end-button {

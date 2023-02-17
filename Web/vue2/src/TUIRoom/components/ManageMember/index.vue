@@ -131,15 +131,15 @@ async function toggleAllVideo() {
         .setting-name {
           font-size: 14px;
           margin-left: 8px;
-          color: #CFD4E6;
+          color: var(--setting-name-color);
         }
       }
     }
     .divide-line {
       height: 1px;
       width: 100%;
-      background: #0D0F15;
-      box-shadow: 0 -1px 0 0 #2E323D;
+      background: var(--divide-line-color);
+      box-shadow: 0 -1px 0 0 var(--divide-line);
     }
     .member-list-container {
       overflow-y: scroll;
@@ -157,7 +157,7 @@ async function toggleAllVideo() {
         padding: 0 32px;
         font-weight: 500;
         font-size: 14px;
-        color: #7C85A6;
+        color: var(--input-font-color);
         line-height: 24px;
       }
       .member-list-content {

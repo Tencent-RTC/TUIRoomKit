@@ -141,7 +141,7 @@ function handleDocumentClick(event: MouseEvent) {
     position: absolute;
     top: 47px;
     right: 0;
-    background-color: $toolBarBackgroundColor;
+    background-color: var(--layout-list);
     box-shadow: 0 1px 10px 0 rgba(0,0,0,0.30);
     border-radius: 4px;
     padding: 20px;
@@ -150,7 +150,7 @@ function handleDocumentClick(event: MouseEvent) {
       width: 180px;
       height: 133px;
       padding: 20px 30px 39px;
-      background-color: $primaryColor;
+      background-color: var(--layout-item);
       border-radius: 2px;
       border: 1px solid transparent;
       cursor: pointer;

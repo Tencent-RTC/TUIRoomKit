@@ -20,7 +20,7 @@
     <span class="icon-content" @click="$emit('click-icon')">
       <svg-icon v-if="iconName" :icon-name="iconName" />
       <slot></slot>
-      <span class="title">{{ title }}</span>
+      <span class="title" :class="isActive ? 'title-active' : 'title'">{{ title }}</span>
     </span>
     <span v-if="hasMore" ref="moreSpanRef" class="icon-arrow" @click="$emit('click-more')">
       <svg-icon class="arrow" icon-name="arrow-up" size="small" />
@@ -37,6 +37,7 @@ interface Props {
   hasMore?: boolean,
   hideHoverEffect?: boolean,
   disabled?: boolean,
+  isActive?: boolean,
 }
 
 defineProps<Props>();
@@ -46,7 +47,9 @@ defineEmits(['click-icon', 'click-more']);
 
 <style lang="scss" scoped>
 @import '../../assets/style/var.scss';
-
+* {
+  transition: none !important;
+}
 .icon-box {
   width: 78px;
   height: 80px;
@@ -69,7 +72,7 @@ defineEmits(['click-icon', 'click-more']);
       width: 78px;
       height: 18px;
       opacity: 0.59;
-      background: $activeBlurBackgroundColor;
+      background: var(--active-blur-background-color);
       filter: blur(16px);
     }
     &:after{
@@ -91,6 +94,10 @@ defineEmits(['click-icon', 'click-more']);
     align-items: center;
     .title {
       font-size: 12px;
+      color: var(--title-color-bg);
+    }
+    .title-active {
+      color:var(--title-active);
     }
   }
   .icon-arrow {
@@ -100,7 +107,7 @@ defineEmits(['click-icon', 'click-more']);
     width: 12px;
     height: 64px;
     &:hover {
-      background: rgba(46,50,61,0.70);
+      background: var(--icon-arrow-hover);
     }
     .arrow {
       position: absolute;

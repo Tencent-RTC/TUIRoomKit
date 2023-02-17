@@ -11,6 +11,7 @@
         {{ item.label }}
       </div>
     </div>
+    <div class="divide-line"></div>
     <div class="dialog-content">
       <audio-setting-tab v-if="activeSettingTab === 'audio'" :mode="SettingMode.DETAIL"></audio-setting-tab>
       <video-setting-tab v-if="activeSettingTab === 'video'" :mode="SettingMode.DETAIL"></video-setting-tab>
@@ -75,16 +76,19 @@ function handleCloseSettingDialog() {
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
-  background-color: $toolBarBackgroundColor;
+  background-color: var(--setting-dialog-bg-color);
+  border-radius: var(--setting-dialog);
   .dialog-tabs {
     width: 194px;
     height: 574px;
-    background-color: $dialogTitleBackgroundColor;
+    background-color: var(--dialog-tabs-bg-color);
+    border-radius: var(--setting-dialog);
     .dialog-title {
       display: inline-block;
       font-weight: 500;
       font-size: 20px;
       line-height: 24px;
+      color:var(--tabs-title-font-color);
       margin: 32px 0 20px 32px;
     }
     .tabs-title {
@@ -94,13 +98,13 @@ function handleCloseSettingDialog() {
       margin-bottom: 10px;
       font-weight: 400;
       font-size: 14px;
-      color: $inactiveColor;
+      color: var(--tabs-title-font-color);
       line-height: 36px;
       position: relative;
       cursor: pointer;
       &.active {
-        background-color: $activeBackgroundColor;
-        color: $activeColor;
+        background-color: var(--create-room-option);
+        color: var(--create-room-option-color);
         font-weight: 500;
         &:before{
           content: '';
@@ -110,7 +114,7 @@ function handleCloseSettingDialog() {
           top: 0;
           width: 2px;
           height: 36px;
-          background: $activeStateColor;
+          background: var(--create-room-option-tab);
         }
         &:after{
           content: '';
@@ -126,6 +130,11 @@ function handleCloseSettingDialog() {
         }
       }
     }
+  }
+  .divide-line {
+    width: 1px;
+    height: 100%;
+    background: var(--divide-line-color-setting);
   }
   .dialog-content {
     flex-grow: 1;
