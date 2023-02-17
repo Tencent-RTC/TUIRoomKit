@@ -49,17 +49,24 @@ class TUIRoomEngine {
     }
 
     /**
-     * 1.1 初始化用户信息接口，您需要先初始化用户信息后才能进入房间，并进行一系列的操作
+     * 1.1 登录接口，您需要先初始化用户信息后才能进入房间，并进行一系列的操作
      *
      * @param sdkAppId 它是腾讯云用于区分客户的唯一标识，进入腾讯云实时音视频 [控制台](https://console.cloud.tencent.com/rav)创建应用，即可看到SDKAppId
      * @param userId 用户ID，用于区分不同用户
      * @param userSig 用户签名，用于腾讯云流量的认证
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
      */
-    TUIKIT_API static void init(int sdkAppId, const char* userId, const char* userSig, TUICallback* callback);
+    TUIKIT_API static void login(int sdkAppId, const char* userId, const char* userSig, TUICallback* callback);
 
     /**
-     * 1.2 设置本地用户名称和头像
+     * 1.2 退出登录接口，会有主动离开房间操作、销毁资源
+     *
+     * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
+     */
+    TUIKIT_API static void logout(TUICallback* callback);
+
+    /**
+     * 1.3 设置本地用户名称和头像
      *
      * @param userName 用户名称
      * @param avatarURL 用户头像URL地址
@@ -68,7 +75,7 @@ class TUIRoomEngine {
     TUIKIT_API static void setSelfInfo(const char* userName, const char* avatarURL, TUICallback* callback);
 
     /**
-     * 1.3 获取本地用户基本信息
+     * 1.4 获取本地用户基本信息
      *
      * @param userInfo 用户信息指针，您可以将外部的成员变量TUIUserInfo的地址传给该接口，并将用户信息赋值后，接口返回。
      * @return true：获取成功；false：获取失败。
@@ -76,7 +83,7 @@ class TUIRoomEngine {
     TUIKIT_API static bool getSelfInfo(TUIUserInfo* userInfo);
 
     /**
-     * 1.4 设置事件回调
+     * 1.5 设置事件回调
      *
      * 您可以通过 TUIRoomObserver 获得各类事件通知（比如：错误码，远端用户进房，音视频状态参数等）
      * @param observer 监听的实例
@@ -84,7 +91,7 @@ class TUIRoomEngine {
     virtual void addObserver(TUIRoomObserver* observer) = 0;
 
     /**
-     * 1.5 移除事件回调
+     * 1.6 移除事件回调
      *
      * @param observer 待移除的监听回调实例
      */
@@ -290,8 +297,8 @@ class TUIRoomEngine {
     /**
      * 4.8  择屏幕分享对象
      *
-     * 当您通过 GetScreenSharingTargetList 获取到可以分享的屏幕和窗口之后，您可以调用该接口选定期望分享的目标屏幕或目标窗口
-     * @param sourceId 屏幕分享窗口或屏幕的句柄，可以调用GetScreenSharingTargetList获取
+     * 当您通过 getScreenSharingTargetList 获取到可以分享的屏幕和窗口之后，您可以调用该接口选定期望分享的目标屏幕或目标窗口
+     * @param sourceId 屏幕分享窗口或屏幕的句柄，可以调用 getScreenSharingTargetList 获取
      */
     virtual void selectScreenSharingTarget(const TUISourceId& sourceId) = 0;
 

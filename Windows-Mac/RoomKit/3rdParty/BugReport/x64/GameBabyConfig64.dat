@@ -1,0 +1,9 @@
+<GameBabyConfig __version="1">
+	<GameName>RoomApp.exe</GameName>
+	<LobbyName></LobbyName>
+	<IgnoreDllCnt>2</IgnoreDllCnt>
+	<IgnoreDlls>TenSLX.dll</IgnoreDlls>
+	<IgnoreDlls>Tensafe.dll</IgnoreDlls>
+	<AppId>b1e31a1553</AppId>
+	<DomainUrl>pc.crashsight.qq.com</DomainUrl>
+</GameBabyConfig>

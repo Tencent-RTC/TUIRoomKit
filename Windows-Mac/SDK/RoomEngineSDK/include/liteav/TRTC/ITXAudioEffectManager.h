@@ -322,7 +322,7 @@ class ITXAudioEffectManager {
      * 该接口可以设置所有背景音乐的本地音量和远端音量。
      * - 本地音量：即主播本地可以听到的背景音乐的音量大小。
      * - 远端音量：即观众端可以听到的背景音乐的音量大小。
-     * @param volume 音量大小，取值范围为0 - 100，默认值：100。
+     * @param volume 音量大小，取值范围为0 - 100，默认值：60。
      * @note 如果将 volume 设置成 100 之后感觉音量还是太小，可以将 volume 最大设置成 150，但超过 100 的 volume 会有爆音的风险，请谨慎操作。
      */
     virtual void setAllMusicVolume(int volume) = 0;
@@ -332,7 +332,7 @@ class ITXAudioEffectManager {
      *
      * 该接口可以细粒度地控制每一首背景音乐的远端音量，也就是观众端可听到的背景音乐的音量大小。
      * @param id     音乐 ID。
-     * @param volume 音量大小，取值范围为0 - 100；默认值：100。
+     * @param volume 音量大小，取值范围为0 - 100；默认值：60。
      * @note 如果将 volume 设置成 100 之后感觉音量还是太小，可以将 volume 最大设置成 150，但超过 100 的 volume 会有爆音的风险，请谨慎操作。
      */
     virtual void setMusicPublishVolume(int id, int volume) = 0;
@@ -342,7 +342,7 @@ class ITXAudioEffectManager {
      *
      * 该接口可以细粒度地控制每一首背景音乐的本地音量，也就是主播本地可以听到的背景音乐的音量大小。
      * @param id     音乐 ID。
-     * @param volume 音量大小，取值范围为0 - 100，默认值：100。
+     * @param volume 音量大小，取值范围为0 - 100，默认值：60。
      * @note 如果将 volume 设置成 100 之后感觉音量还是太小，可以将 volume 最大设置成 150，但超过 100 的 volume 会有爆音的风险，请谨慎操作。
      */
     virtual void setMusicPlayoutVolume(int id, int volume) = 0;

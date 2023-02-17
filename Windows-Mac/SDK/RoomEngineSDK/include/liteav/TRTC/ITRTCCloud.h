@@ -11,7 +11,7 @@
 #include "ITXAudioEffectManager.h"
 #include "ITXDeviceManager.h"
 #include "IDeprecatedTRTCCloud.h"
-#if defined(_WIN32) || defined(__linux__)
+#if defined(_WIN32) || (!__ANDROID__ && __linux__)
 #include "TXLiteAVBase.h"
 #endif
 namespace liteav {

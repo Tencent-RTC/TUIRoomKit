@@ -281,6 +281,9 @@ enum TXLiteAVWarning {
     ///音频播放设备不可用（例如被占用或者PC判定无效设备）
     WARNING_SPEAKER_DEVICE_ABNORMAL = 1205,
 
+    ///蓝牙设备连接失败（例如其他应用通过设置通话音量占用音频通道）
+    WARNING_BLUETOOTH_DEVICE_CONNECT_FAIL = 1207,
+
     ///当前音频帧解码失败
     WARNING_AUDIO_FRAME_DECODE_FAIL = 2102,
 

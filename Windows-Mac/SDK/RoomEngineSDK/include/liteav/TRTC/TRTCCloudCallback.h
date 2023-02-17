@@ -142,7 +142,7 @@ class ITRTCCloudCallback {
      * - 直播类场景（TRTCAppSceneLIVE 和 TRTCAppSceneVoiceChatRoom）：只有主播离开房间时才会触发该通知，观众离开房间不会触发该通知。
      * - 通话类场景（TRTCAppSceneVideoCall 和 TRTCAppSceneAudioCall）：该场景下用户没有角色的区别，任何用户的离开都会触发该通知。
      * @param userId 远端用户的用户标识。
-     * @param reason 离开原因，0表示用户主动退出房间，1表示用户超时退出，2表示被踢出房间。
+     * @param reason 离开原因，0表示用户主动退出房间，1表示用户超时退出，2表示被踢出房间，3表示主播因切换到观众退出房间。
      */
     virtual void onRemoteUserLeaveRoom(const char* userId, int reason) {
     }
@@ -279,8 +279,8 @@ class ITRTCCloudCallback {
      * SDK 会使用一组内嵌的自研算法对当前网络的延迟高低、带宽大小以及稳定情况进行评估，并计算出一个的评估结果：
      * 如果评估结果为 1（Excellent） 代表当前的网络情况非常好，如果评估结果为 6（Down）代表当前网络无法支撑 TRTC 的正常通话。
      * @param localQuality 上行网络质量。
-     * @param remoteQuality 下行网络质量。
-     * @note 回调参数 localQuality 和 remoteQuality 中的 userId 如果为空置，代表本组数据统计的是自己本地的网络质量，否则是代表远端用户的网络质量。
+     * @param remoteQuality 下行网络质量，代表数据流历经“远端->云端->本端”这样一条完整的传输链路后，最终在本端统计到的数据质量。因此，这里的下行网络质量代表的是远端上行链路与本端下行链路共同影响的结果。
+     * @note 暂时无法通过该接口单独判定远端用户的上行质量。
      */
     virtual void onNetworkQuality(TRTCQualityInfo localQuality, TRTCQualityInfo* remoteQuality, uint32_t remoteQualityCount) {
     }
@@ -373,7 +373,7 @@ class ITRTCCloudCallback {
      * 要完成这个功能， 您需要先调用 {@link enableAudioVolumeEvaluation} 开启这个能力并设定事件抛出的时间间隔。
      * 需要补充说明的是，无论当前房间中是否有人说话，SDK 都会按照您设定的时间间隔定时抛出此事件回调。
      * @param userVolumes 是一个数组，用于承载所有正在说话的用户的音量大小，取值范围 0 - 100。
-     * @param totalVolume 所有远端用户的总音量大小, 取值范围 0 - 100。
+     * @param totalVolume 所有远端用户的总音量大小，取值范围 0 - 100。
      * @note userVolumes 为一个数组，对于数组中的每一个元素，当 userId 为空时表示本地麦克风采集的音量大小，当 userId 不为空时代表远端用户的音量大小。
      */
     virtual void onUserVoiceVolume(TRTCVolumeInfo* userVolumes, uint32_t userVolumesCount, uint32_t totalVolume) {

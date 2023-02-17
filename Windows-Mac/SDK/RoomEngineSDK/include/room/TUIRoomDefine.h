@@ -209,16 +209,16 @@ class TUIKIT_API TUIMap {
  * TUIRoomEngine 只支持字符串房间ID
  */
 struct TUIRoomInfo {
-    ///房间ID
+    ///房间ID(创建房间必填参数)
     const char* roomId;
 
-    ///房间类型，请参考：{@link TUIRoomType}。
+    ///房间类型（创建房间可选参数，默认Group类型），请参考：{@link TUIRoomType}。
     TUIRoomType roomType;
 
     ///主持人ID: 默认为房间创建者（只读）
     const char* owner;
 
-    ///房间名称
+    ///房间名称（创建房间可选参数，默认房间ID）
     const char* name;
 
     ///房间创建时间（只读）
@@ -227,20 +227,23 @@ struct TUIRoomInfo {
     ///房间成员数量（只读）
     int roomMemberCount;
 
-    ///最大麦位数量
+    ///最大麦位数量（创建房间可选参数，默认0不做麦位数量限制）
     int maxSeatCount;
 
-    ///是否允许打开视频，默认值：{@link true}。
+    ///是否允许打开摄像头（创建房间可选参数），默认值：{@link true}。
     bool enableVideo;
 
-    ///是否允许打开音频，默认值：{@link true}。
+    ///是否允许打开麦克风（创建房间可选参数），默认值：{@link true}。
     bool enableAudio;
 
-    ///是否允许发送消息，默认值：{@link true}。
+    ///是否允许发送消息（创建房间可选参数），默认值：{@link true}。
     bool enableMessage;
 
-    ///是否开启麦位控制，默认值：{@link false}。
+    ///是否开启麦位控制（创建房间可选参数），默认值：{@link false}。
     bool enableSeatControl;
+
+    TUIRoomInfo() : roomId(nullptr), roomType(TUIRoomType::kGroup), owner(nullptr), name(nullptr), createTime(0), roomMemberCount(0), maxSeatCount(0), enableVideo(true), enableAudio(true), enableMessage(true), enableSeatControl(false) {
+    }
 };
 
 /**
@@ -267,6 +270,9 @@ struct TUIUserInfo {
 
     ///是否有屏幕分享流，默认值：{@link false}。
     bool hasScreenStream;
+
+    TUIUserInfo() : userId(nullptr), userName(nullptr), avatarUrl(nullptr), userRole(TUIRole::kGeneralUser), hasAudioStream(false), hasVideoStream(false), hasScreenStream(false) {
+    }
 };
 
 /**
@@ -287,6 +293,9 @@ struct TUISeatInfo {
 
     ///麦位是否被禁止打开音频，默认值：{@link false}。
     bool audioMuted;
+
+    TUISeatInfo() : index(-1), userId(nullptr), locked(false), videoMuted(false), audioMuted(false) {
+    }
 };
 
 /**
@@ -298,6 +307,9 @@ struct TUIUserVoiceVolume {
 
     ///音量 用于承载所有正在说话的用户的音量大小，取值范围 0 - 100
     int volume;
+
+    TUIUserVoiceVolume() : userId(nullptr), volume(0) {
+    }
 };
 
 /**
@@ -318,6 +330,9 @@ struct TUIRequest {
 
     ///时间戳
     uint32_t timestamp;
+
+    TUIRequest() : requestId(0), requestAction(TUIRequestAction::kInvalidAction), userId(nullptr), content(nullptr), timestamp(0) {
+    }
 };
 
 /**
@@ -341,6 +356,9 @@ struct TUIShareTarget {
 
     ///是否最小化
     bool isMinimized;
+
+    TUIShareTarget() : id(nullptr), sourceType(TUICaptureSourceType::kUnknown), sourceName(nullptr), isMinimized(false) {
+    }
 };
 
 /**
@@ -352,6 +370,9 @@ struct TUIUserListResult {
 
     ///成员信息列表
     TUIList<TUIUserInfo>* userInfoList;
+
+    TUIUserListResult() : nextSequence(0), userInfoList(nullptr) {
+    }
 };
 
 /**
