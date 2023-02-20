@@ -59,7 +59,7 @@ public class RoomEngineManager extends TUIRoomObserver {
         Log.i(TAG, "setup sdkAppId: " + sdkAppId + " userSig is empty: "
                 + TextUtils.isEmpty(userSig + " userId: " + userId));
         mSelfUserId = userId;
-        TUIRoomEngine.init(mContext, sdkAppId, userId, userSig, new TUIRoomDefine.ActionCallback() {
+        TUIRoomEngine.login(mContext, sdkAppId, userId, userSig, new TUIRoomDefine.ActionCallback() {
             @Override
             public void onSuccess() {
                 Log.i(TAG, "setup success");
