@@ -171,15 +171,6 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
     inviteToAnchorRequestId.value = requestId;
     showInviteDialog.value = true;
   }
-  // todo: 需要有被踢下麦的通知
-  // else if (requestAction === TUIRequestAction.kRequestRemoteUserLeaveSeat) {
-  //   // 被主持人踢下麦
-  //   ElMessage({
-  //     type: 'warning',
-  //     message: t('You have been invited by the host to step down, please raise your hand if you need to speak'),
-  //     duration: MESSAGE_DURATION.NORMAL,
-  //   });
-  // }
 }
 
 /**
@@ -209,6 +200,19 @@ async function handleInvite(agree: boolean) {
   if (agree) {
     hideApplyAttention();
   }
+}
+
+/**
+ * Kicked off the seat by the host
+ * 被主持人踢下麦
+ */
+async function onKickedOffSeat() {
+  // 被主持人踢下麦
+  ElMessage({
+    type: 'warning',
+    message: t('You have been invited by the host to step down, please raise your hand if you need to speak'),
+    duration: MESSAGE_DURATION.NORMAL,
+  });
 }
 
 /**
@@ -250,11 +254,13 @@ function onUserAVDisabled(userInfo: { userId: string }) {
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
+  roomEngine.instance?.on(TUIRoomEvents.onKickedOffSeat, onKickedOffSeat);
 });
 
 onBeforeUnmount(() => {
   roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
+  roomEngine.instance?.off(TUIRoomEvents.onKickedOffSeat, onKickedOffSeat);
 });
 
 </script>
