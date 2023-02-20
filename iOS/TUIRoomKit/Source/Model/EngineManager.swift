@@ -63,7 +63,7 @@ class EngineManager: NSObject {
     }
 
     class func setup(sdkAppId: Int, userId: String, userSig: String) {
-        TUIRoomEngine.setup(sdkAppId: sdkAppId, userId: userId, userSig: userSig) {
+        TUIRoomEngine.login(sdkAppId: sdkAppId, userId: userId, userSig: userSig) {
         } onError: { code, message in
             debugPrint("setup,code:\(code),message:\(message)")
         }

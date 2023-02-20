@@ -39,7 +39,7 @@ TODO: Add long description of the pod here.
   
   
   #  依赖内部库
-  spec.dependency 'TUICore/ImSDK_Scenario'
+  spec.dependency 'TUICore'
   
   #  OC第三方库
   spec.dependency 'Masonry'

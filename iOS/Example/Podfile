@@ -1,7 +1,7 @@
 use_frameworks!
 
 platform :ios, '12.0'
-
+source 'https://github.com/CocoaPods/Specs.git'
 
 # UI库
 def ui
@@ -12,9 +12,7 @@ end
 # 工具库
 def tool
   pod 'Alamofire'
-  pod 'TUICore/ImSDK_Scenario', '7.0.1212'
-  pod 'TUIRoomEngine', '1.0.0'
-  pod 'TXLiteAVSDK_TRTC', '10.8.12025'
+  pod 'TUIRoomEngine', '1.0.1'
 end
 
 # 本地依赖库
