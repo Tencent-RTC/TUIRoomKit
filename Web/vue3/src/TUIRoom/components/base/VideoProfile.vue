@@ -31,7 +31,7 @@
 import { computed, watch } from 'vue';
 import { useI18n } from '../../locales';
 
-import { TUIVideoProfile } from '@tencentcloud/tuiroom-engine-js';
+import TUIRoomEngine, { TUIVideoProfile } from '@tencentcloud/tuiroom-engine-js';
 import { useRoomStore } from '../../stores/room';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { storeToRefs } from 'pinia';
@@ -50,8 +50,11 @@ const videoProfileList = computed(() => [
 
 watch(localVideoProfile, (val: TUIVideoProfile) => {
   roomEngine.instance?.setLocalVideoProfile({ videoProfile: val });
-}, { immediate: true });
+});
 
+TUIRoomEngine.once('ready', () => {
+  roomEngine.instance?.setLocalVideoProfile({ videoProfile: localVideoProfile.value });
+});
 </script>
 
 <style lang="scss" scoped>

@@ -201,6 +201,7 @@ onBeforeUnmount(async () => {
   await roomEngine.instance?.closeLocalCamera();
   await roomEngine.instance?.closeLocalMicrophone();
   roomEngine.instance?.off(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
+  roomEngine.instance?.off(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 
 /**
