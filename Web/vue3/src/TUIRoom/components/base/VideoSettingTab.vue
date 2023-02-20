@@ -97,8 +97,8 @@ if (isDetailMode.value) {
       // Electron 需要首次设置 mirrorType
       const trtcCloud = roomEngine.instance?.getTRTCCloud();
       await trtcCloud?.setLocalRenderParams({
-        mirrorType: isLocalStreamMirror ?
-          TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+        mirrorType: isLocalStreamMirror.value
+          ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
         rotation: TRTCVideoRotation.TRTCVideoRotation0,
         fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
       });
