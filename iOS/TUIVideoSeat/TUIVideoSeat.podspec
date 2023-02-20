@@ -25,7 +25,7 @@ Pod::Spec.new do |spec|
   
   spec.dependency 'SnapKit'
   spec.dependency 'Kingfisher'
-  spec.dependency 'TUICore/ImSDK_Scenario'
+  spec.dependency 'TUICore'
   
   spec.default_subspec = 'TRTC'
   

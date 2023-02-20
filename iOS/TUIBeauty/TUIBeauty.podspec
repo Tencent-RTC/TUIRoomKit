@@ -12,7 +12,7 @@ Pod::Spec.new do |spec|
 
   spec.dependency 'Masonry'
   spec.dependency 'SSZipArchive'
-  spec.dependency 'TUICore/ImSDK_Scenario'
+  spec.dependency 'TUICore'
   
   spec.requires_arc = true
   spec.static_framework = true
