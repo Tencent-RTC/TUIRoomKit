@@ -1,0 +1,20 @@
+.custom-element-class {
+  --el-color-primary: #006EFF;
+  --el-fill-color-light: var(--el-fill-color-light-select);
+  --el-fill-color-blank: var(--el-fill-color-blank-select);
+  --el-border-color: var(--el-border-color-select);
+  --el-border-color-light: var(--el-border-color-light-select);
+  --el-border-color-lighter: var(--el-border-lighter);
+  --el-bg-color: var(--el-bg-color-select);
+  --el-bg-color-page: #FFFFFF;
+  --el-bg-color-overlay: var(--el-bg-color-overlay-select);
+  --el-text-color-primary: var(--el-text-color-primary-select);
+  --el-text-color-regular: var(--el-text-color-regular-select);
+  --el-slider-height: 4px;
+  --el-slider-button-size: 12px;
+  --el-dialog-bg-color: var(--el-dialog-bg-color-select);
+  --el-dialog-box-shadow: 0 1px 10px 0 rgba(0,0,0,0.30);
+  --el-disabled-bg-color: var(--el-disabled-background);
+  --el-disabled-border-color: var(--el-disabled-border);
+  --el-switch-on-color: red;
+}
