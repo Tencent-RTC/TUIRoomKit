@@ -37,7 +37,7 @@ import { ref, Ref, computed, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessage } from '../../../elementComp';
 import IconButton from '../../common/IconButton.vue';
-import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
+import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useRoomStore } from '../../../stores/room';
 import logger from '../../../utils/common/logger';
@@ -52,7 +52,7 @@ const roomEngine = useGetRoomEngine();
 const logPrefix = '[ScreenShareControl]';
 
 const roomStore = useRoomStore();
-const { isAnchor, isAudience, enableVideo } = storeToRefs(roomStore);
+const { isAnchor, isAudience } = storeToRefs(roomStore);
 const { t } = useI18n();
 
 const btnStopRef = ref();
@@ -61,10 +61,7 @@ const showStopShareRegion: Ref<boolean> = ref(false);
 const dialogVisible: Ref<boolean> = ref(false);
 
 // 麦下用户不能进行屏幕分享
-// 全员禁画时，普通用户不能进行屏幕分享
-const screenShareDisabled = computed(() => (
-  isAudience.value || (roomStore.localUser.userRole === TUIRole.kGeneralUser && !enableVideo.value)
-));
+const screenShareDisabled = computed(() => isAudience.value);
 const title = computed(() => (isSharing.value ? t('Sharing') : t('Share screen')));
 const iconName = computed(() => {
   if (screenShareDisabled.value) {
@@ -84,14 +81,6 @@ async function toggleScreenShare() {
     ElMessage({
       type: 'warning',
       message: t('You currently do not have sharing permission, please raise your hand to apply for sharing permission first'),
-      duration: MESSAGE_DURATION.LONG,
-    });
-    return;
-  }
-  if (roomStore.localUser.userRole === TUIRole.kGeneralUser && !enableVideo.value) {
-    ElMessage({
-      type: 'warning',
-      message: t('Has been full static painting, can not share your screen'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
