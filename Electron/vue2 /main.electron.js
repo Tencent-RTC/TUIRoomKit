@@ -15,8 +15,8 @@ let crashFilePath = '';
 let crashDumpsDir = '';
 try {
   // electron 低版本
-  crashFilePath = path.join(app.getPath('temp'), app.getName() + ' Crashes');
-  console.log('————————crash path:', crashFilePath); 
+  crashFilePath = path.join(app.getPath('temp'), `${app.getName()} Crashes`);
+  console.log('————————crash path:', crashFilePath);
 
   // electron 高版本
   crashDumpsDir = app.getPath('crashDumps');
@@ -29,7 +29,7 @@ let win = null;
 
 function logBothProcess(msg) {
   console.log(msg);
-  if(win && win.webContents) {
+  if (win && win.webContents) {
     win.webContents.executeJavaScript(`console.log("${msg.toString()}")`);
   }
 }
@@ -43,10 +43,11 @@ function getParam() {
   const tmp = Array.from(process.argv);
   param.BIN_PATH = tmp[0];
   param.APP_PATH = tmp[1];
-  tmp.forEach((value, index)=>{
+  tmp.forEach((value, index) => {
     if (index <= 1) return;
     const splitValue = value.split('=');
-    const key = splitValue[0].replace(/--/g, '').replace(/\s/g, '').toUpperCase();
+    const key = splitValue[0].replace(/--/g, '').replace(/\s/g, '')
+      .toUpperCase();
     const val = splitValue[1].replace(/\s/g, '');
     if (typeof param[key] !== 'undefined') {
       param[key] = val;
@@ -56,32 +57,26 @@ function getParam() {
 }
 const param = getParam();
 console.log('electron param:', param);
-const portStart = 8080;
+const portStart = 8081;
 function gerServer() {
   return `http://localhost:${portStart}`;
 }
 
 async function checkAndApplyDeviceAccessPrivilege() {
   const cameraPrivilege = systemPreferences.getMediaAccessStatus('camera');
-  console.log(
-    `checkAndApplyDeviceAccessPrivilege before apply cameraPrivilege: ${cameraPrivilege}`,
-  );
+  console.log(`checkAndApplyDeviceAccessPrivilege before apply cameraPrivilege: ${cameraPrivilege}`);
   if (cameraPrivilege !== 'granted') {
     await systemPreferences.askForMediaAccess('camera');
   }
 
   const micPrivilege = systemPreferences.getMediaAccessStatus('microphone');
-  console.log(
-    `checkAndApplyDeviceAccessPrivilege before apply micPrivilege: ${micPrivilege}`,
-  );
+  console.log(`checkAndApplyDeviceAccessPrivilege before apply micPrivilege: ${micPrivilege}`);
   if (micPrivilege !== 'granted') {
     await systemPreferences.askForMediaAccess('microphone');
   }
 
   const screenPrivilege = systemPreferences.getMediaAccessStatus('screen');
-  console.log(
-    `checkAndApplyDeviceAccessPrivilege before apply screenPrivilege: ${screenPrivilege}`,
-  );
+  console.log(`checkAndApplyDeviceAccessPrivilege before apply screenPrivilege: ${screenPrivilege}`);
 }
 
 async function createWindow() {
@@ -102,15 +97,15 @@ async function createWindow() {
 
   // 在执行 npm run start 后，经常会窗口已经显示出来了，但代码还未构建好，
   // 此时捕获到 did-fail-load 事件，在之后延迟重载
-  win.webContents.on('did-fail-load', function () {
-     console.log(`createWindow: did-fail-load, reload ${param.TRTC_ENV} soon...`);
-     setTimeout(()=>{
+  win.webContents.on('did-fail-load', () => {
+    console.log(`createWindow: did-fail-load, reload ${param.TRTC_ENV} soon...`);
+    setTimeout(() => {
       win.reload();
-     }, 1000);
-     logBothProcess('did-fail-load occur')
+    }, 1000);
+    logBothProcess('did-fail-load occur');
   });
 
-  win.webContents.on('did-finish-load', function(){
+  win.webContents.on('did-finish-load', () =>  {
     win.webContents.send('crash-file-path', `${crashFilePath}|${crashDumpsDir}`);
   });
 

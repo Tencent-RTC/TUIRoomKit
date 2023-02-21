@@ -5,6 +5,7 @@ module.exports = {
     'vue/setup-compiler-macros': true,
   },
   extends: [
+    'eslint-config-tencent',
     'plugin:vue/recommended',
   ],
   parserOptions: {
