@@ -1,7 +1,6 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@tencentcloud/tuiroom-engine-electron': 1.0.0
   '@typescript-eslint/eslint-plugin': ^5.4.0
   '@typescript-eslint/parser': ^5.4.0
   '@vue/cli-plugin-babel': ~5.0.0
@@ -22,7 +21,6 @@ specifiers:
   native-ext-loader: ^2.3.0
   pinia: ^2.0.28
   sass: ^1.57.1
-  sass-loader: ^13.2.0
   string-replace-webpack-plugin: ^0.1.3
   tim-js-sdk: ^2.24.2
   trtc-electron-sdk: 10.3.405
@@ -39,7 +37,6 @@ specifiers:
   yuv-canvas: ^1.2.11
 
 dependencies:
-  '@tencentcloud/tuiroom-engine-electron': 1.0.0
   axios: 0.27.2
   core-js: 3.27.2
   element-ui: 2.15.12_vue@2.7.14
@@ -65,7 +62,7 @@ devDependencies:
   '@vue/cli-plugin-babel': 5.0.8_qytlyiexgq72haek7ijdsrdwje
   '@vue/cli-plugin-eslint': 5.0.8_yvnkslq6l73c7sesu7e5hzum2a
   '@vue/cli-plugin-typescript': 5.0.8_7dpewdvc2nbluvzza4bbhmq4vy
-  '@vue/cli-service': 5.0.8_4la4aoxu2lbbew63qktr7najxm
+  '@vue/cli-service': 5.0.8_rhqkolmkwunxzlyyxxsuwaiuri
   '@vue/eslint-config-typescript': 9.1.0_dgoclwbz6p3iiscciltwkpac2u
   concurrently: 5.3.0
   electron: 18.3.15
@@ -73,7 +70,6 @@ devDependencies:
   eslint: 7.32.0
   eslint-plugin-vue: 8.7.1_eslint@7.32.0
   native-ext-loader: 2.3.0
-  sass-loader: 13.2.0_sass@1.58.0
   string-replace-webpack-plugin: 0.1.3
   typescript: 4.5.5
   vue-template-compiler: 2.7.14
@@ -1583,15 +1579,6 @@ packages:
       defer-to-connect: 1.1.3
     dev: true
 
-  /@tencentcloud/tuiroom-engine-electron/1.0.0:
-    resolution: {integrity: sha512-fLuNSPhBIhBV9noBpCeGoel3hVmH9go9i6akmHOPG1Gbzb0GWXZWq4M5u++3BURYY9DXeqh3PCUlRCbGAOep3Q==}
-    dependencies:
-      rtc-detect: 0.0.5
-      tim-js-sdk: 2.26.0
-      trtc-electron-sdk: 10.3.405
-      tsignaling: 0.10.0
-    dev: false
-
   /@tootallnate/once/2.0.0:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
@@ -2106,7 +2093,7 @@ packages:
     dependencies:
       '@babel/core': 7.20.12
       '@vue/babel-preset-app': 5.0.8_core-js@3.27.2+vue@2.7.14
-      '@vue/cli-service': 5.0.8_4la4aoxu2lbbew63qktr7najxm
+      '@vue/cli-service': 5.0.8_rhqkolmkwunxzlyyxxsuwaiuri
       '@vue/cli-shared-utils': 5.0.8
       babel-loader: 8.3.0_la66t7xldg4uecmyawueag5wkm
       thread-loader: 3.0.4_webpack@5.75.0
@@ -2128,7 +2115,7 @@ packages:
       '@vue/cli-service': ^3.0.0 || ^4.0.0 || ^5.0.0-0
       eslint: '>=7.5.0'
     dependencies:
-      '@vue/cli-service': 5.0.8_4la4aoxu2lbbew63qktr7najxm
+      '@vue/cli-service': 5.0.8_rhqkolmkwunxzlyyxxsuwaiuri
       '@vue/cli-shared-utils': 5.0.8
       eslint: 7.32.0
       eslint-webpack-plugin: 3.2.0_u2ubl3shblmc7225ne6wflnyua
@@ -2148,7 +2135,7 @@ packages:
     peerDependencies:
       '@vue/cli-service': ^3.0.0 || ^4.0.0 || ^5.0.0-0
     dependencies:
-      '@vue/cli-service': 5.0.8_4la4aoxu2lbbew63qktr7najxm
+      '@vue/cli-service': 5.0.8_rhqkolmkwunxzlyyxxsuwaiuri
       '@vue/cli-shared-utils': 5.0.8
     transitivePeerDependencies:
       - encoding
@@ -2170,7 +2157,7 @@ packages:
     dependencies:
       '@babel/core': 7.20.12
       '@types/webpack-env': 1.18.0
-      '@vue/cli-service': 5.0.8_4la4aoxu2lbbew63qktr7najxm
+      '@vue/cli-service': 5.0.8_rhqkolmkwunxzlyyxxsuwaiuri
       '@vue/cli-shared-utils': 5.0.8
       babel-loader: 8.3.0_la66t7xldg4uecmyawueag5wkm
       fork-ts-checker-webpack-plugin: 6.5.2_2hel2tzrshzaipvr7pmlxyecgy
@@ -2196,10 +2183,10 @@ packages:
     peerDependencies:
       '@vue/cli-service': ^3.0.0 || ^4.0.0 || ^5.0.0-0
     dependencies:
-      '@vue/cli-service': 5.0.8_4la4aoxu2lbbew63qktr7najxm
+      '@vue/cli-service': 5.0.8_rhqkolmkwunxzlyyxxsuwaiuri
     dev: true
 
-  /@vue/cli-service/5.0.8_4la4aoxu2lbbew63qktr7najxm:
+  /@vue/cli-service/5.0.8_rhqkolmkwunxzlyyxxsuwaiuri:
     resolution: {integrity: sha512-nV7tYQLe7YsTtzFrfOMIHc5N2hp5lHG2rpYr0aNja9rNljdgcPZLyQRb2YRivTHqTv7lI962UXFURcpStHgyFw==}
     engines: {node: ^12.0.0 || >= 14.0.0}
     hasBin: true
@@ -2273,7 +2260,6 @@ packages:
       postcss: 8.4.21
       postcss-loader: 6.2.1_6jdsrmfenkuhhw3gx4zvjlznce
       progress-webpack-plugin: 1.0.16_webpack@5.75.0
-      sass-loader: 13.2.0_sass@1.58.0
       ssri: 8.0.1
       terser-webpack-plugin: 5.3.6_webpack@5.75.0
       thread-loader: 3.0.4_webpack@5.75.0
@@ -5742,6 +5728,7 @@ packages:
 
   /immutable/4.2.4:
     resolution: {integrity: sha512-WDxL3Hheb1JkRN3sQkyujNlL/xRjAo3rJtaU5xeufUauG66JdMr32bLj4gF+vWl84DIA3Zxw7tiAjneYzRRw+w==}
+    dev: false
 
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -7799,10 +7786,6 @@ packages:
     dev: true
     optional: true
 
-  /rtc-detect/0.0.5:
-    resolution: {integrity: sha512-VANIELbaoIkZRj4gyiCCbTM+/ASy0eNgF35jCs+rrGxzYvD7YIBajEbGGZeh+5ZCNAX8/rT8IVRdpuallf174Q==}
-    dev: false
-
   /run-parallel/1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
     dependencies:
@@ -7831,30 +7814,6 @@ packages:
       truncate-utf8-bytes: 1.0.2
     dev: true
 
-  /sass-loader/13.2.0_sass@1.58.0:
-    resolution: {integrity: sha512-JWEp48djQA4nbZxmgC02/Wh0eroSUutulROUusYJO9P9zltRbNN80JCBHqRGzjd4cmZCa/r88xgfkjGD0TXsHg==}
-    engines: {node: '>= 14.15.0'}
-    peerDependencies:
-      fibers: '>= 3.1.0'
-      node-sass: ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
-      sass: ^1.3.0
-      sass-embedded: '*'
-      webpack: ^5.0.0
-    peerDependenciesMeta:
-      fibers:
-        optional: true
-      node-sass:
-        optional: true
-      sass:
-        optional: true
-      sass-embedded:
-        optional: true
-    dependencies:
-      klona: 2.0.6
-      neo-async: 2.6.2
-      sass: 1.58.0
-    dev: true
-
   /sass/1.58.0:
     resolution: {integrity: sha512-PiMJcP33DdKtZ/1jSjjqVIKihoDc6yWmYr9K/4r3fVVIEDAluD0q7XZiRKrNJcPK3qkLRF/79DND1H5q1LBjgg==}
     engines: {node: '>=12.0.0'}
@@ -7863,6 +7822,7 @@ packages:
       chokidar: 3.5.3
       immutable: 4.2.4
       source-map-js: 1.0.2
+    dev: false
 
   /sax/1.2.4:
     resolution: {integrity: sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==}

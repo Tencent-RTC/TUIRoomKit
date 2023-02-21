@@ -32,6 +32,7 @@ import { useRoute } from 'vue-router';
 import { onMounted, Ref, ref } from 'vue';
 import { getBasicInfo } from '@/config/basic-info-config';
 import { useI18n } from 'vue-i18n';
+import { useBasicStore } from '../TUIRoom/stores/basic';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
 import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
 
@@ -42,6 +43,7 @@ const avatarUrl: Ref<string> = ref('');
 const userId: Ref<string> = ref('');
 const { t } = useI18n();
 const roomEngine = useGetRoomEngine();
+const basicStore = useBasicStore();
 
 const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId : '';
 const givenRoomId: Ref<string> = ref((roomId) as string);
@@ -131,7 +133,7 @@ async function handleLogOut() {
 **/
 }
 
-onMounted(async () => {
+async function handleInit() {
   let currentUserInfo = null;
   if (sessionStorage.getItem('tuiRoom-userInfo')) {
     currentUserInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo') as string);
@@ -139,6 +141,7 @@ onMounted(async () => {
     currentUserInfo = await getBasicInfo();
     currentUserInfo && sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(currentUserInfo));
   }
+  basicStore.setBasicInfo(currentUserInfo);
   userName.value = currentUserInfo?.userName;
   avatarUrl.value = currentUserInfo?.avatarUrl;
   userId.value = currentUserInfo?.userId;
@@ -148,8 +151,15 @@ onMounted(async () => {
    *
    * 登录 TUIRoomCore, 只有登录 TUIRoomCore 之后，才可以使用 TUIRoomCore.checkRoomExistence 方法
   **/
-  await TUIRoomEngine.init({ sdkAppId, userId: userId.value, userSig });
-  streamPreviewRef.value.startStreamPreview();
+  await TUIRoomEngine.login({ sdkAppId, userId: userId.value, userSig });
+}
+
+handleInit();
+
+onMounted(() => {
+  TUIRoomEngine.once('ready', () => {
+    streamPreviewRef.value.startStreamPreview();
+  });
 });
 
 </script>
