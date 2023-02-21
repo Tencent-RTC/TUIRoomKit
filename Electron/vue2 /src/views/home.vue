@@ -57,12 +57,8 @@ export default {
     this.userAvatar = this.basicInfo.userAvatar;
     this.userId = this.basicInfo.userId;
     const { sdkAppId, userId, userSig } = this.basicInfo;
-    /**
-     * TUIRoomCore.checkRoomExistence method can only be used after logging into TUIRoomCore.
-     *
-     * 登录 TUIRoomCore, 只有登录 TUIRoomCore 之后，才可以使用 TUIRoomCore.checkRoomExistence 方法
-    **/
-    await TUIRoomEngine.init({ sdkAppId, userId, userSig });
+    // 登录 TUIRoomEngine
+    await TUIRoomEngine.login({ sdkAppId, userId, userSig });
     this.$refs.streamPreviewRef.startStreamPreview();
   },
   methods: {

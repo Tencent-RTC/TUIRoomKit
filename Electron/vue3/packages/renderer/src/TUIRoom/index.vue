@@ -147,11 +147,11 @@ interface RoomInitData {
   },
 }
 
-async function init(roomData: RoomInitData) {
-  basicStore.setBasicInfo(roomData);
-  roomStore.setLocalUser(roomData);
-  const { sdkAppId, userId, userSig, userName, avatarUrl } = roomData;
-  await TUIRoomEngine.init({ sdkAppId, userId, userSig });
+async function init(option: RoomInitData) {
+  basicStore.setBasicInfo(option);
+  roomStore.setLocalUser(option);
+  const { sdkAppId, userId, userSig, userName, avatarUrl } = option;
+  await TUIRoomEngine.login({ sdkAppId, userId, userSig });
   await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
 }
 
@@ -204,7 +204,6 @@ async function createRoom(options: {
   // 及时更新本地用户 onSeat 属性
   roomStore.setLocalUser({ onSeat: true });
   await getUserList();
-  await roomEngine.instance?.setLocalVideoProfile({ videoProfile: localVideoProfile.value });
   /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
    * about whether or not to turn on the no-mac ban.
@@ -229,7 +228,6 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
     await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
     roomStore.setLocalUser({ onSeat: true });
   }
-  await roomEngine.instance?.setLocalVideoProfile({ videoProfile: localVideoProfile.value });
   await getUserList();
   /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
