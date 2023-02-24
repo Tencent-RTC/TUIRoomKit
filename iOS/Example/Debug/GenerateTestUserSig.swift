@@ -14,14 +14,14 @@ import zlib
  * You can view your `SDKAppId` after creating an application in the [IM console](https://console.cloud.tencent.com/avc).
  * SDKAppID uniquely identifies a Tencent Cloud account.
  */
-let SDKAPPID: Int = 0
+let SDKAPPID: Int = 0_400_704_311
 
 /**
  * Signature validity period, which should not be set too short
  * Time unit: Second
  * Default value: 604800 (7 days)
  */
-let EXPIRETIME: Int = 0
+let EXPIRETIME: Int = 604_800
 
 /**
  * Follow the steps below to obtain the key required for UserSig calculation.

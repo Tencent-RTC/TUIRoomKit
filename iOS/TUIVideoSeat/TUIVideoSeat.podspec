@@ -24,14 +24,13 @@ Pod::Spec.new do |spec|
   spec.source                = { :path => './' }
   
   spec.dependency 'SnapKit'
-  spec.dependency 'Kingfisher'
   spec.dependency 'TUICore'
   
   spec.default_subspec = 'TRTC'
   
   spec.subspec 'Professional' do |professional|
     professional.dependency 'TUIRoomEngine/Professional'
-    professional.source_files = 'Source/*.swift','Source/Localized/*.swift','Source/View/*.swift','Source/Presenter/*.swift','Source/Model/*.swift','Source/Extension/*.*'
+    professional.source_files = 'Source/*.swift','Source/Localized/*.swift','Source/View/View/*.swift','Source/View/ViewModel/*.swift','Source/Model/*.swift','Source/Common/*.*'
     professional.resource_bundles = {
       'TUIVideoSeatKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.strings']
     }
@@ -40,7 +39,7 @@ Pod::Spec.new do |spec|
   
   spec.subspec 'TRTC' do |trtc|
     trtc.dependency 'TUIRoomEngine/TRTC'
-    trtc.source_files = 'Source/*.swift','Source/Localized/*.swift','Source/View/*.swift','Source/Presenter/*.swift','Source/Model/*.swift','Source/Extension/*.*'
+    trtc.source_files = 'Source/*.swift','Source/Localized/*.swift','Source/View/View/*.swift','Source/View/ViewModel/*.swift','Source/Model/*.swift','Source/Common/*.*'
     trtc.resource_bundles = {
       'TUIVideoSeatKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.strings']
     }

@@ -167,17 +167,17 @@ public class TUIRoomEntranceViewController: UIViewController {
     }
 
     @objc private func createButtonClick() {
-        let vc = TUIRoomCreateViewController()
-        vc.xMagicLicenseURL = xMagicLicenseURL
-        vc.xMagicLicenseKey = xMagicLicenseKey
-        navigationController?.pushViewController(vc, animated: true)
+//        let vc = TUIRoomCreateViewController()
+//        vc.xMagicLicenseURL = xMagicLicenseURL
+//        vc.xMagicLicenseKey = xMagicLicenseKey
+//        navigationController?.pushViewController(vc, animated: true)
     }
 
     @objc private func quickJoinButtonClick() {
-        let vc = TUIRoomJoinViewController()
-        vc.xMagicLicenseURL = xMagicLicenseURL
-        vc.xMagicLicenseKey = xMagicLicenseKey
-        navigationController?.pushViewController(vc, animated: true)
+//        let vc = TUIRoomJoinViewController()
+//        vc.xMagicLicenseURL = xMagicLicenseURL
+//        vc.xMagicLicenseKey = xMagicLicenseKey
+//        navigationController?.pushViewController(vc, animated: true)
     }
 
     deinit {

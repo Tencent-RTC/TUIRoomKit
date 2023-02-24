@@ -3,15 +3,16 @@
 //  TUIRoomKit
 //
 //  Created by WesleyLei on 2022/9/13.
+//  Copyright © 2022 Tencent. All rights reserved.
 //
 
 import UIKit
 
-func tuiRoomKitLocalize(_ key: String) -> String {
+func localized(_ key: String) -> String {
     return TUIRoomKitLocalized.sharedBundle.localizedString(forKey: key, value: "", table: "TUIRoomKitLocalized")
 }
 
-func tuiRoomKitLocalizeReplace(_ origin: String, replace: String) -> String {
+func localizedReplace(_ origin: String, replace: String) -> String {
     return origin.replacingOccurrences(of: "xxx", with: replace)
 }
 
@@ -22,12 +23,12 @@ func tuiRoomKitBundle() -> Bundle {
 private class TUIRoomKitLocalized {
     class var sharedBundle: Bundle {
         struct Static {
-            static let bundel: Bundle? = tuiRoomKitBundle()
+            static let bundle: Bundle? = tuiRoomKitBundle()
         }
-        guard let bunddel = Static.bundel else {
+        guard let bundle = Static.bundle else {
             return Bundle()
         }
-        return bunddel
+        return bundle
     }
 }
 

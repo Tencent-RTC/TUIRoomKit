@@ -20,21 +20,21 @@ public let gVideoSeatViewKey = NSObject.getVideoSeatViewKey()
 // MARK: - TUIExtensionProtocol
 
 extension TUIVideoSeat: TUIExtensionProtocol {
-
+    
     func getExtensionInfo(_ key: String, param: [AnyHashable : Any]?) -> [AnyHashable : Any] {
-
+        
         guard let param = param else {
             return [:]
         }
-
+        
         guard let roomEngine:TUIRoomEngine = param["roomEngine"] as? TUIRoomEngine else {
             return [:]
         }
-
+        
         guard let roomId:String = param["roomId"] as? String else {
             return [:]
         }
-
+        
         if key == gVideoSeatViewKey {
             let view = TUIVideoSeatView(frame: UIScreen.main.bounds, roomEngine: roomEngine, roomId: roomId)
             return [key:view]
