@@ -49,9 +49,6 @@ public class BottomView extends LinearLayout {
         for (final BottomItemData itemData : mDataList) {
             if (BottomItemData.Type.BARRAGE.equals(itemData.getType())
                     || BottomItemData.Type.BEAUTY.equals(itemData.getType())) {
-                if (itemData.getView() == null) {
-                    continue;
-                }
                 RelativeLayout.LayoutParams params = new RelativeLayout
                         .LayoutParams(getResources()
                         .getDimensionPixelSize(R.dimen.tuiroomkit_bottom_item_view_width),

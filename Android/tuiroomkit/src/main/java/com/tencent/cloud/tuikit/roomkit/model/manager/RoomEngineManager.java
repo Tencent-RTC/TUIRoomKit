@@ -15,7 +15,6 @@ import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.liteav.basic.UserModel;
 import com.tencent.liteav.basic.UserModelManager;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
-import com.tencent.liteav.debug.GenerateTestUserSig;
 
 import java.util.HashMap;
 import java.util.Map;

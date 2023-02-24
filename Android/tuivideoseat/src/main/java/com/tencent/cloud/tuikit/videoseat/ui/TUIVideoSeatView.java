@@ -19,9 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.videoseat.R;
-import com.tencent.cloud.tuikit.videoseat.model.UserEntity;
-import com.tencent.cloud.tuikit.videoseat.presenter.IVideoSeatPresenter;
-import com.tencent.cloud.tuikit.videoseat.presenter.VideoSeatPresenter;
+import com.tencent.cloud.tuikit.videoseat.viewmodel.UserEntity;
+import com.tencent.cloud.tuikit.videoseat.viewmodel.IVideoSeatViewModel;
+import com.tencent.cloud.tuikit.videoseat.viewmodel.VideoSeatViewModel;
 import com.tencent.cloud.tuikit.videoseat.ui.utils.ImageLoader;
 import com.tencent.cloud.tuikit.videoseat.ui.utils.PageLayoutManager;
 import com.tencent.cloud.tuikit.videoseat.ui.utils.PagerSnapHelper;
@@ -58,7 +58,7 @@ public class TUIVideoSeatView extends RelativeLayout {
     private Map<Integer, ViewHolder> mViewHolderMap;
 
     private OnClickListener     mSmallWindowTapListener;
-    private IVideoSeatPresenter mPresenter;
+    private IVideoSeatViewModel mViewModel;
 
     private boolean mShowListView;
 
@@ -87,14 +87,14 @@ public class TUIVideoSeatView extends RelativeLayout {
     }
 
     private void init(String roomId, TUIRoomEngine roomEngine) {
-        mPresenter = new VideoSeatPresenter(mContext, roomEngine, this, roomId);
-        setData(mPresenter.getData());
+        mViewModel = new VideoSeatViewModel(mContext, roomEngine, this, roomId);
+        setData(mViewModel.getData());
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mPresenter.destroy();
+        mViewModel.destroy();
     }
 
     private void initView() {
@@ -422,8 +422,8 @@ public class TUIVideoSeatView extends RelativeLayout {
         }
         for (String userId : mVisibleVideoStreams) {
             if (!newUserIds.contains(userId)) {
-                if (mPresenter != null) {
-                    mPresenter.stopPlayVideo(userId, false, false);
+                if (mViewModel != null) {
+                    mViewModel.stopPlayVideo(userId, false, false);
                 }
             }
         }
@@ -447,16 +447,16 @@ public class TUIVideoSeatView extends RelativeLayout {
             entity.setNeedFresh(false);
             if (entity.isVideoAvailable()) {
                 roomVideoView.setPlaying(true);
-                if (mPresenter != null) {
-                    mPresenter.startPlayVideo(entity.getUserId(),
+                if (mViewModel != null) {
+                    mViewModel.startPlayVideo(entity.getUserId(),
                             entity.getRoomVideoView().getPlayVideoView(),
                             entity.isScreenShareAvailable());
                 }
             } else {
                 if (roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(false);
-                    if (mPresenter != null) {
-                        mPresenter.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
+                    if (mViewModel != null) {
+                        mViewModel.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
                     }
                 }
             }
@@ -469,8 +469,8 @@ public class TUIVideoSeatView extends RelativeLayout {
             if (entity.isVideoAvailable()) {
                 if (!roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(true);
-                    if (mPresenter != null) {
-                        mPresenter.startPlayVideo(entity.getUserId(),
+                    if (mViewModel != null) {
+                        mViewModel.startPlayVideo(entity.getUserId(),
                                 entity.getRoomVideoView().getPlayVideoView(),
                                 entity.isScreenShareAvailable());
                     }
@@ -479,8 +479,8 @@ public class TUIVideoSeatView extends RelativeLayout {
             } else {
                 if (roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(false);
-                    if (mPresenter != null) {
-                        mPresenter.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
+                    if (mViewModel != null) {
+                        mViewModel.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
                     }
                 }
             }
@@ -488,8 +488,8 @@ public class TUIVideoSeatView extends RelativeLayout {
             if (!entity.isVideoAvailable()) {
                 if (roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(false);
-                    if (mPresenter != null) {
-                        mPresenter.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
+                    if (mViewModel != null) {
+                        mViewModel.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
                     }
                 }
             }

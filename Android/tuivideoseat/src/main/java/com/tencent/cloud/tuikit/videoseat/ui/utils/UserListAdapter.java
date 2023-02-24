@@ -2,9 +2,9 @@ package com.tencent.cloud.tuikit.videoseat.ui.utils;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.tencent.cloud.tuikit.videoseat.model.UserEntity.QUALITY_BAD;
-import static com.tencent.cloud.tuikit.videoseat.model.UserEntity.QUALITY_GOOD;
-import static com.tencent.cloud.tuikit.videoseat.model.UserEntity.QUALITY_NORMAL;
+import static com.tencent.cloud.tuikit.videoseat.viewmodel.UserEntity.QUALITY_BAD;
+import static com.tencent.cloud.tuikit.videoseat.viewmodel.UserEntity.QUALITY_GOOD;
+import static com.tencent.cloud.tuikit.videoseat.viewmodel.UserEntity.QUALITY_NORMAL;
 
 import android.content.Context;
 import android.view.GestureDetector;
@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.videoseat.R;
-import com.tencent.cloud.tuikit.videoseat.model.UserEntity;
+import com.tencent.cloud.tuikit.videoseat.viewmodel.UserEntity;
 import com.tencent.cloud.tuikit.videoseat.ui.view.VideoView;
 
 import java.util.List;
