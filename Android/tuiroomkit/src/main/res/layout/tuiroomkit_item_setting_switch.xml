@@ -9,9 +9,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="12dp"
+        android:paddingLeft="16dp"
         android:paddingTop="12dp"
-        android:paddingRight="12dp"
+        android:paddingRight="16dp"
         android:paddingBottom="12dp">
 
         <androidx.constraintlayout.widget.Guideline
@@ -40,9 +40,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:textColor="@color/tuiroomkit_color_main_text"
+            android:textColor="@color/tuiroomkit_color_text_light_grey"
             android:textSize="@dimen/tuiroomkit_item_title_size"
-            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -63,7 +62,9 @@
     <View
         android:id="@+id/bottom_line"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/tuiroomkit_color_bg_main" />
+        android:layout_height="0.5dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@color/tuiroomkit_bg_guide_line_grey" />
 </LinearLayout>
 

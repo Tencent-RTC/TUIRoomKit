@@ -4,19 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/tuiroomkit_bg_more_action"
+    android:background="@drawable/tuiroomkit_bg_bottom_dialog_black"
     android:orientation="vertical"
     android:paddingBottom="32dp"
-    tools:background="@drawable/tuiroomkit_bg_more_action">
+    tools:background="@drawable/tuiroomkit_bg_bottom_dialog_black">
 
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="32dp"
         android:text="@string/tuiroomkit_title_resolution"
-        android:textColor="@color/tuiroomkit_color_black"
+        android:textColor="@color/tuiroomkit_color_text_light_grey"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"

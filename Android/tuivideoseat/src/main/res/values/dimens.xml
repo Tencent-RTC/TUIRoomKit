@@ -2,4 +2,5 @@
 <resources>
     <dimen name="tuivideoseat_page_dot_radius">3dp</dimen>
     <dimen name="tuivideoseat_video_view_margin">92dp</dimen>
+    <dimen name="tuivideoseat_video_view_conor">16dp</dimen>
 </resources>

@@ -2,9 +2,6 @@ package com.tencent.cloud.tuikit.videoseat.ui.utils;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.tencent.cloud.tuikit.videoseat.model.UserEntity.QUALITY_BAD;
-import static com.tencent.cloud.tuikit.videoseat.model.UserEntity.QUALITY_GOOD;
-import static com.tencent.cloud.tuikit.videoseat.model.UserEntity.QUALITY_NORMAL;
 
 import android.content.Context;
 import android.view.GestureDetector;
@@ -21,8 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.videoseat.R;
-import com.tencent.cloud.tuikit.videoseat.model.UserEntity;
+import com.tencent.cloud.tuikit.videoseat.ui.view.UserVolumePromptView;
+import com.tencent.cloud.tuikit.videoseat.ui.view.RoundRelativeLayout;
 import com.tencent.cloud.tuikit.videoseat.ui.view.VideoView;
+import com.tencent.cloud.tuikit.videoseat.viewmodel.UserEntity;
 
 import java.util.List;
 
@@ -40,9 +39,19 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private List<UserEntity> mList;
 
+    private boolean mIsLayoutStyleRound = true;
+
+    private final int mRoundConor;
+
     public UserListAdapter(Context context, List<UserEntity> list) {
         this.mContext = context;
         this.mList = list;
+        mRoundConor = (int) context.getResources().getDimension(R.dimen.tuivideoseat_video_view_conor);
+    }
+
+    public void switchLayout(boolean isLayoutStyleRound) {
+        mIsLayoutStyleRound = isLayoutStyleRound;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -66,12 +75,10 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (payloads.size() == 0) {
             onBindViewHolder(holder, position);
         } else {
-            if (QUALITY.equals(payloads.get(0))) {
-                UserEntity item = mList.get(position);
-                ((ViewHolder) holder).setQuality(item.getQuality());
-            } else if (VOLUME.equals(payloads.get(0))) {
+            if (VOLUME.equals(payloads.get(0))) {
                 UserEntity item = mList.get(position);
                 ((ViewHolder) holder).setVolume(item.isTalk());
+                ((ViewHolder) holder).updateVolumeEffect(item.getAudioVolume());
             }
         }
     }
@@ -93,15 +100,16 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private   int             mViewType;
-        protected View            mTalkView;
-        private   View            mViewBackground;
-        private   TextView        mUserNameTv;
-        private   ImageView       mUserSignal;
-        private   ImageView       mIvMaster;
-        private   CircleImageView mUserHeadImg;
-        private   UserEntity      mMemberEntity;
-        private   FrameLayout     mVideoContainer;
+        private   int                  mViewType;
+        protected View                 mTalkView;
+        private   View                 mViewBackground;
+        private   TextView             mUserNameTv;
+        private   ImageView            mIvMaster;
+        private   UserVolumePromptView mUserMic;
+        private   CircleImageView      mUserHeadImg;
+        private   UserEntity           mMemberEntity;
+        private   FrameLayout          mVideoContainer;
+        private   RoundRelativeLayout  mTopLayout;
 
         private final Runnable mRunnable = new Runnable() {
             @Override
@@ -138,24 +146,12 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     }
                 });
 
-        public void setQuality(int quality) {
-            switch (quality) {
-                case QUALITY_GOOD:
-                    mUserSignal.setVisibility(VISIBLE);
-                    mUserSignal.setImageResource(R.drawable.tuivideoseat_ic_signal_3);
-                    break;
-                case QUALITY_NORMAL:
-                    mUserSignal.setVisibility(VISIBLE);
-                    mUserSignal.setImageResource(R.drawable.tuivideoseat_ic_signal_2);
-                    break;
-                case QUALITY_BAD:
-                    mUserSignal.setVisibility(VISIBLE);
-                    mUserSignal.setImageResource(R.drawable.tuivideoseat_ic_signal_1);
-                    break;
-                default:
-                    mUserSignal.setVisibility(GONE);
-                    break;
-            }
+        public void updateVolumeEffect(int volume) {
+            mUserMic.updateVolumeEffect(volume);
+        }
+
+        public void enableVolumeEffect(boolean enable) {
+            mUserMic.enableVolumeEffect(enable);
         }
 
         public void setVolume(boolean isTalk) {
@@ -176,7 +172,8 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mUserHeadImg.setVisibility(model.isVideoAvailable() ? GONE : VISIBLE);
             ImageLoader.loadImage(mContext, mUserHeadImg, model.getUserAvatar(), R.drawable.tuivideoseat_head);
             mUserNameTv.setText(model.getUserName());
-            setQuality(model.getQuality());
+            enableVolumeEffect(model.isAudioAvailable());
+            updateVolumeEffect(model.getAudioVolume());
             mIvMaster.setVisibility(model.getRole() == TUIRoomDefine.Role.ROOM_OWNER ? VISIBLE : GONE);
             if (mViewType == TYPE_SELF) {
                 itemView.setOnTouchListener(new View.OnTouchListener() {
@@ -186,13 +183,19 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     }
                 });
             }
+
+            mTopLayout.setRadius(mIsLayoutStyleRound ? mRoundConor : 0);
+            int backGroundId = mIsLayoutStyleRound ? R.drawable.tuivideoseat_talk_bg_round :
+                    R.drawable.tuivideoseat_talk_bg_rectangular;
+            mTalkView.setBackground(mContext.getResources().getDrawable(backGroundId));
         }
 
         private void initView(final View itemView) {
+            mTopLayout = itemView.findViewById(R.id.rl_content);
             mUserNameTv = itemView.findViewById(R.id.tv_user_name);
             mVideoContainer = itemView.findViewById(R.id.fl_container);
             mUserHeadImg = itemView.findViewById(R.id.img_user_head);
-            mUserSignal = itemView.findViewById(R.id.img_signal);
+            mUserMic = itemView.findViewById(R.id.tuivideoseat_user_mic);
             mIvMaster = itemView.findViewById(R.id.img_master);
             mTalkView = itemView.findViewById(R.id.talk_view);
             mViewBackground = itemView.findViewById(R.id.view_background);

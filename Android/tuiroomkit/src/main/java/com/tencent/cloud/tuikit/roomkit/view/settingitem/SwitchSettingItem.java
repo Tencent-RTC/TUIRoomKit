@@ -42,12 +42,17 @@ public class SwitchSettingItem extends BaseSettingItem {
         return null;
     }
 
+    public void hideBottomLine() {
+        mItemViewHolder.mBottomLine.setVisibility(View.GONE);
+    }
+
     public interface Listener {
         void onSwitchChecked(boolean isChecked);
     }
 
     public class ItemViewHolder {
         public  View         mRootView;
+        private View         mBottomLine;
         private TextView     mTitle;
         private SwitchCompat mItemSwitch;
 
@@ -55,6 +60,7 @@ public class SwitchSettingItem extends BaseSettingItem {
             mRootView = itemView;
             mTitle = itemView.findViewById(R.id.title);
             mTitle.setText(mItemText.title);
+            mBottomLine = itemView.findViewById(R.id.bottom_line);
             mItemSwitch = itemView.findViewById(R.id.switch_item);
             mItemSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override

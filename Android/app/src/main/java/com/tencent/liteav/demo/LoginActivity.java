@@ -58,14 +58,8 @@ public class LoginActivity extends AppCompatActivity {
         userModel.userSig = GenerateTestUserSig.genTestUserSig(userId);
         final UserModelManager manager = UserModelManager.getInstance();
         manager.setUserModel(userModel);
-
-        if (TextUtils.isEmpty(userModel.userName) || TextUtils.isEmpty(userModel.userAvatar)) {
-            Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
-            startActivity(intent);
-        } else {
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-        }
+        Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+        startActivity(intent);
     }
 
     private void initStatusBar() {

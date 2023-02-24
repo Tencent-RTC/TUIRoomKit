@@ -1,0 +1,52 @@
+package com.tencent.cloud.tuikit.videoseat.ui.view;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Path;
+import android.graphics.RectF;
+import android.graphics.Region;
+import android.util.AttributeSet;
+import android.widget.RelativeLayout;
+
+import androidx.annotation.Nullable;
+
+public class RoundRelativeLayout extends RelativeLayout {
+    private int   mRadius;
+    private RectF mRect;
+    private Path  mPath;
+
+    public RoundRelativeLayout(Context context) {
+        this(context, null);
+    }
+
+    public RoundRelativeLayout(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        setWillNotDraw(false);
+        mRadius = 0;
+        mPath = new Path();
+    }
+
+    public void setRadius(int radius) {
+        if (radius < 0) {
+            return;
+        }
+        mRadius = radius;
+        invalidate();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mRect = new RectF(0, 0, getWidth(), getHeight());
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        int saveCount = canvas.save();
+        mPath.reset();
+        mPath.addRoundRect(mRect, mRadius, mRadius, Path.Direction.CW);
+        canvas.clipPath(mPath, Region.Op.INTERSECT);
+        super.draw(canvas);
+        canvas.restoreToCount(saveCount);
+    }
+}

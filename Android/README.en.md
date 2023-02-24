@@ -1,7 +1,7 @@
-# Quick Run of TUIRoom Demo for Android
+# Quick Run of TUIRoomKit Demo for Android
 _[中文](README.md) | English_
 
-This document describes how to quickly run the `TUIRoomKit` demo project to try out multi-person audio/video interactions. For more information on the TUIRoom component connection process, see **[Integrating TUIRoomKit (Android)](https://write.woa.com/document/93119926066618368)**.
+This document describes how to quickly run the `TUIRoomKit` demo project to try out multi-person audio/video interactions. For more information on the TUIRoomKit component connection process, see **[Integrating TUIRoomKit (Android)](https://write.woa.com/document/93119926066618368)**.
 >!This product is currently in the free public beta period, and no additional fees are charged for the time being. The current service billing is consistent with instant messaging IM, real-time audio and video TRTC product billing services.
 You can download the SDK for free for a limited time and access to experience multi-person audio and video sessions ability.
 If there are any changes in the billing method, functions, and free public beta time of the multiplayer audio and video SDK in the future,
@@ -12,12 +12,11 @@ and notify you in advance through in-site letters, text messages, emails, etc., 
 ## Directory Structure
 
 ```
-TUIRoom
+Android
 ├─ app              // Main panel, which is the entry of the multi-person audio/video interaction scenario
 ├─ basic            // basic code,contains base method and class,etc.
 ├─ debug            // Debugging code
 ├─ tuibeauty        // Beauty filter panel, which provides effects such as beauty filters, filters, and animated effect
-├─ tuibarrage       // Barrage panel, which provides sending chat messages
 ├─ tuicore          // Public library, used to mount tui components
 ├─ tuivideoseat     // Video panel，for streaming video
 └─ tuiroomkit       // Multi-person audio/video interaction business logic
@@ -50,7 +49,7 @@ TUIRoom
 	- SECRETKEY: A placeholder by default. Set it to the key information that you noted down in step 1.
 
 ### Step 3. Compile and run the application
-You can open the source code directory `TUIRoom/Android` in Android Studio 3.5 or later, wait for the Android Studio project to be synced, connect to a real device, and click **Run** to try out the application.
+You can open the source code directory `TUIRoomKit/Android` in Android Studio 3.5 or later, wait for the Android Studio project to be synced, connect to a real device, and click **Run** to try out the application.
 
 ### Step 4. Try out the demo
 

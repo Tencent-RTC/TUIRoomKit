@@ -11,6 +11,10 @@ public class BottomSelectItemData {
     @DrawableRes
     private int selectedIconId;
 
+    private String unSelectedName;
+
+    private String selectedName;
+
     private OnItemSelectListener mOnItemSelectListener;
 
     public OnItemSelectListener getOnItemSelectListener() {
@@ -35,6 +39,22 @@ public class BottomSelectItemData {
 
     public void setUnSelectedIconId(int unSelectedIconId) {
         this.unSelectedIconId = unSelectedIconId;
+    }
+
+    public String getSelectedName() {
+        return selectedName;
+    }
+
+    public void setSelectedName(String selectedName) {
+        this.selectedName = selectedName;
+    }
+
+    public String getUnSelectedName() {
+        return unSelectedName;
+    }
+
+    public void setUnSelectedName(String unSelectedName) {
+        this.unSelectedName = unSelectedName;
     }
 
     public int getSelectedIconId() {

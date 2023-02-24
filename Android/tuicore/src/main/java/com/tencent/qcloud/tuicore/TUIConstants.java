@@ -34,6 +34,12 @@ public final class TUIConstants {
         public static final String TUI_COMMUNITY = "TUICommunityService";
     }
 
+    public static final class TUICore {
+        public static final String LANGUAGE_EVENT = "TUIThemeManager";
+        public static final String LANGUAGE_EVENT_SUB_KEY = "onInitLanguage";
+
+    }
+
     public static final class TUILogin {
 
         // User login status change broadcast
@@ -409,6 +415,11 @@ public final class TUIConstants {
         public static final String BUYING_FEATURE_COMMUNITY = "buying_community";
         public static final String BUYING_FEATURE_SEARCH = "buying_search";
         public static final String BUYING_FEATURE_ONLINE_STATUS = "buying_online_status";
+    }
+
+    public static final class TUIVideoSeat {
+        public static final String SERVICE_VIDEO_SEAT = "com.tencent.cloud.tuikit.videoseat.core.TUIVideoSeatExtension";
+        public static final String METHOD_SWITCH_VIDEO_LAYOUT = "switchVideoLayout";
     }
 
     // localBroadcast

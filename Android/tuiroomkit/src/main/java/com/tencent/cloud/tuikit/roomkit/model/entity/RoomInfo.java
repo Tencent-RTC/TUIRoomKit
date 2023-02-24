@@ -6,10 +6,12 @@ public class RoomInfo {
     public String  owner;
     public String  roomId;
     public boolean isOpenCamera;
+    public boolean isUseSpeaker;
     public boolean isOpenMicrophone;
-    public boolean enableVideo   = true;
-    public boolean enableAudio   = true;
-    public boolean enableMessage = true;
+    public boolean enableVideo       = true;
+    public boolean enableAudio       = true;
+    public boolean enableMessage     = true;
+    public boolean enableSeatControl = false;
 
     @Override
     public String toString() {
@@ -19,9 +21,11 @@ public class RoomInfo {
                 + ", roomId='" + roomId + '\''
                 + ", isOpenCamera=" + isOpenCamera
                 + ", isOpenMicrophone=" + isOpenMicrophone
+                + ", isUseSpeaker=" + isUseSpeaker
                 + ", enableVideo=" + enableVideo
                 + ", enableAudio=" + enableAudio
                 + ", enableMessage=" + enableMessage
+                + ", enableSeatControl=" + enableSeatControl
                 + '}';
     }
 }

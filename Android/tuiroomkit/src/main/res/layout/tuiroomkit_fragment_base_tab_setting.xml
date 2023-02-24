@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/tuiroomkit_bg_more_action"
+    android:background="@drawable/tuiroomkit_bg_bottom_dialog_black"
     android:orientation="vertical"
-    tools:background="@drawable/tuiroomkit_bg_more_action">
+    tools:background="@drawable/tuiroomkit_bg_bottom_dialog_black">
 
     <View
         android:layout_width="32dp"
@@ -27,7 +27,7 @@
         app:tabMinWidth="16dp"
         app:tabSelectedTextColor="@color/tuiroomkit_color_blue"
         app:tabTextAppearance="@style/TUIRoomTabFragmentTabText"
-        app:tabTextColor="@color/tuiroomkit_color_tab_text" />
+        app:tabTextColor="@color/tuiroomkit_color_white" />
 
     <View
         android:layout_width="match_parent"

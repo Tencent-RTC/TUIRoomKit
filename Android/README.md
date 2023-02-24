@@ -8,12 +8,11 @@ _中文 | [English](README.en.md)_
 ## 目录结构
 
 ```
-TUIRoom
+Android
 ├─ app              // 主面板，多人音视频互动场景入口
 ├─ basic            // 基础模块，包含一些基础类与方法
 ├─ debug            // 调试相关
 ├─ tuibeauty        // 美颜面板，包含美颜，滤镜，动效等效果
-├─ tuibarrage       // 弹幕组件，用于发送聊天消息
 ├─ tuicore          // tui公共库，用于挂载tui组件
 ├─ tuivideoseat     // 视频组件，用于播放视频流
 └─ tuiroomkit       // 多人音视频房间业务逻辑
@@ -46,7 +45,7 @@ TUIRoom
 	- SECRETKEY：默认为占位符（PLACEHOLDER），请设置为步第一步中记录下的密钥信息。
 
 ### 第三步：编译运行
-使用 Android Studio（3.5 以上的版本）打开源码目录 `TUIRoom/Android`，待Android Studio工程同步完成后，连接真机单击 **运行按钮** 即可开始体验本APP。
+使用 Android Studio（3.5 以上的版本）打开源码目录 `TUIRoomKit/Android`，待Android Studio工程同步完成后，连接真机单击 **运行按钮** 即可开始体验本APP。
 
 ### 第四步：示例体验
 
@@ -61,7 +60,7 @@ Tips：TUIRoomKit 使用体验，至少需要两台设备，如果用户A/B分�
 
 | 步骤1 | 步骤2 | 步骤3 | 步骤4 |
 |---------|---------|---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/7078de13e36acb9756cd407567b8605c.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/82912e69c5b3cb63e8d829133c900879.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/e8fbe729a8e1e0e683eb0b371a4d351d.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/4f532104baf9a13afd147f265b8e1963.png" width="320"/> |
+| <img src="https://qcloudimg.tencent-cloud.cn/raw/7078de13e36acb9756cd407567b8605c.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/497d147ca8e8ece491c2b4aae27697ae.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/632cacffcf697f1bc05e51e6d626e434.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/3d217a070cfc1872ea7dea5a778819bf.png" width="320"/> |
 
 **设备 B（userId：222）**
 
@@ -70,7 +69,7 @@ Tips：TUIRoomKit 使用体验，至少需要两台设备，如果用户A/B分�
 
 | 步骤1 | 步骤2 |
 |---------|---------|
-|<img src="https://qcloudimg.tencent-cloud.cn/raw/e5e7fcc651f705a2d2622e9455eb896c.png" width="320"/>|<img src="https://qcloudimg.tencent-cloud.cn/raw/a49fc2f24020ca1d26ba381ef95d56d6.png" width="320"/>|
+|<img src="https://qcloudimg.tencent-cloud.cn/raw/86c09b7cb9ea8ae640e53f06ad7510d7.png" width="320"/>|<img src="https://qcloudimg.tencent-cloud.cn/raw/949cf774fbfb19986d4373c4d17f260f.png" width="320"/>|
 ## 常见问题
 
 - [TUI 场景化解决方案常见问题](https://cloud.tencent.com/document/product/647/84272)

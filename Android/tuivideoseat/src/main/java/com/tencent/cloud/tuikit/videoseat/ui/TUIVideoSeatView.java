@@ -1,7 +1,6 @@
 package com.tencent.cloud.tuikit.videoseat.ui;
 
 
-import static com.tencent.cloud.tuikit.videoseat.ui.utils.UserListAdapter.QUALITY;
 import static com.tencent.cloud.tuikit.videoseat.ui.utils.UserListAdapter.VOLUME;
 
 import android.content.Context;
@@ -19,15 +18,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.videoseat.R;
-import com.tencent.cloud.tuikit.videoseat.model.UserEntity;
-import com.tencent.cloud.tuikit.videoseat.presenter.IVideoSeatPresenter;
-import com.tencent.cloud.tuikit.videoseat.presenter.VideoSeatPresenter;
 import com.tencent.cloud.tuikit.videoseat.ui.utils.ImageLoader;
 import com.tencent.cloud.tuikit.videoseat.ui.utils.PageLayoutManager;
 import com.tencent.cloud.tuikit.videoseat.ui.utils.PagerSnapHelper;
 import com.tencent.cloud.tuikit.videoseat.ui.utils.UserListAdapter;
 import com.tencent.cloud.tuikit.videoseat.ui.view.CircleIndicator;
+import com.tencent.cloud.tuikit.videoseat.ui.view.RoundRelativeLayout;
+import com.tencent.cloud.tuikit.videoseat.ui.view.UserVolumePromptView;
 import com.tencent.cloud.tuikit.videoseat.ui.view.VideoView;
+import com.tencent.cloud.tuikit.videoseat.viewmodel.IVideoSeatViewModel;
+import com.tencent.cloud.tuikit.videoseat.viewmodel.UserEntity;
+import com.tencent.cloud.tuikit.videoseat.viewmodel.VideoSeatViewModel;
 import com.tencent.qcloud.tuicore.util.ScreenUtil;
 
 import java.util.ArrayList;
@@ -42,7 +43,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class TUIVideoSeatView extends RelativeLayout {
     private static final String TAG = "AnchorListView";
 
-    private static final int MAX_ITEM_COUNT = 6;
+    private static final int   MAX_ITEM_COUNT         = 6;
+    private static final int[] LAYOUT_ROUND_ARR       = {
+            R.layout.tuivideoseat_one_member_layout_round, R.layout.tuivideoseat_two_member_layout_round,
+            R.layout.tuivideoseat_three_member_layout_round, R.layout.tuivideoseat_four_member_layout_round,
+            R.layout.tuivideoseat_five_member_layout_round};
+    private static final int[] LAYOUT_RECTANGULAR_ARR = {
+            R.layout.tuivideoseat_one_member_layout_rectangular, R.layout.tuivideoseat_two_member_layout_rectangular,
+            R.layout.tuivideoseat_three_member_layout_rectangular, R.layout.tuivideoseat_four_member_layout_rectangular,
+            R.layout.tuivideoseat_five_member_layout_rectangular};
 
     private Context mContext;
 
@@ -58,9 +67,12 @@ public class TUIVideoSeatView extends RelativeLayout {
     private Map<Integer, ViewHolder> mViewHolderMap;
 
     private OnClickListener     mSmallWindowTapListener;
-    private IVideoSeatPresenter mPresenter;
+    private IVideoSeatViewModel mViewModel;
 
     private boolean mShowListView;
+    private boolean mIsLayoutStyleRound = true;
+
+    private final int mUserVideoRoundRadius;
 
     public TUIVideoSeatView(Context context, String roomId, TUIRoomEngine roomEngine) {
         super(context);
@@ -76,6 +88,8 @@ public class TUIVideoSeatView extends RelativeLayout {
         mCircleIndicator.setSelectDotColor(selectColor);
         mCircleIndicator.setUnSelectDotColor(unSelectColor);
         init(roomId, roomEngine);
+
+        mUserVideoRoundRadius = (int) context.getResources().getDimension(R.dimen.tuivideoseat_video_view_conor);
     }
 
     private void setData(List<UserEntity> list) {
@@ -87,14 +101,35 @@ public class TUIVideoSeatView extends RelativeLayout {
     }
 
     private void init(String roomId, TUIRoomEngine roomEngine) {
-        mPresenter = new VideoSeatPresenter(mContext, roomEngine, this, roomId);
-        setData(mPresenter.getData());
+        mViewModel = new VideoSeatViewModel(mContext, roomEngine, this, roomId);
+        setData(mViewModel.getData());
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mPresenter.destroy();
+        mViewModel.destroy();
+    }
+
+    public void switchVideoLayout() {
+        mIsLayoutStyleRound = !mIsLayoutStyleRound;
+        initView();
+        int size = mMemberEntityList.size();
+        if (size < MAX_ITEM_COUNT) {
+            ViewHolder holder;
+            for (int i = 0; i < size; i++) {
+                holder = mViewHolderMap.get(i);
+                holder.switchTalkViewBackGround();
+                holder.switchViewConor();
+            }
+        } else {
+            if (mPageLayoutManager != null) {
+                mPageLayoutManager.switchLayout(mIsLayoutStyleRound);
+            }
+            if (mMemberListAdapter != null) {
+                mMemberListAdapter.switchLayout(mIsLayoutStyleRound);
+            }
+        }
     }
 
     private void initView() {
@@ -105,23 +140,14 @@ public class TUIVideoSeatView extends RelativeLayout {
             return;
         }
         int size = mMemberEntityList.size();
-        if (size > 5) {
-            clearTapListener();
+
+        if (size >= MAX_ITEM_COUNT) {
             showListView();
-        } else if (size > 4) {
-            clearTapListener();
-            initMultiConversationView(R.layout.tuivideoseat_anchor_list_view_five_member);
-        } else if (size > 3) {
-            clearTapListener();
-            initMultiConversationView(R.layout.tuivideoseat_anchor_list_view_four_member);
-        } else if (size > 2) {
-            clearTapListener();
-            initMultiConversationView(R.layout.tuivideoseat_anchor_list_view_three_member);
-        } else if (size > 1) {
-            initTwoMemberView();
-        } else {
-            clearTapListener();
-            initMultiConversationView(R.layout.tuivideoseat_anchor_list_view_one_member);
+            return;
+        }
+        int layoutId = mIsLayoutStyleRound ? LAYOUT_ROUND_ARR[size - 1] : LAYOUT_RECTANGULAR_ARR[size - 1];
+        initMultiConversationView(layoutId);
+        if (size == 1) {
             ViewHolder holder = mViewHolderMap.get(0);
             holder.setMarginBottom(92);
         }
@@ -150,7 +176,7 @@ public class TUIVideoSeatView extends RelativeLayout {
         initViewHolder(position, R.id.item2);
     }
 
-    private void initTwoMemberView() {
+    private void initTwoMemberView(int layoutId) {
         if (mMemberEntityList == null) {
             return;
         }
@@ -158,7 +184,7 @@ public class TUIVideoSeatView extends RelativeLayout {
         mRecyclerView.setVisibility(GONE);
         mMultiConversation.setVisibility(VISIBLE);
         mMultiConversation.removeAllViews();
-        final View rootView = inflate(mContext, R.layout.tuivideoseat_anchor_list_view_two_member, mMultiConversation);
+        final View rootView = inflate(mContext, layoutId, mMultiConversation);
         if (mSmallWindowTapListener == null) {
             mSmallWindowTapListener = new OnClickListener() {
                 @Override
@@ -247,10 +273,9 @@ public class TUIVideoSeatView extends RelativeLayout {
             return;
         }
         UserEntity entity = mMemberEntityList.get(position);
-        if (QUALITY.equals(payload)) {
-            viewHolder.setQuality(entity.getQuality());
-        } else if (VOLUME.equals(payload)) {
-            viewHolder.setVolume(entity.isTalk());
+        if (VOLUME.equals(payload)) {
+            viewHolder.showTalking(entity.isTalk());
+            viewHolder.updateVolumeEffect(entity.getAudioVolume());
         }
     }
 
@@ -334,7 +359,7 @@ public class TUIVideoSeatView extends RelativeLayout {
         if (mMemberListAdapter == null) {
             mMemberListAdapter = new UserListAdapter(mContext, mMemberEntityList);
             mRecyclerView.setHasFixedSize(true);
-            mPageLayoutManager = new PageLayoutManager(2, 3,
+            mPageLayoutManager = new PageLayoutManager(3, 2,
                     PageLayoutManager.HORIZONTAL);
             mPageLayoutManager.setAllowContinuousScroll(false);
             mPageLayoutManager.setPageListener(new PageLayoutManager.PageListener() {
@@ -422,8 +447,8 @@ public class TUIVideoSeatView extends RelativeLayout {
         }
         for (String userId : mVisibleVideoStreams) {
             if (!newUserIds.contains(userId)) {
-                if (mPresenter != null) {
-                    mPresenter.stopPlayVideo(userId, false, false);
+                if (mViewModel != null) {
+                    mViewModel.stopPlayVideo(userId, false, false);
                 }
             }
         }
@@ -447,16 +472,16 @@ public class TUIVideoSeatView extends RelativeLayout {
             entity.setNeedFresh(false);
             if (entity.isVideoAvailable()) {
                 roomVideoView.setPlaying(true);
-                if (mPresenter != null) {
-                    mPresenter.startPlayVideo(entity.getUserId(),
+                if (mViewModel != null) {
+                    mViewModel.startPlayVideo(entity.getUserId(),
                             entity.getRoomVideoView().getPlayVideoView(),
                             entity.isScreenShareAvailable());
                 }
             } else {
                 if (roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(false);
-                    if (mPresenter != null) {
-                        mPresenter.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
+                    if (mViewModel != null) {
+                        mViewModel.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
                     }
                 }
             }
@@ -469,8 +494,8 @@ public class TUIVideoSeatView extends RelativeLayout {
             if (entity.isVideoAvailable()) {
                 if (!roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(true);
-                    if (mPresenter != null) {
-                        mPresenter.startPlayVideo(entity.getUserId(),
+                    if (mViewModel != null) {
+                        mViewModel.startPlayVideo(entity.getUserId(),
                                 entity.getRoomVideoView().getPlayVideoView(),
                                 entity.isScreenShareAvailable());
                     }
@@ -479,8 +504,8 @@ public class TUIVideoSeatView extends RelativeLayout {
             } else {
                 if (roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(false);
-                    if (mPresenter != null) {
-                        mPresenter.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
+                    if (mViewModel != null) {
+                        mViewModel.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
                     }
                 }
             }
@@ -488,8 +513,8 @@ public class TUIVideoSeatView extends RelativeLayout {
             if (!entity.isVideoAvailable()) {
                 if (roomVideoView.isPlaying()) {
                     roomVideoView.setPlaying(false);
-                    if (mPresenter != null) {
-                        mPresenter.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
+                    if (mViewModel != null) {
+                        mViewModel.stopPlayVideo(entity.getUserId(), entity.isScreenShareAvailable(), true);
                     }
                 }
             }
@@ -595,17 +620,17 @@ public class TUIVideoSeatView extends RelativeLayout {
     }
 
     public class ViewHolder {
-        protected View            mUserInfoGroup;
-        protected View            mTalkView;
-        protected View            mItemView;
-        private   View            mViewBackground;
-        protected TextView        mUserNameTv;
-        protected ImageView       mUserSignal;
-        protected ImageView       mIvMaster;
-        protected CircleImageView mUserHeadImg;
-        protected FrameLayout     mVideoContainer;
-        private   UserEntity      mMemberEntity;
-        private   Runnable        mRunnable = new Runnable() {
+        protected View                 mUserInfoGroup;
+        protected View                 mTalkView;
+        protected View                 mItemView;
+        private   View                 mViewBackground;
+        protected TextView             mUserNameTv;
+        protected UserVolumePromptView mUserMic;
+        protected ImageView            mIvMaster;
+        protected CircleImageView      mUserHeadImg;
+        protected FrameLayout          mVideoContainer;
+        private   UserEntity           mMemberEntity;
+        private   Runnable             mRunnable = new Runnable() {
             @Override
             public void run() {
                 mTalkView.setVisibility(GONE);
@@ -621,13 +646,15 @@ public class TUIVideoSeatView extends RelativeLayout {
         }
 
         private void initView(final View itemView) {
+            switchViewConor();
             mUserNameTv = itemView.findViewById(R.id.tv_user_name);
             mVideoContainer = itemView.findViewById(R.id.fl_container);
             mUserHeadImg = itemView.findViewById(R.id.img_user_head);
-            mUserSignal = itemView.findViewById(R.id.img_signal);
+            mUserMic = itemView.findViewById(R.id.tuivideoseat_user_mic);
             mIvMaster = itemView.findViewById(R.id.img_master);
             mUserInfoGroup = itemView.findViewById(R.id.user_info_group);
             mTalkView = itemView.findViewById(R.id.talk_view);
+            switchTalkViewBackGround();
             mViewBackground = itemView.findViewById(R.id.view_background);
         }
 
@@ -637,24 +664,29 @@ public class TUIVideoSeatView extends RelativeLayout {
             mUserInfoGroup.setLayoutParams(params);
         }
 
-        protected void setQuality(int quality) {
-            if (quality == UserEntity.QUALITY_GOOD) {
-                mUserSignal.setVisibility(View.VISIBLE);
-                mUserSignal.setImageResource(R.drawable.tuivideoseat_ic_signal_3);
-            } else if (quality == UserEntity.QUALITY_NORMAL) {
-                mUserSignal.setVisibility(View.VISIBLE);
-                mUserSignal.setImageResource(R.drawable.tuivideoseat_ic_signal_2);
-            } else if (quality == UserEntity.QUALITY_BAD) {
-                mUserSignal.setVisibility(View.VISIBLE);
-                mUserSignal.setImageResource(R.drawable.tuivideoseat_ic_signal_1);
-            } else {
-                mUserSignal.setVisibility(View.GONE);
-            }
+        public void updateVolumeEffect(int volume) {
+            mUserMic.updateVolumeEffect(volume);
         }
 
-        public void setVolume(boolean isTalk) {
-            mTalkView.setVisibility(isTalk ? VISIBLE : GONE);
-            if (isTalk) {
+        private void enableVolumeEffect(boolean enable) {
+            mUserMic.enableVolumeEffect(enable);
+        }
+
+        public void switchViewConor() {
+            int conor = mIsLayoutStyleRound ? mUserVideoRoundRadius : 0;
+            RoundRelativeLayout layout = mItemView.findViewById(R.id.rl_content);
+            layout.setRadius(conor);
+        }
+
+        public void switchTalkViewBackGround() {
+            int backGroundId = mIsLayoutStyleRound ? R.drawable.tuivideoseat_talk_bg_round :
+                    R.drawable.tuivideoseat_talk_bg_rectangular;
+            mTalkView.setBackground(mContext.getResources().getDrawable(backGroundId));
+        }
+
+        public void showTalking(boolean isTalking) {
+            mTalkView.setVisibility(isTalking ? VISIBLE : GONE);
+            if (isTalking) {
                 mTalkView.removeCallbacks(mRunnable);
                 mTalkView.postDelayed(mRunnable, 2000);
             }
@@ -674,18 +706,8 @@ public class TUIVideoSeatView extends RelativeLayout {
             mUserHeadImg.setVisibility(entity.isVideoAvailable() ? GONE : VISIBLE);
             mViewBackground.setVisibility(entity.isVideoAvailable() ? GONE : VISIBLE);
             mUserNameTv.setText(entity.getUserName());
-            if (entity.getQuality() == UserEntity.QUALITY_GOOD) {
-                mUserSignal.setVisibility(View.VISIBLE);
-                mUserSignal.setImageResource(R.drawable.tuivideoseat_ic_signal_3);
-            } else if (entity.getQuality() == UserEntity.QUALITY_NORMAL) {
-                mUserSignal.setVisibility(View.VISIBLE);
-                mUserSignal.setImageResource(R.drawable.tuivideoseat_ic_signal_2);
-            } else if (entity.getQuality() == UserEntity.QUALITY_BAD) {
-                mUserSignal.setVisibility(View.VISIBLE);
-                mUserSignal.setImageResource(R.drawable.tuivideoseat_ic_signal_1);
-            } else {
-                mUserSignal.setVisibility(View.GONE);
-            }
+            enableVolumeEffect(entity.isAudioAvailable());
+            updateVolumeEffect(entity.getAudioVolume());
             mIvMaster.setVisibility(entity.getRole() == TUIRoomDefine.Role.ROOM_OWNER ? VISIBLE : GONE);
             mUserInfoGroup.setVisibility(entity.isScreenShareAvailable() ? GONE : VISIBLE);
         }

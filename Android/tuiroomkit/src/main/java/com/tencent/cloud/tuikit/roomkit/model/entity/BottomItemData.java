@@ -3,6 +3,7 @@ package com.tencent.cloud.tuikit.roomkit.model.entity;
 import android.view.View;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
 
 public class BottomItemData {
     private boolean enable;
@@ -12,6 +13,15 @@ public class BottomItemData {
 
     @DrawableRes
     private int disableIconId;
+
+    @DrawableRes
+    private int backgroundIconId;
+
+    private int width;
+
+    private int height;
+
+    private String name;
 
     private BottomSelectItemData selectItemData;
 
@@ -35,6 +45,38 @@ public class BottomItemData {
 
     public View getView() {
         return view;
+    }
+
+    public int getBackground() {
+        return backgroundIconId;
+    }
+
+    public void setBackground(int backgroundIconId) {
+        this.backgroundIconId = backgroundIconId;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public OnItemClickListener getOnItemClickListener() {
@@ -83,8 +125,12 @@ public class BottomItemData {
     }
 
     public enum Type {
+        EXIT,
         AUDIO,
         VIDEO,
+        RAISE_HAND,
+        OFF_STAGE,
+        APPLY,
         BEAUTY,
         BARRAGE,
         MEMBER_LIST,
