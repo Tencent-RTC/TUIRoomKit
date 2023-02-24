@@ -32,14 +32,4 @@
     <string name="app_custom_name_10">ivet</string>
     <string name="app_custom_name_11">clinton</string>
     <string name="app_custom_name_12">virelai</string>
-
-    <string name="app_title_turn_on_camera">Camera</string>
-    <string name="app_title_turn_on_microphone">Mic</string>
-    <string name="app_enter_tag_normal">Join</string>
-    <string name="app_tv_please_input_room_number">Enter a conference ID</string>
-    <string name="app_create_room">Create Room</string>
-    <string name="app_join_room">Join Room</string>
-    <string name="app_room_id">Room ID</string>
-    <string name="app_username">Username</string>
-    <string name="app_copy_room_id_success">Room ID copied successfully.</string>
 </resources>

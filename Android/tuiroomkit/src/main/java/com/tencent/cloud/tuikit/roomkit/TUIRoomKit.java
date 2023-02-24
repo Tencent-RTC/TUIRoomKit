@@ -15,7 +15,11 @@ public abstract class TUIRoomKit {
         return TUIRoomKitImpl.sharedInstance(context);
     }
 
-    public abstract void setup(int sdkAppId, String userId, String userSig);
+    public abstract void login(int sdkAppId, String userId, String userSig);
+
+    public abstract void setSelfInfo(String userName, String avatarURL);
+
+    public abstract void enterPrepareView(boolean enablePreview);
 
     public abstract void createRoom(RoomInfo roomInfo, RoomScene scene);
 

@@ -17,7 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class PageLayoutManager extends RecyclerView.LayoutManager implements
         RecyclerView.SmoothScroller.ScrollVectorProvider {
-    private static final String TAG = PageLayoutManager.class.getName();
+    private static final String TAG = "PageLayoutManager";
+    private static final int DEFAULT_HEIGHT_DP = 450;
+    private static final int ROUND_MARGIN_DP = 8;
 
     public static final int VERTICAL   = 0;
     public static final int HORIZONTAL = 1;
@@ -26,6 +28,8 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
     private int     mLastPageIndex           = -1;
     private int     mFirstVisiblePosition;
     private boolean mChangeSelectInScrolling = true;
+
+    private boolean mIsLayoutStyleRound = true;
 
     @IntDef({VERTICAL, HORIZONTAL})
     public @interface OrientationType {
@@ -65,6 +69,10 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         mRows = rows;
         mColumns = columns;
         mOnePageSize = mRows * mColumns;
+    }
+
+    public void switchLayout(boolean isLayoutStyleRound) {
+        mIsLayoutStyleRound = isLayoutStyleRound;
     }
 
     @Override
@@ -145,11 +153,11 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
             }
         }
 
-
-        if (mItemWidth <= 0) {
+        if (mIsLayoutStyleRound) {
+            mItemWidth = (getUsableWidth() - (mColumns + 1) * dp2px(ROUND_MARGIN_DP)) / mColumns;
+            mItemHeight = mItemWidth;
+        } else {
             mItemWidth = getUsableWidth() / mColumns;
-        }
-        if (mItemHeight <= 0) {
             mItemHeight = getUsableHeight() / mRows;
         }
 
@@ -289,32 +297,31 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
     }
 
     private Rect getItemFrameByPosition(int pos) {
-        Rect rect = mItemFrames.get(pos);
-        if (null == rect) {
-            rect = new Rect();
-            int page = pos / mOnePageSize;
-            int offsetX = 0;
-            int offsetY = 0;
-            if (canScrollHorizontally()) {
-                offsetX += getUsableWidth() * page;
-            } else {
-                offsetY += getUsableHeight() * page;
-            }
-
-            int pagePos = pos % mOnePageSize;
-            int row = pagePos / mColumns;
-            int col = pagePos - (row * mColumns);
-
-            offsetX += col * mItemWidth;
-            offsetY += row * mItemHeight;
-
-            rect.left = offsetX;
-            rect.top = offsetY;
-            rect.right = offsetX + mItemWidth;
-            rect.bottom = offsetY + mItemHeight;
-
-            mItemFrames.put(pos, rect);
+        Rect rect = new Rect();
+        int page = pos / mOnePageSize;
+        int offsetX = 0;
+        int offsetY = 0;
+        if (canScrollHorizontally()) {
+            offsetX += getUsableWidth() * page;
+        } else {
+            offsetY += getUsableHeight() * page;
         }
+
+        int pagePos = pos % mOnePageSize;
+        int row = pagePos / mColumns;
+        int col = pagePos - (row * mColumns);
+
+        offsetX += col * mItemWidth;
+        offsetY += row * mItemHeight;
+        if (mIsLayoutStyleRound) {
+            offsetX += (col + 1) * dp2px(ROUND_MARGIN_DP);
+            offsetY += (row + 1) * dp2px(ROUND_MARGIN_DP);
+        }
+
+        rect.left = offsetX;
+        rect.top = offsetY;
+        rect.right = offsetX + mItemWidth;
+        rect.bottom = offsetY + mItemHeight;
         return rect;
     }
 
@@ -389,8 +396,17 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         if (heightmode != EXACTLY && heightsize > 0) {
             heightmode = EXACTLY;
         }
-        setMeasuredDimension(View.MeasureSpec.makeMeasureSpec(widthsize, widthmode),
-                View.MeasureSpec.makeMeasureSpec(heightsize, heightmode));
+
+        if (mIsLayoutStyleRound) {
+            // 调整 item 的宽高比为 1:1，item 距父布局 8dp，item 之间距离 8dp；
+            int itemWidth = (widthsize - (mColumns + 1) * dp2px(ROUND_MARGIN_DP)) / mColumns;
+            heightsize = itemWidth * mRows + (mRows + 1) * dp2px(ROUND_MARGIN_DP);
+            setMeasuredDimension(View.MeasureSpec.makeMeasureSpec(widthsize, widthmode),
+                    View.MeasureSpec.makeMeasureSpec(heightsize, heightmode));
+        } else {
+            setMeasuredDimension(View.MeasureSpec.makeMeasureSpec(widthsize, widthmode),
+                    View.MeasureSpec.makeMeasureSpec(dp2px(DEFAULT_HEIGHT_DP), heightmode));
+        }
     }
 
     @Override
@@ -629,5 +645,9 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         void onPageSelect(int pageIndex);
 
         void onItemVisible(int fromItem, int toItem);
+    }
+    private int dp2px(int dp) {
+        final float scale = mRecyclerView.getResources().getDisplayMetrics().density;
+        return (int)(dp * scale + 0.5f);
     }
 }

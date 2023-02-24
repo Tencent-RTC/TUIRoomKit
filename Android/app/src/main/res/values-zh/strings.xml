@@ -34,13 +34,4 @@
     <string name="app_custom_name_11">鸣人</string>
     <string name="app_custom_name_12">艾斯</string>
 
-    <string name="app_title_turn_on_camera">开启摄像头</string>
-    <string name="app_title_turn_on_microphone">开启麦克风</string>
-    <string name="app_enter_tag_normal">加入房间</string>
-    <string name="app_tv_please_input_room_number">请输入房间号</string>
-    <string name="app_create_room">创建房间</string>
-    <string name="app_join_room">加入房间</string>
-    <string name="app_username">用户名</string>
-    <string name="app_room_id">房间号</string>
-    <string name="app_copy_room_id_success">房间号复制成功</string>
 </resources>

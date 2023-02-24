@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:id="@+id/rl_item_root"
+    android:layout_width="52dp"
+    android:layout_height="52dp"
+    android:background="@drawable/tuiroomkit_bg_bottom_item_black">
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/image_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/tv_item_name"
         android:layout_centerInParent="true"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_marginBottom="5dp"
         android:background="@android:color/transparent"
+        android:clickable="false"
+        android:maxWidth="24dp"
         android:scaleType="fitXY" />
+
+    <TextView
+        android:id="@+id/tv_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="14dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:textColor="@color/tuiroomkit_color_text_light_grey"
+        android:textSize="12sp" />
 
 </RelativeLayout>

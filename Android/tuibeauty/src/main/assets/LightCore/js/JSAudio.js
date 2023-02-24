@@ -29,6 +29,8 @@
     // 新增一个sdkTime，在update时更新，在newEntity时使用
     light.Audio.prototype.sdkTime = 0;
 
+    light.Audio.prototype.initCallback = null;
+
     // init里重新构建一个Entity出来
     light.Audio.prototype.init = function () {
         this.keyOfPath = this.inputSources.get(this.src);
@@ -49,7 +51,8 @@
             new light.Vec3(0, 0, 0),              // position
             new light.Quat(1, 0, 0, 0),           // rotation(w, x, y, z)
             new light.Vec3(1, 1, 1),              // scale
-            true);                                // enable
+            true,                                 // enable
+            false);                               // interactive
         st.objectEnabled = true;
         // 2.3
         let as = new light.AudioSource(1, this.keyOfPath, 1, new light.VectorVolumeEffect());
@@ -64,6 +67,10 @@
             console.error("audio log, aduio entity is not valid");
         }
         this.entity.getTimeControlComponent().currentTime = 0;
+        if (this.initCallback) {
+          initCallback();
+        }
+        console.log("JSAudio init success");
     }
 
     // audio.pause()

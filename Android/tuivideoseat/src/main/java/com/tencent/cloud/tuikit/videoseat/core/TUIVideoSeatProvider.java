@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
 
 
@@ -15,7 +16,9 @@ public final class TUIVideoSeatProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         Log.d(TAG, "TUIVideoSeatProvider onCreate");
-        TUICore.registerExtension(TUIVideoSeatExtension.OBJECT_TUI_VIDEO_SEAT, new TUIVideoSeatExtension());
+        TUIVideoSeatExtension videoSeatExtension = new TUIVideoSeatExtension();
+        TUICore.registerExtension(TUIVideoSeatExtension.OBJECT_TUI_VIDEO_SEAT, videoSeatExtension);
+        TUICore.registerService(TUIConstants.TUIVideoSeat.SERVICE_VIDEO_SEAT, videoSeatExtension);
         return false;
     }
 

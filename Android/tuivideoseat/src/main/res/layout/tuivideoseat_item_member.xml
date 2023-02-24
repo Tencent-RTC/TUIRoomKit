@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tencent.cloud.tuikit.videoseat.ui.view.RoundRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rl_content"
     android:layout_width="match_parent"
@@ -31,40 +32,37 @@
     <LinearLayout
         android:id="@+id/user_info_group"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="24dp"
         android:layout_above="@+id/bottom_layout"
         android:layout_marginBottom="12dp"
+        android:layout_marginStart="4dp"
         android:background="@drawable/tuivideoseat_bg_anchor_info"
         android:paddingRight="8dp">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_master"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/tuivideoseat_ic_master" />
+
+        <com.tencent.cloud.tuikit.videoseat.ui.view.UserVolumePromptView
+            android:id="@+id/tuivideoseat_user_mic"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/tuivideoseat_ic_master"
-            android:visibility="gone" />
+            android:layout_marginStart="8dp"/>
 
         <TextView
             android:id="@+id/tv_user_name"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:maxWidth="120dp"
-            android:paddingLeft="12dp"
-            android:singleLine="true"
-            android:textColor="@color/tuivideoseat_color_white"
-            android:textSize="14sp" />
-
-        <ImageView
-            android:id="@+id/img_signal"
-            android:layout_width="13dp"
-            android:layout_height="13dp"
+            android:layout_height="16dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:src="@drawable/tuivideoseat_ic_signal_3" />
+            android:singleLine="true"
+            android:textColor="@color/tuivideoseat_color_white"
+            android:textSize="12sp" />
 
     </LinearLayout>
 
@@ -78,7 +76,7 @@
         android:id="@+id/talk_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/tuivideoseat_bg_talk_view"
+        android:background="@drawable/tuivideoseat_talk_bg_rectangular"
         android:visibility="gone" />
 
-</RelativeLayout>
+</com.tencent.cloud.tuikit.videoseat.ui.view.RoundRelativeLayout>

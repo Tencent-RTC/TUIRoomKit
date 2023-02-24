@@ -80,7 +80,7 @@ public class SingleRadioButtonDialog extends BottomSheetDialog {
                 paddingHorizon,
                 paddingVertical);
         radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        radioButton.setTextColor(mContext.getResources().getColor(R.color.tuiroomkit_color_second_text));
+        radioButton.setTextColor(mContext.getResources().getColor(R.color.tuiroomkit_color_text_light_grey));
         radioButton.setText(text);
         radioButton.setButtonDrawable(null);
         setStyle(radioButton);

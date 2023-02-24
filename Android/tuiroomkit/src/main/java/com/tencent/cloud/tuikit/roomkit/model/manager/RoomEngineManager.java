@@ -9,18 +9,14 @@ import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomObserver;
+import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.TUIRoomKitImpl;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 import com.tencent.imsdk.v2.V2TIMManager;
-import com.tencent.liteav.basic.UserModel;
-import com.tencent.liteav.basic.UserModelManager;
-import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
-import com.tencent.liteav.debug.GenerateTestUserSig;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class RoomEngineManager extends TUIRoomObserver {
+public class RoomEngineManager {
     private static final String TAG = "RoomEngineManager";
 
     private static final int SEAT_INDEX   = -1;
@@ -28,11 +24,11 @@ public class RoomEngineManager extends TUIRoomObserver {
 
     private static RoomEngineManager sInstance;
 
-    private String                     mSelfUserId;
-    private Context                    mContext;
-    private Listener                   mListener;
-    private Map<String, RoomInfo>      mRoomInfoMap;
-    private Map<String, TUIRoomEngine> mRoomEngineMap;
+    private Context         mContext;
+    private Listener        mListener;
+    private TUIRoomEngine   mRoomEngine;
+    private RoomStore       mRoomStore;
+    private TUIRoomObserver mObserver;
 
     public static RoomEngineManager sharedInstance(Context context) {
         if (sInstance == null) {
@@ -46,33 +42,55 @@ public class RoomEngineManager extends TUIRoomObserver {
     }
 
     private RoomEngineManager(Context context) {
+        mRoomEngine = TUIRoomEngine.createInstance();
+        mObserver = RoomEventCenter.getInstance().getEngineEventCent();
+        mRoomEngine.addObserver(mObserver);
         mContext = context.getApplicationContext();
-        mRoomEngineMap = new HashMap<>();
-        mRoomInfoMap = new HashMap<>();
+        mRoomStore = new RoomStore();
+        //TODO 等待Engine RoomInfoChange回调修改后删除
+        RoomEventCenter.getInstance().setRoomStore(mRoomStore);
+    }
+
+    private void refreshRoomEngine() {
+        mRoomEngine.removeObserver(mObserver);
+        mRoomEngine = TUIRoomEngine.createInstance();
+        mObserver = RoomEventCenter.getInstance().getEngineEventCent();
+        mRoomEngine.addObserver(mObserver);
     }
 
     public void setListener(Listener listener) {
         mListener = listener;
     }
 
-    public void setup(final int sdkAppId, String userId, String userSig) {
+    public void login(final int sdkAppId, final String userId, String userSig) {
         Log.i(TAG, "setup sdkAppId: " + sdkAppId + " userSig is empty: "
                 + TextUtils.isEmpty(userSig + " userId: " + userId));
-        mSelfUserId = userId;
         TUIRoomEngine.login(mContext, sdkAppId, userId, userSig, new TUIRoomDefine.ActionCallback() {
             @Override
             public void onSuccess() {
                 Log.i(TAG, "setup success");
-                final UserModel userModel = UserModelManager.getInstance().getUserModel();
+                mRoomStore.userModel.userId = userId;
+                if (mListener != null) {
+                    mListener.onLogin(0, "success");
+                }
                 V2TIMManager.getInstance().initSDK(mContext, sdkAppId, null);
-                TUIRoomEngine.setSelfInfo(userModel.userName, userModel.userAvatar, null);
             }
 
             @Override
             public void onError(TUICommonDefine.Error code, String message) {
-                Log.e(TAG, "setup onError code : " + code + " message:" + message);
+                Log.e(TAG, "login onError code : " + code + " message:" + message);
+                if (mListener != null) {
+                    mListener.onLogin(-1, message);
+                }
             }
         });
+    }
+
+    public void setSelfInfo(String userName, String avatarURL) {
+        Log.i(TAG, "setSelfInfo userName: " + userName + ",avatarURL: " + avatarURL);
+        mRoomStore.userModel.userName = TextUtils.isEmpty(userName) ? "" : userName;
+        mRoomStore.userModel.userAvatar = TextUtils.isEmpty(userName) ? "" : avatarURL;
+        TUIRoomEngine.setSelfInfo(mRoomStore.userModel.userName, mRoomStore.userModel.userAvatar, null);
     }
 
     public void createRoom(final RoomInfo roomInfo, final TUIRoomKit.RoomScene scene) {
@@ -85,9 +103,6 @@ public class RoomEngineManager extends TUIRoomObserver {
         if (TextUtils.isEmpty(roomInfo.roomId)) {
             return;
         }
-        mRoomInfoMap.put(roomInfo.roomId, roomInfo);
-        TUIRoomEngine roomEngine = getRoomEngine(roomInfo.roomId);
-        roomEngine.addObserver(this);
         TUIRoomDefine.RoomInfo engineRoomInfo = new TUIRoomDefine.RoomInfo();
         engineRoomInfo.name = roomInfo.name;
         engineRoomInfo.roomId = roomInfo.roomId;
@@ -95,9 +110,14 @@ public class RoomEngineManager extends TUIRoomObserver {
         engineRoomInfo.enableVideo = true;
         engineRoomInfo.enableAudio = true;
         engineRoomInfo.enableMessage = true;
-        engineRoomInfo.enableSeatControl = false;
-        engineRoomInfo.roomType = TUIRoomDefine.RoomType.GROUP;
+        engineRoomInfo.enableSeatControl = roomInfo.enableSeatControl;
+        if (TUIRoomKit.RoomScene.MEETING.equals(scene)) {
+            engineRoomInfo.roomType = TUIRoomDefine.RoomType.GROUP;
+        } else {
+            engineRoomInfo.roomType = TUIRoomDefine.RoomType.OPEN;
+        }
         engineRoomInfo.maxSeatCount = 8;
+        TUIRoomEngine roomEngine = getRoomEngine();
         roomEngine.createRoom(engineRoomInfo, new TUIRoomDefine.ActionCallback() {
             @Override
             public void onSuccess() {
@@ -113,7 +133,7 @@ public class RoomEngineManager extends TUIRoomObserver {
         });
     }
 
-    public void enterRoom(final RoomInfo roomInfo, TUIRoomKit.RoomScene scene) {
+    public void enterRoom(final RoomInfo roomInfo, final TUIRoomKit.RoomScene scene) {
         if (mContext == null) {
             return;
         }
@@ -124,29 +144,45 @@ public class RoomEngineManager extends TUIRoomObserver {
         if (TextUtils.isEmpty(roomId)) {
             return;
         }
-        TUIRoomEngine roomEngine = getRoomEngine(roomInfo.roomId);
+
+        TUIRoomEngine roomEngine = getRoomEngine();
         if (roomEngine == null) {
             roomEngine = TUIRoomEngine.createInstance();
-            mRoomEngineMap.put(roomId, roomEngine);
         }
-        roomEngine.addObserver(this);
         final TUIRoomEngine finalRoomEngine = roomEngine;
         roomEngine.enterRoom(roomId, new TUIRoomDefine.GetRoomInfoCallback() {
             @Override
             public void onSuccess(TUIRoomDefine.RoomInfo engineRoomInfo) {
+
                 Log.i(TAG, "enterRoom success");
-                roomInfo.owner = engineRoomInfo.owner;
                 roomInfo.name = engineRoomInfo.name;
                 roomInfo.owner = engineRoomInfo.owner;
                 roomInfo.roomId = engineRoomInfo.roomId;
                 roomInfo.enableVideo = engineRoomInfo.enableVideo;
                 roomInfo.enableAudio = engineRoomInfo.enableAudio;
                 roomInfo.enableMessage = engineRoomInfo.enableMessage;
-                mRoomInfoMap.put(roomId, roomInfo);
+                roomInfo.enableSeatControl = engineRoomInfo.enableSeatControl;
+                mRoomStore.roomInfo = roomInfo;
+                mRoomStore.roomScene = scene;
+                TUIRoomDefine.Role role = TUIRoomDefine.Role.GENERAL_USER;
+                if (engineRoomInfo.owner.equals(mRoomStore.userModel.userId)) {
+                    role = TUIRoomDefine.Role.ROOM_OWNER;
+                }
+                mRoomStore.userModel.role = role;
+                if (roomInfo.enableSeatControl
+                        && !TUIRoomDefine.Role.ROOM_OWNER.equals(role)) {
+                    if (mListener != null) {
+                        mListener.onEnterEngineRoom(0, "success", roomInfo);
+                    }
+                    return;
+                }
                 finalRoomEngine.takeSeat(SEAT_INDEX, REQ_TIME_OUT, new TUIRoomDefine.RequestCallback() {
                     @Override
                     public void onAccepted(int requestId, String userId) {
-                        mListener.onEnterEngineRoom(0, "success", roomInfo);
+                        mRoomStore.userModel.isOnSeat = true;
+                        if (mListener != null) {
+                            mListener.onEnterEngineRoom(0, "success", roomInfo);
+                        }
                     }
 
                     @Override
@@ -175,87 +211,56 @@ public class RoomEngineManager extends TUIRoomObserver {
             public void onError(TUICommonDefine.Error code, String message) {
                 Log.e(TAG, "enterRoom onError code : " + code + " message:" + message);
                 ToastUtils.showShort("code: " + code + " message:" + message);
-                mListener.onEnterEngineRoom(-1, message, null);
+                if (mListener != null) {
+                    mListener.onEnterEngineRoom(-1, message, null);
+                }
             }
         });
     }
 
-    public void exitRoom(String roomId) {
-        RoomInfo roomInfo = getRoomInfo(roomId);
-        if (roomInfo == null) {
+    public void exitRoom() {
+        if (mRoomStore.roomInfo == null) {
             return;
         }
-        if (mSelfUserId == null) {
+        if (mRoomStore.userModel.userId == null) {
             return;
         }
-        TUIRoomEngine roomEngine = getRoomEngine(roomId);
+        TUIRoomEngine roomEngine = getRoomEngine();
         roomEngine.stopPushLocalVideo();
         roomEngine.stopPushLocalAudio();
         roomEngine.closeLocalCamera();
         roomEngine.closeLocalMicrophone();
-        if (mSelfUserId.equals(roomInfo.owner)) {
+        if (TUIRoomDefine.Role.ROOM_OWNER.equals(mRoomStore.userModel.role)) {
             roomEngine.destroyRoom(null);
         } else {
             roomEngine.exitRoom(false, null);
         }
-        roomEngine.removeObserver(this);
         if (mListener != null) {
             mListener.onExitEngineRoom();
         }
+        refreshRoomStore();
+        refreshRoomEngine();
     }
 
-    public boolean isRoomOwner(String roomId) {
-        RoomInfo roomInfo = getRoomInfo(roomId);
-        if (roomInfo == null) {
-            return false;
-        }
-        if (mSelfUserId == null) {
-            return false;
-        }
-        return mSelfUserId.equals(roomInfo.owner);
+    private void refreshRoomStore() {
+        mRoomStore = new RoomStore();
+        mRoomStore.initialCurrentUser();
+        RoomEventCenter.getInstance().setRoomStore(mRoomStore);
     }
 
-    public TUIRoomEngine getRoomEngine(String roomId) {
-        TUIRoomEngine roomEngine = mRoomEngineMap.get(roomId);
-        if (roomEngine == null) {
-            roomEngine = TUIRoomEngine.createInstance();
-            mRoomEngineMap.put(roomId, roomEngine);
-        }
-        return roomEngine;
+    public TUIRoomEngine getRoomEngine() {
+        return mRoomEngine;
     }
 
-    public RoomInfo getRoomInfo(String roomId) {
-        return mRoomInfoMap.get(roomId);
-    }
-
-    @Override
-    public void onRoomInfoChanged(String roomId, TUIRoomDefine.RoomInfo engineRoomInfo) {
-        if (engineRoomInfo == null) {
-            return;
-        }
-        if (TextUtils.isEmpty(engineRoomInfo.roomId)) {
-            return;
-        }
-
-        RoomInfo roomInfo;
-        if (mRoomInfoMap.containsKey(engineRoomInfo.roomId)) {
-            roomInfo = mRoomInfoMap.get(engineRoomInfo.roomId);
-        } else {
-            roomInfo = new RoomInfo();
-        }
-        roomInfo.name = engineRoomInfo.name;
-        roomInfo.owner = engineRoomInfo.owner;
-        roomInfo.roomId = engineRoomInfo.roomId;
-        roomInfo.enableVideo = engineRoomInfo.enableVideo;
-        roomInfo.enableAudio = engineRoomInfo.enableAudio;
-        roomInfo.enableMessage = engineRoomInfo.enableMessage;
-        mRoomInfoMap.put(roomInfo.roomId, roomInfo);
+    public RoomStore getRoomStore() {
+        return mRoomStore;
     }
 
     public interface Listener {
+        void onLogin(int code, String message);
+
         void onEnterEngineRoom(int code, String message, RoomInfo roomInfo);
 
         void onExitEngineRoom();
     }
-
 }

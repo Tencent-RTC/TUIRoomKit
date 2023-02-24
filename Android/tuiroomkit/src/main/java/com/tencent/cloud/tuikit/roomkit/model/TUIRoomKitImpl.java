@@ -1,14 +1,16 @@
 package com.tencent.cloud.tuikit.roomkit.model;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
+import com.tencent.cloud.tuikit.roomkit.view.activity.PrepareActivity;
 import com.tencent.liteav.basic.UserModel;
 import com.tencent.liteav.basic.UserModelManager;
-import com.tencent.cloud.tuikit.roomkit.MeetingActivity;
+import com.tencent.cloud.tuikit.roomkit.view.activity.RoomMainActivity;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKitListener;
 
@@ -41,8 +43,20 @@ public class TUIRoomKitImpl extends TUIRoomKit implements RoomEngineManager.List
     }
 
     @Override
-    public void setup(int sdkAppId, String userId, String userSig) {
-        RoomEngineManager.sharedInstance(mContext).setup(sdkAppId, userId, userSig);
+    public void login(int sdkAppId, String userId, String userSig) {
+        RoomEngineManager.sharedInstance(mContext).login(sdkAppId, userId, userSig);
+    }
+
+    @Override
+    public void setSelfInfo(String userName, String avatarURL) {
+        RoomEngineManager.sharedInstance(mContext).setSelfInfo(userName, avatarURL);
+    }
+
+    @Override
+    public void enterPrepareView(boolean enablePreview) {
+        Intent intent = new Intent(mContext, PrepareActivity.class);
+        intent.putExtra(PrepareActivity.INTENT_ENABLE_PREVIEW, enablePreview);
+        mContext.startActivity(intent);
     }
 
     @Override
@@ -75,6 +89,14 @@ public class TUIRoomKitImpl extends TUIRoomKit implements RoomEngineManager.List
     }
 
     @Override
+    public void onLogin(int code, String message) {
+        Log.i(TAG, "onLogin: code" + code + " message" + message);
+        for (TUIRoomKitListener listener : mListenerList) {
+            listener.onLogin(code, message);
+        }
+    }
+
+    @Override
     public void onEnterEngineRoom(int code, String message, RoomInfo roomInfo) {
         Log.i(TAG, "onEnterEngineRoom: code" + code + " message" + message);
         if (roomInfo == null) {
@@ -86,8 +108,8 @@ public class TUIRoomKitImpl extends TUIRoomKit implements RoomEngineManager.List
             return;
         }
         if (mContext != null && code == 0) {
-            MeetingActivity.enterRoom(mContext, roomInfo.roomId,
-                    roomInfo.isOpenCamera, roomInfo.isOpenMicrophone);
+            Intent intent = new Intent(mContext, RoomMainActivity.class);
+            mContext.startActivity(intent);
             UserModelManager.getInstance().getUserModel().userType = UserModel.UserType.ROOM;
         }
         for (TUIRoomKitListener listener : mListenerList) {

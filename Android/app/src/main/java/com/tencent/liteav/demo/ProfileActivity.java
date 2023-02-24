@@ -1,6 +1,5 @@
 package com.tencent.liteav.demo;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,10 +18,13 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
+import com.tencent.cloud.tuikit.roomkit.TUIRoomKitListener;
 import com.tencent.liteav.basic.AvatarConstant;
 import com.tencent.liteav.basic.ImageLoader;
 import com.tencent.liteav.basic.UserModel;
 import com.tencent.liteav.basic.UserModelManager;
+import com.tencent.liteav.debug.GenerateTestUserSig;
 
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -50,11 +52,6 @@ public class ProfileActivity extends AppCompatActivity {
             R.string.app_custom_name_11,
             R.string.app_custom_name_12,
     };
-
-    private void startMainActivity() {
-        Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
-        startActivity(intent);
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -128,8 +125,36 @@ public class ProfileActivity extends AppCompatActivity {
         UserModelManager.getInstance().setUserModel(model);
         Log.i(TAG, "set profile success.");
         ToastUtils.showLong(getString(R.string.app_toast_register_success_and_logging_in));
-        startMainActivity();
-        finish();
+        startPrepareActivity();
+    }
+
+    private void startPrepareActivity() {
+        final UserModel userModel = UserModelManager.getInstance().getUserModel();
+        String userName = TextUtils.isEmpty(userModel.userName) ? userModel.userId : userModel.userName;
+        TUIRoomKit roomKit = TUIRoomKit.sharedInstance(this);
+        roomKit.addListener(new TUIRoomKitListener() {
+            @Override
+            public void onLogin(int code, String message) {
+                if (code == 0) {
+                    roomKit.setSelfInfo(userName, userModel.userAvatar);
+                    roomKit.enterPrepareView(true);
+                    finish();
+                } else {
+                    Log.i(TAG, "login error:" + code + ",msg:" + message);
+                }
+            }
+
+            @Override
+            public void onRoomEnter(int code, String message) {
+
+            }
+
+            @Override
+            public void onExitRoom() {
+
+            }
+        });
+        roomKit.login(GenerateTestUserSig.SDKAPPID, userModel.userId, userModel.userSig);
     }
 
     private void initStatusBar() {

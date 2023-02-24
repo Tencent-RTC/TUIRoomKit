@@ -90,8 +90,12 @@ public class TUIBeautyFileUtils {
                     copyAssets(context, oldPath + "/" + fileName, newPath + "/" + fileName);
                 }
             } else {
+                File file = new File(newPath);
+                if (file.exists()) {
+                    return true;
+                }
                 InputStream is = context.getAssets().open(oldPath);
-                FileOutputStream fos = new FileOutputStream(new File(newPath));
+                FileOutputStream fos = new FileOutputStream(file);
                 byte[] buffer = new byte[1024 * 1024];
                 int byteCount = 0;
                 while ((byteCount = is.read(buffer)) != -1) {

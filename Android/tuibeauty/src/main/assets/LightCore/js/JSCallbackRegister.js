@@ -175,6 +175,7 @@
         },
         enumerable: false,
         configurable: true,
+        writable: true
     });
 
     patchEntity();

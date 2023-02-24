@@ -7,10 +7,11 @@
     <View
         android:id="@+id/top_line"
         android:layout_width="match_parent"
-        android:layout_height="1px"
+        android:layout_height="1dp"
         android:background="@color/line" />
 
     <RelativeLayout
+        android:id="@+id/view_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white">
@@ -88,6 +89,6 @@
     <View
         android:id="@+id/bottom_line"
         android:layout_width="match_parent"
-        android:layout_height="1px"
+        android:layout_height="1dp"
         android:background="@color/line" />
 </LinearLayout>
