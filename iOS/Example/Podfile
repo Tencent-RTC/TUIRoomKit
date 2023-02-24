@@ -6,13 +6,14 @@ source 'https://github.com/CocoaPods/Specs.git'
 # UI库
 def ui
   pod 'SnapKit'
-  pod 'Kingfisher'
 end
 
 # 工具库
 def tool
   pod 'Alamofire'
+  pod 'TUICore'
   pod 'TUIRoomEngine', '1.0.1'
+  pod 'TXLiteAVSDK_TRTC'
 end
 
 # 本地依赖库

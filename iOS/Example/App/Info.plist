@@ -24,6 +24,8 @@
 	<string>TUIRoom需要访问你的相机权限</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>TUIRoom需要访问您的麦克风权限</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TUIRoom需要访问你的相册</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

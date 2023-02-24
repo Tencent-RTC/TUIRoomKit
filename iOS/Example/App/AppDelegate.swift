@@ -9,6 +9,8 @@ import ImSDK_Plus
 import TUIRoomKit
 import UIKit
 import TUIBeauty
+import TUICore
+import TUIRoomEngine
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -45,12 +47,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             debugPrint("not login")
             return
         }
-        let listVC = AppMainViewController()
-        let rootVC = UINavigationController(rootViewController: listVC)
-        if let keyWindow = SceneDelegate.getCurrentWindow() {
-            keyWindow.rootViewController = rootVC
-            keyWindow.makeKeyAndVisible()
-        }
+        let mainModel = AppMainModel()
+        mainModel.loginTUIRoomKit()
     }
 
     func showLoginViewController() {

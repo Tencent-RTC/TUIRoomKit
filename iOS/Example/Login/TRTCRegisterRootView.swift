@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Kingfisher
 
 class TRTCRegisterRootView: UIView {
     
@@ -135,11 +134,11 @@ class TRTCRegisterRootView: UIView {
         bindInteraction()
         
         if let url = ProfileManager.shared.curUserModel?.avatar, url.count > 0 {
-            headImageView.kf.setImage(with: URL(string: url))
+            headImageView.sd_setImage(with: URL(string: url))
         } else {
             let url = "https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar1.png"
             ProfileManager.shared.curUserModel?.avatar = url
-            headImageView.kf.setImage(with: URL(string: url))
+            headImageView.sd_setImage(with: URL(string: url))
         }
     }
     

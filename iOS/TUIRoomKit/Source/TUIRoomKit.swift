@@ -3,6 +3,7 @@
 //  TUIRoomKit
 //
 //  Created by WesleyLei on 2022/9/13.
+//  Copyright © 2022 Tencent. All rights reserved.
 //
 
 import Foundation
@@ -13,56 +14,75 @@ public enum RoomScene {
     case live
 }
 
+public protocol TUIRoomKitListener {
+    func onEnterRoom(code: Int, message: String) -> Void
+    func onExitRoom(code: Int, message: String) -> Void
+    func onLogin(code: Int, message: String) -> Void
+}
+
 public class TUIRoomKit {
-    var listenerArray: [TUIRoomKitListener] = []
-    public static var sharedInstance: TUIRoomKit {
-        struct Static {
-            static let shared: TUIRoomKit = TUIRoomKit()
-        }
-        EngineManager.shared.setListener(listener: Static.shared)
-        return Static.shared
-    }
-
+    var listener: TUIRoomKitListener?
+    public static let sharedInstance = TUIRoomKit()
+    
     private init() {}
-
-    public class func setup(sdkAppId: Int, userId: String, userSig: String) {
-        EngineManager.setup(sdkAppId: sdkAppId, userId: userId, userSig: userSig)
+    
+    public func login(sdkAppId: Int, userId: String, userSig: String) {
+        EngineManager.shared.login(sdkAppId: sdkAppId, userId: userId, userSig: userSig)
+        EngineManager.shared.addListener(listener: self)
     }
-
+    
+    public func setSelfInfo(userName: String, avatarURL: String) {
+        EngineManager.shared.setSelfInfo(userName: userName, avatarURL: avatarURL)
+    }
+    
+    public func logout() {
+        EngineManager.shared.logout()
+    }
+    
+    public func enterPrepareView(enablePreview: Bool) {
+        RoomRouter.shared.pushPrePareViewController(enablePrePareView: enablePreview)
+    }
+    
     public func createRoom(roomInfo: RoomInfo, type: RoomScene) {
-        EngineManager.shared.createRoom(roomInfo: roomInfo, type: type)
+        EngineManager.shared.store.update(roomInfo: roomInfo)
+        EngineManager.shared.store.roomScene = type
+        EngineManager.shared.store.addEngineObserver()
+        EngineManager.shared.addListener(listener: self)
+        EngineManager.shared.createRoom()
     }
-
+    
     public func enterRoom(roomInfo: RoomInfo, type: RoomScene) {
-        EngineManager.shared.enterRoom(roomInfo: roomInfo, type: type)
+        EngineManager.shared.store.update(roomInfo: roomInfo)
+        EngineManager.shared.store.roomScene = type
+        EngineManager.shared.store.addEngineObserver()
+        EngineManager.shared.addListener(listener: self)
+        EngineManager.shared.enterRoom()
     }
-
+    
     public func addListener(listener: TUIRoomKitListener) {
-        listenerArray.append(listener)
+        self.listener = listener
+    }
+    
+    deinit {
+        debugPrint("deinit \(self)")
     }
 }
 
 extension TUIRoomKit: EngineManagerListener {
-    public func onEnterEngineRoom(code: TUIError, message: String, roomInfo: RoomInfo?) {
-        listenerArray.forEach { listener in
-            listener.onEnterRoom(code: code, message: message)
-        }
-        if code == .success {
+    public func onLogin(code: Int, message: String) {
+        self.listener?.onLogin(code: code, message: message)
+    }
+    
+    public func onEnterEngineRoom(code: Int, message: String, roomInfo: RoomInfo?) {
+        self.listener?.onEnterRoom(code: code, message: message)
+        if code == 0 {
             guard let roomId = roomInfo?.roomId else { return }
-            guard let vc = Router.shared.roomIdBindController(roomId: roomId) else { return }
-            Router.shared.roomIdRemoveBindController(roomId: roomId)
-            Router.shared.presentRoomController(vc: vc)
+            let vc = RoomRouter.shared.makeMainViewController(roomId: roomId)
+            RoomRouter.shared.presentRoomController(vc: vc)
         }
     }
-
-    public func onExitEngineRoom(code: TUIError, message: String) {
-        listenerArray.forEach { listener in
-            listener.onExitRoom(code: code, message: message)
-        }
+    
+    public func onExitEngineRoom(code: Int, message: String) {
+        self.listener?.onExitRoom(code: code, message: message)
     }
-}
-
-public protocol TUIRoomKitListener {
-    func onEnterRoom(code: TUIError, message: String) -> Void
-    func onExitRoom(code: TUIError, message: String) -> Void
 }

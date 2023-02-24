@@ -17,7 +17,6 @@ Pod::Spec.new do |spec|
   spec.source                = { :path => './' }
   
   spec.dependency 'SnapKit'
-  spec.dependency 'Kingfisher'
   spec.dependency 'TXAppBasic'
   spec.dependency 'TUICore'
   

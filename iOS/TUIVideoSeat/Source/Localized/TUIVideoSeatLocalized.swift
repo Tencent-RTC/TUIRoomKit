@@ -3,6 +3,7 @@
 //  TUIVideoSeat
 //
 //  Created by WesleyLei on 2022/9/13.
+//  Copyright © 2022 Tencent. All rights reserved.
 //
 
 import UIKit
