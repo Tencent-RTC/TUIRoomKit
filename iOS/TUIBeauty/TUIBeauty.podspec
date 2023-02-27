@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'TUIBeauty'
-  spec.version      = '1.0.0'
+  spec.version      = '1.0.2'
   spec.platform     = :ios
   spec.ios.deployment_target = '9.0'
   spec.license      = { :type => 'MIT', :file => 'LICENSE' }
@@ -13,7 +13,6 @@ Pod::Spec.new do |spec|
   spec.dependency 'Masonry'
   spec.dependency 'TUICore'
   spec.dependency 'SSZipArchive'
-  spec.dependency 'TUICore'
   
   spec.requires_arc = true
   spec.static_framework = true
