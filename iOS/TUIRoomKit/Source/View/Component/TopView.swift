@@ -39,7 +39,7 @@ class TopView: UIView {
     
     let dropDownButton: UIButton = {
         let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_drop_down", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_drop_down", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         button.isEnabled = true
         return button

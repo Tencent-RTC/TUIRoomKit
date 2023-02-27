@@ -38,15 +38,15 @@ class ButtonItemData {
     var action: ((Any)->Void)?
     
     var normalImage: UIImage? {
-        return UIImage(named: normalIcon, in: resourceBundle, with: nil)
+        return UIImage(named: normalIcon, in: resourceBundle, compatibleWith: nil)
     }
     
     var selectedImage: UIImage? {
-        return UIImage(named: selectedIcon, in: resourceBundle, with: nil)
+        return UIImage(named: selectedIcon, in: resourceBundle, compatibleWith: nil)
     }
     
     var disabledImage: UIImage? {
-        return UIImage(named: disabledIcon, in: resourceBundle, with: nil)
+        return UIImage(named: disabledIcon, in: resourceBundle, compatibleWith: nil)
     }
     
     var size: CGSize?

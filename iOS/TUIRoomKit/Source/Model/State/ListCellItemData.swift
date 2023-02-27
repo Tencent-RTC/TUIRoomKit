@@ -22,10 +22,10 @@ class ListCellItemData {
     var disabledIcon: String = ""
     var resourceBundle: Bundle = Bundle.main
     var normalImage: UIImage? {
-        return UIImage(named: normalIcon, in: resourceBundle, with: nil)
+        return UIImage(named: normalIcon, in: resourceBundle, compatibleWith: nil)
     }
     var selectedImage: UIImage? {
-        return UIImage(named: selectedIcon, in: resourceBundle, with: nil)
+        return UIImage(named: selectedIcon, in: resourceBundle, compatibleWith: nil)
     }
     var minimumValue: Float = 0
     var maximumValue: Float = 100

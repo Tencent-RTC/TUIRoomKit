@@ -13,7 +13,7 @@ class QRCodeView: UIView {
     
     let backButton: UIButton = {
         let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
         button.setTitle(.codeText, for: .normal)
@@ -55,7 +55,7 @@ class QRCodeView: UIView {
     
     let copyButton: UIButton = {
         let button = UIButton()
-        let normalIcon = UIImage(named: "room_copy", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_copy", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         return button
     }()
@@ -80,7 +80,7 @@ class QRCodeView: UIView {
     }()
     
     let tencentImageView: UIImageView = {
-        let image = UIImage(named: "room_tencent", in: tuiRoomKitBundle(), with: nil)
+        let image = UIImage(named: "room_tencent", in: tuiRoomKitBundle(), compatibleWith: nil)
         let imageView = UIImageView(image: image)
         return imageView
     }()
