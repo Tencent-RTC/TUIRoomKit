@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |spec|
   spec.name                  = 'TUIRoomKit'
-  spec.version               = '1.0.0'
+  spec.version               = '1.0.2'
   spec.platform              = :ios
   spec.ios.deployment_target = '11.0'
   spec.license               = { :type => 'MIT', :file => 'LICENSE' }
@@ -17,8 +17,7 @@ Pod::Spec.new do |spec|
   spec.source                = { :path => './' }
   
   spec.dependency 'SnapKit'
-  spec.dependency 'TXAppBasic'
-  spec.dependency 'TUICore'
+  spec.dependency 'TUICore', '~> 7.0.3768'
   
   spec.default_subspec = 'TRTC'
   

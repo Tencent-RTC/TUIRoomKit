@@ -14,6 +14,7 @@ def tool
   pod 'TUICore'
   pod 'TUIRoomEngine', '1.0.1'
   pod 'TXLiteAVSDK_TRTC'
+  pod 'TXAppBasic'
 end
 
 # 本地依赖库
