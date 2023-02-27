@@ -18,14 +18,14 @@ class PrePareView: UIView {
     
     let backButton: UIButton = {
         let button = UIButton(type: .custom)
-        let image = UIImage(named: "room_back", in: tuiRoomKitBundle(), with: nil)
+        let image = UIImage(named: "room_back", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(image, for: .normal)
         return button
     }()
     
     let avatarButton: UIButton = {
         let button = UIButton(type: .custom)
-        let placeholderImage = UIImage(named: "room_default_avatar", in: tuiRoomKitBundle(), with: nil)
+        let placeholderImage = UIImage(named: "room_default_avatar", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.sd_setImage(with: URL(string: EngineManager.shared.store.currentUser.avatarUrl), for: .normal, placeholderImage:
                             placeholderImage)
         return button
@@ -40,7 +40,7 @@ class PrePareView: UIView {
     
     let switchLanguageButton: UIButton = {
         let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_language", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_language", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         return button
     }()
@@ -48,7 +48,7 @@ class PrePareView: UIView {
     let tencentBigView: UIView = {
         let view = UIView(frame: .zero)
         let iconImageView = UIImageView(frame: .zero)
-        iconImageView.image = UIImage(named: "room_tencent", in: tuiRoomKitBundle(), with: nil)
+        iconImageView.image = UIImage(named: "room_tencent", in: tuiRoomKitBundle(), compatibleWith: nil)
         view.addSubview(iconImageView)
         iconImageView.snp.makeConstraints { make in
             make.top.equalToSuperview()
@@ -57,7 +57,7 @@ class PrePareView: UIView {
             make.height.equalTo(36)
         }
         let textImageView = UIImageView(frame: .zero)
-        textImageView.image = UIImage(named: "room_tencent_text", in: tuiRoomKitBundle(), with: nil)
+        textImageView.image = UIImage(named: "room_tencent_text", in: tuiRoomKitBundle(), compatibleWith: nil)
         view.addSubview(textImageView)
         textImageView.snp.makeConstraints { make in
             make.top.equalTo(iconImageView.snp.bottom).offset(5)
@@ -80,7 +80,7 @@ class PrePareView: UIView {
     
     let userAvatarImage: UIImageView = {
         let imageView = UIImageView(frame: .zero)
-        let placeholderImage = UIImage(named: "room_default_avatar", in: tuiRoomKitBundle(), with: nil)
+        let placeholderImage = UIImage(named: "room_default_avatar", in: tuiRoomKitBundle(), compatibleWith: nil)
         imageView.sd_setImage(with: URL(string: EngineManager.shared.store.currentUser.avatarUrl), placeholderImage: placeholderImage)
         return imageView
     }()
@@ -95,14 +95,14 @@ class PrePareView: UIView {
     
     let userMicphoneImage: UIImageView = {
         let imageView = UIImageView(frame: .zero)
-        imageView.image = UIImage(named: "room_user_mic", in: tuiRoomKitBundle(), with: nil)
+        imageView.image = UIImage(named: "room_user_mic", in: tuiRoomKitBundle(), compatibleWith: nil)
         return imageView
     }()
     
     let openCameraButton: UIButton = {
         let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_camera_on", in: tuiRoomKitBundle(), with: nil)
-        let selectIcon = UIImage(named: "room_camera_off", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_camera_on", in: tuiRoomKitBundle(), compatibleWith: nil)
+        let selectIcon = UIImage(named: "room_camera_off", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         button.setImage(selectIcon, for: .selected)
         return button
@@ -119,8 +119,8 @@ class PrePareView: UIView {
     
     let openMicrophoneButton: UIButton = {
         let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_mic_on", in: tuiRoomKitBundle(), with: nil)
-        let selectIcon = UIImage(named: "room_mic_off", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_mic_on", in: tuiRoomKitBundle(), compatibleWith: nil)
+        let selectIcon = UIImage(named: "room_mic_off", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         button.setImage(selectIcon, for: .selected)
         return button
@@ -137,14 +137,14 @@ class PrePareView: UIView {
     
     let switchCamera: UIButton = {
         let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_switch_camera", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_switch_camera", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         return button
     }()
     
     let switchMirror: UIButton = {
         let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_mirror", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_mirror", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         return button
     }()
@@ -154,7 +154,7 @@ class PrePareView: UIView {
         button.setTitle(.joinRoomText, for: .normal)
         button.layer.cornerRadius = 4
         button.backgroundColor = UIColor(0x146EFA)
-        let normalIcon = UIImage(named: "room_enter", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_enter", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         return button
     }()
@@ -164,14 +164,14 @@ class PrePareView: UIView {
         button.setTitle(.createRoomText, for: .normal)
         button.layer.cornerRadius = 4
         button.backgroundColor = UIColor(0x146EFA)
-        let normalIcon = UIImage(named: "room_create", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_create", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         return button
     }()
     
     let tencentImage: UIImageView = {
         let imageView = UIImageView(frame: .zero)
-        imageView.image = UIImage(named: "room_tencent", in: tuiRoomKitBundle(), with: nil)
+        imageView.image = UIImage(named: "room_tencent", in: tuiRoomKitBundle(), compatibleWith: nil)
         return imageView
     }()
     

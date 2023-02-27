@@ -16,7 +16,7 @@ class CreateRoomView: UIView {
     
     let backButton: UIButton = {
         let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), with: nil)
+        let normalIcon = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
         button.setTitle(.createRoomText, for: .normal)

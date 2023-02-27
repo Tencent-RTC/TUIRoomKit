@@ -50,7 +50,7 @@ class UserListMuteView: UIView {
     
     let switchButton: UIButton = {
         let button = UIButton()
-        let selectIcon = UIImage(named: "check_mark", in: tuiRoomKitBundle(), with: nil)
+        let selectIcon = UIImage(named: "check_mark", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(selectIcon, for: .selected)
         button.layer.borderColor = UIColor(0xE1E1E1).cgColor
         button.layer.borderWidth = 0.3

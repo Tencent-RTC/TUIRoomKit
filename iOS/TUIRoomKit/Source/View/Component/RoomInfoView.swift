@@ -29,7 +29,7 @@ class RoomInfoView: UIView {
     
     let codeButton: UIButton = {
         let button = UIButton()
-        let image = UIImage(named: "room_message_code", in: tuiRoomKitBundle(), with: nil)
+        let image = UIImage(named: "room_message_code", in: tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(image, for: .normal)
         return button
     }()
