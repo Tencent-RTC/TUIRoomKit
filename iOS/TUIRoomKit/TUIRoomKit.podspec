@@ -17,12 +17,12 @@ Pod::Spec.new do |spec|
   spec.source                = { :path => './' }
   
   spec.dependency 'SnapKit'
-  spec.dependency 'TUICore', '~> 7.0.3768'
+  spec.dependency 'TUICore', '~> 7.0.3770'
   
   spec.default_subspec = 'TRTC'
   
   spec.subspec 'Professional' do |professional|
-    professional.dependency 'TUIRoomEngine/Professional'
+    professional.dependency 'TUIRoomEngine/Professional', '~> 1.0.1'
     professional.source_files = 'Source/*.swift', 'Source/Presenter/*.swift', 'Source/**/*.swift', 'Source/**/*.h', 'Source/**/*.m'
     professional.resource_bundles = {
       'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.strings']
@@ -31,7 +31,7 @@ Pod::Spec.new do |spec|
   end
   
   spec.subspec 'TRTC' do |trtc|
-    trtc.dependency 'TUIRoomEngine/TRTC'
+    trtc.dependency 'TUIRoomEngine/TRTC', '~> 1.0.1'
     trtc.source_files = 'Source/*.swift', 'Source/Presenter/*.swift', 'Source/**/*.swift', 'Source/**/*.h', 'Source/**/*.m'
     trtc.resource_bundles = {
       'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.strings']
