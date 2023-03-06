@@ -14,8 +14,10 @@ protocol TransferMasterViewModelFactory {
 
 class TransferMasterViewController: UIViewController {
     let viewModel: TransferMasterViewModel
+    let rootView: TransferMasterView
     init(transferMasterViewModelFactory: TransferMasterViewModelFactory) {
         self.viewModel = transferMasterViewModelFactory.makeTransferMasterViewModel()
+        self.rootView = TransferMasterView(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -24,7 +26,7 @@ class TransferMasterViewController: UIViewController {
     }
     
     override func loadView() {
-        view = TransferMasterView(viewModel: viewModel)
+        view = rootView
     }
     
     override func viewWillAppear(_ animated: Bool) {

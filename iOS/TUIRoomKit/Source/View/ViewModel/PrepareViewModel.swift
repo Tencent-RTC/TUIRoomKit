@@ -27,7 +27,7 @@ class PrePareViewModel {
         }
         
         if EngineManager.shared.store.roomInfo.isOpenCamera {
-            roomEngine.openLocalCamera(isFront: true) {
+            roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) {
                 debugPrint("")
             } onError: { code, message in
                 debugPrint("---openLocalCamera,code:\(code),message:\(message)")
@@ -83,7 +83,7 @@ class PrePareViewModel {
         } else {
             EngineManager.shared.store.roomInfo.isOpenCamera = true
             placeholderImage.isHidden = true
-            roomEngine.openLocalCamera(isFront: true) {
+            roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) {
                 roomEngine.startPushLocalVideo()
             } onError: { code, message in
                 debugPrint("openLocalCamera,code:\(code),message:\(message)")
@@ -109,17 +109,17 @@ class PrePareViewModel {
     }
     
     func switchCameraAction(sender: UIButton) {
-        sender.isSelected = !sender.isSelected
+        EngineManager.shared.store.videoSetting.isFrontCamera = !EngineManager.shared.store.videoSetting.isFrontCamera
         let roomEngine = EngineManager.shared.roomEngine
-        roomEngine.getTRTCCloud().getDeviceManager().switchCamera(!sender.isSelected)
+        roomEngine.getTRTCCloud().getDeviceManager().switchCamera(EngineManager.shared.store.videoSetting.isFrontCamera)
     }
     
     func switchMirrorAction(sender: UIButton) {
-        sender.isSelected = !sender.isSelected
+        EngineManager.shared.store.videoSetting.isMirror = !EngineManager.shared.store.videoSetting.isMirror
         let params = TRTCRenderParams()
         params.fillMode = .fill
         params.rotation = ._0
-        if !sender.isSelected {
+        if EngineManager.shared.store.videoSetting.isMirror {
             params.mirrorType = .enable
         } else {
             params.mirrorType = .disable

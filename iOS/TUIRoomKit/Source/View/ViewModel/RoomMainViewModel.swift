@@ -15,9 +15,13 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
+protocol RoomMainViewResponder: NSObject {
+    func showSelfBecomeRoomOwnerAlert()
+}
+
 class RoomMainViewModel: NSObject {
     let timeoutNumber: Double = 100
-    
+    weak var viewResponder: RoomMainViewResponder? = nil
     override init() {
         super.init()
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
@@ -26,9 +30,11 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onUserVideoStateChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserAudioStateChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRequestCancelled, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
     }
     
     func applyConfigs() {
+        guard EngineManager.shared.store.currentUser.isOnSeat else { return }
         let roomEngine = EngineManager.shared.roomEngine
         if EngineManager.shared.store.roomInfo.isOpenMicrophone && EngineManager.shared.store.roomInfo.enableAudio {
             roomEngine.openLocalMicrophone {
@@ -38,7 +44,16 @@ class RoomMainViewModel: NSObject {
             }
         }
         if EngineManager.shared.store.roomInfo.isOpenCamera && EngineManager.shared.store.roomInfo.enableVideo {
-            roomEngine.openLocalCamera(isFront: true) {
+            let params = TRTCRenderParams()
+            params.fillMode = .fill
+            params.rotation = ._0
+            if EngineManager.shared.store.videoSetting.isMirror {
+                params.mirrorType = .enable
+            } else {
+                params.mirrorType = .disable
+            }
+            roomEngine.getTRTCCloud().setLocalRenderParams(params)
+            roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) {
                 roomEngine.startPushLocalVideo()
             } onError: { code, message in
                 debugPrint("openLocalCamera:code:\(code),message:\(message)")
@@ -57,18 +72,10 @@ class RoomMainViewModel: NSObject {
             debugPrint("responseRemoteRequest:code:\(code),message:\(message)")
         }
         if isAgree {
-            EngineManager.shared.roomEngine.openLocalMicrophone {
-                EngineManager.shared.roomEngine.startPushLocalAudio()
-            } onError: { code, message in
-                debugPrint("openLocalMicrophone:code:\(code),message:\(message)")
-            }
-            EngineManager.shared.roomEngine.openLocalCamera(isFront: true) {
-                EngineManager.shared.roomEngine.startPushLocalVideo()
-            } onError: { code, message in
-                debugPrint("openLocalCamera:code:\(code),message:\(message)")
-            }
+            EngineManager.shared.store.currentUser.isOnSeat = true
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeat, param: [:])
         } else {
+            EngineManager.shared.store.currentUser.isOnSeat = false
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserDownSeat, param: [:])
         }
     }
@@ -90,33 +97,8 @@ class RoomMainViewModel: NSObject {
     
     func respondTurnOnVideo(isAgree: Bool, requestId: Int) {
         EngineManager.shared.roomEngine.responseRemoteRequest(requestId, agree: isAgree) {
-            if isAgree {
-                EngineManager.shared.roomEngine.openLocalCamera(isFront: true, onSuccess: {
-                    EngineManager.shared.roomEngine.startPushLocalVideo()
-                }, onError: { code, message in
-                    debugPrint("openLocalCamera:code:\(code),message:\(message)")
-                })
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalVideo, param: ["select" : false, "enabled": true])
-            }
         } onError: { code, message in
             debugPrint("openLocalCamera:code:\(code),message:\(message)")
-        }
-    }
-    
-    func takeSeat() {
-        if EngineManager.shared.store.roomInfo.enableSeatControl {
-            EngineManager.shared.roomEngine.takeSeat(-1, timeout: timeoutNumber) { _, _ in
-                //todo(如果上台被接受了，要变成下台)
-                debugPrint("")
-            } onRejected: { _, _, _ in
-                debugPrint("")
-            } onCancelled: { _, _ in
-                debugPrint("")
-            } onTimeout: { _, _ in
-                debugPrint("")
-            } onError: { _, _, _, _ in
-                debugPrint("")
-            }
         }
     }
     
@@ -127,6 +109,7 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserVideoStateChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserAudioStateChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onRequestCancelled, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
         debugPrint("deinit \(self)")
     }
 }
@@ -137,7 +120,14 @@ extension RoomMainViewModel: RoomEngineEventResponder {
             interruptClearRoom()
             let alertVC = UIAlertController(title: .destroyAlertText, message: nil, preferredStyle: .alert)
             let sureAction = UIAlertAction(title: .alertOkText, style: .default) { _ in
-                RoomRouter.shared.currentViewController()?.navigationController?.popToRootViewController(animated: true)
+                guard let navigationController = RoomRouter.shared.currentViewController()?.navigationController else { return }
+                navigationController.viewControllers.forEach({ viewController in
+                    if viewController is RoomEntranceViewController {
+                        navigationController.popToViewController(viewController, animated: true)
+                        return
+                    }
+                })
+                return
             }
             alertVC.addAction(sureAction)
             RoomRouter.shared.currentViewController()?.present(alertVC, animated: true)
@@ -147,7 +137,14 @@ extension RoomMainViewModel: RoomEngineEventResponder {
             interruptClearRoom()
             let alertVC = UIAlertController(title: .kickOffTitleText, message: nil, preferredStyle: .alert)
             let sureAction = UIAlertAction(title: .alertOkText, style: .default) { _ in
-                RoomRouter.shared.currentViewController()?.navigationController?.popToRootViewController(animated: true)
+                guard let navigationController = RoomRouter.shared.currentViewController()?.navigationController else { return }
+                navigationController.viewControllers.forEach({ viewController in
+                    if viewController is RoomEntranceViewController {
+                        navigationController.popToViewController(viewController, animated: true)
+                        return
+                    }
+                })
+                return
             }
             alertVC.addAction(sureAction)
             RoomRouter.shared.currentViewController()?.present(alertVC, animated: true)
@@ -297,6 +294,36 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 userModel.userId != userId
             }
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+        }
+        
+        if name == .onUserRoleChanged {
+            guard let userId = param?["userId"] as? String else { return }
+            guard let userRole = param?["userRole"] as? TUIRole else { return }
+            let isSelfRoleChanged = userId == EngineManager.shared.store.currentUser.userId
+            let isRoomOwnerChanged = userRole == .roomOwner
+            if isSelfRoleChanged {
+                EngineManager.shared.store.currentUser.userRole = userRole
+            }
+            if isRoomOwnerChanged {
+                EngineManager.shared.store.roomInfo.owner = userId
+            }
+            if isSelfRoleChanged, isRoomOwnerChanged {
+                if EngineManager.shared.store.roomInfo.enableSeatControl {
+                    EngineManager.shared.roomEngine.takeSeat(-1, timeout: timeoutNumber) { _, _ in
+                        EngineManager.shared.store.currentUser.isOnSeat = true
+                        debugPrint("")
+                    } onRejected: { _, _, _ in
+                        debugPrint("")
+                    } onCancelled: { _, _ in
+                        debugPrint("")
+                    } onTimeout: { _, _ in
+                        debugPrint("")
+                    } onError: { _, _, _, _ in
+                        debugPrint("")
+                    }
+                }
+                viewResponder?.showSelfBecomeRoomOwnerAlert()
+            }
         }
     }
     

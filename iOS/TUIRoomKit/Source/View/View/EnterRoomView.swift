@@ -87,8 +87,11 @@ class EnterRoomView: UIView {
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ResignFirstResponder, param: [:])
     }
     
-    func constructViewHierarchy() {
+    func setNavigationLeftBarButton() {
         RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+    }
+    
+    func constructViewHierarchy() {
         backgroundColor = UIColor(0x17181F)
         addSubview(inputStackView)
         addSubview(switchStackView)

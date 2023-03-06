@@ -30,7 +30,7 @@ class TopView: UIView {
     
     let meetingNameLabel: UILabel = {
         let label = UILabel()
-        label.text = EngineManager.shared.store.roomInfo.owner + .quickMeetingText
+        label.text = EngineManager.shared.store.roomInfo.name
         label.textColor = UIColor(0xD1D9EC)
         label.textAlignment = .left
         label.adjustsFontSizeToFitWidth = true
@@ -179,8 +179,4 @@ class TopView: UIView {
         topMenuTimer.invalidate()
         debugPrint("deinit \(self)")
     }
-}
-
-private extension String {
-    static let quickMeetingText = localized("TUIRoom.quick.meeting")
 }

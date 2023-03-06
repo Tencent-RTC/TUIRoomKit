@@ -147,11 +147,7 @@ class TUIVideoSeatShareCell: UICollectionViewCell {
         } else {
             avatarImageView.isHidden = false
         }
-        if viewModel?.currentUser.userId == item.userId {
-            homeownersImageView.isHidden = false
-        } else {
-            homeownersImageView.isHidden = true
-        }
+        homeownersImageView.isHidden = item.userId != viewModel?.roomInfo.owner
         if attendeeModel?.userId == viewModel?.currentUser.userId  && viewModel?.attendeeList.count == 1 {
             userInfoView.isHidden = true
         } else {

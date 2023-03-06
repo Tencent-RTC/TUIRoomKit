@@ -45,6 +45,7 @@ class UIEventCenter: NSObject {
         case TUIVideoSeatService
         case UserVoiceVolumeChanged
         case UserVideoStateChanged
+        case UserNameChanged
     }
     
     /// 注册UI响应相关监听事件

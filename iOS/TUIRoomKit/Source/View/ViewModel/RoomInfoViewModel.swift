@@ -48,7 +48,8 @@ class RoomInfoViewModel {
         
         let roomLinkItem = ListCellItemData()
         roomLinkItem.titleText = .roomLinkText
-        roomLinkItem.messageText = "TRTC@Tencent.com"
+        roomLinkItem.messageText = "https://web.sdk.qcloud.com/component/tuiroom/index.html#/" + "#/room?roomId=" +
+        EngineManager.shared.store.roomInfo.roomId
         roomLinkItem.hasButton = true
         roomLinkItem.normalIcon = "room_copy"
         roomLinkItem.resourceBundle = tuiRoomKitBundle()
@@ -62,7 +63,7 @@ class RoomInfoViewModel {
     func copyAction(sender: UIButton, text: String) {
         UIPasteboard.general.string = text
     }
-     
+    
     func codeAction(sender: UIButton) {
         RoomRouter.shared.pushQRCodeViewController()
     }

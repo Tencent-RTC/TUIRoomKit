@@ -98,6 +98,11 @@ class RaiseHandApplicationListView: UIView {
         isViewReady = true
     }
     
+    func setNavigationLeftBarButton() {
+        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        RoomRouter.shared.currentViewController()?.navigationItem.hidesSearchBarWhenScrolling = false
+    }
+    
     func constructViewHierarchy() {
         addSubview(applyTableView)
         addSubview(allAgreeButton)
@@ -127,8 +132,6 @@ class RaiseHandApplicationListView: UIView {
     func bindInteraction() {
         searchController.delegate = self
         searchController.searchResultsUpdater = self
-        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
-        RoomRouter.shared.currentViewController()?.navigationItem.hidesSearchBarWhenScrolling = false
         backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         allAgreeButton.addTarget(self, action: #selector(allAgreeStageAction(sender:)), for: .touchUpInside)
         inviteMemberButton.addTarget(self, action: #selector(inviteMemberAction(sender:)), for: .touchUpInside)
@@ -153,6 +156,7 @@ class RaiseHandApplicationListView: UIView {
     }
     
     deinit {
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
         debugPrint("deinit \(self)")
     }
 }
@@ -252,6 +256,15 @@ class ApplyTableCell: UITableViewCell {
         return button
     }()
     
+    let disagreeStageButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.backgroundColor = .red
+        button.setTitle(.disagreeSeatText, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.clipsToBounds = true
+        return button
+    }()
+    
     let downLineView : UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(0x2A2D38)
@@ -283,6 +296,7 @@ class ApplyTableCell: UITableViewCell {
         contentView.addSubview(muteAudioButton)
         contentView.addSubview(muteVideoButton)
         contentView.addSubview(agreeStageButton)
+        contentView.addSubview(disagreeStageButton)
         contentView.addSubview(downLineView)
     }
     
@@ -302,9 +316,15 @@ class ApplyTableCell: UITableViewCell {
             make.right.equalTo(self.muteVideoButton.snp.left).offset(-12)
             make.centerY.equalTo(self.avatarImageView)
         }
-        agreeStageButton.snp.makeConstraints { make in
+        disagreeStageButton.snp.makeConstraints { make in
             make.right.equalToSuperview().offset(-12)
             make.centerY.equalTo(self.avatarImageView)
+            make.width.height.equalTo(80.scale375())
+            make.height.equalTo(24.scale375())
+        }
+        agreeStageButton.snp.makeConstraints { make in
+            make.right.equalTo(disagreeStageButton.snp.left).offset(-5)
+            make.centerY.equalTo(disagreeStageButton)
             make.width.height.equalTo(80.scale375())
             make.height.equalTo(24.scale375())
         }
@@ -326,6 +346,7 @@ class ApplyTableCell: UITableViewCell {
         backgroundColor = UIColor(0x1B1E26)
         setupViewState(item: attendeeModel)
         agreeStageButton.addTarget(self, action: #selector(agreeStageAction(sender:)), for: .touchUpInside)
+        disagreeStageButton.addTarget(self, action: #selector(disagreeStageAction(sender:)), for: .touchUpInside)
     }
     
     func setupViewState(item: UserModel) {
@@ -344,17 +365,23 @@ class ApplyTableCell: UITableViewCell {
         muteVideoButton.isSelected = !item.hasVideoStream
         if item.isOnSeat {
             agreeStageButton.isHidden = true
+            disagreeStageButton.isHidden = true
             muteAudioButton.isHidden = false
             muteVideoButton.isHidden = false
         } else {
             agreeStageButton.isHidden = false
+            disagreeStageButton.isHidden = false
             muteAudioButton.isHidden = true
             muteVideoButton.isHidden = true
         }
     }
     
     @objc func agreeStageAction(sender: UIButton) {
-        viewModel.agreeStageAction(sender: sender, userId: attendeeModel.userId)
+        viewModel.agreeStageAction(sender: sender, isAgree: true, userId: attendeeModel.userId)
+    }
+    
+    @objc func disagreeStageAction(sender: UIButton) {
+        viewModel.agreeStageAction(sender: sender, isAgree: false, userId: attendeeModel.userId)
     }
     
     deinit {
@@ -368,5 +395,6 @@ private extension String {
     static let agreeAllText = localized("TUIRoom.agree.all")
     static let inviteMembersText = localized("TUIRoom.invite.members")
     static let agreeSeatText = localized("TUIRoom.agree.seat")
+    static let disagreeSeatText = localized("TUIRoom.disagree.seat")
     static let meText = localized("TUIRoom.me")
 }

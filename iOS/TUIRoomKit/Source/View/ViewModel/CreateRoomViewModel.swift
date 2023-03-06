@@ -108,7 +108,8 @@ class CreateRoomViewModel: NSObject {
         })
         roomInfo.roomId = roomId
         roomInfo.name = roomInfo.roomId
-        roomInfo.enableSeatControl = enableSeatControl
+        roomInfo.enableSeatControl = EngineManager.shared.store.roomInfo.enableSeatControl
+        roomInfo.name = EngineManager.shared.store.currentUser.userName + .videoConferenceText
         TUIRoomKit.sharedInstance.createRoom(roomInfo: roomInfo, type: .meeting)
     }
     
@@ -119,6 +120,9 @@ class CreateRoomViewModel: NSObject {
     
     func cancelAction(sender: UIButton, view: RoomTypeView) {
         sender.isSelected = !sender.isSelected
+        enableSeatControl = EngineManager.shared.store.roomInfo.enableSeatControl
+        view.raiseHandButton.isSelected = false
+        view.freedomButton.isSelected = false
         view.isHidden = true
     }
     
@@ -160,12 +164,10 @@ extension CreateRoomViewModel: TUIRoomKitListener {
             RoomRouter.shared.currentViewController()?.view.makeToast(message)
         }
     }
-    func onExitRoom(code: Int, message: String) {
-        if code == 0 {
-        } else {
-            RoomRouter.shared.currentViewController()?.view.makeToast(message)
-        }
+    
+    func onExitRoom() {
     }
+    
     func onLogin(code: Int, message: String) {
     }
 }
@@ -179,4 +181,5 @@ private extension String {
     static let openSpeakerText = localized("TUIRoom.open.speaker")
     static let freedomSpeakText = localized("TUIRoom.freedom.speaker")
     static let raiseHandSpeakText = localized("TUIRoom.raise.speaker")
+    static let videoConferenceText = localized("TUIRoom.video.conference")
 }

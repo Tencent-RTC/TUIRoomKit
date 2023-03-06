@@ -22,7 +22,6 @@ def local
   pod 'TUIRoomKit', :path => '../TUIRoomKit/'
   pod 'TUIVideoSeat', :path => '../TUIVideoSeat/'
   pod 'TUIBeauty',  :path => "../TUIBeauty"
-  pod 'TUIBarrage', :path => "../TUIBarrage"
 end
 
 

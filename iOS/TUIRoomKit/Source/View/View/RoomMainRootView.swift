@@ -23,7 +23,6 @@ class RoomMainRootView: UIView {
         self.viewModel = viewModel
         self.viewFactory = viewFactory
         super.init(frame: .zero)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ChangeSelfAsRoomOwner, responder: self)
     }
     
     required init?(coder: NSCoder) {
@@ -50,6 +49,7 @@ class RoomMainRootView: UIView {
         backgroundColor = UIColor(0x1B1E26)
         constructViewHierarchy()
         activateConstraints()
+        bindInteraction()
         viewModel.applyConfigs()
         isViewReady = true
     }
@@ -79,24 +79,24 @@ class RoomMainRootView: UIView {
         }
     }
     
+    private func bindInteraction() {
+        viewModel.viewResponder = self
+    }
+    
     deinit {
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ChangeSelfAsRoomOwner, responder: self)
         debugPrint("deinit \(self)")
     }
 }
 
-extension RoomMainRootView: RoomKitUIEventResponder {
-    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
-        if key == .TUIRoomKitService_ChangeSelfAsRoomOwner {
-            let alertVC = UIAlertController(title: .haveBecomeMasterText,
-                                            message: .haveTransferredMaster,
-                                            preferredStyle: .alert)
-            let sureAction = UIAlertAction(title: .agreeText, style: .default) { _ in
-            }
-            alertVC.addAction(sureAction)
-            RoomRouter.shared.currentViewController()?.present(alertVC, animated: true, completion: nil)
-            viewModel.takeSeat()
+extension RoomMainRootView: RoomMainViewResponder {
+    func showSelfBecomeRoomOwnerAlert() {
+        let alertVC = UIAlertController(title: .haveBecomeMasterText,
+                                        message: .haveTransferredMaster,
+                                        preferredStyle: .alert)
+        let sureAction = UIAlertAction(title: .agreeText, style: .default) { _ in
         }
+        alertVC.addAction(sureAction)
+        RoomRouter.shared.currentViewController()?.present(alertVC, animated: true, completion: nil)
     }
 }
 

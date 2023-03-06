@@ -12,15 +12,23 @@ import TUIRoomEngine
 
 class EngineManager: NSObject {
     static let shared = EngineManager()
-    private var listener: EngineManagerListener?
-    private(set) var store: RoomStore = RoomStore()
-    private(set) lazy var roomEngine: TUIRoomEngine = {
-        return TUIRoomEngine()
+    private weak var listener: EngineManagerListener?
+    private(set) lazy var store: RoomStore = {
+        let store = RoomStore()
+        store.addEngineObserver()
+        return store
     }()
+    private(set) lazy var roomEngine: TUIRoomEngine = {
+        let roomEngine = TUIRoomEngine()
+        roomEngine.addObserver(EngineEventCenter.shared)
+        return roomEngine
+    }()
+    let timeOutNumber: Double = 30
     
     override private init() {}
     
     func refreshRoomEngine() {
+        roomEngine.removeObserver(EngineEventCenter.shared)
         roomEngine = TUIRoomEngine()
         roomEngine.addObserver(EngineEventCenter.shared)
     }
@@ -34,6 +42,7 @@ class EngineManager: NSObject {
             self.listener?.onLogin(code: code.rawValue, message: message)
         }
     }
+    
     func setSelfInfo(userName: String, avatarURL: String) {
         EngineManager.shared.store.currentUser.userName = userName
         EngineManager.shared.store.currentUser.avatarUrl = avatarURL
@@ -52,8 +61,9 @@ class EngineManager: NSObject {
     }
     
     func createRoom() {
-        let currentUserInfo = store.currentUser
         let roomInfo = store.roomInfo
+        store.initialCurrentUser()
+        let currentUserInfo = store.currentUser
         currentUserInfo.isAllowAudioTurnedOn = roomInfo.isOpenMicrophone
         currentUserInfo.isAllowVideoTurnedOn = roomInfo.isOpenCamera
         if store.roomScene == .meeting {
@@ -63,35 +73,38 @@ class EngineManager: NSObject {
         }
         roomEngine.createRoom(roomInfo.getEngineRoomInfo()) { [weak self] in
             guard let self = self else { return }
-            self.enterEngineRoom { [weak self] in
+            self.enterEngineRoom(roomId: roomInfo.roomId) { [weak self] in
                 guard let self = self else { return }
                 currentUserInfo.userRole = .roomOwner
-                self.listener?.onEnterEngineRoom(code: 0, message: "success", roomInfo: roomInfo)
+                self.showRoomViewController(roomId: roomInfo.roomId)
+                self.listener?.onEnterEngineRoom(code: 0, message: "success")
             } onError: { [weak self] code, message in
                 guard let self = self else { return }
-                self.listener?.onEnterEngineRoom(code: code.rawValue, message: message, roomInfo: nil)
+                self.listener?.onEnterEngineRoom(code: code.rawValue, message: message)
             }
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.listener?.onEnterEngineRoom(code: code.rawValue, message: message, roomInfo: nil)
+            self.listener?.onEnterEngineRoom(code: code.rawValue, message: message)
         }
     }
     
-    func enterRoom() {
+    func enterRoom(roomId: String) {
+        store.initialCurrentUser()
         store.currentUser.isAllowAudioTurnedOn = store.roomInfo.isOpenMicrophone
         store.currentUser.isAllowVideoTurnedOn = store.roomInfo.isOpenCamera
-        enterEngineRoom { [weak self] in
+        enterEngineRoom(roomId: roomId) { [weak self] in
             guard let self = self else { return }
             self.store.currentUser.userRole = .generalUser
-            self.listener?.onEnterEngineRoom(code: 0, message: "success", roomInfo: self.store.roomInfo)
+            self.showRoomViewController(roomId: roomId)
+            self.listener?.onEnterEngineRoom(code: 0, message: "success")
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.listener?.onEnterEngineRoom(code: code.rawValue, message: message, roomInfo: nil)
+            self.listener?.onEnterEngineRoom(code: code.rawValue, message: message)
         }
     }
     
-    func enterEngineRoom(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
-        roomEngine.enterRoom(store.roomInfo.roomId) { [weak self] roomInfo in
+    func enterEngineRoom(roomId:String, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
+        roomEngine.enterRoom(roomId) { [weak self] roomInfo in
             guard let self = self else { return }
             guard let roomInfo = roomInfo else {return }
             self.store.roomInfo.update(engineRoomInfo: roomInfo)
@@ -113,7 +126,9 @@ class EngineManager: NSObject {
             if self.store.roomInfo.enableSeatControl && self.store.currentUser.userId != self.store.roomInfo.owner {
                 onSuccess()
             } else {//自由发言模式中直接申请上麦
-                self.roomEngine.takeSeat(-1, timeout: 30) { _, _ in
+                self.roomEngine.takeSeat(-1, timeout: self.timeOutNumber) { [weak self] _, _ in
+                    guard let self = self else { return }
+                    self.store.currentUser.isOnSeat = true
                     onSuccess()
                 } onRejected: { _, _, _ in
                     onError(.failed, "rejected")
@@ -139,13 +154,13 @@ class EngineManager: NSObject {
             guard let self = self else { return }
             onSuccess()
             self.refreshRoomEngine()
-            self.listener?.onExitEngineRoom(code: 0, message: "success")
+            self.listener?.onExitEngineRoom()
             self.store.refreshStore()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             onError(code, message)
             self.refreshRoomEngine()
-            self.listener?.onExitEngineRoom(code: code.rawValue, message: message)
+            self.listener?.onExitEngineRoom()
             self.store.refreshStore()
         }
     }
@@ -154,13 +169,13 @@ class EngineManager: NSObject {
         roomEngine.destroyRoom { [weak self] in
             guard let self = self else { return }
             self.refreshRoomEngine()
-            self.listener?.onExitEngineRoom(code: 0, message: "success")
+            self.listener?.onExitEngineRoom()
             self.store.refreshStore()
             onComplete?()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.refreshRoomEngine()
-            self.listener?.onExitEngineRoom(code: code.rawValue, message: message)
+            self.listener?.onExitEngineRoom()
             self.store.refreshStore()
             onComplete?()
         }
@@ -176,9 +191,18 @@ class EngineManager: NSObject {
     }
 }
 
-public protocol EngineManagerListener {
-    func onEnterEngineRoom(code: Int, message: String, roomInfo: RoomInfo?) -> Void
-    func onExitEngineRoom(code: Int, message: String) -> Void
+// MARK: - Private
+extension EngineManager {
+    
+    private func showRoomViewController(roomId: String) {
+        let vc = RoomRouter.shared.makeMainViewController(roomId: roomId)
+        RoomRouter.shared.presentRoomController(vc: vc)
+    }
+}
+
+public protocol EngineManagerListener: NSObject {
+    func onEnterEngineRoom(code: Int, message: String) -> Void
+    func onExitEngineRoom() -> Void
     func onLogin(code: Int, message: String) -> Void
 }
 

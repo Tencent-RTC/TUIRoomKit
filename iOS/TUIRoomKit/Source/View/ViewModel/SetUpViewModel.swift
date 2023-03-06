@@ -273,10 +273,11 @@ class SetUpViewModel {
     }
     
     func localMirrorAction(sender: UISwitch) {
+        EngineManager.shared.store.videoSetting.isMirror = sender.isOn
         let params = TRTCRenderParams()
         params.fillMode = .fill
         params.rotation = ._0
-        if sender.isOn {
+        if EngineManager.shared.store.videoSetting.isMirror {
             params.mirrorType = .enable
         } else {
             params.mirrorType = .disable

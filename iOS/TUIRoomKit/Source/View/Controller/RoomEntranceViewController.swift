@@ -34,6 +34,11 @@ class RoomEntranceViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+        if let view = rootView as? CreateRoomView {
+            view.setNavigationLeftBarButton()
+        } else if let view = rootView as? EnterRoomView {
+            view.setNavigationLeftBarButton()
+        }
     }
     
     deinit {

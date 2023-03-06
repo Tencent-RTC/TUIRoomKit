@@ -143,11 +143,7 @@ class RoomInfoView: UIView {
     }
     
     func setupViewState(item: RoomInfoViewModel) {
-        var userName = EngineManager.shared.store.roomInfo.owner
-        if let userModel = EngineManager.shared.store.attendeeList.first(where: { $0.userId == EngineManager.shared.store.roomInfo.owner}) {
-            userName = userModel.userName
-        }
-        nameLabel.text = userName + .videoConferenceText
+        nameLabel.text = EngineManager.shared.store.roomInfo.name
     }
     
     @objc func codeAction(sender: UIButton) {
@@ -161,6 +157,5 @@ class RoomInfoView: UIView {
 
 private extension String {
     static let inviteJoinRoomText = localized("TUIRoom.invite.join")
-    static let videoConferenceText = localized("TUIRoom.video.conference")
 }
 

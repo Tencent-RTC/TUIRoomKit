@@ -15,10 +15,10 @@ import TXLiteAVSDK_Professional
 #endif
 
 class TUIVideoSeatViewModel: NSObject {
-    var rootView: TUIVideoSeatView?
-    private var roomEngine: TUIRoomEngine
+    weak var rootView: TUIVideoSeatView?
+    private weak var roomEngine: TUIRoomEngine?
     let currentUser: UserModel = UserModel()
-    var roomInfo: TUIRoomInfo
+    var roomInfo: RoomInfo = RoomInfo()
     var renderMapView: [String: UIView] = [:]
     var shareRenderMapView: [String: UIView] = [:]
     var attendeeList: [UserModel] = []
@@ -27,7 +27,6 @@ class TUIVideoSeatViewModel: NSObject {
     
     init(roomEngine: TUIRoomEngine, roomId: String) {
         self.roomEngine = roomEngine
-        self.roomInfo = TUIRoomInfo()
         roomInfo.roomId = roomId
         currentUser.update(userInfo: TUIRoomEngine.getSelfInfo())
         super.init()
@@ -37,24 +36,24 @@ class TUIVideoSeatViewModel: NSObject {
     }
     
     deinit {
-        roomEngine.removeObserver(self)
+        roomEngine?.removeObserver(self)
     }
     
     func initRoomInfo() {
-        roomEngine.getRoomInfo { [weak self ] roomInfo in
+        roomEngine?.getRoomInfo { [weak self ] roomInfo in
             guard let self = self, let roomInfo = roomInfo else { return }
-            self.roomInfo = roomInfo
+            self.roomInfo = RoomInfo(roomInfo: roomInfo)
         } onError: { code, message in
             debugPrint("getRoomInfo:code:\(code),message:\(message)")
         }
     }
     
     func setLocalVideoView(streamType: TUIVideoStreamType, view: UIView) {
-        roomEngine.setLocalVideoView(streamType: streamType, view: view)
+        roomEngine?.setLocalVideoView(streamType: streamType, view: view)
     }
     
     func getSeatList() {
-        roomEngine.getSeatList { seatInfo in
+        roomEngine?.getSeatList { seatInfo in
             self.addUserList(userList: seatInfo)
         } onError: { code, message in
             debugPrint("getSeatList:code:\(code),message:\(message)")
@@ -86,12 +85,13 @@ class TUIVideoSeatViewModel: NSObject {
                 userModel.userId = userId
                 attendeeMap[userId] = userModel
                 attendeeList.append(userModel)
-                roomEngine.getUserInfo(userId) { [weak self] userInfo in
+                roomEngine?.getUserInfo(userId) { [weak self] userInfo in
                     guard let user = userInfo else {
                         return
                     }
                     guard let self = self else { return }
                     userModel.update(userInfo: user)
+                    UIEventCenter.shared.notifyUIEvent(key: .UserNameChanged, param: ["userId": userModel.userId, "userName": userModel.userName])
                     if userModel.userName.isEmpty {
                         userModel.userName = userModel.userId
                     }
@@ -119,10 +119,10 @@ class TUIVideoSeatViewModel: NSObject {
         if streamType == .cameraStream {
             if userModel.hasVideoStream && roomInfo.enableVideo {
                 if userId == currentUser.userId {
-                    roomEngine.setLocalVideoView(streamType: .cameraStream, view: renderView)
+                    roomEngine?.setLocalVideoView(streamType: .cameraStream, view: renderView)
                 } else {
-                    roomEngine.setRemoteVideoView(userId: userId, streamType: .cameraStream, view: renderView)
-                    roomEngine.startPlayRemoteVideo(userId: userId, streamType: .cameraStream) { _ in
+                    roomEngine?.setRemoteVideoView(userId: userId, streamType: .cameraStream, view: renderView)
+                    roomEngine?.startPlayRemoteVideo(userId: userId, streamType: .cameraStream) { _ in
                         
                     } onLoading: { _ in
                         
@@ -134,9 +134,9 @@ class TUIVideoSeatViewModel: NSObject {
             if userModel.hasScreenStream {
                 let renderParams = TRTCRenderParams()
                 renderParams.fillMode = .fit
-                roomEngine.getTRTCCloud().setRemoteRenderParams(userId, streamType: .sub, params: renderParams)
-                roomEngine.setRemoteVideoView(userId: userId, streamType: .screenStream, view: renderView)
-                roomEngine.startPlayRemoteVideo(userId: userId, streamType: .screenStream) { _ in
+                roomEngine?.getTRTCCloud().setRemoteRenderParams(userId, streamType: .sub, params: renderParams)
+                roomEngine?.setRemoteVideoView(userId: userId, streamType: .screenStream, view: renderView)
+                roomEngine?.startPlayRemoteVideo(userId: userId, streamType: .screenStream) { _ in
                     debugPrint("")
                 } onLoading: { _ in
                     debugPrint("")
@@ -193,10 +193,10 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
             guard renderView.superview != nil else { return }
             if hasVideo {
                 if userId == currentUser.userId {
-                    roomEngine.setLocalVideoView(streamType: .cameraStream, view: renderView)
+                    roomEngine?.setLocalVideoView(streamType: .cameraStream, view: renderView)
                 } else {
-                    roomEngine.setRemoteVideoView(userId: userId, streamType: .cameraStream, view: renderView)
-                    roomEngine.startPlayRemoteVideo(userId: userId, streamType: .cameraStream) { _ in
+                    roomEngine?.setRemoteVideoView(userId: userId, streamType: .cameraStream, view: renderView)
+                    roomEngine?.startPlayRemoteVideo(userId: userId, streamType: .cameraStream) { _ in
                         
                     } onLoading: { _ in
                         
@@ -204,7 +204,7 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
                     }
                 }
             } else {
-                roomEngine.stopPlayRemoteVideo(userId: userId, streamType: .cameraStream)
+                roomEngine?.stopPlayRemoteVideo(userId: userId, streamType: .cameraStream)
             }
             if !model.hasScreenStream {
                 //                renderView?.refreshVideo(isVideoAvailable: hasVideo)
@@ -215,7 +215,7 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
             let attendModel = attendeeList.first(where: { $0.userId == userId })
             attendModel?.hasScreenStream = hasVideo
             if hasVideo {
-                roomEngine.stopPlayRemoteVideo(userId: userId, streamType: .cameraStream)
+                roomEngine?.stopPlayRemoteVideo(userId: userId, streamType: .cameraStream)
                 if shareAttendeeModel != nil {
                     return
                 }
@@ -229,9 +229,9 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
                     if let view = renderView {
                         let renderParams = TRTCRenderParams()
                         renderParams.fillMode = .fit
-                        roomEngine.getTRTCCloud().setRemoteRenderParams(userId, streamType: .sub, params: renderParams)
-                        roomEngine.setRemoteVideoView(userId: userId, streamType: .screenStream, view: view)
-                        roomEngine.startPlayRemoteVideo(userId: userId, streamType: .screenStream) { _ in
+                        roomEngine?.getTRTCCloud().setRemoteRenderParams(userId, streamType: .sub, params: renderParams)
+                        roomEngine?.setRemoteVideoView(userId: userId, streamType: .screenStream, view: view)
+                        roomEngine?.startPlayRemoteVideo(userId: userId, streamType: .screenStream) { _ in
                             
                         } onLoading: { _ in
                             
@@ -244,8 +244,8 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
                     let renderView = getRenderViewByUserid(userId: userId, streamType: .cameraStream)
                     if (renderView?.superview) != nil {
                         if let view = renderView {
-                            roomEngine.setRemoteVideoView(userId: userId, streamType: .cameraStream, view: view)
-                            roomEngine.startPlayRemoteVideo(userId: userId, streamType: .cameraStream) { _ in
+                            roomEngine?.setRemoteVideoView(userId: userId, streamType: .cameraStream, view: view)
+                            roomEngine?.startPlayRemoteVideo(userId: userId, streamType: .cameraStream) { _ in
                             } onLoading: { _ in
                             } onError: { _, _, _ in
                             }
@@ -273,5 +273,17 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
         } else {
             addUserList(userList: seated)
         }
+    }
+    
+    public func onUserRoleChanged(userId: String, userRole: TUIRole) {
+        let isSelfRoleChanged = userId == currentUser.userId
+        let isRoomOwnerChanged = userRole == .roomOwner
+        if isSelfRoleChanged {
+            currentUser.userRole = userRole
+        }
+        if isRoomOwnerChanged {
+            roomInfo.owner = userId
+        }
+        rootView?.attendeeCollectionView.reloadData()
     }
 }

@@ -203,7 +203,8 @@ extension RoomRouter: UserListViewModelFactory {
 extension RoomRouter: QRCodeViewModelFactory {
     func makeQRCodeViewModel() -> QRCodeViewModel {
         //todo房间的链接
-        let model = QRCodeViewModel(urlString: "https://web.sdk.qcloud.com/trtc/webrtc/test/xinli-test/tuiroom-wasm/index.html#/login")
+        let model = QRCodeViewModel(urlString: "https://web.sdk.qcloud.com/component/tuiroom/index.html#/" + "#/room?roomId=" +
+                                    EngineManager.shared.store.roomInfo.roomId)
         return model
     }
 }

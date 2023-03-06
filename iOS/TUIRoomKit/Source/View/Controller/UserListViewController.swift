@@ -14,8 +14,10 @@ protocol UserListViewModelFactory {
 
 class UserListViewController: UIViewController {
     let viewModel: UserListViewModel
+    let rootView: UserListView
     init(userListViewModelFactory: UserListViewModelFactory) {
         self.viewModel = userListViewModelFactory.makeUserListViewModel()
+        self.rootView = UserListView(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -24,7 +26,7 @@ class UserListViewController: UIViewController {
     }
     
     override func loadView() {
-        self.view = UserListView(viewModel: viewModel)
+        self.view = self.rootView
     }
     
     override func viewWillAppear(_ animated: Bool) {
