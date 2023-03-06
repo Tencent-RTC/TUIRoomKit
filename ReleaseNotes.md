@@ -1,5 +1,16 @@
 ## 发布日志
 
+### Version 1.0.3 @ 2023.03.06
+- iOS&Android: 修改 `enterRoom` 回调,删除 `RoomScene` 参数
+- iOS&Android: 修改 `onExitRoom` 回调参数为无参
+- iOS&Android: 修复进房前后置摄像头、视频镜像设置在房间内不生效的bug
+- Android: 修复举手发言模式房主退房后未上麦用户会崩溃的bug
+- Android: 升级工程compileSdkVersion与targetSdkVersion为30
+- Android: 修复房间内人数较多时无法进房的bug
+- Android: gradle版本升级为6.7.1
+- iOS: 修复roomEngine内存泄露引发的回调异常
+- iOS: 修复房主状态显示的异常bug
+
 ### Version 1.0.2 @ 2023.02.24
 - iOS&Android: 修改 `setUp` 接口 `login` 接口
 - iOS&Android: 新增设置用户头像、昵称接口 `setSelfInfo`
