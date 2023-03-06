@@ -90,8 +90,10 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
         mLayoutCamera.setOnClickListener(this);
         mLayoutMicrophone.setOnClickListener(this);
 
-        ImageLoader.loadImage(mContext, mImageHead, mViewModel.getUserModel().userAvatar);
-        ImageLoader.loadImage(mContext, mImageHeadCloseVideo, mViewModel.getUserModel().userAvatar);
+        ImageLoader.loadImage(mContext, mImageHead, mViewModel.getUserModel().userAvatar,
+                R.drawable.tuiroomkit_head);
+        ImageLoader.loadImage(mContext, mImageHeadCloseVideo, mViewModel.getUserModel().userAvatar,
+                R.drawable.tuiroomkit_head);
         mTextUserName.setText(mViewModel.getUserModel().userName);
         mTextUserNameCloseVideo.setText(mViewModel.getUserModel().userName);
         mViewModel.setVideoView(mVideoView);

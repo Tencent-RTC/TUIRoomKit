@@ -116,13 +116,12 @@ public class RoomEngineManager {
         } else {
             engineRoomInfo.roomType = TUIRoomDefine.RoomType.OPEN;
         }
-        engineRoomInfo.maxSeatCount = 8;
         TUIRoomEngine roomEngine = getRoomEngine();
         roomEngine.createRoom(engineRoomInfo, new TUIRoomDefine.ActionCallback() {
             @Override
             public void onSuccess() {
                 Log.i(TAG, "createRoom success");
-                enterRoom(roomInfo, scene);
+                enterRoom(roomInfo);
             }
 
             @Override
@@ -133,7 +132,7 @@ public class RoomEngineManager {
         });
     }
 
-    public void enterRoom(final RoomInfo roomInfo, final TUIRoomKit.RoomScene scene) {
+    public void enterRoom(final RoomInfo roomInfo) {
         if (mContext == null) {
             return;
         }
@@ -163,7 +162,9 @@ public class RoomEngineManager {
                 roomInfo.enableMessage = engineRoomInfo.enableMessage;
                 roomInfo.enableSeatControl = engineRoomInfo.enableSeatControl;
                 mRoomStore.roomInfo = roomInfo;
-                mRoomStore.roomScene = scene;
+                mRoomStore.roomScene = TUIRoomDefine.RoomType.GROUP.equals(engineRoomInfo.roomType)
+                        ? TUIRoomKit.RoomScene.MEETING
+                        : TUIRoomKit.RoomScene.LIVE;
                 TUIRoomDefine.Role role = TUIRoomDefine.Role.GENERAL_USER;
                 if (engineRoomInfo.owner.equals(mRoomStore.userModel.userId)) {
                     role = TUIRoomDefine.Role.ROOM_OWNER;

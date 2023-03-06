@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 
 import com.google.zxing.BarcodeFormat;

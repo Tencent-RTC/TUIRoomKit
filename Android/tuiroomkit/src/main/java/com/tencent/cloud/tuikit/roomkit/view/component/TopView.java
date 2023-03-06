@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.TopViewModel;
+import com.tencent.liteav.basic.RTCubeUtils;
 import com.tencent.qcloud.tuicore.util.DateTimeUtil;
 
 public class TopView extends FrameLayout implements View.OnClickListener {
@@ -47,7 +48,7 @@ public class TopView extends FrameLayout implements View.OnClickListener {
         mImgMirror.setOnClickListener(this);
     }
 
-    private void showReportView(boolean isShow) {
+    public void showReportView(boolean isShow) {
         mImgReport.setVisibility(isShow ? VISIBLE : GONE);
     }
 

@@ -174,7 +174,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:clickable="false"
-            android:src="@drawable/tuiroomkit_ic_list_mic_on" />
+            android:src="@drawable/tuiroomkit_ic_silence_user" />
 
         <TextView
             android:id="@+id/tv_mute_user"

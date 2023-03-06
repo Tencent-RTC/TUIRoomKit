@@ -87,22 +87,16 @@ public class TUIVideoSeatView extends RelativeLayout {
         int selectColor = getResources().getColor(R.color.tuivideoseat_color_white);
         mCircleIndicator.setSelectDotColor(selectColor);
         mCircleIndicator.setUnSelectDotColor(unSelectColor);
-        init(roomId, roomEngine);
-
+        mViewModel = new VideoSeatViewModel(mContext, roomEngine, this, roomId);
         mUserVideoRoundRadius = (int) context.getResources().getDimension(R.dimen.tuivideoseat_video_view_conor);
     }
 
-    private void setData(List<UserEntity> list) {
+    public void setMemberEntityList(List<UserEntity> list) {
         mMemberEntityList = list;
         if (mMemberEntityList.size() > 5) {
             return;
         }
         initView();
-    }
-
-    private void init(String roomId, TUIRoomEngine roomEngine) {
-        mViewModel = new VideoSeatViewModel(mContext, roomEngine, this, roomId);
-        setData(mViewModel.getData());
     }
 
     @Override
@@ -133,7 +127,7 @@ public class TUIVideoSeatView extends RelativeLayout {
     }
 
     private void initView() {
-        if (mMemberEntityList == null) {
+        if (mMemberEntityList == null || mMemberEntityList.isEmpty()) {
             return;
         }
         if (isShareScreen()) {

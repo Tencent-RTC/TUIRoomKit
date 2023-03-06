@@ -217,6 +217,8 @@ public class PermissionRequester {
         }
         Intent intent = new Intent(context, PermissionActivity.class);
         intent.putExtra(PERMISSION_REQUEST_KEY, request);
+        // 在Activity之外startActivity需要添加FLAG_ACTIVITY_NEW_TASK，否则会crash
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 

@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -20,7 +19,7 @@ import com.tencent.qcloud.tuicore.util.ScreenUtil;
 /**
  * Custom LineControllerView
  */
-public class LineControllerView extends LinearLayout {
+public class LineControllerView extends RelativeLayout {
 
     private String mName;
     private boolean mIsBottom;

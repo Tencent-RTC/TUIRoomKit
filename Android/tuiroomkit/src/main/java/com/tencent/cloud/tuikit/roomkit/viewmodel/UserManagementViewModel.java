@@ -89,6 +89,7 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
     private void onUnMuteUserAudio(String userId) {
         if (userId.equals(mRoomStore.userModel.userId)) {
             mRoomEngine.openLocalMicrophone(null);
+            mRoomEngine.startPushLocalAudio();
             return;
         }
         if (!isOwner()) {

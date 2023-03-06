@@ -69,7 +69,7 @@ public class SwipeItemMangerImpl implements SwipeItemMangerInterface {
         } else {
             mOpenPosition = position;
         }
-        swipeAdapterInterface.notifyDatasetChanged();
+        swipeAdapterInterface.notifySwipeItemChanged(position);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class SwipeItemMangerImpl implements SwipeItemMangerInterface {
             if (mOpenPosition == position)
                 mOpenPosition = INVALID_POSITION;
         }
-        swipeAdapterInterface.notifyDatasetChanged();
+        swipeAdapterInterface.notifySwipeItemChanged(position);
     }
 
     @Override

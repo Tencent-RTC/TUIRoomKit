@@ -17,9 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class PageLayoutManager extends RecyclerView.LayoutManager implements
         RecyclerView.SmoothScroller.ScrollVectorProvider {
-    private static final String TAG = "PageLayoutManager";
-    private static final int DEFAULT_HEIGHT_DP = 450;
-    private static final int ROUND_MARGIN_DP = 8;
+    private static final String TAG               = "PageLayoutManager";
+    private static final int    DEFAULT_HEIGHT_DP = 450;
+    private static final int    ROUND_MARGIN_DP   = 8;
 
     public static final int VERTICAL   = 0;
     public static final int HORIZONTAL = 1;
@@ -297,7 +297,6 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
     }
 
     private Rect getItemFrameByPosition(int pos) {
-        Rect rect = new Rect();
         int page = pos / mOnePageSize;
         int offsetX = 0;
         int offsetY = 0;
@@ -318,6 +317,7 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
             offsetY += (row + 1) * dp2px(ROUND_MARGIN_DP);
         }
 
+        Rect rect = new Rect();
         rect.left = offsetX;
         rect.top = offsetY;
         rect.right = offsetX + mItemWidth;
@@ -646,8 +646,9 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
 
         void onItemVisible(int fromItem, int toItem);
     }
+
     private int dp2px(int dp) {
         final float scale = mRecyclerView.getResources().getDisplayMetrics().density;
-        return (int)(dp * scale + 0.5f);
+        return (int) (dp * scale + 0.5f);
     }
 }

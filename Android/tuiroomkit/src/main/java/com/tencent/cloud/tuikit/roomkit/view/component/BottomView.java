@@ -68,26 +68,6 @@ public class BottomView extends LinearLayout {
         mViewModel.destroy();
     }
 
-    private void onButtonDisabled(boolean disable, BottomItemData.Type type) {
-        BottomItemData itemData = mViewModel.findItemData(type);
-        if (itemData != null) {
-            itemData.setEnable(!disable);
-            if (disable) {
-                BottomSelectItemData bottomSelectItemData = itemData.getSelectItemData();
-                if (bottomSelectItemData != null) {
-                    bottomSelectItemData.setSelected(false);
-                }
-            }
-        }
-        AppCompatImageButton button = mButtonMap.get(type);
-        if (button != null) {
-            button.setEnabled(!disable);
-            if (disable) {
-                button.setSelected(false);
-            }
-        }
-    }
-
     public void addItem(int index, final BottomItemData itemData) {
         if (index < 0 || index > mDataList.size()) {
             return;
@@ -216,14 +196,6 @@ public class BottomView extends LinearLayout {
         });
     }
 
-    public void disableCameraButton(boolean disable) {
-        onButtonDisabled(disable, BottomItemData.Type.VIDEO);
-    }
-
-    public void disableMicrophoneButton(boolean disable) {
-        onButtonDisabled(disable, BottomItemData.Type.AUDIO);
-    }
-
     public void updateItemSelectStatus(BottomItemData.Type type, boolean isSelected) {
         BottomItemData itemData = mViewModel.findItemData(type);
         if (itemData != null && itemData.getSelectItemData() != null) {
@@ -239,6 +211,26 @@ public class BottomView extends LinearLayout {
             String name = isSelected ? selectItemData.getSelectedName() : selectItemData.getUnSelectedName();
             if (!TextUtils.isEmpty(name)) {
                 textView.setText(name);
+            }
+        }
+    }
+
+    public void updateItemEnableStatus(BottomItemData.Type type, boolean enable) {
+        BottomItemData itemData = mViewModel.findItemData(type);
+        if (itemData != null) {
+            itemData.setEnable(enable);
+            if (!enable) {
+                BottomSelectItemData bottomSelectItemData = itemData.getSelectItemData();
+                if (bottomSelectItemData != null) {
+                    bottomSelectItemData.setSelected(false);
+                }
+            }
+        }
+        AppCompatImageButton button = mButtonMap.get(type);
+        if (button != null) {
+            button.setEnabled(enable);
+            if (!enable) {
+                button.setSelected(false);
             }
         }
     }

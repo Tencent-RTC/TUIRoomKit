@@ -9,7 +9,6 @@ import android.view.View;
 
 import com.blankj.utilcode.util.PermissionUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.roomkit.R;
@@ -20,11 +19,13 @@ import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.model.utils.CommonUtils;
+import com.tencent.cloud.tuikit.roomkit.view.service.ForegroundService;
 import com.tencent.cloud.tuikit.roomkit.view.component.RoomMainView;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.permission.PermissionCallback;
 import com.tencent.qcloud.tuicore.permission.PermissionRequester;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
+import com.tencent.trtc.TRTCCloudDef;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +37,6 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     private static final int SEAT_INDEX   = -1;
     private static final int REQ_TIME_OUT = 30;
 
-    private boolean mIsFrontCamera;
-
     private Context       mContext;
     private RoomStore     mRoomStore;
     private TUIRoomEngine mRoomEngine;
@@ -48,8 +47,15 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         mRoomMainView = meetingView;
         mRoomEngine = RoomEngineManager.sharedInstance(context).getRoomEngine();
         mRoomStore = RoomEngineManager.sharedInstance(context).getRoomStore();
-        mIsFrontCamera = true;
         subscribeEvent();
+        setMirror();
+    }
+
+    private void setMirror() {
+        TRTCCloudDef.TRTCRenderParams param = new TRTCCloudDef.TRTCRenderParams();
+        param.mirrorType = mRoomStore.videoModel.isMirror ? TRTCCloudDef.TRTC_VIDEO_MIRROR_TYPE_ENABLE
+                : TRTCCloudDef.TRTC_VIDEO_MIRROR_TYPE_DISABLE;
+        mRoomEngine.getTRTCCloud().setLocalRenderParams(param);
     }
 
     private void subscribeEvent() {
@@ -196,7 +202,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         PermissionCallback callback = new PermissionCallback() {
             @Override
             public void onGranted() {
-                mRoomEngine.openLocalCamera(mIsFrontCamera, null);
+                mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, null);
                 mRoomEngine.startPushLocalVideo();
             }
         };
@@ -239,6 +245,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
 
     public void startScreenShare() {
         mRoomEngine.closeLocalCamera();
+        ForegroundService.start(mContext);
         mRoomEngine.startScreenSharing();
     }
 
@@ -458,8 +465,9 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     }
 
     private void onUserScreenCaptureStopped() {
+        ForegroundService.stop(mContext);
         if (mRoomStore.roomInfo.enableVideo && mRoomStore.roomInfo.isOpenCamera) {
-            mRoomEngine.openLocalCamera(mIsFrontCamera, null);
+            mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, null);
         }
     }
 

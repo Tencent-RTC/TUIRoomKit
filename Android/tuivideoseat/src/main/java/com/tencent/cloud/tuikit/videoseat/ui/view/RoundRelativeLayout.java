@@ -42,9 +42,9 @@ public class RoundRelativeLayout extends RelativeLayout {
 
     @Override
     public void draw(Canvas canvas) {
-        int saveCount = canvas.save();
         mPath.reset();
         mPath.addRoundRect(mRect, mRadius, mRadius, Path.Direction.CW);
+        int saveCount = canvas.save();
         canvas.clipPath(mPath, Region.Op.INTERSECT);
         super.draw(canvas);
         canvas.restoreToCount(saveCount);

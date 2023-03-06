@@ -5,11 +5,13 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 
+import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.view.component.TopView;
+import com.tencent.liteav.basic.RTCubeUtils;
 import com.tencent.trtc.TRTCCloudDef;
 
 import java.lang.reflect.Method;
@@ -30,6 +32,8 @@ public class TopViewModel {
         mTopView = topView;
         mRoomEngine = RoomEngineManager.sharedInstance(context).getRoomEngine();
         mRoomStore = RoomEngineManager.sharedInstance(context).getRoomStore();
+        boolean isGeneralUser = TUIRoomDefine.Role.GENERAL_USER.equals(mRoomStore.userModel.role);
+        mTopView.showReportView(isGeneralUser && RTCubeUtils.isRTCubeApp(context));
         mTopView.setTitle(mRoomStore.roomInfo.name);
         mTopView.setHeadsetImg(mRoomStore.roomInfo.isUseSpeaker);
         mMainHandler = new Handler(Looper.getMainLooper());
@@ -83,8 +87,8 @@ public class TopViewModel {
     }
 
     public void switchCamera() {
-        boolean isFrontCamera = mRoomEngine.getDeviceManager().isFrontCamera();
-        mRoomEngine.getDeviceManager().switchCamera(!isFrontCamera);
+        mRoomStore.videoModel.isFrontCamera = !mRoomStore.videoModel.isFrontCamera;
+        mRoomEngine.getDeviceManager().switchCamera(mRoomStore.videoModel.isFrontCamera);
     }
 
     public void report() {
