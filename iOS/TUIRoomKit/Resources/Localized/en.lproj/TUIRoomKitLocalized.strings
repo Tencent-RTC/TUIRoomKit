@@ -74,6 +74,7 @@
 "TUIRoom.member" = "Member";
 "TUIRoom.raise.hand.apply" = "Raise your hand to apply";
 "TUIRoom.raise.hand" = "Raise hand";
+"TUIRoom.raise.hand.list" = "Raise hand list";
 "TUIRoom.leave.seat" = "Step down";
 "TUIRoom.hand.down" = "Hands down";
 "TUIRoom.invite.to.speak" = "The host invites you to speak on stage";
@@ -86,6 +87,7 @@
 "TUIRoom.me" = "Me";
 "TUIRoom.invite.members" = "Invite members to stage";
 "TUIRoom.agree.seat" = "Agree to come on stage";
+"TUIRoom.disagree.seat" = "Disagree to come on stage";
 "TUIRoom.code" = "Room QR code";
 "TUIRoom.scan.code" = "Scan the code to enter the room";
 "TUIRoom.save.into.album" = "Save into the album";
@@ -99,6 +101,10 @@
 "TUIRoom.appoint.master.and.leave.room" = "Appoint and leave";
 "TUIRoom.have.become.master" = "You have become the master";
 "TUIRoom.have.transferred.master.to.you" = "Has transferred the master privileges to you";
+"TUIRoom.mute.audio.seat.reason" = "Raise your hand to speak in the room, please raise your hand to apply for a microphone";
+"TUIRoom.mute.video.seat.reason" = "Raise your hand to speak in the room, please raise your hand to apply for a microphone";
+"TUIRoom.mute.audio.room.reason" = "The host has turned on the mute for all members, and the microphone cannot be turned on";
+"TUIRoom.mute.video.room.reason" = "The host has turned on the mute for all members, and the microphone cannot be turned on";
 
 "TUIRoom.capture.volume" = "Collection Volume";
 "TUIRoom.play.volume" = "Playback Volume";

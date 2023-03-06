@@ -25,7 +25,8 @@ class ListCellItemView: UIView {
         view.backgroundColor = .clear
         view.textColor = UIColor(0xD1D9EC)
         view.font = UIFont(name: "PingFangSC-Medium", size: 14)
-        view.adjustsFontSizeToFitWidth = true
+        view.adjustsFontSizeToFitWidth = false
+        view.numberOfLines = 0
         view.minimumScaleFactor = 0.5
         return view
     }()
@@ -108,7 +109,7 @@ class ListCellItemView: UIView {
         
         messageLabel.snp.makeConstraints { make in
             make.left.equalTo(titleLabel.snp.right).offset(10.scale375())
-            make.trailing.equalToSuperview().offset(-60)
+            make.trailing.equalToSuperview().offset(-40)
             make.centerY.equalToSuperview()
         }
         

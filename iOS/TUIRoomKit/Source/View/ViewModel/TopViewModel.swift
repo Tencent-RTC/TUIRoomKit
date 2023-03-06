@@ -23,13 +23,11 @@ class TopViewModel {
     
     func createBottomData() {
         let micItem = ButtonItemData()
-        micItem.normalIcon = "room_speaker"
-        micItem.selectedIcon = "earpiece"
+        micItem.normalIcon = "room_earpiece"
+        micItem.selectedIcon = "room_speakerphone"
         micItem.backgroundColor = UIColor(0xA3AEC7)
         micItem.resourceBundle = tuiRoomKitBundle()
-        if !EngineManager.shared.store.roomInfo.isOpenMicrophone && EngineManager.shared.store.roomInfo.isUseSpeaker {
-            micItem.isSelect = true
-        }
+        micItem.isSelect = !EngineManager.shared.store.roomInfo.isOpenMicrophone && EngineManager.shared.store.roomInfo.isUseSpeaker
         micItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.micItemAction(sender: button)
@@ -59,31 +57,31 @@ class TopViewModel {
     
     func initialStatus() {
         if !EngineManager.shared.store.roomInfo.isOpenMicrophone && EngineManager.shared.store.roomInfo.isUseSpeaker {
-            EngineManager.shared.roomEngine.getTRTCCloud().setAudioRoute(.modeEarpiece)
+            EngineManager.shared.roomEngine.getTRTCCloud().setAudioRoute(.modeSpeakerphone)
         }
     }
     
     func micItemAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
         if sender.isSelected {
-            EngineManager.shared.roomEngine.getTRTCCloud().setAudioRoute(.modeEarpiece)
-        } else {
             EngineManager.shared.roomEngine.getTRTCCloud().setAudioRoute(.modeSpeakerphone)
+        } else {
+            EngineManager.shared.roomEngine.getTRTCCloud().setAudioRoute(.modeEarpiece)
         }
     }
     
     func cameraItemAction(sender: UIButton) {
-        sender.isSelected = !sender.isSelected
+        EngineManager.shared.store.videoSetting.isFrontCamera = !EngineManager.shared.store.videoSetting.isFrontCamera
         let roomEngine = EngineManager.shared.roomEngine
-        roomEngine.getTRTCCloud().getDeviceManager().switchCamera(!sender.isSelected)
+        roomEngine.getTRTCCloud().getDeviceManager().switchCamera(EngineManager.shared.store.videoSetting.isFrontCamera)
     }
     
     func mirrorItemAction(sender: UIButton) {
-        sender.isSelected = !sender.isSelected
+        EngineManager.shared.store.videoSetting.isMirror = !EngineManager.shared.store.videoSetting.isMirror
         let params = TRTCRenderParams()
         params.fillMode = .fill
         params.rotation = ._0
-        if !sender.isSelected {
+        if EngineManager.shared.store.videoSetting.isMirror {
             params.mirrorType = .enable
         } else {
             params.mirrorType = .disable

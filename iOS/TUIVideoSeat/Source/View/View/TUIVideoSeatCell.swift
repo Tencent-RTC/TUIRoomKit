@@ -47,6 +47,7 @@ class TUIVideoSeatCell: UICollectionViewCell {
         super.init(frame: frame)
         UIEventCenter.shared.subscribeUIEvent(key: .UserVideoStateChanged, responder: self)
         UIEventCenter.shared.subscribeUIEvent(key: .UserVoiceVolumeChanged, responder: self)
+        UIEventCenter.shared.subscribeUIEvent(key: .UserNameChanged, responder: self)
     }
     
     required init?(coder: NSCoder) {
@@ -127,16 +128,7 @@ class TUIVideoSeatCell: UICollectionViewCell {
         } else {
             avatarImageView.isHidden = false
         }
-        if viewModel?.currentUser.userId == item.userId {
-            homeownersImageView.isHidden = false
-        } else {
-            homeownersImageView.isHidden = true
-        }
-        if attendeeModel?.userId == viewModel?.currentUser.userId  && viewModel?.attendeeList.count == 1 {
-            userInfoView.isHidden = true
-        } else {
-            userInfoView.isHidden = false
-        }
+        homeownersImageView.isHidden = item.userId != viewModel?.roomInfo.owner
         voiceVolumeImageView.image = getVoiceVolumeImageView(voiceVolume: item.audioVolume)
     }
     
@@ -149,6 +141,7 @@ class TUIVideoSeatCell: UICollectionViewCell {
     deinit {
         UIEventCenter.shared.unsubscribeUIEvent(key: .TUIVideoSeatService, responder: self)
         UIEventCenter.shared.unsubscribeUIEvent(key: .TUIVideoSeatService, responder: self)
+        UIEventCenter.shared.unsubscribeUIEvent(key: .UserNameChanged, responder: self)
         debugPrint("deinit \(self)")
     }
 }
@@ -170,6 +163,12 @@ extension TUIVideoSeatCell: RoomKitUIEventResponder {
             guard userId == attendeeModel.userId else { return }
             attendeeModel.hasVideoStream = hasVideo
             updateUIView(item: attendeeModel)
+        }
+        if key == .UserNameChanged {
+            guard let userId = info?["userId"] as? String else { return }
+            guard let userName = info?["userName"] as? String else { return }
+            guard userId == attendeeModel?.userId else { return }
+            userLabel.text = userName
         }
     }
 }

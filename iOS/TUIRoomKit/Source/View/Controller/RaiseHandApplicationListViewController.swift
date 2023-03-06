@@ -14,8 +14,10 @@ protocol RaiseHandApplicationListViewModelFactory {
 
 class RaiseHandApplicationListViewController: UIViewController {
     let viewModel: RaiseHandApplicationListViewModel
+    let rootView: RaiseHandApplicationListView
     init(raiseHandApplicationListViewModelFactory: RaiseHandApplicationListViewModelFactory) {
         self.viewModel = raiseHandApplicationListViewModelFactory.makeRaiseHandApplicationListViewModel()
+        self.rootView = RaiseHandApplicationListView(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -24,12 +26,13 @@ class RaiseHandApplicationListViewController: UIViewController {
     }
     
     override func loadView() {
-        view = RaiseHandApplicationListView(viewModel: viewModel)
+        view = self.rootView
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+        rootView.setNavigationLeftBarButton()
     }
     
     deinit {

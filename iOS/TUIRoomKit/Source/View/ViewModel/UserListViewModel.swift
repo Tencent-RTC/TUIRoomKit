@@ -7,62 +7,43 @@
 //
 
 import Foundation
+import TUIRoomEngine
 
-enum MuteAllUserType {
-    case muteAllVideo
-    case muteAllAudio
+protocol UserListViewResponder: NSObject {
+    func updateUIWhenRoomOwnerChanged(roomOwner:String)
+    func reloadUserListView()
 }
 
-class UserListViewModel {
+class UserListViewModel: NSObject {
     var userId: String = ""
-    var muteAllUserType: MuteAllUserType = .muteAllAudio
-   
+    var attendeeList: [UserModel] = []
+
+    weak var viewResponder: UserListViewResponder? = nil
+    
+    override init() {
+        super.init()
+        self.attendeeList = EngineManager.shared.store.attendeeList
+        EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
+    }
+    
+    deinit {
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
+        debugPrint("deinit \(self)")
+    }
+    
     //UserListView的点击事件
     func backAction(sender: UIButton) {
         RoomRouter.shared.currentViewController()?.navigationController?.popViewController(animated: true)
     }
     
     func muteAllAudioAction(sender: UIButton, view: UserListView) {
-        if !sender.isSelected {
-            showUserListMuteViewAction(muteAllUserType: .muteAllAudio, view: view)
-        } else {
-            sender.isSelected = false
-            muteAllUserAudio(mute: false)
-        }
-    }
-    
-    func muteAllVideoAction(sender: UIButton, view: UserListView) {
-        if !sender.isSelected {
-            showUserListMuteViewAction(muteAllUserType: .muteAllVideo, view: view)
-        } else {
-            sender.isSelected = false
-            muteAllUserVideo(mute: false)
-        }
-    }
-    
-    func showUserListMuteViewAction(muteAllUserType: MuteAllUserType, view: UserListView) {
-        self.muteAllUserType = muteAllUserType
-        view.userListMuteView.isHidden = false
-        view.userListMuteView.setupViewState(item: self)
-    }
-    
-    func showUserManageViewAction(userId: String, view: UserListView) {
-        self.userId = userId
-        if EngineManager.shared.store.currentUser.userRole == .roomOwner || EngineManager.shared.store.currentUser.userId == userId {
-            view.userListManagerView.isHidden = false
-            view.userListManagerView.viewModel.userId = userId
-            view.userListManagerView.viewModel.updateUserItem()
-        }
-    }
-    
-    func muteAllUserAudio(mute: Bool) {
-        if let view = RoomRouter.shared.currentViewController()?.view as? UserListView, mute {
-            view.muteAllAudioButton.isSelected = true
-        }
+        sender.isSelected = !sender.isSelected
         let roomInfo = EngineManager.shared.store.roomInfo
-        roomInfo.enableAudio = !mute
+        roomInfo.enableAudio = !sender.isSelected
         EngineManager.shared.roomEngine.updateRoomInfo(roomInfo.getEngineRoomInfo()) {
-            if mute {
+            if sender.isSelected {
                 RoomRouter.shared.currentViewController()?.view.makeToast(.allMuteAudioText)
             } else {
                 RoomRouter.shared.currentViewController()?.view.makeToast(.allUnMuteAudioText)
@@ -72,14 +53,12 @@ class UserListViewModel {
         }
     }
     
-    func muteAllUserVideo(mute: Bool) {
-        if let view = RoomRouter.shared.currentViewController()?.view as? UserListView, mute {
-            view.muteAllVideoButton.isSelected = true
-        }
+    func muteAllVideoAction(sender: UIButton, view: UserListView) {
+        sender.isSelected = !sender.isSelected
         let roomInfo = EngineManager.shared.store.roomInfo
-        roomInfo.enableVideo = !mute
+        roomInfo.enableVideo = !sender.isSelected
         EngineManager.shared.roomEngine.updateRoomInfo(roomInfo.getEngineRoomInfo()) {
-            if mute {
+            if sender.isSelected {
                 RoomRouter.shared.currentViewController()?.view.makeToast(.allMuteVideoText)
             } else {
                 RoomRouter.shared.currentViewController()?.view.makeToast(.allUnMuteVideoText)
@@ -89,14 +68,12 @@ class UserListViewModel {
         }
     }
     
-    func muteAction(sender: UIButton) {
-        if muteAllUserType == .muteAllAudio {
-            muteAllUserAudio(mute: true)
-        } else {
-            muteAllUserVideo(mute: true)
-        }
-        if let view = RoomRouter.shared.currentViewController()?.view as? UserListView {
-            view.userListMuteView.isHidden = true
+    func showUserManageViewAction(userId: String, view: UserListView) {
+        self.userId = userId
+        if EngineManager.shared.store.currentUser.userRole == .roomOwner || EngineManager.shared.store.currentUser.userId == userId {
+            view.userListManagerView.isHidden = false
+            view.userListManagerView.viewModel.userId = userId
+            view.userListManagerView.viewModel.updateUserItem()
         }
     }
     
@@ -114,11 +91,30 @@ class UserListViewModel {
             //todo
         }
     }
+
+}
+
+extension UserListViewModel: RoomEngineEventResponder {
     
-    deinit {
-        debugPrint("deinit \(self)")
+    func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
+        if name == .onUserRoleChanged {
+            guard let userRole = param?["userRole"] as? TUIRole, userRole == .roomOwner else { return }
+            guard let userId = param?["userId"] as? String else { return }
+            viewResponder?.updateUIWhenRoomOwnerChanged(roomOwner: userId)
+        }
     }
 }
+
+
+extension UserListViewModel: RoomKitUIEventResponder {
+    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
+        if key == .TUIRoomKitService_RenewUserList {
+            attendeeList = EngineManager.shared.store.attendeeList
+            viewResponder?.reloadUserListView()
+        }
+    }
+}
+
 
 private extension String {
     static let allMuteAudioText = localized("TUIRoom.all.mute")

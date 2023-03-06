@@ -76,6 +76,11 @@ class TransferMasterView: UIView {
         isViewReady = true
     }
     
+    func setNavigationLeftBarButton() {
+        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        RoomRouter.shared.currentViewController()?.navigationItem.hidesSearchBarWhenScrolling = true
+    }
+    
     func constructViewHierarchy() {
         addSubview(transferMasterTableView)
         addSubview(appointMasterButton)
@@ -98,8 +103,6 @@ class TransferMasterView: UIView {
     func bindInteraction() {
         searchController.delegate = self
         searchController.searchResultsUpdater = self
-        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
-        RoomRouter.shared.currentViewController()?.navigationItem.hidesSearchBarWhenScrolling = false
         backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         appointMasterButton.addTarget(self, action: #selector(appointMasterAction(sender:)), for: .touchUpInside)
     }

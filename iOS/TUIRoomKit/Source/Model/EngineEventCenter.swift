@@ -48,7 +48,6 @@ class EngineEventCenter: NSObject {
     
     private override init() {
         super.init()
-        EngineManager.shared.roomEngine.addObserver(self)
     }
     
     enum RoomEngineEvent: String {
@@ -84,7 +83,6 @@ class EngineEventCenter: NSObject {
         case TUIRoomKitService_RenewSeatList
         case TUIRoomKitService_UserOnSeat
         case TUIRoomKitService_UserDownSeat
-        case TUIRoomKitService_ChangeSelfAsRoomOwner
         case TUIRoomKitService_ResignFirstResponder
         
     }

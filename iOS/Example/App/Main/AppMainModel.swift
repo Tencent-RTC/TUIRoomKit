@@ -7,7 +7,6 @@
 
 import TUICore
 import TUIRoomKit
-import TUIRoomKit
 
 class AppMainModel {
     init() {}
@@ -18,10 +17,10 @@ class AppMainModel {
 }
 
 extension AppMainModel: TUIRoomKitListener {
-    func onEnterRoom(code: Int, message: String) {
+    func onExitRoom() {
     }
     
-    func onExitRoom(code: Int, message: String) {
+    func onEnterRoom(code: Int, message: String) {
     }
     
     func onLogin(code: Int, message: String) {

@@ -24,11 +24,12 @@ class RaiseHandApplicationListViewModel {
             guard let requestId = EngineManager.shared.store.inviteSeatMap[userInfo.userId] else { continue }
             EngineManager.shared.roomEngine.responseRemoteRequest(requestId, agree: true) {
                 EngineManager.shared.store.inviteSeatList = EngineManager.shared.store.inviteSeatList.filter { userModel in
-                    userModel.userId == userInfo.userId
+                    userModel.userId != userInfo.userId
                 }
                 EngineManager.shared.store.inviteSeatMap.removeValue(forKey: userInfo.userId)
                 EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
             } onError: { _, _ in
+                debugPrint("")
             }
         }
     }
@@ -37,15 +38,16 @@ class RaiseHandApplicationListViewModel {
         RoomRouter.shared.pushUserListViewController()
     }
     
-    func agreeStageAction(sender: UIButton, userId: String) {
+    func agreeStageAction(sender: UIButton, isAgree: Bool, userId: String) {
         guard let requestId = EngineManager.shared.store.inviteSeatMap[userId] else { return }
-        EngineManager.shared.roomEngine.responseRemoteRequest(requestId, agree: true) {
+        EngineManager.shared.roomEngine.responseRemoteRequest(requestId, agree: isAgree) {
             EngineManager.shared.store.inviteSeatList = EngineManager.shared.store.inviteSeatList.filter { userModel in
-                return userModel.userId == userId
+                return userModel.userId != userId
             }
             EngineManager.shared.store.inviteSeatMap.removeValue(forKey: userId)
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
         } onError: { _, _ in
+            debugPrint("")
         }
     }
     

@@ -101,7 +101,7 @@ class EnterRoomViewModel: NSObject {
             return
         }
         roomInfo.roomId = roomIDStr
-        TUIRoomKit.sharedInstance.enterRoom(roomInfo: roomInfo, type: .meeting)
+        TUIRoomKit.sharedInstance.enterRoom(roomInfo: roomInfo)
     }
     
     deinit {
@@ -116,12 +116,10 @@ extension EnterRoomViewModel: TUIRoomKitListener {
             RoomRouter.shared.currentViewController()?.view.makeToast(message)
         }
     }
-    func onExitRoom(code: Int, message: String) {
-        if code == 0 {
-        } else {
-            RoomRouter.shared.currentViewController()?.view.makeToast(message)
-        }
+
+    func onExitRoom() {
     }
+
     func onLogin(code: Int, message: String) {
     }
 }

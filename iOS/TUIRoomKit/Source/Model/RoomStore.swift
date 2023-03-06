@@ -24,7 +24,7 @@ class RoomStore: NSObject {
     var attendeeList: [UserModel] = []//用户列表
     var attendeeMap: [String: UserModel] = [:]
     var inviteSeatList: [UserModel] = []//申请上麦的用户列表（针对举手发言房间）
-    var inviteSeatMap: [String:Int] = [:]
+    var inviteSeatMap: [String: Int] = [:]
     
     func update(roomInfo: RoomInfo) {
         self.roomInfo = roomInfo
@@ -112,6 +112,7 @@ extension RoomStore: RoomEngineEventResponder {
                         guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { return }
                         userInfo.isOnSeat = false
                         if EngineManager.shared.store.currentUser.userId == userId {
+                            EngineManager.shared.store.currentUser.isOnSeat = false
                             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserDownSeat,
                                                                    param: [:])
                         }
@@ -128,6 +129,7 @@ extension RoomStore: RoomEngineEventResponder {
                         guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { continue }
                         userInfo.isOnSeat = true
                         if EngineManager.shared.store.currentUser.userId == userId {
+                            EngineManager.shared.store.currentUser.isOnSeat = true
                             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeat,
                                                                    param: [:])
                         }
@@ -141,6 +143,7 @@ extension RoomStore: RoomEngineEventResponder {
                         guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { continue }
                         userInfo.isOnSeat = true
                         if EngineManager.shared.store.currentUser.userId == userId {
+                            EngineManager.shared.store.currentUser.isOnSeat = true
                             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeat,
                                                                    param: [:])
                         }
@@ -204,16 +207,6 @@ extension RoomStore: RoomEngineEventResponder {
                                                                param: ["select": true, "enabled": true])
                     }
                 }
-                if self.roomInfo.owner != roomInfo.owner {
-                    self.roomInfo.update(engineRoomInfo: roomInfo)
-                    if roomInfo.owner == currentUser.userId {
-                        self.currentUser.userRole = .roomOwner
-                    } else {
-                        self.currentUser.userRole = .generalUser
-                    }
-                    EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ChangeSelfAsRoomOwner,
-                                                           param: [:])
-                }
                 self.roomInfo.update(engineRoomInfo: roomInfo)
             }
         }
@@ -261,6 +254,7 @@ class VideoModel {
                                                      stepBitrate: 50)
     var bitrateIndex: Int = 0
     var isMirror: Bool = true
+    var isFrontCamera: Bool = true
 }
 
 public class RoomInfo {
@@ -331,9 +325,7 @@ public class RoomInfo {
         }
     }
     
-    public var owner: String {
-        return roomInfo.owner
-    }
+    public var owner: String = ""
     
     private var roomInfo: TUIRoomInfo
     public init() {
@@ -343,8 +335,15 @@ public class RoomInfo {
         roomInfo = TUIRoomInfo()
     }
     
+    convenience init(roomInfo: TUIRoomInfo) {
+        self.init()
+        self.roomInfo = roomInfo
+        self.owner = roomInfo.owner
+    }
+    
     public func update(engineRoomInfo: TUIRoomInfo) {
         roomInfo = engineRoomInfo
+        owner = engineRoomInfo.owner
     }
     
     public func getEngineRoomInfo() -> TUIRoomInfo {

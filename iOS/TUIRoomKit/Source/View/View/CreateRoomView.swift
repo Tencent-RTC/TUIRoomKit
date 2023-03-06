@@ -93,8 +93,11 @@ class CreateRoomView: UIView {
         switchSpeakerModelView.isHidden = true
     }
     
-    func constructViewHierarchy() {
+    func setNavigationLeftBarButton() {
         RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+    }
+    
+    func constructViewHierarchy() {
         backgroundColor = UIColor(0x17181F)
         addSubview(inputStackView)
         addSubview(switchStackView)

@@ -32,7 +32,7 @@ class QRCodeView: UIView {
         label.font = UIFont(name: "PingFangSC-Regular", size: 28)
         label.textAlignment = .center
         label.backgroundColor = .clear
-        label.text = EngineManager.shared.store.roomInfo.owner + .videoConferenceText
+        label.text = EngineManager.shared.store.roomInfo.name
         label.adjustsFontSizeToFitWidth = true
         return label
     }()
@@ -233,5 +233,4 @@ private extension String {
     static let codeText = localized("TUIRoom.code")
     static let scanCodeText = localized("TUIRoom.scan.code")
     static let saveIntoAlbumText = localized("TUIRoom.save.into.album")
-    static let videoConferenceText = localized("TUIRoom.video.conference")
 }

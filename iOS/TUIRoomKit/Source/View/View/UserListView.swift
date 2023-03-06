@@ -9,10 +9,7 @@
 import Foundation
 
 class UserListView: UIView {
-    let viewModel: UserListViewModel
-    var attendeeList: [UserModel]
-    var searchArray: [UserModel] = []
-    
+    let viewModel: UserListViewModel    
     let searchController: UISearchController = {
         let controller = UISearchController(searchResultsController: nil)
         controller.obscuresBackgroundDuringPresentation = false
@@ -87,18 +84,10 @@ class UserListView: UIView {
         return view
     }()
     
-    lazy var userListMuteView: UserListMuteView = {
-        let view = UserListMuteView(viewModel: viewModel)
-        view.isHidden = true
-        return view
-    }()
-    
     init(viewModel: UserListViewModel) {
         self.viewModel = viewModel
-        self.attendeeList = EngineManager.shared.store.attendeeList
         super.init(frame: .zero)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ChangeSelfAsRoomOwner, responder: self)
+        
     }
     
     required init?(coder: NSCoder) {
@@ -113,12 +102,16 @@ class UserListView: UIView {
         bindInteraction()
     }
     
+    func setNavigationLeftBarButton() {
+        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        RoomRouter.shared.currentViewController()?.navigationItem.hidesSearchBarWhenScrolling = true
+    }
+    
     func constructViewHierarchy() {
         addSubview(userListTableView)
         addSubview(muteAllAudioButton)
         addSubview(muteAllVideoButton)
         addSubview(userListManagerView)
-        addSubview(userListMuteView)
     }
     
     func activateConstraints() {
@@ -142,19 +135,12 @@ class UserListView: UIView {
         userListManagerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        userListMuteView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview()
-            make.width.equalTo(278.scale375())
-            make.height.equalTo(128.scale375())
-        }
     }
     
     func bindInteraction() {
+        viewModel.viewResponder = self
         searchController.delegate = self
         searchController.searchResultsUpdater = self
-        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
-        RoomRouter.shared.currentViewController()?.navigationItem.hidesSearchBarWhenScrolling = true
         backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         muteAllVideoButton.addTarget(self, action: #selector(muteAllVideoAction(sender:)), for: .touchUpInside)
         muteAllAudioButton.addTarget(self, action: #selector(muteAllAudioAction(sender:)), for: .touchUpInside)
@@ -174,46 +160,44 @@ class UserListView: UIView {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         searchController.searchBar.endEditing(true)
-        attendeeList = EngineManager.shared.store.attendeeList
+        viewModel.attendeeList = EngineManager.shared.store.attendeeList
         userListTableView.reloadData()
     }
     
     deinit {
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ChangeSelfAsRoomOwner, responder: self)
         debugPrint("deinit \(self)")
     }
 }
 
 extension UserListView: UISearchControllerDelegate, UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        searchArray = EngineManager.shared.store.attendeeList.filter({ model -> Bool in
+        let searchArray = EngineManager.shared.store.attendeeList.filter({ model -> Bool in
             if let searchText = searchController.searchBar.text {
                 return (model.userName == searchText)
             } else {
                 return false
             }
         })
-        attendeeList = searchArray
+        viewModel.attendeeList = searchArray
         userListTableView.reloadData()
     }
     
     func didDismissSearchController(_ searchController: UISearchController) {
-        attendeeList = EngineManager.shared.store.attendeeList
+        viewModel.attendeeList = EngineManager.shared.store.attendeeList
         userListTableView.reloadData()
     }
 }
 
 extension UserListView: UITableViewDataSource {
     internal func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return attendeeList.count
+        return viewModel.attendeeList.count
     }
 }
 
 extension UserListView: UITableViewDelegate {
     internal func tableView(_ tableView: UITableView,
                             cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let attendeeModel = attendeeList[indexPath.row]
+        let attendeeModel = viewModel.attendeeList[indexPath.row]
         let cell = UserListCell(attendeeModel: attendeeModel, viewModel: viewModel)
         cell.selectionStyle = .none
         return cell
@@ -221,7 +205,7 @@ extension UserListView: UITableViewDelegate {
     
     internal func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         searchController.searchBar.endEditing(true)
-        let attendeeModel = attendeeList[indexPath.row]
+        let attendeeModel = viewModel.attendeeList[indexPath.row]
         viewModel.showUserManageViewAction(userId: attendeeModel.userId, view: self)
     }
     internal func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -229,21 +213,18 @@ extension UserListView: UITableViewDelegate {
     }
 }
 
-extension UserListView: RoomKitUIEventResponder {
-    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
-        if key == .TUIRoomKitService_RenewUserList {
-            attendeeList = EngineManager.shared.store.attendeeList
-            userListTableView.reloadData()
-        }
-        if key == .TUIRoomKitService_ChangeSelfAsRoomOwner {
-            let roomInfo = EngineManager.shared.store.roomInfo
-            let userInfo = EngineManager.shared.store.currentUser
-            muteAllAudioButton.isHidden = !(roomInfo.owner == userInfo.userId)
-            muteAllVideoButton.isHidden = !(roomInfo.owner == userInfo.userId)
-            muteAllAudioButton.isSelected = !roomInfo.enableAudio
-            muteAllVideoButton.isSelected = !roomInfo.enableVideo
-        }
+extension UserListView: UserListViewResponder {
+    
+    func updateUIWhenRoomOwnerChanged(roomOwner: String) {
+        let userInfo = EngineManager.shared.store.currentUser
+        muteAllAudioButton.isHidden = roomOwner != userInfo.userId
+        muteAllVideoButton.isHidden = roomOwner != userInfo.userId
     }
+
+    func reloadUserListView() {
+        userListTableView.reloadData()
+    }
+    
 }
 
 class UserListCell: UITableViewCell {
