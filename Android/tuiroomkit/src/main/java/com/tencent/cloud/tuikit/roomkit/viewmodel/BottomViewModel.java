@@ -30,7 +30,6 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     private static final int REQ_TIME_OUT = 30;
 
     private int                  mLocalRequestId;
-    private boolean              mIsFrontCamera;
     private Context              mContext;
     private BottomView           mBottomView;
     private RoomStore            mRoomStore;
@@ -40,7 +39,6 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     public BottomViewModel(Context context, BottomView bottomView) {
         mContext = context;
         mBottomView = bottomView;
-        mIsFrontCamera = true;
         RoomEngineManager engineManager = RoomEngineManager.sharedInstance(context);
         mRoomEngine = engineManager.getRoomEngine();
         mRoomStore = engineManager.getRoomStore();
@@ -330,7 +328,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         } else {
             mRoomEngine.stopPushLocalAudio();
             mRoomEngine.closeLocalMicrophone();
-            updateAudioButton(false);
+            updateAudioItemSelectStatus(false);
         }
     }
 
@@ -338,13 +336,17 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         return TUIRoomDefine.Role.ROOM_OWNER.equals(mRoomStore.userModel.role);
     }
 
-    private void updateAudioButton(boolean isSelected) {
+    private void updateAudioItemSelectStatus(boolean isSelected) {
         if (isSelected) {
-            mBottomView.disableMicrophoneButton(false);
+            updateAudioItemEnableStatus(true);
         } else if (!mRoomStore.roomInfo.enableVideo) {
-            mBottomView.disableMicrophoneButton(true);
+            updateAudioItemEnableStatus(false);
         }
         mBottomView.updateItemSelectStatus(BottomItemData.Type.AUDIO, isSelected);
+    }
+
+    private void updateAudioItemEnableStatus(boolean enable) {
+        mBottomView.updateItemEnableStatus(BottomItemData.Type.AUDIO, enable);
     }
 
     private void openMicrophone() {
@@ -356,14 +358,14 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         PermissionCallback callback = new PermissionCallback() {
             @Override
             public void onGranted() {
-                updateAudioButton(true);
+                updateAudioItemSelectStatus(true);
                 mRoomEngine.openLocalMicrophone(null);
                 mRoomEngine.startPushLocalAudio();
             }
 
             @Override
             public void onDenied() {
-                updateAudioButton(false);
+                updateAudioItemSelectStatus(false);
             }
         };
 
@@ -398,14 +400,14 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         PermissionCallback callback = new PermissionCallback() {
             @Override
             public void onGranted() {
-                updateVideoButton(true);
-                mRoomEngine.openLocalCamera(mIsFrontCamera, null);
+                updateVideoButtonSelectStatus(true);
+                mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, null);
                 mRoomEngine.startPushLocalVideo();
             }
 
             @Override
             public void onDenied() {
-                updateVideoButton(false);
+                updateVideoButtonSelectStatus(false);
             }
         };
 
@@ -419,13 +421,17 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     }
 
 
-    private void updateVideoButton(boolean isSelected) {
+    private void updateVideoButtonSelectStatus(boolean isSelected) {
         if (isSelected) {
-            mBottomView.disableCameraButton(false);
+            updateVideoItemEnableStatus(true);
         } else if (!mRoomStore.roomInfo.enableVideo) {
-            mBottomView.disableCameraButton(true);
+            updateVideoItemEnableStatus(false);
         }
         mBottomView.updateItemSelectStatus(BottomItemData.Type.VIDEO, isSelected);
+    }
+
+    private void updateVideoItemEnableStatus(boolean enable) {
+        mBottomView.updateItemEnableStatus(BottomItemData.Type.VIDEO, enable);
     }
 
     private void raiseHand() {
@@ -480,7 +486,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
                 userId = (String) params.get(RoomEventConstant.KEY_USER_ID);
                 if (mRoomStore.userModel.userId.equals(userId)) {
                     boolean hasVideo = (boolean) params.get(RoomEventConstant.KEY_HAS_VIDEO);
-                    updateVideoButton(hasVideo);
+                    updateVideoButtonSelectStatus(hasVideo);
                 }
                 break;
             case USER_AUDIO_STATE_CHANGED:
@@ -490,7 +496,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
                 userId = (String) params.get(RoomEventConstant.KEY_USER_ID);
                 if (mRoomStore.userModel.userId.equals(userId)) {
                     boolean hasAudio = (boolean) params.get(RoomEventConstant.KEY_HAS_AUDIO);
-                    updateAudioButton(hasAudio);
+                    updateAudioItemSelectStatus(hasAudio);
                 }
                 break;
             case ROOM_INFO_CHANGED:
@@ -524,11 +530,11 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
 
         boolean isVideoEnableChange = (boolean) params.get(RoomEventConstant.KEY_ENABLE_VIDEO);
         if (isVideoEnableChange && !isOwner()) {
-            mBottomView.disableCameraButton(!roomInfo.enableVideo);
+            updateVideoItemEnableStatus(roomInfo.enableVideo && mRoomStore.userModel.isOnSeat);
         }
         boolean isAudioEnableChange = (boolean) params.get(RoomEventConstant.KEY_ENABLE_AUDIO);
         if (isAudioEnableChange && !isOwner()) {
-            mBottomView.disableMicrophoneButton(!roomInfo.enableAudio);
+            updateAudioItemEnableStatus(roomInfo.enableAudio && mRoomStore.userModel.isOnSeat);
         }
     }
 
@@ -557,7 +563,8 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
             for (TUIRoomDefine.SeatInfo info :
                     userSeatedList) {
                 if (info.userId.equals(mRoomStore.userModel.userId)) {
-                    mBottomView.disableCameraButton(false);
+                    updateAudioItemEnableStatus(mRoomStore.roomInfo.enableAudio);
+                    updateVideoItemEnableStatus(mRoomStore.roomInfo.enableVideo);
                     mRoomStore.userModel.isOnSeat = true;
                     replaceItem(indexOf(BottomItemData.Type.RAISE_HAND), createGetOffStageItem());
                     break;
@@ -571,7 +578,8 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
             for (TUIRoomDefine.SeatInfo info :
                     userLeftList) {
                 if (info.userId.equals(mRoomStore.userModel.userId)) {
-                    mBottomView.disableCameraButton(true);
+                    updateAudioItemEnableStatus(mRoomStore.roomInfo.enableAudio);
+                    updateVideoItemEnableStatus(mRoomStore.roomInfo.enableVideo);
                     replaceItem(indexOf(BottomItemData.Type.OFF_STAGE), createRaiseHandItem());
                     mRoomStore.userModel.isOnSeat = false;
                     break;

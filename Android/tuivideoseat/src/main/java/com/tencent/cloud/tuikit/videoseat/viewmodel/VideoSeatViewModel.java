@@ -45,6 +45,7 @@ public class VideoSeatViewModel extends TUIRoomObserver implements IVideoSeatVie
 
         mUserEntityList = new ArrayList<>();
         mUserEntityMap = new HashMap<>();
+        mVideoSeatView.setMemberEntityList(mUserEntityList);
         mRoomEngine.addObserver(this);
         getSeatList();
     }

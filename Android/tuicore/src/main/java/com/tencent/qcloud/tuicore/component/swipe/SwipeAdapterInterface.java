@@ -6,4 +6,6 @@ public interface SwipeAdapterInterface {
 
     void notifyDatasetChanged();
 
+    void notifySwipeItemChanged(int position);
+
 }

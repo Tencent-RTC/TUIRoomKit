@@ -14,16 +14,20 @@ import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.model.utils.CommonUtils;
+import com.tencent.cloud.tuikit.roomkit.view.activity.PrepareActivity;
 import com.tencent.cloud.tuikit.roomkit.view.component.PrepareView;
 import com.tencent.cloud.tuikit.roomkit.view.activity.CreateRoomActivity;
 import com.tencent.cloud.tuikit.roomkit.view.activity.EnterRoomActivity;
+import com.tencent.liteav.basic.IntentUtils;
+import com.tencent.qcloud.tuicore.TUIThemeManager;
 import com.tencent.qcloud.tuicore.permission.PermissionCallback;
 import com.tencent.qcloud.tuicore.permission.PermissionRequester;
 import com.tencent.trtc.TRTCCloudDef;
 
+import java.util.Locale;
+
 
 public class PrepareViewModel {
-    private boolean       mIsFrontCamera;
     private Context       mContext;
     private PrepareView   mPrepareView;
     private RoomStore     mRoomStore;
@@ -31,7 +35,6 @@ public class PrepareViewModel {
     private TUIRoomEngine mRoomEngine;
 
     public PrepareViewModel(Context context, PrepareView prepareView) {
-        mIsFrontCamera = true;
         mContext = context;
         mPrepareView = prepareView;
         initRoomStore();
@@ -46,7 +49,12 @@ public class PrepareViewModel {
     }
 
     public void changeLanguage() {
-        //TODO changeLanguage
+        boolean isEnglish = Locale.ENGLISH.equals(TUIThemeManager.getInstance().getLocale(mContext));
+        String language = isEnglish ? Locale.CHINESE.getLanguage() : Locale.ENGLISH.getLanguage();
+        TUIThemeManager.getInstance().changeLanguage(mContext, language);
+        Intent intent = new Intent(mContext, PrepareActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        IntentUtils.safeStartActivity(mContext, intent);
     }
 
     public void setVideoView(TUIVideoView view) {
@@ -98,8 +106,8 @@ public class PrepareViewModel {
     }
 
     public void switchCamera() {
-        mIsFrontCamera = !mIsFrontCamera;
-        mRoomEngine.getDeviceManager().switchCamera(mIsFrontCamera);
+        mRoomStore.videoModel.isFrontCamera = !mRoomStore.videoModel.isFrontCamera;
+        mRoomEngine.getDeviceManager().switchCamera(mRoomStore.videoModel.isFrontCamera);
     }
 
     public void changeCameraState() {
@@ -145,7 +153,7 @@ public class PrepareViewModel {
             @Override
             public void onGranted() {
                 mPrepareView.updateVideoView(true);
-                mRoomEngine.openLocalCamera(mIsFrontCamera, null);
+                mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, null);
                 mRoomInfo.isOpenCamera = true;
             }
 

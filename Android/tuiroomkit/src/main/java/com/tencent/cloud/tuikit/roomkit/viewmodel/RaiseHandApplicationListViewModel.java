@@ -46,6 +46,7 @@ public class RaiseHandApplicationListViewModel implements RoomEventCenter.RoomEn
         RoomEventCenter eventCenter = RoomEventCenter.getInstance();
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.REQUEST_RECEIVED, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.REQUEST_CANCELLED, this);
+        eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.SEAT_LIST_CHANGED, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.AGREE_TAKE_SEAT, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.DISAGREE_TAKE_SEAT, this);
     }
@@ -58,6 +59,7 @@ public class RaiseHandApplicationListViewModel implements RoomEventCenter.RoomEn
         RoomEventCenter eventCenter = RoomEventCenter.getInstance();
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.REQUEST_RECEIVED, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.REQUEST_CANCELLED, this);
+        eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.SEAT_LIST_CHANGED, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.AGREE_TAKE_SEAT, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.DISAGREE_TAKE_SEAT, this);
     }
@@ -133,8 +135,17 @@ public class RaiseHandApplicationListViewModel implements RoomEventCenter.RoomEn
 
     public void agreeAllUserOnStage() {
         for (UserModel model : mApplyUserList) {
-            responseUserOnStage(model.userId, true);
+            if (TextUtils.isEmpty(model.userId)) {
+                continue;
+            }
+            if (mApplyMap.get(model.userId) == null) {
+                continue;
+            }
+            mRoomEngine.responseRemoteRequest(mApplyMap.get(model.userId).requestId, true, null);
+            mApplyView.removeItem(model);
         }
+        mApplyMap.clear();
+        mApplyUserList.clear();
     }
 
     private void responseUserOnStage(String userId, boolean agree) {
@@ -187,6 +198,9 @@ public class RaiseHandApplicationListViewModel implements RoomEventCenter.RoomEn
             case REQUEST_CANCELLED:
                 onRequestCancelled(params);
                 break;
+            case SEAT_LIST_CHANGED:
+                onSeatListChanged(params);
+                break;
             default:
                 break;
         }
@@ -205,6 +219,21 @@ public class RaiseHandApplicationListViewModel implements RoomEventCenter.RoomEn
         }
         if (TUIRoomDefine.RequestAction.REQUEST_TO_TAKE_SEAT.equals(request.requestAction)) {
             addApplyUser(request);
+        }
+    }
+
+    private void onSeatListChanged(Map<String, Object> params) {
+        if (params == null) {
+            return;
+        }
+        List<TUIRoomDefine.SeatInfo> userSeatedList = (List<TUIRoomDefine.SeatInfo>)
+                params.get(RoomEventConstant.KEY_SEATED_LIST);
+
+        if (userSeatedList != null && !userSeatedList.isEmpty()) {
+            for (TUIRoomDefine.SeatInfo info :
+                    userSeatedList) {
+                removeApplyUser(info.userId);
+            }
         }
     }
 

@@ -23,7 +23,7 @@ public abstract class TUIRoomKit {
 
     public abstract void createRoom(RoomInfo roomInfo, RoomScene scene);
 
-    public abstract void enterRoom(RoomInfo roomInfo, RoomScene scene);
+    public abstract void enterRoom(RoomInfo roomInfo);
 
     public abstract void addListener(TUIRoomKitListener listener);
 }

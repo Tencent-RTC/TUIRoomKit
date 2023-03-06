@@ -56,6 +56,7 @@ public class TUIRoomKitImpl extends TUIRoomKit implements RoomEngineManager.List
     public void enterPrepareView(boolean enablePreview) {
         Intent intent = new Intent(mContext, PrepareActivity.class);
         intent.putExtra(PrepareActivity.INTENT_ENABLE_PREVIEW, enablePreview);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
     }
 
@@ -71,14 +72,14 @@ public class TUIRoomKitImpl extends TUIRoomKit implements RoomEngineManager.List
     }
 
     @Override
-    public void enterRoom(RoomInfo roomInfo, RoomScene scene) {
+    public void enterRoom(RoomInfo roomInfo) {
         if (roomInfo == null || TextUtils.isEmpty(roomInfo.roomId)) {
             for (TUIRoomKitListener listener : mListenerList) {
                 listener.onRoomEnter(-1, "roomInfo or room id is empty");
             }
             return;
         }
-        RoomEngineManager.sharedInstance(mContext).enterRoom(roomInfo, scene);
+        RoomEngineManager.sharedInstance(mContext).enterRoom(roomInfo);
     }
 
     @Override
@@ -109,6 +110,7 @@ public class TUIRoomKitImpl extends TUIRoomKit implements RoomEngineManager.List
         }
         if (mContext != null && code == 0) {
             Intent intent = new Intent(mContext, RoomMainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(intent);
             UserModelManager.getInstance().getUserModel().userType = UserModel.UserType.ROOM;
         }

@@ -22,6 +22,11 @@ public abstract class RecyclerSwipeAdapter<VH extends RecyclerView.ViewHolder> e
     }
 
     @Override
+    public void notifySwipeItemChanged(int position) {
+        super.notifyItemChanged(position);
+    }
+
+    @Override
     public void openItem(int position) {
         mItemManger.openItem(position);
     }

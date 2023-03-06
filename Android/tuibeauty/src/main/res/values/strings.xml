@@ -87,5 +87,4 @@
     <string name="tuibeauty_empty_segmentation">Segmentation</string>
     <string name="tuibeauty_segmentation_blur_45">Blurred background-weak</string>
     <string name="tuibeauty_segmentation_blur_75">Blurred background-severe</string>
-    <string name="tuibeauty_tips_xmagic_auth_failed">Auth failed</string>
 </resources>

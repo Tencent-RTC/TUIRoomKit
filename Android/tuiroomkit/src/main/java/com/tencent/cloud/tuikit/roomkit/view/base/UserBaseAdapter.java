@@ -23,6 +23,9 @@ public abstract class UserBaseAdapter extends RecyclerView.Adapter<UserBaseAdapt
     }
 
     public void setDataList(List<UserModel> list) {
+        if (list == null) {
+            return;
+        }
         this.mModelList = list;
         notifyDataSetChanged();
     }

@@ -24,8 +24,8 @@
             android:layout_height="wrap_content"
             android:layout_above="@id/tv_broadcast_time"
             android:layout_alignParentTop="true"
-            android:layout_toEndOf="@id/tv_title"
             android:layout_marginLeft="5dp"
+            android:layout_toEndOf="@id/tv_title"
             android:src="@drawable/tuiroomkit_ic_arrow_down" />
 
         <TextView
@@ -68,13 +68,13 @@
 
     <ImageView
         android:id="@+id/btn_report"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="@dimen/tuiroomkit_top_item_view_width"
+        android:layout_height="@dimen/tuiroomkit_top_item_view_width"
         android:layout_centerVertical="true"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_toEndOf="@id/img_camera_switch"
-        android:layout_toRightOf="@id/img_camera_switch"
+        android:layout_marginStart="-135dp"
+        android:layout_marginLeft="-135dp"
+        android:layout_marginEnd="20dp"
+        android:layout_toLeftOf="@id/img_headset"
         android:src="@drawable/tuiroomkit_ic_report_room"
         android:visibility="gone" />
 </RelativeLayout>

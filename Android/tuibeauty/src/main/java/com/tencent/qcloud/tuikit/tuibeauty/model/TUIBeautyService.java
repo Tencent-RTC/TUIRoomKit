@@ -8,6 +8,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.tencent.liteav.basic.log.TXCLog;
@@ -67,18 +68,11 @@ public class TUIBeautyService implements ITUIBeautyService {
         TELicenseCheck.getInstance().setTELicense(context, mLicenseUrl, mLicenseKey,
                 new TELicenseCheck.TELicenseCheckListener() {
                     @Override
-                    public void onLicenseCheckFinish(int i, String s) {
-                        if (i == TELicenseCheck.ERROR_OK) {
+                    public void onLicenseCheckFinish(int code, String message) {
+                        if (code == TELicenseCheck.ERROR_OK) {
                             initXmagicApi();
                         } else {
-                            runOnMainThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(mContext,
-                                            mContext.getString(R.string.tuibeauty_tips_xmagic_auth_failed),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            Log.e(TAG, "XMagic beauty license check error,code:" + code + ",msg:" + message);
                         }
                     }
                 });

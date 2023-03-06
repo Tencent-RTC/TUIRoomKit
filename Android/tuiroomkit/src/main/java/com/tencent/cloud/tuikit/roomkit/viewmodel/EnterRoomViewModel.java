@@ -33,7 +33,7 @@ public class EnterRoomViewModel {
         roomInfo.isOpenMicrophone = mRoomStore.roomInfo.isOpenMicrophone;
         roomInfo.isUseSpeaker = mRoomStore.roomInfo.isUseSpeaker;
         TUIRoomKit tuiRoomKit = TUIRoomKit.sharedInstance(mContext);
-        tuiRoomKit.enterRoom(roomInfo, TUIRoomKit.RoomScene.MEETING);
+        tuiRoomKit.enterRoom(roomInfo);
     }
 
     public void finishActivity() {
