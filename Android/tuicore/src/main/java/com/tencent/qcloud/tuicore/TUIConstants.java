@@ -446,6 +446,7 @@ public final class TUIConstants {
         public static final String GROUP_NOTE_CREATOR_ACTIVITY_NAME = "TUIGroupNoteCreatorActivity";
 
         public static final String PLUGIN_GROUP_NOTE_CREATOR = "creator";
+        public static final String PLUGIN_GROUP_NOTE_SHOW_LINE_NUM = "show_line_num";
         public static final String PLUGIN_GROUP_NOTE_FORMAT = "format";
         public static final String PLUGIN_GROUP_NOTE_ENABLE_MULTIPLE_SUBMISSION = "multi_submit";
         public static final String PLUGIN_GROUP_NOTE_DEADLINE = "deadline";

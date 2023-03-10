@@ -13,6 +13,7 @@ import com.tencent.cloud.tuikit.roomkit.TUIRoomKitListener;
 import com.tencent.liteav.basic.UserModel;
 import com.tencent.liteav.basic.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 public class SplashActivity extends Activity {
     private static final String TAG = "SplashActivity";
@@ -54,12 +55,24 @@ public class SplashActivity extends Activity {
                     roomKit.enterPrepareView(true);
                     finish();
                 } else {
+                    ToastUtil.toastShortMessage("tuiroomkit login error:" + code + ",msg:" + message);
+                    UserModelManager.getInstance().clearUserModel();
                     Log.i(TAG, "login error:" + code + ",msg:" + message);
                 }
             }
 
             @Override
+            public void onRoomCreate(int code, String message) {
+
+            }
+
+            @Override
             public void onRoomEnter(int code, String message) {
+
+            }
+
+            @Override
+            public void onDestroyRoom() {
 
             }
 

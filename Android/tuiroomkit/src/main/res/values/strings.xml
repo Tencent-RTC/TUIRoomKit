@@ -121,4 +121,11 @@
     <string name="tuiroomkit_specify_and_leave">specify and leave</string>
     <string name="tuiroomkit_confirm_leave_tip">Are you sure you want to leave the meeting</string>
     <string name="tuiroomkit_room_link_params">%s#/room?roomId=%s</string>
+    <string name="tuiroomkit_toast_agreed_invitation">You have agreed to the stage invitation and can speak</string>
+    <string name="tuiroomkit_toast_agreed_on_stage_by_master">The host has approved your application to be on stage</string>
+    <string name="tuiroomkit_toast_kick_stage_by_master">You have been asked to step down, please raise your hand again if you want to speak</string>
+    <string name="tuiroomkit_toast_off_stage_by_self">You have taken the initiative to step down, please raise your hand again if you want to speak</string>
+    <string name="tuiroomkit_toast_raised_hand">You have raised your hand, please wait for the master to operate</string>
+    <string name="tuiroomkit_toast_hands_down">You put your hands down</string>
+    <string name="tuiroomkit_toast_invite_audience_to_stage">The audience has been invited to the stage</string>
 </resources>

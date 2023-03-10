@@ -25,6 +25,7 @@ import com.tencent.liteav.basic.ImageLoader;
 import com.tencent.liteav.basic.UserModel;
 import com.tencent.liteav.basic.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -140,12 +141,24 @@ public class ProfileActivity extends AppCompatActivity {
                     roomKit.enterPrepareView(true);
                     finish();
                 } else {
+                    ToastUtil.toastShortMessage("tuiroomkit login error:" + code + ",msg:" + message);
+                    UserModelManager.getInstance().clearUserModel();
                     Log.i(TAG, "login error:" + code + ",msg:" + message);
                 }
             }
 
             @Override
+            public void onRoomCreate(int code, String message) {
+
+            }
+
+            @Override
             public void onRoomEnter(int code, String message) {
+
+            }
+
+            @Override
+            public void onDestroyRoom() {
 
             }
 

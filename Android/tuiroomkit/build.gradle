@@ -24,6 +24,7 @@ dependencies {
     api project(':debug')
     api project(':tuivideoseat')
     api project(':tuibeauty')
+    api project(':tuichat')
     api rootProject.getProperties().containsKey("roomEngineSdk") ? rootProject.ext.roomEngineSdk : "com.tencent.liteav.tuikit:tuiroomengine:latest.release"
     api projects.contains("tuicore") ? project(':tuicore') : "com.tencent.liteav.tuikit:tuicore:latest.release"
 }
