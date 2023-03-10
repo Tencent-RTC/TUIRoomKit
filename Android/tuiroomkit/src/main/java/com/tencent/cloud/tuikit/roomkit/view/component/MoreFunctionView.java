@@ -17,6 +17,7 @@ public class MoreFunctionView extends BottomSheetDialog implements View.OnClickL
 
     private Context               mContext;
     private SettingView           mSettingView;
+    private LinearLayout          mLayoutChat;
     private LinearLayout          mLayoutBeauty;
     private LinearLayout          mLayoutSetting;
     private MoreFunctionViewModel mViewModel;
@@ -30,6 +31,7 @@ public class MoreFunctionView extends BottomSheetDialog implements View.OnClickL
     }
 
     private void initView() {
+        mLayoutChat = findViewById(R.id.ll_item_chat);
         mLayoutBeauty = findViewById(R.id.ll_beauty_icon);
         mLayoutSetting = findViewById(R.id.ll_item_setting);
 
@@ -37,11 +39,20 @@ public class MoreFunctionView extends BottomSheetDialog implements View.OnClickL
         setBeautyView(mViewModel.getBeautyView());
 
         mLayoutSetting.setOnClickListener(this);
+        mLayoutChat.setOnClickListener(this);
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        mViewModel.destroy();
+        super.onDetachedFromWindow();
     }
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.ll_item_setting) {
+        if (v.getId() == R.id.ll_item_chat) {
+            mViewModel.showChatView();
+        } else if (v.getId() == R.id.ll_item_setting) {
             if (mSettingView == null) {
                 mSettingView = new SettingView();
             }

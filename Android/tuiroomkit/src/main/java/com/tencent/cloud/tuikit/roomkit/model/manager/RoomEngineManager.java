@@ -14,7 +14,6 @@ import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.TUIRoomKitImpl;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
-import com.tencent.imsdk.v2.V2TIMManager;
 
 public class RoomEngineManager {
     private static final String TAG = "RoomEngineManager";
@@ -73,7 +72,6 @@ public class RoomEngineManager {
                 if (mListener != null) {
                     mListener.onLogin(0, "success");
                 }
-                V2TIMManager.getInstance().initSDK(mContext, sdkAppId, null);
             }
 
             @Override
@@ -121,6 +119,9 @@ public class RoomEngineManager {
             @Override
             public void onSuccess() {
                 Log.i(TAG, "createRoom success");
+                if (mListener != null) {
+                    mListener.onCreateEngineRoom(0, "success", roomInfo);
+                }
                 enterRoom(roomInfo);
             }
 
@@ -128,6 +129,9 @@ public class RoomEngineManager {
             public void onError(TUICommonDefine.Error code, String message) {
                 ToastUtils.showShort("code: " + code + " message:" + message);
                 Log.e(TAG, "createRoom onError code : " + code + " message:" + message);
+                if (mListener != null) {
+                    mListener.onCreateEngineRoom(-1, message, null);
+                }
             }
         });
     }
@@ -233,12 +237,16 @@ public class RoomEngineManager {
         roomEngine.closeLocalMicrophone();
         if (TUIRoomDefine.Role.ROOM_OWNER.equals(mRoomStore.userModel.role)) {
             roomEngine.destroyRoom(null);
+            if (mListener != null) {
+                mListener.onDestroyEngineRoom();
+            }
         } else {
             roomEngine.exitRoom(false, null);
+            if (mListener != null) {
+                mListener.onExitEngineRoom();
+            }
         }
-        if (mListener != null) {
-            mListener.onExitEngineRoom();
-        }
+
         refreshRoomStore();
         refreshRoomEngine();
     }
@@ -260,7 +268,11 @@ public class RoomEngineManager {
     public interface Listener {
         void onLogin(int code, String message);
 
+        void onCreateEngineRoom(int code, String message, RoomInfo roomInfo);
+
         void onEnterEngineRoom(int code, String message, RoomInfo roomInfo);
+
+        void onDestroyEngineRoom();
 
         void onExitEngineRoom();
     }

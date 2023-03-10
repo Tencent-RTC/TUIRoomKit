@@ -287,20 +287,17 @@ public class VideoSeatViewModel extends TUIRoomObserver implements IVideoSeatVie
             return;
         }
         UserEntity newOwner = mUserEntityMap.get(roomInfo.owner);
-        if (newOwner == null) {
-            return;
+        if (newOwner != null) {
+            newOwner.setRole(TUIRoomDefine.Role.ROOM_OWNER);
+            int newOwnerPosition = mUserEntityList.indexOf(newOwner);
+            mVideoSeatView.notifyItemChanged(newOwnerPosition);
         }
         UserEntity oldOwner = mUserEntityMap.get(mOwnerId);
-        if (oldOwner == null) {
-            return;
+        if (oldOwner != null) {
+            oldOwner.setRole(TUIRoomDefine.Role.GENERAL_USER);
+            int oldOwnerPosition = mUserEntityList.indexOf(oldOwner);
+            mVideoSeatView.notifyItemChanged(oldOwnerPosition);
         }
-        newOwner.setRole(TUIRoomDefine.Role.ROOM_OWNER);
-        oldOwner.setRole(TUIRoomDefine.Role.GENERAL_USER);
-
-        int oldOwnerPosition = mUserEntityList.indexOf(oldOwner);
-        int newOwnerPosition = mUserEntityList.indexOf(newOwner);
-        mVideoSeatView.notifyItemChanged(oldOwnerPosition);
-        mVideoSeatView.notifyItemChanged(newOwnerPosition);
         mOwnerId = roomInfo.owner;
     }
 

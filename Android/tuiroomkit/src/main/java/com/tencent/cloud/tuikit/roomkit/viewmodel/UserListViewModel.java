@@ -609,6 +609,7 @@ public class UserListViewModel implements RoomEventCenter.RoomEngineEventRespond
         if (userModel == null) {
             return;
         }
+        ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_toast_invite_audience_to_stage));
         mRoomEngine.requestRemoteUserOnSeat(SEAT_INDEX, userId, INVITE_TIME_OUT, new TUIRoomDefine.RequestCallback() {
             @Override
             public void onAccepted(int i, String s) {

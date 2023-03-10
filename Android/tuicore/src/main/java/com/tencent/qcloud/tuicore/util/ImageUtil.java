@@ -443,7 +443,18 @@ public class ImageUtil {
      * @return path
      */
     public static String generateImagePath(String uuid, int imageType) {
-        return TUIConfig.getImageDownloadDir() + uuid + "_" + imageType;
+        String uuid_pre = "";
+        String uuid_suf = "";
+        if (!TextUtils.isEmpty(uuid)) {
+            int query_dot = uuid.lastIndexOf('.');
+            if (query_dot >= 0) {
+                uuid_pre = uuid.substring(0, query_dot);
+                uuid_suf = uuid.substring(query_dot);
+            } else {
+                uuid_pre = uuid;
+            }
+        }
+        return TUIConfig.getImageDownloadDir() + uuid_pre + "_" + imageType + uuid_suf;
     }
 
 

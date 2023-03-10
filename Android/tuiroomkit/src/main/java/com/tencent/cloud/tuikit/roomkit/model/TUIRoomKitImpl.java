@@ -98,6 +98,22 @@ public class TUIRoomKitImpl extends TUIRoomKit implements RoomEngineManager.List
     }
 
     @Override
+    public void onCreateEngineRoom(int code, String message, RoomInfo roomInfo) {
+        Log.i(TAG, "onCreateEngineRoom: code" + code + " message" + message);
+        if (roomInfo == null) {
+            Log.e(TAG, "onCreateEngineRoom: " + "room info is null");
+            return;
+        }
+        if (TextUtils.isEmpty(roomInfo.roomId)) {
+            Log.e(TAG, "onCreateEngineRoom: " + "room id is null ");
+            return;
+        }
+        for (TUIRoomKitListener listener : mListenerList) {
+            listener.onRoomCreate(code, message);
+        }
+    }
+
+    @Override
     public void onEnterEngineRoom(int code, String message, RoomInfo roomInfo) {
         Log.i(TAG, "onEnterEngineRoom: code" + code + " message" + message);
         if (roomInfo == null) {
@@ -116,6 +132,13 @@ public class TUIRoomKitImpl extends TUIRoomKit implements RoomEngineManager.List
         }
         for (TUIRoomKitListener listener : mListenerList) {
             listener.onRoomEnter(code, message);
+        }
+    }
+
+    @Override
+    public void onDestroyEngineRoom() {
+        for (TUIRoomKitListener listener : mListenerList) {
+            listener.onDestroyRoom();
         }
     }
 

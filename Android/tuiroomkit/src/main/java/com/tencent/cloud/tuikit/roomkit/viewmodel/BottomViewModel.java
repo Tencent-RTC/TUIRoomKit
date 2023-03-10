@@ -435,6 +435,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     }
 
     private void raiseHand() {
+        ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_toast_raised_hand));
         mLocalRequestId = mRoomEngine.takeSeat(SEAT_INDEX, REQ_TIME_OUT, new TUIRoomDefine.RequestCallback() {
             @Override
             public void onAccepted(int i, String s) {
@@ -467,6 +468,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         if (mLocalRequestId == 0) {
             return;
         }
+        ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_toast_hands_down));
         mRoomEngine.cancelRequest(mLocalRequestId, null);
         mLocalRequestId = 0;
     }

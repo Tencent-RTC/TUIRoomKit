@@ -10,9 +10,9 @@
     <string name="tuiroomkit_toast_end_room">创建者已结束房间</string>
     <string name="tuiroomkit_kicked_by_master">你已经被主持人移除</string>
     <string name="tuiroomkit_toast_mute_all_audio">全体静音</string>
-    <string name="tuiroomkit_toast_not_mute_all_audio">解除全体静音</string>
+    <string name="tuiroomkit_toast_not_mute_all_audio">主持人关闭全员静音，观众可自行开启麦克风</string>
     <string name="tuiroomkit_toast_mute_all_video">全体禁画</string>
-    <string name="tuiroomkit_toast_not_mute_all_video">解除全体禁画</string>
+    <string name="tuiroomkit_toast_not_mute_all_video">主持人关闭全员禁画，观众可自行开启摄像头</string>
     <string name="tuiroomkit_kick_user_confirm">你确定要移除%s吗？</string>
     <string name="tuiroomkit_dialog_ok">确定</string>
     <string name="tuiroomkit_dialog_cancel">再等等</string>
@@ -121,4 +121,11 @@
     <string name="tuiroomkit_specify_and_leave">指定并离开</string>
     <string name="tuiroomkit_confirm_leave_tip">您确定要离开会议吗</string>
     <string name="tuiroomkit_room_link_params">%s#/room?roomId=%s</string>
+    <string name="tuiroomkit_toast_agreed_invitation">您已同意上台邀请，可以发言</string>
+    <string name="tuiroomkit_toast_agreed_on_stage_by_master">主持人同意了您的上台申请</string>
+    <string name="tuiroomkit_toast_kick_stage_by_master">您已被请下台，如需发言请再次举手</string>
+    <string name="tuiroomkit_toast_off_stage_by_self">您已主动下台，如需发言请再次举手申请</string>
+    <string name="tuiroomkit_toast_raised_hand">您已举手，请等待主持人操作</string>
+    <string name="tuiroomkit_toast_hands_down">您已将手放下</string>
+    <string name="tuiroomkit_toast_invite_audience_to_stage">已向观众发出上台邀请</string>
 </resources>
