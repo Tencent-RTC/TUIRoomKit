@@ -105,6 +105,11 @@
 "TUIRoom.mute.video.seat.reason" = "举手发言房间，请先举手申请上麦";
 "TUIRoom.mute.audio.room.reason" = "主持人开启了全员静音，无法开启麦克风";
 "TUIRoom.mute.video.room.reason" = "主持人开启了全员静音，无法开启摄像头";
+"TUIRoom.all.mute.video.prompt" = "已开启全员禁画，观众将无法打开摄像头";
+"TUIRoom.all.mute.audio.prompt" = "已开启全员静音，观众将无法打开麦克风";
+"TUIRoom.all.unmute.video.prompt" = "主持人关闭全员禁画，观众可自行开启视频";
+"TUIRoom.all.unmute.audio.prompt" = "主持人关闭全员静音，观众可自行开启麦克风";
+
 "TUIRoom.prompt" = "提示";
 "TUIRoom.recording.save.path" = "录音保存路径：";
 "TUIRoom.end.recording" = "结束录制";
@@ -124,3 +129,4 @@
 "TUIRoom.resolution.selected" = "分辨率选择完毕";
 "TUIRoom.frame.rate.selected" = "帧率选择完毕";
 "TUIRoom.version.too.low" = "系统版本低于12.0，请升级系统";
+"TUIRoom.input.error.room.num.toast" = "请输入正确房间号";

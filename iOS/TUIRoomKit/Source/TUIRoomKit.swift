@@ -14,17 +14,19 @@ public enum RoomScene {
     case live
 }
 
-public protocol TUIRoomKitListener {
-    func onEnterRoom(code: Int, message: String) -> Void
-    func onExitRoom() -> Void
-    func onLogin(code: Int, message: String) -> Void
+@objc public protocol TUIRoomKitListener {
+    @objc optional func onExitRoom() -> Void
+    @objc optional func onDestroyRoom() -> Void
+    @objc optional func onLogin(code: Int, message: String) -> Void
+    @objc optional func onRoomCreate(code: Int, message: String) -> Void
+    @objc optional func onRoomEnter(code: Int, message: String) -> Void
 }
 
-public class TUIRoomKit: NSObject {
+public class TUIRoomKit {
     var listener: TUIRoomKitListener?
     public static let sharedInstance = TUIRoomKit()
     
-    private override init() {}
+    private init() {}
     
     public func login(sdkAppId: Int, userId: String, userSig: String) {
         EngineManager.shared.login(sdkAppId: sdkAppId, userId: userId, userSig: userSig)
@@ -64,15 +66,23 @@ public class TUIRoomKit: NSObject {
 }
 
 extension TUIRoomKit: EngineManagerListener {
-    public func onLogin(code: Int, message: String) {
-        self.listener?.onLogin(code: code, message: message)
+    public func onExitEngineRoom() {
+        self.listener?.onExitRoom?()
+    }
+    
+    public func onDestroyEngineRoom() {
+        self.listener?.onDestroyRoom?()
+    }
+    
+    public func onCreateEngineRoom(code: Int, message: String) {
+        self.listener?.onRoomCreate?(code: code, message: message)
     }
     
     public func onEnterEngineRoom(code: Int, message: String) {
-        self.listener?.onEnterRoom(code: code, message: message)
+        self.listener?.onRoomEnter?(code: code, message: message)
     }
     
-    public func onExitEngineRoom() {
-        self.listener?.onExitRoom()
+    public func onLogin(code: Int, message: String) {
+        self.listener?.onLogin?(code: code, message: message)
     }
 }

@@ -36,24 +36,25 @@ class EngineManager: NSObject {
     func login(sdkAppId: Int, userId: String, userSig: String) {
         TUIRoomEngine.login(sdkAppId: sdkAppId, userId: userId, userSig: userSig) { [weak self] in
             guard let self = self else { return }
-            self.listener?.onLogin(code: 0, message: "success")
+            self.listener?.onLogin?(code: 0, message: "success")
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.listener?.onLogin(code: code.rawValue, message: message)
+            self.listener?.onLogin?(code: code.rawValue, message: message)
         }
     }
     
     func setSelfInfo(userName: String, avatarURL: String) {
-        EngineManager.shared.store.currentUser.userName = userName
-        EngineManager.shared.store.currentUser.avatarUrl = avatarURL
+        store.currentLoginUser.userName = userName
+        store.currentLoginUser.avatarUrl = avatarURL
         TUIRoomEngine.setSelfInfo(userName: userName, avatarUrl: avatarURL) {
-            EngineManager.shared.store.initialCurrentUser()
+            EngineManager.shared.store.initialLoginCurrentUser()
         } onError: { code, message in
             debugPrint("---setSelfInfo,code:\(code),message:\(message)")
         }
     }
     
     func logout() {
+        store = RoomStore()
         TUIRoomEngine.logout {
         } onError: { code, message in
             debugPrint("---logout,code:\(code),message:\(message)")
@@ -62,10 +63,6 @@ class EngineManager: NSObject {
     
     func createRoom() {
         let roomInfo = store.roomInfo
-        store.initialCurrentUser()
-        let currentUserInfo = store.currentUser
-        currentUserInfo.isAllowAudioTurnedOn = roomInfo.isOpenMicrophone
-        currentUserInfo.isAllowVideoTurnedOn = roomInfo.isOpenCamera
         if store.roomScene == .meeting {
             roomInfo.roomType = .group
         } else {
@@ -73,33 +70,34 @@ class EngineManager: NSObject {
         }
         roomEngine.createRoom(roomInfo.getEngineRoomInfo()) { [weak self] in
             guard let self = self else { return }
+            self.listener?.onCreateEngineRoom?(code: 0, message: "success")
             self.enterEngineRoom(roomId: roomInfo.roomId) { [weak self] in
                 guard let self = self else { return }
-                currentUserInfo.userRole = .roomOwner
+                self.store.currentUser.userRole = .roomOwner
                 self.showRoomViewController(roomId: roomInfo.roomId)
-                self.listener?.onEnterEngineRoom(code: 0, message: "success")
+                self.listener?.onEnterEngineRoom?(code: 0, message: "success")
             } onError: { [weak self] code, message in
                 guard let self = self else { return }
-                self.listener?.onEnterEngineRoom(code: code.rawValue, message: message)
+                self.listener?.onEnterEngineRoom?(code: code.rawValue, message: message)
+                RoomRouter.makeToast(toast: message)
             }
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.listener?.onEnterEngineRoom(code: code.rawValue, message: message)
+            self.listener?.onCreateEngineRoom?(code: code.rawValue, message: message)
+            RoomRouter.makeToast(toast: message)
         }
     }
     
     func enterRoom(roomId: String) {
-        store.initialCurrentUser()
-        store.currentUser.isAllowAudioTurnedOn = store.roomInfo.isOpenMicrophone
-        store.currentUser.isAllowVideoTurnedOn = store.roomInfo.isOpenCamera
         enterEngineRoom(roomId: roomId) { [weak self] in
             guard let self = self else { return }
             self.store.currentUser.userRole = .generalUser
             self.showRoomViewController(roomId: roomId)
-            self.listener?.onEnterEngineRoom(code: 0, message: "success")
+            self.listener?.onEnterEngineRoom?(code: 0, message: "success")
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.listener?.onEnterEngineRoom(code: code.rawValue, message: message)
+            self.listener?.onEnterEngineRoom?(code: code.rawValue, message: message)
+            RoomRouter.makeToast(toast: message)
         }
     }
     
@@ -108,20 +106,16 @@ class EngineManager: NSObject {
             guard let self = self else { return }
             guard let roomInfo = roomInfo else {return }
             self.store.roomInfo.update(engineRoomInfo: roomInfo)
-            self.store.getUserList()
+            self.store.initialRoomCurrentUser()
             let exitRoomBlock = { [weak self] in
                 guard let self = self else { return }
                 let currentUserInfo = self.store.currentUser
                 if currentUserInfo.userRole == .roomOwner {
-                    self.destroyRoom(onComplete: nil)
+                    self.destroyRoom()
                 } else {
-                    self.exitRoom() {
-                    } onError: { code, message in
-                        debugPrint("上麦失败后退出房间失败，code:\(code),message:\(message)")
-                    }
+                    self.exitRoom()
                 }
             }
-            
             //举手发言模式中用户根据自己是否需要上麦进行申请
             if self.store.roomInfo.enableSeatControl && self.store.currentUser.userId != self.store.roomInfo.owner {
                 onSuccess()
@@ -149,35 +143,35 @@ class EngineManager: NSObject {
         }
     }
     
-    func exitRoom(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
+    func exitRoom() {
         roomEngine.exitRoom(syncWaiting: false) { [weak self] in
             guard let self = self else { return }
-            onSuccess()
             self.refreshRoomEngine()
-            self.listener?.onExitEngineRoom()
+            self.listener?.onExitEngineRoom?()
+            RoomRouter.shared.popRoomController()
             self.store.refreshStore()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            onError(code, message)
             self.refreshRoomEngine()
-            self.listener?.onExitEngineRoom()
+            self.listener?.onExitEngineRoom?()
+            RoomRouter.shared.popRoomController()
             self.store.refreshStore()
         }
     }
     
-    func destroyRoom(onComplete: (() -> Void)?) {
+    func destroyRoom() {
         roomEngine.destroyRoom { [weak self] in
             guard let self = self else { return }
             self.refreshRoomEngine()
-            self.listener?.onExitEngineRoom()
+            self.listener?.onDestroyEngineRoom?()
+            RoomRouter.shared.popRoomController()
             self.store.refreshStore()
-            onComplete?()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.refreshRoomEngine()
-            self.listener?.onExitEngineRoom()
+            self.listener?.onDestroyEngineRoom?()
+            RoomRouter.shared.popRoomController()
             self.store.refreshStore()
-            onComplete?()
         }
     }
     
@@ -195,15 +189,16 @@ class EngineManager: NSObject {
 extension EngineManager {
     
     private func showRoomViewController(roomId: String) {
-        let vc = RoomRouter.shared.makeMainViewController(roomId: roomId)
-        RoomRouter.shared.presentRoomController(vc: vc)
+        RoomRouter.shared.pushMainViewController(roomId: roomId)
     }
 }
 
-public protocol EngineManagerListener: NSObject {
-    func onEnterEngineRoom(code: Int, message: String) -> Void
-    func onExitEngineRoom() -> Void
-    func onLogin(code: Int, message: String) -> Void
+@objc public protocol EngineManagerListener {
+    @objc optional func onExitEngineRoom() -> Void
+    @objc optional func onDestroyEngineRoom() -> Void
+    @objc optional func onLogin(code: Int, message: String) -> Void
+    @objc optional func onCreateEngineRoom(code: Int, message: String) -> Void
+    @objc optional func onEnterEngineRoom(code: Int, message: String) -> Void
 }
 
 // MARK: - TUIExtensionProtocol

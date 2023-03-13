@@ -21,6 +21,11 @@ class RoomRouter {
         currentViewController()?.present(rootVC, animated: true)
     }
     
+    func pushMainViewController(roomId: String) {
+        let vc = makeMainViewController(roomId: roomId)
+        presentRoomController(vc: vc)
+    }
+    
     func pushCreateRoomViewController() {
         let vc = makeCreateRoomViewController()
         presentRoomController(vc: vc)
@@ -159,6 +164,10 @@ class RoomRouter {
         }
         let viewController = findCurrentController(from: rootController)
         return viewController
+    }
+    
+    class func makeToast(toast: String) {
+        shared.currentViewController()?.view.makeToast(toast)
     }
     
     deinit {

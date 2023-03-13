@@ -45,6 +45,15 @@ class EngineEventCenter: NSObject {
     static let shared = EngineEventCenter()
     private var engineObserverMap: [RoomEngineEvent: WeakArray<RoomEngineEventResponder>] = [:]
     private var uiEventObserverMap: [RoomUIEvent: [TUINotificationAdapter]] = [:]
+    lazy var engineManager: EngineManager = {
+        return EngineManager.shared
+    }()
+    lazy var roomInfo: RoomInfo = {
+        return engineManager.store.roomInfo
+    }()
+    lazy var currentUser: UserModel = {
+        return engineManager.store.currentUser
+    }()
     
     private override init() {
         super.init()
@@ -76,8 +85,6 @@ class EngineEventCenter: NSObject {
     
     enum RoomUIEvent: String {
         case TUIRoomKitService
-        case TUIRoomKitService_MuteLocalVideo
-        case TUIRoomKitService_MuteLocalAudio
         case TUIRoomKitService_RenewUserList
         case TUIRoomKitService_SomeoneSharing
         case TUIRoomKitService_RenewSeatList
@@ -154,6 +161,37 @@ class EngineEventCenter: NSObject {
         }
     }
     
+    private func checkRoomChangeInfo(roomInfo: TUIRoomInfo) {
+        guard roomInfo.roomId == roomInfo.roomId else {
+            return
+        }
+        if self.roomInfo.enableVideo != roomInfo.enableVideo {
+            if roomInfo.owner == currentUser.userId {
+                return
+            }
+            if !roomInfo.enableVideo {
+                engineManager.roomEngine.closeLocalCamera()
+                engineManager.roomEngine.stopPushLocalVideo()
+                RoomRouter.makeToast(toast: .allMuteVideoText)
+            } else {
+                RoomRouter.makeToast(toast: .allUnMuteVideoText)
+            }
+        }
+        if self.roomInfo.enableAudio != roomInfo.enableAudio {
+            if roomInfo.owner == currentUser.userId {
+                return
+            }
+            if !roomInfo.enableAudio {
+                engineManager.roomEngine.closeLocalMicrophone()
+                engineManager.roomEngine.stopPushLocalAudio()
+                RoomRouter.makeToast(toast: .allMuteAudioText)
+            } else {
+                RoomRouter.makeToast(toast: .allUnMuteAudioText)
+            }
+        }
+        self.roomInfo.update(engineRoomInfo: roomInfo)
+    }
+    
     deinit {
         EngineManager.shared.roomEngine.removeObserver(self)
         debugPrint("deinit \(self)")
@@ -199,9 +237,16 @@ extension EngineEventCenter: TUIRoomObserver {
             "roomId" : roomId,
             "roomInfo" : roomInfo,
         ] as [String : Any]
-        observers.forEach { responder in
+        observers.forEach { [weak self] responder in
+            guard let self = self else  { return }
+            // FIXME: 修复转让房主原房主收不到回调问题
+            let oldRoomOwner = self.engineManager.store.roomInfo.owner
+            if oldRoomOwner != roomInfo.owner {
+                self.onUserRoleChanged(userId: oldRoomOwner, userRole: .generalUser)
+            }
             responder()?.onEngineEvent(name: .onRoomInfoChanged, param: param)
         }
+        checkRoomChangeInfo(roomInfo: roomInfo)
     }
     
     func onRoomDismissed(roomId: String) {
@@ -357,7 +402,7 @@ extension EngineEventCenter: TUIRoomObserver {
         }
     }
     
-    func onRequestCancelled(requestId: UInt, userId: String) {
+    func onRequestCancelled(requestId: String, userId: String) {
         guard let observers = engineObserverMap[.onRequestCancelled] else { return }
         let param = [
             "requestId": requestId,
@@ -390,4 +435,11 @@ extension EngineEventCenter: TUIRoomObserver {
             responder()?.onEngineEvent(name: .onReceiveCustomMessage, param: param)
         }
     }
+}
+
+private extension String {
+    static let allMuteAudioText = localized("TUIRoom.all.mute.audio.prompt")
+    static let allMuteVideoText = localized("TUIRoom.all.mute.video.prompt")
+    static let allUnMuteAudioText = localized("TUIRoom.all.unmute.audio.prompt")
+    static let allUnMuteVideoText = localized("TUIRoom.all.unmute.video.prompt")
 }

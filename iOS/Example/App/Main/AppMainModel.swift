@@ -17,12 +17,6 @@ class AppMainModel {
 }
 
 extension AppMainModel: TUIRoomKitListener {
-    func onExitRoom() {
-    }
-    
-    func onEnterRoom(code: Int, message: String) {
-    }
-    
     func onLogin(code: Int, message: String) {
         if code == 0 {
             TUIRoomKit.sharedInstance.setSelfInfo(userName: TUILogin.getNickName(), avatarURL: TUILogin.getUserID())

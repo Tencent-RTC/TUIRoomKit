@@ -7,24 +7,6 @@
 
 import Foundation
 
-let max_show_cell_count = 6
-enum TUIVideoSeatCellType: NSInteger {
-    case one = 1
-    case two
-    case three
-    case four
-    case five
-    case six
-    case more
-}
-
-enum TUIRoomAttendeeRenderViewType: Int8 {
-    case bigShare = 0
-    case big = 1
-    case small
-    case suspension
-}
-
 let kScreenWidth = UIScreen.main.bounds.width
 let kScreenHeight = UIScreen.main.bounds.height
 

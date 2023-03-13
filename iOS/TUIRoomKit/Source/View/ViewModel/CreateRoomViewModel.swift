@@ -12,9 +12,17 @@ class CreateRoomViewModel: NSObject {
     private(set) var inputViewItems: [ListCellItemData] = []
     private(set) var switchViewItems: [ListCellItemData] = []
     private var enableSeatControl: Bool = false
-    
-    let roomId: String = {
-        let userId = EngineManager.shared.store.currentUser.userId
+    lazy var engineManager: EngineManager = {
+        return EngineManager.shared
+    }()
+    lazy var currentUser: UserModel = {
+        return engineManager.store.currentLoginUser
+    }()
+    lazy var roomInfo: RoomInfo = {
+        return engineManager.store.roomInfo
+    }()
+    lazy var roomId: String = {
+        let userId = currentUser.userId
         let result = "\(String(describing: userId))_room_kit".hash & 0x3B9AC9FF
         return String(result)
     }()
@@ -26,7 +34,7 @@ class CreateRoomViewModel: NSObject {
     }
     
     func initialState() {
-        EngineManager.shared.store.roomInfo.roomId = roomId
+        roomInfo.roomId = roomId
     }
     
     func creatEntranceViewModel() {
@@ -43,48 +51,48 @@ class CreateRoomViewModel: NSObject {
         
         let createRoomIdItem = ListCellItemData()
         createRoomIdItem.titleText = .roomNumText
-        createRoomIdItem.messageText = EngineManager.shared.store.roomInfo.roomId
+        createRoomIdItem.messageText = roomInfo.roomId
         inputViewItems.append(createRoomIdItem)
         
         let userNameItem = ListCellItemData()
         userNameItem.titleText = .userNameText
-        userNameItem.messageText = EngineManager.shared.store.currentUser.userName
+        userNameItem.messageText = currentUser.userName
         inputViewItems.append(userNameItem)
         
         let openMicItem = ListCellItemData()
         openMicItem.titleText = .openMicText
         openMicItem.hasSwitch = true
-        openMicItem.isSwitchOn = EngineManager.shared.store.roomInfo.isOpenMicrophone
-        openMicItem.action = { sender in
-            guard let view = sender as? UISwitch else { return }
-            EngineManager.shared.store.roomInfo.isOpenMicrophone = view.isOn
+        openMicItem.isSwitchOn = roomInfo.isOpenMicrophone
+        openMicItem.action = { [weak self] sender in
+            guard let self = self, let view = sender as? UISwitch else { return }
+            self.roomInfo.isOpenMicrophone = view.isOn
         }
         switchViewItems.append(openMicItem)
         
         let openSpeakerItem = ListCellItemData()
         openSpeakerItem.titleText = .openSpeakerText
         openSpeakerItem.hasSwitch = true
-        openSpeakerItem.isSwitchOn = EngineManager.shared.store.roomInfo.isUseSpeaker
-        openSpeakerItem.action = { sender in
-            guard let view = sender as? UISwitch else { return }
-            EngineManager.shared.store.roomInfo.isUseSpeaker = view.isOn
+        openSpeakerItem.isSwitchOn = roomInfo.isUseSpeaker
+        openSpeakerItem.action = { [weak self] sender in
+            guard let self = self, let view = sender as? UISwitch else { return }
+            self.roomInfo.isUseSpeaker = view.isOn
         }
         switchViewItems.append(openSpeakerItem)
         
         let openCameraItem = ListCellItemData()
         openCameraItem.titleText = .openCameraText
         openCameraItem.hasSwitch = true
-        openCameraItem.isSwitchOn = EngineManager.shared.store.roomInfo.isOpenCamera
-        openCameraItem.action = { sender in
-            guard let view = sender as? UISwitch else { return }
-            EngineManager.shared.store.roomInfo.isOpenCamera = view.isOn
+        openCameraItem.isSwitchOn = roomInfo.isOpenCamera
+        openCameraItem.action = { [weak self] sender in
+            guard let self = self, let view = sender as? UISwitch else { return }
+            self.roomInfo.isOpenCamera = view.isOn
         }
         switchViewItems.append(openCameraItem)
     }
     
     func reductRoomType() {
         guard let itemData = inputViewItems.first(where: { $0.titleText == .roomTypeText }) else { return }
-        if EngineManager.shared.store.roomInfo.enableSeatControl {
+        if roomInfo.enableSeatControl {
             itemData.messageText = .raiseHandSpeakText
         } else {
             itemData.messageText = .freedomSpeakText
@@ -98,8 +106,6 @@ class CreateRoomViewModel: NSObject {
     }
     
     func enterButtonClick(sender: UIButton, view: CreateRoomView) {
-        let roomInfo = EngineManager.shared.store.roomInfo
-        TUIRoomKit.sharedInstance.addListener(listener: self)
         view.enterButton.isEnabled = false
         view.loading.startAnimating()
         DispatchQueue.main.asyncAfter(deadline: .now()+3, execute: {
@@ -107,9 +113,7 @@ class CreateRoomViewModel: NSObject {
             view.loading.stopAnimating()
         })
         roomInfo.roomId = roomId
-        roomInfo.name = roomInfo.roomId
-        roomInfo.enableSeatControl = EngineManager.shared.store.roomInfo.enableSeatControl
-        roomInfo.name = EngineManager.shared.store.currentUser.userName + .videoConferenceText
+        roomInfo.name = currentUser.userName + .videoConferenceText
         TUIRoomKit.sharedInstance.createRoom(roomInfo: roomInfo, type: .meeting)
     }
     
@@ -120,7 +124,7 @@ class CreateRoomViewModel: NSObject {
     
     func cancelAction(sender: UIButton, view: RoomTypeView) {
         sender.isSelected = !sender.isSelected
-        enableSeatControl = EngineManager.shared.store.roomInfo.enableSeatControl
+        enableSeatControl = roomInfo.enableSeatControl
         view.raiseHandButton.isSelected = false
         view.freedomButton.isSelected = false
         view.isHidden = true
@@ -128,7 +132,7 @@ class CreateRoomViewModel: NSObject {
     
     func sureAction(sender: UIButton, view: RoomTypeView) {
         sender.isSelected = !sender.isSelected
-        EngineManager.shared.store.roomInfo.enableSeatControl = enableSeatControl
+        roomInfo.enableSeatControl = enableSeatControl
         view.isHidden = true
         guard let itemData = inputViewItems.first(where: { $0.titleText == .roomTypeText }) else { return }
         if enableSeatControl {
@@ -154,21 +158,6 @@ class CreateRoomViewModel: NSObject {
     
     deinit {
         debugPrint("deinit \(self)")
-    }
-}
-
-extension CreateRoomViewModel: TUIRoomKitListener {
-    func onEnterRoom(code: Int, message: String) {
-        if code == 0 {
-        } else {
-            RoomRouter.shared.currentViewController()?.view.makeToast(message)
-        }
-    }
-    
-    func onExitRoom() {
-    }
-    
-    func onLogin(code: Int, message: String) {
     }
 }
 

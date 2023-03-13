@@ -105,6 +105,10 @@
 "TUIRoom.mute.video.seat.reason" = "Raise your hand to speak in the room, please raise your hand to apply for a microphone";
 "TUIRoom.mute.audio.room.reason" = "The host has turned on the mute for all members, and the microphone cannot be turned on";
 "TUIRoom.mute.video.room.reason" = "The host has turned on the mute for all members, and the microphone cannot be turned on";
+"TUIRoom.all.mute.video.prompt" = "All mute video is turn on, and the audience will not be able to turn on the camera";
+"TUIRoom.all.mute.audio.prompt" = "All mute audio is turned on, and the audience will not be able to turn on the microphone";
+"TUIRoom.all.unmute.video.prompt" = "The host turns off the mute video of all members, and the audience can open the video by themselves";
+"TUIRoom.all.unmute.audio.prompt" = "The host turns off the mute audio of all members, and the audience can turn on the microphone by themselves";
 
 "TUIRoom.capture.volume" = "Collection Volume";
 "TUIRoom.play.volume" = "Playback Volume";
@@ -125,3 +129,4 @@
 "TUIRoom.resolution.selected" = "Resolution selected";
 "TUIRoom.frame.rate.selected" = "Frame rate selected";
 "TUIRoom.version.too.low" = "Your system version is below 12.0. Please update.";
+"TUIRoom.input.error.room.num.toast" = "Enter a valid room ID.";
