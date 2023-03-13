@@ -1,12 +1,9 @@
 //
-//  TUIVideoSeatStyle.swift
+//  UIColor+Extension.swift
 //  TUIVideoSeat
 //
-//  Created by 唐佳宁 on 2023/2/15.
-//  Copyright © 2023 Tencent. All rights reserved.
+//  Created by jack on 2023/3/6.
 //
-
-import Foundation
 
 extension UIColor {
     public convenience init(_ hex: Int, alpha: CGFloat = 1.0) {
@@ -36,28 +33,5 @@ extension UIColor {
         let theImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return theImage ?? UIImage()
-    }
-}
-
-extension UIView {
-    /// 切部分圆角
-    ///
-    /// - Parameters:
-    ///   - rect: 传入View的Rect
-    ///   - byRoundingCorners: 裁剪位置
-    ///   - cornerRadii: 裁剪半径
-    func roundedRect(rect:CGRect, byRoundingCorners: UIRectCorner, cornerRadii: CGSize) {
-        let maskPath = UIBezierPath(roundedRect: rect, byRoundingCorners: byRoundingCorners, cornerRadii: cornerRadii)
-        let maskLayer = CAShapeLayer()
-        maskLayer.frame = bounds
-        maskLayer.path = maskPath.cgPath
-        self.layer.mask = maskLayer
-    }
-    
-    /// 切圆角
-    ///
-    /// - Parameter rect: 传入view的Rect
-    func roundedCircle(rect: CGRect) {
-        roundedRect(rect: rect, byRoundingCorners: .allCorners, cornerRadii: CGSize(width: bounds.size.width / 2, height: bounds.size.height / 2))
     }
 }

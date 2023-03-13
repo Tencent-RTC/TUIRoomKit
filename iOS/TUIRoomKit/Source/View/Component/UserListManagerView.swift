@@ -136,13 +136,13 @@ class UserListManagerView: UIView {
     
     func setupViewState(item: UserListManagerViewModel) {
         let placeholder = UIImage(named: "room_default_user", in: tuiRoomKitBundle(), compatibleWith: nil)
-        guard let attendeeModel = EngineManager.shared.store.attendeeList.first(where: { $0.userId == viewModel.userId }) else { return }
+        guard let attendeeModel = viewModel.attendeeList.first(where: { $0.userId == viewModel.userId }) else { return }
         if let url = URL(string: attendeeModel.avatarUrl) {
             avatarImageView.sd_setImage(with: url, placeholderImage: placeholder)
         } else {
             avatarImageView.image = placeholder
         }
-        if attendeeModel.userRole == .roomOwner {
+        if attendeeModel.userId == viewModel.currentUser.userId {
             userLabel.text = attendeeModel.userName + "(" + .meText + ")"
         } else {
             userLabel.text = attendeeModel.userName
@@ -155,11 +155,11 @@ class UserListManagerView: UIView {
             stackView.removeArrangedSubview(view)
         }
         viewArray = []
-        guard let userInfo = EngineManager.shared.store.attendeeList.first(where: { $0.userId == item.userId }) else { return }
+        guard let userInfo = viewModel.attendeeList.first(where: { $0.userId == item.userId }) else { return }
         var viewItems: [ButtonItemData] = []
         //举手发言房间
-        if EngineManager.shared.store.roomInfo.enableSeatControl {
-            if item.userId == EngineManager.shared.store.currentUser.userId {
+        if viewModel.roomInfo.enableSeatControl {
+            if item.userId == viewModel.currentUser.userId {
                 viewItems = viewModel.currentUserItems
             } else {
                 if userInfo.isOnSeat {
@@ -169,7 +169,7 @@ class UserListManagerView: UIView {
                 }
             }
         } else {//自由发言房间
-            if item.userId == EngineManager.shared.store.currentUser.userId {
+            if item.userId == viewModel.currentUser.userId {
                 viewItems = viewModel.currentUserItems
             } else {
                 viewItems = viewModel.otherUserItems

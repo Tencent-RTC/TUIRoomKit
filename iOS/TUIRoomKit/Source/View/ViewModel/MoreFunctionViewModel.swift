@@ -16,16 +16,6 @@ class MoreFunctionViewModel {
     }
     
     func createBottomData() {
-        //聊天
-        let chatItem = ButtonItemData()
-        chatItem.normalIcon = "room_chat"
-        chatItem.normalTitle = .chatText
-        chatItem.resourceBundle = tuiRoomKitBundle()
-        chatItem.action = { [weak self] sender in
-            guard let self = self, let button = sender as? UIButton else { return }
-            self.chatAction(sender: button)
-        }
-        viewItems.append(chatItem)
         //美颜
         let beautyItem = ButtonItemData()
         beautyItem.normalIcon = "room_beauty"
@@ -48,10 +38,6 @@ class MoreFunctionViewModel {
         viewItems.append(settingItem)
     }
     
-    func chatAction(sender: UIButton) {
-        sender.isSelected = !sender.isSelected
-    }
-    
     func beautyAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
         RoomRouter.shared.presentPopUpViewController(viewType: .beautyViewType)
@@ -68,7 +54,6 @@ class MoreFunctionViewModel {
 }
 
 private extension String {
-    static let chatText = localized("TUIRoom.chat")
     static let beautyText = localized("TUIRoom.beauty")
     static let settingText = localized("TUIRoom.setting")
 }

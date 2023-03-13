@@ -27,7 +27,7 @@ class TopViewModel {
         micItem.selectedIcon = "room_speakerphone"
         micItem.backgroundColor = UIColor(0xA3AEC7)
         micItem.resourceBundle = tuiRoomKitBundle()
-        micItem.isSelect = !EngineManager.shared.store.roomInfo.isOpenMicrophone && EngineManager.shared.store.roomInfo.isUseSpeaker
+        micItem.isSelect = EngineManager.shared.store.roomInfo.isUseSpeaker
         micItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.micItemAction(sender: button)
@@ -56,8 +56,10 @@ class TopViewModel {
     }
     
     func initialStatus() {
-        if !EngineManager.shared.store.roomInfo.isOpenMicrophone && EngineManager.shared.store.roomInfo.isUseSpeaker {
+        if EngineManager.shared.store.roomInfo.isUseSpeaker {
             EngineManager.shared.roomEngine.getTRTCCloud().setAudioRoute(.modeSpeakerphone)
+        } else {
+            EngineManager.shared.roomEngine.getTRTCCloud().setAudioRoute(.modeEarpiece)
         }
     }
     

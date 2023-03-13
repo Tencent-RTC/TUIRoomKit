@@ -9,13 +9,9 @@
 import Foundation
 import TUICore
 import TUIRoomEngine
-#if TXLiteAVSDK_TRTC
-import TXLiteAVSDK_TRTC
-#elseif TXLiteAVSDK_Professional
-import TXLiteAVSDK_Professional
-#endif
 
 class RoomStore: NSObject {
+    var currentLoginUser: UserModel = UserModel()
     var currentUser: UserModel = UserModel()
     private(set) var roomInfo: RoomInfo = RoomInfo()
     var videoSetting: VideoModel = VideoModel()
@@ -24,13 +20,18 @@ class RoomStore: NSObject {
     var attendeeList: [UserModel] = []//用户列表
     var attendeeMap: [String: UserModel] = [:]
     var inviteSeatList: [UserModel] = []//申请上麦的用户列表（针对举手发言房间）
-    var inviteSeatMap: [String: Int] = [:]
+    var inviteSeatMap: [String:Int] = [:]
     
     func update(roomInfo: RoomInfo) {
         self.roomInfo = roomInfo
     }
     
-    func initialCurrentUser() {
+    func initialLoginCurrentUser() {
+        let userInfo = TUIRoomEngine.getSelfInfo()
+        currentLoginUser.update(userInfo: userInfo)
+    }
+    
+    func initialRoomCurrentUser() {
         let userInfo = TUIRoomEngine.getSelfInfo()
         currentUser.update(userInfo: userInfo)
     }
@@ -43,40 +44,19 @@ class RoomStore: NSObject {
         attendeeMap = [:]
         inviteSeatList = []
         inviteSeatMap = [:]
+        currentUser = UserModel()
     }
     
     func addEngineObserver() {
         EngineEventCenter.shared.subscribeEngine(event: .onRemoteUserEnterRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onSeatListChanged, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onRoomInfoChanged, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserVideoStateChanged, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserAudioStateChanged, observer: self)
     }
     
     func removeEngineObserver() {
         EngineEventCenter.shared.unsubscribeEngine(event: .onRemoteUserEnterRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onSeatListChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onRoomInfoChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserVideoStateChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserAudioStateChanged, observer: self)
-    }
-    
-    func getUserList() {
-        EngineManager.shared.roomEngine.getUserList(nextSequence: 0) { [weak self] list, nextSequence in
-            guard let self = self else { return }
-            if nextSequence != 0 {
-                self.getUserList()
-            }
-            list.forEach { userIndo in
-                let userModel = UserModel()
-                userModel.update(userInfo: userIndo)
-                self.addUserList(userModel: userModel)
-            }
-        } onError: { code, message in
-            debugPrint("getUserList:code:\(code),message:\(message)")
-        }
     }
 }
 
@@ -153,63 +133,6 @@ extension RoomStore: RoomEngineEventResponder {
             }
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
         }
-        if name == .onUserVideoStateChanged {
-            guard let userId = param?["userId"] as? String else { return }
-            guard let streamType = param?["streamType"] as? TUIVideoStreamType else { return }
-            guard let hasVideo = param?["hasVideo"] as? Bool else { return }
-            guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { return }
-            switch streamType {
-            case .cameraStream:
-                userInfo.hasVideoStream = hasVideo
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
-            case .screenStream:
-                userInfo.hasScreenStream = hasVideo
-            case .cameraStreamLow: break
-            @unknown default: break
-            }
-        }
-        if name == .onUserAudioStateChanged {
-            guard let userId = param?["userId"] as? String else { return }
-            guard let hasAudio = param?["hasAudio"] as? Bool else { return }
-            guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { return }
-            userInfo.hasAudioStream = hasAudio
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
-        }
-        if name == .onRoomInfoChanged {
-            guard let roomId = param?["roomId"] as? String else { return }
-            guard let roomInfo = param?["roomInfo"] as? TUIRoomInfo else { return }
-            if roomId == EngineManager.shared.store.roomInfo.roomId {
-                if self.roomInfo.enableVideo != roomInfo.enableVideo {
-                    if roomInfo.owner == currentUser.userId {
-                        return
-                    }
-                    if !roomInfo.enableVideo {
-                        EngineManager.shared.roomEngine.closeLocalCamera()
-                        EngineManager.shared.roomEngine.stopPushLocalVideo()
-                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalVideo,
-                                                               param: ["select": true, "enabled": false])
-                    } else {
-                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalVideo,
-                                                               param: ["select": true, "enabled": true])
-                    }
-                }
-                if self.roomInfo.enableAudio != roomInfo.enableAudio {
-                    if roomInfo.owner == currentUser.userId {
-                        return
-                    }
-                    if !roomInfo.enableAudio {
-                        EngineManager.shared.roomEngine.closeLocalMicrophone()
-                        EngineManager.shared.roomEngine.stopPushLocalAudio()
-                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalAudio,
-                                                               param: ["select": true, "enabled": false])
-                    } else {
-                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalAudio,
-                                                               param: ["select": true, "enabled": true])
-                    }
-                }
-                self.roomInfo.update(engineRoomInfo: roomInfo)
-            }
-        }
     }
     
     private func removeUserList(userId: String, type: TUIVideoStreamType = .cameraStream) {
@@ -241,20 +164,6 @@ extension RoomStore: RoomEngineEventResponder {
         }
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
     }
-}
-
-class VideoModel {
-    var frameText: String = "15"
-    var frameIndex: Int = 0
-    var bitrate: BitrateTableData = BitrateTableData(resolutionName: "540 * 960",
-                                                     resolution: TRTCVideoResolution._960_540.rawValue,
-                                                     defaultBitrate: 900,
-                                                     minBitrate: 400,
-                                                     maxBitrate: 1_600,
-                                                     stepBitrate: 50)
-    var bitrateIndex: Int = 0
-    var isMirror: Bool = true
-    var isFrontCamera: Bool = true
 }
 
 public class RoomInfo {
@@ -353,11 +262,4 @@ public class RoomInfo {
     deinit {
         debugPrint("deinit \(self)")
     }
-}
-
-class AudioModel {
-    var captureVolume: Int = 100
-    var playVolume: Int = 100
-    var volumePrompt: Bool = true
-    var isRecord: Bool = false
 }

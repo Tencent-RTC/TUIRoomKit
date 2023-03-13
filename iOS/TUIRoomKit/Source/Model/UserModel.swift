@@ -10,52 +10,25 @@ import Foundation
 import TUIRoomEngine
 
 class UserModel {
-    var allowVideoTurnedOn: Bool
-    var allowAudioTurnedOn: Bool
     private var userInfo: TUIUserInfo
-    var isOnSeat: Bool
-    var isAllowVideoTurnedOn: Bool {
-        set {
-            allowVideoTurnedOn = newValue
-            if !allowVideoTurnedOn { // 远端禁用 本地关闭，
-                hasVideoStream = allowVideoTurnedOn
-            }
-        }
-        get {
-            return allowVideoTurnedOn
-        }
-    }
-    
-    var isAllowAudioTurnedOn: Bool {
-        set {
-            allowAudioTurnedOn = newValue
-            if !allowAudioTurnedOn { // 远端禁用 本地关闭，
-                hasAudioStream = allowAudioTurnedOn
-            }
-        }
-        get {
-            return allowAudioTurnedOn
-        }
-    }
-    
+    var isOnSeat: Bool //是否上麦
+    var isMuteMessage: Bool //是否禁言
     var hasVideoStream: Bool {
         set {
             userInfo.hasVideoStream = newValue
         }
         get {
-            return userInfo.hasVideoStream && isAllowVideoTurnedOn
+            return userInfo.hasVideoStream
         }
     }
-    
     var hasAudioStream: Bool {
         set {
             userInfo.hasAudioStream = newValue
         }
         get {
-            return userInfo.hasAudioStream && isAllowAudioTurnedOn
+            return userInfo.hasAudioStream
         }
     }
-    
     var userId: String {
         set {
             userInfo.userId = newValue
@@ -64,7 +37,6 @@ class UserModel {
             return userInfo.userId
         }
     }
-    
     var userName: String {
         set {
             userInfo.userName = newValue
@@ -73,7 +45,6 @@ class UserModel {
             return userInfo.userName
         }
     }
-    
     var avatarUrl: String {
         set {
             userInfo.avatarUrl = newValue
@@ -82,7 +53,6 @@ class UserModel {
             return userInfo.avatarUrl
         }
     }
-    
     var userRole: TUIRole {
         set {
             userInfo.userRole = newValue
@@ -91,7 +61,6 @@ class UserModel {
             return userInfo.userRole
         }
     }
-    
     var hasScreenStream: Bool {
         set {
             userInfo.hasScreenStream = newValue
@@ -102,9 +71,8 @@ class UserModel {
     }
     
     init() {
-        allowVideoTurnedOn = true
-        allowAudioTurnedOn = true
         isOnSeat = false
+        isMuteMessage = false
         userInfo = TUIUserInfo()
     }
     

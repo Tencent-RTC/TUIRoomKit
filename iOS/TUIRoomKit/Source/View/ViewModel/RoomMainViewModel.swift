@@ -22,6 +22,16 @@ protocol RoomMainViewResponder: NSObject {
 class RoomMainViewModel: NSObject {
     let timeoutNumber: Double = 100
     weak var viewResponder: RoomMainViewResponder? = nil
+    lazy var engineManager: EngineManager = {
+        return EngineManager.shared
+    }()
+    lazy var roomInfo: RoomInfo = {
+        return engineManager.store.roomInfo
+    }()
+    lazy var currentUser: UserModel = {
+        return engineManager.store.currentUser
+    }()
+    
     override init() {
         super.init()
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
@@ -34,61 +44,99 @@ class RoomMainViewModel: NSObject {
     }
     
     func applyConfigs() {
-        guard EngineManager.shared.store.currentUser.isOnSeat else { return }
-        let roomEngine = EngineManager.shared.roomEngine
-        if EngineManager.shared.store.roomInfo.isOpenMicrophone && EngineManager.shared.store.roomInfo.enableAudio {
-            roomEngine.openLocalMicrophone {
+        getUserList()//获取用户列表
+        guard currentUser.isOnSeat else { return }
+        let roomEngine = engineManager.roomEngine
+        if roomInfo.isOpenMicrophone && roomInfo.enableAudio {
+            engineManager.roomEngine.openLocalMicrophone {
                 roomEngine.startPushLocalAudio()
             } onError: { code, message in
                 debugPrint("openLocalMicrophone:code:\(code),message:\(message)")
             }
         }
-        if EngineManager.shared.store.roomInfo.isOpenCamera && EngineManager.shared.store.roomInfo.enableVideo {
+        if roomInfo.isOpenCamera && roomInfo.enableVideo {
             let params = TRTCRenderParams()
             params.fillMode = .fill
             params.rotation = ._0
-            if EngineManager.shared.store.videoSetting.isMirror {
+            if engineManager.store.videoSetting.isMirror {
                 params.mirrorType = .enable
             } else {
                 params.mirrorType = .disable
             }
             roomEngine.getTRTCCloud().setLocalRenderParams(params)
+            // FIXME: - 打开摄像头前需要先设置一个view
+            roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
             roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) {
                 roomEngine.startPushLocalVideo()
             } onError: { code, message in
                 debugPrint("openLocalCamera:code:\(code),message:\(message)")
             }
         }
-        EngineManager.shared.roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(self, pixelFormat: ._Texture_2D, bufferType: .texture)
+        engineManager.roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(self, pixelFormat: ._Texture_2D, bufferType: .texture)
+    }
+    
+    private func getUserList() {
+        engineManager.roomEngine.getUserList(nextSequence: 0) { [weak self] list, nextSequence in
+            guard let self = self else { return }
+            if nextSequence != 0 {
+                self.getUserList()
+            }
+            list.forEach { userIndo in
+                let userModel = UserModel()
+                userModel.update(userInfo: userIndo)
+                self.addUserList(userModel: userModel)
+            }
+        } onError: { code, message in
+            debugPrint("getUserList:code:\(code),message:\(message)")
+        }
+    }
+    
+    private func addUserList(userModel: UserModel) {
+        if engineManager.store.attendeeMap[userModel.userId] != nil {
+            return
+        }
+        engineManager.store.attendeeMap[userModel.userId] = userModel
+        engineManager.store.attendeeList.append(userModel)
+        if engineManager.store.attendeeMap[userModel.userId] != nil {
+            return
+        }
+        engineManager.store.attendeeMap[userModel.userId] = userModel
+        engineManager.store.attendeeList.append(userModel)
+        if userModel.userName.isEmpty {
+            userModel.userName = userModel.userId
+        }
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
     }
     
     func respondUserOnSeat(isAgree: Bool, requestId: Int) {
-        EngineManager.shared.roomEngine.responseRemoteRequest(requestId, agree: isAgree) {
-            EngineManager.shared.store.inviteSeatMap.removeValue(forKey: EngineManager.shared.store.currentUser.userId)
-            EngineManager.shared.store.inviteSeatList = EngineManager.shared.store.inviteSeatList.filter { userModel in
-                userModel.userId == EngineManager.shared.store.currentUser.userId
+        engineManager.roomEngine.responseRemoteRequest(requestId, agree: isAgree) { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.store.inviteSeatMap.removeValue(forKey: self.currentUser.userId)
+            self.engineManager.store.inviteSeatList = self.engineManager.store.inviteSeatList.filter { [weak self] userModel in
+                guard let self = self else { return false }
+                return userModel.userId == self.currentUser.userId
             }
         } onError: { code, message in
             debugPrint("responseRemoteRequest:code:\(code),message:\(message)")
         }
         if isAgree {
-            EngineManager.shared.store.currentUser.isOnSeat = true
+            currentUser.isOnSeat = true
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeat, param: [:])
         } else {
-            EngineManager.shared.store.currentUser.isOnSeat = false
+            currentUser.isOnSeat = false
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserDownSeat, param: [:])
         }
     }
     
     func respondTurnOnAudio(isAgree: Bool, requestId: Int) {
-        EngineManager.shared.roomEngine.responseRemoteRequest(requestId, agree: isAgree) {
+        let roomEngine = engineManager.roomEngine
+        roomEngine.responseRemoteRequest(requestId, agree: isAgree) {
             if isAgree {
-                EngineManager.shared.roomEngine.openLocalMicrophone {
-                    EngineManager.shared.roomEngine.startPushLocalAudio()
+                roomEngine.openLocalMicrophone {
+                    roomEngine.startPushLocalAudio()
                 } onError: { code, message in
                     debugPrint("openLocalMicrophone:code:\(code),message:\(message)")
                 }
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalAudio, param: ["select" : false, "enabled": true])
             }
         } onError: { code, message in
             debugPrint("responseRemoteRequest:code:\(code),message:\(message)")
@@ -96,7 +144,7 @@ class RoomMainViewModel: NSObject {
     }
     
     func respondTurnOnVideo(isAgree: Bool, requestId: Int) {
-        EngineManager.shared.roomEngine.responseRemoteRequest(requestId, agree: isAgree) {
+        engineManager.roomEngine.responseRemoteRequest(requestId, agree: isAgree) {
         } onError: { code, message in
             debugPrint("openLocalCamera:code:\(code),message:\(message)")
         }
@@ -186,34 +234,32 @@ extension RoomMainViewModel: RoomEngineEventResponder {
             case .invalidAction:
                 break
             case .connectOtherRoom:
-                EngineManager.shared.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
+                engineManager.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
                 } onError: { _, _ in
                 }
             case .takeSeat:
-                if EngineManager.shared.store.roomInfo.enableSeatControl {
+                if roomInfo.enableSeatControl {
                     //如果作为房主收到自己要上麦拿到请求，直接同意
-                    if request.userId == EngineManager.shared.store.currentUser.userId && EngineManager.shared.store.roomInfo.owner ==
-                        request.userId {
-                        EngineManager.shared.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
+                    if request.userId == currentUser.userId && roomInfo.owner == request.userId {
+                        engineManager.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
                         } onError: { _, _ in
                         }
                     }
-                    guard let userModel = EngineManager.shared.store.attendeeList.first(where: {$0.userId == request.userId}) else { return }
-                    if (EngineManager.shared.store.inviteSeatMap[request.userId] != nil) {
+                    guard let userModel = engineManager.store.attendeeList.first(where: {$0.userId == request.userId}) else { return }
+                    if (engineManager.store.inviteSeatMap[request.userId] != nil) {
                         break
                     }
-                    EngineManager.shared.store.inviteSeatList.append(userModel)
-                    EngineManager.shared.store.inviteSeatMap[request.userId] = Int(request.requestId)
+                    engineManager.store.inviteSeatList.append(userModel)
+                    engineManager.store.inviteSeatMap[request.userId] = Int(request.requestId)
                     EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
                 }
                 else {
-                    EngineManager.shared.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
+                    engineManager.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
                     } onError: { _, _ in
                     }
                 }
             case .remoteUserOnSeat:
-                if EngineManager.shared.store.roomInfo.enableSeatControl {
-                    //                    if request.userId == EngineManager.shared.store.currentUser.userId {
+                if roomInfo.enableSeatControl {
                     let alertVC = UIAlertController(title: .inviteSpeakOnStageTitle,
                                                     message: .inviteSpeakOnStageMessage,
                                                     preferredStyle: .alert)
@@ -228,10 +274,8 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                     alertVC.addAction(declineAction)
                     alertVC.addAction(sureAction)
                     RoomRouter.shared.currentViewController()?.present(alertVC, animated: true, completion: nil)
-                    
-                    //                    }
                 } else {
-                    EngineManager.shared.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
+                    engineManager.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
                     } onError: { _, _ in
                     }
                 }
@@ -243,54 +287,28 @@ extension RoomMainViewModel: RoomEngineEventResponder {
             guard let userId = param?["userId"] as? String else { return }
             guard let streamType = param?["streamType"] as? TUIVideoStreamType else { return }
             guard let hasVideo = param?["hasVideo"] as? Bool else { return }
-            guard let reason = param?["reason"] as? TUIChangeReason else { return }
             switch streamType {
-            case .cameraStream:
-                if userId == EngineManager.shared.store.currentUser.userId {
-                    if !hasVideo {
-                        if !EngineManager.shared.store.roomInfo.enableVideo && EngineManager.shared.store.currentUser.userRole != .roomOwner {
-                            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalVideo,
-                                                                   param: ["select": true, "enabled": false])
-                        } else {
-                            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalVideo, param: ["select": true])
-                        }
-                        if reason == .byAdmin {
-                            RoomRouter.shared.currentViewController()?.view.window?.makeToast(.noticeCameraOffTitleText)
-                        }
-                    } else {
-                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalVideo, param: ["select": false])
-                    }
-                }
             case .screenStream:
                 EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: ["isSomeoneSharing" : hasVideo])
-            case .cameraStreamLow: break
-            @unknown default: break
+            case .cameraStream:
+                guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
+                userModel.hasVideoStream = hasVideo
+                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+            default: break
             }
         }
         if name == .onUserAudioStateChanged {
             guard let userId = param?["userId"] as? String else { return }
             guard let hasAudio = param?["hasAudio"] as? Bool else { return }
-            guard let reason = param?["reason"] as? TUIChangeReason else { return }
-            if userId == EngineManager.shared.store.currentUser.userId {
-                if !hasAudio {
-                    if !EngineManager.shared.store.roomInfo.enableAudio && EngineManager.shared.store.currentUser.userRole != .roomOwner {
-                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalAudio, param: ["select": true, "enabled": false])
-                    } else {
-                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalAudio, param: ["select": true])
-                    }
-                    if reason == .byAdmin {
-                        RoomRouter.shared.currentViewController()?.view.window?.makeToast(.noticeMicrophoneOffTitleText)
-                    }
-                } else {
-                    EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_MuteLocalAudio, param: ["select": false])
-                }
-            }
+            guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
+            userModel.hasAudioStream = hasAudio
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
         }
         
         if name == .onRequestCancelled {
             guard let userId = param?["userId"] as? String else { return }
-            EngineManager.shared.store.inviteSeatMap.removeValue(forKey: userId)
-            EngineManager.shared.store.inviteSeatList = EngineManager.shared.store.inviteSeatList.filter { userModel in
+            engineManager.store.inviteSeatMap.removeValue(forKey: userId)
+            engineManager.store.inviteSeatList = engineManager.store.inviteSeatList.filter { userModel in
                 userModel.userId != userId
             }
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
@@ -299,18 +317,19 @@ extension RoomMainViewModel: RoomEngineEventResponder {
         if name == .onUserRoleChanged {
             guard let userId = param?["userId"] as? String else { return }
             guard let userRole = param?["userRole"] as? TUIRole else { return }
-            let isSelfRoleChanged = userId == EngineManager.shared.store.currentUser.userId
+            let isSelfRoleChanged = userId == currentUser.userId
             let isRoomOwnerChanged = userRole == .roomOwner
             if isSelfRoleChanged {
-                EngineManager.shared.store.currentUser.userRole = userRole
+                currentUser.userRole = userRole
             }
             if isRoomOwnerChanged {
-                EngineManager.shared.store.roomInfo.owner = userId
+                roomInfo.owner = userId
             }
             if isSelfRoleChanged, isRoomOwnerChanged {
-                if EngineManager.shared.store.roomInfo.enableSeatControl {
-                    EngineManager.shared.roomEngine.takeSeat(-1, timeout: timeoutNumber) { _, _ in
-                        EngineManager.shared.store.currentUser.isOnSeat = true
+                if roomInfo.enableSeatControl {
+                    engineManager.roomEngine.takeSeat(-1, timeout: timeoutNumber) { [weak self] _, _ in
+                        guard let self = self else { return }
+                        self.currentUser.isOnSeat = true
                         debugPrint("")
                     } onRejected: { _, _, _ in
                         debugPrint("")
@@ -328,13 +347,12 @@ extension RoomMainViewModel: RoomEngineEventResponder {
     }
     
     func interruptClearRoom() {
-        EngineManager.shared.roomEngine.closeLocalCamera()
-        EngineManager.shared.roomEngine.closeLocalMicrophone()
-        EngineManager.shared.roomEngine.stopPushLocalAudio()
-        EngineManager.shared.roomEngine.stopPushLocalVideo()
-        EngineManager.shared.exitRoom {
-        } onError: { _, _ in
-        }
+        let roomEngine = engineManager.roomEngine
+        roomEngine.closeLocalCamera()
+        roomEngine.closeLocalMicrophone()
+        roomEngine.stopPushLocalAudio()
+        roomEngine.stopPushLocalVideo()
+        engineManager.exitRoom()
     }
 }
 
@@ -369,9 +387,9 @@ extension RoomMainViewModel: RoomMainViewFactory {
     }
     
     func makeMiddleView() -> UIView {
-        let roomEngineMap = TUICore.getExtensionInfo(gRoomEngineKey, param: ["roomId": EngineManager.shared.store.roomInfo.roomId])
+        let roomEngineMap = TUICore.getExtensionInfo(gRoomEngineKey, param: ["roomId": roomInfo.roomId])
         guard let roomEngine = roomEngineMap[gRoomEngineKey] else { return UIView(frame: .zero) }
-        let map = TUICore.getExtensionInfo(gVideoSeatViewKey, param: ["roomEngine": roomEngine, "roomId": EngineManager.shared.store.roomInfo.roomId])
+        let map = TUICore.getExtensionInfo(gVideoSeatViewKey, param: ["roomEngine": roomEngine, "roomId": roomInfo.roomId])
         guard let view = map[gVideoSeatViewKey] as? UIView else { return UIView(frame: .zero) }
         return view
     }

@@ -11,164 +11,91 @@ import TUIRoomEngine
 import UIKit
 
 class TUIVideoSeatCell: UICollectionViewCell {
-    var viewModel: TUIVideoSeatViewModel?
-    var attendeeModel: UserModel?
-    let userInfoView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(0x121723, alpha: 0.8)
+
+    let cameraRenderView: UIView = {
+        let view = UIView(frame: .zero)
+        view.backgroundColor = UIColor(0x17181F)
+        view.layer.cornerRadius = 16
+        view.layer.masksToBounds = true
+        view.layer.borderWidth = 2
+        view.layer.borderColor = UIColor.clear.cgColor
         return view
     }()
-    
-    let homeownersImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "tuiroom_homeowners_icon", in: tuiVideoSeatBundle(), compatibleWith: nil))
-        return imageView
+
+    let userInfoView: TUIVideoSeatUserStatusView = {
+        let view = TUIVideoSeatUserStatusView()
+        return view
     }()
-    
-    let userLabel: UILabel = {
-        let user = UILabel()
-        user.textColor = .white
-        user.backgroundColor = UIColor.clear
-        user.textAlignment = .center
-        user.numberOfLines = 1
-        return user
-    }()
-    
-    let voiceVolumeImageView: UIImageView = {
-        let imageView = UIImageView()
-        return imageView
-    }()
-    
+        
     let avatarImageView: UIImageView = {
-        let imageView = UIImageView()
+        let imageView = UIImageView(frame: .zero)
+        imageView.layer.cornerRadius = 36
+        imageView.layer.masksToBounds = true
         return imageView
     }()
     
+    var seatItem: VideoSeatItem? = nil
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        UIEventCenter.shared.subscribeUIEvent(key: .UserVideoStateChanged, responder: self)
-        UIEventCenter.shared.subscribeUIEvent(key: .UserVoiceVolumeChanged, responder: self)
-        UIEventCenter.shared.subscribeUIEvent(key: .UserNameChanged, responder: self)
+        constructViewHierarchy()
+        activateConstraints()
+        contentView.backgroundColor = .clear
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private var isViewReady: Bool = false
-    override func didMoveToWindow() {
-        super.didMoveToWindow()
-        guard !isViewReady else { return }
-        constructViewHierarchy()
-        activateConstraints()
-        bindInteraction()
-        isViewReady = true
-    }
-    
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-//        self.roundedRect(rect: bounds, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight], cornerRadii:
-//                            CGSize(width: 12, height: 12))
-        userInfoView.roundedRect(rect: userInfoView.bounds, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight],
-                                 cornerRadii: CGSize(width: userInfoView.frame.width, height: userInfoView.frame.height))
-        homeownersImageView.roundedRect(rect: homeownersImageView.bounds, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight],
-                                        cornerRadii: CGSize(width: homeownersImageView.frame.width, height: homeownersImageView.frame.height))
-        avatarImageView.roundedCircle(rect: avatarImageView.bounds)
-    }
-    
     func constructViewHierarchy() {
-        addSubview(avatarImageView)
-        addSubview(userInfoView)
-        userInfoView.addSubview(homeownersImageView)
-        userInfoView.addSubview(voiceVolumeImageView)
-        userInfoView.addSubview(userLabel)
+        contentView.addSubview(cameraRenderView)
+        contentView.addSubview(avatarImageView)
+        contentView.addSubview(userInfoView)
     }
     
     func activateConstraints() {
+        cameraRenderView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         avatarImageView.snp.makeConstraints { make in
             make.width.height.equalTo(72)
             make.centerX.centerY.equalToSuperview()
         }
         userInfoView.snp.makeConstraints { make in
             make.bottom.equalToSuperview().offset(-5)
-            make.height.equalTo(24)
-            make.left.equalToSuperview().offset(20)
-            make.width.equalTo(140)
-        }
-        homeownersImageView.snp.makeConstraints { make in
-            make.left.equalToSuperview()
-            make.height.width.equalTo(24)
-            make.centerY.equalToSuperview()
-        }
-        voiceVolumeImageView.snp.makeConstraints { make in
-            make.left.equalTo(homeownersImageView.snp.right).offset(5)
-            make.width.height.equalTo(14)
-            make.centerY.equalToSuperview()
-        }
-        userLabel.snp.makeConstraints { make in
-            make.left.equalTo(voiceVolumeImageView.snp.right).offset(5)
-            make.centerY.equalToSuperview()
+            make.leading.equalToSuperview().offset(20)
         }
     }
-    
-    func bindInteraction() {
-        guard let attendeeModel = attendeeModel else { return }
-        setupViewState(item: attendeeModel)
-    }
-    
-    func setupViewState(item: UserModel) {
-        let placeholder = UIImage(named: "tuiroom_default_user", in: tuiVideoSeatBundle(), compatibleWith: nil)
-        avatarImageView.sd_setImage(with: URL(string: item.avatarUrl), placeholderImage: placeholder)
-        userLabel.text = item.userName
-        updateUIView(item: item)
-    }
-    
-    func updateUIView(item: UserModel) {
-        if item.hasVideoStream {
-            avatarImageView.isHidden = true
-        } else {
-            avatarImageView.isHidden = false
-        }
-        homeownersImageView.isHidden = item.userId != viewModel?.roomInfo.owner
-        voiceVolumeImageView.image = getVoiceVolumeImageView(voiceVolume: item.audioVolume)
-    }
-    
-    func getVoiceVolumeImageView(voiceVolume: Int) -> UIImage? {
-        var image = voiceVolume <= 0 ? UIImage(named: "tuiroom_voice_volume1", in: tuiVideoSeatBundle(), compatibleWith: nil) :
-        UIImage(named: "tuiroom_voice_volume2", in: tuiVideoSeatBundle(), compatibleWith: nil)
-        return image
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        guard let item = seatItem else { return }
+        item.viewModel?.stopPlayCameraVideo(item: item)
+        item.cellIndexPath = nil
     }
     
     deinit {
-        UIEventCenter.shared.unsubscribeUIEvent(key: .TUIVideoSeatService, responder: self)
-        UIEventCenter.shared.unsubscribeUIEvent(key: .TUIVideoSeatService, responder: self)
-        UIEventCenter.shared.unsubscribeUIEvent(key: .UserNameChanged, responder: self)
         debugPrint("deinit \(self)")
     }
 }
 
-extension TUIVideoSeatCell: RoomKitUIEventResponder {
-    func onNotifyUIEvent(key: UIEventCenter.TUIVideoSeatUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
-        if key == .UserVoiceVolumeChanged {
-            guard let userId = info?["userId"] as? String else { return }
-            guard let audioVolume = info?["audioVolume"] as? Int else { return }
-            guard let attendeeModel = attendeeModel else { return }
-            guard userId == attendeeModel.userId else { return }
-            attendeeModel.audioVolume = audioVolume
-            updateUIView(item: attendeeModel)
-        }
-        if key == .UserVideoStateChanged {
-            guard let userId = info?["userId"] as? String else { return }
-            guard let hasVideo = info?["hasVideo"] as? Bool else { return }
-            guard let attendeeModel = attendeeModel else { return }
-            guard userId == attendeeModel.userId else { return }
-            attendeeModel.hasVideoStream = hasVideo
-            updateUIView(item: attendeeModel)
-        }
-        if key == .UserNameChanged {
-            guard let userId = info?["userId"] as? String else { return }
-            guard let userName = info?["userName"] as? String else { return }
-            guard userId == attendeeModel?.userId else { return }
-            userLabel.text = userName
-        }
+// MARK: - Public
+extension TUIVideoSeatCell {
+
+    func updateUI(item: VideoSeatItem) {
+        seatItem = item
+        let placeholder = UIImage(named: "tuiroom_default_user", in: tuiVideoSeatBundle(), compatibleWith: nil)
+        avatarImageView.sd_setImage(with: URL(string: item.avatarUrl), placeholderImage: placeholder)
+        avatarImageView.isHidden = item.hasVideoStream
+        userInfoView.updateUserStatus(item)
+    }
+
+    func updateUIVolume(item: VideoSeatItem) {
+        userInfoView.updateUserVolume(hasAudio: item.hasAudioStream, volume: item.audioVolume)
+//        if item.audioVolume > 0 {
+//            cameraRenderView.layer.borderColor = UIColor(0xA5FE33).cgColor
+//        } else {
+//            cameraRenderView.layer.borderColor = UIColor.clear.cgColor
+//        }
     }
 }

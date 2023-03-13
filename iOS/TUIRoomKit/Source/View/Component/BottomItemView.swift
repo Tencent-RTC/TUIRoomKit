@@ -52,10 +52,17 @@ class BottomItemView: UIView {
     }
     
     func activateConstraints() {
-        button.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.bottom.equalTo(titleLabel.snp.top).offset(-2)
-            make.width.height.equalTo(24)
+        if itemData.normalTitle.isEmpty {
+            button.snp.makeConstraints { make in
+                make.centerX.centerY.equalToSuperview()
+                make.width.height.equalTo(24)
+            }
+        } else {
+            button.snp.makeConstraints { make in
+                make.centerX.equalToSuperview()
+                make.bottom.equalTo(titleLabel.snp.top).offset(-2)
+                make.width.height.equalTo(24)
+            }
         }
         titleLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
@@ -82,12 +89,26 @@ class BottomItemView: UIView {
         }
         if !item.normalTitle.isEmpty {
             titleLabel.text = item.normalTitle
+        } else {
+            titleLabel.isHidden = true
         }
     }
     
     @objc
-    func clickMenuButton(sender: UIButton) {
+    func clickMenuButton(sender: UIView) {
         itemData.action?(sender)
+    }
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        guard !isHidden, alpha > 0.01, subviews.count > 0 else {
+            return nil
+        }
+        let buttonPoint = convert(point, to: self.superview)
+        if frame.contains(buttonPoint) {
+            return button
+        } else {
+            return nil
+        }
     }
     
     deinit {

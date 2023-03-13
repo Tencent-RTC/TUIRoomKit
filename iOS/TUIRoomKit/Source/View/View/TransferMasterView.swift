@@ -79,6 +79,8 @@ class TransferMasterView: UIView {
     func setNavigationLeftBarButton() {
         RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         RoomRouter.shared.currentViewController()?.navigationItem.hidesSearchBarWhenScrolling = true
+        RoomRouter.shared.currentViewController()?.navigationController?.navigationBar.isTranslucent = false
+        RoomRouter.shared.currentViewController()?.navigationController?.navigationBar.backgroundColor = UIColor(0x1B1E26)
     }
     
     func constructViewHierarchy() {
@@ -89,7 +91,7 @@ class TransferMasterView: UIView {
     func activateConstraints() {
         transferMasterTableView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
-            make.top.equalToSuperview().offset(10.scale375())
+            make.top.equalTo(safeAreaLayoutGuide.snp.top)
             make.bottom.equalToSuperview()
         }
         appointMasterButton.snp.makeConstraints { make in

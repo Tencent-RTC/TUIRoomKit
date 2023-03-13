@@ -25,15 +25,11 @@ class PrePareView: UIView {
     
     let avatarButton: UIButton = {
         let button = UIButton(type: .custom)
-        let placeholderImage = UIImage(named: "room_default_avatar", in: tuiRoomKitBundle(), compatibleWith: nil)
-        button.sd_setImage(with: URL(string: EngineManager.shared.store.currentUser.avatarUrl), for: .normal, placeholderImage:
-                            placeholderImage)
         return button
     }()
     
     let userNameLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = EngineManager.shared.store.currentUser.userName
         label.font = UIFont.systemFont(ofSize: 16.0)
         return label
     }()
@@ -80,14 +76,11 @@ class PrePareView: UIView {
     
     let userAvatarImage: UIImageView = {
         let imageView = UIImageView(frame: .zero)
-        let placeholderImage = UIImage(named: "room_default_avatar", in: tuiRoomKitBundle(), compatibleWith: nil)
-        imageView.sd_setImage(with: URL(string: EngineManager.shared.store.currentUser.avatarUrl), placeholderImage: placeholderImage)
         return imageView
     }()
     
     let userIdLable: UILabel = {
         let label = UILabel()
-        label.text = EngineManager.shared.store.currentUser.userName
         label.textAlignment = .center
         label.textColor = .white
         return label
@@ -369,6 +362,11 @@ class PrePareView: UIView {
     }
     
     func setupViewState(item: PrePareViewModel) {
+        let placeholderImage = UIImage(named: "room_default_avatar", in: tuiRoomKitBundle(), compatibleWith: nil)
+        avatarButton.sd_setImage(with: URL(string: viewModel.currentUser.avatarUrl), for: .normal, placeholderImage: placeholderImage)
+        userAvatarImage.sd_setImage(with: URL(string: viewModel.currentUser.avatarUrl), placeholderImage: placeholderImage)
+        userNameLabel.text = viewModel.currentUser.userName
+        userIdLable.text = viewModel.currentUser.userName
         if !item.enablePrePareView {
             prePareView.isHidden = true
             tencentImage.isHidden = true
@@ -393,9 +391,9 @@ class PrePareView: UIView {
     }
     
     func updateButtonState() {
-        openCameraButton.isSelected = !EngineManager.shared.store.roomInfo.isOpenCamera
-        openMicrophoneButton.isSelected = !EngineManager.shared.store.roomInfo.isOpenMicrophone
-        userMessageView.isHidden = EngineManager.shared.store.roomInfo.isOpenCamera
+        openCameraButton.isSelected = !viewModel.roomInfo.isOpenCamera
+        openMicrophoneButton.isSelected = !viewModel.roomInfo.isOpenMicrophone
+        userMessageView.isHidden = viewModel.roomInfo.isOpenCamera
     }
     
     func initialState() {

@@ -17,17 +17,25 @@ import TXLiteAVSDK_Professional
 class PrePareViewModel {
     weak var rootView: PrePareView?
     var enablePrePareView: Bool = true
+    lazy var engineManager: EngineManager = {
+        return EngineManager.shared
+    }()
+    lazy var currentUser: UserModel = {
+        return engineManager.store.currentLoginUser
+    }()
+    lazy var roomInfo: RoomInfo = {
+        return engineManager.store.roomInfo
+    }()
     
     func initialState(view: UIView) {
-        let roomEngine = EngineManager.shared.roomEngine
+        let roomEngine = engineManager.roomEngine
         if let rootView = self.rootView {
             roomEngine.setLocalVideoView(streamType: .cameraStream, view: rootView.prePareView)
         } else {
             roomEngine.setLocalVideoView(streamType: .cameraStream, view: view)
         }
-        
-        if EngineManager.shared.store.roomInfo.isOpenCamera {
-            roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) {
+        if roomInfo.isOpenCamera {
+            roomEngine.openLocalCamera(isFront: engineManager.store.videoSetting.isFrontCamera) {
                 debugPrint("")
             } onError: { code, message in
                 debugPrint("---openLocalCamera,code:\(code),message:\(message)")
@@ -35,7 +43,7 @@ class PrePareViewModel {
         } else {
             roomEngine.closeLocalCamera()
         }
-        if EngineManager.shared.store.roomInfo.isOpenMicrophone {
+        if roomInfo.isOpenMicrophone {
             roomEngine.openLocalMicrophone {
                 debugPrint("")
             } onError: { code, message in
@@ -48,15 +56,15 @@ class PrePareViewModel {
     }
     
     func closeLocalCamera() {
-        EngineManager.shared.roomEngine.closeLocalCamera()
+        engineManager.roomEngine.closeLocalCamera()
     }
     
     func closeLocalMicrophone() {
-        EngineManager.shared.roomEngine.closeLocalCamera()
+        engineManager.roomEngine.closeLocalCamera()
     }
     
     func backAction() {
-        EngineManager.shared.logout()
+        engineManager.logout()
         RoomRouter.shared.currentViewController()?.dismiss(animated: true)
     }
     
@@ -74,16 +82,16 @@ class PrePareViewModel {
     
     func openCameraAction(sender: UIButton, placeholderImage: UIView) {
         sender.isSelected = !sender.isSelected
-        let roomEngine = EngineManager.shared.roomEngine
+        let roomEngine = engineManager.roomEngine
         if sender.isSelected {
-            EngineManager.shared.store.roomInfo.isOpenCamera = false
+            roomInfo.isOpenCamera = false
             roomEngine.closeLocalCamera()
             roomEngine.stopPushLocalVideo()
             placeholderImage.isHidden = false
         } else {
-            EngineManager.shared.store.roomInfo.isOpenCamera = true
+            roomInfo.isOpenCamera = true
             placeholderImage.isHidden = true
-            roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) {
+            roomEngine.openLocalCamera(isFront: engineManager.store.videoSetting.isFrontCamera) {
                 roomEngine.startPushLocalVideo()
             } onError: { code, message in
                 debugPrint("openLocalCamera,code:\(code),message:\(message)")
@@ -93,13 +101,13 @@ class PrePareViewModel {
     
     func openMicrophoneAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        let roomEngine = EngineManager.shared.roomEngine
+        let roomEngine = engineManager.roomEngine
         if sender.isSelected {
-            EngineManager.shared.store.roomInfo.isOpenMicrophone = false
+            roomInfo.isOpenMicrophone = false
             roomEngine.closeLocalMicrophone()
             roomEngine.stopPushLocalAudio()
         } else {
-            EngineManager.shared.store.roomInfo.isOpenMicrophone = true
+            roomInfo.isOpenMicrophone = true
             roomEngine.openLocalMicrophone {
                 roomEngine.startPushLocalAudio()
             } onError: { code, message in
@@ -109,22 +117,21 @@ class PrePareViewModel {
     }
     
     func switchCameraAction(sender: UIButton) {
-        EngineManager.shared.store.videoSetting.isFrontCamera = !EngineManager.shared.store.videoSetting.isFrontCamera
-        let roomEngine = EngineManager.shared.roomEngine
-        roomEngine.getTRTCCloud().getDeviceManager().switchCamera(EngineManager.shared.store.videoSetting.isFrontCamera)
+        engineManager.store.videoSetting.isFrontCamera = !engineManager.store.videoSetting.isFrontCamera
+        engineManager.roomEngine.getTRTCCloud().getDeviceManager().switchCamera(engineManager.store.videoSetting.isFrontCamera)
     }
     
     func switchMirrorAction(sender: UIButton) {
-        EngineManager.shared.store.videoSetting.isMirror = !EngineManager.shared.store.videoSetting.isMirror
+        engineManager.store.videoSetting.isMirror = !engineManager.store.videoSetting.isMirror
         let params = TRTCRenderParams()
         params.fillMode = .fill
         params.rotation = ._0
-        if EngineManager.shared.store.videoSetting.isMirror {
+        if engineManager.store.videoSetting.isMirror {
             params.mirrorType = .enable
         } else {
             params.mirrorType = .disable
         }
-        EngineManager.shared.roomEngine.getTRTCCloud().setLocalRenderParams(params)
+        engineManager.roomEngine.getTRTCCloud().setLocalRenderParams(params)
     }
     
     deinit {

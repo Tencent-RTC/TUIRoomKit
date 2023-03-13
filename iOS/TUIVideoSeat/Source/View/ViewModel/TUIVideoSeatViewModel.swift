@@ -14,33 +14,129 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
+protocol TUIVideoSeatViewResponder: NSObject {
+
+    func reloadData()
+
+    func getSeatVideoRenderView(_ item: VideoSeatItem) -> UIView?
+    func getSeatShareRenderView(_ item: VideoSeatItem) -> UIView?
+
+    func updateSeatItem(_ item: VideoSeatItem)
+    func updateSeatVolume(_ item: VideoSeatItem)
+}
+
 class TUIVideoSeatViewModel: NSObject {
-    weak var rootView: TUIVideoSeatView?
-    private weak var roomEngine: TUIRoomEngine?
-    let currentUser: UserModel = UserModel()
+
+    weak var viewResponder: TUIVideoSeatViewResponder? = nil
+
+    var seatItems: [VideoSeatItem] = []
+    var shareSeatItem: VideoSeatItem? = nil
+
     var roomInfo: RoomInfo = RoomInfo()
-    var renderMapView: [String: UIView] = [:]
-    var shareRenderMapView: [String: UIView] = [:]
-    var attendeeList: [UserModel] = []
-    var attendeeMap: [String: UserModel] = [:]
-    var shareAttendeeModel: UserModel?
+    var currentUserId: String {
+        return TUIRoomEngine.getSelfInfo().userId
+    }
     
+    private weak var roomEngine: TUIRoomEngine?
     init(roomEngine: TUIRoomEngine, roomId: String) {
+        super.init()
         self.roomEngine = roomEngine
         roomInfo.roomId = roomId
-        currentUser.update(userInfo: TUIRoomEngine.getSelfInfo())
-        super.init()
         initRoomInfo()
-        getSeatList()
+        initSeatList()
         roomEngine.addObserver(self)
     }
     
     deinit {
         roomEngine?.removeObserver(self)
     }
+}
+
+// MARK: - Public
+extension TUIVideoSeatViewModel {
+
+    func isHomeOwner(_ userId: String) -> Bool {
+        return roomInfo.owner == userId
+    }
     
-    func initRoomInfo() {
-        roomEngine?.getRoomInfo { [weak self ] roomInfo in
+    func startPlayCameraVideo(item: VideoSeatItem, renderView: UIView? = nil) {
+        var videoRenderView = renderView
+        if videoRenderView == nil {
+            videoRenderView = viewResponder?.getSeatVideoRenderView(item)
+        }
+        guard let view = videoRenderView else { return }
+        if item.userId == currentUserId {
+            roomEngine?.setLocalVideoView(streamType: .cameraStream, view: view)
+        } else {
+            roomEngine?.setRemoteVideoView(userId: item.userId, streamType: .cameraStream, view: view)
+            roomEngine?.startPlayRemoteVideo(userId: item.userId, streamType: .cameraStream, onPlaying: { _ in
+                
+            }, onLoading: { _ in
+                
+            }, onError: { _, _, _ in
+                
+            })
+        }
+    }
+    
+    func stopPlayCameraVideo(item: VideoSeatItem) {
+        roomEngine?.stopPlayRemoteVideo(userId: item.userId, streamType: .cameraStream)
+    }
+    
+    func startPlayScreenVideo(item: VideoSeatItem, renderView: UIView? = nil) {
+        var videoRenderView = renderView
+        if videoRenderView == nil {
+            videoRenderView = viewResponder?.getSeatVideoRenderView(item)
+        }
+        guard let view = videoRenderView else { return }
+        let renderParams = TRTCRenderParams()
+        renderParams.fillMode = .fit
+        roomEngine?.getTRTCCloud().setRemoteRenderParams(item.userId, streamType: .sub, params: renderParams)
+        if item.userId == currentUserId {
+            roomEngine?.setLocalVideoView(streamType: .screenStream, view: view)
+        } else {
+            roomEngine?.setRemoteVideoView(userId: item.userId, streamType: .screenStream, view: view)
+            roomEngine?.startPlayRemoteVideo(userId: item.userId, streamType: .screenStream, onPlaying: { _ in
+                
+            }, onLoading: { _ in
+                
+            }, onError: { _, _, _ in
+                
+            })
+        }
+    }
+    
+    func stopPlayScreenVideo(item: VideoSeatItem) {
+        roomEngine?.stopPlayRemoteVideo(userId: item.userId, streamType: .cameraStream)
+    }
+    
+    func asyncUserInfo(_ userId: String) {
+        roomEngine?.getUserInfo(userId, onSuccess: { [weak self] userInfo in
+            guard let self = self, let userInfo = userInfo else { return }
+            guard let seatItem = self.getSeatItem(userId) else { return }
+            seatItem.updateUserInfo(userInfo)
+            if userInfo.userRole == .roomOwner || userInfo.hasScreenStream {
+                self.reloadSeatItems()
+            } else {
+                self.viewResponder?.updateSeatItem(seatItem)
+            }
+            if userInfo.hasVideoStream {
+                self.startPlayCameraVideo(item: seatItem)
+            } else {
+                self.stopPlayCameraVideo(item: seatItem)
+            }
+        }, onError: { _, msg in
+            debugPrint("asyncUserInfo error: \(msg)")
+        })
+    }
+}
+
+
+// MARK: - Private
+extension TUIVideoSeatViewModel {
+
+    private func initRoomInfo() {
+        roomEngine?.getRoomInfo { [weak self] roomInfo in
             guard let self = self, let roomInfo = roomInfo else { return }
             self.roomInfo = RoomInfo(roomInfo: roomInfo)
         } onError: { code, message in
@@ -48,242 +144,156 @@ class TUIVideoSeatViewModel: NSObject {
         }
     }
     
-    func setLocalVideoView(streamType: TUIVideoStreamType, view: UIView) {
-        roomEngine?.setLocalVideoView(streamType: streamType, view: view)
-    }
-    
-    func getSeatList() {
-        roomEngine?.getSeatList { seatInfo in
-            self.addUserList(userList: seatInfo)
+    private func initSeatList() {
+        roomEngine?.getSeatList { [weak self] seatList in
+            guard let self = self else { return }
+            var localSeatList = [VideoSeatItem]()
+            for seatInfo in seatList {
+                let seatItem = VideoSeatItem(seatInfo: seatInfo, viewModel: self)
+                self.asyncUserInfo(seatItem.userId)
+                localSeatList.append(seatItem)
+            }
+            self.seatItems = localSeatList
+            self.reloadSeatItems()
         } onError: { code, message in
             debugPrint("getSeatList:code:\(code),message:\(message)")
         }
     }
     
-    private func removeUserList(userId: String, type: TUIVideoStreamType = .cameraStream) {
-        if type == .cameraStream {
-            attendeeList = attendeeList.filter { model -> Bool in
-                model.userId != userId
-            }
-            attendeeMap.removeValue(forKey: userId)
-        }else if type == .screenStream {
-            shareAttendeeModel = nil
-        }
-        rootView?.attendeeCollectionView.reloadData()
-    }
-    
-    private func addUserList(userList: [TUISeatInfo]) {
-        if userList.count > 0 {
-            for seatInfo: TUISeatInfo in userList {
-                guard let userId = seatInfo.userId else {
-                    continue
-                }
-                if attendeeMap[userId] != nil {
-                    continue
-                }
-                let userModel = UserModel()
-                userModel.userId = userId
-                attendeeMap[userId] = userModel
-                attendeeList.append(userModel)
-                roomEngine?.getUserInfo(userId) { [weak self] userInfo in
-                    guard let user = userInfo else {
-                        return
-                    }
-                    guard let self = self else { return }
-                    userModel.update(userInfo: user)
-                    UIEventCenter.shared.notifyUIEvent(key: .UserNameChanged, param: ["userId": userModel.userId, "userName": userModel.userName])
-                    if userModel.userName.isEmpty {
-                        userModel.userName = userModel.userId
-                    }
-                    if userModel.userRole == .roomOwner {
-                        self.attendeeList = self.attendeeList.filter { model -> Bool in
-                            model.userId != userId
-                        }
-                        self.attendeeList.insert(userModel, at: 0)
-                    }
-                    if userModel.hasScreenStream {
-                        self.shareAttendeeModel = userModel
-                    }
-                    self.rootView?.attendeeCollectionView.reloadData()
-                } onError: { code, message in
-                    debugPrint("code:\(code), message:\(message)")
-                }
-            }
-            rootView?.attendeeCollectionView.reloadData()
+    private func addSeatItem(_ item: VideoSeatItem) {
+        if !seatItems.contains(where: {$0.userId == item.userId}) {
+            seatItems.append(item)
         }
     }
     
-    func playRemoteVideo(userId: String, streamType: TUIVideoStreamType) {
-        guard let renderView = getRenderViewByUserid(userId: userId, streamType: streamType) else { return }
-        guard let userModel = attendeeList.first(where: { $0.userId == userId }) else { return }
-        if streamType == .cameraStream {
-            if userModel.hasVideoStream && roomInfo.enableVideo {
-                if userId == currentUser.userId {
-                    roomEngine?.setLocalVideoView(streamType: .cameraStream, view: renderView)
-                } else {
-                    roomEngine?.setRemoteVideoView(userId: userId, streamType: .cameraStream, view: renderView)
-                    roomEngine?.startPlayRemoteVideo(userId: userId, streamType: .cameraStream) { _ in
-                        
-                    } onLoading: { _ in
-                        
-                    } onError: { _, _, _ in
-                    }
-                }
-            }
+    private func addSeatInfo(_ seatInfo: TUISeatInfo) {
+        if let userId = seatInfo.userId, let seatItem = getSeatItem(userId) {
+            seatItem.updateSeatInfo(seatInfo)
         } else {
-            if userModel.hasScreenStream {
-                let renderParams = TRTCRenderParams()
-                renderParams.fillMode = .fit
-                roomEngine?.getTRTCCloud().setRemoteRenderParams(userId, streamType: .sub, params: renderParams)
-                roomEngine?.setRemoteVideoView(userId: userId, streamType: .screenStream, view: renderView)
-                roomEngine?.startPlayRemoteVideo(userId: userId, streamType: .screenStream) { _ in
-                    debugPrint("")
-                } onLoading: { _ in
-                    debugPrint("")
-                } onError: { _, _, _ in
-                    debugPrint("")
-                }
-            }
+            let seatItem = VideoSeatItem(seatInfo: seatInfo, viewModel:self)
+            asyncUserInfo(seatItem.userId)
+            seatItems.append(seatItem)
         }
     }
     
-    func getRenderViewByUserid(userId: String, streamType: TUIVideoStreamType) -> UIView? {
-        if streamType == .cameraStream {
-            guard let renderView = renderMapView[userId] else {
-                return nil
-            }
-            return renderView
-        } else {
-            guard let renderView = shareRenderMapView[userId] else {
-                return nil
-            }
-            return renderView
+    private func removeSeatItem(_ userId: String) {
+        seatItems.removeAll(where: {$0.userId == userId})
+        if shareSeatItem?.userId == userId {
+            shareSeatItem = nil
         }
+    }
+    
+    private func getSeatItem(_ userId: String) -> VideoSeatItem? {
+        if let item = shareSeatItem, item.userId == userId {
+            return item
+        }
+        return seatItems.first(where: {$0.userId == userId})
+    }
+    
+    private func reloadShareSeatItem() {
+        if let oldItem = shareSeatItem, !oldItem.hasScreenStream {
+            shareSeatItem = nil
+            addSeatItem(oldItem)
+        }
+        if let newShareItemIndex = seatItems.firstIndex(where: {$0.hasScreenStream}) {
+            shareSeatItem = seatItems.remove(at: newShareItemIndex)
+        }
+    }
+    
+    private func reloadSeatItems() {
+        // 1. 查找屏幕分享 item
+        reloadShareSeatItem()
+        // 2. 排序，有视频在前面
+        seatItems = seatItems.sorted(by: { (item1, item2) in
+            if item1.hasVideoStream {
+                return false
+            } else if item2.hasVideoStream {
+                return true
+            }
+            return false
+        })
+        // 3. 房主永远在第一位
+        if let roomOwnerItemIndex = seatItems.firstIndex(where: {$0.userRole == .roomOwner}) {
+            let roomOwnerItem = seatItems.remove(at: roomOwnerItemIndex)
+            seatItems.insert(roomOwnerItem, at: 0)
+        }
+        self.viewResponder?.reloadData()
     }
 }
 
 extension TUIVideoSeatViewModel: TUIRoomObserver {
-    public func onRemoteUserLeaveRoom(roomId: String, userInfo: TUIUserInfo) {
-        if roomId == roomInfo.roomId {
-            removeUserList(userId: userInfo.userId)
+
+    func onRoomInfoChanged(roomId: String, roomInfo: TUIRoomInfo) {
+        // FIXME: 修复转让房主原房主收不到回调问题
+        let oldRoomOwner = self.roomInfo.owner
+        if !oldRoomOwner.isEmpty, oldRoomOwner != roomInfo.owner {
+            self.onUserRoleChanged(userId: oldRoomOwner, userRole: .generalUser)
         }
+        self.roomInfo.update(engineRoomInfo: roomInfo)
+    }
+    
+    func onUserAudioStateChanged(userId: String, hasAudio: Bool, reason: TUIChangeReason) {
+        guard let seatItem = getSeatItem(userId) else {
+            return
+        }
+        seatItem.hasAudioStream = hasAudio
+        viewResponder?.updateSeatVolume(seatItem)
     }
     
     public func onUserVoiceVolumeChanged(volumeMap: [String: NSNumber]) {
         for (userId, volume) in volumeMap {
-            var userId = userId
-            if userId == "" {
-                userId = currentUser.userId
-            }
-            let attendModel = attendeeList.first(where: { $0.userId == userId })
-            attendModel?.audioVolume = volume.intValue
-            UIEventCenter.shared.notifyUIEvent(key: .UserVoiceVolumeChanged, param: ["userId": userId, "audioVolume": volume.intValue])
+            guard let seatItem = getSeatItem(userId) else { return }
+            seatItem.audioVolume = volume.intValue
+            viewResponder?.updateSeatVolume(seatItem)
         }
     }
     
     public func onUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool, reason: TUIChangeReason) {
-        guard let model = attendeeMap[userId] else {
+        guard let seatItem = getSeatItem(userId) else {
             return
         }
         if streamType == .cameraStream {
-            attendeeMap[userId]?.hasVideoStream = hasVideo
-            let attendModel = attendeeList.first(where: { $0.userId == userId })
-            attendModel?.hasVideoStream = hasVideo
-            guard let renderView = getRenderViewByUserid(userId: userId, streamType: .cameraStream) else { return }
-            guard renderView.superview != nil else { return }
+            seatItem.hasVideoStream = hasVideo
+            reloadSeatItems()
             if hasVideo {
-                if userId == currentUser.userId {
-                    roomEngine?.setLocalVideoView(streamType: .cameraStream, view: renderView)
-                } else {
-                    roomEngine?.setRemoteVideoView(userId: userId, streamType: .cameraStream, view: renderView)
-                    roomEngine?.startPlayRemoteVideo(userId: userId, streamType: .cameraStream) { _ in
-                        
-                    } onLoading: { _ in
-                        
-                    } onError: { _, _, _ in
-                    }
-                }
+                startPlayCameraVideo(item: seatItem)
             } else {
-                roomEngine?.stopPlayRemoteVideo(userId: userId, streamType: .cameraStream)
+                stopPlayCameraVideo(item: seatItem)
             }
-            if !model.hasScreenStream {
-                //                renderView?.refreshVideo(isVideoAvailable: hasVideo)
-            }
-            UIEventCenter.shared.notifyUIEvent(key: .UserVideoStateChanged, param: ["userId": userId, "hasVideo": hasVideo])
-        } else if streamType == .screenStream {
-            attendeeMap[userId]?.hasScreenStream = hasVideo
-            let attendModel = attendeeList.first(where: { $0.userId == userId })
-            attendModel?.hasScreenStream = hasVideo
+        }
+        if streamType == .screenStream {
+            seatItem.hasScreenStream = hasVideo
+            reloadSeatItems()
             if hasVideo {
-                roomEngine?.stopPlayRemoteVideo(userId: userId, streamType: .cameraStream)
-                if shareAttendeeModel != nil {
-                    return
-                }
-                guard let userModel = attendeeMap[userId] else {
-                    return
-                }
-                shareAttendeeModel = userModel
-                rootView?.attendeeCollectionView.reloadData()
-                let renderView = getRenderViewByUserid(userId: userId, streamType: .screenStream)
-                if renderView?.superview != nil {
-                    if let view = renderView {
-                        let renderParams = TRTCRenderParams()
-                        renderParams.fillMode = .fit
-                        roomEngine?.getTRTCCloud().setRemoteRenderParams(userId, streamType: .sub, params: renderParams)
-                        roomEngine?.setRemoteVideoView(userId: userId, streamType: .screenStream, view: view)
-                        roomEngine?.startPlayRemoteVideo(userId: userId, streamType: .screenStream) { _ in
-                            
-                        } onLoading: { _ in
-                            
-                        } onError: { _, _, _ in
-                        }
-                    }
-                }
+                startPlayScreenVideo(item: seatItem)
             } else {
-                if model.hasVideoStream {
-                    let renderView = getRenderViewByUserid(userId: userId, streamType: .cameraStream)
-                    if (renderView?.superview) != nil {
-                        if let view = renderView {
-                            roomEngine?.setRemoteVideoView(userId: userId, streamType: .cameraStream, view: view)
-                            roomEngine?.startPlayRemoteVideo(userId: userId, streamType: .cameraStream) { _ in
-                            } onLoading: { _ in
-                            } onError: { _, _, _ in
-                            }
-                        }
-                    }
-                }
-                removeUserList(userId: userId, type: .screenStream)
-                rootView?.attendeeCollectionView.reloadData()
+                stopPlayScreenVideo(item: seatItem)
             }
         }
     }
     
     // seatList: 当前麦位列表  seated: 新增上麦的用户列表 left: 下麦的用户列表
     public func onSeatListChanged(seatList: [TUISeatInfo], seated: [TUISeatInfo], left: [TUISeatInfo]) {
-        if left.count > 0 {
-            for seatInfo: TUISeatInfo in left {
-                guard let userId = seatInfo.userId else {
-                    continue
-                }
-                removeUserList(userId: userId)
+        for leftSeat in left {
+            if let userId = leftSeat.userId {
+                removeSeatItem(userId)
             }
         }
-        if attendeeList.count <= 1 {
-            addUserList(userList: seatList)
-        } else {
-            addUserList(userList: seated)
+        for seatInfo in seatList {
+            addSeatInfo(seatInfo)
         }
+        reloadSeatItems()
     }
     
     public func onUserRoleChanged(userId: String, userRole: TUIRole) {
-        let isSelfRoleChanged = userId == currentUser.userId
+        let isSelfRoleChanged = userId == currentUserId
         let isRoomOwnerChanged = userRole == .roomOwner
-        if isSelfRoleChanged {
-            currentUser.userRole = userRole
-        }
         if isRoomOwnerChanged {
             roomInfo.owner = userId
         }
-        rootView?.attendeeCollectionView.reloadData()
+        if isSelfRoleChanged, let seatItem = getSeatItem(userId) {
+            seatItem.userRole = userRole
+        }
+        reloadSeatItems()
     }
 }
