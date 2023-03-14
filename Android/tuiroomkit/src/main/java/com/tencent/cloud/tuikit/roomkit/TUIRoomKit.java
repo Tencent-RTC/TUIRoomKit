@@ -17,6 +17,8 @@ public abstract class TUIRoomKit {
 
     public abstract void login(int sdkAppId, String userId, String userSig);
 
+    public abstract void logout();
+
     public abstract void setSelfInfo(String userName, String avatarURL);
 
     public abstract void enterPrepareView(boolean enablePreview);

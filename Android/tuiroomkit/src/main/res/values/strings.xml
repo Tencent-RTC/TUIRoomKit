@@ -9,10 +9,12 @@
     <string name="tuiroomkit_tips_start_audio">Please turn on the microphone permission first</string>
     <string name="tuiroomkit_toast_end_room">Conference ended by initiator</string>
     <string name="tuiroomkit_kicked_by_master">You were removed by the room owner.</string>
-    <string name="tuiroomkit_toast_mute_all_audio">Mute All</string>
-    <string name="tuiroomkit_toast_not_mute_all_audio">UnMute All</string>
-    <string name="tuiroomkit_toast_mute_all_video">Stop Videos</string>
-    <string name="tuiroomkit_toast_not_mute_all_video">Start Videos</string>
+    <string name="tuiroomkit_mute_all_audio">Mute All</string>
+    <string name="tuiroomkit_not_mute_all_audio">UnMute All</string>
+    <string name="tuiroomkit_toast_not_mute_all_audio">The master turns off muted microphone for all members, and the audience can turn on the microphone by themselves</string>
+    <string name="tuiroomkit_mute_all_video">Stop Videos</string>
+    <string name="tuiroomkit_not_mute_all_video">Start Videos</string>
+    <string name="tuiroomkit_toast_not_mute_all_video">The master turns off muted camera for all members, and the audience can turn on the camera by themselves</string>
     <string name="tuiroomkit_kick_user_confirm">Are you sure you want to remove \"%s\"?</string>
     <string name="tuiroomkit_dialog_ok">OK</string>
     <string name="tuiroomkit_dialog_cancel">Cancel</string>

@@ -1,10 +1,13 @@
 ## 发布日志
 
 ### Version 1.0.4 @ 2023.03.10
-- Android: 集成TUIChat聊天功能
+- iOS&Android: 新增 `logout` 接口
+- Android: 集成 `TUIChat` 聊天功能
 - Android: 修复部分机型上文字显示异常的问题
 - Android: 修复特定情况房主转让后视频麦位房主图标显示异常的问题
 - Android: 优化部分操作后的 `Toast` 提示
+- iOS： 修复房主在成员列表页面对于成员的管理bug
+- iOS： 修复上麦后退房，重新进入房间麦克风和摄像头的bug
 
 ### Version 1.0.3 @ 2023.03.06
 - iOS&Android: 修改 `enterRoom` 回调,删除 `RoomScene` 参数
