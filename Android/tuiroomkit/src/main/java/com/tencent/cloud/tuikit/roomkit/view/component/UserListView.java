@@ -10,7 +10,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -20,8 +19,6 @@ import com.tencent.cloud.tuikit.roomkit.viewmodel.UserListViewModel;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
-
-import java.util.List;
 
 public class UserListView extends ConstraintLayout implements
         View.OnClickListener {
@@ -129,20 +126,20 @@ public class UserListView extends ConstraintLayout implements
 
     public void updateMuteAudioView(boolean isMute) {
         if (isMute) {
-            mMuteAudioAllBtn.setText(R.string.tuiroomkit_toast_not_mute_all_audio);
+            mMuteAudioAllBtn.setText(R.string.tuiroomkit_not_mute_all_audio);
             mMuteAudioAllBtn.setTextColor(getResources().getColor(R.color.tuiroomkit_color_text_red));
         } else {
-            mMuteAudioAllBtn.setText(R.string.tuiroomkit_toast_mute_all_audio);
+            mMuteAudioAllBtn.setText(R.string.tuiroomkit_mute_all_audio);
             mMuteAudioAllBtn.setTextColor(getResources().getColor(R.color.tuiroomkit_color_text_light_grey));
         }
     }
 
     public void updateMuteVideoView(boolean isMute) {
         if (isMute) {
-            mMuteVideoAllBtn.setText(R.string.tuiroomkit_toast_not_mute_all_video);
+            mMuteVideoAllBtn.setText(R.string.tuiroomkit_not_mute_all_video);
             mMuteVideoAllBtn.setTextColor(getResources().getColor(R.color.tuiroomkit_color_text_red));
         } else {
-            mMuteVideoAllBtn.setText(R.string.tuiroomkit_toast_mute_all_video);
+            mMuteVideoAllBtn.setText(R.string.tuiroomkit_mute_all_video);
             mMuteVideoAllBtn.setTextColor(getResources().getColor(R.color.tuiroomkit_color_text_light_grey));
         }
     }

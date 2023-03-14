@@ -84,6 +84,26 @@ public class RoomEngineManager {
         });
     }
 
+    public void logout() {
+        mRoomEngine.removeObserver(mObserver);
+        mRoomEngine.destroyInstance();
+        mRoomStore = null;
+        sInstance = null;
+        TUIRoomEngine.logout(new TUIRoomDefine.ActionCallback() {
+            @Override
+            public void onSuccess() {
+                Log.i(TAG, "logout success");
+            }
+
+            @Override
+            public void onError(TUICommonDefine.Error error, String message) {
+                Log.e(TAG, "logout onError code : " + error + " message:" + message);
+            }
+        });
+
+
+    }
+
     public void setSelfInfo(String userName, String avatarURL) {
         Log.i(TAG, "setSelfInfo userName: " + userName + ",avatarURL: " + avatarURL);
         mRoomStore.userModel.userName = TextUtils.isEmpty(userName) ? "" : userName;

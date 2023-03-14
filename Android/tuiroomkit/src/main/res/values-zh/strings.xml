@@ -9,9 +9,11 @@
     <string name="tuiroomkit_tips_start_audio">请先打开麦克风权限</string>
     <string name="tuiroomkit_toast_end_room">创建者已结束房间</string>
     <string name="tuiroomkit_kicked_by_master">你已经被主持人移除</string>
-    <string name="tuiroomkit_toast_mute_all_audio">全体静音</string>
+    <string name="tuiroomkit_mute_all_audio">全体静音</string>
+    <string name="tuiroomkit_not_mute_all_audio">解除全体静音</string>
     <string name="tuiroomkit_toast_not_mute_all_audio">主持人关闭全员静音，观众可自行开启麦克风</string>
-    <string name="tuiroomkit_toast_mute_all_video">全体禁画</string>
+    <string name="tuiroomkit_mute_all_video">全体禁画</string>
+    <string name="tuiroomkit_not_mute_all_video">解除全体禁画</string>
     <string name="tuiroomkit_toast_not_mute_all_video">主持人关闭全员禁画，观众可自行开启摄像头</string>
     <string name="tuiroomkit_kick_user_confirm">你确定要移除%s吗？</string>
     <string name="tuiroomkit_dialog_ok">确定</string>

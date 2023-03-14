@@ -48,6 +48,13 @@ public class TUIRoomKitImpl extends TUIRoomKit implements RoomEngineManager.List
     }
 
     @Override
+    public void logout() {
+        mListenerList.clear();
+        sInstance = null;
+        RoomEngineManager.sharedInstance(mContext).logout();
+    }
+
+    @Override
     public void setSelfInfo(String userName, String avatarURL) {
         RoomEngineManager.sharedInstance(mContext).setSelfInfo(userName, avatarURL);
     }

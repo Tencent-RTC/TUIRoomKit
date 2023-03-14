@@ -458,11 +458,11 @@ public class UserListViewModel implements RoomEventCenter.RoomEngineEventRespond
         }
 
         boolean isVideoEnableChange = (boolean) params.get(RoomEventConstant.KEY_ENABLE_VIDEO);
-        if (isVideoEnableChange) {
+        if (isVideoEnableChange && !isOwner()) {
             mUserListView.disableMuteAllVideo(!roomInfo.enableVideo);
         }
         boolean isAudioEnableChange = (boolean) params.get(RoomEventConstant.KEY_ENABLE_AUDIO);
-        if (isAudioEnableChange) {
+        if (isAudioEnableChange && !isOwner()) {
             mUserListView.disableMuteAllAudio(!roomInfo.enableAudio);
         }
     }
