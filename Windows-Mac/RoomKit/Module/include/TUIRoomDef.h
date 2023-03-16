@@ -223,7 +223,7 @@ enum class RequestCallbackType {
     kRequestError = 3,
     kRequestCancelled = 4,
 };
-using RoomEngineRequestCallback = std::function<void(RequestCallbackType type, tuikit::TUIError code, uint32_t request_id,
+using RoomEngineRequestCallback = std::function<void(RequestCallbackType type, tuikit::TUIError code, const std::string& request_id,
     const std::string& user_id,
     const std::string& message)>;
 
@@ -446,24 +446,24 @@ public:
         callback_ = callback;
     }
 
-    void onAccepted(uint32_t requestId, const char* userId) override {
+    void onAccepted(const char* requestId, const char* userId) override {
         callback_(RequestCallbackType::kRequestAccepted, tuikit::TUIError::ERR_SUCC, requestId, TOSTRING(userId), "");
     }
-    void onRejected(uint32_t requestId,
+    void onRejected(const char* requestId,
         const char* userId,
         const char* message) override {
         callback_(RequestCallbackType::kRequestRejected, tuikit::TUIError::ERR_SUCC, requestId, TOSTRING(userId), TOSTRING(message));
     }
-    void onTimeout(uint32_t requestId, const char* userId) override {
+    void onTimeout(const char* requestId, const char* userId) override {
         callback_(RequestCallbackType::kRequestTimeout, tuikit::TUIError::ERR_SUCC, requestId, TOSTRING(userId), "");
     }
-    void onError(uint32_t requestId,
+    void onError(const char* requestId,
         const char* userId,
         const tuikit::TUIError code,
         const char* message) override {
         callback_(RequestCallbackType::kRequestError, tuikit::TUIError::ERR_FAILED, requestId, TOSTRING(userId), TOSTRING(message));
     }
-    void onCancelled(uint32_t requestId, const char* userId) override {
+    void onCancelled(const char* requestId, const char* userId) override {
       callback_(RequestCallbackType::kRequestCancelled,
                 tuikit::TUIError::ERR_SUCC, requestId, TOSTRING(userId), "");
     }

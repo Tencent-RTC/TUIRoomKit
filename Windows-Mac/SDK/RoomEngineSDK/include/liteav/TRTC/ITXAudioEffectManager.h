@@ -1,6 +1,6 @@
 ﻿/**
  * Copyright (c) 2021 Tencent. All rights reserved.
- * Module:   TRTC 背景音乐、短音效和人声特效的管理类
+ * Module:   背景音乐、短音效和人声特效的管理类
  * Function: 用于对背景音乐、短音效和人声特效进行设置的管理类
  */
 #ifndef __ITXAUDIOEFFECTMANAGER_H__
@@ -285,9 +285,6 @@ class ITXAudioEffectManager {
      *
      * 每个音乐都需要您指定具体的 ID，您可以通过该 ID 对音乐的开始、停止、音量等进行设置。
      * @param musicParam 音乐参数。
-     * @param startBlock 播放开始回调。
-     * @param progressBlock 播放进度回调。
-     * @param completeBlock 播放结束回调。
      * @note
      * 1. 如果要多次播放同一首背景音乐，请不要每次播放都分配一个新的 ID，我们推荐使用相同的 ID。
      * 2. 若您希望同时播放多首不同的音乐，请为不同的音乐分配不同的 ID 进行播放。

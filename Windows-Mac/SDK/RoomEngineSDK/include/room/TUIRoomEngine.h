@@ -144,7 +144,7 @@ class TUIRoomEngine {
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
      * @return 请求ID
      */
-    virtual uint32_t connectOtherRoom(const char* roomId, const char* userId, int timeout, TUIRequestCallback* callback) = 0;
+    virtual const char* connectOtherRoom(const char* roomId, const char* userId, int timeout, TUIRequestCallback* callback) = 0;
 
     /**
      * 2.6 断开与其他房间的连接
@@ -341,7 +341,7 @@ class TUIRoomEngine {
      * @param callback 调用接口的回调，用于通知请求状态的回调，详细定义参考: {@link TUIRoomDefine.TUIRequestCallback}
      * @return 请求ID
      */
-    virtual uint32_t requestToOpenRemoteCamera(const char* userId, int timeout, TUIRequestCallback* callback) = 0;
+    virtual const char* requestToOpenRemoteCamera(const char* userId, int timeout, TUIRequestCallback* callback) = 0;
 
     /**
      * 5.5  关闭远端用户摄像头
@@ -360,7 +360,7 @@ class TUIRoomEngine {
      * @param callback 调用接口的回调，用于通知请求状态的回调，详细定义参考: {@link TUIRoomDefine.TUIRequestCallback}
      * @return 请求ID
      */
-    virtual uint32_t requestToOpenRemoteMicrophone(const char* userId, int timeout, TUIRequestCallback* callback) = 0;
+    virtual const char* requestToOpenRemoteMicrophone(const char* userId, int timeout, TUIRequestCallback* callback) = 0;
 
     /**
      * 5.7  关闭远端用户麦克风
@@ -457,7 +457,7 @@ class TUIRoomEngine {
      * @param callback 调用接口的回调，用于通知请求的回调状态，详细定义参考: {@link TUIRoomDefine.TUIRequestCallback}
      * @return 请求ID
      */
-    virtual uint32_t takeSeat(int seatIndex, int timeout, TUIRequestCallback* callback) = 0;
+    virtual const char* takeSeat(int seatIndex, int timeout, TUIRequestCallback* callback) = 0;
 
     /**
      * 6.6  本地下麦
@@ -475,7 +475,7 @@ class TUIRoomEngine {
      * @param callback 调用接口的回调，用于通知请求的回调状态，详细定义参考: {@link TUIRoomDefine.TUIRequestCallback}
      * @return 请求ID
      */
-    virtual uint32_t requestRemoteUserOnSeat(int seatIndex, const char* userId, int timeout, TUIRequestCallback* callback) = 0;
+    virtual const char* requestRemoteUserOnSeat(int seatIndex, const char* userId, int timeout, TUIRequestCallback* callback) = 0;
 
     /**
      * 6.8  主持人/管理员 将用户下麦
@@ -499,7 +499,7 @@ class TUIRoomEngine {
      * @param requestId 请求ID(发送请求的接口返回或者OnRequestReceived事件通知)
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
      */
-    virtual void cancelRequest(uint32_t requestId, TUICallback* callback) = 0;
+    virtual void cancelRequest(const char* requestId, TUICallback* callback) = 0;
 
     /**
      * 7.2  回复请求
@@ -509,7 +509,7 @@ class TUIRoomEngine {
      * @param agree 是否同意 {@link true}: 同意请求, {@link false}: 拒绝请求
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
      */
-    virtual void responseRemoteRequest(uint32_t requestId, bool agree, TUICallback* callback) = 0;
+    virtual void responseRemoteRequest(const char* requestId, bool agree, TUICallback* callback) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //

@@ -2,10 +2,10 @@
  * Copyright (c) 2021 Tencent. All rights reserved.
  * Module:   V2TXLivePlayer @ TXLiteAVSDK
  * Function: 腾讯云直播播放器
- * **功能**
+ * <H2>功能
  * 腾讯云直播播放器。
  * 主要负责从指定的直播流地址拉取音视频数据，并进行解码和本地渲染播放。
- * **介绍**
+ * <H2>介绍
  * 播放器包含如下能力：
  * - 支持 RTMP、HTTP-FLV、HLS、TRTC、WebRTC 协议。
  * - 屏幕截图，可以截取当前直播流的视频画面。
@@ -265,7 +265,8 @@ class V2TXLivePlayer {
     virtual int32_t setProperty(const char* key, const void* value) = 0;
 
    protected:
-    virtual ~V2TXLivePlayer(){};
+    virtual ~V2TXLivePlayer() {
+    }
 };
 
 }  // namespace liteav

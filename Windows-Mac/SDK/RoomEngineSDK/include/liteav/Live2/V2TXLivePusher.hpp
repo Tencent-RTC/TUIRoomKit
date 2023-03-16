@@ -2,9 +2,9 @@
  * Copyright (c) 2021 Tencent. All rights reserved.
  * Module:   V2TXLivePusher @ TXLiteAVSDK
  * Function: 腾讯云直播推流器
- * **功能**
+ * <H2>功能
  * 腾讯云直播推流器
- * **介绍**
+ * <H2>介绍
  * 主要负责将本地的音频和视频画面进行编码，并推送到指定的推流地址，支持任意的推流服务端。
  * 推流器包含如下能力：
  * - 自定义的视频采集，让您可以根据项目需要定制自己的音视频数据源。
@@ -277,18 +277,19 @@ class V2TXLivePusher {
     virtual int32_t setVideoQuality(const V2TXLiveVideoEncoderParam& param) = 0;
 
     /**
-     * 获取音效管理对象 {@link TXAudioEffectManager}
+     * 获取音效管理对象
      *
      * 通过音效管理，您可以使用以下功能：
      * - 调整麦克风收集的人声音量。
      * - 设置混响和变声效果。
      * - 开启耳返，设置耳返音量。
      * - 添加背景音乐，调整背景音乐的播放效果。
+     * 参考  {@link TXAudioEffectManager}
      */
     virtual ITXAudioEffectManager* getAudioEffectManager() = 0;
 
     /**
-     * 获取设备管理对象 {@link TXDeviceManager}
+     * 获取设备管理对象
      *
      * 通过设备管理，您可以使用以下功能：
      * - 切换前后摄像头。
@@ -297,6 +298,7 @@ class V2TXLivePusher {
      * - 打开或关闭闪光灯。
      * - 切换耳机或者扬声器。
      * - 修改音量类型(媒体音量或者通话音量)。
+     * 参考  {@link TXDeviceManager}
      */
     virtual ITXDeviceManager* getDeviceManager() = 0;
 
@@ -528,7 +530,8 @@ class V2TXLivePusher {
     virtual int32_t setProperty(const char* key, const void* value) = 0;
 
    protected:
-    virtual ~V2TXLivePusher(){};
+    virtual ~V2TXLivePusher() {
+    }
 };
 
 }  // namespace liteav

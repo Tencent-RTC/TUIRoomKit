@@ -134,16 +134,19 @@ void MessageDispatcher::OnMemberReplyCallingRoll(const std::string& user_id) {
     emit SignalOnMemberReplyCallingRoll(QString::fromStdString(user_id));
 }
 
-void MessageDispatcher::OnChatRoomMuted(uint32_t request_id, bool mute, TUIMutedReason reason) {
-	emit SignalOnChatRoomMuted(request_id, mute, reason);
+void MessageDispatcher::OnChatRoomMuted(const std::string& request_id, bool mute, TUIMutedReason reason) {
+  emit SignalOnChatRoomMuted(QString::fromStdString(request_id), mute, reason);
 }
 
-void MessageDispatcher::OnMicrophoneMuted(uint32_t request_id, bool mute, TUIMutedReason reason) {
-	emit SignalOnMicrophoneMuted(request_id, mute, reason);
+void MessageDispatcher::OnMicrophoneMuted(const std::string& request_id,
+                                          bool mute, TUIMutedReason reason) {
+  emit SignalOnMicrophoneMuted(QString::fromStdString(request_id), mute,
+                               reason);
 }
 
-void MessageDispatcher::OnCameraMuted(uint32_t request_id, bool mute, TUIMutedReason reason) {
-	emit SignalOnCameraMuted(request_id, mute, reason);
+void MessageDispatcher::OnCameraMuted(const std::string& request_id, bool mute,
+                                      TUIMutedReason reason) {
+  emit SignalOnCameraMuted(QString::fromStdString(request_id), mute, reason);
 }
 
 void MessageDispatcher::OnStatistics(const liteav::TRTCStatistics& statis) {

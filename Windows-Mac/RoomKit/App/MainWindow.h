@@ -58,8 +58,10 @@ private slots :
     void SlotShowChatRoom(bool);
     void SlotOnError(int code, const QString& message);
     void SlotOnExitRoom(TUIExitRoomType code, const QString& message);
-    void SlotOnCameraMuted(uint32_t request_id, bool mute, TUIMutedReason reason);
-    void SlotOnMicrophoneMuted(uint32_t request_id, bool mute, TUIMutedReason reason);
+    void SlotOnCameraMuted(const QString& request_id, bool mute,
+                           TUIMutedReason reason);
+    void SlotOnMicrophoneMuted(const QString& request_id, bool mute,
+                               TUIMutedReason reason);
 
     void SlotEndDetection();
     void SlotOnCreateRoom(int code, const QString& message);

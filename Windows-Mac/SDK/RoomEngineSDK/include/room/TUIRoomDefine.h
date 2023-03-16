@@ -317,7 +317,7 @@ struct TUIUserVoiceVolume {
  */
 struct TUIRequest {
     ///请求ID
-    uint32_t requestId;
+    const char* requestId;
 
     ///请求类型
     TUIRequestAction requestAction;
@@ -331,7 +331,7 @@ struct TUIRequest {
     ///时间戳
     uint32_t timestamp;
 
-    TUIRequest() : requestId(0), requestAction(TUIRequestAction::kInvalidAction), userId(nullptr), content(nullptr), timestamp(0) {
+    TUIRequest() : requestId(nullptr), requestAction(TUIRequestAction::kInvalidAction), userId(nullptr), content(nullptr), timestamp(0) {
     }
 };
 
@@ -509,7 +509,7 @@ class TUIRequestCallback : public TUICallbackBase {
      * @param userId  用户ID
      * @param message  错误信息
      */
-    virtual void onAccepted(uint32_t requestId, const char* userId) = 0;
+    virtual void onAccepted(const char* requestId, const char* userId) = 0;
 
     /**
      * 请求被拒绝
@@ -518,7 +518,7 @@ class TUIRequestCallback : public TUICallbackBase {
      * @param userId  用户ID
      * @param message  错误信息
      */
-    virtual void onRejected(uint32_t requestId, const char* userId, const char* message) = 0;
+    virtual void onRejected(const char* requestId, const char* userId, const char* message) = 0;
 
     /**
      * 请求被取消
@@ -526,7 +526,7 @@ class TUIRequestCallback : public TUICallbackBase {
      * @param requestId  请求ID
      * @param userId  用户ID
      */
-    virtual void onCancelled(uint32_t requestId, const char* userId) = 0;
+    virtual void onCancelled(const char* requestId, const char* userId) = 0;
 
     /**
      * 请求超时
@@ -534,7 +534,7 @@ class TUIRequestCallback : public TUICallbackBase {
      * @param requestId  请求ID
      * @param userId  用户ID
      */
-    virtual void onTimeout(uint32_t requestId, const char* userId) = 0;
+    virtual void onTimeout(const char* requestId, const char* userId) = 0;
 
     /**
      * 请求错误。
@@ -544,7 +544,7 @@ class TUIRequestCallback : public TUICallbackBase {
      * @param code 错误码
      * @param message  错误信息
      */
-    virtual void onError(uint32_t requestId, const char* userId, const TUIError code, const char* message) = 0;
+    virtual void onError(const char* requestId, const char* userId, const TUIError code, const char* message) = 0;
 };
 
 }  // namespace tuikit

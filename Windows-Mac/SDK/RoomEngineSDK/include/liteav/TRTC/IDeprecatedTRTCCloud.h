@@ -1,4 +1,8 @@
-﻿/// Copyright (c) 2022 Tencent. All rights reserved.
+﻿/**
+ * Copyright (c) 2022 Tencent. All rights reserved.
+ * Module:   DeprecatedTRTCCloud @ TXLiteAVSDK
+ * Function: TRTC 废弃接口
+ */
 #ifndef __IDEPRECATEDTRTCCLOUD_H__
 #define __IDEPRECATEDTRTCCLOUD_H__
 

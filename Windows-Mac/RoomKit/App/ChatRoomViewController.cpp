@@ -157,7 +157,8 @@ void ChatRoomViewController::SlotOnRoomMasterChanged(const QString& user_id) {
     }
 }
 
-void ChatRoomViewController::SlotOnChatMute(uint32_t request_id, bool mute, TUIMutedReason reason) {
+void ChatRoomViewController::SlotOnChatMute(const QString& request_id,
+                                            bool mute, TUIMutedReason reason) {
     if (user_info_.role == TUIRole::kMaster) {
         return;
     }

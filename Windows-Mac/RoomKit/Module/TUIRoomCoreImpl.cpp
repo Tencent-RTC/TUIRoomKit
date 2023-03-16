@@ -210,7 +210,8 @@ void TUIRoomCoreImpl::TakeSeat(SuccessCallback success_callback,
   if (room_engine_ != nullptr) {
     TUIRoomEngineRequestCallback* callback = new TUIRoomEngineRequestCallback;
     callback->SetCallback([=](RequestCallbackType type, tuikit::TUIError code,
-                              uint32_t request_id, const std::string& user_id,
+                              const std::string& request_id,
+                              const std::string& user_id,
                               const std::string& message) {
       LINFO("room engine TakeSeat callback.");
       switch (type) {
@@ -763,7 +764,7 @@ int TUIRoomCoreImpl::MuteUserMicrophone(const std::string& user_id, bool mute, C
               new TUIRoomEngineRequestCallback;
           request_callback->SetCallback(
               [=](RequestCallbackType type, tuikit::TUIError code,
-                  uint32_t request_id, const std::string& user_id,
+                  const std::string& request_id, const std::string& user_id,
                   const std::string& message) {
                 LINFO("room engine MuteUserMicrophone callback.");
                 if (callback != nullptr) {
@@ -841,7 +842,7 @@ int TUIRoomCoreImpl::MuteUserCamera(const std::string& user_id, bool mute, Callb
               new TUIRoomEngineRequestCallback;
           request_callback->SetCallback(
               [=](RequestCallbackType type, tuikit::TUIError code,
-                  uint32_t request_id, const std::string& user_id,
+                  const std::string& request_id, const std::string& user_id,
                   const std::string& message) {
                 LINFO("room engine MuteUserMicrophone callback.");
                 if (callback != nullptr) {
@@ -985,7 +986,8 @@ int TUIRoomCoreImpl::CancelSpeechInvitation(const std::string& user_id, Callback
     return 0;
 }
 
-int TUIRoomCoreImpl::ReplySpeechInvitation(uint32_t request_id, bool agree, Callback callback) {
+int TUIRoomCoreImpl::ReplySpeechInvitation(const std::string& request_id,
+                                           bool agree, Callback callback) {
     LINFO("User ReplySpeechInvitation agree : %d", agree);
     auto iter = std::find(received_request_ids_.begin(), received_request_ids_.end(), request_id);
     if (iter != received_request_ids_.end()) {
@@ -997,7 +999,7 @@ int TUIRoomCoreImpl::ReplySpeechInvitation(uint32_t request_id, bool agree, Call
                 [=](const tuikit::TUIError code, const std::string& message) {
                     delete request_callback;
                 });
-            room_engine_->responseRemoteRequest(request_id, agree, request_callback);
+            room_engine_->responseRemoteRequest(request_id.c_str(), agree, request_callback);
         }
         if (agree && callback) {
             callback(RequestCallbackType::kRequestAccepted, "");
@@ -1350,19 +1352,19 @@ void TUIRoomCoreImpl::onRoomInfoChanged(const char* room_id,
         if (!room_info.enableVideo != room_info_.is_all_camera_muted) {
           room_info_.is_all_camera_muted = !room_info.enableVideo;
           room_core_callback_->OnCameraMuted(
-              0, room_info_.is_all_camera_muted,
+              "", room_info_.is_all_camera_muted,
               TUIMutedReason::kAdminMuteAllUsers);
         }
         if (!room_info.enableAudio != room_info_.is_all_microphone_muted) {
           room_info_.is_all_microphone_muted = !room_info.enableAudio;
           room_core_callback_->OnMicrophoneMuted(
-              0, room_info_.is_all_microphone_muted,
+              "", room_info_.is_all_microphone_muted,
               TUIMutedReason::kAdminMuteAllUsers);
         }
         if (!room_info.enableMessage != room_info_.is_chat_room_muted) {
           room_info_.is_chat_room_muted = !room_info.enableMessage;
           room_core_callback_->OnChatRoomMuted(
-              0, room_info_.is_chat_room_muted,
+              "", room_info_.is_chat_room_muted,
               TUIMutedReason::kAdminMuteAllUsers);
         }
       }
@@ -1442,7 +1444,7 @@ void TUIRoomCoreImpl::onUserVideoStateChanged(
   std::string str_user_id = TOSTRING(user_id);
   if (user_id == local_user_info_.user_id || str_user_id.empty()) {
     if (room_core_callback_ && has_video == false && reason == tuikit::TUIChangeReason::kChangedByAdmin) {
-      room_core_callback_->OnCameraMuted(0, true,
+      room_core_callback_->OnCameraMuted("", true,
                                          TUIMutedReason::kMutedByAdmin);
     }
       return;
@@ -1505,7 +1507,7 @@ void TUIRoomCoreImpl::onUserAudioStateChanged(
   if (str_user_id == local_user_info_.user_id || str_user_id.empty()) {
     if (room_core_callback_ && has_audio == false &&
         reason == tuikit::TUIChangeReason::kChangedByAdmin) {
-      room_core_callback_->OnMicrophoneMuted(0, true,
+      room_core_callback_->OnMicrophoneMuted("", true,
                                              TUIMutedReason::kMutedByAdmin);
     }
       return;
@@ -1659,24 +1661,24 @@ void TUIRoomCoreImpl::onKickedOffSeat(const char* userId) {
 }
 
 void TUIRoomCoreImpl::onRequestReceived(const tuikit::TUIRequest* request) {
-    /*
-    * request.user_id: xxx(信令发送者)
-    * request.content:
-    {
-        "businessID" : "",
-        "data" : {
-            "cmd" : "enableUserCamera",
-            "enable" : true,
-            "receiverId" : "jovenxue（信令接收者）",
-            "roomId" : "123321"
-        },
-        "extraInfo" : "",
-        "platform" : "windows",
-        "version" : 1
-    }
-    */
+  /*
+  * request.user_id: xxx(信令发送者)
+  * request.content:
+  {
+      "businessID" : "",
+      "data" : {
+          "cmd" : "enableUserCamera",
+          "enable" : true,
+          "receiverId" : "jovenxue（信令接收者）",
+          "roomId" : "123321"
+      },
+      "extraInfo" : "",
+      "platform" : "windows",
+      "version" : 1
+  }
+  */
   if (request == nullptr) {
-      LINFO("onRequestReceived request is nullptr");
+    LINFO("onRequestReceived request is nullptr");
     return;
   }
   std::stringstream log_stream;
@@ -1687,42 +1689,48 @@ void TUIRoomCoreImpl::onRequestReceived(const tuikit::TUIRequest* request) {
              << "] [content:" << TOSTRING(request->content) << "]";
   LINFO(log_stream.str().c_str());
 
-    bool enable = true;
-    std::string cmd;
-    if (request->content != nullptr) {
-        Json::Reader reader;
-        Json::Value root;
-        if (!reader.parse(request->content, root)) {
-            LINFO("room engine onRequestReceived parser content failed.");
-            return;
-        }
-
-        if (root.isMember("data")) {
-            Json::Value data = root["data"];
-            if (data.isMember("enable")) {
-                enable = data["enable"].asBool();
-            }
-            if (data.isMember("cmd")) {
-                cmd = data["cmd"].asString();
-            }
-        }
-
-        if (room_core_callback_ != nullptr) {
-            if (request->requestAction ==
-                tuikit::TUIRequestAction::kRequestToOpenRemoteCamera) {
-                received_request_ids_.push_back(request->requestId);
-                room_core_callback_->OnCameraMuted(request->requestId, false, TUIMutedReason::kMutedByAdmin);
-            } else if (request->requestAction ==
-                tuikit::TUIRequestAction::kRequestToOpenRemoteMicrophone) {
-                received_request_ids_.push_back(request->requestId);
-                room_core_callback_->OnMicrophoneMuted(request->requestId, false, TUIMutedReason::kMutedByAdmin);
-            }
-        }
+  bool enable = true;
+  std::string cmd;
+  if (request->content != nullptr) {
+    Json::Reader reader;
+    Json::Value root;
+    if (!reader.parse(request->content, root)) {
+      LINFO("room engine onRequestReceived parser content failed.");
+      return;
     }
+
+    if (root.isMember("data")) {
+      Json::Value data = root["data"];
+      if (data.isMember("enable")) {
+        enable = data["enable"].asBool();
+      }
+      if (data.isMember("cmd")) {
+        cmd = data["cmd"].asString();
+      }
+    }
+
+    auto request_id = TOSTRING(request->requestId);
+
+    if (room_core_callback_ != nullptr) {
+      if (request->requestAction ==
+          tuikit::TUIRequestAction::kRequestToOpenRemoteCamera) {
+        received_request_ids_.push_back(request_id);
+        room_core_callback_->OnCameraMuted(request_id, false,
+                                           TUIMutedReason::kMutedByAdmin);
+      } else if (request->requestAction ==
+                 tuikit::TUIRequestAction::kRequestToOpenRemoteMicrophone) {
+        received_request_ids_.push_back(request_id);
+        room_core_callback_->OnMicrophoneMuted(request_id, false,
+                                               TUIMutedReason::kMutedByAdmin);
+      }
+    }
+  }
 }
-void TUIRoomCoreImpl::onRequestCancelled(uint32_t request_id, const char* user_id) {
-  LINFO("onRequestCancelled, request_id:%d", request_id);
-    auto iter = std::find(received_request_ids_.begin(), received_request_ids_.end(), request_id);
+void TUIRoomCoreImpl::onRequestCancelled(const char* request_id,
+                                         const char* user_id) {
+  LINFO("onRequestCancelled, request_id:%s", request_id);
+  auto iter = std::find(received_request_ids_.begin(),
+                        received_request_ids_.end(), TOSTRING(request_id));
     if (iter != received_request_ids_.end()) {
         received_request_ids_.erase(iter);
     }

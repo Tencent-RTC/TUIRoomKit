@@ -668,7 +668,8 @@ void MainWindow::SlotOnExitRoom(TUIExitRoomType code, const QString& message) {
     close();
 }
 
-void MainWindow::SlotOnCameraMuted(uint32_t request_id, bool mute, TUIMutedReason reason) {
+void MainWindow::SlotOnCameraMuted(const QString& request_id, bool mute,
+                                   TUIMutedReason reason) {
     if (mute) {
         if (reason == TUIMutedReason::kAdminMuteAllUsers) {
             TXMessageBox::Instance().AddLineTextMessage( tr("Admin set all users camera muted."));
@@ -689,15 +690,16 @@ void MainWindow::SlotOnCameraMuted(uint32_t request_id, bool mute, TUIMutedReaso
             }
         };
         connect(&TXMessageBox::DialogInstance(), &TXMessageBox::SignalOk, this, [=]() {
-            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id, true, callback);
+            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id.toStdString(), true, callback);
         });
         connect(&TXMessageBox::DialogInstance(), &TXMessageBox::SignalCancel, this, [=]() {
-            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id, false, callback);
+            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id.toStdString(), false, callback);
         });
     }
 }
 
-void MainWindow::SlotOnMicrophoneMuted(uint32_t request_id, bool mute, TUIMutedReason reason) {
+void MainWindow::SlotOnMicrophoneMuted(const QString& request_id,
+                                       bool mute, TUIMutedReason reason) {
     if (mute) {
         if (reason == TUIMutedReason::kAdminMuteAllUsers) {
             TXMessageBox::Instance().AddLineTextMessage(tr("Admin set all users microphone muted."));
@@ -718,10 +720,10 @@ void MainWindow::SlotOnMicrophoneMuted(uint32_t request_id, bool mute, TUIMutedR
             }
         };
         connect(&TXMessageBox::DialogInstance(), &TXMessageBox::SignalOk, this, [=]() {
-            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id, true, callback);
+            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id.toStdString(), true, callback);
             });
         connect(&TXMessageBox::DialogInstance(), &TXMessageBox::SignalCancel, this, [=]() {
-            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id, false, callback);
+            TUIRoomCore::GetInstance()->ReplySpeechInvitation(request_id.toStdString(), false, callback);
             });
         
         //TXMessageBox::Instance().AddLineTextMessage(tr("Admin requests to turn on your microphone."));

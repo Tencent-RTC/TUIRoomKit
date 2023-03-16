@@ -1539,7 +1539,13 @@ struct TRTCScreenCaptureSourceInfo {
     ///【字段含义】是否为主显示屏（适用于多显示器的情况）。
     bool isMainScreen;
 
-    TRTCScreenCaptureSourceInfo() : type(TRTCScreenCaptureSourceTypeUnknown), sourceId(nullptr), sourceName(nullptr), isMinimizeWindow(false), isMainScreen(false) {
+    ///【字段含义】屏幕/窗口宽，单位:像素点。
+    uint32_t width;
+
+    ///【字段含义】屏幕/窗口高，单位:像素点。
+    uint32_t height;
+
+    TRTCScreenCaptureSourceInfo() : type(TRTCScreenCaptureSourceTypeUnknown), sourceId(nullptr), sourceName(nullptr), isMinimizeWindow(false), isMainScreen(false), width(0), height(0) {
     }
 };
 
