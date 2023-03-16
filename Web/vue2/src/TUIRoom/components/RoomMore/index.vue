@@ -28,7 +28,7 @@ import SvgIcon from '../common/SvgIcon.vue';
 const { t } = useI18n();
 
 const groupNumber = '592465424';
-const email = 'tylerding@tencent.com';
+const email = 'matthewwu@tencent.com';
 
 function onCopy(value: string | number) {
   navigator.clipboard.writeText(`${value}`);

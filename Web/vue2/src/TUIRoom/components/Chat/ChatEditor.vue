@@ -112,7 +112,7 @@ const handleChooseEmoji = (emojiName: string) => {
       border: none;
       box-sizing: border-box;
       padding: 12px 14px;
-      caret-color: #ffffff;
+      caret-color: var(--caret-color);
       resize: none;
       &:focus-visible {
         outline: none;

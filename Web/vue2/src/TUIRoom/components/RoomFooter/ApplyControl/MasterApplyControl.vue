@@ -211,10 +211,12 @@ onBeforeUnmount(() => {
     }
     .primary {
       background-image: linear-gradient(235deg, #1883FF 0%, #0062F5 100%);
+      color: var(--apply-container-primary);
     }
     .outline {
       background: rgba(173,182,204,0.10);
       border: 1px solid #ADB6CC;
+      color: var(--apply-container-outline);
     }
   }
 }

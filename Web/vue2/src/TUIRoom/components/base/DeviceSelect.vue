@@ -18,6 +18,7 @@
     class="select custom-element-class"
     :disabled="disabled"
     :teleported="false"
+    :popper-append-to-body="false"
     @change="handleChange"
   >
     <el-option

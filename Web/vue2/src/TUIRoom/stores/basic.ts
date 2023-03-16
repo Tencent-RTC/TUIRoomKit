@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { SpeechMode } from '../constants/room';
 import { getLanguage } from '../utils/common';
 import { LAYOUT } from '../constants/render';
+import { isUndefined } from '../utils/utils';
 
 type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | '';
 
@@ -27,6 +28,7 @@ interface BasicState {
   lang: string,
   defaultTheme: string,
   isSupportSwitchTheme: boolean,
+  showHeaderTool: boolean,
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -64,6 +66,7 @@ export const useBasicStore = defineStore('basic', {
     lang: getLanguage(),
     defaultTheme: 'black',
     isSupportSwitchTheme: true,
+    showHeaderTool: true,
   }),
   getters: {
     // localVideoBitrate: (state) => {
@@ -133,19 +136,23 @@ export const useBasicStore = defineStore('basic', {
     setIsSupportSwitchTheme(isSupportSwitchTheme: boolean) {
       this.isSupportSwitchTheme = isSupportSwitchTheme;
     },
+    setShowHeaderTool(showHeaderTool: boolean) {
+      this.showHeaderTool = showHeaderTool;
+    },
     setBasicInfo(infoObj: any) {
       if (!infoObj) {
         return;
       }
-      const { sdkAppId, userId, userSig, userName, avatarUrl, roomId, defaultTheme = 'black', isSupportSwitchTheme = false } = infoObj;
+      const { sdkAppId, userId, userSig, userName, avatarUrl, roomId, theme, showHeaderTool } = infoObj;
       sdkAppId && this.setSdkAppId(sdkAppId);
       userId && this.setUserId(userId);
       userSig && this.setUserSig(userSig);
       userName && this.setUserName(userName);
       avatarUrl && this.setAvatarUrl(avatarUrl);
       roomId && this.setRoomId(roomId);
-      defaultTheme && this.setDefaultTheme(defaultTheme);
-      typeof isSupportSwitchTheme && this.setIsSupportSwitchTheme(isSupportSwitchTheme);
+      theme && !isUndefined(theme.defaultTheme) && this.setDefaultTheme(theme.defaultTheme);
+      theme && !isUndefined(theme.isSupportSwitchTheme) && this.setIsSupportSwitchTheme(theme.isSupportSwitchTheme);
+      !isUndefined(showHeaderTool) && this.setShowHeaderTool(showHeaderTool);
     },
     setMasterUserId(userId: string) {
       this.masterUserId = userId;
