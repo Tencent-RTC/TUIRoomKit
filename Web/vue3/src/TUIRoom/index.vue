@@ -1,6 +1,6 @@
 <template>
   <div id="roomContainer" ref="roomRef" class="tui-room">
-    <room-header v-show="showRoomTool" class="header" @log-out="logOut"></room-header>
+    <room-header v-show="showRoomTool && showHeaderTool" class="header" @log-out="logOut"></room-header>
     <room-content ref="roomContentRef" :show-room-tool="showRoomTool" class="content"></room-content>
     <room-footer
       v-show="showRoomTool"
@@ -73,7 +73,7 @@ const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 const chatStore = useChatStore();
 
-const { sdkAppId } = storeToRefs(basicStore);
+const { sdkAppId, showHeaderTool } = storeToRefs(basicStore);
 const { localUser, localVideoProfile } = storeToRefs(roomStore);
 
 /**
@@ -141,6 +141,7 @@ interface RoomInitData {
   userSig: string,
   userName: string,
   avatarUrl: string,
+  showHeaderTool: boolean,
   theme?: {
     defaultTheme: 'black' | 'white',
     isSupportSwitchTheme: boolean,
@@ -498,12 +499,10 @@ watch(sdkAppId, (val: number) => {
 <style>
 @import './assets/style/black-theme.scss';
 @import './assets/style/white-theme.scss';
-.tui-room * {
+
+.tui-room :not([class|="el"]) {
     transition: background-color .5s,color .5s;
   }
-.tui-room [class|="el"] {
-  animation-fill-mode: forwards;
-}
 </style>
 
 <style lang="scss" scoped>

@@ -17,6 +17,7 @@
     placeholder="placeholder"
     class="select custom-element-class"
     :teleported="false"
+    :popper-append-to-body="false"
   >
     <el-option
       v-for="(item, index) in videoProfileList"
