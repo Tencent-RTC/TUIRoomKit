@@ -106,7 +106,7 @@ class TUIRoomCoreImpl : public TUIRoomCore,
     int CancelSpeechInvitation(const std::string& user_id, Callback callback) override;
     // 成员同意/拒绝主持人的发言邀请
     // This API is used by a member to accept/reject the invitation to speak from the host.
-    int ReplySpeechInvitation(uint32_t request_id, bool agree, Callback callback) override;
+    int ReplySpeechInvitation(const std::string& request_id, bool agree, Callback callback) override;
 
     // 成员申请发言
     // This API is used by a member to request to speak.
@@ -206,7 +206,7 @@ private:
     void onKickedOffSeat(const char *userId);
 
     void onRequestReceived(const tuikit::TUIRequest* request)override;
-    void onRequestCancelled(uint32_t request_id, const char* user_id)override;
+    void onRequestCancelled(const char* request_id, const char* user_id)override;
 
     void onReceiveTextMessage(const char* room_id, const tuikit::TUIMessage& message) override;
     void onReceiveCustomMessage(const char* room_id, const tuikit::TUIMessage& message) override;
@@ -221,7 +221,7 @@ private:
     ITRTCCloud*    trtc_cloud_ = nullptr;
     tuikit::TUIRoomEngine* room_engine_ = nullptr;
     TUIRoomCoreCallback*          room_core_callback_ = nullptr;
-    std::vector<uint32_t>         received_request_ids_;
+    std::vector<std::string> received_request_ids_;
 
     liteav::ITXDeviceManager*     device_manager_ = nullptr;
     IScreenShareManager* screen_share_manager_ = nullptr;

@@ -1,6 +1,6 @@
 ﻿/**
  * Copyright (c) 2021 Tencent. All rights reserved.
- * Module:   TRTC 音视频设备管理模块
+ * Module:   音视频设备管理模块
  * Function: 用于管理摄像头、麦克风和扬声器等音视频相关的硬件设备
  */
 #ifndef __ITXDEVICEMANAGER_H__
@@ -134,13 +134,13 @@ enum TXCameraCaptureMode {
  * 该设置能决定本地预览图像画质。
  */
 struct TXCameraCaptureParam {
-    ///**字段含义：** 摄像头采集偏好
+    ///**字段含义：** 摄像头采集偏好，请参见 {@link TXCameraCaptureMode}
     TXCameraCaptureMode mode;
 
     ///**字段含义：** 采集图像长度
     int width;
 
-    ///**字段含义** 采集图像宽度
+    ///**字段含义：** 采集图像宽度
     int height;
 
     TXCameraCaptureParam() : mode(TXCameraResolutionStrategyAuto), width(640), height(360) {

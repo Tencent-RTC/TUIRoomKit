@@ -1,4 +1,9 @@
-﻿#ifndef __TXLITEAVCODE_H__
+﻿/**
+ * Copyright (c) 2021 Tencent. All rights reserved.
+ * Module:   TRTC 错误码表
+ * Function: 用于通知客户 TRTC 在使用过程中出现的警告和错误
+ */
+#ifndef __TXLITEAVCODE_H__
 #define __TXLITEAVCODE_H__
 
 /**

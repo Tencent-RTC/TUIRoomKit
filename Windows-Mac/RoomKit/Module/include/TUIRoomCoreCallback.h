@@ -617,7 +617,8 @@ public:
      *
      * @param mute  true: No messages can be sent in the chat room; false: Messages can be sent in the chat room
      */
-    virtual void OnChatRoomMuted(uint32_t request_id, bool muted, TUIMutedReason reason) = 0;
+    virtual void OnChatRoomMuted(const std::string& request_id, bool muted,
+                                 TUIMutedReason reason) = 0;
 
     /**
      * 5.13 主持人设置禁用麦克风回调
@@ -634,7 +635,8 @@ public:
      *
      * @param mute  true: The user's microphone is disabled; false: The user's microphone is enabled
      */
-    virtual void OnMicrophoneMuted(uint32_t request_id, bool muted, TUIMutedReason reason) = 0;
+    virtual void OnMicrophoneMuted(const std::string& request_id, bool muted,
+                                   TUIMutedReason reason) = 0;
 
     /**
      * 5.14 主持人设置禁用摄像头回调
@@ -651,7 +653,8 @@ public:
      *
      * @param mute  true: The user's camera is disabled; false: The user's camera is enabled
      */
-    virtual void OnCameraMuted(uint32_t request_id, bool muted, TUIMutedReason reason) = 0;
+    virtual void OnCameraMuted(const std::string& request_id, bool muted,
+                               TUIMutedReason reason) = 0;
     /// @}
 
     /////////////////////////////////////////////////////////////////////////////////

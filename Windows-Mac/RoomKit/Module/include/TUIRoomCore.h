@@ -675,7 +675,7 @@ class TUIRoomCore {
      * @param  callback Signaling callback, based on which you can know whether the signaling is sent successfully
      *
      */
-    virtual int ReplySpeechInvitation(uint32_t request_id, bool agree, Callback callback) = 0;
+    virtual int ReplySpeechInvitation(const std::string& request_id, bool agree, Callback callback) = 0;
 
     /**
      * 5.13 成员申请发言

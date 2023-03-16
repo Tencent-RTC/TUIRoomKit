@@ -191,7 +191,7 @@ class TUIRoomObserver {
      * @param requestId 请求ID
      * @param userId 取消信令的用户ID
      */
-    virtual void onRequestCancelled(uint32_t requestId, const char* userId) = 0;
+    virtual void onRequestCancelled(const char* requestId, const char* userId) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //

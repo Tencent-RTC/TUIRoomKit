@@ -1,4 +1,9 @@
-﻿#ifndef _ITXLITEAV_LOCAL_RECORD_H_
+﻿/**
+ * Copyright (c) 2021 Tencent. All rights reserved.
+ * Module:   TRTC 本地录制模块
+ * Function: 用于对本地推流内容的录制
+ */
+#ifndef _ITXLITEAV_LOCAL_RECORD_H_
 #define _ITXLITEAV_LOCAL_RECORD_H_
 
 #include "TXLiteAVBase.h"

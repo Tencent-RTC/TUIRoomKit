@@ -69,11 +69,14 @@ public:
 
     void OnMemberReplyCallingRoll(const std::string& user_id) override;
 
-	void OnChatRoomMuted(uint32_t request_id, bool mute, TUIMutedReason reason) override;
+	void OnChatRoomMuted(const std::string& request_id, bool mute,
+                         TUIMutedReason reason) override;
 
-	void OnMicrophoneMuted(uint32_t request_id, bool mute, TUIMutedReason reason) override;
+    void OnMicrophoneMuted(const std::string& request_id, bool mute,
+                           TUIMutedReason reason) override;
 
-	void OnCameraMuted(uint32_t request_id, bool mute, TUIMutedReason reason) override;
+    void OnCameraMuted(const std::string& request_id, bool mute,
+                       TUIMutedReason reason) override;
 
     void OnStatistics(const liteav::TRTCStatistics& statis) override;
 
@@ -153,11 +156,14 @@ signals:
 
     void SignalOnMemberReplyCallingRoll(const QString& user_id);
 
-	void SignalOnChatRoomMuted(uint32_t request_id, bool mute, TUIMutedReason reason);
+	void SignalOnChatRoomMuted(const QString& request_id, bool mute,
+                               TUIMutedReason reason);
 
-	void SignalOnMicrophoneMuted(uint32_t request_id, bool mute, TUIMutedReason reason);
+    void SignalOnMicrophoneMuted(const QString& request_id, bool mute,
+                                 TUIMutedReason reason);
 
-	void SignalOnCameraMuted(uint32_t request_id, bool mute, TUIMutedReason reason);
+    void SignalOnCameraMuted(const QString& request_id, bool mute,
+                             TUIMutedReason reason);
 
     void SignalOnStatistics(const liteav::TRTCStatistics& statis);
 

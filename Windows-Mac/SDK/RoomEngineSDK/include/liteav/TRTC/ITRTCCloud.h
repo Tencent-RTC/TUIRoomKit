@@ -465,12 +465,12 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * @param userId 指定远端用户的 ID。
      * @param streamType 指定要观看 userId 的视频流类型。
      *    - 高清大画面：{@link TRTCVideoStreamTypeBig}。
-     *    - 低清小画面：{@link TRTCVideoStreamTypeSmall}（需要远端用户通过 {@link enableEncSmallVideoStream} 开启双路编码后才有效果）。
+     *    - 低清小画面：{@link TRTCVideoStreamTypeSmall}（需要远端用户通过 {@link enableSmallVideoStream} 开启双路编码后才有效果）。
      *    - 辅流画面（常用于屏幕分享）：{@link TRTCVideoStreamTypeSub}。
      * @param view 用于承载视频画面的渲染控件。
      * @note 注意几点规则需要您关注：
      *  1. SDK 支持同时观看某 userid 的大画面和辅路画面，或者同时观看某 userid 的小画面和辅路画面，但不支持同时观看大画面和小画面。
-     *  2. 只有当指定的 userid 通过 {@link enableEncSmallVideoStream} 开启双路编码后，才能观看该用户的小画面。
+     *  2. 只有当指定的 userid 通过 {@link enableSmallVideoStream} 开启双路编码后，才能观看该用户的小画面。
      *  3. 当指定的 userid 的小画面不存在时，SDK 默认切换到该用户的大画面。
      */
     virtual void startRemoteView(const char* userId, TRTCVideoStreamType streamType, TXView view) = 0;
@@ -600,7 +600,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * 您可以通过此接口选定希望订阅的画面是大画面还是小画面，该接口在 {@link startRemoteView} 之前和之后调用均可生效。
      * @param userId 指定远端用户的 ID。
      * @param streamType 视频流类型，即选择看大画面还是小画面，默认为大画面。
-     * @note 此功能需要目标用户已经通过 {@link enableEncSmallVideoStream} 提前开启了双路编码模式，否则此调用无实际效果。
+     * @note 此功能需要目标用户已经通过 {@link enableSmallVideoStream} 提前开启了双路编码模式，否则此调用无实际效果。
      */
     virtual void setRemoteVideoStreamType(const char* userId, TRTCVideoStreamType streamType) = 0;
 
@@ -741,7 +741,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
     /**
      * 5.15 开启本地媒体录制
      *
-     * 开启后把直播过程中的音视和视频内容录制到本地的一个文件中。
+     * 开启后把直播过程中的音视频内容录制到本地的一个文件中。
      * @param params 录制参数，请参见 {@link TRTCLocalRecordingParams}。
      */
     virtual void startLocalRecording(const TRTCLocalRecordingParams& params) = 0;

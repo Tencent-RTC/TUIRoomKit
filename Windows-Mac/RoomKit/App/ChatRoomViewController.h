@@ -30,8 +30,9 @@ public slots:
     void SlotSendChatMessage();
     void SlotOnReceiveMessage(const QString& user_id, const QString& message);
     void SlotOnRoomMasterChanged(const QString& user_id);
-    void SlotOnChatMute(uint32_t request_id, bool mute, TUIMutedReason reason);
-signals:
+    void SlotOnChatMute(const QString& request_id, bool mute,
+                        TUIMutedReason reason);
+   signals:
     void SignalShowChatRoom(bool show);
 private:
     Ui::ChatRoomViewController* ui_;

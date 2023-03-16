@@ -2,9 +2,9 @@
  * Copyright (c) 2021 Tencent. All rights reserved.
  * Module:   V2TXLivePlayerObserver @ TXLiteAVSDK
  * Function: 腾讯云直播的播放器回调通知
- * **功能**
+ * <H2>功能
  * 腾讯云直播的播放器回调通知。
- * **介绍**
+ * <H2>介绍
  * 可以接收 {@link V2TXLivePlayer} 播放器的一些回调通知，包括播放器状态、播放音量回调、音视频首帧回调、统计数据、警告和错误信息等。
  */
 #ifndef MODULE_CPP_V2TXLIVEPLAYEROBSERVER_H_
@@ -17,7 +17,8 @@ class V2TXLivePlayer;
 
 class V2TXLivePlayerObserver {
    public:
-    virtual ~V2TXLivePlayerObserver(){};
+    virtual ~V2TXLivePlayerObserver() {
+    }
 
     /////////////////////////////////////////////////////////////////////////////////
     //
@@ -33,7 +34,8 @@ class V2TXLivePlayerObserver {
      * @param msg       错误信息。
      * @param extraInfo 扩展信息。
      */
-    virtual void onError(V2TXLivePlayer* player, int32_t code, const char* msg, void* extraInfo){};
+    virtual void onError(V2TXLivePlayer* player, int32_t code, const char* msg, void* extraInfo) {
+    }
 
     /**
      * 直播播放器警告通知
@@ -43,7 +45,8 @@ class V2TXLivePlayerObserver {
      * @param msg       警告信息。
      * @param extraInfo 扩展信息。
      */
-    virtual void onWarning(V2TXLivePlayer* player, int32_t code, const char* msg, void* extraInfo){};
+    virtual void onWarning(V2TXLivePlayer* player, int32_t code, const char* msg, void* extraInfo) {
+    }
 
     /**
      * 直播播放器分辨率变化通知
@@ -52,7 +55,8 @@ class V2TXLivePlayerObserver {
      * @param width     视频宽。
      * @param height    视频高。
      */
-    virtual void onVideoResolutionChanged(V2TXLivePlayer* player, int width, int height){};
+    virtual void onVideoResolutionChanged(V2TXLivePlayer* player, int width, int height) {
+    }
 
     /**
      * 已经成功连接到服务器
@@ -60,7 +64,8 @@ class V2TXLivePlayerObserver {
      * @param player    回调该通知的播放器对象。
      * @param extraInfo 扩展信息。
      */
-    virtual void onConnected(V2TXLivePlayer* player, void* extraInfo){};
+    virtual void onConnected(V2TXLivePlayer* player, void* extraInfo) {
+    }
 
     /**
      * 视频播放事件
@@ -69,7 +74,8 @@ class V2TXLivePlayerObserver {
      * @param firstPlay 第一次播放标志。
      * @param extraInfo 扩展信息。
      */
-    virtual void onVideoPlaying(V2TXLivePlayer* player, bool firstPlay, void* extraInfo){};
+    virtual void onVideoPlaying(V2TXLivePlayer* player, bool firstPlay, void* extraInfo) {
+    }
 
     /**
      * 音频播放事件
@@ -78,7 +84,8 @@ class V2TXLivePlayerObserver {
      * @param firstPlay 第一次播放标志。
      * @param extraInfo 扩展信息。
      */
-    virtual void onAudioPlaying(V2TXLivePlayer* player, bool firstPlay, void* extraInfo){};
+    virtual void onAudioPlaying(V2TXLivePlayer* player, bool firstPlay, void* extraInfo) {
+    }
 
     /**
      * 视频加载事件
@@ -86,7 +93,8 @@ class V2TXLivePlayerObserver {
      * @param player    回调该通知的播放器对象。
      * @param extraInfo 扩展信息。
      */
-    virtual void onVideoLoading(V2TXLivePlayer* player, void* extraInfo){};
+    virtual void onVideoLoading(V2TXLivePlayer* player, void* extraInfo) {
+    }
 
     /**
      * 音频加载事件
@@ -94,7 +102,8 @@ class V2TXLivePlayerObserver {
      * @param player    回调该通知的播放器对象。
      * @param extraInfo 扩展信息。
      */
-    virtual void onAudioLoading(V2TXLivePlayer* player, void* extraInfo){};
+    virtual void onAudioLoading(V2TXLivePlayer* player, void* extraInfo) {
+    }
 
     /**
      * 播放器音量大小回调
@@ -103,7 +112,8 @@ class V2TXLivePlayerObserver {
      * @param volume 音量大小。
      * @note  调用 {@link enableVolumeEvaluation} 开启播放音量大小提示之后，会收到这个回调通知。
      */
-    virtual void onPlayoutVolumeUpdate(V2TXLivePlayer* player, int32_t volume){};
+    virtual void onPlayoutVolumeUpdate(V2TXLivePlayer* player, int32_t volume) {
+    }
 
     /**
      * 直播播放器统计数据回调
@@ -111,7 +121,8 @@ class V2TXLivePlayerObserver {
      * @param player     回调该通知的播放器对象。
      * @param statistics 播放器统计数据 {@link V2TXLivePlayerStatistics}。
      */
-    virtual void onStatisticsUpdate(V2TXLivePlayer* player, V2TXLivePlayerStatistics statistics){};
+    virtual void onStatisticsUpdate(V2TXLivePlayer* player, V2TXLivePlayerStatistics statistics) {
+    }
 
     /**
      * 截图回调
@@ -124,7 +135,8 @@ class V2TXLivePlayerObserver {
      * @param height 截图画面的高度。
      * @param format 截图数据格式，目前只支持 V2TXLivePixelFormatBGRA32。
      */
-    virtual void onSnapshotComplete(V2TXLivePlayer* player, const char* image, int length, int width, int height, V2TXLivePixelFormat format){};
+    virtual void onSnapshotComplete(V2TXLivePlayer* player, const char* image, int length, int width, int height, V2TXLivePixelFormat format) {
+    }
 
     /**
      * 自定义视频渲染回调
@@ -133,7 +145,8 @@ class V2TXLivePlayerObserver {
      * @param videoFrame 视频帧数据 {@link V2TXLiveVideoFrame}。
      * @note  需要您调用 {@link enableObserveVideoFrame} 开启回调开关。
      */
-    virtual void onRenderVideoFrame(V2TXLivePlayer* player, const V2TXLiveVideoFrame* videoFrame){};
+    virtual void onRenderVideoFrame(V2TXLivePlayer* player, const V2TXLiveVideoFrame* videoFrame) {
+    }
 
     /**
      * 音频数据回调
@@ -142,7 +155,8 @@ class V2TXLivePlayerObserver {
      * @param audioFrame 音频帧数据 {@link V2TXLiveAudioFrame}。
      * @note  需要您调用 {@link enableObserveAudioFrame} 开启回调开关。请在当前回调中使用 audioFrame 的 data。
      */
-    virtual void onPlayoutAudioFrame(V2TXLivePlayer* player, const V2TXLiveAudioFrame* audioFrame){};
+    virtual void onPlayoutAudioFrame(V2TXLivePlayer* player, const V2TXLiveAudioFrame* audioFrame) {
+    }
 
     /**
      * 收到 SEI 消息的回调，发送端通过 {@link V2TXLivePusher} 中的 `sendSeiMessage` 来发送 SEI 消息
@@ -153,7 +167,8 @@ class V2TXLivePlayerObserver {
      * @param data          数据。
      * @param dataSize      数据大小。
      */
-    virtual void onReceiveSeiMessage(V2TXLivePlayer* player, int payloadType, const uint8_t* data, uint32_t dataSize){};
+    virtual void onReceiveSeiMessage(V2TXLivePlayer* player, int payloadType, const uint8_t* data, uint32_t dataSize) {
+    }
 };
 
 }  // namespace liteav
