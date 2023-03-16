@@ -138,3 +138,7 @@ export function isElectronEnv() {
   const userAgent = navigator.userAgent.toLowerCase();
   return userAgent.indexOf(' electron/') > -1;
 }
+
+export function isUndefined(value: any) {
+  return typeof value === 'undefined';
+}
