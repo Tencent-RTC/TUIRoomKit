@@ -9,6 +9,7 @@
     :show-close="props.showClose"
     :close-on-click-modal="props.closeOnClickModal"
     :close-on-press-escape="props.closeOnPressEscape"
+    :modal-append-to-body="false"
   >
     <slot></slot>
     <template #footer>

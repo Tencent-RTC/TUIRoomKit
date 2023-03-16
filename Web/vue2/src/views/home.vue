@@ -29,9 +29,7 @@ import RoomControl from '@/TUIRoom/components/RoomHome/RoomControl.vue';
 import { getBasicInfo } from '@/config/basic-info-config';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '@/TUIRoom/hooks/useRoomEngine';
-
 const roomEngine = useGetRoomEngine();
-
 export default {
   name: 'Home',
   components: { UserInfo, LanguageIcon, StreamPreview, RoomControl, SwitchTheme },
@@ -45,6 +43,8 @@ export default {
     };
   },
   async mounted() {
+    sessionStorage.removeItem('tuiRoom-roomInfo');
+    sessionStorage.removeItem('tuiRoom-userInfo');
     this.givenRoomId = this.$route.query.roomId || '';
 
     if (sessionStorage.getItem('tuiRoom-userInfo')) {
@@ -123,9 +123,7 @@ export default {
 <style>
 @import '../TUIRoom/assets/style/black-theme.scss';
 @import '../TUIRoom/assets/style/white-theme.scss';
-* {
-    transition: background-color .5s,color .5s;
-  }
+
 </style>
 
 <style lang="scss" scoped>
@@ -138,6 +136,10 @@ export default {
   justify-content: center;
   align-items: center;
   font-family: PingFangSC-Medium;
+  transition: background .5s,color .5s;
+  :not([class|="el"]) {
+    transition: background-color .5s,color .5s;
+  }
   .header {
     width: 100%;
     position: absolute;

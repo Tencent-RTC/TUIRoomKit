@@ -170,4 +170,5 @@ export default {
   'It has been stilled by the host and cannot open the video': 'It has been stilled by the host and cannot open the video',
   'Failed to enter the room.': 'Failed to enter the room.',
   'Has been full static painting, can not share your screen': 'Has been full static painting, can not share your screen.',
+  'Load More': 'Load More',
 };

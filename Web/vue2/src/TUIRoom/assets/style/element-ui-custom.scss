@@ -29,7 +29,7 @@
 }
 .el-select-dropdown{
     background-color: #1D2029 !important;
-    border: 1px solid var(--input-color-setting) !important;
+    border: 1px solid var(--input-color-setting-border) !important;
 }
 .el-select-dropdown__list{
     background-color: var(--input-color-setting) !important;
@@ -38,7 +38,7 @@
     background-color: var(--input-color-setting-hover) !important;
 }
 .popper__arrow::after {
-    border-bottom-color: var(--input-color-setting) !important;
+    border-bottom-color: var(--input-color-setting-border) !important;
 }
 .el-dialog__header,.el-dialog__body,.el-dialog__footer{
     background-color: var(--el-dialog-bg-color) !important;
@@ -84,6 +84,7 @@
 .el-button--primary {
     background-color: #006EFF !important;
     border-color: #006EFF !important;
+    color: #FFFFFF !important;
 }
 .el-checkbox__input.is-checked .el-checkbox__inner {
     background-color: #006EFF !important;
@@ -91,4 +92,17 @@
 }
 .el-checkbox__input.is-checked+.el-checkbox__label {
     color: #006EFF !important;
+}
+.el-message-box__wrapper {
+    animation-fill-mode: forwards !important;
+}
+.el-message-box {
+    background-color: var(--el-message-box) !important;
+    border: none !important;
+}
+.el-message-box__title {
+    color: var(--el-message-box-title) !important;
+}
+.el-message-box__content {
+    color: #7C85A6 !important;
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="control-container">
     <div class="control-content">
-      <img class="logo" :src="logo">
+      <img v-show="showLogo" class="logo" :src="logo">
       <!--
         *The roomId exists in the query
         *
@@ -59,9 +59,12 @@ import SvgIcon from '../common/SvgIcon.vue';
 import i18n from '../../../TUIRoom/locales/index';
 import { useI18n } from '../../locales';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
+  showLogo?: boolean,
   givenRoomId: string | null,
-}>();
+}>(), {
+  showLogo: true,
+});
 
 const hasGivenRoomId = computed(() => (typeof props.givenRoomId === 'string' && props.givenRoomId !== ''));
 
