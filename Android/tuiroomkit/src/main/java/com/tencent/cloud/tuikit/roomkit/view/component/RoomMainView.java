@@ -187,7 +187,7 @@ public class RoomMainView extends RelativeLayout {
         mTransferMasterView.setVisibility(VISIBLE);
     }
 
-    public void showInvitationDialog(final int inviteId, final TUIRoomDefine.RequestAction requestAction) {
+    public void showInvitationDialog(final String inviteId, final TUIRoomDefine.RequestAction requestAction) {
         String message = "";
         String positiveText = "";
         String negativeText = "";

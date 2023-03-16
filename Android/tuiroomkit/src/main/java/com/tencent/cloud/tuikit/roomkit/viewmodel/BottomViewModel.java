@@ -2,6 +2,8 @@ package com.tencent.cloud.tuikit.roomkit.viewmodel;
 
 import android.Manifest;
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
@@ -29,7 +31,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     private static final int SEAT_INDEX   = -1;
     private static final int REQ_TIME_OUT = 30;
 
-    private int                  mLocalRequestId;
+    private String               mLocalRequestId;
     private Context              mContext;
     private BottomView           mBottomView;
     private RoomStore            mRoomStore;
@@ -438,39 +440,39 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_toast_raised_hand));
         mLocalRequestId = mRoomEngine.takeSeat(SEAT_INDEX, REQ_TIME_OUT, new TUIRoomDefine.RequestCallback() {
             @Override
-            public void onAccepted(int i, String s) {
+            public void onAccepted(String requestId, String userId) {
                 replaceItem(indexOf(BottomItemData.Type.APPLY), createGetOffStageItem());
             }
 
             @Override
-            public void onRejected(int i, String s, String s1) {
+            public void onRejected(String requestId, String userId, String message) {
                 updateRaiseHandButton(false);
             }
 
             @Override
-            public void onCancelled(int i, String s) {
+            public void onCancelled(String requestId, String userId) {
                 updateRaiseHandButton(false);
             }
 
             @Override
-            public void onTimeout(int i, String s) {
+            public void onTimeout(String requestId, String userId) {
                 updateRaiseHandButton(false);
             }
 
             @Override
-            public void onError(int i, String s, TUICommonDefine.Error error, String s1) {
+            public void onError(String requestId, String userId, TUICommonDefine.Error code, String message) {
                 updateRaiseHandButton(false);
             }
         });
     }
 
     private void downHand() {
-        if (mLocalRequestId == 0) {
+        if (TextUtils.isEmpty(mLocalRequestId)) {
             return;
         }
         ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_toast_hands_down));
         mRoomEngine.cancelRequest(mLocalRequestId, null);
-        mLocalRequestId = 0;
+        mLocalRequestId = "";
     }
 
     private void getOffStage() {

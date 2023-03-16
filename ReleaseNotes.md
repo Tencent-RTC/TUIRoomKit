@@ -1,5 +1,9 @@
 ## 发布日志
 
+### Version 1.0.5 @ 2023.03.16
+- Android: 适配 `RoomEngine`  V1.0.2修改，`requestId` 由 `int` 修改为 `String`
+- Android: 更新 `imsdk` 版本为7.1.3925
+
 ### Version 1.0.4 @ 2023.03.10
 - iOS&Android: 新增 `logout` 接口
 - Android: 集成 `TUIChat` 聊天功能

@@ -612,28 +612,28 @@ public class UserListViewModel implements RoomEventCenter.RoomEngineEventRespond
         ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_toast_invite_audience_to_stage));
         mRoomEngine.requestRemoteUserOnSeat(SEAT_INDEX, userId, INVITE_TIME_OUT, new TUIRoomDefine.RequestCallback() {
             @Override
-            public void onAccepted(int i, String s) {
+            public void onAccepted(String requestId, String userId) {
                 ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_accept_invite, userModel.userName));
             }
 
             @Override
-            public void onRejected(int i, String s, String s1) {
+            public void onRejected(String requestId, String userId, String message) {
                 ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_reject_invite, userModel.userName));
             }
 
             @Override
-            public void onCancelled(int i, String s) {
-
+            public void onCancelled(String requestId, String userId) {
+                Log.e(TAG, "takeSeat onRejected requestId : " + requestId + ",userId:" + userId);
             }
 
             @Override
-            public void onTimeout(int i, String s) {
-
+            public void onTimeout(String requestId, String userId) {
+                Log.e(TAG, "takeSeat onTimeout userId : " + userId);
             }
 
             @Override
-            public void onError(int i, String s, TUICommonDefine.Error error, String s1) {
-
+            public void onError(String requestId, String userId, TUICommonDefine.Error code, String message) {
+                Log.e(TAG, "takeSeat onError userId:" + userId + ",code : " + code + ",message:" + message);
             }
         });
     }
