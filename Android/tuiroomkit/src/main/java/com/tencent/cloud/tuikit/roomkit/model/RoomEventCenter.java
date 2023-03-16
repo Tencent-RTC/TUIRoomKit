@@ -379,7 +379,7 @@ public class RoomEventCenter {
         }
 
         @Override
-        public void onRequestCancelled(int requestId, String userId) {
+        public void onRequestCancelled(String requestId, String userId) {
             Map<String, Object> map = new HashMap<>();
             map.put(RoomEventConstant.KEY_REQUEST_ID, requestId);
             map.put(RoomEventConstant.KEY_USER_ID, userId);

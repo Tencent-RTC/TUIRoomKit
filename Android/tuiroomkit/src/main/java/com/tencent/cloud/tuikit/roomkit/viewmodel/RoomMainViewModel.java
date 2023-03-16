@@ -239,7 +239,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         }
     }
 
-    public void responseRequest(int requestId, boolean agree) {
+    public void responseRequest(String requestId, boolean agree) {
         mRoomEngine.responseRemoteRequest(requestId, agree, null);
     }
 

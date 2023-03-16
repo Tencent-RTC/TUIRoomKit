@@ -203,7 +203,7 @@ public class RoomEngineManager {
                 }
                 finalRoomEngine.takeSeat(SEAT_INDEX, REQ_TIME_OUT, new TUIRoomDefine.RequestCallback() {
                     @Override
-                    public void onAccepted(int requestId, String userId) {
+                    public void onAccepted(String requestId, String userId) {
                         mRoomStore.userModel.isOnSeat = true;
                         if (mListener != null) {
                             mListener.onEnterEngineRoom(0, "success", roomInfo);
@@ -211,22 +211,22 @@ public class RoomEngineManager {
                     }
 
                     @Override
-                    public void onRejected(int requestId, String userId, String message) {
+                    public void onRejected(String requestId, String userId, String message) {
                         Log.e(TAG, "takeSeat onRejected userId : " + userId + " message:" + message);
                     }
 
                     @Override
-                    public void onCancelled(int requestId, String userId) {
+                    public void onCancelled(String requestId, String userId) {
                         Log.e(TAG, "takeSeat onRejected requestId : " + requestId + ",userId:" + userId);
                     }
 
                     @Override
-                    public void onTimeout(int requestId, String userId) {
+                    public void onTimeout(String requestId, String userId) {
                         Log.e(TAG, "takeSeat onTimeout userId : " + userId);
                     }
 
                     @Override
-                    public void onError(int requestId, String userId, TUICommonDefine.Error code, String message) {
+                    public void onError(String requestId, String userId, TUICommonDefine.Error code, String message) {
                         Log.e(TAG, "takeSeat onError userId:" + userId + ",code : " + code + ",message:" + message);
                     }
                 });
