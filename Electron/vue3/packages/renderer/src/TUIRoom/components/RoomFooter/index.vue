@@ -1,21 +1,21 @@
 <template>
   <div class="footer-container">
     <div class="left-container">
-      <audio-control @click="report('audioControl')"></audio-control>
-      <video-control @click="report('videoControl')"></video-control>
+      <audio-control @click="handleControlClick('audioControl')"></audio-control>
+      <video-control @click="handleControlClick('videoControl')"></video-control>
     </div>
     <div class="center-container">
-      <screen-share-control @click="report('screenShareControl')"></screen-share-control>
-      <full-screen-control @click="report('fullScreenControl')"></full-screen-control>
+      <screen-share-control @click="handleControlClick('screenShareControl')"></screen-share-control>
+      <full-screen-control @click="handleControlClick('fullScreenControl')"></full-screen-control>
       <manage-member-control
         v-if="roomStore.isMaster"
-        @click="report('manageMemberControl')"
+        @click="handleControlClick('manageMemberControl')"
       ></manage-member-control>
-      <invite-control @click="report('inviteControl')"></invite-control>
-      <chat-control @click="report('chatControl')"></chat-control>
-      <apply-control v-if="roomStore.enableSeatControl" @click="report('applyControl')"></apply-control>
-      <more-control @click="report('moreControl')"></more-control>
-      <setting-control @click="report('settingControl')"></setting-control>
+      <invite-control @click="handleControlClick('inviteControl')"></invite-control>
+      <chat-control @click="handleControlClick('chatControl')"></chat-control>
+      <apply-control v-if="roomStore.enableSeatControl" @click="handleControlClick('applyControl')"></apply-control>
+      <more-control @click="handleControlClick('moreControl')"></more-control>
+      <setting-control @click="handleControlClick('settingControl')"></setting-control>
     </div>
     <div class="right-container">
       <end-control
@@ -39,6 +39,7 @@ import ApplyControl from './ApplyControl/Index.vue';
 import MoreControl from './MoreControl.vue';
 import SettingControl from './SettingControl.vue';
 import EndControl from './EndControl.vue';
+import bus from '../../hooks/useMitt';
 
 
 import { useRoomStore } from '../../stores/room';
@@ -58,8 +59,9 @@ const onExitRoom = (info: { code: number; message: string }) => {
   TUIRoomAegis.reportEvent({ name: 'exitRoom', ext1: 'exitRoom-success' });
 };
 
-function report(name: string) {
+function handleControlClick(name: string) {
   TUIRoomAegis.reportEvent({ name, ext1: name });
+  bus.emit('experience-communication', name);
 }
 </script>
 

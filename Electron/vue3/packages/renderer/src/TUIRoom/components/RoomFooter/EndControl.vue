@@ -9,6 +9,7 @@
       :append-to-body="false"
       width="420px"
       :before-close="cancel"
+      :close-on-click-modal="true"
     >
       <div v-if="currentDialogType === DialogType.BasicDialog">
         <span v-if="roomStore.isMaster">
@@ -23,6 +24,7 @@
           <el-select
             v-model="selectedUser"
             :teleported="false"
+            :popper-append-to-body="false"
           >
             <el-option
               v-for="user in remoteAnchorList"
@@ -35,15 +37,15 @@
       </div>
       <template #footer>
         <div v-if="currentDialogType === DialogType.BasicDialog">
-          <el-button v-if="roomStore.isMaster" type="primary" @click="dismissRoom">
+          <el-button v-if="roomStore.isMaster" type="primary" @click.stop="dismissRoom">
             {{ t('Dismiss') }}
           </el-button>
           <el-button v-if="showLeaveRoom" type="primary" @click="leaveRoom">{{ t('Leave') }}</el-button>
-          <el-button @click="cancel">{{ t('Cancel') }}</el-button>
+          <el-button @click.stop="cancel">{{ t('Cancel') }}</el-button>
         </div>
         <div v-if="currentDialogType === DialogType.TransferDialog">
           <el-button type="primary" @click="transferAndLeave">{{ t('Transfer and leave') }}</el-button>
-          <el-button @click="cancel">{{ t('Cancel') }}</el-button>
+          <el-button @click.stop="cancel">{{ t('Cancel') }}</el-button>
         </div>
       </template>
     </Dialog>

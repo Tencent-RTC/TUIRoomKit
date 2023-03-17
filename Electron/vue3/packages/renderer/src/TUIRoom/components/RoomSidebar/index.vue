@@ -61,21 +61,9 @@ function handleClose(done: any) {
   done();
 }
 
-/** 监听消息接收，放在这里是为了保障消息进房后立即监听消息 */
+/** 监听消息接收，放在这里是为了打开 chat 之前只记录消息未读数 */
 const onReceiveTextMessage = (data: { roomId: string, message: any }) => {
   console.warn('onReceiveTextMessage:', data);
-  const { message } = data;
-  chatStore.updateMessageList({
-    ID: message.messageId,
-    type: 'TIMTextElem',
-    payload: {
-      text: message.message,
-    },
-    nick: message?.userName || message.userId,
-    from: message.userId,
-    flow: 'in',
-    sequence: Math.random(),
-  });
   if (!basicStore.isSidebarOpen || basicStore.sidebarName !== 'chat') {
     // eslint-disable-next-line no-plusplus
     chatStore.updateUnReadCount(++chatStore.unReadCount);
