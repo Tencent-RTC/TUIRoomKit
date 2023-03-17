@@ -29,19 +29,19 @@ export type UserInfo = {
   // 是否正在请求用户打开麦克风
   isRequestingUserOpenMic?: boolean,
   // 请求用户打开麦克风的 requestId
-  requestUserOpenMicRequestId?: number,
+  requestUserOpenMicRequestId?: string,
   // 是否正在请求用户打开摄像头
   isRequestingUserOpenCamera?: boolean,
   // 请求用户打开摄像头的 requestId
-  requestUserOpenCameraRequestId?: number,
+  requestUserOpenCameraRequestId?: string,
   // 用户是否正在申请上麦
   isUserApplyingToAnchor?: boolean,
   // 用户申请上麦的 requestId
-  applyToAnchorRequestId?: number,
+  applyToAnchorRequestId?: string,
   // 是否正在邀请用户上麦
   isInvitingUserToAnchor?: boolean,
   // 邀请用户上麦的 requestId
-  inviteToAnchorRequestId?: number,
+  inviteToAnchorRequestId?: string,
   audioVolume?: number,
   // cameraStreamInfo 和 screenStreamInfo 存在的意义时，流渲染保持使用同一个引用传递的数据
   // 避免出现大窗口和实际数据显示不一致的问题
@@ -473,23 +473,23 @@ export const useRoomStore = defineStore('room', {
         remoteUserInfo.userRole = role;
       }
     },
-    setRequestUserOpenMic(options: { userId: string, isRequesting: boolean, requestId?: number }) {
+    setRequestUserOpenMic(options: { userId: string, isRequesting: boolean, requestId?: string }) {
       const { userId, isRequesting, requestId } = options;
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isRequestingUserOpenMic = isRequesting;
-        remoteUserInfo.requestUserOpenMicRequestId = isRequesting ? requestId : 0;
+        remoteUserInfo.requestUserOpenMicRequestId = isRequesting ? requestId : '';
       }
     },
-    setRequestUserOpenCamera(options: { userId: string, isRequesting: boolean, requestId?: number }) {
+    setRequestUserOpenCamera(options: { userId: string, isRequesting: boolean, requestId?: string }) {
       const { userId, isRequesting, requestId } = options;
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isRequestingUserOpenCamera = isRequesting;
-        remoteUserInfo.requestUserOpenCameraRequestId = isRequesting ? requestId : 0;
+        remoteUserInfo.requestUserOpenCameraRequestId = isRequesting ? requestId : '';
       }
     },
-    addApplyToAnchorUser(options: { userId: string, requestId: number }) {
+    addApplyToAnchorUser(options: { userId: string, requestId: string }) {
       const { userId, requestId } = options;
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
@@ -501,10 +501,10 @@ export const useRoomStore = defineStore('room', {
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isUserApplyingToAnchor = false;
-        remoteUserInfo.applyToAnchorRequestId = 0;
+        remoteUserInfo.applyToAnchorRequestId = '';
       }
     },
-    addInviteToAnchorUser(options: { userId: string, requestId: number }) {
+    addInviteToAnchorUser(options: { userId: string, requestId: string }) {
       const { userId, requestId } = options;
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
@@ -516,7 +516,7 @@ export const useRoomStore = defineStore('room', {
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isInvitingUserToAnchor = false;
-        remoteUserInfo.inviteToAnchorRequestId = 0;
+        remoteUserInfo.inviteToAnchorRequestId = '';
       }
     },
     reset() {
