@@ -9,31 +9,43 @@
 -->
 <template>
   <svg-icon
-    class="switch-theme" icon-name="switch-theme" size="medium" @click="switchTheme"
+    class="switch-theme" icon-name="switch-theme" size="medium" @click="handleSwitchTheme"
   ></svg-icon>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { watch, onMounted } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import { useBasicStore } from '../../stores/basic';
+import { storeToRefs } from 'pinia';
 const basicStore = useBasicStore();
+const { defaultTheme } = storeToRefs(basicStore);
 
-function switchTheme() {
-  const currentTheme = document.body.getAttribute('data-theme') || '';
-  switch (currentTheme) {
-    case 'white':
+function handleSwitchTheme() {
+  const currentTheme = document.body.getAttribute('data-theme') || defaultTheme;
+  if (currentTheme === 'white') {
+    basicStore.setDefaultTheme('black');
+  } else if (currentTheme === 'black') {
+    basicStore.setDefaultTheme('white');
+  }
+}
+
+function doSwitchTheme(theme: string) {
+  switch (theme) {
+    case 'black':
       document.body.setAttribute('data-theme', 'black');
       localStorage.setItem('tuiRoom-currentTheme', 'black');
-      basicStore.setDefaultTheme('black');
       break;
-    case 'black':
+    case 'white':
       document.body.setAttribute('data-theme', 'white');
       localStorage.setItem('tuiRoom-currentTheme', 'white');
-      basicStore.setDefaultTheme('white');
       break;
   };
 }
+
+watch(defaultTheme, (val: string) => {
+  doSwitchTheme(val);
+});
 
 onMounted(() => {
   const defaults = basicStore.defaultTheme;

@@ -134,6 +134,8 @@ async function handleLogOut() {
 }
 
 async function handleInit() {
+  sessionStorage.removeItem('tuiRoom-roomInfo');
+  sessionStorage.removeItem('tuiRoom-userInfo');
   let currentUserInfo = null;
   if (sessionStorage.getItem('tuiRoom-userInfo')) {
     currentUserInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo') as string);
