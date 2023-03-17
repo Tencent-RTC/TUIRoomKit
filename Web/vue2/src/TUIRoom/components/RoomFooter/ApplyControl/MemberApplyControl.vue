@@ -66,8 +66,8 @@ const iconName: Ref<string> = ref('');
 const iconTitle: Ref<string> = ref('');
 const showInviteDialog: Ref<Boolean> = ref(false);
 
-const applyToAnchorRequestId: Ref<number> = ref(0);
-const inviteToAnchorRequestId: Ref<number> = ref(0);
+const applyToAnchorRequestId: Ref<string> = ref('');
+const inviteToAnchorRequestId: Ref<string> = ref('');
 
 watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
   if (localUser.onSeat) {
@@ -178,10 +178,10 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
    *
    * 主持人取消邀请上麦
   **/
-function onRequestCancelled(eventInfo: { requestId: number, userId: string }) {
+function onRequestCancelled(eventInfo: { requestId: string, userId: string }) {
   const { requestId } = eventInfo;
   if (inviteToAnchorRequestId.value === requestId) {
-    inviteToAnchorRequestId.value = 0;
+    inviteToAnchorRequestId.value = '';
     showInviteDialog.value = false;
   }
 }
