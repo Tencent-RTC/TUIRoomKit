@@ -67,6 +67,7 @@
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.6.5",
     "yuv-buffer": "^1.0.0",
-    "yuv-canvas": "^1.2.11"
+    "yuv-canvas": "^1.2.11",
+    "mitt": "^3.0.0"
   }
 }
