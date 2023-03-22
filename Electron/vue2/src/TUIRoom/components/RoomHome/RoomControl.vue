@@ -66,6 +66,7 @@ const props = withDefaults(defineProps<{
   showLogo: true,
 });
 
+
 const hasGivenRoomId = computed(() => (typeof props.givenRoomId === 'string' && props.givenRoomId !== ''));
 
 const logo = computed(() => (i18n.global.locale.value === 'zh-CN' ? logoCn : logoEn));
