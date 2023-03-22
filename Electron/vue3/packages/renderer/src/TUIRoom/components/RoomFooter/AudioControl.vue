@@ -141,7 +141,7 @@ function handleDocumentClick(event: MouseEvent) {
 
 // -------- 处理主持人打开/关闭麦克风信令 --------
 const showRequestOpenMicDialog: Ref<boolean> = ref(false);
-const requestOpenMicRequestId: Ref<number> = ref(0);
+const requestOpenMicRequestId: Ref<string> = ref('');
 async function onRequestReceived(eventInfo: { request: TUIRequest }) {
   const { requestAction, requestId } = eventInfo.request;
   // 主持人邀请打开麦克风，同意之后将会自动打开麦克风
@@ -158,7 +158,7 @@ async function handleAccept() {
     requestId: requestOpenMicRequestId.value,
     agree: true,
   });
-  requestOpenMicRequestId.value = 0;
+  requestOpenMicRequestId.value = '';
   showRequestOpenMicDialog.value = false;
 }
 
@@ -167,12 +167,12 @@ async function handleReject() {
   await roomEngine.instance?.responseRemoteRequest({
     requestId: requestOpenMicRequestId.value,
     agree: false });
-  requestOpenMicRequestId.value = 0;
+  requestOpenMicRequestId.value = '';
   showRequestOpenMicDialog.value = false;
 }
 
 // 请求被取消
-async function onRequestCancelled(eventInfo: { requestId: number }) {
+async function onRequestCancelled(eventInfo: { requestId: string }) {
   const { requestId } = eventInfo;
   if (requestOpenMicRequestId.value === requestId) {
     showRequestOpenMicDialog.value = false;

@@ -29,7 +29,7 @@ export default function () {
   }
 
   // 远端用户取消上麦申请
-  function onRequestCancelled(eventInfo: { requestId: number, userId: string }) {
+  function onRequestCancelled(eventInfo: { requestId: string, userId: string }) {
     const { userId } = eventInfo;
     roomStore.removeApplyToAnchorUser(userId);
   }

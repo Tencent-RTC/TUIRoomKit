@@ -7,16 +7,6 @@ declare module '*.vue' {
   export default component
 }
 
-declare module 'tsignaling/tsignaling-js' {
-  import TSignaling from 'tsignaling/tsignaling-js';
-  export default TSignaling;
-}
-
-declare module 'tim-js-sdk' {
-  import TIM from 'tim-js-sdk';
-  export default TIM;
-}
-
 declare const Aegis: any;
 
 interface ImportMetaEnv {
