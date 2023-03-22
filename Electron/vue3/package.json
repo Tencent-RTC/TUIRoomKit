@@ -1,6 +1,6 @@
 {
   "name": "room-uikit-electron-vue3",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "dist/main/index.cjs",
   "author": "",
   "license": "MIT",
@@ -42,16 +42,18 @@
     "vue"
   ],
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-electron": "^1.0.1",
+    "@tencentcloud/tuiroom-engine-electron": "^1.0.2",
+    "axios": "^0.27.2",
     "element-plus": "^2.2.22",
     "js-cookie": "^3.0.1",
+    "lodash.isequal": "^4.5.0",
+    "mitt": "^3.0.0",
     "pinia": "^2.0.24",
-    "tim-js-sdk": "^2.24.2",
+    "sass": "^1.56.1",
     "trtc-electron-sdk": "10.3.405",
-    "tsignaling": "^0.10.0",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.0.14",
-    "sass": "^1.56.1",
-    "mitt": "^3.0.0"
+    "yuv-buffer": "^1.0.0",
+    "yuv-canvas": "^1.2.11"
   }
 }

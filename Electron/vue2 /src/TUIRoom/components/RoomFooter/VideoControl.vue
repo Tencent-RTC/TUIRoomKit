@@ -149,7 +149,7 @@ function handleDocumentClick(event: MouseEvent) {
 
 // -------- 处理主持人打开/关闭摄像头信令 --------
 const showRequestOpenCameraDialog: Ref<boolean> = ref(false);
-const requestOpenCameraRequestId: Ref<number> = ref(0);
+const requestOpenCameraRequestId: Ref<string> = ref('');
 async function onRequestReceived(eventInfo: { request: TUIRequest }) {
   const { requestAction, requestId } = eventInfo.request;
   // 主持人邀请打开麦克风，同意之后将会自动打开摄像头
@@ -170,7 +170,7 @@ async function handleAccept() {
     requestId: requestOpenCameraRequestId.value,
     agree: true,
   });
-  requestOpenCameraRequestId.value = 0;
+  requestOpenCameraRequestId.value = '';
   showRequestOpenCameraDialog.value = false;
 }
 
@@ -180,12 +180,12 @@ async function handleReject() {
     requestId: requestOpenCameraRequestId.value,
     agree: false,
   });
-  requestOpenCameraRequestId.value = 0;
+  requestOpenCameraRequestId.value = '';
   showRequestOpenCameraDialog.value = false;
 }
 
 // 请求被取消
-async function onRequestCancelled(eventInfo: { requestId: number }) {
+async function onRequestCancelled(eventInfo: { requestId: string }) {
   const { requestId } = eventInfo;
   if (requestOpenCameraRequestId.value === requestId) {
     showRequestOpenCameraDialog.value = false;
