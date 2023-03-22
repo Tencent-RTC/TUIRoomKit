@@ -1,6 +1,6 @@
 {
   "name": "room-uikit-electron-vue2",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "main.electron.js",
   "author": "",
   "license": "MIT",
@@ -49,7 +49,7 @@
     "vue"
   ],
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-electron": "1.0.1",
+    "@tencentcloud/tuiroom-engine-electron": "1.0.2",
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
     "element-ui": "^2.15.10",
@@ -67,7 +67,6 @@
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.6.5",
     "yuv-buffer": "^1.0.0",
-    "yuv-canvas": "^1.2.11",
-    "mitt": "^3.0.0"
+    "yuv-canvas": "^1.2.11"
   }
 }
