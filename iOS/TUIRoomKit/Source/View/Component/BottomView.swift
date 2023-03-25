@@ -18,7 +18,6 @@ class BottomView: UIView {
         view.axis = .horizontal
         view.alignment = .center
         view.distribution = .equalSpacing
-        view.spacing = 12
         return view
     }()
     

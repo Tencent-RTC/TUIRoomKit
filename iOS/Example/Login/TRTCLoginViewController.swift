@@ -83,8 +83,6 @@ class TRTCLoginViewController: UIViewController {
                 self.view.makeToast(LoginLocalize(key: "App.PortalViewController.loginimfailed"))
                 complete(false)
             }
-        } else {
-            complete(true)
         }
     }
     

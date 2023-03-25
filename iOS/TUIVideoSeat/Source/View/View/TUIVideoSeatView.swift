@@ -15,6 +15,10 @@ import TXLiteAVSDK_Professional
 #endif
 
 class TUIVideoSeatView: UIView {
+    
+    let CellID_Normal = "TUIVideoSeatCell_Normal"
+    let CellID_Share = "TUIVideoSeatCell_Share"
+    
     let viewModel: TUIVideoSeatViewModel
     private var isViewReady: Bool = false
     let kCellNumberOfOneRow = 2 //一行中有几个cell
@@ -46,8 +50,8 @@ class TUIVideoSeatView: UIView {
         layout.minimumInteritemSpacing = 0
         layout.scrollDirection = .horizontal
         let collection = UICollectionView(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: frame.size.height), collectionViewLayout: layout)
-        collection.register(TUIVideoSeatCell.classForCoder(), forCellWithReuseIdentifier: "TUIVideoSeatCell")
-        collection.register(TUIVideoSeatShareCell.classForCoder(), forCellWithReuseIdentifier: "TUIVideoSeatShareCell")
+        collection.register(TUIVideoSeatCell.self, forCellWithReuseIdentifier: CellID_Normal)
+        collection.register(TUIVideoSeatShareCell.self, forCellWithReuseIdentifier: CellID_Share)
         collection.isPagingEnabled = true
         collection.showsVerticalScrollIndicator = false
         collection.showsHorizontalScrollIndicator = false
@@ -181,6 +185,36 @@ extension TUIVideoSeatView: UICollectionViewDelegateFlowLayout {
             }
         }
     }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if let seatCell = cell as? TUIVideoSeatCell, let seatItem = seatCell.seatItem {
+            if seatItem.hasVideoStream {
+                viewModel.startPlayCameraVideo(item: seatItem, renderView: seatCell.cameraRenderView)
+            } else {
+                viewModel.stopPlayCameraVideo(item: seatItem)
+            }
+            viewModel.asyncUserInfo(seatItem)
+        }
+        if let seatCell = cell as? TUIVideoSeatShareCell, let seatItem = seatCell.seatItem {
+            viewModel.startPlayScreenVideo(item: seatItem, renderView: seatCell.screenShareRenderView)
+            if seatItem.hasVideoStream {
+                viewModel.startPlayCameraVideo(item: seatItem, renderView: seatCell.cameraRenderView)
+            } else {
+                viewModel.stopPlayCameraVideo(item: seatItem)
+            }
+            viewModel.asyncUserInfo(seatItem)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if let seatCell = cell as? TUIVideoSeatCell, let seatItem = seatCell.seatItem {
+            viewModel.stopPlayCameraVideo(item: seatItem)
+        }
+        if let seatCell = cell as? TUIVideoSeatShareCell, let seatItem = seatCell.seatItem {
+            viewModel.stopPlayCameraVideo(item: seatItem)
+            viewModel.stopPlayScreenVideo(item: seatItem)
+        }
+    }
 }
 
 // MARK: - UICollectionViewDataSource
@@ -220,10 +254,10 @@ extension TUIVideoSeatView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let seatItem = viewModel.shareSeatItem, indexPath.section == 0 {
-            seatItem.cellIndexPath = indexPath
             let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: "TUIVideoSeatShareCell",
+                withReuseIdentifier: CellID_Share,
                 for: indexPath) as! TUIVideoSeatShareCell
+            seatItem.cellIndexPath = indexPath
             cell.updateUI(item: seatItem)
             viewModel.startPlayScreenVideo(item: seatItem, renderView: cell.screenShareRenderView)
             if seatItem.hasVideoStream {
@@ -233,12 +267,12 @@ extension TUIVideoSeatView: UICollectionViewDataSource {
             }
             return cell
         }
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: CellID_Normal,
+            for: indexPath) as! TUIVideoSeatCell
         let seatItemIndex = indexPath.section * kMaxShowCellCount + indexPath.item
         let seatItem = viewModel.seatItems[seatItemIndex]
         seatItem.cellIndexPath = indexPath
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: "TUIVideoSeatCell",
-            for: indexPath) as! TUIVideoSeatCell
         cell.updateUI(item: seatItem)
         if seatItem.hasVideoStream {
             viewModel.startPlayCameraVideo(item: seatItem, renderView: cell.cameraRenderView)
@@ -247,4 +281,5 @@ extension TUIVideoSeatView: UICollectionViewDataSource {
         }
         return cell
     }
+    
 }

@@ -18,10 +18,6 @@ class TransferMasterViewModel {
         userId = ""
     }
     
-    func backAction(sender: UIButton) {
-        RoomRouter.shared.currentViewController()?.navigationController?.popViewController(animated: true)
-    }
-    
     func appointMasterAction(sender: UIButton) {
         guard userId != "" else { return }
         EngineManager.shared.roomEngine.changeUserRole(userId: userId, role: .roomOwner) {

@@ -14,15 +14,6 @@ class CreateRoomView: UIView {
     private var inputViewArray: [ListCellItemView] = []
     private var switchViewArray: [ListCellItemView] = []
     
-    let backButton: UIButton = {
-        let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
-        button.setImage(normalIcon, for: .normal)
-        button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
-        button.setTitle(.createRoomText, for: .normal)
-        return button
-    }()
-    
     let inputStackView: UIStackView = {
         let view = UIStackView()
         view.axis = .vertical
@@ -93,10 +84,6 @@ class CreateRoomView: UIView {
         switchSpeakerModelView.isHidden = true
     }
     
-    func setNavigationLeftBarButton() {
-        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
-    }
-    
     func constructViewHierarchy() {
         backgroundColor = UIColor(0x17181F)
         addSubview(inputStackView)
@@ -125,19 +112,6 @@ class CreateRoomView: UIView {
             }
             view.backgroundColor = item.backgroundColor ?? UIColor(0x2A2D38)
         }
-    }
-    
-    func updateInputStackView(item: ListCellItemData, index: Int) {
-        guard inputViewArray.count > index else { return }
-        inputViewArray[index].removeFromSuperview()
-        let view = ListCellItemView(itemData: item)
-        inputViewArray[index] = view
-        inputStackView.insertArrangedSubview(view, at: index)
-        view.snp.makeConstraints { make in
-            make.height.equalTo(40.scale375())
-            make.width.equalToSuperview()
-        }
-        view.backgroundColor = item.backgroundColor ?? UIColor(0x2A2D38)
     }
     
     func activateConstraints() {
@@ -173,12 +147,8 @@ class CreateRoomView: UIView {
     }
     
     func bindInteraction() {
-        backButton.addTarget(self, action: #selector(backButtonClick(sender:)), for: .touchUpInside)
+        viewModel.responder = self
         enterButton.addTarget(self, action: #selector(enterButtonClick(sender:)), for: .touchUpInside)
-    }
-    
-    @objc func backButtonClick(sender: UIButton) {
-        viewModel.backButtonClick(sender: sender)
     }
     
     @objc func enterButtonClick(sender: UIButton) {
@@ -189,6 +159,27 @@ class CreateRoomView: UIView {
         debugPrint("deinit \(self)")
     }
 }
+
+extension CreateRoomView: CreateViewEventResponder {
+    
+    func updateInputStackView(item: ListCellItemData, index: Int) {
+        guard inputViewArray.count > index else { return }
+        inputViewArray[index].removeFromSuperview()
+        let view = ListCellItemView(itemData: item)
+        inputViewArray[index] = view
+        inputStackView.insertArrangedSubview(view, at: index)
+        view.snp.makeConstraints { make in
+            make.height.equalTo(40.scale375())
+            make.width.equalToSuperview()
+        }
+        view.backgroundColor = item.backgroundColor ?? UIColor(0x2A2D38)
+    }
+    
+    func showSpeechModeControlView() {
+        switchSpeakerModelView.isHidden = false
+    }
+}
+
 private extension String {
     static let createRoomText = localized("TUIRoom.create.room")
 }

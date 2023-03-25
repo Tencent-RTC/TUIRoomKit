@@ -9,13 +9,13 @@
 import UIKit
 
 protocol RoomPrePareViewModelFactory {
-    func makePrePareViewModel() -> PrePareViewModel
+    func makePrePareViewModel(enablePrepareView: Bool) -> PrePareViewModel
 }
 
 class RoomPrePareViewController: UIViewController {
     let viewModel: PrePareViewModel
-    init(roomPrePareViewModelFactory: RoomPrePareViewModelFactory) {
-        self.viewModel = roomPrePareViewModelFactory.makePrePareViewModel()
+    init(roomPrePareViewModelFactory: RoomPrePareViewModelFactory, enablePrepareView: Bool) {
+        self.viewModel = roomPrePareViewModelFactory.makePrePareViewModel(enablePrepareView: enablePrepareView)
         super.init(nibName: nil, bundle: nil)
     }
     

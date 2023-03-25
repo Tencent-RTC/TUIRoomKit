@@ -60,7 +60,7 @@ class TUIVideoSeatShareCell: UICollectionViewCell {
     
     func activateConstraints() {
         screenShareRenderView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.edges.equalToSuperview().inset(3)
         }
         cameraRenderView.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-9)
@@ -79,15 +79,6 @@ class TUIVideoSeatShareCell: UICollectionViewCell {
             make.trailing.lessThanOrEqualToSuperview()
         }
     }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        guard let item = seatItem else { return }
-        item.viewModel?.stopPlayScreenVideo(item: item)
-        item.viewModel?.stopPlayCameraVideo(item: item)
-        item.cellIndexPath = nil
-    }
-
     
     deinit {
         debugPrint("deinit \(self)")

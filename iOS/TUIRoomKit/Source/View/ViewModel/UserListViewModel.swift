@@ -12,6 +12,7 @@ import TUIRoomEngine
 protocol UserListViewResponder: NSObject {
     func updateUIWhenRoomOwnerChanged(roomOwner:String)
     func reloadUserListView()
+    func makeToast(text: String)
 }
 
 class UserListViewModel: NSObject {
@@ -29,27 +30,24 @@ class UserListViewModel: NSObject {
     
     deinit {
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
         debugPrint("deinit \(self)")
-    }
-    
-    //UserListView的点击事件
-    func backAction(sender: UIButton) {
-        RoomRouter.shared.currentViewController()?.navigationController?.popViewController(animated: true)
     }
     
     func muteAllAudioAction(sender: UIButton, view: UserListView) {
         sender.isSelected = !sender.isSelected
         let roomInfo = EngineManager.shared.store.roomInfo
         roomInfo.enableAudio = !sender.isSelected
-        EngineManager.shared.roomEngine.updateRoomInfo(roomInfo.getEngineRoomInfo()) {
+        EngineManager.shared.roomEngine.updateRoomInfo(roomInfo.getEngineRoomInfo()) { [weak self] in
+            guard let self = self else { return }
             if sender.isSelected {
-                RoomRouter.shared.currentViewController()?.view.makeToast(.allMuteAudioText)
+                self.viewResponder?.makeToast(text:.allMuteAudioText)
             } else {
-                RoomRouter.shared.currentViewController()?.view.makeToast(.allUnMuteAudioText)
+                self.viewResponder?.makeToast(text:.allUnMuteAudioText)
             }
-        } onError: { _, message in
-            RoomRouter.shared.currentViewController()?.view.makeToast(message)
+        } onError: { [weak self] _, message in
+            guard let self = self else { return }
+            self.viewResponder?.makeToast(text:message)
         }
     }
     
@@ -57,14 +55,16 @@ class UserListViewModel: NSObject {
         sender.isSelected = !sender.isSelected
         let roomInfo = EngineManager.shared.store.roomInfo
         roomInfo.enableVideo = !sender.isSelected
-        EngineManager.shared.roomEngine.updateRoomInfo(roomInfo.getEngineRoomInfo()) {
+        EngineManager.shared.roomEngine.updateRoomInfo(roomInfo.getEngineRoomInfo()) { [weak self] in
+            guard let self = self else { return }
             if sender.isSelected {
-                RoomRouter.shared.currentViewController()?.view.makeToast(.allMuteVideoText)
+                self.viewResponder?.makeToast(text:.allMuteVideoText)
             } else {
-                RoomRouter.shared.currentViewController()?.view.makeToast(.allUnMuteVideoText)
+                self.viewResponder?.makeToast(text:.allUnMuteVideoText)
             }
-        } onError: { _, message in
-            RoomRouter.shared.currentViewController()?.view.makeToast(message)
+        } onError: { [weak self] _, message in
+            guard let self = self else { return }
+            self.viewResponder?.makeToast(text:message)
         }
     }
     

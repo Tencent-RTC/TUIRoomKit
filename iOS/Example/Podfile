@@ -12,16 +12,17 @@ end
 def tool
   pod 'Alamofire'
   pod 'TUICore'
-  pod 'TUIRoomEngine', '1.0.1'
+  pod 'TUIChat','7.1.3925-swift'
+  pod 'TUIRoomEngine','~> 1.0.2'
   pod 'TXLiteAVSDK_TRTC'
   pod 'TXAppBasic'
 end
 
 # 本地依赖库
 def local
-  pod 'TUIRoomKit', :path => '../TUIRoomKit/'
-  pod 'TUIVideoSeat', :path => '../TUIVideoSeat/'
-  pod 'TUIBeauty',  :path => "../TUIBeauty"
+  pod 'TUIRoomKit', :path => "../TUIRoomKit/"
+  pod 'TUIBeauty', :path => "../TUIBeauty/"
+  pod 'TUIVideoSeat', :path => "../TUIVideoSeat/"
 end
 
 

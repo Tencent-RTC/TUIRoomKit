@@ -125,6 +125,7 @@ class SetUpItemView: UIView {
     
     func bindInteraction() {
         shareStartButton.addTarget(self, action: #selector(shareStartAction(sender:)), for: .touchUpInside)
+        shareStartButton.isEnabled = !viewModel.engineManager.store.isSomeoneSharing
     }
     
     func updateStackView(item: ListCellItemData, index: Int) {
@@ -152,8 +153,7 @@ class SetUpItemView: UIView {
 extension SetUpItemView: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
         if key == .TUIRoomKitService_SomeoneSharing {
-            guard let isSomeoneSharing = info?["isSomeoneSharing"] as? Bool else { return }
-            shareStartButton.isEnabled = !isSomeoneSharing
+            shareStartButton.isEnabled = viewModel.engineManager.store.isSomeoneSharing
         }
     }
 }

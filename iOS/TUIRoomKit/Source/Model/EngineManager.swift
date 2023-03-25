@@ -148,13 +148,13 @@ class EngineManager: NSObject {
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onExitEngineRoom?()
-            RoomRouter.shared.popRoomController()
+            RoomRouter.shared.pop()
             self.store.refreshStore()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onExitEngineRoom?()
-            RoomRouter.shared.popRoomController()
+            RoomRouter.shared.pop()
             self.store.refreshStore()
         }
     }
@@ -164,13 +164,13 @@ class EngineManager: NSObject {
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onDestroyEngineRoom?()
-            RoomRouter.shared.popRoomController()
+            RoomRouter.shared.pop()
             self.store.refreshStore()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onDestroyEngineRoom?()
-            RoomRouter.shared.popRoomController()
+            RoomRouter.shared.pop()
             self.store.refreshStore()
         }
     }
@@ -194,11 +194,11 @@ extension EngineManager {
 }
 
 @objc public protocol EngineManagerListener {
-    @objc optional func onExitEngineRoom() -> Void
-    @objc optional func onDestroyEngineRoom() -> Void
     @objc optional func onLogin(code: Int, message: String) -> Void
     @objc optional func onCreateEngineRoom(code: Int, message: String) -> Void
+    @objc optional func onDestroyEngineRoom() -> Void
     @objc optional func onEnterEngineRoom(code: Int, message: String) -> Void
+    @objc optional func onExitEngineRoom() -> Void
 }
 
 // MARK: - TUIExtensionProtocol

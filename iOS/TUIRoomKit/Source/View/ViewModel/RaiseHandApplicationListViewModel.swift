@@ -8,26 +8,31 @@
 
 import Foundation
 
-class RaiseHandApplicationListViewModel {
-    var attendeeList: [UserModel]
+protocol RaiseHandApplicationListViewResponder: NSObject {
+    func reloadApplyListView()
+}
+
+class RaiseHandApplicationListViewModel: NSObject {
+    weak var responder: RaiseHandApplicationListViewResponder? = nil
+    let engineManager: EngineManager = EngineManager.shared
+    var inviteSeatList: [UserModel] = []
     
-    init() {
-        attendeeList = EngineManager.shared.store.inviteSeatList
-    }
-    
-    func backAction(sender: UIButton) {
-        RoomRouter.shared.currentViewController()?.navigationController?.popViewController(animated: true)
+    override init() {
+        super.init()
+        inviteSeatList = engineManager.store.inviteSeatList
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
     }
     
     func allAgreeStageAction(sender: UIButton, view: RaiseHandApplicationListView) {
-        for userInfo in EngineManager.shared.store.inviteSeatList {
-            guard let requestId = EngineManager.shared.store.inviteSeatMap[userInfo.userId] else { continue }
-            EngineManager.shared.roomEngine.responseRemoteRequest(requestId, agree: true) {
-                EngineManager.shared.store.inviteSeatList = EngineManager.shared.store.inviteSeatList.filter { userModel in
+        for userInfo in engineManager.store.inviteSeatList {
+            guard let requestId = engineManager.store.inviteSeatMap[userInfo.userId] else { continue }
+            engineManager.roomEngine.responseRemoteRequest(requestId, agree: true) { [weak self] in
+                guard let self = self else { return }
+                self.engineManager.store.inviteSeatList = self.engineManager.store.inviteSeatList.filter { userModel in
                     userModel.userId != userInfo.userId
                 }
-                EngineManager.shared.store.inviteSeatMap.removeValue(forKey: userInfo.userId)
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+                self.engineManager.store.inviteSeatMap.removeValue(forKey: userInfo.userId)
+                self.reloadApplyListView()
             } onError: { _, _ in
                 debugPrint("")
             }
@@ -39,19 +44,34 @@ class RaiseHandApplicationListViewModel {
     }
     
     func agreeStageAction(sender: UIButton, isAgree: Bool, userId: String) {
-        guard let requestId = EngineManager.shared.store.inviteSeatMap[userId] else { return }
-        EngineManager.shared.roomEngine.responseRemoteRequest(requestId, agree: isAgree) {
-            EngineManager.shared.store.inviteSeatList = EngineManager.shared.store.inviteSeatList.filter { userModel in
+        guard let requestId = engineManager.store.inviteSeatMap[userId] else { return }
+        engineManager.roomEngine.responseRemoteRequest(requestId, agree: isAgree) { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.store.inviteSeatList = self.engineManager.store.inviteSeatList.filter { userModel in
                 return userModel.userId != userId
             }
-            EngineManager.shared.store.inviteSeatMap.removeValue(forKey: userId)
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
-        } onError: { _, _ in
-            debugPrint("")
+            self.engineManager.store.inviteSeatMap.removeValue(forKey: userId)
+            self.reloadApplyListView()
+        } onError: { code, message in
+            debugPrint("responseRemoteRequest:code:\(code),message:\(message)")
         }
     }
     
+    func reloadApplyListView() {
+        inviteSeatList = engineManager.store.inviteSeatList
+        responder?.reloadApplyListView()
+    }
+    
     deinit {
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
         debugPrint("deinit \(self)")
+    }
+}
+
+extension RaiseHandApplicationListViewModel: RoomKitUIEventResponder {
+    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
+        if key == .TUIRoomKitService_RenewSeatList {
+            self.reloadApplyListView()
+        }
     }
 }

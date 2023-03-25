@@ -64,25 +64,24 @@ class PopUpView: UIView {
     
     func setupViewState() {
         switch viewModel.viewType {
-        case .roomInfoViewType:
-            let model = RoomInfoViewModel()
-            rootView = RoomInfoView(viewModel: model)
-        case .moreViewType:
-            let model = MoreFunctionViewModel()
-            rootView = MoreFunctionView(viewModel: model)
-        case .beautyViewType:
-           rootView = beautyView
-        case .setUpViewType:
-            let model = SetUpViewModel(videoModel: EngineManager.shared.store.videoSetting, audioModel: EngineManager.shared.store.audioSetting)
-            rootView = SetUpView(viewModel: model)
+            case .roomInfoViewType:
+                let model = RoomInfoViewModel()
+                rootView = RoomInfoView(viewModel: model)
+            case .moreViewType:
+                let model = MoreFunctionViewModel()
+                rootView = MoreFunctionView(viewModel: model)
+            case .beautyViewType:
+                rootView = beautyView
+            case .setUpViewType:
+                let model = SetUpViewModel(videoModel: EngineManager.shared.store.videoSetting, audioModel: EngineManager.shared.store.audioSetting)
+                let view = SetUpView(viewModel: model)
+                rootView = view
         }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        if let controller = RoomRouter.shared.currentViewController() as? PopUpViewController {
-            controller.dismiss(animated: true)
-        }
+        RoomRouter.shared.dismissPopupViewController()
     }
     
     deinit {

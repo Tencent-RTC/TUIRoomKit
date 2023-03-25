@@ -11,11 +11,24 @@ import Foundation
 class MoreFunctionViewModel {
     private(set) var viewItems: [ButtonItemData] = []
     
+    var engineManager: EngineManager {
+        return EngineManager.shared
+    }
+    
     init() {
         createBottomData()
     }
     
     func createBottomData() {
+        let chatItem = ButtonItemData()
+        chatItem.normalIcon = "room_chat"
+        chatItem.normalTitle = .chatText
+        chatItem.resourceBundle = tuiRoomKitBundle()
+        chatItem.action = { [weak self] sender in
+            guard let self = self, let button = sender as? UIButton else { return }
+            self.chatAction(sender: button)
+        }
+        viewItems.append(chatItem)
         //美颜
         let beautyItem = ButtonItemData()
         beautyItem.normalIcon = "room_beauty"
@@ -40,12 +53,21 @@ class MoreFunctionViewModel {
     
     func beautyAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
+        RoomRouter.shared.dismissPopupViewController(animated: false)
         RoomRouter.shared.presentPopUpViewController(viewType: .beautyViewType)
     }
     
     func settingAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
+        RoomRouter.shared.dismissPopupViewController(animated: false)
         RoomRouter.shared.presentPopUpViewController(viewType: .setUpViewType, height: 300.scale375())
+    }
+    
+    func chatAction(sender: UIButton) {
+        RoomRouter.shared.dismiss(animated: false)
+        let user = engineManager.store.currentUser
+        let roomInfo = engineManager.store.roomInfo
+        RoomRouter.shared.pushToChatController(user: user, roomInfo: roomInfo)
     }
     
     deinit {
@@ -56,4 +78,5 @@ class MoreFunctionViewModel {
 private extension String {
     static let beautyText = localized("TUIRoom.beauty")
     static let settingText = localized("TUIRoom.setting")
+    static let chatText = localized("TUIRoom.chat")
 }

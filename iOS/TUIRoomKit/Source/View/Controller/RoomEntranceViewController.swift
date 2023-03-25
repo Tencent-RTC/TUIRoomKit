@@ -17,10 +17,19 @@ protocol RoomEntranceViewModelFactory {
 
 class RoomEntranceViewController: UIViewController {
     
+    let backButton: UIButton = {
+        let button = UIButton(type: .custom)
+        let normalIcon = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
+        button.setImage(normalIcon, for: .normal)
+        button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
+        return button
+    }()
+    
     let rootView: UIView
     init(roomMainViewModelFactory: RoomEntranceViewModelFactory, isCreateRoom: Bool) {
         rootView = roomMainViewModelFactory.makeRootView(isCreateRoom: isCreateRoom)
         super.init(nibName: nil, bundle: nil)
+        backButton.addTarget(self, action: #selector(backButtonClick(sender:)), for: .touchUpInside)
     }
     
     required init?(coder: NSCoder) {
@@ -34,11 +43,12 @@ class RoomEntranceViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
-        if let view = rootView as? CreateRoomView {
-            view.setNavigationLeftBarButton()
-        } else if let view = rootView as? EnterRoomView {
-            view.setNavigationLeftBarButton()
-        }
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+    }
+    
+    @objc
+    func backButtonClick(sender: UIButton) {
+        RoomRouter.shared.pop()
     }
     
     deinit {

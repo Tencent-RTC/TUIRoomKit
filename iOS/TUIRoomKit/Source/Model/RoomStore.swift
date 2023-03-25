@@ -20,8 +20,8 @@ class RoomStore: NSObject {
     var attendeeList: [UserModel] = []//用户列表
     var attendeeMap: [String: UserModel] = [:]
     var inviteSeatList: [UserModel] = []//申请上麦的用户列表（针对举手发言房间）
-    var inviteSeatMap: [String:Int] = [:]
-    
+    var inviteSeatMap: [String:String] = [:]
+    var isSomeoneSharing: Bool = false
     func update(roomInfo: RoomInfo) {
         self.roomInfo = roomInfo
     }
@@ -44,7 +44,9 @@ class RoomStore: NSObject {
         attendeeMap = [:]
         inviteSeatList = []
         inviteSeatMap = [:]
+        isSomeoneSharing = false
         currentUser = UserModel()
+        roomInfo = RoomInfo()
     }
     
     func addEngineObserver() {
@@ -103,32 +105,28 @@ extension RoomStore: RoomEngineEventResponder {
                 }
             }
             if attendeeList.count <= 1 {
-                if EngineManager.shared.store.roomInfo.enableSeatControl {
-                    for seatInfo: TUISeatInfo in seatList {
-                        guard let userId = seatInfo.userId else { continue }
-                        guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { continue }
-                        userInfo.isOnSeat = true
-                        if EngineManager.shared.store.currentUser.userId == userId {
-                            EngineManager.shared.store.currentUser.isOnSeat = true
-                            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeat,
-                                                                   param: [:])
-                        }
-                        removeSeatList(userId: userId)
+                for seatInfo: TUISeatInfo in seatList {
+                    guard let userId = seatInfo.userId else { continue }
+                    guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { continue }
+                    userInfo.isOnSeat = true
+                    if EngineManager.shared.store.currentUser.userId == userId {
+                        EngineManager.shared.store.currentUser.isOnSeat = true
+                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeat,
+                                                               param: [:])
                     }
+                    removeSeatList(userId: userId)
                 }
             } else {
-                if EngineManager.shared.store.roomInfo.enableSeatControl {
-                    for seatInfo: TUISeatInfo in seated {
-                        guard let userId = seatInfo.userId else { continue }
-                        guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { continue }
-                        userInfo.isOnSeat = true
-                        if EngineManager.shared.store.currentUser.userId == userId {
-                            EngineManager.shared.store.currentUser.isOnSeat = true
-                            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeat,
-                                                                   param: [:])
-                        }
-                        removeSeatList(userId: userId)
+                for seatInfo: TUISeatInfo in seated {
+                    guard let userId = seatInfo.userId else { continue }
+                    guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { continue }
+                    userInfo.isOnSeat = true
+                    if EngineManager.shared.store.currentUser.userId == userId {
+                        EngineManager.shared.store.currentUser.isOnSeat = true
+                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeat,
+                                                               param: [:])
                     }
+                    removeSeatList(userId: userId)
                 }
             }
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])

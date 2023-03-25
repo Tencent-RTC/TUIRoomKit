@@ -11,15 +11,6 @@ import Foundation
 class QRCodeView: UIView {
     let viewModel: QRCodeViewModel
     
-    let backButton: UIButton = {
-        let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
-        button.setImage(normalIcon, for: .normal)
-        button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
-        button.setTitle(.codeText, for: .normal)
-        return button
-    }()
-    
     let middleView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(0x2A2D38)
@@ -201,18 +192,12 @@ class QRCodeView: UIView {
     func bindInteraction() {
         setupViewState()
         copyButton.addTarget(self, action: #selector(copyAction(sender:)), for: .touchUpInside)
-        backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         bottomButton.addTarget(self, action: #selector(saveIntoAlbumAction(sender:)), for: .touchUpInside)
     }
     
     func setupViewState() {
-        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         backgroundColor = UIColor(0x17181F)
         viewModel.createQRCodeImageView(url: viewModel.urlString, imageView: qrCodeImageView)
-    }
-    
-    @objc func backAction(sender: UIButton) {
-        viewModel.backAction(sender: sender)
     }
     
     @objc func copyAction(sender: UIButton) {

@@ -13,15 +13,15 @@ class EnterRoomViewModel: NSObject {
     private(set) var inputViewItems: [ListCellItemData] = []
     private(set) var switchViewItems: [ListCellItemData] = []
     private var enableSeatControl: Bool = false
-    lazy var engineManager: EngineManager = {
-        return EngineManager.shared
-    }()
-    lazy var currentUser: UserModel = {
-        return engineManager.store.currentLoginUser
-    }()
-    lazy var roomInfo: RoomInfo = {
-        return engineManager.store.roomInfo
-    }()
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
+    var currentUser: UserModel {
+        engineManager.store.currentLoginUser
+    }
+    var roomInfo: RoomInfo {
+        engineManager.store.roomInfo
+    }
     
     override init() {
         super.init()
@@ -77,7 +77,7 @@ class EnterRoomViewModel: NSObject {
     }
     
     func backButtonClick(sender: UIButton) {
-        RoomRouter.shared.popRoomController()
+        RoomRouter.shared.pop()
     }
     
     func enterButtonClick(sender: UIButton, view: EnterRoomView) {
