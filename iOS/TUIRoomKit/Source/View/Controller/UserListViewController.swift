@@ -33,6 +33,11 @@ class UserListViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
     }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        rootView.searchController.isActive = false
+    }
     
     deinit {
         debugPrint("deinit \(self)")

@@ -55,7 +55,7 @@ class TUIVideoSeatCell: UICollectionViewCell {
     
     func activateConstraints() {
         cameraRenderView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.edges.equalToSuperview().inset(3)
         }
         avatarImageView.snp.makeConstraints { make in
             make.width.height.equalTo(72)
@@ -65,13 +65,6 @@ class TUIVideoSeatCell: UICollectionViewCell {
             make.bottom.equalToSuperview().offset(-5)
             make.leading.equalToSuperview().offset(20)
         }
-    }
-
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        guard let item = seatItem else { return }
-        item.viewModel?.stopPlayCameraVideo(item: item)
-        item.cellIndexPath = nil
     }
     
     deinit {

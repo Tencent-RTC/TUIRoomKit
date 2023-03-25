@@ -11,7 +11,7 @@ import TUIRoomEngine
 
 class BottomViewModel: NSObject {
     private(set) var viewItems: [ButtonItemData] = []
-    private(set) var requestList: [String: Int] = [:]
+    private(set) var requestList: [String: String] = [:]
     let timeoutNumber: Double = 30
     weak var bottomView: BottomView?
     private enum ViewItemNumber: Int {
@@ -22,15 +22,15 @@ class BottomViewModel: NSObject {
         case memberItem
         case moreItem
     }
-    lazy var engineManager: EngineManager = {
-        return EngineManager.shared
-    }()
-    lazy var roomInfo: RoomInfo = {
-        return engineManager.store.roomInfo
-    }()
-    lazy var currentUser: UserModel = {
-        return engineManager.store.currentUser
-    }()
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
+    var roomInfo: RoomInfo {
+        engineManager.store.roomInfo
+    }
+    var currentUser: UserModel {
+        engineManager.store.currentUser
+    }
     
     override init() {
         super.init()
@@ -76,8 +76,8 @@ class BottomViewModel: NSObject {
         viewItems.append(muteAudioItem)
         // 静画
         let muteVideoItem = ButtonItemData()
-        muteVideoItem.normalTitle = .unMuteVideoText
-        muteVideoItem.selectedTitle = .muteVideoText
+        muteVideoItem.normalTitle = .muteVideoText
+        muteVideoItem.selectedTitle = .unMuteVideoText
         muteVideoItem.normalIcon = "room_camera_on"
         muteVideoItem.selectedIcon = "room_camera_off"
         muteVideoItem.resourceBundle = tuiRoomKitBundle()
@@ -153,7 +153,7 @@ class BottomViewModel: NSObject {
             alertController.addAction(leaveRoomAction)
             alertController.addAction(dismissRoomAction)
             alertController.addAction(cancelAction)
-            RoomRouter.shared.currentViewController()?.present(alertController, animated: true, completion: nil)
+            RoomRouter.shared.presentAlert(alertController)
             
         } else {
             let alertVC = UIAlertController(title: .audienceLogoutTitle,
@@ -166,7 +166,7 @@ class BottomViewModel: NSObject {
             }
             alertVC.addAction(cancelAction)
             alertVC.addAction(sureAction)
-            RoomRouter.shared.currentViewController()?.present(alertVC, animated: true)
+            RoomRouter.shared.presentAlert(alertVC)
         }
     }
     
@@ -185,8 +185,13 @@ class BottomViewModel: NSObject {
     
     func muteAudioAction(sender: UIButton) {
         let roomEngine = engineManager.roomEngine
-        if !roomInfo.enableAudio, sender.isSelected, currentUser.userRole != .roomOwner {
-            //如果房间已经全员静音，自己操作关闭麦克风就会使按钮处于无法点击状态，房主不会被全员静音
+        if currentUser.hasAudioStream {
+            roomEngine.closeLocalMicrophone()
+            roomEngine.stopPushLocalAudio()
+            return
+        }
+        if !roomInfo.enableAudio, currentUser.userRole != .roomOwner {
+            //如果房间已经全员禁画，自己操作关闭摄像头就会使按钮处于无法点击状态，房主不会被全员禁画
             RoomRouter.makeToast(toast: .muteAudioRoomReasonText)
             return
         }
@@ -194,15 +199,11 @@ class BottomViewModel: NSObject {
             RoomRouter.makeToast(toast: .muteAudioSeatReasonText)
             return
         }
-        if !sender.isSelected {
-            roomEngine.closeLocalMicrophone()
-            roomEngine.stopPushLocalAudio()
-        } else {
-            roomEngine.openLocalMicrophone {
-                roomEngine.startPushLocalAudio()
-            } onError: { code, message in
-                debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
-            }
+        roomEngine.openLocalMicrophone { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.startPushLocalAudio()
+        } onError: { code, message in
+            debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
         }
     }
     
@@ -224,11 +225,12 @@ class BottomViewModel: NSObject {
         }
         // FIXME: - 打开摄像头前需要先设置一个view
         roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-        roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) {
+        roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.startPushLocalVideo()
         } onError: { code, message in
             debugPrint("openLocalCamera,code:\(code),message:\(message)")
         }
-        roomEngine.startPushLocalVideo()
     }
     
     func raiseHandAction(sender: UIButton) {
@@ -244,19 +246,19 @@ class BottomViewModel: NSObject {
                 } onRejected: { [weak self] _, _, _ in
                     guard let self = self else { return }
                     self.requestList.removeValue(forKey: "takeSeat")
-                    self.disagreeOnSeat()
+                    self.changeRaiseHandItemDownSeat()
                 } onCancelled: { [weak self] _, _ in
                     guard let self = self else { return }
                     self.requestList.removeValue(forKey: "takeSeat")
-                    self.disagreeOnSeat()
+                    self.changeRaiseHandItemDownSeat()
                 } onTimeout: { [weak self] _, _ in
                     guard let self = self else { return }
                     self.requestList.removeValue(forKey: "takeSeat")
-                    self.disagreeOnSeat()
+                    self.changeRaiseHandItemDownSeat()
                 } onError: { [weak self] _, _, _, _ in
                     guard let self = self else { return }
                     self.requestList.removeValue(forKey: "takeSeat")
-                    self.disagreeOnSeat()
+                    self.changeRaiseHandItemDownSeat()
                 }
                 requestList["takeSeat"] = requestId
             } else {
@@ -275,19 +277,7 @@ class BottomViewModel: NSObject {
         } onError: { code, message in
             debugPrint("leaveSeat:code:\(code),message:\(message)")
         }
-        guard let raiseHandItem = viewItems.first(where: { $0.buttonType == .raiseHandItemType || $0.buttonType == .leaveSeatItemType })
-        else { return }
-        raiseHandItem.normalTitle = .raiseHandApplyText
-        raiseHandItem.normalIcon = "room_hand_raise"
-        raiseHandItem.selectedIcon = "room_hand_down"
-        raiseHandItem.selectedTitle = .handDownText
-        raiseHandItem.resourceBundle = tuiRoomKitBundle()
-        raiseHandItem.buttonType = .raiseHandItemType
-        raiseHandItem.action = { [weak self] sender in
-            guard let self = self, let button = sender as? UIButton else { return }
-            self.raiseHandAction(sender: button)
-        }
-        bottomView?.updateStackView(item: raiseHandItem, index: ViewItemNumber.raiseHandItem.rawValue)
+        changeRaiseHandItemDownSeat()
     }
     
     func memberAction(sender: UIButton) {
@@ -298,9 +288,24 @@ class BottomViewModel: NSObject {
         RoomRouter.shared.presentPopUpViewController(viewType: .moreViewType, height: 179.scale375())
     }
     
-    func disagreeOnSeat() {
-        guard let raiseHandItem = viewItems.first(where: { $0.buttonType == .raiseHandItemType || $0.buttonType == .leaveSeatItemType })
-        else { return }
+    //用户上麦，举手发言按钮的状态更改
+    private func changeRaiseHandItemOnSeat() {
+        guard let raiseHandItem = viewItems.first(where: { $0.buttonType == .raiseHandItemType }) else { return }
+        raiseHandItem.normalIcon = "room_leaveSeat"
+        raiseHandItem.selectedIcon = "room_hand_raise"
+        raiseHandItem.normalTitle = .leaveSeatText
+        raiseHandItem.selectedTitle = .raiseHandText
+        raiseHandItem.buttonType = .leaveSeatItemType
+        raiseHandItem.resourceBundle = tuiRoomKitBundle()
+        raiseHandItem.action = { [weak self] sender in
+            guard let self = self, let button = sender as? UIButton else { return }
+            self.leaveSeatAction(sender: button)
+        }
+        bottomView?.updateStackView(item: raiseHandItem, index: ViewItemNumber.raiseHandItem.rawValue)
+    }
+    //用户下麦，举手发言按钮的状态更改
+    private func changeRaiseHandItemDownSeat() {
+        guard let raiseHandItem = viewItems.first(where: { $0.buttonType == .leaveSeatItemType }) else { return }
         raiseHandItem.normalTitle = .raiseHandApplyText
         raiseHandItem.normalIcon = "room_hand_raise"
         raiseHandItem.selectedIcon = "room_hand_down"
@@ -313,7 +318,23 @@ class BottomViewModel: NSObject {
         }
         bottomView?.updateStackView(item: raiseHandItem, index: ViewItemNumber.raiseHandItem.rawValue)
     }
-    
+    //用户转成房主，举手发言按钮的状态更改
+    private func changeRaiseHandItemRoomOwner() {
+        guard let raiseHandItem = viewItems.first(where: { $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType })
+        else { return }
+        raiseHandItem.normalTitle = .raiseHandApplyListText
+        raiseHandItem.normalIcon = "room_hand_raise"
+        raiseHandItem.selectedIcon = "room_hand_down"
+        raiseHandItem.selectedTitle = .handDownText
+        raiseHandItem.resourceBundle = tuiRoomKitBundle()
+        raiseHandItem.buttonType = .raiseHandItemType
+        raiseHandItem.action = { [weak self] sender in
+            guard let self = self, let button = sender as? UIButton else { return }
+            self.raiseHandAction(sender: button)
+        }
+        bottomView?.updateStackView(item: raiseHandItem, index: ViewItemNumber.raiseHandItem.rawValue)
+    }
+
     deinit {
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_UserOnSeat, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_UserDownSeat, responder: self)
@@ -326,7 +347,7 @@ class BottomViewModel: NSObject {
 
 extension BottomViewModel: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
-        if key == .TUIRoomKitService_UserOnSeat {
+        if key == .TUIRoomKitService_UserOnSeat && roomInfo.enableSeatControl {
             guard let muteAudioItem = viewItems.first(where: { $0.buttonType == .muteAudioItemType }) else { return }
             muteAudioItem.isSelect = true
             bottomView?.updateStackView(item: muteAudioItem, index: ViewItemNumber.muteAudioItem.rawValue)
@@ -335,21 +356,10 @@ extension BottomViewModel: RoomKitUIEventResponder {
             bottomView?.updateStackView(item: muteVideoItem, index: ViewItemNumber.muteVideoItem.rawValue)
             //如果自己就是房主，上麦不需要更改举手发言的button
             guard currentUser.userRole != .roomOwner else { return }
-            guard let raiseHandItem = viewItems.first(where: { $0.buttonType == .raiseHandItemType }) else { return }
-            raiseHandItem.normalIcon = "room_leaveSeat"
-            raiseHandItem.selectedIcon = "room_hand_raise"
-            raiseHandItem.normalTitle = .leaveSeatText
-            raiseHandItem.selectedTitle = .raiseHandText
-            raiseHandItem.buttonType = .leaveSeatItemType
-            raiseHandItem.resourceBundle = tuiRoomKitBundle()
-            raiseHandItem.action = { [weak self] sender in
-                guard let self = self, let button = sender as? UIButton else { return }
-                self.leaveSeatAction(sender: button)
-            }
-            bottomView?.updateStackView(item: raiseHandItem, index: ViewItemNumber.raiseHandItem.rawValue)
+            changeRaiseHandItemOnSeat()
         }
         
-        if key == .TUIRoomKitService_UserDownSeat {
+        if key == .TUIRoomKitService_UserDownSeat && roomInfo.enableSeatControl {
             guard let muteAudioItem = viewItems.first(where: { $0.buttonType == .muteAudioItemType }) else { return }
             muteAudioItem.isSelect = true
             bottomView?.updateStackView(item: muteAudioItem, index: ViewItemNumber.muteAudioItem.rawValue)
@@ -358,18 +368,7 @@ extension BottomViewModel: RoomKitUIEventResponder {
             bottomView?.updateStackView(item: muteVideoItem, index: ViewItemNumber.muteVideoItem.rawValue)
             //如果自己就是房主，下麦不需要更改举手发言的button
             guard currentUser.userRole != .roomOwner else { return }
-            guard let raiseHandItem = viewItems.first(where: { $0.buttonType == .leaveSeatItemType }) else { return }
-            raiseHandItem.normalTitle = .raiseHandApplyText
-            raiseHandItem.normalIcon = "room_hand_raise"
-            raiseHandItem.selectedIcon = "room_hand_down"
-            raiseHandItem.selectedTitle = .handDownText
-            raiseHandItem.resourceBundle = tuiRoomKitBundle()
-            raiseHandItem.buttonType = .raiseHandItemType
-            raiseHandItem.action = { [weak self] sender in
-                guard let self = self, let button = sender as? UIButton else { return }
-                self.raiseHandAction(sender: button)
-            }
-            bottomView?.updateStackView(item: raiseHandItem, index: ViewItemNumber.raiseHandItem.rawValue)
+            changeRaiseHandItemDownSeat()
         }
     }
 }
@@ -377,22 +376,22 @@ extension BottomViewModel: RoomKitUIEventResponder {
 extension BottomViewModel: RoomEngineEventResponder {
     func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
         if name == .onUserRoleChanged {
-            guard let userRole = param?["userRole"] as? TUIRole, userRole == .roomOwner else { return }
+            guard let userRole = param?["userRole"] as? TUIRole else { return }
             guard let userId = param?["userId"] as? String else { return }
             guard userId == currentUser.userId else { return }
-            guard let raiseHandItem = viewItems.first(where: { $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType })
-            else { return }
-            raiseHandItem.normalTitle = .raiseHandApplyListText
-            raiseHandItem.normalIcon = "room_hand_raise"
-            raiseHandItem.selectedIcon = "room_hand_down"
-            raiseHandItem.selectedTitle = .handDownText
-            raiseHandItem.resourceBundle = tuiRoomKitBundle()
-            raiseHandItem.buttonType = .raiseHandItemType
-            raiseHandItem.action = { [weak self] sender in
-                guard let self = self, let button = sender as? UIButton else { return }
-                self.raiseHandAction(sender: button)
+            if currentUser.userRole == userRole { return }
+            // 如果转换房主的时候，用户是房主
+            switch userRole {
+            case .roomOwner :
+               changeRaiseHandItemRoomOwner()
+            case .generalUser:
+                if currentUser.isOnSeat {
+                    changeRaiseHandItemOnSeat()
+                } else {
+                    changeRaiseHandItemDownSeat()
+                }
+            default: break
             }
-            bottomView?.updateStackView(item: raiseHandItem, index: ViewItemNumber.raiseHandItem.rawValue)
         }
         if name == .onUserVideoStateChanged {
             guard let userId = param?["userId"] as? String else { return }

@@ -9,12 +9,14 @@ import ImSDK_Plus
 import TUIRoomKit
 import UIKit
 import TUIBeauty
-import TUICore
-import TUIRoomEngine
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var blockRotation = false
+    lazy var mainModel: AppMainModel = {
+        return AppMainModel()
+    }()
+    
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         if blockRotation {
             return .allButUpsideDown
@@ -47,7 +49,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             debugPrint("not login")
             return
         }
-        let mainModel = AppMainModel()
         mainModel.loginTUIRoomKit()
     }
 

@@ -188,7 +188,7 @@ static TUIBeautyService *sharedService = nil;
         }
         
         NSDictionary *assetsDict = @{@"core_name": @"LightCore.bundle",
-                                     @"root_path": [TUIBeautyBundle() resourcePath],
+                                     @"root_path": ([NSBundle mainBundle].bundlePath ?: @""),
                                      @"plugin_3d": @"Light3DPlugin.bundle",
                                      @"plugin_hand": @"LightHandPlugin.bundle",
                                      @"plugin_segment": @"LightSegmentPlugin.bundle",

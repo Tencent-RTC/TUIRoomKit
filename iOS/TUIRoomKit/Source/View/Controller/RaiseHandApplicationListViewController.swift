@@ -15,10 +15,19 @@ protocol RaiseHandApplicationListViewModelFactory {
 class RaiseHandApplicationListViewController: UIViewController {
     let viewModel: RaiseHandApplicationListViewModel
     let rootView: RaiseHandApplicationListView
+    
+    let backButton: UIButton = {
+        let button = UIButton(type: .custom)
+        let normalIcon = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
+        button.setImage(normalIcon, for: .normal)
+        return button
+    }()
+    
     init(raiseHandApplicationListViewModelFactory: RaiseHandApplicationListViewModelFactory) {
         self.viewModel = raiseHandApplicationListViewModelFactory.makeRaiseHandApplicationListViewModel()
         self.rootView = RaiseHandApplicationListView(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
+        backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
     }
     
     required init?(coder: NSCoder) {
@@ -32,8 +41,19 @@ class RaiseHandApplicationListViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
-        rootView.setNavigationLeftBarButton()
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        navigationItem.hidesSearchBarWhenScrolling = false
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        rootView.searchController.isActive = false
+    }
+    
+    @objc func backAction(sender: UIButton) {
+        RoomRouter.shared.pop()
+    }
+    
     
     deinit {
         debugPrint("deinit \(self)")

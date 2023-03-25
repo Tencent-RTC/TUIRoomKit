@@ -15,15 +15,15 @@ public enum RoomScene {
 }
 
 @objc public protocol TUIRoomKitListener {
-    @objc optional func onExitRoom() -> Void
-    @objc optional func onDestroyRoom() -> Void
     @objc optional func onLogin(code: Int, message: String) -> Void
     @objc optional func onRoomCreate(code: Int, message: String) -> Void
+    @objc optional func onDestroyRoom() -> Void
     @objc optional func onRoomEnter(code: Int, message: String) -> Void
+    @objc optional func onExitRoom() -> Void
 }
 
 public class TUIRoomKit {
-    var listener: TUIRoomKitListener?
+    weak var listener: TUIRoomKitListener?
     public static let sharedInstance = TUIRoomKit()
     
     private init() {}
@@ -33,12 +33,12 @@ public class TUIRoomKit {
         EngineManager.shared.addListener(listener: self)
     }
     
-    public func setSelfInfo(userName: String, avatarURL: String) {
-        EngineManager.shared.setSelfInfo(userName: userName, avatarURL: avatarURL)
-    }
-    
     public func logout() {
         EngineManager.shared.logout()
+    }
+    
+    public func setSelfInfo(userName: String, avatarURL: String) {
+        EngineManager.shared.setSelfInfo(userName: userName, avatarURL: avatarURL)
     }
     
     public func enterPrepareView(enablePreview: Bool) {
@@ -66,23 +66,23 @@ public class TUIRoomKit {
 }
 
 extension TUIRoomKit: EngineManagerListener {
-    public func onExitEngineRoom() {
-        self.listener?.onExitRoom?()
-    }
-    
-    public func onDestroyEngineRoom() {
-        self.listener?.onDestroyRoom?()
+    public func onLogin(code: Int, message: String) {
+        self.listener?.onLogin?(code: code, message: message)
     }
     
     public func onCreateEngineRoom(code: Int, message: String) {
         self.listener?.onRoomCreate?(code: code, message: message)
     }
     
+    public func onDestroyEngineRoom() {
+        self.listener?.onDestroyRoom?()
+    }
+    
     public func onEnterEngineRoom(code: Int, message: String) {
         self.listener?.onRoomEnter?(code: code, message: message)
     }
     
-    public func onLogin(code: Int, message: String) {
-        self.listener?.onLogin?(code: code, message: message)
+    public func onExitEngineRoom() {
+        self.listener?.onExitRoom?()
     }
 }

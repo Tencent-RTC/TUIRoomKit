@@ -58,14 +58,6 @@ class UserListView: UIView {
         return button
     }()
     
-    let backButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
-        button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
-        button.setTitle(.memberText, for: .normal)
-        return button
-    }()
-    
     lazy var userListTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.separatorStyle = .none
@@ -102,13 +94,6 @@ class UserListView: UIView {
         bindInteraction()
     }
     
-    func setNavigationLeftBarButton() {
-        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
-        RoomRouter.shared.currentViewController()?.navigationItem.hidesSearchBarWhenScrolling = true
-        RoomRouter.shared.currentViewController()?.navigationController?.navigationBar.isTranslucent = false
-        RoomRouter.shared.currentViewController()?.navigationController?.navigationBar.backgroundColor = UIColor(0x1B1E26)
-    }
-    
     func constructViewHierarchy() {
         addSubview(userListTableView)
         addSubview(muteAllAudioButton)
@@ -143,13 +128,8 @@ class UserListView: UIView {
         viewModel.viewResponder = self
         searchController.delegate = self
         searchController.searchResultsUpdater = self
-        backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         muteAllVideoButton.addTarget(self, action: #selector(muteAllVideoAction(sender:)), for: .touchUpInside)
         muteAllAudioButton.addTarget(self, action: #selector(muteAllAudioAction(sender:)), for: .touchUpInside)
-    }
-    
-    @objc func backAction(sender: UIButton) {
-        viewModel.backAction(sender: sender)
     }
     
     @objc func muteAllAudioAction(sender: UIButton) {
@@ -216,6 +196,10 @@ extension UserListView: UITableViewDelegate {
 }
 
 extension UserListView: UserListViewResponder {
+    func makeToast(text: String) {
+        self.makeToast(text)
+    }
+    
     
     func updateUIWhenRoomOwnerChanged(roomOwner: String) {
         let userInfo = EngineManager.shared.store.currentUser

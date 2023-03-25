@@ -17,15 +17,15 @@ import TXLiteAVSDK_Professional
 class PrePareViewModel {
     weak var rootView: PrePareView?
     var enablePrePareView: Bool = true
-    lazy var engineManager: EngineManager = {
-        return EngineManager.shared
-    }()
-    lazy var currentUser: UserModel = {
-        return engineManager.store.currentLoginUser
-    }()
-    lazy var roomInfo: RoomInfo = {
-        return engineManager.store.roomInfo
-    }()
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
+    var currentUser: UserModel {
+        engineManager.store.currentLoginUser
+    }
+    var roomInfo: RoomInfo {
+        engineManager.store.roomInfo
+    }
     
     func initialState(view: UIView) {
         let roomEngine = engineManager.roomEngine
@@ -60,12 +60,11 @@ class PrePareViewModel {
     }
     
     func closeLocalMicrophone() {
-        engineManager.roomEngine.closeLocalCamera()
+        engineManager.roomEngine.closeLocalMicrophone()
     }
     
     func backAction() {
-        engineManager.logout()
-        RoomRouter.shared.currentViewController()?.dismiss(animated: true)
+        RoomRouter.shared.dismiss()
     }
     
     func joinRoom() {
@@ -91,8 +90,9 @@ class PrePareViewModel {
         } else {
             roomInfo.isOpenCamera = true
             placeholderImage.isHidden = true
-            roomEngine.openLocalCamera(isFront: engineManager.store.videoSetting.isFrontCamera) {
-                roomEngine.startPushLocalVideo()
+            roomEngine.openLocalCamera(isFront: engineManager.store.videoSetting.isFrontCamera) { [weak self] in
+                guard let self = self else { return }
+                self.engineManager.roomEngine.startPushLocalVideo()
             } onError: { code, message in
                 debugPrint("openLocalCamera,code:\(code),message:\(message)")
             }
@@ -108,8 +108,9 @@ class PrePareViewModel {
             roomEngine.stopPushLocalAudio()
         } else {
             roomInfo.isOpenMicrophone = true
-            roomEngine.openLocalMicrophone {
-                roomEngine.startPushLocalAudio()
+            roomEngine.openLocalMicrophone { [weak self] in
+                guard let self = self else { return }
+                self.engineManager.roomEngine.startPushLocalAudio()
             } onError: { code, message in
                 debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
             }

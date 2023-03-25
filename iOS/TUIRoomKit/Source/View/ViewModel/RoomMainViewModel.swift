@@ -22,18 +22,19 @@ protocol RoomMainViewResponder: NSObject {
 class RoomMainViewModel: NSObject {
     let timeoutNumber: Double = 100
     weak var viewResponder: RoomMainViewResponder? = nil
-    lazy var engineManager: EngineManager = {
-        return EngineManager.shared
-    }()
-    lazy var roomInfo: RoomInfo = {
-        return engineManager.store.roomInfo
-    }()
-    lazy var currentUser: UserModel = {
-        return engineManager.store.currentUser
-    }()
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
+    var roomInfo: RoomInfo {
+        engineManager.store.roomInfo
+    }
+    var currentUser: UserModel {
+        engineManager.store.currentUser
+    }
     
     override init() {
         super.init()
+        getUserList()//获取用户列表
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRequestReceived, observer: self)
@@ -44,12 +45,12 @@ class RoomMainViewModel: NSObject {
     }
     
     func applyConfigs() {
-        getUserList()//获取用户列表
         guard currentUser.isOnSeat else { return }
         let roomEngine = engineManager.roomEngine
         if roomInfo.isOpenMicrophone && roomInfo.enableAudio {
-            engineManager.roomEngine.openLocalMicrophone {
-                roomEngine.startPushLocalAudio()
+            roomEngine.openLocalMicrophone { [weak self] in
+                guard let self = self else { return }
+                self.engineManager.roomEngine.startPushLocalAudio()
             } onError: { code, message in
                 debugPrint("openLocalMicrophone:code:\(code),message:\(message)")
             }
@@ -66,13 +67,14 @@ class RoomMainViewModel: NSObject {
             roomEngine.getTRTCCloud().setLocalRenderParams(params)
             // FIXME: - 打开摄像头前需要先设置一个view
             roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-            roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) {
-                roomEngine.startPushLocalVideo()
+            roomEngine.openLocalCamera(isFront:engineManager.store.videoSetting.isFrontCamera) { [weak self] in
+                guard let self = self else { return }
+                self.engineManager.roomEngine.startPushLocalVideo()
             } onError: { code, message in
                 debugPrint("openLocalCamera:code:\(code),message:\(message)")
             }
         }
-        engineManager.roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(self, pixelFormat: ._Texture_2D, bufferType: .texture)
+        roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(self, pixelFormat: ._Texture_2D, bufferType: .texture)
     }
     
     private func getUserList() {
@@ -108,7 +110,7 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
     }
     
-    func respondUserOnSeat(isAgree: Bool, requestId: Int) {
+    func respondUserOnSeat(isAgree: Bool, requestId: String) {
         engineManager.roomEngine.responseRemoteRequest(requestId, agree: isAgree) { [weak self] in
             guard let self = self else { return }
             self.engineManager.store.inviteSeatMap.removeValue(forKey: self.currentUser.userId)
@@ -128,25 +130,11 @@ class RoomMainViewModel: NSObject {
         }
     }
     
-    func respondTurnOnAudio(isAgree: Bool, requestId: Int) {
+    func respondTurnOnAudio(isAgree: Bool, requestId: String) {
         let roomEngine = engineManager.roomEngine
         roomEngine.responseRemoteRequest(requestId, agree: isAgree) {
-            if isAgree {
-                roomEngine.openLocalMicrophone {
-                    roomEngine.startPushLocalAudio()
-                } onError: { code, message in
-                    debugPrint("openLocalMicrophone:code:\(code),message:\(message)")
-                }
-            }
         } onError: { code, message in
             debugPrint("responseRemoteRequest:code:\(code),message:\(message)")
-        }
-    }
-    
-    func respondTurnOnVideo(isAgree: Bool, requestId: Int) {
-        engineManager.roomEngine.responseRemoteRequest(requestId, agree: isAgree) {
-        } onError: { code, message in
-            debugPrint("openLocalCamera:code:\(code),message:\(message)")
         }
     }
     
@@ -167,35 +155,23 @@ extension RoomMainViewModel: RoomEngineEventResponder {
         if name == .onRoomDismissed {
             interruptClearRoom()
             let alertVC = UIAlertController(title: .destroyAlertText, message: nil, preferredStyle: .alert)
-            let sureAction = UIAlertAction(title: .alertOkText, style: .default) { _ in
-                guard let navigationController = RoomRouter.shared.currentViewController()?.navigationController else { return }
-                navigationController.viewControllers.forEach({ viewController in
-                    if viewController is RoomEntranceViewController {
-                        navigationController.popToViewController(viewController, animated: true)
-                        return
-                    }
-                })
-                return
+            let sureAction = UIAlertAction(title: .alertOkText, style: .default) { action in
+                // TODO: 这里需要补充弹到主页面的方法
+                RoomRouter.shared.navController.popToRootViewController(animated: true)
             }
             alertVC.addAction(sureAction)
-            RoomRouter.shared.currentViewController()?.present(alertVC, animated: true)
+            RoomRouter.shared.presentAlert(alertVC)
         }
         
         if name == .onKickedOutOfRoom {
             interruptClearRoom()
             let alertVC = UIAlertController(title: .kickOffTitleText, message: nil, preferredStyle: .alert)
-            let sureAction = UIAlertAction(title: .alertOkText, style: .default) { _ in
-                guard let navigationController = RoomRouter.shared.currentViewController()?.navigationController else { return }
-                navigationController.viewControllers.forEach({ viewController in
-                    if viewController is RoomEntranceViewController {
-                        navigationController.popToViewController(viewController, animated: true)
-                        return
-                    }
-                })
-                return
+            let sureAction = UIAlertAction(title: .alertOkText, style: .default) { action in
+                // TODO: 这里需要补充弹到主页面的方法
+                RoomRouter.shared.navController.popToRootViewController(animated: true)
             }
             alertVC.addAction(sureAction)
-            RoomRouter.shared.currentViewController()?.present(alertVC, animated: true)
+            RoomRouter.shared.presentAlert(alertVC)
         }
         
         if name == .onRequestReceived {
@@ -207,41 +183,47 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                                                 preferredStyle: .alert)
                 let declineAction = UIAlertAction(title: .declineText, style: .cancel) { [weak self] _ in
                     guard let self = self else { return }
-                    self.respondTurnOnVideo(isAgree: false, requestId: Int(request.requestId))
+                    self.engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: false) {
+                    } onError: { code, message in
+                        debugPrint("openLocalCamera:code:\(code),message:\(message)")
+                    }
                 }
                 let sureAction = UIAlertAction(title: .agreeText, style: .default) { [weak self] _ in
                     guard let self = self else { return }
-                    self.respondTurnOnVideo(isAgree: true, requestId: Int(request.requestId))
+                    self.engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
+                    } onError: { code, message in
+                        debugPrint("openLocalCamera:code:\(code),message:\(message)")
+                    }
                 }
                 alertVC.addAction(declineAction)
                 alertVC.addAction(sureAction)
-                RoomRouter.shared.currentViewController()?.present(alertVC, animated: true, completion: nil)
+                RoomRouter.shared.presentAlert(alertVC)
             case .openRemoteMicrophone:
                 let alertVC = UIAlertController(title: .inviteTurnOnAudioText,
                                                 message: "",
                                                 preferredStyle: .alert)
                 let declineAction = UIAlertAction(title: .declineText, style: .cancel) { [weak self] _ in
                     guard let self = self else { return }
-                    self.respondTurnOnAudio(isAgree: false, requestId: Int(request.requestId))
+                    self.respondTurnOnAudio(isAgree: false, requestId: request.requestId)
                 }
                 let sureAction = UIAlertAction(title: .agreeText, style: .default) { [weak self] _ in
                     guard let self = self else { return }
-                    self.respondTurnOnAudio(isAgree: true, requestId: Int(request.requestId))
+                    self.respondTurnOnAudio(isAgree: true, requestId: request.requestId)
                 }
                 alertVC.addAction(declineAction)
                 alertVC.addAction(sureAction)
-                RoomRouter.shared.currentViewController()?.present(alertVC, animated: true, completion: nil)
+                RoomRouter.shared.presentAlert(alertVC)
             case .invalidAction:
                 break
             case .connectOtherRoom:
-                engineManager.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
+                engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
                 } onError: { _, _ in
                 }
             case .takeSeat:
                 if roomInfo.enableSeatControl {
                     //如果作为房主收到自己要上麦拿到请求，直接同意
                     if request.userId == currentUser.userId && roomInfo.owner == request.userId {
-                        engineManager.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
+                        engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
                         } onError: { _, _ in
                         }
                     }
@@ -250,11 +232,11 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                         break
                     }
                     engineManager.store.inviteSeatList.append(userModel)
-                    engineManager.store.inviteSeatMap[request.userId] = Int(request.requestId)
+                    engineManager.store.inviteSeatMap[request.userId] = request.requestId
                     EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
                 }
                 else {
-                    engineManager.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
+                    engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
                     } onError: { _, _ in
                     }
                 }
@@ -265,17 +247,17 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                                                     preferredStyle: .alert)
                     let declineAction = UIAlertAction(title: .declineText, style: .cancel) { [weak self] _ in
                         guard let self = self else { return }
-                        self.respondUserOnSeat(isAgree: false, requestId: Int(request.requestId))
+                        self.respondUserOnSeat(isAgree: false, requestId: request.requestId)
                     }
                     let sureAction = UIAlertAction(title: .agreeText, style: .default) { [weak self] _ in
                         guard let self = self else { return }
-                        self.respondUserOnSeat(isAgree: true, requestId: Int(request.requestId))
+                        self.respondUserOnSeat(isAgree: true, requestId: request.requestId)
                     }
                     alertVC.addAction(declineAction)
                     alertVC.addAction(sureAction)
-                    RoomRouter.shared.currentViewController()?.present(alertVC, animated: true, completion: nil)
+                    RoomRouter.shared.presentAlert(alertVC)
                 } else {
-                    engineManager.roomEngine.responseRemoteRequest(Int(request.requestId), agree: true) {
+                    engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
                     } onError: { _, _ in
                     }
                 }
@@ -289,7 +271,8 @@ extension RoomMainViewModel: RoomEngineEventResponder {
             guard let hasVideo = param?["hasVideo"] as? Bool else { return }
             switch streamType {
             case .screenStream:
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: ["isSomeoneSharing" : hasVideo])
+                engineManager.store.isSomeoneSharing = hasVideo
+                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: [:])
             case .cameraStream:
                 guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
                 userModel.hasVideoStream = hasVideo
@@ -352,6 +335,8 @@ extension RoomMainViewModel: RoomEngineEventResponder {
         roomEngine.closeLocalMicrophone()
         roomEngine.stopPushLocalAudio()
         roomEngine.stopPushLocalVideo()
+        roomEngine.stopScreenCapture()
+        roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
         engineManager.exitRoom()
     }
 }

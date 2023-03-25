@@ -8,27 +8,41 @@
 
 import Foundation
 
-class CreateRoomViewModel: NSObject {
+
+enum SpeechMode: Int {
+    case freeTalking = 0
+    case speechControl = 1
+    case seatControl = 2
+}
+
+protocol CreateViewEventResponder: AnyObject {
+    func updateInputStackView(item: ListCellItemData, index: Int) -> Void
+    func showSpeechModeControlView() -> Void
+}
+
+class CreateRoomViewModel {
+    
     private(set) var inputViewItems: [ListCellItemData] = []
     private(set) var switchViewItems: [ListCellItemData] = []
     private var enableSeatControl: Bool = false
-    lazy var engineManager: EngineManager = {
-        return EngineManager.shared
-    }()
-    lazy var currentUser: UserModel = {
-        return engineManager.store.currentLoginUser
-    }()
-    lazy var roomInfo: RoomInfo = {
-        return engineManager.store.roomInfo
-    }()
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
+    var currentUser: UserModel {
+        engineManager.store.currentLoginUser
+    }
+    var roomInfo: RoomInfo {
+        engineManager.store.roomInfo
+    }
     lazy var roomId: String = {
         let userId = currentUser.userId
         let result = "\(String(describing: userId))_room_kit".hash & 0x3B9AC9FF
         return String(result)
     }()
     
-    override init() {
-        super.init()
+    weak var responder: CreateViewEventResponder?
+    
+    init() {
         initialState()
         creatEntranceViewModel()
     }
@@ -44,8 +58,8 @@ class CreateRoomViewModel: NSObject {
         roomTypeItem.hasButton = true
         roomTypeItem.hasOverAllAction = true
         roomTypeItem.action = { [weak self] sender in
-            guard let self = self, let view = sender as? UIView else { return }
-            self.switchRoomTypeClick(sender: view)
+            guard let self = self else { return }
+            self.switchRoomTypeClick()
         }
         inputViewItems.append(roomTypeItem)
         
@@ -97,12 +111,7 @@ class CreateRoomViewModel: NSObject {
         } else {
             itemData.messageText = .freedomSpeakText
         }
-        guard let view = RoomRouter.shared.currentViewController()?.view as? CreateRoomView else { return }
-        view.updateInputStackView(item: itemData, index: 0)
-    }
-    
-    func backButtonClick(sender: UIButton) {
-        RoomRouter.shared.popRoomController()
+        responder?.updateInputStackView(item: itemData, index: 0)
     }
     
     func enterButtonClick(sender: UIButton, view: CreateRoomView) {
@@ -117,9 +126,8 @@ class CreateRoomViewModel: NSObject {
         TUIRoomKit.sharedInstance.createRoom(roomInfo: roomInfo, type: .meeting)
     }
     
-    func switchRoomTypeClick(sender: UIView) {
-        guard let view = RoomRouter.shared.currentViewController()?.view as? CreateRoomView else { return }
-        view.switchSpeakerModelView.isHidden = false
+    func switchRoomTypeClick() {
+        responder?.showSpeechModeControlView()
     }
     
     func cancelAction(sender: UIButton, view: RoomTypeView) {
@@ -140,8 +148,7 @@ class CreateRoomViewModel: NSObject {
         } else {
             itemData.messageText = .freedomSpeakText
         }
-        guard let view = RoomRouter.shared.currentViewController()?.view as? CreateRoomView else { return }
-        view.updateInputStackView(item: itemData, index: 0)
+        responder?.updateInputStackView(item: itemData, index: 0)
     }
     
     func freedomAction(sender: UIButton, view: RoomTypeView) {

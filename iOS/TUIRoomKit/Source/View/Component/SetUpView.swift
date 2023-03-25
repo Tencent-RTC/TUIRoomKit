@@ -76,6 +76,7 @@ class SetUpView: UIView {
         guard !isViewReady else { return }
         constructViewHierarchy()
         activateConstraints()
+        bindInteraction()
         isViewReady = true
     }
     
@@ -116,13 +117,11 @@ class SetUpView: UIView {
             make.leading.trailing.top.equalToSuperview()
             make.height.equalTo(41.scale375())
         }
-        
         segmentScrollView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
             make.top.equalTo(segmentView.snp.bottom)
             make.bottom.equalToSuperview()
         }
-        
         lineView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16 * CGFloat(selectedIndex))
             make.bottom.equalToSuperview().offset(-1)
@@ -136,8 +135,8 @@ class SetUpView: UIView {
         }
     }
     
-    func updateSegmentScrollView(selectedIndex: Int) {
-        segmentScrollView.setContentOffset(CGPoint(x: CGFloat(selectedIndex) * UIScreen.main.bounds.width, y: 0), animated: true)
+    func bindInteraction() {
+        viewModel.viewResponder = self
     }
 }
 
@@ -150,8 +149,44 @@ extension SetUpView: UIScrollViewDelegate {
     }
 }
 
+extension SetUpView: SetUpViewEventResponder {
+    func showFrameRateAlert() {
+        let frameRateAlert = ResolutionAlert()
+        frameRateAlert.dataSource = viewModel.frameRateTable
+        frameRateAlert.selectIndex = viewModel.videoModel.frameIndex
+        frameRateAlert.didSelectItem = { [weak self] index in
+            guard let `self` = self else { return }
+            self.viewModel.changeFrameRateAction(index: index)
+        }
+        frameRateAlert.show(rootView: self)
+    }
+    func showResolutionAlert() {
+        let resolutionAlert = ResolutionAlert()
+        resolutionAlert.dataSource = viewModel.bitrateTable
+        resolutionAlert.selectIndex = viewModel.videoModel.bitrateIndex
+        resolutionAlert.didSelectItem = { [weak self] index in
+            guard let `self` = self else { return }
+            self.viewModel.changeResolutionAction(index: index)
+        }
+        resolutionAlert.show(rootView: self)
+    }
+    func updateStackView(item: ListCellItemData, listIndex: Int, pageIndex: Int) {
+        let view = viewArray[safe: pageIndex]
+        view?.updateStackView(item: item, index: listIndex)
+    }
+    func updateSegmentScrollView(selectedIndex: Int) {
+        segmentScrollView.setContentOffset(CGPoint(x: CGFloat(selectedIndex) * UIScreen.main.bounds.width, y: 0), animated: true)
+    }
+    func makeToast(text: String) {
+        makeToast(text)
+    }
+}
+
 private extension String {
     static let shareText = localized("TUIRoom.share")
+    static let recordingSavePathText = localized("TUIRoom.recording.save.path")
+    static let promptText = localized("TUIRoom.prompt")
+    static let confirmText = localized("TUIRoom.ok")
 }
 
 

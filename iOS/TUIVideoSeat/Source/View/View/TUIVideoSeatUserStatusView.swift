@@ -78,8 +78,8 @@ extension TUIVideoSeatUserStatusView {
         } else {
             userNameLabel.text = item.userId
         }
-        homeOwnerImageView.isHidden = !item.isRoomOwner
-        let width = item.isRoomOwner ? 24:0
+        homeOwnerImageView.isHidden = item.userRole != .roomOwner
+        let width = item.userRole == .roomOwner ? 24 : 0
         homeOwnerImageView.snp.updateConstraints { make in
             make.width.equalTo(width)
         }

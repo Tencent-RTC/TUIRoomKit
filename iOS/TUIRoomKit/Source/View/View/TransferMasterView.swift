@@ -35,14 +35,6 @@ class TransferMasterView: UIView {
         return button
     }()
     
-    let backButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
-        button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
-        button.setTitle(.transferMasterText, for: .normal)
-        return button
-    }()
-    
     lazy var transferMasterTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.separatorStyle = .none
@@ -76,13 +68,6 @@ class TransferMasterView: UIView {
         isViewReady = true
     }
     
-    func setNavigationLeftBarButton() {
-        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
-        RoomRouter.shared.currentViewController()?.navigationItem.hidesSearchBarWhenScrolling = true
-        RoomRouter.shared.currentViewController()?.navigationController?.navigationBar.isTranslucent = false
-        RoomRouter.shared.currentViewController()?.navigationController?.navigationBar.backgroundColor = UIColor(0x1B1E26)
-    }
-    
     func constructViewHierarchy() {
         addSubview(transferMasterTableView)
         addSubview(appointMasterButton)
@@ -105,12 +90,7 @@ class TransferMasterView: UIView {
     func bindInteraction() {
         searchController.delegate = self
         searchController.searchResultsUpdater = self
-        backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         appointMasterButton.addTarget(self, action: #selector(appointMasterAction(sender:)), for: .touchUpInside)
-    }
-    
-    @objc func backAction(sender: UIButton) {
-        viewModel.backAction(sender: sender)
     }
     
     @objc func appointMasterAction(sender: UIButton) {
@@ -124,6 +104,7 @@ class TransferMasterView: UIView {
     }
     
     deinit {
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
         debugPrint("deinit \(self)")
     }
 }

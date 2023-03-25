@@ -111,6 +111,7 @@ extension ResolutionAlert: UITableViewDelegate {
         if let action = didSelectItem {
             action(selectIndex)
         }
+        dismiss()
     }
 }
 
@@ -225,7 +226,11 @@ class AlertContentView: UIView {
         bindInteraction()
     }
     
-    func show() {
+    func show(rootView: UIView) {
+        rootView.addSubview(self)
+        self.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         UIView.animate(withDuration: 0.3) { [weak self] in
             guard let self = self else { return }
             self.alpha = 1

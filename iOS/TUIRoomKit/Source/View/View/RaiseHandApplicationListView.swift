@@ -10,9 +10,6 @@ import Foundation
 
 class RaiseHandApplicationListView: UIView {
     let viewModel: RaiseHandApplicationListViewModel
-    var attendeeList: [UserModel]
-    var searchArray: [UserModel] = []
-    
     let searchController: UISearchController = {
         let controller = UISearchController(searchResultsController: nil)
         controller.obscuresBackgroundDuringPresentation = false
@@ -33,10 +30,6 @@ class RaiseHandApplicationListView: UIView {
         button.clipsToBounds = true
         button.titleLabel?.adjustsFontSizeToFitWidth = true
         button.adjustsImageWhenHighlighted = false
-        let userRole = EngineManager.shared.store.currentUser.userRole
-        let roomInfo = EngineManager.shared.store.roomInfo
-        button.isHidden = (userRole != .roomOwner)
-        button.isSelected = !roomInfo.enableAudio
         return button
     }()
     
@@ -50,18 +43,6 @@ class RaiseHandApplicationListView: UIView {
         button.clipsToBounds = true
         button.titleLabel?.adjustsFontSizeToFitWidth = true
         button.adjustsImageWhenHighlighted = false
-        let userRole = EngineManager.shared.store.currentUser.userRole
-        let roomInfo = EngineManager.shared.store.roomInfo
-        button.isHidden = (userRole != .roomOwner)
-        button.isSelected = !roomInfo.enableVideo
-        return button
-    }()
-    
-    let backButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
-        button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
-        button.setTitle(.raiseHandApplyText, for: .normal)
         return button
     }()
     
@@ -78,9 +59,7 @@ class RaiseHandApplicationListView: UIView {
     
     init(viewModel: RaiseHandApplicationListViewModel) {
         self.viewModel = viewModel
-        self.attendeeList = viewModel.attendeeList
         super.init(frame: .zero)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
     }
     
     required init?(coder: NSCoder) {
@@ -96,13 +75,6 @@ class RaiseHandApplicationListView: UIView {
         activateConstraints()
         bindInteraction()
         isViewReady = true
-    }
-    
-    func setNavigationLeftBarButton() {
-        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
-        RoomRouter.shared.currentViewController()?.navigationItem.hidesSearchBarWhenScrolling = false
-        RoomRouter.shared.currentViewController()?.navigationController?.navigationBar.isTranslucent = false
-        RoomRouter.shared.currentViewController()?.navigationController?.navigationBar.backgroundColor = UIColor(0x1B1E26)
     }
     
     func constructViewHierarchy() {
@@ -132,15 +104,12 @@ class RaiseHandApplicationListView: UIView {
     }
     
     func bindInteraction() {
+        viewModel.responder = self
         searchController.delegate = self
         searchController.searchResultsUpdater = self
-        backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
+        setupViewState()
         allAgreeButton.addTarget(self, action: #selector(allAgreeStageAction(sender:)), for: .touchUpInside)
         inviteMemberButton.addTarget(self, action: #selector(inviteMemberAction(sender:)), for: .touchUpInside)
-    }
-    
-    @objc func backAction(sender: UIButton) {
-        viewModel.backAction(sender: sender)
     }
     
     @objc func allAgreeStageAction(sender: UIButton) {
@@ -153,45 +122,54 @@ class RaiseHandApplicationListView: UIView {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         searchController.searchBar.endEditing(true)
-        attendeeList = viewModel.attendeeList
+        searchController.searchBar.endEditing(true)
+        viewModel.inviteSeatList = viewModel.engineManager.store.inviteSeatList
         applyTableView.reloadData()
     }
     
+    private func setupViewState() {
+        let userRole = viewModel.engineManager.store.currentUser.userRole
+        let roomInfo = viewModel.engineManager.store.roomInfo
+        allAgreeButton.isHidden = (userRole != .roomOwner)
+        allAgreeButton.isSelected = !roomInfo.enableAudio
+        inviteMemberButton.isHidden = (userRole != .roomOwner)
+        inviteMemberButton.isSelected = !roomInfo.enableVideo
+    }
+    
     deinit {
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
         debugPrint("deinit \(self)")
     }
 }
 
 extension RaiseHandApplicationListView: UISearchControllerDelegate, UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        searchArray = viewModel.attendeeList.filter({ model -> Bool in
+        let searchArray = viewModel.inviteSeatList.filter({ model -> Bool in
             if let searchText = searchController.searchBar.text {
                 return (model.userName == searchText)
             } else {
                 return false
             }
         })
-        attendeeList = searchArray
+        viewModel.inviteSeatList = searchArray
         applyTableView.reloadData()
     }
     
     func didDismissSearchController(_ searchController: UISearchController) {
-        attendeeList = viewModel.attendeeList
+        viewModel.inviteSeatList = viewModel.engineManager.store.inviteSeatList
         applyTableView.reloadData()
     }
 }
 
 extension RaiseHandApplicationListView: UITableViewDataSource {
     internal func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return attendeeList.count
+        return viewModel.inviteSeatList.count
     }
 }
 
 extension RaiseHandApplicationListView: UITableViewDelegate {
     internal func tableView(_ tableView: UITableView,
                             cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let attendeeModel = attendeeList[indexPath.row]
+        let attendeeModel = viewModel.inviteSeatList[indexPath.row]
         let cell = ApplyTableCell(attendeeModel: attendeeModel, viewModel: viewModel)
         cell.selectionStyle = .none
         return cell
@@ -205,12 +183,9 @@ extension RaiseHandApplicationListView: UITableViewDelegate {
     }
 }
 
-extension RaiseHandApplicationListView: RoomKitUIEventResponder {
-    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
-        if key == .TUIRoomKitService_RenewSeatList {
-            attendeeList = EngineManager.shared.store.inviteSeatList
-            applyTableView.reloadData()
-        }
+extension RaiseHandApplicationListView: RaiseHandApplicationListViewResponder {
+    func reloadApplyListView() {
+        applyTableView.reloadData()
     }
 }
 

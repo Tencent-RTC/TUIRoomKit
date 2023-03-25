@@ -14,14 +14,9 @@ class BottomItemView: UIView {
     
     let button: UIButton = {
         let button = UIButton(type: .custom)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 10.0)
+        button.titleLabel?.textColor = UIColor(0xD1D9EC)
         return button
-    }()
-    
-    let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 10.0)
-        label.textColor = UIColor(0xD1D9EC)
-        return label
     }()
     
     // MARK: - initialized function
@@ -48,25 +43,11 @@ class BottomItemView: UIView {
     
     func constructViewHierarchy() {
         addSubview(button)
-        addSubview(titleLabel)
     }
     
     func activateConstraints() {
-        if itemData.normalTitle.isEmpty {
-            button.snp.makeConstraints { make in
-                make.centerX.centerY.equalToSuperview()
-                make.width.height.equalTo(24)
-            }
-        } else {
-            button.snp.makeConstraints { make in
-                make.centerX.equalToSuperview()
-                make.bottom.equalTo(titleLabel.snp.top).offset(-2)
-                make.width.height.equalTo(24)
-            }
-        }
-        titleLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-5)
+        button.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
     
@@ -88,27 +69,22 @@ class BottomItemView: UIView {
             button.setImage(disabledImage, for: .disabled)
         }
         if !item.normalTitle.isEmpty {
-            titleLabel.text = item.normalTitle
+            button.setTitle(item.normalTitle, for: .normal)
+        }
+        if !item.selectedTitle.isEmpty {
+            button.setTitle(item.selectedTitle, for: .selected)
+        }
+        if !item.normalTitle.isEmpty || !item.selectedTitle.isEmpty {
+            button.layoutButton(style: .Top, imageTitleSpace: 5, imageFrame: CGSize(width: 24, height: 24))
         } else {
-            titleLabel.isHidden = true
+            button.layoutButton(style: .Top, imageTitleSpace: 5, imageFrame: CGSize(width: 24, height: 24), labelFrame:
+                                    CGSize(width: 0, height: 0))
         }
     }
     
     @objc
     func clickMenuButton(sender: UIView) {
         itemData.action?(sender)
-    }
-    
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        guard !isHidden, alpha > 0.01, subviews.count > 0 else {
-            return nil
-        }
-        let buttonPoint = convert(point, to: self.superview)
-        if frame.contains(buttonPoint) {
-            return button
-        } else {
-            return nil
-        }
     }
     
     deinit {

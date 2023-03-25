@@ -14,11 +14,24 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
+protocol SetUpViewEventResponder: AnyObject {
+    func showResolutionAlert()
+    func showFrameRateAlert()
+    func updateStackView(item: ListCellItemData, listIndex: Int, pageIndex: Int)
+    func updateSegmentScrollView(selectedIndex: Int)
+    func makeToast(text: String)
+}
+
 class SetUpViewModel {
-    enum SetUpItemType {
+    enum SetUpItemType: Int {
         case videoType
         case audioType
         case shareType
+    }
+    enum VideoItemType: Int {
+        case resolutionItemType
+        case frameRateItemType
+        case bitrateItemType
     }
     private(set) var topItems: [ButtonItemData] = []
     private(set) var videoItems: [ListCellItemData] = []
@@ -28,8 +41,13 @@ class SetUpViewModel {
     private(set) var videoResolution: TRTCVideoResolution = ._960_540
     private(set) var videoFPS: Int32 = 15
     private(set) var videoBitrate: Int32 = 900
-    
+    weak var viewResponder: SetUpViewEventResponder? = nil
+    let filePath: String
+    let appGroupString: String
     let frameArray = ["15", "20"]
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
     
     let bitrateTable = [BitrateTableData](
         arrayLiteral:
@@ -84,6 +102,10 @@ class SetUpViewModel {
     init(videoModel: VideoModel, audioModel: AudioModel) {
         self.videoModel = videoModel
         self.audioModel = audioModel
+        filePath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory,
+                                                        FileManager.SearchPathDomainMask.userDomainMask,
+                                                        true).last?.appending("/test-record.aac") ?? ""
+        appGroupString = "com.tencent.TUIRoomTXReplayKit-Screen"
         createTopItem()
         createVideoItem()
         createAudioItem()
@@ -116,29 +138,19 @@ class SetUpViewModel {
     }
     
     func updateSetUpItemView(item: ListCellItemData, listIndex: Int, pageIndex: Int) {
-        if let view = RoomRouter.shared.currentViewController()?.view as? PopUpView, let rootView = view.rootView as? SetUpView? {
-            if let view = rootView?.segmentScrollView.subviews[pageIndex] as? SetUpItemView {
-                view.updateStackView(item: item, index: listIndex)
-            }
-        }
+        viewResponder?.updateStackView(item: item, listIndex: listIndex, pageIndex: pageIndex)
     }
     
     func videoSetAction(sender: UIButton) {
-        if let view = RoomRouter.shared.currentViewController()?.view as? PopUpView, let rootView = view.rootView as? SetUpView? {
-            rootView?.updateSegmentScrollView(selectedIndex: 0)
-        }
+        viewResponder?.updateSegmentScrollView(selectedIndex: SetUpItemType.videoType.rawValue)
     }
     
     func audioSetAction(sender: UIButton) {
-        if let view = RoomRouter.shared.currentViewController()?.view as? PopUpView, let rootView = view.rootView as? SetUpView? {
-            rootView?.updateSegmentScrollView(selectedIndex: 1)
-        }
+        viewResponder?.updateSegmentScrollView(selectedIndex: SetUpItemType.audioType.rawValue)
     }
     
     func shareAction(sender: UIButton) {
-        if let view = RoomRouter.shared.currentViewController()?.view as? PopUpView, let rootView = view.rootView as? SetUpView? {
-            rootView?.updateSegmentScrollView(selectedIndex: 2)
-        }
+        viewResponder?.updateSegmentScrollView(selectedIndex: SetUpItemType.shareType.rawValue)
     }
     
     func createVideoItem() {
@@ -188,26 +200,24 @@ class SetUpViewModel {
     }
     
     func resolutionAction(sender: UIView) {
-        guard let window = RoomRouter.shared.currentViewController()?.view.window else { return }
-        let alert = ResolutionAlert()
-        alert.dataSource = bitrateTable
-        alert.selectIndex = videoModel.bitrateIndex
-        window.addSubview(alert)
-        alert.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        window.layoutIfNeeded()
-        alert.show()
-        alert.didSelectItem = { [weak self, weak alert] index in
-            guard let `self` = self, let alert = alert else { return }
-            self.videoItems[0].messageText = self.bitrateTable[index].resolutionName
-            self.updateSetUpItemView(item: self.videoItems[0], listIndex: 0, pageIndex: 1)
-            self.updateResolution(index: index)
-            alert.dismiss()
-        }
+        viewResponder?.showResolutionAlert()
     }
     
-    func updateResolution(index: Int) {
+    func changeResolutionAction(index: Int) {
+        guard let videoItem = videoItems[safe: VideoItemType.resolutionItemType.rawValue] else { return }
+        videoItem.messageText = self.bitrateTable[index].resolutionName
+        updateSetUpItemView(item: videoItem, listIndex: VideoItemType.resolutionItemType.rawValue, pageIndex: SetUpItemType.videoType.rawValue)
+        updateBitrateItemView(index: index)
+    }
+    
+    func changeFrameRateAction(index: Int) {
+        guard let videoItem = videoItems[safe: VideoItemType.frameRateItemType.rawValue] else { return }
+        videoItem.messageText = self.frameRateTable[index].resolutionName
+        updateSetUpItemView(item: videoItem, listIndex: VideoItemType.frameRateItemType.rawValue, pageIndex: SetUpItemType.videoType.rawValue)
+        updateFps(index: index)
+    }
+    
+    func updateBitrateItemView(index: Int) {
         videoModel.bitrateIndex = index
         videoModel.bitrate = bitrateTable[index]
         EngineManager.shared.store.videoSetting = videoModel
@@ -217,11 +227,12 @@ class SetUpViewModel {
         }
         videoResolution = resolution
         updateVideoEncoderParam()
-        videoItems[2].minimumValue = item.minBitrate / item.stepBitrate
-        videoItems[2].maximumValue = item.maxBitrate / item.stepBitrate
-        videoItems[2].sliderDefault = item.defaultBitrate / item.stepBitrate
-        videoItems[2].sliderStep = item.stepBitrate
-        self.updateSetUpItemView(item: self.videoItems[2], listIndex: 2, pageIndex: 1)
+        let itemIndex = VideoItemType.bitrateItemType.rawValue
+        videoItems[safe: itemIndex]?.minimumValue = item.minBitrate / item.stepBitrate
+        videoItems[safe: itemIndex]?.maximumValue = item.maxBitrate / item.stepBitrate
+        videoItems[safe: itemIndex]?.sliderDefault = item.defaultBitrate / item.stepBitrate
+        videoItems[safe: itemIndex]?.sliderStep = item.stepBitrate
+        updateSetUpItemView(item: self.videoItems[itemIndex], listIndex: itemIndex, pageIndex: SetUpItemType.videoType.rawValue)
     }
     
     func updateVideoEncoderParam() {
@@ -235,24 +246,7 @@ class SetUpViewModel {
     }
     
     func frameRateAction(sender: UIView) {
-        guard let window = RoomRouter.shared.currentViewController()?.view.window else { return }
-        let alert = ResolutionAlert()
-        alert.backgroundColor = UIColor(0x1B1E26)
-        alert.dataSource = frameRateTable
-        alert.selectIndex = videoModel.frameIndex
-        window.addSubview(alert)
-        alert.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        window.layoutIfNeeded()
-        alert.show()
-        alert.didSelectItem = { [weak self, weak alert] index in
-            guard let `self` = self, let alert = alert else { return }
-            self.videoItems[1].messageText = self.frameRateTable[index].resolutionName
-            self.updateSetUpItemView(item: self.videoItems[1], listIndex: 1, pageIndex: 1)
-            self.updateFps(index: index)
-            alert.dismiss()
-        }
+        viewResponder?.showFrameRateAlert()
     }
     
     func updateFps(index: Int) {
@@ -324,16 +318,6 @@ class SetUpViewModel {
             self.volumePromptAction(sender: view)
         }
         audioItems.append(volumePromptItem)
-        
-        let audioRecordingItem = ListCellItemData()
-        audioRecordingItem.titleText = .audioRecordingText
-        audioRecordingItem.hasSwitch = true
-        audioRecordingItem.action = { [weak self] sender in
-            guard let self = self, let view = sender as? UISwitch else { return }
-            self.audioRecordingAction(sender: view)
-        }
-        audioItems.append(audioRecordingItem)
-        
     }
     
     func captureVolumeAction(sender: UISlider) {
@@ -358,40 +342,14 @@ class SetUpViewModel {
         EngineManager.shared.store.audioSetting = audioModel
     }
     
-    func audioRecordingAction(sender: UISwitch) {
-        guard let file_path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory,
-                                                                  FileManager.SearchPathDomainMask.userDomainMask,
-                                                                  true).last?.appending("/test-record.aac") else {
-            return
-        }
-        
-        if sender.isOn {
-            let params = TRTCAudioRecordingParams()
-            params.filePath = file_path
-            EngineManager.shared.roomEngine.startPushLocalAudio()
-        } else {
-            EngineManager.shared.roomEngine.stopPushLocalAudio()
-            let message = .recordingSavePathText + file_path
-            let alertVC = UIAlertController(title: .promptText, message: message, preferredStyle: UIAlertController.Style.alert)
-            let okView = UIAlertAction(title: .confirmText,
-                                       style: UIAlertAction.Style.default,
-                                       handler: { (_: UIAlertAction) in
-            })
-            alertVC.addAction(okView)
-            RoomRouter.shared.currentViewController()?.present(alertVC, animated: true, completion: nil)
-        }
-        audioModel.isRecord = sender.isOn
-        EngineManager.shared.store.audioSetting = audioModel
-    }
-    
     func shareStartAction(sender: UIButton) {
         if #available(iOS 12.0, *) {
             let roomEngine = EngineManager.shared.roomEngine
-            roomEngine.startScreenCapture(appGroup: "com.tencent.TUIRoomTXReplayKit-Screen")
+            roomEngine.startScreenCapture(appGroup: appGroupString)
             BroadcastLauncher.launch()
             roomEngine.closeLocalCamera()
         } else {
-            RoomRouter.shared.currentViewController()?.view.window?.makeToast(.versionLowToastText)
+            viewResponder?.makeToast(text: .versionLowToastText)
         }
     }
     
@@ -412,7 +370,4 @@ private extension String {
     static let captureVolumeText = localized("TUIRoom.capture.volume")
     static let volumePromptText = localized("TUIRoom.volume.prompt")
     static let audioRecordingText = localized("TUIRoom.audio.recording")
-    static let recordingSavePathText = localized("TUIRoom.recording.save.path")
-    static let promptText = localized("TUIRoom.prompt")
-    static let confirmText = localized("TUIRoom.ok")
 }

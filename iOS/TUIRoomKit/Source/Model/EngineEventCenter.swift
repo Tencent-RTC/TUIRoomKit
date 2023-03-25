@@ -45,15 +45,15 @@ class EngineEventCenter: NSObject {
     static let shared = EngineEventCenter()
     private var engineObserverMap: [RoomEngineEvent: WeakArray<RoomEngineEventResponder>] = [:]
     private var uiEventObserverMap: [RoomUIEvent: [TUINotificationAdapter]] = [:]
-    lazy var engineManager: EngineManager = {
-        return EngineManager.shared
-    }()
-    lazy var roomInfo: RoomInfo = {
-        return engineManager.store.roomInfo
-    }()
-    lazy var currentUser: UserModel = {
-        return engineManager.store.currentUser
-    }()
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
+    var roomInfo: RoomInfo {
+        engineManager.store.roomInfo
+    }
+    var currentUser: UserModel {
+        engineManager.store.currentUser
+    }
     
     private override init() {
         super.init()
@@ -232,6 +232,7 @@ extension EngineEventCenter: TUIRoomObserver {
     
     // MARK: - 房间内事件回调
     func onRoomInfoChanged(roomId: String, roomInfo: TUIRoomInfo) {
+        checkRoomChangeInfo(roomInfo: roomInfo)
         guard let observers = engineObserverMap[.onRoomInfoChanged] else { return }
         let param = [
             "roomId" : roomId,
@@ -246,7 +247,6 @@ extension EngineEventCenter: TUIRoomObserver {
             }
             responder()?.onEngineEvent(name: .onRoomInfoChanged, param: param)
         }
-        checkRoomChangeInfo(roomInfo: roomInfo)
     }
     
     func onRoomDismissed(roomId: String) {

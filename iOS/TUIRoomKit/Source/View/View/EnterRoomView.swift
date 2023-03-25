@@ -14,15 +14,6 @@ class EnterRoomView: UIView {
     private var inputViewArray: [ListCellItemView] = []
     private var switchViewArray: [ListCellItemView] = []
     
-    let backButton: UIButton = {
-        let button = UIButton(type: .custom)
-        let normalIcon = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
-        button.setImage(normalIcon, for: .normal)
-        button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
-        button.setTitle(.enterRoomText, for: .normal)
-        return button
-    }()
-    
     let inputStackView: UIStackView = {
         let view = UIStackView()
         view.axis = .vertical
@@ -87,10 +78,6 @@ class EnterRoomView: UIView {
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ResignFirstResponder, param: [:])
     }
     
-    func setNavigationLeftBarButton() {
-        RoomRouter.shared.currentViewController()?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
-    }
-    
     func constructViewHierarchy() {
         backgroundColor = UIColor(0x17181F)
         addSubview(inputStackView)
@@ -145,7 +132,6 @@ class EnterRoomView: UIView {
     }
     
     func bindInteraction() {
-        backButton.addTarget(self, action: #selector(backButtonClick(sender:)), for: .touchUpInside)
         enterButton.addTarget(self, action: #selector(enterButtonClick(sender:)), for: .touchUpInside)
     }
     

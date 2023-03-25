@@ -96,7 +96,7 @@ extension RoomMainRootView: RoomMainViewResponder {
         let sureAction = UIAlertAction(title: .agreeText, style: .default) { _ in
         }
         alertVC.addAction(sureAction)
-        RoomRouter.shared.currentViewController()?.present(alertVC, animated: true, completion: nil)
+        RoomRouter.shared.presentAlert(alertVC)
     }
 }
 

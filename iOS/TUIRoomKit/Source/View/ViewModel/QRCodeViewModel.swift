@@ -20,10 +20,6 @@ class QRCodeViewModel {
         UIPasteboard.general.string = text
     }
     
-    func backAction(sender: UIButton) {
-        RoomRouter.shared.popRoomController()
-    }
-    
     func saveIntoAlbumAction(sender: UIButton, image: UIImage) {
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
     }

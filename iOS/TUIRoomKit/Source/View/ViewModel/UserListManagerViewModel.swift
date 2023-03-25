@@ -16,18 +16,18 @@ class UserListManagerViewModel: NSObject {
     private(set) var currentUserItems: [ButtonItemData] = []
     private(set) var seatInviteSeatItems: [ButtonItemData] = []//已经上麦的用户viewItem
     private(set) var seatNoneInviteSeatItems: [ButtonItemData] = []//没有上麦的用户viewItem
-    lazy var engineManager: EngineManager = {
-        return EngineManager.shared
-    }()
-    lazy var roomInfo: RoomInfo = {
-        return engineManager.store.roomInfo
-    }()
-    lazy var currentUser: UserModel = {
-        return engineManager.store.currentUser
-    }()
-    lazy var attendeeList: [UserModel] = {
-        return engineManager.store.attendeeList
-    }()
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
+    var roomInfo: RoomInfo {
+        engineManager.store.roomInfo
+    }
+    var currentUser: UserModel {
+        engineManager.store.currentUser
+    }
+    var attendeeList: [UserModel] {
+        engineManager.store.attendeeList
+    }
     
     override init() {
         super.init()
@@ -184,8 +184,9 @@ class UserListManagerViewModel: NSObject {
             roomEngine.closeLocalMicrophone()
             roomEngine.stopPushLocalAudio()
         } else {
-            roomEngine.openLocalMicrophone {
-                roomEngine.startPushLocalAudio()
+            roomEngine.openLocalMicrophone { [weak self] in
+                guard let self = self else { return }
+                self.engineManager.roomEngine.startPushLocalAudio()
             } onError: { code, message in
                 debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
             }
@@ -210,8 +211,9 @@ class UserListManagerViewModel: NSObject {
         } else {
             // FIXME: - 打开摄像头前需要先设置一个view
             roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-            roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) {
-                roomEngine.startPushLocalVideo()
+            roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) { [weak self] in
+                guard let self = self else { return }
+                self.engineManager.roomEngine.startPushLocalVideo()
             } onError: { code, message in
                 debugPrint("openLocalCamera,code:\(code),message:\(message)")
             }

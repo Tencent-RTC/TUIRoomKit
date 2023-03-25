@@ -12,9 +12,9 @@ class VideoSeatItem {
 
     let seatInfo: TUISeatInfo
     var userInfo: TUIUserInfo = TUIUserInfo()
-    weak var viewModel: TUIVideoSeatViewModel?
     var audioVolume: Int = 0
     var cellIndexPath: IndexPath? = nil
+    var isAsyncUserInfo: Bool = false
     var seatIndex: Int {
         return seatInfo.index
     }
@@ -81,9 +81,8 @@ class VideoSeatItem {
         }
     }
     
-    init(seatInfo: TUISeatInfo, viewModel: TUIVideoSeatViewModel? = nil) {
+    init(seatInfo: TUISeatInfo) {
         self.seatInfo = seatInfo
-        self.viewModel = viewModel
         self.userInfo.userId = seatInfo.userId ?? ""
     }
 
@@ -97,4 +96,5 @@ class VideoSeatItem {
         self.seatInfo.audioMuted = seatInfo.audioMuted
         self.seatInfo.videoMuted = seatInfo.videoMuted
     }
+    
 }
