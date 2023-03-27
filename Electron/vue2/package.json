@@ -49,6 +49,36 @@
     "vue3",
     "vue"
   ],
+  "build": {
+    "appId": "com.tencentcloud.room-uikit-electron-vue2",
+    "directories": {
+      "output": "./bin"
+    },
+    "win": {
+      "extraFiles": [
+        {
+          "from": "node_modules/trtc-electron-sdk/build/Release/",
+          "to": "./resources",
+          "filter": [
+            "**/*"
+          ]
+        }
+      ]
+    },
+    "mac": {
+      "extraFiles": [
+        {
+          "from": "node_modules/trtc-electron-sdk/build/Release/trtc_electron_sdk.node",
+          "to": "./Resources"
+        }
+      ]
+    },
+    "files": [
+      "dist/**/*",
+      "*.js",
+      "!node_modules"
+    ]
+  },
   "dependencies": {
     "@tencentcloud/tuiroom-engine-electron": "1.0.2",
     "axios": "^0.27.2",
@@ -56,6 +86,7 @@
     "element-ui": "^2.15.10",
     "js-cookie": "^3.0.1",
     "lodash.isequal": "^4.5.0",
+    "mitt": "^3.0.0",
     "pinia": "^2.0.28",
     "sass": "^1.57.1",
     "tim-js-sdk": "^2.24.2",
