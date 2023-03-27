@@ -1,6 +1,5 @@
-package com.tencent.cloud.tuikit.videoseat.ui.utils;
+package com.tencent.cloud.tuikit.videoseat.ui.layout;
 
-import static android.view.View.MeasureSpec.EXACTLY;
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
 
 import android.graphics.PointF;
@@ -15,51 +14,63 @@ import androidx.annotation.IntRange;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tencent.cloud.tuikit.videoseat.R;
+import com.tencent.qcloud.tuicore.util.ScreenUtil;
+
 public class PageLayoutManager extends RecyclerView.LayoutManager implements
         RecyclerView.SmoothScroller.ScrollVectorProvider {
-    private static final String TAG               = "PageLayoutManager";
-    private static final int    DEFAULT_HEIGHT_DP = 450;
-    private static final int    ROUND_MARGIN_DP   = 8;
+    private static final String TAG = "PageLayoutManager";
+
+    public static final int SPEAKER_PAGE_INDEX = 0;
 
     public static final int VERTICAL   = 0;
     public static final int HORIZONTAL = 1;
 
-    private int     mLastPageCount           = -1;
-    private int     mLastPageIndex           = -1;
-    private int     mFirstVisiblePosition;
-    private boolean mChangeSelectInScrolling = true;
+    private static final int SPEAKER_PAGE_ITEM_COUNT = 1;
+    private static final int ITEM_MARGIN_DP                 = 8;
 
-    private boolean mIsLayoutStyleRound = true;
+    protected int mLastPageCount;
+    protected int mLastPageIndex;
+
+    private boolean mChangeSelectInScrolling = true;
 
     @IntDef({VERTICAL, HORIZONTAL})
     public @interface OrientationType {
     }
 
     @OrientationType
-    private int mOrientation;
+    private int mOrientation = HORIZONTAL;
 
-    private int mOffsetX = 0;
-    private int mOffsetY = 0;
+    protected int mOffsetX = 0;
+    protected int mOffsetY = 0;
 
-    private int mRows;
-    private int mColumns;
-    private int mOnePageSize;
+    protected int mRows;
+    protected int mColumns;
+    protected int mOnePageSize;
+    protected int mMarginBetweenItem;
 
     private SparseArray<Rect> mItemFrames;
 
-    private int mItemWidth  = 0;
-    private int mItemHeight = 0;
+    protected int mViewSizeSmall;
+    protected int mViewSizeMiddle;
 
-    private int mWidthUsed  = 0;
-    private int mHeightUsed = 0;
+    protected int mItemWidth  = 0;
+    protected int mItemHeight = 0;
 
-    private int mMaxScrollX;
-    private int mMaxScrollY;
-    private int mScrollState = SCROLL_STATE_IDLE;
+    protected int mWidthUsed  = 0;
+    protected int mHeightUsed = 0;
+
+    protected int mMaxScrollX;
+    protected int mMaxScrollY;
+    private   int mScrollState = SCROLL_STATE_IDLE;
 
     private boolean mAllowContinuousScroll = true;
 
-    private RecyclerView mRecyclerView;
+    protected RecyclerView mRecyclerView;
+
+    protected boolean mIsSpeakerModeOn;
+    protected boolean mIsTwoPersonVideoOn;
+    protected boolean mIsTwoPersonSwitched;
 
     public PageLayoutManager(@IntRange(from = 1, to = 100) int rows,
                              @IntRange(from = 1, to = 100) int columns,
@@ -71,104 +82,31 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         mOnePageSize = mRows * mColumns;
     }
 
-    public void switchLayout(boolean isLayoutStyleRound) {
-        mIsLayoutStyleRound = isLayoutStyleRound;
+    public void enableSpeakerMode(boolean enable) {
+        mIsSpeakerModeOn = enable;
+        mLastPageIndex = 0;
+        mOffsetX = 0;
+    }
+
+    public void enableTwoPersonMeeting(boolean isTwoPersonVideoOn, boolean isPersonSwitch) {
+        mIsTwoPersonVideoOn = isTwoPersonVideoOn;
+        mIsTwoPersonSwitched = isPersonSwitch;
     }
 
     @Override
     public void onAttachedToWindow(RecyclerView view) {
         super.onAttachedToWindow(view);
         mRecyclerView = view;
+        mMarginBetweenItem = ScreenUtil.dip2px(ITEM_MARGIN_DP);
+        mViewSizeSmall =
+                (int) view.getContext().getResources().getDimension(R.dimen.tuivideoseat_video_view_size_small);
+        mViewSizeMiddle =
+                (int) view.getContext().getResources().getDimension(R.dimen.tuivideoseat_video_view_size_middle);
     }
 
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-        if (state.isPreLayout() || getUsableWidth() == 0) {
-            return;
-        }
 
-        if (getItemCount() == 0) {
-            removeAndRecycleAllViews(recycler);
-            setPageCount(0);
-            setPageIndex(0, false);
-            return;
-        } else if (getItemCount() == 1) {
-            detachAndScrapAttachedViews(recycler);
-            View scrap = recycler.getViewForPosition(0);
-            measureChildWithMargins(scrap, 0, 0);
-            addView(scrap);
-            layoutDecorated(scrap,
-                    0,
-                    0,
-                    getWidth(),
-                    getHeight());
-            if (mPageListener != null) {
-                mPageListener.onItemVisible(0, 0);
-            }
-            return;
-        } else if (getItemCount() == 2) {
-            detachAndScrapAttachedViews(recycler);
-            View scrap = recycler.getViewForPosition(0);
-            int heightUse = getUsableHeight() / 2;
-            measureChildWithMargins(scrap, 0, heightUse);
-            addView(scrap);
-            layoutDecorated(scrap,
-                    0,
-                    0,
-                    getWidth(),
-                    heightUse);
-            scrap = recycler.getViewForPosition(1);
-            measureChildWithMargins(scrap, 0, heightUse);
-            addView(scrap);
-            layoutDecorated(scrap,
-                    0,
-                    heightUse,
-                    getWidth(),
-                    getHeight());
-            if (mPageListener != null) {
-                mPageListener.onItemVisible(0, 1);
-            }
-            return;
-        } else {
-            setPageCount(getTotalPageCount());
-            setPageIndex(getPageIndexByOffset(), false);
-        }
-
-        int mPageCount = getItemCount() / mOnePageSize;
-        if (getItemCount() % mOnePageSize != 0) {
-            mPageCount++;
-        }
-
-        if (canScrollHorizontally()) {
-            mMaxScrollX = (mPageCount - 1) * getUsableWidth();
-            mMaxScrollY = 0;
-            if (mOffsetX > mMaxScrollX) {
-                mOffsetX = mMaxScrollX;
-            }
-        } else {
-            mMaxScrollX = 0;
-            mMaxScrollY = (mPageCount - 1) * getUsableHeight();
-            if (mOffsetY > mMaxScrollY) {
-                mOffsetY = mMaxScrollY;
-            }
-        }
-
-        if (mIsLayoutStyleRound) {
-            mItemWidth = (getUsableWidth() - (mColumns + 1) * dp2px(ROUND_MARGIN_DP)) / mColumns;
-            mItemHeight = mItemWidth;
-        } else {
-            mItemWidth = getUsableWidth() / mColumns;
-            mItemHeight = getUsableHeight() / mRows;
-        }
-
-        mWidthUsed = getUsableWidth() - mItemWidth;
-        mHeightUsed = getUsableHeight() - mItemHeight;
-
-        for (int i = 0; i < mOnePageSize * 2; i++) {
-            getItemFrameByPosition(i);
-        }
-
-        recycleAndFillItems(recycler, state, true);
     }
 
     @Override
@@ -182,41 +120,56 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         setPageIndex(getPageIndexByOffset(), false);
     }
 
-    private void recycleAndFillItems(RecyclerView.Recycler recycler, RecyclerView.State state,
-                                     boolean isStart) {
+    protected void recycleAndFillItems(RecyclerView.Recycler recycler, RecyclerView.State state, boolean isStart) {
         if (state.isPreLayout()) {
             return;
         }
 
         Rect displayRect = new Rect(mOffsetX - mItemWidth, mOffsetY - mItemHeight,
                 getUsableWidth() + mOffsetX + mItemWidth, getUsableHeight() + mOffsetY + mItemHeight);
-        displayRect.intersect(0, 0, mMaxScrollX + getUsableWidth(), mMaxScrollY
-                + getUsableHeight());
-
         int startPos;
         int pageIndex = getPageIndexByOffset();
-        startPos = pageIndex * mOnePageSize;
+
+        if (mIsSpeakerModeOn) {
+            if (pageIndex < 1) {
+                return;
+            }
+            startPos = (pageIndex - 1) * mOnePageSize + SPEAKER_PAGE_ITEM_COUNT;
+        } else {
+            startPos = pageIndex * mOnePageSize;
+        }
+
         startPos = startPos - mOnePageSize * 2;
-        if (startPos < 0) {
-            startPos = 0;
+        int minStartPos = mIsSpeakerModeOn ? SPEAKER_PAGE_ITEM_COUNT : 0;
+        if (startPos < minStartPos) {
+            startPos = minStartPos;
         }
         int stopPos = startPos + mOnePageSize * 4;
-        if (stopPos > getItemCount()) {
-            stopPos = getItemCount();
+        if (stopPos >= getItemCount()) {
+            stopPos = getItemCount() - 1;
         }
 
         detachAndScrapAttachedViews(recycler);
-
+        if (pageIndex == SPEAKER_PAGE_ITEM_COUNT + 1 && mIsSpeakerModeOn) {
+            layoutForSpeakerPreview(recycler);
+        }
         if (isStart) {
-            for (int i = startPos; i < stopPos; i++) {
+            for (int i = startPos; i <= stopPos; i++) {
                 addOrRemove(recycler, displayRect, i);
             }
         } else {
-            for (int i = stopPos - 1; i >= startPos; i--) {
+            for (int i = stopPos; i >= startPos; i--) {
                 addOrRemove(recycler, displayRect, i);
             }
         }
-        startPos = pageIndex * mOnePageSize;
+        if (mIsSpeakerModeOn) {
+            if (pageIndex < 1) {
+                return;
+            }
+            startPos = (pageIndex - 1) * mOnePageSize + SPEAKER_PAGE_ITEM_COUNT;
+        } else {
+            startPos = pageIndex * mOnePageSize;
+        }
         stopPos = startPos + mOnePageSize - 1;
         if (stopPos >= getItemCount()) {
             stopPos = getItemCount() - 1;
@@ -224,11 +177,20 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         if (mPageListener != null) {
             mPageListener.onItemVisible(startPos, stopPos);
         }
-        mFirstVisiblePosition = startPos;
     }
 
-    public int findFirstVisibleItemPosition() {
-        return mFirstVisiblePosition;
+    private void layoutForSpeakerPreview(RecyclerView.Recycler recycler) {
+        int pageWidth = getUsableWidth();
+        int pageHeight = getUsableHeight();
+        int itemWidth = pageWidth;
+        int itemHeight = pageHeight;
+        View speakerView = recycler.getViewForPosition(0);
+        measureChildWithMargins(speakerView, pageWidth - itemWidth, pageHeight - itemHeight);
+        addView(speakerView);
+        int centerVerticalMargin = (pageHeight - itemHeight) >> 1;
+        int centerHorizontalMargin = (pageWidth - itemWidth) >> 1;
+        layoutDecorated(speakerView, centerHorizontalMargin - mOffsetX, centerVerticalMargin,
+                centerHorizontalMargin + itemWidth - mOffsetX, centerVerticalMargin + itemHeight);
     }
 
     private void addOrRemove(RecyclerView.Recycler recycler, Rect displayRect, int i) {
@@ -249,8 +211,7 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
     }
 
     @Override
-    public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State
-            state) {
+    public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
         int newX = mOffsetX + dx;
         int result = dx;
         if (newX > mMaxScrollX) {
@@ -296,8 +257,18 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         }
     }
 
-    private Rect getItemFrameByPosition(int pos) {
-        int page = pos / mOnePageSize;
+    private int getPageByPosition(int pos) {
+        if (pos == 0) {
+            return 0;
+        }
+        if (mIsSpeakerModeOn) {
+            return 1 + (pos - 1) / mOnePageSize;
+        }
+        return pos / mOnePageSize;
+    }
+
+    protected Rect getItemFrameByPosition(int pos) {
+        int page = getPageByPosition(pos);
         int offsetX = 0;
         int offsetY = 0;
         if (canScrollHorizontally()) {
@@ -306,16 +277,19 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
             offsetY += getUsableHeight() * page;
         }
 
+        pos -= mIsSpeakerModeOn ? 1 : 0;
         int pagePos = pos % mOnePageSize;
         int row = pagePos / mColumns;
         int col = pagePos - (row * mColumns);
 
         offsetX += col * mItemWidth;
         offsetY += row * mItemHeight;
-        if (mIsLayoutStyleRound) {
-            offsetX += (col + 1) * dp2px(ROUND_MARGIN_DP);
-            offsetY += (row + 1) * dp2px(ROUND_MARGIN_DP);
-        }
+
+        int centerHorizontalMargin =
+                (getUsableWidth() - mItemWidth * mColumns - mMarginBetweenItem * (mColumns + 1)) >> 1;
+        offsetX += (col + 1) * mMarginBetweenItem + centerHorizontalMargin;
+        int centerVerticalMargin = (getUsableHeight() - mItemHeight * mRows - mMarginBetweenItem * (mRows + 1)) >> 1;
+        offsetY += (row + 1) * mMarginBetweenItem + centerVerticalMargin;
 
         Rect rect = new Rect();
         rect.left = offsetX;
@@ -325,30 +299,42 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         return rect;
     }
 
-    private int getUsableWidth() {
+    protected int getUsableWidth() {
         return getWidth() - getPaddingLeft() - getPaddingRight();
     }
 
-    private int getUsableHeight() {
+    protected int getUsableHeight() {
         return getHeight() - getPaddingTop() - getPaddingBottom();
     }
 
-    private int getTotalPageCount() {
-        if (getItemCount() <= 0) {
-            return 0;
+    public int getTotalPageCount() {
+        int itemCount = getItemCount();
+        int pageCount = 0;
+        if (itemCount <= 0) {
+            return 1;
         }
-        int totalCount = getItemCount() / mOnePageSize;
-        if (getItemCount() % mOnePageSize != 0) {
-            totalCount++;
+
+        if (mIsSpeakerModeOn) {
+            pageCount++;
+            itemCount--;
         }
-        return totalCount;
+        pageCount += itemCount / mOnePageSize;
+        pageCount += itemCount % mOnePageSize != 0 ? 1 : 0;
+        return pageCount;
     }
 
     private int getPageIndexByPos(int pos) {
-        return pos / mOnePageSize;
+        int pageIndex;
+        if (mIsSpeakerModeOn) {
+            pageIndex = pos < SPEAKER_PAGE_ITEM_COUNT ? 0 :
+                    (pos - SPEAKER_PAGE_ITEM_COUNT) / mOnePageSize + 1;
+        } else {
+            pageIndex = pos / mOnePageSize;
+        }
+        return pageIndex;
     }
 
-    private int getPageIndexByOffset() {
+    protected int getPageIndexByOffset() {
         int pageIndex;
         if (canScrollVertically()) {
             int pageHeight = getUsableHeight();
@@ -381,35 +367,6 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
     }
 
     @Override
-    public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthMeasureSpec,
-                          int heightMeasureSpec) {
-        super.onMeasure(recycler, state, widthMeasureSpec, heightMeasureSpec);
-        int widthsize = View.MeasureSpec.getSize(widthMeasureSpec);
-        int widthmode = View.MeasureSpec.getMode(widthMeasureSpec);
-
-        int heightsize = View.MeasureSpec.getSize(heightMeasureSpec);
-        int heightmode = View.MeasureSpec.getMode(heightMeasureSpec);
-
-        if (widthmode != EXACTLY && widthsize > 0) {
-            widthmode = EXACTLY;
-        }
-        if (heightmode != EXACTLY && heightsize > 0) {
-            heightmode = EXACTLY;
-        }
-
-        if (mIsLayoutStyleRound) {
-            // 调整 item 的宽高比为 1:1，item 距父布局 8dp，item 之间距离 8dp；
-            int itemWidth = (widthsize - (mColumns + 1) * dp2px(ROUND_MARGIN_DP)) / mColumns;
-            heightsize = itemWidth * mRows + (mRows + 1) * dp2px(ROUND_MARGIN_DP);
-            setMeasuredDimension(View.MeasureSpec.makeMeasureSpec(widthsize, widthmode),
-                    View.MeasureSpec.makeMeasureSpec(heightsize, heightmode));
-        } else {
-            setMeasuredDimension(View.MeasureSpec.makeMeasureSpec(widthsize, widthmode),
-                    View.MeasureSpec.makeMeasureSpec(dp2px(DEFAULT_HEIGHT_DP), heightmode));
-        }
-    }
-
-    @Override
     public boolean canScrollHorizontally() {
         return mOrientation == HORIZONTAL;
     }
@@ -419,33 +376,39 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         return mOrientation == VERTICAL;
     }
 
-    int findNextPageFirstPos() {
-        int page = mLastPageIndex;
-        page++;
-        if (page >= getTotalPageCount()) {
-            page = getTotalPageCount() - 1;
+    public int findNextPageFirstPos() {
+        int nextPageIndex = mLastPageIndex + 1;
+        int maxPageIndex = getTotalPageCount() - 1;
+        if (nextPageIndex > maxPageIndex) {
+            nextPageIndex = maxPageIndex;
         }
-        return page * mOnePageSize;
+        int nextPageFirstPos;
+        if (mIsSpeakerModeOn) {
+            nextPageFirstPos = 1 + (nextPageIndex - 1) * mOnePageSize;
+        } else {
+            nextPageFirstPos = nextPageIndex * mOnePageSize;
+        }
+
+        return nextPageFirstPos;
     }
 
 
-    int findPrePageFirstPos() {
-        int page = mLastPageIndex;
-        page--;
+    public int findPrePageFirstPos() {
+        int page = mLastPageIndex - 1;
         if (page < 0) {
             page = 0;
         }
-        return page * mOnePageSize;
+        if (page == 0) {
+            return 0;
+        }
+        int prePageFirstPost;
+        if (mIsSpeakerModeOn) {
+            prePageFirstPost = 1 + (page - 1) * mOnePageSize;
+        } else {
+            prePageFirstPost = page * mOnePageSize;
+        }
+        return prePageFirstPost;
     }
-
-    public int getOffsetX() {
-        return mOffsetX;
-    }
-
-    public int getOffsetY() {
-        return mOffsetY;
-    }
-
 
     @Override
     public PointF computeScrollVectorForPosition(int targetPosition) {
@@ -456,7 +419,7 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         return vector;
     }
 
-    int[] getSnapOffset(int targetPosition) {
+    public int[] getSnapOffset(int targetPosition) {
         int[] offset = new int[2];
         int[] pos = getPageLeftTopByPosition(targetPosition);
         offset[0] = pos[0] - mOffsetX;
@@ -484,7 +447,14 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         if (getChildCount() <= 0) {
             return null;
         }
-        int targetPos = getPageIndexByOffset() * mOnePageSize;   // 目标Pos
+
+        int pageIndexByOffset = getPageIndexByOffset();
+        int targetPos;
+        if (mIsSpeakerModeOn) {
+            targetPos = pageIndexByOffset == 0 ? 0 : 1 + (pageIndexByOffset - 1) * mOnePageSize;
+        } else {
+            targetPos = pageIndexByOffset * mOnePageSize;
+        }
         for (int i = 0; i < getChildCount(); i++) {
             int childPos = getPosition(getChildAt(i));
             if (childPos == targetPos) {
@@ -495,7 +465,7 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
     }
 
 
-    private void setPageCount(int pageCount) {
+    protected void setPageCount(int pageCount) {
         if (pageCount >= 0) {
             if (mPageListener != null && pageCount != mLastPageCount) {
                 mPageListener.onPageSizeChanged(pageCount);
@@ -504,7 +474,11 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         }
     }
 
-    private void setPageIndex(int pageIndex, boolean isScrolling) {
+    public int getCurrentPageIndex() {
+        return mLastPageIndex;
+    }
+
+    protected void setPageIndex(int pageIndex, boolean isScrolling) {
         if (pageIndex == mLastPageIndex) {
             return;
         }
@@ -518,10 +492,8 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         if (isScrolling && !mChangeSelectInScrolling) {
             return;
         }
-        if (pageIndex >= 0) {
-            if (null != mPageListener) {
-                mPageListener.onPageSelect(pageIndex);
-            }
+        if (null != mPageListener) {
+            mPageListener.onPageSelect(pageIndex);
         }
     }
 
@@ -553,14 +525,6 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         smoothScrollToPage(targetPageIndex);
     }
 
-    public void smoothPrePage() {
-        smoothScrollToPage(getPageIndexByOffset() - 1);
-    }
-
-    public void smoothNextPage() {
-        smoothScrollToPage(getPageIndexByOffset() + 1);
-    }
-
     public void smoothScrollToPage(int pageIndex) {
         if (pageIndex < 0 || pageIndex >= mLastPageCount) {
             Log.e(TAG, "pageIndex is outOfIndex, must in [0, " + mLastPageCount + ").");
@@ -590,14 +554,6 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
     public void scrollToPosition(int position) {
         int pageIndex = getPageIndexByPos(position);
         scrollToPage(pageIndex);
-    }
-
-    public void prePage() {
-        scrollToPage(getPageIndexByOffset() - 1);
-    }
-
-    public void nextPage() {
-        scrollToPage(getPageIndexByOffset() + 1);
     }
 
     public void scrollToPage(int pageIndex) {
@@ -632,7 +588,7 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         mAllowContinuousScroll = allowContinuousScroll;
     }
 
-    private PageListener mPageListener = null;
+    protected PageListener mPageListener = null;
 
     public void setPageListener(PageListener pageListener) {
         mPageListener = pageListener;
@@ -645,10 +601,5 @@ public class PageLayoutManager extends RecyclerView.LayoutManager implements
         void onPageSelect(int pageIndex);
 
         void onItemVisible(int fromItem, int toItem);
-    }
-
-    private int dp2px(int dp) {
-        final float scale = mRecyclerView.getResources().getDisplayMetrics().density;
-        return (int) (dp * scale + 0.5f);
     }
 }

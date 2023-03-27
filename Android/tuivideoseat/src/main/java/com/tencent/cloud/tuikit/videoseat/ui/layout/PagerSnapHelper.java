@@ -1,4 +1,4 @@
-package com.tencent.cloud.tuikit.videoseat.ui.utils;
+package com.tencent.cloud.tuikit.videoseat.ui.layout;
 
 import android.view.View;
 
@@ -37,7 +37,7 @@ public class PagerSnapHelper extends SnapHelper {
     @Override
     public int[] calculateDistanceToFinalSnap(@NonNull RecyclerView.LayoutManager layoutManager,
                                               @NonNull View targetView) {
-        int pos = layoutManager.getPosition(targetView);
+        int pos = mRecyclerView.getChildAdapterPosition(targetView);
         int[] offset = new int[2];
         if (layoutManager instanceof PageLayoutManager) {
             PageLayoutManager manager = (PageLayoutManager) layoutManager;
@@ -129,7 +129,7 @@ public class PagerSnapHelper extends SnapHelper {
             return false;
         }
 
-        RecyclerView.SmoothScroller smoothScroller = createSnapScroller(layoutManager);
+        RecyclerView.SmoothScroller smoothScroller = createScroller(layoutManager);
         if (smoothScroller == null) {
             return false;
         }
@@ -150,7 +150,7 @@ public class PagerSnapHelper extends SnapHelper {
      * @param layoutManager Layout manager
      * @return Custom `LinearSmoothScroller`
      */
-    protected LinearSmoothScroller createSnapScroller(RecyclerView.LayoutManager layoutManager) {
+    protected LinearSmoothScroller createScroller(RecyclerView.LayoutManager layoutManager) {
         if (!(layoutManager instanceof RecyclerView.SmoothScroller.ScrollVectorProvider)) {
             return null;
         }

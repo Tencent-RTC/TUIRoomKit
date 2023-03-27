@@ -12,4 +12,6 @@ public interface IVideoSeatViewModel {
     void startPlayVideo(String userId, TUIVideoView videoView, boolean isSharingScreen);
 
     void stopPlayVideo(String userId, boolean isSharingScreen, boolean isStreamStop);
+
+    void setLocalVideoView(UserEntity selfEntity);
 }

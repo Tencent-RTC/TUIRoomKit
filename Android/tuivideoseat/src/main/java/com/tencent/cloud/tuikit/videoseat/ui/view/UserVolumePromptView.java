@@ -1,5 +1,7 @@
 package com.tencent.cloud.tuikit.videoseat.ui.view;
 
+import static com.tencent.cloud.tuikit.videoseat.Constants.VOLUME_NO_SOUND;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -18,8 +20,6 @@ public class UserVolumePromptView extends View {
     private static final int VOLUME_STEP         = 1;
     private static final int VOLUME_TOTAL_STEP   = 100 / VOLUME_STEP;
     private static final int VOLUME_SHOW_TIME_MS = 500;
-    private static final int VOLUME_QUIET        = 0;
-    private static final int MSG_CLEAR_VOLUME    = 1;
 
     private Paint mPaint;
 
@@ -44,7 +44,7 @@ public class UserVolumePromptView extends View {
         mPaint = new Paint();
         mPaint.setColor(0xFFA5FE33);
 
-        mVolume = VOLUME_QUIET;
+        mVolume = VOLUME_NO_SOUND;
     }
 
     /**
@@ -53,6 +53,9 @@ public class UserVolumePromptView extends View {
      * @param volume 当前 mic 的音量，范围 [0 ~ 100]
      */
     public void updateVolumeEffect(int volume) {
+        if (!isAttachedToWindow()) {
+            return;
+        }
         volume = volume < 0 ? 0 : volume;
         volume = volume > 100 ? 100 : volume;
 
@@ -64,7 +67,7 @@ public class UserVolumePromptView extends View {
         mVolume = greenVolume;
         invalidate();
 
-        if (mMainHandler != null) {
+        if (mMainHandler != null && mVolume != VOLUME_NO_SOUND) {
             mMainHandler.removeCallbacksAndMessages(null);
             mMainHandler.postDelayed(mClearGreenVolume, VOLUME_SHOW_TIME_MS);
         }
@@ -73,12 +76,15 @@ public class UserVolumePromptView extends View {
     public void enableVolumeEffect(boolean enable) {
         int resId = enable ? R.drawable.tuivideoseat_bg_litle_mic : R.drawable.tuivideoseat_mic_close;
         setBackground(getContext().getResources().getDrawable(resId));
+        if (!enable && mVolume != VOLUME_NO_SOUND) {
+            updateVolumeEffect(VOLUME_NO_SOUND);
+        }
     }
 
     Runnable mClearGreenVolume = new Runnable() {
         @Override
         public void run() {
-            mVolume = VOLUME_QUIET;
+            mVolume = VOLUME_NO_SOUND;
             invalidate();
         }
     };
@@ -96,6 +102,7 @@ public class UserVolumePromptView extends View {
             mMainHandler.removeCallbacksAndMessages(null);
             mMainHandler = null;
         }
+        mVolume = VOLUME_NO_SOUND;
     }
 
     @Override
