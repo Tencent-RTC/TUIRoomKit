@@ -3,7 +3,7 @@ Pod::Spec.new do |spec|
   spec.name                  = 'TUIRoomKit'
   spec.version               = '1.0.5'
   spec.platform              = :ios
-  spec.ios.deployment_target = '11.0'
+  spec.ios.deployment_target = '13.0'
   spec.license               = { :type => 'MIT', :file => 'LICENSE' }
   spec.homepage              = 'https://cloud.tencent.com/document/product/269/3794'
   spec.documentation_url     = 'https://cloud.tencent.com/document/product/269/9147'

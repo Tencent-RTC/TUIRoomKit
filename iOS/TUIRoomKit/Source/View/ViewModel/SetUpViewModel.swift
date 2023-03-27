@@ -334,9 +334,9 @@ class SetUpViewModel {
     
     func volumePromptAction(sender: UISwitch) {
         if sender.isOn {
-            EngineManager.shared.roomEngine.getTRTCCloud().enableAudioVolumeEvaluation(300)
+            EngineManager.shared.roomEngine.getTRTCCloud().enableAudioVolumeEvaluation(300, enable_vad: true)
         } else {
-            EngineManager.shared.roomEngine.getTRTCCloud().enableAudioVolumeEvaluation(0)
+            EngineManager.shared.roomEngine.getTRTCCloud().enableAudioVolumeEvaluation(0, enable_vad: false)
         }
         audioModel.volumePrompt = sender.isOn
         EngineManager.shared.store.audioSetting = audioModel
