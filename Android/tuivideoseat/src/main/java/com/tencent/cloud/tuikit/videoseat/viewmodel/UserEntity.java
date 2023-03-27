@@ -1,31 +1,25 @@
 package com.tencent.cloud.tuikit.videoseat.viewmodel;
 
+import android.content.Context;
 import android.text.TextUtils;
 
+import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
-import com.tencent.cloud.tuikit.videoseat.ui.view.VideoView;
 
 public class UserEntity {
-    public static final int QUALITY_GOOD   = 3;
-    public static final int QUALITY_NORMAL = 2;
-    public static final int QUALITY_BAD    = 1;
-
-    private int     quality;
     private int     audioVolume;
     private String  userId;
     private String  userName;
     private String  userAvatar;
     private boolean isSelf;
     private boolean isTalk;
-    private boolean needFresh;
-    private boolean isShowOutSide;
     private boolean isVideoAvailable;
     private boolean isAudioAvailable;
     private boolean isCameraAvailable;
-    private boolean isShowAudioEvaluation;
     private boolean isScreenShareAvailable;
+    private boolean isVideoPlaying;
 
-    private VideoView          mRoomVideoView;
+    private TUIVideoView       mRoomVideoView;
     private TUIRoomDefine.Role role;
 
     public boolean isSelf() {
@@ -44,14 +38,6 @@ public class UserEntity {
         this.role = role;
     }
 
-    public boolean isNeedFresh() {
-        return needFresh;
-    }
-
-    public void setNeedFresh(boolean needFresh) {
-        this.needFresh = needFresh;
-    }
-
     public int getAudioVolume() {
         return audioVolume;
     }
@@ -60,27 +46,11 @@ public class UserEntity {
         this.audioVolume = audioVolume;
     }
 
-    public boolean isShowOutSide() {
-        return isShowOutSide;
-    }
-
-    public void setShowOutSide(boolean showOutSide) {
-        isShowOutSide = showOutSide;
-    }
-
-    public boolean isShowAudioEvaluation() {
-        return isShowAudioEvaluation;
-    }
-
-    public void setShowAudioEvaluation(boolean showAudioEvaluation) {
-        isShowAudioEvaluation = showAudioEvaluation;
-    }
-
-    public VideoView getRoomVideoView() {
+    public TUIVideoView getRoomVideoView() {
         return mRoomVideoView;
     }
 
-    public void setRoomVideoView(VideoView roomVideoView) {
+    public void setRoomVideoView(TUIVideoView roomVideoView) {
         mRoomVideoView = roomVideoView;
     }
 
@@ -106,14 +76,6 @@ public class UserEntity {
 
     public void setUserAvatar(String userAvatar) {
         this.userAvatar = userAvatar;
-    }
-
-    public int getQuality() {
-        return quality;
-    }
-
-    public void setQuality(int quality) {
-        this.quality = quality;
     }
 
     public boolean isVideoAvailable() {
@@ -154,5 +116,38 @@ public class UserEntity {
 
     public void setCameraAvailable(boolean cameraAvailable) {
         isCameraAvailable = cameraAvailable;
+    }
+
+    public boolean isVideoPlaying() {
+        return isVideoPlaying;
+    }
+
+    public void setVideoPlaying(boolean videoPlaying) {
+        isVideoPlaying = videoPlaying;
+    }
+
+    public boolean equals(UserEntity userEntity) {
+        if (userEntity == null) {
+            return false;
+        }
+        return userEntity.getUserId().equals(userId) && userEntity.getUserName().equals(userName)
+                && userEntity.isVideoAvailable() == isVideoAvailable;
+    }
+
+    public UserEntity copy(Context context) {
+        UserEntity copyEntity = new UserEntity();
+        copyEntity.setAudioVolume(audioVolume);
+        copyEntity.setUserId(userId);
+        copyEntity.setUserName(userName);
+        copyEntity.setUserAvatar(userAvatar);
+        copyEntity.setSelf(isSelf);
+        copyEntity.setTalk(isTalk);
+        copyEntity.setVideoAvailable(isVideoAvailable);
+        copyEntity.setAudioAvailable(isAudioAvailable);
+        copyEntity.setCameraAvailable(isCameraAvailable);
+        copyEntity.setScreenShareAvailable(isScreenShareAvailable);
+        copyEntity.mRoomVideoView = new TUIVideoView(context);
+        copyEntity.role = role;
+        return copyEntity;
     }
 }

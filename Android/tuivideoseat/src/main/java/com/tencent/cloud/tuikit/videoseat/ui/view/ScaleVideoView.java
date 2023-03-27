@@ -3,13 +3,11 @@ package com.tencent.cloud.tuikit.videoseat.ui.view;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
 
-public class VideoView extends TUIVideoView implements View.OnTouchListener {
+public class ScaleVideoView extends TUIVideoView implements View.OnTouchListener {
     private static final float SCALE_MAX = 5.0f; //最大的缩放比例
     private static final float SCALE_MIN = 1.0f;
 
@@ -19,105 +17,23 @@ public class VideoView extends TUIVideoView implements View.OnTouchListener {
     private float       mPressedPoint2Y = 0;     // 第二根手指按下的点Y坐标
     private double      mDistBeforeMove = 0;     // 俩手指移动前距离
     private double      mDistAfterMove  = 0;     // 俩手指移动后距离
-    private boolean     mIsPlaying;
-    private boolean     mIsSelfView;
     private boolean     mEnableScale    = false;
-    private String      mUserId;
-    private ViewGroup   mWaitBindGroup;
-    private SurfaceView mSurfaceView;
 
-
-    public boolean isPlaying() {
-        return mIsPlaying;
-    }
-
-    public void setPlayingWithoutSetVisible(boolean playing) {
-        mIsPlaying = playing;
-    }
-
-    public void setPlaying(boolean playing) {
-        mIsPlaying = playing;
-        if (!mIsPlaying) {
-            setVisibility(GONE);
-        } else {
-            setVisibility(VISIBLE);
-        }
-    }
-
-    public String getUserId() {
-        return mUserId;
-    }
-
-    public void setUserId(String userId) {
-        mUserId = userId;
-    }
-
-    public void setSelfView(boolean selfView) {
-        mIsSelfView = selfView;
-        if (mSurfaceView == null && mIsSelfView) {
-            mSurfaceView = new SurfaceView(getContext());
-        }
-    }
-
-    public void setWaitBindGroup(ViewGroup mWaitBindGroup) {
-        this.mWaitBindGroup = mWaitBindGroup;
-    }
-
-    public VideoView(Context context) {
+    public ScaleVideoView(Context context) {
         this(context, null);
     }
 
-    public TUIVideoView getPlayVideoView() {
-        return this;
-    }
-
-    public TUIVideoView getLocalPreviewView() {
-        if (mSurfaceView != null) {
-            return new TUIVideoView(mSurfaceView);
-        } else {
-            return this;
-        }
-    }
-
-    public VideoView(Context context, AttributeSet attrs) {
+    public ScaleVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOnTouchListener(this);
-    }
-
-    public void refreshParent() {
-        if (!mIsSelfView) {
-            ViewGroup viewGroup = (ViewGroup) getParent();
-            if (viewGroup == null) {
-                if (mWaitBindGroup != null) {
-                    mWaitBindGroup.addView(this);
-                }
-                return;
-            }
-            if (viewGroup != mWaitBindGroup) {
-                viewGroup.removeView(this);
-                mWaitBindGroup.addView(this);
-            }
-        } else {
-            ViewGroup viewGroup = (ViewGroup) mSurfaceView.getParent();
-            if (viewGroup == null) {
-                if (mWaitBindGroup != null) {
-                    mWaitBindGroup.addView(mSurfaceView);
-                }
-                return;
-            }
-            if (viewGroup != mWaitBindGroup) {
-                viewGroup.removeView(mSurfaceView);
-                mWaitBindGroup.addView(mSurfaceView);
-            }
-        }
     }
 
     private final Runnable measureAndLayout = new Runnable() {
         @Override
         public void run() {
             measure(
-                    View.MeasureSpec.makeMeasureSpec(getWidth(), View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(getHeight(), View.MeasureSpec.EXACTLY));
+                    MeasureSpec.makeMeasureSpec(getWidth(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(getHeight(), MeasureSpec.EXACTLY));
             layout(getLeft(), getTop(), getRight(), getBottom());
         }
     };

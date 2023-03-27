@@ -11,6 +11,8 @@ import com.tencent.cloud.tuikit.videoseat.R;
 import com.tencent.qcloud.tuicore.util.ScreenUtil;
 
 public class CircleIndicator extends View {
+    private static final int MIN_THRESHOLD_TO_SHOW = 2;
+
     private Paint circlePaint;
 
     private int   mPageNum;
@@ -58,13 +60,15 @@ public class CircleIndicator extends View {
     public void onPageScrolled(int position, float percent) {
         mScrollPercent = percent;
         mCurrentPosition = position;
-        invalidate();
+        if (mPageNum >= MIN_THRESHOLD_TO_SHOW) {
+            invalidate();
+        }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (mPageNum <= 0) {
+        if (mPageNum < MIN_THRESHOLD_TO_SHOW) {
             return;
         }
         float left = (getWidth() - (mPageNum - 1) * mGapSize) * 0.5f;
@@ -80,5 +84,10 @@ public class CircleIndicator extends View {
 
     public void setPageNum(int num) {
         mPageNum = num;
+        if (num < MIN_THRESHOLD_TO_SHOW) {
+            setVisibility(INVISIBLE);
+        } else {
+            setVisibility(VISIBLE);
+        }
     }
 }

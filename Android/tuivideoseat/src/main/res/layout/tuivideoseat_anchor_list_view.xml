@@ -2,13 +2,13 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="450dp"
+    android:layout_height="match_parent"
     tools:parentTag="android.widget.RelativeLayout">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="628dp"
         android:layout_centerInParent="true"
         android:background="@android:color/transparent" />
 
@@ -17,14 +17,14 @@
         android:layout_width="match_parent"
         android:layout_height="20dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="75dp" />
+        android:layout_marginBottom="25dp" />
 
-    <LinearLayout
-        android:id="@+id/multi_conversation"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <com.tencent.cloud.tuikit.videoseat.ui.view.UserDisplayView
+        android:id="@+id/tuivideoseat_user_talking_video_view"
+        android:layout_width="@dimen/tuivideoseat_video_view_size_small"
+        android:layout_height="@dimen/tuivideoseat_video_view_size_small"
         android:background="@android:color/transparent"
-        android:gravity="center_vertical"
-        android:orientation="vertical" />
+        android:visibility="gone"
+        android:gravity="center"  />
 
 </merge>

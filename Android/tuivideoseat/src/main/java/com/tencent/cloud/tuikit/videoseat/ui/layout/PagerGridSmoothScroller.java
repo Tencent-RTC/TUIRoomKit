@@ -1,4 +1,4 @@
-package com.tencent.cloud.tuikit.videoseat.ui.utils;
+package com.tencent.cloud.tuikit.videoseat.ui.layout;
 
 import android.util.DisplayMetrics;
 import android.view.View;

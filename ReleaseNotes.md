@@ -1,5 +1,9 @@
 ## 发布日志
 
+### Version 1.0.6 @ 2023.03.27
+- Android: 双人模式支持视频画面点击切换为对方画面
+- Android: 优化视频麦位 `TUIVideoSeat` 布局，提供更好的交互体验
+
 ### Version 1.0.5 @ 2023.03.27
 - Android: 适配 `RoomEngine`  `V1.0.2` 修改，`requestId` 由 `int` 修改为 `String`
 - Android: 更新 `imsdk` 版本为 `7.1.3925`

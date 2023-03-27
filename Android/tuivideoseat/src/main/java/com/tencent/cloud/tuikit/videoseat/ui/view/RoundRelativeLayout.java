@@ -35,9 +35,9 @@ public class RoundRelativeLayout extends RelativeLayout {
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        mRect = new RectF(0, 0, getWidth(), getHeight());
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        mRect = new RectF(0, 0, r - l, b - t);
     }
 
     @Override

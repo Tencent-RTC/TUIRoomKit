@@ -10,6 +10,7 @@
         android:id="@+id/rl_video_seat_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_view"
         android:layout_below="@id/top_view" />
 
     <RelativeLayout
