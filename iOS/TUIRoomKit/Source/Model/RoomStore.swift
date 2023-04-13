@@ -18,22 +18,34 @@ class RoomStore: NSObject {
     var audioSetting: AudioModel = AudioModel()
     var roomScene: RoomScene = .meeting
     var attendeeList: [UserModel] = []//用户列表
-    var attendeeMap: [String: UserModel] = [:]
     var inviteSeatList: [UserModel] = []//申请上麦的用户列表（针对举手发言房间）
     var inviteSeatMap: [String:String] = [:]
     var isSomeoneSharing: Bool = false
+    var roomSpeechMode: TUISpeechMode
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
+    override init() {
+        roomSpeechMode = roomInfo.speechMode
+    }
     func update(roomInfo: RoomInfo) {
         self.roomInfo = roomInfo
     }
     
     func initialLoginCurrentUser() {
         let userInfo = TUIRoomEngine.getSelfInfo()
-        currentLoginUser.update(userInfo: userInfo)
+        currentLoginUser.updateLoginUserInfo(userInfo: userInfo)
     }
     
     func initialRoomCurrentUser() {
-        let userInfo = TUIRoomEngine.getSelfInfo()
-        currentUser.update(userInfo: userInfo)
+        currentUser.userId = currentLoginUser.userId
+        engineManager.roomEngine.getUserInfo(currentLoginUser.userId) { [weak self] userInfo in
+            guard let self = self else { return }
+            guard let userInfo = userInfo else { return }
+            self.currentUser.update(userInfo: userInfo)
+        } onError: { code, message in
+            debugPrint("getUserInfo,code:\(code),message:\(message)")
+        }
     }
     
     func refreshStore() {
@@ -41,126 +53,10 @@ class RoomStore: NSObject {
         audioSetting = AudioModel()
         roomScene = .meeting
         attendeeList = []
-        attendeeMap = [:]
         inviteSeatList = []
-        inviteSeatMap = [:]
         isSomeoneSharing = false
         currentUser = UserModel()
         roomInfo = RoomInfo()
-    }
-    
-    func addEngineObserver() {
-        EngineEventCenter.shared.subscribeEngine(event: .onRemoteUserEnterRoom, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onSeatListChanged, observer: self)
-    }
-    
-    func removeEngineObserver() {
-        EngineEventCenter.shared.unsubscribeEngine(event: .onRemoteUserEnterRoom, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onSeatListChanged, observer: self)
-    }
-}
-
-extension RoomStore: RoomEngineEventResponder {
-    func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
-        if name == .onRemoteUserEnterRoom {
-            guard let roomId = param?["roomId"] as? String else { return }
-            guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
-            if roomId == EngineManager.shared.store.roomInfo.roomId {
-                let userModel = UserModel()
-                userModel.update(userInfo: userInfo)
-                addUserList(userModel: userModel)
-            }
-        }
-        if name == .onRemoteUserLeaveRoom {
-            guard let roomId = param?["roomId"] as? String else { return }
-            guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
-            if roomId == EngineManager.shared.store.roomInfo.roomId {
-                removeUserList(userId: userInfo.userId)
-                removeSeatList(userId: userInfo.userId)
-            }
-        }
-        if name == .onSeatListChanged {
-            guard let left: [TUISeatInfo] = param?["left"] as? [TUISeatInfo] else { return }
-            guard let seatList: [TUISeatInfo] = param?["seatList"] as? [TUISeatInfo] else { return }
-            guard let seated: [TUISeatInfo] = param?["seated"] as? [TUISeatInfo] else { return }
-            if left.count > 0 {
-                for seatInfo: TUISeatInfo in left {
-                    guard let userId = seatInfo.userId else {
-                        continue
-                    }
-                    if EngineManager.shared.store.roomInfo.enableSeatControl {
-                        guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { return }
-                        userInfo.isOnSeat = false
-                        if EngineManager.shared.store.currentUser.userId == userId {
-                            EngineManager.shared.store.currentUser.isOnSeat = false
-                            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserDownSeat,
-                                                                   param: [:])
-                        }
-                        removeSeatList(userId: userId)
-                    } else {
-                        removeUserList(userId: userId)
-                    }
-                }
-            }
-            if attendeeList.count <= 1 {
-                for seatInfo: TUISeatInfo in seatList {
-                    guard let userId = seatInfo.userId else { continue }
-                    guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { continue }
-                    userInfo.isOnSeat = true
-                    if EngineManager.shared.store.currentUser.userId == userId {
-                        EngineManager.shared.store.currentUser.isOnSeat = true
-                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeat,
-                                                               param: [:])
-                    }
-                    removeSeatList(userId: userId)
-                }
-            } else {
-                for seatInfo: TUISeatInfo in seated {
-                    guard let userId = seatInfo.userId else { continue }
-                    guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { continue }
-                    userInfo.isOnSeat = true
-                    if EngineManager.shared.store.currentUser.userId == userId {
-                        EngineManager.shared.store.currentUser.isOnSeat = true
-                        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeat,
-                                                               param: [:])
-                    }
-                    removeSeatList(userId: userId)
-                }
-            }
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
-        }
-    }
-    
-    private func removeUserList(userId: String, type: TUIVideoStreamType = .cameraStream) {
-        if type == .cameraStream {
-            attendeeList = attendeeList.filter { model -> Bool in
-                model.userId != userId
-            }
-            attendeeMap.removeValue(forKey: userId)
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
-        }
-    }
-    
-    private func removeSeatList(userId: String) {
-        inviteSeatList = inviteSeatList.filter { model -> Bool in
-            model.userId != userId
-        }
-        inviteSeatMap.removeValue(forKey: userId)
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
-    }
-    
-    private func addUserList(userModel: UserModel) {
-        if attendeeMap[userModel.userId] != nil {
-            return
-        }
-        attendeeMap[userModel.userId] = userModel
-        attendeeList.append(userModel)
-        if userModel.userName.isEmpty {
-            userModel.userName = userModel.userId
-        }
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
     }
 }
 
@@ -187,39 +83,39 @@ public class RoomInfo {
     public var isOpenCamera: Bool
     public var isUseSpeaker: Bool
     
-    public var enableSeatControl: Bool {
+    public var speechMode: TUISpeechMode {
         set {
-            roomInfo.enableSeatControl = newValue
+            roomInfo.speechMode = newValue
         }
         get {
-            return roomInfo.enableSeatControl
+            return roomInfo.speechMode
         }
     }
     
-    public var enableVideo: Bool {
+    public var isCameraDisableForAllUser: Bool {
         set {
-            roomInfo.enableVideo = newValue
+            roomInfo.isCameraDisableForAllUser = newValue
         }
         get {
-            return roomInfo.enableVideo
+            return roomInfo.isCameraDisableForAllUser
         }
     }
     
-    public var enableAudio: Bool {
+    public var isMicrophoneDisableForAllUser: Bool {
         set {
-            roomInfo.enableAudio = newValue
+            roomInfo.isMicrophoneDisableForAllUser = newValue
         }
         get {
-            return roomInfo.enableAudio
+            return roomInfo.isMicrophoneDisableForAllUser
         }
     }
     
-    public var enableMessage: Bool {
+    public var isMessageDisableForAllUser: Bool {
         set {
-            roomInfo.enableMessage = newValue
+            roomInfo.isMessageDisableForAllUser = newValue
         }
         get {
-            return roomInfo.enableMessage
+            return roomInfo.isMessageDisableForAllUser
         }
     }
     
@@ -232,7 +128,7 @@ public class RoomInfo {
         }
     }
     
-    public var owner: String = ""
+    public var ownerId: String = ""
     
     private var roomInfo: TUIRoomInfo
     public init() {
@@ -245,12 +141,12 @@ public class RoomInfo {
     convenience init(roomInfo: TUIRoomInfo) {
         self.init()
         self.roomInfo = roomInfo
-        self.owner = roomInfo.owner
+        self.ownerId = roomInfo.ownerId
     }
     
     public func update(engineRoomInfo: TUIRoomInfo) {
         roomInfo = engineRoomInfo
-        owner = engineRoomInfo.owner
+        ownerId = engineRoomInfo.ownerId
     }
     
     public func getEngineRoomInfo() -> TUIRoomInfo {

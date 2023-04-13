@@ -8,21 +8,49 @@
 import Foundation
 import TUIRoomEngine
 
-class VideoSeatItem {
+// VideoSeatItem类型
+enum VideoSeatItemType {
+    case original // 原始
+    case speaker // original -> speaker
+    case share // original -> share
+}
 
-    let seatInfo: TUISeatInfo
-    var userInfo: TUIUserInfo = TUIUserInfo()
+class VideoSeatItem: Equatable {
+    static func == (lhs: VideoSeatItem, rhs: VideoSeatItem) -> Bool {
+        return (lhs.userId == rhs.userId) && (lhs.type == rhs.type)
+    }
+
+    private var itemType: VideoSeatItemType = .original
+    private var videoStreamType: TUIVideoStreamType = .cameraStream
+    private var userInfo: TUIUserInfo
+
     var audioVolume: Int = 0
-    var cellIndexPath: IndexPath? = nil
-    var isAsyncUserInfo: Bool = false
-    var seatIndex: Int {
-        return seatInfo.index
+    var cellIndexPath: IndexPath?
+
+    var streamType: TUIVideoStreamType {
+        return videoStreamType
     }
-    
+
+    var type: VideoSeatItemType {
+        return itemType
+    }
+
     var userId: String {
-        return seatInfo.userId ?? ""
+        return userInfo.userId
     }
-    
+
+    var isRoomOwner: Bool {
+        return userRole == .roomOwner
+    }
+
+    var userName: String {
+        return userInfo.userName
+    }
+
+    var avatarUrl: String {
+        return userInfo.avatarUrl
+    }
+
     var userRole: TUIRole {
         set {
             userInfo.userRole = newValue
@@ -31,29 +59,7 @@ class VideoSeatItem {
             return userInfo.userRole
         }
     }
-    
-    var isRoomOwner: Bool {
-        return userRole == .roomOwner
-    }
-    
-    var userName: String {
-        set {
-            userInfo.userName = newValue
-        }
-        get {
-            return userInfo.userName
-        }
-    }
-    
-    var avatarUrl: String {
-        set {
-            userInfo.avatarUrl = newValue
-        }
-        get {
-            return userInfo.avatarUrl
-        }
-    }
-    
+
     var hasAudioStream: Bool {
         set {
             userInfo.hasAudioStream = newValue
@@ -62,7 +68,7 @@ class VideoSeatItem {
             return userInfo.hasAudioStream
         }
     }
-    
+
     var hasVideoStream: Bool {
         set {
             userInfo.hasVideoStream = newValue
@@ -71,7 +77,11 @@ class VideoSeatItem {
             return userInfo.hasVideoStream
         }
     }
-    
+
+    var isHasVideoStream: Bool {
+        return hasVideoStream || hasScreenStream
+    }
+
     var hasScreenStream: Bool {
         set {
             userInfo.hasScreenStream = newValue
@@ -80,21 +90,31 @@ class VideoSeatItem {
             return userInfo.hasScreenStream
         }
     }
-    
-    init(seatInfo: TUISeatInfo) {
-        self.seatInfo = seatInfo
-        self.userInfo.userId = seatInfo.userId ?? ""
+
+    init(userId: String) {
+        userInfo = TUIUserInfo()
+        userInfo.userId = userId
+    }
+
+    init(userInfo: TUIUserInfo) {
+        self.userInfo = userInfo
     }
 
     func updateUserInfo(_ userInfo: TUIUserInfo) {
         self.userInfo = userInfo
     }
-    
-    func updateSeatInfo(_ seatInfo: TUISeatInfo) {
-        self.seatInfo.index = seatInfo.index
-        self.seatInfo.locked = seatInfo.locked
-        self.seatInfo.audioMuted = seatInfo.audioMuted
-        self.seatInfo.videoMuted = seatInfo.videoMuted
+
+    func cloneShare() -> VideoSeatItem {
+        let item = VideoSeatItem(userInfo: userInfo)
+        item.videoStreamType = .screenStream
+        item.itemType = .share
+        return item
     }
-    
+
+    func cloneSpeaker() -> VideoSeatItem {
+        let item = VideoSeatItem(userInfo: userInfo)
+        item.audioVolume = audioVolume
+        item.itemType = .speaker
+        return item
+    }
 }

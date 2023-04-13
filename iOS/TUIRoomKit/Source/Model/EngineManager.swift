@@ -15,7 +15,6 @@ class EngineManager: NSObject {
     private weak var listener: EngineManagerListener?
     private(set) lazy var store: RoomStore = {
         let store = RoomStore()
-        store.addEngineObserver()
         return store
     }()
     private(set) lazy var roomEngine: TUIRoomEngine = {
@@ -64,9 +63,9 @@ class EngineManager: NSObject {
     func createRoom() {
         let roomInfo = store.roomInfo
         if store.roomScene == .meeting {
-            roomInfo.roomType = .group
+            roomInfo.roomType = .conference
         } else {
-            roomInfo.roomType = .open
+            roomInfo.roomType = .livingRoom
         }
         roomEngine.createRoom(roomInfo.getEngineRoomInfo()) { [weak self] in
             guard let self = self else { return }
@@ -107,6 +106,7 @@ class EngineManager: NSObject {
             guard let roomInfo = roomInfo else {return }
             self.store.roomInfo.update(engineRoomInfo: roomInfo)
             self.store.initialRoomCurrentUser()
+            //进房失败要退出房间
             let exitRoomBlock = { [weak self] in
                 guard let self = self else { return }
                 let currentUserInfo = self.store.currentUser
@@ -116,10 +116,9 @@ class EngineManager: NSObject {
                     self.exitRoom()
                 }
             }
-            //举手发言模式中用户根据自己是否需要上麦进行申请
-            if self.store.roomInfo.enableSeatControl && self.store.currentUser.userId != self.store.roomInfo.owner {
-                onSuccess()
-            } else {//自由发言模式中直接申请上麦
+            //用户进房后上麦
+            let takeSeatBlock = { [weak self] in
+                guard let self = self else { return }
                 self.roomEngine.takeSeat(-1, timeout: self.timeOutNumber) { [weak self] _, _ in
                     guard let self = self else { return }
                     self.store.currentUser.isOnSeat = true
@@ -138,6 +137,23 @@ class EngineManager: NSObject {
                     exitRoomBlock()
                 }
             }
+            //判断用户是否需要上麦进行申请
+            switch self.store.roomInfo.speechMode {
+            case .freeToSpeak:
+                onSuccess()
+            case .applyToSpeak:
+                onSuccess()
+            case .applySpeakAfterTakingSeat:
+                //如果用户是房主，直接上麦
+                if self.store.currentUser.userId == self.store.roomInfo.ownerId {
+                    takeSeatBlock()
+                } else { //如果是观众，进入举手发言房间不上麦
+                    onSuccess()
+                }
+            default:
+                onError(.failed, "room type is wrong")
+                exitRoomBlock()
+            }
         } onError: { code, message in
             onError(code, message)
         }
@@ -148,13 +164,13 @@ class EngineManager: NSObject {
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onExitEngineRoom?()
-            RoomRouter.shared.pop()
+            RoomRouter.shared.popToRoomEntranceViewController()
             self.store.refreshStore()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onExitEngineRoom?()
-            RoomRouter.shared.pop()
+            RoomRouter.shared.popToRoomEntranceViewController()
             self.store.refreshStore()
         }
     }
@@ -164,13 +180,13 @@ class EngineManager: NSObject {
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onDestroyEngineRoom?()
-            RoomRouter.shared.pop()
+            RoomRouter.shared.popToRoomEntranceViewController()
             self.store.refreshStore()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onDestroyEngineRoom?()
-            RoomRouter.shared.pop()
+            RoomRouter.shared.popToRoomEntranceViewController()
             self.store.refreshStore()
         }
     }

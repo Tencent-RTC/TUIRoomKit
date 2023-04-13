@@ -179,7 +179,7 @@ class ListCellItemView: UIView {
         slider.minimumValue = item.minimumValue / item.sliderStep
         slider.maximumValue = item.maximumValue / item.sliderStep
         slider.value = item.sliderDefault / item.sliderStep
-        sliderLabel.text = String(Int(slider.value)) + item.sliderUnit
+        sliderLabel.text = String(Int(slider.value) * Int(item.sliderStep)) + item.sliderUnit
         titleLabel.text = item.titleText
         messageLabel.text = item.messageText
         if let normalImage = item.normalImage {
@@ -217,7 +217,7 @@ class ListCellItemView: UIView {
     }
     
     @objc func sliderAction(sender: UISlider) {
-        sliderLabel.text = String(Int(slider.value * itemData.sliderStep)) + itemData.sliderUnit
+        sliderLabel.text = String(Int(slider.value) * Int(itemData.sliderStep)) + itemData.sliderUnit
         itemData.action?(sender)
     }
     

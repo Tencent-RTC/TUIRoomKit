@@ -12,7 +12,6 @@ import TUICore
 enum PopUpViewType {
     case roomInfoViewType
     case moreViewType
-    case beautyViewType
     case setUpViewType
 }
 

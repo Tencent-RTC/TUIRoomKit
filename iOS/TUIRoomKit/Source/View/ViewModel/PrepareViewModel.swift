@@ -13,9 +13,13 @@ import TXLiteAVSDK_TRTC
 #elseif TXLiteAVSDK_Professional
 import TXLiteAVSDK_Professional
 #endif
+ 
+protocol PrePareViewEventProtocol: AnyObject {
+    func updateButtonState()
+}
 
 class PrePareViewModel {
-    weak var rootView: PrePareView?
+    weak var viewResponder: PrePareViewEventProtocol?
     var enablePrePareView: Bool = true
     var engineManager: EngineManager {
         EngineManager.shared
@@ -29,13 +33,10 @@ class PrePareViewModel {
     
     func initialState(view: UIView) {
         let roomEngine = engineManager.roomEngine
-        if let rootView = self.rootView {
-            roomEngine.setLocalVideoView(streamType: .cameraStream, view: rootView.prePareView)
-        } else {
-            roomEngine.setLocalVideoView(streamType: .cameraStream, view: view)
-        }
+        roomEngine.setLocalVideoView(streamType: .cameraStream, view: view)
         if roomInfo.isOpenCamera {
-            roomEngine.openLocalCamera(isFront: engineManager.store.videoSetting.isFrontCamera) {
+            roomEngine.openLocalCamera(isFront: engineManager.store.videoSetting.isFrontCamera, quality:
+                                        engineManager.store.videoSetting.videoQuality) {
                 debugPrint("")
             } onError: { code, message in
                 debugPrint("---openLocalCamera,code:\(code),message:\(message)")
@@ -44,7 +45,7 @@ class PrePareViewModel {
             roomEngine.closeLocalCamera()
         }
         if roomInfo.isOpenMicrophone {
-            roomEngine.openLocalMicrophone {
+            roomEngine.openLocalMicrophone(engineManager.store.audioSetting.audioQuality) {
                 debugPrint("")
             } onError: { code, message in
                 debugPrint("---openLocalMicrophone,code:\(code), message:\(message)")
@@ -52,7 +53,7 @@ class PrePareViewModel {
         } else {
             roomEngine.closeLocalMicrophone()
         }
-        rootView?.updateButtonState()
+        viewResponder?.updateButtonState()
     }
     
     func closeLocalCamera() {
@@ -90,7 +91,8 @@ class PrePareViewModel {
         } else {
             roomInfo.isOpenCamera = true
             placeholderImage.isHidden = true
-            roomEngine.openLocalCamera(isFront: engineManager.store.videoSetting.isFrontCamera) { [weak self] in
+            roomEngine.openLocalCamera(isFront: engineManager.store.videoSetting.isFrontCamera, quality:
+                                        engineManager.store.videoSetting.videoQuality) { [weak self] in
                 guard let self = self else { return }
                 self.engineManager.roomEngine.startPushLocalVideo()
             } onError: { code, message in
@@ -108,7 +110,7 @@ class PrePareViewModel {
             roomEngine.stopPushLocalAudio()
         } else {
             roomInfo.isOpenMicrophone = true
-            roomEngine.openLocalMicrophone { [weak self] in
+            roomEngine.openLocalMicrophone(engineManager.store.audioSetting.audioQuality) { [weak self] in
                 guard let self = self else { return }
                 self.engineManager.roomEngine.startPushLocalAudio()
             } onError: { code, message in
@@ -119,7 +121,7 @@ class PrePareViewModel {
     
     func switchCameraAction(sender: UIButton) {
         engineManager.store.videoSetting.isFrontCamera = !engineManager.store.videoSetting.isFrontCamera
-        engineManager.roomEngine.getTRTCCloud().getDeviceManager().switchCamera(engineManager.store.videoSetting.isFrontCamera)
+        engineManager.roomEngine.getDeviceManager().switchCamera(engineManager.store.videoSetting.isFrontCamera)
     }
     
     func switchMirrorAction(sender: UIButton) {

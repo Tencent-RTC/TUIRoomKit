@@ -172,7 +172,6 @@ class PrePareView: UIView {
     init(viewModel: PrePareViewModel) {
         self.viewModel = viewModel
         super.init(frame: .zero)
-        self.viewModel.rootView = self
     }
     
     required init?(coder: NSCoder) {
@@ -350,6 +349,7 @@ class PrePareView: UIView {
     }
     
     func bindInteraction() {
+        viewModel.viewResponder = self
         setupViewState(item: viewModel)
         backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         joinRoomButton.addTarget(self, action: #selector(joinRoomAction(sender:)), for: .touchUpInside)
@@ -388,12 +388,6 @@ class PrePareView: UIView {
                 make.bottom.equalTo(createRoomButton.snp.top).offset(-30.scale375())
             }
         }
-    }
-    
-    func updateButtonState() {
-        openCameraButton.isSelected = !viewModel.roomInfo.isOpenCamera
-        openMicrophoneButton.isSelected = !viewModel.roomInfo.isOpenMicrophone
-        userMessageView.isHidden = viewModel.roomInfo.isOpenCamera
     }
     
     func initialState() {
@@ -444,6 +438,14 @@ class PrePareView: UIView {
     
     deinit {
         debugPrint("deinit \(self)")
+    }
+}
+
+extension PrePareView: PrePareViewEventProtocol {
+    func updateButtonState() {
+        openCameraButton.isSelected = !viewModel.roomInfo.isOpenCamera
+        openMicrophoneButton.isSelected = !viewModel.roomInfo.isOpenMicrophone
+        userMessageView.isHidden = viewModel.roomInfo.isOpenCamera
     }
 }
 

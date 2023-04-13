@@ -80,6 +80,12 @@ class UserModel {
         self.userInfo = userInfo
     }
     
+    func updateLoginUserInfo(userInfo: TUILoginUserInfo) {
+        userId = userInfo.userId
+        userName = userInfo.userName
+        avatarUrl = userInfo.avatarUrl
+    }
+    
     func getUserInfo() -> TUIUserInfo {
         return userInfo
     }

@@ -7,10 +7,12 @@
 //
 
 import Foundation
+import TUIRoomEngine
 
 class AudioModel {
     var captureVolume: Int = 100
     var playVolume: Int = 100
     var volumePrompt: Bool = true
     var isRecord: Bool = false
+    var audioQuality: TUIAudioQuality = .default
 }

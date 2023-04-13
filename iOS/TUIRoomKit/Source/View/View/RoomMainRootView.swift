@@ -7,12 +7,12 @@
 //
 
 import Foundation
-import TUICore
 
 protocol RoomMainViewFactory {
     func makeBottomView() -> UIView
     func makeTopView() -> UIView
     func makeMiddleView() -> UIView
+    func makeBeautyView() -> UIView?
 }
 
 class RoomMainRootView: UIView {
@@ -41,6 +41,10 @@ class RoomMainRootView: UIView {
         return viewFactory.makeBottomView()
     }()
     
+    lazy var beautyView: UIView? = {
+        return viewFactory.makeBeautyView()
+    }()
+    
     // MARK: - view layout
     private var isViewReady: Bool = false
     override func didMoveToWindow() {
@@ -50,7 +54,6 @@ class RoomMainRootView: UIView {
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
-        viewModel.applyConfigs()
         isViewReady = true
     }
     
@@ -58,6 +61,8 @@ class RoomMainRootView: UIView {
         addSubview(videoSeatView)
         addSubview(topView)
         addSubview(bottomView)
+        guard let beautyView = beautyView else { return }
+        addSubview(beautyView)
     }
     
     func activateConstraints() {
@@ -75,7 +80,11 @@ class RoomMainRootView: UIView {
         videoSeatView.snp.makeConstraints { make in
             make.width.equalToSuperview()
             make.top.equalTo(topView.snp.bottom)
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(bottomView.snp.top).offset(-5)
+        }
+        guard let beautyView = beautyView else { return }
+        beautyView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
     
@@ -97,6 +106,12 @@ extension RoomMainRootView: RoomMainViewResponder {
         }
         alertVC.addAction(sureAction)
         RoomRouter.shared.presentAlert(alertVC)
+    }
+    func showBeautyView() {
+        beautyView?.isHidden = false
+    }
+    func makeToast(text: String) {
+        RoomRouter.makeToast(toast: text)
     }
 }
 

@@ -13,19 +13,6 @@ class PopUpView: UIView {
     let viewModel: PopUpViewModel
     var rootView: UIView?
     
-    lazy var beautyView: UIView? = {
-        let roomEngine = EngineManager.shared.roomEngine
-        let beautyManager = roomEngine.getTRTCCloud().getBeautyManager()
-        let beautyInfo = TUICore.getExtensionInfo(TUICore_TUIBeautyExtension_BeautyView,
-                                                  param: [
-                                                    TUICore_TUIBeautyExtension_BeautyView_BeautyManager: beautyManager,])
-        if let view = beautyInfo[TUICore_TUIBeautyExtension_BeautyView_View] as? UIView {
-            view.isHidden = false
-            return view
-        }
-        return nil
-    }()
-    
     init(viewModel: PopUpViewModel) {
         self.viewModel = viewModel
         super.init(frame: .zero)
@@ -70,10 +57,8 @@ class PopUpView: UIView {
             case .moreViewType:
                 let model = MoreFunctionViewModel()
                 rootView = MoreFunctionView(viewModel: model)
-            case .beautyViewType:
-                rootView = beautyView
             case .setUpViewType:
-                let model = SetUpViewModel(videoModel: EngineManager.shared.store.videoSetting, audioModel: EngineManager.shared.store.audioSetting)
+                let model = SetUpViewModel()
                 let view = SetUpView(viewModel: model)
                 rootView = view
         }

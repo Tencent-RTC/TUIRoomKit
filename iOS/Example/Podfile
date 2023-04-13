@@ -1,6 +1,7 @@
 use_frameworks!
 
 platform :ios, '13.0'
+
 source 'https://github.com/CocoaPods/Specs.git'
 
 # UI库
@@ -12,8 +13,8 @@ end
 def tool
   pod 'Alamofire'
   pod 'TUICore'
-  pod 'TUIChat','7.1.3925-swift'
-  pod 'TUIRoomEngine','~> 1.0.2'
+  pod 'TUIChat'
+  pod 'TUIRoomEngine','~> 1.2.0'
   pod 'TXLiteAVSDK_TRTC'
   pod 'TXAppBasic'
 end

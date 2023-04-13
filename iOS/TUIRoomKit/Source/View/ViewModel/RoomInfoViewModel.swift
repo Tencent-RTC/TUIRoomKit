@@ -18,8 +18,8 @@ class RoomInfoViewModel {
     func createSourceData() {
         let roomHostItem = ListCellItemData()
         roomHostItem.titleText = .roomHostText
-        var userName = EngineManager.shared.store.roomInfo.owner
-        if let userModel = EngineManager.shared.store.attendeeList.first(where: { $0.userId == EngineManager.shared.store.roomInfo.owner}) {
+        var userName = EngineManager.shared.store.roomInfo.ownerId
+        if let userModel = EngineManager.shared.store.attendeeList.first(where: { $0.userId == EngineManager.shared.store.roomInfo.ownerId}) {
             userName = userModel.userName
         }
         roomHostItem.messageText = userName
@@ -27,10 +27,12 @@ class RoomInfoViewModel {
         
         let roomTypeItem = ListCellItemData()
         roomTypeItem.titleText = .roomTypeText
-        if EngineManager.shared.store.roomInfo.enableSeatControl {
-            roomTypeItem.messageText = .raiseHandSpeakText
-        } else {
+        switch EngineManager.shared.store.roomInfo.speechMode {
+        case .freeToSpeak:
             roomTypeItem.messageText = .freedomSpeakText
+        case .applySpeakAfterTakingSeat:
+            roomTypeItem.messageText = .raiseHandSpeakText
+        default: break
         }
         messageItems.append(roomTypeItem)
         

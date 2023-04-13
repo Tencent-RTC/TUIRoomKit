@@ -13,6 +13,9 @@ import TUIBeauty
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var blockRotation = false
+    lazy var window: UIWindow? = {
+       return SceneDelegate.getCurrentWindow()
+    }()
     lazy var mainModel: AppMainModel = {
         return AppMainModel()
     }()

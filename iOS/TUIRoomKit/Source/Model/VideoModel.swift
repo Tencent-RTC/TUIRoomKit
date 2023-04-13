@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import TUIRoomEngine
 #if TXLiteAVSDK_TRTC
 import TXLiteAVSDK_TRTC
 #elseif TXLiteAVSDK_Professional
@@ -14,15 +15,16 @@ import TXLiteAVSDK_Professional
 #endif
 
 class VideoModel {
-    var frameText: String = "15"
-    var frameIndex: Int = 0
+    var videoFps: Int = 15
+    var videoResolution: TRTCVideoResolution = ._960_540
+    var videoBitrate: Int = 900
+    var isMirror: Bool = false
+    var isFrontCamera: Bool = true
+    var videoQuality: TUIVideoQuality = .quality540P
     var bitrate: BitrateTableData = BitrateTableData(resolutionName: "540 * 960",
-                                                     resolution: TRTCVideoResolution._960_540.rawValue,
+                                                     resolution: TRTCVideoResolution._960_540,
                                                      defaultBitrate: 900,
                                                      minBitrate: 400,
                                                      maxBitrate: 1_600,
                                                      stepBitrate: 50)
-    var bitrateIndex: Int = 0
-    var isMirror: Bool = true
-    var isFrontCamera: Bool = true
 }

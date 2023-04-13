@@ -62,7 +62,6 @@ class UserListManagerView: UIView {
     init(viewModel: UserListManagerViewModel) {
         self.viewModel = viewModel
         super.init(frame: .zero)
-        viewModel.userListManagerView = self
     }
     
     required init?(coder: NSCoder) {
@@ -125,16 +124,16 @@ class UserListManagerView: UIView {
             make.trailing.equalToSuperview().offset(-15)
             make.height.equalTo(32.scale375())
         }
-        updateUI(item: viewModel)
     }
     
     func bindInteraction() {
-        setupViewState(item: viewModel)
+        viewModel.viewResponder = self
+        setupViewState()
         let tap = UITapGestureRecognizer(target: self, action: #selector(backBlockAction(sender:)))
         backBlockView.addGestureRecognizer(tap)
     }
     
-    func setupViewState(item: UserListManagerViewModel) {
+    func setupViewState() {
         let placeholder = UIImage(named: "room_default_user", in: tuiRoomKitBundle(), compatibleWith: nil)
         guard let attendeeModel = viewModel.attendeeList.first(where: { $0.userId == viewModel.userId }) else { return }
         if let url = URL(string: attendeeModel.avatarUrl) {
@@ -149,33 +148,23 @@ class UserListManagerView: UIView {
         }
     }
     
-    func updateUI(item: UserListManagerViewModel) {
-        setupViewState(item: item)
+    @objc func backBlockAction(sender: RoomInfoView) {
+        viewModel.backBlockAction(sender: self)
+    }
+    
+    deinit {
+        debugPrint("deinit \(self)")
+    }
+}
+
+extension UserListManagerView: UserListManagerViewEventResponder {
+    func updateUI(items: [ButtonItemData]) {
+        setupViewState()
         viewArray.forEach { view in
             stackView.removeArrangedSubview(view)
         }
         viewArray = []
-        guard let userInfo = viewModel.attendeeList.first(where: { $0.userId == item.userId }) else { return }
-        var viewItems: [ButtonItemData] = []
-        //举手发言房间
-        if viewModel.roomInfo.enableSeatControl {
-            if item.userId == viewModel.currentUser.userId {
-                viewItems = viewModel.currentUserItems
-            } else {
-                if userInfo.isOnSeat {
-                    viewItems = viewModel.seatInviteSeatItems
-                } else {
-                    viewItems = viewModel.seatNoneInviteSeatItems
-                }
-            }
-        } else {//自由发言房间
-            if item.userId == viewModel.currentUser.userId {
-                viewItems = viewModel.currentUserItems
-            } else {
-                viewItems = viewModel.otherUserItems
-            }
-        }
-        for item in viewItems {
+        for item in items {
             let view = ButtonItemView(itemData: item)
             viewArray.append(view)
             stackView.addArrangedSubview(view)
@@ -186,13 +175,8 @@ class UserListManagerView: UIView {
             view.backgroundColor = item.backgroundColor ?? UIColor(0x2A2D38)
         }
     }
-    
-    @objc func backBlockAction(sender: RoomInfoView) {
-        viewModel.backBlockAction(sender: self)
-    }
-    
-    deinit {
-        debugPrint("deinit \(self)")
+    func makeToast(text : String) {
+        RoomRouter.makeToast(toast: text)
     }
 }
 

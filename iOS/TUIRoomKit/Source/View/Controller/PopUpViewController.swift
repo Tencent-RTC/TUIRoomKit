@@ -9,15 +9,15 @@
 import Foundation
 import UIKit
 
-protocol PopUpViewModelFactory {
+protocol PopUpViewFactory {
     func makeRootView(viewType: PopUpViewType, height:CGFloat) -> UIView
 }
 
 class PopUpViewController: UIViewController {
     let rootView: UIView
     
-    init(popUpViewModelFactory: PopUpViewModelFactory, viewType: PopUpViewType, height: CGFloat) {
-        rootView = popUpViewModelFactory.makeRootView(viewType: viewType, height: height)
+    init(popUpViewFactory: PopUpViewFactory, viewType: PopUpViewType, height: CGFloat) {
+        rootView = popUpViewFactory.makeRootView(viewType: viewType, height: height)
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .overFullScreen
     }

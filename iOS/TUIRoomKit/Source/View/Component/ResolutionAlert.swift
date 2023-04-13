@@ -7,17 +7,22 @@
 //
 
 import Foundation
+#if TXLiteAVSDK_TRTC
+import TXLiteAVSDK_TRTC
+#elseif TXLiteAVSDK_Professional
+import TXLiteAVSDK_Professional
+#endif
 
 class BitrateTableData: NSObject {
     let resolutionName: String
-    let resolution: Int
+    let resolution: TRTCVideoResolution
     let defaultBitrate: Float
     let minBitrate: Float
     let maxBitrate: Float
     let stepBitrate: Float
     
     init(resolutionName: String,
-         resolution: Int,
+         resolution: TRTCVideoResolution,
          defaultBitrate: Float,
          minBitrate: Float,
          maxBitrate: Float,
@@ -41,7 +46,7 @@ class BitrateTableData: NSObject {
 class ResolutionAlert: AlertContentView {
     var dataSource: [BitrateTableData] = []
     var selectIndex = 3
-    
+    var titleText: String = ""
     var didSelectItem: ((_ index: Int) -> Void)?
     
     let tableView: UITableView = {
@@ -75,7 +80,7 @@ class ResolutionAlert: AlertContentView {
     
     override func bindInteraction() {
         super.bindInteraction()
-        titleLabel.text = .resolutionTitleText
+        titleLabel.text = titleText
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(ResolutionTableViewCell.self,
@@ -303,5 +308,4 @@ class AlertContentView: UIView {
 private extension String {
     static let titleText = localized("TUIRoom.Beauty.Setup")
     static let strengthText = localized("TUIRoom.Beauty.Setup.Strength")
-    static let resolutionTitleText = localized("TUIRoom.resolution")
 }

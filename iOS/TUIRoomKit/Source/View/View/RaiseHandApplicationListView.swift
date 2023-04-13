@@ -131,9 +131,9 @@ class RaiseHandApplicationListView: UIView {
         let userRole = viewModel.engineManager.store.currentUser.userRole
         let roomInfo = viewModel.engineManager.store.roomInfo
         allAgreeButton.isHidden = (userRole != .roomOwner)
-        allAgreeButton.isSelected = !roomInfo.enableAudio
+        allAgreeButton.isSelected = roomInfo.isMicrophoneDisableForAllUser
         inviteMemberButton.isHidden = (userRole != .roomOwner)
-        inviteMemberButton.isSelected = !roomInfo.enableVideo
+        inviteMemberButton.isSelected = roomInfo.isCameraDisableForAllUser
     }
     
     deinit {
