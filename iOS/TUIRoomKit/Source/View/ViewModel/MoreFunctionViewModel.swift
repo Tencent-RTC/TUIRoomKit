@@ -54,7 +54,7 @@ class MoreFunctionViewModel {
     func beautyAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
         RoomRouter.shared.dismissPopupViewController(animated: false)
-        RoomRouter.shared.presentPopUpViewController(viewType: .beautyViewType)
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ShowBeautyView, param: [:])
     }
     
     func settingAction(sender: UIButton) {

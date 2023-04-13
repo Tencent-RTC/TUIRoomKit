@@ -75,7 +75,7 @@ class TopViewModel {
     func cameraItemAction(sender: UIButton) {
         EngineManager.shared.store.videoSetting.isFrontCamera = !EngineManager.shared.store.videoSetting.isFrontCamera
         let roomEngine = EngineManager.shared.roomEngine
-        roomEngine.getTRTCCloud().getDeviceManager().switchCamera(EngineManager.shared.store.videoSetting.isFrontCamera)
+        roomEngine.getDeviceManager().switchCamera(EngineManager.shared.store.videoSetting.isFrontCamera)
     }
     
     func mirrorItemAction(sender: UIButton) {

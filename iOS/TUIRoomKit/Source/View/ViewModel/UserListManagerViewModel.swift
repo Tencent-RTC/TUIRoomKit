@@ -7,15 +7,27 @@
 //
 
 import Foundation
+import TUIRoomEngine
+
+protocol UserListManagerViewEventResponder: AnyObject {
+    func updateUI(items: [ButtonItemData])
+    func makeToast(text: String)
+}
 
 class UserListManagerViewModel: NSObject {
+    enum userType {
+        case currentUserType //自己
+        case otherUserType   //自由发言房间其他用户
+        case onSeatUserType  //举手发言房间已经上麦用户
+        case offSeatUserType //举手发言房间已经下麦用户
+    }
     var userId: String = ""
-    var userListManagerView: UserListManagerView?
     let timeoutNumber: Double = 30
     private(set) var otherUserItems: [ButtonItemData] = []//其他用户viewItem
     private(set) var currentUserItems: [ButtonItemData] = []
-    private(set) var seatInviteSeatItems: [ButtonItemData] = []//已经上麦的用户viewItem
-    private(set) var seatNoneInviteSeatItems: [ButtonItemData] = []//没有上麦的用户viewItem
+    private(set) var onSeatItems: [ButtonItemData] = []//已经上麦的用户viewItem
+    private(set) var offSeatItems: [ButtonItemData] = []//没有上麦的用户viewItem
+    weak var viewResponder: UserListManagerViewEventResponder?
     var engineManager: EngineManager {
         EngineManager.shared
     }
@@ -34,11 +46,13 @@ class UserListManagerViewModel: NSObject {
         self.createUserItem()
         EngineEventCenter.shared.subscribeEngine(event: .onUserVideoStateChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserAudioStateChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
     }
     
     deinit {
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserVideoStateChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserAudioStateChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
     }
     
     func createUserItem() {
@@ -81,7 +95,7 @@ class UserListManagerViewModel: NSObject {
             self.muteAudioAction(sender: button)
         }
         otherUserItems.append(muteAudioItem)
-        seatInviteSeatItems.append(muteAudioItem)
+        onSeatItems.append(muteAudioItem)
         //禁画（禁画其他用户）
         let muteVideoItem = ButtonItemData()
         muteVideoItem.normalTitle = .closeVideoText
@@ -95,7 +109,7 @@ class UserListManagerViewModel: NSObject {
             self.muteVideoAction(sender: button)
         }
         otherUserItems.append(muteVideoItem)
-        seatInviteSeatItems.append(muteVideoItem)
+        onSeatItems.append(muteVideoItem)
         //邀请上台
         let inviteSeatItem = ButtonItemData()
         inviteSeatItem.normalTitle = .inviteSeatText
@@ -108,7 +122,7 @@ class UserListManagerViewModel: NSObject {
             guard let self = self, let button = sender as? UIButton else { return }
             self.inviteSeatAction(sender: button)
         }
-        seatNoneInviteSeatItems.append(inviteSeatItem)
+        offSeatItems.append(inviteSeatItem)
         //转交主持人
         let changeHostItem = ButtonItemData()
         changeHostItem.normalTitle = .changeHostText
@@ -122,8 +136,8 @@ class UserListManagerViewModel: NSObject {
             self.changeHostAction(sender: button)
         }
         otherUserItems.append(changeHostItem)
-        seatInviteSeatItems.append(changeHostItem)
-        seatNoneInviteSeatItems.append(changeHostItem)
+        onSeatItems.append(changeHostItem)
+        offSeatItems.append(changeHostItem)
         //禁言
         let muteMessageItem = ButtonItemData()
         muteMessageItem.normalTitle = .muteMessageText
@@ -137,7 +151,7 @@ class UserListManagerViewModel: NSObject {
             self.muteMessageAction(sender: button)
         }
         otherUserItems.append(muteMessageItem)
-        seatNoneInviteSeatItems.append(muteMessageItem)
+        offSeatItems.append(muteMessageItem)
         //请下台
         let stepDownSeatItem = ButtonItemData()
         stepDownSeatItem.normalTitle = .stepDownSeatText
@@ -150,7 +164,7 @@ class UserListManagerViewModel: NSObject {
             guard let self = self, let button = sender as? UIButton else { return }
             self.kickRemoteUserOffSeat(sender: button)
         }
-        seatInviteSeatItems.append(stepDownSeatItem)
+        onSeatItems.append(stepDownSeatItem)
         //踢出房间
         let kickOutItem = ButtonItemData()
         kickOutItem.normalTitle = .kickOutRoomText
@@ -164,59 +178,112 @@ class UserListManagerViewModel: NSObject {
             self.kickOutAction(sender: button)
         }
         otherUserItems.append(kickOutItem)
-        seatInviteSeatItems.append(kickOutItem)
-        seatNoneInviteSeatItems.append(kickOutItem)
+        onSeatItems.append(kickOutItem)
+        offSeatItems.append(kickOutItem)
     }
     
     func muteLocalAudioAction(sender: UIButton) {
-        let roomEngine = engineManager.roomEngine
-        if !roomInfo.enableAudio, sender.isSelected, currentUser.userRole != .roomOwner {
-            //如果房间已经全员静音，自己操作关闭麦克风就会使按钮处于无法点击状态，房主不会被全员静音
-            RoomRouter.makeToast(toast: .muteAudioRoomReasonText)
+        if currentUser.hasAudioStream {
+            engineManager.roomEngine.closeLocalMicrophone()
+            engineManager.roomEngine.stopPushLocalAudio()
             return
         }
-        guard currentUser.isOnSeat else {
-            RoomRouter.makeToast(toast: .muteAudioSeatReasonText)
-            return
+        //如果房主全体静音，房间成员不可打开麦克风
+        if self.roomInfo.isMicrophoneDisableForAllUser && self.currentUser.userRole != .roomOwner {
+            viewResponder?.makeToast(text: .muteAudioRoomReasonText)
+           return
         }
-        sender.isSelected = !sender.isSelected
-        if sender.isSelected {
-            roomEngine.closeLocalMicrophone()
-            roomEngine.stopPushLocalAudio()
-        } else {
-            roomEngine.openLocalMicrophone { [weak self] in
+        // 直接打开本地的麦克风
+        let openLocalMicrophoneBlock = { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.openLocalMicrophone(self.engineManager.store.audioSetting.audioQuality) { [weak self] in
                 guard let self = self else { return }
                 self.engineManager.roomEngine.startPushLocalAudio()
             } onError: { code, message in
                 debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
             }
         }
+        //打开本地的麦克风需要进行申请
+        let applyToAdminToOpenLocalDeviceBlock = { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: .microphone, timeout: self.timeoutNumber) {  [weak self] _, _ in
+                guard let self = self else { return }
+                self.engineManager.roomEngine.startPushLocalAudio()
+            } onRejected: { _, _, _ in
+                //todo
+            } onCancelled: { _, _ in
+                //todo
+            } onTimeout: { _, _ in
+                //todo
+            }
+        }
+        switch roomInfo.speechMode {
+        case .freeToSpeak:
+            openLocalMicrophoneBlock()
+        case .applySpeakAfterTakingSeat:
+            if currentUser.isOnSeat {
+                openLocalMicrophoneBlock()
+            } else {
+                viewResponder?.makeToast(text: .muteAudioSeatReasonText)
+            }
+        case .applyToSpeak:
+            applyToAdminToOpenLocalDeviceBlock()
+        @unknown default:
+            break
+        }
     }
     
     func muteLocalVideoAction(sender: UIButton) {
-        let roomEngine = engineManager.roomEngine
-        if !roomInfo.enableVideo, sender.isSelected, currentUser.userRole != .roomOwner {
-            //如果房间已经全员禁画，自己操作关闭摄像头就会使按钮处于无法点击状态，房主不会被全员禁画
-            RoomRouter.makeToast(toast: .muteVideoRoomReasonText)
+        if currentUser.hasVideoStream {
+            engineManager.roomEngine.closeLocalCamera()
+            engineManager.roomEngine.stopPushLocalVideo()
             return
         }
-        guard currentUser.isOnSeat else {
-            RoomRouter.makeToast(toast: .muteVideoSeatReasonText)
-            return
+        //如果房主全体禁画，房间成员不可打开摄像头
+        if self.roomInfo.isCameraDisableForAllUser && self.currentUser.userRole != .roomOwner {
+            viewResponder?.makeToast(text: .muteVideoRoomReasonText)
+           return
         }
-        sender.isSelected = !sender.isSelected
-        if sender.isSelected {
-            roomEngine.closeLocalCamera()
-            roomEngine.stopPushLocalVideo()
-        } else {
+        // 直接打开本地的摄像头
+        let openLocalCameraBlock = { [weak self] in
+            guard let self = self else { return }
             // FIXME: - 打开摄像头前需要先设置一个view
-            roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-            roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera) { [weak self] in
+            self.engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
+            self.engineManager.roomEngine.openLocalCamera(isFront: self.engineManager.store.videoSetting.isFrontCamera, quality:
+                                                            self.engineManager.store.videoSetting.videoQuality) { [weak self] in
                 guard let self = self else { return }
                 self.engineManager.roomEngine.startPushLocalVideo()
             } onError: { code, message in
                 debugPrint("openLocalCamera,code:\(code),message:\(message)")
             }
+        }
+        //打开本地的摄像头需要向房主进行申请
+        let applyToAdminToOpenLocalDeviceBlock = { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: .camera, timeout: self.timeoutNumber) {  [weak self] _, _ in
+                guard let self = self else { return }
+                self.engineManager.roomEngine.startPushLocalVideo()
+            } onRejected: { _, _, _ in
+                //todo
+            } onCancelled: { _, _ in
+                //todo
+            } onTimeout: { _, _ in
+                //todo
+            }
+        }
+        switch roomInfo.speechMode {
+        case .freeToSpeak:
+            openLocalCameraBlock()
+        case .applySpeakAfterTakingSeat:
+            if currentUser.isOnSeat {
+                openLocalCameraBlock()
+            } else {
+                viewResponder?.makeToast(text: .muteVideoSeatReasonText)
+            }
+        case .applyToSpeak:
+            applyToAdminToOpenLocalDeviceBlock()
+        @unknown default:
+            break
         }
     }
     
@@ -225,26 +292,30 @@ class UserListManagerViewModel: NSObject {
         let roomEngine = engineManager.roomEngine
         let mute = userInfo.hasAudioStream
         if mute {
-            roomEngine.closeRemoteMicrophone(userId: userId) { [weak self] in
-                guard let _ = self else { return }
+            roomEngine.closeRemoteDeviceByAdmin(userId: userId, device: .microphone) {
                 sender.isSelected = !sender.isSelected
                 userInfo.hasAudioStream = !mute
-            } onError: { _, _ in
-                RoomRouter.makeToast(toast: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
+            } onError: { [weak self] _, _ in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(text: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
             }
         } else {
-            roomEngine.requestToOpenRemoteMicrophone(userId: userId, timeout: 30) { [weak self] _, _ in
-                guard let _ = self else { return }
+            roomEngine.openRemoteDeviceByAdmin(userId: userId, device: .microphone, timeout: 30, onAccepted: { [weak self] _, _ in
+                guard let self = self else { return }
                 sender.isSelected = !sender.isSelected
-                RoomRouter.makeToast(toast: .muteAudioSuccessToastText)
-            } onRejected: { _, _, _ in
-                RoomRouter.makeToast(toast: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
-            } onCancelled: { _, _ in
-                RoomRouter.makeToast(toast: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
-            } onTimeout: { _, _ in
-                RoomRouter.makeToast(toast: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
-            } onError: { _, _, _, _ in
-                RoomRouter.makeToast(toast: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
+                self.viewResponder?.makeToast(text: .muteAudioSuccessToastText)
+            }, onRejected: { [weak self] _, _, _ in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(text: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
+            }, onCancelled: { [weak self] _, _ in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(text: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
+            }, onTimeout: { [weak self] _, _ in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(text: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
+            }) { [weak self] _, _, _, _ in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(text: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
             }
         }
     }
@@ -254,33 +325,38 @@ class UserListManagerViewModel: NSObject {
         let roomEngine = engineManager.roomEngine
         let mute = userInfo.hasVideoStream
         if mute {
-            roomEngine.closeRemoteCamera(userId: userId) { [weak self] in
+            roomEngine.closeRemoteDeviceByAdmin(userId: userId, device: .camera) { [weak self] in
                 guard let _ = self else { return }
                 userInfo.hasVideoStream = !mute
                 sender.isSelected = !sender.isSelected
-            } onError: { _, _ in
-                RoomRouter.makeToast(toast: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
+            } onError: { [weak self] _, _ in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(text: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
             }
         } else {
-            roomEngine.requestToOpenRemoteCamera(userId: userId, timeout: 30) { [weak self] _, _ in
-                guard let _ = self else { return }
+            roomEngine.openRemoteDeviceByAdmin(userId: userId, device: .camera, timeout: 30, onAccepted: { [weak self] _, _ in
+                guard let self = self else { return }
                 sender.isSelected = !sender.isSelected
-                RoomRouter.makeToast(toast: .muteVideoSuccessToastText)
-            } onRejected: { _, _, _ in
-                RoomRouter.makeToast(toast: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
-            } onCancelled: { _, _ in
-                RoomRouter.makeToast(toast: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
-            } onTimeout: { _, _ in
-                RoomRouter.makeToast(toast: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
-            } onError: { _, _, _, _ in
-                RoomRouter.makeToast(toast: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
+                self.viewResponder?.makeToast(text: .muteVideoSuccessToastText)
+            }, onRejected: { [weak self] _, _, _ in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(text: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
+            }, onCancelled: { [weak self] _, _ in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(text: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
+            }, onTimeout: { [weak self] _, _ in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(text: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
+            }) { [weak self] _, _, _, _ in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(text: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
             }
         }
     }
     
     func inviteSeatAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        engineManager.roomEngine.requestRemoteUserOnSeat(0, userId: userId, timeout: timeoutNumber) { _, _ in
+        engineManager.roomEngine.takeUserOnSeatByAdmin(-1, userId: userId, timeout: 30) { _, _ in
             //todo
         } onRejected: { _, _, _ in
             //todo
@@ -304,25 +380,17 @@ class UserListManagerViewModel: NSObject {
     }
     
     func muteMessageAction(sender: UIButton) {
-        sender.isSelected = !sender.isSelected
-        let roomEngine = engineManager.roomEngine
-        if !sender.isSelected {
-            roomEngine.unMuteRemoteUser(userId) {
-                debugPrint("unMuteRemoteUser,success")
-            } onError: { code, message in
-                debugPrint("unMuteRemoteUser，code:\(code),message:\(message)")
-            }
-        } else {
-            roomEngine.muteRemoteUser(userId, duration: 30) {
-            } onError: { code, message in
-                debugPrint("openLocalCamera,code:\(code),message:\(message)")
-            }
+        guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { return }
+        let isDisable = !userInfo.isMuteMessage
+        engineManager.roomEngine.disableSendingMessageByAdmin(userId: userId, isDisable: isDisable) {
+        } onError: { code, message in
+            debugPrint("disableSendingMessageByAdmin,code:\(code),message:\(message)")
         }
     }
     
     func kickRemoteUserOffSeat(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        engineManager.roomEngine.kickRemoteUserOffSeat(0, userId: userId) {
+        engineManager.roomEngine.kickUserOffSeatByAdmin(-1, userId: userId) {
             //todo
         } onError: { code, message in
             //todo
@@ -331,7 +399,7 @@ class UserListManagerViewModel: NSObject {
     
     func kickOutAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        engineManager.roomEngine.kickOutRemoteUser(userId) {
+        engineManager.roomEngine.kickRemoteUserOutOfRoom(userId) {
             //todo
         } onError: { code, message in
             //todo
@@ -341,19 +409,56 @@ class UserListManagerViewModel: NSObject {
     //根据用户的状态更新item数组
     func updateUserItem() {
         guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { return }
-        let audioItem = currentUserItems.first(where: { $0.buttonType == .muteAudioItemType})
-        audioItem?.isSelect = !userInfo.hasAudioStream
-        let videoItem = currentUserItems.first(where: { $0.buttonType == .muteVideoItemType})
-        videoItem?.isSelect = !userInfo.hasVideoStream
-        let otherAudioItem = otherUserItems.first(where: { $0.buttonType == .muteAudioItemType})
-        otherAudioItem?.isSelect = !userInfo.hasAudioStream
-        let otherVideoItem = otherUserItems.first(where: { $0.buttonType == .muteVideoItemType})
-        otherVideoItem?.isSelect = !userInfo.hasVideoStream
-        let seatInviteAudioItem = seatInviteSeatItems.first(where: { $0.buttonType == .muteAudioItemType})
-        seatInviteAudioItem?.isSelect = !userInfo.hasAudioStream
-        let seatInviteVideoItem = seatInviteSeatItems.first(where: { $0.buttonType == .muteVideoItemType})
-        seatInviteVideoItem?.isSelect = !userInfo.hasVideoStream
-        userListManagerView?.updateUI(item: self)
+        updateItem(buttonType: .muteAudioItemType, muted: !userInfo.hasAudioStream)
+        updateItem(buttonType: .muteVideoItemType, muted: !userInfo.hasVideoStream)
+        updateItem(buttonType: .muteMessageItemType, muted: userInfo.isMuteMessage)
+    }
+    
+    func updateItem(buttonType: ButtonItemData.ButtonType, muted: Bool) {
+        let userType = getUserType(userId: userId)
+        switch userType {
+        case .currentUserType:
+            guard let currentItem = currentUserItems.first(where: { $0.buttonType == buttonType }) else { return }
+            currentItem.isSelect = muted
+            viewResponder?.updateUI(items: currentUserItems)
+        case .otherUserType:
+            guard let otherItem = otherUserItems.first(where: { $0.buttonType == buttonType }) else { return }
+            otherItem.isSelect = muted
+            viewResponder?.updateUI(items: otherUserItems)
+        case .onSeatUserType:
+            guard let onSeatItem = onSeatItems.first(where: { $0.buttonType == buttonType }) else { return }
+            onSeatItem.isSelect = muted
+            viewResponder?.updateUI(items: onSeatItems)
+        case .offSeatUserType:
+            guard let offSeatItem = offSeatItems.first(where: { $0.buttonType == buttonType }) else { return }
+            offSeatItem.isSelect = muted
+            viewResponder?.updateUI(items: offSeatItems)
+        default: break
+        }
+    }
+    
+    func getUserType(userId: String) -> userType? {
+        guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { return nil }
+        switch roomInfo.speechMode {
+        case .freeToSpeak:
+            if userId == currentUser.userId {
+                return .currentUserType
+            } else {
+                return .otherUserType
+            }
+        case .applySpeakAfterTakingSeat:
+            if userId == currentUser.userId {
+                return.currentUserType
+            } else {
+                if userInfo.isOnSeat {
+                    return .onSeatUserType
+                } else {
+                    return .offSeatUserType
+                }
+            }
+        default: break
+        }
+        return nil
     }
     
     func backBlockAction(sender: UIView) {
@@ -365,14 +470,24 @@ extension UserListManagerViewModel: RoomEngineEventResponder {
     func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
         if name == .onUserAudioStateChanged {
             guard let userId = param?["userId"] as? String else { return }
+            guard let hasAudio = param?["hasAudio"] as? Bool else { return }
             if userId == self.userId {
-                updateUserItem()
+                updateItem(buttonType: .muteAudioItemType, muted: !hasAudio)
             }
         }
         if name == .onUserVideoStateChanged {
             guard let userId = param?["userId"] as? String else { return }
-            if userId == userId {
-                updateUserItem()
+            guard let hasVideo = param?["hasVideo"] as? Bool else { return }
+            guard let streamType = param?["streamType"] as? TUIVideoStreamType else { return }
+            if userId == self.userId && streamType == .cameraStream {
+                updateItem(buttonType: .muteVideoItemType, muted: !hasVideo)
+            }
+        }
+        if name == .onSendMessageForUserDisableChanged {
+            guard let userId = param?["userId"] as? String else { return }
+            guard let muted = param?["muted"] as? Bool else { return }
+            if userId == self.userId {
+                updateItem(buttonType: .muteMessageItemType, muted: muted)
             }
         }
     }

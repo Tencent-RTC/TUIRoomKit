@@ -63,7 +63,9 @@ class EngineEventCenter: NSObject {
         case onError
         case onKickedOffLine
         case onUserSigExpired
-        case onRoomInfoChanged
+        case onAllUserMicrophoneDisableChanged
+        case onAllUserCameraDisableChanged
+        case onSendMessageForAllUserDisableChanged
         case onRoomDismissed
         case onKickedOutOfRoom
         case onRemoteUserEnterRoom
@@ -74,13 +76,14 @@ class EngineEventCenter: NSObject {
         case onUserVoiceVolumeChanged
         case onUserNetworkQualityChanged
         case onUserScreenCaptureStopped
-        case onSeatControlEnabled
         case onSeatListChanged
         case onRequestReceived
         case onRequestCancelled
         case onReceiveTextMessage
         case onReceiveCustomMessage
-        case onUserMuteStateChanged
+        case onRoomNameChanged
+        case onRoomSpeechModeChanged
+        case onSendMessageForUserDisableChanged
     }
     
     enum RoomUIEvent: String {
@@ -88,10 +91,9 @@ class EngineEventCenter: NSObject {
         case TUIRoomKitService_RenewUserList
         case TUIRoomKitService_SomeoneSharing
         case TUIRoomKitService_RenewSeatList
-        case TUIRoomKitService_UserOnSeat
-        case TUIRoomKitService_UserDownSeat
+        case TUIRoomKitService_UserOnSeatChanged
         case TUIRoomKitService_ResignFirstResponder
-        
+        case TUIRoomKitService_ShowBeautyView
     }
     
     /// 注册UI响应相关监听事件
@@ -161,40 +163,119 @@ class EngineEventCenter: NSObject {
         }
     }
     
-    private func checkRoomChangeInfo(roomInfo: TUIRoomInfo) {
-        guard roomInfo.roomId == roomInfo.roomId else {
-            return
-        }
-        if self.roomInfo.enableVideo != roomInfo.enableVideo {
-            if roomInfo.owner == currentUser.userId {
-                return
-            }
-            if !roomInfo.enableVideo {
-                engineManager.roomEngine.closeLocalCamera()
-                engineManager.roomEngine.stopPushLocalVideo()
-                RoomRouter.makeToast(toast: .allMuteVideoText)
-            } else {
-                RoomRouter.makeToast(toast: .allUnMuteVideoText)
-            }
-        }
-        if self.roomInfo.enableAudio != roomInfo.enableAudio {
-            if roomInfo.owner == currentUser.userId {
-                return
-            }
-            if !roomInfo.enableAudio {
-                engineManager.roomEngine.closeLocalMicrophone()
-                engineManager.roomEngine.stopPushLocalAudio()
-                RoomRouter.makeToast(toast: .allMuteAudioText)
-            } else {
-                RoomRouter.makeToast(toast: .allUnMuteAudioText)
-            }
-        }
-        self.roomInfo.update(engineRoomInfo: roomInfo)
-    }
-    
     deinit {
         EngineManager.shared.roomEngine.removeObserver(self)
         debugPrint("deinit \(self)")
+    }
+}
+
+//收到事件回调后的处理逻辑
+extension EngineEventCenter {
+    private func remoteUserEnterRoom(roomId: String, userInfo: TUIUserInfo) {
+        if roomId == engineManager.store.roomInfo.roomId {
+            addUserList(userInfo: userInfo)
+        }
+    }
+    private func remoteUserLeaveRoom(roomId: String, userInfo: TUIUserInfo) {
+        if roomId == engineManager.store.roomInfo.roomId {
+            removeUserList(userId: userInfo.userId)
+            removeSeatList(userId: userInfo.userId)
+        }
+    }
+    private func seatListChanged(seatList: [TUISeatInfo], seated: [TUISeatInfo], left leftList: [TUISeatInfo]) {
+        if leftList.count > 0 {
+            //判断自己是否下麦
+            if leftList.first(where: { $0.userId == currentUser.userId }) != nil {
+                currentUser.isOnSeat = false
+                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
+                                                       param: ["isOnSeat":false])
+            }
+            //更新麦上用户列表
+            for seatInfo: TUISeatInfo in leftList {
+                guard let userId = seatInfo.userId else {
+                    continue
+                }
+                if let userItem = getUserItem(userId) {
+                    userItem.isOnSeat = false
+                }
+                removeSeatList(userId: userId)
+            }
+        }
+        //如果新上麦的人员有自己，要更改自己的上麦状态和摄像头麦克风状态
+        if seated.first(where: { $0.userId == currentUser.userId }) != nil {
+            currentUser.isOnSeat = true
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
+                                                   param: ["isOnSeat":true])
+        }
+        //更新所有在麦上的观众
+        for seatInfo: TUISeatInfo in seatList {
+            guard let userId = seatInfo.userId else { continue }
+            guard let userInfo = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { continue }
+            switch roomInfo.speechMode {
+            case .applySpeakAfterTakingSeat:
+                userInfo.isOnSeat = true
+            default: break
+            }
+        }
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+    }
+    private func allUserMicrophoneDisableChanged(roomId: String, isDisable: Bool) {
+        roomInfo.isMicrophoneDisableForAllUser = isDisable
+        if currentUser.userRole == .roomOwner {
+            return
+        }
+        if isDisable {
+            RoomRouter.makeToast(toast: .allMuteAudioText)
+        } else {
+            RoomRouter.makeToast(toast: .allUnMuteAudioText)
+        }
+    }
+    private func allUserCameraDisableChanged(roomId: String, isDisable: Bool) {
+        roomInfo.isCameraDisableForAllUser = isDisable
+        if currentUser.userRole == .roomOwner {
+            return
+        }
+        if isDisable {
+            RoomRouter.makeToast(toast: .allMuteVideoText)
+        } else {
+            RoomRouter.makeToast(toast: .allUnMuteVideoText)
+        }
+    }
+    private func addUserList(userInfo: TUIUserInfo) {
+        if let userItem = getUserItem(userInfo.userId) {
+            userItem.update(userInfo: userInfo)
+        } else {
+            if userInfo.userId == roomInfo.ownerId {
+                userInfo.userRole = .roomOwner
+            }
+            if userInfo.userName.isEmpty {
+                userInfo.userName = userInfo.userId
+            }
+            let userItem = UserModel()
+            userItem.update(userInfo: userInfo)
+            engineManager.store.attendeeList.append(userItem)
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+        }
+    }
+    
+    private func getUserItem(_ userId: String) -> UserModel? {
+        return engineManager.store.attendeeList.first(where: {$0.userId == userId})
+    }
+    
+    private func removeUserList(userId: String, type: TUIVideoStreamType = .cameraStream) {
+        if type == .cameraStream {
+            engineManager.store.attendeeList = engineManager.store.attendeeList.filter { model -> Bool in
+                model.userId != userId
+            }
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+        }
+    }
+    
+    private func removeSeatList(userId: String) {
+        engineManager.store.inviteSeatList = engineManager.store.inviteSeatList.filter { model -> Bool in
+            model.userId != userId
+        }
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
 }
 
@@ -231,21 +312,39 @@ extension EngineEventCenter: TUIRoomObserver {
     }
     
     // MARK: - 房间内事件回调
-    func onRoomInfoChanged(roomId: String, roomInfo: TUIRoomInfo) {
-        checkRoomChangeInfo(roomInfo: roomInfo)
-        guard let observers = engineObserverMap[.onRoomInfoChanged] else { return }
+    func onAllUserMicrophoneDisableChanged(roomId: String, isDisable: Bool) {
+        allUserMicrophoneDisableChanged(roomId: roomId, isDisable: isDisable)
+        guard let observers = engineObserverMap[.onAllUserMicrophoneDisableChanged] else { return }
         let param = [
             "roomId" : roomId,
-            "roomInfo" : roomInfo,
-        ] as [String : Any]
-        observers.forEach { [weak self] responder in
-            guard let self = self else  { return }
-            // FIXME: 修复转让房主原房主收不到回调问题
-            let oldRoomOwner = self.engineManager.store.roomInfo.owner
-            if oldRoomOwner != roomInfo.owner {
-                self.onUserRoleChanged(userId: oldRoomOwner, userRole: .generalUser)
-            }
-            responder()?.onEngineEvent(name: .onRoomInfoChanged, param: param)
+            "isDisable" : isDisable,
+        ] as [String:Any]
+        observers.forEach { responder in
+            responder()?.onEngineEvent(name: .onAllUserMicrophoneDisableChanged, param: param)
+        }
+    }
+    
+    func onAllUserCameraDisableChanged(roomId: String, isDisable: Bool) {
+        allUserCameraDisableChanged(roomId: roomId, isDisable: isDisable)
+        guard let observers = engineObserverMap[.onAllUserCameraDisableChanged] else { return }
+        let param = [
+            "roomId" : roomId,
+            "isDisable" : isDisable,
+        ] as [String:Any]
+        observers.forEach { responder in
+            responder()?.onEngineEvent(name: .onAllUserCameraDisableChanged, param: param)
+        }
+    }
+    
+    func onSendMessageForAllUserDisableChanged(roomId: String, isDisable: Bool) {
+        roomInfo.isMessageDisableForAllUser = isDisable
+        guard let observers = engineObserverMap[.onSendMessageForAllUserDisableChanged] else { return }
+        let param = [
+            "roomId" : roomId,
+            "isDisable" : isDisable,
+        ] as [String:Any]
+        observers.forEach { responder in
+            responder()?.onEngineEvent(name: .onSendMessageForAllUserDisableChanged, param: param)
         }
     }
     
@@ -270,8 +369,33 @@ extension EngineEventCenter: TUIRoomObserver {
         }
     }
     
+    func onRoomNameChanged(roomId: String, roomName: String) {
+        roomInfo.name = roomName
+        guard let observers = engineObserverMap[.onRoomNameChanged] else { return }
+        let param = [
+            "roomId" : roomId,
+            "roomName" : roomName,
+        ] as [String : Any]
+        observers.forEach { responder in
+            responder()?.onEngineEvent(name: .onRoomNameChanged, param: param)
+        }
+    }
+    
+    func onRoomSpeechModeChanged(roomId: String, speechMode mode: TUISpeechMode) {
+        roomInfo.speechMode = mode
+        guard let observers = engineObserverMap[.onRoomSpeechModeChanged] else { return }
+        let param = [
+            "roomId" : roomId,
+            "mode" : mode,
+        ] as [String : Any]
+        observers.forEach { responder in
+            responder()?.onEngineEvent(name: .onRoomSpeechModeChanged, param: param)
+        }
+    }
+    
     // MARK: - 房间内用户事件回调
     func onRemoteUserEnterRoom(roomId: String, userInfo: TUIUserInfo) {
+        remoteUserEnterRoom(roomId: roomId, userInfo: userInfo)
         guard let observers = engineObserverMap[.onRemoteUserEnterRoom] else { return }
         let param = [
             "roomId": roomId,
@@ -283,6 +407,7 @@ extension EngineEventCenter: TUIRoomObserver {
     }
     
     func onRemoteUserLeaveRoom(roomId: String, userInfo: TUIUserInfo) {
+        remoteUserLeaveRoom(roomId: roomId, userInfo: userInfo)
         guard let observers = engineObserverMap[.onRemoteUserLeaveRoom] else { return }
         let param = [
             "roomId": roomId,
@@ -336,17 +461,6 @@ extension EngineEventCenter: TUIRoomObserver {
         }
     }
     
-    func onUserMuteStateChanged(userId: String, muted: Bool) {
-        guard let observers = engineObserverMap[.onUserMuteStateChanged] else { return }
-        let param = [
-            "userId" : userId,
-            "muted" : muted,
-        ] as [String : Any]
-        observers.forEach { responder in
-            responder()?.onEngineEvent(name: .onUserMuteStateChanged, param: param)
-        }
-    }
-    
     func onUserNetworkQualityChanged(networkList: [TUINetworkInfo]) {
         guard let observers = engineObserverMap[.onUserNetworkQualityChanged] else { return }
         let param = [
@@ -367,19 +481,8 @@ extension EngineEventCenter: TUIRoomObserver {
         }
     }
     
-    // MARK: - 房间内麦位事件回调
-    func onSeatControlEnabled(enable: Bool, maxSeatNumber: Int) {
-        guard let observers = engineObserverMap[.onSeatControlEnabled] else { return }
-        let param = [
-            "enable": enable,
-            "maxSeatNumber": maxSeatNumber,
-        ] as [String : Any]
-        observers.forEach { responder in
-            responder()?.onEngineEvent(name: .onSeatControlEnabled, param: param)
-        }
-    }
-    
     func onSeatListChanged(seatList: [TUISeatInfo], seated seatedList: [TUISeatInfo], left leftList: [TUISeatInfo]) {
+        seatListChanged(seatList: seatList,seated: seatedList, left: leftList)
         guard let observers = engineObserverMap[.onSeatListChanged] else { return }
         let param = [
             "seatList": seatList,
@@ -388,6 +491,18 @@ extension EngineEventCenter: TUIRoomObserver {
         ] as [String : Any]
         observers.forEach { responder in
             responder()?.onEngineEvent(name: .onSeatListChanged, param: param)
+        }
+    }
+    
+    func OnSendMessageForUserDisableChanged(roomId: String, userId: String, isDisable muted: Bool) {
+        guard let observers = engineObserverMap[.onSendMessageForUserDisableChanged] else { return }
+        let param = [
+            "roomId": roomId,
+            "userId": userId,
+            "muted": muted,
+        ] as [String : Any]
+        observers.forEach { responder in
+            responder()?.onEngineEvent(name: .onSendMessageForUserDisableChanged, param: param)
         }
     }
     

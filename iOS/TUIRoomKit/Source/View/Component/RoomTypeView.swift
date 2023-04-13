@@ -99,11 +99,23 @@ class RoomTypeView: UIView {
     }
     
     func bindInteraction() {
+        setupViewState()
         cancelButton.addTarget(self, action: #selector(cancelAction(sender:)), for: .touchUpInside)
         sureButton.addTarget(self, action: #selector(sureAction(sender:)), for: .touchUpInside)
         freedomButton.addTarget(self, action: #selector(freedomAction(sender:)), for: .touchUpInside)
         raiseHandButton.addTarget(self, action: #selector(raiseHandAction(sender:)), for: .touchUpInside)
-        
+    }
+    
+    func setupViewState() {
+        switch viewModel.engineManager.store.roomSpeechMode {
+        case .freeToSpeak:
+            freedomButton.isSelected = true
+            raiseHandButton.isSelected = false
+        case .applySpeakAfterTakingSeat:
+            freedomButton.isSelected = false
+            raiseHandButton.isSelected = true
+        default : break
+        }
     }
     
     @objc func cancelAction(sender: UIButton) {

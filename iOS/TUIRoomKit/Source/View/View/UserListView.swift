@@ -9,7 +9,7 @@
 import Foundation
 
 class UserListView: UIView {
-    let viewModel: UserListViewModel    
+    let viewModel: UserListViewModel
     let searchController: UISearchController = {
         let controller = UISearchController(searchResultsController: nil)
         controller.obscuresBackgroundDuringPresentation = false
@@ -35,7 +35,7 @@ class UserListView: UIView {
         let userRole = EngineManager.shared.store.currentUser.userRole
         let roomInfo = EngineManager.shared.store.roomInfo
         button.isHidden = (userRole != .roomOwner)
-        button.isSelected = !roomInfo.enableAudio
+        button.isSelected = roomInfo.isMicrophoneDisableForAllUser
         return button
     }()
     
@@ -54,7 +54,7 @@ class UserListView: UIView {
         let userRole = EngineManager.shared.store.currentUser.userRole
         let roomInfo = EngineManager.shared.store.roomInfo
         button.isHidden = (userRole != .roomOwner)
-        button.isSelected = !roomInfo.enableVideo
+        button.isSelected = roomInfo.isCameraDisableForAllUser
         return button
     }()
     
@@ -206,7 +206,7 @@ extension UserListView: UserListViewResponder {
         muteAllAudioButton.isHidden = roomOwner != userInfo.userId
         muteAllVideoButton.isHidden = roomOwner != userInfo.userId
     }
-
+    
     func reloadUserListView() {
         userListTableView.reloadData()
     }
@@ -348,19 +348,36 @@ class UserListCell: UITableViewCell {
         }
         muteAudioButton.isSelected = !item.hasAudioStream
         muteVideoButton.isSelected = !item.hasVideoStream
-        inviteStageButton.isHidden = true
         //判断是否显示邀请上台的按钮(房主在举手发言房间中可以邀请其他没有上台的用户)
-        if EngineManager.shared.store.roomInfo.enableSeatControl && !attendeeModel.isOnSeat && attendeeModel.userRole != .roomOwner
-            && EngineManager.shared.store.currentUser.userRole == .roomOwner {
-            muteAudioButton.isHidden = true
-            muteVideoButton.isHidden = true
-            inviteStageButton.isHidden = false
+        switch EngineManager.shared.store.roomInfo.speechMode {
+        case .freeToSpeak:
+            changeInviteStageButtonHidden(isHidden: true)
+        case .applySpeakAfterTakingSeat:
+            switch EngineManager.shared.store.currentUser.userRole {
+            case .roomOwner:
+                if attendeeModel.userRole != .roomOwner && !attendeeModel.isOnSeat {
+                    changeInviteStageButtonHidden(isHidden: false)
+                } else {
+                    changeInviteStageButtonHidden(isHidden: true)
+                }
+            case .generalUser:
+                changeInviteStageButtonHidden(isHidden: true)
+            default: break
+            }
+        default: break
         }
     }
     
     @objc func inviteStageAction(sender: UIButton) {
         viewModel.userId = attendeeModel.userId
         viewModel.inviteSeatAction(sender: sender)
+    }
+    
+    //是否显示邀请按钮（如果显示了邀请按钮，麦克风和摄像头按钮不会显示）
+    private func changeInviteStageButtonHidden(isHidden: Bool) {
+        inviteStageButton.isHidden = isHidden
+        muteAudioButton.isHidden = !isHidden
+        muteVideoButton.isHidden = !isHidden
     }
     
     deinit {

@@ -12,7 +12,6 @@ class EnterRoomViewModel: NSObject {
     private var fieldText: String = ""
     private(set) var inputViewItems: [ListCellItemData] = []
     private(set) var switchViewItems: [ListCellItemData] = []
-    private var enableSeatControl: Bool = false
     var engineManager: EngineManager {
         EngineManager.shared
     }

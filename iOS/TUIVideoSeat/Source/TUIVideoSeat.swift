@@ -27,11 +27,11 @@ extension TUIVideoSeat: TUIExtensionProtocol {
             return [:]
         }
         
-        guard let roomEngine:TUIRoomEngine = param["roomEngine"] as? TUIRoomEngine else {
+        guard let roomEngine = param["roomEngine"] as? TUIRoomEngine else {
             return [:]
         }
         
-        guard let roomId:String = param["roomId"] as? String else {
+        guard let roomId = param["roomId"] as? String else {
             return [:]
         }
         

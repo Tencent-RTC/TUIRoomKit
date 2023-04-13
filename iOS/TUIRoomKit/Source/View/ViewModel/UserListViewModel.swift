@@ -18,7 +18,8 @@ protocol UserListViewResponder: NSObject {
 class UserListViewModel: NSObject {
     var userId: String = ""
     var attendeeList: [UserModel] = []
-
+    
+    let timeoutNumber: Double = 30
     weak var viewResponder: UserListViewResponder? = nil
     
     override init() {
@@ -37,8 +38,9 @@ class UserListViewModel: NSObject {
     func muteAllAudioAction(sender: UIButton, view: UserListView) {
         sender.isSelected = !sender.isSelected
         let roomInfo = EngineManager.shared.store.roomInfo
-        roomInfo.enableAudio = !sender.isSelected
-        EngineManager.shared.roomEngine.updateRoomInfo(roomInfo.getEngineRoomInfo()) { [weak self] in
+        roomInfo.isMicrophoneDisableForAllUser = sender.isSelected
+        EngineManager.shared.roomEngine.disableDeviceForAllUserByAdmin(device: .microphone, isDisable:
+                                                                        roomInfo.isMicrophoneDisableForAllUser) { [weak self] in
             guard let self = self else { return }
             if sender.isSelected {
                 self.viewResponder?.makeToast(text:.allMuteAudioText)
@@ -54,8 +56,9 @@ class UserListViewModel: NSObject {
     func muteAllVideoAction(sender: UIButton, view: UserListView) {
         sender.isSelected = !sender.isSelected
         let roomInfo = EngineManager.shared.store.roomInfo
-        roomInfo.enableVideo = !sender.isSelected
-        EngineManager.shared.roomEngine.updateRoomInfo(roomInfo.getEngineRoomInfo()) { [weak self] in
+        roomInfo.isCameraDisableForAllUser = sender.isSelected
+        EngineManager.shared.roomEngine.disableDeviceForAllUserByAdmin(device: .camera, isDisable:
+                                                                        roomInfo.isCameraDisableForAllUser) { [weak self] in
             guard let self = self else { return }
             if sender.isSelected {
                 self.viewResponder?.makeToast(text:.allMuteVideoText)
@@ -79,7 +82,7 @@ class UserListViewModel: NSObject {
     
     func inviteSeatAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        EngineManager.shared.roomEngine.requestRemoteUserOnSeat(0, userId: userId, timeout: 30) { _, _ in
+        EngineManager.shared.roomEngine.takeUserOnSeatByAdmin(-1, userId: userId, timeout: timeoutNumber) { _, _ in
             //todo
         } onRejected: { _, _, _ in
             //todo
@@ -91,7 +94,6 @@ class UserListViewModel: NSObject {
             //todo
         }
     }
-
 }
 
 extension UserListViewModel: RoomEngineEventResponder {

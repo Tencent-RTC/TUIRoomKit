@@ -116,6 +116,12 @@ class RoomRouter {
         }
     }
     
+    func popToRoomEntranceViewController() {
+        let controllerArray = navController.viewControllers
+        guard let controller = controllerArray.first(where: { $0 is RoomEntranceViewController }) else { return }
+        self.navController.popToViewController(controller, animated: true)
+    }
+    
     // 这个函数要第二波优化掉
     func dismissPopupViewController(animated: Bool = true) {
         guard context.presentControllers.count > 0 else { return }
@@ -240,7 +246,7 @@ extension RoomRouter {
     }
     
     private func makePopUpViewController(viewType: PopUpViewType, height: CGFloat = 0) -> UIViewController {
-        let controller = PopUpViewController(popUpViewModelFactory: self, viewType: viewType, height: height)
+        let controller = PopUpViewController(popUpViewFactory: self, viewType: viewType, height: height)
         return controller
     }
 }
@@ -314,7 +320,7 @@ extension RoomRouter: TransferMasterViewModelFactory {
     }
 }
 
-extension RoomRouter: PopUpViewModelFactory {
+extension RoomRouter: PopUpViewFactory {
     func makeRootView(viewType: PopUpViewType, height: CGFloat = 0) -> UIView {
         let viewModel = PopUpViewModel(viewType: viewType, height: height)
         return PopUpView(viewModel: viewModel)

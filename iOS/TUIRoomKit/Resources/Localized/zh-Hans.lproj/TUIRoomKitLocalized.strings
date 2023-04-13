@@ -48,6 +48,8 @@
 "TUIRoom.homeowners.notice.camera.turned.on" = "主持人解禁了你的摄像头";
 "TUIRoom.homeowners.notice.microphone.turned.off" = "您已被关闭麦克风";
 "TUIRoom.homeowners.notice.microphone.turned.on" = "主持人解禁了你的麦克风";
+"TUIRoom.homeowners.notice.message.turned.off" = "您已被禁言";
+"TUIRoom.homeowners.notice.message.turned.on" = "主持人解除了你的禁言";
 "TUIRoom.mute.audio.error.toast" = "禁麦失败";
 "TUIRoom.mute.video.error.toast" = "禁画失败";
 "TUIRoom.mute.audio.title" = "所有以及新加入的成员将被静音";
@@ -77,7 +79,7 @@
 "TUIRoom.leave.seat" = "下台";
 "TUIRoom.hand.down" = "手放下";
 "TUIRoom.invite.to.speak" = "主持人邀请您上台发言";
-"TUIRoom.agree.to.speak" = "同意上台后将自动打开摄像头和麦克风";
+"TUIRoom.agree.to.speak" = "主持人邀请您上台发言，上台后可以打开摄像头和麦克风";
 "TUIRoom.decline" = "拒绝";
 "TUIRoom.agree" = "同意";
 "TUIRoom.quick.meeting" = "的快速会议";

@@ -138,6 +138,7 @@ class RoomInfoView: UIView {
     }
     
     func bindInteraction() {
+        backgroundColor = UIColor(0x1B1E26)
         setupViewState(item: viewModel)
         codeButton.addTarget(self, action: #selector(codeAction(sender:)), for: .touchUpInside)
     }

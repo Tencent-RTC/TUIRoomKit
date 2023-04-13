@@ -10,84 +10,45 @@ import TUIRoomEngine
 
 public class RoomInfo {
     public var roomId: String {
-        set {
-            roomInfo.roomId = newValue
-        }
-        get {
-            return roomInfo.roomId
-        }
+        return roomInfo.roomId
     }
     
     public var name: String {
-        set {
-            roomInfo.name = newValue
-        }
-        get {
-            return roomInfo.name
-        }
+        return roomInfo.name
     }
     
-    public var enableSeatControl: Bool {
-        set {
-            roomInfo.enableSeatControl = newValue
-        }
-        get {
-            return roomInfo.enableSeatControl
-        }
+    public var speechMode: TUISpeechMode {
+        return roomInfo.speechMode
     }
     
-    public var enableVideo: Bool {
-        set {
-            roomInfo.enableVideo = newValue
-        }
-        get {
-            return roomInfo.enableVideo
-        }
+    public var isCameraDisableForAllUser: Bool {
+        return roomInfo.isCameraDisableForAllUser
     }
     
-    public var enableAudio: Bool {
-        set {
-            roomInfo.enableAudio = newValue
-        }
-        get {
-            return roomInfo.enableAudio
-        }
+    public var isMicrophoneDisableForAllUser: Bool {
+        return roomInfo.isMicrophoneDisableForAllUser
     }
     
-    public var enableMessage: Bool {
-        set {
-            roomInfo.enableMessage = newValue
-        }
-        get {
-            return roomInfo.enableMessage
-        }
+    public var isMessageDisableForAllUser: Bool {
+        return roomInfo.isMessageDisableForAllUser
     }
     
     var roomType: TUIRoomType {
-        set {
-            roomInfo.roomType = newValue
-        }
-        get {
-            return roomInfo.roomType
-        }
+        return roomInfo.roomType
     }
 
-    public var owner: String = ""
-    
-    private var roomInfo: TUIRoomInfo
-    public init() {
-        roomInfo = TUIRoomInfo()
+    public var ownerId: String {
+        return roomInfo.ownerId
     }
     
-    convenience init(roomInfo: TUIRoomInfo) {
-        self.init()
+    private var roomInfo: TUIRoomInfo
+    
+    init(roomInfo: TUIRoomInfo) {
         self.roomInfo = roomInfo
-        self.owner = roomInfo.owner
     }
     
     public func update(engineRoomInfo: TUIRoomInfo) {
         roomInfo = engineRoomInfo
-        owner = engineRoomInfo.owner
     }
 
     deinit {

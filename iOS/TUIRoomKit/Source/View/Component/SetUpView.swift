@@ -152,8 +152,9 @@ extension SetUpView: UIScrollViewDelegate {
 extension SetUpView: SetUpViewEventResponder {
     func showFrameRateAlert() {
         let frameRateAlert = ResolutionAlert()
+        frameRateAlert.titleText = .frameRateText
         frameRateAlert.dataSource = viewModel.frameRateTable
-        frameRateAlert.selectIndex = viewModel.videoModel.frameIndex
+        frameRateAlert.selectIndex = viewModel.engineManager.store.videoSetting.videoFps
         frameRateAlert.didSelectItem = { [weak self] index in
             guard let `self` = self else { return }
             self.viewModel.changeFrameRateAction(index: index)
@@ -162,8 +163,9 @@ extension SetUpView: SetUpViewEventResponder {
     }
     func showResolutionAlert() {
         let resolutionAlert = ResolutionAlert()
+        resolutionAlert.titleText = .resolutionText
         resolutionAlert.dataSource = viewModel.bitrateTable
-        resolutionAlert.selectIndex = viewModel.videoModel.bitrateIndex
+        resolutionAlert.selectIndex = viewModel.engineManager.store.videoSetting.videoBitrate
         resolutionAlert.didSelectItem = { [weak self] index in
             guard let `self` = self else { return }
             self.viewModel.changeResolutionAction(index: index)
@@ -187,6 +189,8 @@ private extension String {
     static let recordingSavePathText = localized("TUIRoom.recording.save.path")
     static let promptText = localized("TUIRoom.prompt")
     static let confirmText = localized("TUIRoom.ok")
+    static let resolutionText = localized("TUIRoom.resolution")
+    static let frameRateText = localized("TUIRoom.frame.rate")
 }
 
 

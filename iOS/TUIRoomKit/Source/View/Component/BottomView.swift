@@ -25,7 +25,6 @@ class BottomView: UIView {
     init(viewModel: BottomViewModel) {
         self.viewModel = viewModel
         super.init(frame: .zero)
-        viewModel.bottomView = self
     }
     
     required init?(coder: NSCoder) {
@@ -39,6 +38,7 @@ class BottomView: UIView {
         guard !isViewReady else { return }
         constructViewHierarchy()
         activateConstraints()
+        bindInteraction()
         isViewReady = true
     }
     
@@ -65,6 +65,16 @@ class BottomView: UIView {
         }
     }
     
+    func bindInteraction() {
+        viewModel.viewResponder = self
+    }
+    
+    deinit {
+        debugPrint("deinit \(self)")
+    }
+}
+
+extension BottomView: BottomViewModelResponder {
     func updateStackView(item: ButtonItemData, index: Int) {
         guard viewArray.count > index else { return }
         viewArray[index].removeFromSuperview()
@@ -77,8 +87,49 @@ class BottomView: UIView {
         }
         view.backgroundColor = item.backgroundColor ?? UIColor(0x2A2D38)
     }
-    
-    deinit {
-        debugPrint("deinit \(self)")
+    func showExitRoomAlert() {
+        let alertVC = UIAlertController(title: .audienceLogoutTitle,
+                                        message: nil,
+                                        preferredStyle: .actionSheet)
+        let cancelAction = UIAlertAction(title: .destroyRoomCancelTitle, style: .cancel, handler: nil)
+        let sureAction = UIAlertAction(title: .logoutOkText, style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.viewModel.exitRoomLogic(isHomeowner: false)
+        }
+        alertVC.addAction(cancelAction)
+        alertVC.addAction(sureAction)
+        RoomRouter.shared.presentAlert(alertVC)
+    }
+    func showDestroyRoomAlert() {
+        let alertController = UIAlertController(title: .dismissMeetingTitleText, message: .appointNewHostText, preferredStyle: .actionSheet)
+        let leaveRoomAction = UIAlertAction(title: .leaveMeetingText, style: .default) { _ in
+            RoomRouter.shared.pushTransferMasterViewController()
+        }
+        let dismissRoomAction = UIAlertAction(title: .dismissMeetingText, style: .destructive) { [weak self] _ in
+            guard let self = self else { return }
+            self.viewModel.exitRoomLogic(isHomeowner: true)
+        }
+        let cancelAction = UIAlertAction(title: .cancelText, style: .cancel) { _ in
+        }
+        alertController.addAction(leaveRoomAction)
+        alertController.addAction(dismissRoomAction)
+        alertController.addAction(cancelAction)
+        RoomRouter.shared.presentAlert(alertController)
+        
+    }
+    func makeToast(text: String) {
+        RoomRouter.makeToast(toast: text)
     }
 }
+
+private extension String {
+    static let audienceLogoutTitle = localized("TUIRoom.sure.leave.room")
+    static let destroyRoomCancelTitle = localized("TUIRoom.destroy.room.cancel")
+    static let logoutOkText = localized("TUIRoom.ok")
+    static let dismissMeetingTitleText = localized("TUIRoom.dismiss.meeting.Title")
+    static let appointNewHostText = localized("TUIRoom.appoint.new.host")
+    static let leaveMeetingText = localized("TUIRoom.leave.meeting")
+    static let dismissMeetingText = localized("TUIRoom.dismiss.meeting")
+    static let cancelText = localized("TUIRoom.cancel")
+}
+
