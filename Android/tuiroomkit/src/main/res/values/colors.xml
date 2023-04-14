@@ -22,5 +22,5 @@
     <color name="tuiroomkit_color_bg_bottom_tip">#5A5757</color>
     <color name="tuiroomkit_color_bg_item_checked">#4F515A</color>
     <color name="tuiroomkit_color_text_hint_search">#636A7E</color>
-    <color name="tuiroomkit_bg_extension_dialog">#1B1E26</color>
+    <color name="tuiroomkit_bg_bottom_dialog">#1B1E26</color>
 </resources>

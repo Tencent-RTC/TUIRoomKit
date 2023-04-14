@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.text.TextUtils;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
@@ -12,6 +13,7 @@ import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.view.component.TopView;
 import com.tencent.liteav.basic.RTCubeUtils;
+import com.tencent.liteav.device.TXDeviceManager;
 import com.tencent.trtc.TRTCCloudDef;
 
 import java.lang.reflect.Method;
@@ -34,7 +36,9 @@ public class TopViewModel {
         mRoomStore = RoomEngineManager.sharedInstance(context).getRoomStore();
         boolean isGeneralUser = TUIRoomDefine.Role.GENERAL_USER.equals(mRoomStore.userModel.role);
         mTopView.showReportView(isGeneralUser && RTCubeUtils.isRTCubeApp(context));
-        mTopView.setTitle(mRoomStore.roomInfo.name);
+        mTopView.setTitle(TextUtils.isEmpty(mRoomStore.roomInfo.name)
+                ? mRoomStore.roomInfo.roomId
+                : mRoomStore.roomInfo.name);
         mTopView.setHeadsetImg(mRoomStore.roomInfo.isUseSpeaker);
         mMainHandler = new Handler(Looper.getMainLooper());
         createTimeHandler();
@@ -80,9 +84,9 @@ public class TopViewModel {
 
     public void switchAudioRoute() {
         mRoomStore.roomInfo.isUseSpeaker = !mRoomStore.roomInfo.isUseSpeaker;
-        mRoomEngine.getTRTCCloud().setAudioRoute(mRoomStore.roomInfo.isUseSpeaker
-                ? TRTCCloudDef.TRTC_AUDIO_ROUTE_SPEAKER
-                : TRTCCloudDef.TRTC_AUDIO_ROUTE_EARPIECE);
+        mRoomEngine.getDeviceManager().setAudioRoute(mRoomStore.roomInfo.isUseSpeaker
+                ? TXDeviceManager.TXAudioRoute.TXAudioRouteSpeakerphone
+                : TXDeviceManager.TXAudioRoute.TXAudioRouteEarpiece);
         mTopView.setHeadsetImg(mRoomStore.roomInfo.isUseSpeaker);
     }
 

@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rl_root_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/tuiroomkit_bg_main_color_black">
@@ -10,8 +11,9 @@
         android:id="@+id/rl_video_seat_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_view"
-        android:layout_below="@id/top_view" />
+        android:layout_above="@id/bottom_view"
+        android:layout_below="@id/top_view"
+        android:layout_marginBottom="@dimen/tuiroomkit_video_seat_bottom_margin" />
 
     <RelativeLayout
         android:id="@+id/top_view"
@@ -21,7 +23,8 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp" />
 
-    <androidx.viewpager.widget.ViewPager
+    <View
+        android:id="@+id/top_view_dividing_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/top_view"
@@ -35,15 +38,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp" />
-
-    <RelativeLayout
-        android:id="@+id/rl_barrage_show"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_above="@id/bottom_view"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="40dp" />
 
     <LinearLayout
         android:id="@+id/ll_raise_hand_tip"
@@ -72,12 +66,6 @@
             android:layout_marginTop="10dp"
             android:src="@drawable/tuiroomkit_ic_cancel_raise_hand_tip" />
     </LinearLayout>
-
-
-    <RelativeLayout
-        android:id="@+id/rl_common_match_parent_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/group_screen_capture"

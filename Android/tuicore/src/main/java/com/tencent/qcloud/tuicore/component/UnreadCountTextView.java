@@ -13,7 +13,6 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import com.tencent.qcloud.tuicore.R;
 
-
 public class UnreadCountTextView extends AppCompatTextView {
 
     private int mNormalSize;

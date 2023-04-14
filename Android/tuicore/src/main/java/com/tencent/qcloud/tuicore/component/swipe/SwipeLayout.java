@@ -163,11 +163,11 @@ public class SwipeLayout extends FrameLayout {
 
     /**
      * bind a view with a specific
-     * {@link OnRevealListener}
+     * {@link com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.OnRevealListener}
      *
      * @param childId the view id.
      * @param l       the target
-     *                {@link OnRevealListener}
+     *                {@link com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.OnRevealListener}
      */
     public void addRevealListener(int childId, OnRevealListener l) {
         View child = findViewById(childId);
@@ -186,10 +186,10 @@ public class SwipeLayout extends FrameLayout {
 
     /**
      * bind multiple views with an
-     * {@link OnRevealListener}.
+     * {@link com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.OnRevealListener}.
      *
      * @param childIds the view id.
-     * @param l        the {@link OnRevealListener}
+     * @param l        the {@link com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.OnRevealListener}
      */
     public void addRevealListener(int[] childIds, OnRevealListener l) {
         for (int i : childIds)
@@ -666,7 +666,7 @@ public class SwipeLayout extends FrameLayout {
     }
 
     /**
-     * {@link OnLayoutChangeListener} added in API 11. I need
+     * {@link android.view.View.OnLayoutChangeListener} added in API 11. I need
      * to support it from API 8.
      */
     public interface OnLayout {
@@ -1237,8 +1237,8 @@ public class SwipeLayout extends FrameLayout {
 
     /**
      * There are 2 diffirent show mode.
-     * {@link ShowMode}.PullOut and
-     * {@link ShowMode}.LayDown.
+     * {@link com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.ShowMode}.PullOut and
+     * {@link com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.ShowMode}.LayDown.
      *
      * @param mode
      */
@@ -1298,7 +1298,7 @@ public class SwipeLayout extends FrameLayout {
     /**
      * get the open status.
      *
-     * @return {@link Status} Open , Close or
+     * @return {@link com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.Status} Open , Close or
      * Middle.
      */
     public Status getOpenStatus() {
@@ -1561,7 +1561,7 @@ public class SwipeLayout extends FrameLayout {
 
 
     /**
-     * Deprecated, use {@link #setDrag(DragEdge, View)}
+     * Deprecated, use {@link #setDrag(com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.DragEdge, android.view.View)}
      */
     @Deprecated
     public void setDragEdge(DragEdge dragEdge) {
@@ -1593,7 +1593,7 @@ public class SwipeLayout extends FrameLayout {
     }
 
     /**
-     * Deprecated, use {@link #setDrag(DragEdge, View)}
+     * Deprecated, use {@link #setDrag(com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.DragEdge, android.view.View)}
      */
     @Deprecated
     public void setDragEdges(List<DragEdge> dragEdges) {
@@ -1610,7 +1610,7 @@ public class SwipeLayout extends FrameLayout {
     }
 
     /**
-     * Deprecated, use {@link #addDrag(DragEdge, View)}
+     * Deprecated, use {@link #addDrag(com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.DragEdge, android.view.View)}
      */
     @Deprecated
     public void setDragEdges(DragEdge... mDragEdges) {
@@ -1619,7 +1619,7 @@ public class SwipeLayout extends FrameLayout {
     }
 
     /**
-     * Deprecated, use {@link #addDrag(DragEdge, View)}
+     * Deprecated, use {@link #addDrag(com.tencent.qcloud.tuicore.component.swipe.SwipeLayout.DragEdge, android.view.View)}
      * When using multiple drag edges it's a good idea to pass the ids of the views that
      * you're using for the left, right, top bottom views (-1 if you're not using a particular view)
      */

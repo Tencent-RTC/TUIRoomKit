@@ -19,6 +19,7 @@ import com.tencent.qcloud.tuicore.R;
 import com.tencent.qcloud.tuicore.TUIThemeManager;
 import com.tencent.qcloud.tuicore.component.interfaces.ITitleBarLayout;
 import com.tencent.qcloud.tuicore.util.ScreenUtil;
+
 public class TitleBarLayout extends LinearLayout implements ITitleBarLayout {
 
     private LinearLayout mLeftGroup;
@@ -55,7 +56,7 @@ public class TitleBarLayout extends LinearLayout implements ITitleBarLayout {
             canReturn = array.getBoolean(R.styleable.TitleBarLayout_title_bar_can_return, false);
             array.recycle();
         }
-        inflate(context, R.layout.title_bar_layout, this);
+        inflate(context, R.layout.core_title_bar_layout, this);
         mTitleLayout = findViewById(R.id.page_title_layout);
         mLeftGroup = findViewById(R.id.page_title_left_group);
         mRightGroup = findViewById(R.id.page_title_right_group);

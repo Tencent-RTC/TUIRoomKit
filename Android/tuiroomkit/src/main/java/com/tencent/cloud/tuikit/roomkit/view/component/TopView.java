@@ -2,6 +2,7 @@ package com.tencent.cloud.tuikit.roomkit.view.component;
 
 import android.content.Context;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -9,7 +10,6 @@ import android.widget.TextView;
 
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.TopViewModel;
-import com.tencent.liteav.basic.RTCubeUtils;
 import com.tencent.qcloud.tuicore.util.DateTimeUtil;
 
 public class TopView extends FrameLayout implements View.OnClickListener {
@@ -62,6 +62,15 @@ public class TopView extends FrameLayout implements View.OnClickListener {
     protected void onDetachedFromWindow() {
         mViewModel.stopTimeCount();
         super.onDetachedFromWindow();
+    }
+
+    @Override
+    public void setVisibility(int visibility) {
+        int animResId = visibility == VISIBLE
+                ? R.anim.tuiroomkit_anim_top_view_show
+                : R.anim.tuiroomkit_anim_top_view_dismiss;
+        startAnimation(AnimationUtils.loadAnimation(getContext(), animResId));
+        super.setVisibility(visibility);
     }
 
     public void updateTimeCount(int second) {

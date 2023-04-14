@@ -94,11 +94,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/img_head_prepare">
 
-        <com.tencent.cloud.tuikit.engine.common.TUIVideoView
-            android:id="@+id/video_preview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
         <ImageView
             android:id="@+id/image_switch_camera_preview"
             android:layout_width="wrap_content"

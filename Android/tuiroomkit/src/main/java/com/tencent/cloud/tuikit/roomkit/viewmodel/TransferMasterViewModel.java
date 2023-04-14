@@ -1,6 +1,7 @@
 package com.tencent.cloud.tuikit.roomkit.viewmodel;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -12,7 +13,6 @@ import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
-import com.tencent.cloud.tuikit.roomkit.model.utils.CommonUtils;
 import com.tencent.cloud.tuikit.roomkit.view.component.TransferMasterView;
 
 import java.util.ArrayList;
@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TransferMasterViewModel implements RoomEventCenter.RoomEngineEventResponder {
+public class TransferMasterViewModel implements RoomEventCenter.RoomEngineEventResponder,
+        RoomEventCenter.RoomKitUIEventResponder {
     private static final String TAG = "TransferMasterViewModel";
 
     private static final long USER_LIST_NEXT_SEQUENCE = 100L;
@@ -43,14 +44,11 @@ public class TransferMasterViewModel implements RoomEventCenter.RoomEngineEventR
         subscribeEvent();
     }
 
-    public void horizontalAnimation(boolean isShowingView) {
-        CommonUtils.horizontalAnimation(mTransferMasterView, isShowingView);
-    }
-
     private void subscribeEvent() {
         RoomEventCenter eventCenter = RoomEventCenter.getInstance();
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.REMOTE_USER_ENTER_ROOM, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.REMOTE_USER_LEAVE_ROOM, this);
+        eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
     }
 
     public void destroy() {
@@ -61,6 +59,7 @@ public class TransferMasterViewModel implements RoomEventCenter.RoomEngineEventR
         RoomEventCenter eventCenter = RoomEventCenter.getInstance();
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.REMOTE_USER_ENTER_ROOM, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.REMOTE_USER_LEAVE_ROOM, this);
+        eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
     }
 
     public void transferMaster(String userId) {
@@ -147,13 +146,20 @@ public class TransferMasterViewModel implements RoomEventCenter.RoomEngineEventR
         return mUserModelList;
     }
 
-    public List<UserModel> searchUserByName(String userName) {
-        UserModel userModel = findUserModelByName(userName);
-        if (userModel == null) {
-            return null;
+    public List<UserModel> searchUserByKeyWords(String keyWords) {
+        if (TextUtils.isEmpty(keyWords)) {
+            return new ArrayList<>();
         }
+
         List<UserModel> searchList = new ArrayList<>();
-        searchList.add(userModel);
+        for (UserModel model : mUserModelList) {
+            if (model == null) {
+                continue;
+            }
+            if (model.userName.contains(keyWords) || model.userId.contains(keyWords)) {
+                searchList.add(model);
+            }
+        }
         return searchList;
     }
 
@@ -211,5 +217,14 @@ public class TransferMasterViewModel implements RoomEventCenter.RoomEngineEventR
             return;
         }
         removeMemberEntity(userInfo.userId);
+    }
+
+    @Override
+    public void onNotifyUIEvent(String key, Map<String, Object> params) {
+        if (RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE.equals(key)
+                && params != null && mTransferMasterView.isShowing()) {
+            Configuration configuration = (Configuration) params.get(RoomEventConstant.KEY_CONFIGURATION);
+            mTransferMasterView.changeConfiguration(configuration);
+        }
     }
 }

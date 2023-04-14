@@ -15,4 +15,5 @@
     <dimen name="tuiroomkit_radio_button_bounds_vertical">24dp</dimen>
     <dimen name="tuiroomkit_create_room_margin_bottom">100dp</dimen>
     <dimen name="tuiroomkit_enter_room_margin_bottom">20dp</dimen>
+    <dimen name="tuiroomkit_video_seat_bottom_margin">15dp</dimen>
 </resources>

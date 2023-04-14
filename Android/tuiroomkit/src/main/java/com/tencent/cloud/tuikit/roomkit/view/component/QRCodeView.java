@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
@@ -14,9 +13,10 @@ import androidx.appcompat.widget.Toolbar;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 import com.tencent.cloud.tuikit.roomkit.model.utils.CommonUtils;
+import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.QRCodeViewModel;
 
-public class QRCodeView extends LinearLayout implements View.OnClickListener {
+public class QRCodeView extends BaseBottomDialog implements View.OnClickListener {
     private static final int QRCODE_WIDTH  = 480;
     private static final int QRCODE_HEIGHT = 480;
 
@@ -33,14 +33,18 @@ public class QRCodeView extends LinearLayout implements View.OnClickListener {
 
     public QRCodeView(Context context, String url) {
         super(context);
-        inflate(context, R.layout.tuiroomkit_view_qr_code, this);
-        mViewModel = new QRCodeViewModel(context, this);
-        mRoomInfo = mViewModel.getRoomInfo();
         mRoomURL = url;
-        initView();
     }
 
-    private void initView() {
+    @Override
+    protected int getLayoutId() {
+        return R.layout.tuiroomkit_view_qr_code;
+    }
+
+    @Override
+    protected void intiView() {
+        mViewModel = new QRCodeViewModel(getContext());
+        mRoomInfo = mViewModel.getRoomInfo();
         mToolbar = findViewById(R.id.toolbar_qr_code_view);
         mButtonSave = findViewById(R.id.btn_save);
         mTextRoomName = findViewById(R.id.tv_room_name);
@@ -60,19 +64,15 @@ public class QRCodeView extends LinearLayout implements View.OnClickListener {
     }
 
     @Override
-    public void setVisibility(int visibility) {
-        if (visibility == GONE) {
-            mViewModel.horizontalAnimation(false);
-        } else if (visibility == VISIBLE) {
-            mViewModel.horizontalAnimation(true);
-        }
-        super.setVisibility(visibility);
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        updateHeightToMatchParent();
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.toolbar_qr_code_view) {
-            setVisibility(GONE);
+            dismiss();
         } else if (v.getId() == R.id.btn_save) {
             mViewModel.saveQRCodeToAlbum(mBitmap);
         } else if (v.getId() == R.id.btn_copy_room_id) {

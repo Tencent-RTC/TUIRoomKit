@@ -4,7 +4,6 @@
     android:id="@+id/ll_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/tuiroomkit_bg_bottom_dialog_extension"
     android:paddingTop="24dp"
     android:paddingBottom="61dp">
 
@@ -25,7 +24,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginBottom="6dp"
-            android:background="@drawable/tuiroomkit_bg_bottom_item_black"
+            android:background="@drawable/tuiroomkit_bg_radius_light_black"
             android:gravity="center">
 
             <ImageView

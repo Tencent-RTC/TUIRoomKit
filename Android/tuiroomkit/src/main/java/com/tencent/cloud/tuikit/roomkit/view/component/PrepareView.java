@@ -76,7 +76,6 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
         mLayoutUserInfo = findViewById(R.id.ll_user_info_close_video);
         mLayoutCamera = findViewById(R.id.ll_camera_prepare);
         mLayoutMicrophone = findViewById(R.id.ll_mic_prepare);
-        mVideoView = findViewById(R.id.video_preview);
         mLayoutVideoPreview = findViewById(R.id.rl_video_preview);
         mLayoutProductLogo = findViewById(R.id.rl_product_logo);
 
@@ -204,6 +203,23 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
         } else if (v.getId() == R.id.ll_create_room) {
             mViewModel.closeLocalCamera();
             mViewModel.createRoom(mContext);
+        }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (mLayoutVideoPreview != null) {
+            mVideoView = new TUIVideoView(mContext.getApplicationContext());
+            mLayoutVideoPreview.addView(mVideoView, 0);
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (mLayoutVideoPreview != null) {
+            mLayoutVideoPreview.removeAllViews();
         }
     }
 }

@@ -15,16 +15,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.tencent.qcloud.tuicore.util.ScreenUtil;
+import com.tencent.qcloud.tuikit.timcommon.bean.MessageRepliesBean;
+import com.tencent.qcloud.tuikit.timcommon.bean.TUIMessageBean;
+import com.tencent.qcloud.tuikit.timcommon.minimalistui.widget.message.MessageBaseHolder;
+import com.tencent.qcloud.tuikit.timcommon.minimalistui.widget.message.MessageContentHolder;
+import com.tencent.qcloud.tuikit.timcommon.util.ScreenUtil;
 import com.tencent.qcloud.tuikit.tuichat.R;
 import com.tencent.qcloud.tuikit.tuichat.bean.ChatInfo;
-import com.tencent.qcloud.tuikit.tuichat.bean.MessageRepliesBean;
-import com.tencent.qcloud.tuikit.tuichat.bean.message.TUIMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.interfaces.IReplyMessageHandler;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.MinimalistUIService;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message.reply.ReplyDetailsView;
-import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message.viewholder.MessageBaseHolder;
-import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message.viewholder.MessageContentHolder;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message.viewholder.MessageViewHolderFactory;
 import com.tencent.qcloud.tuikit.tuichat.presenter.ReplyPresenter;
 
@@ -90,7 +90,7 @@ public class ChatReplyDialogFragment extends DialogFragment implements IReplyMes
             RecyclerView.ViewHolder holder = MessageViewHolderFactory.getInstance(messageContent, null, type);
             if (holder instanceof MessageBaseHolder) {
                 ((MessageContentHolder) holder).isMessageDetailMode = true;
-                ((MessageContentHolder) holder).setTranslationContent(originMessage, 0);
+                ((MessageContentHolder) holder).setTranslationContent(originMessage);
                 ((MessageBaseHolder) holder).layoutViews(originMessage, 0);
             }
             messageContent.addView(holder.itemView);
@@ -104,7 +104,7 @@ public class ChatReplyDialogFragment extends DialogFragment implements IReplyMes
             MessageRepliesBean repliesBean = originMessage.getMessageRepliesBean();
             if (repliesBean != null) {
                 presenter.findReplyMessages(repliesBean);
-                title.setText(getResources().getString(R.string.chat_reply_num, repliesBean.getRepliesSize()));
+                title.setText(getResources().getString(com.tencent.qcloud.tuikit.timcommon.R.string.chat_reply_num, repliesBean.getRepliesSize()));
             }
 
             cancelBtn.setOnClickListener(new View.OnClickListener() {

@@ -5,6 +5,7 @@ import static com.tencent.liteav.debug.GenerateTestUserSig.XMAGIC_LICENSE_URL;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.util.Log;
 import android.view.View;
 
@@ -15,17 +16,19 @@ import androidx.fragment.app.DialogFragment;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
+import com.tencent.cloud.tuikit.roomkit.view.component.MoreFunctionView;
 import com.tencent.imsdk.v2.V2TIMCallback;
+import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMManager;
+import com.tencent.liteav.basic.IntentUtils;
 import com.tencent.liteav.debug.GenerateTestUserSig;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.interfaces.TUICallback;
-import com.tencent.qcloud.tuikit.tuichat.bean.ChatInfo;
-import com.tencent.qcloud.tuikit.tuichat.classicui.page.TUIGroupChatActivity;
 import com.tencent.trtc.TRTCCloudDef;
 import com.tencent.trtc.TRTCCloudListener;
 
@@ -34,26 +37,30 @@ import java.util.Map;
 
 public class MoreFunctionViewModel implements RoomEventCenter.RoomEngineEventResponder,
         RoomEventCenter.RoomKitUIEventResponder {
-    private static final String TAG = "ExtensionViewModel";
+    private static final String TAG = "MoreFunctionViewModel";
 
-    private Context       mContext;
-    private TUIRoomEngine mRoomEngine;
-    private RoomStore     mRoomStore;
+    private Context          mContext;
+    private TUIRoomEngine    mRoomEngine;
+    private RoomStore        mRoomStore;
+    private MoreFunctionView mMoreFunctionView;
 
-    public MoreFunctionViewModel(Context context) {
+    public MoreFunctionViewModel(Context context, MoreFunctionView moreFunctionView) {
         mContext = context;
+        mMoreFunctionView = moreFunctionView;
         RoomEngineManager engineManager = RoomEngineManager.sharedInstance(mContext);
         mRoomEngine = engineManager.getRoomEngine();
         mRoomStore = engineManager.getRoomStore();
         RoomEventCenter eventCenter = RoomEventCenter.getInstance();
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.ROOM_DISMISSED, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.EXIT_MEETING, this);
+        eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
     }
 
     public void destroy() {
         RoomEventCenter eventCenter = RoomEventCenter.getInstance();
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.ROOM_DISMISSED, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.EXIT_MEETING, this);
+        eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
     }
 
     public View getBeautyView() {
@@ -143,8 +150,9 @@ public class MoreFunctionViewModel implements RoomEventCenter.RoomEngineEventRes
     }
 
     private void showTUIChat() {
-        Intent intent = new Intent(mContext, TUIGroupChatActivity.class);
-        intent.putExtra(TUIConstants.TUIChat.CHAT_TYPE, ChatInfo.TYPE_GROUP);
+        Intent intent = new Intent();
+        intent.setClassName(mContext, "com.tencent.qcloud.tuikit.tuichat.classicui.page.TUIGroupChatActivity");
+        intent.putExtra(TUIConstants.TUIChat.CHAT_TYPE, V2TIMConversation.V2TIM_GROUP);
         intent.putExtra(TUIConstants.TUIChat.CHAT_ID, mRoomStore.roomInfo.roomId);
         intent.putExtra(TUIConstants.TUIChat.CHAT_NAME, mContext.getString(R.string.tuiroomkit_item_chat));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -153,7 +161,7 @@ public class MoreFunctionViewModel implements RoomEventCenter.RoomEngineEventRes
         params.put(TUIConstants.TUIChat.ENABLE_VIDEO_CALL, false);
         params.put(TUIConstants.TUIChat.ENABLE_LINK, false);
         TUICore.callService(TUIConstants.TUIChat.SERVICE_NAME, TUIConstants.TUIChat.METHOD_SET_CHAT_EXTENSION, params);
-        mContext.startActivity(intent);
+        IntentUtils.safeStartActivity(mContext, intent);
     }
 
     public void showSettingView(DialogFragment dialogFragment, String tag) {
@@ -201,8 +209,19 @@ public class MoreFunctionViewModel implements RoomEventCenter.RoomEngineEventRes
 
     @Override
     public void onNotifyUIEvent(String key, Map<String, Object> params) {
-        if (RoomEventCenter.RoomKitUIEvent.EXIT_MEETING.equals(key)) {
-            clearHistoryMessage();
+        switch (key) {
+            case RoomEventCenter.RoomKitUIEvent.EXIT_MEETING:
+                clearHistoryMessage();
+                break;
+            case RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE:
+                if (params == null || !mMoreFunctionView.isShowing()) {
+                    break;
+                }
+                Configuration configuration = (Configuration) params.get(RoomEventConstant.KEY_CONFIGURATION);
+                mMoreFunctionView.changeConfiguration(configuration);
+                break;
+            default:
+                break;
         }
     }
 }

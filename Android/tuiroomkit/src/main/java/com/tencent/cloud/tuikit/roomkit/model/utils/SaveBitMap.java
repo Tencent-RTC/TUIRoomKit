@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.provider.MediaStore;
 
 import com.tencent.cloud.tuikit.roomkit.R;
@@ -47,8 +48,10 @@ public class SaveBitMap {
         private Context              mContext;
         private Bitmap               mBitmap;
         private SaveProgressListener mListener;
+        private Handler              mMainHandler;
 
         public SaveBitMapRunnable(Context context, Bitmap bitmap) {
+            mMainHandler = new Handler(Looper.getMainLooper());
             mContext = context;
             mBitmap = bitmap;
         }
@@ -58,7 +61,7 @@ public class SaveBitMap {
             try {
                 MediaStore.Images.Media.insertImage(mContext.getContentResolver(), mBitmap,
                         null, null);
-                ((Activity) mContext).runOnUiThread(new Runnable() {
+                mMainHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         if (mListener != null) {
@@ -68,7 +71,7 @@ public class SaveBitMap {
                     }
                 });
             } catch (Exception e) {
-                ((Activity) mContext).runOnUiThread(new Runnable() {
+                mMainHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         if (mListener != null) {

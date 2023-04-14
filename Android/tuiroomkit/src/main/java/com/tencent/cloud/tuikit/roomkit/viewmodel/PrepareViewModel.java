@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 
+import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
@@ -66,7 +67,7 @@ public class PrepareViewModel {
             @Override
             public void onGranted() {
                 mPrepareView.updateMicPhoneButton(true);
-                mRoomEngine.openLocalMicrophone(null);
+                mRoomEngine.openLocalMicrophone(TUIRoomDefine.AudioQuality.DEFAULT, null);
                 openLocalCamera();
                 mRoomInfo.isOpenMicrophone = true;
             }
@@ -153,7 +154,8 @@ public class PrepareViewModel {
             @Override
             public void onGranted() {
                 mPrepareView.updateVideoView(true);
-                mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, null);
+                mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, TUIRoomDefine.VideoQuality.Q_1080P,
+                        null);
                 mRoomInfo.isOpenCamera = true;
             }
 
@@ -178,7 +180,7 @@ public class PrepareViewModel {
             @Override
             public void onGranted() {
                 mPrepareView.updateMicPhoneButton(true);
-                mRoomEngine.openLocalMicrophone(null);
+                mRoomEngine.openLocalMicrophone(TUIRoomDefine.AudioQuality.DEFAULT, null);
             }
 
             @Override

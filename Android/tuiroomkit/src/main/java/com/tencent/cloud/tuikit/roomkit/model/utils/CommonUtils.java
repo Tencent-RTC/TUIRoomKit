@@ -26,22 +26,10 @@ import java.util.Map;
 public class CommonUtils {
 
     private static final int QR_CODE_MARGIN     = 2;
-    private static final int ANIMATION_DURATION = 500;
 
     public static String getAppName(Context context) {
         ApplicationInfo applicationInfo = context.getApplicationInfo();
         return context.getPackageManager().getApplicationLabel(applicationInfo).toString();
-    }
-
-    public static void horizontalAnimation(View view, boolean isShowingView) {
-        float fromXValue = isShowingView ? 1.0f : 0.0f;
-        float toXValue = isShowingView ? 0.0f : 1.0f;
-        TranslateAnimation animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, fromXValue,
-                Animation.RELATIVE_TO_SELF, toXValue,
-                Animation.RELATIVE_TO_SELF, 0.0f,
-                Animation.RELATIVE_TO_SELF, 0.0f);
-        animation.setDuration(ANIMATION_DURATION);
-        view.startAnimation(animation);
     }
 
     @Nullable

@@ -1,17 +1,19 @@
 package com.tencent.cloud.tuikit.roomkit.model.entity;
 
 
+import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+
 public class RoomInfo {
-    public String  name;
-    public String  owner;
-    public String  roomId;
-    public boolean isOpenCamera;
-    public boolean isUseSpeaker;
-    public boolean isOpenMicrophone;
-    public boolean enableVideo       = true;
-    public boolean enableAudio       = true;
-    public boolean enableMessage     = true;
-    public boolean enableSeatControl = false;
+    public String                   name;
+    public String                   owner;
+    public String                   roomId;
+    public boolean                  isOpenCamera;
+    public boolean                  isUseSpeaker;
+    public boolean                  isOpenMicrophone;
+    public boolean                  isCameraDisableForAllUser     = false;
+    public boolean                  isMicrophoneDisableForAllUser = false;
+    public boolean                  isMessageDisableForAllUser    = false;
+    public TUIRoomDefine.SpeechMode speechMode                    = TUIRoomDefine.SpeechMode.FREE_TO_SPEAK;
 
     @Override
     public String toString() {
@@ -20,12 +22,12 @@ public class RoomInfo {
                 + ", owner='" + owner + '\''
                 + ", roomId='" + roomId + '\''
                 + ", isOpenCamera=" + isOpenCamera
-                + ", isOpenMicrophone=" + isOpenMicrophone
                 + ", isUseSpeaker=" + isUseSpeaker
-                + ", enableVideo=" + enableVideo
-                + ", enableAudio=" + enableAudio
-                + ", enableMessage=" + enableMessage
-                + ", enableSeatControl=" + enableSeatControl
+                + ", isOpenMicrophone=" + isOpenMicrophone
+                + ", isCameraDisableForAllUser=" + isCameraDisableForAllUser
+                + ", isMicrophoneDisableForAllUser=" + isMicrophoneDisableForAllUser
+                + ", isMessageDisableForAllUser=" + isMessageDisableForAllUser
+                + ", speechMode=" + speechMode
                 + '}';
     }
 }

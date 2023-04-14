@@ -31,4 +31,14 @@
         <item name="tabPaddingStart">12dp</item>
         <item name="tabPaddingEnd">12dp</item>
     </style>
+
+    <style name="TUIRoomBottomDialogHorizontalAnim" parent="@android:style/Theme.Holo.Dialog">
+        <item name="android:windowExitAnimation">@anim/tuiroomkit_anim_horizontal_dismiss</item>
+        <item name="android:windowEnterAnimation">@anim/tuiroomkit_anim_horizontal_show</item>
+    </style>
+
+    <style name="TUIRoomBottomDialogVerticalAnim" parent="@android:style/Theme.Holo.Dialog">
+        <item name="android:windowExitAnimation">@anim/tuiroomkit_anim_bottom_view_dismiss</item>
+        <item name="android:windowEnterAnimation">@anim/tuiroomkit_anim_bottom_view_show</item>
+    </style>
 </resources>

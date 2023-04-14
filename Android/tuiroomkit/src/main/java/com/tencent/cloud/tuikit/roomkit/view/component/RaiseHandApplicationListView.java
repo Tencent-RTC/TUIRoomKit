@@ -10,15 +10,15 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
+import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.RaiseHandApplicationListViewModel;
 
-public class RaiseHandApplicationListView extends ConstraintLayout implements
+public class RaiseHandApplicationListView extends BaseBottomDialog implements
         View.OnClickListener {
     private Context                           mContext;
     private TextView                          mTextAgreeAll;
@@ -31,39 +31,22 @@ public class RaiseHandApplicationListView extends ConstraintLayout implements
     public RaiseHandApplicationListView(Context context) {
         super(context);
         mContext = context;
-        inflate(mContext, R.layout.tuiroomkit_view_raise_hand_applies, this);
-        initView(this);
+        mAdapter = new RaiseHandApplicationListAdapter(mContext);
         mViewModel = new RaiseHandApplicationListViewModel(mContext, this);
     }
 
     @Override
-    public void setVisibility(int visibility) {
-        if (visibility == GONE) {
-            mViewModel.horizontalAnimation(false);
-        } else if (visibility == VISIBLE) {
-            mViewModel.horizontalAnimation(true);
-        }
-        super.setVisibility(visibility);
+    protected int getLayoutId() {
+        return R.layout.tuiroomkit_view_raise_hand_applies;
     }
 
-    public void addItem(UserModel userModel) {
-        if (mAdapter != null) {
-            mAdapter.addItem(userModel);
-        }
-    }
+    @Override
+    protected void intiView() {
+        mTextAgreeAll = findViewById(R.id.tv_agree_all);
+        mTextInviteMember = findViewById(R.id.tv_invite_member_to_stage);
+        mRecyclerApplyList = findViewById(R.id.rv_apply_list);
 
-    public void removeItem(UserModel userModel) {
-        if (mAdapter != null) {
-            mAdapter.removeItem(userModel);
-        }
-    }
-
-    private void initView(View itemView) {
-        mTextAgreeAll = itemView.findViewById(R.id.tv_agree_all);
-        mTextInviteMember = itemView.findViewById(R.id.tv_invite_member_to_stage);
-        mRecyclerApplyList = itemView.findViewById(R.id.rv_apply_list);
-
-        mEditSearch = itemView.findViewById(R.id.et_search);
+        mEditSearch = findViewById(R.id.et_search);
 
         findViewById(R.id.toolbar).setOnClickListener(this);
         mTextInviteMember.setOnClickListener(this);
@@ -94,34 +77,53 @@ public class RaiseHandApplicationListView extends ConstraintLayout implements
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String userName = mEditSearch.getText().toString();
-                    mAdapter.setDataList(mViewModel.searchUserByName(userName));
+                    mAdapter.setDataList(mViewModel.searchUserByKeyWords(userName));
                 }
                 return false;
             }
         });
 
         mRecyclerApplyList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
-        mAdapter = new RaiseHandApplicationListAdapter(mContext);
+
         mRecyclerApplyList.setAdapter(mAdapter);
         mRecyclerApplyList.setHasFixedSize(true);
+
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        updateHeightToMatchParent();
+    }
+
+    public void addItem(UserModel userModel) {
+        if (mAdapter != null) {
+            mAdapter.addItem(userModel);
+        }
+    }
+
+    public void removeItem(UserModel userModel) {
+        if (mAdapter != null) {
+            mAdapter.removeItem(userModel);
+        }
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.toolbar) {
-            setVisibility(GONE);
+            dismiss();
         } else if (v.getId() == R.id.tv_agree_all) {
             mViewModel.agreeAllUserOnStage();
         } else if (v.getId() == R.id.tv_invite_member_to_stage) {
-            setVisibility(GONE);
+            dismiss();
             mViewModel.inviteMemberOnstage();
         }
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        mViewModel.destroy();
+    public void destroy() {
+        if (mViewModel != null) {
+            mViewModel.destroy();
+        }
     }
 }
 

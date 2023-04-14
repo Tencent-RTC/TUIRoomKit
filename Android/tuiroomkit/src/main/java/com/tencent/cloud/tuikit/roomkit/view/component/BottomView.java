@@ -1,16 +1,17 @@
 package com.tencent.cloud.tuikit.roomkit.view.component;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.drawable.StateListDrawable;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.DrawableRes;
 import androidx.appcompat.widget.AppCompatImageButton;
 
 import com.tencent.cloud.tuikit.roomkit.R;
@@ -66,6 +67,26 @@ public class BottomView extends LinearLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mViewModel.destroy();
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                updateItemsPosition();
+            }
+        });
+    }
+
+    @Override
+    public void setVisibility(int visibility) {
+        int animResId = visibility == VISIBLE
+                ? R.anim.tuiroomkit_anim_bottom_view_show
+                : R.anim.tuiroomkit_anim_bottom_view_dismiss;
+        startAnimation(AnimationUtils.loadAnimation(getContext(), animResId));
+        super.setVisibility(visibility);
     }
 
     public void addItem(int index, final BottomItemData itemData) {

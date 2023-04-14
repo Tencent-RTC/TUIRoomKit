@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/tuiroomkit_bg_bottom_dialog_black"
+    android:background="@drawable/tuiroomkit_bg_bottom_dialog_black_portrait"
     android:orientation="vertical"
     android:paddingBottom="61dp">
 

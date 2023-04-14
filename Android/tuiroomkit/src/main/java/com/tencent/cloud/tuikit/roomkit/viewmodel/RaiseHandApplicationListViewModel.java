@@ -1,6 +1,7 @@
 package com.tencent.cloud.tuikit.roomkit.viewmodel;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -12,7 +13,6 @@ import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
-import com.tencent.cloud.tuikit.roomkit.model.utils.CommonUtils;
 import com.tencent.cloud.tuikit.roomkit.view.component.RaiseHandApplicationListView;
 
 import java.util.ArrayList;
@@ -49,6 +49,7 @@ public class RaiseHandApplicationListViewModel implements RoomEventCenter.RoomEn
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.SEAT_LIST_CHANGED, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.AGREE_TAKE_SEAT, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.DISAGREE_TAKE_SEAT, this);
+        eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
     }
 
     public void destroy() {
@@ -62,6 +63,7 @@ public class RaiseHandApplicationListViewModel implements RoomEventCenter.RoomEn
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.SEAT_LIST_CHANGED, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.AGREE_TAKE_SEAT, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.DISAGREE_TAKE_SEAT, this);
+        eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
     }
 
     private void addApplyUser(TUIRoomDefine.Request request) {
@@ -88,21 +90,24 @@ public class RaiseHandApplicationListViewModel implements RoomEventCenter.RoomEn
         return null;
     }
 
-    public void horizontalAnimation(boolean isShowingView) {
-        CommonUtils.horizontalAnimation(mApplyView, isShowingView);
-    }
-
     public List<UserModel> getApplyList() {
         return mApplyUserList;
     }
 
-    public List<UserModel> searchUserByName(String userName) {
-        List<UserModel> searchList = new ArrayList<>();
-        UserModel userModel = findUserModelByName(userName);
-        if (userModel == null) {
-            return null;
+    public List<UserModel> searchUserByKeyWords(String keyWords) {
+        if (TextUtils.isEmpty(keyWords)) {
+            return new ArrayList<>();
         }
-        searchList.add(userModel);
+
+        List<UserModel> searchList = new ArrayList<>();
+        for (UserModel model : mApplyUserList) {
+            if (model == null) {
+                continue;
+            }
+            if (model.userName.contains(keyWords) || model.userId.contains(keyWords)) {
+                searchList.add(model);
+            }
+        }
         return searchList;
     }
 
@@ -266,6 +271,13 @@ public class RaiseHandApplicationListViewModel implements RoomEventCenter.RoomEn
                 break;
             case RoomEventCenter.RoomKitUIEvent.DISAGREE_TAKE_SEAT:
                 responseUserOnStage(userId, false);
+                break;
+            case RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE:
+                if (!mApplyView.isShowing()) {
+                    break;
+                }
+                Configuration configuration = (Configuration) params.get(RoomEventConstant.KEY_CONFIGURATION);
+                mApplyView.changeConfiguration(configuration);
                 break;
             default:
                 break;

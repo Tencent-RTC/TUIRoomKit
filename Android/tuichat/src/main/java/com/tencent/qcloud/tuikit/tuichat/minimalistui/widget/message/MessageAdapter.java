@@ -1,6 +1,6 @@
 package com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message;
 
-import static com.tencent.qcloud.tuikit.tuichat.classicui.widget.message.viewholder.MessageBaseHolder.MSG_TYPE_HEADER_VIEW;
+import static com.tencent.qcloud.tuikit.timcommon.classicui.widget.message.MessageBaseHolder.MSG_TYPE_HEADER_VIEW;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,15 +8,16 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.tencent.qcloud.tuikit.tuichat.bean.message.QuoteMessageBean;
-import com.tencent.qcloud.tuikit.tuichat.bean.message.TUIMessageBean;
+import com.tencent.qcloud.tuikit.timcommon.bean.TUIMessageBean;
+import com.tencent.qcloud.tuikit.timcommon.component.fragments.BaseFragment;
+import com.tencent.qcloud.tuikit.timcommon.interfaces.ICommonMessageAdapter;
+import com.tencent.qcloud.tuikit.timcommon.interfaces.OnItemClickListener;
+import com.tencent.qcloud.tuikit.timcommon.minimalistui.widget.message.MessageBaseHolder;
+import com.tencent.qcloud.tuikit.timcommon.minimalistui.widget.message.MessageContentHolder;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.TipsMessageBean;
+import com.tencent.qcloud.tuikit.tuichat.config.TUIChatConfigs;
 import com.tencent.qcloud.tuikit.tuichat.interfaces.IMessageAdapter;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.MinimalistUIService;
-import com.tencent.qcloud.tuikit.tuichat.minimalistui.interfaces.ICommonMessageAdapter;
-import com.tencent.qcloud.tuikit.tuichat.minimalistui.interfaces.OnItemClickListener;
-import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message.viewholder.MessageBaseHolder;
-import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message.viewholder.MessageContentHolder;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message.viewholder.MessageHeaderHolder;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message.viewholder.MessageViewHolderFactory;
 import com.tencent.qcloud.tuikit.tuichat.presenter.ChatPresenter;
@@ -45,9 +46,14 @@ public class MessageAdapter extends RecyclerView.Adapter implements IMessageAdap
     private boolean isReplyDetailMode = false;
 
     private ChatPresenter presenter;
+    private BaseFragment fragment;
 
     public void setPresenter(ChatPresenter chatPresenter) {
         this.presenter = chatPresenter;
+    }
+
+    public void setFragment(BaseFragment fragment) {
+        this.fragment = fragment;
     }
 
     public void setForwardMode(boolean forwardMode) {
@@ -133,8 +139,10 @@ public class MessageAdapter extends RecyclerView.Adapter implements IMessageAdap
             MessageContentHolder messageContentHolder = (MessageContentHolder) holder;
             messageContentHolder.isForwardMode = isForwardMode;
             messageContentHolder.isMessageDetailMode = isReplyDetailMode;
-            messageContentHolder.setPresenter(presenter);
-
+            messageContentHolder.setShowRead(TUIChatConfigs.getConfigs().getGeneralConfig().isShowRead());
+            messageContentHolder.setNeedShowTranslation(presenter.isNeedShowTranslation());
+            messageContentHolder.setRecyclerView(mRecycleView);
+            messageContentHolder.setFragment(fragment);
             if (isForwardMode) {
                 messageContentHolder.setDataSource(mDataSource);
             }
@@ -227,7 +235,7 @@ public class MessageAdapter extends RecyclerView.Adapter implements IMessageAdap
                 }
 
                 @Override
-                public void onReplyMessageClick(View view, int position, QuoteMessageBean messageBean) {
+                public void onReplyMessageClick(View view, int position, TUIMessageBean messageBean) {
                     changeCheckedStatus(msgId, position);
                 }
 

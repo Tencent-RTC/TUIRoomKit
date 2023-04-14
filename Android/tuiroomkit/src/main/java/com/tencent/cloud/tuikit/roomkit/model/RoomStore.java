@@ -24,7 +24,7 @@ public class RoomStore {
     }
 
     public void initialCurrentUser() {
-        TUIRoomDefine.UserInfo userInfo = TUIRoomEngine.getSelfInfo();
+        TUIRoomDefine.LoginUserInfo userInfo = TUIRoomEngine.getSelfInfo();
         userModel.userId = userInfo.userId;
         userModel.userName = userInfo.userName;
         userModel.userAvatar = userInfo.avatarUrl;

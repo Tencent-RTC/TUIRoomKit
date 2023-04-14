@@ -12,17 +12,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
+import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.TransferMasterViewModel;
 
-import java.util.List;
-
-public class TransferMasterView extends ConstraintLayout {
+public class TransferMasterView extends BaseBottomDialog implements View.OnClickListener {
+    private Context                 mContext;
     private Button                  mButtonConfirmLeave;
     private Toolbar                 mToolBar;
     private EditText                mEditSearch;
@@ -32,34 +31,28 @@ public class TransferMasterView extends ConstraintLayout {
 
     public TransferMasterView(Context context) {
         super(context);
-        inflate(context, R.layout.tuiroomkit_view_assign_master, this);
-        mViewModel = new TransferMasterViewModel(context, this);
-        initView(context);
+        mContext = context;
     }
 
-    private void initView(Context context) {
+    @Override
+    protected int getLayoutId() {
+        return R.layout.tuiroomkit_view_assign_master;
+    }
+
+    @Override
+    protected void intiView() {
         mToolBar = findViewById(R.id.toolbar);
         mEditSearch = findViewById(R.id.et_search);
         mButtonConfirmLeave = findViewById(R.id.btn_specify_and_leave);
         mRecyclerUserList = findViewById(R.id.rv_user_list);
 
-        mRecyclerUserList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-        mAdapter = new TransferMasterAdapter(context);
+        mRecyclerUserList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
+        mAdapter = new TransferMasterAdapter(mContext);
         mRecyclerUserList.setAdapter(mAdapter);
         mRecyclerUserList.setHasFixedSize(true);
 
-        mToolBar.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setVisibility(GONE);
-            }
-        });
-        mButtonConfirmLeave.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.transferMaster(mAdapter.getSelectedUserId());
-            }
-        });
+        mToolBar.setOnClickListener(this);
+        mButtonConfirmLeave.setOnClickListener(this);
         mEditSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -84,17 +77,24 @@ public class TransferMasterView extends ConstraintLayout {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String userName = mEditSearch.getText().toString();
-                    mAdapter.setDataList(mViewModel.searchUserByName(userName));
+                    mAdapter.setDataList(mViewModel.searchUserByKeyWords(userName));
                 }
                 return false;
             }
         });
+        mViewModel = new TransferMasterViewModel(mContext, this);
     }
 
     @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        mViewModel.destroy();
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        updateHeightToMatchParent();
+    }
+
+    public void destroy() {
+        if (mViewModel != null) {
+            mViewModel.destroy();
+        }
     }
 
     public void addItem(UserModel userModel) {
@@ -110,12 +110,11 @@ public class TransferMasterView extends ConstraintLayout {
     }
 
     @Override
-    public void setVisibility(int visibility) {
-        if (visibility == GONE) {
-            mViewModel.horizontalAnimation(false);
-        } else if (visibility == VISIBLE) {
-            mViewModel.horizontalAnimation(true);
+    public void onClick(View view) {
+        if (view.getId() == R.id.toolbar) {
+            dismiss();
+        } else if (view.getId() == R.id.btn_specify_and_leave) {
+            mViewModel.transferMaster(mAdapter.getSelectedUserId());
         }
-        super.setVisibility(visibility);
     }
 }

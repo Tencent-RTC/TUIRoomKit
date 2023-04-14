@@ -9,22 +9,6 @@
             android:launchMode="singleTask"
             android:theme="@style/CoreActivityTranslucent"
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden" />
-        <activity
-            android:name=".component.activities.SelectionActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".component.activities.ImageSelectActivity"
-            android:screenOrientation="portrait" />
-
-
-        <activity
-            android:name=".component.activities.SelectionMinimalistActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".component.activities.ImageSelectMinimalistActivity"
-            android:screenOrientation="portrait" />
-
-
 
         <activity
             android:name=".util.PermissionRequester$PermissionActivity"
@@ -41,7 +25,7 @@
             android:exported="false"/>
 
         <provider
-            android:name=".util.TUIFileProvider"
+            android:name=".util.FileProvider"
             android:authorities="${applicationId}.tuicore.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">

@@ -3,6 +3,7 @@ package com.tencent.cloud.tuikit.roomkit.viewmodel;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -20,7 +21,7 @@ import com.tencent.cloud.tuikit.roomkit.view.component.RoomInfoView;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RoomInfoViewModel {
+public class RoomInfoViewModel implements RoomEventCenter.RoomKitUIEventResponder {
     //这个提供Web端RoomKit的体验链接，您可以按照自己的业务需求将房间的链接更改，我们会根据此链接为您生成房间二维码
     private static final String URL_ROOM_KIT_WEB = "https://web.sdk.qcloud.com/component/tuiroom/index.html";
     private static final String LABEL            = "Label";
@@ -35,6 +36,11 @@ public class RoomInfoViewModel {
         mRoomInfoView = view;
         mRoomStore = RoomEngineManager.sharedInstance(context).getRoomStore();
         mRoomEngine = RoomEngineManager.sharedInstance(context).getRoomEngine();
+        RoomEventCenter.getInstance().subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
+    }
+
+    public void destroy() {
+        RoomEventCenter.getInstance().unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
     }
 
     public void copyContentToClipboard(String content, String msg) {
@@ -65,7 +71,7 @@ public class RoomInfoViewModel {
 
     public String getRoomType() {
         String roomType;
-        if (mRoomStore.roomInfo.enableSeatControl) {
+        if (TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT.equals(mRoomStore.roomInfo.speechMode)) {
             roomType = mContext.getString(R.string.tuiroomkit_room_raise_hand);
         } else {
             roomType = mContext.getString(R.string.tuiroomkit_room_free_speech);
@@ -83,5 +89,14 @@ public class RoomInfoViewModel {
         Map<String, Object> params = new HashMap<>();
         params.put(RoomEventConstant.KEY_ROOM_URL, getRoomURL());
         RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_QRCODE_VIEW, params);
+    }
+
+    @Override
+    public void onNotifyUIEvent(String key, Map<String, Object> params) {
+        if (RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE.equals(key)
+                && params != null && mRoomInfoView.isShowing()) {
+            Configuration configuration = (Configuration) params.get(RoomEventConstant.KEY_CONFIGURATION);
+            mRoomInfoView.changeConfiguration(configuration);
+        }
     }
 }
