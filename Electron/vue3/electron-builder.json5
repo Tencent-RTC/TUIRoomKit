@@ -2,8 +2,9 @@
  * @see https://www.electron.build/configuration/configuration
  */
 {
-  "appId": "YourAppID",
+  "appId": "com.tencentcloud.trtc.room-kit-electron-vue3",
   "asar": true,
+  "asarUnpack": "**\\*.{node,dll}",
   "directories": {
     "output": "release/${version}"
   },
@@ -15,7 +16,11 @@
     "artifactName": "${productName}_${version}.${ext}",
     "extraFiles": [
       {
-        "from": "node_modules/trtc-electron-sdk/build/mac-framework/",
+        "from": "node_modules/trtc-electron-sdk/build/Release/${arch}/trtc_electron_sdk.node",
+        "to": "./Resources/app.asar.unpacked/node_modules/trtc-electron-sdk/build/Release"
+      },
+      {
+        "from": "node_modules/trtc-electron-sdk/build/mac-framework/${arch}/",
         "to": "./Frameworks"
       }
     ],

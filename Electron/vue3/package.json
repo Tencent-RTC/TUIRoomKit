@@ -1,6 +1,7 @@
 {
   "name": "room-uikit-electron-vue3",
-  "version": "1.0.2",
+  "version": "1.2.0",
+  "description": "This is an interactive multimedia room solution that published by Tencent Cloud RTC team for PC base on Electron, vue and so on.",
   "main": "dist/main/index.cjs",
   "author": "",
   "license": "MIT",
@@ -17,9 +18,11 @@
     "@vitejs/plugin-vue": "^2.3.2",
     "cross-env": "^7.0.3",
     "electron": "19.0.1",
-    "electron-builder": "^23.0.3",
+    "electron-builder": "^23.6.0",
     "electron-devtools-installer": "^3.2.0",
+    "fs-extra": "^11.0.0",
     "nano-staged": "^0.8.0",
+    "replace": "^1.2.1",
     "simple-git-hooks": "^2.8.0",
     "typescript": "^4.7.2",
     "unplugin-auto-import": "^0.7.1",
@@ -42,7 +45,7 @@
     "vue"
   ],
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-electron": "^1.0.2",
+    "@tencentcloud/tuiroom-engine-electron": "^1.2.0",
     "axios": "^0.27.2",
     "element-plus": "^2.2.22",
     "js-cookie": "^3.0.1",
@@ -50,10 +53,11 @@
     "mitt": "^3.0.0",
     "pinia": "^2.0.24",
     "sass": "^1.56.1",
-    "trtc-electron-sdk": "10.3.405",
+    "trtc-electron-sdk": "^10.9.405-beta.0",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.0.14",
     "yuv-buffer": "^1.0.0",
     "yuv-canvas": "^1.2.11"
-  }
+  },
+  "repository": "https://git.woa.com:TRDCWeb/TUIRoomEngine.git"
 }

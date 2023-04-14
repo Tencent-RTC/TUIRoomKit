@@ -171,5 +171,8 @@ export default {
   'It has been stilled by the host and cannot open the video': '已被主持人静画，无法打开视频',
   'Failed to enter the room.': '进入房间失败！',
   'Has been full static painting, can not share your screen': '已被全员静画，无法打开屏幕分享',
-  'Load More' : '加载更多',
+  'Load More': '加载更多',
+  'Microphone not detected on current device': '当前设备未检测到麦克风',
+  'Camera not detected on current device': '当前设备未检测到摄像头',
+  'Camera And Microphone not detected on current device': '当前设备未检测到摄像头和麦克风',
 };

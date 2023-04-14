@@ -65,7 +65,7 @@ import { ElMessage } from '../../elementComp';
 import { MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
 
-import TUIRoomEngine, { TUIChangeReason, TUIRoomEvents, TUIUserInfo, TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-electron';
+import TUIRoomEngine, { TUIChangeReason, TUIRoomEvents, TUIUserInfo, TUIVideoStreamType, TUIVideoQuality } from '@tencentcloud/tuiroom-engine-electron';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 
 const roomEngine = useGetRoomEngine();
@@ -441,10 +441,9 @@ const onRemoteUserLeaveRoom = (eventInfo: { userInfo: TUIUserInfo }) => {
 };
 
 // 麦位变化
-const onSeatListChanged = (eventInfo: { seatList: any[], usersSeated: any[], usersLeft: any[] }) => {
-  const { seatList, usersSeated, usersLeft } = eventInfo;
-
-  roomStore.updateOnSeatList(seatList, usersSeated, usersLeft);
+const onSeatListChanged = (eventInfo: { seatList: any[], seatedList: any[], leftList: any[] }) => {
+  const { seatList, seatedList, leftList } = eventInfo;
+  roomStore.updateOnSeatList(seatList, seatedList, leftList);
   // todo: 最大屏的用户离开时，应该换一个最大屏的用户
   // else if (userInfo.userId === enlargeStream.value?.userId) {
   //   [enlargeStream.value] = roomStore.remoteStreamList;
@@ -474,7 +473,7 @@ const onUserVideoStateChanged = (eventInfo: {
       // open and then close the single person's camera alone, at this time
       // the corresponding user's camera status for inoperable
       // 主持人开启全员禁画时，单独打开再关闭单人的摄像头，此时对应用户的摄像头状态为无法操作
-      roomStore.setCanControlSelfVideo(roomStore.enableVideo);
+      roomStore.setCanControlSelfVideo(!roomStore.isCameraDisableForAllUser);
     }
     // 主持人关闭屏幕分享
     if (streamType === TUIVideoStreamType.kScreenStream) {
@@ -518,7 +517,6 @@ const onUserAudioStateChanged = (eventInfo: {
 }) => {
   const { userId, hasAudio, reason } = eventInfo;
   roomStore.updateUserAudioState(userId, hasAudio);
-
   // 处理状态变更
   if (userId === basicStore.userId && !hasAudio && reason === TUIChangeReason.kChangedByAdmin) {
     // 主持人关闭麦克风
@@ -533,7 +531,7 @@ const onUserAudioStateChanged = (eventInfo: {
      *
      * 主持人开启全员禁言时，单独打开再关闭单人的麦克风，此时对应用户的麦克风状态为无法操作
     **/
-    roomStore.setCanControlSelfAudio(roomStore.enableAudio);
+    roomStore.setCanControlSelfAudio(!roomStore.isMicrophoneDisableForAllUser);
   }
 };
 
@@ -563,7 +561,7 @@ watch(isDefaultOpenCamera, async (val) => {
        *
        * 开启本地摄像头
       **/
-      await roomEngine.instance?.setLocalRenderView({
+      await roomEngine.instance?.setLocalVideoView({
         streamType: TUIVideoStreamType.kCameraStream,
         view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
       });

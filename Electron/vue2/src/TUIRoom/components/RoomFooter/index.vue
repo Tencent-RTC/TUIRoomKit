@@ -13,7 +13,10 @@
       ></manage-member-control>
       <invite-control @click="handleControlClick('inviteControl')"></invite-control>
       <chat-control @click="handleControlClick('chatControl')"></chat-control>
-      <apply-control v-if="roomStore.enableSeatControl" @click="handleControlClick('applyControl')"></apply-control>
+      <apply-control
+        v-if="roomStore.speechMode === 3"
+        @click="handleControlClick('applyControl')"
+      ></apply-control>
       <more-control @click="handleControlClick('moreControl')"></more-control>
       <setting-control @click="handleControlClick('settingControl')"></setting-control>
     </div>
@@ -46,7 +49,6 @@ import { useRoomStore } from '../../stores/room';
 import TUIRoomAegis from '../../utils/aegis';
 
 const roomStore = useRoomStore();
-
 const emit = defineEmits(['on-destroy-room', 'on-exit-room']);
 
 const onDestroyRoom = (info: { code: number; message: string }) => {

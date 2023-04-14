@@ -58,7 +58,7 @@ function setTUIRoomData(action: string, mode?: string) {
   sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(roomData));
 }
 
-async function checkRoomExist(roomId: string) {
+async function checkRoomExistWhenCreateRoom(roomId: string) {
   let isRoomExist = false;
   const tim = roomEngine.instance?.getTIM();
   try {
@@ -70,14 +70,27 @@ async function checkRoomExist(roomId: string) {
   return isRoomExist;
 }
 
+async function checkRoomExistWhenEnterRoom(roomId: string) {
+  let isRoomExist = false;
+  try {
+    await roomEngine.instance?.enterRoom({ roomId });
+    isRoomExist = true;
+  } catch (error: any) {
+    if (error.message === 'roomId is no exist') {
+      // 房间不存在
+    }
+  }
+  return isRoomExist;
+}
+
 /**
  * Generate room number when creating a room
  *
  * 创建房间时生成房间号
 **/
-async function generateRoomId(): Promise<number> {
-  const roomId = Math.ceil(Math.random() * 1000000);
-  const isRoomExist = await checkRoomExist(String(roomId));
+async function generateRoomId(): Promise<string> {
+  const roomId = String(Math.ceil(Math.random() * 1000000));
+  const isRoomExist = await checkRoomExistWhenCreateRoom(String(roomId));
   if (isRoomExist) {
     return await generateRoomId();
   }
@@ -105,8 +118,8 @@ async function handleCreateRoom(mode: string) {
  *
  * 处理点击【进入房间】
 **/
-async function handleEnterRoom(roomId: number) {
-  const isRoomExist = await checkRoomExist(String(roomId));
+async function handleEnterRoom(roomId: string) {
+  const isRoomExist = await checkRoomExistWhenEnterRoom(String(roomId));
   if (!isRoomExist) {
     alert(t('The room does not exist, please confirm the room number or create a room!'));
     return;

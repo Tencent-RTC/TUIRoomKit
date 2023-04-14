@@ -94,7 +94,7 @@ watch(
       const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
       if (userIdEl) {
         logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, userIdEl);
-        roomEngine.instance?.setRemoteRenderView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
+        roomEngine.instance?.setRemoteVideoView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
         await roomEngine.instance?.
           startPlayRemoteVideo({ userId: props.stream.userId, streamType: props.stream.streamType });
         const trtcCloud = roomEngine.instance?.getTRTCCloud();
@@ -117,7 +117,7 @@ watch(
       const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
       if (userIdEl) {
         logger.debug(`${logPrefix}watch isScreenStreamAvailable:`, props.stream.userId, userIdEl);
-        roomEngine.instance?.setRemoteRenderView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
+        roomEngine.instance?.setRemoteVideoView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
         await roomEngine.instance?.startPlayRemoteVideo({
           userId: props.stream.userId,
           streamType: props.stream.streamType,
@@ -154,13 +154,13 @@ watch(
            * 只有当本地视频流是打开状态的时候，才重新播放本地流
           **/
           if (props.stream.hasVideoStream) {
-            await roomEngine.instance?.setLocalRenderView({
+            await roomEngine.instance?.setLocalVideoView({
               streamType: TUIVideoStreamType.kCameraStream,
               view: `${playRegionDomId.value}`,
             });
           }
         } else {
-          roomEngine.instance?.setRemoteRenderView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
+          roomEngine.instance?.setRemoteVideoView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
           await roomEngine.instance?.startPlayRemoteVideo({
             userId: props.stream.userId,
             streamType: props.stream.streamType,

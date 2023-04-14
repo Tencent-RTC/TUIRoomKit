@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { ref, onMounted, Ref, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from '../../elementComp';
+import { ElMessageBox, ElMessage } from '../../elementComp';
 
 import IconButton from '../common/IconButton.vue';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
@@ -81,7 +81,7 @@ const {
   isAudience,
   localStream,
   isLocalAudioIconDisable,
-  enableAudio,
+  isMicrophoneDisableForAllUser,
 } = storeToRefs(roomStore);
 
 const emits = defineEmits(['click']);
@@ -90,11 +90,10 @@ const showAudioSettingTab: Ref<boolean> = ref(false);
 const audioIconButtonRef = ref<InstanceType<typeof IconButton>>();
 const audioSettingRef = ref<InstanceType<typeof AudioSettingTab>>();
 const { t } = useI18n();
-
-function toggleMuteAudio() {
+async function toggleMuteAudio() {
   if (isLocalAudioIconDisable.value) {
     let warningMessage = '';
-    if (!enableAudio.value) {
+    if (isMicrophoneDisableForAllUser.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_MUTE_ALL;
     } else if (isAudience.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_AUDIENCE;
@@ -106,17 +105,27 @@ function toggleMuteAudio() {
     });
     return;
   }
-
   if (localStream.value.hasAudioStream) {
     roomEngine.instance?.closeLocalMicrophone();
     roomEngine.instance?.stopPushLocalAudio();
     // 如果是全员禁言状态下，用户主动关闭麦克风之后不能再自己打开
-    if (!roomStore.enableAudio) {
+    if (roomStore.isMicrophoneDisableForAllUser) {
       roomStore.setCanControlSelfAudio(false);
     }
   } else {
-    roomEngine.instance?.openLocalMicrophone();
-    roomEngine.instance?.startPushLocalAudio();
+    const microphoneList = await roomEngine.instance?.getMicDevicesList();
+    const hasMicrophoneDevice = microphoneList.length > 0;
+    if (!hasMicrophoneDevice) {
+      // 无麦克风列表
+      ElMessageBox.alert(t('Microphone not detected on current device.'), t('Note'), {
+        customClass: 'custom-element-class',
+        confirmButtonText: t('Confirm'),
+      });
+      return;
+    }
+    // 有麦克风列表且有权限
+    await roomEngine.instance?.openLocalMicrophone();
+    await roomEngine.instance?.startPushLocalAudio();
   }
   showAudioSettingTab.value = false;
 }

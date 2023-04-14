@@ -61,7 +61,8 @@ import { useI18n } from '../../locales';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { isElectronEnv } from '../../utils/utils';
 import Drawer from '../../elementComp/Drawer.vue';
-
+import { MESSAGE_DURATION } from '../../constants/message';
+import { ElMessageBox, ElMessage } from '../../elementComp/index';
 const roomStore = useRoomStore();
 const { localStream } = storeToRefs(roomStore);
 const { t } = useI18n();
@@ -120,10 +121,12 @@ async function startStreamPreview() {
   const cameraList = await roomEngine.instance?.getCameraDevicesList();
   const microphoneList = await roomEngine.instance?.getMicDevicesList();
   const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
+  const hasCameraDevice = cameraList.length > 0;
+  const hasMicrophoneDevice = microphoneList.length > 0;
+  let alertMessage = '';
   roomStore.setCameraList(cameraList);
   roomStore.setMicrophoneList(microphoneList);
   roomStore.setSpeakerList(speakerList);
-
   if (isElectron) {
     const cameraInfo = roomEngine.instance?.getCurrentCameraDevice();
     const micInfo = roomEngine.instance?.getCurrentMicDevice();
@@ -148,13 +151,28 @@ async function startStreamPreview() {
       await roomEngine.instance?.setCurrentSpeakerDevice({ deviceId: speakerList[0].deviceId });
     }
   }
-
-  roomEngine.instance?.setLocalRenderView({ streamType: TUIVideoStreamType.kCameraStream, view: 'stream-preview'  });
-  await roomEngine.instance?.openLocalCamera();
-  await roomEngine.instance?.openLocalMicrophone();
-
+  if (hasCameraDevice && !hasMicrophoneDevice) {
+    alertMessage = 'Microphone not detected on current device';
+  } else if (!hasCameraDevice && hasMicrophoneDevice) {
+    alertMessage = 'Camera not detected on current device';
+  } else if (!hasCameraDevice && !hasMicrophoneDevice) {
+    alertMessage = 'Camera And Microphone not detected on current device';
+  }
+  if (alertMessage) {
+    ElMessageBox.alert(t(alertMessage), t('Note'), {
+      customClass: 'custom-element-class',
+      confirmButtonText: t('Confirm') });
+  }
+  if (hasCameraDevice) {
+    roomEngine.instance?.setLocalVideoView({ streamType: TUIVideoStreamType.kCameraStream, view: 'stream-preview' });
+    await roomEngine.instance?.openLocalCamera();
+  }
+  if (hasMicrophoneDevice) {
+    await roomEngine.instance?.openLocalMicrophone();
+  }
   loading.value = false;
 }
+
 
 /**
  * Device changes: device switching, device plugging and unplugging events

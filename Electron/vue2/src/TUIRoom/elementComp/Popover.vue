@@ -1,11 +1,10 @@
 <template>
   <el-popover
-    v-model="showPopover"
+    :visible="visible"
     :popper-class="popperClass"
     :placement="placement"
     :width="width"
-    :visible-arrow="showArrow"
-    :teleported="teleported">
+    :visible-arrow="showArrow">
     <template #reference>
       <slot name="reference" />
     </template>
@@ -16,29 +15,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, Ref, watch } from 'vue';
 
 
 interface Props {
-  visible: boolean,
+  visible?: boolean,
   popperClass?: string,
   placement?: string,
   width?: string | number,
   showArrow?: boolean,
-  teleported?: boolean,
 }
 
 const props = defineProps<Props>();
 
-const showPopover: Ref<boolean> = ref(props.visible);
-
-watch(() => props.visible, (val) => {
-  showPopover.value = val;
-})
+// element-ui Popover 的 visible 不用设置为 true，会引发状态不同步问题
+// el-Popover 组件会默认监听 reference 的 click 事件
 
 </script>
 
 <style>
 @import url('../assets/style/element-ui-custom.scss');
-
 </style>
