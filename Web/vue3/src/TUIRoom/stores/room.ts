@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { TUIRole, TUIVideoStreamType, TUIRoomInfo, TUIUserInfo, TUIVideoProfile, TUISeatInfo } from '@tencentcloud/tuiroom-engine-js';
+import { TUIRole, TUIVideoStreamType, TUIRoomInfo, TUIUserInfo, TUIVideoQuality, TUISeatInfo, TUISpeechMode } from '@tencentcloud/tuiroom-engine-js';
 import { useBasicStore } from './basic';
 import { isVue3 } from '../utils/constants';
 import Vue from '../utils/vue';
@@ -57,7 +57,7 @@ interface RoomState {
   // 主持人全员禁麦，但是单独取消某个用户音视频禁止状态的时候，是可以自己 unmute audio/video 的
   canControlSelfAudio: boolean,
   canControlSelfVideo: boolean,
-  localVideoProfile: TUIVideoProfile,
+  localVideoQuality: TUIVideoQuality,
   currentCameraId: string,
   currentMicrophoneId: string,
   currentSpeakerId: string,
@@ -65,10 +65,10 @@ interface RoomState {
   microphoneList: object[],
   speakerList: object[],
   masterUserId: string,
-  enableAudio: boolean,
-  enableVideo: boolean,
-  enableMessage: boolean,
-  enableSeatControl: boolean,
+  isMicrophoneDisableForAllUser: boolean,
+  isCameraDisableForAllUser: boolean,
+  isMessageDisableForAllUser: boolean,
+  speechMode: TUISpeechMode,
 }
 
 export const useRoomStore = defineStore('room', {
@@ -105,7 +105,7 @@ export const useRoomStore = defineStore('room', {
     isDefaultOpenMicrophone: false,
     canControlSelfAudio: true,
     canControlSelfVideo: true,
-    localVideoProfile: TUIVideoProfile.kHighDefinition,
+    localVideoQuality: TUIVideoQuality.kVideoQuality_720p,
     currentCameraId: '',
     currentMicrophoneId: '',
     currentSpeakerId: '',
@@ -113,10 +113,10 @@ export const useRoomStore = defineStore('room', {
     microphoneList: [],
     speakerList: [],
     masterUserId: '',
-    enableAudio: true,
-    enableVideo: true,
-    enableMessage: true,
-    enableSeatControl: false,
+    isMicrophoneDisableForAllUser: false,
+    isCameraDisableForAllUser: false,
+    isMessageDisableForAllUser: false,
+    speechMode: TUISpeechMode.kFreeToSpeak,
   }),
   getters: {
     // 当前用户是否是主持人
@@ -129,21 +129,24 @@ export const useRoomStore = defineStore('room', {
     },
     // 当前用户是否是在麦下
     isAudience(state) {
+      if (this.speechMode === TUISpeechMode.kFreeToSpeak) {
+        return state.localUser.onSeat;
+      }
       return !state.localUser.onSeat;
     },
     isLocalAudioIconDisable(): boolean {
       // 全员禁麦状态
       const micForbidden = !this.isMaster && !this.canControlSelfAudio;
       // 举手发言麦下模式
-      const audienceRole = this.enableSeatControl && this.isAudience;
-      return micForbidden || audienceRole;
+      const isAudienceRole = (this.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) && this.isAudience;
+      return micForbidden as any || isAudienceRole;
     },
     isLocalVideoIconDisable(): boolean {
       // 全员禁画状态
       const cameraForbidden = !this.isMaster && !this.canControlSelfVideo;
       // 举手发言麦下模式
-      const audienceRole = this.enableSeatControl && this.isAudience;
-      return cameraForbidden || audienceRole;
+      const isAudienceRole = (this.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) && this.isAudience;
+      return cameraForbidden || isAudienceRole as any;
     },
     localStream: (state) => {
       const { userId, userName, avatarUrl, hasAudioStream, hasVideoStream, audioVolume } = state.localUser;
@@ -215,7 +218,7 @@ export const useRoomStore = defineStore('room', {
         hasScreenStream: false,
         userRole: TUIRole.kGeneralUser,
         audioVolume: 0,
-        onSeat: false,
+        onSeat: true,
         cameraStreamInfo: {
           userId,
           userName: '',
@@ -272,7 +275,12 @@ export const useRoomStore = defineStore('room', {
       if (this.remoteUserObj[userId]) {
         Object.assign(this.remoteUserObj[userId], userInfo);
       } else {
-        const newUserInfo = Object.assign(this.getNewUserInfo(userId), userInfo);
+        let newUserInfo = {} as any;
+        if (this.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) {
+          newUserInfo = Object.assign(this.getNewUserInfo(userId), { onSeat: false }, userInfo);
+        } else {
+          newUserInfo = Object.assign(this.getNewUserInfo(userId), userInfo);
+        }
         if (isVue3) {
           this.remoteUserObj[userId] = newUserInfo;
         } else {
@@ -292,7 +300,7 @@ export const useRoomStore = defineStore('room', {
     // 更新 seatList 的变更
     // 进入房间后会立即通知 onSeatListChanged， onUserVideoAvailable，onUserAudioAvailable 事件，因此先更新到 userMap 中
     // 等待 getUserList 获取到全部用户列表后再做更新
-    updateOnSeatList(seatList: TUISeatInfo[], usersSeated: TUISeatInfo[], usersLeft: TUISeatInfo[]) {
+    updateOnSeatList(seatList: TUISeatInfo[], seatedList: TUISeatInfo[], leftList: TUISeatInfo[]) {
       if (JSON.stringify(this.remoteUserObj) === '{}') {
         seatList.forEach((seat) => {
           const { userId } = seat;
@@ -309,7 +317,7 @@ export const useRoomStore = defineStore('room', {
           };
         });
       } else {
-        usersSeated.forEach((seat) => {
+        seatedList.forEach((seat) => {
           const { userId } = seat;
           if (userId === this.localUser.userId) {
             Object.assign(this.localUser, { onSeat: true });
@@ -328,7 +336,7 @@ export const useRoomStore = defineStore('room', {
             }
           };
         });
-        usersLeft.forEach((seat) => {
+        leftList.forEach((seat) => {
           if (seat.userId === this.localUser.userId) {
             Object.assign(this.localUser, { onSeat: false });
           } else {
@@ -396,17 +404,28 @@ export const useRoomStore = defineStore('room', {
       this.currentSpeakerId = deviceId;
     },
     setRoomInfo(roomInfo: TUIRoomInfo) {
-      const { owner, enableAudio, enableVideo, enableMessage, enableSeatControl } = roomInfo;
-      if (this.localUser.userId === owner) {
+      const { roomOwner, isMicrophoneDisableForAllUser,
+        isCameraDisableForAllUser, isMessageDisableForAllUser, speechMode } = roomInfo;
+      if (this.localUser.userId === roomOwner) {
         this.localUser.userRole = TUIRole.kRoomOwner;
       }
-      this.masterUserId = owner;
-      this.enableAudio = enableAudio;
-      this.enableVideo = enableVideo;
-      this.enableMessage = enableMessage;
-      this.enableSeatControl = enableSeatControl;
-      this.canControlSelfAudio = this.enableAudio;
-      this.canControlSelfVideo = this.enableVideo;
+
+      this.masterUserId = roomOwner;
+      this.isMicrophoneDisableForAllUser = isMicrophoneDisableForAllUser;
+      this.isCameraDisableForAllUser = isCameraDisableForAllUser;
+      this.isMessageDisableForAllUser = isMessageDisableForAllUser;
+      this.speechMode = speechMode;
+      this.canControlSelfAudio = !this.isMicrophoneDisableForAllUser;
+      this.canControlSelfVideo = !this.isCameraDisableForAllUser;
+    },
+    setDisableMicrophoneForAllUserByAdmin(isDisable: boolean) {
+      this.isMicrophoneDisableForAllUser = isDisable;
+    },
+    setDisableCameraForAllUserByAdmin(isDisable: boolean) {
+      this.isCameraDisableForAllUser = isDisable;
+    },
+    setMasterUserId(userId: string) {
+      this.masterUserId = userId;
     },
     setRoomParam(roomParam: any) {
       if (!roomParam) {
@@ -417,11 +436,13 @@ export const useRoomStore = defineStore('room', {
       defaultMicrophoneId && this.setCurrentMicrophoneId(defaultMicrophoneId);
       defaultSpeakerId && this.setCurrentSpeakerId(defaultSpeakerId);
       // 如果已经开启全员禁言/当前为申请发言模式，则忽略默认打开麦克风的设置
-      if (this.isMaster || (this.enableAudio && !this.enableSeatControl)) {
+      if (this.isMaster || (!this.isMicrophoneDisableForAllUser
+        && (this.speechMode !== TUISpeechMode.kSpeakAfterTakingSeat))) {
         typeof isOpenMicrophone === 'boolean' && (this.isDefaultOpenMicrophone = isOpenMicrophone);
       }
       // 如果已经开启全员禁画/当前为申请发言模式，则忽略默认打开摄像头的设置
-      if (this.isMaster || (this.enableVideo && !this.enableSeatControl)) {
+      if (this.isMaster || (!this.isCameraDisableForAllUser
+        && this.speechMode !== TUISpeechMode.kSpeakAfterTakingSeat)) {
         typeof isOpenCamera === 'boolean' && (this.isDefaultOpenCamera = isOpenCamera);
       }
     },
@@ -431,8 +452,8 @@ export const useRoomStore = defineStore('room', {
     setCanControlSelfVideo(capability: boolean) {
       this.canControlSelfVideo = capability;
     },
-    setLocalVideoProfile(videoProfile: TUIVideoProfile) {
-      this.localVideoProfile = videoProfile;
+    updateVideoQuality(quality: TUIVideoQuality) {
+      this.localVideoQuality = quality;
     },
     setCameraList(deviceList: {deviceId: string, deviceName: string}[]) {
       this.cameraList = deviceList;
@@ -453,12 +474,12 @@ export const useRoomStore = defineStore('room', {
       }
     },
     // 全员禁麦/取消禁麦时设置所有人的禁麦状态
-    setEnableAudio(enable: boolean) {
-      this.enableAudio = enable;
+    setMicrophoneDisableState(enable: boolean) {
+      this.isMicrophoneDisableForAllUser = enable;
     },
     // 全员禁画/取消禁画时设置所有人的禁画状态
-    setEnableVideo(enable: boolean) {
-      this.enableVideo = enable;
+    setCameraDisableState(enable: boolean) {
+      this.isCameraDisableForAllUser = enable;
     },
     // 主持人单个修改用户的发文字消息 mute 状态
     setMuteUserChat(userId: string, muted: boolean) {
@@ -552,7 +573,7 @@ export const useRoomStore = defineStore('room', {
       this.isDefaultOpenMicrophone = false;
       this.canControlSelfAudio = true;
       this.canControlSelfVideo = true;
-      this.localVideoProfile = TUIVideoProfile.kHighDefinition;
+      this.localVideoQuality = TUIVideoQuality.kVideoQuality_720p;
       this.currentCameraId = '';
       this.currentMicrophoneId = '';
       this.currentSpeakerId = '';
@@ -560,10 +581,9 @@ export const useRoomStore = defineStore('room', {
       this.microphoneList = [];
       this.speakerList = [];
       this.masterUserId = '';
-      this.enableAudio = true;
-      this.enableVideo = true;
-      this.enableMessage = true;
-      this.enableSeatControl = false;
+      this.isMicrophoneDisableForAllUser = false;
+      this.isCameraDisableForAllUser = false;
+      this.isMessageDisableForAllUser = false;
     },
   },
 });
