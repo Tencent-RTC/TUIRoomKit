@@ -3,6 +3,7 @@ package com.tencent.cloud.tuikit.videoseat.ui.view;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +20,14 @@ import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.videoseat.R;
 import com.tencent.cloud.tuikit.videoseat.ui.utils.ImageLoader;
 import com.tencent.cloud.tuikit.videoseat.viewmodel.UserEntity;
+import com.tencent.qcloud.tuicore.util.ScreenUtil;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserDisplayView extends FrameLayout {
-    private static final int CLICK_ACTION_MAX_MOVE_DISTANCE = 0;
+    public static final int MARGIN_PX = ScreenUtil.dip2px(5);
+
+    private static final int CLICK_ACTION_MAX_MOVE_DISTANCE = 10;
 
     private Context              mContext;
     private View                 mTalkView;
@@ -42,6 +46,9 @@ public class UserDisplayView extends FrameLayout {
 
     private float mTouchDownPointX;
     private float mTouchDownPointY;
+    private int   mLeftWhenTouchDown;
+    private int   mTopWhenTouchDown;
+    private boolean mIsActionDrag;
 
     private OnClickListener mOnClickListener;
 
@@ -168,15 +175,24 @@ public class UserDisplayView extends FrameLayout {
             case MotionEvent.ACTION_DOWN:
                 mTouchDownPointX = event.getX();
                 mTouchDownPointY = event.getY();
+                mLeftWhenTouchDown = getLeft();
+                mTopWhenTouchDown = getTop();
+                mIsActionDrag = false;
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                Rect position = calculateLayoutPosition(event);
+                Rect position = calculateLayoutPosition(event.getX(), event.getY());
                 relayoutInRelativeLayout(position.left, position.top);
+                updateFlagOfDragAction(event.getX(), event.getY());
                 break;
 
             case MotionEvent.ACTION_UP:
-                handleClickActionIfPossible(event.getX() - mTouchDownPointX, event.getY() - mTouchDownPointY);
+                if (mIsActionDrag) {
+                    autoMoveToScreenEdge();
+                } else {
+                    relayoutInRelativeLayout(mLeftWhenTouchDown, mTopWhenTouchDown);
+                    handleClickAction();
+                }
                 break;
 
             default:
@@ -184,34 +200,44 @@ public class UserDisplayView extends FrameLayout {
         }
     }
 
-    private Rect calculateLayoutPosition(MotionEvent event) {
-        float xDistance = event.getX() - mTouchDownPointX;
-        float yDistance = event.getY() - mTouchDownPointY;
-
-        int l = (int) (getLeft() + xDistance);
-        int t = (int) (getTop() + yDistance);
-        int r = l + mWidth;
-        int b = t + mHeight;
-
-        if (l < 0) {
-            l = 0;
-            r = mWidth;
+    private void updateFlagOfDragAction(float xMovePoint, float yMovePoint) {
+        float xDistance = Math.abs(xMovePoint - mTouchDownPointX);
+        float yDistance = Math.abs(yMovePoint - mTouchDownPointY);
+        if (xDistance >= CLICK_ACTION_MAX_MOVE_DISTANCE || yDistance >= CLICK_ACTION_MAX_MOVE_DISTANCE) {
+            mIsActionDrag = true;
         }
-        if (t < 0) {
-            t = 0;
-            b = mHeight;
+    }
+
+    private Rect calculateLayoutPosition(float xMovePoint, float yMovePoint) {
+        float xDistance = xMovePoint - mTouchDownPointX;
+        float yDistance = yMovePoint - mTouchDownPointY;
+
+        int left = (int) (getLeft() + xDistance);
+        int top = (int) (getTop() + yDistance);
+        int right = left + mWidth;
+        int bottom = top + mHeight;
+
+        if (left < MARGIN_PX) {
+            left = MARGIN_PX;
+            right = mWidth + MARGIN_PX;
+        }
+        if (top < MARGIN_PX) {
+            top = MARGIN_PX;
+            bottom = mHeight + MARGIN_PX;
         }
         View parent = (View) getParent();
-        if (parent != null && r > parent.getWidth()) {
-            l -= r - parent.getWidth();
-            r = parent.getWidth();
+        if (parent != null && right > parent.getWidth() - MARGIN_PX) {
+            right = parent.getWidth() - MARGIN_PX;
+            left = right - mWidth;
+
         }
-        if (parent != null && b > parent.getHeight()) {
-            t -= b - parent.getHeight();
-            b = parent.getHeight();
+        if (parent != null && bottom > parent.getHeight()) {
+            bottom = parent.getHeight() - MARGIN_PX;
+            top = bottom - mHeight;
+
         }
 
-        return new Rect(l, t, r, b);
+        return new Rect(left, top, right, bottom);
     }
 
     private void relayoutInRelativeLayout(int leftMargin, int topMargin) {
@@ -226,14 +252,25 @@ public class UserDisplayView extends FrameLayout {
         setLayoutParams(layoutParams);
     }
 
-    private void handleClickActionIfPossible(float xDistance, float yDistance) {
+    private void handleClickAction() {
         if (mOnClickListener == null) {
             return;
         }
-        if (Math.abs(xDistance) > CLICK_ACTION_MAX_MOVE_DISTANCE
-                || Math.abs(yDistance) > CLICK_ACTION_MAX_MOVE_DISTANCE) {
+        mOnClickListener.onClick(this);
+    }
+
+    private void autoMoveToScreenEdge() {
+        int left = getLeft();
+        View parent = (View) getParent();
+        if (parent == null) {
             return;
         }
-        mOnClickListener.onClick(this);
+        int parentWidth = parent.getWidth();
+        if (left + (mWidth >> 1) > (parentWidth >> 1)) {
+            left = parentWidth - mWidth - MARGIN_PX;
+        } else {
+            left = MARGIN_PX;
+        }
+        relayoutInRelativeLayout(left, getTop());
     }
 }

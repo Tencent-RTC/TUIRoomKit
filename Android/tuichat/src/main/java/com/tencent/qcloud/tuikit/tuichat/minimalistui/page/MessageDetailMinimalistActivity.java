@@ -17,19 +17,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
-import com.tencent.qcloud.tuicore.component.CustomLinearLayoutManager;
-import com.tencent.qcloud.tuicore.component.activities.BaseMinimalistLightActivity;
-import com.tencent.qcloud.tuicore.component.imageEngine.impl.GlideEngine;
-import com.tencent.qcloud.tuicore.component.interfaces.IUIKitCallback;
+import com.tencent.qcloud.tuikit.timcommon.bean.MessageReceiptInfo;
+import com.tencent.qcloud.tuikit.timcommon.bean.TUIMessageBean;
+import com.tencent.qcloud.tuikit.timcommon.component.CustomLinearLayoutManager;
+import com.tencent.qcloud.tuikit.timcommon.component.activities.BaseMinimalistLightActivity;
+import com.tencent.qcloud.tuikit.timcommon.component.impl.GlideEngine;
+import com.tencent.qcloud.tuikit.timcommon.component.interfaces.IUIKitCallback;
+import com.tencent.qcloud.tuikit.timcommon.minimalistui.widget.message.MessageContentHolder;
 import com.tencent.qcloud.tuikit.tuichat.R;
 import com.tencent.qcloud.tuikit.tuichat.TUIChatConstants;
 import com.tencent.qcloud.tuikit.tuichat.bean.ChatInfo;
 import com.tencent.qcloud.tuikit.tuichat.bean.GroupMemberInfo;
-import com.tencent.qcloud.tuikit.tuichat.bean.MessageReceiptInfo;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.GroupMessageReadMembersInfo;
-import com.tencent.qcloud.tuikit.tuichat.bean.message.TUIMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.MinimalistUIService;
-import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message.viewholder.MessageContentHolder;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.message.viewholder.MessageViewHolderFactory;
 import com.tencent.qcloud.tuikit.tuichat.presenter.MessageReceiptPresenter;
 import com.tencent.qcloud.tuikit.tuichat.presenter.ReplyPresenter;
@@ -202,7 +202,7 @@ public class MessageDetailMinimalistActivity extends BaseMinimalistLightActivity
         RecyclerView.ViewHolder holder = MessageViewHolderFactory.getInstance(messageArea, null, type);
         if (holder instanceof MessageContentHolder) {
             ((MessageContentHolder) holder).layoutViews(messageBean, 0);
-            ((MessageContentHolder) holder).setTranslationContent(messageBean, 0);
+            ((MessageContentHolder) holder).setTranslationContent(messageBean);
         }
         messageArea.addView(holder.itemView);
     }

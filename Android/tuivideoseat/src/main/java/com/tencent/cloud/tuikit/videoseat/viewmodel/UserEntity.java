@@ -134,7 +134,7 @@ public class UserEntity {
                 && userEntity.isVideoAvailable() == isVideoAvailable;
     }
 
-    public UserEntity copy(Context context) {
+    public UserEntity copy() {
         UserEntity copyEntity = new UserEntity();
         copyEntity.setAudioVolume(audioVolume);
         copyEntity.setUserId(userId);
@@ -146,7 +146,6 @@ public class UserEntity {
         copyEntity.setAudioAvailable(isAudioAvailable);
         copyEntity.setCameraAvailable(isCameraAvailable);
         copyEntity.setScreenShareAvailable(isScreenShareAvailable);
-        copyEntity.mRoomVideoView = new TUIVideoView(context);
         copyEntity.role = role;
         return copyEntity;
     }

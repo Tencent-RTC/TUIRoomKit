@@ -1,6 +1,5 @@
 package com.tencent.cloud.tuikit.roomkit.view.component;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
@@ -9,15 +8,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
+import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.UserManagementViewModel;
 import com.tencent.liteav.basic.ImageLoader;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class UserManagementView extends BottomSheetDialog implements View.OnClickListener {
+public class UserManagementView extends BaseBottomDialog implements View.OnClickListener {
     private Context                 mContext;
     private UserModel               mUserModel;
     private TextView                mTextMute;
@@ -38,15 +37,19 @@ public class UserManagementView extends BottomSheetDialog implements View.OnClic
     private UserManagementViewModel mViewModel;
 
     public UserManagementView(@NonNull Context context, UserModel model) {
-        super(context, R.style.TUIRoomDialogFragmentTheme);
-        setContentView(R.layout.tuiroomkit_dialog_user_manager);
+        super(context);
         mContext = context;
         mUserModel = model;
         mViewModel = new UserManagementViewModel(context, mUserModel, this);
-        initView();
     }
 
-    private void initView() {
+    @Override
+    protected int getLayoutId() {
+        return R.layout.tuiroomkit_dialog_user_manager;
+    }
+
+    @Override
+    protected void intiView() {
         mImageHead = findViewById(R.id.image_head);
         mImageMic = findViewById(R.id.image_mic);
         mImageCamera = findViewById(R.id.image_camera);
@@ -78,7 +81,7 @@ public class UserManagementView extends BottomSheetDialog implements View.OnClic
         updateMicState(mUserModel.isAudioAvailable);
         updateMuteState(!mUserModel.isMute);
 
-        ImageLoader.loadImage(getContext(), mImageHead, mUserModel.userAvatar);
+        ImageLoader.loadImage(getContext(), mImageHead, mUserModel.userAvatar, R.drawable.tuiroomkit_head);
 
         if (mViewModel.isSelf()) {
             String userName = mUserModel.userName + getContext().getString(R.string.tuiroomkit_me);
@@ -134,37 +137,35 @@ public class UserManagementView extends BottomSheetDialog implements View.OnClic
 
     @Override
     public void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
         mViewModel.destroy();
+        super.onDetachedFromWindow();
     }
 
     public void showKickDialog(final String userId, String userName) {
-        final ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment();
-        dialogFragment.setCancelable(true);
-        dialogFragment.setMessage(mContext.getString(R.string.tuiroomkit_kick_user_confirm, userName));
-        if (dialogFragment.isAdded()) {
-            dialogFragment.dismiss();
+        final ConfirmDialog confirmDialog = new ConfirmDialog(mContext);
+        confirmDialog.setCancelable(true);
+        confirmDialog.setMessage(mContext.getString(R.string.tuiroomkit_kick_user_confirm, userName));
+        if (confirmDialog.isShowing()) {
+            confirmDialog.dismiss();
             return;
         }
-        dialogFragment.setPositiveText(mContext.getString(R.string.tuiroomkit_dialog_ok));
-        dialogFragment.setNegativeText(mContext.getString(R.string.tuiroomkit_dialog_cancel));
-        dialogFragment.setPositiveClickListener(new ConfirmDialogFragment.PositiveClickListener() {
+        confirmDialog.setPositiveText(mContext.getString(R.string.tuiroomkit_dialog_ok));
+        confirmDialog.setNegativeText(mContext.getString(R.string.tuiroomkit_dialog_cancel));
+        confirmDialog.setPositiveClickListener(new ConfirmDialog.PositiveClickListener() {
             @Override
             public void onClick() {
                 mViewModel.kickUser(userId);
-                dialogFragment.dismiss();
+                confirmDialog.dismiss();
             }
         });
 
-        dialogFragment.setNegativeClickListener(new ConfirmDialogFragment.NegativeClickListener() {
+        confirmDialog.setNegativeClickListener(new ConfirmDialog.NegativeClickListener() {
             @Override
             public void onClick() {
-                dialogFragment.dismiss();
+                confirmDialog.dismiss();
             }
         });
-        if (mContext instanceof Activity) {
-            dialogFragment.show(((Activity) mContext).getFragmentManager(), "ConfirmDialogFragment");
-        }
+        confirmDialog.show();
     }
 
     public void updateMicState(boolean isSelect) {

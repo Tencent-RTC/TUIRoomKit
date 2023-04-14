@@ -1,12 +1,14 @@
 package com.tencent.cloud.tuikit.roomkit.view.component;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
@@ -59,5 +61,11 @@ public class ExitRoomDialog extends BottomSheetDialog {
                 dismiss();
             }
         });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
+        super.onCreate(savedInstanceState);
     }
 }

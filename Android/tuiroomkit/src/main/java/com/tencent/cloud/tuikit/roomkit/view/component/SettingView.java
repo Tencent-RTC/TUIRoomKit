@@ -1,49 +1,74 @@
 package com.tencent.cloud.tuikit.roomkit.view.component;
 
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.SettingViewModel;
-import com.tencent.cloud.tuikit.roomkit.view.base.BaseTabSettingDialogFragment;
-import com.tencent.cloud.tuikit.roomkit.view.extension.AudioSettingFragment;
-import com.tencent.cloud.tuikit.roomkit.view.extension.ShareSettingFragment;
-import com.tencent.cloud.tuikit.roomkit.view.extension.VideoSettingFragment;
+import com.tencent.cloud.tuikit.roomkit.view.settingview.AudioSettingView;
+import com.tencent.cloud.tuikit.roomkit.view.settingview.ShareSettingView;
+import com.tencent.cloud.tuikit.roomkit.view.settingview.VideoSettingView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class SettingView extends BaseTabSettingDialogFragment {
-    private String[]             mTitleList;
-    private VideoSettingFragment mVideoSettingFragment;
-    private AudioSettingFragment mAudioSettingFragment;
-    private ShareSettingFragment mShareSettingFragment;
-    private List<Fragment>       mFragmentList;
-    private SettingViewModel     mViewModel;
+public class SettingView extends BaseBottomDialog {
+    private boolean                mEnableShare = true;
+    private TabLayout              mLayoutTop;
+    private ViewPager              mViewPagerContent;
+    private SettingViewPageAdapter mPagerAdapter;
+    private VideoSettingView       mVideoSettingView;
+    private AudioSettingView       mAudioSettingView;
+    private ShareSettingView       mShareSettingView;
+    private List<View>             mFragmentList;
+    private List<String>           mTitleList;
+    private SettingViewModel       mViewModel;
 
-    private boolean mEnableShare = true;
+    public SettingView(@NonNull Context context) {
+        super(context);
+    }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mTitleList = new String[]{
-                getString(R.string.tuiroomkit_title_video),
-                getString(R.string.tuiroomkit_title_audio),
-                getString(R.string.tuiroomkit_title_sharing)
-        };
-        initFragment();
+    protected int getLayoutId() {
+        return R.layout.tuiroomkit_view_setting;
+    }
+
+    @Override
+    protected void intiView() {
         mViewModel = new SettingViewModel(getContext(), this);
+        mLayoutTop = findViewById(R.id.tl_top);
+        mViewPagerContent = findViewById(R.id.vp_content);
+
+        mTitleList = new ArrayList<>();
+        mTitleList.add(getContext().getString(R.string.tuiroomkit_title_video));
+        mTitleList.add(getContext().getString(R.string.tuiroomkit_title_audio));
+        mTitleList.add(getContext().getString(R.string.tuiroomkit_title_sharing));
+        initFragment();
+
+        mPagerAdapter = new SettingViewPageAdapter(mFragmentList);
+        mLayoutTop.setupWithViewPager(mViewPagerContent, false);
+
+        mViewPagerContent.setAdapter(mPagerAdapter);
+        for (int i = 0; i < mTitleList.size(); i++) {
+            TabLayout.Tab tab = mLayoutTop.getTabAt(i);
+            if (tab != null) {
+                tab.setText(mTitleList.get(i));
+            }
+        }
     }
 
     private void initFragment() {
         if (mFragmentList == null) {
             mFragmentList = new ArrayList<>();
-            mVideoSettingFragment = new VideoSettingFragment();
-            mVideoSettingFragment.setListener(new VideoSettingFragment.OnItemChangeListener() {
+            mVideoSettingView = new VideoSettingView(getContext());
+            mVideoSettingView.setListener(new VideoSettingView.OnItemChangeListener() {
                 @Override
                 public void onVideoBitrateChange(int bitrate) {
                     mViewModel.setVideoBitrate(bitrate);
@@ -64,8 +89,8 @@ public class SettingView extends BaseTabSettingDialogFragment {
                     mViewModel.setVideoMirror(mirror);
                 }
             });
-            mAudioSettingFragment = new AudioSettingFragment();
-            mAudioSettingFragment.setListener(new AudioSettingFragment.OnItemChangeListener() {
+            mAudioSettingView = new AudioSettingView(getContext());
+            mAudioSettingView.setListener(new AudioSettingView.OnItemChangeListener() {
                 @Override
                 public void onAudioCaptureVolumeChange(int volume) {
                     mViewModel.setAudioCaptureVolume(volume);
@@ -91,41 +116,65 @@ public class SettingView extends BaseTabSettingDialogFragment {
                     mViewModel.stopFileDumping();
                 }
             });
-            mShareSettingFragment = new ShareSettingFragment();
-            mFragmentList.add(mVideoSettingFragment);
-            mFragmentList.add(mAudioSettingFragment);
-            mFragmentList.add(mShareSettingFragment);
-            mShareSettingFragment.setShareButtonClickListener(new ShareSettingFragment.OnShareButtonClickListener() {
+            mShareSettingView = new ShareSettingView(getContext());
+            mFragmentList.add(mVideoSettingView);
+            mFragmentList.add(mAudioSettingView);
+            mFragmentList.add(mShareSettingView);
+            mShareSettingView.setShareButtonClickListener(new ShareSettingView.OnShareButtonClickListener() {
                 @Override
                 public void onClick() {
                     mViewModel.startScreenShare();
                     dismiss();
                 }
             });
-            mShareSettingFragment.enableShareButton(mEnableShare);
+            mShareSettingView.enableShareButton(mEnableShare);
         }
     }
 
+
     @Override
-    public void onDestroy() {
+    public void onDetachedFromWindow() {
         mViewModel.destroy();
-        super.onDestroy();
-    }
-
-    @Override
-    protected List<Fragment> getFragments() {
-        return mFragmentList;
-    }
-
-    @Override
-    protected List<String> getTitleList() {
-        return Arrays.asList(mTitleList);
+        super.onDetachedFromWindow();
     }
 
     public void enableShareButton(boolean enable) {
         mEnableShare = enable;
-        if (mShareSettingFragment != null) {
-            mShareSettingFragment.enableShareButton(enable);
+        if (mShareSettingView != null) {
+            mShareSettingView.enableShareButton(enable);
+        }
+    }
+
+    static class SettingViewPageAdapter extends PagerAdapter {
+        private List<View> viewLists;
+
+        public SettingViewPageAdapter(List<View> viewLists) {
+            super();
+            this.viewLists = viewLists;
+        }
+
+        @Override
+        public int getCount() {
+            return viewLists.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @NonNull
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            container.addView(viewLists.get(position));
+            return viewLists.get(position);
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView(viewLists.get(position));
         }
     }
 }
+
+

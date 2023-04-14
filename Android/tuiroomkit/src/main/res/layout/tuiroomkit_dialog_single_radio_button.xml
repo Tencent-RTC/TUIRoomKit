@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/tuiroomkit_bg_bottom_dialog_black"
+    android:background="@drawable/tuiroomkit_bg_bottom_dialog_black_portrait"
     android:orientation="vertical"
     android:paddingBottom="32dp"
-    tools:background="@drawable/tuiroomkit_bg_bottom_dialog_black">
+    tools:background="@drawable/tuiroomkit_bg_bottom_dialog_black_portrait">
 
     <TextView
         android:id="@+id/tv_title"

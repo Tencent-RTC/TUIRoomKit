@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -113,7 +112,7 @@ public class FileUtil {
     public static Uri getUriFromPath(String path) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                return TUIFileProvider.getUriForFile(TUIConfig.getAppContext(), TUIConfig.getAppContext().getApplicationInfo().packageName + ".tuicore.fileprovider", new File(path));
+                return FileProvider.getUriForFile(TUIConfig.getAppContext(), TUIConfig.getAppContext().getApplicationInfo().packageName + ".tuicore.fileprovider", new File(path));
             } else {
                 return Uri.fromFile(new File(path));
             }
@@ -461,7 +460,7 @@ public class FileUtil {
     }
 
     public static void openFile(String path, String fileName) {
-        Uri uri = TUIFileProvider.getUriForFile(TUIConfig.getAppContext(),
+        Uri uri = FileProvider.getUriForFile(TUIConfig.getAppContext(),
                 TUIConfig.getAppContext().getApplicationInfo().packageName + ".tuicore.fileprovider",
                 new File(path));
         if (uri == null) {

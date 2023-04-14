@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/tuiroomkit_bg_bottom_dialog_black"
+    android:background="@drawable/tuiroomkit_bg_bottom_dialog_black_portrait"
     android:orientation="vertical"
     android:paddingBottom="61dp">
 
@@ -34,6 +34,7 @@
             android:id="@+id/btn_qr_code"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:background="@color/transparent"
             android:src="@drawable/tuiroomkit_ic_qr_code" />
     </LinearLayout>
 
@@ -123,6 +124,7 @@
             android:layout_height="14dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
+            android:background="@color/transparent"
             android:src="@drawable/tuiroomkit_ic_copy_white" />
     </RelativeLayout>
 
@@ -158,6 +160,7 @@
             android:layout_height="14dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
+            android:background="@color/transparent"
             android:src="@drawable/tuiroomkit_ic_copy_white" />
     </RelativeLayout>
 

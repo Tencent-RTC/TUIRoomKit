@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -42,12 +44,13 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
     private Context         mContext;
     private TUIBeautyParams mTUIBeautyParams;
     private TXBeautyManager mBeautyManager;
-
+    private Handler         mMainHandler;
 
     public TUIBeautyPresenter(Context context, TXBeautyManager beautyManager) {
         mContext = context;
         mTUIBeautyParams = new TUIBeautyParams();
         mBeautyManager = beautyManager;
+        mMainHandler = new Handler(Looper.getMainLooper());
     }
 
     @Override
@@ -235,7 +238,7 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
 
             @Override
             public void onDownloadFail(final String errorMsg) {
-                ((Activity) mContext).runOnUiThread(new Runnable() {
+                mMainHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         if (mProgressDialog != null) {
@@ -248,7 +251,7 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
 
             @Override
             public void onDownloadProgress(final int progress) {
-                ((Activity) mContext).runOnUiThread(new Runnable() {
+                mMainHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         if (mProgressDialog == null) {
@@ -265,7 +268,7 @@ public class TUIBeautyPresenter implements ITUIBeautyPresenter {
 
             @Override
             public void onDownloadSuccess(final String filePath) {
-                ((Activity) mContext).runOnUiThread(new Runnable() {
+                mMainHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         if (mProgressDialog != null) {

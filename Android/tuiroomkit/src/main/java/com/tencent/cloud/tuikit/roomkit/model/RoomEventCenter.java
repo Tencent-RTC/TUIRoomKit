@@ -21,13 +21,6 @@ public class RoomEventCenter {
     private Map<RoomEngineEvent, Set<WeakReference<RoomEngineEventResponder>>> mEngineResponderMap;
     private Map<String, Set<WeakReference<TUINotificationAdapter>>>            mUIEventResponderMap;
 
-    //TODO 等待Engine RoomInfoChange回调修改后删除
-    private RoomStore mRoomStore;
-
-    public void setRoomStore(RoomStore roomStore) {
-        this.mRoomStore = roomStore;
-    }
-
     /**
      * 事件列表
      */
@@ -35,19 +28,23 @@ public class RoomEventCenter {
         ERROR,
         KICKED_OFF_LINE,
         USER_SIG_EXPIRED,
-        ROOM_INFO_CHANGED,
+        ROOM_NAME_CHANGED,
+        ALL_USER_MICROPHONE_DISABLE_CHANGED,
+        ALL_USER_CAMERA_DISABLE_CHANGED,
+        SEND_MESSAGE_FOR_ALL_USER_DISABLE_CHANGED,
         ROOM_DISMISSED,
         KICKED_OUT_OF_ROOM,
+        ROOM_SPEECH_MODE_CHANGED,
         REMOTE_USER_ENTER_ROOM,
         REMOTE_USER_LEAVE_ROOM,
         USER_ROLE_CHANGED,
         USER_VIDEO_STATE_CHANGED,
         USER_AUDIO_STATE_CHANGED,
         USER_VOICE_VOLUME_CHANGED,
-        USER_MUTE_STATE_CHANGED,
+        SEND_MESSAGE_FOR_USER_DISABLE_CHANGED,
         USER_NETWORK_QUALITY_CHANGED,
         USER_SCREEN_CAPTURE_STOPPED,
-        SEAT_CONTROL_ENABLED,
+        ROOM_MAX_SEAT_COUNT_CHANGED,
         SEAT_LIST_CHANGED,
         REQUEST_RECEIVED,
         REQUEST_CANCELLED,
@@ -58,6 +55,7 @@ public class RoomEventCenter {
 
     public static class RoomKitUIEvent {
         public static final String ROOM_KIT_EVENT        = "RoomKitEvent";
+        public static final String CONFIGURATION_CHANGE  = "appConfigurationChange";
         public static final String EXIT_MEETING          = "exitMeeting";
         public static final String LEAVE_MEETING         = "leaveMeeting";
         public static final String EXIT_PREPARE_ACTIVITY = "exitPrepareActivity";
@@ -245,30 +243,41 @@ public class RoomEventCenter {
         }
 
         @Override
-        public void onRoomInfoChanged(String roomId, TUIRoomDefine.RoomInfo roomInfo) {
+        public void onRoomNameChanged(String roomId, String roomName) {
             Map<String, Object> map = new HashMap<>();
             map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
-            map.put(RoomEventConstant.KEY_ROOM_INFO, roomInfo);
+            map.put(RoomEventConstant.KEY_ROOM_NAME, roomName);
+            notifyEngineEvent(RoomEngineEvent.ROOM_NAME_CHANGED, map);
+        }
 
-            //TODO 等待Engine RoomInfoChange回调修改后删除
-            boolean isOwnerChange = !roomInfo.owner.equals(mRoomStore.roomInfo.owner);
-            map.put(RoomEventConstant.KEY_OWNER_CHANGE, isOwnerChange);
+        @Override
+        public void onAllUserMicrophoneDisableChanged(String roomId, boolean isDisable) {
+            Map<String, Object> map = new HashMap<>();
+            map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
+            map.put(RoomEventConstant.KEY_IS_DISABLE, isDisable);
+            notifyEngineEvent(RoomEngineEvent.ALL_USER_MICROPHONE_DISABLE_CHANGED, map);
+        }
 
-            boolean isVideoChange = roomInfo.enableVideo != mRoomStore.roomInfo.enableVideo;
-            map.put(RoomEventConstant.KEY_ENABLE_VIDEO, isVideoChange);
+        @Override
+        public void onAllUserCameraDisableChanged(String roomId, boolean isDisable) {
+            Map<String, Object> map = new HashMap<>();
+            map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
+            map.put(RoomEventConstant.KEY_IS_DISABLE, isDisable);
+            notifyEngineEvent(RoomEngineEvent.ALL_USER_CAMERA_DISABLE_CHANGED, map);
+        }
 
-            boolean isAudioChange = roomInfo.enableAudio != mRoomStore.roomInfo.enableAudio;
-            map.put(RoomEventConstant.KEY_ENABLE_AUDIO, isAudioChange);
-
-            notifyEngineEvent(RoomEngineEvent.ROOM_INFO_CHANGED, map);
+        @Override
+        public void onSendMessageForAllUserDisableChanged(String roomId, boolean isDisable) {
+            Map<String, Object> map = new HashMap<>();
+            map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
+            map.put(RoomEventConstant.KEY_IS_DISABLE, isDisable);
+            notifyEngineEvent(RoomEngineEvent.SEND_MESSAGE_FOR_ALL_USER_DISABLE_CHANGED, map);
         }
 
         @Override
         public void onRoomDismissed(String roomId) {
             Map<String, Object> map = new HashMap<>();
             map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
-            boolean isOwner = mRoomStore.userModel.userId.equals(mRoomStore.roomInfo.owner);
-            map.put(RoomEventConstant.KEY_IS_OWNER, isOwner);
             notifyEngineEvent(RoomEngineEvent.ROOM_DISMISSED, map);
         }
 
@@ -278,6 +287,14 @@ public class RoomEventCenter {
             map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
             map.put(RoomEventConstant.KEY_MESSAGE, message);
             notifyEngineEvent(RoomEngineEvent.KICKED_OUT_OF_ROOM, map);
+        }
+
+        @Override
+        public void onRoomSpeechModeChanged(String roomId, TUIRoomDefine.SpeechMode speechMode) {
+            Map<String, Object> map = new HashMap<>();
+            map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
+            map.put(RoomEventConstant.KEY_SPEECH_MODE, speechMode);
+            notifyEngineEvent(RoomEngineEvent.ROOM_SPEECH_MODE_CHANGED, map);
         }
 
         @Override
@@ -332,11 +349,12 @@ public class RoomEventCenter {
         }
 
         @Override
-        public void onUserMuteStateChanged(String userId, boolean muted) {
+        public void onSendMessageForUserDisableChanged(String roomId, String userId, boolean isDisable) {
             Map<String, Object> map = new HashMap<>();
+            map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
             map.put(RoomEventConstant.KEY_USER_ID, userId);
-            map.put(RoomEventConstant.KEY_MUTED, muted);
-            notifyEngineEvent(RoomEngineEvent.USER_MUTE_STATE_CHANGED, map);
+            map.put(RoomEventConstant.KEY_IS_DISABLE, isDisable);
+            notifyEngineEvent(RoomEngineEvent.SEND_MESSAGE_FOR_USER_DISABLE_CHANGED, map);
         }
 
         @Override
@@ -354,11 +372,11 @@ public class RoomEventCenter {
         }
 
         @Override
-        public void onSeatControlEnabled(boolean enable, int maxSeatNumber) {
+        public void onRoomMaxSeatCountChanged(String roomId, int maxSeatCount) {
             Map<String, Object> map = new HashMap<>();
-            map.put(RoomEventConstant.KEY_ENABLE, enable);
-            map.put(RoomEventConstant.KEY_MAX_SEAT_NUMBER, maxSeatNumber);
-            notifyEngineEvent(RoomEngineEvent.SEAT_CONTROL_ENABLED, map);
+            map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
+            map.put(RoomEventConstant.KEY_MAX_SEAT_COUNT, maxSeatCount);
+            notifyEngineEvent(RoomEngineEvent.ROOM_MAX_SEAT_COUNT_CHANGED, map);
         }
 
         @Override

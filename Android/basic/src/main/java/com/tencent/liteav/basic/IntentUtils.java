@@ -25,7 +25,7 @@ public class IntentUtils {
             }
             context.startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            Log.e("TAG", "ActivityNotFoundException : " + intent.toString());
+            Log.e(TAG, "ActivityNotFoundException : " + intent.toString());
         }
     }
 }

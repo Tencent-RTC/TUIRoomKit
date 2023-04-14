@@ -7,11 +7,11 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 
 import com.google.gson.Gson;
+import com.tencent.qcloud.tuikit.timcommon.bean.TUIMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.R;
 import com.tencent.qcloud.tuikit.tuichat.TUIChatConstants;
 import com.tencent.qcloud.tuikit.tuichat.bean.CustomHelloMessage;
 import com.tencent.qcloud.tuikit.tuichat.bean.InputMoreActionUnit;
-import com.tencent.qcloud.tuikit.tuichat.bean.message.TUIMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.config.TUIChatConfigs;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.ChatView;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.widget.input.InputView;
@@ -201,7 +201,7 @@ public class ChatLayoutSetting {
         if (TUIChatConfigs.getConfigs().getGeneralConfig().isEnableLink()) {
             InputMoreActionUnit unit = new InputMoreActionUnit() {};
             unit.setIconResId(R.drawable.chat_minimalist_more_action_custom_icon);
-            unit.setTitleId(R.string.test_custom_action);
+            unit.setName(inputView.getResources().getString(R.string.test_custom_action));
             unit.setActionId(CustomHelloMessage.CUSTOM_HELLO_ACTION_ID);
             unit.setPriority(10);
             unit.setOnClickListener(unit.new OnActionClickListener() {

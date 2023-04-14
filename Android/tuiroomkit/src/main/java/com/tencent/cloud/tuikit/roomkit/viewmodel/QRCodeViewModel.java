@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.widget.Toast;
 
 import com.tencent.cloud.tuikit.roomkit.R;
@@ -12,18 +13,16 @@ import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.model.utils.CommonUtils;
 import com.tencent.cloud.tuikit.roomkit.model.utils.SaveBitMap;
-import com.tencent.cloud.tuikit.roomkit.view.component.QRCodeView;
 import com.tencent.qcloud.tuicore.permission.PermissionCallback;
 import com.tencent.qcloud.tuicore.permission.PermissionRequester;
+import com.tencent.qcloud.tuicore.util.TUIBuild;
 
 public class QRCodeViewModel {
     private Context    mContext;
-    private QRCodeView mQRCodeView;
     private SaveBitMap mSaveBitMap;
 
-    public QRCodeViewModel(Context context, QRCodeView view) {
+    public QRCodeViewModel(Context context) {
         mContext = context;
-        mQRCodeView = view;
     }
 
     public RoomInfo getRoomInfo() {
@@ -31,13 +30,14 @@ public class QRCodeViewModel {
     }
 
     public void saveQRCodeToAlbum(final Bitmap bitmap) {
+        if (TUIBuild.getVersionInt() >= Build.VERSION_CODES.Q) {
+            saveBitmapToAlbum(bitmap);
+            return;
+        }
         PermissionCallback callback = new PermissionCallback() {
             @Override
             public void onGranted() {
-                if (mSaveBitMap == null) {
-                    mSaveBitMap = new SaveBitMap();
-                }
-                mSaveBitMap.saveToAlbum(mContext, bitmap);
+                saveBitmapToAlbum(bitmap);
             }
         };
 
@@ -50,14 +50,17 @@ public class QRCodeViewModel {
                 .request();
     }
 
+    private void saveBitmapToAlbum(final Bitmap bitmap) {
+        if (mSaveBitMap == null) {
+            mSaveBitMap = new SaveBitMap();
+        }
+        mSaveBitMap.saveToAlbum(mContext, bitmap);
+    }
+
     public void copyContentToClipboard(String content, String toast) {
         ClipboardManager cm = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData mClipData = ClipData.newPlainText("Label", content);
         cm.setPrimaryClip(mClipData);
         Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
-    }
-
-    public void horizontalAnimation(boolean isShowingView) {
-        CommonUtils.horizontalAnimation(mQRCodeView, isShowingView);
     }
 }

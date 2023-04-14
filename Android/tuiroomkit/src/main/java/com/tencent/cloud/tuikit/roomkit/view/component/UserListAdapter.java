@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.AppCompatImageButton;
 
+import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.view.base.UserBaseAdapter;
 import com.tencent.liteav.basic.ImageLoader;
@@ -20,9 +21,10 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserListAdapter extends UserBaseAdapter {
-    private boolean mIsOwner;
-    private String  mSelfId;
-    private Context mContext;
+    private boolean                  mIsOwner;
+    private String                   mSelfId;
+    private Context                  mContext;
+    private TUIRoomDefine.SpeechMode mSpeechMode;
 
     public UserListAdapter(Context context) {
         super(context);
@@ -35,6 +37,10 @@ public class UserListAdapter extends UserBaseAdapter {
 
     public void setOwner(boolean isOwner) {
         this.mIsOwner = isOwner;
+    }
+
+    public void setSpeechMode(TUIRoomDefine.SpeechMode speechMode) {
+        this.mSpeechMode = speechMode;
     }
 
     public class ViewHolder extends UserBaseViewHolder {
@@ -72,7 +78,8 @@ public class UserListAdapter extends UserBaseAdapter {
             mTextUserName.setText(userName);
             mImageAudio.setSelected(model.isAudioAvailable);
             mImageVideo.setSelected(model.isVideoAvailable);
-            if (model.isOnSeat) {
+
+            if (TUIRoomDefine.SpeechMode.FREE_TO_SPEAK.equals(mSpeechMode) || model.isOnSeat) {
                 mImageAudio.setVisibility(View.VISIBLE);
                 mImageVideo.setVisibility(View.VISIBLE);
                 mBtnInvite.setVisibility(View.GONE);

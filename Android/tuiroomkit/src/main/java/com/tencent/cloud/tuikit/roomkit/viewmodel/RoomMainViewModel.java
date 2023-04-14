@@ -2,6 +2,7 @@ package com.tencent.cloud.tuikit.roomkit.viewmodel;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,18 +16,22 @@ import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
+import com.tencent.cloud.tuikit.roomkit.model.entity.ExtensionSettingEntity;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
+import com.tencent.cloud.tuikit.roomkit.model.manager.ExtensionSettingManager;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.model.utils.CommonUtils;
 import com.tencent.cloud.tuikit.roomkit.view.service.ForegroundService;
 import com.tencent.cloud.tuikit.roomkit.view.component.RoomMainView;
+import com.tencent.liteav.device.TXDeviceManager;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.permission.PermissionCallback;
 import com.tencent.qcloud.tuicore.permission.PermissionRequester;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 import com.tencent.trtc.TRTCCloudDef;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +54,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         mRoomStore = RoomEngineManager.sharedInstance(context).getRoomStore();
         subscribeEvent();
         setMirror();
+        setAudioRoute();
     }
 
     private void setMirror() {
@@ -56,6 +62,15 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         param.mirrorType = mRoomStore.videoModel.isMirror ? TRTCCloudDef.TRTC_VIDEO_MIRROR_TYPE_ENABLE
                 : TRTCCloudDef.TRTC_VIDEO_MIRROR_TYPE_DISABLE;
         mRoomEngine.getTRTCCloud().setLocalRenderParams(param);
+        ExtensionSettingEntity entity = ExtensionSettingManager.getInstance().getExtensionSetting();
+        entity.isMirror = mRoomStore.videoModel.isMirror;
+        ExtensionSettingManager.getInstance().setExtensionSetting(entity);
+    }
+
+    private void setAudioRoute() {
+        mRoomEngine.getDeviceManager().setAudioRoute(mRoomStore.roomInfo.isUseSpeaker
+                ? TXDeviceManager.TXAudioRoute.TXAudioRouteSpeakerphone
+                : TXDeviceManager.TXAudioRoute.TXAudioRouteEarpiece);
     }
 
     private void subscribeEvent() {
@@ -70,26 +85,31 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.LEAVE_MEETING, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.EXIT_MEETING, this);
 
+        eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.ROOM_DISMISSED, this);
+        eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.KICKED_OUT_OF_ROOM, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.USER_VIDEO_STATE_CHANGED, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.USER_AUDIO_STATE_CHANGED, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.REQUEST_RECEIVED, this);
-        eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.ROOM_INFO_CHANGED, this);
+        eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.ALL_USER_CAMERA_DISABLE_CHANGED, this);
+        eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.ALL_USER_MICROPHONE_DISABLE_CHANGED, this);
+        eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.SEND_MESSAGE_FOR_ALL_USER_DISABLE_CHANGED, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.USER_SCREEN_CAPTURE_STOPPED, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.USER_ROLE_CHANGED, this);
     }
 
     public void initCameraAndMicrophone() {
-        if (!isOwner() && mRoomStore.roomInfo.enableSeatControl) {
+        if (!isOwner() && TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT
+                .equals(mRoomStore.roomInfo.speechMode)) {
             return;
         }
         if (mRoomStore.roomInfo.isOpenMicrophone
-                && mRoomStore.roomInfo.enableAudio) {
+                && !mRoomStore.roomInfo.isMicrophoneDisableForAllUser) {
             PermissionCallback callback = new PermissionCallback() {
                 @Override
                 public void onGranted() {
                     enableMicrophone(true);
                     if (mRoomStore.roomInfo.isOpenCamera
-                            && mRoomStore.roomInfo.enableVideo) {
+                            && !mRoomStore.roomInfo.isCameraDisableForAllUser) {
                         requestCameraPermission();
                     }
                 }
@@ -103,7 +123,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
                     .callback(callback)
                     .request();
         } else if (mRoomStore.roomInfo.isOpenCamera
-                && mRoomStore.roomInfo.enableVideo) {
+                && !mRoomStore.roomInfo.isCameraDisableForAllUser) {
             requestCameraPermission();
         }
     }
@@ -141,10 +161,14 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.LEAVE_MEETING, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.EXIT_MEETING, this);
 
+        eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.ROOM_DISMISSED, this);
+        eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.KICKED_OUT_OF_ROOM, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.USER_VIDEO_STATE_CHANGED, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.USER_AUDIO_STATE_CHANGED, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.REQUEST_RECEIVED, this);
-        eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.ROOM_INFO_CHANGED, this);
+        eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.ALL_USER_CAMERA_DISABLE_CHANGED, this);
+        eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.ALL_USER_MICROPHONE_DISABLE_CHANGED, this);
+        eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.SEND_MESSAGE_FOR_ALL_USER_DISABLE_CHANGED, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.USER_SCREEN_CAPTURE_STOPPED, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.USER_ROLE_CHANGED, this);
     }
@@ -163,14 +187,14 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     }
 
     private void openMicrophone() {
-        if (!getRoomInfo().enableAudio) {
+        if (getRoomInfo().isMicrophoneDisableForAllUser) {
             ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_can_not_open_mic));
             return;
         }
         PermissionCallback callback = new PermissionCallback() {
             @Override
             public void onGranted() {
-                mRoomEngine.openLocalMicrophone(null);
+                mRoomEngine.openLocalMicrophone(TUIRoomDefine.AudioQuality.DEFAULT, null);
                 mRoomEngine.startPushLocalAudio();
             }
         };
@@ -194,7 +218,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     }
 
     private void openCamera() {
-        if (!getRoomInfo().enableVideo) {
+        if (getRoomInfo().isCameraDisableForAllUser) {
             ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_can_not_open_camera));
             return;
         }
@@ -202,7 +226,8 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         PermissionCallback callback = new PermissionCallback() {
             @Override
             public void onGranted() {
-                mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, null);
+                mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, TUIRoomDefine.VideoQuality.Q_1080P,
+                        null);
                 mRoomEngine.startPushLocalVideo();
             }
         };
@@ -259,6 +284,16 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
 
     public UserModel getUserModel() {
         return mRoomStore.userModel;
+    }
+
+    public void notifyConfigChange(Configuration configuration) {
+        Map<String, Object> params = new HashMap<>();
+        params.put(RoomEventConstant.KEY_CONFIGURATION, configuration);
+        RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, params);
+    }
+
+    public void notifyExitRoom() {
+        RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.EXIT_MEETING, null);
     }
 
     private void onCameraMuted(boolean muted) {
@@ -338,6 +373,12 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     @Override
     public void onEngineEvent(RoomEventCenter.RoomEngineEvent event, Map<String, Object> params) {
         switch (event) {
+            case ROOM_DISMISSED:
+                onRoomDisMissed();
+                break;
+            case KICKED_OUT_OF_ROOM:
+                mRoomMainView.showSingleConfirmDialog(mContext.getString(R.string.tuiroomkit_kicked_by_master), true);
+                break;
             case USER_VIDEO_STATE_CHANGED:
                 onUserVideoStateChanged(params);
                 break;
@@ -347,8 +388,14 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
             case REQUEST_RECEIVED:
                 onRequestReceived(params);
                 break;
-            case ROOM_INFO_CHANGED:
-                onRoomInfoChanged(params);
+            case ALL_USER_CAMERA_DISABLE_CHANGED:
+                allUserCameraDisableChanged(params);
+                break;
+            case ALL_USER_MICROPHONE_DISABLE_CHANGED:
+                allUserMicrophoneDisableChanged(params);
+                break;
+            case SEND_MESSAGE_FOR_ALL_USER_DISABLE_CHANGED:
+                sendMessageForAllUserDisableChanged(params);
                 break;
             case USER_SCREEN_CAPTURE_STOPPED:
                 onUserScreenCaptureStopped();
@@ -358,6 +405,25 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
                 break;
             default:
                 break;
+        }
+    }
+
+    private void onRoomDisMissed() {
+        ToastUtils.showShort(mContext.getString(R.string.tuiroomkit_toast_end_room));
+        if (isOwner()) {
+            showDestroyDialog();
+        } else {
+            mRoomMainView.showSingleConfirmDialog(mContext.getString(R.string.tuiroomkit_room_room_destroyed), true);
+        }
+    }
+
+    private void showDestroyDialog() {
+        try {
+            Class clz = Class.forName("com.tencent.liteav.privacy.util.RTCubeAppLegalUtils");
+            Method method = clz.getDeclaredMethod("showRoomDestroyTips", Context.class);
+            method.invoke(null, this);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -423,51 +489,65 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         }
     }
 
-    private void onRoomInfoChanged(Map<String, Object> params) {
+
+    private void allUserCameraDisableChanged(Map<String, Object> params) {
         if (params == null) {
             return;
         }
-        TUIRoomDefine.RoomInfo roomInfo = (TUIRoomDefine.RoomInfo) params.get(RoomEventConstant.KEY_ROOM_INFO);
-        if (roomInfo == null) {
-            return;
-        }
-        if (!roomInfo.roomId.equals(mRoomStore.roomInfo.roomId)) {
+
+        boolean isDisable = (Boolean) params.get(RoomEventConstant.KEY_IS_DISABLE);
+        mRoomStore.roomInfo.isCameraDisableForAllUser = isDisable;
+
+        if (isOwner()) {
             return;
         }
 
-        boolean isOwnerChange = (boolean) params.get(RoomEventConstant.KEY_OWNER_CHANGE);
-        if (isOwnerChange) {
-            mRoomStore.roomInfo.owner = roomInfo.owner;
-            boolean isOwner = mRoomStore.userModel.userId.equals(roomInfo.owner);
-            mRoomStore.userModel.role = isOwner ? TUIRoomDefine.Role.ROOM_OWNER : TUIRoomDefine.Role.GENERAL_USER;
-            if (isOwner) {
-                mRoomMainView.showSingleConfirmDialog(mContext.getString(R.string.tuiroomkit_have_become_master));
-            }
+        int stringResId = isDisable
+                ? R.string.tuiroomkit_mute_all_camera_toast
+                : R.string.tuiroomkit_toast_not_mute_all_video;
+        ToastUtil.toastShortMessage(mContext.getString(stringResId));
+
+        if (isDisable) {
+            mRoomEngine.stopPushLocalVideo();
+            mRoomEngine.closeLocalCamera();
+        }
+    }
+
+    private void allUserMicrophoneDisableChanged(Map<String, Object> params) {
+        if (params == null) {
+            return;
         }
 
-        boolean isVideoEnableChange = (boolean) params.get(RoomEventConstant.KEY_ENABLE_VIDEO);
-        if (isVideoEnableChange) {
-            mRoomStore.roomInfo.enableVideo = roomInfo.enableVideo;
-            if (!isOwner() && !roomInfo.enableVideo) {
-                mRoomEngine.stopPushLocalVideo();
-                mRoomEngine.closeLocalCamera();
-            }
+        boolean isDisable = (Boolean) params.get(RoomEventConstant.KEY_IS_DISABLE);
+        mRoomStore.roomInfo.isMicrophoneDisableForAllUser = isDisable;
+
+        if (isOwner()) {
+            return;
         }
-        boolean isAudioEnableChange = (boolean) params.get(RoomEventConstant.KEY_ENABLE_AUDIO);
-        if (isAudioEnableChange) {
-            mRoomStore.roomInfo.enableAudio = roomInfo.enableAudio;
-            if (!isOwner() && !roomInfo.enableAudio) {
-                mRoomEngine.stopPushLocalAudio();
-                mRoomEngine.closeLocalMicrophone();
-            }
+
+        int resId = isDisable ? R.string.tuiroomkit_mute_all_mic_toast : R.string.tuiroomkit_toast_not_mute_all_audio;
+        ToastUtil.toastShortMessage(mContext.getString(resId));
+
+        if (isDisable) {
+            mRoomEngine.stopPushLocalAudio();
+            mRoomEngine.closeLocalMicrophone();
         }
-        mRoomStore.roomInfo.enableMessage = roomInfo.enableMessage;
+    }
+
+    private void sendMessageForAllUserDisableChanged(Map<String, Object> params) {
+        if (params == null) {
+            return;
+        }
+
+        mRoomStore.roomInfo.isMessageDisableForAllUser = (boolean) params
+                .get(RoomEventConstant.KEY_IS_DISABLE);
     }
 
     private void onUserScreenCaptureStopped() {
         ForegroundService.stop(mContext);
-        if (mRoomStore.roomInfo.enableVideo && mRoomStore.roomInfo.isOpenCamera) {
-            mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, null);
+        if (!mRoomStore.roomInfo.isCameraDisableForAllUser && mRoomStore.roomInfo.isOpenCamera) {
+            mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, TUIRoomDefine.VideoQuality.Q_1080P, null);
+            mRoomEngine.startPushLocalVideo();
         }
     }
 
@@ -475,20 +555,22 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         if (params == null) {
             return;
         }
-        if (mRoomStore.userModel.isOnSeat) {
-            return;
-        }
+
         String userId = (String) params.get(RoomEventConstant.KEY_USER_ID);
         if (TextUtils.isEmpty(userId) || !mRoomStore.userModel.userId.equals(userId)) {
             return;
         }
+
         TUIRoomDefine.Role role = (TUIRoomDefine.Role) params.get(RoomEventConstant.KEY_ROLE);
         if (role == null) {
             return;
         }
+
+        mRoomStore.userModel.role = role;
         if (TUIRoomDefine.Role.ROOM_OWNER.equals(role)) {
             mRoomEngine.takeSeat(SEAT_INDEX, REQ_TIME_OUT, null);
+            mRoomStore.roomInfo.owner = userId;
+            mRoomMainView.showSingleConfirmDialog(mContext.getString(R.string.tuiroomkit_have_become_master), false);
         }
-
     }
 }

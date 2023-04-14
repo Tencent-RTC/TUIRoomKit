@@ -2,6 +2,7 @@ package com.tencent.cloud.tuikit.roomkit.viewmodel;
 
 import android.content.Context;
 
+import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
@@ -47,10 +48,10 @@ public class CreateRoomViewModel implements RoomEventCenter.RoomKitUIEventRespon
         roomInfo.isOpenCamera = mRoomStore.roomInfo.isOpenCamera;
         roomInfo.isOpenMicrophone = mRoomStore.roomInfo.isOpenMicrophone;
         roomInfo.isUseSpeaker = mRoomStore.roomInfo.isUseSpeaker;
-        roomInfo.enableAudio = true;
-        roomInfo.enableVideo = true;
-        roomInfo.enableMessage = true;
-        roomInfo.enableSeatControl = mRoomStore.roomInfo.enableSeatControl;
+        roomInfo.isMicrophoneDisableForAllUser = false;
+        roomInfo.isCameraDisableForAllUser = false;
+        roomInfo.isMessageDisableForAllUser = false;
+        roomInfo.speechMode = mRoomStore.roomInfo.speechMode;
         TUIRoomKit tuiRoomKit = TUIRoomKit.sharedInstance(mContext);
         tuiRoomKit.createRoom(roomInfo, TUIRoomKit.RoomScene.MEETING);
     }
@@ -102,9 +103,12 @@ public class CreateRoomViewModel implements RoomEventCenter.RoomKitUIEventRespon
             if (params == null) {
                 return;
             }
-            boolean isFreeSpeech = (boolean) params.get(RoomEventConstant.KEY_IS_FREE_SPEECH);
-            mRoomStore.roomInfo.enableSeatControl = !isFreeSpeech;
-            int resId = isFreeSpeech ? R.string.tuiroomkit_room_free_speech : R.string.tuiroomkit_room_raise_hand;
+            TUIRoomDefine.SpeechMode speechMode = (TUIRoomDefine.SpeechMode)
+                    params.get(RoomEventConstant.KEY_IS_FREE_SPEECH);
+            mRoomStore.roomInfo.speechMode = speechMode;
+            int resId = TUIRoomDefine.SpeechMode.FREE_TO_SPEAK.equals(speechMode)
+                    ? R.string.tuiroomkit_room_free_speech
+                    : R.string.tuiroomkit_room_raise_hand;
             mCreateRoomView.setRoomTypeText(mContext.getString(resId));
         }
     }

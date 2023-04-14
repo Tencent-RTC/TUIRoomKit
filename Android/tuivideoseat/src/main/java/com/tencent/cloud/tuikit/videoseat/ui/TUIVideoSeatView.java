@@ -34,10 +34,6 @@ import java.util.List;
 public class TUIVideoSeatView extends RelativeLayout {
     private static final String TAG = "TUIVideoSeatView";
 
-    private static final int TALKING_VIEW_MARGIN_TOP_IN_PORTRAIT_DP = 10;
-    private static final int TALKING_VIEW_MARGIN_RIGHT_IN_PORTRAIT_DP = 10;
-    private static final int TALKING_VIEW_MARGIN_TOP_IN_LANDSCAPE_DP = 10;
-    private static final int TALKING_VIEW_MARGIN_RIGHT_IN_LANDSCAPE_DP = 10;
     private Context mContext;
 
     private RecyclerView      mRecyclerView;
@@ -184,11 +180,9 @@ public class TUIVideoSeatView extends RelativeLayout {
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mUserDisplayView.getLayoutParams();
         setUserTalkingViewSize(talkingEntity, layoutParams);
 
-        boolean isPortrait = mContext.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
-        layoutParams.leftMargin = ScreenUtil.getScreenWidth(mContext) - layoutParams.width - ScreenUtil.dip2px(
-                isPortrait ? TALKING_VIEW_MARGIN_RIGHT_IN_PORTRAIT_DP : TALKING_VIEW_MARGIN_RIGHT_IN_LANDSCAPE_DP);
-        layoutParams.topMargin = ScreenUtil.dip2px(
-                isPortrait ? TALKING_VIEW_MARGIN_TOP_IN_PORTRAIT_DP : TALKING_VIEW_MARGIN_TOP_IN_LANDSCAPE_DP);
+        layoutParams.leftMargin =
+                ScreenUtil.getScreenWidth(mContext) - layoutParams.width - UserDisplayView.MARGIN_PX;
+        layoutParams.topMargin = UserDisplayView.MARGIN_PX;
         mUserDisplayView.setLayoutParams(layoutParams);
     }
 
@@ -246,9 +240,10 @@ public class TUIVideoSeatView extends RelativeLayout {
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mUserDisplayView.getLayoutParams();
         setUserTalkingViewSize(talkingEntity, params);
 
-        int rightMargin = ScreenUtil.getScreenWidth(mContext) - params.leftMargin - params.width;
+        int rightMargin =
+                ScreenUtil.getScreenWidth(mContext) - params.leftMargin - params.width - UserDisplayView.MARGIN_PX;
         params.leftMargin += rightMargin < 0 ? rightMargin : 0;
-        int bottomMargin = getHeight() - params.topMargin - params.height;
+        int bottomMargin = getHeight() - params.topMargin - params.height - UserDisplayView.MARGIN_PX;
         params.topMargin += bottomMargin < 0 ? bottomMargin : 0;
         mUserDisplayView.setLayoutParams(params);
     }
@@ -362,6 +357,12 @@ public class TUIVideoSeatView extends RelativeLayout {
     public void notifyDataSetChanged() {
         if (mMemberListAdapter != null) {
             mMemberListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void notifyItemChanged(int position) {
+        if (mMemberListAdapter != null) {
+            mMemberListAdapter.notifyItemChanged(position);
         }
     }
 

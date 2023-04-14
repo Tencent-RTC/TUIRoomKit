@@ -8,6 +8,7 @@ import android.widget.RadioGroup;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
@@ -51,7 +52,9 @@ public class RoomTypeSelectView extends BottomSheetDialog implements View.OnClic
             dismiss();
         } else if (v.getId() == R.id.btn_confirm) {
             Map<String, Object> params = new HashMap<>();
-            params.put(RoomEventConstant.KEY_IS_FREE_SPEECH, mIsFreeSpeech);
+            params.put(RoomEventConstant.KEY_IS_FREE_SPEECH,
+                    mIsFreeSpeech ? TUIRoomDefine.SpeechMode.FREE_TO_SPEAK
+                            : TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT);
             RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.ROOM_TYPE_CHANGE, params);
             dismiss();
         }
