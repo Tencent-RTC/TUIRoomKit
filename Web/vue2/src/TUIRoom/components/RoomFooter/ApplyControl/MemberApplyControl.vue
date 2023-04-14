@@ -100,7 +100,7 @@ async function toggleApplySpeech() {
 **/
 async function sendSeatApplication() {
   try {
-    const requestId = await roomEngine.instance?.takeSeat({
+    const request = await roomEngine.instance?.takeSeat({
       seatIndex: -1,
       timeout: 0,
       requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType }) => {
@@ -126,8 +126,8 @@ async function sendSeatApplication() {
         }
       },
     });
-    if (requestId) {
-      applyToAnchorRequestId.value = requestId;
+    if (request && request.requestId) {
+      applyToAnchorRequestId.value = request.requestId;
     }
     isApplyingOnSeat.value = true;
   } catch (error) {

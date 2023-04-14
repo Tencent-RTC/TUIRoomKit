@@ -30,10 +30,10 @@ import { useChatStore } from './stores/chat';
 
 import TUIRoomEngine, {
   TUIRoomEvents,
-  TUIRoomInfo,
   TUIRoomType,
   TRTCDeviceType,
   TRTCDeviceState,
+  TUISpeechMode,
 } from '@tencentcloud/tuiroom-engine-js';
 
 import TUIRoomAegis from './utils/aegis';
@@ -44,7 +44,6 @@ import useGetRoomEngine from './hooks/useRoomEngine';
 
 const isElectron = isElectronEnv();
 const roomEngine = useGetRoomEngine();
-
 const { t } = useI18n();
 
 defineExpose({
@@ -74,7 +73,7 @@ const roomStore = useRoomStore();
 const chatStore = useChatStore();
 
 const { sdkAppId, showHeaderTool } = storeToRefs(basicStore);
-const { localUser, localVideoProfile } = storeToRefs(roomStore);
+const { localUser, localVideoQuality } = storeToRefs(roomStore);
 
 /**
  * Handle page mouse hover display toolbar logic
@@ -159,7 +158,7 @@ async function init(option: RoomInitData) {
 async function createRoom(options: {
   roomId: string,
   roomName: string,
-  roomMode: 'FreeSpeech' | 'ApplySpeech',
+  roomMode: 'FreeToSpeak' | 'SpeakAfterTakingSeat',
   roomParam?: RoomParam,
 }) {
   const { roomId, roomName, roomMode, roomParam } = options;
@@ -171,21 +170,15 @@ async function createRoom(options: {
   const roomParams = {
     roomId,
     name: roomName,
-    roomType: TUIRoomType.kGroup,
+    roomType: TUIRoomType.kConference,
   };
-  if (roomMode === 'FreeSpeech') {
+  if (roomMode === 'FreeToSpeak') {
     Object.assign(roomParams, {
-      enableAudio: true,
-      enableVideo: true,
-      enableMessage: true,
-      enableSeatControl: false,
+      speechMode: TUISpeechMode.kFreeToSpeak,
     });
   } else {
     Object.assign(roomParams, {
-      enableAudio: true,
-      enableVideo: true,
-      enableMessage: true,
-      enableSeatControl: true,
+      speechMode: TUISpeechMode.kSpeakAfterTakingSeat,
     });
   }
   await roomEngine.instance?.createRoom(roomParams);
@@ -193,17 +186,19 @@ async function createRoom(options: {
     code: 0,
     message: 'create room success',
   });
-  await roomEngine.instance?.enterRoom({ roomId });
+  const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
   emit('on-enter-room', {
     code: 0,
     message: 'enter room success',
   });
-  const roomInfo = await roomEngine.instance?.getRoomInfo();
   roomStore.setRoomInfo(roomInfo);
-  // 房主上麦
-  await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
-  // 及时更新本地用户 onSeat 属性
-  roomStore.setLocalUser({ onSeat: true });
+  // 申请发言模式房主上麦
+  if (roomInfo.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) {
+    await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+    // 及时更新本地用户 onSeat 属性
+    roomStore.setLocalUser({ onSeat: true });
+  }
+
   await getUserList();
   /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
@@ -224,11 +219,6 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
   console.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
   const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
   roomStore.setRoomInfo(roomInfo);
-  // 自由发言模式
-  if (!roomInfo.enableSeatControl) {
-    await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
-    roomStore.setLocalUser({ onSeat: true });
-  }
   await getUserList();
   /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
@@ -292,16 +282,16 @@ const onError = (error: any) => {
   console.error('roomEngine.onError: ', error);
 };
 
-const onUserMuteStateChanged = (data: { userId: string, muted: boolean }) => {
-  const { userId, muted } = data;
+const onSendMessageForUserDisableChanged = (data: { userId: string, isDisable: boolean }) => {
+  const { userId, isDisable } = data;
   if (userId === localUser.value.userId) {
-    const tipMessage = muted ? t('You have been banned from text chat by the host') : t('You are allowed to text chat by the host');
+    const tipMessage = isDisable ? t('You have been banned from text chat by the host') : t('You are allowed to text chat by the host');
     ElMessage({
       type: 'warning',
       message: tipMessage,
       duration: MESSAGE_DURATION.NORMAL,
     });
-    chatStore.setIsMuteChatByMater(muted);
+    chatStore.setIsMuteChatByMater(isDisable);
   }
 };
 
@@ -311,6 +301,8 @@ const onKickedOutOfRoom = async (eventInfo: { roomId: string, message: string })
     resetStore();
     ElMessageBox.alert(t('kicked out of the room by the host'), t('Note'), {
       confirmButtonText: t('Confirm'),
+      customClass: 'custom-element-class',
+      appendTo: '#roomContainer',
       callback: async () => {
         emit('on-kicked-out-of-room', { roomId, message });
       },
@@ -323,6 +315,8 @@ const onKickedOutOfRoom = async (eventInfo: { roomId: string, message: string })
 const onUserSigExpired = () => {
   ElMessageBox.alert('userSig 已过期', t('Note'), {
     confirmButtonText: t('Confirm'),
+    customClass: 'custom-element-class',
+    appendTo: '#roomContainer',
     callback: async () => {
       emit('on-userSig-expired');
     },
@@ -333,6 +327,8 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
   const { message } = eventInfo;
   ElMessageBox.alert('系统检测到您的账号被踢下线', t('Note'), {
     confirmButtonText: t('Confirm'),
+    customClass: 'custom-element-class',
+    appendTo: '#roomContainer',
     callback: async () => {
       emit('on-kicked-off-line', { message });
     },
@@ -340,8 +336,8 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
 };
 
 // todo: 处理禁言所有人和禁画所有人
-async function handleEnableAudioChange(enableAudio: boolean) {
-  const tipMessage = enableAudio ? t('The host has unmuted all') : t('The host has muted all');
+async function handleAudioStateChange(isDisableAudio: boolean) {
+  const tipMessage = !isDisableAudio ? t('The host has unmuted all') : t('The host has muted all');
   ElMessage({
     type: 'warning',
     message: tipMessage,
@@ -352,14 +348,14 @@ async function handleEnableAudioChange(enableAudio: boolean) {
    *
    * 如果主持人解除全员禁言，不主动调起用户麦克风
   **/
-  if (!enableAudio) {
+  if (isDisableAudio) {
     await roomEngine.instance?.closeLocalMicrophone();
     await roomEngine.instance?.stopPushLocalAudio();
   }
 }
 
-async function handleEnableVideoChange(enableVideo: boolean) {
-  const tipMessage = enableVideo ? t('The host has lifted the ban on all paintings') : t('The host has turned on the ban on all paintings');
+async function handleVideoStateChange(isDisableVideo: boolean) {
+  const tipMessage = !isDisableVideo ? t('The host has lifted the ban on all paintings') : t('The host has turned on the ban on all paintings');
   ElMessage({
     type: 'warning',
     message: tipMessage,
@@ -370,24 +366,29 @@ async function handleEnableVideoChange(enableVideo: boolean) {
    *
    * 如果主持人解除全员禁画，不主动调起用户摄像头
   **/
-  if (!enableVideo) {
+  if (isDisableVideo) {
     await roomEngine.instance?.closeLocalCamera();
     await roomEngine.instance?.stopPushLocalVideo();
   }
 }
 
-const onRoomInfoChanged = (eventInfo: { roomId: string, roomInfo: TUIRoomInfo}) => {
-  const { roomInfo } = eventInfo;
-  const { enableAudio, enableVideo } = roomInfo;
-  if (enableAudio !== roomStore.enableAudio) {
-    handleEnableAudioChange(enableAudio);
+const onAllUserCameraDisableChanged =  async (eventInfo: { roomId: string, isDisable: boolean }) => {
+  const { isDisable } = eventInfo;
+  if (isDisable !== roomStore.isCameraDisableForAllUser) {
+    handleVideoStateChange(isDisable);
   }
-  if (enableVideo !== roomStore.enableVideo) {
-    handleEnableVideoChange(enableVideo);
-  }
-  roomStore.setRoomInfo(roomInfo);
+  roomStore.setDisableCameraForAllUserByAdmin(isDisable);
+  roomStore.setCanControlSelfVideo(!roomStore.isCameraDisableForAllUser);
 };
 
+const onAllUserMicrophoneDisableChanged = async (eventInfo: { roomId: string, isDisable: boolean }) => {
+  const { isDisable } = eventInfo;
+  if (isDisable !== roomStore.isMicrophoneDisableForAllUser) {
+    handleAudioStateChange(isDisable);
+  }
+  roomStore.setDisableMicrophoneForAllUserByAdmin(isDisable);
+  roomStore.setCanControlSelfAudio(!roomStore.isMicrophoneDisableForAllUser);
+};
 // 初始化获取设备列表
 async function getMediaDeviceList() {
   const cameraList = await roomEngine.instance?.getCameraDevicesList();
@@ -464,12 +465,12 @@ TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolumeChanged);
   roomEngine.instance?.on(TUIRoomEvents.onUserNetworkQualityChanged, onUserNetworkQualityChanged);
   roomEngine.instance?.on(TUIRoomEvents.onKickedOutOfRoom, onKickedOutOfRoom);
-  roomEngine.instance?.on(TUIRoomEvents.onUserMuteStateChanged, onUserMuteStateChanged);
+  roomEngine.instance?.on(TUIRoomEvents.onSendMessageForUserDisableChanged, onSendMessageForUserDisableChanged);
   roomEngine.instance?.on(TUIRoomEvents.onUserSigExpired, onUserSigExpired);
   roomEngine.instance?.on(TUIRoomEvents.onKickedOffLine, onKickedOffLine);
-  roomEngine.instance?.on(TUIRoomEvents.onRoomInfoChanged, onRoomInfoChanged);
+  roomEngine.instance?.on(TUIRoomEvents.onAllUserCameraDisableChanged, onAllUserCameraDisableChanged);
+  roomEngine.instance?.on(TUIRoomEvents.onAllUserMicrophoneDisableChanged, onAllUserMicrophoneDisableChanged);
   roomEngine.instance?.on(TUIRoomEvents.onDeviceChange, onDeviceChange);
-
   getMediaDeviceList();
 });
 
@@ -478,10 +479,11 @@ onUnmounted(() => {
   roomEngine.instance?.off(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolumeChanged);
   roomEngine.instance?.off(TUIRoomEvents.onUserNetworkQualityChanged, onUserNetworkQualityChanged);
   roomEngine.instance?.off(TUIRoomEvents.onKickedOutOfRoom, onKickedOutOfRoom);
-  roomEngine.instance?.off(TUIRoomEvents.onUserMuteStateChanged, onUserMuteStateChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onSendMessageForUserDisableChanged, onSendMessageForUserDisableChanged);
   roomEngine.instance?.off(TUIRoomEvents.onUserSigExpired, onUserSigExpired);
   roomEngine.instance?.off(TUIRoomEvents.onKickedOffLine, onKickedOffLine);
-  roomEngine.instance?.off(TUIRoomEvents.onRoomInfoChanged, onRoomInfoChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onAllUserCameraDisableChanged, onAllUserCameraDisableChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onAllUserMicrophoneDisableChanged, onAllUserMicrophoneDisableChanged);
   roomEngine.instance?.off(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 

@@ -196,6 +196,7 @@ onUnmounted(() => {
   }
   .user-control-container {
     background: var(--user-control-container-color-bg);
+    box-shadow: var(--user-control-container-shadow);
     color: var(--color-font);
     padding: 10px 0;
     position: absolute;

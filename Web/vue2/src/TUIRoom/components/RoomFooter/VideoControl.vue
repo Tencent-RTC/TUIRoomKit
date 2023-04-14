@@ -57,7 +57,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, Ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from '../../elementComp';
+import { ElMessageBox, ElMessage } from '../../elementComp';
 
 import IconButton from '../common/IconButton.vue';
 import VideoSettingTab from '../base/VideoSettingTab.vue';
@@ -77,7 +77,7 @@ const roomStore = useRoomStore();
 const emits = defineEmits(['click']);
 
 const {
-  enableVideo,
+  isCameraDisableForAllUser,
   isAudience,
   localStream,
   isLocalVideoIconDisable,
@@ -95,10 +95,10 @@ const iconName = computed(() => {
   return localStream.value.hasVideoStream ? ICON_NAME.CameraOn : ICON_NAME.CameraOff;
 });
 
-function toggleMuteVideo() {
+async function toggleMuteVideo() {
   if (isLocalVideoIconDisable.value) {
     let warningMessage = '';
-    if (!enableVideo.value) {
+    if (isCameraDisableForAllUser.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_MUTE_ALL;
     } else if (isAudience.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_AUDIENCE;
@@ -115,16 +115,27 @@ function toggleMuteVideo() {
     roomEngine.instance?.closeLocalCamera();
     roomEngine.instance?.stopPushLocalVideo();
     // 如果是全员禁画状态下，用户主动关闭摄像头之后不能再自己打开
-    if (!roomStore.enableVideo) {
+    if (roomStore.isCameraDisableForAllUser) {
       roomStore.setCanControlSelfVideo(false);
     }
   } else {
-    roomEngine.instance?.setLocalRenderView({
+    const cameraList = await roomEngine.instance?.getCameraDevicesList();
+    const hasCameraDevice = cameraList.length > 0;
+    // 无摄像头列表
+    if (!hasCameraDevice) {
+      ElMessageBox.alert(t('Camera not detected on current device'), t('Note'), {
+        customClass: 'custom-element-class',
+        confirmButtonText: t('Confirm'),
+      });
+      return;
+    }
+    // 有摄像头列表
+    roomEngine.instance?.setLocalVideoView({
       view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
       streamType: TUIVideoStreamType.kCameraStream,
     });
-    roomEngine.instance?.openLocalCamera();
-    roomEngine.instance?.startPushLocalVideo();
+    await roomEngine.instance?.openLocalCamera();
+    await roomEngine.instance?.startPushLocalVideo();
   }
   showVideoSettingTab.value = false;
 }
@@ -162,7 +173,7 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
 // 接受主持人邀请，打开摄像头
 async function handleAccept() {
   roomStore.setCanControlSelfVideo(true);
-  roomEngine.instance?.setLocalRenderView({
+  roomEngine.instance?.setLocalVideoView({
     view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
     streamType: TUIVideoStreamType.kCameraStream,
   });

@@ -37,7 +37,7 @@ const chatStore = useChatStore();
 const roomStore = useRoomStore();
 
 const { isMuteChatByMater } = storeToRefs(chatStore);
-const { enableMessage } = storeToRefs(roomStore);
+const { isMessageDisableForAllUser } = storeToRefs(roomStore);
 const editorInputEle = ref();
 const sendMsg = ref('');
 
@@ -47,14 +47,12 @@ watch(isMuteChatByMater, (value) => {
   }
 });
 
-watch(enableMessage, (value) => {
-  if (!value) {
+watch(isMessageDisableForAllUser, (value) => {
+  if (value) {
     sendMsg.value = '';
   }
 });
-
-const cannotSendMessage = computed(() => Boolean(isMuteChatByMater.value || !enableMessage.value));
-
+const cannotSendMessage = computed(() => Boolean(isMuteChatByMater.value || isMessageDisableForAllUser.value));
 const sendMessage = async () => {
   const msg = sendMsg.value.replace('\n', '');
   sendMsg.value = '';
