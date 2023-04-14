@@ -5,6 +5,7 @@
   --input-color: rgba(27,30,38,0.90);
   --create-room-mode-color-bg:#1D2437;
   --user-control-container-color-bg: rgba(46,50,61,0.60);
+  --user-control-container-shadow: none;
   --stream-container-flatten-bg-color: #0D0F15;
   --room-header-bg-color: #1D2029;
   --room-footer-bg-color: #1D2029;
@@ -57,7 +58,7 @@
   --manage-member-svg: url(../icons/svg/manage-member.svg);
   --manage-member-active-svg: url(../icons/svg/manage-member-active.svg);
   --chat-svg: url(../icons/svg/chat.svg);
-  --chat-active-svg: url(../icons/svg/chat.svg);
+  --chat-active-svg: url(../icons/svg/chat-active.svg);
   --more-active-svg: url(../icons/svg/more-active.svg);
   --more-svg: url(../icons/svg/more.svg);
   --room-sidebar-bg-color: #1D2029;

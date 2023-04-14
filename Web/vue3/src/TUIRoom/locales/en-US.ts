@@ -171,4 +171,7 @@ export default {
   'Failed to enter the room.': 'Failed to enter the room.',
   'Has been full static painting, can not share your screen': 'Has been full static painting, can not share your screen.',
   'Load More': 'Load More',
+  'Microphone not detected on current device': 'Microphone not detected on current device',
+  'Camera not detected on current device': 'Camera not detected on current device',
+  'Camera And Microphone not detected on current device': 'Camera And Microphone not detected on current device',
 };

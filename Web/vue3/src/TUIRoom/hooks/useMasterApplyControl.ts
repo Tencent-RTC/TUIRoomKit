@@ -111,7 +111,7 @@ export default function () {
   // 邀请用户上台
   async function inviteUserOnStage(userInfo: UserInfo) {
     const { userId } = userInfo;
-    const requestId = await roomEngine.instance?.requestRemoteUserOnSeat({
+    const request = await roomEngine.instance?.takeUserOnSeatByAdmin({
       seatIndex: -1,
       userId,
       timeout: 0,
@@ -142,7 +142,9 @@ export default function () {
         }
       },
     });
-    requestId && roomStore.addInviteToAnchorUser({ userId, requestId });
+    if (request && request.requestId) {
+      roomStore.addInviteToAnchorUser({ userId, requestId: request.requestId });
+    }
   }
 
   // 取消邀请用户上台
@@ -156,7 +158,7 @@ export default function () {
 
   // 邀请下台
   function kickUserOffStage(userInfo: UserInfo) {
-    roomEngine.instance?.kickRemoteUserOffSeat({
+    roomEngine.instance?.kickUserOffSeatByAdmin({
       seatIndex: -1,
       userId: userInfo.userId,
     });

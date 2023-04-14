@@ -32,11 +32,11 @@
           </div>
           <div class="connect-region"></div>
           <div v-show="showCreateRoomOption" class="create-room-mode">
-            <div class="create-room-option" @click="createRoom('FreeSpeech')">
+            <div class="create-room-option" @click="createRoom('FreeToSpeak')">
               <svg-icon class="icon" icon-name="free-speech-icon"></svg-icon>
               <span class="title">{{ t('Free Speech Room') }}</span>
             </div>
-            <div class="create-room-option" @click="createRoom('ApplySpeech')">
+            <div class="create-room-option" @click="createRoom('SpeakAfterTakingSeat')">
               <svg-icon class="icon" icon-name="apply-speech-icon"></svg-icon>
               <span class="title">{{ t('Raise Hand Room') }}</span>
             </div>
