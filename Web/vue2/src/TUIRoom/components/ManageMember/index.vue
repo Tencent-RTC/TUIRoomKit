@@ -15,7 +15,7 @@
           <span class="setting-name">{{ t('Disable all audios') }}</span>
         </div>
         <div class="item-right-section">
-          <el-switch :value="!roomStore.enableAudio" @change="toggleAllAudio" />
+          <el-switch :value="roomStore.isMicrophoneDisableForAllUser" @change="toggleAllAudio" />
         </div>
       </div>
       <div class="setting-item">
@@ -26,7 +26,7 @@
           <span class="setting-name">{{ t('Disable all videos') }}</span>
         </div>
         <div class="item-right-section">
-          <el-switch :value="!roomStore.enableVideo" @change="toggleAllVideo" />
+          <el-switch :value="roomStore.isCameraDisableForAllUser" @change="toggleAllVideo" />
         </div>
       </div>
     </div>
@@ -52,6 +52,7 @@ import { useBasicStore } from '../../stores/basic';
 import { ICON_NAME } from '../../constants/icon';
 import MemberItem from './MemberItem/index.vue';
 import { useI18n } from '../../locales';
+import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-js';
 
 const roomEngine = useGetRoomEngine();
 
@@ -67,19 +68,21 @@ function showApplyUserLit() {
 }
 
 async function toggleAllAudio() {
-  const newEnableAudio = !roomStore.enableAudio;
-  await roomEngine.instance?.updateRoomInfo({
-    enableAudio: newEnableAudio,
+  const microphoneDisableState = !roomStore.isMicrophoneDisableForAllUser;
+  await roomEngine.instance?.disableDeviceForAllUserByAdmin({
+    isDisable: microphoneDisableState,
+    device: TUIMediaDevice.kMicrophone,
   });
-  roomStore.setEnableAudio(newEnableAudio);
+  roomStore.setMicrophoneDisableState(microphoneDisableState);
 }
 
 async function toggleAllVideo() {
-  const newEnableVideo = !roomStore.enableVideo;
-  await roomEngine.instance?.updateRoomInfo({
-    enableVideo: newEnableVideo,
+  const cameraDisableState = !roomStore.isCameraDisableForAllUser;
+  await roomEngine.instance?.disableDeviceForAllUserByAdmin({
+    isDisable: cameraDisableState,
+    device: TUIMediaDevice.kCamera,
   });
-  roomStore.setEnableVideo(newEnableVideo);
+  roomStore.setCameraDisableState(cameraDisableState);
 }
 </script>
 

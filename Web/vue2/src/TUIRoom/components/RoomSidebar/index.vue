@@ -70,6 +70,7 @@ const onReceiveTextMessage = (data: { roomId: string, message: any }) => {
   }
 };
 
+
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onReceiveTextMessage, onReceiveTextMessage);
 });
