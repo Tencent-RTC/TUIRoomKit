@@ -161,7 +161,7 @@ async function transferAndLeave() {
   }
   try {
     const userId = selectedUser.value;
-    const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({ userId, role: TUIRole.kRoomOwner });
+    const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({ userId, userRole: TUIRole.kRoomOwner });
     console.log(`${logPrefix}transferAndLeave:`, changeUserRoleResponse);
     await closeMediaBeforeLeave();
     const exitRoomResponse = await roomEngine.instance?.exitRoom();
@@ -185,6 +185,7 @@ const onRoomDismissed = async (eventInfo: { roomId: string}) => {
     ElMessageBox.alert(t('The host closed the room.'), t('Note'), {
       customClass: 'custom-element-class',
       confirmButtonText: t('Confirm'),
+      appendTo: '#roomContainer',
       callback: async () => {
         resetState();
         emit('on-destroy-room', { code: 0, message: '' });
@@ -199,35 +200,38 @@ const onRoomDismissed = async (eventInfo: { roomId: string}) => {
  * By listening for a change in ownerId,
  * the audience receives a notification that the host has handed over the privileges
  *
- * 通过监听ownerId发生改变，观众收到主持人移交权限通知
 **/
-watch(() => roomStore.masterUserId, (newVal: string, oldVal: string) => {
-  // 创建房间或者进入房间时，oldVal为''
-  if (oldVal !== '' && newVal !== '' && newVal !== oldVal) {
-    let newName = roomStore.getUserName(newVal) || newVal;
-    if (newVal === localUser.value.userId) {
+
+const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }) => {
+  if (eventInfo.userRole === TUIRole.kRoomOwner) {
+    const { userId } = eventInfo;
+    let newName = roomStore.getUserName(userId) || userId;
+    if (userId === localUser.value.userId) {
       newName = t('me');
     }
-    const tipMessage =  `${t('Moderator changed to ')}${newName}`;
+    const tipMessage = `${t('Moderator changed to ')}${newName}`;
     ElMessage({
       type: 'success',
       message: tipMessage,
     });
-    if (roomStore.localUser.userId === newVal) {
-      roomStore.setLocalUser({ role: TUIRole.kRoomOwner });
+    if (roomStore.localUser.userId === userId) {
+      roomStore.setLocalUser({ userRole: TUIRole.kRoomOwner });
     } else {
-      roomStore.setRemoteUserRole(newVal, TUIRole.kRoomOwner);
+      roomStore.setRemoteUserRole(userId, TUIRole.kRoomOwner);
     }
+    roomStore.setMasterUserId(userId);
     resetState();
   }
-});
+};
 
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRoomDismissed, onRoomDismissed);
+  roomEngine.instance?.on(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
 });
 
 onUnmounted(() => {
   roomEngine.instance?.off(TUIRoomEvents.onRoomDismissed, onRoomDismissed);
+  roomEngine.instance?.off(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
 });
 
 </script>

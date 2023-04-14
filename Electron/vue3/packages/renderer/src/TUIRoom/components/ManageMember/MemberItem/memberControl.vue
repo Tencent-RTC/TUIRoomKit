@@ -6,12 +6,17 @@
     >
       {{ singleControl.title }}
     </div>
-    <div class="more-container">
+    <div class="more-container" @click="handlePopUp">
       <div class="more-btn" @click="toggleClickMoreBtn">
         {{ t('More') }}
         <svg-icon class="more-icon" :icon-name="ICON_NAME.ArrowBorderDown"></svg-icon>
       </div>
-      <div v-show="showMoreControl" class="user-operate-list">
+      <div
+        v-show="showMoreControl"
+        id="operate-list"
+        :class="dropdownClass"
+        @mouseleave="handleMouseLeave"
+      >
         <div
           v-for="item, index in controlList"
           :key="index"
@@ -35,12 +40,13 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
 import SvgIcon from '../../common/SvgIcon.vue';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
-
+import { TUIMediaDevice, TUISpeechMode } from '@tencentcloud/tuiroom-engine-electron';
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
+const dropdownClass = ref('');
 /**
  * Functions related to the Raise Your Hand function
  *
@@ -64,8 +70,8 @@ const showMoreControl = ref(false);
 const isMe = computed(() => basicStore.userId === props.userInfo.userId);
 const isAnchor = computed(() => props.userInfo.onSeat === true);
 const isAudience = computed(() => props.userInfo.onSeat !== true);
-const isFreeSpeechMode = computed(() => roomStore.enableSeatControl === false);
-const isApplyRoomMode = computed(() => roomStore.enableSeatControl === true);
+const isFreeSpeechMode = computed(() => roomStore.speechMode === TUISpeechMode.kFreeToSpeak);
+const isApplyRoomMode = computed(() => roomStore.speechMode === TUISpeechMode.kSpeakAfterTakingSeat);
 /**
 * Control the centralized matching of elements
  *
@@ -115,6 +121,18 @@ const isApplyRoomMode = computed(() => roomStore.enableSeatControl === true);
  *              禁止聊天
  *              踢出房间
 **/
+function handlePopUp() {
+  const dropdown = document.getElementById('operate-list');
+  const roomContainer = document.getElementById('roomContainer');
+  const dropdownRectBottom = dropdown !== null && dropdown.getBoundingClientRect().bottom;
+  const roomContainerHeight = roomContainer !== null && roomContainer.offsetHeight;
+  if (dropdownRectBottom > roomContainerHeight) {
+    dropdownClass.value = 'user-operate-list dropdownUp';
+  } else {
+    dropdownClass.value = 'user-operate-list';
+  }
+};
+
 const singleControl = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const control = { title: '', func: (userInfo: UserInfo) => {} };
@@ -174,6 +192,9 @@ const controlList = computed(() => {
 function toggleClickMoreBtn() {
   showMoreControl.value = !showMoreControl.value;
 }
+function handleMouseLeave() {
+  showMoreControl.value = false;
+}
 
 /**
  * Invitation to the stage/uninvitation to the stage
@@ -196,8 +217,9 @@ async function toggleInviteUserOnStage(userInfo: UserInfo) {
 **/
 async function muteUserAudio(userInfo: UserInfo) {
   if (userInfo.hasAudioStream) {
-    await roomEngine.instance?.closeRemoteMicrophone({
+    await roomEngine.instance?.closeRemoteDeviceByAdmin({
       userId: userInfo.userId,
+      device: TUIMediaDevice.kMicrophone,
     });
   } else {
     if (userInfo.isRequestingUserOpenMic) {
@@ -205,15 +227,18 @@ async function muteUserAudio(userInfo: UserInfo) {
       requestId && await roomEngine.instance?.cancelRequest({ requestId });
       roomStore.setRequestUserOpenMic({ userId: userInfo.userId, isRequesting: false });
     } else {
-      const requestId = await roomEngine.instance?.requestToOpenRemoteMicrophone({
+      const request = await roomEngine.instance?.openRemoteDeviceByAdmin({
         userId: userInfo.userId,
+        device: TUIMediaDevice.kMicrophone,
         timeout: 0,
         requestCallback: () => {
           // 处理请求超时，应答，拒绝的情况
           roomStore.setRequestUserOpenMic({ userId: userInfo.userId, isRequesting: false });
         },
       });
-      requestId && roomStore.setRequestUserOpenMic({ userId: userInfo.userId, isRequesting: true, requestId });
+      if (request && request.requestId) {
+        roomStore.setRequestUserOpenMic({ userId: userInfo.userId, isRequesting: true, requestId: request.requestId });
+      }
     }
   }
 }
@@ -225,8 +250,9 @@ async function muteUserAudio(userInfo: UserInfo) {
 **/
 async function muteUserVideo(userInfo: UserInfo) {
   if (userInfo.hasVideoStream) {
-    await roomEngine.instance?.closeRemoteCamera({
+    await roomEngine.instance?.closeRemoteDeviceByAdmin({
       userId: userInfo.userId,
+      device: TUIMediaDevice.kCamera,
     });
   } else {
     if (userInfo.isRequestingUserOpenCamera) {
@@ -234,19 +260,25 @@ async function muteUserVideo(userInfo: UserInfo) {
       requestId && await roomEngine.instance?.cancelRequest({ requestId });
       roomStore.setRequestUserOpenCamera({ userId: userInfo.userId, isRequesting: false });
     } else {
-      const requestId = await roomEngine.instance?.requestToOpenRemoteCamera({
+      const request = await roomEngine.instance?.openRemoteDeviceByAdmin({
         userId: userInfo.userId,
+        device: TUIMediaDevice.kCamera,
         timeout: 0,
         requestCallback: () => {
           // 处理请求超时，应答，拒绝的情况
           roomStore.setRequestUserOpenCamera({ userId: userInfo.userId, isRequesting: false });
         },
       });
-      requestId && roomStore.setRequestUserOpenCamera({ userId: userInfo.userId, isRequesting: true, requestId });
+      if (request && request.requestId) {
+        roomStore.setRequestUserOpenCamera({
+          userId: userInfo.userId,
+          isRequesting: true,
+          requestId: request.requestId,
+        });
+      }
     }
   }
 }
-
 /**
  * Allow text chat / Cancel text chat
  *
@@ -256,13 +288,14 @@ function muteUserChat(userInfo: UserInfo) {
   const currentState = userInfo.isChatMutedByMaster;
   roomStore.setMuteUserChat(userInfo.userId, !currentState);
   if (currentState) {
-    roomEngine.instance?.unmuteRemoteUser({
+    roomEngine.instance?.disableSendingMessageByAdmin({
       userId: userInfo.userId,
+      isDisable: false,
     });
   } else {
-    roomEngine.instance?.muteRemoteUser({
+    roomEngine.instance?.disableSendingMessageByAdmin({
       userId: userInfo.userId,
-      duration: 24 * 60 * 60,
+      isDisable: true,
     });
   }
 }
@@ -273,7 +306,7 @@ function muteUserChat(userInfo: UserInfo) {
  * 将用户踢出房间
 **/
 function kickOffUser(userInfo: UserInfo) {
-  roomEngine.instance?.kickOutRemoteUser({
+  roomEngine.instance?.kickRemoteUserOutOfRoom({
     userId: userInfo.userId,
   });
 }
@@ -329,6 +362,9 @@ function kickOffUser(userInfo: UserInfo) {
         line-height: 40px;
         white-space: nowrap;
       }
+    }
+    .dropdownUp {
+      transform: translateY(-140%);
     }
   }
 }

@@ -13,7 +13,7 @@
 -->
 <template>
   <el-select
-    v-model="localVideoProfile"
+    v-model="localVideoQuality"
     placeholder="placeholder"
     class="select custom-element-class"
     :teleported="false"
@@ -32,29 +32,29 @@
 import { computed, watch } from 'vue';
 import { useI18n } from '../../locales';
 
-import TUIRoomEngine, { TUIVideoProfile } from '@tencentcloud/tuiroom-engine-electron';
+import TUIRoomEngine, { TUIVideoQuality } from '@tencentcloud/tuiroom-engine-electron';
 import { useRoomStore } from '../../stores/room';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { storeToRefs } from 'pinia';
 
 const roomEngine = useGetRoomEngine();
 const roomStore = useRoomStore();
-const { localVideoProfile } = storeToRefs(roomStore);
+const { localVideoQuality } = storeToRefs(roomStore);
 
 const { t } = useI18n();
 
 const videoProfileList = computed(() => [
-  { label: t('Low Definition'), value: TUIVideoProfile.kLowDefinition },
-  { label: t('Standard Definition'), value: TUIVideoProfile.kStandardDefinition },
-  { label: t('High Definition'), value: TUIVideoProfile.kHighDefinition },
-  { label: t('Super Definition'), value: TUIVideoProfile.kSuperDefinition }]);
+  { label: t('Low Definition'), value: TUIVideoQuality.kVideoQuality_360p },
+  { label: t('Standard Definition'), value: TUIVideoQuality.kVideoQuality_540p },
+  { label: t('High Definition'), value: TUIVideoQuality.kVideoQuality_720p },
+  { label: t('Super Definition'), value: TUIVideoQuality.kVideoQuality_1080p }]);
 
-watch(localVideoProfile, (val: TUIVideoProfile) => {
-  roomEngine.instance?.setLocalVideoProfile({ videoProfile: val });
+watch(localVideoQuality, (val: TUIVideoQuality) => {
+  roomEngine.instance?.updateVideoQuality({ quality: val });
 });
 
 TUIRoomEngine.once('ready', () => {
-  roomEngine.instance?.setLocalVideoProfile({ videoProfile: localVideoProfile.value });
+  roomEngine.instance?.updateVideoQuality({ quality: localVideoQuality.value });
 });
 </script>
 

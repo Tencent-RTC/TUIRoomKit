@@ -15,6 +15,7 @@ import IconButton from '../common/IconButton.vue';
 import { setFullScreen, exitFullScreen } from '../../utils/utils';
 import { ICON_NAME } from '../../constants/icon';
 import { useI18n } from '../../locales';
+import { isVue27 } from '../../utils/constants';
 
 const { t } = useI18n();
 
@@ -31,9 +32,14 @@ const iconName = computed((): string => (isFullScreen.value ?  ICON_NAME.ExitFul
 function toggleScreen() {
   if (isFullScreen.value) {
     exitFullScreen();
-  } else  {
-    const roomContainer = document.getElementById('roomContainer');
-    roomContainer && setFullScreen(roomContainer);
+  } else {
+    if (isVue27) {
+      const roomContainer = document.body;
+      roomContainer && setFullScreen(roomContainer);
+    } else {
+      const roomContainer = document.getElementById('roomContainer');
+      roomContainer && setFullScreen(roomContainer);
+    }
   }
 }
 

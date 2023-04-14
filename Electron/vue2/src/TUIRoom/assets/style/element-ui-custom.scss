@@ -43,6 +43,9 @@
 .el-dialog__header,.el-dialog__body,.el-dialog__footer{
     background-color: var(--el-dialog-bg-color) !important;
 }
+.el-dialog__body {
+    color: #7C85A6 !important;
+}
 .el-dialog__title{
     color:var(--el-text-color-primary) !important;
 }
