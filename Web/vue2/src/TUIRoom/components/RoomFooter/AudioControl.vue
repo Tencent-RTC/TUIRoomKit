@@ -106,8 +106,8 @@ async function toggleMuteAudio() {
     return;
   }
   if (localStream.value.hasAudioStream) {
-    roomEngine.instance?.closeLocalMicrophone();
-    roomEngine.instance?.stopPushLocalAudio();
+    await roomEngine.instance?.closeLocalMicrophone();
+    await roomEngine.instance?.stopPushLocalAudio();
     // 如果是全员禁言状态下，用户主动关闭麦克风之后不能再自己打开
     if (roomStore.isMicrophoneDisableForAllUser) {
       roomStore.setCanControlSelfAudio(false);
