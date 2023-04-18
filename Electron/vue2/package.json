@@ -20,7 +20,8 @@
     "pack:mac-universal": "npm run build:mac && npm run compile:mac-universal",
     "pack:win64": "npm run build:win && npm run compile:win64",
     "postinstall-mac:x64": "rsync -a ./node_modules/trtc-electron-sdk/build/mac-framework/x64/ ./node_modules/electron/dist/Electron.app/Contents/Frameworks",
-    "postinstall-mac:arm64": "rsync -a ./node_modules/trtc-electron-sdk/build/mac-framework/arm64/ ./node_modules/electron/dist/Electron.app/Contents/Frameworks"
+    "postinstall-mac:arm64": "rsync -a ./node_modules/trtc-electron-sdk/build/mac-framework/arm64/ ./node_modules/electron/dist/Electron.app/Contents/Frameworks",
+    "postinstall": "node scripts/postinstall.js"
   },
   "build": {
     "appId": "com.tencentcloud.trtc.room-kit-electron-vue2",
@@ -67,7 +68,7 @@
     "pinia": "^2.0.28",
     "sass": "^1.57.1",
     "tim-js-sdk": "^2.24.2",
-    "trtc-electron-sdk": "10.9.405-beta.0",
+    "trtc-electron-sdk": "^10.9.405-beta.0",
     "tsignaling": "^0.10.0",
     "vue": "^2.7.14",
     "vue-class-component": "^7.2.3",
