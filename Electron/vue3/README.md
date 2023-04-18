@@ -73,6 +73,7 @@
    cd TUIRoomKit/Electron/vue3
    
    npm install
+   npm install trtc-electron-sdk@10.9.405-beta.1
    ```
 
     > **注意**
