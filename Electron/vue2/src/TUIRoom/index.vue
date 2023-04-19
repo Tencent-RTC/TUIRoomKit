@@ -195,8 +195,6 @@ async function createRoom(options: {
   // 申请发言模式房主上麦
   if (roomInfo.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) {
     await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
-    // 及时更新本地用户 onSeat 属性
-    roomStore.setLocalUser({ onSeat: true });
   }
 
   await getUserList();
@@ -291,7 +289,7 @@ const onSendMessageForUserDisableChanged = (data: { userId: string, isDisable: b
       message: tipMessage,
       duration: MESSAGE_DURATION.NORMAL,
     });
-    chatStore.setIsMuteChatByMater(isDisable);
+    chatStore.setSendMessageDisableChanged(isDisable);
   }
 };
 
@@ -337,7 +335,7 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
 
 // todo: 处理禁言所有人和禁画所有人
 async function handleAudioStateChange(isDisableAudio: boolean) {
-  const tipMessage = !isDisableAudio ? t('The host has unmuted all') : t('The host has muted all');
+  const tipMessage = isDisableAudio ? t('The host has muted all') : t('The host has unmuted all');
   ElMessage({
     type: 'warning',
     message: tipMessage,
@@ -355,7 +353,7 @@ async function handleAudioStateChange(isDisableAudio: boolean) {
 }
 
 async function handleVideoStateChange(isDisableVideo: boolean) {
-  const tipMessage = !isDisableVideo ? t('The host has lifted the ban on all paintings') : t('The host has turned on the ban on all paintings');
+  const tipMessage = isDisableVideo ? t('The host has turned on the ban on all paintings') : t('The host has lifted the ban on all paintings');
   ElMessage({
     type: 'warning',
     message: tipMessage,
@@ -370,6 +368,15 @@ async function handleVideoStateChange(isDisableVideo: boolean) {
     await roomEngine.instance?.closeLocalCamera();
     await roomEngine.instance?.stopPushLocalVideo();
   }
+}
+
+async function handleMessageStateChange(isDisableMessage: boolean) {
+  const tipMessage = isDisableMessage ? t('The host has turned on the ban on all chat') : t('The host has lifted the ban on all chat');
+  ElMessage({
+    type: 'warning',
+    message: tipMessage,
+    duration: MESSAGE_DURATION.NORMAL,
+  });
 }
 
 const onAllUserCameraDisableChanged =  async (eventInfo: { roomId: string, isDisable: boolean }) => {
@@ -388,6 +395,14 @@ const onAllUserMicrophoneDisableChanged = async (eventInfo: { roomId: string, is
   }
   roomStore.setDisableMicrophoneForAllUserByAdmin(isDisable);
   roomStore.setCanControlSelfAudio(!roomStore.isMicrophoneDisableForAllUser);
+};
+
+const onSendMessageForAllUserDisableChanged = async (eventInfo: { roomId: string, isDisable: boolean}) => {
+  const { isDisable } = eventInfo;
+  if (isDisable !== roomStore.isMessageDisableForAllUser) {
+    handleMessageStateChange(isDisable);
+  }
+  roomStore.setDisableMessageAllUserByAdmin(isDisable);
 };
 // 初始化获取设备列表
 async function getMediaDeviceList() {
@@ -470,6 +485,7 @@ TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onKickedOffLine, onKickedOffLine);
   roomEngine.instance?.on(TUIRoomEvents.onAllUserCameraDisableChanged, onAllUserCameraDisableChanged);
   roomEngine.instance?.on(TUIRoomEvents.onAllUserMicrophoneDisableChanged, onAllUserMicrophoneDisableChanged);
+  roomEngine.instance?.on(TUIRoomEvents.onSendMessageForAllUserDisableChanged, onSendMessageForAllUserDisableChanged);
   roomEngine.instance?.on(TUIRoomEvents.onDeviceChange, onDeviceChange);
   getMediaDeviceList();
 });
@@ -484,6 +500,7 @@ onUnmounted(() => {
   roomEngine.instance?.off(TUIRoomEvents.onKickedOffLine, onKickedOffLine);
   roomEngine.instance?.off(TUIRoomEvents.onAllUserCameraDisableChanged, onAllUserCameraDisableChanged);
   roomEngine.instance?.off(TUIRoomEvents.onAllUserMicrophoneDisableChanged, onAllUserMicrophoneDisableChanged);
+  roomEngine.instance?.off(TUIRoomEvents.onSendMessageForAllUserDisableChanged, onSendMessageForAllUserDisableChanged);
   roomEngine.instance?.off(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 

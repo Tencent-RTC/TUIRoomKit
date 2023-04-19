@@ -9,6 +9,7 @@
     "dev": "cross-env VITE_RUNTIME_ENV=github node scripts/watch.mjs",
     "prebuild": "node scripts/build.mjs",
     "build": "electron-builder",
+    "build:mac-universal": "node scripts/build.mjs && electron-builder --universal",
     "postinstall": "node scripts/postinstall.js"
   },
   "engines": {

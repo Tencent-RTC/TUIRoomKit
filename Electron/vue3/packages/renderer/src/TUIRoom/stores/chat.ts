@@ -14,7 +14,7 @@ interface MessageItem {
 
 interface ChatState {
   messageList: MessageItem[];
-  isMuteChatByMater: boolean;
+  isMessageDisableByAdmin: boolean;
   unReadCount: number;
   isCompleted: boolean;
   // 是否已经拉完所有消息列表
@@ -25,7 +25,7 @@ interface ChatState {
 export const useChatStore = defineStore('chat', {
   state: (): ChatState => ({
     messageList: [],
-    isMuteChatByMater: false,
+    isMessageDisableByAdmin: false,
     unReadCount: 0,
     isCompleted: false,
     nextReqMessageId: '',
@@ -53,13 +53,13 @@ export const useChatStore = defineStore('chat', {
       this.messageList = filteredMessageList.concat(this.messageList).sort((
         messageA: MessageItem, messageB: MessageItem) => messageA.sequence - messageB.sequence);
     },
-    setIsMuteChatByMater(isMuteChatByMater: boolean) {
-      this.isMuteChatByMater = isMuteChatByMater;
+    setSendMessageDisableChanged(isDisable: boolean) {
+      this.isMessageDisableByAdmin = isDisable;
     },
     reset() {
       this.messageList = [];
       this.unReadCount = 0;
-      this.isMuteChatByMater = false;
+      this.isMessageDisableByAdmin = false;
     },
   },
 });

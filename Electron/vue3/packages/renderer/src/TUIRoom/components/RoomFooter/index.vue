@@ -14,7 +14,7 @@
       <invite-control @click="handleControlClick('inviteControl')"></invite-control>
       <chat-control @click="handleControlClick('chatControl')"></chat-control>
       <apply-control
-        v-if="roomStore.speechMode === 3"
+        v-if="roomStore.isSpeakAfterTakingSeatMode"
         @click="handleControlClick('applyControl')"
       ></apply-control>
       <more-control @click="handleControlClick('moreControl')"></more-control>

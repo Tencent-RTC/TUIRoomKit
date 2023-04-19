@@ -125,28 +125,37 @@ export const useRoomStore = defineStore('room', {
     },
     // 当前用户是否在麦上
     isAnchor(state) {
-      return state.localUser.onSeat;
+      if (this.isFreeSpeakMode) {
+        return true;
+      }
+      if (this.isSpeakAfterTakingSeatMode) {
+        return state.localUser.onSeat;
+      }
     },
     // 当前用户是否是在麦下
     isAudience(state) {
-      if (this.speechMode === TUISpeechMode.kFreeToSpeak) {
-        return state.localUser.onSeat;
+      if (this.isFreeSpeakMode) {
+        return false;
       }
-      return !state.localUser.onSeat;
+      if (this.isSpeakAfterTakingSeatMode) {
+        return !state.localUser.onSeat;
+      }
+    },
+    isSpeakAfterTakingSeatMode(): boolean {
+      return this.speechMode === TUISpeechMode.kSpeakAfterTakingSeat;
+    },
+    isFreeSpeakMode(): boolean {
+      return this.speechMode === TUISpeechMode.kFreeToSpeak;
     },
     isLocalAudioIconDisable(): boolean {
       // 全员禁麦状态
       const micForbidden = !this.isMaster && !this.canControlSelfAudio;
-      // 举手发言麦下模式
-      const isAudienceRole = (this.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) && this.isAudience;
-      return micForbidden as any || isAudienceRole;
+      return micForbidden as any || this.isAudience;
     },
     isLocalVideoIconDisable(): boolean {
       // 全员禁画状态
       const cameraForbidden = !this.isMaster && !this.canControlSelfVideo;
-      // 举手发言麦下模式
-      const isAudienceRole = (this.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) && this.isAudience;
-      return cameraForbidden || isAudienceRole as any;
+      return cameraForbidden as any || this.isAudience;
     },
     localStream: (state) => {
       const { userId, userName, avatarUrl, hasAudioStream, hasVideoStream, audioVolume } = state.localUser;
@@ -218,7 +227,7 @@ export const useRoomStore = defineStore('room', {
         hasScreenStream: false,
         userRole: TUIRole.kGeneralUser,
         audioVolume: 0,
-        onSeat: true,
+        onSeat: !this.isSpeakAfterTakingSeatMode,
         cameraStreamInfo: {
           userId,
           userName: '',
@@ -275,12 +284,7 @@ export const useRoomStore = defineStore('room', {
       if (this.remoteUserObj[userId]) {
         Object.assign(this.remoteUserObj[userId], userInfo);
       } else {
-        let newUserInfo = {} as any;
-        if (this.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) {
-          newUserInfo = Object.assign(this.getNewUserInfo(userId), { onSeat: false }, userInfo);
-        } else {
-          newUserInfo = Object.assign(this.getNewUserInfo(userId), userInfo);
-        }
+        const newUserInfo = Object.assign(this.getNewUserInfo(userId), userInfo);
         if (isVue3) {
           this.remoteUserObj[userId] = newUserInfo;
         } else {
@@ -424,6 +428,9 @@ export const useRoomStore = defineStore('room', {
     setDisableCameraForAllUserByAdmin(isDisable: boolean) {
       this.isCameraDisableForAllUser = isDisable;
     },
+    setDisableMessageAllUserByAdmin(isDisable: boolean) {
+      this.isMessageDisableForAllUser = isDisable;
+    },
     setMasterUserId(userId: string) {
       this.masterUserId = userId;
     },
@@ -437,12 +444,12 @@ export const useRoomStore = defineStore('room', {
       defaultSpeakerId && this.setCurrentSpeakerId(defaultSpeakerId);
       // 如果已经开启全员禁言/当前为申请发言模式，则忽略默认打开麦克风的设置
       if (this.isMaster || (!this.isMicrophoneDisableForAllUser
-        && (this.speechMode !== TUISpeechMode.kSpeakAfterTakingSeat))) {
+        && this.isFreeSpeakMode)) {
         typeof isOpenMicrophone === 'boolean' && (this.isDefaultOpenMicrophone = isOpenMicrophone);
       }
       // 如果已经开启全员禁画/当前为申请发言模式，则忽略默认打开摄像头的设置
       if (this.isMaster || (!this.isCameraDisableForAllUser
-        && this.speechMode !== TUISpeechMode.kSpeakAfterTakingSeat)) {
+        && this.isFreeSpeakMode)) {
         typeof isOpenCamera === 'boolean' && (this.isDefaultOpenCamera = isOpenCamera);
       }
     },
@@ -474,12 +481,12 @@ export const useRoomStore = defineStore('room', {
       }
     },
     // 全员禁麦/取消禁麦时设置所有人的禁麦状态
-    setMicrophoneDisableState(enable: boolean) {
-      this.isMicrophoneDisableForAllUser = enable;
+    setMicrophoneDisableState(isDisable: boolean) {
+      this.isMicrophoneDisableForAllUser = isDisable;
     },
     // 全员禁画/取消禁画时设置所有人的禁画状态
-    setCameraDisableState(enable: boolean) {
-      this.isCameraDisableForAllUser = enable;
+    setCameraDisableState(isDisable: boolean) {
+      this.isCameraDisableForAllUser = isDisable;
     },
     // 主持人单个修改用户的发文字消息 mute 状态
     setMuteUserChat(userId: string, muted: boolean) {
@@ -584,6 +591,7 @@ export const useRoomStore = defineStore('room', {
       this.isMicrophoneDisableForAllUser = false;
       this.isCameraDisableForAllUser = false;
       this.isMessageDisableForAllUser = false;
+      this.speechMode = TUISpeechMode.kFreeToSpeak;
     },
   },
 });

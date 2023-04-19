@@ -75,8 +75,10 @@
    - 构建符合当前机器 CPU 类型的安装包。适合 Windows 和 Mac 操作系统。
 
    ```bash
-   npm run pack:mac
-   npm run pack:win64
+   npm run pack:mac              // 构建 mac 单架构包 
+   npm run pack:win64            // 构建 windows 包
+
+   npm run pack:mac-universal    // 构建 mac 双架构包
    ```
    > 注意：构建好的安装包位于 bin 目录下。默认只能使用 Mac 电脑构建 Mac 安装包，使用 Windows 电脑构建 Windows 安装包。
 
