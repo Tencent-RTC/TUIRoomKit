@@ -82,18 +82,6 @@ export default {
       }
       return isRoomExist;
     },
-    async checkRoomExistWhenEnterRoom(roomId) {
-      let isRoomExist = false;
-      try {
-        await roomEngine.instance?.enterRoom({ roomId });
-        isRoomExist = true;
-      } catch (error) {
-        if (error.message === 'roomId is no exist') {
-          // 房间不存在
-        }
-      }
-      return isRoomExist;
-    },
     // 创建房间时生成房间号
     async generateRoomId() {
       const roomId = Math.ceil(Math.random() * 1000000);
@@ -111,11 +99,6 @@ export default {
     },
     // 处理点击【进入房间】
     async handleEnterRoom(roomId) {
-      const isRoomExist = await this.checkRoomExistWhenEnterRoom(String(roomId));
-      if (!isRoomExist) {
-        alert(this.$t('The room does not exist, please confirm the room number or create a room!'));
-        return;
-      }
       this.setTUIRoomData('enterRoom');
       this.$router.push({
         path: 'room',
