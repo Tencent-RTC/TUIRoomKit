@@ -52,7 +52,7 @@ function setTUIRoomData(action: string, mode?: string) {
   const roomParam = streamPreviewRef.value.getRoomParam();
   const roomData = {
     action,
-    roomMode: mode || 'FreeSpeech',
+    roomMode: mode || 'FreeToSpeak',
     roomParam,
   };
   sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(roomData));
@@ -66,19 +66,6 @@ async function checkRoomExistWhenCreateRoom(roomId: string) {
     isRoomExist = true;
   } catch (error: any) {
     // 房间不存在
-  }
-  return isRoomExist;
-}
-
-async function checkRoomExistWhenEnterRoom(roomId: string) {
-  let isRoomExist = false;
-  try {
-    await roomEngine.instance?.enterRoom({ roomId });
-    isRoomExist = true;
-  } catch (error: any) {
-    if (error.message === 'roomId is no exist') {
-      // 房间不存在
-    }
   }
   return isRoomExist;
 }
@@ -119,11 +106,6 @@ async function handleCreateRoom(mode: string) {
  * 处理点击【进入房间】
 **/
 async function handleEnterRoom(roomId: string) {
-  const isRoomExist = await checkRoomExistWhenEnterRoom(String(roomId));
-  if (!isRoomExist) {
-    alert(t('The room does not exist, please confirm the room number or create a room!'));
-    return;
-  }
   setTUIRoomData('enterRoom');
   router.replace({
     path: 'room',
