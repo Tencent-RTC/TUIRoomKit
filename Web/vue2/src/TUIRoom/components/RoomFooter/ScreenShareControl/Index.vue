@@ -146,6 +146,7 @@ async function stopScreenShare() {
   }
 }
 
+/** 用户点击浏览器自带的 "停止共享" 按钮*/
 function screenCaptureStopped() {
   isSharing.value = false;
 }

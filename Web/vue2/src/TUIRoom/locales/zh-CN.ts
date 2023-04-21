@@ -155,6 +155,8 @@ export default {
   'Turn on the microphone': '打开麦克风',
   'The host has turned on the ban on all paintings': '主持人已开启全体禁画',
   'The host has lifted the ban on all paintings': '主持人已解除全体禁画',
+  'The host has turned on the ban on all chat': '主持人已开启全体禁止文字聊天',
+  'The host has lifted the ban on all chat': '主持人已解除全体禁止文字聊天',
   'The host has turned off your camera': '主持人已关闭您的摄像头',
   'The host invites you to turn on the camera': '主持人邀请你打开摄像头',
   'The host has turned off your screen sharing': '主持人已关闭您的屏幕分享',
