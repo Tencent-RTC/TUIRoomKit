@@ -36,12 +36,12 @@ const { t } = useI18n();
 const chatStore = useChatStore();
 const roomStore = useRoomStore();
 
-const { isMuteChatByMater } = storeToRefs(chatStore);
+const { isMessageDisableByAdmin } = storeToRefs(chatStore);
 const { isMessageDisableForAllUser } = storeToRefs(roomStore);
 const editorInputEle = ref();
 const sendMsg = ref('');
 
-watch(isMuteChatByMater, (value) => {
+watch(isMessageDisableByAdmin, (value) => {
   if (value) {
     sendMsg.value = '';
   }
@@ -52,7 +52,7 @@ watch(isMessageDisableForAllUser, (value) => {
     sendMsg.value = '';
   }
 });
-const cannotSendMessage = computed(() => Boolean(isMuteChatByMater.value || isMessageDisableForAllUser.value));
+const cannotSendMessage = computed(() => Boolean(isMessageDisableByAdmin.value || isMessageDisableForAllUser.value));
 const sendMessage = async () => {
   const msg = sendMsg.value.replace('\n', '');
   sendMsg.value = '';

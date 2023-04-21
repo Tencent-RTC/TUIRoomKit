@@ -91,9 +91,14 @@ const isCameraMuted = ref(false);
 
 const cameraIconName = computed(() => (isCameraMuted.value ? ICON_NAME.CameraOff : ICON_NAME.CameraOn));
 
-function toggleMuteAudio() {
+async function toggleMuteAudio() {
   isMicMuted.value = !isMicMuted.value;
   tuiRoomParam.isOpenMicrophone = !isMicMuted.value;
+  if (isMicMuted.value) {
+    await roomEngine.instance?.closeLocalMicrophone();
+  } else {
+    await roomEngine.instance?.openLocalMicrophone();
+  }
 }
 
 async function toggleMuteVideo() {

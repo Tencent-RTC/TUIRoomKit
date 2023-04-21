@@ -70,8 +70,8 @@ const showMoreControl = ref(false);
 const isMe = computed(() => basicStore.userId === props.userInfo.userId);
 const isAnchor = computed(() => props.userInfo.onSeat === true);
 const isAudience = computed(() => props.userInfo.onSeat !== true);
-const isFreeSpeechMode = computed(() => roomStore.speechMode === TUISpeechMode.kFreeToSpeak);
-const isApplyRoomMode = computed(() => roomStore.speechMode === TUISpeechMode.kSpeakAfterTakingSeat);
+const isFreeSpeechMode = computed(() => roomStore.isFreeSpeakMode);
+const isSpeakAfterTakingSeat = computed(() => roomStore.isSpeakAfterTakingSeatMode);
 /**
 * Control the centralized matching of elements
  *
@@ -139,7 +139,7 @@ const singleControl = computed(() => {
   if (isFreeSpeechMode.value) {
     control.title = props.userInfo.hasAudioStream ? t('Mute') : (props.userInfo.isRequestingUserOpenMic ? t('Cancel Unmute') : t('Unmute'));
     control.func = muteUserAudio;
-  } else if (isApplyRoomMode.value) {
+  } else if (isSpeakAfterTakingSeat.value) {
     if (isAnchor.value) {
       control.title = props.userInfo.hasAudioStream ? t('Mute') : (props.userInfo.isRequestingUserOpenMic ? t('Cancel Unmute') : t('Unmute'));
       control.func = muteUserAudio;
@@ -171,7 +171,7 @@ const videoControlTitle = computed(() => {
 const videoControl = computed(() => ({ title: videoControlTitle.value, func: muteUserVideo }));
 
 const chatControlTitle = computed(() => (props.userInfo.isChatMutedByMaster ? t('Enable chat') : t('Disable chat')));
-const forbidChat = computed(() => ({ title: chatControlTitle.value, func: muteUserChat }));
+const forbidChat = computed(() => ({ title: chatControlTitle.value, func: disableUserChat }));
 
 const kickUser = computed(() => ({ title: t('Kick out'), func: kickOffUser }));
 const controlList = computed(() => {
@@ -179,7 +179,7 @@ const controlList = computed(() => {
   if (isFreeSpeechMode.value) {
     list.unshift(videoControl.value);
   }
-  if (isAnchor.value && isApplyRoomMode.value) {
+  if (isAnchor.value &&  isSpeakAfterTakingSeat.value) {
     list.unshift(videoControl.value);
     list.splice(1, 0, makeOffStage.value);
   }
@@ -284,20 +284,13 @@ async function muteUserVideo(userInfo: UserInfo) {
  *
  * 允许文字聊天/取消文字聊天
 **/
-function muteUserChat(userInfo: UserInfo) {
+function disableUserChat(userInfo: UserInfo) {
   const currentState = userInfo.isChatMutedByMaster;
   roomStore.setMuteUserChat(userInfo.userId, !currentState);
-  if (currentState) {
-    roomEngine.instance?.disableSendingMessageByAdmin({
-      userId: userInfo.userId,
-      isDisable: false,
-    });
-  } else {
-    roomEngine.instance?.disableSendingMessageByAdmin({
-      userId: userInfo.userId,
-      isDisable: true,
-    });
-  }
+  roomEngine.instance?.disableSendingMessageByAdmin({
+    userId: userInfo.userId,
+    isDisable: !currentState,
+  });
 }
 
 /**

@@ -66,7 +66,7 @@ export default {
       const roomParam = this.$refs.streamPreviewRef.getRoomParam();
       const roomData = {
         action,
-        roomMode: mode || 'FreeSpeech',
+        roomMode: mode || 'FreeToSpeak',
         roomParam,
       };
       sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(roomData));
