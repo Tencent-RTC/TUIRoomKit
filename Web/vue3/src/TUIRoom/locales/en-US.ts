@@ -154,6 +154,8 @@ export default {
   'Turn on the microphone': 'Turn on the microphone',
   'The host has turned on the ban on all paintings': 'The host has turned on the ban on all paintings',
   'The host has lifted the ban on all paintings': 'The host has lifted the ban on all paintings',
+  'The host has turned on the ban on all chat': 'The host has turned on the ban on all chat',
+  'The host has lifted the ban on all chat': 'The host has lifted the ban on all chat',
   'The host has turned off your camera': 'The host has turned off your camera',
   'The host invites you to turn on the camera': 'The host invites you to turn on the camera',
   'The host has turned off your screen sharing': 'The host has turned off your screen sharing',

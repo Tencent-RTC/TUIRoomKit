@@ -52,7 +52,7 @@ function setTUIRoomData(action: string, mode?: string) {
   const roomParam = streamPreviewRef.value.getRoomParam();
   const roomData = {
     action,
-    roomMode: mode || 'FreeSpeech',
+    roomMode: mode || 'FreeToSpeak',
     roomParam,
   };
   sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(roomData));
