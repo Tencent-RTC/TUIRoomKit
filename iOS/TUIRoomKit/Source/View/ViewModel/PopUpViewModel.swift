@@ -10,18 +10,43 @@ import Foundation
 import TUICore
 
 enum PopUpViewType {
-    case roomInfoViewType
-    case moreViewType
-    case setUpViewType
+    case roomInfoViewType //房间详情页面
+    case moreViewType //更多功能页面
+    case setUpViewType //设置页面
+    case userListViewType //用户列表页面
+    case raiseHandApplicationListViewType //举手发言列表页面
+    case transferMasterViewType //转换房主页面
+    case QRCodeViewType // 二维码页面
+    case prepareViewType //预览页面
+    case chatViewType //聊天页面
 }
 
-class PopUpViewModel: NSObject {
+protocol PopUpViewResponder: AnyObject {
+    func searchControllerChangeActive(isActive: Bool)
+    func updateViewOrientation(isLandscape: Bool)
+}
+
+class PopUpViewModel {
     let viewType: PopUpViewType
-    let height: CGFloat
+    let height: CGFloat?
+    var backgroundColor: UIColor?
+    weak var viewResponder: PopUpViewResponder?
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
     
-    init(viewType: PopUpViewType, height: CGFloat) {
+    init(viewType: PopUpViewType, height: CGFloat?) {
         self.viewType = viewType
         self.height = height
+    }
+    
+    func panelControlAction() {
+        viewResponder?.searchControllerChangeActive(isActive: false)
+        RoomRouter.shared.dismissPopupViewController(viewType: viewType)
+    }
+    
+    func updateOrientation(isLandscape: Bool) {
+        viewResponder?.updateViewOrientation(isLandscape: isLandscape)
     }
     
     deinit {

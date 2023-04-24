@@ -111,6 +111,8 @@
 "TUIRoom.all.mute.audio.prompt" = "All mute audio is turned on, and the audience will not be able to turn on the microphone";
 "TUIRoom.all.unmute.video.prompt" = "The host turns off the mute video of all members, and the audience can open the video by themselves";
 "TUIRoom.all.unmute.audio.prompt" = "The host turns off the mute audio of all members, and the audience can turn on the microphone by themselves";
+"TUIRoom.raiseHand.notice" = "If you want to speak, please raise your hand to apply for the microphone";
+"TUIRoom.video.conference.title" = "Video conference";
 
 "TUIRoom.capture.volume" = "Collection Volume";
 "TUIRoom.play.volume" = "Playback Volume";

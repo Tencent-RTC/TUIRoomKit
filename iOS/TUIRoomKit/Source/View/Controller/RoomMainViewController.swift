@@ -13,10 +13,17 @@ protocol RoomMainViewModelFactory {
 }
 
 class RoomMainViewController: UIViewController {
-    
+    let rootView: RoomMainRootView
     let viewModel: RoomMainViewModel
+    override var shouldAutorotate: Bool {
+        return true
+    }
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .allButUpsideDown
+    }
     init(roomMainViewModelFactory: RoomMainViewModelFactory) {
         self.viewModel = roomMainViewModelFactory.makeRoomMainViewModel()
+        self.rootView = RoomMainRootView(viewModel: viewModel, viewFactory: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -25,7 +32,7 @@ class RoomMainViewController: UIViewController {
     }
     
     override func loadView() {
-        self.view = RoomMainRootView(viewModel: viewModel, viewFactory: viewModel)
+        self.view = rootView
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -37,7 +44,12 @@ class RoomMainViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
-        UIApplication.shared.isIdleTimerDisabled = false
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        let isLandscape = size.width > size.height
+        rootView.updateRootViewOrientation(isLandscape: isLandscape)
     }
     
     deinit {

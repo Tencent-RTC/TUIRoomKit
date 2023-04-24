@@ -14,6 +14,12 @@ protocol RoomPrePareViewModelFactory {
 
 class RoomPrePareViewController: UIViewController {
     let viewModel: PrePareViewModel
+    override var shouldAutorotate: Bool {
+        return false
+    }
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
     init(roomPrePareViewModelFactory: RoomPrePareViewModelFactory, enablePrepareView: Bool) {
         self.viewModel = roomPrePareViewModelFactory.makePrePareViewModel(enablePrepareView: enablePrepareView)
         super.init(nibName: nil, bundle: nil)
@@ -26,6 +32,8 @@ class RoomPrePareViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+        UIApplication.shared.isIdleTimerDisabled = false
+        UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
         if let view = self.view as? PrePareView{
             self.viewModel.initialState(view: view.prePareView)
         }

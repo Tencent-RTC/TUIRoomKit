@@ -42,6 +42,13 @@ class MoreFunctionView: UIView {
         isViewReady = true
     }
     
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        roundedRect(rect: bounds,
+                    byRoundingCorners: [.topLeft, .topRight],
+                    cornerRadii: CGSize(width: 12, height: 12))
+    }
+    
     func constructViewHierarchy() {
         addSubview(stackView)
         for item in viewModel.viewItems {

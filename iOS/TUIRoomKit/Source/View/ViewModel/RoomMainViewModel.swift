@@ -66,15 +66,15 @@ class RoomMainViewModel: NSObject {
                 params.mirrorType = .disable
             }
             roomEngine.getTRTCCloud().setLocalRenderParams(params)
+            roomEngine.getTRTCCloud().setGSensorMode(.uiFixLayout)
             // FIXME: - 打开摄像头前需要先设置一个view
             roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
             roomEngine.openLocalCamera(isFront:engineManager.store.videoSetting.isFrontCamera, quality:
-                                        engineManager.store.videoSetting.videoQuality) { [weak self] in
-                guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalVideo()
+                                        engineManager.store.videoSetting.videoQuality) {
             } onError: { code, message in
                 debugPrint("openLocalCamera:code:\(code),message:\(message)")
             }
+            roomEngine.startPushLocalVideo()
         }
         if roomInfo.isOpenMicrophone && !roomInfo.isMicrophoneDisableForAllUser {
             roomEngine.openLocalMicrophone(engineManager.store.audioSetting.audioQuality) { [weak self] in
@@ -382,16 +382,17 @@ extension RoomMainViewModel: TRTCVideoFrameDelegate {
 }
 
 extension RoomMainViewModel: RoomMainViewFactory {
-    func makeBeautyView() -> UIView? {
+    func makeBeautyView() -> UIView {
         let beautyManager = engineManager.roomEngine.getTRTCCloud().getBeautyManager()
+        var beautyView = UIView()
         let beautyInfo = TUICore.getExtensionInfo(TUICore_TUIBeautyExtension_BeautyView,
                                                   param: [
                                                     TUICore_TUIBeautyExtension_BeautyView_BeautyManager: beautyManager,])
         if let view = beautyInfo[TUICore_TUIBeautyExtension_BeautyView_View] as? UIView {
             view.isHidden = true
-            return view
+            beautyView = view
         }
-        return nil
+        return beautyView
     }
     
     func makeTopView() -> UIView {
@@ -412,6 +413,17 @@ extension RoomMainViewModel: RoomMainViewFactory {
         let map = TUICore.getExtensionInfo(gVideoSeatViewKey, param: ["roomEngine": roomEngine, "roomId": roomInfo.roomId])
         guard let view = map[gVideoSeatViewKey] as? UIView else { return UIView(frame: .zero) }
         return view
+    }
+    
+    func makeRaiseHandNoticeView() -> UIView {
+        let raiseHandNoticeView = RaiseHandNoticeView()
+        //只有举手发言房间，并且用户不是房主时才会显示举手上麦提示
+        if roomInfo.speechMode == .applySpeakAfterTakingSeat && currentUser.userRole != .roomOwner {
+            raiseHandNoticeView.isHidden = false
+        } else {
+            raiseHandNoticeView.isHidden = true
+        }
+        return raiseHandNoticeView
     }
 }
 

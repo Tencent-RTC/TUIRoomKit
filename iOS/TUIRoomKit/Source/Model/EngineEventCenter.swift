@@ -187,7 +187,7 @@ extension EngineEventCenter {
             //判断自己是否下麦
             if leftList.first(where: { $0.userId == currentUser.userId }) != nil {
                 currentUser.isOnSeat = false
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
+                notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
                                                        param: ["isOnSeat":false])
             }
             //更新麦上用户列表
@@ -204,7 +204,7 @@ extension EngineEventCenter {
         //如果新上麦的人员有自己，要更改自己的上麦状态和摄像头麦克风状态
         if seated.first(where: { $0.userId == currentUser.userId }) != nil {
             currentUser.isOnSeat = true
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
+            notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
                                                    param: ["isOnSeat":true])
         }
         //更新所有在麦上的观众
@@ -216,8 +216,12 @@ extension EngineEventCenter {
                 userInfo.isOnSeat = true
             default: break
             }
+            engineManager.store.inviteSeatList = engineManager.store.inviteSeatList.filter({ userModel in
+                userModel.userId != userId
+            })
+            engineManager.store.inviteSeatMap.removeValue(forKey: userId)
         }
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+        notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
     private func allUserMicrophoneDisableChanged(roomId: String, isDisable: Bool) {
         roomInfo.isMicrophoneDisableForAllUser = isDisable
@@ -254,7 +258,7 @@ extension EngineEventCenter {
             let userItem = UserModel()
             userItem.update(userInfo: userInfo)
             engineManager.store.attendeeList.append(userItem)
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+            notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
         }
     }
     
@@ -267,7 +271,7 @@ extension EngineEventCenter {
             engineManager.store.attendeeList = engineManager.store.attendeeList.filter { model -> Bool in
                 model.userId != userId
             }
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+            notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
         }
     }
     
@@ -275,7 +279,8 @@ extension EngineEventCenter {
         engineManager.store.inviteSeatList = engineManager.store.inviteSeatList.filter { model -> Bool in
             model.userId != userId
         }
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+        engineManager.store.inviteSeatMap.removeValue(forKey: userId)
+        notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
 }
 

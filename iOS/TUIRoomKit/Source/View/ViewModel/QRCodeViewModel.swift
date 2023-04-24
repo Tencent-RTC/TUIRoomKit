@@ -24,6 +24,10 @@ class QRCodeViewModel {
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
     }
     
+    func backAction() {
+        RoomRouter.shared.dismissPopupViewController(viewType: .QRCodeViewType)
+    }
+    
     func createQRCodeImageView(url: String, imageView: UIImageView) {
         if url.count == 0 { return }
         guard let filter = CIFilter(name: "CIQRCodeGenerator") else {return}

@@ -111,6 +111,8 @@
 "TUIRoom.all.mute.audio.prompt" = "已开启全员静音，观众将无法打开麦克风";
 "TUIRoom.all.unmute.video.prompt" = "主持人关闭全员禁画，观众可自行开启视频";
 "TUIRoom.all.unmute.audio.prompt" = "主持人关闭全员静音，观众可自行开启麦克风";
+"TUIRoom.raiseHand.notice" = "如果您想发言请先举手申请上麦";
+"TUIRoom.video.conference.title" = "视频会议";
 
 "TUIRoom.prompt" = "提示";
 "TUIRoom.recording.save.path" = "录音保存路径：";

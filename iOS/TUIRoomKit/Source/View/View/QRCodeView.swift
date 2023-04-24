@@ -11,6 +11,20 @@ import Foundation
 class QRCodeView: UIView {
     let viewModel: QRCodeViewModel
     
+    let backButton: UIButton = {
+        let button = UIButton()
+        button.contentVerticalAlignment = .center
+        button.contentHorizontalAlignment = .left
+        button.setTitleColor(UIColor(0xADB6CC), for: .normal)
+        let image = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
+        button.setImage(image, for: .normal)
+        button.setTitle(.videoConferenceTitle, for: .normal)
+        button.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 18)
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 25, bottom: 0, right: 0)
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 0)
+        return button
+    }()
+    
     let middleView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(0x2A2D38)
@@ -118,6 +132,7 @@ class QRCodeView: UIView {
     }
     
     func constructViewHierarchy() {
+        addSubview(backButton)
         addSubview(middleView)
         addSubview(bottomButton)
         middleView.addSubview(titleLabel)
@@ -131,6 +146,12 @@ class QRCodeView: UIView {
     }
     
     func activateConstraints() {
+        backButton.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.top.equalTo(safeAreaLayoutGuide.snp.top)
+            make.height.equalTo(20)
+            make.width.equalTo(200)
+        }
         middleView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12.scale375())
             make.trailing.equalToSuperview().offset(-12.scale375())
@@ -191,6 +212,7 @@ class QRCodeView: UIView {
     
     func bindInteraction() {
         setupViewState()
+        backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         copyButton.addTarget(self, action: #selector(copyAction(sender:)), for: .touchUpInside)
         bottomButton.addTarget(self, action: #selector(saveIntoAlbumAction(sender:)), for: .touchUpInside)
     }
@@ -198,6 +220,10 @@ class QRCodeView: UIView {
     func setupViewState() {
         backgroundColor = UIColor(0x17181F)
         viewModel.createQRCodeImageView(url: viewModel.urlString, imageView: qrCodeImageView)
+    }
+    
+    @objc func backAction(sender: UIButton) {
+        viewModel.backAction()
     }
     
     @objc func copyAction(sender: UIButton) {
@@ -218,4 +244,5 @@ private extension String {
     static let codeText = localized("TUIRoom.code")
     static let scanCodeText = localized("TUIRoom.scan.code")
     static let saveIntoAlbumText = localized("TUIRoom.save.into.album")
+    static let videoConferenceTitle = localized("TUIRoom.video.conference.title")
 }

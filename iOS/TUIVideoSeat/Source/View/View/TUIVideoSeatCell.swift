@@ -13,13 +13,25 @@ import UIKit
 class TUIVideoSeatCell: UICollectionViewCell {
     var seatItem: VideoSeatItem?
 
+    private lazy var scrollRenderView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.backgroundColor = UIColor(0x17181F)
+        scrollView.layer.cornerRadius = 16
+        scrollView.layer.masksToBounds = true
+        scrollView.layer.borderWidth = 2
+        scrollView.layer.borderColor = UIColor.clear.cgColor
+
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.maximumZoomScale = 3
+        scrollView.minimumZoomScale = 1
+        scrollView.delegate = self
+        return scrollView
+    }()
+
     let renderView: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(0x17181F)
-        view.layer.cornerRadius = 16
-        view.layer.masksToBounds = true
-        view.layer.borderWidth = 2
-        view.layer.borderColor = UIColor.clear.cgColor
+        view.backgroundColor = .clear
         return view
     }()
 
@@ -47,14 +59,20 @@ class TUIVideoSeatCell: UICollectionViewCell {
     }
 
     private func constructViewHierarchy() {
-        contentView.addSubview(renderView)
+        scrollRenderView.addSubview(renderView)
+        contentView.addSubview(scrollRenderView)
         contentView.addSubview(avatarImageView)
         contentView.addSubview(userInfoView)
     }
 
     private func activateConstraints() {
-        renderView.snp.makeConstraints { make in
+        scrollRenderView.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(3)
+        }
+        renderView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.equalToSuperview()
+            make.height.equalToSuperview()
         }
         userInfoView.snp.makeConstraints { make in
             make.height.equalTo(24)
@@ -64,9 +82,21 @@ class TUIVideoSeatCell: UICollectionViewCell {
         }
     }
 
+    @objc private func resetVolumeView() {
+        guard let seatItem = seatItem else { return }
+        userInfoView.updateUserVolume(hasAudio: seatItem.hasAudioStream, volume: 0)
+        scrollRenderView.layer.borderColor = UIColor.clear.cgColor
+    }
+
     deinit {
         NSObject.cancelPreviousPerformRequests(withTarget: self)
         debugPrint("deinit \(self)")
+    }
+}
+
+extension TUIVideoSeatCell: UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return renderView
     }
 }
 
@@ -97,22 +127,16 @@ extension TUIVideoSeatCell {
     func updateUIVolume(item: VideoSeatItem) {
         userInfoView.updateUserVolume(hasAudio: item.hasAudioStream, volume: item.audioVolume)
         if item.audioVolume > 0 && item.hasAudioStream {
-            renderView.layer.borderColor = UIColor(0xA5FE33).cgColor
+            scrollRenderView.layer.borderColor = UIColor(0xA5FE33).cgColor
         } else {
-            renderView.layer.borderColor = UIColor.clear.cgColor
+            scrollRenderView.layer.borderColor = UIColor.clear.cgColor
         }
         resetVolume()
     }
-    
+
     func resetVolume() {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(resetVolumeView), object: nil)
         perform(#selector(resetVolumeView), with: nil, afterDelay: 1)
-    }
-    
-    @objc func resetVolumeView() {
-        guard let seatItem = seatItem else{ return}
-        userInfoView.updateUserVolume(hasAudio: seatItem.hasAudioStream, volume: 0)
-        renderView.layer.borderColor = UIColor.clear.cgColor
     }
 }
 
@@ -125,6 +149,21 @@ class TUIVideoSeatDragCell: TUIVideoSeatCell {
         addGesture()
     }
 
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func updateSize(size: CGSize) {
+        var frame = self.frame
+        frame.size = size
+        self.frame = frame
+        center = adsorption(centerPoint: center)
+    }
+}
+
+// MARK: - gesture
+
+extension TUIVideoSeatDragCell {
     private func addGesture() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(click))
         addGestureRecognizer(tap)
@@ -132,22 +171,7 @@ class TUIVideoSeatDragCell: TUIVideoSeatCell {
         addGestureRecognizer(dragGesture)
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-// MARK: - gesture
-
-extension TUIVideoSeatDragCell {
-    func updateSize(size: CGSize) {
-        var frame = self.frame
-        frame.size = size
-        self.frame = frame
-        center = adsorption(centerPoint: center)
-    }
-
-    @objc func click() {
+    @objc private func click() {
         clickBlock()
     }
 

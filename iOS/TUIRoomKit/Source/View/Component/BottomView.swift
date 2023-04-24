@@ -103,7 +103,7 @@ extension BottomView: BottomViewModelResponder {
     func showDestroyRoomAlert() {
         let alertController = UIAlertController(title: .dismissMeetingTitleText, message: .appointNewHostText, preferredStyle: .actionSheet)
         let leaveRoomAction = UIAlertAction(title: .leaveMeetingText, style: .default) { _ in
-            RoomRouter.shared.pushTransferMasterViewController()
+            RoomRouter.shared.presentPopUpViewController(viewType: .transferMasterViewType,height: nil)
         }
         let dismissRoomAction = UIAlertAction(title: .dismissMeetingText, style: .destructive) { [weak self] _ in
             guard let self = self else { return }

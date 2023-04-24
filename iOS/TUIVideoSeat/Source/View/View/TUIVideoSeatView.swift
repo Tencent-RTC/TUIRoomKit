@@ -43,6 +43,21 @@ class TUIVideoSeatView: UIView {
         isViewReady = true
     }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if let item = moveMiniscreen.seatItem,!moveMiniscreen.isHidden {
+            moveMiniscreen.updateSize(size: videoSeatLayout.getMiniscreenFrame(item: item).size)
+        }
+        let offsetYu = Int(attendeeCollectionView.contentOffset.x) % Int(attendeeCollectionView.mm_w)
+        let offsetMuti = CGFloat(offsetYu) / attendeeCollectionView.mm_w
+        let currentPage = (offsetMuti > 0.5 ? 1 : 0) + (Int(attendeeCollectionView.contentOffset.x) / Int(attendeeCollectionView.mm_w))
+        if currentPage != pageControl.currentPage {
+            attendeeCollectionView.setContentOffset(
+                CGPoint(x: CGFloat(pageControl.currentPage) * attendeeCollectionView.frame.size.width,
+                        y: attendeeCollectionView.contentOffset.y), animated: false)
+        }
+    }
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -221,7 +236,7 @@ extension TUIVideoSeatView: UIScrollViewDelegate {
         updatePageControl()
     }
 
-    func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         attendeeCollectionView.addSubview(moveMiniscreen)
     }
 }

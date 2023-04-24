@@ -12,6 +12,20 @@ class TransferMasterView: UIView {
     var attendeeList: [UserModel]
     var searchArray: [UserModel] = []
     
+    let backButton: UIButton = {
+        let button = UIButton()
+        button.contentVerticalAlignment = .center
+        button.contentHorizontalAlignment = .left
+        button.setTitleColor(UIColor(0xADB6CC), for: .normal)
+        let image = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
+        button.setImage(image, for: .normal)
+        button.setTitle(.videoConferenceTitle, for: .normal)
+        button.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 18)
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 25, bottom: 0, right: 0)
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 0)
+        return button
+    }()
+    
     let searchController: UISearchController = {
         let controller = UISearchController(searchResultsController: nil)
         controller.obscuresBackgroundDuringPresentation = false
@@ -50,7 +64,7 @@ class TransferMasterView: UIView {
         self.viewModel = viewModel
         self.attendeeList = viewModel.attendeeList
         super.init(frame: .zero)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
     }
     
     required init?(coder: NSCoder) {
@@ -69,14 +83,21 @@ class TransferMasterView: UIView {
     }
     
     func constructViewHierarchy() {
+        addSubview(backButton)
         addSubview(transferMasterTableView)
         addSubview(appointMasterButton)
     }
     
     func activateConstraints() {
+        backButton.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.top.equalTo(safeAreaLayoutGuide.snp.top)
+            make.height.equalTo(20)
+            make.width.equalTo(200)
+        }
         transferMasterTableView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
-            make.top.equalTo(safeAreaLayoutGuide.snp.top)
+            make.top.equalTo(backButton.snp.bottom).offset(5)
             make.bottom.equalToSuperview()
         }
         appointMasterButton.snp.makeConstraints { make in
@@ -90,21 +111,23 @@ class TransferMasterView: UIView {
     func bindInteraction() {
         searchController.delegate = self
         searchController.searchResultsUpdater = self
+        viewModel.viewResponder = self
+        backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         appointMasterButton.addTarget(self, action: #selector(appointMasterAction(sender:)), for: .touchUpInside)
+    }
+    
+    @objc func backAction(sender: UIButton) {
+        searchController.searchBar.endEditing(true)
+        searchController.isActive = false
+        viewModel.backAction()
     }
     
     @objc func appointMasterAction(sender: UIButton) {
         viewModel.appointMasterAction(sender: sender)
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        searchController.searchBar.endEditing(true)
-        attendeeList = viewModel.attendeeList
-        transferMasterTableView.reloadData()
-    }
-    
     deinit {
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
         debugPrint("deinit \(self)")
     }
 }
@@ -155,10 +178,21 @@ extension TransferMasterView: UITableViewDelegate {
 
 extension TransferMasterView: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
-        if key == .TUIRoomKitService_RenewSeatList {
+        if key == .TUIRoomKitService_RenewUserList {
             attendeeList = viewModel.attendeeList
             transferMasterTableView.reloadData()
         }
+    }
+}
+
+extension  TransferMasterView: TransferMasterViewResponder {
+    func reloadTransferMasterTableView() {
+        transferMasterTableView.reloadData()
+    }
+    
+    func searchControllerChangeActive(isActive: Bool) {
+        searchController.searchBar.endEditing(true)
+        searchController.isActive = false
     }
 }
 
@@ -275,4 +309,5 @@ private extension String {
     static let transferMasterText = localized("TUIRoom.trans.master")
     static let searchMemberText = localized("TUIRoom.search.meeting.member")
     static let appointAndLeaveRoomText = localized("TUIRoom.appoint.master.and.leave.room")
+    static let videoConferenceTitle = localized("TUIRoom.video.conference.title")
 }

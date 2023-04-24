@@ -24,6 +24,12 @@ class RoomEntranceViewController: UIViewController {
         button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
         return button
     }()
+    override var shouldAutorotate: Bool {
+        return false
+    }
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
     
     let rootView: UIView
     init(roomMainViewModelFactory: RoomEntranceViewModelFactory, isCreateRoom: Bool) {
@@ -44,6 +50,8 @@ class RoomEntranceViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        UIApplication.shared.isIdleTimerDisabled = false
+        UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
     }
     
     @objc

@@ -53,18 +53,18 @@ class MoreFunctionViewModel {
     
     func beautyAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        RoomRouter.shared.dismissPopupViewController(animated: false)
+        RoomRouter.shared.dismissPopupViewController(viewType: .moreViewType)
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ShowBeautyView, param: [:])
     }
     
     func settingAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        RoomRouter.shared.dismissPopupViewController(animated: false)
+        RoomRouter.shared.dismissPopupViewController(viewType: .moreViewType)
         RoomRouter.shared.presentPopUpViewController(viewType: .setUpViewType, height: 300.scale375())
     }
     
     func chatAction(sender: UIButton) {
-        RoomRouter.shared.dismiss(animated: false)
+        RoomRouter.shared.dismissPopupViewController(viewType: .moreViewType)
         let user = engineManager.store.currentUser
         let roomInfo = engineManager.store.roomInfo
         RoomRouter.shared.pushToChatController(user: user, roomInfo: roomInfo)

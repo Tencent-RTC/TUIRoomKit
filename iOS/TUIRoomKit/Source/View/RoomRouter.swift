@@ -11,8 +11,9 @@ import TUICore
 
 // 视图路由上下文
 class RouteContext {
-    var rootNavigation: UINavigationController? // 当前根视图控制器
-    var presentControllers: [UIViewController] = [] // 当前模态弹出的页面
+    var rootNavigation: RoomKitNavigationController? // 当前根视图控制器
+    typealias WeakArray<T> = [() -> T?]
+    var presentControllerMap: [PopUpViewType:WeakArray<UIViewController>] = [:] //当前模态弹出的页面
     let appearance: UINavigationBarAppearance = UINavigationBarAppearance()
     let navigationDelegate = RoomRouter.RoomNavigationDelegate()
     weak var chatViewController: UIViewController? // 当前聊天视图控制器
@@ -28,10 +29,10 @@ class RoomRouter {
         
     }
     
-    var navController: UINavigationController {
+    var navController: RoomKitNavigationController {
         // 这里完善逻辑，如果没有获取到，就取当前window控制器
         assert(context.rootNavigation != nil, "RoomKit路由设置有误，没有初始化根导航控制器")
-        return context.rootNavigation ?? UINavigationController()
+        return context.rootNavigation ?? RoomKitNavigationController(rootViewController: UIViewController())
     }
     
     func pushToChatController(user: UserModel, roomInfo: RoomInfo) {
@@ -79,41 +80,49 @@ class RoomRouter {
         push(viewController: joinRoomVC)
     }
     
-    func pushUserListViewController() {
-        let userListVC = makeUserListViewController()
-        push(viewController: userListVC)
-    }
-    
-    func pushQRCodeViewController() {
-        let qrCodeVC = makeQRCodeViewController()
-        push(viewController: qrCodeVC)
-    }
-    
-    func pushRaiseHandApplicationListViewController() {
-        let raiseHandVC = makeRaiseHandApplicationListViewController()
-        push(viewController: raiseHandVC)
-    }
-    
-    func pushTransferMasterViewController() {
-        let transferMasterViewController = makeTransferMasterViewController()
-        push(viewController: transferMasterViewController)
-    }
-    
-    func presentPopUpViewController(viewType: PopUpViewType, height: CGFloat = 0) {
-        let vc = makePopUpViewController(viewType: viewType, height: height)
+    func presentPopUpViewController(viewType: PopUpViewType, height: CGFloat?, backgroundColor: UIColor = UIColor(0x1B1E26)) {
+        let vc = makePopUpViewController(viewType: viewType, height: height, backgroundColor: backgroundColor)
+        let weakObserver = { [weak vc] in return vc }
+        if var observerArray = context.presentControllerMap[viewType] {
+            observerArray.append(weakObserver)
+            context.presentControllerMap[viewType] = observerArray
+        } else {
+            context.presentControllerMap[viewType] = [weakObserver]
+        }
         present(viewController: vc)
+    }
+    
+    func dismissPopupViewController(viewType: PopUpViewType, animated: Bool = true) {
+        guard var observerArray = context.presentControllerMap[viewType] else { return }
+        guard observerArray.count > 0 else {
+            context.presentControllerMap.removeValue(forKey: viewType)
+            return
+        }
+        guard let observer = observerArray.last, let vc = observer() else { return }
+        vc.dismiss(animated: animated)
+        observerArray.removeLast()
+        if observerArray.count == 0 {
+            context.presentControllerMap.removeValue(forKey: viewType)
+        }
+    }
+    
+    func dismissAllRoomPopupViewController() {
+        for viewType in context.presentControllerMap.keys {
+            if viewType == .prepareViewType { continue } //预览页面不属于进房后的页面，在退出房间时不被销毁
+            guard let observerArray = context.presentControllerMap[viewType] else { continue }
+            guard observerArray.count > 0 else {
+                context.presentControllerMap.removeValue(forKey: viewType)
+                continue
+            }
+            observerArray.forEach { observer in
+                observer()?.dismiss(animated: true)
+            }
+            context.presentControllerMap.removeValue(forKey: viewType)
+        }
     }
     
     func pop(animated: Bool = true) {
         navController.popViewController(animated: animated)
-    }
-    
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
-        guard context.presentControllers.count > 0 else { return }
-        if let controller = context.presentControllers.last {
-            controller.dismiss(animated: animated, completion: completion)
-            context.presentControllers.removeLast()
-        }
     }
     
     func popToRoomEntranceViewController() {
@@ -122,17 +131,8 @@ class RoomRouter {
         self.navController.popToViewController(controller, animated: true)
     }
     
-    // 这个函数要第二波优化掉
-    func dismissPopupViewController(animated: Bool = true) {
-        guard context.presentControllers.count > 0 else { return }
-        guard let controller = context.presentControllers.last else { return }
-        guard controller is PopUpViewController else { return }
-        controller.dismiss(animated: animated, completion: nil)
-        context.presentControllers.removeLast()
-    }
-    
     func presentAlert(_ alertController: UIAlertController) {
-        present(viewController: alertController)
+        getCurrentWindowViewController()?.present(alertController, animated: true)
     }
     
     class func makeToast(toast: String) {
@@ -151,13 +151,12 @@ extension RoomRouter {
     }
     
     private func present(viewController: UIViewController, style: UIModalPresentationStyle = .automatic, animated: Bool = true) {
-        context.presentControllers.append(viewController)
         viewController.modalPresentationStyle = style
         navController.present(viewController, animated: animated)
     }
     
     private func createRootNavigationAndPresent(controller: UIViewController) {
-        let navigationController = UINavigationController(rootViewController: controller)
+        let navigationController = RoomKitNavigationController(rootViewController: controller)
         navigationController.modalPresentationStyle = .fullScreen
         context.rootNavigation = navigationController
         if #available(iOS 13.0, *) {
@@ -166,7 +165,15 @@ extension RoomRouter {
             navigationController.navigationBar.scrollEdgeAppearance = context.appearance
         }
         navigationController.delegate = context.navigationDelegate
-        context.presentControllers.append(navigationController)
+        let weakObserver = { [weak navigationController] in
+            return navigationController
+        }
+        if var observerArray = context.presentControllerMap[.prepareViewType] {
+            observerArray.append(weakObserver)
+            context.presentControllerMap[.prepareViewType] = observerArray
+        } else {
+            context.presentControllerMap[.prepareViewType] = [weakObserver]
+        }
         guard let controller = getCurrentWindowViewController() else { return }
         controller.present(navigationController, animated: true)
     }
@@ -225,28 +232,8 @@ extension RoomRouter {
         return controller
     }
     
-    private func makeUserListViewController() -> UIViewController {
-        let controller = UserListViewController(userListViewModelFactory: self)
-        return controller
-    }
-    
-    private func makeQRCodeViewController() -> UIViewController {
-        let controller = QRCodeViewController(qrCodeViewModelFactory: self)
-        return controller
-    }
-    
-    private func makeRaiseHandApplicationListViewController() -> UIViewController {
-        let controller = RaiseHandApplicationListViewController(raiseHandApplicationListViewModelFactory: self)
-        return controller
-    }
-    
-    private func makeTransferMasterViewController() -> UIViewController {
-        let controller = TransferMasterViewController(transferMasterViewModelFactory: self)
-        return controller
-    }
-    
-    private func makePopUpViewController(viewType: PopUpViewType, height: CGFloat = 0) -> UIViewController {
-        let controller = PopUpViewController(popUpViewFactory: self, viewType: viewType, height: height)
+    private func makePopUpViewController(viewType: PopUpViewType, height: CGFloat?, backgroundColor: UIColor) -> UIViewController {
+        let controller = PopUpViewController(popUpViewModelFactory: self, viewType: viewType, height: height, backgroundColor: backgroundColor)
         return controller
     }
 }
@@ -290,39 +277,10 @@ extension RoomRouter: RoomEntranceViewModelFactory {
     }
 }
 
-extension RoomRouter: UserListViewModelFactory {
-    func makeUserListViewModel() -> UserListViewModel {
-        let model = UserListViewModel()
-        return model
-    }
-}
-
-extension RoomRouter: QRCodeViewModelFactory {
-    func makeQRCodeViewModel() -> QRCodeViewModel {
-        //todo房间的链接
-        let model = QRCodeViewModel(urlString: "https://web.sdk.qcloud.com/component/tuiroom/index.html#/" + "#/room?roomId=" +
-                                    EngineManager.shared.store.roomInfo.roomId)
-        return model
-    }
-}
-
-extension RoomRouter: RaiseHandApplicationListViewModelFactory {
-    func makeRaiseHandApplicationListViewModel() -> RaiseHandApplicationListViewModel {
-        let model = RaiseHandApplicationListViewModel()
-        return model
-    }
-}
-
-extension RoomRouter: TransferMasterViewModelFactory {
-    func makeTransferMasterViewModel() -> TransferMasterViewModel {
-        let model = TransferMasterViewModel()
-        return model
-    }
-}
-
-extension RoomRouter: PopUpViewFactory {
-    func makeRootView(viewType: PopUpViewType, height: CGFloat = 0) -> UIView {
+extension RoomRouter: PopUpViewModelFactory {
+    func makeRootView(viewType: PopUpViewType, height: CGFloat?, backgroundColor: UIColor) -> PopUpView {
         let viewModel = PopUpViewModel(viewType: viewType, height: height)
+        viewModel.backgroundColor = backgroundColor
         return PopUpView(viewModel: viewModel)
     }
 }

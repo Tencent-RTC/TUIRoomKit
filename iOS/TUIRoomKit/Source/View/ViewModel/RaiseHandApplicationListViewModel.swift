@@ -10,10 +10,11 @@ import Foundation
 
 protocol RaiseHandApplicationListViewResponder: NSObject {
     func reloadApplyListView()
+    func searchControllerChangeActive(isActive: Bool)
 }
 
 class RaiseHandApplicationListViewModel: NSObject {
-    weak var responder: RaiseHandApplicationListViewResponder? = nil
+    weak var viewResponder: RaiseHandApplicationListViewResponder? = nil
     let engineManager: EngineManager = EngineManager.shared
     var inviteSeatList: [UserModel] = []
     
@@ -40,7 +41,8 @@ class RaiseHandApplicationListViewModel: NSObject {
     }
     
     func inviteMemberAction(sender: UIButton, view: RaiseHandApplicationListView) {
-        RoomRouter.shared.pushUserListViewController()
+        RoomRouter.shared.dismissPopupViewController(viewType: .raiseHandApplicationListViewType)
+        RoomRouter.shared.presentPopUpViewController(viewType: .userListViewType, height: nil)
     }
     
     func agreeStageAction(sender: UIButton, isAgree: Bool, userId: String) {
@@ -59,7 +61,11 @@ class RaiseHandApplicationListViewModel: NSObject {
     
     func reloadApplyListView() {
         inviteSeatList = engineManager.store.inviteSeatList
-        responder?.reloadApplyListView()
+        viewResponder?.reloadApplyListView()
+    }
+    
+    func backAction() {
+        RoomRouter.shared.dismissPopupViewController(viewType: .raiseHandApplicationListViewType)
     }
     
     deinit {
@@ -75,3 +81,16 @@ extension RaiseHandApplicationListViewModel: RoomKitUIEventResponder {
         }
     }
 }
+
+extension RaiseHandApplicationListViewModel: PopUpViewResponder {
+    func updateViewOrientation(isLandscape: Bool) {
+        viewResponder?.searchControllerChangeActive(isActive: false)
+        inviteSeatList = engineManager.store.inviteSeatList
+        viewResponder?.reloadApplyListView()
+    }
+    
+    func searchControllerChangeActive(isActive: Bool) {
+        viewResponder?.searchControllerChangeActive(isActive: isActive)
+    }
+}
+

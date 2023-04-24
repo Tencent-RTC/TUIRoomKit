@@ -146,6 +146,12 @@ public class RoomInfo {
     
     public func update(engineRoomInfo: TUIRoomInfo) {
         roomInfo = engineRoomInfo
+        switch engineRoomInfo.speechMode {
+        case .freeToSpeak, .applyToSpeak, .applySpeakAfterTakingSeat:
+            roomInfo.speechMode = engineRoomInfo.speechMode
+        default:
+            roomInfo.speechMode = .freeToSpeak
+        }
         ownerId = engineRoomInfo.ownerId
     }
     

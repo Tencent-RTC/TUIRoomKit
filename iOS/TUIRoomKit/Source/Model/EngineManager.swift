@@ -164,12 +164,14 @@ class EngineManager: NSObject {
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onExitEngineRoom?()
+            RoomRouter.shared.dismissAllRoomPopupViewController()
             RoomRouter.shared.popToRoomEntranceViewController()
             self.store.refreshStore()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onExitEngineRoom?()
+            RoomRouter.shared.dismissAllRoomPopupViewController()
             RoomRouter.shared.popToRoomEntranceViewController()
             self.store.refreshStore()
         }
@@ -180,12 +182,14 @@ class EngineManager: NSObject {
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onDestroyEngineRoom?()
+            RoomRouter.shared.dismissAllRoomPopupViewController()
             RoomRouter.shared.popToRoomEntranceViewController()
             self.store.refreshStore()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.refreshRoomEngine()
             self.listener?.onDestroyEngineRoom?()
+            RoomRouter.shared.dismissAllRoomPopupViewController()
             RoomRouter.shared.popToRoomEntranceViewController()
             self.store.refreshStore()
         }
