@@ -67,8 +67,8 @@ class RoomInfoViewModel {
     }
     
     func codeAction(sender: UIButton) {
-        RoomRouter.shared.dismissPopupViewController(animated: false)
-        RoomRouter.shared.pushQRCodeViewController()
+        RoomRouter.shared.dismissPopupViewController(viewType: .roomInfoViewType)
+        RoomRouter.shared.presentPopUpViewController(viewType: .QRCodeViewType, height: nil)
     }
     
     deinit {

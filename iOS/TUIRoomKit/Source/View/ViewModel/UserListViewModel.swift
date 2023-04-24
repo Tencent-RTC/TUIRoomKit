@@ -13,6 +13,7 @@ protocol UserListViewResponder: NSObject {
     func updateUIWhenRoomOwnerChanged(roomOwner:String)
     func reloadUserListView()
     func makeToast(text: String)
+    func searchControllerChangeActive(isActive: Bool)
 }
 
 class UserListViewModel: NSObject {
@@ -27,11 +28,13 @@ class UserListViewModel: NSObject {
         self.attendeeList = EngineManager.shared.store.attendeeList
         EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
     }
     
     deinit {
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
         debugPrint("deinit \(self)")
     }
     
@@ -94,10 +97,13 @@ class UserListViewModel: NSObject {
             //todo
         }
     }
+    
+    func backAction() {
+        RoomRouter.shared.dismissPopupViewController(viewType: .userListViewType)
+    }
 }
 
 extension UserListViewModel: RoomEngineEventResponder {
-    
     func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
         if name == .onUserRoleChanged {
             guard let userRole = param?["userRole"] as? TUIRole, userRole == .roomOwner else { return }
@@ -107,13 +113,26 @@ extension UserListViewModel: RoomEngineEventResponder {
     }
 }
 
-
 extension UserListViewModel: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
-        if key == .TUIRoomKitService_RenewUserList {
+        switch key {
+        case .TUIRoomKitService_RenewUserList, .TUIRoomKitService_RenewSeatList:
             attendeeList = EngineManager.shared.store.attendeeList
             viewResponder?.reloadUserListView()
+        default: break
         }
+    }
+}
+
+extension UserListViewModel: PopUpViewResponder {
+    func updateViewOrientation(isLandscape: Bool) {
+        viewResponder?.searchControllerChangeActive(isActive: false)
+        attendeeList = EngineManager.shared.store.attendeeList
+        viewResponder?.reloadUserListView()
+    }
+    
+    func searchControllerChangeActive(isActive: Bool) {
+        viewResponder?.searchControllerChangeActive(isActive: isActive)
     }
 }
 

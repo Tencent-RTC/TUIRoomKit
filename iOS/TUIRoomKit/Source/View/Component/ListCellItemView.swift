@@ -150,7 +150,7 @@ class ListCellItemView: UIView {
         }
         rightButton.addTarget(self, action: #selector(rightButtonAction(sender:)), for: .touchUpInside)
         rightSwitch.addTarget(self, action: #selector(switchAction(sender:)), for: .touchUpInside)
-        slider.addTarget(self, action: #selector(sliderAction(sender:)), for: .touchUpInside)
+        slider.addTarget(self, action: #selector(sliderAction(sender:)), for: .valueChanged)
     }
     
     func setupViewState(item: ListCellItemData) {

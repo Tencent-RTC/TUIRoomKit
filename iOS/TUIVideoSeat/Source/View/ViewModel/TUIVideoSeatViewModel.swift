@@ -368,7 +368,7 @@ extension TUIVideoSeatViewModel {
                 speakerItem = currentSpeakerItem
             } else {
                 // 全部静音，且speakerItem已经离开了
-                if let item = speakerItem,(videoSeatItems.firstIndex(where: { $0.userId == item.userId }) == nil) {
+                if let item = speakerItem, videoSeatItems.firstIndex(where: { $0.userId == item.userId }) == nil {
                     speakerItem = nil
                 }
             }
@@ -445,9 +445,13 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
         }
 
         if videoSeatViewType == .speechType {
-            guard let currentSpeakerItem = findCurrentSpeaker(list: listSeatItem)?.cloneSpeaker(), currentSpeakerItem.hasAudioStream else{ return}
+            guard let currentSpeakerItem = findCurrentSpeaker(list: listSeatItem)?.cloneSpeaker(), currentSpeakerItem.hasAudioStream else { return }
+            if speakerItem?.userId == currentSpeakerItem.userId {
+                viewResponder?.updateMiniscreenVolume(currentSpeakerItem)
+            } else {
+                viewResponder?.updateMiniscreen(currentSpeakerItem)
+            }
             speakerItem = currentSpeakerItem
-            viewResponder?.updateMiniscreen(speakerItem)
         }
     }
 

@@ -92,7 +92,7 @@ class TopViewModel {
     }
     
     func dropDownAction(sender: UIView) {
-        RoomRouter.shared.presentPopUpViewController(viewType: .roomInfoViewType, height: 300.scale375())
+        RoomRouter.shared.presentPopUpViewController(viewType: .roomInfoViewType, height: 350)
     }
     
     deinit {

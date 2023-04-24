@@ -22,21 +22,31 @@ class TUIVideoSeatLayout: UICollectionViewFlowLayout {
         return collectionView?.bounds.width ?? UIScreen.main.bounds.width
     }
 
+    private var isPortrait: Bool {
+        return collectionViewHeight > collectionViewWidth
+    }
+
     // 一行最多展示cell数
-    private var kVideoSeatCellNumberOfOneRow: Int {
-        return (viewModel.videoSeatViewType == .pureAudioType) ? 3 : 2
+    private var kVideoSeatCellNumberOfOneRow: CGFloat {
+        return isPortrait ? 2 : 3
     }
 
     // 一页最多展示cell数
     private var kMaxShowCellCount: Int {
-        return (viewModel.videoSeatViewType == .pureAudioType) ? 9 : 6
+        return 6
     }
 
-    // 左右间距
-    let leftRightSpace: CGFloat = 5.0
-    // 上下间距
-    private var topBottomSpace: CGFloat {
-        return (viewModel.videoSeatViewType == .pureAudioType) ? 20.0 : 5.0
+    private let itemDiffSpace: CGFloat = 5.0
+
+    // item 宽高
+    private var itemWidthHeight: CGFloat {
+        let minimumDistance = min(collectionViewHeight, collectionViewWidth)
+        let availableSpace = minimumDistance - (kVideoSeatCellNumberOfOneRow + 1) * itemDiffSpace
+        if isPortrait {
+            return availableSpace / kVideoSeatCellNumberOfOneRow
+        } else {
+            return availableSpace / (CGFloat(kMaxShowCellCount) / kVideoSeatCellNumberOfOneRow)
+        }
     }
 
     private let viewModel: TUIVideoSeatViewModel
@@ -69,14 +79,19 @@ class TUIVideoSeatLayout: UICollectionViewFlowLayout {
 
     // Miniscreen布局信息
     func getMiniscreenFrame(item: VideoSeatItem?) -> CGRect {
-        var height = 180.0
-        let width = 100.0
+        var height = isPortrait ? 180.0 : 100.0
+        var width = isPortrait ? 100.0 : 180.0
         if let item = item, !item.hasVideoStream {
-            height = width
+            height = 100.0
+            width = 100.0
         }
-        return CGRect(x: collectionViewWidth - width - leftRightSpace, y: leftRightSpace, width: width, height: height)
+        return CGRect(x: collectionViewWidth - width - itemDiffSpace, y: itemDiffSpace, width: width, height: height)
     }
+}
 
+// MARK: - layout
+
+extension TUIVideoSeatLayout {
     // 计算cell的位置和大小，并进行存储
     private func calculateEachCellFrame() {
         guard let collectionViewWidth: CGFloat = collectionView?.bounds.width else { return }
@@ -153,30 +168,29 @@ class TUIVideoSeatLayout: UICollectionViewFlowLayout {
         let currentPageItemCount = min(itemCount, page * kMaxShowCellCount) - (page - 1) * kMaxShowCellCount // 当前页item个数
         let cell = UICollectionViewLayoutAttributes(forCellWith: indexPath)
 
-        /*-----------------itemWidth&currentPageAllRow&beginCellTop&beginCellLeft-----------------**/
-        let contentWidth = collectionViewWidth - CGFloat(kVideoSeatCellNumberOfOneRow + 1) * leftRightSpace
-        let itemWidth = contentWidth / CGFloat(kVideoSeatCellNumberOfOneRow) // 计算cell的宽
+        /*-----------------currentPageAllRow&beginCellY&beginCellLeft-----------------**/
         let currentPageAllRow = Int(ceil(CGFloat(currentPageItemCount) / CGFloat(kVideoSeatCellNumberOfOneRow))) // 计算本页总行数
-        let itemAllHeight = itemWidth * CGFloat(currentPageAllRow) + CGFloat(currentPageAllRow - 1) * topBottomSpace
-        let beginCellTop = (collectionViewHeight - itemAllHeight) * 0.5 // 计算beginCellTop
+        let itemAllHeight = (itemWidthHeight + itemDiffSpace) * CGFloat(currentPageAllRow) - itemDiffSpace
+        let itemAllWidth = (itemWidthHeight + itemDiffSpace) * kVideoSeatCellNumberOfOneRow - itemDiffSpace
+        let beginCellY = (collectionViewHeight - itemAllHeight) * 0.5 // 计算beginCellTop
+        let beginCellX = (collectionViewWidth - itemAllWidth) * 0.5 // 计算beginCellTop
         let beginCellLeft = CGFloat(page - 1) * collectionViewWidth // 计算beginCellLeft
 
-        /*-----------------itemIndex&columnIndex&rowIndex-----------------**/
+        /*-----------------itemIndex&column&row-----------------**/
         let itemIndex = item - (page - 1) * kMaxShowCellCount // 本页的第几个
-        let column = (itemIndex - 1) % kVideoSeatCellNumberOfOneRow // cell当前页上的第几列 从0开始
+        let column = (itemIndex - 1) % Int(kVideoSeatCellNumberOfOneRow) // cell当前页上的第几列 从0开始
         let row = Int(ceil(CGFloat(itemIndex) / CGFloat(kVideoSeatCellNumberOfOneRow))) // cell当前页上的第几行
-        let itemY = beginCellTop + (itemWidth + topBottomSpace) * CGFloat(row - 1)
+        let itemY = beginCellY + (itemWidthHeight + itemDiffSpace) * CGFloat(row - 1)
         var itemX = 0.0
         if currentPageAllRow == row {
             // 最后一行居中调整
-            let lastRowItemCount = currentPageItemCount - (row - 1) * kVideoSeatCellNumberOfOneRow
-            let lastRowBeginCellLeft = (collectionViewWidth - CGFloat(lastRowItemCount - 1) * leftRightSpace -
-                itemWidth * CGFloat(lastRowItemCount)) * 0.5 - leftRightSpace
-            itemX = lastRowBeginCellLeft + beginCellLeft + (itemWidth + leftRightSpace) * CGFloat(column) + leftRightSpace
+            let lastRowItemCount = currentPageItemCount - (row - 1) * Int(kVideoSeatCellNumberOfOneRow)
+            let lastRowBeginCellLeft = (collectionViewWidth - (itemWidthHeight + itemDiffSpace) * CGFloat(lastRowItemCount) - itemDiffSpace) * 0.5
+            itemX = lastRowBeginCellLeft + beginCellLeft + (itemWidthHeight + itemDiffSpace) * CGFloat(column)
         } else {
-            itemX = beginCellLeft + (itemWidth + leftRightSpace) * CGFloat(column) + leftRightSpace
+            itemX = beginCellX + beginCellLeft + (itemWidthHeight + itemDiffSpace) * CGFloat(column)
         }
-        cell.frame = CGRect(x: leftDiff + itemX, y: itemY, width: itemWidth, height: itemWidth)
+        cell.frame = CGRect(x: leftDiff + itemX, y: itemY, width: itemWidthHeight, height: itemWidthHeight)
         return cell
     }
 
@@ -187,26 +201,26 @@ class TUIVideoSeatLayout: UICollectionViewFlowLayout {
         // page:1,2,3 row:1,2,3, item:1,2,3
         // column:0,1,2,3
 
-        /*-----------------page&item&cell-----------------**/
+        /*-----------------item&page&cell-----------------**/
         let item = item + 1
         let page = Int(ceil(CGFloat(item) / CGFloat(kMaxShowCellCount))) // cell在第几页上
         let cell = UICollectionViewLayoutAttributes(forCellWith: indexPath)
 
-        /*-----------------itemWidth&currentPageAllRow&beginCellTop&beginCellLeft-----------------**/
-        let contentWidth = collectionViewWidth - CGFloat(kVideoSeatCellNumberOfOneRow + 1) * leftRightSpace
-        let itemWidth = contentWidth / CGFloat(kVideoSeatCellNumberOfOneRow) // 计算cell的宽
-        let currentPageAllRow = kMaxShowCellCount / kVideoSeatCellNumberOfOneRow // 计算本页总行数
-        let itemAllHeight = itemWidth * CGFloat(currentPageAllRow) + CGFloat(currentPageAllRow - 1) * topBottomSpace
-        let beginCellTop = (collectionViewHeight - itemAllHeight) * 0.5 // 计算beginCellTop
+        /*-----------------currentPageAllRow&beginCellY&beginCellLeft-----------------**/
+        let currentPageAllRow = kMaxShowCellCount / Int(kVideoSeatCellNumberOfOneRow) // 计算本页总行数
+        let itemAllHeight = (itemWidthHeight + itemDiffSpace) * CGFloat(currentPageAllRow) - itemDiffSpace
+        let itemAllWidth = (itemWidthHeight + itemDiffSpace) * kVideoSeatCellNumberOfOneRow - itemDiffSpace
+        let beginCellY = (collectionViewHeight - itemAllHeight) * 0.5 // 计算beginCellTop
+        let beginCellX = (collectionViewWidth - itemAllWidth) * 0.5 // 计算beginCellTop
         let beginCellLeft = CGFloat(page - 1) * collectionViewWidth // 计算beginCellLeft
 
-        /*-----------------itemIndex&columnIndex&rowIndex-----------------**/
+        /*-----------------itemIndex&column&row-----------------**/
         let itemIndex = item - (page - 1) * kMaxShowCellCount // 本页的第几个
-        let column = (itemIndex - 1) % kVideoSeatCellNumberOfOneRow // cell当前页上的第几列 从0开始
+        let column = (itemIndex - 1) % Int(kVideoSeatCellNumberOfOneRow) // cell当前页上的第几列 从0开始
         let row = Int(ceil(CGFloat(itemIndex) / CGFloat(kVideoSeatCellNumberOfOneRow))) // cell当前页上的第几行
-        let itemY = beginCellTop + (itemWidth + topBottomSpace) * CGFloat(row - 1)
-        let itemX = beginCellLeft + (itemWidth + leftRightSpace) * CGFloat(column) + leftRightSpace
-        cell.frame = CGRect(x: leftDiff + itemX, y: itemY, width: itemWidth, height: itemWidth)
+        let itemY = beginCellY + (itemWidthHeight + itemDiffSpace) * CGFloat(row - 1)
+        let itemX = beginCellX + beginCellLeft + (itemWidthHeight + itemDiffSpace) * CGFloat(column)
+        cell.frame = CGRect(x: leftDiff + itemX, y: itemY, width: itemWidthHeight, height: itemWidthHeight)
         return cell
     }
 }

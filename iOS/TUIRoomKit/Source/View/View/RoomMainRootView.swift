@@ -12,7 +12,8 @@ protocol RoomMainViewFactory {
     func makeBottomView() -> UIView
     func makeTopView() -> UIView
     func makeMiddleView() -> UIView
-    func makeBeautyView() -> UIView?
+    func makeBeautyView() -> UIView
+    func makeRaiseHandNoticeView() -> UIView
 }
 
 class RoomMainRootView: UIView {
@@ -41,8 +42,12 @@ class RoomMainRootView: UIView {
         return viewFactory.makeBottomView()
     }()
     
-    lazy var beautyView: UIView? = {
+    lazy var beautyView: UIView = {
         return viewFactory.makeBeautyView()
+    }()
+    
+    lazy var raiseHandNoticeView: UIView = {
+        return viewFactory.makeRaiseHandNoticeView()
     }()
     
     // MARK: - view layout
@@ -61,35 +66,61 @@ class RoomMainRootView: UIView {
         addSubview(videoSeatView)
         addSubview(topView)
         addSubview(bottomView)
-        guard let beautyView = beautyView else { return }
         addSubview(beautyView)
+        addSubview(raiseHandNoticeView)
     }
     
     func activateConstraints() {
         topView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide.snp.top)
-            make.width.equalToSuperview()
+            make.leading.equalTo(safeAreaLayoutGuide.snp.leading)
+            make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
             make.height.equalTo(53.scale375())
-            make.centerX.equalToSuperview()
         }
         bottomView.snp.makeConstraints { make in
-            make.width.equalToSuperview()
-            make.height.equalTo(52.scale375())
             make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+            make.leading.equalTo(safeAreaLayoutGuide.snp.leading)
+            make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
+            make.height.equalTo(52.scale375())
         }
         videoSeatView.snp.makeConstraints { make in
-            make.width.equalToSuperview()
+            make.leading.equalTo(safeAreaLayoutGuide.snp.leading)
+            make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
             make.top.equalTo(topView.snp.bottom)
             make.bottom.equalTo(bottomView.snp.top).offset(-5)
         }
-        guard let beautyView = beautyView else { return }
         beautyView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.bottom.equalToSuperview()
+            make.leading.equalTo(safeAreaLayoutGuide.snp.leading)
+            make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
+        }
+        raiseHandNoticeView.snp.makeConstraints { make in
+            make.bottom.equalTo(bottomView.snp.top).offset(-15)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(40)
+            make.width.equalTo(300)
         }
     }
     
     private func bindInteraction() {
         viewModel.viewResponder = self
+    }
+    
+    func updateRootViewOrientation(isLandscape: Bool) {
+        if isLandscape { //横屏时，videoSeat扩展到整个页面
+            videoSeatView.snp.remakeConstraints { make in
+                make.leading.equalTo(safeAreaLayoutGuide.snp.leading)
+                make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
+                make.top.bottom.equalToSuperview()
+            }
+        } else {
+            videoSeatView.snp.remakeConstraints { make in
+                make.leading.equalTo(safeAreaLayoutGuide.snp.leading)
+                make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
+                make.top.equalTo(topView.snp.bottom)
+                make.bottom.equalTo(bottomView.snp.top).offset(-5)
+            }
+        }
     }
     
     deinit {
@@ -107,9 +138,11 @@ extension RoomMainRootView: RoomMainViewResponder {
         alertVC.addAction(sureAction)
         RoomRouter.shared.presentAlert(alertVC)
     }
+    
     func showBeautyView() {
-        beautyView?.isHidden = false
+        beautyView.isHidden = false
     }
+    
     func makeToast(text: String) {
         RoomRouter.makeToast(toast: text)
     }

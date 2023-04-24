@@ -7,15 +7,24 @@
 
 import Foundation
 
+protocol TransferMasterViewResponder: NSObject {
+    func reloadTransferMasterTableView()
+    func searchControllerChangeActive(isActive: Bool)
+}
+
 class TransferMasterViewModel {
     var attendeeList: [UserModel]
     var userId: String
-    
+    weak var viewResponder: TransferMasterViewResponder? = nil
     init() {
         attendeeList = EngineManager.shared.store.attendeeList.filter({ userModel in
             userModel.userId != EngineManager.shared.store.currentUser.userId
         })
         userId = ""
+    }
+    
+    func backAction() {
+        RoomRouter.shared.dismissPopupViewController(viewType: .transferMasterViewType)
     }
     
     func appointMasterAction(sender: UIButton) {
@@ -44,5 +53,17 @@ class TransferMasterViewModel {
     
     deinit {
         debugPrint("deinit \(self)")
+    }
+}
+
+extension TransferMasterViewModel: PopUpViewResponder {
+    func updateViewOrientation(isLandscape: Bool) {
+        viewResponder?.searchControllerChangeActive(isActive: false)
+        attendeeList = EngineManager.shared.store.attendeeList
+        viewResponder?.reloadTransferMasterTableView()
+    }
+    
+    func searchControllerChangeActive(isActive: Bool) {
+        viewResponder?.searchControllerChangeActive(isActive: isActive)
     }
 }

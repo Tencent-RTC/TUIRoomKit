@@ -11,7 +11,18 @@ import Foundation
 class SetUpView: UIView {
     let viewModel: SetUpViewModel
     var selectedIndex: Int = 0
-    let width: CGFloat = (kScreenWidth - 30 * 2 - 20 * 2) / 3
+    var rootViewWidth: CGFloat {
+        guard let orientationIsLandscape = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape as? Bool else
+        { return 0 }
+        if orientationIsLandscape { //横屏
+           return UIScreen.main.bounds.width/2
+        } else { //竖屏
+           return UIScreen.main.bounds.width
+        }
+    }
+    var width: CGFloat {
+           return (rootViewWidth - 30 * 2 - 20 * 2) / 3
+    }
     private var viewArray: [SetUpItemView] = []
     
     lazy var segmentView: UIScrollView = {
@@ -61,6 +72,10 @@ class SetUpView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        debugPrint("deinit \(self)")
+    }
+    
     func initItemView() {
         let videoItemView = SetUpItemView(viewModel: viewModel, viewType: .videoType)
         let audioItemView = SetUpItemView(viewModel: viewModel, viewType: .audioType)
@@ -78,6 +93,13 @@ class SetUpView: UIView {
         activateConstraints()
         bindInteraction()
         isViewReady = true
+    }
+    
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        roundedRect(rect: bounds,
+                    byRoundingCorners: [.topLeft, .topRight],
+                    cornerRadii: CGSize(width: 12, height: 12))
     }
     
     func constructViewHierarchy() {
@@ -104,7 +126,7 @@ class SetUpView: UIView {
         for(index, item) in viewArray.enumerated() {
             segmentScrollView.addSubview(item)
             item.snp.makeConstraints { make in
-                make.left.equalToSuperview().offset(CGFloat(index) * (UIScreen.main.bounds.width))
+                make.left.equalToSuperview().offset(CGFloat(index) * (rootViewWidth))
                 make.top.equalToSuperview()
                 make.width.equalToSuperview()
                 make.height.equalToSuperview()
@@ -177,7 +199,7 @@ extension SetUpView: SetUpViewEventResponder {
         view?.updateStackView(item: item, index: listIndex)
     }
     func updateSegmentScrollView(selectedIndex: Int) {
-        segmentScrollView.setContentOffset(CGPoint(x: CGFloat(selectedIndex) * UIScreen.main.bounds.width, y: 0), animated: true)
+        segmentScrollView.setContentOffset(CGPoint(x: CGFloat(selectedIndex) * rootViewWidth, y: 0), animated: true)
     }
     func makeToast(text: String) {
         makeToast(text)

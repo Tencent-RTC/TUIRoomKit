@@ -10,6 +10,21 @@ import Foundation
 
 class RaiseHandApplicationListView: UIView {
     let viewModel: RaiseHandApplicationListViewModel
+    
+    let backButton: UIButton = {
+        let button = UIButton()
+        button.contentVerticalAlignment = .center
+        button.contentHorizontalAlignment = .left
+        button.setTitleColor(UIColor(0xADB6CC), for: .normal)
+        let image = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
+        button.setImage(image, for: .normal)
+        button.setTitle(.videoConferenceTitle, for: .normal)
+        button.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 18)
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 25, bottom: 0, right: 0)
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 0)
+        return button
+    }()
+    
     let searchController: UISearchController = {
         let controller = UISearchController(searchResultsController: nil)
         controller.obscuresBackgroundDuringPresentation = false
@@ -78,15 +93,22 @@ class RaiseHandApplicationListView: UIView {
     }
     
     func constructViewHierarchy() {
+        addSubview(backButton)
         addSubview(applyTableView)
         addSubview(allAgreeButton)
         addSubview(inviteMemberButton)
     }
     
     func activateConstraints() {
+        backButton.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.top.equalTo(safeAreaLayoutGuide.snp.top)
+            make.height.equalTo(20)
+            make.width.equalTo(200)
+        }
         applyTableView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
-            make.top.equalTo(safeAreaLayoutGuide.snp.top)
+            make.top.equalTo(backButton.snp.bottom).offset(5)
             make.bottom.equalToSuperview()
         }
         allAgreeButton.snp.makeConstraints { make in
@@ -104,12 +126,19 @@ class RaiseHandApplicationListView: UIView {
     }
     
     func bindInteraction() {
-        viewModel.responder = self
+        viewModel.viewResponder = self
         searchController.delegate = self
         searchController.searchResultsUpdater = self
         setupViewState()
+        backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         allAgreeButton.addTarget(self, action: #selector(allAgreeStageAction(sender:)), for: .touchUpInside)
         inviteMemberButton.addTarget(self, action: #selector(inviteMemberAction(sender:)), for: .touchUpInside)
+    }
+    
+    @objc func backAction(sender: UIButton) {
+        searchController.searchBar.endEditing(true)
+        searchController.isActive = false
+        viewModel.backAction()
     }
     
     @objc func allAgreeStageAction(sender: UIButton) {
@@ -118,13 +147,6 @@ class RaiseHandApplicationListView: UIView {
     
     @objc func inviteMemberAction(sender: UIButton) {
         viewModel.inviteMemberAction(sender: sender, view: self)
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        searchController.searchBar.endEditing(true)
-        searchController.searchBar.endEditing(true)
-        viewModel.inviteSeatList = viewModel.engineManager.store.inviteSeatList
-        applyTableView.reloadData()
     }
     
     private func setupViewState() {
@@ -184,6 +206,11 @@ extension RaiseHandApplicationListView: UITableViewDelegate {
 }
 
 extension RaiseHandApplicationListView: RaiseHandApplicationListViewResponder {
+    func searchControllerChangeActive(isActive: Bool) {
+        searchController.searchBar.endEditing(true)
+        searchController.isActive = false
+    }
+    
     func reloadApplyListView() {
         applyTableView.reloadData()
     }
@@ -374,4 +401,5 @@ private extension String {
     static let agreeSeatText = localized("TUIRoom.agree.seat")
     static let disagreeSeatText = localized("TUIRoom.disagree.seat")
     static let meText = localized("TUIRoom.me")
+    static let videoConferenceTitle = localized("TUIRoom.video.conference.title")
 }
