@@ -1,5 +1,10 @@
 ## 发布日志
 
+### Version 1.2.0 @ 2023.04.25
+- iOS：TUIRoomKit增加横屏模式
+- iOS：TUIRoomKit增加举手发言房间上麦提示
+- iOS：TUIVideoSeat增加横屏模式和双指放大功能
+
 ### Version 1.1.0 @ 2023.04.14
 - iOS&Android: 适配 `RoomEngine`  `V1.2.0` 修改
 - iOS：VideoSeat增加演讲者模式
