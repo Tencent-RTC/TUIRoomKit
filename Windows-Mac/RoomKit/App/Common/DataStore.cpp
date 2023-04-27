@@ -213,11 +213,11 @@ void DataStore::ParseLaunchParam(QStringList params) {
     is_online_ = is_online;
 }
 
-void DataStore::SetAudioQuality(liteav::TRTCAudioQuality audio_quality) {
+void DataStore::SetAudioQuality(tuikit::TUIAudioQuality audio_quality) {
     audio_quality_ = audio_quality;
 }
 
-liteav::TRTCAudioQuality DataStore::GetAudioQuality() {
+tuikit::TUIAudioQuality DataStore::GetAudioQuality() {
     return audio_quality_;
 }
 

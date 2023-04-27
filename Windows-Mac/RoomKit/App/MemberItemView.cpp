@@ -4,7 +4,7 @@
 #include "DataStore.h"
 #include "MessageDispatcher/MessageDispatcher.h"
 
-MemberItemView::MemberItemView(TUIRole role, const TUIUserInfo& user_info, QWidget* parent)
+MemberItemView::MemberItemView(tuikit::TUIRole role, const TUIUserInfo& user_info, QWidget* parent)
     :role_(role)
     ,user_info_(user_info)
     ,QWidget(parent){
@@ -22,7 +22,7 @@ MemberItemView::~MemberItemView(){
 void MemberItemView::InitUi() {
     LOAD_STYLE_SHEET(":/MemberItemView/MemberItemView/MemberItemView.qss");
 
-    if (role_ != TUIRole::kMaster) {
+    if (role_ != tuikit::TUIRole::kRoomOwner) {
         ui_->mic_btn->setEnabled(false);
         ui_->cam_btn->setEnabled(false);
         ui_->control_widget->hide();
@@ -41,7 +41,7 @@ void MemberItemView::InitConnect() {
 
 bool MemberItemView::eventFilter(QObject *watched, QEvent *event) {
     auto local_user = TUIRoomCore::GetInstance()->GetUserInfo(DataStore::Instance()->GetCurrentUserInfo().user_id);
-    if (event->type() == QEvent::Enter && local_user && local_user->role == TUIRole::kMaster) {
+    if (event->type() == QEvent::Enter && local_user && local_user->role == tuikit::TUIRole::kRoomOwner) {
         if (watched == ui_->cam_btn) {
             QString tip = user_info_.has_video_stream ? tr("click to close video") : tr("click to open video");
             ui_->cam_btn->setToolTip(tip);
@@ -83,7 +83,7 @@ void MemberItemView::SetMemberStatus(MemberStatus status) {
 }
 
 void MemberItemView::UpdateMaster() {
-    role_ = TUIRole::kMaster;
+    role_ = tuikit::TUIRole::kRoomOwner;
     ui_->mic_btn->setEnabled(true);
     ui_->cam_btn->setEnabled(true);
     ui_->control_widget->show();
@@ -92,7 +92,7 @@ void MemberItemView::UpdateMaster() {
 void MemberItemView::SlotMemberOperate() {
     // 成员列表操作，只有主持人有权限
     // Member list operation. Only the host has the permission
-    if (role_ != TUIRole::kMaster) {
+    if (role_ != tuikit::TUIRole::kRoomOwner) {
         return;
     }
     QObject* obj = sender();

@@ -140,7 +140,7 @@
     </message>
     <message>
         <location filename="../../App/Form/ChatRoomViewController.ui" line="127"/>
-        <location filename="../../App/ChatRoomViewController.cpp" line="169"/>
+        <location filename="../../App/ChatRoomViewController.cpp" line="172"/>
         <source>All Mute</source>
         <translation>All Mute</translation>
     </message>
@@ -155,12 +155,12 @@
         <translation>Send</translation>
     </message>
     <message>
-        <location filename="../../App/ChatRoomViewController.cpp" line="166"/>
+        <location filename="../../App/ChatRoomViewController.cpp" line="170"/>
         <source>Admin forbid all users send message.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/ChatRoomViewController.cpp" line="173"/>
+        <location filename="../../App/ChatRoomViewController.cpp" line="175"/>
         <source>Admin cancel forbid all users send message.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -201,80 +201,80 @@
 <context>
     <name>LoginViewController</name>
     <message>
-        <location filename="../../App/Form/LoginViewController.ui" line="213"/>
+        <location filename="../../App/Form/LoginViewController.ui" line="210"/>
         <source>YourName</source>
         <translation>Your Name</translation>
     </message>
     <message>
-        <location filename="../../App/Form/LoginViewController.ui" line="136"/>
+        <location filename="../../App/Form/LoginViewController.ui" line="133"/>
         <source>RoomID</source>
         <translation>RoomID</translation>
     </message>
     <message>
-        <location filename="../../App/Form/LoginViewController.ui" line="155"/>
+        <location filename="../../App/Form/LoginViewController.ui" line="152"/>
         <source>The maximum length cannot exceed 9</source>
         <translation>The maximum length cannot exceed 9</translation>
     </message>
     <message>
-        <location filename="../../App/Form/LoginViewController.ui" line="232"/>
+        <location filename="../../App/Form/LoginViewController.ui" line="229"/>
         <source>The maximum length cannot exceed 16</source>
         <translation type="unfinished">The maximum length cannot exceed 16</translation>
     </message>
     <message>
-        <location filename="../../App/Form/LoginViewController.ui" line="284"/>
-        <location filename="../../App/LoginViewController.cpp" line="188"/>
-        <location filename="../../App/LoginViewController.cpp" line="213"/>
+        <location filename="../../App/Form/LoginViewController.ui" line="281"/>
+        <location filename="../../App/LoginViewController.cpp" line="210"/>
+        <location filename="../../App/LoginViewController.cpp" line="235"/>
         <source>EnterRoom</source>
         <translation>Enter Room</translation>
     </message>
     <message>
-        <location filename="../../App/Form/LoginViewController.ui" line="395"/>
-        <source>Logout</source>
+        <location filename="../../App/Form/LoginViewController.ui" line="358"/>
+        <source>SDKAPPID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/Form/LoginViewController.ui" line="360"/>
-        <location filename="../../App/LoginViewController.cpp" line="58"/>
+        <location filename="../../App/Form/LoginViewController.ui" line="456"/>
+        <location filename="../../App/LoginViewController.cpp" line="55"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="../../App/LoginViewController.cpp" line="58"/>
+        <location filename="../../App/LoginViewController.cpp" line="55"/>
         <source>Chinese</source>
         <translation>简体中文</translation>
     </message>
     <message>
-        <location filename="../../App/LoginViewController.cpp" line="148"/>
+        <location filename="../../App/LoginViewController.cpp" line="168"/>
         <source>user_id or room_id can&apos;t be empty.</source>
         <translation>用户名或房间号不能为空。</translation>
     </message>
     <message>
-        <location filename="../../App/LoginViewController.cpp" line="211"/>
+        <location filename="../../App/LoginViewController.cpp" line="233"/>
         <source>Login failed</source>
         <translation>登录失败</translation>
     </message>
     <message>
-        <location filename="../../App/LoginViewController.cpp" line="228"/>
+        <location filename="../../App/LoginViewController.cpp" line="250"/>
         <source>You have been removed from room</source>
         <translation>You have been removed from room</translation>
     </message>
     <message>
-        <location filename="../../App/LoginViewController.cpp" line="231"/>
+        <location filename="../../App/LoginViewController.cpp" line="253"/>
         <source>The room has been destroyed</source>
         <translation>The room has been destroye</translation>
     </message>
     <message>
-        <location filename="../../App/LoginViewController.cpp" line="234"/>
+        <location filename="../../App/LoginViewController.cpp" line="256"/>
         <source>You have been kicked off line</source>
         <translation>You have been kicked off</translation>
     </message>
     <message>
-        <location filename="../../App/LoginViewController.cpp" line="166"/>
+        <location filename="../../App/LoginViewController.cpp" line="188"/>
         <source>Please complete the user information first</source>
         <translation>Please complete the user information first</translation>
     </message>
     <message>
-        <location filename="../../App/LoginViewController.cpp" line="170"/>
+        <location filename="../../App/LoginViewController.cpp" line="192"/>
         <source>Entering...</source>
         <translation>Entering...</translation>
     </message>
@@ -289,94 +289,98 @@
         <translation>Are you sure to leave the room ?</translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="517"/>
+        <location filename="../../App/MainWindow.cpp" line="510"/>
         <source>The master has set video ban for all staff, you cannot open the video temporarily.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="539"/>
+        <location filename="../../App/MainWindow.cpp" line="531"/>
         <source>The master has set audio ban for all staff, you cannot open the audio temporarily.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="625"/>
+        <location filename="../../App/MainWindow.cpp" line="602"/>
         <source>Send the messgae failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="631"/>
+        <location filename="../../App/MainWindow.cpp" line="608"/>
         <source>Failed to open the camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="635"/>
+        <location filename="../../App/MainWindow.cpp" line="612"/>
         <source>Failed to turn on the microphone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="639"/>
+        <location filename="../../App/MainWindow.cpp" line="616"/>
         <source>Other users are sharing screens</source>
         <translation type="unfinished">Other user is sharing screens</translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="645"/>
+        <location filename="../../App/MainWindow.cpp" line="622"/>
         <source>Mute chat room failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="648"/>
+        <location filename="../../App/MainWindow.cpp" line="625"/>
         <source>Change speech mode failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="674"/>
-        <source>Admin set all users camera muted.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../App/MainWindow.cpp" line="676"/>
-        <source>Muted camera by admin.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../App/MainWindow.cpp" line="681"/>
-        <source>Admin requests to turn on your camera, are you agree ?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../App/MainWindow.cpp" line="688"/>
-        <location filename="../../App/MainWindow.cpp" line="717"/>
-        <source>The request has timed out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../App/MainWindow.cpp" line="703"/>
-        <source>Admin set all users microphone muted.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../App/MainWindow.cpp" line="705"/>
-        <source>Muted microphone by admin.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../App/MainWindow.cpp" line="710"/>
-        <source>Admin requests to turn on your microphone, are you agree ?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../App/MainWindow.cpp" line="222"/>
         <location filename="../../App/MainWindow.cpp" line="651"/>
-        <source>Enter room failed</source>
+        <source>the room microphone is disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/MainWindow.cpp" line="653"/>
+        <source>the room microphone is enable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../App/MainWindow.cpp" line="659"/>
+        <source>the room camera is disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/MainWindow.cpp" line="661"/>
+        <source>the room camera is enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/MainWindow.cpp" line="667"/>
+        <source>the camera is disable by admin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/MainWindow.cpp" line="679"/>
+        <source>the microphone is disable by admin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/MainWindow.cpp" line="692"/>
+        <source>Admin requests to turn on your camera, are you agree ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/MainWindow.cpp" line="714"/>
+        <source>Admin requests to turn on your microphone, are you agree ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/MainWindow.cpp" line="225"/>
+        <location filename="../../App/MainWindow.cpp" line="628"/>
+        <source>Enter room failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../App/MainWindow.cpp" line="636"/>
         <source>Open microphone failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MainWindow.cpp" line="658"/>
+        <location filename="../../App/MainWindow.cpp" line="635"/>
         <source>This application doesn&apos;t have microphone authorization</source>
         <translation type="unfinished"></translation>
     </message>
@@ -466,15 +470,15 @@
     </message>
     <message>
         <location filename="../../App/Form/MemberListViewController.ui" line="236"/>
-        <location filename="../../App/MemberListViewController.cpp" line="344"/>
-        <location filename="../../App/MemberListViewController.cpp" line="364"/>
+        <location filename="../../App/MemberListViewController.cpp" line="322"/>
+        <location filename="../../App/MemberListViewController.cpp" line="342"/>
         <source>forbid all mic</source>
         <translation>Forbid All Mic</translation>
     </message>
     <message>
         <location filename="../../App/Form/MemberListViewController.ui" line="303"/>
-        <location filename="../../App/MemberListViewController.cpp" line="337"/>
-        <location filename="../../App/MemberListViewController.cpp" line="374"/>
+        <location filename="../../App/MemberListViewController.cpp" line="315"/>
+        <location filename="../../App/MemberListViewController.cpp" line="352"/>
         <source>forbid all video</source>
         <translation>Forbid All Video</translation>
     </message>
@@ -519,59 +523,49 @@
         <translation type="vanished">Open All Camera</translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="161"/>
-        <source>It&apos;s already set not allowed to open microphone.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../App/MemberListViewController.cpp" line="166"/>
+        <location filename="../../App/MemberListViewController.cpp" line="159"/>
         <source>Request to turn on microphone rejected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="168"/>
+        <location filename="../../App/MemberListViewController.cpp" line="161"/>
         <source>Request to turn on microphone timeout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="170"/>
+        <location filename="../../App/MemberListViewController.cpp" line="163"/>
         <source>Request to turn on microphone error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="198"/>
-        <source>It&apos;s already set not allowed to open video.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../App/MemberListViewController.cpp" line="203"/>
+        <location filename="../../App/MemberListViewController.cpp" line="186"/>
         <source>Request to turn on camera rejected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="205"/>
+        <location filename="../../App/MemberListViewController.cpp" line="188"/>
         <source>Request to turn on camera timeout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="207"/>
+        <location filename="../../App/MemberListViewController.cpp" line="190"/>
         <source>Request to turn on camera error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="342"/>
-        <location filename="../../App/MemberListViewController.cpp" line="362"/>
+        <location filename="../../App/MemberListViewController.cpp" line="320"/>
+        <location filename="../../App/MemberListViewController.cpp" line="340"/>
         <source>open all mic</source>
         <translation>Cancel Forbid All Mic</translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="381"/>
+        <location filename="../../App/MemberListViewController.cpp" line="359"/>
         <source>%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../App/MemberListViewController.cpp" line="335"/>
-        <location filename="../../App/MemberListViewController.cpp" line="372"/>
+        <location filename="../../App/MemberListViewController.cpp" line="313"/>
+        <location filename="../../App/MemberListViewController.cpp" line="350"/>
         <source>open all video</source>
         <translation>Cancel Forbid All Video</translation>
     </message>
@@ -1183,7 +1177,7 @@
 <context>
     <name>StageListController</name>
     <message>
-        <location filename="../../App/StageListController.cpp" line="1059"/>
+        <location filename="../../App/StageListController.cpp" line="1052"/>
         <source>You have become the new master.</source>
         <translation>You have become the new master.</translation>
     </message>
@@ -1347,10 +1341,9 @@ Current Role: %1.</source>
 Current Role: %1.</translation>
     </message>
     <message>
-        <location filename="../../App/TransferRoomController.cpp" line="94"/>
         <source>You cannot transfer the room to the user.
 Current Role: %1.</source>
-        <translation>You cannot transfer the room to the user.
+        <translation type="vanished">You cannot transfer the room to the user.
 Current Role: %1.</translation>
     </message>
 </context>

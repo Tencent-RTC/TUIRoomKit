@@ -887,7 +887,7 @@ class ITRTCAudioFrameCallback {
      * 2. 此接口回调出的音频数据是可读写的，也就是说您可以在回调函数中同步修改音频数据，但请保证处理耗时。
      * 3. 此接口回调出的音频数据已经经过了前处理(ANS、AEC、AGC），但**不包含**背景音、音效、混响等前处理效果，延迟较低。
      */
-    virtual void onCapturedRawAudioFrame(TRTCAudioFrame* frame) {
+    virtual void onCapturedAudioFrame(TRTCAudioFrame* frame) {
     }
 
     /**
@@ -904,7 +904,7 @@ class ITRTCAudioFrameCallback {
      * @note
      * 1. 请不要在此回调函数中做任何耗时操作，由于 SDK 每隔 20ms 就要处理一帧音频数据，如果您的处理时间超过 20ms，就会导致声音异常。
      * 2. 此接口回调出的音频数据是可读写的，也就是说您可以在回调函数中同步修改音频数据，但请保证处理耗时。
-     * 3. 此接口回调出的数据已经经过了前处理(ANS、AEC、AGC）、音效和混 BGM 处理，声音的延迟相比于 {@link onCapturedRawAudioFrame} 要高一些。
+     * 3. 此接口回调出的数据已经经过了前处理(ANS、AEC、AGC）、音效和混 BGM 处理，声音的延迟相比于 {@link onCapturedAudioFrame} 要高一些。
      */
     virtual void onLocalProcessedAudioFrame(TRTCAudioFrame* frame) {
     }

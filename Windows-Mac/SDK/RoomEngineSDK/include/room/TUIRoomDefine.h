@@ -8,10 +8,14 @@
 
 #include "TUICommonDefine.h"
 
-#ifdef TUIKIT_EXPORTS
+#ifdef _WIN32
+#if defined(TUIKIT_EXPORTS)
 #define TUIKIT_API __declspec(dllexport)
 #else
 #define TUIKIT_API __declspec(dllimport)
+#endif
+#else
+#define TUIKIT_API __attribute__((visibility("default")))
 #endif
 
 namespace tuikit {
@@ -27,16 +31,48 @@ namespace tuikit {
  */
 enum class TUIRoomType {
 
-    /// Group类型房间，适用于会议，教育场景，该房间中麦位是无序的。
-    kGroup = 1,
+    ///会议类型房间，适用于会议，教育场景，该房间中可以开启自由发言，申请发言、麦控等不同模式，麦位没有编号。
+    kConference = 1,
 
-    /// Open类型房间，适用于直播场景，该房间中麦位是有序的。
-    kOpen = 2,
+    /// Open类型房间，适用于直播场景，该房间可以开启自由发言，麦位控制模式，该房间中麦位是有编号的。
+    kLivingRoom = 2,
 
 };
 
 /**
- * 1.2 房间内角色类型
+ * 1.2 房间模式
+ */
+enum class TUISpeechMode {
+
+    ///自由发言模式
+    kFreeToSpeak = 1,
+
+    ///申请发言模式。（仅在会议类型房间下生效）
+    kApplyToSpeak = 2,
+
+    ///麦控模式。
+    kApplySpeakAfterTakingSeat = 3,
+
+};
+
+/**
+ * 1.3 房间内媒体设备类型
+ */
+enum class TUIMediaDevice {
+
+    ///麦克风
+    kMicrophone = 1,
+
+    ///摄像头
+    kCamera = 2,
+
+    ///屏幕共享
+    kApplyScreenSharing = 3,
+
+};
+
+/**
+ * 1.4 房间内角色类型
  */
 enum class TUIRole {
 
@@ -60,26 +96,26 @@ enum class TUIRole {
 /**
  * 2.1 视频质量
  */
-enum class TUIVideoProfile {
+enum class TUIVideoQuality {
 
-    ///低清
-    kLowDefinition = 0,
+    ///低清360P
+    kVideoQuality_360P = 1,
 
-    ///标清
-    kStandardDefinition = 1,
+    ///标清540P
+    kVideoQuality_540P = 2,
 
-    ///高清
-    kHighDefinition = 2,
+    ///高清720P
+    kVideoQuality_720P = 3,
 
-    ///超清
-    kSuperDefinition = 3,
+    ///超清1080P
+    kVideoQuality_1080P = 4,
 
 };
 
 /**
  * 2.2 音频质量
  */
-enum class TUIAudioProfile {
+enum class TUIAudioQuality {
 
     ///人声模式
     kAudioProfileSpeech = 0,
@@ -109,7 +145,7 @@ enum class TUIVideoStreamType {
 };
 
 /**
- * 2.4 更改原因（用户音视频状态变更操作原因: 自己主动修改 或者 被房主、管理员修改）
+ * 2.4 音视频状态更改原因（分类: 自己主动修改 或者 被房主、管理员修改）
  */
 enum class TUIChangeReason {
 
@@ -166,10 +202,13 @@ enum class TUIRequestAction {
     ///请求远端用户上麦
     kRequestRemoteUserOnSeat = 5,
 
-};
+    ///向管理员请求打开本地摄像头
+    kApplyToAdminToOpenLocalCamera = 6,
 
-///屏幕分享源句柄
-typedef void* TUISourceId;
+    ///向管理员请求打开本地麦克风
+    kApplyToAdminToOpenLocalMicrophone = 7,
+
+};
 
 /**
  * TUIList定义
@@ -212,42 +251,78 @@ struct TUIRoomInfo {
     ///房间ID(创建房间必填参数)
     const char* roomId;
 
+    ///主持人ID: 默认为房间创建者（只读）
+    const char* ownerId;
+
     ///房间类型（创建房间可选参数，默认Group类型），请参考：{@link TUIRoomType}。
     TUIRoomType roomType;
-
-    ///主持人ID: 默认为房间创建者（只读）
-    const char* owner;
 
     ///房间名称（创建房间可选参数，默认房间ID）
     const char* name;
 
+    ///房间发言模式
+    TUISpeechMode speechMode;
+
+    ///是否禁止打开摄像头（创建房间可选参数），默认值：{@link false}。
+    bool isCameraDisableForAllUser;
+
+    ///是否禁止打开麦克风（创建房间可选参数），默认值：{@link false}。
+    bool isMicrophoneDisableForAllUser;
+
+    ///是否禁止发送消息（创建房间可选参数），默认值：{@link false}。
+    bool isMessageDisableForAllUser;
+
+    ///最大麦位数
+    int maxSeatCount;
+
+    ///是否开启CDN直播（创建房间可选参数，直播房间使用），默认值：{@link false}。
+    bool enableCDNStreaming;
+
+    ///直播推流域名（创建房间可选参数，直播房间使用），默认值：空。
+    const char* cdnStreamDomain;
+
     ///房间创建时间（只读）
     uint64_t createTime;
 
-    ///房间成员数量（只读）
-    int roomMemberCount;
+    ///房间内成员数量（只读）
+    int memberCount;
 
-    ///最大麦位数量（创建房间可选参数，默认0不做麦位数量限制）
-    int maxSeatCount;
-
-    ///是否允许打开摄像头（创建房间可选参数），默认值：{@link true}。
-    bool enableVideo;
-
-    ///是否允许打开麦克风（创建房间可选参数），默认值：{@link true}。
-    bool enableAudio;
-
-    ///是否允许发送消息（创建房间可选参数），默认值：{@link true}。
-    bool enableMessage;
-
-    ///是否开启麦位控制（创建房间可选参数），默认值：{@link false}。
-    bool enableSeatControl;
-
-    TUIRoomInfo() : roomId(nullptr), roomType(TUIRoomType::kGroup), owner(nullptr), name(nullptr), createTime(0), roomMemberCount(0), maxSeatCount(0), enableVideo(true), enableAudio(true), enableMessage(true), enableSeatControl(false) {
+    TUIRoomInfo()
+        : roomId(nullptr),
+          roomType(TUIRoomType::kConference),
+          name(nullptr),
+          speechMode(TUISpeechMode::kFreeToSpeak),
+          isCameraDisableForAllUser(false),
+          isMicrophoneDisableForAllUser(false),
+          isMessageDisableForAllUser(false),
+          maxSeatCount(0),
+          enableCDNStreaming(false),
+          cdnStreamDomain(nullptr),
+          ownerId(nullptr),
+          createTime(0),
+          memberCount(0) {
     }
 };
 
 /**
  * 5.2 房间内用户信息
+ */
+struct TUILoginUserInfo {
+    ///用户ID
+    const char* userId;
+
+    ///用户名称
+    const char* userName;
+
+    ///用户头像URL
+    const char* avatarUrl;
+
+    TUILoginUserInfo() : userId(nullptr), userName(nullptr), avatarUrl(nullptr) {
+    }
+};
+
+/**
+ * 5.3 房间内用户信息
  */
 struct TUIUserInfo {
     ///用户ID
@@ -271,12 +346,12 @@ struct TUIUserInfo {
     ///是否有屏幕分享流，默认值：{@link false}。
     bool hasScreenStream;
 
-    TUIUserInfo() : userId(nullptr), userName(nullptr), avatarUrl(nullptr), userRole(TUIRole::kGeneralUser), hasAudioStream(false), hasVideoStream(false), hasScreenStream(false) {
+    TUIUserInfo() : userRole(TUIRole::kGeneralUser), hasAudioStream(false), hasVideoStream(false), hasScreenStream(false) {
     }
 };
 
 /**
- * 5.3 房间内座位信息
+ * 5.4 房间内座位信息
  */
 struct TUISeatInfo {
     ///麦位序号
@@ -286,20 +361,37 @@ struct TUISeatInfo {
     const char* userId;
 
     ///麦位是否被锁定，默认值：{@link false}。
-    bool locked;
+    bool isLocked;
 
     ///麦位是否被禁止打开视频，默认值：{@link false}。
-    bool videoMuted;
+    bool isVideoLocked;
 
     ///麦位是否被禁止打开音频，默认值：{@link false}。
-    bool audioMuted;
+    bool isAudioLocked;
 
-    TUISeatInfo() : index(-1), userId(nullptr), locked(false), videoMuted(false), audioMuted(false) {
+    TUISeatInfo() : index(-1), userId(nullptr), isLocked(false), isVideoLocked(false), isAudioLocked(false) {
     }
 };
 
 /**
- * 5.4 房间内用户音量
+ * 5.5 锁定麦位操作参数
+ */
+struct TUISeatLockParams {
+    ///锁定麦位，默认值：{@link false}。
+    bool lockSeat;
+
+    ///锁定麦位视频，默认值：{@link false}。
+    bool lockVideo;
+
+    ///锁定麦位音频，默认值：{@link false}。
+    bool lockAudio;
+
+    TUISeatLockParams() : lockSeat(false), lockVideo(false), lockAudio(false) {
+    }
+};
+
+/**
+ * 5.5 房间内用户音量
  */
 struct TUIUserVoiceVolume {
     ///用户ID
@@ -313,7 +405,7 @@ struct TUIUserVoiceVolume {
 };
 
 /**
- * 5.5 信令请求
+ * 5.6 信令请求
  */
 struct TUIRequest {
     ///请求ID
@@ -335,31 +427,12 @@ struct TUIRequest {
     }
 };
 
-/**
- * 5.6 屏幕分享采集源信息
- */
-struct TUIShareTarget {
-    ///采集源的ID，对于窗口，该字段代表窗口的 ID；对于屏幕，该字段代表显示器的 ID
-    TUISourceId id;
-
-    ///采集源类型
-    TUICaptureSourceType sourceType;
-
-    ///采集源名称
-    const char* sourceName;
-
-    ///缩略图
-    TUIImageBuffer thumbnailImage;
-
-    ///图标
-    TUIImageBuffer iconImage;
-
-    ///是否最小化
-    bool isMinimized;
-
-    TUIShareTarget() : id(nullptr), sourceType(TUICaptureSourceType::kUnknown), sourceName(nullptr), isMinimized(false) {
-    }
-};
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                      TUIRoomEngine 基本类型定义
+//
+/////////////////////////////////////////////////////////////////////////////////
+///
 
 /**
  * TUIUserListResult定义
@@ -507,7 +580,6 @@ class TUIRequestCallback : public TUICallbackBase {
      *
      * @param requestId  请求ID
      * @param userId  用户ID
-     * @param message  错误信息
      */
     virtual void onAccepted(const char* requestId, const char* userId) = 0;
 
@@ -545,6 +617,35 @@ class TUIRequestCallback : public TUICallbackBase {
      * @param message  错误信息
      */
     virtual void onError(const char* requestId, const char* userId, const TUIError code, const char* message) = 0;
+};
+
+///屏幕分享源句柄
+typedef void* TUISourceId;
+
+/**
+ * 屏幕分享采集源信息
+ */
+struct TUIShareTarget {
+    ///采集源的ID，对于窗口，该字段代表窗口的 ID；对于屏幕，该字段代表显示器的 ID
+    TUISourceId id;
+
+    ///采集源类型
+    TUICaptureSourceType sourceType;
+
+    ///采集源名称
+    const char* sourceName;
+
+    ///缩略图
+    TUIImageBuffer thumbnailImage;
+
+    ///图标
+    TUIImageBuffer iconImage;
+
+    ///是否最小化
+    bool isMinimized;
+
+    TUIShareTarget() : id(nullptr), sourceType(TUICaptureSourceType::kUnknown), sourceName(nullptr), isMinimized(false) {
+    }
 };
 
 }  // namespace tuikit

@@ -508,12 +508,12 @@ void MainWindowLayout::ShowTransferRoomWindow() {
 }
 
 void MainWindowLayout::TransferRoomToOther() {
-    auto member_list = TUIRoomCore::GetInstance()->GetRoomUsers();
-    for (int i = 0; i < member_list.size(); i++) {
-        auto member = member_list.at(i);
-        if (member.role == TUIRole::kAnchor) {
-            TUIRoomCore::GetInstance()->TransferRoomMaster(member.user_id);
-            return;
-        }
+  auto member_list = TUIRoomCore::GetInstance()->GetRoomUsers();
+  for (int i = 0; i < member_list.size(); i++) {
+    auto member = member_list.at(i);
+    if (member.user_id != DataStore::Instance()->GetCurrentUserInfo().user_id) {
+      TUIRoomCore::GetInstance()->TransferRoomMaster(member.user_id);
+      return;
     }
+  }
 }

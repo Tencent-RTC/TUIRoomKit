@@ -380,7 +380,10 @@ struct V2TXLivePusherStatistics {
     /// 【字段含义】音频码率（Kbps）。
     int32_t audioBitrate;
 
-    V2TXLivePusherStatistics() : appCpu(0), systemCpu(0), width(0), height(0), fps(0), videoBitrate(0), audioBitrate(0) {
+    /// 【字段含义】从 SDK 到云端的往返延时（ms）
+    int32_t rtt;
+
+    V2TXLivePusherStatistics() : appCpu(0), systemCpu(0), width(0), height(0), fps(0), videoBitrate(0), audioBitrate(0), rtt(0) {
     }
 };
 

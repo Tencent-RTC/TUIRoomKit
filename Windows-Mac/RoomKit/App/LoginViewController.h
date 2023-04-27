@@ -41,7 +41,7 @@ private slots:
 private:
     Ui::LoginViewController* ui_;
     MainWindow* main_window_ = nullptr;
-    TUISpeechMode speech_mode_;
+    tuikit::TUISpeechMode speech_mode_;
     ViewDragger view_dragger_;
 
     QTranslator* translator_zh_ = nullptr;

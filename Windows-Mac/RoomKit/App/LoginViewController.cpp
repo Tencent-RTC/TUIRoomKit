@@ -176,7 +176,6 @@ void LoginViewController::SlotOnShowLoginWin(TUIExitRoomType type_exit_room) {
         delete main_window_;
         main_window_ = nullptr;
     }
-    TUIRoomCore::GetInstance()->Logout();
     QDesktopWidget* desk = QApplication::desktop();
     this->move((desk->availableGeometry().width() - this->width()) / 2, (desk->availableGeometry().height() - this->height()) / 2);
     this->show();
@@ -196,7 +195,7 @@ void LoginViewController::SlotOnLogin(int code, const QString& message) {
     info.name = user_name;
     DataStore::Instance()->SetUserLoginInfo(info);
     TUIRoomCore::GetInstance()->SetSelfProfile(user_name,"");
-    main_window_ = new MainWindow(TUISpeechMode::kFreeSpeech);
+    main_window_ = new MainWindow(tuikit::TUISpeechMode::kFreeToSpeak);
     connect(main_window_, &MainWindow::SignalShowLoginWind, this, &LoginViewController::SlotOnShowLoginWin);
     main_window_->SetLoginView(this);
     main_window_->show();

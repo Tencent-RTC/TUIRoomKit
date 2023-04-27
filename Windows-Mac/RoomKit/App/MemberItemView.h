@@ -13,7 +13,7 @@ class MemberItemView : public QWidget
     Q_OBJECT
 
 public:
-    MemberItemView(TUIRole role, const TUIUserInfo& user_info, QWidget *parent = nullptr);
+    MemberItemView(tuikit::TUIRole role, const TUIUserInfo& user_info, QWidget *parent = nullptr);
     ~MemberItemView();
 
     void UpdateUserInfo(const std::string& user_id);
@@ -37,8 +37,8 @@ public slots:
     bool IsOnStage() const;
 
 private:
-    TUIRole role_;
-    TUISpeechMode speech_mode_;
+    tuikit::TUIRole role_;
+    tuikit::TUISpeechMode speech_mode_;
     TUIUserInfo user_info_;
     MemberStatus member_status_;
 

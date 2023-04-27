@@ -169,6 +169,17 @@ class V2TXLivePlayerObserver {
      */
     virtual void onReceiveSeiMessage(V2TXLivePlayer* player, int payloadType, const uint8_t* data, uint32_t dataSize) {
     }
+
+    /**
+     * 分辨率无缝切换回调
+     *
+     * @note  调用 {@link V2TXLivePlayer} 中的 `switchStream` 切换分辨率，会收到这个回调通知。
+     * @param player 回调该通知的播放器对象。
+     * @param url    切换的播放地址。
+     * @param code   状态码，0：成功，-1：切换超时，-2：切换失败，服务端错误，-3：切换失败，客户端错误。
+     */
+    virtual void onStreamSwitched(V2TXLivePlayer* player, const char* url, int32_t code) {
+    }
 };
 
 }  // namespace liteav

@@ -124,7 +124,7 @@ private:
     QTimer         hide_bar_timer_;
 
     QLabel*         label_member_num_ = nullptr;
-    TUIRole         role_;
+    tuikit::TUIRole         role_;
 
     std::string screen_shower_id_ = "";
     ScreenShareWindow* screen_share_window_ = nullptr;

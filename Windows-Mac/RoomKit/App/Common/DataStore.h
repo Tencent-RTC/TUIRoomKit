@@ -44,8 +44,8 @@ public:
     bool IsAppLaunch() const;
     void ParseStartParam(int argc, char** argv);
 
-    void SetAudioQuality(liteav::TRTCAudioQuality audio_quality);
-    liteav::TRTCAudioQuality GetAudioQuality();
+    void SetAudioQuality(tuikit::TUIAudioQuality audio_quality);
+    tuikit::TUIAudioQuality GetAudioQuality();
 
     void OpenAINoiseReduction(bool open);
     bool GetAINoiseReduction();
@@ -80,7 +80,7 @@ private:
     bool            ai_noise_reduction_opened_ = true;
     bool            is_online_ = false;
     Language        current_language_ = Language::kChinese;
-    liteav::TRTCAudioQuality audio_quality_ = liteav::TRTCAudioQualitySpeech;
+    tuikit::TUIAudioQuality audio_quality_ = tuikit::TUIAudioQuality::kAudioProfileSpeech;
 };
 
 #endif  //  !__DATA_CENTER_H__

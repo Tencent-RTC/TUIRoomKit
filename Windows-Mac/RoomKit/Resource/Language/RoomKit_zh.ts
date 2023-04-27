@@ -227,11 +227,11 @@
     </message>
     <message>
         <source>SDKAPPID</source>
-        <translation type="vanished">SDKAPPID</translation>
+        <translation>SDKAPPID</translation>
     </message>
     <message>
         <source>Logout</source>
-        <translation>退出当前账号</translation>
+        <translation type="vanished">退出当前账号</translation>
     </message>
 </context>
 <context>
@@ -246,11 +246,11 @@
     </message>
     <message>
         <source>Admin set all users camera muted.</source>
-        <translation>主持人设置了全员禁止打开摄像头。</translation>
+        <translation type="vanished">主持人设置了全员禁止打开摄像头。</translation>
     </message>
     <message>
         <source>Muted camera by admin.</source>
-        <translation>主持人关闭了您的摄像头。</translation>
+        <translation type="vanished">主持人关闭了您的摄像头。</translation>
     </message>
     <message>
         <source>Admin requests to turn on your camera, are you agree ?</source>
@@ -262,11 +262,11 @@
     </message>
     <message>
         <source>Admin set all users microphone muted.</source>
-        <translation>主持人设置了全员禁止打开麦克风。</translation>
+        <translation type="vanished">主持人设置了全员禁止打开麦克风。</translation>
     </message>
     <message>
         <source>Muted microphone by admin.</source>
-        <translation>主持人关闭了您的麦克风。</translation>
+        <translation type="vanished">主持人关闭了您的麦克风。</translation>
     </message>
     <message>
         <source>Admin requests to turn on your microphone, are you agree ?</source>
@@ -360,7 +360,31 @@ CPU：%3%
     </message>
     <message>
         <source>The request has timed out.</source>
-        <translation>请求已超时。</translation>
+        <translation type="vanished">请求已超时。</translation>
+    </message>
+    <message>
+        <source>the room microphone is disable</source>
+        <translation>当前房间禁止打开麦克风</translation>
+    </message>
+    <message>
+        <source>the room microphone is enable</source>
+        <translation>当前房间允许麦克风</translation>
+    </message>
+    <message>
+        <source>the room camera is disable</source>
+        <translation>当前房间禁止打开摄像头</translation>
+    </message>
+    <message>
+        <source>the room camera is enable</source>
+        <translation>当前房间允许打开摄像头</translation>
+    </message>
+    <message>
+        <source>the camera is disable by admin</source>
+        <translation>摄像头被主持人关闭</translation>
+    </message>
+    <message>
+        <source>the microphone is disable by admin</source>
+        <translation>麦克风被主持人关闭</translation>
     </message>
 </context>
 <context>
@@ -474,7 +498,7 @@ CPU：%3%
     </message>
     <message>
         <source>It&apos;s already set not allowed to open microphone.</source>
-        <translation>已设置了全员禁麦。</translation>
+        <translation type="vanished">已设置了全员禁麦。</translation>
     </message>
     <message>
         <source>Request to turn on microphone rejected.</source>
@@ -490,7 +514,7 @@ CPU：%3%
     </message>
     <message>
         <source>It&apos;s already set not allowed to open video.</source>
-        <translation>已设置了全员禁视频。</translation>
+        <translation type="vanished">已设置了全员禁视频。</translation>
     </message>
     <message>
         <source>Request to turn on camera rejected.</source>
@@ -1144,7 +1168,7 @@ Current Role: %1.</source>
     <message>
         <source>You cannot transfer the room to the user.
 Current Role: %1.</source>
-        <translation>您不能将房间转给该用户。
+        <translation type="vanished">您不能将房间转给该用户。
 当前角色：%1.</translation>
     </message>
 </context>

@@ -327,7 +327,6 @@ void VideoRenderView::SlotOnFirstVideoFrame(const QString& user_id, const TUIStr
     if (user_info == nullptr) {
         return;
     }
-    emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*user_info);
     if (user_id.toStdString() == user_info_.user_id && DataStore::Instance()->GetCurrentUserInfo().user_id == user_info_.user_id) {
         // 本地用户
         // local user

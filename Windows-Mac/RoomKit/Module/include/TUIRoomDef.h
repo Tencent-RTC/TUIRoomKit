@@ -68,44 +68,6 @@ enum class TXSignalingStatus {
 };
 
 /**
- * Role type
- */
-enum class TUIRole {
-    // 主持人，具有房间麦控管理能力，聊天能力和音视频能力。
-    // Host: Has room microphone control, chat, and audio/video capabilities.
-    kMaster   = 1,
-
-    // 管理员，不具有音视频能力，具有群管理能力，无转交群能力。
-    // Admin: Has audio/video and group management capabilities but has no group transfer capabilities.
-    kManager  = 2,
-
-    // 主播，有聊天能力和音视频能力
-    // Anchor: Has has chat and audio/video capabilities
-    kAnchor   = 3,
-
-    // 观众，仅有聊天能力
-    // Audience: Has only chat capabilities
-    kAudience = 4,
-
-    // 为了兼容无IM能力的老版本，此参数用于识别老版本进房的用户
-    // To be compatible with early versions without IM capabilities, this parameter is added to identify users entering the room on an early version
-    kOther    = 5,
-};
-
-/**
- * Speech mode
- */
-enum class TUISpeechMode {
-    // 自由发言模式，成员进入房间后以主播身份进入TRTC房间
-    // Free speech mode, where members enter a TRTC room as an anchor
-    kFreeSpeech   = 1,
-
-    // 申请发言模式，成员进入房间后以听众身份进入TRTC房间，申请发言成功后以主播身份进入TRTC房间
-    // Apply speech mode: Users enter a TRTC room as listeners and can become anchors after request for permission to speak
-    kApplySpeech  = 2,
-};
-
-/**
  * Stream pull type
  */
 enum class TUIStreamType {
@@ -160,7 +122,7 @@ struct TUIUserInfo {
     std::string user_id;               // 用户ID (User ID)
     std::string user_name;             // 用户名 (Username)
     std::string avatar_url;            // 用户头像url (User profile photo URL)
-    TUIRole role;                      // 用户角色 (User role)
+    tuikit::TUIRole role;              // 用户角色 (User role)
     bool has_audio_stream;             // 是否有音频流 (Whether there is an audio stream)
     bool has_video_stream;             // 是否有视频流 (Whether there is a video stream)
     bool has_screen_stream;            // 是否有屏幕分享流 (Whether there is a screen sharing stream)
@@ -169,7 +131,7 @@ struct TUIUserInfo {
     bool has_subscribed_screen_stream; // 是否订阅屏幕分享流 (Whether the screen sharing stream is subscribed)
 
     TUIUserInfo()
-        : role(TUIRole::kAudience)
+        : role(tuikit::TUIRole::kGeneralUser)
         , user_id("")
         , user_name("")
         , has_audio_stream(false)
@@ -188,7 +150,7 @@ struct TUIRoomInfo {
     std::string room_id;                    // 房间ID (Room ID)
     std::string owner_id;                   // 群拥有者ID (Group owner ID)
     std::string room_name;                  // 房间名 (Room name)
-    TUISpeechMode mode;                     // 发言模式 (Speech mode)
+    tuikit::TUISpeechMode mode;             // 发言模式 (Speech mode)
     uint64_t start_time;                    // 开始时间 (Start time)
     int room_member_num;                    // 成员个数 (Number of members)
     bool is_chat_room_muted;                // 聊天室是否可以发消息 (Whether messages can be sent in the chat room)
@@ -198,7 +160,7 @@ struct TUIRoomInfo {
     bool is_callingroll;                    // 是否正在点名 (Whether a roll call is ongoing)
 
     TUIRoomInfo()
-        : mode(TUISpeechMode::kFreeSpeech)
+        : mode(tuikit::TUISpeechMode::kFreeToSpeak)
         , is_chat_room_muted(false)
         , is_speech_application_forbidden(false)
         , is_all_camera_muted(false)

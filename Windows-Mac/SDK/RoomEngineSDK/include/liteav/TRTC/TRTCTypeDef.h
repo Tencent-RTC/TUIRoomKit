@@ -9,6 +9,7 @@
 #include "ITXDeviceManager.h"
 #include <stdint.h>
 #include <memory>
+#include <string.h>
 
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
@@ -802,6 +803,21 @@ enum TRTCPublishMode {
     ///您可以通过设置该参数，配合媒体流编码输出参数 ({@link TRTCStreamEncoderParam}) 和混流转码参数 ({@link TRTCStreamMixingConfig})，将您指定的多路音视频流进行转码并发布到您指定的房间中。
     ///- 通过 {@link TRTCPublishTarget} 中的 TRTCUser 进行指定回推房间的机器人信息。
     TRTCPublishMixStreamToRoom = 4,
+
+};
+
+/**
+ * 4.13 加密算法
+ *
+ * 该枚举类型用于媒体流私有加密算法选择。
+ */
+enum TRTCEncryptionAlgorithm {
+
+    /// AES GCM 128。
+    TRTCEncryptionAlgorithmAes128Gcm = 0,
+
+    /// AES GCM 256。
+    TRTCEncryptionAlgorithmAes256Gcm = 1,
 
 };
 
@@ -1846,6 +1862,28 @@ struct TRTCStreamMixingConfig {
     uint32_t watermarkListSize;
 
     TRTCStreamMixingConfig() : backgroundColor(0), backgroundImage(nullptr), videoLayoutList(nullptr), videoLayoutListSize(0), audioMixUserList(nullptr), audioMixUserListSize(0), watermarkList(nullptr), watermarkListSize(0) {
+    }
+};
+
+/**
+ * 5.32 媒体流私有加密配置
+ *
+ * 该配置用于设置媒体流私有加密的算法和密钥。
+ */
+struct TRTCPayloadPrivateEncryptionConfig {
+    ///【字段含义】加密算法，默认为 TRTCEncryptionAlgorithmAes128Gcm。
+    TRTCEncryptionAlgorithm encryptionAlgorithm;
+
+    ///【字段含义】加密用密钥，字符串类型。
+    ///【推荐取值】若加密算法为 TRTCEncryptionAlgorithmAes128Gcm，密匙长度需为 16 字节，若加密算法为 TRTCEncryptionAlgorithmAes256Gcm，密匙长度需为 32 字节。
+    const char *encryptionKey;
+
+    ///【字段含义】盐，加密用初始向量。
+    ///【推荐取值】需确保填入该参数的数组不为空、不全为 0 且数据长度为 32 字节。
+    uint8_t encryptionSalt[32];
+
+    TRTCPayloadPrivateEncryptionConfig() : encryptionAlgorithm(TRTCEncryptionAlgorithm::TRTCEncryptionAlgorithmAes128Gcm), encryptionKey(nullptr) {
+        memset(encryptionSalt, 0, sizeof(encryptionSalt));
     }
 };
 
