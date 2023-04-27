@@ -17,8 +17,8 @@ enum PopUpViewType {
     case raiseHandApplicationListViewType //举手发言列表页面
     case transferMasterViewType //转换房主页面
     case QRCodeViewType // 二维码页面
-    case prepareViewType //预览页面
     case chatViewType //聊天页面
+    case navigationControllerType
 }
 
 protocol PopUpViewResponder: AnyObject {

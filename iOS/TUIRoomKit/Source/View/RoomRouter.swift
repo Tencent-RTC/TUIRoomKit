@@ -29,10 +29,8 @@ class RoomRouter {
         
     }
     
-    var navController: RoomKitNavigationController {
-        // 这里完善逻辑，如果没有获取到，就取当前window控制器
-        assert(context.rootNavigation != nil, "RoomKit路由设置有误，没有初始化根导航控制器")
-        return context.rootNavigation ?? RoomKitNavigationController(rootViewController: UIViewController())
+    var navController: RoomKitNavigationController? {
+        return context.rootNavigation
     }
     
     func pushToChatController(user: UserModel, roomInfo: RoomInfo) {
@@ -53,6 +51,10 @@ class RoomRouter {
             context.chatViewController = chatVC
             let appearance = context.appearance
             appearance.backgroundColor = UIColor.white
+            guard let navController = navController else {
+                push(viewController: chatVC)
+                return
+            }
             navController.navigationBar.standardAppearance = appearance
             navController.navigationBar.scrollEdgeAppearance = appearance
             navController.navigationBar.tintColor = UIColor.black
@@ -106,9 +108,10 @@ class RoomRouter {
         }
     }
     
+    //删除所有进房后的popupViewController
     func dismissAllRoomPopupViewController() {
         for viewType in context.presentControllerMap.keys {
-            if viewType == .prepareViewType { continue } //预览页面不属于进房后的页面，在退出房间时不被销毁
+            if viewType == .navigationControllerType { continue }
             guard let observerArray = context.presentControllerMap[viewType] else { continue }
             guard observerArray.count > 0 else {
                 context.presentControllerMap.removeValue(forKey: viewType)
@@ -122,13 +125,21 @@ class RoomRouter {
     }
     
     func pop(animated: Bool = true) {
-        navController.popViewController(animated: animated)
+        let currentController = getCurrentWindowViewController()
+        if navController?.viewControllers.first == currentController {
+            navController?.dismiss(animated: true)
+            context.rootNavigation = nil
+            context.presentControllerMap.removeValue(forKey: .navigationControllerType)
+        } else {
+            navController?.popViewController(animated: animated)
+        }
     }
     
     func popToRoomEntranceViewController() {
+        guard let navController = navController else { return }
         let controllerArray = navController.viewControllers
         guard let controller = controllerArray.first(where: { $0 is RoomEntranceViewController }) else { return }
-        self.navController.popToViewController(controller, animated: true)
+        navController.popToViewController(controller, animated: true)
     }
     
     func presentAlert(_ alertController: UIAlertController) {
@@ -147,11 +158,16 @@ class RoomRouter {
 extension RoomRouter {
     
     private func push(viewController: UIViewController, animated: Bool = true) {
+        guard let navController = navController else {
+            createRootNavigationAndPresent(controller: viewController)
+            return
+        }
         navController.pushViewController(viewController, animated: animated)
     }
     
     private func present(viewController: UIViewController, style: UIModalPresentationStyle = .automatic, animated: Bool = true) {
         viewController.modalPresentationStyle = style
+        guard let navController = navController else { return }
         navController.present(viewController, animated: animated)
     }
     
@@ -168,11 +184,11 @@ extension RoomRouter {
         let weakObserver = { [weak navigationController] in
             return navigationController
         }
-        if var observerArray = context.presentControllerMap[.prepareViewType] {
+        if var observerArray = context.presentControllerMap[.navigationControllerType] {
             observerArray.append(weakObserver)
-            context.presentControllerMap[.prepareViewType] = observerArray
+            context.presentControllerMap[.navigationControllerType] = observerArray
         } else {
-            context.presentControllerMap[.prepareViewType] = [weakObserver]
+            context.presentControllerMap[.navigationControllerType] = [weakObserver]
         }
         guard let controller = getCurrentWindowViewController() else { return }
         controller.present(navigationController, animated: true)

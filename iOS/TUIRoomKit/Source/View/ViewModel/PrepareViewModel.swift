@@ -65,7 +65,7 @@ class PrePareViewModel {
     }
     
     func backAction() {
-        RoomRouter.shared.dismissPopupViewController(viewType: .prepareViewType)
+        RoomRouter.shared.pop()
     }
     
     func joinRoom() {
