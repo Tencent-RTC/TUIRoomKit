@@ -14,11 +14,10 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    MainWindow(TUISpeechMode speech_mode, QWidget *parent = Q_NULLPTR);
+    MainWindow(tuikit::TUISpeechMode speech_mode, QWidget *parent = Q_NULLPTR);
     ~MainWindow();
 
     void InitShow(bool show_preview_wnd = true);
-    void ShowUserList();
     void SetLoginView(LoginViewController* login_view);
 
 protected:
@@ -32,6 +31,8 @@ protected:
     void resizeEvent(QResizeEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
 private:
+    void ShowUserList();
+    void ShowStageList();
     void StageAddMember(const TUIUserInfo& user_info);
     void StageRemoveMember(const std::string& user_id);
     void MemberListAddMember(const TUIUserInfo& user_info);
@@ -51,21 +52,24 @@ private:
 signals:
     void SignalShowLoginWind(TUIExitRoomType type_exit_room);
 
-private slots :
+private slots:
     void SlotClose();
     void SlotBottomMenuMuteCamera(bool);
     void SlotBottomMenuMuteMicrophone(bool);
     void SlotShowChatRoom(bool);
     void SlotOnError(int code, const QString& message);
     void SlotOnExitRoom(TUIExitRoomType code, const QString& message);
-    void SlotOnCameraMuted(const QString& request_id, bool mute,
-                           TUIMutedReason reason);
-    void SlotOnMicrophoneMuted(const QString& request_id, bool mute,
-                               TUIMutedReason reason);
-
+    void SlotOnAllUserMicrophoneDisableChanged(const QString& room_id,
+                                               bool is_disable);
+    void SlotOnAllUserCameraDisableChanged(const QString& room_id,
+                                           bool is_disable);
     void SlotEndDetection();
     void SlotOnCreateRoom(int code, const QString& message);
     void SlotOnEnterRoom(int code, const QString& message);
+    void SlotOnCameraStateChanged(bool has_video, tuikit::TUIChangeReason reason);
+    void SlotOnMicrophoneStateChanged(bool has_audio, tuikit::TUIChangeReason reason);
+    void SlotOnRequestOpenCameraByAdmin(const QString& request_id);
+    void SlotOnRequestOpenMicrophoneByAdmin(const QString& request_id);
 
     void SlotOnHideMenuBarTimeout();
 private:
@@ -77,7 +81,7 @@ private:
     VideoRenderView*            main_widget_control_ = nullptr;
 
     PopStageListController* pop_widget_ = nullptr;
-    TUISpeechMode speech_mode_;
+    tuikit::TUISpeechMode speech_mode_;
 
     LoginViewController* login_view_ = nullptr;
     TUIExitRoomType type_exit_room_ = TUIExitRoomType::kNormal;

@@ -46,13 +46,13 @@ void MemberListViewController::InitUi() {
     ui_->member_list_widget->setFocusPolicy(Qt::NoFocus);
     // 成员端不显示操作功能
     // The operation feature is not displayed on the member's client
-    if (user_info_.role != TUIRole::kMaster) {
+    if (user_info_.role != tuikit::TUIRole::kRoomOwner) {
         ui_->control_widget->hide();
         ui_->opeate_widget->hide();
         
         auto member_list = TUIRoomCore::GetInstance()->GetRoomUsers();
         auto it = find_if(member_list.begin(), member_list.end(), [](const TUIUserInfo& user_info) {
-            return user_info.role == TUIRole::kMaster;
+            return user_info.role == tuikit::TUIRole::kRoomOwner;
         });
         if (it == member_list.end()) {
             return; 
@@ -92,8 +92,6 @@ void MemberListViewController::InitConnect() {
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserLeave, this, &MemberListViewController::SlotOnRemoteUserLeaveRoom);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserCameraAvailable, this, &MemberListViewController::SlotOnRemoteUserVideoOpen);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserAudioAvailable, this, &MemberListViewController::SlotOnRemoteUserAudioOpen);
-    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserEnterSpeechState, this, &MemberListViewController::SlotOnRemoteUserEnterSpeechState);
-    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserExitSpeechState, this, &MemberListViewController::SlotOnRemoteUserExitSpeechState);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRoomMasterChanged, this, &MemberListViewController::SlotOnRoomMasterChanged);
     
     connect(&StatusUpdateCenter::Instance(), &StatusUpdateCenter::SignalUpdateUserInfo, this, &MemberListViewController::SlotUpdateUserInfo);
@@ -107,7 +105,7 @@ void MemberListViewController::InsertUser(const TUIUserInfo& user_info) {
         InitUi();
     }
     TUIRoomInfo room_info = TUIRoomCore::GetInstance()->GetRoomInfo();
-    if (user_info.role == TUIRole::kMaster) {
+    if (user_info.role == tuikit::TUIRole::kRoomOwner) {
         SetMaster(user_info.user_name);
         return;
     }
@@ -151,31 +149,21 @@ void MemberListViewController::MemberListMuteUserMic(const std::string& user_id)
     }
 
     bool mute = remote_user_info->has_audio_stream && remote_user_info->has_subscribed_audio_stream;
-    if (remote_user_info->role == TUIRole::kAnchor) {
-        if (mute) {
-            TUIRoomCore::GetInstance()->MuteUserMicrophone(user_id, mute, nullptr);
-            emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*remote_user_info);
-        } else {
-            bool microphone_all_muted = TUIRoomCore::GetInstance()->GetRoomInfo().is_all_microphone_muted;
-            if (microphone_all_muted) {
-                TXMessageBox::Instance().AddLineTextMessage(tr("It's already set not allowed to open microphone."));
-            } else {
-                auto callback = [=](RequestCallbackType type, const std::string& error_message) {
-                    LINFO("MuteUserMicrophone result type : %d,error_message :%s", (int)type, error_message.c_str());
-                    if (type == RequestCallbackType::kRequestRejected) {
-                        TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on microphone rejected."));
-                    } else if (type == RequestCallbackType::kRequestTimeout) {
-                        TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on microphone timeout."));
-                    } else if (type == RequestCallbackType::kRequestError) {
-                        TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on microphone error."));
-                    }
-                };
-                TUIRoomCore::GetInstance()->MuteUserMicrophone(user_id, mute, callback);
-            }
-        }
-    } else if (remote_user_info->role == TUIRole::kOther) {
+    if (mute) {
         TUIRoomCore::GetInstance()->MuteUserMicrophone(user_id, mute, nullptr);
-        emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*remote_user_info);
+        //emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*remote_user_info);
+    } else {
+        auto callback = [=](RequestCallbackType type, const std::string& error_message) {
+            LINFO("MuteUserMicrophone result type : %d,error_message :%s", (int)type, error_message.c_str());
+            if (type == RequestCallbackType::kRequestRejected) {
+                TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on microphone rejected."));
+            } else if (type == RequestCallbackType::kRequestTimeout) {
+                TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on microphone timeout."));
+            } else if (type == RequestCallbackType::kRequestError) {
+                TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on microphone error."));
+            }
+        };
+      TUIRoomCore::GetInstance()->MuteUserMicrophone(user_id, mute, callback);
     }
 }
 void MemberListViewController::MemberListMuteUserCamera(const std::string& user_id) {
@@ -186,39 +174,29 @@ void MemberListViewController::MemberListMuteUserCamera(const std::string& user_
     }
 
     bool mute = remote_user_info->has_video_stream && remote_user_info->has_subscribed_video_stream;
-    if (remote_user_info->role == TUIRole::kAnchor) {
-        // 关闭时直接设置状态， 打开时按照流的状态回调里设置
-        // Disabled: Directly set the status. Enabled: Set the status according to the stream status callback
-        if (mute) {
-            TUIRoomCore::GetInstance()->MuteUserCamera(user_id, mute, nullptr);
-            emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*remote_user_info);
-        } else {
-            bool camera_all_muted = TUIRoomCore::GetInstance()->GetRoomInfo().is_all_camera_muted;
-            if (camera_all_muted) {
-                TXMessageBox::Instance().AddLineTextMessage(tr("It's already set not allowed to open video."));
-            } else {
-                auto callback = [=](RequestCallbackType type, const std::string& error_message) {
-                    LINFO("MuteUserCamera result type : %d,error_message :%s", (int)type, error_message.c_str());
-                    if (type == RequestCallbackType::kRequestRejected) {
-                        TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on camera rejected."));
-                    } else if (type == RequestCallbackType::kRequestTimeout) {
-                        TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on camera timeout."));
-                    } else if (type == RequestCallbackType::kRequestError) {
-                        TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on camera error."));
-                    }
-                };
-                TUIRoomCore::GetInstance()->MuteUserCamera(user_id, mute, callback);
-            }
-        }
-    } else if (remote_user_info->role == TUIRole::kOther) {
+    // 关闭时直接设置状态， 打开时按照流的状态回调里设置
+    // Disabled: Directly set the status. Enabled: Set the status according to the stream status callback
+    if (mute) {
         TUIRoomCore::GetInstance()->MuteUserCamera(user_id, mute, nullptr);
-        emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*remote_user_info);
+        //emit StatusUpdateCenter::Instance().SignalUpdateUserInfo(*remote_user_info);
+    } else {
+        auto callback = [=](RequestCallbackType type, const std::string& error_message) {
+            LINFO("MuteUserCamera result type : %d,error_message :%s", (int)type, error_message.c_str());
+            if (type == RequestCallbackType::kRequestRejected) {
+                TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on camera rejected."));
+            } else if (type == RequestCallbackType::kRequestTimeout) {
+                TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on camera timeout."));
+            } else if (type == RequestCallbackType::kRequestError) {
+                TXMessageBox::Instance().AddLineTextMessage(tr("Request to turn on camera error."));
+            }
+        };
+        TUIRoomCore::GetInstance()->MuteUserCamera(user_id, mute, callback);
     }
 }
 void MemberListViewController::MemberListKickOffUser(const std::string& user_id) {
     LINFO("Master MemberListKickOffUser, user_id :%s", user_id.c_str());
     auto user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id);
-    if (user_info == nullptr || user_info->role == TUIRole::kOther) {
+    if (user_info == nullptr) {
         return;
     }
     auto callback = [=](RequestCallbackType type, const std::string& error_message) {
@@ -270,7 +248,7 @@ void MemberListViewController::UpdateMaster(const std::string& user_id) {
         }
     }
     if (user_info_.user_id == user_id) {
-        user_info_.role = TUIRole::kMaster;
+        user_info_.role = tuikit::TUIRole::kRoomOwner;
         for (int i = 0; i < ui_->member_list_widget->count(); ++i) {
             QListWidgetItem* item = ui_->member_list_widget->item(i);
             MemberItemView* view = static_cast<MemberItemView*>(ui_->member_list_widget->itemWidget(item));

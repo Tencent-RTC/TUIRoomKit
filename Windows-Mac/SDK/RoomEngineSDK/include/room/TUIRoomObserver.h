@@ -49,27 +49,59 @@ class TUIRoomObserver {
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 3.1 房间信息更改事件
+     * 3.1 房间名称更改事件
      *
      * @param roomId 房间ID
-     * @param roomInfo 房间信息
+     * @param roomName 房间名称
      */
-    virtual void onRoomInfoChanged(const char* roomId, const TUIRoomInfo& roomInfo) = 0;
+    virtual void onRoomNameChanged(const char* roomId, const char* roomName) = 0;
 
     /**
-     * 3.2 房间被解散事件
+     * 3.2 房间内用户麦克风被禁用事件
+     *
+     * @param roomId 房间ID
+     * @param isDisable 是否被禁用
+     */
+    virtual void onAllUserMicrophoneDisableChanged(const char* roomId, bool isDisable) = 0;
+
+    /**
+     * 3.3 房间内用户摄像头被禁用事件
+     *
+     * @param roomId 房间ID
+     * @param isDisable 是否被禁用
+     */
+    virtual void onAllUserCameraDisableChanged(const char* roomId, bool isDisable) = 0;
+
+    /**
+     * 3.4 房间内用户发送文本消息被禁用事件
+     *
+     * @param roomId 房间ID
+     * @param isDisable 是否被禁用
+     */
+    virtual void onSendMessageForAllUserDisableChanged(const char* roomId, bool isDisable) = 0;
+
+    /**
+     * 3.5 房间被解散事件
      *
      * @param roomId 房间ID
      */
     virtual void onRoomDismissed(const char* roomId) = 0;
 
     /**
-     * 3.3 被踢出房间事件
+     * 3.6 被踢出房间事件
      *
      * @param roomId 房间ID
      * @param message 被踢出的描述
      */
     virtual void onKickedOutOfRoom(const char* roomId, const char* message) = 0;
+
+    /**
+     * 3.8 房间发言管理模式发生变化
+     *
+     * @param roomId 房间ID
+     * @param mode 房间模式
+     */
+    virtual void onRoomSpeechModeChanged(const char* roomId, TUISpeechMode speechMode) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //
@@ -97,9 +129,9 @@ class TUIRoomObserver {
      * 4.3 用户角色发生变化事件
      *
      * @param userId 用户ID
-     * @param userRole用户角色 可参考 {@link TUIRole} 枚举定义
+     * @param userRole 用户角色 可参考 {@link TUIRole} 枚举定义
      */
-    virtual void onUserRoleChanged(const char* userId, const TUIRole& role) = 0;
+    virtual void onUserRoleChanged(const char* userId, TUIRole role) = 0;
 
     /**
      * 4.4 用户视频状态发生变化事件
@@ -128,12 +160,12 @@ class TUIRoomObserver {
     virtual void onUserVoiceVolumeChanged(TUIMap<const char*, int>* volumeMap) = 0;
 
     /**
-     * 4.7 用户禁言状态发生变化事件
+     * 4.7 用户文本消息发送能力发生变化事件
      *
      * @param userId 用户ID
-     * @param muted 是否被禁止发言 {@link true}: 用户被禁止发送消息 {@link false}: 用户被解除禁止，可以发送消息
+     * @param isDisable 是否被禁止发送文本消息 {@link true}: 用户被禁止发送消息 {@link false}: 用户被解除禁止，可以发送消息
      */
-    virtual void onUserMuteStateChanged(const char* userId, bool muted) = 0;
+    virtual void onSendMessageForUserDisableChanged(const char* roomId, const char* userId, bool isDisable) = 0;
 
     /**
      * 4.8 用户网络状态变化事件
@@ -156,12 +188,12 @@ class TUIRoomObserver {
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 5.1 上麦控制发生变化事件
+     * 5.1 房间内最大麦位数发生变化事件（仅在会议类型房间生效）
      *
-     * @param enable 是否开启上麦控制
-     * @param maxSeatNumber 最大麦上用户数量
+     * @param roomId 房间ID
+     * @param maxSeatCount 房间内最大麦位数量
      */
-    virtual void onSeatControlEnabled(bool enable, int maxSeatNumber) = 0;
+    virtual void onRoomMaxSeatCountChanged(const char* roomId, int maxSeatCount) = 0;
 
     /**
      * 5.2 麦位列表发生变化事件
@@ -171,6 +203,13 @@ class TUIRoomObserver {
      * @param leftList 新下麦的用户列表
      */
     virtual void onSeatListChanged(TUIList<TUISeatInfo>* seatList, TUIList<TUISeatInfo>* seatedList, TUIList<TUISeatInfo>* leftList) = 0;
+
+    /**
+     * 5.3 收到用户被踢下麦事件
+     *
+     * @param userId 操作踢人的（主持人/管理员）用户id
+     */
+    virtual void onKickedOffSeat(const char* userId) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //
@@ -214,13 +253,6 @@ class TUIRoomObserver {
      * @param message 消息内容, 请参考: {@link TUIMessage} 定义
      */
     virtual void onReceiveCustomMessage(const char* roomId, const TUIMessage& message) = 0;
-
-    /**
-     * 7.3 收到用户被踢下麦事件
-     *
-     * @param userId 操作踢人的（主持人/管理员）用户id
-     */
-    virtual void onKickedOffSeat(const char* userId) = 0;
 };
 
 }  // namespace tuikit

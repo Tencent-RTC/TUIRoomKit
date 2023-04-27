@@ -28,6 +28,17 @@ public:
 	void OnExitRoom(TUIExitRoomType code, const std::string& message) override;
 
     void OnRoomMasterChanged(const std::string& user_id) override;
+
+    void OnRoomNameChanged(const std::string& room_id, const std::string& room_name) override;
+
+    void OnAllUserMicrophoneDisableChanged(const std::string& room_id,
+                                           bool is_disable);
+
+    void OnAllUserCameraDisableChanged(const std::string& room_id,
+                                       bool is_disable);
+
+    void OnSendMessageForAllUserDisableChanged(const std::string& room_id,
+                                               bool is_disable);
     
 	void OnRemoteUserEnter(const std::string& user_id) override;
 
@@ -39,44 +50,21 @@ public:
 
 	void OnRemoteUserAudioAvailable(const std::string& user_id, bool available) override;
 
-    void OnRemoteUserEnterSpeechState(const std::string& user_id) override;
+    void OnRequestOpenCameraByAdmin(const std::string& request_id) override;
 
-    void OnRemoteUserExitSpeechState(const std::string& user_id) override;
+    void OnRequestOpenMicrophoneByAdmin(const std::string& request_id) override;
+
+    void OnMicrophoneStateChanged(bool has_audio, tuikit::TUIChangeReason reason) override;
+
+    void OnCameraStateChanged(bool has_video, tuikit::TUIChangeReason reason) override;
+
+    void OnScreenSharingStateChanged(bool has_video, tuikit::TUIChangeReason reason) override;
 
 	void OnReceiveChatMessage(const std::string& user_id, const std::string& message) override;
 
 	void OnReceiveCustomMessage(const std::string& user_id, const std::string& message) override;
 
-    void OnReceiveSpeechInvitation() override;
-
-    void OnReceiveInvitationCancelled() override;
-
-    void OnReceiveReplyToSpeechInvitation(const std::string& user_id, bool agree) override;
-
-    void OnReceiveSpeechApplication(const std::string& user_id) override;
-
-    void OnSpeechApplicationCancelled(const std::string& user_id) override;
-
-    void OnReceiveReplyToSpeechApplication(bool agree) override;
-
-    void OnSpeechApplicationForbidden(bool forbidden) override;
-
-    void OnOrderedToExitSpeechState() override;
-
-    void OnCallingRollStarted() override;
-
-    void OnCallingRollStopped() override;
-
-    void OnMemberReplyCallingRoll(const std::string& user_id) override;
-
-	void OnChatRoomMuted(const std::string& request_id, bool mute,
-                         TUIMutedReason reason) override;
-
-    void OnMicrophoneMuted(const std::string& request_id, bool mute,
-                           TUIMutedReason reason) override;
-
-    void OnCameraMuted(const std::string& request_id, bool mute,
-                       TUIMutedReason reason) override;
+	void OnSendMessageForUserDisableChanged(const std::string& room_id, const std::string& user_id, bool is_disable) override;
 
     void OnStatistics(const liteav::TRTCStatistics& statis) override;
 
@@ -116,6 +104,15 @@ signals:
 
     void SignalOnRoomMasterChanged(const QString& user_id);
 
+    void SignalOnRoomNameChanged(const QString& room_id, const QString& room_name);
+
+    void SignalOnAllUserMicrophoneDisableChanged(const QString& room_id, bool is_disable);
+
+    void SignalOnAllUserCameraDisableChanged(const QString& room_id, bool is_disable);
+
+    void SignalOnSendMessageForAllUserDisableChanged(const QString& room_id,
+                                                     bool is_disable);
+
 	void SignalOnRemoteUserEnter(const QString& user_id);
 
 	void SignalOnRemoteUserLeave(const QString& user_id);
@@ -126,44 +123,21 @@ signals:
 
 	void SignalOnRemoteUserAudioAvailable(const QString& user_id, bool available);
 
-    void SignalOnRemoteUserEnterSpeechState(const QString& user_id);
+    void SignalOnRequestOpenCameraByAdmin(const QString& request_id);
 
-    void SignalOnRemoteUserExitSpeechState(const QString& user_id);
+    void SignalOnRequestOpenMicrophoneByAdmin(const QString& request_id);
+
+    void SignalOnMicrophoneStateChanged(bool has_audio, tuikit::TUIChangeReason reason);
+
+    void SignalOnCameraStateChanged(bool has_video, tuikit::TUIChangeReason reason);
+
+    void SignalOnScreenSharingStateChanged(bool has_video, tuikit::TUIChangeReason reason);
 
 	void SignalOnReceiveChatMessage(const QString& user_id, const QString& message);
 
 	void SignalOnReceiveCustomMessage(const QString& user_id, const QString& message);
 
-    void SignalOnReceiveSpeechInvitation();
-
-    void SignalOnReceiveInvitationCancelled();
-
-    void SignalOnReceiveReplyToSpeechInvitation(const QString& user_id, bool agree);
-
-    void SignalOnReceiveSpeechApplication(const QString& user_id);
-
-    void SignalOnSpeechApplicationCancelled(const QString& user_id);
-
-    void SignalOnReceiveReplyToSpeechApplication(bool agree);
-
-    void SignalOnSpeechApplicationForbidden(bool forbidden);
-
-	void SignalOnOrderedToExitSpeechState();
-
-    void SignalOnCallingRollStarted();
-
-    void SignalOnCallingRollStopped();
-
-    void SignalOnMemberReplyCallingRoll(const QString& user_id);
-
-	void SignalOnChatRoomMuted(const QString& request_id, bool mute,
-                               TUIMutedReason reason);
-
-    void SignalOnMicrophoneMuted(const QString& request_id, bool mute,
-                                 TUIMutedReason reason);
-
-    void SignalOnCameraMuted(const QString& request_id, bool mute,
-                             TUIMutedReason reason);
+	void SignalOnSendMessageForUserDisableChanged(const QString& room_id, const QString& user_id, bool is_disable);
 
     void SignalOnStatistics(const liteav::TRTCStatistics& statis);
 

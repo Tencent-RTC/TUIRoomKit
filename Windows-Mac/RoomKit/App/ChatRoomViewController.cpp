@@ -34,7 +34,7 @@ void ChatRoomViewController::InitUi() {
     ui_->message_list->setFocusPolicy(Qt::NoFocus);
     ui_->message_list->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     QRect rect = this->geometry();
-    if (user_info_.role != TUIRole::kMaster) {
+    if (user_info_.role != tuikit::TUIRole::kRoomOwner) {
         ui_->all_mute_box->setVisible(false);
     }
     SetPopupMode(false);
@@ -42,17 +42,22 @@ void ChatRoomViewController::InitUi() {
     ui_->message_edit->installEventFilter(this);
 
     TUIRoomInfo room_info = TUIRoomCore::GetInstance()->GetRoomInfo();
-    SlotOnChatMute(0, room_info.is_chat_room_muted, TUIMutedReason::kInitMute);
+    if (room_info.is_chat_room_muted) {
+      SlotOnSendMessageForAllUserDisableChanged("", true);
+    }
 }
 
 void ChatRoomViewController::InitConnect() {
     connect(ui_->send_btn, &QPushButton::clicked, this, &ChatRoomViewController::SlotSendChatMessage);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnReceiveChatMessage, this, &ChatRoomViewController::SlotOnReceiveMessage);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRoomMasterChanged, this, &ChatRoomViewController::SlotOnRoomMasterChanged);
-    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnChatRoomMuted, this, &ChatRoomViewController::SlotOnChatMute);
+    connect(&MessageDispatcher::Instance(),
+            &MessageDispatcher::SignalOnSendMessageForAllUserDisableChanged, this,
+            &ChatRoomViewController::SlotOnSendMessageForAllUserDisableChanged);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnEnterRoom, this, [=](int code, const QString& message) {
         TUIRoomInfo room_info = TUIRoomCore::GetInstance()->GetRoomInfo();
-        this->SlotOnChatMute(0, room_info.is_chat_room_muted, TUIMutedReason::kInitMute);
+              this->SlotOnSendMessageForAllUserDisableChanged(
+                  "", room_info.is_chat_room_muted);
     });
     connect(ui_->all_mute_box, &QCheckBox::clicked, this, [=](bool checked) {
         if (checked) {
@@ -157,22 +162,17 @@ void ChatRoomViewController::SlotOnRoomMasterChanged(const QString& user_id) {
     }
 }
 
-void ChatRoomViewController::SlotOnChatMute(const QString& request_id,
-                                            bool mute, TUIMutedReason reason) {
-    if (user_info_.role == TUIRole::kMaster) {
+void ChatRoomViewController::SlotOnSendMessageForAllUserDisableChanged(const QString& room_id, bool is_disable) {
+    if (user_info_.role == tuikit::TUIRole::kRoomOwner) {
         return;
     }
-    if (mute) {
-        if (reason != TUIMutedReason::kInitMute) {
-            TXMessageBox::Instance().AddLineTextMessage(tr("Admin forbid all users send message."));
-        }
+    if (is_disable) {
+        TXMessageBox::Instance().AddLineTextMessage(tr("Admin forbid all users send message."));
         ui_->message_edit->setEnabled(false);
         ui_->message_edit->setText(tr("All Mute"));
         ui_->send_btn->setEnabled(false);
     } else {
-        if (reason != TUIMutedReason::kInitMute) {
-            TXMessageBox::Instance().AddLineTextMessage(tr("Admin cancel forbid all users send message."));
-        }
+        TXMessageBox::Instance().AddLineTextMessage(tr("Admin cancel forbid all users send message."));
         ui_->message_edit->setEnabled(true);
         ui_->message_edit->setText(tr(""));
         ui_->send_btn->setEnabled(true);

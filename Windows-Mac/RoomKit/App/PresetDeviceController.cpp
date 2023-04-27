@@ -159,12 +159,12 @@ void PresetDeviceController::InitUi() {
     ui.hSlider_Whitening->setTickInterval(10);
     OnBeautyClicked(beauty_config.open_beauty);
 
-    liteav::TRTCAudioQuality audio_quality = DataStore::Instance()->GetAudioQuality();
-    if (audio_quality == TRTCAudioQualitySpeech) {
+    tuikit::TUIAudioQuality audio_quality = DataStore::Instance()->GetAudioQuality();
+    if (audio_quality == tuikit::TUIAudioQuality::kAudioProfileSpeech) {
         ui.comboBox_audio_quality->setCurrentIndex(0);
-    } else if (audio_quality == TRTCAudioQualityDefault) {
+    } else if (audio_quality == tuikit::TUIAudioQuality::kAudioProfileDefault) {
         ui.comboBox_audio_quality->setCurrentIndex(1);
-    } else if (audio_quality == TRTCAudioQualityMusic) {
+    } else if (audio_quality == tuikit::TUIAudioQuality::kAudioProfileMusic) {
         ui.comboBox_audio_quality->setCurrentIndex(2);
     } else {
         ui.comboBox_audio_quality->setCurrentIndex(0);
@@ -442,20 +442,20 @@ void PresetDeviceController::OnRadioButtonChanged() {
 }
 
 void PresetDeviceController::OnAudioQualityIndexChanged(int index) {
-    liteav::TRTCAudioQuality audio_quality;
+    tuikit::TUIAudioQuality audio_quality;
     switch (index)
     {
     case 0:
-        audio_quality = TRTCAudioQualitySpeech;
+        audio_quality = tuikit::TUIAudioQuality::kAudioProfileSpeech;
         break;
     case 1:
-        audio_quality = TRTCAudioQualityDefault;
+        audio_quality = tuikit::TUIAudioQuality::kAudioProfileDefault;
         break;
     case 2:
-        audio_quality = TRTCAudioQualityMusic;
+        audio_quality = tuikit::TUIAudioQuality::kAudioProfileMusic;
         break;
     default:
-        audio_quality = TRTCAudioQualityDefault;
+        audio_quality = tuikit::TUIAudioQuality::kAudioProfileDefault;
         break;
     }
     DataStore::Instance()->SetAudioQuality(audio_quality);

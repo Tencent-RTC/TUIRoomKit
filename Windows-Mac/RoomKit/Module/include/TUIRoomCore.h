@@ -103,7 +103,7 @@ class TUIRoomCore {
      * This API is used to create a room by `room_id`. After the creation succeeds, you will become the host. A member can only enter a room but not create one.
      * After calling the room creation API, you will receive the `OnCreateRoom()` callback notification in `TUIRoomCoreCallback`.
      */
-    virtual int CreateRoom(const std::string& room_id, TUISpeechMode speech_mode) = 0;
+    virtual int CreateRoom(const std::string& room_id, tuikit::TUISpeechMode speech_mode) = 0;
 
     /**
      * 1.4 销毁房间
@@ -293,7 +293,7 @@ class TUIRoomCore {
      *
      * @param quality Sound quality
      */
-    virtual int StartLocalAudio(const liteav::TRTCAudioQuality& quality) = 0;
+    virtual int StartLocalAudio(tuikit::TUIAudioQuality quality) = 0;
 
     /**
      * 2.5 关闭本地音频设备
@@ -593,47 +593,6 @@ class TUIRoomCore {
      * @param  callback Signaling callback, based on which you can know whether the signaling is sent successfully
      */
     virtual int KickOffUser(const std::string& user_id, Callback callback) = 0;
-
-    /**
-     * 5.7 主持人开始点名
-     *
-     * 主持人开始点名，成员端会收到OnCallingRollStarted()回调。
-     */
-
-    /**
-     * 5.7 Starting roll call by host
-     *
-     * When the host calls this API to start a roll call, the members will receive the `OnCallingRollStarted()` callback.
-     */
-    virtual int StartCallingRoll() = 0;
-
-    /**
-     * 5.8 主持人结束点名
-     *
-     * 主持人结束点名，成员端会收到OnCallingRollStopped()回调。
-     */
-
-    /**
-     * 5.8 Ending roll call by host
-     *
-     * When the host calls this API to end a roll call, the members will receive the `OnCallingRollStopped()` callback.
-     */
-    virtual int StopCallingRoll() = 0;
-
-    /**
-     * 5.9 成员回复主持人点名
-     *
-     * 成员回复主持人点名，主持人会收到OnMemberReplyCallingRoll()回调。
-     * @param  callback 信令的回调，可以根据回调知道信令是否发送成功
-     */
-
-    /**
-     * 5.9 Replying to roll call
-     *
-     * When a member replies to the roll call started by the host, the host will receive the `OnMemberReplyCallingRoll()` callback.
-     * @param  callback Signaling callback, based on which you can know whether the signaling is sent successfully
-     */
-    virtual int ReplyCallingRoll(Callback callback) = 0;
 
     /**
      * 5.11 主持人取消邀请成员发言

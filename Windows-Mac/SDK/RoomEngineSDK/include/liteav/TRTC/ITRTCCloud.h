@@ -242,24 +242,28 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      *
      * TRTCCloud 一开始被设计成单例模式，限制了多房间并发观看的能力。
      * 通过调用该接口，您可以创建出多个 TRTCCloud 实例，以便同时进入多个不同的房间观看音视频流。
-     * 但需要注意的是，由于摄像头和麦克风还是只有一份，因此您只能同时在一个 TRTCCloud 实例中以“主播”的身份存在，也就是您只能同时在一个 TRTCCloud 实例中发布自己的音视频流。
+     * 但需要注意的是，您在多个 TRTCCloud 实例中发布音视频流的能力会受到一定限制。
      * 该功能主要用于在线教育场景中一种被称为“超级小班课”的业务场景中，用于解决“每个 TRTC 的房间中最多只能有 50 人同时发布自己音视频流”的限制。
      * 示例代码如下：
      * <pre>
+     *     //In the small room that needs interaction, enter the room as an anchor and push audio and video streams
      *     ITRTCCloud *mainCloud = getTRTCShareInstance();
-     *     mainCloud->enterRoom(params1, TRTCAppSceneLIVE);
+     *     TRTCParams mainParams;
+     *     //Fill your params
+     *     mainParams.role = TRTCRoleAnchor;
+     *     mainCloud->enterRoom(mainParams, TRTCAppSceneLIVE);
      *     //...
-     *     //Switch the role from "anchor" to "audience" in your own room
-     *     mainCloud->switchRole(TRTCRoleAudience);
-     *     mainCloud->muteLocalVideo(true);
-     *     mainCloud->muteLocalAudio(true);
-     *     //...
-     *     //Use subcloud to enter another room and switch the role from "audience" to "anchor"
+     *     mainCloud->startLocalAudio(TRTCAudioQualityDefault);
+     *     mainCloud->startLocalPreview(renderView);
+     *
+     *     //In the large room that only needs to watch, enter the room as an audience and pull audio and video streams
      *     ITRTCCloud *subCloud = mainCloud->createSubCloud();
-     *     subCloud->enterRoom(params2, TRTCAppSceneLIVE);
-     *     subCloud->switchRole(TRTCRoleAnchor);
-     *     subCloud->muteLocalVideo(false);
-     *     subCloud->muteLocalAudio(false);
+     *     TRTCParams subParams;
+     *     //Fill your params
+     *     subParams.role = TRTCRoleAudience;
+     *     subCloud->enterRoom(subParams, TRTCAppSceneLIVE);
+     *     //...
+     *     subCloud->startRemoteView(userId, TRTCVideoStreamTypeBig, renderView);
      *     //...
      *     //Exit from new room and release it.
      *     subCloud->exitRoom();
@@ -269,8 +273,10 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * @note
      * - 同一个用户，可以使用同一个 userId 进入多个不同 roomId 的房间。
      * - 两台不同的终端设备不可以同时使用同一个 userId 进入同一个 roomId 的房间。
-     * - 同一个用户，同时只能在一个 TRTCCloud 实例中推流，在不同房间同时推流会引发云端的状态混乱，导致各种 bug。
-     * - 通过 createSubCloud 接口创建出来的 TRTCCloud 实例有一个能力限制：不能调用子实例中与本地音视频相关的接口（除 switchRole、muteLocalVideo 和 muteLocalAudio 之外）， 设置美颜等接口请使用原 TRTCCloud 实例对象。
+     * - 您可以分别为不同实例分别设置 {@link ITRTCCloudCallback} 获取各自的事件通知。
+     * - 同一个用户可以在多个 TRTCCloud 实例中推流，也可以调用子实例中与本地音视频相关的接口。但需要注意：
+     *    - 多实例的音频需要同时为麦克风采集或自定义采集，而且与音频设备相关的接口调用会以最后一次为准；
+     *    - 与摄像头相关的调用会以最后一次为准：{@link startLocalPreview}。
      * @return 子 TRTCCloud 实例
      */
     virtual ITRTCCloud* createSubCloud() = 0;
@@ -874,7 +880,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
  * 该接口会从电脑的声卡中采集音频数据，并将其混入到 SDK 当前的音频数据流中，从而使房间中的其他用户也能听到主播的电脑所播放出的声音。
  * 在线教育场景中，老师可以使用此功能让 SDK 采集教学影片中的声音，并广播给同房间中的学生。
  * 音乐直播场景中，主播可以使用此功能让 SDK 采集音乐播放器中的音乐，从而为自己的直播间增加背景音乐。
- * @param deviceName 您可以指定该参数为空置（nullptr），代表让 SDK 采集整个系统的声音。
+ * @param deviceName 您可以指定该参数为空值（nullptr），代表让 SDK 采集整个系统的声音。
  * @note
  * 在 Windows 平台下，您也可以将参数 deviceName 设置为某个应用程序的可执行文件（如 QQMuisc.exe）的绝对路径，此时 SDK 只会采集该应用程序的声音（仅支持 32 位版本的 SDK）。
  * 您也可以指定该参数为某个扬声器设备的名称来采集特定扬声器声音（通过接口 {@link TXDeviceManager} 中的 getDevicesList 接口，可以获取类型为 {@link TXMediaDeviceTypeSpeaker} 的扬声器设备）。
@@ -906,14 +912,14 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 9.1 开始桌面端屏幕分享（该接口仅支持桌面系统）
+     * 9.1 启动屏幕分享
      *
-     * 该接口可以抓取整个 Mac OS 系统的屏幕内容，或抓取您指定的某个应用的窗口内容，并将其分享给同房间中的其他用户。
+     * 该接口可以抓取整个屏幕的内容，或抓取您指定的某个应用的窗口内容，并将其分享给同房间中的其他用户。
      * @param view 渲染控件所在的父控件，可以设置为空值，表示不显示屏幕分享的预览效果。
      * @param streamType 屏幕分享使用的线路，可以设置为主路（TRTCVideoStreamTypeBig）或者辅路（TRTCVideoStreamTypeSub），推荐使用辅路。
      * @param encParam 屏幕分享的画面编码参数，SDK 会优先使用您通过此接口设置的编码参数：
-     *   - 如果您设置 encParam 为 nil，且您已通过 setSubStreamEncoderParam 设置过辅路视频编码参数，SDK 将使用您设置过的辅路编码参数进行屏幕分享。
-     *   - 如果您设置 encParam 为 nil，且您未通过 setSubStreamEncoderParam 设置过辅路视频编码参数，SDK 将自动选择一个最佳的编码参数进行屏幕分享。
+     *   - 如果您设置 encParam 为空值，且您已通过 setSubStreamEncoderParam 设置过辅路视频编码参数，SDK 将使用您设置过的辅路编码参数进行屏幕分享。
+     *   - 如果您设置 encParam 为空值，且您未通过 setSubStreamEncoderParam 设置过辅路视频编码参数，SDK 将自动选择一个最佳的编码参数进行屏幕分享。
      * @note
      * 1. 同一个用户同时最多只能发布一路主路（{@link TRTCVideoStreamTypeBig}）画面和一路辅路（{@link TRTCVideoStreamTypeSub}）画面。
      * 2. 默认情况下，屏幕分享使用辅路画面。如果使用主路做屏幕分享，您需要提前停止摄像头采集（{@link stopLocalPreview}）以避免相互冲突。
@@ -1224,7 +1230,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * 10.12 设置音频数据自定义回调
      *
      * 设置该回调之后，SDK 内部会把音频数据（PCM 格式）回调出来，包括：
-     * - {@link onCapturedRawAudioFrame}：本地麦克风采集到的原始音频数据回调
+     * - {@link onCapturedAudioFrame}：本地麦克风采集到的音频数据回调
      * - {@link onLocalProcessedAudioFrame}：本地采集并经过音频模块前处理后的音频数据回调
      * - {@link onRemoteUserAudioFrame}：混音前的每一路远程用户的音频数据
      * - {@link onMixedPlayAudioFrame}：将各路音频混合之后并最终要由系统播放出的音频数据回调
@@ -1234,9 +1240,9 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
     virtual int setAudioFrameCallback(ITRTCAudioFrameCallback* callback) = 0;
 
     /**
-     * 10.13 设置本地麦克风采集出的原始音频帧回调格式
+     * 10.13 设置本地麦克风采集出的音频帧回调格式
      *
-     * 本接口用于设置 {@link onCapturedRawAudioFrame} 回调出来的 AudioFrame 的格式：
+     * 本接口用于设置 {@link onCapturedAudioFrame} 回调出来的 AudioFrame 的格式：
      * - sampleRate：采样率，支持：16000、32000、44100、48000。
      * - channel：声道数（如果是立体声，数据是交叉的），单声道：1； 双声道：2。
      * - samplesPerCall：采样点数，定义回调数据帧长。帧长必须为 10ms 的整数倍。
@@ -1247,7 +1253,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * @note
      * 最终回调的帧长度是以字节为单位，采样点数转换成字节数的计算公式为：字节数 = 采样点数 * channel * 2（位宽）举例：48000 采样率，双声道，20ms 帧长，采样点数为 960，字节数为 3840 = 960 * 2 * 2
      */
-    virtual int setCapturedRawAudioFrameCallbackFormat(TRTCAudioFrameCallbackFormat* format) = 0;
+    virtual int setCapturedAudioFrameCallbackFormat(TRTCAudioFrameCallbackFormat* format) = 0;
 
     /**
      * 10.14 设置经过前处理后的本地音频帧回调格式
@@ -1447,6 +1453,24 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
 #else
     virtual void callExperimentalAPI(const char* jsonStr) = 0;
 #endif
+
+    /////////////////////////////////////////////////////////////////////////////////
+    //
+    //                    加密接口
+    //
+    /////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * 14.1 开启或关闭媒体流私有加密
+     *
+     * 在安全要求较高的场景下，TRTC 建议您在加入房间前，调用 enablePayloadPrivateEncryption 方法开启媒体流私有加密。
+     * 用户退出房间后，SDK 会自动关闭私有加密。如需重新开启私有加密，您需要在用户再次加入房间前调用该方法。
+     * @param enabled 是否开启媒体流私有加密。
+     * @param config 配置媒体流私有加密的算法和密钥，参见 {@link TRTCPayloadPrivateEncryptionConfig}。
+     * @return 接口调用结果，0: 方法调用成功， -1: 传入参数无效， -2: 功能已过期。若需解锁：请前往中国大陆站点开通 [TRTC 旗舰版套餐](https://buy.cloud.tencent.com/trtc?tab=month&trtcversion=ultimate)。
+     * @note TRTC 已经内置对媒体流进行加密后再传输，启用媒体流私有加密后将使用您传入的密匙与初始向量进行再次加密。
+     */
+    virtual int enablePayloadPrivateEncryption(bool enabled, const TRTCPayloadPrivateEncryptionConfig& config) = 0;
 
     using IDeprecatedTRTCCloud::enableAudioVolumeEvaluation;
     using IDeprecatedTRTCCloud::enableCustomVideoCapture;

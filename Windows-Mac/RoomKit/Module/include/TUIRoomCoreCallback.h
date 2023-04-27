@@ -241,6 +241,82 @@ public:
     virtual void OnRoomMasterChanged(const std::string& user_id) = 0;
     /// @}
 
+    /**
+     * 2.10 房间名称更改回调
+     *
+     * 房间名称更改回调
+     *
+     * @param room_id 房间ID。
+     * @param room_name 更改后的房间名称。
+     */
+
+    /**
+     * 2.10 Callback for room name change
+     *
+     * The room name was changed.
+     *
+     * @param room_id 
+     * @param room_name New room name
+     */
+    virtual void OnRoomNameChanged(const std::string& room_id, const std::string& room_name) = 0;
+
+    /**
+     * 2.11 房间禁麦状态更改回调
+     *
+     * 房间禁麦状态更改回调
+     *
+     * @param room_id 房间ID。
+     * @param is_disable 是否禁用。
+     */
+
+    /**
+     * 2.11 Callback for room microphone disable change
+     *
+     * The microphone disable was changed.
+     *
+     * @param room_id
+     * @param is_disable microphone is disable
+     */
+    virtual void OnAllUserMicrophoneDisableChanged(const std::string& room_id, bool is_disable) = 0;
+
+    /**
+     * 2.12 房间禁画状态更改回调
+     *
+     * 房间禁画状态更改回调
+     *
+     * @param room_id 房间ID。
+     * @param is_disable 是否禁用。
+     */
+
+    /**
+     * 2.12 Callback for room camera disable change
+     *
+     * The camera disable was changed.
+     *
+     * @param room_id
+     * @param is_disable camera is disable
+     */
+    virtual void OnAllUserCameraDisableChanged(const std::string& room_id, bool is_disable) = 0;
+
+    /**
+     * 2.13 房间禁止聊天状态更改回调
+     *
+     * 房间禁止聊天状态更改回调
+     *
+     * @param room_id 房间ID。
+     * @param is_disable 是否禁用。
+     */
+
+    /**
+     * 2.13 Callback for send message disable change
+     *
+     * The camera disable was changed.
+     *
+     * @param room_id
+     * @param is_disable send message is disable
+     */
+    virtual void OnSendMessageForAllUserDisableChanged(const std::string& room_id, bool is_disable) = 0;
+
     /////////////////////////////////////////////////////////////////////////////////
     //
     //              （三）远端用户事件回调 (Remote User Event Callbacks)
@@ -339,41 +415,6 @@ public:
      */
     virtual void OnRemoteUserAudioAvailable(const std::string& user_id, bool available) = 0;
 
-    /**
-     * 3.6 远端用户开始发言
-     *
-     * 当您收到 OnRemoteUserEnterSpeechState(user_id) 通知时，表示该用户发言成功。
-     *
-     * @param user_id 用户ID
-     */
-
-    /**
-     * 3.6 Callback for microphone-on of remote user
-     *
-     * When the `OnRemoteUserEnterSpeechState(user_id)` notification is received, it indicates that a user is speaking.
-     *
-     * @param user_id User ID
-     */
-    virtual void OnRemoteUserEnterSpeechState(const std::string& user_id) = 0;
-
-    /**
-     * 3.7 远端用户结束发言
-     *
-     * 当您收到 OnRemoteUserExitSpeechState(user_id) 通知时，表示该用户已经停止发言。
-     *
-     * @param user_id 用户ID
-     */
-
-    /**
-     * 3.7 Callback for speech stop of remote user
-     *
-     * When the `OnRemoteUserExitSpeechState(user_id)` notification is received, it indicates that a user stopped speaking.
-     *
-     * @param user_id User ID
-     */
-    virtual void OnRemoteUserExitSpeechState(const std::string& user_id) = 0;
-    /// @}
-
     /////////////////////////////////////////////////////////////////////////////////
     //
     //          （四）聊天室消息事件回调 (Chat Room Message Event Callbacks)
@@ -427,183 +468,9 @@ public:
     /////////////////////////////////////////////////////////////////////////////////
     /// @name 场控相关事件回调 (Room control event callbacks)
     /// @{
-    /**
-     * 5.1 用户收到主持人发言邀请回调
-     *
-     * 主持人调用SendSpeechInvitation接口邀请用户发言后，用户收到的回调，用户需要进行回复。
-     */
 
     /**
-     * 5.1 Callback for host sending an invitation to speak
-     *
-     * The host called the `SendSpeechInvitation` API to invite the user to speak. The user needs to reply to the invitation.
-     */
-    virtual void OnReceiveSpeechInvitation() = 0;
-
-    /**
-     * 5.2 用户收到主持人取消发言邀请回调
-     *
-     * 主持人调用CancelSpeechInvitation接口取消邀请用户发言后，用户收到的回调。
-     */
-
-    /**
-     * 5.2 Callback for host canceling an invitation to speak
-     *
-     * The host called the `CancelSpeechInvitation` API to cancel the invitation to speak sent to the user.
-     */
-    virtual void OnReceiveInvitationCancelled() = 0;
-
-    /**
-     * 5.3 主持人收到用户同意邀请发言的回调
-     *
-     * 在TUISpeechMode::kApplySpeech模式下，用户调用ReplySpeechInvitation接口回应主持人发言邀请时，
-     * 主持人收到的回调
-     *
-     * @param user_id  用户ID
-     * @param agree    是否同意发言 true为同意， false为不同意
-     */
-
-    /**
-     * 5.3 Callback for user accepting an invitation to speak
-     *
-     * The user called the `ReplySpeechInvitation` API
-     * to respond to the microphone-on invitation sent by the host in `TUISpeechMode::kApplySpeech` mode.
-     *
-     * @param user_id  User ID
-     * @param agree    Whether the user agrees to speak. Valid values: true: Yes; false: No
-     */
-    virtual void OnReceiveReplyToSpeechInvitation(const std::string& user_id, bool agree) = 0;
-
-    /**
-     * 5.4 主持人收到用户发言申请的回调
-     *
-     * 在TUISpeechMode::kApplySpeech模式下，用户调用SendSpeechApplication接口向主持人申请发言时，
-     * 主持人收到的回调，主持人需要操作并调用ReplySpeechApplication接口对申请进行回应。
-     *
-     * @param user_id  用户ID
-     */
-
-    /**
-     * 5.4 Callback for receiving a request to speak
-     *
-     * A user called the `SendSpeechApplication` API to send a microphone-on request to the host in `TUISpeechMode::kApplySpeech` mode.
-     * The host needs to process the request and call the `ReplySpeechApplication` API to reply to the request.
-     *
-     * @param user_id  User ID
-     */
-    virtual void OnReceiveSpeechApplication(const std::string& user_id) = 0;
-
-    /**
-     * 5.5 用户取消申请发言回调
-     *
-     * 在TUISpeechMode::kApplySpeech模式下，用户调用CancelSpeechApplication接口取消申请发言时，主持人收到的回调。
-     *
-     * @param user_id  用户ID
-     */
-
-    /**
-     * 5.5 Callback for user canceling their request to speak
-     *
-     * A user called the `CancelSpeechApplication` API to cancel their request to speak in `TUISpeechMode::kApplySpeech` mode.
-     *
-     * @param user_id  User ID
-     */
-    virtual void OnSpeechApplicationCancelled(const std::string& user_id) = 0;
-
-    /**
-     * 5.6 主持人同意发言申请回调
-     *
-     * 在TUISpeechMode::kApplySpeech模式下，主持人调用ReplySpeechApplication接口回应用户申请发言时，
-     * 用户收到的回调，用户根据主持人是否同意决定是否可以发言。
-     *
-     * @param agree  是否同意发言 true为同意， false为不同意
-     */
-
-    /**
-     * 5.6 Callback for host approving a request to speak
-     *
-     * The host called the `ReplySpeechApplication` API to reply to the user's microphone-on request in `TUISpeechMode::kApplySpeech` mode.
-     * The user determines whether to speak based on the host's decision.
-     *
-     * @param agree   Whether the host allows the user to speak. Valid values: true: Yes; false: No
-     */
-    virtual void OnReceiveReplyToSpeechApplication(bool agree) = 0;
-
-    /**
-     * 5.7 主持人禁止申请发言回调
-     *
-     * 主持人禁止申请发言回调。
-     *
-     * @param forbidden true,发言申请被禁用, false 可以申请发言
-     */
-
-    /**
-     * 5.7 Callback for host disabling requests to speak
-     *
-     * The host disabled requests to speak.
-     *
-     * @param forbidden true: Requests to speak are disabled; false: Requests are allowed
-     */
-    virtual void OnSpeechApplicationForbidden(bool forbidden) = 0;
-
-    /**
-     * 5.8 成员被请求停止发言的回调
-     *
-     * 主持人调用SendOffSpeaker接口请求用户停止发言后，用户收到的回调，用户需要停止发言。
-     */
-
-    /**
-     * 5.8 Callback for host requesting a user to stop speaking
-     *
-     * The host called the `SendOffSpeaker` API to request the user to stop speaking. 
-     */
-    virtual void OnOrderedToExitSpeechState() = 0;
-
-    /**
-     * 5.9 主持人开始点名，成员收到的回调
-     *
-     * 主持人开始点名，成员收到的回调。
-     */
-
-    /**
-     * 5.9 Callback for starting a roll call
-     *
-     * The host started a roll call.
-     */
-    virtual void OnCallingRollStarted() = 0;
-
-    /**
-     * 5.10 主持人结束点名，成员收到的回调
-     *
-     * 主持人结束点名，成员收到的回调。
-     */
-
-    /**
-     * 5.10 Callback for ending a roll call
-     *
-     * The host ended a roll call.
-     */
-    virtual void OnCallingRollStopped() = 0;
-
-    /**
-     * 5.11 成员回复点名，主持人收到的回调
-     *
-     * 成员回复点名，主持人收到的回调。
-     *
-     * @param user_id 用户id
-     */
-
-    /**
-     * 5.11 Callback for replying to roll call
-     *
-     * A user replied to a roll call.
-     *
-     * @param user_id User ID
-     */
-    virtual void OnMemberReplyCallingRoll(const std::string& user_id) = 0;
-
-    /**
-     * 5.12 主持人更改聊天室是否禁言回调
+     * 5.1 主持人更改聊天室是否禁言回调
      *
      * 主持人设置聊天室是否禁言的回调。
      *
@@ -611,17 +478,20 @@ public:
      */
 
     /**
-     * 5.12 Callback for muting/unmuting a chat room 
+     * 5.1 Callback for muting/unmuting a chat room 
      *
      * The host set whether to mute or unmute the chat room.
      *
      * @param mute  true: No messages can be sent in the chat room; false: Messages can be sent in the chat room
      */
-    virtual void OnChatRoomMuted(const std::string& request_id, bool muted,
-                                 TUIMutedReason reason) = 0;
+    virtual void OnSendMessageForUserDisableChanged(const std::string& room_id, const std::string& user_id, bool is_disable) = 0;
+
+    virtual void OnRequestOpenCameraByAdmin(const std::string& request_id) = 0;
+
+    virtual void OnRequestOpenMicrophoneByAdmin(const std::string& request_id) = 0;
 
     /**
-     * 5.13 主持人设置禁用麦克风回调
+     * 5.2 主持人设置禁用麦克风回调
      *
      * 主持人禁用用户麦克风的回调。
      *
@@ -629,32 +499,17 @@ public:
      */
 
     /**
-     * 5.13 Callback for disabling microphone
+     * 5.2 Callback for disabling microphone
      *
      * The host disabled a user's microphone.
      *
      * @param mute  true: The user's microphone is disabled; false: The user's microphone is enabled
      */
-    virtual void OnMicrophoneMuted(const std::string& request_id, bool muted,
-                                   TUIMutedReason reason) = 0;
+    virtual void OnMicrophoneStateChanged(bool has_audio, tuikit::TUIChangeReason reason) = 0;
 
-    /**
-     * 5.14 主持人设置禁用摄像头回调
-     *
-     * 主持人禁用用户摄像头的回调。
-     *
-     * @param mute  true,用户摄像头被禁用  false用户摄像头打开
-     */
+    virtual void OnCameraStateChanged(bool has_video, tuikit::TUIChangeReason reason) = 0;
 
-    /**
-     * 5.14 Callback for disabling camera
-     *
-     * The host disabled a user's camera.
-     *
-     * @param mute  true: The user's camera is disabled; false: The user's camera is enabled
-     */
-    virtual void OnCameraMuted(const std::string& request_id, bool muted,
-                               TUIMutedReason reason) = 0;
+    virtual void OnScreenSharingStateChanged(bool has_video, tuikit::TUIChangeReason reason) = 0;
     /// @}
 
     /////////////////////////////////////////////////////////////////////////////////

@@ -102,8 +102,6 @@ void StageListController::InitConnect() {
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserCameraAvailable, this, &StageListController::SlotOnRemoteUserVideoOpen);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserAudioAvailable, this, &StageListController::SlotOnRemoteUserAudioOpen);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserScreenAvailable, this, &StageListController::SlotOnRemoteUserScreenVideoOpen);
-    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserEnterSpeechState, this, &StageListController::SlotOnRemoteUserEnterSpeechState);
-    connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRemoteUserExitSpeechState, this, &StageListController::SlotOnRemoteUserExitSpeechState);
     connect(&MessageDispatcher::Instance(), &MessageDispatcher::SignalOnRoomMasterChanged, this, &StageListController::SlotOnRoomMasterChanged);
 
     connect(&StatusUpdateCenter::Instance(), &StatusUpdateCenter::SignalUpdateUserInfo, this, &StageListController::SlotUpdateUserInfo);
@@ -189,7 +187,7 @@ void StageListController::SetVideoViewLayout(StageListDirection direction) {
             all_screen_share_userid_list_.push_back(current_main_window_user);
         } else {
             const TUIUserInfo* user = TUIRoomCore::GetInstance()->GetUserInfo(current_main_window_user);
-            if (user->role == TUIRole::kMaster || user->user_id == DataStore::Instance()->GetCurrentUserInfo().user_id) {
+            if (user->role == tuikit::TUIRole::kRoomOwner || user->user_id == DataStore::Instance()->GetCurrentUserInfo().user_id) {
                 all_video_userid_list_.push_front(current_main_window_user);
             } else {
                 all_video_userid_list_.insert(current_page_video_view_list_.size() + 1, current_main_window_user);
@@ -480,7 +478,7 @@ void StageListController::InsertUser(const TUIUserInfo& user_info, bool is_scree
                 all_video_userid_list_.removeOne(user_info.user_id);
             }
 
-            if (user_info.has_screen_stream || user_info.role == TUIRole::kMaster ||
+            if (user_info.has_screen_stream || user_info.role == tuikit::TUIRole::kRoomOwner ||
                 user_info.user_id == DataStore::Instance()->GetCurrentUserInfo().user_id) {
                 all_video_userid_list_.push_front(user_info.user_id);
             } else {
@@ -536,7 +534,7 @@ void StageListController::InsertUser(const TUIUserInfo& user_info, bool is_scree
                 all_video_userid_list_.removeOne(user_info.user_id);
             }
 
-            if (user_info.has_screen_stream || user_info.role == TUIRole::kMaster ||
+            if (user_info.has_screen_stream || user_info.role == tuikit::TUIRole::kRoomOwner ||
                 user_info.user_id == DataStore::Instance()->GetCurrentUserInfo().user_id) {
                 all_video_userid_list_.push_front(user_info.user_id);
                 for (int i = 0; i < current_page_video_view_list_.size(); i++) {
@@ -809,11 +807,11 @@ void StageListController::RemoveVideoViewFromStage(VideoRenderView* video_view) 
 }
 
 void StageListController::SlotOnRemoteUserEnterRoom(const QString& user_id) {
-  return;
+  SlotOnRemoteUserEnterSpeechState(user_id);
 }
 
 void StageListController::SlotOnRemoteUserLeaveRoom(const QString& user_id) {
-  UserExit(user_id.toStdString());
+  SlotOnRemoteUserExitSpeechState(user_id);
 }
 
 void StageListController::SlotOnRemoteUserVideoOpen(const QString& user_id, bool available) {
@@ -946,14 +944,9 @@ void StageListController::SlotOnRemoteUserEnterSpeechState(const QString& user_i
 }
 
 void StageListController::SlotOnRemoteUserExitSpeechState(const QString& user_id) {
-    auto user_info = TUIRoomCore::GetInstance()->GetUserInfo(user_id.toStdString());
-    if (user_info == nullptr) {
-        return;
-    }
     if (main_window_view_->GetUserId() == user_id.toStdString() && !main_window_view_->IsScreenShareWindow()) {
         main_window_view_->InitMainVideo();
         DataStore::Instance()->SetCurrentMainWindowUser("");
-        TUIRoomCore::GetInstance()->StopRemoteView(user_id.toStdString(), TUIStreamType::kStreamTypeCamera);
     }
 
     UserExit(user_id.toStdString());
@@ -986,7 +979,7 @@ void StageListController::SlotShowVideoOnMainScreen(const std::string user_id, b
             if (user_info == nullptr) {
                 return;
             }
-            if (user_info->has_screen_stream || user_info->role == TUIRole::kMaster || 
+            if (user_info->has_screen_stream || user_info->role == tuikit::TUIRole::kRoomOwner || 
                 user_info->user_id == DataStore::Instance()->GetCurrentUserInfo().user_id) {
                 all_video_userid_list_.push_front(current_main_window_user);
             } else {

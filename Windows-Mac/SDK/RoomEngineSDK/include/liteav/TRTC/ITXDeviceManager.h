@@ -362,8 +362,8 @@ class ITXDeviceManager {
      * 仅支持设置麦克风和扬声器类型，摄像头暂不支持跟随系统默认设备
      * @param type 设备类型，详见 TXMediaDeviceType 定义。
      * @param enable 是否跟随系统默认的音频设备。
-     *         - true：跟随。当系统默认音频设备发生改变时，SDK 立即切换音频设备。
-     *         - false：不跟随。只有当 SDK 使用的音频设备被移除后或插入新的音频设备为系统默认设备时，SDK 才切换至系统默认的音频设备。
+     *         - true：跟随。当系统默认音频设备发生改变或者有新音频设备插入时，SDK 立即切换音频设备。
+     *         - false：不跟随。当系统默认音频设备发生改变或者有新音频设备插入时，SDK 不会切换音频设备。
      */
     virtual int enableFollowingDefaultAudioDevice(TXMediaDeviceType type, bool enable) = 0;
 

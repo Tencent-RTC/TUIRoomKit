@@ -11,11 +11,12 @@ MessageDispatcher& MessageDispatcher::Instance(){
 MessageDispatcher::MessageDispatcher(QObject *parent)
 	: QObject(parent){
 
-	qRegisterMetaType<TUISpeechMode>("TUISpeechMode");
+	qRegisterMetaType<tuikit::TUISpeechMode>("TUISpeechMode");
+	qRegisterMetaType<tuikit::TUIChangeReason>("TUIChangeReason");
     qRegisterMetaType<TUIStreamType>("TUIStreamType");
     qRegisterMetaType<TUIExitRoomType>("TXTypeExitRoom");
     qRegisterMetaType<liteav::TRTCStatistics>("liteav::TRTCStatistics");
-    qRegisterMetaType <UserNetQualityInfo>("UserNetQualityInfo");
+    qRegisterMetaType<UserNetQualityInfo>("UserNetQualityInfo");
     qRegisterMetaType<TUIMutedReason>("TUIMutedReason");
 }
 
@@ -54,6 +55,30 @@ void MessageDispatcher::OnRoomMasterChanged(const std::string& user_id) {
     emit SignalOnRoomMasterChanged(QString::fromStdString(user_id));
 }
 
+void MessageDispatcher::OnRoomNameChanged(const std::string& room_id,
+                                          const std::string& room_name) {
+  emit SignalOnRoomNameChanged(QString::fromStdString(room_id),
+                               QString::fromStdString(room_name));
+}
+
+void MessageDispatcher::OnAllUserMicrophoneDisableChanged(
+    const std::string& room_id, bool is_disable) {
+  emit SignalOnAllUserMicrophoneDisableChanged(QString::fromStdString(room_id),
+                                               is_disable);
+}
+
+void MessageDispatcher::OnAllUserCameraDisableChanged(
+    const std::string& room_id, bool is_disable) {
+  emit SignalOnAllUserCameraDisableChanged(QString::fromStdString(room_id),
+                                           is_disable);
+}
+
+void MessageDispatcher::OnSendMessageForAllUserDisableChanged(
+    const std::string& room_id, bool is_disable) {
+  emit SignalOnSendMessageForAllUserDisableChanged(
+      QString::fromStdString(room_id), is_disable);
+}
+
 void MessageDispatcher::OnRemoteUserEnter(const std::string& user_id) {
 	emit SignalOnRemoteUserEnter(QString::fromStdString(user_id));
 }
@@ -74,12 +99,24 @@ void MessageDispatcher::OnRemoteUserAudioAvailable(const std::string& user_id, b
 	emit SignalOnRemoteUserAudioAvailable(QString::fromStdString(user_id), available);
 }
 
-void MessageDispatcher::OnRemoteUserEnterSpeechState(const std::string& user_id) {
-    emit SignalOnRemoteUserEnterSpeechState(QString::fromStdString(user_id));
+void MessageDispatcher::OnRequestOpenCameraByAdmin(const std::string& request_id) {
+    emit SignalOnRequestOpenCameraByAdmin(QString::fromStdString(request_id));
 }
 
-void MessageDispatcher::OnRemoteUserExitSpeechState(const std::string& user_id) {
-    emit SignalOnRemoteUserExitSpeechState(QString::fromStdString(user_id));
+void MessageDispatcher::OnRequestOpenMicrophoneByAdmin(const std::string& request_id) {
+    emit SignalOnRequestOpenMicrophoneByAdmin(QString::fromStdString(request_id));
+}
+
+void MessageDispatcher::OnMicrophoneStateChanged(bool has_audio, tuikit::TUIChangeReason reason) {
+    emit SignalOnMicrophoneStateChanged(has_audio, reason);
+}
+
+void MessageDispatcher::OnCameraStateChanged(bool has_video, tuikit::TUIChangeReason reason) {
+    emit SignalOnCameraStateChanged(has_video, reason);
+}
+
+void MessageDispatcher::OnScreenSharingStateChanged(bool has_video, tuikit::TUIChangeReason reason) {
+    emit SignalOnScreenSharingStateChanged(has_video, reason);
 }
 
 void MessageDispatcher::OnReceiveChatMessage(const std::string& user_id, const std::string& message) {
@@ -90,63 +127,10 @@ void MessageDispatcher::OnReceiveCustomMessage(const std::string& user_id, const
 	emit SignalOnReceiveCustomMessage(QString::fromStdString(user_id), QString::fromStdString(message));
 }
 
-void MessageDispatcher::OnReceiveSpeechInvitation() {
-    emit SignalOnReceiveSpeechInvitation();
-}
-
-void MessageDispatcher::OnReceiveInvitationCancelled() {
-    emit SignalOnReceiveInvitationCancelled();
-}
-
-void MessageDispatcher::OnReceiveReplyToSpeechInvitation(const std::string& user_id, bool agree) {
-    emit SignalOnReceiveReplyToSpeechInvitation(QString::fromStdString(user_id), agree);
-}
-
-void MessageDispatcher::OnReceiveSpeechApplication(const std::string& user_id) {
-    emit SignalOnReceiveSpeechApplication(QString::fromStdString(user_id));
-}
-
-void MessageDispatcher::OnSpeechApplicationCancelled(const std::string& user_id) {
-    emit SignalOnSpeechApplicationCancelled(QString::fromStdString(user_id));
-}
-
-void MessageDispatcher::OnReceiveReplyToSpeechApplication(bool agree) {
-    emit SignalOnReceiveReplyToSpeechApplication(agree);
-}
-
-void MessageDispatcher::OnSpeechApplicationForbidden(bool forbidden) {
-    emit SignalOnSpeechApplicationForbidden(forbidden);
-}
-
-void MessageDispatcher::OnOrderedToExitSpeechState() {
-	emit SignalOnOrderedToExitSpeechState();
-}
-
-void MessageDispatcher::OnCallingRollStarted() {
-    emit SignalOnCallingRollStarted();
-}
-
-void MessageDispatcher::OnCallingRollStopped() {
-    emit SignalOnCallingRollStopped();
-}
-
-void MessageDispatcher::OnMemberReplyCallingRoll(const std::string& user_id) {
-    emit SignalOnMemberReplyCallingRoll(QString::fromStdString(user_id));
-}
-
-void MessageDispatcher::OnChatRoomMuted(const std::string& request_id, bool mute, TUIMutedReason reason) {
-  emit SignalOnChatRoomMuted(QString::fromStdString(request_id), mute, reason);
-}
-
-void MessageDispatcher::OnMicrophoneMuted(const std::string& request_id,
-                                          bool mute, TUIMutedReason reason) {
-  emit SignalOnMicrophoneMuted(QString::fromStdString(request_id), mute,
-                               reason);
-}
-
-void MessageDispatcher::OnCameraMuted(const std::string& request_id, bool mute,
-                                      TUIMutedReason reason) {
-  emit SignalOnCameraMuted(QString::fromStdString(request_id), mute, reason);
+void MessageDispatcher::OnSendMessageForUserDisableChanged(const std::string& room_id, const std::string& user_id, bool is_disable) {
+  emit SignalOnSendMessageForUserDisableChanged(QString::fromStdString(room_id),
+                                                QString::fromStdString(user_id),
+                                                is_disable);
 }
 
 void MessageDispatcher::OnStatistics(const liteav::TRTCStatistics& statis) {
