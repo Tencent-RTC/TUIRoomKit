@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'TUIBeauty'
-  spec.version      = '1.2.0'
+  spec.version      = '1.2.1'
   spec.platform     = :ios
   spec.ios.deployment_target = '9.0'
   spec.license      = { :type => 'MIT', :file => 'LICENSE' }
