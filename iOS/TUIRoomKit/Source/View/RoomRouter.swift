@@ -125,8 +125,8 @@ class RoomRouter {
     }
     
     func pop(animated: Bool = true) {
-        let currentController = getCurrentWindowViewController()
-        if navController?.viewControllers.first == currentController {
+        guard let viewControllerArray = navController?.viewControllers else { return }
+        if viewControllerArray.count <= 1 {
             navController?.dismiss(animated: true)
             context.rootNavigation = nil
             context.presentControllerMap.removeValue(forKey: .navigationControllerType)
@@ -137,9 +137,18 @@ class RoomRouter {
     
     func popToRoomEntranceViewController() {
         guard let navController = navController else { return }
-        let controllerArray = navController.viewControllers
-        guard let controller = controllerArray.first(where: { $0 is RoomEntranceViewController }) else { return }
-        navController.popToViewController(controller, animated: true)
+        var controllerArray = navController.viewControllers
+        controllerArray.reverse()
+        for vc in controllerArray {
+            if vc is PopUpViewController {
+                vc.dismiss(animated: true)
+            } else {
+                pop()
+            }
+            if vc is RoomMainViewController {
+                break
+            }
+        }
     }
     
     func presentAlert(_ alertController: UIAlertController) {
