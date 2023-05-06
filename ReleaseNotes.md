@@ -1,5 +1,8 @@
 ## 发布日志
 
+### Version 1.2.3 @ 2023.05.06
+- iOS：修复同时接入TUIRoomKit和TUICallKit产生的问题
+
 ### Version 1.2.2 @ 2023.04.28
 - iOS：修复路由跳转问题
 
