@@ -100,6 +100,7 @@ onUnmounted(() => {
     color: var(--el-drawer-header-color);
     font-weight: 500;
     padding: 32px 22px 32px 32px;
+    box-shadow: 0 1px 0 0 var(--divide-line-color);
   }
   .sidebar-container .el-drawer__body {
     padding: 0;
