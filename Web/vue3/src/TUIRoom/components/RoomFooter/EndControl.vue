@@ -109,11 +109,9 @@ function cancel() {
 async function closeMediaBeforeLeave() {
   if (localUser.value.hasAudioStream) {
     await roomEngine.instance?.closeLocalMicrophone();
-    await roomEngine.instance?.stopPushLocalAudio();
   }
   if (localUser.value.hasVideoStream) {
     await roomEngine.instance?.closeLocalCamera();
-    await roomEngine.instance?.stopPushLocalVideo();
   }
 }
 

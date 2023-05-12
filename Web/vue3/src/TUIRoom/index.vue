@@ -348,7 +348,6 @@ async function handleAudioStateChange(isDisableAudio: boolean) {
   **/
   if (isDisableAudio) {
     await roomEngine.instance?.closeLocalMicrophone();
-    await roomEngine.instance?.stopPushLocalAudio();
   }
 }
 
@@ -366,7 +365,6 @@ async function handleVideoStateChange(isDisableVideo: boolean) {
   **/
   if (isDisableVideo) {
     await roomEngine.instance?.closeLocalCamera();
-    await roomEngine.instance?.stopPushLocalVideo();
   }
 }
 

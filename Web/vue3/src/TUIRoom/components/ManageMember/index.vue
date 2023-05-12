@@ -141,8 +141,8 @@ async function toggleAllVideo() {
     .divide-line {
       height: 1px;
       width: 100%;
-      background: var(--divide-line-color);
-      box-shadow: 0 -1px 0 0 var(--divide-line);
+      background: var(--el-drawer-divide);
+      box-shadow: 0 -1px 0 0 var(--divide-line-color);
     }
     .member-list-container {
       overflow-y: scroll;
