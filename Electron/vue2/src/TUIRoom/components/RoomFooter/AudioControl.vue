@@ -107,7 +107,6 @@ async function toggleMuteAudio() {
   }
   if (localStream.value.hasAudioStream) {
     await roomEngine.instance?.closeLocalMicrophone();
-    await roomEngine.instance?.stopPushLocalAudio();
     // 如果是全员禁言状态下，用户主动关闭麦克风之后不能再自己打开
     if (roomStore.isMicrophoneDisableForAllUser) {
       roomStore.setCanControlSelfAudio(false);
@@ -125,7 +124,6 @@ async function toggleMuteAudio() {
     }
     // 有麦克风列表且有权限
     await roomEngine.instance?.openLocalMicrophone();
-    await roomEngine.instance?.startPushLocalAudio();
   }
   showAudioSettingTab.value = false;
 }

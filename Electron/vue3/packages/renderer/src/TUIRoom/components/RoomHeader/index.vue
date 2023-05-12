@@ -2,13 +2,14 @@
   <div class="header-container">
     <div class="left-container">
       <user-info
+        v-show="showHeaderInfo"
         class="header-item user-info"
         :user-id="userId"
         :user-name="userName"
         :avatar-url="avatarUrl"
         @log-out="$emit('log-out')"
       ></user-info>
-      <language class="header-item language"></language>
+      <language v-show="showHeaderInfo" class="header-item language"></language>
       <switch-theme class="header-item theme"></switch-theme>
     </div>
     <div class="right-container">
@@ -37,6 +38,8 @@ import { storeToRefs } from 'pinia';
 const basicStore = useBasicStore();
 
 const { userId, userName, avatarUrl } = storeToRefs(basicStore);
+
+withDefaults(defineProps<{ showHeaderInfo?: boolean }>(), { showHeaderInfo: true });
 
 defineEmits(['log-out']);
 

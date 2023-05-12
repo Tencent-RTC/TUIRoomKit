@@ -110,7 +110,7 @@ function cancel() {
 
 }
   .selected {
-    background-color: $activeStateColor;
+    background-color: transparent;
     color: $primaryColor;
   }
 </style>
