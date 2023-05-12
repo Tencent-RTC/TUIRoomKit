@@ -113,7 +113,6 @@ async function toggleMuteVideo() {
 
   if (localStream.value.hasVideoStream) {
     await roomEngine.instance?.closeLocalCamera();
-    await roomEngine.instance?.stopPushLocalVideo();
     // 如果是全员禁画状态下，用户主动关闭摄像头之后不能再自己打开
     if (roomStore.isCameraDisableForAllUser) {
       roomStore.setCanControlSelfVideo(false);
@@ -135,7 +134,6 @@ async function toggleMuteVideo() {
       streamType: TUIVideoStreamType.kCameraStream,
     });
     await roomEngine.instance?.openLocalCamera();
-    await roomEngine.instance?.startPushLocalVideo();
   }
   showVideoSettingTab.value = false;
 }

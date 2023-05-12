@@ -566,7 +566,6 @@ watch(isDefaultOpenCamera, async (val) => {
         view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
       });
       await roomEngine.instance?.openLocalCamera();
-      await roomEngine.instance?.startPushLocalVideo();
     }
   }
 });
@@ -579,7 +578,6 @@ watch(isDefaultOpenMicrophone, async (val) => {
      * 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
     **/
     await roomEngine.instance?.openLocalMicrophone();
-    await roomEngine.instance?.startPushLocalAudio();
     const microphoneList = await roomEngine.instance?.getMicDevicesList();
     const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
     if (!roomStore.currentMicrophoneId && microphoneList.length > 0) {
