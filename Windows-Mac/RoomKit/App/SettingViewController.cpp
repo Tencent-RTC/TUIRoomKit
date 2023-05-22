@@ -238,9 +238,9 @@ void SettingViewController::InitUi() {
     ui.hSlider_speaker->setValue(speaker_value);
 
     tuikit::TUIAudioQuality audio_quality = DataStore::Instance()->GetAudioQuality();
-    if (audio_quality == tuikit::TUIAudioQuality::kAudioProfileSpeech) {
+    if (audio_quality == tuikit::TUIAudioQuality::kAudioQualitySpeech) {
         ui.comboBox_audio_quality->setCurrentIndex(0);
-    } else if (audio_quality == tuikit::TUIAudioQuality::kAudioProfileDefault) {
+    } else if (audio_quality == tuikit::TUIAudioQuality::kAudioQualityDefault) {
         ui.comboBox_audio_quality->setCurrentIndex(1);
     } else {
         ui.comboBox_audio_quality->setCurrentIndex(2);
@@ -608,16 +608,16 @@ void SettingViewController::OnAudioQualityIndexChanged(int index) {
     switch (index)
     {
     case 0:
-        audio_quality = tuikit::TUIAudioQuality::kAudioProfileSpeech;
+        audio_quality = tuikit::TUIAudioQuality::kAudioQualitySpeech;
         break;
     case 1:
-        audio_quality = tuikit::TUIAudioQuality::kAudioProfileDefault;
+        audio_quality = tuikit::TUIAudioQuality::kAudioQualityDefault;
         break;
     case 2:
-        audio_quality = tuikit::TUIAudioQuality::kAudioProfileMusic;
+        audio_quality = tuikit::TUIAudioQuality::kAudioQualityMusic;
         break;
     default:
-        audio_quality = tuikit::TUIAudioQuality::kAudioProfileDefault;
+        audio_quality = tuikit::TUIAudioQuality::kAudioQualityDefault;
         break;
     }
     DataStore::Instance()->SetAudioQuality(audio_quality);

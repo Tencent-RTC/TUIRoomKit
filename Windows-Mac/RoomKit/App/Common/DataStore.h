@@ -80,7 +80,7 @@ private:
     bool            ai_noise_reduction_opened_ = true;
     bool            is_online_ = false;
     Language        current_language_ = Language::kChinese;
-    tuikit::TUIAudioQuality audio_quality_ = tuikit::TUIAudioQuality::kAudioProfileSpeech;
+    tuikit::TUIAudioQuality audio_quality_ = tuikit::TUIAudioQuality::kAudioQualitySpeech;
 };
 
 #endif  //  !__DATA_CENTER_H__

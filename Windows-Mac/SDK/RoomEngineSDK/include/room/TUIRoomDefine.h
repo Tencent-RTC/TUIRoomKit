@@ -31,16 +31,16 @@ namespace tuikit {
  */
 enum class TUIRoomType {
 
-    ///会议类型房间，适用于会议，教育场景，该房间中可以开启自由发言，申请发言、麦控等不同模式，麦位没有编号。
+    ///会议类型房间，适用于会议，教育场景，该房间中可以开启自由发言，申请发言、上麦发言等不同模式
     kConference = 1,
 
-    /// Open类型房间，适用于直播场景，该房间可以开启自由发言，麦位控制模式，该房间中麦位是有编号的。
+    ///直播类型房间，适用于直播场景，该房间可以开启自由发言，上麦发言模式
     kLivingRoom = 2,
 
 };
 
 /**
- * 1.2 房间模式
+ * 1.2 麦控模式
  */
 enum class TUISpeechMode {
 
@@ -50,7 +50,7 @@ enum class TUISpeechMode {
     ///申请发言模式。（仅在会议类型房间下生效）
     kApplyToSpeak = 2,
 
-    ///麦控模式。
+    ///上麦发言模式。
     kApplySpeakAfterTakingSeat = 3,
 
 };
@@ -118,13 +118,13 @@ enum class TUIVideoQuality {
 enum class TUIAudioQuality {
 
     ///人声模式
-    kAudioProfileSpeech = 0,
+    kAudioQualitySpeech = 0,
 
     ///默认模式
-    kAudioProfileDefault = 1,
+    kAudioQualityDefault = 1,
 
     ///音乐模式
-    kAudioProfileMusic = 2,
+    kAudioQualityMusic = 2,
 
 };
 
@@ -260,7 +260,7 @@ struct TUIRoomInfo {
     ///房间名称（创建房间可选参数，默认房间ID）
     const char* name;
 
-    ///房间发言模式
+    ///房间麦控模式
     TUISpeechMode speechMode;
 
     ///是否禁止打开摄像头（创建房间可选参数），默认值：{@link false}。
@@ -274,12 +274,6 @@ struct TUIRoomInfo {
 
     ///最大麦位数
     int maxSeatCount;
-
-    ///是否开启CDN直播（创建房间可选参数，直播房间使用），默认值：{@link false}。
-    bool enableCDNStreaming;
-
-    ///直播推流域名（创建房间可选参数，直播房间使用），默认值：空。
-    const char* cdnStreamDomain;
 
     ///房间创建时间（只读）
     uint64_t createTime;
@@ -296,8 +290,6 @@ struct TUIRoomInfo {
           isMicrophoneDisableForAllUser(false),
           isMessageDisableForAllUser(false),
           maxSeatCount(0),
-          enableCDNStreaming(false),
-          cdnStreamDomain(nullptr),
           ownerId(nullptr),
           createTime(0),
           memberCount(0) {
@@ -305,7 +297,7 @@ struct TUIRoomInfo {
 };
 
 /**
- * 5.2 房间内用户信息
+ * 5.2 用户登录信息
  */
 struct TUILoginUserInfo {
     ///用户ID
@@ -363,10 +355,10 @@ struct TUISeatInfo {
     ///麦位是否被锁定，默认值：{@link false}。
     bool isLocked;
 
-    ///麦位是否被禁止打开视频，默认值：{@link false}。
+    ///麦位是否被禁止打开摄像头，默认值：{@link false}。
     bool isVideoLocked;
 
-    ///麦位是否被禁止打开音频，默认值：{@link false}。
+    ///麦位是否被禁止打开麦克风，默认值：{@link false}。
     bool isAudioLocked;
 
     TUISeatInfo() : index(-1), userId(nullptr), isLocked(false), isVideoLocked(false), isAudioLocked(false) {
@@ -380,10 +372,10 @@ struct TUISeatLockParams {
     ///锁定麦位，默认值：{@link false}。
     bool lockSeat;
 
-    ///锁定麦位视频，默认值：{@link false}。
+    ///锁定麦位摄像头，默认值：{@link false}。
     bool lockVideo;
 
-    ///锁定麦位音频，默认值：{@link false}。
+    ///锁定麦位麦克风，默认值：{@link false}。
     bool lockAudio;
 
     TUISeatLockParams() : lockSeat(false), lockVideo(false), lockAudio(false) {

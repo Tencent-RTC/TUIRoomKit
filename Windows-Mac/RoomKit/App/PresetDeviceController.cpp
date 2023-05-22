@@ -160,11 +160,11 @@ void PresetDeviceController::InitUi() {
     OnBeautyClicked(beauty_config.open_beauty);
 
     tuikit::TUIAudioQuality audio_quality = DataStore::Instance()->GetAudioQuality();
-    if (audio_quality == tuikit::TUIAudioQuality::kAudioProfileSpeech) {
+    if (audio_quality == tuikit::TUIAudioQuality::kAudioQualitySpeech) {
         ui.comboBox_audio_quality->setCurrentIndex(0);
-    } else if (audio_quality == tuikit::TUIAudioQuality::kAudioProfileDefault) {
+    } else if (audio_quality == tuikit::TUIAudioQuality::kAudioQualityDefault) {
         ui.comboBox_audio_quality->setCurrentIndex(1);
-    } else if (audio_quality == tuikit::TUIAudioQuality::kAudioProfileMusic) {
+    } else if (audio_quality == tuikit::TUIAudioQuality::kAudioQualityMusic) {
         ui.comboBox_audio_quality->setCurrentIndex(2);
     } else {
         ui.comboBox_audio_quality->setCurrentIndex(0);
@@ -446,16 +446,16 @@ void PresetDeviceController::OnAudioQualityIndexChanged(int index) {
     switch (index)
     {
     case 0:
-        audio_quality = tuikit::TUIAudioQuality::kAudioProfileSpeech;
+        audio_quality = tuikit::TUIAudioQuality::kAudioQualitySpeech;
         break;
     case 1:
-        audio_quality = tuikit::TUIAudioQuality::kAudioProfileDefault;
+        audio_quality = tuikit::TUIAudioQuality::kAudioQualityDefault;
         break;
     case 2:
-        audio_quality = tuikit::TUIAudioQuality::kAudioProfileMusic;
+        audio_quality = tuikit::TUIAudioQuality::kAudioQualityMusic;
         break;
     default:
-        audio_quality = tuikit::TUIAudioQuality::kAudioProfileDefault;
+        audio_quality = tuikit::TUIAudioQuality::kAudioQualityDefault;
         break;
     }
     DataStore::Instance()->SetAudioQuality(audio_quality);

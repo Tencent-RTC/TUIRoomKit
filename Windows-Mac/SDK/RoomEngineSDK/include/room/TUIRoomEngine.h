@@ -82,7 +82,15 @@ class TUIRoomEngine {
     TUIKIT_API static TUILoginUserInfo getSelfInfo();
 
     /**
-     * 1.5 设置事件回调
+     * 1.5 设置本地用户信息
+     *
+     * @param userInfo 本地用户信息
+     * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
+     */
+    TUIKIT_API static void setSelfInfo(const TUILoginUserInfo& userInfo, TUICallback* callback);
+
+    /**
+     * 1.6 设置事件回调
      *
      * 您可以通过 TUIRoomObserver 获得各类事件通知（比如：错误码，远端用户进房，音视频状态参数等）
      * @param observer 监听的实例
@@ -90,7 +98,7 @@ class TUIRoomEngine {
     virtual void addObserver(TUIRoomObserver* observer) = 0;
 
     /**
-     * 1.6 移除事件回调
+     * 1.7 移除事件回调
      *
      * @param observer 待移除的监听回调实例
      */
@@ -161,7 +169,7 @@ class TUIRoomEngine {
     virtual void fetchRoomInfo(TUIValueCallback<TUIRoomInfo>* callback) = 0;
 
     /**
-     * 2.8 更新房间名称
+     * 2.8 更新房间名称（只有管理员或房主能够调用）
      *
      * @param roomName 房间名称
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
@@ -169,11 +177,11 @@ class TUIRoomEngine {
     virtual void updateRoomNameByAdmin(const char* roomName, TUICallback* callback) = 0;
 
     /**
-     * 2.9  设置房间管理模式（只有管理员或群主能够调用）
+     * 2.9  设置房间管理模式（只有管理员或房主能够调用）
      *
      * @param mode kFreeToSpeak: 自由发言模式, 用户可以自由开启麦克风和扬声器;
      *             kApplyToSpeak: 申请发言模式，用户requestOpenLocalMicrophone 或 requestOpenLocalCamera 向房主或管理员申请后，方可打开麦克风和摄像头开始发言
-     *             kkSpeakAfterTakingSeat: 麦控模式。KConference房间内，所有人在发言前，必须takeSeat，才能进行麦克风和摄像头操作。
+     *             kkSpeakAfterTakingSeat: 上麦发言模式。KConference房间内，所有人在发言前，必须takeSeat，才能进行麦克风和摄像头操作。
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
      */
     virtual void updateRoomSpeechModeByAdmin(TUISpeechMode mode, TUICallback* callback) = 0;
@@ -351,7 +359,7 @@ class TUIRoomEngine {
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 7.1  修改用户角色
+     * 7.1  修改用户角色（只有管理员或房主能够调用）
      *
      * @param userId 用户ID
      * @param role 用户角色 详细定义可以参考 {@link TUIRole} 的定义
@@ -360,7 +368,7 @@ class TUIRoomEngine {
     virtual void changeUserRole(const char* userId, TUIRole role, TUICallback* callback) = 0;
 
     /**
-     * 7.2  将远端用户踢出房间（只有管理员或群主能够调用）
+     * 7.2  将远端用户踢出房间（只有管理员或房主能够调用）
      *
      * @param userId 用户ID
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
@@ -383,7 +391,7 @@ class TUIRoomEngine {
     virtual void disableDeviceForAllUserByAdmin(TUIMediaDevice device, bool isDisable, TUICallback* callback) = 0;
 
     /**
-     * 8.2  请求远端用户打开媒体设备
+     * 8.2  请求远端用户打开媒体设备（只有管理员或房主能够调用）
      *
      * @param userId 用户ID
      * @param device 媒体设备。详细定义参考:{@link TUIMediaDevice}
@@ -394,7 +402,7 @@ class TUIRoomEngine {
     virtual TUIRequest openRemoteDeviceByAdmin(const char* userId, TUIMediaDevice device, int timeout, TUIRequestCallback* callback) = 0;
 
     /**
-     * 8.3  关闭远端用户媒体设备
+     * 8.3  关闭远端用户媒体设备（只有管理员或房主能够调用）
      *
      * @param userId 用户ID
      * @param device 媒体设备。详细定义参考:{@link TUIMediaDevice}
@@ -419,7 +427,7 @@ class TUIRoomEngine {
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 9.1  设置最大麦位数
+     * 9.1  设置最大麦位数（仅支持进房前和创建房间时设置）
      *
      * @param maxSeatCount 最大麦位数
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
@@ -434,7 +442,7 @@ class TUIRoomEngine {
     virtual void getSeatList(TUIListCallback<TUISeatInfo>* callback) = 0;
 
     /**
-     * 9.3  锁定麦位
+     * 9.3  锁定麦位（只有管理员或群主能够调用，包括位置锁定、音频状态锁定和视频状态锁定）
      *
      * @param seatIndex 麦位编号
      * @param lockParams 锁麦参数。详情参考:{@link TUIRoomDefine.SeatLockParams}
@@ -443,9 +451,9 @@ class TUIRoomEngine {
     virtual void lockSeatByAdmin(int seatIndex, const TUISeatLockParams& lockParams, TUICallback* callback) = 0;
 
     /**
-     * 9.4  本地上麦
+     * 9.4  上麦（上麦发言模式下，需要申请）
      *
-     * @note 开启麦控模式时，需要向主持人或管理员发起申请才允许上麦。
+     * @note 开启上麦发言模式时，需要向主持人或管理员发起申请才允许上麦。
      *       开启自由发言模式，直播场景可以自由上麦，上麦后开麦发言，会议场景无需调用该接口，即可开麦发言。
      * @param seatIndex 麦位编号
      * @param timeout 超时时间，单位秒，如果设置为 0，SDK 不会做超时检测，也不会触发超时回调
@@ -455,7 +463,7 @@ class TUIRoomEngine {
     virtual TUIRequest takeSeat(int seatIndex, int timeout, TUIRequestCallback* callback) = 0;
 
     /**
-     * 9.5  本地下麦
+     * 9.5  下麦
      *
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
      */
@@ -504,7 +512,7 @@ class TUIRoomEngine {
     virtual void sendCustomMessage(const char* message, TUICallback* callback) = 0;
 
     /**
-     * 10.3  禁用远端用户的发送文本消息能力（只有管理员或群主能够调用）
+     * 10.3  禁用远端用户的发送文本消息能力（只有管理员或房主能够调用）
      *
      * @param userId 用户ID
      * @param isDisable 是否禁用
@@ -513,7 +521,7 @@ class TUIRoomEngine {
     virtual void disableSendingMessageByAdmin(const char* userId, bool isDisable, TUICallback* callback) = 0;
 
     /**
-     * 10.4  禁用所有用户的发送文本消息能力（只有管理员或群主能够调用）
+     * 10.4  禁用所有用户的发送文本消息能力（只有管理员或房主能够调用）
      *
      * @param isDisable 是否禁用
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败

@@ -1070,7 +1070,7 @@ int TUIRoomCoreImpl::OpenAINoiseReduction() {
     open_ai_noise_reduction_ = true;
     if (enter_room_success_) {
         std::stringstream ans_level;
-        if (audio_quality_ == tuikit::TUIAudioQuality::kAudioProfileMusic) {
+        if (audio_quality_ == tuikit::TUIAudioQuality::kAudioQualityMusic) {
             ans_level << "{\"api\":\"enableAudioANS\",\"params\":{\"enable\":1,\"level\":60}}";
         } else {
             ans_level << "{\"api\":\"enableAudioANS\",\"params\":{\"enable\":1,\"level\":120}}";
@@ -1088,9 +1088,9 @@ int TUIRoomCoreImpl::CloseAINoiseReduction() {
     if (enter_room_success_) {
         std::stringstream ans_level;
         int level = 120;
-        if (audio_quality_ == tuikit::TUIAudioQuality::kAudioProfileSpeech) {
+        if (audio_quality_ == tuikit::TUIAudioQuality::kAudioQualitySpeech) {
             level = 100;
-        } else if (audio_quality_ == tuikit::TUIAudioQuality::kAudioProfileDefault) {
+        } else if (audio_quality_ == tuikit::TUIAudioQuality::kAudioQualityDefault) {
             level = 60;
         } else {
             level = 60;
