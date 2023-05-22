@@ -57,7 +57,7 @@ class TUIRoomObserver {
     virtual void onRoomNameChanged(const char* roomId, const char* roomName) = 0;
 
     /**
-     * 3.2 房间内用户麦克风被禁用事件
+     * 3.2 房间内所有用户麦克风被禁用事件
      *
      * @param roomId 房间ID
      * @param isDisable 是否被禁用
@@ -65,7 +65,7 @@ class TUIRoomObserver {
     virtual void onAllUserMicrophoneDisableChanged(const char* roomId, bool isDisable) = 0;
 
     /**
-     * 3.3 房间内用户摄像头被禁用事件
+     * 3.3 房间内所有用户摄像头被禁用事件
      *
      * @param roomId 房间ID
      * @param isDisable 是否被禁用
@@ -96,7 +96,7 @@ class TUIRoomObserver {
     virtual void onKickedOutOfRoom(const char* roomId, const char* message) = 0;
 
     /**
-     * 3.8 房间发言管理模式发生变化
+     * 3.8 房间麦控模式发生变化
      *
      * @param roomId 房间ID
      * @param mode 房间模式

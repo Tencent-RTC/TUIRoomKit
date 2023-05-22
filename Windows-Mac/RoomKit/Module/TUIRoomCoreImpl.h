@@ -227,7 +227,7 @@ private:
     int             sdk_app_id_;
     std::string     user_sig_;
     std::string     sdk_version_;
-    tuikit::TUIAudioQuality audio_quality_ = tuikit::TUIAudioQuality::kAudioProfileSpeech;
+    tuikit::TUIAudioQuality audio_quality_ = tuikit::TUIAudioQuality::kAudioQualitySpeech;
 };
 
 #endif  //  MODULE_TUIROOMCOREIMPL_H_
