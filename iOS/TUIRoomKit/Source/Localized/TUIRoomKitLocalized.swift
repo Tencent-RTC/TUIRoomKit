@@ -7,8 +7,13 @@
 //
 
 import UIKit
+import TUICore
 
 func localized(_ key: String) -> String {
+    if let bundlePath = tuiRoomKitBundle().path(forResource: TUIGlobalization.tk_localizableLanguageKey() ?? "", ofType: "lproj"),
+       let bundle = Bundle(path: bundlePath) {
+        return bundle.localizedString(forKey: key, value: "", table: "TUIRoomKitLocalized")
+    }
     return TUIRoomKitLocalized.sharedBundle.localizedString(forKey: key, value: "", table: "TUIRoomKitLocalized")
 }
 

@@ -207,12 +207,12 @@ extension SetUpView: SetUpViewEventResponder {
 }
 
 private extension String {
-    static let shareText = localized("TUIRoom.share")
-    static let recordingSavePathText = localized("TUIRoom.recording.save.path")
-    static let promptText = localized("TUIRoom.prompt")
-    static let confirmText = localized("TUIRoom.ok")
-    static let resolutionText = localized("TUIRoom.resolution")
-    static let frameRateText = localized("TUIRoom.frame.rate")
+    static var resolutionText: String {
+        localized("TUIRoom.resolution")
+    }
+    static var frameRateText: String {
+        localized("TUIRoom.frame.rate")
+    }
 }
 
 

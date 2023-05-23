@@ -13,7 +13,7 @@
 "TUIRoom.user.name" = "Yourname";
 "TUIRoom.room.num" = "Room ID";
 "TUIRoom.room.link" = "Room Link";
-"TUIRoom.open.video" = "Turn video on";
+"TUIRoom.open.video" = "Open camera";
 "TUIRoom.open.mic" = "Turn mic on";
 "TUIRoom.open.speaker" = "Turn speaker on";
 "TUIRoom.room.type" = "Room type";
@@ -57,9 +57,9 @@
 "TUIRoom.mute.video.title" = "All and new members will be banned from drawing";
 "TUIRoom.mute.video.message" = "Allow members to unban themselves";
 "TUIRoom.video.conference" = "Video conference";
-"TUIRoom.mute" = "Mute";
-"TUIRoom.unmute" = "Unmute";
-"TUIRoom.close.video" = "Turn video off";
+"TUIRoom.mute" = "Close mic";
+"TUIRoom.unmute" = "Open mic";
+"TUIRoom.close.video" = "Close camera";
 "TUIRoom.change.host" = "Change host";
 "TUIRoom.mute.message" = "Mute message";
 "TUIRoom.unmute.message" = "Unmute message";
@@ -106,7 +106,7 @@
 "TUIRoom.mute.audio.seat.reason" = "Raise your hand to speak in the room, please raise your hand to apply for a microphone";
 "TUIRoom.mute.video.seat.reason" = "Raise your hand to speak in the room, please raise your hand to apply for a microphone";
 "TUIRoom.mute.audio.room.reason" = "The host has turned on the mute for all members, and the microphone cannot be turned on";
-"TUIRoom.mute.video.room.reason" = "The host has turned on the mute for all members, and the microphone cannot be turned on";
+"TUIRoom.mute.video.room.reason" = "The host has turned on the mute video for all members, and the camera cannot be turned on";
 "TUIRoom.all.mute.video.prompt" = "All mute video is turn on, and the audience will not be able to turn on the camera";
 "TUIRoom.all.mute.audio.prompt" = "All mute audio is turned on, and the audience will not be able to turn on the microphone";
 "TUIRoom.all.unmute.video.prompt" = "The host turns off the mute video of all members, and the audience can open the video by themselves";

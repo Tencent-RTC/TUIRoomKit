@@ -302,10 +302,3 @@ class AlertContentView: UIView {
         debugPrint("deinit \(self)")
     }
 }
-
-// MARK: - internationalization string
-
-private extension String {
-    static let titleText = localized("TUIRoom.Beauty.Setup")
-    static let strengthText = localized("TUIRoom.Beauty.Setup.Strength")
-}

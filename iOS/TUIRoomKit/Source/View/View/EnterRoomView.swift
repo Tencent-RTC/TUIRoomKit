@@ -149,5 +149,7 @@ class EnterRoomView: UIView {
 }
 
 private extension String {
-    static let enterRoomText = localized("TUIRoom.join.room")
+    static var enterRoomText: String {
+        localized("TUIRoom.join.room")
+    }
 }

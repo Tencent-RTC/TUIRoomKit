@@ -32,11 +32,6 @@ class RoomStore: NSObject {
         self.roomInfo = roomInfo
     }
     
-    func initialLoginCurrentUser() {
-        let userInfo = TUIRoomEngine.getSelfInfo()
-        currentLoginUser.updateLoginUserInfo(userInfo: userInfo)
-    }
-    
     func initialRoomCurrentUser() {
         currentUser.userId = currentLoginUser.userId
         engineManager.roomEngine.getUserInfo(currentLoginUser.userId) { [weak self] userInfo in
@@ -60,7 +55,7 @@ class RoomStore: NSObject {
     }
 }
 
-public class RoomInfo {
+@objcMembers public class RoomInfo: NSObject {
     public var roomId: String {
         set {
             roomInfo.roomId = newValue
@@ -131,11 +126,12 @@ public class RoomInfo {
     public var ownerId: String = ""
     
     private var roomInfo: TUIRoomInfo
-    public init() {
+    public override init() {
         isOpenMicrophone = true
         isOpenCamera = true
         isUseSpeaker = false
         roomInfo = TUIRoomInfo()
+        super.init()
     }
     
     convenience init(roomInfo: TUIRoomInfo) {

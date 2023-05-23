@@ -7,8 +7,13 @@
 //
 
 import UIKit
+import TUICore
 
 func tuiVideoSeatLocalize(_ key: String) -> String {
+    if let bundlePath = tuiVideoSeatBundle().path(forResource: TUIGlobalization.tk_localizableLanguageKey() ?? "", ofType: "lproj"),
+       let bundle = Bundle(path: bundlePath) {
+        return bundle.localizedString(forKey: key, value: "", table: "TUIVideoSeatLocalized")
+    }
     return TUIVideoSeatLocalized.sharedBundle.localizedString(forKey: key, value: "", table: "TUIVideoSeatLocalized")
 }
 

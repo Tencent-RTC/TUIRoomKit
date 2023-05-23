@@ -207,8 +207,8 @@ extension RaiseHandApplicationListView: UITableViewDelegate {
 
 extension RaiseHandApplicationListView: RaiseHandApplicationListViewResponder {
     func searchControllerChangeActive(isActive: Bool) {
-        searchController.searchBar.endEditing(true)
-        searchController.isActive = false
+        searchController.searchBar.endEditing(!isActive)
+        searchController.isActive = isActive
     }
     
     func reloadApplyListView() {
@@ -394,12 +394,28 @@ class ApplyTableCell: UITableViewCell {
 }
 
 private extension String {
-    static let raiseHandApplyText = localized("TUIRoom.raise.hand.apply")
-    static let searchMemberText = localized("TUIRoom.search.meeting.member")
-    static let agreeAllText = localized("TUIRoom.agree.all")
-    static let inviteMembersText = localized("TUIRoom.invite.members")
-    static let agreeSeatText = localized("TUIRoom.agree.seat")
-    static let disagreeSeatText = localized("TUIRoom.disagree.seat")
-    static let meText = localized("TUIRoom.me")
-    static let videoConferenceTitle = localized("TUIRoom.video.conference.title")
+    static var raiseHandApplyText: String {
+        localized("TUIRoom.raise.hand.apply")
+    }
+    static var searchMemberText: String {
+        localized("TUIRoom.search.meeting.member")
+    }
+    static var agreeAllText: String {
+        localized("TUIRoom.agree.all")
+    }
+    static var inviteMembersText: String {
+        localized("TUIRoom.invite.members")
+    }
+    static var agreeSeatText: String {
+        localized("TUIRoom.agree.seat")
+    }
+    static var disagreeSeatText: String {
+        localized("TUIRoom.disagree.seat")
+    }
+    static var meText: String {
+        localized("TUIRoom.me")
+    }
+    static var videoConferenceTitle: String {
+        localized("TUIRoom.video.conference.title")
+    }
 }

@@ -191,8 +191,8 @@ extension  TransferMasterView: TransferMasterViewResponder {
     }
     
     func searchControllerChangeActive(isActive: Bool) {
-        searchController.searchBar.endEditing(true)
-        searchController.isActive = false
+        searchController.searchBar.endEditing(!isActive)
+        searchController.isActive = isActive
     }
 }
 
@@ -306,8 +306,16 @@ class TransferMasterTableCell: UITableViewCell {
 }
 
 private extension String {
-    static let transferMasterText = localized("TUIRoom.trans.master")
-    static let searchMemberText = localized("TUIRoom.search.meeting.member")
-    static let appointAndLeaveRoomText = localized("TUIRoom.appoint.master.and.leave.room")
-    static let videoConferenceTitle = localized("TUIRoom.video.conference.title")
+    static var transferMasterText: String {
+        localized("TUIRoom.trans.master")
+    }
+    static var searchMemberText: String {
+        localized("TUIRoom.search.meeting.member")
+    }
+    static var appointAndLeaveRoomText: String {
+        localized("TUIRoom.appoint.master.and.leave.room")
+    }
+    static var videoConferenceTitle: String {
+        localized("TUIRoom.video.conference.title")
+    }
 }

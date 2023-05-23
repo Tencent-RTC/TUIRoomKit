@@ -181,5 +181,7 @@ extension CreateRoomView: CreateViewEventResponder {
 }
 
 private extension String {
-    static let createRoomText = localized("TUIRoom.create.room")
+    static var createRoomText: String {
+        localized("TUIRoom.create.room")
+    }
 }

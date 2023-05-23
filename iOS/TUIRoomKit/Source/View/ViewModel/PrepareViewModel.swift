@@ -16,6 +16,7 @@ import TXLiteAVSDK_Professional
  
 protocol PrePareViewEventProtocol: AnyObject {
     func updateButtonState()
+    func changeLanguage()
 }
 
 class PrePareViewModel {
@@ -29,6 +30,9 @@ class PrePareViewModel {
     }
     var roomInfo: RoomInfo {
         engineManager.store.roomInfo
+    }
+    var languageID: String {
+        TUIGlobalization.tk_localizableLanguageKey()
     }
     
     func initialState(view: UIView) {
@@ -77,7 +81,12 @@ class PrePareViewModel {
     }
     
     func switchLanguageAction() {
-        
+        if languageID == "zh-Hans" {
+            TUIGlobalization.setPreferredLanguage("en")
+        } else if languageID == "en" {
+            TUIGlobalization.setPreferredLanguage("zh-Hans")
+        }
+        viewResponder?.changeLanguage()
     }
     
     func openCameraAction(sender: UIButton, placeholderImage: UIView) {
@@ -138,11 +147,7 @@ class PrePareViewModel {
     }
     
     deinit {
+        TRTCCloud.destroySharedIntance()
         debugPrint("deinit \(self)")
     }
-}
-
-private extension String {
-    static let exitLoginText = localized("TUIRoom.exit.login")
-    static let cancelText = localized("TUIRoom.cancel")
 }

@@ -335,16 +335,40 @@ class SetUpViewModel {
 }
 
 private extension String {
-    static let videoText = localized("TUIRoom.video")
-    static let audioText = localized("TUIRoom.audio")
-    static let shareText = localized("TUIRoom.share")
-    static let versionLowToastText = localized("TUIRoom.version.too.low")
-    static let resolutionText = localized("TUIRoom.resolution")
-    static let frameRateText = localized("TUIRoom.frame.rate")
-    static let bitrateText = localized("TUIRoom.bitrate")
-    static let localMirrorText = localized("TUIRoom.local.mirror")
-    static let captureVolumeText = localized("TUIRoom.capture.volume")
-    static let playVolumeText = localized("TUIRoom.play.volume")
-    static let volumePromptText = localized("TUIRoom.volume.prompt")
-    static let audioRecordingText = localized("TUIRoom.audio.recording")
+    static var videoText: String {
+        localized("TUIRoom.video")
+    }
+    static var audioText: String {
+        localized("TUIRoom.audio")
+    }
+    static var shareText: String {
+        localized("TUIRoom.share")
+    }
+    static var versionLowToastText: String {
+        localized("TUIRoom.version.too.low")
+    }
+    static var resolutionText: String {
+        localized("TUIRoom.resolution")
+    }
+    static var frameRateText: String {
+        localized("TUIRoom.frame.rate")
+    }
+    static var bitrateText: String {
+        localized("TUIRoom.bitrate")
+    }
+    static var localMirrorText: String {
+        localized("TUIRoom.local.mirror")
+    }
+    static var captureVolumeText: String {
+        localized("TUIRoom.capture.volume")
+    }
+    static var playVolumeText: String {
+        localized("TUIRoom.play.volume")
+    }
+    static var volumePromptText: String {
+        localized("TUIRoom.volume.prompt")
+    }
+    static var audioRecordingText: String {
+        localized("TUIRoom.audio.recording")
+    }
 }

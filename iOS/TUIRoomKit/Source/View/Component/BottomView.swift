@@ -123,13 +123,29 @@ extension BottomView: BottomViewModelResponder {
 }
 
 private extension String {
-    static let audienceLogoutTitle = localized("TUIRoom.sure.leave.room")
-    static let destroyRoomCancelTitle = localized("TUIRoom.destroy.room.cancel")
-    static let logoutOkText = localized("TUIRoom.ok")
-    static let dismissMeetingTitleText = localized("TUIRoom.dismiss.meeting.Title")
-    static let appointNewHostText = localized("TUIRoom.appoint.new.host")
-    static let leaveMeetingText = localized("TUIRoom.leave.meeting")
-    static let dismissMeetingText = localized("TUIRoom.dismiss.meeting")
-    static let cancelText = localized("TUIRoom.cancel")
+    static var audienceLogoutTitle: String {
+        localized("TUIRoom.sure.leave.room")
+    }
+    static var destroyRoomCancelTitle: String {
+        localized("TUIRoom.destroy.room.cancel")
+    }
+    static var logoutOkText: String {
+        localized("TUIRoom.ok")
+    }
+    static var dismissMeetingTitleText: String {
+        localized("TUIRoom.dismiss.meeting.Title")
+    }
+    static var appointNewHostText: String {
+        localized("TUIRoom.appoint.new.host")
+    }
+    static var leaveMeetingText: String {
+        localized("TUIRoom.leave.meeting")
+    }
+    static var dismissMeetingText: String {
+        localized("TUIRoom.dismiss.meeting")
+    }
+    static var cancelText: String {
+        localized("TUIRoom.cancel")
+    }
 }
 

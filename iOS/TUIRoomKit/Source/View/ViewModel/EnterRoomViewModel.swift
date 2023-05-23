@@ -109,11 +109,25 @@ class EnterRoomViewModel: NSObject {
 }
 
 private extension String {
-    static let enterRoomIdErrorToast = localized("TUIRoom.input.error.room.num.toast")
-    static let placeholderTipsText = localized("TUIRoom.input.room.num")
-    static let userNameText = localized("TUIRoom.user.name")
-    static let roomNumText = localized("TUIRoom.room.num")
-    static let openCameraText = localized("TUIRoom.open.video")
-    static let openMicText = localized("TUIRoom.open.mic")
-    static let openSpeakerText = localized("TUIRoom.open.speaker")
+    static var enterRoomIdErrorToast: String {
+        localized("TUIRoom.input.error.room.num.toast")
+    }
+    static var placeholderTipsText: String {
+        localized("TUIRoom.input.room.num")
+    }
+    static var userNameText: String {
+        localized("TUIRoom.user.name")
+    }
+    static var roomNumText: String {
+        localized("TUIRoom.room.num")
+    }
+    static var openCameraText: String {
+        localized("TUIRoom.open.video")
+    }
+    static var openMicText: String {
+        localized("TUIRoom.open.mic")
+    }
+    static var openSpeakerText: String {
+        localized("TUIRoom.open.speaker")
+    }
 }

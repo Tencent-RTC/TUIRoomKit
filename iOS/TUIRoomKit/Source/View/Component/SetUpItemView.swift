@@ -159,5 +159,7 @@ extension SetUpItemView: RoomKitUIEventResponder {
 }
 
 private extension String {
-    static let shareText = localized("TUIRoom.share")
+    static var shareText: String {
+        localized("TUIRoom.share")
+    }
 }

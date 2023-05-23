@@ -64,23 +64,12 @@ class BottomViewModel: NSObject {
         // 静音
         let muteAudioItem = ButtonItemData()
         muteAudioItem.normalTitle = .muteAudioText
+        muteAudioItem.selectedTitle = .unMuteAudioText
         muteAudioItem.normalIcon = "room_mic_on"
         muteAudioItem.selectedIcon = "room_mic_off"
         muteAudioItem.resourceBundle = tuiRoomKitBundle()
         muteAudioItem.buttonType = .muteAudioItemType
-        switch currentUser.userRole {
-        case .roomOwner:
-            muteAudioItem.isSelect = !roomInfo.isOpenMicrophone
-        case .generalUser:
-            switch roomInfo.speechMode {
-            case .freeToSpeak:
-                muteAudioItem.isSelect = !roomInfo.isOpenMicrophone || roomInfo.isMicrophoneDisableForAllUser
-            case .applySpeakAfterTakingSeat:
-                muteAudioItem.isSelect = !roomInfo.isOpenMicrophone || !currentUser.isOnSeat || roomInfo.isMicrophoneDisableForAllUser
-            default:break
-            }
-        default: break
-        }
+        muteAudioItem.isSelect = true
         muteAudioItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.muteAudioAction(sender: button)
@@ -94,19 +83,7 @@ class BottomViewModel: NSObject {
         muteVideoItem.selectedIcon = "room_camera_off"
         muteVideoItem.resourceBundle = tuiRoomKitBundle()
         muteVideoItem.buttonType = .muteVideoItemType
-        switch currentUser.userRole {
-        case .roomOwner:
-            muteVideoItem.isSelect = !roomInfo.isOpenCamera
-        case .generalUser:
-            switch roomInfo.speechMode {
-            case .freeToSpeak:
-                muteVideoItem.isSelect = !roomInfo.isOpenCamera || roomInfo.isCameraDisableForAllUser
-            case .applySpeakAfterTakingSeat:
-                muteVideoItem.isSelect = !roomInfo.isOpenCamera || !currentUser.isOnSeat || roomInfo.isCameraDisableForAllUser
-            default: break
-            }
-        default: break
-        }
+        muteVideoItem.isSelect = true
         muteVideoItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.muteVideoAction(sender: button)
@@ -177,9 +154,9 @@ class BottomViewModel: NSObject {
     }
     
     func muteAudioAction(sender: UIButton) {
-        if currentUser.hasAudioStream {
-            engineManager.roomEngine.closeLocalMicrophone()
+        if !sender.isSelected {
             engineManager.roomEngine.stopPushLocalAudio()
+            engineManager.roomEngine.closeLocalMicrophone()
             return
         }
         //如果房主全体静音，房间成员不可打开麦克风
@@ -187,50 +164,34 @@ class BottomViewModel: NSObject {
             viewResponder?.makeToast(text: .muteAudioRoomReasonText)
             return
         }
-        // 直接打开本地的麦克风
-        let openLocalMicrophoneBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.openLocalMicrophone(self.engineManager.store.audioSetting.audioQuality) { [weak self] in
-                guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalAudio()
-            } onError: { code, message in
-                debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
-            }
-        }
-        //打开本地的麦克风需要进行申请
-        let applyToAdminToOpenLocalDeviceBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: .microphone, timeout: self.timeoutNumber) {  [weak self] _, _ in
-                guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalAudio()
-            } onRejected: { _, _, _ in
-                //todo
-            } onCancelled: { _, _ in
-                //todo
-            } onTimeout: { _, _ in
-                //todo
-            }
-        }
         switch roomInfo.speechMode {
         case .freeToSpeak:
-            openLocalMicrophoneBlock()
+            openLocalMicrophone()
         case .applySpeakAfterTakingSeat:
             if currentUser.isOnSeat {
-                openLocalMicrophoneBlock()
+                openLocalMicrophone()
             } else {
                 viewResponder?.makeToast(text: .muteAudioSeatReasonText)
             }
         case .applyToSpeak:
-            applyToAdminToOpenLocalDeviceBlock()
+            applyToAdminToOpenLocalDevice(device: .microphone)
         @unknown default:
             break
         }
     }
     
+    private func openLocalMicrophone() {
+        engineManager.roomEngine.openLocalMicrophone(self.engineManager.store.audioSetting.audioQuality) {
+        } onError: { code, message in
+            debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
+        }
+        engineManager.roomEngine.startPushLocalAudio()
+    }
+    
     func muteVideoAction(sender: UIButton) {
-        if currentUser.hasVideoStream {
-            engineManager.roomEngine.closeLocalCamera()
+        if !sender.isSelected {
             engineManager.roomEngine.stopPushLocalVideo()
+            engineManager.roomEngine.closeLocalCamera()
             return
         }
         //如果房主全体禁画，房间成员不可打开摄像头
@@ -238,46 +199,42 @@ class BottomViewModel: NSObject {
             viewResponder?.makeToast(text: .muteVideoRoomReasonText)
             return
         }
-        // 直接打开本地的摄像头
-        let openLocalCameraBlock = { [weak self] in
-            guard let self = self else { return }
-            // FIXME: - 打开摄像头前需要先设置一个view
-            self.engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-            self.engineManager.roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera, quality:
-                                                            EngineManager.shared.store.videoSetting.videoQuality) { [weak self] in
-                guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalVideo()
-            } onError: { code, message in
-                debugPrint("openLocalCamera,code:\(code),message:\(message)")
-            }
-        }
-        //打开本地的摄像头需要向房主进行申请
-        let applyToAdminToOpenLocalDeviceBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: .camera, timeout: self.timeoutNumber) {  [weak self] _, _ in
-                guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalVideo()
-            } onRejected: { _, _, _ in
-                //todo
-            } onCancelled: { _, _ in
-                //todo
-            } onTimeout: { _, _ in
-                //todo
-            }
-        }
         switch roomInfo.speechMode {
         case .freeToSpeak:
-            openLocalCameraBlock()
+            openLocalCamera()
         case .applySpeakAfterTakingSeat:
             if currentUser.isOnSeat {
-                openLocalCameraBlock()
+                openLocalCamera()
             } else {
                 viewResponder?.makeToast(text: .muteVideoSeatReasonText)
             }
         case .applyToSpeak:
-            applyToAdminToOpenLocalDeviceBlock()
+            applyToAdminToOpenLocalDevice(device: .camera)
         @unknown default:
             break
+        }
+    }
+    
+    private func openLocalCamera() {
+        engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: nil)
+        engineManager.roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera, quality:
+                                                    EngineManager.shared.store.videoSetting.videoQuality) {
+        } onError: { code, message in
+            debugPrint("openLocalCamera,code:\(code),message:\(message)")
+        }
+        engineManager.roomEngine.startPushLocalVideo()
+    }
+    
+    private func applyToAdminToOpenLocalDevice(device: TUIMediaDevice) {
+        self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: device, timeout: self.timeoutNumber) {  [weak self] _, _ in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.startPushLocalVideo()
+        } onRejected: { _, _, _ in
+            //todo
+        } onCancelled: { _, _ in
+            //todo
+        } onTimeout: { _, _ in
+            //todo
         }
     }
     
@@ -459,22 +416,61 @@ extension BottomViewModel: RoomEngineEventResponder {
 }
 
 private extension String {
-    static let exitText = localized("TUIRoom.leave")
-    static let muteAudioText = localized("TUIRoom.mute")
-    static let muteVideoText = localized("TUIRoom.close.video")
-    static let unMuteVideoText = localized("TUIRoom.open.video")
-    static let memberText = localized("TUIRoom.member")
-    static let raiseHandApplyText = localized("TUIRoom.raise.hand")
-    static let raiseHandApplyListText = localized("TUIRoom.raise.hand.list")
-    static let handDownText = localized("TUIRoom.hand.down")
-    static let homeownersLogoutTitle = localized("TUIRoom.sure.destroy.room")
-    static let destroyRoomOkTitle = localized("TUIRoom.destroy.room.ok")
-    static let raiseHandText = localized("TUIRoom.raise.hand")
-    static let leaveSeatText = localized("TUIRoom.leave.seat")
-    static let muteAudioSeatReasonText = localized("TUIRoom.mute.audio.seat.reason")
-    static let muteVideoSeatReasonText = localized("TUIRoom.mute.video.seat.reason")
-    static let muteAudioRoomReasonText = localized("TUIRoom.mute.audio.room.reason")
-    static let muteVideoRoomReasonText = localized("TUIRoom.mute.video.room.reason")
-    static let noticeCameraOffTitleText = localized("TUIRoom.homeowners.notice.camera.turned.off")
-    static let noticeMicrophoneOffTitleText = localized("TUIRoom.homeowners.notice.microphone.turned.off")
+    static var exitText: String {
+        localized("TUIRoom.leave")
+    }
+    static var muteAudioText: String {
+        localized("TUIRoom.mute")
+    }
+    static var unMuteAudioText: String {
+        localized("TUIRoom.unmute")
+    }
+    static var muteVideoText: String {
+        localized("TUIRoom.close.video")
+    }
+    static var unMuteVideoText: String {
+        localized("TUIRoom.open.video")
+    }
+    static var memberText: String {
+        localized("TUIRoom.member")
+    }
+    static var raiseHandApplyText: String {
+        localized("TUIRoom.raise.hand")
+    }
+    static var raiseHandApplyListText: String {
+        localized("TUIRoom.raise.hand.list")
+    }
+    static var handDownText: String {
+        localized("TUIRoom.hand.down")
+    }
+    static var homeownersLogoutTitle: String {
+        localized("TUIRoom.sure.destroy.room")
+    }
+    static var destroyRoomOkTitle: String {
+        localized("TUIRoom.destroy.room.ok")
+    }
+    static var raiseHandText: String {
+        localized("TUIRoom.raise.hand")
+    }
+    static var leaveSeatText: String {
+        localized("TUIRoom.leave.seat")
+    }
+    static var muteAudioSeatReasonText: String {
+        localized("TUIRoom.mute.audio.seat.reason")
+    }
+    static var muteVideoSeatReasonText: String {
+        localized("TUIRoom.mute.video.seat.reason")
+    }
+    static var muteAudioRoomReasonText: String {
+        localized("TUIRoom.mute.audio.room.reason")
+    }
+    static var muteVideoRoomReasonText: String {
+        localized("TUIRoom.mute.video.room.reason")
+    }
+    static var noticeCameraOffTitleText: String {
+        localized("TUIRoom.homeowners.notice.camera.turned.off")
+    }
+    static var noticeMicrophoneOffTitleText: String {
+        localized("TUIRoom.homeowners.notice.microphone.turned.off")
+    }
 }

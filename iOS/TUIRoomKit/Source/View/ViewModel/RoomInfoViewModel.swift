@@ -77,10 +77,22 @@ class RoomInfoViewModel {
 }
 
 private extension String {
-    static let freedomSpeakText = localized("TUIRoom.freedom.speaker")
-    static let raiseHandSpeakText = localized("TUIRoom.raise.speaker")
-    static let roomHostText = localized("TUIRoom.host")
-    static let roomTypeText = localized("TUIRoom.room.type")
-    static let roomIdText = localized("TUIRoom.room.num")
-    static let roomLinkText = localized("TUIRoom.room.link")
+    static var freedomSpeakText: String {
+        localized("TUIRoom.freedom.speaker")
+    }
+    static var raiseHandSpeakText: String {
+        localized("TUIRoom.raise.speaker")
+    }
+    static var roomHostText: String {
+        localized("TUIRoom.host")
+    }
+    static var roomTypeText: String {
+        localized("TUIRoom.room.type")
+    }
+    static var roomIdText: String {
+        localized("TUIRoom.room.num")
+    }
+    static var roomLinkText: String {
+        localized("TUIRoom.room.link")
+    }
 }

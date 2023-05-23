@@ -76,7 +76,13 @@ class MoreFunctionViewModel {
 }
 
 private extension String {
-    static let beautyText = localized("TUIRoom.beauty")
-    static let settingText = localized("TUIRoom.setting")
-    static let chatText = localized("TUIRoom.chat")
+    static var beautyText: String {
+        localized("TUIRoom.beauty")
+    }
+    static var settingText: String {
+        localized("TUIRoom.setting")
+    }
+    static var chatText: String {
+        localized("TUIRoom.chat")
+    }
 }

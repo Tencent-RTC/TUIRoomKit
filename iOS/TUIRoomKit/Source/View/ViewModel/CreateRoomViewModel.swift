@@ -163,13 +163,31 @@ class CreateRoomViewModel {
 }
 
 private extension String {
-    static let userNameText = localized("TUIRoom.user.name")
-    static let roomTypeText = localized("TUIRoom.room.type")
-    static let roomNumText = localized("TUIRoom.room.num")
-    static let openCameraText = localized("TUIRoom.open.video")
-    static let openMicText = localized("TUIRoom.open.mic")
-    static let openSpeakerText = localized("TUIRoom.open.speaker")
-    static let freedomSpeakText = localized("TUIRoom.freedom.speaker")
-    static let raiseHandSpeakText = localized("TUIRoom.raise.speaker")
-    static let videoConferenceText = localized("TUIRoom.video.conference")
+    static var userNameText: String {
+        localized("TUIRoom.user.name")
+    }
+    static var roomTypeText: String {
+        localized("TUIRoom.room.type")
+    }
+    static var roomNumText: String {
+        localized("TUIRoom.room.num")
+    }
+    static var openCameraText: String {
+        localized("TUIRoom.open.video")
+    }
+    static var openMicText: String {
+        localized("TUIRoom.open.mic")
+    }
+    static var openSpeakerText: String {
+        localized("TUIRoom.open.speaker")
+    }
+    static var freedomSpeakText: String {
+        localized("TUIRoom.freedom.speaker")
+    }
+    static var raiseHandSpeakText: String {
+        localized("TUIRoom.raise.speaker")
+    }
+    static var videoConferenceText: String {
+        localized("TUIRoom.video.conference")
+    }
 }
