@@ -17,6 +17,7 @@ class BottomItemView: UIView {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 10.0)
         button.titleLabel?.textColor = UIColor(0xD1D9EC)
         button.titleLabel?.textAlignment = .center
+        button.titleLabel?.adjustsFontSizeToFitWidth = true
         return button
     }()
     

@@ -181,6 +181,8 @@ extension UserListManagerView: UserListManagerViewEventResponder {
 }
 
 private extension String {
-    static let meText = localized("TUIRoom.me")
+    static var meText: String {
+        localized("TUIRoom.me")
+    }
 }
 

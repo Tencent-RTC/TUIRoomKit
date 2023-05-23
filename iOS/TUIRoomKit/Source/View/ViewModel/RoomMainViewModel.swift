@@ -36,7 +36,6 @@ class RoomMainViewModel: NSObject {
     
     override init() {
         super.init()
-        applyConfigs()
         getUserList(nextSequence: 0)//获取用户列表
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
@@ -382,17 +381,18 @@ extension RoomMainViewModel: TRTCVideoFrameDelegate {
 }
 
 extension RoomMainViewModel: RoomMainViewFactory {
-    func makeBeautyView() -> UIView {
+    func makeBeautyView() -> UIView? {
         let beautyManager = engineManager.roomEngine.getTRTCCloud().getBeautyManager()
-        var beautyView = UIView()
-        let beautyInfo = TUICore.getExtensionInfo(TUICore_TUIBeautyExtension_BeautyView,
-                                                  param: [
-                                                    TUICore_TUIBeautyExtension_BeautyView_BeautyManager: beautyManager,])
-        if let view = beautyInfo[TUICore_TUIBeautyExtension_BeautyView_View] as? UIView {
+        let beautyInfoArray = TUICore.getExtensionList(TUICore_TUIBeautyExtension_BeautyView,
+                                                       param: [
+                                                        TUICore_TUIBeautyExtension_BeautyView_BeautyManager: beautyManager,])
+        for extensionInfo in beautyInfoArray {
+            let map = extensionInfo.data
+            guard let view = map[TUICore_TUIBeautyExtension_BeautyView_View] as? UIView else { continue }
             view.isHidden = true
-            beautyView = view
+            return view
         }
-        return beautyView
+        return nil
     }
     
     func makeTopView() -> UIView {
@@ -408,11 +408,14 @@ extension RoomMainViewModel: RoomMainViewFactory {
     }
     
     func makeMiddleView() -> UIView {
-        let roomEngineMap = TUICore.getExtensionInfo(gRoomEngineKey, param: ["roomId": roomInfo.roomId])
-        guard let roomEngine = roomEngineMap[gRoomEngineKey] else { return UIView(frame: .zero) }
-        let map = TUICore.getExtensionInfo(gVideoSeatViewKey, param: ["roomEngine": roomEngine, "roomId": roomInfo.roomId])
-        guard let view = map[gVideoSeatViewKey] as? UIView else { return UIView(frame: .zero) }
-        return view
+        let array = TUICore.getExtensionList(gVideoSeatViewKey, param: ["roomEngine": engineManager.roomEngine, "roomId": roomInfo.roomId])
+        var middleView: UIView = UIView(frame: .zero)
+        array.forEach { extensionInfo in
+            let map = extensionInfo.data
+            guard let view = map[gVideoSeatViewKey] as? UIView else { return }
+            middleView = view
+        }
+        return middleView
     }
     
     func makeRaiseHandNoticeView() -> UIView {
@@ -438,15 +441,37 @@ extension RoomMainViewModel: RoomKitUIEventResponder {
 }
 
 private extension String {
-    static let alertOkText = localized("TUIRoom.ok")
-    static let kickOffTitleText = localized("TUIRoom.kick.off.title")
-    static let destroyAlertText = localized("TUIRoom.room.destroy")
-    static let inviteTurnOnAudioText = localized("TUIRoom.invite.turn.on.audio")
-    static let inviteTurnOnVideoText = localized("TUIRoom.invite.turn.on.video")
-    static let declineText = localized("TUIRoom.decline")
-    static let agreeText = localized("TUIRoom.agree")
-    static let inviteSpeakOnStageTitle = localized("TUIRoom.invite.to.speak")
-    static let inviteSpeakOnStageMessage = localized("TUIRoom.agree.to.speak")
-    static let messageTurnedOffText = localized("TUIRoom.homeowners.notice.message.turned.off")
-    static let messageTurnedOnText = localized("TUIRoom.homeowners.notice.message.turned.on")
+    static var alertOkText: String {
+        localized("TUIRoom.ok")
+    }
+    static var kickOffTitleText: String {
+        localized("TUIRoom.kick.off.title")
+    }
+    static var destroyAlertText: String {
+        localized("TUIRoom.room.destroy")
+    }
+    static var inviteTurnOnAudioText: String {
+        localized("TUIRoom.invite.turn.on.audio")
+    }
+    static var inviteTurnOnVideoText: String {
+        localized("TUIRoom.invite.turn.on.video")
+    }
+    static var declineText: String {
+        localized("TUIRoom.decline")
+    }
+    static var agreeText: String {
+        localized("TUIRoom.agree")
+    }
+    static var inviteSpeakOnStageTitle: String {
+        localized("TUIRoom.invite.to.speak")
+    }
+    static var inviteSpeakOnStageMessage: String {
+        localized("TUIRoom.agree.to.speak")
+    }
+    static var messageTurnedOffText: String {
+        localized("TUIRoom.homeowners.notice.message.turned.off")
+    }
+    static var messageTurnedOnText: String {
+        localized("TUIRoom.homeowners.notice.message.turned.on")
+    }
 }

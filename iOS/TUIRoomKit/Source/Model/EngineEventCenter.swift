@@ -558,8 +558,16 @@ extension EngineEventCenter: TUIRoomObserver {
 }
 
 private extension String {
-    static let allMuteAudioText = localized("TUIRoom.all.mute.audio.prompt")
-    static let allMuteVideoText = localized("TUIRoom.all.mute.video.prompt")
-    static let allUnMuteAudioText = localized("TUIRoom.all.unmute.audio.prompt")
-    static let allUnMuteVideoText = localized("TUIRoom.all.unmute.video.prompt")
+    static var allMuteAudioText: String {
+        localized("TUIRoom.all.mute.audio.prompt")
+    }
+    static var allMuteVideoText: String {
+        localized("TUIRoom.all.mute.video.prompt")
+    }
+    static var allUnMuteAudioText: String {
+        localized("TUIRoom.all.unmute.audio.prompt")
+    }
+    static var allUnMuteVideoText: String {
+        localized("TUIRoom.all.unmute.video.prompt")
+    }
 }

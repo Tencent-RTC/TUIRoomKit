@@ -12,7 +12,7 @@ protocol RoomMainViewFactory {
     func makeBottomView() -> UIView
     func makeTopView() -> UIView
     func makeMiddleView() -> UIView
-    func makeBeautyView() -> UIView
+    func makeBeautyView() -> UIView?
     func makeRaiseHandNoticeView() -> UIView
 }
 
@@ -42,7 +42,7 @@ class RoomMainRootView: UIView {
         return viewFactory.makeBottomView()
     }()
     
-    lazy var beautyView: UIView = {
+    lazy var beautyView: UIView? = {
         return viewFactory.makeBeautyView()
     }()
     
@@ -66,7 +66,9 @@ class RoomMainRootView: UIView {
         addSubview(videoSeatView)
         addSubview(topView)
         addSubview(bottomView)
-        addSubview(beautyView)
+        if let beautyView = beautyView {
+            addSubview(beautyView)
+        }
         addSubview(raiseHandNoticeView)
     }
     
@@ -89,7 +91,7 @@ class RoomMainRootView: UIView {
             make.top.equalTo(topView.snp.bottom)
             make.bottom.equalTo(bottomView.snp.top).offset(-5)
         }
-        beautyView.snp.makeConstraints { make in
+        beautyView?.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview()
             make.leading.equalTo(safeAreaLayoutGuide.snp.leading)
             make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
@@ -104,6 +106,7 @@ class RoomMainRootView: UIView {
     
     private func bindInteraction() {
         viewModel.viewResponder = self
+        viewModel.applyConfigs()
     }
     
     func updateRootViewOrientation(isLandscape: Bool) {
@@ -140,7 +143,7 @@ extension RoomMainRootView: RoomMainViewResponder {
     }
     
     func showBeautyView() {
-        beautyView.isHidden = false
+        beautyView?.isHidden = false
     }
     
     func makeToast(text: String) {
@@ -149,7 +152,13 @@ extension RoomMainRootView: RoomMainViewResponder {
 }
 
 private extension String {
-    static let agreeText = localized("TUIRoom.agree")
-    static let haveBecomeMasterText = localized("TUIRoom.have.become.master")
-    static let haveTransferredMaster = localized("TUIRoom.have.transferred.master.to.you")
+    static var agreeText: String {
+        localized("TUIRoom.agree")
+    }
+    static var haveBecomeMasterText: String {
+        localized("TUIRoom.have.become.master")
+    }
+    static var haveTransferredMaster: String {
+        localized("TUIRoom.have.transferred.master.to.you")
+    }
 }

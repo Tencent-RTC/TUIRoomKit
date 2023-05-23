@@ -9,9 +9,9 @@
 import Foundation
 import TUIRoomEngine
 
-public enum RoomScene {
-    case meeting
-    case live
+@objc public enum RoomScene: Int {
+    case meeting = 1
+    case live = 2
 }
 
 @objc public protocol TUIRoomKitListener {
@@ -22,11 +22,13 @@ public enum RoomScene {
     @objc optional func onExitRoom() -> Void
 }
 
-public class TUIRoomKit {
+@objcMembers public class TUIRoomKit: NSObject {
     weak var listener: TUIRoomKitListener?
-    public static let sharedInstance = TUIRoomKit()
+    @objc public static let sharedInstance = TUIRoomKit()
     
-    private init() {}
+    private override init() {
+        super.init()
+    }
     
     public func login(sdkAppId: Int, userId: String, userSig: String) {
         EngineManager.shared.login(sdkAppId: sdkAppId, userId: userId, userSig: userSig)

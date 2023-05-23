@@ -104,7 +104,7 @@ class ListCellItemView: UIView {
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(20)
             make.centerY.equalToSuperview()
-            make.width.equalTo(80.scale375())
+            make.width.equalTo(100.scale375())
         }
         
         messageLabel.snp.makeConstraints { make in

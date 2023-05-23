@@ -255,9 +255,9 @@ class PrePareView: UIView {
             make.centerY.equalToSuperview()
         }
         switchLanguageButton.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().offset(-15)
+            make.trailing.equalToSuperview().offset(-20)
+            make.width.height.equalTo(30)
         }
-        
         tencentBigView.snp.makeConstraints { make in
             make.width.equalToSuperview()
             make.top.equalToSuperview().offset(150.scale375())
@@ -447,12 +447,26 @@ extension PrePareView: PrePareViewEventProtocol {
         openMicrophoneButton.isSelected = !viewModel.roomInfo.isOpenMicrophone
         userMessageView.isHidden = viewModel.roomInfo.isOpenCamera
     }
+    func changeLanguage() {
+        cameraLabel.text = .cameraText
+        microphoneLabel.text = .micText
+        joinRoomButton.setTitle(.joinRoomText, for: .normal)
+        createRoomButton.setTitle(.createRoomText, for: .normal)
+    }
 }
 
 private extension String {
-    static let joinRoomText = localized("TUIRoom.join.room")
-    static let createRoomText = localized("TUIRoom.create.room")
-    static let cameraText = localized("TUIRoom.camera")
-    static let micText = localized("TUIRoom.mic")
+    static var joinRoomText: String {
+        localized("TUIRoom.join.room")
+    }
+    static var createRoomText: String {
+        localized("TUIRoom.create.room")
+    }
+    static var cameraText: String {
+        localized("TUIRoom.camera")
+    }
+    static var micText: String {
+        localized("TUIRoom.mic")
+    }
 }
 

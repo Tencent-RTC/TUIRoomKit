@@ -65,7 +65,8 @@
 }
 
 #pragma mark - TUIExtensionProtocol
-- (NSDictionary *)getExtensionInfo:(NSString *)key param:(NSDictionary *)param {
+- (NSArray<TUIExtensionInfo *> *)onGetExtension:(NSString *)key param:(NSDictionary *)param {
+    NSMutableArray<TUIExtensionInfo *> *resultExtensionInfoList = [NSMutableArray array];
     if (!key || ![param isKindOfClass:[NSDictionary class]]) {
         return nil;
     }
@@ -76,9 +77,21 @@
         }
         TUIBeautyView *beautyView = [[TUIBeautyView alloc] initWithBeautyManager:beautyManager];
         id beautyService = [TUIBeautyView getBeautyService];
-        return @{TUICore_TUIBeautyExtension_BeautyView_View: beautyView, TUICore_TUIBeautyExtension_BeautyView_DataProcessDelegate: beautyService};
+        
+        NSDictionary *info = @{TUICore_TUIBeautyExtension_BeautyView_View: beautyView,
+                               TUICore_TUIBeautyExtension_BeautyView_DataProcessDelegate: beautyService};
+        TUIExtensionInfo *resultExtensionInfo = [[TUIExtensionInfo alloc] init];
+        resultExtensionInfo.data = info;
+        [resultExtensionInfoList addObject:resultExtensionInfo];
+
+        return resultExtensionInfoList;
     } else if ([key isEqualToString:TUICore_TUIBeautyExtension_Extension]) {
-        return @{TUICore_TUIBeautyExtension_Extension_View : [TUIBeautyExtensionView getExtensionView]};
+        NSDictionary *info = @{TUICore_TUIBeautyExtension_Extension_View : [TUIBeautyExtensionView getExtensionView]};
+        TUIExtensionInfo *resultExtensionInfo = [[TUIExtensionInfo alloc] init];
+        resultExtensionInfo.data = info;
+        [resultExtensionInfoList addObject:resultExtensionInfo];
+
+        return resultExtensionInfoList;
     }
     return nil;
 }

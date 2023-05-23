@@ -41,8 +41,12 @@ class PopUpViewModel {
     }
     
     func panelControlAction() {
-        viewResponder?.searchControllerChangeActive(isActive: false)
+        searchControllerActiveChange()
         RoomRouter.shared.dismissPopupViewController(viewType: viewType)
+    }
+    
+    func searchControllerActiveChange() {
+        viewResponder?.searchControllerChangeActive(isActive: false)
     }
     
     func updateOrientation(isLandscape: Bool) {

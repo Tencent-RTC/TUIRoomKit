@@ -136,10 +136,17 @@ extension UserListViewModel: PopUpViewResponder {
     }
 }
 
-
 private extension String {
-    static let allMuteAudioText = localized("TUIRoom.all.mute")
-    static let allMuteVideoText = localized("TUIRoom.all.mute.video")
-    static let allUnMuteAudioText = localized("TUIRoom.all.unmute")
-    static let allUnMuteVideoText = localized("TUIRoom.all.unmute.video")
+    static var allMuteAudioText: String {
+        localized("TUIRoom.all.mute")
+    }
+    static var allMuteVideoText: String {
+        localized("TUIRoom.all.mute.video")
+    }
+    static var allUnMuteAudioText: String {
+        localized("TUIRoom.all.unmute")
+    }
+    static var allUnMuteVideoText: String {
+        localized("TUIRoom.all.unmute.video")
+    }
 }

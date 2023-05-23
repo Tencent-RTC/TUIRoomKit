@@ -41,13 +41,12 @@ class RoomRouter {
         ]
         TUICore.callService(TUICore_TUIChatService, method: TUICore_TUIChatService_SetChatExtensionMethod, param: config)
         let param : [String : Any] = [
-            TUICore_TUIChatService_GetChatViewControllerMethod_TitleKey : roomInfo.name,
-            TUICore_TUIChatService_GetChatViewControllerMethod_GroupIDKey: roomInfo.roomId,
-            TUICore_TUIChatService_GetChatViewControllerMethod_AvatarUrlKey : user.avatarUrl,
+            TUICore_TUIChatObjectFactory_GetChatViewControllerMethod_TitleKey : roomInfo.name,
+            TUICore_TUIChatObjectFactory_GetChatViewControllerMethod_GroupIDKey: roomInfo.roomId,
+            TUICore_TUIChatObjectFactory_GetChatViewControllerMethod_AvatarUrlKey : user.avatarUrl,
         ]
-        if let chatVC = TUICore.callService(TUICore_TUIChatService,
-                                            method: TUICore_TUIChatService_GetChatViewControllerMethod,
-                                            param: param) as? UIViewController {
+        if let chatVC = TUICore.createObject(TUICore_TUIChatObjectFactory, key: TUICore_TUIChatObjectFactory_GetChatViewControllerMethod,
+                                             param: param) as? UIViewController {
             context.chatViewController = chatVC
             let appearance = context.appearance
             appearance.backgroundColor = UIColor.white
@@ -118,6 +117,9 @@ class RoomRouter {
                 continue
             }
             observerArray.forEach { observer in
+                if let vc = observer() as? PopUpViewController {
+                    vc.viewModel.searchControllerActiveChange()
+                }
                 observer()?.dismiss(animated: true)
             }
             context.presentControllerMap.removeValue(forKey: viewType)
@@ -303,9 +305,9 @@ extension RoomRouter: RoomEntranceViewModelFactory {
 }
 
 extension RoomRouter: PopUpViewModelFactory {
-    func makeRootView(viewType: PopUpViewType, height: CGFloat?, backgroundColor: UIColor) -> PopUpView {
+    func makeRootViewModel(viewType: PopUpViewType, height: CGFloat?, backgroundColor: UIColor) -> PopUpViewModel {
         let viewModel = PopUpViewModel(viewType: viewType, height: height)
         viewModel.backgroundColor = backgroundColor
-        return PopUpView(viewModel: viewModel)
+        return viewModel
     }
 }

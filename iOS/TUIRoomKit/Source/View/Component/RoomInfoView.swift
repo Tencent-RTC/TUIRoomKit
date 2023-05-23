@@ -157,6 +157,8 @@ class RoomInfoView: UIView {
 }
 
 private extension String {
-    static let inviteJoinRoomText = localized("TUIRoom.invite.join")
+    static var inviteJoinRoomText: String {
+        localized("TUIRoom.invite.join")
+    }
 }
 

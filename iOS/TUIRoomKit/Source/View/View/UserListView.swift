@@ -220,8 +220,8 @@ extension UserListView: UITableViewDelegate {
 
 extension UserListView: UserListViewResponder {
     func searchControllerChangeActive(isActive: Bool) {
-        searchController.searchBar.endEditing(true)
-        searchController.isActive = false
+        searchController.searchBar.endEditing(!isActive)
+        searchController.isActive = isActive
     }
     
     func makeToast(text: String) {
@@ -413,13 +413,31 @@ class UserListCell: UITableViewCell {
 }
 
 private extension String {
-    static let allMuteAudioText = localized("TUIRoom.all.mute")
-    static let allMuteVideoText = localized("TUIRoom.all.mute.video")
-    static let allUnMuteAudioText = localized("TUIRoom.all.unmute")
-    static let allUnMuteVideoText = localized("TUIRoom.all.unmute.video")
-    static let memberText = localized("TUIRoom.conference.member")
-    static let searchMemberText = localized("TUIRoom.search.meeting.member")
-    static let inviteSeatText = localized("TUIRoom.invite.seat")
-    static let meText = localized("TUIRoom.me")
-    static let videoConferenceTitle = localized("TUIRoom.video.conference.title")
+    static var allMuteAudioText: String {
+        localized("TUIRoom.all.mute")
+    }
+    static var allMuteVideoText: String {
+        localized("TUIRoom.all.mute.video")
+    }
+    static var allUnMuteAudioText: String {
+        localized("TUIRoom.all.unmute")
+    }
+    static var allUnMuteVideoText: String {
+        localized("TUIRoom.all.unmute.video")
+    }
+    static var memberText: String {
+        localized("TUIRoom.conference.member")
+    }
+    static var searchMemberText: String {
+        localized("TUIRoom.search.meeting.member")
+    }
+    static var inviteSeatText: String {
+        localized("TUIRoom.invite.seat")
+    }
+    static var meText: String {
+        localized("TUIRoom.me")
+    }
+    static var videoConferenceTitle: String {
+        localized("TUIRoom.video.conference.title")
+    }
 }

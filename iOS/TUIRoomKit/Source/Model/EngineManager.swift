@@ -9,6 +9,11 @@
 import Foundation
 import TUICore
 import TUIRoomEngine
+#if TXLiteAVSDK_TRTC
+import TXLiteAVSDK_TRTC
+#elseif TXLiteAVSDK_Professional
+import TXLiteAVSDK_Professional
+#endif
 
 class EngineManager: NSObject {
     static let shared = EngineManager()
@@ -35,6 +40,7 @@ class EngineManager: NSObject {
     func login(sdkAppId: Int, userId: String, userSig: String) {
         TUIRoomEngine.login(sdkAppId: sdkAppId, userId: userId, userSig: userSig) { [weak self] in
             guard let self = self else { return }
+            self.store.currentLoginUser.userId = userId
             self.listener?.onLogin?(code: 0, message: "success")
         } onError: { [weak self] code, message in
             guard let self = self else { return }
@@ -46,7 +52,6 @@ class EngineManager: NSObject {
         store.currentLoginUser.userName = userName
         store.currentLoginUser.avatarUrl = avatarURL
         TUIRoomEngine.setSelfInfo(userName: userName, avatarUrl: avatarURL) {
-            EngineManager.shared.store.initialLoginCurrentUser()
         } onError: { code, message in
             debugPrint("---setSelfInfo,code:\(code),message:\(message)")
         }
@@ -175,6 +180,7 @@ class EngineManager: NSObject {
             RoomRouter.shared.popToRoomEntranceViewController()
             self.store.refreshStore()
         }
+        TRTCCloud.destroySharedIntance()
     }
     
     func destroyRoom() {
@@ -193,6 +199,7 @@ class EngineManager: NSObject {
             RoomRouter.shared.popToRoomEntranceViewController()
             self.store.refreshStore()
         }
+        TRTCCloud.destroySharedIntance()
     }
     
     func addListener(listener: EngineManagerListener?) {

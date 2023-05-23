@@ -494,22 +494,58 @@ extension UserListManagerViewModel: RoomEngineEventResponder {
 }
 
 private extension String {
-    static let muteAudioErrorToastText = localized("TUIRoom.mute.audio.error.toast")
-    static let muteAudioSuccessToastText = localized("TUIRoom.mute.audio.success.toast")
-    static let muteVideoErrorToastText = localized("TUIRoom.mute.video.error.toast")
-    static let muteVideoSuccessToastText = localized("TUIRoom.mute.video.success.toast")
-    static let muteText = localized("TUIRoom.mute")
-    static let unmuteText = localized("TUIRoom.unmute")
-    static let openVideoText = localized("TUIRoom.open.video")
-    static let closeVideoText = localized("TUIRoom.close.video")
-    static let changeHostText = localized("TUIRoom.change.host")
-    static let muteMessageText = localized("TUIRoom.mute.message")
-    static let unMuteMessageText = localized("TUIRoom.unmute.message")
-    static let kickOutRoomText = localized("TUIRoom.kick")
-    static let stepDownSeatText = localized("TUIRoom.step.down.seat")
-    static let inviteSeatText = localized("TUIRoom.invite.seat")
-    static let muteAudioSeatReasonText = localized("TUIRoom.mute.audio.seat.reason")
-    static let muteVideoSeatReasonText = localized("TUIRoom.mute.video.seat.reason")
-    static let muteAudioRoomReasonText = localized("TUIRoom.mute.audio.room.reason")
-    static let muteVideoRoomReasonText = localized("TUIRoom.mute.video.room.reason")
+    static var muteAudioErrorToastText: String {
+        localized("TUIRoom.mute.audio.error.toast")
+    }
+    static var muteAudioSuccessToastText: String {
+        localized("TUIRoom.mute.audio.success.toast")
+    }
+    static var muteVideoErrorToastText: String {
+        localized("TUIRoom.mute.video.error.toast")
+    }
+    static var muteVideoSuccessToastText: String {
+        localized("TUIRoom.mute.video.success.toast")
+    }
+    static var muteText: String {
+        localized("TUIRoom.mute")
+    }
+    static var unmuteText: String {
+        localized("TUIRoom.unmute")
+    }
+    static var openVideoText: String {
+        localized("TUIRoom.open.video")
+    }
+    static var closeVideoText: String {
+        localized("TUIRoom.close.video")
+    }
+    static var changeHostText: String {
+        localized("TUIRoom.change.host")
+    }
+    static var muteMessageText: String {
+        localized("TUIRoom.mute.message")
+    }
+    static var unMuteMessageText: String {
+        localized("TUIRoom.unmute.message")
+    }
+    static var kickOutRoomText: String {
+        localized("TUIRoom.kick")
+    }
+    static var stepDownSeatText: String {
+        localized("TUIRoom.step.down.seat")
+    }
+    static var inviteSeatText: String {
+        localized("TUIRoom.invite.seat")
+    }
+    static var muteAudioSeatReasonText: String {
+        localized("TUIRoom.mute.audio.seat.reason")
+    }
+    static var muteVideoSeatReasonText: String {
+        localized("TUIRoom.mute.video.seat.reason")
+    }
+    static var muteAudioRoomReasonText: String {
+        localized("TUIRoom.mute.audio.room.reason")
+    }
+    static var muteVideoRoomReasonText: String {
+        localized("TUIRoom.mute.video.room.reason")
+    }
 }

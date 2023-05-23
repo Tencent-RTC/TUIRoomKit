@@ -10,11 +10,12 @@ import Foundation
 import UIKit
 
 protocol PopUpViewModelFactory {
-    func makeRootView(viewType: PopUpViewType, height:CGFloat?, backgroundColor: UIColor) -> PopUpView
+    func makeRootViewModel(viewType: PopUpViewType, height:CGFloat?, backgroundColor: UIColor) -> PopUpViewModel
 }
 
 class PopUpViewController: UIViewController {
     let rootView: PopUpView
+    let viewModel: PopUpViewModel
     var duration = 0.5 //弹出动画持续时间
     var alertTransitionStyle: AlertTransitionAnimator.AlertTransitionStyle = .present //动画弹出或者消失
     var alertTransitionPosition: AlertTransitionAnimator.AlertTransitionPosition = .bottom //动画的弹出位置
@@ -26,7 +27,8 @@ class PopUpViewController: UIViewController {
         return .allButUpsideDown
     }
     init(popUpViewModelFactory: PopUpViewModelFactory, viewType: PopUpViewType, height: CGFloat?, backgroundColor: UIColor) {
-        rootView = popUpViewModelFactory.makeRootView(viewType: viewType, height: height, backgroundColor: backgroundColor)
+        viewModel = popUpViewModelFactory.makeRootViewModel(viewType: viewType, height: height, backgroundColor: backgroundColor)
+        rootView = PopUpView(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .custom
         transitioningDelegate = self

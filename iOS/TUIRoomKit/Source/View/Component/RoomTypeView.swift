@@ -80,7 +80,7 @@ class RoomTypeView: UIView {
         cancelButton.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12)
             make.top.equalToSuperview().offset(20.scale375())
-            make.width.equalTo(50.scale375())
+            make.width.equalTo(80.scale375())
             make.height.equalTo(30.scale375())
         }
         sureButton.snp.makeConstraints { make in
@@ -140,8 +140,16 @@ class RoomTypeView: UIView {
 }
 
 private extension String {
-    static let okText = localized("TUIRoom.ok")
-    static let cancelText = localized("TUIRoom.cancel")
-    static let raiseHandSpeakText = localized("TUIRoom.raise.speak.model")
-    static let freedomSpeakText = localized("TUIRoom.freedom.speak.model")
+    static var okText: String {
+        localized("TUIRoom.ok")
+    }
+    static var cancelText: String {
+        localized("TUIRoom.cancel")
+    }
+    static var raiseHandSpeakText: String {
+        localized("TUIRoom.raise.speak.model")
+    }
+    static var freedomSpeakText: String {
+        localized("TUIRoom.freedom.speak.model")
+    }
 }

@@ -241,8 +241,13 @@ class QRCodeView: UIView {
 }
 
 private extension String {
-    static let codeText = localized("TUIRoom.code")
-    static let scanCodeText = localized("TUIRoom.scan.code")
-    static let saveIntoAlbumText = localized("TUIRoom.save.into.album")
-    static let videoConferenceTitle = localized("TUIRoom.video.conference.title")
+    static var scanCodeText: String {
+        localized("TUIRoom.scan.code")
+    }
+    static var saveIntoAlbumText: String {
+        localized("TUIRoom.save.into.album")
+    }
+    static var videoConferenceTitle: String {
+        localized("TUIRoom.video.conference.title")
+    }
 }
