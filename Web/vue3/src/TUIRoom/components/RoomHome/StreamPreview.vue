@@ -277,6 +277,7 @@ function handleDrawerClose(done: any) {
   position: relative;
   overflow: hidden;
   border: 2px solid var(--stream-container-border);
+  box-shadow: 0px 12px 24px rgba(2, 108, 254, 0.1), inset 0px 0px 4px rgba(55, 69, 111, 0.325503);
   .stream-preview {
     width: 100%;
     height: 100%;
