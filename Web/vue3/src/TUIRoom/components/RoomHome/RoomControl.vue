@@ -115,6 +115,7 @@ function enterRoom() {
   position: relative;
   padding: 2px;
   background-image:linear-gradient(230deg, var(--background-image-color), rgba(61,143,255,0) 50%);
+  box-shadow: 0px 12px 24px rgba(16, 34, 64, 0.05);
   .control-content {
     width: 100%;
     height: 100%;
