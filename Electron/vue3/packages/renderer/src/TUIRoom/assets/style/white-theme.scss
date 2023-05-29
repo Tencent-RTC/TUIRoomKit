@@ -1,7 +1,7 @@
 [data-theme="white"]{
   --color-font: #000000;
   --control-content: #FFFFFF;
-  --background-image-color: #C8CACC;
+  --background-image-color: transparent;
   --border-color: #37456F;
   --input-color: #FFFFFF;
   --create-room-mode-color-bg: #FFFFFF;
@@ -20,7 +20,7 @@
   --tabs-title-font-color: #000000;
   --center-user-info-container-bg-color: #F2F2F2;
   --stream-info-bg-color: #FFFFFF;
-  --title-color-bg: #000000;
+  --title-color-bg: #666666;
   --title-color-font: #000000;
   --el-dialog-bg-color-select: #FFFFFF;
   --el-text-color-primary-select: #000000;
@@ -46,7 +46,7 @@
   --send-btn-color: #006EFF;
   --message-color: #006EFF;
   --background-color-style: url(../imgs/banner.png);
-  --stream-container-border: #C8CACC;
+  --stream-container-border: none;
   --apply-list-container-bg-color: #F2F2F2;
   --apply-list-container-color: #000000;
   --full-screen-svg: url(../icons/svg/full-screen-w.svg);
@@ -98,7 +98,7 @@
   --el-disabled-border: #b6b6b6;
   --el-disabled-background: #dcdcdc;
   --el-border-lighter: #dcdcdc;
-  --title-active: #006EFF;
+  --title-active: #666666;
   --mic-bar-color: #babbbe;
   --more-notice-color: #000000;
   --setting-dialog: 8px;
