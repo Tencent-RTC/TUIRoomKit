@@ -187,7 +187,7 @@ function handleClickIcon() {
       width = (containerHeight / 9) * 16;
       height = containerHeight;
     }
-    if (scaleWidth < scaleHeight) {
+    if (scaleWidth <= scaleHeight) {
       width = containerWidth;
       height = (containerWidth / 16) * 9;
     }
@@ -294,7 +294,7 @@ async function handleRightSideListLayout() {
       width = (containerHeight / 9) * 16;
       height = containerHeight;
     }
-    if (scaleWidth < scaleHeight) {
+    if (scaleWidth <= scaleHeight) {
       width = containerWidth;
       height = (containerWidth / 16) * 9;
     }
@@ -330,7 +330,7 @@ async function handleTopSideListLayout() {
       width = (containerHeight / 9) * 16;
       height = containerHeight;
     }
-    if (scaleWidth < scaleHeight) {
+    if (scaleWidth <= scaleHeight) {
       width = containerWidth;
       height = (containerWidth / 16) * 9;
     }

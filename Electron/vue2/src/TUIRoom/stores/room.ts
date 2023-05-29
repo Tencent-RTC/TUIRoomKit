@@ -352,23 +352,41 @@ export const useRoomStore = defineStore('room', {
     },
     updateUserVideoState(userId: string, streamType: TUIVideoStreamType, hasVideo: boolean) {
       const basicStore = useBasicStore();
-      const user = userId === basicStore.userId ? this.localUser : this.remoteUserObj[userId];
-      if (!user) {
-        return;
+      let user = userId === basicStore.userId ? this.localUser : this.remoteUserObj[userId];
+      // 需要判断 hasVideo 是否为 true，避免视频取消事件在 onRemoteUserLeaveRoom 之后抛出的情况
+      if (!user && hasVideo) {
+        user = this.getNewUserInfo(userId);
+        if (isVue3) {
+          this.remoteUserObj[userId] = user;
+        } else {
+          // @ts-ignore
+          Vue.set(this.remoteUserObj, userId, user);
+        }
       }
-      if (streamType === TUIVideoStreamType.kCameraStream) {
-        user.hasVideoStream = hasVideo;
-      } else if (streamType === TUIVideoStreamType.kScreenStream) {
-        user.hasScreenStream = hasVideo;
+      if (user) {
+        if (streamType === TUIVideoStreamType.kCameraStream) {
+          user.hasVideoStream = hasVideo;
+        } else if (streamType === TUIVideoStreamType.kScreenStream) {
+          user.hasScreenStream = hasVideo;
+        }
       }
     },
     updateUserAudioState(userId: string, hasAudio: boolean) {
       const basicStore = useBasicStore();
-      const user = userId === basicStore.userId ? this.localUser : this.remoteUserObj[userId];
-      if (!user) {
-        return;
+      let user = userId === basicStore.userId ? this.localUser : this.remoteUserObj[userId];
+      // 需要判断 hasAudio 是否为 true，避免音频取消事件在 onRemoteUserLeaveRoom 之后抛出的情况
+      if (!user && hasAudio) {
+        user = this.getNewUserInfo(userId);
+        if (isVue3) {
+          this.remoteUserObj[userId] = user;
+        } else {
+          // @ts-ignore
+          Vue.set(this.remoteUserObj, userId, user);
+        }
       }
-      user.hasAudioStream = hasAudio;
+      if (user) {
+        user.hasAudioStream = hasAudio;
+      }
     },
 
     removeRemoteUser(userId: string) {
