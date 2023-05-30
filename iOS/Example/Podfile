@@ -10,7 +10,7 @@ end
 # 工具库
 def tool
   pod 'Alamofire'
-  pod 'TUICore'
+  pod 'TUICore','>= 7.2.4146'
   pod 'TUIChat'
   pod 'TUIRoomEngine','>= 1.2.0'
   pod 'TXLiteAVSDK_TRTC'
