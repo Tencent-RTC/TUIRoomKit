@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import TUICore
 
 class MoreFunctionViewModel {
     private(set) var viewItems: [ButtonItemData] = []
@@ -20,25 +21,30 @@ class MoreFunctionViewModel {
     }
     
     func createBottomData() {
-        let chatItem = ButtonItemData()
-        chatItem.normalIcon = "room_chat"
-        chatItem.normalTitle = .chatText
-        chatItem.resourceBundle = tuiRoomKitBundle()
-        chatItem.action = { [weak self] sender in
-            guard let self = self, let button = sender as? UIButton else { return }
-            self.chatAction(sender: button)
+        //聊天
+        if hasTUIChatItem() {
+            let chatItem = ButtonItemData()
+            chatItem.normalIcon = "room_chat"
+            chatItem.normalTitle = .chatText
+            chatItem.resourceBundle = tuiRoomKitBundle()
+            chatItem.action = { [weak self] sender in
+                guard let self = self, let button = sender as? UIButton else { return }
+                self.chatAction(sender: button)
+            }
+            viewItems.append(chatItem)
         }
-        viewItems.append(chatItem)
         //美颜
-        let beautyItem = ButtonItemData()
-        beautyItem.normalIcon = "room_beauty"
-        beautyItem.normalTitle = .beautyText
-        beautyItem.resourceBundle = tuiRoomKitBundle()
-        beautyItem.action = { [weak self] sender in
-            guard let self = self, let button = sender as? UIButton else { return }
-            self.beautyAction(sender: button)
+        if hasBeautyItem() {
+            let beautyItem = ButtonItemData()
+            beautyItem.normalIcon = "room_beauty"
+            beautyItem.normalTitle = .beautyText
+            beautyItem.resourceBundle = tuiRoomKitBundle()
+            beautyItem.action = { [weak self] sender in
+                guard let self = self, let button = sender as? UIButton else { return }
+                self.beautyAction(sender: button)
+            }
+            viewItems.append(beautyItem)
         }
-        viewItems.append(beautyItem)
         //设置
         let settingItem = ButtonItemData()
         settingItem.normalIcon = "room_setting"
@@ -49,6 +55,14 @@ class MoreFunctionViewModel {
             self.settingAction(sender: button)
         }
         viewItems.append(settingItem)
+    }
+    
+    private func hasTUIChatItem() -> Bool {
+        return TUICore.getService(TUICore_TUIChatService) != nil
+    }
+    
+    private func hasBeautyItem() -> Bool {
+        return TUICore.getService(TUICore_TUIBeautyService) != nil
     }
     
     func beautyAction(sender: UIButton) {
