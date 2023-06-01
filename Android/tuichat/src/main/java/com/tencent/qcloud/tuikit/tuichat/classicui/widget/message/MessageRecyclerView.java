@@ -56,9 +56,6 @@ import java.util.Set;
 public class MessageRecyclerView extends RecyclerView implements IMessageRecyclerView, IMessageLayout {
     private static final String TAG = MessageRecyclerView.class.getSimpleName();
 
-    // 120s
-    public static final int REVOKE_TIME_OUT = 120;
-
     // 取一个足够大的偏移保证能一次性滚动到最底部
     // Take a large enough offset to scroll to the bottom at one time
     private static final int SCROLL_TO_END_OFFSET = -999999;
@@ -259,7 +256,7 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
             if (msg.isSelf()) {
                 if (msg.getStatus() != TUIMessageBean.MSG_STATUS_SEND_FAIL) {
                     long timeInterval = TUIChatUtils.getServerTime() - msg.getMessageTime();
-                    if (timeInterval <= REVOKE_TIME_OUT) {
+                    if (timeInterval < TUIChatConfigs.getConfigs().getGeneralConfig().getTimeIntervalForMessageRecall()) {
                         revokeAction = new ChatPopMenu.ChatPopMenuAction();
                         revokeAction.setActionName(getContext().getString(R.string.revoke_action));
                         revokeAction.setActionIcon(R.drawable.pop_menu_revoke);
@@ -571,6 +568,13 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
             public void onMessageClick(View view, int position, TUIMessageBean messageBean) {
                 if (mOnItemClickListener != null) {
                     mOnItemClickListener.onMessageClick(view, position, messageBean);
+                }
+            }
+
+            @Override
+            public void onMessageReadStatusClick(View view, TUIMessageBean messageBean) {
+                if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onMessageReadStatusClick(view, messageBean);
                 }
             }
         });

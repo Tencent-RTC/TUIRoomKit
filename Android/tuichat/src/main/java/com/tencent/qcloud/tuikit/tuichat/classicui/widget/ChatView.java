@@ -73,7 +73,6 @@ import com.tencent.qcloud.tuikit.tuichat.util.TUIChatLog;
 import com.tencent.qcloud.tuikit.tuichat.util.TUIChatUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -350,7 +349,7 @@ public class ChatView extends LinearLayout  implements IChatLayout {
                 public void onClick(View view) {
                     Bundle bundle = new Bundle();
                     bundle.putString(TUIChatConstants.GROUP_ID, chatInfo.getId());
-                    TUICore.startActivity(getContext(), "GroupApplyManagerMinimalistActivity", bundle);
+                    TUICore.startActivity(getContext(), "GroupApplyManagerActivity", bundle);
                 }
             });
         }
@@ -512,7 +511,7 @@ public class ChatView extends LinearLayout  implements IChatLayout {
     }
 
     public void onApplied(int size) {
-        if (size == 0) {
+        if (size <= 0) {
             mGroupApplyLayout.setVisibility(View.GONE);
         } else {
             mGroupApplyLayout.getContent().setText(getContext().getString(R.string.group_apply_tips, size));

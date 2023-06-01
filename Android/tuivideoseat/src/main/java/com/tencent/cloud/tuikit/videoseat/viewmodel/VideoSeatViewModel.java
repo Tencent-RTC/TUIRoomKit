@@ -245,7 +245,7 @@ public class VideoSeatViewModel extends TUIRoomObserver implements IVideoSeatVie
         }
         userEntity.setRole(userRole);
         notifyUiForUserListChanged();
-        mVideoSeatView.notifyItemChanged(mUserEntityList.indexOf(userEntity));
+        mVideoSeatView.notifyDataSetChanged();
     }
 
     private void fetchUserList() {
@@ -485,7 +485,7 @@ public class VideoSeatViewModel extends TUIRoomObserver implements IVideoSeatVie
             return;
         }
         if (isTwoPersonVideoMeeting) {
-            mVideoSeatView.enableTwoPersonVideoMeeting(true);
+            mVideoSeatView.notifyTalkingViewDataChanged();
         }
     }
 

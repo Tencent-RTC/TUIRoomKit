@@ -31,7 +31,7 @@ public class RoomEngineManager {
 
     public static RoomEngineManager sharedInstance(Context context) {
         if (sInstance == null) {
-            synchronized (RoomEngineManager.class) {
+            synchronized (TUIRoomKitImpl.class) {
                 if (sInstance == null) {
                     sInstance = new RoomEngineManager(context);
                 }

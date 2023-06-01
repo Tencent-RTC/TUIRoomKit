@@ -87,8 +87,6 @@ public final class TUIConstants {
         public static final String METHOD_GET_DISPLAY_STRING = "getDisplayString";
         // add message to chat list
         public static final String METHOD_ADD_MESSAGE_TO_CHAT = "addMessageToChat";
-        // 处理完群申请 // Process the group application
-        public static final String METHOD_GROUP_APPLICAITON_PROCESSED = "groupApplicationProcessed";
         // Set chat extension
         public static final String METHOD_SET_CHAT_EXTENSION = "setChatExtension";
 
@@ -402,6 +400,10 @@ public final class TUIConstants {
             public static final String FACTORY_NAME = "TUICallingObjectFactory";
             public static class RecentCalls {
                 public static final String OBJECT_NAME = "TUICallingRecentCallsFragment";
+                public static final String UI_STYLE = "TUICallingRecentCallsFragmentUIStyle";
+                public static final String UI_STYLE_CLASSIC = "ClassicStyle";
+                public static final String UI_STYLE_MINIMALIST = "MinimalistStyle";
+
             }
         }
     }
@@ -482,6 +484,14 @@ public final class TUIConstants {
                 public static final String CONTEXT = "GroupProfileContext";
             }
         }
+
+        public static class Event {
+            public static class GroupApplication {
+                public static final String KEY_GROUP_APPLICATION = "groupApplication";
+                public static final String SUB_KEY_GROUP_APPLICATION_NUM_CHANGED = "groupApplicationNumChanged";
+            }
+        }
+
     }
 
 
@@ -663,6 +673,16 @@ public final class TUIConstants {
     public static final class TUIVideoSeat {
         public static final String SERVICE_VIDEO_SEAT = "com.tencent.cloud.tuikit.videoseat.core.TUIVideoSeatExtension";
         public static final String METHOD_SWITCH_VIDEO_LAYOUT = "switchVideoLayout";
+    }
+
+    public static final class Privacy {
+        public static class PermissionsFactory {
+            public static final String FACTORY_NAME = "PrivacyPermissionsFactory";
+            public static class PermissionsName {
+                public static final String CAMERA_PERMISSIONS = "CameraPermissions";
+                public static final String MICROPHONE_PERMISSIONS = "MicrophonePermissions";
+            }
+        }
     }
 
     // localBroadcast

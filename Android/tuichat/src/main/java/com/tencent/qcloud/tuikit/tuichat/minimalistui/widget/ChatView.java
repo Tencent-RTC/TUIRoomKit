@@ -589,6 +589,9 @@ public class ChatView extends LinearLayout implements IChatLayout {
 
                 @Override
                 public void onGroupFaceUrlChanged(String faceUrl) {
+                    if (isActivityDestroyed()){
+                        return;
+                    }
                     Glide.with(getContext())
                             .load(faceUrl)
                             .apply(new RequestOptions()
@@ -680,7 +683,7 @@ public class ChatView extends LinearLayout implements IChatLayout {
     }
 
     public void onApplied(int size) {
-        if (size == 0) {
+        if (size <= 0) {
             mGroupApplyLayout.setVisibility(View.GONE);
         } else {
             mGroupApplyLayout.getContent().setText(getContext().getString(R.string.group_apply_tips, size));

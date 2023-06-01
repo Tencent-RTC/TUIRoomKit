@@ -111,6 +111,8 @@ public class TUIChatService extends ServiceInitializer implements ITUIChatServic
         TUICore.registerEvent(TUIChatConstants.EVENT_KEY_MESSAGE_STATUS_CHANGED, TUIChatConstants.EVENT_SUB_KEY_MESSAGE_SEND, this);
         TUICore.registerEvent(TUIChatConstants.EVENT_KEY_OFFLINE_MESSAGE_PRIVATE_RING, TUIChatConstants.EVENT_SUB_KEY_OFFLINE_MESSAGE_PRIVATE_RING, this);
         TUICore.registerEvent(TUIConstants.TUITranslation.EVENT_KEY_TRANSLATION_EVENT, TUIConstants.TUITranslation.EVENT_SUB_KEY_TRANSLATION_CHANGED, this);
+        TUICore.registerEvent(TUIConstants.TUIGroup.Event.GroupApplication.KEY_GROUP_APPLICATION,
+                TUIConstants.TUIGroup.Event.GroupApplication.SUB_KEY_GROUP_APPLICATION_NUM_CHANGED, this);
     }
 
     @Override
@@ -162,15 +164,6 @@ public class TUIChatService extends ServiceInitializer implements ITUIChatServic
                     c2CChatEventListener.addMessage(messageBean, chatId);
                 }
             }
-        } else if (TextUtils.equals(TUIConstants.TUIChat.METHOD_GROUP_APPLICAITON_PROCESSED, method)) {
-            int number = (int) param.get(TUIConstants.TUIChat.GROUP_APPLY_NUM);
-            boolean isGroupChat = (boolean) param.get(TUIConstants.TUIChat.IS_GROUP_CHAT);
-            if (isGroupChat) {
-                List<GroupChatEventListener> groupChatEventListenerList = getGroupChatEventListenerList();
-                for (GroupChatEventListener groupChatEventListener : groupChatEventListenerList) {
-                    groupChatEventListener.onApplied(number);
-                }
-            }
         } else if (TextUtils.equals(TUIConstants.TUIChat.METHOD_UPDATE_DATA_STORE_CHAT_URI, method)) {
             String uri = (String) param.get(TUIConstants.TUIChat.CHAT_BACKGROUND_URI);
             String chatId = (String) param.get(TUIConstants.TUIChat.CHAT_ID);
@@ -186,7 +179,7 @@ public class TUIChatService extends ServiceInitializer implements ITUIChatServic
                 } else if (TextUtils.equals(key, TUIConstants.TUIChat.ENABLE_AUDIO_CALL)) {
                     TUIChatConfigs.getConfigs().getGeneralConfig().setEnableVoiceCall((Boolean) value);
                 } else if (TextUtils.equals(key, TUIConstants.TUIChat.ENABLE_LINK)) {
-                    TUIChatConfigs.getConfigs().getGeneralConfig().setEnableLink((Boolean) value);
+                    TUIChatConfigs.getConfigs().getGeneralConfig().setEnableWelcomeCustomMessage((Boolean) value);
                 }
             }
         }
@@ -333,6 +326,17 @@ public class TUIChatService extends ServiceInitializer implements ITUIChatServic
                 for (GroupChatEventListener groupChatEventListener : groupChatEventListenerList) {
                     groupChatEventListener.onMessageChanged(messageBean, dataChangeType);
                 }
+            }
+        }  else if (TextUtils.equals(TUIConstants.TUIGroup.Event.GroupApplication.KEY_GROUP_APPLICATION, key)) {
+            onGroupApplicationEvent(subKey, param);
+        }
+    }
+
+    private void onGroupApplicationEvent(String subKey, Map<String, Object> param) {
+        if (TextUtils.equals(subKey, TUIConstants.TUIGroup.Event.GroupApplication.SUB_KEY_GROUP_APPLICATION_NUM_CHANGED)) {
+            List<GroupChatEventListener> groupChatEventListenerList = getGroupChatEventListenerList();
+            for (GroupChatEventListener groupChatEventListener : groupChatEventListenerList) {
+                groupChatEventListener.onApplied();
             }
         }
     }

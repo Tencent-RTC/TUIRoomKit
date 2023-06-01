@@ -424,9 +424,13 @@ class TUIRouter {
                 Log.e(TAG, "intent is null.");
                 return;
             }
-            ActivityResultLauncher<Pair<Intent, ActivityResultCallback<ActivityResult>>> launcher = activityResultLauncherMap.get(caller);
-            if (launcher != null) {
-                launcher.launch(Pair.create(intent, callback));
+            try {
+                ActivityResultLauncher<Pair<Intent, ActivityResultCallback<ActivityResult>>> launcher = activityResultLauncherMap.get(caller);
+                if (launcher != null) {
+                    launcher.launch(Pair.create(intent, callback));
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "start activity failed, " + e.getLocalizedMessage());
             }
         }
 

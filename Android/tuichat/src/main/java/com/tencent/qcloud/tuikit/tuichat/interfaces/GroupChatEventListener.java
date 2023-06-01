@@ -10,7 +10,7 @@ import java.util.List;
  */
 public abstract class GroupChatEventListener {
     public void onGroupForceExit(String groupId) {};
-    public void onApplied(int unHandledSize) {}
+    public void onApplied() {}
     public void handleRevoke(String msgId) {}
     public void onRecvNewMessage(TUIMessageBean message) {}
     public void onReadReport(List<MessageReceiptInfo> receiptInfoList) {}

@@ -286,6 +286,7 @@ public class ChatProvider {
             v2TIMOfflinePushInfo.setAndroidFCMChannelID(OfflinePushInfoUtils.FCM_PUSH_CHANNEL_ID);
         }
         v2TIMOfflinePushInfo.setAndroidHuaWeiCategory("IM");
+        v2TIMOfflinePushInfo.setAndroidVIVOCategory("IM");
 
         final V2TIMMessage v2TIMMessage = message.getV2TIMMessage();
         v2TIMMessage.setExcludedFromUnreadCount(TUIChatConfigs.getConfigs().getGeneralConfig().isExcludedFromUnreadCount());

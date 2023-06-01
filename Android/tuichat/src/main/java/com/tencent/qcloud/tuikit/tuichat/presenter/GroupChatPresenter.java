@@ -57,8 +57,8 @@ public class GroupChatPresenter extends ChatPresenter {
             }
 
             @Override
-            public void onApplied(int unHandledSize) {
-                GroupChatPresenter.this.onApplied(unHandledSize);
+            public void onApplied() {
+                GroupChatPresenter.this.onApplied();
             }
 
             @Override
@@ -275,10 +275,20 @@ public class GroupChatPresenter extends ChatPresenter {
         }
     }
 
-    public void onApplied(int unHandledSize) {
-        if (chatNotifyHandler != null) {
-            chatNotifyHandler.onApplied(unHandledSize);
-        }
+    public void onApplied() {
+        loadApplyList(new IUIKitCallback<List<GroupApplyInfo>>() {
+            @Override
+            public void onSuccess(List<GroupApplyInfo> data) {
+                if (chatNotifyHandler != null) {
+                    chatNotifyHandler.onApplied(data.size());
+                }
+            }
+
+            @Override
+            public void onError(String module, int errCode, String errMsg) {
+                super.onError(module, errCode, errMsg);
+            }
+        });
     }
 
     public void onGroupNameChanged(String newName) {

@@ -63,11 +63,6 @@ import java.util.Map;
 public class TUIBaseChatMinimalistFragment extends BaseFragment {
     private static final String TAG = TUIBaseChatMinimalistFragment.class.getSimpleName();
 
-
-    public static final int REQUEST_CODE_PHOTO = 1012;
-
-    public static TUIBaseChatMinimalistFragment fragment;
-
     protected View baseView;
 
     protected ChatView chatView;
@@ -83,7 +78,6 @@ public class TUIBaseChatMinimalistFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragment = this;
     }
 
     @Nullable

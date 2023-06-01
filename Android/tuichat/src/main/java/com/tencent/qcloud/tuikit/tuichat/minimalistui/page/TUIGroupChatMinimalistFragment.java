@@ -115,6 +115,18 @@ public class TUIGroupChatMinimalistFragment extends TUIBaseChatMinimalistFragmen
                     startActivity(intent);
                 }
             }
+
+
+            @Override
+            public void onMessageReadStatusClick(View view, TUIMessageBean messageBean) {
+                if (getChatInfo() != null) {
+                    Intent intent = new Intent(getContext(), MessageDetailMinimalistActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra(TUIChatConstants.MESSAGE_BEAN, messageBean);
+                    intent.putExtra(TUIChatConstants.CHAT_INFO, getChatInfo());
+                    startActivity(intent);
+                }
+            }
         });
         setTitleBarClickAction();
     }

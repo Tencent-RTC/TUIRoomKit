@@ -83,16 +83,15 @@ public class MergeMessageHolder extends MessageContentHolder {
                     return true;
                 }
             });
-
-            mForwardMsgLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (onItemClickListener != null) {
-                        onItemClickListener.onMessageClick(msgArea, position, msg);
-                    }
-                }
-            });
         }
+        mForwardMsgLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onMessageClick(msgArea, position, msg);
+                }
+            }
+        });
         setMessageAreaPadding();
     }
 

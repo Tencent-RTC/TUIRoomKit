@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -45,7 +48,6 @@ import com.tencent.qcloud.tuikit.tuichat.bean.message.QuoteMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.ReplyMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.TextMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.VideoMessageBean;
-import com.tencent.qcloud.tuikit.tuichat.classicui.component.popmenu.ChatPopMenu;
 import com.tencent.qcloud.tuikit.tuichat.config.TUIChatConfigs;
 import com.tencent.qcloud.tuikit.tuichat.interfaces.IMessageRecyclerView;
 import com.tencent.qcloud.tuikit.tuichat.minimalistui.interfaces.IMessageLayout;
@@ -65,9 +67,6 @@ import java.util.Set;
 
 public class MessageRecyclerView extends RecyclerView implements IMessageRecyclerView, IMessageLayout {
     private static final String TAG = MessageRecyclerView.class.getSimpleName();
-
-    // 120s
-    public static final int REVOKE_TIME_OUT = 120;
 
     // 取一个足够大的偏移保证能一次性滚动到最底部
     // Take a large enough offset to scroll to the bottom at one time
@@ -178,11 +177,12 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
         ChatPopDataHolder.setMessageViewGlobalRect(rect);
         view.setVisibility(INVISIBLE);
         View decorView = ((Activity)getContext()).getWindow().getDecorView();
-        decorView.setDrawingCacheEnabled(true);
-        decorView.buildDrawingCache();
-        dialogBgBitmap = Bitmap.createBitmap(decorView.getDrawingCache());
+        Bitmap dialogBgBitmap = Bitmap.createBitmap(decorView.getWidth(), decorView.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas();
+        canvas.setBitmap(dialogBgBitmap);
+        decorView.draw(canvas);
+        canvas.drawColor(Color.WHITE, PorterDuff.Mode.DST_OVER);
         ChatPopDataHolder.setChatPopBgBitmap(dialogBgBitmap);
-        decorView.setDrawingCacheEnabled(false);
 
         emojiOnClickListener = new ChatPopActivity.EmojiOnClickListener() {
 
@@ -288,7 +288,7 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
             if (msg.isSelf()) {
                 if (msg.getStatus() != TUIMessageBean.MSG_STATUS_SEND_FAIL) {
                     long timeInterval = TUIChatUtils.getServerTime() - msg.getMessageTime();
-                    if (timeInterval <= REVOKE_TIME_OUT) {
+                    if (timeInterval < TUIChatConfigs.getConfigs().getGeneralConfig().getTimeIntervalForMessageRecall()) {
                         revokeAction = new ChatPopActivity.ChatPopMenuAction();
                         revokeAction.setActionName(getContext().getString(R.string.revoke_action));
                         revokeAction.setActionIcon(R.drawable.chat_minimalist_pop_menu_revoke);
@@ -606,6 +606,12 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
                 }
             }
 
+            @Override
+            public void onMessageReadStatusClick(View view, TUIMessageBean messageBean) {
+                if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onMessageReadStatusClick(view, messageBean);
+                }
+            }
         });
     }
 

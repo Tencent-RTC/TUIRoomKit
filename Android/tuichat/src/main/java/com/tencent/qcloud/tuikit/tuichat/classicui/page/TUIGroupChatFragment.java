@@ -67,7 +67,7 @@ public class TUIGroupChatFragment extends TUIBaseChatFragment {
 
             @Override
             public void onMessageClick(View view, int position, TUIMessageBean messageBean) {
-                if (messageBean instanceof MergeMessageBean) {
+                if (messageBean instanceof MergeMessageBean && getChatInfo() != null) {
                     Bundle bundle = new Bundle();
                     bundle.putSerializable(TUIChatConstants.FORWARD_MERGE_MESSAGE_KEY, messageBean);
                     bundle.putSerializable(TUIChatConstants.CHAT_INFO, getChatInfo());
@@ -116,6 +116,15 @@ public class TUIGroupChatFragment extends TUIBaseChatFragment {
                 chatView.getMessageLayout().showItemPopMenu(position - 1, messageInfo, view);
             }
 
+            @Override
+            public void onMessageReadStatusClick(View view, TUIMessageBean messageBean) {
+                if (messageBean != null && getChatInfo() != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(TUIChatConstants.MESSAGE_BEAN, messageBean);
+                    bundle.putSerializable(TUIChatConstants.CHAT_INFO, getChatInfo());
+                    TUICore.startActivity("MessageReceiptDetailActivity", bundle);
+                }
+            }
         });
 
         setTitleBarExtension();

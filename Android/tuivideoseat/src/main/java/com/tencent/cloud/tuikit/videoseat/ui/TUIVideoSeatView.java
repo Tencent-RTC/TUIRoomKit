@@ -416,6 +416,10 @@ public class TUIVideoSeatView extends RelativeLayout {
         mMemberListAdapter.notifyDataSetChanged();
     }
 
+    public void notifyTalkingViewDataChanged() {
+        updateUserTalkingView(mIsTwoPersonSwitched ? 0 : 1);
+    }
+
     private void setUserDisplayViewClickListener() {
         mUserDisplayView.setOnClickListener(new OnClickListener() {
             @Override

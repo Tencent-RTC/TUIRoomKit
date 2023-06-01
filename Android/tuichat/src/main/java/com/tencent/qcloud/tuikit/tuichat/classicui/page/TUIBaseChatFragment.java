@@ -38,6 +38,7 @@ import com.tencent.qcloud.tuikit.tuichat.R;
 import com.tencent.qcloud.tuikit.tuichat.TUIChatConstants;
 import com.tencent.qcloud.tuikit.tuichat.bean.ChatInfo;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.CallingMessageBean;
+import com.tencent.qcloud.tuikit.tuichat.bean.message.MergeMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.classicui.widget.ChatView;
 import com.tencent.qcloud.tuikit.tuichat.classicui.widget.input.InputView;
 import com.tencent.qcloud.tuikit.tuichat.classicui.widget.message.MessageRecyclerView;
@@ -169,6 +170,17 @@ public class TUIBaseChatFragment extends BaseFragment {
         });
 
         chatView.getMessageLayout().setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onMessageClick(View view, int position, TUIMessageBean messageBean) {
+                if (messageBean instanceof MergeMessageBean && getChatInfo() != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(TUIChatConstants.FORWARD_MERGE_MESSAGE_KEY, messageBean);
+                    bundle.putSerializable(TUIChatConstants.CHAT_INFO, getChatInfo());
+                    TUICore.startActivity("TUIForwardChatActivity", bundle);
+                }
+            }
+
             @Override
             public void onMessageLongClick(View view, int position, TUIMessageBean message) {
                 // 因为adapter中第一条为加载条目，位置需减1
@@ -227,6 +239,15 @@ public class TUIBaseChatFragment extends BaseFragment {
                 chatView.getMessageLayout().showItemPopMenu(position - 1, messageInfo, view);
             }
 
+            @Override
+            public void onMessageReadStatusClick(View view, TUIMessageBean messageBean) {
+                if (messageBean != null && getChatInfo() != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(TUIChatConstants.MESSAGE_BEAN, messageBean);
+                    bundle.putSerializable(TUIChatConstants.CHAT_INFO, getChatInfo());
+                    TUICore.startActivity("MessageReceiptDetailActivity", bundle);
+                }
+            }
         });
 
         chatView.getInputLayout().setOnInputViewListener(new InputView.OnInputViewListener() {

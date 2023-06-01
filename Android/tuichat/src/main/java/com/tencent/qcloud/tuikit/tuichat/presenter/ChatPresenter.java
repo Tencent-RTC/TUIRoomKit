@@ -4,10 +4,12 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
+import com.tencent.imsdk.BaseConstants;
 import com.tencent.qcloud.tuicore.TUIConfig;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
@@ -119,6 +121,7 @@ public abstract class ChatPresenter {
     // Whether to display the translated content. The merged-forwarded message details activity does not display the translated content.
     protected boolean isNeedShowTranslation = true;
 
+    private final Handler loadApplyHandler = new Handler();
     public ChatPresenter() {
         TUIChatLog.i(TAG, "ChatPresenter Init");
 
@@ -139,6 +142,7 @@ public abstract class ChatPresenter {
 
     public void loadMessage(int type, TUIMessageBean locateMessage) {
         if (type == TUIChatConstants.GET_MESSAGE_BACKWARD && !isHaveMoreNewMessage) {
+            updateAdapter(IMessageRecyclerView.DATA_CHANGE_TYPE_ADD_FRONT, 0);
             return;
         }
         if (type == TUIChatConstants.GET_MESSAGE_FORWARD && !isHaveMoreOldMessage) {
@@ -467,8 +471,9 @@ public abstract class ChatPresenter {
         while (iterator.hasNext()) {
             TUIMessageBean loadedMessageBean = iterator.next();
             if (TextUtils.equals(loadedMessageBean.getId(), messageBean.getId())) {
-                updateAdapter(IMessageRecyclerView.DATA_CHANGE_TYPE_DELETE, loadedMessageBean);
+                int index = loadedMessageInfoList.indexOf(loadedMessageBean);
                 iterator.remove();
+                updateAdapter(IMessageRecyclerView.DATA_CHANGE_TYPE_DELETE, index);
             }
         }
     }
@@ -966,7 +971,7 @@ public abstract class ChatPresenter {
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
-
+                Log.e(TAG, "delete message failed, errCode " + errCode + ", " + errMsg);
             }
         });
 
@@ -1510,31 +1515,46 @@ public abstract class ChatPresenter {
         message.setStatus(TUIMessageBean.MSG_STATUS_SENDING);
     }
 
-    public void loadApplyList(IUIKitCallback<List<GroupApplyInfo>> callBack) {
-        provider.loadApplyInfo(new IUIKitCallback<List<GroupApplyInfo>>() {
-            @Override
-            public void onSuccess(List<GroupApplyInfo> data) {
-                if (!(getChatInfo() instanceof GroupInfo)) {
-                    return;
-                }
-                String groupId = getChatInfo().getId();
-                List<GroupApplyInfo> applyInfos = new ArrayList<>();
-                for (int i = 0; i < data.size(); i++) {
-                    GroupApplyInfo applyInfo = data.get(i);
-                    if (groupId.equals(applyInfo.getGroupApplication().getGroupID())
-                            && !applyInfo.isStatusHandled()) {
-                        applyInfos.add(applyInfo);
+    class LoadApplyListRunnable implements Runnable {
+        private static final int TRY_DELAY = 500;
+        private IUIKitCallback<List<GroupApplyInfo>> callback;
+        @Override
+        public void run() {
+            provider.loadApplyInfo(new IUIKitCallback<List<GroupApplyInfo>>() {
+                @Override
+                public void onSuccess(List<GroupApplyInfo> data) {
+                    if (!(getChatInfo() instanceof GroupInfo)) {
+                        return;
                     }
+                    String groupId = getChatInfo().getId();
+                    List<GroupApplyInfo> applyInfos = new ArrayList<>();
+                    for (int i = 0; i < data.size(); i++) {
+                        GroupApplyInfo applyInfo = data.get(i);
+                        if (groupId.equals(applyInfo.getGroupApplication().getGroupID())
+                                && !applyInfo.isStatusHandled()) {
+                            applyInfos.add(applyInfo);
+                        }
+                    }
+                    TUIChatUtils.callbackOnSuccess(callback, applyInfos);
                 }
-                TUIChatUtils.callbackOnSuccess(callBack, applyInfos);
-            }
 
-            @Override
-            public void onError(String module, int errCode, String errMsg) {
-                TUIChatUtils.callbackOnError(callBack, module, errCode, errMsg);
-            }
-        });
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    if (errCode == BaseConstants.ERR_IN_PROGESS) {
+                        loadApplyHandler.removeCallbacksAndMessages(null);
+                        loadApplyHandler.postDelayed(LoadApplyListRunnable.this, TRY_DELAY);
+                    }
+                    TUIChatUtils.callbackOnError(callback, module, errCode, errMsg);
+                }
+            });
+        }
+    }
 
+    public void loadApplyList(IUIKitCallback<List<GroupApplyInfo>> callBack) {
+        loadApplyHandler.removeCallbacksAndMessages(null);
+        LoadApplyListRunnable runnable = new LoadApplyListRunnable();
+        runnable.callback = callBack;
+        loadApplyHandler.post(runnable);
     }
 
     public void setDraft(String draft) {

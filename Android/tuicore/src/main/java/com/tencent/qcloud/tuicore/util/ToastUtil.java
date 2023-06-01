@@ -12,6 +12,7 @@ import com.tencent.qcloud.tuicore.ServiceInitializer;
 public class ToastUtil {
 
     private final static Handler handler = new Handler(Looper.getMainLooper());
+    private static Toast toast;
 
     public static void toastLongMessage(final String message) {
         toastMessage(message, true);
@@ -25,7 +26,11 @@ public class ToastUtil {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Toast toast = Toast.makeText(ServiceInitializer.getAppContext(), message,
+                if (toast != null) {
+                    toast.cancel();
+                    toast = null;
+                }
+                toast = Toast.makeText(ServiceInitializer.getAppContext(), message,
                         isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
                 View view = toast.getView();
                 if (view != null) {

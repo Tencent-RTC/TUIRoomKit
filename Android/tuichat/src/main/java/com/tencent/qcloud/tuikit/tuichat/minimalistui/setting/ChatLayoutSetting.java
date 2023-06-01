@@ -198,7 +198,7 @@ public class ChatLayoutSetting {
 
         // 增加一个欢迎提示富文本
         // Add a welcome prompt with rich text
-        if (TUIChatConfigs.getConfigs().getGeneralConfig().isEnableLink()) {
+        if (TUIChatConfigs.getConfigs().getGeneralConfig().isEnableWelcomeCustomMessage()) {
             InputMoreActionUnit unit = new InputMoreActionUnit() {};
             unit.setIconResId(R.drawable.chat_minimalist_more_action_custom_icon);
             unit.setName(inputView.getResources().getString(R.string.test_custom_action));
