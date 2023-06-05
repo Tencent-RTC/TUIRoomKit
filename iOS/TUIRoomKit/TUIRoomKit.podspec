@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |spec|
   spec.name                  = 'TUIRoomKit'
-  spec.version               = '1.3.1'
+  spec.version               = '1.3.2'
   spec.platform              = :ios
   spec.ios.deployment_target = '13.0'
   spec.license               = { :type => 'MIT', :file => 'LICENSE' }
@@ -17,12 +17,12 @@ Pod::Spec.new do |spec|
   spec.source                = { :path => './' }
   
   spec.dependency 'SnapKit'
-  spec.dependency 'TUICore'
+  spec.dependency 'TUICore', '>= 7.2.4146'
   
   spec.default_subspec = 'TRTC'
   
   spec.subspec 'Professional' do |professional|
-    professional.dependency 'TUIRoomEngine/Professional'
+    professional.dependency 'TUIRoomEngine/Professional', '>= 1.2.0'
     professional.source_files = 'Source/*.swift', 'Source/Presenter/*.swift', 'Source/**/*.swift', 'Source/**/*.h', 'Source/**/*.m'
     professional.resource_bundles = {
       'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.strings']
@@ -31,7 +31,7 @@ Pod::Spec.new do |spec|
   end
   
   spec.subspec 'TRTC' do |trtc|
-    trtc.dependency 'TUIRoomEngine/TRTC'
+    trtc.dependency 'TUIRoomEngine/TRTC', '>= 1.2.0'
     trtc.source_files = 'Source/*.swift', 'Source/Presenter/*.swift', 'Source/**/*.swift', 'Source/**/*.h', 'Source/**/*.m'
     trtc.resource_bundles = {
       'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.strings']
