@@ -11,7 +11,6 @@ import Foundation
 class TopView: UIView {
     // MARK: - store property
     let viewModel: TopViewModel
-    var topMenuTimer: Timer = Timer()
     
     let stackView: UIStackView = {
         let view = UIStackView()
@@ -47,7 +46,6 @@ class TopView: UIView {
     
     let timeLabel: UILabel = {
         let label = UILabel()
-        label.text = "00:00"
         label.textColor = UIColor(0xD1D9EC)
         label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true
@@ -139,36 +137,8 @@ class TopView: UIView {
     func bindInteraction() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(dropDownAction(sender:)))
         meetingTitleView.addGestureRecognizer(tap)
-        setupViewState()
-    }
-    
-    func setupViewState() {
-        var hour: Int = 0
-        var minute: Int = 0
-        var second: Int = 0
-        topMenuTimer = Timer(timeInterval: 1.0, repeats: true) { [weak self] timer in
-            guard let self = self else { return }
-            if second >= 60 {
-                minute += 1
-                second = 0
-                if minute >= 60 {
-                    hour += 1
-                    minute = 0
-                } else {
-                    minute += 1
-                }
-            } else {
-                second += 1
-            }
-            if hour > 0 {
-                self.timeLabel.text = "\(hour):\(minute):\(second)"
-            } else {
-                self.timeLabel.text = "\(minute):\(second)"
-            }
-        }
-        topMenuTimer.tolerance = 0.2
-        RunLoop.current.add(topMenuTimer, forMode: .default)
-        topMenuTimer.fire()
+        viewModel.viewResponder = self
+        viewModel.updateTimerLabelText()
     }
     
     @objc func dropDownAction(sender: UIView) {
@@ -176,7 +146,12 @@ class TopView: UIView {
     }
     
     deinit {
-        topMenuTimer.invalidate()
         debugPrint("deinit \(self)")
+    }
+}
+
+extension TopView: TopViewModelResponder {
+    func updateTimerLabel(text: String) {
+        self.timeLabel.text = text
     }
 }

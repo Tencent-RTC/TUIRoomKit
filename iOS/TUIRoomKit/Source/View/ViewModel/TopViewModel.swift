@@ -13,13 +13,18 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
+protocol TopViewModelResponder: AnyObject {
+    func updateTimerLabel(text: String)
+}
+
 class TopViewModel {
+    private var topMenuTimer: Timer = Timer()
+    private(set) var viewItems: [ButtonItemData] = []
+    weak var viewResponder: TopViewModelResponder?
     init() {
         createBottomData()
         initialStatus()
     }
-    
-    private(set) var viewItems: [ButtonItemData] = []
     
     func createBottomData() {
         let micItem = ButtonItemData()
@@ -94,8 +99,32 @@ class TopViewModel {
     func dropDownAction(sender: UIView) {
         RoomRouter.shared.presentPopUpViewController(viewType: .roomInfoViewType, height: 350)
     }
+    func updateTimerLabelText() {
+        var hour: Int = 0
+        var minute: Int = 0
+        var second: Int = 0
+        var totalSeconds: Int = 0
+        var timerText: String = "00:00"
+        topMenuTimer = Timer(timeInterval: 1.0, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            if hour > 0 {
+                timerText = String(format: "%.2d:%.2d:%.2d", hour, minute, second)
+            } else {
+                timerText = String(format: "%.2d:%.2d", minute, second)
+            }
+            self.viewResponder?.updateTimerLabel(text: timerText)
+            totalSeconds += 1
+            second = totalSeconds % 60
+            minute = (totalSeconds / 60) % 60
+            hour = totalSeconds / 3600
+        }
+        topMenuTimer.tolerance = 0.2
+        RunLoop.current.add(topMenuTimer, forMode: .default)
+        topMenuTimer.fire()
+    }
     
     deinit {
+        topMenuTimer.invalidate()
         debugPrint("deinit \(self)")
     }
 }
