@@ -1,13 +1,16 @@
-QT += core gui webenginewidgets network
+QT += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = RoomApp
+QMAKE_MACOSX_DEPLOYMENT_TARGET= 11.0
+
+TARGET = RoomKit
 TEMPLATE = app
 
 CONFIG += c++11
 CONFIG += debug_and_release warn_on
-CONFIG += thread exceptions rtti stl
+CONFIG += thread exceptions stl
+CONFIG += rtti_off
 
 # set path for auto-generated ui header files
 UI_DIR = ./auto-generated/ui_auto_gen
@@ -20,16 +23,18 @@ OBJECTS_DIR += ./auto-generated/release
 
 DESTDIR = ../bin
 
-include(RoomApp.pri)
+include(RoomKit.pri)
 include(RoomModule.pri)
-RESOURCES += $$PWD/Resource/RoomApp.qrc
+RESOURCES += $$PWD/Resource/RoomKit.qrc
 
-INCLUDEPATH += $$PWD/../Module/include
-DEPENDPATH += $$PWD/../Module/include
+INCLUDEPATH += $$PWD/Module/include
+DEPENDPATH += $$PWD/Module/include
 INCLUDEPATH += $$PWD/../utils
 INCLUDEPATH += $$PWD/../utils/jsoncpp
+INCLUDEPATH += $$PWD/../utils/BugReport
+INCLUDEPATH += $$PWD/3rdParty/zlib/include
 INCLUDEPATH += $$PWD/../Common
-INCLUDEPATH += $$PWD/../Common/MessageDispatcher
+INCLUDEPATH += $$PWD/App/Common/MessageDispatcher
 
 INCLUDEPATH += $${SOURCE_PATHS}
 DEPENDPATH += $${SOURCE_PATHS}
@@ -43,45 +48,43 @@ QMAKE_LFLAGS_RELEASE   = $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
 
 win32 {
 contains(QT_ARCH,i386) {
-INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win32/include/
-INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win32/include/TRTC
-
-LIBS += -L"$(ProjectDir)../SDK/LiteAVSDK/CPlusPlus/Win32/lib" \
-    -L"$(ProjectDir)../SDK/ImSDK/Win/lib/Win32" \
-    -L"$(ProjectDir)3rdParty/zlib/x86" \
-    -L"$(ProjectDir)bin" \
-    -lliteav \
-    -lImSDK \
-    -lzlibstatic
-} else {
-INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win64/include/
-INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Win64/include/TRTC
-
-LIBS += -L"$(ProjectDir)../SDK/LiteAVSDK/CPlusPlus/Win64/lib" \
-    -L"$(ProjectDir)../SDK/ImSDK/Win/lib/Win64" \
-    -L"$(ProjectDir)3rdParty/zlib/x86_64" \
-    -L"$(ProjectDir)bin" \
-    -lliteav \
-    -lImSDK \
-    -lzlibstatic
-}
-
-INCLUDEPATH += $$PWD/../SDK/ImSDK/Win/include/
-INCLUDEPATH += $$PWD/../utils/BugReport/
-INCLUDEPATH += $$PWD/3rdParty/zlib/include/
 INCLUDEPATH += $$PWD/../utils/usersig/win/include
 DEPENDPATH += $$PWD/../utils/usersig/win/include
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/include/
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/include/room/
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/include/liteav/
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/include/liteav/TRTC
+
+LIBS += -L"$$PWD/../SDK/RoomEngineSDK/lib/Win32" \
+    -L"$$PWD/3rdParty/zlib/x86" \
+    -L"$$PWD/bin" \
+    -lTUIRoomEngine \
+    -lliteav \
+    -lzlibstatic \
+    -lUser32 \
+    -lgdi32
+} else {
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/include/
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/include/room/
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/include/liteav/
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/include/liteav/TRTC
+
+LIBS += -L"$(ProjectDir)../SDK/RoomEngineSDK/lib/Win64" \
+    -L"$(ProjectDir)3rdParty/zlib/x86_64" \
+    -L"$(ProjectDir)bin" \
+    -lTUIRoomEngine \
+    -lliteav \
+    -lzlibstatic \
+    -lUser32 \
+    -lgdi32
+}
 }
 
 macx {
 QMAKE_INFO_PLIST += Info.plist
 
-# 添加库依赖
-LIBS += "-F$$PWD/../utils/usersig/mac"
-LIBS += "-F$$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac"
-LIBS += "-F$$PWD/../SDK/ImSDK/Mac"
-LIBS += -framework TXLiteAVSDK_TRTC_Mac
-LIBS += -framework ImSDKForMac_CPP
+INCLUDEPATH += $$PWD/../utils/usersig/mac
+
 LIBS += -framework Accelerate
 LIBS += -framework AudioUnit
 LIBS += -lbz2
@@ -113,36 +116,32 @@ LIBS += -lz
 LIBS += -ObjC
 LIBS += -framework Metal
 LIBS += -framework QuartzCore
+LIBS += -framework ScreenCaptureKit
+LIBS += -framework IOSurface
 
-LIBS += -F$$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXFFmpeg.xcframework/macos-arm64_x86_64
-LIBS += -F$$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXSoundTouch.xcframework/macos-arm64_x86_64
-LIBS += -framework TXFFmpeg
-LIBS += -framework TXSoundTouch
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/mac
+DEPENDPATH += $$PWD/../SDK/RoomEngineSDK/mac
 
-ImSDK_FRAMEWORK.files = $$PWD/../SDK/ImSDK/Mac/ImSDKForMac_CPP.framework
-ImSDK_FRAMEWORK.path = /Contents/Frameworks
-QMAKE_BUNDLE_DATA += ImSDK_FRAMEWORK
+LIBS += -F$$PWD/../SDK/RoomEngineSDK/mac/ -framework ImSDKForMac_Plus
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/mac/ImSDKForMac_Plus.framework/cpluscplus/include
 
-TXFFmpeg_FRAMEWORK.files = $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXFFmpeg.xcframework/macos-arm64_x86_64/TXFFmpeg.framework
-TXFFmpeg_FRAMEWORK.path = /Contents/Frameworks
-QMAKE_BUNDLE_DATA += TXFFmpeg_FRAMEWORK
+LIBS += -F$$PWD/../SDK/RoomEngineSDK/mac/ -framework TXLiteAVSDK_TRTC_Mac
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/mac/TXLiteAVSDK_TRTC_Mac.framework/Headers/cpp_interface
 
-TXSoundTouch_FRAMEWORK.files = $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXSoundTouch.xcframework/macos-arm64_x86_64/TXSoundTouch.framework
-TXSoundTouch_FRAMEWORK.path = /Contents/Frameworks
-QMAKE_BUNDLE_DATA += TXSoundTouch_FRAMEWORK
+LIBS += -F$$PWD/../SDK/RoomEngineSDK/mac/ -framework TUIRoomEngine_Mac
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/mac/TUIRoomEngine_Mac.framework/Headers/cpp_interface
+DEPENDPATH += $$PWD/../SDK/RoomEngineSDK/mac/TUIRoomEngine_Mac.framework/Headers/cpp_interface
 
-# 添加TXLiteAVSDK_TRTC_Mac.framework头文件
-INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXLiteAVSDK_TRTC_Mac.framework/Headers/cpp_interface
-INCLUDEPATH += $$PWD/../SDK/LiteAVSDK/CPlusPlus/Mac/TXLiteAVSDK_TRTC_Mac.framework/Headers
+LIBS += -F$$PWD/../SDK/RoomEngineSDK/mac/TXFFmpeg.xcframework/macos-arm64_x86_64/ -framework TXFFmpeg
 
-# 添加ImSDKForMac.framework头文件
-INCLUDEPATH += $$PWD/../SDK/ImSDK/Mac/ImSDKForMac_CPP.framework/Headers
-QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../Frameworks/
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/mac/TXFFmpeg.xcframework/macos-arm64_x86_64
+DEPENDPATH += $$PWD/../SDK/RoomEngineSDK/mac/TXFFmpeg.xcframework/macos-arm64_x86_64
+
+LIBS += -F$$PWD/../SDK/RoomEngineSDK/mac/TXSoundTouch.xcframework/macos-arm64_x86_64/ -framework TXSoundTouch
+
+INCLUDEPATH += $$PWD/../SDK/RoomEngineSDK/mac/TXSoundTouch.xcframework/macos-arm64_x86_64
+DEPENDPATH += $$PWD/../SDK/RoomEngineSDK/mac/TXSoundTouch.xcframework/macos-arm64_x86_64
 
 QMAKE_CXXFLAGS += -std=gnu++11
 #CONFIG += console
-
-INCLUDEPATH += $$PWD/../utils/usersig/mac
 }
-
-

@@ -199,7 +199,7 @@ void DataStore::ParseLaunchParam(QStringList params) {
 #else
         user_login_info_.sdk_app_id = SDKAPPID;
 
-        NSString* ns_user_id = [[NSString alloc]initWithUTF8String:info.user_id.c_str()];
+        NSString* ns_user_id = [[NSString alloc]initWithUTF8String:user_id.c_str()];
         NSString* ns_user_sig = [GenerateTestUserSig genTestUserSig : ns_user_id];
         const char* c_string = [ns_user_sig cString];
         user_login_info_.user_sig = std::string(c_string);

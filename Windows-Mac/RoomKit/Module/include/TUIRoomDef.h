@@ -5,7 +5,7 @@
 #include <functional>
 #include "TRTCTypeDef.h"
 
-#include "TUIRoomDefine.h"
+#include "ITUIRoomDefine.h"
 
 /**
  * Error codes
