@@ -1,13 +1,12 @@
-HEADERS += ../utils/json.h \
-    ../utils/log.h \
+HEADERS += ../utils/log.h \
     ../utils/UserDirectory.h \
-    ../Common/MessageDispatcher/MessageDispatcher.h \
     ../Common/ViewDragger.h \
     ../Common/ScreenCenter.h \
     ../Common/TXMessageBox.h \
     ../Common/TXImageButton.h \
     ../Common/StatusUpdateCenter.h \
     ../Common/DataReport.h \
+    ./App/Common/MessageDispatcher/MessageDispatcher.h \
     ./App/Common/DataStore.h \
     ./App/CommonDef.h \
     ./App/BottomBarController.h \
@@ -39,16 +38,15 @@ macx{
     HEADERS +=../utils/usersig/mac/GenerateTestUserSig.h
 }
 
-SOURCES += ../utils/jsoncpp.cpp \
-    ../utils/log.cpp \
+SOURCES += ../utils/log.cpp \
     ../utils/UserDirectory.cpp \
-    ../Common/MessageDispatcher/MessageDispatcher.cpp \
     ../Common/ScreenCenter.cpp \
     ../Common/TXMessageBox.cpp \
     ../Common/TXImageButton.cpp \
     ../Common/ViewDragger.cpp \
     ../Common/StatusUpdateCenter.cpp \
     ../Common/DataReport.cpp \
+    ./App/Common/MessageDispatcher/MessageDispatcher.cpp \
     ./App/Common/DataStore.cpp \
     ./App/BottomBarController.cpp \
     ./App/ChatMessageView.cpp \
@@ -103,4 +101,4 @@ FORMS += ../Common/Form/TXMessageBox.ui \
     ./App/Form/TransferRoomController.ui \
     ./App/Form/TransferUserItem.ui
 	
-RESOURCES += Resource/RoomApp.qrc
+RESOURCES += Resource/RoomKit.qrc

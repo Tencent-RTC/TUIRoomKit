@@ -6,9 +6,9 @@
 
 #include "ITRTCCloud.h"
 
-#include "TUIRoomEngine.h"
-#include "TUIRoomDefine.h"
-#include "TUIRoomObserver.h"
+#include "ITUIRoomEngine.h"
+#include "ITUIRoomDefine.h"
+#include "ITUIRoomObserver.h"
 
 #include "CommonDef.h"
 #include <unordered_map>
@@ -173,7 +173,7 @@ private:
     void onAllUserCameraDisableChanged(const char* room_id, bool is_disable) override;
     void onSendMessageForAllUserDisableChanged(const char* room_id, bool is_disable) override;
     void onRoomDismissed(const char* room_id) override;
-    void onKickedOutOfRoom(const char* room_id, const char* message) override;
+    void onKickedOutOfRoom(const char* room_id, tuikit::TUIKickedOutOfRoomReason reason, const char* message) override;
     void onRoomSpeechModeChanged(const char* room_id, tuikit::TUISpeechMode speech_mode) override;
     void onRemoteUserEnterRoom(const char* room_id, const tuikit::TUIUserInfo& user_info) override;
     void onRemoteUserLeaveRoom(const char* room_id, const tuikit::TUIUserInfo& user_info) override;

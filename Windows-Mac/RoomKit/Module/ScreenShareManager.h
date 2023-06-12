@@ -3,7 +3,7 @@
 #define MODULE_SCREENSHAREMANAGER_H_
 
 #include "include/IScreenShareManager.h"
-#include "TUIRoomEngine.h"
+#include "ITUIRoomEngine.h"
 #include "ITRTCCloud.h"
 
 #include "TUIRoomCoreCallback.h"

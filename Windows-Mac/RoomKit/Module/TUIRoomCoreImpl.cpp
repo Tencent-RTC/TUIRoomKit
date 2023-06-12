@@ -12,8 +12,6 @@
 #include "ScreenShareManager.h"
 #include "log.h"
 
-#include "json.h"
-
 #define TIMEOUT 15
 #define MAX_SEAT_COUNT 0
 
@@ -135,8 +133,12 @@ int TUIRoomCoreImpl::Logout() {
     return 0;
 }
 const char* TUIRoomCoreImpl::GetSDKVersion() {
+#ifdef _WIN32
     sdk_version_ = TOSTRING(getLiteAvSDKVersion());
     return sdk_version_.c_str();
+#else
+    return "";
+#endif
 }
 int TUIRoomCoreImpl::CreateRoom(const std::string& room_id, tuikit::TUISpeechMode speech_mode) {
     // 创建房间者为房主角色
@@ -1201,7 +1203,7 @@ void TUIRoomCoreImpl::OnFirstVideoFrame(const char* user_id, const TUIStreamType
 
 // TUIRoomEngine callback
 void TUIRoomCoreImpl::onError(tuikit::TUIError error_code, const char* message){}
-void TUIRoomCoreImpl::onKickedOutOfRoom(const char* room_id,const char* message) {
+void TUIRoomCoreImpl::onKickedOutOfRoom(const char* room_id,tuikit::TUIKickedOutOfRoomReason reason, const char* message) {
   LINFO("onKickedOutOfRoom [room_id:%s] [message:%s]", room_id, message);
     if (room_core_callback_ != nullptr) {
         room_core_callback_->OnExitRoom(TUIExitRoomType::kKickOff, "room engine kicked out of room.");
