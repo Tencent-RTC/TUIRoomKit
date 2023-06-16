@@ -213,9 +213,9 @@ export const useRoomStore = defineStore('room', {
     },
     getUserName(userId: string) {
       if (userId === this.localUser.userId) {
-        return this.localUser.userName;
+        return this.localUser.userName || userId;
       }
-      return this.remoteUserObj[userId]?.userName;
+      return this.remoteUserObj[userId]?.userName || userId;
     },
     getNewUserInfo(userId: string) {
       const newUserInfo = {

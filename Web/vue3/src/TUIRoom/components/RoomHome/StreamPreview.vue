@@ -40,7 +40,11 @@
         :size="480"
       >
         <audio-setting-tab v-if="settingTab === 'audio'" :mode="SettingMode.DETAIL"></audio-setting-tab>
-        <video-setting-tab v-else-if="settingTab === 'video'" :mode="SettingMode.DETAIL"></video-setting-tab>
+        <video-setting-tab
+          v-else-if="settingTab === 'video'"
+          :mode="SettingMode.DETAIL"
+          :with-preview="false"
+        ></video-setting-tab>
       </Drawer>
     </div>
   </div>
@@ -48,7 +52,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onBeforeUnmount } from 'vue';
-import TUIRoomEngine, { TUIRoomEvents, TUIVideoStreamType,  TRTCDeviceType, TRTCDeviceState } from '@tencentcloud/tuiroom-engine-js';
+import TUIRoomEngine, { TUIRoomEvents,  TRTCDeviceType, TRTCDeviceState } from '@tencentcloud/tuiroom-engine-js';
 import IconButton from '../common/IconButton.vue';
 import { SettingMode } from '../../constants/render';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
@@ -95,9 +99,9 @@ async function toggleMuteAudio() {
   isMicMuted.value = !isMicMuted.value;
   tuiRoomParam.isOpenMicrophone = !isMicMuted.value;
   if (isMicMuted.value) {
-    await roomEngine.instance?.closeLocalMicrophone();
+    await roomEngine.instance?.stopMicDeviceTest();
   } else {
-    await roomEngine.instance?.openLocalMicrophone();
+    await roomEngine.instance?.startMicDeviceTest({ interval: 200 });
   }
 }
 
@@ -105,9 +109,11 @@ async function toggleMuteVideo() {
   isCameraMuted.value = !isCameraMuted.value;
   tuiRoomParam.isOpenCamera = !isCameraMuted.value;
   if (isCameraMuted.value) {
-    await roomEngine.instance?.closeLocalCamera();
+    await roomEngine.instance?.stopCameraDeviceTest();
   } else {
-    await roomEngine.instance?.openLocalCamera();
+    await roomEngine.instance?.startCameraDeviceTest({
+      view: 'stream-preview',
+    });
   }
 }
 
@@ -118,8 +124,8 @@ function getRoomParam() {
   return tuiRoomParam;
 }
 
-const onUserVoiceVolume = (eventInfo: { userVolumeList: [] }) => {
-  roomStore.setAudioVolume(eventInfo.userVolumeList);
+const onUserVoiceVolume = (result: any) => {
+  roomStore.setAudioVolume(result);
 };
 
 async function startStreamPreview() {
@@ -169,11 +175,10 @@ async function startStreamPreview() {
       confirmButtonText: t('Confirm') });
   }
   if (hasCameraDevice) {
-    roomEngine.instance?.setLocalVideoView({ streamType: TUIVideoStreamType.kCameraStream, view: 'stream-preview' });
-    await roomEngine.instance?.openLocalCamera();
+    await roomEngine.instance?.startCameraDeviceTest({ view: 'stream-preview' });
   }
   if (hasMicrophoneDevice) {
-    await roomEngine.instance?.openLocalMicrophone();
+    await roomEngine.instance?.startMicDeviceTest({ interval: 200 });
   }
   loading.value = false;
 }
@@ -216,14 +221,19 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
 }
 
 TUIRoomEngine.once('ready', async () => {
-  roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
+  // 兼容没有打开音频前，roomEngine 没有抛出音量事件的问题
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  trtcCloud.on('onTestMicVolume', onUserVoiceVolume);
+
   roomEngine.instance?.on(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 
 onBeforeUnmount(async () => {
-  await roomEngine.instance?.closeLocalCamera();
-  await roomEngine.instance?.closeLocalMicrophone();
-  roomEngine.instance?.off(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
+  await roomEngine.instance?.stopCameraDeviceTest();
+  await roomEngine.instance?.stopMicDeviceTest();
+
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  trtcCloud.off('onTestMicVolume', onUserVoiceVolume);
   roomEngine.instance?.off(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 
@@ -338,5 +348,6 @@ function handleDrawerClose(done: any) {
 .el-drawer__body {
   padding: 32px;
 }
+
 
 </style>

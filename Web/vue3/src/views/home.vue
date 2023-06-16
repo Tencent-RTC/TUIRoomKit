@@ -1,19 +1,22 @@
 <template>
-  <div class="home-container">
-    <div class="header">
+  <div :class="[isMobile? 'home-container-H5' : 'home-container']">
+    <div :class="[isMobile ? 'header-H5' : 'header']">
       <user-info
-        class="header-item user-info"
         :user-id="userId"
         :user-name="userName"
         :avatar-url="avatarUrl"
         @log-out="handleLogOut"
       ></user-info>
-      <language-icon class="header-item language"></language-icon>
-      <switch-theme class="header-item theme"></switch-theme>
+      <div class="container-icon">
+        <language-icon class="header-item language"></language-icon>
+        <switch-theme class="header-item theme"></switch-theme>
+      </div>
     </div>
-    <stream-preview ref="streamPreviewRef"></stream-preview>
+    <stream-preview v-if="!isMobile" ref="streamPreviewRef"></stream-preview>
     <room-control
+      ref="roomControlRef"
       :given-room-id="givenRoomId"
+      :user-name="userName"
       @create-room="handleCreateRoom"
       @enter-room="handleEnterRoom"
     ></room-control>
@@ -21,11 +24,11 @@
 </template>
 
 <script setup lang="ts">
-import UserInfo from '@TUIRoom/components/RoomHeader/UserInfo.vue';
+import UserInfo from '@TUIRoom/components/RoomHeader/UserInfo';
 import StreamPreview from '@TUIRoom/components/RoomHome/StreamPreview.vue';
-import RoomControl from '@TUIRoom/components/RoomHome/RoomControl.vue';
-import LanguageIcon from '@/TUIRoom/components/RoomHeader/Language.vue';
-import SwitchTheme from '@/TUIRoom/components/RoomHeader/SwitchTheme.vue';
+import RoomControl from '@TUIRoom/components/RoomHome/RoomControl';
+import LanguageIcon from '@/TUIRoom/components/base/Language.vue';
+import SwitchTheme from '@/TUIRoom/components/base/SwitchTheme.vue';
 import { checkNumber } from '@/TUIRoom/utils/common';
 import router from '@/router';
 import { useRoute } from 'vue-router';
@@ -35,6 +38,7 @@ import { useI18n } from 'vue-i18n';
 import { useBasicStore } from '../TUIRoom/stores/basic';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
+import isMobile from '../TUIRoom/utils/useMediaValue';
 
 const route = useRoute();
 const streamPreviewRef = ref();
@@ -44,12 +48,13 @@ const userId: Ref<string> = ref('');
 const { t } = useI18n();
 const roomEngine = useGetRoomEngine();
 const basicStore = useBasicStore();
+const roomControlRef = ref();
 
 const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId : '';
 const givenRoomId: Ref<string> = ref((roomId) as string);
 
 function setTUIRoomData(action: string, mode?: string) {
-  const roomParam = streamPreviewRef.value.getRoomParam();
+  const roomParam = isMobile ? roomControlRef.value.getRoomParam() : streamPreviewRef.value.getRoomParam();
   const roomData = {
     action,
     roomMode: mode || 'FreeToSpeak',
@@ -155,7 +160,9 @@ handleInit();
 
 onMounted(() => {
   TUIRoomEngine.once('ready', () => {
-    streamPreviewRef.value.startStreamPreview();
+    if (!isMobile) {
+      streamPreviewRef.value.startStreamPreview();
+    }
   });
 });
 
@@ -170,6 +177,25 @@ onMounted(() => {
 </style>
 
 <style lang="scss" scoped>
+.home-container-H5{
+  width: 100%;
+  height: 100%;
+  background: var(--background-color-style);
+  color: #B3B8C8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: PingFangSC-Medium;;
+    .header-H5{
+      width: 100%;
+      position: absolute;
+      top: 0;
+      padding: 22px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+  }
+}
 .home-container {
   width: 100%;
   height: 100%;
@@ -199,4 +225,8 @@ onMounted(() => {
     }
   }
 }
+  .container-icon{
+    display: flex;
+    align-items: center;
+  }
 </style>

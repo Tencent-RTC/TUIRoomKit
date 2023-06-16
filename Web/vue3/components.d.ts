@@ -13,7 +13,6 @@ declare module '@vue/runtime-core' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElLink: typeof import('element-plus/es')['ElLink']
     ElOption: typeof import('element-plus/es')['ElOption']
-    ElPopover: typeof import('element-plus/es')['ElPopover']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']

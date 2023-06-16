@@ -1,5 +1,5 @@
 <template>
-  <div class="invite-control-container">
+  <div class="manage-member-control-container">
     <icon-button
       :is-active="sidebarName === 'manage-member'"
       :title="t('Members')"

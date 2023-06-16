@@ -14,7 +14,11 @@
     <div class="divide-line"></div>
     <div class="dialog-content">
       <audio-setting-tab v-if="activeSettingTab === 'audio'" :mode="SettingMode.DETAIL"></audio-setting-tab>
-      <video-setting-tab v-if="activeSettingTab === 'video'" :mode="SettingMode.DETAIL"></video-setting-tab>
+      <video-setting-tab
+        v-if="activeSettingTab === 'video'"
+        :mode="SettingMode.DETAIL"
+        :with-preview="true"
+      ></video-setting-tab>
     </div>
     <svg-icon
       class="close-icon"

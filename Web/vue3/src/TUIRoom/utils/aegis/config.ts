@@ -6,6 +6,8 @@
  * projectName: 项目名称
  */
 
+import isMobile from '../useMediaValue';
+
 const IS_LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 const IS_OFFICIAL_DEMO = location.host === 'web.sdk.qcloud.com';
 
@@ -15,7 +17,7 @@ const isUploadDetailEvent = IS_OFFICIAL_DEMO;
 
 const aegisId = 'iHWefAYqCFrCVqqyIZ';
 
-const projectName = 'TUIRoomKit-Web';
+const projectName = isMobile ? 'TUIRoomKit-H5-vue3' : 'TUIRoomKit-Web';
 
 export {
   isUploadLoaded,

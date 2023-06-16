@@ -1,12 +1,13 @@
 <!--
   * 名称：SvgIcon
   * @param name String required
-  * @param size String 'large'|'medium'|'small'
+  * @param size String 'large'|'medium'|'small'｜'custom'
   * Usage:
   * Use <svg-icon icon-name="star"/> in template
 
   * 使用方式：
   * 在 template 中使用 <svg-icon icon-name="star"/>
+  * 如果要在外部设置大小，必须是传入custom
 -->
 <template>
   <div :class="svgClass" @click="handleClick"></div>
@@ -24,7 +25,7 @@ const props = defineProps<Props>();
 const emit = defineEmits(['click']);
 const svgName = computed((): string => `${props.iconName}`);
 const svgClass = computed((): string => {
-  const validate = props.size && ['large', 'medium', 'small'].includes(props.size);
+  const validate = props.size && ['large', 'medium', 'small', 'custom'].includes(props.size);
   const size = validate ? props.size : 'large';
   return `svg-icon ${size}-icon ${svgName.value}`;
 });

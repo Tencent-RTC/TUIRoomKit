@@ -1,6 +1,9 @@
 <template>
   <div class="mail-login">
-    <input v-model="mailAddress" class="input" :placeholder="t('Email address')">
+    <input
+      v-model="mailAddress" :class="[isMobile ? 'input-mobile' : 'input']" :placeholder="t('Email address')"
+      enterkeyhint="complete"
+    >
     <div class="area-container">
       <svg-icon icon-name="mail-icon" size="medium"></svg-icon>
     </div>
@@ -11,6 +14,8 @@
 import { ref, watch } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import { useI18n } from '../../locales';
+import isMobile from '../../utils/useMediaValue';
+
 const { t } = useI18n();
 
 const emit = defineEmits(['update-mail-address']);
@@ -42,6 +47,23 @@ watch(() => mailAddress.value, (val) => {
     transition:border-color .2s cubic-bezier(.645,.045,.355,1);
     width:100%;
   }
+  .input-mobile{
+    -webkit-appearance:none;
+    background-color:rgba(207, 213, 230, 0.2);
+    background-image:none;
+    border-radius:8px;
+    box-sizing:border-box;
+    color: #B3B8C8;
+    display:inline-block;
+    font-size:inherit;
+    height:60px;
+    line-height:60px;
+    outline:none;
+    border: 0px;
+    padding:0 15px 0 40px;
+    transition:border-color .2s cubic-bezier(.645,.045,.355,1);
+    width:100%;
+    }
   .area-container{
     width:20px;
     height:20px;

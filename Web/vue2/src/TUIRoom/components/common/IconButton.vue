@@ -116,4 +116,18 @@ defineEmits(['click-icon', 'click-more']);
     }
   }
 }
+
+@media screen and (max-width: 600px) {
+  .icon-box {
+    width: 72px;
+    &.hover-effect:hover {
+      &:before{
+        width: 72px;
+      }
+      &:after{
+       width: 72px;
+      }
+    }
+  }
+}
 </style>
