@@ -10,7 +10,11 @@
       <svg-icon icon-name="apply-big-icon" class="apply-big-icon"></svg-icon>
       <span class="info">{{ applyToAnchorList.length }}</span>
     </div>
-    <div v-show="showApplyUserList" ref="masterApplyListRef" class="apply-list-container">
+    <div
+      v-show="showApplyUserList"
+      ref="masterApplyListRef"
+      :class="isMobile ? 'apply-list-container-h5':'apply-list-container'"
+    >
       <div class="title-container">
         <span class="title">{{ t('Apply to stage application') }}</span>
         <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyList"></svg-icon>
@@ -45,6 +49,7 @@ import { storeToRefs } from 'pinia';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
 import { useI18n } from '../../../locales';
 import defaultAvatar from '../../../assets/imgs/avatar.png';
+import isMobile from '../../../utils/useMediaValue';
 
 const { t } = useI18n();
 
@@ -126,7 +131,7 @@ onBeforeUnmount(() => {
       font-size: 14px;
     }
   }
-  .apply-list-container {
+  .apply-list-container, .apply-list-container-h5 {
     width: 470px;
     height: 286px;
     background: var(--apply-list-container-bg-color);
@@ -217,6 +222,20 @@ onBeforeUnmount(() => {
       background: rgba(173,182,204,0.10);
       border: 1px solid #ADB6CC;
       color: var(--apply-container-outline);
+    }
+  }
+  .apply-list-container-h5 {
+    width: 80vw;
+    height: 20vh;
+    top: -3vh;
+    .apply-list {
+      height: 60%;
+    }
+    .apply-footer {
+      margin-top: 0;
+      .button {
+        padding: 0;
+      }
     }
   }
 }

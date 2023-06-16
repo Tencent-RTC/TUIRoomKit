@@ -1,6 +1,11 @@
 <template>
   <div class="phone-login">
-    <input v-model="phoneNumber" class="input" :placeholder="t('Mobile number')" auto-complete="true">
+    <input
+      v-model="phoneNumber"
+      :class="[isMobile ? 'input-mobile' : 'input']"
+      :placeholder="t('Mobile number')" auto-complete="true"
+      enterkeyhint="complete"
+    >
     <div class="area-container">
       <svg-icon icon-name="phone-icon" size="medium"></svg-icon>
     </div>
@@ -11,6 +16,8 @@
 import SvgIcon from '../common/SvgIcon.vue';
 import { ref, watch } from 'vue';
 import { useI18n } from '../../locales';
+import isMobile from '../../utils/useMediaValue';
+
 const { t } = useI18n();
 const emit = defineEmits(['update-phone-number']);
 const phoneNumber = ref('');
@@ -42,6 +49,23 @@ watch(() => phoneNumber.value, (val) => {
     transition:border-color .2s cubic-bezier(.645,.045,.355,1);
     width:100%;
   }
+  .input-mobile{
+    -webkit-appearance:none;
+    background-color:rgba(207, 213, 230, 0.2);
+    background-image:none;
+    border-radius:8px;
+    box-sizing:border-box;
+    color: #B3B8C8;
+    display:inline-block;
+    font-size:inherit;
+    height:60px;
+    line-height:60px;
+    outline:none;
+    border: 0px;
+    padding:0 15px 0 40px;
+    transition:border-color .2s cubic-bezier(.645,.045,.355,1);
+    width:100%;
+    }
   .area-container{
     width:20px;
     height:20px;

@@ -18,7 +18,7 @@
         ref="audioIconButtonRef"
         :is-active="!localStream.hasAudioStream"
         :title="t('Mic')"
-        :has-more="true"
+        :has-more="hasMore"
         :show-more="showAudioSettingTab"
         :disabled="isLocalAudioIconDisable"
         @click-icon="toggleMuteAudio"
@@ -61,10 +61,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, Ref, onUnmounted } from 'vue';
+import { ref, onMounted, Ref, onUnmounted, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessageBox, ElMessage } from '../../elementComp';
-
+import { ElMessageBox, ElMessage, Dialog  } from '../../elementComp';
 import IconButton from '../common/IconButton.vue';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
 import { useRoomStore } from '../../stores/room';
@@ -73,7 +72,7 @@ import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
 import useRoomEngine from '../../hooks/useRoomEngine';
-import Dialog from '../../elementComp/Dialog.vue';
+import isMobile from '../../utils/useMediaValue';
 const roomEngine = useRoomEngine();
 
 const roomStore = useRoomStore();
@@ -85,7 +84,7 @@ const {
 } = storeToRefs(roomStore);
 
 const emits = defineEmits(['click']);
-
+const hasMore = computed(() => !isMobile);
 const showAudioSettingTab: Ref<boolean> = ref(false);
 const audioIconButtonRef = ref<InstanceType<typeof IconButton>>();
 const audioSettingRef = ref<InstanceType<typeof AudioSettingTab>>();

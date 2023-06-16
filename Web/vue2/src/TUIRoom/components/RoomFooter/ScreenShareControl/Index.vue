@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { ref, Ref, computed, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from '../../../elementComp';
+import { ElMessage, Dialog  } from '../../../elementComp';
 import IconButton from '../../common/IconButton.vue';
 import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
@@ -45,7 +45,6 @@ import SvgIcon from '../../common/SvgIcon.vue';
 import { ICON_NAME } from '../../../constants/icon';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useI18n } from '../../../locales';
-import Dialog from '../../../elementComp/Dialog.vue';
 
 const roomEngine = useGetRoomEngine();
 

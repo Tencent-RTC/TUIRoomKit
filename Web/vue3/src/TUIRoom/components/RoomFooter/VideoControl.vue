@@ -19,7 +19,7 @@
         :is-active="!localStream.hasVideoStream"
         :title="t('Camera')"
         :icon-name="iconName"
-        :has-more="true"
+        :has-more="hasMore"
         :disabled="isLocalVideoIconDisable"
         @click-icon="toggleMuteVideo"
         @click-more="handleMore"
@@ -57,7 +57,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, Ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessageBox, ElMessage } from '../../elementComp';
+import { ElMessageBox, ElMessage, Dialog } from '../../elementComp';
 
 import IconButton from '../common/IconButton.vue';
 import VideoSettingTab from '../base/VideoSettingTab.vue';
@@ -69,11 +69,13 @@ import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import TUIRoomEngine, { TUIVideoStreamType, TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
-import Dialog from '../../elementComp/Dialog.vue';
+import isMobile from '../../utils/useMediaValue';
+import { useBasicStore } from '../../stores/basic';
 const roomEngine = useGetRoomEngine();
 
 const roomStore = useRoomStore();
-
+const basicStore = useBasicStore();
+const isFrontCamera: Ref<boolean> = ref(basicStore.isFrontCamera);
 const emits = defineEmits(['click']);
 
 const {
@@ -83,7 +85,7 @@ const {
   isLocalVideoIconDisable,
 } = storeToRefs(roomStore);
 const { t } = useI18n();
-
+const hasMore = computed(() => !isMobile);
 const showVideoSettingTab: Ref<boolean> = ref(false);
 const videoIconButtonRef = ref<InstanceType<typeof IconButton>>();
 const videoSettingRef = ref<InstanceType<typeof VideoSettingTab>>();
@@ -133,7 +135,12 @@ async function toggleMuteVideo() {
       view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
       streamType: TUIVideoStreamType.kCameraStream,
     });
-    await roomEngine.instance?.openLocalCamera();
+    if (isMobile) {
+      await roomEngine.instance?.openLocalCamera({ isFrontCamera: isFrontCamera.value });
+    } else {
+      await roomEngine.instance?.openLocalCamera();
+    }
+    await roomEngine.instance?.startPushLocalVideo();
   }
   showVideoSettingTab.value = false;
 }

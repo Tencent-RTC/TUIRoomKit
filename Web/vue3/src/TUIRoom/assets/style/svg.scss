@@ -47,6 +47,9 @@
 .svg-icon.emoji{
   background-image: url(../icons/svg/emoji.svg);
 }
+.svg-icon.emoji-h5{
+  background-image: var(--emoji-h5);
+}
 .svg-icon.exit-fullscreen{
   background-image: var(--exit-fullscreen-svg);
 }
@@ -150,3 +153,43 @@
 .svg-icon.language-icon{
   background-image: var(--switch-language);
 }
+.svg-icon.enter-room{
+  background-image: url(../icons/svg/enter-room.svg);
+}
+.svg-icon.close-back{
+  background-image: var(--close-svg);
+}
+.svg-icon.chevron-down{
+  background-image: var(--chevron-down-svg);
+}
+.svg-icon.tencent-cloud{
+  background-image: var(--tencent-cloud-svg);
+}
+.svg-icon.tencent-cloud-text{
+  background-image: url(../icons/svg/tencent-cloud.svg);
+}
+.svg-icon.speaker{
+  background-image: var(--speaker-svg);
+}
+.svg-icon.camera{
+  background-image: var(--camera-svg);
+}
+.svg-icon.mirror{
+  background-image: var(--mirror-svg);
+}
+.svg-icon.qrcode{
+  background-image: url(../icons/svg/mini-qrcode.svg);
+}
+.svg-icon.copy-icon-qrcode{
+  background-image: url(../icons/svg/copy-icon-qrcode.svg);
+}
+.svg-icon.contact-us-h5 {
+  background-image: var(--contact-us-svg);
+}
+.svg-icon.mute-h5 {
+  background-image: url(../icons/svg/mute-h5.svg);
+}
+.svg-icon.kick-h5 {
+  background-image: url(../icons/svg/kick-h5.svg);
+}
+

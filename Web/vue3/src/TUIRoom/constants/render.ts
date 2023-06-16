@@ -5,6 +5,7 @@ export enum LAYOUT {
   RIGHT_SIDE_LIST = 'right_side_list',
   TOP_SIDE_LIST = 'top_side_list',
   LARGE_SMALL_WINDOW = 'large_small_window',
+  GRID_VIEW= 'grid_view',
 };
 
 export enum SettingMode {
