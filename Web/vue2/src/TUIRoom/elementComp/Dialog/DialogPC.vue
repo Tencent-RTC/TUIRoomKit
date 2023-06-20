@@ -37,6 +37,6 @@ const props = defineProps<Props>();
 </script>
 
 <style>
-@import url('../assets/style/element-ui-custom.scss');
+@import url('../../assets/style/element-ui-custom.scss');
 
 </style>

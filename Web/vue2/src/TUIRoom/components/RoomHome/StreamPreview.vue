@@ -15,7 +15,7 @@
           @click-icon="toggleMuteAudio"
           @click-more="handleMicSetting"
         >
-          <audio-icon :audio-volume="localStream.audioVolume" :is-muted="isMicMuted"></audio-icon>
+          <audio-icon :audio-volume="audioVolume" :is-muted="isMicMuted"></audio-icon>
         </icon-button>
         <icon-button
           ref="videoIconButtonRef"
@@ -59,18 +59,16 @@ import AudioSettingTab from '../base/AudioSettingTab.vue';
 import VideoSettingTab from '../base/VideoSettingTab.vue';
 import AudioIcon from '../base/AudioIcon.vue';
 import { useRoomStore } from '../../stores/room';
-import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
 import { useI18n } from '../../locales';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { isElectronEnv } from '../../utils/utils';
 import Drawer from '../../elementComp/Drawer.vue';
-import { MESSAGE_DURATION } from '../../constants/message';
-import { ElMessageBox, ElMessage } from '../../elementComp/index';
+import { ElMessageBox } from '../../elementComp/index';
 const roomStore = useRoomStore();
-const { localStream } = storeToRefs(roomStore);
 const { t } = useI18n();
 
+const audioVolume = ref(0);
 const isElectron = isElectronEnv();
 const roomEngine = useGetRoomEngine();
 
@@ -100,6 +98,7 @@ async function toggleMuteAudio() {
   tuiRoomParam.isOpenMicrophone = !isMicMuted.value;
   if (isMicMuted.value) {
     await roomEngine.instance?.stopMicDeviceTest();
+    audioVolume.value = 0;
   } else {
     await roomEngine.instance?.startMicDeviceTest({ interval: 200 });
   }
@@ -125,7 +124,7 @@ function getRoomParam() {
 }
 
 const onUserVoiceVolume = (result: any) => {
-  roomStore.setAudioVolume(result);
+  audioVolume.value = result;
 };
 
 async function startStreamPreview() {
@@ -223,7 +222,7 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
 TUIRoomEngine.once('ready', async () => {
   // 兼容没有打开音频前，roomEngine 没有抛出音量事件的问题
   const trtcCloud = roomEngine.instance?.getTRTCCloud();
-  trtcCloud.on('onTestMicVolume', onUserVoiceVolume);
+  trtcCloud?.on('onTestMicVolume', onUserVoiceVolume);
 
   roomEngine.instance?.on(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
@@ -233,7 +232,7 @@ onBeforeUnmount(async () => {
   await roomEngine.instance?.stopMicDeviceTest();
 
   const trtcCloud = roomEngine.instance?.getTRTCCloud();
-  trtcCloud.off('onTestMicVolume', onUserVoiceVolume);
+  trtcCloud?.off('onTestMicVolume', onUserVoiceVolume);
   roomEngine.instance?.off(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 

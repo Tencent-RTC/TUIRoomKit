@@ -54,7 +54,8 @@
 
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
-import  { ElMessageBox, ElMessage, Dialog } from '../../../elementComp';
+import { ElMessageBox, ElMessage } from '../../../elementComp';
+import { Dialog  } from '../../../elementComp/Dialog';
 import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useEndControl from './useEndControlHooks';
 
