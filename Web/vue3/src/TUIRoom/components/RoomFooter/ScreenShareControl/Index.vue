@@ -35,7 +35,8 @@
 <script setup lang="ts">
 import { ref, Ref, computed, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage, Dialog  } from '../../../elementComp';
+import { ElMessage } from '../../../elementComp';
+import { Dialog  } from '../../../elementComp/Dialog';
 import IconButton from '../../common/IconButton.vue';
 import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
