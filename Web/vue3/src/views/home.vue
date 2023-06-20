@@ -161,7 +161,7 @@ handleInit();
 onMounted(() => {
   TUIRoomEngine.once('ready', () => {
     if (!isMobile) {
-      streamPreviewRef.value.startStreamPreview();
+      streamPreviewRef.value?.startStreamPreview();
     }
   });
 });
