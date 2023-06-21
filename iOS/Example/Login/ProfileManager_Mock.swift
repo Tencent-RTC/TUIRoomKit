@@ -19,7 +19,7 @@ import TUICore
     @objc var userId: String
     @objc var userSig: String = ""
     
-    public init(userID: String) {
+    init(userID: String) {
         userId = userID
         token = userID
         phone = userID

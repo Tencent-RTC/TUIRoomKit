@@ -79,6 +79,9 @@ class TopView: UIView {
         activateConstraints()
         bindInteraction()
         isViewReady = true
+#if RTCube_APPSTORE
+        injectReport()
+#endif
     }
     
     func constructViewHierarchy() {
@@ -155,3 +158,37 @@ extension TopView: TopViewModelResponder {
         self.timeLabel.text = text
     }
 }
+
+#if RTCube_APPSTORE
+extension TopView {
+
+    func injectReport() {
+        let roomInfo = EngineManager.shared.store.roomInfo
+        if EngineManager.shared.store.currentUser.userId == roomInfo.ownerId {
+           return
+        }
+        guard let menuView =  menuButtons.first else{ return}
+        let reportBtn = UIButton(type: .custom)
+        reportBtn.setImage(UIImage(named: "room_report", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
+        reportBtn.adjustsImageWhenHighlighted = false
+        
+        addSubview(reportBtn)
+        reportBtn.snp.makeConstraints({ make in
+            make.centerY.equalTo(menuView.snp.centerY)
+            make.right.equalTo(menuView.snp.left).offset(-10)
+            make.width.height.equalTo(menuView)
+        })
+        reportBtn.addTarget(self, action: #selector(clickReport), for: .touchUpInside)
+
+    }
+    
+    @objc func clickReport() {
+        let selector = NSSelectorFromString("showReportAlertWithRoomId:ownerId:")
+        if responds(to: selector) {
+            let roomInfo = EngineManager.shared.store.roomInfo
+            perform(selector, with: roomInfo.roomId, with: roomInfo.ownerId)
+        }
+    }
+    
+}
+#endif

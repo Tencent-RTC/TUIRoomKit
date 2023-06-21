@@ -165,7 +165,7 @@ class RaiseHandApplicationListView: UIView {
 
 extension RaiseHandApplicationListView: UISearchControllerDelegate, UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        let searchArray = viewModel.inviteSeatList.filter({ model -> Bool in
+        let searchArray = viewModel.engineManager.store.inviteSeatList.filter({ model -> Bool in
             if let searchText = searchController.searchBar.text {
                 return (model.userName == searchText)
             } else {

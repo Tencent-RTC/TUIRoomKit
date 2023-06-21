@@ -111,12 +111,13 @@ class TRTCLoginRootView: UIView {
     
     weak var currentTextField: UITextField?
     
-    public weak var rootVC: TRTCLoginViewController?
+    weak var rootVC: TRTCLoginViewController?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardFrameChange(noti:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardFrameChange(noti:)), name:
+                                                UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
     deinit {

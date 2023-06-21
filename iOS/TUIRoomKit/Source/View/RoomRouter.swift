@@ -41,11 +41,11 @@ class RoomRouter {
         ]
         TUICore.callService(TUICore_TUIChatService, method: TUICore_TUIChatService_SetChatExtensionMethod, param: config)
         let param : [String : Any] = [
-            TUICore_TUIChatObjectFactory_GetChatViewControllerMethod_TitleKey : roomInfo.name,
-            TUICore_TUIChatObjectFactory_GetChatViewControllerMethod_GroupIDKey: roomInfo.roomId,
-            TUICore_TUIChatObjectFactory_GetChatViewControllerMethod_AvatarUrlKey : user.avatarUrl,
+            TUICore_TUIChatObjectFactory_ChatViewController_Title : roomInfo.name,
+            TUICore_TUIChatObjectFactory_ChatViewController_GroupID: roomInfo.roomId,
+            TUICore_TUIChatObjectFactory_ChatViewController_AvatarUrl : user.avatarUrl,
         ]
-        if let chatVC = TUICore.createObject(TUICore_TUIChatObjectFactory, key: TUICore_TUIChatObjectFactory_GetChatViewControllerMethod,
+        if let chatVC = TUICore.createObject(TUICore_TUIChatObjectFactory, key: TUICore_TUIChatObjectFactory_ChatViewController_Classic,
                                              param: param) as? UIViewController {
             context.chatViewController = chatVC
             let appearance = context.appearance
@@ -93,14 +93,14 @@ class RoomRouter {
         present(viewController: vc)
     }
     
-    func dismissPopupViewController(viewType: PopUpViewType, animated: Bool = true) {
+    func dismissPopupViewController(viewType: PopUpViewType, animated: Bool = true, completion: (() -> Void)? = nil) {
         guard var observerArray = context.presentControllerMap[viewType] else { return }
         guard observerArray.count > 0 else {
             context.presentControllerMap.removeValue(forKey: viewType)
             return
         }
         guard let observer = observerArray.last, let vc = observer() else { return }
-        vc.dismiss(animated: animated)
+        vc.dismiss(animated: animated, completion: completion)
         observerArray.removeLast()
         if observerArray.count == 0 {
             context.presentControllerMap.removeValue(forKey: viewType)

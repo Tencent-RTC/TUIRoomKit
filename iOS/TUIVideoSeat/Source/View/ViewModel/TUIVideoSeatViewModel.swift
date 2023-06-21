@@ -316,6 +316,9 @@ extension TUIVideoSeatViewModel {
         if videoSeatItems.count == 1 {
             // 单人
             videoSeatViewType = .singleType
+            if isHasScreenStream {
+                refreshMultiVideo()
+            }
         } else if videoSeatItems.count == 2, isHasVideoStream,!isHasScreenStream {
             // 双人 大小窗切换
             videoSeatViewType = .largeSmallWindowType

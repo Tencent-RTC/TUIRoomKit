@@ -7,6 +7,11 @@
 //
 
 import UIKit
+#if TXLiteAVSDK_TRTC
+import TXLiteAVSDK_TRTC
+#elseif TXLiteAVSDK_Professional
+import TXLiteAVSDK_Professional
+#endif
 
 protocol RoomMainViewModelFactory {
     func makeRoomMainViewModel() -> RoomMainViewModel
@@ -49,6 +54,13 @@ class RoomMainViewController: UIViewController {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         let isLandscape = size.width > size.height
+        let param = TRTCVideoEncParam()
+        if isLandscape {
+            param.resMode = .landscape
+        } else {
+            param.resMode = .portrait
+        }
+        EngineManager.shared.roomEngine.getTRTCCloud().setVideoEncoderParam(param)
         rootView.updateRootViewOrientation(isLandscape: isLandscape)
     }
     

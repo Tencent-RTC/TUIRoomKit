@@ -33,6 +33,7 @@ class RoomMainViewModel: NSObject {
     var currentUser: UserModel {
         engineManager.store.currentUser
     }
+    let roomRouter: RoomRouter = RoomRouter.shared
     
     override init() {
         super.init()
@@ -40,8 +41,6 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRequestReceived, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserVideoStateChanged, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserAudioStateChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRequestCancelled, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
@@ -49,6 +48,7 @@ class RoomMainViewModel: NSObject {
     }
     
     func applyConfigs() {
+        setVideoEncoderParam()
         engineManager.roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(self, pixelFormat: ._Texture_2D, bufferType: .texture)
         //如果房间不是自由发言房间并且用户没有上麦，不开启摄像头和麦克风
         if roomInfo.speechMode != .freeToSpeak && !currentUser.isOnSeat {
@@ -75,14 +75,16 @@ class RoomMainViewModel: NSObject {
             }
             roomEngine.startPushLocalVideo()
         }
-        if roomInfo.isOpenMicrophone && !roomInfo.isMicrophoneDisableForAllUser {
-            roomEngine.openLocalMicrophone(engineManager.store.audioSetting.audioQuality) { [weak self] in
-                guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalAudio()
-            } onError: { code, message in
-                debugPrint("openLocalMicrophone:code:\(code),message:\(message)")
-            }
-        }
+    }
+    
+    private func setVideoEncoderParam() {
+        let param = TRTCVideoEncParam()
+        param.videoResolution = engineManager.store.videoSetting.videoResolution
+        param.videoBitrate = Int32(engineManager.store.videoSetting.videoBitrate)
+        param.videoFps = Int32(engineManager.store.videoSetting.videoFps)
+        param.resMode = .portrait
+        param.enableAdjustRes = true
+        engineManager.roomEngine.getTRTCCloud().setVideoEncoderParam(param)
     }
     
     private func getUserList(nextSequence: Int) {
@@ -144,8 +146,6 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onRequestReceived, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserVideoStateChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserAudioStateChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onRequestCancelled, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
@@ -159,19 +159,25 @@ extension RoomMainViewModel: RoomEngineEventResponder {
         if name == .onRoomDismissed {
             interruptClearRoom()
             let alertVC = UIAlertController(title: .destroyAlertText, message: nil, preferredStyle: .alert)
-            let sureAction = UIAlertAction(title: .alertOkText, style: .default) { action in
+            let sureAction = UIAlertAction(title: .alertOkText, style: .default) { [weak self] action in
+                guard let self = self else { return }
+                self.roomRouter.dismissAllRoomPopupViewController()
+                self.roomRouter.popToRoomEntranceViewController()
             }
             alertVC.addAction(sureAction)
-            RoomRouter.shared.presentAlert(alertVC)
+            roomRouter.presentAlert(alertVC)
         }
         
         if name == .onKickedOutOfRoom {
             interruptClearRoom()
             let alertVC = UIAlertController(title: .kickOffTitleText, message: nil, preferredStyle: .alert)
-            let sureAction = UIAlertAction(title: .alertOkText, style: .default) { action in
+            let sureAction = UIAlertAction(title: .alertOkText, style: .default) { [weak self] action in
+                guard let self = self else { return }
+                self.roomRouter.dismissAllRoomPopupViewController()
+                self.roomRouter.popToRoomEntranceViewController()
             }
             alertVC.addAction(sureAction)
-            RoomRouter.shared.presentAlert(alertVC)
+            roomRouter.presentAlert(alertVC)
         }
         
         if name == .onRequestReceived {
@@ -192,14 +198,16 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                     guard let self = self else { return }
                     // FIXME: - 打开摄像头前需要先设置一个view
                     self.engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-                    self.engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
+                    self.engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) { [weak self] in
+                        guard let self = self else { return }
+                        self.engineManager.roomEngine.startPushLocalVideo()
                     } onError: { code, message in
                         debugPrint("openLocalCamera:code:\(code),message:\(message)")
                     }
                 }
                 alertVC.addAction(declineAction)
                 alertVC.addAction(sureAction)
-                RoomRouter.shared.presentAlert(alertVC)
+                roomRouter.presentAlert(alertVC)
             case .openRemoteMicrophone:
                 let alertVC = UIAlertController(title: .inviteTurnOnAudioText,
                                                 message: "",
@@ -213,14 +221,16 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 }
                 let sureAction = UIAlertAction(title: .agreeText, style: .default) { [weak self] _ in
                     guard let self = self else { return }
-                    self.engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
+                    self.engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) { [weak self] in
+                        guard let self = self else { return }
+                        self.engineManager.roomEngine.startPushLocalAudio()
                     } onError: { code, message in
                         debugPrint("openLocalCamera:code:\(code),message:\(message)")
                     }
                 }
                 alertVC.addAction(declineAction)
                 alertVC.addAction(sureAction)
-                RoomRouter.shared.presentAlert(alertVC)
+                roomRouter.presentAlert(alertVC)
             case .invalidAction:
                 break
             case .connectOtherRoom:
@@ -261,33 +271,11 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                     }
                     alertVC.addAction(declineAction)
                     alertVC.addAction(sureAction)
-                    RoomRouter.shared.presentAlert(alertVC)
+                    roomRouter.presentAlert(alertVC)
                 default: break
                 }
             default: break
             }
-        }
-        if name == .onUserVideoStateChanged {
-            guard let userId = param?["userId"] as? String else { return }
-            guard let streamType = param?["streamType"] as? TUIVideoStreamType else { return }
-            guard let hasVideo = param?["hasVideo"] as? Bool else { return }
-            switch streamType {
-            case .screenStream:
-                engineManager.store.isSomeoneSharing = hasVideo
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: [:])
-            case .cameraStream:
-                guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
-                userModel.hasVideoStream = hasVideo
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
-            default: break
-            }
-        }
-        if name == .onUserAudioStateChanged {
-            guard let userId = param?["userId"] as? String else { return }
-            guard let hasAudio = param?["hasAudio"] as? Bool else { return }
-            guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
-            userModel.hasAudioStream = hasAudio
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
         }
         
         if name == .onSendMessageForUserDisableChanged {
@@ -387,7 +375,7 @@ extension RoomMainViewModel: RoomMainViewFactory {
                                                        param: [
                                                         TUICore_TUIBeautyExtension_BeautyView_BeautyManager: beautyManager,])
         for extensionInfo in beautyInfoArray {
-            let map = extensionInfo.data
+            guard let map = extensionInfo.data as? [String: Any] else { continue }
             guard let view = map[TUICore_TUIBeautyExtension_BeautyView_View] as? UIView else { continue }
             view.isHidden = true
             return view
@@ -411,7 +399,7 @@ extension RoomMainViewModel: RoomMainViewFactory {
         let array = TUICore.getExtensionList(gVideoSeatViewKey, param: ["roomEngine": engineManager.roomEngine, "roomId": roomInfo.roomId])
         var middleView: UIView = UIView(frame: .zero)
         array.forEach { extensionInfo in
-            let map = extensionInfo.data
+            guard let map = extensionInfo.data as? [String:Any] else { return }
             guard let view = map[gVideoSeatViewKey] as? UIView else { return }
             middleView = view
         }

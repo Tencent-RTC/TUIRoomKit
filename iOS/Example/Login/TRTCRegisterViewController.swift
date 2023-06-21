@@ -16,7 +16,7 @@ import TUICore
 class TRTCRegisterViewController: UIViewController {
     
     
-    let loading = UIActivityIndicatorView.init(style: .large)
+    let loading = UIActivityIndicatorView(style: .large)
     
     override func viewDidLoad() {
         super.viewDidLoad()

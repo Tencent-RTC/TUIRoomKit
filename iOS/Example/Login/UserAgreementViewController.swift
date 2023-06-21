@@ -16,14 +16,20 @@ class UserAgreementViewController: UIViewController {
     
     var topPadding: CGFloat = {
         if #available(iOS 11.0, *) {
-            return UIApplication.shared.keyWindow!.safeAreaInsets.top
+            if let window = SceneDelegate.getCurrentWindow() {
+                return window.safeAreaInsets.top
+            }
+            return 0
         }
         return 0
     }()
     
     var bottomPadding: CGFloat = {
         if #available(iOS 11.0, *) {
-            return UIApplication.shared.keyWindow!.safeAreaInsets.top
+            if let window = SceneDelegate.getCurrentWindow() {
+                return window.safeAreaInsets.top
+            }
+            return 0
         }
         return 0
     }()

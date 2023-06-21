@@ -282,6 +282,26 @@ extension EngineEventCenter {
         engineManager.store.inviteSeatMap.removeValue(forKey: userId)
         notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
+    private func userAudioStateChanged(userId: String, hasAudio: Bool) {
+        if userId == currentUser.userId {
+            currentUser.hasAudioStream = hasAudio
+        }
+        guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
+        userModel.hasAudioStream = hasAudio
+        notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+    }
+    private func userVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool) {
+        switch streamType {
+        case .screenStream:
+            engineManager.store.isSomeoneSharing = hasVideo
+            notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: [:])
+        case .cameraStream:
+            guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
+            userModel.hasVideoStream = hasVideo
+            notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+        default: break
+        }
+    }
 }
 
 extension EngineEventCenter: TUIRoomObserver {
@@ -435,6 +455,7 @@ extension EngineEventCenter: TUIRoomObserver {
     }
     
     func onUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool, reason: TUIChangeReason) {
+        userVideoStateChanged(userId: userId, streamType: streamType, hasVideo: hasVideo)
         guard let observers = engineObserverMap[.onUserVideoStateChanged] else { return }
         let param = [
             "userId" : userId,
@@ -448,6 +469,7 @@ extension EngineEventCenter: TUIRoomObserver {
     }
     
     func onUserAudioStateChanged(userId: String, hasAudio: Bool, reason: TUIChangeReason) {
+        userAudioStateChanged(userId: userId, hasAudio: hasAudio)
         guard let observers = engineObserverMap[.onUserAudioStateChanged] else { return }
         let param = [
             "userId" : userId,

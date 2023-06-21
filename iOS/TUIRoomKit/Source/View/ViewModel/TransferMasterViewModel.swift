@@ -13,14 +13,18 @@ protocol TransferMasterViewResponder: NSObject {
 }
 
 class TransferMasterViewModel {
-    var attendeeList: [UserModel]
-    var userId: String
+    var attendeeList: [UserModel] = []
+    var userId: String = ""
     weak var viewResponder: TransferMasterViewResponder? = nil
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
+    let roomRouter: RoomRouter = RoomRouter.shared
     init() {
-        attendeeList = EngineManager.shared.store.attendeeList.filter({ userModel in
-            userModel.userId != EngineManager.shared.store.currentUser.userId
+        attendeeList = self.engineManager.store.attendeeList.filter({ [weak self] userModel in
+            guard let self = self else { return true }
+            return userModel.userId != self.engineManager.store.currentUser.userId
         })
-        userId = ""
     }
     
     func backAction() {
@@ -29,20 +33,24 @@ class TransferMasterViewModel {
     
     func appointMasterAction(sender: UIButton) {
         guard userId != "" else { return }
-        EngineManager.shared.roomEngine.changeUserRole(userId: userId, role: .roomOwner) { [weak self] in
+        engineManager.roomEngine.changeUserRole(userId: userId, role: .roomOwner) { [weak self] in
             guard let self = self else { return }
             self.closeLocalDevice()
-            EngineManager.shared.exitRoom()
+            self.engineManager.exitRoom()
+            self.roomRouter.dismissAllRoomPopupViewController()
+            self.roomRouter.popToRoomEntranceViewController()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.closeLocalDevice()
-            EngineManager.shared.destroyRoom()
+            self.engineManager.destroyRoom()
+            self.roomRouter.dismissAllRoomPopupViewController()
+            self.roomRouter.popToRoomEntranceViewController()
             debugPrint("changeUserRole:code:\(code),message:\(message)")
         }
     }
     
     private func closeLocalDevice() {
-        let roomEngine = EngineManager.shared.roomEngine
+        let roomEngine = engineManager.roomEngine
         roomEngine.closeLocalCamera()
         roomEngine.closeLocalMicrophone()
         roomEngine.stopPushLocalAudio()
@@ -59,7 +67,7 @@ class TransferMasterViewModel {
 extension TransferMasterViewModel: PopUpViewResponder {
     func updateViewOrientation(isLandscape: Bool) {
         viewResponder?.searchControllerChangeActive(isActive: false)
-        attendeeList = EngineManager.shared.store.attendeeList
+        attendeeList = engineManager.store.attendeeList
         viewResponder?.reloadTransferMasterTableView()
     }
     

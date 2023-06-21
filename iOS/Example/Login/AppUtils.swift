@@ -11,13 +11,13 @@ import ImSDK_Plus
 
 // IMSDK APNS ID
 #if DEBUG
-    let timSdkBusiId: UInt32 = 18069
+    let timSdkBusiId: UInt32 = 18_069
 #else
-    let timSdkBusiId: UInt32 = 18070
+    let timSdkBusiId: UInt32 = 18_070
 #endif
 
 class AppUtils: NSObject {
-    @objc public static let shared = AppUtils()
+    @objc static let shared = AppUtils()
     private override init() {}
     
     @objc var appDelegate: AppDelegate {
@@ -25,13 +25,11 @@ class AppUtils: NSObject {
     }
 
     @objc var curUserId: String {
-         get {
         #if NOT_LOGIN
             return ""
         #else
             return V2TIMManager.sharedInstance()?.getLoginUser() ?? ""
         #endif
-        }
     }
 
     //MARK: - UI
