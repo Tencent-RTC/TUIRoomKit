@@ -66,9 +66,9 @@ class TRTCLoginViewController: UIViewController {
     }
     
     #if DEBUG
-    let SdkBusiId: Int32 = 18069
+    let SdkBusiId: Int32 = 18_069
     #else
-    let SdkBusiId: Int32 = 18070
+    let SdkBusiId: Int32 = 18_070
     #endif
     
     func loginIM(complete: @escaping (_ success: Bool)->Void) {
@@ -98,7 +98,7 @@ class TRTCLoginViewController: UIViewController {
     }
     
     func showRegisterVC() {
-        let vc = TRTCRegisterViewController.init()
+        let vc = TRTCRegisterViewController()
         navigationController?.pushViewController(vc, animated: true)
     }
     

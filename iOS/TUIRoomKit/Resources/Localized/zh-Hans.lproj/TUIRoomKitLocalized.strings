@@ -29,7 +29,7 @@
 "TUIRoom.destroy.room.cancel" = "再等等";
 "TUIRoom.ok" = "确认";
 "TUIRoom.cancel" = "取消";
-"TUIRoom.invite.join" = "您可以分享二维码、房间号或链接邀请更多人加入房间";
+"TUIRoom.invite.join" = "您可以分享房间号或链接邀请更多人加入房间";
 "TUIRoom.logout.member.list" = "成员列表";
 "TUIRoom.resolution" = "分辨率";
 "TUIRoom.room.destroy" = "房间已被销毁";
@@ -82,7 +82,7 @@
 "TUIRoom.agree.to.speak" = "主持人邀请您上台发言，上台后可以打开摄像头和麦克风";
 "TUIRoom.decline" = "拒绝";
 "TUIRoom.agree" = "同意";
-"TUIRoom.quick.meeting" = "的快速会议";
+"TUIRoom.quick.meeting" = "快速会议";
 "TUIRoom.agree.all" = "全部同意";
 "TUIRoom.search.meeting.member" = "搜索参会成员";
 "TUIRoom.me" = "我";
@@ -134,3 +134,14 @@
 "TUIRoom.frame.rate.selected" = "帧率选择完毕";
 "TUIRoom.version.too.low" = "系统版本低于12.0，请升级系统";
 "TUIRoom.input.error.room.num.toast" = "请输入正确房间号";
+
+"TUIRoom.quick.conference" = "快速会议";
+"TUIRoom.invite.meeting" = "邀请你进入会议";
+"TUIRoom.enter.meeting" = "进入会议";
+"TUIRoom.already.entered.meeting" = "已入会";
+"TUIRoom.meeting" = "会议";
+"TUIRoom.in.progress" = "进行中";
+"TUIRoom.people.entered.meeting" = "人已入会";
+"TUIRoom.starting.meeting" = "正在发起";
+"TUIRoom.waiting.members.enter.meeting" = "等待成员入会";
+"TUIRoom.meeting.ended" = "会议已结束";

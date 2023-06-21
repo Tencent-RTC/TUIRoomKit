@@ -116,7 +116,7 @@ class TopViewModel {
             totalSeconds += 1
             second = totalSeconds % 60
             minute = (totalSeconds / 60) % 60
-            hour = totalSeconds / 3600
+            hour = totalSeconds / 3_600
         }
         topMenuTimer.tolerance = 0.2
         RunLoop.current.add(topMenuTimer, forMode: .default)

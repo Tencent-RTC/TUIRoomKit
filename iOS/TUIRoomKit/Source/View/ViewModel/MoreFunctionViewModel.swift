@@ -15,6 +15,9 @@ class MoreFunctionViewModel {
     var engineManager: EngineManager {
         return EngineManager.shared
     }
+    var engineEventCenter: EngineEventCenter {
+        return EngineEventCenter.shared
+    }
     
     init() {
         createBottomData()
@@ -22,7 +25,7 @@ class MoreFunctionViewModel {
     
     func createBottomData() {
         //聊天
-        if hasTUIChatItem() {
+        if hasTUIChatItem(), !engineManager.store.isChatAccessRoom {
             let chatItem = ButtonItemData()
             chatItem.normalIcon = "room_chat"
             chatItem.normalTitle = .chatText
@@ -60,15 +63,16 @@ class MoreFunctionViewModel {
     private func hasTUIChatItem() -> Bool {
         return TUICore.getService(TUICore_TUIChatService) != nil
     }
-    
     private func hasBeautyItem() -> Bool {
         return TUICore.getService(TUICore_TUIBeautyService) != nil
     }
     
     func beautyAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        RoomRouter.shared.dismissPopupViewController(viewType: .moreViewType)
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ShowBeautyView, param: [:])
+        RoomRouter.shared.dismissPopupViewController(viewType: .moreViewType) { [weak self] in
+            guard let self = self else { return }
+            self.engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_ShowBeautyView, param: [:])
+        }
     }
     
     func settingAction(sender: UIButton) {

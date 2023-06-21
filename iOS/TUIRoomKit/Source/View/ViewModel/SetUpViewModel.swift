@@ -232,9 +232,8 @@ class SetUpViewModel {
         param.videoResolution = engineManager.store.videoSetting.videoResolution
         param.videoBitrate = Int32(engineManager.store.videoSetting.videoBitrate)
         param.videoFps = Int32(engineManager.store.videoSetting.videoFps)
-        param.resMode = .portrait
         param.enableAdjustRes = true
-        EngineManager.shared.roomEngine.getTRTCCloud().setVideoEncoderParam(param)
+        engineManager.roomEngine.getTRTCCloud().setVideoEncoderParam(param)
     }
     
     func frameRateAction() {
@@ -248,16 +247,16 @@ class SetUpViewModel {
     }
     
     func localMirrorAction(sender: UISwitch) {
-        EngineManager.shared.store.videoSetting.isMirror = sender.isOn
+        engineManager.store.videoSetting.isMirror = sender.isOn
         let params = TRTCRenderParams()
         params.fillMode = .fill
         params.rotation = ._0
-        if EngineManager.shared.store.videoSetting.isMirror {
+        if engineManager.store.videoSetting.isMirror {
             params.mirrorType = .enable
         } else {
             params.mirrorType = .disable
         }
-        EngineManager.shared.roomEngine.getTRTCCloud().setLocalRenderParams(params)
+        engineManager.roomEngine.getTRTCCloud().setLocalRenderParams(params)
     }
     
     func createAudioItem() {
@@ -321,8 +320,7 @@ class SetUpViewModel {
     
     func shareStartAction(sender: UIButton) {
         if #available(iOS 12.0, *) {
-            let roomEngine = EngineManager.shared.roomEngine
-            roomEngine.startScreenCapture(appGroup: appGroupString)
+            engineManager.roomEngine.startScreenCapture(appGroup: appGroupString)
             BroadcastLauncher.launch()
         } else {
             viewResponder?.makeToast(text: .versionLowToastText)

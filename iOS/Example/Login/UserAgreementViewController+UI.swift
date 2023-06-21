@@ -44,7 +44,7 @@ extension UserAgreementViewController {
         
         let agreeBtn = UIButton()
         agreeBtn.setTitle(LoginLocalize(key:"V2.Live.LinkMicNew.agree"), for: .normal)
-        agreeBtn.setTitleColor(UIColor.init(0x0062E3), for: .normal)
+        agreeBtn.setTitleColor(UIColor(0x0062E3), for: .normal)
         view.addSubview(agreeBtn)
         agreeBtn.snp.remakeConstraints { (make) in
             make.width.equalTo(view).dividedBy(2)
@@ -57,7 +57,7 @@ extension UserAgreementViewController {
         
         let unAgreeBtn = UIButton()
         unAgreeBtn.setTitle(LoginLocalize(key:"V2.Live.LinkMicNew.disagree"), for: .normal)
-        unAgreeBtn.setTitleColor(UIColor.init(0x0062E3), for: .normal)
+        unAgreeBtn.setTitleColor(UIColor(0x0062E3), for: .normal)
         view.addSubview(unAgreeBtn)
         unAgreeBtn.snp.remakeConstraints { (make) in
             make.width.equalTo(view).dividedBy(2)

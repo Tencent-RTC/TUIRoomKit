@@ -15,6 +15,7 @@ def tool
   pod 'TUIRoomEngine','>= 1.2.0'
   pod 'TXLiteAVSDK_TRTC'
   pod 'TXAppBasic'
+  pod 'TIMCommon'
 end
 
 # 本地依赖库

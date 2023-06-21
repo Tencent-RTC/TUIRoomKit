@@ -22,6 +22,8 @@ class RoomStore: NSObject {
     var inviteSeatMap: [String:String] = [:]
     var isSomeoneSharing: Bool = false
     var roomSpeechMode: TUISpeechMode
+    var isBanAutoRaise: Bool = false //是否禁止跳转页面
+    var isChatAccessRoom: Bool = false //是否是由TUIChat跳转进来的
     var engineManager: EngineManager {
         EngineManager.shared
     }
@@ -44,6 +46,7 @@ class RoomStore: NSObject {
     }
     
     func refreshStore() {
+        isChatAccessRoom = false
         videoSetting = VideoModel()
         audioSetting = AudioModel()
         roomScene = .meeting

@@ -89,12 +89,13 @@ class TRTCRegisterRootView: UIView {
         checkRegistBtnState()
     }
     
-    public weak var rootVC: TRTCRegisterViewController?
+    weak var rootVC: TRTCRegisterViewController?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardFrameChange(noti:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardFrameChange(noti:)), name:
+                                                UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
     deinit {

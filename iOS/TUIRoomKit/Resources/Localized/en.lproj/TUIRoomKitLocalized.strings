@@ -29,7 +29,7 @@
 "TUIRoom.destroy.room.cancel" = "Cancel";
 "TUIRoom.ok" = "OK";
 "TUIRoom.cancel" = "Cancel";
-"TUIRoom.invite.join" = "You can share QR code, room number or link to invite more people to join the room";
+"TUIRoom.invite.join" = "You can share room number or link to invite more people to join the room";
 "TUIRoom.logout.member.list" = "Participants";
 "TUIRoom.resolution" = "Resolution";
 "TUIRoom.room.destroy" = "The room was closed.";
@@ -134,3 +134,14 @@
 "TUIRoom.frame.rate.selected" = "Frame rate selected";
 "TUIRoom.version.too.low" = "Your system version is below 12.0. Please update.";
 "TUIRoom.input.error.room.num.toast" = "Enter a valid room ID.";
+
+"TUIRoom.quick.conference" = "Quick meeting";
+"TUIRoom.invite.meeting" = "Invite you to a meeting";
+"TUIRoom.enter.meeting" = "Enter the meeting";
+"TUIRoom.already.entered.meeting" = "Already entered the meeting";
+"TUIRoom.meeting" = "Meeting";
+"TUIRoom.in.progress" = "In progress";
+"TUIRoom.people.entered.meeting" = "People have entered the meeting";
+"TUIRoom.starting.meeting" = "Starting meeting";
+"TUIRoom.waiting.members.enter.meeting" = "Waiting for members to enter the meeting";
+"TUIRoom.meeting.ended" = "Meeting ended";

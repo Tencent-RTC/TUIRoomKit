@@ -115,6 +115,7 @@ class CreateRoomViewModel {
         roomInfo.roomId = roomId
         roomInfo.name = currentUser.userName + .videoConferenceText
         roomInfo.speechMode = engineManager.store.roomSpeechMode
+        TUIRoomKit.sharedInstance.banAutoRaiseUiOnce(isBan: false)
         TUIRoomKit.sharedInstance.createRoom(roomInfo: roomInfo, type: .meeting)
     }
     

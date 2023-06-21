@@ -50,7 +50,7 @@ class RoomInfoViewModel {
         
         let roomLinkItem = ListCellItemData()
         roomLinkItem.titleText = .roomLinkText
-        roomLinkItem.messageText = "https://web.sdk.qcloud.com/component/tuiroom/index.html#/" + "#/room?roomId=" +
+        roomLinkItem.messageText = "https://web.sdk.qcloud.com/component/tuiroom/index.html#/" + "room?roomId=" +
         EngineManager.shared.store.roomInfo.roomId
         roomLinkItem.hasButton = true
         roomLinkItem.normalIcon = "room_copy"

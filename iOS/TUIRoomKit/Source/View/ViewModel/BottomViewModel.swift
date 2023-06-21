@@ -69,7 +69,7 @@ class BottomViewModel: NSObject {
         muteAudioItem.selectedIcon = "room_mic_off"
         muteAudioItem.resourceBundle = tuiRoomKitBundle()
         muteAudioItem.buttonType = .muteAudioItemType
-        muteAudioItem.isSelect = true
+        muteAudioItem.isSelect = !currentUser.hasAudioStream
         muteAudioItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.muteAudioAction(sender: button)
@@ -83,7 +83,7 @@ class BottomViewModel: NSObject {
         muteVideoItem.selectedIcon = "room_camera_off"
         muteVideoItem.resourceBundle = tuiRoomKitBundle()
         muteVideoItem.buttonType = .muteVideoItemType
-        muteVideoItem.isSelect = true
+        muteVideoItem.isSelect = !currentUser.hasVideoStream
         muteVideoItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.muteVideoAction(sender: button)
@@ -151,6 +151,8 @@ class BottomViewModel: NSObject {
         } else {
             engineManager.exitRoom()
         }
+        RoomRouter.shared.dismissAllRoomPopupViewController()
+        RoomRouter.shared.popToRoomEntranceViewController()
     }
     
     func muteAudioAction(sender: UIButton) {
