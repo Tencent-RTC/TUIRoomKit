@@ -1,4 +1,5 @@
 <resources>
+    <string name="tuiroomkit_app_running">运行中</string>
     <string name="tuiroomkit_copy_room_id_success">房间号复制成功</string>
     <string name="tuiroomkit_permission_camera_reason_title">%s申请获取相机权限</string>
     <string name="tuiroomkit_permission_camera_reason">需要访问您的相机权限，开启后用于视频互动、秀场直播、视频通话、多人视频通话、多人音视频房间等功能，在您使用美颜功能时，我们会对您实时拍摄的面部的像素信息进行实时智能识别，在识别过程中会实时收集您面部的像素信息，以为您提供更好的美颜效果。</string>
@@ -69,7 +70,7 @@
     <string name="tuiroomkit_meeting_title">的快速会议</string>
     <string name="tuiroomkit_master">主持人</string>
     <string name="tuiroomkit_room_link">房间链接</string>
-    <string name="tuiroomkit_room_tips">您可以分享二维码、房间号或链接邀请更多人加入房间</string>
+    <string name="tuiroomkit_room_tips">您可以分享房间号或链接邀请更多人加入房间</string>
     <string name="tuiroomkit_room_qr_code">房间二维码</string>
     <string name="tuiroomkit_room_qr_code_tip">扫码进入房间</string>
     <string name="tuiroomkit_room_qr_code_save">保存到相册</string>
@@ -130,4 +131,21 @@
     <string name="tuiroomkit_toast_raised_hand">您已举手，请等待主持人操作</string>
     <string name="tuiroomkit_toast_hands_down">您已将手放下</string>
     <string name="tuiroomkit_toast_invite_audience_to_stage">已向观众发出上台邀请</string>
+    <string name="tuiroomkit_room_msg_display_suffix">的快速会议</string>
+    <string name="tuiroomkit_chat_access_room">快速会议</string>
+    <string name="tuiroomkit_room_msg_meeting">会议</string>
+    <string name="tuiroomkit_room_msg_meeting_in_progress">会议 &#183; 进行中</string>
+    <string name="tuiroomkit_chat_access_room_creating">正在发起...</string>
+    <string name="tuiroomkit_chat_access_room_ended">会议已结束</string>
+    <string name="tuiroomkit_room_msg_members_has_joined"> 人已入会</string>
+    <string name="tuiroomkit_room_msg_join">进入会议</string>
+    <string name="tuiroomkit_room_msg_joined">已入会</string>
+    <string name="tuiroomkit_room_msg_waiting_for_members">等待成员入会</string>
+    <string name="tuiroomkit_chat_access_room_invite_to_join">邀请您进入会议</string>
+    <string name="tuiroomkit_chat_access_room_invite_accept">接受</string>
+    <string name="tuiroomkit_chat_access_room_invite_reject">拒绝</string>
+    <string name="tuiroomkit_chat_access_room_extension_settings">快速会议设置</string>
+    <string name="tuiroomkit_chat_access_room_extension_settings_microphone">入会开启麦克风</string>
+    <string name="tuiroomkit_chat_access_room_extension_settings_camera">入会开启摄像头</string>
+    <string name="tuiroomkit_can_not_join_room_tip">音视频已被其他功能占用，所以无法加入会议</string>
 </resources>

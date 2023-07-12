@@ -32,7 +32,7 @@ public abstract class BaseBottomDialog extends BottomSheetDialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
-        bottomSheetView = findViewById(R.id.design_bottom_sheet);
+        bottomSheetView = findViewById(com.google.android.material.R.id.design_bottom_sheet);
         if (bottomSheetView != null) {
             mBehavior = BottomSheetBehavior.from(bottomSheetView);
         }
@@ -90,7 +90,7 @@ public abstract class BaseBottomDialog extends BottomSheetDialog {
         int resId = getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                 ? R.drawable.tuiroomkit_bg_bottom_dialog_black_landscape
                 : R.drawable.tuiroomkit_bg_bottom_dialog_black_portrait;
-        getWindow().findViewById(R.id.design_bottom_sheet)
+        getWindow().findViewById(com.google.android.material.R.id.design_bottom_sheet)
                 .setBackgroundResource(resId);
     }
 }

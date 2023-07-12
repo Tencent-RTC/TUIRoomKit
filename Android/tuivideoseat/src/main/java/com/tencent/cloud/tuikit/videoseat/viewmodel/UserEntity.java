@@ -1,6 +1,5 @@
 package com.tencent.cloud.tuikit.videoseat.viewmodel;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
@@ -18,6 +17,7 @@ public class UserEntity {
     private boolean isCameraAvailable;
     private boolean isScreenShareAvailable;
     private boolean isVideoPlaying;
+    private TUIRoomDefine.VideoStreamType videoStreamType;
 
     private TUIVideoView       mRoomVideoView;
     private TUIRoomDefine.Role role;
@@ -126,6 +126,12 @@ public class UserEntity {
         isVideoPlaying = videoPlaying;
     }
 
+    public TUIRoomDefine.VideoStreamType getVideoStreamType() {
+        return videoStreamType;
+    }
+    public void setVideoStreamType(TUIRoomDefine.VideoStreamType videoStreamType) {
+        this.videoStreamType = videoStreamType;
+    }
     public boolean equals(UserEntity userEntity) {
         if (userEntity == null) {
             return false;
@@ -146,6 +152,7 @@ public class UserEntity {
         copyEntity.setAudioAvailable(isAudioAvailable);
         copyEntity.setCameraAvailable(isCameraAvailable);
         copyEntity.setScreenShareAvailable(isScreenShareAvailable);
+        copyEntity.setVideoStreamType(videoStreamType);
         copyEntity.role = role;
         return copyEntity;
     }

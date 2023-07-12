@@ -10,8 +10,8 @@ import androidx.appcompat.widget.AppCompatImageButton;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.view.base.UserBaseAdapter;
-import com.tencent.liteav.basic.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 

@@ -3,9 +3,6 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="read_dot_bg">#f74c31</color>
-    <color name="core_title_bar_text_bg_serious">#FFFFFFFF</color>
-    <color name="core_title_bar_text_bg_lively">#FFFFFFFF</color>
-    <color name="core_title_bar_text_bg_light">#FF000000</color>
     <color name="font_blue">#066fff</color>
 
 </resources>

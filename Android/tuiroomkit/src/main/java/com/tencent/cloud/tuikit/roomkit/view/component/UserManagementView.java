@@ -12,7 +12,7 @@ import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.UserManagementViewModel;
-import com.tencent.liteav.basic.ImageLoader;
+import com.tencent.cloud.tuikit.videoseat.ui.utils.ImageLoader;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 

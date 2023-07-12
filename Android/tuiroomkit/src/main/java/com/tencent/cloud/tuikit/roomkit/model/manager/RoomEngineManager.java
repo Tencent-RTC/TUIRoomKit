@@ -4,16 +4,20 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.blankj.utilcode.util.ToastUtils;
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomObserver;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
+import com.tencent.cloud.tuikit.roomkit.utils.RoomPermissionUtil;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.TUIRoomKitImpl;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
+import com.tencent.imsdk.v2.V2TIMManager;
+import com.tencent.imsdk.v2.V2TIMSDKConfig;
+import com.tencent.qcloud.tuicore.permission.PermissionCallback;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 public class RoomEngineManager {
     private static final String TAG = "RoomEngineManager";
@@ -31,7 +35,7 @@ public class RoomEngineManager {
 
     public static RoomEngineManager sharedInstance(Context context) {
         if (sInstance == null) {
-            synchronized (RoomEngineManager.class) {
+            synchronized (TUIRoomKitImpl.class) {
                 if (sInstance == null) {
                     sInstance = new RoomEngineManager(context);
                 }
@@ -62,6 +66,7 @@ public class RoomEngineManager {
     public void login(final int sdkAppId, final String userId, String userSig) {
         Log.i(TAG, "setup sdkAppId: " + sdkAppId + " userSig is empty: "
                 + TextUtils.isEmpty(userSig + " userId: " + userId));
+        V2TIMManager.getInstance().initSDK(mContext, sdkAppId, new V2TIMSDKConfig());
         TUIRoomEngine.login(mContext, sdkAppId, userId, userSig, new TUIRoomDefine.ActionCallback() {
             @Override
             public void onSuccess() {
@@ -80,6 +85,9 @@ public class RoomEngineManager {
                 }
             }
         });
+        mRoomStore.loginInfo.userId = userId;
+        mRoomStore.loginInfo.sdkAppId = sdkAppId;
+        mRoomStore.loginInfo.userSig = userSig;
     }
 
     public void logout() {
@@ -143,13 +151,31 @@ public class RoomEngineManager {
 
             @Override
             public void onError(TUICommonDefine.Error code, String message) {
-                ToastUtils.showShort("code: " + code + " message:" + message);
+                ToastUtil.toastShortMessage("code: " + code + " message:" + message);
                 Log.e(TAG, "createRoom onError code : " + code + " message:" + message);
                 if (mListener != null) {
                     mListener.onCreateEngineRoom(-1, message, null);
                 }
             }
         });
+    }
+
+    private void startLocalMicrophoneIfNeeded(final RoomInfo roomInfo) {
+        if (TUIRoomDefine.Role.GENERAL_USER.equals(mRoomStore.userModel.role)
+                && TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT.equals(mRoomStore.roomInfo.speechMode)) {
+            return;
+        }
+        if (!roomInfo.isOpenMicrophone || roomInfo.isMicrophoneDisableForAllUser) {
+            return;
+        }
+        PermissionCallback callback = new PermissionCallback() {
+            @Override
+            public void onGranted() {
+                mRoomEngine.openLocalMicrophone(TUIRoomDefine.AudioQuality.DEFAULT, null);
+                mRoomStore.roomInfo.isOpenMicrophone = true;
+            }
+        };
+        RoomPermissionUtil.requestAudioPermission(mContext, callback);
     }
 
     public void enterRoom(final RoomInfo roomInfo) {
@@ -189,6 +215,7 @@ public class RoomEngineManager {
                     role = TUIRoomDefine.Role.ROOM_OWNER;
                 }
                 mRoomStore.userModel.role = role;
+                startLocalMicrophoneIfNeeded(roomInfo);
                 if (TUIRoomDefine.SpeechMode.FREE_TO_SPEAK.equals(roomInfo.speechMode)) {
                     if (mListener != null) {
                         mListener.onEnterEngineRoom(0, "success", roomInfo);
@@ -235,7 +262,7 @@ public class RoomEngineManager {
             @Override
             public void onError(TUICommonDefine.Error code, String message) {
                 Log.e(TAG, "enterRoom onError code : " + code + " message:" + message);
-                ToastUtils.showShort("code: " + code + " message:" + message);
+                ToastUtil.toastShortMessage("code: " + code + " message:" + message);
                 if (mListener != null) {
                     mListener.onEnterEngineRoom(-1, message, null);
                 }
@@ -251,8 +278,6 @@ public class RoomEngineManager {
             return;
         }
         TUIRoomEngine roomEngine = getRoomEngine();
-        roomEngine.stopPushLocalVideo();
-        roomEngine.stopPushLocalAudio();
         roomEngine.closeLocalCamera();
         roomEngine.closeLocalMicrophone();
         if (TUIRoomDefine.Role.ROOM_OWNER.equals(mRoomStore.userModel.role)) {

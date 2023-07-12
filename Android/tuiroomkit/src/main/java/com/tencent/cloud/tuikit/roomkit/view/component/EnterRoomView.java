@@ -13,9 +13,9 @@ import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
 
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.EnterRoomViewModel;
 import com.tencent.cloud.tuikit.roomkit.view.settingitem.SwitchSettingItem;
-import com.tencent.liteav.basic.UserModelManager;
 
 import java.util.ArrayList;
 

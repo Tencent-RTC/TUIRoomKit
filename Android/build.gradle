@@ -30,7 +30,6 @@ task clean(type: Delete) {
 }
 
 ext {
-    liteavSdk = "com.tencent.liteav:LiteAVSDK_TRTC:11.2.0.13154"
     roomEngineSdk = "com.tencent.liteav.tuikit:tuiroomengine:1.3.4.17"
     imSdk = "com.tencent.imsdk:imsdk-plus:7.2.4146"
 }

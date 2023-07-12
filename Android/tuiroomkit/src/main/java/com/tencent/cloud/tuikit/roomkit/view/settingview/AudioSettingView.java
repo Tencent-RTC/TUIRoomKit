@@ -12,13 +12,13 @@ import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.blankj.utilcode.util.ToastUtils;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.entity.ExtensionSettingEntity;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ExtensionSettingManager;
 import com.tencent.cloud.tuikit.roomkit.view.settingitem.BaseSettingItem;
 import com.tencent.cloud.tuikit.roomkit.view.settingitem.SeekBarSettingItem;
 import com.tencent.cloud.tuikit.roomkit.view.settingitem.SwitchSettingItem;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -117,7 +117,7 @@ public class AudioSettingView extends CoordinatorLayout {
                         if (mListener != null) {
                             mListener.onStartFileDumping(mRecordFilePath);
                         }
-                        ToastUtils.showShort(getContext().getString(R.string.tuiroomkit_btn_start_recording));
+                        ToastUtil.toastShortMessage(getContext().getString(R.string.tuiroomkit_btn_start_recording));
                     }
                 } else {
                     if (mExtensionSettingManager.getExtensionSetting().recording) {
@@ -127,8 +127,9 @@ public class AudioSettingView extends CoordinatorLayout {
                         ExtensionSettingEntity entity = mExtensionSettingManager.getExtensionSetting();
                         entity.recording = false;
                         mExtensionSettingManager.setExtensionSetting(entity);
-                        ToastUtils.showLong(getContext().getString(R.string.tuiroomkit_toast_recording_file_path_copied,
-                                mRecordFilePath));
+                        ToastUtil.toastLongMessage(
+                                getContext().getString(R.string.tuiroomkit_toast_recording_file_path_copied,
+                                        mRecordFilePath));
                         ClipboardManager cm = (ClipboardManager) getContext().getSystemService(
                                 Context.CLIPBOARD_SERVICE);
                         ClipData mClipData = ClipData.newPlainText("path", mRecordFilePath);

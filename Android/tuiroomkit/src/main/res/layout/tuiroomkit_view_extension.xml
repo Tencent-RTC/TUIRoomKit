@@ -8,7 +8,7 @@
     android:paddingBottom="61dp">
 
     <LinearLayout
-        android:id="@+id/ll_item_chat"
+        android:id="@+id/ll_item_setting"
         android:layout_width="48dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -20,21 +20,19 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/ll_chat_icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginBottom="6dp"
-            android:background="@drawable/tuiroomkit_bg_radius_light_black"
+            android:background="@drawable/tuiroomkit_bg_bottom_item_black"
             android:gravity="center">
 
             <ImageView
-                android:id="@+id/image_chat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
                 android:maxWidth="24dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/tuiroomkit_ic_chat" />
+                android:src="@drawable/tuiroomkit_ic_setting" />
 
         </LinearLayout>
 
@@ -45,7 +43,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="6dp"
             android:gravity="center"
-            android:text="@string/tuiroomkit_item_chat"
+            android:text="@string/tuiroomkit_settings"
             android:textColor="@color/tuiroomkit_color_text_light_grey"
             android:textSize="12sp" />
     </LinearLayout>
@@ -56,11 +54,12 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/ll_item_chat"
-        app:layout_constraintEnd_toStartOf="@+id/ll_item_setting"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/ll_item_setting"
+        app:layout_constraintEnd_toStartOf="@+id/ll_item_chat"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/ll_item_chat"
-        app:layout_constraintTop_toTopOf="@+id/ll_item_chat">
+        app:layout_constraintStart_toEndOf="@+id/ll_item_setting"
+        app:layout_constraintTop_toTopOf="@+id/ll_item_setting">
 
         <LinearLayout
             android:id="@+id/ll_beauty_icon"
@@ -94,31 +93,34 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_item_setting"
+        android:id="@+id/ll_item_chat"
         android:layout_width="48dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/ll_item_beauty"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@+id/ll_item_beauty"
-        app:layout_constraintTop_toTopOf="@+id/ll_item_beauty">
+        app:layout_constraintTop_toTopOf="@+id/ll_item_setting"
+        app:layout_constraintBottom_toBottomOf="@id/ll_item_setting">
 
         <LinearLayout
+            android:id="@+id/ll_chat_icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginBottom="6dp"
-            android:background="@drawable/tuiroomkit_bg_bottom_item_black"
+            android:background="@drawable/tuiroomkit_bg_radius_light_black"
             android:gravity="center">
 
             <ImageView
+                android:id="@+id/image_chat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
                 android:maxWidth="24dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/tuiroomkit_ic_setting" />
+                android:src="@drawable/tuiroomkit_ic_chat" />
         </LinearLayout>
 
         <TextView
@@ -128,7 +130,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="6dp"
             android:gravity="center"
-            android:text="@string/tuiroomkit_settings"
+            android:text="@string/tuiroomkit_item_chat"
             android:textColor="@color/tuiroomkit_color_text_light_grey"
             android:textSize="12sp" />
 

@@ -1,11 +1,9 @@
 package com.tencent.cloud.tuikit.roomkit.viewmodel;
 
-import static com.tencent.liteav.debug.GenerateTestUserSig.XMAGIC_LICENSE_KEY;
-import static com.tencent.liteav.debug.GenerateTestUserSig.XMAGIC_LICENSE_URL;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -19,12 +17,11 @@ import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
+import com.tencent.cloud.tuikit.roomkit.utils.IntentUtils;
 import com.tencent.cloud.tuikit.roomkit.view.component.MoreFunctionView;
 import com.tencent.imsdk.v2.V2TIMCallback;
 import com.tencent.imsdk.v2.V2TIMConversation;
 import com.tencent.imsdk.v2.V2TIMManager;
-import com.tencent.liteav.basic.IntentUtils;
-import com.tencent.liteav.debug.GenerateTestUserSig;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
@@ -66,8 +63,8 @@ public class MoreFunctionViewModel implements RoomEventCenter.RoomEngineEventRes
     public View getBeautyView() {
         Map<String, Object> map = new HashMap<>();
         map.put(TUIConstants.TUIBeauty.PARAM_NAME_CONTEXT, mContext);
-        map.put(TUIConstants.TUIBeauty.PARAM_NAME_LICENSE_URL, XMAGIC_LICENSE_URL);
-        map.put(TUIConstants.TUIBeauty.PARAM_NAME_LICENSE_KEY, XMAGIC_LICENSE_KEY);
+        // map.put(TUIConstants.TUIBeauty.PARAM_NAME_LICENSE_URL, XMAGIC_LICENSE_URL);
+        // map.put(TUIConstants.TUIBeauty.PARAM_NAME_LICENSE_KEY, XMAGIC_LICENSE_KEY);
         TUICore.callService(TUIConstants.TUIBeauty.SERVICE_NAME, TUIConstants.TUIBeauty.METHOD_INIT_XMAGIC, map);
 
         HashMap<String, Object> beautyParaMap = new HashMap<>();
@@ -129,10 +126,12 @@ public class MoreFunctionViewModel implements RoomEventCenter.RoomEngineEventRes
 
     public void showChatView() {
         if (!TUILogin.isUserLogined()) {
+            Log.d(TAG, "TUILogin.login sdkAppId=" + mRoomStore.loginInfo.sdkAppId + " userId="
+                    + mRoomStore.loginInfo.userId + " userSig=" + TextUtils.isEmpty(mRoomStore.loginInfo.userSig));
             TUILogin.login(mContext.getApplicationContext(),
-                    GenerateTestUserSig.SDKAPPID,
-                    mRoomStore.userModel.userId,
-                    GenerateTestUserSig.genTestUserSig(mRoomStore.userModel.userId),
+                    mRoomStore.loginInfo.sdkAppId,
+                    mRoomStore.loginInfo.userId,
+                    mRoomStore.loginInfo.userSig,
                     new TUICallback() {
                         @Override
                         public void onSuccess() {
@@ -141,7 +140,8 @@ public class MoreFunctionViewModel implements RoomEventCenter.RoomEngineEventRes
 
                         @Override
                         public void onError(int errorCode, String errorMessage) {
-                            Log.e(TAG, "TUIChat Login error,code:" + errorCode + ",msg:" + errorMessage);
+                            Log.e(TAG,
+                                    "TUILogin.login onError errorCode=" + errorCode + " errorMessage=" + errorMessage);
                         }
                     });
         } else {
@@ -150,6 +150,7 @@ public class MoreFunctionViewModel implements RoomEventCenter.RoomEngineEventRes
     }
 
     private void showTUIChat() {
+        Log.d(TAG, "showTUIChat");
         Intent intent = new Intent();
         intent.setClassName(mContext, "com.tencent.qcloud.tuikit.tuichat.classicui.page.TUIGroupChatActivity");
         intent.putExtra(TUIConstants.TUIChat.CHAT_TYPE, V2TIMConversation.V2TIM_GROUP);

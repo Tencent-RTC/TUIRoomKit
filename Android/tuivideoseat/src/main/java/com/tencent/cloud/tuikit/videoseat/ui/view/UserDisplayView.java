@@ -76,11 +76,11 @@ public class UserDisplayView extends FrameLayout {
         if (model == null) {
             return;
         }
-        mMemberEntity = model;
         addRoomVideoView(model);
         mViewBackground.setVisibility(model.isVideoAvailable() ? GONE : VISIBLE);
         mUserHeadImg.setVisibility(model.isVideoAvailable() ? GONE : VISIBLE);
-        ImageLoader.loadImage(mContext, mUserHeadImg, model.getUserAvatar(), R.drawable.tuivideoseat_head);
+        updateUserAvatarIfNeeded(mMemberEntity, model);
+
         mUserNameTv.setText(model.getUserName());
         enableVolumeEffect(model.isAudioAvailable());
         updateVolumeEffect(model.getAudioVolume());
@@ -90,6 +90,23 @@ public class UserDisplayView extends FrameLayout {
         int backGroundId = R.drawable.tuivideoseat_talk_bg_round;
         mTalkView.setBackground(mContext.getResources().getDrawable(backGroundId));
         mTopLayout.setVisibility(VISIBLE);
+
+        mMemberEntity = model;
+    }
+
+    private void updateUserAvatarIfNeeded(UserEntity oldUser, UserEntity newUser) {
+        if (newUser == null) {
+            return;
+        }
+        if (oldUser == null) {
+            ImageLoader.loadImage(mContext, mUserHeadImg, newUser.getUserAvatar(), R.drawable.tuivideoseat_head);
+            return;
+        }
+        if (oldUser.getUserId().equals(newUser.getUserId()) && oldUser.getUserAvatar()
+                .equals(newUser.getUserAvatar())) {
+            return;
+        }
+        ImageLoader.loadImage(mContext, mUserHeadImg, newUser.getUserAvatar(), R.drawable.tuivideoseat_head);
     }
 
     private void addRoomVideoView(UserEntity userEntity) {

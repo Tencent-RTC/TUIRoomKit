@@ -1,4 +1,5 @@
 <resources>
+    <string name="tuiroomkit_app_running">Running</string>
     <string name="tuiroomkit_copy_room_id_success">Room ID copied successfully.</string>
     <string name="tuiroomkit_permission_mic_reason_title">%s applies for access to the microphone</string>
     <string name="tuiroomkit_permission_mic_reason">Needs access to your microphone, and it can be used for functions such as Interactive Video Streaming, Show Live, Video Call, Group Video Call, Multi-person audio and video room, etc.</string>
@@ -69,7 +70,7 @@
     <string name="tuiroomkit_meeting_title">\'s quick meeting</string>
     <string name="tuiroomkit_master">Master</string>
     <string name="tuiroomkit_room_link">Room Link</string>
-    <string name="tuiroomkit_room_tips">You can share QR code, room number or link to invite more people to join the room</string>
+    <string name="tuiroomkit_room_tips">You can share room number or link to invite more people to join the room</string>
     <string name="tuiroomkit_room_qr_code">Room QR code</string>
     <string name="tuiroomkit_room_qr_code_tip">Scan the code to enter the room</string>
     <string name="tuiroomkit_room_qr_code_save">Save into the album</string>
@@ -130,4 +131,21 @@
     <string name="tuiroomkit_toast_raised_hand">You have raised your hand, please wait for the master to operate</string>
     <string name="tuiroomkit_toast_hands_down">You put your hands down</string>
     <string name="tuiroomkit_toast_invite_audience_to_stage">The audience has been invited to the stage</string>
+    <string name="tuiroomkit_room_msg_display_suffix">\'s fast meeting</string>
+    <string name="tuiroomkit_chat_access_room">Fast meeting</string>
+    <string name="tuiroomkit_room_msg_meeting">Meeting</string>
+    <string name="tuiroomkit_room_msg_meeting_in_progress">Meeting &#183; in progress</string>
+    <string name="tuiroomkit_chat_access_room_creating">Starting fast meeting</string>
+    <string name="tuiroomkit_chat_access_room_ended">Fast meeting ended</string>
+    <string name="tuiroomkit_room_msg_members_has_joined"> person has joined</string>
+    <string name="tuiroomkit_room_msg_join">Join</string>
+    <string name="tuiroomkit_room_msg_joined">Joined</string>
+    <string name="tuiroomkit_room_msg_waiting_for_members">Waiting for members</string>
+    <string name="tuiroomkit_chat_access_room_invite_to_join">Invites you to a meeting</string>
+    <string name="tuiroomkit_chat_access_room_invite_accept">Accept</string>
+    <string name="tuiroomkit_chat_access_room_invite_reject">Reject</string>
+    <string name="tuiroomkit_chat_access_room_extension_settings">Fast meeting settings</string>
+    <string name="tuiroomkit_chat_access_room_extension_settings_microphone">Join the conference and turn on the microphone</string>
+    <string name="tuiroomkit_chat_access_room_extension_settings_camera">Join the meeting and turn on the camera</string>
+    <string name="tuiroomkit_can_not_join_room_tip">Audio and video are occupied by other functions, so cannot join the meeting</string>
 </resources>

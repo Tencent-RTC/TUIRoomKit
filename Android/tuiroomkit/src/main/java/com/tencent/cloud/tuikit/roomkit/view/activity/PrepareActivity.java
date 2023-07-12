@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.view.component.PrepareView;
-import com.tencent.liteav.basic.UserModelManager;
 
 import java.util.Map;
 
