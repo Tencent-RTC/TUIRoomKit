@@ -16,6 +16,9 @@ import TUIRoomEngine
 
 protocol TUIVideoSeatViewResponder: AnyObject {
     func reloadData()
+    func insertItems(at indexPaths: [IndexPath])
+    func deleteItems(at indexPaths: [IndexPath])
+    func reloadItems(at indexPaths: [IndexPath])
 
     func getSeatVideoRenderView(_ item: VideoSeatItem) -> UIView?
 
@@ -43,21 +46,30 @@ class TUIVideoSeatViewModel: NSObject {
     private var speakerItem: VideoSeatItem?
     // 小画面item
     private var smallItem: VideoSeatItem?
-
+    private var userNoExistMap: [String: TUIUserInfo] = [:]
     private var isSwitchPosition: Bool = false
+    private var itemStreamType: TUIVideoStreamType {
+        if listSeatItem.filter({ $0.hasVideoStream }).count > 5 {
+            return .cameraStreamLow
+        } else {
+            return .cameraStream
+        }
+    }
 
     var listSeatItem: [VideoSeatItem] = []
 
     private var isHasVideoStream: Bool {
-        guard videoSeatItems.firstIndex(where: { $0.isHasVideoStream }) != nil else { return false }
-        return true
+        return videoSeatItems.firstIndex(where: { $0.isHasVideoStream }) != nil
     }
 
     private var isHasScreenStream: Bool {
-        guard videoSeatItems.firstIndex(where: { $0.hasScreenStream }) != nil else { return false }
-        return true
+        return videoSeatItems.firstIndex(where: { $0.hasScreenStream }) != nil
     }
 
+    private var isNeedReloadStream: Bool {
+        return videoSeatItems.firstIndex(where: { $0.cell != nil }) == nil
+    }
+    
     weak var viewResponder: TUIVideoSeatViewResponder?
     var videoSeatViewType: TUIVideoSeatViewType = .equallyDividedType
     var roomInfo: RoomInfo
@@ -109,60 +121,54 @@ extension TUIVideoSeatViewModel {
     }
 
     func startPlayVideo(item: VideoSeatItem, renderView: UIView?) {
+        guard let renderView = renderView else { return }
         if item.userId == currentUserId {
             roomEngine?.setLocalVideoView(streamType: item.streamType, view: renderView)
         } else {
-            let renderParams = TRTCRenderParams()
-            renderParams.fillMode = (item.streamType == .screenStream) ? .fit : .fill
-            let streamType: TRTCVideoStreamType = (item.streamType == .screenStream) ? .sub : .big
-            roomEngine?.getTRTCCloud().setRemoteRenderParams(item.userId, streamType: streamType, params: renderParams)
+            item.updateStreamType(streamType: itemStreamType)
             roomEngine?.setRemoteVideoView(userId: item.userId, streamType: item.streamType, view: renderView)
             roomEngine?.startPlayRemoteVideo(userId: item.userId, streamType: item.streamType, onPlaying: { _ in
-
+                debugPrint("------ onPlaying ")
             }, onLoading: { _ in
-
-            }, onError: { _, _, _ in
-
+                debugPrint("------ onLoading ")
+            }, onError: { userId, code, message in
+                debugPrint("------ onError onError:\(userId) code:\(code) message:\(message)")
             })
         }
     }
 
     func stopPlayVideo(item: VideoSeatItem) {
-        if item.userId == currentUserId {
-            roomEngine?.setLocalVideoView(streamType: item.streamType, view: nil)
-        } else {
-            roomEngine?.setRemoteVideoView(userId: item.userId, streamType: item.streamType, view: nil)
+        unbindCell(item: item)
+        if item.userId != currentUserId {
+            if item.streamType != .screenStream {
+                roomEngine?.stopPlayRemoteVideo(userId: item.userId, streamType: .cameraStreamLow)
+            }
             roomEngine?.stopPlayRemoteVideo(userId: item.userId, streamType: item.streamType)
         }
     }
 
-    func isNeedStopPlayVideo(item: VideoSeatItem, currentPageIndex: Int) -> Bool {
-        // currentPageIndex : 0,1,2,3
-        if currentPageIndex < 0 {
-            return true
+    func unbindCell(item: VideoSeatItem) {
+        if viewResponder?.getSeatVideoRenderView(item) != nil {
+            return
         }
-        let cellCount = (videoSeatViewType == .pureAudioType) ? 9 : 6
-        guard let seatItemIndex = listSeatItem.firstIndex(where: { $0 == item }) else {
-            if currentPageIndex == 0 {
-                return false
-            }
-            return true
-        }
-        var beginIndex = 0
-        var endIndex = 0
-        if videoSeatViewType == .speechType {
-            if currentPageIndex > 0 {
-                beginIndex = 1 + (currentPageIndex - 1) * cellCount
-            }
-            endIndex = 1 + currentPageIndex * cellCount
+        if item.userId == currentUserId {
+            roomEngine?.setLocalVideoView(streamType: item.streamType, view: nil)
         } else {
-            beginIndex = currentPageIndex * cellCount
-            endIndex = (currentPageIndex + 1) * cellCount
+            if item.streamType != .screenStream {
+                roomEngine?.setRemoteVideoView(userId: item.userId, streamType: .cameraStreamLow, view: nil)
+            }
+            roomEngine?.setRemoteVideoView(userId: item.userId, streamType: item.streamType, view: nil)
         }
-        if beginIndex <= seatItemIndex && seatItemIndex < endIndex {
-            return false
-        } else {
-            return true
+    }
+
+    func clearSubscribeVideoStream(items: [VideoSeatItem]) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            for item in items {
+                if self.viewResponder?.getSeatVideoRenderView(item) == nil {
+                    self.stopPlayVideo(item: item)
+                }
+            }
         }
     }
 }
@@ -177,6 +183,7 @@ extension TUIVideoSeatViewModel {
             self.viewResponder?.updateSeatItem(seatItem)
             if userInfo.hasVideoStream {
                 self.reloadSeatItems()
+                self.startPlayVideo(item: seatItem, renderView: self.viewResponder?.getSeatVideoRenderView(seatItem))
             } else {
                 self.stopPlayVideo(item: seatItem)
             }
@@ -211,6 +218,11 @@ extension TUIVideoSeatViewModel {
                 self.asyncUserInfo(seatItem)
                 if seatItem.userId == self.roomInfo.ownerId {
                     seatItem.userRole = .roomOwner
+                }
+                if let userInfo = self.userNoExistMap[seatItem.userId] {
+                    seatItem.hasVideoStream = userInfo.hasVideoStream
+                    seatItem.hasScreenStream = userInfo.hasScreenStream
+                    seatItem.hasAudioStream = userInfo.hasAudioStream
                 }
                 localSeatList.append(seatItem)
             }
@@ -384,11 +396,10 @@ extension TUIVideoSeatViewModel {
     private func reloadSeatItems() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            let type = self.videoSeatViewType
+            let lastListSeatItem = Array(self.listSeatItem)
             self.refreshListSeatItem()
-            CATransaction.begin()
-            CATransaction.setDisableActions(true)
-            self.viewResponder?.reloadData()
-            CATransaction.commit()
+            self.updateCollectionView(type, lastListSeatItem)
             if self.videoSeatViewType == .largeSmallWindowType {
                 self.speakerItem = nil
                 self.shareItem = nil
@@ -425,11 +436,46 @@ extension TUIVideoSeatViewModel {
             viewResponder?.updateMiniscreenVolume(smallItem)
         }
     }
+
+    private func updateCollectionView(_ type: TUIVideoSeatViewType, _ lastList: [VideoSeatItem]) {
+        if type != videoSeatViewType {
+            viewResponder?.reloadData()
+        } else {
+            let count = lastList.count
+            let diffItem = listSeatItem.count - count
+            var indexPaths: [IndexPath] = []
+            if diffItem > 0 {
+                for i in count ... (count + diffItem - 1) {
+                    indexPaths.append(IndexPath(item: i, section: 0))
+                }
+                viewResponder?.insertItems(at: indexPaths)
+            } else if diffItem < 0 {
+                for i in (count + diffItem + 1) ... count {
+                    indexPaths.append(IndexPath(item: i - 1, section: 0))
+                }
+                viewResponder?.deleteItems(at: indexPaths)
+            }
+            indexPaths = []
+            for i in 0 ... min(max(count - 1, 0), max(listSeatItem.count - 1, 0)) {
+                if lastList.count > i && listSeatItem.count > i && lastList[i] != listSeatItem[i] {
+                    indexPaths.append(IndexPath(item: i, section: 0))
+                }
+            }
+            if indexPaths.count > 0 {
+                viewResponder?.reloadItems(at: indexPaths)
+            } else if diffItem == 0 && isNeedReloadStream {
+                viewResponder?.reloadData()
+            }
+        }
+    }
 }
 
 extension TUIVideoSeatViewModel: TUIRoomObserver {
     func onUserAudioStateChanged(userId: String, hasAudio: Bool, reason: TUIChangeReason) {
         guard let seatItem = getSeatItem(userId) else {
+            let userInfo = userNoExistMap[userId] ?? TUIUserInfo()
+            userInfo.hasAudioStream = hasAudio
+            userNoExistMap[userId] = userInfo
             return
         }
         // 同步刷新 分享和speaker的view的音量
@@ -459,7 +505,20 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
     }
 
     public func onUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool, reason: TUIChangeReason) {
+        if hasVideo {
+            let renderParams = TRTCRenderParams()
+            renderParams.fillMode = (streamType == .screenStream) ? .fit : .fill
+            let trtcStreamType: TRTCVideoStreamType = (streamType == .screenStream) ? .sub : .big
+            roomEngine?.getTRTCCloud().setRemoteRenderParams(userId, streamType: trtcStreamType, params: renderParams)
+        }
         guard var seatItem = getSeatItem(userId) else {
+            let userInfo = userNoExistMap[userId] ?? TUIUserInfo()
+            if streamType == .screenStream {
+                userInfo.hasScreenStream = hasVideo
+            } else {
+                userInfo.hasVideoStream = hasVideo
+            }
+            userNoExistMap[userId] = userInfo
             return
         }
         if streamType == .cameraStream {

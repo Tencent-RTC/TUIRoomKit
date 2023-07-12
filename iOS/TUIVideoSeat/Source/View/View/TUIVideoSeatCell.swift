@@ -127,7 +127,9 @@ extension TUIVideoSeatCell {
     func updateUIVolume(item: VideoSeatItem) {
         userInfoView.updateUserVolume(hasAudio: item.hasAudioStream, volume: item.audioVolume)
         if item.audioVolume > 0 && item.hasAudioStream {
-            scrollRenderView.layer.borderColor = UIColor(0xA5FE33).cgColor
+            if item.type != .share {
+                scrollRenderView.layer.borderColor = UIColor(0xA5FE33).cgColor
+            }
         } else {
             scrollRenderView.layer.borderColor = UIColor.clear.cgColor
         }
