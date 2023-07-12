@@ -38,6 +38,59 @@ class RoomMainViewModel: NSObject {
     override init() {
         super.init()
         getUserList(nextSequence: 0)//获取用户列表
+        setLocalVideoProcessDelegate()
+        setEngineEventCenterSubscribe()
+    }
+    
+    func applyConfigs() {
+        setVideoEncoderParam()
+        //如果房间不是自由发言房间并且用户没有上麦，不开启摄像头和麦克风
+        if roomInfo.speechMode != .freeToSpeak && !currentUser.isOnSeat {
+            return
+        }
+        let openLocalCameraActionBlock = { [weak self] in
+            guard let self = self else { return }
+            let params = TRTCRenderParams()
+            params.fillMode = .fill
+            params.rotation = ._0
+            if self.engineManager.store.videoSetting.isMirror {
+                params.mirrorType = .enable
+            } else {
+                params.mirrorType = .disable
+            }
+            let roomEngine = self.engineManager.roomEngine
+            roomEngine.getTRTCCloud().setLocalRenderParams(params)
+            roomEngine.getTRTCCloud().setGSensorMode(.uiFixLayout)
+            // FIXME: - 打开摄像头前需要先设置一个view
+            roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
+            roomEngine.openLocalCamera(isFront:self.engineManager.store.videoSetting.isFrontCamera, quality:
+                                        self.engineManager.store.videoSetting.videoQuality) {
+            } onError: { code, message in
+                debugPrint("openLocalCamera:code:\(code),message:\(message)")
+            }
+        }
+        if roomInfo.isOpenCamera && !roomInfo.isCameraDisableForAllUser {
+            if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+                openLocalCameraActionBlock()
+            } else {
+                RoomCommon.cameraStateActionWithPopCompletion {
+                    if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+                        openLocalCameraActionBlock()
+                    }
+                }
+            }
+        }
+    }
+    
+    private func setLocalVideoProcessDelegate() {
+        engineManager.roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(self, pixelFormat: ._Texture_2D, bufferType: .texture)
+    }
+    
+    private func deleteLocalVideoProcessDelegate() {
+        engineManager.roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
+    }
+    
+    private func setEngineEventCenterSubscribe() {
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRequestReceived, observer: self)
@@ -47,36 +100,15 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
     
-    func applyConfigs() {
-        setVideoEncoderParam()
-        engineManager.roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(self, pixelFormat: ._Texture_2D, bufferType: .texture)
-        //如果房间不是自由发言房间并且用户没有上麦，不开启摄像头和麦克风
-        if roomInfo.speechMode != .freeToSpeak && !currentUser.isOnSeat {
-            return
-        }
-        let roomEngine = engineManager.roomEngine
-        if roomInfo.isOpenCamera && !roomInfo.isCameraDisableForAllUser {
-            let params = TRTCRenderParams()
-            params.fillMode = .fill
-            params.rotation = ._0
-            if engineManager.store.videoSetting.isMirror {
-                params.mirrorType = .enable
-            } else {
-                params.mirrorType = .disable
-            }
-            roomEngine.getTRTCCloud().setLocalRenderParams(params)
-            roomEngine.getTRTCCloud().setGSensorMode(.uiFixLayout)
-            // FIXME: - 打开摄像头前需要先设置一个view
-            roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-            roomEngine.openLocalCamera(isFront:engineManager.store.videoSetting.isFrontCamera, quality:
-                                        engineManager.store.videoSetting.videoQuality) {
-            } onError: { code, message in
-                debugPrint("openLocalCamera:code:\(code),message:\(message)")
-            }
-            roomEngine.startPushLocalVideo()
-        }
+    private func deleteEngineEventCenterSubscribe() {
+        EngineEventCenter.shared.unsubscribeEngine(event: .onRoomDismissed, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOutOfRoom, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onRequestReceived, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onRequestCancelled, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
-    
     private func setVideoEncoderParam() {
         let param = TRTCVideoEncParam()
         param.videoResolution = engineManager.store.videoSetting.videoResolution
@@ -143,13 +175,8 @@ class RoomMainViewModel: NSObject {
     }
     
     deinit {
-        EngineEventCenter.shared.unsubscribeEngine(event: .onRoomDismissed, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOutOfRoom, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onRequestReceived, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onRequestCancelled, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
+        deleteLocalVideoProcessDelegate()
+        deleteEngineEventCenterSubscribe()
         debugPrint("deinit \(self)")
     }
 }
@@ -157,7 +184,7 @@ class RoomMainViewModel: NSObject {
 extension RoomMainViewModel: RoomEngineEventResponder {
     func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
         if name == .onRoomDismissed {
-            interruptClearRoom()
+            engineManager.exitRoom()
             let alertVC = UIAlertController(title: .destroyAlertText, message: nil, preferredStyle: .alert)
             let sureAction = UIAlertAction(title: .alertOkText, style: .default) { [weak self] action in
                 guard let self = self else { return }
@@ -169,7 +196,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
         }
         
         if name == .onKickedOutOfRoom {
-            interruptClearRoom()
+            engineManager.exitRoom()
             let alertVC = UIAlertController(title: .kickOffTitleText, message: nil, preferredStyle: .alert)
             let sureAction = UIAlertAction(title: .alertOkText, style: .default) { [weak self] action in
                 guard let self = self else { return }
@@ -198,9 +225,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                     guard let self = self else { return }
                     // FIXME: - 打开摄像头前需要先设置一个view
                     self.engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-                    self.engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) { [weak self] in
-                        guard let self = self else { return }
-                        self.engineManager.roomEngine.startPushLocalVideo()
+                    self.engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
                     } onError: { code, message in
                         debugPrint("openLocalCamera:code:\(code),message:\(message)")
                     }
@@ -221,9 +246,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 }
                 let sureAction = UIAlertAction(title: .agreeText, style: .default) { [weak self] _ in
                     guard let self = self else { return }
-                    self.engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) { [weak self] in
-                        guard let self = self else { return }
-                        self.engineManager.roomEngine.startPushLocalAudio()
+                    self.engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
                     } onError: { code, message in
                         debugPrint("openLocalCamera:code:\(code),message:\(message)")
                     }
@@ -336,17 +359,6 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 viewResponder?.showSelfBecomeRoomOwnerAlert()
             }
         }
-    }
-    
-    func interruptClearRoom() {
-        let roomEngine = engineManager.roomEngine
-        roomEngine.closeLocalCamera()
-        roomEngine.closeLocalMicrophone()
-        roomEngine.stopPushLocalAudio()
-        roomEngine.stopPushLocalVideo()
-        roomEngine.stopScreenCapture()
-        roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
-        engineManager.exitRoom()
     }
 }
 

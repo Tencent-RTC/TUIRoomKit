@@ -141,11 +141,6 @@ class BottomViewModel: NSObject {
     }
     
     func exitRoomLogic(isHomeowner: Bool) {
-        let roomEngine = engineManager.roomEngine
-        roomEngine.stopScreenCapture()
-        roomEngine.stopPushLocalVideo()
-        roomEngine.stopPushLocalAudio()
-        roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
         if isHomeowner {
             engineManager.destroyRoom()
         } else {
@@ -157,7 +152,6 @@ class BottomViewModel: NSObject {
     
     func muteAudioAction(sender: UIButton) {
         if !sender.isSelected {
-            engineManager.roomEngine.stopPushLocalAudio()
             engineManager.roomEngine.closeLocalMicrophone()
             return
         }
@@ -183,16 +177,26 @@ class BottomViewModel: NSObject {
     }
     
     private func openLocalMicrophone() {
-        engineManager.roomEngine.openLocalMicrophone(self.engineManager.store.audioSetting.audioQuality) {
-        } onError: { code, message in
-            debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
+        let actionBlock = { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.openLocalMicrophone(self.engineManager.store.audioSetting.audioQuality) {
+            } onError: { code, message in
+                debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
+            }
         }
-        engineManager.roomEngine.startPushLocalAudio()
+        if RoomCommon.checkAuthorMicStatusIsDenied() {
+            actionBlock()
+        } else {
+            RoomCommon.micStateActionWithPopCompletion {
+                if RoomCommon.checkAuthorMicStatusIsDenied() {
+                    actionBlock()
+                }
+            }
+        }
     }
     
     func muteVideoAction(sender: UIButton) {
         if !sender.isSelected {
-            engineManager.roomEngine.stopPushLocalVideo()
             engineManager.roomEngine.closeLocalCamera()
             return
         }
@@ -218,19 +222,37 @@ class BottomViewModel: NSObject {
     }
     
     private func openLocalCamera() {
-        engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: nil)
-        engineManager.roomEngine.openLocalCamera(isFront: EngineManager.shared.store.videoSetting.isFrontCamera, quality:
-                                                    EngineManager.shared.store.videoSetting.videoQuality) {
-        } onError: { code, message in
-            debugPrint("openLocalCamera,code:\(code),message:\(message)")
+        let actionBlock = { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: nil)
+            self.engineManager.roomEngine.openLocalCamera(isFront: self.engineManager.store.videoSetting.isFrontCamera, quality:
+                                                            self.engineManager.store.videoSetting.videoQuality) {
+            } onError: { code, message in
+                debugPrint("openLocalCamera,code:\(code),message:\(message)")
+            }
         }
-        engineManager.roomEngine.startPushLocalVideo()
+        if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+           actionBlock()
+        } else {
+            RoomCommon.cameraStateActionWithPopCompletion {
+                if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+                    actionBlock()
+                }
+            }
+        }
     }
     
     private func applyToAdminToOpenLocalDevice(device: TUIMediaDevice) {
         self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: device, timeout: self.timeoutNumber) {  [weak self] _, _ in
             guard let self = self else { return }
-            self.engineManager.roomEngine.startPushLocalVideo()
+            switch device {
+            case .camera:
+                self.openLocalCamera()
+            case .microphone:
+                self.openLocalMicrophone()
+            default:
+                break
+            }
         } onRejected: { _, _, _ in
             //todo
         } onCancelled: { _, _ in

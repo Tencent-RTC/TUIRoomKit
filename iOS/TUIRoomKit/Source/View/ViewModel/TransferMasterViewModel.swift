@@ -35,28 +35,16 @@ class TransferMasterViewModel {
         guard userId != "" else { return }
         engineManager.roomEngine.changeUserRole(userId: userId, role: .roomOwner) { [weak self] in
             guard let self = self else { return }
-            self.closeLocalDevice()
             self.engineManager.exitRoom()
             self.roomRouter.dismissAllRoomPopupViewController()
             self.roomRouter.popToRoomEntranceViewController()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.closeLocalDevice()
             self.engineManager.destroyRoom()
             self.roomRouter.dismissAllRoomPopupViewController()
             self.roomRouter.popToRoomEntranceViewController()
             debugPrint("changeUserRole:code:\(code),message:\(message)")
         }
-    }
-    
-    private func closeLocalDevice() {
-        let roomEngine = engineManager.roomEngine
-        roomEngine.closeLocalCamera()
-        roomEngine.closeLocalMicrophone()
-        roomEngine.stopPushLocalAudio()
-        roomEngine.stopPushLocalVideo()
-        roomEngine.stopScreenCapture()
-        roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
     }
     
     deinit {

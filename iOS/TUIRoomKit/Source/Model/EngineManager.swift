@@ -39,6 +39,7 @@ class EngineManager: NSObject {
     }
     
     func login(sdkAppId: Int, userId: String, userSig: String) {
+        V2TIMManager.sharedInstance().initSDK(Int32(sdkAppId), config: V2TIMSDKConfig())
         TUIRoomEngine.login(sdkAppId: sdkAppId, userId: userId, userSig: userSig) { [weak self] in
             guard let self = self else { return }
             self.store.currentLoginUser.userId = userId
@@ -111,9 +112,10 @@ class EngineManager: NSObject {
     func enterEngineRoom(roomId:String, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         roomEngine.enterRoom(roomId) { [weak self] roomInfo in
             guard let self = self else { return }
-            guard let roomInfo = roomInfo else {return }
+            guard let roomInfo = roomInfo else { return }
             self.store.roomInfo.update(engineRoomInfo: roomInfo)
             self.store.initialRoomCurrentUser()
+            self.store.isEnteredRoom = true
             //判断用户是否需要上麦进行申请
             switch self.store.roomInfo.speechMode {
             case .freeToSpeak:
@@ -134,11 +136,13 @@ class EngineManager: NSObject {
                         if self.store.roomInfo.isOpenMicrophone {
                             self.openMicrophone()
                         }
+                        onSuccess()
                     } onError: { [weak self] code, message in
                         guard let self = self else { return }
                         self.destroyRoom()
                         self.rootRouter.dismissAllRoomPopupViewController()
                         self.rootRouter.popToRoomEntranceViewController()
+                        onError(code, message)
                     }
                 } else { //如果是观众，进入举手发言房间不上麦
                     onSuccess()
@@ -151,6 +155,7 @@ class EngineManager: NSObject {
                 }
                 self.rootRouter.dismissAllRoomPopupViewController()
                 self.rootRouter.popToRoomEntranceViewController()
+                onError(.failed, "speechMode is wrong")
             }
         } onError: { code, message in
             onError(code, message)
@@ -204,12 +209,23 @@ extension EngineManager {
         self.rootRouter.pushMainViewController(roomId: roomId)
     }
     private func openMicrophone() {
-        roomEngine.openLocalMicrophone(store.audioSetting.audioQuality) { [weak self] in
+        let openLocalMicrophoneBlock = { [weak self] in
             guard let self = self else { return }
-            self.roomEngine.startPushLocalAudio()
-        } onError: { code, message in
-            debugPrint("openLocalMicrophone:code:\(code),message:\(message)")
+            self.roomEngine.openLocalMicrophone(self.store.audioSetting.audioQuality) {
+            } onError: { code, message in
+                debugPrint("openLocalMicrophone:code:\(code),message:\(message)")
+            }
         }
+        if RoomCommon.checkAuthorMicStatusIsDenied() {
+            openLocalMicrophoneBlock()
+        } else {
+            RoomCommon.micStateActionWithPopCompletion {
+                if RoomCommon.checkAuthorMicStatusIsDenied() {
+                    openLocalMicrophoneBlock()
+                }
+            }
+        }
+            
     }
     private func takeSeat(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         self.roomEngine.takeSeat(-1, timeout: self.timeOutNumber) { [weak self] _, _ in

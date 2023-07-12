@@ -10,20 +10,20 @@ import Foundation
 import TIMCommon
 import TUICore
 
-@objc(RoomMessageCellModel)
-class RoomMessageCellModel: TUIBubbleMessageCellData {
+@objc(RoomMessageBubbleCellData)
+class RoomMessageBubbleCellData: TUIBubbleMessageCellData {
     var messageModel: RoomMessageModel?
     var businessID: String?
-    var contentView: RoomMessageContentView?
+    var contentView: RoomMessageView?
     typealias WeakModel<T> = () -> T?
-    static var messageMap: [String: WeakModel<RoomMessageCellModel>] = [:] //消息存储
+    static var messageMap: [String: WeakModel<RoomMessageBubbleCellData>] = [:] //消息存储
     override init(direction: TMsgDirection) {
         super.init(direction: direction)
     }
     override class func getCellData(_ message: V2TIMMessage) -> TUIMessageCellData {
-        guard let dict = TUITool.jsonData2Dictionary(message.customElem.data) else { return RoomMessageCellModel(
+        guard let dict = TUITool.jsonData2Dictionary(message.customElem.data) else { return RoomMessageBubbleCellData(
             direction: message.isSelf ? .MsgDirectionOutgoing : .MsgDirectionIncoming) }
-        guard let roomId = dict["roomId"] as? String else { return RoomMessageCellModel(
+        guard let roomId = dict["roomId"] as? String else { return RoomMessageBubbleCellData(
             direction: message.isSelf ? .MsgDirectionOutgoing : .MsgDirectionIncoming) }
         let messageModel = RoomMessageModel(message: message)
         if let cellData = messageMap[roomId] {
@@ -35,13 +35,13 @@ class RoomMessageCellModel: TUIBubbleMessageCellData {
                 return cellModel
             }
         }
-        let messageCellData = RoomMessageCellModel(direction: message.isSelf ? .MsgDirectionOutgoing : .MsgDirectionIncoming)
+        let messageCellData = RoomMessageBubbleCellData(direction: message.isSelf ? .MsgDirectionOutgoing : .MsgDirectionIncoming)
         messageCellData.businessID = messageModel.businessID
         messageCellData.messageModel = messageModel
         let param: [String: AnyHashable] = [TUICore_TUIRoomImAccessFactory_GetRoomMessageContentViewMethod_Message: message]
         messageCellData.contentView = TUICore.createObject(TUICore_TUIRoomImAccessFactory, key:
                                                             TUICore_TUIRoomImAccessFactory_GetRoomMessageContentViewMethod,
-                                                           param: param) as? RoomMessageContentView
+                                                           param: param) as? RoomMessageView
         let weakObserver = { [weak messageCellData] in return messageCellData }
         messageMap[roomId] = weakObserver
         return messageCellData
@@ -80,7 +80,7 @@ class RoomMessageCellModel: TUIBubbleMessageCellData {
         let param: [String: AnyHashable] = [TUICore_TUIRoomImAccessFactory_GetRoomMessageContentViewMethod_Message: messageModel?.getMessage()]
         guard let view = TUICore.createObject(TUICore_TUIRoomImAccessFactory, key:
                 TUICore_TUIRoomImAccessFactory_GetRoomMessageContentViewMethod, param: param)
-                as? RoomMessageContentView else { return nil }
+                as? RoomMessageView else { return nil }
         contentView = view
         return view
     }

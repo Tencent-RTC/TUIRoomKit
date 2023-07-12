@@ -12,14 +12,16 @@ class AppMainModel {
     init() {}
     func loginTUIRoomKit() {
         TUIRoomKit.sharedInstance.addListener(listener: self)
-        TUIRoomKit.sharedInstance.login(sdkAppId: Int(TUILogin.getSdkAppID()), userId: TUILogin.getUserID(), userSig: TUILogin.getUserSig())
+        TUIRoomKit.sharedInstance.login(sdkAppId: Int(TUILogin.getSdkAppID()),
+                                        userId: TUILogin.getUserID() ?? "",
+                                        userSig: TUILogin.getUserSig() ?? "")
     }
 }
 
 extension AppMainModel: TUIRoomKitListener {
     func onLogin(code: Int, message: String) {
         if code == 0 {
-            TUIRoomKit.sharedInstance.setSelfInfo(userName: TUILogin.getNickName(), avatarURL: TUILogin.getFaceUrl())
+            TUIRoomKit.sharedInstance.setSelfInfo(userName: TUILogin.getNickName() ?? "", avatarURL: TUILogin.getFaceUrl() ?? "")
             TUIRoomKit.sharedInstance.enterPrepareView(enablePreview: true)
         } else {
             debugPrint("onLogin:code:\(code),message:\(message)")

@@ -74,10 +74,6 @@ import TUIRoomEngine
         RoomRouter.shared.pushMainViewController(roomId: EngineManager.shared.store.roomInfo.roomId)
     }
     
-    func setChatAccessRoom(isChatAccessRoom: Bool) {
-        EngineManager.shared.store.isChatAccessRoom = isChatAccessRoom
-    }
-    
     deinit {
         debugPrint("deinit \(self)")
     }

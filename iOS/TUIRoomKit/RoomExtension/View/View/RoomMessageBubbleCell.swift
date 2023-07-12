@@ -9,9 +9,9 @@
 import Foundation
 import TIMCommon
 
-@objc(RoomMessageCell)
-class RoomMessageCell: TUIBubbleMessageCell {
-    var customData: RoomMessageCellModel?
+@objc(RoomMessageBubbleCell)
+class RoomMessageBubbleCell: TUIBubbleMessageCell {
+    var customData: RoomMessageBubbleCellData?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -22,13 +22,13 @@ class RoomMessageCell: TUIBubbleMessageCell {
     }
     override func fill(with data: TUIBubbleMessageCellData) {
         super.fill(with: data)
-        self.customData = data as? RoomMessageCellModel
+        self.customData = data as? RoomMessageBubbleCellData
         guard let roomId = customData?.messageModel?.roomId as? String else { return }
         guard let view = customData?.getRoomMessageView(roomId: roomId) else { return }
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             let subviewArray = self.container.subviews
-            for view in subviewArray where view is RoomMessageContentView {
+            for view in subviewArray where view is RoomMessageView {
                 view.removeFromSuperview()
             }
             guard self.container != nil else { return }

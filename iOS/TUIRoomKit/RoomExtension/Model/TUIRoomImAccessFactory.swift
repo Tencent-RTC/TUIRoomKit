@@ -25,8 +25,8 @@ extension TUIRoomImAccessFactory: TUIObjectProtocol {
             guard let message = param?[TUICore_TUIRoomImAccessFactory_GetRoomMessageContentViewMethod_Message] as?
                     V2TIMMessage else { return UIView(frame: .zero) }
             let roomMessageModel = RoomMessageModel(message: message)
-            let viewModel = RoomMessageContentViewModel(message: roomMessageModel)
-            let view = RoomMessageContentView(viewModel: viewModel)
+            let viewModel = RoomMessageViewModel(message: roomMessageModel)
+            let view = RoomMessageView(viewModel: viewModel)
             return view
         }
         return nil

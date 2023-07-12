@@ -185,30 +185,19 @@ class UserListManagerViewModel: NSObject {
     func muteLocalAudioAction(sender: UIButton) {
         if currentUser.hasAudioStream {
             engineManager.roomEngine.closeLocalMicrophone()
-            engineManager.roomEngine.stopPushLocalAudio()
             return
         }
         //如果房主全体静音，房间成员不可打开麦克风
         if self.roomInfo.isMicrophoneDisableForAllUser && self.currentUser.userRole != .roomOwner {
             viewResponder?.makeToast(text: .muteAudioRoomReasonText)
-           return
-        }
-        // 直接打开本地的麦克风
-        let openLocalMicrophoneBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.openLocalMicrophone(self.engineManager.store.audioSetting.audioQuality) { [weak self] in
-                guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalAudio()
-            } onError: { code, message in
-                debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
-            }
+            return
         }
         //打开本地的麦克风需要进行申请
         let applyToAdminToOpenLocalDeviceBlock = { [weak self] in
             guard let self = self else { return }
             self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: .microphone, timeout: self.timeoutNumber) {  [weak self] _, _ in
                 guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalAudio()
+                self.openLocalMicrophone()
             } onRejected: { _, _, _ in
                 //todo
             } onCancelled: { _, _ in
@@ -219,10 +208,10 @@ class UserListManagerViewModel: NSObject {
         }
         switch roomInfo.speechMode {
         case .freeToSpeak:
-            openLocalMicrophoneBlock()
+            openLocalMicrophone()
         case .applySpeakAfterTakingSeat:
             if currentUser.isOnSeat {
-                openLocalMicrophoneBlock()
+                openLocalMicrophone()
             } else {
                 viewResponder?.makeToast(text: .muteAudioSeatReasonText)
             }
@@ -233,36 +222,62 @@ class UserListManagerViewModel: NSObject {
         }
     }
     
+    private func openLocalMicrophone() {
+        let actionBlock = { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.openLocalMicrophone(self.engineManager.store.audioSetting.audioQuality) {
+            } onError: { code, message in
+                debugPrint("---openLocalMicrophone,code:\(code), message:\(message)")
+            }
+        }
+        if RoomCommon.checkAuthorMicStatusIsDenied() {
+            actionBlock()
+        } else {
+            RoomCommon.micStateActionWithPopCompletion {
+                if RoomCommon.checkAuthorMicStatusIsDenied() {
+                    actionBlock()
+                }
+            }
+        }
+    }
+    
+    private func openLocalCamera() {
+        let actionBlock = { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
+            self.engineManager.roomEngine.openLocalCamera(isFront: self.engineManager.store.videoSetting.isFrontCamera, quality:
+                                                            self.engineManager.store.videoSetting.videoQuality) {
+            } onError: { code, message in
+                debugPrint("openLocalCamera,code:\(code),message:\(message)")
+            }
+        }
+        if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+            actionBlock()
+        } else {
+            RoomCommon.cameraStateActionWithPopCompletion {
+                if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+                    actionBlock()
+                }
+            }
+        }
+    }
+    
     func muteLocalVideoAction(sender: UIButton) {
         if currentUser.hasVideoStream {
             engineManager.roomEngine.closeLocalCamera()
-            engineManager.roomEngine.stopPushLocalVideo()
             return
         }
         //如果房主全体禁画，房间成员不可打开摄像头
         if self.roomInfo.isCameraDisableForAllUser && self.currentUser.userRole != .roomOwner {
             viewResponder?.makeToast(text: .muteVideoRoomReasonText)
-           return
-        }
-        // 直接打开本地的摄像头
-        let openLocalCameraBlock = { [weak self] in
-            guard let self = self else { return }
-            // FIXME: - 打开摄像头前需要先设置一个view
-            self.engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-            self.engineManager.roomEngine.openLocalCamera(isFront: self.engineManager.store.videoSetting.isFrontCamera, quality:
-                                                            self.engineManager.store.videoSetting.videoQuality) { [weak self] in
-                guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalVideo()
-            } onError: { code, message in
-                debugPrint("openLocalCamera,code:\(code),message:\(message)")
-            }
+            return
         }
         //打开本地的摄像头需要向房主进行申请
         let applyToAdminToOpenLocalDeviceBlock = { [weak self] in
             guard let self = self else { return }
             self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: .camera, timeout: self.timeoutNumber) {  [weak self] _, _ in
                 guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalVideo()
+                self.openLocalCamera()
             } onRejected: { _, _, _ in
                 //todo
             } onCancelled: { _, _ in
@@ -273,10 +288,10 @@ class UserListManagerViewModel: NSObject {
         }
         switch roomInfo.speechMode {
         case .freeToSpeak:
-            openLocalCameraBlock()
+            openLocalCamera()
         case .applySpeakAfterTakingSeat:
             if currentUser.isOnSeat {
-                openLocalCameraBlock()
+                openLocalCamera()
             } else {
                 viewResponder?.makeToast(text: .muteVideoSeatReasonText)
             }

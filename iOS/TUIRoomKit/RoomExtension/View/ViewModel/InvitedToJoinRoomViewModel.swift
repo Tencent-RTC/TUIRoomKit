@@ -10,7 +10,7 @@ import Foundation
 import TUICore
 import AVFAudio
 
-class RoomInviteViewModel: NSObject, AVAudioPlayerDelegate {
+class InvitedToJoinRoomViewModel: NSObject, AVAudioPlayerDelegate {
     let inviteUserName: String
     let roomId: String
     var avatarUrl: String
@@ -36,7 +36,7 @@ class RoomInviteViewModel: NSObject, AVAudioPlayerDelegate {
     }
     func disagreeAction() {
         stopPlay()
-        closeRoomInviteView()
+        closeInvitedToJoinRoomView()
     }
     func agreeAction() {
         stopPlay()
@@ -53,7 +53,9 @@ class RoomInviteViewModel: NSObject, AVAudioPlayerDelegate {
                 enterRoom()
             }
         } else {
-            TUIRoomKit.sharedInstance.login(sdkAppId: Int(TUILogin.getSdkAppID()), userId: TUILogin.getUserID(), userSig: TUILogin.getUserSig())
+            TUIRoomKit.sharedInstance.login(sdkAppId: Int(TUILogin.getSdkAppID()),
+                                            userId: TUILogin.getUserID() ?? "",
+                                            userSig: TUILogin.getUserSig() ?? "")
         }
     }
     private func enterRoom() {
@@ -81,10 +83,10 @@ class RoomInviteViewModel: NSObject, AVAudioPlayerDelegate {
         }
     }
     
-    private func closeRoomInviteView() {
+    private func closeInvitedToJoinRoomView() {
         TUIRoomImAccessService.shared.inviteWindow?.isHidden = true
         TUIRoomImAccessService.shared.inviteWindow = nil
-        TUIRoomImAccessService.shared.alreadyShownRoomInviteView = false
+        TUIRoomImAccessService.shared.isShownInvitedToJoinRoomView = false
     }
     
     deinit {
@@ -92,7 +94,7 @@ class RoomInviteViewModel: NSObject, AVAudioPlayerDelegate {
     }
 }
 
-extension RoomInviteViewModel: TUIRoomKitListener {
+extension InvitedToJoinRoomViewModel: TUIRoomKitListener {
     func onLogin(code: Int, message: String) {
         TUIRoomKit.sharedInstance.setSelfInfo(userName: TUILogin.getNickName() ?? "", avatarURL: TUILogin.getFaceUrl() ?? "")
         let roomInfo = RoomInfo()
@@ -100,6 +102,6 @@ extension RoomInviteViewModel: TUIRoomKitListener {
         TUIRoomKit.sharedInstance.enterRoom(roomInfo: roomInfo)
     }
     func onExitRoom() {
-        closeRoomInviteView()
+        closeInvitedToJoinRoomView()
     }
 }

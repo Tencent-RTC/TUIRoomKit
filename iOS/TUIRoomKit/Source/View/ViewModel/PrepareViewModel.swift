@@ -36,24 +36,23 @@ class PrePareViewModel {
     }
     
     func initialState(view: UIView) {
+        let params = TRTCRenderParams()
+        if self.engineManager.store.videoSetting.isMirror {
+            params.mirrorType = .enable
+        } else {
+            params.mirrorType = .disable
+        }
         let roomEngine = engineManager.roomEngine
+        roomEngine.getTRTCCloud().setLocalRenderParams(params)
+        roomEngine.getTRTCCloud().setGSensorMode(.uiFixLayout)
         roomEngine.setLocalVideoView(streamType: .cameraStream, view: view)
         if roomInfo.isOpenCamera {
-            roomEngine.openLocalCamera(isFront: engineManager.store.videoSetting.isFrontCamera, quality:
-                                        engineManager.store.videoSetting.videoQuality) {
-                debugPrint("")
-            } onError: { code, message in
-                debugPrint("---openLocalCamera,code:\(code),message:\(message)")
-            }
+            openLocalCamera()
         } else {
             roomEngine.closeLocalCamera()
         }
         if roomInfo.isOpenMicrophone {
-            roomEngine.openLocalMicrophone(engineManager.store.audioSetting.audioQuality) {
-                debugPrint("")
-            } onError: { code, message in
-                debugPrint("---openLocalMicrophone,code:\(code), message:\(message)")
-            }
+            openLocalMicrophone()
         } else {
             roomEngine.closeLocalMicrophone()
         }
@@ -95,18 +94,11 @@ class PrePareViewModel {
         if sender.isSelected {
             roomInfo.isOpenCamera = false
             roomEngine.closeLocalCamera()
-            roomEngine.stopPushLocalVideo()
             placeholderImage.isHidden = false
         } else {
             roomInfo.isOpenCamera = true
             placeholderImage.isHidden = true
-            roomEngine.openLocalCamera(isFront: engineManager.store.videoSetting.isFrontCamera, quality:
-                                        engineManager.store.videoSetting.videoQuality) { [weak self] in
-                guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalVideo()
-            } onError: { code, message in
-                debugPrint("openLocalCamera,code:\(code),message:\(message)")
-            }
+            openLocalCamera()
         }
     }
     
@@ -116,14 +108,47 @@ class PrePareViewModel {
         if sender.isSelected {
             roomInfo.isOpenMicrophone = false
             roomEngine.closeLocalMicrophone()
-            roomEngine.stopPushLocalAudio()
         } else {
             roomInfo.isOpenMicrophone = true
-            roomEngine.openLocalMicrophone(engineManager.store.audioSetting.audioQuality) { [weak self] in
-                guard let self = self else { return }
-                self.engineManager.roomEngine.startPushLocalAudio()
+            openLocalMicrophone()
+        }
+    }
+    
+    private func openLocalMicrophone() {
+        let actionBlock = { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.openLocalMicrophone(self.engineManager.store.audioSetting.audioQuality) {
             } onError: { code, message in
-                debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
+                debugPrint("---openLocalMicrophone,code:\(code), message:\(message)")
+            }
+        }
+        if RoomCommon.checkAuthorMicStatusIsDenied() {
+            actionBlock()
+        } else {
+            RoomCommon.micStateActionWithPopCompletion {
+                if RoomCommon.checkAuthorMicStatusIsDenied() {
+                    actionBlock()
+                }
+            }
+        }
+    }
+    
+    private func openLocalCamera() {
+        let actionBlock = { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.roomEngine.openLocalCamera(isFront: self.engineManager.store.videoSetting.isFrontCamera, quality:
+                                                            self.engineManager.store.videoSetting.videoQuality) {
+            } onError: { code, message in
+                debugPrint("---openLocalCamera,code:\(code),message:\(message)")
+            }
+        }
+        if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+            actionBlock()
+        } else {
+            RoomCommon.cameraStateActionWithPopCompletion {
+                if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+                    actionBlock()
+                }
             }
         }
     }

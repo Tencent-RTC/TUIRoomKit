@@ -10,12 +10,13 @@ end
 # 工具库
 def tool
   pod 'Alamofire'
-  pod 'TUICore','>= 7.2.4146'
+  pod 'TUICore','>= 7.3.4358'
   pod 'TUIChat'
-  pod 'TUIRoomEngine','>= 1.2.0'
+  pod 'TUIRoomEngine','>= 1.3.4'
   pod 'TXLiteAVSDK_TRTC'
   pod 'TXAppBasic'
   pod 'TIMCommon'
+  pod 'TXIMSDK_Plus_iOS'
 end
 
 # 本地依赖库

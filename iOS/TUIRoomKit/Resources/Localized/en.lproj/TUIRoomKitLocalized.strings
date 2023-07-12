@@ -145,3 +145,15 @@
 "TUIRoom.starting.meeting" = "Starting meeting";
 "TUIRoom.waiting.members.enter.meeting" = "Waiting for members to enter the meeting";
 "TUIRoom.meeting.ended" = "Meeting ended";
+
+"TUIRoom.fail.microphone.permission.Title" = "No access to microphone";
+"TUIRoom.fail.microphone.permission.Tips"  = "Unable to use audio function, click \"Authorize Now\" to open the microphone permission.";
+"TUIRoom.fail.microphone.permission.Later" = "Later";
+"TUIRoom.fail.microphone.permission.Enable" = "Authorize Now";
+"TUIRoom.fail.camera.permission.Title" = "No access to camera";
+"TUIRoom.fail.camera.permission.Tips"  = "Unable to use the video function, click \"Authorize Now\" to open the camera permission.";
+"TUIRoom.fail.camera.permission.Later" = "Later";
+"TUIRoom.fail.camera.permission.Enable" = "Authorize Now";
+"TUIRoom.device.set" = "Meeting Settings";
+"TUIRoom.mic.set" = "Join the conference and turn on the microphone";
+"TUIRoom.camera.set" = "Join the conference and turn on the camera";
