@@ -413,7 +413,24 @@ public class TUIVideoSeatView extends RelativeLayout {
             mUserDisplayView.clearUserEntity();
         }
         mPageLayoutManager.enableTwoPersonMeeting(mIsTwoPersonVideoOn, mIsTwoPersonSwitched);
+
+        if (mMemberListAdapter.getItemCount() == 1) {
+            if (mIsTwoPersonSwitched) {
+                mMemberListAdapter.notifyItemChanged(0);
+            }
+            return;
+        }
+        if (mMemberListAdapter.getItemCount() == 2 && enable) {
+            if (mIsTwoPersonSwitched) {
+                mMemberListAdapter.notifyItemChanged(mIsTwoPersonSwitched ? 1 : 0);
+            }
+            return;
+        }
         mMemberListAdapter.notifyDataSetChanged();
+    }
+
+    public void notifyTalkingViewDataChanged() {
+        updateUserTalkingView(mIsTwoPersonSwitched ? 0 : 1);
     }
 
     private void setUserDisplayViewClickListener() {
@@ -432,6 +449,6 @@ public class TUIVideoSeatView extends RelativeLayout {
         Log.d(TAG, "switchTwoPersonVideoMeeting mIsTwoPersonSwitched=" + mIsTwoPersonSwitched);
         updateUserTalkingView(mIsTwoPersonSwitched ? 0 : 1);
         mPageLayoutManager.enableTwoPersonMeeting(mIsTwoPersonVideoOn, mIsTwoPersonSwitched);
-        mMemberListAdapter.notifyDataSetChanged();
+        mMemberListAdapter.notifyItemChanged(mIsTwoPersonSwitched ? 1 : 0);
     }
 }

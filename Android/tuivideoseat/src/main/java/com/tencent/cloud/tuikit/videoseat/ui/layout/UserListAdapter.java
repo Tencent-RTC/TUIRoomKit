@@ -73,7 +73,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
         if (PAYLOAD_AUDIO.equals(payloads.get(0))) {
             UserEntity item = mList.get(position);
-            ((ViewHolder) holder).setVolume(item.isTalk());
+            ((ViewHolder) holder).setVolume(item);
             ((ViewHolder) holder).updateVolumeEffect(item.getAudioVolume());
             ((ViewHolder) holder).enableVolumeEffect(item.isAudioAvailable());
             return;
@@ -169,9 +169,12 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mUserMic.enableVolumeEffect(enable);
         }
 
-        public void setVolume(boolean isTalk) {
-            mTalkView.setVisibility(isTalk ? VISIBLE : GONE);
-            if (isTalk) {
+        public void setVolume(UserEntity userEntity) {
+            if (userEntity.isScreenShareAvailable()) {
+                return;
+            }
+            mTalkView.setVisibility(userEntity.isTalk() ? VISIBLE : GONE);
+            if (userEntity.isTalk()) {
                 mTalkView.removeCallbacks(mRunnable);
                 mTalkView.postDelayed(mRunnable, 2000);
             }

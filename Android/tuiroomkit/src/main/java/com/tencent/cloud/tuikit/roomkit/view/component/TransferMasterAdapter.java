@@ -3,21 +3,13 @@ package com.tencent.cloud.tuikit.roomkit.view.component;
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.widget.AppCompatImageButton;
-
-import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
+import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.view.base.UserBaseAdapter;
-import com.tencent.liteav.basic.ImageLoader;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 

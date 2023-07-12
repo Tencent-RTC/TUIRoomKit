@@ -41,4 +41,16 @@
         <item name="android:windowExitAnimation">@anim/tuiroomkit_anim_bottom_view_dismiss</item>
         <item name="android:windowEnterAnimation">@anim/tuiroomkit_anim_bottom_view_show</item>
     </style>
+    <style name="TUIRoomMsgLoadingAnim">
+        <item name="android:indeterminateDrawable">@drawable/tuiroomkit_room_msg_loading</item>
+        <item name="android:minWidth">27dip</item>
+        <item name="android:maxWidth">27dip</item>
+        <item name="android:minHeight">27dip</item>
+        <item name="android:maxHeight">27dip</item>
+    </style>
+    <style name="TUIRoomActivityTransparent" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item> <!-- 背景色透明 -->
+        <item name="android:windowIsTranslucent">true</item> <!-- 是否有透明属性 -->
+        <item name="android:backgroundDimEnabled">false</item> <!-- 背景是否半透明 -->
+    </style>
 </resources>

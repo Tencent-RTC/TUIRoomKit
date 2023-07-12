@@ -2,7 +2,7 @@ package com.tencent.cloud.tuikit.roomkit.model.manager;
 
 import android.util.Log;
 
-import com.blankj.utilcode.util.GsonUtils;
+import com.google.gson.Gson;
 import com.tencent.cloud.tuikit.roomkit.model.entity.ExtensionSettingEntity;
 import com.tencent.qcloud.tuicore.util.SPUtils;
 
@@ -36,7 +36,8 @@ public class ExtensionSettingManager {
     public synchronized void setExtensionSetting(ExtensionSettingEntity entity) {
         mEntity = entity;
         try {
-            SPUtils.getInstance(PER_DATA).put(PER_SETTING_ENTITY, GsonUtils.toJson(mEntity));
+            Gson gson = new Gson();
+            SPUtils.getInstance(PER_DATA).put(PER_SETTING_ENTITY, gson.toJson(mEntity));
         } catch (Exception e) {
             Log.d(TAG, "");
         }
@@ -45,7 +46,8 @@ public class ExtensionSettingManager {
     private void loadSetting() {
         try {
             String json = SPUtils.getInstance(PER_DATA).getString(PER_SETTING_ENTITY);
-            mEntity = GsonUtils.fromJson(json, ExtensionSettingEntity.class);
+            Gson gson = new Gson();
+            mEntity = gson.fromJson(json, ExtensionSettingEntity.class);
         } catch (Exception e) {
             Log.d(TAG, "loadSetting failed:" + e.getMessage());
         }

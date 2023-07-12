@@ -17,13 +17,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.blankj.utilcode.util.ToastUtils;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKitListener;
-import com.tencent.liteav.basic.AvatarConstant;
-import com.tencent.liteav.basic.ImageLoader;
-import com.tencent.liteav.basic.UserModel;
-import com.tencent.liteav.basic.UserModelManager;
+import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
+import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
+import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 
@@ -111,7 +109,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void setProfile() {
         final String userName = mEditUserName.getText().toString().trim();
         if (TextUtils.isEmpty(userName)) {
-            ToastUtils.showLong(getString(R.string.app_hint_user_name));
+            ToastUtil.toastLongMessage(getString(R.string.app_hint_user_name));
             return;
         }
         String reg = "^[a-z0-9A-Z\\u4e00-\\u9fa5\\_]{2,20}$";
@@ -125,7 +123,7 @@ public class ProfileActivity extends AppCompatActivity {
         model.userAvatar = mAvatarUrl;
         UserModelManager.getInstance().setUserModel(model);
         Log.i(TAG, "set profile success.");
-        ToastUtils.showLong(getString(R.string.app_toast_register_success_and_logging_in));
+        ToastUtil.toastLongMessage(getString(R.string.app_toast_register_success_and_logging_in));
         startPrepareActivity();
     }
 

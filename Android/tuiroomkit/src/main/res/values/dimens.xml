@@ -16,4 +16,5 @@
     <dimen name="tuiroomkit_create_room_margin_bottom">100dp</dimen>
     <dimen name="tuiroomkit_enter_room_margin_bottom">20dp</dimen>
     <dimen name="tuiroomkit_video_seat_bottom_margin">15dp</dimen>
+    <dimen name="tuiroomkit_room_float_view_size">50dp</dimen>
 </resources>

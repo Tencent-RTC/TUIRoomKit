@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -13,9 +12,8 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tencent.liteav.basic.AvatarConstant;
-import com.tencent.liteav.basic.UserModel;
-import com.tencent.liteav.basic.UserModelManager;
+import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
+import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
 
 import java.util.Random;

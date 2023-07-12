@@ -24,14 +24,5 @@
             android:enabled="true"
             android:exported="false"/>
 
-        <provider
-            android:name=".util.FileProvider"
-            android:authorities="${applicationId}.tuicore.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths_public"/>
-        </provider>
     </application>
 </manifest>

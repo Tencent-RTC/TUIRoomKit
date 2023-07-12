@@ -15,8 +15,8 @@ import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.PrepareViewModel;
-import com.tencent.liteav.basic.ImageLoader;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -47,6 +47,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
     private ConstraintSet    mPreSet;
     private PrepareViewModel mViewModel;
 
+    private boolean mIsDuringSwitchLanguage = false;
     public PrepareView(Context context, boolean enablePreview) {
         super(context);
         mContext = context;
@@ -171,13 +172,18 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
         }
     }
 
+    private void restoreMicAndCamera() {
+        mViewModel.initRoomStore();
+        mViewModel.setVideoView(mVideoView);
+        mViewModel.restoreMicAndCamera();
+        updateVideoView(mViewModel.isCameraOpen());
+        updateMicPhoneButton(mViewModel.isMicOpen());
+    }
     @Override
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         if (visibility == VISIBLE) {
-            mViewModel.setVideoView(mVideoView);
-            mViewModel.initRoomStore();
-            mViewModel.initMicAndCamera();
-        } else {
+            restoreMicAndCamera();
+        } else if (!mIsDuringSwitchLanguage) {
             mViewModel.closeLocalCamera();
             mViewModel.closeLocalMicrophone();
         }
@@ -189,6 +195,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
         if (v.getId() == R.id.img_back) {
             mViewModel.finishActivity();
         } else if (v.getId() == R.id.img_language_change) {
+            mIsDuringSwitchLanguage = true;
             mViewModel.changeLanguage();
         } else if (v.getId() == R.id.image_switch_camera_preview) {
             mViewModel.switchCamera();
@@ -218,6 +225,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        mIsDuringSwitchLanguage = false;
         if (mLayoutVideoPreview != null) {
             mLayoutVideoPreview.removeAllViews();
         }

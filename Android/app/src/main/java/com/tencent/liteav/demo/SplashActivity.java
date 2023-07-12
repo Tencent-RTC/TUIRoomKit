@@ -10,8 +10,8 @@ import androidx.annotation.Nullable;
 
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKitListener;
-import com.tencent.liteav.basic.UserModel;
-import com.tencent.liteav.basic.UserModelManager;
+import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
+import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 

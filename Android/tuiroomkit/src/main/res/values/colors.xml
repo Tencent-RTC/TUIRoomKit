@@ -23,4 +23,9 @@
     <color name="tuiroomkit_color_bg_item_checked">#4F515A</color>
     <color name="tuiroomkit_color_text_hint_search">#636A7E</color>
     <color name="tuiroomkit_bg_bottom_dialog">#1B1E26</color>
+    <color name="tuiroomkit_room_msg_title_creating">#147AFF</color>
+    <color name="tuiroomkit_room_msg_title_created">#15B72D</color>
+    <color name="tuiroomkit_room_msg_title_destroyed">#888888</color>
+    <color name="tuiroomkit_room_msg_btn_text_color_join">#FFFFFF</color>
+    <color name="tuiroomkit_room_msg_btn_text_color_joined">#999999</color>
 </resources>

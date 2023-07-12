@@ -10,11 +10,11 @@ import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
+import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
+import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.cloud.tuikit.roomkit.view.component.CreateRoomView;
 import com.tencent.cloud.tuikit.roomkit.view.settingitem.BaseSettingItem;
 import com.tencent.cloud.tuikit.roomkit.view.settingitem.SwitchSettingItem;
-import com.tencent.liteav.basic.UserModel;
-import com.tencent.liteav.basic.UserModelManager;
 
 import java.util.ArrayList;
 import java.util.Map;

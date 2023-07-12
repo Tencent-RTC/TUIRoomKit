@@ -10,8 +10,11 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.imaccess.utils.BusinessSceneUtil;
 import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.MoreFunctionViewModel;
+import com.tencent.qcloud.tuicore.TUIConstants;
+import com.tencent.qcloud.tuicore.TUICore;
 
 public class MoreFunctionView extends BaseBottomDialog implements View.OnClickListener {
 
@@ -41,7 +44,11 @@ public class MoreFunctionView extends BaseBottomDialog implements View.OnClickLi
         setBeautyView(mViewModel.getBeautyView());
 
         mLayoutSetting.setOnClickListener(this);
+        if (BusinessSceneUtil.isChatAccessRoom() || TUICore.getService(TUIConstants.Service.TUI_CHAT) == null) {
+            mLayoutChat.setVisibility(View.INVISIBLE);
+        } else {
         mLayoutChat.setOnClickListener(this);
+        }
     }
 
     @Override
