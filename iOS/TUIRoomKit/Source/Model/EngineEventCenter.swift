@@ -484,7 +484,7 @@ extension EngineEventCenter: TUIRoomObserver {
     func onUserVoiceVolumeChanged(volumeMap: [String : NSNumber]) {
         guard let observers = engineObserverMap[.onUserVoiceVolumeChanged] else { return }
         observers.forEach { responder in
-            responder()?.onEngineEvent(name: .onKickedOutOfRoom, param: volumeMap)
+            responder()?.onEngineEvent(name: .onUserVoiceVolumeChanged, param: volumeMap)
         }
     }
     

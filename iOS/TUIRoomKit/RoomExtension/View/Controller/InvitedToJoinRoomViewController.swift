@@ -1,5 +1,5 @@
 //
-//  RoomInviteViewController.swift
+//  InvitedToJoinRoomViewController.swift
 //  TUIRoomKit
 //
 //  Created by 唐佳宁 on 2023/5/25.
@@ -9,12 +9,12 @@
 import Foundation
 
 //收到邀请页面
-class RoomInviteViewController: UIViewController {
-    let roomView: RoomInviteView
-    let viewModel: RoomInviteViewModel
+class InvitedToJoinRoomViewController: UIViewController {
+    let roomView: InvitedToJoinRoomView
+    let viewModel: InvitedToJoinRoomViewModel
     init(inviteUserName: String,inviteUserAvatarUrl: String, roomId: String) {
-        viewModel = RoomInviteViewModel(inviteUserName: inviteUserName, inviteUserAvatarUrl:inviteUserAvatarUrl, roomId: roomId)
-        roomView = RoomInviteView(viewModel: viewModel)
+        viewModel = InvitedToJoinRoomViewModel(inviteUserName: inviteUserName, inviteUserAvatarUrl:inviteUserAvatarUrl, roomId: roomId)
+        roomView = InvitedToJoinRoomView(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     

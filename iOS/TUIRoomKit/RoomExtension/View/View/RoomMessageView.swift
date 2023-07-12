@@ -1,13 +1,13 @@
 //
-//  RoomMessageContentView.swift
+//  RoomMessageView.swift
 //  TUIRoomKit
 //
 //  Created by 唐佳宁 on 2023/5/9.
 //  Copyright © 2023 Tencent. All rights reserved.
 //
 
-class RoomMessageContentView: UIView {
-    let viewModel: RoomMessageContentViewModel
+class RoomMessageView: UIView {
+    let viewModel: RoomMessageViewModel
     private var viewArray: [UIView] = []
     let roomStatusView: UIView = {
         let view = UIView()
@@ -70,7 +70,7 @@ class RoomMessageContentView: UIView {
         label.textAlignment = .center
         return label
     }()
-    init(viewModel: RoomMessageContentViewModel) {
+    init(viewModel: RoomMessageViewModel) {
         self.viewModel = viewModel
         super.init(frame: .zero)
     }
@@ -288,7 +288,7 @@ class RoomMessageContentView: UIView {
     }
 }
 
-extension RoomMessageContentView: RoomMessageContentViewResponder {
+extension RoomMessageView: RoomMessageViewResponder {
     func updateStackView() {
         setupStackView()
     }

@@ -24,11 +24,34 @@ class RoomStore: NSObject {
     var roomSpeechMode: TUISpeechMode
     var isBanAutoRaise: Bool = false //是否禁止跳转页面
     var isChatAccessRoom: Bool = false //是否是由TUIChat跳转进来的
+    var isEnteredRoom: Bool = false //是否已经进入房间
+    var isOpenMicrophone: Bool {
+        didSet {
+            UserDefaults.standard.set(isOpenMicrophone, forKey: "isOpenMicrophone")
+            UserDefaults.standard.synchronize()
+        }
+    }
+    var isOpenCamera: Bool {
+        didSet {
+            UserDefaults.standard.set(isOpenCamera, forKey: "isOpenCamera")
+            UserDefaults.standard.synchronize()
+        }
+    }
     var engineManager: EngineManager {
         EngineManager.shared
     }
     override init() {
         roomSpeechMode = roomInfo.speechMode
+        if let isOpenMicrophoneValue = UserDefaults.standard.object(forKey: "isOpenMicrophone") as? Bool {
+            isOpenMicrophone = isOpenMicrophoneValue
+        } else {
+            isOpenMicrophone = true
+        }
+        if let isOpenCameraValue = UserDefaults.standard.object(forKey: "isOpenCamera") as? Bool {
+            isOpenCamera = isOpenCameraValue
+        } else {
+            isOpenCamera = true
+        }
     }
     func update(roomInfo: RoomInfo) {
         self.roomInfo = roomInfo
@@ -47,6 +70,7 @@ class RoomStore: NSObject {
     
     func refreshStore() {
         isChatAccessRoom = false
+        isEnteredRoom = false
         videoSetting = VideoModel()
         audioSetting = AudioModel()
         roomScene = .meeting

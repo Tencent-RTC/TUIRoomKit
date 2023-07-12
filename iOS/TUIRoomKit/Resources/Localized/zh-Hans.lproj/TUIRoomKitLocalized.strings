@@ -145,3 +145,13 @@
 "TUIRoom.starting.meeting" = "正在发起";
 "TUIRoom.waiting.members.enter.meeting" = "等待成员入会";
 "TUIRoom.meeting.ended" = "会议已结束";
+
+"TUIRoom.fail.microphone.permission.Title" = "麦克风权限未开启";
+"TUIRoom.fail.microphone.permission.Tips"  = "无法使用多人音视频语音功能，点击\"去开启\"打开麦克风权限";
+"TUIRoom.fail.camera.permission.Title" = "相机权限未开启";
+"TUIRoom.fail.camera.permission.Tips"  = "无法使用多人音视频视频功能，点击\"去开启\"打开相机权限";
+"TUIRoom.fail.permission.Later" = "以后再说";
+"TUIRoom.fail.permission.Enable" = "去开启";
+"TUIRoom.device.set" = "快速会议设置";
+"TUIRoom.mic.set" = "入会开启麦克风";
+"TUIRoom.camera.set" = "入会开启摄像头";

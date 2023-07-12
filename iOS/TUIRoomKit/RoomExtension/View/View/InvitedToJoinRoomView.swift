@@ -7,8 +7,8 @@
 
 import Foundation
 
-class RoomInviteView: UIView {
-    let viewModel : RoomInviteViewModel
+class InvitedToJoinRoomView: UIView {
+    let viewModel : InvitedToJoinRoomViewModel
     let userNameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont(name: "PingFangSC-Regular", size: 30)
@@ -62,7 +62,7 @@ class RoomInviteView: UIView {
         return label
     }()
     
-    init(viewModel: RoomInviteViewModel) {
+    init(viewModel: InvitedToJoinRoomViewModel) {
         self.viewModel = viewModel
         super.init(frame: .zero)
     }

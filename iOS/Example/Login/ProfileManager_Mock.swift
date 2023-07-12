@@ -10,6 +10,8 @@ import UIKit
 import Alamofire
 import ImSDK_Plus
 import TUICore
+import TUIRoomEngine
+import TUIRoomKit
 
 @objc class LoginResultModel: NSObject, Codable {
     @objc var token: String
@@ -28,6 +30,11 @@ import TUICore
         userSig = GenerateTestUserSig.genTestUserSig(identifier: userID)
         avatar = "https://imgcache.qq.com/qcloud/public/static//avatar1_100.20191230.png"
         super.init()
+    }
+    
+    convenience init(userID: String, nickName: String) {
+        self.init(userID: userID)
+        self.name = nickName
     }
 }
 
@@ -54,7 +61,9 @@ import TUICore
                     failed(err)
                     UserDefaults.standard.set(nil, forKey: tokenKey)
                 }
-                login(phone: curUserModel?.userId ?? "", code: "", success: success, failed: fail, auto: true)
+                let nickName = curUserModel?.name ?? (curUserModel?.userId ?? "")
+                curUserModel?.name = nickName
+                login(phone: curUserModel?.userId ?? "", name: curUserModel?.name ?? "", success: success, failed: fail, auto: true)
                 return true
             }
         }
@@ -84,6 +93,30 @@ import TUICore
         success()
     }
     
+    @objc public func login(phone: String,
+                            name: String,
+                            success: @escaping ()->Void,
+                            failed: ((_ error: String) -> Void)? = nil ,
+                            auto: Bool = false) {
+        let phoneValue = phone
+        if !auto {
+            assert(phoneValue.count > 0)
+            curUserModel = LoginResultModel(userID: phoneValue, nickName: name)
+        }
+        localizeUserModel()
+        success()
+    }
+    
+    func localizeUserModel() {
+        let tokenKey = "com.tencent.trtcScences.demo"
+        do {
+            let cacheData = try JSONEncoder().encode(curUserModel)
+            UserDefaults.standard.set(cacheData, forKey: tokenKey)
+        } catch {
+          print("Save Failed")
+        }
+    }
+    
     /// 设置昵称
     /// - Parameters:
     ///   - name: 昵称
@@ -92,15 +125,20 @@ import TUICore
     ///   - error: 错误信息
     @objc public func setNickName(name: String, success: @escaping ()->Void,
                         failed: @escaping (_ error: String)->Void) {
-        let userInfo = V2TIMUserFullInfo()
-        userInfo.nickName = name
-        V2TIMManager.sharedInstance()?.setSelfInfo(userInfo, succ: {
+        guard let userModel = curUserModel else {
+            failed("set profile failed")
+            debugPrint("set profile failed.")
+            return
+        }
+        let oldName = userModel.name
+        curUserModel?.name = name
+        TUIRoomEngine.setSelfInfo(userName: userModel.name, avatarUrl: userModel.avatar) {
             success()
             debugPrint("set profile success")
-        }, fail: { (code, desc) in
-            failed(desc ?? "")
+        } onError: {[weak self] code, message in
             debugPrint("set profile failed.")
-        })
+            self?.curUserModel?.name = oldName
+        }
     }
     
     /// IM 登录当前用户
@@ -119,7 +157,6 @@ import TUICore
                 guard let `self` = self else { return }
                 if let info = infos?.first {
                     self.curUserModel?.avatar = info.faceURL ?? ""
-                    self.curUserModel?.name = info.nickName ?? ""
                     success()
                 }
                 else {
@@ -149,6 +186,15 @@ import TUICore
     
     @objc public func curUserSig() -> String {
            return curUserModel?.userSig ?? ""
+    }
+    
+    
+    @objc public func curNickName() -> String {
+        return curUserModel?.name ?? ""
+    }
+    
+    @objc public func refreshAvatar(faceURL: String) {
+        self.curUserModel?.avatar = faceURL
     }
     
     @objc func synchronizUserInfo() {

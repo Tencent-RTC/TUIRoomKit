@@ -64,7 +64,9 @@ class RoomMessageManager: NSObject {
         //判断是否已经登录Engine，如果没有登录，需要先进行登录
         if !isEngineLogin {
             TUIRoomKit.sharedInstance.addListener(listener: self)
-            TUIRoomKit.sharedInstance.login(sdkAppId: Int(TUILogin.getSdkAppID()), userId: TUILogin.getUserID(), userSig: TUILogin.getUserSig())
+            TUIRoomKit.sharedInstance.login(sdkAppId: Int(TUILogin.getSdkAppID()),
+                                            userId: TUILogin.getUserID() ?? "",
+                                            userSig: TUILogin.getUserSig() ?? "")
             return
         }
         //判断现在是否在其他会议房间中
@@ -104,12 +106,6 @@ class RoomMessageManager: NSObject {
     }
     
     private func destroyRoom(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
-        roomEngine.closeLocalCamera()
-        roomEngine.closeLocalMicrophone()
-        roomEngine.stopPushLocalAudio()
-        roomEngine.stopPushLocalVideo()
-        roomEngine.stopScreenCapture()
-        roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
         roomEngine.destroyRoom { [weak self] in
             guard let self = self else { return }
             self.listener?.roomHasDestroyed(roomId: self.roomId)
@@ -140,12 +136,6 @@ class RoomMessageManager: NSObject {
     }
     
     private func exitRoom(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
-        roomEngine.closeLocalCamera()
-        roomEngine.closeLocalMicrophone()
-        roomEngine.stopPushLocalAudio()
-        roomEngine.stopPushLocalVideo()
-        roomEngine.stopScreenCapture()
-        roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
         roomEngine.exitRoom(syncWaiting: true) { [weak self] in
             guard let self = self else { return }
             self.engineManager.refreshRoomEngine()

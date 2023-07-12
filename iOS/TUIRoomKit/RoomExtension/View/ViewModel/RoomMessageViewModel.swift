@@ -1,5 +1,5 @@
 //
-//  RoomMessageContentViewModel.swift
+//  RoomMessageViewModel.swift
 //  TUIRoomKit
 //
 //  Created by 唐佳宁 on 2023/5/10.
@@ -11,12 +11,12 @@ import TUIRoomEngine
 import TUICore
 import TIMCommon
 
-protocol RoomMessageContentViewResponder: NSObject {
+protocol RoomMessageViewResponder: NSObject {
     func updateStackView()
     func updateRoomStatus()
 }
 
-class RoomMessageContentViewModel: NSObject {
+class RoomMessageViewModel: NSObject {
     var message: RoomMessageModel
     lazy var userList: [[String: Any]] = {
         return message.userList
@@ -37,7 +37,7 @@ class RoomMessageContentViewModel: NSObject {
         RoomMessageManager.shared
     }
     let roomKit = TUIRoomKit.sharedInstance
-    weak var viewResponder: RoomMessageContentViewResponder?
+    weak var viewResponder: RoomMessageViewResponder?
     init(message: RoomMessageModel) {
         self.message = message
         super.init()
@@ -71,8 +71,10 @@ class RoomMessageContentViewModel: NSObject {
     func createRoom() {
         let roomInfo = RoomInfo()
         roomInfo.roomId = self.message.roomId
-        roomInfo.name = TUILogin.getNickName() ?? TUILogin.getUserID() + .quickMeetingText
+        roomInfo.name = TUILogin.getNickName() ?? (TUILogin.getUserID() ?? "") + .quickMeetingText
         roomInfo.speechMode = .freeToSpeak
+        roomInfo.isOpenCamera = engineManager.store.isOpenCamera
+        roomInfo.isOpenMicrophone = engineManager.store.isOpenMicrophone
         roomKit.banAutoRaiseUiOnce(isBan: true)
         roomKit.createRoom(roomInfo: roomInfo, type: .meeting)
     }
@@ -115,7 +117,7 @@ class RoomMessageContentViewModel: NSObject {
         }
         if !messageManager.isEngineLogin {
             roomKit.addListener(listener: self)
-            roomKit.login(sdkAppId: Int(TUILogin.getSdkAppID()), userId: TUILogin.getUserID(), userSig: TUILogin.getUserSig())
+            roomKit.login(sdkAppId: Int(TUILogin.getSdkAppID()), userId: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "")
             return
         }
         //如果用户已经进入了其他TUIRoomKit房间，需要先退出房间
@@ -132,14 +134,20 @@ class RoomMessageContentViewModel: NSObject {
     }
     
     private func enterRoom() {
-        if message.owner != userId {
-            roomKit.addListener(listener: self)
-            roomEngine.addObserver(self)
+        roomKit.addListener(listener: self)
+        roomEngine.addObserver(self)
+        engineManager.store.isChatAccessRoom = true
+        if !engineManager.store.isEnteredRoom {
+            let roomInfo = RoomInfo()
+            roomInfo.roomId = message.roomId
+            roomInfo.isOpenCamera = engineManager.store.isOpenCamera
+            roomInfo.isOpenMicrophone = engineManager.store.isOpenMicrophone
+            debugPrint("*******执行进入房间enterRoom")
+            roomKit.enterRoom(roomInfo: roomInfo)
+        } else {
+            debugPrint("*******执行raiseUi")
+            roomKit.raiseUi()
         }
-        roomKit.setChatAccessRoom(isChatAccessRoom: true)
-        let roomInfo = RoomInfo()
-        roomInfo.roomId = message.roomId
-        roomKit.enterRoom(roomInfo: roomInfo)
     }
     
     func inviteUserAction() {
@@ -149,7 +157,7 @@ class RoomMessageContentViewModel: NSObject {
                 navigateController.push(TUICore_TUIGroupObjectFactory_SelectGroupMemberVC_Classic, param: param) { [weak self] responseData in
                     guard let self = self else { return }
                     guard let modelList =
-                        responseData[TUICore_TUIGroupObjectFactory_SelectGroupMemberVC_ResultUserList] as? [TUIUserModel]
+                            responseData[TUICore_TUIGroupObjectFactory_SelectGroupMemberVC_ResultUserList] as? [TUIUserModel]
                     else { return }
                     self.startInviteUsers(groupId : self.message.groupId, userModelList: modelList, roomId : self.message.roomId)
                 }
@@ -161,7 +169,7 @@ class RoomMessageContentViewModel: NSObject {
                                                forResult: { [weak self] responseData in
                     guard let self = self else { return }
                     guard let modelList =
-                        responseData[TUICore_TUIGroupObjectFactory_SelectGroupMemberVC_ResultUserList] as? [TUIUserModel]
+                            responseData[TUICore_TUIGroupObjectFactory_SelectGroupMemberVC_ResultUserList] as? [TUIUserModel]
                     else { return }
                     self.startInviteUsers(groupId : self.message.groupId, userModelList: modelList, roomId : self.message.roomId)
                 })
@@ -215,10 +223,10 @@ class RoomMessageContentViewModel: NSObject {
         return str
     }
     //字符串转成字典
-   private func stringValueDic(_ str: String) -> [String : Any]?{
+    private func stringValueDic(_ str: String) -> [String : Any]?{
         guard let data = str.data(using: String.Encoding.utf8) else { return nil }
         if let dict = try? JSONSerialization.jsonObject(with: data,
-                        options: .mutableContainers) as? [String : Any] {
+                                                        options: .mutableContainers) as? [String : Any] {
             return dict
         }
         return nil
@@ -249,12 +257,12 @@ class RoomMessageContentViewModel: NSObject {
     }
 }
 
-extension RoomMessageContentViewModel: TUIRoomObserver {
+extension RoomMessageViewModel: TUIRoomObserver {
     func onRemoteUserEnterRoom(roomId: String, userInfo: TUIUserInfo) {
         addUserList(userInfo: userInfo)
         if self.message.owner == self.userId {
             let prefixUserList = Array(userList.prefix(5))
-                messageManager.resendRoomMessage(message: message, dic: ["userList":prefixUserList,"memberCount":userList.count])
+            messageManager.resendRoomMessage(message: message, dic: ["userList":prefixUserList,"memberCount":userList.count])
             debugPrint("---+++:,现在上传的userList是：\(prefixUserList.count),memberCount:\(userList.count)")
         }
         viewResponder?.updateStackView()
@@ -280,7 +288,7 @@ extension RoomMessageContentViewModel: TUIRoomObserver {
     }
 }
 
-extension RoomMessageContentViewModel: TUIRoomKitListener {
+extension RoomMessageViewModel: TUIRoomKitListener {
     func onLogin(code: Int, message: String) {
         messageManager.isEngineLogin = true
         enterRoomAction()
@@ -297,8 +305,8 @@ extension RoomMessageContentViewModel: TUIRoomKitListener {
                 if self.message.owner == self.userId {
                     let prefixUserList = Array(userList.prefix(5))
                     messageManager.resendRoomMessage(message: self.message, dic: ["userList":prefixUserList,
-                                            "memberCount":userList.count,
-                                            "roomState":RoomMessageModel.RoomState.created.rawValue,])
+                                                                                  "memberCount":userList.count,
+                                                                                  "roomState":RoomMessageModel.RoomState.created.rawValue,])
                     debugPrint("---+++:,现在上传的userList是：\(prefixUserList.count),memberCount:\(userList.count)")
                 }
                 viewResponder?.updateRoomStatus()
@@ -320,10 +328,6 @@ extension RoomMessageContentViewModel: TUIRoomKitListener {
             }
             self.message.roomState = .entered
             viewResponder?.updateRoomStatus()
-            if self.message.owner != userId {
-                roomEngine.addObserver(self)
-                roomKit.addListener(listener: self)
-            }
         }
         messageManager.isReadyToSendMessage = true
     }
@@ -357,7 +361,7 @@ extension RoomMessageContentViewModel: TUIRoomKitListener {
     }
 }
 
-extension RoomMessageContentViewModel: RoomMessageManagerListener {
+extension RoomMessageViewModel: RoomMessageManagerListener {
     func roomHasDestroyed(roomId: String) {
         if roomId == message.roomId {
             TUILogin.setCurrentBusinessScene(.None)
