@@ -124,6 +124,14 @@ class TUIVideoSeatView: UIView {
         let offsetYu = Int(attendeeCollectionView.contentOffset.x) % Int(attendeeCollectionView.mm_w)
         let offsetMuti = CGFloat(offsetYu) / attendeeCollectionView.mm_w
         pageControl.currentPage = (offsetMuti > 0.5 ? 1 : 0) + (Int(attendeeCollectionView.contentOffset.x) / Int(attendeeCollectionView.mm_w))
+
+        if let seatItem = moveMiniscreen.seatItem, seatItem.hasVideoStream {
+            if pageControl.currentPage == 0 && !moveMiniscreen.isHidden {
+                viewModel.startPlayVideo(item: seatItem, renderView: moveMiniscreen.renderView)
+            } else {
+                viewModel.startPlayVideo(item: seatItem, renderView: getSeatVideoRenderView(seatItem))
+            }
+        }
     }
 
     deinit {
@@ -134,8 +142,45 @@ class TUIVideoSeatView: UIView {
 // MARK: - TUIVideoSeatViewResponder
 
 extension TUIVideoSeatView: TUIVideoSeatViewResponder {
+    private func freshCollectionView(block: () -> Void) {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        CATransaction.setCompletionBlock { [weak self] in
+            guard let self = self else { return }
+            self.viewModel.clearSubscribeVideoStream(items: self.getNoLoadHasVideoItems())
+        }
+        block()
+        CATransaction.commit()
+    }
+
     func reloadData() {
-        attendeeCollectionView.reloadData()
+        freshCollectionView {
+            self.attendeeCollectionView.reloadData()
+        }
+    }
+
+    func insertItems(at indexPaths: [IndexPath]) {
+        freshCollectionView {
+            self.attendeeCollectionView.performBatchUpdates {
+                self.attendeeCollectionView.insertItems(at: indexPaths)
+            }
+        }
+    }
+
+    func deleteItems(at indexPaths: [IndexPath]) {
+        freshCollectionView {
+            self.attendeeCollectionView.performBatchUpdates {
+                self.attendeeCollectionView.deleteItems(at: indexPaths)
+            }
+        }
+    }
+
+    func reloadItems(at indexPaths: [IndexPath]) {
+        freshCollectionView {
+            self.attendeeCollectionView.performBatchUpdates {
+                self.attendeeCollectionView.reloadItems(at: indexPaths)
+            }
+        }
     }
 
     func updateSeatItem(_ item: VideoSeatItem) {
@@ -171,7 +216,7 @@ extension TUIVideoSeatView: TUIVideoSeatViewResponder {
             moveMiniscreen.isHidden = true
             return
         }
-        if Int(attendeeCollectionView.contentOffset.x / max(attendeeCollectionView.mm_w, 1)) != 0 {
+        if attendeeCollectionView.contentOffset.x > 5 {
             return
         }
 
@@ -182,7 +227,7 @@ extension TUIVideoSeatView: TUIVideoSeatViewResponder {
                firstItem.userId == lastItem.userId,
                firstItem.type != .share {
             } else {
-                viewModel.stopPlayVideo(item: lastItem)
+                viewModel.unbindCell(item: lastItem)
             }
         }
 
@@ -200,6 +245,29 @@ extension TUIVideoSeatView: TUIVideoSeatViewResponder {
     func updateMiniscreenVolume(_ item: VideoSeatItem) {
         moveMiniscreen.updateUIVolume(item: item)
     }
+
+    private func getNoLoadHasVideoItems() -> [VideoSeatItem] {
+        var hasVideoStreamItems = viewModel.listSeatItem.filter({ $0.isHasVideoStream })
+        let visibleCells = Array(attendeeCollectionView.visibleCells)
+        for cell in visibleCells {
+            if let seatCell = cell as? TUIVideoSeatCell,
+               let seatItem = seatCell.seatItem,
+               let seatItemIndex = hasVideoStreamItems.firstIndex(where: { $0 == seatItem }) {
+                hasVideoStreamItems.remove(at: seatItemIndex)
+            }
+        }
+        if let seatItem = moveMiniscreen.seatItem,
+           let seatItemIndex = hasVideoStreamItems.firstIndex(where: {
+               if $0.userId == seatItem.userId && $0.type != .share {
+                   return true
+               } else {
+                   return false
+               }
+           }) {
+            hasVideoStreamItems.remove(at: seatItemIndex)
+        }
+        return hasVideoStreamItems
+    }
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
@@ -210,16 +278,8 @@ extension TUIVideoSeatView: UICollectionViewDelegateFlowLayout {
             if seatItem.isHasVideoStream {
                 viewModel.startPlayVideo(item: seatItem, renderView: seatCell.renderView)
             } else {
-                viewModel.stopPlayVideo(item: seatItem)
+                viewModel.unbindCell(item: seatItem)
             }
-        }
-    }
-
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let seatCell = cell as? TUIVideoSeatCell, let seatItem = seatCell.seatItem else { return }
-        let currentPageIndex = Int(collectionView.contentOffset.x / collectionView.mm_w)
-        if viewModel.isNeedStopPlayVideo(item: seatItem, currentPageIndex: currentPageIndex) {
-            viewModel.stopPlayVideo(item: seatItem)
         }
     }
 }
@@ -233,6 +293,7 @@ extension TUIVideoSeatView: UIScrollViewDelegate {
         } else {
             attendeeCollectionView.addSubview(moveMiniscreen)
         }
+        viewModel.clearSubscribeVideoStream(items: getNoLoadHasVideoItems())
         updatePageControl()
     }
 
@@ -259,7 +320,15 @@ extension TUIVideoSeatView: UICollectionViewDataSource {
         if indexPath.item >= viewModel.listSeatItem.count {
             return cell
         }
+
+        // 解绑cell和item的绑定
         let seatItem = viewModel.listSeatItem[indexPath.item]
+        if let lastSeatItem = cell.seatItem, lastSeatItem != seatItem, lastSeatItem.cell == cell {
+            lastSeatItem.cell = nil
+            lastSeatItem.cellIndexPath = nil
+            viewModel.stopPlayVideo(item: lastSeatItem)
+        }
+        seatItem.cell = cell
         seatItem.cellIndexPath = indexPath
         cell.updateUI(item: seatItem)
         if seatItem.isHasVideoStream {

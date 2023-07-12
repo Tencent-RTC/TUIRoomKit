@@ -26,6 +26,7 @@ class VideoSeatItem: Equatable {
 
     var audioVolume: Int = 0
     var cellIndexPath: IndexPath?
+    weak var cell: TUIVideoSeatCell?
 
     var streamType: TUIVideoStreamType {
         return videoStreamType
@@ -116,5 +117,11 @@ class VideoSeatItem: Equatable {
         item.audioVolume = audioVolume
         item.itemType = .speaker
         return item
+    }
+   
+    func updateStreamType(streamType:TUIVideoStreamType) {
+        if videoStreamType != .screenStream {
+            videoStreamType = streamType
+        }
     }
 }
