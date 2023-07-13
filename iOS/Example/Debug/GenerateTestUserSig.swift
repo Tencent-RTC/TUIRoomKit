@@ -21,7 +21,7 @@ let SDKAPPID: Int = 0
  * Time unit: Second
  * Default value: 604800 (7 days)
  */
-let EXPIRETIME: Int = 0
+let EXPIRETIME: Int = 604_800
 
 /**
  * Follow the steps below to obtain the key required for UserSig calculation.
