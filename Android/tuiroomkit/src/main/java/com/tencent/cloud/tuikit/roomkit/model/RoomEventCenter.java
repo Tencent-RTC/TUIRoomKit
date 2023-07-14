@@ -282,7 +282,7 @@ public class RoomEventCenter {
         }
 
         @Override
-        public void onKickedOutOfRoom(String roomId, String message) {
+        public void onKickedOutOfRoom(String roomId, TUIRoomDefine.KickedOutOfRoomReason reason, String message) {
             Map<String, Object> map = new HashMap<>();
             map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
             map.put(RoomEventConstant.KEY_MESSAGE, message);
