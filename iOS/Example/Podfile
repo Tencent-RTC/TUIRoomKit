@@ -10,9 +10,9 @@ end
 # 工具库
 def tool
   pod 'Alamofire'
-  pod 'TUICore','>= 7.3.4358'
+  pod 'TUICore'
   pod 'TUIChat'
-  pod 'TUIRoomEngine','>= 1.3.4'
+  pod 'TUIRoomEngine','1.4.1'
   pod 'TXLiteAVSDK_TRTC'
   pod 'TXAppBasic'
   pod 'TIMCommon'
@@ -31,6 +31,12 @@ target 'DemoApp' do
   ui
   tool
   local
+  
+  # 屏幕分享扩展Podfile配置
+  target 'TXReplayKit_Screen' do
+    inherit! :search_paths
+    pod 'TXLiteAVSDK_TRTC/ReplayKitExt'
+  end
 end
 
 post_install do |installer|
