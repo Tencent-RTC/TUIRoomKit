@@ -45,7 +45,9 @@
 
 <script setup lang='ts'>
 import { storeToRefs } from 'pinia';
+/// @TUIRoom-PlatformAdapter-Start
 import MemberItem from '../ManageMember/MemberItem';
+/// @TUIRoom-PlatformAdapter-End
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import SvgIcon from '../common/SvgIcon.vue';
 import { useRoomStore } from '../../stores/room';

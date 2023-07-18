@@ -151,6 +151,10 @@ const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }
     }
     roomStore.setMasterUserId(userId);
     resetState();
+    if (roomStore.isAnchor) return;
+    if (roomStore.isSpeakAfterTakingSeatMode) {
+      await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+    };
   }
 };
 
