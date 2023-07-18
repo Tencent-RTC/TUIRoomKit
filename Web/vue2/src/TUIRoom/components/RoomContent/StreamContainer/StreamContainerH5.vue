@@ -67,11 +67,13 @@ import StreamRegion from '../StreamRegion';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ElMessage } from '../../../elementComp';
 import { MESSAGE_DURATION } from '../../../constants/message';
+import logger from '../../../utils/common/logger';
 
 import TUIRoomEngine, { TUIChangeReason, TUIRoomEvents,  TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import useStreamContainer from './useStreamContainerHooks';
 
+const logPrefix = '[StreamContainer]';
 const {
   onRemoteUserEnterRoom,
   onRemoteUserLeaveRoom,
@@ -436,6 +438,12 @@ const onUserVideoStateChanged = (eventInfo: {
       } else if (userId === enlargeStream.value?.userId) {
         [enlargeStream.value] = roomStore.remoteStreamList;
       }
+
+      logger.debug(`${logPrefix} onUserVideoStateChanged: stop`, userId, streamType);
+      roomEngine.instance?.stopPlayRemoteVideo({
+        userId,
+        streamType,
+      });
     }
   }
 };

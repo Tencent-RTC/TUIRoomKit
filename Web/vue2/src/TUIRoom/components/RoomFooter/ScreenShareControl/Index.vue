@@ -35,7 +35,10 @@
 <script setup lang="ts">
 import { ref, Ref, computed, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage, Dialog  } from '../../../elementComp';
+import { ElMessage } from '../../../elementComp';
+
+import Dialog from '../../../elementComp/Dialog';
+
 import IconButton from '../../common/IconButton.vue';
 import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
@@ -92,7 +95,7 @@ async function toggleScreenShare() {
     await roomEngine.instance?.startScreenSharing();
     isSharing.value = true;
   } catch (error: any) {
-    logger.error(`${logPrefix}startScreenShare error:`, error);
+    logger.error(`${logPrefix}startScreenShare error:`, error.name, error.message, error.code);
     let message = '';
     // 当屏幕分享流初始化失败时, 提醒用户并停止后续进房发布流程
     switch (error.name) {

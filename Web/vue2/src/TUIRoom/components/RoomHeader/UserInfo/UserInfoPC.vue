@@ -1,7 +1,7 @@
 <template>
   <div ref="userInfoRef" class="user-info-container">
     <div class="user-info-content" @click="handleUserControl">
-      <img class="avatar" :src="avatarUrl || defaultAvatar">
+      <Avatar class="avatar" :img-src="avatarUrl"></Avatar>
       <div class="name">{{ userName || userId }}</div>
       <svg-icon class="down-icon" :icon-name="iconName" size="medium"></svg-icon>
     </div>
@@ -41,10 +41,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Dialog } from '../../../elementComp';
+
+import Dialog from '../../../elementComp/Dialog';
+
 import SvgIcon from '../../common/SvgIcon.vue';
-import defaultAvatar from '../../../assets/imgs/avatar.png';
 import useUserInfo from './useUserInfoHooks';
+import Avatar from '../../base/Avatar.vue';
 const {
   t,
   showEditNameItem,
