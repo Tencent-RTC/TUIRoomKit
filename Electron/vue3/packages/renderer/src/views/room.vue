@@ -20,6 +20,10 @@ import router from '@/router';
 import { checkNumber } from '@/TUIRoom/utils/common';
 import { useI18n } from 'vue-i18n';
 import { ElMessageBox } from 'element-plus';
+import {
+  TUIKickedOutOfRoomReason,
+} from '@tencentcloud/tuiroom-engine-electron';
+
 const { t } = useI18n();
 
 const route = useRoute();
@@ -139,7 +143,7 @@ const onExitRoom = (info: { code: number; message: string }) => {
  * Ordinary members were kicked out of the room by the host
  * 普通成员被主持人踢出房间
 **/
-const onKickedOutOfRoom = (info: { roomId: string; message: string }) => {
+const onKickedOutOfRoom = (info: { roomId: string; reason: TUIKickedOutOfRoomReason, message: string }) => {
   console.debug('onKickedOutOfRoom:', info);
   sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });

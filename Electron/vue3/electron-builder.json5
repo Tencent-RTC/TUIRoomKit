@@ -2,47 +2,36 @@
  * @see https://www.electron.build/configuration/configuration
  */
 {
-  "appId": "com.tencentcloud.trtc.room-kit-electron-vue3",
-  "asar": true,
-  "asarUnpack": "**\\*.{node,dll}",
-  "directories": {
-    "output": "release/${version}"
+  appId: "com.tencentcloud.trtc.room-kit-electron-vue3",
+  asar: true,
+  asarUnpack: "**\\*.{node,dll}",
+  directories: {
+    output: "release/${version}",
   },
-  "files": [
-    "dist",
-    "!node_modules/trtc-electron-sdk/build/mac-framework"
-  ],
-  "mac": {
-    "artifactName": "${productName}_${version}.${ext}",
-    "extraFiles": [
+  files: ["dist", "!node_modules/trtc-electron-sdk/build/mac-framework"],
+  mac: {
+    artifactName: "${productName}_${version}.${ext}",
+    extraFiles: [
       {
-        "from": "node_modules/trtc-electron-sdk/build/Release/${arch}/trtc_electron_sdk.node",
-        "to": "./Resources/app.asar.unpacked/node_modules/trtc-electron-sdk/build/Release"
+        from: "node_modules/trtc-electron-sdk/build/mac-framework/${arch}/",
+        to: "./Frameworks",
       },
-      {
-        "from": "node_modules/trtc-electron-sdk/build/mac-framework/${arch}/",
-        "to": "./Frameworks"
-      }
     ],
-    "target": [
-      "dmg"
-    ]
+    target: ["dmg"],
   },
-  "win": {
-    "target": [
+  win: {
+    target: [
       {
-        "target": "nsis",
-        "arch": [
-          "x64"
-        ]
-      }
+        target: "nsis",
+        arch: ["x64"],
+      },
     ],
-    "artifactName": "${productName}_${version}.${ext}"
+    artifactName: "${productName}_${version}.${ext}",
   },
-  "nsis": {
-    "oneClick": false,
-    "perMachine": false,
-    "allowToChangeInstallationDirectory": true,
-    "deleteAppDataOnUninstall": false
-  }
+  nsis: {
+    oneClick: false,
+    perMachine: false,
+    allowToChangeInstallationDirectory: true,
+    deleteAppDataOnUninstall: false,
+  },
 }

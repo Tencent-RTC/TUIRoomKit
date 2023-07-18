@@ -1,6 +1,11 @@
 <template>
   <div class="verify-input">
-    <input v-model="verifyStates.verifyCode" class="input" :placeholder="t('Verification code')">
+    <input
+      v-model="verifyStates.verifyCode"
+      :class="[isMobile ? 'input-mobile': 'input']"
+      :placeholder="t('Verification code')"
+      enterkeyhint="complete"
+    >
     <div class="area-container">
       <svg-icon icon-name="verify-code" size="medium"></svg-icon>
     </div>
@@ -13,6 +18,7 @@
 import { reactive, watch } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import { useI18n } from '../../locales';
+import isMobile from '../../utils/useMediaValue';
 const { t } = useI18n();
 const emit = defineEmits(['update-verify-code', 'send-verify-code']);
 interface VerifyStates{
@@ -73,6 +79,23 @@ defineExpose({ startCountDown, clear });
         height:60px;
         line-height:60px;
         outline:none;
+        padding:0 15px 0 40px;
+        transition:border-color .2s cubic-bezier(.645,.045,.355,1);
+        width:100%;
+    }
+    .input-mobile{
+        -webkit-appearance:none;
+        background-color:rgba(207, 213, 230, 0.2);
+        background-image:none;
+        border-radius:8px;
+        box-sizing:border-box;
+        color: #B3B8C8;
+        display:inline-block;
+        font-size:inherit;
+        height:60px;
+        line-height:60px;
+        outline:none;
+        border: 0px;
         padding:0 15px 0 40px;
         transition:border-color .2s cubic-bezier(.645,.045,.355,1);
         width:100%;

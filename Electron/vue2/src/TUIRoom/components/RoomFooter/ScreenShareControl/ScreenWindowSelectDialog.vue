@@ -49,7 +49,7 @@ import { TRTCScreenCaptureSourceInfo } from '@tencentcloud/tuiroom-engine-electr
 import ScreenWindowPreviewer from './ScreenWindowPreviewer.vue';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useI18n } from '../../../locales';
-import Dialog from '../../../elementComp/Dialog.vue';
+import Dialog from '../../../elementComp/Dialog/index.vue';
 
 const { t } = useI18n();
 
@@ -111,6 +111,7 @@ function cancel() {
 }
   .selected {
     background-color: transparent;
-    color: $primaryColor;
+    color: var(--selected-screen-share-dialog);
+    box-shadow: 2px 2px 10px 2px $activeStateColor;
   }
 </style>

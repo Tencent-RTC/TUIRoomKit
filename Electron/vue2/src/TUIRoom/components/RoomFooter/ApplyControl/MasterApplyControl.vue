@@ -10,7 +10,11 @@
       <svg-icon icon-name="apply-big-icon" class="apply-big-icon"></svg-icon>
       <span class="info">{{ applyToAnchorList.length }}</span>
     </div>
-    <div v-show="showApplyUserList" ref="masterApplyListRef" class="apply-list-container">
+    <div
+      v-show="showApplyUserList"
+      ref="masterApplyListRef"
+      :class="isMobile ? 'apply-list-container-h5':'apply-list-container'"
+    >
       <div class="title-container">
         <span class="title">{{ t('Apply to stage application') }}</span>
         <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyList"></svg-icon>
@@ -18,7 +22,7 @@
       <div class="apply-list">
         <div v-for="(item, index) in applyToAnchorList" :key="index" class="apply-item">
           <div class="user-info">
-            <img class="avatar-url" :src="item.avatarUrl || defaultAvatar">
+            <Avatar class="avatar-url" :img-src="item.avatarUrl"></Avatar>
             <span class="user-name" :title="item.userName || item.userId">{{ item.userName || item.userId }}</span>
           </div>
           <div class="control-container">
@@ -36,6 +40,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import Avatar from '../../base/Avatar.vue';
 import { ICON_NAME } from '../../../constants/icon';
 import IconButton from '../../common/IconButton.vue';
 import SvgIcon from '../../common/SvgIcon.vue';
@@ -44,7 +49,7 @@ import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
 import { useI18n } from '../../../locales';
-import defaultAvatar from '../../../assets/imgs/avatar.png';
+import isMobile from '../../../utils/useMediaValue';
 
 const { t } = useI18n();
 
@@ -126,7 +131,7 @@ onBeforeUnmount(() => {
       font-size: 14px;
     }
   }
-  .apply-list-container {
+  .apply-list-container, .apply-list-container-h5 {
     width: 470px;
     height: 286px;
     background: var(--apply-list-container-bg-color);
@@ -217,6 +222,38 @@ onBeforeUnmount(() => {
       background: rgba(173,182,204,0.10);
       border: 1px solid #ADB6CC;
       color: var(--apply-container-outline);
+    }
+  }
+  .apply-list-container-h5 {
+    width: 80vw;
+    height: 30vh;
+    border-radius: 13px;
+    display: flex;
+    flex-direction: column;
+    .apply-list {
+      max-height: 72%;
+    }
+    .apply-footer {
+      height: 40px;
+      .button {
+        width: 100%;
+        background: var(--apply-container-background-outline-h5);
+        border-radius: 8px;
+        padding: 0;
+      }
+      .deny-all {
+        padding: 8px;
+      }
+    }
+    .primary {
+      border-radius: 8px;
+      color: var(--apply-container-primary);
+    }
+    .outline {
+      border-radius: 8px;
+      background: var(--apply-container-background-outline-h5);
+      border: none;
+      color: var(--apply-container-outline-h5);
     }
   }
 }

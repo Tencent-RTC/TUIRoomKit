@@ -43,7 +43,9 @@ import { ICON_NAME } from '../../../constants/icon';
 import IconButton from '../../common/IconButton.vue';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ElMessage } from '../../../elementComp';
-import Dialog from '../../../elementComp/Dialog.vue';
+/// @TUIRoom-PlatformAdapter-Start
+import Dialog from '../../../elementComp/Dialog/index.vue';
+/// @TUIRoom-PlatformAdapter-End
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';

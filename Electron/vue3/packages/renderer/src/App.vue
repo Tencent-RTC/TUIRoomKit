@@ -6,10 +6,13 @@
 </template>
 
 <style lang="scss">
-  html,body,#app{
-    height: 100%;
-  }
-  #app {
-    overflow: hidden;
-  }
+html,
+body,
+#app {
+  height: 100%;
+}
+
+#app {
+  overflow: hidden;
+}
 </style>

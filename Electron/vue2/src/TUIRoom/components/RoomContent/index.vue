@@ -5,7 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import StreamContainer from './StreamContainer.vue';
+/// @TUIRoom-PlatformAdapter-Start
+import StreamContainer from './StreamContainer/index.vue';
+/// @TUIRoom-PlatformAdapter-End
 
 defineProps<{
   showRoomTool: boolean,

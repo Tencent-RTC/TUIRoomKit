@@ -14,6 +14,7 @@
 
 <script>
 import RoomContainer from '@/TUIRoom/index.vue';
+import { MessageBox } from 'element-ui';
 export default {
   name: 'Room',
   components: { RoomContainer },
@@ -40,17 +41,51 @@ export default {
 
     const { action, roomMode, roomParam } = JSON.parse(this.roomInfo);
     const { sdkAppId, userId, userSig, userName, avatarUrl } = JSON.parse(this.userInfo);
-    await this.$refs.TUIRoomRef.init({
-      sdkAppId,
-      userId,
-      userSig,
-      userName,
-      avatarUrl,
-    });
-    if (action === 'createRoom') {
-      await this.$refs.TUIRoomRef.createRoom({ roomId: this.roomId, roomName: this.roomId, roomMode, roomParam });
-    } else if (action === 'enterRoom') {
-      await this.$refs.TUIRoomRef.enterRoom({ roomId: this.roomId, roomParam });
+    try {
+      await this.$refs.TUIRoomRef.init({
+        sdkAppId,
+        userId,
+        userSig,
+        userName,
+        avatarUrl,
+      });
+      if (action === 'createRoom') {
+        try {
+          await this.$refs.TUIRoomRef.createRoom({ roomId: this.roomId, roomName: this.roomId, roomMode, roomParam });
+        } catch (error) {
+          const message = this.$t('Failed to enter the room.') + error.message;
+          MessageBox.alert(message, this.$t('Note'), {
+            customClass: 'custom-element-class',
+            confirmButtonText: this.$t('Confirm'),
+            callback: () => {
+              this.$router.push({ path: 'home' });
+            },
+          });
+        }
+      } else if (action === 'enterRoom') {
+        try {
+          await this.$refs.TUIRoomRef.enterRoom({ roomId: this.roomId, roomParam });
+        } catch (error) {
+          const message = this.$t('Failed to enter the room.') + error.message;
+          MessageBox.alert(message, this.$t('Note'), {
+            customClass: 'custom-element-class',
+            confirmButtonText: this.$t('Confirm'),
+            callback: () => {
+              this.$router.push({ path: 'home' });
+            },
+          });
+        }
+      }
+    } catch (error) {
+      const message = this.$t('Failed to enter the room.') + error.message;
+      MessageBox.alert(message, this.$t('Note'), {
+        customClass: 'custom-element-class',
+        confirmButtonText: this.$t('Confirm'),
+        callback: () => {
+          sessionStorage.removeItem('tuiRoom-currentUserInfo');
+          this.$router.push({ path: 'home' });
+        },
+      });
     }
   },
   methods: {
