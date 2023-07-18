@@ -195,3 +195,8 @@ ipcMain.handle("open-win", (event, arg) => {
     // childWindow.webContents.openDevTools({ mode: "undocked", activate: true })
   }
 });
+
+ipcMain.on('app-exit', () => {
+  win?.close();
+  app.exit();
+})

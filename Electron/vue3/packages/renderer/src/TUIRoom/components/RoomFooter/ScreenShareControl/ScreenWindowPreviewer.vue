@@ -50,7 +50,7 @@ onMounted(() => {
   margin: 8px;
   padding: 8px;
   width: 160px;
-  height: 122px;
+  height: 150px;
   border: 1px solid $primaryColor;
   border-radius: 8px;
   text-align: center;
@@ -62,7 +62,7 @@ onMounted(() => {
 
 .previewer-canvas {
   width: 100%;
-  height: 90px;
+  height: 120px;
   margin: 0 auto;
   display: flex;
   justify-content: space-around;

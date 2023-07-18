@@ -21,22 +21,15 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from '../../elementComp';
-import { useI18n } from '../../locales';
-import SvgIcon from '../common/SvgIcon.vue';
+import useRoomMoreControl from './useRoomMoreHooks';
 
-const { t } = useI18n();
-
-const groupNumber = '592465424';
-const email = 'matthewwu@tencent.com';
-
-function onCopy(value: string | number) {
-  navigator.clipboard.writeText(`${value}`);
-  ElMessage({
-    message: t('Copied successfully'),
-    type: 'success',
-  });
-}
+const {
+  t,
+  groupNumber,
+  email,
+  onCopy,
+  SvgIcon,
+} = useRoomMoreControl();
 </script>
 
 <style lang="scss" scoped>

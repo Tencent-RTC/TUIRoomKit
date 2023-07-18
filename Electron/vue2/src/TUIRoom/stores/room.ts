@@ -13,6 +13,7 @@ export type StreamInfo = {
   hasScreenStream?: boolean,
   audioVolume?: number,
   streamType: TUIVideoStreamType,
+  isVisible: boolean,
 }
 
 export type UserInfo = {
@@ -22,6 +23,8 @@ export type UserInfo = {
   hasAudioStream?: boolean,
   hasVideoStream?: boolean,
   hasScreenStream?: boolean,
+  isVideoVisible?: boolean,
+  isScreenVisible?: boolean,
   userRole?: TUIRole,
   // 是否在麦上
   onSeat?: boolean,
@@ -69,6 +72,9 @@ interface RoomState {
   isCameraDisableForAllUser: boolean,
   isMessageDisableForAllUser: boolean,
   speechMode: TUISpeechMode,
+  maxMembersCount: number,
+  hasVideoStreamObject: Record<string, UserInfo>,
+  currentStreamIdListInVisibleView: string[],
 }
 
 export const useRoomStore = defineStore('room', {
@@ -91,6 +97,7 @@ export const useRoomStore = defineStore('room', {
         hasAudioStream: false,
         hasVideoStream: false,
         streamType: TUIVideoStreamType.kCameraStream,
+        isVisible: true,
       },
       screenStreamInfo: {
         userId: '',
@@ -98,6 +105,7 @@ export const useRoomStore = defineStore('room', {
         avatarUrl: '',
         hasScreenStream: false,
         streamType: TUIVideoStreamType.kScreenStream,
+        isVisible: true,
       },
     },
     remoteUserObj: {},
@@ -117,6 +125,10 @@ export const useRoomStore = defineStore('room', {
     isCameraDisableForAllUser: false,
     isMessageDisableForAllUser: false,
     speechMode: TUISpeechMode.kFreeToSpeak,
+    maxMembersCount: 5, // 包含本地流和屏幕分享，超过该数目后续都播放小流
+    hasVideoStreamObject: {},
+    // 可视区域用户流列表
+    currentStreamIdListInVisibleView: [],
   }),
   getters: {
     // 当前用户是否是主持人
@@ -177,12 +189,14 @@ export const useRoomStore = defineStore('room', {
           hasVideoStream,
           hasScreenStream,
           audioVolume,
+          isVideoVisible,
+          isScreenVisible,
         } = userInfo;
         if (onSeat) {
-          obj[`${userId}_${TUIVideoStreamType.kCameraStream}`] = Object.assign(userInfo.cameraStreamInfo, { userId, avatarUrl, userName, hasAudioStream, hasVideoStream, audioVolume, streamType: TUIVideoStreamType.kCameraStream });
+          obj[`${userId}_${TUIVideoStreamType.kCameraStream}`] = Object.assign(userInfo.cameraStreamInfo, { userId, avatarUrl, userName, hasAudioStream, hasVideoStream, audioVolume, streamType: TUIVideoStreamType.kCameraStream, isVisible: isVideoVisible });
         }
         if (hasScreenStream) {
-          obj[`${userId}_${TUIVideoStreamType.kScreenStream}`] = Object.assign(userInfo.screenStreamInfo, { userId, avatarUrl, userName, hasScreenStream, streamType: TUIVideoStreamType.kScreenStream });
+          obj[`${userId}_${TUIVideoStreamType.kScreenStream}`] = Object.assign(userInfo.screenStreamInfo, { userId, avatarUrl, userName, hasScreenStream, streamType: TUIVideoStreamType.kScreenStream, isVisible: isScreenVisible });
         }
       });
       return obj;
@@ -203,6 +217,10 @@ export const useRoomStore = defineStore('room', {
     },
     applyToAnchorList: state => [...Object.values(state.remoteUserObj)]
       .filter(item => item.isUserApplyingToAnchor) || [],
+    defaultStreamType(): TUIVideoStreamType {
+      return Object.keys(this.hasVideoStreamObject).length > this.maxMembersCount
+        ? TUIVideoStreamType.kCameraStreamLow : TUIVideoStreamType.kCameraStream;
+    },
   },
   actions: {
     setLocalUser(obj: Record<string, any>) {
@@ -213,9 +231,9 @@ export const useRoomStore = defineStore('room', {
     },
     getUserName(userId: string) {
       if (userId === this.localUser.userId) {
-        return this.localUser.userName;
+        return this.localUser.userName || userId;
       }
-      return this.remoteUserObj[userId]?.userName;
+      return this.remoteUserObj[userId]?.userName || userId;
     },
     getNewUserInfo(userId: string) {
       const newUserInfo = {
@@ -225,6 +243,8 @@ export const useRoomStore = defineStore('room', {
         hasAudioStream: false,
         hasVideoStream: false,
         hasScreenStream: false,
+        isVideoVisible: false,
+        isScreenVisible: false,
         userRole: TUIRole.kGeneralUser,
         audioVolume: 0,
         onSeat: !this.isSpeakAfterTakingSeatMode,
@@ -236,6 +256,7 @@ export const useRoomStore = defineStore('room', {
           hasAudioStream: false,
           hasVideoStream: false,
           streamType: TUIVideoStreamType.kCameraStream,
+          isVisible: false,
         },
         screenStreamInfo: {
           userId,
@@ -243,6 +264,7 @@ export const useRoomStore = defineStore('room', {
           avatarUrl: '',
           hasScreenStream: false,
           streamType: TUIVideoStreamType.kScreenStream,
+          isVisible: false,
         },
       };
       // 本端为主持人，则记录用户禁言禁画, 申请发言等信息
@@ -364,10 +386,31 @@ export const useRoomStore = defineStore('room', {
         }
       }
       if (user) {
-        if (streamType === TUIVideoStreamType.kCameraStream) {
+        this.updatehasVideoStreamObject(user, hasVideo,  userId === basicStore.userId);
+        if (streamType === TUIVideoStreamType.kCameraStream || streamType === TUIVideoStreamType.kCameraStreamLow) {
           user.hasVideoStream = hasVideo;
         } else if (streamType === TUIVideoStreamType.kScreenStream) {
           user.hasScreenStream = hasVideo;
+        }
+      }
+    },
+    updatehasVideoStreamObject(userInfo: UserInfo,  hasVideo: boolean, isSelf: boolean) {
+      if (isSelf) return;
+      const { userId, cameraStreamInfo, screenStreamInfo, hasVideoStream } = userInfo;
+      const streamId = `${userId}_${hasVideoStream ? cameraStreamInfo.streamType : screenStreamInfo.streamType}`;
+      if (hasVideo) {
+        if (isVue3) {
+          this.hasVideoStreamObject[streamId] = userInfo;
+        } else {
+          // @ts-ignore
+          Vue.set(this.hasVideoStreamObject, streamId, userInfo);
+        }
+      } else {
+        if (isVue3) {
+          delete this.hasVideoStreamObject[streamId];
+        } else {
+          // @ts-ignore
+          Vue.delete(this.hasVideoStreamObject, streamId);
         }
       }
     },
@@ -400,6 +443,42 @@ export const useRoomStore = defineStore('room', {
         // @ts-ignore
         Vue.delete(this.remoteUserObj, userId);
       }
+    },
+
+    updateUserStreamVisible(streamIdList: string[]) {
+      streamIdList.forEach((item) => {
+        const userId = item.slice(0, item.length - 2);
+        const streamType = Number(item.slice(-1)) as TUIVideoStreamType;
+        if (userId === this.localUser.userId) {
+          return;
+        }
+        const user = this.remoteUserObj[userId];
+        if (!user) {
+          return;
+        }
+        if (streamType === TUIVideoStreamType.kCameraStream || streamType === TUIVideoStreamType.kCameraStreamLow) {
+          user.isVideoVisible = true;
+        } else if (streamType === TUIVideoStreamType.kScreenStream) {
+          user.isScreenVisible = true;
+        }
+      });
+      // 在新的 streamIdList 里面没有的流, isVideoVisible 要设置为 false
+      this.currentStreamIdListInVisibleView.forEach((item: string) => {
+        const userId = item.slice(0, item.length - 2);
+        const streamType = Number(item.slice(-1)) as TUIVideoStreamType;
+        if (streamIdList.indexOf(item) < 0) {
+          const user = this.remoteUserObj[userId];
+          if (!user) {
+            return;
+          }
+          if (streamType === TUIVideoStreamType.kCameraStream || streamType === TUIVideoStreamType.kCameraStreamLow) {
+            user.isVideoVisible = false;
+          } else if (streamType === TUIVideoStreamType.kScreenStream) {
+            user.isScreenVisible = false;
+          }
+        }
+      });
+      this.currentStreamIdListInVisibleView = streamIdList;
     },
 
     setAudioVolume(audioVolumeArray: []) {
@@ -584,6 +663,7 @@ export const useRoomStore = defineStore('room', {
           hasAudioStream: false,
           hasVideoStream: false,
           streamType: TUIVideoStreamType.kCameraStream,
+          isVisible: true,
         },
         screenStreamInfo: {
           userId: '',
@@ -591,6 +671,7 @@ export const useRoomStore = defineStore('room', {
           avatarUrl: '',
           hasScreenStream: false,
           streamType: TUIVideoStreamType.kScreenStream,
+          isVisible: true,
         },
       };
       this.remoteUserObj = {};
@@ -610,6 +691,7 @@ export const useRoomStore = defineStore('room', {
       this.isCameraDisableForAllUser = false;
       this.isMessageDisableForAllUser = false;
       this.speechMode = TUISpeechMode.kFreeToSpeak;
+      this.hasVideoStreamObject = {};
     },
   },
 });

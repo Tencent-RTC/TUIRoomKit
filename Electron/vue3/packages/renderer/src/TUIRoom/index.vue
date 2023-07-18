@@ -1,14 +1,23 @@
 <template>
   <div id="roomContainer" ref="roomRef" class="tui-room">
-    <room-header v-show="showRoomTool && showHeaderTool" class="header" @log-out="logOut"></room-header>
+    <room-header
+      v-show="showRoomTool && showHeaderTool"
+      class="header"
+      @log-out="logOut"
+      @on-destroy-room="onDestroyRoom"
+      @on-exit-room="onExitRoom"
+    ></room-header>
     <room-content ref="roomContentRef" :show-room-tool="showRoomTool" class="content"></room-content>
+    <!-- <chat-room-content v-if="isMobile"></chat-room-content> -->
     <room-footer
       v-show="showRoomTool"
       class="footer"
       @on-destroy-room="onDestroyRoom"
       @on-exit-room="onExitRoom"
     />
-    <room-sidebar></room-sidebar>
+    <room-sidebar
+      @on-exit-room="onExitRoom"
+    ></room-sidebar>
     <room-setting></room-setting>
   </div>
 </template>
@@ -17,24 +26,33 @@
 import { ElMessage, ElMessageBox } from './elementComp';
 import { ref, onMounted, onUnmounted, Ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-
-import RoomHeader from './components/RoomHeader/index.vue';
-import RoomContent from './components/RoomContent/index.vue';
-import RoomFooter from './components/RoomFooter/index.vue';
+/// @TUIRoom-PlatformAdapter-Start
+import RoomHeader from './components/RoomHeader/index/index.vue';
+import RoomFooter from './components/RoomFooter/index/index.vue';
 import RoomSidebar from './components/RoomSidebar/index.vue';
+/// @TUIRoom-PlatformAdapter-End
+import RoomContent from './components/RoomContent/index.vue';
 import RoomSetting from './components/RoomSetting/index.vue';
+// import chatRoomContent from './components/RoomContent/ChatRoomContent.vue';
 import { isElectronEnv, debounce, throttle } from './utils/utils';
 import { useBasicStore } from './stores/basic';
 import { useRoomStore } from './stores/room';
 import { useChatStore } from './stores/chat';
-
+import isMobile from './utils/useMediaValue';
 import TUIRoomEngine, {
+  TRTCVideoMirrorType,
+  TRTCVideoRotation,
+  TRTCVideoFillMode,
   TUIRoomEvents,
   TUIRoomType,
   TRTCDeviceType,
   TRTCDeviceState,
   TUISpeechMode,
+  TUIKickedOutOfRoomReason,
+  TRTCVideoResolution,
+  TRTCVideoEncParam,
 } from '@tencentcloud/tuiroom-engine-electron';
+
 
 import TUIRoomAegis from './utils/aegis';
 import { MESSAGE_DURATION } from './constants/message';
@@ -90,7 +108,12 @@ function handleHideRoomTool() {
 const handleHideRoomToolDebounce = debounce(handleHideRoomTool, 5000);
 const handleHideRoomToolThrottle = throttle(handleHideRoomToolDebounce, 1000);
 
-onMounted(() => {
+const smallParam =  new TRTCVideoEncParam();
+smallParam.videoResolution = TRTCVideoResolution.TRTCVideoResolution_640_360;
+smallParam.videoFps = 10;
+smallParam.videoBitrate = 550;
+
+onMounted(async () => {
   roomRef.value?.addEventListener('mouseenter', () => {
     showRoomTool.value = true;
     handleHideRoomToolDebounce();
@@ -106,6 +129,18 @@ onMounted(() => {
   roomRef.value?.addEventListener('mouseleave', () => {
     showRoomTool.value = false;
   });
+  const defaults = basicStore.defaultTheme;
+  const storageCurrentTheme = localStorage.getItem('tuiRoom-currentTheme') || defaults;
+  basicStore.setDefaultTheme(storageCurrentTheme);
+  document.body.setAttribute('data-theme', storageCurrentTheme);
+  if (isMobile) {
+    const trtcCloud = roomEngine.instance?.getTRTCCloud();
+    await trtcCloud?.setLocalRenderParams({
+      mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Auto,
+      rotation: TRTCVideoRotation.TRTCVideoRotation0,
+      fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
+    });
+  }
 });
 
 onUnmounted(() => {
@@ -186,6 +221,9 @@ async function createRoom(options: {
     code: 0,
     message: 'create room success',
   });
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  trtcCloud.setDefaultStreamRecvMode(true, false);
+  trtcCloud.enableSmallVideoStream(true, smallParam);
   const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
   emit('on-enter-room', {
     code: 0,
@@ -215,6 +253,9 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
   }
   basicStore.setRoomId(roomId);
   console.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  trtcCloud.setDefaultStreamRecvMode(true, false);
+  trtcCloud.enableSmallVideoStream(true, smallParam);
   const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
   roomStore.setRoomInfo(roomInfo);
   await getUserList();
@@ -293,16 +334,28 @@ const onSendMessageForUserDisableChanged = (data: { userId: string, isDisable: b
   }
 };
 
-const onKickedOutOfRoom = async (eventInfo: { roomId: string, message: string }) => {
-  const { roomId, message } = eventInfo;
+const onKickedOutOfRoom = async (eventInfo: { roomId: string, reason: TUIKickedOutOfRoomReason, message: string }) => {
+  const { roomId, reason, message } = eventInfo;
   try {
     resetStore();
-    ElMessageBox.alert(t('kicked out of the room by the host'), t('Note'), {
+    let notice = '';
+    switch (reason) {
+      case TUIKickedOutOfRoomReason.kKickedByAdmin:
+        notice = t('kicked out of the room by the host');
+        break;
+      case TUIKickedOutOfRoomReason.kKickedByLoggedOnOtherDevice:
+        notice = t('kicked out of the room by other device');
+        break;
+      case TUIKickedOutOfRoomReason.kKickedByServer:
+        notice = t('kicked out of the room by serve');
+        break;
+    }
+    ElMessageBox.alert(notice, t('Note'), {
       confirmButtonText: t('Confirm'),
       customClass: 'custom-element-class',
       appendTo: '#roomContainer',
       callback: async () => {
-        emit('on-kicked-out-of-room', { roomId, message });
+        emit('on-kicked-out-of-room', { roomId, reason, message });
       },
     });
   } catch (error) {
@@ -551,9 +604,8 @@ watch(sdkAppId, (val: number) => {
     background-color: $roomBackgroundColor;
   }
   .footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    position: relative;
+    bottom: 80px;
     width: 100%;
     height: 80px;
     background-color: var(--room-footer-bg-color);
