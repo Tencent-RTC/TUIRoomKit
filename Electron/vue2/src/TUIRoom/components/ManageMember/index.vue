@@ -45,14 +45,17 @@
 
 <script setup lang='ts'>
 import { storeToRefs } from 'pinia';
+
+import MemberItem from '../ManageMember/MemberItem/index.vue';
+
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import SvgIcon from '../common/SvgIcon.vue';
 import { useRoomStore } from '../../stores/room';
 import { useBasicStore } from '../../stores/basic';
 import { ICON_NAME } from '../../constants/icon';
-import MemberItem from './MemberItem/index.vue';
 import { useI18n } from '../../locales';
 import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-electron';
+
 
 const roomEngine = useGetRoomEngine();
 
@@ -84,9 +87,10 @@ async function toggleAllVideo() {
   });
   roomStore.setCameraDisableState(cameraDisableState);
 }
+
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .manage-member-container {
     position: relative;
     height: 100%;

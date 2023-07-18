@@ -4,7 +4,7 @@ import { getLanguage } from '../utils/common';
 import { LAYOUT } from '../constants/render';
 import { isUndefined } from '../utils/utils';
 
-type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | '';
+type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | 'transfer-leave' | '';
 
 interface BasicState {
   sdkAppId: number,
@@ -21,6 +21,7 @@ interface BasicState {
   activeSettingTab: string,
   layout: LAYOUT,
   isLocalStreamMirror: boolean,
+  isFrontCamera: boolean,
   sidebarName: SideBarType,
   masterUserId: string,
   localQuality: number,
@@ -47,6 +48,7 @@ export const useBasicStore = defineStore('basic', {
     showApplyUserList: false,
     activeSettingTab: 'audio',
     isLocalStreamMirror: true,
+    isFrontCamera: true,
     sidebarName: '',
     masterUserId: '',
     localQuality: 0,
@@ -129,6 +131,9 @@ export const useBasicStore = defineStore('basic', {
     },
     setIsLocalStreamMirror(mirror: boolean) {
       this.isLocalStreamMirror = mirror;
+    },
+    setIsFrontCamera(isFront: boolean) {
+      this.isFrontCamera = isFront;
     },
     setDefaultTheme(defaultTheme: string) {
       this.defaultTheme = defaultTheme;

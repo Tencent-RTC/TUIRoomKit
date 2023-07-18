@@ -11,9 +11,11 @@
       <language-icon class="header-item language"></language-icon>
       <switch-theme class="header-item theme"></switch-theme>
     </div>
-    <stream-preview ref="streamPreviewRef"></stream-preview>
+    <stream-preview v-if="!isMobile" ref="streamPreviewRef"></stream-preview>
     <room-control
+      ref="roomControlRef"
       :given-room-id="givenRoomId"
+      :user-name="userName || userId"
       @create-room="handleCreateRoom"
       @enter-room="handleEnterRoom"
     ></room-control>
@@ -21,18 +23,26 @@
 </template>
 
 <script>
-import UserInfo from '@/TUIRoom/components/RoomHeader/UserInfo.vue';
-import LanguageIcon from '@/TUIRoom/components/RoomHeader/Language.vue';
-import SwitchTheme from '@/TUIRoom/components/RoomHeader/SwitchTheme.vue';
+import UserInfo from '@/TUIRoom/components/RoomHeader/UserInfo';
+import LanguageIcon from '@/TUIRoom/components/base/Language.vue';
+import SwitchTheme from '@/TUIRoom/components/base/SwitchTheme.vue';
 import StreamPreview from '@/TUIRoom/components/RoomHome/StreamPreview.vue';
-import RoomControl from '@/TUIRoom/components/RoomHome/RoomControl.vue';
+import RoomControl from '@/TUIRoom/components/RoomHome/RoomControl';
 import { getBasicInfo } from '@/config/basic-info-config';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
 import useGetRoomEngine from '@/TUIRoom/hooks/useRoomEngine';
+import isMobile from '../TUIRoom/utils/useMediaValue';
+
 const roomEngine = useGetRoomEngine();
 export default {
   name: 'Home',
-  components: { UserInfo, LanguageIcon, StreamPreview, RoomControl, SwitchTheme },
+  components: {
+    UserInfo,
+    LanguageIcon,
+    StreamPreview,
+    RoomControl,
+    SwitchTheme,
+  },
   data() {
     return {
       givenRoomId: '',
@@ -40,6 +50,7 @@ export default {
       userName: '',
       userAvatar: '',
       userId: '',
+      isMobile,
     };
   },
   async mounted() {
@@ -59,11 +70,14 @@ export default {
     const { sdkAppId, userId, userSig } = this.basicInfo;
     // 登录 TUIRoomEngine
     await TUIRoomEngine.login({ sdkAppId, userId, userSig });
-    this.$refs.streamPreviewRef.startStreamPreview();
+    if (!this.isMobile) {
+      this.$refs.streamPreviewRef.startStreamPreview();
+    }
   },
   methods: {
     setTUIRoomData(action, mode) {
-      const roomParam = this.$refs.streamPreviewRef.getRoomParam();
+      const roomParam = this.isMobile
+        ? this.$refs.roomControlRef.getRoomParam() : this.$refs.streamPreviewRef.getRoomParam();
       const roomData = {
         action,
         roomMode: mode || 'FreeToSpeak',

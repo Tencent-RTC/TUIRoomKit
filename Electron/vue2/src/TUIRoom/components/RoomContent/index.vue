@@ -5,7 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import StreamContainer from './StreamContainer.vue';
+
+import StreamContainer from './StreamContainer/index.vue';
+
 
 defineProps<{
   showRoomTool: boolean,

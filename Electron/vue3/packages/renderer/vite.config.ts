@@ -116,5 +116,12 @@ export default defineConfig({
   server: {
     host: pkg.env.VITE_DEV_SERVER_HOST,
     port: pkg.env.VITE_DEV_SERVER_PORT,
+    proxy: {
+      "/api": {
+        target: `https://service.trtc.qcloud.com/`,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   },
 })

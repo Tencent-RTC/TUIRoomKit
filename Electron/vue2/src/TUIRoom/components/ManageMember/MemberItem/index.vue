@@ -4,16 +4,24 @@
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
   >
-    <member-info :user-info="userInfo" :show-member-control="showMemberControl"></member-info>
+    <member-info :user-info="userInfo" :show-state-icon="!showMemberControl"></member-info>
     <member-control v-show="showMemberControl" :user-info="userInfo"></member-control>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import memberInfo from './memberInfo.vue';
-import memberControl from './memberControl.vue';
+import MemberInfo from '../MemberItemCommon/MemberInfo.vue';
+
+import MemberControl from '../MemberControl/index.vue';
+
 import { UserInfo } from '../../../stores/room';
+import useMemberItem from './useMemberItemHooks';
+
+const {
+  showMemberControl,
+  handleMouseEnter,
+  handleMouseLeave,
+} = useMemberItem();
 
 interface Props {
   userInfo: UserInfo,
@@ -21,19 +29,10 @@ interface Props {
 
 defineProps<Props>();
 
-const showMemberControl = ref(false);
-
-function handleMouseEnter() {
-  showMemberControl.value = true;
-}
-
-function handleMouseLeave() {
-  showMemberControl.value = false;
-}
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .member-item-container {
   display: flex;
   flex-direction: row;
@@ -47,4 +46,3 @@ function handleMouseLeave() {
   }
 }
 </style>
-

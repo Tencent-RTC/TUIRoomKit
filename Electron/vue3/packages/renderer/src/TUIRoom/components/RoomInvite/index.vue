@@ -29,24 +29,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
-import { useBasicStore } from '../../stores/basic';
-import { ElMessage } from '../../elementComp';
-import { storeToRefs } from 'pinia';
-import SvgIcon from '../common/SvgIcon.vue';
-import { useI18n } from '../../locales';
+import { onMounted } from 'vue';
+import useRoomInviteControl from './useRoomInviteHooks';
 
-import { isElectronEnv } from '../../utils/utils';
-
-const { t } = useI18n();
-
-const roomLinkDisplay = ref(true);
-
-const basicStore = useBasicStore();
-const { roomId } = storeToRefs(basicStore);
-
-const { origin, pathname } = location;
-const isElectron = isElectronEnv();
+const {
+  t,
+  roomLinkDisplay,
+  roomId,
+  inviteLink,
+  schemeLink,
+  onCopy,
+  SvgIcon,
+} = useRoomInviteControl();
 
 onMounted(() => {
   // eslint-disable-next-line no-underscore-dangle
@@ -54,24 +48,6 @@ onMounted(() => {
     roomLinkDisplay.value = false;
   }
 });
-
-let inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);
-if(isElectron) {
-  inviteLink = computed(
-    () => `https://web.sdk.qcloud.com/trtc/webrtc/test/xinli-test/tuiroom-wasm/index.html#home?roomId=${roomId.value}`
-  );
-}
-
-// todo: schema 唤起
-const schemeLink = computed(() => `tuiroom://joinroom?roomId=${roomId.value}`);
-
-function onCopy(value: string | number) {
-  navigator.clipboard.writeText(`${value}`);
-  ElMessage({
-    message: t('Copied successfully'),
-    type: 'success',
-  });
-}
 </script>
 
 <style lang="scss" scoped>

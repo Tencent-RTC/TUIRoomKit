@@ -9,7 +9,7 @@
         :icon-name="iconName"
         @click.native="startScreenShare"
       />
-      <div  v-if="showStopShareRegion" class="stop-share-region" text @click.prevent="openStopConfirmDialog">
+      <div  v-if="showStopShareRegion" class="stop-share-region" @click.prevent="openStopConfirmDialog">
         <svg-icon class="stop-share-icon"  :icon-name="ICON_NAME.ScreenShareStopped" />
         <span> {{ t('End sharing') }} </span>
       </div>
@@ -59,7 +59,7 @@
   import { useBasicStore } from '../../../stores/basic';
   import { useRoomStore } from '../../../stores/room';
   import useGetRoomEngine from '../../../hooks/useRoomEngine';
-  import Dialog from '../../../elementComp/Dialog.vue';
+  import Dialog from '../../../elementComp/Dialog/index.vue';
   import Popover from '../../../elementComp/Popover.vue';
 
   const { t } = useI18n();
@@ -103,7 +103,6 @@
       windowList.value = screenCaptureList.filter(
         (screen: TRTCScreenCaptureSourceInfo) =>
           screen.type === TRTCScreenCaptureSourceType.TRTCScreenCaptureSourceTypeWindow
-          && !screen.isMinimizeWindow // eslint-disable-line
       );
       selectDialogVisible.value = true;
     }
