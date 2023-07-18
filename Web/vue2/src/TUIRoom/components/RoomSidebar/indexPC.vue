@@ -21,12 +21,13 @@
 <script setup lang="ts">
 
 import Chat from '../Chat/index.vue';
-import RoomInvite from '../RoomInvite';
-import RoomMore from '../RoomMore';
-import ManageMember from '../ManageMember/index';
 import Drawer from '../../elementComp/Drawer.vue';
 import useSideBar from './useSideBarHooks';
-
+/// @TUIRoom-PlatformAdapter-Start
+import RoomInvite from '../RoomInvite';
+import ManageMember from '../ManageMember';
+import RoomMore from '../RoomMore';
+/// @TUIRoom-PlatformAdapter-End
 const {
   isSidebarOpen,
   title,

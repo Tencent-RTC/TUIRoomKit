@@ -11,7 +11,9 @@
 
 <script setup lang="ts">
 import MemberInfo from '../MemberItemCommon/MemberInfo.vue';
+/// @TUIRoom-PlatformAdapter-Start
 import MemberControl from '../MemberControl';
+/// @TUIRoom-PlatformAdapter-End
 import { UserInfo } from '../../../stores/room';
 import useMemberItem from './useMemberItemHooks';
 

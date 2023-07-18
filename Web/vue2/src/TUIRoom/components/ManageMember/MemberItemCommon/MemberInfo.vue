@@ -7,7 +7,7 @@
   <div class="member-info">
     <!-- 用户基础信息 -->
     <div class="member-basic-info">
-      <img class="avatar-url" :src="userInfo.avatarUrl || defaultAvatar">
+      <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
       <div class="user-name">{{ userInfo.userName || userInfo.userId }}</div>
       <div v-if="isMaster && isMe" class="user-extra-info">
         {{ t('Host') }}, {{ t('Me') }}
@@ -57,7 +57,7 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import defaultAvatar from '../../../assets/imgs/avatar.png';
+import Avatar from '../../base/Avatar.vue';
 import { useBasicStore } from '../../../stores/basic';
 import { UserInfo, useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';

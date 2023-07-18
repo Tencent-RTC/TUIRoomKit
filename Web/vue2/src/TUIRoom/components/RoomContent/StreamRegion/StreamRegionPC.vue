@@ -3,16 +3,18 @@
     v-if="playRegionDomId !== enlargeDomId"
     ref="streamRegionRef"
     class="user-stream-container"
-    @dblclick="$emit('dblclick')"
+    @dblclick="$emit('room_dblclick')"
   >
-    <div :id="playRegionDomId" class="stream-region">
+    <div v-if="loading" class="loading-region">
+      <svg-icon icon-name="loading" class="loading"></svg-icon>
     </div>
+    <div :id="playRegionDomId" class="stream-region"></div>
     <div
       v-if="!stream.hasVideoStream && !stream.hasScreenStream"
       ref="centerUserInfoRef"
       class="center-user-info-container"
     >
-      <img class="avatar-region" :src="stream.avatarUrl || defaultAvatar">
+      <Avatar class="avatar-region" :img-src="stream.avatarUrl"></Avatar>
     </div>
     <div class="corner-user-info-container">
       <svg-icon v-if="showMasterIcon" class="master-icon" icon-name="user"></svg-icon>
@@ -41,13 +43,13 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from 'vue';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
-import defaultAvatar from '../../../assets/imgs/avatar.png';
+import Avatar from '../../base/Avatar.vue';
 import { useBasicStore } from '../../../stores/basic';
 import logger from '../../../utils/common/logger';
 import AudioIcon from '../../base/AudioIcon.vue';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { useI18n } from '../../../locales';
-import { TUIVideoStreamType, TRTCVideoStreamType, TRTCVideoFillMode, TRTCVideoMirrorType, TRTCVideoRotation } from '@tencentcloud/tuiroom-engine-js';
+import { TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { isInnerScene } from '../../../utils/constants';
 
@@ -70,6 +72,7 @@ const props = defineProps<Props>();
 
 const streamRegionRef = ref();
 const centerUserInfoRef = ref();
+const loading = ref(false);
 
 const playRegionDomId = computed(() => `${props.stream.userId}_${props.stream.streamType}`);
 
@@ -79,7 +82,6 @@ const showMasterIcon = computed(() => {
 });
 
 const isScreenStream = computed(() => props.stream.streamType === TUIVideoStreamType.kScreenStream);
-
 const userInfo = computed(() => {
   if (isInnerScene) {
     return `${props.stream.userName} | ${props.stream.userId}` || props.stream.userId;
@@ -87,62 +89,94 @@ const userInfo = computed(() => {
   return props.stream.userName || props.stream.userId;
 });
 
+// 要拉取远端用户的流类型
+const streamTypeToFetch = computed(() => {
+  const { streamType, userId } = props.stream;
+  const { kScreenStream, kCameraStream } = TUIVideoStreamType;
+  const { defaultStreamType } = roomStore;
+  const { userId: localUserId } = basicStore;
+  if (streamType === kScreenStream) {
+    return kScreenStream;
+  }
+  if (playRegionDomId.value === props.enlargeDomId || userId === localUserId) {
+    return kCameraStream;
+  }
+  if (streamType === kCameraStream) {
+    return defaultStreamType;
+  }
+  return streamType;
+});
 
-watch(
-  () => props.stream.hasVideoStream,
-  async (val) => {
-    if (val) {
-      await nextTick();
-      const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
-      if (userIdEl) {
-        logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, userIdEl);
-        if (basicStore.userId === props.stream.userId) {
-          if (props.stream.hasVideoStream) {
-            await roomEngine.instance?.setLocalVideoView({
-              streamType: TUIVideoStreamType.kCameraStream,
-              view: `${playRegionDomId.value}`,
-            });
-          }
+const startPlayRemoteVideo = async () => {
+  const { userId } = props.stream;
+  // 播放远端流
+  loading.value = true;
+  roomEngine.instance?.setRemoteVideoView({ userId, streamType: streamTypeToFetch.value, view: `${playRegionDomId.value}` });
+  await roomEngine.instance?.startPlayRemoteVideo({ userId, streamType: streamTypeToFetch.value });
+  // 播放远端流成功
+  loading.value = false;
+};
+
+const stopPlayRemoteVideo = async () => {
+  loading.value = false;
+  await roomEngine.instance?.
+    stopPlayRemoteVideo({ userId: props.stream.userId, streamType: streamTypeToFetch.value });
+};
+
+if (props.stream.streamType === TUIVideoStreamType.kCameraStream
+  || props.stream.streamType === TUIVideoStreamType.kCameraStreamLow) {
+  watch(
+    () => [props.stream.hasVideoStream, props.stream.isVisible],
+    async (val, oldVal) => {
+      if (props.stream.userId === basicStore.userId) {
+        return;
+      }
+      const [hasVideoStream, isVisible] = val;
+      if (hasVideoStream && isVisible) {
+        await nextTick();
+        const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
+        if (userIdEl) {
+          logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, userIdEl);
+          await startPlayRemoteVideo();
         }
-        roomEngine.instance?.setRemoteVideoView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
-        await roomEngine.instance?.
-          startPlayRemoteVideo({ userId: props.stream.userId, streamType: props.stream.streamType });
-        const trtcCloud = roomEngine.instance?.getTRTCCloud();
-        await trtcCloud?.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeBig, {
-          mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-          rotation: TRTCVideoRotation.TRTCVideoRotation0,
-          fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fit,
-        });
       }
-    }
-  },
-  { immediate: true },
-);
+      if (oldVal) {
+        const [oldHasVideoStream, oldIsVisible] = oldVal;
+        // 从有流且可见状态变为有流但不可见，无流但可见，无流且不可见状态，停止播放流
+        if ((oldHasVideoStream && oldIsVisible) && (!hasVideoStream || !isVisible)) {
+          await stopPlayRemoteVideo();
+        }
+      }
+    },
+    { immediate: true },
+  );
+}
 
-watch(
-  () => props.stream.hasScreenStream,
-  async (val) => {
-    if (val) {
-      await nextTick();
-      const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
-      if (userIdEl) {
-        logger.debug(`${logPrefix}watch isScreenStreamAvailable:`, props.stream.userId, userIdEl);
-        roomEngine.instance?.setRemoteVideoView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
-        await roomEngine.instance?.startPlayRemoteVideo({
-          userId: props.stream.userId,
-          streamType: props.stream.streamType,
-        });
-        const trtcCloud = roomEngine.instance?.getTRTCCloud();
-        await trtcCloud?.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeSub, {
-          mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-          rotation: TRTCVideoRotation.TRTCVideoRotation0,
-          fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fit,
-        });
+if (props.stream.streamType === TUIVideoStreamType.kScreenStream) {
+  watch(
+    () => [props.stream.hasScreenStream, props.stream.isVisible],
+    async (val, oldVal) => {
+      const [hasScreenStream, isVisible] = val;
+      if (hasScreenStream && isVisible) {
+        await nextTick();
+        const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
+        if (userIdEl) {
+          logger.debug(`${logPrefix}watch isScreenStreamAvailable:`, props.stream.userId, userIdEl);
+          await startPlayRemoteVideo();
+        }
       }
-    }
-  },
-  { immediate: true },
-);
+      if (oldVal) {
+        const [oldHasScreenStream, oldIsVisible] = oldVal;
+        // 从有流且可见状态变为有流但不可见，无流但可见，无流且不可见状态，停止播放流
+        if ((oldHasScreenStream && oldIsVisible) && (!hasScreenStream || !isVisible)) {
+          await stopPlayRemoteVideo();
+        }
+      }
+    },
+    { immediate: true },
+  );
+}
+
 
 /**
  * enlargeUserId The switch requires that both the small window
@@ -165,71 +199,47 @@ watch(
           **/
           if (props.stream.hasVideoStream) {
             await roomEngine.instance?.setLocalVideoView({
-              streamType: TUIVideoStreamType.kCameraStream,
+              streamType: streamTypeToFetch.value,
               view: `${playRegionDomId.value}`,
             });
           }
         } else {
-          roomEngine.instance?.setRemoteVideoView({ userId: props.stream.userId, streamType: props.stream.streamType, view: `${playRegionDomId.value}` });
-          await roomEngine.instance?.startPlayRemoteVideo({
-            userId: props.stream.userId,
-            streamType: props.stream.streamType,
-          });
+          await startPlayRemoteVideo();
         };
       }
     }
   },
+  { immediate: true },
 );
-
-// watch(
-//   playRegionDomId,
-//   async () => {
-//     await nextTick();
-//     const userIdEl = document.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
-//     if (userIdEl) {
-//       if (basicStore.userId !== props.stream.userId) {
-//         if (props.stream.type === 'main') {
-//           logger.debug(`${logPrefix}watch playRegionDomId:`, props.stream.userId, userIdEl, ETUIStreamType.CAMERA);
-//           TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.CAMERA);
-//         } else if (props.stream.type === 'screen') {
-//           logger.debug(`${logPrefix}watch playRegionDomId:`, props.stream.userId, userIdEl, ETUIStreamType.SCREEN);
-//           TUIRoomCore.startRemoteView(props.stream.userId as string, userIdEl, ETUIStreamType.SCREEN);
-//         }
-//       }
-//     }
-//   },
-// );
-
-// watch(streamRegionRef.value.offsetWidth, () => {
-//   centerUserInfoRef.value.style.transform = `scale(${streamRegionRef.value.offsetWidth / 1280})`;
-// });
-
-// watch(
-//   () => props.stream.isVideoMuted,
-//   async (val) => {
-//     if (val) {
-//       await nextTick();
-//       centerUserInfoRef.value.style.transform = `scale(${streamRegionRef.value.offsetWidth / 1280})`;
-//     }
-//   },
-// );
-
-
-// onMounted(() => {
-//   centerUserInfoRef.value.style.transform = `scale(${streamRegionRef.value.offsetWidth / 1280})`;
-// });
-
 </script>
 
 <style lang="scss" scoped>
 @import '../../../assets/style/var.scss';
 
+@keyframes loading-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 .user-stream-container {
   position: relative;
   .stream-region {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    background-color: #000000;
+  }
+  .loading-region {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    .loading {
+      animation: loading-rotate 0.7s linear infinite;
+    }
   }
   .corner-user-info-container {
     position: absolute;
@@ -264,27 +274,6 @@ watch(
       background-size: cover;
     }
   }
-  .icon-box{
-    position: absolute;
-    left: 188px;
-    top: 20px;
-    z-index: 99;
-    display: flex;
-    width: 12px;
-    height: 12px;
-  }
-  .enlarge-mobile-up {
-    width: 10px;
-    height: 10px;
-    border-top: 1px solid white;
-    border-right: 1px solid white;
-    }
-  .enlarge-mobile-down {
-    width: 10px;
-    height: 10px;
-    border-left: 1px solid white;
-    border-bottom: 1px solid white;
-    }
   .center-user-info-container {
     position: absolute;
     top: 0;

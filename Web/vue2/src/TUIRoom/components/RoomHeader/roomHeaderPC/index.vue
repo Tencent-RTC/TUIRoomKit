@@ -16,19 +16,16 @@
       <!-- <network-info></network-info> -->
       <!-- <info-control></info-control> -->
       <layout-control></layout-control>
-      <end-control
-        @on-destroy-room="onDestroyRoom"
-        @on-exit-room="onExitRoom"
-      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+/// @TUIRoom-PlatformAdapter-Start
 import UserInfo from '../UserInfo';
+/// @TUIRoom-PlatformAdapter-End
 import Language from '../../base/Language.vue';
 import SwitchTheme from '../../base/SwitchTheme.vue';
-import EndControl from '../../RoomFooter/EndControl';
 // import NetworkInfo from './NetworkInfo.vue';
 /**
  * [info] Functions to be improved
@@ -39,7 +36,6 @@ import EndControl from '../../RoomFooter/EndControl';
 import LayoutControl from './LayoutControl.vue';
 import { useBasicStore } from '../../../stores/basic';
 import { storeToRefs } from 'pinia';
-import TUIRoomAegis from '../../../utils/aegis';
 
 const basicStore = useBasicStore();
 
@@ -47,17 +43,7 @@ const { userId, userName, avatarUrl } = storeToRefs(basicStore);
 
 withDefaults(defineProps<{ showHeaderInfo?: boolean }>(), { showHeaderInfo: true });
 
-const emit = defineEmits(['log-out', 'on-destroy-room', 'on-exit-room']);
-
-const onDestroyRoom = (info: { code: number; message: string }) => {
-  emit('on-destroy-room', info);
-  TUIRoomAegis.reportEvent({ name: 'destroyRoom', ext1: 'destroyRoom-success' });
-};
-
-const onExitRoom = (info: { code: number; message: string }) => {
-  emit('on-exit-room', info);
-  TUIRoomAegis.reportEvent({ name: 'exitRoom', ext1: 'exitRoom-success' });
-};
+defineEmits(['log-out']);
 
 </script>
 

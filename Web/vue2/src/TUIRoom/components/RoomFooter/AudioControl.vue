@@ -63,7 +63,10 @@
 <script setup lang="ts">
 import { ref, onMounted, Ref, onUnmounted, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessageBox, ElMessage, Dialog  } from '../../elementComp';
+import { ElMessageBox, ElMessage } from '../../elementComp';
+/// @TUIRoom-PlatformAdapter-Start
+import Dialog from '../../elementComp/Dialog';
+/// @TUIRoom-PlatformAdapter-End
 import IconButton from '../common/IconButton.vue';
 import AudioSettingTab from '../base/AudioSettingTab.vue';
 import { useRoomStore } from '../../stores/room';

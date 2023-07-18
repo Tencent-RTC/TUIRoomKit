@@ -3,6 +3,7 @@
     <div v-show="showIconControl" ref="enlargedContainerRef" class="enlarged-stream-container">
       <stream-region
         v-if="enlargeStream"
+        :key="`${enlargeStream.userId}_${enlargeStream.streamType}`"
         :stream="enlargeStream"
         :style="enlargedStreamStyle"
       ></stream-region>
@@ -17,7 +18,7 @@
           :enlarge-dom-id="enlargeDomId"
           class="single-stream"
           :style="streamStyle"
-          @dblclick="handleEnlargeStreamRegion(stream)"
+          @room_dblclick="handleEnlargeStreamRegion(stream)"
         ></stream-region>
       </div>
     </div>
@@ -59,15 +60,20 @@ import { storeToRefs } from 'pinia';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
 import { LAYOUT } from '../../../constants/render';
+/// @TUIRoom-PlatformAdapter-Start
 import StreamRegion from '../StreamRegion';
+/// @TUIRoom-PlatformAdapter-End
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ElMessage } from '../../../elementComp';
 import { MESSAGE_DURATION } from '../../../constants/message';
+import { debounce } from '../../../utils/utils';
+import logger from '../../../utils/common/logger';
 
 import TUIRoomEngine, { TUIChangeReason, TUIRoomEvents,  TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import useStreamContainer from './useStreamContainerHooks';
 
+const logPrefix = '[StreamContainer]';
 const {
   onRemoteUserEnterRoom,
   onRemoteUserLeaveRoom,
@@ -93,11 +99,24 @@ const showSideList = ref(true);
 const enlargeStream: Ref<StreamInfo | null> = ref(null);
 const enlargeDomId = computed(() => (enlargeStream.value ? `${enlargeStream.value.userId}_${enlargeStream.value.streamType}` : ''));
 
-watch(remoteStreamList, (val) => {
+watch(() => remoteStreamList.value.length, (val) => {
   // 当没有远端流的时候，将流布局改为九宫格
-  if (val.length === 0) {
+  if (val === 0) {
     basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
     enlargeStream.value = null;
+    return;
+  }
+});
+
+watch(() => streamList.value.length, () => {
+  if (layout.value === LAYOUT.RIGHT_SIDE_LIST || layout.value === LAYOUT.TOP_SIDE_LIST) {
+    handleStreamContainerScroll();
+  }
+});
+
+watch(() => enlargeDomId.value, () => {
+  if (layout.value === LAYOUT.RIGHT_SIDE_LIST || layout.value === LAYOUT.TOP_SIDE_LIST) {
+    handleStreamContainerScroll();
   }
 });
 
@@ -109,9 +128,20 @@ watch(remoteStreamList, (val) => {
 const currentPageIndex = ref(0);
 const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
   if (layout.value !== LAYOUT.NINE_EQUAL_POINTS) {
-    return streamList.value;
+    return streamList.value.filter(item => `${item.userId}_${item.streamType}` !== enlargeDomId.value);
   }
   return streamList.value.slice(currentPageIndex.value * 9, currentPageIndex.value * 9 + 9);
+});
+
+watch(() => [showStreamList.value.length, currentPageIndex.value], () => {
+  if (layout.value === LAYOUT.NINE_EQUAL_POINTS) {
+    const streamIdList: string[] = [];
+    showStreamList.value.forEach((item) => {
+      const currentStreamId = `${item.userId}_${item.streamType}`;
+      streamIdList.push(currentStreamId);
+    });
+    roomStore.updateUserStreamVisible(streamIdList);
+  }
 });
 
 watch(streamNumber, (val) => {
@@ -269,8 +299,9 @@ async function handleNineEqualPointsLayout() {
     width = containerWidth;
     height = (containerWidth / 16) * 9;
   }
-  streamStyle.value.width = `${width}px`;
-  streamStyle.value.height = `${height}px`;
+  // 九宫格模式需要减掉 streamRegion 的 margin 的尺寸
+  streamStyle.value.width = `${width - 8}px`;
+  streamStyle.value.height = `${height - 8}px`;
 }
 
 /**
@@ -362,22 +393,24 @@ function handleEnlargeStreamRegion(stream: StreamInfo) {
  *
  * 页面加载或者 layout 改变时，处理页面布局
 **/
-function handleLayout() {
+async function handleLayout() {
   switch (layout.value as any) {
     case LAYOUT.NINE_EQUAL_POINTS:
-      handleNineEqualPointsLayout();
+      await handleNineEqualPointsLayout();
       break;
     case LAYOUT.RIGHT_SIDE_LIST:
       showSideList.value = true;
       enlargedContainerRef.value.style.width = 'calc(100% - 260px)';
       enlargedContainerRef.value.style.height = '100%';
-      handleRightSideListLayout();
+      await handleRightSideListLayout();
+      await handleStreamContainerScroll();
       break;
     case LAYOUT.TOP_SIDE_LIST:
       showSideList.value = true;
       enlargedContainerRef.value.style.width = '100%';
       enlargedContainerRef.value.style.height = 'calc(100% - 175px)';
-      handleTopSideListLayout();
+      await handleTopSideListLayout();
+      await handleStreamContainerScroll();
       break;
     default:
       break;
@@ -389,16 +422,18 @@ function handleLayout() {
  *
  * 页面 resize 时，处理流窗口尺寸
 **/
-function handleResize() {
+async function handleResize() {
   switch (layout.value as any) {
     case LAYOUT.NINE_EQUAL_POINTS:
-      handleNineEqualPointsLayout();
+      await handleNineEqualPointsLayout();
       break;
     case LAYOUT.RIGHT_SIDE_LIST:
-      handleRightSideListLayout();
+      await handleRightSideListLayout();
+      await handleStreamContainerScroll();
       break;
     case LAYOUT.TOP_SIDE_LIST:
-      handleTopSideListLayout();
+      await handleTopSideListLayout();
+      await handleStreamContainerScroll();
       break;
     default:
       break;
@@ -487,10 +522,67 @@ const onUserVideoStateChanged = (eventInfo: {
       } else if (userId === enlargeStream.value?.userId) {
         [enlargeStream.value] = roomStore.remoteStreamList;
       }
+
+      logger.debug(`${logPrefix} onUserVideoStateChanged: stop`, userId, streamType);
+      roomEngine.instance?.stopPlayRemoteVideo({
+        userId,
+        streamType,
+      });
     }
   }
 };
 
+const handleStreamContainerScroll = () => {
+  const childDom = streamListRef.value.children[0];
+
+  // 从第几个
+  let index = 0;
+  let finalIndex = 0;
+  // 可视区域有几个
+  let number = 0;
+
+  if (layout.value === LAYOUT.RIGHT_SIDE_LIST) {
+    const firstChildHeight = childDom.offsetHeight + 10;
+    const normalChildHeight = childDom.offsetHeight + 14;
+    const streamListRefEnd = streamListRef.value.scrollTop + streamListRef.value.offsetHeight;
+    index = Math.floor((streamListRef.value.scrollTop - firstChildHeight) / normalChildHeight) + 1;
+    finalIndex = Math.ceil((streamListRefEnd - firstChildHeight) / normalChildHeight) + 1;
+  } else if (layout.value === LAYOUT.TOP_SIDE_LIST) {
+    const firstChildWidth = childDom.offsetWidth;
+    const normalChildWidth = childDom.offsetWidth + 14;
+    const streamListRefEnd = streamListRef.value.scrollLeft + streamListRef.value.offsetWidth;
+    index = Math.floor((streamListRef.value.scrollLeft - firstChildWidth) / normalChildWidth) + 1;
+    finalIndex = Math.ceil((streamListRefEnd - firstChildWidth) / normalChildWidth) + 1;
+  }
+  if (index < 0) {
+    index = 0;
+  }
+  number = finalIndex - index;
+  if (number > (showStreamList.value.length - index)) {
+    number = showStreamList.value.length - index;
+  }
+
+  const streamUserIdList = [];
+  [...new Array(number)].forEach(() => {
+    const currentStreamId = `${showStreamList.value[index].userId}_${showStreamList.value[index].streamType}`;
+    streamUserIdList.push(currentStreamId);
+    index = index + 1;
+  });
+  streamUserIdList.push(enlargeDomId.value);
+
+  // 修改对应的 streamInfo 的 showInView 为 true
+  roomStore.updateUserStreamVisible(streamUserIdList);
+};
+
+const handleStreamContainerScrollDebounce = debounce(handleStreamContainerScroll, 300);
+
+onMounted(() => {
+  streamListRef.value.addEventListener('scroll', handleStreamContainerScrollDebounce);
+});
+
+onUnmounted(() => {
+  streamListRef.value && streamListRef.value.removeEventListener('scroll', handleStreamContainerScrollDebounce);
+});
 
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRemoteUserEnterRoom, onRemoteUserEnterRoom);
@@ -498,8 +590,6 @@ TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onSeatListChanged, onSeatListChanged);
   roomEngine.instance?.on(TUIRoomEvents.onUserVideoStateChanged, onUserVideoStateChanged);
   roomEngine.instance?.on(TUIRoomEvents.onUserAudioStateChanged, onUserAudioStateChanged);
-  // roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolumeChanged);
-  // roomEngine.instance?.on(TUIRoomEvents.onUserNetworkQualityChanged, onUserNetworkQualityChanged);
 });
 
 onUnmounted(() => {
@@ -532,7 +622,7 @@ onUnmounted(() => {
     align-items: center;
     align-content: center;
     .single-stream {
-      padding: 4px;
+      margin: 4px;
     }
   }
 }

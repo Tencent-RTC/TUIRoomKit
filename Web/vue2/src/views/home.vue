@@ -36,7 +36,13 @@ import isMobile from '../TUIRoom/utils/useMediaValue';
 const roomEngine = useGetRoomEngine();
 export default {
   name: 'Home',
-  components: { UserInfo, LanguageIcon, StreamPreview, RoomControl, SwitchTheme },
+  components: {
+    UserInfo,
+    LanguageIcon,
+    StreamPreview,
+    RoomControl,
+    SwitchTheme,
+  },
   data() {
     return {
       givenRoomId: '',

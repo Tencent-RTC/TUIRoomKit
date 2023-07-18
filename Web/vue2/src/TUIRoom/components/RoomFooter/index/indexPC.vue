@@ -38,9 +38,11 @@ import VideoControl from '../VideoControl.vue';
 import ManageMemberControl from '../ManageMemberControl.vue';
 import ChatControl from '../ChatControl.vue';
 import ApplyControl from '../ApplyControl/Index.vue';
+/// @TUIRoom-PlatformAdapter-Start
 import MoreControl from '../MoreControl';
-import SettingControl from '../SettingControl.vue';
 import EndControl from '../EndControl';
+/// @TUIRoom-PlatformAdapter-End
+import SettingControl from '../SettingControl.vue';
 import bus from '../../../hooks/useMitt';
 
 

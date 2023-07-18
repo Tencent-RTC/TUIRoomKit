@@ -54,7 +54,10 @@
 
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
-import  { ElMessageBox, ElMessage, Dialog } from '../../../elementComp';
+import { ElMessageBox, ElMessage } from '../../../elementComp';
+/// @TUIRoom-PlatformAdapter-Start
+import Dialog from '../../../elementComp/Dialog';
+/// @TUIRoom-PlatformAdapter-End
 import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useEndControl from './useEndControlHooks';
 
@@ -187,6 +190,10 @@ const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }
     }
     roomStore.setMasterUserId(userId);
     resetState();
+    if (roomStore.isAnchor) return;
+    if (roomStore.isSpeakAfterTakingSeatMode) {
+      await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+    }
   }
 };
 
