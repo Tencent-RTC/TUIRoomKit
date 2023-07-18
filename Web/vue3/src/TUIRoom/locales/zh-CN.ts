@@ -1,4 +1,5 @@
 export default {
+  '': '',
   'Sign in': '请登录',
   'Phone Login': '手机登录',
   'Email Login': '邮箱登录',
@@ -190,6 +191,8 @@ export default {
   'You have been banned from text chat by the host': '您被主持人禁止文字聊天',
   'You are allowed to text chat by the host': '您被主持人允许文字聊天',
   'kicked out of the room by the host': '被主持人踢出房间',
+  'kicked out of the room by other device': '相同账号在其他客户端进入房间',
+  'kicked out of the room by serve': '被服务端踢出房间',
   'Reject on Stage failed, please retry': '拒绝 {userName} 上台失败, 请重试',
   'Has been fully muted and cannot open the microphone': '已被全员静音，无法打开麦克风',
   'Has been muted by the host and cannot open the microphone': '已被主持人静音，无法打开麦克风',

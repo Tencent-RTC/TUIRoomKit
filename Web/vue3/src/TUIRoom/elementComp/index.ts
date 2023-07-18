@@ -1,11 +1,3 @@
-import { ElMessage, ElMessageBox } from 'element-plus';
-/// @TUIRoom-PlatformAdapter-Start
-import DialogH5 from './DialogH5.vue';
-import DialogPC from './DialogPC.vue';
-import isMobile from '../utils/useMediaValue';
-const Dialog = isMobile ? DialogH5 : DialogPC;
+import { ElMessage, ElMessageBox, ClickOutside } from 'element-plus';
 
-export {
-  ElMessage, ElMessageBox, Dialog,
-};
-/// @TUIRoom-PlatformAdapter-End
+export { ElMessage, ElMessageBox, ClickOutside };

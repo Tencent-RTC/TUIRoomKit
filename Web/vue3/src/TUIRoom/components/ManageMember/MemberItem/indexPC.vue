@@ -11,7 +11,9 @@
 
 <script setup lang="ts">
 import MemberInfo from '../MemberItemCommon/MemberInfo.vue';
+
 import MemberControl from '../MemberControl';
+
 import { UserInfo } from '../../../stores/room';
 import useMemberItem from './useMemberItemHooks';
 
