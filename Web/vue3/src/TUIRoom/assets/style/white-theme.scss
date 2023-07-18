@@ -46,7 +46,7 @@
   --send-btn-color: #006EFF;
   --message-color: #006EFF;
   --background-color-style: url(../imgs/banner.png);
-  --stream-container-border: none;
+  --stream-container-border: #ffffff;
   --apply-list-container-bg-color: #F2F2F2;
   --apply-list-container-color: #000000;
   --full-screen-svg: url(../icons/svg/full-screen-w.svg);
@@ -114,6 +114,7 @@
   --el-message-box: #FFFFFF;
   --el-message-box-title: #000000;
   --el-button-text-color: #646366;
+  --selected-screen-share-dialog: #006EFF;
   /* H5新增 */
   --log-out-mobile: rgba(0, 0, 0, 0.7);
   --log-out: #F9F9F9C7;
@@ -151,4 +152,6 @@
   --message-body-h5: #817e7e;
   --user-extra-info-bg-color-h5: #006EFF;
   --user-extra-info-color-h5: #FFFFFF;
+  --apply-container-background-outline-h5: #006EFF;
+  --apply-container-outline-h5: #FFFFFF;
 }

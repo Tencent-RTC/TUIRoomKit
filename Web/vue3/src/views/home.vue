@@ -24,9 +24,11 @@
 </template>
 
 <script setup lang="ts">
+
 import UserInfo from '@TUIRoom/components/RoomHeader/UserInfo';
-import StreamPreview from '@TUIRoom/components/RoomHome/StreamPreview.vue';
 import RoomControl from '@TUIRoom/components/RoomHome/RoomControl';
+
+import StreamPreview from '@TUIRoom/components/RoomHome/StreamPreview.vue';
 import LanguageIcon from '@/TUIRoom/components/base/Language.vue';
 import SwitchTheme from '@/TUIRoom/components/base/SwitchTheme.vue';
 import { checkNumber } from '@/TUIRoom/utils/common';

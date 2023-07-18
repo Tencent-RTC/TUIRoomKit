@@ -22,7 +22,7 @@
       <div class="apply-list">
         <div v-for="(item, index) in applyToAnchorList" :key="index" class="apply-item">
           <div class="user-info">
-            <img class="avatar-url" :src="item.avatarUrl || defaultAvatar">
+            <Avatar class="avatar-url" :img-src="item.avatarUrl"></Avatar>
             <span class="user-name" :title="item.userName || item.userId">{{ item.userName || item.userId }}</span>
           </div>
           <div class="control-container">
@@ -40,6 +40,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import Avatar from '../../base/Avatar.vue';
 import { ICON_NAME } from '../../../constants/icon';
 import IconButton from '../../common/IconButton.vue';
 import SvgIcon from '../../common/SvgIcon.vue';
@@ -48,7 +49,6 @@ import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
 import { useI18n } from '../../../locales';
-import defaultAvatar from '../../../assets/imgs/avatar.png';
 import isMobile from '../../../utils/useMediaValue';
 
 const { t } = useI18n();
@@ -226,16 +226,34 @@ onBeforeUnmount(() => {
   }
   .apply-list-container-h5 {
     width: 80vw;
-    height: 20vh;
-    top: -3vh;
+    height: 30vh;
+    border-radius: 13px;
+    display: flex;
+    flex-direction: column;
     .apply-list {
-      height: 60%;
+      max-height: 72%;
     }
     .apply-footer {
-      margin-top: 0;
+      height: 40px;
       .button {
+        width: 100%;
+        background: var(--apply-container-background-outline-h5);
+        border-radius: 8px;
         padding: 0;
       }
+      .deny-all {
+        padding: 8px;
+      }
+    }
+    .primary {
+      border-radius: 8px;
+      color: var(--apply-container-primary);
+    }
+    .outline {
+      border-radius: 8px;
+      background: var(--apply-container-background-outline-h5);
+      border: none;
+      color: var(--apply-container-outline-h5);
     }
   }
 }

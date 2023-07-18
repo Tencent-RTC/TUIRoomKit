@@ -12,6 +12,6 @@
 </script>
 
 <style>
-@import '../assets/style/element-custom.scss';
+@import '../../assets/style/element-custom.scss';
 
 </style>
