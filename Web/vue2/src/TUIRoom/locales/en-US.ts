@@ -1,4 +1,5 @@
 export default {
+  '': '',
   'Sign in': 'Sign in',
   'Phone Login': 'Phone Login',
   'Email Login': 'Email Login',
@@ -190,6 +191,8 @@ export default {
   'You have been banned from text chat by the host': 'You have been banned from text chat by the host',
   'You are allowed to text chat by the host': 'You are allowed to text chat by the host',
   'kicked out of the room by the host': 'kicked out of the room by the host',
+  'kicked out of the room by other device': 'kicked out of the room by other device',
+  'kicked out of the room by serve': 'kicked out of the room by serve',
   'Reject on Stage failed, please retry': 'Reject {userName} on Stage failed, please retry',
   'Has been fully muted and cannot open the microphone': 'Has been fully muted and cannot open the microphone',
   'Has been muted by the host and cannot open the microphone': 'Has been muted by the host and cannot open the microphone',

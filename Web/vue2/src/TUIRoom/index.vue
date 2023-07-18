@@ -28,9 +28,10 @@ import { ref, onMounted, onUnmounted, Ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import RoomHeader from './components/RoomHeader/index';
-import RoomContent from './components/RoomContent/index.vue';
 import RoomFooter from './components/RoomFooter/index';
-import RoomSidebar from './components/RoomSidebar/index';
+import RoomSidebar from './components/RoomSidebar';
+
+import RoomContent from './components/RoomContent/index.vue';
 import RoomSetting from './components/RoomSetting/index.vue';
 // import chatRoomContent from './components/RoomContent/ChatRoomContent.vue';
 import { isElectronEnv, debounce, throttle } from './utils/utils';
@@ -47,6 +48,9 @@ import TUIRoomEngine, {
   TRTCDeviceType,
   TRTCDeviceState,
   TUISpeechMode,
+  TUIKickedOutOfRoomReason,
+  TRTCVideoResolution,
+  TRTCVideoEncParam,
 } from '@tencentcloud/tuiroom-engine-js';
 
 
@@ -103,6 +107,11 @@ function handleHideRoomTool() {
 
 const handleHideRoomToolDebounce = debounce(handleHideRoomTool, 5000);
 const handleHideRoomToolThrottle = throttle(handleHideRoomToolDebounce, 1000);
+
+const smallParam =  new TRTCVideoEncParam();
+smallParam.videoResolution = TRTCVideoResolution.TRTCVideoResolution_640_360;
+smallParam.videoFps = 10;
+smallParam.videoBitrate = 550;
 
 onMounted(async () => {
   roomRef.value?.addEventListener('mouseenter', () => {
@@ -212,6 +221,9 @@ async function createRoom(options: {
     code: 0,
     message: 'create room success',
   });
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  trtcCloud.setDefaultStreamRecvMode(true, false);
+  trtcCloud.enableSmallVideoStream(true, smallParam);
   const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
   emit('on-enter-room', {
     code: 0,
@@ -241,6 +253,9 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
   }
   basicStore.setRoomId(roomId);
   console.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  trtcCloud.setDefaultStreamRecvMode(true, false);
+  trtcCloud.enableSmallVideoStream(true, smallParam);
   const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
   roomStore.setRoomInfo(roomInfo);
   await getUserList();
@@ -319,16 +334,28 @@ const onSendMessageForUserDisableChanged = (data: { userId: string, isDisable: b
   }
 };
 
-const onKickedOutOfRoom = async (eventInfo: { roomId: string, message: string }) => {
-  const { roomId, message } = eventInfo;
+const onKickedOutOfRoom = async (eventInfo: { roomId: string, reason: TUIKickedOutOfRoomReason, message: string }) => {
+  const { roomId, reason, message } = eventInfo;
   try {
     resetStore();
-    ElMessageBox.alert(t('kicked out of the room by the host'), t('Note'), {
+    let notice = '';
+    switch (reason) {
+      case TUIKickedOutOfRoomReason.kKickedByAdmin:
+        notice = t('kicked out of the room by the host');
+        break;
+      case TUIKickedOutOfRoomReason.kKickedByLoggedOnOtherDevice:
+        notice = t('kicked out of the room by other device');
+        break;
+      case TUIKickedOutOfRoomReason.kKickedByServer:
+        notice = t('kicked out of the room by serve');
+        break;
+    }
+    ElMessageBox.alert(notice, t('Note'), {
       confirmButtonText: t('Confirm'),
       customClass: 'custom-element-class',
       appendTo: '#roomContainer',
       callback: async () => {
-        emit('on-kicked-out-of-room', { roomId, message });
+        emit('on-kicked-out-of-room', { roomId, reason, message });
       },
     });
   } catch (error) {

@@ -131,9 +131,23 @@ async function startStreamPreview() {
   const cameraList = await roomEngine.instance?.getCameraDevicesList();
   const microphoneList = await roomEngine.instance?.getMicDevicesList();
   const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
+
   const hasCameraDevice = cameraList.length > 0;
   const hasMicrophoneDevice = microphoneList.length > 0;
   let alertMessage = '';
+  if (hasCameraDevice && !hasMicrophoneDevice) {
+    alertMessage = 'Microphone not detected on current device';
+  } else if (!hasCameraDevice && hasMicrophoneDevice) {
+    alertMessage = 'Camera not detected on current device';
+  } else if (!hasCameraDevice && !hasMicrophoneDevice) {
+    alertMessage = 'Camera And Microphone not detected on current device';
+  }
+  if (alertMessage) {
+    ElMessageBox.alert(t(alertMessage), t('Note'), {
+      customClass: 'custom-element-class',
+      confirmButtonText: t('Confirm') });
+  }
+
   roomStore.setCameraList(cameraList);
   roomStore.setMicrophoneList(microphoneList);
   roomStore.setSpeakerList(speakerList);
@@ -160,18 +174,6 @@ async function startStreamPreview() {
     if (speakerList.length > 0) {
       await roomEngine.instance?.setCurrentSpeakerDevice({ deviceId: speakerList[0].deviceId });
     }
-  }
-  if (hasCameraDevice && !hasMicrophoneDevice) {
-    alertMessage = 'Microphone not detected on current device';
-  } else if (!hasCameraDevice && hasMicrophoneDevice) {
-    alertMessage = 'Camera not detected on current device';
-  } else if (!hasCameraDevice && !hasMicrophoneDevice) {
-    alertMessage = 'Camera And Microphone not detected on current device';
-  }
-  if (alertMessage) {
-    ElMessageBox.alert(t(alertMessage), t('Note'), {
-      customClass: 'custom-element-class',
-      confirmButtonText: t('Confirm') });
   }
   if (hasCameraDevice) {
     await roomEngine.instance?.startCameraDeviceTest({ view: 'stream-preview' });

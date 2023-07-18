@@ -1,3 +1,19 @@
+## 2023.07.18
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.4.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89378)。
+- 支持仅播放可视区域视频流，降低下行带宽消耗。
+- 支持大小流能力，当播放超过 5 个远端流时，小窗口区域自动播放远端用户的小流视频。
+- 优化移动端浏览器举手发言列表的样式。
+
+**Bug Fixed**
+
+- 修复举手发言模式下转移主持人给麦下用户，该用户无法进行媒体操作的问题。
+- onKickedOutOfRoom 事件细分被踢出房的原因。
+- 修复头像图片资源无法加载时使用默认头像。
+- 修复移交主持人时出现多个提示的问题。
+
 ## 2023.06.20
 
 **Feature**

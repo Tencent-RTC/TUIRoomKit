@@ -80,7 +80,7 @@ export default function useStreamContainer() {
          * 设置设备id
         **/
         if (!roomStore.currentCameraId) {
-          const cameraList = await roomEngine.instance?.getCameraDevicesList();
+          const cameraList:any = await roomEngine.instance?.getCameraDevicesList();
           roomStore.setCurrentCameraId(cameraList[0].deviceId);
         }
         await roomEngine.instance?.setCurrentCameraDevice({ deviceId: roomStore.currentCameraId });
@@ -94,6 +94,7 @@ export default function useStreamContainer() {
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
         });
         if (isMobile) {
+          // @ts-ignore
           await roomEngine.instance?.openLocalCamera({ isFrontCamera: basicStore.isFrontCamera });
         } else {
           await roomEngine.instance?.openLocalCamera();
