@@ -1,7 +1,7 @@
 # Quick Run of TUIRoomKit Demo for Android
 _[中文](README.md) | English_
 
-This document describes how to quickly run the `TUIRoomKit` demo project to try out multi-person audio/video interactions. For more information on the TUIRoomKit component connection process, see **[Integrating TUIRoomKit (Android)](https://write.woa.com/document/93119926066618368)**.
+This document describes how to quickly run the `TUIRoomKit` demo project to try out multi-person audio/video interactions. For more information on the TUIRoomKit component connection process, see **[Integrating TUIRoomKit (Android)](https://cloud.tencent.com/document/product/647/81961)**.
 >!This product is currently in the free public beta period, and no additional fees are charged for the time being. The current service billing is consistent with instant messaging IM, real-time audio and video TRTC product billing services.
 You can download the SDK for free for a limited time and access to experience multi-person audio and video sessions ability.
 If there are any changes in the billing method, functions, and free public beta time of the multiplayer audio and video SDK in the future,
