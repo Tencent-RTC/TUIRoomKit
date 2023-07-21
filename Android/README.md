@@ -1,7 +1,7 @@
 # TUIRoomKit Android 示例工程快速跑通
 _中文 | [English](README.en.md)_
 
-本文档主要介绍如何快速跑通 `TUIRoomKit` 示例工程，体验多人音视频互动，更详细的 `TUIRoomKit` 组件接入流程，请点击腾讯云官网文档： [**TUIRoomKit 组件 Android 接入说明** ](https://write.woa.com/document/93119926066618368)...
+本文档主要介绍如何快速跑通 `TUIRoomKit` 示例工程，体验多人音视频互动，更详细的 `TUIRoomKit` 组件接入流程，请点击腾讯云官网文档： [**TUIRoomKit 组件 Android 接入说明** ](https://cloud.tencent.com/document/product/647/78729)...
 >!该产品目前处于限免公测期，暂不收取额外费用，目前服务计费与即时通信IM、实时音视频TRTC产品计费服务保持一致 ，您可限时免费下载 SDK 并接入体验多人音视频会话能力。若未来多人音视频 SDK 的计费方式、功能和限免公测时间等有所变更，我们将提前在官网发布公告进行说明，并通过站内信、短信、邮件等方式提前通知您，敬请关注。
 <img src="https://qcloudimg.tencent-cloud.cn/raw/526f1e79040089c7a7bb5f9be6f084f9.svg" width="900">
 
