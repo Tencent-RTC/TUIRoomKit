@@ -1,5 +1,9 @@
 ## 发布日志
 
+### Version 1.4.2 @ 2023.07.24
+- Android & iOS: 修复了频繁获取用户信息时，偶现Crash；
+- Android & iOS: 修复了部分场景下，关闭麦克风导致的音频音量回调异常问题；
+
 ### Version 1.3.4 @ 2023.07.12
 - Android：增加后台保活逻辑，保证 app 退到后台时，音视频的正常使用；
 - Android：去除 Basic 和 TUIBeauty 模块；
