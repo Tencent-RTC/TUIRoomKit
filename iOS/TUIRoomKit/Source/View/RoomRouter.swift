@@ -161,6 +161,16 @@ class RoomRouter {
         shared.getCurrentWindowViewController()?.view.makeToast(toast)
     }
     
+    class func getCurrentWindow() -> UIWindow? {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            if let keyWindow = windowScene.windows.first {
+                return keyWindow
+            }
+        }
+        return UIApplication.shared.windows.first(where: { $0.windowLevel == .normal && $0.isHidden == false &&
+            CGRectEqualToRect($0.bounds , UIScreen.main.bounds )})
+    }
+    
     deinit {
         debugPrint("deinit \(self)")
     }

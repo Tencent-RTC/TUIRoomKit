@@ -97,6 +97,8 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onRequestCancelled, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserVideoStateChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
     
@@ -107,6 +109,8 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onRequestCancelled, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserVideoStateChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
     private func setVideoEncoderParam() {
@@ -358,6 +362,17 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 }
                 viewResponder?.showSelfBecomeRoomOwnerAlert()
             }
+        }
+        if name == .onUserVideoStateChanged {
+            guard let userId = param?["userId"] as? String else { return }
+            guard let streamType = param?["streamType"] as? TUIVideoStreamType else { return }
+            guard let hasVideo = param?["hasVideo"] as? Bool else { return }
+            if userId == currentUser.userId, streamType == .screenStream, hasVideo {
+                ScreenCaptureMaskView.show()
+            }
+        }
+        if name == .onUserScreenCaptureStopped {
+            ScreenCaptureMaskView.dismiss()
         }
     }
 }

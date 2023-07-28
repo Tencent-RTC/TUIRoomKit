@@ -505,6 +505,9 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
     }
 
     public func onUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool, reason: TUIChangeReason) {
+        if streamType == .screenStream, userId == currentUserId {
+            return
+        }
         if hasVideo {
             let renderParams = TRTCRenderParams()
             renderParams.fillMode = (streamType == .screenStream) ? .fit : .fill
