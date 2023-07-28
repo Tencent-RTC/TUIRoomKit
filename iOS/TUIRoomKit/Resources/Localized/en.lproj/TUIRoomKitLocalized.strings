@@ -157,3 +157,7 @@
 "TUIRoom.device.set" = "Meeting Settings";
 "TUIRoom.mic.set" = "Join the conference and turn on the microphone";
 "TUIRoom.camera.set" = "Join the conference and turn on the camera";
+"TUIRoom.sharing.screen" = "You are sharing your screen";
+"TUIRoom.stop.share.screen" = "Stop screen sharing";
+"TUIRoom.screen.recording" = "Screen recording";
+

@@ -155,3 +155,7 @@
 "TUIRoom.device.set" = "快速会议设置";
 "TUIRoom.mic.set" = "入会开启麦克风";
 "TUIRoom.camera.set" = "入会开启摄像头";
+"TUIRoom.sharing.screen" = "您正在共享屏幕";
+"TUIRoom.stop.share.screen" = "停止共享";
+"TUIRoom.screen.recording" = "屏幕录制中";
+

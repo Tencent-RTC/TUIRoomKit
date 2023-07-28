@@ -383,10 +383,11 @@ extension EngineEventCenter: TUIRoomObserver {
         }
     }
     
-    func onKickedOutOfRoom(roomId: String, message: String) {
+    func onKickedOutOfRoom(roomId: String, reason: TUIKickedOutOfRoomReason, message: String) {
         guard let observers = engineObserverMap[.onKickedOutOfRoom] else { return }
         let param = [
             "roomId" : roomId,
+            "reason" : reason,
             "message" : message,
         ] as [String : Any]
         observers.forEach { responder in
@@ -499,6 +500,7 @@ extension EngineEventCenter: TUIRoomObserver {
     }
     
     func onUserScreenCaptureStopped(reason: Int) {
+        engineManager.store.isSomeoneSharing = false
         guard let observers = engineObserverMap[.onUserScreenCaptureStopped] else { return }
         let param = [
             "reason" : reason,
