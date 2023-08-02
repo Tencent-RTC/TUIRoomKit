@@ -24,10 +24,8 @@
 </template>
 
 <script setup lang="ts">
-
 import UserInfo from '@TUIRoom/components/RoomHeader/UserInfo';
 import RoomControl from '@TUIRoom/components/RoomHome/RoomControl';
-
 import StreamPreview from '@TUIRoom/components/RoomHome/StreamPreview.vue';
 import LanguageIcon from '@/TUIRoom/components/base/Language.vue';
 import SwitchTheme from '@/TUIRoom/components/base/SwitchTheme.vue';
@@ -187,7 +185,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: PingFangSC-Medium;;
+  font-family: PingFangSC-Medium;
     .header-H5{
       width: 100%;
       position: absolute;

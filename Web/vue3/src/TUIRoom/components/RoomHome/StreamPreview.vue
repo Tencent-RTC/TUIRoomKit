@@ -65,6 +65,7 @@ import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { isElectronEnv } from '../../utils/utils';
 import Drawer from '../../elementComp/Drawer.vue';
 import { ElMessageBox } from '../../elementComp/index';
+import logger from '../../utils/common/logger';
 const roomStore = useRoomStore();
 const { t } = useI18n();
 
@@ -194,7 +195,7 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
   const stateList = ['add', 'remove', 'active'];
   const { deviceId, type, state } = eventInfo;
   if (type === TRTCDeviceType.TRTCDeviceTypeMic) {
-    console.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
+    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
     const deviceList = await roomEngine.instance?.getMicDevicesList();
     roomStore.setMicrophoneList(deviceList);
     if (state === TRTCDeviceState.TRTCDeviceStateActive) {
@@ -203,7 +204,7 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
     return;
   }
   if (type === TRTCDeviceType.TRTCDeviceTypeSpeaker) {
-    console.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
+    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
     const deviceList = await roomEngine.instance?.getSpeakerDevicesList();
     roomStore.setSpeakerList(deviceList);
     if (state === TRTCDeviceState.TRTCDeviceStateActive) {
@@ -212,7 +213,7 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
     return;
   }
   if (type === TRTCDeviceType.TRTCDeviceTypeCamera) {
-    console.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
+    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
     const deviceList = await roomEngine.instance?.getCameraDevicesList();
     roomStore.setCameraList(deviceList);
     if (state === TRTCDeviceState.TRTCDeviceStateActive) {

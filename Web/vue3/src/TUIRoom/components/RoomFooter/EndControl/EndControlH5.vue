@@ -42,6 +42,7 @@ import { onUnmounted } from 'vue';
 import { ElMessageBox, ElMessage } from '../../../elementComp';
 import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useEndControl from './useEndControlHooks';
+import logger from '../../../utils/common/logger';
 
 const {
   t,
@@ -71,13 +72,13 @@ const emit = defineEmits(['on-exit-room', 'on-destroy-room']);
 **/
 async function dismissRoom() {
   try {
-    console.log(`${logPrefix}dismissRoom: enter`);
+    logger.log(`${logPrefix}dismissRoom: enter`);
     await closeMediaBeforeLeave();
     await roomEngine.instance?.destroyRoom();
     resetState();
     emit('on-destroy-room', { code: 0, message: '' });
   } catch (error) {
-    console.error(`${logPrefix}dismissRoom error:`, error);
+    logger.error(`${logPrefix}dismissRoom error:`, error);
   }
 }
 
@@ -96,11 +97,11 @@ async function leaveRoom() { // eslint-disable-line
     }
     await closeMediaBeforeLeave();
     const response = await roomEngine.instance?.exitRoom();
-    console.log(`${logPrefix}leaveRoom:`, response);
+    logger.log(`${logPrefix}leaveRoom:`, response);
     resetState();
     emit('on-exit-room', { code: 0, message: '' });
   } catch (error) {
-    console.error(`${logPrefix}leaveRoom error:`, error);
+    logger.error(`${logPrefix}leaveRoom error:`, error);
   }
 }
 /**
@@ -111,7 +112,7 @@ async function leaveRoom() { // eslint-disable-line
 const onRoomDismissed = async (eventInfo: { roomId: string}) => {
   try {
     const { roomId } = eventInfo;
-    console.log(`${logPrefix}onRoomDismissed:`, roomId);
+    logger.log(`${logPrefix}onRoomDismissed:`, roomId);
     ElMessageBox.alert(t('The host closed the room.'), t('Note'), {
       customClass: 'custom-element-class',
       confirmButtonText: t('Confirm'),
@@ -122,7 +123,7 @@ const onRoomDismissed = async (eventInfo: { roomId: string}) => {
       },
     });
   } catch (error) {
-    console.error(`${logPrefix}onRoomDestroyed error:`, error);
+    logger.error(`${logPrefix}onRoomDestroyed error:`, error);
   }
 };
 

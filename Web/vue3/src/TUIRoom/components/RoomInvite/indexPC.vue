@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import SvgIcon from '../common/SvgIcon.vue';
 import useRoomInviteControl from './useRoomInviteHooks';
 
 const {
@@ -39,7 +40,6 @@ const {
   inviteLink,
   schemeLink,
   onCopy,
-  SvgIcon,
 } = useRoomInviteControl();
 
 onMounted(() => {

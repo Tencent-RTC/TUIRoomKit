@@ -322,7 +322,7 @@ onUnmounted(() => {
 }
 .room-detail-info-box{
     display: flex;
-    padding: 15px 12px;;
+    padding: 15px 12px;
 }
 .room-detail-title{
     min-width: 64px;
