@@ -45,13 +45,9 @@
   import { useI18n } from '../../../locales';
 
   import IconButton from '../../common/IconButton.vue';
-  import TUIRoomEngine, {
+  import {
     TRTCScreenCaptureSourceType,
     TRTCScreenCaptureSourceInfo,
-    Rect,
-    TRTCVideoEncParam,
-    TRTCVideoResolution,
-    TRTCVideoResolutionMode,
   } from '@tencentcloud/tuiroom-engine-electron';
   import ScreenWindowSelectDialog from './ScreenWindowSelectDialog.vue';
   import SvgIcon from '../../common/SvgIcon.vue';
@@ -60,17 +56,17 @@
   import { useRoomStore } from '../../../stores/room';
   import useGetRoomEngine from '../../../hooks/useRoomEngine';
   import Dialog from '../../../elementComp/Dialog/index.vue';
-  import Popover from '../../../elementComp/Popover.vue';
+  import { ElMessage } from '../../../elementComp';
+  import { MESSAGE_DURATION } from '../../../constants/message';
 
   const { t } = useI18n();
 
   const basicInfo = useBasicStore();
   const roomStore = useRoomStore();
-  const { isAudience } = storeToRefs(roomStore);
+  const { isAudience, hasOtherScreenShare } = storeToRefs(roomStore);
   const roomEngine = useGetRoomEngine();
 
   const btnStopRef = ref();
-  const popoverRef = ref();
   const isSharing: Ref<boolean> = ref(false);
   const dialogVisible: Ref<boolean> = ref(false);
   const showStopShareRegion: Ref<boolean> = ref(false);
@@ -88,6 +84,14 @@
   const windowList: Ref<Array<TRTCScreenCaptureSourceInfo>> = ref([]);
 
   async function startScreenShare() {
+    if (hasOtherScreenShare.value) {
+      ElMessage({
+        type: 'warning',
+        message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
+        duration: MESSAGE_DURATION.LONG,
+      });
+      return;
+    }
     if (!(window as any).isHasScreen && process.platform === 'darwin') {
       const { shell } = require('electron');
       shell.openExternal(`x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture`);

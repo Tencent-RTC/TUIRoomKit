@@ -43,15 +43,14 @@ import { ICON_NAME } from '../../../constants/icon';
 import IconButton from '../../common/IconButton.vue';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ElMessage } from '../../../elementComp';
-/// @TUIRoom-PlatformAdapter-Start
 import Dialog from '../../../elementComp/Dialog/index.vue';
-/// @TUIRoom-PlatformAdapter-End
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { useI18n } from '../../../locales';
 import { storeToRefs } from 'pinia';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
+import logger from '../../../utils/common/logger';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-electron';
 
 const roomEngine = useGetRoomEngine();
@@ -133,7 +132,7 @@ async function sendSeatApplication() {
     }
     isApplyingOnSeat.value = true;
   } catch (error) {
-    console.log('member sendSpeechApplication error', error);
+    logger.log('member sendSpeechApplication error', error);
   }
 }
 
@@ -148,7 +147,7 @@ async function cancelSeatApplication() {
     await roomEngine.instance?.cancelRequest({ requestId: applyToAnchorRequestId.value });
     isApplyingOnSeat.value = false;
   } catch (error) {
-    console.log('member cancelSpeechApplication', error);
+    logger.log('member cancelSpeechApplication', error);
   }
 }
 

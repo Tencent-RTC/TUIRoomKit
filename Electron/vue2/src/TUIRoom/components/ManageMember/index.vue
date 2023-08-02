@@ -45,9 +45,7 @@
 
 <script setup lang='ts'>
 import { storeToRefs } from 'pinia';
-
 import MemberItem from '../ManageMember/MemberItem/index.vue';
-
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import SvgIcon from '../common/SvgIcon.vue';
 import { useRoomStore } from '../../stores/room';

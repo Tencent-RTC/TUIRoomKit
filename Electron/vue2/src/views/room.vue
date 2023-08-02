@@ -15,6 +15,7 @@
 <script>
 import RoomContainer from '@/TUIRoom/index.vue';
 import { MessageBox } from 'element-ui';
+import logger from '../TUIRoom/utils/common/logger';
 export default {
   name: 'Room',
   components: { RoomContainer },
@@ -96,23 +97,23 @@ export default {
 
     // 主持人创建房间回调
     onCreateRoom(info) {
-      console.debug('onEnterRoom:', info);
+      logger.debug('onEnterRoom:', info);
     },
 
     // 普通成员进入房间回调
     onEnterRoom(info) {
-      console.debug('onCreateRoom:', info);
+      logger.debug('onCreateRoom:', info);
     },
 
     // 主持人销毁房间回调
     onDestroyRoom(info) {
-      console.debug('onDestroyRoom:', info);
+      logger.debug('onDestroyRoom:', info);
       this.$router.replace({ path: '/home' });
     },
 
     // 普通成员退出房间回调
     onExitRoom(info) {
-      console.debug('onExitRoom:', info);
+      logger.debug('onExitRoom:', info);
       this.$router.replace({ path: '/home' });
     },
 
@@ -121,7 +122,7 @@ export default {
      * 普通成员被主持人踢出房间
     **/
     onKickedOutOfRoom(info) {
-      console.debug('onKickedOutOfRoom:', info);
+      logger.debug('onKickedOutOfRoom:', info);
       sessionStorage.removeItem('tuiRoom-roomInfo');
       this.$router.replace({ path: '/home' });
     },
@@ -131,7 +132,7 @@ export default {
      * 被踢下线
      */
     onKickedOffLine(info) {
-      console.debug('onKickedOffLine:', info);
+      logger.debug('onKickedOffLine:', info);
       sessionStorage.removeItem('tuiRoom-roomInfo');
       this.$router.replace({ path: '/home' });
     },
@@ -141,7 +142,7 @@ export default {
      * userSig 过期，需要获取新的 userSig
      */
     onUserSigExpired() {
-      console.debug('onUserSigExpired');
+      logger.debug('onUserSigExpired');
       sessionStorage.removeItem('tuiRoom-roomInfo');
       sessionStorage.removeItem('tuiRoom-currentUserInfo');
       this.$router.replace({ path: '/home' });

@@ -19,9 +19,7 @@ import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
 import isMobile from '../../utils/useMediaValue';
-
 import roomContact from '../RoomMore/index.vue';
-
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);

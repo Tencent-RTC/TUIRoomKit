@@ -2,7 +2,7 @@
   <li class="screen-window-previewer">
     <canvas
       ref="canvasRef"
-      class="previewer-canvas"
+      :class="[data.isMinimizeWindow ? 'previewer-mini':'previewer-canvas']"
       :width="data.thumbBGRA.width"
       :height="data.thumbBGRA.height"
       :data-id="data.sourceId"
@@ -48,8 +48,8 @@ onMounted(() => {
   list-style: none;
   display: inline-block;
   margin: 8px;
-  padding: 8px;
-  width: 160px;
+  padding: 8px 0;
+  width: 170px;
   height: 150px;
   border: 1px solid $primaryColor;
   border-radius: 8px;
@@ -60,13 +60,16 @@ onMounted(() => {
   }
 }
 
-.previewer-canvas {
-  width: 100%;
-  height: 120px;
+.previewer-canvas, .previewer-mini {
   margin: 0 auto;
   display: flex;
   justify-content: space-around;
   align-items: center;
+}
+.previewer-mini {
+  width: 110px;
+  height: 110px;
+  padding: 4px;
 }
 
 .previewer-name {

@@ -26,11 +26,9 @@
 import { ElMessage, ElMessageBox } from './elementComp';
 import { ref, onMounted, onUnmounted, Ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-
 import RoomHeader from './components/RoomHeader/index/index.vue';
 import RoomFooter from './components/RoomFooter/index/index.vue';
 import RoomSidebar from './components/RoomSidebar/index.vue';
-
 import RoomContent from './components/RoomContent/index.vue';
 import RoomSetting from './components/RoomSetting/index.vue';
 // import chatRoomContent from './components/RoomContent/ChatRoomContent.vue';
@@ -39,6 +37,7 @@ import { useBasicStore } from './stores/basic';
 import { useRoomStore } from './stores/room';
 import { useChatStore } from './stores/chat';
 import isMobile from './utils/useMediaValue';
+import logger from '../TUIRoom/utils/common/logger';
 import TUIRoomEngine, {
   TRTCVideoMirrorType,
   TRTCVideoRotation,
@@ -201,7 +200,7 @@ async function createRoom(options: {
     return;
   }
   basicStore.setRoomId(roomId);
-  console.debug(`${logPrefix}createRoom:`, roomId, roomMode, roomParam);
+  logger.debug(`${logPrefix}createRoom:`, roomId, roomMode, roomParam);
   const roomParams = {
     roomId,
     name: roomName,
@@ -252,7 +251,7 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
     return;
   }
   basicStore.setRoomId(roomId);
-  console.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
+  logger.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
   const trtcCloud = roomEngine.instance?.getTRTCCloud();
   trtcCloud.setDefaultStreamRecvMode(true, false);
   trtcCloud.enableSmallVideoStream(true, smallParam);
@@ -278,7 +277,7 @@ async function getUserList() {
     const { userInfoList } = await roomEngine.instance?.getUserList() as any;
     roomStore.setUserList(userInfoList);
   } catch (error: any) {
-    console.error('TUIRoomEngine.getUserList', error.code, error.message);
+    logger.error('TUIRoomEngine.getUserList', error.code, error.message);
   }
 }
 
@@ -318,7 +317,7 @@ const onExitRoom = (info: { code: number; message: string }) => {
 };
 
 const onError = (error: any) => {
-  console.error('roomEngine.onError: ', error);
+  logger.error('roomEngine.onError: ', error);
 };
 
 const onSendMessageForUserDisableChanged = (data: { userId: string, isDisable: boolean }) => {
@@ -359,7 +358,7 @@ const onKickedOutOfRoom = async (eventInfo: { roomId: string, reason: TUIKickedO
       },
     });
   } catch (error) {
-    console.error(`${logPrefix}onKickedOutOfRoom error:`, error);
+    logger.error(`${logPrefix}onKickedOutOfRoom error:`, error);
   }
 };
 
@@ -499,7 +498,7 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
   const stateList = ['add', 'remove', 'active'];
   const { deviceId, type, state } = eventInfo;
   if (type === TRTCDeviceType.TRTCDeviceTypeMic) {
-    console.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
+    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
     const deviceList = await roomEngine.instance?.getMicDevicesList();
     roomStore.setMicrophoneList(deviceList);
     if (state === TRTCDeviceState.TRTCDeviceStateActive) {
@@ -508,7 +507,7 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
     return;
   }
   if (type === TRTCDeviceType.TRTCDeviceTypeSpeaker) {
-    console.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
+    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
     const deviceList = await roomEngine.instance?.getSpeakerDevicesList();
     roomStore.setSpeakerList(deviceList);
     if (state === TRTCDeviceState.TRTCDeviceStateActive) {
@@ -517,7 +516,7 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
     return;
   }
   if (type === TRTCDeviceType.TRTCDeviceTypeCamera) {
-    console.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
+    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
     const deviceList = await roomEngine.instance?.getCameraDevicesList();
     roomStore.setCameraList(deviceList);
     if (state === TRTCDeviceState.TRTCDeviceStateActive) {
