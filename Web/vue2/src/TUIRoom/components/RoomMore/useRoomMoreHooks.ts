@@ -1,6 +1,5 @@
 import { ElMessage } from '../../elementComp';
 import { useI18n } from '../../locales';
-import SvgIcon from '../common/SvgIcon.vue';
 
 export default function useRoomMoreHooks() {
   const { t } = useI18n();
@@ -20,6 +19,5 @@ export default function useRoomMoreHooks() {
     groupNumber,
     email,
     onCopy,
-    SvgIcon,
   };
 }

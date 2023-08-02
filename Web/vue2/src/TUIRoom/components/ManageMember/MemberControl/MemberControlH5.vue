@@ -294,7 +294,7 @@ function kickOffUser(userInfo: UserInfo) {
   left: 0;
   z-index: 2;
   padding: 22px 16px;
-  background: var(--member-control-background-color-h5);;
+  background: var(--member-control-background-color-h5);
   border-radius: 15px 15px 0px 0px;
   display: flex;
   flex-direction: column !important;

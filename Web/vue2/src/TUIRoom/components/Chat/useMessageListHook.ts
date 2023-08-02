@@ -13,7 +13,6 @@ export default function useMessageList() {
   const { roomId } = storeToRefs(basicStore);
   const { messageList, isCompleted, nextReqMessageId } = storeToRefs(chatStore);
   const historyMessageList = ref([]);
-  const showLoadMore = ref(false);
   const messageAimId = ref();
   const messageBottomEl = ref<HTMLInputElement | null>(null);
   /**
@@ -22,6 +21,7 @@ export default function useMessageList() {
  *
  * 为了解决自己向上滚动浏览消息, 防止别人发的消息不停向下滚消息列表
 **/
+  let loadMore = false;
   let isScrollNotAtBottom = false;
   let isScrollToTop = false;
   const handleMessageListScroll = (e: Event) => {
@@ -41,19 +41,24 @@ export default function useMessageList() {
       messageContainer.scrollTop = 0;
       isScrollToTop = false;
     }
+
+    if (messageContainer.scrollTop < 40 && loadMore) {
+      handleGetHistoryMessageList();
+    }
   };
 
   watch(isCompleted, (value) => {
-    showLoadMore.value = !value;
+    loadMore = !value;
   }, { immediate: true, deep: true });
 
-watch(messageList, async (newMessageList, oldMessageList) => { // eslint-disable-line
+  watch(messageList, async (newMessageList, oldMessageList) => { // eslint-disable-line
     await nextTick();
     if (isScrollNotAtBottom) {
       if (newMessageList.length >= 1) {
         const lastMessage = newMessageList[newMessageList.length - 1];
-        if ((lastMessage as any).flow === 'out') {
-        /**
+        const oldLastMessage = oldMessageList[oldMessageList.length - 1];
+        if ((lastMessage as any).flow === 'out'  && lastMessage.ID !== oldLastMessage.ID) {
+          /**
          * The latest one was sent by myself
          *
          * 最新一条是自己发送的
@@ -81,9 +86,52 @@ watch(messageList, async (newMessageList, oldMessageList) => { // eslint-disable
     messageList.value.splice(0, 0, ...historyMessageList);
     const currentMessageList = messageList.value.filter(item => item.type === 'TIMTextElem');
     chatStore.setMessageListInfo(currentMessageList, isCompleted, middleReqMessageId);
-    isScrollToTop = true;
   }
+  async function getMessageList(): Promise<{
+    currentMessageList: any[];
+    isCompleted: boolean,
+    nextReqMessageId: string,
+  }> {
+    let count = 0;
+    const result: {
+      currentMessageList: any[],
+      isCompleted: boolean,
+      nextReqMessageId: string,
+    } = {
+      currentMessageList: [],
+      isCompleted: false,
+      nextReqMessageId: '',
+    };
+    const tim: any = roomEngine.instance?.getTIM();
 
+    const getIMMessageList = async () => {
+      const conversationData: {
+        conversationID: string,
+        nextReqMessageID?: string | undefined;
+      } = {
+        conversationID: `GROUP${roomId.value}`,
+      };
+      if (result.nextReqMessageId !== '') {
+        conversationData.nextReqMessageID = result.nextReqMessageId;
+      }
+      const imResponse = await tim.getMessageList(conversationData);
+      const { messageList, isCompleted, nextReqMessageID } = imResponse.data;
+      result.currentMessageList.splice(0, 0, ...messageList);
+      result.isCompleted = messageList.length > 0 ? isCompleted : true;
+      result.nextReqMessageId = nextReqMessageID;
+      if (result.isCompleted || result.currentMessageList.length >= 15) {
+        return;
+      }
+      count += 1;
+      if (count === 1) {
+        await getIMMessageList();
+      }
+    };
+
+    await getIMMessageList();
+
+    return result;
+  };
   const onReceiveTextMessage = (data: { roomId: string, message: any }) => {
     const { message } = data;
     chatStore.updateMessageList({
@@ -102,7 +150,6 @@ watch(messageList, async (newMessageList, oldMessageList) => { // eslint-disable
     t,
     roomEngine,
     historyMessageList,
-    showLoadMore,
     messageAimId,
     messageBottomEl,
     handleMessageListScroll,
@@ -110,5 +157,6 @@ watch(messageList, async (newMessageList, oldMessageList) => { // eslint-disable
     onReceiveTextMessage,
     messageList,
     isScrollNotAtBottom,
+    getMessageList,
   };
 }

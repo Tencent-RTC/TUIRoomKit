@@ -1,3 +1,12 @@
+## 2023.08.02
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.4.3 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89378)。
+- 拉 chat 消息时向上滑动会预加载消息列表, 避免出现【加载更多字样】。
+- 当房间中有人在屏幕分享时，阻止新的屏幕分享。
+
+
 ## 2023.07.18
 
 **Feature**

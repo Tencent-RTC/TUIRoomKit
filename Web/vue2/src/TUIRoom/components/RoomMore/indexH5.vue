@@ -17,13 +17,14 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 import useRoomMoreControl from './useRoomMoreHooks';
+import SvgIcon from '../common/SvgIcon.vue';
+
 
 const {
   t,
   groupNumber,
   email,
   onCopy,
-  SvgIcon,
 } = useRoomMoreControl();
 
 const contactContentList = reactive([

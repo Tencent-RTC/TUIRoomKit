@@ -36,9 +36,7 @@
 import { ref, Ref, computed, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessage } from '../../../elementComp';
-
 import Dialog from '../../../elementComp/Dialog';
-
 import IconButton from '../../common/IconButton.vue';
 import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
@@ -54,7 +52,7 @@ const roomEngine = useGetRoomEngine();
 const logPrefix = '[ScreenShareControl]';
 
 const roomStore = useRoomStore();
-const { isAnchor, isAudience } = storeToRefs(roomStore);
+const { isAnchor, isAudience, hasOtherScreenShare } = storeToRefs(roomStore);
 const { t } = useI18n();
 
 const btnStopRef = ref();
@@ -83,6 +81,14 @@ async function toggleScreenShare() {
     ElMessage({
       type: 'warning',
       message: t('You currently do not have sharing permission, please raise your hand to apply for sharing permission first'),
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
+  }
+  if (hasOtherScreenShare.value) {
+    ElMessage({
+      type: 'warning',
+      message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;

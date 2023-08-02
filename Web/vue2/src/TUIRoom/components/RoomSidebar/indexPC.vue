@@ -23,11 +23,9 @@
 import Chat from '../Chat/index.vue';
 import Drawer from '../../elementComp/Drawer.vue';
 import useSideBar from './useSideBarHooks';
-
 import RoomInvite from '../RoomInvite';
 import ManageMember from '../ManageMember';
 import RoomMore from '../RoomMore';
-
 const {
   isSidebarOpen,
   title,

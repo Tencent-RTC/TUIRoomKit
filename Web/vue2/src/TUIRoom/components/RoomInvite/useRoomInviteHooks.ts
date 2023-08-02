@@ -2,7 +2,6 @@ import { computed, ref } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { ElMessage } from '../../elementComp';
 import { storeToRefs } from 'pinia';
-import SvgIcon from '../common/SvgIcon.vue';
 import { useI18n } from '../../locales';
 import { isElectronEnv } from '../../utils/utils';
 
@@ -18,10 +17,7 @@ export default function useRoomInvite() {
   const isElectron = isElectronEnv();
 
   let inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);
-  if (isElectron) {
-    inviteLink = computed(() => `https://web.sdk.qcloud.com/trtc/webrtc/test/xinli-test/tuiroom-wasm/index.html#home?roomId=${roomId.value}`);
-  }
-
+  
   // todo: schema 唤起
   const schemeLink = computed(() => `tuiroom://joinroom?roomId=${roomId.value}`);
 
@@ -42,6 +38,5 @@ export default function useRoomInvite() {
     inviteLink,
     schemeLink,
     onCopy,
-    SvgIcon,
   };
 }
