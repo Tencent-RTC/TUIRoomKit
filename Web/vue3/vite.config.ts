@@ -40,6 +40,11 @@ export default defineConfig({
   },
   server: {
     open: true,
+    // 解决 whistle 代理之后无限刷新页面问题
+    hmr: {
+      protocol: 'ws',
+      host: '127.0.0.1',
+    },
   },
   // https://cn.vitejs.dev/guide/dep-pre-bundling.html#monorepos-and-linked-dependencies
   optimizeDeps: {

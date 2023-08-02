@@ -1,7 +1,6 @@
 <template>
   <div :class="isMobile ? 'message-list-container-h5':'message-list-container'">
     <div class="message-list">
-      <p v-if="showLoadMore" class="message-top" @click="handleGetHistoryMessageList">{{ t('Load More') }}</p>
       <div
         v-for="item in messageList"
         :key="item.ID"
@@ -26,21 +25,26 @@ import MessageText from './MessageTypes/MessageText.vue';
 import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import isMobile from '../../utils/useMediaValue';
 import useMessageList from '../Chat/useMessageListHook';
+import { useChatStore } from '../../stores/chat';
+const chatStore = useChatStore();
 
 const {
-  t,
-  showLoadMore,
   messageAimId,
   roomEngine,
   messageBottomEl,
   handleMessageListScroll,
-  handleGetHistoryMessageList,
   onReceiveTextMessage,
   messageList,
+  getMessageList,
 } = useMessageList();
 
-onMounted(() => {
-  nextTick(() => {
+
+onMounted(async () => {
+  const { currentMessageList, isCompleted, nextReqMessageId } = await getMessageList();
+  const filterCurrentMessageList = currentMessageList.filter((item: any) => item.type === 'TIMTextElem');
+  chatStore.setMessageListInfo(filterCurrentMessageList, isCompleted, nextReqMessageId);
+
+  await nextTick(() => {
     if (messageAimId?.value?.length > 0) {
       const target = messageAimId?.value[messageAimId?.value?.length - 1];
       target.scrollIntoView();
@@ -48,6 +52,7 @@ onMounted(() => {
   });
   window.addEventListener('scroll', handleMessageListScroll, true);
 });
+
 
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onReceiveTextMessage, onReceiveTextMessage);
@@ -73,6 +78,7 @@ onUnmounted(() => {
     display: flex;
     justify-content: center;
   }
+
   .message-item {
     margin-bottom: 20px;
     word-break: break-all;

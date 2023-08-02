@@ -22,13 +22,13 @@
 
 <script setup lang="ts">
 import useRoomMoreControl from './useRoomMoreHooks';
+import SvgIcon from '../common/SvgIcon.vue';
 
 const {
   t,
   groupNumber,
   email,
   onCopy,
-  SvgIcon,
 } = useRoomMoreControl();
 </script>
 

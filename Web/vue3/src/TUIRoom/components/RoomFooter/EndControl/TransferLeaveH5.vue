@@ -39,6 +39,7 @@ import { storeToRefs } from 'pinia';
 import useEndControl from './useEndControlHooks';
 import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import { ElMessageBox, ElMessage } from '../../../elementComp';
+import logger from '../../../utils/common/logger';
 
 const {
   t,
@@ -70,16 +71,16 @@ async function transferAndLeave() {
   try {
     const userId = selectedUser.value;
     const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({ userId, userRole: TUIRole.kRoomOwner });
-    console.log(`${logPrefix}transferAndLeave:`, changeUserRoleResponse);
+    logger.log(`${logPrefix}transferAndLeave:`, changeUserRoleResponse);
     await closeMediaBeforeLeave();
     const exitRoomResponse = await roomEngine.instance?.exitRoom();
-    console.log(`${logPrefix}exitRoom:`, exitRoomResponse);
+    logger.log(`${logPrefix}exitRoom:`, exitRoomResponse);
     resetState();
     emit('on-exit-room', { code: 0, message: '' });
     basicStore.setSidebarOpenStatus(false);
     basicStore.setSidebarName('');
   } catch (error) {
-    console.error(`${logPrefix}transferAndLeave error:`, error);
+    logger.error(`${logPrefix}transferAndLeave error:`, error);
   }
 }
 /**
@@ -90,7 +91,7 @@ async function transferAndLeave() {
 const onRoomDismissed = async (eventInfo: { roomId: string}) => {
   try {
     const { roomId } = eventInfo;
-    console.log(`${logPrefix}onRoomDismissed:`, roomId);
+    logger.log(`${logPrefix}onRoomDismissed:`, roomId);
     ElMessageBox.alert(t('The host closed the room.'), t('Note'), {
       customClass: 'custom-element-class',
       confirmButtonText: t('Confirm'),
@@ -101,7 +102,7 @@ const onRoomDismissed = async (eventInfo: { roomId: string}) => {
       },
     });
   } catch (error) {
-    console.error(`${logPrefix}onRoomDestroyed error:`, error);
+    logger.error(`${logPrefix}onRoomDestroyed error:`, error);
   }
 };
 

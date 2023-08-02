@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia';
 import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
 import { computed, onUnmounted, ref } from 'vue';
+import logger from '../../utils/common/logger';
 
 export default function useSideBar() {
   const roomEngine = useGetRoomEngine();
@@ -45,7 +46,7 @@ export default function useSideBar() {
 
   /** 监听消息接收，放在这里是为了打开 chat 之前只记录消息未读数 */
   const onReceiveTextMessage = (data: { roomId: string, message: any }) => {
-    console.warn('onReceiveTextMessage:', data);
+    logger.warn('onReceiveTextMessage:', data);
     if (!basicStore.isSidebarOpen || basicStore.sidebarName !== 'chat') {
       // eslint-disable-next-line no-plusplus
       chatStore.updateUnReadCount(++chatStore.unReadCount);
