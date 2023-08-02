@@ -41,9 +41,7 @@
   </div>
 </template>
 <script setup lang="ts">
-/// @TUIRoom-PlatformAdapter-Start
 import Dialog from '../../../elementComp/Dialog/index.vue';
-/// @TUIRoom-PlatformAdapter-End
 import SvgIcon from '../../common/SvgIcon.vue';
 import useUserInfo from './useUserInfoHooks';
 import Avatar from '../../base/Avatar.vue';

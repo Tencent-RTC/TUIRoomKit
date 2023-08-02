@@ -20,9 +20,7 @@ import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
 import { useI18n } from '../../locales';
 import isMobile from '../../utils/useMediaValue';
-
 import roomInvite from '../RoomInvite/index.vue';
-
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);

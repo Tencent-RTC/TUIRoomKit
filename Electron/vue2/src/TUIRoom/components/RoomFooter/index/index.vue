@@ -38,10 +38,8 @@ import VideoControl from '../VideoControl.vue';
 import ManageMemberControl from '../ManageMemberControl.vue';
 import ChatControl from '../ChatControl.vue';
 import ApplyControl from '../ApplyControl/Index.vue';
-
 import MoreControl from '../MoreControl/index.vue';
 import EndControl from '../EndControl/index.vue';
-
 import SettingControl from '../SettingControl.vue';
 import bus from '../../../hooks/useMitt';
 

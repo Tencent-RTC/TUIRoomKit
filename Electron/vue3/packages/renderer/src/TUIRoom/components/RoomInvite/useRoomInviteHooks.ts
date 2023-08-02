@@ -18,9 +18,6 @@ export default function useRoomInvite() {
   const isElectron = isElectronEnv();
 
   let inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);
-  if (isElectron) {
-    inviteLink = computed(() => `https://web.sdk.qcloud.com/trtc/webrtc/test/xinli-test/tuiroom-wasm/index.html#home?roomId=${roomId.value}`);
-  }
 
   // todo: schema 唤起
   const schemeLink = computed(() => `tuiroom://joinroom?roomId=${roomId.value}`);

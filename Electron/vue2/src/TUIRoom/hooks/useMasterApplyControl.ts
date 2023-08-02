@@ -9,6 +9,7 @@ import { MESSAGE_DURATION } from '../constants/message';
 import { useRoomStore, UserInfo } from '../stores/room';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../locales';
+import logger from '../utils/common/logger';
 
 const roomEngine = useGetRoomEngine();
 
@@ -85,7 +86,7 @@ export default function () {
         });
         roomStore.removeApplyToAnchorUser(userId);
       } catch (error) {
-        console.error(`拒绝 ${userName || userId} 上台申请失败，请重试！`);
+        logger.error(`拒绝 ${userName || userId} 上台申请失败，请重试！`);
         ElMessage({
           type: 'warning',
           message: t('Reject on Stage failed, please retry', { userName: userName || userId }),

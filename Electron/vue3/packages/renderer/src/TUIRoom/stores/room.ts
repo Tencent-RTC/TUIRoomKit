@@ -75,6 +75,7 @@ interface RoomState {
   maxMembersCount: number,
   hasVideoStreamObject: Record<string, UserInfo>,
   currentStreamIdListInVisibleView: string[],
+  hasOtherScreenShare: boolean,
 }
 
 export const useRoomStore = defineStore('room', {
@@ -129,6 +130,7 @@ export const useRoomStore = defineStore('room', {
     hasVideoStreamObject: {},
     // 可视区域用户流列表
     currentStreamIdListInVisibleView: [],
+    hasOtherScreenShare: false,
   }),
   getters: {
     // 当前用户是否是主持人
@@ -644,6 +646,9 @@ export const useRoomStore = defineStore('room', {
         remoteUserInfo.inviteToAnchorRequestId = '';
       }
     },
+    setHasOtherScreenShare(hasScreenShare: boolean) {
+      this.hasOtherScreenShare = hasScreenShare;
+    },
     reset() {
       this.localUser = {
         userId: '',
@@ -692,6 +697,7 @@ export const useRoomStore = defineStore('room', {
       this.isMessageDisableForAllUser = false;
       this.speechMode = TUISpeechMode.kFreeToSpeak;
       this.hasVideoStreamObject = {};
+      this.hasOtherScreenShare = false;
     },
   },
 });

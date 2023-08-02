@@ -7,9 +7,7 @@
 
 <script setup lang="ts">
 import MessageList from './MessageList.vue';
-/// @TUIRoom-PlatformAdapter-Start
 import ChatEditor from './ChatEditor/index.vue';
-/// @TUIRoom-PlatformAdapter-End
 import isMobile from '../../utils/useMediaValue';
 </script>
 

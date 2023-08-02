@@ -41,9 +41,7 @@
   </div>
 </template>
 <script setup lang="ts">
-
 import Dialog from '../../../elementComp/Dialog/index.vue';
-
 import SvgIcon from '../../common/SvgIcon.vue';
 import useUserInfo from './useUserInfoHooks';
 import Avatar from '../../base/Avatar.vue';

@@ -23,6 +23,7 @@ import { ElMessageBox } from 'element-plus';
 import {
   TUIKickedOutOfRoomReason,
 } from '@tencentcloud/tuiroom-engine-electron';
+import logger from '../TUIRoom/utils/common/logger';
 
 const { t } = useI18n();
 
@@ -108,7 +109,7 @@ function handleLogOut() {
  * 主持人创建房间回调
 **/
 function onCreateRoom(info: { code: number; message: string }) {
-  console.debug('onEnterRoom:', info);
+  logger.debug('onEnterRoom:', info);
 }
 
 /**
@@ -116,7 +117,7 @@ function onCreateRoom(info: { code: number; message: string }) {
  * 普通成员进入房间回调
 **/
 function onEnterRoom(info: { code: number; message: string }) {
-  console.debug('onCreateRoom:', info);
+  logger.debug('onCreateRoom:', info);
 }
 
 /**
@@ -124,7 +125,7 @@ function onEnterRoom(info: { code: number; message: string }) {
  * 主持人销毁房间回调
 **/
 const onDestroyRoom = (info: { code: number; message: string }) => {
-  console.debug('onDestroyRoom:', info);
+  logger.debug('onDestroyRoom:', info);
   sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });
 };
@@ -134,7 +135,7 @@ const onDestroyRoom = (info: { code: number; message: string }) => {
  * 普通成员退出房间回调
 **/
 const onExitRoom = (info: { code: number; message: string }) => {
-  console.debug('onExitRoom:', info);
+  logger.debug('onExitRoom:', info);
   sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });
 };
@@ -144,7 +145,7 @@ const onExitRoom = (info: { code: number; message: string }) => {
  * 普通成员被主持人踢出房间
 **/
 const onKickedOutOfRoom = (info: { roomId: string; reason: TUIKickedOutOfRoomReason, message: string }) => {
-  console.debug('onKickedOutOfRoom:', info);
+  logger.debug('onKickedOutOfRoom:', info);
   sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });
 };
@@ -154,7 +155,7 @@ const onKickedOutOfRoom = (info: { roomId: string; reason: TUIKickedOutOfRoomRea
  * 被踢下线
  */
 const onKickedOffLine = (info: { message: string }) => {
-  console.debug('onKickedOffLine:', info);
+  logger.debug('onKickedOffLine:', info);
   sessionStorage.removeItem('tuiRoom-roomInfo');
   router.replace({ path: '/home' });
 };
@@ -164,7 +165,7 @@ const onKickedOffLine = (info: { message: string }) => {
  * userSig 过期，需要获取新的 userSig
  */
 const onUserSigExpired = () => {
-  console.debug('onUserSigExpired');
+  logger.debug('onUserSigExpired');
   sessionStorage.removeItem('tuiRoom-roomInfo');
   sessionStorage.removeItem('tuiRoom-currentUserInfo');
   router.replace({ path: '/home' });
