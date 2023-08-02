@@ -4,6 +4,7 @@ import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../../locales';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
+import logger from '../../../utils/common/logger';
 
 export default function useEndControl() {
   const { t } = useI18n();
@@ -17,7 +18,7 @@ export default function useEndControl() {
   const roomEngine = useGetRoomEngine();
   const visible: Ref<boolean> = ref(false);
   const basicStore = useBasicStore();
-  console.log(`${logPrefix} basicStore:`, basicStore);
+  logger.log(`${logPrefix} basicStore:`, basicStore);
 
   const roomStore = useRoomStore();
   const { localUser, remoteAnchorList } = storeToRefs(roomStore);

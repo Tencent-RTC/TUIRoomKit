@@ -21,9 +21,7 @@
 </template>
 
 <script setup lang="ts">
-
 import UserInfo from '../UserInfo';
-
 import Language from '../../base/Language.vue';
 import SwitchTheme from '../../base/SwitchTheme.vue';
 // import NetworkInfo from './NetworkInfo.vue';

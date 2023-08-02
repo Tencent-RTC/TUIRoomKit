@@ -60,9 +60,7 @@ import { storeToRefs } from 'pinia';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
 import { LAYOUT } from '../../../constants/render';
-
 import StreamRegion from '../StreamRegion';
-
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ElMessage } from '../../../elementComp';
 import { MESSAGE_DURATION } from '../../../constants/message';
@@ -504,6 +502,7 @@ const onUserVideoStateChanged = (eventInfo: {
   // 当远端屏幕分享变化的时候，处理流布局
   if (userId !== basicStore.userId && streamType === TUIVideoStreamType.kScreenStream) {
     if (hasVideo) {
+      roomStore.setHasOtherScreenShare(true);
       enlargeStream.value = roomStore.remoteStreamObj[`${userId}_${streamType}`] as StreamInfo;
       if (enlargeStream.value) {
         if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
@@ -511,6 +510,7 @@ const onUserVideoStateChanged = (eventInfo: {
         }
       }
     } else {
+      roomStore.setHasOtherScreenShare(false);
       /**
        * Reset the stream playback layout when the remote screen sharing stream is stopped
        *
