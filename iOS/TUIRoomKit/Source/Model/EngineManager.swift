@@ -60,7 +60,15 @@ class EngineManager: NSObject {
     }
     
     func logout() {
-        store = RoomStore()
+        if store.isEnteredRoom {
+            if store.currentUser.userRole == .roomOwner {
+                destroyRoom()
+            } else {
+                exitRoom()
+            }
+        } else {
+            store = RoomStore()
+        }
         TUIRoomEngine.logout {
         } onError: { code, message in
             debugPrint("---logout,code:\(code),message:\(message)")
@@ -81,18 +89,16 @@ class EngineManager: NSObject {
                 guard let self = self else { return }
                 self.store.currentUser.userRole = .roomOwner
                 self.listener?.onEnterEngineRoom?(code: 0, message: "success")
-                if !self.store.isBanAutoRaise {
+                if self.store.isShowRoomMainViewAutomatically {
                     self.showRoomViewController(roomId: roomInfo.roomId)
                 }
             } onError: { [weak self] code, message in
                 guard let self = self else { return }
                 self.listener?.onEnterEngineRoom?(code: code.rawValue, message: message)
-                RoomRouter.makeToast(toast: message)
             }
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.listener?.onCreateEngineRoom?(code: code.rawValue, message: message)
-            RoomRouter.makeToast(toast: message)
         }
     }
     
@@ -101,21 +107,151 @@ class EngineManager: NSObject {
             guard let self = self else { return }
             self.store.currentUser.userRole = .generalUser
             self.listener?.onEnterEngineRoom?(code: 0, message: "success")
-            self.showRoomViewController(roomId: roomId)
+            if self.store.isShowRoomMainViewAutomatically {
+                self.showRoomViewController(roomId: roomId)
+            }
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.listener?.onEnterEngineRoom?(code: code.rawValue, message: message)
-            RoomRouter.makeToast(toast: message)
         }
     }
     
-    func enterEngineRoom(roomId:String, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
+    func exitRoom() {
+        roomEngine.getTRTCCloud().stopAllRemoteView()
+        RoomFloatView.dismiss()
+        roomEngine.exitRoom(syncWaiting: false) { [weak self] in
+            guard let self = self else { return }
+            self.cleanRoomData()
+        } onError: { [weak self] code, message in
+            guard let self = self else { return }
+            self.cleanRoomData()
+        }
+        TRTCCloud.destroySharedIntance()
+    }
+    
+    func destroyRoom() {
+        roomEngine.getTRTCCloud().stopAllRemoteView()
+        RoomFloatView.dismiss()
+        roomEngine.destroyRoom { [weak self] in
+            guard let self = self else { return }
+            self.cleanRoomData()
+        } onError: { [weak self] code, message in
+            guard let self = self else { return }
+            self.cleanRoomData()
+        }
+        TRTCCloud.destroySharedIntance()
+    }
+    
+    func cleanRoomData() {
+        refreshRoomEngine()
+        if store.currentUser.userRole == .roomOwner {
+            listener?.onDestroyEngineRoom?()
+        } else {
+            listener?.onExitEngineRoom?()
+        }
+        store.refreshStore()
+    }
+    
+    //关闭本地麦克风
+    func closeLocalMicrophone() {
+        store.roomInfo.isOpenMicrophone = false
+        roomEngine.closeLocalMicrophone()
+    }
+    
+    //打开本地麦克风
+    func openLocalMicrophone() {
+        let actionBlock = { [weak self] in
+            guard let self = self else { return }
+            self.store.roomInfo.isOpenMicrophone = true
+            self.roomEngine.openLocalMicrophone(self.store.audioSetting.audioQuality) {
+            } onError: { code, message in
+                debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
+            }
+        }
+        if RoomCommon.checkAuthorMicStatusIsDenied() {
+            actionBlock()
+        } else {
+            RoomCommon.micStateActionWithPopCompletion {
+                if RoomCommon.checkAuthorMicStatusIsDenied() {
+                    actionBlock()
+                }
+            }
+        }
+    }
+    
+    //关闭本地摄像头
+    func closeLocalCamera() {
+        store.roomInfo.isOpenCamera = false
+        roomEngine.closeLocalCamera()
+    }
+    
+    //打开本地摄像头
+    func openLocalCamera() {
+        let actionBlock = { [weak self] in
+            guard let self = self else { return }
+            self.store.roomInfo.isOpenCamera = true
+            self.roomEngine.openLocalCamera(isFront: self.store.videoSetting.isFrontCamera, quality:
+                                                            self.store.videoSetting.videoQuality) {
+            } onError: { code, message in
+                debugPrint("openLocalCamera,code:\(code),message:\(message)")
+            }
+        }
+        if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+           actionBlock()
+        } else {
+            RoomCommon.cameraStateActionWithPopCompletion {
+                if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+                    actionBlock()
+                }
+            }
+        }
+    }
+    
+    //申请打开本地设备（当roomType是applyToSpeak时使用）
+    func applyToAdminToOpenLocalDevice(device: TUIMediaDevice, timeout: Double) {
+        roomEngine.applyToAdminToOpenLocalDevice(device: device, timeout: timeout) {  [weak self] _, _ in
+            guard let self = self else { return }
+            switch device {
+            case .camera:
+                self.openLocalCamera()
+            case .microphone:
+                self.openLocalMicrophone()
+            default:
+                break
+            }
+        } onRejected: { _, _, _ in
+            //todo
+        } onCancelled: { _, _ in
+            //todo
+        } onTimeout: { _, _ in
+            //todo
+        }
+    }
+    
+    func setListener(listener: EngineManagerListener) {
+        self.listener = listener
+    }
+    
+    func dismissListener() {
+        listener = nil
+    }
+    
+    deinit {
+        debugPrint("deinit \(self)")
+    }
+}
+
+// MARK: - Private
+extension EngineManager {
+    private func enterEngineRoom(roomId:String, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
+        setFramework()
         roomEngine.enterRoom(roomId) { [weak self] roomInfo in
             guard let self = self else { return }
             guard let roomInfo = roomInfo else { return }
             self.store.roomInfo.update(engineRoomInfo: roomInfo)
             self.store.initialRoomCurrentUser()
             self.store.isEnteredRoom = true
+            self.store.timeStampOnEnterRoom = Int(Date().timeIntervalSince1970)
             //判断用户是否需要上麦进行申请
             switch self.store.roomInfo.speechMode {
             case .freeToSpeak:
@@ -162,52 +298,10 @@ class EngineManager: NSObject {
         }
     }
     
-    func exitRoom() {
-        roomEngine.exitRoom(syncWaiting: false) { [weak self] in
-            guard let self = self else { return }
-            self.refreshRoomEngine()
-            self.listener?.onExitEngineRoom?()
-            self.store.refreshStore()
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            self.refreshRoomEngine()
-            self.listener?.onExitEngineRoom?()
-            self.store.refreshStore()
-        }
-        TRTCCloud.destroySharedIntance()
-    }
-    
-    func destroyRoom() {
-        roomEngine.destroyRoom { [weak self] in
-            guard let self = self else { return }
-            self.refreshRoomEngine()
-            self.listener?.onDestroyEngineRoom?()
-            self.store.refreshStore()
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            self.refreshRoomEngine()
-            self.listener?.onDestroyEngineRoom?()
-            self.store.refreshStore()
-        }
-        TRTCCloud.destroySharedIntance()
-    }
-    
-    func addListener(listener: EngineManagerListener?) {
-        guard let listener = listener else { return }
-        self.listener = listener
-    }
-    
-    deinit {
-        debugPrint("deinit \(self)")
-    }
-}
-
-// MARK: - Private
-extension EngineManager {
-    
     private func showRoomViewController(roomId: String) {
         self.rootRouter.pushMainViewController(roomId: roomId)
     }
+    
     private func openMicrophone() {
         let openLocalMicrophoneBlock = { [weak self] in
             guard let self = self else { return }
@@ -225,8 +319,9 @@ extension EngineManager {
                 }
             }
         }
-            
+        
     }
+    
     private func takeSeat(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         self.roomEngine.takeSeat(-1, timeout: self.timeOutNumber) { [weak self] _, _ in
             guard let self = self else { return }
@@ -273,5 +368,26 @@ extension EngineManager: TUIExtensionProtocol {
         } else {
             return [:]
         }
+    }
+}
+
+
+// MARK: - setFramework
+extension EngineManager {
+    fileprivate static let TUIRoomKitFrameworkValue = 1
+    fileprivate static let TUIRoomKitComponentValue = 18
+    fileprivate static let TUIRoomKitLanguageValue = 3
+    private func setFramework() {
+        let jsonStr = """
+            {
+                "api":"setFramework",
+                "params":{
+                    "framework":\(EngineManager.TUIRoomKitFrameworkValue),
+                    "component":\(EngineManager.TUIRoomKitComponentValue),
+                    "language":\(EngineManager.TUIRoomKitLanguageValue)
+                }
+            }
+        """
+        roomEngine.callExperimentalAPI(jsonStr: jsonStr)
     }
 }

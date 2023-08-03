@@ -43,7 +43,7 @@ class TRTCLoginViewController: UIViewController {
             loading.startAnimating()
             if let rootView = view as? TRTCLoginRootView {
                 rootView.phoneNumTextField.text = ProfileManager.shared.curUserModel?.phone ?? ""
-                rootView.nickNameTextField.text = ProfileManager.shared.curUserModel?.name ?? ""
+                rootView.checkLoginBtnState()
             }
         }
     }
@@ -141,20 +141,26 @@ extension TRTCLoginViewController: TUIRoomKitListener {
             let userInfo = TUIRoomEngine.getSelfInfo()
             ProfileManager.shared.refreshAvatar(faceURL: userInfo.avatarUrl)
             
-            if userInfo.userName != ProfileManager.shared.curNickName() {
-                ProfileManager.shared.setNickName(name: ProfileManager.shared.curNickName()) {
+            if ProfileManager.shared.curNickName().isEmpty{
+                showRegisterVC()
+            }else if userInfo.userName != ProfileManager.shared.curNickName() {
+                ProfileManager.shared.setNickName(name: ProfileManager.shared.curNickName()) { [weak self] in
+                    guard let self = self else { return }
                     debugPrint("set nickName success")
                     let userInfo = TUIRoomEngine.getSelfInfo()
                     TUIRoomKit.sharedInstance.setSelfInfo(userName: userInfo.userName, avatarURL: userInfo.avatarUrl)
-                    TUIRoomKit.sharedInstance.enterPrepareView(enablePreview: true)
+                    self.navigationController?.pushViewController(MainViewController(), animated: true)
                 } failed: { [weak self] (err) in
                     guard let self = self else { return }
                     self.view.makeToast(err)
                 }
             } else {
                 TUIRoomKit.sharedInstance.setSelfInfo(userName: userInfo.userName, avatarURL: userInfo.avatarUrl)
-                TUIRoomKit.sharedInstance.enterPrepareView(enablePreview: true)
+                let vc = MainViewController()
+                navigationController?.pushViewController(vc, animated: true)
             }
+        } else if code == ERR_USER_SIG_EXPIRED.rawValue {
+            self.view.makeToast(LoginLocalize(key: "App.PortalViewController.loginimExpired"))
         } else {
             debugPrint("onLogin:code:\(code),message:\(message)")
             self.view.makeToast(LoginLocalize(key: "App.PortalViewController.loginimfailed"))

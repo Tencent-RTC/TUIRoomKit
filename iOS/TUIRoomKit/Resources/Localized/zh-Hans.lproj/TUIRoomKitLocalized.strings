@@ -23,9 +23,8 @@
 "TUIRoom.host" = "主持人";
 "TUIRoom.camera" = "摄像头";
 "TUIRoom.mic" = "麦克风";
-"TUIRoom.sure.destroy.room" = "你确定要解散房间吗？";
+"TUIRoom.sure.destroy.room" = "你确定要结束会议吗？";
 "TUIRoom.sure.leave.room" = "你确定要离开房间吗？";
-"TUIRoom.destroy.room.ok" = "解散房间";
 "TUIRoom.destroy.room.cancel" = "再等等";
 "TUIRoom.ok" = "确认";
 "TUIRoom.cancel" = "取消";
@@ -101,7 +100,7 @@
 "TUIRoom.trans.master" = "指定一位新主持人";
 "TUIRoom.appoint.master.and.leave.room" = "指定并离开";
 "TUIRoom.have.become.master" = "您已成为主持人";
-"TUIRoom.have.transferred.master.to.you" = "已将主持人权限转交给您";
+"TUIRoom.have.transferred.master" = "您已转让了房主";
 "TUIRoom.raise.hand.apply" = "举手申请";
 "TUIRoom.mute.audio.seat.reason" = "举手发言房间，请先举手申请上麦";
 "TUIRoom.mute.video.seat.reason" = "举手发言房间，请先举手申请上麦";

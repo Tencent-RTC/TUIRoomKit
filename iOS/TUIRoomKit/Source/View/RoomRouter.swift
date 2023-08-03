@@ -20,10 +20,13 @@ class RouteContext {
     init() {}
 }
 
-class RoomRouter {
+class RoomRouter: NSObject {
     static let shared = RoomRouter()
     private let context: RouteContext = RouteContext()
-    private init() {}
+    private override init() {
+        super.init()
+        subscribeUIEvent()
+    }
     
     class RoomNavigationDelegate: NSObject {
         
@@ -31,6 +34,20 @@ class RoomRouter {
     
     var navController: RoomKitNavigationController? {
         return context.rootNavigation
+    }
+    
+    private func subscribeUIEvent() {
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowRoomMainView, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowRoomFloatView, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RoomMainControllerAlreadyShown, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_EntranceControllerAlreadyShown, responder: self)
+    }
+    
+    private func unsubscribeEvent() {
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowRoomMainView, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowRoomFloatView, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RoomMainControllerAlreadyShown, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_EntranceControllerAlreadyShown, responder: self)
     }
     
     func pushToChatController(user: UserModel, roomInfo: RoomInfo) {
@@ -172,6 +189,7 @@ class RoomRouter {
     }
     
     deinit {
+        unsubscribeEvent()
         debugPrint("deinit \(self)")
     }
 }
@@ -319,5 +337,26 @@ extension RoomRouter: PopUpViewModelFactory {
         let viewModel = PopUpViewModel(viewType: viewType, height: height)
         viewModel.backgroundColor = backgroundColor
         return viewModel
+    }
+}
+
+extension RoomRouter: RoomKitUIEventResponder {
+    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
+        switch key {
+        case .TUIRoomKitService_ShowRoomFloatView:
+            dismissAllRoomPopupViewController()
+            popToRoomEntranceViewController()
+            RoomFloatView.show()
+        case .TUIRoomKitService_ShowRoomMainView:
+            RoomFloatView.dismiss()
+            self.pushMainViewController(roomId: EngineManager.shared.store.roomInfo.roomId)
+        case .TUIRoomKitService_RoomMainControllerAlreadyShown:
+            guard let navController = navController else { return }
+            navController.viewControllers.removeAll(where: { $0 is RoomEntranceViewController })
+        case .TUIRoomKitService_EntranceControllerAlreadyShown:
+            guard let navController = navController else { return }
+            navController.viewControllers.removeAll(where: { $0 is RoomPrePareViewController })
+        default: break
+        }
     }
 }

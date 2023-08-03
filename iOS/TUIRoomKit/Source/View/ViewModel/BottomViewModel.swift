@@ -11,9 +11,8 @@ import TUIRoomEngine
 
 protocol BottomViewModelResponder: AnyObject {
     func updateStackView(item: ButtonItemData, index: Int)
-    func showExitRoomAlert()
-    func showDestroyRoomAlert()
     func makeToast(text: String)
+    func showExitRoomAlert(isRoomOwner: Bool, isOnlyOneUserInRoom: Bool)
 }
 
 class BottomViewModel: NSObject {
@@ -91,22 +90,11 @@ class BottomViewModel: NSObject {
         viewItems.append(muteVideoItem)
         if roomInfo.speechMode == .applySpeakAfterTakingSeat {
             //举手
-            let raiseHandItem = ButtonItemData()
-            if currentUser.userRole == .roomOwner {
-                raiseHandItem.normalTitle = .raiseHandApplyListText
+            if currentUser.userRole == .roomOwner || !currentUser.isOnSeat {
+                viewItems.append(getItemOnRaiseHand())
             } else {
-                raiseHandItem.normalTitle = .raiseHandApplyText
+                viewItems.append(getItemOnLeaveSeat())
             }
-            raiseHandItem.normalIcon = "room_hand_raise"
-            raiseHandItem.selectedIcon = "room_hand_down"
-            raiseHandItem.selectedTitle = .handDownText
-            raiseHandItem.resourceBundle = tuiRoomKitBundle()
-            raiseHandItem.buttonType = .raiseHandItemType
-            raiseHandItem.action = { [weak self] sender in
-                guard let self = self, let button = sender as? UIButton else { return }
-                self.raiseHandAction(sender: button)
-            }
-            viewItems.append(raiseHandItem)
         }
         // 成员列表
         let memberItem = ButtonItemData()
@@ -132,15 +120,12 @@ class BottomViewModel: NSObject {
     }
     
     func exitAction(sender: UIButton) {
-        let isHomeowner: Bool = currentUser.userId == roomInfo.ownerId
-        if isHomeowner {
-            viewResponder?.showDestroyRoomAlert()
-        } else {
-            viewResponder?.showExitRoomAlert()
-        }
+        let isRoomOwner: Bool = currentUser.userRole == .roomOwner
+        let isOnlyOneUserInRoom: Bool = engineManager.store.attendeeList.count == 1
+        viewResponder?.showExitRoomAlert(isRoomOwner: isRoomOwner, isOnlyOneUserInRoom: isOnlyOneUserInRoom)
     }
     
-    func exitRoomLogic(isHomeowner: Bool) {
+    func exitRoom(isHomeowner: Bool) {
         if isHomeowner {
             engineManager.destroyRoom()
         } else {
@@ -152,7 +137,7 @@ class BottomViewModel: NSObject {
     
     func muteAudioAction(sender: UIButton) {
         if !sender.isSelected {
-            engineManager.roomEngine.closeLocalMicrophone()
+            engineManager.closeLocalMicrophone()
             return
         }
         //如果房主全体静音，房间成员不可打开麦克风
@@ -162,42 +147,23 @@ class BottomViewModel: NSObject {
         }
         switch roomInfo.speechMode {
         case .freeToSpeak:
-            openLocalMicrophone()
+            engineManager.openLocalMicrophone()
         case .applySpeakAfterTakingSeat:
             if currentUser.isOnSeat {
-                openLocalMicrophone()
+                engineManager.openLocalMicrophone()
             } else {
                 viewResponder?.makeToast(text: .muteAudioSeatReasonText)
             }
         case .applyToSpeak:
-            applyToAdminToOpenLocalDevice(device: .microphone)
+                engineManager.applyToAdminToOpenLocalDevice(device: .microphone, timeout: timeoutNumber)
         @unknown default:
             break
         }
     }
     
-    private func openLocalMicrophone() {
-        let actionBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.openLocalMicrophone(self.engineManager.store.audioSetting.audioQuality) {
-            } onError: { code, message in
-                debugPrint("openLocalMicrophone,code:\(code), message:\(message)")
-            }
-        }
-        if RoomCommon.checkAuthorMicStatusIsDenied() {
-            actionBlock()
-        } else {
-            RoomCommon.micStateActionWithPopCompletion {
-                if RoomCommon.checkAuthorMicStatusIsDenied() {
-                    actionBlock()
-                }
-            }
-        }
-    }
-    
     func muteVideoAction(sender: UIButton) {
         if !sender.isSelected {
-            engineManager.roomEngine.closeLocalCamera()
+            engineManager.closeLocalCamera()
             return
         }
         //如果房主全体禁画，房间成员不可打开摄像头
@@ -205,60 +171,20 @@ class BottomViewModel: NSObject {
             viewResponder?.makeToast(text: .muteVideoRoomReasonText)
             return
         }
+        engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: nil)
         switch roomInfo.speechMode {
         case .freeToSpeak:
-            openLocalCamera()
+            engineManager.openLocalCamera()
         case .applySpeakAfterTakingSeat:
             if currentUser.isOnSeat {
-                openLocalCamera()
+                engineManager.openLocalCamera()
             } else {
                 viewResponder?.makeToast(text: .muteVideoSeatReasonText)
             }
         case .applyToSpeak:
-            applyToAdminToOpenLocalDevice(device: .camera)
+                engineManager.applyToAdminToOpenLocalDevice(device: .camera, timeout: timeoutNumber)
         @unknown default:
             break
-        }
-    }
-    
-    private func openLocalCamera() {
-        let actionBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: nil)
-            self.engineManager.roomEngine.openLocalCamera(isFront: self.engineManager.store.videoSetting.isFrontCamera, quality:
-                                                            self.engineManager.store.videoSetting.videoQuality) {
-            } onError: { code, message in
-                debugPrint("openLocalCamera,code:\(code),message:\(message)")
-            }
-        }
-        if RoomCommon.checkAuthorCamaraStatusIsDenied() {
-           actionBlock()
-        } else {
-            RoomCommon.cameraStateActionWithPopCompletion {
-                if RoomCommon.checkAuthorCamaraStatusIsDenied() {
-                    actionBlock()
-                }
-            }
-        }
-    }
-    
-    private func applyToAdminToOpenLocalDevice(device: TUIMediaDevice) {
-        self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: device, timeout: self.timeoutNumber) {  [weak self] _, _ in
-            guard let self = self else { return }
-            switch device {
-            case .camera:
-                self.openLocalCamera()
-            case .microphone:
-                self.openLocalMicrophone()
-            default:
-                break
-            }
-        } onRejected: { _, _, _ in
-            //todo
-        } onCancelled: { _, _ in
-            //todo
-        } onTimeout: { _, _ in
-            //todo
         }
     }
     
@@ -318,23 +244,19 @@ class BottomViewModel: NSObject {
     
     //举手按钮变成下台状态
     private func changeItemStateForLeaveSeat() {
-        guard let raiseHandItem = viewItems.first(where: { $0.buttonType == .raiseHandItemType }) else { return }
-        raiseHandItem.normalIcon = "room_leaveSeat"
-        raiseHandItem.selectedIcon = "room_hand_raise"
-        raiseHandItem.normalTitle = .leaveSeatText
-        raiseHandItem.selectedTitle = .raiseHandText
-        raiseHandItem.buttonType = .leaveSeatItemType
-        raiseHandItem.resourceBundle = tuiRoomKitBundle()
-        raiseHandItem.action = { [weak self] sender in
-            guard let self = self, let button = sender as? UIButton else { return }
-            self.leaveSeatAction(sender: button)
-        }
-        viewResponder?.updateStackView(item: raiseHandItem, index: ViewItemNumber.raiseHandItem.rawValue)
+        guard viewItems.first(where: { $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType  }) != nil
+        else { return }
+        viewResponder?.updateStackView(item: getItemOnLeaveSeat(), index: ViewItemNumber.raiseHandItem.rawValue)
     }
     //举手按钮变成举手状态
     private func changeItemStateForRaiseHand() {
-        guard let raiseHandItem = viewItems.first(where: { $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType })
+        guard viewItems.first(where: { $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType }) != nil
         else { return }
+        viewResponder?.updateStackView(item: getItemOnRaiseHand(), index: ViewItemNumber.raiseHandItem.rawValue)
+    }
+    
+    private func getItemOnRaiseHand() -> ButtonItemData {
+        let raiseHandItem = ButtonItemData()
         if currentUser.userRole == .roomOwner {
             raiseHandItem.normalTitle = .raiseHandApplyListText
         } else {
@@ -349,7 +271,22 @@ class BottomViewModel: NSObject {
             guard let self = self, let button = sender as? UIButton else { return }
             self.raiseHandAction(sender: button)
         }
-        viewResponder?.updateStackView(item: raiseHandItem, index: ViewItemNumber.raiseHandItem.rawValue)
+        return raiseHandItem
+    }
+    
+    private func getItemOnLeaveSeat() -> ButtonItemData {
+        let raiseHandItem = ButtonItemData()
+        raiseHandItem.normalIcon = "room_leaveSeat"
+        raiseHandItem.selectedIcon = "room_hand_raise"
+        raiseHandItem.normalTitle = .leaveSeatText
+        raiseHandItem.selectedTitle = .raiseHandText
+        raiseHandItem.buttonType = .leaveSeatItemType
+        raiseHandItem.resourceBundle = tuiRoomKitBundle()
+        raiseHandItem.action = { [weak self] sender in
+            guard let self = self, let button = sender as? UIButton else { return }
+            self.leaveSeatAction(sender: button)
+        }
+        return raiseHandItem
     }
     
     deinit {
@@ -466,12 +403,6 @@ private extension String {
     }
     static var handDownText: String {
         localized("TUIRoom.hand.down")
-    }
-    static var homeownersLogoutTitle: String {
-        localized("TUIRoom.sure.destroy.room")
-    }
-    static var destroyRoomOkTitle: String {
-        localized("TUIRoom.destroy.room.ok")
     }
     static var raiseHandText: String {
         localized("TUIRoom.raise.hand")

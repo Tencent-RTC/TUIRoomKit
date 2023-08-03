@@ -94,6 +94,10 @@ class EngineEventCenter: NSObject {
         case TUIRoomKitService_UserOnSeatChanged
         case TUIRoomKitService_ResignFirstResponder
         case TUIRoomKitService_ShowBeautyView
+        case TUIRoomKitService_ShowRoomMainView
+        case TUIRoomKitService_ShowRoomFloatView
+        case TUIRoomKitService_RoomMainControllerAlreadyShown
+        case TUIRoomKitService_EntranceControllerAlreadyShown
     }
     
     /// 注册UI响应相关监听事件
@@ -106,7 +110,9 @@ class EngineEventCenter: NSObject {
         } else {
             uiEventObserverMap[key] = [observer]
         }
-        TUICore.registerEvent(RoomUIEvent.TUIRoomKitService.rawValue, subKey: key.rawValue, object: observer)
+        DispatchQueue.main.async {
+            TUICore.registerEvent(RoomUIEvent.TUIRoomKitService.rawValue, subKey: key.rawValue, object: observer)
+        }
     }
     
     
@@ -118,7 +124,9 @@ class EngineEventCenter: NSObject {
             observerArray = observerArray.filter({ observer in
                 guard let responderValue = observer.responder else { return false }
                 if responderValue == responder {
-                    TUICore.unRegisterEvent(RoomUIEvent.TUIRoomKitService.rawValue, subKey: key.rawValue, object: observer)
+                    DispatchQueue.main.async {
+                        TUICore.unRegisterEvent(RoomUIEvent.TUIRoomKitService.rawValue, subKey: key.rawValue, object: observer)
+                    }
                 }
                 return responderValue == responder
             })
@@ -128,19 +136,28 @@ class EngineEventCenter: NSObject {
             }
         } else {
             observerArray.forEach { observer in
-                TUICore.unRegisterEvent(RoomUIEvent.TUIRoomKitService.rawValue, subKey: key.rawValue, object: observer)
+                DispatchQueue.main.async {
+                    TUICore.unRegisterEvent(RoomUIEvent.TUIRoomKitService.rawValue, subKey: key.rawValue, object: observer)
+                }
             }
             uiEventObserverMap.removeValue(forKey: key)
         }
     }
     
     func notifyUIEvent(key: RoomUIEvent, param: [AnyHashable : Any]) {
-        TUICore.notifyEvent(RoomUIEvent.TUIRoomKitService.rawValue, subKey: key.rawValue, object: nil, param: param)
+        DispatchQueue.main.async {
+            TUICore.notifyEvent(RoomUIEvent.TUIRoomKitService.rawValue, subKey: key.rawValue, object: nil, param: param)
+        }
     }
     
     func subscribeEngine(event: RoomEngineEvent, observer: RoomEngineEventResponder) {
         let weakObserver = { [weak observer] in return observer }
         if var observerArray = engineObserverMap[event] {
+            let listenerObject = observerArray.first { weakObject in
+                guard let object = weakObject() else { return false }
+                return object.isEqual(observer)
+            }
+            guard listenerObject == nil else { return }
             observerArray.append(weakObserver)
             engineObserverMap[event] = observerArray
         } else {
@@ -150,9 +167,14 @@ class EngineEventCenter: NSObject {
     
     func unsubscribeEngine(event: RoomEngineEvent, observer: RoomEngineEventResponder) {
         guard var observerArray = engineObserverMap[event] else { return }
-        observerArray.removeAll(where: {$0() === observer})
+        observerArray.removeAll { weakObject in
+            guard let object = weakObject() else { return true }
+            return object.isEqual(observer)
+        }
         if observerArray.count == 0 {
             engineObserverMap.removeValue(forKey: event)
+        } else {
+            engineObserverMap[event] = observerArray
         }
     }
     
@@ -176,19 +198,21 @@ extension EngineEventCenter {
             addUserList(userInfo: userInfo)
         }
     }
+    
     private func remoteUserLeaveRoom(roomId: String, userInfo: TUIUserInfo) {
         if roomId == engineManager.store.roomInfo.roomId {
             removeUserList(userId: userInfo.userId)
             removeSeatList(userId: userInfo.userId)
         }
     }
+    
     private func seatListChanged(seatList: [TUISeatInfo], seated: [TUISeatInfo], left leftList: [TUISeatInfo]) {
         if leftList.count > 0 {
             //判断自己是否下麦
             if leftList.first(where: { $0.userId == currentUser.userId }) != nil {
                 currentUser.isOnSeat = false
                 notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
-                                                       param: ["isOnSeat":false])
+                              param: ["isOnSeat":false])
             }
             //更新麦上用户列表
             for seatInfo: TUISeatInfo in leftList {
@@ -205,7 +229,7 @@ extension EngineEventCenter {
         if seated.first(where: { $0.userId == currentUser.userId }) != nil {
             currentUser.isOnSeat = true
             notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
-                                                   param: ["isOnSeat":true])
+                          param: ["isOnSeat":true])
         }
         //更新所有在麦上的观众
         for seatInfo: TUISeatInfo in seatList {
@@ -223,6 +247,7 @@ extension EngineEventCenter {
         }
         notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
+    
     private func allUserMicrophoneDisableChanged(roomId: String, isDisable: Bool) {
         roomInfo.isMicrophoneDisableForAllUser = isDisable
         if currentUser.userRole == .roomOwner {
@@ -234,6 +259,7 @@ extension EngineEventCenter {
             RoomRouter.makeToast(toast: .allUnMuteAudioText)
         }
     }
+    
     private func allUserCameraDisableChanged(roomId: String, isDisable: Bool) {
         roomInfo.isCameraDisableForAllUser = isDisable
         if currentUser.userRole == .roomOwner {
@@ -245,6 +271,7 @@ extension EngineEventCenter {
             RoomRouter.makeToast(toast: .allUnMuteVideoText)
         }
     }
+    
     private func addUserList(userInfo: TUIUserInfo) {
         if let userItem = getUserItem(userInfo.userId) {
             userItem.update(userInfo: userInfo)
@@ -282,24 +309,105 @@ extension EngineEventCenter {
         engineManager.store.inviteSeatMap.removeValue(forKey: userId)
         notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
+    
     private func userAudioStateChanged(userId: String, hasAudio: Bool) {
         if userId == currentUser.userId {
             currentUser.hasAudioStream = hasAudio
+            roomInfo.isOpenMicrophone = hasAudio
         }
         guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
         userModel.hasAudioStream = hasAudio
         notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
     }
+    
     private func userVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool) {
         switch streamType {
         case .screenStream:
             engineManager.store.isSomeoneSharing = hasVideo
+            guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
+            userModel.hasScreenStream = hasVideo
             notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: [:])
         case .cameraStream:
+            if userId == currentUser.userId {
+                currentUser.hasVideoStream = hasVideo
+                roomInfo.isOpenCamera = hasVideo
+            }
             guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
             userModel.hasVideoStream = hasVideo
             notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
         default: break
+        }
+    }
+    
+    private func userRoleChanged(userId: String, userRole: TUIRole) {
+        let isSelfRoleChanged = userId == currentUser.userId
+        let isRoomOwnerChanged = userRole == .roomOwner
+        let timeoutNumber: TimeInterval = 100
+        if isSelfRoleChanged {
+            currentUser.userRole = userRole
+        }
+        if isRoomOwnerChanged {
+            roomInfo.ownerId = userId
+        }
+        //转成房主之后需要上麦
+        guard isSelfRoleChanged, isRoomOwnerChanged else { return }
+        guard roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat else { return }
+        engineManager.roomEngine.takeSeat(-1, timeout: timeoutNumber) { [weak self] _, _ in
+            guard let self = self else { return }
+            self.currentUser.isOnSeat = true
+            debugPrint("")
+        } onRejected: { _, _, _ in
+            debugPrint("")
+        } onCancelled: { _, _ in
+            debugPrint("")
+        } onTimeout: { _, _ in
+            debugPrint("")
+        } onError: { _, _, _, _ in
+            debugPrint("")
+        }
+    }
+    
+    private func requestCancelled(requestId: String, userId: String) {
+        var userId = userId
+        //如果是请求超时被取消，userId是房主，需要通过requestId找到用户的userId
+        engineManager.store.inviteSeatMap.forEach { (key, value) in
+            if value == requestId {
+                userId = key
+            }
+        }
+        engineManager.store.inviteSeatMap.removeValue(forKey: userId)
+        engineManager.store.inviteSeatList = engineManager.store.inviteSeatList.filter { userModel in
+            userModel.userId != userId
+        }
+        notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+    }
+    
+    private func requestReceived(request: TUIRequest) {
+        switch request.requestAction {
+        case .takeSeat:
+            if roomInfo.speechMode == .applySpeakAfterTakingSeat {
+                //如果作为房主收到自己要上麦拿到请求，直接同意
+                if request.userId == currentUser.userId, roomInfo.ownerId == request.userId {
+                    engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
+                    } onError: { _, _ in
+                    }
+                }
+                guard let userModel = engineManager.store.attendeeList.first(where: {$0.userId == request.userId}) else { return }
+                if (engineManager.store.inviteSeatMap[request.userId] != nil) {
+                    break
+                }
+                engineManager.store.inviteSeatList.append(userModel)
+                engineManager.store.inviteSeatMap[request.userId] = request.requestId
+                notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+            }
+        default: break
+        }
+    }
+    
+    private func userVoiceVolumeChanged(volumeMap: [String : NSNumber]) {
+        for (userId, volume) in volumeMap {
+            guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId}) else { continue }
+            userModel.volume = volume.intValue
         }
     }
 }
@@ -445,6 +553,7 @@ extension EngineEventCenter: TUIRoomObserver {
     }
     
     func onUserRoleChanged(userId: String, userRole: TUIRole) {
+        userRoleChanged(userId: userId, userRole: userRole)
         guard let observers = engineObserverMap[.onUserRoleChanged] else { return }
         let param = [
             "userId" : userId,
@@ -483,6 +592,7 @@ extension EngineEventCenter: TUIRoomObserver {
     }
     
     func onUserVoiceVolumeChanged(volumeMap: [String : NSNumber]) {
+        userVoiceVolumeChanged(volumeMap: volumeMap)
         guard let observers = engineObserverMap[.onUserVoiceVolumeChanged] else { return }
         observers.forEach { responder in
             responder()?.onEngineEvent(name: .onUserVoiceVolumeChanged, param: volumeMap)
@@ -537,6 +647,7 @@ extension EngineEventCenter: TUIRoomObserver {
     
     // MARK: - 信令请求相关回调
     func onRequestReceived(request: TUIRequest) {
+        requestReceived(request: request)
         guard let observers = engineObserverMap[.onRequestReceived] else { return }
         let param = [
             "request": request,
@@ -547,6 +658,7 @@ extension EngineEventCenter: TUIRoomObserver {
     }
     
     func onRequestCancelled(requestId: String, userId: String) {
+        requestCancelled(requestId: requestId, userId: userId)
         guard let observers = engineObserverMap[.onRequestCancelled] else { return }
         let param = [
             "requestId": requestId,

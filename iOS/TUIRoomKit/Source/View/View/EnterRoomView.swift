@@ -132,6 +132,7 @@ class EnterRoomView: UIView {
     }
     
     func bindInteraction() {
+        viewModel.responder = self
         enterButton.addTarget(self, action: #selector(enterButtonClick(sender:)), for: .touchUpInside)
     }
     
@@ -145,6 +146,12 @@ class EnterRoomView: UIView {
     
     deinit {
         debugPrint("deinit \(self)")
+    }
+}
+
+extension EnterRoomView: EnterRoomViewEventResponder {
+    func makeToast(text: String) {
+        RoomRouter.makeToast(toast: text)
     }
 }
 

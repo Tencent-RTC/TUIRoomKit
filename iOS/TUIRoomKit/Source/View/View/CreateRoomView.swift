@@ -178,6 +178,10 @@ extension CreateRoomView: CreateViewEventResponder {
     func showSpeechModeControlView() {
         switchSpeakerModelView.isHidden = false
     }
+    
+    func makeToast(text: String) {
+        RoomRouter.makeToast(toast: text)
+    }
 }
 
 private extension String {

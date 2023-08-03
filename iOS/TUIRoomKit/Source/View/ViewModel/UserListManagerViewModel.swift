@@ -12,6 +12,8 @@ import TUIRoomEngine
 protocol UserListManagerViewEventResponder: AnyObject {
     func updateUI(items: [ButtonItemData])
     func makeToast(text: String)
+    func showTransferredRoomOwnerAlert()
+    func setUserListManagerViewHidden(isHidden: Bool)
 }
 
 class UserListManagerViewModel: NSObject {
@@ -192,79 +194,25 @@ class UserListManagerViewModel: NSObject {
             viewResponder?.makeToast(text: .muteAudioRoomReasonText)
             return
         }
-        //打开本地的麦克风需要进行申请
-        let applyToAdminToOpenLocalDeviceBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: .microphone, timeout: self.timeoutNumber) {  [weak self] _, _ in
-                guard let self = self else { return }
-                self.openLocalMicrophone()
-            } onRejected: { _, _, _ in
-                //todo
-            } onCancelled: { _, _ in
-                //todo
-            } onTimeout: { _, _ in
-                //todo
-            }
-        }
         switch roomInfo.speechMode {
         case .freeToSpeak:
-            openLocalMicrophone()
+            engineManager.openLocalMicrophone()
         case .applySpeakAfterTakingSeat:
             if currentUser.isOnSeat {
-                openLocalMicrophone()
+                engineManager.openLocalMicrophone()
             } else {
                 viewResponder?.makeToast(text: .muteAudioSeatReasonText)
             }
         case .applyToSpeak:
-            applyToAdminToOpenLocalDeviceBlock()
+            engineManager.applyToAdminToOpenLocalDevice(device: .microphone, timeout: timeoutNumber)
         @unknown default:
             break
         }
     }
     
-    private func openLocalMicrophone() {
-        let actionBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.openLocalMicrophone(self.engineManager.store.audioSetting.audioQuality) {
-            } onError: { code, message in
-                debugPrint("---openLocalMicrophone,code:\(code), message:\(message)")
-            }
-        }
-        if RoomCommon.checkAuthorMicStatusIsDenied() {
-            actionBlock()
-        } else {
-            RoomCommon.micStateActionWithPopCompletion {
-                if RoomCommon.checkAuthorMicStatusIsDenied() {
-                    actionBlock()
-                }
-            }
-        }
-    }
-    
-    private func openLocalCamera() {
-        let actionBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-            self.engineManager.roomEngine.openLocalCamera(isFront: self.engineManager.store.videoSetting.isFrontCamera, quality:
-                                                            self.engineManager.store.videoSetting.videoQuality) {
-            } onError: { code, message in
-                debugPrint("openLocalCamera,code:\(code),message:\(message)")
-            }
-        }
-        if RoomCommon.checkAuthorCamaraStatusIsDenied() {
-            actionBlock()
-        } else {
-            RoomCommon.cameraStateActionWithPopCompletion {
-                if RoomCommon.checkAuthorCamaraStatusIsDenied() {
-                    actionBlock()
-                }
-            }
-        }
-    }
-    
     func muteLocalVideoAction(sender: UIButton) {
         if currentUser.hasVideoStream {
-            engineManager.roomEngine.closeLocalCamera()
+            engineManager.closeLocalCamera()
             return
         }
         //如果房主全体禁画，房间成员不可打开摄像头
@@ -272,31 +220,18 @@ class UserListManagerViewModel: NSObject {
             viewResponder?.makeToast(text: .muteVideoRoomReasonText)
             return
         }
-        //打开本地的摄像头需要向房主进行申请
-        let applyToAdminToOpenLocalDeviceBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.applyToAdminToOpenLocalDevice(device: .camera, timeout: self.timeoutNumber) {  [weak self] _, _ in
-                guard let self = self else { return }
-                self.openLocalCamera()
-            } onRejected: { _, _, _ in
-                //todo
-            } onCancelled: { _, _ in
-                //todo
-            } onTimeout: { _, _ in
-                //todo
-            }
-        }
+        engineManager.roomEngine.setLocalVideoView(streamType: .cameraStream, view: nil)
         switch roomInfo.speechMode {
         case .freeToSpeak:
-            openLocalCamera()
+                engineManager.openLocalCamera()
         case .applySpeakAfterTakingSeat:
             if currentUser.isOnSeat {
-                openLocalCamera()
+                engineManager.openLocalCamera()
             } else {
                 viewResponder?.makeToast(text: .muteVideoSeatReasonText)
             }
         case .applyToSpeak:
-            applyToAdminToOpenLocalDeviceBlock()
+            engineManager.applyToAdminToOpenLocalDevice(device: .camera, timeout: timeoutNumber)
         @unknown default:
             break
         }
@@ -387,7 +322,10 @@ class UserListManagerViewModel: NSObject {
     func changeHostAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
         let roomEngine = engineManager.roomEngine
-        roomEngine.changeUserRole(userId: userId, role: .roomOwner) {
+        roomEngine.changeUserRole(userId: userId, role: .roomOwner) { [weak self] in
+            guard let self = self else { return }
+            self.viewResponder?.showTransferredRoomOwnerAlert()
+            self.viewResponder?.setUserListManagerViewHidden(isHidden: true)
             debugPrint("转交主持人,success")
         } onError: { code, message in
             debugPrint("转交主持人，code,message")

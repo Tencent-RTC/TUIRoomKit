@@ -8,6 +8,20 @@
 
 import UIKit
 
+class CustomTextField:UITextField{
+
+    var leftPadding: CGFloat = 15
+    override func textRect(forBounds bounds:CGRect)->CGRect{
+        let originalRect = super.textRect(forBounds: bounds)
+        return originalRect.insetBy(dx: leftPadding, dy: 0)
+    }
+    
+    override func editingRect(forBounds bounds:CGRect)->CGRect{
+        let originalRect = super.editingRect(forBounds: bounds)
+        return originalRect.insetBy(dx: leftPadding, dy: 0)
+    }
+}
+
 class TRTCRegisterRootView: UIView {
     
     lazy var headImageView: UIImageView = {
@@ -19,7 +33,11 @@ class TRTCRegisterRootView: UIView {
     }()
     
     lazy var textField: UITextField = {
+        let label = UILabel()
+        label.text = "昵称"
         let textField = createTextField(.nicknamePlaceholderText)
+        textField.leftView = label
+        textField.leftViewMode = .always
         return textField
     }()
     
@@ -54,7 +72,7 @@ class TRTCRegisterRootView: UIView {
     }()
     
     private func createTextField(_ placeholder: String) -> UITextField {
-        let textField = UITextField(frame: .zero)
+        let textField = CustomTextField(frame: .zero)
         textField.backgroundColor = .white
         textField.font = UIFont(name: "PingFangSC-Regular", size: 16)
         textField.textColor = UIColor.tui_color(withHex: "333333")
@@ -200,7 +218,6 @@ class TRTCRegisterRootView: UIView {
     @objc func headBtnClick() {
         
     }
-    
     @objc func registBtnClick() {
         textField.resignFirstResponder()
         guard let name = textField.text else {
@@ -211,12 +228,7 @@ class TRTCRegisterRootView: UIView {
     }
     
     func checkRegistBtnState(_ count: Int = -1) {
-        if count > -1 {
-            registBtn.isEnabled = count > 0
-        }
-        else {
-            registBtn.isEnabled = false
-        }
+        registBtn.isEnabled = count > 1
     }
 }
 
@@ -244,12 +256,31 @@ extension TRTCRegisterRootView : UITextFieldDelegate {
         let substringToReplace = textFieldText[rangeOfTextToReplace]
         let count = textFieldText.count - substringToReplace.count + string.count
         let res = count <= maxCount
+        
         if res {
             checkRegistBtnState(count)
+            if string.isEmpty {
+                return true
+            }else if string.count > 1 {
+                for char in string {
+                    let str = String(char)
+                    if !validateString(str) {
+                        return false
+                    }
+                }
+                return true
+            }else{
+                return validateString(string)
+            }
         }
         return res
     }
 }
+func validateString(_ string: String) -> Bool {
+        let regex = try! NSRegularExpression(pattern: "^[a-zA-Z0-9_\u{4e00}-\u{9fa5}]{0,20}$")
+        let range = NSRange(location: 0, length: string.utf16.count)
+        return regex.firstMatch(in: string, options: [], range: range) != nil
+    }
 
 /// MARK: - internationalization string
 fileprivate extension String {

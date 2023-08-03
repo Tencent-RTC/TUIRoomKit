@@ -83,6 +83,7 @@ class ScreenCaptureMaskView: UIView {
     
     @objc func stopScreenCaptureAction(sender: UIButton) {
         EngineManager.shared.roomEngine.stopScreenCapture()
+        ScreenCaptureMaskView.dismiss()
     }
     
     class func show() {

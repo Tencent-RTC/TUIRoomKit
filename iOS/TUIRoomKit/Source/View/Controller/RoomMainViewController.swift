@@ -40,6 +40,11 @@ class RoomMainViewController: UIViewController {
         self.view = rootView
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RoomMainControllerAlreadyShown, param: [:])
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)

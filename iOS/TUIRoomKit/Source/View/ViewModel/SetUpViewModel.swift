@@ -322,6 +322,7 @@ class SetUpViewModel {
         if #available(iOS 12.0, *) {
             engineManager.roomEngine.startScreenCapture(appGroup: appGroupString)
             BroadcastLauncher.launch()
+            ScreenCaptureMaskView.show()
         } else {
             viewResponder?.makeToast(text: .versionLowToastText)
         }

@@ -11,10 +11,15 @@ import TIMCommon
 
 @objc(RoomMessageBubbleCell)
 class RoomMessageBubbleCell: TUIBubbleMessageCell {
-    var customData: RoomMessageBubbleCellData?
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        guard self.container != nil else { return }
+        let message = RoomMessageModel()
+        let view = RoomMessageView(viewModel: RoomMessageViewModel(message: message))
+        self.container.addSubview(view)
+        view.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -22,19 +27,14 @@ class RoomMessageBubbleCell: TUIBubbleMessageCell {
     }
     override func fill(with data: TUIBubbleMessageCellData) {
         super.fill(with: data)
-        self.customData = data as? RoomMessageBubbleCellData
-        guard let roomId = customData?.messageModel?.roomId as? String else { return }
-        guard let view = customData?.getRoomMessageView(roomId: roomId) else { return }
+        let customData = data as? RoomMessageBubbleCellData
+        guard let messageModel = customData?.messageModel as? RoomMessageModel else { return }
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             let subviewArray = self.container.subviews
             for view in subviewArray where view is RoomMessageView {
-                view.removeFromSuperview()
-            }
-            guard self.container != nil else { return }
-            self.container.addSubview(view)
-            view.snp.makeConstraints { make in
-                make.edges.equalToSuperview()
+                guard let messageView = view as? RoomMessageView else { continue }
+                messageView.viewModel.changeMessage(message: messageModel)
             }
         }
     }

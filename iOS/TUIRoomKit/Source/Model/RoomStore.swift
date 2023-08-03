@@ -10,6 +10,8 @@ import Foundation
 import TUICore
 import TUIRoomEngine
 
+let roomHashNumber: Int = 0x3B9AC9FF
+
 class RoomStore: NSObject {
     var currentLoginUser: UserModel = UserModel()
     var currentUser: UserModel = UserModel()
@@ -22,9 +24,10 @@ class RoomStore: NSObject {
     var inviteSeatMap: [String:String] = [:]
     var isSomeoneSharing: Bool = false
     var roomSpeechMode: TUISpeechMode
-    var isBanAutoRaise: Bool = false //是否禁止跳转页面
     var isChatAccessRoom: Bool = false //是否是由TUIChat跳转进来的
     var isEnteredRoom: Bool = false //是否已经进入房间
+    var isShowRoomMainViewAutomatically: Bool = true //true 调用createRoom或者enterRoom会自动进入主界面; false 需要调用 showRoomMainView 才能进入主界面。
+    var timeStampOnEnterRoom: Int = 0 //进入会议的时间戳
     var isOpenMicrophone: Bool {
         didSet {
             UserDefaults.standard.set(isOpenMicrophone, forKey: "isOpenMicrophone")
@@ -69,6 +72,8 @@ class RoomStore: NSObject {
     }
     
     func refreshStore() {
+        timeStampOnEnterRoom = 0
+        isShowRoomMainViewAutomatically = true
         isChatAccessRoom = false
         isEnteredRoom = false
         videoSetting = VideoModel()
@@ -101,9 +106,9 @@ class RoomStore: NSObject {
         }
     }
     
-    public var isOpenMicrophone: Bool
-    public var isOpenCamera: Bool
-    public var isUseSpeaker: Bool
+    public var isOpenMicrophone: Bool = true
+    public var isOpenCamera: Bool = true
+    public var isUseSpeaker: Bool = true
     
     public var speechMode: TUISpeechMode {
         set {
@@ -152,20 +157,7 @@ class RoomStore: NSObject {
     
     public var ownerId: String = ""
     
-    private var roomInfo: TUIRoomInfo
-    public override init() {
-        isOpenMicrophone = true
-        isOpenCamera = true
-        isUseSpeaker = false
-        roomInfo = TUIRoomInfo()
-        super.init()
-    }
-    
-    convenience init(roomInfo: TUIRoomInfo) {
-        self.init()
-        self.roomInfo = roomInfo
-        self.ownerId = roomInfo.ownerId
-    }
+    private var roomInfo: TUIRoomInfo = TUIRoomInfo()
     
     public func update(engineRoomInfo: TUIRoomInfo) {
         roomInfo = engineRoomInfo

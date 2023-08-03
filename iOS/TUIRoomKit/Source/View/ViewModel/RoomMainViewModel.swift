@@ -37,15 +37,18 @@ class RoomMainViewModel: NSObject {
     
     override init() {
         super.init()
+        fetchRoomInfo()
         getUserList(nextSequence: 0)//获取用户列表
         setLocalVideoProcessDelegate()
-        setEngineEventCenterSubscribe()
+        subscribeEngine()
     }
     
     func applyConfigs() {
         setVideoEncoderParam()
-        //如果房间不是自由发言房间并且用户没有上麦，不开启摄像头和麦克风
+        //如果房间不是自由发言房间并且用户没有上麦，不开启摄像头
         if roomInfo.speechMode != .freeToSpeak && !currentUser.isOnSeat {
+            roomInfo.isOpenCamera = false
+            roomInfo.isOpenMicrophone = false
             return
         }
         let openLocalCameraActionBlock = { [weak self] in
@@ -62,12 +65,8 @@ class RoomMainViewModel: NSObject {
             roomEngine.getTRTCCloud().setLocalRenderParams(params)
             roomEngine.getTRTCCloud().setGSensorMode(.uiFixLayout)
             // FIXME: - 打开摄像头前需要先设置一个view
-            roomEngine.setLocalVideoView(streamType: .cameraStream, view: UIView())
-            roomEngine.openLocalCamera(isFront:self.engineManager.store.videoSetting.isFrontCamera, quality:
-                                        self.engineManager.store.videoSetting.videoQuality) {
-            } onError: { code, message in
-                debugPrint("openLocalCamera:code:\(code),message:\(message)")
-            }
+            roomEngine.setLocalVideoView(streamType: .cameraStream, view: nil)
+            self.engineManager.openLocalCamera()
         }
         if roomInfo.isOpenCamera && !roomInfo.isCameraDisableForAllUser {
             if RoomCommon.checkAuthorCamaraStatusIsDenied() {
@@ -90,26 +89,22 @@ class RoomMainViewModel: NSObject {
         engineManager.roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
     }
     
-    private func setEngineEventCenterSubscribe() {
+    private func subscribeEngine() {
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRequestReceived, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onRequestCancelled, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserVideoStateChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
     
-    private func deleteEngineEventCenterSubscribe() {
+    private func unsubscribeEngine() {
         EngineEventCenter.shared.unsubscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onRequestReceived, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onRequestCancelled, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserVideoStateChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
@@ -134,6 +129,16 @@ class RoomMainViewModel: NSObject {
             }
         } onError: { code, message in
             debugPrint("getUserList:code:\(code),message:\(message)")
+        }
+    }
+    
+    private func fetchRoomInfo() {
+        engineManager.roomEngine.fetchRoomInfo { [weak self] roomInfo in
+            guard let self = self else { return }
+            guard let roomInfo = roomInfo else { return }
+            self.engineManager.store.roomInfo.update(engineRoomInfo: roomInfo)
+        } onError: { code, message in
+            debugPrint("")
         }
     }
     
@@ -180,7 +185,7 @@ class RoomMainViewModel: NSObject {
     
     deinit {
         deleteLocalVideoProcessDelegate()
-        deleteEngineEventCenterSubscribe()
+        unsubscribeEngine()
         debugPrint("deinit \(self)")
     }
 }
@@ -188,10 +193,11 @@ class RoomMainViewModel: NSObject {
 extension RoomMainViewModel: RoomEngineEventResponder {
     func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
         if name == .onRoomDismissed {
-            engineManager.exitRoom()
+            engineManager.cleanRoomData()
             let alertVC = UIAlertController(title: .destroyAlertText, message: nil, preferredStyle: .alert)
             let sureAction = UIAlertAction(title: .alertOkText, style: .default) { [weak self] action in
                 guard let self = self else { return }
+                ScreenCaptureMaskView.dismiss()
                 self.roomRouter.dismissAllRoomPopupViewController()
                 self.roomRouter.popToRoomEntranceViewController()
             }
@@ -200,10 +206,11 @@ extension RoomMainViewModel: RoomEngineEventResponder {
         }
         
         if name == .onKickedOutOfRoom {
-            engineManager.exitRoom()
+            engineManager.cleanRoomData()
             let alertVC = UIAlertController(title: .kickOffTitleText, message: nil, preferredStyle: .alert)
             let sureAction = UIAlertAction(title: .alertOkText, style: .default) { [weak self] action in
                 guard let self = self else { return }
+                ScreenCaptureMaskView.dismiss()
                 self.roomRouter.dismissAllRoomPopupViewController()
                 self.roomRouter.popToRoomEntranceViewController()
             }
@@ -264,24 +271,6 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
                 } onError: { _, _ in
                 }
-            case .takeSeat:
-                switch roomInfo.speechMode {
-                case .applySpeakAfterTakingSeat:
-                    //如果作为房主收到自己要上麦拿到请求，直接同意
-                    if request.userId == currentUser.userId && roomInfo.ownerId == request.userId {
-                        engineManager.roomEngine.responseRemoteRequest(request.requestId, agree: true) {
-                        } onError: { _, _ in
-                        }
-                    }
-                    guard let userModel = engineManager.store.attendeeList.first(where: {$0.userId == request.userId}) else { return }
-                    if (engineManager.store.inviteSeatMap[request.userId] != nil) {
-                        break
-                    }
-                    engineManager.store.inviteSeatList.append(userModel)
-                    engineManager.store.inviteSeatMap[request.userId] = request.requestId
-                    EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
-                default: break
-                }
             case .remoteUserOnSeat:
                 switch roomInfo.speechMode {
                 case .applySpeakAfterTakingSeat:
@@ -316,59 +305,12 @@ extension RoomMainViewModel: RoomEngineEventResponder {
             }
         }
         
-        if name == .onRequestCancelled {
-            guard var userId = param?["userId"] as? String else { return }
-            guard let requestId = param?["requestId"] as? String else { return }
-            //如果是请求超时被取消，userId是房主，需要通过requestId找到用户的userId
-            engineManager.store.inviteSeatMap.forEach { (key, value) in
-                if value == requestId {
-                    userId = key
-                }
-            }
-            engineManager.store.inviteSeatMap.removeValue(forKey: userId)
-            engineManager.store.inviteSeatList = engineManager.store.inviteSeatList.filter { userModel in
-                userModel.userId != userId
-            }
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
-        }
-        
         if name == .onUserRoleChanged {
             guard let userId = param?["userId"] as? String else { return }
             guard let userRole = param?["userRole"] as? TUIRole else { return }
-            let isSelfRoleChanged = userId == currentUser.userId
-            let isRoomOwnerChanged = userRole == .roomOwner
-            if isSelfRoleChanged {
-                currentUser.userRole = userRole
-            }
-            if isRoomOwnerChanged {
-                roomInfo.ownerId = userId
-            }
             //转成房主之后需要上麦
-            if isSelfRoleChanged, isRoomOwnerChanged {
-                if roomInfo.speechMode == .applySpeakAfterTakingSeat {
-                    engineManager.roomEngine.takeSeat(-1, timeout: timeoutNumber) { [weak self] _, _ in
-                        guard let self = self else { return }
-                        self.currentUser.isOnSeat = true
-                        debugPrint("")
-                    } onRejected: { _, _, _ in
-                        debugPrint("")
-                    } onCancelled: { _, _ in
-                        debugPrint("")
-                    } onTimeout: { _, _ in
-                        debugPrint("")
-                    } onError: { _, _, _, _ in
-                        debugPrint("")
-                    }
-                }
+            if userId == currentUser.userId, userRole == .roomOwner {
                 viewResponder?.showSelfBecomeRoomOwnerAlert()
-            }
-        }
-        if name == .onUserVideoStateChanged {
-            guard let userId = param?["userId"] as? String else { return }
-            guard let streamType = param?["streamType"] as? TUIVideoStreamType else { return }
-            guard let hasVideo = param?["hasVideo"] as? Bool else { return }
-            if userId == currentUser.userId, streamType == .screenStream, hasVideo {
-                ScreenCaptureMaskView.show()
             }
         }
         if name == .onUserScreenCaptureStopped {
@@ -422,15 +364,10 @@ extension RoomMainViewModel: RoomMainViewFactory {
         return bottomView
     }
     
-    func makeMiddleView() -> UIView {
-        let array = TUICore.getExtensionList(gVideoSeatViewKey, param: ["roomEngine": engineManager.roomEngine, "roomId": roomInfo.roomId])
-        var middleView: UIView = UIView(frame: .zero)
-        array.forEach { extensionInfo in
-            guard let map = extensionInfo.data as? [String:Any] else { return }
-            guard let view = map[gVideoSeatViewKey] as? UIView else { return }
-            middleView = view
-        }
-        return middleView
+    func makeVideoSeatView() -> UIView {
+        let videoSeatView = TUIVideoSeatView(frame: UIScreen.main.bounds, roomEngine: engineManager.roomEngine,
+                                             roomId: engineManager.store.roomInfo.roomId)
+        return videoSeatView
     }
     
     func makeRaiseHandNoticeView() -> UIView {

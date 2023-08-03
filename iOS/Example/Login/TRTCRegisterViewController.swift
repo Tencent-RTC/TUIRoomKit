@@ -12,8 +12,9 @@ import SnapKit
 import UIKit
 import ImSDK_Plus
 import TUICore
+import TUIRoomKit
 
-class TRTCRegisterViewController: UIViewController {
+class TRTCRegisterViewController: UIViewController, TUIRoomKitListener {
     
     
     let loading = UIActivityIndicatorView(style: .large)
@@ -52,15 +53,24 @@ class TRTCRegisterViewController: UIViewController {
         
         self.loading.stopAnimating()
         self.view.makeToast(.registSuccessText)
+        ProfileManager.shared.localizeUserModel()
+        ProfileManager.shared.synchronizUserInfo()
+       
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            //show main vc
-            AppUtils.shared.showMainController()
+            self.loginAfterRegister()
         }
+    }
+    func loginAfterRegister(){
+        guard let userID = ProfileManager.shared.curUserID() else { return }
+        TUIRoomKit.sharedInstance.addListener(listener: self)
+        let userSig = ProfileManager.shared.curUserSig()
+        TUIRoomKit.sharedInstance.login(sdkAppId: Int(SDKAPPID), userId:userID, userSig: userSig)
     }
     
     override func loadView() {
         super.loadView()
         let rootView = TRTCRegisterRootView()
+        rootView.backgroundColor = UIColor.white
         rootView.rootVC = self
         view = rootView
     }

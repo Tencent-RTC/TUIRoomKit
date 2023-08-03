@@ -33,4 +33,7 @@
 "TUIRoom.logout.room" = "退出房间";
 "TUIRoom.user.name" = "用户名";
 "TUIRoom.enter.again" = "再次进入";
-
+"TUIRoom.video.conferencing" = "多人视频会议";
+"TUIRoom.average.latency.desc" = "全球端到端平均延时<300ms";
+"TUIRoom.entered.room" = "已经进入会议";
+"TUIRoom.logout" = "注销";

@@ -32,3 +32,7 @@
 "TUIRoom.logout.room" = "Leave";
 "TUIRoom.user.name" = "Username";
 "TUIRoom.enter.again" = "Reenter";
+"TUIRoom.video.conferencing" = "Video Conferencing";
+"TUIRoom.average.latency.desc" = "Average end-to-end latency < 300 ms worldwide";
+"TUIRoom.entered.room" = "Already entered the meeting";
+"TUIRoom.logout" = "Log out";

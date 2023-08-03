@@ -24,7 +24,9 @@
 		7D67424628C05FCA0051E46D /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D67424528C05FC00051E46D /* libsqlite3.tbd */; };
 		7D67424828C05FDB0051E46D /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D67424728C05FDB0051E46D /* OpenAL.framework */; };
 		7D67424A28C05FE80051E46D /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D67424928C05FE80051E46D /* VideoToolbox.framework */; };
-		C11C13AE27858B4B001D39CB /* AppMainModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11C13AD27858B4B001D39CB /* AppMainModel.swift */; };
+		7D7C7A0E2A6E69F800A18CA0 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D7C7A0D2A6E69F800A18CA0 /* MainViewController.swift */; };
+		7D7C7A102A6E6A0D00A18CA0 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D7C7A0F2A6E6A0D00A18CA0 /* MainView.swift */; };
+		7D7C7A132A6E6BDC00A18CA0 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D7C7A122A6E6BDC00A18CA0 /* UIView+Extension.swift */; };
 		C18CE615279005D10071C120 /* ReplayKitLocalized.m in Sources */ = {isa = PBXBuildFile; fileRef = C18CE607279005D10071C120 /* ReplayKitLocalized.m */; };
 		C18CE616279005D10071C120 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE608279005D10071C120 /* InfoPlist.strings */; };
 		C18CE617279005D10071C120 /* ReplayKitLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE60A279005D10071C120 /* ReplayKitLocalized.strings */; };
@@ -48,7 +50,6 @@
 		C659799F2680897900CCAA4C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C659799D2680897900CCAA4C /* LaunchScreen.storyboard */; };
 		C685C0F626A67931007A7A6F /* DemoLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = C685C0EE26A67931007A7A6F /* DemoLocalized.strings */; };
 		C685C0F726A67931007A7A6F /* DemoLocalized.swift in Sources */ = {isa = PBXBuildFile; fileRef = C685C0F126A67931007A7A6F /* DemoLocalized.swift */; };
-		C685C0F826A67931007A7A6F /* KaraokeAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C685C0F326A67931007A7A6F /* KaraokeAssets.xcassets */; };
 		EEEFC4BEDE08C2B999313806 /* Pods_TXReplayKit_Screen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 906FB864AA4AD0E6330C2287 /* Pods_TXReplayKit_Screen.framework */; };
 		FA3A4ABB2A5424FE0061C7DC /* RoomFileBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3A4ABA2A5424FE0061C7DC /* RoomFileBrowserViewController.swift */; };
 		FA3A4ABF2A543A660061C7DC /* RoomFileBroswerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3A4ABE2A543A660061C7DC /* RoomFileBroswerModel.swift */; };
@@ -98,12 +99,14 @@
 		7D67424528C05FC00051E46D /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		7D67424728C05FDB0051E46D /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		7D67424928C05FE80051E46D /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		7D7C7A0D2A6E69F800A18CA0 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		7D7C7A0F2A6E6A0D00A18CA0 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		7D7C7A122A6E6BDC00A18CA0 /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		906FB864AA4AD0E6330C2287 /* Pods_TXReplayKit_Screen.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TXReplayKit_Screen.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		90F2D7D94B9B392568BE9C57 /* Pods-TXReplayKit_Screen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TXReplayKit_Screen.release.xcconfig"; path = "Target Support Files/Pods-TXReplayKit_Screen/Pods-TXReplayKit_Screen.release.xcconfig"; sourceTree = "<group>"; };
 		9A118A5B5DE110B8217C48CB /* Pods-DemoApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp.release.xcconfig"; path = "Target Support Files/Pods-DemoApp/Pods-DemoApp.release.xcconfig"; sourceTree = "<group>"; };
 		9BBF5668A4EAAF4314521FBB /* Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig"; path = "Target Support Files/Pods-DemoApp-TXReplayKit_Screen/Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig"; sourceTree = "<group>"; };
 		9CA7D17F6CB864C86F7B41C8 /* Pods-DemoApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp.debug.xcconfig"; path = "Target Support Files/Pods-DemoApp/Pods-DemoApp.debug.xcconfig"; sourceTree = "<group>"; };
-		C11C13AD27858B4B001D39CB /* AppMainModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppMainModel.swift; sourceTree = "<group>"; };
 		C18CE607279005D10071C120 /* ReplayKitLocalized.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplayKitLocalized.m; sourceTree = "<group>"; };
 		C18CE609279005D10071C120 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		C18CE60B279005D10071C120 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ReplayKitLocalized.strings"; sourceTree = "<group>"; };
@@ -137,7 +140,6 @@
 		C685C0EF26A67931007A7A6F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/DemoLocalized.strings"; sourceTree = "<group>"; };
 		C685C0F026A67931007A7A6F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/DemoLocalized.strings; sourceTree = "<group>"; };
 		C685C0F126A67931007A7A6F /* DemoLocalized.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoLocalized.swift; sourceTree = "<group>"; };
-		C685C0F326A67931007A7A6F /* KaraokeAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = KaraokeAssets.xcassets; sourceTree = "<group>"; };
 		D6AF979DB363A77B86E35374 /* Pods-DemoApp-TXReplayKit_Screen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp-TXReplayKit_Screen.release.xcconfig"; path = "Target Support Files/Pods-DemoApp-TXReplayKit_Screen/Pods-DemoApp-TXReplayKit_Screen.release.xcconfig"; sourceTree = "<group>"; };
 		E4CD7F588EA29064C4C9474A /* Pods_DemoApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DemoApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA3A4ABA2A5424FE0061C7DC /* RoomFileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomFileBrowserViewController.swift; sourceTree = "<group>"; };
@@ -211,6 +213,23 @@
 				7D5B0C942A3AB75600CC1585 /* LoginLocalized.swift */,
 			);
 			path = AppLocalized;
+			sourceTree = "<group>";
+		};
+		7D7C7A0C2A6E69E900A18CA0 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				7D7C7A0D2A6E69F800A18CA0 /* MainViewController.swift */,
+				7D7C7A0F2A6E6A0D00A18CA0 /* MainView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		7D7C7A112A6E6BCA00A18CA0 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				7D7C7A122A6E6BDC00A18CA0 /* UIView+Extension.swift */,
+			);
+			path = Common;
 			sourceTree = "<group>";
 		};
 		C18CE606279005D10071C120 /* Localized */ = {
@@ -290,7 +309,8 @@
 		C685C0E826A67931007A7A6F /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				C11C13AD27858B4B001D39CB /* AppMainModel.swift */,
+				7D7C7A112A6E6BCA00A18CA0 /* Common */,
+				7D7C7A0C2A6E69E900A18CA0 /* View */,
 				C685C0EC26A67931007A7A6F /* Resource */,
 			);
 			path = Main;
@@ -300,7 +320,6 @@
 			isa = PBXGroup;
 			children = (
 				C685C0ED26A67931007A7A6F /* Localized */,
-				C685C0F226A67931007A7A6F /* Assets */,
 			);
 			path = Resource;
 			sourceTree = "<group>";
@@ -312,14 +331,6 @@
 				C685C0F126A67931007A7A6F /* DemoLocalized.swift */,
 			);
 			path = Localized;
-			sourceTree = "<group>";
-		};
-		C685C0F226A67931007A7A6F /* Assets */ = {
-			isa = PBXGroup;
-			children = (
-				C685C0F326A67931007A7A6F /* KaraokeAssets.xcassets */,
-			);
-			path = Assets;
 			sourceTree = "<group>";
 		};
 		F6F6B85282DF8397356DE795 /* Frameworks */ = {
@@ -450,7 +461,6 @@
 				C6597946268079C500CCAA4C /* LaunchImage_en@3x.png in Resources */,
 				C6597942268079C500CCAA4C /* LaunchImage@2x.png in Resources */,
 				C6597995268088B400CCAA4C /* LaunchScreen_en.storyboard in Resources */,
-				C685C0F826A67931007A7A6F /* KaraokeAssets.xcassets in Resources */,
 				C6597945268079C500CCAA4C /* Assets.xcassets in Resources */,
 				C685C0F626A67931007A7A6F /* DemoLocalized.strings in Resources */,
 				C6597944268079C500CCAA4C /* LaunchImage_en@2x.png in Resources */,
@@ -561,15 +571,17 @@
 				C659794F268079CD00CCAA4C /* GenerateTestUserSig.swift in Sources */,
 				FA3A4ABB2A5424FE0061C7DC /* RoomFileBrowserViewController.swift in Sources */,
 				C6597941268079C500CCAA4C /* ViewController.swift in Sources */,
+				7D7C7A0E2A6E69F800A18CA0 /* MainViewController.swift in Sources */,
 				7D5B0CA22A3AB75600CC1585 /* AppUtils.swift in Sources */,
 				7D5B0CA02A3AB75600CC1585 /* TRTCLoginViewController.swift in Sources */,
 				7D5B0CA52A3AB75600CC1585 /* LayoutDefine.swift in Sources */,
 				FA3A4AC12A543E9B0061C7DC /* RoomFileBroswerCell.swift in Sources */,
 				7D5B0C9D2A3AB75600CC1585 /* UserAgreementViewController+UI.swift in Sources */,
-				C11C13AE27858B4B001D39CB /* AppMainModel.swift in Sources */,
 				7D5B0C9B2A3AB75600CC1585 /* TRTCRegisterRootView.swift in Sources */,
 				FA3A4ABF2A543A660061C7DC /* RoomFileBroswerModel.swift in Sources */,
+				7D7C7A102A6E6A0D00A18CA0 /* MainView.swift in Sources */,
 				C685C0F726A67931007A7A6F /* DemoLocalized.swift in Sources */,
+				7D7C7A132A6E6BDC00A18CA0 /* UIView+Extension.swift in Sources */,
 				7D5B0C9F2A3AB75600CC1585 /* LoginLocalized.swift in Sources */,
 				7D5B0CA12A3AB75600CC1585 /* ProfileManager_Mock.swift in Sources */,
 				C659794B268079C500CCAA4C /* SceneDelegate.swift in Sources */,
@@ -865,19 +877,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = F8A3GH6Q4W;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/App/Info.plist";
-				INFOPLIST_KEY_NSCameraUsageDescription = "TUIRoom需要访问你的相机权限";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "TUIRoom需要访问您的麦克风权限";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "TUIRoom需要访问你的相册";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UIUserInterfaceStyle = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -900,20 +903,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = FN2V63AD2J;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FN2V63AD2J;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/App/Info.plist";
-				INFOPLIST_KEY_NSCameraUsageDescription = "TUIRoom需要访问你的相机权限";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "TUIRoom需要访问您的麦克风权限";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "TUIRoom需要访问你的相册";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UIUserInterfaceStyle = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
