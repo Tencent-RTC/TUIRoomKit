@@ -6,7 +6,8 @@ import com.tencent.cloud.tuikit.roomkit.imaccess.model.observer.RoomMsgData;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 
 public interface IRoomManager {
-    void raiseUi();
+    void enableAutoShowRoomMainUi(boolean enable);
+    void showRoomMainUi();
 
     void createRoom(RoomInfo roomInfo, RoomScene scene);
 

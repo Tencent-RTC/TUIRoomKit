@@ -23,6 +23,7 @@ import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
+import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.Random;
@@ -136,7 +137,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onLogin(int code, String message) {
                 if (code == 0) {
                     roomKit.setSelfInfo(userName, userModel.userAvatar);
-                    roomKit.enterPrepareView(true);
+                    TUICore.startActivity("MainActivity", null);
                     finish();
                 } else {
                     ToastUtil.toastShortMessage("tuiroomkit login error:" + code + ",msg:" + message);

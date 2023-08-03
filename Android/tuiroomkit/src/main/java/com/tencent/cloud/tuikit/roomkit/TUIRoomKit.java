@@ -31,7 +31,5 @@ public abstract class TUIRoomKit {
 
     public abstract void removeListener(TUIRoomKitListener listener);
 
-    public abstract void banAutoRaiseUiOnce();
 
-    public abstract void raiseUi();
 }

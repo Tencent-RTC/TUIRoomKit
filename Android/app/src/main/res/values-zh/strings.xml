@@ -34,4 +34,6 @@
     <string name="app_custom_name_11">鸣人</string>
     <string name="app_custom_name_12">艾斯</string>
 
+    <string name="app_item_video_conferencing">多人音视频房间</string>
+    <string name="app_tv_video_conferencing_tips">全球端到端平均延时&lt;300ms</string>
 </resources>

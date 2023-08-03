@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId 'com.tencent.liteav.tuiroom'
-        versionName "1.0"
-        versionCode 1
+        versionName "1.4.4"
+        versionCode 100
         minSdkVersion 19
         targetSdkVersion 30
         multiDexEnabled true
@@ -30,6 +30,7 @@ dependencies {
     implementation project(':tuiroomkit')
     implementation project(':debug')
     implementation project(':tuicore')
+
     implementation "androidx.navigation:navigation-fragment:2.1.0"
     implementation "androidx.navigation:navigation-ui:2.1.0"
 }

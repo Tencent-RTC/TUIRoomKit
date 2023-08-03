@@ -6,20 +6,16 @@ import android.content.Intent;
 import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
-import com.tencent.cloud.tuikit.roomkit.utils.RoomPermissionUtil;
-import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.utils.IntentUtils;
+import com.tencent.cloud.tuikit.roomkit.utils.RoomPermissionUtil;
 import com.tencent.cloud.tuikit.roomkit.view.activity.PrepareActivity;
 import com.tencent.cloud.tuikit.roomkit.view.component.PrepareView;
-import com.tencent.cloud.tuikit.roomkit.view.activity.CreateRoomActivity;
-import com.tencent.cloud.tuikit.roomkit.view.activity.EnterRoomActivity;
 import com.tencent.qcloud.tuicore.TUIThemeManager;
 import com.tencent.qcloud.tuicore.permission.PermissionCallback;
-import com.tencent.trtc.TRTCCloudDef;
 
 import java.util.Locale;
 
@@ -39,10 +35,7 @@ public class PrepareViewModel {
 
     public UserModel getUserModel() {
         return mRoomStore.userModel;
-    }
 
-    public void finishActivity() {
-        RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.EXIT_PREPARE_ACTIVITY, null);
     }
 
     public void changeLanguage() {
@@ -98,11 +91,7 @@ public class PrepareViewModel {
     }
 
     public void switchMirrorType() {
-        mRoomStore.videoModel.isMirror = !mRoomStore.videoModel.isMirror;
-        TRTCCloudDef.TRTCRenderParams param = new TRTCCloudDef.TRTCRenderParams();
-        param.mirrorType = mRoomStore.videoModel.isMirror ? TRTCCloudDef.TRTC_VIDEO_MIRROR_TYPE_ENABLE
-                : TRTCCloudDef.TRTC_VIDEO_MIRROR_TYPE_DISABLE;
-        mRoomEngine.getTRTCCloud().setLocalRenderParams(param);
+        RoomEngineManager.sharedInstance().enableVideoLocalMirror(!mRoomStore.videoModel.isLocalMirror);
     }
 
     public void switchCamera() {
@@ -136,16 +125,8 @@ public class PrepareViewModel {
 
     public void closeLocalMicrophone() {
         mRoomEngine.closeLocalMicrophone();
-    }
 
-    public void createRoom(Context context) {
-        Intent intent = new Intent(context, CreateRoomActivity.class);
-        context.startActivity(intent);
-    }
 
-    public void enterRoom(Context context) {
-        Intent intent = new Intent(context, EnterRoomActivity.class);
-        context.startActivity(intent);
     }
 
     private void openLocalCamera() {

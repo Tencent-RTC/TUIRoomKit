@@ -32,4 +32,6 @@
     <string name="app_custom_name_10">ivet</string>
     <string name="app_custom_name_11">clinton</string>
     <string name="app_custom_name_12">virelai</string>
+    <string name="app_item_video_conferencing">Video Conferencing</string>
+    <string name="app_tv_video_conferencing_tips">Average end-to-end latency &lt; 300 ms worldwide</string>
 </resources>

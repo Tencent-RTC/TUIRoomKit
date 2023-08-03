@@ -7,9 +7,6 @@ public class UserModel {
     public String             userName;
     public String             userAvatar;
     public TUIRoomDefine.Role role;
-    public boolean            isOpenCamera;
-    public boolean            isOpenSpeaker;
-    public boolean            isOpenMicrophone;
     public boolean            isVideoAvailable;
     public boolean            isAudioAvailable;
     public boolean            isOnSeat;

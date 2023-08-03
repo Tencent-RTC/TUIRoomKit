@@ -8,14 +8,14 @@ import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.utils.RoomPermissionUtil;
-import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 
 import com.tencent.cloud.tuikit.roomkit.model.entity.BottomItemData;
 import com.tencent.cloud.tuikit.roomkit.model.entity.BottomSelectItemData;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
+import com.tencent.cloud.tuikit.roomkit.utils.RoomPermissionUtil;
 import com.tencent.cloud.tuikit.roomkit.view.component.BottomView;
 import com.tencent.qcloud.tuicore.permission.PermissionCallback;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
@@ -82,7 +82,8 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         itemDataList.add(createMicItem());
         itemDataList.add(createCameraItem());
         if (isTakeSeatSpeechMode()) {
-            BottomItemData itemData = isOwner() ? createApplyListItem() : createRaiseHandItem();
+            BottomItemData itemData = isOwner() ? createApplyListItem() : mRoomStore.userModel.isOnSeat
+                    ? createGetOffStageItem() : createRaiseHandItem();
             itemDataList.add(itemData);
         }
         itemDataList.add(createUserListItem());
@@ -153,7 +154,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         BottomSelectItemData camaraSelectItemData = new BottomSelectItemData();
         camaraSelectItemData.setSelectedName(mContext.getString(R.string.tuiroomkit_item_close_camera));
         camaraSelectItemData.setUnSelectedName(mContext.getString(R.string.tuiroomkit_item_open_camera));
-        camaraSelectItemData.setSelected(false);
+        camaraSelectItemData.setSelected(mRoomStore.roomInfo.isOpenCamera);
         camaraSelectItemData.setSelectedIconId(R.drawable.tuiroomkit_ic_camera_on);
         camaraSelectItemData.setUnSelectedIconId(R.drawable.tuiroomkit_ic_camera_off);
         camaraSelectItemData.setOnItemSelectListener(new BottomSelectItemData.OnItemSelectListener() {
@@ -584,7 +585,6 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
                 if (info.userId.equals(mRoomStore.userModel.userId)) {
                     updateAudioItemEnableStatus(!mRoomStore.roomInfo.isMicrophoneDisableForAllUser);
                     updateVideoItemEnableStatus(!mRoomStore.roomInfo.isCameraDisableForAllUser);
-                    mRoomStore.userModel.isOnSeat = true;
                     replaceItem(indexOf(BottomItemData.Type.RAISE_HAND), createGetOffStageItem());
                     break;
                 }
@@ -600,7 +600,6 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
                     updateAudioItemEnableStatus(false);
                     updateVideoItemEnableStatus(false);
                     replaceItem(indexOf(BottomItemData.Type.OFF_STAGE), createRaiseHandItem());
-                    mRoomStore.userModel.isOnSeat = false;
                     break;
                 }
             }
