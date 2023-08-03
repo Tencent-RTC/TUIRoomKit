@@ -3,14 +3,13 @@
 buildscript {
     ext.kotlin_version = '1.5.31'
     repositories {
+        maven { url "https://mirrors.tencent.com/nexus/repository/maven-public/" }
+        maven { url "https://mirrors.tencent.com/repository/maven/thirdparty" }
         google()
         mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.1'
-
-
-
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -20,6 +19,8 @@ allprojects {
         flatDir {
             dirs project(':app').file('libs')
         }
+        maven { url "https://mirrors.tencent.com/nexus/repository/maven-public/" }
+        maven { url "https://mirrors.tencent.com/repository/maven/thirdparty" }
         google()
         mavenCentral()
     }
@@ -30,7 +31,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    roomEngineSdk = "com.tencent.liteav.tuikit:tuiroomengine:1.4.3.3"
     liteavSdk = "com.tencent.liteav:LiteAVSDK_TRTC:11.3.0.13176"
+    roomEngineSdk = "com.tencent.liteav.tuikit:tuiroomengine:1.4.4.2"
     imSdk = "com.tencent.imsdk:imsdk-plus:7.3.4358"
 }

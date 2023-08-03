@@ -13,6 +13,7 @@ import com.tencent.cloud.tuikit.roomkit.TUIRoomKitListener;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
+import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 public class SplashActivity extends Activity {
@@ -45,6 +46,7 @@ public class SplashActivity extends Activity {
 
     private void startPrepareActivity() {
         final UserModel userModel = UserModelManager.getInstance().getUserModel();
+        userModel.userSig = GenerateTestUserSig.genTestUserSig(userModel.userId);
         String userName = TextUtils.isEmpty(userModel.userName) ? userModel.userId : userModel.userName;
         TUIRoomKit roomKit = TUIRoomKit.sharedInstance(this);
         roomKit.addListener(new TUIRoomKitListener() {
@@ -52,7 +54,7 @@ public class SplashActivity extends Activity {
             public void onLogin(int code, String message) {
                 if (code == 0) {
                     roomKit.setSelfInfo(userName, userModel.userAvatar);
-                    roomKit.enterPrepareView(true);
+                    TUICore.startActivity("MainActivity", null);
                     finish();
                 } else {
                     ToastUtil.toastShortMessage("tuiroomkit login error:" + code + ",msg:" + message);

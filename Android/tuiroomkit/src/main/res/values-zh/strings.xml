@@ -10,6 +10,7 @@
     <string name="tuiroomkit_tips_start_audio">请先打开麦克风权限</string>
     <string name="tuiroomkit_toast_end_room">创建者已结束房间</string>
     <string name="tuiroomkit_kicked_by_master">你已经被主持人移除</string>
+    <string name="tuiroomkit_you_have_transferred_master">您已转让了房主</string>
     <string name="tuiroomkit_mute_all_audio">全体静音</string>
     <string name="tuiroomkit_not_mute_all_audio">解除全体静音</string>
     <string name="tuiroomkit_toast_not_mute_all_audio">主持人关闭全员静音，观众可自行开启麦克风</string>
@@ -63,6 +64,7 @@
     <string name="tuiroomkit_your_name">您的姓名</string>
     <string name="tuiroomkit_turn_on_speaker">开启扬声器</string>
     <string name="tuiroomkit_logout">退出登录</string>
+    <string name="tuiroomkit_kiecked_off_line">您已在其它地方登录</string>
     <string name="tuiroomkit_cancel">取消</string>
     <string name="tuiroomkit_microphone">麦克风</string>
     <string name="tuiroomkit_camera">摄像头</string>

@@ -6,6 +6,8 @@ import static com.tencent.cloud.tuikit.roomkit.imaccess.AccessRoomConstants.Self
 import static com.tencent.cloud.tuikit.roomkit.imaccess.AccessRoomConstants.SelfRoomStatus.JOINING_ROOM;
 import static com.tencent.cloud.tuikit.roomkit.imaccess.AccessRoomConstants.SelfRoomStatus.LEAVING_ROOM;
 import static com.tencent.cloud.tuikit.roomkit.imaccess.AccessRoomConstants.SelfRoomStatus.NO_IN_ROOM;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.ENTER_FLOAT_WINDOW;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.EXIT_FLOAT_WINDOW;
 
 import android.util.Log;
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
@@ -20,7 +22,7 @@ import com.tencent.cloud.tuikit.roomkit.imaccess.model.observer.RoomMsgUserEntit
 import com.tencent.cloud.tuikit.roomkit.imaccess.model.observer.RoomObserver;
 import com.tencent.cloud.tuikit.roomkit.imaccess.utils.BusinessSceneUtil;
 import com.tencent.cloud.tuikit.roomkit.imaccess.utils.RoomSpUtil;
-import com.tencent.cloud.tuikit.roomkit.imaccess.view.RoomFloatViewService;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.qcloud.tuicore.TUILogin;
@@ -198,12 +200,14 @@ public class RoomPresenterImpl extends RoomPresenter implements IRoomCallback {
         mSelfRoomStatus = JOINING_ROOM;
         mJoinRoomLatch = new CountDownLatch(1);
         Log.d(TAG, "waitUntilCreateRoom start roomId=" + roomInfo.roomId);
+        mRoomManager.enableAutoShowRoomMainUi(false);
         mRoomManager.createRoom(roomInfo, MEETING);
         try {
             mJoinRoomLatch.await(WAIT_TIME_S, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        mRoomManager.enableAutoShowRoomMainUi(true);
         Log.d(TAG, "waitUntilCreateRoom end");
         mSelfRoomStatus = JOINED_ROOM;
 
@@ -248,10 +252,9 @@ public class RoomPresenterImpl extends RoomPresenter implements IRoomCallback {
             waitUntilEnterRoom(roomMsgData);
             return;
         }
-        RoomFloatViewService.dismissFloatView();
         if (isInRoom(roomMsgData)) {
             Log.d(TAG, "processEnterRoom raiseActivity");
-            mRoomManager.raiseUi();
+            RoomEngineManager.sharedInstance(TUILogin.getAppContext()).exitFloatWindow();
             return;
         }
         mIsProcess.set(true);
@@ -324,7 +327,7 @@ public class RoomPresenterImpl extends RoomPresenter implements IRoomCallback {
             destroyInstance();
             return;
         }
-        RoomFloatViewService.showFloatView(mRoomObserver.getRoomMsgData());
+        RoomEngineManager.sharedInstance(TUILogin.getAppContext()).enterFloatWindow();
     }
 
     @Override

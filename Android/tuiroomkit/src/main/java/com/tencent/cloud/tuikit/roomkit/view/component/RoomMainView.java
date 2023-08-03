@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.RoomMainViewModel;
@@ -261,6 +262,20 @@ public class RoomMainView extends RelativeLayout {
         confirmDialog.show();
     }
 
+    public void showKickedOffLineDialog() {
+        final ConfirmDialog confirmDialog = new ConfirmDialog(mContext);
+        confirmDialog.setCancelable(true);
+        confirmDialog.setMessage(mContext.getString(R.string.tuiroomkit_kiecked_off_line));
+        confirmDialog.setPositiveText(mContext.getString(R.string.tuiroomkit_dialog_ok));
+        confirmDialog.setPositiveClickListener(new ConfirmDialog.PositiveClickListener() {
+            @Override
+            public void onClick() {
+                RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.KICKED_OFF_LINE, null);
+                confirmDialog.dismiss();
+            }
+        });
+        confirmDialog.show();
+    }
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();

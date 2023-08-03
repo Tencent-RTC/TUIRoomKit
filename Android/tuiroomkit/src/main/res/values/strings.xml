@@ -10,6 +10,7 @@
     <string name="tuiroomkit_tips_start_audio">Please turn on the microphone permission first</string>
     <string name="tuiroomkit_toast_end_room">Conference ended by initiator</string>
     <string name="tuiroomkit_kicked_by_master">You were removed by the room owner.</string>
+    <string name="tuiroomkit_you_have_transferred_master">You have transferred the master</string>
     <string name="tuiroomkit_mute_all_audio">Mute All</string>
     <string name="tuiroomkit_not_mute_all_audio">UnMute All</string>
     <string name="tuiroomkit_toast_not_mute_all_audio">The master turns off muted microphone for all members, and the audience can turn on the microphone by themselves</string>
@@ -63,6 +64,7 @@
     <string name="tuiroomkit_your_name">Your Name</string>
     <string name="tuiroomkit_turn_on_speaker">Speaker</string>
     <string name="tuiroomkit_logout">Logout</string>
+    <string name="tuiroomkit_kiecked_off_line">You are already logged in elsewhere</string>
     <string name="tuiroomkit_cancel">Cancel</string>
     <string name="tuiroomkit_microphone">Microphone</string>
     <string name="tuiroomkit_camera">Camera</string>

@@ -57,7 +57,7 @@
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
         <service
-            android:name="com.tencent.cloud.tuikit.roomkit.imaccess.view.RoomFloatViewService"
+            android:name="com.tencent.cloud.tuikit.roomkit.view.service.RoomFloatViewService"
             android:enabled="true"
             android:exported="false" />
         <provider

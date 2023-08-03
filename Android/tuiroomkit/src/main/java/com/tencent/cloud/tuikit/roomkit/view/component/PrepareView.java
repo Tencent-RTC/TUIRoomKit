@@ -1,6 +1,7 @@
 package com.tencent.cloud.tuikit.roomkit.view.component;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.view.View;
@@ -15,8 +16,12 @@ import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
+import com.tencent.cloud.tuikit.roomkit.view.activity.CreateRoomActivity;
+import com.tencent.cloud.tuikit.roomkit.view.activity.EnterRoomActivity;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.PrepareViewModel;
+import com.tencent.qcloud.tuicore.TUICore;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -193,7 +198,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.img_back) {
-            mViewModel.finishActivity();
+            finishActivity();
         } else if (v.getId() == R.id.img_language_change) {
             mIsDuringSwitchLanguage = true;
             mViewModel.changeLanguage();
@@ -206,11 +211,21 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
         } else if (v.getId() == R.id.ll_camera_prepare) {
             mViewModel.changeCameraState();
         } else if (v.getId() == R.id.ll_enter_room) {
-            mViewModel.enterRoom(mContext);
+            enterRoom();
         } else if (v.getId() == R.id.ll_create_room) {
-            mViewModel.closeLocalCamera();
-            mViewModel.createRoom(mContext);
+            createRoom();
         }
+    }
+    private void finishActivity() {
+        RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.EXIT_PREPARE_ACTIVITY, null);
+    }
+    private void createRoom() {
+        TUICore.startActivity("CreateRoomActivity", null);
+        finishActivity();
+        }
+    private void enterRoom() {
+        TUICore.startActivity("EnterRoomActivity", null);
+        finishActivity();
     }
 
     @Override
