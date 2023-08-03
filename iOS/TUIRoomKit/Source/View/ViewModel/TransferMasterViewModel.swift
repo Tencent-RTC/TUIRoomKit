@@ -12,7 +12,7 @@ protocol TransferMasterViewResponder: NSObject {
     func searchControllerChangeActive(isActive: Bool)
 }
 
-class TransferMasterViewModel {
+class TransferMasterViewModel: NSObject {
     var attendeeList: [UserModel] = []
     var userId: String = ""
     weak var viewResponder: TransferMasterViewResponder? = nil
@@ -20,11 +20,13 @@ class TransferMasterViewModel {
         EngineManager.shared
     }
     let roomRouter: RoomRouter = RoomRouter.shared
-    init() {
+    override init() {
+        super.init()
         attendeeList = self.engineManager.store.attendeeList.filter({ [weak self] userModel in
             guard let self = self else { return true }
             return userModel.userId != self.engineManager.store.currentUser.userId
         })
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
     }
     
     func backAction() {
@@ -48,6 +50,7 @@ class TransferMasterViewModel {
     }
     
     deinit {
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
         debugPrint("deinit \(self)")
     }
 }
@@ -61,5 +64,19 @@ extension TransferMasterViewModel: PopUpViewResponder {
     
     func searchControllerChangeActive(isActive: Bool) {
         viewResponder?.searchControllerChangeActive(isActive: isActive)
+    }
+}
+
+extension TransferMasterViewModel: RoomKitUIEventResponder {
+    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
+        switch key {
+        case .TUIRoomKitService_RenewUserList:
+            attendeeList = self.engineManager.store.attendeeList.filter({ [weak self] userModel in
+                guard let self = self else { return true }
+                return userModel.userId != self.engineManager.store.currentUser.userId
+            })
+            viewResponder?.reloadTransferMasterTableView()
+        default: break
+        }
     }
 }

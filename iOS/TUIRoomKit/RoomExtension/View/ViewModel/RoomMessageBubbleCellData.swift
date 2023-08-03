@@ -13,37 +13,21 @@ import TUICore
 @objc(RoomMessageBubbleCellData)
 class RoomMessageBubbleCellData: TUIBubbleMessageCellData {
     var messageModel: RoomMessageModel?
-    var businessID: String?
-    var contentView: RoomMessageView?
-    typealias WeakModel<T> = () -> T?
-    static var messageMap: [String: WeakModel<RoomMessageBubbleCellData>] = [:] //消息存储
     override init(direction: TMsgDirection) {
         super.init(direction: direction)
     }
     override class func getCellData(_ message: V2TIMMessage) -> TUIMessageCellData {
-        guard let dict = TUITool.jsonData2Dictionary(message.customElem.data) else { return RoomMessageBubbleCellData(
-            direction: message.isSelf ? .MsgDirectionOutgoing : .MsgDirectionIncoming) }
-        guard let roomId = dict["roomId"] as? String else { return RoomMessageBubbleCellData(
-            direction: message.isSelf ? .MsgDirectionOutgoing : .MsgDirectionIncoming) }
-        let messageModel = RoomMessageModel(message: message)
-        if let cellData = messageMap[roomId] {
-            if let cellModel = cellData() {
-                cellModel.messageModel = messageModel
-                if cellModel.messageModel?.roomId == messageModel.roomId {
-                    cellModel.contentView?.viewModel.changeMessage(message: messageModel)
-                }
-                return cellModel
-            }
+        let messageModel = RoomMessageModel()
+        messageModel.updateMessage(message: message)
+        if messageModel.messageId.count > 0, messageModel.roomState == .creating, messageModel.roomId == RoomManager.shared.roomId {
+            RoomManager.shared.roomObserver.messageModel.updateMessage(message: message)
+            createRoom(roomId: messageModel.roomId)
+        }
+        if messageModel.roomId == RoomManager.shared.roomId, messageModel.roomState != .destroyed {
+            RoomManager.shared.roomObserver.messageModel.updateMessage(message: message)
         }
         let messageCellData = RoomMessageBubbleCellData(direction: message.isSelf ? .MsgDirectionOutgoing : .MsgDirectionIncoming)
-        messageCellData.businessID = messageModel.businessID
         messageCellData.messageModel = messageModel
-        let param: [String: AnyHashable] = [TUICore_TUIRoomImAccessFactory_GetRoomMessageContentViewMethod_Message: message]
-        messageCellData.contentView = TUICore.createObject(TUICore_TUIRoomImAccessFactory, key:
-                                                            TUICore_TUIRoomImAccessFactory_GetRoomMessageContentViewMethod,
-                                                           param: param) as? RoomMessageView
-        let weakObserver = { [weak messageCellData] in return messageCellData }
-        messageMap[roomId] = weakObserver
         return messageCellData
     }
     
@@ -58,10 +42,6 @@ class RoomMessageBubbleCellData: TUIBubbleMessageCellData {
         }
     }
     
-    override func contentSize() -> CGSize {
-        return CGSize(width: 238, height: 157)
-    }
-    
     private class func parseBusinessID(message: V2TIMMessage?) -> String {
         guard let message = message else { return "" }
         let customData = message.customElem.data
@@ -70,20 +50,20 @@ class RoomMessageBubbleCellData: TUIBubbleMessageCellData {
         return businessID
     }
     
-    func getRoomMessageView(roomId: String) -> UIView? {
-        if contentView != nil {
-            if let message = messageModel, message.roomId == roomId {
-                contentView?.viewModel.changeMessage(message: message)
-            }
-            return contentView
-        }
-        let param: [String: AnyHashable] = [TUICore_TUIRoomImAccessFactory_GetRoomMessageContentViewMethod_Message: messageModel?.getMessage()]
-        guard let view = TUICore.createObject(TUICore_TUIRoomImAccessFactory, key:
-                TUICore_TUIRoomImAccessFactory_GetRoomMessageContentViewMethod, param: param)
-                as? RoomMessageView else { return nil }
-        contentView = view
-        return view
+    private class func createRoom(roomId: String) {
+        let roomInfo = RoomInfo()
+        roomInfo.roomId = roomId
+        roomInfo.name = TUILogin.getNickName() ?? (TUILogin.getUserID() ?? "") + .quickMeetingText
+        roomInfo.speechMode = .freeToSpeak
+        roomInfo.isOpenCamera = EngineManager.shared.store.isOpenCamera
+        roomInfo.isOpenMicrophone = EngineManager.shared.store.isOpenMicrophone
+        RoomManager.shared.createRoom(roomInfo: roomInfo)
     }
+    
+    override func contentSize() -> CGSize {
+        return CGSize(width: 238, height: 157)
+    }
+    
     deinit {
         debugPrint("deinit \(self)")
     }

@@ -10,21 +10,6 @@ import UIKit
 
 class TRTCLoginRootView: UIView {
     
-    lazy var bgView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "login_bg"))
-        return imageView
-    }()
-    
-    lazy var titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = UIFont.systemFont(ofSize: 32)
-        label.textColor = UIColor.tui_color(withHex: "333333") ?? .black
-        label.text = .titleText
-        label.numberOfLines = 2
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
-    
     lazy var contentView: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .white
@@ -38,22 +23,16 @@ class TRTCLoginRootView: UIView {
     }()
     
     lazy var phoneNumTextField: UITextField = {
+
+        let label = UILabel()
+        label.text = "用户名"
         let textField = createTextField(.phoneNumPlaceholderText)
+        textField.leftView = label
+        textField.leftViewMode = .always
         return textField
     }()
     
     lazy var phoneNumBottomLine: UIView = {
-        let view = createSpacingLine()
-        return view
-    }()
-    
-    lazy var nickNameTextField: UITextField = {
-        let textField = createTextField(.nickNamePlaceholderText)
-        //textField.keyboardType = .namePhonePad
-        return textField
-    }()
-    
-    lazy var nickNameBottomLine: UIView = {
         let view = createSpacingLine()
         return view
     }()
@@ -86,7 +65,7 @@ class TRTCLoginRootView: UIView {
     }
     
     private func createTextField(_ placeholder: String) -> UITextField {
-        let textField = UITextField(frame: .zero)
+        let textField = CustomTextField(frame: .zero)
         textField.backgroundColor = .white
         textField.font = UIFont(name: "PingFangSC-Regular", size: 16)
         textField.textColor = UIColor.tui_color(withHex: "333333")
@@ -99,17 +78,6 @@ class TRTCLoginRootView: UIView {
         textField.delegate = self
         return textField
     }
-    
-    lazy var debugBtn: UIButton = {
-        let btn = UIButton(type: .custom)
-        if let iconImg = UIImage(named: "debug.png")?.resizeImage(reSize: CGSize(width: 25.0, height: 25.0)) {
-            btn.setImage(iconImg, for: .normal)
-        } else {
-            btn.setTitleColor(.gray, for: .normal)
-            btn.setTitle("debug", for: .normal)
-        }
-        return btn
-    }()
     
     override func draw(_ rect: CGRect) {
         super.draw(rect)
@@ -178,33 +146,19 @@ class TRTCLoginRootView: UIView {
     }
     
     func constructViewHierarchy() {
-        addSubview(bgView)
-        addSubview(titleLabel)
         addSubview(contentView)
-        addSubview(debugBtn)
         contentView.addSubview(phoneNumTextField)
         contentView.addSubview(phoneNumBottomLine)
-        contentView.addSubview(nickNameTextField)
-        contentView.addSubview(nickNameBottomLine)
         contentView.addSubview(loginBtn)
     }
     
     func activateConstraints() {
-        bgView.snp.makeConstraints { (make) in
-            make.top.leading.trailing.equalToSuperview()
-            make.height.equalTo(bgView.snp_width)
-        }
-        titleLabel.snp.makeConstraints { (make) in
-            make.top.equalToSuperview().offset(convertPixel(h: 86) + kDeviceSafeTopHeight)
-            make.leading.equalToSuperview().offset(convertPixel(w: 40))
-            make.trailing.lessThanOrEqualToSuperview().offset(-convertPixel(w: 40))
-        }
         contentView.snp.makeConstraints { (make) in
-            make.top.equalTo(bgView.snp.bottom).offset(-convertPixel(h: 64))
+            make.top.equalToSuperview()
             make.leading.trailing.bottom.equalToSuperview()
         }
         phoneNumTextField.snp.makeConstraints { (make) in
-            make.top.equalToSuperview().offset(convertPixel(h: 30))
+            make.top.equalToSuperview().offset(convertPixel(h: 300))
             make.leading.equalToSuperview().offset(convertPixel(w: 40))
             make.trailing.equalToSuperview().offset(-convertPixel(w: 40))
             make.height.equalTo(convertPixel(h: 57))
@@ -215,33 +169,16 @@ class TRTCLoginRootView: UIView {
             make.height.equalTo(convertPixel(h: 1))
         }
         
-        nickNameTextField.snp.makeConstraints { (make) in
-            make.top.equalTo(phoneNumBottomLine.snp.bottom).offset(convertPixel(h: 20))
-            make.leading.equalToSuperview().offset(convertPixel(w: 40))
-            make.trailing.equalToSuperview().offset(-convertPixel(w: 40))
-            make.height.equalTo(convertPixel(h: 57))
-        }
-        
-        nickNameBottomLine.snp.makeConstraints { (make) in
-            make.bottom.leading.trailing.equalTo(nickNameTextField)
-            make.height.equalTo(convertPixel(h: 1))
-        }
-        
         loginBtn.snp.makeConstraints { (make) in
-            make.top.equalTo(nickNameBottomLine.snp.bottom).offset(convertPixel(h: 50))
+            make.top.equalTo(phoneNumBottomLine.snp.bottom).offset(convertPixel(h: 50))
             make.leading.equalToSuperview().offset(convertPixel(w: 20))
             make.trailing.equalToSuperview().offset(-convertPixel(w: 20))
             make.height.equalTo(convertPixel(h: 52))
         }
         
-        debugBtn.snp.makeConstraints { (make) in
-            make.top.equalTo(safeAreaLayoutGuide.snp.top)
-            make.trailing.equalToSuperview().offset(-convertPixel(w: 15))
-        }
     }
     func bindInteraction() {
         loginBtn.addTarget(self, action: #selector(loginBtnClick), for: .touchUpInside)
-        debugBtn.addTarget(self, action: #selector(debugBtnClick), for: .touchUpInside)
     }
     
     @objc func loginBtnClick() {
@@ -252,11 +189,7 @@ class TRTCLoginRootView: UIView {
             return
         }
         loginBtn.isEnabled = false
-        if let nickName = nickNameTextField.text {
-            rootVC?.login(phone: phone, nickName: nickName.isEmpty ? phone : nickName)
-        } else {
-            rootVC?.login(phone: phone, nickName: phone)
-        }
+        rootVC?.login(phone: phone, nickName: "")
         DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
             self.loginBtn.isEnabled = true
         }
@@ -267,7 +200,7 @@ class TRTCLoginRootView: UIView {
     }
     
     @objc func debugBtnClick() {
-        rootVC?.showDebugVC()
+      
     }
 }
 

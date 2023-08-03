@@ -8,7 +8,12 @@
 
 import Foundation
 
+protocol EnterRoomViewEventResponder: AnyObject {
+    func makeToast(text: String)
+}
+
 class EnterRoomViewModel: NSObject {
+    weak var responder: EnterRoomViewEventResponder?
     private var fieldText: String = ""
     private(set) var inputViewItems: [ListCellItemData] = []
     private(set) var switchViewItems: [ListCellItemData] = []
@@ -25,6 +30,7 @@ class EnterRoomViewModel: NSObject {
     override init() {
         super.init()
         creatEntranceViewModel()
+        TUIRoomKit.sharedInstance.addListener(listener: self)
     }
     
     func creatEntranceViewModel() {
@@ -104,7 +110,16 @@ class EnterRoomViewModel: NSObject {
     }
     
     deinit {
+        TUIRoomKit.sharedInstance.removeListener(listener: self)
         debugPrint("deinit \(self)")
+    }
+}
+
+extension EnterRoomViewModel: TUIRoomKitListener {
+    func onRoomEnter(code: Int, message: String) {
+        if code != 0 {
+            responder?.makeToast(text: message)
+        }
     }
 }
 

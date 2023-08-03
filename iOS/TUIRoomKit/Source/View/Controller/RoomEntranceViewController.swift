@@ -54,6 +54,11 @@ class RoomEntranceViewController: UIViewController {
         UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_EntranceControllerAlreadyShown, param: [:])
+    }
+    
     @objc
     func backButtonClick(sender: UIButton) {
         RoomRouter.shared.pop()

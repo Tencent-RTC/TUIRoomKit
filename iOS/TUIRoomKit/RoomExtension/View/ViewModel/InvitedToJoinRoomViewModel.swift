@@ -21,6 +21,9 @@ class InvitedToJoinRoomViewModel: NSObject, AVAudioPlayerDelegate {
     var messageManager: RoomMessageManager {
         return RoomMessageManager.shared
     }
+    private var roomManager: RoomManager {
+        RoomManager.shared
+    }
     init(inviteUserName: String, inviteUserAvatarUrl: String, roomId: String) {
         self.inviteUserName = inviteUserName
         self.roomId = roomId
@@ -28,40 +31,46 @@ class InvitedToJoinRoomViewModel: NSObject, AVAudioPlayerDelegate {
         super.init()
         playAudio(forResource: "phone_ringing", ofType: "mp3")
     }
+    
     func startPlay() {
         audioPlayer.play()
     }
+    
     func stopPlay() {
         audioPlayer.stop()
     }
+    
     func disagreeAction() {
         stopPlay()
         closeInvitedToJoinRoomView()
     }
+    
     func agreeAction() {
         stopPlay()
-        TUIRoomKit.sharedInstance.addListener(listener: self)
-        if messageManager.isEngineLogin {
-            if messageManager.hasEnterRoom() {
-                messageManager.exitOrDestroyPreviousRoom { [weak self] in
-                    guard let self = self else { return }
-                    self.enterRoom()
-                } onError: { code, message in
-                    debugPrint("code:\(code),message:\(message)")
-                }
-            } else {
-                enterRoom()
+        if !roomManager.isEngineLogin {
+            roomManager.loginEngine { [weak self] in
+                guard let self = self else { return }
+                self.agreeAction()
+            } onError: { code, message in
+                debugPrint("loginEngine, code:\(code), message:\(message)")
+            }
+        } else if EngineManager.shared.store.isEnteredRoom {
+            roomManager.exitOrDestroyPreviousRoom { [weak self] in
+                guard let self = self else { return }
+                self.enterRoom()
+            } onError: { code, message in
+                debugPrint("exitRoom, code:\(code), message:\(message)")
             }
         } else {
-            TUIRoomKit.sharedInstance.login(sdkAppId: Int(TUILogin.getSdkAppID()),
-                                            userId: TUILogin.getUserID() ?? "",
-                                            userSig: TUILogin.getUserSig() ?? "")
+            enterRoom()
         }
     }
+    
     private func enterRoom() {
         let roomInfo = RoomInfo()
         roomInfo.roomId = roomId
-        TUIRoomKit.sharedInstance.enterRoom(roomInfo: roomInfo)
+        roomManager.enterRoom(roomInfo: roomInfo)
+        closeInvitedToJoinRoomView()
     }
     
     private func playAudio(forResource: String, ofType: String){
@@ -91,17 +100,5 @@ class InvitedToJoinRoomViewModel: NSObject, AVAudioPlayerDelegate {
     
     deinit {
         debugPrint("deinit \(self)")
-    }
-}
-
-extension InvitedToJoinRoomViewModel: TUIRoomKitListener {
-    func onLogin(code: Int, message: String) {
-        TUIRoomKit.sharedInstance.setSelfInfo(userName: TUILogin.getNickName() ?? "", avatarURL: TUILogin.getFaceUrl() ?? "")
-        let roomInfo = RoomInfo()
-        roomInfo.roomId = roomId
-        TUIRoomKit.sharedInstance.enterRoom(roomInfo: roomInfo)
-    }
-    func onExitRoom() {
-        closeInvitedToJoinRoomView()
     }
 }

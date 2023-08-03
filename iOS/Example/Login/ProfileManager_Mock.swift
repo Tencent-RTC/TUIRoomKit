@@ -136,6 +136,7 @@ import TUIRoomKit
             success()
             debugPrint("set profile success")
         } onError: {[weak self] code, message in
+            failed(message)
             debugPrint("set profile failed.")
             self?.curUserModel?.name = oldName
         }

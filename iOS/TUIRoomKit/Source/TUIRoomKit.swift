@@ -14,7 +14,7 @@ import TUIRoomEngine
     case live = 2
 }
 
-@objc public protocol TUIRoomKitListener {
+@objc public protocol TUIRoomKitListener: NSObjectProtocol {
     @objc optional func onLogin(code: Int, message: String) -> Void
     @objc optional func onRoomCreate(code: Int, message: String) -> Void
     @objc optional func onDestroyRoom() -> Void
@@ -23,7 +23,8 @@ import TUIRoomEngine
 }
 
 @objcMembers public class TUIRoomKit: NSObject {
-    weak var listener: TUIRoomKitListener?
+    typealias Weak<T> = () -> T?
+    private var listenerArray: [Weak<TUIRoomKitListener>] = []
     @objc public static let sharedInstance = TUIRoomKit()
     
     private override init() {
@@ -32,10 +33,11 @@ import TUIRoomEngine
     
     public func login(sdkAppId: Int, userId: String, userSig: String) {
         EngineManager.shared.login(sdkAppId: sdkAppId, userId: userId, userSig: userSig)
-        EngineManager.shared.addListener(listener: self)
+        EngineManager.shared.setListener(listener: self)
     }
     
     public func logout() {
+        EngineManager.shared.dismissListener()
         EngineManager.shared.logout()
     }
     
@@ -59,19 +61,20 @@ import TUIRoomEngine
     }
     
     public func addListener(listener: TUIRoomKitListener) {
-        self.listener = listener
+        let listenerObject = listenerArray.first { weakObject in
+            guard let object = weakObject() else { return false }
+            return object.isEqual(listener)
+        }
+        guard listenerObject == nil else { return }
+        let weakObserver = { [weak listener] in return listener }
+        self.listenerArray.append(weakObserver)
     }
     
-    func removeListener() {
-        self.listener = nil
-    }
-    
-    func banAutoRaiseUiOnce(isBan: Bool) {
-        EngineManager.shared.store.isBanAutoRaise = isBan
-    }
-    
-    func raiseUi() {
-        RoomRouter.shared.pushMainViewController(roomId: EngineManager.shared.store.roomInfo.roomId)
+    public func removeListener(listener: TUIRoomKitListener) {
+        listenerArray.removeAll { weakObject in
+            guard let object = weakObject() else { return true }
+            return object.isEqual(listener)
+        }
     }
     
     deinit {
@@ -81,22 +84,42 @@ import TUIRoomEngine
 
 extension TUIRoomKit: EngineManagerListener {
     public func onLogin(code: Int, message: String) {
-        self.listener?.onLogin?(code: code, message: message)
+        for weakObserver in listenerArray {
+            if let listener = weakObserver() {
+                listener.onLogin?(code: code, message: message)
+            }
+        }
     }
     
     public func onCreateEngineRoom(code: Int, message: String) {
-        self.listener?.onRoomCreate?(code: code, message: message)
+        for weakObserver in listenerArray {
+            if let listener = weakObserver() {
+                listener.onRoomCreate?(code: code, message: message)
+            }
+        }
     }
     
     public func onDestroyEngineRoom() {
-        self.listener?.onDestroyRoom?()
+        for weakObserver in listenerArray {
+            if let listener = weakObserver() {
+                listener.onDestroyRoom?()
+            }
+        }
     }
     
     public func onEnterEngineRoom(code: Int, message: String) {
-        self.listener?.onRoomEnter?(code: code, message: message)
+        for weakObserver in listenerArray {
+            if let listener = weakObserver() {
+                listener.onRoomEnter?(code: code, message: message)
+            }
+        }
     }
     
     public func onExitEngineRoom() {
-        self.listener?.onExitRoom?()
+        for weakObserver in listenerArray {
+            if let listener = weakObserver() {
+                listener.onExitRoom?()
+            }
+        }
     }
 }

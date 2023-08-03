@@ -149,7 +149,6 @@ class RoomMessageView: UIView {
         }
     }
     func bindInteraction() {
-        viewModel.initRoomListener()
         viewModel.viewResponder = self
         enterRoomButton.addTarget(self, action: #selector(enterRoomAction(sender:)), for: .touchUpInside)
         inviteUserButton.addTarget(self, action: #selector(inviteUserAction(sender:)), for: .touchUpInside)
@@ -197,22 +196,6 @@ class RoomMessageView: UIView {
                 userNumberLabel.text = .waitingMembersEnterMeetingText
             }
             roomStatusView.backgroundColor = UIColor(0xDCEAFD)
-        case .entered:
-            //进入房间成功
-            roomStatusImageView.image = UIImage(named: "room_created_success", in: tuiRoomKitBundle(), compatibleWith: nil)
-            roomStatusLabel.text = .meetingText + "." + .inProgressText
-            roomStatusLabel.textColor = UIColor(0x15B72D)
-            enterRoomButton.isSelected = true
-            enterRoomButton.isHidden = false
-            userNumberLabel.isHidden = false
-            enterRoomStatusLabel.isHidden = true
-            enterRoomStatusLabel.isHidden = true
-            if viewModel.message.memberCount > 1 {
-                userNumberLabel.text = String(viewModel.message.memberCount) + .peopleEnteredMeetingText
-            } else {
-                userNumberLabel.text = .waitingMembersEnterMeetingText
-            }
-            roomStatusView.backgroundColor = UIColor(0xDCEAFD)
         case .destroyed:
             //房间解散
             roomStatusImageView.image = UIImage(named: "room_has_destroyed", in: tuiRoomKitBundle(), compatibleWith: nil)
@@ -227,6 +210,7 @@ class RoomMessageView: UIView {
         default: break
         }
     }
+    
     func setupStackView() {
         if !isViewReady {
             return
@@ -245,7 +229,7 @@ class RoomMessageView: UIView {
         viewArray.forEach { view in
             view.removeFromSuperview()
         }
-        viewModel.userList.forEach { userDic in
+        viewModel.message.userList.forEach { userDic in
             if userNumber >= 5 {
                 let label = UILabel()
                 label.text = "..."
@@ -297,6 +281,12 @@ extension RoomMessageView: RoomMessageViewResponder {
     }
     func changeEnterRoomButton(isEnabled: Bool) {
         enterRoomButton.isEnabled = isEnabled
+    }
+    func updateEnteredRoom() {
+        enterRoomButton.isSelected = true
+    }
+    func updateExitRoom() {
+        enterRoomButton.isSelected = false
     }
 }
 

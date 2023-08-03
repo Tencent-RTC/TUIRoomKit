@@ -12,10 +12,10 @@ import TUIRoomEngine
 protocol CreateViewEventResponder: AnyObject {
     func updateInputStackView(item: ListCellItemData, index: Int) -> Void
     func showSpeechModeControlView() -> Void
+    func makeToast(text: String)
 }
 
-class CreateRoomViewModel {
-    
+class CreateRoomViewModel: NSObject {
     private(set) var inputViewItems: [ListCellItemData] = []
     private(set) var switchViewItems: [ListCellItemData] = []
     private var speechMode: TUISpeechMode = .freeToSpeak
@@ -30,19 +30,21 @@ class CreateRoomViewModel {
     }
     lazy var roomId: String = {
         let userId = currentUser.userId
-        let result = "\(String(describing: userId))_room_kit".hash & 0x3B9AC9FF
+        let result = "\(String(describing: userId))_room_kit".hash & roomHashNumber
         return String(result)
     }()
     
     weak var responder: CreateViewEventResponder?
     
-    init() {
-        speechMode = engineManager.store.roomSpeechMode
+    override init() {
+        super.init()
         initialState()
         creatEntranceViewModel()
+        TUIRoomKit.sharedInstance.addListener(listener: self)
     }
     
     func initialState() {
+        speechMode = engineManager.store.roomSpeechMode
         roomInfo.roomId = roomId
     }
     
@@ -115,7 +117,7 @@ class CreateRoomViewModel {
         roomInfo.roomId = roomId
         roomInfo.name = currentUser.userName + .videoConferenceText
         roomInfo.speechMode = engineManager.store.roomSpeechMode
-        TUIRoomKit.sharedInstance.banAutoRaiseUiOnce(isBan: false)
+        engineManager.store.isShowRoomMainViewAutomatically = true
         TUIRoomKit.sharedInstance.createRoom(roomInfo: roomInfo, type: .meeting)
     }
     
@@ -159,7 +161,22 @@ class CreateRoomViewModel {
     }
     
     deinit {
+        TUIRoomKit.sharedInstance.removeListener(listener: self)
         debugPrint("deinit \(self)")
+    }
+}
+
+extension CreateRoomViewModel: TUIRoomKitListener {
+    func onRoomCreate(code: Int, message: String) {
+        if code != 0 {
+            responder?.makeToast(text: message)
+        }
+    }
+    
+    func onRoomEnter(code: Int, message: String) {
+        if code != 0 {
+            responder?.makeToast(text: message)
+        }
     }
 }
 

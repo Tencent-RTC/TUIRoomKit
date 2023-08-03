@@ -13,7 +13,7 @@ import TXLiteAVSDK_TRTC
 #elseif TXLiteAVSDK_Professional
 import TXLiteAVSDK_Professional
 #endif
- 
+
 protocol PrePareViewEventProtocol: AnyObject {
     func updateButtonState()
     func changeLanguage()
@@ -47,9 +47,9 @@ class PrePareViewModel {
         roomEngine.getTRTCCloud().setGSensorMode(.uiFixLayout)
         roomEngine.setLocalVideoView(streamType: .cameraStream, view: view)
         if roomInfo.isOpenCamera {
-            openLocalCamera()
+            engineManager.openLocalCamera()
         } else {
-            roomEngine.closeLocalCamera()
+            engineManager.closeLocalCamera()
         }
         if roomInfo.isOpenMicrophone {
             openLocalMicrophone()
@@ -90,15 +90,12 @@ class PrePareViewModel {
     
     func openCameraAction(sender: UIButton, placeholderImage: UIView) {
         sender.isSelected = !sender.isSelected
-        let roomEngine = engineManager.roomEngine
         if sender.isSelected {
-            roomInfo.isOpenCamera = false
-            roomEngine.closeLocalCamera()
+            engineManager.closeLocalCamera()
             placeholderImage.isHidden = false
         } else {
-            roomInfo.isOpenCamera = true
             placeholderImage.isHidden = true
-            openLocalCamera()
+            engineManager.openLocalCamera()
         }
     }
     
@@ -127,26 +124,6 @@ class PrePareViewModel {
         } else {
             RoomCommon.micStateActionWithPopCompletion {
                 if RoomCommon.checkAuthorMicStatusIsDenied() {
-                    actionBlock()
-                }
-            }
-        }
-    }
-    
-    private func openLocalCamera() {
-        let actionBlock = { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.roomEngine.openLocalCamera(isFront: self.engineManager.store.videoSetting.isFrontCamera, quality:
-                                                            self.engineManager.store.videoSetting.videoQuality) {
-            } onError: { code, message in
-                debugPrint("---openLocalCamera,code:\(code),message:\(message)")
-            }
-        }
-        if RoomCommon.checkAuthorCamaraStatusIsDenied() {
-            actionBlock()
-        } else {
-            RoomCommon.cameraStateActionWithPopCompletion {
-                if RoomCommon.checkAuthorCamaraStatusIsDenied() {
                     actionBlock()
                 }
             }

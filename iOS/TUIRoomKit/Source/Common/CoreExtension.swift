@@ -23,8 +23,6 @@ let gUserListControllerKey = NSObject.getUserListControllerKey()
 // {roomEngine:roomEngineObj,currentUserInfo:currentUserInfoObj}
 let gExtensionControllerKey = NSObject.getExtensionControllerKey()
 // {roomEngine:roomEngineObj,currentUserInfo:currentUserInfoObj}
-let gVideoSeatViewKey = "TUIVideoSeat.Video.Seat.View.Key"
-// {roomEngine:roomEngineObj,currentUserInfo:currentUserInfoObj}
 
 extension NSObject {
     @objc class func tuiRoomKitSwiftLoad() {
