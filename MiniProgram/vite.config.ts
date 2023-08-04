@@ -22,8 +22,8 @@ export default defineConfig({
     },
   },
   build: {
-    // rollupOptions: {
-    //   external: 'circlerich-trtc-cloud-wx'
-    // }
+    rollupOptions: {
+      external: ['@tencentcloud/trtc-component-wx', '@tencentcloud/tuiroom-cloud-wx']
+    }
   },
 });
