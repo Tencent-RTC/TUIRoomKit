@@ -10,7 +10,7 @@ function resolve(dir) {
 // https://vitejs.dev/config/
 export default defineConfig({
   optimizeDeps: {
-    include: ['circlerich-trtc-cloud-wx'],
+    include: ['@tencentcloud/trtc-component-wx', '@tencentcloud/tuiroom-engine-wx', '@tencentcloud/tuiroom-cloud-wx'],
   },
   plugins: [
     uni(),

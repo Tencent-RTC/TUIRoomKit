@@ -1,5 +1,5 @@
 ## 简介
-本 demo 演示了如何在 uni-app 项目跑通 [TUIRoomKit](!).
+本 demo 演示了如何在 uni-app 项目跑通 TUIRoomKit
 
 ## 环境准备
 
@@ -14,7 +14,7 @@
 第一步：下载源码，编译运行
 1. 克隆或者直接下载此仓库源码。
    ```
-   git clone https://github.com/tencentyun/TUICallKit.git
+   git clone https://github.com/tencentyun/TUIRoomKit.git
    ```
 2. 进入 demo 目录
    ```
@@ -42,7 +42,7 @@ bash wxmini_dev.sh
 
 ## 接入指引
 ### 步骤一：开通小程序权限
-由于 TUICallKit 所使用的小程序标签有更苛刻的权限要求，因此集成 TUICallKit 的第一步就是要开通小程序的类目和标签使用权限，**否则无法使用**，这包括如下步骤：
+由于 TUIRoomKit 所使用的小程序标签有更苛刻的权限要求，因此集成 TUIRoomKit 的第一步就是要开通小程序的类目和标签使用权限，**否则无法使用**，这包括如下步骤：
 
 - 小程序推拉流标签不支持个人小程序，只支持企业类小程序。需要在 [注册](https://developers.weixin.qq.com/community/business/doc/000200772f81508894e94ec965180d) 时填写主体类型为企业，如下图所示：
    <img width="480" height="480" src="https://main.qcloudimg.com/raw/a30f04a8983066fb9fdf179229d3ee31.png">
