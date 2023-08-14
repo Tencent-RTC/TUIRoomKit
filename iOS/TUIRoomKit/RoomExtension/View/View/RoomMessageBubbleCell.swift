@@ -25,6 +25,7 @@ class RoomMessageBubbleCell: TUIBubbleMessageCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     override func fill(with data: TUIBubbleMessageCellData) {
         super.fill(with: data)
         let customData = data as? RoomMessageBubbleCellData
@@ -37,6 +38,10 @@ class RoomMessageBubbleCell: TUIBubbleMessageCell {
                 messageView.viewModel.changeMessage(message: messageModel)
             }
         }
+    }
+    
+    override class func getContentSize(_ data: TUIMessageCellData?) -> CGSize {
+        return CGSize(width: 238, height: 157)
     }
     
     deinit {

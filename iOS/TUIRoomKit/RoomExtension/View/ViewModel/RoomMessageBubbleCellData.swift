@@ -60,10 +60,6 @@ class RoomMessageBubbleCellData: TUIBubbleMessageCellData {
         RoomManager.shared.createRoom(roomInfo: roomInfo)
     }
     
-    override func contentSize() -> CGSize {
-        return CGSize(width: 238, height: 157)
-    }
-    
     deinit {
         debugPrint("deinit \(self)")
     }
