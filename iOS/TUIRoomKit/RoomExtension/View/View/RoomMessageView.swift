@@ -152,6 +152,8 @@ class RoomMessageView: UIView {
         viewModel.viewResponder = self
         enterRoomButton.addTarget(self, action: #selector(enterRoomAction(sender:)), for: .touchUpInside)
         inviteUserButton.addTarget(self, action: #selector(inviteUserAction(sender:)), for: .touchUpInside)
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressAction(sender:)))
+        addGestureRecognizer(longPressGesture)
         layer.masksToBounds = true
         layer.borderWidth = 0.5
         layer.borderColor = UIColor(0xDDDDDD).cgColor
@@ -161,8 +163,13 @@ class RoomMessageView: UIView {
     @objc func enterRoomAction(sender: UIButton) {
         viewModel.enterRoomAction()
     }
+    
     @objc func inviteUserAction(sender: UIButton) {
         viewModel.inviteUserAction()
+    }
+    
+    @objc func longPressAction(sender: UIView) {
+        return
     }
     
     func setupViewState() {
