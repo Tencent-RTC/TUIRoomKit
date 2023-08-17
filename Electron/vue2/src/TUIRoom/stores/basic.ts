@@ -30,6 +30,7 @@ interface BasicState {
   defaultTheme: string,
   isSupportSwitchTheme: boolean,
   showHeaderTool: boolean,
+  shareLink: string,
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -69,6 +70,7 @@ export const useBasicStore = defineStore('basic', {
     defaultTheme: 'black',
     isSupportSwitchTheme: true,
     showHeaderTool: true,
+    shareLink: '',
   }),
   getters: {
     // localVideoBitrate: (state) => {
@@ -143,6 +145,9 @@ export const useBasicStore = defineStore('basic', {
     },
     setShowHeaderTool(showHeaderTool: boolean) {
       this.showHeaderTool = showHeaderTool;
+    },
+    setShareLink(shareLink: string) {
+      this.shareLink = shareLink;
     },
     setBasicInfo(infoObj: any) {
       if (!infoObj) {
