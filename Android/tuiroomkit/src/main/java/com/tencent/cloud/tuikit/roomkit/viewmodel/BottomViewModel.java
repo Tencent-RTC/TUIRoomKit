@@ -475,7 +475,8 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
                     break;
                 }
                 userId = (String) params.get(RoomEventConstant.KEY_USER_ID);
-                if (mRoomStore.userModel.userId.equals(userId)) {
+                TUIRoomDefine.VideoStreamType type = (TUIRoomDefine.VideoStreamType) params.get(RoomEventConstant.KEY_STREAM_TYPE);
+                if (mRoomStore.userModel.userId.equals(userId) && type != TUIRoomDefine.VideoStreamType.SCREEN_STREAM) {
                     boolean hasVideo = (boolean) params.get(RoomEventConstant.KEY_HAS_VIDEO);
                     updateVideoButtonSelectStatus(hasVideo);
                 }
