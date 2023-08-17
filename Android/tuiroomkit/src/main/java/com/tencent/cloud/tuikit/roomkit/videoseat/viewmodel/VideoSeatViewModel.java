@@ -66,7 +66,8 @@ public class VideoSeatViewModel extends TUIRoomObserver implements IVideoSeatVie
 
     @Override
     public void setLocalVideoView(UserEntity selfEntity) {
-        if (selfEntity == null || selfEntity.getRoomVideoView() == mLocalPreview) {
+        if (selfEntity == null || mLocalPreview == selfEntity.getRoomVideoView()
+                || selfEntity.isScreenShareAvailable()) {
             return;
         }
         mLocalPreview = selfEntity.getRoomVideoView();

@@ -448,9 +448,7 @@ public class TUIVideoSeatView extends RelativeLayout {
         mPageLayoutManager.enableTwoPersonMeeting(mIsTwoPersonVideoOn, mIsTwoPersonSwitched);
 
         if (mMemberListAdapter.getItemCount() == 1) {
-            if (mIsTwoPersonSwitched) {
-                mMemberListAdapter.notifyItemChanged(0);
-            }
+            mMemberListAdapter.notifyItemChanged(0);
             return;
         }
         if (mMemberListAdapter.getItemCount() == 2 && enable) {
