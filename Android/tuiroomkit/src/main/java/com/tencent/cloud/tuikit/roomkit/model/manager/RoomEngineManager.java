@@ -14,6 +14,7 @@ import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.entity.RoomInfo;
+import com.tencent.cloud.tuikit.roomkit.utils.DrawOverlaysPermissionUtil;
 import com.tencent.cloud.tuikit.roomkit.utils.RoomPermissionUtil;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMSDKConfig;
@@ -51,6 +52,20 @@ public class RoomEngineManager {
             }
         }
         return sInstance;
+    }
+
+    public void startScreenCapture() {
+        if (!DrawOverlaysPermissionUtil.isGrantedDrawOverlays()) {
+            Log.w(TAG, "startScreenCapture no permission");
+            return;
+        }
+        mRoomEngine.startScreenSharing();
+        mRoomStore.videoModel.setScreenSharing(true);
+    }
+
+    public void stopScreenCapture() {
+        mRoomEngine.stopScreenSharing();
+        mRoomStore.videoModel.setScreenSharing(false);
     }
 
     public void enableAutoShowRoomMainUi(boolean enable) {

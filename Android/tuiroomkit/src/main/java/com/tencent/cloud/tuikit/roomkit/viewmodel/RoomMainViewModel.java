@@ -53,6 +53,10 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         RoomEngineManager.sharedInstance().enableVideoLocalMirror(mRoomStore.videoModel.isLocalMirror);
     }
 
+    public void stopScreenCapture() {
+        RoomEngineManager.sharedInstance().stopScreenCapture();
+    }
+
     private void setAudioRoute() {
         mRoomEngine.getDeviceManager().setAudioRoute(mRoomStore.roomInfo.isUseSpeaker
                 ? TXDeviceManager.TXAudioRoute.TXAudioRouteSpeakerphone
@@ -66,7 +70,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_EXTENSION_VIEW, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_QRCODE_VIEW, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_APPLY_LIST, this);
-        eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.START_SCREEN_SHARE, this);
+        eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.LOCAL_SCREEN_SHARE_STATE_CHANGED, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_EXIT_ROOM_VIEW, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.LEAVE_MEETING, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.EXIT_MEETING, this);
@@ -131,7 +135,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_EXTENSION_VIEW, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_QRCODE_VIEW, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_APPLY_LIST, this);
-        eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.START_SCREEN_SHARE, this);
+        eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.LOCAL_SCREEN_SHARE_STATE_CHANGED, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_EXIT_ROOM_VIEW, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.LEAVE_MEETING, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.EXIT_MEETING, this);
@@ -211,14 +215,6 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         mRoomEngine.responseRemoteRequest(requestId, agree, null);
     }
 
-    public void startScreenShare() {
-        mRoomEngine.startScreenSharing();
-    }
-
-    public void stopScreenShare() {
-        mRoomEngine.stopScreenSharing();
-    }
-
     public RoomInfo getRoomInfo() {
         return mRoomStore.roomInfo;
     }
@@ -275,9 +271,10 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
             case RoomEventCenter.RoomKitUIEvent.SHOW_APPLY_LIST:
                 mRoomMainView.showApplyList();
                 break;
-            case RoomEventCenter.RoomKitUIEvent.START_SCREEN_SHARE:
-                onScreenShareClick();
+            case RoomEventCenter.RoomKitUIEvent.LOCAL_SCREEN_SHARE_STATE_CHANGED:
+                onScreenShareStateChanged();
                 break;
+
             case RoomEventCenter.RoomKitUIEvent.EXIT_MEETING:
                 RoomEngineManager.sharedInstance(mContext).exitRoom();
                 break;
@@ -286,12 +283,12 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         }
     }
 
-    private void onScreenShareClick() {
-        if (DrawOverlaysPermissionUtil.isGrantedDrawOverlays()) {
-            mRoomMainView.startScreenShare();
-            return;
+    private void onScreenShareStateChanged() {
+        if (RoomEngineManager.sharedInstance().getRoomStore().videoModel.isScreenSharing()) {
+            mRoomMainView.onScreenShareStarted();
+        } else {
+            mRoomMainView.onScreenShareStopped();
         }
-        DrawOverlaysPermissionUtil.requestDrawOverlays();
     }
 
     @Override

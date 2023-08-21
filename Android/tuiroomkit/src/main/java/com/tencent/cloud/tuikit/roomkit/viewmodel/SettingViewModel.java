@@ -9,6 +9,7 @@ import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
+import com.tencent.cloud.tuikit.roomkit.utils.DrawOverlaysPermissionUtil;
 import com.tencent.cloud.tuikit.roomkit.view.component.SettingView;
 import com.tencent.trtc.TRTCCloudDef;
 
@@ -82,7 +83,15 @@ public class SettingViewModel implements RoomEventCenter.RoomEngineEventResponde
     }
 
     public void startScreenShare() {
-        RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.START_SCREEN_SHARE, null);
+        if (!DrawOverlaysPermissionUtil.isGrantedDrawOverlays()) {
+            DrawOverlaysPermissionUtil.requestDrawOverlays();
+            return;
+        }
+        RoomEngineManager.sharedInstance().startScreenCapture();
+    }
+
+    public void stopScreenShare() {
+        RoomEngineManager.sharedInstance().stopScreenCapture();
     }
 
     public void enableAudioEvaluation(boolean enable) {
