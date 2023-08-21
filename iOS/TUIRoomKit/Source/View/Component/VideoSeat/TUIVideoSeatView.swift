@@ -40,6 +40,7 @@ class TUIVideoSeatView: UIView {
         guard !isViewReady else { return }
         constructViewHierarchy()
         activateConstraints()
+        bindInteraction()
         isViewReady = true
     }
 
@@ -102,11 +103,18 @@ class TUIVideoSeatView: UIView {
         addSubview(cell)
         return cell
     }()
+    
+    lazy var screenCaptureMaskView: ScreenCaptureMaskView = {
+        let view = ScreenCaptureMaskView()
+        view.isHidden = true
+        return view
+    }()
 
     func constructViewHierarchy() {
         backgroundColor = .clear
         addSubview(attendeeCollectionView)
         addSubview(pageControl)
+        addSubview(screenCaptureMaskView)
     }
 
     func activateConstraints() {
@@ -118,6 +126,14 @@ class TUIVideoSeatView: UIView {
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview().offset(-5)
         }
+        screenCaptureMaskView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+    
+    func bindInteraction() {
+        //如果自己在进行屏幕共享，显示遮挡层
+        screenCaptureMaskView.isHidden = !EngineManager.shared.store.currentUser.hasScreenStream
     }
 
     func updatePageControl() {
@@ -243,6 +259,10 @@ extension TUIVideoSeatView: TUIVideoSeatViewResponder {
 
     func getMoveMiniscreen() -> TUIVideoSeatDragCell {
         return moveMiniscreen
+    }
+    
+    func showScreenCaptureMaskView(isShow: Bool) {
+        screenCaptureMaskView.isHidden = !isShow
     }
 
     private func getNoLoadHasVideoItems() -> [VideoSeatItem] {

@@ -38,7 +38,6 @@ class SetUpViewModel {
     private(set) var audioItems: [ListCellItemData] = []
     weak var viewResponder: SetUpViewEventResponder? = nil
     let filePath: String
-    let appGroupString: String
     var engineManager: EngineManager {
         EngineManager.shared
     }
@@ -96,9 +95,8 @@ class SetUpViewModel {
     
     init() {
         filePath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory,
-                                                        FileManager.SearchPathDomainMask.userDomainMask,
-                                                        true).last?.appending("/test-record.aac") ?? ""
-        appGroupString = "com.tencent.TUIRoomTXReplayKit-Screen"
+                                                       FileManager.SearchPathDomainMask.userDomainMask,
+                                                       true).last?.appending("/test-record.aac") ?? ""
         createTopItem()
         createVideoItem()
         createAudioItem()
@@ -320,9 +318,7 @@ class SetUpViewModel {
     
     func shareStartAction(sender: UIButton) {
         if #available(iOS 12.0, *) {
-            engineManager.roomEngine.startScreenCapture(appGroup: appGroupString)
             BroadcastLauncher.launch()
-            ScreenCaptureMaskView.show()
         } else {
             viewResponder?.makeToast(text: .versionLowToastText)
         }

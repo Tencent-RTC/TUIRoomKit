@@ -42,6 +42,7 @@ class RoomFloatViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserAudioStateChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserVoiceVolumeChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
     }
     
     private func unsubscribeEngine() {
@@ -51,6 +52,7 @@ class RoomFloatViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserAudioStateChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserVoiceVolumeChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
     }
     
     func showRoomMainView() {
@@ -85,10 +87,13 @@ extension RoomFloatViewModel {
     }
     
     private func showScreenStream(userModel: UserModel) {
-        startPlayVideo(userId: userModel.userId, streamType: .screenStream)
-        changePlayingState(userId: userModel.userId, streamType: .screenStream)
+        var streamType: TUIVideoStreamType = .screenStream
+        if userModel.userId == currentUser.userId {
+            streamType = .cameraStream
+        }
+        startPlayVideo(userId: userModel.userId, streamType: streamType)
+        changePlayingState(userId: userModel.userId, streamType: streamType)
         viewResponder?.updateUserStatus(user: userModel)
-        viewResponder?.showAvatarImageView(isShow: false)
     }
     
     private func showOwnerCameraStream() {
@@ -104,7 +109,7 @@ extension RoomFloatViewModel {
     }
     
     private func startPlayVideo(userId: String, streamType: TUIVideoStreamType) {
-        if userId == engineManager.store.currentUser.userId {
+        if userId == currentUser.userId {
             engineManager.roomEngine.setLocalVideoView(streamType: streamType, view: renderView)
         } else {
             engineManager.roomEngine.setRemoteVideoView(userId: userId, streamType: streamType, view: renderView)
@@ -161,7 +166,7 @@ extension RoomFloatViewModel: RoomEngineEventResponder {
                 return
             }
             guard getScreenUserModel() == nil else { return } //如果有人在进行屏幕共享，不显示房主画面
-            guard userId == engineManager.store.roomInfo.ownerId else { return }
+            guard userId == roomInfo.ownerId else { return }
             if hasVideo {
                 startPlayVideo(userId: userId, streamType: streamType)
             } else {

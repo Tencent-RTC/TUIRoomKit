@@ -323,6 +323,9 @@ extension EngineEventCenter {
     private func userVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool) {
         switch streamType {
         case .screenStream:
+            if userId == currentUser.userId {
+                currentUser.hasScreenStream = hasVideo
+            }
             engineManager.store.isSomeoneSharing = hasVideo
             guard let userModel = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return }
             userModel.hasScreenStream = hasVideo
