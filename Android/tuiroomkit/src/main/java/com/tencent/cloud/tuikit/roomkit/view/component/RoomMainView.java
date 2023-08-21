@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.RoomMainViewModel;
@@ -61,7 +62,7 @@ public class RoomMainView extends RelativeLayout {
         mTextStopScreenShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopScreenShare();
+                mViewModel.stopScreenCapture();
             }
         });
 
@@ -92,6 +93,9 @@ public class RoomMainView extends RelativeLayout {
         setVideoSeatView(mViewModel.getVideoSeatView());
         setMoreFunctionView();
         showAlertUserLiveTips();
+        if (RoomEngineManager.sharedInstance().getRoomStore().videoModel.isScreenSharing()) {
+            onScreenShareStarted();
+        }
     }
 
     private void showAlertUserLiveTips() {
@@ -292,33 +296,21 @@ public class RoomMainView extends RelativeLayout {
         }
     }
 
-    public void startScreenShare() {
+    public void onScreenShareStarted() {
         mLayoutVideoSeat.setVisibility(View.GONE);
         mScreenCaptureGroup.setVisibility(View.VISIBLE);
-        mBottomView.setVisibility(GONE);
-        mTopView.setVisibility(GONE);
-        mViewModel.startScreenShare();
 
         if (mFloatingWindow == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             mFloatingWindow = inflater.inflate(R.layout.tuiroomkit_screen_capture_floating_window, null, false);
-            mFloatingWindow.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "onClick: 悬浮窗");
-                }
-            });
         }
         showFloatingWindow();
     }
 
-    private void stopScreenShare() {
+    public void onScreenShareStopped() {
         hideFloatingWindow();
-        mViewModel.stopScreenShare();
         mLayoutVideoSeat.setVisibility(View.VISIBLE);
         mScreenCaptureGroup.setVisibility(View.GONE);
-        mBottomView.setVisibility(View.VISIBLE);
-        mTopView.setVisibility(View.VISIBLE);
     }
 
     private void showFloatingWindow() {

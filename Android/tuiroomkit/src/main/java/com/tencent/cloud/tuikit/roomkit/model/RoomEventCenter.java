@@ -84,9 +84,10 @@ public class RoomEventCenter {
         public static final String SHOW_APPLY_LIST       = "showApplyList";
         public static final String SHOW_EXTENSION_VIEW   = "showExtensionView";
         public static final String SHOW_QRCODE_VIEW      = "showQRCodeView";
-        public static final String START_SCREEN_SHARE    = "startScreenShare";
-        public static final String ENTER_FLOAT_WINDOW = "ENTER_FLOAT_WINDOW";
-        public static final String EXIT_FLOAT_WINDOW  = "EXIT_FLOAT_WINDOW";
+        public static final String ENTER_FLOAT_WINDOW    = "ENTER_FLOAT_WINDOW";
+        public static final String EXIT_FLOAT_WINDOW     = "EXIT_FLOAT_WINDOW";
+
+        public static final String LOCAL_SCREEN_SHARE_STATE_CHANGED = "LOCAL_SCREEN_SHARE_STATE_CHANGED";
     }
 
     /**

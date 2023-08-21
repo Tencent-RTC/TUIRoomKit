@@ -10,6 +10,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.view.settingview.AudioSettingView;
 import com.tencent.cloud.tuikit.roomkit.view.settingview.ShareSettingView;
@@ -121,14 +122,17 @@ public class SettingView extends BaseBottomDialog {
             mShareSettingView.setShareButtonClickListener(new ShareSettingView.OnShareButtonClickListener() {
                 @Override
                 public void onClick() {
-                    mViewModel.startScreenShare();
+                    if (RoomEngineManager.sharedInstance().getRoomStore().videoModel.isScreenSharing()) {
+                        mViewModel.stopScreenShare();
+                    } else {
+                        mViewModel.startScreenShare();
+                    }
                     dismiss();
                 }
             });
             mShareSettingView.enableShareButton(mEnableShare);
         }
     }
-
 
     @Override
     public void onDetachedFromWindow() {
