@@ -23,6 +23,7 @@ protocol RoomMainViewResponder: AnyObject {
 
 class RoomMainViewModel: NSObject {
     let timeoutNumber: Double = 100
+    private let appGroupString = "com.tencent.TUIRoomTXReplayKit-Screen"
     weak var viewResponder: RoomMainViewResponder? = nil
     var engineManager: EngineManager {
         EngineManager.shared
@@ -95,8 +96,10 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onRequestReceived, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onUserScreenCaptureStarted),
+                                               name: UIScreen.capturedDidChangeNotification, object: nil)
     }
     
     private func unsubscribeEngine() {
@@ -105,8 +108,8 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onRequestReceived, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
+        NotificationCenter.default.removeObserver(self, name: UIScreen.capturedDidChangeNotification, object: nil)
     }
     private func setVideoEncoderParam() {
         let param = TRTCVideoEncParam()
@@ -183,6 +186,14 @@ class RoomMainViewModel: NSObject {
         }
     }
     
+    @objc func onUserScreenCaptureStarted(notification:Notification)
+    {
+        guard let screen = notification.object as? UIScreen else {return}
+        if screen.isCaptured {
+            engineManager.roomEngine.startScreenCapture(appGroup: appGroupString)
+        }
+    }
+    
     deinit {
         deleteLocalVideoProcessDelegate()
         unsubscribeEngine()
@@ -197,7 +208,6 @@ extension RoomMainViewModel: RoomEngineEventResponder {
             let alertVC = UIAlertController(title: .destroyAlertText, message: nil, preferredStyle: .alert)
             let sureAction = UIAlertAction(title: .alertOkText, style: .default) { [weak self] action in
                 guard let self = self else { return }
-                ScreenCaptureMaskView.dismiss()
                 self.roomRouter.dismissAllRoomPopupViewController()
                 self.roomRouter.popToRoomEntranceViewController()
             }
@@ -210,7 +220,6 @@ extension RoomMainViewModel: RoomEngineEventResponder {
             let alertVC = UIAlertController(title: .kickOffTitleText, message: nil, preferredStyle: .alert)
             let sureAction = UIAlertAction(title: .alertOkText, style: .default) { [weak self] action in
                 guard let self = self else { return }
-                ScreenCaptureMaskView.dismiss()
                 self.roomRouter.dismissAllRoomPopupViewController()
                 self.roomRouter.popToRoomEntranceViewController()
             }
@@ -313,9 +322,6 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 viewResponder?.showSelfBecomeRoomOwnerAlert()
             }
         }
-        if name == .onUserScreenCaptureStopped {
-            ScreenCaptureMaskView.dismiss()
-        }
     }
 }
 
@@ -366,7 +372,7 @@ extension RoomMainViewModel: RoomMainViewFactory {
     
     func makeVideoSeatView() -> UIView {
         let videoSeatView = TUIVideoSeatView(frame: UIScreen.main.bounds, roomEngine: engineManager.roomEngine,
-                                             roomId: engineManager.store.roomInfo.roomId)
+                                             roomId: roomInfo.roomId)
         return videoSeatView
     }
     

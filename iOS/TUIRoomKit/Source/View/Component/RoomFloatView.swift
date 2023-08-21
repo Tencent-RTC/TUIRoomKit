@@ -18,6 +18,13 @@ class RoomFloatView: UIView {
         return view
     }()
     
+    private let shutterView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(0x17181F)
+        view.isHidden = true
+        return view
+    }()
+    
     private let avatarImageView: UIImageView = {
         let imageView = UIImageView(frame: .zero)
         imageView.layer.masksToBounds = true
@@ -72,12 +79,16 @@ class RoomFloatView: UIView {
     
     func constructViewHierarchy() {
         addSubview(renderView)
+        addSubview(shutterView)
         addSubview(avatarImageView)
         addSubview(userStatusView)
     }
     
     func activateConstraints() {
         renderView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        shutterView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         avatarImageView.snp.makeConstraints { make in
@@ -95,7 +106,7 @@ class RoomFloatView: UIView {
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(didPan(panGesture:)))
         addGestureRecognizer(panGesture)
         let tap = UITapGestureRecognizer(target: self, action: #selector(didTap(sender:)))
-        renderView.addGestureRecognizer(tap)
+        addGestureRecognizer(tap)
         viewModel.viewResponder = self
         viewModel.showFloatWindowViewVideo(renderView: renderView)
         setupViewState()
@@ -198,6 +209,7 @@ extension RoomFloatView: RoomFloatViewResponder {
     }
     
     func showAvatarImageView(isShow: Bool) {
+        shutterView.isHidden = !isShow
         avatarImageView.isHidden = !isShow
     }
 }

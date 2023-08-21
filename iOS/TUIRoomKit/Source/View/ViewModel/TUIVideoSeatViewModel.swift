@@ -28,6 +28,8 @@ protocol TUIVideoSeatViewResponder: AnyObject {
 
     func updateSeatItem(_ item: VideoSeatItem)
     func updateSeatVolume(_ item: VideoSeatItem)
+    
+    func showScreenCaptureMaskView(isShow: Bool)
 }
 
 // 视图类型
@@ -511,6 +513,7 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
 
     public func onUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool, reason: TUIChangeReason) {
         if streamType == .screenStream, userId == currentUserId {
+            viewResponder?.showScreenCaptureMaskView(isShow: hasVideo)
             return
         }
         if hasVideo {
@@ -577,5 +580,12 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
 
     public func onRemoteUserLeaveRoom(roomId: String, userInfo: TUIUserInfo) {
         removeSeatItem(userInfo.userId)
+    }
+    
+    public func onUserScreenCaptureStopped(reason: Int) {
+        viewResponder?.showScreenCaptureMaskView(isShow: false)
+        guard var seatItem = getSeatItem(currentUserId) else { return }
+        seatItem.hasScreenStream = false
+        reloadSeatItems()
     }
 }
