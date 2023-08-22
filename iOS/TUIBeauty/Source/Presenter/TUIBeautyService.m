@@ -8,8 +8,7 @@
 #import "TUIBeautyService.h"
 #import "XMagic.h"
 #import "TESign.h"
-#import "TELicenseCheck.h"
-
+#import <YTCommonXMagic/TELicenseCheck.h>
 #import "TUIBeautyDownloader.h"
 #import "TUIBeautyModel.h"
 #import "BeautyLocalized.h"
@@ -18,6 +17,8 @@
 @property (nonatomic, strong) XMagic *xMagicKit;
 
 @property (nonatomic, assign) CGSize renderSize;
+
+@property (nonatomic, strong) NSLock *lock;
 
 @end
 
@@ -35,6 +36,7 @@ static TUIBeautyService *sharedService = nil;
 
 - (instancetype)init {
     if (self = [super init]) {
+        _lock = [[NSLock alloc] init];
         _renderSize = CGSizeZero;
         [self.xMagicKit registerSDKEventListener:self];
         [self.xMagicKit registerLoggerListener:self withDefaultLevel:YT_SDK_VERBOSE_LEVEL];
@@ -86,8 +88,11 @@ static TUIBeautyService *sharedService = nil;
 
 - (void)cleanXMagic {
     if (_xMagicKit) {
+        [_lock lock];
+        [_xMagicKit clearListeners];
         [_xMagicKit deinit];
         _xMagicKit = nil;
+        [_lock unlock];
     }
     _beautyManager = nil;
 }
@@ -102,6 +107,7 @@ static TUIBeautyService *sharedService = nil;
 }
 
 - (int)processVideoFrameWithTextureId:(int)textureId textureWidth:(int)textureWidth textureHeight:(int)textureHeight {
+    [_lock lock];
     if (textureWidth != _renderSize.width || textureHeight != _renderSize.height) {
         _renderSize = CGSizeMake(textureWidth, textureHeight);
         [self.xMagicKit setRenderSize:_renderSize];
@@ -113,6 +119,7 @@ static TUIBeautyService *sharedService = nil;
     input.textureData.textureHeight = textureHeight;
     input.dataType = kYTTextureData;
     YTProcessOutput *output = [self.xMagicKit process:input withOrigin:YtLightImageOriginTopLeft withOrientation:YtLightCameraRotation0];
+    [_lock unlock];
     return output.textureData.texture;
 }
 

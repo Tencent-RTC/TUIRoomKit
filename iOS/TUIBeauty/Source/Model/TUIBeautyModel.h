@@ -84,6 +84,7 @@ typedef NS_ENUM(NSUInteger, TUIBeautyType) {
 - (void)addTarget:(id)target action:(SEL _Nullable)action;
 
 - (void)sendAction:(NSArray *)args;
+- (void)setSlider:(float)value;
 @end
 
 #pragma mark - Beauty
