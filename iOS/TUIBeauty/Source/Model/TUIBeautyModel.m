@@ -68,6 +68,9 @@
     }
 }
 
+- (void)setSlider:(float)value {
+}
+
 @end
 
 @implementation TUIBeautyBasePackage
