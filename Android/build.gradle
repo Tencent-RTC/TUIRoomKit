@@ -3,8 +3,6 @@
 buildscript {
     ext.kotlin_version = '1.5.31'
     repositories {
-        maven { url "https://mirrors.tencent.com/nexus/repository/maven-public/" }
-        maven { url "https://mirrors.tencent.com/repository/maven/thirdparty" }
         google()
         mavenCentral()
     }
@@ -19,8 +17,6 @@ allprojects {
         flatDir {
             dirs project(':app').file('libs')
         }
-        maven { url "https://mirrors.tencent.com/nexus/repository/maven-public/" }
-        maven { url "https://mirrors.tencent.com/repository/maven/thirdparty" }
         google()
         mavenCentral()
     }
