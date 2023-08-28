@@ -13,13 +13,13 @@
       "root": "roomkit",
       "pages": [
         {
-          "path": "pages/home-config",
+          "path": "pages/home",
           "style": {
             "navigationBarTitleText": "home"
           }
         },
         {
-          "path": "pages/room-config",
+          "path": "pages/room",
           "style": {
             "navigationBarTitleText": "room"
           }

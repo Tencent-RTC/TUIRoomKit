@@ -5,7 +5,7 @@ import router from '@/router';
 import { onMounted } from 'vue';
 
 onMounted(() => {
-  router.replace({ path: '/roomkit/pages/home-config' });
+  router.replace({ path: '/roomkit/pages/home' });
   uni.showToast({
     icon: 'loading',
   });
