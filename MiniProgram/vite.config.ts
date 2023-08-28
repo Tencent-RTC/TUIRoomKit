@@ -8,22 +8,35 @@ function resolve(dir) {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  optimizeDeps: {
-    include: ['@tencentcloud/trtc-component-wx', '@tencentcloud/tuiroom-engine-wx', '@tencentcloud/tuiroom-cloud-wx'],
-  },
-  plugins: [
-    uni(),
-  ],
-  resolve: {
-    alias: {
-      '@': resolve('src'),
-      '@TUIRoom': resolve('src/TUIRoom'),
+export default defineConfig(({ mode }) => {
+  const isProd = mode === 'production';
+
+  const commonConfig = {
+    optimizeDeps: {
+      include: ['@tencentcloud/tuiroom-engine-wx'],
     },
-  },
-  build: {
-    rollupOptions: {
-      external: ['@tencentcloud/trtc-component-wx', '@tencentcloud/tuiroom-cloud-wx']
-    }
-  },
+    plugins: [
+      uni(),
+    ],
+    resolve: {
+      alias: {
+        '@': resolve('src'),
+        '@TUIRoom': resolve('src/roomkit/TUIRoom'),
+      },
+    },
+    build: {
+      rollupOptions: {
+        external: ['@tencentcloud/tuiroom-engine-wx'],
+      },
+    },
+  };
+  const devConfig = {
+    ...commonConfig,
+  };
+
+  const prodConfig = {
+    ...commonConfig,
+  };
+
+  return isProd ? prodConfig : devConfig;
 });
