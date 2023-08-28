@@ -229,6 +229,8 @@ onUnmounted(() => {
           display: flex;
         }
         .correct {
+          width: 24px;
+          height: 24px;
           position: absolute;
           right: 5vw;
         }
@@ -242,7 +244,7 @@ onUnmounted(() => {
       height: 5vh;
       color: var(--input-font-color);
       border-radius: 4px;
-      background-color: var(--message-list-color-h5);
+      background-color: var(--message-list-color);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -251,7 +253,9 @@ onUnmounted(() => {
       position: fixed;
       bottom: 2vh;
       left: 7vw;
-      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       .transfer-button{
         width: 86vw;
         height: 5vh;
@@ -262,6 +266,9 @@ onUnmounted(() => {
         font-weight: 500;
         font-size: 16px;
         line-height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
         color: #FFFFFF;
         border-style: none;
@@ -269,5 +276,4 @@ onUnmounted(() => {
     }
   }
 }
-// 343*44
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="popup-container">
     <div class="popup-main-header">
-      <svg-icon class="close-icon" size="custom" icon-name="close-back" @click.self="handleClose"></svg-icon>
+      <svg-icon v-tap="handleClose" class="close-icon" size="custom" icon-name="close-back"></svg-icon>
       <span class="sidebar-title">{{ title }}</span>
     </div>
     <div class="popup-main-content">
@@ -15,6 +15,8 @@
 <script setup lang="ts">
 import SvgIcon from './SvgIcon.vue';
 import { useBasicStore } from '../../stores/basic';
+import vTap from '../../directives/vTap';
+
 interface Props {
   title: string,
 }
@@ -63,12 +65,12 @@ function handleClose() {
   }
   .popup-main-content {
     width: 100%;
-    height: calc(100% - 120px);
+    height: calc(100% - 130px);
     overflow: hidden;
   }
   .popup-main-footer {
     width: 100%;
-    height: 60px;
+    height: auto;
     position: sticky;
     bottom: 0;
     padding-top: 10px;

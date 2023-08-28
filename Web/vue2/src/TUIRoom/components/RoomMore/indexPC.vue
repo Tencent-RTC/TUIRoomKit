@@ -63,22 +63,23 @@ const {
       margin-top: 10px;
       position: relative;
       .input{
+        appearance: none;
         -webkit-appearance: none;
-          background-color: var(--input-bg-color);
-          background-image: none;
-          border-radius: 2px;
-          border: 1px solid var(--input-border-color);
-          box-sizing: border-box;
-          color: var(--input-font-color);
-          opacity: 0.8;
-          display: inline-block;
-          font-size: 14px;
-          height: 32px;
-          line-height: 32px;
-          outline: none;
-          padding: 0 40px 0 10px;
-          transition: border-color .2s cubic-bezier(.645,.045,.355,1);
-          width: 416px;
+        background-color: var(--input-bg-color);
+        background-image: none;
+        border-radius: 2px;
+        border: 1px solid var(--input-border-color);
+        box-sizing: border-box;
+        color: var(--input-font-color);
+        opacity: 0.8;
+        display: inline-block;
+        font-size: 14px;
+        height: 32px;
+        line-height: 32px;
+        outline: none;
+        padding: 0 40px 0 10px;
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+        width: 416px;
       }
       .copy {
         width: 14px;

@@ -7,14 +7,17 @@ import { useI18n } from '../../../locales';
 import { useBasicStore } from '../../../stores/basic';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { storeToRefs } from 'pinia';
-import isMobile from '../../../utils/useMediaValue';
+import { isMobile, isWeChat } from '../../../utils/useMediaValue';
+import logger from '../../../utils/common/logger';
+
+const logPrefix = '[StreamContainer]';
 
 export default function useStreamContainer() {
   /**
- * --- The following processing stream events ----
- *
- * --- 以下处理流事件 ----
-**/
+   * --- The following processing stream events ----
+   *
+   * --- 以下处理流事件 ----
+   **/
   const roomEngine = useGetRoomEngine();
   const basicStore = useBasicStore();
   const roomStore = useRoomStore();
@@ -59,7 +62,7 @@ export default function useStreamContainer() {
        * and off separately, and the microphone status of the corresponding user is inoperable at this time
        *
        * 主持人开启全员禁言时，单独打开再关闭单人的麦克风，此时对应用户的麦克风状态为无法操作
-      **/
+       **/
       roomStore.setCanControlSelfAudio(!roomStore.isMicrophoneDisableForAllUser);
     }
   };
@@ -72,16 +75,50 @@ export default function useStreamContainer() {
 
   watch(isDefaultOpenCamera, async (val) => {
     if (val && !isLocalVideoIconDisable.value) {
-      const previewDom = document.getElementById(`${roomStore.localStream.userId}_${roomStore.localStream.streamType}`);
-      if (previewDom) {
+      /**
+       * Turn on the local camera
+       *
+       * 开启本地摄像头
+       **/
+
+      if (isWeChat) {
+        await roomEngine.instance?.setLocalVideoView({
+          streamType: TUIVideoStreamType.kCameraStream,
+          view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
+        });
+        // @ts-ignore
+        await roomEngine.instance?.openLocalCamera({ isFrontCamera: basicStore.isFrontCamera });
+        await roomEngine.instance?.startPushLocalVideo();
+      } else if (isMobile) {
+        const previewDom = document?.getElementById(`${roomStore.localStream.userId}_${roomStore.localStream.streamType}`);
+        if (!previewDom) {
+          logger.error(`${logPrefix}watch isDefaultOpenCamera:`, isDefaultOpenCamera, previewDom);
+          return;
+        }
+        await roomEngine.instance?.setLocalVideoView({
+          streamType: TUIVideoStreamType.kCameraStream,
+          view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
+        });
+        // @ts-ignore
+        await roomEngine.instance?.openLocalCamera({ isFrontCamera: basicStore.isFrontCamera });
+        await roomEngine.instance?.startPushLocalVideo();
+        return;
+      } else {
+        const previewDom = document?.getElementById(`${roomStore.localStream.userId}_${roomStore.localStream.streamType}`);
+        if (!previewDom) {
+          logger.error(`${logPrefix}watch isDefaultOpenCamera:`, isDefaultOpenCamera, previewDom);
+          return;
+        }
         /**
          * Set device id
          *
          * 设置设备id
         **/
         if (!roomStore.currentCameraId) {
-          const cameraList:any = await roomEngine.instance?.getCameraDevicesList();
-          roomStore.setCurrentCameraId(cameraList[0].deviceId);
+          const cameraList = await roomEngine.instance?.getCameraDevicesList();
+          if (cameraList && cameraList.length > 0) {
+            roomStore.setCurrentCameraId(cameraList[0].deviceId);
+          }
         }
         await roomEngine.instance?.setCurrentCameraDevice({ deviceId: roomStore.currentCameraId });
         /**
@@ -93,12 +130,7 @@ export default function useStreamContainer() {
           streamType: TUIVideoStreamType.kCameraStream,
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
         });
-        if (isMobile) {
-          // @ts-ignore
-          await roomEngine.instance?.openLocalCamera({ isFrontCamera: basicStore.isFrontCamera });
-        } else {
-          await roomEngine.instance?.openLocalCamera();
-        }
+        await roomEngine.instance?.openLocalCamera();
         await roomEngine.instance?.startPushLocalVideo();
       }
     }
@@ -110,18 +142,21 @@ export default function useStreamContainer() {
        * Advance the timing of startMicrophone to ensure that it is executed before startCameraPreview
        *
        * 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
-      **/
+       **/
       await roomEngine.instance?.openLocalMicrophone();
       await roomEngine.instance?.startPushLocalAudio();
-      const microphoneList = await roomEngine.instance?.getMicDevicesList();
-      const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
-      if (!roomStore.currentMicrophoneId && microphoneList.length > 0) {
-        roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
+      if (!isWeChat && !isMobile) {
+        const microphoneList = await roomEngine.instance?.getMicDevicesList();
+        const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
+        if (microphoneList?.length === 0 || speakerList?.length === 0) return;
+        if (!roomStore.currentMicrophoneId && microphoneList.length > 0) {
+          roomStore.setCurrentMicrophoneId(microphoneList[0].deviceId);
+        }
+        if (!roomStore.currentSpeakerId && speakerList.length > 0) {
+          roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
+        }
+        await roomEngine.instance?.setCurrentMicDevice({ deviceId: roomStore.currentMicrophoneId });
       }
-      if (!roomStore.currentSpeakerId && speakerList.length > 0) {
-        roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
-      }
-      await roomEngine.instance?.setCurrentMicDevice({ deviceId: roomStore.currentMicrophoneId });
     }
   });
   return {
