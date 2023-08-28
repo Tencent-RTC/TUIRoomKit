@@ -61,11 +61,11 @@ class Router {
       success,
     } as any;
 
-    if (location.isTab) {
+    if (location?.isTab) {
       uni.switchTab(params);
     }
 
-    if (location.reLaunch) {
+    if (location?.reLaunch) {
       uni.reLaunch(params);
     }
 

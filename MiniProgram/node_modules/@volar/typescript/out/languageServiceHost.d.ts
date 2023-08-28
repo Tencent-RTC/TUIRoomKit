@@ -1,0 +1,6 @@
+import type { LanguageContext } from '@volar/language-core';
+import type * as ts from 'typescript/lib/tsserverlibrary';
+import { ServiceEnvironment } from '@volar/language-service';
+export declare function createLanguageServiceHost(ctx: LanguageContext, ts: typeof import('typescript/lib/tsserverlibrary'), sys: ts.System & {
+    version?: number;
+}, env: ServiceEnvironment | undefined): ts.LanguageServiceHost;
