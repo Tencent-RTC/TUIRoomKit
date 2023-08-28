@@ -1,15 +1,22 @@
-
-## 2023.05.26
+## 2023.08.17
 
 **Feature**
 
-- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.3.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89380)。
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.4.5 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89380)。
 
-**Bug Fixed**
+## 2023.08.09
 
-- 修复偶现的侧边栏布局下收起侧边栏并点击页面全屏时页面布局错乱问题。
-- 修复偶现的用户进入房间后，远端用户屏幕分享没有自动切换到大窗口显示的问题。
+**Feature**
 
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.4.4 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89380)。
+
+## 2023.08.02
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.4.3 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89380)。
+
+- 新增本地日志优化，移除冗余信息，增加时间戳打印；
 
 ## 2023.07.18
 
@@ -37,14 +44,6 @@
 - 修复远端用户未开启大小流，本地拉取该用户大小流时，SDK 默认拉大流，但是本地显示黑屏的问题；
 - 修复屏幕分享从切换另外一个人后，部分观众观看屏幕分享黑屏的问题。
 
-## 2023.08.02
-
-**Feature**
-
-- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.4.3 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89380)。
-
-- 新增本地日志优化，移除冗余信息，增加时间戳打印；
-
 **Bug Fixed**
 
 - 修复拉 chat 消息时向上滑动会预加载消息列表, 避免出现【加载更多字样】的问题；
@@ -55,3 +54,15 @@
   - 优化 mac 启动 system loopback 失败率高问题。
   - 解决 mac 分享窗口，上行帧率为零问题
 
+
+
+## 2023.05.26
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.3.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89380)。
+
+**Bug Fixed**
+
+- 修复偶现的侧边栏布局下收起侧边栏并点击页面全屏时页面布局错乱问题。
+- 修复偶现的用户进入房间后，远端用户屏幕分享没有自动切换到大窗口显示的问题。

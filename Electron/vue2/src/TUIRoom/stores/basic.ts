@@ -2,7 +2,8 @@ import { defineStore } from 'pinia';
 import { SpeechMode } from '../constants/room';
 import { getLanguage } from '../utils/common';
 import { LAYOUT } from '../constants/render';
-import { isUndefined } from '../utils/utils';
+import { isUndefined, isElectronEnv } from '../utils/utils';
+import { isWeChat } from '../utils/useMediaValue';
 
 type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | 'transfer-leave' | '';
 
@@ -30,6 +31,8 @@ interface BasicState {
   defaultTheme: string,
   isSupportSwitchTheme: boolean,
   showHeaderTool: boolean,
+  shareLink: string,
+  isRoomLinkVisible: boolean
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -69,6 +72,8 @@ export const useBasicStore = defineStore('basic', {
     defaultTheme: 'black',
     isSupportSwitchTheme: true,
     showHeaderTool: true,
+    shareLink: '',
+    isRoomLinkVisible: !isElectronEnv() && !isWeChat,
   }),
   getters: {
     // localVideoBitrate: (state) => {
@@ -143,6 +148,12 @@ export const useBasicStore = defineStore('basic', {
     },
     setShowHeaderTool(showHeaderTool: boolean) {
       this.showHeaderTool = showHeaderTool;
+    },
+    setShareLink(shareLink: string) {
+      this.shareLink = shareLink;
+    },
+    setIsRoomLinkVisible(isRoomLinkVisible: boolean) {
+      this.isRoomLinkVisible = isRoomLinkVisible;
     },
     setBasicInfo(infoObj: any) {
       if (!infoObj) {

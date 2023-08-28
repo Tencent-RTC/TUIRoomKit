@@ -1,5 +1,6 @@
 
 export enum LAYOUT {
+  SIX_EQUAL_POINTS = 'six_equal_points',
   NINE_EQUAL_POINTS = 'nine_equal_points',
   TWENTY_FIVE_EQUAL_POINTS = 'twenty_five_equal_points',
   RIGHT_SIDE_LIST = 'right_side_list',

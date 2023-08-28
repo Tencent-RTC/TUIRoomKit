@@ -15,7 +15,7 @@
     <div class="right-container">
       <!-- <network-info></network-info> -->
       <!-- <info-control></info-control> -->
-      <layout-control></layout-control>
+      <layout-control class="right-container-item"></layout-control>
     </div>
   </div>
 </template>
@@ -62,7 +62,7 @@ defineEmits(['log-out']);
     display: flex;
     align-items: center;
     padding-left: 24px;
-    > :not(:first-child) {
+    .header-item:not(:first-child) {
       margin-left: 1rem;
     }
   }
@@ -75,7 +75,7 @@ defineEmits(['log-out']);
     padding-right: 24px;
     display: flex;
     align-items: center;
-    > :not(:last-child) {
+    .right-container-item:not(:last-child) {
       margin-right: 1rem;
     }
 

@@ -4,7 +4,7 @@
       *
       *用户基础信息
     -->
-  <div class="member-info">
+  <div :class="[isMobile ? 'member-info-mobile' : 'member-info']">
     <!-- 用户基础信息 -->
     <div class="member-basic-info">
       <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
@@ -37,7 +37,7 @@
           size="large"
         />
       </div>
-      <div v-else-if="!userInfo.onSeat && !userInfo.isUserApplyingToAnchor">
+      <div v-if="!userInfo.onSeat && !userInfo.isUserApplyingToAnchor">
         <svg-icon
           class="setting-icon"
           :icon-name="ICON_NAME.MicOffDisabled"
@@ -49,7 +49,7 @@
           size="large"
         />
       </div>
-      <div v-else-if="!userInfo.onSeat && userInfo.isUserApplyingToAnchor">
+      <div v-if="!userInfo.onSeat && userInfo.isUserApplyingToAnchor">
         <svg-icon icon-name="apply-active"></svg-icon>
       </div>
     </div>
@@ -64,6 +64,7 @@ import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../../constants/icon';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { useI18n } from '../../../locales';
+import { isMobile } from '../../../utils/useMediaValue';
 
 const { t } = useI18n();
 
@@ -81,7 +82,13 @@ const isMe = computed(() => basicStore.userId === props.userInfo.userId);
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.member-info-mobile{
+    display: flex;
+    align-items: center;
+    width: 80vw;
+    justify-content: space-between;
+}
 .member-info{
     display: contents;
 }
@@ -92,7 +99,9 @@ const isMe = computed(() => basicStore.userId === props.userInfo.userId);
   .avatar-url {
     width: 48px;
     height: 48px;
+    display: flex;
     border-radius: 50%;
+    align-items: center;
   }
   .user-name {
     margin-left: 9px;
@@ -116,6 +125,7 @@ const isMe = computed(() => basicStore.userId === props.userInfo.userId);
   }
 }
 .member-av-state {
+  padding-left: 80px;
   .video-icon {
     margin-left: 5px;
   }
