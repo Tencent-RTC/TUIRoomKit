@@ -1,6 +1,6 @@
 import { ElMessage } from '../../elementComp';
 import { useI18n } from '../../locales';
-import SvgIcon from '../common/SvgIcon.vue';
+import { clipBoard } from '../../utils/utils';
 
 export default function useRoomMoreHooks() {
   const { t } = useI18n();
@@ -8,18 +8,24 @@ export default function useRoomMoreHooks() {
   const groupNumber = '592465424';
   const email = 'matthewwu@tencent.com';
 
-  function onCopy(value: string | number) {
-    navigator.clipboard.writeText(`${value}`);
-    ElMessage({
-      message: t('Copied successfully'),
-      type: 'success',
-    });
+  async function  onCopy(value: string | number) {
+    try {
+      await clipBoard(value);
+      ElMessage({
+        message: t('Copied successfully'),
+        type: 'success',
+      });
+    } catch (error) {
+      ElMessage({
+        message: t('Copied failure'),
+        type: 'error',
+      });
+    }
   }
   return {
     t,
     groupNumber,
     email,
     onCopy,
-    SvgIcon,
   };
 }

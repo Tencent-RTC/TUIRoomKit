@@ -7,7 +7,7 @@
       @click-icon="toggleInviteSidebar"
     />
     <div v-if="isShowInviteTab" class="invite-container">
-      <room-invite ref="inviteRef"></room-invite>
+      <room-invite ref="inviteRef" @on-close-invite="handleCloseInvite"></room-invite>
     </div>
   </div>
 </template>
@@ -19,7 +19,7 @@ import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
 import { useI18n } from '../../locales';
-import isMobile from '../../utils/useMediaValue';
+import { isMobile }  from '../../utils/useMediaValue';
 import roomInvite from '../RoomInvite/index.vue';
 
 const basicStore = useBasicStore();
@@ -57,12 +57,16 @@ function handleDocumentClick(event: MouseEvent) {
   }
 }
 
+function handleCloseInvite() {
+  isShowInviteTab.value = false;
+}
+
 onMounted(() => {
-  document.addEventListener('click', handleDocumentClick, true);
+  document?.addEventListener('click', handleDocumentClick, true);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleDocumentClick, true);
+  document?.removeEventListener('click', handleDocumentClick, true);
 });
 </script>
 

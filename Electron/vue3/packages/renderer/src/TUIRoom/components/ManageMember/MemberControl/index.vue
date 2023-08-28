@@ -40,7 +40,7 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
 import SvgIcon from '../../common/SvgIcon.vue';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
-import { TUIMediaDevice, TUISpeechMode } from '@tencentcloud/tuiroom-engine-electron';
+import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-electron';
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 

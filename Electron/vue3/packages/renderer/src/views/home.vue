@@ -38,7 +38,7 @@ import { useI18n } from 'vue-i18n';
 import { useBasicStore } from '../TUIRoom/stores/basic';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
 import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
-import isMobile from '../TUIRoom/utils/useMediaValue';
+import { isMobile } from '../TUIRoom/utils/useMediaValue';
 
 const route = useRoute();
 const streamPreviewRef = ref();
