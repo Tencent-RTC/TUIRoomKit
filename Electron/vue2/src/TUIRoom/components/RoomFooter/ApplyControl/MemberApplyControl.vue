@@ -6,7 +6,7 @@
         :icon-name="iconName"
         @click-icon="toggleApplySpeech"
       />
-      <div v-show="showMemberApplyAttention" class="attention member-attention">
+      <div v-if="showMemberApplyAttention" class="attention member-attention">
         <span class="info">{{ t('Please raise your hand to apply') }}</span>
         <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyAttention"></svg-icon>
       </div>
@@ -28,10 +28,10 @@
         }}
       </span>
       <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" @click="handleInvite(true)">{{ t('Agree') }}</el-button>
-          <el-button @click="handleInvite(false)">{{ t('Cancel') }}</el-button>
-        </span>
+        <div :class="[isMobile ? 'button-container-mobile' : 'button-container-PC']">
+          <span class="cancel" @click="handleInvite(false)">{{ t('Cancel') }}</span>
+          <span class="agree" @click="handleInvite(true)">{{ t('Agree') }}</span>
+        </div>
       </template>
     </Dialog>
   </div>
@@ -52,7 +52,7 @@ import { storeToRefs } from 'pinia';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import logger from '../../../utils/common/logger';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-electron';
-
+import { isMobile } from '../../../utils/useMediaValue';
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
@@ -216,42 +216,6 @@ async function onKickedOffSeat() {
   });
 }
 
-/**
- * User access to trtc room
- *
- * 用户进入 trtc 房间
-**/
-function onUserAVEnabled(userInfo: { userId: string }) {
-  const { userId } = userInfo;
-  /**
-   * If the host re-enters the trtc room, he/she needs to resend
-   * the request to go to the mike if he/she has previously sent a request to go to the mike.
-   *
-   * 主播重新进入 trtc 房间，如果之前发送过请求上麦信令需要重新发送上麦申请
-  **/
-  if (userId === basicStore.masterUserId && isApplyingOnSeat.value) {
-    sendSeatApplication();
-  }
-}
-
-/**
- * User leaves trtc room
- *
- * 用户离开 trtc 房间
-**/
-function onUserAVDisabled(userInfo: { userId: string }) {
-  const { userId } = userInfo;
-  /**
-   * If the host leaves the trtc room, the invitation box will not be displayed
-   * if the invitation is being made to the mic.
-   *
-   * 主播离开 trtc 房间，如果正在进行上麦邀请，则不显示邀请框
-  **/
-  if (userId === basicStore.masterUserId && showInviteDialog.value) {
-    showInviteDialog.value = false;
-  }
-}
-
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
@@ -306,6 +270,49 @@ onBeforeUnmount(() => {
     .close {
       cursor: pointer;
     }
+  }
+}
+.button-container-mobile{
+  width: 100%;
+  display: flex;
+  .agree{
+    padding: 14px;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid var(--choose-type);
+    color: var(--close-cancel-h5);
+  }
+  .cancel{
+    padding: 14px;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid var(--choose-type);
+    color: var(--apply-container-outline);
+    border-right: 1px solid var(--choose-type);
+  }
+}
+.button-container-PC{
+  .cancel{
+    padding: 5px 20px;
+    background: var(--create-room-option);
+    border-radius: 2px;
+    width: auto;
+    display: initial;
+    color: var(--color-font);
+    border: 1px solid var(--choose-type);
+  }
+  .agree{
+    padding: 5px 20px;
+    background: #006EFF;
+    color: white;
+    margin-left: 14px;
+    border-radius: 2px;
+    width: auto;
+    display: initial;
   }
 }
 </style>

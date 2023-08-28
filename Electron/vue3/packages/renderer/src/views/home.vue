@@ -24,8 +24,10 @@
 </template>
 
 <script setup lang="ts">
+// / @TUIRoom-PlatformAdapter-Start
 import UserInfo from '@TUIRoom/components/RoomHeader/UserInfo/index.vue';
 import RoomControl from '@TUIRoom/components/RoomHome/RoomControl/index.vue';
+// / @TUIRoom-PlatformAdapter-End
 import StreamPreview from '@TUIRoom/components/RoomHome/StreamPreview.vue';
 import LanguageIcon from '@/TUIRoom/components/base/Language.vue';
 import SwitchTheme from '@/TUIRoom/components/base/SwitchTheme.vue';
@@ -38,7 +40,7 @@ import { useI18n } from 'vue-i18n';
 import { useBasicStore } from '../TUIRoom/stores/basic';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
 import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
-import isMobile from '../TUIRoom/utils/useMediaValue';
+import { isMobile } from '../TUIRoom/utils/useMediaValue';
 
 const route = useRoute();
 const streamPreviewRef = ref();

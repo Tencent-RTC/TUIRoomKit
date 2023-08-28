@@ -6,9 +6,11 @@
 </template>
 
 <script setup lang="ts">
-import MessageList from './MessageList.vue';
+import MessageList from './MessageList/index.vue';
+// / @TUIRoom-PlatformAdapter-Start
 import ChatEditor from './ChatEditor/index.vue';
-import isMobile from '../../utils/useMediaValue';
+// / @TUIRoom-PlatformAdapter-End
+import { isMobile }  from '../../utils/useMediaValue';
 </script>
 
 <style lang="scss" scoped>

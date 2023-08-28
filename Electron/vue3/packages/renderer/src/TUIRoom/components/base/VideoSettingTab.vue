@@ -54,7 +54,7 @@ import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode } from '@tencentcloud/tuiroom-engine-electron';
-import isMobile from '../../utils/useMediaValue';
+import { isMobile }  from '../../utils/useMediaValue';
 const roomEngine = useGetRoomEngine();
 const isElectron = isElectronEnv();
 
@@ -80,7 +80,8 @@ watch(isLocalStreamMirror, async (val: boolean) => {
     });
   } else {
     await trtcCloud?.setLocalRenderParams({
-      mirrorType: val ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+      mirrorType: val
+        ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
       rotation: TRTCVideoRotation.TRTCVideoRotation0,
       fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
     });

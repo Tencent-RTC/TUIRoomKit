@@ -7,7 +7,7 @@
       @click-icon="toggleContactSidebar"
     />
     <div v-if="isShowContactTab" class="contact-container">
-      <room-contact ref="contactRef"></room-contact>
+      <room-contact ref="contactRef" @on-close-contact="handleOnCloseContact"></room-contact>
     </div>
   </div>
 </template>
@@ -18,8 +18,10 @@ import IconButton from '../common/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
-import isMobile from '../../utils/useMediaValue';
+import { isMobile }  from '../../utils/useMediaValue';
+// / @TUIRoom-PlatformAdapter-Start
 import roomContact from '../RoomMore/index.vue';
+// / @TUIRoom-PlatformAdapter-End
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);
@@ -51,6 +53,10 @@ function handleDocumentClick(event: MouseEvent) {
   if (isShowContactTab.value && contactRef.value && !contactRef.value.$el.contains(event.target)) {
     isShowContactTab.value = false;
   }
+}
+
+function handleOnCloseContact() {
+  isShowContactTab.value = false;
 }
 
 onMounted(() => {

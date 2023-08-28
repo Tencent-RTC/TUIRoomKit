@@ -1,7 +1,8 @@
+/* eslint-disable no-param-reassign */
 import Cookies from 'js-cookie';
 import logger from './logger';
 
-const SEVEN_DAYs = 7; // default 7 days
+const SEVEN_DAYS = 7; // default 7 days
 const ONE_DAY_MILLISECOND = 864e5; // one day in milliseconds
 
 const cookieStorage = {
@@ -11,16 +12,11 @@ const cookieStorage = {
       Cookies.set(key, value, options);
     } else {
       // Date type of options.expires must be number or Date. If not, use the default
-      if (
-        typeof options.expires !== 'number' &&
-        !(options.expires instanceof Date)
-      ) {
-        options.expires = SEVEN_DAYs;
+      if (typeof options.expires !== 'number' && !(options.expires instanceof Date)) {
+        options.expires = SEVEN_DAYS;
       }
       if (typeof options.expires === 'number') {
-        options.expires = new Date(
-          Date.now() + options.expires * ONE_DAY_MILLISECOND
-        );
+        options.expires = new Date(Date.now() + options.expires * ONE_DAY_MILLISECOND);
       }
       if (options.expires) {
         options.expires = options.expires.toUTCString();
@@ -30,7 +26,7 @@ const cookieStorage = {
         JSON.stringify({
           value,
           options,
-        })
+        }),
       );
     }
   },
@@ -56,9 +52,7 @@ const cookieStorage = {
           this.remove(key);
         }
       } catch (err) {
-        logger.warn(
-          `[CookieStorage] come across invalid key/value: ${key}:${cookieItem}`
-        );
+        logger.warn(`[CookieStorage] come across invalid key/value: ${key}:${cookieItem}`);
         this.remove(key);
       }
     }

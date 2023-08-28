@@ -1,37 +1,45 @@
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { ElMessage } from '../../elementComp';
 import { storeToRefs } from 'pinia';
-import SvgIcon from '../common/SvgIcon.vue';
 import { useI18n } from '../../locales';
-import { isElectronEnv } from '../../utils/utils';
+import { isElectronEnv, clipBoard } from '../../utils/utils';
 
 export default function useRoomInvite() {
   const { t } = useI18n();
 
-  const roomLinkDisplay = ref(true);
-
   const basicStore = useBasicStore();
-  const { roomId } = storeToRefs(basicStore);
+  const { roomId, shareLink, isRoomLinkVisible } = storeToRefs(basicStore);
 
-  const { origin, pathname } = location;
+  const { origin, pathname } = location || {};
   const isElectron = isElectronEnv();
 
-  let inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);
-
-  // todo: schema 唤起
+  const inviteLink = computed(() => {
+    if (shareLink.value) {
+      const urlConcatenation = shareLink.value.indexOf('?') !== -1 ? '&' : '?';
+      return `${shareLink.value}${urlConcatenation}roomId=${roomId.value}`;
+    }
+    return `${origin}${pathname}#/home?roomId=${roomId.value}`;
+  });
   const schemeLink = computed(() => `tuiroom://joinroom?roomId=${roomId.value}`);
 
-  function onCopy(value: string | number) {
-    navigator.clipboard.writeText(`${value}`);
-    ElMessage({
-      message: t('Copied successfully'),
-      type: 'success',
-    });
+  async function  onCopy(value: string | number) {
+    try {
+      await clipBoard(value);
+      ElMessage({
+        message: t('Copied successfully'),
+        type: 'success',
+      });
+    } catch (error) {
+      ElMessage({
+        message: t('Copied failure'),
+        type: 'error',
+      });
+    }
   }
   return {
     t,
-    roomLinkDisplay,
+    isRoomLinkVisible,
     roomId,
     origin,
     pathname,
@@ -39,6 +47,5 @@ export default function useRoomInvite() {
     inviteLink,
     schemeLink,
     onCopy,
-    SvgIcon,
   };
 }
