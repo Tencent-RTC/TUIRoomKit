@@ -1,3 +1,15 @@
+## 2023.08.17
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.4.5 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89378)。
+
+## 2023.08.09
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.4.4 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89378)。
+
 ## 2023.08.02
 
 **Feature**

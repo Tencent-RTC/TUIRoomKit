@@ -1,14 +1,16 @@
 <template>
-  <div class="header-container">
-    <div class="icon-box">
-      <switch-camera />
-      <switch-mirror />
+  <div class="header">
+    <div class="header-container">
+      <div class="icon-box">
+        <switch-camera />
+        <switch-mirror />
+      </div>
+      <room-info />
+      <end-control
+        @on-destroy-room="onDestroyRoom"
+        @on-exit-room="onExitRoom"
+      />
     </div>
-    <room-info />
-    <end-control
-      @on-destroy-room="onDestroyRoom"
-      @on-exit-room="onExitRoom"
-    />
   </div>
 </template>
 <script setup lang="ts">
@@ -32,10 +34,15 @@ const onExitRoom = (info: { code: number; message: string }) => {
 
 </script>
 <style scoped>
+.header{
+  height: 100%
+}
 .header-container{
+    height: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
+    padding:0 12px;
 }
 .icon-box{
    min-width: 50px;

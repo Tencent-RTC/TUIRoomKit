@@ -7,17 +7,19 @@
       @on-destroy-room="onDestroyRoom"
       @on-exit-room="onExitRoom"
     ></room-header>
-    <room-content ref="roomContentRef" :show-room-tool="showRoomTool" class="content"></room-content>
-    <!-- <chat-room-content v-if="isMobile"></chat-room-content> -->
+    <room-content
+      ref="roomContentRef"
+      v-tap="handleRoomContentTap"
+      :show-room-tool="showRoomTool"
+      class="content"
+    ></room-content>
     <room-footer
       v-show="showRoomTool"
       class="footer"
       @on-destroy-room="onDestroyRoom"
       @on-exit-room="onExitRoom"
     />
-    <room-sidebar
-      @on-exit-room="onExitRoom"
-    ></room-sidebar>
+    <room-sidebar></room-sidebar>
     <room-setting></room-setting>
   </div>
 </template>
@@ -31,13 +33,12 @@ import RoomFooter from './components/RoomFooter/index';
 import RoomSidebar from './components/RoomSidebar';
 import RoomContent from './components/RoomContent/index.vue';
 import RoomSetting from './components/RoomSetting/index.vue';
-// import chatRoomContent from './components/RoomContent/ChatRoomContent.vue';
 import { isElectronEnv, debounce, throttle } from './utils/utils';
 import { useBasicStore } from './stores/basic';
 import { useRoomStore } from './stores/room';
 import { useChatStore } from './stores/chat';
-import isMobile from './utils/useMediaValue';
-import logger from '../TUIRoom/utils/common/logger';
+import { isMobile, isWeChat }  from './utils/useMediaValue';
+import vTap from './directives/vTap';
 import TUIRoomEngine, {
   TRTCVideoMirrorType,
   TRTCVideoRotation,
@@ -58,6 +59,7 @@ import { MESSAGE_DURATION } from './constants/message';
 import { useI18n } from './locales';
 
 import useGetRoomEngine from './hooks/useRoomEngine';
+import logger from './utils/common/logger';
 
 const isElectron = isElectronEnv();
 const roomEngine = useGetRoomEngine();
@@ -90,7 +92,7 @@ const roomStore = useRoomStore();
 const chatStore = useChatStore();
 
 const { sdkAppId, showHeaderTool } = storeToRefs(basicStore);
-const { localUser, localVideoQuality } = storeToRefs(roomStore);
+const { localUser } = storeToRefs(roomStore);
 
 /**
  * Handle page mouse hover display toolbar logic
@@ -112,22 +114,53 @@ smallParam.videoResolution = TRTCVideoResolution.TRTCVideoResolution_640_360;
 smallParam.videoFps = 10;
 smallParam.videoBitrate = 550;
 
+// PC 端处理 room 控制栏交互
+if (!isWeChat && !isMobile) {
+  onMounted(() => {
+    roomRef.value?.addEventListener('mouseenter', () => {
+      showRoomTool.value = true;
+      handleHideRoomToolDebounce();
+    });
+    roomRef.value?.addEventListener('click', () => {
+      showRoomTool.value = true;
+      handleHideRoomToolDebounce();
+    }, false);
+    roomRef.value?.addEventListener('mousemove', () => {
+      showRoomTool.value = true;
+      handleHideRoomToolThrottle();
+    });
+    roomRef.value?.addEventListener('mouseleave', () => {
+      showRoomTool.value = false;
+    });
+  });
+  onUnmounted(() => {
+    roomRef.value?.removeEventListener('mouseenter', () => {
+      showRoomTool.value = true;
+      handleHideRoomToolDebounce();
+    });
+    roomRef.value?.removeEventListener('click', () => {
+      showRoomTool.value = true;
+      handleHideRoomToolDebounce();
+    }, false);
+    roomRef.value?.removeEventListener('mousemove', () => {
+      showRoomTool.value = true;
+      handleHideRoomToolThrottle();
+    });
+    roomRef.value?.removeEventListener('mouseleave', () => {
+      showRoomTool.value = false;
+    });
+  });
+}
+
+// H5 及小程序端处理 room 控制栏交互
+function handleRoomContentTap() {
+  showRoomTool.value = !showRoomTool.value;
+  if (showRoomTool.value) {
+    handleHideRoomToolDebounce();
+  }
+}
+
 onMounted(async () => {
-  roomRef.value?.addEventListener('mouseenter', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolDebounce();
-  });
-  roomRef.value?.addEventListener('click', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolDebounce();
-  }, false);
-  roomRef.value?.addEventListener('mousemove', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolThrottle();
-  });
-  roomRef.value?.addEventListener('mouseleave', () => {
-    showRoomTool.value = false;
-  });
   const defaults = basicStore.defaultTheme;
   const storageCurrentTheme = localStorage.getItem('tuiRoom-currentTheme') || defaults;
   basicStore.setDefaultTheme(storageCurrentTheme);
@@ -140,24 +173,6 @@ onMounted(async () => {
       fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
     });
   }
-});
-
-onUnmounted(() => {
-  roomRef.value?.removeEventListener('mouseenter', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolDebounce();
-  });
-  roomRef.value?.removeEventListener('click', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolDebounce();
-  }, false);
-  roomRef.value?.removeEventListener('mousemove', () => {
-    showRoomTool.value = true;
-    handleHideRoomToolThrottle();
-  });
-  roomRef.value?.removeEventListener('mouseleave', () => {
-    showRoomTool.value = false;
-  });
 });
 
 interface RoomParam {
@@ -581,13 +596,6 @@ watch(sdkAppId, (val: number) => {
   width: 100%;
   height: 100%;
   position: relative;
-  * {
-    color: $fontColor;
-    box-sizing: border-box;
-    text-align: start;
-    user-select: none;
-    font-family: PingFangSC-Medium;
-  }
   .header {
     width: 100%;
     height: 48px;
@@ -601,10 +609,12 @@ watch(sdkAppId, (val: number) => {
     width: 100%;
     height: 100%;
     background-color: $roomBackgroundColor;
+    position: absolute;
+    top: 0;
   }
   .footer {
-    position: relative;
-    bottom: 80px;
+    position: absolute;
+    bottom: 0;
     width: 100%;
     height: 80px;
     background-color: var(--room-footer-bg-color);

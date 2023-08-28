@@ -1,10 +1,10 @@
 <template>
   <div>
     <svg-icon
+      v-tap="handleSwitchCamera"
       class="camera-icon"
       size="custom"
       icon-name="camera"
-      @click="handleSwitchCamera"
     ></svg-icon>
   </div>
 </template>
@@ -13,6 +13,7 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { storeToRefs } from 'pinia';
 import { useBasicStore } from '../../../stores/basic';
+import vTap from '../../../directives/vTap';
 const basicStore = useBasicStore();
 const { isFrontCamera } = storeToRefs(basicStore);
 const roomEngine = useGetRoomEngine();
@@ -24,8 +25,9 @@ async function handleSwitchCamera() {
 </script>
 <style scoped>
  .camera-icon{
+    display: block;
     background-size: cover;
-    width: 18px;
-    height: 16px;
+    width: 20px;
+    height: 18px;
  }
 </style>

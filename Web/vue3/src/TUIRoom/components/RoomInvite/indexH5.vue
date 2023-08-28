@@ -2,11 +2,12 @@
   <div class="invite-container-main">
     <div class="invite-title-main">
       <p>{{ t('Invite') }}</p>
+      <span v-if="isWeChat" v-tap="handleCloseInvite" class="cancel">{{ t('Cancel') }}</span>
     </div>
-    <div v-for="item in inviteContentList" :key="item.id" class="invite-content-main">
+    <div v-for="item in visibleInviteContentList" :key="item.id" class="invite-content-main">
       <span class="invite-title">{{ t(item.title) }}</span>
       <span class="invite-content">{{ item.content }}</span>
-      <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(item.copyLink)"></svg-icon>
+      <svg-icon v-tap="() => onCopy(item.copyLink)" icon-name="copy-icon" class="copy" size="custom"></svg-icon>
     </div>
     <span class="invite-bottom">
       {{ t('You can share the room number or link to invite more people to join the room.') }}
@@ -15,31 +16,24 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import useRoomInviteControl from './useRoomInviteHooks';
+import { isWeChat } from '../../utils/useMediaValue';
+import vTap from '../../directives/vTap';
 
 const {
   t,
-  roomLinkDisplay,
-  roomId,
-  inviteLink,
-  schemeLink,
   onCopy,
+  visibleInviteContentList,
 } = useRoomInviteControl();
 
-const inviteContentList = reactive([
-  { id: 1, title: 'Room ID', content: roomId, copyLink: roomId },
-  { id: 2, title: 'Room link', content: inviteLink, copyLink: inviteLink },
-  { id: 3, title: 'scheme', content: schemeLink, copyLink: inviteLink },
-]);
 
-onMounted(() => {
-  // eslint-disable-next-line no-underscore-dangle
-  if ((window as any).__TRTCElectron) {
-    roomLinkDisplay.value = false;
-  }
-});
+const emit = defineEmits(['on-close-invite']);
+
+function handleCloseInvite() {
+  emit('on-close-invite');
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -78,7 +72,8 @@ span{
     font-size: 20px;
     line-height: 24px;
     color: var(--popup-title-color-h5);
-    padding: 0px 0 0 25px;
+    padding: 20px;
+    align-items: center;
   }
   .invite-content-main {
     width: 90%;
@@ -123,5 +118,11 @@ span{
     margin-left: 30px;
   }
 }
-
+.cancel{
+  flex: 1;
+  text-align: end;
+  padding-right: 30px;
+  font-weight: 400;
+  font-size: 16px;
+}
 </style>

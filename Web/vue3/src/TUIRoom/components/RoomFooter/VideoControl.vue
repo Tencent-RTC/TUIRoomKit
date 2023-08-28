@@ -33,7 +33,7 @@
     <Dialog
       :model-value="showRequestOpenCameraDialog"
       class="custom-element-class"
-      title="Tips"
+      :title="title"
       :modal="false"
       :show-close="false"
       :append-to-body="true"
@@ -45,10 +45,10 @@
         {{ t('The host invites you to turn on the camera') }}
       </span>
       <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" @click="handleAccept">{{ t('Turn on the camera') }}</el-button>
-          <el-button @click="handleReject">{{ t('Keep it closed') }}</el-button>
-        </span>
+        <div :class="[isMobile ? 'button-container-mobile' : 'button-container-PC']">
+          <span class="cancel" @click="handleReject">{{ t('Keep it closed') }}</span>
+          <span class="agree" @click="handleAccept">{{ t('Turn on the camera') }}</span>
+        </div>
       </template>
     </Dialog>
   </div>
@@ -69,7 +69,7 @@ import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import TUIRoomEngine, { TUIVideoStreamType, TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
-import isMobile from '../../utils/useMediaValue';
+import { isMobile, isWeChat }  from '../../utils/useMediaValue';
 import { useBasicStore } from '../../stores/basic';
 const roomEngine = useGetRoomEngine();
 
@@ -89,6 +89,7 @@ const hasMore = computed(() => !isMobile);
 const showVideoSettingTab: Ref<boolean> = ref(false);
 const videoIconButtonRef = ref<InstanceType<typeof IconButton>>();
 const videoSettingRef = ref<InstanceType<typeof VideoSettingTab>>();
+const title = computed(() => (isMobile ? '' : t('Tips')));
 
 const iconName = computed(() => {
   if (isLocalVideoIconDisable.value) {
@@ -123,7 +124,7 @@ async function toggleMuteVideo() {
     const cameraList = await roomEngine.instance?.getCameraDevicesList();
     const hasCameraDevice = cameraList.length > 0;
     // 无摄像头列表
-    if (!hasCameraDevice) {
+    if (!hasCameraDevice && !isWeChat) {
       ElMessageBox.alert(t('Camera not detected on current device'), t('Note'), {
         customClass: 'custom-element-class',
         confirmButtonText: t('Confirm'),
@@ -209,7 +210,7 @@ async function onRequestCancelled(eventInfo: { requestId: string }) {
 }
 
 onMounted(() => {
-  document.addEventListener('click', handleDocumentClick, true);
+  document?.addEventListener('click', handleDocumentClick, true);
 });
 
 TUIRoomEngine.once('ready', () => {
@@ -218,7 +219,7 @@ TUIRoomEngine.once('ready', () => {
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleDocumentClick, true);
+  document?.removeEventListener('click', handleDocumentClick, true);
 
   roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
@@ -232,14 +233,57 @@ onUnmounted(() => {
 $videoTabWidth: 320px;
 
 .video-control-container {
-  position: relative;
-  .video-tab {
-    position: absolute;
-    bottom: 90px;
-    left: -60px;
-    width: $videoTabWidth;
-    background: var(--room-videotab-bg-color);
-    padding: 20px;
+    position: relative;
+    .video-tab {
+      position: absolute;
+      bottom: 90px;
+      left: -60px;
+      width: $videoTabWidth;
+      background: var(--room-videotab-bg-color);
+      padding: 20px;
+    }
+  }
+.button-container-mobile{
+  width: 100%;
+  display: flex;
+  .agree{
+    padding: 14px;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid rgba(242, 242, 242, 1);
+    color:rgba(0, 110, 255, 1);
+  }
+  .cancel{
+    padding: 14px;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid rgba(242, 242, 242, 1);
+    color: rgba(43, 46, 56, 1);
+    border-right: 1px solid rgba(242, 242, 242, 1);
+  }
+}
+.button-container-PC{
+  .cancel{
+    padding: 5px 20px;
+    background: var(--create-room-option);
+    border-radius: 2px;
+    width: auto;
+    display: initial;
+    color: var(--color-font);
+    border: 1px solid var(--choose-type);
+  }
+  .agree{
+    padding: 5px 20px;
+    background: #006EFF;
+    color: white;
+    margin-left: 14px;
+    border-radius: 2px;
+    width: auto;
+    display: initial;
   }
 }
 </style>
