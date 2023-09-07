@@ -37,11 +37,9 @@ export default function useStreamContainer() {
   const onSeatListChanged = (eventInfo: { seatList: any[], seatedList: any[], leftList: any[] }) => {
     const { seatList, seatedList, leftList } = eventInfo;
     roomStore.updateOnSeatList(seatList, seatedList, leftList);
-    // todo: 最大屏的用户离开时，应该换一个最大屏的用户
-    // else if (userInfo.userId === enlargeStream.value?.userId) {
-    //   [enlargeStream.value] = roomStore.remoteStreamList;
-    // }
   };
+
+  // 用户音频状态发生改变
   const onUserAudioStateChanged = (eventInfo: {
     userId: string,
     hasAudio: boolean,
@@ -88,7 +86,6 @@ export default function useStreamContainer() {
         });
         // @ts-ignore
         await roomEngine.instance?.openLocalCamera({ isFrontCamera: basicStore.isFrontCamera });
-        await roomEngine.instance?.startPushLocalVideo();
       } else if (isMobile) {
         const previewDom = document?.getElementById(`${roomStore.localStream.userId}_${roomStore.localStream.streamType}`);
         if (!previewDom) {
@@ -101,7 +98,6 @@ export default function useStreamContainer() {
         });
         // @ts-ignore
         await roomEngine.instance?.openLocalCamera({ isFrontCamera: basicStore.isFrontCamera });
-        await roomEngine.instance?.startPushLocalVideo();
         return;
       } else {
         const previewDom = document?.getElementById(`${roomStore.localStream.userId}_${roomStore.localStream.streamType}`);
@@ -131,7 +127,6 @@ export default function useStreamContainer() {
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
         });
         await roomEngine.instance?.openLocalCamera();
-        await roomEngine.instance?.startPushLocalVideo();
       }
     }
   });
@@ -144,7 +139,6 @@ export default function useStreamContainer() {
        * 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
        **/
       await roomEngine.instance?.openLocalMicrophone();
-      await roomEngine.instance?.startPushLocalAudio();
       if (!isWeChat && !isMobile) {
         const microphoneList = await roomEngine.instance?.getMicDevicesList();
         const speakerList = await roomEngine.instance?.getSpeakerDevicesList();

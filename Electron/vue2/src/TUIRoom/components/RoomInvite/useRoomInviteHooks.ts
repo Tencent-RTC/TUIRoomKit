@@ -41,7 +41,7 @@ export default function useRoomInvite() {
   const inviteContentList = [
     { id: 1, title: 'Room ID', content: roomId, copyLink: roomId, visible: true },
     { id: 2, title: 'Room Link', content: inviteLink, copyLink: inviteLink, visible: isRoomLinkVisible.value },
-    { id: 3, title: 'scheme', content: schemeLink, copyLink: inviteLink, visible: true },
+    { id: 3, title: 'scheme', content: schemeLink, copyLink: schemeLink, visible: true },
   ];
   const visibleInviteContentList = reactive(inviteContentList.filter(item => item.visible));
 
