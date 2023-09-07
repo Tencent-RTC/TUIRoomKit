@@ -1,4 +1,4 @@
-import i18n from '../../../../TUIRoom/locales/index';
+import i18n from '../../../locales/index';
 import { ref, computed } from 'vue';
 import { useI18n } from '../../../locales';
 import logoCn from '../../../assets/imgs/logo.png';

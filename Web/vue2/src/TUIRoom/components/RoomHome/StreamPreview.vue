@@ -133,8 +133,8 @@ async function startStreamPreview() {
   const microphoneList = await roomEngine.instance?.getMicDevicesList();
   const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
 
-  const hasCameraDevice = cameraList.length > 0;
-  const hasMicrophoneDevice = microphoneList.length > 0;
+  const hasCameraDevice = cameraList && cameraList.length > 0;
+  const hasMicrophoneDevice = microphoneList && microphoneList.length > 0;
   let alertMessage = '';
   if (hasCameraDevice && !hasMicrophoneDevice) {
     alertMessage = 'Microphone not detected on current device';
@@ -149,33 +149,22 @@ async function startStreamPreview() {
       confirmButtonText: t('Confirm') });
   }
 
-  roomStore.setCameraList(cameraList);
-  roomStore.setMicrophoneList(microphoneList);
-  roomStore.setSpeakerList(speakerList);
-  if (isElectron) {
-    const cameraInfo = roomEngine.instance?.getCurrentCameraDevice();
-    const micInfo = roomEngine.instance?.getCurrentMicDevice();
-    const speakerInfo = roomEngine.instance?.getCurrentSpeakerDevice();
-    if (cameraInfo && cameraInfo.deviceId) {
-      roomStore.setCurrentCameraId(cameraInfo.deviceId);
-    }
-    if (micInfo && micInfo.deviceId) {
-      roomStore.setCurrentMicrophoneId(micInfo.deviceId);
-    }
-    if (speakerInfo && speakerInfo.deviceId) {
-      roomStore.setCurrentSpeakerId(speakerInfo.deviceId);
-    }
-  } else {
-    if (cameraList.length > 0) {
-      await roomEngine.instance?.setCurrentCameraDevice({ deviceId: cameraList[0].deviceId });
-    }
-    if (microphoneList.length > 0) {
-      await roomEngine.instance?.setCurrentMicDevice({ deviceId: microphoneList[0].deviceId });
-    }
-    if (speakerList.length > 0) {
-      await roomEngine.instance?.setCurrentSpeakerDevice({ deviceId: speakerList[0].deviceId });
-    }
+  cameraList && roomStore.setCameraList(cameraList);
+  microphoneList && roomStore.setMicrophoneList(microphoneList);
+  speakerList && roomStore.setSpeakerList(speakerList);
+  const cameraInfo = roomEngine.instance?.getCurrentCameraDevice();
+  const micInfo = roomEngine.instance?.getCurrentMicDevice();
+  const speakerInfo = roomEngine.instance?.getCurrentSpeakerDevice();
+  if (cameraInfo && cameraInfo.deviceId) {
+    roomStore.setCurrentCameraId(cameraInfo.deviceId);
   }
+  if (micInfo && micInfo.deviceId) {
+    roomStore.setCurrentMicrophoneId(micInfo.deviceId);
+  }
+  if (speakerInfo && speakerInfo.deviceId) {
+    roomStore.setCurrentSpeakerId(speakerInfo.deviceId);
+  }
+
   if (hasCameraDevice) {
     await roomEngine.instance?.startCameraDeviceTest({ view: 'stream-preview' });
   }
