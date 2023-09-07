@@ -309,6 +309,8 @@ const onUserVideoStateChanged = (eventInfo: {
         if (layout.value === LAYOUT.LARGE_SMALL_WINDOW) {
           basicStore.setLayout(LAYOUT.SIX_EQUAL_POINTS);
           currentPageIndex.value = 0;
+        } else if (layout.value === LAYOUT.SIX_EQUAL_POINTS && currentPageIndex.value > 0) {
+          currentPageIndex.value = currentPageIndex.value - 1;
         }
       }
     }

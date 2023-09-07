@@ -1,10 +1,12 @@
 <template>
-  <div>
+  <div class="camera-icon">
     <svg-icon
       @tap="handleSwitchCamera"
-      class="camera-icon"
-      size="custom"
       icon-name="camera"
+      size="custom"
+      :custom-style="{
+        backgroundSize: '50%'
+      }"
     ></svg-icon>
   </div>
 </template>
@@ -26,7 +28,7 @@ async function handleSwitchCamera() {
  .camera-icon{
     display: block;
     background-size: cover;
-    width: 20px;
-    height: 18px;
+    width: 40px;
+    height: 36px;
  }
 </style>

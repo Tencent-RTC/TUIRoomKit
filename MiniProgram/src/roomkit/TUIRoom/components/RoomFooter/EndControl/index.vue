@@ -3,35 +3,37 @@
     <div class="end-control-container">
       <div @tap="stopMeeting" class="end-button" tabindex="1">{{ t('EndH5') }}</div>
     </div>
-    <div v-if="visible" :class="showLeaveRoom === true ? 'end-dialog':'end-dialog-single'">
-      <div v-if="currentDialogType === DialogType.BasicDialog">
-        <div v-if="roomStore.isMaster" class="end-dialog-header">
-          <span v-if="roomStore.isMaster" class="end-dialog-text">
-            <!-- eslint-disable-next-line max-len -->
-            {{ t('If you do not want to end the meeting, please designate a new host before leaving the meeting.') }}
-          </span>
-          <span v-else>{{ t('Are you sure you want to leave this room?') }}</span>
+    <div v-if="visible" class="end-main-content">
+      <div :class="isShowLeaveRoomDialog ? 'end-dialog-leave':'end-dialog-dismiss'">
+        <div v-if="currentDialogType === DialogType.BasicDialog">
+          <div v-if="roomStore.isMaster" class="end-dialog-header">
+            <span v-if="roomStore.isMaster" class="end-dialog-text">
+              <!-- eslint-disable-next-line max-len -->
+              {{ t('If you do not want to end the meeting, please designate a new host before leaving the meeting.') }}
+            </span>
+            <span v-else>{{ t('Are you sure you want to leave this room?') }}</span>
+          </div>
         </div>
-      </div>
-      <div v-if="currentDialogType === DialogType.BasicDialog" class="dialog-middle-content">
-        <span
-          v-if="roomStore.isMaster"
-          :class="showLeaveRoom === true ? 'end-button-dismiss':'end-button-dismiss-single'"
-          @click.stop="dismissRoom"
-        >
-          {{ t('Dismiss') }}
-        </span>
-        <span
-          v-if="showLeaveRoom"
-          @tap="leaveRoom"
-          :class="roomStore.isMaster === true ?'end-button-leave':'end-button-leave-single'"
-        >
-          {{ t('Leave') }}
-        </span>
-        <span class="end-button-cancel" @click.stop="cancel">{{ t('Cancel') }}</span>
-      </div>
-      <div v-if="currentDialogType === DialogType.TransferDialog">
-        <span class="end-button-cancel" @click.stop="cancel">{{ t('Cancel') }}</span>
+        <div v-if="currentDialogType === DialogType.BasicDialog" class="dialog-middle-content">
+          <span
+            v-if="roomStore.isMaster"
+            :class="isShowLeaveRoomDialog ? 'end-button-dismiss':'end-button-dismiss-single'"
+            @click.stop="dismissRoom"
+          >
+            {{ t('Dismiss') }}
+          </span>
+          <span
+            v-if="isShowLeaveRoomDialog"
+            @tap="leaveRoom"
+            :class="roomStore.isMaster ?'end-button-leave':'end-button-leave-single'"
+          >
+            {{ t('Leave') }}
+          </span>
+          <span class="end-button-cancel" @click.stop="cancel">{{ t('Cancel') }}</span>
+        </div>
+        <div v-if="currentDialogType === DialogType.TransferDialog">
+          <span class="end-button-cancel" @click.stop="cancel">{{ t('Cancel') }}</span>
+        </div>
       </div>
     </div>
     <popup
@@ -95,7 +97,7 @@ import Avatar from '../../base/Avatar.vue';
 
 const {
   t,
-  showLeaveRoom,
+  isShowLeaveRoomDialog,
   roomStore,
   basicStore,
   roomEngine,
@@ -271,92 +273,103 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
 }
-.end-dialog,.end-dialog-single {
-  width: 90%;
-  border-radius: 14px;
+.end-main-content{
   position: fixed;
-  right: 0;
   left: 0;
-  bottom: 10vh;
-  z-index: 9;
-  margin: auto;
-  .manage-transfer{
-    position: absolute;
-    top: 0;
-  }
-  .end-dialog-header {
-    background: #CACACB;
-    font-family: 'PingFang SC';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 17px;
-    text-align: center;
-    color: #6a6c74;
-    height: 56px;
-    width: 100%;
-    margin: 0 auto;
-    border-top-left-radius: 14px;
-    border-top-right-radius: 14px;
-    border-bottom: .5px solid #4f4e4e;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .end-dialog-text {
-      width: 230px;
+  top: 0;
+  bottom: 0;
+  width: 100vw;
+  height: auto;
+  box-sizing: border-box;
+  background-color: var(--log-out-mobile);
+  backdrop-filter: blur(10px);
+  .end-dialog-leave,.end-dialog-dismiss {
+    width: 90%;
+    border-radius: 14px;
+    position: fixed;
+    right: 0;
+    left: 0;
+    bottom: 10vh;
+    z-index: 9;
+    margin: auto;
+    .manage-transfer{
+      position: absolute;
+      top: 0;
+    }
+    .end-dialog-header {
+      background: #CACACB;
+      font-family: 'PingFang SC';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 17px;
+      text-align: center;
+      color: #6a6c74;
+      height: 56px;
+      width: 100%;
+      margin: 0 auto;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+      border-bottom: .5px solid #4f4e4e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .end-dialog-text {
+        width: 230px;
+      }
+    }
+    .end-button-dismiss,.end-button-leave,.end-button-cancel,.end-button-dismiss-single,.end-button-leave-single {
+      width: 100%;
+      font-family: 'PingFang SC';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 24px;
+      text-align: center;
+      color: #FF2E2E;
+      border-style: none;
+      background: #CACACB;
+      padding: 20px 0;
+    }
+    .end-button-leave {
+      color: #007AFF;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      border-top: .5px solid #8f8e8e;
+    }
+    .end-button-leave-single{
+      position: absolute;
+      bottom: 1vh;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .end-button-cancel {
+      position: absolute;
+      bottom: -9vh;
+      left: 0;
+      background-color: #FFFFFF;
+      border-radius: 14px;
+      color: #007AFF;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .end-button-dismiss-single {
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
-  .end-button-dismiss,.end-button-leave,.end-button-cancel,.end-button-dismiss-single,.end-button-leave-single {
-    width: 100%;
-    font-family: 'PingFang SC';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 20px;
-    line-height: 24px;
-    text-align: center;
-    color: #FF2E2E;
-    border-style: none;
-    background: #CACACB;
-    padding: 20px 0;
-  }
-  .end-button-leave {
-    color: #007AFF;
-    border-bottom-left-radius: 14px;
-    border-bottom-right-radius: 14px;
-    border-top: .5px solid #8f8e8e;
-  }
-  .end-button-leave-single{
-    position: absolute;
-    bottom: 1vh;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .end-button-cancel {
-    position: absolute;
-    bottom: -9vh;
-    left: 0;
-    background-color: #FFFFFF;
-    border-radius: 14px;
-    color: #007AFF;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .end-button-dismiss-single {
-    border-bottom-left-radius: 14px;
-    border-bottom-right-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
-.end-dialog-single {
-  bottom: 12vh;
-  .end-button-cancel{
-    bottom: -9vh;
+  .end-dialog-dismiss {
+    bottom: 12vh;
+    .end-button-cancel{
+      bottom: -9vh;
+    }
   }
 }
 .transfer-container {

@@ -129,18 +129,22 @@ const { t } = useI18n();
 **/
 function handleSpeakerTest() {
   if (isTestingSpeaker.value) {
-    audioPlayer.pause();
-    audioPlayer.currentTime = 0;
+    if (audioPlayer) {
+      audioPlayer.pause();
+      audioPlayer.currentTime = 0;
+    }
     isTestingSpeaker.value = false;
   } else {
     isTestingSpeaker.value = true;
-    audioPlayer.src = 'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';
-    audioPlayer.play();
+    if (audioPlayer) {
+      audioPlayer.src = 'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';
+      audioPlayer.play();
+    }
   }
 }
 
 onBeforeUnmount(() => {
-  audioPlayer.pause();
+  audioPlayer && audioPlayer.pause();
 });
 
 </script>

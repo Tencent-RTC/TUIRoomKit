@@ -3,13 +3,14 @@
     <div class="member-title">
       <img class="avatar-url" :src="userInfo.avatarUrl || defaultAvatar" />
       <div class="member-title-content">{{ userInfo.userName || userInfo.userId }}</div>
-      <span v-if="isWeChat" class="cancel" @tap="handleCloseControl">{{ t('Cancel') }}</span>
+      <!-- TODO: 完善 @tap 的 .stop 修饰符 -->
+      <span v-if="isWeChat" @tap.stop="handleCloseControl" class="cancel">{{ t('Cancel') }}</span>
     </div>
     <div
       v-for="item, index in controlList"
       :key="index"
+      @tap="() => item.func(userInfo)"
       class="user-operate-item"
-      @touchstart="item.func(userInfo)"
     >
       <svg-icon :icon-name="item.iconName" class="icon-svg"></svg-icon>
       <div class="control-title">{{ item.title }}</div>

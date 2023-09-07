@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="playRegionDomId !== enlargeDomId"
+    v-if="playRegionDomId !== enlargeDomId && props.stream.userId"
     ref="streamRegionRef"
     class="user-stream-container"
     :class="[showVoiceBorder ? 'border' : '']"

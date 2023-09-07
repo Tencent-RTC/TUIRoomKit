@@ -23,7 +23,7 @@ export default function useRoomInvite() {
   });
   const schemeLink = computed(() => `tuiroom://joinroom?roomId=${roomId.value}`);
 
-  async function  onCopy(value: string | number) {
+  async function onCopy(value: string | number) {
     try {
       await clipBoard(value);
       ElMessage({
@@ -41,7 +41,7 @@ export default function useRoomInvite() {
   const inviteContentList = [
     { id: 1, title: 'Room ID', content: roomId, copyLink: roomId, visible: true },
     { id: 2, title: 'Room Link', content: inviteLink, copyLink: inviteLink, visible: isRoomLinkVisible.value },
-    { id: 3, title: 'scheme', content: schemeLink, copyLink: inviteLink, visible: true },
+    { id: 3, title: 'scheme', content: schemeLink, copyLink: schemeLink, visible: true },
   ];
   const visibleInviteContentList = reactive(inviteContentList.filter(item => item.visible));
 
