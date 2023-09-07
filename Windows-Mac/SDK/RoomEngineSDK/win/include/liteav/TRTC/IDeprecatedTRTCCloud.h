@@ -230,7 +230,7 @@ class IDeprecatedTRTCCloud {
     /**
      * 设置所有音效音量
      *
-     * @deprecated v7.3 版本开始不推荐使用，建议使用 {@link TXAudioEffectManager} 中的 {@link setMusicPublishVolume} 和{@link setMusicPlayoutVolume} 替代之。
+     * @deprecated v7.3 版本开始不推荐使用，建议使用 {@link TXAudioEffectManager} 中的 {@link setMusicPublishVolume} 和 {@link setMusicPlayoutVolume} 替代之。
      */
     trtc_attribute_deprecated virtual void setAllAudioEffectsVolume(int volume) = 0;
 
@@ -289,6 +289,13 @@ class IDeprecatedTRTCCloud {
      * @deprecated v7.2 版本开始不推荐使用，建议使用 {@link startScreenCapture} 替代之。
      */
     trtc_attribute_deprecated virtual void startScreenCapture(TXView rendView) = 0;
+
+    /**
+     * 设置第三方美颜的视频数据回调
+     *
+     * @deprecated v11.4 版本开始不推荐使用，建议使用 {@link enableLocalVideoCustomProcess} 和 {@link setLocalVideoCustomProcessCallback} 替代之。
+     */
+    trtc_attribute_deprecated virtual int setLocalVideoProcessCallback(TRTCVideoPixelFormat pixelFormat, TRTCVideoBufferType bufferType, ITRTCVideoFrameCallback* callback) = 0;
 
 /**
  * 获取摄像头设备列表

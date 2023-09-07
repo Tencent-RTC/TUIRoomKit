@@ -79,6 +79,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * 1.3 设置 TRTC 事件回调
      *
      * 您可以通过 {@link ITRTCCloudCallback} 获得来自 SDK 的各类事件通知（比如：错误码，警告码，音视频状态参数等）。
+     * 从 11.4.0 版本以后，我们推荐您使用功能更加强大的{@link addListener}接口，支持添加/移除多个监听。
      * @param listener 回调实例。
      */
     virtual void addCallback(ITRTCCloudCallback* callback) = 0;
@@ -563,7 +564,8 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * - 低清小画面：{@link TRTCVideoStreamTypeSmall}。
      * - 辅流画面（常用于屏幕分享）：{@link TRTCVideoStreamTypeSub}。
      * @param mute 是否暂停接收。
-     * @note 该接口支持您在进入房间（enterRoom）前调用，暂停状态会在退出房间（exitRoom）在之后会被重置。
+     * @note 该接口支持您在进入房间（{@link enterRoom}）前调用，暂停状态在退出房间（{@link exitRoom}）之后会被重置。
+     * @note 调用该接口暂停接收指定用户的视频流后，只调用 {@link startRemoteView} 接口无法播放指定用户的视频，需要调用 {@link muteRemoteVideoStream}(false) 或 {@link muteAllRemoteVideoStreams}(false) 才能恢复。
      */
     virtual void muteRemoteVideoStream(const char* userId, TRTCVideoStreamType streamType, bool mute) = 0;
 
@@ -572,7 +574,8 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      *
      * 该接口仅暂停/恢复接收所有用户的视频流，但并不释放显示资源，视频画面会被冻屏在接口调用时的最后一帧。
      * @param mute  是否暂停接收。
-     * @note 该接口支持您在进入房间（enterRoom）前调用，暂停状态会在退出房间（exitRoom）在之后会被重置。
+     * @note 该接口支持您在进入房间（{@link enterRoom}）前调用，暂停状态在退出房间（{@link exitRoom}）之后会被重置。
+     * @note 调用该接口暂停接收所有用户的视频流后，只调用 {@link startRemoteView} 接口无法播放指定用户的视频，需要调用 {@link muteRemoteVideoStream}(false) 或 {@link muteAllRemoteVideoStreams}(false) 才能恢复。
      */
     virtual void muteAllRemoteVideoStreams(bool mute) = 0;
 
@@ -709,7 +712,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * 当您静音某用户的远端音频时，SDK 会停止播放指定用户的声音，同时也会停止拉取该用户的音频数据数据。
      * @param userId 用于指定远端用户的 ID。
      * @param mute true：静音；false：取消静音。
-     * @note 在进入房间（enterRoom）之前或之后调用本接口均生效，静音状态在退出房间（exitRoom） 之后会被重置为 false。
+     * @note 在进入房间（enterRoom）之前或之后调用本接口均生效，静音状态在退出房间（exitRoom）之后会被重置为 false。
      */
     virtual void muteRemoteAudio(const char* userId, bool mute) = 0;
 
@@ -718,7 +721,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      *
      * 当您静音所有用户的远端音频时，SDK 会停止播放所有来自远端的音频流，同时也会停止拉取所有用户的音频数据。
      * @param mute true：静音；false：取消静音。
-     * @note 在进入房间（enterRoom）之前或之后调用本接口均生效，静音状态在退出房间（exitRoom） 之后会被重置为 false。
+     * @note 在进入房间（enterRoom）之前或之后调用本接口均生效，静音状态在退出房间（exitRoom）之后会被重置为 false。
      */
     virtual void muteAllRemoteAudio(bool mute) = 0;
 
@@ -1226,15 +1229,23 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
     virtual uint64_t generateCustomPTS() = 0;
 
     /**
-     * 10.9 设置第三方美颜的视频数据回调
+     * 10.9.1 开启视频第三方美颜
      *
-     * 设置该回调之后，SDK 会把采集到的视频帧通过您设置的 callback 回调出来，用于第三方美颜组件进行二次处理，之后 SDK 会将处理后的视频帧进行编码和发送。
-     * @param pixelFormat 指定回调的像素格式，出于数据处理效率的考虑，目前仅支持 OpenGL 纹理格式数据。
-     * @param bufferType  指定视频数据结构类型，出于数据处理效率的考虑，目前仅支持 OpenGL 纹理格式数据。
-     * @param callback    自定义渲染回调，详见 {@link ITRTCVideoFrameCallback}。
+     * 开启后，您可以通过 {@link ITRTCVideoFrameCallback} 获取到指定像素格式和视频数据结构类型的图像帧。
+     * @param enable      是否启用视频第三方美颜，默认为关闭状态。
+     * @param pixelFormat 指定回调的像素格式。
+     * @param bufferType  指定视频数据结构类型。
      * @return 0：成功；<0：错误
      */
-    virtual int setLocalVideoProcessCallback(TRTCVideoPixelFormat pixelFormat, TRTCVideoBufferType bufferType, ITRTCVideoFrameCallback* callback) = 0;
+    virtual int enableLocalVideoCustomProcess(bool enable, TRTCVideoPixelFormat pixelFormat, TRTCVideoBufferType bufferType) = 0;
+
+    /**
+     * 10.9.2 设置第三方美颜的视频数据回调
+     *
+     * 设置该回调之后，SDK 会把采集到的视频帧通过您设置的 callback 回调出来，用于第三方美颜组件进行二次处理，之后 SDK 会将处理后的视频帧进行编码和发送。
+     * @param callback 自定义美颜回调，详见 {@link ITRTCVideoFrameCallback}。
+     */
+    virtual void setLocalVideoCustomProcessCallback(ITRTCVideoFrameCallback* callback) = 0;
 
     /**
      * 10.10 设置本地视频自定义渲染回调

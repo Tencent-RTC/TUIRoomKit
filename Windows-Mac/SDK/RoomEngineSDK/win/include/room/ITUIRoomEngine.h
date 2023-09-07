@@ -9,6 +9,7 @@
 
 #include "ITUIRoomDefine.h"
 #include "ITUIRoomObserver.h"
+#include "IDeprecatedRoomEngineAPI.h"
 
 namespace liteav {
 class ITRTCCloud;
@@ -43,7 +44,7 @@ class TUIDeviceManager;
 class TUIAudioEffectManager;
 class TUIVideoEffectManager;
 
-class TUIRoomEngine {
+class TUIRoomEngine : IDeprecatedRoomEngineAPI {
    public:
     virtual ~TUIRoomEngine() {
     }
@@ -214,12 +215,38 @@ class TUIRoomEngine {
     virtual void closeLocalCamera() = 0;
 
     /**
-     * 3.4 更新本地视频编码质量设置
+     * 3.4 开始推送本地视频。默认开启
+     */
+    virtual void startPushLocalVideo() = 0;
+
+    /**
+     * 3.5 停止推送本地视频
+     */
+    virtual void stopPushLocalVideo() = 0;
+
+    /**
+     * 3.6 更新本地视频编码质量设置
      */
     virtual void updateVideoQuality(TUIVideoQuality quality) = 0;
 
     /**
-     * 3.7  开始屏幕分享。
+     * 3.7 设置视频编码器的编码参数
+     *
+     * @param streamType 视频流的类型，定义可参考 {@link TUIVideoStreamType} 的定义
+     * @param params 视频编码器的编码参数，定义可参考 {@link TUIVideoEncoderParams} 的定义
+     */
+    virtual void updateVideoQualityEx(TUIVideoStreamType streamType, const TUIVideoEncoderParams& params) = 0;
+
+    /**
+     * 3.8 设置视频编码器分辨率模式（横屏分辨率 or 竖屏分辨率）
+     *
+     * @param streamType 视频流的类型，定义可参考 {@link TUIVideoStreamType} 的定义
+     * @param resolutionMode 分辨率模式，定义可参考 {@link TUIResolutionMode} 的定义
+     */
+    virtual void setVideoResolutionMode(TUIVideoStreamType streamType, TUIResolutionMode resolutionMode) = 0;
+
+    /**
+     * 3.9  开始屏幕分享。
      *
      * @param sourceId 屏幕分享窗口或屏幕的句柄，可以调用GetScreenSharingTargetList获取，移动端填空即可。
      * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
@@ -227,12 +254,12 @@ class TUIRoomEngine {
     virtual void startScreenSharing(const TUISourceId& sourceId, TUICallback* callback) = 0;
 
     /**
-     * 3.9  结束屏幕分享
+     * 3.10  结束屏幕分享
      */
     virtual void stopScreenSharing() = 0;
 
     /**
-     * 3.12  获取分享对象列表
+     * 3.11  获取分享对象列表
      *
      * 当您在对接桌面端系统的屏幕分享功能时，一般都需要展示一个选择分享目标的界面，这样用户能够使用这个界面选择是分享整个屏幕还是某个窗口通过本接口，您就可以查询到当前系统中可用于分享的窗口的 ID、名称以及缩略图
      * @param list 调用接口的回调，用于通知接口调用的成功或者失败
@@ -240,22 +267,12 @@ class TUIRoomEngine {
     virtual void getScreenSharingTargetList(TUIListCallback<TUIShareTarget>* list) = 0;
 
     /**
-     * 3.12  择屏幕分享对象
+     * 3.12  选择屏幕分享对象
      *
      * 当您通过 getScreenSharingTargetList 获取到可以分享的屏幕和窗口之后，您可以调用该接口选定期望分享的目标屏幕或目标窗口
      * @param sourceId 屏幕分享窗口或屏幕的句柄，可以调用 getScreenSharingTargetList 获取
      */
     virtual void selectScreenSharingTarget(const TUISourceId& sourceId) = 0;
-
-    /**
-     * 3.13 开始推送本地视频。默认开启
-     */
-    virtual void startPushLocalVideo() = 0;
-
-    /**
-     * 3.14 停止推送本地视频
-     */
-    virtual void stopPushLocalVideo() = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //
@@ -281,14 +298,11 @@ class TUIRoomEngine {
     virtual void updateAudioQuality(TUIAudioQuality quality) = 0;
 
     /**
-     * 4.4 开始推送本地音频
+     * 4.4 暂停/恢复发布本地的视频流
+     *
+     * @param mute {@link true}: 暂停 {@link false}: 恢复
      */
-    virtual void startPushLocalAudio() = 0;
-
-    /**
-     * 4.5 停止推送本地音频
-     */
-    virtual void stopPushLocalAudio() = 0;
+    virtual void muteLocalAudio(bool mute) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //
@@ -555,33 +569,58 @@ class TUIRoomEngine {
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    高级功能：获取TRTC实例
+    //                    高级功能
+    //
+    /////////////////////////////////////////////////////////////////////////////////
+
+#if TARGET_PLATFORM_DESKTOP
+
+    /**
+     * 8.2 获取设备列表（仅适用于桌面端）
+     *
+     * @param type  设备类型，指定需要获取哪种设备的列表。详见 TXMediaDeviceType 定义。
+     * @note
+     * - 使用完毕后请调用 release 方法释放资源，这样可以让 SDK 维护 ITXDeviceCollection 对象的生命周期。
+     *   - 不要使用 delete 释放返回的 Collection 对象，delete ITXDeviceCollection* 指针会导致异常崩溃。
+     *   - type 只支持 TXMediaDeviceTypeMic、TXMediaDeviceTypeSpeaker、TXMediaDeviceTypeCamera。
+     *   - 此接口只支持 Mac 和 Windows 平台。
+     */
+    virtual liteav::ITXDeviceCollection* getDevicesList(liteav::TXMediaDeviceType type) = 0;
+
+    /**
+     * 8.3 设置当前要使用的设备（仅适用于桌面端）
+     *
+     * @param type 设备类型，详见 TXMediaDeviceType 定义。
+     * @param deviceId 设备ID，您可以通过接口 {@link getDevicesList} 获得设备 ID。
+     * @return 0：操作成功；负数：操作失败。
+     */
+    virtual int setCurrentDevice(liteav::TXMediaDeviceType type, const char* deviceId) = 0;
+
+#endif
+
+    /**
+     * 8.4设置美颜级别
+     *
+     * @param beautyStyle 美颜风格，TXBeautyStyleSmooth：光滑；TXBeautyStyleNature：自然；TXBeautyStylePitu：优图。
+     * @param beautyLevel 美颜级别，取值范围 0 - 9； 0 表示关闭，9 表示效果最明显。
+     */
+    virtual void setBeautyLevel(int beautyStyle, uint32_t beautyLevel) = 0;
+
+    /**
+     * 8.5设置美白级别
+     *
+     * @param whitenessLevel 美白级别，取值范围 0 - 9；0 表示关闭，9 表示效果最明显。
+     */
+    virtual void setWhitenessLevel(uint32_t whitenessLevel) = 0;
+
+    /////////////////////////////////////////////////////////////////////////////////
+    //
+    //                    调试相关
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 9.1 获得TRTC实例对象
-     *
-     * @return 返回TRTCCloud对象
-     */
-    virtual void* getTRTCCloud() = 0;
-
-    /**
-     * 9.2 获得设备管理对象
-     *
-     * @return 返回TXDeviceManager对象
-     */
-    virtual liteav::ITXDeviceManager* getDeviceManager() = 0;
-
-    /**
-     * 9.3 获得音效管理对象
-     *
-     * @return  返回TXAudioEffectManager对象
-     */
-    virtual liteav::ITXAudioEffectManager* getAudioEffectManager() = 0;
-
-    /**
-     * 9.5 调用实验性接口
+     * 9.1 调用实验性接口
      *
      * @param  jsonStr 接口信息
      */

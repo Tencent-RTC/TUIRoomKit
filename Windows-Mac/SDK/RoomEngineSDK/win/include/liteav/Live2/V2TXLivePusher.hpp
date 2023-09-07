@@ -124,6 +124,18 @@ class V2TXLivePusher {
      */
     virtual int32_t setRenderRotation(V2TXLiveRotation rotation) = 0;
 
+    /**
+     * 设置本地摄像头预览画面的填充模式
+     *
+     * @param mode 画面填充模式 {@link V2TXLiveFillMode}。
+     *         - V2TXLiveFillModeFill 【默认值】: 图像铺满屏幕，不留黑边，如果图像宽高比不同于屏幕宽高比，部分画面内容会被裁剪掉。
+     *         - V2TXLiveFillModeFit: 图像适应屏幕，保持画面完整，但如果图像宽高比不同于屏幕宽高比，会有黑边的存在。
+     *         - V2TXLiveFillModeScaleFill: 图像拉伸铺满，因此长度和宽度可能不会按比例变化。
+     * @return 返回值 {@link V2TXLiveCode}。
+     *         - V2TXLIVE_OK: 成功。
+     */
+    virtual int32_t setRenderFillMode(V2TXLiveFillMode mode) = 0;
+
 #if TARGET_PLATFORM_PHONE
 
     /**

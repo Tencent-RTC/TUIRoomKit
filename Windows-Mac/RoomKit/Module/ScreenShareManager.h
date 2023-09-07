@@ -70,13 +70,9 @@ class ScreenShareManager :
      * @param iconSize The icon size.
      * @return List of windows (including the screen)
      */
-#ifdef _WIN32
-    virtual std::vector<ScreenCaptureSourceInfo>& GetScreenCaptureSources(const SIZE& thumb_size,
-        const SIZE& icon_size);
-#else
-    virtual std::vector<ScreenCaptureSourceInfo>& GetScreenCaptureSources(const liteav::SIZE& thumb_size,
-        const liteav::SIZE& icon_size);
-#endif
+    virtual void GetScreenCaptureSources(
+        const SIZE& thumb_size, const SIZE& icon_size,
+        GetScreenSharingSourceCallback callback);
     /**
      * @desc 释放窗口列表资源
      */

@@ -10,6 +10,7 @@ using namespace liteav;
 #endif
 #include <string>
 #include <vector>
+#include <functional>
 
 class IScreenShareManager {
  public:
@@ -46,6 +47,8 @@ class IScreenShareManager {
             , is_minimized(false) {
         }
     };
+
+    using GetScreenSharingSourceCallback = std::function<void(const std::vector<ScreenCaptureSourceInfo>& sources)>;
 
     // 屏幕分享控制参数
     // Screen sharing control parameters
@@ -145,8 +148,9 @@ class IScreenShareManager {
      * @param icon_size  Specifies the icon size of the window to be obtained
      * @return List of windows (including the screen)
      */
-    virtual std::vector<ScreenCaptureSourceInfo>& GetScreenCaptureSources(const SIZE& thumb_size,
-        const SIZE& icon_size) = 0;
+    virtual void GetScreenCaptureSources(
+        const SIZE& thumb_size, const SIZE& icon_size,
+        GetScreenSharingSourceCallback callback) = 0;
 
     /**
      * @desc 释放窗口列表资源

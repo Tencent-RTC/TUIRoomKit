@@ -468,7 +468,7 @@ class ITXDeviceManager {
 /**
  * 设置系统音量类型（仅适用于移动端）
  *
- * @deprecated v9.5 版本开始不推荐使用，建议使用 {@link TRTCCloud} 中的 startLocalAudio(quality) 接口替代之，通过 quality 参数来决策音质。
+ * @deprecated v9.5 版本开始不推荐使用，建议使用 `TRTCCloud` 中的 startLocalAudio(quality) 接口替代之，通过 quality 参数来决策音质。
  */
 #if __ANDROID__ || (__APPLE__ && TARGET_OS_IOS)
     virtual int setSystemVolumeType(TXSystemVolumeType type) = 0;

@@ -312,6 +312,9 @@ enum TXLiteAVWarning {
     ///蓝牙设备连接失败（例如其他应用通过设置通话音量占用音频通道）
     WARNING_BLUETOOTH_DEVICE_CONNECT_FAIL = 1207,
 
+    ///音频采集设备被占用
+    WARNING_MICROPHONE_IS_OCCUPIED = 1208,
+
     ///当前音频帧解码失败
     WARNING_AUDIO_FRAME_DECODE_FAIL = 2102,
 

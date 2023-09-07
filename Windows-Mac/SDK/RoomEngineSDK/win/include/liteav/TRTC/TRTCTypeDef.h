@@ -649,7 +649,7 @@ enum TRTCTranscodingConfigMode {
     ///全手动排版模式。
     ///该模式下，您需要指定每一路画面的精确排版位置。该模式的自由度最高，但易用性也最差：
     ///- 您需要填写 TRTCTranscodingConfig 中的所有参数，包括每一路画面（TRTCMixUser）的位置坐标。
-    ///- 您需要监听 TRTCCloudDelegate 中的 onUserVideoAvailable() 和 onUserAudioAvailable() 事件回调，并根据当前房间中各个麦上用户的音视频状态不断地调整 mixUsers 参数。
+    ///- 您需要监听 ITRTCCloudCallback 中的 onUserVideoAvailable() 和 onUserAudioAvailable() 事件回调，并根据当前房间中各个麦上用户的音视频状态不断地调整 mixUsers 参数。
     TRTCTranscodingConfigMode_Manual = 1,
 
     ///纯音频模式。
@@ -664,7 +664,7 @@ enum TRTCTranscodingConfigMode {
     /// - "$PLACE_HOLDER_REMOTE$"     :  指代远程用户的画面，可以设置多个。
     /// - "$PLACE_HOLDER_LOCAL_MAIN$" ： 指代本地摄像头画面，只允许设置一个。
     /// - "$PLACE_HOLDER_LOCAL_SUB$"  :  指代本地屏幕分享画面，只允许设置一个。
-    ///此模式下，您不需要监听 TRTCCloudDelegate 中的 onUserVideoAvailable 和 onUserAudioAvailable 回调进行实时调整，只需要在进房成功后调用一次 setMixTranscodingConfig 即可，之后 SDK 会自动将真实的 userId 补位到您设置的占位符上。
+    ///此模式下，您不需要监听 ITRTCCloudCallback 中的 onUserVideoAvailable 和 onUserAudioAvailable 回调进行实时调整，只需要在进房成功后调用一次 setMixTranscodingConfig 即可，之后 SDK 会自动将真实的 userId 补位到您设置的占位符上。
     TRTCTranscodingConfigMode_Template_PresetLayout = 3,
 
     ///屏幕分享模式。
@@ -858,7 +858,7 @@ struct TRTCParams {
     uint32_t sdkAppId;
 
     ///【字段含义】用户标识（必填），当前用户的 userId，相当于用户名，使用 UTF-8 编码。
-    ///【推荐取值】如果一个用户在您的帐号系统中的 ID 为“mike”，则 userId 即可设置为“mike”。
+    ///【推荐取值】如果一个用户在您的账号系统中的 ID 为“mike”，则 userId 即可设置为“mike”。
     const char *userId;
 
     ///【字段含义】用户签名（必填），当前 userId 对应的验证签名，相当于使用云服务的登录密码。
@@ -975,8 +975,8 @@ struct TRTCNetworkQosParam {
     ///【字段含义】清晰优先还是流畅优先。
     ///【推荐取值】清晰优先。
     ///【特别说明】该参数主要影响 TRTC 在较差网络环境下的音视频表现：
-    ///- 流畅优先：即当前网络不足以传输既清晰又流畅的画面时，优先保证画面的流畅性，代价就是画面会比较模糊且伴随有较多的马赛克。
-    ///- 清晰优先（默认值）：即当前网络不足以传输既清晰又流畅的画面时，优先保证画面的清晰度，代价就是画面会比较卡顿。
+    ///- 流畅优先：即当前网络不足以传输既清晰又流畅的画面时，优先保证画面的流畅性，代价就是画面会比较模糊且伴随有较多的马赛克。参见 {@link TRTCVideoQosPreferenceSmooth}
+    ///- 清晰优先（默认值）：即当前网络不足以传输既清晰又流畅的画面时，优先保证画面的清晰度，代价就是画面会比较卡顿。参见 {@link TRTCVideoQosPreferenceClear}
     TRTCVideoQosPreference preference;
 
     ///【字段含义】流控模式（已废弃）。
@@ -1132,7 +1132,7 @@ struct TRTCTexture {
     ///【字段含义】视频纹理 ID。
     int glTextureId;
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(_WIN32)
 
     ///【字段含义】纹理所在的 OpenGL 上下文环境。
     void *glContext;
@@ -1450,7 +1450,10 @@ struct TRTCAudioRecordingParams {
     ///【特别说明】默认录制所有本地和远端音频。
     TRTCAudioRecordingContent recordingContent;
 
-    TRTCAudioRecordingParams() : filePath(nullptr), recordingContent(TRTCAudioRecordingContentAll) {
+    ///【字段含义】maxDurationPerFile 录制文件分片时长，单位毫秒，最小值10000。默认值为0，表示不分片。
+    int maxDurationPerFile = 0;
+
+    TRTCAudioRecordingParams() : filePath(nullptr), recordingContent(TRTCAudioRecordingContentAll), maxDurationPerFile(0) {
     }
 };
 
@@ -1472,6 +1475,9 @@ struct TRTCLocalRecordingParams {
 
     ///【字段含义】interval 录制信息更新频率，单位毫秒，有效范围：1000-10000。默认值为-1，表示不回调。
     int interval = -1;
+
+    ///【字段含义】maxDurationPerFile 录制文件分片时长，单位毫秒，最小值10000。默认值为0，表示不分片。
+    int maxDurationPerFile = 0;
 };
 
 /**
@@ -1611,13 +1617,19 @@ struct TRTCScreenCaptureSourceInfo {
     ///【字段含义】是否为主显示屏（适用于多显示器的情况）。
     bool isMainScreen;
 
+    ///【字段含义】屏幕/窗口 x 坐标，单位:像素点。
+    uint32_t x;
+
+    ///【字段含义】屏幕/窗口 y 坐标，单位:像素点。
+    uint32_t y;
+
     ///【字段含义】屏幕/窗口宽，单位:像素点。
     uint32_t width;
 
     ///【字段含义】屏幕/窗口高，单位:像素点。
     uint32_t height;
 
-    TRTCScreenCaptureSourceInfo() : type(TRTCScreenCaptureSourceTypeUnknown), sourceId(nullptr), sourceName(nullptr), isMinimizeWindow(false), isMainScreen(false), width(0), height(0) {
+    TRTCScreenCaptureSourceInfo() : type(TRTCScreenCaptureSourceTypeUnknown), sourceId(nullptr), sourceName(nullptr), isMinimizeWindow(false), isMainScreen(false), x(0), y(0), width(0), height(0) {
     }
 };
 
@@ -1693,7 +1705,7 @@ struct TRTCAudioParallelParams {
  */
 struct TRTCUser {
     ///【字段含义】用户标识，当前用户的 userId，相当于用户名，使用 UTF-8 编码。
-    ///【推荐取值】如果一个用户在您的帐号系统中的 ID 为“mike”，则 userId 即可设置为“mike”。
+    ///【推荐取值】如果一个用户在您的账号系统中的 ID 为“mike”，则 userId 即可设置为“mike”。
     const char *userId;
 
     ///【字段含义】数字房间号，需要和您的进房参数 ({@link TRTCParams}) 中的房间号类型相匹配。
@@ -1756,9 +1768,10 @@ struct TRTCPublishTarget {
     ///【字段含义】回推房间机器人信息。
     ///【特别说明】仅当您的 mode 选择为 TRTCPublishMixStreamToRoom 时，您需要设置该参数。
     ///【特别说明】设置后，该路转码音视频数据将回推到您指定的房间中。建议设置为特殊的 userId，以避免难以区分回推机器人和您通过 TRTC SDK 进房的主播。
+    ///【特别说明】参与混流的用户不支持订阅该转码流。
     ///【特别说明】当您进房前设置的订阅模式({@link setDefaultStreamRecvMode}) 均为手动时，您需要自行管理您想要拉取的音视频流（通常当您拉取回推房间的转码流时，您应该取消订阅参与转码的对应音视频单流）。
     ///【特别说明】当您进房前设置的订阅模式({@link setDefaultStreamRecvMode}) 均为自动时，不参与转码的用户将自动收到后台下发的转码流并不再继续接收参与转码的音视频单流。除非您明确进行取消订阅（{@link muteRemoteVideoStream} 和 {@link
-    /// muteRemoteAudio}），否则转码流数据将持续下发。 【特别说明】为了减少订阅复杂性，全量订阅接口（{@link muteAllRemoteAudio} 和 {@link muteAllRemoteVideoStreams}）对回推房间机器人的下发数据不生效。 【特别说明】参与混流的用户不支持订阅该转码流。
+    /// muteRemoteAudio}），否则转码流数据将持续下发。
     TRTCUser *mixStreamIdentity;
 
     TRTCPublishTarget() : mode(TRTCPublishMode::TRTCPublishModeUnknown), cdnUrlList(nullptr), cdnUrlListSize(0), mixStreamIdentity(nullptr) {
