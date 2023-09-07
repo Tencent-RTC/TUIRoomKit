@@ -495,37 +495,38 @@ void BottomBarController::StartSharing() {
   icon_size.width = kShareIconWidth;
   icon_size.height = kShareIconHeight;
 #endif
-  std::vector<IScreenShareManager::ScreenCaptureSourceInfo> source =
-      TUIRoomCore::GetInstance()
-          ->GetScreenShareManager()
-          ->GetScreenCaptureSources(thumb_size, icon_size);
-  LINFO("GetScreenCaptureSources size=%d", source.size());
 
-  TUIRoomCore::GetInstance()
-      ->GetScreenShareManager()
-      ->RemoveAllExcludedShareWindow();
-
-  std::vector<IScreenShareManager::ScreenCaptureSourceInfo>::iterator iter =
-      source.begin();
-  while (iter != source.end()) {
-    std::string src_name = iter->source_name;
-    if (src_name.find(kAppName) != std::string::npos) {
-      if (iter->source_id != NULL)
+  auto callback =
+      [=](const std::vector<IScreenShareManager::ScreenCaptureSourceInfo>&
+              sources) {
+        auto source = sources;
         TUIRoomCore::GetInstance()
             ->GetScreenShareManager()
-            ->AddExcludedShareWindow(iter->source_id);
-      iter = source.erase(iter);
-    } else {
-      iter++;
-    }
-  }
-  if (screen_share_window_ == nullptr) {
-    screen_share_window_ = new ScreenShareWindow(this);
-    connect(screen_share_window_, SIGNAL(SignalConfirmShareScreen(bool)), this,
-            SLOT(OnConfirmShareScreen(bool)));
-  }
-  screen_share_window_->InitShow(source);
-  screen_share_window_->show();
+            ->RemoveAllExcludedShareWindow();
+        auto iter = source.begin();
+        while (iter != source.end()) {
+          std::string src_name = iter->source_name;
+          if (src_name.find(kAppName) != std::string::npos) {
+            if (iter->source_id != NULL)
+              TUIRoomCore::GetInstance()
+                  ->GetScreenShareManager()
+                  ->AddExcludedShareWindow(iter->source_id);
+            iter = source.erase(iter);
+          } else {
+            iter++;
+          }
+        }
+        if (screen_share_window_ == nullptr) {
+          screen_share_window_ = new ScreenShareWindow(this);
+          connect(screen_share_window_, SIGNAL(SignalConfirmShareScreen(bool)),
+                  this, SLOT(OnConfirmShareScreen(bool)));
+        }
+        screen_share_window_->InitShow(source);
+        screen_share_window_->show();
+      };
+
+  TUIRoomCore::GetInstance()->GetScreenShareManager()->GetScreenCaptureSources(
+      thumb_size, icon_size, callback);
 }
 
 void BottomBarController::StopSharing() {

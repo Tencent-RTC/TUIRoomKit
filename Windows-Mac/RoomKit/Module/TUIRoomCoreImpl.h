@@ -192,6 +192,7 @@ private:
     void onRequestCancelled(const char* request_id, const char* user_id) override;
     void onReceiveTextMessage(const char* room_id, const tuikit::TUIMessage& message) override;
     void onReceiveCustomMessage(const char* room_id, const tuikit::TUIMessage& message) override;
+    void onDeviceChanged(const char* deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) override;
     ///
 
     void LocalUserVideoStateChanged(tuikit::TUIVideoStreamType stream_type, bool has_video, tuikit::TUIChangeReason reason);

@@ -4,7 +4,7 @@
 ScreenShareManager::ScreenShareManager(tuikit::TUIRoomEngine* room_engine, TUIRoomCoreCallback* callback) {
     room_engine_ = room_engine;
     room_core_callback_ = callback;
-    trtc_cloud_ = static_cast<liteav::ITRTCCloud*>(room_engine->getTRTCCloud());
+    trtc_cloud_ = static_cast<liteav::ITRTCCloud*>(getTRTCShareInstance());
 }
 
 ScreenShareManager::~ScreenShareManager() {
@@ -44,52 +44,57 @@ void ScreenShareManager::ResumeScreenCapture() {
         trtc_cloud_->resumeScreenCapture();
     }
 }
-std::vector<IScreenShareManager::ScreenCaptureSourceInfo>& ScreenShareManager::GetScreenCaptureSources\
-                                                            (const SIZE& thumb_size, const SIZE& icon_size) {
-
-    if (room_engine_ != nullptr) {
-        screen_window_info_list_.clear();
-        TUIRoomEngineGetShareTargetListCallback* callback = new TUIRoomEngineGetShareTargetListCallback;
-        callback->SetCallback([=](tuikit::TUIList<tuikit::TUIShareTarget>* target) {
-            int count = target->getSize();
-            for (int i = 0; i < count; i++) {
-                const tuikit::TUIShareTarget* item = target->getElement(i);
-                IScreenShareManager::ScreenCaptureSourceInfo window_info;
-                window_info.source_id = item->id;
-                window_info.source_name = item->sourceName;
-                switch (item->sourceType) {
-                case tuikit::TUICaptureSourceType::kScreen:
-                    window_info.type = IScreenShareManager::kScreen;
-                    break;
-                case tuikit::TUICaptureSourceType::kWindow:
-                    window_info.type = IScreenShareManager::kWindow;
-                    break;
-                default:
-                    window_info.type = IScreenShareManager::kUnknown;
-                    break;
-                }
-                window_info.thumb_bgra.buffer = item->thumbnailImage.buffer;
-                window_info.thumb_bgra.length = item->thumbnailImage.length;
-                window_info.thumb_bgra.width = item->thumbnailImage.width;
-                window_info.thumb_bgra.height = item->thumbnailImage.height;
-
-                window_info.icon_bgra.buffer = item->iconImage.buffer;
-                window_info.icon_bgra.length = item->iconImage.length;
-                window_info.icon_bgra.width = item->iconImage.width;
-                window_info.icon_bgra.height = item->iconImage.height;
-
-                window_info.is_minimized = item->isMinimized;
-                screen_window_info_list_.push_back(window_info);
+void ScreenShareManager::GetScreenCaptureSources(
+    const SIZE& thumb_size, const SIZE& icon_size,
+    GetScreenSharingSourceCallback callback) {
+  if (room_engine_ != nullptr) {
+    screen_window_info_list_.clear();
+    TUIRoomEngineGetShareTargetListCallback* get_source_callback =
+        new TUIRoomEngineGetShareTargetListCallback;
+    get_source_callback->SetCallback(
+        [=](tuikit::TUIList<tuikit::TUIShareTarget>* target) {
+          int count = target->getSize();
+          for (int i = 0; i < count; i++) {
+            const tuikit::TUIShareTarget* item = target->getElement(i);
+            IScreenShareManager::ScreenCaptureSourceInfo window_info;
+            window_info.source_id = item->id;
+            window_info.source_name = item->sourceName;
+            switch (item->sourceType) {
+              case tuikit::TUICaptureSourceType::kScreen:
+                window_info.type = IScreenShareManager::kScreen;
+                break;
+              case tuikit::TUICaptureSourceType::kWindow:
+                window_info.type = IScreenShareManager::kWindow;
+                break;
+              default:
+                window_info.type = IScreenShareManager::kUnknown;
+                break;
             }
-            }, [=](const tuikit::TUIError code, const std::string& message) {
-                if (room_core_callback_ != nullptr) {
-                    room_core_callback_->OnError(-1, "tuikit engine room error: get share target failed.");
-                }
-            });
-        room_engine_->getScreenSharingTargetList(callback);
-    }
+            window_info.thumb_bgra.buffer = item->thumbnailImage.buffer;
+            window_info.thumb_bgra.length = item->thumbnailImage.length;
+            window_info.thumb_bgra.width = item->thumbnailImage.width;
+            window_info.thumb_bgra.height = item->thumbnailImage.height;
 
-    return screen_window_info_list_;
+            window_info.icon_bgra.buffer = item->iconImage.buffer;
+            window_info.icon_bgra.length = item->iconImage.length;
+            window_info.icon_bgra.width = item->iconImage.width;
+            window_info.icon_bgra.height = item->iconImage.height;
+
+            window_info.is_minimized = item->isMinimized;
+            screen_window_info_list_.push_back(window_info);
+          }
+          if (callback) {
+            callback(screen_window_info_list_);
+          }
+        },
+        [=](const tuikit::TUIError code, const std::string& message) {
+          if (room_core_callback_ != nullptr) {
+            room_core_callback_->OnError(
+                -1, "tuikit engine room error: get share target failed.");
+          }
+        });
+    room_engine_->getScreenSharingTargetList(get_source_callback);
+  }
 }
 void ScreenShareManager::ReleaseScreenCaptureSources() {
     if (source_window_list_ != nullptr) {

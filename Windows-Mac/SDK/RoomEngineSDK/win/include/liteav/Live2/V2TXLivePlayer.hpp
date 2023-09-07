@@ -215,7 +215,7 @@ class V2TXLivePlayer {
     /**
      * 开启/关闭对视频帧的监听回调
      *
-     * SDK 在您开启次此开关后将不再渲染视频画面，您可以通过 V2TXLivePlayerObserver 获得视频帧，并执行自定义的渲染逻辑。
+     * SDK 在您开启此开关后将不再渲染视频画面，您可以通过 V2TXLivePlayerObserver 获得视频帧，并执行自定义的渲染逻辑。
      * @param enable      是否开启自定义渲染。【默认值】：false。
      * @param pixelFormat 自定义渲染回调的视频像素格式 {@link V2TXLivePixelFormat}。
      * @param bufferType  自定义渲染回调的视频数据格式 {@link V2TXLiveBufferType}。

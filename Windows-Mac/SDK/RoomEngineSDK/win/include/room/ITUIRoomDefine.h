@@ -174,7 +174,20 @@ enum class TUIKickedOutOfRoomReason {
 };
 
 /**
- * 2.6 屏幕分享捕获源类型
+ * 2.6 分辨率模式（横屏 or 竖屏）
+ */
+enum class TUIResolutionMode {
+
+    /// 横屏
+    kResolutionMode_Landscape = 0,
+
+    /// 竖屏
+    kResolutionMode_Portrait = 1,
+
+};
+
+/**
+ * 2.7 屏幕分享捕获源类型
  */
 enum class TUICaptureSourceType {
 
@@ -355,6 +368,26 @@ struct TUIUserInfo {
     bool hasScreenStream;
 
     TUIUserInfo() : userRole(TUIRole::kGeneralUser), hasAudioStream(false), hasVideoStream(false), hasScreenStream(false) {
+    }
+};
+
+/**
+ * 5.3 视频编码参数
+ */
+struct TUIVideoEncoderParams {
+    /// 视频质量, 请参考：{@link TUIVideoQuality}。
+    TUIVideoQuality videoResolution;
+
+    /// 分辨率模式, 请参考：{@link TUIResolutionMode}。
+    TUIResolutionMode resolutionMode;
+
+    /// 视频采集帧率
+    int fps;
+
+    /// 目标视频码率
+    int bitrate;
+
+    TUIVideoEncoderParams() : videoResolution(TUIVideoQuality::kVideoQuality_720P), resolutionMode(TUIResolutionMode::kResolutionMode_Landscape), fps(15), bitrate(1500) {
     }
 };
 

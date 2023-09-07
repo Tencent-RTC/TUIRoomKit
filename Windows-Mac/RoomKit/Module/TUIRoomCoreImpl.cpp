@@ -77,7 +77,7 @@ int TUIRoomCoreImpl::Login(int sdk_appid, const std::string& user_id, const std:
     if (room_engine_ == nullptr) {
       room_engine_ = createTUIRoomEngine();
         if (room_engine_ != nullptr) {
-            trtc_cloud_ = static_cast<ITRTCCloud*>(room_engine_->getTRTCCloud());
+            trtc_cloud_ = getTRTCShareInstance();
             room_engine_->addObserver(this);
         } else {
             LINFO("getRoomEngineInstance error,trtc_cloud is null");
@@ -1008,7 +1008,7 @@ int TUIRoomCoreImpl::EnterSpeechState(SuccessCallback success_callback,
 
 liteav::ITXDeviceManager* TUIRoomCoreImpl::GetDeviceManager() {
     if (device_manager_ == nullptr) {
-        device_manager_ = room_engine_->getDeviceManager();
+        device_manager_ = getTRTCShareInstance()->getDeviceManager();
     }
     return device_manager_;
 }
@@ -1033,7 +1033,7 @@ int TUIRoomCoreImpl::SetBeautyStyle(liteav::TRTCBeautyStyle style, uint32_t beau
     if (trtc_cloud_ == nullptr) {
         return -1;
     }
-    trtc_cloud_ = static_cast<ITRTCCloud*>(room_engine_->getTRTCCloud());
+    trtc_cloud_ = getTRTCShareInstance();
     trtc_cloud_->setBeautyStyle(style, beauty_level, whiteness_level, ruddiness_level);
     return 0;
 }
@@ -1203,7 +1203,7 @@ void TUIRoomCoreImpl::OnFirstVideoFrame(const char* user_id, const TUIStreamType
 
 // TUIRoomEngine callback
 void TUIRoomCoreImpl::onError(tuikit::TUIError error_code, const char* message){}
-void TUIRoomCoreImpl::onKickedOutOfRoom(const char* room_id,tuikit::TUIKickedOutOfRoomReason reason, const char* message) {
+void TUIRoomCoreImpl::onKickedOutOfRoom(const char* room_id, tuikit::TUIKickedOutOfRoomReason reason, const char* message) {
   LINFO("onKickedOutOfRoom [room_id:%s] [message:%s]", room_id, message);
     if (room_core_callback_ != nullptr) {
         room_core_callback_->OnExitRoom(TUIExitRoomType::kKickOff, "room engine kicked out of room.");
@@ -1530,6 +1530,10 @@ void TUIRoomCoreImpl::onReceiveCustomMessage(const char* room_id, const tuikit::
     }
 }
 
+void TUIRoomCoreImpl::onDeviceChanged(const char* deviceId,
+                                      liteav::TXMediaDeviceType type,
+                                      liteav::TXMediaDeviceState state) {}
+
 void TUIRoomCoreImpl::LocalUserVideoStateChanged(tuikit::TUIVideoStreamType stream_type, bool has_video, tuikit::TUIChangeReason reason) {
   if (stream_type == tuikit::TUIVideoStreamType::kCameraStream || stream_type == tuikit::TUIVideoStreamType::kCameraStreamLow) {
     local_user_info_.has_video_stream = has_video;
@@ -1566,7 +1570,10 @@ void TUIRoomCoreImpl::LocalUserAudioStateChanged(bool has_audio, tuikit::TUIChan
 void TUIRoomCoreImpl::RemoteUserVideoStateChanged(const std::string& user_id, tuikit::TUIVideoStreamType stream_type, bool has_video) {
   auto iter = room_user_map_.find(user_id);
   if (iter == room_user_map_.end()) {
-    return;
+    TUIUserInfo info;
+    info.user_id = user_id;
+    room_user_map_[user_id] = info;
+    iter = room_user_map_.find(user_id);
   }
 
   liteav::TRTCRenderParams param;
@@ -1603,7 +1610,10 @@ void TUIRoomCoreImpl::RemoteUserVideoStateChanged(const std::string& user_id, tu
 void TUIRoomCoreImpl::RemoteUserAduioStateChanged(const std::string& user_id, bool has_audio){
   auto iter = room_user_map_.find(user_id);
   if (iter == room_user_map_.end()) {
-    return;
+    TUIUserInfo info;
+    info.user_id = user_id;
+    room_user_map_[user_id] = info;
+    iter = room_user_map_.find(user_id);
   }
 
   iter->second.has_audio_stream = has_audio;

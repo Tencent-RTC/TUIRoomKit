@@ -1,6 +1,6 @@
 ﻿/**
  * Copyright (c) 2021 Tencent. All rights reserved.
- * Module:   TRTCCloudDelegate @ TXLiteAVSDK
+ * Module:   ITRTCCloudCallback @ TXLiteAVSDK
  * Function: 腾讯云实时音视频的事件回调接口
  */
 #ifndef __TRTCCLOUDCALLBACK_H__
@@ -28,7 +28,7 @@ class ITRTCCloudCallback {
      * 1.1 错误事件回调
      *
      * 错误事件，表示 SDK 抛出的不可恢复的错误，比如进入房间失败或设备开启失败等。
-     * 参考文档：[错误码表](https://cloud.tencent.com/document/product/647/32257)
+     * 参考文档：[错误码表](https://cloud.tencent.com/document/product/647/38308)
      * @param errCode 错误码
      * @param errMsg  错误信息
      * @param extInfo 扩展信息字段，个别错误码可能会带额外的信息帮助定位问题
@@ -39,7 +39,7 @@ class ITRTCCloudCallback {
      * 1.2 警告事件回调
      *
      * 警告事件，表示 SDK 抛出的提示性问题，比如视频出现卡顿或 CPU 使用率太高等。
-     * 参考文档：[错误码表](https://cloud.tencent.com/document/product/647/32257)
+     * 参考文档：[错误码表](https://cloud.tencent.com/document/product/647/38308)
      * @param warningCode 警告码
      * @param warningMsg 警告信息
      * @param extInfo 扩展信息字段，个别警告码可能会带额外的信息帮助定位问题
@@ -55,10 +55,10 @@ class ITRTCCloudCallback {
     /**
      * 2.1 进入房间成功与否的事件回调
      *
-     * 调用 TRTCCloud 中的 enterRoom() 接口执行进房操作后，会收到来自 TRTCCloudDelegate 的 onEnterRoom(result) 回调：
+     * 调用 TRTCCloud 中的 enterRoom() 接口执行进房操作后，会收到来自 ITRTCCloudCallback 的 onEnterRoom(result) 回调：
      * - 如果加入成功，回调 result 会是一个正数（result > 0），代表进入房间所消耗的时间，单位是毫秒（ms）。
      * - 如果加入失败，回调 result 会是一个负数（result < 0），代表失败原因的错误码。
-     *  进房失败的错误码含义请参见[错误码表](https://cloud.tencent.com/document/product/647/32257)。
+     *  进房失败的错误码含义请参见[错误码表](https://cloud.tencent.com/document/product/647/38308)。
      * @param result result > 0 时为进房耗时（ms），result < 0 时为进房错误码。
      * @note
      * 1. 在 Ver6.6 之前的版本，只有进房成功会抛出 onEnterRoom(result) 回调，进房失败由 onError() 回调抛出。
@@ -169,10 +169,10 @@ class ITRTCCloudCallback {
      * 3.4 某远端用户发布/取消了辅路视频画面
      *
      * “辅路画面”一般被用于承载屏幕分享的画面。当您收到 onUserSubStreamAvailable(userId, true) 通知时，表示该路画面已经有可播放的视频帧到达。
-     * 此时，您需要调用 {@link startRemoteSubStreamView} 接口订阅该用户的远程画面，订阅成功后，您会继续收到该用户的首帧画面渲染回调 onFirstVideoFrame(userid)。
+     * 此时，您需要调用 {@link startRemoteView} 接口订阅该用户的远程画面，订阅成功后，您会继续收到该用户的首帧画面渲染回调 onFirstVideoFrame(userid)。
      * @param userId 远端用户的用户标识。
      * @param available 该用户是否发布（或取消发布）了辅路视频画面，true: 发布；false：取消发布。
-     * @note 显示辅路画面使用的函数是 {@link startRemoteSubStreamView} 而非 {@link startRemoteView}。
+     * @note 显示辅路画面使用的函数是 {@link startRemoteView} 而非 {@link startRemoteSubStreamView}，startRemoteSubStreamView 已经被废弃。
      */
     virtual void onUserSubStreamAvailable(const char* userId, bool available) {
     }
@@ -692,7 +692,13 @@ class ITRTCCloudCallback {
      * 10.1 本地录制任务已经开始的事件回调
      *
      * 当您调用 {@link startLocalRecording} 启动本地媒体录制任务时，SDK 会抛出该事件回调，用于通知您录制任务是否已经顺利启动。
-     * @param errCode 错误码 0：初始化录制成功；-1：初始化录制失败；-2: 文件后缀名有误。
+     * @param errCode 状态码。
+     *               - 0：录制任务启动成功。
+     *               - -1：内部错误导致录制任务启动失败。
+     *               - -2：文件后缀名有误（比如不支持的录制格式）。
+     *               - -6：录制已经启动，需要先停止录制。
+     *               - -7：录制文件已存在，需要先删除文件。
+     *               - -8：录制目录无写入权限，请检查目录权限问题。
      * @param storagePath 录制文件存储路径。
      */
     virtual void onLocalRecordBegin(int errCode, const char* storagePath) {
@@ -711,17 +717,30 @@ class ITRTCCloudCallback {
     }
 
     /**
-     * 10.3 本地录制任务已经结束的事件回调
+     * 10.3 本地录制分片的事件回调
+     *
+     * 当您开启分片录制时，每完成一个分片，都会通过此接口回调。
+     * @param storagePath 分片文件存储路径。
+     */
+    virtual void onLocalRecordFragment(const char* storagePath) {
+    }
+
+    /**
+     * 10.4 本地录制任务已经结束的事件回调
      *
      * 当您调用 {@link stopLocalRecording} 停止本地媒体录制任务时，SDK 会抛出该事件回调，用于通知您录制任务的最终结果。
-     * @param errCode 错误码 0：录制成功；-1：录制失败；-2：切换分辨率或横竖屏导致录制结束；-3：音频数据或者视频数据一直没有到达导致没有开始正式录制。
+     * @param errCode 状态码。
+     *               -  0：结束录制任务成功。
+     *               - -1：录制失败。
+     *               - -2：切换分辨率或横竖屏导致录制结束。
+     *               - -3：录制时间太短，或未采集到任何视频或音频数据，请检查录制时长，或是否已开启音、视频采集。
      * @param storagePath 录制文件存储路径。
      */
     virtual void onLocalRecordComplete(int errCode, const char* storagePath) {
     }
 
     /**
-     * 10.4 本地截图完成的事件回调
+     * 10.5 本地截图完成的事件回调
      *
      * @param userId 用户标识，如果 userId 为空字符串，则代表截取的是本地画面。
      * @param type   视频流类型。
@@ -838,6 +857,12 @@ class ITRTCVideoFrameCallback {
     }
 
     /**
+     * SDK 内部 OpenGL 环境已经创建的通知
+     */
+    virtual void onGLContextCreated() {
+    }
+
+    /**
      * 用于对接第三方美颜组件的视频处理回调
      *
      * 如果您选购了第三方美颜组件，就需要在 TRTCCloud 中设置第三方美颜回调，之后 TRTC 就会将原本要进行预处理的视频帧通过此回调接口抛送给您。
@@ -845,8 +870,8 @@ class ITRTCVideoFrameCallback {
      * 情况一：美颜组件自身会产生新的纹理。
      * 如果您使用的美颜组件会在处理图像的过程中产生一帧全新的纹理（用于承载处理后的图像），那请您在回调函数中将 dstFrame.textureId 设置为新纹理的 ID：
      * <pre>
-     * uint32_t onProcessVideoFrame(TRTCVideoFrame * srcFrame, TRTCVideoFrame *dstFrame) {
-     *     dstFrame->textureId = mFURenderer.onDrawFrameSingleImput(srcFrame->textureId);
+     * int onProcessVideoFrame(TRTCVideoFrame * srcFrame, TRTCVideoFrame *dstFrame) {
+     *     dstFrame->textureId = mFURenderer.onDrawFrameSingleInput(srcFrame->textureId);
      *     return 0;
      * }
      * </pre>
@@ -866,6 +891,12 @@ class ITRTCVideoFrameCallback {
      */
     virtual int onProcessVideoFrame(TRTCVideoFrame* srcFrame, TRTCVideoFrame* dstFrame) {
         return 0;
+    }
+
+    /**
+     * SDK 内部 OpenGL 环境被销毁的通知
+     */
+    virtual void onGLContextDestroy() {
     }
 };
 

@@ -7,6 +7,7 @@
 #define TUIROOMOBSERVER_H_
 
 #include "ITUIRoomDefine.h"
+#include "TRTCTypeDef.h"
 
 namespace tuikit {
 
@@ -103,7 +104,7 @@ class TUIRoomObserver {
     virtual void onKickedOutOfRoom(const char* roomId, TUIKickedOutOfRoomReason reason, const char* message) = 0;
 
     /**
-     * 3.8 房间麦控模式发生变化
+     * 3.7 房间麦控模式发生变化
      *
      * @param roomId 房间ID
      * @param mode 房间模式
@@ -260,6 +261,16 @@ class TUIRoomObserver {
      * @param message 消息内容, 请参考: {@link TUIMessage} 定义
      */
     virtual void onReceiveCustomMessage(const char* roomId, const TUIMessage& message) = 0;
+
+    /**
+     * 7.3 本地设备添加事件
+     *
+     * @note 当本地设备（包括摄像头、麦克风以及扬声器）添加时，SDK 便会抛出此事件回调
+     * @param deviceId 设备 ID。
+     * @param type 设备类型。
+     * @param state 通断状态，0：设备已添加；1：设备已被移除；2：设备已启用
+     */
+    virtual void onDeviceChanged(const char* deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) = 0;
 };
 
 }  // namespace tuikit
