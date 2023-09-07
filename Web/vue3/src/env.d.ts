@@ -9,8 +9,6 @@ declare module '*.vue' {
   export default component;
 }
 
-declare const TencentCaptcha: any;
-
 interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string;
   readonly VITE_RUNTIME_ENV: string;
