@@ -13,7 +13,7 @@ TUIRoomEngine.once('ready', () => {
     api: 'setFramework',
     params: {
       component: 'TUIRoomKit',
-      language: vueVersion
-    }
-  }))
+      language: vueVersion,
+    },
+  }));
 });

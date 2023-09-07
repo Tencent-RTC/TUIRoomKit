@@ -19,6 +19,7 @@
       :user-name="userName"
       @create-room="handleCreateRoom"
       @enter-room="handleEnterRoom"
+      @update-user-name="handleUpdateUserName"
     ></room-control>
   </div>
 </template>
@@ -34,22 +35,20 @@ import router from '@/router';
 import { useRoute } from 'vue-router';
 import { onMounted, Ref, ref } from 'vue';
 import { getBasicInfo } from '@/config/basic-info-config';
-import { useI18n } from 'vue-i18n';
 import { useBasicStore } from '../TUIRoom/stores/basic';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
-import isMobile from '../TUIRoom/utils/useMediaValue';
+import { isMobile }  from '../TUIRoom/utils/useMediaValue';
+import logger from '@/TUIRoom/utils/common/logger';
 
 const route = useRoute();
 const streamPreviewRef = ref();
 const userName: Ref<string> = ref('');
 const avatarUrl: Ref<string> = ref('');
 const userId: Ref<string> = ref('');
-const { t } = useI18n();
 const roomEngine = useGetRoomEngine();
 const basicStore = useBasicStore();
 const roomControlRef = ref();
-
 const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId : '';
 const givenRoomId: Ref<string> = ref((roomId) as string);
 
@@ -97,7 +96,7 @@ async function generateRoomId(): Promise<string> {
 async function handleCreateRoom(mode: string) {
   setTUIRoomData('createRoom', mode);
   const roomId = await generateRoomId();
-  router.replace({
+  router.push({
     path: 'room',
     query: {
       roomId,
@@ -112,12 +111,22 @@ async function handleCreateRoom(mode: string) {
 **/
 async function handleEnterRoom(roomId: string) {
   setTUIRoomData('enterRoom');
-  router.replace({
+  router.push({
     path: 'room',
     query: {
       roomId,
     },
   });
+}
+
+function handleUpdateUserName(userName: string) {
+  try {
+    const currentUserInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo') as string);
+    currentUserInfo.userName = userName;
+    sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(currentUserInfo));
+  } catch (error) {
+    logger.log('sessionStorage error', error);
+  }
 }
 
 /**
@@ -171,9 +180,6 @@ onMounted(() => {
 <style>
 @import '../TUIRoom/assets/style/black-theme.scss';
 @import '../TUIRoom/assets/style/white-theme.scss';
-* {
-    transition: background-color .5s,color .5s !important;
-  }
 </style>
 
 <style lang="scss" scoped>
@@ -186,6 +192,8 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   font-family: PingFangSC-Medium;
+  transition: background .5s,color .5s;
+
     .header-H5{
       width: 100%;
       position: absolute;

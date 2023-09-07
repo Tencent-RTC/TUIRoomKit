@@ -6,12 +6,12 @@
       :icon-name="ICON_NAME.ApplyOnSeat"
       @click-icon="toggleApplySpeech"
     />
-    <div v-show="hasApplyToAnchorUser && !showApplyUserList" class="attention master-attention">
+    <div v-if="hasApplyToAnchorUser && !showApplyUserList" class="attention master-attention">
       <svg-icon icon-name="apply-big-icon" class="apply-big-icon"></svg-icon>
       <span class="info">{{ applyToAnchorList.length }}</span>
     </div>
     <div
-      v-show="showApplyUserList"
+      v-if="showApplyUserList"
       ref="masterApplyListRef"
       :class="isMobile ? 'apply-list-container-h5':'apply-list-container'"
     >
@@ -49,7 +49,7 @@ import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
 import { useI18n } from '../../../locales';
-import isMobile from '../../../utils/useMediaValue';
+import { isMobile }  from '../../../utils/useMediaValue';
 
 const { t } = useI18n();
 
@@ -131,7 +131,7 @@ onBeforeUnmount(() => {
       font-size: 14px;
     }
   }
-  .apply-list-container, .apply-list-container-h5 {
+  .apply-list-container{
     width: 470px;
     height: 286px;
     background: var(--apply-list-container-bg-color);
@@ -192,7 +192,6 @@ onBeforeUnmount(() => {
         }
         .control-container {
           display: flex;
-          width: 176px;
           justify-content: space-between;
         }
       }
@@ -210,13 +209,13 @@ onBeforeUnmount(() => {
       font-weight: 400;
       font-size: 14px;
       color: var(--apply-list-container-color);
-      min-width: 82px;
       text-align: center;
       cursor: pointer;
     }
     .primary {
       background-image: linear-gradient(235deg, #1883FF 0%, #0062F5 100%);
       color: var(--apply-container-primary);
+      margin-right: 5px;
     }
     .outline {
       background: rgba(173,182,204,0.10);
@@ -230,11 +229,71 @@ onBeforeUnmount(() => {
     border-radius: 13px;
     display: flex;
     flex-direction: column;
+    background: var(--apply-list-container-bg-color);
+    box-shadow: 0 1px 10px 0 rgba(0,0,0,0.30);
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    padding: 12px 20px;
+    color: #CFD4E6;
+    .title-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .title {
+        font-weight: 500;
+        font-size: 16px;
+        color: var(--apply-list-container-color);
+      }
+      .close {
+        cursor: pointer;
+      }
+    }
     .apply-list {
       max-height: 72%;
+      overflow: scroll;
+      margin-top: 4px;
+      flex: 1;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      .apply-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 48px;
+        margin-top: 8px;
+        .user-info {
+          height: 100%;
+          display: flex;
+          align-items: center;
+          .avatar-url {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+          }
+          .user-name {
+            font-weight: 500;
+            font-size: 14px;
+            color: #7C85A6;
+            line-height: 22px;
+            margin-left: 9px;
+            max-width: 180px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+          }
+        }
+        .control-container {
+          display: flex;
+          justify-content: space-between;
+        }
+      }
     }
     .apply-footer {
       height: 40px;
+      margin-top: auto;
       .button {
         width: 100%;
         background: var(--apply-container-background-outline-h5);
@@ -245,9 +304,21 @@ onBeforeUnmount(() => {
         padding: 8px;
       }
     }
+    .button {
+      border-radius: 2px;
+      padding: 4px 15px;
+      font-family: PingFangSC-Regular;
+      font-weight: 400;
+      font-size: 14px;
+      color: var(--apply-list-container-color);
+      text-align: center;
+      cursor: pointer;
+    }
     .primary {
+      background-image: linear-gradient(235deg, #1883FF 0%, #0062F5 100%);
       border-radius: 8px;
       color: var(--apply-container-primary);
+      margin-right: 5px;
     }
     .outline {
       border-radius: 8px;
