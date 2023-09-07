@@ -4,7 +4,7 @@ import { useChatStore } from '../../stores/chat';
 import { storeToRefs } from 'pinia';
 import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
-import { computed, onUnmounted, ref } from 'vue';
+import { computed, onUnmounted } from 'vue';
 import logger from '../../utils/common/logger';
 
 export default function useSideBar() {
@@ -14,6 +14,7 @@ export default function useSideBar() {
   const chatStore = useChatStore();
   const basicStore = useBasicStore();
   const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
+  const showSideBar = computed(() => isSidebarOpen.value && sidebarName.value !== 'transfer-leave');
   const title = computed((): string => {
     let sidebarTitle = '';
     switch (sidebarName.value) {
@@ -28,9 +29,6 @@ export default function useSideBar() {
         break;
       case 'manage-member':
         sidebarTitle = 'Member management';
-        break;
-      case 'transfer-leave':
-        sidebarTitle = 'Appoint a new host';
         break;
       default:
         break;
@@ -66,7 +64,9 @@ export default function useSideBar() {
     isSidebarOpen,
     title,
     sidebarName,
-    handleClose }
+    handleClose,
+    showSideBar,
+  }
   ;
 }
 
