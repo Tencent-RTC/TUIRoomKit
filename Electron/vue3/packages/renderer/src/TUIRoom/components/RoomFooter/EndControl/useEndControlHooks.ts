@@ -23,7 +23,7 @@ export default function useEndControl() {
   const roomStore = useRoomStore();
   const { localUser, remoteAnchorList } = storeToRefs(roomStore);
   const title = computed(() => (currentDialogType.value === DialogType.BasicDialog ? t('Leave room?') : t('Select a new host')));
-  const showLeaveRoom = computed(() => (
+  const isShowLeaveRoomDialog = computed(() => (
     roomStore.isMaster && remoteAnchorList.value.length > 0)
   || !roomStore.isMaster);
   const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
@@ -68,17 +68,15 @@ export default function useEndControl() {
   async function closeMediaBeforeLeave() {
     if (localUser.value.hasAudioStream) {
       await roomEngine.instance?.closeLocalMicrophone();
-      await roomEngine.instance?.stopPushLocalAudio();
     }
     if (localUser.value.hasVideoStream) {
       await roomEngine.instance?.closeLocalCamera();
-      await roomEngine.instance?.stopPushLocalVideo();
     }
   }
   return {
     t,
     basicStore,
-    showLeaveRoom,
+    isShowLeaveRoomDialog,
     roomStore,
     roomEngine,
     localUser,
