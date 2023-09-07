@@ -1,6 +1,9 @@
 <template>
-  <div class="mirror-container">
-    <svg-icon class="mirror-icon" size="custom" icon-name="mirror" @tap="toogleMirrorStatus"></svg-icon>
+  <div class="mirror-icon">
+    <svg-icon
+      @tap="toogleMirrorStatus" icon-name="mirror" size="custom"
+      :custom-style="{backgroundSize: '50%'}"
+    ></svg-icon>
   </div>
 </template>
 <script setup lang="ts">
@@ -29,8 +32,7 @@ function toogleMirrorStatus() {
 <style lang="scss" scoped>
   .mirror-icon{
     display: block;
-    width: 16px;
-    height: 16px;
-    background-size: cover;
+    width: 32px;
+    height: 32px;
   }
 </style>

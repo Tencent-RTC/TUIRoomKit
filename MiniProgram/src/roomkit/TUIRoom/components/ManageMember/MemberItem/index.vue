@@ -6,7 +6,7 @@
   >
     <member-info :ref="(el) => setMemberInfoRef(el)" :show-state-icon="true" :user-info="userInfo"></member-info>
     <member-control
-      v-show="showMemberControl"
+      v-if="showMemberControl"
       :ref="(el) => setMemberControlRef(el)"
       :user-info="userInfo"
       @on-close-control="handleCloseControl"

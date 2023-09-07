@@ -1,25 +1,18 @@
 <template>
   <div class="conference-container">
     <div v-if="isShowRoomInfoTitle" @click="toggleShowRoomInfoStatus">
-      <div v-if="isWeChat" class="title-container">
-        <span class="text">{{ masterUserName }}</span>
-        <span class="text">{{ '的视频会议' }}</span>
-        <svg-icon class="chevron-down-icon" size="custom" icon-name="chevron-down"></svg-icon>
-      </div>
-      <div v-else class="title-container">
-        <span class="text">{{ t('video conferencing', { user: masterUserName }) }}</span>
-        <svg-icon class="chevron-down-icon" size="custom" icon-name="chevron-down"></svg-icon>
+      <div class="title-container">
+        <span class="text">{{ conferenceTitle }}</span>
+        <span class="chevron-down-container">
+          <svg-icon class="chevron-down-icon" size="custom" icon-name="chevron-down"></svg-icon>
+        </span>
       </div>
     </div>
     <div v-if="isShowRoomInfo" class="roomInfo-container">
       <div ref="roomInfoRef" class="roomInfo-container-main">
-        <div v-if="isWeChat" class="roomInfo-title">
-          <span class="master-header">{{ masterUserName }}</span>
-          <span class="master-header">{{ '的视频会议' }}</span>
+        <div class="roomInfo-title">
+          <span class="master-header">{{ conferenceTitle }}</span>
           <span class="cancel" @click="handleHiddenRoomInfo">{{ t('Cancel') }}</span>
-        </div>
-        <div v-else class="roomInfo-title">
-          <span class="master-header">{{ t('video conferencing', { user: masterUserName }) }}</span>
         </div>
         <div class="roomInfo-middle">
           <div class="roomInfo-role">
@@ -75,11 +68,13 @@ const masterUserName = computed(() => (roomStore.getUserName(masterUserId.value)
 
 const isShowRoomInfoTitle = computed(() => (masterUserName.value));
 
+const conferenceTitle = computed(() => `${masterUserName.value}${t('video conferencing')}`);
+
 function toggleShowRoomInfoStatus() {
   isShowRoomInfo.value = !isShowRoomInfo.value;
 }
 
-async function  onCopy(value: string | number) {
+async function onCopy(value: string | number) {
   try {
     await clipBoard(value);
     ElMessage({
@@ -117,7 +112,7 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .conference-container{
   min-width: 140px;
-  max-width: 200px;
+  max-width: 300px;
 }
 
 .title-container{
@@ -125,13 +120,21 @@ onUnmounted(() => {
   align-items: center;
 }
 
-.text{
+.text {
   font-weight: 500;
   font-size: 12px;
   line-height: 17px;
+  max-width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   color: var(--input-font-color);
 }
 .master-header{
+  max-width: 300px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   padding: 20px 0;
 }
 .text-right {
@@ -144,13 +147,16 @@ onUnmounted(() => {
   color: var(--popup-title-color-h5);
   padding-left: 25px;
 }
-.chevron-down-icon{
-    background-size: cover;
-    width: 10px;
-    height: 7px;
+.chevron-down-container {
     display: flex;
-    align-items: center;
     margin-left: 5px;
+    .chevron-down-icon {
+      display: flex;
+      background-size: cover;
+      width: 10px;
+      height: 7px;
+      align-items: center;
+    }
 }
 .roomInfo-container{
   position: fixed;

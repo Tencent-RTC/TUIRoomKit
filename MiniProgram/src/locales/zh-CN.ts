@@ -56,7 +56,7 @@ export default {
   'Raise Hand Room': '举手发言房间',
   'Join Room': '进入房间',
   'Enter room ID': '输入房间号',
-  'video conferencing': '{user} 的视频会议',
+  'video conferencing': ' 的视频会议',
   'Room ID': '房间号',
   'Low Definition': '流畅',
   'Standard Definition': '标清',
@@ -216,4 +216,6 @@ export default {
   'Camera not detected on current device': '当前设备未检测到摄像头',
   'Camera And Microphone not detected on current device': '当前设备未检测到摄像头和麦克风',
   'Another user is currently sharing the screen, screen sharing is not possible.': '当前有其他用户正在屏幕共享，无法进行屏幕共享',
+  'This action causes the room to be exited, does it continue?': '该操作会导致退出房间，是否继续？',
+  'This action causes the room to be disbanded, does it continue?': '该操作会导致解散房间，是否继续？',
 };

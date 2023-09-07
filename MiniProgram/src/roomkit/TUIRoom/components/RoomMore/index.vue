@@ -50,7 +50,6 @@ span{
 }
 .contact-container-main {
   width: 100%;
-  height: 25vh;
   background: var(--popup-background-color-h5);
   border-radius: 15px 15px 0px 0px;
   position: fixed;

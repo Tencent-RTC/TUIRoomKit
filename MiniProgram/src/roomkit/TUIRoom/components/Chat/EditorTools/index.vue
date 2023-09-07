@@ -3,7 +3,7 @@
     <div
       v-for="(childrenItem, childrenIndex) in emojiList"
       :key="childrenIndex"
-      @tap="chooseEmoji(childrenItem)"
+      @tap="() => chooseEmoji(childrenItem)"
       class="emoji-item"
     >
       <img class="emoji-image" :src="emojiUrl + emojiMap[childrenItem]" />

@@ -55,6 +55,8 @@
               v-model="currentUserName"
               class="roomid-input"
               enterkeyhint="complete"
+              maxlength="16"
+              minlength="1"
               @keyup="handleInputName"
             />
           </div>

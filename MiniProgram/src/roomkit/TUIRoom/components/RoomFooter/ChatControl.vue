@@ -1,23 +1,23 @@
 <template>
   <div class="chat-control-container">
-    <div v-if="isWeChat">
+    <div v-if="isMobile">
       <div
         v-if="chatStore.unReadCount > 0"
         class="count"
       >
         <icon-button
+          @tap="toggleChatSidebar"
           :title="t('Chat')"
           :icon-name="iconName"
-          @click-icon="toggleChatSidebar"
         />
         <span class="unreadCount">{{ chatStore.unReadCount > 10 ? '10+' : chatStore.unReadCount }}</span>
       </div>
       <icon-button
         v-else
+        @tap="toggleChatSidebar"
         :is-active="sidebarName === 'chat'"
         :title="t('Chat')"
         :icon-name="iconName"
-        @click-icon="toggleChatSidebar"
       />
     </div>
     <div v-else>
@@ -50,8 +50,7 @@ import { useChatStore } from '../../stores/chat';
 import { storeToRefs } from 'pinia';
 import { ICON_NAME } from '../../constants/icon';
 import { useI18n } from '../../locales';
-import { isWeChat } from '../../utils/useMediaValue';
-
+import { isMobile } from '../../utils/useMediaValue';
 const { t } = useI18n();
 
 const basicStore = useBasicStore();
