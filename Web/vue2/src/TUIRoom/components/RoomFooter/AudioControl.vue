@@ -39,7 +39,7 @@
     <Dialog
       :model-value="showRequestOpenMicDialog"
       class="custom-element-class"
-      :title="title"
+      title="Tips"
       :modal="false"
       :show-close="false"
       :append-to-body="true"
@@ -51,10 +51,10 @@
         {{ t('The host invites you to turn on the microphone') }}
       </span>
       <template #footer>
-        <div :class="[isMobile ? 'button-container-mobile' : 'button-container-PC']">
-          <span class="cancel" @click="handleReject">{{ t('Keep it closed') }}</span>
-          <span class="agree" @click="handleAccept">{{ t('Turn on the microphone') }}</span>
-        </div>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="handleAccept">{{ t('Turn on the microphone') }}</el-button>
+          <el-button @click="handleReject">{{ t('Keep it closed') }}</el-button>
+        </span>
       </template>
     </Dialog>
   </div>
@@ -73,9 +73,7 @@ import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
 import useRoomEngine from '../../hooks/useRoomEngine';
-import { isMobile, isWeChat }  from '../../utils/useMediaValue';
-
-
+import isMobile from '../../utils/useMediaValue';
 const roomEngine = useRoomEngine();
 
 const roomStore = useRoomStore();
@@ -92,8 +90,6 @@ const showAudioSettingTab: Ref<boolean> = ref(false);
 const audioIconButtonRef = ref<InstanceType<typeof IconButton>>();
 const audioSettingRef = ref<InstanceType<typeof AudioSettingTab>>();
 const { t } = useI18n();
-const title = computed(() => (isMobile ? '' : t('Tips')));
-
 async function toggleMuteAudio() {
   if (isLocalAudioIconDisable.value) {
     let warningMessage = '';
@@ -118,7 +114,7 @@ async function toggleMuteAudio() {
   } else {
     const microphoneList = await roomEngine.instance?.getMicDevicesList();
     const hasMicrophoneDevice = microphoneList.length > 0;
-    if (!hasMicrophoneDevice && !isWeChat) {
+    if (!hasMicrophoneDevice) {
       // 无麦克风列表
       ElMessageBox.alert(t('Microphone not detected on current device.'), t('Note'), {
         customClass: 'custom-element-class',
@@ -191,7 +187,7 @@ async function onRequestCancelled(eventInfo: { requestId: string }) {
 }
 
 onMounted(() => {
-  document?.addEventListener('click', handleDocumentClick, true);
+  document.addEventListener('click', handleDocumentClick, true);
 });
 
 TUIRoomEngine.once('ready', () => {
@@ -200,7 +196,7 @@ TUIRoomEngine.once('ready', () => {
 });
 
 onUnmounted(() => {
-  document?.removeEventListener('click', handleDocumentClick, true);
+  document.removeEventListener('click', handleDocumentClick, true);
 
   roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
@@ -214,58 +210,14 @@ onUnmounted(() => {
 $audioTabWidth: 320px;
 
 .audio-control-container {
-    position: relative;
-    .audio-tab {
-      position: absolute;
-      bottom: 90px;
-      left: 15px;
-      width: $audioTabWidth;
-      background: var(--room-audiotab-bg-color);
-      padding: 20px;
-    }
-  }
-.button-container-mobile{
-  width: 100%;
-  display: flex;
-  .agree{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-top: 1px solid rgba(242, 242, 242, 1);
-    color:rgba(0, 110, 255, 1);
-  }
-  .cancel{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-top: 1px solid rgba(242, 242, 242, 1);
-    color: rgba(43, 46, 56, 1);
-    border-right: 1px solid rgba(242, 242, 242, 1);
+  position: relative;
+  .audio-tab {
+    position: absolute;
+    bottom: 90px;
+    left: 15px;
+    width: $audioTabWidth;
+    background: var(--room-audiotab-bg-color);
+    padding: 20px;
   }
 }
-.button-container-PC{
-  .cancel{
-    padding: 5px 20px;
-    background: var(--create-room-option);
-    border-radius: 2px;
-    width: auto;
-    display: initial;
-    color: var(--color-font);
-    border: 1px solid var(--choose-type);
-  }
-  .agree{
-    padding: 5px 20px;
-    background: #006EFF;
-    color: white;
-    margin-left: 14px;
-    border-radius: 2px;
-    width: auto;
-    display: initial;
-  }
-}
-
 </style>

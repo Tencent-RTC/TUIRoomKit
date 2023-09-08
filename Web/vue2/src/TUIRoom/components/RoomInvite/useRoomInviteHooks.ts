@@ -1,53 +1,36 @@
-import { computed, reactive } from 'vue';
+import { computed, ref } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { ElMessage } from '../../elementComp';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
-import { isElectronEnv, clipBoard } from '../../utils/utils';
+import { isElectronEnv } from '../../utils/utils';
 
 export default function useRoomInvite() {
   const { t } = useI18n();
 
-  const basicStore = useBasicStore();
-  const { roomId, shareLink, isRoomLinkVisible } = storeToRefs(basicStore);
+  const roomLinkDisplay = ref(true);
 
-  const { origin, pathname } = location || {};
+  const basicStore = useBasicStore();
+  const { roomId } = storeToRefs(basicStore);
+
+  const { origin, pathname } = location;
   const isElectron = isElectronEnv();
 
-  const inviteLink = computed(() => {
-    if (shareLink.value) {
-      const urlConcatenation = shareLink.value.indexOf('?') !== -1 ? '&' : '?';
-      return `${shareLink.value}${urlConcatenation}roomId=${roomId.value}`;
-    }
-    return `${origin}${pathname}#/home?roomId=${roomId.value}`;
-  });
+  let inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);
+  
+  // todo: schema 唤起
   const schemeLink = computed(() => `tuiroom://joinroom?roomId=${roomId.value}`);
 
-  async function onCopy(value: string | number) {
-    try {
-      await clipBoard(value);
-      ElMessage({
-        message: t('Copied successfully'),
-        type: 'success',
-      });
-    } catch (error) {
-      ElMessage({
-        message: t('Copied failure'),
-        type: 'error',
-      });
-    }
+  function onCopy(value: string | number) {
+    navigator.clipboard.writeText(`${value}`);
+    ElMessage({
+      message: t('Copied successfully'),
+      type: 'success',
+    });
   }
-
-  const inviteContentList = [
-    { id: 1, title: 'Room ID', content: roomId, copyLink: roomId, visible: true },
-    { id: 2, title: 'Room Link', content: inviteLink, copyLink: inviteLink, visible: isRoomLinkVisible.value },
-    { id: 3, title: 'scheme', content: schemeLink, copyLink: schemeLink, visible: true },
-  ];
-  const visibleInviteContentList = reactive(inviteContentList.filter(item => item.visible));
-
   return {
     t,
-    isRoomLinkVisible,
+    roomLinkDisplay,
     roomId,
     origin,
     pathname,
@@ -55,6 +38,5 @@ export default function useRoomInvite() {
     inviteLink,
     schemeLink,
     onCopy,
-    visibleInviteContentList,
   };
 }

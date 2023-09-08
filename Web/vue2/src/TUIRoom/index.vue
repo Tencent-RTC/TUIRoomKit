@@ -7,19 +7,17 @@
       @on-destroy-room="onDestroyRoom"
       @on-exit-room="onExitRoom"
     ></room-header>
-    <room-content
-      ref="roomContentRef"
-      v-tap="handleRoomContentTap"
-      :show-room-tool="showRoomTool"
-      class="content"
-    ></room-content>
+    <room-content ref="roomContentRef" :show-room-tool="showRoomTool" class="content"></room-content>
+    <!-- <chat-room-content v-if="isMobile"></chat-room-content> -->
     <room-footer
       v-show="showRoomTool"
       class="footer"
       @on-destroy-room="onDestroyRoom"
       @on-exit-room="onExitRoom"
     />
-    <room-sidebar></room-sidebar>
+    <room-sidebar
+      @on-exit-room="onExitRoom"
+    ></room-sidebar>
     <room-setting></room-setting>
   </div>
 </template>
@@ -33,13 +31,13 @@ import RoomFooter from './components/RoomFooter/index';
 import RoomSidebar from './components/RoomSidebar';
 import RoomContent from './components/RoomContent/index.vue';
 import RoomSetting from './components/RoomSetting/index.vue';
-import { debounce, throttle } from './utils/utils';
+// import chatRoomContent from './components/RoomContent/ChatRoomContent.vue';
+import { isElectronEnv, debounce, throttle } from './utils/utils';
 import { useBasicStore } from './stores/basic';
 import { useRoomStore } from './stores/room';
 import { useChatStore } from './stores/chat';
-import { isMobile, isWeChat }  from './utils/useMediaValue';
-import vTap from './directives/vTap';
-import { onBeforeRouteLeave } from 'vue-router';
+import isMobile from './utils/useMediaValue';
+import logger from '../TUIRoom/utils/common/logger';
 import TUIRoomEngine, {
   TRTCVideoMirrorType,
   TRTCVideoRotation,
@@ -52,7 +50,6 @@ import TUIRoomEngine, {
   TUIKickedOutOfRoomReason,
   TRTCVideoResolution,
   TRTCVideoEncParam,
-  TUIRole,
 } from '@tencentcloud/tuiroom-engine-js';
 
 
@@ -61,8 +58,8 @@ import { MESSAGE_DURATION } from './constants/message';
 import { useI18n } from './locales';
 
 import useGetRoomEngine from './hooks/useRoomEngine';
-import logger from './utils/common/logger';
 
+const isElectron = isElectronEnv();
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
@@ -92,8 +89,8 @@ const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 const chatStore = useChatStore();
 
-const { sdkAppId, showHeaderTool, roomId } = storeToRefs(basicStore);
-const { localUser } = storeToRefs(roomStore);
+const { sdkAppId, showHeaderTool } = storeToRefs(basicStore);
+const { localUser, localVideoQuality } = storeToRefs(roomStore);
 
 /**
  * Handle page mouse hover display toolbar logic
@@ -115,53 +112,22 @@ smallParam.videoResolution = TRTCVideoResolution.TRTCVideoResolution_640_360;
 smallParam.videoFps = 10;
 smallParam.videoBitrate = 550;
 
-// PC 端处理 room 控制栏交互
-if (!isWeChat && !isMobile) {
-  onMounted(() => {
-    roomRef.value?.addEventListener('mouseenter', () => {
-      showRoomTool.value = true;
-      handleHideRoomToolDebounce();
-    });
-    roomRef.value?.addEventListener('click', () => {
-      showRoomTool.value = true;
-      handleHideRoomToolDebounce();
-    }, false);
-    roomRef.value?.addEventListener('mousemove', () => {
-      showRoomTool.value = true;
-      handleHideRoomToolThrottle();
-    });
-    roomRef.value?.addEventListener('mouseleave', () => {
-      showRoomTool.value = false;
-    });
-  });
-  onUnmounted(() => {
-    roomRef.value?.removeEventListener('mouseenter', () => {
-      showRoomTool.value = true;
-      handleHideRoomToolDebounce();
-    });
-    roomRef.value?.removeEventListener('click', () => {
-      showRoomTool.value = true;
-      handleHideRoomToolDebounce();
-    }, false);
-    roomRef.value?.removeEventListener('mousemove', () => {
-      showRoomTool.value = true;
-      handleHideRoomToolThrottle();
-    });
-    roomRef.value?.removeEventListener('mouseleave', () => {
-      showRoomTool.value = false;
-    });
-  });
-}
-
-// H5 及小程序端处理 room 控制栏交互
-function handleRoomContentTap() {
-  showRoomTool.value = !showRoomTool.value;
-  if (showRoomTool.value) {
-    handleHideRoomToolDebounce();
-  }
-}
-
 onMounted(async () => {
+  roomRef.value?.addEventListener('mouseenter', () => {
+    showRoomTool.value = true;
+    handleHideRoomToolDebounce();
+  });
+  roomRef.value?.addEventListener('click', () => {
+    showRoomTool.value = true;
+    handleHideRoomToolDebounce();
+  }, false);
+  roomRef.value?.addEventListener('mousemove', () => {
+    showRoomTool.value = true;
+    handleHideRoomToolThrottle();
+  });
+  roomRef.value?.addEventListener('mouseleave', () => {
+    showRoomTool.value = false;
+  });
   const defaults = basicStore.defaultTheme;
   const storageCurrentTheme = localStorage.getItem('tuiRoom-currentTheme') || defaults;
   basicStore.setDefaultTheme(storageCurrentTheme);
@@ -176,57 +142,23 @@ onMounted(async () => {
   }
 });
 
-
-onBeforeRouteLeave((from: any, to: any, next: any) => {
-  if (!roomId.value) {
-    next();
-  } else {
-    const message = roomStore.isMaster
-      ? t('This action causes the room to be disbanded, does it continue?') : t('This action causes the room to be exited, does it continue?');
-    if (window.confirm(message)) {
-      if (roomStore.isMaster) {
-        dismissRoom();
-      } else {
-        leaveRoom();
-      }
-      resetStore();
-      next();
-    } else {
-      next(false);
-    }
-  }
+onUnmounted(() => {
+  roomRef.value?.removeEventListener('mouseenter', () => {
+    showRoomTool.value = true;
+    handleHideRoomToolDebounce();
+  });
+  roomRef.value?.removeEventListener('click', () => {
+    showRoomTool.value = true;
+    handleHideRoomToolDebounce();
+  }, false);
+  roomRef.value?.removeEventListener('mousemove', () => {
+    showRoomTool.value = true;
+    handleHideRoomToolThrottle();
+  });
+  roomRef.value?.removeEventListener('mouseleave', () => {
+    showRoomTool.value = false;
+  });
 });
-
-async function dismissRoom() {
-  try {
-    logger.log(`${logPrefix}dismissRoom: enter`);
-    await closeMediaBeforeLeave();
-    await roomEngine.instance?.destroyRoom();
-    emit('on-destroy-room');
-  } catch (error) {
-    logger.error(`${logPrefix}dismissRoom error:`, error);
-  }
-}
-
-async function leaveRoom() {
-  try {
-    await closeMediaBeforeLeave();
-    const response = await roomEngine.instance?.exitRoom();
-    emit('on-exit-room');
-    logger.log(`${logPrefix}leaveRoom:`, response);
-  } catch (error) {
-    logger.error(`${logPrefix}leaveRoom error:`, error);
-  }
-}
-
-async function closeMediaBeforeLeave() {
-  if (localUser.value.hasAudioStream) {
-    await roomEngine.instance?.closeLocalMicrophone();
-  }
-  if (localUser.value.hasVideoStream) {
-    await roomEngine.instance?.closeLocalCamera();
-  }
-}
 
 interface RoomParam {
 	isOpenCamera: boolean,
@@ -264,92 +196,80 @@ async function createRoom(options: {
   roomParam?: RoomParam,
 }) {
   const { roomId, roomName, roomMode, roomParam } = options;
-  try {
-    if (!roomEngine.instance) {
-      return;
-    }
-    basicStore.setRoomId(roomId);
-    logger.debug(`${logPrefix}createRoom:`, roomId, roomMode, roomParam);
-    const roomParams = {
-      roomId,
-      name: roomName,
-      roomType: TUIRoomType.kConference,
-    };
-    if (roomMode === 'FreeToSpeak') {
-      Object.assign(roomParams, {
-        speechMode: TUISpeechMode.kFreeToSpeak,
-      });
-    } else {
-      Object.assign(roomParams, {
-        speechMode: TUISpeechMode.kSpeakAfterTakingSeat,
-      });
-    }
-    await roomEngine.instance?.createRoom(roomParams);
-    emit('on-create-room', {
-      code: 0,
-      message: 'create room success',
+  if (!roomEngine.instance) {
+    return;
+  }
+  basicStore.setRoomId(roomId);
+  logger.debug(`${logPrefix}createRoom:`, roomId, roomMode, roomParam);
+  const roomParams = {
+    roomId,
+    name: roomName,
+    roomType: TUIRoomType.kConference,
+  };
+  if (roomMode === 'FreeToSpeak') {
+    Object.assign(roomParams, {
+      speechMode: TUISpeechMode.kFreeToSpeak,
     });
-    const trtcCloud = roomEngine.instance?.getTRTCCloud();
-    trtcCloud.setDefaultStreamRecvMode(true, false);
-    trtcCloud.enableSmallVideoStream(true, smallParam);
-    const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
-    emit('on-enter-room', {
-      code: 0,
-      message: 'enter room success',
+  } else {
+    Object.assign(roomParams, {
+      speechMode: TUISpeechMode.kSpeakAfterTakingSeat,
     });
-    roomStore.setRoomInfo(roomInfo);
-    // 申请发言模式房主上麦
-    if (roomInfo.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) {
-      await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
-    }
+  }
+  await roomEngine.instance?.createRoom(roomParams);
+  emit('on-create-room', {
+    code: 0,
+    message: 'create room success',
+  });
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  trtcCloud.setDefaultStreamRecvMode(true, false);
+  trtcCloud.enableSmallVideoStream(true, smallParam);
+  const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
+  emit('on-enter-room', {
+    code: 0,
+    message: 'enter room success',
+  });
+  roomStore.setRoomInfo(roomInfo);
+  // 申请发言模式房主上麦
+  if (roomInfo.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) {
+    await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+  }
 
-    await getUserList();
-    /**
+  await getUserList();
+  /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
    * about whether or not to turn on the no-mac ban.
    *
    * setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
   **/
-    roomStore.setRoomParam(roomParam);
-    TUIRoomAegis.reportEvent({ name: 'createRoom', ext1: 'createRoom-success' });
-  } catch (error) {
-    logger.error(`${logPrefix}createRoom error:`, error);
-    basicStore.reset();
-    throw error;
-  }
+  roomStore.setRoomParam(roomParam);
+  TUIRoomAegis.reportEvent({ name: 'createRoom', ext1: 'createRoom-success' });
 }
 
 async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
   const { roomId, roomParam } = options;
-  try {
-    if (!roomEngine.instance) {
-      return;
-    }
-    basicStore.setRoomId(roomId);
-    logger.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
-    const trtcCloud = roomEngine.instance?.getTRTCCloud();
-    trtcCloud.setDefaultStreamRecvMode(true, false);
-    trtcCloud.enableSmallVideoStream(true, smallParam);
-    const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
-    roomStore.setRoomInfo(roomInfo);
-    await getUserList();
-    /**
+  if (!roomEngine.instance) {
+    return;
+  }
+  basicStore.setRoomId(roomId);
+  logger.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  trtcCloud.setDefaultStreamRecvMode(true, false);
+  trtcCloud.enableSmallVideoStream(true, smallParam);
+  const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
+  roomStore.setRoomInfo(roomInfo);
+  await getUserList();
+  /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
    * about whether or not to turn on the no-mac ban.
    *
    * setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
   **/
-    roomStore.setRoomParam(roomParam);
-    emit('on-enter-room', {
-      code: 0,
-      message: 'enter room success',
-    });
-    TUIRoomAegis.reportEvent({ name: 'enterRoom', ext1: 'enterRoom-success' });
-  } catch (error) {
-    logger.error(`${logPrefix}enterRoom error:`, error);
-    basicStore.reset();
-    throw error;
-  }
+  roomStore.setRoomParam(roomParam);
+  emit('on-enter-room', {
+    code: 0,
+    message: 'enter room success',
+  });
+  TUIRoomAegis.reportEvent({ name: 'enterRoom', ext1: 'enterRoom-success' });
 }
 
 async function getUserList() {
@@ -511,25 +431,25 @@ async function handleMessageStateChange(isDisableMessage: boolean) {
 
 const onAllUserCameraDisableChanged =  async (eventInfo: { roomId: string, isDisable: boolean }) => {
   const { isDisable } = eventInfo;
-  if (isDisable !== roomStore.isCameraDisableForAllUser && localUser.value.userRole === TUIRole.kGeneralUser) {
+  if (isDisable !== roomStore.isCameraDisableForAllUser) {
     handleVideoStateChange(isDisable);
-    roomStore.setCanControlSelfVideo(!isDisable);
   }
   roomStore.setDisableCameraForAllUserByAdmin(isDisable);
+  roomStore.setCanControlSelfVideo(!roomStore.isCameraDisableForAllUser);
 };
 
 const onAllUserMicrophoneDisableChanged = async (eventInfo: { roomId: string, isDisable: boolean }) => {
   const { isDisable } = eventInfo;
-  if (isDisable !== roomStore.isMicrophoneDisableForAllUser && localUser.value.userRole === TUIRole.kGeneralUser) {
+  if (isDisable !== roomStore.isMicrophoneDisableForAllUser) {
     handleAudioStateChange(isDisable);
-    roomStore.setCanControlSelfAudio(!isDisable);
   }
   roomStore.setDisableMicrophoneForAllUserByAdmin(isDisable);
+  roomStore.setCanControlSelfAudio(!roomStore.isMicrophoneDisableForAllUser);
 };
 
 const onSendMessageForAllUserDisableChanged = async (eventInfo: { roomId: string, isDisable: boolean}) => {
   const { isDisable } = eventInfo;
-  if (isDisable !== roomStore.isMessageDisableForAllUser && localUser.value.userRole === TUIRole.kGeneralUser) {
+  if (isDisable !== roomStore.isMessageDisableForAllUser) {
     handleMessageStateChange(isDisable);
   }
   roomStore.setDisableMessageAllUserByAdmin(isDisable);
@@ -539,21 +459,33 @@ async function getMediaDeviceList() {
   const cameraList = await roomEngine.instance?.getCameraDevicesList();
   const microphoneList = await roomEngine.instance?.getMicDevicesList();
   const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
-  cameraList && roomStore.setCameraList(cameraList);
-  microphoneList && roomStore.setMicrophoneList(microphoneList);
-  speakerList && roomStore.setSpeakerList(speakerList);
+  roomStore.setCameraList(cameraList);
+  roomStore.setMicrophoneList(microphoneList);
+  roomStore.setSpeakerList(speakerList);
 
-  const cameraInfo = roomEngine.instance?.getCurrentCameraDevice();
-  const micInfo = roomEngine.instance?.getCurrentMicDevice();
-  const speakerInfo = roomEngine.instance?.getCurrentSpeakerDevice();
-  if (cameraInfo && cameraInfo.deviceId) {
-    roomStore.setCurrentCameraId(cameraInfo.deviceId);
-  }
-  if (micInfo && micInfo.deviceId) {
-    roomStore.setCurrentMicrophoneId(micInfo.deviceId);
-  }
-  if (speakerInfo && speakerInfo.deviceId) {
-    roomStore.setCurrentSpeakerId(speakerInfo.deviceId);
+  if (isElectron) {
+    const cameraInfo = roomEngine.instance?.getCurrentCameraDevice();
+    const micInfo = roomEngine.instance?.getCurrentMicDevice();
+    const speakerInfo = roomEngine.instance?.getCurrentSpeakerDevice();
+    if (cameraInfo && cameraInfo.deviceId) {
+      roomStore.setCurrentCameraId(cameraInfo.deviceId);
+    }
+    if (micInfo && micInfo.deviceId) {
+      roomStore.setCurrentMicrophoneId(micInfo.deviceId);
+    }
+    if (speakerInfo && speakerInfo.deviceId) {
+      roomStore.setCurrentSpeakerId(speakerInfo.deviceId);
+    }
+  } else {
+    if (cameraList.length > 0) {
+      await roomEngine.instance?.setCurrentCameraDevice({ deviceId: cameraList[0].deviceId });
+    }
+    if (microphoneList.length > 0) {
+      await roomEngine.instance?.setCurrentMicDevice({ deviceId: microphoneList[0].deviceId });
+    }
+    if (speakerList.length > 0) {
+      await roomEngine.instance?.setCurrentSpeakerDevice({ deviceId: speakerList[0].deviceId });
+    }
   }
 }
 
@@ -568,7 +500,7 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
   if (type === TRTCDeviceType.TRTCDeviceTypeMic) {
     logger.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
     const deviceList = await roomEngine.instance?.getMicDevicesList();
-    deviceList && roomStore.setMicrophoneList(deviceList);
+    roomStore.setMicrophoneList(deviceList);
     if (state === TRTCDeviceState.TRTCDeviceStateActive) {
       roomStore.setCurrentMicrophoneId(deviceId);
     }
@@ -577,7 +509,7 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
   if (type === TRTCDeviceType.TRTCDeviceTypeSpeaker) {
     logger.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
     const deviceList = await roomEngine.instance?.getSpeakerDevicesList();
-    deviceList && roomStore.setSpeakerList(deviceList);
+    roomStore.setSpeakerList(deviceList);
     if (state === TRTCDeviceState.TRTCDeviceStateActive) {
       roomStore.setCurrentSpeakerId(deviceId);
     }
@@ -586,7 +518,7 @@ async function onDeviceChange(eventInfo: {deviceId: string, type: number, state:
   if (type === TRTCDeviceType.TRTCDeviceTypeCamera) {
     logger.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
     const deviceList = await roomEngine.instance?.getCameraDevicesList();
-    deviceList && roomStore.setCameraList(deviceList);
+    roomStore.setCameraList(deviceList);
     if (state === TRTCDeviceState.TRTCDeviceStateActive) {
       roomStore.setCurrentCameraId(deviceId);
     }
@@ -649,6 +581,13 @@ watch(sdkAppId, (val: number) => {
   width: 100%;
   height: 100%;
   position: relative;
+  * {
+    color: $fontColor;
+    box-sizing: border-box;
+    text-align: start;
+    user-select: none;
+    font-family: PingFangSC-Medium;
+  }
   .header {
     width: 100%;
     height: 48px;
@@ -662,12 +601,10 @@ watch(sdkAppId, (val: number) => {
     width: 100%;
     height: 100%;
     background-color: $roomBackgroundColor;
-    position: absolute;
-    top: 0;
   }
   .footer {
-    position: absolute;
-    bottom: 0;
+    position: relative;
+    bottom: 80px;
     width: 100%;
     height: 80px;
     background-color: var(--room-footer-bg-color);

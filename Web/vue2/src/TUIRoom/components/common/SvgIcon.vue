@@ -10,7 +10,7 @@
   * 如果要在外部设置大小，必须是传入custom
 -->
 <template>
-  <span :class="[svgClass, customClass]" :style="customStyle" @click="handleClick"></span>
+  <div :class="svgClass" @click="handleClick"></div>
 </template>
 
 <script setup lang="ts">
@@ -19,8 +19,6 @@ import { computed } from 'vue';
 interface Props {
   iconName: string,
   size?: string,
-  customClass?: string,
-  customStyle?: any,
 }
 
 const props = defineProps<Props>();
@@ -41,13 +39,9 @@ function handleClick(event: Event) {
 @import url(../../assets/style/svg.scss);
 
 .svg-icon {
-  width: 100%;
-  height: 100%;
   overflow: hidden;
   display: inline-block;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-size: contain;
 }
 .small-icon {
   width: 12px;

@@ -1,4 +1,5 @@
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
+import { isElectronEnv } from '../utils/utils';
 import { isVue3 } from '../utils/constants';
 
 const roomEngine: Record<string, TUIRoomEngine | null> = { instance: null };
@@ -13,7 +14,7 @@ TUIRoomEngine.once('ready', () => {
     api: 'setFramework',
     params: {
       component: 'TUIRoomKit',
-      language: vueVersion,
-    },
-  }));
+      language: vueVersion
+    }
+  }))
 });

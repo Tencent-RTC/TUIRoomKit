@@ -1,5 +1,4 @@
 
-
 /**
  * 防抖函数
  * @param {*} fn 要执行的函数
@@ -12,7 +11,7 @@ export function debounce(fn: { apply: (arg0: any, arg1: any) => void; }, delay: 
     if (timer > 0) {
       clearTimeout(timer);
     }
-    timer = window?.setTimeout(() => {
+    timer = window.setTimeout(() => {
       fn.apply(this, args);
       timer = -1;
     }, delay);
@@ -50,17 +49,17 @@ export function setFullScreen(element: HTMLElement) {
     msRequestFullscreen(): Promise<void>;
     webkitRequestFullScreen(): Promise<void>;
   };
-  if (fullScreenElement?.requestFullscreen) {
-    fullScreenElement?.requestFullscreen();
+  if (fullScreenElement.requestFullscreen) {
+    fullScreenElement.requestFullscreen();
     // 兼容Firefox
-  } else if (fullScreenElement?.mozRequestFullScreen) {
-    fullScreenElement?.mozRequestFullScreen();
+  } else if (fullScreenElement.mozRequestFullScreen) {
+    fullScreenElement.mozRequestFullScreen();
     // 兼容 chrome，safari,opera等
-  } else if (fullScreenElement?.webkitRequestFullScreen) {
-    fullScreenElement?.webkitRequestFullScreen();
+  } else if (fullScreenElement.webkitRequestFullScreen) {
+    fullScreenElement.webkitRequestFullScreen();
     // 兼容IE/Edge
-  } else if (fullScreenElement?.msRequestFullscreen) {
-    fullScreenElement?.msRequestFullscreen();
+  } else if (fullScreenElement.msRequestFullscreen) {
+    fullScreenElement.msRequestFullscreen();
   }
 }
 
@@ -70,8 +69,8 @@ export function setFullScreen(element: HTMLElement) {
  * exitFullscreen();
  */
 export function exitFullScreen() {
-  if (!document?.fullscreenElement
-    && !(document as any)?.webkitFullscreenElement && !(document as any)?.mozFullScreenElement) {
+  if (!document.fullscreenElement
+    && !(document as any).webkitFullscreenElement && !(document as any).mozFullScreenElement) {
     return;
   }
   const exitFullScreenDocument  = document as Document & {
@@ -79,14 +78,14 @@ export function exitFullScreen() {
     msExitFullscreen(): Promise<void>;
     webkitExitFullscreen(): Promise<void>;
   };
-  if (exitFullScreenDocument?.exitFullscreen) {
-    exitFullScreenDocument?.exitFullscreen();
-  } else if (exitFullScreenDocument?.msExitFullscreen) {
-    exitFullScreenDocument?.msExitFullscreen();
-  } else if (exitFullScreenDocument?.mozCancelFullScreen) {
-    exitFullScreenDocument?.mozCancelFullScreen();
-  } else if (exitFullScreenDocument?.webkitExitFullscreen) {
-    exitFullScreenDocument?.webkitExitFullscreen();
+  if (exitFullScreenDocument.exitFullscreen) {
+    exitFullScreenDocument.exitFullscreen();
+  } else if (exitFullScreenDocument.msExitFullscreen) {
+    exitFullScreenDocument.msExitFullscreen();
+  } else if (exitFullScreenDocument.mozCancelFullScreen) {
+    exitFullScreenDocument.mozCancelFullScreen();
+  } else if (exitFullScreenDocument.webkitExitFullscreen) {
+    exitFullScreenDocument.webkitExitFullscreen();
   }
 }
 
@@ -99,9 +98,9 @@ export function exitFullScreen() {
  * const value = getUrlParam(key);
  */
 export function getUrlParam(key: string) {
-  const url = window?.location.href.replace(/^[^?]*\?/, '');
+  const url = window.location.href.replace(/^[^?]*\?/, '');
   const regexp = new RegExp(`(^|&)${key}=([^&#]*)(&|$|)`, 'i');
-  const paramMatch = url?.match(regexp);
+  const paramMatch = url.match(regexp);
 
   return paramMatch ? paramMatch[2] : null;
 }
@@ -136,12 +135,10 @@ export function deepClone(data: any) {
 }
 
 export function isElectronEnv() {
-  const userAgent = navigator?.userAgent.toLowerCase();
-  return userAgent?.indexOf(' electron/') > -1;
+  const userAgent = navigator.userAgent.toLowerCase();
+  return userAgent.indexOf(' electron/') > -1;
 }
 
 export function isUndefined(value: any) {
   return typeof value === 'undefined';
 }
-
-export { clipBoard } from './adapter';

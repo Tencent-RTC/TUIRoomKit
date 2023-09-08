@@ -3,14 +3,12 @@
     <div class="member-title">
       <img class="avatar-url" :src="userInfo.avatarUrl || defaultAvatar" />
       <div class="member-title-content">{{ userInfo.userName || userInfo.userId }}</div>
-      <!-- TODO: 完善 v-tap 的 .stop 修饰符 -->
-      <span v-if="isWeChat" v-tap.stop="handleCloseControl" class="cancel">{{ t('Cancel') }}</span>
     </div>
     <div
       v-for="item, index in controlList"
       :key="index"
-      v-tap="() => item.func(userInfo)"
       class="user-operate-item"
+      @touchstart="item.func(userInfo)"
     >
       <svg-icon :icon-name="item.iconName" class="icon-svg"></svg-icon>
       <div class="control-title">{{ item.title }}</div>
@@ -28,10 +26,7 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
 import SvgIcon from '../../common/SvgIcon.vue';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
-import { isWeChat } from '../../../utils/useMediaValue';
 import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-js';
-import vTap from '../../../directives/vTap';
-
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
@@ -53,7 +48,7 @@ const {
 interface Props {
   userInfo: UserInfo,
 }
-const emit = defineEmits(['on-close-control']);
+
 const props = defineProps<Props>();
 
 const isMe = computed(() => basicStore.userId === props.userInfo.userId);
@@ -289,9 +284,6 @@ function kickOffUser(userInfo: UserInfo) {
   });
 }
 
-function handleCloseControl() {
-  emit('on-close-control');
-}
 </script>
 
 <style lang="scss" scoped>
@@ -344,11 +336,6 @@ function handleCloseControl() {
       margin-left: 10px;
     }
   }
-}
-.cancel{
-  flex: 1;
-  text-align: end;
-  padding-right: 30px
 }
 </style>
 
