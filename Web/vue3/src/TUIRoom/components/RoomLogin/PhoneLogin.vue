@@ -16,7 +16,7 @@
 import SvgIcon from '../common/SvgIcon.vue';
 import { ref, watch } from 'vue';
 import { useI18n } from '../../locales';
-import { isMobile }  from '../../utils/useMediaValue';
+import isMobile from '../../utils/useMediaValue';
 
 const { t } = useI18n();
 const emit = defineEmits(['update-phone-number']);

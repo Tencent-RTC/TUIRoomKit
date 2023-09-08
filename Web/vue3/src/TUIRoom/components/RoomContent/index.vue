@@ -16,6 +16,15 @@ defineProps<{
 .content-container {
   width: 100%;
   height: 100%;
+  display: flex;
+  .left-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    > :not(:first-child) {
+      margin-left: 1rem;
+    }
+  }
 }
 
 </style>

@@ -67,13 +67,15 @@ import { MESSAGE_DURATION } from '../../../constants/message';
 import { debounce } from '../../../utils/utils';
 import logger from '../../../utils/common/logger';
 
-import TUIRoomEngine, { TUIUserInfo, TUIChangeReason, TUIRoomEvents,  TUIVideoStreamType, TUISeatInfo } from '@tencentcloud/tuiroom-engine-js';
+import TUIRoomEngine, { TUIChangeReason, TUIRoomEvents,  TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import useStreamContainer from './useStreamContainerHooks';
 
 const logPrefix = '[StreamContainer]';
 const {
   onRemoteUserEnterRoom,
+  onRemoteUserLeaveRoom,
+  onSeatListChanged,
   onUserAudioStateChanged,
   t,
 } = useStreamContainer();
@@ -129,7 +131,7 @@ const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
   return streamList.value.slice(currentPageIndex.value * 9, currentPageIndex.value * 9 + 9);
 });
 
-watch([() => showStreamList.value.length, currentPageIndex], () => {
+watch(() => [showStreamList.value.length, currentPageIndex.value], () => {
   if (layout.value === LAYOUT.NINE_EQUAL_POINTS) {
     const streamIdList: string[] = [];
     showStreamList.value.forEach((item) => {
@@ -514,8 +516,11 @@ const onUserVideoStateChanged = (eventInfo: {
        *
        * 远端屏幕分享流停止的时候，重新设置流播放布局
       **/
-      if (userId === enlargeStream.value?.userId) {
-        handleLargeStreamLeave();
+      if (roomStore.remoteStreamList.length === 0) {
+        basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
+        enlargeStream.value = null;
+      } else if (userId === enlargeStream.value?.userId) {
+        [enlargeStream.value] = roomStore.remoteStreamList;
       }
 
       logger.debug(`${logPrefix} onUserVideoStateChanged: stop`, userId, streamType);
@@ -527,42 +532,8 @@ const onUserVideoStateChanged = (eventInfo: {
   }
 };
 
-// 麦位变化
-const onSeatListChanged = (eventInfo:
-  { seatList: TUISeatInfo[], seatedList: TUISeatInfo[], leftList: TUISeatInfo[] }) => {
-  const { seatList, seatedList, leftList } = eventInfo;
-  roomStore.updateOnSeatList(seatList, seatedList, leftList);
-  const leftUserIdList = leftList.map(item => item.userId);
-  // 最大屏用户下麦时，需要更换最大屏用户
-  if (enlargeStream.value && leftUserIdList.includes(enlargeStream.value?.userId)) {
-    handleLargeStreamLeave();
-  }
-};
-
-// 远端用户离开
-const onRemoteUserLeaveRoom = (eventInfo: { userInfo: TUIUserInfo }) => {
-  const { userInfo: { userId } } = eventInfo;
-  roomStore.removeRemoteUser(userId);
-  if (userId === enlargeStream.value?.userId) {
-    handleLargeStreamLeave();
-  }
-};
-
-// 处理大窗口流离开
-const handleLargeStreamLeave = () => {
-  if (roomStore.remoteStreamList.length === 0) {
-    basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
-    enlargeStream.value = null;
-  } else {
-    [enlargeStream.value] = roomStore.remoteStreamList;
-  }
-};
-
-// 处理侧边栏&顶部栏的视频懒加载
-const handleStreamContainerScroll = async () => {
+const handleStreamContainerScroll = () => {
   const childDom = streamListRef.value.children[0];
-  // 添加 nextTick 处理顶部栏模式下新增用户触发 scroll，但是拿到的 streamListRef.value.offsetWidth 还没有更新的问题
-  await nextTick();
 
   // 从第几个
   let index = 0;
@@ -599,7 +570,7 @@ const handleStreamContainerScroll = async () => {
   });
   streamUserIdList.push(enlargeDomId.value);
 
-  // 修改对应的 streamInfo 的 isVisible 为 true
+  // 修改对应的 streamInfo 的 showInView 为 true
   roomStore.updateUserStreamVisible(streamUserIdList);
 };
 

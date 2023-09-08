@@ -2,12 +2,11 @@
   <div class="contact-container-main">
     <div class="contact-title-main">
       <p>{{ t('Contact us') }}</p>
-      <span v-if="isWeChat" v-tap="handleCloseContact" class="cancel">{{ t('Cancel') }}</span>
     </div>
     <div v-for="item in contactContentList" :key="item.id" class="contact-content-main">
       <span class="contact-title">{{ t(item.title) }}</span>
       <span class="contact-content">{{ item.content }}</span>
-      <svg-icon v-tap="() => onCopy(item.copyLink)" icon-name="copy-icon" class="copy" size="custom"></svg-icon>
+      <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(item.copyLink)"></svg-icon>
     </div>
     <span class="contact-bottom">
       {{ t('If you have any questions, please feel free to join our QQ group or send an email') }}
@@ -19,8 +18,6 @@
 import { reactive } from 'vue';
 import useRoomMoreControl from './useRoomMoreHooks';
 import SvgIcon from '../common/SvgIcon.vue';
-import { isWeChat } from '../../utils/useMediaValue';
-import vTap from '../../directives/vTap';
 
 
 const {
@@ -30,16 +27,11 @@ const {
   onCopy,
 } = useRoomMoreControl();
 
-const emit = defineEmits(['on-close-contact']);
-
 const contactContentList = reactive([
   { id: 1, title: 'group chat', content: groupNumber, copyLink: groupNumber },
   { id: 2, title: 'Email', content: email, copyLink: email },
 ]);
 
-function handleCloseContact() {
-  emit('on-close-contact');
-}
 </script>
 
 <style lang="scss" scoped>
@@ -51,6 +43,7 @@ span{
 }
 .contact-container-main {
   width: 100%;
+  height: 25vh;
   background: var(--popup-background-color-h5);
   border-radius: 15px 15px 0px 0px;
   position: fixed;
@@ -77,8 +70,7 @@ span{
     font-size: 20px;
     line-height: 24px;
     color: var(--popup-title-color-h5);
-    padding: 20px;
-    align-items: center;
+    padding: 0px 0 0 25px;
   }
   .contact-content-main {
     width: 90%;
@@ -122,12 +114,5 @@ span{
     height: 14px;
     margin-left: 30px;
   }
-}
-.cancel{
-  flex: 1;
-  text-align: end;
-  padding-right: 30px;
-  font-weight: 400;
-  font-size: 16px;
 }
 </style>

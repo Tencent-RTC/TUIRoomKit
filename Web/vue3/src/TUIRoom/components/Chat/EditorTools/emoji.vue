@@ -18,7 +18,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { emojiUrl, emojiMap, emojiList } from '../util';
 import SvgIcon from '../../common/SvgIcon.vue';
-import { isMobile }  from '../../../utils/useMediaValue';
+import isMobile from '../../../utils/useMediaValue';
 const emojiListRef = ref();
 
 const visible = ref(false);

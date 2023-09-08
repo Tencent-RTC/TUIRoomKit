@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import emoji from '../EditorTools';
+import emoji from '../EditorTools/emoji.vue';
 import useChatEditor from './useChatEditor';
 const {
   t,
