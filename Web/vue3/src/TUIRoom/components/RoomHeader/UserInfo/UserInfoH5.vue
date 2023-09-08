@@ -1,6 +1,6 @@
 <template>
   <div ref="userInfoRef" class="user-info-container">
-    <div v-tap="handleUserControl" class="user-info-content">
+    <div class="user-info-content" @click="handleUserControl">
       <img class="avatar" :src="avatarUrl || defaultAvatar">
       <div class="name">{{ userName || userId }}</div>
     </div>
@@ -8,7 +8,7 @@
     <div v-if="showUserControl" class="user-control-container">
       <div class="logout-mobile">
         <div class="logout-mobile-main">
-          <div class="logout" v-tap="() => $emit('log-out')">
+          <div class="logout" @click="$emit('log-out')">
             <i> {{ t('Log out') }}</i>
           </div>
           <div class="close" @click.stop="showUserControl = false">
@@ -22,7 +22,6 @@
 <script setup lang="ts">
 import defaultAvatar from '../../../assets/imgs/avatar.png';
 import useUserInfo from './useUserInfoHooks';
-import vTap from '../../../directives/vTap';
 const {
   userInfoRef,
   showUserControl,

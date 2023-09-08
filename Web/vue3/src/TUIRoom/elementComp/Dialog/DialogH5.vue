@@ -1,19 +1,16 @@
 <template>
-  <Teleport to="body">
-    <div v-if="props.modelValue" class="dialog-container">
-      <span v-if="hasTitle" class="dialog-title">{{ props.title }}</span>
-      <div :class="[hasTitle ? 'dialog-content': 'dialog-content-notitle']">
-        <slot></slot>
-      </div>
-      <div class="dialog-footer">
-        <slot name="footer"></slot>
-      </div>
+  <div v-if="props.modelValue" class="dialog-container">
+    <span class="dialog-title">{{ props.title }}</span>
+    <div class="dialog-content">
+      <slot></slot>
     </div>
-  </Teleport>
+    <div class="dialog-footer">
+      <slot name="footer"></slot>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 
 interface Props {
   modelValue: boolean,
@@ -21,18 +18,14 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const hasTitle = computed(() => props.title !== '');
-
-
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .dialog-container {
-    height: 18vh;
     max-width: 80vw;
     position: fixed;
-    background-color: #FFFFFF;
+    max-height: 18vh;
+    background-color: var(--log-out-cancel);
     border-radius: 8px;
     top: 0;
     left: 0;
@@ -42,17 +35,16 @@ const hasTitle = computed(() => props.title !== '');
     border: 1px solid rgba(211, 219, 238, 0.4);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
   .dialog-title {
     display: inline-block;
+    padding: 12px 0 15px 14px;
     font-family: 'PingFang SC';
     font-style: normal;
     font-weight: 400;
     font-size: 18px;
     line-height: 22px;
     text-align: center;
-    color: rgba(43, 46, 56, 1);
-    padding-top: 14px;
+    color: var(--dialog-title-h5);
   }
   .dialog-content {
     font-family: 'PingFang SC';
@@ -61,27 +53,16 @@ const hasTitle = computed(() => props.title !== '');
     font-size: 14px;
     line-height: 16px;
     text-align: center;
-    color: rgba(43, 46, 56, 1);
+    color: var(--dialog-title-h5);
     text-align: center;
     padding-top: 10px;
   }
-  .dialog-content-notitle{
-    font-family: 'PingFang SC';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 16px;
-    text-align: center;
-    color: rgba(43, 46, 56, 1);
-    text-align: center;
-    padding-top: 40px;
-  }
   .dialog-footer {
+    padding-top: 4%;
+    padding: 10px 10px 0 10px;
     display: flex;
-    height: auto;
     flex-direction: row;
     justify-content: center;
-  }
-
+   }
 }
 </style>

@@ -23,7 +23,7 @@ import { ElMessageBox } from 'element-plus';
 import {
   TUIKickedOutOfRoomReason,
 } from '@tencentcloud/tuiroom-engine-js';
-import logger from '@/TUIRoom/utils/common/logger';
+import logger from '../TUIRoom/utils/common/logger';
 
 const { t } = useI18n();
 

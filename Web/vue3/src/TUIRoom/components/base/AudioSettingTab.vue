@@ -119,7 +119,7 @@ function handleMicrophoneTest() {
 }
 
 const isTestingSpeaker = ref(false);
-const audioPlayer = document?.createElement('audio');
+const audioPlayer = document.createElement('audio');
 const { t } = useI18n();
 
 /**
@@ -129,22 +129,18 @@ const { t } = useI18n();
 **/
 function handleSpeakerTest() {
   if (isTestingSpeaker.value) {
-    if (audioPlayer) {
-      audioPlayer.pause();
-      audioPlayer.currentTime = 0;
-    }
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
     isTestingSpeaker.value = false;
   } else {
     isTestingSpeaker.value = true;
-    if (audioPlayer) {
-      audioPlayer.src = 'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';
-      audioPlayer.play();
-    }
+    audioPlayer.src = 'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';
+    audioPlayer.play();
   }
 }
 
 onBeforeUnmount(() => {
-  audioPlayer && audioPlayer.pause();
+  audioPlayer.pause();
 });
 
 </script>

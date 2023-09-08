@@ -14,7 +14,7 @@
 import { ref, watch } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import { useI18n } from '../../locales';
-import { isMobile }  from '../../utils/useMediaValue';
+import isMobile from '../../utils/useMediaValue';
 
 const { t } = useI18n();
 

@@ -1,4 +1,4 @@
-import { ref, nextTick } from 'vue';
+import { ref } from 'vue';
 
 export default function useMemberItem() {
   const showMemberControl = ref(false);
@@ -25,22 +25,18 @@ export default function useMemberItem() {
     MemberControlEl.value = el;
   }
 
-  function handleMemberItemClick() {
+  function handleMemberItemClick(event: MouseEvent) {
     if (!showMemberControl.value) {
       showMemberControl.value = true;
     }
   }
-  async function handleCloseControl() {
-    await nextTick();
-    showMemberControl.value = false;
-  }
+
 
   function handleDocumentClick(event: MouseEvent) {
     if (showMemberControl.value && memberItemEl.value && !memberItemEl.value.contains(event.target)) {
       showMemberControl.value = false;
     }
   }
-
 
   return {
     showMemberControl,
@@ -51,8 +47,5 @@ export default function useMemberItem() {
     setMemberControlRef,
     handleMemberItemClick,
     handleDocumentClick,
-    handleCloseControl,
   };
 }
-
-

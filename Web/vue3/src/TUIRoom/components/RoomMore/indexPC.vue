@@ -3,7 +3,7 @@
     <div class="more-notice">{{ t('Join our QQ group chat or email us.') }}</div>
     <div class="more-content">
       <div class="more-item">
-        <span class="more-title">{{ t('group chat') }}</span>
+        <span class="more-title">QQ {{ t('group chat') }}</span>
         <div class="input-area">
           <input class="input" type="text" :value="groupNumber">
           <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(groupNumber)"></svg-icon>
@@ -63,23 +63,22 @@ const {
       margin-top: 10px;
       position: relative;
       .input{
-        appearance: none;
         -webkit-appearance: none;
-        background-color: var(--input-bg-color);
-        background-image: none;
-        border-radius: 2px;
-        border: 1px solid var(--input-border-color);
-        box-sizing: border-box;
-        color: var(--input-font-color);
-        opacity: 0.8;
-        display: inline-block;
-        font-size: 14px;
-        height: 32px;
-        line-height: 32px;
-        outline: none;
-        padding: 0 40px 0 10px;
-        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
-        width: 416px;
+          background-color: var(--input-bg-color);
+          background-image: none;
+          border-radius: 2px;
+          border: 1px solid var(--input-border-color);
+          box-sizing: border-box;
+          color: var(--input-font-color);
+          opacity: 0.8;
+          display: inline-block;
+          font-size: 14px;
+          height: 32px;
+          line-height: 32px;
+          outline: none;
+          padding: 0 40px 0 10px;
+          transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+          width: 416px;
       }
       .copy {
         width: 14px;

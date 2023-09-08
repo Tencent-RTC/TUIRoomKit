@@ -1,21 +1,21 @@
 <template>
   <div class="footer-container">
     <div class="left-container">
-      <audio-control v-tap="() => handleControlClick('audioControl')"></audio-control>
-      <video-control v-tap="() => handleControlClick('videoControl')"></video-control>
+      <audio-control @click="handleControlClick('audioControl')"></audio-control>
+      <video-control @click="handleControlClick('videoControl')"></video-control>
       <chat-control
         v-if="!roomStore.isSpeakAfterTakingSeatMode"
-        v-tap="() => handleControlClick('chatControl')"
+        @click="handleControlClick('chatControl')"
       ></chat-control>
       <apply-control
         v-else
-        v-tap="() => handleControlClick('applyControl')"
+        @click="handleControlClick('applyControl')"
       ></apply-control>
       <manage-member-control
         v-if="roomStore.isMaster"
-        v-tap="() => handleControlClick('manageMemberControl')"
+        @click="handleControlClick('manageMemberControl')"
       ></manage-member-control>
-      <more-control v-tap="() => handleControlClick('moreControl')"></more-control>
+      <more-control @click="handleControlClick('moreControl')"></more-control>
     </div>
   </div>
 </template>
@@ -27,7 +27,6 @@ import ChatControl from '../ChatControl.vue';
 import ApplyControl from '../ApplyControl/Index.vue';
 import MoreControl from '../MoreControl';
 import bus from '../../../hooks/useMitt';
-import vTap from '../../../directives/vTap';
 
 import TUIRoomAegis from '../../../utils/aegis';
 
@@ -46,10 +45,7 @@ function handleControlClick(name: string) {
 
 <style scoped>
 .footer-container{
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
+    display: flex;
 }
 .left-container{
     width: 100%;

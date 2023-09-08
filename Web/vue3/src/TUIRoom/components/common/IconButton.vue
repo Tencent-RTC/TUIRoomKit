@@ -47,15 +47,20 @@ defineEmits(['click-icon', 'click-more']);
 
 <style lang="scss" scoped>
 @import '../../assets/style/var.scss';
+* {
+  transition: none !important;
+}
 .icon-box {
   width: 78px;
-  height: 100%;
+  height: 80px;
   position: relative;
   display: flex;
   cursor: pointer;
   padding: 10px 0;
   &.disabled {
-    color: $disabledColor;
+    * {
+      color: $disabledColor;
+    }
   }
   &.hover-effect:hover {
     &:before{

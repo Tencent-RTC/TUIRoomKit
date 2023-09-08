@@ -1,8 +1,8 @@
 <template>
   <div class="footer-container">
     <div class="left-container">
-      <audio-control class="left-container-item" @click="handleControlClick('audioControl')"></audio-control>
-      <video-control class="left-container-item" @click="handleControlClick('videoControl')"></video-control>
+      <audio-control @click="handleControlClick('audioControl')"></audio-control>
+      <video-control @click="handleControlClick('videoControl')"></video-control>
     </div>
     <div class="center-container">
       <screen-share-control @click="handleControlClick('screenShareControl')"></screen-share-control>
@@ -82,7 +82,7 @@ function handleControlClick(name: string) {
     height: 100%;
     display: flex;
     align-items: center;
-    .left-container-item:not(:first-child) {
+    > :not(:first-child) {
       margin-left: 1rem;
     }
   }

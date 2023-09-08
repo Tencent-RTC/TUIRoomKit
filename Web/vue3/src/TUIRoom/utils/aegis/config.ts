@@ -6,7 +6,7 @@
  * projectName: 项目名称
  */
 
-import { isMobile }  from '../useMediaValue';
+import isMobile from '../useMediaValue';
 
 const IS_LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 const IS_OFFICIAL_DEMO = location.host === 'web.sdk.qcloud.com';
