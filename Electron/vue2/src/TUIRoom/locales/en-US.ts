@@ -59,7 +59,7 @@ export default {
   'Raise Hand Room': 'Raise Hand Room',
   'Join Room': 'Join Room',
   'Enter room ID': 'Enter room ID',
-  'video conferencing': ' \'s video conferencing',
+  'video conferencing': '{user}\'s video conferencing',
   'Room ID': 'Room ID',
   'Low Definition': 'Low Definition',
   'Standard Definition': 'Standard Definition',
@@ -216,6 +216,4 @@ export default {
   'Camera not detected on current device': 'Camera not detected on current device',
   'Camera And Microphone not detected on current device': 'Camera And Microphone not detected on current device',
   'Another user is currently sharing the screen, screen sharing is not possible.': 'Another user is currently sharing the screen, screen sharing is not possible.',
-  'This action causes the room to be disbanded, does it continue?': 'This action causes the room to be disbanded, does it continue?',
-  'This action causes the room to be exited, does it continue?': 'This action causes the room to be exited, does it continue?',
 };

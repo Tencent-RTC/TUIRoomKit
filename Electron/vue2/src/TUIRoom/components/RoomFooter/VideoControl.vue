@@ -141,6 +141,7 @@ async function toggleMuteVideo() {
     } else {
       await roomEngine.instance?.openLocalCamera();
     }
+    await roomEngine.instance?.startPushLocalVideo();
   }
   showVideoSettingTab.value = false;
 }

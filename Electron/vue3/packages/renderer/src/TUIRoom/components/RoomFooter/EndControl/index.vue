@@ -40,7 +40,7 @@
           <el-button v-if="roomStore.isMaster" type="primary" @click.stop="dismissRoom">
             {{ t('Dismiss') }}
           </el-button>
-          <el-button v-if="isShowLeaveRoomDialog" type="primary" @click="leaveRoom">{{ t('Leave') }}</el-button>
+          <el-button v-if="showLeaveRoom" type="primary" @click="leaveRoom">{{ t('Leave') }}</el-button>
           <el-button @click.stop="cancel">{{ t('Cancel') }}</el-button>
         </div>
         <div v-if="currentDialogType === DialogType.TransferDialog">
@@ -62,7 +62,7 @@ import logger from '../../../utils/common/logger';
 
 const {
   t,
-  isShowLeaveRoomDialog,
+  showLeaveRoom,
   roomStore,
   basicStore,
   roomEngine,
