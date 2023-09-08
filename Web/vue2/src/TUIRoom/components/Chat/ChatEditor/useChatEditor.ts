@@ -17,7 +17,7 @@ export default function useChatEditor() {
   const { isMessageDisableForAllUser } = storeToRefs(roomStore);
   const editorInputEle = ref();
   const sendMsg = ref('');
-  const isEmojiToolbarVisible = ref(false);
+
   watch(isMessageDisableByAdmin, (value) => {
     if (value) {
       sendMsg.value = '';
@@ -36,7 +36,6 @@ export default function useChatEditor() {
     if (msg === '') {
       return;
     }
-    isEmojiToolbarVisible.value = false;
     try {
       await roomEngine.instance?.sendTextMessage({
         messageText: msg,
@@ -66,9 +65,6 @@ export default function useChatEditor() {
     sendMsg.value += emojiName;
     editorInputEle.value.focus();
   };
-  const togglePopover = () => {
-    isEmojiToolbarVisible.value = !isEmojiToolbarVisible.value;
-  };
   return {
     t,
     editorInputEle,
@@ -77,7 +73,5 @@ export default function useChatEditor() {
     cannotSendMessage,
     sendMessage,
     handleChooseEmoji,
-    isEmojiToolbarVisible,
-    togglePopover,
   };
 }

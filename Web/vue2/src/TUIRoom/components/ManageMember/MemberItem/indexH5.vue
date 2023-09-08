@@ -1,15 +1,14 @@
 <template>
   <div
     :ref="(el) => setMemberItemRef(el)"
-    v-tap="handleMemberItemClick"
     class="member-item-container"
+    @click="handleMemberItemClick"
   >
     <member-info :ref="(el) => setMemberInfoRef(el)" :show-state-icon="true" :user-info="userInfo"></member-info>
     <member-control
-      v-if="showMemberControl"
+      v-show="showMemberControl"
       :ref="(el) => setMemberControlRef(el)"
       :user-info="userInfo"
-      @on-close-control="handleCloseControl"
     ></member-control>
   </div>
 </template>
@@ -20,7 +19,6 @@ import MemberInfo from '../MemberItemCommon/MemberInfo.vue';
 import MemberControl from '../MemberControl';
 import { UserInfo } from '../../../stores/room';
 import useMemberItem from './useMemberItemHooks';
-import vTap from '../../../directives/vTap';
 
 const {
   showMemberControl,
@@ -29,7 +27,6 @@ const {
   setMemberControlRef,
   handleMemberItemClick,
   handleDocumentClick,
-  handleCloseControl,
 } = useMemberItem();
 
 interface Props {

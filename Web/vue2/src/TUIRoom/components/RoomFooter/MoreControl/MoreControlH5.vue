@@ -60,11 +60,11 @@ function handleDocumentClick(event: MouseEvent) {
 }
 
 onMounted(() => {
-  document?.addEventListener('click', handleDocumentClick, true);
+  document.addEventListener('click', handleDocumentClick, true);
 });
 
 onUnmounted(() => {
-  document?.removeEventListener('click', handleDocumentClick, true);
+  document.removeEventListener('click', handleDocumentClick, true);
 });
 </script>
 <style lang="scss" scoped>
