@@ -2,6 +2,12 @@
 
 本文档主要介绍如何快速跑通 TUIRoomKit Electron 示例工程，体验多人音视频互动，更详细的 TUIRoomKit Electron 组件接入流程，请点击腾讯云官网文档：[TUIRoomKit 组件 Electron 接入说明](https://cloud.tencent.com/document/product/647/84238)...
 
+> **限免公测说明：**
+>
+> 产品目前处于**限免公测期，暂不收取额外费用**，目前服务计费与即时通信 IM、实时音视频 TRTC 产品计费服务保持一致 ，您可限时免费下载 SDK 并接入体验多人音视频会话能力。若**未来多人音视频 SDK 的计费方式、功能和限免公测时间等有所变更，我们将提前在官网发布公告进行说明，并通过站内信、短信、邮件等方式提前通知您，敬请关注。**
+产品计费如下：
+>
+> ![](https://qcloudimg.tencent-cloud.cn/raw/d7cc415af767a462efef414849255ea9.svg)
 
 ## 目录结构
 
@@ -21,21 +27,15 @@
 ├── tsconfig.json
 └── vue.config.js      // vue 配置文件
 ```
-### 第一步：开通服务
+### 第一步：创建TRTC的应用
 
-在使用 TUIRoomKit 发起会议前，您需要开通 TUIRoomKit 专属的多人音视频互动服务，详细步骤如下：
+1. 进入腾讯云实时音视频控制台的 [应用管理](https://console.cloud.tencent.com/trtc/app) 界面，选择创建应用，输入应用名称，例如 `TUIKitDemo` ，单击 **创建**；
+2. 点击对应应用条目后**应用信息**，具体位置如下下图所示：
+    <img src="https://qcloudimg.tencent-cloud.cn/raw/62f58d310dde3de2d765e9a460b8676a.png" width="900">
+3. 进入应用信息后，按下图操作，记录SDKAppID和密钥：
+    <img src="https://qcloudimg.tencent-cloud.cn/raw/bea06852e22a33c77cb41d287cac25db.png" width="900">
 
-1. 登录  [腾讯云视立方 SDK 控制台](https://console.cloud.tencent.com/vcube/project/manage)，单击创建项目按钮后，选择多人音视频互动场景和集成方式，这里我们推荐“含 UI 快速集成”，即 TUIRoomKit。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/a7ff9c2e362530504c00afad3f60b443.png" width="900" />
-
-2. 在选定接入场景和集成方式以后，您需要开通多人音视频房间 SDK 使用的两项腾讯云基础的 PaaS 能力，即 [即时通信 IM](https://cloud.tencent.com/document/product/269/1498) 和 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788)，开通后，单击创建项目并下一步按钮。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/c0e9905f8db488e90bb03b168afb42ab.png" width="900" />
-
-3. 在项目创建完成以后，您需要为该项目匹配一个 IM 应用，因为多人音视频房间 SDK 依赖了 IM SDK 提供的基础能力，这里创建或者管理已有的 IM 应用均可，在关联成功后，就可以领取 7天的免费体验版，用于后续的开发调试工作，当然如果您之前已经体验过，也可以直接在该页面单击 [购买正式版本](https://buy.cloud.tencent.com/vcube)。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/77427e4ca940924cd0bb9aefecfd8a40.png" width="900" />
-
-4. 单击前往集成按钮，选择项目配置，查看详细的配置页面，找到 **SDKAppID 和密钥** 并记录下来，它们会在后续步骤用到，至此 **多人音视频房间 SDK 服务** 开通完成。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/d7495fa5c7e26ff861783916655cf9fd.png" width="900" />
+>! 本功能同时使用了腾讯云 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788) 和 [即时通信 IM](https://cloud.tencent.com/document/product/269) 两个基础 PaaS 服务，开通实时音视频后会同步开通即时通信 IM 服务。 即时通信 IM 属于增值服务，详细计费规则请参见 [即时通信 IM 价格说明](https://cloud.tencent.com/document/product/269/11673)。
 
 ### 第二步：下载源码，配置工程
 1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~

@@ -3,9 +3,6 @@ import { TUIRole, TUIVideoStreamType, TUIRoomInfo, TUIUserInfo, TUIVideoQuality,
 import { useBasicStore } from './basic';
 import { isVue3 } from '../utils/constants';
 import Vue from '../utils/vue';
-import useGetRoomEngine from '../hooks/useRoomEngine';
-
-const roomEngine = useGetRoomEngine();
 
 export type StreamInfo = {
   userId: string,
@@ -541,18 +538,9 @@ export const useRoomStore = defineStore('room', {
         return;
       }
       const { isOpenCamera, isOpenMicrophone, defaultCameraId, defaultMicrophoneId, defaultSpeakerId } = roomParam;
-      if (defaultCameraId) {
-        this.setCurrentCameraId(defaultCameraId);
-        roomEngine.instance?.setCurrentCameraDevice({ deviceId: defaultCameraId });
-      }
-      if (defaultMicrophoneId) {
-        this.setCurrentMicrophoneId(defaultMicrophoneId);
-        roomEngine.instance?.setCurrentMicDevice({ deviceId: defaultMicrophoneId });
-      }
-      if (defaultSpeakerId) {
-        this.setCurrentSpeakerId(defaultSpeakerId);
-        roomEngine.instance?.setCurrentSpeakerDevice({ deviceId: defaultSpeakerId });
-      }
+      defaultCameraId && this.setCurrentCameraId(defaultCameraId);
+      defaultMicrophoneId && this.setCurrentMicrophoneId(defaultMicrophoneId);
+      defaultSpeakerId && this.setCurrentSpeakerId(defaultSpeakerId);
       // 如果已经开启全员禁言/当前为申请发言模式，则忽略默认打开麦克风的设置
       if (this.isMaster || (!this.isMicrophoneDisableForAllUser
         && this.isFreeSpeakMode)) {

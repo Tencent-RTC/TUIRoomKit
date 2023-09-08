@@ -49,7 +49,7 @@ defineEmits(['click-icon', 'click-more']);
 @import '../../assets/style/var.scss';
 .icon-box {
   width: 78px;
-  height: 100%;
+  height: 80px;
   position: relative;
   display: flex;
   cursor: pointer;

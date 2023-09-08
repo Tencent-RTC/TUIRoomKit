@@ -3,7 +3,7 @@
     <div class="more-notice">{{ t('Join our QQ group chat or email us.') }}</div>
     <div class="more-content">
       <div class="more-item">
-        <span class="more-title">{{ t('group chat') }}</span>
+        <span class="more-title">QQ {{ t('group chat') }}</span>
         <div class="input-area">
           <input class="input" type="text" :value="groupNumber">
           <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(groupNumber)"></svg-icon>
