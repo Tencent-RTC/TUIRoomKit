@@ -68,7 +68,6 @@
 "TUIRoom.raise.speak.model" = "举手发言模式";
 "TUIRoom.freedom.speak.model" = "自由发言模式";
 "TUIRoom.chat" = "聊天";
-"TUIRoom.beauty" = "美颜";
 "TUIRoom.switch.layout" = "切换布局";
 
 "TUIRoom.leave" = "离开";

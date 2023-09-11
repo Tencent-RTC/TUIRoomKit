@@ -8,13 +8,11 @@ This document describes how to quickly run the TUIRoomKit demo project to make a
 ```
 TUIRoomKit
 ├─ Example                    // multi-person video conferencing demo project
-    ├─ App                    // Folder of entering/creating multi-person video conferencing UI code and used images and internationalization string resources
-    ├─ Debug                  // Folder of the key business code required for project debugging and running
-    ├─ Login                  // Folder of the login UI and business logic code
-    └─ TXReplayKit_Screen     // Folder of sharing screen
-├─ TUIRoomKit                 // Folder of multi-person video conferencing UI code and used images and internationalization string resources
-├─ TUIBarrage                 // Barrage components
-└─ TUIBeauty                  // Beauty components
+│   ├─ App                    // Folder of entering/creating multi-person video conferencing UI code and used images and internationalization string resources
+│   ├─ Debug                  // Folder of the key business code required for project debugging and running
+│   ├─ Login                  // Folder of the login UI and business logic code
+│   └─ TXReplayKit_Screen     // Folder of sharing screen
+└─ TUIRoomKit                 // Folder of multi-person video conferencing UI code and used images and internationalization string resources
 ```
 
 ## Environment Requirements
@@ -24,13 +22,14 @@ TUIRoomKit
 
 [](id:ui.step1)
 ### Step 1. Create a TRTC application
-1. Go to the [Application management](https://console.cloud.tencent.com/trtc/app) page in the TRTC console, select **Create Application**, enter an application name such as `TUIKitDemo`, and click **Confirm**.
-2. Click **Application Information** on the right of the application as shown below:
-    <img src="https://qcloudimg.tencent-cloud.cn/raw/62f58d310dde3de2d765e9a460b8676a.png" width="900">
-3. On the application information page, note down the `SDKAppID` and key as shown below:
-    <img src="https://qcloudimg.tencent-cloud.cn/raw/bea06852e22a33c77cb41d287cac25db.png" width="900">
+1. Enter the [Application Management](https://www.tencentcloud.com/account/login) interface of the Tencent Cloud Live Audio/Video Console, select Create Application, enter the application name,click **Create Application**.
+2. Find your application in the application list and Click **Application Info**.
+    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a12607f338b311ed8088525400463ef7.png" width="900">
+        
+3. Follow the steps below to get the application’s `SDKAppID` and key.
+    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a0eb96e038b311ed8088525400463ef7.png" width="900">
 
->! This feature uses two basic PaaS services of Tencent Cloud: [TRTC](https://www.tencentcloud.com/document/product/647/35078) and [IM](https://www.tencentcloud.com/document/product/1047/33513). When you activate TRTC, IM will be activated automatically. IM is a value-added service.
+>! This component uses two basic PaaS services of Tencent Cloud: [TRTC](https://intl.cloud.tencent.com/document/product/647/35078) and [IM](https://intl.cloud.tencent.com/document/product/1047). When you activate TRTC, IM will be activated automatically. For information about the billing of IM, see [Pricing](https://intl.cloud.tencent.com/document/product/1047/34350).
 
 [](id:ui.step2)
 ### Step 2. Configure the project

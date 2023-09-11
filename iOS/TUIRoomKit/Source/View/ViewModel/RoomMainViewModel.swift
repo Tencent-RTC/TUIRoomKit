@@ -17,7 +17,6 @@ import TXLiteAVSDK_Professional
 
 protocol RoomMainViewResponder: AnyObject {
     func showSelfBecomeRoomOwnerAlert()
-    func showBeautyView()
     func makeToast(text: String)
 }
 
@@ -40,7 +39,6 @@ class RoomMainViewModel: NSObject {
         super.init()
         fetchRoomInfo()
         getUserList(nextSequence: 0)//获取用户列表
-        setLocalVideoProcessDelegate()
         subscribeEngine()
     }
     
@@ -82,21 +80,12 @@ class RoomMainViewModel: NSObject {
         }
     }
     
-    private func setLocalVideoProcessDelegate() {
-        engineManager.roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(self, pixelFormat: ._Texture_2D, bufferType: .texture)
-    }
-    
-    private func deleteLocalVideoProcessDelegate() {
-        engineManager.roomEngine.getTRTCCloud().setLocalVideoProcessDelegete(nil, pixelFormat: ._Texture_2D, bufferType: .texture)
-    }
-    
     private func subscribeEngine() {
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRequestReceived, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onUserScreenCaptureStarted),
                                                name: UIScreen.capturedDidChangeNotification, object: nil)
@@ -108,7 +97,6 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onRequestReceived, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
         NotificationCenter.default.removeObserver(self, name: UIScreen.capturedDidChangeNotification, object: nil)
     }
     private func setVideoEncoderParam() {
@@ -195,7 +183,6 @@ class RoomMainViewModel: NSObject {
     }
     
     deinit {
-        deleteLocalVideoProcessDelegate()
         unsubscribeEngine()
         debugPrint("deinit \(self)")
     }
@@ -325,39 +312,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
     }
 }
 
-extension RoomMainViewModel: TRTCVideoFrameDelegate {
-    public func onProcessVideoFrame(_ srcFrame: TRTCVideoFrame, dstFrame: TRTCVideoFrame) -> UInt32 {
-        //todo：美颜组件有bug，xMagicKit初始化不成功，需要更改
-        if let dstTextureId = TUICore.callService(TUICore_TUIBeautyService,
-                                                  method: TUICore_TUIBeautyService_ProcessVideoFrame,
-                                                  param: [
-                                                    TUICore_TUIBeautyService_ProcessVideoFrame_SRCTextureIdKey: srcFrame.textureId,
-                                                    TUICore_TUIBeautyService_ProcessVideoFrame_SRCFrameWidthKey: srcFrame.width,
-                                                    TUICore_TUIBeautyService_ProcessVideoFrame_SRCFrameHeightKey: srcFrame.height,
-                                                  ]) as? GLuint {
-            dstFrame.textureId = dstTextureId
-        } else {
-            dstFrame.textureId = srcFrame.textureId
-        }
-        return 0
-    }
-}
-
 extension RoomMainViewModel: RoomMainViewFactory {
-    func makeBeautyView() -> UIView? {
-        let beautyManager = engineManager.roomEngine.getTRTCCloud().getBeautyManager()
-        let beautyInfoArray = TUICore.getExtensionList(TUICore_TUIBeautyExtension_BeautyView,
-                                                       param: [
-                                                        TUICore_TUIBeautyExtension_BeautyView_BeautyManager: beautyManager,])
-        for extensionInfo in beautyInfoArray {
-            guard let map = extensionInfo.data as? [String: Any] else { continue }
-            guard let view = map[TUICore_TUIBeautyExtension_BeautyView_View] as? UIView else { continue }
-            view.isHidden = true
-            return view
-        }
-        return nil
-    }
-    
     func makeTopView() -> UIView {
         let viewModel = TopViewModel()
         let topView = TopView(viewModel: viewModel)
@@ -385,16 +340,6 @@ extension RoomMainViewModel: RoomMainViewFactory {
             raiseHandNoticeView.isHidden = true
         }
         return raiseHandNoticeView
-    }
-}
-
-extension RoomMainViewModel: RoomKitUIEventResponder {
-    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
-        switch key{
-        case .TUIRoomKitService_ShowBeautyView:
-            viewResponder?.showBeautyView()
-        default: break
-        }
     }
 }
 

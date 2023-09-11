@@ -68,7 +68,6 @@
 "TUIRoom.raise.speak.model" = "Raise hand speak model";
 "TUIRoom.freedom.speak.model" = "Freedom speak model";
 "TUIRoom.chat" = "chat";
-"TUIRoom.beauty" = "beauty";
 "TUIRoom.switch.layout" = "Switch layout";
 
 "TUIRoom.leave" = "Leave";
