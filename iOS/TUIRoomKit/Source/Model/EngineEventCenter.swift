@@ -93,7 +93,6 @@ class EngineEventCenter: NSObject {
         case TUIRoomKitService_RenewSeatList
         case TUIRoomKitService_UserOnSeatChanged
         case TUIRoomKitService_ResignFirstResponder
-        case TUIRoomKitService_ShowBeautyView
         case TUIRoomKitService_ShowRoomMainView
         case TUIRoomKitService_ShowRoomFloatView
         case TUIRoomKitService_RoomMainControllerAlreadyShown

@@ -36,18 +36,6 @@ class MoreFunctionViewModel {
             }
             viewItems.append(chatItem)
         }
-        //美颜
-        if hasBeautyItem() {
-            let beautyItem = ButtonItemData()
-            beautyItem.normalIcon = "room_beauty"
-            beautyItem.normalTitle = .beautyText
-            beautyItem.resourceBundle = tuiRoomKitBundle()
-            beautyItem.action = { [weak self] sender in
-                guard let self = self, let button = sender as? UIButton else { return }
-                self.beautyAction(sender: button)
-            }
-            viewItems.append(beautyItem)
-        }
         //设置
         let settingItem = ButtonItemData()
         settingItem.normalIcon = "room_setting"
@@ -62,17 +50,6 @@ class MoreFunctionViewModel {
     
     private func hasTUIChatItem() -> Bool {
         return TUICore.getService(TUICore_TUIChatService) != nil
-    }
-    private func hasBeautyItem() -> Bool {
-        return TUICore.getService(TUICore_TUIBeautyService) != nil
-    }
-    
-    func beautyAction(sender: UIButton) {
-        sender.isSelected = !sender.isSelected
-        RoomRouter.shared.dismissPopupViewController(viewType: .moreViewType) { [weak self] in
-            guard let self = self else { return }
-            self.engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_ShowBeautyView, param: [:])
-        }
     }
     
     func settingAction(sender: UIButton) {
@@ -94,9 +71,6 @@ class MoreFunctionViewModel {
 }
 
 private extension String {
-    static var beautyText: String {
-        localized("TUIRoom.beauty")
-    }
     static var settingText: String {
         localized("TUIRoom.setting")
     }

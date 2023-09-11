@@ -121,12 +121,17 @@ extension RoomFloatViewModel {
         viewResponder?.showAvatarImageView(isShow: false)
     }
     
-    //清理被占用的view
-    private func resetVideoView(userId: String, streamType: TUIVideoStreamType) {
-        if userId != currentUser.userId {
-            engineManager.roomEngine.setRemoteVideoView(userId: userId, streamType: streamType, view: nil)
-        } else {
+    private func stopPlayVideo(userId: String, streamType: TUIVideoStreamType) {
+        if userId == currentUser.userId {
             engineManager.roomEngine.setLocalVideoView(streamType: streamType, view: nil)
+            return
+        }
+        engineManager.roomEngine.setRemoteVideoView(userId: userId, streamType: streamType, view: nil)
+        guard let userItem = getUserModel(userId: userId) else { return }
+        if streamType == .screenStream, userItem.hasScreenStream {
+            engineManager.roomEngine.stopPlayRemoteVideo(userId: userId, streamType: .screenStream)
+        } else if streamType == .cameraStream, userItem.hasVideoStream {
+            engineManager.roomEngine.stopPlayRemoteVideo(userId: userId, streamType: .cameraStream)
         }
     }
     
@@ -148,7 +153,7 @@ extension RoomFloatViewModel: RoomEngineEventResponder {
             guard userRole == .roomOwner else { return }
             roomInfo.ownerId = userId
             guard getScreenUserModel() == nil else { return } //如果有人正在进行屏幕共享，不显示房主画面
-            resetVideoView(userId: self.userId, streamType: .cameraStream)
+            stopPlayVideo(userId: self.userId, streamType: .cameraStream)
             showOwnerCameraStream()
         case .onUserVideoStateChanged:
             guard let userId = param?["userId"] as? String else { return }
@@ -156,11 +161,11 @@ extension RoomFloatViewModel: RoomEngineEventResponder {
             guard let hasVideo = param?["hasVideo"] as? Bool else { return }
             if streamType == .screenStream {
                 if hasVideo {
-                    resetVideoView(userId: roomInfo.ownerId, streamType: .cameraStream)
+                    stopPlayVideo(userId: roomInfo.ownerId, streamType: .cameraStream)
                     guard let userModel = getUserModel(userId: userId) else { return }
                     showScreenStream(userModel: userModel)
                 } else {
-                    resetVideoView(userId: self.userId, streamType: .screenStream)
+                    stopPlayVideo(userId: self.userId, streamType: .screenStream)
                     showOwnerCameraStream()
                 }
                 return
@@ -176,11 +181,11 @@ extension RoomFloatViewModel: RoomEngineEventResponder {
             guard let userId = param?["userId"] as? String else { return }
             guard let hasAudio = param?["hasAudio"] as? Bool else { return }
             guard userId == self.userId else { return }
-                var volume = 0
-                if let userModel = getUserModel(userId: self.userId) {
-                    volume = userModel.volume
-                }
-                viewResponder?.updateUserAudioVolume(hasAudio: hasAudio, volume: volume)
+            var volume = 0
+            if let userModel = getUserModel(userId: self.userId) {
+                volume = userModel.volume
+            }
+            viewResponder?.updateUserAudioVolume(hasAudio: hasAudio, volume: volume)
         case .onUserVoiceVolumeChanged:
             guard let volumeNumber = param?[self.userId] as? NSNumber else { return }
             guard let userModel = getUserModel(userId: self.userId) else { return }

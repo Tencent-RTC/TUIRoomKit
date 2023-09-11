@@ -12,7 +12,6 @@ protocol RoomMainViewFactory {
     func makeBottomView() -> UIView
     func makeTopView() -> UIView
     func makeVideoSeatView() -> UIView
-    func makeBeautyView() -> UIView?
     func makeRaiseHandNoticeView() -> UIView
 }
 
@@ -42,10 +41,6 @@ class RoomMainRootView: UIView {
         return viewFactory.makeBottomView()
     }()
     
-    lazy var beautyView: UIView? = {
-        return viewFactory.makeBeautyView()
-    }()
-    
     lazy var raiseHandNoticeView: UIView = {
         return viewFactory.makeRaiseHandNoticeView()
     }()
@@ -66,9 +61,6 @@ class RoomMainRootView: UIView {
         addSubview(videoSeatView)
         addSubview(topView)
         addSubview(bottomView)
-        if let beautyView = beautyView {
-            addSubview(beautyView)
-        }
         addSubview(raiseHandNoticeView)
     }
     
@@ -90,11 +82,6 @@ class RoomMainRootView: UIView {
             make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
             make.top.equalTo(topView.snp.bottom)
             make.bottom.equalTo(bottomView.snp.top).offset(-5)
-        }
-        beautyView?.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview()
-            make.leading.equalTo(safeAreaLayoutGuide.snp.leading)
-            make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
         }
         raiseHandNoticeView.snp.makeConstraints { make in
             make.bottom.equalTo(bottomView.snp.top).offset(-15)
@@ -140,10 +127,6 @@ extension RoomMainRootView: RoomMainViewResponder {
         }
         alertVC.addAction(sureAction)
         RoomRouter.shared.presentAlert(alertVC)
-    }
-    
-    func showBeautyView() {
-        beautyView?.isHidden = false
     }
     
     func makeToast(text: String) {
