@@ -16,6 +16,31 @@
 import RoomContainer from '@/TUIRoom/index.vue';
 import { MessageBox } from 'element-ui';
 import logger from '../TUIRoom/utils/common/logger';
+import router from '@/router';
+import { useRoomStore } from '../TUIRoom/stores/room';
+import { useBasicStore } from '../TUIRoom/stores/basic';
+const basicStore = useBasicStore();
+const roomStore = useRoomStore();
+let TUIRoomRef;
+router.beforeEach((from, to, next) => {
+  if (!basicStore.roomId) {
+    next();
+  } else {
+    const message = roomStore.isMaster
+      ? TUIRoomRef?.t('This action causes the room to be disbanded, does it continue?') : TUIRoomRef?.t('This action causes the room to be exited, does it continue?');
+    if (window.confirm(message)) {
+      if (roomStore.isMaster) {
+        TUIRoomRef?.dismissRoom();
+      } else {
+        TUIRoomRef?.leaveRoom();
+      }
+      TUIRoomRef?.resetStore();
+      next();
+    } else {
+      next(false);
+    }
+  }
+});
 export default {
   name: 'Room',
   components: { RoomContainer },
@@ -27,6 +52,7 @@ export default {
     };
   },
   async mounted() {
+    TUIRoomRef = this.$refs.TUIRoomRef;
     this.roomInfo = sessionStorage.getItem('tuiRoom-roomInfo');
     this.userInfo = sessionStorage.getItem('tuiRoom-userInfo');
     this.roomId = this.$route.query.roomId;
@@ -43,7 +69,7 @@ export default {
     const { action, roomMode, roomParam } = JSON.parse(this.roomInfo);
     const { sdkAppId, userId, userSig, userName, avatarUrl } = JSON.parse(this.userInfo);
     try {
-      await this.$refs.TUIRoomRef.init({
+      await TUIRoomRef.init({
         sdkAppId,
         userId,
         userSig,
@@ -52,7 +78,7 @@ export default {
       });
       if (action === 'createRoom') {
         try {
-          await this.$refs.TUIRoomRef.createRoom({ roomId: this.roomId, roomName: this.roomId, roomMode, roomParam });
+          await TUIRoomRef.createRoom({ roomId: this.roomId, roomName: this.roomId, roomMode, roomParam });
         } catch (error) {
           const message = this.$t('Failed to enter the room.') + error.message;
           MessageBox.alert(message, this.$t('Note'), {
@@ -65,7 +91,7 @@ export default {
         }
       } else if (action === 'enterRoom') {
         try {
-          await this.$refs.TUIRoomRef.enterRoom({ roomId: this.roomId, roomParam });
+          await TUIRoomRef.enterRoom({ roomId: this.roomId, roomParam });
         } catch (error) {
           const message = this.$t('Failed to enter the room.') + error.message;
           MessageBox.alert(message, this.$t('Note'), {

@@ -22,10 +22,10 @@ const props = defineProps<Props>();
 
 <style lang="scss">
 .dialog-container {
+   height: 15vh;
     max-width: 80vw;
     position: fixed;
-    max-height: 18vh;
-    background-color: var(--log-out-cancel);
+    background-color: #FFFFFF;
     border-radius: 8px;
     top: 0;
     left: 0;
@@ -35,16 +35,16 @@ const props = defineProps<Props>();
     border: 1px solid rgba(211, 219, 238, 0.4);
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
   .dialog-title {
     display: inline-block;
-    padding: 12px 0 15px 14px;
     font-family: 'PingFang SC';
     font-style: normal;
     font-weight: 400;
     font-size: 18px;
     line-height: 22px;
     text-align: center;
-    color: var(--dialog-title-h5);
+    color: rgba(43, 46, 56, 1);
   }
   .dialog-content {
     font-family: 'PingFang SC';
@@ -53,14 +53,13 @@ const props = defineProps<Props>();
     font-size: 14px;
     line-height: 16px;
     text-align: center;
-    color: var(--dialog-title-h5);
+    color: rgba(43, 46, 56, 1);
     text-align: center;
     padding-top: 10px;
   }
   .dialog-footer {
-    padding-top: 4%;
-    padding: 10px 10px 0 10px;
     display: flex;
+    height: auto;
     flex-direction: row;
     justify-content: center;
    }
