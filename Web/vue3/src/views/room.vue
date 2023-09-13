@@ -23,12 +23,15 @@ import { ElMessageBox } from 'element-plus';
 import {
   TUIKickedOutOfRoomReason,
 } from '@tencentcloud/tuiroom-engine-js';
-import logger from '../TUIRoom/utils/common/logger';
+import logger from '@/TUIRoom/utils/common/logger';
+import { useBasicStore } from '../TUIRoom/stores/basic';
+import { useRoomStore } from '../TUIRoom/stores/room';
 
 const { t } = useI18n();
 
 const route = useRoute();
-
+const basicStore = useBasicStore();
+const roomStore = useRoomStore();
 const roomInfo = sessionStorage.getItem('tuiRoom-roomInfo');
 const userInfo = sessionStorage.getItem('tuiRoom-userInfo');
 
@@ -93,6 +96,25 @@ onMounted(async () => {
   }
 });
 
+router.beforeEach((from: any, to: any, next: any) => {
+  if (!basicStore.roomId) {
+    next();
+  } else {
+    const message = roomStore.isMaster
+      ? t('This action causes the room to be disbanded, does it continue?') : t('This action causes the room to be exited, does it continue?');
+    if (window.confirm(message)) {
+      if (roomStore.isMaster) {
+        TUIRoomRef.value?.dismissRoom();
+      } else {
+        TUIRoomRef.value?.leaveRoom();
+      }
+      TUIRoomRef.value?.resetStore();
+      next();
+    } else {
+      next(false);
+    }
+  }
+});
 /**
  * Processing users click [Logout Login] in the upper left corner of the page
  * 处理用户点击页面左上角【退出登录】

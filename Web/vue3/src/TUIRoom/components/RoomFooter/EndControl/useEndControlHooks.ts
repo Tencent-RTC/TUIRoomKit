@@ -22,13 +22,33 @@ export default function useEndControl() {
 
   const roomStore = useRoomStore();
   const { localUser, remoteAnchorList } = storeToRefs(roomStore);
-
   const title = computed(() => (currentDialogType.value === DialogType.BasicDialog ? t('Leave room?') : t('Select a new host')));
-  const showLeaveRoom = computed(() => (
+  const isShowLeaveRoomDialog = computed(() => (
     roomStore.isMaster && remoteAnchorList.value.length > 0)
   || !roomStore.isMaster);
-
+  const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
+  const showSideBar = computed(() => isSidebarOpen.value && sidebarName.value === 'transfer-leave');
   const selectedUser: Ref<string> = ref('');
+  const showTransfer = ref(false);
+  const searchName = ref('');
+  const filteredList = computed(() => remoteAnchorList.value.filter(searchUser => (
+    searchUser.userId.includes(searchName.value)) || (searchUser.userName?.includes(searchName.value))));
+  const hasNoData = computed(() => filteredList.value.length === 0);
+
+  function toggleMangeMemberSidebar() {
+    if (basicStore.setSidebarOpenStatus && sidebarName.value === 'transfer-leave') {
+      basicStore.setSidebarOpenStatus(false);
+      basicStore.setSidebarName('');
+      return;
+    }
+
+    basicStore.setSidebarOpenStatus(true);
+    basicStore.setSidebarName('transfer-leave');
+  }
+
+  function handleShowMemberControl(userId: string) {
+    selectedUser.value = userId;
+  }
 
   function resetState() {
     visible.value = false;
@@ -44,38 +64,21 @@ export default function useEndControl() {
   function cancel() {
     resetState();
   }
-  const { sidebarName } = storeToRefs(basicStore);
-
-  function toggleMangeMemberSidebar() {
-    if (basicStore.setSidebarOpenStatus && sidebarName.value === 'transfer-leave') {
-      basicStore.setSidebarOpenStatus(false);
-      basicStore.setSidebarName('');
-      return;
-    }
-
-    basicStore.setSidebarOpenStatus(true);
-    basicStore.setSidebarName('transfer-leave');
-  }
 
   async function closeMediaBeforeLeave() {
     if (localUser.value.hasAudioStream) {
       await roomEngine.instance?.closeLocalMicrophone();
-      await roomEngine.instance?.stopPushLocalAudio();
     }
     if (localUser.value.hasVideoStream) {
       await roomEngine.instance?.closeLocalCamera();
-      await roomEngine.instance?.stopPushLocalVideo();
     }
   }
-
   return {
     t,
     basicStore,
-    showLeaveRoom,
-    sidebarName,
+    isShowLeaveRoomDialog,
     roomStore,
     roomEngine,
-    toggleMangeMemberSidebar,
     localUser,
     remoteAnchorList,
     stopMeeting,
@@ -88,5 +91,13 @@ export default function useEndControl() {
     visible,
     closeMediaBeforeLeave,
     resetState,
+    searchName,
+    hasNoData,
+    handleShowMemberControl,
+    filteredList,
+    toggleMangeMemberSidebar,
+    showTransfer,
+    sidebarName,
+    showSideBar,
   };
 }
