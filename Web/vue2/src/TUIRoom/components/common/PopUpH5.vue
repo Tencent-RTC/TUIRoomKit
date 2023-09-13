@@ -1,7 +1,9 @@
 <template>
   <div class="popup-container">
     <div class="popup-main-header">
-      <svg-icon class="close-icon" size="custom" icon-name="close-back" @click.self="handleClose"></svg-icon>
+      <span v-tap="handleClose" class="icon-container">
+        <svg-icon class="close-icon" size="custom" icon-name="close-back"></svg-icon>
+      </span>
       <span class="sidebar-title">{{ title }}</span>
     </div>
     <div class="popup-main-content">
@@ -15,6 +17,8 @@
 <script setup lang="ts">
 import SvgIcon from './SvgIcon.vue';
 import { useBasicStore } from '../../stores/basic';
+import '../../directives/vTap';
+
 interface Props {
   title: string,
 }
@@ -36,13 +40,21 @@ function handleClose() {
   position: static;
   flex: 1;
   .popup-main-header {
-    position: sticky;
-    top: 0;
     width: 100%;
     height: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
+    .icon-container{
+      padding: 20px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 10px;
+      height: 18px;
+      background-size: cover;
+      box-sizing: content-box;
+    }
     .sidebar-title {
       font-family: 'PingFang SC';
       font-style: normal;
@@ -53,9 +65,6 @@ function handleClose() {
       color: var(--input-font-color);
     }
     .close-icon{
-      position: absolute;
-      top: 21px;
-      left: 22px;
       width: 10px;
       height: 18px;
       background-size: cover;
@@ -63,12 +72,12 @@ function handleClose() {
   }
   .popup-main-content {
     width: 100%;
-    height: calc(100% - 120px);
+    height: calc(100% - 130px);
     overflow: hidden;
   }
   .popup-main-footer {
     width: 100%;
-    height: 60px;
+    height: auto;
     position: sticky;
     bottom: 0;
     padding-top: 10px;
