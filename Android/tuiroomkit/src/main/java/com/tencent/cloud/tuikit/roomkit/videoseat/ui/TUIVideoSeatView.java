@@ -112,7 +112,7 @@ public class TUIVideoSeatView extends RelativeLayout {
         mPageLayoutManager.setPageListener(new PageLayoutManager.PageListener() {
             @Override
             public void onPageSizeChanged(int pageSize) {
-
+                updateScrollIndicator();
             }
 
             @Override
