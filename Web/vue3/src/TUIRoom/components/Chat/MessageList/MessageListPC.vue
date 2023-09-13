@@ -21,11 +21,11 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted } from 'vue';
-import MessageText from './MessageTypes/MessageText.vue';
+import MessageText from '../MessageTypes/MessageText.vue';
 import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
-import isMobile from '../../utils/useMediaValue';
-import useMessageList from '../Chat/useMessageListHook';
-import { useChatStore } from '../../stores/chat';
+import { isMobile }  from '../../../utils/useMediaValue';
+import useMessageList from '../useMessageListHook';
+import { useChatStore } from '../../../stores/chat';
 const chatStore = useChatStore();
 
 const {
