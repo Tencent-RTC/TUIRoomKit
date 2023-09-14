@@ -24,7 +24,7 @@ _English | [简体中文](README.zh.md)
 - Platform connectivity: TUIRoomKit components of all platforms are interconnected and accessible.
 - Screen sharing: Based on the screen acquisition capability of each platform jointly polished by 3000+ market applications, with exclusive AI coding algorithm, lower bit rate and clearer picture.
 - Member management: It supports multiple standard room management functions such as all mute, single member gag, drawing, inviting to speak, kicking out of the room, etc.
-- Other features: Support room members chat screen, music playback, sound Settings, basic beauty and other features, welcome to use.
+- Other features: Support room members chat screen, sound Settings and other features, welcome to use.
 
 ## Make a first video Conference 
 
