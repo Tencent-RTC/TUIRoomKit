@@ -1,3 +1,4 @@
+import Vue from '../utils/vue';
 
 class VueTouch {
   public dom: HTMLElement;
@@ -12,15 +13,15 @@ class VueTouch {
 
     el?.addEventListener('touchstart', () => {
       this.touchstart();
-    });
+    }, { passive: true });
 
     el?.addEventListener('touchmove', () => {
       this.touchmove();
-    });
+    }, { passive: true});
 
     el?.addEventListener('touchend', () => {
       this.touchend();
-    });
+    }, { passive: true});
   }
 
   touchstart() {
@@ -38,10 +39,8 @@ class VueTouch {
   }
 }
 
-const vTap = {
-  mounted(el: HTMLElement, binding: any) {
+Vue.directive('tap', {
+  bind: function (el: HTMLElement, binding: any) {
     return new VueTouch(el, binding);
-  },
-};
-
-export default vTap;
+  }
+});

@@ -1,16 +1,37 @@
-## 2023.08.17
+## 2023.09.07@1.5.0
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.5.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89380)。
+- 优化远端用户退房或关闭视频流时，本地视频布局变更逻辑，优化交互体验。
+
+**Bug Fixed**
+- 修复 Windows 下 WPS 全屏分享异常问题。
+- 修复 Electron 下，大画面显示的用户直接退房时，观看端因视频显示切换异常，导致大画面显示黑屏问题。
+- 修复顶部栏布局下，新增用户视频流播放黑屏的问题。
+
+## 2023.08.28@1.4.6
+
+**Feature**
+
+- 升级 [@tencentyun/TUIRoomKit/Electron](https://github.com/tencentyun/TUIRoomKit) 到 v1.4.6 版本。
+
+- 修复邀请链接错误的问题。
+- 新增屏幕分享中禁止他人进行屏幕分享。
+
+## 2023.08.17@1.4.5
 
 **Feature**
 
 - 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.4.5 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89380)。
 
-## 2023.08.09
+## 2023.08.09@1.4.4
 
 **Feature**
 
 - 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.4.4 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89380)。
 
-## 2023.08.02
+## 2023.08.02@1.4.3
 
 **Feature**
 
@@ -28,7 +49,7 @@
   - 优化 mac 启动 system loopback 失败率高问题。
   - 解决 mac 分享窗口，上行帧率为零问题
 
-## 2023.07.18
+## 2023.07.18@1.4.0
 
 **Feature**
 
@@ -55,7 +76,7 @@
 - 修复屏幕分享从切换另外一个人后，部分观众观看屏幕分享黑屏的问题。
 
 
-## 2023.05.26
+## 2023.05.26@1.3.0
 
 **Feature**
 
