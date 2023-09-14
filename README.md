@@ -3,13 +3,6 @@ _简体中文 | [English](README.en.md)
 
 <img src="Preview/logo.png" align="left" width=120 height=120>  TUIRoomKit 是腾讯云推出一款定位 企业会议、在线课堂、网络沙龙等场景的 UI 组件，通过集成该组件，您只需要编写几行代码就可以为您的 App 添加类似视频会议功能，并且支持屏幕分享、成员管理，禁麦禁画、聊天弹幕等功能。TUIRoomlKit 支持 Windows、Mac、Android、iOS、Web、Electron 等多个开发平台。
 
-<a href="https://apps.apple.com/cn/app/%E8%85%BE%E8%AE%AF%E4%BA%91%E9%9F%B3%E8%A7%86%E9%A2%91/id1400663224"><img src="Preview/app-store.svg" height=40></a> <a href="https://dldir1.qq.com/hudongzhibo/liteav/TRTCDemo.apk"><img src="Preview/play-store.svg" height=40></a> <a href="https://web.sdk.qcloud.com/trtc/webrtc/demo/api-sample/login.html"><img src="Preview/web-app.svg" height=40></a>
-
-> TUIRoomKit于2022.12.16日更新上线，目前处于限免公测期，UI开源免费使用，组件内部SDK提供的房间管理、麦控等能力暂不收取使用费用，但使用过程中产生的即时通信 IM 与 实时音视频 TRTC 消耗仍会正常收费，详情见下图：
-> 若未来多人音视频 SDK（TUIRoomKit）的计费方式、功能和限免公测时间等有所变更，我们将提前在官网发布公告进行说明，并通过站内信、短信、邮件等多种方式提前通知您，敬请关注。
-<image src="https://qcloudimg.tencent-cloud.cn/raw/d7cc415af767a462efef414849255ea9.svg">
-
-
 ## 产品特性
 
 <p align="center">
@@ -20,7 +13,7 @@ _简体中文 | [English](README.en.md)
 - 平台互通：各平台的 TUIRoomKit 组件互联互通，沟通无障碍；
 - 屏幕分享：基于3000+家市场应用共同打磨的各平台屏幕采集能力，搭配专属AI 编码算法，更低码率更清晰的画面；
 - 成员管理：支持全体静音、单一成员禁言禁画、邀请发言、踢出房间等多个标准的房间管理功能；
-- 其他特性：支持房间成员聊天弹幕、音乐播放、音效设置、基础美颜等其他特性，欢迎使用；
+- 其他特性：支持房间成员聊天弹幕、音效设置等其他特性，欢迎使用；
 
 ## 开始使用
 
