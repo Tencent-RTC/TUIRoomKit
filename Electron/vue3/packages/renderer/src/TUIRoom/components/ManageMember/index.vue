@@ -15,7 +15,7 @@
           <span class="setting-name">{{ t('Disable all audios') }}</span>
         </div>
         <div class="item-right-section">
-          <el-switch :value="roomStore.isMicrophoneDisableForAllUser" @change="toggleAllAudio" />
+          <el-switch :value="isMicrophoneDisableForAllUser" @change="toggleAllAudio" />
         </div>
       </div>
       <div class="setting-item">
@@ -26,7 +26,7 @@
           <span class="setting-name">{{ t('Disable all videos') }}</span>
         </div>
         <div class="item-right-section">
-          <el-switch :value="roomStore.isCameraDisableForAllUser" @change="toggleAllVideo" />
+          <el-switch :value="isCameraDisableForAllUser" @change="toggleAllVideo" />
         </div>
       </div>
     </div>
@@ -44,47 +44,29 @@
 </template>
 
 <script setup lang='ts'>
-import { storeToRefs } from 'pinia';
 import MemberItem from '../ManageMember/MemberItem/index.vue';
-import useGetRoomEngine from '../../hooks/useRoomEngine';
 import SvgIcon from '../common/SvgIcon.vue';
-import { useRoomStore } from '../../stores/room';
-import { useBasicStore } from '../../stores/basic';
+
 import { ICON_NAME } from '../../constants/icon';
-import { useI18n } from '../../locales';
-import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-electron';
-
-
-const roomEngine = useGetRoomEngine();
-
-const { t } = useI18n();
-
-const basicStore = useBasicStore();
+import { storeToRefs } from 'pinia';
+import { useRoomStore } from '../../stores/room';
+import useIndex from './useIndexHooks';
 const roomStore = useRoomStore();
 
-const { userList, userNumber, applyToAnchorList } = storeToRefs(roomStore);
+const {
+  userList,
+  userNumber,
+  applyToAnchorList,
+  isMicrophoneDisableForAllUser,
+  isCameraDisableForAllUser,
+} = storeToRefs(roomStore);
 
-function showApplyUserLit() {
-  basicStore.setShowApplyUserList(true);
-}
-
-async function toggleAllAudio() {
-  const microphoneDisableState = !roomStore.isMicrophoneDisableForAllUser;
-  await roomEngine.instance?.disableDeviceForAllUserByAdmin({
-    isDisable: microphoneDisableState,
-    device: TUIMediaDevice.kMicrophone,
-  });
-  roomStore.setMicrophoneDisableState(microphoneDisableState);
-}
-
-async function toggleAllVideo() {
-  const cameraDisableState = !roomStore.isCameraDisableForAllUser;
-  await roomEngine.instance?.disableDeviceForAllUserByAdmin({
-    isDisable: cameraDisableState,
-    device: TUIMediaDevice.kCamera,
-  });
-  roomStore.setCameraDisableState(cameraDisableState);
-}
+const {
+  t,
+  showApplyUserLit,
+  toggleAllAudio,
+  toggleAllVideo,
+} = useIndex();
 
 </script>
 
