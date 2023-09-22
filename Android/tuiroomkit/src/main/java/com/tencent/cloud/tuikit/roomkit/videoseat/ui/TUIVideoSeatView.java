@@ -128,12 +128,12 @@ public class TUIVideoSeatView extends RelativeLayout {
                 }
                 mCurrentPageIndex = pageIndex;
                 updateUserTalkingViewVisible(pageIndex);
+                updateCircleIndicator();
                 processVideoPlay(mVisibleRange.getMinVisibleRange(), mVisibleRange.getMaxVisibleRange());
             }
 
             @Override
             public void onItemVisible(int fromItem, int toItem) {
-                Log.d(TAG, "onItemVisible: " + fromItem + " to " + toItem);
                 mVisibleRange.updateRange(fromItem, toItem);
             }
         });
