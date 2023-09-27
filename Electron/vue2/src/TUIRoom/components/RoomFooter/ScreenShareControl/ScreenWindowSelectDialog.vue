@@ -16,7 +16,7 @@
               v-for="item in screenList"
               :key="item.sourceId"
               :data="item"
-              :class="{ selected: item.sourceId === selected?.sourceId}"
+              :class="{ 'selected-screen' : item.sourceId === selected?.sourceId}"
               :title="item.sourceName"
               @click.native="onSelect(item)"
             />
@@ -27,7 +27,7 @@
               v-for="item in windowList"
               :key="item.sourceId"
               :data="item"
-              :class="{ selected: item.sourceId === selected?.sourceId}"
+              :class="{ 'selected-screen' : item.sourceId === selected?.sourceId}"
               :title="item.sourceName"
               @click.native="onSelect(item)"
             />
@@ -109,7 +109,7 @@ function cancel() {
   }
 
 }
-  .selected {
+  .selected-screen {
     background-color: transparent;
     color: var(--selected-screen-share-dialog);
     box-shadow: 2px 2px 10px 2px $activeStateColor;

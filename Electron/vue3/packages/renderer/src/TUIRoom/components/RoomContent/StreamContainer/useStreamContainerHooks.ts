@@ -138,7 +138,7 @@ export default function useStreamContainer() {
        *
        * 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
        **/
-      await roomEngine.instance?.openLocalMicrophone();
+      await roomEngine.instance?.unmuteLocalAudio();
       if (!isWeChat && !isMobile) {
         const microphoneList = await roomEngine.instance?.getMicDevicesList();
         const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
@@ -151,6 +151,8 @@ export default function useStreamContainer() {
         }
         await roomEngine.instance?.setCurrentMicDevice({ deviceId: roomStore.currentMicrophoneId });
       }
+    } else {
+      await roomEngine.instance?.muteLocalAudio();
     }
   });
   return {

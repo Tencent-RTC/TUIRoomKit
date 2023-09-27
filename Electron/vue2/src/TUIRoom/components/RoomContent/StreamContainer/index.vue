@@ -129,7 +129,8 @@ const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
   return streamList.value.slice(currentPageIndex.value * 9, currentPageIndex.value * 9 + 9);
 });
 
-watch([() => showStreamList.value.length, currentPageIndex], () => {
+// 当展示页面中的用户改变或者当前页面改变时，重新计算可视区域的用户
+watch([() => showStreamList.value.map(item => item.userId), currentPageIndex], () => {
   if (layout.value === LAYOUT.NINE_EQUAL_POINTS) {
     const streamIdList: string[] = [];
     showStreamList.value.forEach((item) => {

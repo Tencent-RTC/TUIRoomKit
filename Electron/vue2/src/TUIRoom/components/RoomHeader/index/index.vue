@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import { inject } from 'vue';
 import UserInfo from '../UserInfo/index.vue';
 import Language from '../../base/Language.vue';
 import SwitchTheme from '../../base/SwitchTheme.vue';
@@ -39,7 +40,7 @@ const basicStore = useBasicStore();
 
 const { userId, userName, avatarUrl } = storeToRefs(basicStore);
 
-withDefaults(defineProps<{ showHeaderInfo?: boolean }>(), { showHeaderInfo: true });
+const showHeaderInfo = inject('showHeaderInfo', true);
 
 defineEmits(['log-out']);
 
