@@ -233,9 +233,9 @@ class TUIRoomEngine : IDeprecatedRoomEngineAPI {
      * 3.7 设置视频编码器的编码参数
      *
      * @param streamType 视频流的类型，定义可参考 {@link TUIVideoStreamType} 的定义
-     * @param params 视频编码器的编码参数，定义可参考 {@link TUIVideoEncoderParams} 的定义
+     * @param params 视频编码器的编码参数，定义可参考 {@link TUIRoomVideoEncoderParams} 的定义
      */
-    virtual void updateVideoQualityEx(TUIVideoStreamType streamType, const TUIVideoEncoderParams& params) = 0;
+    virtual void updateVideoQualityEx(TUIVideoStreamType streamType, const TUIRoomVideoEncoderParams& params) = 0;
 
     /**
      * 3.8 设置视频编码器分辨率模式（横屏分辨率 or 竖屏分辨率）
@@ -298,11 +298,16 @@ class TUIRoomEngine : IDeprecatedRoomEngineAPI {
     virtual void updateAudioQuality(TUIAudioQuality quality) = 0;
 
     /**
-     * 4.4 暂停/恢复发布本地的视频流
-     *
-     * @param mute {@link true}: 暂停 {@link false}: 恢复
+     * 4.4 暂停发布本地的音频流
      */
-    virtual void muteLocalAudio(bool mute) = 0;
+    virtual void muteLocalAudio() = 0;
+
+    /**
+     * 4.5 恢复发布本地的音频流
+     *
+     * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
+     */
+    virtual void unmuteLocalAudio(TUICallback* callback) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //
