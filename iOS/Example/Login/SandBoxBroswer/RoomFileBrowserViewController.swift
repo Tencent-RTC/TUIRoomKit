@@ -24,7 +24,6 @@ class RoomFileBrowserViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         self.initUI()
         self.loadData()
     }
@@ -34,11 +33,11 @@ class RoomFileBrowserViewController: UITableViewController {
         self.tableView.register(RoomFileBroswerCell.self, forCellReuseIdentifier: "RoomFileBroswerCell")
         
         self.navigationItem.title = self.bathPath
+        self.navigationController?.setNavigationBarHidden(false, animated: false)
         
         let backBtnItem = UIBarButtonItem(title: " ", style: .plain, target: nil, action: nil)
         self.navigationItem.backBarButtonItem = backBtnItem
     }
-    
     
     func loadData() {
         guard let fileList = try? FileManager.default.contentsOfDirectory(atPath: self.bathPath) else {

@@ -6,33 +6,23 @@
   
 */
 
-
-"Demo.TRTC.Karaoke.voicechatroom" = "TUIRoom";
-"Demo.TRTC.LiveRoom.createRoom" = "Create Room";
-"Demo.TRTC.LiveRoom.roomNumber" = "Room Number  ";
-"Demo.TRTC.LiveRoom.enterRoom" = "Enter Room";
-"Demo.TRTC.LiveRoom.enterRoomNumber" = "Please Enter Room Number";
-"Demo.TRTC.LiveRoom.prompt" = "Prompt";
-"Demo.TRTC.LiveRoom.ok" = "OK";
-"Demo.TRTC.LiveRoom.roomNumberis:" = "The currently created room number is:";
-"Demo.TRTC.LiveRoom.roomdoesnotexist" = "The current room does not exist";
-"App.PortalViewController.areyousureloginout" = "Are you sure you want to log out?";
-"App.PortalViewController.cancel" = "Cancel";
-"App.PortalViewController.determine" = "Yes";
-"Demo.TRTC.Karaoke.roomInfo" = "Room information";
-"TUIRoom.create.title" = "Audio/Video Room";
-"TUIRoom.create.room" = "Create Room";
-"TUIRoom.quick.join" = "Join Room";
-"TUIRoom.room.num" = "Room ID";
-"TUIRoom.open.camera" = "Turn camera on";
-"TUIRoom.open.mic" = "Turn mic on";
-"TUIRoom.not.login.toast" = "Please log in.";
-"TUIRoom.input.room.num" = "Enter a room ID";
-"TUIRoom.input.error.room.num.toast" = "Enter a valid room ID.";
-"TUIRoom.logout.room" = "Leave";
-"TUIRoom.user.name" = "Username";
-"TUIRoom.enter.again" = "Reenter";
-"TUIRoom.video.conferencing" = "Video Conferencing";
-"TUIRoom.average.latency.desc" = "Average end-to-end latency < 300 ms worldwide";
-"TUIRoom.entered.room" = "Already entered the meeting";
-"TUIRoom.logout" = "Log out";
+"Demo.TUIRoomKit.create.room" = "Create Room";
+"Demo.TUIRoomKit.join.room" = "Join Room";
+"Demo.TUIRoomKit.join.live.room" = "Join Live Room";
+"Demo.TUIRoomKit.room.num" = "Room ID";
+"Demo.TUIRoomKit.input.room.num" = "Enter a room ID";
+"Demo.TUIRoomKit.input.error.room.num.toast" = "Enter a valid room ID.";
+"Demo.TUIRoomKit.user.name" = "Your Name";
+"Demo.TUIRoomKit.ok" = "OK";
+"Demo.TUIRoomKit.cancel" = "Cancel";
+"Demo.TUIRoomKit.raise.speak.model" = "Raise hand speak model";
+"Demo.TUIRoomKit.freedom.speak.model" = "Freedom speak model";
+"Demo.TUIRoomKit.room.type" = "Room Type";
+"Demo.TUIRoomKit.open.video" = "Camera";
+"Demo.TUIRoomKit.open.mic" = "Mic";
+"Demo.TUIRoomKit.open.speaker" = "Speaker";
+"Demo.TUIRoomKit.freedom.speaker" = "Freedom Speaker Room";
+"Demo.TUIRoomKit.raise.speaker" = "Raise hand Speaker Room";
+"Demo.TUIRoomKit.video.conference" = "`s quick meeting";
+"Demo.TUIRoomKit.prepareSetting" = "Prepare Settings";
+"Demo.TUIRoomKit.tip" = "Tencent Cloud TUIRoomKit";

@@ -10,7 +10,7 @@ import Foundation
 class ChatExtensionRoomSettingsViewModel {
     var isOpenMicrophone: Bool
     var isOpenCamera: Bool
-    private let engineManager = EngineManager.shared
+    private let engineManager = EngineManager.createInstance()
     private(set) var roomSettingsViewItems: [RoomSetListItemData] = []
     init(isOpenMicrophone: Bool, isOpenCamera: Bool) {
         self.isOpenMicrophone = isOpenMicrophone

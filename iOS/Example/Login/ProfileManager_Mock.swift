@@ -10,7 +10,6 @@ import UIKit
 import Alamofire
 import ImSDK_Plus
 import TUICore
-import TUIRoomEngine
 import TUIRoomKit
 
 @objc class LoginResultModel: NSObject, Codable {
@@ -30,11 +29,6 @@ import TUIRoomKit
         userSig = GenerateTestUserSig.genTestUserSig(identifier: userID)
         avatar = "https://imgcache.qq.com/qcloud/public/static//avatar1_100.20191230.png"
         super.init()
-    }
-    
-    convenience init(userID: String, nickName: String) {
-        self.init(userID: userID)
-        self.name = nickName
     }
 }
 
@@ -61,8 +55,6 @@ import TUIRoomKit
                     failed(err)
                     UserDefaults.standard.set(nil, forKey: tokenKey)
                 }
-                let nickName = curUserModel?.name ?? (curUserModel?.userId ?? "")
-                curUserModel?.name = nickName
                 login(phone: curUserModel?.userId ?? "", name: curUserModel?.name ?? "", success: success, failed: fail, auto: true)
                 return true
             }
@@ -75,7 +67,7 @@ import TUIRoomKit
     ///   - success: 登录成功
     ///   - failed: 登录失败
     ///   - error: 错误信息
-    @objc public func login(phone: String, code: String, success: @escaping ()->Void,
+    @objc public func login(phone: String, name: String, success: @escaping ()->Void,
                             failed: ((_ error: String) -> Void)? = nil , auto: Bool = false) {
         let phoneValue = phone
         if !auto {
@@ -88,22 +80,8 @@ import TUIRoomKit
             let cacheData = try JSONEncoder().encode(curUserModel)
             UserDefaults.standard.set(cacheData, forKey: tokenKey)
         } catch {
-          print("Save Failed")
+            print("Save Failed")
         }
-        success()
-    }
-    
-    @objc public func login(phone: String,
-                            name: String,
-                            success: @escaping ()->Void,
-                            failed: ((_ error: String) -> Void)? = nil ,
-                            auto: Bool = false) {
-        let phoneValue = phone
-        if !auto {
-            assert(phoneValue.count > 0)
-            curUserModel = LoginResultModel(userID: phoneValue, nickName: name)
-        }
-        localizeUserModel()
         success()
     }
     
@@ -113,7 +91,7 @@ import TUIRoomKit
             let cacheData = try JSONEncoder().encode(curUserModel)
             UserDefaults.standard.set(cacheData, forKey: tokenKey)
         } catch {
-          print("Save Failed")
+            print("Save Failed")
         }
     }
     
@@ -124,22 +102,17 @@ import TUIRoomKit
     ///   - failed: 失败回调
     ///   - error: 错误信息
     @objc public func setNickName(name: String, success: @escaping ()->Void,
-                        failed: @escaping (_ error: String)->Void) {
-        guard let userModel = curUserModel else {
-            failed("set profile failed")
-            debugPrint("set profile failed.")
-            return
-        }
-        let oldName = userModel.name
+                                  failed: @escaping (_ error: String)->Void) {
+        let userInfo = V2TIMUserFullInfo()
+        userInfo.nickName = name
         curUserModel?.name = name
-        TUIRoomEngine.setSelfInfo(userName: userModel.name, avatarUrl: userModel.avatar) {
+        V2TIMManager.sharedInstance()?.setSelfInfo(userInfo, succ: {
             success()
             debugPrint("set profile success")
-        } onError: {[weak self] code, message in
-            failed(message)
+        }, fail: { (code, desc) in
+            failed(desc ?? "")
             debugPrint("set profile failed.")
-            self?.curUserModel?.name = oldName
-        }
+        })
     }
     
     /// IM 登录当前用户
@@ -158,6 +131,7 @@ import TUIRoomKit
                 guard let `self` = self else { return }
                 if let info = infos?.first {
                     self.curUserModel?.avatar = info.faceURL ?? ""
+                    self.curUserModel?.name = info.nickName ?? ""
                     success()
                 }
                 else {
@@ -186,16 +160,7 @@ import TUIRoomKit
     }
     
     @objc public func curUserSig() -> String {
-           return curUserModel?.userSig ?? ""
-    }
-    
-    
-    @objc public func curNickName() -> String {
-        return curUserModel?.name ?? ""
-    }
-    
-    @objc public func refreshAvatar(faceURL: String) {
-        self.curUserModel?.avatar = faceURL
+        return curUserModel?.userSig ?? ""
     }
     
     @objc func synchronizUserInfo() {

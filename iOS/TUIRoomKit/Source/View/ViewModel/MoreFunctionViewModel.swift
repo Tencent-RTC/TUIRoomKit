@@ -13,7 +13,7 @@ class MoreFunctionViewModel {
     private(set) var viewItems: [ButtonItemData] = []
     
     var engineManager: EngineManager {
-        return EngineManager.shared
+        return EngineManager.createInstance()
     }
     var engineEventCenter: EngineEventCenter {
         return EngineEventCenter.shared
@@ -25,7 +25,7 @@ class MoreFunctionViewModel {
     
     func createBottomData() {
         //聊天
-        if hasTUIChatItem(), !engineManager.store.isChatAccessRoom {
+        if hasTUIChatItem() {
             let chatItem = ButtonItemData()
             chatItem.normalIcon = "room_chat"
             chatItem.normalTitle = .chatText

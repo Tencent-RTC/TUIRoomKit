@@ -78,17 +78,15 @@ class TUIVideoSeatViewModel: NSObject {
 
     weak var viewResponder: TUIVideoSeatViewResponder?
     var videoSeatViewType: TUIVideoSeatViewType = .unknown
-    var roomInfo: RoomInfo
+    var roomInfo: TUIRoomInfo
     var currentUserId: String {
         return TUIRoomEngine.getSelfInfo().userId
     }
 
     private weak var roomEngine: TUIRoomEngine?
     init(roomEngine: TUIRoomEngine, roomId: String) {
-        let tuiRoomInfo = TUIRoomInfo()
-        tuiRoomInfo.roomId = roomId
-        roomInfo = RoomInfo()
-        roomInfo.update(engineRoomInfo: tuiRoomInfo)
+        roomInfo = TUIRoomInfo()
+        roomInfo.roomId = roomId
         super.init()
         self.roomEngine = roomEngine
         initRoomInfo()
@@ -201,8 +199,7 @@ extension TUIVideoSeatViewModel {
     private func initRoomInfo() {
         roomEngine?.fetchRoomInfo { [weak self] roomInfo in
             guard let self = self, let roomInfo = roomInfo else { return }
-            self.roomInfo = RoomInfo()
-            self.roomInfo.update(engineRoomInfo: roomInfo)
+            self.roomInfo = roomInfo
             switch self.roomInfo.speechMode {
             case .freeToSpeak:
                 let localSeatList: [VideoSeatItem] = []
@@ -513,8 +510,8 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
 
     public func onUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool, reason: TUIChangeReason) {
         if streamType == .screenStream, userId == currentUserId {
-            viewResponder?.showScreenCaptureMaskView(isShow: hasVideo)
-            return
+                  viewResponder?.showScreenCaptureMaskView(isShow: hasVideo)
+                  return
         }
         if hasVideo {
             let renderParams = TRTCRenderParams()
@@ -584,7 +581,7 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
     
     public func onUserScreenCaptureStopped(reason: Int) {
         viewResponder?.showScreenCaptureMaskView(isShow: false)
-        guard var seatItem = getSeatItem(currentUserId) else { return }
+        guard let seatItem = getSeatItem(currentUserId) else { return }
         seatItem.hasScreenStream = false
         reloadSeatItems()
     }

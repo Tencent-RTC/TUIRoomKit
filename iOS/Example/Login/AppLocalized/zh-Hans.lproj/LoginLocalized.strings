@@ -17,5 +17,6 @@
 "V2.Live.LinkMicNew.loginsuccess" = "登录成功";
 "Demo.TRTC.Login.regist" = "注册";
 "Demo.TRTC.Login.enterusername" = "请输入用户昵称";
-"Demo.TRTC.Login.limit20count" = "仅限中文、字母、数字和下划线，2-20个字";
+"Demo.TRTC.Login.limit20count" = "仅限中文、字母、数字和下划线";
 "Demo.TRTC.Login.registsuccess" = "注册成功";
+"Demo.TRTC.Login.registsfailure.nameTooLong" = "您的昵称过长";

@@ -13,10 +13,10 @@ import TUICore
 class RoomMessageManager {
     static let shared = RoomMessageManager()
     private var engineManager: EngineManager {
-        EngineManager.shared
+        EngineManager.createInstance()
     }
     private lazy var userId: String = {
-        return TUILogin.getUserID() ?? engineManager.store.currentLoginUser.userId
+        return TUILogin.getUserID() ?? engineManager.store.currentUser.userId
     }()
     weak var navigateController: UINavigationController?
     var isReadyToSendMessage: Bool = true //是否可以发送新消息
@@ -28,15 +28,7 @@ class RoomMessageManager {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             guard BusinessSceneUtil.canJoinRoom() else { return }
-            //判断是否已经登录Engine，如果没有登录，需要先进行登录
-            if !RoomManager.shared.isEngineLogin {
-                RoomManager.shared.loginEngine { [weak self] in
-                    guard let self = self else { return }
-                    self.sendRoomMessageToGroup()
-                } onError: { code, message in
-                    debugPrint("loginEngine,code:\(code),message:\(message)")
-                }
-            } else if self.engineManager.store.isEnteredRoom { //判断现在是否在其他会议房间中
+            if self.engineManager.store.isEnteredRoom { //判断现在是否在其他会议房间中
                 RoomManager.shared.exitOrDestroyPreviousRoom() { [weak self] in
                     guard let self = self else { return }
                     self.sendMessage()
@@ -52,25 +44,28 @@ class RoomMessageManager {
     }
     
     private func sendMessage() {
-        guard self.isReadyToSendMessage else {
-            self.changeReadyToSendMessage()
-            return
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard self.isReadyToSendMessage else {
+                self.changeReadyToSendMessage()
+                return
+            }
+            self.isReadyToSendMessage = false
+            guard let roomId = RoomManager.shared.getRoomId() else { return }
+            let messageModel = RoomMessageModel()
+            messageModel.groupId = self.groupId
+            messageModel.roomId = roomId
+            messageModel.ownerName = TUILogin.getNickName() ?? ""
+            messageModel.owner = self.userId
+            let messageDic = messageModel.getDictFromMessageModel()
+            guard let jsonString = self.dicValueString(messageDic) else { return }
+            let jsonData = jsonString.data(using: String.Encoding.utf8)
+            let message = V2TIMManager.sharedInstance().createCustomMessage(jsonData)
+            message?.supportMessageExtension = true
+            let param = [TUICore_TUIChatService_SendMessageMethod_MsgKey: message]
+            TUICore.callService(TUICore_TUIChatService, method: TUICore_TUIChatService_SendMessageMethod, param: param as [AnyHashable : Any])
+            RoomManager.shared.roomId = roomId
         }
-        self.isReadyToSendMessage = false
-        guard let roomId = RoomManager.shared.getRoomId() else { return }
-        let messageModel = RoomMessageModel()
-        messageModel.groupId = groupId
-        messageModel.roomId = roomId
-        messageModel.ownerName = TUILogin.getNickName() ?? ""
-        messageModel.owner = userId
-        let messageDic = messageModel.getDictFromMessageModel()
-        guard let jsonString = dicValueString(messageDic) else { return }
-        let jsonData = jsonString.data(using: String.Encoding.utf8)
-        let message = V2TIMManager.sharedInstance().createCustomMessage(jsonData)
-        message?.supportMessageExtension = true
-        let param = [TUICore_TUIChatService_SendMessageMethod_MsgKey: message]
-        TUICore.callService(TUICore_TUIChatService, method: TUICore_TUIChatService_SendMessageMethod, param: param as [AnyHashable : Any])
-        RoomManager.shared.roomId = roomId
     }
     
     //修改message

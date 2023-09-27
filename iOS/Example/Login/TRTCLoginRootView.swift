@@ -136,6 +136,7 @@ class TRTCLoginRootView: UIView {
     var isViewReady = false
     override func didMoveToWindow() {
         super.didMoveToWindow()
+        loginBtn.isEnabled = true
         guard !isViewReady else {
             return
         }
@@ -198,10 +199,6 @@ class TRTCLoginRootView: UIView {
     @objc func getVerifyCodeBtnClick() {
        
     }
-    
-    @objc func debugBtnClick() {
-      
-    }
 }
 
 extension TRTCLoginRootView: UITextFieldDelegate {
@@ -230,7 +227,7 @@ extension TRTCLoginRootView: UITextFieldDelegate {
             maxCount = 11
         }
         else {
-            maxCount = 20
+            maxCount = 6
         }
         guard let textFieldText = textField.text,
             let rangeOfTextToReplace = Range(range, in: textFieldText) else {
@@ -284,18 +281,7 @@ extension TRTCLoginRootView: UITextFieldDelegate {
 fileprivate extension String {
     static let titleText = LoginLocalize(key: "Demo.TRTC.Login.welcome")
     static let phoneNumPlaceholderText = LoginLocalize(key:"V2.Live.LinkMicNew.enterphonenumber")
-    static let nickNamePlaceholderText = LoginLocalize(key:"V2.Live.LinkMicNew.enternickname")
     static let verifyCodePlaceholderText = LoginLocalize(key:"V2.Live.LinkMicNew.enterverificationcode")
     static let getVerifyCodeText = LoginLocalize(key:"V2.Live.LinkMicNew.getverificationcode")
     static let loginText = LoginLocalize(key:"V2.Live.LoginMock.login")
-}
-
-extension UIImage {
-    func resizeImage(reSize:CGSize) -> UIImage? {
-        UIGraphicsBeginImageContext(CGSizeMake(reSize.width, reSize.height))
-        self.draw(in: CGRectMake(0, 0, reSize.width, reSize.height))
-        let reSizeImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return reSizeImage
-    }
 }

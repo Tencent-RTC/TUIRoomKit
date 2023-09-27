@@ -42,7 +42,6 @@ class RoomMainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RoomMainControllerAlreadyShown, param: [:])
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -65,7 +64,7 @@ class RoomMainViewController: UIViewController {
         } else {
             param.resMode = .portrait
         }
-        EngineManager.shared.roomEngine.getTRTCCloud().setVideoEncoderParam(param)
+        EngineManager.createInstance().setVideoEncoderParam(param)
         rootView.updateRootViewOrientation(isLandscape: isLandscape)
     }
     

@@ -9,6 +9,7 @@
 import Foundation
 import TUICore
 import AVFAudio
+import TUIRoomEngine
 
 class InvitedToJoinRoomViewModel: NSObject, AVAudioPlayerDelegate {
     let inviteUserName: String
@@ -47,14 +48,7 @@ class InvitedToJoinRoomViewModel: NSObject, AVAudioPlayerDelegate {
     
     func agreeAction() {
         stopPlay()
-        if !roomManager.isEngineLogin {
-            roomManager.loginEngine { [weak self] in
-                guard let self = self else { return }
-                self.agreeAction()
-            } onError: { code, message in
-                debugPrint("loginEngine, code:\(code), message:\(message)")
-            }
-        } else if EngineManager.shared.store.isEnteredRoom {
+        if EngineManager.createInstance().store.isEnteredRoom {
             roomManager.exitOrDestroyPreviousRoom { [weak self] in
                 guard let self = self else { return }
                 self.enterRoom()
@@ -67,9 +61,7 @@ class InvitedToJoinRoomViewModel: NSObject, AVAudioPlayerDelegate {
     }
     
     private func enterRoom() {
-        let roomInfo = RoomInfo()
-        roomInfo.roomId = roomId
-        roomManager.enterRoom(roomInfo: roomInfo)
+        roomManager.enterRoom(roomId: roomId)
         closeInvitedToJoinRoomView()
     }
     

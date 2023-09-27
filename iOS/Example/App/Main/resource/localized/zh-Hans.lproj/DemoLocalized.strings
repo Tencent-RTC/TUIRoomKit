@@ -6,34 +6,23 @@
   
 */
 
-
-"Demo.TRTC.Karaoke.voicechatroom" = "TUIRoom";
-"Demo.TRTC.LiveRoom.createRoom" = "创建房间";
-"Demo.TRTC.LiveRoom.roomNumber" = "房间号  ";
-"Demo.TRTC.LiveRoom.enterRoom" = "进入房间";
-"Demo.TRTC.LiveRoom.enterRoomNumber" = "请输入您的房间号";
-"Demo.TRTC.LiveRoom.prompt" = "提示";
-"Demo.TRTC.LiveRoom.ok" = "确定";
-"Demo.TRTC.LiveRoom.roomNumberis:" = "当前创建房间号为:";
-"Demo.TRTC.LiveRoom.roomdoesnotexist" = "当前房间不存在";
-"App.PortalViewController.areyousureloginout" = "确定要退出登录吗？";
-"App.PortalViewController.cancel" = "取消";
-"App.PortalViewController.determine" = "确定";
-"Demo.TRTC.Karaoke.roomInfo" = "房间信息";
-
-"TUIRoom.create.title" = "多人音视频房间";
-"TUIRoom.create.room" = "创建房间";
-"TUIRoom.quick.join" = "加入房间";
-"TUIRoom.room.num" = "房间号";
-"TUIRoom.open.camera" = "开启摄像头";
-"TUIRoom.open.mic" = "开启麦克风";
-"TUIRoom.not.login.toast" = "请登录";
-"TUIRoom.input.room.num" = "请输入房间号";
-"TUIRoom.input.error.room.num.toast" = "请输入正确房间号";
-"TUIRoom.logout.room" = "退出房间";
-"TUIRoom.user.name" = "用户名";
-"TUIRoom.enter.again" = "再次进入";
-"TUIRoom.video.conferencing" = "多人视频会议";
-"TUIRoom.average.latency.desc" = "全球端到端平均延时<300ms";
-"TUIRoom.entered.room" = "已经进入会议";
-"TUIRoom.logout" = "注销";
+"Demo.TUIRoomKit.create.room" = "创建房间";
+"Demo.TUIRoomKit.join.room" = "加入房间";
+"Demo.TUIRoomKit.join.live.room" = "加入直播房间";
+"Demo.TUIRoomKit.room.num" = "房间号";
+"Demo.TUIRoomKit.input.room.num" = "请输入房间号";
+"Demo.TUIRoomKit.input.error.room.num.toast" = "请输入正确房间号";
+"Demo.TUIRoomKit.user.name" = "您的姓名";
+"Demo.TUIRoomKit.ok" = "确认";
+"Demo.TUIRoomKit.cancel" = "取消";
+"Demo.TUIRoomKit.raise.speak.model" = "举手发言模式";
+"Demo.TUIRoomKit.freedom.speak.model" = "自由发言模式";
+"Demo.TUIRoomKit.room.type" = "房间类型";
+"Demo.TUIRoomKit.open.video" = "开启视频";
+"Demo.TUIRoomKit.open.mic" = "开启麦克风";
+"Demo.TUIRoomKit.open.speaker" = "开启扬声器";
+"Demo.TUIRoomKit.freedom.speaker" = "自由发言房间";
+"Demo.TUIRoomKit.raise.speaker" = "举手发言房间";
+"Demo.TUIRoomKit.video.conference" = "的快速会议";
+"Demo.TUIRoomKit.prepareSetting" = "进房前设置";
+"Demo.TUIRoomKit.tip" = "腾讯云 TUIRoomKit";

@@ -10,40 +10,49 @@ import Foundation
 import TUIRoomEngine
 
 protocol UserListViewResponder: NSObject {
-    func updateUIWhenRoomOwnerChanged(roomOwner:String)
+    func updateUIWhenRoomOwnerChanged(isOwner: Bool)
     func reloadUserListView()
     func makeToast(text: String)
-    func searchControllerChangeActive(isActive: Bool)
+    func updateBlurViewDisplayStatus(isHidden: Bool)
 }
 
 class UserListViewModel: NSObject {
     var userId: String = ""
-    var attendeeList: [UserModel] = []
-    
-    let timeoutNumber: Double = 30
+    var attendeeList: [UserEntity] = []
+    var engineManager: EngineManager {
+        EngineManager.createInstance()
+    }
+    var currentUser: UserEntity {
+        engineManager.store.currentUser
+    }
+    var roomInfo: TUIRoomInfo {
+        engineManager.store.roomInfo
+    }
+    let timeoutNumber: Double = 0
     weak var viewResponder: UserListViewResponder? = nil
     
     override init() {
         super.init()
-        self.attendeeList = EngineManager.shared.store.attendeeList
-        EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
+        self.attendeeList = engineManager.store.attendeeList
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_UserListManagerDisplayStatusChanged, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RoomOwnerChanged, responder: self)
     }
     
     deinit {
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_UserListManagerDisplayStatusChanged, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RoomOwnerChanged, responder: self)
         debugPrint("deinit \(self)")
     }
     
     func muteAllAudioAction(sender: UIButton, view: UserListView) {
         sender.isSelected = !sender.isSelected
-        let roomInfo = EngineManager.shared.store.roomInfo
-        roomInfo.isMicrophoneDisableForAllUser = sender.isSelected
-        EngineManager.shared.roomEngine.disableDeviceForAllUserByAdmin(device: .microphone, isDisable:
-                                                                        roomInfo.isMicrophoneDisableForAllUser) { [weak self] in
+        engineManager.muteAllAudioAction(isMute: sender.isSelected) { [weak self] in
             guard let self = self else { return }
             if sender.isSelected {
                 self.viewResponder?.makeToast(text:.allMuteAudioText)
@@ -58,10 +67,7 @@ class UserListViewModel: NSObject {
     
     func muteAllVideoAction(sender: UIButton, view: UserListView) {
         sender.isSelected = !sender.isSelected
-        let roomInfo = EngineManager.shared.store.roomInfo
-        roomInfo.isCameraDisableForAllUser = sender.isSelected
-        EngineManager.shared.roomEngine.disableDeviceForAllUserByAdmin(device: .camera, isDisable:
-                                                                        roomInfo.isCameraDisableForAllUser) { [weak self] in
+        engineManager.muteAllVideoAction(isMute: sender.isSelected) { [weak self] in
             guard let self = self else { return }
             if sender.isSelected {
                 self.viewResponder?.makeToast(text:.allMuteVideoText)
@@ -76,40 +82,26 @@ class UserListViewModel: NSObject {
     
     func showUserManageViewAction(userId: String, view: UserListView) {
         self.userId = userId
-        if EngineManager.shared.store.currentUser.userRole == .roomOwner || EngineManager.shared.store.currentUser.userId == userId {
+        if currentUser.userId == roomInfo.ownerId || currentUser.userId == userId {
             view.userListManagerView.isHidden = false
             view.userListManagerView.viewModel.userId = userId
             view.userListManagerView.viewModel.updateUserItem()
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserListManagerDisplayStatusChanged,
+                                                   param: ["isPresent":true])
         }
+    }
+    
+    func hideUserManageViewAction(view: UserListView) {
+        view.userListManagerView.isHidden = true
     }
     
     func inviteSeatAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        EngineManager.shared.roomEngine.takeUserOnSeatByAdmin(-1, userId: userId, timeout: timeoutNumber) { _, _ in
-            //todo
-        } onRejected: { _, _, _ in
-            //todo
-        } onCancelled: { _, _ in
-            //todo
-        } onTimeout: { _, _ in
-            //todo
-        } onError: { _, _, _, _ in
-            //todo
-        }
+        engineManager.takeUserOnSeatByAdmin(userId: userId, timeout: timeoutNumber)
     }
     
-    func backAction() {
-        RoomRouter.shared.dismissPopupViewController(viewType: .userListViewType)
-    }
-}
-
-extension UserListViewModel: RoomEngineEventResponder {
-    func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
-        if name == .onUserRoleChanged {
-            guard let userRole = param?["userRole"] as? TUIRole, userRole == .roomOwner else { return }
-            guard let userId = param?["userId"] as? String else { return }
-            viewResponder?.updateUIWhenRoomOwnerChanged(roomOwner: userId)
-        }
+    func dropDownAction(sender: UIView) {
+        RoomRouter.shared.dismissPopupViewController(viewType: .userListViewType, animated: true)
     }
 }
 
@@ -117,22 +109,18 @@ extension UserListViewModel: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
         switch key {
         case .TUIRoomKitService_RenewUserList, .TUIRoomKitService_RenewSeatList:
-            attendeeList = EngineManager.shared.store.attendeeList
+            attendeeList = engineManager.store.attendeeList
+            viewResponder?.reloadUserListView()
+        case .TUIRoomKitService_CurrentUserRoleChanged:
+            guard let userRole = info?["userRole"] as? TUIRole else { return }
+            viewResponder?.updateUIWhenRoomOwnerChanged(isOwner: userRole == .roomOwner)
+        case .TUIRoomKitService_UserListManagerDisplayStatusChanged:
+            guard let isPresent = info?["isPresent"] as? Bool else {return}
+            viewResponder?.updateBlurViewDisplayStatus(isHidden: !isPresent)
+        case .TUIRoomKitService_RoomOwnerChanged:
             viewResponder?.reloadUserListView()
         default: break
         }
-    }
-}
-
-extension UserListViewModel: PopUpViewResponder {
-    func updateViewOrientation(isLandscape: Bool) {
-        viewResponder?.searchControllerChangeActive(isActive: false)
-        attendeeList = EngineManager.shared.store.attendeeList
-        viewResponder?.reloadUserListView()
-    }
-    
-    func searchControllerChangeActive(isActive: Bool) {
-        viewResponder?.searchControllerChangeActive(isActive: isActive)
     }
 }
 

@@ -14,9 +14,9 @@ class QRCodeView: UIView {
     let backButton: UIButton = {
         let button = UIButton()
         button.contentVerticalAlignment = .center
-        button.contentHorizontalAlignment = .left
+        button.contentHorizontalAlignment = isRTL ? .right : .left
         button.setTitleColor(UIColor(0xADB6CC), for: .normal)
-        let image = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)
+        let image = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)?.checkOverturn()
         button.setImage(image, for: .normal)
         button.setTitle(.videoConferenceTitle, for: .normal)
         button.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 18)
@@ -37,7 +37,6 @@ class QRCodeView: UIView {
         label.font = UIFont(name: "PingFangSC-Regular", size: 28)
         label.textAlignment = .center
         label.backgroundColor = .clear
-        label.text = EngineManager.shared.store.roomInfo.name
         label.adjustsFontSizeToFitWidth = true
         return label
     }()
@@ -54,7 +53,6 @@ class QRCodeView: UIView {
         label.font = UIFont(name: "PingFangSC-Regular", size: 20)
         label.adjustsFontSizeToFitWidth = true
         label.textAlignment = .center
-        label.text = EngineManager.shared.store.roomInfo.roomId
         return label
     }()
     
@@ -175,7 +173,7 @@ class QRCodeView: UIView {
             make.width.equalTo(80.scale375())
         }
         copyButton.snp.makeConstraints { make in
-            make.left.equalTo(roomIdLabel.snp.right).offset(3)
+            make.leading.equalTo(roomIdLabel.snp.trailing).offset(3)
             make.centerY.equalToSuperview()
             make.width.height.equalTo(22.scale375())
         }
@@ -219,6 +217,8 @@ class QRCodeView: UIView {
     
     func setupViewState() {
         backgroundColor = UIColor(0x17181F)
+        titleLabel.text = viewModel.store.roomInfo.name
+        roomIdLabel.text = viewModel.store.roomInfo.roomId
         viewModel.createQRCodeImageView(url: viewModel.urlString, imageView: qrCodeImageView)
     }
     

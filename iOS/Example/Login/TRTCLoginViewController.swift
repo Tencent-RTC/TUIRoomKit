@@ -9,7 +9,6 @@
 import Foundation
 import WebKit
 import TUICore
-import TUIRoomEngine
 import TUIRoomKit
 
 class TRTCLoginViewController: UIViewController {
@@ -32,25 +31,29 @@ class TRTCLoginViewController: UIViewController {
         }
         
         /// auto login
-        if ProfileManager.shared.autoLogin(success: { [weak self] in
-            guard let self = self else {return}
-            self.roomKitLogin()
-        }, failed: { [weak self] (err) in
-            guard let self = self else {return}
-            self.loading.stopAnimating()
-            self.view.makeToast(err)
+        if ProfileManager.shared.autoLogin(success: {
+            self.loginIM { [weak self] (success) in
+                guard let `self` = self else { return }
+                self.loading.stopAnimating()
+                if success {
+                    self.loginSucc()
+                }
+            }
+            }, failed: { [weak self] (err) in
+                guard let self = self else {return}
+                self.loading.stopAnimating()
+                self.view.makeToast(err)
         }) {
             loading.startAnimating()
             if let rootView = view as? TRTCLoginRootView {
                 rootView.phoneNumTextField.text = ProfileManager.shared.curUserModel?.phone ?? ""
-                rootView.checkLoginBtnState()
             }
         }
     }
     
-    func login(phone: String, code: String) {
+    func login(phone: String, nickName: String) {
         loading.startAnimating()
-        ProfileManager.shared.login(phone: phone, code: code) { [weak self] in
+        ProfileManager.shared.login(phone: phone, name: nickName) { [weak self] in
             guard let `self` = self else { return }
             self.loading.stopAnimating()
             self.loginIM { [weak self] (success) in
@@ -59,14 +62,6 @@ class TRTCLoginViewController: UIViewController {
                     self.loginSucc()
                 }
             }
-        }
-    }
-    
-    func login(phone: String, nickName: String) {
-        loading.startAnimating()
-        ProfileManager.shared.login(phone: phone, name: nickName) { [weak self] in
-            guard let self = self else { return }
-            self.roomKitLogin()
         }
     }
     
@@ -80,22 +75,16 @@ class TRTCLoginViewController: UIViewController {
         guard let userID = ProfileManager.shared.curUserID() else { return }
         let userSig = ProfileManager.shared.curUserSig()
         if TUILogin.getUserID() != userID {
-            ProfileManager.shared.IMLogin(userSig: userSig) {
-                debugPrint("IM login success.")
-                complete(true)
-            } failed: { [weak self] (error) in
-                guard let `self` = self else { return }
-                self.view.makeToast(LoginLocalize(key: "App.PortalViewController.loginimfailed"))
-                complete(false)
-            }
+            ProfileManager.shared.curUserModel?.name = ""
         }
-    }
-    
-    func roomKitLogin() {
-        guard let userID = ProfileManager.shared.curUserID() else { return }
-        TUIRoomKit.sharedInstance.addListener(listener: self)
-        let userSig = ProfileManager.shared.curUserSig()
-        TUIRoomKit.sharedInstance.login(sdkAppId: Int(SDKAPPID), userId:userID, userSig: userSig)
+        ProfileManager.shared.IMLogin(userSig: userSig) {
+            debugPrint("IM login success.")
+            complete(true)
+        } failed: { [weak self] (error) in
+            guard let `self` = self else { return }
+            self.view.makeToast(LoginLocalize(key: "App.PortalViewController.loginimfailed"))
+            complete(false)
+        }
     }
     
     func loginSucc() {
@@ -114,11 +103,6 @@ class TRTCLoginViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    func showDebugVC() {
-        let debugVC = RoomFileBrowserViewController(bathPath: NSHomeDirectory())
-        navigationController?.pushViewController(debugVC, animated: true)
-    }
-    
     override func loadView() {
         super.loadView()
         let rootView = TRTCLoginRootView()
@@ -131,39 +115,4 @@ extension String {
     static let verifySuccessStr = "verifySuccess"
     static let verifyCancelStr = "verifyCancel"
     static let verifyErrorStr = "verifyError"
-}
-
-extension TRTCLoginViewController: TUIRoomKitListener {
-    func onLogin(code: Int, message: String) {
-        self.loading.stopAnimating()
-        if code == 0 {
-            self.view.makeToast(LoginLocalize(key:"V2.Live.LinkMicNew.loginsuccess"))
-            let userInfo = TUIRoomEngine.getSelfInfo()
-            ProfileManager.shared.refreshAvatar(faceURL: userInfo.avatarUrl)
-            
-            if ProfileManager.shared.curNickName().isEmpty{
-                showRegisterVC()
-            }else if userInfo.userName != ProfileManager.shared.curNickName() {
-                ProfileManager.shared.setNickName(name: ProfileManager.shared.curNickName()) { [weak self] in
-                    guard let self = self else { return }
-                    debugPrint("set nickName success")
-                    let userInfo = TUIRoomEngine.getSelfInfo()
-                    TUIRoomKit.sharedInstance.setSelfInfo(userName: userInfo.userName, avatarURL: userInfo.avatarUrl)
-                    self.navigationController?.pushViewController(MainViewController(), animated: true)
-                } failed: { [weak self] (err) in
-                    guard let self = self else { return }
-                    self.view.makeToast(err)
-                }
-            } else {
-                TUIRoomKit.sharedInstance.setSelfInfo(userName: userInfo.userName, avatarURL: userInfo.avatarUrl)
-                let vc = MainViewController()
-                navigationController?.pushViewController(vc, animated: true)
-            }
-        } else if code == ERR_USER_SIG_EXPIRED.rawValue {
-            self.view.makeToast(LoginLocalize(key: "App.PortalViewController.loginimExpired"))
-        } else {
-            debugPrint("onLogin:code:\(code),message:\(message)")
-            self.view.makeToast(LoginLocalize(key: "App.PortalViewController.loginimfailed"))
-        }
-    }
 }

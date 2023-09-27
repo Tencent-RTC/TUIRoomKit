@@ -13,11 +13,11 @@ protocol TransferMasterViewResponder: NSObject {
 }
 
 class TransferMasterViewModel: NSObject {
-    var attendeeList: [UserModel] = []
+    var attendeeList: [UserEntity] = []
     var userId: String = ""
     weak var viewResponder: TransferMasterViewResponder? = nil
     var engineManager: EngineManager {
-        EngineManager.shared
+        EngineManager.createInstance()
     }
     let roomRouter: RoomRouter = RoomRouter.shared
     override init() {
@@ -35,14 +35,14 @@ class TransferMasterViewModel: NSObject {
     
     func appointMasterAction(sender: UIButton) {
         guard userId != "" else { return }
-        engineManager.roomEngine.changeUserRole(userId: userId, role: .roomOwner) { [weak self] in
+        engineManager.changeUserRole(userId: userId, role: .roomOwner) { [weak self] in
             guard let self = self else { return }
-            self.engineManager.exitRoom()
+            self.engineManager.exitRoom(onSuccess: nil, onError: nil)
             self.roomRouter.dismissAllRoomPopupViewController()
             self.roomRouter.popToRoomEntranceViewController()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.engineManager.destroyRoom()
+            self.engineManager.destroyRoom(onSuccess: nil, onError: nil)
             self.roomRouter.dismissAllRoomPopupViewController()
             self.roomRouter.popToRoomEntranceViewController()
             debugPrint("changeUserRole:code:\(code),message:\(message)")

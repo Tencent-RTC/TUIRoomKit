@@ -11,18 +11,14 @@ import TUICore
 
 class RoomManager {
     static let shared = RoomManager()
-    var isEngineLogin: Bool = false
     private var engineManager: EngineManager {
-        EngineManager.shared
+        EngineManager.createInstance()
     }
-    private var roomEngine: TUIRoomEngine {
-        engineManager.roomEngine
-    }
-    private var roomInfo: RoomInfo {
+    private var roomInfo: TUIRoomInfo {
         engineManager.store.roomInfo
     }
     private lazy var userId: String = {
-        return TUILogin.getUserID() ?? engineManager.store.currentLoginUser.userId
+        return TUILogin.getUserID() ?? engineManager.store.currentUser.userId
     }()
     private let messageManager = RoomMessageManager.shared
     let roomObserver: RoomObserver = RoomObserver()
@@ -54,22 +50,34 @@ class RoomManager {
         return roomInfo.roomId != roomId && roomInfo.roomId != ""
     }
     
-    func createRoom(roomInfo: RoomInfo) {
+    func createRoom(roomInfo: TUIRoomInfo) {
         roomId = roomInfo.roomId
         roomObserver.registerObserver()
         engineManager.store.isShowRoomMainViewAutomatically = false
-        TUIRoomKit.sharedInstance.createRoom(roomInfo: roomInfo, type: .meeting)
+        TUIRoomKit.createInstance().createRoom(roomInfo: roomInfo) { [weak self] in
+            guard let self = self else { return }
+            self.roomObserver.createdRoom()
+            self.enterRoom(roomId: roomInfo.roomId)
+        } onError: { code, message in
+            RoomCommon.getCurrentWindowViewController()?.view.makeToast(message)
+            debugPrint("createRoom:code:\(code),message:\(message)")
+        }
     }
     
-    func enterRoom(roomInfo: RoomInfo) {
-        roomId = roomInfo.roomId
+    func enterRoom(roomId: String) {
         roomObserver.registerObserver()
-        engineManager.store.isChatAccessRoom = true
-        TUIRoomKit.sharedInstance.enterRoom(roomInfo: roomInfo)
+        TUIRoomKit.createInstance().enterRoom(roomId: roomId, enableMic: engineManager.store.isOpenMicrophone,
+                                              enableCamera: engineManager.store.isOpenCamera, isSoundOnSpeaker: true, onSuccess: { [weak self] in
+            guard let self = self else { return }
+            self.roomObserver.enteredRoom()
+        }, onError: {code, message in
+            RoomCommon.getCurrentWindowViewController()?.view.makeToast(message)
+            debugPrint("enterRoom:code:\(code),message:\(message)")
+        })
     }
     
     func exitRoom(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
-        roomEngine.exitRoom(syncWaiting: true) { [weak self] in
+        engineManager.exitRoom { [weak self] in
             guard let self = self else { return }
             self.refreshSource()
             self.messageManager.isReadyToSendMessage = true
@@ -77,18 +85,18 @@ class RoomManager {
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.refreshSource()
-            onError(code, message)
+            if code.rawValue == -2_102 {
+                self.destroyRoom(onSuccess: onSuccess, onError: onError)
+            } else {
+                onError(code, message)
+            }
         }
     }
     
     func destroyRoom(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
-        roomEngine.destroyRoom { [weak self] in
+        engineManager.destroyRoom { [weak self] in
             guard let self = self else { return }
             self.roomObserver.messageModel.roomState = .destroyed
-            if self.roomObserver.messageModel.owner == self.userId {
-                self.messageManager.resendRoomMessage(message: self.roomObserver.messageModel, dic:
-                                                        ["roomState":RoomMessageModel.RoomState.destroyed.rawValue])
-            }
             self.refreshSource()
             self.messageManager.isReadyToSendMessage = true
             onSuccess()
@@ -102,17 +110,15 @@ class RoomManager {
     private func refreshSource() {
         roomId = nil
         TUILogin.setCurrentBusinessScene(.None)
-        engineManager.refreshRoomEngine()
-        engineManager.store.refreshStore()
         roomObserver.userList = []
         roomObserver.unregisterObserver()
     }
     
     private func changeUserRole(userId: String, role: TUIRole, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
-        roomEngine.changeUserRole(userId: userId, role: .roomOwner) {
+        engineManager.changeUserRole(userId: userId, role: .roomOwner) {
             onSuccess()
         } onError: { code, message in
-           onError(code, message)
+            onError(code, message)
         }
     }
     
@@ -135,21 +141,6 @@ class RoomManager {
         } else {
             //之前加入过房间，在快速会议前要先退出房间
             exitRoom(onSuccess: onSuccess, onError: onError)
-        }
-    }
-    
-    func loginEngine(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
-        let sdkAppId = Int(TUILogin.getSdkAppID())
-        let userSig = TUILogin.getUserSig() ?? ""
-        V2TIMManager.sharedInstance().initSDK(Int32(sdkAppId), config: V2TIMSDKConfig())
-        engineManager.setListener(listener: TUIRoomKit.sharedInstance)
-        TUIRoomEngine.login(sdkAppId: sdkAppId, userId: userId, userSig: userSig) { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.store.currentLoginUser.userId = self.userId
-            self.isEngineLogin = true
-            onSuccess()
-        } onError: { code, message in
-            onError(code, message)
         }
     }
 }

@@ -8,6 +8,7 @@
 
 import Foundation
 import TUICore
+import TUIRoomEngine
 
 // 视图路由上下文
 class RouteContext {
@@ -39,18 +40,14 @@ class RoomRouter: NSObject {
     private func subscribeUIEvent() {
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowRoomMainView, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowRoomFloatView, responder: self)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RoomMainControllerAlreadyShown, responder: self)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_EntranceControllerAlreadyShown, responder: self)
     }
     
     private func unsubscribeEvent() {
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowRoomMainView, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowRoomFloatView, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RoomMainControllerAlreadyShown, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_EntranceControllerAlreadyShown, responder: self)
     }
     
-    func pushToChatController(user: UserModel, roomInfo: RoomInfo) {
+    func pushToChatController(user: UserEntity, roomInfo: TUIRoomInfo) {
         let config: [String : Any] = [
             TUICore_TUIChatService_SetChatExtensionMethod_EnableVideoCallKey: false,
             TUICore_TUIChatService_SetChatExtensionMethod_EnableAudioCallKey: false,
@@ -58,9 +55,12 @@ class RoomRouter: NSObject {
         ]
         TUICore.callService(TUICore_TUIChatService, method: TUICore_TUIChatService_SetChatExtensionMethod, param: config)
         let param : [String : Any] = [
-            TUICore_TUIChatObjectFactory_ChatViewController_Title : roomInfo.name,
+            TUICore_TUIChatObjectFactory_ChatViewController_Title : String.chatText,
             TUICore_TUIChatObjectFactory_ChatViewController_GroupID: roomInfo.roomId,
             TUICore_TUIChatObjectFactory_ChatViewController_AvatarUrl : user.avatarUrl,
+            TUICore_TUIChatObjectFactory_ChatViewController_Enable_Video_Call : String(0),
+            TUICore_TUIChatObjectFactory_ChatViewController_Enable_Audio_Call : String(0),
+            TUICore_TUIChatObjectFactory_ChatViewController_Enable_Room : String(0),
         ]
         if let chatVC = TUICore.createObject(TUICore_TUIChatObjectFactory, key: TUICore_TUIChatObjectFactory_ChatViewController_Classic,
                                              param: param) as? UIViewController {
@@ -78,24 +78,9 @@ class RoomRouter: NSObject {
         }
     }
     
-    func pushPrePareViewController(enablePrePareView: Bool) {
-        let prepareVC = makePrePareViewController(enablePrepareView: enablePrePareView)
-        createRootNavigationAndPresent(controller: prepareVC)
-    }
-    
     func pushMainViewController(roomId: String) {
         let vc = makeMainViewController(roomId: roomId)
         push(viewController: vc)
-    }
-    
-    func pushCreateRoomViewController() {
-        let createRoomVC = makeCreateRoomViewController()
-        push(viewController: createRoomVC)
-    }
-    
-    func pushJoinRoomViewController() {
-        let joinRoomVC = makeJoinRoomViewController()
-        push(viewController: joinRoomVC)
     }
     
     func presentPopUpViewController(viewType: PopUpViewType, height: CGFloat?, backgroundColor: UIColor = UIColor(0x1B1E26)) {
@@ -176,6 +161,11 @@ class RoomRouter: NSObject {
     
     class func makeToast(toast: String) {
         shared.getCurrentWindowViewController()?.view.makeToast(toast)
+    }
+    
+    class func makeToastInCenter(toast: String, duration:TimeInterval) {
+        guard let windowView = shared.getCurrentWindowViewController()?.view else {return}
+        windowView.makeToast(toast,duration: duration,position:windowView.center)
     }
     
     class func getCurrentWindow() -> UIWindow? {
@@ -267,23 +257,8 @@ extension RoomRouter {
         return viewController
     }
     
-    private func makePrePareViewController(enablePrepareView: Bool) -> UIViewController {
-        let viewController = RoomPrePareViewController(roomPrePareViewModelFactory: self, enablePrepareView: enablePrepareView)
-        return viewController
-    }
-    
     private func makeMainViewController(roomId: String) -> UIViewController {
         let controller = RoomMainViewController(roomMainViewModelFactory: self)
-        return controller
-    }
-    
-    private func makeCreateRoomViewController() -> UIViewController {
-        let controller = RoomEntranceViewController(roomMainViewModelFactory: self, isCreateRoom: true)
-        return controller
-    }
-    
-    private func makeJoinRoomViewController() -> UIViewController {
-        let controller = RoomEntranceViewController(roomMainViewModelFactory: self, isCreateRoom: false)
         return controller
     }
     
@@ -305,30 +280,10 @@ extension RoomRouter.RoomNavigationDelegate: UINavigationControllerDelegate {
     }
 }
 
-extension RoomRouter: RoomPrePareViewModelFactory {
-    func makePrePareViewModel(enablePrepareView: Bool) -> PrePareViewModel {
-        let model = PrePareViewModel()
-        model.enablePrePareView = enablePrepareView
-        return model
-    }
-}
-
 extension RoomRouter: RoomMainViewModelFactory {
     func makeRoomMainViewModel() -> RoomMainViewModel {
         let model = RoomMainViewModel()
         return model
-    }
-}
-
-extension RoomRouter: RoomEntranceViewModelFactory {
-    func makeRootView(isCreateRoom: Bool) -> UIView {
-        if isCreateRoom {
-            let model = CreateRoomViewModel()
-            return CreateRoomView(viewModel: model)
-        } else {
-            let model = EnterRoomViewModel()
-            return EnterRoomView(viewModel: model)
-        }
     }
 }
 
@@ -349,14 +304,14 @@ extension RoomRouter: RoomKitUIEventResponder {
             RoomFloatView.show()
         case .TUIRoomKitService_ShowRoomMainView:
             RoomFloatView.dismiss()
-            self.pushMainViewController(roomId: EngineManager.shared.store.roomInfo.roomId)
-        case .TUIRoomKitService_RoomMainControllerAlreadyShown:
-            guard let navController = navController else { return }
-            navController.viewControllers.removeAll(where: { $0 is RoomEntranceViewController })
-        case .TUIRoomKitService_EntranceControllerAlreadyShown:
-            guard let navController = navController else { return }
-            navController.viewControllers.removeAll(where: { $0 is RoomPrePareViewController })
+            self.pushMainViewController(roomId: EngineManager.createInstance().store.roomInfo.roomId)
         default: break
         }
+    }
+}
+
+private extension String {
+    static var chatText: String {
+        localized("TUIRoom.chat")
     }
 }

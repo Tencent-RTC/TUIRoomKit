@@ -223,8 +223,12 @@ class TRTCRegisterRootView: UIView {
         guard let name = textField.text else {
             return
         }
-        ProfileManager.shared.curUserModel?.name = name
-        rootVC?.regist(name)
+        if name.utf8.count > 30 {
+            makeToast(.nameTooLongText, duration: 1)
+        } else {
+            ProfileManager.shared.curUserModel?.name = name
+            rootVC?.regist(name)
+        }
     }
     
     func checkRegistBtnState(_ count: Int = -1) {
@@ -287,4 +291,5 @@ fileprivate extension String {
     static let nicknamePlaceholderText = LoginLocalize(key:"Demo.TRTC.Login.enterusername")
     static let descText = LoginLocalize(key:"Demo.TRTC.Login.limit20count")
     static let registText = LoginLocalize(key:"Demo.TRTC.Login.regist")
+    static let nameTooLongText = LoginLocalize(key:"Demo.TRTC.Login.registsfailure.nameTooLong")
 }
