@@ -25,7 +25,7 @@
         @click-more="handleMore"
       >
         <audio-icon
-          :audio-volume="localStream.audioVolume"
+          :user-id="localStream.userId"
           :is-muted="!localStream.hasAudioStream"
           :is-disabled="isLocalAudioIconDisable"
         ></audio-icon>
@@ -110,7 +110,7 @@ async function toggleMuteAudio() {
     return;
   }
   if (localStream.value.hasAudioStream) {
-    await roomEngine.instance?.closeLocalMicrophone();
+    await roomEngine.instance?.muteLocalAudio();
     // 如果是全员禁言状态下，用户主动关闭麦克风之后不能再自己打开
     if (roomStore.isMicrophoneDisableForAllUser) {
       roomStore.setCanControlSelfAudio(false);
@@ -127,7 +127,7 @@ async function toggleMuteAudio() {
       return;
     }
     // 有麦克风列表且有权限
-    await roomEngine.instance?.openLocalMicrophone();
+    await roomEngine.instance?.unmuteLocalAudio();
   }
   showAudioSettingTab.value = false;
 }

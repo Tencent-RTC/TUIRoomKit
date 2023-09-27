@@ -38,7 +38,6 @@ import { useBasicStore } from './stores/basic';
 import { useRoomStore } from './stores/room';
 import { useChatStore } from './stores/chat';
 import { isMobile, isWeChat }  from './utils/useMediaValue';
-import { onBeforeRouteLeave } from 'vue-router';
 import {
   TUIRoomEngine,
   TRTCVideoMirrorType,
@@ -53,6 +52,7 @@ import {
   TRTCVideoResolution,
   TRTCVideoEncParam,
   TUIRole,
+  TUIRoomInfo,
 } from '@tencentcloud/tuiroom-engine-wx';
 
 
@@ -70,6 +70,10 @@ defineExpose({
   init,
   createRoom,
   enterRoom,
+  dismissRoom,
+  leaveRoom,
+  resetStore,
+  t,
 });
 
 const emit = defineEmits([
@@ -92,7 +96,7 @@ const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 const chatStore = useChatStore();
 
-const { sdkAppId, showHeaderTool, roomId } = storeToRefs(basicStore);
+const { sdkAppId, showHeaderTool } = storeToRefs(basicStore);
 const { localUser } = storeToRefs(roomStore);
 
 /**
@@ -177,26 +181,6 @@ onMounted(async () => {
 });
 
 
-onBeforeRouteLeave((from: any, to: any, next: any) => {
-  if (!roomId.value) {
-    next();
-  } else {
-    const message = roomStore.isMaster
-      ? t('This action causes the room to be disbanded, does it continue?') : t('This action causes the room to be exited, does it continue?');
-    if (window?.confirm(message)) {
-      if (roomStore.isMaster) {
-        dismissRoom();
-      } else {
-        leaveRoom();
-      }
-      resetStore();
-      next();
-    } else {
-      next(false);
-    }
-  }
-});
-
 async function dismissRoom() {
   try {
     logger.log(`${logPrefix}dismissRoom: enter`);
@@ -256,7 +240,15 @@ async function init(option: RoomInitData) {
   await TUIRoomEngine.login({ sdkAppId, userId, userSig });
   await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
 }
-
+const doEnterRoom = async (roomId: string) => {
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  trtcCloud.setDefaultStreamRecvMode(true, false);
+  trtcCloud.enableSmallVideoStream(true, smallParam);
+  const roomInfo = await roomEngine.instance?.enterRoom({ roomId }) as TUIRoomInfo;
+  roomEngine.instance?.muteLocalAudio();
+  roomEngine.instance?.openLocalMicrophone();
+  return roomInfo;
+};
 async function createRoom(options: {
   roomId: string,
   roomName: string,
@@ -289,10 +281,7 @@ async function createRoom(options: {
       code: 0,
       message: 'create room success',
     });
-    const trtcCloud = roomEngine.instance?.getTRTCCloud();
-    trtcCloud.setDefaultStreamRecvMode(true, false);
-    trtcCloud.enableSmallVideoStream(true, smallParam);
-    const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
+    const roomInfo = await doEnterRoom(roomId);
     emit('on-enter-room', {
       code: 0,
       message: 'enter room success',
@@ -327,11 +316,11 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
     }
     basicStore.setRoomId(roomId);
     logger.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
-    const trtcCloud = roomEngine.instance?.getTRTCCloud();
-    trtcCloud.setDefaultStreamRecvMode(true, false);
-    trtcCloud.enableSmallVideoStream(true, smallParam);
-    const roomInfo = await roomEngine.instance?.enterRoom({ roomId });
+    const roomInfo = await doEnterRoom(roomId);
     roomStore.setRoomInfo(roomInfo);
+    if (roomStore.isMaster && roomStore.isSpeakAfterTakingSeatMode) {
+      await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+    }
     await getUserList();
     /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
@@ -479,7 +468,7 @@ async function handleAudioStateChange(isDisableAudio: boolean) {
    * 如果主持人解除全员禁言，不主动调起用户麦克风
   **/
   if (isDisableAudio) {
-    await roomEngine.instance?.closeLocalMicrophone();
+    await roomEngine.instance?.muteLocalAudio();
   }
 }
 

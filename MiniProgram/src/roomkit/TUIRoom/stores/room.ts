@@ -4,6 +4,7 @@ import { useBasicStore } from './basic';
 import { isVue3 } from '../utils/constants';
 import Vue from '../utils/vue';
 import useGetRoomEngine from '../hooks/useRoomEngine';
+import { isMobile } from '../utils/useMediaValue';
 
 const roomEngine = useGetRoomEngine();
 
@@ -14,7 +15,6 @@ export type StreamInfo = {
   hasAudioStream?: boolean,
   hasVideoStream?: boolean,
   hasScreenStream?: boolean,
-  audioVolume?: number,
   streamType: TUIVideoStreamType,
   isVisible: boolean,
 }
@@ -44,11 +44,12 @@ export type UserInfo = {
   isUserApplyingToAnchor?: boolean,
   // 用户申请上麦的 requestId
   applyToAnchorRequestId?: string,
+  // 用户申请上麦的时间点
+  applyToAnchorTimestamp?: number,
   // 是否正在邀请用户上麦
   isInvitingUserToAnchor?: boolean,
   // 邀请用户上麦的 requestId
   inviteToAnchorRequestId?: string,
-  audioVolume?: number,
   // cameraStreamInfo 和 screenStreamInfo 存在的意义时，流渲染保持使用同一个引用传递的数据
   // 避免出现大窗口和实际数据显示不一致的问题
   cameraStreamInfo: StreamInfo,
@@ -58,6 +59,7 @@ export type UserInfo = {
 interface RoomState {
   localUser: UserInfo,
   remoteUserObj: Record<string, UserInfo>,
+  userVolumeObj: Record<string, number>,
   isDefaultOpenCamera: boolean,
   isDefaultOpenMicrophone: boolean,
   // 主持人全员禁麦，但是单独取消某个用户音视频禁止状态的时候，是可以自己 unmute audio/video 的
@@ -91,13 +93,11 @@ export const useRoomStore = defineStore('room', {
       hasVideoStream: false,
       hasScreenStream: false,
       userRole: TUIRole.kGeneralUser,
-      audioVolume: 0,
       onSeat: false,
       cameraStreamInfo: {
         userId: '',
         userName: '',
         avatarUrl: '',
-        audioVolume: 0,
         hasAudioStream: false,
         hasVideoStream: false,
         streamType: TUIVideoStreamType.kCameraStream,
@@ -113,11 +113,12 @@ export const useRoomStore = defineStore('room', {
       },
     },
     remoteUserObj: {},
+    userVolumeObj: {},
     isDefaultOpenCamera: false,
     isDefaultOpenMicrophone: false,
     canControlSelfAudio: true,
     canControlSelfVideo: true,
-    localVideoQuality: TUIVideoQuality.kVideoQuality_720p,
+    localVideoQuality: isMobile ? TUIVideoQuality.kVideoQuality_360p : TUIVideoQuality.kVideoQuality_720p,
     currentCameraId: '',
     currentMicrophoneId: '',
     currentSpeakerId: '',
@@ -175,10 +176,10 @@ export const useRoomStore = defineStore('room', {
       return cameraForbidden as any || this.isAudience;
     },
     localStream: (state) => {
-      const { userId, userName, avatarUrl, hasAudioStream, hasVideoStream, audioVolume } = state.localUser;
+      const { userId, userName, avatarUrl, hasAudioStream, hasVideoStream } = state.localUser;
       Object.assign(
         state.localUser.cameraStreamInfo,
-        { userId, userName, avatarUrl, hasAudioStream, hasVideoStream, audioVolume },
+        { userId, userName, avatarUrl, hasAudioStream, hasVideoStream },
       );
       return state.localUser.cameraStreamInfo;
     },
@@ -193,12 +194,11 @@ export const useRoomStore = defineStore('room', {
           hasAudioStream,
           hasVideoStream,
           hasScreenStream,
-          audioVolume,
           isVideoVisible,
           isScreenVisible,
         } = userInfo;
         if (onSeat) {
-          obj[`${userId}_${TUIVideoStreamType.kCameraStream}`] = Object.assign(userInfo.cameraStreamInfo, { userId, avatarUrl, userName, hasAudioStream, hasVideoStream, audioVolume, streamType: TUIVideoStreamType.kCameraStream, isVisible: isVideoVisible });
+          obj[`${userId}_${TUIVideoStreamType.kCameraStream}`] = Object.assign(userInfo.cameraStreamInfo, { userId, avatarUrl, userName, hasAudioStream, hasVideoStream, streamType: TUIVideoStreamType.kCameraStream, isVisible: isVideoVisible });
         }
         if (hasScreenStream) {
           obj[`${userId}_${TUIVideoStreamType.kScreenStream}`] = Object.assign(userInfo.screenStreamInfo, { userId, avatarUrl, userName, hasScreenStream, streamType: TUIVideoStreamType.kScreenStream, isVisible: isScreenVisible });
@@ -221,7 +221,8 @@ export const useRoomStore = defineStore('room', {
       return this.userList.length;
     },
     applyToAnchorList: state => [...Object.values(state.remoteUserObj)]
-      .filter(item => item.isUserApplyingToAnchor) || [],
+      .filter(item => item.isUserApplyingToAnchor)
+      .sort((item1, item2) => (item1?.applyToAnchorTimestamp || 0) - (item2?.applyToAnchorTimestamp || 0)) || [],
     defaultStreamType(): TUIVideoStreamType {
       return Object.keys(this.hasVideoStreamObject).length > this.maxMembersCount
         ? TUIVideoStreamType.kCameraStreamLow : TUIVideoStreamType.kCameraStream;
@@ -251,13 +252,11 @@ export const useRoomStore = defineStore('room', {
         isVideoVisible: false,
         isScreenVisible: false,
         userRole: TUIRole.kGeneralUser,
-        audioVolume: 0,
         onSeat: !this.isSpeakAfterTakingSeatMode,
         cameraStreamInfo: {
           userId,
           userName: '',
           avatarUrl: '',
-          audioVolume: 0,
           hasAudioStream: false,
           hasVideoStream: false,
           streamType: TUIVideoStreamType.kCameraStream,
@@ -489,14 +488,16 @@ export const useRoomStore = defineStore('room', {
     setAudioVolume(audioVolumeArray: []) {
       const basicStore = useBasicStore();
       audioVolumeArray.forEach((audioVolumeItem: any) => {
-        const { userId, volume } = audioVolumeItem;
-        if (userId === basicStore.userId || userId === '') {
-          this.localUser.audioVolume = volume;
+        let { userId } = audioVolumeItem;
+        const { volume } = audioVolumeItem;
+        if (userId === '') {
+          userId = basicStore.userId;
+        }
+        if (isVue3) {
+          this.userVolumeObj[userId] = volume;
         } else {
-          const remoteUserInfo = this.remoteUserObj[userId];
-          if (remoteUserInfo) {
-            remoteUserInfo.audioVolume = volume;
-          }
+          // @ts-ignore
+          Vue.set(this.userVolumeObj, userId, volume);
         }
       });
     },
@@ -628,12 +629,13 @@ export const useRoomStore = defineStore('room', {
         remoteUserInfo.requestUserOpenCameraRequestId = isRequesting ? requestId : '';
       }
     },
-    addApplyToAnchorUser(options: { userId: string, requestId: string }) {
-      const { userId, requestId } = options;
+    addApplyToAnchorUser(options: { userId: string, requestId: string, timestamp: number }) {
+      const { userId, requestId, timestamp } = options;
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.isUserApplyingToAnchor = true;
         remoteUserInfo.applyToAnchorRequestId = requestId;
+        remoteUserInfo.applyToAnchorTimestamp = timestamp;
       }
     },
     removeApplyToAnchorUser(userId: string) {
@@ -641,6 +643,7 @@ export const useRoomStore = defineStore('room', {
       if (remoteUserInfo) {
         remoteUserInfo.isUserApplyingToAnchor = false;
         remoteUserInfo.applyToAnchorRequestId = '';
+        remoteUserInfo.applyToAnchorTimestamp = 0;
       }
     },
     addInviteToAnchorUser(options: { userId: string, requestId: string }) {
@@ -670,13 +673,11 @@ export const useRoomStore = defineStore('room', {
         hasVideoStream: false,
         hasScreenStream: false,
         userRole: TUIRole.kGeneralUser,
-        audioVolume: 0,
         onSeat: false,
         cameraStreamInfo: {
           userId: '',
           userName: '',
           avatarUrl: '',
-          audioVolume: 0,
           hasAudioStream: false,
           hasVideoStream: false,
           streamType: TUIVideoStreamType.kCameraStream,
@@ -692,6 +693,7 @@ export const useRoomStore = defineStore('room', {
         },
       };
       this.remoteUserObj = {};
+      this.userVolumeObj = {};
       this.isDefaultOpenCamera = false;
       this.isDefaultOpenMicrophone = false;
       this.canControlSelfAudio = true;
