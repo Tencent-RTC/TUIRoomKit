@@ -99,6 +99,7 @@ span{
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 64%;
+    font-size: 14px;
   }
   .invite-bottom {
     width: 90%;

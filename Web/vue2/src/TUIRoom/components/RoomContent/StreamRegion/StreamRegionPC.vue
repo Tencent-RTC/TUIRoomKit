@@ -20,7 +20,7 @@
       <svg-icon v-if="showMasterIcon" class="master-icon" icon-name="user"></svg-icon>
       <audio-icon
         v-if="!isScreenStream"
-        :audio-volume="stream.audioVolume"
+        :user-id="stream.userId"
         :is-muted="!stream.hasAudioStream"
         size="small"
       ></audio-icon>

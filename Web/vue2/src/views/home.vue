@@ -18,6 +18,7 @@
       :user-name="userName || userId"
       @create-room="handleCreateRoom"
       @enter-room="handleEnterRoom"
+      @update-user-name="handleUpdateUserName"
     ></room-control>
   </div>
 </template>
@@ -32,6 +33,7 @@ import { getBasicInfo } from '@/config/basic-info-config';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '@/TUIRoom/hooks/useRoomEngine';
 import { isMobile } from '../TUIRoom/utils/useMediaValue';
+import logger from '../TUIRoom/utils/common/logger';
 
 const roomEngine = useGetRoomEngine();
 export default {
@@ -124,6 +126,16 @@ export default {
     // 处理用户点击页面左上角【退出登录】
     handleLogOut() {
       // 接入方处理 logout 方法
+    },
+    // 更新用户自己修改的userName
+    handleUpdateUserName(userName) {
+      try {
+        const storageUserInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo'));
+        storageUserInfo.userName = userName;
+        sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(storageUserInfo));
+      } catch (error) {
+        logger.log('sessionStorage error', error);
+      }
     },
   },
 };
