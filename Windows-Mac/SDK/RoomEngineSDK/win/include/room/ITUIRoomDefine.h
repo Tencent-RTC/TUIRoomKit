@@ -374,7 +374,7 @@ struct TUIUserInfo {
 /**
  * 5.3 视频编码参数
  */
-struct TUIVideoEncoderParams {
+struct TUIRoomVideoEncoderParams {
     /// 视频质量, 请参考：{@link TUIVideoQuality}。
     TUIVideoQuality videoResolution;
 
@@ -387,7 +387,7 @@ struct TUIVideoEncoderParams {
     /// 目标视频码率
     int bitrate;
 
-    TUIVideoEncoderParams() : videoResolution(TUIVideoQuality::kVideoQuality_720P), resolutionMode(TUIResolutionMode::kResolutionMode_Landscape), fps(15), bitrate(1500) {
+    TUIRoomVideoEncoderParams() : videoResolution(TUIVideoQuality::kVideoQuality_720P), resolutionMode(TUIResolutionMode::kResolutionMode_Landscape), fps(15), bitrate(1500) {
     }
 };
 
