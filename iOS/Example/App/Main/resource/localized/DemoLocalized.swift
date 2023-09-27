@@ -8,6 +8,6 @@
 import Foundation
 
 let demoLocalizedTableName = "DemoLocalized"
-func TRTCDemoLocalize(_ key: String) -> String {
+func RoomDemoLocalize(_ key: String) -> String {
     return localizeFromTable(key: key, table: demoLocalizedTableName)
 }

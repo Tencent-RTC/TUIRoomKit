@@ -21,15 +21,15 @@ protocol RoomMessageViewResponder: NSObject {
 class RoomMessageViewModel: NSObject {
     var message: RoomMessageModel
     private var engineManager: EngineManager {
-        EngineManager.shared
+        EngineManager.createInstance()
     }
     lazy var userId: String = {
-        return TUILogin.getUserID() ?? EngineManager.shared.store.currentLoginUser.userId
+        return TUILogin.getUserID() ?? EngineManager.createInstance().store.currentUser.userId
     }()
     var messageManager: RoomMessageManager {
         RoomMessageManager.shared
     }
-    let roomKit = TUIRoomKit.sharedInstance
+    let roomKit = TUIRoomKit.createInstance()
     let roomManager = RoomManager.shared
     weak var viewResponder: RoomMessageViewResponder?
     init(message: RoomMessageModel) {
@@ -52,14 +52,7 @@ class RoomMessageViewModel: NSObject {
     func enterRoomAction() {
         //首先判断现在是否已经进行TUICallKit的视频通话或者音频通话
         guard BusinessSceneUtil.canJoinRoom() else { return }
-        if !RoomManager.shared.isEngineLogin {
-            RoomManager.shared.loginEngine { [weak self] in
-                guard let self = self else { return }
-                self.enterRoomAction()
-            } onError: { code, message in
-                debugPrint("loginEngine, code:\(code), message:\(message)")
-            }
-        } else if roomManager.isEnteredOtherRoom(roomId: message.roomId) {
+        if roomManager.isEnteredOtherRoom(roomId: message.roomId) {
             roomManager.exitOrDestroyPreviousRoom { [weak self] in
                 guard let self = self else { return }
                 self.enterRoom()
@@ -74,12 +67,8 @@ class RoomMessageViewModel: NSObject {
     }
     
     private func enterRoom() {
-        if !EngineManager.shared.store.isEnteredRoom {
-            let roomInfo = RoomInfo()
-            roomInfo.roomId = message.roomId
-            roomInfo.isOpenCamera = engineManager.store.isOpenCamera
-            roomInfo.isOpenMicrophone = engineManager.store.isOpenMicrophone
-            roomManager.enterRoom(roomInfo: roomInfo)
+        if !engineManager.store.isEnteredRoom {
+            roomManager.enterRoom(roomId: message.roomId)
         } else {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ShowRoomMainView, param: [:])
         }

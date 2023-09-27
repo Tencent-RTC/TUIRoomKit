@@ -49,12 +49,17 @@
             break;
     }
 
-    NSError *error = [NSError errorWithDomain:NSStringFromClass(self.class)
-                                         code:0
-                                     userInfo:@{
-                                         NSLocalizedFailureReasonErrorKey:tip
-                                     }];
-    [self finishBroadcastWithError:error];
+    if (reason == TXReplayKitExtReasonRequestedByMain) {
+        [self finishBroadcastWithError:nil];
+    }else {
+        NSError *error = [NSError errorWithDomain:NSStringFromClass(self.class)
+                                             code:0
+                                         userInfo:@{
+                                             NSLocalizedFailureReasonErrorKey:tip
+                                         }];
+        [self finishBroadcastWithError:error];
+    }
+   
 }
 
 - (void)processSampleBuffer:(CMSampleBufferRef)sampleBuffer withType:(RPSampleBufferType)sampleBufferType {

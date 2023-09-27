@@ -19,6 +19,8 @@ enum PopUpViewType {
     case QRCodeViewType // 二维码页面
     case chatViewType //聊天页面
     case navigationControllerType
+    case inviteViewType
+    case exitRoomViewType
 }
 
 protocol PopUpViewResponder: AnyObject {
@@ -31,9 +33,6 @@ class PopUpViewModel {
     let height: CGFloat?
     var backgroundColor: UIColor?
     weak var viewResponder: PopUpViewResponder?
-    var engineManager: EngineManager {
-        EngineManager.shared
-    }
     
     init(viewType: PopUpViewType, height: CGFloat?) {
         self.viewType = viewType

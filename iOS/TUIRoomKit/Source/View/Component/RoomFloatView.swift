@@ -47,6 +47,7 @@ class RoomFloatView: UIView {
     }
     
     deinit {
+        NSObject.cancelPreviousPerformRequests(withTarget: self)
         debugPrint("deinit:\(self)")
     }
     
@@ -116,7 +117,7 @@ class RoomFloatView: UIView {
         guard let userModel = viewModel.engineManager.store.attendeeList.first(where: { $0.userId == viewModel.userId }) else { return }
         let placeholder = UIImage(named: "room_default_user", in: tuiRoomKitBundle(), compatibleWith: nil)
         avatarImageView.sd_setImage(with: URL(string: userModel.avatarUrl), placeholderImage: placeholder)
-        userStatusView.updateUserVolume(hasAudio: userModel.hasAudioStream, volume: userModel.volume)
+        userStatusView.updateUserVolume(hasAudio: userModel.hasAudioStream, volume: userModel.userVoiceVolume)
     }
     
     @objc func didTap(sender: UIView) {
@@ -191,14 +192,24 @@ class RoomFloatView: UIView {
         }
         return CGPoint(x: newPoint.x + frame.width / 2, y: newPoint.y + frame.height / 2)
     }
+    
+    private func resetVolume() {
+       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(resetVolumeView), object: nil)
+       perform(#selector(resetVolumeView), with: nil, afterDelay: 1)
+   }
+   
+    @objc func resetVolumeView() {
+        guard let userItem = viewModel.getUserEntity(userId: viewModel.userId) else { return }
+        userStatusView.updateUserVolume(hasAudio: userItem.hasAudioStream, volume: 0)
+    }
 }
 
 extension RoomFloatView: RoomFloatViewResponder {
     func makeToast(text: String) {
-        RoomRouter.makeToast(toast: text)
+        RoomRouter.makeToastInCenter(toast: text, duration: 0.5)
     }
     
-    func updateUserStatus(user: UserModel) {
+    func updateUserStatus(user: UserEntity) {
         let placeholder = UIImage(named: "room_default_user", in: tuiRoomKitBundle(), compatibleWith: nil)
         avatarImageView.sd_setImage(with: URL(string: user.avatarUrl), placeholderImage: placeholder)
         userStatusView.updateUserStatus(userModel: user)
@@ -206,6 +217,7 @@ extension RoomFloatView: RoomFloatViewResponder {
     
     func updateUserAudioVolume(hasAudio: Bool, volume: Int) {
         userStatusView.updateUserVolume(hasAudio: hasAudio, volume: volume)
+        resetVolume()
     }
     
     func showAvatarImageView(isShow: Bool) {

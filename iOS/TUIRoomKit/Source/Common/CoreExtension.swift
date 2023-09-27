@@ -26,8 +26,8 @@ let gExtensionControllerKey = NSObject.getExtensionControllerKey()
 
 extension NSObject {
     @objc class func tuiRoomKitSwiftLoad() {
-        TUICore.registerExtension(gRoomInfoKey, object: EngineManager.shared)
-        TUICore.registerExtension(gRoomEngineKey, object: EngineManager.shared)
-        TUICore.registerExtension(gLocalUserInfoKey, object: EngineManager.shared)
+//        TUICore.registerExtension(gRoomInfoKey, object: EngineManager.shared())
+//        TUICore.registerExtension(gRoomEngineKey, object: EngineManager.shared())
+//        TUICore.registerExtension(gLocalUserInfoKey, object: EngineManager.shared())
     }
 }

@@ -25,7 +25,6 @@ class RoomMessageBubbleCell: TUIBubbleMessageCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
     override func fill(with data: TUIBubbleMessageCellData) {
         super.fill(with: data)
         let customData = data as? RoomMessageBubbleCellData

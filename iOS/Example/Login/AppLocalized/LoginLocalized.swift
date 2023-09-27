@@ -6,9 +6,14 @@
 //
 
 import Foundation
+import TUICore
 
 //MARK: Base
 func localizeFromTable(key: String, table: String) -> String {
+    if let bundlePath = Bundle.main.path(forResource: TUIGlobalization.tk_localizableLanguageKey() ?? "", ofType: "lproj"),
+        let bundle = Bundle(path: bundlePath) {
+        return bundle.localizedString(forKey: key, value: "", table: table)
+    }
     return Bundle.main.localizedString(forKey: key, value: "", table: table)
 }
 
