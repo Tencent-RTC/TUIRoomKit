@@ -105,6 +105,7 @@ span{
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 62%;
+    font-size: 14px;
   }
   .contact-bottom {
     width: 90%;
