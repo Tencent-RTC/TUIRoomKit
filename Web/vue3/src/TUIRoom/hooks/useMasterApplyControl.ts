@@ -22,10 +22,10 @@ export default function () {
 
   // new: 收到来自用户的上麦申请
   function onRequestReceived(eventInfo: { request: TUIRequest }) {
-    const { requestAction, requestId, userId } = eventInfo.request;
+    const { requestAction, requestId, userId, timestamp } = eventInfo.request;
     if (requestAction === TUIRequestAction.kRequestToTakeSeat) {
       // 用户申请上麦
-      userId && roomStore.addApplyToAnchorUser({ userId, requestId });
+      userId && roomStore.addApplyToAnchorUser({ userId, requestId, timestamp });
     }
   }
 

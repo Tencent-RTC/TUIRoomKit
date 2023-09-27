@@ -69,6 +69,7 @@ export default {
   'Stop sharing?': 'Stop sharing?',
   'Stop sharing': 'Stop sharing',
   Sharing: 'Sharing',
+  'Safety Reminder': '安全提醒',
   'Share screen': 'Share screen',
   'Others will no longer see your screen after you stop sharing. Are you sure you want to stop?': 'Others will no longer see your screen after you stop sharing. Are you sure you want to stop?',
   'Others will no longer see your screen after you stop sharing.': 'Others will no longer see your screen after you stop sharing.',
@@ -148,6 +149,7 @@ export default {
   Screen: 'Screen',
   Window: 'Window',
   Share: 'Share',
+  'Continue sharing': 'Continue sharing',
   'Select a screen or window first': 'Select a screen or window first',
   Grid: 'Grid',
   Tips: 'Tips',
@@ -218,4 +220,5 @@ export default {
   'Another user is currently sharing the screen, screen sharing is not possible.': 'Another user is currently sharing the screen, screen sharing is not possible.',
   'This action causes the room to be disbanded, does it continue?': 'This action causes the room to be disbanded, does it continue?',
   'This action causes the room to be exited, does it continue?': 'This action causes the room to be exited, does it continue?',
+  'Sharing screens may lead to the leakage of private information such as SMS verification codes and passwords, resulting in financial losses. Please be vigilant against various forms of fraud.': 'Sharing screens may lead to the leakage of private information such as SMS verification codes and passwords, resulting in financial losses. Please be vigilant against various forms of fraud.',
 };
