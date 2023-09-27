@@ -81,17 +81,25 @@ async function toggleChatSidebar() {
 }
 .count{
   display: flex;
+  position: relative;
 }
 .unreadCount{
   background-color: #006eff;
-  min-width: 20px;
-  height: 20px;
-  text-align: center;
   color: white;
-  position: relative;
-  left: -20px;
+  font-size: 12px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  color: white;
+  position: absolute;
+  right: 0px;
   top: 4px;
-  padding: 2px;
-  border-radius:45px;
+  border-radius: 50%;
+  padding: 11px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
 </style>

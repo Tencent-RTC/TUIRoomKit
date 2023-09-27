@@ -1,3 +1,15 @@
+## 2023.09.15@1.5.1
+
+**Feature**
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.5.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。
+- 优化平滑开关麦克风操作
+
+**Bug Fixed**
+- 修复举手发言模式下，主持人重新进入房间后没有自动上麦的问题；
+- 修复举手发言模式下，主持人侧举手发言列表不是按照举手顺序排列的问题；
+- 修复 Electron 端下拉框 hover UI 错误问题；
+- 修复聊天未读数不居中问题；
+
 ## 2023.09.07@1.5.0
 
 **Feature**

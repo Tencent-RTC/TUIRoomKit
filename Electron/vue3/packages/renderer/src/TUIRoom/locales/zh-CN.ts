@@ -151,6 +151,8 @@ export default {
   Screen: '屏幕',
   Window: '窗口',
   Share: '开始分享',
+  'Safety Reminder': '安全提醒',
+  'Continue sharing': '继续共享',
   'Select a screen or window first': '请选择要分享的屏幕或者窗口',
   Grid: '一屏九等分',
   'Gallery on right': '右侧成员列表',
@@ -218,4 +220,5 @@ export default {
   'Another user is currently sharing the screen, screen sharing is not possible.': '当前有其他用户正在屏幕共享，无法进行屏幕共享',
   'This action causes the room to be exited, does it continue?': '该操作会导致退出房间，是否继续？',
   'This action causes the room to be disbanded, does it continue?': '该操作会导致解散房间，是否继续？',
+  'Sharing screens may lead to the leakage of private information such as SMS verification codes and passwords, resulting in financial losses. Please be vigilant against various forms of fraud.': '共享屏幕时可能会泄露短信验证码、密码等隐私信息，造成财产损失，请警惕各种诈骗行为',
 };

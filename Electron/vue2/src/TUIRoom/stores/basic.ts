@@ -32,7 +32,8 @@ interface BasicState {
   isSupportSwitchTheme: boolean,
   showHeaderTool: boolean,
   shareLink: string,
-  isRoomLinkVisible: boolean
+  isRoomLinkVisible: boolean,
+  isShowScreenShareAntiFraud: boolean,
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -74,6 +75,7 @@ export const useBasicStore = defineStore('basic', {
     showHeaderTool: true,
     shareLink: '',
     isRoomLinkVisible: !isElectronEnv() && !isWeChat,
+    isShowScreenShareAntiFraud: false,
   }),
   getters: {
     // localVideoBitrate: (state) => {
@@ -155,6 +157,9 @@ export const useBasicStore = defineStore('basic', {
     setIsRoomLinkVisible(isRoomLinkVisible: boolean) {
       this.isRoomLinkVisible = isRoomLinkVisible;
     },
+    setIsShowScreenShareAntiFraud(isShowScreenShareAntiFraud: boolean) {
+      this.isShowScreenShareAntiFraud = isShowScreenShareAntiFraud;
+    },
     setBasicInfo(infoObj: any) {
       if (!infoObj) {
         return;
@@ -193,17 +198,10 @@ export const useBasicStore = defineStore('basic', {
       this.masterUserId = '';
       this.localQuality = 0;
       this.roomId = '';
-      this.sdkAppId = 0;
-      this.userId = '';
-      this.userSig = '';
-      this.userName = '';
-      this.avatarUrl = '';
       this.useStringRoomId = false;
       this.roomMode = 'FreeSpeech';
       this.showApplyUserList = false;
       this.isFrontCamera = true;
-      this.defaultTheme = 'black';
-      this.isSupportSwitchTheme = true;
       this.showHeaderTool = true;
       this.shareLink = '';
     },
