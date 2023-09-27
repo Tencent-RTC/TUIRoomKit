@@ -86,6 +86,7 @@ import { useRoomStore } from '../../stores/room';
 import { SettingMode } from '../../constants/render';
 import { useI18n } from '../../locales';
 import { storeToRefs } from 'pinia';
+import { useBasicStore } from '../../stores/basic';
 
 
 interface Props {
@@ -96,14 +97,17 @@ const settingMode = props.mode || SettingMode.SIMPLE;
 const isSampleMode = computed(() => settingMode === SettingMode.SIMPLE);
 const isDetailMode = computed(() => settingMode === SettingMode.DETAIL);
 
+const basicStore = useBasicStore();
+const { userId } = storeToRefs(basicStore);
 const roomStore = useRoomStore();
-const { speakerList } = storeToRefs(roomStore);
+const { speakerList, userVolumeObj } = storeToRefs(roomStore);
+
 // const inputAudioLevel = ref(0);
 // const outputAudioLevel = ref(100);
 
 const volumeTotalNum = computed(() => (isDetailMode.value ? 36 : 28));
 
-const volumeNum = computed(() => (roomStore.localStream.audioVolume || 0) * volumeTotalNum.value / 100);
+const volumeNum = computed(() => (userVolumeObj.value[userId.value] || 0) * volumeTotalNum.value / 100);
 
 const showVolume = computed(() => isSampleMode.value || (isDetailMode.value && isTestingMicrophone.value));
 

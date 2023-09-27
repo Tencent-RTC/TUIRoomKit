@@ -16,13 +16,30 @@
 import { computed } from 'vue';
 import SvgIcon from '../common/SvgIcon.vue';
 import { ICON_NAME } from '../../constants/icon';
+import { useRoomStore } from '../../stores/room';
+import { storeToRefs } from 'pinia';
+import { isUndefined } from '../../utils/utils';
 
 interface Props {
+  userId?: string,
   audioVolume?: number,
   isMuted?: boolean,
   size?: string,
   isDisabled?: boolean,
 }
+
+const roomStore = useRoomStore();
+const { userVolumeObj } = storeToRefs(roomStore);
+
+const currentAudioVolume = computed(() => {
+  if (!isUndefined(props.audioVolume)) {
+    return props.audioVolume;
+  }
+  if (userVolumeObj.value && props.userId) {
+    return userVolumeObj.value[props.userId];
+  }
+  return 0;
+});
 
 const props = defineProps<Props>();
 
@@ -34,10 +51,10 @@ const iconName = computed(() => {
 });
 
 const showAudioLevel = computed(() => {
-  if (props.isMuted || !props.audioVolume) {
+  if (props.isMuted || !currentAudioVolume.value) {
     return 0;
   }
-  return ((props.audioVolume * 4) / 100) * 5;
+  return ((currentAudioVolume.value * 4) / 100) * 5;
 });
 
 </script>

@@ -13,12 +13,32 @@
       <span>{{ t('End sharing') }}</span>
     </div>
     <Dialog
-      :model-value="dialogVisible"
+      :model-value="isShowFraudDialog && isShowScreenShareAntiFraud"
       width="420px"
-      :title="t('Stop sharing?') "
+      :title="t('Safety Reminder')"
       :modal="true"
       :append-to-body="false"
-      :before-close="cancelStop"
+    >
+      <span>
+        {{
+          t(
+            'Sharing screens may lead to the leakage of private information such as SMS verification codes and passwords, resulting in financial losses. Please be vigilant against various forms of fraud.',
+          )
+        }}
+      </span>
+      <template #footer>
+        <span>
+          <el-button type="primary" @click="startScreenShare">{{ t('Continue sharing') }}</el-button>
+          <el-button type="default" @click="isShowFraudDialog = false">{{ t('Cancel') }}</el-button>
+        </span>
+      </template>
+    </Dialog>
+    <Dialog
+      :model-value="dialogVisible"
+      width="420px"
+      :title="t('Stop sharing?')"
+      :modal="true"
+      :append-to-body="false"
     >
       <span>
         {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
@@ -41,6 +61,7 @@ import IconButton from '../../common/IconButton.vue';
 import { TUIRoomEngine, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-wx';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useRoomStore } from '../../../stores/room';
+import { useBasicStore } from '../../../stores/basic';
 import logger from '../../../utils/common/logger';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ICON_NAME } from '../../../constants/icon';
@@ -52,13 +73,16 @@ const roomEngine = useGetRoomEngine();
 const logPrefix = '[ScreenShareControl]';
 
 const roomStore = useRoomStore();
+const basicStore = useBasicStore();
 const { isAnchor, isAudience, hasOtherScreenShare } = storeToRefs(roomStore);
+const { isShowScreenShareAntiFraud } = storeToRefs(basicStore);
 const { t } = useI18n();
 
 const btnStopRef = ref();
 const isSharing: Ref<boolean> = ref(false);
 const showStopShareRegion: Ref<boolean> = ref(false);
 const dialogVisible: Ref<boolean> = ref(false);
+const isShowFraudDialog: Ref<boolean> = ref(false);
 
 // 麦下用户不能进行屏幕分享
 const screenShareDisabled = computed(() => isAudience.value);
@@ -77,6 +101,11 @@ watch(isAnchor, (val: any, oldVal: any) => {
 });
 
 async function toggleScreenShare() {
+  if (isSharing.value) {
+    showStopShareRegion.value = true;
+    return;
+  }
+
   if (isAudience.value) {
     ElMessage({
       type: 'warning',
@@ -85,6 +114,7 @@ async function toggleScreenShare() {
     });
     return;
   }
+
   if (hasOtherScreenShare.value) {
     ElMessage({
       type: 'warning',
@@ -93,10 +123,27 @@ async function toggleScreenShare() {
     });
     return;
   }
-  if (isSharing.value) {
-    showStopShareRegion.value = true;
+
+  if (!isShowScreenShareAntiFraud.value) {
+    await startScreenShare();
     return;
   }
+  isShowFraudDialog.value = true;
+}
+
+function openStopConfirmDialog() {
+  showStopShareRegion.value = false;
+  if (isSharing.value) {
+    dialogVisible.value = true;
+  }
+}
+
+function cancelStop() {
+  dialogVisible.value = false;
+}
+
+async function startScreenShare() {
+  isShowFraudDialog.value = false;
   try {
     await roomEngine.instance?.startScreenSharing();
     isSharing.value = true;
@@ -131,17 +178,6 @@ async function toggleScreenShare() {
   }
 }
 
-function openStopConfirmDialog() {
-  showStopShareRegion.value = false;
-  if (isSharing.value) {
-    dialogVisible.value = true;
-  }
-}
-
-function cancelStop() {
-  dialogVisible.value = false;
-}
-
 async function stopScreenShare() {
   if (isSharing.value) {
     try {
@@ -169,31 +205,31 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../assets/style/var.scss';
-  @import '../../../assets/style/element-custom.scss';
+@import '../../../assets/style/var.scss';
+@import '../../../assets/style/element-custom.scss';
 
-  .screen-share-control-container {
-    position: relative;
-  }
-  .stop-share-region {
-    width: 131px;
-    height: 48px;
-    background: var(--stop-share-region-bg-color);
-    border-radius: 4px;
-    position: absolute;
-    top: -58px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--color-font);
-  }
-  .stop-share-icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 10px;
-  }
+.screen-share-control-container {
+  position: relative;
+}
+.stop-share-region {
+  width: 131px;
+  height: 48px;
+  background: var(--stop-share-region-bg-color);
+  border-radius: 4px;
+  position: absolute;
+  top: -58px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-font);
+}
+.stop-share-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
 </style>

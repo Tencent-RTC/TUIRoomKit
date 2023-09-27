@@ -17,14 +17,14 @@
     <div class="manage-member-bottom">
       <div
         class="manage-member-button"
-        :class="roomStore.isMicrophoneDisableForAllUser ? 'lift-all' : ''"
+        :class="isMicrophoneDisableForAllUser ? 'lift-all' : ''"
         @touchstart="toggleManageMember(ManageControlType.AUDIO)"
       >
         {{ audioManageInfo }}
       </div>
       <div
         class="manage-member-button"
-        :class="roomStore.isCameraDisableForAllUser ? 'lift-all' : ''"
+        :class="isCameraDisableForAllUser ? 'lift-all' : ''"
         @touchstart="toggleManageMember(ManageControlType.VIDEO)"
       >
         {{ videoManageInfo }}
@@ -54,17 +54,11 @@
 </template>
 
 <script setup lang='ts'>
-import { Ref, ref, computed, nextTick } from 'vue';
-import { storeToRefs } from 'pinia';
 import MemberItem from '../ManageMember/MemberItem/index.vue';
-import useGetRoomEngine from '../../hooks/useRoomEngine';
-import { useRoomStore } from '../../stores/room';
-import { useI18n } from '../../locales';
-import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-wx';
 import Dialog from '../../elementComp/Dialog/index.vue';
-
-const roomEngine = useGetRoomEngine();
-const { t } = useI18n();
+import useIndex from './useIndexHooks';
+import { storeToRefs } from 'pinia';
+import { useRoomStore } from '../../stores/room';
 const roomStore = useRoomStore();
 const {
   userList,
@@ -74,65 +68,19 @@ const {
   isCameraDisableForAllUser,
 } = storeToRefs(roomStore);
 
-const audioManageInfo = computed(() => (roomStore.isMicrophoneDisableForAllUser ? t('Lift all mute') : t('All mute')));
-const videoManageInfo = computed(() => (roomStore.isCameraDisableForAllUser ? t('Lift stop all video') : t('All stop video')));
+const {
+  audioManageInfo,
+  videoManageInfo,
+  showManageAllUserDialog,
+  dialogTitleInfo,
+  dialogActionInfo,
+  ManageControlType,
+  toggleManageMember,
+  doToggleManageMember,
+  t,
+} = useIndex();
 
-const showManageAllUserDialog: Ref<boolean> = ref(false);
-const dialogTitleInfo: Ref<string> = ref('');
-const dialogActionInfo: Ref<string> = ref('');
 
-enum ManageControlType {
-  AUDIO = 'audio',
-  VIDEO = 'video',
-  Message = 'message',
-}
-const currentControlType: Ref<ManageControlType> = ref(ManageControlType.AUDIO);
-
-async function toggleManageMember(type: ManageControlType) {
-  showManageAllUserDialog.value = true;
-  currentControlType.value = type;
-  switch (type) {
-    case ManageControlType.AUDIO:
-      dialogTitleInfo.value = roomStore.isMicrophoneDisableForAllUser
-        ? t('Can you lift all mute')
-        : t('All current and new members will be muted.');
-      // 小程序更新视图
-      await nextTick();
-      dialogActionInfo.value = audioManageInfo.value;
-      break;
-    case ManageControlType.VIDEO:
-      dialogTitleInfo.value = roomStore.isCameraDisableForAllUser
-        ? t('Should we turn on the video for everyone')
-        : t('All current and new members will turn off their videos.');
-      await nextTick();
-      dialogActionInfo.value = videoManageInfo.value;
-      break;
-    default:
-      break;
-  }
-}
-
-async function doToggleManageMember() {
-  switch (currentControlType.value) {
-    case ManageControlType.AUDIO:
-      await roomEngine.instance?.disableDeviceForAllUserByAdmin({
-        isDisable: !isMicrophoneDisableForAllUser.value,
-        device: TUIMediaDevice.kMicrophone,
-      });
-      roomStore.setMicrophoneDisableState(!isMicrophoneDisableForAllUser.value);
-      break;
-    case ManageControlType.VIDEO:
-      await roomEngine.instance?.disableDeviceForAllUserByAdmin({
-        isDisable: !isCameraDisableForAllUser.value,
-        device: TUIMediaDevice.kCamera,
-      });
-      roomStore.setCameraDisableState(!isCameraDisableForAllUser.value);
-      break;
-    default:
-      break;
-  }
-  showManageAllUserDialog.value = false;
-}
 </script>
 
 <style lang="scss" scoped>

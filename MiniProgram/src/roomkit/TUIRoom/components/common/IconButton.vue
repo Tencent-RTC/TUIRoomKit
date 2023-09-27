@@ -17,7 +17,12 @@
 -->
 <template>
   <div :class="['icon-box', `${!hideHoverEffect && 'hover-effect'}`, `${disabled && 'disabled'}`]">
-    <span class="icon-content" @click="$emit('click-icon')">
+    <span v-if="isMobile" @tap="handleClickEvent" class="icon-content">
+      <svg-icon v-if="iconName" :icon-name="iconName" />
+      <slot></slot>
+      <span class="title" :class="isActive ? 'title-active' : 'title'">{{ title }}</span>
+    </span>
+    <span v-else class="icon-content" @click="$emit('click-icon')">
       <svg-icon v-if="iconName" :icon-name="iconName" />
       <slot></slot>
       <span class="title" :class="isActive ? 'title-active' : 'title'">{{ title }}</span>
@@ -30,7 +35,7 @@
 
 <script setup lang="ts">
 import SvgIcon from '../common/SvgIcon.vue';
-
+import { isMobile } from '../../utils/useMediaValue';
 interface Props {
   title: string,
   iconName?: string,
@@ -41,7 +46,11 @@ interface Props {
 }
 
 defineProps<Props>();
-defineEmits(['click-icon', 'click-more']);
+const emit = defineEmits(['click-icon', 'click-more']);
+
+const handleClickEvent = () => {
+  emit('click-icon');
+};
 
 </script>
 
