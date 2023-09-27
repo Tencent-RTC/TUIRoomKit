@@ -17,7 +17,7 @@
       <audio-icon
         v-if="!isScreenStream"
         class="audio-icon"
-        :audio-volume="stream.audioVolume"
+        :user-id="stream.userId"
         :is-muted="!stream.hasAudioStream"
         size="small"
       ></audio-icon>
@@ -46,11 +46,13 @@ import {
 } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { isInnerScene } from '../../../utils/constants';
+import { storeToRefs } from 'pinia';
 const roomEngine = useGetRoomEngine();
 
 const logPrefix = '[StreamRegion]';
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
+const { userVolumeObj } = storeToRefs(roomStore);
 
 const { t } = useI18n();
 
@@ -63,7 +65,7 @@ const props = defineProps<Props>();
 
 const streamRegionRef = ref();
 const showVoiceBorder = computed(() => (
-  props.stream?.audioVolume !== 0 && props.stream?.streamType !== TUIVideoStreamType.kScreenStream
+  props.stream.hasAudioStream && userVolumeObj.value[props.stream.userId] !== 0
 ));
 const playRegionDomId = computed(() => `${props.stream.userId}_${props.stream.streamType}`);
 

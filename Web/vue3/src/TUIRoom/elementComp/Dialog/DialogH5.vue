@@ -27,20 +27,21 @@ const hasTitle = computed(() => props.title !== '');
 
 <style lang="scss" scoped>
 .dialog-container {
-  height: 15vh;
-  max-width: 80vw;
-  position: fixed;
-  background-color: #ffffff;
-  border-radius: 8px;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  margin: auto;
-  border: 1px solid rgba(211, 219, 238, 0.4);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+    height: 15vh;
+    max-width: 80vw;
+    position: fixed;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    border: 1px solid rgba(211, 219, 238, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 2000;
   .dialog-title {
     display: inline-block;
     font-family: 'PingFang SC';
