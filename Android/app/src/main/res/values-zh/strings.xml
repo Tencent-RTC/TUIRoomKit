@@ -16,7 +16,9 @@
     <string name="app_title_register">注册</string>
     <string name="app_text_user_name">用户名</string>
     <string name="app_hint_user_name">请输入用户名</string>
-    <string name="app_tips_user_name">仅限中文、字母、数字和下划线，2–20个字</string>
+    <string name="app_tips_user_name">仅限中文、字母、数字和下划线</string>
+    <string name="app_toast_username_too_long">您的昵称过长</string>
+    <string name="app_toast_username_too_short">您的昵称过短</string>
     <string name="app_toast_register_success_and_logging_in">注册成功</string>
     <string name="app_toast_failed_to_set">设置失败: %s</string>
 
@@ -35,5 +37,15 @@
     <string name="app_custom_name_12">艾斯</string>
 
     <string name="app_item_video_conferencing">多人音视频房间</string>
+    <string name="app_item_video_conferencing_h5">多人音视频房间(H5)</string>
     <string name="app_tv_video_conferencing_tips">全球端到端平均延时&lt;300ms</string>
+
+    <string name="tuiroomkit_your_name">您的姓名</string>
+    <string name="tuiroomkit_multi_video_conferencing">多人视频会议</string>
+    <string name="tuiroomkit_app_version">Tencent Cloud TUIRoomKit v%s</string>
+    <string name="tuiroomkit_product_name">多人音视频房间</string>
+    <string name="tuiroomkit_please_input_room_number">请输入房间号</string>
+    <string name="tuiroomkit_enter_room">加入房间</string>
+    <string name="tuiroomkit_create_room">新建房间</string>
+    <string name="tuiroomkit_enter_live_room">加入直播房间</string>
 </resources>

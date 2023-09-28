@@ -1,10 +1,10 @@
 ## 发布日志
 
 ### Version 1.5.1 @ 2023.09.28
-- iOS: 修改TUIRoomKit对外接口和回调；
-- iOS: 更新UI视图，让UI更加美观；
-- iOS: 修改麦克风逻辑，让开关操作更加顺滑；
-- iOS: 适配RTL；
+- iOS & Android: 优化开发接入流程，更新 TUIRoomKit 的接口；
+- iOS & Android: 优化产品体验，更新 UI 界面；
+- iOS & Android: 优化产品体验，让麦克风开关速度更新顺滑；
+- iOS & Android: 布局适配 RTL，新增阿拉伯语；
 
 ### Version 1.5.0 @ 2023.09.08
 - iOS: 删除美颜；

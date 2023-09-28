@@ -16,7 +16,9 @@
     <string name="app_title_register">Register</string>
     <string name="app_text_user_name">Username</string>
     <string name="app_hint_user_name">Enter a username</string>
-    <string name="app_tips_user_name">Chinese characters, letters, numbers and underscores, 2 – 20 words</string>
+    <string name="app_tips_user_name">Chinese characters, letters, numbers and underscores</string>
+    <string name="app_toast_username_too_long">Your nickname is too long</string>
+    <string name="app_toast_username_too_short">Your nickname is too short</string>
     <string name="app_toast_register_success_and_logging_in">Registered successfully</string>
     <string name="app_toast_failed_to_set">Failed: %s</string>
 
@@ -32,6 +34,17 @@
     <string name="app_custom_name_10">ivet</string>
     <string name="app_custom_name_11">clinton</string>
     <string name="app_custom_name_12">virelai</string>
+
     <string name="app_item_video_conferencing">Video Conferencing</string>
+    <string name="app_item_video_conferencing_h5">Video Conferencing(H5)</string>
     <string name="app_tv_video_conferencing_tips">Average end-to-end latency &lt; 300 ms worldwide</string>
+
+    <string name="tuiroomkit_your_name">Your Name</string>
+    <string name="tuiroomkit_multi_video_conferencing">Multi-person video conferencing</string>
+    <string name="tuiroomkit_app_version">Tencent Cloud TUIRoomKit v%s</string>
+    <string name="tuiroomkit_product_name">Multi-person Audio/Video Interactions</string>
+    <string name="tuiroomkit_please_input_room_number">Enter a conference ID</string>
+    <string name="tuiroomkit_enter_room">Join</string>
+    <string name="tuiroomkit_create_room">Create Room</string>
+    <string name="tuiroomkit_enter_live_room">Join LiveRoom</string>
 </resources>

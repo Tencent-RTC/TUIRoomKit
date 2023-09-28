@@ -4,98 +4,118 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
-import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.videoseat.ui.TUIVideoSeatView;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.RoomMainViewModel;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.lang.reflect.Method;
 
 public class RoomMainView extends RelativeLayout {
-    private static final String TAG = "MeetingView";
+    private static final String TAG = "RoomMainView";
+
+    private static final int ROOM_BARS_DISAPPEAR_DELAY_MS = 3 * 1000;
 
     private Context                      mContext;
-    private View                         mScreenCaptureGroup;
     private View                         mFloatingWindow;
-    private View                         mDividingLine;
-    private TextView                     mTextStopScreenShare;
-    private TopView                      mTopView;
-    private BottomView                   mBottomView;
+    private TUIVideoSeatView             mVideoSeatView;
+    private Button                       mBtnStopScreenShare;
+    private FrameLayout                  mLayoutTopView;
+    private FrameLayout                  mLayoutVideoSeat;
+    private View                         mLayoutScreenCaptureGroup;
+    private FrameLayout                  mLayoutBottomView;
+    private BottomLayout                 mBottomLayout;
     private QRCodeView                   mQRCodeView;
     private UserListView                 mUserListView;
     private RoomInfoView                 mRoomInfoView;
-    private MoreFunctionView             mMoreFunctionView;
+    private MemberInviteView             mMemberInviteView;
     private TransferMasterView           mTransferMasterView;
     private RaiseHandApplicationListView mRaiseHandApplicationListView;
-    private LinearLayout                 mLayoutRaiseHandTip;
-    private RelativeLayout               mLayoutVideoSeat;
     private RoomMainViewModel            mViewModel;
+
+    private Handler mMainHandler = new Handler(Looper.getMainLooper());
+
+    private boolean mIsBarsShowed         = true;
+    private boolean mIsBottomViewExpanded = false;
 
     public RoomMainView(Context context) {
         super(context);
         mContext = context;
+        mViewModel = new RoomMainViewModel(mContext, this);
+        mVideoSeatView = new TUIVideoSeatView(mContext);
+        mVideoSeatView.setViewClickListener(this::onClick);
         initView();
     }
 
     private void initView() {
-        View.inflate(mContext, R.layout.tuiroomkit_view_meeting, this);
-        mViewModel = new RoomMainViewModel(mContext, this);
+        removeAllViews();
+        addView(LayoutInflater.from(mContext)
+                .inflate(R.layout.tuiroomkit_view_room_main,
+                        this, false));
 
-        mLayoutVideoSeat = findViewById(R.id.rl_video_seat_container);
-        mLayoutRaiseHandTip = findViewById(R.id.ll_raise_hand_tip);
-        mScreenCaptureGroup = findViewById(R.id.group_screen_capture);
-        mTextStopScreenShare = findViewById(R.id.tv_stop_screen_capture);
-        mDividingLine = findViewById(R.id.top_view_dividing_line);
+        mLayoutTopView = findViewById(R.id.tuiroomit_top_view_container);
+        mLayoutTopView.addView(new TopView(mContext));
 
-        mTextStopScreenShare.setOnClickListener(new View.OnClickListener() {
+        mLayoutVideoSeat = findViewById(R.id.tuiroomkit_video_seat_container);
+        ViewParent parent = mVideoSeatView.getParent();
+        if (parent != null && parent instanceof ViewGroup) {
+            ((ViewGroup) parent).removeView(mVideoSeatView);
+        }
+        mLayoutVideoSeat.addView(mVideoSeatView);
+
+        mLayoutScreenCaptureGroup = findViewById(R.id.tuiroomkit_group_screen_capture);
+        mLayoutScreenCaptureGroup.setOnClickListener(this::onClick);
+        mBtnStopScreenShare = findViewById(R.id.tuiroomkit_btn_stop_screen_capture);
+        mBtnStopScreenShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mViewModel.stopScreenCapture();
             }
         });
 
-        if (TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT.equals(mViewModel.getRoomInfo().speechMode)
-                && !mViewModel.isOwner()) {
-            mLayoutRaiseHandTip.setVisibility(VISIBLE);
-        }
-        mLayoutRaiseHandTip.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLayoutRaiseHandTip.setVisibility(GONE);
-            }
-        });
+        mBottomLayout = new BottomLayout(mContext);
+        mBottomLayout.setExpandStateListener(this::onExpandStateChanged);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        mBottomLayout.setLayoutParams(layoutParams);
+        mLayoutBottomView = findViewById(R.id.tuiroomkit_bottom_view_container);
+        mLayoutBottomView.addView(mBottomLayout);
 
         mUserListView = new UserListView(mContext);
-
         mRaiseHandApplicationListView = new RaiseHandApplicationListView(mContext);
 
-        mBottomView = new BottomView(mContext);
-        mViewModel.initCameraAndMicrophone();
-        ViewGroup bottomLayout = findViewById(R.id.bottom_view);
-        bottomLayout.addView(mBottomView);
-
-        mTopView = new TopView(mContext);
-        ViewGroup topLayout = findViewById(R.id.top_view);
-        topLayout.addView(mTopView);
-
-        setVideoSeatView(mViewModel.getVideoSeatView());
-        setMoreFunctionView();
         showAlertUserLiveTips();
         if (RoomEngineManager.sharedInstance().getRoomStore().videoModel.isScreenSharing()) {
             onScreenShareStarted();
         }
+        showRoomBars();
+        if (mIsBottomViewExpanded) {
+            mBottomLayout.expandView();
+        }
+    }
+
+    public void stopScreenShare() {
+        mBottomLayout.stopScreenShare();
     }
 
     private void showAlertUserLiveTips() {
@@ -104,49 +124,15 @@ public class RoomMainView extends RelativeLayout {
             Method method = clz.getDeclaredMethod("showAlertUserLiveTips", Context.class);
             method.invoke(null, mContext);
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    //TODO 横屏模式下要隐藏bottomView和TopView
-    private void changeViewVisibility(View view) {
-        if (view == null) {
-            return;
-        }
-
-        if (view.getVisibility() == VISIBLE) {
-            view.setVisibility(GONE);
-        } else {
-            view.setVisibility(VISIBLE);
+            Log.i(TAG, "showAlertUserLiveTips fail");
         }
     }
 
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        RelativeLayout.LayoutParams params = new RelativeLayout
-                .LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        if (Configuration.ORIENTATION_PORTRAIT == newConfig.orientation) {
-            params.addRule(RelativeLayout.BELOW, R.id.top_view);
-            params.addRule(RelativeLayout.ABOVE, R.id.bottom_view);
-            params.bottomMargin = getResources()
-                    .getDimensionPixelSize(R.dimen.tuiroomkit_video_seat_bottom_margin);
-        }
-        mLayoutVideoSeat.setLayoutParams(params);
+        initView();
         mViewModel.notifyConfigChange(newConfig);
-    }
-
-    private void setMoreFunctionView() {
-        mMoreFunctionView = new MoreFunctionView(mContext);
-    }
-
-    private void setVideoSeatView(View view) {
-        if (view == null) {
-            return;
-        }
-        RelativeLayout.LayoutParams params = new RelativeLayout
-                .LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        mLayoutVideoSeat.addView(view, params);
     }
 
     public void showRoomInfo() {
@@ -163,18 +149,18 @@ public class RoomMainView extends RelativeLayout {
         mUserListView.show();
     }
 
+    public void showMemberInviteList() {
+        if (mMemberInviteView == null) {
+            mMemberInviteView = new MemberInviteView(mContext);
+        }
+        mMemberInviteView.show();
+    }
+
     public void showApplyList() {
         if (mRaiseHandApplicationListView == null) {
             mRaiseHandApplicationListView = new RaiseHandApplicationListView(mContext);
         }
         mRaiseHandApplicationListView.show();
-    }
-
-    public void showExtensionView() {
-        if (mMoreFunctionView == null) {
-            mMoreFunctionView = new MoreFunctionView(mContext);
-        }
-        mMoreFunctionView.show();
     }
 
     public void showQRCodeView(String url) {
@@ -231,21 +217,21 @@ public class RoomMainView extends RelativeLayout {
         confirmDialog.setPositiveClickListener(new ConfirmDialog.PositiveClickListener() {
             @Override
             public void onClick() {
-                mViewModel.responseRequest(inviteId, true);
+                mViewModel.responseRequest(requestAction, inviteId, true);
                 confirmDialog.dismiss();
             }
         });
         confirmDialog.setNegativeClickListener(new ConfirmDialog.NegativeClickListener() {
             @Override
             public void onClick() {
-                mViewModel.responseRequest(inviteId, false);
+                mViewModel.responseRequest(requestAction, inviteId, false);
                 confirmDialog.dismiss();
             }
         });
         confirmDialog.show();
     }
 
-    public void showSingleConfirmDialog(String message, boolean isExitRoom) {
+    public void showExitRoomConfirmDialog(String message) {
         final ConfirmDialog confirmDialog = new ConfirmDialog(mContext);
         confirmDialog.setCancelable(true);
         confirmDialog.setMessage(message);
@@ -257,9 +243,7 @@ public class RoomMainView extends RelativeLayout {
         confirmDialog.setPositiveClickListener(new ConfirmDialog.PositiveClickListener() {
             @Override
             public void onClick() {
-                if (isExitRoom) {
-                    mViewModel.notifyExitRoom();
-                }
+                RoomEngineManager.sharedInstance().exitRoom(null);
                 confirmDialog.dismiss();
             }
         });
@@ -280,6 +264,25 @@ public class RoomMainView extends RelativeLayout {
         });
         confirmDialog.show();
     }
+
+    public void showSingleConfirmDialog(String message) {
+        final ConfirmDialog confirmDialog = new ConfirmDialog(mContext);
+        confirmDialog.setCancelable(true);
+        confirmDialog.setMessage(message);
+        if (confirmDialog.isShowing()) {
+            confirmDialog.dismiss();
+            return;
+        }
+        confirmDialog.setPositiveText(mContext.getString(R.string.tuiroomkit_dialog_ok));
+        confirmDialog.setPositiveClickListener(new ConfirmDialog.PositiveClickListener() {
+            @Override
+            public void onClick() {
+                confirmDialog.dismiss();
+            }
+        });
+        confirmDialog.show();
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -294,23 +297,24 @@ public class RoomMainView extends RelativeLayout {
         if (mRaiseHandApplicationListView != null) {
             mRaiseHandApplicationListView.destroy();
         }
+        if (mVideoSeatView != null) {
+            mVideoSeatView.destroy();
+        }
     }
 
     public void onScreenShareStarted() {
-        mLayoutVideoSeat.setVisibility(View.GONE);
-        mScreenCaptureGroup.setVisibility(View.VISIBLE);
+        mLayoutScreenCaptureGroup.setVisibility(View.VISIBLE);
 
         if (mFloatingWindow == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             mFloatingWindow = inflater.inflate(R.layout.tuiroomkit_screen_capture_floating_window, null, false);
+            showFloatingWindow();
         }
-        showFloatingWindow();
     }
 
     public void onScreenShareStopped() {
         hideFloatingWindow();
-        mLayoutVideoSeat.setVisibility(View.VISIBLE);
-        mScreenCaptureGroup.setVisibility(View.GONE);
+        mLayoutScreenCaptureGroup.setVisibility(View.GONE);
     }
 
     private void showFloatingWindow() {
@@ -352,17 +356,65 @@ public class RoomMainView extends RelativeLayout {
 
     public void onCameraMuted(boolean muted) {
         if (muted) {
-            ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_mute_video_by_master));
+            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_mute_video_by_master));
         } else {
-            ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_un_mute_video_by_master));
+            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_un_mute_video_by_master));
         }
     }
 
     public void onMicrophoneMuted(boolean muted) {
         if (muted) {
-            ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_mute_audio_by_master));
+            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_mute_audio_by_master));
         } else {
-            ToastUtil.toastShortMessage(mContext.getString(R.string.tuiroomkit_un_mute_audio_by_master));
+            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_un_mute_audio_by_master));
         }
+    }
+
+    public void onExpandStateChanged(boolean isExpanded) {
+        mIsBottomViewExpanded = isExpanded;
+        if (isExpanded) {
+            mMainHandler.removeCallbacksAndMessages(null);
+        } else {
+            mMainHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    hideRoomBars();
+                }
+            }, ROOM_BARS_DISAPPEAR_DELAY_MS);
+        }
+    }
+
+    public void onClick(View v) {
+        if (mIsBottomViewExpanded) {
+            return;
+        }
+        if (mIsBarsShowed) {
+            hideRoomBars();
+        } else {
+            showRoomBars();
+        }
+    }
+
+    private void showRoomBars() {
+        mIsBarsShowed = true;
+        mLayoutTopView.setVisibility(VISIBLE);
+        mLayoutBottomView.setVisibility(VISIBLE);
+        mMainHandler.removeCallbacksAndMessages(null);
+        if (mIsBottomViewExpanded) {
+            return;
+        }
+        mMainHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                hideRoomBars();
+            }
+        }, ROOM_BARS_DISAPPEAR_DELAY_MS);
+    }
+
+    private void hideRoomBars() {
+        mIsBarsShowed = false;
+        mLayoutTopView.setVisibility(INVISIBLE);
+        mLayoutBottomView.setVisibility(INVISIBLE);
+        mMainHandler.removeCallbacksAndMessages(null);
     }
 }

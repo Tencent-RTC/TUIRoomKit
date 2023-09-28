@@ -36,6 +36,7 @@ public class AudioSettingView extends CoordinatorLayout {
     private SeekBarSettingItem      mPlayVolumeItem;
     private List<BaseSettingItem>   mSettingItemList;
     private OnItemChangeListener    mListener;
+
     private RoomStore mRoomStore = RoomEngineManager.sharedInstance().getRoomStore();
 
     public AudioSettingView(@NonNull Context context, OnItemChangeListener listener) {
@@ -58,7 +59,7 @@ public class AudioSettingView extends CoordinatorLayout {
             public void onSeekBarChange(int progress, boolean fromUser) {
                 String volume = String.valueOf(progress);
                 mCollectionVolumeItem.setTips(volume);
-                    mListener.onAudioCaptureVolumeChange(progress);
+                mListener.onAudioCaptureVolumeChange(progress);
             }
         }).setProgress(mRoomStore.audioModel.captureVolume);
         mSettingItemList.add(mCollectionVolumeItem);
@@ -70,7 +71,7 @@ public class AudioSettingView extends CoordinatorLayout {
             public void onSeekBarChange(int progress, boolean fromUser) {
                 String volume = String.valueOf(progress);
                 mPlayVolumeItem.setTips(volume);
-                    mListener.onAudioPlayVolumeChange(progress);
+                mListener.onAudioPlayVolumeChange(progress);
             }
         }).setProgress(mRoomStore.audioModel.playVolume);
         mSettingItemList.add(mPlayVolumeItem);
@@ -80,7 +81,7 @@ public class AudioSettingView extends CoordinatorLayout {
         mAudioVolumeEvaluationItem = new SwitchSettingItem(getContext(), itemText, new SwitchSettingItem.Listener() {
             @Override
             public void onSwitchChecked(boolean isChecked) {
-                    mListener.onAudioEvaluationEnableChange(isChecked);
+                mListener.onAudioEvaluationEnableChange(isChecked);
                 Intent intent = new Intent(AUDIO_EVALUATION_CHANGED);
                 LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
 
@@ -94,18 +95,18 @@ public class AudioSettingView extends CoordinatorLayout {
             @Override
             public void onSwitchChecked(boolean isChecked) {
                 if (isChecked) {
-                        createFile(mRecordFilePath);
-                            mListener.onStartFileDumping(mRecordFilePath);
-                        ToastUtil.toastShortMessage(getContext().getString(R.string.tuiroomkit_btn_start_recording));
+                    createFile(mRecordFilePath);
+                    mListener.onStartFileDumping(mRecordFilePath);
+                    ToastUtil.toastShortMessage(getContext().getString(R.string.tuiroomkit_btn_start_recording));
                 } else {
-                            mListener.onStopFileDumping();
-                        ToastUtil.toastLongMessage(
-                                getContext().getString(R.string.tuiroomkit_toast_recording_file_path_copied,
-                                        mRecordFilePath));
+                    mListener.onStopFileDumping();
+                    ToastUtil.toastLongMessage(
+                            getContext().getString(R.string.tuiroomkit_toast_recording_file_path_copied,
+                                    mRecordFilePath));
                     ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData mClipData = ClipData.newPlainText("path", mRecordFilePath);
-                        if (cm != null) {
-                            cm.setPrimaryClip(mClipData);
+                    ClipData mClipData = ClipData.newPlainText("path", mRecordFilePath);
+                    if (cm != null) {
+                        cm.setPrimaryClip(mClipData);
                     }
                 }
             }
@@ -138,15 +139,13 @@ public class AudioSettingView extends CoordinatorLayout {
     }
 
     private void createFile(String path) {
-        File file = new File(path);
         try {
+            File file = new File(path);
             file.delete();
-            file.createNewFile();
-        } catch (IOException e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
     }
-
 
     public interface OnItemChangeListener {
         void onAudioCaptureVolumeChange(int volume);
