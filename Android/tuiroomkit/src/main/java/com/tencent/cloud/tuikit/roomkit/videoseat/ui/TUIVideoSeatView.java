@@ -260,8 +260,10 @@ public class TUIVideoSeatView extends RelativeLayout {
         LayoutParams params = (LayoutParams) mUserDisplayView.getLayoutParams();
         setUserTalkingViewSize(talkingEntity, params);
 
-        int rightMargin =
-                ScreenUtil.getScreenWidth(mContext) - params.leftMargin - params.width - UserDisplayView.MARGIN_PX;
+        int videoSeatViewWidth = ScreenUtil.getScreenWidth(mContext) - (int) mContext.getResources()
+                .getDimension(R.dimen.tuiroomkit_video_seat_margin_start) - (int) mContext.getResources()
+                .getDimension(R.dimen.tuiroomkit_video_seat_margin_end);
+        int rightMargin = videoSeatViewWidth - params.leftMargin - params.width - UserDisplayView.MARGIN_PX;
         params.leftMargin += rightMargin < 0 ? rightMargin : 0;
         int bottomMargin = getHeight() - params.topMargin - params.height - UserDisplayView.MARGIN_PX;
         params.topMargin += bottomMargin < 0 ? bottomMargin : 0;
