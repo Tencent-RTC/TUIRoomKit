@@ -15,19 +15,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.utils.widget.ImageFilterView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.videoseat.ui.view.UserVolumePromptView;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.utils.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.view.RoundRelativeLayout;
+import com.tencent.cloud.tuikit.roomkit.videoseat.ui.view.UserVolumePromptView;
 import com.tencent.cloud.tuikit.roomkit.videoseat.viewmodel.UserEntity;
 
 import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -43,10 +42,17 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private final int mRoundRadius;
 
+    private View.OnClickListener mClickListener;
+
     public UserListAdapter(Context context, List<UserEntity> list) {
         this.mContext = context;
         this.mList = list;
         mRoundRadius = (int) context.getResources().getDimension(R.dimen.tuivideoseat_video_view_conor);
+    }
+
+    public void setItemClickListener(View.OnClickListener clickListener) {
+        mClickListener = clickListener;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -107,7 +113,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         private TextView             mUserNameTv;
         private ImageView            mIvMaster;
         private UserVolumePromptView mUserMic;
-        private CircleImageView      mUserHeadImg;
+        private ImageFilterView      mUserHeadImg;
         private UserEntity           mMemberEntity;
         private FrameLayout          mVideoContainer;
         private RoundRelativeLayout  mTopLayout;
@@ -213,6 +219,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             mVideoContainer.removeAllViews();
             mVideoContainer.addView(videoView);
+            videoView.setOnClickListener(mClickListener);
         }
 
         private void initView(final View itemView) {

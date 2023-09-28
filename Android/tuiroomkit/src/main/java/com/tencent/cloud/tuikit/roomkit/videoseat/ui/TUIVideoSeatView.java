@@ -5,24 +5,25 @@ import static com.tencent.cloud.tuikit.roomkit.videoseat.Constants.VOLUME_NO_SOU
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
-import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.LandscapePageLayoutManager;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.PageLayoutManager;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.PagerSnapHelper;
+import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.PortraitPageLayoutManager;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.UserListAdapter;
+import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.VisibleRange;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.view.CircleIndicator;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.view.UserDisplayView;
-import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.PortraitPageLayoutManager;
-import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.VisibleRange;
 import com.tencent.cloud.tuikit.roomkit.videoseat.viewmodel.IVideoSeatViewModel;
 import com.tencent.cloud.tuikit.roomkit.videoseat.viewmodel.UserEntity;
 import com.tencent.cloud.tuikit.roomkit.videoseat.viewmodel.VideoSeatViewModel;
@@ -33,6 +34,8 @@ import java.util.List;
 
 public class TUIVideoSeatView extends RelativeLayout {
     private static final String TAG = "TUIVideoSeatView";
+
+    private static final int CLICK_ACTION_MAX_MOVE_DISTANCE = 10;
 
     private Context mContext;
 
@@ -46,7 +49,6 @@ public class TUIVideoSeatView extends RelativeLayout {
     private List<UserEntity> mMemberEntityList;
 
     private IVideoSeatViewModel mViewModel;
-    private TUIRoomEngine       mRoomEngine;
 
     private boolean mIsSpeakerModeOn;
     private boolean mIsTwoPersonVideoOn;
@@ -55,21 +57,17 @@ public class TUIVideoSeatView extends RelativeLayout {
     private int mScreenOrientation = ORIENTATION_PORTRAIT;
     private int mCurrentPageIndex = 0;
 
+    private OnClickListener mClickListener;
+    private boolean         mIsClickAction;
+    private float           mTouchDownPointX;
+    private float           mTouchDownPointY;
+
     private VisibleRange mVisibleRange = new VisibleRange();
 
-    public TUIVideoSeatView(Context context, String roomId, TUIRoomEngine roomEngine) {
+    public TUIVideoSeatView(Context context) {
         super(context);
+        Log.d(TAG, "new : " + this);
         mContext = context;
-        mRoomEngine = roomEngine;
-    }
-
-    public void setMemberEntityList(List<UserEntity> memberEntityList) {
-        mMemberEntityList = memberEntityList;
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
         inflate(mContext, R.layout.tuivideoseat_anchor_list_view, this);
         mUserDisplayView = findViewById(R.id.tuivideoseat_user_talking_video_view);
         mCircleIndicator = findViewById(R.id.simple_view);
@@ -77,13 +75,21 @@ public class TUIVideoSeatView extends RelativeLayout {
         int selectColor = getResources().getColor(R.color.tuivideoseat_color_white);
         mCircleIndicator.setSelectDotColor(selectColor);
         mCircleIndicator.setUnSelectDotColor(unSelectColor);
-        mViewModel = new VideoSeatViewModel(mContext, mRoomEngine, this);
+        mViewModel = new VideoSeatViewModel(mContext, this);
         initListView();
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+    public void setViewClickListener(OnClickListener clickListener) {
+        mClickListener = clickListener;
+        mMemberListAdapter.setItemClickListener(mClickListener);
+    }
+
+    public void setMemberEntityList(List<UserEntity> memberEntityList) {
+        mMemberEntityList = memberEntityList;
+    }
+
+    public void destroy() {
+        Log.d(TAG, "destroy : " + this);
         mViewModel.destroy();
     }
 
@@ -156,6 +162,13 @@ public class TUIVideoSeatView extends RelativeLayout {
         });
         PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(mRecyclerView);
+        mRecyclerView.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mRecyclerView.onTouchEvent(event);
+                return recognizeClickEventFromTouch(event);
+            }
+        });
     }
 
     private void updateUserTalkingViewVisible() {
@@ -184,8 +197,11 @@ public class TUIVideoSeatView extends RelativeLayout {
         LayoutParams layoutParams = (LayoutParams) mUserDisplayView.getLayoutParams();
         setUserTalkingViewSize(talkingEntity, layoutParams);
 
-        layoutParams.leftMargin =
-                ScreenUtil.getScreenWidth(mContext) - layoutParams.width - UserDisplayView.MARGIN_PX;
+        int videoSeatViewWidth = ScreenUtil.getScreenWidth(mContext) - (int) mContext.getResources()
+                .getDimension(R.dimen.tuiroomkit_video_seat_margin_start) - (int) mContext.getResources()
+                .getDimension(R.dimen.tuiroomkit_video_seat_margin_end);
+        layoutParams.leftMargin = videoSeatViewWidth - layoutParams.width - UserDisplayView.MARGIN_PX;
+
         layoutParams.topMargin = UserDisplayView.MARGIN_PX;
         mUserDisplayView.setLayoutParams(layoutParams);
     }
@@ -493,5 +509,34 @@ public class TUIVideoSeatView extends RelativeLayout {
         updateUserTalkingView(mIsTwoPersonSwitched ? 0 : 1);
         mPageLayoutManager.enableTwoPersonMeeting(mIsTwoPersonVideoOn, mIsTwoPersonSwitched);
         mMemberListAdapter.notifyItemChanged(mIsTwoPersonSwitched ? 1 : 0);
+    }
+
+    private boolean recognizeClickEventFromTouch(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mTouchDownPointX = event.getX();
+                mTouchDownPointY = event.getY();
+                mIsClickAction = true;
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                float xDistance = Math.abs(event.getX() - mTouchDownPointX);
+                float yDistance = Math.abs(event.getY() - mTouchDownPointY);
+                if (xDistance >= CLICK_ACTION_MAX_MOVE_DISTANCE || yDistance >= CLICK_ACTION_MAX_MOVE_DISTANCE) {
+                    mIsClickAction = false;
+                }
+                break;
+
+            case MotionEvent.ACTION_UP:
+                if (mIsClickAction && mClickListener != null) {
+                    mClickListener.onClick(this);
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        return true;
     }
 }

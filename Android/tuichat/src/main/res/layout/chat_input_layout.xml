@@ -40,6 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_weight="1"
+            android:textAlignment="viewStart"
             android:background="@drawable/msg_editor_border"
             android:textSize="@dimen/chat_input_text_size"
             android:textColor="@color/black"

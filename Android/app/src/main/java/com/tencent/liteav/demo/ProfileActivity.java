@@ -18,14 +18,16 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
-import com.tencent.cloud.tuikit.roomkit.TUIRoomKitListener;
 import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
 import com.tencent.qcloud.tuicore.TUICore;
+import com.tencent.qcloud.tuicore.TUILogin;
+import com.tencent.qcloud.tuicore.interfaces.TUICallback;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,7 +94,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence text, int start, int before, int count) {
                 mButtonRegister.setEnabled(text.length() != 0);
                 String editable = mEditUserName.getText().toString();
-                Pattern p = Pattern.compile("^[a-z0-9A-Z\\u4e00-\\u9fa5\\_]{2,20}$");
+                Pattern p = Pattern.compile("^[a-z0-9A-Z\\u4e00-\\u9fa5\\_]*$");
                 Matcher m = p.matcher(editable);
                 if (!m.matches()) {
                     mTvInputTips.setTextColor(getResources().getColor(R.color.color_input_no_match));
@@ -113,9 +115,16 @@ public class ProfileActivity extends AppCompatActivity {
             ToastUtil.toastLongMessage(getString(R.string.app_hint_user_name));
             return;
         }
-        String reg = "^[a-z0-9A-Z\\u4e00-\\u9fa5\\_]{2,20}$";
+        String reg = "^[a-z0-9A-Z\\u4e00-\\u9fa5\\_]*$";
         if (!userName.matches(reg)) {
             mTvInputTips.setTextColor(getResources().getColor(R.color.color_input_no_match));
+            return;
+        }
+        if(userName.getBytes(StandardCharsets.UTF_8).length > 30) {
+            ToastUtil.toastLongMessage(getString(R.string.app_toast_username_too_long));
+            return;
+        } else if (userName.getBytes(StandardCharsets.UTF_8).length < 2) {
+            ToastUtil.toastLongMessage(getString(R.string.app_toast_username_too_short));
             return;
         }
         mTvInputTips.setTextColor(getResources().getColor(R.color.text_color_hint));
@@ -130,43 +139,27 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void startPrepareActivity() {
         final UserModel userModel = UserModelManager.getInstance().getUserModel();
-        String userName = TextUtils.isEmpty(userModel.userName) ? userModel.userId : userModel.userName;
-        TUIRoomKit roomKit = TUIRoomKit.sharedInstance(this);
-        roomKit.addListener(new TUIRoomKitListener() {
+        int sdkAppId = GenerateTestUserSig.SDKAPPID;
+        String userId = userModel.userId;
+        String userSig = GenerateTestUserSig.genTestUserSig(userModel.userId);
+        Log.d(TAG, "TUILogin.login sdkAppId=" + sdkAppId + " userId=" + userId + " userSig=" + !TextUtils.isEmpty(
+                userSig));
+        TUILogin.login(this.getApplicationContext(), sdkAppId, userId, userSig, new TUICallback() {
             @Override
-            public void onLogin(int code, String message) {
-                if (code == 0) {
-                    roomKit.setSelfInfo(userName, userModel.userAvatar);
-                    TUICore.startActivity("MainActivity", null);
-                    finish();
-                } else {
-                    ToastUtil.toastShortMessage("tuiroomkit login error:" + code + ",msg:" + message);
-                    UserModelManager.getInstance().clearUserModel();
-                    Log.i(TAG, "login error:" + code + ",msg:" + message);
-                }
+            public void onSuccess() {
+                Log.d(TAG, "TUILogin.login onSuccess");
+                String userName = TextUtils.isEmpty(userModel.userName) ? userModel.userId : userModel.userName;
+                TUIRoomKit.createInstance().setSelfInfo(userName, userModel.userAvatar, null);
+                TUICore.startActivity("MainActivity", null);
+                finish();
             }
 
             @Override
-            public void onRoomCreate(int code, String message) {
-
-            }
-
-            @Override
-            public void onRoomEnter(int code, String message) {
-
-            }
-
-            @Override
-            public void onDestroyRoom() {
-
-            }
-
-            @Override
-            public void onExitRoom() {
-
+            public void onError(int errorCode, String errorMessage) {
+                Log.d(TAG, "TUILogin.login onError errorCode=" + errorCode + " errorMessage=" + errorMessage);
+                UserModelManager.getInstance().clearUserModel();
             }
         });
-        roomKit.login(GenerateTestUserSig.SDKAPPID, userModel.userId, userModel.userSig);
     }
 
     private void initStatusBar() {

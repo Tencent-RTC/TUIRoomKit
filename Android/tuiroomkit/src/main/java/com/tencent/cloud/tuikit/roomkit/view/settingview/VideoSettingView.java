@@ -36,9 +36,10 @@ public class VideoSettingView extends CoordinatorLayout {
     private int mCurRes;
     private int mAppScene = TRTCCloudDef.TRTC_APP_SCENE_VIDEOCALL;
 
-    private OnItemChangeListener    mListener;
+    private OnItemChangeListener mListener;
 
     private RoomStore mRoomStore = RoomEngineManager.sharedInstance().getRoomStore();
+
     public VideoSettingView(@NonNull Context context, OnItemChangeListener listener) {
         super(context);
         mListener = listener;
@@ -73,7 +74,7 @@ public class VideoSettingView extends CoordinatorLayout {
             public void onSeekBarChange(int progress, boolean fromUser) {
                 int bitrate = getBitrate(progress, mCurRes);
                 mBitrateItem.setTips(bitrate + "kbps");
-                        mListener.onVideoBitrateChange(bitrate);
+                mListener.onVideoBitrateChange(bitrate);
             }
         });
 
@@ -87,7 +88,7 @@ public class VideoSettingView extends CoordinatorLayout {
                         mCurRes = position;
                         updateSolution(mCurRes);
                         int resolution = getResolution(position);
-                                mListener.onVideoResolutionChange(resolution);
+                        mListener.onVideoResolutionChange(resolution);
                     }
                 }
         ).setSelect(mCurRes);
@@ -96,11 +97,11 @@ public class VideoSettingView extends CoordinatorLayout {
         itemText = new BaseSettingItem.ItemText(getContext().getString(R.string.tuiroomkit_title_frame_rate),
                 getResources().getStringArray(R.array.video_fps));
         mVideoFpsItem = new SelectionSettingItem(getContext(), itemText, new SelectionSettingItem.Listener() {
-                    @Override
-                    public void onItemSelected(int position, String text) {
-                        int fps = getFps(position);
-                                mListener.onVideoFpsChange(fps);
-                            }
+            @Override
+            public void onItemSelected(int position, String text) {
+                int fps = getFps(position);
+                mListener.onVideoFpsChange(fps);
+            }
         }).setSelect(getFpsPos(mRoomStore.videoModel.fps));
         mSettingItemList.add(mVideoFpsItem);
 
@@ -119,7 +120,7 @@ public class VideoSettingView extends CoordinatorLayout {
                 mListener.onVideoLocalMirrorChange(isChecked);
             }
         }).setCheck(mRoomStore.videoModel.isLocalMirror);
-        mSettingItemList.add(mMirrorTypeItem);
+     //   mSettingItemList.add(mMirrorTypeItem);
 
         for (BaseSettingItem item : mSettingItemList) {
             View view = item.getView();
@@ -232,7 +233,6 @@ public class VideoSettingView extends CoordinatorLayout {
             this.step = step;
         }
     }
-
 
     public interface OnItemChangeListener {
         void onVideoBitrateChange(int bitrate);

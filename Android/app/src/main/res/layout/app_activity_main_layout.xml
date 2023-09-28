@@ -79,5 +79,55 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/meeting_h5"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/app_bg_home_item"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/image_meeting_h5"
+                android:layout_width="160dp"
+                android:layout_height="72dp"
+                android:layout_marginLeft="14dp"
+                android:background="@drawable/app_tab_meeting"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_title_meeting_h5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="10dp"
+                android:text="@string/app_item_video_conferencing_h5"
+                android:textColor="@color/app_color_black"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_description_meeting_h5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:paddingBottom="16dp"
+                android:textColor="#FF626E84"
+                android:textSize="13sp"
+                android:text="@string/app_tv_video_conferencing_tips"
+                app:layout_constraintEnd_toStartOf="@id/image_meeting_h5"
+                app:layout_constraintStart_toStartOf="@+id/tv_title_meeting_h5"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_meeting_h5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </LinearLayout>
 </RelativeLayout>

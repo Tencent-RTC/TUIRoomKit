@@ -8,7 +8,6 @@ public interface AccessRoomConstants {
 
     String ROOM_INVITE_SINGLING = "ROOM_INVITE_ACTION";
 
-
     int DATA_VERSION = 1;
 
     int MSG_MAX_SHOW_MEMBER_COUNT = 5;

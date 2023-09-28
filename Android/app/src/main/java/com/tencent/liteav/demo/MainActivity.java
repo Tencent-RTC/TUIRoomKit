@@ -1,9 +1,12 @@
 package com.tencent.liteav.demo;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -13,13 +16,23 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
+import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
+import com.tencent.liteav.demo.view.activity.PrepareActivity;
+import com.tencent.qcloud.tuicore.TUIConstants;
+import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUIThemeManager;
 import com.tencent.qcloud.tuicore.util.TUIBuild;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+    private String TAG = "MainActivity";
+
+    private Context mContext;
+    private ConstraintLayout mMeetingLayout;
+    private ConstraintLayout mH5MeetingLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,16 +40,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.app_activity_main_layout);
         initStatusBar();
 
+        mContext = this.getApplicationContext();
         ImageView mainIconView = findViewById(R.id.img_main_icon);
         mainIconView.setBackgroundResource(R.drawable.app_title_zh);
         if (TextUtils.equals(getCurrentLanguage(), "en")) {
             mainIconView.setBackgroundResource(R.drawable.app_title_en);
         }
-        ConstraintLayout layout = findViewById(R.id.app_cl_item_meeting);
-        layout.setOnClickListener(new View.OnClickListener() {
+        mMeetingLayout= findViewById(R.id.app_cl_item_meeting);
+        mMeetingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TUIRoomKit.sharedInstance(MainActivity.this.getApplicationContext()).enterPrepareView(true);
+                enterPrepareView(true);
             }
         });
     }
@@ -51,6 +65,18 @@ public class MainActivity extends AppCompatActivity {
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
+    }
+
+    public void enterPrepareView(boolean enablePreview) {
+        Log.i(TAG, "enter prepare view enablePreview=" + enablePreview);
+        if (RoomEngineManager.sharedInstance(mContext).getRoomStore().isInFloatWindow()) {
+            ToastUtil.toastLongMessage(mContext.getString(R.string.tuiroomkit_room_msg_joined));
+            return;
+        }
+        Intent intent = new Intent(mContext, PrepareActivity.class);
+        intent.putExtra(PrepareActivity.INTENT_ENABLE_PREVIEW, enablePreview);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
     }
 
     private String getCurrentLanguage() {

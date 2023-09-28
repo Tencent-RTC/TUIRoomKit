@@ -9,12 +9,12 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
-import com.tencent.cloud.tuikit.roomkit.TUIRoomKitListener;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
 import com.tencent.qcloud.tuicore.TUICore;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
+import com.tencent.qcloud.tuicore.TUILogin;
+import com.tencent.qcloud.tuicore.interfaces.TUICallback;
 
 public class SplashActivity extends Activity {
     private static final String TAG = "SplashActivity";
@@ -46,43 +46,26 @@ public class SplashActivity extends Activity {
 
     private void startPrepareActivity() {
         final UserModel userModel = UserModelManager.getInstance().getUserModel();
-        userModel.userSig = GenerateTestUserSig.genTestUserSig(userModel.userId);
-        String userName = TextUtils.isEmpty(userModel.userName) ? userModel.userId : userModel.userName;
-        TUIRoomKit roomKit = TUIRoomKit.sharedInstance(this);
-        roomKit.addListener(new TUIRoomKitListener() {
+        int sdkAppId = GenerateTestUserSig.SDKAPPID;
+        String userId = userModel.userId;
+        String userSig = GenerateTestUserSig.genTestUserSig(userModel.userId);
+        Log.d(TAG,
+                "TUILogin.login sdkAppId=" + sdkAppId + " userId=" + userId + " userSig=" + TextUtils.isEmpty(userSig));
+        TUILogin.login(this.getApplicationContext(), sdkAppId, userId, userSig, new TUICallback() {
             @Override
-            public void onLogin(int code, String message) {
-                if (code == 0) {
-                    roomKit.setSelfInfo(userName, userModel.userAvatar);
-                    TUICore.startActivity("MainActivity", null);
-                    finish();
-                } else {
-                    ToastUtil.toastShortMessage("tuiroomkit login error:" + code + ",msg:" + message);
-                    UserModelManager.getInstance().clearUserModel();
-                    Log.i(TAG, "login error:" + code + ",msg:" + message);
-                }
+            public void onSuccess() {
+                Log.d(TAG, "TUILogin.login onSuccess");
+                String userName = TextUtils.isEmpty(userModel.userName) ? userModel.userId : userModel.userName;
+                TUIRoomKit.createInstance().setSelfInfo(userName, userModel.userAvatar, null);
+                TUICore.startActivity("MainActivity", null);
+                finish();
             }
 
             @Override
-            public void onRoomCreate(int code, String message) {
-
-            }
-
-            @Override
-            public void onRoomEnter(int code, String message) {
-
-            }
-
-            @Override
-            public void onDestroyRoom() {
-
-            }
-
-            @Override
-            public void onExitRoom() {
-
+            public void onError(int errorCode, String errorMessage) {
+                Log.d(TAG, "TUILogin.login onError errorCode=" + errorCode + " errorMessage=" + errorMessage);
+                UserModelManager.getInstance().clearUserModel();
             }
         });
-        roomKit.login(GenerateTestUserSig.SDKAPPID, userModel.userId, userModel.userSig);
     }
 }
