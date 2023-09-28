@@ -125,10 +125,26 @@ public class RoomStore {
             userModel.isOnSeat = true;
         }
         if (userInfo.hasScreenStream) {
-            seatUserList.add(0, UserEntity.toUserEntityForScreenStream(userInfo));
-            Map<String, Object> map = new HashMap<>();
-            map.put(RoomEventConstant.KEY_USER_POSITION, 0);
-            RoomEventCenter.getInstance().notifyEngineEvent(RoomEventCenter.RoomEngineEvent.REMOTE_USER_TAKE_SEAT, map);
+            boolean isUserExist = false;
+            for (UserEntity item : seatUserList) {
+                if (TextUtils.equals(item.getUserId(), userInfo.userId) && item.getVideoStreamType() == SCREEN_STREAM) {
+                    isUserExist = true;
+                    break;
+                }
+            }
+            if (!isUserExist) {
+                seatUserList.add(0, UserEntity.toUserEntityForScreenStream(userInfo));
+                Map<String, Object> map = new HashMap<>();
+                map.put(RoomEventConstant.KEY_USER_POSITION, 0);
+                RoomEventCenter.getInstance()
+                        .notifyEngineEvent(RoomEventCenter.RoomEngineEvent.REMOTE_USER_TAKE_SEAT, map);
+            }
+        }
+
+        for (UserEntity item : seatUserList) {
+            if (TextUtils.equals(item.getUserId(), userInfo.userId) && item.getVideoStreamType() != SCREEN_STREAM) {
+                return;
+            }
         }
         seatUserList.add(UserEntity.toUserEntityForCameraStream(userInfo));
         Map<String, Object> map = new HashMap<>();
@@ -194,7 +210,7 @@ public class RoomStore {
         int seatPosition = USER_NOT_FOUND;
         for (int i = 0; i < seatUserList.size(); i++) {
             if (TextUtils.equals(userId, seatUserList.get(i).getUserId())
-                    && allUserList.get(i).getVideoStreamType() != SCREEN_STREAM) {
+                    && seatUserList.get(i).getVideoStreamType() != SCREEN_STREAM) {
                 seatUserList.get(i).setHasAudioStream(hasAudio);
                 seatPosition = i;
                 break;
@@ -224,7 +240,7 @@ public class RoomStore {
         int seatPosition = USER_NOT_FOUND;
         for (int i = 0; i < seatUserList.size(); i++) {
             if (TextUtils.equals(userId, seatUserList.get(i).getUserId())
-                    && allUserList.get(i).getVideoStreamType() != SCREEN_STREAM) {
+                    && seatUserList.get(i).getVideoStreamType() != SCREEN_STREAM) {
                 seatUserList.get(i).setHasVideoStream(hasCamera);
                 seatUserList.get(i).setVideoStreamType(streamType);
                 seatPosition = i;
