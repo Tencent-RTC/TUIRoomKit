@@ -1,51 +1,58 @@
 <template>
   <div class="end-control-container">
-    <div class="end-button" tabindex="1" @click="stopMeeting">{{ t('EndPC') }}</div>
+    <Button type="primary" class="end-button" @click="handleEndBtnClick">
+      {{ showEndButtonContent }}
+    </Button>
     <Dialog
       :model-value="visible"
-      class="custom-element-class"
       :title="title"
       :modal="true"
-      :append-to-body="false"
-      width="420px"
+      width="480px"
       :before-close="cancel"
       :close-on-click-modal="true"
+      :append-to-room-container="true"
     >
       <div v-if="currentDialogType === DialogType.BasicDialog">
-        <span v-if="roomStore.isMaster">
-          <!-- eslint-disable-next-line max-len -->
-          {{ t('You are currently the room host, please select the appropriate action.If you select "Leave Room", the room will not be dissolved and you will need to appoint a new host.') }}
-        </span>
-        <span v-else>{{ t('Are you sure you want to leave this room?') }}</span>
+        <span>{{ showEndDialogContent }}</span>
       </div>
       <div v-if="currentDialogType === DialogType.TransferDialog">
         <div>{{ t('New host') }}</div>
         <div>
-          <el-select
+          <tui-select
             v-model="selectedUser"
             :teleported="false"
             :popper-append-to-body="false"
+            theme="white"
           >
-            <el-option
+            <tui-option
               v-for="user in remoteAnchorList"
               :key="user.userId"
               :value="user.userId"
               :label="user.userName"
+              theme="white"
             />
-          </el-select>
+          </tui-select>
         </div>
       </div>
       <template #footer>
         <div v-if="currentDialogType === DialogType.BasicDialog">
-          <el-button v-if="roomStore.isMaster" type="primary" @click.stop="dismissRoom">
+          <Button v-if="roomStore.isMaster" class="button" size="default" @click="dismissRoom">
             {{ t('Dismiss') }}
-          </el-button>
-          <el-button v-if="isShowLeaveRoomDialog" type="primary" @click="leaveRoom">{{ t('Leave') }}</el-button>
-          <el-button @click.stop="cancel">{{ t('Cancel') }}</el-button>
+          </Button>
+          <Button v-if="isShowLeaveRoomDialog" class="button" size="default" @click="handleEndLeaveClick">
+            {{ t('Leave') }}
+          </Button>
+          <Button class="button" type="primary" size="default" @click="cancel">
+            {{ t('Cancel') }}
+          </Button>
         </div>
         <div v-if="currentDialogType === DialogType.TransferDialog">
-          <el-button type="primary" @click="transferAndLeave">{{ t('Transfer and leave') }}</el-button>
-          <el-button @click.stop="cancel">{{ t('Cancel') }}</el-button>
+          <Button class="button" size="default" @click="transferAndLeave">
+            {{ t('Transfer and leave') }}
+          </Button>
+          <Button class="button" size="default" type="primary" @click="cancel">
+            {{ t('Cancel') }}
+          </Button>
         </div>
       </template>
     </Dialog>
@@ -54,8 +61,11 @@
 
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
+import Button from '../../common/base/Button.vue';
+import TuiSelect from '../../common/base/Select.vue';
+import TuiOption from '../../common/base/Option.vue';
 import { ElMessageBox, ElMessage } from '../../../elementComp';
-import Dialog from '../../../elementComp/Dialog';
+import Dialog from '../../common/base/Dialog';
 import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useEndControl from './useEndControlHooks';
 import logger from '../../../utils/common/logger';
@@ -72,16 +82,43 @@ const {
   cancel,
   selectedUser,
   DialogType,
+  showEndDialogContent,
   logPrefix,
   title,
+  showEndButtonContent,
   currentDialogType,
   visible,
   closeMediaBeforeLeave,
   resetState,
+  isMasterWithOneRemoteAnchor,
+  isMasterWithRemoteAnchors,
+  isMasterWithoutRemoteAnchors,
 } = useEndControl();
 
 
 const emit = defineEmits(['on-exit-room', 'on-destroy-room']);
+
+function handleEndBtnClick() {
+  if (isMasterWithoutRemoteAnchors.value) {
+    dismissRoom();
+  } else {
+    stopMeeting();
+  }
+}
+function handleEndLeaveClick() {
+  if (!roomStore.isMaster) {
+    leaveRoom();
+    return;
+  }
+  if (isMasterWithRemoteAnchors.value) {
+    selectedUser.value = remoteAnchorList.value[0].userId;
+    if (isMasterWithOneRemoteAnchor.value) {
+      transferAndLeave();
+      return;
+    }
+    currentDialogType.value = DialogType.TransferDialog;
+  }
+}
 
 /**
  * Active room dismissal
@@ -107,10 +144,6 @@ async function dismissRoom() {
 **/
 async function leaveRoom() { // eslint-disable-line
   try {
-    if (roomStore.isMaster) {
-      currentDialogType.value = DialogType.TransferDialog;
-      return;
-    }
     await closeMediaBeforeLeave();
     const response = await roomEngine.instance?.exitRoom();
     logger.log(`${logPrefix}leaveRoom:`, response);
@@ -171,8 +204,13 @@ const onRoomDismissed = async (eventInfo: { roomId: string}) => {
 **/
 
 const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }) => {
+  const { userId, userRole } = eventInfo;
+  if (roomStore.localUser.userId === userId) {
+    roomStore.setLocalUser({ userRole });
+  } else {
+    roomStore.setRemoteUserRole(userId, userRole);
+  }
   if (eventInfo.userRole === TUIRole.kRoomOwner) {
-    const { userId } = eventInfo;
     let newName = roomStore.getUserName(userId) || userId;
     if (userId === localUser.value.userId) {
       newName = t('me');
@@ -182,11 +220,6 @@ const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }
       type: 'success',
       message: tipMessage,
     });
-    if (roomStore.localUser.userId === userId) {
-      roomStore.setLocalUser({ userRole: TUIRole.kRoomOwner });
-    } else {
-      roomStore.setRemoteUserRole(userId, TUIRole.kRoomOwner);
-    }
     roomStore.setMasterUserId(userId);
     resetState();
     if (roomStore.isAnchor) return;
@@ -209,21 +242,21 @@ onUnmounted(() => {
 </script>
 <style lang="scss" scoped>
 @import '../../../assets/style/var.scss';
+.end-control-container{
   .end-button {
-    width: 90px;
-    height: 40px;
-    border: 2px solid #FF2E2E;
-    border-radius: 4px;
-    font-weight: 400;
+    padding: 9px 20px;
     font-size: 14px;
-    color: #FF2E2E;
-    letter-spacing: 0;
-    cursor: pointer;
-    text-align: center;
-    line-height: 36px;
+    border-radius: 20px;
+    border: 1.5px solid var(--red-color-2);
+    color: var(--red-color-2);
     &:hover {
-      background-color: #FF2E2E;
-      color: $whiteColor;
+      background: var(--red-color-2);
+      color: var(--font-color-7);
+      border: 1px solid var(--red-color-2);
     }
+  }
+}
+  .button {
+    margin-left: 20px;
   }
 </style>

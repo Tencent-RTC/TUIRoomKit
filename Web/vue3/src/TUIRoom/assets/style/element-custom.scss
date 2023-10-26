@@ -18,3 +18,17 @@
   --el-disabled-border-color: var(--el-disabled-border);
   --el-switch-on-color: red;
 }
+.el-message-box__btns button {
+  background-color: #409eff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+}
+
+.el-message-box__btns button:hover {
+  background-color: #66b1ff;
+}
+ .el-badge__content {
+  background-color: #006eff;
+ }

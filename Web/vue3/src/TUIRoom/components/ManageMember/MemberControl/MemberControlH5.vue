@@ -26,7 +26,7 @@ import { UserInfo, useRoomStore } from '../../../stores/room';
 import defaultAvatar from '../../../assets/imgs/avatar.png';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
-import SvgIcon from '../../common/SvgIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
 import { isWeChat } from '../../../utils/useMediaValue';
 import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-js';
