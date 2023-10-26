@@ -4,7 +4,11 @@
       <div class="title-container">
         <span class="text">{{ conferenceTitle }}</span>
         <span class="chevron-down-container">
-          <svg-icon class="chevron-down-icon" size="custom" icon-name="chevron-down"></svg-icon>
+          <svg-icon
+            class="chevron-down-icon"
+            size="custom"
+            icon-name="chevron-down"
+          ></svg-icon>
         </span>
       </div>
     </div>
@@ -12,30 +16,43 @@
       <div ref="roomInfoRef" class="roomInfo-container-main">
         <div class="roomInfo-title">
           <span class="master-header">{{ conferenceTitle }}</span>
-          <span class="cancel" @click="handleHiddenRoomInfo">{{ t('Cancel') }}</span>
+          <span class="cancel" @click="handleHiddenRoomInfo">{{ t("Cancel") }}</span>
         </div>
         <div class="roomInfo-middle">
           <div class="roomInfo-role">
-            <span>{{ t('Host') }}</span>
+            <span>{{ t("Host") }}</span>
             <span class="text-right">{{ masterUserName }}</span>
           </div>
           <div class="roomInfo-roomMode">
-            <span class="middle-left">{{ t('Room Type') }}</span>
+            <span class="middle-left">{{ t("Room Type") }}</span>
             <span class="text-type">{{ roomType }}</span>
           </div>
           <div class="roomInfo-roomID">
-            <span class="middle-left">{{ t('Room ID') }}</span>
+            <span class="middle-left">{{ t("Room ID") }}</span>
             <span class="text-right">{{ roomId }}</span>
-            <svg-icon icon-name="copy-icon" class="copy" size="custom" @click="onCopy(roomId)"></svg-icon>
+            <svg-icon
+              icon-name="copy-icon"
+              class="copy"
+              size="custom"
+              @click="onCopy(roomId)"
+            ></svg-icon>
           </div>
           <div v-if="!isWeChat" class="roomInfo-roomID">
-            <span>{{ t('Room Link') }}</span>
+            <span>{{ t("Room Link") }}</span>
             <span class="link">{{ inviteLink }}</span>
-            <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(inviteLink)"></svg-icon>
+            <svg-icon
+              icon-name="copy-icon"
+              class="copy"
+              @click="onCopy(inviteLink)"
+            ></svg-icon>
           </div>
         </div>
         <div v-if="!isWeChat" class="roomInfo-bottom">
-          <span>{{ t('You can share the room number or link to invite more people to join the room.') }}</span>
+          <span>{{
+            t(
+              "You can share the room number or link to invite more people to join the room."
+            )
+          }}</span>
         </div>
       </div>
     </div>
@@ -50,7 +67,7 @@ import { storeToRefs } from 'pinia';
 import SvgIcon from '../../common/SvgIcon.vue';
 import { ElMessage } from '../../../elementComp';
 import { isWeChat } from '../../../utils/useMediaValue';
-import  { clipBoard }  from '../../../utils/utils';
+import { clipBoard } from '../../../utils/utils';
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
@@ -64,9 +81,9 @@ const roomType = computed(() => (roomStore.isFreeSpeakMode ? t('Free Speech Room
 const { origin, pathname } = location || {};
 const inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);
 
-const masterUserName = computed(() => (roomStore.getUserName(masterUserId.value)) || masterUserId.value);
+const masterUserName = computed(() => roomStore.getUserName(masterUserId.value) || masterUserId.value);
 
-const isShowRoomInfoTitle = computed(() => (masterUserName.value));
+const isShowRoomInfoTitle = computed(() => masterUserName.value);
 
 const conferenceTitle = computed(() => `${masterUserName.value}${t('video conferencing')}`);
 
@@ -99,7 +116,6 @@ function handleHiddenRoomInfo() {
   isShowRoomInfo.value = false;
 }
 
-
 onMounted(() => {
   document?.addEventListener('click', handleDocumentClick, true);
 });
@@ -107,15 +123,14 @@ onMounted(() => {
 onUnmounted(() => {
   document?.removeEventListener('click', handleDocumentClick, true);
 });
-
 </script>
 <style lang="scss" scoped>
-.conference-container{
+.conference-container {
   min-width: 140px;
   max-width: 300px;
 }
 
-.title-container{
+.title-container {
   display: flex;
   align-items: center;
 }
@@ -130,7 +145,7 @@ onUnmounted(() => {
   text-overflow: ellipsis;
   color: var(--input-font-color);
 }
-.master-header{
+.master-header {
   max-width: 300px;
   overflow: hidden;
   white-space: nowrap;
@@ -143,22 +158,22 @@ onUnmounted(() => {
 .text-type {
   padding-left: 12px;
 }
-.roomInfo-middle{
+.roomInfo-middle {
   color: var(--popup-title-color-h5);
   padding-left: 25px;
 }
 .chevron-down-container {
+  display: flex;
+  margin-left: 5px;
+  .chevron-down-icon {
     display: flex;
-    margin-left: 5px;
-    .chevron-down-icon {
-      display: flex;
-      background-size: cover;
-      width: 10px;
-      height: 7px;
-      align-items: center;
-    }
+    background-size: cover;
+    width: 10px;
+    height: 7px;
+    align-items: center;
+  }
 }
-.roomInfo-container{
+.roomInfo-container {
   position: fixed;
   left: 0;
   top: 0;
@@ -175,74 +190,78 @@ onUnmounted(() => {
     bottom: 0;
     display: flex;
     flex-direction: column;
-    animation-duration: 100ms;
+    animation-duration: 300ms;
     animation-name: popup;
     padding-bottom: 4vh;
     @keyframes popup {
-    from {
-      height: 0;
+      from {
+        transform-origin: bottom;
+        transform: scaleY(0);
+      }
+      to {
+        transform-origin: bottom;
+        transform: scaleY(1);
+      }
     }
-    to {
-      height: 30%;
+    .roomInfo-title {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      font-family: "PingFang SC";
+      font-style: normal;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 24px;
+      color: var(--popup-title-color-h5);
+      padding: 0px 0 0 25px;
+      position: relative;
     }
-}
-  .roomInfo-title {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    font-family: 'PingFang SC';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 24px;
-    color: var(--popup-title-color-h5);
-    padding: 0px 0 0 25px;
-    position: relative;
-  }
-  .roomInfo-role,.roomInfo-roomMode,.roomInfo-roomID{
-    display: flex;
-    flex-direction: row;
-    padding: 5px 0;
-    align-items: center;
-  }
-  .link {
-    color: var(--popup-content-color-h5);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 64%;
-    padding-left: 16px;
-  }
+    .roomInfo-role,
+    .roomInfo-roomMode,
+    .roomInfo-roomID {
+      display: flex;
+      flex-direction: row;
+      padding: 5px 0;
+      align-items: center;
+    }
+    .link {
+      color: var(--popup-content-color-h5);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 64%;
+      padding-left: 16px;
+    }
 
-  .roomInfo-bottom {
-    font-family: 'PingFang SC';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 17px;
-    text-align: center;
-    color: var(--popup-title-color-h5);
-    padding-top: 2vh;
-  }
-  .copy {
-    width: 14px;
-    height: 14px;
-    margin-left: 30px;
-  }
-  .qrcode {
-    width: 24px;
-    height: 24px;
-    position: absolute;
-    right: 10vw;
-    top: 3vh;
+    .roomInfo-bottom {
+      font-family: "PingFang SC";
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 17px;
+      text-align: center;
+      color: var(--popup-title-color-h5);
+      padding-top: 2vh;
+    }
+    .copy {
+      width: 14px;
+      height: 14px;
+      margin-left: 30px;
+    }
+    .qrcode {
+      width: 24px;
+      height: 24px;
+      position: absolute;
+      right: 10vw;
+      top: 3vh;
+    }
   }
 }
+.cancel {
+  flex: 1;
+  text-align: end;
+  padding-right: 30px;
+  font-weight: 400;
+  font-size: 16px;
 }
-.cancel{
-    flex: 1;
-    text-align: end;
-    padding-right: 30px;
-    font-weight: 400;
-    font-size: 16px;
-  }
 </style>

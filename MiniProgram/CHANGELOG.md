@@ -1,4 +1,18 @@
-## 2023.09.15@1.5.1
+## 2023.10.26@1.6.0
+
+**Feature**
+- 升级 [@tencentcloud/tuiroom-engine-wx](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.6.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。
+- 升级 chat sdk 至 v3 版本。
+
+**Bug Fixed**
+- 修复聊天未读数气泡过大问题；
+- 修复 RoomInfo 动画抖动问题；
+- 修复 chat 模块消息位置显示异常问题；
+- 修复转交主持人列表不能滑动问题；
+- 修复 userName 过长导致成员管理中音视频状态 icon 错位问题；
+- 修复麦克风音量条以及音量高亮区域显示问题；
+
+## 2023.09.25@1.5.1
 
 **Feature**
 - 升级 [@tencentcloud/tuiroom-engine-wx](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-wx) 到 v1.5.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。

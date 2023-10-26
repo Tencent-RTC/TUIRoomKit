@@ -21,7 +21,7 @@
       v-if="!stream.hasVideoStream && !stream.hasScreenStream"
       class="center-user-info-container"
     >
-      <img class="avatar-region" :src="stream.avatarUrl || defaultAvatar">
+      <Avatar class="avatar-region" :img-src="stream.avatarUrl"></Avatar>
     </div>
     <div class="corner-user-info-container">
       <svg-icon v-if="showMasterIcon" size="custom" class="master-icon" icon-name="user"></svg-icon>
@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, computed, onMounted } from 'vue';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
-import defaultAvatar from '../../../assets/imgs/avatar.png';
+import Avatar from '../../base/Avatar.vue';
 import { useBasicStore } from '../../../stores/basic';
 import logger from '../../../utils/common/logger';
 import AudioIcon from '../../base/AudioIcon.vue';
@@ -226,6 +226,7 @@ onMounted(() => {
   -webkit-transform: rotate(0deg);
   &.border {
     border: 2px solid #37E858;
+    box-sizing: border-box;
   }
 
   .center-user-info-container {

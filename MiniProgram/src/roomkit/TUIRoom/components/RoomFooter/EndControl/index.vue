@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="end-control-container">
-      <div @tap="stopMeeting" class="end-button" tabindex="1">{{ t('EndH5') }}</div>
+      <div class="end-button" tabindex="1" @tap="stopMeeting">{{ t('EndH5') }}</div>
     </div>
     <div v-if="visible" class="end-main-content">
       <div :class="isShowLeaveRoomDialog ? 'end-dialog-leave':'end-dialog-dismiss'">
@@ -24,8 +24,8 @@
           </span>
           <span
             v-if="isShowLeaveRoomDialog"
-            @tap="leaveRoom"
             :class="roomStore.isMaster ?'end-button-leave':'end-button-leave-single'"
+            @tap="leaveRoom"
           >
             {{ t('Leave') }}
           </span>
@@ -43,7 +43,7 @@
     >
       <template #sidebarContent>
         <div style="height:100%">
-          <div>
+          <div class="transfer-list-container">
             <div class="transfer-header">
               <input
                 v-model="searchName"
@@ -378,6 +378,12 @@ onUnmounted(() => {
   top: 0;
   height: 100vh;
   z-index: 102;
+  .transfer-list-container{
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
   .transfer-header {
     display: flex;
     justify-content: center;
@@ -415,8 +421,12 @@ onUnmounted(() => {
       }
   }
   .transfer-body {
-    flex: 1;
     overflow-y: scroll;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-top: 20px;
     .transfer-list-content{
       padding-bottom: 5px;
     .transfer-item-container {
@@ -430,7 +440,6 @@ onUnmounted(() => {
     .member-basic-info {
       display: flex;
       position: relative;
-      width: 100%;
       flex-direction: row;
       align-items: center;
       padding: 24px 20px 0 24px;

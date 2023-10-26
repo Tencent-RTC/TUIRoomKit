@@ -81,7 +81,6 @@ const showAudioLevel = computed(() => {
     overflow: hidden;
     flex-direction: column-reverse;
     justify-content: space-between;
-    padding: 2px;
     .audio-level-item {
       width: 100%;
       height: 2px;
