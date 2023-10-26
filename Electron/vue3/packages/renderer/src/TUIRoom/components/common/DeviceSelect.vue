@@ -12,28 +12,30 @@
   * 在 template 中使用 <device-select></device-select>
 -->
 <template>
-  <el-select
+  <tui-select
     v-model="currentDeviceId"
     placeholder="placeholder"
-    class="select custom-element-class"
+    class="select"
     :disabled="disabled"
     :teleported="false"
     :popper-append-to-body="false"
     @change="handleChange"
   >
-    <el-option
+    <tui-option
       v-for="item in deviceList"
       :key="item.deviceId"
       :label="item.deviceName"
       :value="item.deviceId"
     />
-  </el-select>
+  </tui-select>
 </template>
 
 <script setup lang="ts">
 import { ref, Ref } from 'vue';
 import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
+import TuiSelect from './base/Select.vue';
+import TuiOption from './base/Option.vue';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { TRTCDeviceInfo } from '@tencentcloud/tuiroom-engine-electron';
@@ -109,10 +111,8 @@ async function handleChange(deviceId: string) {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/element-custom.scss';
 .select {
-  width: 280px;
-  height: 32px;
+  width: 100%;
   font-size: 14px;
 }
 </style>

@@ -3,9 +3,10 @@
     <icon-button
       :is-active="sidebarName === 'invite'"
       :title="t('Invite')"
-      :icon-name="iconName"
+      :icon="InviteIcon"
       @click-icon="toggleInviteSidebar"
-    />
+    >
+    </icon-button>
     <div v-if="isShowInviteTab" class="invite-container">
       <room-invite ref="inviteRef" @on-close-invite="handleCloseInvite"></room-invite>
     </div>
@@ -13,11 +14,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue';
-import IconButton from '../common/IconButton.vue';
+import { ref } from 'vue';
+import IconButton from '../common/base/IconButton.vue';
+import InviteIcon from '../common/icons/InviteIcon.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
-import { ICON_NAME } from '../../constants/icon';
 import { useI18n } from '../../locales';
 import { isMobile }  from '../../utils/useMediaValue';
 import roomInvite from '../RoomInvite/index.vue';
@@ -27,10 +28,6 @@ const { sidebarName } = storeToRefs(basicStore);
 const { t } = useI18n();
 const isShowInviteTab = ref(false);
 const inviteRef = ref();
-
-const iconName = computed(() => (
-  isMobile ? ICON_NAME.Invite : (sidebarName.value === 'invite' ? ICON_NAME.InviteActive : ICON_NAME.Invite)
-));
 
 function toggleInviteSidebar() {
   if (isMobile) {
@@ -51,23 +48,9 @@ function toggleInviteSidebar() {
   }
 }
 
-function handleDocumentClick(event: MouseEvent) {
-  if (isShowInviteTab.value && inviteRef.value && !inviteRef.value.$el.contains(event.target)) {
-    isShowInviteTab.value = false;
-  }
-}
-
 function handleCloseInvite() {
   isShowInviteTab.value = false;
 }
-
-onMounted(() => {
-  document?.addEventListener('click', handleDocumentClick, true);
-});
-
-onUnmounted(() => {
-  document?.removeEventListener('click', handleDocumentClick, true);
-});
 </script>
 
 <style lang="scss" scoped>

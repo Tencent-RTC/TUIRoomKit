@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue';
+import { computed, ref } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { ElMessage } from '../../elementComp';
 import { storeToRefs } from 'pinia';
@@ -13,6 +13,7 @@ export default function useRoomInvite() {
 
   const { origin, pathname } = location || {};
   const isElectron = isElectronEnv();
+  const isShowLink = ref(true);
 
   const inviteLink = computed(() => {
     if (shareLink.value) {
@@ -22,6 +23,7 @@ export default function useRoomInvite() {
     return `${origin}${pathname}#/home?roomId=${roomId.value}`;
   });
   const schemeLink = computed(() => `tuiroom://joinroom?roomId=${roomId.value}`);
+
 
   async function onCopy(value: string | number) {
     try {
@@ -38,12 +40,13 @@ export default function useRoomInvite() {
     }
   }
 
-  const inviteContentList = [
-    { id: 1, title: 'Room ID', content: roomId, copyLink: roomId, visible: true },
-    { id: 2, title: 'Room Link', content: inviteLink, copyLink: inviteLink, visible: isRoomLinkVisible.value },
-    { id: 3, title: 'scheme', content: schemeLink, copyLink: schemeLink, visible: true },
-  ];
-  const visibleInviteContentList = reactive(inviteContentList.filter(item => item.visible));
+  const inviteContentList = computed(() => [
+    { id: 1, mobileTitle: 'Room ID', pcTitle: 'Invite by room number', content: roomId.value, copyLink: roomId.value, visible: isShowLink.value },
+    { id: 2, mobileTitle: 'Room Link', pcTitle: 'Invite via room link', content: inviteLink.value, copyLink: inviteLink.value, visible: isRoomLinkVisible.value },
+    { id: 3, mobileTitle: 'scheme', pcTitle: 'Invite via client scheme', content: schemeLink.value, copyLink: schemeLink.value, visible: isShowLink.value },
+  ]);
+
+  const visibleInviteContentList = computed(() => inviteContentList.value.filter(item => item.visible));
 
   return {
     t,

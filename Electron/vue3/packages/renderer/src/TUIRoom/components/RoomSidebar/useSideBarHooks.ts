@@ -6,6 +6,7 @@ import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
 import { computed, onUnmounted } from 'vue';
 import logger from '../../utils/common/logger';
+import { useRoomStore } from '@/TUIRoom/stores/room';
 
 export default function useSideBar() {
   const roomEngine = useGetRoomEngine();
@@ -14,26 +15,29 @@ export default function useSideBar() {
   const chatStore = useChatStore();
   const basicStore = useBasicStore();
   const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
+  const roomStore = useRoomStore();
+  const { userNumber } = storeToRefs(roomStore);
+
   const showSideBar = computed(() => isSidebarOpen.value && sidebarName.value !== 'transfer-leave');
   const title = computed((): string => {
     let sidebarTitle = '';
     switch (sidebarName.value) {
       case 'chat':
-        sidebarTitle = 'Chat';
+        sidebarTitle = t('Chat');
         break;
       case 'invite':
-        sidebarTitle = 'Invite';
+        sidebarTitle = t('Invite');
         break;
       case 'more':
-        sidebarTitle = 'More';
+        sidebarTitle = t('More');
         break;
       case 'manage-member':
-        sidebarTitle = 'Member management';
+        sidebarTitle = `${t('Members')} (${userNumber.value})`;
         break;
       default:
         break;
     }
-    return t(sidebarTitle);
+    return sidebarTitle;
   });
 
   function handleClose(done: any) {

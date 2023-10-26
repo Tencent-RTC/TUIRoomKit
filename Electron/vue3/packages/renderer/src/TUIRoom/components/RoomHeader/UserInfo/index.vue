@@ -5,7 +5,6 @@
       <div class="name">{{ userName || userId }}</div>
       <svg-icon class="down-icon" :icon-name="iconName" size="medium"></svg-icon>
     </div>
-
     <div v-if="showUserControl" class="user-control-container">
       <div v-show="showEditNameItem">
         <div class="user-control-item-head" @click="showEditUserNameDialog">{{ t('Edit profile') }}</div>
@@ -14,37 +13,33 @@
     </div>
     <Dialog
       :title="t('Edit profile')"
-      width="420px"
       :model-value="showUserNameEdit"
-      class="custom-element-class"
       :modal="true"
-      :append-to-body="false"
+      width="480px"
       :close-on-click-modal="true"
+      :append-to-room-container="true"
       @close="closeEditUserNameDialog"
     >
-      <div class="dialog-content">
-        <span class="title">{{ t('User Name') }}</span>
-        <div class="input-container">
-          <el-input
-            v-model="tempUserName"
-            type="text"
-            maxlength="80"
-            :placeholder="t('Please input user name')"
-          ></el-input>
-        </div>
+      <div class="edit-content">
+        <span>{{ t('User Name') }}</span>
+        <tui-input v-model="tempUserName" class="edit-name-input" :placeholder="t('Please input user name')" />
       </div>
-      <div class="dialog-footer">
-        <el-button @click="closeEditUserNameDialog">{{ t('Cancel') }}</el-button>
-        <el-button type="primary" @click="handleSaveUserName(tempUserName)">{{ t('Save') }}</el-button>
-      </div>
+      <template #footer>
+        <Button class="button" size="default" @click="closeEditUserNameDialog">{{ t('Cancel') }}</Button>
+        <Button class="button" size="default" type="primary" @click="handleSaveUserName(tempUserName)">
+          {{ t('Save') }}
+        </Button>
+      </template>
     </Dialog>
   </div>
 </template>
 <script setup lang="ts">
-import Dialog from '../../../elementComp/Dialog/index.vue';
-import SvgIcon from '../../common/SvgIcon.vue';
+import Dialog from '../../common/base/Dialog/index.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
 import useUserInfo from './useUserInfoHooks';
-import Avatar from '../../base/Avatar.vue';
+import Avatar from '../../common/Avatar.vue';
+import Button from '../../common/base/Button.vue';
+import TuiInput from '../../common/base/Input.vue';
 const {
   t,
   showEditNameItem,
@@ -65,30 +60,22 @@ const {
 defineProps<Props>();
 defineEmits(['log-out']);
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../assets/style/var.scss';
 @import '../../../assets/style/element-custom.scss';
 
+.tui-theme-white .user-control-container {
+  --filter-color:
+    drop-shadow(0px 0px 4px rgba(32, 77, 141, 0.03))
+    drop-shadow(0px 4px 10px rgba(32, 77, 141, 0.06))
+    drop-shadow(0px 1px 14px rgba(32, 77, 141, 0.05));
+}
+.tui-theme-black .user-control-container {
+  --filter-color:
+    drop-shadow(0px 8px 40px rgba(23, 25, 31, 0.6))
+    drop-shadow(0px 4px 12px rgba(23, 25, 31, 0.4));
+}
 
-.dialog-content {
-  padding: 0 10px;
-  text-align: left;
-  .title {
-    font-weight: bold;
-    font-size: 16px;
-    display: inline-block;
-    margin-bottom: 14px;
-  }
-  .input-container {
-    position: relative;
-    margin-bottom: 30px;
-  }
-}
-.dialog-footer {
-  width: 100%;
-  height: 100%;
-  text-align: center;
-}
 .user-info-container {
   position: relative;
   .user-info-content {
@@ -102,33 +89,67 @@ defineEmits(['log-out']);
     }
     .name {
       max-width: 100px;
-      margin-left: 20px;
+      margin-left: 10px;
       font-size: 16px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: var(--color-font);
+      color: var(--font-color);
     }
     .down-icon {
       margin-left: 4px;
     }
   }
   .user-control-container {
-    background: var(--user-control-container-color-bg);
-    box-shadow: var(--user-control-container-shadow);
-    color: var(--color-font);
-    padding: 10px 0;
     position: absolute;
-    top: calc(100% + 14px);
+    top: calc(100% + 15px);
     right: 0;
-    border-radius: 4px;
-    .user-control-item-foot,.user-control-item-head{
-      width: 104px;
+    padding: 10px;
+    min-width: 100px;
+    background: #ffffff;
+    border-radius: 8px;
+    filter: var(--filter-color);
+    &::before {
+      content: '';
+      position: absolute;
+      right: 20px;
+      top: -20px;
+      width: 0px;
+      border-top: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 10px solid #ffffff;
+      border-left: 10px solid transparent;
+    }
+    &::after {
+      content: '';
+      width: 100%;
+      height: 20px;
+      position: absolute;
+      left: 0px;
+      top: -20px;
+      background-color: transparent;
+    }
+
+    .user-control-item-foot,
+    .user-control-item-head {
       text-align: center;
+      color: #4f586b;
       font-size: 14px;
       cursor: pointer;
       height: 20px;
     }
   }
+}
+.edit-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  .edit-name-input {
+    margin-left: 16px;
+    flex-grow: 1;
+  }
+}
+.button {
+  margin-left: 12px;
 }
 </style>

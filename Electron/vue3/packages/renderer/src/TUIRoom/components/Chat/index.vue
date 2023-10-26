@@ -13,8 +13,10 @@ import { isMobile }  from '../../utils/useMediaValue';
 
 <style lang="scss" scoped>
   .chat-container {
-    position: relative;
+    display: flex;
+    flex-direction: column;
     height: 100%;
+    padding: 20px;
   }
   .chat-container-h5 {
     height: 100%;

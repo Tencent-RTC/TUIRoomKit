@@ -34,6 +34,7 @@ interface BasicState {
   shareLink: string,
   isRoomLinkVisible: boolean,
   isShowScreenShareAntiFraud: boolean,
+  isOpenMic: boolean,
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -76,6 +77,7 @@ export const useBasicStore = defineStore('basic', {
     shareLink: '',
     isRoomLinkVisible: !isElectronEnv() && !isWeChat,
     isShowScreenShareAntiFraud: false,
+    isOpenMic: false,
   }),
   getters: {
     // localVideoBitrate: (state) => {
@@ -188,6 +190,9 @@ export const useBasicStore = defineStore('basic', {
     setLang(lang: string) {
       this.lang = lang;
     },
+    setIsOpenMic(isOpen: boolean) {
+      this.isOpenMic = isOpen;
+    },
     reset() {
       this.isSidebarOpen = false;
       this.layout = LAYOUT.NINE_EQUAL_POINTS;
@@ -204,6 +209,7 @@ export const useBasicStore = defineStore('basic', {
       this.isFrontCamera = true;
       this.showHeaderTool = true;
       this.shareLink = '';
+      this.isOpenMic = false;
     },
   },
 });

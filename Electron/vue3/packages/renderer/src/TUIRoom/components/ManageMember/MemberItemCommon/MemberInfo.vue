@@ -9,125 +9,165 @@
     <div class="member-basic-info">
       <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
       <div class="user-name">{{ userInfo.userName || userInfo.userId }}</div>
-      <div v-if="isMaster && isMe" class="user-extra-info">
-        {{ t('Host') }}, {{ t('Me') }}
+      <div v-if="userInfo.userRole === TUIRole.kRoomOwner" class="master-icon">
+        <svg-icon :icon="UserIcon" />
       </div>
-      <div v-else-if="isMe" class="user-extra-info">
-        {{ t('Me') }}
-      </div>
-      <div v-else-if="basicStore.masterUserId === userInfo.userId" class="user-extra-info">
-        {{ t('Host') }}
-      </div>
+      <div class="user-extra-info">{{ extraInfo }}</div>
     </div>
     <!--
       *User audio and video status information
       *
       *用户音视频状态信息
     -->
-    <div v-if="!isMe && showStateIcon" class="member-av-state">
-      <div v-if="userInfo.onSeat">
-        <svg-icon
-          class="setting-icon"
-          :icon-name="userInfo.hasAudioStream ? ICON_NAME.MicOn : ICON_NAME.MicOff"
-          size="large"
-        />
-        <svg-icon
-          class="setting-icon video-icon"
-          :icon-name="userInfo.hasVideoStream ? ICON_NAME.CameraOn : ICON_NAME.CameraOff "
-          size="large"
-        />
-      </div>
-      <div v-if="!userInfo.onSeat && !userInfo.isUserApplyingToAnchor">
-        <svg-icon
-          class="setting-icon"
-          :icon-name="ICON_NAME.MicOffDisabled"
-          size="large"
-        />
-        <svg-icon
-          class="setting-icon video-icon"
-          :icon-name="ICON_NAME.CameraOffDisabled"
-          size="large"
-        />
-      </div>
-      <div v-if="!userInfo.onSeat && userInfo.isUserApplyingToAnchor">
-        <svg-icon icon-name="apply-active"></svg-icon>
-      </div>
+    <div v-if="showStateIcon" class="member-av-state">
+      <svg-icon
+        v-for="(item, index) in iconList"
+        :key="index"
+        :icon="item.icon"
+        :class="['state-icon', { 'disable-icon': item.disable }]"
+        :size="item.size"
+      />
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import Avatar from '../../base/Avatar.vue';
+import Avatar from '../../common/Avatar.vue';
 import { useBasicStore } from '../../../stores/basic';
 import { UserInfo, useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
-import { ICON_NAME } from '../../../constants/icon';
-import SvgIcon from '../../common/SvgIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import VideoOpenIcon from '../../common/icons/VideoOpenIcon.vue';
+import VideoCloseIcon from '../../common/icons/VideoCloseIcon.vue';
+import AudioOpenIcon from '../../common/icons/AudioOpenIcon.vue';
+import AudioCloseIcon from '../../common/icons/AudioCloseIcon.vue';
+import ScreenOpenIcon from '../../common/icons/ScreenOpenIcon.vue';
+import ApplyActiveIcon from '../../common/icons/ApplyActiveIcon.vue';
 import { useI18n } from '../../../locales';
 import { isMobile } from '../../../utils/useMediaValue';
+import UserIcon from '../../common/icons/UserIcon.vue';
+import { TUIRole } from '@tencentcloud/tuiroom-engine-electron';
 
 const { t } = useI18n();
 
 interface Props {
   userInfo: UserInfo,
-  showStateIcon?: Boolean,
+  showStateIcon: Boolean,
 }
 
 const props = defineProps<Props>();
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
-const { isMaster } = storeToRefs(roomStore);
+const { isMaster, isSpeakAfterTakingSeatMode, masterUserId } = storeToRefs(roomStore);
 
 const isMe = computed(() => basicStore.userId === props.userInfo.userId);
+
+const extraInfo = computed(() => {
+  if (isMaster.value && isMe.value) {
+    return `${t('Host')}, ${t('Me')}`;
+  }
+  if (isMe.value) {
+    return t('Me');
+  }
+  if (masterUserId.value === props.userInfo.userId) {
+    return t('Host');
+  }
+  return '';
+});
+
+const isAudienceRole = computed(() => isSpeakAfterTakingSeatMode.value && !props.userInfo.onSeat);
+
+const iconList = computed(() => {
+  const list = [];
+  if (props.userInfo.hasScreenStream) {
+    list.push({ icon: ScreenOpenIcon });
+  }
+  if (!isAudienceRole.value) {
+    list.push({ icon: props.userInfo.hasAudioStream ? AudioOpenIcon : AudioCloseIcon });
+    list.push({ icon: props.userInfo.hasVideoStream ? VideoOpenIcon : VideoCloseIcon });
+  }
+  if (isAudienceRole.value && !props.userInfo.isUserApplyingToAnchor) {
+    list.push({ icon: AudioCloseIcon, disable: true });
+    list.push({ icon: VideoCloseIcon, disable: true });
+  }
+  if (isAudienceRole.value && props.userInfo.isUserApplyingToAnchor) {
+    list.push({ icon: ApplyActiveIcon, size: 20 });
+  }
+  return list;
+});
 
 </script>
 
 <style lang="scss" scoped>
+
+.tui-theme-black .member-av-state {
+  --icon-color: #A3AEC7;
+}
+
+.tui-theme-white .member-av-state {
+  --icon-color: #B2BBD1;
+}
 .member-info-mobile{
-    display: flex;
-    align-items: center;
-    width: 80vw;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  width: 80vw;
+  justify-content: space-between;
 }
 .member-info{
-    display: contents;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
 }
 .member-basic-info {
   display: flex;
   flex-direction: row;
   align-items: center;
   .avatar-url {
-    width: 48px;
-    height: 48px;
+    width: 32px;
+    height: 32px;
     display: flex;
     border-radius: 50%;
     align-items: center;
   }
   .user-name {
-    margin-left: 9px;
+    margin-left: 12px;
     font-size: 14px;
-    color: var(--input-font-color);
+    font-weight: 400;
+    color: var(--font-color-1);
     line-height: 22px;
     max-width: 110px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
   }
+  .master-icon {
+    color: var(--active-color-2);
+    margin-left: 8px;
+    display: flex;
+  }
   .user-extra-info {
-    line-height: 18px;
-    font-size: 12px;
-    margin-left: 13px;
+    line-height: 20px;
+    font-size: 14px;
+    font-weight: 400;
+    margin-left: 4px;
     padding: 2px;
-    color: var(--user-extra-info-color-h5);
-    background: var(--user-extra-info-bg-color-h5);
-    border-radius: 8px;
+    color: var(--active-color-2);
     padding: 0 6px;
   }
 }
+
 .member-av-state {
-  padding-left: 80px;
-  .video-icon {
-    margin-left: 5px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--icon-color);
+  .state-icon {
+    margin-left: 16px;
+  }
+  .disable-icon {
+    opacity: 0.4;
   }
 }
+
 </style>
