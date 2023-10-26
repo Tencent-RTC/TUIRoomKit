@@ -251,8 +251,8 @@ $videoTabWidth: 320px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid rgba(242, 242, 242, 1);
-    color:rgba(0, 110, 255, 1);
+    border-top: 1px solid #F2F2F2;
+    color: #006EFF;
   }
   .cancel{
     padding: 14px;
@@ -260,9 +260,9 @@ $videoTabWidth: 320px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid rgba(242, 242, 242, 1);
-    color: rgba(43, 46, 56, 1);
-    border-right: 1px solid rgba(242, 242, 242, 1);
+    border-top: 1px solid #F2F2F2;
+    color: #2B2E38;
+    border-right: 1px solid #F2F2F2;
   }
 }
 .button-container-PC{
