@@ -16,7 +16,7 @@ page{
   box-sizing: border-box;
 }
 
-view {
+view label{
   box-sizing: border-box;
 }
 </style>

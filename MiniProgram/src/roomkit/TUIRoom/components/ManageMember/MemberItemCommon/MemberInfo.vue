@@ -125,7 +125,9 @@ const isMe = computed(() => basicStore.userId === props.userInfo.userId);
   }
 }
 .member-av-state {
-  padding-left: 80px;
+  height: 100%;
+  display: flex;
+  align-items: center;
   .video-icon {
     margin-left: 5px;
   }

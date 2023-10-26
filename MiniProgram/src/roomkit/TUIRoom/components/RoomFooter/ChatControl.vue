@@ -2,23 +2,20 @@
   <div class="chat-control-container">
     <div v-if="isMobile">
       <div
-        v-if="chatStore.unReadCount > 0"
         class="count"
       >
         <icon-button
           @tap="toggleChatSidebar"
+          class="chat-icon-box"
+          :is-active="sidebarName === 'chat'"
           :title="t('Chat')"
           :icon-name="iconName"
         />
-        <span class="unreadCount">{{ chatStore.unReadCount > 10 ? '10+' : chatStore.unReadCount }}</span>
+        <span
+          v-if="chatStore.unReadCount > 0"
+          class="unreadCount"
+        >{{ chatStore.unReadCount > 10 ? '10+' : chatStore.unReadCount }}</span>
       </div>
-      <icon-button
-        v-else
-        @tap="toggleChatSidebar"
-        :is-active="sidebarName === 'chat'"
-        :title="t('Chat')"
-        :icon-name="iconName"
-      />
     </div>
     <div v-else>
       <el-badge
@@ -100,5 +97,7 @@ async function toggleChatSidebar() {
   justify-content: center;
   align-items: center;
 }
-
+.chat-icon-box{
+  height: 100%;
+}
 </style>
