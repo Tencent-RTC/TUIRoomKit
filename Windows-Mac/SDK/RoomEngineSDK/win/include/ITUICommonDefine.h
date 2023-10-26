@@ -26,6 +26,9 @@ enum class TUIError {
     /// 请求被限频，请稍后重试
     ERR_FREQ_LIMIT = -2,
 
+    /// 重复操作
+    ERR_REPEAT_OPERATION = -3,
+
     /// 未找到SDKAppID，请在腾讯云视立方SDK[控制台](https://console.cloud.tencent.com/vcube/project/manage)确认应用信息。
     ERR_SDKAPPID_NOT_FOUND = -1000,
 
@@ -36,8 +39,8 @@ enum class TUIError {
     ERR_SDK_NOT_INITIALIZED = -1002,
 
     /// 获取权限失败，当前未授权音/视频权限，请查看是否开启设备权限。Room场景下请使用以下错误码来处理:
-    ///摄像头没有系统授权: ERR_CAMERA_NOT_AUTHORIZED
-    ///麦克风没有系统授权: ERR_MICROPHONE_NOT_AUTHORIZED
+    /// 摄像头没有系统授权: ERR_CAMERA_NOT_AUTHORIZED
+    /// 麦克风没有系统授权: ERR_MICROPHONE_NOT_AUTHORIZED
     ERR_PERMISSION_DENIED = -1003,
 
     /// 该功能需要开通额外的套餐，请在腾讯云视立方SDK按需开通对应套餐: https://console.cloud.tencent.com/vcube/project/manage
@@ -98,7 +101,7 @@ enum class TUIError {
     ERR_ROOM_NAME_INVALID = -2107,
 
     /// 当前用户已在别的房间内，需要先退房才能加入新的房间:
-    ///单个roomEngine实例只支持用户进入一个房间，如果要进入不同的房间请先退房或者使用新的roomEngine实例。
+    /// 单个roomEngine实例只支持用户进入一个房间，如果要进入不同的房间请先退房或者使用新的roomEngine实例。
     ERR_ALREADY_IN_OTHER_ROOM = -2108,
 
     /// 用户不存在
@@ -199,13 +202,13 @@ struct TUINetwork {
     TUINetworkQuality quality;
 
     /// 上行丢包率，单位 (%) 该数值越小越好
-    ///如果 upLoss 为0%，则意味着上行链路的网络质量很好，上传到云端的数据包基本不发生丢失
-    ///如果upLoss 为 30%，则意味着 SDK 向云端发送的音视频数据包中，会有 30%丢失在传输链路中
+    /// 如果 upLoss 为0%，则意味着上行链路的网络质量很好，上传到云端的数据包基本不发生丢失
+    /// 如果upLoss 为 30%，则意味着 SDK 向云端发送的音视频数据包中，会有 30%丢失在传输链路中
     int upLoss;
 
     /// 下行丢包率，单位 (%) 该数值越小越好
-    ///如果downLoss 为0%，则意味着下行链路的网络质量很好，从云端接收的数据包基本不发生丢失
-    ///如果downLoss 为 30%，则意味着云端向 SDK 传输的音视频数据包中，会有 30%丢失在传输链路中
+    /// 如果downLoss 为0%，则意味着下行链路的网络质量很好，从云端接收的数据包基本不发生丢失
+    /// 如果downLoss 为 30%，则意味着云端向 SDK 传输的音视频数据包中，会有 30%丢失在传输链路中
     int downLoss;
 
     /// 网络延迟，单位 ms
