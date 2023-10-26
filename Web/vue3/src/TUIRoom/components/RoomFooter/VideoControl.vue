@@ -13,57 +13,49 @@
 -->
 <template>
   <div>
-    <div class="video-control-container" @click="emits('click')">
-      <icon-button
-        ref="videoIconButtonRef"
-        :is-active="!localStream.hasVideoStream"
-        :title="t('Camera')"
-        :icon-name="iconName"
-        :has-more="hasMore"
-        :disabled="isLocalVideoIconDisable"
-        @click-icon="toggleMuteVideo"
-        @click-more="handleMore"
-      />
-      <video-setting-tab
-        v-show="showVideoSettingTab"
-        ref="videoSettingRef"
-        class="video-tab"
-      ></video-setting-tab>
-    </div>
+    <video-media-control
+      :has-more="hasMore"
+      :is-muted="!localStream.hasVideoStream"
+      :is-disabled="isLocalVideoIconDisable"
+      @click="handleVideoMediaClick"
+    ></video-media-control>
     <Dialog
       :model-value="showRequestOpenCameraDialog"
-      class="custom-element-class"
       :title="title"
-      :modal="false"
+      :modal="true"
       :show-close="false"
-      :append-to-body="true"
       :close-on-click-modal="false"
-      :close-on-press-escape="false"
       width="500px"
+      :append-to-room-container="true"
     >
       <span>
         {{ t('The host invites you to turn on the camera') }}
       </span>
+      <template v-if="isMobile" #cancel>
+        <Button class="cancel" size="default" type="primary" @click="handleReject">
+          {{ t('Keep it closed') }}
+        </Button>
+      </template>
+      <template v-if="isMobile" #agree>
+        <Button class="agree" size="default" @click="handleAccept">{{ t('Turn on the camera') }}</Button>
+      </template>
       <template #footer>
-        <div :class="[isMobile ? 'button-container-mobile' : 'button-container-PC']">
-          <span class="cancel" @click="handleReject">{{ t('Keep it closed') }}</span>
-          <span class="agree" @click="handleAccept">{{ t('Turn on the camera') }}</span>
-        </div>
+        <Button class="cancel-button" size="default" @click="handleAccept">{{ t('Turn on the camera') }}</Button>
+        <Button class="cancel-button" size="default" type="primary" @click="handleReject">
+          {{ t('Keep it closed') }}
+        </Button>
       </template>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, Ref } from 'vue';
+import { ref, computed, onUnmounted, Ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessageBox, ElMessage } from '../../elementComp';
-import Dialog from '../../elementComp/Dialog';
-import IconButton from '../common/IconButton.vue';
-import VideoSettingTab from '../base/VideoSettingTab.vue';
-
+import Dialog from '../common/base/Dialog';
+import VideoMediaControl from '../common/VideoMediaControl.vue';
 import { useRoomStore } from '../../stores/room';
-import { ICON_NAME } from '../../constants/icon';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
 
@@ -71,6 +63,7 @@ import useGetRoomEngine from '../../hooks/useRoomEngine';
 import TUIRoomEngine, { TUIVideoStreamType, TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
 import { isMobile, isWeChat }  from '../../utils/useMediaValue';
 import { useBasicStore } from '../../stores/basic';
+import Button from '../common/base/Button.vue';
 const roomEngine = useGetRoomEngine();
 
 const roomStore = useRoomStore();
@@ -87,16 +80,12 @@ const {
 const { t } = useI18n();
 const hasMore = computed(() => !isMobile);
 const showVideoSettingTab: Ref<boolean> = ref(false);
-const videoIconButtonRef = ref<InstanceType<typeof IconButton>>();
-const videoSettingRef = ref<InstanceType<typeof VideoSettingTab>>();
 const title = computed(() => (isMobile ? '' : t('Tips')));
 
-const iconName = computed(() => {
-  if (isLocalVideoIconDisable.value) {
-    return ICON_NAME.CameraOffDisabled;
-  }
-  return localStream.value.hasVideoStream ? ICON_NAME.CameraOn : ICON_NAME.CameraOff;
-});
+function handleVideoMediaClick() {
+  emits('click');
+  toggleMuteVideo();
+}
 
 async function toggleMuteVideo() {
   if (isLocalVideoIconDisable.value) {
@@ -145,23 +134,6 @@ async function toggleMuteVideo() {
   showVideoSettingTab.value = false;
 }
 
-function handleMore() {
-  if (!showVideoSettingTab.value) {
-    showVideoSettingTab.value = true;
-  } else {
-    showVideoSettingTab.value = false;
-  }
-}
-
-function handleDocumentClick(event: MouseEvent) {
-  if (
-    showVideoSettingTab.value
-    && !videoIconButtonRef.value?.$el.contains(event.target)
-    && !videoSettingRef.value?.$el.contains(event.target)
-  ) {
-    showVideoSettingTab.value = false;
-  }
-}
 
 // -------- 处理主持人打开/关闭摄像头信令 --------
 const showRequestOpenCameraDialog: Ref<boolean> = ref(false);
@@ -208,18 +180,12 @@ async function onRequestCancelled(eventInfo: { requestId: string }) {
   }
 }
 
-onMounted(() => {
-  document?.addEventListener('click', handleDocumentClick, true);
-});
-
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
 });
 
 onUnmounted(() => {
-  document?.removeEventListener('click', handleDocumentClick, true);
-
   roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
 });
@@ -242,17 +208,21 @@ $videoTabWidth: 320px;
       padding: 20px;
     }
   }
-.button-container-mobile{
-  width: 100%;
-  display: flex;
   .agree{
     padding: 14px;
     width: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid rgba(242, 242, 242, 1);
-    color:rgba(0, 110, 255, 1);
+    border: 1px solid transparent;
+    color: var(--active-color-1);
+    font-size: 16px;
+    font-weight: 500;
+    background-color: #fff;
+      &:hover {
+      background: none;
+      border: none;
+    }
   }
   .cancel{
     padding: 14px;
@@ -260,29 +230,16 @@ $videoTabWidth: 320px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid rgba(242, 242, 242, 1);
-    color: rgba(43, 46, 56, 1);
-    border-right: 1px solid rgba(242, 242, 242, 1);
+    border: 1px solid transparent;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--font-color-4);
+      &:hover {
+      background: none;
+      border: none;
+    }
   }
-}
-.button-container-PC{
-  .cancel{
-    padding: 5px 20px;
-    background: var(--create-room-option);
-    border-radius: 2px;
-    width: auto;
-    display: initial;
-    color: var(--color-font);
-    border: 1px solid var(--choose-type);
-  }
-  .agree{
-    padding: 5px 20px;
-    background: #006EFF;
-    color: white;
-    margin-left: 14px;
-    border-radius: 2px;
-    width: auto;
-    display: initial;
-  }
+ .cancel-button {
+  margin-left: 20px;
 }
 </style>

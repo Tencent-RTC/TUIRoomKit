@@ -2,7 +2,7 @@
   <div class="contact-container-main">
     <div class="contact-title-main">
       <p>{{ t('Contact us') }}</p>
-      <span v-if="isWeChat" v-tap="handleCloseContact" class="cancel">{{ t('Cancel') }}</span>
+      <span v-tap="handleCloseContact" class="cancel">{{ t('Cancel') }}</span>
     </div>
     <div v-for="item in contactContentList" :key="item.id" class="contact-content-main">
       <span class="contact-title">{{ t(item.title) }}</span>
@@ -16,26 +16,19 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
 import useRoomMoreControl from './useRoomMoreHooks';
-import SvgIcon from '../common/SvgIcon.vue';
+import SvgIcon from '../common/base/SvgIcon.vue';
 import { isWeChat } from '../../utils/useMediaValue';
 import vTap from '../../directives/vTap';
 
 
 const {
   t,
-  groupNumber,
-  email,
   onCopy,
+  contactContentList,
 } = useRoomMoreControl();
 
 const emit = defineEmits(['on-close-contact']);
-
-const contactContentList = reactive([
-  { id: 1, title: 'group chat', content: groupNumber, copyLink: groupNumber },
-  { id: 2, title: 'Email', content: email, copyLink: email },
-]);
 
 function handleCloseContact() {
   emit('on-close-contact');

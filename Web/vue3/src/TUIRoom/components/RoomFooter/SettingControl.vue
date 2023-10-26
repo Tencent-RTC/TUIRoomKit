@@ -3,26 +3,24 @@
     <icon-button
       :is-active="showSettingDialog"
       :title="t('Settings')"
-      :icon-name="iconName"
       @click-icon="handleShowSettingDialog"
-    />
+    >
+      <setting-icon></setting-icon>
+    </icon-button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import IconButton from '../common/IconButton.vue';
+import IconButton from '../common/base/IconButton.vue';
+import SettingIcon from '../common/icons/SettingIcon.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
-import { ICON_NAME } from '../../constants/icon';
 import { useI18n } from '../../locales';
 
 const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const { showSettingDialog } = storeToRefs(basicStore);
-
-const iconName = computed(() => (showSettingDialog.value ? ICON_NAME.SettingActive : ICON_NAME.Setting));
 
 function handleShowSettingDialog() {
   basicStore.setShowSettingDialog(!basicStore.showSettingDialog);

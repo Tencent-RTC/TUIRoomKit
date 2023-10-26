@@ -1,4 +1,16 @@
-## 2023.09.15@1.5.1
+## 2023.10.26@1.6.0
+
+**Feature**
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.6.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。
+- 全新 UI 界面。
+- 升级 chat sdk 至 v3 版本。如果您同时使用了 Chat TUIKit 需要将其依赖的 sdk 也升级至 v3 版本，详情查看[升级指引](https://web.sdk.qcloud.com/im/doc/v3/zh-cn/tutorial-03-integration.html)
+
+**Bug Fixed**
+- 修复 H5 转交主持人列表不能滑动问题。；
+- 修复 H5 下邀请成员和联系他人的字体不一致问题；
+- 修复聊天未读数不居中问题；
+
+## 2023.09.25@1.5.1
 
 **Feature**
 - 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.5.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。

@@ -5,19 +5,17 @@
       :is-active="isSharing"
       :disabled="screenShareDisabled"
       :title="title"
-      :icon-name="iconName"
       @click-icon="toggleScreenShare"
-    />
-    <div v-if="showStopShareRegion" class="stop-share-region" @click="openStopConfirmDialog">
-      <svg-icon class="stop-share-icon" :icon-name="ICON_NAME.ScreenShareStopped" />
-      <span>{{ t('End sharing') }}</span>
-    </div>
+    >
+      <stop-screen-share-icon v-if="isSharing"></stop-screen-share-icon>
+      <screen-share-icon v-else></screen-share-icon>
+    </icon-button>
     <Dialog
       :model-value="isShowFraudDialog && isShowScreenShareAntiFraud"
       width="420px"
       :title="t('Safety Reminder')"
       :modal="true"
-      :append-to-body="false"
+      :append-to-room-container="true"
     >
       <span>
         {{
@@ -28,24 +26,25 @@
       </span>
       <template #footer>
         <span>
-          <el-button type="primary" @click="startScreenShare">{{ t('Continue sharing') }}</el-button>
-          <el-button type="default" @click="isShowFraudDialog = false">{{ t('Cancel') }}</el-button>
+          <Button class="button" size="default" @click="startScreenShare">{{ t('Continue sharing') }}</Button>
+          <Button type="primary" size="default" @click="isShowFraudDialog = false">{{ t('Cancel') }}</Button>
         </span>
       </template>
     </Dialog>
     <Dialog
       :model-value="dialogVisible"
       width="420px"
-      :title="t('Stop sharing?')"
+      :title="t('End sharing')"
       :modal="true"
-      :append-to-body="false"
+      :before-close="cancelStop"
+      :append-to-room-container="true"
     >
       <span>
         {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
       <template #footer>
         <span>
-          <el-button type="primary" @click="stopScreenShare">{{ t('Stop sharing') }}</el-button>
-          <el-button type="default" @click="cancelStop">{{ t('Cancel') }}</el-button>
+          <Button class="button" size="default" @click="stopScreenShare">{{ t('End sharing') }}</Button>
+          <Button type="primary" size="default" @click="cancelStop">{{ t('Cancel') }}</Button>
         </span>
       </template>
     </Dialog>
@@ -56,17 +55,20 @@
 import { ref, Ref, computed, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessage } from '../../../elementComp';
-import Dialog from '../../../elementComp/Dialog';
-import IconButton from '../../common/IconButton.vue';
+import Dialog from '../../common/base/Dialog';
+import IconButton from '../../common/base/IconButton.vue';
+import ScreenShareIcon from '../../common/icons/ScreenShareIcon.vue';
+import StopScreenShareIcon from '../../common/icons/StopScreenShareIcon.vue';
 import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useRoomStore } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
 import logger from '../../../utils/common/logger';
-import SvgIcon from '../../common/SvgIcon.vue';
 import { ICON_NAME } from '../../../constants/icon';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useI18n } from '../../../locales';
+import Button from '../../common/base/Button.vue';
+import eventBus from '../../../hooks/useMitt';
 
 const roomEngine = useGetRoomEngine();
 
@@ -80,19 +82,12 @@ const { t } = useI18n();
 
 const btnStopRef = ref();
 const isSharing: Ref<boolean> = ref(false);
-const showStopShareRegion: Ref<boolean> = ref(false);
 const dialogVisible: Ref<boolean> = ref(false);
 const isShowFraudDialog: Ref<boolean> = ref(false);
 
 // 麦下用户不能进行屏幕分享
 const screenShareDisabled = computed(() => isAudience.value);
-const title = computed(() => (isSharing.value ? t('Sharing') : t('Share screen')));
-const iconName = computed(() => {
-  if (screenShareDisabled.value) {
-    return ICON_NAME.ScreenShareDisabled;
-  }
-  return isSharing.value ? ICON_NAME.ScreenSharing : ICON_NAME.ScreenShare;
-});
+const title = computed(() => (isSharing.value ? t('End sharing') : t('Share screen')));
 
 watch(isAnchor, (val: any, oldVal: any) => {
   if (!oldVal && val && isSharing.value) {
@@ -102,7 +97,7 @@ watch(isAnchor, (val: any, oldVal: any) => {
 
 async function toggleScreenShare() {
   if (isSharing.value) {
-    showStopShareRegion.value = true;
+    dialogVisible.value = true;
     return;
   }
 
@@ -131,12 +126,6 @@ async function toggleScreenShare() {
   isShowFraudDialog.value = true;
 }
 
-function openStopConfirmDialog() {
-  showStopShareRegion.value = false;
-  if (isSharing.value) {
-    dialogVisible.value = true;
-  }
-}
 
 function cancelStop() {
   dialogVisible.value = false;
@@ -195,11 +184,14 @@ function screenCaptureStopped() {
   isSharing.value = false;
 }
 
+eventBus.on('ScreenShare:stopScreenShare', stopScreenShare);
+
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
 });
 
 onUnmounted(() => {
+  eventBus.off('ScreenShare:stopScreenShare', stopScreenShare);
   roomEngine.instance?.off(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
 });
 </script>
@@ -231,5 +223,8 @@ onUnmounted(() => {
   width: 24px;
   height: 24px;
   margin-right: 10px;
+}
+.button {
+  margin-left: 20px;
 }
 </style>

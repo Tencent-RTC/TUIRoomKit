@@ -5,10 +5,10 @@ import { clipBoard } from '../../utils/utils';
 export default function useRoomMoreHooks() {
   const { t } = useI18n();
 
-  const groupNumber = '592465424';
-  const email = 'matthewwu@tencent.com';
+  const groupNumber = '770645461';
+  const email = 'xinlxinli@tencent.com';
 
-  async function  onCopy(value: string | number) {
+  async function onCopy(value: string | number) {
     try {
       await clipBoard(value);
       ElMessage({
@@ -22,10 +22,15 @@ export default function useRoomMoreHooks() {
       });
     }
   }
+
+  const contactContentList = [
+    { id: 1, title: 'group chat', content: groupNumber, copyLink: groupNumber },
+    { id: 2, title: 'Email', content: email, copyLink: email },
+  ];
+
   return {
     t,
-    groupNumber,
-    email,
+    contactContentList,
     onCopy,
   };
 }

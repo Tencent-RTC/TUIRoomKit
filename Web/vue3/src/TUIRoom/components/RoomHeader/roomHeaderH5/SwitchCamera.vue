@@ -2,8 +2,7 @@
   <div class="camera-icon">
     <svg-icon
       v-tap="handleSwitchCamera"
-      icon-name="camera"
-      size="custom"
+      :icon="CameraSwitchIcon"
       :custom-style="{
         backgroundSize: '50%'
       }"
@@ -12,8 +11,9 @@
 </template>
 <script setup lang="ts">
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
-import SvgIcon from '../../common/SvgIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
 import { storeToRefs } from 'pinia';
+import CameraSwitchIcon from '../../common/icons/CameraSwitchIcon.vue';
 import { useBasicStore } from '../../../stores/basic';
 import vTap from '../../../directives/vTap';
 const basicStore = useBasicStore();
@@ -27,7 +27,7 @@ async function handleSwitchCamera() {
 </script>
 <style scoped>
  .camera-icon{
-    display: block;
+    display: flex;
     background-size: cover;
     width: 40px;
     height: 36px;

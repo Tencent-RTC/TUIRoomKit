@@ -1,53 +1,66 @@
 <template>
-  <div class="control-container">
-    <div class="control-content">
-      <img v-show="showLogo" class="logo" :src="logo">
-      <!--
-        *The roomId exists in the query
-        *
-        *query 中存在 roomId
-      -->
-      <div v-if="hasGivenRoomId" class="control-region">
-        <span class="invite-title">{{ t('Join the room ?') }}</span>
-        <span class="invite-info">{{ t('You are invited to room ') }}{{ `${givenRoomId} ` }}{{ t('Room') }}</span>
-        <div class="button enter-given-room-button" @click="enterGivenRoom">
-          <span class="title">{{ t('Join') }}</span>
+  <div class="room-control-container">
+    <Logo v-show="showLogo" class="logo" />
+    <div class="control-container">
+      <!-- 视频预览区域 -->
+      <div id="stream-preview" class="stream-preview">
+        <div class="attention-info">
+          <span v-if="isCameraMuted" class="off-camera-info">{{ t('Off Camera') }}</span>
+          <svg-icon v-if="isCameraLoading" :icon="LoadingIcon" class="loading"></svg-icon>
         </div>
       </div>
-      <!--
-        *There is no roomId in the query
-        *
-        *query 中没有 roomId
-      -->
-      <div v-else class="control-region">
-        <div
-          type="primary"
-          class="button create-room-button"
-          @mouseenter="handleMouseEnter"
-          @mouseleave="handleMouseLeave"
-        >
-          <div class="create-room">
-            <svg-icon icon-name="add-icon"></svg-icon>
-            <span class="title">{{ t('New Room') }}</span>
-          </div>
-          <div class="connect-region"></div>
-          <div v-show="showCreateRoomOption" class="create-room-mode">
-            <div class="create-room-option" @click="createRoom('FreeToSpeak')">
-              <svg-icon class="icon" icon-name="free-speech-icon"></svg-icon>
-              <span class="title">{{ t('Free Speech Room') }}</span>
-            </div>
-            <div class="create-room-option" @click="createRoom('SpeakAfterTakingSeat')">
-              <svg-icon class="icon" icon-name="apply-speech-icon"></svg-icon>
-              <span class="title">{{ t('Raise Hand Room') }}</span>
-            </div>
-          </div>
+      <div class="control-region">
+        <!-- 麦克风，摄像头操作区域 -->
+        <div class="media-control-region">
+          <audio-media-control
+            class="media-control-item"
+            :has-more="true"
+            :is-muted="isMicMuted"
+            :audio-volume="audioVolume"
+            @click="toggleMuteAudio"
+          ></audio-media-control>
+          <video-media-control
+            class="media-control-item"
+            :has-more="true"
+            :is-muted="isCameraMuted"
+            @click="toggleMuteVideo"
+          ></video-media-control>
         </div>
-        <div class="button join-room-button" type="primary" @click="enterRoom">
-          <input
-            v-model="roomId" class="input" :placeholder="t('Enter room ID')"
-            maxlength="10" @click.stop=""
-          >
-          <span class="title">{{ t('Join Room') }}</span>
+        <div class="room-control-region">
+          <!-- 创建房间逻辑 -->
+          <div class="create-room-region">
+            <Button class="button-item" @click.stop="handleCreateRoom">
+              <svg-icon :icon="CreateRoomIcon" />
+              <span class="button-text">{{ t('New Room') }}</span>
+            </Button>
+            <div
+              v-if="showCreateRoomItems"
+              v-click-outside="handleClickOutsideCreateRoomItems"
+              class="create-room-items"
+            >
+              <div class="create-room-item" @click="createRoom('SpeakAfterTakingSeat')">
+                <span :title="t('Raise Hand Room')" class="create-room-option">{{ t('Raise Hand Room') }}</span>
+                <svg-icon class="create-room-icon" :icon="NextIcon"></svg-icon>
+              </div>
+              <div class="create-room-item" @click="createRoom('FreeToSpeak')">
+                <span :title="t('Free Speech Room')" class="create-room-option">{{ t('Free Speech Room') }}</span>
+                <svg-icon class="create-room-icon" :icon="NextIcon"></svg-icon>
+              </div>
+            </div>
+          </div>
+          <!-- 加入房间逻辑 -->
+          <div class="enter-room-region">
+            <Button v-if="!showEnterRoomAction" class="button-item" @click="handleEnterRoom">
+              <svg-icon :icon="EnterRoomIcon" />
+              <span class="button-text">{{ t('Join Room') }}</span>
+            </Button>
+            <div v-if="showEnterRoomAction" class="enter-room-action">
+              <input v-model="roomId" class="input" :placeholder="t('Enter room ID')" @click.stop="">
+              <div :class="['enter-button', {'active': roomId.length > 0 }]" @click="enterRoom">
+                <svg-icon :icon="EnterRoomIcon" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -55,13 +68,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
-import SvgIcon from '../../common/SvgIcon.vue';
+import { ref, onBeforeUnmount } from 'vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import LoadingIcon from '../../common/icons/LoadingIcon.vue';
+import NextIcon from '../../common/icons/NextIcon.vue';
+import Button from '../../common/base/Button.vue';
+import Logo from '../../common/Logo.vue';
 import useRoomControl from './useRoomControlHooks';
+import CreateRoomIcon from '../../common/icons/CreateRoomIcon.vue';
+import EnterRoomIcon from '../../common/icons/EnterRoomIcon.vue';
+import useGetRoomEngine from '../../../hooks/useRoomEngine';
+import { useRoomStore } from '../../../stores/room';
+import AudioMediaControl from '../../common/AudioMediaControl.vue';
+import VideoMediaControl from '../../common/VideoMediaControl.vue';
+import TUIRoomEngine, { TUIRoomEvents, TRTCDeviceType, TUIVideoStreamType, TRTCDeviceState } from '@tencentcloud/tuiroom-engine-js';
+import vClickOutside from '../../../directives/vClickOutside';
+import logger from '../../../utils/common/logger';
+import { isElectronEnv } from '../../../utils/utils';
+import { ElMessageBox } from '../../../elementComp';
 
+const roomStore = useRoomStore();
 const {
-  logo,
-  showCreateRoomOption,
   t,
 } = useRoomControl();
 
@@ -72,24 +99,162 @@ const props = withDefaults(defineProps<{
   showLogo: true,
 });
 
-const hasGivenRoomId = computed(() => (typeof props.givenRoomId === 'string' && props.givenRoomId !== ''));
-const roomId = ref('');
+defineExpose({
+  getRoomParam,
+  startStreamPreview,
+});
+
+const roomEngine = useGetRoomEngine();
+const isCameraLoading = ref(false);
+const isElectron = isElectronEnv();
+
+const audioVolume = ref(0);
+const isMicMuted = ref(false);
+const isCameraMuted = ref(false);
+
+const showCreateRoomItems = ref(false);
+const showEnterRoomAction = ref(Boolean(props.givenRoomId));
+
+const tuiRoomParam = {
+  isOpenCamera: true,
+  isOpenMicrophone: true,
+  defaultCameraId: '',
+  defaultMicrophoneId: '',
+  defaultSpeakerId: '',
+};
+
+async function openCamera() {
+  if (isElectron) {
+    roomEngine.instance?.setLocalVideoView({ streamType: TUIVideoStreamType.kCameraStream, view: 'stream-preview' });
+    await roomEngine.instance?.openLocalCamera();
+  } else {
+    await roomEngine.instance?.startCameraDeviceTest({
+      view: 'stream-preview',
+    });
+  }
+}
+
+async function closeCamera() {
+  if (isElectron) {
+    await roomEngine.instance?.closeLocalCamera();
+  } else {
+    await roomEngine.instance?.stopCameraDeviceTest();
+  }
+}
+
+async function openAudio() {
+  if (isElectron) {
+    await roomEngine.instance?.openLocalMicrophone();
+  } else {
+    await roomEngine.instance?.startMicDeviceTest({ interval: 200 });
+  }
+}
+
+async function closeAudio() {
+  if (isElectron) {
+    await roomEngine.instance?.closeLocalMicrophone();
+  } else {
+    await roomEngine.instance?.stopMicDeviceTest();
+  }
+}
+
+async function toggleMuteAudio() {
+  isMicMuted.value = !isMicMuted.value;
+  tuiRoomParam.isOpenMicrophone = !isMicMuted.value;
+  if (isMicMuted.value) {
+    await closeAudio();
+    audioVolume.value = 0;
+  } else {
+    await openAudio();
+  }
+}
+
+async function toggleMuteVideo() {
+  isCameraMuted.value = !isCameraMuted.value;
+  tuiRoomParam.isOpenCamera = !isCameraMuted.value;
+  if (isCameraMuted.value) {
+    await closeCamera();
+  } else {
+    isCameraLoading.value = true;
+    await openCamera();
+    isCameraLoading.value = false;
+  }
+}
+
+function getRoomParam() {
+  tuiRoomParam.defaultCameraId = roomStore.currentCameraId;
+  tuiRoomParam.defaultMicrophoneId = roomStore.currentMicrophoneId;
+  tuiRoomParam.defaultSpeakerId = roomStore.currentSpeakerId;
+  return tuiRoomParam;
+}
+
+const onUserVoiceVolume = (result: any) => {
+  audioVolume.value = result;
+};
+
+async function startStreamPreview() {
+  isCameraLoading.value = true;
+  const cameraList = await roomEngine.instance?.getCameraDevicesList();
+  const microphoneList = await roomEngine.instance?.getMicDevicesList();
+  const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
+
+  const hasCameraDevice = cameraList && cameraList.length > 0;
+  const hasMicrophoneDevice = microphoneList && microphoneList.length > 0;
+  let alertMessage = '';
+  if (hasCameraDevice && !hasMicrophoneDevice) {
+    alertMessage = 'Microphone not detected on current device';
+  } else if (!hasCameraDevice && hasMicrophoneDevice) {
+    alertMessage = 'Camera not detected on current device';
+  } else if (!hasCameraDevice && !hasMicrophoneDevice) {
+    alertMessage = 'Camera And Microphone not detected on current device';
+  }
+  if (alertMessage) {
+    ElMessageBox.alert(t(alertMessage), t('Note'), {
+      customClass: 'custom-element-class',
+      confirmButtonText: t('Confirm') });
+  }
+
+  cameraList && roomStore.setCameraList(cameraList);
+  microphoneList && roomStore.setMicrophoneList(microphoneList);
+  speakerList && roomStore.setSpeakerList(speakerList);
+  const cameraInfo = roomEngine.instance?.getCurrentCameraDevice();
+  const micInfo = roomEngine.instance?.getCurrentMicDevice();
+  const speakerInfo = roomEngine.instance?.getCurrentSpeakerDevice();
+  if (cameraInfo && cameraInfo.deviceId) {
+    roomStore.setCurrentCameraId(cameraInfo.deviceId);
+  }
+  if (micInfo && micInfo.deviceId) {
+    roomStore.setCurrentMicrophoneId(micInfo.deviceId);
+  }
+  if (speakerInfo && speakerInfo.deviceId) {
+    roomStore.setCurrentSpeakerId(speakerInfo.deviceId);
+  }
+
+  if (hasCameraDevice) {
+    await openCamera();
+  }
+  if (hasMicrophoneDevice) {
+    await openAudio();
+  }
+  isCameraLoading.value = false;
+}
+
+const roomId = ref(props.givenRoomId);
 
 const emit = defineEmits(['create-room', 'enter-room']);
 
-watch(roomId, (val) => {
-  roomId.value = val.replace(/[^\d]/g, '');
-});
-
-function enterGivenRoom() {
-  emit('enter-room', props.givenRoomId);
-}
-function handleMouseEnter() {
-  showCreateRoomOption.value = true;
+function handleCreateRoom() {
+  showCreateRoomItems.value = !showCreateRoomItems.value;
 }
 
-function handleMouseLeave() {
-  showCreateRoomOption.value = false;
+function handleClickOutsideCreateRoomItems() {
+  if (showCreateRoomItems.value) {
+    showCreateRoomItems.value = false;
+  }
+}
+
+function handleEnterRoom() {
+  showEnterRoomAction.value = true;
 }
 
 function createRoom(mode: string) {
@@ -103,156 +268,280 @@ function enterRoom() {
   emit('enter-room', String(roomId.value));
 }
 
+/**
+ * Device changes: device switching, device plugging and unplugging events
+ *
+ * 设备变化：设备切换、设备插拔事件
+ **/
+async function onDeviceChange(eventInfo: {deviceId: string, type: number, state: number}) {
+  const stateList = ['add', 'remove', 'active'];
+  const { deviceId, type, state } = eventInfo;
+  if (type === TRTCDeviceType.TRTCDeviceTypeMic) {
+    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
+    const deviceList = await roomEngine.instance?.getMicDevicesList();
+    roomStore.setMicrophoneList(deviceList);
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentMicrophoneId(deviceId);
+    }
+    return;
+  }
+  if (type === TRTCDeviceType.TRTCDeviceTypeSpeaker) {
+    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
+    const deviceList = await roomEngine.instance?.getSpeakerDevicesList();
+    roomStore.setSpeakerList(deviceList);
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentSpeakerId(deviceId);
+    }
+    return;
+  }
+  if (type === TRTCDeviceType.TRTCDeviceTypeCamera) {
+    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
+    const deviceList = await roomEngine.instance?.getCameraDevicesList();
+    roomStore.setCameraList(deviceList);
+    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
+      roomStore.setCurrentCameraId(deviceId);
+    }
+  }
+}
+
+TUIRoomEngine.once('ready', () => {
+  startStreamPreview();
+
+  if (isElectron) {
+    roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
+  } else {
+    // 兼容没有打开音频前，roomEngine 没有抛出音量事件的问题
+    const trtcCloud = roomEngine.instance?.getTRTCCloud();
+    trtcCloud?.on('onTestMicVolume', onUserVoiceVolume);
+  }
+  roomEngine.instance?.on(TUIRoomEvents.onDeviceChange, onDeviceChange);
+});
+
+onBeforeUnmount(async () => {
+  await closeAudio();
+  await closeCamera();
+
+  if (isElectron) {
+    roomEngine.instance?.off(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
+  } else {
+    const trtcCloud = roomEngine.instance?.getTRTCCloud();
+    trtcCloud?.off('onTestMicVolume', onUserVoiceVolume);
+  }
+  roomEngine.instance?.off(TUIRoomEvents.onDeviceChange, onDeviceChange);
+});
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
+
+.tui-theme-white .control-container {
+  --background-color: #FFFFFF;
+  --box-shadow: 0px 8px 30px 0px rgba(197, 210, 229, 0.30), 0px 2px 3px 0px rgba(197, 210, 229, 0.30);
+}
+
+.tui-theme-black .control-container {
+  --background-color: rgba(79,88,107,0.3);
+  --box-shadow: 0px 4px 30px 0px rgba(34, 38, 46, 0.30), 0px 0px 3px 0px rgba(34, 38, 46, 0.30);
+}
+
+@keyframes loading-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.room-control-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.logo {
+  margin-bottom: 56px;
+}
+
 .control-container {
-  width: 430px;
-  height: 476px;
-  border-radius: 20px;
-  margin-left: 40px;
-  position: relative;
-  padding: 2px;
-  background-image:linear-gradient(230deg, var(--background-image-color), rgba(61,143,255,0) 50%);
-  box-shadow: 0px 12px 24px rgba(16, 34, 64, 0.05);
-  .control-content {
+  width: 760px;
+  height: 544px;
+  border-radius: 24px;
+  background-color: var(--background-color);
+  box-shadow: var(--box-shadow);
+  padding: 20px 20px 32px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .stream-preview {
     width: 100%;
-    height: 100%;
-    padding: 0 40px;
-    border-radius: 20px;
-    background: var(--control-content);
-  }
-  .logo {
-    position: absolute;
-    top: 78px;
-    left: 50%;
-    width: 318px;
-    transform: translate(-50%);
-  }
-  .control-region {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    justify-content: center;
-  }
-  .invite-title {
-    display: inline-block;
-    font-weight: 500;
-    font-size: 28px;
-    color: var(--invite-region);
-    line-height: 34px;
-    position: absolute;
-    top: 183px;
-  }
-  .invite-info {
-    display: inline-block;
-    font-weight: 400;
-    font-size: 20px;
-    color: var(--invite-region);
-    opacity: 0.6;
-    line-height: 34px;
-    position: absolute;
-    top: 232px;
-  }
-  .button {
-    width: 360px;
-    height: 88px;
-    background-image: linear-gradient(-45deg, #006EFF 0%, #0C59F2 100%);
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.20);
+    height: 400px;
     border-radius: 8px;
-    cursor: pointer;
-    .title {
-      font-size: 22px;
-      color: #FFFFFF;
-      line-height: 34px;
-      margin-left: 9px;
-    }
-  }
-
-  .enter-given-room-button {
-    position: absolute;
-    top: 338px;
-    text-align: center;
-    line-height: 88px;
-  }
-
-  .create-room-button {
-    position: absolute;
-    top: 214px;
-    .create-room {
+    overflow: hidden;
+    background-color: #000000;
+    position: relative;
+    .attention-info {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-    .create-room-mode {
-      width: 100%;
-      position: absolute;
-      top: calc(100% + 4px);
-      z-index: 10;
-      background-color: var(--create-room-mode-color-bg);
-      border: 1px solid rgba(255,255,255,0.10);
-      box-shadow: 0 1px 10px 0 #091D3B;
-      border-radius: 8px;
-      padding: 4px 0;
-    }
-    .connect-region {
-      width: 100%;
-      height: 6px;
-    }
-    .create-room-option {
-      height: 48px;
-      padding-left: 32px;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      &:hover {
-        background-color: var(--create-room-option);
-        .title {
-          color: var(--create-room-option-color);
-        }
-        .icon {
-          background-color: var(--create-room-option-icon-color);
-        }
-      }
-      .icon {
-        background-color: var(--create-room-option-icon);
-      }
-      .title {
+      .off-camera-info {
         font-weight: 400;
-        font-size: 14px;
-        color: var(--title-color-font);
+        font-size: 22px;
+        line-height: 34px;
+        color: #4F586B;
+      }
+      .loading {
+        animation: loading-rotate 2s linear infinite;
       }
     }
   }
-
-  .join-room-button {
-    position: absolute;
-    bottom: 50px;
-    padding: 2px;
-    .input {
-      width: 212px;
-      height: 100%;
-      background: var(--input-color);
-      border-color: transparent;
-      outline: none;
-      border-radius: 8px;
-      font-weight: 400;
-      font-size: 22px;
-      color: #676C80;
-      line-height: 34px;
-      padding: 0 20px;
+  .control-region {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    .media-control-region {
+      display: flex;
+      align-items: center;
+      position: relative;
+      .media-control-item {
+        &:not(:first-child) {
+          margin-left: 20px;
+        }
+        .media-tab {
+          position: absolute;
+          top: -100%;
+          left: 0;
+        }
+      }
     }
-    .title {
-      cursor: pointer;
-      text-align: center;
-      display: inline-block;
-      width: 135px;
+    .room-control-region {
+      display: flex;
+      .button-item {
+        width: 206px;
+        height: 60px;
+        .button-text {
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 22px;
+          margin-left: 6px;
+        }
+      }
+      .create-room-region {
+        position: relative;
+        .create-room-items {
+          background-color: #FFFFFF;
+          border-radius: 10px;
+          box-shadow:
+            0px 2px 4px rgba(32, 77, 141, 0.03),
+            0px 6px 10px rgba(32, 77, 141, 0.06),
+            0px 3px 14px rgba(32, 77, 141, 0.05);
+          position: absolute;
+          bottom: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%);
+          cursor: pointer;
+          .create-room-item {
+            padding: 19px 32px;
+            transition: background-color 0s, color 0s;
+            display: flex;
+            justify-content: space-between;
+            color: #4F586B;
+            &:hover {
+              color: var(--active-color-1);
+              .create-room-option {
+                font-weight: 500;
+              }
+            }
+            .create-room-option {
+              font-size: 20px;
+              font-weight: 400;
+              line-height: 22px;
+              white-space: nowrap;
+              &::before {
+                display: block;
+                content: attr(title);
+                font-weight: 500;
+                height: 0;
+                overflow: hidden;
+                visibility: hidden;
+              }
+            }
+            .create-room-icon {
+              margin-left: 8px;
+            }
+          }
+        }
+      }
+      .enter-room-region {
+        margin-left: 20px;
+        .enter-room-action {
+          width: 260px;
+          height: 60px;
+          border-radius: 30px;
+          background-color: var(--background-color);
+          border: 2px solid var(--active-color-1);
+          padding: 0px 24px;
+          position: relative;
+          line-height: 60px;
+          .input {
+            max-width: 140px;
+            outline: none;
+            background-color: transparent;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 28px;
+            padding: 0;
+            border: 0;
+            color: var(--font-color-1);
+            --input-placeholder-color: rgba(143,154,178, 0.7);
+            &::input-placeholder {
+              color: var(--input-placeholder-color);
+            }
+            &::-webkit-input-placeholder {
+              /* WebKit browsers */
+              color: var(--input-placeholder-color);
+            }
+            &:-moz-placeholder {
+              /* Mozilla Firefox 4 to 18 */
+              color: var(--input-placeholder-color);
+            }
+            &::-moz-placeholder {
+              /* Mozilla Firefox 19+ */
+              color: var(--input-placeholder-color);
+            }
+            &::-ms-input-placeholder {
+              /* Internet Explorer 10+ */
+              color: var(--input-placeholder-color);
+            }
+          }
+          .enter-button {
+            width: 72px;
+            height: 52px;
+            background-color: #90B3F0;
+            border-radius: 26px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            &.active {
+              cursor: pointer;
+              background-color: var(--active-color-1);
+            }
+          }
+        }
+      }
     }
   }
 }
