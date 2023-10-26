@@ -246,7 +246,10 @@ const doEnterRoom = async (roomId: string) => {
   trtcCloud.enableSmallVideoStream(true, smallParam);
   const roomInfo = await roomEngine.instance?.enterRoom({ roomId }) as TUIRoomInfo;
   roomEngine.instance?.muteLocalAudio();
-  roomEngine.instance?.openLocalMicrophone();
+  if (roomInfo.speechMode === TUISpeechMode.kFreeToSpeak) {
+    roomEngine.instance?.openLocalMicrophone();
+    basicStore.setIsOpenMic(true);
+  }
   return roomInfo;
 };
 async function createRoom(options: {
