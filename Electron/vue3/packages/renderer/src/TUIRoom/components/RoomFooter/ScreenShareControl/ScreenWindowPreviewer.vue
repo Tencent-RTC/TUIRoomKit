@@ -47,24 +47,25 @@ onMounted(() => {
 .screen-window-previewer {
   list-style: none;
   display: inline-block;
-  margin: 8px;
-  padding: 8px 0;
-  width: 170px;
-  height: 150px;
-  border: 1px solid $primaryColor;
+  margin-right: 40px;
+  width: 184px;
   border-radius: 8px;
+  border: 2px solid #e4eaf7;
   text-align: center;
+  margin-bottom: 40px;
   &:hover {
-    border-color: $activeStateColor;
-    box-shadow: 2px 2px 10px 2px $activeStateColor;
+    border-color: #1c66e5;
   }
 }
 
-.previewer-canvas, .previewer-mini {
+.previewer-canvas,
+.previewer-mini {
   margin: 0 auto;
   display: flex;
   justify-content: space-around;
   align-items: center;
+  border-radius: 8px;
+  overflow: hidden;
 }
 .previewer-mini {
   width: 110px;
@@ -76,5 +77,10 @@ onMounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  padding: 0 20px;
 }
 </style>
+

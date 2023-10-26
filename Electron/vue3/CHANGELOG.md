@@ -1,4 +1,11 @@
-## 2023.09.15@1.5.1
+## 2023.10.26@1.6.0
+
+**Feature**
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.6.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。
+- 全新 UI 界面。
+- 升级 chat sdk 至 v3 版本。
+
+## 2023.09.25@1.5.1
 
 **Feature**
 - 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.5.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。

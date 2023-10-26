@@ -12,31 +12,26 @@
   * 在 template 中使用 <video-tab></video-tab>
 -->
 <template>
-  <div class="video-tab">
-    <div :class="['item-setting-container', isSampleMode && 'hasDividingLine']">
-      <div class="item-setting">
-        <span class="title">{{ t('Camera') }}</span>
-        <device-select
-          :class="isDetailMode ? 'detail-select' : ''"
-          device-type="camera"
-        ></device-select>
-      </div>
-      <div v-if="isDetailMode && withPreview" class="item-setting">
-        <span class="title">{{ t('Preview') }}</span>
+  <div :class="['video-tab', themeClass]">
+    <div class="item-setting">
+      <span class="title">{{ t('Camera') }}</span>
+      <device-select device-type="camera"></device-select>
+    </div>
+    <div v-if="withPreview" class="item-setting">
+      <span class="title">{{ t('Preview') }}</span>
+      <div class="video-preview-container">
         <div id="test-camera-preview" class="video-preview"></div>
       </div>
-      <el-checkbox
-        v-if="isDetailMode"
-        v-model="isLocalStreamMirror"
-        class="mirror-checkbox custom-element-class"
-        :label="t('Mirror')"
-      />
     </div>
-    <div v-if="isSampleMode" :class="['item-setting-container', isSampleMode && 'hasDividingLine']">
+    <div class="item-setting">
       <span class="title">{{ t('Resolution') }}</span>
       <video-profile></video-profile>
     </div>
-    <div v-if="isSampleMode" :class="['item-setting-container', isSampleMode && 'hasDividingLine']">
+    <div class="mirror-container">
+      <span>{{ t('Mirror') }}</span>
+      <SwitchControl v-model="isLocalStreamMirror"></SwitchControl>
+    </div>
+    <div v-if="withMore" class="item-setting">
       <!-- TODO: <div class="item">美颜与虚拟背景</div> -->
       <div class="item" @click="handleMoreCameraSetting">{{ t('More Camera Settings') }}</div>
     </div>
@@ -44,11 +39,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, Ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, Ref, watch, onMounted, onUnmounted, computed } from 'vue';
 import DeviceSelect from './DeviceSelect.vue';
 import VideoProfile from './VideoProfile.vue';
+import SwitchControl from '../common/base/Switch.vue';
 import { useBasicStore } from '../../stores/basic';
-import { SettingMode } from '../../constants/render';
 import { isElectronEnv } from '../../utils/utils';
 import { useI18n } from '../../locales';
 
@@ -59,15 +54,16 @@ const roomEngine = useGetRoomEngine();
 const isElectron = isElectronEnv();
 
 interface Props {
-  mode?: SettingMode,
   withPreview?: boolean,
+  withMore?: boolean,
+  withMirror?: boolean,
+  theme?: 'white' | 'black',
 }
 const props = defineProps<Props>();
-const settingMode = props.mode || SettingMode.SIMPLE;
-const isSampleMode = computed(() => settingMode === SettingMode.SIMPLE);
-const isDetailMode = computed(() => settingMode === SettingMode.DETAIL);
 
 const basicStore = useBasicStore();
+
+const themeClass = computed(() => (props.theme ? `tui-theme-${props.theme}` : ''));
 
 const isLocalStreamMirror: Ref<boolean> = ref(basicStore.isLocalStreamMirror);
 watch(isLocalStreamMirror, async (val: boolean) => {
@@ -101,7 +97,7 @@ function handleMoreCameraSetting() {
   basicStore.setActiveSettingTab('video');
 }
 
-if (isDetailMode.value && props.withPreview) {
+if (props.withPreview) {
   onMounted(async () => {
     roomEngine.instance?.startCameraDeviceTest({ view: 'test-camera-preview' });
     if (isElectron) {
@@ -128,46 +124,54 @@ if (isDetailMode.value && props.withPreview) {
 @import '../../assets/style/element-custom.scss';
 
 .video-tab {
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 14px;
-  .item-setting-container {
-    padding-bottom: 20px;
-    &:not(:first-child) {
-      padding-top: 20px;
-    }
-    &.hasDividingLine:not(:last-child) {
-      border-bottom: 1px solid var(--divide-line-color);
-    }
-    .item-setting {
-      &:not(:last-child) {
-        margin-bottom: 20px;
-      }
+  .item-setting {
+    &:not(:last-child) {
+      margin-bottom: 20px;
     }
   }
   .title {
     display: inline-block;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     width: 100%;
-    color:var(--camera-color);
+    color: var(--font-color-4);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
   }
-  .detail-select {
-    width: 309px;
-    height: 32px;
+  .video-preview-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: calc(100% * 9 / 16);
+    background-color: #000000;
+    border-radius: 8px;
+    overflow: hidden;
+    .video-preview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
   }
-  .video-preview {
-    width: 402px;
-    height: 226px;
-    background-color: $roomBackgroundColor;
-  }
-  .mirror-checkbox {
-    margin-top: 10px;
+  .mirror-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--font-color-4);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+    padding-right: 2px;
   }
   .item {
     width: 100%;
     height: 20px;
-    margin-bottom: 20px;
     cursor: pointer;
-    color:var(--camera-color);
+    color: var(--font-color-3);
   }
 }
 </style>

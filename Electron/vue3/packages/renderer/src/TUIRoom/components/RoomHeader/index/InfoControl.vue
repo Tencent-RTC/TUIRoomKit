@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { ref, Ref } from 'vue';
-import SvgIcon from '../../common/SvgIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
 
 const showInfoTab = ref(false);
 const infoRef:Ref<Node | undefined> = ref(undefined);

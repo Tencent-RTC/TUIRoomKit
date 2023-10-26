@@ -281,8 +281,8 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid var(--choose-type);
-    color: var(--close-cancel-h5);
+    border-top: 1px solid #F2F2F2;
+    color: #006EFF;
   }
   .cancel{
     padding: 14px;
@@ -290,9 +290,9 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid var(--choose-type);
-    color: var(--apply-container-outline);
-    border-right: 1px solid var(--choose-type);
+    border-top: 1px solid #F2F2F2;
+    color: #2B2E38;
+    border-right: 1px solid #F2F2F2;
   }
 }
 .button-container-PC{

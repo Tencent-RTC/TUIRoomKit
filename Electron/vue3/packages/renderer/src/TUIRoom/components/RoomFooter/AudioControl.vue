@@ -13,86 +13,81 @@
 -->
 <template>
   <div>
-    <div class="audio-control-container" @click="emits('click')">
-      <icon-button
-        ref="audioIconButtonRef"
-        :is-active="!localStream.hasAudioStream"
-        :title="t('Mic')"
-        :has-more="hasMore"
-        :show-more="showAudioSettingTab"
-        :disabled="isLocalAudioIconDisable"
-        @click-icon="toggleMuteAudio"
-        @click-more="handleMore"
-      >
-        <audio-icon
-          :user-id="localStream.userId"
-          :is-muted="!localStream.hasAudioStream"
-          :is-disabled="isLocalAudioIconDisable"
-        ></audio-icon>
-      </icon-button>
-      <audio-setting-tab
-        v-show="showAudioSettingTab"
-        ref="audioSettingRef"
-        class="audio-tab"
-      ></audio-setting-tab>
-    </div>
+    <audio-media-control
+      :has-more="hasMore"
+      :is-muted="!localStream.hasAudioStream"
+      :is-disabled="isLocalAudioIconDisable"
+      :audio-volume="userVolumeObj[localStream.userId]"
+      @click="handleAudioMediaClick"
+    ></audio-media-control>
     <Dialog
       :model-value="showRequestOpenMicDialog"
-      class="custom-element-class"
       :title="title"
-      :modal="false"
+      :modal="true"
       :show-close="false"
-      :append-to-body="true"
       :close-on-click-modal="false"
-      :close-on-press-escape="false"
       width="500px"
+      :append-to-room-container="true"
     >
       <span>
         {{ t('The host invites you to turn on the microphone') }}
       </span>
+      <template v-if="isMobile" #cancel>
+        <Button class="cancel" size="default" type="primary" @click="handleReject">
+          {{ t('Keep it closed') }}
+        </Button>
+      </template>
+      <template v-if="isMobile" #agree>
+        <Button class="agree" size="default" @click="handleAccept">{{ t('Turn on the microphone') }}</Button>
+      </template>
       <template #footer>
-        <div :class="[isMobile ? 'button-container-mobile' : 'button-container-PC']">
-          <span class="cancel" @click="handleReject">{{ t('Keep it closed') }}</span>
-          <span class="agree" @click="handleAccept">{{ t('Turn on the microphone') }}</span>
-        </div>
+        <Button class="agree-button" size="default" @click="handleAccept">{{ t('Turn on the microphone') }}</Button>
+        <Button class="cancel-button" size="default" type="primary" @click="handleReject">
+          {{ t('Keep it closed') }}
+        </Button>
       </template>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, Ref, onUnmounted, computed } from 'vue';
+import { ref, Ref, onUnmounted, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessageBox, ElMessage } from '../../elementComp';
-import Dialog from '../../elementComp/Dialog/index.vue';
-import IconButton from '../common/IconButton.vue';
-import AudioSettingTab from '../base/AudioSettingTab.vue';
+import Dialog from '../common/base/Dialog/index.vue';
 import { useRoomStore } from '../../stores/room';
-import AudioIcon from '../base/AudioIcon.vue';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-electron';
 import useRoomEngine from '../../hooks/useRoomEngine';
-import { isMobile, isWeChat }  from '../../utils/useMediaValue';
+import { isMobile, isWeChat } from '../../utils/useMediaValue';
+import Button from '../common/base/Button.vue';
+import AudioMediaControl from '../common/AudioMediaControl.vue';
+import { useBasicStore } from '../../stores/basic';
 
 
 const roomEngine = useRoomEngine();
 
 const roomStore = useRoomStore();
+const basicStore = useBasicStore();
+
 const {
   isAudience,
   localStream,
   isLocalAudioIconDisable,
   isMicrophoneDisableForAllUser,
+  userVolumeObj,
 } = storeToRefs(roomStore);
 
 const emits = defineEmits(['click']);
 const hasMore = computed(() => !isMobile);
-const showAudioSettingTab: Ref<boolean> = ref(false);
-const audioIconButtonRef = ref<InstanceType<typeof IconButton>>();
-const audioSettingRef = ref<InstanceType<typeof AudioSettingTab>>();
 const { t } = useI18n();
 const title = computed(() => (isMobile ? '' : t('Tips')));
+
+function handleAudioMediaClick() {
+  emits('click');
+  toggleMuteAudio();
+}
 
 async function toggleMuteAudio() {
   if (isLocalAudioIconDisable.value) {
@@ -128,25 +123,10 @@ async function toggleMuteAudio() {
     }
     // 有麦克风列表且有权限
     await roomEngine.instance?.unmuteLocalAudio();
-  }
-  showAudioSettingTab.value = false;
-}
-
-function handleMore() {
-  if (!showAudioSettingTab.value) {
-    showAudioSettingTab.value = true;
-  } else {
-    showAudioSettingTab.value = false;
-  }
-}
-
-function handleDocumentClick(event: MouseEvent) {
-  if (
-    showAudioSettingTab.value
-    && !audioIconButtonRef.value?.$el.contains(event.target)
-    && !audioSettingRef.value?.$el.contains(event.target)
-  ) {
-    showAudioSettingTab.value = false;
+    if (!basicStore.isOpenMic) {
+      roomEngine.instance?.openLocalMicrophone();
+      basicStore.setIsOpenMic(true);
+    }
   }
 }
 
@@ -190,18 +170,12 @@ async function onRequestCancelled(eventInfo: { requestId: string }) {
   }
 }
 
-onMounted(() => {
-  document?.addEventListener('click', handleDocumentClick, true);
-});
-
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
 });
 
 onUnmounted(() => {
-  document?.removeEventListener('click', handleDocumentClick, true);
-
   roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
 });
@@ -210,62 +184,38 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 @import '../../assets/style/var.scss';
-
-$audioTabWidth: 320px;
-
-.audio-control-container {
-    position: relative;
-    .audio-tab {
-      position: absolute;
-      bottom: 90px;
-      left: 15px;
-      width: $audioTabWidth;
-      background: var(--room-audiotab-bg-color);
-      padding: 20px;
+  .agree{
+    padding: 14px;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    color: var(--active-color-1);
+    font-size: 16px;
+    font-weight: 500;
+    background-color: #fff;
+      &:hover {
+      background: none;
+      border: none;
     }
   }
-.button-container-mobile{
-  width: 100%;
-  display: flex;
-  .agree{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-top: 1px solid rgba(242, 242, 242, 1);
-    color:rgba(0, 110, 255, 1);
-  }
   .cancel{
     padding: 14px;
     width: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid rgba(242, 242, 242, 1);
-    color: rgba(43, 46, 56, 1);
-    border-right: 1px solid rgba(242, 242, 242, 1);
+    border: 1px solid transparent;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--font-color-4);
+      &:hover {
+      background: none;
+      border: none;
+    }
   }
-}
-.button-container-PC{
-  .cancel{
-    padding: 5px 20px;
-    background: var(--create-room-option);
-    border-radius: 2px;
-    width: auto;
-    display: initial;
-    color: var(--color-font);
-    border: 1px solid var(--choose-type);
+  .cancel-button {
+    margin-left: 20px;
   }
-  .agree{
-    padding: 5px 20px;
-    background: #006EFF;
-    color: white;
-    margin-left: 14px;
-    border-radius: 2px;
-    width: auto;
-    display: initial;
-  }
-}
-
 </style>

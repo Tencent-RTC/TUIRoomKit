@@ -1,8 +1,37 @@
-[data-theme="white"]{
-  --color-font: #000000;
+.tui-theme-white {
+  --background-color-1: #FFFFFF;
+  --background-color-2: #FBFCFE;
+  --background-color-3: #F0F3FA;
+  --background-color-4: #D5E0F2;
+  --background-color-5: transparent;
+  --background-color-6: #BDBDBD;
+  --background-color-7: #F9FAFC;
+  --background-color-8: #FFFFFF;
+  --background-color-9: #F7F9FC;
+  --background-color-10: #E7EAF7;
+  --font-color-1: #4F586B;
+  --font-color-2: #B2BBD1;
+  --font-color-3: #000000;
+  --font-color-4: #4F586B;
+  --font-color-5: #4F586B;
+  --font-color-6: #0F1014;
+  --font-color-7: #FFFFFF;
+  --font-color-8: #4F586B;
+  --title-color: #0F1014;
+  --stroke-color: #E4EAF7;
+  --border-color: #E4E8EE;
+  --active-color-1: #1C66E5;
+  --active-color-2: #1C66E5;
+  --green-color: #27C39F;
+  --orange-color: #F06C4B;
+  --white-color: #FFFFFF;
+  --black-color: #000000;
+  --red-color: #ED414D;
+  --red-color-2: #F23C5B;
+  --red-color-3: #E5395C;
+
   --control-content: #FFFFFF;
   --background-image-color: transparent;
-  --border-color: #37456F;
   --input-color: #FFFFFF;
   --create-room-mode-color-bg: #FFFFFF;
   --user-control-container-color-bg: #E8E8E8;
@@ -80,12 +109,11 @@
   --create-room-option-icon: #000000;
   --create-room-option-icon-color:#006EFF;
   --control-region-bg-color: #EEEEEE;
-  --dialog-tabs-bg-color: #FFFFFF;
+  --dialog-tabs-bg-color: #F0F3FA;
   --divide-line-color: transparent;
   --divice-line: #dcdcdc;
   --el-drawer-divide: transparent;
   --send-btn: #FFFFFF;
-  --camera-color: #000000;
   --invite-region: #000000;
   --layout-list: #EEEEEE;
   --layout-item: #FFFFFF;
@@ -124,7 +152,6 @@
   --room-detail-title: black;
   --close-svg: url(../icons/svg/close-white.svg);
   --chevron-down-svg: url(../icons/svg/chevron-down-white.svg);
-  --tencent-cloud-svg: url(../icons/svg/tencent-cloud-white.svg);
   --camera-svg: url(../icons/svg/camera-switch-white.svg);
   --mirror-svg: url(../icons/svg/mirror-white.svg);
   --choose-type: #E1E1E3;

@@ -1,5 +1,36 @@
-[data-theme="black"]{
-  --color-font: #B3B8C8;
+.tui-theme-black {
+  --background-color-1: #0F1014;
+  --background-color-2: #22262E;
+  --background-color-3: #4F586B;
+  --background-color-4: #D5E0F2;
+  --background-color-5: transparent;
+  --background-color-6: #373942;
+  --background-color-7: #2E323D;
+  --background-color-8: #22262E;
+  --background-color-9: #2E323D;
+  --background-color-10: #2B2F38;
+  --font-color-1: #D5E0F2;
+  --font-color-2: #6B758A;
+  --font-color-3: #B3B8C8;
+  --font-color-4: #4F586B;
+  --font-color-5: #7C85A6;
+  --font-color-6: #CFD5E6;
+  --font-color-7: #FFFFFF;
+  --font-color-8: #8F9AB2;
+  --title-color: #000000;
+  --stroke-color: rgba(79, 88, 107, 0.30);
+  --border-color: #2E323D;
+  --active-color-1: #1C66E5;
+  --active-color-2: #4791FF;
+  --green-color: #27C39F;
+  --orange-color: #F06C4B;
+  --white-color: #FFFFFF;
+  --black-color: #000000;
+  --red-color: #ED414D;
+  --red-color-2: #F23C5B;
+  --red-color-3: #E5395C;
+
+  --color-font: #D5E0F2;
   --control-content: rgba(27, 30, 38, 0.9);
   --background-image-color: rgba(61,119,255,0.53);
   --input-color: rgba(27,30,38,0.90);
@@ -19,7 +50,6 @@
   --tabs-title-font-color: #7C85A6;
   --center-user-info-container-bg-color: #0D0F15;
   --stream-info-bg-color: #0D0F15;
-  --title-color: #B3B8C8;
   --el-dialog-bg-color-select: #1D2029;
   --el-text-color-primary-select: #CFD4E6;
   --el-text-color-regular-select: #7C85A6;
@@ -85,7 +115,6 @@
   --divice-line: #CFD4E6;
   --el-drawer-divide: #0D0F15;
   --send-btn: #CFD4E6;
-  --camera-color: #B3B8C8;
   --invite-region: #FFFFFF;
   --layout-list: #1D2029;
   --layout-item: #2E323D;
@@ -124,7 +153,6 @@
   --room-detail-title: white;
   --close-svg: url(../icons/svg/close-black.svg);
   --chevron-down-svg: url(../icons/svg/chevron-down-black.svg);
-  --tencent-cloud-svg: url(../icons/svg/tencent-cloud-black.svg);
   --camera-svg: url(../icons/svg/camera-switch-black.svg);
   --mirror-svg: url(../icons/svg/mirror-black.svg);
   --choose-type: #4F515A;

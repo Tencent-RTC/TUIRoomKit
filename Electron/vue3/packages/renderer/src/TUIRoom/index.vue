@@ -166,10 +166,8 @@ function handleRoomContentTap() {
 }
 
 onMounted(async () => {
-  const defaults = basicStore.defaultTheme;
-  const storageCurrentTheme = localStorage.getItem('tuiRoom-currentTheme') || defaults;
-  basicStore.setDefaultTheme(storageCurrentTheme);
-  document.body.setAttribute('data-theme', storageCurrentTheme);
+  const storageCurrentTheme = localStorage.getItem('tuiRoom-currentTheme');
+  storageCurrentTheme && basicStore.setDefaultTheme(storageCurrentTheme);
   if (isMobile) {
     const trtcCloud = roomEngine.instance?.getTRTCCloud();
     await trtcCloud?.setLocalRenderParams({
@@ -246,7 +244,10 @@ const doEnterRoom = async (roomId: string) => {
   trtcCloud.enableSmallVideoStream(true, smallParam);
   const roomInfo = await roomEngine.instance?.enterRoom({ roomId }) as TUIRoomInfo;
   roomEngine.instance?.muteLocalAudio();
-  roomEngine.instance?.openLocalMicrophone();
+  if (roomInfo.speechMode === TUISpeechMode.kFreeToSpeak) {
+    roomEngine.instance?.openLocalMicrophone();
+    basicStore.setIsOpenMic(true);
+  }
   return roomInfo;
 };
 async function createRoom(options: {
@@ -523,6 +524,7 @@ const onSendMessageForAllUserDisableChanged = async (eventInfo: { roomId: string
   }
   roomStore.setDisableMessageAllUserByAdmin(isDisable);
 };
+
 // 初始化获取设备列表
 async function getMediaDeviceList() {
   const cameraList = await roomEngine.instance?.getCameraDevicesList();
@@ -622,26 +624,41 @@ watch(sdkAppId, (val: number) => {
 });
 </script>
 
-<style>
+<style lang="scss">
 @import './assets/style/black-theme.scss';
 @import './assets/style/white-theme.scss';
 
 .tui-room :not([class|="el"]) {
-    transition: background-color .5s,color .5s;
+    transition: background-color .3s,color .3s, box-shadow .3s;
   }
 </style>
 
 <style lang="scss" scoped>
 @import './assets/style/var.scss';
 
+.tui-theme-white .tui-room {
+  --header-shadow-color: #E3EAF7;
+  --footer-shadow-color: rgba(197, 210, 229, 0.20);
+}
+
+.tui-theme-black .tui-room {
+  --header-shadow-color: rgba(34, 38, 46, 0.30);
+  --footer-shadow-color: rgba(34, 38, 46, 0.30);
+}
+
 .tui-room {
   width: 100%;
   height: 100%;
   position: relative;
+  color: var(--font-color-1);
+  background-color: var(--background-color-1);
+  display: flex;
+  flex-direction: column;
   .header {
     width: 100%;
-    height: 48px;
-    background-color: var(--room-header-bg-color);
+    height: 64px;
+    background-color: var(--background-color-2);
+    box-shadow: 0px 1px 0px var(--header-shadow-color);
     position: absolute;
     top: 0;
     left: 0;
@@ -650,7 +667,7 @@ watch(sdkAppId, (val: number) => {
   .content {
     width: 100%;
     height: 100%;
-    background-color: $roomBackgroundColor;
+    background-color: var(--background-color-1);
     position: absolute;
     top: 0;
   }
@@ -658,8 +675,9 @@ watch(sdkAppId, (val: number) => {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 80px;
-    background-color: var(--room-footer-bg-color);
+    height: 76px;
+    background-color: var(--background-color-2);
+    box-shadow: 0px -8px 30px var(--footer-shadow-color);
   }
 }
 </style>

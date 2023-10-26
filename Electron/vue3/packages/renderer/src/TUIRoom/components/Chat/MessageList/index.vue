@@ -1,13 +1,13 @@
 <template>
-  <div :class="isMobile ? 'message-list-container-h5':'message-list-container'">
+  <div :class="isMobile ? 'message-list-container-h5' : 'message-list-container'">
     <div class="message-list">
       <div
-        v-for="item in messageList"
+        v-for="(item, index) in messageList"
         :key="item.ID"
         ref="messageAimId"
         :class="['message-item', `${'out' === item.flow ? 'is-me' : ''}`]"
       >
-        <div class="message-header" :title="item.nick || item.from">
+        <div v-if="handleDisplaySenderName(index)" class="message-header" :title="item.nick || item.from">
           {{ item.nick || item.from }}
         </div>
         <div class="message-body">
@@ -38,6 +38,10 @@ const {
   getMessageList,
 } = useMessageList();
 
+function handleDisplaySenderName(index: number) {
+  if (index === 0) return true;
+  return messageList.value[index].from !== messageList.value[index - 1].from;
+}
 
 onMounted(async () => {
   const { currentMessageList, isCompleted, nextReqMessageId } = await getMessageList();
@@ -53,7 +57,6 @@ onMounted(async () => {
   window.addEventListener('scroll', handleMessageListScroll, true);
 });
 
-
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onReceiveTextMessage, onReceiveTextMessage);
 });
@@ -65,11 +68,20 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.tui-theme-white .message-body {
+  --user-chat-color: rgba(213, 224, 242, 0.4);
+  --user-font-color: var(--black-color);
+  --host-font-color: var(--white-color);
+}
+.tui-theme-black .message-body {
+  --user-chat-color: rgba(213, 224, 242, 0.1);
+  --user-font-color: var(--background-color-4);
+  --host-font-color: var(--background-color-4);
+}
+
 .message-list-container {
-  height: calc(100% - 188px);
-  padding: 10px 23px 10px 32px;
-  background-color: var(--message-list-color);
   overflow: auto;
+  flex: 1;
 
   &::-webkit-scrollbar {
     display: none;
@@ -80,7 +92,7 @@ onUnmounted(() => {
   }
 
   .message-item {
-    margin-bottom: 20px;
+    margin-bottom: 8px;
     word-break: break-all;
     display: flex;
     flex-direction: column;
@@ -91,26 +103,32 @@ onUnmounted(() => {
     &.is-me {
       align-items: end;
       .message-body {
-        background-color: var(--message-color);
+        background-color: var(--active-color-1);
         min-width: 24px;
+        padding: 10px;
+        color: var(--host-font-color);
+        border-radius: 8px;
       }
     }
     .message-header {
       font-size: 14px;
-      color: #7C85A6;
-      margin-bottom: 10px;
+      color: var(--font-color-8);
+      margin-bottom: 4px;
       max-width: 180px;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
+      font-weight: 400;
+      line-height: 22px;
     }
     .message-body {
-      background-color: #1883FF;
+      background-color: var(--user-chat-color);
       display: inline-block;
-      padding: 7px;
+      padding: 10px;
       font-weight: 400;
       font-size: 14px;
-      color: #FFFFFF;
+      color: var(--user-font-color);
+      border-radius: 8px;
     }
   }
   .message-bottom {
@@ -135,57 +153,51 @@ onUnmounted(() => {
   }
   .message-list {
     overflow-y: scroll;
-  .message-item {
-    margin-bottom: 20px;
-    word-break: break-all;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    &:last-of-type {
-      margin-bottom: 0;
-    }
-    &.is-me {
-      align-items: end;
+    .message-item {
+      margin-bottom: 20px;
+      word-break: break-all;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+      &.is-me {
+        align-items: end;
+        .message-body {
+          background-color: #4791ff;
+          min-width: 24px;
+          border-radius: 8px;
+          display: inline-block;
+          padding: 7px;
+          font-weight: 400;
+          font-size: 14px;
+          color: #ffffff;
+        }
+      }
+      .message-header {
+        margin-bottom: 10px;
+        max-width: 180px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 10px;
+        color: #ff7200;
+        line-height: 14px;
+      }
       .message-body {
-        background-color: #4791FF;
-        min-width: 24px;
-        border-radius: 8px;
+        background-color: var(--message-body-h5);
         display: inline-block;
         padding: 7px;
         font-weight: 400;
         font-size: 14px;
-        color: #FFFFFF;
+        color: #ffffff;
+        border-radius: 8px;
       }
     }
-    .message-header {
-      margin-bottom: 10px;
-      max-width: 180px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      font-family: 'PingFang SC';
-      font-style: normal;
-      font-weight: 500;
-      font-size: 10px;
-      color: #ff7200;
-      line-height: 14px;
-      margin-bottom: 10px;
-      max-width: 180px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-    .message-body {
-      background-color: var(--message-body-h5);
-      display: inline-block;
-      padding: 7px;
-      font-weight: 400;
-      font-size: 14px;
-      color: #FFFFFF;
-      border-radius: 8px;
-    }
   }
-}
 
   .message-bottom {
     width: 0;

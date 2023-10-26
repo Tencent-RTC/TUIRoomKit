@@ -12,25 +12,27 @@
   * 在 template 中使用 <device-select></device-select>
 -->
 <template>
-  <el-select
+  <tui-select
     v-model="localVideoQuality"
     placeholder="placeholder"
     class="select custom-element-class"
     :teleported="false"
     :popper-append-to-body="false"
   >
-    <el-option
+    <tui-option
       v-for="(item, index) in videoProfileList"
       :key="index"
       :label="item.label"
       :value="item.value"
     />
-  </el-select>
+  </tui-select>
 </template>
 
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 import { useI18n } from '../../locales';
+import TuiSelect from './base/Select.vue';
+import TuiOption from './base/Option.vue';
 
 import TUIRoomEngine, { TUIVideoQuality } from '@tencentcloud/tuiroom-engine-electron';
 import { useRoomStore } from '../../stores/room';
@@ -62,8 +64,7 @@ TUIRoomEngine.once('ready', () => {
 @import '../../assets/style/element-custom.scss';
 
 .select {
-  width: 280px;
-  height: 32px;
+  width: 100%;
   font-size: 14px;
 }
 </style>

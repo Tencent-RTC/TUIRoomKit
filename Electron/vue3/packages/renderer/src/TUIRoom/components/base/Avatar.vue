@@ -19,7 +19,7 @@ function showDefaultAvatar(e:any) {
 <style>
 .default-avatar {
   border-radius: 50%;
-  width: 48px;
-  height: 48px;
+  width: 100%;
+  height: 100%;
 }
 </style>
