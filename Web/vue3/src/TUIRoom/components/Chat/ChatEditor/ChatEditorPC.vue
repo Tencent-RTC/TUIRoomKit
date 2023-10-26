@@ -1,21 +1,14 @@
 <template>
-  <div
-    :class="['chat-editor', cannotSendMessage ? 'disable-editor': '']"
-  >
+  <div :class="['chat-editor', cannotSendMessage ? 'disable-editor' : '']">
+    <emoji class="chat-emoji" @choose-emoji="handleChooseEmoji"></emoji>
     <textarea
       ref="editorInputEle"
       v-model="sendMsg"
-      class="content-bottom-input"
       :disabled="cannotSendMessage"
+      :class="`${cannotSendMessage ? 'disabled-text' : ''} content-bottom-input`"
       :placeholder="cannotSendMessage ? t('Muted by the moderator') : t('Type a message')"
       @keyup.enter="sendMessage"
     />
-    <div v-if="!cannotSendMessage" class="chat-editor-toolbar">
-      <div class="left-section">
-        <emoji @choose-emoji="handleChooseEmoji"></emoji>
-      </div>
-      <div :class="['send-btn', `${sendMsg.length > 0 ? 'active' : ''}`]" @click="sendMessage">{{ t('Send') }}</div>
-    </div>
   </div>
 </template>
 
@@ -30,53 +23,63 @@ const {
   sendMessage,
   handleChooseEmoji,
 } = useChatEditor();
-
 </script>
 
 <style lang="scss" scoped>
 @import '../../../assets/style/var.scss';
 
-  .chat-editor {
-    height: 188px;
-    background: var(--chat-editor-bg-color);
+.tui-theme-white textarea {
+  --input-border-color: var(--background-color-10);
+  --chat-editor-color: var(--background-color-8);
+}
+.tui-theme-black textarea {
+  --input-border-color: rgba(213, 224, 242, 0.2);
+  --chat-editor-color: var(--background-color-2);
+}
+
+.chat-editor {
+  width: 100%;
+  height: 150px;
+  box-sizing: border-box;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--input-border-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  position: relative;
+  .chat-emoji {
+    display: flex;
+  }
+  .content-bottom-input {
+    height: 100%;
+    border: none;
+    background: var(--chat-editor-color);
+    color: var(--textarea-color);
     box-sizing: border-box;
-    textarea {
-      height: 138px;
-      color: var(--textarea-color);
-      width: 100%;
-      background: var(--chat-editor-bg-color);
-      border: none;
-      box-sizing: border-box;
-      padding: 12px 14px;
-      caret-color: var(--caret-color);
-      resize: none;
-      &:focus-visible {
-        outline: none;
-      }
+    caret-color: var(--caret-color);
+    resize: none;
+    padding: 0;
+    margin-top: 8px;
+    font-family: 'PingFang SC';
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+    &:focus-visible {
+      outline: none;
     }
-    .send-btn {
-      padding: 6px 18px;
-      background: var(--send-btn-color);
-      border-radius: 2px;
+    &::placeholder {
+      color: rgba(143, 154, 178, 0.7);
       font-size: 14px;
-      color: var(--send-btn);
-      &:hover {
-        cursor: pointer;
-        background: $primaryHighLightColor;
-        color: $whiteColor;
-      }
-      &.active {
-        background: $primaryHighLightColor;
-        color: $whiteColor;
-      }
+      font-weight: 400;
+      line-height: 22px;
     }
-    .chat-editor-toolbar {
-      height: 44px;
-      padding: 0 14px 12px;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
+    &::-webkit-scrollbar {
+      display: none;
     }
   }
+  .disable-text {
+    background-color: var(--background-color-9);
+  }
+}
 </style>

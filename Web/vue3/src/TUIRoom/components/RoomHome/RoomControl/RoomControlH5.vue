@@ -1,33 +1,21 @@
 <template>
   <div class="control-container">
     <div v-if="!showRoomDetail" class="container-header">
-      <div>
-        <div v-if="!isEN" class="container-icon">
-          <svg-icon
-            class="tencent-cloud" icon-name="tencent-cloud" size="custom"
-          ></svg-icon>
-          <svg-icon
-            class="tencent-cloud-text" icon-name="tencent-cloud-text" size="custom"
-          ></svg-icon>
-        </div>
-        <div v-else class="login-logo">
-          <img class="login-top" :src="logoEn">
-        </div>
-      </div>
+      <Logo class="container-icon" />
       <div class="container-bottom">
         <div v-tap="enterRoom" class="join-room">
-          <svg-icon class="enter-icon" icon-name="enter-room" size="custom"></svg-icon>
+          <svg-icon class="enter-icon" :icon="EnterRoomIcon" />
           <span class="title">{{ t('Join Room') }}</span>
         </div>
         <div v-tap="createRoom" class="create-room">
-          <svg-icon class="add-icon" icon-name="add-icon" size="custom"></svg-icon>
+          <svg-icon class="add-icon" :icon="CreateRoomIcon" />
           <span class="title">{{ t('New Room') }}</span>
         </div>
       </div>
     </div>
     <div v-if="showRoomDetail || hasGivenRoomId " class="room-detail">
       <div class="room-detail-header">
-        <svg-icon v-tap="handleClose" class="close-icon" icon-name="close-back" size="custom"></svg-icon>
+        <svg-icon v-tap="handleClose" class="close-icon" :icon="ArrowStrokeBackIcon"></svg-icon>
         <span v-if="isJoinRoom || hasGivenRoomId" class="room-detail-header-title">{{ t('Join Room') }}</span>
         <span v-else class="room-detail-header-title">{{ t('New Room') }}</span>
       </div>
@@ -47,7 +35,7 @@
             <div class="room-show-title">
               <span class="room-show-title">{{ roomType }}</span>
             </div>
-            <svg-icon class="chevron-down-icon" icon-name="chevron-down" size="custom"></svg-icon>
+            <svg-icon class="chevron-down-icon" :icon="ArrowStrokeSelectDownIcon"></svg-icon>
           </div>
           <div class="room-detail-info-box">
             <span class="room-detail-title">{{ t('Your Name') }}</span>
@@ -107,15 +95,18 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue';
-import SvgIcon from '../../common/SvgIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
 import { useRoomStore } from '../../../stores/room';
 import useRoomControl from './useRoomControlHooks';
 import vTap from '../../../directives/vTap';
+import CreateRoomIcon from '../../common/icons/CreateRoomIcon.vue';
+import EnterRoomIcon from '../../common/icons/EnterRoomIcon.vue';
+import ArrowStrokeBackIcon from '../../common/icons/ArrowStrokeBackIcon.vue';
+import ArrowStrokeSelectDownIcon from '../../common/icons/ArrowStrokeSelectDownIcon.vue';
+import Logo from '../../common/Logo.vue';
 
 const {
-  logoEn,
   t,
-  isEN,
 } = useRoomControl();
 
 const moreTypeRef = ref();
@@ -251,7 +242,10 @@ onUnmounted(() => {
 }
 
 .container-header{
-   padding-top: 80px;
+  padding-top: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .container-icon{
     display: flex;
@@ -468,17 +462,6 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
 }
-.tencent-cloud{
-    width: 120px;
-    height: 32px;
-    background-size: cover;
-}
-.tencent-cloud-text{
-    width: 169px;
-    height: 27px;
-    margin-top: 10px;
-    background-size: cover;
-}
 .room-choose-title{
     display: flex;
     align-items: center;
@@ -518,13 +501,5 @@ onUnmounted(() => {
     border: 0 solid rgba(0,0,0,0.85);
     box-shadow: 0 2px 4px 0 #D1D1D1;
   }
-}
-.login-logo{
-    display: flex;
-    justify-content: center;
-    padding-top: 20%;
-}
-.login-top{
-    width: 60vw;
 }
 </style>

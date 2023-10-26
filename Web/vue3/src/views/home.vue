@@ -1,18 +1,20 @@
 <template>
-  <div :class="[isMobile? 'home-container-H5' : 'home-container']">
-    <div :class="[isMobile ? 'header-H5' : 'header']">
-      <user-info
-        :user-id="userId"
-        :user-name="userName"
-        :avatar-url="avatarUrl"
-        @log-out="handleLogOut"
-      ></user-info>
-      <div class="container-icon">
+  <div class="home-container">
+    <div class="header">
+      <div class="left-header">
+        <switch-theme class="header-item"></switch-theme>
+      </div>
+      <div class="right-header">
         <language-icon class="header-item language"></language-icon>
-        <switch-theme class="header-item theme"></switch-theme>
+        <user-info
+          class="header-item user-info"
+          :user-id="userId"
+          :user-name="userName"
+          :avatar-url="avatarUrl"
+          @log-out="handleLogOut"
+        ></user-info>
       </div>
     </div>
-    <stream-preview v-if="!isMobile" ref="streamPreviewRef"></stream-preview>
     <room-control
       ref="roomControlRef"
       :given-room-id="givenRoomId"
@@ -27,22 +29,19 @@
 <script setup lang="ts">
 import UserInfo from '@TUIRoom/components/RoomHeader/UserInfo';
 import RoomControl from '@TUIRoom/components/RoomHome/RoomControl';
-import StreamPreview from '@TUIRoom/components/RoomHome/StreamPreview.vue';
-import LanguageIcon from '@/TUIRoom/components/base/Language.vue';
-import SwitchTheme from '@/TUIRoom/components/base/SwitchTheme.vue';
+import LanguageIcon from '@/TUIRoom/components/common/Language.vue';
+import SwitchTheme from '@/TUIRoom/components/common/SwitchTheme.vue';
 import { checkNumber } from '@/TUIRoom/utils/common';
 import router from '@/router';
 import { useRoute } from 'vue-router';
-import { onMounted, Ref, ref } from 'vue';
+import { Ref, ref } from 'vue';
 import { getBasicInfo } from '@/config/basic-info-config';
 import { useBasicStore } from '../TUIRoom/stores/basic';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
-import { isMobile }  from '../TUIRoom/utils/useMediaValue';
 import logger from '@/TUIRoom/utils/common/logger';
 
 const route = useRoute();
-const streamPreviewRef = ref();
 const userName: Ref<string> = ref('');
 const avatarUrl: Ref<string> = ref('');
 const userId: Ref<string> = ref('');
@@ -53,7 +52,7 @@ const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId 
 const givenRoomId: Ref<string> = ref((roomId) as string);
 
 function setTUIRoomData(action: string, mode?: string) {
-  const roomParam = isMobile ? roomControlRef.value.getRoomParam() : streamPreviewRef.value.getRoomParam();
+  const roomParam = roomControlRef.value.getRoomParam();
   const roomData = {
     action,
     roomMode: mode || 'FreeToSpeak',
@@ -167,14 +166,6 @@ async function handleInit() {
 
 handleInit();
 
-onMounted(() => {
-  TUIRoomEngine.once('ready', () => {
-    if (!isMobile) {
-      streamPreviewRef.value?.startStreamPreview();
-    }
-  });
-});
-
 </script>
 
 <style>
@@ -183,36 +174,24 @@ onMounted(() => {
 </style>
 
 <style lang="scss" scoped>
-.home-container-H5{
-  width: 100%;
-  height: 100%;
-  background: var(--background-color-style);
-  color: #B3B8C8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: PingFangSC-Medium;
-  transition: background .5s,color .5s;
 
-    .header-H5{
-      width: 100%;
-      position: absolute;
-      top: 0;
-      padding: 22px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-  }
+.tui-theme-black .home-container {
+  --background: var(--background-color-1);
 }
+.tui-theme-white .home-container {
+  --background: url(../TUIRoom/assets/imgs/background-white.png);
+}
+
 .home-container {
   width: 100%;
   height: 100%;
-  background: var(--background-color-style);
-  color: #B3B8C8;
+  background: var(--background);
+  background-size: cover;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: PingFangSC-Medium;
+  font-family: PingFang SC;
+  color: var(--font-color-1);
   .header {
     width: 100%;
     position: absolute;
@@ -220,21 +199,16 @@ onMounted(() => {
     padding: 22px 24px;
     display: flex;
     align-items: center;
-    .header-item {
-      &:not(:first-child) {
-        margin-left: 16px;
-      }
-      .language{
-        cursor: pointer;
-      }
-      .theme{
-        cursor: pointer;
+    justify-content: space-between;
+    .left-header, .right-header {
+      display: flex;
+      align-items: center;
+      .header-item {
+        &:not(:first-child) {
+          margin-left: 16px;
+        }
       }
     }
   }
 }
-  .container-icon{
-    display: flex;
-    align-items: center;
-  }
 </style>

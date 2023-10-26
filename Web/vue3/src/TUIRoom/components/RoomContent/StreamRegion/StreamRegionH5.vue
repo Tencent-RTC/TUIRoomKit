@@ -10,10 +10,12 @@
       v-if="!stream.hasVideoStream && !stream.hasScreenStream"
       class="center-user-info-container"
     >
-      <img class="avatar-region" :src="stream.avatarUrl || defaultAvatar">
+      <Avatar class="avatar-region" :img-src="stream.avatarUrl"></Avatar>
     </div>
     <div class="corner-user-info-container">
-      <svg-icon v-if="showMasterIcon" size="custom" class="master-icon" icon-name="user"></svg-icon>
+      <div v-if="showMasterIcon" class="master-icon">
+        <user-icon></user-icon>
+      </div>
       <audio-icon
         v-if="!isScreenStream"
         class="audio-icon"
@@ -30,12 +32,13 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, computed, onMounted } from 'vue';
+import Avatar from '../../common/Avatar.vue';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
-import defaultAvatar from '../../../assets/imgs/avatar.png';
 import { useBasicStore } from '../../../stores/basic';
 import logger from '../../../utils/common/logger';
-import AudioIcon from '../../base/AudioIcon.vue';
-import SvgIcon from '../../common/SvgIcon.vue';
+import UserIcon from '../../common/icons/UserIcon.vue';
+import AudioIcon from '../../common/AudioIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
 import { useI18n } from '../../../locales';
 import {
   TUIVideoStreamType,
@@ -289,9 +292,12 @@ onMounted(() => {
     }
     .master-icon {
       margin-left: 0;
-      width: 25px;
-      height: 25px;
-      background-size: cover;
+      width: 32px;
+      height: 32px;
+      background-color: var(--active-color-1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .screen-icon {
       transform: scale(0.8);

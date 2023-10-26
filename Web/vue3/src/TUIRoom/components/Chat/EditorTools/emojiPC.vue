@@ -1,7 +1,11 @@
 <template>
   <div class="emoji-tool">
-    <svg-icon class="arrow emoji-icon" icon-name="emoji-h5" size="medium" @click="togglePopover" />
-    <div v-if="visible" id="emoji-list" ref="emojiListRef" :class="isMobile? 'emoji-list-h5':'emoji-list'">
+    <svg-icon :icon="EmojiIcon" class="emoji-icon" @click.stop="handleEmojiToobar"></svg-icon>
+    <div
+      v-show="showEmojiToolbar"
+      v-click-outside="handleClickOutsideEmojiToobar"
+      :class="isMobile ? 'emoji-list-h5' : 'emoji-list'"
+    >
       <div
         v-for="(childrenItem, childrenIndex) in emojiList"
         :key="childrenIndex"
@@ -15,78 +19,81 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref } from 'vue';
 import { emojiUrl, emojiMap, emojiList } from '../util';
-import SvgIcon from '../../common/SvgIcon.vue';
-import { isMobile }  from '../../../utils/useMediaValue';
-const emojiListRef = ref();
+import { isMobile } from '../../../utils/useMediaValue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import EmojiIcon from '../../common/icons/EmojiIcon.vue';
+import vClickOutside from '../../../directives/vClickOutside';
 
-const visible = ref(false);
 const emit = defineEmits(['choose-emoji']);
+const showEmojiToolbar = ref(false);
 const chooseEmoji = (itemName: string) => {
   const emojiInfo = itemName;
-  closePopover();
   emit('choose-emoji', emojiInfo);
 };
-
-const togglePopover = () => {
-  visible.value = !visible.value;
+const handleEmojiToobar = () => {
+  showEmojiToolbar.value = !showEmojiToolbar.value;
 };
-
-const closePopover = () => {
-  visible.value = false;
-};
-
-function handleDocumentClick(event: MouseEvent) {
-  if (visible.value && !emojiListRef.value.contains(event.target)) {
-    visible.value = false;
+const handleClickOutsideEmojiToobar = () => {
+  if (showEmojiToolbar.value) {
+    showEmojiToolbar.value = false;
   }
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleDocumentClick, true);
-});
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleDocumentClick, true);
-});
+};
 </script>
 
 <style lang="scss" scoped>
-.emoji-icon {
-  cursor: pointer;
+.tui-theme-white .emoji-list {
+  --emoji-box-shadow:
+    0px 2px 4px -3px rgba(32, 77, 141, 0.03),
+    0px 6px 10px 1px rgba(32, 77, 141, 0.06),
+    0px 3px 14px 2px rgba(32, 77, 141, 0.05);
 }
-.emoji-list,.emoji-list-h5 {
-  width: 404px;
-  height: 214px;
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  overflow-y: auto;
-  position: absolute;
-  bottom: 50px;
-  background-color: var(--emoji-background-color);
-  padding: 12px;
-  border-radius: 4px;
-  border: 1px solid #2e323d;
-  &::-webkit-scrollbar {
-    display: none; /* Chrome Safari */
+.tui-theme-black .emoji-list {
+  --emoji-box-shadow:
+    0px 8px 40px 0px rgba(23, 25, 31, 0.6),
+    0px 4px 12px 0px rgba(23, 25, 31, 0.8);
+}
+
+.emoji-tool {
+  .emoji-icon {
+    cursor: pointer;
   }
-  .emoji-item {
-    padding: 2px;
-    &:hover {
-      cursor: pointer;
+  .emoji-list,
+  .emoji-list-h5 {
+    height: 204px;
+    width: 100%;
+    position: absolute;
+    bottom: 160px;
+    left: 0px;
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    background-color: var(--background-color-8);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: var(--emoji-box-shadow);
+    gap: 5px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    .emoji-item {
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    img {
+      width: 23px;
+      height: 23px;
     }
   }
-  img {
-    width: 30px;
+  .emoji-list-h5 {
+    width: 298px;
+    height: 148px;
+    position: fixed;
+    bottom: 77px;
+    left: 30px;
   }
-}
-.emoji-list-h5 {
-  width: 298px;
-  height: 148px;
-  position: fixed;
-  bottom: 77px;
-  left: 30px;
 }
 </style>

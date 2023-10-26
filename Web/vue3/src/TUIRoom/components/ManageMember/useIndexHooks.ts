@@ -1,10 +1,12 @@
 import { storeToRefs } from 'pinia';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
-import { useRoomStore } from '../../stores/room';
+import { UserInfo, useRoomStore } from '../../stores/room';
 import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
 import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-js';
 import { Ref, computed, nextTick, ref } from 'vue';
+import { ElMessage } from '../../elementComp';
+import { MESSAGE_DURATION } from '../../constants/message';
 
 export default function useIndex() {
   const roomEngine = useGetRoomEngine();
@@ -13,11 +15,25 @@ export default function useIndex() {
 
   const basicStore = useBasicStore();
   const roomStore = useRoomStore();
-
   const {
     isMicrophoneDisableForAllUser,
     isCameraDisableForAllUser,
+    userList,
   } = storeToRefs(roomStore);
+
+  const searchText = ref('');
+  const showUserList = computed(() => {
+    if (searchText.value === '') {
+      return userList.value;
+    }
+    return userList.value.filter((item: UserInfo) => item.userName?.includes(searchText.value)
+      || item.userId.includes(searchText.value));
+  });
+
+  function handleInvite() {
+    basicStore.setSidebarName('invite');
+  }
+
   const audioManageInfo = computed(() => (roomStore.isMicrophoneDisableForAllUser ? t('Lift all mute') : t('All mute')));
   const videoManageInfo = computed(() => (roomStore.isCameraDisableForAllUser ? t('Lift stop all video') : t('All stop video')));
 
@@ -74,26 +90,41 @@ export default function useIndex() {
   }
 
   async function toggleAllAudio() {
-    const microphoneDisableState = !isMicrophoneDisableForAllUser.value;
+    const isMicrophoneDisable = !isMicrophoneDisableForAllUser.value;
     await roomEngine.instance?.disableDeviceForAllUserByAdmin({
-      isDisable: microphoneDisableState,
+      isDisable: isMicrophoneDisable,
       device: TUIMediaDevice.kMicrophone,
     });
-    roomStore.setMicrophoneDisableState(microphoneDisableState);
+    const tipMessage = isMicrophoneDisable ? t('The host has muted all') : t('The host has unmuted all');
+    ElMessage({
+      type: 'success',
+      message: tipMessage,
+      duration: MESSAGE_DURATION.NORMAL,
+    });
+    roomStore.setMicrophoneDisableState(isMicrophoneDisable);
   }
 
   async function toggleAllVideo() {
-    const cameraDisableState = !isCameraDisableForAllUser.value;
+    const isCameraDisable = !isCameraDisableForAllUser.value;
     await roomEngine.instance?.disableDeviceForAllUserByAdmin({
-      isDisable: cameraDisableState,
+      isDisable: isCameraDisable,
       device: TUIMediaDevice.kCamera,
     });
-    roomStore.setCameraDisableState(cameraDisableState);
+    const tipMessage = isCameraDisable ? t('The host has turned on the ban on all paintings') : t('The host has lifted the ban on all paintings');
+    ElMessage({
+      type: 'success',
+      message: tipMessage,
+      duration: MESSAGE_DURATION.NORMAL,
+    });
+    roomStore.setCameraDisableState(isCameraDisable);
   }
   return {
     showApplyUserLit,
     toggleAllAudio,
     toggleAllVideo,
+    searchText,
+    showUserList,
+    handleInvite,
     t,
     toggleManageMember,
     doToggleManageMember,

@@ -5,20 +5,40 @@
       <video-control class="left-container-item" @click="handleControlClick('videoControl')"></video-control>
     </div>
     <div class="center-container">
-      <screen-share-control @click="handleControlClick('screenShareControl')"></screen-share-control>
-      <full-screen-control @click="handleControlClick('fullScreenControl')"></full-screen-control>
+      <screen-share-control
+        class="center-container-item"
+        @click="handleControlClick('screenShareControl')"
+      ></screen-share-control>
+      <full-screen-control
+        class="center-container-item"
+        @click="handleControlClick('fullScreenControl')"
+      ></full-screen-control>
       <manage-member-control
         v-if="roomStore.isMaster"
+        class="center-container-item"
         @click="handleControlClick('manageMemberControl')"
       ></manage-member-control>
-      <invite-control @click="handleControlClick('inviteControl')"></invite-control>
-      <chat-control @click="handleControlClick('chatControl')"></chat-control>
+      <invite-control
+        class="center-container-item"
+        @click="handleControlClick('inviteControl')"
+      ></invite-control>
+      <chat-control
+        class="center-container-item"
+        @click="handleControlClick('chatControl')"
+      ></chat-control>
       <apply-control
         v-if="roomStore.isSpeakAfterTakingSeatMode"
+        class="center-container-item"
         @click="handleControlClick('applyControl')"
       ></apply-control>
-      <more-control @click="handleControlClick('moreControl')"></more-control>
-      <setting-control @click="handleControlClick('settingControl')"></setting-control>
+      <more-control
+        class="center-container-item"
+        @click="handleControlClick('moreControl')"
+      ></more-control>
+      <setting-control
+        class="center-container-item"
+        @click="handleControlClick('settingControl')"
+      ></setting-control>
     </div>
     <div class="right-container">
       <end-control
@@ -92,6 +112,9 @@ function handleControlClick(name: string) {
     align-items: center;
     position: relative;
     margin: 0 auto;
+    .center-container-item:not(:first-child) {
+      margin-left: 16px;
+    }
   }
   .right-container {
     height: 100%;

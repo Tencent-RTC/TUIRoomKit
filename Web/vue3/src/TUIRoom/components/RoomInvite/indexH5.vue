@@ -2,10 +2,10 @@
   <div class="invite-container-main">
     <div class="invite-title-main">
       <p>{{ t('Invite') }}</p>
-      <span v-if="isWeChat" v-tap="handleCloseInvite" class="cancel">{{ t('Cancel') }}</span>
+      <span v-tap="handleCloseInvite" class="cancel">{{ t('Cancel') }}</span>
     </div>
     <div v-for="item in visibleInviteContentList" :key="item.id" class="invite-content-main">
-      <span class="invite-title">{{ t(item.title) }}</span>
+      <span class="invite-title">{{ t(item.mobileTitle) }}</span>
       <span class="invite-content">{{ item.content }}</span>
       <svg-icon v-tap="() => onCopy(item.copyLink)" icon-name="copy-icon" class="copy" size="custom"></svg-icon>
     </div>
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import SvgIcon from '../common/SvgIcon.vue';
+import SvgIcon from '../common/base/SvgIcon.vue';
 import useRoomInviteControl from './useRoomInviteHooks';
 import { isWeChat } from '../../utils/useMediaValue';
 import vTap from '../../directives/vTap';

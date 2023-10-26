@@ -2,10 +2,10 @@
   <div>
     <div class="more-control-container">
       <icon-button
+        v-tap="showMore"
         :is-active="sidebarName === 'more'"
         :title="t('More')"
-        :icon-name="ICON_NAME.More"
-        @click-icon="showMore"
+        :icon="ExtensionIcon"
       />
     </div>
     <div v-if="showMoreContent" ref="moreContentRef" class="show-more-content">
@@ -17,24 +17,23 @@
         <contact-control @click="handleControlClick('contactControl')"></contact-control>
         <invite-control @click="handleControlClick('inviteControl')"></invite-control>
       </div>
-      <div class="close" @click="showMoreContent=false">
-        <i>{{ t('Cancel') }}</i>
-      </div>
+      <Button v-tap="handleCancelControl" class="close">{{ t('Cancel') }}</Button>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import IconButton from '../../common/IconButton.vue';
+import IconButton from '../../common/base/IconButton.vue';
+import Button from '../../common/base/Button.vue';
 import userMoreControl from './useMoreControlHooks';
 import ChatControl from '../ChatControl.vue';
 import InviteControl from '../InviteControl.vue';
 import ContactControl from '../ContactControl.vue';
 import { useRoomStore } from '../../../stores/room';
 import { ref, onMounted, onUnmounted } from 'vue';
+import ExtensionIcon from '../../common/icons/ExtensionIcon.vue';
 import bus from '../../../hooks/useMitt';
 import TUIRoomAegis from '../../../utils/aegis';
-import { ICON_NAME } from '../../../constants/icon';
-
+import vTap from '../../../directives/vTap';
 
 const showMoreContent = ref(false);
 const moreContentRef = ref();
@@ -47,6 +46,10 @@ const roomStore = useRoomStore();
 
 function showMore() {
   showMoreContent.value = true;
+}
+
+function handleCancelControl() {
+  showMoreContent.value = false;
 }
 function handleControlClick(name: string) {
   TUIRoomAegis.reportEvent({ name, ext1: name });
@@ -73,7 +76,7 @@ onUnmounted(() => {
     left: 5%;
     bottom: 15px;
     width: 90%;
-    height: 20vh;
+    height: 17vh;
     background: var(--log-out-cancel);
     border-radius: 13px;
     padding: 10px;
@@ -91,20 +94,21 @@ onUnmounted(() => {
 .control-compent{
     display: flex;
 }
-.close{
+.close {
+    position: relative;
     background: var(--close-cancel-h5);
     border-radius: 8px;
+    border: 1px solid var(--close-cancel-h5);
     display: flex;
+    width: 100%;
     align-items: center;
     justify-content: center;
     padding: 10px;
     color: var(--mute-button-color-h5);
-    i{
-     font-family: 'PingFang SC';
-     font-style: normal;
-     font-weight: 400;
-     line-height: 24px;
-     text-align: center;
-    }
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    text-align: center;
+    top: 10%;
 }
 </style>

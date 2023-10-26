@@ -32,22 +32,15 @@
     </div>
     <Dialog
       :model-value="showManageAllUserDialog"
-      class="custom-element-class"
-      :modal="false"
-      :show-close="false"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      width="500px"
     >
       <span>
         {{ dialogTitleInfo }}
       </span>
-      <template #footer>
-        <div class="button-container-mobile">
-          <span class="cancel" @click="showManageAllUserDialog = false">{{ t('Cancel') }}</span>
-          <span class="agree" @click="doToggleManageMember">{{ dialogActionInfo }}</span>
-        </div>
+      <template #cancel>
+        <Button class="cancel" @click="showManageAllUserDialog = false">{{ t('Cancel') }}</Button>
+      </template>
+      <template #agree>
+        <Button class="agree" @click="doToggleManageMember">{{ dialogActionInfo }}</Button>
       </template>
     </Dialog>
   </div>
@@ -55,10 +48,11 @@
 
 <script setup lang='ts'>
 import MemberItem from '../ManageMember/MemberItem';
-import Dialog from '../../elementComp/Dialog';
+import Dialog from '../common/base/Dialog';
 import useIndex from './useIndexHooks';
 import { storeToRefs } from 'pinia';
 import { useRoomStore } from '../../stores/room';
+import Button from '../common/base/Button.vue';
 const roomStore = useRoomStore();
 const {
   userList,
@@ -256,17 +250,21 @@ const {
     }
   }
 }
-.button-container-mobile{
-  width: 100%;
-  display: flex;
   .agree{
     padding: 14px;
     width: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid rgba(242, 242, 242, 1);
-    color:rgba(0, 110, 255, 1);
+    border: 1px solid transparent;
+    color: var(--active-color-1);
+    font-size: 16px;
+    font-weight: 500;
+    background-color: #fff;
+      &:hover {
+      background: none;
+      border: none;
+    }
   }
   .cancel{
     padding: 14px;
@@ -274,9 +272,14 @@ const {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid rgba(242, 242, 242, 1);
-    color: rgba(43, 46, 56, 1);
-    border-right: 1px solid rgba(242, 242, 242, 1);
+    border: 1px solid transparent;
+    background-color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--font-color-4);
+    &:hover {
+      background: none;
+      border: none;
+    }
   }
-}
 </style>
