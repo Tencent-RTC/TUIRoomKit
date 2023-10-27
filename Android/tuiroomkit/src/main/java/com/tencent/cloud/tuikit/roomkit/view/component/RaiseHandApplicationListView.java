@@ -29,8 +29,13 @@ public class RaiseHandApplicationListView extends BaseBottomDialog implements Vi
     public RaiseHandApplicationListView(Context context) {
         super(context);
         mContext = context;
-        mAdapter = new RaiseHandApplicationListAdapter(mContext);
         mViewModel = new RaiseHandApplicationListViewModel(this);
+    }
+
+    @Override
+    public void cancel() {
+        super.cancel();
+        mViewModel.destroy();
     }
 
     @Override
@@ -82,7 +87,7 @@ public class RaiseHandApplicationListView extends BaseBottomDialog implements Vi
         });
 
         mRecyclerApplyList.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
-
+        mAdapter = new RaiseHandApplicationListAdapter(mContext);
         mAdapter.setDataList(mViewModel.getApplyList());
         mRecyclerApplyList.setAdapter(mAdapter);
         mRecyclerApplyList.setHasFixedSize(true);
@@ -102,10 +107,6 @@ public class RaiseHandApplicationListView extends BaseBottomDialog implements Vi
         mAdapter.notifyItemRemoved(position);
     }
 
-    public void notifyDataSetChanged() {
-        mAdapter.notifyDataSetChanged();
-    }
-
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.toolbar) {
@@ -115,12 +116,6 @@ public class RaiseHandApplicationListView extends BaseBottomDialog implements Vi
         } else if (v.getId() == R.id.tv_invite_member_to_stage) {
             dismiss();
             mViewModel.inviteMemberOnstage();
-        }
-    }
-
-    public void destroy() {
-        if (mViewModel != null) {
-            mViewModel.destroy();
         }
     }
 }

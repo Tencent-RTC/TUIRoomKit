@@ -1,8 +1,12 @@
 package com.tencent.cloud.tuikit.roomkit.view.service;
 
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
+
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.IBinder;
@@ -29,18 +33,15 @@ public class RoomFloatViewService extends Service {
 
     private static Context mAppContext = TUILogin.getAppContext();
 
+    private OrientationReceiver mOrientationReceiver;
+
     private RoomVideoFloatView         mVideoFloatView;
     private WindowManager              mWindowManager;
     private WindowManager.LayoutParams mWindowLayoutParams;
     private WindowManager.LayoutParams mOldParams;
 
-    private int mFloatViewWidth  =
-            mAppContext.getResources().getDimensionPixelSize(R.dimen.tuiroomkit_room_video_float_view_width);
-    private int mFloatViewHeight =
-            mAppContext.getResources().getDimensionPixelSize(R.dimen.tuiroomkit_room_video_float_view_height);
-    private int mMaxPositionX    = ScreenUtil.getScreenWidth(mAppContext) - mFloatViewWidth - VIEW_MARGIN_EDGE_PX;
-    private int mMaxPositionY    = ScreenUtil.getScreenHeight(mAppContext) - mFloatViewHeight - VIEW_MARGIN_EDGE_PX;
-
+    private int   mMaxPositionX;
+    private int   mMaxPositionY;
     private float mTouchDownPointX;
     private float mTouchDownPointY;
     private float mCurPointX;
@@ -52,7 +53,9 @@ public class RoomFloatViewService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate");
+        initData();
         initWindow();
+        registerReceiver();
     }
 
     @Nullable
@@ -74,8 +77,13 @@ public class RoomFloatViewService extends Service {
         if (mVideoFloatView != null) {
             mWindowManager.removeView(mVideoFloatView);
         }
+        unregisterReceiver();
     }
 
+    private void initData() {
+        mMaxPositionX = getMaxPositionX();
+        mMaxPositionY = getMaxPositionY();
+    }
 
     private void initWindow() {
         mWindowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
@@ -180,5 +188,47 @@ public class RoomFloatViewService extends Service {
                 mWindowLayoutParams.y < VIEW_MARGIN_EDGE_PX ? VIEW_MARGIN_EDGE_PX : mWindowLayoutParams.y;
         mWindowLayoutParams.y = mWindowLayoutParams.y > mMaxPositionY ? mMaxPositionY : mWindowLayoutParams.y;
         mWindowManager.updateViewLayout(mVideoFloatView, mWindowLayoutParams);
+    }
+
+    private int getMaxPositionX() {
+        int floatViewWidth =
+                mAppContext.getResources().getDimensionPixelSize(R.dimen.tuiroomkit_room_video_float_view_width);
+        int maxPositionX = ScreenUtil.getScreenWidth(mAppContext) - floatViewWidth - VIEW_MARGIN_EDGE_PX;
+        return maxPositionX;
+
+    }
+
+    private int getMaxPositionY() {
+        int floatViewHeight =
+                mAppContext.getResources().getDimensionPixelSize(R.dimen.tuiroomkit_room_video_float_view_height);
+        int maxPositionY = ScreenUtil.getScreenHeight(mAppContext) - floatViewHeight - VIEW_MARGIN_EDGE_PX;
+        return maxPositionY;
+    }
+
+    private void registerReceiver() {
+        mOrientationReceiver = new OrientationReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
+        registerReceiver(mOrientationReceiver, filter);
+    }
+
+    private void unregisterReceiver() {
+        if (mOrientationReceiver != null) {
+            unregisterReceiver(mOrientationReceiver);
+            mOrientationReceiver = null;
+        }
+    }
+
+    private class OrientationReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_CONFIGURATION_CHANGED)) {
+                initData();
+                getViewParams();
+                updateLayout();
+                RoomEngineManager.sharedInstance().setCameraResolutionMode(
+                        mAppContext.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT);
+            }
+        }
     }
 }

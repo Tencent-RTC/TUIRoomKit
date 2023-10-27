@@ -1,8 +1,11 @@
 package com.tencent.cloud.tuikit.roomkit.view.component;
 
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -12,12 +15,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 
-public class MemberInviteView extends BaseBottomDialog {
+import java.util.Map;
+
+public class MemberInviteView extends BaseBottomDialog implements RoomEventCenter.RoomKitUIEventResponder {
     private static final String URL_ROOM_KIT_WEB = "https://web.sdk.qcloud.com/component/tuiroom/index.html";
     private static final String LABEL            = "Label";
 
@@ -31,6 +38,13 @@ public class MemberInviteView extends BaseBottomDialog {
 
     public MemberInviteView(@NonNull Context context) {
         super(context);
+        RoomEventCenter.getInstance().subscribeUIEvent(CONFIGURATION_CHANGE, this);
+    }
+
+    @Override
+    public void cancel() {
+        super.cancel();
+        RoomEventCenter.getInstance().unsubscribeUIEvent(CONFIGURATION_CHANGE, this);
     }
 
     @Override
@@ -92,5 +106,16 @@ public class MemberInviteView extends BaseBottomDialog {
         ClipData mClipData = ClipData.newPlainText(LABEL, content);
         cm.setPrimaryClip(mClipData);
         ToastUtil.toastShortMessageCenter(msg);
+    }
+
+    @Override
+    public void onNotifyUIEvent(String key, Map<String, Object> params) {
+        if (TextUtils.equals(key, CONFIGURATION_CHANGE)) {
+            if (params == null || !isShowing()) {
+                return;
+            }
+            Configuration configuration = (Configuration) params.get(RoomEventConstant.KEY_CONFIGURATION);
+            changeConfiguration(configuration);
+        }
     }
 }

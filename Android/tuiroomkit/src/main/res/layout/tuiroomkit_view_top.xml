@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="53dp"
     android:background="@color/tuiroomkit_bg_main_color_black"
+    android:foreground="@drawable/tuiroomkit_bg_top_view"
     android:paddingTop="5dp">
 
     <RelativeLayout

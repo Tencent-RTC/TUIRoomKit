@@ -1,7 +1,9 @@
 package com.tencent.cloud.tuikit.roomkit.viewmodel;
 
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomConstant.USER_NOT_FOUND;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_SCREEN_STATE_CHANGED;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.BAR_SHOW_TIME_RECOUNT;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant.KEY_USER_POSITION;
 
 import android.content.Context;
@@ -60,6 +62,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_EXIT_ROOM_VIEW, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.OWNER_EXIT_ROOM_ACTION, this);
         eventCenter.subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_INVITE_VIEW, this);
+        eventCenter.subscribeUIEvent(BAR_SHOW_TIME_RECOUNT, this);
 
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.ROOM_DISMISSED, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.KICKED_OUT_OF_ROOM, this);
@@ -88,6 +91,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_EXIT_ROOM_VIEW, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.OWNER_EXIT_ROOM_ACTION, this);
         eventCenter.unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_INVITE_VIEW, this);
+        eventCenter.unsubscribeUIEvent(BAR_SHOW_TIME_RECOUNT, this);
 
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.ROOM_DISMISSED, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.KICKED_OUT_OF_ROOM, this);
@@ -109,6 +113,10 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
 
     public void responseRequest(TUIRoomDefine.RequestAction requestAction, String requestId, boolean agree) {
         RoomEngineManager.sharedInstance().responseRemoteRequest(requestAction, requestId, agree, null);
+    }
+
+    public void setCameraResolutionMode(Configuration configuration) {
+        RoomEngineManager.sharedInstance().setCameraResolutionMode(configuration.orientation == ORIENTATION_PORTRAIT);
     }
 
     public UserModel getUserModel() {
@@ -158,6 +166,9 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
                 break;
             case RoomEventCenter.RoomKitUIEvent.SHOW_INVITE_VIEW:
                 mRoomMainView.showMemberInviteList();
+                break;
+            case BAR_SHOW_TIME_RECOUNT:
+                mRoomMainView.recountBarShowTime();
                 break;
             default:
                 break;

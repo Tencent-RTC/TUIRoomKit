@@ -19,7 +19,6 @@ import com.tencent.cloud.tuikit.roomkit.model.entity.BottomItemData;
 import com.tencent.cloud.tuikit.roomkit.model.entity.BottomSelectItemData;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.BottomViewModel;
-import com.tencent.qcloud.tuikit.timcommon.util.ScreenUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,17 +61,10 @@ public class BottomView extends LinearLayout {
         mViewModel.initExtensionItemData();
     }
 
-    private int getExtensionParentWidth() {
-        int screenWidth = ScreenUtil.getScreenWidth(mContext);
-        int density = ScreenUtil.getPxByDp(16);
-        int screenWidthMinus16dp = screenWidth - density;
-        return screenWidthMinus16dp;
-    }
-
     private void updateItemsPosition() {
-        int seatCount = mType == EXTENSIONVIEW ? TALK_SEAT_MODE : TALK_FREEDOM;
+        int seatCount = TALK_FREEDOM;
         int childCount = getChildCount();
-        int parentWidth = ((ViewGroup) getParent()).getWidth();
+        int parentWidth = (int) mContext.getResources().getDimension(R.dimen.tuiroomkit_bottom_main_view_width);
         int totalChildWidth = 0;
         for (int i = 0; i < childCount; i++) {
             int childWidth = mDataList.get(i).getWidth() == 0 ? getResources()
@@ -102,12 +94,7 @@ public class BottomView extends LinearLayout {
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        post(new Runnable() {
-            @Override
-            public void run() {
-                updateItemsPosition();
-            }
-        });
+        updateItemsPosition();
     }
 
     @Override
@@ -148,12 +135,7 @@ public class BottomView extends LinearLayout {
             ((ViewGroup) layout).removeView(button);
             ((ViewGroup) layout).addView(itemData.getView(), params);
             addView(layout);
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    updateItemsPosition();
-                }
-            });
+            updateItemsPosition();
             return;
         }
         button.setScaleType(ImageView.ScaleType.FIT_XY);
@@ -183,12 +165,7 @@ public class BottomView extends LinearLayout {
         addView(layout, index);
         mButtonMap.put(itemData.getType(), button);
         mTextViewMap.put(itemData.getType(), textItemName);
-        post(new Runnable() {
-            @Override
-            public void run() {
-                updateItemsPosition();
-            }
-        });
+        updateItemsPosition();
     }
 
     public void replaceItem(BottomItemData.Type type, BottomItemData itemData) {

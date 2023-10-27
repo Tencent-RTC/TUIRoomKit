@@ -34,15 +34,13 @@
 
             <RelativeLayout
                 android:id="@+id/bottom_main_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_width="@dimen/tuiroomkit_bottom_main_view_width"
+                android:layout_height="wrap_content" />
 
             <RelativeLayout
                 android:id="@+id/ll_item_expand"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
                 android:orientation="vertical">
 
                 <LinearLayout

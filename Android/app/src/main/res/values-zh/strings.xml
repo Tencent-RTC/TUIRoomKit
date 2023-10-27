@@ -48,4 +48,8 @@
     <string name="tuiroomkit_enter_room">加入房间</string>
     <string name="tuiroomkit_create_room">新建房间</string>
     <string name="tuiroomkit_enter_live_room">加入直播房间</string>
+
+    <string name="app_turn_on_audio">打开音频</string>
+    <string name="app_turn_on_speaker">打开扬声器</string>
+    <string name="app_turn_on_video">打开视频</string>
 </resources>

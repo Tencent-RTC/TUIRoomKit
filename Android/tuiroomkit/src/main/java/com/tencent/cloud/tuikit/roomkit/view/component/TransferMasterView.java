@@ -32,6 +32,13 @@ public class TransferMasterView extends BaseBottomDialog implements View.OnClick
     public TransferMasterView(Context context) {
         super(context);
         mContext = context;
+        mViewModel = new TransferMasterViewModel(this);
+    }
+
+    @Override
+    public void cancel() {
+        super.cancel();
+        mViewModel.destroy();
     }
 
     @Override
@@ -83,19 +90,12 @@ public class TransferMasterView extends BaseBottomDialog implements View.OnClick
                 return false;
             }
         });
-        mViewModel = new TransferMasterViewModel(this);
     }
 
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         updateHeightToMatchParent();
-    }
-
-    public void destroy() {
-        if (mViewModel != null) {
-            mViewModel.destroy();
-        }
     }
 
     public void onNotifyUserEnter(int position) {

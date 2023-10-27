@@ -1,9 +1,10 @@
 package com.tencent.cloud.tuikit.roomkit.view.component;
 
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.BAR_SHOW_TIME_RECOUNT;
+
 import android.content.Context;
 import android.view.View;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -88,6 +89,10 @@ public class TopView extends FrameLayout implements View.OnClickListener {
         }
     }
 
+    public void setSwitchCameraViewVisible(boolean isVisible) {
+        mImageSwitchCamera.setVisibility(isVisible ? VISIBLE : INVISIBLE);
+    }
+
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.img_headset) {
@@ -101,5 +106,6 @@ public class TopView extends FrameLayout implements View.OnClickListener {
         } else if (v.getId() == R.id.btn_exit_room) {
             RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_EXIT_ROOM_VIEW, null);
         }
+        RoomEventCenter.getInstance().notifyUIEvent(BAR_SHOW_TIME_RECOUNT, null);
     }
 }

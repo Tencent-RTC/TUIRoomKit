@@ -94,7 +94,7 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
 
     private void onMuteUserAudio(String userId) {
         if (TextUtils.equals(userId, TUILogin.getUserId())) {
-            RoomEngineManager.sharedInstance().closeLocalMicrophone();
+            RoomEngineManager.sharedInstance().disableLocalAudio();
             return;
         }
         if (!isOwner()) {
@@ -105,7 +105,7 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
 
     private void onUnMuteUserAudio(String userId) {
         if (TextUtils.equals(userId, TUILogin.getUserId())) {
-            RoomEngineManager.sharedInstance().openLocalMicrophone(null);
+            RoomEngineManager.sharedInstance().enableLocalAudio();
             return;
         }
         if (!isOwner()) {

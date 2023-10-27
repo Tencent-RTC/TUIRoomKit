@@ -45,4 +45,8 @@
     <string name="tuiroomkit_enter_room">Join</string>
     <string name="tuiroomkit_create_room">Create Room</string>
     <string name="tuiroomkit_enter_live_room">Join LiveRoom</string>
+
+    <string name="app_turn_on_audio">Turn on audio</string>
+    <string name="app_turn_on_speaker">Turn on speaker</string>
+    <string name="app_turn_on_video">Turn on video</string>
 </resources>
