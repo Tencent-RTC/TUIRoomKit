@@ -23,18 +23,18 @@ enum PopUpViewType {
     case exitRoomViewType
 }
 
-protocol PopUpViewResponder: AnyObject {
+protocol PopUpViewModelResponder: AnyObject {
     func searchControllerChangeActive(isActive: Bool)
     func updateViewOrientation(isLandscape: Bool)
 }
 
 class PopUpViewModel {
     let viewType: PopUpViewType
-    let height: CGFloat?
+    let height: CGFloat
     var backgroundColor: UIColor?
-    weak var viewResponder: PopUpViewResponder?
+    weak var viewResponder: PopUpViewModelResponder?
     
-    init(viewType: PopUpViewType, height: CGFloat?) {
+    init(viewType: PopUpViewType, height: CGFloat) {
         self.viewType = viewType
         self.height = height
     }
@@ -46,10 +46,6 @@ class PopUpViewModel {
     
     func searchControllerActiveChange() {
         viewResponder?.searchControllerChangeActive(isActive: false)
-    }
-    
-    func updateOrientation(isLandscape: Bool) {
-        viewResponder?.updateViewOrientation(isLandscape: isLandscape)
     }
     
     deinit {

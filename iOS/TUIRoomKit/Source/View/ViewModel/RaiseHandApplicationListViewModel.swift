@@ -43,7 +43,7 @@ class RaiseHandApplicationListViewModel: NSObject {
     
     func inviteMemberAction(sender: UIButton, view: RaiseHandApplicationListView) {
         RoomRouter.shared.dismissPopupViewController(viewType: .raiseHandApplicationListViewType)
-        RoomRouter.shared.presentPopUpViewController(viewType: .userListViewType, height: nil)
+        RoomRouter.shared.presentPopUpViewController(viewType: .userListViewType, height: 720.scale375Height())
     }
     
     func agreeStageAction(sender: UIButton, isAgree: Bool, userId: String) {
@@ -80,7 +80,7 @@ extension RaiseHandApplicationListViewModel: RoomKitUIEventResponder {
     }
 }
 
-extension RaiseHandApplicationListViewModel: PopUpViewResponder {
+extension RaiseHandApplicationListViewModel: PopUpViewModelResponder {
     func updateViewOrientation(isLandscape: Bool) {
         viewResponder?.searchControllerChangeActive(isActive: false)
         inviteSeatList = engineManager.store.inviteSeatList

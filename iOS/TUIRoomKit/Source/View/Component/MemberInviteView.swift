@@ -14,18 +14,6 @@ class MemberInviteView: UIView {
     private var isViewReady: Bool = false
     var viewArray: [UIView] = []
     
-    let dropView : UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(0x1B1E26)
-        return view
-    }()
-    
-    let dropImageView: UIImageView = {
-        let view = UIImageView()
-        view.image = UIImage(named: "room_lineImage",in:tuiRoomKitBundle(),compatibleWith: nil)
-        return view
-    }()
-    
     let headView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(0x1B1E26)
@@ -75,26 +63,12 @@ class MemberInviteView: UIView {
     }
     
     func constructViewHierarchy() {
-        addSubview(dropView)
         addSubview(stackView)
         addSubview(headView)
-        dropView.addSubview(dropImageView)
         headView.addSubview(titleLabel)
     }
     
     func activateConstraints() {
-        dropView.snp.makeConstraints{ make in
-            make.top.equalToSuperview()
-            make.height.equalTo(15.scale375())
-            make.leading.equalToSuperview()
-            make.width.equalToSuperview()
-        }
-        dropImageView.snp.makeConstraints{ make in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(12.scale375())
-            make.width.equalTo(24.scale375())
-            make.height.equalTo(3.scale375())
-        }
         headView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(35.scale375())
             make.leading.equalToSuperview().offset(16.scale375())
@@ -127,14 +101,7 @@ class MemberInviteView: UIView {
     
     func bindInteraction() {
         backgroundColor = UIColor(0x1B1E26)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dropDownRoomInfoAction(sender:)))
-        dropView.addGestureRecognizer(tap)
-        dropView.isUserInteractionEnabled = true
         viewModel.viewResponder = self
-    }
-    
-    @objc func dropDownRoomInfoAction(sender: UIView) {
-        viewModel.dropDownAction(sender: sender)
     }
     
     deinit {

@@ -42,13 +42,20 @@ class MemberInviteViewModel {
         item.titleText = titleText
         item.messageText = messageText
         item.hasRightButton = true
-        item.normalIcon = "room_copy"
-        item.normalText = .copyText
-        item.resourceBundle = tuiRoomKitBundle()
-        item.action = { [weak self] sender in
+        let buttonData = ButtonItemData()
+        buttonData.normalIcon = "room_copy"
+        buttonData.normalTitle = .copyText
+        buttonData.cornerRadius = 4
+        buttonData.titleFont = UIFont(name: "PingFangSC-Regular", size: 12)
+        buttonData.titleColor = UIColor(0xB2BBD1)
+        buttonData.backgroundColor = UIColor(0x6B758A).withAlphaComponent(0.7)
+        buttonData.resourceBundle = tuiRoomKitBundle()
+        buttonData.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.copyAction(sender: button, text: item.messageText,copyType: copyType)
+            
         }
+        item.buttonData = buttonData
         return item
     }
     
@@ -60,10 +67,6 @@ class MemberInviteViewModel {
             let roomLinkItem = createListCellItemData(titleText: .roomLinkText, messageText: roomLink, hasButton: true, copyType: .copyRoomLinkType)
             messageItems.append(roomLinkItem)
         }
-    }
-    
-    func dropDownAction(sender: UIView) {
-        RoomRouter.shared.dismissPopupViewController(viewType: .inviteViewType, animated: true)
     }
     
     func copyAction(sender: UIButton, text: String, copyType: CopyType) {

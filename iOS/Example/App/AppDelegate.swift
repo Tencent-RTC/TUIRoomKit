@@ -16,8 +16,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return SceneDelegate.getCurrentWindow()
     }()
     
+    var orientation: UIInterfaceOrientationMask = .allButUpsideDown
+    
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-        return .allButUpsideDown
+        return orientation
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {

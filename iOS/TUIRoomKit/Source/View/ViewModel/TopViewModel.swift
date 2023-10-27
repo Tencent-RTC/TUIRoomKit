@@ -16,10 +16,11 @@ import TXLiteAVSDK_Professional
 
 protocol TopViewModelResponder: AnyObject {
     func updateTimerLabel(text: String)
+    func updateStackView(item: ButtonItemData)
 }
 
-class TopViewModel {
-    private var topMenuTimer: Timer = Timer()
+class TopViewModel: NSObject {
+    private var topMenuTimer: DispatchSourceTimer?
     private(set) var viewItems: [ButtonItemData] = []
     var engineManager: EngineManager {
         return EngineManager.createInstance()
@@ -36,35 +37,40 @@ class TopViewModel {
         engineManager.store.currentUser
     }
     
-    init() {
+    override init() {
+        super.init()
         createBottomData()
         initialStatus()
+        subscribeUIEvent()
     }
     
-    func createBottomData() {
+    private func createBottomData() {
         let micItem = ButtonItemData()
         micItem.normalIcon = "room_earpiece"
         micItem.selectedIcon = "room_speakerphone"
         micItem.backgroundColor = UIColor(0xA3AEC7)
         micItem.resourceBundle = tuiRoomKitBundle()
+        micItem.buttonType = .switchMicItemType
         micItem.isSelect = engineManager.store.audioSetting.isSoundOnSpeaker
         micItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
-            self.micItemAction(sender: button)
+            self.switchMicItemAction(sender: button)
         }
         viewItems.append(micItem)
         let cameraItem = ButtonItemData()
         cameraItem.normalIcon = "room_switch_camera"
         cameraItem.backgroundColor = UIColor(0xA3AEC7)
         cameraItem.resourceBundle = tuiRoomKitBundle()
+        cameraItem.buttonType = .switchCamaraItemType
+        cameraItem.isHidden = !currentUser.hasVideoStream
         cameraItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
-            self.cameraItemAction(sender: button)
+            self.switchCameraItemAction(sender: button)
         }
         viewItems.append(cameraItem)
     }
     
-    func initialStatus() {
+    private func initialStatus() {
         if engineManager.store.audioSetting.isSoundOnSpeaker {
             engineManager.setAudioRoute(route: .modeSpeakerphone)
         } else {
@@ -72,7 +78,16 @@ class TopViewModel {
         }
     }
     
-    func micItemAction(sender: UIButton) {
+    private func subscribeUIEvent() {
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasVideoStream, responder: self)
+    }
+    
+    private func unsubscribeUIEvent() {
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasVideoStream, responder: self)
+    }
+    
+    private func switchMicItemAction(sender: UIButton) {
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": true])
         sender.isSelected = !sender.isSelected
         if sender.isSelected {
             engineManager.setAudioRoute(route: .modeSpeakerphone)
@@ -81,35 +96,9 @@ class TopViewModel {
         }
     }
     
-    func cameraItemAction(sender: UIButton) {
+    private func switchCameraItemAction(sender: UIButton) {
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": true])
         engineManager.switchCamera()
-    }
-    
-    func mirrorItemAction(sender: UIButton) {
-        engineManager.switchMirror()
-    }
-    
-    func dropDownAction(sender: UIView) {
-        RoomRouter.shared.presentPopUpViewController(viewType: .roomInfoViewType, height: 258)
-    }
-    
-    func exitAction(sender: UIView) {
-        RoomRouter.shared.presentPopUpViewController(viewType: .exitRoomViewType, height: 219,backgroundColor: UIColor(0x17181F))
-    }
-    
-    func updateTimerLabelText() {
-        let timeInterval: TimeInterval = Date().timeIntervalSince1970
-        let timeStamp = Int(timeInterval)
-        var totalSeconds: UInt = UInt(labs(timeStamp - store.timeStampOnEnterRoom))
-        updateTimer(totalSeconds: totalSeconds)
-        topMenuTimer = Timer(timeInterval: 1.0, repeats: true) { [weak self] timer in
-            guard let self = self else { return }
-            totalSeconds += 1
-            self.updateTimer(totalSeconds: totalSeconds)
-        }
-        topMenuTimer.tolerance = 0.2
-        RunLoop.current.add(topMenuTimer, forMode: .default)
-        topMenuTimer.fire()
     }
     
     private func updateTimer(totalSeconds: UInt) {
@@ -125,8 +114,47 @@ class TopViewModel {
         self.viewResponder?.updateTimerLabel(text: timerText)
     }
     
+    func dropDownAction(sender: UIView) {
+        RoomRouter.shared.presentPopUpViewController(viewType: .roomInfoViewType, height: 258)
+    }
+    
+    func exitAction(sender: UIView) {
+        RoomRouter.shared.presentPopUpViewController(viewType: .exitRoomViewType, height: 219,backgroundColor: UIColor(0x17181F))
+    }
+    
+    func updateTimerLabelText() {
+        let timeInterval: TimeInterval = Date().timeIntervalSince1970
+        let timeStamp = Int(timeInterval)
+        var totalSeconds: UInt = UInt(labs(timeStamp - store.timeStampOnEnterRoom))
+        updateTimer(totalSeconds: totalSeconds)
+        topMenuTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
+        topMenuTimer?.schedule(deadline: .now(), repeating: .seconds(1))
+        topMenuTimer?.setEventHandler { [weak self] in
+            guard let self = self else { return }
+            totalSeconds += 1
+            self.updateTimer(totalSeconds: totalSeconds)
+        }
+        topMenuTimer?.resume()
+    }
+    
     deinit {
-        topMenuTimer.invalidate()
+        unsubscribeUIEvent()
+        topMenuTimer?.cancel()
+        topMenuTimer = nil
         debugPrint("deinit \(self)")
     }
 }
+
+extension TopViewModel: RoomKitUIEventResponder {
+    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
+        switch key {
+        case .TUIRoomKitService_CurrentUserHasVideoStream:
+            guard let hasVideo = info?["hasVideo"] as? Bool else { return }
+            guard let item = viewItems.first(where: { $0.buttonType == .switchCamaraItemType }) else { return }
+            item.isHidden = !hasVideo
+            viewResponder?.updateStackView(item: item)
+        default: break
+        }
+    }
+}
+

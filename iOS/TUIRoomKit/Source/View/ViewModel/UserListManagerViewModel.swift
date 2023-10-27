@@ -66,6 +66,7 @@ class UserListManagerViewModel: NSObject {
         muteLocalAudioItem.selectedIcon = "room_mute_audio"
         muteLocalAudioItem.resourceBundle = tuiRoomKitBundle()
         muteLocalAudioItem.buttonType = .muteAudioItemType
+        muteLocalAudioItem.hasLineView = true
         muteLocalAudioItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.muteLocalAudioAction(sender: button)
@@ -79,6 +80,7 @@ class UserListManagerViewModel: NSObject {
         muteLocalVideoItem.selectedIcon = "room_mute_video"
         muteLocalVideoItem.resourceBundle = tuiRoomKitBundle()
         muteLocalVideoItem.buttonType = .muteVideoItemType
+        muteLocalVideoItem.hasLineView = true
         muteLocalVideoItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.muteLocalVideoAction(sender: button)
@@ -92,6 +94,7 @@ class UserListManagerViewModel: NSObject {
         muteAudioItem.selectedIcon = "room_mute_audio"
         muteAudioItem.resourceBundle = tuiRoomKitBundle()
         muteAudioItem.buttonType = .muteAudioItemType
+        muteAudioItem.hasLineView = true
         muteAudioItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.muteAudioAction(sender: button)
@@ -106,6 +109,7 @@ class UserListManagerViewModel: NSObject {
         muteVideoItem.selectedIcon = "room_mute_video"
         muteVideoItem.resourceBundle = tuiRoomKitBundle()
         muteVideoItem.buttonType = .muteVideoItemType
+        muteVideoItem.hasLineView = true
         muteVideoItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.muteVideoAction(sender: button)
@@ -120,6 +124,7 @@ class UserListManagerViewModel: NSObject {
         inviteSeatItem.selectedIcon = "room_invite_seat"
         inviteSeatItem.resourceBundle = tuiRoomKitBundle()
         inviteSeatItem.buttonType = .inviteSeatItemType
+        inviteSeatItem.hasLineView = true
         inviteSeatItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.inviteSeatAction(sender: button)
@@ -133,6 +138,7 @@ class UserListManagerViewModel: NSObject {
         changeHostItem.selectedIcon = "room_change_host"
         changeHostItem.resourceBundle = tuiRoomKitBundle()
         changeHostItem.buttonType = .changeHostItemType
+        changeHostItem.hasLineView = true
         changeHostItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.changeHostAction(sender: button)
@@ -148,6 +154,7 @@ class UserListManagerViewModel: NSObject {
         muteMessageItem.selectedIcon = "room_unMute_message"
         muteMessageItem.resourceBundle = tuiRoomKitBundle()
         muteMessageItem.buttonType = .muteMessageItemType
+        muteMessageItem.hasLineView = true
         muteMessageItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.muteMessageAction(sender: button)
@@ -162,6 +169,7 @@ class UserListManagerViewModel: NSObject {
         stepDownSeatItem.selectedIcon = "room_step_down_seat"
         stepDownSeatItem.resourceBundle = tuiRoomKitBundle()
         stepDownSeatItem.buttonType = .stepDownSeatItemType
+        stepDownSeatItem.hasLineView = true
         stepDownSeatItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.kickRemoteUserOffSeat(sender: button)
@@ -175,6 +183,7 @@ class UserListManagerViewModel: NSObject {
         kickOutItem.selectedIcon = "room_kickOut_room"
         kickOutItem.resourceBundle = tuiRoomKitBundle()
         kickOutItem.buttonType = .kickOutItemType
+        kickOutItem.hasLineView = true
         kickOutItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.kickOutAction(sender: button)
@@ -196,10 +205,12 @@ class UserListManagerViewModel: NSObject {
         }
         //如果是举手发言房间，并且没有上麦，不可打开麦克风
         if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
-            viewResponder?.makeToast(text: .muteAudioSeatReasonText)
+            viewResponder?.makeToast(text: .muteSeatReasonText)
             return
         }
-        self.engineManager.unmuteLocalAudio()
+        engineManager.unmuteLocalAudio()
+        guard !engineManager.store.audioSetting.isMicOpened else { return }
+        engineManager.openLocalMicrophone()
     }
     
     func muteLocalVideoAction(sender: UIButton) {
@@ -212,9 +223,9 @@ class UserListManagerViewModel: NSObject {
             viewResponder?.makeToast(text: .muteVideoRoomReasonText)
             return
         }
-        //如果是举手发言房间，并且没有上麦，不可打开麦克风
+        //如果是举手发言房间，并且没有上麦，不可打开摄像头
         if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
-            viewResponder?.makeToast(text: .muteVideoSeatReasonText)
+            viewResponder?.makeToast(text: .muteSeatReasonText)
             return
         }
         engineManager.setLocalVideoView(streamType: .cameraStream, view: nil)
@@ -453,11 +464,8 @@ private extension String {
     static var inviteSeatText: String {
         localized("TUIRoom.invite.seat")
     }
-    static var muteAudioSeatReasonText: String {
-        localized("TUIRoom.mute.audio.seat.reason")
-    }
-    static var muteVideoSeatReasonText: String {
-        localized("TUIRoom.mute.video.seat.reason")
+    static var muteSeatReasonText: String {
+        localized("TUIRoom.mute.seat.reason")
     }
     static var muteAudioRoomReasonText: String {
         localized("TUIRoom.mute.audio.room.reason")

@@ -10,6 +10,7 @@ import Foundation
 
 class RaiseHandApplicationListView: UIView {
     let viewModel: RaiseHandApplicationListViewModel
+    private var isSearching: Bool = false
     
     let backButton: UIButton = {
         let button = UIButton()
@@ -25,14 +26,21 @@ class RaiseHandApplicationListView: UIView {
         return button
     }()
     
-    let searchController: UISearchController = {
-        let controller = UISearchController(searchResultsController: nil)
-        controller.obscuresBackgroundDuringPresentation = false
-        controller.searchBar.placeholder = .searchMemberText
-        controller.searchBar.setBackgroundImage(UIColor(0x1B1E26).trans2Image(), for: .top, barMetrics: .default)
-        controller.obscuresBackgroundDuringPresentation = false
-        controller.hidesNavigationBarDuringPresentation = false
-        return controller
+    let searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.placeholder = .searchMemberText
+        searchBar.setBackgroundImage(UIColor(0x1B1E26).trans2Image(), for: .top, barMetrics: .default)
+        searchBar.searchTextField.textColor = UIColor(0xB2BBD1)
+        searchBar.searchTextField.tintColor = UIColor(0xB2BBD1).withAlphaComponent(0.3)
+        searchBar.searchTextField.layer.cornerRadius = 6
+        return searchBar
+    }()
+    
+    let searchControl: UIControl = {
+        let view = UIControl()
+        view.backgroundColor = .clear
+        view.isHidden = true
+        return view
     }()
     
     let allAgreeButton : UIButton = {
@@ -68,7 +76,6 @@ class RaiseHandApplicationListView: UIView {
         tableView.dataSource = self
         tableView.backgroundColor = UIColor(0x1B1E26)
         tableView.register(UserListCell.self, forCellReuseIdentifier: "RaiseHandCell")
-        tableView.tableHeaderView = searchController.searchBar
         return tableView
     }()
     
@@ -94,9 +101,11 @@ class RaiseHandApplicationListView: UIView {
     
     func constructViewHierarchy() {
         addSubview(backButton)
+        addSubview(searchBar)
         addSubview(applyTableView)
         addSubview(allAgreeButton)
         addSubview(inviteMemberButton)
+        addSubview(searchControl)
     }
     
     func activateConstraints() {
@@ -106,9 +115,16 @@ class RaiseHandApplicationListView: UIView {
             make.height.equalTo(20)
             make.width.equalTo(200)
         }
+        searchBar.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16.scale375())
+            make.trailing.equalToSuperview().offset(-16.scale375())
+            make.height.equalTo(34.scale375Height())
+            make.top.equalTo(backButton.snp.bottom).offset(23.scale375Height())
+        }
         applyTableView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview()
-            make.top.equalTo(backButton.snp.bottom).offset(5)
+            make.leading.equalToSuperview().offset(16.scale375())
+            make.trailing.equalToSuperview().offset(-16.scale375())
+            make.top.equalTo(searchBar.snp.bottom).offset(10.scale375Height())
             make.bottom.equalToSuperview()
         }
         allAgreeButton.snp.makeConstraints { make in
@@ -123,21 +139,26 @@ class RaiseHandApplicationListView: UIView {
             make.height.equalTo(50)
             make.trailing.equalToSuperview().offset(-30)
         }
+        searchControl.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     func bindInteraction() {
         viewModel.viewResponder = self
-        searchController.delegate = self
-        searchController.searchResultsUpdater = self
+        searchBar.delegate = self
         setupViewState()
         backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         allAgreeButton.addTarget(self, action: #selector(allAgreeStageAction(sender:)), for: .touchUpInside)
         inviteMemberButton.addTarget(self, action: #selector(inviteMemberAction(sender:)), for: .touchUpInside)
+        searchBar.setBackgroundImage(UIColor(0x1B1E26).trans2Image(), for: .top, barMetrics: .default)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(hideSearchControl(sender:)))
+        searchControl.addGestureRecognizer(tap)
     }
     
     @objc func backAction(sender: UIButton) {
-        searchController.searchBar.endEditing(true)
-        searchController.isActive = false
+        searchBar.endEditing(true)
+        searchBar.searchTextField.resignFirstResponder()
         viewModel.backAction()
     }
     
@@ -147,6 +168,11 @@ class RaiseHandApplicationListView: UIView {
     
     @objc func inviteMemberAction(sender: UIButton) {
         viewModel.inviteMemberAction(sender: sender, view: self)
+    }
+    
+    @objc func hideSearchControl(sender: UIView) {
+        searchBar.searchTextField.resignFirstResponder()
+        searchControl.isHidden = true
     }
     
     private func setupViewState() {
@@ -164,22 +190,26 @@ class RaiseHandApplicationListView: UIView {
     }
 }
 
-extension RaiseHandApplicationListView: UISearchControllerDelegate, UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        let searchArray = viewModel.engineManager.store.inviteSeatList.filter({ model -> Bool in
-            if let searchText = searchController.searchBar.text {
-                return (model.userName == searchText)
-            } else {
-                return false
-            }
-        })
-        viewModel.inviteSeatList = searchArray
-        applyTableView.reloadData()
+extension RaiseHandApplicationListView: UISearchBarDelegate {
+    func searchBar(_ searchBar:UISearchBar,textDidChange searchText:String){
+        let searchContentText = searchText.trimmingCharacters(in: .whitespaces)
+        if searchContentText.count == 0 {
+            viewModel.inviteSeatList = viewModel.engineManager.store.inviteSeatList
+            applyTableView.reloadData()
+            isSearching = false
+        } else {
+            let searchArray = viewModel.engineManager.store.inviteSeatList.filter({ model -> Bool in
+                return model.userName.contains(searchContentText)
+            })
+            viewModel.inviteSeatList = searchArray
+            applyTableView.reloadData()
+            isSearching = true
+        }
     }
     
-    func didDismissSearchController(_ searchController: UISearchController) {
-        viewModel.inviteSeatList = viewModel.engineManager.store.inviteSeatList
-        applyTableView.reloadData()
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        searchControl.isHidden = false
+        return true
     }
 }
 
@@ -199,7 +229,8 @@ extension RaiseHandApplicationListView: UITableViewDelegate {
     }
     
     internal func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        searchController.searchBar.endEditing(true)
+        searchBar.endEditing(true)
+        searchBar.searchTextField.resignFirstResponder()
     }
     internal func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 68.scale375()
@@ -208,11 +239,12 @@ extension RaiseHandApplicationListView: UITableViewDelegate {
 
 extension RaiseHandApplicationListView: RaiseHandApplicationListViewResponder {
     func searchControllerChangeActive(isActive: Bool) {
-        searchController.searchBar.endEditing(!isActive)
-        searchController.isActive = isActive
+        searchBar.endEditing(!isActive)
+        searchBar.searchTextField.resignFirstResponder()
     }
     
     func reloadApplyListView() {
+        guard !isSearching else { return }
         applyTableView.reloadData()
     }
 }
@@ -257,6 +289,8 @@ class ApplyTableCell: UITableViewCell {
         button.backgroundColor = UIColor(0x0565FA)
         button.setTitle(.agreeSeatText, for: .normal)
         button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        button.layer.cornerRadius = 6
         button.clipsToBounds = true
         return button
     }()
@@ -265,7 +299,9 @@ class ApplyTableCell: UITableViewCell {
         let button = UIButton(type: .custom)
         button.backgroundColor = .red
         button.setTitle(.disagreeSeatText, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .regular)
         button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 6
         button.clipsToBounds = true
         return button
     }()
@@ -307,8 +343,8 @@ class ApplyTableCell: UITableViewCell {
     
     func activateConstraints() {
         avatarImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(48)
-            make.leading.equalToSuperview().offset(20)
+            make.width.height.equalTo(40)
+            make.leading.equalToSuperview()
             make.centerY.equalToSuperview()
         }
         muteVideoButton.snp.makeConstraints { make in
@@ -322,28 +358,28 @@ class ApplyTableCell: UITableViewCell {
             make.centerY.equalTo(self.avatarImageView)
         }
         disagreeStageButton.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().offset(-12)
+            make.width.equalTo(62.scale375())
+            make.height.equalTo(24.scale375Height())
+            make.trailing.equalToSuperview()
             make.centerY.equalTo(self.avatarImageView)
-            make.width.height.equalTo(80.scale375())
-            make.height.equalTo(24.scale375())
         }
         agreeStageButton.snp.makeConstraints { make in
-            make.trailing.equalTo(disagreeStageButton.snp.leading).offset(-5)
+            make.trailing.equalTo(disagreeStageButton.snp.leading).offset(-10)
             make.centerY.equalTo(disagreeStageButton)
-            make.width.height.equalTo(80.scale375())
-            make.height.equalTo(24.scale375())
+            make.width.height.equalTo(64.scale375())
+            make.height.equalTo(24.scale375Height())
         }
         userLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(12)
+            make.leading.equalTo(avatarImageView.snp.trailing).offset(12.scale375())
             make.width.equalTo(150.scale375())
-            make.height.equalTo(48)
+            make.height.equalTo(22.scale375())
         }
         downLineView.snp.makeConstraints { make in
             make.leading.equalTo(userLabel)
-            make.trailing.equalToSuperview().offset(-12)
+            make.trailing.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.height.equalTo(0.3)
+            make.height.equalTo(1.scale375())
         }
     }
     

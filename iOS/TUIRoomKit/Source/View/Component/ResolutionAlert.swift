@@ -13,38 +13,12 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
-class BitrateTableData: NSObject {
-    let resolutionName: String
-    let resolution: TRTCVideoResolution
-    let defaultBitrate: Float
-    let minBitrate: Float
-    let maxBitrate: Float
-    let stepBitrate: Float
-    
-    init(resolutionName: String,
-         resolution: TRTCVideoResolution,
-         defaultBitrate: Float,
-         minBitrate: Float,
-         maxBitrate: Float,
-         stepBitrate: Float) {
-        self.resolutionName = resolutionName
-        self.resolution = resolution
-        self.defaultBitrate = defaultBitrate
-        self.minBitrate = minBitrate
-        self.maxBitrate = maxBitrate
-        self.stepBitrate = stepBitrate
-        super.init()
-    }
-    
-    deinit {
-        debugPrint("deinit \(self)")
-    }
-}
+
 
 // MARK: Resolution
 
 class ResolutionAlert: AlertContentView {
-    var dataSource: [BitrateTableData] = []
+    var dataSource: [String] = []
     var selectIndex = 3
     var titleText: String = ""
     var didSelectItem: ((_ index: Int) -> Void)?
@@ -52,7 +26,7 @@ class ResolutionAlert: AlertContentView {
     let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.separatorStyle = .none
-        tableView.backgroundColor = UIColor(0x1B1E26)
+        tableView.backgroundColor = UIColor(0x22262E)
         return tableView
     }()
     
@@ -72,9 +46,8 @@ class ResolutionAlert: AlertContentView {
     override func activateConstraints() {
         super.activateConstraints()
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(20)
+            make.top.equalTo(titleLabel.snp.bottom).offset(space.scale375Height())
             make.leading.trailing.bottom.equalToSuperview()
-            make.height.equalTo(248)
         }
     }
     
@@ -101,8 +74,7 @@ extension ResolutionAlert: UITableViewDataSource {
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ResolutionTableViewCell", for: indexPath)
         if let scell = cell as? ResolutionTableViewCell {
-            let model = dataSource[indexPath.row]
-            scell.titleLabel.text = model.resolutionName
+            scell.titleLabel.text = dataSource[indexPath.row]
             scell.isSelected = indexPath.row == selectIndex
         }
         return cell
@@ -123,20 +95,21 @@ extension ResolutionAlert: UITableViewDelegate {
 class ResolutionTableViewCell: UITableViewCell {
     let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.font = UIFont(name: "PingFangSC-Medium", size: 16)
-        label.textColor = UIColor(0x666666)
+        label.font = UIFont(name: "PingFangSC-Regular", size: 16)
+        label.textColor = UIColor(0xD1D9EC)
         return label
     }()
     
     let checkboxImageView: UIImageView = {
-        let norImage = UIImage(named: "tuiroom_checkbox_nor")
+        let norImage = UIImage(named: "room_checkbox_sel", in: tuiRoomKitBundle(), compatibleWith: nil)
         let imageView = UIImageView(image: norImage)
+        imageView.isHidden = true
         return imageView
     }()
     
     override var isSelected: Bool {
         didSet {
-            checkboxImageView.image = isSelected ? UIImage(named: "tuiroom_checkbox_sel") : UIImage(named: "tuiroom_checkbox_nor")
+            checkboxImageView.isHidden = !isSelected
         }
     }
     
@@ -170,7 +143,7 @@ class ResolutionTableViewCell: UITableViewCell {
         checkboxImageView.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-20)
-            make.size.equalTo(CGSize(width: 24, height: 24))
+            make.size.equalTo(CGSize(width: 16, height: 16))
         }
     }
     
@@ -184,41 +157,53 @@ class ResolutionTableViewCell: UITableViewCell {
 }
 
 // MARK: Base
-
 class AlertContentView: UIView {
+    let space: Int = 16
+    let landscapeHight: CGFloat = min(kScreenWidth, kScreenHeight)
+    let portraitHight: CGFloat = 718
+    private var currentLandscape: Bool = isLandscape
     let bgView: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .black
         view.alpha = 0.6
         return view
     }()
-    
+
     let contentView: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(0x1B1E26)
+        view.backgroundColor = UIColor(0x22262E)
+        view.layer.cornerRadius = 12
         return view
     }()
     
+    let backButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
+        button.backgroundColor = .clear
+        return button
+    }()
+
     let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.textColor = .black
-        label.font = UIFont(name: "PingFangSC-Medium", size: 24)
+        label.textColor = UIColor(0xD1D9EC)
+        label.textAlignment = .center
+        label.font = UIFont(name: "PingFangSC-Medium", size: 16)
         return label
     }()
-    
+
     var willDismiss: (() -> Void)?
     var didDismiss: (() -> Void)?
-    
+
     override init(frame: CGRect = .zero) {
         super.init(frame: frame)
         contentView.transform = CGAffineTransform(translationX: 0, y: kScreenHeight)
         alpha = 0
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private var isViewReady = false
     override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -230,7 +215,7 @@ class AlertContentView: UIView {
         activateConstraints()
         bindInteraction()
     }
-    
+
     func show(rootView: UIView) {
         rootView.addSubview(self)
         self.snp.makeConstraints { make in
@@ -242,7 +227,7 @@ class AlertContentView: UIView {
             self.contentView.transform = .identity
         }
     }
-    
+
     func dismiss() {
         if let action = willDismiss {
             action()
@@ -259,45 +244,67 @@ class AlertContentView: UIView {
             self.removeFromSuperview()
         }
     }
-    
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = touches.first?.location(in: self) else {
             return
         }
-        if !contentView.frame.contains(point) {
+        let backButtonFrame = backButton.frame.inset(by: UIEdgeInsets.init(top: -space.scale375Height(), left: -space.scale375(), bottom: -space.scale375Height(), right: -space.scale375()))
+        if !contentView.frame.contains(point) || backButtonFrame.contains(point) {
             dismiss()
         }
     }
     
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        contentView.roundedRect(rect: contentView.bounds,
-                                byRoundingCorners: [.topLeft, .topRight],
-                                cornerRadii: CGSize(width: 12, height: 12))
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard currentLandscape != isLandscape else { return }
+        setupViewOrientation(isLandscape: isLandscape)
+        currentLandscape = isLandscape
     }
-    
+
     func constructViewHierarchy() {
         addSubview(bgView)
         addSubview(contentView)
+        contentView.addSubview(backButton)
         contentView.addSubview(titleLabel)
     }
-    
+
     func activateConstraints() {
         bgView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        contentView.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
+        setupViewOrientation(isLandscape: isLandscape)
+        backButton.snp.makeConstraints { make in
+            make.width.height.equalTo(16)
+            make.leading.equalToSuperview().offset(space.scale375())
+            make.centerY.equalTo(titleLabel)
         }
         titleLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(20)
-            make.top.equalToSuperview().offset(32)
+            make.top.equalToSuperview().offset(space.scale375Height())
+            make.centerX.equalToSuperview()
+            make.width.equalTo(64.scale375())
+        }
+    }
+
+    func bindInteraction() {
+        backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
+    }
+    
+    private func setupViewOrientation(isLandscape: Bool) {
+        contentView.snp.remakeConstraints { make in
+            if isLandscape {
+                make.height.equalTo(landscapeHight)
+            } else {
+                make.height.equalTo(portraitHight)
+            }
+            make.leading.trailing.bottom.equalToSuperview()
         }
     }
     
-    func bindInteraction() {
+    @objc func backAction(sender: UIButton) {
+        dismiss()
     }
-    
+
     deinit {
         debugPrint("deinit \(self)")
     }

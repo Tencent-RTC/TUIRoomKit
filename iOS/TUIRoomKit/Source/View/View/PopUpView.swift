@@ -9,14 +9,48 @@
 import Foundation
 import TUICore
 
+protocol PopUpViewResponder: AnyObject {
+    func updateAlertTransitionPosition(position: AlertTransitionAnimator.AlertTransitionPosition)
+}
+
 class PopUpView: UIView {
     let viewModel: PopUpViewModel
     var rootView: UIView?
+    weak var responder: PopUpViewResponder?
+    private let arrowViewHeight: CGFloat = 35.0
+    private var currentLandscape: Bool = isLandscape
     
     private let panelControl : UIControl = {
         let control = UIControl()
         control.backgroundColor = .clear
         return control
+    }()
+    
+    private let dropArrowView : UIView = {
+        let view = UIView()
+        return view
+    }()
+    
+    private let dropArrowImageView: UIImageView = {
+        let view = UIImageView()
+        view.image = UIImage(named: "room_drop_arrow",in:tuiRoomKitBundle(),compatibleWith: nil)
+        return view
+    }()
+    
+    private let rightArrowView : UIView = {
+        let view = UIView()
+        return view
+    }()
+    
+    private let rightArrowImageView: UIImageView = {
+        let view = UIImageView()
+        view.image = UIImage(named: "room_right_arrow",in:tuiRoomKitBundle(),compatibleWith: nil)
+        return view
+    }()
+    
+    private let backgroundView: UIView = {
+        let view = UIView()
+        return view
     }()
     
     init(viewModel: PopUpViewModel) {
@@ -40,41 +74,50 @@ class PopUpView: UIView {
     
     func constructViewHierarchy() {
         addSubview(panelControl)
+        addSubview(backgroundView)
+        backgroundView.addSubview(dropArrowView)
+        backgroundView.addSubview(rightArrowView)
+        dropArrowView.addSubview(dropArrowImageView)
+        rightArrowView.addSubview(rightArrowImageView)
         setupViewState()
         guard let rootView = rootView else { return }
-        addSubview(rootView)
-        rootView.layer.cornerRadius = 15
+        backgroundView.addSubview(rootView)
+        backgroundView.layer.cornerRadius = 15
     }
     
     func activateConstraints() {
         panelControl.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        guard let orientationIsLandscape = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape as? Bool
-        else { return }
-        if orientationIsLandscape { //横屏
-            rootView?.snp.makeConstraints { make in
-                make.width.equalTo(UIScreen.main.bounds.size.height)
-                make.top.equalToSuperview()
-                make.height.equalToSuperview()
-                make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
-            }
-        } else { //竖屏
-            if let height = viewModel.height {
-                rootView?.snp.makeConstraints { make in
-                    make.width.bottom.equalToSuperview()
-                    make.height.equalTo(height)
-                }
-            } else {
-                rootView?.snp.makeConstraints { make in
-                    make.width.height.equalToSuperview()
-                }
-            }
+        setupViewOrientation(isLandscape: isLandscape)
+        dropArrowView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+            make.height.equalTo(arrowViewHeight)
+        }
+        dropArrowImageView.snp.makeConstraints { make in
+            make.centerX.centerY.equalToSuperview()
+            make.width.equalTo(24.scale375())
+            make.height.equalTo(3.scale375())
+        }
+        rightArrowView.snp.makeConstraints { make in
+            make.top.leading.bottom.equalToSuperview()
+            make.width.equalTo(arrowViewHeight)
+        }
+        rightArrowImageView.snp.makeConstraints { make in
+            make.centerY.centerX.equalToSuperview()
+            make.width.equalTo(3.scale375())
+            make.height.equalTo(24.scale375())
         }
     }
     
     func bindInteraction() {
-        rootView?.backgroundColor = viewModel.backgroundColor
+        backgroundView.backgroundColor = viewModel.backgroundColor
+        let dropArrowTap = UITapGestureRecognizer(target: self, action: #selector(dropDownPopUpViewAction(sender:)))
+        dropArrowView.addGestureRecognizer(dropArrowTap)
+        dropArrowView.isUserInteractionEnabled = true
+        let rightArrowTap = UITapGestureRecognizer(target: self, action: #selector(dropDownPopUpViewAction(sender:)))
+        rightArrowView.addGestureRecognizer(rightArrowTap)
+        rightArrowView.isUserInteractionEnabled = true
         panelControl.addTarget(self, action: #selector(panelControlAction), for: .touchUpInside)
     }
     
@@ -112,29 +155,49 @@ class PopUpView: UIView {
         }
     }
     
-    //根据设备旋转方向更改弹出view
-    func updateRootViewOrientation(isLandscape: Bool) {
-        viewModel.updateOrientation(isLandscape: isLandscape)
+    @objc func dropDownPopUpViewAction(sender: UIView) {
+        RoomRouter.shared.dismissPopupViewController(viewType: viewModel.viewType, animated: true)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard currentLandscape != isLandscape else { return }
+        setupViewOrientation(isLandscape: isLandscape)
+        responder?.updateAlertTransitionPosition(position: isLandscape ? .right : .bottom)
+        currentLandscape = isLandscape
+    }
+    
+    func setupViewOrientation(isLandscape: Bool) {
+        let width = min(kScreenHeight, kScreenWidth)
+        let height = max(kScreenHeight, kScreenWidth)
         if isLandscape { //横屏
-            rootView?.snp.remakeConstraints{ make in
-                make.width.equalTo(UIScreen.main.bounds.size.width)
+            backgroundView.snp.remakeConstraints { make in
+                make.width.equalTo(width + arrowViewHeight)
                 make.top.equalToSuperview()
                 make.height.equalToSuperview()
                 make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
             }
-        } else {
-            if let height = viewModel.height {
-                rootView?.snp.remakeConstraints { make in
-                    make.width.bottom.equalToSuperview()
-                    make.height.equalTo(height)
-                }
-            } else {
-                rootView?.snp.remakeConstraints { make in
-                    make.edges.equalToSuperview()
-                }
+        } else { //竖屏
+            let currentHeight = min(viewModel.height + arrowViewHeight, height - arrowViewHeight)
+            backgroundView.snp.remakeConstraints { make in
+                make.width.bottom.equalToSuperview()
+                make.height.equalTo(currentHeight)
             }
         }
+        rootView?.snp.remakeConstraints { make in
+            if isLandscape {
+                make.leading.equalToSuperview().offset(arrowViewHeight)
+                make.trailing.top.bottom.equalToSuperview()
+            } else {
+                let currentHeight = min(viewModel.height, height - 2*arrowViewHeight)
+                make.height.equalTo(currentHeight)
+                make.trailing.leading.bottom.equalToSuperview()
+            }
+        }
+        rightArrowView.isHidden = !isLandscape
+        dropArrowView.isHidden = isLandscape
     }
+    
     
     @objc func panelControlAction() {
         viewModel.panelControlAction()

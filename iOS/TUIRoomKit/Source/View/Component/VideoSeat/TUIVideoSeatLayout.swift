@@ -19,7 +19,7 @@ class TUIVideoSeatLayout: UICollectionViewFlowLayout {
     }
 
     private var collectionViewWidth: CGFloat {
-        return collectionView?.bounds.width ?? UIScreen.main.bounds.width
+        return collectionView?.bounds.width ?? kScreenWidth
     }
 
     private var isPortrait: Bool {

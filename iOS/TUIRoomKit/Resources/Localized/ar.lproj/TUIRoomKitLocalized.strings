@@ -98,8 +98,7 @@
 "TUIRoom.have.become.master" = "لقد أصبحت مضيفًا";
 "TUIRoom.have.transferred.master" = "لقد قمت بنقل المالك";
 "TUIRoom.raise.hand.apply" = "أظهر يدك للتقديم";
-"TUIRoom.mute.audio.seat.reason" = "ارفع يدك للتحدث في الغرفة، ويرجى رفع يدك لتقديم طلب للحصول على ميكروفون";
-"TUIRoom.mute.video.seat.reason" = "ارفع يدك للتحدث في الغرفة، ويرجى رفع يدك لتقديم طلب للحصول على ميكروفون";
+"TUIRoom.mute.seat.reason" = "ارفع يدك للتحدث في الغرفة، من فضلك ارفع يدك أولا";
 "TUIRoom.mute.audio.room.reason" = "لقد قام المضيف بكتم صوت جميع الأعضاء ولا يمكنه تشغيل الميكروفون.";
 "TUIRoom.mute.video.room.reason" = "قام المضيف بتمكين جميع الأعضاء من حظر الصور ولا يمكنه تشغيل الكاميرا.";
 "TUIRoom.all.mute.video.prompt" = "تم تفعيل الحظر على الرسم ولن يتمكن الجمهور من تشغيل الكاميرا";
@@ -115,8 +114,8 @@
 "TUIRoom.capture.volume" = "جمع الحجم";
 "TUIRoom.play.volume" = "حجم التشغيل";
 "TUIRoom.share" = "شاشة المشاركة";
-"TUIRoom.video" = "فيديو";
-"TUIRoom.audio" = "صوتي";
+"TUIRoom.video.settings" = "اعدادات الفيديو";
+"TUIRoom.audio.settings" = "إعدادات الصوت";
 "TUIRoom.setting" = "يثبت";
 "TUIRoom.advancedSetting" = "إعدادات متقدمة";
 "TUIRoom.frame.rate" = "معدل الإطار";
@@ -142,7 +141,7 @@
 "TUIRoom.fail.permission.Later" = "الحديث عن ذلك في وقت لاحق";
 "TUIRoom.fail.permission.Enable" = "لتشغيل";
 "TUIRoom.device.set" = "الإعداد السريع للاجتماع";
-"TUIRoom.mic.set" = "قم بتشغيل الميكروفون عند الانضمام إلى اجتماع";
+"TUIRoom.mic.set" = "تمكين الصوت عند الانضمام إلى اجتماع";
 "TUIRoom.camera.set" = "انضم إلى الاجتماع وقم بتشغيل الكاميرا";
 "TUIRoom.sharing.screen" = "شاشة المشاركة";
 "TUIRoom.stop.share.screen" = "التوقف عن المشاركة";
@@ -170,3 +169,9 @@
 "TUIRoom.rejected.take.seat" = "رفض المضيف طلبك للظهور على المسرح";
 "TUIRoom.taken.seat" = "لقد وافق المضيف على طلبك للظهور على المسرح";
 "TUIRoom.role.owner" = "صاحب المنزل";
+"TUIRoom.in.another.room" = "أنت بالفعل في غرفة أخرى";
+"TUIRoom.others.screen.sharing" = "توجد حاليًا مشاركة للأعضاء، يرجى المحاولة مرة أخرى لاحقًا.";
+"TUIRoom.smooth.resolution" = "القرار السلس";
+"TUIRoom.standard.resolution" = "التعريف القياسى";
+"TUIRoom.high.resolution" = "عالية الدقة";
+"TUIRoom.super.resolution" = "واضح جدا";

@@ -16,7 +16,7 @@ class ListCellItemView: UIView {
         let view = UILabel()
         view.backgroundColor = .clear
         view.textColor = UIColor(0xD1D9EC)
-        view.font = UIFont(name: "PingFangSC-Medium", size: 14)
+        view.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         view.minimumScaleFactor = 0.5
         return view
     }()
@@ -25,7 +25,7 @@ class ListCellItemView: UIView {
         let view = UILabel()
         view.backgroundColor = .clear
         view.textColor = UIColor(0xD1D9EC)
-        view.font = UIFont(name: "PingFangSC-Medium", size: 14)
+        view.font = UIFont.systemFont(ofSize: 14, weight: .medium)
         view.adjustsFontSizeToFitWidth = false
         view.numberOfLines = 0
         view.minimumScaleFactor = 0.5
@@ -56,6 +56,12 @@ class ListCellItemView: UIView {
         return button
     }()
     
+    let downLineView : UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(0x6B758A,alpha: 0.3)
+        return view
+    }()
+    
     init(itemData: ListCellItemData) {
         self.itemData = itemData
         super.init(frame: .zero)
@@ -81,6 +87,7 @@ class ListCellItemView: UIView {
         addSubview(textField)
         addSubview(rightSwitch)
         addSubview(rightButton)
+        addSubview(downLineView)
     }
     
     func activateConstraints() {
@@ -105,11 +112,20 @@ class ListCellItemView: UIView {
         rightSwitch.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-20)
             make.centerY.equalToSuperview()
+            make.width.equalTo(42)
+            make.height.equalTo(24)
         }
         
         rightButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-20)
+        }
+        
+        downLineView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalToSuperview()
+            make.height.equalTo(1)
         }
     }
     
@@ -152,6 +168,7 @@ class ListCellItemView: UIView {
         } else {
             textField.text = item.fieldText
         }
+        downLineView.isHidden = !item.hasDownLineView
     }
     
     @objc func overAllAction(sender: UIView) {

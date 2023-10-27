@@ -21,14 +21,18 @@ class ExitRoomViewModel {
         isOnlyOneUserInRoom = engineManager.store.attendeeList.count == 1
     }
     
-    func dropDownAction(sender: UIView) {
-        RoomRouter.shared.dismissPopupViewController(viewType: .exitRoomViewType, animated: true)
+    func isShowLeaveRoomButton() -> Bool {
+        if currentUser.userId == engineManager.store.roomInfo.ownerId {
+            return engineManager.store.attendeeList.count > 1
+        } else {
+            return true
+        }
     }
     
     func leaveRoomAction(sender: UIView) {
         if isRoomOwner && !isOnlyOneUserInRoom {
             RoomRouter.shared.dismissPopupViewController(viewType: .exitRoomViewType, animated: true)
-            RoomRouter.shared.presentPopUpViewController(viewType: .transferMasterViewType, height: nil)
+            RoomRouter.shared.presentPopUpViewController(viewType: .transferMasterViewType, height: 720.scale375Height())
         }else {
             exitRoom()
         }

@@ -52,11 +52,9 @@ class TUIVideoSeatView: UIView {
         let offsetYu = Int(attendeeCollectionView.contentOffset.x) % Int(attendeeCollectionView.mm_w)
         let offsetMuti = CGFloat(offsetYu) / attendeeCollectionView.mm_w
         let currentPage = (offsetMuti > 0.5 ? 1 : 0) + (Int(attendeeCollectionView.contentOffset.x) / Int(attendeeCollectionView.mm_w))
-        if currentPage != pageControl.currentPage {
-            attendeeCollectionView.setContentOffset(
-                CGPoint(x: CGFloat(pageControl.currentPage) * attendeeCollectionView.frame.size.width,
-                        y: attendeeCollectionView.contentOffset.y), animated: false)
-        }
+        attendeeCollectionView.setContentOffset(
+            CGPoint(x: CGFloat(pageControl.currentPage) * attendeeCollectionView.frame.size.width,
+                    y: attendeeCollectionView.contentOffset.y), animated: false)
     }
 
     required init?(coder: NSCoder) {
@@ -78,7 +76,7 @@ class TUIVideoSeatView: UIView {
         collection.showsHorizontalScrollIndicator = false
         collection.isUserInteractionEnabled = true
         collection.contentMode = .scaleToFill
-        collection.backgroundColor = .black
+        collection.backgroundColor = UIColor(0x0F1014)
         if #available(iOS 11.0, *) {
             collection.contentInsetAdjustmentBehavior = .never
         } else {
@@ -188,7 +186,12 @@ extension TUIVideoSeatView: TUIVideoSeatViewResponder {
     func insertItems(at indexPaths: [IndexPath]) {
         freshCollectionView {
             self.attendeeCollectionView.performBatchUpdates {
-                self.attendeeCollectionView.insertItems(at: indexPaths)
+                //如果当前的cell数量已经和数据源相同，不再进行插入操作而是直接reloadData
+                if self.attendeeCollectionView.numberOfItems(inSection: 0) == viewModel.listSeatItem.count {
+                    attendeeCollectionView.reloadData()
+                } else {
+                    self.attendeeCollectionView.insertItems(at: indexPaths)
+                }
             }
         }
     }
@@ -196,16 +199,21 @@ extension TUIVideoSeatView: TUIVideoSeatViewResponder {
     func deleteItems(at indexPaths: [IndexPath]) {
         freshCollectionView {
             self.attendeeCollectionView.performBatchUpdates {
-                var resultArray: [IndexPath] = []
-                let numberOfSections = self.attendeeCollectionView.numberOfSections
-                for indexPath in indexPaths {
-                    let section = indexPath.section
-                    let item = indexPath.item
-                    guard section < numberOfSections && item < self.attendeeCollectionView.numberOfItems(inSection: section)
-                    else { continue } // indexPath越界，不执行删除操作
-                    resultArray.append(indexPath)
+                //如果当前cell的数量已经和数据源相同，不再进行删除操作，而是直接reloadData
+                if attendeeCollectionView.numberOfItems(inSection: 0) == viewModel.listSeatItem.count {
+                    attendeeCollectionView.reloadData()
+                } else {
+                    var resultArray: [IndexPath] = []
+                    let numberOfSections = self.attendeeCollectionView.numberOfSections
+                    for indexPath in indexPaths {
+                        let section = indexPath.section
+                        let item = indexPath.item
+                        guard section < numberOfSections && item < self.attendeeCollectionView.numberOfItems(inSection: section)
+                        else { continue } // indexPath越界，不执行删除操作
+                        resultArray.append(indexPath)
+                    }
+                    self.attendeeCollectionView.deleteItems(at: resultArray)
                 }
-                self.attendeeCollectionView.deleteItems(at: resultArray)
             }
         }
     }

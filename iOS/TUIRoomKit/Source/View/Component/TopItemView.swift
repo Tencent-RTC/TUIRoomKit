@@ -58,6 +58,7 @@ class TopItemView: UIView {
     func setupViewState(item: ButtonItemData) {
         button.isSelected = item.isSelect
         button.isEnabled = item.isEnabled
+        button.isHidden = item.isHidden
         if let normalImage = item.normalImage {
             button.setImage(normalImage, for: .normal)
         }

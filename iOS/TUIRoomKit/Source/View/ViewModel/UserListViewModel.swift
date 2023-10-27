@@ -99,10 +99,6 @@ class UserListViewModel: NSObject {
         sender.isSelected = !sender.isSelected
         engineManager.takeUserOnSeatByAdmin(userId: userId, timeout: timeoutNumber)
     }
-    
-    func dropDownAction(sender: UIView) {
-        RoomRouter.shared.dismissPopupViewController(viewType: .userListViewType, animated: true)
-    }
 }
 
 extension UserListViewModel: RoomKitUIEventResponder {

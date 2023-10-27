@@ -49,6 +49,7 @@ class ScreenCaptureMaskView: UIView {
         button.setTitle(.shareOffText, for: .normal)
         button.backgroundColor = UIColor(0xCC3D47)
         button.layer.cornerRadius = 6.scale375()
+        button.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 12)
         return button
     }()
     
@@ -107,12 +108,6 @@ class ScreenCaptureMaskView: UIView {
         sharingScreenLabel.snp.makeConstraints { make in
             make.bottom.left.right.equalToSuperview()
             make.height.equalTo(22.scale375())
-        }
-        stopScreenButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview()
-            make.centerX.equalToSuperview()
-            make.height.equalTo(34.scale375())
-            make.width.equalTo(102.scale375())
         }
     }
     

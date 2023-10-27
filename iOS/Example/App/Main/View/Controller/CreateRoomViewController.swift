@@ -22,8 +22,8 @@ class CreateRoomViewController: UIViewController {
     private let currentUserId: String = TUILogin.getUserID() ?? ""
     private let roomInfo: TUIRoomInfo = TUIRoomInfo()
     private let roomKit: TUIRoomKit = TUIRoomKit.createInstance()
-    private var enableMic: Bool = true
-    private var enableCamera: Bool = true
+    private var enableLocalAudio: Bool = true
+    private var enableLocalVideo: Bool = true
     private var isSoundOnSpeaker: Bool = true
     let roomHashNumber: Int = 0x3B9AC9FF
     lazy var roomId: String = {
@@ -69,6 +69,15 @@ class CreateRoomViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         UIApplication.shared.isIdleTimerDisabled = false
         UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
+        renewRootViewState()
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        appDelegate.orientation = .portrait
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        appDelegate.orientation = .allButUpsideDown
     }
     
     @objc
@@ -82,11 +91,10 @@ class CreateRoomViewController: UIViewController {
 }
 
 extension CreateRoomViewController {
-   private func createItems() {
+    private func createItems() {
         let roomTypeItem = ListCellItemData()
         roomTypeItem.titleText = .roomTypeText
         roomTypeItem.messageText = .freedomSpeakText
-        roomTypeItem.hasButton = true
         roomTypeItem.hasOverAllAction = true
         roomTypeItem.action = { [weak self] sender in
             guard let self = self else { return }
@@ -102,15 +110,16 @@ extension CreateRoomViewController {
         let userNameItem = ListCellItemData()
         userNameItem.titleText = .userNameText
         userNameItem.messageText = currentUserName
+        userNameItem.hasDownLineView = false
         inputViewItems.append(userNameItem)
         
         let openMicItem = ListCellItemData()
         openMicItem.titleText = .openMicText
         openMicItem.hasSwitch = true
-        openMicItem.isSwitchOn = true
+        openMicItem.isSwitchOn = enableLocalAudio
         openMicItem.action = { [weak self] sender in
             guard let self = self, let view = sender as? UISwitch else { return }
-            self.enableMic = view.isOn
+            self.enableLocalAudio = view.isOn
         }
         switchViewItems.append(openMicItem)
         
@@ -127,37 +136,43 @@ extension CreateRoomViewController {
         let openCameraItem = ListCellItemData()
         openCameraItem.titleText = .openCameraText
         openCameraItem.hasSwitch = true
-        openCameraItem.isSwitchOn = enableMic
+        openCameraItem.isSwitchOn = enableLocalVideo
+        openCameraItem.hasDownLineView = false
         openCameraItem.action = { [weak self] sender in
             guard let self = self, let view = sender as? UISwitch else { return }
-            self.enableCamera = view.isOn
+            self.enableLocalVideo = view.isOn
         }
         switchViewItems.append(openCameraItem)
     }
-        
-    func enterButtonClick(sender: UIButton, view: CreateRoomView) {
-        view.enterButton.isEnabled = false
-        view.loading.startAnimating()
-        DispatchQueue.main.asyncAfter(deadline: .now()+3, execute: {
-            view.enterButton.isEnabled = true
-            view.loading.stopAnimating()
-        })
+    
+    func enterButtonClick(sender: UIButton) {
+        rootView?.updateEnterButtonState(isEnabled: false)
+        rootView?.updateLoadingState(isStarted: true)
         roomInfo.roomId = roomId
         roomInfo.name = currentUserName.truncateUtf8String(maxByteLength: 30)
         roomInfo.speechMode = roomSpeechMode
         roomInfo.roomType = .conference
         roomKit.createRoom(roomInfo: roomInfo) { [weak self] in
             guard let self = self else { return }
-            self.roomKit.enterRoom(roomId: self.roomInfo.roomId, enableMic: self.enableMic, enableCamera: self.enableCamera,
-                                   isSoundOnSpeaker: self.isSoundOnSpeaker) {
+            self.roomKit.enterRoom(roomId: self.roomInfo.roomId, enableAudio: self.enableLocalAudio, enableVideo:
+                                    self.enableLocalVideo, isSoundOnSpeaker: self.isSoundOnSpeaker) { [weak self] in
+                guard let self = self else { return }
+                self.renewRootViewState()
             } onError: { [weak self] code, message in
                 guard let self = self else { return }
-                self.view.makeToast(message)
+                self.renewRootViewState()
+                self.rootView?.makeToast(message)
             }
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.view.makeToast(message)
+            self.renewRootViewState()
+            self.rootView?.makeToast(message)
         }
+    }
+    
+    private func renewRootViewState() {
+        rootView?.updateEnterButtonState(isEnabled: true)
+        rootView?.updateLoadingState(isStarted: false)
     }
     
     func switchRoomTypeClick() {

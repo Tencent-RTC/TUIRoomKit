@@ -11,6 +11,7 @@ class TransferMasterView: UIView {
     let viewModel: TransferMasterViewModel
     var attendeeList: [UserEntity]
     var searchArray: [UserEntity] = []
+    private var isSearching: Bool = false
     
     let backButton: UIButton = {
         let button = UIButton()
@@ -26,14 +27,21 @@ class TransferMasterView: UIView {
         return button
     }()
     
-    let searchController: UISearchController = {
-        let controller = UISearchController(searchResultsController: nil)
-        controller.obscuresBackgroundDuringPresentation = false
-        controller.searchBar.placeholder = .searchMemberText
-        controller.searchBar.setBackgroundImage(UIColor(0x1B1E26).trans2Image(), for: .top, barMetrics: .default)
-        controller.obscuresBackgroundDuringPresentation = false
-        controller.hidesNavigationBarDuringPresentation = false
-        return controller
+    let searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.placeholder = .searchMemberText
+        searchBar.setBackgroundImage(UIColor(0x1B1E26).trans2Image(), for: .top, barMetrics: .default)
+        searchBar.searchTextField.textColor = UIColor(0xB2BBD1)
+        searchBar.searchTextField.tintColor = UIColor(0xB2BBD1).withAlphaComponent(0.3)
+        searchBar.searchTextField.layer.cornerRadius = 6
+        return searchBar
+    }()
+    
+    let searchControl: UIControl = {
+        let view = UIControl()
+        view.backgroundColor = .clear
+        view.isHidden = true
+        return view
     }()
     
     let appointMasterButton: UIButton = {
@@ -56,7 +64,6 @@ class TransferMasterView: UIView {
         tableView.dataSource = self
         tableView.backgroundColor = UIColor(0x1B1E26)
         tableView.register(UserListCell.self, forCellReuseIdentifier: "RaiseHandCell")
-        tableView.tableHeaderView = searchController.searchBar
         return tableView
     }()
     
@@ -64,7 +71,6 @@ class TransferMasterView: UIView {
         self.viewModel = viewModel
         self.attendeeList = viewModel.attendeeList
         super.init(frame: .zero)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
     }
     
     required init?(coder: NSCoder) {
@@ -84,8 +90,10 @@ class TransferMasterView: UIView {
     
     func constructViewHierarchy() {
         addSubview(backButton)
+        addSubview(searchBar)
         addSubview(transferMasterTableView)
         addSubview(appointMasterButton)
+        addSubview(searchControl)
     }
     
     func activateConstraints() {
@@ -95,9 +103,16 @@ class TransferMasterView: UIView {
             make.height.equalTo(20)
             make.width.equalTo(200)
         }
+        searchBar.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16.scale375())
+            make.trailing.equalToSuperview().offset(-16.scale375())
+            make.height.equalTo(34.scale375Height())
+            make.top.equalTo(backButton.snp.bottom).offset(23.scale375Height())
+        }
         transferMasterTableView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview()
-            make.top.equalTo(backButton.snp.bottom).offset(5)
+            make.leading.equalToSuperview().offset(16.scale375())
+            make.trailing.equalToSuperview().offset(-16.scale375())
+            make.top.equalTo(searchBar.snp.bottom).offset(10.scale375Height())
             make.bottom.equalToSuperview()
         }
         appointMasterButton.snp.makeConstraints { make in
@@ -106,19 +121,23 @@ class TransferMasterView: UIView {
             make.height.equalTo(50)
             make.leading.equalToSuperview().offset(20)
         }
+        searchControl.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     func bindInteraction() {
-        searchController.delegate = self
-        searchController.searchResultsUpdater = self
+        searchBar.delegate = self
         viewModel.viewResponder = self
         backButton.addTarget(self, action: #selector(backAction(sender:)), for: .touchUpInside)
         appointMasterButton.addTarget(self, action: #selector(appointMasterAction(sender:)), for: .touchUpInside)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(hideSearchControl(sender:)))
+        searchControl.addGestureRecognizer(tap)
     }
     
     @objc func backAction(sender: UIButton) {
-        searchController.searchBar.endEditing(true)
-        searchController.isActive = false
+        searchBar.endEditing(true)
+        searchBar.searchTextField.resignFirstResponder()
         viewModel.backAction()
     }
     
@@ -126,28 +145,36 @@ class TransferMasterView: UIView {
         viewModel.appointMasterAction(sender: sender)
     }
     
+    @objc func hideSearchControl(sender: UIView) {
+        searchBar.searchTextField.resignFirstResponder()
+        searchControl.isHidden = true
+    }
+    
     deinit {
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
         debugPrint("deinit \(self)")
     }
 }
 
-extension TransferMasterView: UISearchControllerDelegate, UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        searchArray = viewModel.attendeeList.filter({ model -> Bool in
-            if let searchText = searchController.searchBar.text {
-                return (model.userName == searchText)
-            } else {
-                return false
-            }
-        })
-        attendeeList = searchArray
-        transferMasterTableView.reloadData()
+extension TransferMasterView: UISearchBarDelegate {
+    func searchBar(_ searchBar:UISearchBar,textDidChange searchText:String){
+        let searchContentText = searchText.trimmingCharacters(in: .whitespaces)
+        if searchContentText.count == 0 {
+            attendeeList = viewModel.attendeeList
+            transferMasterTableView.reloadData()
+            isSearching = false
+        } else {
+            searchArray = viewModel.attendeeList.filter({ model -> Bool in
+                return model.userName.contains(searchContentText)
+            })
+            attendeeList = searchArray
+            transferMasterTableView.reloadData()
+            isSearching = true
+        }
     }
     
-    func didDismissSearchController(_ searchController: UISearchController) {
-        attendeeList = viewModel.attendeeList
-        transferMasterTableView.reloadData()
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        searchControl.isHidden = false
+        return true
     }
 }
 
@@ -167,32 +194,26 @@ extension TransferMasterView: UITableViewDelegate {
     }
     
     internal func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        searchController.searchBar.endEditing(true)
+        searchBar.endEditing(true)
+        searchBar.searchTextField.resignFirstResponder()
         viewModel.userId = attendeeList[indexPath.row].userId
         transferMasterTableView.reloadData()
     }
     internal func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 68.scale375()
-    }
-}
-
-extension TransferMasterView: RoomKitUIEventResponder {
-    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
-        if key == .TUIRoomKitService_RenewUserList {
-            attendeeList = viewModel.attendeeList
-            transferMasterTableView.reloadData()
-        }
+        return 60.scale375Height()
     }
 }
 
 extension  TransferMasterView: TransferMasterViewResponder {
     func reloadTransferMasterTableView() {
+        guard !isSearching else { return }
+        attendeeList = viewModel.attendeeList
         transferMasterTableView.reloadData()
     }
     
     func searchControllerChangeActive(isActive: Bool) {
-        searchController.searchBar.endEditing(!isActive)
-        searchController.isActive = isActive
+        searchBar.endEditing(!isActive)
+        searchBar.searchTextField.resignFirstResponder()
     }
 }
 
@@ -209,10 +230,11 @@ class TransferMasterTableCell: UITableViewCell {
     
     let userLabel: UILabel = {
         let label = UILabel()
-        label.textColor = UIColor(0xD1D9EC)
+        label.textColor = UIColor(0xD5E0F2)
         label.backgroundColor = UIColor.clear
         label.textAlignment = isRTL ? .right : .left
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.textAlignment = .left
+        label.font = UIFont(name: "PingFangSC-Regular", size: 16)
         label.numberOfLines = 1
         return label
     }()
@@ -259,26 +281,26 @@ class TransferMasterTableCell: UITableViewCell {
     
     func activateConstraints() {
         avatarImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(48)
-            make.leading.equalToSuperview().offset(20)
+            make.width.height.equalTo(40.scale375Height())
+            make.leading.equalToSuperview()
             make.centerY.equalToSuperview()
         }
         checkMarkButton.snp.makeConstraints { make in
-            make.width.height.equalTo(36)
-            make.trailing.equalToSuperview().offset(-12)
+            make.width.height.equalTo(22.scale375())
+            make.trailing.equalToSuperview()
             make.centerY.equalTo(self.avatarImageView)
         }
         userLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(12)
+            make.leading.equalTo(avatarImageView.snp.trailing).offset(10.scale375())
             make.width.equalTo(150.scale375())
-            make.height.equalTo(48)
+            make.height.equalTo(22.scale375Height())
         }
         downLineView.snp.makeConstraints { make in
             make.leading.equalTo(userLabel)
-            make.trailing.equalToSuperview().offset(-12)
+            make.trailing.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.height.equalTo(0.3)
+            make.height.equalTo(1.scale375Height())
         }
     }
     

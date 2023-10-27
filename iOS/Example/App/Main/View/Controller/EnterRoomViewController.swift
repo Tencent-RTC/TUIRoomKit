@@ -12,21 +12,17 @@ import TUIRoomEngine
 import TUIRoomKit
 import TUICore
 
-protocol EnterRoomResponder :NSObjectProtocol {
-    func updateEnterButtonBottomConstraint(offset: CGFloat)
-}
-
 class EnterRoomViewController: UIViewController {
+    weak var rootView: EnterRoomView?
     private var fieldText: String = ""
     private(set) var inputViewItems: [ListCellItemData] = []
     private(set) var switchViewItems: [ListCellItemData] = []
     private let currentUserName: String = TUILogin.getNickName() ?? ""
     private let currentUserId: String = TUILogin.getUserID() ?? ""
     private var roomId: String = ""
-    private var enableMic: Bool = true
-    private var enableCamera: Bool = true
+    private var enableLocalAudio: Bool = true
+    private var enableLocalVideo: Bool = true
     private var isSoundOnSpeaker: Bool = true
-    weak var viewResponder: EnterRoomResponder?
     
     let backButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -48,14 +44,6 @@ class EnterRoomViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         createItems()
         backButton.addTarget(self, action: #selector(backButtonClick(sender:)), for: .touchUpInside)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(keyboardWillShow),
-                                               name: UIResponder.keyboardWillShowNotification,
-                                               object:nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(keyboardWillHide),
-                                               name: UIResponder.keyboardWillHideNotification,
-                                               object:nil)
     }
     
     required init?(coder: NSCoder) {
@@ -66,6 +54,7 @@ class EnterRoomViewController: UIViewController {
         let rootView = EnterRoomView()
         rootView.rootViewController = self
         view = rootView
+        self.rootView = rootView
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -74,60 +63,28 @@ class EnterRoomViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         UIApplication.shared.isIdleTimerDisabled = false
         UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
+        renewRootViewState()
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        appDelegate.orientation = .portrait
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        appDelegate.orientation = .allButUpsideDown
     }
     
     @objc func backButtonClick(sender: UIButton) {
         navigationController?.popViewController(animated: true)
     }
     
-    @objc func keyboardWillShow(notification:Notification) {
-        guard let userInfo = notification.userInfo else{
-            return
-        }
-        let keyboardRect = userInfo[EnterRoomViewController.keyboardFrameEndUserInfoKey] as! CGRect
-        let animationDuration = userInfo[EnterRoomViewController.keyboardAnimationDurationUserInfoKey] as! Double
-        let animationCurve = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as! NSNumber
-        guard let curve = UIView.AnimationCurve(rawValue: animationCurve.intValue) else
-        {
-            return
-        }
-        UIView.setAnimationCurve(curve)
-        UIView.animate(withDuration: animationDuration){ [weak self]  in
-            guard let self = self else { return }
-            self.viewResponder?.updateEnterButtonBottomConstraint(offset: keyboardRect.size.height-51)
-            
-        }
-    }
-    
-    @objc func keyboardWillHide(notification:Notification) {
-        guard let userInfo = notification.userInfo else{
-            return
-        }
-        let animationCurve = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as! NSNumber
-        guard let curve = UIView.AnimationCurve(rawValue: animationCurve.intValue) else
-        {
-            return
-        }
-        UIView.setAnimationCurve(curve)
-        UIView.animate(withDuration: 0.3){ [weak self] in
-            guard let self = self else { return }
-            self.viewResponder?.updateEnterButtonBottomConstraint(offset: 0)
-        }
-    }
-    
     deinit {
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         debugPrint("deinit \(self)")
     }
 }
 
 extension EnterRoomViewController {
-   private func createItems() {
+    private func createItems() {
         let enterRoomIdItem = ListCellItemData()
         enterRoomIdItem.titleText = .roomNumText
         enterRoomIdItem.fieldEnable = true
@@ -142,15 +99,16 @@ extension EnterRoomViewController {
         let userNameItem = ListCellItemData()
         userNameItem.titleText = .userNameText
         userNameItem.messageText = currentUserName
+        userNameItem.hasDownLineView = false
         inputViewItems.append(userNameItem)
         
         let openMicItem = ListCellItemData()
         openMicItem.titleText = .openMicText
         openMicItem.hasSwitch = true
-        openMicItem.isSwitchOn = true
+        openMicItem.isSwitchOn = enableLocalAudio
         openMicItem.action = {[weak self] sender in
             guard let self = self, let view = sender as? UISwitch else { return }
-            self.enableMic = view.isOn
+            self.enableLocalAudio = view.isOn
         }
         switchViewItems.append(openMicItem)
         
@@ -167,21 +125,16 @@ extension EnterRoomViewController {
         let openCameraItem = ListCellItemData()
         openCameraItem.titleText = .openCameraText
         openCameraItem.hasSwitch = true
-        openCameraItem.isSwitchOn = true
+        openCameraItem.isSwitchOn = enableLocalVideo
+        openCameraItem.hasDownLineView = false
         openCameraItem.action = {[weak self] sender in
             guard let self = self, let view = sender as? UISwitch else { return }
-            self.enableCamera = view.isOn
+            self.enableLocalVideo = view.isOn
         }
         switchViewItems.append(openCameraItem)
     }
     
-    func enterButtonClick(sender: UIButton, view: EnterRoomView) {
-        view.enterButton.isEnabled = false
-        view.loading.startAnimating()
-        DispatchQueue.main.asyncAfter(deadline: .now()+3, execute: {
-            view.enterButton.isEnabled = true
-            view.loading.stopAnimating()
-        })
+    func enterButtonClick(sender: UIButton) {
         if fieldText.count <= 0 {
             view.makeToast(.enterRoomIdErrorToast)
             return
@@ -196,11 +149,22 @@ extension EnterRoomViewController {
             return
         }
         roomId = roomIDStr
-        TUIRoomKit.createInstance().enterRoom(roomId: roomId, enableMic: enableMic, enableCamera: enableCamera, isSoundOnSpeaker: isSoundOnSpeaker) {
+        rootView?.updateEnterButtonState(isEnabled: false)
+        rootView?.updateLoadingState(isStarted: true)
+        TUIRoomKit.createInstance().enterRoom(roomId: roomId, enableAudio: enableLocalAudio, enableVideo: enableLocalVideo,
+                                              isSoundOnSpeaker: isSoundOnSpeaker) { [weak self] in
+            guard let self = self else { return }
+            self.renewRootViewState()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.view.makeToast(message)
+            self.renewRootViewState()
+            self.rootView?.makeToast(message)
         }
+    }
+    
+    private func renewRootViewState() {
+        rootView?.updateEnterButtonState(isEnabled: true)
+        rootView?.updateLoadingState(isStarted: false)
     }
 }
 

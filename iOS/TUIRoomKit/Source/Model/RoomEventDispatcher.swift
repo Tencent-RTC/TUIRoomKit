@@ -103,7 +103,7 @@ extension RoomEventDispatcher: TUIRoomObserver {
     
     func onUserScreenCaptureStopped(reason: Int) {
         userScreenCaptureStopped()
-        EngineEventCenter.shared.notifyEngineEvent(event: .onUserScreenCaptureStopped, param: ["reason" : reason,])
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: ["userId":currentUser.userId, "hasVideo": false])
     }
     
     func onSeatListChanged(seatList: [TUISeatInfo], seated seatedList: [TUISeatInfo], left leftList: [TUISeatInfo]) {
@@ -153,6 +153,9 @@ extension RoomEventDispatcher {
         //判断自己是否下麦
         if leftList.first(where: { $0.userId == currentUser.userId }) != nil {
             currentUser.isOnSeat = false
+            if currentUser.hasScreenStream { //如果正在进行屏幕共享，要把屏幕共享关闭。
+                engineManager.stopScreenCapture()
+            }
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
                                                    param: ["isOnSeat":false])
         }
@@ -244,7 +247,7 @@ extension RoomEventDispatcher {
             }
             guard let userModel = store.attendeeList.first(where: { $0.userId == userId }) else { return }
             userModel.hasScreenStream = hasVideo
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: [:])
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: ["userId": userId, "hasVideo": hasVideo])
         case .cameraStream:
             if userId == currentUser.userId {
                 EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_CurrentUserHasVideoStream,

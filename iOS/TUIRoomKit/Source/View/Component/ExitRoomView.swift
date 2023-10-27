@@ -18,23 +18,6 @@ class ExitRoomView: UIView {
     var roomInfo: TUIRoomInfo {
         EngineManager.createInstance().store.roomInfo
     }
-    let dropView : UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(0x17181F)
-        return view
-    }()
-    
-    let dropImageView: UIImageView = {
-        let view = UIImageView()
-        view.image = UIImage(named: "room_lineImage",in:tuiRoomKitBundle(),compatibleWith: nil)
-        return view
-    }()
-    
-    let headView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(0x17181F)
-        return view
-    }()
     
     let titleLabel: UILabel = {
         let label = UILabel()
@@ -70,7 +53,7 @@ class ExitRoomView: UIView {
         return view
     }()
     
-    let ExitRoomButton: UIButton = {
+    let exitRoomButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitle(.exitRoomText, for: .normal)
         button.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 18)
@@ -97,86 +80,49 @@ class ExitRoomView: UIView {
         activateConstraints()
         bindInteraction()
         isViewReady = true
-        boundary2View.isHidden = currentUser.userId != roomInfo.ownerId
-        ExitRoomButton.isHidden = currentUser.userId != roomInfo.ownerId
-    }
-    
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        roundedRect(rect: bounds,
-                    byRoundingCorners: [.topLeft, .topRight],
-                    cornerRadii: CGSize(width: 12, height: 12))
+        exitRoomButton.isHidden = currentUser.userId != roomInfo.ownerId
+        leaveRoomButton.isHidden = !viewModel.isShowLeaveRoomButton()
+        boundary2View.isHidden = currentUser.userId != roomInfo.ownerId || !viewModel.isShowLeaveRoomButton()
     }
     
     func constructViewHierarchy() {
-        addSubview(dropView)
-        addSubview(headView)
+        addSubview(titleLabel)
         addSubview(boundary1View)
         addSubview(leaveRoomButton)
         addSubview(boundary2View)
-        addSubview(ExitRoomButton)
-        dropView.addSubview(dropImageView)
-        headView.addSubview(titleLabel)
+        addSubview(exitRoomButton)
     }
     
     func activateConstraints() {
-        dropView.snp.makeConstraints{ make in
-            make.top.equalToSuperview()
-            make.height.equalTo(15.scale375())
-            make.leading.equalToSuperview()
-            make.width.equalToSuperview()
-        }
-        dropImageView.snp.makeConstraints{ make in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(12.scale375())
-            make.width.equalTo(24.scale375())
-            make.height.equalTo(3.scale375())
-        }
-        headView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(25.scale375())
-            make.left.equalToSuperview()
-            make.right.equalToSuperview()
-            make.height.equalTo(35.scale375())
-        }
         titleLabel.snp.makeConstraints { make in
-            make.top.left.right.equalToSuperview()
-            make.height.equalTo(35.scale375())
+            make.top.leading.trailing.equalToSuperview()
+            make.height.equalTo(67.scale375Height())
         }
         boundary1View.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(68.scale375())
-            make.centerX.equalToSuperview()
-            make.height.equalTo(1.scale375())
-            make.width.equalToSuperview()
+            make.top.equalTo(titleLabel.snp.bottom)
+            make.height.equalTo(1.scale375Height())
+            make.leading.trailing.equalToSuperview()
         }
+        let height = viewModel.isShowLeaveRoomButton() ? 57.scale375Height() : 0
         leaveRoomButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(85.scale375())
-            make.centerX.equalToSuperview()
-            make.height.equalTo(25)
-            make.width.equalToSuperview()
+            make.top.equalTo(boundary1View.snp.bottom)
+            make.height.equalTo(height)
+            make.leading.trailing.equalToSuperview()
         }
         boundary2View.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(126.scale375())
-            make.centerX.equalToSuperview()
-            make.height.equalTo(1.scale375())
-            make.width.equalToSuperview()
+            make.top.equalTo(leaveRoomButton.snp.bottom)
+            make.height.equalTo(1.scale375Height())
+            make.leading.trailing.equalToSuperview()
         }
-        ExitRoomButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(143.scale375())
-            make.centerX.equalToSuperview()
-            make.height.equalTo(25.scale375())
-            make.width.equalToSuperview()
+        exitRoomButton.snp.makeConstraints { make in
+            make.top.equalTo(leaveRoomButton.snp.bottom).offset(1.scale375Height())
+            make.height.equalTo(57.scale375Height())
+            make.leading.trailing.equalToSuperview()
         }
     }
     
     func bindInteraction() {
-        backgroundColor = UIColor(0x1B1E26)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dropDownRoomInfoAction(sender:)))
-        dropView.addGestureRecognizer(tap)
-        dropView.isUserInteractionEnabled = true
-    }
-    
-    @objc func dropDownRoomInfoAction(sender: UIView) {
-        viewModel.dropDownAction(sender: sender)
+        backgroundColor = UIColor(0x17181F)
     }
     
     @objc func leaveRoomAction(sender: UIView) {
