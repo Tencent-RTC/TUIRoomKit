@@ -11,6 +11,12 @@ import Foundation
 class TopView: UIView {
     // MARK: - store property
     let viewModel: TopViewModel
+    private var viewArray: [TopItemView] = []
+    let backgroundImageView: UIImageView = {
+        let image = UIImage(named: "room_top_background",in: tuiRoomKitBundle(), compatibleWith: nil)
+        let imageView = UIImageView(image: image)
+        return imageView
+    }()
     
     let stackView: UIStackView = {
         let view = UIStackView()
@@ -29,7 +35,7 @@ class TopView: UIView {
         let label = UILabel()
         label.textColor = UIColor(0xD5E0F2)
         label.font = UIFont(name: "PingFangSC-Medium", size: 16)
-        label.textAlignment = .center
+        label.textAlignment = isRTL ? .left : .right
         label.adjustsFontSizeToFitWidth = true
         label.lineBreakMode = .byTruncatingTail
         return label
@@ -107,6 +113,7 @@ class TopView: UIView {
     }
     
     func constructViewHierarchy() {
+        addSubview(backgroundImageView)
         addSubview(meetingTitleView)
         addSubview(stackView)
         meetingTitleView.addSubview(meetingNameLabel)
@@ -120,6 +127,7 @@ class TopView: UIView {
             let view = TopItemView(itemData: item)
             menuButtons.append(view)
             stackView.addArrangedSubview(view)
+            viewArray.append(view)
             let size = item.size ?? CGSize(width: 20.scale375(), height: 20.scale375())
             view.snp.makeConstraints { make in
                 make.height.equalTo(size.height)
@@ -129,6 +137,9 @@ class TopView: UIView {
     }
     
     func activateConstraints() {
+        backgroundImageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         stackView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16.scale375())
             make.top.bottom.equalToSuperview()
@@ -136,8 +147,8 @@ class TopView: UIView {
         }
         meetingTitleView.snp.makeConstraints { make in
             make.width.equalTo(129.scale375())
-            make.top.bottom.equalToSuperview()
-            make.centerX.equalToSuperview()
+            make.height.equalTo(44.scale375Height())
+            make.centerX.centerY.equalToSuperview()
         }
         meetingNameLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview()
@@ -202,6 +213,7 @@ class TopView: UIView {
             }
             meetingTitleView.snp.updateConstraints { make in
                 make.width.equalTo(150.scale375())
+                make.height.equalTo(24.scale375Height())
             }
         } else { //竖屏时，会议时间放在会议名称的下边
             timeLabel.snp.remakeConstraints { make in
@@ -210,6 +222,7 @@ class TopView: UIView {
             }
             meetingTitleView.snp.updateConstraints { make in
                 make.width.equalTo(129.scale375())
+                make.height.equalTo(44.scale375Height())
             }
         }
     }
@@ -235,6 +248,11 @@ enum AlertAction {
 }
 
 extension TopView: TopViewModelResponder {
+    func updateStackView(item: ButtonItemData) {
+        guard let view = viewArray.first(where: { $0.itemData.buttonType == item.buttonType }) else { return }
+        view.setupViewState(item: item)
+    }
+    
     func updateTimerLabel(text: String) {
         self.timeLabel.text = text
     }

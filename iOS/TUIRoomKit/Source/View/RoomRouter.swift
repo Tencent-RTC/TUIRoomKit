@@ -83,7 +83,7 @@ class RoomRouter: NSObject {
         push(viewController: vc)
     }
     
-    func presentPopUpViewController(viewType: PopUpViewType, height: CGFloat?, backgroundColor: UIColor = UIColor(0x1B1E26)) {
+    func presentPopUpViewController(viewType: PopUpViewType, height: CGFloat, backgroundColor: UIColor = UIColor(0x1B1E26)) {
         let vc = makePopUpViewController(viewType: viewType, height: height, backgroundColor: backgroundColor)
         let weakObserver = { [weak vc] in return vc }
         if var observerArray = context.presentControllerMap[viewType] {
@@ -262,7 +262,7 @@ extension RoomRouter {
         return controller
     }
     
-    private func makePopUpViewController(viewType: PopUpViewType, height: CGFloat?, backgroundColor: UIColor) -> UIViewController {
+    private func makePopUpViewController(viewType: PopUpViewType, height: CGFloat, backgroundColor: UIColor) -> UIViewController {
         let controller = PopUpViewController(popUpViewModelFactory: self, viewType: viewType, height: height, backgroundColor: backgroundColor)
         return controller
     }
@@ -288,7 +288,7 @@ extension RoomRouter: RoomMainViewModelFactory {
 }
 
 extension RoomRouter: PopUpViewModelFactory {
-    func makeRootViewModel(viewType: PopUpViewType, height: CGFloat?, backgroundColor: UIColor) -> PopUpViewModel {
+    func makeRootViewModel(viewType: PopUpViewType, height: CGFloat, backgroundColor: UIColor) -> PopUpViewModel {
         let viewModel = PopUpViewModel(viewType: viewType, height: height)
         viewModel.backgroundColor = backgroundColor
         return viewModel

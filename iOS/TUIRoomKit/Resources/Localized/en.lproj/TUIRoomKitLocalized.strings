@@ -116,8 +116,7 @@
 "TUIRoom.appoint.master.and.leave.room" = "Appoint and leave";
 "TUIRoom.have.become.master" = "You have become the master";
 "TUIRoom.have.transferred.master" = "You have transferred the master";
-"TUIRoom.mute.audio.seat.reason" = "Raise your hand to speak in the room, please raise your hand to apply for a microphone";
-"TUIRoom.mute.video.seat.reason" = "Raise your hand to speak in the room, please raise your hand to apply for a microphone";
+"TUIRoom.mute.seat.reason" = "Raise your hand to speak in the room, please raise your hand first";
 "TUIRoom.mute.audio.room.reason" = "All on mute audio, unable to turn on microphone";
 "TUIRoom.mute.video.room.reason" = "All on mute video, unable to turn on camera";
 "TUIRoom.all.mute.video.prompt" = "The host has banned all members from turning on the camera";
@@ -135,8 +134,8 @@
 "TUIRoom.exit" = "exit";
 "TUIRoom.share.on" = "Share";
 "TUIRoom.share.off" = "Stop";
-"TUIRoom.video" = "Video";
-"TUIRoom.audio" = "Audio";
+"TUIRoom.video.settings" = "Video settings";
+"TUIRoom.audio.settings" = "Audio settings";
 "TUIRoom.setting" = "Settings";
 "TUIRoom.advancedSetting" = "Advanced Settings";
 "TUIRoom.frame.rate" = "Frame Rate";
@@ -164,7 +163,7 @@
 "TUIRoom.fail.camera.permission.Later" = "Later";
 "TUIRoom.fail.camera.permission.Enable" = "Authorize Now";
 "TUIRoom.device.set" = "Meeting Settings";
-"TUIRoom.mic.set" = "Join the conference and turn on the microphone";
+"TUIRoom.mic.set" = "Join the meeting and start the audio";
 "TUIRoom.camera.set" = "Join the conference and turn on the camera";
 "TUIRoom.sharing.screen" = "You are sharing your screen";
 "TUIRoom.stop.share.screen" = "Stop screen sharing";
@@ -178,3 +177,9 @@
 "TUIRoom.raised.hand" = "You have raised your hand, please wait for the moderator to act";
 "TUIRoom.rejected.take.seat" = "The moderator has rejected your request to take seat";
 "TUIRoom.taken.seat" = "The moderator has approved your request to take seat";
+"TUIRoom.in.another.room" = "You are already in another room";
+"TUIRoom.others.screen.sharing" = "An existing member is sharing. Please try again later";
+"TUIRoom.smooth.resolution" = "Smooth resolution";
+"TUIRoom.standard.resolution" = "Standard resolution";
+"TUIRoom.high.resolution" = "High resolution";
+"TUIRoom.super.resolution" = "Super resolution";

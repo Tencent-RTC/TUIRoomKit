@@ -242,6 +242,8 @@ class PrePareView: UIView {
     @objc
     func switchLanguageAction(sender: UIButton) {
         rootViewController?.switchLanguageAction()
+        joinRoomButton.setTitle(.joinRoomText, for: .normal)
+        createRoomButton.setTitle(.createRoomText, for: .normal)
     }
     
     deinit {

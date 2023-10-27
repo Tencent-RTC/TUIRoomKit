@@ -91,6 +91,7 @@ class RoomTypeView: UIView {
     }
     
     func bindInteraction() {
+        self.layer.cornerRadius = 12
         setupViewState()
         cancelButton.addTarget(self, action: #selector(cancelAction(sender:)), for: .touchUpInside)
         sureButton.addTarget(self, action: #selector(sureAction(sender:)), for: .touchUpInside)

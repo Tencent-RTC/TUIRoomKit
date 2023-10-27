@@ -16,8 +16,7 @@ class BottomView: UIView {
     var moreButtonItem: BottomItemView?
     var dropButtonItem: BottomItemView?
     var recordButtonItem: BottomItemView?
-    var shareScreenButtonItem: BottomItemView?
-    var memberButtonItem: BottomItemView?
+    var isUnfold: Bool = false //是否展开
 
     let baseButtonMenuView: UIStackView = {
         let view = UIStackView()
@@ -164,12 +163,6 @@ class BottomView: UIView {
             recordButtonItem?.alpha = 0
             recordButtonItem?.button.isEnabled = false
         }
-        if view.itemData.buttonType == .shareScreenItemType {
-            shareScreenButtonItem = view
-        }
-        if view.itemData.buttonType == .memberItemType {
-            memberButtonItem = view
-        }
     }
 
     func activateConstraints() {
@@ -177,26 +170,26 @@ class BottomView: UIView {
             make.bottom.leading.trailing.equalToSuperview()
             make.height.equalTo(60.scale375())
         }
+        let width = min(kScreenWidth, kScreenHeight)
         buttonMenuView.snp.makeConstraints { make in
-            make.width.equalTo(UIScreen.main.bounds.width - 16)
+            make.width.equalTo(width)
             make.bottom.centerX.height.equalToSuperview()
         }
         baseButtonMenuView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(8.scale375())
             make.height.equalTo(52.scale375())
-            make.width.equalToSuperview()
+            make.leading.equalToSuperview().offset(16.scale375())
+            make.trailing.equalToSuperview().offset(-16.scale375())
         }
         moreButtonMenuView.snp.makeConstraints { make in
             make.bottom.equalToSuperview()
             make.height.equalTo(52.scale375())
-            make.width.equalToSuperview()
+            make.leading.trailing.equalTo(baseButtonMenuView)
         }
     }
 
     func bindInteraction() {
         viewModel.viewResponder = self
-        let title = localizedReplace(.memberText,replace: String(viewModel.attendeeList.count))
-        memberButtonItem?.button.setTitle(title, for: .normal)
     }
 
     deinit {
@@ -207,15 +200,7 @@ class BottomView: UIView {
 extension BottomView: BottomViewModelResponder {
     func updateStackView(item: ButtonItemData, index: Int) {
         guard viewArray.count > index else { return }
-        viewArray[index].removeFromSuperview()
-        let view = BottomItemView(itemData: item)
-        viewArray[index] = view
-        baseButtonMenuView.insertArrangedSubview(view, at: index)
-        view.snp.makeConstraints { make in
-            make.height.equalTo(52.scale375())
-            make.width.equalTo(52.scale375())
-        }
-        view.backgroundColor = item.backgroundColor ?? UIColor(0x2A2D38)
+        viewArray[index].setupViewState(item: item)
     }
 
     func makeToast(text: String) {
@@ -258,6 +243,7 @@ extension BottomView: BottomViewModelResponder {
 
     func updataBottomView(isUp: Bool) {
         buttonMenuView.backgroundColor = isUp ? UIColor(0x2A2D38) : UIColor(0x0F1014)
+        self.isUnfold = isUp
         if isUp {
             updateBottomViewConstraints(isUnfold: true) { [weak self] in
                 guard let self = self else { return }
@@ -267,18 +253,6 @@ extension BottomView: BottomViewModelResponder {
             self.changeButtonMenuState(isUnfold: false)
             updateBottomViewConstraints(isUnfold: false) {}
         }
-    }
-
-    func updateButtonItemViewSelectState(shareScreenSeletecd: Bool) {
-        shareScreenButtonItem?.button.isSelected = shareScreenSeletecd
-    }
-
-    func updateButtonItemViewEnableState(shareScreenEnable: Bool) {
-        shareScreenButtonItem?.button.isEnabled = shareScreenEnable
-    }
-    
-    func reloadBottomView() {
-        memberButtonItem?.button.setTitle(.memberText + "(\(viewModel.attendeeList.count))", for: .normal)
     }
 }
 

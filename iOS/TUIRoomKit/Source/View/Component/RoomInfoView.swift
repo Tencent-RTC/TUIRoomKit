@@ -13,18 +13,6 @@ class RoomInfoView: UIView {
     private var isViewReady: Bool = false
     var viewArray: [UIView] = []
     
-    let dropView : UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(0x1B1E26)
-        return view
-    }()
-    
-    let dropImageView: UIImageView = {
-        let view = UIImageView()
-        view.image = UIImage(named: "room_lineImage",in:tuiRoomKitBundle(),compatibleWith: nil)
-        return view
-    }()
-    
     let headView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(0x1B1E26)
@@ -82,27 +70,13 @@ class RoomInfoView: UIView {
     }
     
     func constructViewHierarchy() {
-        addSubview(dropView)
         addSubview(stackView)
         addSubview(headView)
-        dropView.addSubview(dropImageView)
         headView.addSubview(nameLabel)
         headView.addSubview(codeButton)
     }
     
     func activateConstraints() {
-        dropView.snp.makeConstraints{ make in
-            make.top.equalToSuperview()
-            make.height.equalTo(15.scale375())
-            make.leading.equalToSuperview()
-            make.width.equalToSuperview()
-        }
-        dropImageView.snp.makeConstraints{ make in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(12.scale375())
-            make.width.equalTo(24.scale375())
-            make.height.equalTo(3.scale375())
-        }
         stackView.snp.makeConstraints { make in
             make.top.equalTo(headView.snp.bottom).offset(20.scale375())
             make.leading.equalToSuperview().offset(16.scale375())
@@ -141,18 +115,11 @@ class RoomInfoView: UIView {
         backgroundColor = UIColor(0x1B1E26)
         setupViewState(item: viewModel)
         codeButton.addTarget(self, action: #selector(codeAction(sender:)), for: .touchUpInside)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dropDownRoomInfoAction(sender:)))
-        dropView.addGestureRecognizer(tap)
-        dropView.isUserInteractionEnabled = true
         viewModel.viewResponder = self
     }
     
     func setupViewState(item: RoomInfoViewModel) {
         nameLabel.text = EngineManager.createInstance().store.roomInfo.name + .quickMeetingText
-    }
-    
-    @objc func dropDownRoomInfoAction(sender: UIView) {
-        viewModel.dropDownAction(sender: sender)
     }
     
     @objc func codeAction(sender: UIButton) {

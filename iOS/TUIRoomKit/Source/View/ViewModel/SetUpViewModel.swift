@@ -17,26 +17,14 @@ import TXLiteAVSDK_Professional
 protocol SetUpViewEventResponder: AnyObject {
     func showResolutionAlert()
     func showFrameRateAlert()
-    func updateStackView(item: ListCellItemData, listIndex: Int, pageIndex: Int)
-    func updateSegmentScrollView(selectedIndex: Int)
+    func updateStackView(item: ListCellItemData)
     func makeToast(text: String)
 }
 
 class SetUpViewModel {
-    enum SetUpItemType: Int {
-        case videoType
-        case audioType
-    }
-    enum VideoItemType: Int {
-        case resolutionItemType
-        case frameRateItemType
-        case bitrateItemType
-    }
-    private(set) var topItems: [ButtonItemData] = []
     private(set) var videoItems: [ListCellItemData] = []
     private(set) var audioItems: [ListCellItemData] = []
     weak var viewResponder: SetUpViewEventResponder? = nil
-    let filePath: String
     var engineManager: EngineManager {
         EngineManager.createInstance()
     }
@@ -46,102 +34,36 @@ class SetUpViewModel {
     var audioSetting: AudioModel {
         engineManager.store.audioSetting
     }
-    
-    let bitrateTable = [BitrateTableData](
-        arrayLiteral:
-            BitrateTableData(resolutionName: "180 * 320",
-                             resolution: TRTCVideoResolution._320_180,
-                             defaultBitrate: 350,
-                             minBitrate: 80,
-                             maxBitrate: 350,
-                             stepBitrate: 10),
-        BitrateTableData(resolutionName: "270 * 480",
-                         resolution: TRTCVideoResolution._480_270,
-                         defaultBitrate: 500,
-                         minBitrate: 200,
-                         maxBitrate: 1_000,
-                         stepBitrate: 10),
-        BitrateTableData(resolutionName: "360 * 640",
-                         resolution: TRTCVideoResolution._640_360,
-                         defaultBitrate: 600,
-                         minBitrate: 200,
-                         maxBitrate: 1_000,
-                         stepBitrate: 10),
-        BitrateTableData(resolutionName: "540 * 960",
-                         resolution: TRTCVideoResolution._960_540,
-                         defaultBitrate: 900,
-                         minBitrate: 400,
-                         maxBitrate: 1_600,
-                         stepBitrate: 50),
-        BitrateTableData(resolutionName: "720 * 1280",
-                         resolution: TRTCVideoResolution._1280_720,
-                         defaultBitrate: 1_250,
-                         minBitrate: 500,
-                         maxBitrate: 2_000,
-                         stepBitrate: 50)
-    )
-    
-    let frameRateTable = [BitrateTableData](
-        arrayLiteral:
-            BitrateTableData(resolutionName: "15",
-                             resolution: TRTCVideoResolution._320_180,
-                             defaultBitrate: 350,
-                             minBitrate: 80,
-                             maxBitrate: 350,
-                             stepBitrate: 10),
-        BitrateTableData(resolutionName: "20",
-                         resolution: TRTCVideoResolution._480_270,
-                         defaultBitrate: 500,
-                         minBitrate: 200,
-                         maxBitrate: 1_000,
-                         stepBitrate: 10)
-    )
-    let frameRateArray = [15, 20]
+    let resolutionNameItems: [String] = [.smoothResolutionText, .standardResolutionText, .highResolutionText, .superResolutionText]
+    private let resolutionItems: [TUIVideoQuality] = [.quality360P, .quality540P, .quality720P, .quality1080P]
+    private let bitrateArray = [550, 850, 1_200, 2_000]
+    let topItems: [String] = [.videoText, .audioText]
+    let frameRateArray = ["15", "20"]
     
     init() {
-        filePath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory,
-                                                        FileManager.SearchPathDomainMask.userDomainMask,
-                                                        true).last?.appending("/test-record.aac") ?? ""
-        createTopItem()
         createVideoItem()
         createAudioItem()
     }
     
-    func createTopItem() {
-        let videoSetItem = ButtonItemData()
-        videoSetItem.normalTitle = .videoText
-        videoSetItem.action = { [weak self] sender in
-            guard let self = self, let button = sender as? UIButton else { return }
-            self.videoSetAction(sender: button)
-        }
-        topItems.append(videoSetItem)
-        
-        let audioSetItem = ButtonItemData()
-        audioSetItem.normalTitle = .audioText
-        audioSetItem.action = { [weak self] sender in
-            guard let self = self, let button = sender as? UIButton else { return }
-            self.audioSetAction(sender: button)
-        }
-        topItems.append(audioSetItem)
-    }
-    
-    func updateSetUpItemView(item: ListCellItemData, listIndex: Int, pageIndex: Int) {
-        viewResponder?.updateStackView(item: item, listIndex: listIndex, pageIndex: pageIndex)
-    }
-    
-    func videoSetAction(sender: UIButton) {
-        viewResponder?.updateSegmentScrollView(selectedIndex: SetUpItemType.videoType.rawValue)
-    }
-    
-    func audioSetAction(sender: UIButton) {
-        viewResponder?.updateSegmentScrollView(selectedIndex: SetUpItemType.audioType.rawValue)
-    }
-    
-    func createVideoItem() {
+    private func createVideoItem() {
         let resolutionItem = ListCellItemData()
         resolutionItem.titleText = .resolutionText
-        resolutionItem.messageText = videoSetting.bitrate.resolutionName
         resolutionItem.hasOverAllAction = true
+        resolutionItem.type = .resolutionType
+        resolutionItem.hasDownLineView = true
+        resolutionItem.hasRightButton = true
+        let buttonData = ButtonItemData()
+        if let resolutionName = getResolutionName(videoQuality: videoSetting.videoQuality) {
+            buttonData.normalTitle = resolutionName
+        }
+        buttonData.orientation = .right
+        buttonData.normalIcon = "room_down_arrow1"
+        buttonData.resourceBundle = tuiRoomKitBundle()
+        buttonData.titleFont = UIFont.systemFont(ofSize: 16, weight: .regular)
+        buttonData.titleColor = UIColor(0xD1D9EC)
+        buttonData.size = CGSize(width: 80, height: 30)
+        buttonData.isEnabled = false
+        resolutionItem.buttonData = buttonData
         resolutionItem.action = { [weak self] sender in
             guard let self = self else { return }
             self.resolutionAction()
@@ -150,98 +72,27 @@ class SetUpViewModel {
         
         let frameRateItem = ListCellItemData()
         frameRateItem.titleText = .frameRateText
-        frameRateItem.messageText = String(videoSetting.videoFps)
         frameRateItem.hasOverAllAction = true
+        frameRateItem.type = .frameRateType
+        frameRateItem.hasRightButton = true
+        let frameRateButtonData = ButtonItemData()
+        frameRateButtonData.orientation = .right
+        frameRateButtonData.normalIcon = "room_down_arrow1"
+        frameRateButtonData.normalTitle = String(videoSetting.videoFps)
+        frameRateButtonData.resourceBundle = tuiRoomKitBundle()
+        frameRateButtonData.titleFont = UIFont.systemFont(ofSize: 16, weight: .regular)
+        frameRateButtonData.titleColor = UIColor(0xD1D9EC)
+        frameRateButtonData.size = CGSize(width: 80, height: 30)
+        frameRateButtonData.isEnabled = false
+        frameRateItem.buttonData = frameRateButtonData
         frameRateItem.action = { [weak self] sender in
             guard let self = self else { return }
             self.frameRateAction()
         }
         videoItems.append(frameRateItem)
-        
-        let bitrateItem = ListCellItemData()
-        bitrateItem.titleText = .bitrateText
-        bitrateItem.hasSlider = true
-        bitrateItem.hasSliderLabel = true
-        bitrateItem.minimumValue = videoSetting.bitrate.minBitrate
-        bitrateItem.maximumValue = videoSetting.bitrate.maxBitrate
-        bitrateItem.sliderUnit = "kbps"
-        bitrateItem.sliderStep = videoSetting.bitrate.stepBitrate
-        bitrateItem.sliderDefault = Float(videoSetting.videoBitrate)
-        bitrateItem.action = { [weak self] sender in
-            guard let self = self, let view = sender as? UISlider else { return }
-            self.bitrateAction(sender: view)
-        }
-        videoItems.append(bitrateItem)
-        
-//        let localMirrorItem = ListCellItemData()
-//        localMirrorItem.titleText = .localMirrorText
-//        localMirrorItem.hasSwitch = true
-//        localMirrorItem.isSwitchOn = videoSetting.isMirror
-//        localMirrorItem.action = { [weak self] sender in
-//            guard let self = self, let view = sender as? UISwitch else { return }
-//            self.localMirrorAction(sender: view)
-//        }
-//        videoItems.append(localMirrorItem)
     }
     
-    func resolutionAction() {
-        viewResponder?.showResolutionAlert()
-    }
-    
-    func changeResolutionAction(index: Int) {
-        videoSetting.bitrate = bitrateTable[index]
-        videoSetting.videoBitrate = Int(videoSetting.bitrate.defaultBitrate)
-        videoSetting.videoResolution = bitrateTable[index].resolution
-        guard let videoItem = videoItems[safe: VideoItemType.resolutionItemType.rawValue] else { return }
-        videoItem.messageText = videoSetting.bitrate.resolutionName
-        updateSetUpItemView(item: videoItem, listIndex: VideoItemType.resolutionItemType.rawValue, pageIndex: SetUpItemType.videoType.rawValue)
-        updateBitrateItemView(index: index)
-    }
-    
-    func changeFrameRateAction(index: Int) {
-        guard let videoItem = videoItems[safe: VideoItemType.frameRateItemType.rawValue] else { return }
-        videoItem.messageText = String(frameRateArray[index])
-        updateSetUpItemView(item: videoItem, listIndex: VideoItemType.frameRateItemType.rawValue, pageIndex: SetUpItemType.videoType.rawValue)
-        videoSetting.videoFps = frameRateArray[index]
-        updateVideoEncoderParam()
-    }
-    
-    func updateBitrateItemView(index: Int) {
-        videoSetting.bitrate = bitrateTable[index]
-        videoSetting.videoBitrate = Int(videoSetting.bitrate.defaultBitrate)
-        updateVideoEncoderParam()
-        guard let bitrateItem = videoItems[safe: VideoItemType.bitrateItemType.rawValue] else { return }
-        bitrateItem.minimumValue = videoSetting.bitrate.minBitrate
-        bitrateItem.maximumValue = videoSetting.bitrate.maxBitrate
-        bitrateItem.sliderDefault = videoSetting.bitrate.defaultBitrate
-        bitrateItem.sliderStep = videoSetting.bitrate.stepBitrate
-        updateSetUpItemView(item: bitrateItem, listIndex: VideoItemType.bitrateItemType.rawValue, pageIndex: SetUpItemType.videoType.rawValue)
-    }
-    
-    func updateVideoEncoderParam() {
-        let param = TRTCVideoEncParam()
-        param.videoResolution = videoSetting.videoResolution
-        param.videoBitrate = Int32(videoSetting.videoBitrate)
-        param.videoFps = Int32(videoSetting.videoFps)
-        param.enableAdjustRes = true
-        engineManager.setVideoEncoderParam(param)
-    }
-    
-    func frameRateAction() {
-        viewResponder?.showFrameRateAlert()
-    }
-    
-    func bitrateAction(sender: UISlider) {
-        let bitrate = Int(sender.value) * Int(videoSetting.bitrate.stepBitrate)
-        videoSetting.videoBitrate = bitrate
-        updateVideoEncoderParam()
-    }
-    
-//    func localMirrorAction(sender: UISwitch) {
-//        engineManager.switchMirror()
-//    }
-    
-    func createAudioItem() {
+    private func createAudioItem() {
         let captureVolumeItem = ListCellItemData()
         captureVolumeItem.titleText = .captureVolumeText
         captureVolumeItem.hasSlider = true
@@ -250,6 +101,8 @@ class SetUpViewModel {
         captureVolumeItem.maximumValue = 100
         captureVolumeItem.sliderStep = 1
         captureVolumeItem.sliderDefault = Float(audioSetting.captureVolume)
+        captureVolumeItem.type = .captureVolumeType
+        captureVolumeItem.hasDownLineView = true
         captureVolumeItem.action = { [weak self] sender in
             guard let self = self, let view = sender as? UISlider else { return }
             self.captureVolumeAction(sender: view)
@@ -264,6 +117,8 @@ class SetUpViewModel {
         playingVolumeItem.maximumValue = 100
         playingVolumeItem.sliderStep = 1
         playingVolumeItem.sliderDefault = Float(audioSetting.playVolume)
+        playingVolumeItem.type = .playingVolumeType
+        playingVolumeItem.hasDownLineView = true
         playingVolumeItem.action = { [weak self] sender in
             guard let self = self, let view = sender as? UISlider else { return }
             self.playingVolumeAction(sender: view)
@@ -274,6 +129,7 @@ class SetUpViewModel {
         volumePromptItem.titleText = .volumePromptText
         volumePromptItem.hasSwitch = true
         volumePromptItem.isSwitchOn = audioSetting.volumePrompt
+        volumePromptItem.type = .volumePromptType
         volumePromptItem.action = { [weak self] sender in
             guard let self = self, let view = sender as? UISwitch else { return }
             self.volumePromptAction(sender: view)
@@ -281,16 +137,83 @@ class SetUpViewModel {
         audioItems.append(volumePromptItem)
     }
     
-    func captureVolumeAction(sender: UISlider) {
+    private func resolutionAction() {
+        viewResponder?.showResolutionAlert()
+    }
+    
+    private func updateVideoBitrateEncoderParam() {
+        guard let bitrate = getBitrate(videoQuality: videoSetting.videoQuality) else { return }
+        videoSetting.videoBitrate = bitrate
+        let param = TRTCVideoEncParam()
+        param.videoBitrate = Int32(videoSetting.videoBitrate)
+        param.enableAdjustRes = true
+        engineManager.setVideoEncoderParam(param)
+    }
+    
+    private func updateVideoFpsEncoderParam() {
+        let param = TRTCVideoEncParam()
+        param.videoFps = Int32(videoSetting.videoFps)
+        param.enableAdjustRes = true
+        engineManager.setVideoEncoderParam(param)
+    }
+    
+    private func frameRateAction() {
+        viewResponder?.showFrameRateAlert()
+    }
+    
+    private func captureVolumeAction(sender: UISlider) {
         engineManager.setAudioCaptureVolume(Int(sender.value))
     }
     
-    func playingVolumeAction(sender: UISlider) {
+    private func playingVolumeAction(sender: UISlider) {
         engineManager.setAudioPlayoutVolume(Int(sender.value))
     }
     
-    func volumePromptAction(sender: UISwitch) {
+    private func volumePromptAction(sender: UISwitch) {
         engineManager.enableAudioVolumeEvaluation(isVolumePrompt: sender.isOn)
+    }
+    
+    func changeResolutionAction(index: Int) {
+        guard let videoItem = videoItems.first(where: { $0.type == .resolutionType }) else { return }
+        guard let quality = resolutionItems[safe: index] else { return }
+        guard let resolutionName = getResolutionName(videoQuality: quality) else { return }
+        videoSetting.videoQuality = quality
+        videoItem.buttonData?.normalTitle = resolutionName
+        viewResponder?.updateStackView(item: videoItem)
+        engineManager.updateVideoQuality(quality: videoSetting.videoQuality)
+        updateVideoBitrateEncoderParam()
+    }
+    
+    func changeFrameRateAction(index: Int) {
+        guard let videoItem = videoItems.first(where: { $0.type == .frameRateType }) else { return }
+        guard let frameRate = frameRateArray[safe: index] else { return }
+        videoItem.buttonData?.normalTitle = frameRate
+        viewResponder?.updateStackView(item: videoItem)
+        videoSetting.videoFps = Int(frameRate) ?? videoSetting.videoFps
+        updateVideoFpsEncoderParam()
+    }
+    
+    func getCurrentResolutionIndex() -> Int {
+        guard let index = resolutionItems.firstIndex(where: { $0 == videoSetting.videoQuality }) else { return 0 }
+        return index
+    }
+    
+    func getCurrentFrameRateIndex() -> Int {
+        let frameRateString = String(videoSetting.videoFps)
+        guard let index = frameRateArray.firstIndex(where: { $0 == frameRateString }) else { return 0 }
+        return index
+    }
+    
+    private func getResolutionName(videoQuality: TUIVideoQuality) -> String? {
+        guard let index = resolutionItems.firstIndex(of: videoQuality) else { return nil }
+        guard let resolutionName = resolutionNameItems[safe: index] else { return nil }
+        return resolutionName
+    }
+    
+    private func getBitrate(videoQuality: TUIVideoQuality) -> Int? {
+        guard let index = resolutionItems.firstIndex(of: videoQuality) else { return nil }
+        guard let bitrate = bitrateArray[safe: index] else { return nil }
+        return bitrate
     }
     
     deinit {
@@ -300,10 +223,10 @@ class SetUpViewModel {
 
 private extension String {
     static var videoText: String {
-        localized("TUIRoom.video")
+        localized("TUIRoom.video.settings")
     }
     static var audioText: String {
-        localized("TUIRoom.audio")
+        localized("TUIRoom.audio.settings")
     }
     static var versionLowToastText: String {
         localized("TUIRoom.version.too.low")
@@ -331,5 +254,17 @@ private extension String {
     }
     static var audioRecordingText: String {
         localized("TUIRoom.audio.recording")
+    }
+    static var smoothResolutionText: String {
+        localized("TUIRoom.smooth.resolution")
+    }
+    static var standardResolutionText: String {
+        localized("TUIRoom.standard.resolution")
+    }
+    static var highResolutionText: String {
+        localized("TUIRoom.high.resolution")
+    }
+    static var superResolutionText: String {
+        localized("TUIRoom.super.resolution")
     }
 }

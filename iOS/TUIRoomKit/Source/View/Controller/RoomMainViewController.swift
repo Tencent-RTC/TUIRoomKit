@@ -55,19 +55,6 @@ class RoomMainViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        let isLandscape = size.width > size.height
-        let param = TRTCVideoEncParam()
-        if isLandscape {
-            param.resMode = .landscape
-        } else {
-            param.resMode = .portrait
-        }
-        EngineManager.createInstance().setVideoEncoderParam(param)
-        rootView.updateRootViewOrientation(isLandscape: isLandscape)
-    }
-    
     deinit {
         debugPrint("deinit \(self)")
     }

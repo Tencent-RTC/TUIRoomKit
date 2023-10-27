@@ -10,6 +10,7 @@ import Foundation
 class RoomKitNavigationController: UINavigationController {
     override init(rootViewController: UIViewController) {
         super.init(rootViewController: rootViewController)
+        interactivePopGestureRecognizer?.isEnabled = false
     }
     
     required init?(coder aDecoder: NSCoder) {

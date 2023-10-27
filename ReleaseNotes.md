@@ -1,5 +1,9 @@
 ## 发布日志
 
+### Version 1.6.0 @ 2023.10.27
+- iOS & Android: 优化界面；
+- iOS & Android: 增加横竖屏适配；
+
 ### Version 1.5.1 @ 2023.09.28
 - iOS & Android: 优化开发接入流程，更新 TUIRoomKit 的接口；
 - iOS & Android: 优化产品体验，更新 UI 界面；

@@ -18,7 +18,7 @@ class TUIVideoSeatUserStatusView: UIView {
         isViewReady = true
         constructViewHierarchy()
         activateConstraints()
-        backgroundColor = UIColor(0x121723, alpha: 0.8)
+        backgroundColor = UIColor(0x22262E, alpha: 0.8)
         layer.cornerRadius = 12
         layer.masksToBounds = true
     }
@@ -54,7 +54,7 @@ class TUIVideoSeatUserStatusView: UIView {
     private func activateConstraints() {
         updateOwnerImageConstraints()
         voiceVolumeImageView.snp.remakeConstraints { make in
-            make.leading.equalTo(homeOwnerImageView.snp.trailing).offset(5)
+            make.leading.equalTo(homeOwnerImageView.snp.trailing).offset(6.scale375())
             make.width.height.equalTo(14)
             make.centerY.equalToSuperview()
         }

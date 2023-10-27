@@ -55,10 +55,13 @@ class TransferMasterViewModel: NSObject {
     }
 }
 
-extension TransferMasterViewModel: PopUpViewResponder {
+extension TransferMasterViewModel: PopUpViewModelResponder {
     func updateViewOrientation(isLandscape: Bool) {
         viewResponder?.searchControllerChangeActive(isActive: false)
-        attendeeList = engineManager.store.attendeeList
+        attendeeList = engineManager.store.attendeeList.filter({ [weak self] userModel in
+            guard let self = self else { return true }
+            return userModel.userId != self.engineManager.store.currentUser.userId
+        })
         viewResponder?.reloadTransferMasterTableView()
     }
     
@@ -71,7 +74,7 @@ extension TransferMasterViewModel: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
         switch key {
         case .TUIRoomKitService_RenewUserList:
-            attendeeList = self.engineManager.store.attendeeList.filter({ [weak self] userModel in
+            attendeeList = engineManager.store.attendeeList.filter({ [weak self] userModel in
                 guard let self = self else { return true }
                 return userModel.userId != self.engineManager.store.currentUser.userId
             })

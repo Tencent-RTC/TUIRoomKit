@@ -156,7 +156,7 @@ class RoomFloatView: UIView {
             let roomFloatView = RoomFloatView()
             currentWindow.addSubview(roomFloatView)
             roomFloatView.snp.makeConstraints { make in
-                make.trailing.equalToSuperview().offset(-10)
+                make.trailing.equalToSuperview().offset(-5)
                 make.bottom.equalToSuperview().offset(-100)
                 make.width.equalTo(width)
                 make.height.equalTo(height)

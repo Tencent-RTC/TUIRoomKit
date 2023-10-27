@@ -10,24 +10,13 @@ import Foundation
 
 class UserListView: UIView {
     let viewModel: UserListViewModel
-    
+    private var isSearching: Bool = false
+
     let blurView: UIVisualEffectView = {
         let blurEffect = UIBlurEffect(style: .dark)
         let view = UIVisualEffectView(effect: blurEffect)
         view.alpha = 0.9
         view.isHidden = true
-        return view
-    }()
-    
-    let dropView : UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(0x17181F)
-        return view
-    }()
-    
-    let dropImageView: UIImageView = {
-        let view = UIImageView()
-        view.image = UIImage(named: "room_lineImage",in:tuiRoomKitBundle(),compatibleWith: nil)
         return view
     }()
     
@@ -42,7 +31,17 @@ class UserListView: UIView {
         let searchBar = UISearchBar()
         searchBar.placeholder = .searchMemberText
         searchBar.setBackgroundImage(UIColor(0x17181F).trans2Image(), for: .top, barMetrics: .default)
+        searchBar.searchTextField.textColor = UIColor(0xB2BBD1)
+        searchBar.searchTextField.tintColor = UIColor(0xB2BBD1).withAlphaComponent(0.3)
+        searchBar.searchTextField.layer.cornerRadius = 6
         return searchBar
+    }()
+    
+    let searchControl: UIControl = {
+        let view = UIControl()
+        view.backgroundColor = .clear
+        view.isHidden = true
+        return view
     }()
     
     let inviteButton: UIButton = {
@@ -66,7 +65,7 @@ class UserListView: UIView {
         button.setTitleColor(UIColor(0xB2BBD1), for: .normal)
         button.setTitle(.allUnMuteAudioText, for: .selected)
         button.setTitleColor(UIColor(0xF2504B), for: .selected)
-        button.backgroundColor = UIColor(0x4F586B)
+        button.backgroundColor = UIColor(0x4F586B, alpha: 0.3)
         button.layer.cornerRadius = 6
         button.clipsToBounds = true
         button.titleLabel?.adjustsFontSizeToFitWidth = true
@@ -81,7 +80,7 @@ class UserListView: UIView {
         button.setTitleColor(UIColor(0xB2BBD1), for: .normal)
         button.setTitle(.allUnMuteVideoText, for: .selected)
         button.setTitleColor(UIColor(0xF2504B), for: .selected)
-        button.backgroundColor = UIColor(0x4F586B)
+        button.backgroundColor = UIColor(0x4F586B, alpha: 0.3)
         button.layer.cornerRadius = 6
         button.clipsToBounds = true
         button.titleLabel?.adjustsFontSizeToFitWidth = true
@@ -94,7 +93,7 @@ class UserListView: UIView {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
         button.setTitle(.moreText, for: .normal)
         button.setTitleColor(UIColor(0xB2BBD1), for: .normal)
-        button.backgroundColor = UIColor(0x4F586B)
+        button.backgroundColor = UIColor(0x4F586B, alpha: 0.3)
         button.layer.cornerRadius = 6
         button.clipsToBounds = true
         button.titleLabel?.adjustsFontSizeToFitWidth = true
@@ -139,7 +138,6 @@ class UserListView: UIView {
     }
     
     func constructViewHierarchy() {
-        addSubview(dropView)
         addSubview(attendeeCountLabel)
         addSubview(searchBar)
         addSubview(inviteButton)
@@ -149,20 +147,10 @@ class UserListView: UIView {
         addSubview(moreFunctionButton)
         addSubview(blurView)
         addSubview(userListManagerView)
-        dropView.addSubview(dropImageView)
+        addSubview(searchControl)
     }
     
     func activateConstraints() {
-        dropView.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
-            make.height.equalTo(30.scale375())
-        }
-        dropImageView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(12.scale375())
-            make.centerX.equalToSuperview()
-            make.height.equalTo(3.scale375())
-            make.width.equalTo(24.scale375())
-        }
         attendeeCountLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(35.scale375())
             make.leading.equalToSuperview().offset(16.scale375())
@@ -212,14 +200,14 @@ class UserListView: UIView {
             make.bottom.leading.trailing.equalToSuperview()
             make.height.equalTo(355.scale375())
         }
+        searchControl.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     func bindInteraction() {
         viewModel.viewResponder = self
         setupViewState()
-        let dropTap = UITapGestureRecognizer(target: self, action: #selector(dropDownRoomInfoAction))
-        dropView.addGestureRecognizer(dropTap)
-        dropView.isUserInteractionEnabled = true
         attendeeCountLabel.text = .memberText + "（\(viewModel.attendeeList.count)）"
         searchBar.delegate = self
         inviteButton.addTarget(self, action: #selector(inviteMemberAction), for: .touchUpInside)
@@ -229,10 +217,8 @@ class UserListView: UIView {
         let hideBlurTap = UITapGestureRecognizer(target: self, action: #selector(hideBlurViewAction))
         blurView.addGestureRecognizer(hideBlurTap)
         blurView.isUserInteractionEnabled = true
-    }
-    
-    @objc func dropDownRoomInfoAction(sender: UIView) {
-        viewModel.dropDownAction(sender: sender)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(hideSearchControl(sender:)))
+        searchControl.addGestureRecognizer(tap)
     }
     
     func setupViewState() {
@@ -269,6 +255,11 @@ class UserListView: UIView {
         blurView.isHidden = true
     }
     
+    @objc func hideSearchControl(sender: UIView) {
+        searchBar.searchTextField.resignFirstResponder()
+        searchControl.isHidden = true
+    }
+    
     deinit {
         debugPrint("deinit \(self)")
     }
@@ -280,13 +271,20 @@ extension UserListView: UISearchBarDelegate {
         if searchContentText.count == 0 {
             viewModel.attendeeList = viewModel.engineManager.store.attendeeList
             userListTableView.reloadData()
-        }else {
+            isSearching = false
+        } else {
             let searchArray = viewModel.engineManager.store.attendeeList.filter({ model -> Bool in
                 return (model.userName.contains(searchContentText))
             })
             viewModel.attendeeList = searchArray
             userListTableView.reloadData()
+            isSearching = true
         }
+    }
+    
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        searchControl.isHidden = false
+        return true
     }
 }
 
@@ -311,7 +309,7 @@ extension UserListView: UITableViewDelegate {
     }
     
     internal func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50.scale375()
+        return 60
     }
 }
 
@@ -327,8 +325,9 @@ extension UserListView: UserListViewResponder {
     }
     
     func reloadUserListView() {
-        userListTableView.reloadData()
         attendeeCountLabel.text = .memberText + "（\(viewModel.attendeeList.count)）"
+        guard !isSearching else { return }
+        userListTableView.reloadData()
     }
     
     func updateBlurViewDisplayStatus(isHidden: Bool) {
@@ -359,8 +358,9 @@ class UserListCell: UITableViewCell {
     }()
     
     let roleImageView: UIImageView = {
-        let img = UIImageView()
-        return img
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "room_role_owner", in: tuiRoomKitBundle(), compatibleWith: nil)
+        return imageView
     }()
     
     let roleLabel: UILabel = {
@@ -368,6 +368,7 @@ class UserListCell: UITableViewCell {
         label.font = UIFont(name: "PingFangSC-Regular", size: 12)
         label.backgroundColor = UIColor.clear
         label.textColor = UIColor(0x4791FF)
+        label.text = .ownerText
         return label
     }()
     
@@ -387,10 +388,11 @@ class UserListCell: UITableViewCell {
     
     let inviteStageButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.titleLabel?.adjustsFontSizeToFitWidth = true
         button.backgroundColor = UIColor(0x0565FA)
+        button.layer.cornerRadius = 6
         button.setTitle(.inviteSeatText, for: .normal)
         button.setTitleColor(UIColor(0xFFFFFF), for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .regular)
         return button
     }()
     
@@ -449,12 +451,16 @@ class UserListCell: UITableViewCell {
         }
         inviteStageButton.snp.makeConstraints { make in
             make.width.equalTo(62.scale375())
-            make.height.equalTo(24.scale375())
-            make.trailing.equalToSuperview().offset(-12)
+            make.height.equalTo(24.scale375Height())
+            make.trailing.equalToSuperview()
             make.centerY.equalTo(self.avatarImageView)
         }
         userLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(4.scale375Height())
+            if attendeeModel.userId == viewModel.roomInfo.ownerId {
+                make.top.equalToSuperview().offset(10.scale375Height())
+            } else {
+                make.centerY.equalToSuperview()
+            }
             make.leading.equalTo(avatarImageView.snp.trailing).offset(12.scale375())
             make.width.equalTo(150.scale375())
             make.height.equalTo(22.scale375())
@@ -465,7 +471,7 @@ class UserListCell: UITableViewCell {
             make.width.height.equalTo(14.scale375())
         }
         roleLabel.snp.makeConstraints { make in
-            make.top.equalTo(userLabel.snp.bottom).offset(2.scale375Height())
+            make.centerY.equalTo(roleImageView)
             make.leading.equalTo(roleImageView.snp.trailing).offset(2.scale375())
             make.trailing.equalTo(81.scale375())
             make.height.equalTo(16.scale375())
@@ -492,17 +498,12 @@ class UserListCell: UITableViewCell {
             avatarImageView.image = placeholder
         }
         if item.userId == viewModel.currentUser.userId {
-            userLabel.text = item.userName + "(" + .meText + ")"
+            userLabel.text = item.userName + "（" + .meText + "）"
         } else {
             userLabel.text = item.userName
         }
-        if item.userId == viewModel.roomInfo.ownerId {
-            roleImageView.image =  UIImage(named: "room_role_owner", in: tuiRoomKitBundle(), compatibleWith: nil)
-            roleLabel.text = .ownerText
-        } else {
-            roleImageView.image =  nil
-            roleLabel.text = ""
-        }
+        roleImageView.isHidden = item.userId != viewModel.roomInfo.ownerId
+        roleLabel.isHidden = item.userId != viewModel.roomInfo.ownerId
         muteAudioButton.isSelected = !item.hasAudioStream
         muteVideoButton.isSelected = !item.hasVideoStream
         //判断是否显示邀请上台的按钮(房主在举手发言房间中可以邀请其他没有上台的用户)

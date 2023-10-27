@@ -10,7 +10,7 @@ import UIKit
 
 class BottomItemView: UIView {
     
-    let itemData: ButtonItemData
+    var itemData: ButtonItemData
     
     var engineManager: EngineManager {
         EngineManager.createInstance()
@@ -18,12 +18,21 @@ class BottomItemView: UIView {
     
     let button: UIButton = {
         let button = UIButton(type: .custom)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 10.0)
-        button.titleLabel?.textColor = UIColor(0xD1D9EC)
-        button.titleLabel?.textAlignment = .center
-        button.titleLabel?.adjustsFontSizeToFitWidth = true
-        button.titleLabel?.textAlignment = isRTL ? .right : .left
         return button
+    }()
+    
+    let label: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 10.0)
+        label.textColor = UIColor(0xD1D9EC)
+        label.textAlignment = .center
+        label.adjustsFontSizeToFitWidth = true
+        return label
+    }()
+    
+    let imageView: UIImageView = {
+        let view = UIImageView()
+        return view
     }()
     
     // MARK: - initialized function
@@ -50,11 +59,31 @@ class BottomItemView: UIView {
     
     func constructViewHierarchy() {
         addSubview(button)
+        button.addSubview(imageView)
+        button.addSubview(label)
     }
     
     func activateConstraints() {
         button.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        imageView.snp.makeConstraints { make in
+            if itemData.normalTitle.isEmpty, itemData.selectedTitle.isEmpty {
+                make.centerY.equalToSuperview()
+            } else {
+                make.top.equalToSuperview().offset(7)
+            }
+            make.width.height.equalTo(24)
+            make.centerX.equalToSuperview()
+        }
+        label.snp.makeConstraints { make in
+            if itemData.normalIcon.isEmpty, itemData.selectedIcon.isEmpty {
+                make.centerY.equalToSuperview()
+            } else {
+                make.top.equalTo(imageView.snp.bottom).offset(2)
+            }
+            make.width.equalToSuperview()
+            make.height.equalTo(14)
         }
     }
     
@@ -64,31 +93,11 @@ class BottomItemView: UIView {
     }
     
     func setupViewState(item: ButtonItemData) {
+        itemData = item
         button.isSelected = item.isSelect
-        if item.buttonType == .shareScreenItemType {
-            button.isEnabled = engineManager.store.attendeeList.first(where: {$0.hasScreenStream}) == nil
-        }
-        if let normalImage = item.normalImage {
-            button.setImage(normalImage.sd_resizedImage(with: CGSize(width: 24, height: 24), scaleMode: .aspectFit), for: .normal)
-        }
-        if let selectedImage = item.selectedImage {
-            button.setImage(selectedImage.sd_resizedImage(with: CGSize(width: 24, height: 24), scaleMode: .aspectFit), for: .selected)
-        }
-        if let disabledImage = item.disabledImage {
-            button.setImage(disabledImage, for: .disabled)
-        }
-        if !item.normalTitle.isEmpty {
-            button.setTitle(item.normalTitle, for: .normal)
-        }
-        if !item.selectedTitle.isEmpty {
-            button.setTitle(item.selectedTitle, for: .selected)
-        }
-        if !item.normalTitle.isEmpty || !item.selectedTitle.isEmpty {
-            button.layoutButton(style: .Top, imageTitleSpace: 5, imageFrame: CGSize(width: 24, height: 24))
-        } else {
-            button.layoutButton(style: .Top, imageTitleSpace: 5, imageFrame: CGSize(width: 24, height: 24), labelFrame:
-                                    CGSize(width: 0, height: 0))
-        }
+        button.isEnabled = item.isEnabled
+        imageView.image = item.isSelect ? itemData.selectedImage : itemData.normalImage
+        label.text = item.isSelect ? itemData.selectedTitle : itemData.normalTitle
     }
     
     @objc

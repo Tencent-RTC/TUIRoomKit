@@ -20,6 +20,7 @@ protocol RoomMainViewResponder: AnyObject {
     func makeToast(text: String)
     func changeToolBarHiddenState()
     func setToolBarDelayHidden(isDelay: Bool)
+    func updateMuteAudioButton(isSelected: Bool)
 }
 
 class RoomMainViewModel: NSObject {
@@ -38,13 +39,19 @@ class RoomMainViewModel: NSObject {
     }
     let roomRouter: RoomRouter = RoomRouter.shared
     
+    var isLandscape: Bool = {
+        guard let orientationIsLandscape = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape as? Bool
+        else { return false }
+        return orientationIsLandscape
+    }()
+    
     override init() {
         super.init()
         subscribeEngine()
     }
     
     func applyConfigs() {
-        setVideoEncoderParam()
+        initLocalVideoState()
         //如果房间不是自由发言房间并且用户没有上麦，不开启摄像头
         if roomInfo.speechMode != .freeToSpeak && !currentUser.isOnSeat {
             store.videoSetting.isCameraOpened = false
@@ -74,6 +81,29 @@ class RoomMainViewModel: NSObject {
         }
     }
     
+    private func initLocalVideoState() {
+        setVideoEncoderParam()
+        engineManager.updateVideoQuality(quality: store.videoSetting.videoQuality)
+        engineManager.enableGravitySensor(enable: true)
+        setResolutionMode()
+    }
+    
+    private func setVideoEncoderParam() {
+        let param = TRTCVideoEncParam()
+        param.videoBitrate = Int32(engineManager.store.videoSetting.videoBitrate)
+        param.videoFps = Int32(engineManager.store.videoSetting.videoFps)
+        param.enableAdjustRes = true
+        engineManager.setVideoEncoderParam(param)
+    }
+    
+    func setResolutionMode() {
+        let resolutionMode: TUIResolutionMode = isLandscape ? .landscape : .portrait
+        engineManager.setVideoResolutionMode(streamType: .cameraStream, resolutionMode: resolutionMode)
+        if currentUser.hasScreenStream {
+            engineManager.setVideoResolutionMode(streamType: .screenStream, resolutionMode: resolutionMode)
+        }
+    }
+    
     private func subscribeEngine() {
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
@@ -82,6 +112,7 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserMuteMessage, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasAudioStream, responder: self)
     }
     
     private func unsubscribeEngine() {
@@ -91,17 +122,9 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserMuteMessage, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasAudioStream, responder: self)
     }
-    private func setVideoEncoderParam() {
-        let param = TRTCVideoEncParam()
-        param.videoResolution = engineManager.store.videoSetting.videoResolution
-        param.videoBitrate = Int32(engineManager.store.videoSetting.videoBitrate)
-        param.videoFps = Int32(engineManager.store.videoSetting.videoFps)
-        param.resMode = .portrait
-        param.enableAdjustRes = true
-        engineManager.setVideoEncoderParam(param)
-    }
+    
     func respondUserOnSeat(isAgree: Bool, requestId: String) {
         engineManager.responseRemoteRequest(requestId, agree: isAgree) { [weak self] in
             guard let self = self else { return }
@@ -254,6 +277,37 @@ extension RoomMainViewModel: RoomMainViewFactory {
         }
         return raiseHandNoticeView
     }
+    
+    func makeMuteAudioButton() -> UIButton {
+        let muteAudioButton = UIButton()
+        muteAudioButton.setImage(UIImage(named: "room_mic_on", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
+        muteAudioButton.setImage(UIImage(named: "room_mic_off", in: tuiRoomKitBundle(), compatibleWith: nil), for: .selected)
+        muteAudioButton.isSelected = !currentUser.hasAudioStream
+        muteAudioButton.backgroundColor = UIColor(0x2A2D38)
+        muteAudioButton.addTarget(self, action: #selector(muteAudioAction(sender: )), for: .touchUpInside)
+        muteAudioButton.layer.cornerRadius = 12
+        return muteAudioButton
+    }
+    
+    @objc private func muteAudioAction(sender: UIButton) {
+        if currentUser.hasAudioStream {
+            engineManager.muteLocalAudio()
+            return
+        }
+        //如果房主全体静音，房间成员不可打开麦克风
+        if self.roomInfo.isMicrophoneDisableForAllUser && self.currentUser.userId != roomInfo.ownerId {
+            viewResponder?.makeToast(text: .muteAudioRoomReasonText)
+            return
+        }
+        //如果是举手发言房间，并且没有上麦，不可打开麦克风
+        if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
+            viewResponder?.makeToast(text: .muteSeatReasonText)
+            return
+        }
+        engineManager.unmuteLocalAudio()
+        guard !engineManager.store.audioSetting.isMicOpened else { return }
+        engineManager.openLocalMicrophone()
+    }
 }
 
 extension RoomMainViewModel: RoomKitUIEventResponder {
@@ -271,6 +325,8 @@ extension RoomMainViewModel: RoomKitUIEventResponder {
         case .TUIRoomKitService_SetToolBarDelayHidden:
             guard let isDelay = info?["isDelay"] as? Bool else { return }
             viewResponder?.setToolBarDelayHidden(isDelay: isDelay)
+        case .TUIRoomKitService_CurrentUserHasAudioStream:
+            viewResponder?.updateMuteAudioButton(isSelected: !currentUser.hasAudioStream)
         default: break
         }
     }
@@ -309,5 +365,11 @@ private extension String {
     }
     static var messageTurnedOnText: String {
         localized("TUIRoom.homeowners.notice.message.turned.on")
+    }
+    static var muteAudioRoomReasonText: String {
+        localized("TUIRoom.mute.audio.room.reason")
+    }
+    static var muteSeatReasonText: String {
+        localized("TUIRoom.mute.seat.reason")
     }
 }

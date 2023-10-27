@@ -18,8 +18,8 @@
 "Demo.TUIRoomKit.raise.speak.model" = "Raise hand speak model";
 "Demo.TUIRoomKit.freedom.speak.model" = "Freedom speak model";
 "Demo.TUIRoomKit.room.type" = "Room Type";
-"Demo.TUIRoomKit.open.video" = "Camera";
-"Demo.TUIRoomKit.open.mic" = "Mic";
+"Demo.TUIRoomKit.open.video" = "Video";
+"Demo.TUIRoomKit.open.mic" = "Audio";
 "Demo.TUIRoomKit.open.speaker" = "Speaker";
 "Demo.TUIRoomKit.freedom.speaker" = "Freedom Speaker Room";
 "Demo.TUIRoomKit.raise.speaker" = "Raise hand Speaker Room";

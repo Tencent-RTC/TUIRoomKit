@@ -36,7 +36,7 @@ class CreateRoomView: UIView {
     let enterButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setBackgroundImage(UIColor(0x0062E3).trans2Image(), for: .normal)
-        button.layer.cornerRadius = 25
+        button.layer.cornerRadius = 10
         button.clipsToBounds = true
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 19)
         button.setTitleColor(.white, for: .normal)
@@ -144,7 +144,7 @@ class CreateRoomView: UIView {
     }
     
     @objc func enterButtonClick(sender: UIButton) {
-        rootViewController?.enterButtonClick(sender: sender, view: self)
+        rootViewController?.enterButtonClick(sender: sender)
     }
     
     func updateInputStackView(item: ListCellItemData, index: Int) {
@@ -162,6 +162,14 @@ class CreateRoomView: UIView {
     
     func showSpeechModeControlView() {
         switchSpeakerModelView.isHidden = false
+    }
+    
+    func updateEnterButtonState(isEnabled: Bool) {
+        enterButton.isEnabled = isEnabled
+    }
+    
+    func updateLoadingState(isStarted: Bool) {
+        isStarted ? loading.startAnimating() : loading.stopAnimating()
     }
     
     deinit {

@@ -14,30 +14,13 @@ protocol BottomViewModelResponder: AnyObject {
     func updateStackView(item: ButtonItemData, index: Int)
     func makeToast(text: String)
     func updataBottomView(isUp:Bool)
-    func updateButtonItemViewSelectState(shareScreenSeletecd: Bool)
-    func updateButtonItemViewEnableState(shareScreenEnable: Bool)
-    func reloadBottomView()
 }
 
 class BottomViewModel: NSObject {
     private(set) var viewItems: [ButtonItemData] = []
     private(set) var requestList: [String: String] = [:]
-    var timeoutNumber: Double = 0
     weak var viewResponder: BottomViewModelResponder?
-    private enum ViewItemNumber: Int {
-        case normalItem
-        case muteAudioItem
-        case muteVideoItem
-        case raiseHandItem
-        case memberItem
-        case moreItem
-        case inviteItem
-        case floatItem
-        case recordItem
-        case setupItem
-        case dropItem
-        case shareItem
-    }
+
     var engineManager: EngineManager {
         EngineManager.createInstance()
     }
@@ -57,7 +40,7 @@ class BottomViewModel: NSObject {
     
     var memberItem: ButtonItemData {
         let memberItem = ButtonItemData()
-        memberItem.normalTitle = .memberText
+        memberItem.normalTitle = localizedReplace(.memberText,replace: String(attendeeList.count))
         memberItem.normalIcon = "room_member"
         memberItem.resourceBundle = tuiRoomKitBundle()
         memberItem.buttonType = .memberItemType
@@ -109,11 +92,6 @@ class BottomViewModel: NSObject {
             guard let self = self, let button = sender as? UIButton else { return }
             self.shareScreenAction(sender: button)
         }
-        if engineManager.store.attendeeList.first(where: {$0.hasScreenStream}) != nil {
-            shareScreenItem.isEnabled = false
-        }else{
-            shareScreenItem.isEnabled = true
-        }
         return shareScreenItem
     }
     var chatItem: ButtonItemData {
@@ -137,7 +115,6 @@ class BottomViewModel: NSObject {
         moreItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.moreAction(sender: button)
-            self.engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": false])
         }
         return moreItem
     }
@@ -198,7 +175,6 @@ class BottomViewModel: NSObject {
         dropItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.dropAction(sender: button)
-            self.engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": true])
         }
         return dropItem
     }
@@ -213,8 +189,6 @@ class BottomViewModel: NSObject {
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_SomeoneSharing, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserVideoStateChanged, observer: self)
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onUserScreenCaptureStarted),
                                                name: UIScreen.capturedDidChangeNotification, object: nil)
@@ -252,15 +226,12 @@ class BottomViewModel: NSObject {
         viewItems.append(recordItem)
     }
     
-    private func hasTUIChatItem() -> Bool {
-        return TUICore.getService(TUICore_TUIChatService) != nil
-    }
-    
     func memberAction(sender: UIButton) {
-        RoomRouter.shared.presentPopUpViewController(viewType: .userListViewType, height: 708.scale375Height(),backgroundColor: UIColor(0x17181F))
+        RoomRouter.shared.presentPopUpViewController(viewType: .userListViewType, height: 720.scale375Height(), backgroundColor: UIColor(0x17181F))
     }
     
     func muteAudioAction(sender: UIButton) {
+        engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": true])
         if currentUser.hasAudioStream {
             engineManager.muteLocalAudio()
             return
@@ -272,13 +243,16 @@ class BottomViewModel: NSObject {
         }
         //如果是举手发言房间，并且没有上麦，不可打开麦克风
         if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
-            viewResponder?.makeToast(text: .muteAudioSeatReasonText)
+            viewResponder?.makeToast(text: .muteSeatReasonText)
             return
         }
-        self.engineManager.unmuteLocalAudio()
+        engineManager.unmuteLocalAudio()
+        guard !engineManager.store.audioSetting.isMicOpened else { return }
+        engineManager.openLocalMicrophone()
     }
     
     func muteVideoAction(sender: UIButton) {
+        engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": true])
         if currentUser.hasVideoStream {
             engineManager.closeLocalCamera()
             return
@@ -288,9 +262,9 @@ class BottomViewModel: NSObject {
             viewResponder?.makeToast(text: .muteVideoRoomReasonText)
             return
         }
-        //如果是举手发言房间，并且没有上麦，不可打开麦克风
+        //如果是举手发言房间，并且没有上麦，不可打开摄像头
         if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
-            viewResponder?.makeToast(text: .muteVideoSeatReasonText)
+            viewResponder?.makeToast(text: .muteSeatReasonText)
             return
         }
         engineManager.setLocalVideoView(streamType: .cameraStream, view: nil)
@@ -298,31 +272,33 @@ class BottomViewModel: NSObject {
     }
     
     func raiseHandAction(sender: UIButton) {
+        engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": true])
         if currentUser.userId == roomInfo.ownerId {
-            RoomRouter.shared.presentPopUpViewController(viewType: .raiseHandApplicationListViewType, height: nil)
+            RoomRouter.shared.presentPopUpViewController(viewType: .raiseHandApplicationListViewType, height: 720.scale375Height())
         } else {
-            sender.isSelected = !sender.isSelected
-            if sender.isSelected {
+            changeItemSelectState(type: .raiseHandItemType)
+            guard let item = getItem(type: .raiseHandItemType) else { return }
+            if item.isSelect {
                 let request = engineManager.takeSeat() { [weak self] _,_ in
                     guard let self = self else { return }
                     self.viewResponder?.makeToast(text: .takenSeatText)
                 } onRejected: { [weak self] _, _, _ in
                     guard let self = self else { return }
                     self.requestList.removeValue(forKey: "takeSeat")
-                    self.changeItemStateForRaiseHand()
+                    self.changeItemStateToRaiseHand()
                     self.viewResponder?.makeToast(text: .rejectedTakeSeatText)
                 } onCancelled: { [weak self] _, _ in
                     guard let self = self else { return }
                     self.requestList.removeValue(forKey: "takeSeat")
-                    self.changeItemStateForRaiseHand()
+                    self.changeItemStateToRaiseHand()
                 } onTimeout: { [weak self] _, _ in
                     guard let self = self else { return }
                     self.requestList.removeValue(forKey: "takeSeat")
-                    self.changeItemStateForRaiseHand()
+                    self.changeItemStateToRaiseHand()
                 } onError: { [weak self] _, _, code, message in
                     guard let self = self else { return }
                     self.requestList.removeValue(forKey: "takeSeat")
-                    self.changeItemStateForRaiseHand()
+                    self.changeItemStateToRaiseHand()
                     self.viewResponder?.makeToast(text: message)
                 }
                 requestList["takeSeat"] = request.requestId
@@ -336,14 +312,27 @@ class BottomViewModel: NSObject {
     }
     
     func leaveSeatAction(sender: UIButton) {
-        sender.isSelected = !sender.isSelected
+        engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": true])
+        changeItemSelectState(type: .leaveSeatItemType)
         engineManager.leaveSeat()
-        changeItemStateForRaiseHand()
+        changeItemStateToRaiseHand()
     }
     
     func shareScreenAction(sender: UIButton) {
         if #available(iOS 12.0, *) {
-            if !sender.isSelected {
+            guard let item = viewItems.first(where: { $0.buttonType == .shareScreenItemType })
+            else { return }
+            if !item.isSelect {
+                //如果有人正在进行屏幕共享，自己就不能再进行屏幕共享
+                guard engineManager.store.attendeeList.first(where: {$0.hasScreenStream}) == nil else {
+                    viewResponder?.makeToast(text: .othersScreenSharingText)
+                    return
+                }
+                //如果现在是举手发言房间，自己又没有上麦，也不能进行屏幕共享
+                guard !(roomInfo.speechMode == .applySpeakAfterTakingSeat && !currentUser.isOnSeat) else {
+                    viewResponder?.makeToast(text: .muteSeatReasonText)
+                    return
+                }
                 if TUICore.callService(TUICore_PrivacyService,
                                        method: TUICore_PrivacyService_ScreenShareAntifraudReminderMethod,
                                        param: nil, resultCallback: { [weak self] code, message, param in
@@ -356,7 +345,7 @@ class BottomViewModel: NSObject {
                     isCalledFromShareScreen = true
                     BroadcastLauncher.launch()
                 }
-            }else {
+            } else {
                 let alertVC = UIAlertController(title: .toastTitleText,
                                                 message: .toastMessageText,
                                                 preferredStyle: .alert)
@@ -384,6 +373,7 @@ class BottomViewModel: NSObject {
     }
     
     func moreAction(sender: UIButton) {
+        engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": false])
         if let viewResponder = self.viewResponder {
             viewResponder.updataBottomView(isUp: true)
         }
@@ -402,27 +392,80 @@ class BottomViewModel: NSObject {
     }
     
     func setupAction(sender: UIButton) {
-        sender.isSelected = !sender.isSelected
-        RoomRouter.shared.presentPopUpViewController(viewType: .setUpViewType, height: 300.scale375())
+        RoomRouter.shared.presentPopUpViewController(viewType: .setUpViewType, height: 709.scale375Height())
     }
     
     func dropAction(sender: UIButton) {
+        engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": true])
         if let viewResponder = self.viewResponder {
             viewResponder.updataBottomView(isUp: false)
         }
     }
     
-    //举手按钮变成下台状态
-    private func changeItemStateForLeaveSeat() {
-        guard viewItems.first(where: { $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType  }) != nil
+    @objc func onUserScreenCaptureStarted(notification:Notification)
+    {
+        guard let screen = notification.object as? UIScreen else {return}
+        if screen.isCaptured,isCalledFromShareScreen {
+            engineManager.startScreenCapture()
+        }
+    }
+    
+    deinit {
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_UserOnSeatChanged, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasAudioStream, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasVideoStream, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_SomeoneSharing, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
+        NotificationCenter.default.removeObserver(self, name: UIScreen.capturedDidChangeNotification, object: nil)
+        debugPrint("deinit \(self)")
+    }
+}
+
+// MARK: - Private
+extension BottomViewModel {
+    private func getItem(type: ButtonItemData.ButtonType) -> ButtonItemData? {
+        guard let item = viewItems.first(where: { $0.buttonType == type }) else { return nil }
+        return item
+    }
+    
+    private func getItemIndex(type: ButtonItemData.ButtonType) -> Int? {
+        guard let index = viewItems.firstIndex(where: { $0.buttonType == type }) else { return nil }
+        return index
+    }
+    
+    private func hasTUIChatItem() -> Bool {
+        return TUICore.getService(TUICore_TUIChatService) != nil
+    }
+    
+    //修改item的点击情况，type用于区分item，isSelected用来设置点击状态，如果不传入isSelected则点击状态默认取反
+    private func changeItemSelectState(type: ButtonItemData.ButtonType, isSelected: Bool? = nil) {
+        guard let item = viewItems.first(where: { $0.buttonType == type })
         else { return }
-        viewResponder?.updateStackView(item: getItemOnLeaveSeat(), index: ViewItemNumber.raiseHandItem.rawValue)
+        guard let itemIndex = viewItems.firstIndex(where: { $0.buttonType == type })
+        else { return }
+        if let isSelected = isSelected {
+            item.isSelect = isSelected
+        } else {
+            item.isSelect = !item.isSelect
+        }
+        viewResponder?.updateStackView(item: item, index: itemIndex)
+    }
+    
+    //举手按钮变成下台状态
+    private func changeItemStateToLeaveSeat() {
+        guard let index = viewItems.firstIndex(where:{ $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType })
+        else { return }
+        viewItems[index] = getItemOnLeaveSeat()
+        viewResponder?.updateStackView(item: getItemOnLeaveSeat(), index: index)
     }
     //举手按钮变成举手状态
-    private func changeItemStateForRaiseHand() {
-        guard viewItems.first(where: { $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType }) != nil
+    private func changeItemStateToRaiseHand() {
+        guard let index = viewItems.firstIndex(where:{ $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType })
         else { return }
-        viewResponder?.updateStackView(item: getItemOnRaiseHand(), index: ViewItemNumber.raiseHandItem.rawValue)
+        viewItems[index] = getItemOnRaiseHand()
+        viewResponder?.updateStackView(item: getItemOnRaiseHand(), index: index)
     }
     
     private func getItemOnRaiseHand() -> ButtonItemData {
@@ -458,29 +501,8 @@ class BottomViewModel: NSObject {
         }
         return raiseHandItem
     }
-    
-    @objc func onUserScreenCaptureStarted(notification:Notification)
-    {
-        guard let screen = notification.object as? UIScreen else {return}
-        if screen.isCaptured,isCalledFromShareScreen {
-            engineManager.startScreenCapture()
-        }
-    }
-    
-    deinit {
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_UserOnSeatChanged, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasAudioStream, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasVideoStream, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_SomeoneSharing, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserVideoStateChanged, observer: self)
-        NotificationCenter.default.removeObserver(self, name: UIScreen.capturedDidChangeNotification, object: nil)
-        debugPrint("deinit \(self)")
-    }
 }
+
 
 extension BottomViewModel: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
@@ -488,29 +510,25 @@ extension BottomViewModel: RoomKitUIEventResponder {
         case .TUIRoomKitService_UserOnSeatChanged:
             guard roomInfo.speechMode == .applySpeakAfterTakingSeat else { return }
             guard let isOnSeat = info?["isOnSeat"] as? Bool else { return }
-            guard let muteAudioItem = viewItems.first(where: { $0.buttonType == .muteAudioItemType }) else { return }
-            muteAudioItem.isSelect = !currentUser.hasAudioStream
-            viewResponder?.updateStackView(item: muteAudioItem, index: ViewItemNumber.muteAudioItem.rawValue)
-            guard let muteVideoItem = viewItems.first(where: { $0.buttonType == .muteVideoItemType }) else { return }
-            muteVideoItem.isSelect = !currentUser.hasVideoStream
-            viewResponder?.updateStackView(item: muteVideoItem, index: ViewItemNumber.muteVideoItem.rawValue)
+            changeItemSelectState(type: .muteAudioItemType, isSelected: !currentUser.hasAudioStream)
+            changeItemSelectState(type: .muteVideoItemType, isSelected: !currentUser.hasVideoStream)
             //如果自己就是房主，上麦不需要更改举手发言的button
             guard currentUser.userId != roomInfo.ownerId else { return }
             if isOnSeat {
-                changeItemStateForLeaveSeat()
+                changeItemStateToLeaveSeat()
             } else {
-                changeItemStateForRaiseHand()
+                changeItemStateToRaiseHand()
             }
         case .TUIRoomKitService_CurrentUserRoleChanged:
             guard let userRole = info?["userRole"] as? TUIRole else { return }
             switch userRole {
             case .roomOwner :
-                changeItemStateForRaiseHand()
+                changeItemStateToRaiseHand()
             case .generalUser:
                 if currentUser.isOnSeat {
-                    changeItemStateForLeaveSeat()
+                    changeItemStateToLeaveSeat()
                 } else {
-                    changeItemStateForRaiseHand()
+                    changeItemStateToRaiseHand()
                 }
             default: break
             }
@@ -520,47 +538,28 @@ extension BottomViewModel: RoomKitUIEventResponder {
             if !hasAudio, reason == .byAdmin, !roomInfo.isMicrophoneDisableForAllUser {
                 viewResponder?.makeToast(text: .noticeMicrophoneOffTitleText)
             }
-            guard let audioItem = viewItems.first(where: { $0.buttonType == .muteAudioItemType }) else { return }
-            audioItem.isSelect = !currentUser.hasAudioStream
-            viewResponder?.updateStackView(item: audioItem, index: ViewItemNumber.muteAudioItem.rawValue)
+            changeItemSelectState(type: .muteAudioItemType, isSelected: !currentUser.hasAudioStream)
         case .TUIRoomKitService_CurrentUserHasVideoStream:
             guard let hasVideo = info?["hasVideo"] as? Bool else { return }
             guard let reason = info?["reason"] as? TUIChangeReason else { return }
             if !hasVideo, reason == .byAdmin, !roomInfo.isCameraDisableForAllUser {
                 viewResponder?.makeToast(text: .noticeCameraOffTitleText)
             }
-            guard let videoItem = viewItems.first(where: { $0.buttonType == .muteVideoItemType }) else { return }
-            videoItem.isSelect = !currentUser.hasVideoStream
-            viewResponder?.updateStackView(item: videoItem, index: ViewItemNumber.muteVideoItem.rawValue)
+            changeItemSelectState(type: .muteVideoItemType, isSelected: !currentUser.hasVideoStream)
         case .TUIRoomKitService_SomeoneSharing:
-            if let sharingUser = engineManager.store.attendeeList.first(where: {$0.hasScreenStream}){
-                viewResponder?.updateButtonItemViewEnableState(shareScreenEnable: sharingUser.userId == currentUser.userId)
+            guard let userId = info?["userId"] as? String else { return }
+            guard let hasVideo = info?["hasVideo"] as? Bool else { return }
+            guard userId == currentUser.userId else { return }
+            changeItemSelectState(type: .shareScreenItemType, isSelected: hasVideo)
+            if !hasVideo {
+                isCalledFromShareScreen = false
             }
         case .TUIRoomKitService_RenewUserList, .TUIRoomKitService_RenewSeatList:
-            viewResponder?.reloadBottomView()
+            guard let item = getItem(type: .memberItemType) else { return }
+            guard let index = getItemIndex(type: .memberItemType) else { return }
+            item.normalTitle = localizedReplace(.memberText,replace: String(attendeeList.count))
+            viewResponder?.updateStackView(item: item, index: index)
         default: break
-        }
-    }
-}
-
-extension BottomViewModel: RoomEngineEventResponder {
-    func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String: Any]?){
-        switch name {
-        case .onUserScreenCaptureStopped:
-            isCalledFromShareScreen = false
-            viewResponder?.updateButtonItemViewSelectState(shareScreenSeletecd: false)
-        case .onUserVideoStateChanged:
-            guard let userId = param?["userId"] as? String, let streamType = param?["streamType"] as? TUIVideoStreamType,
-                  let hasVideo =  param?["hasVideo"] as? Bool else{return}
-            if userId == currentUser.userId,streamType == .screenStream,
-               hasVideo == true {
-                viewResponder?.updateButtonItemViewSelectState(shareScreenSeletecd: true)
-            }
-            if streamType == .screenStream && hasVideo == false {
-                viewResponder?.updateButtonItemViewEnableState(shareScreenEnable: true)
-            }
-        default:
-            break
         }
     }
 }
@@ -596,11 +595,8 @@ private extension String {
     static var leaveSeatText: String {
         localized("TUIRoom.leave.seat")
     }
-    static var muteAudioSeatReasonText: String {
-        localized("TUIRoom.mute.audio.seat.reason")
-    }
-    static var muteVideoSeatReasonText: String {
-        localized("TUIRoom.mute.video.seat.reason")
+    static var muteSeatReasonText: String {
+        localized("TUIRoom.mute.seat.reason")
     }
     static var muteAudioRoomReasonText: String {
         localized("TUIRoom.mute.audio.room.reason")
@@ -667,5 +663,8 @@ private extension String {
     }
     static var takenSeatText: String {
         localized("TUIRoom.taken.seat")
+    }
+    static var othersScreenSharingText: String {
+        localized("TUIRoom.others.screen.sharing")
     }
 }

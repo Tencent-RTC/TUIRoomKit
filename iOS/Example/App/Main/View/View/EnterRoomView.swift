@@ -36,7 +36,7 @@ class EnterRoomView: UIView {
     let enterButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setBackgroundImage(UIColor(0x0062E3).trans2Image(), for: .normal)
-        button.layer.cornerRadius = 25
+        button.layer.cornerRadius = 10
         button.clipsToBounds = true
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 19)
         button.setTitleColor(.white, for: .normal)
@@ -67,12 +67,7 @@ class EnterRoomView: UIView {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        for subView in inputStackView.subviews {
-            guard subView is ListCellItemView, let view = subView as? ListCellItemView else { continue }
-            guard view.itemData.hasFieldView, view.textField.isFirstResponder else { continue }
-            view.textField.resignFirstResponder()
-            break
-        }
+        resignTextFieldFirstResponder()
     }
     
     func constructViewHierarchy() {
@@ -116,7 +111,7 @@ class EnterRoomView: UIView {
         }
         
         enterButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().offset(-40 - kDeviceSafeBottomHeight)
+            make.top.equalTo(switchStackView.snp.bottom).offset(48)
             make.centerX.equalToSuperview()
             make.width.equalToSuperview().multipliedBy(0.4)
             make.height.equalTo(50)
@@ -130,7 +125,6 @@ class EnterRoomView: UIView {
     
     func bindInteraction() {
         enterButton.addTarget(self, action: #selector(enterButtonClick(sender:)), for: .touchUpInside)
-        rootViewController?.viewResponder = self
     }
     
     @objc func backButtonClick(sender: UIButton) {
@@ -138,19 +132,29 @@ class EnterRoomView: UIView {
     }
     
     @objc func enterButtonClick(sender: UIButton) {
-        rootViewController?.enterButtonClick(sender: sender, view: self)
+        resignTextFieldFirstResponder()
+        rootViewController?.enterButtonClick(sender: sender)
+    }
+    
+    func updateEnterButtonState(isEnabled: Bool) {
+        enterButton.isEnabled = isEnabled
+    }
+    
+    func updateLoadingState(isStarted: Bool) {
+        isStarted ? loading.startAnimating() : loading.stopAnimating()
+    }
+    
+    private func resignTextFieldFirstResponder() {
+        for subView in inputStackView.subviews {
+            guard subView is ListCellItemView, let view = subView as? ListCellItemView else { continue }
+            guard view.itemData.hasFieldView, view.textField.isFirstResponder else { continue }
+            view.textField.resignFirstResponder()
+            break
+        }
     }
     
     deinit {
         debugPrint("deinit \(self)")
-    }
-}
-
-extension EnterRoomView: EnterRoomResponder {
-    func updateEnterButtonBottomConstraint( offset: CGFloat) {
-        enterButton.snp.updateConstraints { make in
-            make.bottom.equalToSuperview().offset(-40 - kDeviceSafeBottomHeight - offset)
-        }
     }
 }
 

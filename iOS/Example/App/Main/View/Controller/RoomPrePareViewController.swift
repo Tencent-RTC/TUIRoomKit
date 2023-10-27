@@ -34,6 +34,12 @@ class RoomPrePareViewController: UIViewController {
         UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        appDelegate.orientation = .portrait
+    }
+    
     override func loadView() {
         let rootView = PrePareView()
         rootView.rootViewController = self

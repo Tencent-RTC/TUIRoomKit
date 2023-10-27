@@ -26,4 +26,5 @@ class ListCellItemData {
     var hasOverAllAction: Bool = false
     var size: CGSize?
     var backgroundColor: UIColor?
+    var hasDownLineView: Bool = true
 }
