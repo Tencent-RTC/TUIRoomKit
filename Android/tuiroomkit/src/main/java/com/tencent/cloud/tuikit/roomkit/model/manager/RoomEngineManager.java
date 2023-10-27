@@ -1,10 +1,13 @@
 package com.tencent.cloud.tuikit.roomkit.model.manager;
 
-import static com.tencent.cloud.tuikit.engine.common.TUICommonDefine.Error.CAMERA_START_FAIL;
 import static com.tencent.cloud.tuikit.engine.common.TUICommonDefine.Error.PERMISSION_DENIED;
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.RequestAction.REQUEST_TO_OPEN_REMOTE_CAMERA;
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.RequestAction.REQUEST_TO_OPEN_REMOTE_MICROPHONE;
+import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.ResolutionMode.LANDSCAPE;
+import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.ResolutionMode.PORTRAIT;
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT;
+import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.VideoStreamType.CAMERA_STREAM;
+import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.VideoStreamType.CAMERA_STREAM_LOW;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomConstant.KEY_ERROR;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_CREATE_ROOM;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_DESTROY_ROOM;
@@ -43,7 +46,8 @@ public class RoomEngineManager {
     private static final String TAG = "RoomEngineManager";
 
     private static RoomEngineManager sInstance;
-    private static boolean           sIsLoginSuccess = false;
+
+    private boolean mIsLoginSuccess = false;
 
     private Context         mContext;
     private TUIRoomEngine   mRoomEngine;
@@ -51,8 +55,6 @@ public class RoomEngineManager {
     private TUIRoomObserver mObserver;
 
     private RoomFloatWindowManager mRoomFloatWindowManager;
-
-    private boolean mIsMicOpened = false;
 
     public static RoomEngineManager sharedInstance() {
         return sharedInstance(TUILogin.getAppContext());
@@ -77,6 +79,11 @@ public class RoomEngineManager {
                 @Override
                 public void onGranted() {
                     mRoomEngine.responseRemoteRequest(requestId, true, callback);
+                    if (requestAction == REQUEST_TO_OPEN_REMOTE_MICROPHONE) {
+                        mRoomStore.audioModel.setMicOpen(true);
+                    } else if (requestAction == REQUEST_TO_OPEN_REMOTE_CAMERA) {
+                        mRoomStore.videoModel.setCameraOpened(true);
+                    }
                 }
 
                 @Override
@@ -101,6 +108,7 @@ public class RoomEngineManager {
         }
 
         mRoomEngine.responseRemoteRequest(requestId, agree, callback);
+        mRoomStore.removeTakeSeatRequest(requestId);
     }
 
     public void cancelRequest(String requestId, TUIRoomDefine.ActionCallback callback) {
@@ -165,11 +173,32 @@ public class RoomEngineManager {
         mRoomEngine.getDeviceManager().switchCamera(mRoomStore.videoModel.isFrontCamera);
     }
 
+    public void enableLocalAudio() {
+        if (!isAllowToToggleAudio()) {
+            return;
+        }
+        if (RoomEngineManager.sharedInstance().getRoomStore().audioModel.isMicOpen()) {
+            RoomEngineManager.sharedInstance().unMuteLocalAudio(null);
+        } else {
+            RoomEngineManager.sharedInstance().openLocalMicrophone(null);
+        }
+    }
+
+    public void disableLocalAudio() {
+        if (!isAllowToToggleAudio()) {
+            return;
+        }
+        if (RoomEngineManager.sharedInstance().getRoomStore().audioModel.isMicOpen()) {
+            RoomEngineManager.sharedInstance().muteLocalAudio();
+        }
+    }
+
     public void openLocalMicrophone(TUIRoomDefine.ActionCallback micCallback) {
         PermissionCallback callback = new PermissionCallback() {
             @Override
             public void onGranted() {
                 mRoomEngine.openLocalMicrophone(TUIRoomDefine.AudioQuality.DEFAULT, micCallback);
+                mRoomStore.audioModel.setMicOpen(true);
             }
 
             @Override
@@ -180,16 +209,20 @@ public class RoomEngineManager {
             }
         };
 
-        if (!mIsMicOpened) {
-            RoomPermissionUtil.requestAudioPermission(mContext, callback);
-            mIsMicOpened = true;
-        } else {
-            mRoomEngine.unmuteLocalAudio(micCallback);
-        }
+        RoomPermissionUtil.requestAudioPermission(mContext, callback);
+    }
+
+    public void unMuteLocalAudio(TUIRoomDefine.ActionCallback callback) {
+        mRoomEngine.unmuteLocalAudio(callback);
+    }
+
+    public void muteLocalAudio() {
+        mRoomEngine.muteLocalAudio();
     }
 
     public void closeLocalMicrophone() {
-        mRoomEngine.muteLocalAudio();
+        mRoomEngine.closeLocalMicrophone();
+        mRoomStore.audioModel.setMicOpen(false);
     }
 
     public void openRemoteDeviceByAdmin(String userId, TUIRoomDefine.MediaDevice device, int timeout
@@ -243,18 +276,18 @@ public class RoomEngineManager {
 
     public void setAudioCaptureVolume(int volume) {
         mRoomEngine.getTRTCCloud().setAudioCaptureVolume(volume);
-        mRoomStore.audioModel.captureVolume = volume;
+        mRoomStore.audioModel.setCaptureVolume(volume);
     }
 
     public void setAudioPlayOutVolume(int volume) {
         mRoomEngine.getTRTCCloud().setAudioPlayoutVolume(volume);
-        mRoomStore.audioModel.playVolume = volume;
+        mRoomStore.audioModel.setPlayVolume(volume);
     }
 
     public void enableAudioVolumeEvaluation(boolean enable) {
         TRTCCloudDef.TRTCAudioVolumeEvaluateParams params = new TRTCCloudDef.TRTCAudioVolumeEvaluateParams();
         mRoomEngine.getTRTCCloud().enableAudioVolumeEvaluation(enable, params);
-        mRoomStore.audioModel.enableVolumeEvaluation = enable;
+        mRoomStore.audioModel.setEnableVolumeEvaluation(enable);
     }
 
     public void setAudioRoute(boolean isSoundOnSpeaker) {
@@ -264,18 +297,18 @@ public class RoomEngineManager {
         mRoomStore.audioModel.setSoundOnSpeaker(isSoundOnSpeaker);
     }
 
-    public void setVideoBitrate(int bitrate) {
-        mRoomStore.videoModel.bitrate = bitrate;
-        setVideoEncoderParam();
+    public void setCameraResolutionMode(boolean isPortrait) {
+        mRoomEngine.setVideoResolutionMode(CAMERA_STREAM, isPortrait ? PORTRAIT : LANDSCAPE);
+        mRoomEngine.setVideoResolutionMode(CAMERA_STREAM_LOW, isPortrait ? PORTRAIT : LANDSCAPE);
     }
 
-    public void setVideoResolution(int resolution) {
-        mRoomStore.videoModel.resolution = resolution;
+    public void setVideoResolution(TUIRoomDefine.VideoQuality resolution) {
+        mRoomStore.videoModel.setResolution(resolution);
         setVideoEncoderParam();
     }
 
     public void setVideoFps(int fps) {
-        mRoomStore.videoModel.fps = fps;
+        mRoomStore.videoModel.setFps(fps);
         setVideoEncoderParam();
     }
 
@@ -289,13 +322,13 @@ public class RoomEngineManager {
     }
 
     private void setVideoEncoderParam() {
-        TRTCCloudDef.TRTCVideoEncParam param = new TRTCCloudDef.TRTCVideoEncParam();
-        param.videoResolution = mRoomStore.videoModel.resolution;
-        param.videoBitrate = mRoomStore.videoModel.bitrate;
-        param.videoFps = mRoomStore.videoModel.fps;
-        param.enableAdjustRes = true;
-        param.videoResolutionMode = TRTCCloudDef.TRTC_VIDEO_RESOLUTION_MODE_PORTRAIT;
-        mRoomEngine.getTRTCCloud().setVideoEncoderParam(param);
+        TUIRoomDefine.RoomVideoEncoderParams params = new TUIRoomDefine.RoomVideoEncoderParams();
+        params.videoResolution = mRoomStore.videoModel.getResolution();
+        params.resolutionMode = PORTRAIT;
+        params.fps = mRoomStore.videoModel.getFps();
+        params.bitrate = mRoomStore.videoModel.getBitrate();
+        Log.d(TAG, "updateVideoQualityEx videoResolution=" + params.videoResolution);
+        mRoomEngine.updateVideoQualityEx(CAMERA_STREAM, params);
     }
 
     private RoomEngineManager(Context context) {
@@ -306,6 +339,7 @@ public class RoomEngineManager {
 
         mObserver = new RoomEventDispatcher(mRoomStore);
         mRoomEngine.addObserver(mObserver);
+        mRoomFloatWindowManager = new RoomFloatWindowManager(mContext);
     }
 
     public void changeUserRole(String userId, TUIRoomDefine.Role role, TUIRoomDefine.ActionCallback callback) {
@@ -381,7 +415,6 @@ public class RoomEngineManager {
                         KeepAliveService.startKeepAliveService(
                                 mContext.getString(mContext.getApplicationInfo().labelRes),
                                 mContext.getString(R.string.tuiroomkit_app_running));
-                        mRoomFloatWindowManager = new RoomFloatWindowManager(mContext);
                         if (callback != null) {
                             callback.onSuccess(engineRoomInfo);
                         }
@@ -394,6 +427,7 @@ public class RoomEngineManager {
                     @Override
                     public void onError(TUICommonDefine.Error error, String message) {
                         ToastUtil.toastShortMessage("error=" + error + " message=" + message);
+                        Log.e(TAG, "enterRoom onError error=" + error + " message=" + message);
                         if (callback != null) {
                             callback.onError(error, message);
                         }
@@ -513,14 +547,17 @@ public class RoomEngineManager {
     }
 
     private void getSeatList() {
+        Log.d(TAG, "getSeatList");
         mRoomEngine.getSeatList(new TUIRoomDefine.GetSeatListCallback() {
             @Override
             public void onSuccess(List<TUIRoomDefine.SeatInfo> list) {
+                Log.d(TAG, "getSeatList onSuccess");
                 for (TUIRoomDefine.SeatInfo item : list) {
                     mRoomStore.setUserOnSeat(item.userId, true);
                     mRoomEngine.getUserInfo(item.userId, new TUIRoomDefine.GetUserInfoCallback() {
                         @Override
                         public void onSuccess(TUIRoomDefine.UserInfo userInfo) {
+                            Log.d(TAG, "getSeatList remoteUserTakeSeat userId=" + userInfo.userId);
                             mRoomStore.remoteUserTakeSeat(userInfo);
                         }
 
@@ -613,14 +650,17 @@ public class RoomEngineManager {
     }
 
     private void destroyInstance() {
+        if (mRoomStore.audioModel.isMicOpen()) {
+            closeLocalMicrophone();
+        }
         KeepAliveService.stopKeepAliveService();
         mRoomFloatWindowManager.destroy();
         mRoomEngine.removeObserver(mObserver);
         sInstance = null;
     }
 
-    private static void loginRoomEngine(TUIRoomDefine.ActionCallback callback) {
-        if (sIsLoginSuccess) {
+    private void loginRoomEngine(TUIRoomDefine.ActionCallback callback) {
+        if (mIsLoginSuccess) {
             if (callback != null) {
                 callback.onSuccess();
             }
@@ -635,7 +675,7 @@ public class RoomEngineManager {
                             @Override
                             public void onSuccess() {
                                 Log.i(TAG, "TUIRoomEngine.login onSuccess");
-                                sIsLoginSuccess = true;
+                                mIsLoginSuccess = true;
                                 if (callback != null) {
                                     callback.onSuccess();
                                 }
@@ -660,5 +700,20 @@ public class RoomEngineManager {
             Handler mainHandler = new Handler(Looper.getMainLooper());
             mainHandler.post(runnable);
         }
+    }
+
+    private boolean isAllowToToggleAudio() {
+        Context context = TUILogin.getAppContext();
+        if (TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT == mRoomStore.roomInfo.speechMode
+                && !mRoomStore.userModel.isOnSeat) {
+            ToastUtil.toastShortMessageCenter(context.getString(R.string.tuiroomkit_please_raise_hand));
+            return false;
+        }
+        if (mRoomStore.roomInfo.isMicrophoneDisableForAllUser
+                && mRoomStore.userModel.role != TUIRoomDefine.Role.ROOM_OWNER) {
+            ToastUtil.toastShortMessageCenter(context.getString(R.string.tuiroomkit_can_not_open_mic));
+            return false;
+        }
+        return true;
     }
 }

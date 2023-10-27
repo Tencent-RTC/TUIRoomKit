@@ -54,7 +54,6 @@ public class TUIVideoSeatView extends RelativeLayout {
     private boolean mIsTwoPersonVideoOn;
     private boolean mIsTwoPersonSwitched;
 
-    private int mScreenOrientation = ORIENTATION_PORTRAIT;
     private int mCurrentPageIndex = 0;
 
     private OnClickListener mClickListener;
@@ -96,10 +95,7 @@ public class TUIVideoSeatView extends RelativeLayout {
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation != mScreenOrientation) {
-            mScreenOrientation = newConfig.orientation;
-            chooseLayoutManagerByOrientation();
-        }
+        chooseLayoutManagerByOrientation();
         if (mIsSpeakerModeOn) {
             enableSpeakerMode(true);
         }
@@ -109,7 +105,7 @@ public class TUIVideoSeatView extends RelativeLayout {
     }
 
     private void chooseLayoutManagerByOrientation() {
-        if (mScreenOrientation == ORIENTATION_PORTRAIT) {
+        if (mContext.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
             mPageLayoutManager = new PortraitPageLayoutManager();
         } else {
             mPageLayoutManager = new LandscapePageLayoutManager();

@@ -40,15 +40,10 @@ public class RoomMainView extends RelativeLayout {
     private Button                       mBtnStopScreenShare;
     private FrameLayout                  mLayoutTopView;
     private FrameLayout                  mLayoutVideoSeat;
+    private FrameLayout                  mLayoutLocalAudio;
     private View                         mLayoutScreenCaptureGroup;
     private FrameLayout                  mLayoutBottomView;
     private BottomLayout                 mBottomLayout;
-    private QRCodeView                   mQRCodeView;
-    private UserListView                 mUserListView;
-    private RoomInfoView                 mRoomInfoView;
-    private MemberInviteView             mMemberInviteView;
-    private TransferMasterView           mTransferMasterView;
-    private RaiseHandApplicationListView mRaiseHandApplicationListView;
     private RoomMainViewModel            mViewModel;
 
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
@@ -101,8 +96,8 @@ public class RoomMainView extends RelativeLayout {
         mLayoutBottomView = findViewById(R.id.tuiroomkit_bottom_view_container);
         mLayoutBottomView.addView(mBottomLayout);
 
-        mUserListView = new UserListView(mContext);
-        mRaiseHandApplicationListView = new RaiseHandApplicationListView(mContext);
+        mLayoutLocalAudio = findViewById(R.id.tuiroomit_local_audio_container);
+        mLayoutLocalAudio.addView(new LocalAudioToggleView(mContext));
 
         showAlertUserLiveTips();
         if (RoomEngineManager.sharedInstance().getRoomStore().videoModel.isScreenSharing()) {
@@ -133,41 +128,32 @@ public class RoomMainView extends RelativeLayout {
         super.onConfigurationChanged(newConfig);
         initView();
         mViewModel.notifyConfigChange(newConfig);
+        mViewModel.setCameraResolutionMode(newConfig);
     }
 
     public void showRoomInfo() {
-        if (mRoomInfoView == null) {
-            mRoomInfoView = new RoomInfoView(mContext);
-        }
-        mRoomInfoView.show();
+        RoomInfoView roomInfoView = new RoomInfoView(mContext);
+        roomInfoView.show();
     }
 
     public void showUserList() {
-        if (mUserListView == null) {
-            mUserListView = new UserListView(mContext);
-        }
-        mUserListView.show();
+        UserListView userListView = new UserListView(mContext);
+        userListView.show();
     }
 
     public void showMemberInviteList() {
-        if (mMemberInviteView == null) {
-            mMemberInviteView = new MemberInviteView(mContext);
-        }
-        mMemberInviteView.show();
+        MemberInviteView memberInviteView = new MemberInviteView(mContext);
+        memberInviteView.show();
     }
 
     public void showApplyList() {
-        if (mRaiseHandApplicationListView == null) {
-            mRaiseHandApplicationListView = new RaiseHandApplicationListView(mContext);
-        }
-        mRaiseHandApplicationListView.show();
+        RaiseHandApplicationListView raiseHandApplicationListView = new RaiseHandApplicationListView(mContext);
+        raiseHandApplicationListView.show();
     }
 
     public void showQRCodeView(String url) {
-        if (mQRCodeView == null) {
-            mQRCodeView = new QRCodeView(mContext, url);
-        }
-        mQRCodeView.show();
+        QRCodeView qrCodeView = new QRCodeView(mContext, url);
+        qrCodeView.show();
     }
 
     public void showExitRoomDialog() {
@@ -176,10 +162,12 @@ public class RoomMainView extends RelativeLayout {
     }
 
     public void showTransferMasterView() {
-        if (mTransferMasterView == null) {
-            mTransferMasterView = new TransferMasterView(mContext);
-        }
-        mTransferMasterView.show();
+        TransferMasterView transferMasterView = new TransferMasterView(mContext);
+        transferMasterView.show();
+    }
+
+    public void recountBarShowTime() {
+        showRoomBars();
     }
 
     public void showInvitationDialog(final String inviteId, final TUIRoomDefine.RequestAction requestAction) {
@@ -288,15 +276,6 @@ public class RoomMainView extends RelativeLayout {
         super.onDetachedFromWindow();
         hideFloatingWindow();
         mViewModel.destroy();
-        if (mUserListView != null) {
-            mUserListView.destroy();
-        }
-        if (mTransferMasterView != null) {
-            mTransferMasterView.destroy();
-        }
-        if (mRaiseHandApplicationListView != null) {
-            mRaiseHandApplicationListView.destroy();
-        }
         if (mVideoSeatView != null) {
             mVideoSeatView.destroy();
         }
@@ -397,6 +376,7 @@ public class RoomMainView extends RelativeLayout {
 
     private void showRoomBars() {
         mIsBarsShowed = true;
+        mLayoutLocalAudio.setVisibility(INVISIBLE);
         mLayoutTopView.setVisibility(VISIBLE);
         mLayoutBottomView.setVisibility(VISIBLE);
         mMainHandler.removeCallbacksAndMessages(null);
@@ -415,6 +395,7 @@ public class RoomMainView extends RelativeLayout {
         mIsBarsShowed = false;
         mLayoutTopView.setVisibility(INVISIBLE);
         mLayoutBottomView.setVisibility(INVISIBLE);
+        mLayoutLocalAudio.setVisibility(VISIBLE);
         mMainHandler.removeCallbacksAndMessages(null);
     }
 }

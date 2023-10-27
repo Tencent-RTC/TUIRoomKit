@@ -43,11 +43,15 @@ public class UserListViewModel
         mRoomEngine = RoomEngineManager.sharedInstance(context).getRoomEngine();
         mRoomStore = RoomEngineManager.sharedInstance(mContext).getRoomStore();
 
+        initUserModelList();
+        subscribeEvent();
+    }
+
+    public void updateViewInitState() {
         mUserListView.updateMuteVideoView(mRoomStore.roomInfo.isCameraDisableForAllUser);
         mUserListView.updateMuteAudioView(mRoomStore.roomInfo.isMicrophoneDisableForAllUser);
         mUserListView.updateMemberCount(mRoomStore.getTotalUserCount());
-        initUserModelList();
-        subscribeEvent();
+        mUserListView.setOwner(isOwner());
     }
 
     private void subscribeEvent() {
@@ -87,7 +91,6 @@ public class UserListViewModel
     }
 
     private void initUserModelList() {
-        mUserListView.setOwner(isOwner());
         mUserModelList = mRoomStore.allUserList;
     }
 

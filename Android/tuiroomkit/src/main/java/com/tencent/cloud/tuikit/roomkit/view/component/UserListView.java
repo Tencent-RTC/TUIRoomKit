@@ -1,6 +1,6 @@
 package com.tencent.cloud.tuikit.roomkit.view.component;
 
-import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 import android.content.Context;
@@ -43,13 +43,19 @@ public class UserListView extends BaseBottomDialog implements View.OnClickListen
     public UserListView(Context context) {
         super(context);
         mContext = context;
+        mViewModel = new UserListViewModel(mContext, this);
+    }
+
+    @Override
+    public void cancel() {
+        super.cancel();
+        mViewModel.destroy();
     }
 
     @Override
     protected int getLayoutId() {
-        return R.layout.tuiroomkit_view_room_remote_user_list;
+        return R.layout.tuiroomkit_panel_user_management;
     }
-
 
     @Override
     protected void initView() {
@@ -66,7 +72,7 @@ public class UserListView extends BaseBottomDialog implements View.OnClickListen
         mMoreOptions.setOnClickListener(this);
         mBtnConfirm.setOnClickListener(this);
         mBtnInvite.setOnClickListener(this);
-        findViewById(R.id.toolbar).setOnClickListener(this);
+        findViewById(R.id.tuiroomkit_rl_title).setOnClickListener(this);
 
         mEditSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -102,10 +108,11 @@ public class UserListView extends BaseBottomDialog implements View.OnClickListen
         mUserListAdapter = new UserListAdapter(mContext);
         mRecyclerUserList.setAdapter(mUserListAdapter);
         mRecyclerUserList.setHasFixedSize(true);
-        mViewModel = new UserListViewModel(mContext, this);
+
         mUserListAdapter.setUserId(TUILogin.getUserId());
         mUserListAdapter.setSpeechMode(RoomEngineManager.sharedInstance().getRoomStore().roomInfo.speechMode);
         mUserListAdapter.setDataList(mViewModel.getUserList());
+        mViewModel.updateViewInitState();
     }
 
     public void updateMemberCount(int memberCount) {
@@ -113,10 +120,10 @@ public class UserListView extends BaseBottomDialog implements View.OnClickListen
     }
 
     public void setOwner(boolean isOwner) {
-        mMuteAudioAllBtn.setVisibility(isOwner ? VISIBLE : GONE);
-        mMuteVideoAllBtn.setVisibility(isOwner ? VISIBLE : GONE);
-        mMoreOptions.setVisibility(isOwner ? VISIBLE : GONE);
-        mBtnConfirm.setVisibility(isOwner ? GONE : VISIBLE);
+        mMuteAudioAllBtn.setVisibility(isOwner ? VISIBLE : INVISIBLE);
+        mMuteVideoAllBtn.setVisibility(isOwner ? VISIBLE : INVISIBLE);
+        mMoreOptions.setVisibility(isOwner ? VISIBLE : INVISIBLE);
+        mBtnConfirm.setVisibility(isOwner ? INVISIBLE : VISIBLE);
         mUserListAdapter.setOwner(isOwner);
         mUserListAdapter.notifyDataSetChanged();
     }
@@ -185,12 +192,6 @@ public class UserListView extends BaseBottomDialog implements View.OnClickListen
             mViewModel.muteAllUserVideo();
         } else if (v.getId() == R.id.btn_mute_more_options || v.getId() == R.id.btn_invite) {
             RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.SHOW_INVITE_VIEW, null);
-        }
-    }
-
-    public void destroy() {
-        if (mViewModel != null) {
-            mViewModel.destroy();
         }
     }
 

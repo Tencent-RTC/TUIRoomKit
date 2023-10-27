@@ -8,13 +8,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserEntity;
-import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.UserManagementViewModel;
-import com.tencent.cloud.tuikit.roomkit.videoseat.ui.utils.ImageLoader;
-import com.tencent.qcloud.tuicore.TUILogin;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -37,6 +36,8 @@ public class UserManagementView extends BaseBottomDialog implements View.OnClick
     private LinearLayout            mLayoutMuteUser;
     private LinearLayout            mLayoutForwardMaster;
     private UserManagementViewModel mViewModel;
+
+    private RequestManager mGlideRequestManager;
 
     public UserManagementView(@NonNull Context context, UserEntity user) {
         super(context);
@@ -82,8 +83,6 @@ public class UserManagementView extends BaseBottomDialog implements View.OnClick
         updateCameraState(mUser.isHasVideoStream());
         updateMicState(mUser.isHasAudioStream());
         updateMuteState(!mUser.isDisableSendingMessage());
-
-        ImageLoader.loadImage(getContext(), mImageHead, mUser.getAvatarUrl(), R.drawable.tuiroomkit_head);
 
         if (mViewModel.isSelf()) {
             String userName = mUser.getUserName() + getContext().getString(R.string.tuiroomkit_me);
@@ -152,9 +151,20 @@ public class UserManagementView extends BaseBottomDialog implements View.OnClick
     }
 
     @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mGlideRequestManager = Glide.with(mContext);
+        mGlideRequestManager.load(mUser.getAvatarUrl()).into(mImageHead);
+    }
+
+    @Override
     public void onDetachedFromWindow() {
         mViewModel.destroy();
         super.onDetachedFromWindow();
+        if (mGlideRequestManager != null) {
+            mGlideRequestManager.clear(mImageHead);
+            mGlideRequestManager = null;
+        }
     }
 
     public void showKickDialog(final String userId, String userName) {

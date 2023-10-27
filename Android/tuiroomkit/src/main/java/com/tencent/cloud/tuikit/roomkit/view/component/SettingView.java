@@ -2,156 +2,167 @@ package com.tencent.cloud.tuikit.roomkit.view.component;
 
 import android.content.Context;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.SeekBar;
+import android.widget.Switch;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.google.android.material.tabs.TabLayout;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.view.base.BaseBottomDialog;
-import com.tencent.cloud.tuikit.roomkit.view.settingview.AudioSettingView;
-import com.tencent.cloud.tuikit.roomkit.view.settingview.VideoSettingView;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.SettingViewModel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SettingView extends BaseBottomDialog {
-    private boolean                mEnableShare = true;
-    private TabLayout              mLayoutTop;
-    private ViewPager              mViewPagerContent;
-    private SettingViewPageAdapter mPagerAdapter;
-    private VideoSettingView       mVideoSettingView;
-    private AudioSettingView       mAudioSettingView;
-    private List<View>             mFragmentList;
-    private List<String>           mTitleList;
-    private SettingViewModel       mViewModel;
+
+    private ConstraintLayout mClVideoResolution;
+    private TextView         mTvVideoResolution;
+
+    private ConstraintLayout mClVideoFps;
+    private TextView         mTvVideoFps;
+
+    private SeekBar  mPbAudioCaptureVolume;
+    private TextView mTvAudioCaptureVolume;
+
+    private SeekBar  mPbAudioPlayVolume;
+    private TextView mTvAudioPlayVolume;
+    private Switch   mSwitchAudioVolumeEvaluation;
+
+    private Context mContext;
+
+    private SettingViewModel mViewModel;
 
     public SettingView(@NonNull Context context) {
         super(context);
+        mContext = context;
+        mViewModel = new SettingViewModel(this);
+    }
+
+    @Override
+    public void cancel() {
+        super.cancel();
+        mViewModel.destroy();
+    }
+
+    public void onVideoFpsChanged(int fps) {
+        mTvVideoFps.setText(fps + "");
+    }
+
+    public void onVideoResolutionChanged(String resolution) {
+        mTvVideoResolution.setText(resolution);
+    }
+
+    public void onAudioCaptureVolumeChanged(int volume) {
+        mPbAudioCaptureVolume.setProgress(volume);
+        mTvAudioCaptureVolume.setText(volume + "");
+    }
+
+    public void onAudioPlayVolumeChanged(int volume) {
+        mPbAudioPlayVolume.setProgress(volume);
+        mTvAudioPlayVolume.setText(volume + "");
     }
 
     @Override
     protected int getLayoutId() {
-        return R.layout.tuiroomkit_view_setting;
+        return R.layout.tuiroomkit_panel_setting;
     }
 
     @Override
     protected void initView() {
-        mViewModel = new SettingViewModel(this);
-        mLayoutTop = findViewById(R.id.tl_top);
-        mViewPagerContent = findViewById(R.id.vp_content);
+        initVideoResolutionView();
+        initVideoFpsView();
 
-        mTitleList = new ArrayList<>();
-        mTitleList.add(getContext().getString(R.string.tuiroomkit_title_video));
-        mTitleList.add(getContext().getString(R.string.tuiroomkit_title_audio));
-        mTitleList.add(getContext().getString(R.string.tuiroomkit_title_sharing));
-        initFragment();
+        initAudioCaptureVolumeView();
+        initAudioPlayVolumeView();
+        initAudioVolumeEvaluationView();
 
-        mPagerAdapter = new SettingViewPageAdapter(mFragmentList);
-        mLayoutTop.setupWithViewPager(mViewPagerContent, false);
+        mViewModel.updateViewInitState();
+    }
 
-        mViewPagerContent.setAdapter(mPagerAdapter);
-        for (int i = 0; i < mTitleList.size(); i++) {
-            TabLayout.Tab tab = mLayoutTop.getTabAt(i);
-            if (tab != null) {
-                tab.setText(mTitleList.get(i));
+    private void initVideoResolutionView() {
+        mClVideoResolution = findViewById(R.id.tuiroomkit_settings_video_resolution);
+        mTvVideoResolution = findViewById(R.id.tuiroomkit_tv_settings_video_resolution);
+        mClVideoResolution.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VideoResolutionChoicePanel videoResolutionChoicePanel = new VideoResolutionChoicePanel(mContext);
+                videoResolutionChoicePanel.show();
             }
-        }
+        });
     }
 
-    private void initFragment() {
-        if (mFragmentList == null) {
-            mFragmentList = new ArrayList<>();
-            mVideoSettingView = new VideoSettingView(getContext(), new VideoSettingView.OnItemChangeListener() {
-                @Override
-                public void onVideoBitrateChange(int bitrate) {
-                    mViewModel.setVideoBitrate(bitrate);
-                }
-
-                @Override
-                public void onVideoResolutionChange(int resolution) {
-                    mViewModel.setVideoResolution(resolution);
-                }
-
-                @Override
-                public void onVideoFpsChange(int fps) {
-                    mViewModel.setVideoFps(fps);
-                }
-
-                @Override
-                public void onVideoLocalMirrorChange(boolean mirror) {
-                    mViewModel.setVideoLocalMirror(mirror);
-                }
-            });
-            mAudioSettingView = new AudioSettingView(getContext(), new AudioSettingView.OnItemChangeListener() {
-                @Override
-                public void onAudioCaptureVolumeChange(int volume) {
-                    mViewModel.setAudioCaptureVolume(volume);
-                }
-
-                @Override
-                public void onAudioPlayVolumeChange(int volume) {
-                    mViewModel.setAudioPlayVolume(volume);
-                }
-
-                @Override
-                public void onAudioEvaluationEnableChange(boolean enable) {
-                    mViewModel.enableAudioEvaluation(enable);
-                }
-
-                @Override
-                public void onStartFileDumping(String path) {
-                    mViewModel.startFileDumping(path);
-                }
-
-                @Override
-                public void onStopFileDumping() {
-                    mViewModel.stopFileDumping();
-                }
-            });
-            mFragmentList.add(mVideoSettingView);
-            mFragmentList.add(mAudioSettingView);
-        }
+    private void initVideoFpsView() {
+        mClVideoFps = findViewById(R.id.tuiroomkit_settings_video_fps);
+        mTvVideoFps = findViewById(R.id.tuiroomkit_tv_settings_video_fps);
+        mClVideoFps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VideoFrameRateChoicePanel videoFrameRateChoicePanel = new VideoFrameRateChoicePanel(mContext);
+                videoFrameRateChoicePanel.show();
+            }
+        });
     }
 
-    @Override
-    public void onDetachedFromWindow() {
-        mViewModel.destroy();
-        super.onDetachedFromWindow();
+    private void initAudioCaptureVolumeView() {
+        mPbAudioCaptureVolume = findViewById(R.id.tuiroomkit_settings_audio_capture_volume);
+        mTvAudioCaptureVolume = findViewById(R.id.tuiroomkit_tv_audio_capture_volume);
+        mPbAudioCaptureVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int captureProgress;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mTvAudioCaptureVolume.setText(progress + "");
+                captureProgress = progress;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mViewModel.setAudioCaptureVolume(captureProgress);
+            }
+        });
     }
 
-    static class SettingViewPageAdapter extends PagerAdapter {
-        private List<View> viewLists;
+    private void initAudioPlayVolumeView() {
+        mPbAudioPlayVolume = findViewById(R.id.tuiroomkit_settings_audio_play_volume);
+        mTvAudioPlayVolume = findViewById(R.id.tuiroomkit_tv_audio_play_volume);
+        mPbAudioPlayVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int playProgress;
 
-        public SettingViewPageAdapter(List<View> viewLists) {
-            super();
-            this.viewLists = viewLists;
-        }
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mTvAudioPlayVolume.setText(progress + "");
+                playProgress = progress;
+            }
 
-        @Override
-        public int getCount() {
-            return viewLists.size();
-        }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
+            }
 
-        @NonNull
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            container.addView(viewLists.get(position));
-            return viewLists.get(position);
-        }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mViewModel.setAudioPlayVolume(playProgress);
+            }
+        });
+    }
 
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView(viewLists.get(position));
-        }
+    private void initAudioVolumeEvaluationView() {
+        mSwitchAudioVolumeEvaluation = findViewById(R.id.tuiroomkit_switch_audio_volume_evaluation);
+        mSwitchAudioVolumeEvaluation.setChecked(
+                RoomEngineManager.sharedInstance().getRoomStore().audioModel.isEnableVolumeEvaluation());
+        mSwitchAudioVolumeEvaluation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mViewModel.enableAudioEvaluation(isChecked);
+            }
+        });
     }
 }
 

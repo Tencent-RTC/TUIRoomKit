@@ -5,10 +5,10 @@ import android.text.TextUtils;
 
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
-import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
 import com.tencent.cloud.tuikit.roomkit.view.settingitem.BaseSettingItem;
 import com.tencent.cloud.tuikit.roomkit.view.settingitem.SwitchSettingItem;
+import com.tencent.liteav.demo.R;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.ArrayList;
@@ -16,9 +16,9 @@ import java.util.ArrayList;
 public class EnterRoomViewModel {
     private Context mContext;
 
-    private boolean mIsOpenCamera     = true;
-    private boolean mIsOpenMicrophone = true;
-    private boolean mIsUseSpeaker     = true;
+    private boolean mIsOpenVideo  = true;
+    private boolean mIsOpenAudio  = true;
+    private boolean mIsUseSpeaker = true;
 
     public EnterRoomViewModel(Context context) {
         mContext = context;
@@ -29,7 +29,7 @@ public class EnterRoomViewModel {
             return;
         }
         TUIRoomKit tuiRoomKit = TUIRoomKit.createInstance();
-        tuiRoomKit.enterRoom(roomId, mIsOpenMicrophone, mIsOpenCamera, mIsUseSpeaker,
+        tuiRoomKit.enterRoom(roomId, mIsOpenAudio, mIsOpenVideo, mIsUseSpeaker,
                 new TUIRoomDefine.GetRoomInfoCallback() {
                     @Override
                     public void onSuccess(TUIRoomDefine.RoomInfo roomInfo) {
@@ -44,19 +44,19 @@ public class EnterRoomViewModel {
 
     public ArrayList<SwitchSettingItem> createSwitchSettingItemList() {
         BaseSettingItem.ItemText audioItemText = new BaseSettingItem
-                .ItemText(mContext.getString(R.string.tuiroomkit_turn_on_microphone), "");
+                .ItemText(mContext.getString(R.string.app_turn_on_audio), "");
         SwitchSettingItem audioItem = new SwitchSettingItem(mContext, audioItemText,
                 new SwitchSettingItem.Listener() {
                     @Override
                     public void onSwitchChecked(boolean isChecked) {
-                        mIsOpenMicrophone = isChecked;
+                        mIsOpenAudio = isChecked;
                     }
-                }).setCheck(mIsOpenMicrophone);
+                }).setCheck(mIsOpenAudio);
         ArrayList<SwitchSettingItem> settingItemList = new ArrayList<>();
         settingItemList.add(audioItem);
 
         BaseSettingItem.ItemText speakerItemText = new BaseSettingItem
-                .ItemText(mContext.getString(R.string.tuiroomkit_turn_on_speaker), "");
+                .ItemText(mContext.getString(R.string.app_turn_on_speaker), "");
         SwitchSettingItem speakerItem = new SwitchSettingItem(mContext, speakerItemText,
                 new SwitchSettingItem.Listener() {
                     @Override
@@ -67,14 +67,14 @@ public class EnterRoomViewModel {
         settingItemList.add(speakerItem);
 
         BaseSettingItem.ItemText videoItemText =
-                new BaseSettingItem.ItemText(mContext.getString(R.string.tuiroomkit_turn_on_camera), "");
+                new BaseSettingItem.ItemText(mContext.getString(R.string.app_turn_on_video), "");
         SwitchSettingItem videoItem = new SwitchSettingItem(mContext, videoItemText,
                 new SwitchSettingItem.Listener() {
                     @Override
                     public void onSwitchChecked(boolean isChecked) {
-                        mIsOpenCamera = isChecked;
+                        mIsOpenVideo = isChecked;
                     }
-                }).setCheck(mIsOpenCamera);
+                }).setCheck(mIsOpenVideo);
         settingItemList.add(videoItem);
         return settingItemList;
     }

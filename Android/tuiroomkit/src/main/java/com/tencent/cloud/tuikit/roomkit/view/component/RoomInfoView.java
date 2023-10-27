@@ -30,6 +30,13 @@ public class RoomInfoView extends BaseBottomDialog {
 
     public RoomInfoView(@NonNull Context context) {
         super(context);
+        mViewModel = new RoomInfoViewModel(getContext(), this);
+    }
+
+    @Override
+    public void cancel() {
+        super.cancel();
+        mViewModel.destroy();
     }
 
     @Override
@@ -39,7 +46,6 @@ public class RoomInfoView extends BaseBottomDialog {
 
     @Override
     protected void initView() {
-        mViewModel = new RoomInfoViewModel(getContext(), this);
         mTextName = findViewById(R.id.tv_info_name);
         mTextMaster = findViewById(R.id.tv_master);
         mTextRoomId = findViewById(R.id.tv_room_id);
@@ -82,12 +88,6 @@ public class RoomInfoView extends BaseBottomDialog {
                         getContext().getString(R.string.tuiroomkit_copy_room_line_success));
             }
         });
-    }
-
-    @Override
-    public void onDetachedFromWindow() {
-        mViewModel.destroy();
-        super.onDetachedFromWindow();
     }
 
     public void setMasterName(String name) {
