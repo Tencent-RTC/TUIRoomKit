@@ -27,6 +27,7 @@ public class ChatInfo implements Serializable {
     boolean enableAudioCall = true;
     boolean enableVideoCall = true;
     boolean enableRoom = true;
+    boolean enableCustomHelloMessage = true;
     private DraftInfo draft;
 
     public ChatInfo() {}
@@ -199,5 +200,13 @@ public class ChatInfo implements Serializable {
 
     public boolean isEnableVideoCall() {
         return enableVideoCall;
+    }
+
+    public void setEnableCustomHelloMessage(boolean enableCustomHelloMessage) {
+        this.enableCustomHelloMessage = enableCustomHelloMessage;
+    }
+
+    public boolean isEnableCustomHelloMessage() {
+        return enableCustomHelloMessage;
     }
 }

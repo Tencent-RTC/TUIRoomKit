@@ -156,7 +156,7 @@ public class ChatLayoutSetting {
 
         //====== InputLayout使用范例 ======//
         //====== InputLayout example ======//
-        final InputView inputView = layout.getInputLayout();
+        // final InputView inputView = layout.getInputLayout();
 
         //        // TODO 隐藏音频输入的入口，可以打开下面代码测试
         //        // To hide the entrance of audio input, you can open the following code to test
@@ -187,13 +187,16 @@ public class ChatLayoutSetting {
         //        inputView.disableSendFileAction(true);
         //        inputView.disableSendPhotoAction(true);
         //        inputView.disableVideoRecordAction(true);
+    }
 
+    public void customizeInputMoreExtension(ChatView layout) {
+        InputView inputView = layout.getInputLayout();
         // TODO 可以自己增加一些功能，可以打开下面代码测试
         // You can add some functions yourself, you can open the following code to test
 
         // 增加一个欢迎提示富文本
         // Add a welcome prompt with rich text
-        if (TUIChatConfigs.getConfigs().getGeneralConfig().isEnableWelcomeCustomMessage()) {
+        if (TUIChatConfigs.getConfigs().getGeneralConfig().isEnableWelcomeCustomMessage() && layout.getChatInfo().isEnableCustomHelloMessage()) {
             InputMoreActionUnit unit = new InputMoreActionUnit() {};
             unit.setIconResId(R.drawable.custom);
             unit.setName(mContext.getString(R.string.test_custom_action));
