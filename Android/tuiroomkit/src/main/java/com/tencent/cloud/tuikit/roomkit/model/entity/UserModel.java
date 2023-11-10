@@ -8,14 +8,26 @@ public class UserModel {
     public String             userName;
     public String             userAvatar;
     public TUIRoomDefine.Role role;
-    public boolean            isVideoAvailable;
-    public boolean            isAudioAvailable;
-    public boolean            isOnSeat;
-    public boolean            isMute;
+    public SeatStatus         seatStatus = SeatStatus.OFF_SEAT;
+    public String             takeSeatRequestId;
 
     public UserModel() {
         userId = TUILogin.getUserId();
         userName = TUILogin.getNickName();
         userAvatar = TUILogin.getFaceUrl();
+    }
+
+    public enum SeatStatus {
+        OFF_SEAT,
+        APPLYING_TAKE_SEAT,
+        ON_SEAT
+    }
+
+    public boolean isOnSeat() {
+        return seatStatus == SeatStatus.ON_SEAT;
+    }
+
+    public boolean isOffSeat() {
+        return seatStatus == SeatStatus.OFF_SEAT;
     }
 }

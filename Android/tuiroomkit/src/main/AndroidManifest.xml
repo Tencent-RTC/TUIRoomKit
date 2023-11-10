@@ -15,10 +15,17 @@
     <application>
 
         <activity
-            android:name=".view.activity.RoomMainActivity"
+            android:name=".view.page.RoomMainActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+        <activity
+            android:name=".view.page.widget.Chat.ChatActivity"
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize|adjustPan"
+            android:theme="@style/TUIRoomActivityTransparent" />
 
         <activity
             android:name=".imaccess.view.InviteToJoinRoomActivity"
@@ -41,7 +48,7 @@
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
         <service
-            android:name="com.tencent.cloud.tuikit.roomkit.view.service.RoomFloatViewService"
+            android:name="com.tencent.cloud.tuikit.roomkit.view.page.widget.FloatWindow.VideoPlaying.RoomFloatViewService"
             android:enabled="true"
             android:exported="false" />
         <provider

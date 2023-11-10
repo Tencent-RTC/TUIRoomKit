@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="tuiroomkit_panel_corner">14dp</dimen>
+
     <dimen name="tuiroomkit_top_view_margin_start">0dp</dimen>
     <dimen name="tuiroomkit_top_view_margin_end">0dp</dimen>
     <dimen name="tuiroomkit_top_view_margin_top">52dp</dimen>

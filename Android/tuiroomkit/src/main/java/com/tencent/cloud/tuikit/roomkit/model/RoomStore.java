@@ -171,7 +171,7 @@ public class RoomStore {
     public void remoteUserTakeSeat(TUIRoomDefine.UserInfo userInfo) {
         Log.d(TAG, "remoteUserTakeSeat userId=" + userInfo.userId);
         if (TextUtils.equals(userInfo.userId, TUILogin.getUserId())) {
-            userModel.isOnSeat = true;
+            userModel.seatStatus = UserModel.SeatStatus.ON_SEAT;
         }
         if (userInfo.hasScreenStream) {
             boolean isUserExist = false;
@@ -204,7 +204,7 @@ public class RoomStore {
     public void remoteUserLeaveSeat(String userId) {
         Log.d(TAG, "remoteUserLeaveSeat userId=" + userId);
         if (TextUtils.equals(userId, TUILogin.getUserId())) {
-            userModel.isOnSeat = false;
+            userModel.seatStatus = UserModel.SeatStatus.OFF_SEAT;
         }
         for (int i = 0; i < seatUserList.size(); i++) {
             if (TextUtils.equals(userId, seatUserList.get(i).getUserId())) {
