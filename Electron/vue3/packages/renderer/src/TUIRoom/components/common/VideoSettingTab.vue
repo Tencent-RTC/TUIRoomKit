@@ -120,7 +120,6 @@ if (props.withPreview) {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/var.scss';
 @import '../../assets/style/element-custom.scss';
 
 .video-tab {

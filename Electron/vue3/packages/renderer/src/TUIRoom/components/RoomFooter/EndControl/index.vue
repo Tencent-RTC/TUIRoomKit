@@ -1,8 +1,8 @@
 <template>
   <div class="end-control-container">
-    <Button type="primary" class="end-button" @click="handleEndBtnClick">
+    <tui-button type="primary" class="end-button" @click="handleEndBtnClick">
       {{ showEndButtonContent }}
-    </Button>
+    </tui-button>
     <Dialog
       :model-value="visible"
       :title="title"
@@ -36,23 +36,23 @@
       </div>
       <template #footer>
         <div v-if="currentDialogType === DialogType.BasicDialog">
-          <Button v-if="roomStore.isMaster" class="button" size="default" @click="dismissRoom">
+          <tui-button v-if="roomStore.isMaster" class="button" size="default" @click="dismissRoom">
             {{ t('Dismiss') }}
-          </Button>
-          <Button v-if="isShowLeaveRoomDialog" class="button" size="default" @click="handleEndLeaveClick">
+          </tui-button>
+          <tui-button v-if="isShowLeaveRoomDialog" class="button" size="default" @click="handleEndLeaveClick">
             {{ t('Leave') }}
-          </Button>
-          <Button class="button" type="primary" size="default" @click="cancel">
+          </tui-button>
+          <tui-button class="button" type="primary" size="default" @click="cancel">
             {{ t('Cancel') }}
-          </Button>
+          </tui-button>
         </div>
         <div v-if="currentDialogType === DialogType.TransferDialog">
-          <Button class="button" size="default" @click="transferAndLeave">
+          <tui-button class="button" size="default" @click="transferAndLeave">
             {{ t('Transfer and leave') }}
-          </Button>
-          <Button class="button" size="default" type="primary" @click="cancel">
+          </tui-button>
+          <tui-button class="button" size="default" type="primary" @click="cancel">
             {{ t('Cancel') }}
-          </Button>
+          </tui-button>
         </div>
       </template>
     </Dialog>
@@ -61,14 +61,15 @@
 
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
-import Button from '../../common/base/Button.vue';
+import TuiButton from '../../common/base/Button.vue';
 import TuiSelect from '../../common/base/Select.vue';
 import TuiOption from '../../common/base/Option.vue';
-import { ElMessageBox, ElMessage } from '../../../elementComp';
 import Dialog from '../../common/base/Dialog/index.vue';
 import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-electron';
 import useEndControl from './useEndControlHooks';
 import logger from '../../../utils/common/logger';
+import TUIMessage from '../../common/base/Message';
+import TUIMessageBox from '../../common/base/MessageBox';
 
 const {
   t,
@@ -183,10 +184,11 @@ const onRoomDismissed = async (eventInfo: { roomId: string}) => {
   try {
     const { roomId } = eventInfo;
     logger.log(`${logPrefix}onRoomDismissed:`, roomId);
-    ElMessageBox.alert(t('The host closed the room.'), t('Note'), {
-      customClass: 'custom-element-class',
-      confirmButtonText: t('Confirm'),
-      appendTo: '#roomContainer',
+    TUIMessageBox({
+      title: t('Note'),
+      message: t('The host closed the room.'),
+      appendToRoomContainer: true,
+      confirmButtonText: t('Sure'),
       callback: async () => {
         resetState();
         emit('on-destroy-room', { code: 0, message: '' });
@@ -216,7 +218,7 @@ const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }
       newName = t('me');
     }
     const tipMessage = `${t('Moderator changed to ')}${newName}`;
-    ElMessage({
+    TUIMessage({
       type: 'success',
       message: tipMessage,
     });
@@ -241,7 +243,6 @@ onUnmounted(() => {
 
 </script>
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 .end-control-container{
   .end-button {
     padding: 9px 20px;

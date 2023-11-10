@@ -1,6 +1,6 @@
 import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from '../../../elementComp';
+import TUIMessage from '../../common/base/Message';
 
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useChatStore } from '../../../stores/chat';
@@ -58,7 +58,7 @@ export default function useChatEditor() {
      *
      * 消息发送失败
     **/
-      ElMessage.error(t('Failed to send the message'));
+      TUIMessage({ type: 'error', message: t('Failed to send the message') });
     }
   };
 

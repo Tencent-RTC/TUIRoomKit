@@ -134,7 +134,6 @@ async function toggleMuteVideo() {
     // 有摄像头列表
     roomEngine.instance?.setLocalVideoView({
       view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
-      streamType: TUIVideoStreamType.kCameraStream,
     });
     if (isMobile) {
       await roomEngine.instance?.openLocalCamera({ isFrontCamera: isFrontCamera.value });
@@ -180,7 +179,6 @@ async function handleAccept() {
   roomStore.setCanControlSelfVideo(true);
   roomEngine.instance?.setLocalVideoView({
     view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
-    streamType: TUIVideoStreamType.kCameraStream,
   });
   await roomEngine.instance?.responseRemoteRequest({
     requestId: requestOpenCameraRequestId.value,

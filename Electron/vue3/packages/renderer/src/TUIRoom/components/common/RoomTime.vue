@@ -1,11 +1,12 @@
 <template>
   <div class="timing">{{ formattedTime }}</div>
 </template>
+
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 const meetingTime = ref(0);
-let intervalId: number;
+let intervalId: any = null;
 
 const formattedTime = computed(() => {
   const minutes = Math.floor(meetingTime.value / 60);
@@ -14,7 +15,7 @@ const formattedTime = computed(() => {
 });
 
 function startTimer() {
-  intervalId = window.setInterval(() => {
+  intervalId = setInterval(() => {
     meetingTime.value += 1;
   }, 1000);
 }
@@ -24,7 +25,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  intervalId && window.clearInterval(intervalId);
+  intervalId && clearInterval(intervalId);
 });
 </script>
 

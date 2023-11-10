@@ -5,7 +5,7 @@ import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
 import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-electron';
 import { Ref, computed, nextTick, ref } from 'vue';
-import { ElMessage } from '../../elementComp';
+import TUIMessage from '../common/base/Message';
 import { MESSAGE_DURATION } from '../../constants/message';
 
 export default function useIndex() {
@@ -96,7 +96,7 @@ export default function useIndex() {
       device: TUIMediaDevice.kMicrophone,
     });
     const tipMessage = isMicrophoneDisable ? t('The host has muted all') : t('The host has unmuted all');
-    ElMessage({
+    TUIMessage({
       type: 'success',
       message: tipMessage,
       duration: MESSAGE_DURATION.NORMAL,
@@ -111,7 +111,7 @@ export default function useIndex() {
       device: TUIMediaDevice.kCamera,
     });
     const tipMessage = isCameraDisable ? t('The host has turned on the ban on all paintings') : t('The host has lifted the ban on all paintings');
-    ElMessage({
+    TUIMessage({
       type: 'success',
       message: tipMessage,
       duration: MESSAGE_DURATION.NORMAL,

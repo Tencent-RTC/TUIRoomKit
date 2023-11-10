@@ -29,17 +29,17 @@
         <div class="room-control-region">
           <!-- 创建房间逻辑 -->
           <div class="create-room-region">
-            <Button class="button-item" @click.stop="handleCreateRoom">
+            <tui-button class="button-item" @click.stop="handleCreateRoom">
               <svg-icon :icon="CreateRoomIcon" />
               <span class="button-text">{{ t('New Room') }}</span>
-            </Button>
+            </tui-button>
             <div
               v-if="showCreateRoomItems"
               v-click-outside="handleClickOutsideCreateRoomItems"
               class="create-room-items"
             >
               <div class="create-room-item" @click="createRoom('SpeakAfterTakingSeat')">
-                <span :title="t('Raise Hand Room')" class="create-room-option">{{ t('Raise Hand Room') }}</span>
+                <span :title="t('On-stage Speaking Room')" class="create-room-option">{{ t('On-stage Speaking Room') }}</span>
                 <svg-icon class="create-room-icon" :icon="NextIcon"></svg-icon>
               </div>
               <div class="create-room-item" @click="createRoom('FreeToSpeak')">
@@ -50,10 +50,10 @@
           </div>
           <!-- 加入房间逻辑 -->
           <div class="enter-room-region">
-            <Button v-if="!showEnterRoomAction" class="button-item" @click="handleEnterRoom">
+            <tui-button v-if="!showEnterRoomAction" class="button-item" @click="handleEnterRoom">
               <svg-icon :icon="EnterRoomIcon" />
               <span class="button-text">{{ t('Join Room') }}</span>
-            </Button>
+            </tui-button>
             <div v-if="showEnterRoomAction" class="enter-room-action">
               <input v-model="roomId" class="input" :placeholder="t('Enter room ID')" @click.stop="">
               <div :class="['enter-button', {'active': roomId.length > 0 }]" @click="enterRoom">
@@ -72,7 +72,7 @@ import { ref, onBeforeUnmount } from 'vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import LoadingIcon from '../../common/icons/LoadingIcon.vue';
 import NextIcon from '../../common/icons/NextIcon.vue';
-import Button from '../../common/base/Button.vue';
+import TuiButton from '../../common/base/Button.vue';
 import Logo from '../../common/Logo.vue';
 import useRoomControl from './useRoomControlHooks';
 import CreateRoomIcon from '../../common/icons/CreateRoomIcon.vue';
@@ -85,7 +85,7 @@ import TUIRoomEngine, { TUIRoomEvents, TRTCDeviceType, TUIVideoStreamType, TRTCD
 import vClickOutside from '../../../directives/vClickOutside';
 import logger from '../../../utils/common/logger';
 import { isElectronEnv } from '../../../utils/utils';
-import { ElMessageBox } from '../../../elementComp';
+import TUIMessageBox from '../../common/base/MessageBox';
 
 const roomStore = useRoomStore();
 const {
@@ -125,7 +125,7 @@ const tuiRoomParam = {
 
 async function openCamera() {
   if (isElectron) {
-    roomEngine.instance?.setLocalVideoView({ streamType: TUIVideoStreamType.kCameraStream, view: 'stream-preview' });
+    roomEngine.instance?.setLocalVideoView({ view: 'stream-preview' });
     await roomEngine.instance?.openLocalCamera();
   } else {
     await roomEngine.instance?.startCameraDeviceTest({
@@ -209,9 +209,12 @@ async function startStreamPreview() {
     alertMessage = 'Camera And Microphone not detected on current device';
   }
   if (alertMessage) {
-    ElMessageBox.alert(t(alertMessage), t('Note'), {
-      customClass: 'custom-element-class',
-      confirmButtonText: t('Confirm') });
+    TUIMessageBox({
+      title: t('Note'),
+      message: t(alertMessage),
+      appendToRoomContainer: true,
+      confirmButtonText: t('Sure'),
+    });
   }
 
   cameraList && roomStore.setCameraList(cameraList);
@@ -546,3 +549,4 @@ onBeforeUnmount(async () => {
   }
 }
 </style>
+../../common/base/MessageBox

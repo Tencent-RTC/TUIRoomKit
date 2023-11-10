@@ -3,7 +3,6 @@
     <div class="apply-control-container">
       <icon-button
         :title="iconTitle"
-        :icon-name="iconName"
         :icon="ApplyIcon"
         @click-icon="toggleApplySpeech"
       />
@@ -27,14 +26,14 @@
         }}
       </span>
       <template v-if="isMobile" #cancel>
-        <Button class="cancel" size="default" type="primary" @click="handleInvite(false)">{{ t('Cancel') }}</Button>
+        <tui-button class="cancel" size="default" type="text" @click="handleInvite(false)">{{ t('Cancel') }}</tui-button>
       </template>
       <template v-if="isMobile" #agree>
-        <Button class="agree" size="default" @click="handleInvite(true)">{{ t('Agree') }}</Button>
+        <tui-button class="agree" size="default" type="text" @click="handleInvite(true)">{{ t('Agree') }}</tui-button>
       </template>
-      <template v-else #footer>
-        <Button class="agree-button" size="default" @click="handleInvite(true)">{{ t('Agree') }}</Button>
-        <Button class="cancel-button" size="default" type="primary" @click="handleInvite(false)">{{ t('Cancel') }}</Button>
+      <template v-if="!isMobile" #footer>
+        <tui-button class="agree-button" size="default" @click="handleInvite(true)">{{ t('Agree') }}</tui-button>
+        <tui-button class="cancel-button" size="default" type="primary" @click="handleInvite(false)">{{ t('Cancel') }}</tui-button>
       </template>
     </Dialog>
   </div>
@@ -48,7 +47,7 @@ import SvgIcon from '../../common/base/SvgIcon.vue';
 import ApplyIcon from '../../common/icons/ApplyIcon.vue';
 import CloseIcon from '../../common/icons/CloseIcon.vue';
 import Dialog from '../../common/base/Dialog/index.vue';
-import { ElMessage } from '../../../elementComp';
+import TUIMessage from '../../common/base/Message';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
@@ -58,7 +57,7 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import logger from '../../../utils/common/logger';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-electron';
 import { isMobile } from '../../../utils/useMediaValue';
-import Button from '../../common/base/Button.vue';
+import TuiButton from '../../common/base/Button.vue';
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
@@ -115,14 +114,14 @@ async function sendSeatApplication() {
         const { requestCallbackType } = callbackInfo;
         switch (requestCallbackType) {
           case TUIRequestCallbackType.kRequestAccepted:
-            ElMessage({
+            TUIMessage({
               type: 'success',
               message: t('The host has approved your application'),
               duration: MESSAGE_DURATION.NORMAL,
             });
             break;
           case TUIRequestCallbackType.kRequestRejected:
-            ElMessage({
+            TUIMessage({
               type: 'warning',
               message: t('The host has rejected your application for the stage'),
               duration: MESSAGE_DURATION.NORMAL,
@@ -215,7 +214,7 @@ async function handleInvite(agree: boolean) {
  */
 async function onKickedOffSeat() {
   // 被主持人踢下麦
-  ElMessage({
+  TUIMessage({
     type: 'warning',
     message: t('You have been invited by the host to step down, please raise your hand if you need to speak'),
     duration: MESSAGE_DURATION.NORMAL,
@@ -279,7 +278,7 @@ onBeforeUnmount(() => {
     }
   }
 }
-.agree {
+.agree, .cancel {
   padding: 14px;
   width: 50%;
   display: flex;
@@ -287,28 +286,10 @@ onBeforeUnmount(() => {
   font-size: 16px;
   font-weight: 500;
   justify-content: center;
-  border: 1px solid transparent;
   color: var(--active-color-1);
-  background-color: #fff;
-  &:hover {
-    background: none;
-    border: none;
-  }
 }
 .cancel {
-  padding: 14px;
-  width: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid transparent;
-  font-size: 16px;
-  font-weight: 400;
   color: var(--font-color-4);
-  &:hover {
-    background: none;
-    border: none;
-  }
 }
 .cancel-button {
   margin-left: 20px;

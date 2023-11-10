@@ -1,0 +1,20 @@
+@mixin success_color() {
+  .tui-theme-white & {
+    color: rgba(16, 178, 81, 1);
+    background-color: rgba(227, 255, 248, 1);
+  }
+  .tui-theme-black & {
+    color: rgba(54, 222, 121, 1);
+    background-color: rgba(27, 72, 61, 1);
+  }
+}
+@mixin err_color() {
+  .tui-theme-white & {
+    color: rgba(235, 58, 94, 1);
+    background-color: rgba(255, 227, 232, 1);
+  }
+  .tui-theme-black & {
+    color: rgba(235, 58, 94, 1);
+    background-color: rgba(62, 15, 23, 1);
+  }
+}

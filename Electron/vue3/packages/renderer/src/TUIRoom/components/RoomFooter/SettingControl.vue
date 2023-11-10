@@ -28,21 +28,4 @@ function handleShowSettingDialog() {
 </script>
 
 <style lang="scss" scoped>
-
-@import '../../assets/style/var.scss';
-
-.setting-dialog {
-  width: 660px;
-  height: 574px;
-  position: absolute;
-  display: flex;
-  .dialog-tabs {
-    width: 194px;
-    height: 574px;
-    background-color: $toolBarBackgroundColor;
-  }
-  .dialog-content {
-    flex-grow: 1;
-  }
-}
 </style>

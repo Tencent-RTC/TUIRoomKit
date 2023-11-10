@@ -15,7 +15,7 @@
   <tui-select
     v-model="localVideoQuality"
     placeholder="placeholder"
-    class="select custom-element-class"
+    class="select"
     :teleported="false"
     :popper-append-to-body="false"
   >
@@ -61,7 +61,6 @@ TUIRoomEngine.once('ready', () => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/element-custom.scss';
 
 .select {
   width: 100%;

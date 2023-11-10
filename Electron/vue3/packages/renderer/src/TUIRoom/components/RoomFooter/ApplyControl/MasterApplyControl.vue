@@ -18,7 +18,7 @@
     >
       <div class="title-container">
         <span class="title">{{ t('Apply to stage application') }}</span>
-        <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyList"></svg-icon>
+        <svg-icon :icon="CloseIcon" class="close" @click="hideApplyList"></svg-icon>
       </div>
       <div class="apply-list">
         <div v-for="(item, index) in applyToAnchorList" :key="index" class="apply-item">
@@ -27,17 +27,17 @@
             <span class="user-name" :title="item.userName || item.userId">{{ item.userName || item.userId }}</span>
           </div>
           <div class="control-container">
-            <Button size="default" @click="handleUserApply(item.userId, true)">
+            <tui-button size="default" @click="handleUserApply(item.userId, true)">
               {{ t('Agree') }}
-            </Button>
-            <Button size="default" type="primary" @click="handleUserApply(item.userId, false)">
+            </tui-button>
+            <tui-button size="default" type="primary" @click="handleUserApply(item.userId, false)">
               {{ t('Reject') }}
-            </Button>
+            </tui-button>
           </div>
         </div>
       </div>
       <div class="apply-footer">
-        <Button size="default" class="deny-all" @click="denyAllUserApply">{{ t('Reject All') }}</Button>
+        <tui-button size="default" class="deny-all" @click="denyAllUserApply">{{ t('Reject All') }}</tui-button>
       </div>
     </div>
   </div>
@@ -49,7 +49,8 @@ import Avatar from '../../common/Avatar.vue';
 import IconButton from '../../common/base/IconButton.vue';
 import ApplyIcon from '../../common/icons/ApplyIcon.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
-import Button from '../../common/base/Button.vue';
+import CloseIcon from '../../common/icons/CloseIcon.vue';
+import TuiButton from '../../common/base/Button.vue';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';

@@ -199,7 +199,6 @@ watch(
           **/
           if (props.stream.hasVideoStream) {
             await roomEngine.instance?.setLocalVideoView({
-              streamType: streamTypeToFetch.value,
               view: `${playRegionDomId.value}`,
             });
           }

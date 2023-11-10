@@ -81,7 +81,6 @@ export default function useStreamContainer() {
 
       if (isWeChat) {
         await roomEngine.instance?.setLocalVideoView({
-          streamType: TUIVideoStreamType.kCameraStream,
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
         });
         // @ts-ignore
@@ -93,7 +92,6 @@ export default function useStreamContainer() {
           return;
         }
         await roomEngine.instance?.setLocalVideoView({
-          streamType: TUIVideoStreamType.kCameraStream,
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
         });
         // @ts-ignore
@@ -123,7 +121,6 @@ export default function useStreamContainer() {
          * 开启本地摄像头
         **/
         await roomEngine.instance?.setLocalVideoView({
-          streamType: TUIVideoStreamType.kCameraStream,
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
         });
         await roomEngine.instance?.openLocalCamera();

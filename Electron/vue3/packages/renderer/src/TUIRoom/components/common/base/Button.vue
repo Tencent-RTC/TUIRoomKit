@@ -110,4 +110,18 @@ const buttonClassList = computed(() => [
   margin-right: 5px;
   display: flex;
 }
+
+.button-text {
+  border: 0 solid transparent;
+  background-color: transparent;
+  color: var(--font-color-4);
+  &:hover {
+    border: 0 solid transparent;
+    background-color: transparent;
+    color: var(--font-color-4);
+  }
+  &::after {
+    border: none;
+  }
+}
 </style>

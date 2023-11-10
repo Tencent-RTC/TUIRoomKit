@@ -3,7 +3,10 @@
     <div class="user-info-content" @click="handleUserControl">
       <Avatar class="avatar" :img-src="avatarUrl"></Avatar>
       <div class="name">{{ userName || userId }}</div>
-      <svg-icon class="down-icon" :icon-name="iconName" size="medium"></svg-icon>
+      <svg-icon
+        :class="[showUserControl ? 'up-icon' : 'down-icon']"
+        :icon="ArrowStrokeSelectDownIcon"
+      ></svg-icon>
     </div>
     <div v-if="showUserControl" class="user-control-container">
       <div v-show="showEditNameItem">
@@ -25,10 +28,10 @@
         <tui-input v-model="tempUserName" class="edit-name-input" :placeholder="t('Please input user name')" />
       </div>
       <template #footer>
-        <Button class="button" size="default" @click="closeEditUserNameDialog">{{ t('Cancel') }}</Button>
-        <Button class="button" size="default" type="primary" @click="handleSaveUserName(tempUserName)">
+        <tui-button class="button" size="default" @click="closeEditUserNameDialog">{{ t('Cancel') }}</tui-button>
+        <tui-button class="button" size="default" type="primary" @click="handleSaveUserName(tempUserName)">
           {{ t('Save') }}
-        </Button>
+        </tui-button>
       </template>
     </Dialog>
   </div>
@@ -36,14 +39,14 @@
 <script setup lang="ts">
 import Dialog from '../../common/base/Dialog/index.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
+import ArrowStrokeSelectDownIcon from '../../common/icons/ArrowStrokeSelectDownIcon.vue';
 import useUserInfo from './useUserInfoHooks';
 import Avatar from '../../common/Avatar.vue';
-import Button from '../../common/base/Button.vue';
+import TuiButton from '../../common/base/Button.vue';
 import TuiInput from '../../common/base/Input.vue';
 const {
   t,
   showEditNameItem,
-  iconName,
   showUserControl,
   showUserNameEdit,
   userInfoRef,
@@ -61,9 +64,6 @@ defineProps<Props>();
 defineEmits(['log-out']);
 </script>
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
-@import '../../../assets/style/element-custom.scss';
-
 .tui-theme-white .user-control-container {
   --filter-color:
     drop-shadow(0px 0px 4px rgba(32, 77, 141, 0.03))
@@ -98,6 +98,10 @@ defineEmits(['log-out']);
     }
     .down-icon {
       margin-left: 4px;
+    }
+    .up-icon {
+      margin-left: 4px;
+      transform: rotate(180deg);
     }
   }
   .user-control-container {

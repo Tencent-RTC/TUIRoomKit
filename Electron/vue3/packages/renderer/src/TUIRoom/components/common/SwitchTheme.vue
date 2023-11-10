@@ -13,7 +13,7 @@
     :title="t('Switch Theme')"
     :layout="IconButtonLayout.HORIZONTAL"
     :icon="SwitchThemeIcon"
-    @click="handleSwitchTheme"
+    @click-icon="handleSwitchTheme"
   >
   </icon-button>
 </template>

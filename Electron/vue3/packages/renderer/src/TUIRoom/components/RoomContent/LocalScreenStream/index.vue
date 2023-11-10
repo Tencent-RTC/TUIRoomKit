@@ -5,9 +5,9 @@
         <svg-icon :icon="ScreenSharingIcon"></svg-icon>
         <span class="text">{{ t('You are sharing the screen...') }}</span>
       </div>
-      <Button size="default" class="stop-button" @click="openStopConfirmDialog">
+      <tui-button size="default" class="stop-button" @click="openStopConfirmDialog">
         {{ t('End sharing') }}
-      </Button>
+      </tui-button>
       <Dialog
         :model-value="showStopShareRegion"
         width="420px"
@@ -21,8 +21,8 @@
           {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
         <template #footer>
           <span>
-            <Button class="dialog-button" size="default" @click="stopScreenSharing">{{ t('End sharing') }}</Button>
-            <Button type="primary" size="default" @click="showStopShareRegion = false">{{ t('Cancel') }}</Button>
+            <tui-button class="dialog-button" size="default" @click="stopScreenSharing">{{ t('End sharing') }}</tui-button>
+            <tui-button type="primary" size="default" @click="showStopShareRegion = false">{{ t('Cancel') }}</tui-button>
           </span>
         </template>
       </Dialog>
@@ -34,7 +34,7 @@
 import { ref } from 'vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import ScreenSharingIcon from '../../common/icons/ScreenSharingIcon.vue';
-import Button from '../../common/base/Button.vue';
+import TuiButton from '../../common/base/Button.vue';
 import Dialog from '../../common/base/Dialog/index.vue';
 import eventBus from '../../../hooks/useMitt';
 import { useI18n } from '../../../locales';

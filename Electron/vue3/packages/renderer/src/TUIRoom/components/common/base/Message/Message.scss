@@ -1,0 +1,61 @@
+@import './mixins';
+.message {
+  &-enter {
+    &-from {
+      transform: translate3d(0, -75px, 0);
+      opacity: 0;
+    }
+
+    &-active {
+      transition: all 0.3s;
+    }
+
+    &-to {
+      transform: none;
+      opacity: 1;
+    }
+  }
+}
+
+.t-message {
+  border-radius: 6px;
+  padding: 10px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 6%;
+  background: #f5f5f5;
+  color: #999;
+  white-space: nowrap;
+  
+  i {
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  .t-message-text {
+    vertical-align: middle;
+    font-size: .875rem;
+  }
+
+  .t-message-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-size: cover;
+  }
+  .t-message-icon.t-message-icon-success {
+    background-image: url('./images/success.svg');
+  }
+  .t-message-icon.t-message-icon-error {
+    background-image: url('./images/error.svg');
+  }
+}
+
+.t-message.t-message-error {
+  @include err_color();
+}
+.t-message.t-message-success {
+  @include success_color();
+}

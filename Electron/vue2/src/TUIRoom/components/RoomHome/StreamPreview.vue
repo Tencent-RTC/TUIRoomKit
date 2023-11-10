@@ -170,7 +170,7 @@ async function startStreamPreview() {
       confirmButtonText: t('Confirm') });
   }
   if (hasCameraDevice) {
-    roomEngine.instance?.setLocalVideoView({ streamType: TUIVideoStreamType.kCameraStream, view: 'stream-preview' });
+    roomEngine.instance?.setLocalVideoView({ view: 'stream-preview' });
     await roomEngine.instance?.openLocalCamera();
   }
   if (hasMicrophoneDevice) {
