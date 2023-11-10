@@ -40,8 +40,6 @@
 "TUIRoom.inviteMember" = "邀请成员";
 "TUIRoom.kick.off.error.toast" = "xx被移除失败";
 "TUIRoom.suer.kick.off.xx" = "你确定要移除\"xx\"吗？";
-"TUIRoom.mute.audio.success.toast" = "同意了麦克风开启请求";
-"TUIRoom.mute.video.success.toast" = "同意了摄像头开启请求";
 "TUIRoom.mute.audio.reject.toast" = "拒绝了麦克风开启请求";
 "TUIRoom.mute.video.reject.toast" = "拒绝了摄像头开启请求";
 "TUIRoom.copy.success" = "房间号复制成功";
@@ -63,6 +61,7 @@
 "TUIRoom.mute" = "静音";
 "TUIRoom.unmute" = "解除静音";
 "TUIRoom.request.open.video" = "请求开启视频";
+"TUIRoom.request.open.audio" = "请求开启音频";
 "TUIRoom.close.video" = "关闭视频";
 "TUIRoom.change.host" = "转交房主";
 "TUIRoom.mute.message" = "禁言";
@@ -180,3 +179,10 @@
 "TUIRoom.standard.resolution" = "标清";
 "TUIRoom.high.resolution" = "高清";
 "TUIRoom.super.resolution" = "超清";
+"TUIRoom.invited.take.seat" = "已向观众发出上台邀请";
+"TUIRoom.invited.open.audio" = "已向观众发出开启音频邀请";
+"TUIRoom.invited.open.video" = "已向观众发出开启视频邀请";
+"TUIRoom.refused.take.seat.invitation" = "拒绝了您的上台邀请";
+"TUIRoom.take.seat.invitation.timeout" = "上麦邀请已经超时";
+"TUIRoom.open.video.invitation.timeout" = "开启视频的邀请已经超时";
+"TUIRoom.open.audio.invitation.timeout" = "开启音频的邀请已经超时";

@@ -449,20 +449,20 @@ class EngineManager: NSObject {
     }
     
     //初始化用户列表
-    func initUserList(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
+    func initUserList(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         self.getUserList(nextSequence: 0, localUserList: []) { [weak self] in
             guard let self = self else { return }
             if self.store.roomInfo.speechMode == .applySpeakAfterTakingSeat {
                 self.getSeatList {
-                    onSuccess()
+                    onSuccess?()
                 } onError: { code, message in
-                    onError(code, message)
+                    onError?(code, message)
                 }
             } else {
-                onSuccess()
+                onSuccess?()
             }
         } onError: { code, message in
-            onError(code, message)
+            onError?(code, message)
         }
     }
     
@@ -521,6 +521,9 @@ class EngineManager: NSObject {
         roomEngine.setVideoResolutionMode(streamType: streamType, resolutionMode: resolutionMode)
     }
     
+    func changeRaiseHandNoticeState(isShown: Bool) {
+        store.isShownRaiseHandNotice = isShown
+    }
 }
 
 // MARK: - Private
@@ -551,7 +554,7 @@ extension EngineManager {
     private func createEngineRoom(roomInfo: TUIRoomInfo, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         guard !store.isEnteredRoom else {
             if store.roomInfo.roomId == roomInfo.roomId {
-                RoomFloatView.dismiss()
+                RoomVideoFloatView.dismiss()
                 onSuccess()
             } else {
                 onError(.failed, .inAnotherRoomText)
@@ -569,7 +572,7 @@ extension EngineManager {
     private func enterEngineRoom(roomId: String, enableAudio: Bool, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         guard !store.isEnteredRoom else {
             if store.roomInfo.roomId == roomId {
-                RoomFloatView.dismiss()
+                RoomVideoFloatView.dismiss()
                 EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ShowRoomMainView, param: [:])
                 onSuccess()
             } else {
@@ -586,37 +589,31 @@ extension EngineManager {
             self.store.isEnteredRoom = true
             self.store.timeStampOnEnterRoom = Int(Date().timeIntervalSince1970)
             //初始化用户列表
-            self.initUserList { [weak self] in
-                guard let self = self else { return }
-                //如果是举手发言房间的房主，需要先上麦再跳转到会议主页面
-                if roomInfo.speechMode == .applySpeakAfterTakingSeat, self.store.currentUser.userId == roomInfo.ownerId {
-                    self.takeSeat() { [weak self] _,_ in
-                        guard let self = self else { return }
-                        self.showRoomViewController(roomId: roomInfo.roomId)
-                        self.operateLocalMicrophone(enableAudio: enableAudio)
-                        onSuccess()
-                    } onError: { [weak self] _, _, code, message in
-                        guard let self = self else { return }
-                        if self.store.currentUser.userId == roomInfo.ownerId {
-                            self.destroyRoom()
-                        } else {
-                            self.exitRoom()
-                        }
-                        self.rootRouter.dismissAllRoomPopupViewController()
-                        self.rootRouter.popToRoomEntranceViewController()
-                        onError(code, message)
-                    }
-                } else {
-                    //跳转到会议主界面
-                    if self.store.isShowRoomMainViewAutomatically {
-                        self.showRoomViewController(roomId: roomInfo.roomId)
-                    }
-                    //操作麦克风
+            self.initUserList()
+            //初始化视频设置
+            self.initLocalVideoState()
+            //如果是举手发言房间的房主，需要先上麦再跳转到会议主页面
+            if roomInfo.speechMode == .applySpeakAfterTakingSeat, self.store.currentUser.userId == roomInfo.ownerId {
+                self.takeSeat() { [weak self] _,_ in
+                    guard let self = self else { return }
+                    self.showRoomViewController(roomId: roomInfo.roomId)
                     self.operateLocalMicrophone(enableAudio: enableAudio)
                     onSuccess()
+                } onError: { [weak self] _, _, code, message in
+                    guard let self = self else { return }
+                    self.store.currentUser.userId == roomInfo.ownerId ? self.destroyRoom() : self.exitRoom()
+                    self.rootRouter.dismissAllRoomPopupViewController()
+                    self.rootRouter.popToRoomEntranceViewController()
+                    onError(code, message)
                 }
-            } onError: {  code, message in
-                onError(code, message)
+            } else {
+                //跳转到会议主界面
+                if self.store.isShowRoomMainViewAutomatically {
+                    self.showRoomViewController(roomId: roomInfo.roomId)
+                }
+                //操作麦克风
+                self.operateLocalMicrophone(enableAudio: enableAudio)
+                onSuccess()
             }
         } onError: { code, message in
             onError(code, message)
@@ -649,6 +646,28 @@ extension EngineManager {
             muteLocalAudio()
             openLocalMicrophone()
         }
+    }
+    
+    //进房后视频设置
+    private func initLocalVideoState() {
+        setVideoParam()
+        updateVideoQuality(quality: store.videoSetting.videoQuality)
+        enableGravitySensor(enable: true)
+        setGSensorMode(mode: .uiFixLayout)
+        let resolutionMode: TUIResolutionMode = isLandscape ? .landscape : .portrait
+        setVideoResolutionMode(streamType: .cameraStream, resolutionMode: resolutionMode)
+    }
+    
+    private func setVideoParam() {
+        let param = TRTCVideoEncParam()
+        param.videoBitrate = Int32(store.videoSetting.videoBitrate)
+        param.videoFps = Int32(store.videoSetting.videoFps)
+        param.enableAdjustRes = true
+        setVideoEncoderParam(param)
+        let params = TRTCRenderParams()
+        params.fillMode = .fill
+        params.rotation = ._0
+        setLocalRenderParams(params: params)
     }
     
     //获取用户列表

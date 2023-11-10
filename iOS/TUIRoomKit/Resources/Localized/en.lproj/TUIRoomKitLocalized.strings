@@ -39,8 +39,6 @@
 "TUIRoom.kick.off.title" = "You were removed by the room owner.";
 "TUIRoom.kick.off.error.toast" = "Failed to remove xx.";
 "TUIRoom.suer.kick.off.xx" = "Are you sure you want to remove \"xx\"?";
-"TUIRoom.mute.audio.success.toast" = " agreed to the microphone access request.";
-"TUIRoom.mute.video.success.toast" = " agreed to the camera access request.";
 "TUIRoom.mute.audio.reject.toast" = " rejected to the microphone access request.";
 "TUIRoom.mute.video.reject.toast" = " rejected to the camera access request.";
 "TUIRoom.copy.success" = "Room ID copied successfully.";
@@ -61,7 +59,8 @@
 "TUIRoom.video.conference" = "'s quick meeting";
 "TUIRoom.mute" = "Close mic";
 "TUIRoom.unmute" = "Open mic";
-"TUIRoom.request.open.video" = "Open Camera";
+"TUIRoom.request.open.video" = "Request open video";
+"TUIRoom.request.open.audio" = "Request open audio";
 "TUIRoom.close.video" = "Close camera";
 "TUIRoom.change.host" = "Change host";
 "TUIRoom.mute.message" = "Mute message";
@@ -183,3 +182,10 @@
 "TUIRoom.standard.resolution" = "Standard resolution";
 "TUIRoom.high.resolution" = "High resolution";
 "TUIRoom.super.resolution" = "Super resolution";
+"TUIRoom.invited.take.seat" = "The audience has been invited to the stage";
+"TUIRoom.invited.open.audio" = "The audience has been invited to open the audio";
+"TUIRoom.invited.open.video" = "The audience has been invited to open the video";
+"TUIRoom.refused.take.seat.invitation" = "declined your invitation to go on stage";
+"TUIRoom.take.seat.invitation.timeout" = "The invitation to take seat has timed out";
+"TUIRoom.open.video.invitation.timeout" = "The invitation to start the video has timed out";
+"TUIRoom.open.audio.invitation.timeout" = "The invitation to start the audio has timed out";
