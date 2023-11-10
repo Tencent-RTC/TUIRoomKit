@@ -6,8 +6,8 @@ import android.text.TextUtils;
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
-import com.tencent.cloud.tuikit.roomkit.view.settingitem.BaseSettingItem;
-import com.tencent.cloud.tuikit.roomkit.view.settingitem.SwitchSettingItem;
+import com.tencent.liteav.demo.view.component.BaseSettingItem;
+import com.tencent.liteav.demo.view.component.SwitchSettingItem;
 import com.tencent.liteav.demo.R;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 

@@ -9,17 +9,12 @@ import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
-import com.tencent.cloud.tuikit.roomkit.view.settingitem.SwitchSettingItem;
 import com.tencent.liteav.demo.R;
 import com.tencent.liteav.demo.viewmodel.CreateRoomViewModel;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.interfaces.TUICallback;
-import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
-import com.tencent.qcloud.tuicore.TUIConstants;
-import com.tencent.qcloud.tuicore.TUICore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class CreateRoomView extends RelativeLayout
         implements View.OnClickListener {

@@ -14,7 +14,7 @@ import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
-import com.tencent.cloud.tuikit.roomkit.view.component.RoomInfoView;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.RoomInfoDialog;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.HashMap;
@@ -27,10 +27,10 @@ public class RoomInfoViewModel implements RoomEventCenter.RoomKitUIEventResponde
 
     private Context       mContext;
     private RoomStore     mRoomStore;
-    private TUIRoomEngine mRoomEngine;
-    private RoomInfoView  mRoomInfoView;
+    private TUIRoomEngine  mRoomEngine;
+    private RoomInfoDialog mRoomInfoView;
 
-    public RoomInfoViewModel(Context context, RoomInfoView view) {
+    public RoomInfoViewModel(Context context, RoomInfoDialog view) {
         mContext = context;
         mRoomInfoView = view;
         mRoomStore = RoomEngineManager.sharedInstance(context).getRoomStore();

@@ -33,7 +33,7 @@ dependencies {
     implementation project(':timcommon')
     implementation project(':tuichat')
 
-    api rootProject.getProperties().containsKey("roomEngineSdk") ? rootProject.ext.roomEngineSdk : "com.tencent.liteav.tuikit:tuiroomengine:1.6.0.16"
+    api rootProject.getProperties().containsKey("roomEngineSdk") ? rootProject.ext.roomEngineSdk : "com.tencent.liteav.tuikit:tuiroomengine:1.6.1.102"
     implementation rootProject.getProperties().containsKey("liteavSdk") ? rootProject.ext.liteavSdk : "com.tencent.liteav:LiteAVSDK_TRTC:11.4.0.13217"
     if (projects.contains("tuicore")) {
         api project(':tuicore')

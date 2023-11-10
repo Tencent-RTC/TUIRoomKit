@@ -36,6 +36,7 @@ public class TUIVideoSeatView extends RelativeLayout {
     private static final String TAG = "TUIVideoSeatView";
 
     private static final int CLICK_ACTION_MAX_MOVE_DISTANCE = 10;
+    private static final int SMALL_VIDEO_UPDATE_INTERVAL = 5 * 1000;
 
     private Context mContext;
 
@@ -55,6 +56,8 @@ public class TUIVideoSeatView extends RelativeLayout {
     private boolean mIsTwoPersonSwitched;
 
     private int mCurrentPageIndex = 0;
+
+    private long mSmallVideoLastUpdateTime = 0L;
 
     private OnClickListener mClickListener;
     private boolean         mIsClickAction;
@@ -222,9 +225,11 @@ public class TUIVideoSeatView extends RelativeLayout {
             return;
         }
         UserEntity newEntity = mMemberEntityList.get(position);
-        if (newEntity == null) {
+        UserEntity curEntity = mUserDisplayView.getUserEntity();
+        if (isSmallVideoTwinkleInSpeaker(newEntity, curEntity)) {
             return;
         }
+        updateSmallVideoFlushTimeInSpeaker(newEntity, curEntity);
 
         mUserDisplayView.setUserEntity(newEntity);
         if (newEntity.isVideoAvailable()) {
@@ -241,6 +246,35 @@ public class TUIVideoSeatView extends RelativeLayout {
         newEntity.setAudioVolume(VOLUME_NO_SOUND);
     }
 
+    private boolean isSmallVideoTwinkleInSpeaker(UserEntity newUser, UserEntity curUser) {
+        if (newUser == null || curUser == null) {
+            return false;
+        }
+        if (!mIsSpeakerModeOn) {
+            return false;
+        }
+        if (TextUtils.equals(newUser.getUserId(), curUser.getUserId())) {
+            return false;
+        }
+        return System.currentTimeMillis() - mSmallVideoLastUpdateTime < SMALL_VIDEO_UPDATE_INTERVAL;
+    }
+
+    private void updateSmallVideoFlushTimeInSpeaker(UserEntity newUser, UserEntity curUser) {
+        if (curUser == null) {
+            mSmallVideoLastUpdateTime = System.currentTimeMillis();
+            return;
+        }
+        if (newUser == null) {
+            return;
+        }
+        if (!mIsSpeakerModeOn) {
+            return;
+        }
+        if (TextUtils.equals(newUser.getUserId(), curUser.getUserId())) {
+            return;
+        }
+        mSmallVideoLastUpdateTime = System.currentTimeMillis();
+    }
 
     private void ensureUserTalkingViewFullyDisplayed() {
         if (!mIsSpeakerModeOn && !mIsTwoPersonVideoOn) {

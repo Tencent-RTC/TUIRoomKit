@@ -10,20 +10,15 @@ import static com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant.KEY_USER_
 
 import android.content.res.Configuration;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
-import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.entity.TakeSeatRequestEntity;
-import com.tencent.cloud.tuikit.roomkit.model.entity.UserEntity;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
-import com.tencent.cloud.tuikit.roomkit.view.component.RaiseHandApplicationListView;
-import com.tencent.qcloud.tuicore.TUILogin;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel.RaiseHandApplicationListPanel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,11 +26,11 @@ public class RaiseHandApplicationListViewModel
         implements RoomEventCenter.RoomEngineEventResponder, RoomEventCenter.RoomKitUIEventResponder {
     private static final String TAG = "ApplyListViewModel";
 
-    private final RaiseHandApplicationListView mApplyView;
+    private final RaiseHandApplicationListPanel mApplyView;
 
     private List<TakeSeatRequestEntity> mTakeSeatRequestList;
 
-    public RaiseHandApplicationListViewModel(RaiseHandApplicationListView view) {
+    public RaiseHandApplicationListViewModel(RaiseHandApplicationListPanel view) {
         mApplyView = view;
 
         mTakeSeatRequestList = RoomEngineManager.sharedInstance().getRoomStore().takeSeatRequestList;

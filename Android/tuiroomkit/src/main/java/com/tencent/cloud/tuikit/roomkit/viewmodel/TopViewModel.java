@@ -15,7 +15,7 @@ import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.utils.RTCubeUtils;
-import com.tencent.cloud.tuikit.roomkit.view.component.TopView;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.TopNavigationBar.TopView;
 
 import java.lang.reflect.Method;
 import java.util.Map;
