@@ -101,6 +101,9 @@ enum TXMediaDeviceState {
     ///设备已启用
     TXMediaDeviceStateActive = 2,
 
+    ///系统默认设备变更
+    TXMediaDefaultDeviceChanged = 3,
+
 };
 
 /**

@@ -1618,10 +1618,10 @@ struct TRTCScreenCaptureSourceInfo {
     bool isMainScreen;
 
     ///【字段含义】屏幕/窗口 x 坐标，单位:像素点。
-    uint32_t x;
+    int32_t x;
 
     ///【字段含义】屏幕/窗口 y 坐标，单位:像素点。
-    uint32_t y;
+    int32_t y;
 
     ///【字段含义】屏幕/窗口宽，单位:像素点。
     uint32_t width;

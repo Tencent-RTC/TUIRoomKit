@@ -207,10 +207,9 @@ class TUIRoomEngine : IDeprecatedRoomEngineAPI {
   /**
    * 3.1 设置本地用户视频渲染的视图控件
    *
-   * @param streamType 视频流的类型，定义可参考 {@link TUIVideoStreamType} 的定义
    * @param view 视频渲染视图
    */
-  virtual void setLocalVideoView(TUIVideoStreamType streamType, const TUIVideoView& view) = 0;
+  virtual void setLocalVideoView(const TUIVideoView& view) = 0;
 
   /**
    * 3.2 打开本地摄像头
@@ -265,7 +264,9 @@ class TUIRoomEngine : IDeprecatedRoomEngineAPI {
    * 屏幕分享窗口或屏幕的句柄，可以调用GetScreenSharingTargetList获取，移动端填空即可。
    * @param callback 调用接口的回调，用于通知接口调用的成功或者失败
    */
-  virtual void startScreenSharing(const TUISourceId& sourceId, TUICallback* callback) = 0;
+  virtual void startScreenSharing(const TUISourceId& sourceId,
+                                  const TUIVideoView& view,
+                                  TUICallback* callback) = 0;
 
   /**
    * 3.10  结束屏幕分享

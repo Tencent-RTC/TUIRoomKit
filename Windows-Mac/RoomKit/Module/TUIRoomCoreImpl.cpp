@@ -482,7 +482,7 @@ int TUIRoomCoreImpl::StartCameraDeviceTest(bool start, const liteav::TXView& vie
                 LINFO("room engine openLocalCamera failed: %d %s", code, message.c_str());
                 delete callback;
             });
-        room_engine_->setLocalVideoView(tuikit::TUIVideoStreamType::kCameraStream, view);
+        room_engine_->setLocalVideoView(view);
         room_engine_->openLocalCamera(false, tuikit::TUIVideoQuality::kVideoQuality_1080P, callback);
 
         local_user_info_.has_subscribed_video_stream = true;
@@ -501,8 +501,7 @@ int TUIRoomCoreImpl::StartCameraPreview(const liteav::TXView& view) {
         return -1;
     }
     LINFO("StartCameraPreview");
-    room_engine_->setLocalVideoView(tuikit::TUIVideoStreamType::kCameraStream,
-                                    view);
+    room_engine_->setLocalVideoView(view);
     TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
     callback->SetCallback([=]() {
         LINFO("room engine openLocalCamera success.");
@@ -542,7 +541,7 @@ int TUIRoomCoreImpl::UpdateCameraPreview(const liteav::TXView& view) {
     if (room_engine_ == nullptr) {
         return -1;
     }
-    room_engine_->setLocalVideoView(tuikit::TUIVideoStreamType::kCameraStream, view);
+    room_engine_->setLocalVideoView(view);
     return 0;
 }
 

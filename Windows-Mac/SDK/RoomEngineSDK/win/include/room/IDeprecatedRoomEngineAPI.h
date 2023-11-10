@@ -5,6 +5,7 @@
 #define __IDEPRECATEDROOMENGINEAPI_H__
 
 #include "TRTCTypeDef.h"
+#include "ITUIRoomDefine.h"
 
 namespace liteav {
 class ITRTCCloud;
@@ -56,6 +57,13 @@ class IDeprecatedRoomEngineAPI {
      * @deprecated v1.5.0 版本开始不推荐使用
      */
     trtc_attribute_deprecated virtual liteav::ITXAudioEffectManager* getAudioEffectManager() = 0;
+
+    /**
+     * 设置本地用户视频渲染的视图控件
+     *
+     * @deprecated v1.6.1 版本开始不推荐使用
+     */
+    trtc_attribute_deprecated virtual void setLocalVideoView(TUIVideoStreamType streamType, const TUIVideoView& view) = 0;
 };
 }  // namespace tuikit
 #endif
