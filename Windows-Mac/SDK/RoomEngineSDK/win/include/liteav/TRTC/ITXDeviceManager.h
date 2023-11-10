@@ -101,6 +101,9 @@ enum TXMediaDeviceState {
     ///设备已启用
     TXMediaDeviceStateActive = 2,
 
+    ///系统默认设备变更
+    TXMediaDefaultDeviceChanged = 3,
+
 };
 
 /**
@@ -108,7 +111,6 @@ enum TXMediaDeviceState {
  *
  * 该枚举类型用于摄像头采集参数设置。
  */
-#ifdef _WIN32
 enum TXCameraCaptureMode {
 
     ///自动调整采集参数。
@@ -146,7 +148,6 @@ struct TXCameraCaptureParam {
     TXCameraCaptureParam() : mode(TXCameraResolutionStrategyAuto), width(640), height(360) {
     }
 };
-#endif
 
 /**
  * 音视频设备的相关信息（仅适用于桌面平台）

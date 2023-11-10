@@ -25,7 +25,7 @@ void ScreenShareManager::StartScreenCapture(void* target_id, void* view) {
                 }
                 delete callback;
             });
-        room_engine_->startScreenSharing(target_id, callback);
+        room_engine_->startScreenSharing(target_id, nullptr, callback);
     }
 }
 void ScreenShareManager::StopScreenCapture() {

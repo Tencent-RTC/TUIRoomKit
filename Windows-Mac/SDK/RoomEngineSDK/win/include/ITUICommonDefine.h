@@ -39,8 +39,8 @@ enum class TUIError {
     ERR_SDK_NOT_INITIALIZED = -1002,
 
     /// 获取权限失败，当前未授权音/视频权限，请查看是否开启设备权限。Room场景下请使用以下错误码来处理:
-    /// 摄像头没有系统授权: ERR_CAMERA_NOT_AUTHORIZED
-    /// 麦克风没有系统授权: ERR_MICROPHONE_NOT_AUTHORIZED
+    ///摄像头没有系统授权: ERR_CAMERA_NOT_AUTHORIZED
+    ///麦克风没有系统授权: ERR_MICROPHONE_NOT_AUTHORIZED
     ERR_PERMISSION_DENIED = -1003,
 
     /// 该功能需要开通额外的套餐，请在腾讯云视立方SDK按需开通对应套餐: https://console.cloud.tencent.com/vcube/project/manage
@@ -101,7 +101,7 @@ enum class TUIError {
     ERR_ROOM_NAME_INVALID = -2107,
 
     /// 当前用户已在别的房间内，需要先退房才能加入新的房间:
-    /// 单个roomEngine实例只支持用户进入一个房间，如果要进入不同的房间请先退房或者使用新的roomEngine实例。
+    ///单个roomEngine实例只支持用户进入一个房间，如果要进入不同的房间请先退房或者使用新的roomEngine实例。
     ERR_ALREADY_IN_OTHER_ROOM = -2108,
 
     /// 用户不存在
@@ -121,6 +121,12 @@ enum class TUIError {
 
     /// 信令请求ID 无效或已经被处理过。
     ERR_REQUEST_ID_INVALID = -2311,
+
+    /// 信令请求重复
+    ERR_REQUEST_ID_REPEAT = -2312,
+
+    /// 信令请求冲突
+    ERR_REQUEST_ID_CONFLICT = -2313,
 
     /// 最大麦位超出套餐包数量限制
     ERR_MAX_SEAT_COUNT_LIMIT = -2340,
@@ -142,6 +148,9 @@ enum class TUIError {
 
     /// 上麦人数已满
     ERR_ALL_SEAT_OCCUPIED = -2346,
+
+    /// 不支持连麦
+    ERR_SEAT_NOT_SUPPORT_LINK_MIC = -2347,
 
     /// 当前麦位音频被锁
     ERR_OPEN_MICROPHONE_NEED_SEAT_UNLOCK = -2360,
@@ -192,6 +201,16 @@ enum class TUINetworkQuality {
 };
 
 /**
+ * 1.3 插件类型
+ */
+enum class TUIExtensionType {
+
+    /// 设备管理插件
+    kDeviceManager = 1,
+
+};
+
+/**
  * 1.3 网络质量信息
  */
 struct TUINetwork {
@@ -202,13 +221,13 @@ struct TUINetwork {
     TUINetworkQuality quality;
 
     /// 上行丢包率，单位 (%) 该数值越小越好
-    /// 如果 upLoss 为0%，则意味着上行链路的网络质量很好，上传到云端的数据包基本不发生丢失
-    /// 如果upLoss 为 30%，则意味着 SDK 向云端发送的音视频数据包中，会有 30%丢失在传输链路中
+    ///如果 upLoss 为 0%，则意味着上行链路的网络质量很好，上传到云端的数据包基本不发生丢失
+    ///如果 upLoss 为 30%，则意味着 SDK 向云端发送的音视频数据包中，会有 30%丢失在传输链路中
     int upLoss;
 
     /// 下行丢包率，单位 (%) 该数值越小越好
-    /// 如果downLoss 为0%，则意味着下行链路的网络质量很好，从云端接收的数据包基本不发生丢失
-    /// 如果downLoss 为 30%，则意味着云端向 SDK 传输的音视频数据包中，会有 30%丢失在传输链路中
+    ///如果 downLoss 为 0%，则意味着下行链路的网络质量很好，从云端接收的数据包基本不发生丢失
+    ///如果 downLoss 为 30%，则意味着云端向 SDK 传输的音视频数据包中，会有 30%丢失在传输链路中
     int downLoss;
 
     /// 网络延迟，单位 ms

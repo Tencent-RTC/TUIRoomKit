@@ -885,7 +885,7 @@ struct TRTCParams {
     TRTCRoleType role;
 
     ///【字段含义】用于指定在腾讯云直播平台上的 streamId（选填），设置之后，您可以在腾讯云直播 CDN 上通过标准拉流方案（FLV 或 HLS）播放该用户的音视频流。
-    ///【推荐取值】限制长度为64字节，可以不填写，一种推荐的方案是使用 `sdkappid_roomid_userid_main` 作为 streamid，这中命名方式容易辨认且不会在您的多个应用中发生冲突。
+    ///【推荐取值】限制长度为64字节，可以不填写，一种推荐的方案是使用 `sdkappid_roomid_userid_main` 作为 streamid，这种命名方式容易辨认且不会在您的多个应用中发生冲突。
     ///【特殊说明】要使用腾讯云直播 CDN，您需要先在 [控制台](https://console.cloud.tencent.com/trtc/) 中的功能配置页开启“启动自动旁路直播”开关。
     ///【参考文档】[CDN 旁路直播](https://cloud.tencent.com/document/product/647/16826)。
     const char *streamId;
@@ -1618,10 +1618,10 @@ struct TRTCScreenCaptureSourceInfo {
     bool isMainScreen;
 
     ///【字段含义】屏幕/窗口 x 坐标，单位:像素点。
-    uint32_t x;
+    int32_t x;
 
     ///【字段含义】屏幕/窗口 y 坐标，单位:像素点。
-    uint32_t y;
+    int32_t y;
 
     ///【字段含义】屏幕/窗口宽，单位:像素点。
     uint32_t width;
@@ -1881,12 +1881,46 @@ struct TRTCStreamEncoderParam {
     uint32_t audioEncodedKbps;
 
     ///【字段含义】指定媒体发布流的目标音频编码类型。
-    ///【推荐取值】默认值：0，代表LC-AAC。可设定的数值只有三个数字：0 - LC-AAC，1 - HE-AAC，2 - HE-AACv2。
+    ///【推荐取值】默认值：0，代表 LC-AAC。可设定的数值只有三个数字：0 - LC-AAC，1 - HE-AAC，2 - HE-AACv2。
     ///【特别说明】HE-AAC 和 HE-AACv2 支持的输出流音频采样率范围为[48000, 44100, 32000, 24000, 16000]。
     ///【特别说明】当音频编码设置为 HE-AACv2 时，只支持输出流音频声道数为双声道。
     uint32_t audioEncodedCodecType;
 
-    TRTCStreamEncoderParam() : videoEncodedWidth(0), videoEncodedHeight(0), videoEncodedFPS(0), videoEncodedGOP(0), videoEncodedKbps(0), audioEncodedSampleRate(0), audioEncodedChannelNum(0), audioEncodedKbps(0), audioEncodedCodecType(0) {
+    ///【字段含义】指定媒体发布流的目标视频编码类型。
+    ///【推荐取值】默认值：0，代表 H264。可设定的数值只有两个数字：0 - H264，1 - H265。
+    uint32_t videoEncodedCodecType;
+
+    ///【字段含义】混流 SEI 参数，默认不填写。
+    ///【特别说明】参数以 json 字符串形式传入，示例如下：
+    ///```json
+    ///{
+    ///  "payLoadContent":"xxx",
+    ///  "payloadType":5,
+    ///  "payloadUuid":"1234567890abcdef1234567890abcdef",
+    ///  "interval":1000,
+    ///  "followIdr":false
+    ///}
+    ///```
+    ///当前支持的字段及含义：
+    ///- payloadContent: 必填。透传 sei 的 payload 内容，不能为空；
+    ///- payloadType: 必填。sei 消息的类型，取值范围: 5 或 [100, 254] 范围内的整数（244 除外，244 是内部自定义的时间戳 sei）；
+    ///- payloadUuid: 当 payloadType 为 5 时必须填写，其他情况下该值会被忽略。该值必须是长度为 32 的十六进制数字；
+    ///- interval: 选填，默认 1000。sei 的发送间隔，单位毫秒；
+    ///- followIdr: 选填，默认 false。该值为 true 时，发送关键帧时会确保带 sei，否则不确保。
+    const char *videoSeiParams;
+
+    TRTCStreamEncoderParam()
+        : videoEncodedWidth(0),
+          videoEncodedHeight(0),
+          videoEncodedFPS(0),
+          videoEncodedGOP(0),
+          videoEncodedKbps(0),
+          audioEncodedSampleRate(0),
+          audioEncodedChannelNum(0),
+          audioEncodedKbps(0),
+          audioEncodedCodecType(0),
+          videoEncodedCodecType(0),
+          videoSeiParams(nullptr) {
     }
 };
 
@@ -1908,7 +1942,7 @@ struct TRTCStreamMixingConfig {
     ///   - 图片格式支持 png、jpg、jpeg、bmp 格式，推荐使用 png 格式的半透明图片作为背景图。
     const char *backgroundImage;
 
-    ///【字段含义】指定混合画面的中每一路视频画面的位置、大小、图层以及流类型等信息。
+    ///【字段含义】指定混合画面中的每一路视频画面的位置、大小、图层以及流类型等信息。
     ///【推荐取值】该字段是一个 TRTCVideoLayout 类型的数组，数组中的每一个元素都用来代表每一路画面的信息。
     TRTCVideoLayout *videoLayoutList;
 
@@ -1923,7 +1957,7 @@ struct TRTCStreamMixingConfig {
     ///【字段含义】 数组 audioMixUserList 的元素个数。
     uint32_t audioMixUserListSize;
 
-    ///【字段含义】指定混合画面的中每一路水印画面的位置、大小、图层等信息。
+    ///【字段含义】指定混合画面中的每一路水印画面的位置、大小、图层等信息。
     ///【推荐取值】该字段是一个 TRTCWatermark 类型的数组，数组中的每一个元素都用来代表每一路水印的信息。
     TRTCWatermark *watermarkList;
 

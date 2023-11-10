@@ -26,46 +26,46 @@ class ITXCopyrightedSongScore;
  */
 enum class TXCopyrightedError {
 
-    ///成功
+    /// 成功
     TXCopyrightedErrorNoError = 0,
 
-    ///初始化失败
+    /// 初始化失败
     TXCopyrightedErrorInitFail = -1,
 
-    ///用户取消数据获取
+    /// 用户取消数据获取
     TXCopyrightedErrorCancel = -2,
 
     /// token 过期
     TXCopyrightedErrorTokenFail = -3,
 
-    ///网络错误
+    /// 网络错误
     TXCopyrightedErrorNetFail = -4,
 
-    ///内部错误
+    /// 内部错误
     TXCopyrightedErrorInner = -5,
 
-    ///解析错误
+    /// 解析错误
     TXCopyrightedErrorParseFail = -6,
 
-    ///解密错误
+    /// 解密错误
     TXCopyrightedErrorDecryptFail = -7,
 
     /// License校验不通过
     TXCopyrightedErrorLicenseFail = -8,
 
-    ///音乐正在下载
+    /// 音乐正在下载
     TXCopyrightedErrorIsDownloading = -9,
 
-    ///伴奏文件不存在
+    /// 伴奏文件不存在
     TXCopyrightedErrorAccompanimentNotExist = -10,
 
-    ///原唱文件不存在
+    /// 原唱文件不存在
     TXCopyrightedErrorOriginNotExist = -11,
 
-    ///歌词文件不存在
+    /// 歌词文件不存在
     TXCopyrightedErrorLyricNotExist = -12,
 
-    ///写文件出错
+    /// 写文件出错
     TXCopyrightedErrorWriteFileFail = -13,
 
 };
@@ -190,7 +190,7 @@ class ITXCopyrightedMedia {
  */
 enum class TXCopyrightedSongScoreError {
 
-    ///成功
+    /// 成功
     TXCopyrightedSongScoreNoError = 0,
 
     /// K歌打分内部错误
@@ -199,7 +199,7 @@ enum class TXCopyrightedSongScoreError {
     /// Prepare打分模块失败，具体失败原因在errMsg中描述
     kTXCopyrightedSongScorePrepareFail = -2,
 
-    ///调用打分相关接口时，如果还没有Prepare或者Prepare失败了，会回调该错误
+    /// 调用打分相关接口时，如果还没有Prepare或者Prepare失败了，会回调该错误
     kTXCopyrightedSongScoreNotPrepared = -3,
 
 };
@@ -208,13 +208,13 @@ enum class TXCopyrightedSongScoreError {
  * 音高数据结构
  */
 struct ITXCopyrightedSongScoreNoteItem {
-    ///开始时间
+    /// 开始时间
     int startTime;
 
-    ///持续时间
+    /// 持续时间
     int duration;
 
-    ///音高
+    /// 音高
     int pitch;
 };
 

@@ -41,8 +41,13 @@ enum class TUIRoomType {
 
 /**
  * 1.2 麦控模式
+ *
+ * @deprecated v2.0 版本开始，该功能已废弃，建议使用 isSeatEnabled（是否开启麦位控制） 代替
  */
 enum class TUISpeechMode {
+
+    /// 未设置
+    kNone = 0,
 
     /// 自由发言模式
     kFreeToSpeak = 1,
@@ -52,6 +57,19 @@ enum class TUISpeechMode {
 
     /// 上麦发言模式。
     kApplySpeakAfterTakingSeat = 3,
+
+};
+
+/**
+ * 上麦模式
+ */
+enum class TUISeatMode {
+
+    /// 自由上麦模式，台下观众可以自由上麦，无需申请
+    kFreeToTake = 1,
+
+    /// 申请上麦模式，台下观众上麦需要房主或者管理员同意后才能上麦
+    kApplyToTake = 2,
 
 };
 
@@ -289,7 +307,7 @@ struct TUIRoomInfo {
     /// 房间名称（创建房间可选参数，默认房间ID）
     const char* name;
 
-    /// 房间麦控模式
+    /// 房间麦控模式（v2.0 版本开始，该功能已废弃，建议使用 isSeatEnabled（是否开启麦位控制） 代替）
     TUISpeechMode speechMode;
 
     /// 是否禁止打开摄像头（创建房间可选参数），默认值：{@link false}。
@@ -300,6 +318,12 @@ struct TUIRoomInfo {
 
     /// 是否禁止发送消息（创建房间可选参数），默认值：{@link false}。
     bool isMessageDisableForAllUser;
+
+    /// 是否开启麦位控制
+    bool isSeatEnabled;
+
+    /// 上麦模式(只有开启麦位控制后生效)
+    TUISeatMode seatMode;
 
     /// 最大麦位数
     int maxSeatCount;
@@ -312,14 +336,16 @@ struct TUIRoomInfo {
 
     TUIRoomInfo()
         : roomId(nullptr),
+          ownerId(nullptr),
           roomType(TUIRoomType::kConference),
           name(nullptr),
-          speechMode(TUISpeechMode::kFreeToSpeak),
+          speechMode(TUISpeechMode::kNone),
           isCameraDisableForAllUser(false),
           isMicrophoneDisableForAllUser(false),
           isMessageDisableForAllUser(false),
+          isSeatEnabled(false),
+          seatMode(TUISeatMode::kFreeToTake),
           maxSeatCount(0),
-          ownerId(nullptr),
           createTime(0),
           memberCount(0) {
     }
