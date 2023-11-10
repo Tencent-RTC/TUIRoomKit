@@ -193,6 +193,7 @@ private:
     void onReceiveTextMessage(const char* room_id, const tuikit::TUIMessage& message) override;
     void onReceiveCustomMessage(const char* room_id, const tuikit::TUIMessage& message) override;
     void onDeviceChanged(const char* deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) override;
+    void onRoomSeatModeChanged(const char* room_id, tuikit::TUISeatMode seat_mode) override;
     ///
 
     void LocalUserVideoStateChanged(tuikit::TUIVideoStreamType stream_type, bool has_video, tuikit::TUIChangeReason reason);

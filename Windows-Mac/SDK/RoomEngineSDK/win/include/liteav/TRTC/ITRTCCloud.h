@@ -76,18 +76,14 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
     TRTC_API static void destroyTRTCShareInstance();
 
     /**
-     * 1.3 设置 TRTC 事件回调
+     * 1.3 添加 TRTC 事件回调
      *
      * 您可以通过 {@link ITRTCCloudCallback} 获得来自 SDK 的各类事件通知（比如：错误码，警告码，音视频状态参数等）。
-     * 从 11.4.0 版本以后，我们推荐您使用功能更加强大的{@link addListener}接口，支持添加/移除多个监听。
-     * @param listener 回调实例。
      */
     virtual void addCallback(ITRTCCloudCallback* callback) = 0;
 
     /**
      * 1.4 移除 TRTC 事件回调
-     *
-     * @param callback 回调指针
      */
     virtual void removeCallback(ITRTCCloudCallback* callback) = 0;
 
@@ -403,7 +399,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * 1. SDK 会通过回调 {@link onStartPublishMediaStream} 带给您后台启动的任务标识（即 taskId）。
      * 2. 同一个任务（TRTCPublishMode 与 TRTCPublishCdnUrl 均相同）仅支持启动一次。若您后续需要更新或者停止该项任务，需要记录并使用返回的 taskId，通过 {@link updatePublishMediaStream} 或者 {@link stopPublishMediaStream} 来操作。
      * 3. target 支持同时配置多个 CDN URL（最多同时 10 个）。若您的同一个转推/转码任务需要发布至多路 CDN，则仅需要在 target 中配置多个 CDN URL 即可。同一个转码任务即使有多个转推地址，对应的转码计费仍只收取一份。
-     * 4. 使用时需要注意不要多个任务同时往相同的 URL 地址推送，以免引起异常推流状态。一种推荐的方案是 URL 中使用 “sdkappid_roomid_userid_main” 作为区分标识，这中命名方式容易辨认且不会在您的多个应用中发生冲突。
+     * 4. 使用时需要注意不要多个任务同时往相同的 URL 地址推送，以免引起异常推流状态。一种推荐的方案是 URL 中使用 “sdkappid_roomid_userid_main” 作为区分标识，这种命名方式容易辨认且不会在您的多个应用中发生冲突。
      */
     virtual void startPublishMediaStream(TRTCPublishTarget* target, TRTCStreamEncoderParam* params, TRTCStreamMixingConfig* config) = 0;
 
@@ -584,6 +580,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      *
      * 该设置能够决定远端用户看到的画面质量，同时也能决定云端录制出的视频文件的画面质量。
      * @param param 用于设置视频编码器的相关参数，详情请参见 {@link TRTCVideoEncParam}。
+     * @note 从v11.5版本开始，编码输出分辨率会按照宽8高2字节对齐，并且是向下调整，eg:输入分辨率540x960，实际编码输出分辨率536x960。
      */
     virtual void setVideoEncoderParam(const TRTCVideoEncParam& param) = 0;
 
@@ -697,8 +694,8 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
     /**
      * 5.3 暂停/恢复发布本地的音频流
      *
-     * 当您暂停发布本地音频流之后，房间中的其他他用户会收到 {@link onUserAudioAvailable}(userId, false) 的通知。
-     * 当您恢复发布本地音频流之后，房间中的其他他用户会收到 {@link onUserAudioAvailable}(userId, true) 的通知。
+     * 当您暂停发布本地音频流之后，房间中的其他用户会收到 {@link onUserAudioAvailable}(userId, false) 的通知。
+     * 当您恢复发布本地音频流之后，房间中的其他用户会收到 {@link onUserAudioAvailable}(userId, true) 的通知。
      * 与 {@link stopLocalAudio} 的不同之处在于，muteLocalAudio(true) 并不会释放麦克风权限，而是继续发送码率极低的静音包。
      * 这对于需要云端录制的场景非常适用，因为 MP4 等格式的视频文件，对于音频数据的连续性要求很高，使用 {@link stopLocalAudio} 会导致录制出的 MP4 文件不易播放。
      * 因此在对录制文件的质量要求较高的场景中，建议选择 muteLocalAudio 而不建议使用 stopLocalAudio。
@@ -709,7 +706,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
     /**
      * 5.4 暂停/恢复播放远端的音频流
      *
-     * 当您静音某用户的远端音频时，SDK 会停止播放指定用户的声音，同时也会停止拉取该用户的音频数据数据。
+     * 当您静音某用户的远端音频时，SDK 会停止播放指定用户的声音，同时也会停止拉取该用户的音频数据。
      * @param userId 用于指定远端用户的 ID。
      * @param mute true：静音；false：取消静音。
      * @note 在进入房间（enterRoom）之前或之后调用本接口均生效，静音状态在退出房间（exitRoom）之后会被重置为 false。
@@ -776,8 +773,10 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      *
      * 当您调用该接口后， SDK 会将本地和远端的所有音频（包括本地音频，远端音频，背景音乐和音效等）混合并录制到一个本地文件中。
      * 该接口在进入房间前后调用均可生效，如果录制任务在退出房间前尚未通过 stopAudioRecording 停止，则退出房间后录制任务会自动被停止。
+     * 本次录制的启动、完成状态会通过本地录制相关回调进行通知。参见 TRTCCloud 相关回调。
      * @param param 录音参数，请参见 {@link TRTCAudioRecordingParams}。
      * @return 0：成功；-1：录音已开始；-2：文件或目录创建失败；-3：后缀指定的音频格式不支持。
+     * @note 自 v11.5 版本，音频录制的状态结果由返回值统一调整为异步回调进行通知。参见 TRTCCloud 相关回调。
      */
     virtual int startAudioRecording(const TRTCAudioRecordingParams& param) = 0;
 
@@ -979,6 +978,8 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
 
     /**
      * 9.3 暂停屏幕分享
+     *
+     * @note 从v11.5版本开始，暂停屏幕采集会使用最后一帧按照1fps帧率输出。
      */
     virtual void pauseScreenCapture() = 0;
 

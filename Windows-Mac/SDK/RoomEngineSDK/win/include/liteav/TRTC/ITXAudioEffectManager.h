@@ -299,7 +299,7 @@ class ITXAudioEffectManager {
      * @param musicId   音乐 ID。
      * @param observer  具体参考 ITXMusicPlayObserver 中定义接口。
      * @note
-     * 1. 如果要该ID不需要使用，observer 可设置为 NULL 彻底释放。
+     * 1. 如果该 ID 不需要使用，observer 可设置为 NULL 彻底释放。
      */
     virtual void setMusicObserver(int musicId, ITXMusicPlayObserver* observer) = 0;
 

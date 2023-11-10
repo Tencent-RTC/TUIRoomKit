@@ -8,6 +8,7 @@
 
 #include "ITUIRoomDefine.h"
 #include "TRTCTypeDef.h"
+#include "IDeprecatedRoomEngineAPI.h"
 
 namespace tuikit {
 
@@ -106,10 +107,18 @@ class TUIRoomObserver {
     /**
      * 3.7 房间麦控模式发生变化
      *
+     * @deprecated v2.0 版本开始，该功能已废弃，建议使用isSeatEnabled代替
      * @param roomId 房间ID
      * @param mode 房间模式
      */
-    virtual void onRoomSpeechModeChanged(const char* roomId, TUISpeechMode speechMode) = 0;
+    room_engine_attribute_deprecated virtual void onRoomSpeechModeChanged(const char* roomId, TUISpeechMode speechMode) = 0;
+
+    /**
+     * 3.8 房间上麦模式发生变化
+     * @param roomId 房间ID
+     * @param seatMode 上麦模式
+     */
+    virtual void onRoomSeatModeChanged(const char* roomId, TUISeatMode seatMode) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //
@@ -265,12 +274,13 @@ class TUIRoomObserver {
     /**
      * 7.3 本地设备添加事件
      *
+     * @deprecated v2.0 版本开始不推荐使用,建议使用{$TUIRoomDeviceManager$}中的{@link onDeviceChanged}代替。
      * @note 当本地设备（包括摄像头、麦克风以及扬声器）添加时，SDK 便会抛出此事件回调
      * @param deviceId 设备 ID。
      * @param type 设备类型。
      * @param state 通断状态，0：设备已添加；1：设备已被移除；2：设备已启用
      */
-    virtual void onDeviceChanged(const char* deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) = 0;
+    room_engine_attribute_deprecated virtual void onDeviceChanged(const char* deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) = 0;
 };
 
 }  // namespace tuikit

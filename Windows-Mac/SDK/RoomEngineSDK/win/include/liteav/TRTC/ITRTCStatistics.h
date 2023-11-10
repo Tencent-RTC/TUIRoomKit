@@ -167,6 +167,15 @@ struct TRTCStatistics {
     ///【字段含义】当前系统的 CPU 使用率，单位 (%)，Android 8.0 以上不支持。
     uint32_t systemCpu;
 
+    ///【字段含义】当前系统的内存，单位 (MB)。
+    uint32_t systemMemoryInMB;
+
+    ///【字段含义】当前系统内存占用，单位 (MB)，iOS/MAC 不支持(MB)。
+    uint32_t systemMemoryUsageInMB;
+
+    ///【字段含义】当前应用的内存占用，单位 (MB)。
+    uint32_t appMemoryUsageInMB;
+
     ///【字段含义】从 SDK 到云端的上行丢包率，单位 (%)
     ///该数值越小越好，如果 upLoss 为 0%，则意味着上行链路的网络质量很好，上传到云端的数据包基本不发生丢失。
     ///如果 upLoss 为 30%，则意味着 SDK 向云端发送的音视频数据包中，会有 30% 丢失在传输链路中。
@@ -208,7 +217,22 @@ struct TRTCStatistics {
     ///【字段含义】数组 remoteStatisticsArray 的大小。
     uint32_t remoteStatisticsArraySize;
 
-    TRTCStatistics() : appCpu(0), systemCpu(0), upLoss(0), downLoss(0), rtt(0), gatewayRtt(0), sentBytes(0), receivedBytes(0), localStatisticsArray(nullptr), localStatisticsArraySize(0), remoteStatisticsArray(nullptr), remoteStatisticsArraySize(0) {
+    TRTCStatistics()
+        : appCpu(0),
+          systemCpu(0),
+          systemMemoryInMB(0),
+          systemMemoryUsageInMB(0),
+          appMemoryUsageInMB(0),
+          upLoss(0),
+          downLoss(0),
+          rtt(0),
+          gatewayRtt(0),
+          sentBytes(0),
+          receivedBytes(0),
+          localStatisticsArray(nullptr),
+          localStatisticsArraySize(0),
+          remoteStatisticsArray(nullptr),
+          remoteStatisticsArraySize(0) {
     }
 };
 
