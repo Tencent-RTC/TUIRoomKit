@@ -2,7 +2,7 @@ import { watch } from 'vue';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import {  useRoomStore } from '../../../stores/room';
 import  { TUIChangeReason,  TUIUserInfo, TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-js';
-import { ElMessage } from '../../../elementComp';
+import TUIMessage from '../../common/base/Message/index';
 import { useI18n } from '../../../locales';
 import { useBasicStore } from '../../../stores/basic';
 import { MESSAGE_DURATION } from '../../../constants/message';
@@ -50,7 +50,7 @@ export default function useStreamContainer() {
     // 处理状态变更
     if (userId === basicStore.userId && !hasAudio && reason === TUIChangeReason.kChangedByAdmin) {
       // 主持人关闭麦克风
-      ElMessage({
+      TUIMessage({
         type: 'warning',
         message: t('The host has turned off your microphone'),
         duration: MESSAGE_DURATION.NORMAL,
@@ -81,7 +81,6 @@ export default function useStreamContainer() {
 
       if (isWeChat) {
         await roomEngine.instance?.setLocalVideoView({
-          streamType: TUIVideoStreamType.kCameraStream,
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
         });
         // @ts-ignore
@@ -93,7 +92,6 @@ export default function useStreamContainer() {
           return;
         }
         await roomEngine.instance?.setLocalVideoView({
-          streamType: TUIVideoStreamType.kCameraStream,
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
         });
         // @ts-ignore
@@ -123,7 +121,6 @@ export default function useStreamContainer() {
          * 开启本地摄像头
         **/
         await roomEngine.instance?.setLocalVideoView({
-          streamType: TUIVideoStreamType.kCameraStream,
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
         });
         await roomEngine.instance?.openLocalCamera();

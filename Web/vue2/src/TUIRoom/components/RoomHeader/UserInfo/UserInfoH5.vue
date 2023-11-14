@@ -37,8 +37,7 @@ interface Props {
 defineProps<Props>();
 defineEmits(['log-out']);
 </script>
-<style lang="scss">
-@import '../../../assets/style/var.scss';
+<style lang="scss" scoped>
 @import '../../../assets/style/element-custom.scss';
 
 .user-info-container {
@@ -59,7 +58,7 @@ defineEmits(['log-out']);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: var(--color-font);
+      color: var(--font-color);
     }
     .down-icon {
       margin-left: 4px;
@@ -68,7 +67,7 @@ defineEmits(['log-out']);
   .user-control-container {
     background: var(--user-control-container-color-bg);
     box-shadow: var(--user-control-container-shadow);
-    color: var(--color-font);
+    color: var(--font-color);
     padding: 10px 0;
     position: absolute;
     top: calc(100% + 14px);
@@ -94,7 +93,7 @@ defineEmits(['log-out']);
       background:  var(--log-out-mobile);
       &-main{
         position: absolute;
-        top: 85%;
+        bottom: 34px;
         width: 100%;
         display: flex;
         flex-direction: column;

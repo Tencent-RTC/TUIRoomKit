@@ -64,7 +64,7 @@ import { useI18n } from '../../../locales';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
-import SvgIcon from '../../common/SvgIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
 import { ElMessage } from '../../../elementComp';
 import { isWeChat } from '../../../utils/useMediaValue';
 import { clipBoard } from '../../../utils/utils';
@@ -76,7 +76,7 @@ const { masterUserId } = storeToRefs(roomStore);
 const { t } = useI18n();
 const roomInfoRef = ref();
 const isShowRoomInfo = ref(false);
-const roomType = computed(() => (roomStore.isFreeSpeakMode ? t('Free Speech Room') : t('Raise Hand Room')));
+const roomType = computed(() => (roomStore.isFreeSpeakMode ? t('Free Speech Room') : t('On-stage Speaking Room')));
 
 const { origin, pathname } = location || {};
 const inviteLink = computed(() => `${origin}${pathname}#/home?roomId=${roomId.value}`);

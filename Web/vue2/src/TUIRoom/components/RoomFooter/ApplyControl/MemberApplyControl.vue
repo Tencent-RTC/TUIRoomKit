@@ -3,35 +3,37 @@
     <div class="apply-control-container">
       <icon-button
         :title="iconTitle"
-        :icon-name="iconName"
+        :icon="ApplyIcon"
         @click-icon="toggleApplySpeech"
       />
       <div v-if="showMemberApplyAttention" class="attention member-attention">
         <span class="info">{{ t('Please raise your hand to apply') }}</span>
-        <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyAttention"></svg-icon>
+        <svg-icon :icon="CloseIcon" class="close" @click="hideApplyAttention"></svg-icon>
       </div>
     </div>
     <Dialog
-      :model-value="showInviteDialog"
+      v-model="showInviteDialog"
       :title="t('The host invites you to speak on stage')"
-      class="custom-element-class"
-      :modal="false"
+      :modal="true"
       :show-close="false"
-      :append-to-body="true"
       :close-on-click-modal="false"
-      :close-on-press-escape="false"
       width="500px"
+      :append-to-room-container="true"
     >
       <span>
         {{
           t('After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?')
         }}
       </span>
-      <template #footer>
-        <div :class="[isMobile ? 'button-container-mobile' : 'button-container-PC']">
-          <span class="cancel" @click="handleInvite(false)">{{ t('Cancel') }}</span>
-          <span class="agree" @click="handleInvite(true)">{{ t('Agree') }}</span>
-        </div>
+      <template v-if="isMobile" #cancel>
+        <tui-button class="cancel" size="default" type="text" @click="handleInvite(false)">{{ t('Cancel') }}</tui-button>
+      </template>
+      <template v-if="isMobile" #agree>
+        <tui-button class="agree" size="default" type="text" @click="handleInvite(true)">{{ t('Agree') }}</tui-button>
+      </template>
+      <template v-if="!isMobile" #footer>
+        <tui-button class="agree-button" size="default" @click="handleInvite(true)">{{ t('Agree') }}</tui-button>
+        <tui-button class="cancel-button" size="default" type="primary" @click="handleInvite(false)">{{ t('Cancel') }}</tui-button>
       </template>
     </Dialog>
   </div>
@@ -40,10 +42,12 @@
 <script setup lang="ts">
 import { ref, Ref, watch, onBeforeUnmount } from 'vue';
 import { ICON_NAME } from '../../../constants/icon';
-import IconButton from '../../common/IconButton.vue';
-import SvgIcon from '../../common/SvgIcon.vue';
-import { ElMessage } from '../../../elementComp';
-import Dialog from '../../../elementComp/Dialog';
+import IconButton from '../../common/base/IconButton.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import ApplyIcon from '../../common/icons/ApplyIcon.vue';
+import CloseIcon from '../../common/icons/CloseIcon.vue';
+import Dialog from '../../common/base/Dialog';
+import TUIMessage from '../../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
@@ -53,6 +57,7 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import logger from '../../../utils/common/logger';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-js';
 import { isMobile } from '../../../utils/useMediaValue';
+import TuiButton from '../../common/base/Button.vue';
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
@@ -65,7 +70,7 @@ const isApplyingOnSeat: Ref<Boolean> = ref(false);
 const showMemberApplyAttention: Ref<boolean> = ref(true);
 const iconName: Ref<string> = ref('');
 const iconTitle: Ref<string> = ref('');
-const showInviteDialog: Ref<Boolean> = ref(false);
+const showInviteDialog: Ref<boolean> = ref(false);
 
 const applyToAnchorRequestId: Ref<string> = ref('');
 const inviteToAnchorRequestId: Ref<string> = ref('');
@@ -109,14 +114,14 @@ async function sendSeatApplication() {
         const { requestCallbackType } = callbackInfo;
         switch (requestCallbackType) {
           case TUIRequestCallbackType.kRequestAccepted:
-            ElMessage({
+            TUIMessage({
               type: 'success',
               message: t('The host has approved your application'),
               duration: MESSAGE_DURATION.NORMAL,
             });
             break;
           case TUIRequestCallbackType.kRequestRejected:
-            ElMessage({
+            TUIMessage({
               type: 'warning',
               message: t('The host has rejected your application for the stage'),
               duration: MESSAGE_DURATION.NORMAL,
@@ -209,7 +214,7 @@ async function handleInvite(agree: boolean) {
  */
 async function onKickedOffSeat() {
   // 被主持人踢下麦
-  ElMessage({
+  TUIMessage({
     type: 'warning',
     message: t('You have been invited by the host to step down, please raise your hand if you need to speak'),
     duration: MESSAGE_DURATION.NORMAL,
@@ -230,14 +235,14 @@ onBeforeUnmount(() => {
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../assets/style/element-custom.scss';
 
 .apply-control-container {
   position: relative;
   .attention {
-    background: rgba(19,124,253,0.96);
-    box-shadow: 0 4px 16px 0 rgba(47,48,164,0.10);
+    background: rgba(19, 124, 253, 0.96);
+    box-shadow: 0 4px 16px 0 rgba(47, 48, 164, 0.1);
     position: absolute;
     border-radius: 4px;
     display: flex;
@@ -250,7 +255,7 @@ onBeforeUnmount(() => {
       content: '';
       display: block;
       border: 4px solid transparent;
-      border-top-color: rgba(19,124,253,0.96);
+      border-top-color: rgba(19, 124, 253, 0.96);
       position: absolute;
       top: 100%;
       left: 50%;
@@ -264,55 +269,29 @@ onBeforeUnmount(() => {
       height: 20px;
       font-weight: 400;
       font-size: 14px;
-      color: #FFFFFF;
+      color: #ffffff;
       line-height: 20px;
     }
     .close {
       cursor: pointer;
+      color: #ffffff;
     }
   }
 }
-.button-container-mobile{
-  width: 100%;
+.agree, .cancel {
+  padding: 14px;
+  width: 50%;
   display: flex;
-  .agree{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-top: 1px solid #F2F2F2;
-    color: #006EFF;
-  }
-  .cancel{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-top: 1px solid #F2F2F2;
-    color: #2B2E38;
-    border-right: 1px solid #F2F2F2;
-  }
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  justify-content: center;
+  color: var(--active-color-1);
 }
-.button-container-PC{
-  .cancel{
-    padding: 5px 20px;
-    background: var(--create-room-option);
-    border-radius: 2px;
-    width: auto;
-    display: initial;
-    color: var(--color-font);
-    border: 1px solid var(--choose-type);
-  }
-  .agree{
-    padding: 5px 20px;
-    background: #006EFF;
-    color: white;
-    margin-left: 14px;
-    border-radius: 2px;
-    width: auto;
-    display: initial;
-  }
+.cancel {
+  color: var(--font-color-4);
+}
+.cancel-button {
+  margin-left: 20px;
 }
 </style>

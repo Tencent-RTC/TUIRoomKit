@@ -13,7 +13,9 @@
       <Avatar class="avatar-region" :img-src="stream.avatarUrl"></Avatar>
     </div>
     <div class="corner-user-info-container">
-      <svg-icon v-if="showMasterIcon" size="custom" class="master-icon" icon-name="user"></svg-icon>
+      <div v-if="showMasterIcon" class="master-icon">
+        <svg-icon :icon="UserIcon"></svg-icon>
+      </div>
       <audio-icon
         v-if="!isScreenStream"
         class="audio-icon"
@@ -21,7 +23,7 @@
         :is-muted="!stream.hasAudioStream"
         size="small"
       ></audio-icon>
-      <svg-icon v-if="isScreenStream" icon-name="screen-share" class="screen-icon"></svg-icon>
+      <svg-icon v-if="isScreenStream" :icon="ScreenOpenIcon" class="screen-icon"></svg-icon>
       <span class="user-name" :title="userInfo">{{ userInfo }}</span>
       <span v-if="isScreenStream"> {{ t('is sharing their screen') }} </span>
     </div>
@@ -30,12 +32,14 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, computed, onMounted } from 'vue';
-import Avatar from '../../base/Avatar.vue';
+import Avatar from '../../common/Avatar.vue';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
 import logger from '../../../utils/common/logger';
-import AudioIcon from '../../base/AudioIcon.vue';
-import SvgIcon from '../../common/SvgIcon.vue';
+import UserIcon from '../../common/icons/UserIcon.vue';
+import AudioIcon from '../../common/AudioIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import ScreenOpenIcon from '../../common/icons/ScreenOpenIcon.vue';
 import { useI18n } from '../../../locales';
 import {
   TUIVideoStreamType,
@@ -95,7 +99,6 @@ onMounted(() => {
           if (basicStore.userId === props.stream.userId) {
             if (props.stream.hasVideoStream) {
               await roomEngine.instance?.setLocalVideoView({
-                streamType: TUIVideoStreamType.kCameraStream,
                 view: `${playRegionDomId.value}`,
               });
             }
@@ -176,7 +179,6 @@ onMounted(() => {
             **/
             if (props.stream.hasVideoStream) {
               await roomEngine.instance?.setLocalVideoView({
-                streamType: TUIVideoStreamType.kCameraStream,
                 view: `${playRegionDomId.value}`,
               });
             }
@@ -199,7 +201,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 .user-stream-container {
   position: relative;
   width: 100%;
@@ -275,7 +276,7 @@ onMounted(() => {
     height: 30px;
     display: flex;
     background: rgba(0,0,0,0.60);
-    color: $whiteColor;
+    color: #FFFFFF;
     align-items: center;
     align-content: center;
     font-size: 14px;
@@ -289,9 +290,12 @@ onMounted(() => {
     }
     .master-icon {
       margin-left: 0;
-      width: 25px;
-      height: 25px;
-      background-size: cover;
+      width: 32px;
+      height: 32px;
+      background-color: var(--active-color-1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .screen-icon {
       transform: scale(0.8);

@@ -1,5 +1,5 @@
 <template>
-  <div :class="streamContainerClass">
+  <div id="streamContainer" :class="streamContainerClass">
     <div v-show="showIconControl" ref="enlargedContainerRef" class="enlarged-stream-container">
       <stream-region
         v-if="enlargeStream"
@@ -9,7 +9,7 @@
       ></stream-region>
     </div>
     <div :class="['stream-list-container', `${showSideList ? '' : 'hide-list'}`]">
-      <div ref="streamListRef" class="stream-list">
+      <div ref="streamListRef" :style="streamListStyle" class="stream-list">
         <stream-region
           v-for="(stream) in streamList"
           v-show="showStreamList.indexOf(stream) > -1"
@@ -23,13 +23,18 @@
       </div>
     </div>
     <!--
-    *Sidebar and upper sidebar arrows
-    *
-    *侧边栏和上边栏箭头
+     *Sidebar and upper sidebar arrows
+     *
+     *侧边栏和上边栏箭头
     -->
-    <div v-if="showIconControl && showRoomTool" :class="arrowClass" @click="handleClickIcon">
-      <svg-icon icon-name="line-arrow-up" size="medium"></svg-icon>
-    </div>
+    <arrow-stroke
+      v-if="showIconControl && (showRoomTool || showSideList)"
+      :class="[`arrow-stroke-${arrowDirection}`]"
+      :stroke-position="strokePosition"
+      :arrow-direction="arrowDirection"
+      :has-stroke="showSideList"
+      @click-arrow="handleClickIcon"
+    ></arrow-stroke>
     <!--
     *Nine-pane left and right page flip control bar
     *
@@ -41,14 +46,14 @@
         class="turn-page-arrow-container left-container"
         @click="handleTurnPageLeft"
       >
-        <div class="turn-page-arrow"></div>
+        <svg-icon :icon="ArrowStrokeTurnPageIcon"></svg-icon>
       </div>
       <div
         v-show="showTurnPageRightArrow"
         class="turn-page-arrow-container right-container"
         @click="handleTurnPageRight"
       >
-        <div class="turn-page-arrow turn-page-right"></div>
+        <svg-icon class="turn-page-right" :icon="ArrowStrokeTurnPageIcon"></svg-icon>
       </div>
     </div>
   </div>
@@ -61,11 +66,13 @@ import { StreamInfo, useRoomStore } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
 import { LAYOUT } from '../../../constants/render';
 import StreamRegion from '../StreamRegion';
-import SvgIcon from '../../common/SvgIcon.vue';
-import { ElMessage } from '../../../elementComp';
+import TUIMessage from '../../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { debounce } from '../../../utils/utils';
 import logger from '../../../utils/common/logger';
+import ArrowStroke from '../../common/ArrowStroke.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import ArrowStrokeTurnPageIcon from '../../common/icons/ArrowStrokeTurnPageIcon.vue';
 
 import TUIRoomEngine, { TUIUserInfo, TUIChangeReason, TUIRoomEvents,  TUIVideoStreamType, TUISeatInfo } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
@@ -79,11 +86,18 @@ const {
 } = useStreamContainer();
 const roomEngine = useGetRoomEngine();
 
+// 流容器垂直方向 padding 的大小
+const verticalPadding = 50;
+// 流容器水平方向 padding 的大小
+const horizontalPadding = 40;
+// 单个视频流窗口 margin 大小
+const singleStreamMargin = 8;
 
 defineProps<{
   showRoomTool: boolean,
 }>();
 
+const streamListStyle: Ref<Record<string, any>> = ref({ width: '0' });
 const streamStyle: Ref<Record<string, any>> = ref({ width: '0', height: '0' });
 const enlargedStreamStyle: Ref<Record<string, any>> = ref({ width: '0', height: '0' });
 const roomStore = useRoomStore();
@@ -196,15 +210,26 @@ const streamContainerClass = ref('');
 const enlargedContainerRef = ref();
 const streamListRef = ref();
 
-const arrowClass = computed(() => {
-  let arrowDirection = '';
+const arrowDirection = computed(() => {
+  let arrowDirection = 'right';
   if (layout.value === LAYOUT.TOP_SIDE_LIST) {
     arrowDirection = showSideList.value ? 'up' : 'down';
   }
   if (layout.value === LAYOUT.RIGHT_SIDE_LIST) {
     arrowDirection = showSideList.value ? 'right' : 'left';
   }
-  return `icon-control arrow-${arrowDirection}`;
+  return arrowDirection;
+});
+
+const strokePosition = computed(() => {
+  let strokePosition = '';
+  if (layout.value === LAYOUT.TOP_SIDE_LIST) {
+    strokePosition = 'bottom';
+  }
+  if (layout.value === LAYOUT.RIGHT_SIDE_LIST) {
+    strokePosition = 'left';
+  }
+  return strokePosition;
 });
 
 function handleClickIcon() {
@@ -212,8 +237,8 @@ function handleClickIcon() {
   if (!showSideList.value) {
     let width = 0;
     let height = 0;
-    const containerWidth = document.getElementById('roomContainer')!.offsetWidth;
-    const containerHeight = document.getElementById('roomContainer')!.offsetHeight;
+    const containerWidth = document.getElementById('roomContainer')!.offsetWidth - horizontalPadding;
+    const containerHeight = document.getElementById('roomContainer')!.offsetHeight - verticalPadding;
     const scaleWidth = containerWidth / 16;
     const scaleHeight = containerHeight / 9;
     if (scaleWidth > scaleHeight) {
@@ -243,17 +268,12 @@ function handleClickIcon() {
       return;
     }
   } else {
-    if (layout.value  === LAYOUT.RIGHT_SIDE_LIST) {
+    if (layout.value === LAYOUT.RIGHT_SIDE_LIST) {
       handleRightSideListLayout();
-      enlargedContainerRef.value.style.width = 'calc(100% - 260px)';
-      enlargedContainerRef.value.style.height = '100%';
       return;
     }
     if (layout.value === LAYOUT.TOP_SIDE_LIST) {
       handleTopSideListLayout();
-      enlargedContainerRef.value.style.top = '175px';
-      enlargedContainerRef.value.style.width = '100%';
-      enlargedContainerRef.value.style.height = 'calc(100% - 175px)';
       return;
     }
   }
@@ -276,29 +296,56 @@ async function handleNineEqualPointsLayout() {
   if (!roomContainerElement) {
     return;
   }
-  let containerWidth = roomContainerElement!.offsetWidth;
-  let containerHeight = roomContainerElement!.offsetHeight;
+  // 容器的实际宽高为 offsetWidth/offsetHeight 减去 padding 的大小
+  const containerWidth = roomContainerElement!.offsetWidth - horizontalPadding;
+  const containerHeight = roomContainerElement!.offsetHeight - verticalPadding;
+  let horizontalStreamNumber = 1;
+  let verticalStreamNumber = 1;
   if (number <= 4) {
-    containerWidth = number < 2 ? roomContainerElement!.offsetWidth / number : roomContainerElement!.offsetWidth / 2;
-    containerHeight = roomContainerElement!.offsetHeight / Math.ceil(number / 2);
+    horizontalStreamNumber = Math.min(number, 2);
+    verticalStreamNumber = Math.ceil(number / 2);
   } else if (number > 4) {
-    containerWidth = number < 3 ? roomContainerElement!.offsetWidth / number : roomContainerElement!.offsetWidth / 3;
-    containerHeight = roomContainerElement!.offsetHeight / Math.ceil(number / 3);
+    horizontalStreamNumber = 3;
+    verticalStreamNumber = Math.ceil(number / 3);
   }
+  // 减去单个视频流的 margin 大小，保证 width 和 height 的比例为 16:9
+  const contentWidth = (containerWidth - horizontalStreamNumber * singleStreamMargin) / horizontalStreamNumber;
+  const contentHeight = (containerHeight - verticalStreamNumber * singleStreamMargin) / verticalStreamNumber;
 
-  const scaleWidth = containerWidth / 16;
-  const scaleHeight = containerHeight / 9;
+  const scaleWidth = contentWidth / 16;
+  const scaleHeight = contentHeight / 9;
   if (scaleWidth > scaleHeight) {
-    width = (containerHeight / 9) * 16;
-    height = containerHeight;
+    width = (contentHeight / 9) * 16;
+    height = contentHeight;
   }
   if (scaleWidth <= scaleHeight) {
-    width = containerWidth;
-    height = (containerWidth / 16) * 9;
+    width = contentWidth;
+    height = (contentWidth / 16) * 9;
   }
   // 九宫格模式需要减掉 streamRegion 的 margin 的尺寸
-  streamStyle.value.width = `${width - 8}px`;
-  streamStyle.value.height = `${height - 8}px`;
+  streamStyle.value.width = `${width}px`;
+  streamStyle.value.height = `${height}px`;
+
+  // 设置九宫格布局容器的大小，保证横向最多只能有 3 个视频流
+  streamListStyle.value.width = `${horizontalStreamNumber * (width + singleStreamMargin)}px`;
+}
+
+/**
+ * Get stream information for large region areas
+ *
+ * 获取大窗口区域的流信息
+ */
+function getEnlargeStream() {
+  if (roomStore.localScreenStream?.hasScreenStream) {
+    return roomStore.localScreenStream;
+  }
+  if (remoteStreamList.value.length > 0) {
+    const remoteScreenStream = remoteStreamList.value.find(stream => (
+      stream.streamType === TUIVideoStreamType.kScreenStream && stream.hasScreenStream
+    ));
+    return remoteScreenStream ? remoteScreenStream : remoteStreamList.value[0];
+  }
+  return roomStore.localStream;
 }
 
 /**
@@ -310,16 +357,19 @@ async function handleRightSideListLayout() {
   streamContainerClass.value = 'stream-container-right';
 
   if (!enlargeStream.value) {
-    [enlargeStream.value] = remoteStreamList.value;
+    enlargeStream.value = getEnlargeStream();
   }
 
   await nextTick();
 
   streamStyle.value = {};
+  streamListStyle.value = {};
 
   if (enlargedContainerRef.value) {
-    const containerWidth = enlargedContainerRef.value.offsetWidth;
-    const containerHeight = enlargedContainerRef.value.offsetHeight;
+    enlargedContainerRef.value.style.width = 'calc(100% - 280px)';
+    enlargedContainerRef.value.style.height = '100%';
+    const containerWidth = enlargedContainerRef.value.offsetWidth - horizontalPadding;
+    const containerHeight = enlargedContainerRef.value.offsetHeight - verticalPadding;
     let width = 0;
     let height = 0;
     const scaleWidth = containerWidth / 16;
@@ -346,16 +396,20 @@ async function handleTopSideListLayout() {
   streamContainerClass.value = 'stream-container-top';
 
   if (!enlargeStream.value) {
-    [enlargeStream.value] = remoteStreamList.value;
+    enlargeStream.value = getEnlargeStream();
   }
 
   await nextTick();
 
   streamStyle.value = {};
+  streamListStyle.value = {};
 
   if (enlargedContainerRef.value) {
-    const containerWidth = enlargedContainerRef.value.offsetWidth;
-    const containerHeight = enlargedContainerRef.value.offsetHeight;
+    enlargedContainerRef.value.style.top = '175px';
+    enlargedContainerRef.value.style.width = '100%';
+    enlargedContainerRef.value.style.height = 'calc(100% - 184px)';
+    const containerWidth = enlargedContainerRef.value.offsetWidth - horizontalPadding;
+    const containerHeight = enlargedContainerRef.value.offsetHeight - verticalPadding;
     let width = 0;
     let height = 0;
     const scaleWidth = containerWidth / 16;
@@ -397,7 +451,7 @@ async function handleLayout() {
       break;
     case LAYOUT.RIGHT_SIDE_LIST:
       showSideList.value = true;
-      enlargedContainerRef.value.style.width = 'calc(100% - 260px)';
+      enlargedContainerRef.value.style.width = 'calc(100% - 280px)';
       enlargedContainerRef.value.style.height = '100%';
       await handleRightSideListLayout();
       await handleStreamContainerScroll();
@@ -405,7 +459,7 @@ async function handleLayout() {
     case LAYOUT.TOP_SIDE_LIST:
       showSideList.value = true;
       enlargedContainerRef.value.style.width = '100%';
-      enlargedContainerRef.value.style.height = 'calc(100% - 175px)';
+      enlargedContainerRef.value.style.height = 'calc(100% - 184px)';
       await handleTopSideListLayout();
       await handleStreamContainerScroll();
       break;
@@ -477,7 +531,7 @@ const onUserVideoStateChanged = (eventInfo: {
   if (userId === basicStore.userId && !hasVideo && reason === TUIChangeReason.kChangedByAdmin) {
     // 主持人关闭摄像头
     if (streamType === TUIVideoStreamType.kCameraStream) {
-      ElMessage({
+      TUIMessage({
         type: 'warning',
         message: t('The host has turned off your camera'),
         duration: MESSAGE_DURATION.NORMAL,
@@ -490,7 +544,7 @@ const onUserVideoStateChanged = (eventInfo: {
     }
     // 主持人关闭屏幕分享
     if (streamType === TUIVideoStreamType.kScreenStream) {
-      ElMessage({
+      TUIMessage({
         type: 'warning',
         message: t('The host has turned off your screen sharing'),
         duration: MESSAGE_DURATION.NORMAL,
@@ -498,27 +552,23 @@ const onUserVideoStateChanged = (eventInfo: {
     }
   }
 
-  // 当远端屏幕分享变化的时候，处理流布局
-  if (userId !== basicStore.userId && streamType === TUIVideoStreamType.kScreenStream) {
+  // 当屏幕分享流变化的时候，处理流布局
+  if (streamType === TUIVideoStreamType.kScreenStream) {
     if (hasVideo) {
-      roomStore.setHasOtherScreenShare(true);
-      enlargeStream.value = roomStore.remoteStreamObj[`${userId}_${streamType}`] as StreamInfo;
-      if (enlargeStream.value) {
-        if (layout.value !== LAYOUT.RIGHT_SIDE_LIST && layout.value !== LAYOUT.TOP_SIDE_LIST) {
-          basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
-        }
+      enlargeStream.value = userId === basicStore.userId ? roomStore.localScreenStream : roomStore.remoteStreamObj[`${userId}_${streamType}`];
+      if (enlargeStream.value && [LAYOUT.RIGHT_SIDE_LIST, LAYOUT.TOP_SIDE_LIST].indexOf(layout.value) === -1) {
+        basicStore.setLayout(LAYOUT.RIGHT_SIDE_LIST);
+      }
+      if (userId !== basicStore.userId) {
+        roomStore.setHasOtherScreenShare(true);
       }
     } else {
-      roomStore.setHasOtherScreenShare(false);
-      /**
-       * Reset the stream playback layout when the remote screen sharing stream is stopped
-       *
-       * 远端屏幕分享流停止的时候，重新设置流播放布局
-      **/
       if (userId === enlargeStream.value?.userId) {
         handleLargeStreamLeave();
       }
-
+      if (userId !== basicStore.userId) {
+        roomStore.setHasOtherScreenShare(false);
+      }
       logger.debug(`${logPrefix} onUserVideoStateChanged: stop`, userId, streamType);
       roomEngine.instance?.stopPlayRemoteVideo({
         userId,
@@ -632,20 +682,19 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
-
 .stream-container-flatten {
   width: 100%;
   height: 100%;
-  background-color: var(--stream-container-flatten-bg-color);
   overflow: hidden;
+  padding: 25px 20px;
   .stream-list-container {
     width: 100%;
-    height: 100%
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
   }
   .stream-list {
-    width: 100%;
-    height: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -657,69 +706,39 @@ onUnmounted(() => {
   }
 }
 
-.icon-control {
-  background-color: var(--layout-item);
+.arrow-stroke-right {
   position: absolute;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  right: 280px;
+  top: 0;
 }
-.arrow-up {
-  width: 52px;
-  height: 20px;
-  position: fixed;
-  left: 50%;
-  transform: translate(-50%);
+
+.arrow-stroke-left {
+  position: absolute;
+  right: 12px;
+  top: 0;
+}
+
+.arrow-stroke-up {
+  position: absolute;
   top: 175px;
-  border-radius: 0 0 4px 4px;
+  left: 0;
 }
-.arrow-down {
-  width: 52px;
-  height: 20px;
-  position: fixed;
-  left: 50%;
-  transform: translate(-50%);
-  top: 48px;
-  border-radius: 0 0 4px 4px;
-  * {
-    transform: rotate(180deg);
-  }
-}
-.arrow-right {
-  width: 20px;
-  height: 52px;
-  position: fixed;
-  right: 250px;
-  transform: translate(-50%);
-  top: calc((100% - 148px) / 2 + 58px);
-  border-radius: 4px 0 0 4px;
-  * {
-    transform: rotate(90deg);
-  }
-}
-.arrow-left {
-  width: 20px;
-  height: 52px;
-  position: fixed;
-  right: -10px;
-  transform: translate(-50%);
-  top: calc((100% - 148px) / 2 + 58px);
-  border-radius: 4px 0 0 4px;
-  * {
-    transform: rotate(270deg);
-  }
+
+.arrow-stroke-down {
+  position: absolute;
+  top: 76px;
+  left: 0;
 }
 
 .stream-container-top {
   width: 100%;
   height: 100%;
-  background-color: var(--stream-container-flatten-bg-color);
   overflow: hidden;
   position: relative;
   .enlarged-stream-container {
     width: 100%;
-    height: calc(100% - 175px);
+    height: calc(100% - 184px);
+    padding: 25px 20px;
     position: absolute;
     top: 175px;
     display: flex;
@@ -729,7 +748,6 @@ onUnmounted(() => {
   .stream-list-container {
     width: 100%;
     height: 175px;
-    background-color: var(--stream-list-container);
     position: absolute;
     top: 0;
     left: 0;
@@ -737,7 +755,7 @@ onUnmounted(() => {
     display: flex;
     justify-content: center;
     &.hide-list {
-      transform: translateY(-175px);
+      transform: translateY(-166px);
     }
     .stream-list {
       display: flex;
@@ -750,7 +768,7 @@ onUnmounted(() => {
       .single-stream {
         width: 240px;
         height: 135px;
-        border-radius: 4px;
+        border-radius: 8px;
         overflow: hidden;
         flex-shrink: 0;
         &:not(:first-child) {
@@ -764,38 +782,38 @@ onUnmounted(() => {
 .stream-container-right {
   width: 100%;
   height: 100%;
-  background-color: var(--stream-container-flatten-bg-color);
   overflow: hidden;
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
   align-content: center;
+  position: relative;
   .enlarged-stream-container {
-    width: calc(100% - 260px);
-    height: 100%;
+    width: calc(100% - 280px);
+    height: calc(100%);
+    padding: 25px 20px;
     display: flex;
     justify-content: center;
     align-items: center;
   }
   .stream-list-container {
-    width: 260px;
+    width: 280px;
     height: 100%;
     position: absolute;
     top: 0;
     right: 0;
-    padding: 48px 10px 80px;
-    background-color: var(--stream-list-container);
+    padding: 20px;
     display: flex;
     align-items: center;
     &.hide-list {
-      transform: translateX(260px);
+      transform: translateX(270px);
     }
     &::before {
       content: '';
       width: 100%;
       height: 40px;
       position: absolute;
-      top: 48px;
+      top: 10px;
       left: 0;
       opacity: 0.1;
     }
@@ -811,7 +829,7 @@ onUnmounted(() => {
     .single-stream {
       width: 240px;
       height: 135px;
-      border-radius: 4px;
+      border-radius: 8px;
       overflow: hidden;
       &:not(:first-child) {
         margin-top: 14px;
@@ -820,38 +838,48 @@ onUnmounted(() => {
   }
 }
 
+.tui-theme-black .turn-page-container {
+  --turn-page-background-color: rgba(213, 224, 242, 0.2);
+  --turn-page-hover-background-color: rgba(213, 224, 242, 0.4);
+  --turn-page-arrow-color: #D5E0F2;
+}
+
+.tui-theme-white .turn-page-container {
+  --turn-page-background-color: rgba(15, 16, 20, 0.3);
+  --turn-page-hover-background-color: rgba(15, 16, 20, 0.5);
+  --turn-page-arrow-color: white;
+}
+
 .turn-page-container {
   width: 100%;
-  height: 86px;
+  height: 60px;
   position: absolute;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
-  padding: 0 24px;
   display: flex;
   justify-content: space-between;
   .turn-page-arrow-container {
-    width: 40px;
-    height: 86px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 4.21px;
+    width: 32px;
+    height: 60px;
+    background: var(--turn-page-background-color);
+    border-radius: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    color: var(--turn-page-arrow-color);
+    &:hover {
+      background: var(--turn-page-hover-background-color);
+    }
   }
   .left-container {
     position: absolute;
-    left: 24px;
+    left: 34px;
   }
   .right-container {
     position: absolute;
-    right: 24px;
-  }
-  .turn-page-arrow {
-    background-image: url(../../../assets/icons/svg/turn-page-arrow-left.svg);
-    width: 14px;
-    height: 23px;
-    background-size: 100% 100%;
+    right: 34px;
   }
   .turn-page-right {
     transform: rotateY(180deg);
