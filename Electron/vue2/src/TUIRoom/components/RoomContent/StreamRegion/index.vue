@@ -5,53 +5,65 @@
     class="user-stream-container"
     @dblclick="$emit('room_dblclick')"
   >
-    <div v-if="loading" class="loading-region">
-      <svg-icon icon-name="loading" class="loading"></svg-icon>
-    </div>
-    <div :id="playRegionDomId" class="stream-region"></div>
-    <div
-      v-if="!stream.hasVideoStream && !stream.hasScreenStream"
-      ref="centerUserInfoRef"
-      class="center-user-info-container"
-    >
-      <Avatar class="avatar-region" :img-src="stream.avatarUrl"></Avatar>
-    </div>
-    <div class="corner-user-info-container">
-      <svg-icon v-if="showMasterIcon" class="master-icon" icon-name="user"></svg-icon>
-      <audio-icon
-        v-if="!isScreenStream"
-        :user-id="stream.userId"
-        :is-muted="!stream.hasAudioStream"
-        size="small"
-      ></audio-icon>
-      <svg-icon v-if="isScreenStream" icon-name="screen-share" class="screen-icon"></svg-icon>
-      <span class="user-name" :title="userInfo">{{ userInfo }}</span>
-      <span v-if="isScreenStream"> {{ t('is sharing their screen') }} </span>
-    </div>
-    <!-- <div v-if="stream.isVideoMuted" ref="centerUserInfoRef" class="center-user-info-container">
-      <div class="user-info">
-        <img class="avatar-region" :src="stream.avatarUrl || defaultAvatar">
-        <div class="user-gender-name">
-          <svg-icon icon-name="user" size="medium"></svg-icon>
-          <span class="user-name">{{ stream.userName || stream.userId }}</span>
-        </div>
+    <local-screen-stream
+      v-if="isLocalScreen"
+      :is-mini-region="isMiniRegion"
+    ></local-screen-stream>
+    <template v-else>
+      <div v-if="loading" class="loading-region">
+        <svg-icon :icon="LoadingIcon" class="loading"></svg-icon>
       </div>
-    </div> -->
+      <div :id="playRegionDomId" class="stream-region"></div>
+      <div
+        v-if="!stream.hasVideoStream && !stream.hasScreenStream"
+        ref="centerUserInfoRef"
+        class="center-user-info-container"
+      >
+        <Avatar class="avatar-region" :img-src="stream.avatarUrl"></Avatar>
+      </div>
+      <div class="corner-user-info-container">
+        <div v-if="showMasterIcon" class="master-icon">
+          <user-icon></user-icon>
+        </div>
+        <audio-icon
+          v-if="!isScreenStream"
+          :user-id="stream.userId"
+          :is-muted="!stream.hasAudioStream"
+          size="small"
+        ></audio-icon>
+        <svg-icon v-if="isScreenStream" :icon="ScreenOpenIcon" class="screen-icon"></svg-icon>
+        <span class="user-name" :title="userInfo">{{ userInfo }}</span>
+        <span v-if="isScreenStream"> {{ t('is sharing their screen') }} </span>
+      </div>
+      <!-- <div v-if="stream.isVideoMuted" ref="centerUserInfoRef" class="center-user-info-container">
+        <div class="user-info">
+          <img class="avatar-region" :src="stream.avatarUrl || defaultAvatar">
+          <div class="user-gender-name">
+            <svg-icon icon-name="user" size="medium"></svg-icon>
+            <span class="user-name">{{ stream.userName || stream.userId }}</span>
+          </div>
+        </div>
+      </div> -->
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from 'vue';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
-import Avatar from '../../base/Avatar.vue';
+import Avatar from '../../common/Avatar.vue';
 import { useBasicStore } from '../../../stores/basic';
 import logger from '../../../utils/common/logger';
-import AudioIcon from '../../base/AudioIcon.vue';
-import SvgIcon from '../../common/SvgIcon.vue';
+import AudioIcon from '../../common/AudioIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import UserIcon from '../../common/icons/UserIcon.vue';
+import LoadingIcon from '../../common/icons/LoadingIcon.vue';
 import { useI18n } from '../../../locales';
 import { TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-electron';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { isInnerScene } from '../../../utils/constants';
+import ScreenOpenIcon from '../../common/icons/ScreenOpenIcon.vue';
+import LocalScreenStream from '../LocalScreenStream/index.vue';
 
 const roomEngine = useGetRoomEngine();
 
@@ -69,6 +81,14 @@ interface Props {
 
 const props = defineProps<Props>();
 
+// 是否是本地屏幕分享占位窗口
+const isLocalScreen = computed(() => (
+  props.stream
+  && (props.stream.userId === basicStore.userId && props.stream.streamType === TUIVideoStreamType.kScreenStream)
+));
+
+// 是否为小窗口
+const isMiniRegion = computed(() => !!(props.enlargeDomId && `${props.stream.userId}_${props.stream.streamType}` !== props.enlargeDomId));
 
 const streamRegionRef = ref();
 const centerUserInfoRef = ref();
@@ -156,6 +176,9 @@ if (props.stream.streamType === TUIVideoStreamType.kScreenStream) {
   watch(
     () => [props.stream.hasScreenStream, props.stream.isVisible],
     async (val, oldVal) => {
+      if (props.stream.userId === basicStore.userId) {
+        return;
+      }
       const [hasScreenStream, isVisible] = val;
       if (hasScreenStream && isVisible) {
         await nextTick();
@@ -199,7 +222,6 @@ watch(
           **/
           if (props.stream.hasVideoStream) {
             await roomEngine.instance?.setLocalVideoView({
-              streamType: streamTypeToFetch.value,
               view: `${playRegionDomId.value}`,
             });
           }
@@ -214,7 +236,6 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 
 @keyframes loading-rotate {
   0% {
@@ -224,13 +245,29 @@ watch(
     transform: rotate(360deg);
   }
 }
+
+.tui-theme-white .user-stream-container {
+  --screen-font-color: #8F9AB2;
+  --user-has-no-camera-bg-color: rgba(228, 232, 238, 0.40);
+  --user-info-container-bg-color: rgba(18, 23, 35, 0.80);
+}
+
+.tui-theme-black .user-stream-container {
+  --screen-font-color: #B2BBD1;
+  --user-has-no-camera-bg-color: rgba(34, 38, 46, 0.50);
+  --user-info-container-bg-color: rgba(34, 38, 46, 0.80);
+}
+
 .user-stream-container {
   position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #000000;
+
   .stream-region {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background-color: #000000;
   }
   .loading-region {
     position: absolute;
@@ -238,20 +275,21 @@ watch(
     left: 50%;
     transform: translate(-50%, -50%);
     .loading {
-      animation: loading-rotate 0.7s linear infinite;
+      animation: loading-rotate 1.5s linear infinite;
     }
   }
   .corner-user-info-container {
     position: absolute;
-    bottom: 4px;
-    left: 0;
+    bottom: 8px;
+    left: 8px;
     min-width: 118px;
     max-width: 100%;
     overflow: hidden;
-    height: 30px;
+    height: 32px;
+    border-radius: 16px;
     display: flex;
-    background: rgba(0,0,0,0.60);
-    color: $whiteColor;
+    background: var(--user-info-container-bg-color);
+    color: #FFFFFF;
     align-items: center;
     align-content: center;
     padding: 0 10px 0 0;
@@ -265,9 +303,13 @@ watch(
     }
     .master-icon {
       margin-left: 0;
-      width: 30px;
-      height: 30px;
-      background-size: cover;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--active-color-1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .screen-icon {
       transform: scale(0.8);
@@ -280,14 +322,24 @@ watch(
     left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--center-user-info-container-bg-color);
+    background-color: var(--background-color-1);
+    &::before {
+      content: '';
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: var(--user-has-no-camera-bg-color);
+    }
     .avatar-region {
-        width: 130px;
-        height: 130px;
-        border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(130px, 40%);
+      padding-top: min(130px, 40%);
+      height: 0;
     }
     .user-info {
       width: 130px;

@@ -1,10 +1,18 @@
 import { ref, nextTick } from 'vue';
+import { useRoomStore } from '../../../stores/room';
+import { storeToRefs } from 'pinia';
+
 
 export default function useMemberItem() {
+  const roomStore = useRoomStore();
+  const { isMaster } = storeToRefs(roomStore);
+
   const showMemberControl = ref(false);
 
   function handleMouseEnter() {
-    showMemberControl.value = true;
+    if (isMaster.value) {
+      showMemberControl.value = true;
+    }
   }
 
   function handleMouseLeave() {
@@ -26,7 +34,7 @@ export default function useMemberItem() {
   }
 
   function handleMemberItemClick() {
-    if (!showMemberControl.value) {
+    if (isMaster.value && !showMemberControl.value) {
       showMemberControl.value = true;
     }
   }

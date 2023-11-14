@@ -1,169 +1,183 @@
 <template>
   <div class="screen-share-control-container">
-      <icon-button
-        :is-active="isSharing"
-        ref="btnStopRef"
-        :class="{ outlined: isSharing }"
-        :title="title"
-        :disabled="isAudience"
-        :icon-name="iconName"
-        @click.native="startScreenShare"
-      />
-      <div  v-if="showStopShareRegion" class="stop-share-region" @click.prevent="openStopConfirmDialog">
-        <svg-icon class="stop-share-icon"  :icon-name="ICON_NAME.ScreenShareStopped" />
-        <span> {{ t('End sharing') }} </span>
-      </div>
-    <Dialog
-      :model-value="dialogVisible"
-      width="420px"
-      :title="t('Stop sharing?') "
-      :modal="true"
-      :append-to-body="true"
-      :before-close="cancelStop"
+    <icon-button
+      ref="btnStopRef"
+      :is-active="isSharing"
+      :class="{ outlined: isSharing }"
+      :title="title"
+      :disabled="isAudience"
+      @click-icon="toggleScreenShare"
     >
-      <span>{{ t('Others will no longer see your screen after you stop sharing.') }}</span>
+      <stop-screen-share-icon v-if="isSharing"></stop-screen-share-icon>
+      <screen-share-icon v-else></screen-share-icon>
+    </icon-button>
+    <Dialog v-model="showStopShareRegion" width="420px" :title="t('End sharing')" :modal="true">
+      <span>
+        {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
       <template #footer>
         <span>
-          <el-button type="primary" @click.native="stopScreenShare">{{ t('Stop sharing') }}</el-button>
-          <el-button type="default" @click.native="cancelStop">{{ t('Cancel') }}</el-button>
+          <tui-button class="dialog-button" size="default" @click="stopScreenShare">{{ t('End sharing') }}</tui-button>
+          <tui-button type="primary" size="default" @click="showStopShareRegion = false">{{ t('Cancel') }}</tui-button>
         </span>
       </template>
     </Dialog>
+
     <screen-window-select-dialog
       :visible="selectDialogVisible"
       :screen-list="screenList"
       :window-list="windowList"
       @on-confirm="onConfirmScreenShare"
-      @on-cancel="selectDialogVisible = false"
+      @on-close="selectDialogVisible = false"
     />
+    <Dialog
+      v-model="showPermissionVisible"
+      :title="t('Grant permission to screen recording')"
+      :modal="true"
+      :append-to-body="true"
+      width="480px"
+    >
+      <div>
+        {{
+          t(
+            'Due to macOS 10.15 system requirements, please check the current application in "System Preferences - Security & Privacy - Screen Recording".',
+          )
+        }}
+      </div>
+      <template #footer>
+        <tui-button size="default" @click="onPermissionScreenShare">
+          {{ t('Open the system preferences settings') }}
+        </tui-button>
+        <tui-button class="button" type="primary" size="default" @click="showPermissionVisible = false">
+          {{ t('Cancel') }}
+        </tui-button>
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, Ref, watch, computed } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useI18n } from '../../../locales';
+import { ref, Ref, computed, onUnmounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useI18n } from '../../../locales';
 
-  import IconButton from '../../common/IconButton.vue';
-  import {
-    TRTCScreenCaptureSourceType,
-    TRTCScreenCaptureSourceInfo,
-  } from '@tencentcloud/tuiroom-engine-electron';
-  import ScreenWindowSelectDialog from './ScreenWindowSelectDialog.vue';
-  import SvgIcon from '../../common/SvgIcon.vue';
-  import { ICON_NAME } from '../../../constants/icon';
-  import { useBasicStore } from '../../../stores/basic';
-  import { useRoomStore } from '../../../stores/room';
-  import useGetRoomEngine from '../../../hooks/useRoomEngine';
-  import Dialog from '../../../elementComp/Dialog/index.vue';
-  import { ElMessage } from '../../../elementComp';
-  import { MESSAGE_DURATION } from '../../../constants/message';
+import IconButton from '../../common/base/IconButton.vue';
+import { TRTCScreenCaptureSourceType, TRTCScreenCaptureSourceInfo } from '@tencentcloud/tuiroom-engine-electron';
+import ScreenWindowSelectDialog from './ScreenWindowSelectDialog.vue';
+import ScreenShareIcon from '../../common/icons/ScreenShareIcon.vue';
+import StopScreenShareIcon from '../../common/icons/StopScreenShareIcon.vue';
+import { ICON_NAME } from '../../../constants/icon';
+import { useRoomStore } from '../../../stores/room';
+import useGetRoomEngine from '../../../hooks/useRoomEngine';
+import TUIMessage from '../../common/base/Message';
+import { MESSAGE_DURATION } from '../../../constants/message';
+import eventBus from '../../../hooks/useMitt';
+import Dialog from '../../common/base/Dialog/index.vue';
+import TuiButton from '../../common/base/Button.vue';
 
-  const { t } = useI18n();
+const { t } = useI18n();
 
-  const basicInfo = useBasicStore();
-  const roomStore = useRoomStore();
-  const { isAudience, hasOtherScreenShare } = storeToRefs(roomStore);
-  const roomEngine = useGetRoomEngine();
+const roomStore = useRoomStore();
+const { isAudience, hasOtherScreenShare } = storeToRefs(roomStore);
+const roomEngine = useGetRoomEngine();
 
-  const btnStopRef = ref();
-  const isSharing: Ref<boolean> = ref(false);
-  const dialogVisible: Ref<boolean> = ref(false);
-  const showStopShareRegion: Ref<boolean> = ref(false);
+const btnStopRef = ref();
+const isSharing: Ref<boolean> = ref(false);
+const showPermissionVisible: Ref<boolean> = ref(false);
+const showStopShareRegion: Ref<boolean> = ref(false);
+const title = computed(() => (isSharing.value ? t('End sharing') : t('Share screen')));
 
-  const title = computed(() => (isSharing.value ? t('Sharing') : t('Share screen')));
-  const iconName = computed(() => {
-    if (isAudience.value) {
-      return ICON_NAME.ScreenShareDisabled;
-    }
-    return isSharing.value ? ICON_NAME.ScreenSharing : ICON_NAME.ScreenShare;
-  });
+const selectDialogVisible: Ref<boolean> = ref(false);
+const screenList: Ref<Array<TRTCScreenCaptureSourceInfo>> = ref([]);
+const windowList: Ref<Array<TRTCScreenCaptureSourceInfo>> = ref([]);
 
-  const selectDialogVisible: Ref<boolean> = ref(false);
-  const screenList: Ref<Array<TRTCScreenCaptureSourceInfo>> = ref([]);
-  const windowList: Ref<Array<TRTCScreenCaptureSourceInfo>> = ref([]);
-
-  async function startScreenShare() {
-    if (hasOtherScreenShare.value) {
-      ElMessage({
-        type: 'warning',
-        message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
-        duration: MESSAGE_DURATION.LONG,
-      });
-      return;
-    }
-    if (!(window as any).isHasScreen && process.platform === 'darwin') {
-      const { shell } = require('electron');
-      shell.openExternal(`x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture`);
-      // todo: 这里不能注释，防止应用不出现在屏幕录制权限列表里
-      // return;
-    }
-    if (!isSharing.value && !selectDialogVisible.value) {
-      const screenCaptureList: any = await roomEngine.instance?.getScreenSharingTarget();
-      screenList.value = screenCaptureList.filter(
-        (screen: TRTCScreenCaptureSourceInfo) =>
-          screen.type === TRTCScreenCaptureSourceType.TRTCScreenCaptureSourceTypeScreen // eslint-disable-line
-      );
-      windowList.value = screenCaptureList.filter(
-        (screen: TRTCScreenCaptureSourceInfo) =>
-          screen.type === TRTCScreenCaptureSourceType.TRTCScreenCaptureSourceTypeWindow
-      );
-      selectDialogVisible.value = true;
-    }
-    if(isSharing.value ) {
-      showStopShareRegion.value = true
-    }
+async function toggleScreenShare() {
+  if (isSharing.value) {
+    showStopShareRegion.value = true;
+    return;
   }
-
-  function onConfirmScreenShare(screenInfo: TRTCScreenCaptureSourceInfo) {
-    roomEngine.instance?.startScreenSharingElectron(screenInfo.sourceId);
-    isSharing.value = true;
-    selectDialogVisible.value = false;
+  if (hasOtherScreenShare.value) {
+    TUIMessage({
+      type: 'warning',
+      message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
   }
-
-  function openStopConfirmDialog() {
-    showStopShareRegion.value = false
-    if (isSharing.value) {
-      dialogVisible.value = true;
-    }
+  if (!(window as any).isHasScreen && process.platform === 'darwin') {
+    showPermissionVisible.value = true;
   }
-
-  function cancelStop() {
-    dialogVisible.value = false;
+  if (!isSharing.value && !selectDialogVisible.value) {
+    const screenCaptureList: any = await roomEngine.instance?.getScreenSharingTarget();
+    screenList.value = screenCaptureList.filter((screen: TRTCScreenCaptureSourceInfo) =>
+        screen.type === TRTCScreenCaptureSourceType.TRTCScreenCaptureSourceTypeScreen, // eslint-disable-line
+    );
+    windowList.value = screenCaptureList.filter((screen: TRTCScreenCaptureSourceInfo) => screen.type === TRTCScreenCaptureSourceType.TRTCScreenCaptureSourceTypeWindow);
+    selectDialogVisible.value = true;
   }
+}
 
-  async function stopScreenShare() {
-    roomEngine.instance?.stopScreenSharingElectron();
-    isSharing.value = false;
-    dialogVisible.value = false;
+async function onPermissionScreenShare() {
+  const { shell } = require('electron');
+  shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture');
+  // todo: 这里不能注释，防止应用不出现在屏幕录制权限列表里
+  // return;
+  showPermissionVisible.value = false;
+}
+
+function onConfirmScreenShare(screenInfo: TRTCScreenCaptureSourceInfo) {
+  if (hasOtherScreenShare.value) {
+    TUIMessage({
+      type: 'warning',
+      message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
   }
+  roomEngine.instance?.startScreenSharingElectron({ targetId: screenInfo.sourceId });
+  isSharing.value = true;
+  selectDialogVisible.value = false;
+}
+
+async function stopScreenShare() {
+  roomEngine.instance?.stopScreenSharingElectron();
+  isSharing.value = false;
+  showStopShareRegion.value = false;
+}
+
+eventBus.on('ScreenShare:stopScreenShare', stopScreenShare);
+onUnmounted(() => {
+  eventBus.off('ScreenShare:stopScreenShare', stopScreenShare);
+});
 </script>
 
-<style lang="scss">
-  @import '../../../assets/style/var.scss';
-  @import '../../../assets/style/element-custom.scss';
-  .screen-share-control-container {
-    position: relative;
-  }
-  .stop-share-region {
-    width: 131px;
-    height: 48px;
-    background: var(--stop-share-region-bg-color);
-    border-radius: 4px;
-    position: absolute;
-    top: -58px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--color-font);
-  }
-  .stop-share-icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 10px;
-  }
+<style lang="scss" scoped>
+@import '../../../assets/style/var.scss';
+@import '../../../assets/style/element-custom.scss';
+.screen-share-control-container {
+  position: relative;
+}
+.stop-share-region {
+  width: 131px;
+  height: 48px;
+  background: var(--stop-share-region-bg-color);
+  border-radius: 4px;
+  position: absolute;
+  top: -58px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-font);
+}
+.stop-share-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
+.button {
+  margin-left: 12px;
+}
 </style>

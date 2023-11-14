@@ -6,7 +6,7 @@ import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
 import { computed, onUnmounted } from 'vue';
 import logger from '../../utils/common/logger';
-import { useRoomStore } from '@/TUIRoom/stores/room';
+import { useRoomStore } from '../../stores/room';
 
 export default function useSideBar() {
   const roomEngine = useGetRoomEngine();

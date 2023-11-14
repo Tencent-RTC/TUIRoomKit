@@ -17,7 +17,6 @@
   --el-disabled-bg-color: var(--el-disabled-background);
   --el-disabled-border-color: var(--el-disabled-border);
   --el-switch-on-color: red;
-  --el-color-danger: #006eff;
 }
 .el-message-box__btns button {
   background-color: #409eff;
@@ -30,6 +29,3 @@
 .el-message-box__btns button:hover {
   background-color: #66b1ff;
 }
- .el-badge__content {
-  background-color: #006eff;
- }
