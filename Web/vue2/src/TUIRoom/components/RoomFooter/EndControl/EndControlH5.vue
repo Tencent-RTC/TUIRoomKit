@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="end-control-container">
-      <div v-tap="stopMeeting" class="end-button" tabindex="1">{{ t('EndH5') }}</div>
+      <div v-tap="handleEndBtnClick" class="end-button" tabindex="1">
+        <svg-icon :icon="EndRoomIcon" />
+        <span class="end-button-title">{{ t('EndH5') }}</span>
+      </div>
     </div>
     <div v-if="visible" class="end-main-content">
       <div :class="isShowLeaveRoomDialog ? 'end-dialog-leave':'end-dialog-dismiss'">
@@ -24,7 +27,7 @@
           </span>
           <span
             v-if="isShowLeaveRoomDialog"
-            v-tap="leaveRoom"
+            v-tap="handleEndLeaveClick"
             :class="roomStore.isMaster ?'end-button-leave':'end-button-leave-single'"
           >
             {{ t('Leave') }}
@@ -43,7 +46,7 @@
     >
       <template #sidebarContent>
         <div style="height:100%">
-          <div>
+          <div class="transfer-list-container">
             <div class="transfer-header">
               <input
                 v-model="searchName"
@@ -65,10 +68,10 @@
                   <div class="user-name">{{ user.userName || user.userId }}</div>
                   <svg-icon
                     v-if="selectedUser === user.userId"
+                    :icon="CorrectIcon"
                     class="correct"
-                    icon-name="correct"
-                    size="custom"
-                  ></svg-icon>
+                  >
+                  </svg-icon>
                 </div>
               </div>
               <div v-if="hasNoData" class="member-hasNoData">{{ t('No relevant user found.') }}</div>
@@ -87,14 +90,17 @@
 
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
-import { ElMessageBox, ElMessage } from '../../../elementComp';
 import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useEndControl from './useEndControlHooks';
 import logger from '../../../utils/common/logger';
-import popup from '../../common/PopUpH5.vue';
-import SvgIcon from '../../common/SvgIcon.vue';
-import Avatar from '../../base/Avatar.vue';
+import popup from '../../common/base/PopUpH5.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import CorrectIcon from '../../common/icons/CorrectIcon.vue';
+import Avatar from '../../common/Avatar.vue';
 import '../../../directives/vTap';
+import EndRoomIcon from '../../common/icons/EndRoomIcon.vue';
+import TUIMessage from '../../common/base/Message/index';
+import TUIMessageBox from '../../common/base/MessageBox/index';
 
 const {
   t,
@@ -118,11 +124,38 @@ const {
   filteredList,
   selectedUser,
   showSideBar,
+  remoteAnchorList,
+  isMasterWithOneRemoteAnchor,
+  isMasterWithRemoteAnchors,
+  isMasterWithoutRemoteAnchors,
 } = useEndControl();
 
 
 const emit = defineEmits(['on-exit-room', 'on-destroy-room']);
-
+function handleEndBtnClick() {
+  if (isMasterWithoutRemoteAnchors.value) {
+    dismissRoom();
+  } else {
+    stopMeeting();
+  }
+}
+function handleEndLeaveClick() {
+  if (!roomStore.isMaster) {
+    leaveRoom();
+    return;
+  }
+  if (isMasterWithRemoteAnchors.value) {
+    selectedUser.value = remoteAnchorList.value[0].userId;
+    if (isMasterWithOneRemoteAnchor.value) {
+      transferAndLeave();
+      return;
+    }
+    currentDialogType.value = DialogType.TransferDialog;
+    toggleMangeMemberSidebar();
+    resetState();
+    return;
+  }
+}
 
 /**
  * Active room dismissal
@@ -148,11 +181,6 @@ async function dismissRoom() {
 **/
 async function leaveRoom() { // eslint-disable-line
   try {
-    if (roomStore.isMaster) {
-      toggleMangeMemberSidebar();
-      resetState();
-      return;
-    }
     await closeMediaBeforeLeave();
     const response = await roomEngine.instance?.exitRoom();
     logger.log(`${logPrefix}leaveRoom:`, response);
@@ -192,10 +220,11 @@ const onRoomDismissed = async (eventInfo: { roomId: string}) => {
   try {
     const { roomId } = eventInfo;
     logger.log(`${logPrefix}onRoomDismissed:`, roomId);
-    ElMessageBox.alert(t('The host closed the room.'), t('Note'), {
-      customClass: 'custom-element-class',
-      confirmButtonText: t('Confirm'),
-      appendTo: '#roomContainer',
+    TUIMessageBox({
+      title: t('Note'),
+      message: t('The host closed the room.'),
+      appendToRoomContainer: true,
+      confirmButtonText: t('Sure'),
       callback: async () => {
         resetState();
         emit('on-destroy-room', { code: 0, message: '' });
@@ -220,7 +249,7 @@ const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }
       newName = t('me');
     }
     const tipMessage = `${t('Moderator changed to ')}${newName}`;
-    ElMessage({
+    TUIMessage({
       type: 'success',
       message: tipMessage,
     });
@@ -250,11 +279,8 @@ onUnmounted(() => {
 
 </script>
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 .end-control-container{
   .end-button {
-    border: 1px solid #FF2E2E;
-    border-radius: 4px;
     font-weight: 400;
     font-size: 12px;
     color: #FF2E2E;
@@ -262,10 +288,9 @@ onUnmounted(() => {
     cursor: pointer;
     text-align: center;
     line-height: 21px;
-    padding:  0 8px;
-    &:hover {
-      background-color: #FF2E2E;
-      color: $whiteColor;
+    display: flex;
+    .end-button-title {
+      margin-left: 3px;
     }
   }
 }
@@ -379,6 +404,12 @@ onUnmounted(() => {
   top: 0;
   height: 100vh;
   z-index: 102;
+  .transfer-list-container{
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
   .transfer-header {
     display: flex;
     justify-content: center;
@@ -416,8 +447,12 @@ onUnmounted(() => {
       }
   }
   .transfer-body {
-    flex: 1;
     overflow-y: scroll;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-top: 20px;
     .transfer-list-content{
       padding-bottom: 5px;
     .transfer-item-container {

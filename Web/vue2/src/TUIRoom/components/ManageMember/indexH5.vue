@@ -14,7 +14,7 @@
         <member-item v-for="(userInfo) in userList" :key="userInfo.userId" :user-info="userInfo"></member-item>
       </div>
     </div>
-    <div class="manage-member-bottom">
+    <div v-if="isMaster" class="manage-member-bottom">
       <div
         class="manage-member-button"
         :class="isMicrophoneDisableForAllUser ? 'lift-all' : ''"
@@ -30,24 +30,15 @@
         {{ videoManageInfo }}
       </div>
     </div>
-    <Dialog
-      :model-value="showManageAllUserDialog"
-      class="custom-element-class"
-      :modal="false"
-      :show-close="false"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      width="500px"
-    >
+    <Dialog v-model="showManageAllUserDialog">
       <span>
         {{ dialogTitleInfo }}
       </span>
-      <template #footer>
-        <div class="button-container-mobile">
-          <span class="cancel" @click="showManageAllUserDialog = false">{{ t('Cancel') }}</span>
-          <span class="agree" @click="doToggleManageMember">{{ dialogActionInfo }}</span>
-        </div>
+      <template #cancel>
+        <tui-button class="cancel" type="text" @click="showManageAllUserDialog = false">{{ t('Cancel') }}</tui-button>
+      </template>
+      <template #agree>
+        <tui-button class="agree" type="text" @click="doToggleManageMember">{{ dialogActionInfo }}</tui-button>
       </template>
     </Dialog>
   </div>
@@ -55,10 +46,11 @@
 
 <script setup lang='ts'>
 import MemberItem from '../ManageMember/MemberItem';
-import Dialog from '../../elementComp/Dialog';
+import Dialog from '../common/base/Dialog';
 import useIndex from './useIndexHooks';
 import { storeToRefs } from 'pinia';
 import { useRoomStore } from '../../stores/room';
+import TuiButton from '../common/base/Button.vue';
 const roomStore = useRoomStore();
 const {
   userList,
@@ -66,6 +58,7 @@ const {
   applyToAnchorList,
   isMicrophoneDisableForAllUser,
   isCameraDisableForAllUser,
+  isMaster,
 } = storeToRefs(roomStore);
 
 const {
@@ -256,27 +249,17 @@ const {
     }
   }
 }
-.button-container-mobile{
-  width: 100%;
-  display: flex;
-  .agree{
+  .agree, .cancel{
     padding: 14px;
     width: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid #F2F2F2;
-    color: #006EFF;
+    color: var(--active-color-1);
+    font-size: 16px;
+    font-weight: 500;
   }
   .cancel{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-top: 1px solid #F2F2F2;
-    color: #2B2E38;
-    border-right: 1px solid #F2F2F2;
+    color: var(--font-color-4);
   }
-}
 </style>

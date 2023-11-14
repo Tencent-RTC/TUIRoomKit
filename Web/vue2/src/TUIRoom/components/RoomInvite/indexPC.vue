@@ -1,106 +1,76 @@
 <template>
   <div class="invite-container">
-    <div class="invite-notice">{{ t('Share the room ID or invite link') }}</div>
-    <div class="invite-content">
-      <div class="invite-item">
-        <span class="invite-title">{{ t('Invite by room number') }}</span>
-        <div class="input-area">
-          <input class="input" type="text" :value="roomId">
-          <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(roomId)"></svg-icon>
-        </div>
-      </div>
-      <div v-if="isRoomLinkVisible" class="invite-item">
-        <span class="invite-title">{{ t('Invite via room link') }}</span>
-        <div class="input-area">
-          <input class="input" type="text" :value="inviteLink">
-          <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(inviteLink)"></svg-icon>
-        </div>
-      </div>
-      <div class="invite-item">
-        <span class="invite-title">{{ t('Invite via client scheme') }}</span>
-        <div class="input-area">
-          <input class="input" type="text" :value="schemeLink">
-          <svg-icon icon-name="copy-icon" class="copy" @click="onCopy(schemeLink)"></svg-icon>
-        </div>
-      </div>
+    <div
+      v-for="item in visibleInviteContentList"
+      :key="item.id"
+      class="invite-item"
+    >
+      <div class="invite-title">{{ t(item.pcTitle) }}</div>
+      <div class="invite-content">{{ item.content }}</div>
+      <svg-icon class="copy-icon" @click="onCopy(item.copyLink)">
+        <copy-icon></copy-icon>
+      </svg-icon>
     </div>
-    <!-- <div>允许访客通过链接进入房间</div> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import useRoomInviteControl from './useRoomInviteHooks';
-import SvgIcon from '../common/SvgIcon.vue';
+import SvgIcon from '../common/base/SvgIcon.vue';
+import CopyIcon from '../common/icons/CopyIcon.vue';
 
-const {
-  t,
-  isRoomLinkVisible,
-  roomId,
-  inviteLink,
-  schemeLink,
-  onCopy,
-} = useRoomInviteControl();
-
+const { t, visibleInviteContentList, onCopy } = useRoomInviteControl();
 </script>
 
 <style lang="scss" scoped>
-.invite-container{
-  padding: 20px 32px;
-}
-.invite-notice{
-  font-size: 14px;
-  width: 100%;
-  height: 22px;
-  line-height: 22px;
-  opacity: 0.8;
-  font-weight: 400;
-  color: var(--input-font-color);
-  font-family: PingFangSC-Regular;
-}
-.invite-content{
-  width: 100%;
-  margin-top: 20px;
+.invite-container {
+  padding: 20px;
   .invite-item {
+    display: flex;
+    flex-direction: column;
+    position: relative;
     &:not(:first-child) {
       margin-top: 20px;
     }
     .invite-title {
       font-size: 14px;
-      color: var(--more-notice-color);
+      font-weight: 400;
+      line-height: 22px;
+      color: var(--font-color-5);
       width: 100%;
-      opacity: 0.8;
+      padding-bottom: 8px;
     }
-    .input-area {
-      margin-top: 10px;
+
+    .invite-content {
+      flex: 1;
+      background-color: var(--background-color-7);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-sizing: border-box;
+      color: var(--font-color-6);
+      display: inline-block;
+      font-size: 14px;
+      height: 42px;
+      font-weight: 500;
+      line-height: 22px;
+      outline: none;
+      padding: 10px 30px 10px 16px;
+      transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       position: relative;
-      .input{
-        appearance: none;
-        -webkit-appearance: none;
-        background-color: var(--input-bg-color);
-        background-image: none;
-        border-radius: 2px;
-        border: 1px solid var(--input-border-color);
-        box-sizing: border-box;
-        color: var(--input-font-color);
-        opacity: 0.8;
-        display: inline-block;
-        font-size: 14px;
-        height: 32px;
-        line-height: 32px;
-        outline: none;
-        padding: 0 40px 0 10px;
-        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
-        width: 416px;
-      }
-      .copy {
-        width: 14px;
-        height: 14px;
-        position: absolute;
-        top: 50%;
-        right: 10px;
-        transform: translateY(-50%);
-        cursor: pointer;
-      }
+    }
+    .copy-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      position: absolute;
+      top: 36px;
+      right: 0;
     }
   }
 }
