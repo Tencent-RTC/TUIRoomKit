@@ -68,7 +68,7 @@ import StopScreenShareIcon from '../../common/icons/StopScreenShareIcon.vue';
 import { ICON_NAME } from '../../../constants/icon';
 import { useRoomStore } from '../../../stores/room';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
-import { ElMessage } from '../../../elementComp';
+import TUIMessage from '../../common/base/Message';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import eventBus from '../../../hooks/useMitt';
 import Dialog from '../../common/base/Dialog.vue';
@@ -96,7 +96,7 @@ async function toggleScreenShare() {
     return;
   }
   if (hasOtherScreenShare.value) {
-    ElMessage({
+    TUIMessage({
       type: 'warning',
       message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
       duration: MESSAGE_DURATION.LONG,
@@ -126,14 +126,14 @@ async function onPermissionScreenShare() {
 
 function onConfirmScreenShare(screenInfo: TRTCScreenCaptureSourceInfo) {
   if (hasOtherScreenShare.value) {
-    ElMessage({
+    TUIMessage({
       type: 'warning',
       message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
   }
-  roomEngine.instance?.startScreenSharingElectron(screenInfo.sourceId);
+  roomEngine.instance?.startScreenSharingElectron({ targetId: screenInfo.sourceId });
   isSharing.value = true;
   selectDialogVisible.value = false;
 }
@@ -150,7 +150,7 @@ onUnmounted(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../assets/style/var.scss';
 @import '../../../assets/style/element-custom.scss';
 .screen-share-control-container {

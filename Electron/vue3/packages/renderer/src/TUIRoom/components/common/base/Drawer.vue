@@ -23,33 +23,32 @@
   * 在 template 中使用 <Drawer title="there is title" v-model="showDrawer"></Drawer>
 -->
 <template>
-  <teleport to="body" :disabled="teleportDisable">
-    <div
-      v-if="visible"
-      class="overlay-container"
-      :class="[modal && 'overlay']"
-      @mouseup="handleOverlayMouseUp"
-      @mousedown="handleOverlayMouseDown"
-      @click="handleOverlayClick"
-    >
-      <div class="drawer-container" :style="drawerContainerStyle">
-        <div class="drawer-header">
-          <div class="drawer-header-title">
-            {{ title }}
-          </div>
-          <template v-if="$slots.title">
-            <slot name="title"></slot>
-          </template>
-          <div class="close" @click="handleClose">
-            <svg-icon :size="16" :icon="CloseIcon" />
-          </div>
+  <div
+    v-if="visible"
+    class="overlay-container"
+    :class="[modal && 'overlay']"
+    ref="drawerRef"
+    @mouseup="handleOverlayMouseUp"
+    @mousedown="handleOverlayMouseDown"
+    @click="handleOverlayClick"
+  >
+    <div class="drawer-container" :style="drawerContainerStyle">
+      <div class="drawer-header">
+        <div class="drawer-header-title">
+          {{ title }}
         </div>
-        <div class="drawer-content">
-          <slot></slot>
+        <template v-if="$slots.title">
+          <slot name="title"></slot>
+        </template>
+        <div class="close" @click="handleClose">
+          <svg-icon :size="16" :icon="CloseIcon" />
         </div>
       </div>
+      <div class="drawer-content">
+        <slot></slot>
+      </div>
     </div>
-  </teleport>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -68,6 +67,7 @@ interface Props {
   size?: string | number,
   beforeClose?: BeforeCloseFn | undefined;
   appendToBody?: boolean,
+  appendToRoomContainer?: false;
   closeOnClickModal?: boolean,
 }
 
@@ -78,18 +78,28 @@ const props = withDefaults(defineProps<Props>(), {
   size: '400',
   beforeClose: undefined,
   appendToBody: false,
+  appendToRoomContainer: false,
   closeOnClickModal: true,
 });
 
 const emit = defineEmits(['update:modelValue']);
 
-const teleportDisable = computed(() => !props.appendToBody);
-
+const drawerRef = ref();
 const visible = ref(false);
 const drawerContainerStyle = computed(() => `width: ${addSuffix(props.size)}`);
 
 watch(() => props.modelValue, (val) => {
   visible.value = val;
+});
+
+watch(visible, (val) => {
+  if (val) {
+    if (props.appendToBody) {
+      document.body.appendChild(drawerRef.value);
+    } else if (props.appendToRoomContainer) {
+      document.getElementById('roomContainer')?.appendChild(drawerRef.value);
+    }
+  }
 });
 
 function doClose() {

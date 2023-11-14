@@ -1,21 +1,23 @@
 <template>
   <div class="header-container">
     <div class="left-container">
+      <switch-theme class="header-item"></switch-theme>
+      <layout-control class="header-item"></layout-control>
+      <!-- <network-info></network-info> -->
+    </div>
+    <div class="center-container">
+      <room-info class="header-item"></room-info>
+    </div>
+    <div class="right-container">
+      <language v-show="showHeaderInfo" class="header-item"></language>
       <user-info
         v-show="showHeaderInfo"
-        class="header-item user-info"
+        class="header-item"
         :user-id="userId"
         :user-name="userName"
         :avatar-url="avatarUrl"
         @log-out="$emit('log-out')"
       ></user-info>
-      <language v-show="showHeaderInfo" class="header-item language"></language>
-      <switch-theme class="header-item theme"></switch-theme>
-    </div>
-    <div class="right-container">
-      <!-- <network-info></network-info> -->
-      <!-- <info-control></info-control> -->
-      <layout-control class="right-container-item"></layout-control>
     </div>
   </div>
 </template>
@@ -23,15 +25,9 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 import UserInfo from '../UserInfo/index.vue';
-import Language from '../../base/Language.vue';
-import SwitchTheme from '../../base/SwitchTheme.vue';
-// import NetworkInfo from './NetworkInfo.vue';
-/**
- * [info] Functions to be improved
- *
- * 【info】功能待完善
-**/
-// import InfoControl from './InfoControl.vue';
+import Language from '../../common/Language.vue';
+import SwitchTheme from '../../common/SwitchTheme.vue';
+import RoomInfo from '../RoomInfo/index.vue';
 import LayoutControl from './LayoutControl.vue';
 import { useBasicStore } from '../../../stores/basic';
 import { storeToRefs } from 'pinia';
@@ -67,6 +63,14 @@ defineEmits(['log-out']);
       margin-left: 1rem;
     }
   }
+  .center-container {
+    position: absolute;
+    left: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    transform: translateX(-50%);
+  }
   .right-container {
     position: absolute;
     top: 0;
@@ -76,7 +80,7 @@ defineEmits(['log-out']);
     padding-right: 24px;
     display: flex;
     align-items: center;
-    .right-container-item:not(:last-child) {
+    .header-item:not(:last-child) {
       margin-right: 1rem;
     }
 

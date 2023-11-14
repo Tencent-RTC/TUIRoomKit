@@ -5,12 +5,12 @@
         <search-icon></search-icon>
         <input v-model="searchText" class="search-input" :placeholder="t('Search Member')">
       </div>
-      <Button class="invite-button" type="primary" @click="handleInvite">
+      <tui-button class="invite-button" type="primary" @click="handleInvite">
         <template #icon>
           <invite-solid-icon></invite-solid-icon>
         </template>
         {{ t('Invite') }}
-      </Button>
+      </tui-button>
     </div>
     <div v-if="applyToAnchorList.length > 0" class="apply-on-stage-info">
       <div class="apply-info">
@@ -21,13 +21,13 @@
     <div id="memberListContainer" class="member-list-container">
       <member-item v-for="(userInfo) in showUserList" :key="userInfo.userId" :user-info="userInfo"></member-item>
     </div>
-    <div class="global-setting">
-      <Button class="button" size="default" @click="toggleAllAudio">
+    <div v-if="isMaster" class="global-setting">
+      <tui-button class="button" size="default" @click="toggleAllAudio">
         {{ isMicrophoneDisableForAllUser ? t('Enable all audios') : t('Disable all audios') }}
-      </Button>
-      <Button class="button" size="default" @click="toggleAllVideo">
+      </tui-button>
+      <tui-button class="button" size="default" @click="toggleAllVideo">
         {{ isCameraDisableForAllUser ? t('Enable all videos') : t('Disable all videos') }}
-      </Button>
+      </tui-button>
     </div>
   </div>
 </template>
@@ -39,7 +39,7 @@ import InviteSolidIcon from '../common/icons/InviteSolidIcon.vue';
 import { storeToRefs } from 'pinia';
 import { useRoomStore } from '../../stores/room';
 import useIndex from './useIndexHooks';
-import Button from '../common/base/Button.vue';
+import TuiButton from '../common/base/Button.vue';
 
 const roomStore = useRoomStore();
 
@@ -47,6 +47,7 @@ const {
   applyToAnchorList,
   isMicrophoneDisableForAllUser,
   isCameraDisableForAllUser,
+  isMaster,
 } = storeToRefs(roomStore);
 
 const {

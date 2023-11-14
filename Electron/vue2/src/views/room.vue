@@ -14,7 +14,7 @@
 
 <script>
 import RoomContainer from '@/TUIRoom/index.vue';
-import { MessageBox } from 'element-ui';
+import TUIMessageBox from '@/TUIRoom/components/common/base/MessageBox';
 import logger from '../TUIRoom/utils/common/logger';
 export default {
   name: 'Room',
@@ -55,9 +55,11 @@ export default {
           await this.$refs.TUIRoomRef.createRoom({ roomId: this.roomId, roomName: this.roomId, roomMode, roomParam });
         } catch (error) {
           const message = this.$t('Failed to enter the room.') + error.message;
-          MessageBox.alert(message, this.$t('Note'), {
-            customClass: 'custom-element-class',
-            confirmButtonText: this.$t('Confirm'),
+          TUIMessageBox({
+            title: this.$t('Note'),
+            message,
+            appendToRoomContainer: true,
+            confirmButtonText: this.$t('Sure'),
             callback: () => {
               this.$router.push({ path: 'home' });
             },
@@ -68,9 +70,11 @@ export default {
           await this.$refs.TUIRoomRef.enterRoom({ roomId: this.roomId, roomParam });
         } catch (error) {
           const message = this.$t('Failed to enter the room.') + error.message;
-          MessageBox.alert(message, this.$t('Note'), {
-            customClass: 'custom-element-class',
-            confirmButtonText: this.$t('Confirm'),
+          TUIMessageBox({
+            title: this.$t('Note'),
+            message,
+            appendToRoomContainer: true,
+            confirmButtonText: this.$t('Sure'),
             callback: () => {
               this.$router.push({ path: 'home' });
             },
@@ -79,9 +83,11 @@ export default {
       }
     } catch (error) {
       const message = this.$t('Failed to enter the room.') + error.message;
-      MessageBox.alert(message, this.$t('Note'), {
-        customClass: 'custom-element-class',
-        confirmButtonText: this.$t('Confirm'),
+      TUIMessageBox({
+        title: this.$t('Note'),
+        message,
+        appendToRoomContainer: true,
+        confirmButtonText: this.$t('Sure'),
         callback: () => {
           sessionStorage.removeItem('tuiRoom-currentUserInfo');
           this.$router.push({ path: 'home' });
@@ -120,7 +126,7 @@ export default {
     /**
      * Ordinary members were kicked out of the room by the host
      * 普通成员被主持人踢出房间
-    **/
+     **/
     onKickedOutOfRoom(info) {
       logger.debug('onKickedOutOfRoom:', info);
       sessionStorage.removeItem('tuiRoom-roomInfo');
@@ -153,10 +159,10 @@ export default {
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: PingFang SC;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #B3B8C8;
+  color: #b3b8c8;
   position: relative;
   width: 100%;
   height: 100%;

@@ -40,7 +40,7 @@
 </template>
 <script setup lang="ts">
 import { ref, Ref, watch } from 'vue';
-import { ElMessage } from '../../../elementComp/index';
+import TUIMessage from '../../common/base/Message';
 import { TRTCScreenCaptureSourceInfo } from '@tencentcloud/tuiroom-engine-electron';
 import ScreenWindowPreviewer from './ScreenWindowPreviewer.vue';
 import { MESSAGE_DURATION } from '../../../constants/message';
@@ -78,7 +78,7 @@ function start() {
   if (selected?.value) {
     emit('on-confirm', selected.value);
   } else {
-    ElMessage({
+    TUIMessage({
       type: 'warning',
       message: t('Select a screen or window first'),
       duration: MESSAGE_DURATION.LONG,
