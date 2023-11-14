@@ -63,6 +63,7 @@ function handleCloseInvite() {
   height: auto;
   box-sizing: border-box;
   background-color: var(--log-out-mobile);
+  z-index: 1;
 }
 </style>
 

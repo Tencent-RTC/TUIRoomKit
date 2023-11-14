@@ -61,7 +61,7 @@ const portStart = 8080;
 function gerServer() {
   return `http://localhost:${portStart}`;
 }
-
+let isHasScreen = false;
 async function checkAndApplyDeviceAccessPrivilege() {
   const cameraPrivilege = systemPreferences.getMediaAccessStatus('camera');
   console.log(`checkAndApplyDeviceAccessPrivilege before apply cameraPrivilege: ${cameraPrivilege}`);
@@ -77,6 +77,9 @@ async function checkAndApplyDeviceAccessPrivilege() {
 
   const screenPrivilege = systemPreferences.getMediaAccessStatus('screen');
   console.log(`checkAndApplyDeviceAccessPrivilege before apply screenPrivilege: ${screenPrivilege}`);
+  if (screenPrivilege === 'granted') {
+    isHasScreen = true;
+  }
 }
 
 async function createWindow() {
@@ -107,6 +110,9 @@ async function createWindow() {
 
   win.webContents.on('did-finish-load', () =>  {
     win.webContents.send('crash-file-path', `${crashFilePath}|${crashDumpsDir}`);
+    win?.webContents.send('main-process-message', {
+      isHasScreen,
+    });
   });
 
   if (param.TRTC_ENV === 'production') {

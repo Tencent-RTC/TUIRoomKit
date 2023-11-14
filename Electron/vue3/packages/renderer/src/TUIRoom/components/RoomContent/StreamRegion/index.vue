@@ -222,7 +222,6 @@ watch(
           **/
           if (props.stream.hasVideoStream) {
             await roomEngine.instance?.setLocalVideoView({
-              streamType: streamTypeToFetch.value,
               view: `${playRegionDomId.value}`,
             });
           }
@@ -237,7 +236,6 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 
 @keyframes loading-rotate {
   0% {
@@ -291,7 +289,7 @@ watch(
     border-radius: 16px;
     display: flex;
     background: var(--user-info-container-bg-color);
-    color: $whiteColor;
+    color: #FFFFFF;
     align-items: center;
     align-content: center;
     padding: 0 10px 0 0;

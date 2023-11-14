@@ -3,18 +3,19 @@
     <icon-button
       :is-active="sidebarName === 'more'"
       :title="t('More')"
-      :icon-name="iconName"
+      :icon="MoreIcon"
       @click-icon="toggleMoreSidebar"
-    />
+    >
+    </icon-button>
   </div>
 </template>
 <script setup lang="ts">
-import IconButton from '../../common/IconButton.vue';
+import IconButton from '../../common/base/IconButton.vue';
+import MoreIcon from '../../common/icons/MoreIcon.vue';
 import userMoreControl from './useMoreControlHooks';
 
 const {
   t,
-  iconName,
   basicStore,
   sidebarName,
 } = userMoreControl();

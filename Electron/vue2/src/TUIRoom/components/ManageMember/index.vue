@@ -1,68 +1,60 @@
 <template>
   <div class="manage-member-container">
+    <div class="manage-member-header">
+      <div class="search-container">
+        <search-icon></search-icon>
+        <input v-model="searchText" class="search-input" :placeholder="t('Search Member')">
+      </div>
+      <tui-button class="invite-button" type="primary" @click="handleInvite">
+        <template #icon>
+          <invite-solid-icon></invite-solid-icon>
+        </template>
+        {{ t('Invite') }}
+      </tui-button>
+    </div>
     <div v-if="applyToAnchorList.length > 0" class="apply-on-stage-info">
       <div class="apply-info">
         {{ `${applyToAnchorList[0].userName || applyToAnchorList[0].userId} ${t('Applying for the stage')}` }}
       </div>
       <div class="button" @click="showApplyUserLit">{{ t('Check') }}</div>
     </div>
-    <div class="global-setting">
-      <div class="setting-item">
-        <div class="item-left-section">
-          <svg-icon
-            class="setting-icon" :icon-name="ICON_NAME.MicOn" size="large"
-          />
-          <span class="setting-name">{{ t('Disable all audios') }}</span>
-        </div>
-        <div class="item-right-section">
-          <el-switch :value="isMicrophoneDisableForAllUser" @change="toggleAllAudio" />
-        </div>
-      </div>
-      <div class="setting-item">
-        <div class="item-left-section">
-          <svg-icon
-            class="setting-icon" :icon-name="ICON_NAME.CameraOn" size="large"
-          />
-          <span class="setting-name">{{ t('Disable all videos') }}</span>
-        </div>
-        <div class="item-right-section">
-          <el-switch :value="isCameraDisableForAllUser" @change="toggleAllVideo" />
-        </div>
-      </div>
+    <div id="memberListContainer" class="member-list-container">
+      <member-item v-for="(userInfo) in showUserList" :key="userInfo.userId" :user-info="userInfo"></member-item>
     </div>
-    <div class="divide-line"></div>
-    <div class="member-list-container">
-      <div class="member-list-header">
-        {{ t('Member List') }}
-        <span class="member-count">({{ userNumber }}{{ t('members') }})</span>
-      </div>
-      <div class="member-list-content">
-        <member-item v-for="(userInfo) in userList" :key="userInfo.userId" :user-info="userInfo"></member-item>
-      </div>
+    <div v-if="isMaster" class="global-setting">
+      <tui-button class="button" size="default" @click="toggleAllAudio">
+        {{ isMicrophoneDisableForAllUser ? t('Enable all audios') : t('Disable all audios') }}
+      </tui-button>
+      <tui-button class="button" size="default" @click="toggleAllVideo">
+        {{ isCameraDisableForAllUser ? t('Enable all videos') : t('Disable all videos') }}
+      </tui-button>
     </div>
   </div>
 </template>
 
 <script setup lang='ts'>
 import MemberItem from '../ManageMember/MemberItem/index.vue';
-import SvgIcon from '../common/SvgIcon.vue';
-
-import { ICON_NAME } from '../../constants/icon';
+import SearchIcon from '../common/icons/SearchIcon.vue';
+import InviteSolidIcon from '../common/icons/InviteSolidIcon.vue';
 import { storeToRefs } from 'pinia';
 import { useRoomStore } from '../../stores/room';
 import useIndex from './useIndexHooks';
+import TuiButton from '../common/base/Button.vue';
+
 const roomStore = useRoomStore();
 
 const {
-  userList,
-  userNumber,
   applyToAnchorList,
   isMicrophoneDisableForAllUser,
   isCameraDisableForAllUser,
+  isMaster,
 } = storeToRefs(roomStore);
 
 const {
   t,
+  searchText,
+  showUserList,
+  handleInvite,
   showApplyUserLit,
   toggleAllAudio,
   toggleAllVideo,
@@ -71,14 +63,55 @@ const {
 </script>
 
 <style lang="scss" scoped>
+
+.tui-theme-black .search-container {
+  --background-color: rgba(79, 88, 107, 0.30);
+  --font-color: #636A7E;
+}
+.tui-theme-white .search-container {
+  --background-color: var(--background-color-3);
+  --font-color: var(--font-color-1);
+}
+
   .manage-member-container {
     position: relative;
     height: 100%;
     display: flex;
     flex-direction: column;
+
+    .manage-member-header {
+      padding: 23px 20px 0 20px;
+      display: flex;
+      justify-content: space-around;
+      .search-container {
+        height: 32px;
+        border-radius: 16px;
+        padding: 0 16px;
+        background-color: var(--background-color);
+        color: var(--font-color-1);
+        display: flex;
+        align-items: center;
+        flex: 1;
+        .search-input {
+          margin-left: 8px;
+          font-size: 14px;
+          outline: none;
+          border: none;
+          background: none;
+          width: 100%;
+          color: var(--font-color-1);
+        }
+      }
+      .invite-button {
+        width: 85px;
+        height: 32px;
+        margin-left: 10px;
+      }
+    }
     .apply-on-stage-info {
       width: 100%;
       height: 60px;
+      margin-top: 14px;
       background-image: linear-gradient(235deg, #1883FF 0%, #0062F5 100%);
       padding: 0 20px 0 32px;
       display: flex;
@@ -103,55 +136,20 @@ const {
         cursor: pointer;
       }
     }
-    .setting-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 32px;
-      .setting-icon {
-        width: 32px;
-        height: 32px;
-      }
-      .item-left-section {
-        display: flex;
-        align-items: center;
-
-        .setting-name {
-          font-size: 14px;
-          margin-left: 8px;
-          color: var(--setting-name-color);
-        }
-      }
-    }
-    .divide-line {
-      height: 1px;
-      width: 100%;
-      background: var(--el-drawer-divide);
-      box-shadow: 0 -1px 0 0 var(--divide-line-color);
-    }
-    .member-list-container {
-      overflow-y: scroll;
-      padding: 10px 0;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      .member-count {
-        margin-left: 5px;
-      }
-      &::-webkit-scrollbar {
-        display: none;
-      }
-      .member-list-header {
-        padding: 0 32px;
-        font-weight: 500;
-        font-size: 14px;
-        color: var(--input-font-color);
-        line-height: 24px;
-      }
-      .member-list-content {
-        margin-top: 15px;
-        flex: 1;
-        overflow-y: scroll;
-      }
+  .member-list-container {
+    overflow-y: scroll;
+    flex: 1;
+    margin-top: 10px;
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+      display: none;
     }
   }
+  .global-setting {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+  }
+
+}
 </style>

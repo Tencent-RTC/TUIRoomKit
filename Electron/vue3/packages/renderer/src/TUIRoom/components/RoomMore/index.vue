@@ -1,11 +1,19 @@
 <template>
   <div class="more-container">
-    <div class="more-notice">{{ t('Join our QQ group chat or email us.') }}</div>
-    <div v-for="item in contactContentList" :key="item.id" class="more-item">
-      <div class="more-title">{{ t(item.title) }}</div>
-      <div class="more-content">{{ item.content }}</div>
-      <svg-icon class="copy-icon" @click="onCopy(item.copyLink)">
-        <copy-icon></copy-icon>
+    <div class="more-title">
+      <svg-icon class="email-icon" :icon="EmailIcon"></svg-icon>
+      <div class="more-notice">{{ t('If you have any questions, please email us.') }}</div>
+    </div>
+    <div v-if="isZH" class="more-item">
+      <div class="item-title">{{ t('Join our product discussion group') }}</div>
+      <tui-button class="join-button" type="primary" @click="handleClick">
+        {{ t('Join now') }}
+      </tui-button>
+    </div>
+    <div class="more-item">
+      <div class="item-title">{{ t('Our email address') }}</div>
+      <div class="more-content">{{ email }}</div>
+      <svg-icon class="copy-icon" :icon="CopyIcon" @click="onCopy(email)">
       </svg-icon>
     </div>
   </div>
@@ -15,20 +23,30 @@
 import useRoomMoreControl from './useRoomMoreHooks';
 import SvgIcon from '../common/base/SvgIcon.vue';
 import CopyIcon from '../common/icons/CopyIcon.vue';
+import EmailIcon from '../common/icons/EmailIcon.vue';
+import TuiButton from '../common/base/Button.vue';
 
-const { t, onCopy, contactContentList } = useRoomMoreControl();
+
+const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
 </script>
 
 <style lang="scss" scoped>
 .more-container {
   padding: 20px;
-  .more-notice {
-    font-size: 14px;
-    width: 100%;
-    height: 22px;
-    line-height: 22px;
-    font-weight: 400;
-    color: var(--font-color-5);
+  .more-title {
+    display: flex;
+    .email-icon {
+      color: #7c85a6;
+    }
+    .more-notice {
+      font-size: 14px;
+      width: 100%;
+      height: 22px;
+      line-height: 22px;
+      font-weight: 400;
+      color: var(--font-color-5);
+      padding-left: 8px;
+    }
   }
   .more-item {
     display: flex;
@@ -36,13 +54,17 @@ const { t, onCopy, contactContentList } = useRoomMoreControl();
     position: relative;
     &:not(:first-child) {
       margin-top: 20px;
-      .more-title {
+      .item-title {
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
         color: var(--font-color-5);
         width: 100%;
         padding-bottom: 8px;
+      }
+      .join-button {
+        height: 42px;
+        font-weight: 600;
       }
       .more-content {
         flex: 1;

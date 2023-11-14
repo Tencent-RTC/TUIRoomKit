@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { useBasicStore } from '../../stores/basic';
-import { ElMessage } from '../../elementComp';
+import TUIMessage from '../common/base/Message/index';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
 import { isElectronEnv, clipBoard } from '../../utils/utils';
@@ -28,12 +28,12 @@ export default function useRoomInvite() {
   async function onCopy(value: string | number) {
     try {
       await clipBoard(value);
-      ElMessage({
+      TUIMessage({
         message: t('Copied successfully'),
         type: 'success',
       });
     } catch (error) {
-      ElMessage({
+      TUIMessage({
         message: t('Copied failure'),
         type: 'error',
       });
