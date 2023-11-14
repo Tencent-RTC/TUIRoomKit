@@ -90,7 +90,6 @@
 
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
-import { ElMessageBox, ElMessage } from '../../../elementComp';
 import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useEndControl from './useEndControlHooks';
 import logger from '../../../utils/common/logger';
@@ -100,6 +99,8 @@ import CorrectIcon from '../../common/icons/CorrectIcon.vue';
 import Avatar from '../../common/Avatar.vue';
 import vTap from '../../../directives/vTap';
 import EndRoomIcon from '../../common/icons/EndRoomIcon.vue';
+import TUIMessage from '../../common/base/Message/index';
+import TUIMessageBox from '../../common/base/MessageBox/index';
 
 const {
   t,
@@ -219,10 +220,11 @@ const onRoomDismissed = async (eventInfo: { roomId: string}) => {
   try {
     const { roomId } = eventInfo;
     logger.log(`${logPrefix}onRoomDismissed:`, roomId);
-    ElMessageBox.alert(t('The host closed the room.'), t('Note'), {
-      customClass: 'custom-element-class',
-      confirmButtonText: t('Confirm'),
-      appendTo: '#roomContainer',
+    TUIMessageBox({
+      title: t('Note'),
+      message: t('The host closed the room.'),
+      appendToRoomContainer: true,
+      confirmButtonText: t('Sure'),
       callback: async () => {
         resetState();
         emit('on-destroy-room', { code: 0, message: '' });
@@ -247,7 +249,7 @@ const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }
       newName = t('me');
     }
     const tipMessage = `${t('Moderator changed to ')}${newName}`;
-    ElMessage({
+    TUIMessage({
       type: 'success',
       message: tipMessage,
     });
@@ -277,7 +279,6 @@ onUnmounted(() => {
 
 </script>
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 .end-control-container{
   .end-button {
     font-weight: 400;

@@ -20,7 +20,7 @@
       @click="handleVideoMediaClick"
     ></video-media-control>
     <Dialog
-      :model-value="showRequestOpenCameraDialog"
+      v-model="showRequestOpenCameraDialog"
       :title="title"
       :modal="true"
       :show-close="false"
@@ -32,18 +32,18 @@
         {{ t('The host invites you to turn on the camera') }}
       </span>
       <template v-if="isMobile" #cancel>
-        <Button class="cancel" size="default" type="primary" @click="handleReject">
+        <tui-button class="cancel" size="default" type="text" @click="handleReject">
           {{ t('Keep it closed') }}
-        </Button>
+        </tui-button>
       </template>
       <template v-if="isMobile" #agree>
-        <Button class="agree" size="default" @click="handleAccept">{{ t('Turn on the camera') }}</Button>
+        <tui-button class="agree" size="default" type="text" @click="handleAccept">{{ t('Turn on the camera') }}</tui-button>
       </template>
       <template #footer>
-        <Button class="cancel-button" size="default" @click="handleAccept">{{ t('Turn on the camera') }}</Button>
-        <Button class="cancel-button" size="default" type="primary" @click="handleReject">
+        <tui-button class="cancel-button" size="default" @click="handleAccept">{{ t('Turn on the camera') }}</tui-button>
+        <tui-button class="cancel-button" size="default" type="primary" @click="handleReject">
           {{ t('Keep it closed') }}
-        </Button>
+        </tui-button>
       </template>
     </Dialog>
   </div>
@@ -52,7 +52,6 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted, Ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessageBox, ElMessage } from '../../elementComp';
 import Dialog from '../common/base/Dialog';
 import VideoMediaControl from '../common/VideoMediaControl.vue';
 import { useRoomStore } from '../../stores/room';
@@ -63,7 +62,9 @@ import useGetRoomEngine from '../../hooks/useRoomEngine';
 import TUIRoomEngine, { TUIVideoStreamType, TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
 import { isMobile, isWeChat }  from '../../utils/useMediaValue';
 import { useBasicStore } from '../../stores/basic';
-import Button from '../common/base/Button.vue';
+import TuiButton from '../common/base/Button.vue';
+import TUIMessage from '../common/base/Message/index';
+import TUIMessageBox from '../common/base/MessageBox/index';
 const roomEngine = useGetRoomEngine();
 
 const roomStore = useRoomStore();
@@ -95,7 +96,7 @@ async function toggleMuteVideo() {
     } else if (isAudience.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_AUDIENCE;
     }
-    ElMessage({
+    TUIMessage({
       type: 'warning',
       message: t(warningMessage),
       duration: MESSAGE_DURATION.NORMAL,
@@ -114,16 +115,17 @@ async function toggleMuteVideo() {
     const hasCameraDevice = cameraList.length > 0;
     // 无摄像头列表
     if (!hasCameraDevice && !isWeChat) {
-      ElMessageBox.alert(t('Camera not detected on current device'), t('Note'), {
-        customClass: 'custom-element-class',
-        confirmButtonText: t('Confirm'),
+      TUIMessageBox({
+        title: t('Note'),
+        message: t('Camera not detected on current device'),
+        appendToRoomContainer: true,
+        confirmButtonText: t('Sure'),
       });
       return;
     }
     // 有摄像头列表
     roomEngine.instance?.setLocalVideoView({
       view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
-      streamType: TUIVideoStreamType.kCameraStream,
     });
     if (isMobile) {
       await roomEngine.instance?.openLocalCamera({ isFrontCamera: isFrontCamera.value });
@@ -152,7 +154,6 @@ async function handleAccept() {
   roomStore.setCanControlSelfVideo(true);
   roomEngine.instance?.setLocalVideoView({
     view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
-    streamType: TUIVideoStreamType.kCameraStream,
   });
   await roomEngine.instance?.responseRemoteRequest({
     requestId: requestOpenCameraRequestId.value,
@@ -193,7 +194,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/var.scss';
 
 $videoTabWidth: 320px;
 
@@ -208,36 +208,18 @@ $videoTabWidth: 320px;
       padding: 20px;
     }
   }
-  .agree{
+  .agree, .cancel{
     padding: 14px;
     width: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid transparent;
     color: var(--active-color-1);
     font-size: 16px;
     font-weight: 500;
-    background-color: #fff;
-      &:hover {
-      background: none;
-      border: none;
-    }
   }
   .cancel{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    font-size: 16px;
-    font-weight: 400;
     color: var(--font-color-4);
-      &:hover {
-      background: none;
-      border: none;
-    }
   }
  .cancel-button {
   margin-left: 20px;

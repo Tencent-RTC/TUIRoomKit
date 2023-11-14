@@ -21,7 +21,7 @@
       @click="handleAudioMediaClick"
     ></audio-media-control>
     <Dialog
-      :model-value="showRequestOpenMicDialog"
+      v-model="showRequestOpenMicDialog"
       :title="title"
       :modal="true"
       :show-close="false"
@@ -33,18 +33,24 @@
         {{ t('The host invites you to turn on the microphone') }}
       </span>
       <template v-if="isMobile" #cancel>
-        <Button class="cancel" size="default" type="primary" @click="handleReject">
+        <tui-button class="cancel" size="default" type="text" @click="handleReject">
           {{ t('Keep it closed') }}
-        </Button>
+        </tui-button>
       </template>
       <template v-if="isMobile" #agree>
-        <Button class="agree" size="default" @click="handleAccept">{{ t('Turn on the microphone') }}</Button>
+        <tui-button class="agree" size="default" type="text" @click="handleAccept">{{ t('Turn on the microphone') }}</tui-button>
       </template>
       <template #footer>
-        <Button class="agree-button" size="default" @click="handleAccept">{{ t('Turn on the microphone') }}</Button>
-        <Button class="cancel-button" size="default" type="primary" @click="handleReject">
+        <tui-button
+          class="agree-button"
+          size="default"
+          @click="handleAccept"
+        >
+          {{ t('Turn on the microphone') }}
+        </tui-button>
+        <tui-button class="cancel-button" size="default" type="primary" @click="handleReject">
           {{ t('Keep it closed') }}
-        </Button>
+        </tui-button>
       </template>
     </Dialog>
   </div>
@@ -53,7 +59,7 @@
 <script setup lang="ts">
 import { ref, Ref, onUnmounted, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessageBox, ElMessage } from '../../elementComp';
+import TUIMessage from '../common/base/Message/index';
 import Dialog from '../common/base/Dialog';
 import { useRoomStore } from '../../stores/room';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
@@ -61,9 +67,10 @@ import { useI18n } from '../../locales';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
 import useRoomEngine from '../../hooks/useRoomEngine';
 import { isMobile, isWeChat } from '../../utils/useMediaValue';
-import Button from '../common/base/Button.vue';
+import TuiButton from '../common/base/Button.vue';
 import AudioMediaControl from '../common/AudioMediaControl.vue';
 import { useBasicStore } from '../../stores/basic';
+import TUIMessageBox from '../common/base/MessageBox/index';
 
 
 const roomEngine = useRoomEngine();
@@ -97,7 +104,7 @@ async function toggleMuteAudio() {
     } else if (isAudience.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_AUDIENCE;
     }
-    ElMessage({
+    TUIMessage({
       type: 'warning',
       message: t(warningMessage),
       duration: MESSAGE_DURATION.NORMAL,
@@ -114,10 +121,11 @@ async function toggleMuteAudio() {
     const microphoneList = await roomEngine.instance?.getMicDevicesList();
     const hasMicrophoneDevice = microphoneList.length > 0;
     if (!hasMicrophoneDevice && !isWeChat) {
-      // 无麦克风列表
-      ElMessageBox.alert(t('Microphone not detected on current device.'), t('Note'), {
-        customClass: 'custom-element-class',
-        confirmButtonText: t('Confirm'),
+      TUIMessageBox({
+        title: t('Note'),
+        message: t('Microphone not detected on current device.'),
+        appendToRoomContainer: true,
+        confirmButtonText: t('Sure'),
       });
       return;
     }
@@ -183,37 +191,18 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/var.scss';
-  .agree{
+  .agree, .cancel{
     padding: 14px;
     width: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid transparent;
     color: var(--active-color-1);
     font-size: 16px;
     font-weight: 500;
-    background-color: #fff;
-      &:hover {
-      background: none;
-      border: none;
-    }
   }
   .cancel{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    font-size: 16px;
-    font-weight: 400;
     color: var(--font-color-4);
-      &:hover {
-      background: none;
-      border: none;
-    }
   }
   .cancel-button {
     margin-left: 20px;

@@ -3,9 +3,9 @@
     <icon-button
       :is-active="sidebarName === 'manage-member'"
       :title="memberTitle"
+      :icon="ManageMemberIcon"
       @click-icon="toggleMangeMemberSidebar"
     >
-      <manage-member-icon></manage-member-icon>
     </icon-button>
   </div>
 </template>

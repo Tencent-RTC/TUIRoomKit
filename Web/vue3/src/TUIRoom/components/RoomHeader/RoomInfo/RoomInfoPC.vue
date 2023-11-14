@@ -8,7 +8,7 @@
       </div>
     </div>
     <div v-if="isShowRoomInfo" v-click-outside="handleClickOutsideRoomInfoContainer" class="roomInfo-container">
-      <div v-for="item in roomInfoTabList" :key="item.id" class="roomInfo-content">
+      <div v-for="item in roomInfoTabList" v-show="item.visible" :key="item.id" class="roomInfo-content">
         <span class="roomInfo-title">{{ t(item.title) }}</span>
         <span class="roomInfo-item">{{ item.content }}</span>
         <div v-if="item.isShowCopyIcon" class="copy-container" @click="onCopy(item.copyLink)">
@@ -21,15 +21,15 @@
 </template>
 <script setup lang="ts">
 import useRoomInfo from './useRoomInfoHooks';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import Arrow from '../../common/icons/ArrowUpIcon.vue';
+import copyIcon from '../../common/icons/CopyIcon.vue';
+import vClickOutside from '../../../directives/vClickOutside';
+import RoomTime from '../../common/RoomTime.vue';
 
 const {
   t,
-  SvgIcon,
-  Arrow,
   arrowDirection,
-  copyIcon,
-  RoomTime,
-  vClickOutside,
   isShowRoomInfoTitle,
   conferenceTitle,
   isShowRoomInfo,
@@ -98,6 +98,7 @@ const {
   gap: 16px;
   .roomInfo-content {
     display: flex;
+    min-width: 300px;
     align-items: stretch;
     font-size: 14px;
     font-weight: 400;

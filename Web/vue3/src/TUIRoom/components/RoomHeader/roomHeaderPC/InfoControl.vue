@@ -46,8 +46,6 @@ function handleDocumentClick(event: MouseEvent) {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
-
 .info-container {
   position: relative;
   width: 20px;

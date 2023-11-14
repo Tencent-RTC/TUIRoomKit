@@ -1,5 +1,5 @@
 <template>
-  <div id="roomContainer" ref="roomRef" class="tui-room">
+  <div id="roomContainer" ref="roomRef" :class="['tui-room', `tui-theme-${defaultTheme}`]">
     <room-header
       v-show="showRoomTool && showHeaderTool"
       class="header"
@@ -25,7 +25,6 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage, ElMessageBox } from './elementComp';
 import { ref, onMounted, onUnmounted, Ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import RoomHeader from './components/RoomHeader/index';
@@ -62,6 +61,8 @@ import { useI18n } from './locales';
 
 import useGetRoomEngine from './hooks/useRoomEngine';
 import logger from './utils/common/logger';
+import TUIMessageBox from './components/common/base/MessageBox/index';
+import TUIMessage from './components/common/base/Message/index';
 
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
@@ -96,7 +97,7 @@ const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 const chatStore = useChatStore();
 
-const { sdkAppId, showHeaderTool } = storeToRefs(basicStore);
+const { sdkAppId, showHeaderTool, defaultTheme } = storeToRefs(basicStore);
 const { localUser } = storeToRefs(roomStore);
 
 /**
@@ -168,14 +169,18 @@ function handleRoomContentTap() {
 onMounted(async () => {
   const storageCurrentTheme = localStorage.getItem('tuiRoom-currentTheme');
   storageCurrentTheme && basicStore.setDefaultTheme(storageCurrentTheme);
-  if (isMobile) {
-    const trtcCloud = roomEngine.instance?.getTRTCCloud();
-    await trtcCloud?.setLocalRenderParams({
-      mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Auto,
-      rotation: TRTCVideoRotation.TRTCVideoRotation0,
-      fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
-    });
-  }
+  // 设置本地视频默认渲染模式
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  const mirrorType = isMobile
+    ? TRTCVideoMirrorType.TRTCVideoMirrorType_Auto
+    : (basicStore.isLocalStreamMirror
+      ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable
+      : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable);
+  await trtcCloud?.setLocalRenderParams({
+    mirrorType,
+    rotation: TRTCVideoRotation.TRTCVideoRotation0,
+    fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
+  });
 });
 
 
@@ -394,7 +399,7 @@ const onSendMessageForUserDisableChanged = (data: { userId: string, isDisable: b
   const { userId, isDisable } = data;
   if (userId === localUser.value.userId) {
     const tipMessage = isDisable ? t('You have been banned from text chat by the host') : t('You are allowed to text chat by the host');
-    ElMessage({
+    TUIMessage({
       type: 'warning',
       message: tipMessage,
       duration: MESSAGE_DURATION.NORMAL,
@@ -419,10 +424,11 @@ const onKickedOutOfRoom = async (eventInfo: { roomId: string, reason: TUIKickedO
         notice = t('kicked out of the room by serve');
         break;
     }
-    ElMessageBox.alert(notice, t('Note'), {
-      confirmButtonText: t('Confirm'),
-      customClass: 'custom-element-class',
-      appendTo: '#roomContainer',
+    TUIMessageBox({
+      title: t('Note'),
+      message: notice,
+      confirmButtonText: t('Sure'),
+      appendToRoomContainer: true,
       callback: async () => {
         emit('on-kicked-out-of-room', { roomId, reason, message });
       },
@@ -433,10 +439,11 @@ const onKickedOutOfRoom = async (eventInfo: { roomId: string, reason: TUIKickedO
 };
 
 const onUserSigExpired = () => {
-  ElMessageBox.alert('userSig 已过期', t('Note'), {
-    confirmButtonText: t('Confirm'),
-    customClass: 'custom-element-class',
-    appendTo: '#roomContainer',
+  TUIMessageBox({
+    title: t('Note'),
+    message: t('userSig 已过期'),
+    confirmButtonText: t('Sure'),
+    appendToRoomContainer: true,
     callback: async () => {
       emit('on-userSig-expired');
     },
@@ -445,10 +452,11 @@ const onUserSigExpired = () => {
 
 const onKickedOffLine = (eventInfo: { message: string }) => {
   const { message } = eventInfo;
-  ElMessageBox.alert('系统检测到您的账号被踢下线', t('Note'), {
-    confirmButtonText: t('Confirm'),
-    customClass: 'custom-element-class',
-    appendTo: '#roomContainer',
+  TUIMessageBox({
+    title: t('Note'),
+    message: t('系统检测到您的账号被踢下线'),
+    confirmButtonText: t('Sure'),
+    appendToRoomContainer: true,
     callback: async () => {
       emit('on-kicked-off-line', { message });
     },
@@ -458,7 +466,7 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
 // todo: 处理禁言所有人和禁画所有人
 async function handleAudioStateChange(isDisableAudio: boolean) {
   const tipMessage = isDisableAudio ? t('The host has muted all') : t('The host has unmuted all');
-  ElMessage({
+  TUIMessage({
     type: 'warning',
     message: tipMessage,
     duration: MESSAGE_DURATION.NORMAL,
@@ -475,7 +483,7 @@ async function handleAudioStateChange(isDisableAudio: boolean) {
 
 async function handleVideoStateChange(isDisableVideo: boolean) {
   const tipMessage = isDisableVideo ? t('The host has turned on the ban on all paintings') : t('The host has lifted the ban on all paintings');
-  ElMessage({
+  TUIMessage({
     type: 'warning',
     message: tipMessage,
     duration: MESSAGE_DURATION.NORMAL,
@@ -492,7 +500,7 @@ async function handleVideoStateChange(isDisableVideo: boolean) {
 
 async function handleMessageStateChange(isDisableMessage: boolean) {
   const tipMessage = isDisableMessage ? t('The host has turned on the ban on all chat') : t('The host has lifted the ban on all chat');
-  ElMessage({
+  TUIMessage({
     type: 'warning',
     message: tipMessage,
     duration: MESSAGE_DURATION.NORMAL,
@@ -634,8 +642,6 @@ watch(sdkAppId, (val: number) => {
 </style>
 
 <style lang="scss" scoped>
-@import './assets/style/var.scss';
-
 .tui-theme-white .tui-room {
   --header-shadow-color: #E3EAF7;
   --footer-shadow-color: rgba(197, 210, 229, 0.20);

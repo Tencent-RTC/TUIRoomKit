@@ -11,7 +11,7 @@
       <screen-share-icon v-else></screen-share-icon>
     </icon-button>
     <Dialog
-      :model-value="isShowFraudDialog && isShowScreenShareAntiFraud"
+      v-model="isShowFraudDialog"
       width="420px"
       :title="t('Safety Reminder')"
       :modal="true"
@@ -26,13 +26,13 @@
       </span>
       <template #footer>
         <span>
-          <Button class="button" size="default" @click="startScreenShare">{{ t('Continue sharing') }}</Button>
-          <Button type="primary" size="default" @click="isShowFraudDialog = false">{{ t('Cancel') }}</Button>
+          <tui-button class="button" size="default" @click="startScreenShare">{{ t('Continue sharing') }}</tui-button>
+          <tui-button type="primary" size="default" @click="isShowFraudDialog = false">{{ t('Cancel') }}</tui-button>
         </span>
       </template>
     </Dialog>
     <Dialog
-      :model-value="dialogVisible"
+      v-model="dialogVisible"
       width="420px"
       :title="t('End sharing')"
       :modal="true"
@@ -43,8 +43,8 @@
         {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
       <template #footer>
         <span>
-          <Button class="button" size="default" @click="stopScreenShare">{{ t('End sharing') }}</Button>
-          <Button type="primary" size="default" @click="cancelStop">{{ t('Cancel') }}</Button>
+          <tui-button class="button" size="default" @click="stopScreenShare">{{ t('End sharing') }}</tui-button>
+          <tui-button type="primary" size="default" @click="cancelStop">{{ t('Cancel') }}</tui-button>
         </span>
       </template>
     </Dialog>
@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import { ref, Ref, computed, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from '../../../elementComp';
+import TUIMessage from '../../common/base/Message/index';
 import Dialog from '../../common/base/Dialog';
 import IconButton from '../../common/base/IconButton.vue';
 import ScreenShareIcon from '../../common/icons/ScreenShareIcon.vue';
@@ -64,10 +64,9 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useRoomStore } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
 import logger from '../../../utils/common/logger';
-import { ICON_NAME } from '../../../constants/icon';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useI18n } from '../../../locales';
-import Button from '../../common/base/Button.vue';
+import TuiButton from '../../common/base/Button.vue';
 import eventBus from '../../../hooks/useMitt';
 
 const roomEngine = useGetRoomEngine();
@@ -102,7 +101,7 @@ async function toggleScreenShare() {
   }
 
   if (isAudience.value) {
-    ElMessage({
+    TUIMessage({
       type: 'warning',
       message: t('You currently do not have sharing permission, please raise your hand to apply for sharing permission first'),
       duration: MESSAGE_DURATION.LONG,
@@ -111,7 +110,7 @@ async function toggleScreenShare() {
   }
 
   if (hasOtherScreenShare.value) {
-    ElMessage({
+    TUIMessage({
       type: 'warning',
       message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
       duration: MESSAGE_DURATION.LONG,
@@ -159,7 +158,7 @@ async function startScreenShare() {
         message = '屏幕分享遇到未知错误';
         break;
     }
-    ElMessage({
+    TUIMessage({
       type: 'warning',
       message,
       duration: MESSAGE_DURATION.LONG,
@@ -197,7 +196,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 @import '../../../assets/style/element-custom.scss';
 
 .screen-share-control-container {

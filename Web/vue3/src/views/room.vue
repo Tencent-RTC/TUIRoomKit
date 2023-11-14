@@ -19,7 +19,7 @@ import { useRoute } from 'vue-router';
 import router from '@/router';
 import { checkNumber } from '@/TUIRoom/utils/common';
 import { useI18n } from 'vue-i18n';
-import { ElMessageBox } from 'element-plus';
+import TUIMessageBox from '@/TUIRoom/components/common/base/MessageBox/index';
 import {
   TUIKickedOutOfRoomReason,
 } from '@tencentcloud/tuiroom-engine-js';
@@ -61,10 +61,12 @@ onMounted(async () => {
         await TUIRoomRef.value?.createRoom({ roomId, roomName: roomId, roomMode, roomParam });
       } catch (error: any) {
         const message = t('Failed to enter the room.') + error.message;
-        ElMessageBox.alert(message, t('Note'), {
-          customClass: 'custom-element-class',
-          confirmButtonText: t('Confirm'),
-          callback: () => {
+        TUIMessageBox({
+          title: t('Note'),
+          message,
+          confirmButtonText: t('Sure'),
+          appendToRoomContainer: true,
+          callback: async () => {
             router.replace({ path: 'home' });
           },
         });
@@ -74,10 +76,12 @@ onMounted(async () => {
         await TUIRoomRef.value?.enterRoom({ roomId, roomParam });
       } catch (error: any) {
         const message = t('Failed to enter the room.') + error.message;
-        ElMessageBox.alert(message, t('Note'), {
-          customClass: 'custom-element-class',
-          confirmButtonText: t('Confirm'),
-          callback: () => {
+        TUIMessageBox({
+          title: t('Note'),
+          message,
+          confirmButtonText: t('Sure'),
+          appendToRoomContainer: true,
+          callback: async () => {
             router.replace({ path: 'home' });
           },
         });
@@ -85,10 +89,12 @@ onMounted(async () => {
     }
   } catch (error: any) {
     const message = t('Failed to enter the room.') + error.message;
-    ElMessageBox.alert(message, t('Note'), {
-      customClass: 'custom-element-class',
-      confirmButtonText: t('Confirm'),
-      callback: () => {
+    TUIMessageBox({
+      title: t('Note'),
+      message,
+      confirmButtonText: t('Sure'),
+      appendToRoomContainer: true,
+      callback: async () => {
         sessionStorage.removeItem('tuiRoom-currentUserInfo');
         router.replace({ path: 'home' });
       },

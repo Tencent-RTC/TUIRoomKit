@@ -51,8 +51,6 @@ const audioLevelStyle = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/var.scss';
-
 .audio-icon-container {
   position: relative;
   width: 24px;
@@ -76,14 +74,6 @@ const audioLevelStyle = computed(() => {
       width: 100%;
       background-color: var(--green-color);
       transition: height 0.2s;
-    }
-    .audio-level-item {
-      width: 100%;
-      height: 2px;
-      border-radius: 50%;
-      &.active {
-        background-color: $levelHighLightColor;
-      }
     }
   }
 

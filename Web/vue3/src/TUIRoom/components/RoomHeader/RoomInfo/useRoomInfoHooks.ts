@@ -3,26 +3,20 @@ import { useI18n } from '../../../locales';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import { ElMessage } from '../../../elementComp';
+import TUIMessage from '../../common/base/Message/index';
 import { clipBoard } from '../../../utils/utils';
-import Arrow from '../../common/icons/ArrowUpIcon.vue';
-import copyIcon from '../../common/icons/CopyIcon.vue';
-import RoomTime from '../../common/RoomTime.vue';
-import vClickOutside from '../../../directives/vClickOutside';
 import useRoomInviteControl from '../../RoomInvite/useRoomInviteHooks';
 import { isWeChat } from '../../../utils/useMediaValue';
 
 export default function useRoomInfo() {
   const { inviteLink } = useRoomInviteControl();
-
   const basicStore = useBasicStore();
   const roomStore = useRoomStore();
-  const { roomId } = storeToRefs(basicStore);
+  const { roomId, isRoomLinkVisible } = storeToRefs(basicStore);
   const { masterUserId } = storeToRefs(roomStore);
   const { t } = useI18n();
   const isShowRoomInfo = ref(false);
-  const roomType = computed(() => (roomStore.isFreeSpeakMode ? t('Free Speech Room') : t('Raise Hand Room')));
+  const roomType = computed(() => (roomStore.isFreeSpeakMode ? t('Free Speech Room') : t('On-stage Speaking Room')));
   const arrowDirection = ref(false);
 
   const masterUserName = computed(() => roomStore.getUserName(masterUserId.value) || masterUserId.value);
@@ -32,10 +26,10 @@ export default function useRoomInfo() {
   const conferenceTitle = computed(() => `${masterUserName.value}${t('Quick Meeting')}`);
 
   const roomInfoTabList = computed(() => [
-    { id: 1, title: 'Host', content: masterUserName.value, copyLink: '', isShowCopyIcon: false },
-    { id: 2, title: 'Room Type', content: roomType.value, copyLink: '', isShowCopyIcon: false },
-    { id: 3, title: 'Room ID', content: roomId.value, copyLink: roomId.value, isShowCopyIcon: true },
-    { id: 4, title: 'Room Link', content: inviteLink.value, copyLink: inviteLink.value, isShowCopyIcon: true },
+    { id: 1, title: 'Host', content: masterUserName.value, copyLink: '', isShowCopyIcon: false, visible: true },
+    { id: 2, title: 'Room Type', content: roomType.value, copyLink: '', isShowCopyIcon: false, visible: true },
+    { id: 3, title: 'Room ID', content: roomId.value, copyLink: roomId.value, isShowCopyIcon: true, visible: true },
+    { id: 4, title: 'Room Link', content: inviteLink.value, copyLink: inviteLink.value, isShowCopyIcon: true, visible: isRoomLinkVisible.value },
   ]);
 
   function toggleShowRoomInfoStatus() {
@@ -57,12 +51,12 @@ export default function useRoomInfo() {
   async function onCopy(value: string | number) {
     try {
       await clipBoard(value);
-      ElMessage({
+      TUIMessage({
         message: t('Copied successfully'),
         type: 'success',
       });
     } catch (error) {
-      ElMessage({
+      TUIMessage({
         message: t('Copied failure'),
         type: 'error',
       });
@@ -70,12 +64,7 @@ export default function useRoomInfo() {
   }
   return {
     t,
-    SvgIcon,
-    Arrow,
     arrowDirection,
-    copyIcon,
-    RoomTime,
-    vClickOutside,
     isWeChat,
     isShowRoomInfo,
     isShowRoomInfoTitle,
