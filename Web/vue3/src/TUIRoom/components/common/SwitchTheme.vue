@@ -13,7 +13,7 @@
     :title="t('Switch Theme')"
     :layout="IconButtonLayout.HORIZONTAL"
     :icon="SwitchThemeIcon"
-    @click="handleSwitchTheme"
+    @click-icon="handleSwitchTheme"
   >
   </icon-button>
 </template>
@@ -25,7 +25,7 @@ import { IconButtonLayout } from '../../constants/room';
 import { watch } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '../../locales';
 const basicStore = useBasicStore();
 const { defaultTheme } = storeToRefs(basicStore);
 const { t } = useI18n();

@@ -2,9 +2,9 @@
   <icon-button
     :title="title"
     :layout="IconButtonLayout.HORIZONTAL"
-    @click="handleChange"
+    :icon="LanguageIcon"
+    @click-icon="handleChange"
   >
-    <language-icon></language-icon>
   </icon-button>
 </template>
 

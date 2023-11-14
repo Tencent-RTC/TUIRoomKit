@@ -26,8 +26,6 @@ const {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
-
 .tui-theme-white textarea {
   --input-border-color: var(--background-color-10);
   --chat-editor-color: var(--background-color-8);

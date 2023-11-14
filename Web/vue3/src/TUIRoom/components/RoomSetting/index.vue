@@ -84,8 +84,6 @@ function handleOverlayClick(event: any) {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/var.scss';
-
 .overlay-container {
   position: fixed;
   top: 0;
@@ -113,7 +111,7 @@ function handleOverlayClick(event: any) {
   .setting-header {
     height: 64px;
     border-bottom: 1px solid rgba(235, 240, 247, 1);
-    box-shadow: 0px 8px 10px rgba(230, 236, 245, 0.8);
+    box-shadow: 0px 7px 10px -5px rgba(230, 236, 245, 0.8);
     display: flex;
     flex-direction: row;
     justify-content: space-between;

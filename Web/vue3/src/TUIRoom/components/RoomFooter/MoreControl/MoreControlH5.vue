@@ -17,13 +17,12 @@
         <contact-control @click="handleControlClick('contactControl')"></contact-control>
         <invite-control @click="handleControlClick('inviteControl')"></invite-control>
       </div>
-      <Button v-tap="handleCancelControl" class="close">{{ t('Cancel') }}</Button>
+      <div v-tap="handleCancelControl" class="close">{{ t('Cancel') }}</div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import IconButton from '../../common/base/IconButton.vue';
-import Button from '../../common/base/Button.vue';
 import userMoreControl from './useMoreControlHooks';
 import ChatControl from '../ChatControl.vue';
 import InviteControl from '../InviteControl.vue';
@@ -80,7 +79,7 @@ onUnmounted(() => {
     background: var(--log-out-cancel);
     border-radius: 13px;
     padding: 10px;
-    animation-duration: 100ms;
+    animation-duration: 200ms;
     animation-name: popup;
 }
 @keyframes popup{

@@ -20,14 +20,14 @@
           class="select"
           device-type="microphone"
         ></device-select>
-        <Button
+        <tui-button
           v-if="isDetailMode"
           class="button"
           type="primary"
           @click="handleMicrophoneTest"
         >
           {{ isTestingMicrophone ? t('Stop') : t('Test') }}
-        </Button>
+        </tui-button>
       </div>
     </div>
     <div class="item-setting">
@@ -49,14 +49,14 @@
           device-type="speaker"
           :disabled="mode === SettingMode.DETAIL"
         ></device-select>
-        <Button
+        <tui-button
           v-if="isDetailMode"
           class="button"
           type="primary"
           @click="handleSpeakerTest"
         >
           {{ isTestingSpeaker ? t('Stop') : t('Test') }}
-        </Button>
+        </tui-button>
       </div>
     </div>
   </div>
@@ -70,7 +70,7 @@ import { SettingMode } from '../../constants/render';
 import { useI18n } from '../../locales';
 import { storeToRefs } from 'pinia';
 import { useBasicStore } from '../../stores/basic';
-import Button from '../common/base/Button.vue';
+import TuiButton from '../common/base/Button.vue';
 
 
 interface Props {
@@ -142,8 +142,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/var.scss';
-
 .audio-setting-tab {
   border-radius: 4px;
   font-size: 14px;
@@ -183,7 +181,7 @@ onBeforeUnmount(() => {
       height: 6px;
       background-color: var(--background-color-4);
       &.active {
-        background-color: $levelHighLightColor;
+        background-color: var(--green-color);
       }
     }
   }

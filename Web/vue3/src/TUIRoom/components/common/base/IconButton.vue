@@ -36,7 +36,7 @@
       <span class="title">{{ title }}</span>
     </div>
     <div v-if="hasMore" ref="moreSpanRef" class="icon-arrow" @click="$emit('click-more')">
-      <arrow-up></arrow-up>
+      <svg-icon :icon="ArrowUp"></svg-icon>
     </div>
   </div>
 </template>

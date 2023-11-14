@@ -14,7 +14,7 @@
         <member-item v-for="(userInfo) in userList" :key="userInfo.userId" :user-info="userInfo"></member-item>
       </div>
     </div>
-    <div class="manage-member-bottom">
+    <div v-if="isMaster" class="manage-member-bottom">
       <div
         class="manage-member-button"
         :class="isMicrophoneDisableForAllUser ? 'lift-all' : ''"
@@ -30,17 +30,15 @@
         {{ videoManageInfo }}
       </div>
     </div>
-    <Dialog
-      :model-value="showManageAllUserDialog"
-    >
+    <Dialog v-model="showManageAllUserDialog">
       <span>
         {{ dialogTitleInfo }}
       </span>
       <template #cancel>
-        <Button class="cancel" @click="showManageAllUserDialog = false">{{ t('Cancel') }}</Button>
+        <tui-button class="cancel" type="text" @click="showManageAllUserDialog = false">{{ t('Cancel') }}</tui-button>
       </template>
       <template #agree>
-        <Button class="agree" @click="doToggleManageMember">{{ dialogActionInfo }}</Button>
+        <tui-button class="agree" type="text" @click="doToggleManageMember">{{ dialogActionInfo }}</tui-button>
       </template>
     </Dialog>
   </div>
@@ -52,7 +50,7 @@ import Dialog from '../common/base/Dialog';
 import useIndex from './useIndexHooks';
 import { storeToRefs } from 'pinia';
 import { useRoomStore } from '../../stores/room';
-import Button from '../common/base/Button.vue';
+import TuiButton from '../common/base/Button.vue';
 const roomStore = useRoomStore();
 const {
   userList,
@@ -60,6 +58,7 @@ const {
   applyToAnchorList,
   isMicrophoneDisableForAllUser,
   isCameraDisableForAllUser,
+  isMaster,
 } = storeToRefs(roomStore);
 
 const {
@@ -250,36 +249,17 @@ const {
     }
   }
 }
-  .agree{
+  .agree, .cancel{
     padding: 14px;
     width: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid transparent;
     color: var(--active-color-1);
     font-size: 16px;
     font-weight: 500;
-    background-color: #fff;
-      &:hover {
-      background: none;
-      border: none;
-    }
   }
   .cancel{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    background-color: #fff;
-    font-size: 16px;
-    font-weight: 500;
     color: var(--font-color-4);
-    &:hover {
-      background: none;
-      border: none;
-    }
   }
 </style>

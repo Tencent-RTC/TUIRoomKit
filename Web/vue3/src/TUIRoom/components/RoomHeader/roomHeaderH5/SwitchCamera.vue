@@ -3,9 +3,6 @@
     <svg-icon
       v-tap="handleSwitchCamera"
       :icon="CameraSwitchIcon"
-      :custom-style="{
-        backgroundSize: '50%'
-      }"
     ></svg-icon>
   </div>
 </template>
@@ -29,7 +26,5 @@ async function handleSwitchCamera() {
  .camera-icon{
     display: flex;
     background-size: cover;
-    width: 40px;
-    height: 36px;
  }
 </style>

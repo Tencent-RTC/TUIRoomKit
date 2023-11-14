@@ -21,6 +21,8 @@ function showDefaultAvatar(e:any) {
 <style lang="scss" scoped>
 .avatar-container {
   position: relative;
+  width: 100%;
+  height: 100%;
   .avatar {
     position: absolute;
     top: 0;

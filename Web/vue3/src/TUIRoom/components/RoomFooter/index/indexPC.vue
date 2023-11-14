@@ -14,7 +14,6 @@
         @click="handleControlClick('fullScreenControl')"
       ></full-screen-control>
       <manage-member-control
-        v-if="roomStore.isMaster"
         class="center-container-item"
         @click="handleControlClick('manageMemberControl')"
       ></manage-member-control>

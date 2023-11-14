@@ -29,7 +29,7 @@
     </div>
     <div class="mirror-container">
       <span>{{ t('Mirror') }}</span>
-      <SwitchControl v-model="isLocalStreamMirror"></SwitchControl>
+      <tui-switch v-model="isLocalStreamMirror"></tui-switch>
     </div>
     <div v-if="withMore" class="item-setting">
       <!-- TODO: <div class="item">美颜与虚拟背景</div> -->
@@ -42,7 +42,7 @@
 import { ref, Ref, watch, onMounted, onUnmounted, computed } from 'vue';
 import DeviceSelect from './DeviceSelect.vue';
 import VideoProfile from './VideoProfile.vue';
-import SwitchControl from '../common/base/Switch.vue';
+import TuiSwitch from './base/TuiSwitch.vue';
 import { useBasicStore } from '../../stores/basic';
 import { isElectronEnv } from '../../utils/utils';
 import { useI18n } from '../../locales';
@@ -50,6 +50,7 @@ import { useI18n } from '../../locales';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode } from '@tencentcloud/tuiroom-engine-js';
 import { isMobile }  from '../../utils/useMediaValue';
+import { storeToRefs } from 'pinia';
 const roomEngine = useGetRoomEngine();
 const isElectron = isElectronEnv();
 
@@ -62,10 +63,10 @@ interface Props {
 const props = defineProps<Props>();
 
 const basicStore = useBasicStore();
+const { isLocalStreamMirror } = storeToRefs(basicStore);
 
 const themeClass = computed(() => (props.theme ? `tui-theme-${props.theme}` : ''));
 
-const isLocalStreamMirror: Ref<boolean> = ref(basicStore.isLocalStreamMirror);
 watch(isLocalStreamMirror, async (val: boolean) => {
   const trtcCloud = roomEngine.instance?.getTRTCCloud();
   if (isMobile) {
@@ -120,7 +121,6 @@ if (props.withPreview) {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/var.scss';
 @import '../../assets/style/element-custom.scss';
 
 .video-tab {

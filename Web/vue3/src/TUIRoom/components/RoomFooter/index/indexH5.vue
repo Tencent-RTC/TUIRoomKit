@@ -11,7 +11,6 @@
       v-tap="() => handleControlClick('applyControl')"
     ></apply-control>
     <manage-member-control
-      v-if="roomStore.isMaster"
       v-tap="() => handleControlClick('manageMemberControl')"
     ></manage-member-control>
     <more-control v-tap="() => handleControlClick('moreControl')"></more-control>
