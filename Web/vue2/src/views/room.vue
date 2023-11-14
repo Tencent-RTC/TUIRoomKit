@@ -14,11 +14,11 @@
 
 <script>
 import RoomContainer from '@/TUIRoom/index.vue';
-import { MessageBox } from 'element-ui';
 import logger from '../TUIRoom/utils/common/logger';
 import router from '@/router';
 import { useRoomStore } from '../TUIRoom/stores/room';
 import { useBasicStore } from '../TUIRoom/stores/basic';
+import TUIMessageBox from '@/TUIRoom/components/common/base/MessageBox';
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 let TUIRoomRef;
@@ -27,7 +27,8 @@ router.beforeEach((from, to, next) => {
     next();
   } else {
     const message = roomStore.isMaster
-      ? TUIRoomRef?.t('This action causes the room to be disbanded, does it continue?') : TUIRoomRef?.t('This action causes the room to be exited, does it continue?');
+      ? TUIRoomRef?.t('This action causes the room to be disbanded, does it continue?')
+      : TUIRoomRef?.t('This action causes the room to be exited, does it continue?');
     if (window.confirm(message)) {
       if (roomStore.isMaster) {
         TUIRoomRef?.dismissRoom();
@@ -81,9 +82,11 @@ export default {
           await TUIRoomRef.createRoom({ roomId: this.roomId, roomName: this.roomId, roomMode, roomParam });
         } catch (error) {
           const message = this.$t('Failed to enter the room.') + error.message;
-          MessageBox.alert(message, this.$t('Note'), {
-            customClass: 'custom-element-class',
-            confirmButtonText: this.$t('Confirm'),
+          TUIMessageBox({
+            title: this.$t('Note'),
+            message,
+            appendToRoomContainer: true,
+            confirmButtonText: this.$t('Sure'),
             callback: () => {
               this.$router.push({ path: 'home' });
             },
@@ -94,9 +97,11 @@ export default {
           await TUIRoomRef.enterRoom({ roomId: this.roomId, roomParam });
         } catch (error) {
           const message = this.$t('Failed to enter the room.') + error.message;
-          MessageBox.alert(message, this.$t('Note'), {
-            customClass: 'custom-element-class',
-            confirmButtonText: this.$t('Confirm'),
+          TUIMessageBox({
+            title: this.$t('Note'),
+            message,
+            appendToRoomContainer: true,
+            confirmButtonText: this.$t('Sure'),
             callback: () => {
               this.$router.push({ path: 'home' });
             },
@@ -105,9 +110,11 @@ export default {
       }
     } catch (error) {
       const message = this.$t('Failed to enter the room.') + error.message;
-      MessageBox.alert(message, this.$t('Note'), {
-        customClass: 'custom-element-class',
-        confirmButtonText: this.$t('Confirm'),
+      TUIMessageBox({
+        title: this.$t('Note'),
+        message,
+        appendToRoomContainer: true,
+        confirmButtonText: this.$t('Sure'),
         callback: () => {
           sessionStorage.removeItem('tuiRoom-currentUserInfo');
           this.$router.push({ path: 'home' });
@@ -179,10 +186,9 @@ export default {
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: PingFang SC;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #B3B8C8;
   position: relative;
   width: 100%;
   height: 100%;

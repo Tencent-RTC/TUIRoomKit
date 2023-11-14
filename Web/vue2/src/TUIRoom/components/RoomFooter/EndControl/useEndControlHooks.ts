@@ -34,7 +34,14 @@ export default function useEndControl() {
   const filteredList = computed(() => remoteAnchorList.value.filter(searchUser => (
     searchUser.userId.includes(searchName.value)) || (searchUser.userName?.includes(searchName.value))));
   const hasNoData = computed(() => filteredList.value.length === 0);
-
+  const isMasterWithOneRemoteAnchor = computed(() => remoteAnchorList.value.length === 1);
+  const isMasterWithRemoteAnchors = computed(() => remoteAnchorList.value.length > 0);
+  const isMasterWithoutRemoteAnchors = computed(() => roomStore.isMaster && remoteAnchorList.value.length === 0);
+  const showEndButtonContent = computed(() => (roomStore.isMaster ? t('EndPC') : t('Leave')));
+  const showEndDialogContent = computed(() => (
+    roomStore.isMaster
+      ? t('You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed. If you choose "Leave Room", the current room will not be disbanded, and your hosting privileges will be transferred to other members.')
+      : t('Are you sure you want to leave this room?')));
   function toggleMangeMemberSidebar() {
     if (basicStore.setSidebarOpenStatus && sidebarName.value === 'transfer-leave') {
       basicStore.setSidebarOpenStatus(false);
@@ -84,7 +91,9 @@ export default function useEndControl() {
     stopMeeting,
     cancel,
     selectedUser,
+    showEndButtonContent,
     DialogType,
+    showEndDialogContent,
     logPrefix,
     title,
     currentDialogType,
@@ -99,5 +108,8 @@ export default function useEndControl() {
     showTransfer,
     sidebarName,
     showSideBar,
+    isMasterWithOneRemoteAnchor,
+    isMasterWithRemoteAnchors,
+    isMasterWithoutRemoteAnchors,
   };
 }

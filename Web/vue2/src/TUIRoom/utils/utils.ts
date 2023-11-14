@@ -145,3 +145,15 @@ export function isUndefined(value: any) {
 }
 
 export { clipBoard } from './adapter';
+
+
+export const isString = (value: any) => typeof value === 'string';
+export const isNumber = (value: any) => typeof value === 'number';
+export const isStringNumber = (value: any) => typeof value === 'string' && !isNaN(Number(value));
+
+export function addSuffix(value: string | number, suffix = 'px') {
+  if (isNumber(value) || isStringNumber(value)) {
+    return value + suffix;
+  }
+  return value;
+}

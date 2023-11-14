@@ -3,17 +3,18 @@
     <icon-button
       :is-active="isFullScreen"
       :title="title"
-      :icon-name="iconName"
       @click-icon="toggleScreen"
-    />
+    >
+      <full-screen-icon></full-screen-icon>
+    </icon-button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import IconButton from '../common/IconButton.vue';
+import IconButton from '../common/base/IconButton.vue';
+import FullScreenIcon from '../common/icons/FullScreenIcon.vue';
 import { setFullScreen, exitFullScreen } from '../../utils/utils';
-import { ICON_NAME } from '../../constants/icon';
 import { useI18n } from '../../locales';
 import { isVue27 } from '../../utils/constants';
 
@@ -27,7 +28,6 @@ const { t } = useI18n();
 const isFullScreen = ref(false);
 
 const title = computed((): string => (isFullScreen.value ? t('Exit') : t('Full screen')));
-const iconName = computed((): string => (isFullScreen.value ?  ICON_NAME.ExitFullScreen : ICON_NAME.FullScreen));
 
 function toggleScreen() {
   if (isFullScreen.value) {

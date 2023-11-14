@@ -183,6 +183,14 @@ export const useRoomStore = defineStore('room', {
       );
       return state.localUser.cameraStreamInfo;
     },
+    localScreenStream: (state) => {
+      const { userId, userName, avatarUrl, hasScreenStream } = state.localUser;
+      Object.assign(
+        state.localUser.screenStreamInfo,
+        { userId, userName, avatarUrl, hasScreenStream },
+      );
+      return state.localUser.screenStreamInfo;
+    },
     remoteStreamObj: (state) => {
       const obj: Record<string, StreamInfo> = {};
       [...Object.values(state.remoteUserObj)].forEach((userInfo) => {
@@ -210,7 +218,11 @@ export const useRoomStore = defineStore('room', {
       return [...Object.values(this.remoteStreamObj)];
     },
     streamList(): Array<StreamInfo> {
-      return [this.localStream, ...Object.values(this.remoteStreamObj)];
+      const list = [this.localStream, ...Object.values(this.remoteStreamObj)];
+      if (this.localUser.hasScreenStream) {
+        list.unshift(this.localScreenStream);
+      }
+      return list;
     },
     streamNumber(): number {
       return this.streamList.length;

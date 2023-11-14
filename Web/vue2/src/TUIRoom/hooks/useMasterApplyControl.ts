@@ -4,7 +4,7 @@
 import { onBeforeUnmount } from 'vue';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequestAction, TUIRequest, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from './useRoomEngine';
-import { ElMessage } from '../elementComp';
+import TUIMessage from '../components/common/base/Message/index';
 import { MESSAGE_DURATION } from '../constants/message';
 import { useRoomStore, UserInfo } from '../stores/room';
 import { storeToRefs } from 'pinia';
@@ -87,7 +87,7 @@ export default function () {
         roomStore.removeApplyToAnchorUser(userId);
       } catch (error) {
         logger.error(`拒绝 ${userName || userId} 上台申请失败，请重试！`);
-        ElMessage({
+        TUIMessage({
           type: 'warning',
           message: t('Reject on Stage failed, please retry', { userName: userName || userId }),
           duration: MESSAGE_DURATION.NORMAL,
@@ -121,7 +121,7 @@ export default function () {
         const userName = roomStore.getUserName(userId);
         switch (requestCallbackType) {
           case TUIRequestCallbackType.kRequestAccepted:
-            ElMessage({
+            TUIMessage({
               type: 'success',
               message: `${userName || userId} ${t('accepted the invitation to the stage')}`,
               duration: MESSAGE_DURATION.NORMAL,
@@ -129,7 +129,7 @@ export default function () {
             roomStore.removeInviteToAnchorUser(userId);
             break;
           case TUIRequestCallbackType.kRequestRejected:
-            ElMessage({
+            TUIMessage({
               type: 'warning',
               message: `${userName || userId} ${t('declined the invitation to the stage')}`,
               duration: MESSAGE_DURATION.NORMAL,

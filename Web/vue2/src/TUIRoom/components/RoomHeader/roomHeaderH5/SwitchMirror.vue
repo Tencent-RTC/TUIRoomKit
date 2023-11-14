@@ -1,15 +1,16 @@
 <template>
   <div class="mirror-icon">
     <svg-icon
-      v-tap="toogleMirrorStatus" icon-name="mirror" size="custom"
+      v-tap="toogleMirrorStatus"
+      :icon="MirrorIcon"
       :custom-style="{backgroundSize: '50%'}"
     ></svg-icon>
   </div>
 </template>
 <script setup lang="ts">
-import SvgIcon from '../../common/SvgIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
 import { useBasicStore } from '../../../stores/basic';
-
+import MirrorIcon from '../../common/icons/MirrorIcon.vue';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode } from '@tencentcloud/tuiroom-engine-js';
 import '../../../directives/vTap';
@@ -32,8 +33,6 @@ function toogleMirrorStatus() {
 </script>
 <style lang="scss" scoped>
   .mirror-icon{
-    display: block;
-    width: 32px;
-    height: 32px;
+    display: flex;
   }
 </style>

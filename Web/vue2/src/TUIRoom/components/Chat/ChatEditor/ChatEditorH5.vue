@@ -31,7 +31,6 @@ const {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 
   .chat-editor {
     width: 100vw;
