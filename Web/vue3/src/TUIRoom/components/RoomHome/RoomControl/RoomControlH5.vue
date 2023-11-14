@@ -87,7 +87,7 @@
           <span
             v-tap="() => chooseCurrentType('SpeakAfterTakingSeat')"
             :class="[mode === 'SpeakAfterTakingSeat' && 'room-current-title']" class="room-choose-title"
-          >{{ t('Raise Hand Room') }}</span>
+          >{{ t('On-stage Speaking Room') }}</span>
         </div>
       </div>
     </div>
@@ -104,6 +104,7 @@ import EnterRoomIcon from '../../common/icons/EnterRoomIcon.vue';
 import ArrowStrokeBackIcon from '../../common/icons/ArrowStrokeBackIcon.vue';
 import ArrowStrokeSelectDownIcon from '../../common/icons/ArrowStrokeSelectDownIcon.vue';
 import Logo from '../../common/Logo.vue';
+import TUIMessage from '../../common/base/Message/index';
 
 const {
   t,
@@ -114,7 +115,7 @@ const roomStore = useRoomStore();
 const showRoomDetail = ref(false);
 const showMoreType = ref(false);
 const isJoinRoom = ref(false);
-const roomType =  computed(() => (mode.value === 'FreeToSpeak' ? t('Free Speech Room') : t('Raise Hand Room')));
+const roomType =  computed(() => (mode.value === 'FreeToSpeak' ? t('Free Speech Room') : t('On-stage Speaking Room')));
 const isMicOn = ref(true);
 const isCamerOn = ref(true);
 const mode = ref('FreeToSpeak');
@@ -210,6 +211,10 @@ function handleRoomOption(type:string) {
   emit('update-user-name', currentUserName.value);
   switch (type) {
     case 'Join':
+      if (!roomId.value) {
+        TUIMessage({ type: 'error', message: t('Please enter the room number') });
+        return;
+      }
       emit('enter-room', String(roomId.value));
       break;
     case 'New':
@@ -231,7 +236,6 @@ onUnmounted(() => {
 
 </script>
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 .control-container{
     width: 100vw;
     height: 100%;

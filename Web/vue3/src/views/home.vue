@@ -1,5 +1,5 @@
 <template>
-  <div class="home-container">
+  <div class="home-container" :class="[`tui-theme-${defaultTheme}`]">
     <div class="header">
       <div class="left-header">
         <switch-theme class="header-item"></switch-theme>
@@ -40,6 +40,7 @@ import { useBasicStore } from '../TUIRoom/stores/basic';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
 import logger from '@/TUIRoom/utils/common/logger';
+import { storeToRefs } from 'pinia';
 
 const route = useRoute();
 const userName: Ref<string> = ref('');
@@ -47,6 +48,7 @@ const avatarUrl: Ref<string> = ref('');
 const userId: Ref<string> = ref('');
 const roomEngine = useGetRoomEngine();
 const basicStore = useBasicStore();
+const { defaultTheme } = storeToRefs(basicStore);
 const roomControlRef = ref();
 const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId : '';
 const givenRoomId: Ref<string> = ref((roomId) as string);
@@ -175,10 +177,10 @@ handleInit();
 
 <style lang="scss" scoped>
 
-.tui-theme-black .home-container {
+.tui-theme-black.home-container {
   --background: var(--background-color-1);
 }
-.tui-theme-white .home-container {
+.tui-theme-white.home-container {
   --background: url(../TUIRoom/assets/imgs/background-white.png);
 }
 

@@ -71,15 +71,15 @@ type DoneFn = () => void;
 type BeforeCloseFn = (done: DoneFn) => void;
 
 interface Props {
-  title?: string,
-  modelValue: boolean,
-  modal?: boolean,
-  width?: string | number,
+  title?: string;
+  modelValue: boolean;
+  modal?: boolean;
+  width?: string | number;
   beforeClose?: BeforeCloseFn | null;
-  closeOnClickModal?: boolean,
-  showClose?: boolean,
-  appendToBody?: boolean,
-  appendToRoomContainer?: boolean,
+  closeOnClickModal?: boolean;
+  showClose?: boolean;
+  appendToBody?: boolean;
+  appendToRoomContainer?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -114,9 +114,12 @@ const drawerContainerStyle = computed(() => {
   return style;
 });
 
-watch(() => props.modelValue, (val) => {
-  visible.value = val;
-});
+watch(
+  () => props.modelValue,
+  (val) => {
+    visible.value = val;
+  },
+);
 
 watch(visible, (val) => {
   if (val) {
@@ -138,8 +141,8 @@ function handleClose() {
     props.beforeClose(doClose);
   } else {
     doClose();
-  };
-};
+  }
+}
 
 function handleOverlayClick(event: any) {
   if (!props.closeOnClickModal) {
@@ -150,7 +153,6 @@ function handleOverlayClick(event: any) {
   }
   handleClose();
 }
-
 </script>
 
 <style lang="scss" scoped>
@@ -161,13 +163,13 @@ function handleOverlayClick(event: any) {
   left: 0;
   right: 0;
   &.overlay {
-    background-color: rgba(15, 16, 20, 0.60);
+    background-color: rgba(15, 16, 20, 0.6);
   }
 }
 
 .tui-dialog-container {
   --tui-dialog-width: 480px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -176,20 +178,20 @@ function handleOverlayClick(event: any) {
   flex-direction: column;
   border-radius: 20px;
   width: var(--tui-dialog-width, 50%);
-  box-shadow: 0px 3px 1px #E9F0FB;
+  box-shadow: 0px 3px 1px #e9f0fb;
   .tui-dialog-header {
     height: 64px;
     position: relative;
     display: flex;
     padding: 0 24px;
     align-items: center;
-    box-shadow: 0px 1px 0px rgba(230, 236, 245, 0.80);
+    box-shadow: 0px 7px 10px -5px rgba(230, 236, 245, 0.8);
     .tui-dialog-header-title {
       font-size: 16px;
       font-style: normal;
       font-weight: 600;
       line-height: 24px;
-      color: #0F1014;
+      color: #0f1014;
     }
     .close {
       width: 32px;
@@ -201,7 +203,7 @@ function handleOverlayClick(event: any) {
       display: flex;
       justify-content: center;
       align-items: center;
-      color: #4F586B;
+      color: #4f586b;
       cursor: pointer;
     }
   }
@@ -212,7 +214,7 @@ function handleOverlayClick(event: any) {
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
-    color: #4F586B;
+    color: #4f586b;
   }
   .tui-dialog-footer {
     padding: 20px 30px;

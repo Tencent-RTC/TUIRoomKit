@@ -1,17 +1,15 @@
 <template>
-  <Teleport to="body">
-    <div v-if="props.modelValue" class="dialog-container">
-      <span v-if="hasTitle" class="dialog-title">{{ props.title }}</span>
-      <div :class="[hasTitle ? 'dialog-content' : 'dialog-content-notitle']">
-        <slot></slot>
-      </div>
-      <div class="dialog-footer">
-        <slot name="cancel"></slot>
-        <div class="divide-line"></div>
-        <slot name="agree"></slot>
-      </div>
+  <div v-if="props.modelValue" class="dialog-container">
+    <span v-if="hasTitle" class="dialog-title">{{ props.title }}</span>
+    <div :class="[hasTitle ? 'dialog-content' : 'dialog-content-notitle']">
+      <slot></slot>
     </div>
-  </Teleport>
+    <div class="dialog-footer">
+      <slot name="cancel"></slot>
+      <div class="divide-line"></div>
+      <slot name="agree"></slot>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -22,6 +20,7 @@ interface Props {
   title?: string;
 }
 
+// TODO: 处理需要 appendToBody 一起 appendToRoomContainer 的情况
 const props = defineProps<Props>();
 
 const hasTitle = computed(() => props.title !== '');

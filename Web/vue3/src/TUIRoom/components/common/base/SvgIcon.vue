@@ -18,6 +18,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Component } from 'vue';
+import { addSuffix } from '../../../utils/utils';
 
 interface Props {
   size?: string | number,
@@ -29,8 +30,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(['click']);
 
-
-const customStyle = computed(() => `width: ${props.size}px;height: ${props.size}px;`);
+const customStyle = computed(() => (props.size ? `width: ${addSuffix(props.size)};height: ${addSuffix(props.size)};` : ''));
 
 function handleClick(event: Event) {
   emit('click', event);

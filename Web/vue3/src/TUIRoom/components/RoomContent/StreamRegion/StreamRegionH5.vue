@@ -14,7 +14,7 @@
     </div>
     <div class="corner-user-info-container">
       <div v-if="showMasterIcon" class="master-icon">
-        <user-icon></user-icon>
+        <svg-icon :icon="UserIcon"></svg-icon>
       </div>
       <audio-icon
         v-if="!isScreenStream"
@@ -23,7 +23,7 @@
         :is-muted="!stream.hasAudioStream"
         size="small"
       ></audio-icon>
-      <svg-icon v-if="isScreenStream" icon-name="screen-share" class="screen-icon"></svg-icon>
+      <svg-icon v-if="isScreenStream" :icon="ScreenOpenIcon" class="screen-icon"></svg-icon>
       <span class="user-name" :title="userInfo">{{ userInfo }}</span>
       <span v-if="isScreenStream"> {{ t('is sharing their screen') }} </span>
     </div>
@@ -39,6 +39,7 @@ import logger from '../../../utils/common/logger';
 import UserIcon from '../../common/icons/UserIcon.vue';
 import AudioIcon from '../../common/AudioIcon.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
+import ScreenOpenIcon from '../../common/icons/ScreenOpenIcon.vue';
 import { useI18n } from '../../../locales';
 import {
   TUIVideoStreamType,
@@ -98,7 +99,6 @@ onMounted(() => {
           if (basicStore.userId === props.stream.userId) {
             if (props.stream.hasVideoStream) {
               await roomEngine.instance?.setLocalVideoView({
-                streamType: TUIVideoStreamType.kCameraStream,
                 view: `${playRegionDomId.value}`,
               });
             }
@@ -179,7 +179,6 @@ onMounted(() => {
             **/
             if (props.stream.hasVideoStream) {
               await roomEngine.instance?.setLocalVideoView({
-                streamType: TUIVideoStreamType.kCameraStream,
                 view: `${playRegionDomId.value}`,
               });
             }
@@ -202,7 +201,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 .user-stream-container {
   position: relative;
   width: 100%;
@@ -278,7 +276,7 @@ onMounted(() => {
     height: 30px;
     display: flex;
     background: rgba(0,0,0,0.60);
-    color: $whiteColor;
+    color: #FFFFFF;
     align-items: center;
     align-content: center;
     font-size: 14px;

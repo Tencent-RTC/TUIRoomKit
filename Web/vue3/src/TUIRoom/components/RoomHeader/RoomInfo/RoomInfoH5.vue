@@ -13,11 +13,13 @@
           <span class="master-header">{{ conferenceTitle }}</span>
           <span class="cancel" @click="handleCloseRoomInfo">{{ t('Cancel') }}</span>
         </div>
-        <div v-for="item in roomInfoTabList" :key="item.id" class="roomInfo-content">
-          <span class="roomInfo-title">{{ t(item.title) }}</span>
-          <span class="roomInfo-item">{{ item.content }}</span>
-          <div v-if="item.isShowCopyIcon && !isWeChat" class="copy-container" @click="onCopy(item.copyLink)">
-            <svg-icon class="copy" :icon="copyIcon"></svg-icon>
+        <div v-for="item in roomInfoTabList" :key="item.id">
+          <div v-if="item.visible" class="roomInfo-content">
+            <span class="roomInfo-title">{{ t(item.title) }}</span>
+            <span class="roomInfo-item">{{ item.content }}</span>
+            <div v-if="item.isShowCopyIcon && item.visible" class="copy-container" @click="onCopy(item.copyLink)">
+              <svg-icon class="copy" :icon="copyIcon"></svg-icon>
+            </div>
           </div>
         </div>
         <div v-if="!isWeChat" class="roomInfo-bottom">
@@ -29,15 +31,15 @@
 </template>
 <script setup lang="ts">
 import useRoomInfo from './useRoomInfoHooks';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import Arrow from '../../common/icons/ArrowUpIcon.vue';
+import copyIcon from '../../common/icons/CopyIcon.vue';
+import RoomTime from '../../common/RoomTime.vue';
 
 const {
   t,
-  SvgIcon,
   isWeChat,
-  Arrow,
   arrowDirection,
-  copyIcon,
-  RoomTime,
   handleCloseRoomInfo,
   isShowRoomInfo,
   isShowRoomInfoTitle,
@@ -59,13 +61,12 @@ const {
   align-items: center;
   .title-text {
     display: flex;
+    align-items: center;
   }
   .arrow-icon {
     display: flex;
     margin-left: 5px;
     background-size: cover;
-    width: 16px;
-    height: 16px;
     align-items: center;
     transform: rotateX(180deg);
   }
@@ -117,7 +118,7 @@ const {
     bottom: 0;
     display: flex;
     flex-direction: column;
-    animation-duration: 300ms;
+    animation-duration: 200ms;
     animation-name: popup;
     padding-bottom: 4vh;
     gap: 5px;

@@ -40,12 +40,12 @@ function handleClick(event: MouseEvent) {
 }
 
 const buttonClassList = computed(() => [
-  'button',
-  `button-${props.type}`,
-  `button-${props.size}`,
-  { 'button-round': props.round },
-  { 'button-loading': props.loading },
-  { 'button-disabled': props.disabled },
+  'tui-button',
+  `tui-button-${props.type}`,
+  `tui-button-${props.size}`,
+  { 'tui-button-round': props.round },
+  { 'tui-button-loading': props.loading },
+  { 'tui-button-disabled': props.disabled },
 ]);
 </script>
 
@@ -57,7 +57,7 @@ const buttonClassList = computed(() => [
 .tui-theme-black .button-primary {
   --shadow-color: rgba(28, 102, 229, 0.20);
 }
-.button {
+.tui-button {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -77,7 +77,7 @@ const buttonClassList = computed(() => [
     outline: none;
   }
 }
-.button-primary {
+.tui-button-primary {
   background-color: transparent;
   border: 1px solid var(--active-color-2);
   color: var(--active-color-2);
@@ -89,25 +89,39 @@ const buttonClassList = computed(() => [
   }
 }
 
-.button-large {
+.tui-button-large {
   padding: 19px 48px;
   font-size: 20px;
 }
-.button-default {
+.tui-button-default {
   padding: 5px 30px;
   font-size: 14px;
 }
-.button-round {
+.tui-button-round {
   border-radius: 999999px;
 }
 
-.button-disable {
+.tui-button-disable {
   cursor: not-allowed;
   opacity: 0.3;
 }
 
-.button-icon {
+.tui-button-icon {
   margin-right: 5px;
   display: flex;
+}
+
+.tui-button-text {
+  border: 0 solid transparent;
+  background-color: transparent;
+  color: var(--font-color-4);
+  &:hover {
+    border: 0 solid transparent;
+    background-color: transparent;
+    color: var(--font-color-4);
+  }
+  &::after {
+    border: none;
+  }
 }
 </style>

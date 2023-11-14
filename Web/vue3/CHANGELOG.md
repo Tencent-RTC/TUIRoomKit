@@ -1,3 +1,20 @@
+## 2023.11.14@1.6.1
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.6.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+- 新增观众端的查看成员列表功能；
+- 调整更多组件内容，移除 QQ 群，新增中文环境下知了社群跳转按钮，支持跳转到知了社群页面；
+
+**Bug Fixed**
+- 修改举手发言房间名称为上台发言房间；
+- 修复 onChangeEvent 重复触发；
+- 修复 Message、MessageBox 和 Badge 组件的展示问题；
+- 修复 H5 复制 icon 丢失的问题；
+- 修复 Dialog、Setting和 Message 边框阴影的问题；
+- 修复 H5 房间号为空时，未拦截进房问题；
+- 修复结束按钮间距问题；
+
 ## 2023.10.26@1.6.0
 
 **Feature**

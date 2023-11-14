@@ -38,7 +38,6 @@ defineProps<Props>();
 defineEmits(['log-out']);
 </script>
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 @import '../../../assets/style/element-custom.scss';
 
 .user-info-container {
@@ -94,7 +93,7 @@ defineEmits(['log-out']);
       background:  var(--log-out-mobile);
       &-main{
         position: absolute;
-        top: 85%;
+        bottom: 34px;
         width: 100%;
         display: flex;
         flex-direction: column;
