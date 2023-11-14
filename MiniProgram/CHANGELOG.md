@@ -1,3 +1,17 @@
+## 2023.11.10@1.6.1
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.6.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。
+- 新增支持切换黑白主题，更改 svg 的引入方式；
+
+**Bug Fixed**
+
+- 修改举手发言房间名称为上台发言房间；
+- 修复 Message、MessageBox 和 Badge 组件的展示问题；
+- 修复小程序复制 icon 丢失的问题；
+- 修复小程序房间号为空时，未拦截进房问题；
+
 ## 2023.10.26@1.6.0
 
 **Feature**

@@ -21,7 +21,7 @@ import { useRoute } from '@/router/wxRouter';
 import router from '@/router';
 import { checkNumber } from '@TUIRoom/utils/common';
 import { useI18n } from 'vue-i18n';
-import { ElMessageBox } from '@TUIRoom/elementComp';
+import TUIMessageBox from '@TUIRoom/components/common/base/MessageBox/index';
 const { t } = useI18n();
 
 const route = useRoute();
@@ -29,7 +29,7 @@ const route = useRoute();
 const roomInfo = uni.getStorageSync('tuiRoom-roomInfo');
 const userInfo = uni.getStorageSync('tuiRoom-userInfo');
 
-const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId : '';
+const roomId = checkNumber(route.query.roomId as string) ? route.query.roomId : '';
 
 if (!roomId) {
   router.push({ path: 'home' });
@@ -55,10 +55,12 @@ onMounted(async () => {
         await TUIRoomRef.value?.createRoom({ roomId, roomName: roomId, roomMode, roomParam });
       } catch (error: any) {
         const message = t('Failed to enter the room.') + error.message;
-        ElMessageBox.alert(message, t('Note'), {
-          customClass: 'custom-element-class',
-          confirmButtonText: t('Confirm'),
-          callback: () => {
+        TUIMessageBox({
+          title: t('Note'),
+          message,
+          confirmButtonText: t('Sure'),
+          appendToRoomContainer: true,
+          callback: async () => {
             router.replace({ path: 'home' });
           },
         });
@@ -68,10 +70,12 @@ onMounted(async () => {
         await TUIRoomRef.value?.enterRoom({ roomId, roomParam });
       } catch (error: any) {
         const message = t('Failed to enter the room.') + error.message;
-        ElMessageBox.alert(message, t('Note'), {
-          customClass: 'custom-element-class',
-          confirmButtonText: t('Confirm'),
-          callback: () => {
+        TUIMessageBox({
+          title: t('Note'),
+          message,
+          confirmButtonText: t('Sure'),
+          appendToRoomContainer: true,
+          callback: async () => {
             router.replace({ path: 'home' });
           },
         });
@@ -79,10 +83,12 @@ onMounted(async () => {
     }
   } catch (error: any) {
     const message = t('Failed to enter the room.') + error.message;
-    ElMessageBox.alert(message, t('Note'), {
-      customClass: 'custom-element-class',
-      confirmButtonText: t('Confirm'),
-      callback: () => {
+    TUIMessageBox({
+      title: t('Note'),
+      message,
+      confirmButtonText: t('Sure'),
+      appendToRoomContainer: true,
+      callback: async () => {
         uni.removeStorageSync('tuiRoom-currentUserInfo');
         router.replace({ path: 'home' });
       },
@@ -93,18 +99,18 @@ onMounted(async () => {
 /**
  * Processing users click [Logout Login] in the upper left corner of the page
  * 处理用户点击页面左上角【退出登录】
-**/
+ **/
 function handleLogOut() {
-/**
- * The accessor handles the logout method
- * 接入方处理 logout 方法
-**/
+  /**
+   * The accessor handles the logout method
+   * 接入方处理 logout 方法
+   **/
 }
 
 /**
  * Hosts create room callbacks
  * 主持人创建房间回调
-**/
+ **/
 function onCreateRoom(info: { code: number; message: string }) {
   console.debug('onEnterRoom:', info);
 }
@@ -112,7 +118,7 @@ function onCreateRoom(info: { code: number; message: string }) {
 /**
  * Ordinary members enter the room callback
  * 普通成员进入房间回调
-**/
+ **/
 function onEnterRoom(info: { code: number; message: string }) {
   console.debug('onCreateRoom:', info);
 }
@@ -120,7 +126,7 @@ function onEnterRoom(info: { code: number; message: string }) {
 /**
  * Hosts destroy room callbacks
  * 主持人销毁房间回调
-**/
+ **/
 const onDestroyRoom = (info: { code: number; message: string }) => {
   console.debug('onDestroyRoom:', info);
   uni.removeStorageSync('tuiRoom-roomInfo');
@@ -130,7 +136,7 @@ const onDestroyRoom = (info: { code: number; message: string }) => {
 /**
  * Ordinary members exit the room callback
  * 普通成员退出房间回调
-**/
+ **/
 const onExitRoom = (info: { code: number; message: string }) => {
   console.debug('onExitRoom:', info);
   uni.removeStorageSync('tuiRoom-roomInfo');
@@ -140,7 +146,7 @@ const onExitRoom = (info: { code: number; message: string }) => {
 /**
  * Ordinary members were kicked out of the room by the host
  * 普通成员被主持人踢出房间
-**/
+ **/
 const onKickedOutOfRoom = (info: { roomId: string; message: string }) => {
   console.debug('onKickedOutOfRoom:', info);
   uni.removeStorageSync('tuiRoom-roomInfo');
@@ -175,7 +181,7 @@ const onUserSigExpired = () => {
   font-family: PingFangSC-Medium;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #B3B8C8;
+  color: #b3b8c8;
   position: relative;
   width: 100%;
   height: 100%;

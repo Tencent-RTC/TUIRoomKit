@@ -1,33 +1,21 @@
 <template>
   <div class="control-container">
     <div v-if="!showRoomDetail" class="container-header">
-      <div>
-        <div v-if="!isEN" class="container-icon">
-          <svg-icon
-            class="tencent-cloud" icon-name="tencent-cloud" size="custom"
-          ></svg-icon>
-          <svg-icon
-            class="tencent-cloud-text" icon-name="tencent-cloud-text" size="custom"
-          ></svg-icon>
-        </div>
-        <div v-else class="login-logo">
-          <img class="login-top" :src="logoEn">
-        </div>
-      </div>
+      <Logo class="container-icon" />
       <div class="container-bottom">
         <div @tap="enterRoom" class="join-room">
-          <svg-icon class="enter-icon" icon-name="enter-room" size="custom"></svg-icon>
+          <svg-icon style="display: flex" class="enter-icon" :icon="EnterRoomIcon" />
           <span class="title">{{ t('Join Room') }}</span>
         </div>
         <div @tap="createRoom" class="create-room">
-          <svg-icon class="add-icon" icon-name="add-icon" size="custom"></svg-icon>
+          <svg-icon style="display: flex" class="add-icon" :icon="CreateRoomIcon" />
           <span class="title">{{ t('New Room') }}</span>
         </div>
       </div>
     </div>
     <div v-if="showRoomDetail || hasGivenRoomId " class="room-detail">
       <div class="room-detail-header">
-        <svg-icon @tap="handleClose" class="close-icon" icon-name="close-back" size="custom"></svg-icon>
+        <svg-icon style="display: flex" @tap="handleClose" class="close-icon" :icon="ArrowStrokeBackIcon"></svg-icon>
         <span v-if="isJoinRoom || hasGivenRoomId" class="room-detail-header-title">{{ t('Join Room') }}</span>
         <span v-else class="room-detail-header-title">{{ t('New Room') }}</span>
       </div>
@@ -47,7 +35,7 @@
             <div class="room-show-title">
               <span class="room-show-title">{{ roomType }}</span>
             </div>
-            <svg-icon class="chevron-down-icon" icon-name="chevron-down" size="custom"></svg-icon>
+            <svg-icon style="display: flex" class="chevron-down-icon" :icon="ArrowStrokeSelectDownIcon"></svg-icon>
           </div>
           <div class="room-detail-info-box">
             <span class="room-detail-title">{{ t('Your Name') }}</span>
@@ -99,7 +87,7 @@
           <span
             @tap="() => chooseCurrentType('SpeakAfterTakingSeat')"
             :class="[mode === 'SpeakAfterTakingSeat' && 'room-current-title']" class="room-choose-title"
-          >{{ t('Raise Hand Room') }}</span>
+          >{{ t('On-stage Speaking Room') }}</span>
         </div>
       </div>
     </div>
@@ -107,14 +95,18 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue';
-import SvgIcon from '../../common/SvgIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
 import { useRoomStore } from '../../../stores/room';
 import useRoomControl from './useRoomControlHooks';
+import CreateRoomIcon from '../../../assets/icons/CreateRoomIcon.svg';
+import EnterRoomIcon from '../../../assets/icons/EnterRoomIcon.svg';
+import ArrowStrokeBackIcon from '../../../assets/icons/ArrowStrokeBackIcon.svg';
+import ArrowStrokeSelectDownIcon from '../../../assets/icons/ArrowStrokeSelectDownIcon.svg';
+import Logo from '../../common/Logo.vue';
+import TUIMessage from '../../common/base/Message/index';
 
 const {
-  logoEn,
   t,
-  isEN,
 } = useRoomControl();
 
 const moreTypeRef = ref();
@@ -122,7 +114,7 @@ const roomStore = useRoomStore();
 const showRoomDetail = ref(false);
 const showMoreType = ref(false);
 const isJoinRoom = ref(false);
-const roomType =  computed(() => (mode.value === 'FreeToSpeak' ? t('Free Speech Room') : t('Raise Hand Room')));
+const roomType =  computed(() => (mode.value === 'FreeToSpeak' ? t('Free Speech Room') : t('On-stage Speaking Room')));
 const isMicOn = ref(true);
 const isCamerOn = ref(true);
 const mode = ref('FreeToSpeak');
@@ -218,6 +210,10 @@ function handleRoomOption(type:string) {
   emit('update-user-name', currentUserName.value);
   switch (type) {
     case 'Join':
+      if (!roomId.value) {
+        TUIMessage({ type: 'error', message: t('Please enter the room number') });
+        return;
+      }
       emit('enter-room', String(roomId.value));
       break;
     case 'New':
@@ -239,7 +235,6 @@ onUnmounted(() => {
 
 </script>
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
 .control-container{
     width: 100vw;
     height: 100%;
@@ -250,7 +245,10 @@ onUnmounted(() => {
 }
 
 .container-header{
-   padding-top: 80px;
+  padding-top: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .container-icon{
     display: flex;
@@ -467,17 +465,6 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
 }
-.tencent-cloud{
-    width: 120px;
-    height: 32px;
-    background-size: cover;
-}
-.tencent-cloud-text{
-    width: 169px;
-    height: 27px;
-    margin-top: 10px;
-    background-size: cover;
-}
 .room-choose-title{
     display: flex;
     align-items: center;
@@ -517,13 +504,5 @@ onUnmounted(() => {
     border: 0 solid rgba(0,0,0,0.85);
     box-shadow: 0 2px 4px 0 #D1D1D1;
   }
-}
-.login-logo{
-    display: flex;
-    justify-content: center;
-    padding-top: 20%;
-}
-.login-top{
-    width: 60vw;
 }
 </style>

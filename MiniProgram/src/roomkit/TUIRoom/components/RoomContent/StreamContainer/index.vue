@@ -55,7 +55,7 @@ import { StreamInfo, useRoomStore } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
 import { LAYOUT } from '../../../constants/render';
 import StreamRegion from '../StreamRegion/index.vue';
-import { ElMessage } from '../../../elementComp';
+import TUIMessage from '../../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import logger from '../../../utils/common/logger';
 import { throttle } from '../../../utils/utils';
@@ -262,7 +262,7 @@ const onUserVideoStateChanged = (eventInfo: {
   if (userId === basicStore.userId && !hasVideo && reason === TUIChangeReason.kChangedByAdmin) {
     // 主持人关闭摄像头
     if (streamType === TUIVideoStreamType.kCameraStream) {
-      ElMessage({
+      TUIMessage({
         type: 'warning',
         message: t('The host has turned off your camera'),
         duration: MESSAGE_DURATION.NORMAL,
@@ -275,7 +275,7 @@ const onUserVideoStateChanged = (eventInfo: {
     }
     // 主持人关闭屏幕分享
     if (streamType === TUIVideoStreamType.kScreenStream) {
-      ElMessage({
+      TUIMessage({
         type: 'warning',
         message: t('The host has turned off your screen sharing'),
         duration: MESSAGE_DURATION.NORMAL,
@@ -380,8 +380,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
-
 .stream-container {
   width: 100%;
   height: 100%;

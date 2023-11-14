@@ -64,7 +64,7 @@ import { useI18n } from '../../locales';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { isElectronEnv } from '../../utils/utils';
 import Drawer from '../../elementComp/Drawer.vue';
-import { ElMessageBox } from '../../elementComp/index';
+import TUIMessageBox from '../common/base/MessageBox';
 import logger from '../../utils/common/logger';
 const roomStore = useRoomStore();
 const { t } = useI18n();
@@ -144,9 +144,12 @@ async function startStreamPreview() {
     alertMessage = 'Camera And Microphone not detected on current device';
   }
   if (alertMessage) {
-    ElMessageBox.alert(t(alertMessage), t('Note'), {
-      customClass: 'custom-element-class',
-      confirmButtonText: t('Confirm') });
+    TUIMessageBox({
+      title: t('Note'),
+      message: t(alertMessage),
+      confirmButtonText: t('Sure'),
+      appendToRoomContainer: true,
+    });
   }
 
   cameraList && roomStore.setCameraList(cameraList);

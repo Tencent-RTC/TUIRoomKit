@@ -1,22 +1,19 @@
 <template>
   <div class="footer-container">
-    <div class="left-container">
-      <audio-control @tap="() => handleControlClick('audioControl')"></audio-control>
-      <video-control @tap="() => handleControlClick('videoControl')"></video-control>
-      <chat-control
-        v-if="!roomStore.isSpeakAfterTakingSeatMode"
-        @tap="() => handleControlClick('chatControl')"
-      ></chat-control>
-      <apply-control
-        v-else
-        @tap="() => handleControlClick('applyControl')"
-      ></apply-control>
-      <manage-member-control
-        v-if="roomStore.isMaster"
-        @tap="() => handleControlClick('manageMemberControl')"
-      ></manage-member-control>
-      <more-control @tap="() => handleControlClick('moreControl')"></more-control>
-    </div>
+    <audio-control @tap="() => handleControlClick('audioControl')"></audio-control>
+    <video-control @tap="() => handleControlClick('videoControl')"></video-control>
+    <chat-control
+      v-if="!roomStore.isSpeakAfterTakingSeatMode"
+      @tap="() => handleControlClick('chatControl')"
+    ></chat-control>
+    <apply-control
+      v-else
+      @tap="() => handleControlClick('applyControl')"
+    ></apply-control>
+    <manage-member-control
+      @tap="() => handleControlClick('manageMemberControl')"
+    ></manage-member-control>
+    <more-control @tap="() => handleControlClick('moreControl')"></more-control>
   </div>
 </template>
 <script setup lang="ts">
@@ -49,14 +46,8 @@ function handleControlClick(name: string) {
   bottom: 0;
   width: 100%;
   height: 100%;
-}
-.left-container{
-    width: 100%;
-    display: flex;
-    justify-content: space-evenly;
-}
-.top-container{
-  position: fixed;
-  top: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 </style>

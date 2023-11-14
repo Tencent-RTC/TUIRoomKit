@@ -2,7 +2,7 @@
   <div :class="['chat-editor', cannotSendMessage ? 'disable-editor' : '']">
     <div class="chat-input-container">
       <div class="input-content">
-        <svg-icon @tap="togglePopover" class="emoji-icon" icon-name="emoji-h5" size="medium" />
+        <svg-icon style="display: flex" @tap="togglePopover" :icon="EmojiIcon" class="emoji-icon" />
         <input
           ref="editorInputEle"
           v-model="sendMsg"
@@ -23,7 +23,8 @@
 <script setup lang="ts">
 import emoji from '../EditorTools/index.vue';
 import useChatEditor from './useChatEditor';
-import SvgIcon from '../../common/SvgIcon.vue';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import EmojiIcon from '../../../assets/icons/EmojiIcon.svg';
 const {
   t,
   editorInputEle,
@@ -38,8 +39,6 @@ const {
 </script>
 
   <style lang="scss" scoped>
-  @import '../../../assets/style/var.scss';
-
     .chat-editor {
       .input-content {
         display: flex;
@@ -98,7 +97,6 @@ const {
       display: flex;
       justify-content: center;
       align-items: center;
-      background: white;
       padding-top: 5px;
     }
     .emoji-icon{
