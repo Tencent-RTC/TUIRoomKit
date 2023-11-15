@@ -1,63 +1,59 @@
 <template>
-  <div :class="[isMobile? 'home-container-H5' : 'home-container']" data-theme="white" class="white-theme">
-    <div :class="[isMobile ? 'header-H5' : 'header']">
-      <user-info
-        v-if="!isMobile"
-        :user-id="userId"
-        :user-name="userName"
-        :avatar-url="avatarUrl"
-        @log-out="handleLogOut"
-      ></user-info>
-      <div v-if="!isMobile" class="container-icon">
-        <language-icon class="header-item language"></language-icon>
-        <switch-theme class="header-item theme"></switch-theme>
+  <div class="home-container" :class="[`tui-theme-${defaultTheme}`]">
+    <div class="header">
+      <div class="left-header">
+        <switch-theme class="header-item"></switch-theme>
+      </div>
+      <div class="right-header">
+        <user-info
+          class="header-item user-info"
+          :user-id="userId"
+          :user-name="userName"
+          :avatar-url="avatarUrl"
+          @log-out="handleLogOut"
+        ></user-info>
       </div>
     </div>
-    <stream-preview v-if="!isMobile" ref="streamPreviewRef"></stream-preview>
     <room-control
       ref="roomControlRef"
       :given-room-id="givenRoomId"
       :user-name="userName"
-      @update-user-name="handleUpdateUserName"
       @create-room="handleCreateRoom"
       @enter-room="handleEnterRoom"
+      @update-user-name="handleUpdateUserName"
     ></room-control>
   </div>
 </template>
 
 <script setup lang="ts">
 import UserInfo from '@TUIRoom/components/RoomHeader/UserInfo/index.vue';
-import StreamPreview from '@TUIRoom/components/RoomHome/StreamPreview.vue';
 import RoomControl from '@TUIRoom/components/RoomHome/RoomControl/index.vue';
-import LanguageIcon from '@TUIRoom/components/base/Language.vue';
-import SwitchTheme from '@TUIRoom/components/base/SwitchTheme.vue';
+import SwitchTheme from '@TUIRoom/components/common/SwitchTheme.vue';
 import { checkNumber } from '@TUIRoom/utils/common';
 import router from '@/router';
 import { useRoute } from '@/router/wxRouter';
-import { onMounted, Ref, ref } from 'vue';
+import { Ref, ref } from 'vue';
 import { getBasicInfo } from '../config/basic-info-config';
-import { useI18n } from 'vue-i18n';
 import { useBasicStore } from '@TUIRoom/stores/basic';
 import { TUIRoomEngine } from '@tencentcloud/tuiroom-engine-wx';
 import useGetRoomEngine from '@TUIRoom/hooks/useRoomEngine';
-import { isMobile } from '@TUIRoom/utils/useMediaValue';
 import logger from '@TUIRoom/utils/common/logger';
+import { storeToRefs } from 'pinia';
 
 const route = useRoute();
-const streamPreviewRef = ref();
 const userName: Ref<string> = ref('');
 const avatarUrl: Ref<string> = ref('');
 const userId: Ref<string> = ref('');
-const { t } = useI18n();
 const roomEngine = useGetRoomEngine();
 const basicStore = useBasicStore();
+const { defaultTheme } = storeToRefs(basicStore);
 const roomControlRef = ref();
 
 const roomId = checkNumber((route.query?.roomId) as string) ? route.query?.roomId : '';
 const givenRoomId: Ref<string> = ref((roomId) as string);
 
 function setTUIRoomData(action: string, mode?: string) {
-  const roomParam = isMobile ? roomControlRef.value.getRoomParam() : streamPreviewRef.value.getRoomParam();
+  const roomParam = roomControlRef.value.getRoomParam();
   const roomData = {
     action,
     roomMode: mode || 'FreeToSpeak',
@@ -91,15 +87,7 @@ async function generateRoomId(): Promise<string> {
   }
   return roomId;
 }
-function handleUpdateUserName(userName: string) {
-  try {
-    const currentUserInfo = JSON.parse(uni.getStorageSync('tuiRoom-userInfo') as string);
-    currentUserInfo.userName = userName;
-    uni.setStorageSync('tuiRoom-userInfo', JSON.stringify(currentUserInfo));
-  } catch (error) {
-    logger.log('sessionStorage error', error);
-  }
-}
+
 /**
  * Processing Click [Create Room]
  *
@@ -129,6 +117,16 @@ async function handleEnterRoom(roomId: string) {
       roomId,
     },
   });
+}
+
+function handleUpdateUserName(userName: string) {
+  try {
+    const currentUserInfo = JSON.parse(uni.getStorageSync('tuiRoom-userInfo') as string);
+    currentUserInfo.userName = userName;
+    uni.setStorageSync('tuiRoom-userInfo', JSON.stringify(currentUserInfo));
+  } catch (error) {
+    logger.log('sessionStorage error', error);
+  }
 }
 
 /**
@@ -168,18 +166,10 @@ async function handleInit() {
 }
 
 handleInit();
-
-onMounted(() => {
-  TUIRoomEngine.once('ready', () => {
-    if (!isMobile) {
-      streamPreviewRef.value.startStreamPreview();
-    }
-  });
-});
-
 </script>
 
 <style>
+@import '@TUIRoom/assets/style/black-theme.scss';
 @import '@TUIRoom/assets/style/white-theme.scss';
 /* * {
     transition: background-color .5s,color .5s !important;
@@ -187,34 +177,24 @@ onMounted(() => {
 </style>
 
 <style lang="scss" scoped>
-.home-container-H5{
-  width: 100%;
-  height: 100%;
-  // background: var(--background-color-style);
-  color: #B3B8C8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: PingFangSC-Medium;
-    .header-H5{
-      width: 100%;
-      position: absolute;
-      top: 0;
-      padding: 22px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-  }
+
+.tui-theme-black.home-container {
+  --background: var(--background-color-1);
 }
+.tui-theme-white.home-container {
+  --background: var(--background-color-1);
+}
+
 .home-container {
   width: 100%;
   height: 100%;
-  background: var(--background-color-style);
-  color: #B3B8C8;
+  background: var(--background);
+  background-size: cover;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: PingFangSC-Medium;
+  font-family: PingFang SC;
+  color: var(--font-color-1);
   .header {
     width: 100%;
     position: absolute;
@@ -222,21 +202,16 @@ onMounted(() => {
     padding: 22px 24px;
     display: flex;
     align-items: center;
-    .header-item {
-      &:not(:first-child) {
-        margin-left: 16px;
-      }
-      .language{
-        cursor: pointer;
-      }
-      .theme{
-        cursor: pointer;
+    justify-content: space-between;
+    .left-header, .right-header {
+      display: flex;
+      align-items: center;
+      .header-item {
+        &:not(:first-child) {
+          margin-left: 16px;
+        }
       }
     }
   }
 }
-  .container-icon{
-    display: flex;
-    align-items: center;
-  }
 </style>

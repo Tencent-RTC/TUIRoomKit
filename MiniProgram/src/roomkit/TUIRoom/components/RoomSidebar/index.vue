@@ -24,7 +24,7 @@
 
 import Chat from '../Chat/index.vue';
 import ManageMember from '../ManageMember/index';
-import popup from '../common/PopUpH5.vue';
+import popup from '../common/base/PopUpH5.vue';
 import useSideBar from './useSideBarHooks';
 import ChatEditor from '../Chat/ChatEditor/index.vue';
 

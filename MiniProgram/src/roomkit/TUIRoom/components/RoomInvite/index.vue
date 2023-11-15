@@ -1,13 +1,13 @@
 <template>
   <div class="invite-container-main">
     <div class="invite-title-main">
-      <p>{{ t('Invite') }}</p>
-      <span v-if="isWeChat" @tap="handleCloseInvite" class="cancel">{{ t('Cancel') }}</span>
+      <div>{{ t('Invite') }}</div>
+      <span @tap="handleCloseInvite" class="cancel">{{ t('Cancel') }}</span>
     </div>
     <div v-for="item in visibleInviteContentList" :key="item.id" class="invite-content-main">
-      <span class="invite-title">{{ t(item.title) }}</span>
+      <span class="invite-title">{{ t(item.mobileTitle) }}</span>
       <span class="invite-content">{{ item.content }}</span>
-      <svg-icon @tap="() => onCopy(item.copyLink)" icon-name="copy-icon" class="copy" size="custom"></svg-icon>
+      <svg-icon style="display: flex" @tap="() => onCopy(item.copyLink)" :icon="CopyIcon" class="copy"></svg-icon>
     </div>
     <span class="invite-bottom">
       {{ t('You can share the room number or link to invite more people to join the room.') }}
@@ -16,9 +16,9 @@
 </template>
 
 <script setup lang="ts">
-import SvgIcon from '../common/SvgIcon.vue';
+import SvgIcon from '../common/base/SvgIcon.vue';
+import CopyIcon from '../../assets/icons/CopyIcon.svg';
 import useRoomInviteControl from './useRoomInviteHooks';
-import { isWeChat } from '../../utils/useMediaValue';
 
 const {
   t,
@@ -50,15 +50,17 @@ span{
   bottom: 0;
   display: flex;
   flex-direction: column;
-  animation-duration: 100ms;
+  animation-duration: 200ms;
   animation-name: popup;
   padding-bottom: 4vh;
   @keyframes popup {
   from {
-    height: 0;
+    transform-origin: bottom;
+    transform: scaleY(0);
   }
   to {
-    height: 30%;
+    transform-origin: bottom;
+    transform: scaleY(1);
   }
 }
   .invite-title-main {
@@ -70,7 +72,7 @@ span{
     font-size: 20px;
     line-height: 24px;
     color: var(--popup-title-color-h5);
-    padding: 20px;
+    padding: 30px 0 20px 25px;
     align-items: center;
   }
   .invite-content-main {
@@ -112,9 +114,10 @@ span{
     padding-left: 40px;
   }
   .copy {
-    width: 14px;
-    height: 14px;
+    color: var(--active-color-1);
     margin-left: 30px;
+    width: 20px;
+    height: 20px;
   }
 }
 .cancel{

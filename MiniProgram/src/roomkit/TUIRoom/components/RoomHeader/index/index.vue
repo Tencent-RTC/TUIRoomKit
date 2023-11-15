@@ -11,14 +11,16 @@
         @on-exit-room="onExitRoom"
       />
     </div>
+    <switch-theme :visible="false"></switch-theme>
   </div>
 </template>
 <script setup lang="ts">
 import EndControl from '../../RoomFooter/EndControl/index.vue';
 import SwitchCamera from './SwitchCamera.vue';
 import SwitchMirror from './SwitchMirror.vue';
-import RoomInfo from './RoomInfo.vue';
+import RoomInfo from '../RoomInfo/index.vue';
 import TUIRoomAegis from '../../../utils/aegis';
+import SwitchTheme from '../../common/SwitchTheme.vue';
 
 const emit = defineEmits(['log-out', 'on-destroy-room', 'on-exit-room']);
 

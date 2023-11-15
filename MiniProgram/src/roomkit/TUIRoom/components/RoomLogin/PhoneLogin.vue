@@ -7,13 +7,14 @@
       enterkeyhint="complete"
     >
     <div class="area-container">
-      <svg-icon icon-name="phone-icon" size="medium"></svg-icon>
+      <svg-icon style="display: flex" :icon="PhoneIcon"></svg-icon>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import SvgIcon from '../common/SvgIcon.vue';
+import SvgIcon from '../common/base/SvgIcon.vue';
+import PhoneIcon from '../../assets/icons/PhoneIcon.svg';
 import { ref, watch } from 'vue';
 import { useI18n } from '../../locales';
 import { isMobile }  from '../../utils/useMediaValue';

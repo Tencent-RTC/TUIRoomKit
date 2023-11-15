@@ -1,13 +1,13 @@
 <template>
   <div class="contact-container-main">
     <div class="contact-title-main">
-      <p>{{ t('Contact us') }}</p>
-      <span v-if="isWeChat" @tap="handleCloseContact" class="cancel">{{ t('Cancel') }}</span>
+      <div>{{ t('Contact us') }}</div>
+      <span @tap="handleCloseContact" class="cancel">{{ t('Cancel') }}</span>
     </div>
     <div v-for="item in contactContentList" :key="item.id" class="contact-content-main">
       <span class="contact-title">{{ t(item.title) }}</span>
       <span class="contact-content">{{ item.content }}</span>
-      <svg-icon @tap="() => onCopy(item.copyLink)" icon-name="copy-icon" class="copy" size="custom"></svg-icon>
+      <svg-icon style="display: flex" @tap="() => onCopy(item.copyLink)" :icon="CopyIcon" class="copy"></svg-icon>
     </div>
     <span class="contact-bottom">
       {{ t('If you have any questions, please feel free to join our QQ group or send an email') }}
@@ -16,25 +16,18 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
 import useRoomMoreControl from './useRoomMoreHooks';
-import SvgIcon from '../common/SvgIcon.vue';
-import { isWeChat } from '../../utils/useMediaValue';
+import SvgIcon from '../common/base/SvgIcon.vue';
+import CopyIcon from '../../assets/icons/CopyIcon.svg';
 
 
 const {
   t,
-  groupNumber,
-  email,
   onCopy,
+  contactContentList,
 } = useRoomMoreControl();
 
 const emit = defineEmits(['on-close-contact']);
-
-const contactContentList = reactive([
-  { id: 1, title: 'group chat', content: groupNumber, copyLink: groupNumber },
-  { id: 2, title: 'Email', content: email, copyLink: email },
-]);
 
 function handleCloseContact() {
   emit('on-close-contact');
@@ -56,15 +49,17 @@ span{
   bottom: 0;
   display: flex;
   flex-direction: column;
-  animation-duration: 100ms;
+  animation-duration: 200ms;
   animation-name: popup;
   padding-bottom: 4vh;
   @keyframes popup {
   from {
-    height: 0;
+    transform-origin: bottom;
+    transform: scaleY(0);
   }
   to {
-    height: 30%;
+    transform-origin: bottom;
+    transform: scaleY(1);
   }
 }
   .contact-title-main {
@@ -76,7 +71,7 @@ span{
     font-size: 20px;
     line-height: 24px;
     color: var(--popup-title-color-h5);
-    padding: 20px;
+    padding: 30px 0 20px 25px;
     align-items: center;
   }
   .contact-content-main {
@@ -118,9 +113,10 @@ span{
     padding-left: 40px;
   }
   .copy {
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
     margin-left: 30px;
+    color: var(--active-color-1);
   }
 }
 .cancel{
