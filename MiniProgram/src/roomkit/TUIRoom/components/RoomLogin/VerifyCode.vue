@@ -7,7 +7,7 @@
       enterkeyhint="complete"
     >
     <div class="area-container">
-      <svg-icon icon-name="verify-code" size="medium"></svg-icon>
+      <svg-icon style="display: flex" :icon="VerifyIcon"></svg-icon>
     </div>
     <span v-if="verifyStates.countdown <= 0" class="text send-btn" @click="sendVerifyCode">{{ t('SEND') }}</span>
     <span v-else class="text static"> {{ t(' ') }} {{ `${verifyStates.countdown} s` }}</span>
@@ -16,7 +16,8 @@
 
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
-import SvgIcon from '../common/SvgIcon.vue';
+import SvgIcon from '../common/base/SvgIcon.vue';
+import VerifyIcon from '../../assets/icons/VerifyIcon.svg';
 import { useI18n } from '../../locales';
 import { isMobile }  from '../../utils/useMediaValue';
 const { t } = useI18n();
@@ -117,7 +118,7 @@ defineExpose({ startCountDown, clear });
       // border:1px solid #000;
         &.send-btn{
             cursor:pointer;
-            color:#4791FF;
+            color: #1C66E5;
             font-size: 16px;
         }
         &.static{

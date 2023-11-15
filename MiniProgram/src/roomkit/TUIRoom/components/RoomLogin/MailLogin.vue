@@ -5,16 +5,17 @@
       enterkeyhint="complete"
     >
     <div class="area-container">
-      <svg-icon icon-name="mail-icon" size="medium"></svg-icon>
+      <svg-icon style="display: flex" :icon="MailIcon"></svg-icon>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import SvgIcon from '../common/SvgIcon.vue';
+import SvgIcon from '../common/base/SvgIcon.vue';
 import { useI18n } from '../../locales';
 import { isMobile }  from '../../utils/useMediaValue';
+import MailIcon from '../../assets/icons/MailIcon.svg';
 
 const { t } = useI18n();
 

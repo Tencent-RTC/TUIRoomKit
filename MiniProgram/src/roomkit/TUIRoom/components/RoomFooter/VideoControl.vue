@@ -13,57 +13,48 @@
 -->
 <template>
   <div>
-    <div class="video-control-container" @click="emits('click')">
-      <icon-button
-        ref="videoIconButtonRef"
-        :is-active="!localStream.hasVideoStream"
-        :title="t('Camera')"
-        :icon-name="iconName"
-        :has-more="hasMore"
-        :disabled="isLocalVideoIconDisable"
-        @click-icon="toggleMuteVideo"
-        @click-more="handleMore"
-      />
-      <video-setting-tab
-        v-show="showVideoSettingTab"
-        ref="videoSettingRef"
-        class="video-tab"
-      ></video-setting-tab>
-    </div>
+    <video-media-control
+      :has-more="hasMore"
+      :is-muted="!localStream.hasVideoStream"
+      :is-disabled="isLocalVideoIconDisable"
+      @click="handleVideoMediaClick"
+    ></video-media-control>
     <Dialog
-      :model-value="showRequestOpenCameraDialog"
-      class="custom-element-class"
+      v-model="showRequestOpenCameraDialog"
       :title="title"
-      :modal="false"
+      :modal="true"
       :show-close="false"
-      :append-to-body="true"
       :close-on-click-modal="false"
-      :close-on-press-escape="false"
       width="500px"
+      :append-to-room-container="true"
     >
       <span>
         {{ t('The host invites you to turn on the camera') }}
       </span>
+      <template v-if="isMobile" #cancel>
+        <tui-button class="cancel" size="default" type="text" @click="handleReject">
+          {{ t('Keep it closed') }}
+        </tui-button>
+      </template>
+      <template v-if="isMobile" #agree>
+        <tui-button class="agree" size="default" type="text" @click="handleAccept">{{ t('Turn on the camera') }}</tui-button>
+      </template>
       <template #footer>
-        <div :class="[isMobile ? 'button-container-mobile' : 'button-container-PC']">
-          <span class="cancel" @click="handleReject">{{ t('Keep it closed') }}</span>
-          <span class="agree" @click="handleAccept">{{ t('Turn on the camera') }}</span>
-        </div>
+        <tui-button class="cancel-button" size="default" @click="handleAccept">{{ t('Turn on the camera') }}</tui-button>
+        <tui-button class="cancel-button" size="default" type="primary" @click="handleReject">
+          {{ t('Keep it closed') }}
+        </tui-button>
       </template>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, Ref } from 'vue';
+import { ref, computed, onUnmounted, Ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessageBox, ElMessage } from '../../elementComp';
-import Dialog from '../../elementComp/Dialog/index.vue';
-import IconButton from '../common/IconButton.vue';
-import VideoSettingTab from '../base/VideoSettingTab.vue';
-
+import Dialog from '../common/base/Dialog/index.vue';
+import VideoMediaControl from '../common/VideoMediaControl.vue';
 import { useRoomStore } from '../../stores/room';
-import { ICON_NAME } from '../../constants/icon';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
 
@@ -71,6 +62,9 @@ import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { TUIRoomEngine, TUIVideoStreamType, TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-wx';
 import { isMobile, isWeChat }  from '../../utils/useMediaValue';
 import { useBasicStore } from '../../stores/basic';
+import TuiButton from '../common/base/Button.vue';
+import TUIMessage from '../common/base/Message/index';
+import TUIMessageBox from '../common/base/MessageBox/index';
 const roomEngine = useGetRoomEngine();
 
 const roomStore = useRoomStore();
@@ -87,16 +81,12 @@ const {
 const { t } = useI18n();
 const hasMore = computed(() => !isMobile);
 const showVideoSettingTab: Ref<boolean> = ref(false);
-const videoIconButtonRef = ref<InstanceType<typeof IconButton>>();
-const videoSettingRef = ref<InstanceType<typeof VideoSettingTab>>();
 const title = computed(() => (isMobile ? '' : t('Tips')));
 
-const iconName = computed(() => {
-  if (isLocalVideoIconDisable.value) {
-    return ICON_NAME.CameraOffDisabled;
-  }
-  return localStream.value.hasVideoStream ? ICON_NAME.CameraOn : ICON_NAME.CameraOff;
-});
+function handleVideoMediaClick() {
+  emits('click');
+  toggleMuteVideo();
+}
 
 async function toggleMuteVideo() {
   if (isLocalVideoIconDisable.value) {
@@ -106,7 +96,7 @@ async function toggleMuteVideo() {
     } else if (isAudience.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_AUDIENCE;
     }
-    ElMessage({
+    TUIMessage({
       type: 'warning',
       message: t(warningMessage),
       duration: MESSAGE_DURATION.NORMAL,
@@ -125,16 +115,17 @@ async function toggleMuteVideo() {
     const hasCameraDevice = cameraList.length > 0;
     // 无摄像头列表
     if (!hasCameraDevice && !isWeChat) {
-      ElMessageBox.alert(t('Camera not detected on current device'), t('Note'), {
-        customClass: 'custom-element-class',
-        confirmButtonText: t('Confirm'),
+      TUIMessageBox({
+        title: t('Note'),
+        message: t('Camera not detected on current device'),
+        appendToRoomContainer: true,
+        confirmButtonText: t('Sure'),
       });
       return;
     }
     // 有摄像头列表
     roomEngine.instance?.setLocalVideoView({
       view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
-      streamType: TUIVideoStreamType.kCameraStream,
     });
     if (isMobile) {
       await roomEngine.instance?.openLocalCamera({ isFrontCamera: isFrontCamera.value });
@@ -145,23 +136,6 @@ async function toggleMuteVideo() {
   showVideoSettingTab.value = false;
 }
 
-function handleMore() {
-  if (!showVideoSettingTab.value) {
-    showVideoSettingTab.value = true;
-  } else {
-    showVideoSettingTab.value = false;
-  }
-}
-
-function handleDocumentClick(event: MouseEvent) {
-  if (
-    showVideoSettingTab.value
-    && !videoIconButtonRef.value?.$el.contains(event.target)
-    && !videoSettingRef.value?.$el.contains(event.target)
-  ) {
-    showVideoSettingTab.value = false;
-  }
-}
 
 // -------- 处理主持人打开/关闭摄像头信令 --------
 const showRequestOpenCameraDialog: Ref<boolean> = ref(false);
@@ -180,7 +154,6 @@ async function handleAccept() {
   roomStore.setCanControlSelfVideo(true);
   roomEngine.instance?.setLocalVideoView({
     view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
-    streamType: TUIVideoStreamType.kCameraStream,
   });
   await roomEngine.instance?.responseRemoteRequest({
     requestId: requestOpenCameraRequestId.value,
@@ -208,18 +181,12 @@ async function onRequestCancelled(eventInfo: { requestId: string }) {
   }
 }
 
-onMounted(() => {
-  document?.addEventListener('click', handleDocumentClick, true);
-});
-
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
 });
 
 onUnmounted(() => {
-  document?.removeEventListener('click', handleDocumentClick, true);
-
   roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
 });
@@ -227,7 +194,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/var.scss';
 
 $videoTabWidth: 320px;
 
@@ -242,47 +208,20 @@ $videoTabWidth: 320px;
       padding: 20px;
     }
   }
-.button-container-mobile{
-  width: 100%;
-  display: flex;
-  .agree{
+  .agree, .cancel{
     padding: 14px;
     width: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid #F2F2F2;
-    color: #006EFF;
+    color: var(--active-color-1);
+    font-size: 16px;
+    font-weight: 500;
   }
   .cancel{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-top: 1px solid #F2F2F2;
-    color: #2B2E38;
-    border-right: 1px solid #F2F2F2;
+    color: var(--font-color-4);
   }
-}
-.button-container-PC{
-  .cancel{
-    padding: 5px 20px;
-    background: var(--create-room-option);
-    border-radius: 2px;
-    width: auto;
-    display: initial;
-    color: var(--color-font);
-    border: 1px solid var(--choose-type);
-  }
-  .agree{
-    padding: 5px 20px;
-    background: #006EFF;
-    color: white;
-    margin-left: 14px;
-    border-radius: 2px;
-    width: auto;
-    display: initial;
-  }
+ .cancel-button {
+  margin-left: 20px;
 }
 </style>

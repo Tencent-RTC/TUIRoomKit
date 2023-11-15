@@ -1,9 +1,9 @@
 <template>
   <div class="more-control-container">
     <icon-button
+      :icon="MoreIcon"
       :is-active="sidebarName === 'more'"
       :title="t('Contact us')"
-      icon-name="contact-us-h5"
       @click-icon="toggleContactSidebar"
     />
     <div v-if="isShowContactTab" class="contact-container">
@@ -13,9 +13,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import IconButton from '../common/IconButton.vue';
+import { ref } from 'vue';
+import IconButton from '../common/base/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
+import MoreIcon from '../../assets/icons/MoreIcon.svg';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
 import { isMobile }  from '../../utils/useMediaValue';
@@ -46,24 +47,10 @@ function toggleContactSidebar() {
   }
 }
 
-
-function handleDocumentClick(event: MouseEvent) {
-  if (isShowContactTab.value && contactRef.value && !contactRef.value.$el.contains(event.target)) {
-    isShowContactTab.value = false;
-  }
-}
-
 function handleOnCloseContact() {
   isShowContactTab.value = false;
 }
 
-onMounted(() => {
-  document?.addEventListener('click', handleDocumentClick, true);
-});
-
-onUnmounted(() => {
-  document?.removeEventListener('click', handleDocumentClick, true);
-});
 </script>
 
 <style lang="scss" scoped>

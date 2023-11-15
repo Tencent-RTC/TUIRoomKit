@@ -2,26 +2,31 @@
   <div class="manage-member-control-container">
     <icon-button
       :is-active="sidebarName === 'manage-member'"
-      :title="t('Members')"
-      :icon-name="iconName"
+      :title="memberTitle"
+      :icon="ManageMemberIcon"
       @click-icon="toggleMangeMemberSidebar"
-    />
+    >
+    </icon-button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import IconButton from '../common/IconButton.vue';
+import IconButton from '../common/base/IconButton.vue';
+import ManageMemberIcon from '../../assets/icons/ManageMemberIcon.svg';
 import { useBasicStore } from '../../stores/basic';
-import { ICON_NAME } from '../../constants/icon';
+import { useRoomStore } from '../../stores/room';
 import { useI18n } from '../../locales';
+import { computed } from 'vue';
 
 const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);
-const iconName = computed(() => (sidebarName.value === 'manage-member' ? ICON_NAME.ManageMemberActive : ICON_NAME.ManageMember));
+const roomStore = useRoomStore();
+const { userNumber } = storeToRefs(roomStore);
+
+const memberTitle = computed(() => `${t('Members')}(${userNumber.value})`);
 
 function toggleMangeMemberSidebar() {
   if (basicStore.setSidebarOpenStatus && sidebarName.value === 'manage-member') {

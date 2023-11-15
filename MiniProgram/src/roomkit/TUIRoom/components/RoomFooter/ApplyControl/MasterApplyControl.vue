@@ -3,21 +3,22 @@
     <icon-button
       ref="masterApplyControlRef"
       :title="t('Raise hand')"
-      :icon-name="ICON_NAME.ApplyOnSeat"
+      :icon="ApplyIcon"
       @click-icon="toggleApplySpeech"
     />
     <div v-if="hasApplyToAnchorUser && !showApplyUserList" class="attention master-attention">
-      <svg-icon icon-name="apply-big-icon" class="apply-big-icon"></svg-icon>
+      <svg-icon style="display: flex" :icon="ApplyIcon" class="apply-big-icon"></svg-icon>
       <span class="info">{{ applyToAnchorList.length }}</span>
     </div>
     <div
       v-if="showApplyUserList"
       ref="masterApplyListRef"
       :class="isMobile ? 'apply-list-container-h5':'apply-list-container'"
+      :style="applyListContainerStyle"
     >
       <div class="title-container">
         <span class="title">{{ t('Apply to stage application') }}</span>
-        <svg-icon icon-name="close" size="medium" class="close" @click="hideApplyList"></svg-icon>
+        <svg-icon style="display: flex" :icon="CloseIcon" class="close" @click="hideApplyList"></svg-icon>
       </div>
       <div class="apply-list">
         <div v-for="(item, index) in applyToAnchorList" :key="index" class="apply-item">
@@ -26,37 +27,46 @@
             <span class="user-name" :title="item.userName || item.userId">{{ item.userName || item.userId }}</span>
           </div>
           <div class="control-container">
-            <div class="button primary" @click="handleUserApply(item.userId, true)">{{ t('Agree') }}</div>
-            <div class="button outline" @click="handleUserApply(item.userId, false)">{{ t('Reject') }}</div>
+            <tui-button size="default" @click="handleUserApply(item.userId, true)">
+              {{ t('Agree') }}
+            </tui-button>
+            <tui-button size="default" type="primary" @click="handleUserApply(item.userId, false)">
+              {{ t('Reject') }}
+            </tui-button>
           </div>
         </div>
       </div>
       <div class="apply-footer">
-        <div class="button outline deny-all" @click="denyAllUserApply">{{ t('Reject All') }}</div>
+        <tui-button size="default" class="deny-all" @click="denyAllUserApply">{{ t('Reject All') }}</tui-button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import Avatar from '../../base/Avatar.vue';
-import { ICON_NAME } from '../../../constants/icon';
-import IconButton from '../../common/IconButton.vue';
-import SvgIcon from '../../common/SvgIcon.vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import Avatar from '../../common/Avatar.vue';
+import IconButton from '../../common/base/IconButton.vue';
+import ApplyIcon from '../../../assets/icons/ApplyIcon.svg';
+import SvgIcon from '../../common/base/SvgIcon.vue';
+import CloseIcon from '../../../assets/icons/CloseIcon.svg';
+import TuiButton from '../../common/base/Button.vue';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
 import { useI18n } from '../../../locales';
 import { isMobile }  from '../../../utils/useMediaValue';
+import useZIndex from '../../../hooks/useZIndex';
 
 const { t } = useI18n();
+const { nextZIndex } = useZIndex();
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 const { handleUserApply, denyAllUserApply } = useMasterApplyControl();
 const { showApplyUserList } = storeToRefs(basicStore);
+const applyListContainerStyle = ref({});
 const { isMaster, applyToAnchorList } = storeToRefs(roomStore);
 const masterApplyControlRef = ref<InstanceType<typeof IconButton>>();
 const masterApplyListRef = ref();
@@ -73,6 +83,12 @@ function toggleApplySpeech() {
 function hideApplyList() {
   basicStore.setShowApplyUserList(false);
 }
+
+watch(showApplyUserList, (val) => {
+  if (val) {
+    applyListContainerStyle.value = { zIndex: nextZIndex() };
+  }
+});
 
 function handleDocumentClick(event: MouseEvent) {
   if (
@@ -125,6 +141,8 @@ onBeforeUnmount(() => {
     .apply-big-icon {
       width: 40px;
       height: 40px;
+      justify-content: center;
+      color: #FFFFFF;
     }
     .info {
       color: #FFFFFF;
@@ -193,6 +211,9 @@ onBeforeUnmount(() => {
         .control-container {
           display: flex;
           justify-content: space-between;
+          button:last-child {
+            margin-left: 10px;
+          }
         }
       }
     }
@@ -201,26 +222,6 @@ onBeforeUnmount(() => {
       .deny-all {
         float: right;
       }
-    }
-    .button {
-      border-radius: 2px;
-      padding: 6px 20px;
-      font-family: PingFangSC-Regular;
-      font-weight: 400;
-      font-size: 14px;
-      color: var(--apply-list-container-color);
-      text-align: center;
-      cursor: pointer;
-    }
-    .primary {
-      background-image: linear-gradient(235deg, #1883FF 0%, #0062F5 100%);
-      color: var(--apply-container-primary);
-      margin-right: 5px;
-    }
-    .outline {
-      background: rgba(173,182,204,0.10);
-      border: 1px solid #ADB6CC;
-      color: var(--apply-container-outline);
     }
   }
   .apply-list-container-h5 {
@@ -310,7 +311,6 @@ onBeforeUnmount(() => {
       font-family: PingFangSC-Regular;
       font-weight: 400;
       font-size: 14px;
-      color: var(--apply-list-container-color);
       text-align: center;
       cursor: pointer;
     }

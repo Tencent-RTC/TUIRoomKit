@@ -1,9 +1,8 @@
-import { ref, onMounted, computed, onUnmounted, Ref } from 'vue';
-import { ICON_NAME } from '../../../constants/icon';
+import { ref, onMounted, onUnmounted, Ref } from 'vue';
 import { useI18n } from '../../../locales';
 import { useBasicStore } from '../../../stores/basic';
 import { storeToRefs } from 'pinia';
-import { ElMessage } from '../../../elementComp';
+import TUIMessage from '../../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { TUIRoomEngine } from '@tencentcloud/tuiroom-engine-wx';
 import { useRoomStore } from '../../../stores/room';
@@ -21,8 +20,6 @@ export default function useUserInfo() {
 
   const tempUserName = ref('');
   const roomStore = useRoomStore();
-
-  const iconName = computed(() => (showUserControl.value ? ICON_NAME.LineArrowUp : ICON_NAME.LineArrowDown));
 
   /**
      * Whether to display the user information operation box
@@ -70,7 +67,7 @@ export default function useUserInfo() {
     **/
   async function handleSaveUserName(userName: string) {
     if (userName.length === 0) {
-      ElMessage({
+      TUIMessage({
         type: 'warning',
         message: t('Username length should be greater than 0'),
         duration: MESSAGE_DURATION.NORMAL,
@@ -95,7 +92,6 @@ export default function useUserInfo() {
     t,
     showEditNameItem,
     showUserControl,
-    iconName,
     showUserNameEdit,
     userInfoRef,
     tempUserName,
