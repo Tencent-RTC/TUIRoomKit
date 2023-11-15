@@ -1,0 +1,89 @@
+PODS:
+  - Flutter (1.0.0)
+  - fluttertoast (0.0.2):
+    - Flutter
+    - Toast
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - permission_handler_apple (9.1.1):
+    - Flutter
+  - rtc_conference_tui_kit (0.0.1):
+    - Flutter
+  - rtc_room_engine (1.6.1):
+    - Flutter
+    - TUIRoomEngine_Flutter (= 1.6.1)
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - tencent_trtc_cloud (10.7):
+    - Flutter
+    - TXCustomBeautyProcesserPlugin (= 1.0.2)
+    - TXLiteAVSDK_Professional (~> 11.4.14445)
+  - Toast (4.0.0)
+  - TUIRoomEngine_Flutter (1.6.1):
+    - TUIRoomEngine_Flutter/Professional (= 1.6.1)
+    - TXIMSDK_Plus_iOS (>= 7.5.4852)
+  - TUIRoomEngine_Flutter/Professional (1.6.1):
+    - TXIMSDK_Plus_iOS (>= 7.5.4852)
+    - TXLiteAVSDK_Professional
+  - TXCustomBeautyProcesserPlugin (1.0.2)
+  - TXIMSDK_Plus_iOS (7.6.5011)
+  - TXLiteAVSDK_Professional (11.4.14530):
+    - TXLiteAVSDK_Professional/Professional (= 11.4.14530)
+  - TXLiteAVSDK_Professional/Professional (11.4.14530)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - rtc_conference_tui_kit (from `.symlinks/plugins/rtc_conference_tui_kit/ios`)
+  - rtc_room_engine (from `.symlinks/plugins/rtc_room_engine/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - tencent_trtc_cloud (from `.symlinks/plugins/tencent_trtc_cloud/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Toast
+    - TUIRoomEngine_Flutter
+    - TXCustomBeautyProcesserPlugin
+    - TXIMSDK_Plus_iOS
+    - TXLiteAVSDK_Professional
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  fluttertoast:
+    :path: ".symlinks/plugins/fluttertoast/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
+  rtc_conference_tui_kit:
+    :path: ".symlinks/plugins/rtc_conference_tui_kit/ios"
+  rtc_room_engine:
+    :path: ".symlinks/plugins/rtc_room_engine/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  tencent_trtc_cloud:
+    :path: ".symlinks/plugins/tencent_trtc_cloud/ios"
+
+SPEC CHECKSUMS:
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  fluttertoast: 31b00dabfa7fb7bacd9e7dbee580d7a2ff4bf265
+  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
+  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+  rtc_conference_tui_kit: 4161666e26c6d659e11f64c43d111fd5a797253e
+  rtc_room_engine: b47932c383f60ad1f1e238ab0dcfb4a516e39730
+  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
+  tencent_trtc_cloud: 8b55aa23005a77db473cdbc13841a4b13b261946
+  Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
+  TUIRoomEngine_Flutter: 4e9157ad9384343ef65f307160ef85c5921d56fd
+  TXCustomBeautyProcesserPlugin: 099393b941cb40eda12b3a80bf6c0319957b1cfd
+  TXIMSDK_Plus_iOS: b665f09489e7d1a35c2dd95a495544d0c2a84f37
+  TXLiteAVSDK_Professional: 2fde63cb7ed1338bac4b26a229d20f1ca6a1b6c9
+
+PODFILE CHECKSUM: f1c82f10837f8fdf27aee12401554c9539720e1f
+
+COCOAPODS: 1.14.2
