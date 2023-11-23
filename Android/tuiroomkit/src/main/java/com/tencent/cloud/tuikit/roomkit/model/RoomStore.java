@@ -51,7 +51,7 @@ public class RoomStore {
         videoModel = new VideoModel();
         allUserList = new CopyOnWriteArrayList<>();
         seatUserList = new CopyOnWriteArrayList<>();
-        takeSeatRequestList = new LinkedList<>();
+        takeSeatRequestList = new CopyOnWriteArrayList<>();
     }
 
     public void addTakeSeatRequest(TUIRoomDefine.Request request) {
