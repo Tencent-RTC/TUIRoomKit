@@ -1,38 +1,51 @@
-_简体中文 | [English](README.en.md)
-# 腾讯云 · 多人音视频房间解决方案
+<!--
+ * @Author: abyyxwang
+ * @Date: 2022-12-16 10:40:40
+ * @LastEditors: abyyxwang
+ * @LastEditTime: 2022-12-16 10:41:32
+ * @Description: 
+-->
+English | [简体中文](README.zh.md)
+# Tencent Cloud UIKit for Video Conference
 
-<img src="Preview/logo.png" align="left" width=120 height=120>  TUIRoomKit 是腾讯云推出一款定位 企业会议、在线课堂、网络沙龙等场景的 UI 组件，通过集成该组件，您只需要编写几行代码就可以为您的 App 添加类似视频会议功能，并且支持屏幕分享、成员管理，禁麦禁画、聊天弹幕等功能。TUIRoomlKit 支持 Windows、Mac、Android、iOS、Web、Electron 等多个开发平台。
+<img src="Preview/logo.png" align="left" width=120 height=120>  TUIRoomKit is Tencent Cloud launched a positioning enterprise meeting, online class, network salon and other scenes of the UI component, through the integration of the component, you only need to write a few lines of code can add similar video conference functions for your App, and support screen sharing, member management, ban the ban painting, chat and other functions. TUIRoomlKit supports Windows, Mac, Android, iOS, Web, Electron and other development platforms.
 
-## 产品特性
+<a href="https://apps.apple.com/cn/app/%E8%85%BE%E8%AE%AF%E4%BA%91%E9%9F%B3%E8%A7%86%E9%A2%91/id1400663224"><img src="Preview/app-store.svg" height=40></a> <a href="https://dldir1.qq.com/hudongzhibo/liteav/TRTCDemo.apk"><img src="Preview/play-store.svg" height=40></a> <a href="https://web.sdk.qcloud.com/trtc/webrtc/demo/api-sample/login.html"><img src="Preview/web-app.svg" height=40></a>
+
+
+
+## Features
 
 <p align="center">
-  <img src="Preview/room-uikit-zh.png"/>
+  <img src="Preview/room-uikit-en.png"/>
 </p>
 
-- 接入方便：提供带 UI 的开源组件，节省90%开发时间，快速上线在线视频会议功能。
-- 平台互通：各平台的 TUIRoomKit 组件互联互通，沟通无障碍；
-- 屏幕分享：基于3000+家市场应用共同打磨的各平台屏幕采集能力，搭配专属AI 编码算法，更低码率更清晰的画面；
-- 成员管理：支持全体静音、单一成员禁言禁画、邀请发言、踢出房间等多个标准的房间管理功能；
-- 其他特性：支持房间成员聊天弹幕、音效设置等其他特性，欢迎使用；
+- Easy access: Provide open source components with UI, save 90% development time, fast online video conference function.
+- Platform connectivity: TUIRoomKit components of all platforms are interconnected and accessible.
+- Screen sharing: Based on the screen acquisition capability of each platform jointly polished by 3000+ market applications, with exclusive AI coding algorithm, lower bit rate and clearer picture.
+- Member management: It supports multiple standard room management functions such as all mute, single member gag, drawing, inviting to speak, kicking out of the room, etc.
+- Other features: Support room members chat screen, sound Settings and other features, welcome to use.
 
-## 开始使用
+## Make a first video Conference 
 
-这里以 含 UI 的集成（即TUIRoomKit）为例，这也是我们推荐的集成方式，关键步骤如下：
-- **Step1**：参考官网文档快速接入 TUIRoomKit 到您的项目中，各平台/框架详细的接入流程：[Web](https://cloud.tencent.com/document/product/647/81962) 、[Android ](https://cloud.tencent.com/document/product/647/81961)、 [iOS](https://cloud.tencent.com/document/product/647/84237)、 [Electron](https://cloud.tencent.com/document/product/647/84238)、[Windows](https://cloud.tencent.com/document/product/647/84239)
-- **Step2**：创建您的第一个多人音视频房间！
-
-
-
-## 快速访问
-
-- 如果你遇到了困难，可以先参阅 [常见问题](https://cloud.tencent.com/document/product/647/84271)，这里整理开发者最常出现的问题，覆盖各个平台，希望可以帮助您快速解决问题
-- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](Web/)、[Android](Android/)、[Electron](Electron/)、[Windows](Windows-Mac/)
-- 如果您想了解我们最新的一些产品特性，可以查看 [更新日志](https://cloud.tencent.com/document/product/647/81974)，这里有 TUIRoomKit 最新的功能特性，以及历史版本功能迭代
-- 完整的 API 文档见 [多人音视频 SDK API 示例](https://cloud.tencent.com/document/product/647/84244)：包含TUIRoomKit（含 UI）、TUIRoomEngine（无 UI）、以及通话事件回调等介绍。
-- 如果你想了解更多腾讯云音视频团队维护的项目，可以查看我们的 [产品官网](https://cloud.tencent.com/product/rtcube)、[Github Organizations](https://github.com/LiteAVSDK) 等
+Here is an example of integration with UI (ie TUIRoomKit), which is also our recommended integration method. The key steps are as follows:
+- **Step1**：Refer to the official website document to quickly connect TUIRoomKit to your project, the detailed access process of each platform/framework: [Web](https://cloud.tencent.com/document/product/1640/81132) 、[Android ](https://cloud.tencent.com/document/product/647/78729)、 [iOS](https://cloud.tencent.com/document/product/647/78730)、 [微信小程序](https://cloud.tencent.com/document/product/647/78733)、[uni-app](https://cloud.tencent.com/document/product/647/78732)
+- **Step2**：Create your first multiplayer video conference.
 
 
 
-## 交流&反馈
+## Quick link
+- If you encounter difficulties, you can refer to [FAQs](https://cloud.tencent.com/document/product/647/78767), here are the most frequently encountered problems of developers, covering various platforms, I hope you can Help you solve problems quickly.
+- If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](Web/), [Android](Android/), [iOS](iOS/).
 
-如果您在使用过程中有遇到什么问题，欢迎提交 [**issue**](https://github.com/tencentyun/TUIRoomKit/issues)，我们也欢迎您加入我们的开发者QQ群进行技术交流和反馈问题，QQ群 ID：770645461.
+- If you would like to see some of our latest product features, you can check the [Update Log](https://cloud.tencent.com/document/product/647/80931), here are the latest features of TUICallKit, as well as the historical version features iterate
+- For complete API documentation, see [Audio Video Call SDK API Example](https://cloud.tencent.com/document/product/647/78748): including TUICallKit (with UIKit), TUICallEngine (without UIKit), and call events Callbacks, etc.
+- If you want to learn more about the projects maintained by Tencent Cloud  Media Services Team, you can check our [Product Official Website](https://cloud.tencent.com/product/rtcube), [Github Organizations](https://github .com/LiteAVSDK) etc.
+
+
+
+## Have any questions?
+- Welcome to submit [**issue**](https://github.com/tencentyun/TUIRoomKit/issues)  
+- Welcome to join our Telegram Group to communicate with our professional engineers! We are more than happy to hear from you，Click to join: https://t.me/+EPk6TMZEZMM5OGY1
+Or scan the QR code 
+<img src="Preview/telegram-code.jpg"/>
