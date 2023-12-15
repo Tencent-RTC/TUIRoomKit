@@ -25,4 +25,5 @@
 "Demo.TUIRoomKit.raise.speaker" = "Raise hand Speaker Room";
 "Demo.TUIRoomKit.video.conference" = "`s quick meeting";
 "Demo.TUIRoomKit.prepareSetting" = "Prepare Settings";
-"Demo.TUIRoomKit.tip" = "Tencent Cloud TUIRoomKit";
+"Demo.TUIRoomKit.video.conferencing" = "Multi-party video conferencing";
+"Demo.TUIRoomKit.generating.roomId" = "Generating room number, please try again later";

@@ -31,14 +31,14 @@ class ExitRoomView: UIView {
         return view
     }()
     
-    let titleLabel: UILabel = {
+    lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = .leaveRoomTipText
         label.textColor = UIColor(0x7C85A6)
         label.font = UIFont(name: "PingFangSC-Regular", size: 12)
         label.textAlignment = .center
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
+        label.text = viewModel.isShownExitRoomButton() && viewModel.isShownLeaveRoomButton() ? .appointOwnerText : .leaveRoomTipText
         return label
     }()
     
@@ -55,7 +55,6 @@ class ExitRoomView: UIView {
         button.setTitleColor(UIColor(0x006CFF), for: .normal)
         button.backgroundColor = UIColor(0x17181F)
         button.isEnabled = true
-        button.addTarget(self, action: #selector(leaveRoomAction), for: .touchUpInside)
         return button
     }()
     
@@ -72,7 +71,6 @@ class ExitRoomView: UIView {
         button.setTitleColor(UIColor(0xE5395C), for: .normal)
         button.backgroundColor = UIColor(0x17181F)
         button.isEnabled = true
-        button.addTarget(self, action: #selector(exitRoomAction), for: .touchUpInside)
         return button
     }()
     
@@ -92,9 +90,9 @@ class ExitRoomView: UIView {
         activateConstraints()
         bindInteraction()
         isViewReady = true
-        exitRoomButton.isHidden = currentUser.userId != roomInfo.ownerId
-        leaveRoomButton.isHidden = !viewModel.isShowLeaveRoomButton()
-        boundary2View.isHidden = currentUser.userId != roomInfo.ownerId || !viewModel.isShowLeaveRoomButton()
+        exitRoomButton.isHidden = !viewModel.isShownExitRoomButton()
+        leaveRoomButton.isHidden = !viewModel.isShownLeaveRoomButton()
+        boundary2View.isHidden = !viewModel.isShownExitRoomButton() || !viewModel.isShownLeaveRoomButton()
     }
     
     func constructViewHierarchy() {
@@ -109,7 +107,7 @@ class ExitRoomView: UIView {
     
     func activateConstraints() {
         let titleLabelHeight = 67.scale375Height()
-        let leaveRoomButtonHeight = viewModel.isShowLeaveRoomButton() ? 57.scale375Height() : 0
+        let leaveRoomButtonHeight = viewModel.isShownLeaveRoomButton() ? 57.scale375Height() : 0
         let exitRoomButtonHeight = currentUser.userId == roomInfo.ownerId ? 57.scale375Height() : 0
         let space = 20.scale375Height()
         let contentViewHeight = titleLabelHeight + leaveRoomButtonHeight + exitRoomButtonHeight + space
@@ -149,6 +147,8 @@ class ExitRoomView: UIView {
     }
     
     func bindInteraction() {
+        leaveRoomButton.addTarget(self, action: #selector(leaveRoomAction), for: .touchUpInside)
+        exitRoomButton.addTarget(self, action: #selector(exitRoomAction), for: .touchUpInside)
         contentView.transform = CGAffineTransform(translationX: 0, y: kScreenHeight)
         panelControl.addTarget(self, action: #selector(clickBackgroundView), for: .touchUpInside)
     }
@@ -195,9 +195,18 @@ class ExitRoomView: UIView {
     }
 }
 
+extension ExitRoomView: ExitRoomViewModelResponder {
+    func makeToast(message: String) {
+        makeToast(message)
+    }
+}
+
 private extension String {
     static var leaveRoomTipText: String {
         localized("TUIRoom.leave.room.tip" )
+    }
+    static var appointOwnerText: String {
+        localized("TUIRoom.appoint.owner" )
     }
     static var leaveRoomText: String {
         localized("TUIRoom.leave.room")

@@ -9,23 +9,22 @@
 import Foundation
 import TUIRoomEngine
 #if TXLiteAVSDK_TRTC
-    import TXLiteAVSDK_TRTC
+import TXLiteAVSDK_TRTC
 #elseif TXLiteAVSDK_Professional
-    import TXLiteAVSDK_Professional
+import TXLiteAVSDK_Professional
 #endif
 
 protocol TUIVideoSeatViewResponder: AnyObject {
     func reloadData()
     func insertItems(at indexPaths: [IndexPath])
     func deleteItems(at indexPaths: [IndexPath])
-    func reloadItems(at indexPaths: [IndexPath])
-
-    func getSeatVideoRenderView(_ item: VideoSeatItem) -> UIView?
+    
+    func getVideoVisibleCell(_ item: VideoSeatItem) -> VideoSeatCell?
     func getMoveMiniscreen() -> TUIVideoSeatDragCell
-
+    
     func updateMiniscreen(_ item: VideoSeatItem?)
     func updateMiniscreenVolume(_ item: VideoSeatItem)
-
+    
     func updateSeatItem(_ item: VideoSeatItem)
     func updateSeatVolume(_ item: VideoSeatItem)
     
@@ -50,9 +49,7 @@ class TUIVideoSeatViewModel: NSObject {
     private var speakerItem: VideoSeatItem?
     // 小画面item
     private var smallItem: VideoSeatItem?
-
-    private var userNoExistMap: [String: TUIUserInfo] = [:]
-
+    
     private var isSwitchPosition: Bool = false
     
     private var speakerUpdateTimer: Int = 0 //演讲者更新的时间戳
@@ -64,40 +61,77 @@ class TUIVideoSeatViewModel: NSObject {
             return .cameraStream
         }
     }
-
+    
     var listSeatItem: [VideoSeatItem] = []
-
+    
     private var isHasVideoStream: Bool {
         return videoSeatItems.firstIndex(where: { $0.isHasVideoStream }) != nil
     }
-
+    
     private var isHasScreenStream: Bool {
         return videoSeatItems.firstIndex(where: { $0.hasScreenStream }) != nil
     }
-
-    private var isNeedReloadStream: Bool {
-        return videoSeatItems.firstIndex(where: { $0.boundCell != nil }) == nil
-    }
-
+    
     weak var viewResponder: TUIVideoSeatViewResponder?
     var videoSeatViewType: TUIVideoSeatViewType = .unknown
-    var roomInfo: TUIRoomInfo
+    var engineManager: EngineManager {
+        EngineManager.createInstance()
+    }
+    var store: RoomStore {
+        engineManager.store
+    }
+    var roomInfo: TUIRoomInfo {
+        store.roomInfo
+    }
     var currentUserId: String {
-        return TUIRoomEngine.getSelfInfo().userId
+        store.currentUser.userId
     }
-
-    private weak var roomEngine: TUIRoomEngine?
-    init(roomEngine: TUIRoomEngine, roomId: String) {
-        roomInfo = TUIRoomInfo()
-        roomInfo.roomId = roomId
+    
+    override init() {
         super.init()
-        self.roomEngine = roomEngine
-        initRoomInfo()
-        roomEngine.addObserver(self)
+        initVideoSeatItems()
+        subscribeUIEvent()
     }
-
+    
+    private func initVideoSeatItems() {
+        videoSeatItems = []
+        let videoItems = store.roomInfo.speechMode == .applySpeakAfterTakingSeat ? store.seatList : store.attendeeList
+        guard videoItems.count > 0 else { return }
+        videoItems.forEach { userInfo in
+            let userItem = VideoSeatItem(userInfo: userInfo)
+            videoSeatItems.append(userItem)
+        }
+        sortSeatItems()
+        reloadSeatItems()
+    }
+    
+    private func subscribeUIEvent() {
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewVideoSeatView, responder: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserAudioStateChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserVideoStateChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserVoiceVolumeChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onRemoteUserEnterRoom, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onSeatListChanged, observer: self)
+    }
+    
+    private func unsubscribeUIEvent() {
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewVideoSeatView, responder: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserAudioStateChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserVideoStateChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserVoiceVolumeChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onRemoteUserEnterRoom, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onSeatListChanged, observer: self)
+    }
+    
     deinit {
-        roomEngine?.removeObserver(self)
+        unsubscribeUIEvent()
+        debugPrint("deinit:\(self)")
     }
 }
 
@@ -107,14 +141,15 @@ extension TUIVideoSeatViewModel {
     func isHomeOwner(_ userId: String) -> Bool {
         return roomInfo.ownerId == userId
     }
-
+    
     func switchPosition() {
         if videoSeatViewType == .largeSmallWindowType {
             isSwitchPosition = !isSwitchPosition
             reloadSeatItems()
+            viewResponder?.reloadData()
         }
     }
-
+    
     func updateSpeakerPlayVideoState(currentPageIndex: Int) {
         // currentPageIndex : 0,1,2,3
         if videoSeatViewType != .speechType {
@@ -123,64 +158,46 @@ extension TUIVideoSeatViewModel {
         if currentPageIndex == 0 {
             viewResponder?.updateMiniscreen(speakerItem)
         } else if let item = videoSeatItems.first(where: { $0.userId == speakerItem?.userId }),
-                  let renderView = viewResponder?.getSeatVideoRenderView(item) {
+                  let renderView = viewResponder?.getVideoVisibleCell(item)?.renderView {
             startPlayVideo(item: item, renderView: renderView)
         }
     }
-
+    
     func startPlayVideo(item: VideoSeatItem, renderView: UIView?) {
         guard let renderView = renderView else { return }
         if item.userId == currentUserId {
-            roomEngine?.setLocalVideoView(streamType: item.streamType, view: renderView)
+            engineManager.setLocalVideoView(streamType: item.streamType, view: renderView)
         } else {
             item.updateStreamType(streamType: itemStreamType)
-            if item.isPlaying {
-                roomEngine?.setRemoteVideoView(userId: item.userId, streamType: item.streamType, view: renderView)
-                return
-            }
-            roomEngine?.setRemoteVideoView(userId: item.userId, streamType: item.streamType, view: renderView)
-            roomEngine?.startPlayRemoteVideo(userId: item.userId, streamType: item.streamType, onPlaying: { [weak self] _ in
+            engineManager.setRemoteVideoView(userId: item.userId, streamType: item.streamType, view: renderView)
+            engineManager.startPlayRemoteVideo(userId: item.userId, streamType: item.streamType, onSuccess: { [weak self] in
                 guard let self = self else { return }
-                item.isPlaying = true
-                if let seatCell = item.boundCell, item == seatCell.seatItem {
-                    seatCell.updateUI(item: item)
-                }
                 if item == self.viewResponder?.getMoveMiniscreen().seatItem {
                     self.viewResponder?.getMoveMiniscreen().updateUI(item: item)
                 }
-            }, onLoading: { _ in
-            }, onError: { _, _, _ in
             })
         }
+        guard let seatCell = viewResponder?.getVideoVisibleCell(item) else { return }
+        seatCell.updateUI(item: item)
     }
-
+    
     func stopPlayVideo(item: VideoSeatItem) {
         unboundCell(item: item)
         if item.userId != currentUserId {
-            item.isPlaying = false
-            roomEngine?.stopPlayRemoteVideo(userId: item.userId, streamType: item.streamType)
+            engineManager.stopPlayRemoteVideo(userId: item.userId, streamType: item.streamType)
         }
+        guard let seatCell = viewResponder?.getVideoVisibleCell(item) else { return }
+        seatCell.updateUI(item: item)
     }
-
-    func unboundCell(item: VideoSeatItem) {
+    
+    private func unboundCell(item: VideoSeatItem) {
         if item.userId == currentUserId {
-            roomEngine?.setLocalVideoView(streamType: item.streamType, view: nil)
+            engineManager.setLocalVideoView(streamType: item.streamType, view: nil)
         } else {
             if item.streamType != .screenStream {
-                roomEngine?.setRemoteVideoView(userId: item.userId, streamType: .cameraStreamLow, view: nil)
+                engineManager.setRemoteVideoView(userId: item.userId, streamType: .cameraStreamLow, view: nil)
             }
-            roomEngine?.setRemoteVideoView(userId: item.userId, streamType: item.streamType, view: nil)
-        }
-    }
-
-    func clearSubscribeVideoStream(items: [VideoSeatItem]) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            for item in items {
-                if self.viewResponder?.getSeatVideoRenderView(item) == nil {
-                    self.stopPlayVideo(item: item)
-                }
-            }
+            engineManager.setRemoteVideoView(userId: item.userId, streamType: item.streamType, view: nil)
         }
     }
     
@@ -189,133 +206,86 @@ extension TUIVideoSeatViewModel {
         guard RoomRouter.shared.hasChatWindow() else { return }
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_HiddenChatWindow, param: [:])
     }
+    
+    func stopScreenCapture() {
+        EngineEventCenter.shared.notifyEngineEvent(event: .onUserScreenCaptureStopped, param: [:])
+        engineManager.stopScreenCapture()
+    }
 }
 
 // MARK: - Private
 
 extension TUIVideoSeatViewModel {
-    private func asyncUserInfo(_ seatItem: VideoSeatItem) {
-        roomEngine?.getUserInfo(seatItem.userId, onSuccess: { [weak self] userInfo in
-            guard let self = self, let userInfo = userInfo else { return }
-            seatItem.updateUserInfo(userInfo)
-            self.viewResponder?.updateSeatItem(seatItem)
-            self.reloadSeatItems()
-        }, onError: { _, msg in
-            debugPrint("asyncUserInfo error: \(msg)")
-        })
-    }
-
-    private func initRoomInfo() {
-        roomEngine?.fetchRoomInfo { [weak self] roomInfo in
-            guard let self = self, let roomInfo = roomInfo else { return }
-            self.roomInfo = roomInfo
-            switch self.roomInfo.speechMode {
-            case .freeToSpeak:
-                let localSeatList: [VideoSeatItem] = []
-                self.initUserList(nextSequence: 0, localSeatList: localSeatList)
-            case .applySpeakAfterTakingSeat:
-                self.initSeatList()
-            default: break
-            }
-        } onError: { code, message in
-            debugPrint("getRoomInfo:code:\(code),message:\(message)")
-        }
-    }
-
-    private func initSeatList() {
-        roomEngine?.getSeatList { [weak self] seatList in
-            guard let self = self else { return }
-            var localSeatList = [VideoSeatItem]()
-            for seatInfo in seatList {
-                let seatItem = VideoSeatItem(userId: seatInfo.userId ?? "")
-                self.asyncUserInfo(seatItem)
-                if seatItem.userId == self.roomInfo.ownerId {
-                    seatItem.userRole = .roomOwner
-                }
-                if let userInfo = self.userNoExistMap[seatItem.userId] {
-                    seatItem.hasVideoStream = userInfo.hasVideoStream
-                    seatItem.hasScreenStream = userInfo.hasScreenStream
-                    seatItem.hasAudioStream = userInfo.hasAudioStream
-                }
-                localSeatList.append(seatItem)
-            }
-            self.videoSeatItems = localSeatList
-            self.reloadSeatItems()
-        } onError: { code, message in
-            debugPrint("getSeatList:code:\(code),message:\(message)")
-        }
-    }
-
-    private func initUserList(nextSequence: Int, localSeatList: [VideoSeatItem]) {
-        roomEngine?.getUserList(nextSequence: nextSequence) { [weak self] list, nextSequence in
-            guard let self = self else { return }
-            var localSeatList = localSeatList
-            list.forEach { userInfo in
-                let userItem = VideoSeatItem(userInfo: userInfo)
-                localSeatList.append(userItem)
-            }
-            if nextSequence != 0 {
-                self.initUserList(nextSequence: nextSequence, localSeatList: localSeatList)
-            }
-            self.videoSeatItems = localSeatList
-            self.reloadSeatItems()
-        } onError: { code, message in
-            debugPrint("getUserList:code:\(code),message:\(message)")
-        }
-    }
-
-    private func addSeatInfo(_ seatInfo: TUISeatInfo) {
-        if let userId = seatInfo.userId, let _ = getSeatItem(userId) {
-            return
-        }
-        let seatItem = VideoSeatItem(userId: seatInfo.userId ?? "")
-        asyncUserInfo(seatItem)
+    private func addUserInfo(_ userId: String) {
+        guard let userInfo = store.attendeeList.first(where: { $0.userId == userId }) else { return }
+        let seatItem = VideoSeatItem(userInfo: userInfo)
         videoSeatItems.append(seatItem)
         reloadSeatItems()
     }
-
-    private func addUserInfo(_ userInfo: TUIUserInfo) {
-        if let userItem = getSeatItem(userInfo.userId) {
-            userItem.updateUserInfo(userInfo)
-            viewResponder?.updateSeatItem(userItem)
-        } else {
-            let seatItem = VideoSeatItem(userInfo: userInfo)
-            videoSeatItems.append(seatItem)
-            reloadSeatItems()
-        }
-    }
-
+    
     private func removeSeatItem(_ userId: String) {
         if shareItem?.userId == userId, let seatItem = shareItem {
             stopPlayVideo(item: seatItem)
         }
-
         if speakerItem?.userId == userId, let seatItem = speakerItem {
             stopPlayVideo(item: seatItem)
         }
-        guard let seatItemIndex = videoSeatItems.firstIndex(where: { $0.userId == userId }) else { return }
-        let seatItem = videoSeatItems.remove(at: seatItemIndex)
-        stopPlayVideo(item: seatItem)
-        reloadSeatItems()
+        if let seatItem = videoSeatItems.first(where: { $0.userId == userId }) {
+            stopPlayVideo(item: seatItem)
+        }
+        videoSeatItems.removeAll(where: { $0.userId == userId })
+        if let index = listSeatItem.firstIndex(where: { $0.userId == userId && $0.type != .share }),
+            let item = listSeatItem.first(where: { $0.userId == userId && $0.type != .share }) {
+            listSeatItem.remove(at: index)
+            if ((viewResponder?.getVideoVisibleCell(item)) != nil) {
+                viewResponder?.reloadData()
+            } else {
+                viewResponder?.deleteItems(at: [IndexPath(item: index, section: 0)])
+            }
+        }
+        let type = videoSeatViewType
+        self.refreshListSeatItem()
+        if type != videoSeatViewType {
+            viewResponder?.reloadData()
+        }
+        self.resetMiniscreen()
     }
-
+    
     private func getSeatItem(_ userId: String) -> VideoSeatItem? {
         return videoSeatItems.first(where: { $0.userId == userId })
     }
-
+    
     private func sortSeatItems() {
+        guard checkNeededSort() else { return }
         //  自己在第二位
         if let currentItemIndex = videoSeatItems.firstIndex(where: { $0.userId == self.currentUserId }) {
             let currentItem = videoSeatItems.remove(at: currentItemIndex)
             videoSeatItems.insert(currentItem, at: 0)
         }
         // 房主永远在第一位
-        if let roomOwnerItemIndex = videoSeatItems.firstIndex(where: { $0.userRole == .roomOwner }) {
+        if let roomOwnerItemIndex = videoSeatItems.firstIndex(where: { $0.userId == roomInfo.ownerId }) {
             let roomOwnerItem = videoSeatItems.remove(at: roomOwnerItemIndex)
             videoSeatItems.insert(roomOwnerItem, at: 0)
         }
+        
+        viewResponder?.reloadData()
     }
-
+    
+    private func checkNeededSort() -> Bool {
+        var isSort = false
+        if let roomOwnerItemIndex = videoSeatItems.firstIndex(where: { $0.userId == roomInfo.ownerId }) {
+            isSort = roomOwnerItemIndex != 0
+        }
+        if let currentItemIndex = videoSeatItems.firstIndex(where: { $0.userId == self.currentUserId }) {
+            if currentUserId == roomInfo.ownerId {
+                isSort = isSort || (currentItemIndex != 0)
+            } else {
+                isSort = isSort || (currentItemIndex != 1)
+            }
+        }
+        return isSort
+    }
+    
     private func findCurrentSpeaker(list: [VideoSeatItem]) -> VideoSeatItem? {
         let array = list.filter({ $0.type == .original })
         var currentSpeakerItem: VideoSeatItem?
@@ -326,11 +296,11 @@ extension TUIVideoSeatViewModel {
         }
         return currentSpeakerItem
     }
-
+    
+    //判断type状态
     private func refreshListSeatItem() {
         sortSeatItems()
         listSeatItem = Array(videoSeatItems)
-
         if videoSeatItems.count == 1 {
             // 单人
             videoSeatViewType = .singleType
@@ -354,7 +324,7 @@ extension TUIVideoSeatViewModel {
             refreshMultiVideo()
         }
     }
-
+    
     private func refreshMultiVideo() {
         let screenResult = videoSeatItems.filter({ $0.hasScreenStream })
         let videoResult = videoSeatItems.filter({ $0.hasVideoStream })
@@ -366,7 +336,7 @@ extension TUIVideoSeatViewModel {
             // 只有一路视频
             speechItem = item
         }
-
+        
         if let item = speechItem, let seatItemIndex = videoSeatItems.firstIndex(where: { $0.userId == item.userId }) {
             // 演讲者
             videoSeatViewType = .speechType
@@ -398,7 +368,7 @@ extension TUIVideoSeatViewModel {
             videoSeatViewType = .equallyDividedType
         }
     }
-
+    
     private func reloadSeatItems() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -406,22 +376,26 @@ extension TUIVideoSeatViewModel {
             let lastListSeatItem = Array(self.listSeatItem)
             self.refreshListSeatItem()
             self.updateCollectionView(type, lastListSeatItem)
-            if self.videoSeatViewType == .largeSmallWindowType {
-                self.speakerItem = nil
-                self.shareItem = nil
-                self.viewResponder?.updateMiniscreen(self.smallItem)
-            } else if self.videoSeatViewType == .speechType {
-                self.smallItem = nil
-                self.viewResponder?.updateMiniscreen(self.speakerItem)
-            } else {
-                self.smallItem = nil
-                self.speakerItem = nil
-                self.shareItem = nil
-                self.viewResponder?.updateMiniscreen(nil)
-            }
+            self.resetMiniscreen()
         }
     }
-
+    
+    private func resetMiniscreen() {
+        if self.videoSeatViewType == .largeSmallWindowType {
+            self.speakerItem = nil
+            self.shareItem = nil
+            self.viewResponder?.updateMiniscreen(self.smallItem)
+        } else if self.videoSeatViewType == .speechType {
+            self.smallItem = nil
+            self.viewResponder?.updateMiniscreen(self.speakerItem)
+        } else {
+            self.smallItem = nil
+            self.speakerItem = nil
+            self.shareItem = nil
+            self.viewResponder?.updateMiniscreen(nil)
+        }
+    }
+    
     private func updateSeatVolume(item: VideoSeatItem) {
         viewResponder?.updateSeatVolume(item)
         if let shareItem = shareItem, shareItem.userId == item.userId {
@@ -429,20 +403,20 @@ extension TUIVideoSeatViewModel {
             shareItem.audioVolume = item.audioVolume
             viewResponder?.updateSeatVolume(shareItem)
         }
-
+        
         if let speakerItem = speakerItem, speakerItem.userId == item.userId {
             speakerItem.hasAudioStream = item.hasAudioStream
             speakerItem.audioVolume = item.audioVolume
             viewResponder?.updateMiniscreenVolume(speakerItem)
         }
-
+        
         if let smallItem = smallItem, smallItem.userId == item.userId {
             smallItem.hasAudioStream = item.hasAudioStream
             smallItem.audioVolume = item.audioVolume
             viewResponder?.updateMiniscreenVolume(smallItem)
         }
     }
-
+    
     private func updateCollectionView(_ type: TUIVideoSeatViewType, _ lastList: [VideoSeatItem]) {
         if type != videoSeatViewType {
             viewResponder?.reloadData()
@@ -455,22 +429,13 @@ extension TUIVideoSeatViewModel {
                     indexPaths.append(IndexPath(item: i, section: 0))
                 }
                 viewResponder?.insertItems(at: indexPaths)
-            } else if diffItem < 0 {
-                for i in (count + diffItem + 1) ... count {
-                    indexPaths.append(IndexPath(item: i - 1, section: 0))
-                }
-                viewResponder?.deleteItems(at: indexPaths)
             }
-            indexPaths = []
             for i in 0 ... min(max(count - 1, 0), max(listSeatItem.count - 1, 0)) {
                 if lastList.count > i && listSeatItem.count > i && lastList[i] != listSeatItem[i] {
-                    indexPaths.append(IndexPath(item: i, section: 0))
+                    if let item = listSeatItem[safe: i] {
+                        viewResponder?.updateSeatItem(item)
+                    }
                 }
-            }
-            if indexPaths.count > 0 {
-                viewResponder?.reloadItems(at: indexPaths)
-            } else if diffItem == 0 && isNeedReloadStream {
-                viewResponder?.reloadData()
             }
         }
     }
@@ -483,20 +448,58 @@ extension TUIVideoSeatViewModel {
     }
 }
 
-extension TUIVideoSeatViewModel: TUIRoomObserver {
-    func onUserAudioStateChanged(userId: String, hasAudio: Bool, reason: TUIChangeReason) {
-        guard let seatItem = getSeatItem(userId) else {
-            let userInfo = userNoExistMap[userId] ?? TUIUserInfo()
-            userInfo.hasAudioStream = hasAudio
-            userNoExistMap[userId] = userInfo
-            return
+extension TUIVideoSeatViewModel: RoomKitUIEventResponder {
+    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
+        switch key {
+        case .TUIRoomKitService_RenewVideoSeatView:
+            initVideoSeatItems()
+        default: break
         }
-        // 同步刷新 分享和speaker的view的音量
-        seatItem.hasAudioStream = hasAudio
-        updateSeatVolume(item: seatItem)
     }
+}
 
-    public func onUserVoiceVolumeChanged(volumeMap: [String: NSNumber]) {
+extension TUIVideoSeatViewModel: RoomEngineEventResponder {
+    func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
+        switch name {
+        case .onUserAudioStateChanged:
+            guard let userId = param?["userId"] as? String else { return }
+            guard let hasAudio = param?["hasAudio"] as? Bool else { return }
+            guard let seatItem = getSeatItem(userId) else { return }
+            seatItem.hasAudioStream = hasAudio
+            updateSeatVolume(item: seatItem)
+        case .onUserVoiceVolumeChanged:
+            guard let volumeMap = param as? [String: NSNumber] else { return }
+            userVoiceVolumeChanged(volumeMap: volumeMap)
+        case .onUserVideoStateChanged:
+            guard let userId = param?["userId"] as? String else { return }
+            guard let streamType = param?["streamType"] as? TUIVideoStreamType else { return }
+            guard let hasVideo = param?["hasVideo"] as? Bool else { return }
+            userVideoStateChanged(userId: userId, streamType: streamType, hasVideo: hasVideo)
+        case .onUserScreenCaptureStopped:
+            userScreenCaptureStopped()
+        case .onRemoteUserEnterRoom:
+            guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
+            guard roomInfo.speechMode != .applySpeakAfterTakingSeat else { return }
+            addUserInfo(userInfo.userId)
+        case .onRemoteUserLeaveRoom:
+            guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
+            removeSeatItem(userInfo.userId)
+        case .onUserRoleChanged:
+            engineManager.fetchRoomInfo() { [weak self] in
+                guard let self = self else { return }
+                self.reloadSeatItems()
+            }
+        case .onSeatListChanged:
+            guard let left = param?["left"] as? [TUISeatInfo] else { return }
+            guard let seated = param?["seated"] as? [TUISeatInfo] else { return }
+            seatListChanged(seated: seated, left: left)
+        default: break
+        }
+    }
+}
+
+extension TUIVideoSeatViewModel: TUIRoomObserver {
+    private func userVoiceVolumeChanged(volumeMap: [String: NSNumber]) {
         if volumeMap.count <= 0 {
             return
         }
@@ -505,7 +508,7 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
             seatItem.audioVolume = volume.intValue
             updateSeatVolume(item: seatItem)
         }
-
+        
         if videoSeatViewType == .speechType {
             guard let currentSpeakerItem = findCurrentSpeaker(list: listSeatItem), currentSpeakerItem.hasAudioStream else { return }
             if speakerItem?.userId == currentSpeakerItem.userId {
@@ -518,28 +521,19 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
             speakerItem = currentSpeakerItem
         }
     }
-
-    public func onUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool, reason: TUIChangeReason) {
+    
+    private func userVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool) {
         if streamType == .screenStream, userId == currentUserId {
-                  viewResponder?.showScreenCaptureMaskView(isShow: hasVideo)
-                  return
+            viewResponder?.showScreenCaptureMaskView(isShow: hasVideo)
+            return
         }
         if hasVideo {
             let renderParams = TRTCRenderParams()
             renderParams.fillMode = (streamType == .screenStream) ? .fit : .fill
             let trtcStreamType: TRTCVideoStreamType = (streamType == .screenStream) ? .sub : .big
-            roomEngine?.getTRTCCloud().setRemoteRenderParams(userId, streamType: trtcStreamType, params: renderParams)
+            engineManager.setRemoteRenderParams(userId: userId, streamType: trtcStreamType, params: renderParams)
         }
-        guard var seatItem = getSeatItem(userId) else {
-            let userInfo = userNoExistMap[userId] ?? TUIUserInfo()
-            if streamType == .screenStream {
-                userInfo.hasScreenStream = hasVideo
-            } else {
-                userInfo.hasVideoStream = hasVideo
-            }
-            userNoExistMap[userId] = userInfo
-            return
-        }
+        guard var seatItem = getSeatItem(userId) else { return }
         if streamType == .cameraStream {
             seatItem.hasVideoStream = hasVideo
             viewResponder?.updateSeatItem(seatItem)
@@ -550,47 +544,34 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
             }
         }
         if hasVideo {
-            startPlayVideo(item: seatItem, renderView: viewResponder?.getSeatVideoRenderView(seatItem))
+            startPlayVideo(item: seatItem, renderView: viewResponder?.getVideoVisibleCell(seatItem)?.renderView)
         } else {
             stopPlayVideo(item: seatItem)
         }
-        reloadSeatItems()
+        if streamType == .screenStream, hasVideo, videoSeatItems.filter({ $0.hasScreenStream }).count == 1 {
+            refreshListSeatItem()
+            viewResponder?.insertItems(at: [IndexPath(item: 0, section: 0)])
+            resetMiniscreen()
+        } else {
+            reloadSeatItems()
+        }
     }
-
+    
     // seatList: 当前麦位列表  seated: 新增上麦的用户列表 left: 下麦的用户列表
-    public func onSeatListChanged(seatList: [TUISeatInfo], seated: [TUISeatInfo], left: [TUISeatInfo]) {
+    private func seatListChanged(seated: [TUISeatInfo], left: [TUISeatInfo]) {
         for leftSeat in left {
             if let userId = leftSeat.userId {
                 removeSeatItem(userId)
             }
         }
-        for seatInfo in seatList {
-            addSeatInfo(seatInfo)
+        for seatInfo in seated {
+            if let userId = seatInfo.userId {
+                addUserInfo(userId)
+            }
         }
-        reloadSeatItems()
-    }
-
-    public func onUserRoleChanged(userId: String, userRole: TUIRole) {
-        guard let seatItem = getSeatItem(userId) else { return }
-        seatItem.userRole = userRole
-        reloadSeatItems()
-    }
-
-    public func onRemoteUserEnterRoom(roomId: String, userInfo: TUIUserInfo) {
-        switch roomInfo.speechMode {
-        case .freeToSpeak:
-            addUserInfo(userInfo)
-        case .applySpeakAfterTakingSeat:
-            break
-        default: break
-        }
-    }
-
-    public func onRemoteUserLeaveRoom(roomId: String, userInfo: TUIUserInfo) {
-        removeSeatItem(userInfo.userId)
     }
     
-    public func onUserScreenCaptureStopped(reason: Int) {
+    private func userScreenCaptureStopped() {
         viewResponder?.showScreenCaptureMaskView(isShow: false)
         guard let seatItem = getSeatItem(currentUserId) else { return }
         seatItem.hasScreenStream = false

@@ -7,6 +7,7 @@
 
 import UIKit
 import TUICore
+import TUIRoomEngine
 
 class PrePareView: UIView {
     
@@ -49,25 +50,18 @@ class PrePareView: UIView {
         return button
     }()
     
-    let tencentBigView: UIView = {
-        let view = UIView(frame: .zero)
-        let iconImageView = UIImageView(frame: .zero)
-        iconImageView.image = UIImage(named: "room_tencent")
-        view.addSubview(iconImageView)
-        iconImageView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.centerX.equalToSuperview()
-            make.width.equalTo(136)
-            make.height.equalTo(36)
-        }
-        let textImageView = UIImageView(frame: .zero)
-        textImageView.image = UIImage(named: "room_tencent_text")
-        view.addSubview(textImageView)
-        textImageView.snp.makeConstraints { make in
-            make.top.equalTo(iconImageView.snp.bottom).offset(5)
-            make.centerX.equalToSuperview()
-        }
-        return view
+    let signImageView: UIView = {
+        let imageView = UIImageView(frame: .zero)
+        imageView.image = UIImage(named: "room_tencent")
+        return imageView
+    }()
+    
+    let signLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        label.text = .videoConferencingText
+        return label
     }()
     
     let joinRoomButton: UIButton = {
@@ -101,7 +95,9 @@ class PrePareView: UIView {
         return tip
     }()
     
-    init() { 
+    private let signViewHeight: CGFloat = 36
+    
+    init() {
         super.init(frame: .zero)
     }
     
@@ -142,7 +138,8 @@ class PrePareView: UIView {
         topViewContainer.addSubview(userNameLabel)
         topViewContainer.addSubview(debugButton)
         topViewContainer.addSubview(switchLanguageButton)
-        addSubview(tencentBigView)
+        addSubview(signImageView)
+        addSubview(signLabel)
         addSubview(joinRoomButton)
         addSubview(createRoomButton)
         addSubview(appVersionTipLabel)
@@ -176,13 +173,17 @@ class PrePareView: UIView {
             make.trailing.equalToSuperview().offset(-20)
             make.width.height.equalTo(30)
         }
-        tencentBigView.snp.makeConstraints { make in
-            make.width.equalTo(136.scale375())
-            make.height.equalTo(36.scale375())
-            make.leading.equalToSuperview().offset(119.scale375())
+        signImageView.snp.makeConstraints { make in
+            make.width.equalTo(136)
+            make.height.equalTo(signViewHeight)
+            make.centerX.equalToSuperview()
             make.top.equalToSuperview().offset(157.scale375())
         }
-        
+        signLabel.snp.makeConstraints { make in
+            make.top.equalTo(signImageView.snp.bottom).offset(5)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(signViewHeight)
+        }
         joinRoomButton.snp.makeConstraints { make in
             make.height.equalTo(60.scale375())
             make.width.equalTo(204.scale375())
@@ -217,6 +218,8 @@ class PrePareView: UIView {
         let placeholderImage = UIImage(named: "room_default_avatar")
         avatarButton.sd_setImage(with: URL(string: TUILogin.getFaceUrl() ?? ""), for: .normal, placeholderImage: placeholderImage)
         userNameLabel.text = TUILogin.getNickName() ?? ""
+        guard let image = getGradientImage(size: CGSize(width: UIScreen.main.bounds.width, height: signViewHeight)) else { return }
+        signLabel.textColor = UIColor(patternImage: image)
     }
     
     @objc
@@ -244,6 +247,21 @@ class PrePareView: UIView {
         rootViewController?.switchLanguageAction()
         joinRoomButton.setTitle(.joinRoomText, for: .normal)
         createRoomButton.setTitle(.createRoomText, for: .normal)
+        signLabel.text = .videoConferencingText
+    }
+    
+    private func getGradientImage(size:CGSize) -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
+        guard let context = UIGraphicsGetCurrentContext() else{ return nil }
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        guard let gradientRef = CGGradient(colorsSpace: colorSpace, colors: [UIColor(0x00CED9).cgColor, UIColor(0x0C59F2).cgColor] 
+                                           as CFArray, locations: nil) else { return nil }
+        let startPoint = CGPoint(x: 0, y: 0)
+        let endPoint = CGPoint(x: size.width, y: 0)
+        context.drawLinearGradient(gradientRef, start: startPoint, end: endPoint, options: CGGradientDrawingOptions(arrayLiteral: .drawsBeforeStartLocation,.drawsAfterEndLocation))
+        let gradientImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return gradientImage
     }
     
     deinit {
@@ -257,6 +275,9 @@ private extension String {
     }
     static var createRoomText: String {
         RoomDemoLocalize("Demo.TUIRoomKit.create.room")
+    }
+    static var videoConferencingText: String {
+        RoomDemoLocalize("Demo.TUIRoomKit.video.conferencing")
     }
 }
 

@@ -8,11 +8,16 @@
 import Foundation
 import TUIRoomEngine
 
+protocol ExitRoomViewModelResponder: AnyObject {
+    func makeToast(message: String)
+}
+
 class ExitRoomViewModel {
     var engineManager: EngineManager
     var currentUser: UserEntity
     var isRoomOwner: Bool
     var isOnlyOneUserInRoom: Bool
+    weak var viewResponder: ExitRoomViewModelResponder?
     
     init() {
         engineManager = EngineManager.createInstance()
@@ -21,12 +26,16 @@ class ExitRoomViewModel {
         isOnlyOneUserInRoom = engineManager.store.attendeeList.count == 1
     }
     
-    func isShowLeaveRoomButton() -> Bool {
+    func isShownLeaveRoomButton() -> Bool {
         if currentUser.userId == engineManager.store.roomInfo.ownerId {
             return engineManager.store.attendeeList.count > 1
         } else {
             return true
         }
+    }
+    
+    func isShownExitRoomButton() -> Bool {
+        return currentUser.userId == engineManager.store.roomInfo.ownerId
     }
     
     func leaveRoomAction() {
@@ -39,12 +48,22 @@ class ExitRoomViewModel {
     
     func exitRoom() {
         if isRoomOwner {
-            engineManager.destroyRoom(onSuccess: nil, onError: nil)
+            engineManager.destroyRoom {
+                RoomRouter.shared.dismissAllRoomPopupViewController()
+                RoomRouter.shared.popToRoomEntranceViewController()
+            } onError: { [weak self] code, message in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(message: message)
+            }
         } else {
-            engineManager.exitRoom(onSuccess: nil, onError: nil)
+            engineManager.exitRoom {
+                RoomRouter.shared.dismissAllRoomPopupViewController()
+                RoomRouter.shared.popToRoomEntranceViewController()
+            } onError: { [weak self] code, message in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(message: message)
+            }
         }
-        RoomRouter.shared.dismissAllRoomPopupViewController()
-        RoomRouter.shared.popToRoomEntranceViewController()
     }
     
     deinit {

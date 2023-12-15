@@ -15,7 +15,7 @@ enum ScreenCaptureMaskViewFrameType {
 
 class ScreenCaptureMaskView: UIView {
     private var dotsTimer: Timer = Timer()
-    
+    var viewModel: TUIVideoSeatViewModel?
     let frameType: ScreenCaptureMaskViewFrameType
     
     let contentView: UIView = {
@@ -122,18 +122,10 @@ class ScreenCaptureMaskView: UIView {
     }
     
     @objc func stopScreenCaptureAction(sender: UIButton) {
-        let alertVC = UIAlertController(title: .toastTitleText,
-                                        message: .toastMessageText,
-                                        preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: .toastCancelText, style: .cancel) { _ in
-        }
-        let StopAction = UIAlertAction(title: .toastStopText, style: .default) { _ in
-            EngineEventCenter.shared.notifyEngineEvent(event: .onUserScreenCaptureStopped, param: [:])
-            EngineManager.createInstance().stopScreenCapture()
-        }
-        alertVC.addAction(cancelAction)
-        alertVC.addAction(StopAction)
-        RoomRouter.shared.presentAlert(alertVC)
+        RoomRouter.presentAlert(title: .toastTitleText, message: .toastMessageText, sureTitle: .toastStopText, declineTitle: .toastCancelText, sureBlock: { [weak self] in
+            guard let self = self else { return }
+            self.viewModel?.stopScreenCapture()
+        }, declineBlock: nil)
     }
     
     @objc func clickMask() {

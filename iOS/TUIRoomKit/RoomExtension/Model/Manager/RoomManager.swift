@@ -66,6 +66,7 @@ class RoomManager {
     
     func enterRoom(roomId: String) {
         roomObserver.registerObserver()
+        engineManager.store.isImAccess = true
         engineManager.enterRoom(roomId: roomId, enableAudio: engineManager.store.isOpenMicrophone, enableVideo:
                                     engineManager.store.isOpenCamera, isSoundOnSpeaker: true) { [weak self] in
             guard let self = self else { return }

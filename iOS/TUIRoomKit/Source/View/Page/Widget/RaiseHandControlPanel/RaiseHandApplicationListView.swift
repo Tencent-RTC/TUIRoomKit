@@ -290,6 +290,7 @@ class ApplyTableCell: UITableViewCell {
         button.setTitle(.agreeSeatText, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        button.titleLabel?.adjustsFontSizeToFitWidth = true
         button.layer.cornerRadius = 6
         button.clipsToBounds = true
         return button
@@ -300,6 +301,7 @@ class ApplyTableCell: UITableViewCell {
         button.backgroundColor = .red
         button.setTitle(.disagreeSeatText, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        button.titleLabel?.adjustsFontSizeToFitWidth = true
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 6
         button.clipsToBounds = true

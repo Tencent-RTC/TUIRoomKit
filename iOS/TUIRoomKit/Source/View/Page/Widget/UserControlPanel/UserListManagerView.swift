@@ -172,6 +172,10 @@ class UserListManagerView: UIView {
 }
 
 extension UserListManagerView: UserListManagerViewEventResponder {
+    func showKickOutAlert(title: String, sureAction: (() -> ())?) {
+        RoomRouter.presentAlert(title: title, message: nil, sureTitle: .alertOkText, declineTitle: .cancelText, sureBlock: sureAction, declineBlock: nil)
+    }
+    
     func updateUI(items: [ButtonItemData]) {
         setupViewState()
         viewArray.forEach { view in
@@ -203,13 +207,7 @@ extension UserListManagerView: UserListManagerViewEventResponder {
     }
     
     func showTransferredRoomOwnerAlert() {
-        let alertVC = UIAlertController(title: .haveTransferredMasterText,
-                                        message: nil,
-                                        preferredStyle: .alert)
-        let sureAction = UIAlertAction(title: .alertOkText, style: .cancel) { _ in
-        }
-        alertVC.addAction(sureAction)
-        RoomRouter.shared.presentAlert(alertVC)
+        RoomRouter.presentAlert(title: .haveTransferredMasterText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: nil, declineBlock: nil)
     }
     
     func setUserListManagerViewHidden(isHidden: Bool) {
@@ -226,6 +224,9 @@ private extension String {
     }
     static var haveTransferredMasterText: String {
         localized("TUIRoom.have.transferred.master")
+    }
+    static var cancelText: String {
+        localized("TUIRoom.cancel")
     }
 }
 

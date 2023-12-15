@@ -37,10 +37,10 @@ public let kDeviceSafeBottomHeight : CGFloat = {
     }
 }()
 private var width: CGFloat {
-    return isLandscape ? kScreenHeight : kScreenWidth
+    return min(kScreenHeight, kScreenWidth)
 }
 private var height: CGFloat {
-    return isLandscape ? kScreenWidth : kScreenHeight
+    return max(kScreenWidth, kScreenHeight)
 }
 
 extension CGFloat {

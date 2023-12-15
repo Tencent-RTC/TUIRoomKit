@@ -174,8 +174,22 @@ class RoomRouter: NSObject {
         }
     }
     
-    func presentAlert(_ alertController: UIAlertController) {
-        getCurrentWindowViewController()?.present(alertController, animated: true)
+    class func presentAlert(title: String?, message: String?, sureTitle:String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?) {
+        let alertVC = UIAlertController(title: title,
+                                        message: message,
+                                        preferredStyle: .alert)
+        if let declineTitle = declineTitle {
+            let declineAction = UIAlertAction(title: declineTitle, style: .destructive) { _ in
+                declineBlock?()
+            }
+            declineAction.setValue(UIColor(0x4F586B), forKey: "titleTextColor")
+            alertVC.addAction(declineAction)
+        }
+        let sureAction = UIAlertAction(title: sureTitle, style: .default) { _ in
+            sureBlock?()
+        }
+        alertVC.addAction(sureAction)
+        shared.getCurrentWindowViewController()?.present(alertVC, animated: true)
     }
     
     class func makeToast(toast: String) {

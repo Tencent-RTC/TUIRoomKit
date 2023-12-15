@@ -114,15 +114,15 @@ class ListCellItemView: UIView {
             make.height.equalTo(20.scale375())
         }
         
-        sliderLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(85.scale375())
-            make.trailing.equalToSuperview().offset(-160.scale375())
-            make.centerY.equalToSuperview()
-        }
-        
         slider.snp.makeConstraints { make in
             make.trailing.equalToSuperview()
             make.width.equalTo(152.scale375())
+            make.centerY.equalToSuperview()
+        }
+        
+        sliderLabel.snp.makeConstraints { make in
+            make.leading.equalTo(titleLabel.snp.trailing).offset(5.scale375())
+            make.trailing.equalTo(slider.snp.leading).offset(-5.scale375())
             make.centerY.equalToSuperview()
         }
         

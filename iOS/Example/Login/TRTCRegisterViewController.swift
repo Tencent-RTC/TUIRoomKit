@@ -16,6 +16,14 @@ import TUICore
 class TRTCRegisterViewController: UIViewController {
     let loading = UIActivityIndicatorView(style: .large)
     
+    override var shouldAutorotate: Bool {
+        return false
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         TUICSToastManager.setDefaultPosition(TUICSToastPositionBottom)

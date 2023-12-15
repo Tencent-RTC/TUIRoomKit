@@ -38,7 +38,7 @@ class EngineManager: NSObject {
         let eventDispatcher = RoomEventDispatcher()
         return eventDispatcher
     }()
-    private let timeOutNumber: Double = 0
+    private let timeOutNumber: Double = 10
     private let rootRouter: RoomRouter = RoomRouter.shared
     private var isLoginEngine: Bool = false
     private let appGroupString: String = "com.tencent.TUIRoomTXReplayKit-Screen"
@@ -98,35 +98,25 @@ class EngineManager: NSObject {
     }
     
     func exitRoom(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
-        roomEngine.getTRTCCloud().stopAllRemoteView()
         roomEngine.exitRoom(syncWaiting: false) { [weak self] in
             guard let self = self else { return }
             self.destroyEngineManager()
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ExitedRoom, param: ["isExited":true])
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ExitedRoom, param: [:])
             onSuccess?()
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            self.destroyEngineManager()
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ExitedRoom, param: ["isExited":false])
+        } onError: { code, message in
             onError?(code, message)
         }
-        TRTCCloud.destroySharedIntance()
     }
     
     func destroyRoom(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
-        roomEngine.getTRTCCloud().stopAllRemoteView()
         roomEngine.destroyRoom { [weak self] in
             guard let self = self else { return }
             self.destroyEngineManager()
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DestroyedRoom, param: ["isDestroyed":true])
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DestroyedRoom, param: [:])
             onSuccess?()
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            self.destroyEngineManager()
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DestroyedRoom, param: ["isDestroyed":false])
+        } onError: { code, message in
             onError?(code, message)
         }
-        TRTCCloud.destroySharedIntance()
     }
     
     func destroyEngineManager() {
@@ -239,20 +229,32 @@ class EngineManager: NSObject {
                                onCancelled: TUIRequestCancelledBlock? =  nil,
                                onTimeout: TUIRequestTimeoutBlock? = nil,
                                onError: TUIRequestErrorBlock? = nil) {
-        roomEngine.takeUserOnSeatByAdmin(-1, userId: userId, timeout: timeout) { requestId, userId in
+        store.extendedInvitationList.append(userId)
+        roomEngine.takeUserOnSeatByAdmin(-1, userId: userId, timeout: timeout) { [weak self] requestId, userId in
+            guard let self = self else { return }
+            self.store.extendedInvitationList.removeAll(where: { $0 == userId })
             onAccepted?(requestId, userId)
-        } onRejected: { requestId, userId, message in
-            onRejected?(requestId, userId, message)
-        } onCancelled: { requestId, userId in
+        } onRejected: { [weak self] requestId, userId, message in
+            guard let self = self else { return }
+            self.store.extendedInvitationList.removeAll(where: { $0 == userId })
+            onRejected?( requestId, userId, message)
+        } onCancelled: { [weak self] requestId, userId in
+            guard let self = self else { return }
+            self.store.extendedInvitationList.removeAll(where: { $0 == userId })
             onCancelled?(requestId, userId)
-        } onTimeout: { requestId, userId in
+        } onTimeout: { [weak self] requestId, userId in
+            guard let self = self else { return }
+            self.store.extendedInvitationList.removeAll(where: { $0 == userId })
             onTimeout?(requestId, userId)
-        } onError: { requestId, userId, code, message in
+        } onError: { [weak self] requestId, userId, code, message in
+            guard let self = self else { return }
+            self.store.extendedInvitationList.removeAll(where: { $0 == userId })
             onError?(requestId, userId, code, message)
         }
     }
     
     func setAudioRoute(route: TRTCAudioRoute) {
+        store.audioSetting.isSoundOnSpeaker = route == .modeSpeakerphone
         roomEngine.getTRTCCloud().setAudioRoute(route)
     }
     
@@ -524,6 +526,10 @@ class EngineManager: NSObject {
     func changeRaiseHandNoticeState(isShown: Bool) {
         store.isShownRaiseHandNotice = isShown
     }
+    
+    func setRemoteRenderParams(userId: String, streamType: TRTCVideoStreamType, params: TRTCRenderParams) {
+        roomEngine.getTRTCCloud().setRemoteRenderParams(userId, streamType: streamType, params: params)
+    }
 }
 
 // MARK: - Private
@@ -688,6 +694,9 @@ extension EngineManager {
             } else {
                 self.store.attendeeList = localUserList
                 onSuccess()
+                if self.store.roomInfo.speechMode != .applySpeakAfterTakingSeat {
+                    EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewVideoSeatView, param: [:])
+                }
                 EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
             }
         } onError: { code, message in
@@ -713,6 +722,7 @@ extension EngineManager {
             self.store.seatList = localSeatList
             onSuccess()
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewVideoSeatView, param: [:])
         } onError: { code, message in
             onError(code, message)
             debugPrint("getSeatList:code:\(code),message:\(message)")
@@ -756,14 +766,16 @@ extension EngineManager: TUIExtensionProtocol {
 extension EngineManager {
     fileprivate static let TUIRoomKitFrameworkValue = 1
     fileprivate static let TUIRoomKitComponentValue = 18
+    fileprivate static let IMComponentValue = 19
     fileprivate static let TUIRoomKitLanguageValue = 3
     private func setFramework() {
+        let componentValue = store.isImAccess ? EngineManager.IMComponentValue : EngineManager.TUIRoomKitComponentValue
         let jsonStr = """
             {
                 "api":"setFramework",
                 "params":{
                     "framework":\(EngineManager.TUIRoomKitFrameworkValue),
-                    "component":\(EngineManager.TUIRoomKitComponentValue),
+                    "component":\(componentValue),
                     "language":\(EngineManager.TUIRoomKitLanguageValue)
                 }
             }
