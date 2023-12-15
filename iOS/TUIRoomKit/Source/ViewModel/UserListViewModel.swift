@@ -100,6 +100,7 @@ class UserListViewModel: NSObject {
     }
     
     func inviteSeatAction(sender: UIButton) {
+        userManagerModel.userId = userId
         userManagerModel.inviteSeatAction(sender: sender)
     }
 }

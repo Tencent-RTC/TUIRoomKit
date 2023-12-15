@@ -17,6 +17,8 @@ class BottomView: UIView {
     var dropButtonItem: BottomItemView?
     var recordButtonItem: BottomItemView?
     var isUnfold: Bool = false //是否展开
+    let unfoldHeight = Float(130.scale375Height())
+    let packUpHeight = Float(68.scale375Height())
 
     let baseButtonMenuView: UIStackView = {
         let view = UIStackView()
@@ -168,7 +170,7 @@ class BottomView: UIView {
     func activateConstraints() {
         backgroundView.snp.makeConstraints { make in
             make.bottom.leading.trailing.equalToSuperview()
-            make.height.equalTo(60.scale375())
+            make.height.equalTo(packUpHeight)
         }
         let width = min(kScreenWidth, kScreenHeight)
         buttonMenuView.snp.makeConstraints { make in
@@ -198,6 +200,10 @@ class BottomView: UIView {
 }
 
 extension BottomView: BottomViewModelResponder {
+    func showStopShareScreenAlert(sureBlock: (() -> ())?) {
+        RoomRouter.presentAlert(title: .toastTitleText, message: .toastMessageText, sureTitle: .toastStopText, declineTitle: .toastCancelText, sureBlock: sureBlock, declineBlock: nil)
+    }
+    
     func updateStackView(item: ButtonItemData, index: Int) {
         guard viewArray.count > index else { return }
         viewArray[index].setupViewState(item: item)
@@ -211,7 +217,7 @@ extension BottomView: BottomViewModelResponder {
         UIView.animate(withDuration: 0.3) { [weak self] () in
             guard let self = self else { return }
             self.snp.updateConstraints { make in
-                make.height.equalTo(isUnfold ? 130.scale375() : 60.scale375())
+                make.height.equalTo(isUnfold ? self.unfoldHeight : self.packUpHeight)
             }
             self.superview?.layoutIfNeeded()
         } completion: { _ in
@@ -266,7 +272,7 @@ private extension String {
     }
 
     static var destroyRoomCancelTitle: String {
-        localized("TUIRoom.destroy.room.cancel")
+        localized("TUIRoom.wait")
     }
 
     static var logoutOkText: String {
@@ -295,5 +301,18 @@ private extension String {
     
     static var memberText: String {
         localized("TUIRoom.conference.member")
+    }
+
+    static var toastTitleText: String {
+        localized("TUIRoom.toast.shareScreen.title")
+    }
+    static var toastMessageText: String {
+        localized("TUIRoom.toast.shareScreen.message")
+    }
+    static var toastCancelText: String {
+        localized("TUIRoom.toast.shareScreen.cancel")
+    }
+    static var toastStopText: String {
+        localized("TUIRoom.toast.shareScreen.stop")
     }
 }

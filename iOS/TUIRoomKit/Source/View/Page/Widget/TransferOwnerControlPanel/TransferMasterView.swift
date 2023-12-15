@@ -205,6 +205,10 @@ extension TransferMasterView: UITableViewDelegate {
 }
 
 extension  TransferMasterView: TransferMasterViewResponder {
+    func makeToast(message: String) {
+        makeToast(message)
+    }
+    
     func reloadTransferMasterTableView() {
         guard !isSearching else { return }
         attendeeList = viewModel.attendeeList

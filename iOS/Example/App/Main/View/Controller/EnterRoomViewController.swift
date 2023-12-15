@@ -62,16 +62,7 @@ class EnterRoomViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         UIApplication.shared.isIdleTimerDisabled = false
-        UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
         renewRootViewState()
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        appDelegate.orientation = .portrait
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        appDelegate.orientation = .allButUpsideDown
     }
     
     @objc func backButtonClick(sender: UIButton) {

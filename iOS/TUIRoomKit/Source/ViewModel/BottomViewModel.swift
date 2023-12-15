@@ -14,6 +14,7 @@ protocol BottomViewModelResponder: AnyObject {
     func updateStackView(item: ButtonItemData, index: Int)
     func makeToast(text: String)
     func updataBottomView(isUp:Bool)
+    func showStopShareScreenAlert(sureBlock: (()->())?)
 }
 
 class BottomViewModel: NSObject {
@@ -346,20 +347,10 @@ class BottomViewModel: NSObject {
                     BroadcastLauncher.launch()
                 }
             } else {
-                let alertVC = UIAlertController(title: .toastTitleText,
-                                                message: .toastMessageText,
-                                                preferredStyle: .alert)
-                let cancelAction = UIAlertAction(title: .toastCancelText, style: .cancel) { _ in
-                }
-                let StopAction = UIAlertAction(title: .toastStopText, style: .default) { [weak self] _ in
-                    guard let self = self else {
-                        return
-                    }
+                viewResponder?.showStopShareScreenAlert(sureBlock: { [weak self] in
+                    guard let self = self else { return }
                     self.engineManager.stopScreenCapture()
-                }
-                alertVC.addAction(cancelAction)
-                alertVC.addAction(StopAction)
-                RoomRouter.shared.presentAlert(alertVC)
+                })
             }
         } else {
             viewResponder?.makeToast(text: .versionLowToastText)
@@ -639,18 +630,6 @@ private extension String {
     }
     static var dropText: String {
         localized("TUIRoom.drop")
-    }
-    static var toastTitleText: String {
-        localized("TUIRoom.toast.shareScreen.title")
-    }
-    static var toastMessageText: String {
-        localized("TUIRoom.toast.shareScreen.message")
-    }
-    static var toastCancelText: String {
-        localized("TUIRoom.toast.shareScreen.cancel")
-    }
-    static var toastStopText: String {
-        localized("TUIRoom.toast.shareScreen.stop")
     }
     static var putHandsDownText: String {
         localized("TUIRoom.put.hands.down")

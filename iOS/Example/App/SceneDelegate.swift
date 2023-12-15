@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.backgroundColor = UIColor.white
 
         let loginVC = TRTCLoginViewController()
-        let nav = UINavigationController(rootViewController: loginVC)
+        let nav = RoomNavigationController(rootViewController: loginVC)
         window?.rootViewController = nav
         window?.makeKeyAndVisible()
     }

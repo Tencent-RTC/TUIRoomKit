@@ -15,6 +15,14 @@ class TRTCLoginViewController: UIViewController {
     
     let loading = UIActivityIndicatorView()
     
+    override var shouldAutorotate: Bool {
+        return false
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         view.bringSubviewToFront(loading)

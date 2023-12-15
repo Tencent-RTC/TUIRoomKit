@@ -12,7 +12,7 @@ def tool
   pod 'Alamofire'
   pod 'TUICore'
   pod 'TUIChat'
-  pod 'TUIRoomEngine','1.6.1'
+  pod 'TUIRoomEngine','1.7.0'
   pod 'TXLiteAVSDK_TRTC'
   pod 'TXAppBasic'
   pod 'TIMCommon'
@@ -46,6 +46,22 @@ post_install do |installer|
         target.build_configurations.each do |config|
             config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
         end
+      end
+      xcode_version = `xcrun xcodebuild -version | grep Xcode | cut -d' ' -f2`.to_f
+      if xcode_version >= 15
+        xcconfig_path = config.base_configuration_reference.real_path
+        xcconfig = File.read(xcconfig_path)
+        if xcconfig.include?("OTHER_LDFLAGS") == false
+          xcconfig = xcconfig + "\n" + 'OTHER_LDFLAGS = $(inherited) "-ld64"'
+        else
+          if xcconfig.include?("OTHER_LDFLAGS = $(inherited)") == false
+            xcconfig = xcconfig.sub("OTHER_LDFLAGS", "OTHER_LDFLAGS = $(inherited)")
+          end
+          if xcconfig.include?("-ld64") == false
+            xcconfig = xcconfig.sub("OTHER_LDFLAGS = $(inherited)", 'OTHER_LDFLAGS = $(inherited) "-ld64"')
+          end
+        end
+        File.open(xcconfig_path, "w") { |file| file << xcconfig }
       end
     end
   end

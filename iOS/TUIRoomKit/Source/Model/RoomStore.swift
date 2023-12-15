@@ -24,6 +24,8 @@ class RoomStore: NSObject {
     var isEnteredRoom: Bool = false //是否已经进入房间
     var timeStampOnEnterRoom: Int = 0 //进入会议的时间戳
     var isShowRoomMainViewAutomatically: Bool = true //true 调用createRoom或者enterRoom会自动进入主界面; false 需要调用 showRoomMainView 才能进入主界面。
+    var extendedInvitationList : [String] = [] //已经发出邀请的用户列表
+    var isImAccess: Bool = false //是否由IM进入的TUIRoomKit
     private let openCameraKey = "isOpenCamera"
     private let openMicrophoneKey = "isOpenMicrophone"
     private let shownRaiseHandNoticeKey = "isShownRaiseHandNotice"
@@ -65,12 +67,16 @@ class RoomStore: NSObject {
     }
     
     func initialRoomCurrentUser() {
-        EngineManager.createInstance().getUserInfo(currentUser.userId) { [weak self] userInfo in
+        EngineManager.createInstance().getUserInfo(TUILogin.getUserID() ?? "") { [weak self] userInfo in
             guard let self = self else { return }
             guard let userInfo = userInfo else { return }
             self.currentUser.update(userInfo: userInfo)
         } onError: { code, message in
             debugPrint("getUserInfo,code:\(code),message:\(message)")
         }
+    }
+    
+    deinit {
+        debugPrint("self:\(self),deinit")
     }
 }

@@ -164,7 +164,6 @@ class ListCellItemView: UIView {
             let color = UIColor(0xBBBBBB)
             textField.attributedPlaceholder = NSAttributedString(string: item.fieldPlaceholderText,attributes:
                                                                     [NSAttributedString.Key.foregroundColor:color])
-            textField.becomeFirstResponder()
         } else {
             textField.text = item.fieldText
         }

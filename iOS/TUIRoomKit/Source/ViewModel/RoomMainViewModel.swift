@@ -21,7 +21,7 @@ protocol RoomMainViewResponder: AnyObject {
     func setToolBarDelayHidden(isDelay: Bool)
     func updateMuteAudioButton(isSelected: Bool)
     func showExitRoomView()
-    func showAlert(title: String?, message: String?, sureBlock: (()->())?, declineBlock: (() -> ())?)
+    func showAlert(title: String?, message: String?, sureTitle:String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?)
 }
 
 class RoomMainViewModel: NSObject {
@@ -116,7 +116,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
     func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
         if name == .onRoomDismissed {
             engineManager.destroyEngineManager()
-            viewResponder?.showAlert(title: .destroyAlertText, message: nil, sureBlock: { [weak self] in
+            viewResponder?.showAlert(title: .destroyAlertText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: { [weak self] in
                 guard let self = self else { return }
                 self.roomRouter.dismissAllRoomPopupViewController()
                 self.roomRouter.popToRoomEntranceViewController()
@@ -125,7 +125,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
         
         if name == .onKickedOutOfRoom {
             engineManager.destroyEngineManager()
-            viewResponder?.showAlert(title: .kickOffTitleText, message: nil, sureBlock: { [weak self] in
+            viewResponder?.showAlert(title: .kickOffTitleText, message: nil, sureTitle: .alertOkText, declineTitle: nil , sureBlock: { [weak self] in
                 guard let self = self else { return }
                 self.roomRouter.dismissAllRoomPopupViewController()
                 self.roomRouter.popToRoomEntranceViewController()
@@ -137,7 +137,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
             switch request.requestAction {
             case .openRemoteCamera:
                 guard !isShownOpenCameraInviteAlert else { return }
-                viewResponder?.showAlert(title: .inviteTurnOnVideoText, message: nil, sureBlock: { [weak self] in
+                viewResponder?.showAlert(title: .inviteTurnOnVideoText, message: nil, sureTitle: .agreeText, declineTitle: .declineText, sureBlock: { [weak self] in
                     guard let self = self else { return }
                     self.isShownOpenCameraInviteAlert = false
                     // FIXME: - 打开摄像头前需要先设置一个view
@@ -160,7 +160,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 isShownOpenCameraInviteAlert = true
             case .openRemoteMicrophone:
                 guard !isShownOpenMicrophoneInviteAlert else { return }
-                viewResponder?.showAlert(title: .inviteTurnOnAudioText, message: nil, sureBlock: { [weak self] in
+                viewResponder?.showAlert(title: .inviteTurnOnAudioText, message: nil, sureTitle: .agreeText, declineTitle: .declineText, sureBlock: { [weak self] in
                     guard let self = self else { return }
                     self.isShownOpenMicrophoneInviteAlert = false
                     if RoomCommon.checkAuthorMicStatusIsDenied() {
@@ -185,7 +185,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 switch roomInfo.speechMode {
                 case .applySpeakAfterTakingSeat:
                     guard !isShownTakeSeatInviteAlert else { return }
-                    viewResponder?.showAlert(title: .inviteSpeakOnStageTitle, message: .inviteSpeakOnStageMessage, sureBlock: { [weak self] in
+                    viewResponder?.showAlert(title: .inviteSpeakOnStageTitle, message: .inviteSpeakOnStageMessage, sureTitle: .agreeSeatText, declineTitle: .declineText, sureBlock: { [weak self] in
                         guard let self = self else { return }
                         self.isShownTakeSeatInviteAlert = false
                         self.respondUserOnSeat(isAgree: true, requestId: request.requestId)
@@ -219,8 +219,7 @@ extension RoomMainViewModel: RoomMainViewFactory {
     }
     
     func makeVideoSeatView() -> UIView {
-        let videoSeatView = TUIVideoSeatView(frame: UIScreen.main.bounds, roomEngine: engineManager.roomEngine,
-                                             roomId: roomInfo.roomId)
+        let videoSeatView = TUIVideoSeatView()
         videoSeatView.backgroundColor = UIColor(0x0F1014)
         return videoSeatView
     }
@@ -274,7 +273,7 @@ extension RoomMainViewModel: RoomKitUIEventResponder {
         case .TUIRoomKitService_CurrentUserRoleChanged:
             guard let userRole = info?["userRole"] as? TUIRole else { return }
             guard userRole == .roomOwner else { return }
-            viewResponder?.showAlert(title: .haveBecomeMasterText, message: nil, sureBlock: nil, declineBlock: nil)
+            viewResponder?.showAlert(title: .haveBecomeMasterText, message: nil,sureTitle: .alertOkText, declineTitle: nil, sureBlock: nil, declineBlock: nil)
         case .TUIRoomKitService_CurrentUserMuteMessage:
             guard let isMute = info?["isMute"] as? Bool else { return }
             viewResponder?.makeToast(text: isMute ? .messageTurnedOffText : .messageTurnedOnText)
@@ -328,5 +327,17 @@ private extension String {
     }
     static var kickedOffLineText: String {
         localized("TUIRoom.kicked.off.line")
+    }
+    static var alertOkText: String {
+        localized("TUIRoom.ok")
+    }
+    static var declineText: String {
+        localized("TUIRoom.decline")
+    }
+    static var agreeText: String {
+        localized("TUIRoom.agree")
+    }
+    static var agreeSeatText: String {
+        localized("TUIRoom.agree.seat")
     }
 }

@@ -45,14 +45,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return
         }
         let prePareViewController = RoomPrePareViewController()
-        let nav = UINavigationController(rootViewController: prePareViewController)
+        let nav = RoomNavigationController(rootViewController: prePareViewController)
         nav.modalPresentationStyle = .fullScreen
         getCurrentWindowViewController()?.present(nav, animated: true)
     }
     
     func showLoginViewController() {
         let loginVC = TRTCLoginViewController()
-        let nav = UINavigationController(rootViewController: loginVC)
+        let nav = RoomNavigationController(rootViewController: loginVC)
         if let keyWindow = SceneDelegate.getCurrentWindow() {
             keyWindow.rootViewController = nav
             keyWindow.makeKeyAndVisible()

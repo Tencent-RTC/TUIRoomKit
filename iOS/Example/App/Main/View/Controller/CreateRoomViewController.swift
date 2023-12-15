@@ -26,11 +26,7 @@ class CreateRoomViewController: UIViewController {
     private var enableLocalVideo: Bool = true
     private var isSoundOnSpeaker: Bool = true
     let roomHashNumber: Int = 0x3B9AC9FF
-    lazy var roomId: String = {
-        let userId = currentUserId
-        let result = "\(String(describing: userId))_room_kit".hash & roomHashNumber
-        return String(result)
-    }()
+    var roomId: String?
     
     let backButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -68,16 +64,8 @@ class CreateRoomViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         UIApplication.shared.isIdleTimerDisabled = false
-        UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
         renewRootViewState()
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        appDelegate.orientation = .portrait
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        appDelegate.orientation = .allButUpsideDown
+        setupRoomId()
     }
     
     @objc
@@ -96,16 +84,12 @@ extension CreateRoomViewController {
         roomTypeItem.titleText = .roomTypeText
         roomTypeItem.messageText = .freedomSpeakText
         roomTypeItem.hasOverAllAction = true
+        roomTypeItem.hasButton = true
         roomTypeItem.action = { [weak self] sender in
             guard let self = self else { return }
             self.switchRoomTypeClick()
         }
         inputViewItems.append(roomTypeItem)
-        
-        let createRoomIdItem = ListCellItemData()
-        createRoomIdItem.titleText = .roomNumText
-        createRoomIdItem.messageText = roomId
-        inputViewItems.append(createRoomIdItem)
         
         let userNameItem = ListCellItemData()
         userNameItem.titleText = .userNameText
@@ -148,6 +132,11 @@ extension CreateRoomViewController {
     func enterButtonClick(sender: UIButton) {
         rootView?.updateEnterButtonState(isEnabled: false)
         rootView?.updateLoadingState(isStarted: true)
+        guard let roomId = self.roomId else {
+            self.view.makeToast(.generatingRoomIdText)
+            self.renewRootViewState()
+            return
+        }
         roomInfo.roomId = roomId
         roomInfo.name = currentUserName.truncateUtf8String(maxByteLength: 30)
         roomInfo.speechMode = roomSpeechMode
@@ -213,6 +202,39 @@ extension CreateRoomViewController {
         view.freedomButton.isSelected = false
         chooseSpeechMode = .applySpeakAfterTakingSeat
     }
+    
+    private func setupRoomId() {
+        let roomId = getRandomRoomId(numberOfDigits: 6)
+        checkIfRoomIdExists(roomId: roomId) { [weak self] in
+            guard let self = self else { return }
+            self.setupRoomId()
+        } onNotExist: { [weak self] in
+            guard let self = self else { return }
+            self.roomId = roomId
+        }
+    }
+    
+    //获取随机数roomId，numberOfDigits为位数
+    private func getRandomRoomId(numberOfDigits: Int) -> String {
+        var numberOfDigit = numberOfDigits > 0 ? numberOfDigits : 1
+        numberOfDigit = numberOfDigit < 10 ? numberOfDigit : 9
+        let minNumber = Int(truncating: NSDecimalNumber(decimal: pow(10, numberOfDigit - 1)))
+        let maxNumber = Int(truncating: NSDecimalNumber(decimal: pow(10, numberOfDigit))) - 1
+        let randomNumber = arc4random_uniform(UInt32(maxNumber - minNumber)) + UInt32(minNumber)
+        return String(randomNumber)
+    }
+    
+    private func checkIfRoomIdExists(roomId: String, onExist: @escaping () -> (), onNotExist: @escaping () -> ()) {
+        V2TIMManager.sharedInstance().getGroupsInfo([roomId]) { infoResult in
+            if infoResult?.first?.resultCode == 0 {
+                onExist()
+            } else {
+                onNotExist()
+            }
+        } fail: { code, message in
+            onNotExist()
+        }
+    }
 }
 
 private extension String {
@@ -221,9 +243,6 @@ private extension String {
     }
     static var roomTypeText: String {
         RoomDemoLocalize("Demo.TUIRoomKit.room.type")
-    }
-    static var roomNumText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.room.num")
     }
     static var openCameraText: String {
         RoomDemoLocalize("Demo.TUIRoomKit.open.video")
@@ -242,6 +261,9 @@ private extension String {
     }
     static var videoConferenceText: String {
         RoomDemoLocalize("Demo.TUIRoomKit.video.conference")
+    }
+    static var generatingRoomIdText: String {
+        RoomDemoLocalize("Demo.TUIRoomKit.generating.roomId")
     }
     func truncateUtf8String(maxByteLength: Int) -> String {
         let length = self.utf8.count

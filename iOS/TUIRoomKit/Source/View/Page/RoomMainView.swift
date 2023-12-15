@@ -139,7 +139,7 @@ class RoomMainView: UIView {
         bottomView.snp.remakeConstraints { make in
             make.leading.equalTo(safeAreaLayoutGuide.snp.leading)
             make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
-            make.height.equalTo(bottomView.isUnfold ? 130.scale375() : 60.scale375())
+            make.height.equalTo(bottomView.isUnfold ? bottomView.unfoldHeight : bottomView.packUpHeight)
             if isLandscape {
                 make.bottom.equalToSuperview().offset(-layout.bottomViewLandscapeSpace)
             } else {
@@ -165,22 +165,8 @@ extension RoomMainView: RoomMainViewResponder {
         muteAudioButton.isSelected = isSelected
     }
     
-    func showAlert(title: String?, message: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?) {
-        let alertVC = UIAlertController(title: title,
-                                        message: message,
-                                        preferredStyle: .alert)
-        let sureTitle: String = declineBlock != nil ? .agreeText : .alertOkText
-        let sureAction = UIAlertAction(title: sureTitle, style: .default) { _ in
-            sureBlock?()
-        }
-        alertVC.addAction(sureAction)
-        if let declineBlock = declineBlock {
-            let declineAction = UIAlertAction(title: .declineText, style: .destructive) { _ in
-                declineBlock()
-            }
-            alertVC.addAction(declineAction)
-        }
-        RoomRouter.shared.presentAlert(alertVC)
+    func showAlert(title: String?, message: String?, sureTitle:String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?) {
+        RoomRouter.presentAlert(title: title, message: message, sureTitle: sureTitle, declineTitle: declineTitle, sureBlock: sureBlock, declineBlock: declineBlock)
     }
     
     func makeToast(text: String) {
@@ -229,17 +215,5 @@ extension RoomMainView: RoomMainViewResponder {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(hideToolBar), object: nil)
         guard !bottomView.isUnfold, isDelay else { return }
         perform(#selector(hideToolBar),with: nil,afterDelay: delayDisappearanceTime)
-    }
-}
-
-private extension String {
-    static var alertOkText: String {
-        localized("TUIRoom.ok")
-    }
-    static var declineText: String {
-        localized("TUIRoom.decline")
-    }
-    static var agreeText: String {
-        localized("TUIRoom.agree")
     }
 }

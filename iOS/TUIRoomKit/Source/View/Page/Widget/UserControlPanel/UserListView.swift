@@ -100,6 +100,12 @@ class UserListView: UIView {
         return button
     }()
     
+    let bottomView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(0x17181F)
+        return view
+    }()
+    
     lazy var userListTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.separatorStyle = .none
@@ -141,9 +147,10 @@ class UserListView: UIView {
         addSubview(searchBar)
         addSubview(inviteButton)
         addSubview(userListTableView)
-        addSubview(muteAllAudioButton)
-        addSubview(muteAllVideoButton)
-        addSubview(moreFunctionButton)
+        addSubview(bottomView)
+        bottomView.addSubview(muteAllAudioButton)
+        bottomView.addSubview(muteAllVideoButton)
+        bottomView.addSubview(moreFunctionButton)
         addSubview(blurView)
         addSubview(userListManagerView)
         addSubview(searchControl)
@@ -168,26 +175,30 @@ class UserListView: UIView {
             make.trailing.equalToSuperview().offset(-16.scale375())
             make.height.equalTo(36.scale375())
         }
+        bottomView.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalToSuperview()
+            make.height.equalTo(84.scale375Height())
+        }
         userListTableView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16.scale375())
             make.trailing.equalToSuperview().offset(-16.scale375())
             make.top.equalToSuperview().offset(127.scale375())
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(bottomView.snp.top)
         }
         muteAllAudioButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().offset(-34.scale375())
+            make.top.equalToSuperview().offset(10.scale375Height())
             make.leading.equalToSuperview().offset(16.scale375())
             make.width.equalTo(108.scale375())
             make.height.equalTo(40.scale375())
         }
         muteAllVideoButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().offset(-34.scale375())
+            make.top.equalToSuperview().offset(10.scale375Height())
             make.leading.equalToSuperview().offset(133.scale375())
             make.width.equalTo(108.scale375())
             make.height.equalTo(40.scale375())
         }
         moreFunctionButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().offset(-34.scale375())
+            make.top.equalToSuperview().offset(10.scale375Height())
             make.leading.equalToSuperview().offset(250.scale375())
             make.width.equalTo(108.scale375())
             make.height.equalTo(40.scale375())
@@ -396,6 +407,7 @@ class UserListCell: UITableViewCell {
         button.setTitle(.inviteSeatText, for: .normal)
         button.setTitleColor(UIColor(0xFFFFFF), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        button.isHidden = true
         return button
     }()
     
@@ -453,8 +465,6 @@ class UserListCell: UITableViewCell {
             make.centerY.equalTo(self.avatarImageView)
         }
         inviteStageButton.snp.makeConstraints { make in
-            make.width.equalTo(62.scale375())
-            make.height.equalTo(24.scale375Height())
             make.trailing.equalToSuperview()
             make.centerY.equalTo(self.avatarImageView)
         }
@@ -512,18 +522,13 @@ class UserListCell: UITableViewCell {
         muteAudioButton.isSelected = !item.hasAudioStream
         muteVideoButton.isSelected = !item.hasVideoStream
         //判断是否显示邀请上台的按钮(房主在举手发言房间中可以邀请其他没有上台的用户)
-        switch viewModel.roomInfo.speechMode {
-        case .freeToSpeak:
-            changeInviteStageButtonHidden(isHidden: true)
-        case .applySpeakAfterTakingSeat:
-            //房主可以邀请没有上麦的成员上麦
-            if viewModel.currentUser.userId == viewModel.roomInfo.ownerId, attendeeModel.userId != viewModel.roomInfo.ownerId,
-               !attendeeModel.isOnSeat {
-                changeInviteStageButtonHidden(isHidden: false)
-            } else {
-                changeInviteStageButtonHidden(isHidden: true)
-            }
-        default: break
+        guard viewModel.roomInfo.speechMode == .applySpeakAfterTakingSeat else { return }
+        muteAudioButton.isHidden = !attendeeModel.isOnSeat
+        muteVideoButton.isHidden = !attendeeModel.isOnSeat
+        if viewModel.currentUser.userId == viewModel.roomInfo.ownerId {
+            inviteStageButton.isHidden = attendeeModel.isOnSeat
+        } else {
+            inviteStageButton.isHidden = true
         }
     }
     
@@ -534,13 +539,6 @@ class UserListCell: UITableViewCell {
     
     @objc func showUserManageAction(sender: UIButton) {
         viewModel.showUserManageViewAction(userId: attendeeModel.userId, userName: attendeeModel.userName)
-    }
-    
-    //是否显示邀请按钮（如果显示了邀请按钮，麦克风和摄像头按钮不会显示）
-    private func changeInviteStageButtonHidden(isHidden: Bool) {
-        inviteStageButton.isHidden = isHidden
-        muteAudioButton.isHidden = !isHidden
-        muteVideoButton.isHidden = !isHidden
     }
     
     deinit {

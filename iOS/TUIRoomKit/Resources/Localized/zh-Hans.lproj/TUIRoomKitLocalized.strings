@@ -23,8 +23,8 @@
 
 "TUIRoom.sure.destroy.room" = "你确定要结束会议吗？";
 "TUIRoom.sure.leave.room" = "你确定要离开房间吗？";
-"TUIRoom.destroy.room.cancel" = "再等等";
-"TUIRoom.ok" = "确认";
+"TUIRoom.wait" = "再等等";
+"TUIRoom.ok" = "确定";
 "TUIRoom.cancel" = "取消";
 "TUIRoom.invite.join" = "您可以分享房间号或链接邀请更多人加入房间";
 "TUIRoom.logout.member.list" = "成员列表";
@@ -86,7 +86,7 @@
 "TUIRoom.leave.seat" = "下台";
 "TUIRoom.hand.down" = "手放下";
 "TUIRoom.invite.to.speak" = "主持人邀请您上台发言";
-"TUIRoom.agree.to.speak" = "主持人邀请您上台发言，上台后可以打开摄像头和麦克风";
+"TUIRoom.agree.to.speak" = "主持人邀请您上台发言，上台后可以打开摄像头和取消静音";
 "TUIRoom.decline" = "拒绝";
 "TUIRoom.agree" = "同意";
 "TUIRoom.quick.meeting" = "快速会议";
@@ -104,7 +104,8 @@
 "TUIRoom.invite.turn.on.video" = "主持人邀请您开启视频画面";
 "TUIRoom.dismiss.meeting.Title" = "如果您不想结束会议";
 "TUIRoom.appoint.new.host" = "请在离开会议前指定新的主持人";
-"TUIRoom.leave.room.tip" = "如果您不想结束房间，请在离开房间前指定新的主持人";
+"TUIRoom.appoint.owner" = "如果您不想结束房间，请在离开房间前指定新的主持人";
+"TUIRoom.leave.room.tip"= "您确定要离开房间吗";
 "TUIRoom.leave.meeting" = "离开会议";
 "TUIRoom.leave.room" = "离开房间";
 "TUIRoom.dismiss.meeting" = "结束会议";
@@ -186,3 +187,4 @@
 "TUIRoom.take.seat.invitation.timeout" = "上麦邀请已经超时";
 "TUIRoom.open.video.invitation.timeout" = "开启视频的邀请已经超时";
 "TUIRoom.open.audio.invitation.timeout" = "开启音频的邀请已经超时";
+"TUIRoom.sure.kick.out" = "是否将xx移出房间？";

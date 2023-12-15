@@ -1,5 +1,5 @@
 //
-//  TUIVideoSeatLayout.swift
+//  VideoSeatLayout.swift
 //  TUIVideoSeat
 //
 //  Created by 唐佳宁 on 2023/3/16.
@@ -7,11 +7,11 @@
 
 import Foundation
 
-protocol TUIVideoSeatLayoutDelegate: AnyObject {
+protocol VideoSeatLayoutDelegate: AnyObject {
     func updateNumberOfPages(numberOfPages: NSInteger)
 }
 
-class TUIVideoSeatLayout: UICollectionViewFlowLayout {
+class VideoSeatLayout: UICollectionViewFlowLayout {
     private var prePageCount: NSInteger = 1
 
     private var collectionViewHeight: CGFloat {
@@ -75,7 +75,7 @@ class TUIVideoSeatLayout: UICollectionViewFlowLayout {
         return CGSize(width: CGFloat(prePageCount) * collectionViewWidth, height: collectionViewHeight)
     }
 
-    weak var delegate: TUIVideoSeatLayoutDelegate?
+    weak var delegate: VideoSeatLayoutDelegate?
 
     // Miniscreen布局信息
     func getMiniscreenFrame(item: VideoSeatItem?) -> CGRect {
@@ -91,7 +91,7 @@ class TUIVideoSeatLayout: UICollectionViewFlowLayout {
 
 // MARK: - layout
 
-extension TUIVideoSeatLayout {
+extension VideoSeatLayout {
     // 计算cell的位置和大小，并进行存储
     private func calculateEachCellFrame() {
         guard let collectionViewWidth: CGFloat = collectionView?.bounds.width else { return }

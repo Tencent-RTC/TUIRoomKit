@@ -1,5 +1,5 @@
 //
-//  TUIVideoSeatUserStatusView.swift
+//  VideoSeatUserStatusView.swift
 //  TUIVideoSeat
 //
 //  Created by jack on 2023/3/6.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class TUIVideoSeatUserStatusView: UIView {
+class VideoSeatUserStatusView: UIView {
     private var isOwner: Bool = false
     private var isViewReady: Bool = false
     override func didMoveToWindow() {
@@ -77,14 +77,14 @@ class TUIVideoSeatUserStatusView: UIView {
 
 // MARK: - Public
 
-extension TUIVideoSeatUserStatusView {
+extension VideoSeatUserStatusView {
     func updateUserStatus(_ item: VideoSeatItem) {
         if !item.userName.isEmpty {
             userNameLabel.text = item.userName
         } else {
             userNameLabel.text = item.userId
         }
-        isOwner = item.userRole == .roomOwner
+        isOwner = item.userId == EngineManager.createInstance().store.roomInfo.ownerId
         homeOwnerImageView.isHidden = !isOwner
         updateOwnerImageConstraints()
         updateUserVolume(hasAudio: item.hasAudioStream, volume: item.audioVolume)

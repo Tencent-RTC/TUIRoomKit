@@ -13,6 +13,7 @@ protocol UserListManagerViewEventResponder: AnyObject {
     func updateUI(items: [ButtonItemData])
     func makeToast(text: String)
     func showTransferredRoomOwnerAlert()
+    func showKickOutAlert(title: String, sureAction: (() ->())?)
     func setUserListManagerViewHidden(isHidden: Bool)
 }
 
@@ -25,7 +26,7 @@ class UserListManagerViewModel: NSObject {
     }
     var userId: String = ""
     var userName: String = ""
-    let timeoutNumber: Double = 0
+    let timeoutNumber: Double = 10
     private(set) var otherUserItems: [ButtonItemData] = []//其他用户viewItem
     private(set) var currentUserItems: [ButtonItemData] = []
     private(set) var onSeatItems: [ButtonItemData] = []//已经上麦的用户viewItem
@@ -45,7 +46,6 @@ class UserListManagerViewModel: NSObject {
     }
     private var hasOpenCameraInvite = false
     private var hasOpenMicrophoneInvite = false
-    var hasTakeSeatInvite = false
     
     override init() {
         super.init()
@@ -315,29 +315,20 @@ class UserListManagerViewModel: NSObject {
     
     func inviteSeatAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        if !hasTakeSeatInvite {
-            engineManager.takeUserOnSeatByAdmin(userId: userId, timeout: timeoutNumber) { [weak self] _,_ in
-                guard let self = self else { return }
-                self.hasTakeSeatInvite = false
+        if !engineManager.store.extendedInvitationList.contains(userId) {
+            engineManager.takeUserOnSeatByAdmin(userId: userId, timeout: timeoutNumber) { _,_ in
             } onRejected: { [weak self] requestId, userId, message in
                 guard let self = self else { return }
-                self.hasTakeSeatInvite = false
                 self.viewResponder?.makeToast(text: self.userName + .refusedTakeSeatInvitationText)
-            } onCancelled: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.hasTakeSeatInvite = false
             } onTimeout: { [weak self] _, _ in
                 guard let self = self else { return }
-                self.hasTakeSeatInvite = false
                 self.viewResponder?.makeToast(text: .takeSeatInvitationTimeoutText)
             } onError: { [weak self] _, _, _, message in
                 guard let self = self else { return }
-                self.hasTakeSeatInvite = false
                 self.viewResponder?.makeToast(text: message)
             }
         }
         viewResponder?.makeToast(text: .invitedTakeSeatText)
-        hasTakeSeatInvite = true
         hideUserListManagerView()
     }
     
@@ -368,8 +359,12 @@ class UserListManagerViewModel: NSObject {
     
     func kickOutAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        engineManager.kickRemoteUserOutOfRoom(userId: userId)
-        hideUserListManagerView()
+        let kickOutTitle = localizedReplace(.kickOutText, replace: userName)
+        viewResponder?.showKickOutAlert(title: kickOutTitle, sureAction: { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.kickRemoteUserOutOfRoom(userId: self.userId)
+            self.hideUserListManagerView()
+        })
     }
     
     //根据用户的状态更新item数组
@@ -541,5 +536,8 @@ private extension String {
     }
     static var invitedOpenVideoText: String {
         localized("TUIRoom.invited.open.video")
+    }
+    static var kickOutText: String {
+        localized("TUIRoom.sure.kick.out")
     }
 }

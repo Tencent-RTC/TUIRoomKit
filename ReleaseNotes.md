@@ -1,5 +1,9 @@
 ## 发布日志
 
+### Version 1.7.0 @ 2023.12.15
+- iOS & Android: 优化界面，修改UI问题；
+- iOS & Android: 修改roomId生成逻辑；
+
 ### Version 1.6.1 @ 2023.11.10
 - Android & iOS：优化产品体验，进一步美化横屏UI；
 - Android & iOS：优化产品体验，解决演讲者模式小画面切换抖动，设置小画面切换间隔为5秒；

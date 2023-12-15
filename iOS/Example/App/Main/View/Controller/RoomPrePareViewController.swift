@@ -31,13 +31,6 @@ class RoomPrePareViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
         UIApplication.shared.isIdleTimerDisabled = false
-        UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        appDelegate.orientation = .portrait
     }
     
     override func loadView() {

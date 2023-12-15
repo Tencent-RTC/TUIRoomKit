@@ -10,6 +10,7 @@ import Foundation
 protocol TransferMasterViewResponder: NSObject {
     func reloadTransferMasterTableView()
     func searchControllerChangeActive(isActive: Bool)
+    func makeToast(message: String)
 }
 
 class TransferMasterViewModel: NSObject {
@@ -37,15 +38,17 @@ class TransferMasterViewModel: NSObject {
         guard userId != "" else { return }
         engineManager.changeUserRole(userId: userId, role: .roomOwner) { [weak self] in
             guard let self = self else { return }
-            self.engineManager.exitRoom(onSuccess: nil, onError: nil)
-            self.roomRouter.dismissAllRoomPopupViewController()
-            self.roomRouter.popToRoomEntranceViewController()
+            self.engineManager.exitRoom { [weak self] in
+                guard let self = self else { return }
+                self.roomRouter.dismissAllRoomPopupViewController()
+                self.roomRouter.popToRoomEntranceViewController()
+            } onError: { [weak self] code, message in
+                guard let self = self else { return }
+                self.viewResponder?.makeToast(message: message)
+            }
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.engineManager.destroyRoom(onSuccess: nil, onError: nil)
-            self.roomRouter.dismissAllRoomPopupViewController()
-            self.roomRouter.popToRoomEntranceViewController()
-            debugPrint("changeUserRole:code:\(code),message:\(message)")
+            self.viewResponder?.makeToast(message: message)
         }
     }
     
