@@ -1,3 +1,4 @@
+import org.gradle.util.VersionNumber
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
@@ -7,8 +8,14 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        VersionNumber currentGradleVersion = VersionNumber.parse(gradle.gradleVersion)
+        if (currentGradleVersion.major >= 8) {
+            classpath 'com.android.tools.build:gradle:8.0.2'
+            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0"
+        } else {
+            classpath 'com.android.tools.build:gradle:4.2.1'
+            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        }
     }
 }
 
@@ -27,7 +34,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    liteavSdk = "com.tencent.liteav:LiteAVSDK_TRTC:11.4.0.13217"
-    roomEngineSdk = "com.tencent.liteav.tuikit:tuiroomengine:1.6.1.102"
+    liteavSdk = "com.tencent.liteav:LiteAVSDK_TRTC:11.4.0.13270"
+    roomEngineSdk = "com.tencent.liteav.tuikit:tuiroomengine:1.7.0.137"
     imSdk = "com.tencent.imsdk:imsdk-plus:7.6.5011"
 }

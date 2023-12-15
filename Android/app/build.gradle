@@ -1,8 +1,11 @@
+import org.gradle.util.VersionNumber
+
 apply plugin: 'com.android.application'
 
 android {
+    namespace "com.tencent.liteav.demo"
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId 'com.tencent.liteav.tuiroom'
@@ -12,10 +15,8 @@ android {
         targetSdkVersion 30
         multiDexEnabled true
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    buildFeatures {
+        buildConfig = false
     }
 
     buildTypes {
@@ -24,12 +25,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    def roomSourceJavaVersion = JavaVersion.VERSION_1_8
+    VersionNumber currentGradleVersion = VersionNumber.parse(gradle.gradleVersion)
+    if (currentGradleVersion.major >= 8) {
+        roomSourceJavaVersion = JavaVersion.VERSION_17
+    }
+    compileOptions {
+        sourceCompatibility roomSourceJavaVersion
+        targetCompatibility roomSourceJavaVersion
+    }
 }
 
 dependencies {
     implementation project(':tuiroomkit')
     implementation project(':debug')
 
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation "androidx.navigation:navigation-fragment:2.1.0"
     implementation "androidx.navigation:navigation-ui:2.1.0"
     implementation "de.hdodenhof:circleimageview:3.1.0"

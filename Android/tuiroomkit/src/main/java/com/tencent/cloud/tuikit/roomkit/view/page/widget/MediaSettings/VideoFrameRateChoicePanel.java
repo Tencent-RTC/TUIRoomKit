@@ -1,5 +1,7 @@
 package com.tencent.cloud.tuikit.roomkit.view.page.widget.MediaSettings;
 
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.DISMISS_USER_LIST;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.view.View;
@@ -28,8 +30,8 @@ public class VideoFrameRateChoicePanel extends BaseBottomDialog implements RoomE
     }
 
     @Override
-    public void cancel() {
-        super.cancel();
+    public void dismiss() {
+        super.dismiss();
         RoomEventCenter.getInstance().unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
     }
 

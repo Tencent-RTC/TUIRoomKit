@@ -8,13 +8,23 @@ public class UserModel {
     public String             userName;
     public String             userAvatar;
     public TUIRoomDefine.Role role;
-    public SeatStatus         seatStatus = SeatStatus.OFF_SEAT;
     public String             takeSeatRequestId;
+    public long               enterRoomTime = 0L;
+
+    private SeatStatus seatStatus = SeatStatus.OFF_SEAT;
 
     public UserModel() {
         userId = TUILogin.getUserId();
         userName = TUILogin.getNickName();
         userAvatar = TUILogin.getFaceUrl();
+    }
+
+    public SeatStatus getSeatStatus() {
+        return seatStatus;
+    }
+
+    public void setSeatStatus(SeatStatus seatStatus) {
+        this.seatStatus = seatStatus;
     }
 
     public enum SeatStatus {

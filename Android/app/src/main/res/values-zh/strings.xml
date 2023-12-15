@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">多人音视频房间</string>
-    <string name="toast_login_success">登录成功</string>
-    <string name="toast_login_fail">登录IM失败，所有功能不可用[%d]%s</string>
-    <string name="working">正在运行中</string>
-    <string name="user_id">用户名</string>
-    <string name="hint_user_id">请输入登录的userId</string>
-    <string name="btn_login">登录</string>
+    <string name="app_toast_login_success">登录成功</string>
+    <string name="app_working">正在运行中</string>
+    <string name="app_user_id">用户名</string>
+    <string name="app_hint_user_id">请输入登录的userId</string>
+    <string name="app_btn_login">登录</string>
     <string name="app_toast_login_fail">登录IM失败，所有功能不可用[%d]%s</string>
 
-    <string name="welcome_tips">欢迎使用\n腾讯云实时音视频</string>
-    <string name="dialog_log_out">确定要退出登录吗？</string>
-    <string name="user_sig_expired">您的用户签名信息已过期,请重新登录</string>
-    <string name="user_id_is_empty">userId 不能为空</string>
+    <string name="app_welcome_tips">欢迎使用\n腾讯云实时音视频</string>
+    <string name="app_dialog_log_out">确定要退出登录吗？</string>
+    <string name="app_user_sig_expired">您的用户签名信息已过期,请重新登录</string>
+    <string name="app_user_id_is_empty">userId 不能为空</string>
     <string name="app_title_register">注册</string>
     <string name="app_text_user_name">用户名</string>
     <string name="app_hint_user_name">请输入用户名</string>
@@ -40,16 +39,21 @@
     <string name="app_item_video_conferencing_h5">多人音视频房间(H5)</string>
     <string name="app_tv_video_conferencing_tips">全球端到端平均延时&lt;300ms</string>
 
-    <string name="tuiroomkit_your_name">您的姓名</string>
-    <string name="tuiroomkit_multi_video_conferencing">多人视频会议</string>
-    <string name="tuiroomkit_app_version">Tencent Cloud TUIRoomKit v%s</string>
-    <string name="tuiroomkit_product_name">多人音视频房间</string>
-    <string name="tuiroomkit_please_input_room_number">请输入房间号</string>
-    <string name="tuiroomkit_enter_room">加入房间</string>
-    <string name="tuiroomkit_create_room">新建房间</string>
-    <string name="tuiroomkit_enter_live_room">加入直播房间</string>
+    <string name="app_your_name">您的姓名</string>
+    <string name="app_multi_video_conferencing">多人视频会议</string>
+    <string name="app_version">Tencent Cloud TUIRoomKit v%s</string>
+    <string name="app_product_name">多人音视频房间</string>
+    <string name="app_please_input_room_number">请输入房间号</string>
+    <string name="app_enter_room">加入房间</string>
+    <string name="app_create_room">新建房间</string>
+    <string name="app_enter_live_room">加入直播房间</string>
 
     <string name="app_turn_on_audio">打开音频</string>
     <string name="app_turn_on_speaker">打开扬声器</string>
     <string name="app_turn_on_video">打开视频</string>
+    <string name="app_tip_creating_room_id">正在生成房间号，请稍后重试</string>
+
+    <string name="app_room_msg_joined">已入会</string>
+    <string name="app_room_free_speech">自由发言房间</string>
+    <string name="app_room_raise_hand">举手发言房间</string>
 </resources>

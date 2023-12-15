@@ -33,7 +33,7 @@ public class EnterRoomView extends RelativeLayout {
 
     public EnterRoomView(Context context) {
         super(context);
-        View.inflate(context, R.layout.tuiroomkit_view_enter_room, this);
+        View.inflate(context, R.layout.app_view_enter_room, this);
         mContext = context;
         mViewModel = new EnterRoomViewModel(mContext);
         initView();

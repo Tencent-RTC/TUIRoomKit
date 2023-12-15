@@ -5,6 +5,7 @@ import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineE
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_CAMERA_STATE_CHANGED;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_SCREEN_STATE_CHANGED;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.BAR_SHOW_TIME_RECOUNT;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.SHOW_MEDIA_SETTING_PANEL;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant.KEY_USER_POSITION;
 
 import android.content.Context;
@@ -45,7 +46,6 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
 
     private Context              mContext;
     private BottomView           mBottomView;
-    private MediaSettingPanel    mSettingView;
     private RoomStore            mRoomStore;
     private List<BottomItemData> mItemDataList;
 
@@ -624,7 +624,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         if (position == USER_NOT_FOUND) {
             return;
         }
-        if (TextUtils.equals(mRoomStore.seatUserList.get(position).getUserId(), TUILogin.getUserId())) {
+        if (TextUtils.equals(mRoomStore.allUserList.get(position).getUserId(), TUILogin.getUserId())) {
             updateAudioItemEnableStatus(!mRoomStore.roomInfo.isMicrophoneDisableForAllUser);
             updateVideoItemEnableStatus(!mRoomStore.roomInfo.isCameraDisableForAllUser);
             mBottomView.replaceItem(BottomItemData.Type.RAISE_HAND, createGetOffStageItem());
@@ -639,7 +639,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         if (position == USER_NOT_FOUND) {
             return;
         }
-        if (TextUtils.equals(mRoomStore.seatUserList.get(position).getUserId(), TUILogin.getUserId())) {
+        if (TextUtils.equals(mRoomStore.allUserList.get(position).getUserId(), TUILogin.getUserId())) {
             updateAudioItemEnableStatus(false);
             updateVideoItemEnableStatus(false);
             mBottomView.replaceItem(BottomItemData.Type.OFF_STAGE, createRaiseHandItem());
@@ -681,7 +681,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
             @Override
             public void onItemClick() {
                 RoomEventCenter.getInstance().notifyUIEvent(
-                        RoomEventCenter.RoomKitUIEvent.SHOW_INVITE_VIEW, null);
+                        RoomEventCenter.RoomKitUIEvent.SHOW_INVITE_PANEL, null);
             }
         });
         return inviteItemData;
@@ -749,10 +749,8 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         setttingItemData.setOnItemClickListener(new BottomItemData.OnItemClickListener() {
             @Override
             public void onItemClick() {
-                if (mSettingView == null) {
-                    mSettingView = new MediaSettingPanel(mContext);
-                }
-                mSettingView.show();
+                RoomEventCenter.getInstance().notifyUIEvent(SHOW_MEDIA_SETTING_PANEL, null);
+                RoomEventCenter.getInstance().notifyUIEvent(BAR_SHOW_TIME_RECOUNT, null);
             }
         });
         return setttingItemData;

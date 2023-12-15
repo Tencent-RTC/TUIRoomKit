@@ -333,7 +333,7 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
         if (position == USER_NOT_FOUND) {
             return;
         }
-        if (TextUtils.equals(mRoomStore.seatUserList.get(position).getUserId(), TUILogin.getUserId())) {
+        if (TextUtils.equals(mRoomStore.allUserList.get(position).getUserId(), mUser.getUserId())) {
             mUserManagementView.updateLayout(isOnSeat);
         }
     }

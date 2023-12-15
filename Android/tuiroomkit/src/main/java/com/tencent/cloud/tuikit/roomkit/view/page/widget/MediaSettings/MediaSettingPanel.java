@@ -1,5 +1,7 @@
 package com.tencent.cloud.tuikit.roomkit.view.page.widget.MediaSettings;
 
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.DISMISS_MEDIA_SETTING_PANEL;
+
 import android.content.Context;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -8,9 +10,11 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.SettingViewModel;
@@ -26,9 +30,9 @@ public class MediaSettingPanel extends BaseBottomDialog {
     private SeekBar  mPbAudioCaptureVolume;
     private TextView mTvAudioCaptureVolume;
 
-    private SeekBar  mPbAudioPlayVolume;
-    private TextView mTvAudioPlayVolume;
-    private Switch   mSwitchAudioVolumeEvaluation;
+    private SeekBar      mPbAudioPlayVolume;
+    private TextView     mTvAudioPlayVolume;
+    private SwitchCompat mSwitchAudioVolumeEvaluation;
 
     private Context mContext;
 
@@ -41,8 +45,9 @@ public class MediaSettingPanel extends BaseBottomDialog {
     }
 
     @Override
-    public void cancel() {
-        super.cancel();
+    public void dismiss() {
+        super.dismiss();
+        RoomEventCenter.getInstance().notifyUIEvent(DISMISS_MEDIA_SETTING_PANEL, null);
         mViewModel.destroy();
     }
 

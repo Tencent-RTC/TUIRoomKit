@@ -1,12 +1,15 @@
+import org.gradle.util.VersionNumber
+
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    namespace "com.tencent.liteav.debug"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 30
     }
 
     buildTypes {
@@ -14,6 +17,19 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    buildFeatures {
+        buildConfig = false
+    }
+
+    def roomSourceJavaVersion = JavaVersion.VERSION_1_8
+    VersionNumber currentGradleVersion = VersionNumber.parse(gradle.gradleVersion)
+    if (currentGradleVersion.major >= 8) {
+        roomSourceJavaVersion = JavaVersion.VERSION_17
+    }
+    compileOptions {
+        sourceCompatibility roomSourceJavaVersion
+        targetCompatibility roomSourceJavaVersion
     }
 }
 

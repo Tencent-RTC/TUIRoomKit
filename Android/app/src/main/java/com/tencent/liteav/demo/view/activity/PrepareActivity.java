@@ -5,7 +5,6 @@ import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
 import com.tencent.liteav.demo.R;
 import com.tencent.liteav.demo.view.component.PrepareView;
 import com.tencent.qcloud.tuicore.interfaces.TUICallback;
@@ -16,7 +15,7 @@ public class PrepareActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.tuiroomkit_activity_prepare);
+        setContentView(R.layout.app_activity_prepare);
         ViewGroup root = findViewById(R.id.ll_root);
         boolean enablePreview = getIntent().getBooleanExtra(INTENT_ENABLE_PREVIEW, true);
         PrepareView prepareView = new PrepareView(this, enablePreview);
@@ -32,6 +31,5 @@ public class PrepareActivity extends AppCompatActivity {
 
             }
         });
-        TUIRoomKit.createInstance();
     }
 }

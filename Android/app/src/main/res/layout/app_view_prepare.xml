@@ -75,7 +75,7 @@
             android:layout_below="@id/img_tencent_cloud"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="@string/tuiroomkit_product_name"
+            android:text="@string/app_product_name"
             android:textSize="24sp"
             android:textStyle="italic|bold" />
     </RelativeLayout>
@@ -103,7 +103,7 @@
             android:drawableLeft="@drawable/tuiroomkit_ic_enter_room"
             android:drawablePadding="5dp"
             android:gravity="center"
-            android:text="@string/tuiroomkit_enter_room"
+            android:text="@string/app_enter_room"
             android:textColor="@color/white"
             android:textSize="16sp" />
     </LinearLayout>
@@ -130,7 +130,7 @@
             android:drawableLeft="@drawable/tuiroomkit_ic_create_room"
             android:drawablePadding="5dp"
             android:gravity="center"
-            android:text="@string/tuiroomkit_create_room"
+            android:text="@string/app_create_room"
             android:textColor="@color/white"
             android:textSize="16sp" />
     </LinearLayout>
@@ -152,7 +152,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/tuiroomkit_multi_video_conferencing"
+        android:text="@string/app_multi_video_conferencing"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

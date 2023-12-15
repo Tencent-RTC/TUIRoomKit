@@ -57,7 +57,7 @@ public class SplashActivity extends Activity {
                 Log.d(TAG, "TUILogin.login onSuccess");
                 String userName = TextUtils.isEmpty(userModel.userName) ? userModel.userId : userModel.userName;
                 TUIRoomKit.createInstance().setSelfInfo(userName, userModel.userAvatar, null);
-                TUICore.startActivity("MainActivity", null);
+                TUICore.startActivity("PrepareActivity", null);
                 finish();
             }
 

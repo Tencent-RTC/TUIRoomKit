@@ -19,7 +19,7 @@ public class CreateRoomActivity extends AppCompatActivity implements RoomEventCe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.tuiroomkit_activity_create_room);
+        setContentView(R.layout.app_activity_create_room);
         CreateRoomView createRoomView = new CreateRoomView(this);
         ViewGroup root = findViewById(R.id.ll_root_create_room);
         root.addView(createRoomView);
