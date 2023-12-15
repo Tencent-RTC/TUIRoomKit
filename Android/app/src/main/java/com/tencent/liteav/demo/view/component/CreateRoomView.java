@@ -1,6 +1,7 @@
 package com.tencent.liteav.demo.view.component;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -13,6 +14,7 @@ import com.tencent.liteav.demo.R;
 import com.tencent.liteav.demo.viewmodel.CreateRoomViewModel;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.interfaces.TUICallback;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.ArrayList;
 
@@ -20,7 +22,6 @@ public class CreateRoomView extends RelativeLayout
         implements View.OnClickListener {
     private Context             mContext;
     private Toolbar             mToolbar;
-    private TextView            mTextRoomId;
     private TextView            mTextCreateRoom;
     
     private TextView            mTextUserName;
@@ -31,9 +32,11 @@ public class CreateRoomView extends RelativeLayout
 
     private TUICallback mFinishCallback;
 
+    private String mRoomId;
+
     public CreateRoomView(Context context) {
         super(context);
-        View.inflate(context, R.layout.tuiroomkit_view_create_room, this);
+        View.inflate(context, R.layout.app_view_create_room, this);
         mContext = context;
         mViewModel = new CreateRoomViewModel(mContext);
         initView();
@@ -45,19 +48,20 @@ public class CreateRoomView extends RelativeLayout
     }
 
     private void initData() {
-        String userId = TUILogin.getUserId();
         String userName = TUILogin.getNickName();
-        String roomId = mViewModel.getRoomId(userId);
-        mTextRoomId.setText(roomId);
         mTextUserName.setText(userName);
+        mViewModel.getRoomId(new CreateRoomViewModel.GetRoomIdCallback() {
+            @Override
+            public void onGetRoomId(String roomId) {
+                mRoomId = roomId;
+            }
+        });
     }
-
 
     private void initView() {
         mToolbar = findViewById(R.id.toolbar);
         mTextCreateRoom = findViewById(R.id.tv_create);
         mTextUserName = findViewById(R.id.tv_user_name);
-        mTextRoomId = findViewById(R.id.tv_room_id);
         mTextRoomType = findViewById(R.id.tv_room_type);
         mLayoutSettingContainer = findViewById(R.id.ll_setting_container);
         mRoomTypeDialog = new RoomTypeSelectView(mContext);
@@ -66,8 +70,8 @@ public class CreateRoomView extends RelativeLayout
             public void onSpeechModeChanged(TUIRoomDefine.SpeechMode speechMode) {
                 mViewModel.setSpeechMode(speechMode);
                 int resId = TUIRoomDefine.SpeechMode.FREE_TO_SPEAK.equals(speechMode)
-                        ? R.string.tuiroomkit_room_free_speech
-                        : R.string.tuiroomkit_room_raise_hand;
+                        ? R.string.app_room_free_speech
+                        : R.string.app_room_raise_hand;
                 mTextRoomType.setText(resId);
             }
         });
@@ -107,7 +111,11 @@ public class CreateRoomView extends RelativeLayout
             }
             mRoomTypeDialog.show();
         } else if (view.getId() == R.id.tv_create) {
-            mViewModel.createRoom(mTextRoomId.getText().toString());
+            if (TextUtils.isEmpty(mRoomId)) {
+                ToastUtil.toastShortMessage(mContext.getString(R.string.app_tip_creating_room_id));
+                return;
+            }
+            mViewModel.createRoom(mRoomId);
             mTextCreateRoom.setClickable(false);
         }
     }

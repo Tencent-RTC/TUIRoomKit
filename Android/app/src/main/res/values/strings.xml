@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Room</string>
-    <string name="toast_login_success">Logged in</string>
-    <string name="toast_login_fail">Login failed [%d]%s</string>
-    <string name="working">Running</string>
-    <string name="user_id">Username</string>
-    <string name="hint_user_id">Enter a userId</string>
-    <string name="btn_login">Log In</string>
+    <string name="app_toast_login_success">Logged in</string>
+    <string name="app_working">Running</string>
+    <string name="app_user_id">Username</string>
+    <string name="app_hint_user_id">Enter a userId</string>
+    <string name="app_btn_login">Log In</string>
     <string name="app_toast_login_fail">Login failed [%d]%s</string>
-    <string name="welcome_tips">Welcome to Tencent\nReal-Time Communication</string>
-    <string name="dialog_log_out">Are you sure you want to log out?</string>
-    <string name="user_sig_expired">Your user signature information has expired. Please log in again!</string>
-    <string name="user_id_is_empty">UserId is empty</string>
+    <string name="app_welcome_tips">Welcome to Tencent\nReal-Time Communication</string>
+    <string name="app_dialog_log_out">Are you sure you want to log out?</string>
+    <string name="app_user_sig_expired">Your user signature information has expired. Please log in again!</string>
+    <string name="app_user_id_is_empty">UserId is empty</string>
     <string name="app_title_register">Register</string>
     <string name="app_text_user_name">Username</string>
     <string name="app_hint_user_name">Enter a username</string>
@@ -37,16 +36,20 @@
     <string name="app_item_video_conferencing_h5">Video Conferencing(H5)</string>
     <string name="app_tv_video_conferencing_tips">Average end-to-end latency &lt; 300 ms worldwide</string>
 
-    <string name="tuiroomkit_your_name">Your Name</string>
-    <string name="tuiroomkit_multi_video_conferencing">Multi-person video conferencing</string>
-    <string name="tuiroomkit_app_version">Tencent Cloud TUIRoomKit v%s</string>
-    <string name="tuiroomkit_product_name">Multi-person Audio/Video Interactions</string>
-    <string name="tuiroomkit_please_input_room_number">Enter a conference ID</string>
-    <string name="tuiroomkit_enter_room">Join</string>
-    <string name="tuiroomkit_create_room">Create Room</string>
-    <string name="tuiroomkit_enter_live_room">Join LiveRoom</string>
+    <string name="app_your_name">Your Name</string>
+    <string name="app_multi_video_conferencing">Multi-person video conferencing</string>
+    <string name="app_version">Tencent Cloud TUIRoomKit v%s</string>
+    <string name="app_product_name">Multi-person Audio/Video Interactions</string>
+    <string name="app_please_input_room_number">Enter a conference ID</string>
+    <string name="app_enter_room">Join</string>
+    <string name="app_create_room">Create Room</string>
+    <string name="app_enter_live_room">Join LiveRoom</string>
 
     <string name="app_turn_on_audio">Turn on audio</string>
     <string name="app_turn_on_speaker">Turn on speaker</string>
     <string name="app_turn_on_video">Turn on video</string>
+    <string name="app_tip_creating_room_id">Generating room number, please try again later</string>
+    <string name="app_room_msg_joined">Joined</string>
+    <string name="app_room_free_speech">Free Speech Room</string>
+    <string name="app_room_raise_hand">Raise Hand Room</string>
 </resources>

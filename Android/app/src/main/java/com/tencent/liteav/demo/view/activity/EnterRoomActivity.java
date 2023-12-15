@@ -19,7 +19,7 @@ public class EnterRoomActivity extends AppCompatActivity implements RoomEventCen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.tuiroomkit_activity_enter_room);
+        setContentView(R.layout.app_activity_enter_room);
         EnterRoomView enterRoomView = new EnterRoomView(this);
         ViewGroup root = findViewById(R.id.ll_root_enter_room);
         root.addView(enterRoomView);

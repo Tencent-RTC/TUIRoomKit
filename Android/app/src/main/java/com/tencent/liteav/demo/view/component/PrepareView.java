@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 
+import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.utils.IntentUtils;
 import com.tencent.liteav.demo.R;
@@ -24,6 +25,7 @@ import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.TUIThemeManager;
 import com.tencent.qcloud.tuicore.interfaces.TUICallback;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.Locale;
 
@@ -60,7 +62,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
     }
 
     private void initView() {
-        View.inflate(mContext, R.layout.tuiroomkit_view_prepare, this);
+        View.inflate(mContext, R.layout.app_view_prepare, this);
 
         mLayoutRoot = findViewById(R.id.cl_root_prepare);
         mImageHead = findViewById(R.id.img_head_prepare);
@@ -81,7 +83,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
         mLayoutEnterRoom.setOnClickListener(this);
         mLayoutCreateRoom.setOnClickListener(this);
 
-        mTextVersion.setText(mContext.getString(R.string.tuiroomkit_app_version, getVersionName(mContext)));
+        mTextVersion.setText(mContext.getString(R.string.app_version, getVersionName(mContext)));
 
         Shader shader = new LinearGradient(
                 0, 0, mTextMultiVideo.getPaint().measureText("多人视频会议"), mTextMultiVideo.getTextSize(),
@@ -92,7 +94,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
         mTextMultiVideo.getPaint().setShader(shader);
 
         ImageLoader.loadImage(mContext, mImageHead, TUILogin.getFaceUrl(),
-                R.drawable.tuiroomkit_head);
+                R.drawable.app_ic_avatar);
         mTextUserName.setText(TUILogin.getNickName());
 
         mPreSet = new ConstraintSet();
@@ -115,12 +117,12 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
             set.constrainPercentWidth(mLayoutCreateRoom.getId(), 0.5f);
             set.connect(mLayoutCreateRoom.getId(), ConstraintSet.BOTTOM, mLayoutRoot.getId(),
                     ConstraintSet.BOTTOM,
-                    getResources().getDimensionPixelSize(R.dimen.tuiroomkit_create_room_margin_bottom));
+                    getResources().getDimensionPixelSize(R.dimen.app_create_room_margin_bottom));
             set.connect(mLayoutCreateRoom.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
             set.connect(mLayoutCreateRoom.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
 
             set.connect(mLayoutEnterRoom.getId(), ConstraintSet.BOTTOM, mLayoutCreateRoom.getId(), ConstraintSet.TOP,
-                    getResources().getDimensionPixelSize(R.dimen.tuiroomkit_enter_room_margin_bottom));
+                    getResources().getDimensionPixelSize(R.dimen.app_enter_room_margin_bottom));
             set.connect(mLayoutEnterRoom.getId(), ConstraintSet.LEFT, mLayoutCreateRoom.getId(), ConstraintSet.LEFT);
             set.connect(mLayoutEnterRoom.getId(), ConstraintSet.RIGHT, mLayoutCreateRoom.getId(), ConstraintSet.RIGHT);
             set.constrainWidth(mLayoutEnterRoom.getId(), ConstraintSet.MATCH_CONSTRAINT);
@@ -135,8 +137,8 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
     private void setTextGradient(TextView view) {
         LinearGradient gradient = new LinearGradient(0, 0,
                 view.getPaint().getTextSize() * view.getText().length(),
-                0, getResources().getColor(R.color.tuiroomkit_color_gradient_start),
-                getResources().getColor(R.color.tuiroomkit_color_gradient_end),
+                0, getResources().getColor(R.color.app_color_gradient_start),
+                getResources().getColor(R.color.app_color_gradient_end),
                 Shader.TileMode.CLAMP);
         view.getPaint().setShader(gradient);
         view.invalidate();
@@ -185,13 +187,18 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
     }
 
     private void createRoom() {
+        if (RoomEngineManager.sharedInstance().getRoomStore().isInFloatWindow()) {
+            ToastUtil.toastLongMessage(mContext.getString(R.string.app_room_msg_joined));
+            return;
+        }
         TUICore.startActivity("CreateRoomActivity", null);
-        finishActivity();
     }
 
     private void enterRoom() {
+        if (RoomEngineManager.sharedInstance().getRoomStore().isInFloatWindow()) {
+            ToastUtil.toastLongMessage(mContext.getString(R.string.app_room_msg_joined));
+            return;
+        }
         TUICore.startActivity("EnterRoomActivity", null);
-        finishActivity();
     }
-
 }

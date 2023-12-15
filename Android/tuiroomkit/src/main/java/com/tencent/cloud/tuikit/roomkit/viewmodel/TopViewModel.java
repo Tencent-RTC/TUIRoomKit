@@ -72,7 +72,7 @@ public class TopViewModel implements RoomEventCenter.RoomEngineEventResponder {
         mTimeRunnable = new Runnable() {
             @Override
             public void run() {
-                int time = (int) (System.currentTimeMillis() - mRoomStore.roomInfo.createTime) / 1000;
+                int time = (int) (System.currentTimeMillis() - mRoomStore.userModel.enterRoomTime) / 1000;
                 mMainHandler.post(new Runnable() {
                     @Override
                     public void run() {

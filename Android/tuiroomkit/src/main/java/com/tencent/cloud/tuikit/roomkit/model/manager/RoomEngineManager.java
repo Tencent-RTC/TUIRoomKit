@@ -27,6 +27,7 @@ import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomObserver;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.imaccess.utils.BusinessSceneUtil;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
@@ -477,7 +478,7 @@ public class RoomEngineManager {
             @Override
             public void onAccepted(String requestId, String userId) {
                 Log.d(TAG, "takeSeat onAccepted requestId=" + requestId + " userId=" + userId);
-                mRoomStore.userModel.seatStatus = UserModel.SeatStatus.ON_SEAT;
+                mRoomStore.userModel.setSeatStatus(UserModel.SeatStatus.ON_SEAT);
                 mRoomStore.userModel.takeSeatRequestId = null;
                 if (callback != null) {
                     callback.onAccepted(requestId, userId);
@@ -487,7 +488,7 @@ public class RoomEngineManager {
             @Override
             public void onRejected(String requestId, String userId, String message) {
                 Log.i(TAG, "takeSeat onRejected userId=" + userId + " message=" + message);
-                mRoomStore.userModel.seatStatus = UserModel.SeatStatus.OFF_SEAT;
+                mRoomStore.userModel.setSeatStatus(UserModel.SeatStatus.OFF_SEAT);
                 mRoomStore.userModel.takeSeatRequestId = null;
                 if (callback != null) {
                     callback.onRejected(requestId, userId, message);
@@ -497,7 +498,7 @@ public class RoomEngineManager {
             @Override
             public void onCancelled(String requestId, String userId) {
                 Log.i(TAG, "takeSeat onRejected requestId=" + requestId + " userId=" + userId);
-                mRoomStore.userModel.seatStatus = UserModel.SeatStatus.OFF_SEAT;
+                mRoomStore.userModel.setSeatStatus(UserModel.SeatStatus.OFF_SEAT);
                 mRoomStore.userModel.takeSeatRequestId = null;
                 if (callback != null) {
                     callback.onCancelled(requestId, userId);
@@ -507,7 +508,7 @@ public class RoomEngineManager {
             @Override
             public void onTimeout(String requestId, String userId) {
                 Log.i(TAG, "takeSeat onTimeout requestId=" + requestId + " userId=" + userId);
-                mRoomStore.userModel.seatStatus = UserModel.SeatStatus.OFF_SEAT;
+                mRoomStore.userModel.setSeatStatus(UserModel.SeatStatus.OFF_SEAT);
                 mRoomStore.userModel.takeSeatRequestId = null;
                 if (callback != null) {
                     callback.onTimeout(requestId, userId);
@@ -517,41 +518,57 @@ public class RoomEngineManager {
             @Override
             public void onError(String requestId, String userId, TUICommonDefine.Error code, String message) {
                 Log.e(TAG, "takeSeat onError userId=" + userId + " code=" + code + " message=" + message);
-                mRoomStore.userModel.seatStatus = UserModel.SeatStatus.OFF_SEAT;
+                mRoomStore.userModel.setSeatStatus(UserModel.SeatStatus.OFF_SEAT);
                 mRoomStore.userModel.takeSeatRequestId = null;
                 if (callback != null) {
                     callback.onError(requestId, userId, code, message);
                 }
             }
         });
-        mRoomStore.userModel.seatStatus = UserModel.SeatStatus.APPLYING_TAKE_SEAT;
+        mRoomStore.userModel.setSeatStatus(UserModel.SeatStatus.APPLYING_TAKE_SEAT);
         mRoomStore.userModel.takeSeatRequestId = request.requestId;
         return request;
     }
 
     public void leaveSeat(TUIRoomDefine.ActionCallback callback) {
         mRoomEngine.leaveSeat(callback);
+        mRoomStore.audioModel.setMicOpen(false);
     }
 
-    private void autoTakeSeatForOwner(TUIRoomDefine.RequestCallback callback) {
+    public void autoTakeSeatForOwner(TUIRoomDefine.RequestCallback callback) {
         if (mRoomStore.userModel.role == TUIRoomDefine.Role.ROOM_OWNER
-                && mRoomStore.roomInfo.speechMode == SPEAK_AFTER_TAKING_SEAT) {
+                && mRoomStore.roomInfo.speechMode == SPEAK_AFTER_TAKING_SEAT && mRoomStore.userModel.isOffSeat()) {
             takeSeat(0, 0, callback);
             return;
         }
-        callback.onAccepted(null, null);
+        if (callback != null) {
+            callback.onAccepted(null, null);
+        }
     }
 
     private void setFramework() {
-        String jsonStr = "{\n"
-                + "  \"api\":\"setFramework\",\n"
-                + "  \"params\":\n"
-                + "  {\n"
-                + "    \"framework\": 1, \n"
-                + "    \"component\": 18, \n"
-                + "    \"language\": 1\n"
-                + "  }\n"
-                + "}";
+        String jsonStr;
+        if (BusinessSceneUtil.isChatAccessRoom()) {
+            jsonStr = "{\n"
+                    + "  \"api\":\"setFramework\",\n"
+                    + "  \"params\":\n"
+                    + "  {\n"
+                    + "    \"framework\": 1, \n"
+                    + "    \"component\": 19, \n"
+                    + "    \"language\": 1\n"
+                    + "  }\n"
+                    + "}";
+        } else {
+            jsonStr = "{\n"
+                    + "  \"api\":\"setFramework\",\n"
+                    + "  \"params\":\n"
+                    + "  {\n"
+                    + "    \"framework\": 1, \n"
+                    + "    \"component\": 18, \n"
+                    + "    \"language\": 1\n"
+                    + "  }\n"
+                    + "}";
+        }
         mRoomEngine.callExperimentalAPI(jsonStr);
     }
 
@@ -614,6 +631,7 @@ public class RoomEngineManager {
 
     private void updateRoomStore(TUIRoomDefine.RoomInfo engineRoomInfo) {
         mRoomStore.roomInfo = engineRoomInfo;
+        mRoomStore.userModel.enterRoomTime = System.currentTimeMillis();
         mRoomStore.userModel.role =
                 TextUtils.equals(engineRoomInfo.ownerId, TUILogin.getUserId()) ? TUIRoomDefine.Role.ROOM_OWNER :
                         TUIRoomDefine.Role.GENERAL_USER;
