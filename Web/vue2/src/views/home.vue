@@ -36,8 +36,10 @@ import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '@/TUIRoom/hooks/useRoomEngine';
 import { isMobile } from '../TUIRoom/utils/useMediaValue';
 import logger from '../TUIRoom/utils/common/logger';
-
+import TUIMessageBox from '@/TUIRoom/components/common/base/MessageBox/index';
+import useTRTCDetect from '@/TUIRoom/hooks/useTRTCDetect';
 const roomEngine = useGetRoomEngine();
+
 export default {
   name: 'Home',
   components: {
@@ -106,12 +108,32 @@ export default {
     },
     // 处理点击【创建房间】
     async handleCreateRoom(mode) {
+      const { isSupportTRTC } = useTRTCDetect();
+      if (!isSupportTRTC.value) {
+        TUIMessageBox({
+          title: this.$t('Note'),
+          message: this.$t('The current browser does not support TRTC capability'),
+          appendToRoomContainer: true,
+          confirmButtonText: this.$t('Sure'),
+        });
+        return;
+      }
       this.setTUIRoomData('createRoom', mode);
       const roomId = await this.generateRoomId();
       this.$router.push({ path: 'room', query: { roomId } });
     },
     // 处理点击【进入房间】
     async handleEnterRoom(roomId) {
+    const { isSupportTRTC } = useTRTCDetect();
+      if (!isSupportTRTC.value) {
+        TUIMessageBox({
+          title: this.$t('Note'),
+          message: this.$t('The current browser does not support TRTC capability'),
+          appendToRoomContainer: true,
+          confirmButtonText: this.$t('Sure'),
+        });
+        return;
+      }
       this.setTUIRoomData('enterRoom');
       this.$router.push({
         path: 'room',
@@ -139,6 +161,7 @@ export default {
 </script>
 
 <style>
+@import '../TUIRoom/assets/style/global.scss';
 @import '../TUIRoom/assets/style/black-theme.scss';
 @import '../TUIRoom/assets/style/white-theme.scss';
 

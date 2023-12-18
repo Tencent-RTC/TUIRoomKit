@@ -1,7 +1,7 @@
 <template>
   <div ref="userInfoRef" class="user-info-container">
     <div v-tap="handleUserControl" class="user-info-content">
-      <img class="avatar" :src="avatarUrl || defaultAvatar">
+      <Avatar class="avatar" :img-src="avatarUrl"></Avatar>
       <div class="name">{{ userName || userId }}</div>
     </div>
 
@@ -20,7 +20,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import defaultAvatar from '../../../assets/imgs/avatar.png';
+import Avatar from '../../common/Avatar.vue';
 import useUserInfo from './useUserInfoHooks';
 import '../../../directives/vTap';
 const {
@@ -38,8 +38,6 @@ defineProps<Props>();
 defineEmits(['log-out']);
 </script>
 <style lang="scss" scoped>
-@import '../../../assets/style/element-custom.scss';
-
 .user-info-container {
   position: relative;
   .user-info-content {

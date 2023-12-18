@@ -6,7 +6,6 @@ import TUIMessage from '../../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import { useRoomStore } from '../../../stores/room';
-import { isInnerScene } from '../../../utils/constants';
 export default function useUserInfo() {
   const { t } = useI18n();
   const basicStore = useBasicStore();
@@ -15,8 +14,6 @@ export default function useUserInfo() {
   const userInfoRef = ref();
   const showUserControl = ref(false);
   const showUserNameEdit: Ref<boolean> = ref(false);
-
-  const showEditNameItem: Ref<boolean> = ref(isInnerScene);
 
   const tempUserName = ref('');
   const roomStore = useRoomStore();
@@ -90,7 +87,6 @@ export default function useUserInfo() {
   });
   return {
     t,
-    showEditNameItem,
     showUserControl,
     showUserNameEdit,
     userInfoRef,

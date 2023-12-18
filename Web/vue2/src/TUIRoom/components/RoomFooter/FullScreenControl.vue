@@ -44,17 +44,17 @@ function toggleScreen() {
 }
 
 function handleFullScreenChange() {
-  isFullScreen.value = !isFullScreen.value;
+  isFullScreen.value = !!(document.fullscreenElement);
 }
 
 onMounted(() => {
-  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach((item) => {
+  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach((item) => {
     window.addEventListener(item, handleFullScreenChange);
   });
 });
 
 onUnmounted(() => {
-  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach((item) => {
+  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach((item) => {
     window.removeEventListener(item, handleFullScreenChange);
   });
 });

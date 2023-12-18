@@ -5,6 +5,7 @@
       :is-active="isSharing"
       :disabled="screenShareDisabled"
       :title="title"
+      :is-not-support="!isGetUserMediaSupported"
       @click-icon="toggleScreenShare"
     >
       <stop-screen-share-icon v-if="isSharing"></stop-screen-share-icon>
@@ -26,8 +27,8 @@
       </span>
       <template #footer>
         <span>
-          <tui-button class="button" size="default" @click="startScreenShare">{{ t('Continue sharing') }}</tui-button>
-          <tui-button type="primary" size="default" @click="isShowFraudDialog = false">{{ t('Cancel') }}</tui-button>
+          <tui-button size="default" @click="startScreenShare">{{ t('Continue sharing') }}</tui-button>
+          <tui-button class="button" type="primary" size="default" @click="isShowFraudDialog = false">{{ t('Cancel') }}</tui-button>
         </span>
       </template>
     </Dialog>
@@ -43,8 +44,8 @@
         {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
       <template #footer>
         <span>
-          <tui-button class="button" size="default" @click="stopScreenShare">{{ t('End sharing') }}</tui-button>
-          <tui-button type="primary" size="default" @click="cancelStop">{{ t('Cancel') }}</tui-button>
+          <tui-button size="default" @click="stopScreenShare">{{ t('End sharing') }}</tui-button>
+          <tui-button class="button" type="primary" size="default" @click="cancelStop">{{ t('Cancel') }}</tui-button>
         </span>
       </template>
     </Dialog>
@@ -68,6 +69,7 @@ import { MESSAGE_DURATION } from '../../../constants/message';
 import { useI18n } from '../../../locales';
 import TuiButton from '../../common/base/Button.vue';
 import eventBus from '../../../hooks/useMitt';
+import useMediaDetect from '../../../hooks/useMediaDetect';
 
 const roomEngine = useGetRoomEngine();
 
@@ -87,6 +89,8 @@ const isShowFraudDialog: Ref<boolean> = ref(false);
 // 麦下用户不能进行屏幕分享
 const screenShareDisabled = computed(() => isAudience.value);
 const title = computed(() => (isSharing.value ? t('End sharing') : t('Share screen')));
+
+const { isGetUserMediaSupported } = useMediaDetect();
 
 watch(isAnchor, (val: any, oldVal: any) => {
   if (!oldVal && val && isSharing.value) {
@@ -178,7 +182,7 @@ async function stopScreenShare() {
   }
 }
 
-/** 用户点击浏览器自带的 "停止共享" 按钮*/
+/** 收到停止屏幕共享事件(用户点击浏览器自带的 ""结束共享" 按钮或上台发言模式被主持人踢下台)*/
 function screenCaptureStopped() {
   isSharing.value = false;
 }
@@ -196,8 +200,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/element-custom.scss';
-
 .screen-share-control-container {
   position: relative;
 }
@@ -223,6 +225,6 @@ onUnmounted(() => {
   margin-right: 10px;
 }
 .button {
-  margin-left: 20px;
+  margin-left: 12px;
 }
 </style>

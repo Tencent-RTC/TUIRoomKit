@@ -1,6 +1,6 @@
 {
   "name": "room-uikit-web-vue2",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -8,11 +8,11 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-js": "^1.6.1",
+    "@tencentcloud/tuiroom-engine-js": "^1.7.0",
     "core-js": "^3.8.3",
-    "element-ui": "^2.15.12",
     "mitt": "^3.0.0",
     "pinia": "^2.0.28",
+    "rtc-detect": "^1.0.2",
     "vue": "^2.7.14",
     "vue-i18n": "^8.28.2",
     "vue-i18n-bridge": "^9.2.2",

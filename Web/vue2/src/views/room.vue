@@ -23,7 +23,7 @@ const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 let TUIRoomRef;
 router.beforeEach((from, to, next) => {
-  if (!basicStore.roomId) {
+  if (!basicStore.roomId || (from.path === to.path && from.query.roomId === to.query.roomId)) {
     next();
   } else {
     const message = roomStore.isMaster
@@ -67,7 +67,7 @@ export default {
       return;
     }
 
-    const { action, roomMode, roomParam } = JSON.parse(this.roomInfo);
+    const { action, roomMode, roomParam, hasCreated } = JSON.parse(this.roomInfo);
     const { sdkAppId, userId, userSig, userName, avatarUrl } = JSON.parse(this.userInfo);
     try {
       await TUIRoomRef.init({
@@ -77,9 +77,13 @@ export default {
         userName,
         avatarUrl,
       });
-      if (action === 'createRoom') {
+      if (action === 'createRoom' && !hasCreated) {
         try {
           await TUIRoomRef.createRoom({ roomId: this.roomId, roomName: this.roomId, roomMode, roomParam });
+          const newRoomInfo = {
+            action, roomId: this.roomId, roomName: this.roomId, roomMode, roomParam, hasCreated: true,
+          };
+          sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(newRoomInfo));
         } catch (error) {
           const message = this.$t('Failed to enter the room.') + error.message;
           TUIMessageBox({
@@ -92,7 +96,7 @@ export default {
             },
           });
         }
-      } else if (action === 'enterRoom') {
+      } else {
         try {
           await TUIRoomRef.enterRoom({ roomId: this.roomId, roomParam });
         } catch (error) {

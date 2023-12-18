@@ -48,13 +48,16 @@
         <div style="height:100%">
           <div class="transfer-list-container">
             <div class="transfer-header">
-              <input
-                v-model="searchName"
-                type="text"
-                class="searching-input"
-                :placeholder="t('Search for conference attendees')"
-                enterkeyhint="done"
-              >
+              <div class="search-container">
+                <svg-icon :icon="SearchIcon"></svg-icon>
+                <input
+                  v-model="searchName"
+                  type="text"
+                  class="searching-input"
+                  :placeholder="t('Search for conference attendees')"
+                  enterkeyhint="done"
+                >
+              </div>
             </div>
             <div class="transfer-body">
               <div
@@ -96,6 +99,7 @@ import logger from '../../../utils/common/logger';
 import popup from '../../common/base/PopUpH5.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import CorrectIcon from '../../common/icons/CorrectIcon.vue';
+import SearchIcon from '../../common/icons/SearchIcon.vue';
 import Avatar from '../../common/Avatar.vue';
 import '../../../directives/vTap';
 import EndRoomIcon from '../../common/icons/EndRoomIcon.vue';
@@ -127,17 +131,12 @@ const {
   remoteAnchorList,
   isMasterWithOneRemoteAnchor,
   isMasterWithRemoteAnchors,
-  isMasterWithoutRemoteAnchors,
 } = useEndControl();
 
 
 const emit = defineEmits(['on-exit-room', 'on-destroy-room']);
 function handleEndBtnClick() {
-  if (isMasterWithoutRemoteAnchors.value) {
-    dismissRoom();
-  } else {
-    stopMeeting();
-  }
+  stopMeeting();
 }
 function handleEndLeaveClick() {
   if (!roomStore.isMaster) {
@@ -165,7 +164,7 @@ function handleEndLeaveClick() {
 async function dismissRoom() {
   try {
     logger.log(`${logPrefix}dismissRoom: enter`);
-    await closeMediaBeforeLeave();
+    closeMediaBeforeLeave();
     await roomEngine.instance?.destroyRoom();
     resetState();
     emit('on-destroy-room', { code: 0, message: '' });
@@ -181,7 +180,7 @@ async function dismissRoom() {
 **/
 async function leaveRoom() { // eslint-disable-line
   try {
-    await closeMediaBeforeLeave();
+    closeMediaBeforeLeave();
     const response = await roomEngine.instance?.exitRoom();
     logger.log(`${logPrefix}leaveRoom:`, response);
     resetState();
@@ -199,7 +198,7 @@ async function transferAndLeave() {
     const userId = selectedUser.value;
     const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({ userId, userRole: TUIRole.kRoomOwner });
     logger.log(`${logPrefix}transferAndLeave:`, changeUserRoleResponse);
-    await closeMediaBeforeLeave();
+    closeMediaBeforeLeave();
     const exitRoomResponse = await roomEngine.instance?.exitRoom();
     logger.log(`${logPrefix}exitRoom:`, exitRoomResponse);
     basicStore.setSidebarOpenStatus(false);
@@ -242,8 +241,13 @@ const onRoomDismissed = async (eventInfo: { roomId: string}) => {
 **/
 
 const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }) => {
+  const { userId, userRole } = eventInfo;
+  if (roomStore.localUser.userId === userId) {
+    roomStore.setLocalUser({ userRole });
+  } else {
+    roomStore.setRemoteUserRole(userId, userRole);
+  }
   if (eventInfo.userRole === TUIRole.kRoomOwner) {
-    const { userId } = eventInfo;
     let newName = roomStore.getUserName(userId) || userId;
     if (userId === localUser.value.userId) {
       newName = t('me');
@@ -253,17 +257,12 @@ const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }
       type: 'success',
       message: tipMessage,
     });
-    if (roomStore.localUser.userId === userId) {
-      roomStore.setLocalUser({ userRole: TUIRole.kRoomOwner });
-    } else {
-      roomStore.setRemoteUserRole(userId, TUIRole.kRoomOwner);
-    }
     roomStore.setMasterUserId(userId);
     resetState();
     if (roomStore.isAnchor) return;
     if (roomStore.isSpeakAfterTakingSeatMode) {
       await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
-    };
+    }
   }
 };
 
@@ -413,38 +412,32 @@ onUnmounted(() => {
   .transfer-header {
     display: flex;
     justify-content: center;
-     input[type=text]{
-        background-image: url(../../../assets/icons/svg/search.svg);
-        background-repeat: no-repeat;
-        background-position: 10px center;
-        padding-left: 35px;
-        background-color: var(--transfer-input-color-h5);
-     }
-        .searching-input {
-          padding: 0 80px;
-          background: #292D38;
-          border-radius: 8px;
-          height: 34px;
-          border-style: none;
-          font-family: 'PingFang SC';
-          font-style: normal;
-          font-weight: 450;
-          font-size: 16px;
-          line-height: 18px;
-          color: #676c80;
-          caret-color: var(--caret-color);
-        ::placeholder {
-          font-family: 'PingFang SC';
-          font-style: normal;
-          font-weight: 400;
-          font-size: 16px;
-          line-height: 18px;
-          color: #676c80;
-        }
-        &:focus-visible {
-         outline: none;
-       }
+    padding: 0 16px;
+    .search-container {
+      height: 34px;
+      border-radius: 8px;
+      background-color: var(--transfer-input-color-h5);
+      display: flex;
+      padding: 0 16px;
+      color: #676c80;
+      caret-color: var(--caret-color);
+      flex: 1;
+      align-items: center;
+      .searching-input {
+        outline: none;
+        border: none;
+        background: none;
+        width: 100%;
+      ::placeholder {
+        font-size: 16px;
+        line-height: 18px;
+        color: #676c80;
       }
+      &:focus-visible {
+        outline: none;
+      }
+    }
+    }
   }
   .transfer-body {
     overflow-y: scroll;

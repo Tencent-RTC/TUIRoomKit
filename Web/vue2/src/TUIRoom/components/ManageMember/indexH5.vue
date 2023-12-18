@@ -30,7 +30,14 @@
         {{ videoManageInfo }}
       </div>
     </div>
-    <Dialog v-model="showManageAllUserDialog">
+    <Dialog
+      v-model="showManageAllUserDialog" 
+      :title="t('Note')"
+      :modal="true"
+      width="480px"
+      :close-on-click-modal="true"
+      :append-to-room-container="true"
+    >
       <span>
         {{ dialogTitleInfo }}
       </span>
@@ -38,7 +45,7 @@
         <tui-button class="cancel" type="text" @click="showManageAllUserDialog = false">{{ t('Cancel') }}</tui-button>
       </template>
       <template #agree>
-        <tui-button class="agree" type="text" @click="doToggleManageMember">{{ dialogActionInfo }}</tui-button>
+        <tui-button class="agree" type="text" :custom-style="customStyle" @click="doToggleManageMember">{{ dialogActionInfo }}</tui-button>
       </template>
     </Dialog>
   </div>
@@ -72,7 +79,7 @@ const {
   doToggleManageMember,
   t,
 } = useIndex();
-
+const customStyle = { color: '#1C66E5' };
 
 </script>
 
@@ -109,65 +116,6 @@ const {
       color: #FFFFFF;
       cursor: pointer;
     }
-  }
-  .searching-container {
-    input[type=text]{
-      background-image: url(../../assets/icons/svg/search.svg);
-      background-repeat: no-repeat;
-      background-position: 10px center;
-      padding-left: 35px;
-    }
-    .searching-input {
-      width: 93%;
-      background: #292D38;
-      border-radius: 8px;
-      height: 34px;
-      border-style: none;
-      margin-left: 16px;
-      font-family: 'PingFang SC';
-      font-style: normal;
-      font-weight: 450;
-      font-size: 16px;
-      line-height: 18px;
-      color: #676c80;
-      caret-color: var(--caret-color);
-      ::placeholder {
-        font-family: 'PingFang SC';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 16px;
-        line-height: 18px;
-        color: #676c80;
-      }
-      &:focus-visible {
-       outline: none;
-     }
-    }
-  }
-  .setting-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 32px;
-    .setting-icon {
-      width: 32px;
-      height: 32px;
-    }
-    .item-left-section {
-      display: flex;
-      align-items: center;
-
-      .setting-name {
-        font-size: 14px;
-        margin-left: 8px;
-        color: var(--setting-name-color);
-      }
-    }
-  }
-  .divide-line {
-    height: 1px;
-    width: 100%;
-    background: var(--divide-line-color);
-    box-shadow: 0 -1px 0 0 var(--divide-line);
   }
   .member-list-container {
     flex: 1;
