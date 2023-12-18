@@ -42,8 +42,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-@import '../../../assets/style/var.scss';
-
 .screen-window-previewer {
   list-style: none;
   display: inline-block;

@@ -39,8 +39,10 @@ export default function useEndControl() {
   const isMasterWithoutRemoteAnchors = computed(() => roomStore.isMaster && remoteAnchorList.value.length === 0);
   const showEndButtonContent = computed(() => (roomStore.isMaster ? t('EndPC') : t('Leave')));
   const showEndDialogContent = computed(() => (
-    roomStore.isMaster
-      ? t('You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed. If you choose "Leave Room", the current room will not be disbanded, and your hosting privileges will be transferred to other members.')
+    roomStore.isMaster ? (isMasterWithoutRemoteAnchors.value
+      ? t('You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed.')
+      : t('You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed. If you choose "Leave Room", the current room will not be disbanded, and your hosting privileges will be transferred to other members.')
+    )
       : t('Are you sure you want to leave this room?')));
   function toggleMangeMemberSidebar() {
     if (basicStore.setSidebarOpenStatus && sidebarName.value === 'transfer-leave') {
@@ -72,12 +74,12 @@ export default function useEndControl() {
     resetState();
   }
 
-  async function closeMediaBeforeLeave() {
+  function closeMediaBeforeLeave() {
     if (localUser.value.hasAudioStream) {
-      await roomEngine.instance?.closeLocalMicrophone();
+      roomEngine.instance?.closeLocalMicrophone();
     }
     if (localUser.value.hasVideoStream) {
-      await roomEngine.instance?.closeLocalCamera();
+      roomEngine.instance?.closeLocalCamera();
     }
   }
   return {
@@ -110,6 +112,5 @@ export default function useEndControl() {
     showSideBar,
     isMasterWithOneRemoteAnchor,
     isMasterWithRemoteAnchors,
-    isMasterWithoutRemoteAnchors,
   };
 }

@@ -1,8 +1,31 @@
+## 2023.12.18@1.7.0
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.7.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。
+- 新增会中移交主持人功能。
+- 新增结束会议及踢出房间确认弹窗。
+- 输入房间号后，支持按回车键进房。
+- 主持人邀请成员开启视频、麦克风增加消息提示。
+- 移交主持人新增错误信息提示。
+- 优化退房性能。
+
+**Bug Fixed**
+
+- 修复上台发言模式下，屏幕分享状态错误问题。
+- 修复侧边栏模式下，收起侧边栏并点击全屏按钮，导致的布局错误问题。
+- 修复观众端禁止文字聊天区域的展示交互。
+- 修复偶现拉不到进房前历史消息问题。
+- 修复上台发言模式下，举手申请 tab 状态错误问题。
+- 修复上台发言模式下，第二次上麦打不开麦克风问题。
+- 修复九宫格布局，左右翻页按钮显示不明显问题。
+- 修复设备测试区域，切换扬声器和播放设备不生效的问题。
+
 ## 2023.11.14@1.6.1
 
 **Feature**
 
-- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.6.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.6.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
 - 全新 UI 界面；
 - 新增观众端的查看成员列表功能；
 - 调整更多组件内容，移除 QQ 群，新增中文环境下知了社群跳转按钮，支持跳转到知了社群页面；

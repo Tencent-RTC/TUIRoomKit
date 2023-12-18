@@ -34,7 +34,7 @@ function updateValue(event: any) {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .tui-input {
   position: relative;
   display: inline-block;

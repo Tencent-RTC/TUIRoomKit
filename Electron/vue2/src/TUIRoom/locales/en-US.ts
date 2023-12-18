@@ -99,6 +99,7 @@ export default {
   EndPC: 'End',
   EndH5: 'End',
   'You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed. If you choose "Leave Room", the current room will not be disbanded, and your hosting privileges will be transferred to other members.': 'You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed. If you choose "Leave Room", the current room will not be disbanded, and your hosting privileges will be transferred to other members.',
+  'You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed.': 'You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed.',
   'If you do not want to end the meeting, please designate a new host before leaving the meeting.': 'If you do not want to end the meeting, please designate a new host before leaving the meeting.',
   'Are you sure you want to leave this room?': 'Are you sure you want to leave this room?',
   'New host': 'New host',
@@ -151,6 +152,7 @@ export default {
   'Reject All': 'Reject All',
   'Please raise your hand to apply': 'Please raise your hand to apply',
   'The host invites you to speak on stage': 'The host invites you to speak on stage',
+  'The host invites you to speak on stage and once on stage you can turn on the camera and unmute it.': 'The host invites you to speak on stage and once on stage you can turn on the camera and unmute it.',
   'After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?': 'After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?',
   'Hand down': 'Hand down',
   'The host has approved your application': 'The host has approved your application',
@@ -238,4 +240,13 @@ export default {
   'This action causes the room to be exited, does it continue?': 'This action causes the room to be exited, does it continue?',
   'Sharing screens may lead to the leakage of private information such as SMS verification codes and passwords, resulting in financial losses. Please be vigilant against various forms of fraud.': 'Sharing screens may lead to the leakage of private information such as SMS verification codes and passwords, resulting in financial losses. Please be vigilant against various forms of fraud.',
   'Please enter the room number': 'Please enter the room number',
+  // @ts-ignore
+  'whether to kick sb off the room': ({ named }) => `whether to kick ${named('name')} off the room`,
+  'The current browser does not support the use of media devices': 'The current browser does not support the use of media devices',
+  // @ts-ignore
+  'An invitation to open the microphone has been sent to sb.': ({ named }) => `An invitation to open the microphone has been sent to ${named('name')}`,
+  // @ts-ignore
+  'An invitation to open the camera has been sent to sb.': ({ named }) => `An invitation to open the camera has been sent to ${named('name')}`,
+  'The current browser does not support TRTC capability': 'The current browser does not support TRTC capability',
+  'Transfer owner failed, please try again.': 'Transfer owner failed, please try again.',
 };

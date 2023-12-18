@@ -1,6 +1,6 @@
 {
   "name": "room-uikit-electron-vue2",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "main": "main.electron.js",
   "license": "MIT",
@@ -60,17 +60,16 @@
     ]
   },
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-electron": "^1.6.1",
+    "@tencentcloud/tuiroom-engine-electron": "^1.7.0",
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
-    "element-ui": "^2.15.10",
     "js-cookie": "^3.0.1",
     "lodash.isequal": "^4.5.0",
     "mitt": "^3.0.0",
     "pinia": "^2.0.28",
     "sass": "^1.57.1",
     "tim-js-sdk": "^2.24.2",
-    "trtc-electron-sdk": "11.4.503-beta.1",
+    "trtc-electron-sdk": "11.4.504-beta.1",
     "tsignaling": "^0.10.0",
     "vue": "^2.7.14",
     "vue-class-component": "^7.2.3",
@@ -109,7 +108,6 @@
     "trtc",
     "rtc",
     "webpack",
-    "vue",
-    "element-ui"
+    "vue"
   ]
 }

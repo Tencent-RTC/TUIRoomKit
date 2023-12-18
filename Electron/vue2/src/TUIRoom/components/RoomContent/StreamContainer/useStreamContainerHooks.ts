@@ -1,7 +1,7 @@
 import { watch } from 'vue';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import {  useRoomStore } from '../../../stores/room';
-import  { TUIChangeReason,  TUIUserInfo, TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-electron';
+import  { TUIChangeReason,  TUIUserInfo } from '@tencentcloud/tuiroom-engine-electron';
 import TUIMessage from '../../common/base/Message/index';
 import { useI18n } from '../../../locales';
 import { useBasicStore } from '../../../stores/basic';
@@ -9,6 +9,7 @@ import { MESSAGE_DURATION } from '../../../constants/message';
 import { storeToRefs } from 'pinia';
 import { isMobile, isWeChat } from '../../../utils/useMediaValue';
 import logger from '../../../utils/common/logger';
+import { SMALL_VIDEO_ENC_PARAM } from '../../../constants/room';
 
 const logPrefix = '[StreamContainer]';
 
@@ -94,6 +95,8 @@ export default function useStreamContainer() {
         await roomEngine.instance?.setLocalVideoView({
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
         });
+        const trtcCloud = roomEngine.instance?.getTRTCCloud();
+        trtcCloud?.enableSmallVideoStream(false, SMALL_VIDEO_ENC_PARAM);
         // @ts-ignore
         await roomEngine.instance?.openLocalCamera({ isFrontCamera: basicStore.isFrontCamera });
         return;

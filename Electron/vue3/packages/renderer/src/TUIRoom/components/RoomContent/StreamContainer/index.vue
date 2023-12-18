@@ -366,7 +366,7 @@ async function handleRightSideListLayout() {
   streamListStyle.value = {};
 
   if (enlargedContainerRef.value) {
-    enlargedContainerRef.value.style.width = 'calc(100% - 280px)';
+    enlargedContainerRef.value.style.width = showSideList.value ? 'calc(100% - 280px)' : '100%';
     enlargedContainerRef.value.style.height = '100%';
     const containerWidth = enlargedContainerRef.value.offsetWidth - horizontalPadding;
     const containerHeight = enlargedContainerRef.value.offsetHeight - verticalPadding;
@@ -405,9 +405,9 @@ async function handleTopSideListLayout() {
   streamListStyle.value = {};
 
   if (enlargedContainerRef.value) {
-    enlargedContainerRef.value.style.top = '175px';
+    enlargedContainerRef.value.style.top = showSideList.value ? '175px' : '0';
     enlargedContainerRef.value.style.width = '100%';
-    enlargedContainerRef.value.style.height = 'calc(100% - 184px)';
+    enlargedContainerRef.value.style.height = showSideList.value ? 'calc(100% - 184px)' : '100%';
     const containerWidth = enlargedContainerRef.value.offsetWidth - horizontalPadding;
     const containerHeight = enlargedContainerRef.value.offsetHeight - verticalPadding;
     let width = 0;
@@ -451,15 +451,11 @@ async function handleLayout() {
       break;
     case LAYOUT.RIGHT_SIDE_LIST:
       showSideList.value = true;
-      enlargedContainerRef.value.style.width = 'calc(100% - 280px)';
-      enlargedContainerRef.value.style.height = '100%';
       await handleRightSideListLayout();
       await handleStreamContainerScroll();
       break;
     case LAYOUT.TOP_SIDE_LIST:
       showSideList.value = true;
-      enlargedContainerRef.value.style.width = '100%';
-      enlargedContainerRef.value.style.height = 'calc(100% - 184px)';
       await handleTopSideListLayout();
       await handleStreamContainerScroll();
       break;
@@ -762,6 +758,8 @@ onUnmounted(() => {
       overflow-x: scroll;
       max-width: 100%;
       max-height: 100%;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
       &::-webkit-scrollbar {
         display: none;
       }
@@ -823,6 +821,8 @@ onUnmounted(() => {
     max-height: 100%;
     overflow-y: scroll;
     padding: 10px 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     &::-webkit-scrollbar {
       display: none;
     }
@@ -839,14 +839,14 @@ onUnmounted(() => {
 }
 
 .tui-theme-black .turn-page-container {
-  --turn-page-background-color: rgba(213, 224, 242, 0.2);
-  --turn-page-hover-background-color: rgba(213, 224, 242, 0.4);
+  --turn-page-background-color: rgba(114, 122, 138, 0.4);
+  --turn-page-hover-background-color: rgba(114, 122, 138, 0.7);
   --turn-page-arrow-color: #D5E0F2;
 }
 
 .tui-theme-white .turn-page-container {
-  --turn-page-background-color: rgba(15, 16, 20, 0.3);
-  --turn-page-hover-background-color: rgba(15, 16, 20, 0.5);
+  --turn-page-background-color: rgba(114, 122, 138, 0.4);
+  --turn-page-hover-background-color: rgba(114, 122, 138, 0.7);
   --turn-page-arrow-color: white;
 }
 
@@ -863,6 +863,7 @@ onUnmounted(() => {
     width: 32px;
     height: 60px;
     background: var(--turn-page-background-color);
+    backdrop-filter: blur(2.25px);
     border-radius: 32px;
     display: flex;
     justify-content: center;
