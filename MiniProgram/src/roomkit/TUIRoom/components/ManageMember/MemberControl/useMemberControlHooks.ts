@@ -1,17 +1,20 @@
-import { computed } from 'vue';
+import { computed, Ref, ref } from 'vue';
 import { useI18n } from '../../../locales';
 import { UserInfo, useRoomStore } from '../../../stores/room';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
-import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-wx';
+import { TUIMediaDevice, TUIRole } from '@tencentcloud/tuiroom-engine-wx';
 import AudioOpenIcon from '../../../assets/icons/AudioOpenIcon.svg';
 import VideoOpenIcon from '../../../assets/icons/VideoOpenIcon.svg';
 import ChatForbiddenIcon from '../../../assets/icons/ChatForbiddenIcon.svg';
 import KickOutIcon from '../../../assets/icons/KickOutIcon.svg';
 import OnStageIcon from '../../../assets/icons/OnStageIcon.svg';
 import OffStageIcon from '../../../assets/icons/OffStageIcon.svg';
+import TransferOwnerIcon from '../../../assets/icons/TransferOwnerIcon.svg';
 import { storeToRefs } from 'pinia';
+import TUIMessage from '../../common/base/Message';
+import { MESSAGE_DURATION } from '../../../constants/message';
 
 export default function useMemberControl(props: any) {
   const roomEngine = useGetRoomEngine();
@@ -19,6 +22,8 @@ export default function useMemberControl(props: any) {
 
   const basicStore = useBasicStore();
   const roomStore = useRoomStore();
+  const showKickOffDialog: Ref<boolean> = ref(false);
+  const kickOffDialogContent = computed(() => t('whether to kick sb off the room', { name: props.userInfo.userName }));
   const { isFreeSpeakMode, isSpeakAfterTakingSeatMode } = storeToRefs(roomStore);
   /**
    * Functions related to the Raise Your Hand function
@@ -91,7 +96,7 @@ export default function useMemberControl(props: any) {
   *              踢出房间
   **/
   const controlList = computed(() => {
-    const list = [chatControl.value, kickUser.value];
+    const list = [transferOwner.value, chatControl.value, kickUser.value];
     if (isFreeSpeakMode.value) {
       list.unshift(...[audioControl.value, videoControl.value]);
     } else if (isSpeakAfterTakingSeatMode.value) {
@@ -126,17 +131,16 @@ export default function useMemberControl(props: any) {
     func: disableUserChat,
   }));
 
-  // todo: 房间内移交主持人
-  // const transferOwner = computed(() => ({
-  //   icon: UserStrokeIcon,
-  //   title: t('Transfer owner'),
-  //   func: handleTransferOwner,
-  // }));
+  const transferOwner = computed(() => ({
+    icon: TransferOwnerIcon,
+    title: t('Transfer owner'),
+    func: handleTransferOwner,
+  }));
 
   const kickUser = computed(() => ({
     icon: KickOutIcon,
     title: t('Kick out'),
-    func: kickOffUser,
+    func: handleShowKickOffDialog,
   }));
 
   const inviteOnStage = computed(() => ({
@@ -192,6 +196,11 @@ export default function useMemberControl(props: any) {
           roomStore.setRequestUserOpenMic({ userId: userInfo.userId, isRequesting: false });
         },
       });
+      TUIMessage({
+        type: 'info',
+        message: `${t('An invitation to open the microphone has been sent to sb.', { name: userInfo.userName })}`,
+        duration: MESSAGE_DURATION.NORMAL,
+      });
       if (request && request.requestId) {
         roomStore.setRequestUserOpenMic({ userId: userInfo.userId, isRequesting: true, requestId: request.requestId });
       }
@@ -228,6 +237,11 @@ export default function useMemberControl(props: any) {
           isRequesting: true,
           requestId: request.requestId,
         });
+        TUIMessage({
+          type: 'info',
+          message: `${t('An invitation to open the camera has been sent to sb.', { name: userInfo.userName })}`,
+          duration: MESSAGE_DURATION.NORMAL,
+        });
       }
     }
   }
@@ -250,25 +264,48 @@ export default function useMemberControl(props: any) {
    *
    * 将用户踢出房间
   **/
-  function kickOffUser(userInfo: UserInfo) {
-    roomEngine.instance?.kickRemoteUserOutOfRoom({
+  function handleShowKickOffDialog() {
+    showKickOffDialog.value = true;
+  }
+  function handleCancelKickOffDialog() {
+    showKickOffDialog.value = false;
+  }
+  async function kickOffUser(userInfo: UserInfo) {
+    await roomEngine.instance?.kickRemoteUserOutOfRoom({
       userId: userInfo.userId,
     });
+    showKickOffDialog.value = false;
   }
 
   /**
    * 转移房主给用户
    */
-  // function handleTransferOwner(userInfo: UserInfo) {
-  //   roomEngine.instance?.changeUserRole({
-  //     userId: userInfo.userId,
-  //     userRole: TUIRole.kRoomOwner,
-  //   });
-  // }
+  async function handleTransferOwner(userInfo: UserInfo) {
+    const roomInfo = await roomEngine.instance?.fetchRoomInfo();
+    if (roomInfo?.roomOwner === roomStore.localUser.userId) {
+      try {
+        await roomEngine.instance?.changeUserRole({
+          userId: userInfo.userId,
+          userRole: TUIRole.kRoomOwner,
+        });
+        roomStore.setMasterUserId(userInfo.userId);
+      } catch (error) {
+        TUIMessage({
+          type: 'error',
+          message: t('Transfer owner failed, please try again.'),
+          duration: MESSAGE_DURATION.NORMAL,
+        });
+      }
+    }
+  }
 
   return {
     props,
     isMe,
     controlList,
+    showKickOffDialog,
+    kickOffDialogContent,
+    kickOffUser,
+    handleCancelKickOffDialog,
   };
 };

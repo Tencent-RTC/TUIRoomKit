@@ -145,9 +145,8 @@ onMounted(() => {
     async (val) => {
       if (val) {
         await nextTick();
-        const userIdEl = document?.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
         if (player.value) {
-          logger.debug(`${logPrefix}watch isScreenStreamAvailable:`, props.stream.userId, userIdEl);
+          logger.debug(`${logPrefix}watch isScreenStreamAvailable:`, props.stream.userId);
           await player.value.setTRTCStreamId(playRegionDomId.value);
           roomEngine.instance?.setRemoteVideoView({
             userId: props.stream.userId,

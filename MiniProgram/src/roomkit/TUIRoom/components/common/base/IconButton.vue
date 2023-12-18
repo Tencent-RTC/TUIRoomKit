@@ -33,6 +33,7 @@
     >
       <slot></slot>
       <svg-icon style="display: flex" v-if="icon" :icon="icon"></svg-icon>
+      <svg-icon style="display: flex" v-if="isNotSupport" class="unsupport-icon" :icon="UnSupportIcon"></svg-icon>
       <span class="title">{{ title }}</span>
     </div>
     <div v-if="hasMore" ref="moreSpanRef" class="icon-arrow" @click="$emit('click-more')">
@@ -47,6 +48,7 @@ import ArrowUp from '../../../assets/icons/ArrowUpIcon.svg';
 import { IconButtonLayout } from '../../../constants/room';
 import { computed } from 'vue';
 import { isMobile } from '../../../utils/useMediaValue';
+import UnSupportIcon from '../../../assets/icons/UnSupportIcon.svg';
 import type { Component } from 'vue';
 
 interface Props {
@@ -57,6 +59,7 @@ interface Props {
   isActive?: boolean,
   layout?: IconButtonLayout,
   icon?: Component | null,
+  isNotSupport?: boolean,
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -66,8 +69,8 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   isActive: false,
   layout: IconButtonLayout.VERTICAl,
+  isNotSupport: false,
 });
-
 const emit = defineEmits(['click-icon', 'click-more']);
 
 const iconContentClass = computed(() => {
@@ -151,6 +154,11 @@ const handleClickEvent = () => {
       background: var(--icon-button-hover);
     }
   }
+}
+.unsupport-icon{
+  position: absolute;
+  top: 13px;
+  left: 26px;
 }
 
 @media screen and (max-width: 600px) {

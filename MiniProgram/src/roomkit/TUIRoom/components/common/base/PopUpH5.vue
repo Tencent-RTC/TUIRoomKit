@@ -46,7 +46,7 @@ function handleClose() {
     justify-content: center;
     align-items: center;
     .icon-container{
-      padding: 20px;
+      padding: 20px 25px;
       position: absolute;
       left: 0;
       top: 0;

@@ -15,6 +15,8 @@ const formatType = (type: string = '') => {
     case 'error':
     case 'loading':
       return type;
+    case 'info':
+      return 'none';
     default:
       return 'none';
   }
