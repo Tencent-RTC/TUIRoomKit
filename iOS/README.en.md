@@ -16,7 +16,7 @@ TUIRoomKit
 ```
 
 ## Environment Requirements
-- Xcode 12.0 or above
+- Xcode 13.0 or above
 - 
 ## Running the Demo
 
