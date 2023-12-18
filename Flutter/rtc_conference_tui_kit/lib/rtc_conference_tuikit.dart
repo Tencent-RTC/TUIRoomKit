@@ -1,4 +1,4 @@
-library rtc_conference_tuikit;
+library rtc_conference_tui_kit;
 
 import 'package:rtc_conference_tui_kit/rtc_conference_tuikit_impl.dart';
 import 'package:rtc_room_engine/api/room/tui_room_define.dart';

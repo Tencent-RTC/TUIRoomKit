@@ -47,14 +47,6 @@ class WithDraggableWindowWidget extends GetView<VideoLayoutController> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<VideoLayoutController>(
-      init: VideoLayoutController(),
-      id: "with_draggable_window",
-      builder: (_) {
-        return SafeArea(
-          child: _buildView(),
-        );
-      },
-    );
+    return _buildView();
   }
 }

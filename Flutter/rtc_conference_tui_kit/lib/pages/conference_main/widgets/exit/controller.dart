@@ -11,7 +11,7 @@ class ExitController extends GetxController {
   final RoomEngineManager _engineManager = RoomEngineManager();
 
   void exitRoomAction() {
-    if (RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner) {
+    if (isRoomOwner()) {
       if (RoomStore.to.userInfoList.length > 1) {
         Get.bottomSheet(const TransferHostWidget(), isScrollControlled: true);
       } else {
@@ -26,5 +26,13 @@ class ExitController extends GetxController {
   void destroyRoomAction() {
     _engineManager.destroyRoom();
     Get.back();
+  }
+
+  bool isRoomOwner() {
+    return RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner;
+  }
+
+  bool isNeedTransferOwner() {
+    return isRoomOwner() && RoomStore.to.userInfoList.length > 1;
   }
 }

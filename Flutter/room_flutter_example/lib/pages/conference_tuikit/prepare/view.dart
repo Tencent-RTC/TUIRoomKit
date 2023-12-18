@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:room_flutter_example/common/index.dart';
 
 import 'index.dart';
 import 'widgets/widgets.dart';
@@ -49,6 +50,13 @@ class PreparePage extends GetView<PrepareController> {
             title: const ShowUserInfoWidget(),
             backgroundColor: Colors.white,
             iconTheme: const IconThemeData(color: Colors.black),
+            actions: [
+              IconButton(
+                onPressed: () => controller.switchLanguage(),
+                icon: Image.asset(AssetsImages.switchLanguage),
+              ),
+              const SizedBox(width: 10.0),
+            ],
           ),
           backgroundColor: Colors.white,
           body: SafeArea(child: _buildView()),

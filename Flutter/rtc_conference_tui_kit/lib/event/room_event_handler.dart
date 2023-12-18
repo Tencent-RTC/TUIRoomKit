@@ -3,6 +3,7 @@ import 'package:rtc_conference_tui_kit/manager/rtc_engine_manager.dart';
 import 'package:rtc_room_engine/rtc_room_engine.dart';
 
 class RoomEventHandler extends TUIRoomObserver {
+  final int volumeCanHeardMinLimit = 10;
   final _store = RoomStore.to;
   RoomEventHandler() {
     super.onAllUserMicrophoneDisableChanged = (roomId, isDisable) {
@@ -58,6 +59,11 @@ class RoomEventHandler extends TUIRoomObserver {
           _store.isSharing.value = hasVideo;
         }
       }
+
+      if (userId == _store.currentUser.userId.value) {
+        _store.updateSelfVideoState(hasVideo, reason,
+            isScreenStream: streamType == TUIVideoStreamType.screenStream);
+      }
     };
 
     super.onUserAudioStateChanged = (userId, hasAudio, reason) {
@@ -67,6 +73,25 @@ class RoomEventHandler extends TUIRoomObserver {
         _store.updateUserAudioState(
             userId, hasAudio, reason, _store.seatedUserList);
       }
+
+      if (userId == _store.currentUser.userId.value) {
+        _store.updateSelfAudioState(hasAudio, reason);
+      }
+    };
+
+    super.onUserVoiceVolumeChanged = (volumeMap) {
+      volumeMap.forEach((userId, volume) {
+        bool isTalking = false;
+        if (volume > volumeCanHeardMinLimit) {
+          isTalking = true;
+        }
+
+        _store.updateUserTalkingState(userId, isTalking, _store.userInfoList);
+        if (_store.roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+          _store.updateUserTalkingState(
+              userId, isTalking, _store.seatedUserList);
+        }
+      });
     };
 
     super.onUserRoleChanged = (String userId, TUIRole role) {
@@ -74,6 +99,14 @@ class RoomEventHandler extends TUIRoomObserver {
         _store.roomInfo.ownerId = userId;
       }
       _store.updateUserRole(userId, role, _store.userInfoList);
+
+      if (_store.roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+        _store.updateUserRole(userId, role, _store.seatedUserList);
+      }
+
+      if (userId == _store.currentUser.userId.value) {
+        _store.updateSelfRole(role);
+      }
     };
 
     super.onSendMessageForUserDisableChanged =
@@ -84,6 +117,7 @@ class RoomEventHandler extends TUIRoomObserver {
     super.onSeatListChanged = (seatList, seatedList, leftList) async {
       for (var element in seatedList) {
         _store.updateUserSeatedState(element.userId, true);
+        _store.deleteInviteSeatUser(element.userId);
         var result = await RoomEngineManager()
             .getRoomEngine()
             .getUserInfo(element.userId);

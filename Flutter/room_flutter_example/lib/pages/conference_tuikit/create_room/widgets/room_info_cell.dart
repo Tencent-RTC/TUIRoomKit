@@ -28,7 +28,7 @@ class RoomInfoCellWidget extends StatelessWidget {
             ),
             const SizedBox(width: 20),
             Expanded(
-                flex: 9,
+                flex: 7,
                 child: Text(infoText,
                     textAlign: TextAlign.left, style: Get.textTheme.bodyLarge)),
             Expanded(flex: 1, child: image ?? Container())

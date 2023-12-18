@@ -112,7 +112,8 @@ const Map<String, String> roomContentsZhCN = {
   'takeSeatInvitationRejected': '拒绝了您的上台邀请',
   'otherUserScreenSharing': '其他用户已开启屏幕分享',
   'sureLeaveRoomTip': '您确定要离开房间吗？',
-  'handRaised':
-      '您已举手，请等待主持人操作',
+  'handRaised': '您已举手，请等待主持人操作',
   'quickConference': '的快速会议',
+  'sureKickOut': '是否将xx移出房间？',
+  'sure': '确定',
 };

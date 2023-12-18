@@ -152,8 +152,8 @@ class UserControlWidget extends GetView<UserListController> {
             ),
             UserControlItemWidget(
               onPressed: () {
-                controller.kickOutAction(userModel.userId.value);
                 Get.back();
+                controller.kickOutAction(userModel);
               },
               text: RoomContentsTranslations.translate('kick'),
               image: Image.asset(

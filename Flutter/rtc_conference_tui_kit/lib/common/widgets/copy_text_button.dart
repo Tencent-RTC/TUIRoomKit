@@ -26,19 +26,21 @@ class CopyTextButton extends StatelessWidget {
         onTap: () => {copyAction(infoText, successToast)},
         child: Row(
           children: [
-            Image.asset(
-              AssetsImages.roomCopy,
-              package: 'rtc_conference_tui_kit',
-              width: 25,
-              height: 25,
-              color: RoomColors.textWhite,
-            ),
-            const SizedBox(width: 3),
             SizedBox(
-              width: 28,
+              width: 25.0.scale375(),
+              child: Image.asset(
+                AssetsImages.roomCopy,
+                package: 'rtc_conference_tui_kit',
+                color: RoomColors.textWhite,
+              ),
+            ),
+            SizedBox(width: 1.0.scale375()),
+            SizedBox(
+              width: 34.0.scale375(),
               child: Text(
                 RoomContentsTranslations.translate('copy'),
                 style: RoomTheme.defaultTheme.textTheme.bodyMedium,
+                textAlign: TextAlign.center,
               ),
             ),
           ],

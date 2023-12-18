@@ -48,6 +48,8 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
                   isSelected.value ? selectedText ?? text : text,
                   textAlign: TextAlign.center,
                   style: RoomTheme.defaultTheme.textTheme.labelSmall,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),

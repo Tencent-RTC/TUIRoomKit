@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_room_engine/api/room/tui_room_define.dart';
+import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/widgets.dart';
 
-import '../index.dart';
 import 'widgets.dart';
 
 class UserTableWidget extends GetView<UserListController> {

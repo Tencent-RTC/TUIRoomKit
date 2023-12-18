@@ -3,28 +3,47 @@ import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_room_engine/api/common/tui_video_view.dart';
 
+import '../../index.dart';
 import 'widgets/widgets.dart';
 
-class VideoItemWidget extends StatelessWidget {
+class VideoItemWidget extends StatefulWidget {
   final UserModel userModel;
-  final ValueChanged<int>? onVideoViewCreated;
   final double? width;
   final double? height;
-  final bool isBackGroundVisible;
+  final bool isScreenStream;
 
   const VideoItemWidget({
     Key? key,
     required this.userModel,
-    this.onVideoViewCreated,
     this.width,
     this.height,
-    this.isBackGroundVisible = true,
+    this.isScreenStream = false,
   }) : super(key: key);
 
-  Widget _buildView() {
+  @override
+  State<StatefulWidget> createState() => _VideoItemState();
+}
+
+class _VideoItemState extends State<VideoItemWidget> {
+  int _nativeViewPtr = 0;
+
+  final controller = Get.find<VideoLayoutController>();
+
+  @override
+  void didUpdateWidget(covariant VideoItemWidget oldWidget) {
+    if (widget.userModel.userId.value != oldWidget.userModel.userId.value) {
+      controller.removeVideoView(
+          oldWidget.userModel.userId.value, _nativeViewPtr);
+      controller.setVideoView(widget.userModel.userId.value, _nativeViewPtr);
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: width,
-      height: height,
+      width: widget.width,
+      height: widget.height,
       padding: const EdgeInsets.all(2.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -34,18 +53,31 @@ class VideoItemWidget extends StatelessWidget {
           children: [
             VideoView(
               onViewCreated: (id) {
-                onVideoViewCreated!(id);
+                _nativeViewPtr = id;
+                controller.setVideoView(
+                    widget.userModel.userId.value, _nativeViewPtr,
+                    isScreenStream: widget.isScreenStream);
               },
+              borderRadius: 16,
             ),
             Obx(
-              () => Visibility(
-                visible: !userModel.hasVideoStream.value && isBackGroundVisible,
-                child: Image.asset(
-                  AssetsImages.roomVideoBgNoContent,
-                  fit: BoxFit.fill,
-                  package: 'rtc_conference_tui_kit',
-                ),
-              ),
+              () {
+                controller.updateVideoPlayState(
+                    widget.userModel.userId.value,
+                    widget.isScreenStream
+                        ? widget.userModel.hasScreenStream.value
+                        : widget.userModel.hasVideoStream.value,
+                    isScreenStream: widget.isScreenStream);
+                return Visibility(
+                  visible: !widget.userModel.hasVideoStream.value &&
+                      !widget.isScreenStream,
+                  child: Image.asset(
+                    AssetsImages.roomVideoBgNoContent,
+                    fit: BoxFit.fill,
+                    package: 'rtc_conference_tui_kit',
+                  ),
+                );
+              },
             ),
             Positioned(
               left: 0,
@@ -56,14 +88,14 @@ class VideoItemWidget extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Obx(
                   () => Visibility(
-                    visible:
-                        isBackGroundVisible && !userModel.hasVideoStream.value,
+                    visible: !widget.isScreenStream &&
+                        !widget.userModel.hasVideoStream.value,
                     child: SizedBox(
                       width: 50,
                       height: 50,
                       child: ClipOval(
                         child: Image.network(
-                          userModel.userAvatarURL.value,
+                          widget.userModel.userAvatarURL.value,
                           errorBuilder: (context, error, stackTrace) {
                             return Image.asset(
                               AssetsImages.roomDefaultAvatar,
@@ -79,7 +111,7 @@ class VideoItemWidget extends StatelessWidget {
             ),
             Obx(
               () => Visibility(
-                visible: userModel.hasAudioStream.value,
+                visible: widget.userModel.isTalking.value,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
@@ -93,17 +125,12 @@ class VideoItemWidget extends StatelessWidget {
               bottom: 12,
               left: 7,
               child: VideoUserInfoWidget(
-                userModel: userModel,
+                userModel: widget.userModel,
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildView();
   }
 }

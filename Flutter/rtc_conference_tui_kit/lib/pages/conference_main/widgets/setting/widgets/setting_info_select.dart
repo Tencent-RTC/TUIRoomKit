@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/setting/controller.dart';
 
-
 class SettingInfoSelectWidget extends GetView<SettingController> {
   final String title;
   final List<Widget> items;

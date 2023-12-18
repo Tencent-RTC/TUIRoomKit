@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:room_flutter_example/common/index.dart';
 
 import 'index.dart';
 
@@ -18,13 +19,14 @@ class ProfilePage extends GetView<ProfileController> {
             width: 100,
             height: 100,
             child: CircleAvatar(
-              backgroundImage: NetworkImage(controller.getRandomAvatarURL()),
+              backgroundImage: NetworkImage(UserStore.to.userModel.avatarURL),
             ),
           ),
           const SizedBox(
             height: 30,
           ),
           TextField(
+            style: Get.textTheme.displayMedium,
             controller: controller.userNameController,
             decoration: InputDecoration(hintText: 'userNameInputHint'.tr),
           ),
@@ -39,8 +41,12 @@ class ProfilePage extends GetView<ProfileController> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-                onPressed: () => controller.toMainPage(),
-                child: Text('register'.tr)),
+              onPressed: () => controller.toMainPage(),
+              child: Text(
+                'register'.tr,
+                style: Get.textTheme.bodyLarge,
+              ),
+            ),
           )
         ],
       ),

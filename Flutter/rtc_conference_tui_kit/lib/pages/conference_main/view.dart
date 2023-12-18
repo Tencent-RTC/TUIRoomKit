@@ -39,8 +39,10 @@ class ConferenceMainPage extends GetView<ConferenceMainController> {
       id: "conference_main",
       builder: (_) {
         return Scaffold(
+          resizeToAvoidBottomInset: true,
           backgroundColor: RoomTheme.defaultTheme.scaffoldBackgroundColor,
           body: SafeArea(
+            top: false,
             child: _buildView(),
           ),
         );

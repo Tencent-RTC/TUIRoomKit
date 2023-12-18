@@ -83,7 +83,7 @@ class RoomTypeButtonCell extends GetView<CreateRoomController> {
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(0))),
             minimumSize: MaterialStateProperty.all(Size(screenWidth, 46)),
           ),
-          child: Text(roomType.tr, style: const TextStyle(fontSize: 18)),
+          child: Text(roomType.tr, style: Get.textTheme.labelLarge),
         ));
   }
 }

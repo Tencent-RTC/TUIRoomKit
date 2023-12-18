@@ -216,12 +216,26 @@ class UserListController extends GetxController {
         userModel.userId.value, userModel.ableSendingMessage.value);
   }
 
-  void kickOutAction(String userId) {
-    _engineManager.kickRemoteUserOutOfRoom(userId).then((value) {
-      if (value.code == TUIError.success) {
-        searchResults.removeWhere((element) => element.userId.value == userId);
-      }
-    });
+  void kickOutAction(UserModel userModel) {
+    showConferenceDialog(
+      title: RoomContentsTranslations.translate('sureKickOut')
+          .replaceAll('xx', userModel.userName.value),
+      confirmText: RoomContentsTranslations.translate('sure'),
+      cancelText: RoomContentsTranslations.translate('cancel'),
+      confirmTextStyle: RoomTheme.defaultTheme.textTheme.titleMedium,
+      cancelTextStyle: RoomTheme.defaultTheme.textTheme.titleLarge,
+      onConfirm: () {
+        _engineManager
+            .kickRemoteUserOutOfRoom(userModel.userId.value)
+            .then((value) {
+          if (value.code == TUIError.success) {
+            searchResults.removeWhere(
+                (element) => element.userId.value == userModel.userId.value);
+          }
+        });
+        Get.back();
+      },
+    );
   }
 
   @override

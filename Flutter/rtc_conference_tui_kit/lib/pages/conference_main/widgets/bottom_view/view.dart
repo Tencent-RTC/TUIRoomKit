@@ -31,7 +31,7 @@ class BottomViewWidget extends GetView<BottomViewController> {
                 if (controller.isUnfold.value &&
                     controller.showMoreButton.value) ...[
                   Container(
-                      height: 10,
+                      height: 10.0.scale375(),
                       width: Get.width - 32.0.scale375(),
                       color: RoomColors.lightGrey),
                   const MoreButtonWidget(),
