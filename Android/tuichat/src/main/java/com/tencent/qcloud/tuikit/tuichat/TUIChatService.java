@@ -8,6 +8,8 @@ import androidx.datastore.preferences.core.Preferences;
 import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
 import androidx.datastore.rxjava3.RxDataStore;
 import androidx.fragment.app.Fragment;
+
+import com.google.auto.service.AutoService;
 import com.tencent.imsdk.v2.V2TIMAdvancedMsgListener;
 import com.tencent.imsdk.v2.V2TIMFriendInfo;
 import com.tencent.imsdk.v2.V2TIMFriendshipListener;
@@ -20,7 +22,10 @@ import com.tencent.qcloud.tuicore.ServiceInitializer;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
+import com.tencent.qcloud.tuicore.annotations.TUIInitializerDependency;
+import com.tencent.qcloud.tuicore.annotations.TUIInitializerID;
 import com.tencent.qcloud.tuicore.interfaces.ITUIObjectFactory;
+import com.tencent.qcloud.tuicore.interfaces.TUIInitializer;
 import com.tencent.qcloud.tuicore.util.SPUtils;
 import com.tencent.qcloud.tuikit.timcommon.bean.MessageReceiptInfo;
 import com.tencent.qcloud.tuikit.timcommon.bean.TUIMessageBean;
@@ -59,13 +64,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class TUIChatService extends ServiceInitializer implements ITUIChatService, ITUIObjectFactory {
+@AutoService(TUIInitializer.class)
+@TUIInitializerDependency("TIMCommon")
+@TUIInitializerID("TUIChat")
+public class TUIChatService implements TUIInitializer, ITUIChatService, ITUIObjectFactory {
     public static final String TAG = TUIChatService.class.getSimpleName();
     private static TUIChatService instance;
 
     public static TUIChatService getInstance() {
         return instance;
     }
+
+    private Context appContext;
 
     private final List<WeakReference<GroupChatEventListener>> groupChatEventListenerList = new ArrayList<>();
 
@@ -84,6 +94,7 @@ public class TUIChatService extends ServiceInitializer implements ITUIChatServic
     @Override
     public void init(Context context) {
         instance = this;
+        appContext = context;
         initMessageType();
         initService();
         initObjectFactory();
@@ -123,11 +134,9 @@ public class TUIChatService extends ServiceInitializer implements ITUIChatServic
         TUICore.registerEvent(TUIChatConstants.EVENT_KEY_MESSAGE_STATUS_CHANGED, TUIChatConstants.EVENT_SUB_KEY_MESSAGE_SEND, this);
         TUICore.registerEvent(TUIChatConstants.EVENT_KEY_OFFLINE_MESSAGE_PRIVATE_RING, TUIChatConstants.EVENT_SUB_KEY_OFFLINE_MESSAGE_PRIVATE_RING, this);
         TUICore.registerEvent(
-            TUIConstants.TUITranslationPlugin.EVENT_KEY_TRANSLATION_EVENT, TUIConstants.TUITranslationPlugin.EVENT_SUB_KEY_TRANSLATION_CHANGED, this);
+            TUIConstants.TUIChat.EVENT_KEY_MESSAGE_EVENT, TUIConstants.TUIChat.EVENT_SUB_KEY_MESSAGE_INFO_CHANGED, this);
         TUICore.registerEvent(TUIConstants.TUIGroup.Event.GroupApplication.KEY_GROUP_APPLICATION,
             TUIConstants.TUIGroup.Event.GroupApplication.SUB_KEY_GROUP_APPLICATION_NUM_CHANGED, this);
-        TUICore.registerEvent(
-            TUIConstants.TUIVoiceToTextPlugin.EVENT_KEY_VOICE_TO_TEXT_EVENT, TUIConstants.TUIVoiceToTextPlugin.EVENT_SUB_KEY_VOICE_TO_TEXT_CHANGED, this);
     }
 
     @Override
@@ -205,8 +214,7 @@ public class TUIChatService extends ServiceInitializer implements ITUIChatServic
             handleMessageStatusChangedEvent(subKey, param);
         } else if (TextUtils.equals(key, TUIChatConstants.EVENT_KEY_OFFLINE_MESSAGE_PRIVATE_RING)) {
             handleOfflineRingEvent(subKey, param);
-        } else if (TextUtils.equals(key, TUIConstants.TUITranslationPlugin.EVENT_KEY_TRANSLATION_EVENT)
-            || TextUtils.equals(key, TUIConstants.TUIVoiceToTextPlugin.EVENT_KEY_VOICE_TO_TEXT_EVENT)) {
+        } else if (TextUtils.equals(key, TUIConstants.TUIChat.EVENT_KEY_MESSAGE_EVENT)) {
             handleMessageChangedEvent(subKey, param);
         } else if (TextUtils.equals(TUIConstants.TUIGroup.Event.GroupApplication.KEY_GROUP_APPLICATION, key)) {
             handleGroupApplicationEvent(subKey, param);
@@ -280,8 +288,7 @@ public class TUIChatService extends ServiceInitializer implements ITUIChatServic
     }
 
     private void handleMessageChangedEvent(String subKey, Map<String, Object> param) {
-        if (TextUtils.equals(subKey, TUIConstants.TUITranslationPlugin.EVENT_SUB_KEY_TRANSLATION_CHANGED)
-            || TextUtils.equals(subKey, TUIConstants.TUIVoiceToTextPlugin.EVENT_SUB_KEY_VOICE_TO_TEXT_CHANGED)) {
+        if (TextUtils.equals(subKey, TUIConstants.TUIChat.EVENT_SUB_KEY_MESSAGE_INFO_CHANGED)) {
             TUIMessageBean messageBean = (TUIMessageBean) param.get(TUIConstants.TUIChat.MESSAGE_BEAN);
             int dataChangeType = (int) param.get(TUIChatConstants.DATA_CHANGE_TYPE);
             List<C2CChatEventListener> c2CChatEventListenerList = getInstance().getC2CChatEventListenerList();
@@ -662,6 +669,17 @@ public class TUIChatService extends ServiceInitializer implements ITUIChatServic
         c2CChatEventListenerList.add(new WeakReference<>(c2cChatEventListener));
     }
 
+    public void removeC2CChatEventListener(C2CChatEventListener c2cChatEventListener) {
+        Iterator<WeakReference<C2CChatEventListener>> iterator = c2CChatEventListenerList.listIterator();
+        while (iterator.hasNext()) {
+            WeakReference<C2CChatEventListener> listenerWeakReference = iterator.next();
+            C2CChatEventListener listener = listenerWeakReference.get();
+            if (listener == c2cChatEventListener) {
+                iterator.remove();
+            }
+        }
+    }
+
     public void setMessageSender(IBaseMessageSender baseMessageSender) {
         messageSender = new WeakReference<>(baseMessageSender);
     }
@@ -770,5 +788,9 @@ public class TUIChatService extends ServiceInitializer implements ITUIChatServic
             }
         }
         return null;
+    }
+
+    public static Context getAppContext() {
+        return instance.appContext;
     }
 }
