@@ -40,7 +40,7 @@ export default {
       return;
     }
 
-    const { action, roomMode, roomParam } = JSON.parse(this.roomInfo);
+    const { action, roomMode, roomParam, hasCreated } = JSON.parse(this.roomInfo);
     const { sdkAppId, userId, userSig, userName, avatarUrl } = JSON.parse(this.userInfo);
     try {
       await this.$refs.TUIRoomRef.init({
@@ -50,9 +50,13 @@ export default {
         userName,
         avatarUrl,
       });
-      if (action === 'createRoom') {
+      if (action === 'createRoom' && !hasCreated) {
         try {
           await this.$refs.TUIRoomRef.createRoom({ roomId: this.roomId, roomName: this.roomId, roomMode, roomParam });
+          const newRoomInfo = {
+            action, roomId: this.roomId, roomName: this.roomId, roomMode, roomParam, hasCreated: true,
+          };
+          sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(newRoomInfo));
         } catch (error) {
           const message = this.$t('Failed to enter the room.') + error.message;
           TUIMessageBox({

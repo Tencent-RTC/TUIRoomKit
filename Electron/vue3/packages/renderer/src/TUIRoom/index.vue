@@ -187,7 +187,7 @@ onMounted(async () => {
 async function dismissRoom() {
   try {
     logger.log(`${logPrefix}dismissRoom: enter`);
-    await closeMediaBeforeLeave();
+    closeMediaBeforeLeave();
     await roomEngine.instance?.destroyRoom();
     emit('on-destroy-room');
   } catch (error) {
@@ -197,7 +197,7 @@ async function dismissRoom() {
 
 async function leaveRoom() {
   try {
-    await closeMediaBeforeLeave();
+    closeMediaBeforeLeave();
     const response = await roomEngine.instance?.exitRoom();
     emit('on-exit-room');
     logger.log(`${logPrefix}leaveRoom:`, response);
@@ -206,12 +206,12 @@ async function leaveRoom() {
   }
 }
 
-async function closeMediaBeforeLeave() {
+function closeMediaBeforeLeave() {
   if (localUser.value.hasAudioStream) {
-    await roomEngine.instance?.closeLocalMicrophone();
+    roomEngine.instance?.closeLocalMicrophone();
   }
   if (localUser.value.hasVideoStream) {
-    await roomEngine.instance?.closeLocalCamera();
+    roomEngine.instance?.closeLocalCamera();
   }
 }
 
@@ -244,9 +244,10 @@ async function init(option: RoomInitData) {
   await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
 }
 const doEnterRoom = async (roomId: string) => {
+  const isH5 = isMobile && !isWeChat;
   const trtcCloud = roomEngine.instance?.getTRTCCloud();
   trtcCloud.setDefaultStreamRecvMode(true, false);
-  trtcCloud.enableSmallVideoStream(true, smallParam);
+  trtcCloud.enableSmallVideoStream(!isH5, smallParam);
   const roomInfo = await roomEngine.instance?.enterRoom({ roomId }) as TUIRoomInfo;
   roomEngine.instance?.muteLocalAudio();
   if (roomInfo.speechMode === TUISpeechMode.kFreeToSpeak) {
@@ -411,7 +412,9 @@ const onSendMessageForUserDisableChanged = (data: { userId: string, isDisable: b
 const onKickedOutOfRoom = async (eventInfo: { roomId: string, reason: TUIKickedOutOfRoomReason, message: string }) => {
   const { roomId, reason, message } = eventInfo;
   try {
-    resetStore();
+    if (!isWeChat) {
+      resetStore();
+    }
     let notice = '';
     switch (reason) {
       case TUIKickedOutOfRoomReason.kKickedByAdmin:
@@ -430,6 +433,9 @@ const onKickedOutOfRoom = async (eventInfo: { roomId: string, reason: TUIKickedO
       confirmButtonText: t('Sure'),
       appendToRoomContainer: true,
       callback: async () => {
+        if (isWeChat) {
+          resetStore();
+        }
         emit('on-kicked-out-of-room', { roomId, reason, message });
       },
     });
@@ -633,6 +639,7 @@ watch(sdkAppId, (val: number) => {
 </script>
 
 <style lang="scss">
+@import './assets/style/global.scss';
 @import './assets/style/black-theme.scss';
 @import './assets/style/white-theme.scss';
 

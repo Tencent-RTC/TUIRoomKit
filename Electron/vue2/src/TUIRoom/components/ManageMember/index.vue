@@ -2,14 +2,14 @@
   <div class="manage-member-container">
     <div class="manage-member-header">
       <div class="search-container">
-        <search-icon></search-icon>
+        <svg-icon :icon="SearchIcon"></svg-icon>
         <input v-model="searchText" class="search-input" :placeholder="t('Search Member')">
       </div>
       <tui-button class="invite-button" type="primary" @click="handleInvite">
         <template #icon>
           <invite-solid-icon></invite-solid-icon>
         </template>
-        {{ t('Invite') }}
+        <span class="invite-content">{{ t('Invite') }}</span>
       </tui-button>
     </div>
     <div v-if="applyToAnchorList.length > 0" class="apply-on-stage-info">
@@ -34,6 +34,7 @@
 
 <script setup lang='ts'>
 import MemberItem from '../ManageMember/MemberItem/index.vue';
+import SvgIcon from '../common/base/SvgIcon.vue';
 import SearchIcon from '../common/icons/SearchIcon.vue';
 import InviteSolidIcon from '../common/icons/InviteSolidIcon.vue';
 import { storeToRefs } from 'pinia';
@@ -106,6 +107,10 @@ const {
         width: 85px;
         height: 32px;
         margin-left: 10px;
+        line-height: 16px;
+        .invite-content {
+          margin-left: 3px;
+        }
       }
     }
     .apply-on-stage-info {

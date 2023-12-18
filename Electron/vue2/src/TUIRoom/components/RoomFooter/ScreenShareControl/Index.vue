@@ -5,7 +5,7 @@
       :is-active="isSharing"
       :class="{ outlined: isSharing }"
       :title="title"
-      :disabled="isAudience"
+      :disabled="screenShareDisabled"
       @click-icon="toggleScreenShare"
     >
       <stop-screen-share-icon v-if="isSharing"></stop-screen-share-icon>
@@ -16,8 +16,8 @@
         {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
       <template #footer>
         <span>
-          <tui-button class="dialog-button" size="default" @click="stopScreenShare">{{ t('End sharing') }}</tui-button>
-          <tui-button type="primary" size="default" @click="showStopShareRegion = false">{{ t('Cancel') }}</tui-button>
+          <tui-button size="default" @click="stopScreenShare">{{ t('End sharing') }}</tui-button>
+          <tui-button class="button" type="primary" size="default" @click="showStopShareRegion = false">{{ t('Cancel') }}</tui-button>
         </span>
       </template>
     </Dialog>
@@ -56,16 +56,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, computed, onUnmounted } from 'vue';
+import { ref, Ref, computed, onUnmounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../../locales';
-
 import IconButton from '../../common/base/IconButton.vue';
-import { TRTCScreenCaptureSourceType, TRTCScreenCaptureSourceInfo } from '@tencentcloud/tuiroom-engine-electron';
+import TUIRoomEngine, { TUIRoomEvents, TRTCScreenCaptureSourceType, TRTCScreenCaptureSourceInfo } from '@tencentcloud/tuiroom-engine-electron';
 import ScreenWindowSelectDialog from './ScreenWindowSelectDialog.vue';
 import ScreenShareIcon from '../../common/icons/ScreenShareIcon.vue';
 import StopScreenShareIcon from '../../common/icons/StopScreenShareIcon.vue';
-import { ICON_NAME } from '../../../constants/icon';
 import { useRoomStore } from '../../../stores/room';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import TUIMessage from '../../common/base/Message';
@@ -73,6 +71,7 @@ import { MESSAGE_DURATION } from '../../../constants/message';
 import eventBus from '../../../hooks/useMitt';
 import Dialog from '../../common/base/Dialog/index.vue';
 import TuiButton from '../../common/base/Button.vue';
+import logger from '../../../utils/common/logger';
 
 const { t } = useI18n();
 
@@ -80,10 +79,14 @@ const roomStore = useRoomStore();
 const { isAudience, hasOtherScreenShare } = storeToRefs(roomStore);
 const roomEngine = useGetRoomEngine();
 
+const logPrefix = '[ScreenShareControl]';
+
 const btnStopRef = ref();
 const isSharing: Ref<boolean> = ref(false);
 const showPermissionVisible: Ref<boolean> = ref(false);
 const showStopShareRegion: Ref<boolean> = ref(false);
+
+const screenShareDisabled = computed(() => isAudience.value);
 const title = computed(() => (isSharing.value ? t('End sharing') : t('Share screen')));
 
 const selectDialogVisible: Ref<boolean> = ref(false);
@@ -95,6 +98,16 @@ async function toggleScreenShare() {
     showStopShareRegion.value = true;
     return;
   }
+
+  if (isAudience.value) {
+    TUIMessage({
+      type: 'warning',
+      message: t('You currently do not have sharing permission, please raise your hand to apply for sharing permission first'),
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
+  }
+
   if (hasOtherScreenShare.value) {
     TUIMessage({
       type: 'warning',
@@ -124,7 +137,7 @@ async function onPermissionScreenShare() {
   showPermissionVisible.value = false;
 }
 
-function onConfirmScreenShare(screenInfo: TRTCScreenCaptureSourceInfo) {
+async function onConfirmScreenShare(screenInfo: TRTCScreenCaptureSourceInfo) {
   if (hasOtherScreenShare.value) {
     TUIMessage({
       type: 'warning',
@@ -133,26 +146,40 @@ function onConfirmScreenShare(screenInfo: TRTCScreenCaptureSourceInfo) {
     });
     return;
   }
-  roomEngine.instance?.startScreenSharingElectron({ targetId: screenInfo.sourceId });
+  await roomEngine.instance?.startScreenSharingElectron({ targetId: screenInfo.sourceId });
   isSharing.value = true;
   selectDialogVisible.value = false;
 }
 
 async function stopScreenShare() {
-  roomEngine.instance?.stopScreenSharingElectron();
+  if (isSharing.value) {
+    try {
+      await roomEngine.instance?.stopScreenSharingElectron();
+      showStopShareRegion.value = false;
+      isSharing.value = false;
+    } catch (error) {
+      logger.error(`${logPrefix}stopScreenShare error:`, error);
+    }
+  }
+}
+
+/** 收到停止屏幕共享事件(用户点击浏览器自带的 ""结束共享" 按钮或上台发言模式被主持人踢下台)*/
+function screenCaptureStopped() {
   isSharing.value = false;
-  showStopShareRegion.value = false;
 }
 
 eventBus.on('ScreenShare:stopScreenShare', stopScreenShare);
+TUIRoomEngine.once('ready', () => {
+  roomEngine.instance?.on(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
+});
+
 onUnmounted(() => {
   eventBus.off('ScreenShare:stopScreenShare', stopScreenShare);
+  roomEngine.instance?.off(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
 });
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
-@import '../../../assets/style/element-custom.scss';
 .screen-share-control-container {
   position: relative;
 }

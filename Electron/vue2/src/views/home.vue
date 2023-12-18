@@ -139,6 +139,7 @@ export default {
 </script>
 
 <style>
+@import '../TUIRoom/assets/style/global.scss';
 @import '../TUIRoom/assets/style/black-theme.scss';
 @import '../TUIRoom/assets/style/white-theme.scss';
 

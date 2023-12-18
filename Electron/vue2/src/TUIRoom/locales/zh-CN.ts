@@ -90,13 +90,14 @@ export default {
   'Full screen': '全屏',
   Members: '成员',
   'Search Member': '搜索成员',
-  'Transfer owner': '转交主持人',
+  'Transfer owner': '转交房主',
   Invite: '邀请',
   Settings: '设置',
   EndPC: '结束房间',
   EndH5: '结束',
   Tips: '提示',
   'You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed. If you choose "Leave Room", the current room will not be disbanded, and your hosting privileges will be transferred to other members.': '您当前是房间主持人，请选择相应操作。若选择“结束房间”，将解散当前房间并将全体成员移出。若选择“离开房间”，当前房间不会解散，您的主持人权限将移交给其他成员。',
+  'You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed.': '您当前是房间主持人，请选择相应操作。若选择“结束房间”，将解散当前房间并将全体成员移出。',
   'If you do not want to end the meeting, please designate a new host before leaving the meeting.': '如果您不想结束会议，请在离开会议前指定新的主持人。',
   'Are you sure you want to leave this room?': '确定离开房间吗？',
   'New host': '选择主持人',
@@ -151,6 +152,7 @@ export default {
   'Reject All': '全部拒绝',
   'Please raise your hand to apply': '如果您想发言请先举手申请上麦',
   'The host invites you to speak on stage': '主持人邀请您上台发言',
+  'The host invites you to speak on stage and once on stage you can turn on the camera and unmute it.': '主持人邀请您上台发言，上台后可以打开摄像头和取消静音。',
   'After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?': '同意上台后可打开摄像头和麦克风，是否同意上台？',
   'Hand down': '手放下',
   'Step down(Master)': '邀请下台',
@@ -238,4 +240,13 @@ export default {
   'This action causes the room to be disbanded, does it continue?': '该操作会导致解散房间，是否继续？',
   'Sharing screens may lead to the leakage of private information such as SMS verification codes and passwords, resulting in financial losses. Please be vigilant against various forms of fraud.': '共享屏幕时可能会泄露短信验证码、密码等隐私信息，造成财产损失，请警惕各种诈骗行为',
   'Please enter the room number': '请输入房间号',
+  'The current browser does not support the use of media devices': '当前浏览器不支持使用媒体设备',
+  // @ts-ignore
+  'whether to kick sb off the room': ({ named }) => `是否将 ${named('name')} 移出房间`,
+  // @ts-ignore
+  'An invitation to open the microphone has been sent to sb.': ({ named }) => `已向 ${named('name')} 发出开启麦克风邀请`,
+  // @ts-ignore
+  'An invitation to open the camera has been sent to sb.': ({ named }) => `已向 ${named('name')} 发出开启摄像头邀请`,
+  'The current browser does not support TRTC capability': '当前浏览器不支持 TRTC 能力',
+  'Transfer owner failed, please try again.': '转交房主失败，请重试',
 };

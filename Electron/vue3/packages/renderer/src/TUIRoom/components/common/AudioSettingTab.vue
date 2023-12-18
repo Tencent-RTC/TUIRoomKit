@@ -70,6 +70,8 @@ import { SettingMode } from '../../constants/render';
 import { useI18n } from '../../locales';
 import { storeToRefs } from 'pinia';
 import { useBasicStore } from '../../stores/basic';
+import { isElectronEnv } from '../../utils/utils';
+import useGetRoomEngine from '../../hooks/useRoomEngine';
 import TuiButton from '../common/base/Button.vue';
 
 
@@ -86,7 +88,10 @@ const isDetailMode = computed(() => settingMode === SettingMode.DETAIL);
 const basicStore = useBasicStore();
 const { userId } = storeToRefs(basicStore);
 const roomStore = useRoomStore();
-const { speakerList, userVolumeObj } = storeToRefs(roomStore);
+const { speakerList, userVolumeObj, currentSpeakerId } = storeToRefs(roomStore);
+const isElectron = isElectronEnv();
+const roomEngine = useGetRoomEngine();
+const trtcCloud = roomEngine.instance?.getTRTCCloud();
 
 const themeClass = computed(() => (props.theme ? `tui-theme-${props.theme}` : ''));
 
@@ -119,23 +124,38 @@ const { t } = useI18n();
  *
  * 点击扬声器【测试】按钮
 **/
-function handleSpeakerTest() {
-  if (isTestingSpeaker.value) {
-    if (audioPlayer) {
-      audioPlayer.pause();
-      audioPlayer.currentTime = 0;
+async function handleSpeakerTest() {
+  const SPEAKER_TEST_URL = 'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';
+  isTestingSpeaker.value = !isTestingSpeaker.value;
+  const isStartSpeakerTest = isTestingSpeaker.value;
+  if (isElectron) {
+    if (isStartSpeakerTest) {
+      trtcCloud?.startSpeakerDeviceTest(SPEAKER_TEST_URL);
+    } else {
+      trtcCloud?.stopSpeakerDeviceTest();
     }
-    isTestingSpeaker.value = false;
+    return;
+  }
+
+  if (!audioPlayer) {
+    return;
+  }
+  if (isStartSpeakerTest) {
+    // @ts-ignore
+    await audioPlayer?.setSinkId(currentSpeakerId.value);
+    audioPlayer.src = SPEAKER_TEST_URL;
+    audioPlayer.play();
   } else {
-    isTestingSpeaker.value = true;
-    if (audioPlayer) {
-      audioPlayer.src = 'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';
-      audioPlayer.play();
-    }
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
   }
 }
 
 onBeforeUnmount(() => {
+  if (isElectron) {
+    trtcCloud?.stopSpeakerDeviceTest();
+    return;
+  }
   audioPlayer && audioPlayer.pause();
 });
 

@@ -45,7 +45,7 @@ import { TRTCScreenCaptureSourceInfo } from '@tencentcloud/tuiroom-engine-electr
 import ScreenWindowPreviewer from './ScreenWindowPreviewer.vue';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useI18n } from '../../../locales';
-import Dialog from '../../common/base/Dialog.vue';
+import Dialog from '../../common/base/Dialog/index.vue';
 import Button from '../../common/base/Button.vue';
 
 const { t } = useI18n();
@@ -92,9 +92,6 @@ function onClose() {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
-@import '../../../assets/style/element-custom.scss';
-
 .screen-content {
   height: auto;
   min-width: 200px;

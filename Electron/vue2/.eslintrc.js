@@ -1,7 +1,7 @@
 module.exports = {
-  root: true,
   env: {
-    node: true,
+    browser: true,
+    es2021: true,
     'vue/setup-compiler-macros': true,
   },
   extends: [
@@ -9,16 +9,17 @@ module.exports = {
     'plugin:vue/recommended',
   ],
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: 'latest',
+    parser: '@typescript-eslint/parser',
+    sourceType: 'module',
   },
   plugins: [
     'vue',
     '@typescript-eslint',
   ],
   rules: {
-    'no-console': 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-unused-vars': 'off',
+    'no-nested-ternary': 'off',
     '@typescript-eslint/no-unused-vars': ['error'],
     'vue/max-attributes-per-line': 'off',
     'vue/html-self-closing': 'off',

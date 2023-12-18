@@ -1,14 +1,14 @@
 <template>
   <div
     class="member-item-container"
-    @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave"
+    @mouseenter="openMemberControl"
+    @mouseleave="closeMemberControl"
   >
-    <member-info :user-info="userInfo" :show-state-icon="!showMemberControl"></member-info>
+    <member-info :user-info="props.userInfo" :show-state-icon="!showMemberControl"></member-info>
     <member-control
       v-show="showMemberControl"
       :show-member-control="showMemberControl"
-      :user-info="userInfo"
+      :user-info="props.userInfo"
     ></member-control>
   </div>
 </template>
@@ -18,19 +18,25 @@ import MemberInfo from '../MemberItemCommon/MemberInfo.vue';
 import MemberControl from '../MemberControl/index.vue';
 import { UserInfo } from '../../../stores/room';
 import useMemberItem from './useMemberItemHooks';
+import { ref, watch } from 'vue';
 
-const {
-  showMemberControl,
-  handleMouseEnter,
-  handleMouseLeave,
-} = useMemberItem();
 
 interface Props {
   userInfo: UserInfo,
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+const {
+  isMemberControlAccessible,
+  openMemberControl,
+  closeMemberControl,
+} = useMemberItem(props.userInfo.userId);
 
+const showMemberControl = ref(false);
+
+watch(isMemberControlAccessible, (accessible: boolean) => {
+  showMemberControl.value = accessible;
+});
 
 </script>
 

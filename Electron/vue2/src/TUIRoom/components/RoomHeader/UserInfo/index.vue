@@ -9,7 +9,7 @@
       ></svg-icon>
     </div>
     <div v-if="showUserControl" class="user-control-container">
-      <div v-show="showEditNameItem">
+      <div v-show="showEditNameContainer">
         <div class="user-control-item-head" @click="showEditUserNameDialog">{{ t('Edit profile') }}</div>
       </div>
       <div class="user-control-item-foot" @click="$emit('log-out')">{{ t('Log out') }}</div>
@@ -43,9 +43,10 @@ import useUserInfo from './useUserInfoHooks';
 import Avatar from '../../common/Avatar.vue';
 import TuiButton from '../../common/base/Button.vue';
 import TuiInput from '../../common/base/Input.vue';
+import { isInnerScene } from '../../../utils/constants';
+
 const {
   t,
-  showEditNameItem,
   showUserControl,
   showUserNameEdit,
   userInfoRef,
@@ -54,13 +55,17 @@ const {
   showEditUserNameDialog,
   closeEditUserNameDialog,
   handleSaveUserName } = useUserInfo();
-    interface Props {
-    userId: string,
-    userName: string,
-    avatarUrl?: string,
-  }
-defineProps<Props>();
+
+const props = withDefaults(defineProps<{
+  userId: string,
+  userName: string,
+  avatarUrl?: string,
+  isShowEditName?: boolean,
+}>(), {
+  isShowEditName: false,
+});
 defineEmits(['log-out']);
+const showEditNameContainer = isInnerScene && props.isShowEditName;
 </script>
 <style lang="scss" scoped>
 .tui-theme-white .user-control-container {

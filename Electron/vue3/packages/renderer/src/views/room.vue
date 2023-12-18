@@ -43,7 +43,7 @@ if (!roomId) {
 const TUIRoomRef = ref();
 
 onMounted(async () => {
-  const { action, roomMode, roomParam } = JSON.parse(roomInfo as string);
+  const { action, roomMode, roomParam, hasCreated } = JSON.parse(roomInfo as string);
   const { sdkAppId, userId, userSig, userName, avatarUrl } = JSON.parse(userInfo as string);
   try {
     await TUIRoomRef.value?.init({
@@ -53,9 +53,11 @@ onMounted(async () => {
       userName,
       avatarUrl,
     });
-    if (action === 'createRoom') {
+    if (action === 'createRoom' && !hasCreated) {
       try {
         await TUIRoomRef.value?.createRoom({ roomId, roomName: roomId, roomMode, roomParam });
+        const newRoomInfo = { action, roomId, roomName: roomId, roomMode, roomParam, hasCreated: true };
+        sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(newRoomInfo));
       } catch (error: any) {
         const message = t('Failed to enter the room.') + error.message;
         TUIMessageBox({
@@ -68,7 +70,7 @@ onMounted(async () => {
           },
         });
       }
-    } else if (action === 'enterRoom') {
+    } else {
       try {
         await TUIRoomRef.value?.enterRoom({ roomId, roomParam });
       } catch (error: any) {

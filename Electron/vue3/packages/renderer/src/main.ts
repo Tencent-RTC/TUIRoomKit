@@ -2,8 +2,6 @@ import { createApp } from 'vue';
 import App from '@/App.vue';
 import { createPinia } from 'pinia';
 import router from './router/index';
-import 'element-plus/theme-chalk/el-message.css';
-import 'element-plus/theme-chalk/el-message-box.css';
 import VueI18n from './TUIRoom/locales/index';
 import { ipcRenderer } from 'electron';
 if (window.isHasScreen === undefined) {

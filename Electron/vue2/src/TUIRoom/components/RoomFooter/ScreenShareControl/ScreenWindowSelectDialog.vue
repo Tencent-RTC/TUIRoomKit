@@ -92,9 +92,6 @@ function onClose() {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/var.scss';
-@import '../../../assets/style/element-custom.scss';
-
 .screen-content {
   height: auto;
   min-width: 200px;

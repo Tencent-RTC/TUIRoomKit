@@ -18,7 +18,7 @@
 }
 
 .t-message {
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 10px;
   position: fixed;
   z-index: 9999;
@@ -29,11 +29,6 @@
   color: #999;
   white-space: nowrap;
   
-  i {
-    margin-right: 4px;
-    vertical-align: middle;
-  }
-
   .t-message-text {
     vertical-align: middle;
     font-size: .875rem;
@@ -44,15 +39,8 @@
     width: 20px;
     height: 20px;
     background-size: cover;
-  }
-  .t-message-icon.t-message-icon-success {
-    background-image: url('./images/success.svg');
-  }
-  .t-message-icon.t-message-icon-error {
-    background-image: url('./images/error.svg');
-  }
-  .t-message-icon.t-message-icon-warning {
-    background-image: url('./images/warning.svg');
+    margin-right: 4px;
+    vertical-align: middle;
   }
 }
 
@@ -64,4 +52,7 @@
 }
 .t-message.t-message-warning {
   @include warning_color();
+}
+.t-message.t-message-info {
+  @include info_color();
 }
