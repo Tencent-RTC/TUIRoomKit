@@ -93,18 +93,13 @@ const {
   resetState,
   isMasterWithOneRemoteAnchor,
   isMasterWithRemoteAnchors,
-  isMasterWithoutRemoteAnchors,
 } = useEndControl();
 
 
 const emit = defineEmits(['on-exit-room', 'on-destroy-room']);
 
 function handleEndBtnClick() {
-  if (isMasterWithoutRemoteAnchors.value) {
-    dismissRoom();
-  } else {
-    stopMeeting();
-  }
+  stopMeeting();
 }
 function handleEndLeaveClick() {
   if (!roomStore.isMaster) {
@@ -129,7 +124,7 @@ function handleEndLeaveClick() {
 async function dismissRoom() {
   try {
     logger.log(`${logPrefix}dismissRoom: enter`);
-    await closeMediaBeforeLeave();
+    closeMediaBeforeLeave();
     await roomEngine.instance?.destroyRoom();
     resetState();
     emit('on-destroy-room', { code: 0, message: '' });
@@ -145,7 +140,7 @@ async function dismissRoom() {
 **/
 async function leaveRoom() { // eslint-disable-line
   try {
-    await closeMediaBeforeLeave();
+    closeMediaBeforeLeave();
     const response = await roomEngine.instance?.exitRoom();
     logger.log(`${logPrefix}leaveRoom:`, response);
     resetState();
@@ -163,7 +158,7 @@ async function transferAndLeave() {
     const userId = selectedUser.value;
     const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({ userId, userRole: TUIRole.kRoomOwner });
     logger.log(`${logPrefix}transferAndLeave:`, changeUserRoleResponse);
-    await closeMediaBeforeLeave();
+    closeMediaBeforeLeave();
     const exitRoomResponse = await roomEngine.instance?.exitRoom();
     logger.log(`${logPrefix}exitRoom:`, exitRoomResponse);
     basicStore.setSidebarOpenStatus(false);

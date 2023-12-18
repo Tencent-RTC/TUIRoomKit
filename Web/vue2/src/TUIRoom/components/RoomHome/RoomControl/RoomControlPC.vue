@@ -3,7 +3,8 @@
     <Logo v-show="showLogo" class="logo" />
     <div class="control-container">
       <!-- 视频预览区域 -->
-      <div id="stream-preview" class="stream-preview">
+      <div class="stream-preview-container">
+        <div id="stream-preview" class="stream-preview"></div>
         <div class="attention-info">
           <span v-if="isCameraMuted" class="off-camera-info">{{ t('Off Camera') }}</span>
           <svg-icon v-if="isCameraLoading" :icon="LoadingIcon" class="loading"></svg-icon>
@@ -55,7 +56,7 @@
               <span class="button-text">{{ t('Join Room') }}</span>
             </tui-button>
             <div v-if="showEnterRoomAction" class="enter-room-action">
-              <input v-model="roomId" class="input" :placeholder="t('Enter room ID')" @click.stop="">
+              <input v-model="roomId" class="input" :placeholder="t('Enter room ID')" @keyup.enter="enterRoom">
               <div :class="['enter-button', {'active': roomId.length > 0 }]" @click="enterRoom">
                 <svg-icon :icon="EnterRoomIcon" />
               </div>
@@ -393,13 +394,20 @@ onBeforeUnmount(async () => {
   flex-direction: column;
   justify-content: space-between;
 
-  .stream-preview {
+  .stream-preview-container {
     width: 100%;
     height: 400px;
     border-radius: 8px;
     overflow: hidden;
     background-color: #000000;
     position: relative;
+    .stream-preview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
     .attention-info {
       position: absolute;
       top: 0;

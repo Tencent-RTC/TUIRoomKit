@@ -1,5 +1,5 @@
 <template>
-  <div :class="['chat-editor', cannotSendMessage ? 'disable-editor' : '']">
+  <div :class="['chat-editor', { 'disable': cannotSendMessage }]">
     <div class="input-content">
       <emoji class="chat-emoji" @choose-emoji="handleChooseEmoji"></emoji>
       <input
@@ -88,6 +88,11 @@ const {
         &:focus-visible {
           outline: none;
         }
+      }
+    }
+    &.disable {
+      .chat-emoji {
+        pointer-events: none;
       }
     }
   }

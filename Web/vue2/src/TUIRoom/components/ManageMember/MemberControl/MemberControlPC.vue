@@ -29,6 +29,21 @@
         </div>
       </div>
     </div>
+    <Dialog
+      v-model="showKickOffDialog"
+      :title="t('Note')"
+      :modal="true"
+      width="480px"
+      :before-close="handleCancelKickOffDialog"
+      :close-on-click-modal="true"
+      :append-to-room-container="true"
+    >
+      <span>{{ kickOffDialogContent }}</span>
+      <template #footer>
+        <tui-button size="default" @click="kickOffUser(props.userInfo)"> {{ t('Confirm') }} </tui-button>
+        <tui-button class="cancel" size="default" type="primary" @click="handleCancelKickOffDialog"> {{ t('Cancel') }}</tui-button>
+      </template>
+    </Dialog>
   </div>
 </template>
 
@@ -36,6 +51,7 @@
 import { ref, watch, computed } from 'vue';
 import { useI18n } from '../../../locales';
 import TuiButton from '../../common/base/Button.vue';
+import Dialog from '../../common/base/Dialog';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import ArrowUpIcon from '../../common/icons/ArrowUpIcon.vue';
 import useMemberControlHooks from './useMemberControlHooks';
@@ -49,7 +65,14 @@ interface Props {
 const props = defineProps<Props>();
 
 const { t } = useI18n();
-const { isMe, controlList } = useMemberControlHooks(props);
+const {
+  isMe,
+  controlList,
+  showKickOffDialog,
+  kickOffDialogContent,
+  kickOffUser,
+  handleCancelKickOffDialog,
+} = useMemberControlHooks(props);
 
 const singleControl = computed(() => controlList.value[0]);
 const moreControlList = computed(() => controlList.value.slice(1));
@@ -191,4 +214,8 @@ function handleDropDownPosition() {
     }
   }
 }
+.cancel {
+  margin-left: 12px;
+}
+
 </style>

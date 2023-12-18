@@ -48,7 +48,7 @@ export const useBasicStore = defineStore('basic', {
     roomId: '',
     roomMode: 'FreeSpeech',
     isSidebarOpen: false,
-    layout: LAYOUT.NINE_EQUAL_POINTS,
+    layout: isWeChat ? LAYOUT.SIX_EQUAL_POINTS :  LAYOUT.NINE_EQUAL_POINTS,
     showSettingDialog: false,
     showApplyUserList: false,
     activeSettingTab: 'audio',
@@ -195,7 +195,7 @@ export const useBasicStore = defineStore('basic', {
     },
     reset() {
       this.isSidebarOpen = false;
-      this.layout = LAYOUT.NINE_EQUAL_POINTS;
+      this.layout = isWeChat ? LAYOUT.SIX_EQUAL_POINTS :  LAYOUT.NINE_EQUAL_POINTS;
       this.showSettingDialog = false;
       this.activeSettingTab = 'audio';
       this.isLocalStreamMirror = true;
