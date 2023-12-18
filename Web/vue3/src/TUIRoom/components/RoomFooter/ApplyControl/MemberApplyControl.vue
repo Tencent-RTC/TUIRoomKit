@@ -21,19 +21,17 @@
       :append-to-room-container="true"
     >
       <span>
-        {{
-          t('After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?')
-        }}
+        {{ t('The host invites you to speak on stage and once on stage you can turn on the camera and unmute it.') }}
       </span>
       <template v-if="isMobile" #cancel>
-        <tui-button class="cancel" size="default" type="text" @click="handleInvite(false)">{{ t('Cancel') }}</tui-button>
+        <tui-button class="cancel" size="default" type="text" @click="handleInvite(false)">{{ t('Reject') }}</tui-button>
       </template>
       <template v-if="isMobile" #agree>
-        <tui-button class="agree" size="default" type="text" @click="handleInvite(true)">{{ t('Agree') }}</tui-button>
+        <tui-button class="agree" size="default" type="text" :custom-style="customStyle" @click="handleInvite(true)">{{ t('Agree to the stage') }}</tui-button>
       </template>
       <template v-if="!isMobile" #footer>
-        <tui-button class="agree-button" size="default" @click="handleInvite(true)">{{ t('Agree') }}</tui-button>
-        <tui-button class="cancel-button" size="default" type="primary" @click="handleInvite(false)">{{ t('Cancel') }}</tui-button>
+        <tui-button class="agree-button" size="default" @click="handleInvite(true)">{{ t('Agree to the stage') }}</tui-button>
+        <tui-button class="cancel-button" size="default" type="primary" @click="handleInvite(false)">{{ t('Reject') }}</tui-button>
       </template>
     </Dialog>
   </div>
@@ -74,11 +72,14 @@ const showInviteDialog: Ref<boolean> = ref(false);
 
 const applyToAnchorRequestId: Ref<string> = ref('');
 const inviteToAnchorRequestId: Ref<string> = ref('');
+const customStyle = { color: '#1C66E5' };
+
 
 watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
   if (localUser.onSeat) {
     iconName.value = ICON_NAME.GoOffSeat;
     iconTitle.value = t('Step down');
+    showMemberApplyAttention.value = false;
   } else {
     if (isApplyingOnSeat) {
       iconName.value = ICON_NAME.ApplyActive;
@@ -86,6 +87,7 @@ watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
     } else {
       iconName.value = ICON_NAME.ApplyOnSeat;
       iconTitle.value = t('Raise hand');
+      showMemberApplyAttention.value = true;
     }
   }
 }, { immediate: true, deep: true });
@@ -236,8 +238,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/element-custom.scss';
-
 .apply-control-container {
   position: relative;
   .attention {

@@ -1,8 +1,5 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import AutoImport from 'unplugin-auto-import/vite';
-import Components from 'unplugin-vue-components/vite';
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 const path = require('path');
 
 // https://vitejs.dev/config/
@@ -20,24 +17,7 @@ export default defineConfig({
       // 说明：解决了引入生成userSig 文件的问题
       // reactivityTransform: true,
     }),
-    AutoImport({
-      resolvers: [ElementPlusResolver()],
-    }),
-    Components({
-      resolvers: [ElementPlusResolver({
-        importStyle: 'sass',
-      })],
-    }),
   ],
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: `
-          @use "@/assets/style/global.scss" as *;
-        `,
-      },
-    },
-  },
   server: {
     open: true,
     // 解决 whistle 代理之后无限刷新页面问题

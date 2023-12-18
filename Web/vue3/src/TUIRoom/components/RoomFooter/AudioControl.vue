@@ -38,7 +38,7 @@
         </tui-button>
       </template>
       <template v-if="isMobile" #agree>
-        <tui-button class="agree" size="default" type="text" @click="handleAccept">{{ t('Turn on the microphone') }}</tui-button>
+        <tui-button class="agree" size="default" type="text" :custom-style="customStyle" @click="handleAccept">{{ t('Turn on the microphone') }}</tui-button>
       </template>
       <template #footer>
         <tui-button
@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, onUnmounted, computed } from 'vue';
+import { ref, Ref, onUnmounted, computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import TUIMessage from '../common/base/Message/index';
 import Dialog from '../common/base/Dialog';
@@ -77,6 +77,7 @@ const roomEngine = useRoomEngine();
 
 const roomStore = useRoomStore();
 const basicStore = useBasicStore();
+const customStyle = { color: '#1C66E5' };
 
 const {
   isAudience,
@@ -177,7 +178,12 @@ async function onRequestCancelled(eventInfo: { requestId: string }) {
     showRequestOpenMicDialog.value = false;
   }
 }
-
+watch(isAudience, (newValue) => {
+  if (newValue) {
+    // 离开麦位sdk内部会closeMic，因此需要在此处同步业务逻辑
+    basicStore.setIsOpenMic(false);
+  }
+});
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);

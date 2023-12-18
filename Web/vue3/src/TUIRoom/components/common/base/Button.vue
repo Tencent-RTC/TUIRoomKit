@@ -1,6 +1,7 @@
 <template>
   <button
     :class="buttonClassList"
+    :style="customStyle"
     @click="handleClick"
   >
     <span v-if="$slots.icon" class="button-icon">
@@ -11,12 +12,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, StyleValue } from 'vue';
 
 interface Props {
   size?: 'large' | 'default';
   type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'text';
-  customClass?: string;
+  customStyle?: StyleValue;
   loading?: boolean;
   disabled?: boolean;
   round?: boolean;
@@ -25,7 +26,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   size: undefined,
   type: undefined,
-  customClass: '',
+  customStyle: () => ({}),
   loading: false,
   disabled: false,
   round: true,

@@ -46,7 +46,7 @@ if (!roomId) {
 const TUIRoomRef = ref();
 
 onMounted(async () => {
-  const { action, roomMode, roomParam } = JSON.parse(roomInfo as string);
+  const { action, roomMode, roomParam, hasCreated } = JSON.parse(roomInfo as string);
   const { sdkAppId, userId, userSig, userName, avatarUrl } = JSON.parse(userInfo as string);
   try {
     await TUIRoomRef.value?.init({
@@ -56,9 +56,11 @@ onMounted(async () => {
       userName,
       avatarUrl,
     });
-    if (action === 'createRoom') {
+    if (action === 'createRoom' && !hasCreated) {
       try {
         await TUIRoomRef.value?.createRoom({ roomId, roomName: roomId, roomMode, roomParam });
+        const newRoomInfo = { action, roomId, roomName: roomId, roomMode, roomParam, hasCreated: true };
+        sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(newRoomInfo));
       } catch (error: any) {
         const message = t('Failed to enter the room.') + error.message;
         TUIMessageBox({
@@ -71,7 +73,7 @@ onMounted(async () => {
           },
         });
       }
-    } else if (action === 'enterRoom') {
+    } else {
       try {
         await TUIRoomRef.value?.enterRoom({ roomId, roomParam });
       } catch (error: any) {
@@ -103,11 +105,13 @@ onMounted(async () => {
 });
 
 router.beforeEach((from: any, to: any, next: any) => {
-  if (!basicStore.roomId) {
+  // 解散房间后改变路由或者不改变路由和 roomId 参数的情况下不做处理
+  if (!basicStore.roomId || (from.path === to.path && from.query.roomId === to.query.roomId)) {
     next();
   } else {
     const message = roomStore.isMaster
-      ? t('This action causes the room to be disbanded, does it continue?') : t('This action causes the room to be exited, does it continue?');
+      ? t('This action causes the room to be disbanded, does it continue?')
+      : t('This action causes the room to be exited, does it continue?');
     if (window.confirm(message)) {
       if (roomStore.isMaster) {
         TUIRoomRef.value?.dismissRoom();

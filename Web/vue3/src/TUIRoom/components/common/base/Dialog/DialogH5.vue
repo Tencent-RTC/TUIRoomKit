@@ -62,7 +62,7 @@ const hasTitle = computed(() => props.title !== '');
   .dialog-content-notitle {
     font-size: 14px;
     text-align: center;
-    padding: 24px;
+    padding: 40px;
   }
   .dialog-footer {
     border-top: 1px solid #d5e0f2;
