@@ -18,8 +18,8 @@ class VueTouch {
       this.touchmove();
     });
 
-    el?.addEventListener('touchend', () => {
-      this.touchend();
+    el?.addEventListener('touchend', (event: TouchEvent) => {
+      this.touchend(event);
     });
   }
 
@@ -31,9 +31,9 @@ class VueTouch {
     this.isMove = true;
   }
 
-  touchend() {
+  touchend(event?: TouchEvent) {
     if (!this.isMove) {
-      this.callback();
+      this.callback(event);
     }
   }
 }

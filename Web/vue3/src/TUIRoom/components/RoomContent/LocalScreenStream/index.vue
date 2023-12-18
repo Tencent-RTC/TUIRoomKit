@@ -111,6 +111,6 @@ function stopScreenSharing() {
   }
 }
 .dialog-button {
-  margin-right: 20px;
+  margin-right: 12px;
 }
 </style>

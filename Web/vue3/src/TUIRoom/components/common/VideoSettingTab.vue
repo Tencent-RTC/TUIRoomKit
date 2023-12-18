@@ -69,13 +69,7 @@ const themeClass = computed(() => (props.theme ? `tui-theme-${props.theme}` : ''
 
 watch(isLocalStreamMirror, async (val: boolean) => {
   const trtcCloud = roomEngine.instance?.getTRTCCloud();
-  if (isMobile) {
-    await trtcCloud?.setLocalRenderParams({
-      mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Auto,
-      rotation: TRTCVideoRotation.TRTCVideoRotation0,
-      fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
-    });
-  } else {
+  if (!isMobile) {
     await trtcCloud?.setLocalRenderParams({
       mirrorType: val
         ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
@@ -83,7 +77,6 @@ watch(isLocalStreamMirror, async (val: boolean) => {
       fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
     });
   }
-  basicStore.setIsLocalStreamMirror(val);
 });
 
 const { t } = useI18n();
@@ -121,8 +114,6 @@ if (props.withPreview) {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/style/element-custom.scss';
-
 .video-tab {
   border-radius: 8px;
   font-size: 14px;

@@ -41,6 +41,9 @@ import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
 import logger from '@/TUIRoom/utils/common/logger';
 import { storeToRefs } from 'pinia';
+import TUIMessageBox from '@/TUIRoom/components/common/base/MessageBox/index';
+import useTRTCDetect from '@/TUIRoom/hooks/useTRTCDetect';
+import { useI18n } from 'vue-i18n';
 
 const route = useRoute();
 const userName: Ref<string> = ref('');
@@ -52,6 +55,8 @@ const { defaultTheme } = storeToRefs(basicStore);
 const roomControlRef = ref();
 const roomId = checkNumber((route.query.roomId) as string) ? route.query.roomId : '';
 const givenRoomId: Ref<string> = ref((roomId) as string);
+const { isSupportTRTC } = useTRTCDetect();
+const { t } = useI18n();
 
 function setTUIRoomData(action: string, mode?: string) {
   const roomParam = roomControlRef.value.getRoomParam();
@@ -95,6 +100,15 @@ async function generateRoomId(): Promise<string> {
  * 处理点击【创建房间】
 **/
 async function handleCreateRoom(mode: string) {
+  if (!isSupportTRTC.value) {
+    TUIMessageBox({
+      title: t('Note'),
+      message: t('The current browser does not support TRTC capability'),
+      appendToRoomContainer: true,
+      confirmButtonText: t('Sure'),
+    });
+    return;
+  }
   setTUIRoomData('createRoom', mode);
   const roomId = await generateRoomId();
   router.push({
@@ -111,6 +125,15 @@ async function handleCreateRoom(mode: string) {
  * 处理点击【进入房间】
 **/
 async function handleEnterRoom(roomId: string) {
+  if (!isSupportTRTC.value) {
+    TUIMessageBox({
+      title: t('Note'),
+      message: t('The current browser does not support TRTC capability'),
+      appendToRoomContainer: true,
+      confirmButtonText: t('Sure'),
+    });
+    return;
+  }
   setTUIRoomData('enterRoom');
   router.push({
     path: 'room',
@@ -171,6 +194,7 @@ handleInit();
 </script>
 
 <style>
+@import '../TUIRoom/assets/style/global.scss';
 @import '../TUIRoom/assets/style/black-theme.scss';
 @import '../TUIRoom/assets/style/white-theme.scss';
 </style>

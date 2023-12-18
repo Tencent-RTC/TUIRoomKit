@@ -20,6 +20,7 @@
         :title="t('Mic')"
         :has-more="hasMore"
         :disabled="isDisabled"
+        :is-not-support="!isGetUserMediaSupported"
         @click-icon="handleClickIcon"
         @click-more="handleMore"
       >
@@ -40,12 +41,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from 'vue';
+import { ref, Ref, watch } from 'vue';
 import IconButton from '../common/base/IconButton.vue';
 import AudioSettingTab from '../common/AudioSettingTab.vue';
 import AudioIcon from '../common/AudioIcon.vue';
 import { useI18n } from '../../locales';
 import vClickOutside from '../../directives/vClickOutside';
+import useMediaDetect from '../../hooks/useMediaDetect';
 
 interface Props {
   hasMore?: boolean,
@@ -53,6 +55,8 @@ interface Props {
   isDisabled?: boolean,
   audioVolume: number,
 }
+
+const { isGetUserMediaSupported } = useMediaDetect();
 
 withDefaults(defineProps<Props>(), {
   hasMore: true,
