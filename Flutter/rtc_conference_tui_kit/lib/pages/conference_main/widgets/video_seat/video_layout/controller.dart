@@ -9,6 +9,7 @@ class VideoLayoutController extends GetxController {
   final _right = 5.0.obs;
   final _top = 5.0.obs;
   final _isSwitchMainDraggableAndWindow = false.obs;
+  final Map<String, int> _viewPtrMap = {};
 
   double get rightPadding => _right.value;
   double get topPadding => _top.value;
@@ -44,7 +45,33 @@ class VideoLayoutController extends GetxController {
       roomEngine.setLocalVideoView(id);
     } else {
       roomEngine.setRemoteVideoView(userId, streamType, id);
+    }
+    _viewPtrMap[userId] = id;
+  }
+
+  void removeVideoView(String userId, int id) {
+    if (_viewPtrMap[userId] != id) {
+      return;
+    }
+    if (userId == TUIRoomEngine.getSelfInfo().userId) {
+      RoomEngineManager().getRoomEngine().setLocalVideoView(0);
+    } else {
+      RoomEngineManager()
+          .getRoomEngine()
+          .setRemoteVideoView(userId, TUIVideoStreamType.cameraStream, 0);
+    }
+  }
+
+  void updateVideoPlayState(String userId, bool hasVideo,
+      {bool? isScreenStream}) {
+    var streamType = isScreenStream == true
+        ? TUIVideoStreamType.screenStream
+        : TUIVideoStreamType.cameraStream;
+    var roomEngine = RoomEngineManager().getRoomEngine();
+    if (hasVideo) {
       roomEngine.startPlayRemoteVideo(userId, streamType, null);
+    } else {
+      roomEngine.stopPlayRemoteVideo(userId, streamType);
     }
   }
 

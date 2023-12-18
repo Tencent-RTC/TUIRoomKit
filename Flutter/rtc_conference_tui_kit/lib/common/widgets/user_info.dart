@@ -40,7 +40,9 @@ class UserInfoWidget extends StatelessWidget {
                     userModel.userId.value ==
                             RoomStore.to.currentUser.userId.value
                         ? '${userModel.userName.value}（${RoomContentsTranslations.translate('me')}）'
-                        : userModel.userName.value,
+                        : userModel.userName.value.isEmpty
+                            ? userModel.userId.value
+                            : userModel.userName.value,
                     style: RoomTheme.defaultTheme.textTheme.bodyLarge,
                     textAlign: TextAlign.left,
                   ),

@@ -21,4 +21,5 @@ class UserModel {
   var hasScreenStream = false.obs;
   var ableSendingMessage = true.obs;
   var isOnSeat = false.obs;
+  var isTalking = false.obs;
 }

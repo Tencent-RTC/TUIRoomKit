@@ -118,11 +118,13 @@ const Map<String, String> roomContentsEnUS = {
   'haveBecomeMaster': 'You have become the master',
   'takeSeatInvitationSend':
       'Invitation to the audience have been sent to the stage',
-  'takeSeatInvitationAccepted': 'accepted your invitation',
-  'takeSeatInvitationRejected': 'rejected your invitation',
+  'takeSeatInvitationAccepted': ' accepted your invitation',
+  'takeSeatInvitationRejected': ' rejected your invitation',
   'otherUserScreenSharing': 'Other users have turned on screen sharing',
   'sureLeaveRoomTip': 'Are you sure you want to leave the room?',
   'handRaised':
       'You have raised your hand, please wait for the master to operate',
-  'quickConference': 's quick meeting',
+  'quickConference': '\'s quick meeting',
+  'sureKickOut': 'Do you want to move xx out of the room?',
+  'sure': 'Sure',
 };

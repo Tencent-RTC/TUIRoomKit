@@ -45,6 +45,7 @@ class RaiseHandListWidget extends GetView<RaiseHandListController> {
                         child: Text(
                           RoomContentsTranslations.translate('agreeAll'),
                           style: RoomTheme.defaultTheme.textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
@@ -63,6 +64,7 @@ class RaiseHandListWidget extends GetView<RaiseHandListController> {
                           RoomContentsTranslations.translate(
                               'inviteMemberToTakeSeat'),
                           style: RoomTheme.defaultTheme.textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),

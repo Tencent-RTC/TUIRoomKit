@@ -11,7 +11,7 @@ class ExitWidget extends GetView<ExitController> {
   Widget _buildView() {
     return BottomSheetWidget(
       width: Get.width,
-      height: RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner
+      height: controller.isNeedTransferOwner()
           ? 219.0.scale375()
           : 169.0.scale375(),
       padding: const EdgeInsets.only(
@@ -28,31 +28,34 @@ class ExitWidget extends GetView<ExitController> {
                   ? RoomContentsTranslations.translate('leaveRoomTip')
                   : RoomContentsTranslations.translate('sureLeaveRoomTip'),
               style: RoomTheme.defaultTheme.textTheme.displaySmall,
+              textAlign: TextAlign.center,
             ),
           ),
           Divider(
               thickness: 1.0.scale375(),
               height: 0,
               color: RoomColors.dividerGrey),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              Get.back();
-              controller.exitRoomAction();
-            },
-            child: SizedBox(
-              height: 50.0.scale375(),
-              child: Center(
-                child: Text(RoomContentsTranslations.translate('leaveRoom'),
-                    style: RoomTheme.defaultTheme.textTheme.titleLarge),
+          if (!controller.isRoomOwner() || controller.isNeedTransferOwner())
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                Get.back();
+                controller.exitRoomAction();
+              },
+              child: SizedBox(
+                height: 50.0.scale375(),
+                child: Center(
+                  child: Text(RoomContentsTranslations.translate('leaveRoom'),
+                      style: RoomTheme.defaultTheme.textTheme.titleLarge),
+                ),
               ),
             ),
-          ),
-          Divider(
-              thickness: 1.0.scale375(),
-              height: 0,
-              color: RoomColors.dividerGrey),
-          if (RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner)
+          if (controller.isNeedTransferOwner())
+            Divider(
+                thickness: 1.0.scale375(),
+                height: 0,
+                color: RoomColors.dividerGrey),
+          if (controller.isRoomOwner())
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {

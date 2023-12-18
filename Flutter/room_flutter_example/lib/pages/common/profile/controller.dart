@@ -11,11 +11,12 @@ class ProfileController extends GetxController {
 
   _initData() {
     userNameController.text = _getRandomUserName();
+    _getRandomAvatarURL();
   }
 
   @override
-  void onReady() {
-    super.onReady();
+  void onInit() {
+    super.onInit();
     _initData();
   }
 
@@ -24,11 +25,10 @@ class ProfileController extends GetxController {
     return Constants.userNameArray.elementAt(index).tr;
   }
 
-  getRandomAvatarURL() {
+  _getRandomAvatarURL() {
     var index = Random().nextInt(Constants.userAvatarURLArray.length);
     var avatarURL = Constants.userAvatarURLArray.elementAt(index);
     UserStore.to.userModel.avatarURL = avatarURL;
-    return avatarURL;
   }
 
   toMainPage() {

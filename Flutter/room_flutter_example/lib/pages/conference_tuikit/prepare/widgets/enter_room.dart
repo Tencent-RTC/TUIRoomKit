@@ -10,15 +10,21 @@ class EnterRoomWidget extends GetView<PrepareController> {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Image.asset(
-          AssetsImages.enterRoom,
-          width: 16,
-          height: 16,
-        ),
-        const SizedBox(width: 5),
-        Text('enterRoom'.tr, style: const TextStyle(fontSize: 16))
-      ]),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            AssetsImages.enterRoom,
+            width: 16,
+            height: 16,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            'enterRoom'.tr,
+            style: const TextStyle(fontSize: 16, color: Colors.white),
+          )
+        ],
+      ),
       onPressed: () => controller.toEnterRoomPage(),
     );
   }

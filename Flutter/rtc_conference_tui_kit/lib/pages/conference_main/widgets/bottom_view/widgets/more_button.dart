@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
-import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/setting/index.dart';
+import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/widgets.dart';
 
-import '../index.dart';
 import 'widgets.dart';
 
 class MoreButtonWidget extends GetView<BottomViewController> {

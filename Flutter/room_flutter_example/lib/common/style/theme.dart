@@ -50,8 +50,16 @@ class AppTheme {
             color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
+          displayMedium: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+          ),
           bodyLarge: TextStyle(
             fontSize: 16,
+            color: Colors.white,
+          ),
+          labelLarge: TextStyle(
+            fontSize: 18,
             color: Colors.white,
           ),
         ),

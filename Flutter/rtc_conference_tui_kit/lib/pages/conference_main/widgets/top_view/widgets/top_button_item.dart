@@ -36,12 +36,9 @@ class TopButtonItemWidget extends GetView<TopViewController> {
             Obx(() => isSelected.value ? selectedImage ?? image : image),
             if (text != null) ...[
               SizedBox(width: 3.0.scale375()),
-              SizedBox(
-                width: 28.0.scale375(),
-                child: Text(
-                  text!,
-                  style: RoomTheme.defaultTheme.textTheme.labelMedium,
-                ),
+              Text(
+                text!,
+                style: RoomTheme.defaultTheme.textTheme.labelMedium,
               ),
             ],
           ],

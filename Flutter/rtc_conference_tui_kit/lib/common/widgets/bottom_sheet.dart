@@ -24,9 +24,9 @@ class BottomSheetWidget extends StatelessWidget {
         ),
       ),
       padding: padding ??
-          const EdgeInsets.only(
-            left: 16.0,
-            right: 16.0,
+          EdgeInsets.only(
+            left: 16.0.scale375(),
+            right: 16.0.scale375(),
           ),
       width: width,
       height: height,

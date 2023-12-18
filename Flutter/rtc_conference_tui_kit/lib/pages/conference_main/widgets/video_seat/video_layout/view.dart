@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
-import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/video_seat/video_item/index.dart';
 
 import 'index.dart';
 import 'widgets/widgets.dart';
@@ -13,40 +12,31 @@ class VideoLayoutWidget extends GetView<VideoLayoutController> {
   final startIndex;
   final endIndex;
   final isScreenLayout;
-  final isTowUserLayout;
+  final isTwoUserLayout;
   const VideoLayoutWidget(
       {Key? key,
       required this.userList,
       required this.startIndex,
       required this.endIndex,
       this.isScreenLayout = false,
-      this.isTowUserLayout = false})
+      this.isTwoUserLayout = false})
       : super(key: key);
 
   Widget _buildView() {
     if (isScreenLayout) {
       return VideoItemWidget(
-        isBackGroundVisible: false,
+        isScreenStream: true,
         userModel: RoomStore.to.screenShareUser,
-        onVideoViewCreated: (value) {
-          controller.setVideoView(
-              RoomStore.to.screenShareUser.userId.value, value,
-              isScreenStream: true);
-        },
       );
-    } else if (isTowUserLayout) {
+    } else if (isTwoUserLayout) {
       return Obx(
         () => WithDraggableWindowWidget(
           mainWidget: VideoItemWidget(
             userModel: userList[0],
-            onVideoViewCreated: (value) =>
-                controller.setVideoView(userList[0].userId.value, value),
           ),
           draggableWidget: userList.length == 2
               ? VideoItemWidget(
                   userModel: userList[1],
-                  onVideoViewCreated: (value) =>
-                      controller.setVideoView(userList[1].userId.value, value),
                 )
               : null,
           draggableWidgetHeight:
@@ -57,7 +47,7 @@ class VideoLayoutWidget extends GetView<VideoLayoutController> {
       );
     } else {
       return Padding(
-        padding: EdgeInsets.all(8.0.scale375()),
+        padding: EdgeInsets.all(7.0.scale375()),
         child: Wrap(
           spacing: 7.0.scale375(),
           runSpacing: 7.0.scale375(),
@@ -70,10 +60,6 @@ class VideoLayoutWidget extends GetView<VideoLayoutController> {
                 width: 176.0.scale375(),
                 height: 176.0.scale375(),
                 userModel: userList[startIndex + index],
-                onVideoViewCreated: (value) {
-                  controller.setVideoView(
-                      userList[startIndex + index].userId.value, value);
-                },
               );
             },
           ),
@@ -86,11 +72,10 @@ class VideoLayoutWidget extends GetView<VideoLayoutController> {
   Widget build(BuildContext context) {
     return GetBuilder<VideoLayoutController>(
       init: VideoLayoutController(),
+      autoRemove: false,
       id: "video_layout",
       builder: (_) {
-        return SafeArea(
-          child: _buildView(),
-        );
+        return _buildView();
       },
     );
   }

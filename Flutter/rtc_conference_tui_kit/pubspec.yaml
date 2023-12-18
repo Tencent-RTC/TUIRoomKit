@@ -1,7 +1,7 @@
 name: rtc_conference_tui_kit
 description: rtc_conference_tui_kit is a UIKit about audio&video room launched by Tencent Cloud.
-version: 1.6.1-rc
-repository: https://github.com/tencentyun/TUIRoomKit
+version: 1.7.0
+repository: https://github.com/tencentyun/TUIRoomKit/tree/main/Flutter/rtc_conference_tui_kit
 homepage: https://trtc.io/
 
 environment:
@@ -12,11 +12,11 @@ dependencies:
   flutter:
     sdk: flutter
   get: ^4.0.0
-  rtc_room_engine: ^1.6.1
+  rtc_room_engine: ^1.7.0
   permission_handler: ^10.2.0
   plugin_platform_interface: ^2.1.6
   fluttertoast: ^8.2.2
-  tencent_trtc_cloud: ^2.5.4
+  tencent_trtc_cloud: ^2.7.0
 
 dev_dependencies:
   flutter_test:

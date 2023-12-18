@@ -27,10 +27,13 @@ class ButtonItemWidget extends GetView<UserListController> {
         () => ElevatedButton(
           style: RoomTheme.defaultTheme.elevatedButtonTheme.style,
           onPressed: onPressed,
-          child: Text(isSelected.value ? selectedText ?? text : text,
-              style: isSelected.value
-                  ? RoomTheme.defaultTheme.textTheme.labelMedium
-                  : RoomTheme.defaultTheme.textTheme.labelLarge),
+          child: Text(
+            isSelected.value ? selectedText ?? text : text,
+            style: isSelected.value
+                ? RoomTheme.defaultTheme.textTheme.labelMedium
+                : RoomTheme.defaultTheme.textTheme.labelLarge,
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );

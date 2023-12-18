@@ -71,7 +71,11 @@ class RoomStore extends GetxController {
       isSharing.value = true;
       screenShareUser = UserModel.fromTUIUserInfo(userInfo);
     }
-    destList.add(UserModel.fromTUIUserInfo(userInfo));
+    if (userInfo.userRole == TUIRole.roomOwner) {
+      destList.insert(0, UserModel.fromTUIUserInfo(userInfo));
+    } else {
+      destList.add(UserModel.fromTUIUserInfo(userInfo));
+    }
   }
 
   UserModel? getUserById(String userId) {
@@ -102,26 +106,26 @@ class RoomStore extends GetxController {
     } else {
       destList[index].hasVideoStream.value = hasVideo;
     }
+  }
 
-    if (userId == currentUser.userId.value) {
-      if (isScreenStream == true) {
-        currentUser.hasScreenStream.value = hasVideo;
-      } else {
-        currentUser.hasVideoStream.value = hasVideo;
-      }
+  void updateSelfVideoState(bool hasVideo, TUIChangeReason reason,
+      {bool? isScreenStream}) {
+    if (isScreenStream == true) {
+      currentUser.hasScreenStream.value = hasVideo;
+    } else {
+      currentUser.hasVideoStream.value = hasVideo;
+    }
 
-      if (reason != TUIChangeReason.changedByAdmin) {
-        return;
-      }
-      if (currentUser.hasVideoStream.value) {
-        makeToast(
-            msg: RoomContentsTranslations.translate(
-                'cameraTurnedOnByHostToast'));
-      } else if (!roomInfo.isCameraDisableForAllUser) {
-        makeToast(
-            msg: RoomContentsTranslations.translate(
-                'cameraTurnedOffByHostToast'));
-      }
+    if (reason != TUIChangeReason.changedByAdmin) {
+      return;
+    }
+    if (currentUser.hasVideoStream.value) {
+      makeToast(
+          msg: RoomContentsTranslations.translate('cameraTurnedOnByHostToast'));
+    } else if (!roomInfo.isCameraDisableForAllUser) {
+      makeToast(
+          msg:
+              RoomContentsTranslations.translate('cameraTurnedOffByHostToast'));
     }
   }
 
@@ -132,19 +136,19 @@ class RoomStore extends GetxController {
       return;
     }
     destList[index].hasAudioStream.value = hasAudio;
+  }
 
-    if (userId == currentUser.userId.value) {
-      currentUser.hasAudioStream.value = hasAudio;
-      if (reason == TUIChangeReason.changedByAdmin) {
-        if (hasAudio) {
-          makeToast(
-              msg: RoomContentsTranslations.translate(
-                  'microphoneTurnedOnByHostToast'));
-        } else if (!roomInfo.isMicrophoneDisableForAllUser) {
-          makeToast(
-              msg: RoomContentsTranslations.translate(
-                  'microphoneTurnedOffByHostToast'));
-        }
+  void updateSelfAudioState(bool hasAudio, TUIChangeReason reason) {
+    currentUser.hasAudioStream.value = hasAudio;
+    if (reason == TUIChangeReason.changedByAdmin) {
+      if (hasAudio) {
+        makeToast(
+            msg: RoomContentsTranslations.translate(
+                'microphoneTurnedOnByHostToast'));
+      } else if (!roomInfo.isMicrophoneDisableForAllUser) {
+        makeToast(
+            msg: RoomContentsTranslations.translate(
+                'microphoneTurnedOffByHostToast'));
       }
     }
   }
@@ -155,16 +159,29 @@ class RoomStore extends GetxController {
       return;
     }
     destList[index].userRole.value = role;
+  }
 
-    if (userId == currentUser.userId.value) {
-      currentUser.userRole.value = role;
-      if (RoomStore.to.roomInfo.speechMode ==
-              TUISpeechMode.speakAfterTakingSeat &&
-          !RoomStore.to.currentUser.isOnSeat.value &&
-          role == TUIRole.roomOwner) {
-        RoomEngineManager().takeSeat(_seatIndex, _reqTimeout, null);
-      }
+  void updateSelfRole(TUIRole role) {
+    currentUser.userRole.value = role;
+    if (RoomStore.to.roomInfo.speechMode ==
+            TUISpeechMode.speakAfterTakingSeat &&
+        !RoomStore.to.currentUser.isOnSeat.value &&
+        role == TUIRole.roomOwner) {
+      RoomEngineManager().takeSeat(_seatIndex, _reqTimeout, null);
     }
+  }
+
+  void updateUserTalkingState(
+      String userId, bool isTalking, RxList<UserModel> destList) {
+    var index = getUserIndex(userId, destList);
+    if (index == -1) {
+      return;
+    }
+    if (!destList[index].hasAudioStream.value) {
+      destList[index].isTalking.value = false;
+      return;
+    }
+    destList[index].isTalking.value = isTalking;
   }
 
   void updateUserSeatedState(String userId, bool isOnSeat) {
@@ -176,6 +193,9 @@ class RoomStore extends GetxController {
 
     if (userId == currentUser.userId.value) {
       currentUser.isOnSeat.value = isOnSeat;
+      if (!isOnSeat) {
+        audioSetting.isMicDeviceOpened = false;
+      }
     }
   }
 

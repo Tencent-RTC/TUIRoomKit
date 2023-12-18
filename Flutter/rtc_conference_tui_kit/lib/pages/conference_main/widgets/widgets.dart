@@ -1,6 +1,7 @@
 library widgets;
 
-export 'local_screen_sharing.dart';
+export './local_screen_sharing/local_screen_sharing.dart';
+export './invite_sheet/invite_sheet.dart';
 export './bottom_view/index.dart';
 export './exit/index.dart';
 export './raise_hand_list/index.dart';

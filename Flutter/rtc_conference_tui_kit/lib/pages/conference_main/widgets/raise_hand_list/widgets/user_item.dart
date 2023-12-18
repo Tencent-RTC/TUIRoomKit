@@ -27,6 +27,9 @@ class UserItemWidget extends GetView<RaiseHandListController> {
                   controller.agreeStageAction(userModel.userId.value, true),
               child: Text(
                 RoomContentsTranslations.translate('agreeTakeSeat'),
+                style: RoomTheme.defaultTheme.textTheme.bodySmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               )),
         ),
         const SizedBox(width: 10),
@@ -39,6 +42,9 @@ class UserItemWidget extends GetView<RaiseHandListController> {
                   controller.agreeStageAction(userModel.userId.value, false),
               child: Text(
                 RoomContentsTranslations.translate('disagreeSeat'),
+                style: RoomTheme.defaultTheme.textTheme.bodySmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               )),
         ),
       ],

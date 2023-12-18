@@ -20,6 +20,7 @@ class SingleSelectWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      padding: EdgeInsets.zero,
       separatorBuilder: (context, index) {
         return const Divider(
           height: 34,

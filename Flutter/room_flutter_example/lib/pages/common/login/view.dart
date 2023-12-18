@@ -25,8 +25,8 @@ class LoginPage extends GetView<LoginController> {
             child: Column(
               children: [
                 TextField(
+                  style: Get.textTheme.displayMedium,
                   decoration: InputDecoration(hintText: 'userIdInputHint'.tr),
-                  keyboardType: TextInputType.number,
                   controller: controller,
                 ),
                 const SizedBox(height: 30),

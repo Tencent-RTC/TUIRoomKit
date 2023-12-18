@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 
-import '../controller.dart';
+import '../../controller.dart';
 
 class LocalScreenSharingWidget extends GetView<ConferenceMainController> {
   const LocalScreenSharingWidget({super.key});

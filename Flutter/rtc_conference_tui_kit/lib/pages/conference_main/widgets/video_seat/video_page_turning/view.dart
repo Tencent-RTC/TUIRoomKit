@@ -17,7 +17,6 @@ class VideoPageTurningPage extends GetView<VideoPageTurningController> {
         Expanded(
           child: Obx(
             () => PageView.builder(
-              allowImplicitScrolling: true,
               onPageChanged: (value) {
                 controller.currentIndex = value;
               },
@@ -30,7 +29,7 @@ class VideoPageTurningPage extends GetView<VideoPageTurningController> {
                   startIndex: controller.getPageStarIndex(index),
                   endIndex: controller.getPageEndIndex(index),
                   isScreenLayout: controller.isScreenShareLayout(index),
-                  isTowUserLayout: controller.isTwoUserLayout(),
+                  isTwoUserLayout: controller.isTwoUserLayout(),
                 );
               },
               itemCount: controller.getTotalPageCount(),
@@ -59,9 +58,7 @@ class VideoPageTurningPage extends GetView<VideoPageTurningController> {
       init: VideoPageTurningController(),
       id: "video_page_turning",
       builder: (_) {
-        return SafeArea(
-          child: _buildView(),
-        );
+        return _buildView();
       },
     );
   }

@@ -12,23 +12,20 @@ class RoomInfoWidget extends GetView<CreateRoomController> {
   Widget build(BuildContext context) {
     return RoundedContainerWidget(
       children: [
-        Obx(() => RoomInfoCellWidget(
-              prefixText: 'roomType'.tr,
-              infoText: controller.roomTypeString.value,
-              image: Image.asset(
-                AssetsImages.dropDown,
-                width: 24,
-                height: 24,
-                color: AppColors.textHintGrey,
-              ),
-              onTap: () {
-                showRoomTypeView();
-              },
-            )),
-        const Divider(height: 32.0),
-        RoomInfoCellWidget(
-          prefixText: 'roomId'.tr,
-          infoText: controller.getRoomId(),
+        Obx(
+          () => RoomInfoCellWidget(
+            prefixText: 'roomType'.tr,
+            infoText: controller.roomTypeString.value,
+            image: Image.asset(
+              AssetsImages.dropDown,
+              width: 24,
+              height: 24,
+              color: AppColors.textHintGrey,
+            ),
+            onTap: () {
+              showRoomTypeView();
+            },
+          ),
         ),
         const Divider(height: 32.0),
         RoomInfoCellWidget(

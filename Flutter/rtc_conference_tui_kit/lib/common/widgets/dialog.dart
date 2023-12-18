@@ -74,7 +74,12 @@ Future<void> showConferenceDialog({
                         },
                         child: Text(
                           cancelText,
-                          style: cancelTextStyle,
+                          style: cancelTextStyle ??
+                              const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: RoomColors.btnGrey,
+                              ),
                         ),
                       ),
                     ),
@@ -96,7 +101,8 @@ Future<void> showConferenceDialog({
                         },
                         child: Text(
                           confirmText,
-                          style: confirmTextStyle,
+                          style: confirmTextStyle ??
+                              RoomTheme.defaultTheme.textTheme.displayMedium,
                         ),
                       ),
                     ),

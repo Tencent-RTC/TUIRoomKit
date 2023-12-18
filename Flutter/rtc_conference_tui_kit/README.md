@@ -40,19 +40,50 @@ First, please Create an application in the [TRTC Console](https://console.tencen
 
 ### Access and use
 
-- Step 1:Add the dependency
+- Step 1: Add the dependency
 
-  Add the rtc_conference_tuikit plugin dependency in `pubspec.yaml` file in your project
+  Add the rtc_conference_tui_kit plugin dependency in `pubspec.yaml` file in your project
   ```
   dependencies:  
-   rtc_conference_tuikit: latest release version
+   rtc_conference_tui_kit: latest release version
   ```
   Execute the following command to install the plugin
   ```
   flutter pub get
   ```
 
-- Step 2:Login `rtc_conference_tuikit` plugin
+- Step 2: Complete Project Configuration
+
+  - Since the `rtc_conference_tui_kit` component uses the `GetX` state management library for navigation, you need to use `GetMaterialApp` instead of `MaterialApp` in your application. Or you can set the `navigatorKey` property in your `MaterialApp` to `Get.key` to achieve the same effect.
+
+  - Use `Xcode` to open your project, select [Project] -> [Building Settings] -> [Deployment], and set the [Strip Style] to `Non-Global Symbols` to retain all global symbol information.
+
+  - To use the audio and video functions on **iOS**, you need to authorize the use of the mic and camera (For Android, the relevant permissions have been declared in the SDK, so you do not need to manually configure them). 
+    
+    Add the following two items to the `Info.plist` of the App, which correspond to the prompt messages of the mic and camera when the system pops up the authorization dialog box. 
+    ```
+    <key>NSCameraUsageDescription</key>
+    <string>TUIRoom needs access to your Camera permission</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>TUIRoom needs access to your Mic permission</string>
+    ```
+    After completing the above additions, add the following preprocessor definitions in your `ios/Podfile` to enable camera and microphone permissions.
+    ```ruby
+    post_install do |installer|
+      installer.pods_project.targets.each do |target|
+        flutter_additional_ios_build_settings(target)
+          target.build_configurations.each do |config|
+            config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+          '$(inherited)',
+          'PERMISSION_MICROPHONE=1',
+          'PERMISSION_CAMERA=1',
+          ]
+        end
+      end
+    end
+    ```
+
+- Step 3: Login `rtc_conference_tui_kit` plugin
 
   ```dart
   import 'package:rtc_room_engine/rtc_room_engine.dart';
@@ -70,7 +101,7 @@ First, please Create an application in the [TRTC Console](https://console.tencen
   }
   ```
 
-- Step 3:User `rtc_conference_tuikit` plugin
+- Step 4: User `rtc_conference_tui_kit` plugin
 
   - Set self nickName and avatar
 
@@ -117,11 +148,11 @@ First, please Create an application in the [TRTC Console](https://console.tencen
 
 ## Quick link
 
-- If you encounter difficulties, you can refer to [FAQs](https://www.tencentcloud.com/document/product/647/52820), here are the most frequently encountered problems of developers, covering various platforms, I hope it can Help you solve problems quickly.
-- If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](../../Web/)、[Android](../../Android/)、[iOS](../../iOS/)、[Electron](../../Electron/)、[Windows](../../Windows-Mac/).
+- If you encounter difficulties, you can refer to [FAQs](https://www.tencentcloud.com/document/product/647/57598), here are the most frequently encountered problems of developers, covering various platforms, I hope it can Help you solve problems quickly.
+- If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](../../Web/), [Android](../../Android/), [iOS](../../iOS/), [Electron](../../Electron/), [Windows](../../Windows-Mac/).
 
 - If you would like to see some of our latest product features, you can check the [Update Log](https://cloud.tencent.com/document/product/1690/89361), here are the latest features of TUIRoomKit, as well as the historical version features iterate
-- For complete API documentation, see [API reference](https://cloud.tencent.com/document/product/1690/94557): including TUIRoomKit、 (with UIKit), TUIRoomEngine (without UIKit), and events Callbacks, etc.
+- For complete API documentation, see [API reference](https://www.tencentcloud.com/zh/document/product/647/57512): including TUIRoomKit、 (with UIKit), TUIRoomEngine (without UIKit), and events Callbacks, etc.
 - If you want to learn more about the projects maintained by Tencent Cloud  Media Services Team, you can check our [Product Official Website](https://cloud.tencent.com/product/rtcube), [Github Organizations](https://github.com/LiteAVSDK) etc.
 
 ## Communication and feedback
