@@ -2,7 +2,10 @@
   <div :class="['chat-editor', cannotSendMessage ? 'disable-editor' : '']">
     <div class="chat-input-container">
       <div class="input-content">
-        <svg-icon style="display: flex" @tap="togglePopover" :icon="EmojiIcon" class="emoji-icon" />
+        <svg-icon
+          style="display: flex"
+          @tap="togglePopover" :icon="EmojiIcon" :class="['emoji-icon', { 'disable-emoji': cannotSendMessage }]"
+        />
         <input
           ref="editorInputEle"
           v-model="sendMsg"
@@ -102,6 +105,9 @@ const {
     .emoji-icon{
       width: 20px;
       height: 20px;
+    }
+    .disable-emoji {
+      pointer-events: none;
     }
     .chat-emoji{
       width: 100vw;

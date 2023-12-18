@@ -1,3 +1,4 @@
+import { TRTCVideoResolution } from '@tencentcloud/tuiroom-engine-wx';
 
 export enum SpeechMode {
   FREE_SPEECH = 'FreeSpeech', // 自由发言模式
@@ -15,3 +16,9 @@ export enum MediaDeviceState {
   DISABLED = 'DISABLED',
   UNAVAILABLE = 'UNAVAILABLE',
 }
+
+export const SMALL_VIDEO_ENC_PARAM = {
+  videoResolution: TRTCVideoResolution.TRTCVideoResolution_640_360,
+  videoFps: 15,
+  videoBitrate: 800,
+};

@@ -20,6 +20,7 @@
         :title="t('Camera')"
         :has-more="hasMore"
         :disabled="isDisabled"
+        :is-not-support="!isGetUserMediaSupported"
         @click-icon="handleClickIcon"
         @click-more="handleMore"
       >
@@ -43,12 +44,15 @@ import CameraOnIcon from '../../assets/icons/CameraOnIcon.svg';
 import CameraOffIcon from '../../assets/icons/CameraOffIcon.svg';
 import VideoSettingTab from '../common/VideoSettingTab.vue';
 import { useI18n } from '../../locales';
+import useMediaDetect from '../../hooks/useMediaDetect';
 
 interface Props {
   hasMore?: boolean,
   isMuted: boolean,
   isDisabled?: boolean,
 }
+
+const { isGetUserMediaSupported } = useMediaDetect();
 
 const props = withDefaults(defineProps<Props>(), {
   hasMore: true,

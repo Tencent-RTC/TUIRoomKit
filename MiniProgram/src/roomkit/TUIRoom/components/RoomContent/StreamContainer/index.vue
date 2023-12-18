@@ -7,12 +7,13 @@
   >
     <div :class="streamContainerClass">
       <div
-        v-show="layout === LAYOUT.LARGE_SMALL_WINDOW"
+        v-if="layout === LAYOUT.LARGE_SMALL_WINDOW"
         ref="enlargedContainerRef"
         class="enlarged-stream-container"
       >
         <stream-region
           v-if="enlargeStream"
+          :key="`${enlargeStream.userId}_${enlargeStream.streamType}`"
           :stream="enlargeStream"
         ></stream-region>
       </div>
@@ -25,15 +26,22 @@
           :class="['stream-list', `${isFirstPageInSixPointLayout ? '' : 'not-first-page'}`]"
         >
           <stream-region
-            v-for="(stream) in onlyVideoStreamList"
-            v-show="showStreamList.indexOf(stream) > -1"
-            :key="`${stream.userId}_${stream.streamType}`"
-            :stream="stream"
+            v-show="showPusher"
+            :stream="localStream"
             :enlarge-dom-id="enlargeDomId"
             :show-room-tool="showRoomTool"
             :class="[onlyVideoStreamList.length > 1 ? 'multi-stream' : 'single-stream']"
           >
           </stream-region>
+          <template v-for="(stream) in paginatedArray" :key="`${stream.userId}_${stream.streamType}`">
+            <stream-region
+              v-if="basicStore.userId !== stream.userId"
+              :stream="stream"
+              :show-room-tool="showRoomTool"
+              :class="[onlyVideoStreamList.length > 1 ? 'multi-stream' : 'single-stream']"
+            >
+            </stream-region>
+          </template>
         </div>
       </div>
     </div>
@@ -49,7 +57,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onUnmounted, Ref, ComputedRef, watch, computed } from 'vue';
+import { ref, onUnmounted, Ref, ComputedRef, watch, computed, nextTick } from 'vue';
 import { storeToRefs } from 'pinia';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
@@ -91,8 +99,12 @@ const {
   remoteStreamObj,
 } = storeToRefs(roomStore);
 const basicStore = useBasicStore();
-// 小程序默认布局为六宫格模式
-basicStore.setLayout(LAYOUT.SIX_EQUAL_POINTS);
+
+const setLayout = async (layout: LAYOUT) => {
+  await nextTick();
+  basicStore.setLayout(layout);
+};
+
 const { layout } = storeToRefs(basicStore);
 
 const enlargeStream: Ref<StreamInfo | null> = ref(null);
@@ -106,6 +118,20 @@ const onlyVideoStreamList = computed(() => (
 ));
 const currentPageIndex = ref(0);
 
+const showPusher = computed(() => (layout.value === LAYOUT.SIX_EQUAL_POINTS && isFirstPageInSixPointLayout)
+  || (layout.value === LAYOUT.LARGE_SMALL_WINDOW && currentSpeakerUserId.value === localStream.value.userId));
+
+const paginatedArray = computed(() => {
+  if (layout.value === LAYOUT.LARGE_SMALL_WINDOW) {
+    return showStreamList.value;
+  }
+  if (layout.value === LAYOUT.SIX_EQUAL_POINTS) {
+    const start = enlargeDomId.value ? (currentPageIndex.value - 1) * 6 : currentPageIndex.value * 6;
+    const end = start + 6;
+    return onlyVideoStreamList.value.slice(start, end);
+  }
+  return [];
+});
 watch(() => onlyVideoStreamList.value.length, (val) => {
   if (layout.value === LAYOUT.SIX_EQUAL_POINTS) {
     const equalPointIndex = enlargeStream.value ? currentPageIndex.value - 1 : currentPageIndex.value;
@@ -172,13 +198,13 @@ function isActiveDot(index: number) {
  *
  * 向左滑动翻页
 **/
-function handleTurnPageLeft() {
+async function handleTurnPageLeft() {
   if (currentPageIndex.value === 0) {
     return;
   }
   currentPageIndex.value = currentPageIndex.value - 1;
   if (enlargeStream.value && currentPageIndex.value === 0) {
-    basicStore.setLayout(LAYOUT.LARGE_SMALL_WINDOW);
+    await setLayout(LAYOUT.LARGE_SMALL_WINDOW);
   }
 }
 
@@ -187,13 +213,13 @@ function handleTurnPageLeft() {
  *
  * 向右滑动翻页
 **/
-function handleTurnPageRight() {
+async function handleTurnPageRight() {
   if (currentPageIndex.value === totalPageNumber.value - 1) {
     return;
   }
   currentPageIndex.value = currentPageIndex.value + 1;
   if (layout.value === LAYOUT.LARGE_SMALL_WINDOW) {
-    basicStore.setLayout(LAYOUT.SIX_EQUAL_POINTS);
+    await setLayout(LAYOUT.SIX_EQUAL_POINTS);
   }
 }
 
@@ -248,7 +274,7 @@ function handleTouchEnd(event:any) {
 **/
 
 
-const onUserVideoStateChanged = (eventInfo: {
+const onUserVideoStateChanged = async (eventInfo: {
   userId: string,
   streamType: TUIVideoStreamType,
   hasVideo: boolean,
@@ -286,9 +312,10 @@ const onUserVideoStateChanged = (eventInfo: {
   // 当远端屏幕分享变化的时候，处理流布局
   if (userId !== basicStore.userId && streamType === TUIVideoStreamType.kScreenStream) {
     if (hasVideo) {
-      enlargeStream.value = roomStore.remoteStreamObj[`${userId}_${streamType}`] as StreamInfo;
-      if (enlargeStream.value) {
-        basicStore.setLayout(LAYOUT.LARGE_SMALL_WINDOW);
+      const largeStream = roomStore.remoteStreamObj[`${userId}_${streamType}`] as StreamInfo;
+      if (largeStream) {
+        enlargeStream.value = largeStream;
+        await setLayout(LAYOUT.LARGE_SMALL_WINDOW);
         currentPageIndex.value = 0;
       }
     } else {
@@ -307,7 +334,7 @@ const onUserVideoStateChanged = (eventInfo: {
           enlargeStream.value = null;
         }
         if (layout.value === LAYOUT.LARGE_SMALL_WINDOW) {
-          basicStore.setLayout(LAYOUT.SIX_EQUAL_POINTS);
+          await setLayout(LAYOUT.SIX_EQUAL_POINTS);
           currentPageIndex.value = 0;
         } else if (layout.value === LAYOUT.SIX_EQUAL_POINTS && currentPageIndex.value > 0) {
           currentPageIndex.value = currentPageIndex.value - 1;

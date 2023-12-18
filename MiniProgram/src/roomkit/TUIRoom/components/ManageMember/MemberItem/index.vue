@@ -1,48 +1,66 @@
 <template>
   <div
-    :ref="(el) => setMemberItemRef(el)"
-    @tap="handleMemberItemClick"
+    ref="memberItemContainerRef"
+    @tap="handleOpenMemberControl"
     class="member-item-container"
   >
-    <member-info :ref="(el) => setMemberInfoRef(el)" :show-state-icon="true" :user-info="userInfo"></member-info>
+    <member-info :show-state-icon="true" :user-info="props.userInfo"></member-info>
     <member-control
       v-if="showMemberControl"
-      :ref="(el) => setMemberControlRef(el)"
-      :user-info="userInfo"
-      @on-close-control="handleCloseControl"
+      :user-info="props.userInfo"
+      @on-close-control="handleDocumentTouchend"
     ></member-control>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import MemberInfo from '../MemberItemCommon/MemberInfo.vue';
 import MemberControl from '../MemberControl/index.vue';
 import { UserInfo } from '../../../stores/room';
 import useMemberItem from './useMemberItemHooks';
 
-const {
-  showMemberControl,
-  setMemberItemRef,
-  setMemberInfoRef,
-  setMemberControlRef,
-  handleMemberItemClick,
-  handleDocumentClick,
-  handleCloseControl,
-} = useMemberItem();
 
 interface Props {
   userInfo: UserInfo,
 }
+const props = defineProps<Props>();
 
-defineProps<Props>();
+const memberItemContainerRef = ref();
 
+const {
+  isMemberControlAccessible,
+  openMemberControl,
+  closeMemberControl,
+} = useMemberItem(props.userInfo.userId);
+const showMemberControl = ref(false);
+watch(isMemberControlAccessible, (accessible: boolean) => {
+  if (accessible === false) {
+    showMemberControl.value = false;
+  }
+});
+
+const handleOpenMemberControl = (event: MouseEvent | TouchEvent) => {
+  event.stopPropagation();
+  openMemberControl();
+  if (isMemberControlAccessible.value === true) {
+    showMemberControl.value = true;
+  }
+};
+
+const handleDocumentTouchend = (event: any) => {
+  if (memberItemContainerRef.value?.contains(event?.target)) {
+    return;
+  }
+  closeMemberControl();
+  showMemberControl.value = false;
+};
 onMounted(() => {
-  document?.addEventListener('click', handleDocumentClick, true);
+  document?.addEventListener('touchend', handleDocumentTouchend);
 });
 
 onUnmounted(() => {
-  document?.removeEventListener('click', handleDocumentClick, true);
+  document?.removeEventListener('touchend', handleDocumentTouchend);
 });
 
 </script>
@@ -56,7 +74,6 @@ onUnmounted(() => {
   padding: 0 32px;
   justify-content: space-between;
   &:hover {
-    cursor: pointer;
     background: var(--member-item-container-hover-bg-color);
   }
 }

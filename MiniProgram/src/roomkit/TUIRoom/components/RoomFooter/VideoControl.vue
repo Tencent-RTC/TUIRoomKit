@@ -37,7 +37,7 @@
         </tui-button>
       </template>
       <template v-if="isMobile" #agree>
-        <tui-button class="agree" size="default" type="text" @click="handleAccept">{{ t('Turn on the camera') }}</tui-button>
+        <tui-button class="agree" size="default" type="text" :custom-style="customStyle" @click="handleAccept">{{ t('Turn on the camera') }}</tui-button>
       </template>
       <template #footer>
         <tui-button class="cancel-button" size="default" @click="handleAccept">{{ t('Turn on the camera') }}</tui-button>
@@ -59,18 +59,19 @@ import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
-import { TUIRoomEngine, TUIVideoStreamType, TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-wx';
-import { isMobile, isWeChat }  from '../../utils/useMediaValue';
+import { TUIRoomEngine, TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-wx';
+import { isMobile, isWeChat, isH5 }  from '../../utils/useMediaValue';
 import { useBasicStore } from '../../stores/basic';
 import TuiButton from '../common/base/Button.vue';
 import TUIMessage from '../common/base/Message/index';
 import TUIMessageBox from '../common/base/MessageBox/index';
+import { SMALL_VIDEO_ENC_PARAM } from '../../constants/room';
 const roomEngine = useGetRoomEngine();
 
 const roomStore = useRoomStore();
 const basicStore = useBasicStore();
-const isFrontCamera: Ref<boolean> = ref(basicStore.isFrontCamera);
 const emits = defineEmits(['click']);
+const customStyle = { color: '#1C66E5' };
 
 const {
   isCameraDisableForAllUser,
@@ -128,7 +129,11 @@ async function toggleMuteVideo() {
       view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
     });
     if (isMobile) {
-      await roomEngine.instance?.openLocalCamera({ isFrontCamera: isFrontCamera.value });
+      if (isH5) {
+        const trtcCloud = roomEngine.instance?.getTRTCCloud();
+        trtcCloud.enableSmallVideoStream(false, SMALL_VIDEO_ENC_PARAM);
+      }
+      await roomEngine.instance?.openLocalCamera({ isFrontCamera: basicStore.isFrontCamera });
     } else {
       await roomEngine.instance?.openLocalCamera();
     }
