@@ -144,10 +144,24 @@ extension TUIVideoSeatViewModel {
     
     func switchPosition() {
         if videoSeatViewType == .largeSmallWindowType {
-            isSwitchPosition = !isSwitchPosition
-            reloadSeatItems()
+            isSwitchPosition = !self.isSwitchPosition
+            sortSeatItems()
+            listSeatItem = Array(videoSeatItems)
+            switchLargeSmallWindow()
             viewResponder?.reloadData()
+            resetMiniscreen()
         }
+    }
+    
+    private func switchLargeSmallWindow() {
+        guard videoSeatViewType == .largeSmallWindowType else { return }
+        if isSwitchPosition {
+            let first = listSeatItem[0]
+            listSeatItem[0] = listSeatItem[1]
+            listSeatItem[1] = first
+        }
+        smallItem = listSeatItem[1]
+        listSeatItem = [listSeatItem[0]]
     }
     
     func updateSpeakerPlayVideoState(currentPageIndex: Int) {
@@ -310,13 +324,7 @@ extension TUIVideoSeatViewModel {
         } else if videoSeatItems.count == 2, isHasVideoStream,!isHasScreenStream {
             // 双人 大小窗切换
             videoSeatViewType = .largeSmallWindowType
-            if isSwitchPosition {
-                let first = listSeatItem[0]
-                listSeatItem[0] = listSeatItem[1]
-                listSeatItem[1] = first
-            }
-            smallItem = listSeatItem[1]
-            listSeatItem = [listSeatItem[0]]
+            switchLargeSmallWindow()
         } else if videoSeatItems.count >= 2, !isHasVideoStream {
             // 多人 纯音频模式
             videoSeatViewType = .pureAudioType
