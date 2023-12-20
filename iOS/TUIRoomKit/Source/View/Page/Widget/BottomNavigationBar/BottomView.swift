@@ -104,7 +104,8 @@ class BottomView: UIView {
                      .floatWindowItemType,
                      .setupItemType,
                      .advancedSettingItemType,
-                     .recordItemType:
+                     .recordItemType,
+                     .beautyItemType:
                     moreButtonMenuView.addArrangedSubview(view)
                 default:
                     break
@@ -124,7 +125,8 @@ class BottomView: UIView {
                      .floatWindowItemType,
                      .setupItemType,
                      .advancedSettingItemType,
-                     .recordItemType:
+                     .recordItemType,
+                     .beautyItemType:
                     moreButtonMenuView.addArrangedSubview(view)
                 default:
                     break

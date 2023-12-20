@@ -79,6 +79,7 @@
 "TUIRoom.beauty" = "Beauty";
 "TUIRoom.record" = "Record";
 "TUIRoom.drop" = "Drop";
+"TUIRoom.beauty" = "Beauty";
 "TUIRoom.switch.layout" = "Switch layout";
 
 "TUIRoom.leave" = "Leave";
