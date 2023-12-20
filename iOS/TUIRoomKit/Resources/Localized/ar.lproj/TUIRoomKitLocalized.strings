@@ -154,6 +154,7 @@
 "TUIRoom.share.off" = "التوقف عن المشاركة";
 "TUIRoom.unfold" = "يوسع";
 "TUIRoom.drop" = "وضع بعيدا";
+"TUIRoom.beauty" = "جمال";
 "TUIRoom.appoint.owner" = "إذا كنت لا ترغب في إنهاء الغرفة، فقم بتعيين مضيف جديد قبل مغادرة الغرفة";
 "TUIRoom.leave.room.tip" = "هل أنت متأكد أنك تريد مغادرة الغرفة؟";
 "TUIRoom.room.type" = "نوع الغرفة";

@@ -32,6 +32,7 @@ class ButtonItemData {
         case advancedSettingItemType
         case switchMicItemType
         case switchCamaraItemType
+        case beautyItemType
     }
     enum Orientation {
         case left

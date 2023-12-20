@@ -530,6 +530,10 @@ class EngineManager: NSObject {
     func setRemoteRenderParams(userId: String, streamType: TRTCVideoStreamType, params: TRTCRenderParams) {
         roomEngine.getTRTCCloud().setRemoteRenderParams(userId, streamType: streamType, params: params)
     }
+    
+    func getBeautyManager() -> TXBeautyManager {
+        roomEngine.getBeautyManager()
+    }
 }
 
 // MARK: - Private

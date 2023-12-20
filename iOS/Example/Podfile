@@ -17,6 +17,7 @@ def tool
   pod 'TXAppBasic'
   pod 'TIMCommon'
   pod 'TXIMSDK_Plus_iOS'
+  pod 'TUIBeauty'
 end
 
 # 本地依赖库

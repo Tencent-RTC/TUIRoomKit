@@ -22,6 +22,7 @@ protocol RoomMainViewResponder: AnyObject {
     func updateMuteAudioButton(isSelected: Bool)
     func showExitRoomView()
     func showAlert(title: String?, message: String?, sureTitle:String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?)
+    func showBeautyView()
 }
 
 class RoomMainViewModel: NSObject {
@@ -83,6 +84,7 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasAudioStream, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowExitRoomView, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
     
     private func unsubscribeEngine() {
@@ -95,6 +97,7 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasAudioStream, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowExitRoomView, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
 
     func respondUserOnSeat(isAgree: Bool, requestId: String) {
@@ -246,6 +249,16 @@ extension RoomMainViewModel: RoomMainViewFactory {
         return muteAudioButton
     }
     
+    func makeBeautyView() -> UIView? {
+        let beautyManager = engineManager.getBeautyManager()
+        let beautyList = TUICore.getExtensionList(TUICore_TUIBeautyExtension_BeautyView, param: [
+            TUICore_TUIBeautyExtension_BeautyView_BeautyManager: beautyManager,])
+        guard beautyList.count > 0 else { return nil }
+        guard let view = beautyList[0].data?[TUICore_TUIBeautyExtension_BeautyView_View] as? UIView else { return nil }
+        view.isHidden = true
+        return view
+    }
+    
     @objc private func muteAudioAction(sender: UIButton) {
         if currentUser.hasAudioStream {
             engineManager.muteLocalAudio()
@@ -286,6 +299,8 @@ extension RoomMainViewModel: RoomKitUIEventResponder {
             viewResponder?.updateMuteAudioButton(isSelected: !currentUser.hasAudioStream)
         case .TUIRoomKitService_ShowExitRoomView:
             viewResponder?.showExitRoomView()
+        case .TUIRoomKitService_ShowBeautyView:
+            viewResponder?.showBeautyView()
         default: break
         }
     }

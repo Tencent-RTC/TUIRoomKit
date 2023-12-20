@@ -15,6 +15,7 @@ protocol RoomMainViewFactory {
     func makeVideoSeatView() -> UIView
     func makeRaiseHandNoticeView() -> UIView
     func makeMuteAudioButton() -> UIButton
+    func makeBeautyView() -> UIView?
 }
 
 struct RoomMainViewLayout { //横竖屏切换时的布局变化
@@ -65,6 +66,10 @@ class RoomMainView: UIView {
         return viewFactory.makeMuteAudioButton()
     }()
     
+    lazy var beautyView: UIView? = {
+        return viewFactory.makeBeautyView()
+    }()
+    
     // MARK: - view layout
     private var isViewReady: Bool = false
     override func didMoveToWindow() {
@@ -90,6 +95,9 @@ class RoomMainView: UIView {
         addSubview(bottomView)
         addSubview(muteAudioButton)
         addSubview(raiseHandNoticeView)
+        if let beautyView = beautyView {
+            addSubview(beautyView)
+        }
     }
     
     func activateConstraints() {
@@ -105,6 +113,9 @@ class RoomMainView: UIView {
             make.width.height.equalTo(40)
             make.bottom.equalToSuperview().offset(-40)
         }
+        beautyView?.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
     }
     
     private func bindInteraction() {
@@ -147,6 +158,15 @@ class RoomMainView: UIView {
             }
         }
         topView.updateRootViewOrientation(isLandscape: isLandscape)
+        beautyView?.snp.remakeConstraints({ make in
+            if !isLandscape {
+                make.edges.equalToSuperview()
+            } else {
+                make.top.bottom.equalToSuperview()
+                make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
+                make.width.equalTo(min(kScreenWidth, kScreenHeight))
+            }
+        })
     }
     
     deinit {
@@ -156,6 +176,10 @@ class RoomMainView: UIView {
 }
 
 extension RoomMainView: RoomMainViewResponder {
+    func showBeautyView() {
+        beautyView?.isHidden = false
+    }
+    
     func showExitRoomView() {
         let view = ExitRoomView(viewModel: ExitRoomViewModel())
         view.show(rootView: self)

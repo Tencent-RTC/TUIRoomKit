@@ -180,6 +180,19 @@ class BottomViewModel: NSObject {
         return dropItem
     }
     
+    var beautyItem: ButtonItemData {
+        let beautyItem = ButtonItemData()
+        beautyItem.normalTitle = .beautyText
+        beautyItem.resourceBundle = tuiRoomKitBundle()
+        beautyItem.normalIcon = "room_beauty"
+        beautyItem.buttonType = .beautyItemType
+        beautyItem.action = { [weak self] sender in
+            guard let self = self, let button = sender as? UIButton else { return }
+            self.beautyAction(sender: button)
+        }
+        return beautyItem
+    }
+    
     override init() {
         super.init()
         createBottomData()
@@ -222,6 +235,9 @@ class BottomViewModel: NSObject {
     func createMoreBottomData(){
         viewItems.append(inviteItem)
         viewItems.append(floatItem)
+        if hasBeautyItem() {
+            viewItems.append(beautyItem)
+        }
         viewItems.append(setupItem)
         viewItems.append(dropItem)
         viewItems.append(recordItem)
@@ -393,6 +409,10 @@ class BottomViewModel: NSObject {
         }
     }
     
+    func beautyAction(sender: UIButton) {
+        engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_ShowBeautyView, param: [:])
+    }
+    
     @objc func onUserScreenCaptureStarted(notification:Notification)
     {
         guard let screen = notification.object as? UIScreen else {return}
@@ -428,6 +448,10 @@ extension BottomViewModel {
     
     private func hasTUIChatItem() -> Bool {
         return TUICore.getService(TUICore_TUIChatService) != nil
+    }
+    
+    private func hasBeautyItem() -> Bool {
+        return TUICore.getService(TUICore_TUIBeautyService) != nil
     }
     
     //修改item的点击情况，type用于区分item，isSelected用来设置点击状态，如果不传入isSelected则点击状态默认取反
@@ -645,5 +669,8 @@ private extension String {
     }
     static var othersScreenSharingText: String {
         localized("TUIRoom.others.screen.sharing")
+    }
+    static var beautyText: String {
+        localized("TUIRoom.beauty")
     }
 }
