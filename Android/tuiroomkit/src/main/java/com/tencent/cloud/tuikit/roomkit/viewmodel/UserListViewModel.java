@@ -47,13 +47,14 @@ public class UserListViewModel
 
         initUserModelList();
         subscribeEvent();
+        Log.d(TAG, "UserListViewModel new : " + this);
     }
 
     public void updateViewInitState() {
         mUserListView.updateMuteVideoView(mRoomStore.roomInfo.isCameraDisableForAllUser);
         mUserListView.updateMuteAudioView(mRoomStore.roomInfo.isMicrophoneDisableForAllUser);
         mUserListView.updateMemberCount(mRoomStore.getTotalUserCount());
-        mUserListView.setOwner(isOwner());
+        mUserListView.updateViewForRole(mRoomStore.userModel.role);
     }
 
     private void subscribeEvent() {
@@ -76,6 +77,7 @@ public class UserListViewModel
 
     public void destroy() {
         unSubscribeEvent();
+        Log.d(TAG, "UserListViewModel destroy : " + this);
     }
 
     private void unSubscribeEvent() {
@@ -101,64 +103,13 @@ public class UserListViewModel
     }
 
     public void muteAllUserAudio() {
-        if (!isOwner()) {
-            return;
-        }
-        boolean isMute = !mRoomStore.roomInfo.isMicrophoneDisableForAllUser;
-        if (isMute) {
-            onMuteAllUserAudio();
-        } else {
-            onUnMuteAllUserAudio();
-        }
-        mUserListView.updateMuteAudioView(isMute);
-    }
-
-    private boolean isOwner() {
-        return TUIRoomDefine.Role.ROOM_OWNER.equals(mRoomStore.userModel.role);
-    }
-
-    private void onMuteAllUserAudio() {
-        mRoomEngine.disableDeviceForAllUserByAdmin(TUIRoomDefine.MediaDevice.MICROPHONE, true,
-                new TUIRoomDefine.ActionCallback() {
-                    @Override
-                    public void onSuccess() {
-                        mUserListView.disableMuteAllAudio(true);
-                    }
-
-                    @Override
-                    public void onError(TUICommonDefine.Error error, String message) {
-                        Log.e(TAG, "disableDeviceForAllUserByAdmin MICROPHONE error:" + error + ",msg:" + message);
-                    }
-                });
-    }
-
-    private void onUnMuteAllUserAudio() {
-        mRoomEngine.disableDeviceForAllUserByAdmin(TUIRoomDefine.MediaDevice.MICROPHONE, false,
-                new TUIRoomDefine.ActionCallback() {
-                    @Override
-                    public void onSuccess() {
-                        mUserListView.disableMuteAllAudio(false);
-                    }
-
-                    @Override
-                    public void onError(TUICommonDefine.Error error, String message) {
-                        Log.e(TAG, "enableDeviceForAllUserByAdmin MICROPHONE error:" + error + ",msg:" + message);
-                    }
-                });
+        RoomEngineManager.sharedInstance().disableDeviceForAllUserByAdmin(TUIRoomDefine.MediaDevice.MICROPHONE,
+                !mRoomStore.roomInfo.isMicrophoneDisableForAllUser, null);
     }
 
     public void muteAllUserVideo() {
-        if (!isOwner()) {
-            return;
-        }
-
-        boolean isMute = !mRoomStore.roomInfo.isCameraDisableForAllUser;
-        if (isMute) {
-            onMuteAllVideo();
-        } else {
-            onUnMuteAllUserVideo();
-        }
-        mUserListView.updateMuteVideoView(isMute);
+        RoomEngineManager.sharedInstance().disableDeviceForAllUserByAdmin(TUIRoomDefine.MediaDevice.CAMERA,
+                !mRoomStore.roomInfo.isCameraDisableForAllUser, null);
     }
 
     public List<UserEntity> getUserList() {
@@ -179,44 +130,14 @@ public class UserListViewModel
         return searchList;
     }
 
-    private void onMuteAllVideo() {
-        mRoomEngine.disableDeviceForAllUserByAdmin(TUIRoomDefine.MediaDevice.CAMERA, true,
-                new TUIRoomDefine.ActionCallback() {
-                    @Override
-                    public void onSuccess() {
-                        mUserListView.disableMuteAllVideo(true);
-                    }
-
-                    @Override
-                    public void onError(TUICommonDefine.Error error, String message) {
-                        Log.e(TAG, "enableDeviceForAllUserByAdmin CAMERA error:" + error + ",msg:" + message);
-                    }
-                });
-    }
-
-    private void onUnMuteAllUserVideo() {
-        mRoomEngine.disableDeviceForAllUserByAdmin(TUIRoomDefine.MediaDevice.CAMERA, false,
-                new TUIRoomDefine.ActionCallback() {
-                    @Override
-                    public void onSuccess() {
-                        mUserListView.disableMuteAllVideo(false);
-                    }
-
-                    @Override
-                    public void onError(TUICommonDefine.Error error, String message) {
-                        Log.e(TAG, "enableDeviceForAllUserByAdmin CAMERA error:" + error + ",msg:" + message);
-                    }
-                });
-    }
-
     @Override
     public void onEngineEvent(RoomEventCenter.RoomEngineEvent event, Map<String, Object> params) {
         switch (event) {
             case ALL_USER_CAMERA_DISABLE_CHANGED:
-                allUserCameraDisableChanged(params);
+                onAllUserCameraDisableChanged(params);
                 break;
             case ALL_USER_MICROPHONE_DISABLE_CHANGED:
-                allUserMicrophoneDisableChanged(params);
+                onAllUserMicrophoneDisableChanged(params);
                 break;
             case USER_ROLE_CHANGED:
                 onUserRoleChange(params);
@@ -244,34 +165,26 @@ public class UserListViewModel
         }
     }
 
-    private void allUserCameraDisableChanged(Map<String, Object> params) {
+    private void onAllUserCameraDisableChanged(Map<String, Object> params) {
         if (params == null) {
             return;
         }
-        if (isOwner()) {
-            return;
-        }
-        String userId = (String) params.get(RoomEventConstant.KEY_USER_ID);
-        if (TextUtils.isEmpty(userId)) {
-            return;
-        }
         boolean isDisable = (Boolean) params.get(RoomEventConstant.KEY_IS_DISABLE);
-        mUserListView.disableMuteAllVideo(isDisable);
+        mUserListView.toastForAllVideoDisableState(isDisable);
+        if (mRoomStore.userModel.role != TUIRoomDefine.Role.GENERAL_USER) {
+            mUserListView.updateMuteVideoView(isDisable);
+        }
     }
 
-    private void allUserMicrophoneDisableChanged(Map<String, Object> params) {
+    private void onAllUserMicrophoneDisableChanged(Map<String, Object> params) {
         if (params == null) {
             return;
         }
-        if (isOwner()) {
-            return;
-        }
-        String userId = (String) params.get(RoomEventConstant.KEY_USER_ID);
-        if (TextUtils.isEmpty(userId)) {
-            return;
-        }
         boolean isDisable = (Boolean) params.get(RoomEventConstant.KEY_IS_DISABLE);
-        mUserListView.disableMuteAllAudio(isDisable);
+        mUserListView.toastForAllAudioDisableState(isDisable);
+        if (mRoomStore.userModel.role != TUIRoomDefine.Role.GENERAL_USER) {
+            mUserListView.updateMuteAudioView(isDisable);
+        }
     }
 
     private void onUserRoleChange(Map<String, Object> params) {
@@ -279,16 +192,16 @@ public class UserListViewModel
             return;
         }
 
-        String userId = (String) params.get(RoomEventConstant.KEY_USER_ID);
-        if (TextUtils.isEmpty(userId) || !mRoomStore.userModel.userId.equals(userId)) {
+        int position = (int) params.get(KEY_USER_POSITION);
+        if (position == USER_NOT_FOUND) {
             return;
         }
-        TUIRoomDefine.Role role = (TUIRoomDefine.Role) params.get(RoomEventConstant.KEY_ROLE);
-        if (role == null) {
-            return;
+        UserEntity changeUser = mRoomStore.allUserList.get(position);
+        if (TextUtils.equals(mRoomStore.userModel.userId, changeUser.getUserId())) {
+            mUserListView.updateViewForRole(mRoomStore.userModel.role);
+        } else {
+            mUserListView.notifyUserStateChanged(position);
         }
-
-        mUserListView.setOwner(TUIRoomDefine.Role.ROOM_OWNER.equals(role));
     }
 
     private void onUserCameraStateChanged(Map<String, Object> params) {

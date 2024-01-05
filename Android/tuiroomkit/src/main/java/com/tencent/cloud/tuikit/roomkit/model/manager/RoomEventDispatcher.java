@@ -118,17 +118,12 @@ public class RoomEventDispatcher extends TUIRoomObserver {
 
     @Override
     public void onUserRoleChanged(String userId, TUIRoomDefine.Role role) {
+        Log.d(TAG, "onUserRoleChanged userId=" + userId + " role=" + role);
         if (TextUtils.equals(userId, mRoomStore.userModel.userId)) {
             mRoomStore.userModel.role = role;
             RoomEngineManager.sharedInstance().autoTakeSeatForOwner(null);
         }
-        if (role == TUIRoomDefine.Role.ROOM_OWNER) {
-            mRoomStore.roomInfo.ownerId = userId;
-        }
-        Map<String, Object> map = new HashMap<>();
-        map.put(RoomEventConstant.KEY_USER_ID, userId);
-        map.put(RoomEventConstant.KEY_ROLE, role);
-        RoomEventCenter.getInstance().notifyEngineEvent(RoomEventCenter.RoomEngineEvent.USER_ROLE_CHANGED, map);
+        mRoomStore.handleUserRoleChanged(userId, role);
     }
 
     @Override
@@ -168,7 +163,7 @@ public class RoomEventDispatcher extends TUIRoomObserver {
 
     @Override
     public void onSendMessageForUserDisableChanged(String roomId, String userId, boolean isDisable) {
-        mRoomStore.disableUserSendingMsg(userId, isDisable);
+        mRoomStore.enableUserSendingMsg(userId, !isDisable);
     }
 
     @Override
@@ -202,7 +197,6 @@ public class RoomEventDispatcher extends TUIRoomObserver {
         Log.d(TAG, "onSeatListChanged");
         RoomEngineManager manager = RoomEngineManager.sharedInstance();
         for (TUIRoomDefine.SeatInfo item : seatedList) {
-            mRoomStore.setUserOnSeat(item.userId, true);
             manager.getUserInfo(item.userId, new TUIRoomDefine.GetUserInfoCallback() {
                 @Override
                 public void onSuccess(TUIRoomDefine.UserInfo userInfo) {
@@ -218,7 +212,6 @@ public class RoomEventDispatcher extends TUIRoomObserver {
         }
 
         for (TUIRoomDefine.SeatInfo item : leftList) {
-            mRoomStore.setUserOnSeat(item.userId, false);
             Log.d(TAG, "onSeatListChanged remoteUserLeaveSeat userId=" + item.userId);
             mRoomStore.remoteUserLeaveSeat(item.userId);
         }

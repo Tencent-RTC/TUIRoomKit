@@ -28,18 +28,20 @@ import java.util.Map;
 
 public class RoomMainActivity extends AppCompatActivity
         implements RoomEventCenter.RoomKitUIEventResponder, RoomEventCenter.RoomEngineEventResponder {
-    private static final String TAG = "RoomMainActivity";
+    private static final String TAG = "RoomMainAy";
+
+    private ViewGroup mRootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreate : " + this);
         setContentView(R.layout.tuiroomkit_activity_meeting);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         initStatusBar();
         RoomMainView meetingView = new RoomMainView(this);
-        ViewGroup rootView = findViewById(R.id.root_view);
-        rootView.addView(meetingView);
+        mRootView = findViewById(R.id.root_view);
+        mRootView.addView(meetingView);
 
         subscribeEvent();
     }
@@ -87,13 +89,15 @@ public class RoomMainActivity extends AppCompatActivity
     public void finish() {
         super.finish();
         Log.d(TAG, "finish");
+        unSubscribeEvent();
+        mRootView.removeAllViews();
+        mRootView = null;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy");
-        unSubscribeEvent();
+        Log.d(TAG, "onDestroy : " + this);
     }
 
     @Override
@@ -118,8 +122,8 @@ public class RoomMainActivity extends AppCompatActivity
     }
 
     private void unSubscribeEvent() {
-        RoomEventCenter.getInstance().subscribeEngine(LOCAL_USER_DESTROY_ROOM, this);
-        RoomEventCenter.getInstance().subscribeEngine(LOCAL_USER_EXIT_ROOM, this);
+        RoomEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_DESTROY_ROOM, this);
+        RoomEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_EXIT_ROOM, this);
         RoomEventCenter.getInstance().unsubscribeEngine(REQUEST_RECEIVED, this);
 
         RoomEventCenter.getInstance().unsubscribeUIEvent(ENTER_FLOAT_WINDOW, this);

@@ -348,7 +348,6 @@ public class RoomPresenterImpl extends RoomPresenter implements IRoomCallback, R
         removeObserver();
         sRoomPresenter = null;
         mRoomTaskStoreHouse.destroyRoomTaskStoreHouse();
-        BusinessSceneUtil.clearJoinRoomFlag();
         BusinessSceneUtil.setChatAccessRoom(false);
         RoomEventCenter.getInstance().unsubscribeUIEvent(SEND_IM_MSG_COMPLETE, this);
     }
