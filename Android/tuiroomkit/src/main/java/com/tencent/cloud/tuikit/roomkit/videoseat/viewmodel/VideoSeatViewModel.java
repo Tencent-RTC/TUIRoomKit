@@ -174,7 +174,7 @@ public class VideoSeatViewModel extends TUIRoomObserver implements IVideoSeatVie
             return;
         }
         if (available) {
-            if (mLatestSpeakerMode != Constants.SPEAKER_MODE_NONE) {
+            if (mLatestSpeakerMode == Constants.SPEAKER_MODE_SCREEN_SHARING) {
                 Log.w(TAG, "Screen sharing is started");
                 return;
             }

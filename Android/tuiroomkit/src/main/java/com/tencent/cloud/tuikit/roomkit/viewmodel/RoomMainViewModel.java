@@ -2,6 +2,7 @@ package com.tencent.cloud.tuikit.roomkit.viewmodel;
 
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomConstant.USER_NOT_FOUND;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.KICKED_OFF_SEAT;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_SCREEN_STATE_CHANGED;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.BAR_SHOW_TIME_RECOUNT;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.DISMISS_APPLY_LIST;
@@ -103,6 +104,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.USER_SCREEN_CAPTURE_STOPPED, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.USER_ROLE_CHANGED, this);
         eventCenter.subscribeEngine(LOCAL_SCREEN_STATE_CHANGED, this);
+        eventCenter.subscribeEngine(KICKED_OFF_SEAT, this);
     }
 
     public void destroy() {
@@ -142,6 +144,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.USER_SCREEN_CAPTURE_STOPPED, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.USER_ROLE_CHANGED, this);
         eventCenter.unsubscribeEngine(LOCAL_SCREEN_STATE_CHANGED, this);
+        eventCenter.unsubscribeEngine(KICKED_OFF_SEAT, this);
     }
 
     public boolean isOwner() {
@@ -348,6 +351,10 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
                 onScreenShareStateChanged();
                 break;
 
+            case KICKED_OFF_SEAT:
+                onKickedOffSeat();
+                break;
+
             default:
                 break;
         }
@@ -373,7 +380,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     }
 
     private void onUserCameraStateChanged(Map<String, Object> params) {
-        if (params == null) {
+        if (params == null || !mRoomStore.userModel.isOnSeat()) {
             return;
         }
         int position = (int) params.get(KEY_USER_POSITION);
@@ -389,7 +396,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     }
 
     private void onUserMicStateChanged(Map<String, Object> params) {
-        if (params == null) {
+        if (params == null || !mRoomStore.userModel.isOnSeat()) {
             return;
         }
         int position = (int) params.get(KEY_USER_POSITION);
@@ -402,6 +409,10 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
                 && TUIRoomDefine.ChangeReason.BY_ADMIN == changeReason) {
             onMicrophoneMuted(!micUser.isHasAudioStream());
         }
+    }
+
+    private void onKickedOffSeat() {
+        ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_tip_kicked_off_seat));
     }
 
     private void allUserCameraDisableChanged(Map<String, Object> params) {
