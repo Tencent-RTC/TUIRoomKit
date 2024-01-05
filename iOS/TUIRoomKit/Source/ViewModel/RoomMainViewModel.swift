@@ -19,7 +19,6 @@ protocol RoomMainViewResponder: AnyObject {
     func makeToast(text: String)
     func changeToolBarHiddenState()
     func setToolBarDelayHidden(isDelay: Bool)
-    func updateMuteAudioButton(isSelected: Bool)
     func showExitRoomView()
     func showAlert(title: String?, message: String?, sureTitle:String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?)
     func showBeautyView()
@@ -43,6 +42,7 @@ class RoomMainViewModel: NSObject {
     private var isShownOpenCameraInviteAlert = false
     private var isShownOpenMicrophoneInviteAlert = false
     private var isShownTakeSeatInviteAlert = false
+    private weak var localAudioViewModel: LocalAudioViewModel?
     
     override init() {
         super.init()
@@ -78,11 +78,13 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRequestReceived, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onAllUserMicrophoneDisableChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onAllUserCameraDisableChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onKickedOffSeat, observer: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserMuteMessage, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasAudioStream, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowExitRoomView, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
@@ -91,15 +93,17 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onRequestReceived, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onAllUserMicrophoneDisableChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onAllUserCameraDisableChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOffSeat, observer: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserMuteMessage, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserHasAudioStream, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowExitRoomView, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
-
+    
     func respondUserOnSeat(isAgree: Bool, requestId: String) {
         engineManager.responseRemoteRequest(requestId, agree: isAgree) { [weak self] in
             guard let self = self else { return }
@@ -107,6 +111,14 @@ class RoomMainViewModel: NSObject {
         } onError: { code, message in
             debugPrint("responseRemoteRequest:code:\(code),message:\(message)")
         }
+    }
+    
+    func hideLocalAudioView() {
+        localAudioViewModel?.hideLocalAudioView()
+    }
+    
+    func showLocalAudioView() {
+        localAudioViewModel?.showLocalAudioView()
     }
     
     deinit {
@@ -133,6 +145,29 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 self.roomRouter.dismissAllRoomPopupViewController()
                 self.roomRouter.popToRoomEntranceViewController()
             }, declineBlock: nil)
+        }
+        
+        if name == .onAllUserMicrophoneDisableChanged {
+            guard let isDisable = param?["isDisable"] as? Bool else { return }
+            if isDisable {
+                RoomRouter.makeToastInCenter(toast: .allMuteAudioText, duration: 1.5)
+            } else {
+                RoomRouter.makeToastInCenter(toast: .allUnMuteAudioText, duration: 1.5)
+            }
+        }
+        
+        if name == .onAllUserCameraDisableChanged {
+            guard let isDisable = param?["isDisable"] as? Bool else { return }
+            if isDisable {
+                RoomRouter.makeToastInCenter(toast: .allMuteVideoText, duration: 1.5)
+            } else {
+                RoomRouter.makeToastInCenter(toast: .allUnMuteVideoText, duration: 1.5)
+            }
+        }
+        
+        if name == .onKickedOffSeat {
+            guard let userId = param?["userId"] as? String else { return }
+            viewResponder?.makeToast(text: .kickedOffSeat)
         }
         
         if name == .onRequestReceived {
@@ -202,7 +237,6 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                 }
             default: break
             }
-            
         }
     }
 }
@@ -238,15 +272,12 @@ extension RoomMainViewModel: RoomMainViewFactory {
         return raiseHandNoticeView
     }
     
-    func makeMuteAudioButton() -> UIButton {
-        let muteAudioButton = UIButton()
-        muteAudioButton.setImage(UIImage(named: "room_mic_on", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
-        muteAudioButton.setImage(UIImage(named: "room_mic_off", in: tuiRoomKitBundle(), compatibleWith: nil), for: .selected)
-        muteAudioButton.isSelected = !currentUser.hasAudioStream
-        muteAudioButton.backgroundColor = UIColor(0x2A2D38)
-        muteAudioButton.addTarget(self, action: #selector(muteAudioAction(sender: )), for: .touchUpInside)
-        muteAudioButton.layer.cornerRadius = 12
-        return muteAudioButton
+    func makeLocalAudioView() -> UIView {
+        let localAudioViewModel  = LocalAudioViewModel()
+        localAudioViewModel.hideLocalAudioView()
+        let view = LocalAudioView(viewModel: localAudioViewModel)
+        self.localAudioViewModel = localAudioViewModel
+        return view
     }
     
     func makeBeautyView() -> UIView? {
@@ -258,26 +289,6 @@ extension RoomMainViewModel: RoomMainViewFactory {
         view.isHidden = true
         return view
     }
-    
-    @objc private func muteAudioAction(sender: UIButton) {
-        if currentUser.hasAudioStream {
-            engineManager.muteLocalAudio()
-            return
-        }
-        //如果房主全体静音，房间成员不可打开麦克风
-        if self.roomInfo.isMicrophoneDisableForAllUser && self.currentUser.userId != roomInfo.ownerId {
-            viewResponder?.makeToast(text: .muteAudioRoomReasonText)
-            return
-        }
-        //如果是举手发言房间，并且没有上麦，不可打开麦克风
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
-            viewResponder?.makeToast(text: .muteSeatReasonText)
-            return
-        }
-        engineManager.unmuteLocalAudio()
-        guard !engineManager.store.audioSetting.isMicOpened else { return }
-        engineManager.openLocalMicrophone()
-    }
 }
 
 extension RoomMainViewModel: RoomKitUIEventResponder {
@@ -285,8 +296,20 @@ extension RoomMainViewModel: RoomKitUIEventResponder {
         switch key{
         case .TUIRoomKitService_CurrentUserRoleChanged:
             guard let userRole = info?["userRole"] as? TUIRole else { return }
-            guard userRole == .roomOwner else { return }
-            viewResponder?.showAlert(title: .haveBecomeMasterText, message: nil,sureTitle: .alertOkText, declineTitle: nil, sureBlock: nil, declineBlock: nil)
+            switch userRole {
+            case .roomOwner:
+                viewResponder?.showAlert(title: .haveBecomeMasterText, message: nil,sureTitle: .alertOkText, declineTitle: nil, sureBlock: nil, declineBlock: nil)
+            case .administrator:
+                if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
+                    viewResponder?.showAlert(title: .haveBecomeAdministratorText, message: .setAsAdministratorMessageText, sureTitle: .joinStageImmediatelyText, declineTitle: .notYetJoinStageText, sureBlock: { [weak self] in
+                        guard let self = self else { return }
+                        self.engineManager.takeSeat()
+                    }, declineBlock: nil)
+                } else {
+                    viewResponder?.showAlert(title: .haveBecomeAdministratorText, message: nil,sureTitle: .alertOkText, declineTitle: nil, sureBlock: nil, declineBlock: nil)
+                }
+            default: break
+            }
         case .TUIRoomKitService_CurrentUserMuteMessage:
             guard let isMute = info?["isMute"] as? Bool else { return }
             viewResponder?.makeToast(text: isMute ? .messageTurnedOffText : .messageTurnedOnText)
@@ -295,8 +318,6 @@ extension RoomMainViewModel: RoomKitUIEventResponder {
         case .TUIRoomKitService_SetToolBarDelayHidden:
             guard let isDelay = info?["isDelay"] as? Bool else { return }
             viewResponder?.setToolBarDelayHidden(isDelay: isDelay)
-        case .TUIRoomKitService_CurrentUserHasAudioStream:
-            viewResponder?.updateMuteAudioButton(isSelected: !currentUser.hasAudioStream)
         case .TUIRoomKitService_ShowExitRoomView:
             viewResponder?.showExitRoomView()
         case .TUIRoomKitService_ShowBeautyView:
@@ -331,14 +352,11 @@ private extension String {
     static var messageTurnedOnText: String {
         localized("TUIRoom.homeowners.notice.message.turned.on")
     }
-    static var muteAudioRoomReasonText: String {
-        localized("TUIRoom.mute.audio.room.reason")
-    }
-    static var muteSeatReasonText: String {
-        localized("TUIRoom.mute.seat.reason")
-    }
     static var haveBecomeMasterText: String {
         localized("TUIRoom.have.become.master")
+    }
+    static var haveBecomeAdministratorText: String {
+        localized("TUIRoom.have.become.administrator")
     }
     static var kickedOffLineText: String {
         localized("TUIRoom.kicked.off.line")
@@ -354,5 +372,29 @@ private extension String {
     }
     static var agreeSeatText: String {
         localized("TUIRoom.agree.seat")
+    }
+    static var allMuteAudioText: String {
+        localized("TUIRoom.all.mute.audio.prompt")
+    }
+    static var allMuteVideoText: String {
+        localized("TUIRoom.all.mute.video.prompt")
+    }
+    static var allUnMuteAudioText: String {
+        localized("TUIRoom.all.unmute.audio.prompt")
+    }
+    static var allUnMuteVideoText: String {
+        localized("TUIRoom.all.unmute.video.prompt")
+    }
+    static var notYetJoinStageText: String {
+        localized("TUIRoom.not.yet.join.stage")
+    }
+    static var joinStageImmediatelyText: String {
+        localized("TUIRoom.join.stage.immediately")
+    }
+    static var setAsAdministratorMessageText: String {
+        localized("TUIRoom.set.as.administrator.message")
+    }
+    static var kickedOffSeat: String {
+        localized("TUIRoom.kicked.off.seat")
     }
 }

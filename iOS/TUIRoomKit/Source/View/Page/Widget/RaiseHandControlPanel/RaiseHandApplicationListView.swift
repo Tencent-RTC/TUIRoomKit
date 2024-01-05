@@ -178,10 +178,7 @@ class RaiseHandApplicationListView: UIView {
     private func setupViewState() {
         let currentUser = viewModel.engineManager.store.currentUser
         let roomInfo = viewModel.engineManager.store.roomInfo
-        let isOwner: Bool = currentUser.userId == roomInfo.ownerId
-        allAgreeButton.isHidden = !isOwner
         allAgreeButton.isSelected = roomInfo.isMicrophoneDisableForAllUser
-        inviteMemberButton.isHidden = !isOwner
         inviteMemberButton.isSelected = roomInfo.isCameraDisableForAllUser
     }
     
@@ -433,9 +430,6 @@ class ApplyTableCell: UITableViewCell {
 }
 
 private extension String {
-    static var raiseHandApplyText: String {
-        localized("TUIRoom.raise.hand.apply")
-    }
     static var searchMemberText: String {
         localized("TUIRoom.search.meeting.member")
     }

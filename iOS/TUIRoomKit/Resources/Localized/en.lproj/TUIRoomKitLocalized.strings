@@ -69,6 +69,9 @@
 "TUIRoom.kick" = "Kick out of the room";
 "TUIRoom.step.down.seat" = "Please step down";
 "TUIRoom.invite.seat" = "Invite to stage";
+"TUIRoom.set.as.administrator" = "Set as administrator";
+"TUIRoom.undo.administrator" = "Undo administrator";
+"TUIRoom.revoked.your.administrator" = "Your administrator status is revoked";
 
 "TUIRoom.raise.speak.model" = "Raise hand speak model";
 "TUIRoom.freedom.speak.model" = "Freedom speak model";
@@ -77,18 +80,16 @@
 "TUIRoom.invite" = "Invite";
 "TUIRoom.float" = "Float";
 "TUIRoom.beauty" = "Beauty";
-"TUIRoom.record" = "Record";
 "TUIRoom.drop" = "Drop";
 "TUIRoom.beauty" = "Beauty";
 "TUIRoom.switch.layout" = "Switch layout";
 
 "TUIRoom.leave" = "Leave";
 "TUIRoom.member" = "Member(xx)";
-"TUIRoom.raise.hand.apply" = "Raise your hand to apply";
-"TUIRoom.raise.hand" = "Raise hand";
-"TUIRoom.raise.hand.list" = "Raise hand list";
+"TUIRoom.apply.join.stage" = "Join stage";
+"TUIRoom.stage.management" = "Stage Management";
 "TUIRoom.leave.seat" = "Step down";
-"TUIRoom.hand.down" = "Hands down";
+"TUIRoom.cancel.stage" = "Cancel the stage";
 "TUIRoom.invite.to.speak" = "The host invites you to speak on stage";
 "TUIRoom.agree.to.speak" = "The host invites you to speak on stage. Once on stage, you can turn on the camera and unmute yourself.";
 "TUIRoom.decline" = "Decline";
@@ -98,6 +99,7 @@
 "TUIRoom.search.meeting.member" = "Search for participants";
 "TUIRoom.me" = "Me";
 "TUIRoom.role.owner" = "Owner";
+"TUIRoom.role.administrator" = "Administrator";
 "TUIRoom.invite.members" = "Invite members to stage";
 "TUIRoom.agree.seat" = "Agree take seat";
 "TUIRoom.disagree.seat" = "Disagree take seat";
@@ -117,15 +119,18 @@
 "TUIRoom.trans.master" = "Appoint a new master";
 "TUIRoom.appoint.master.and.leave.room" = "Appoint and leave";
 "TUIRoom.have.become.master" = "You have become the master";
+"TUIRoom.have.become.administrator" = "You have been set as an administrator";
 "TUIRoom.have.transferred.master" = "You have transferred the master";
-"TUIRoom.mute.seat.reason" = "Raise your hand to speak in the room, please raise your hand first";
+"TUIRoom.have.set.up.administrator" = "You have set up an administrator";
+"TUIRoom.have.removed.administrator" = "You have removed the administrator";
+"TUIRoom.mute.seat.reason" = "Can be turned on after taking the stage";
 "TUIRoom.mute.audio.room.reason" = "All on mute audio, unable to turn on microphone";
 "TUIRoom.mute.video.room.reason" = "All on mute video, unable to turn on camera";
-"TUIRoom.all.mute.video.prompt" = "The host has banned all members from turning on the camera";
-"TUIRoom.all.mute.audio.prompt" = "The host has banned all members from turning on the audio";
-"TUIRoom.all.unmute.video.prompt" = "The host has turned off the mute for all participants";
-"TUIRoom.all.unmute.audio.prompt" = "The host has turned off the camera disable for all participants";
-"TUIRoom.raiseHand.notice" = "If you want to speak, please raise your hand to apply for the microphone";
+"TUIRoom.all.mute.video.prompt" = "Banned all members from turning on the camera";
+"TUIRoom.all.mute.audio.prompt" = "Banned all members from turning on the audio";
+"TUIRoom.all.unmute.video.prompt" = "Turned off the mute for all participants";
+"TUIRoom.all.unmute.audio.prompt" = "Turned off the camera disable for all participants";
+"TUIRoom.raiseHand.notice" = "If you would like to speak, turn on videos, and share screens, please request to be onstage first";
 "TUIRoom.video.conference.title" = "Video conference";
 
 "TUIRoom.capture.volume" = "Collection Volume";
@@ -172,12 +177,9 @@
 "TUIRoom.screen.recording" = "Screen recording";
 "TUIRoom.toast.shareScreen.title" = "Share Screen";
 "TUIRoom.toast.shareScreen.message" = "Stop TUIRoom screen sharing screen live?";
-"TUIRoom.toast.shareScreen.cancel" = "Cancel";
 "TUIRoom.toast.shareScreen.stop" = "Stop";
-"TUIRoom.put.hands.down" = "You've put your hands down";
-"TUIRoom.raised.hand" = "You have raised your hand, please wait for the moderator to act";
-"TUIRoom.rejected.take.seat" = "The moderator has rejected your request to take seat";
-"TUIRoom.taken.seat" = "The moderator has approved your request to take seat";
+"TUIRoom.rejected.take.seat" = "The owner/administrator rejected your application";
+"TUIRoom.taken.seat" = "The owner/administrator has approved your application";
 "TUIRoom.in.another.room" = "You are already in another room";
 "TUIRoom.others.screen.sharing" = "An existing member is sharing. Please try again later";
 "TUIRoom.smooth.resolution" = "Smooth resolution";
@@ -192,3 +194,20 @@
 "TUIRoom.open.video.invitation.timeout" = "The invitation to start the video has timed out";
 "TUIRoom.open.audio.invitation.timeout" = "The invitation to start the audio has timed out";
 "TUIRoom.sure.kick.out" = "Do you want to move xx out of the room?";
+
+"TUIRoom.join.stage.application.sent" = "Application has been sent, please wait for the owner/administrator to approve";
+"TUIRoom.join.stage.application.cancelled" = "Application for stage has been cancelled";
+"TUIRoom.not.yet.join.stage" = "Not yet join stage";
+"TUIRoom.join.stage.immediately" = "Join stage immediately";
+"TUIRoom.set.as.administrator.message" = "You have been set as an administrator by the host. Do you want to join stage immediately?";
+"TUIRoom.join.stage" = "Join stage";
+"TUIRoom.kicked.off.seat" = "You have been asked to leave stage";
+"TUIRoom.leave.seat.title" = "Are you sure you want to step down?";
+"TUIRoom.leave.seat.message" = "To get on stage again, you need to resend the application and wait for the owner/administrator to approve it.";
+"TUIRoom.all.mute.title" = "All and new members will be muted";
+"TUIRoom.all.mute.video.title" = "All and new members will be banned from video";
+"TUIRoom.all.mute.message" = "Members will not be able to turn on their microphones";
+"TUIRoom.all.mute.video.message" = "Members will not be able to open the video";
+"TUIRoom.all.unmute.message" = "After being released, the user can freely turn on the microphone.";
+"TUIRoom.all.unmute.video.message" = "After deactivation, the user can freely start the video";
+"TUIRoom.confirm.release" = "Confirm release";

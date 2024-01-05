@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "leaveSeat.png",
+      "filename" : "room_administrator.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "leaveSeat@2x.png",
+      "filename" : "room_administrator@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "leaveSeat@3x.png",
+      "filename" : "room_administrator@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

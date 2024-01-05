@@ -144,24 +144,10 @@ extension TUIVideoSeatViewModel {
     
     func switchPosition() {
         if videoSeatViewType == .largeSmallWindowType {
-            isSwitchPosition = !self.isSwitchPosition
-            sortSeatItems()
-            listSeatItem = Array(videoSeatItems)
-            switchLargeSmallWindow()
+            isSwitchPosition = !isSwitchPosition
+            reloadSeatItems()
             viewResponder?.reloadData()
-            resetMiniscreen()
         }
-    }
-    
-    private func switchLargeSmallWindow() {
-        guard videoSeatViewType == .largeSmallWindowType else { return }
-        if isSwitchPosition {
-            let first = listSeatItem[0]
-            listSeatItem[0] = listSeatItem[1]
-            listSeatItem[1] = first
-        }
-        smallItem = listSeatItem[1]
-        listSeatItem = [listSeatItem[0]]
     }
     
     func updateSpeakerPlayVideoState(currentPageIndex: Int) {
@@ -265,6 +251,28 @@ extension TUIVideoSeatViewModel {
         self.resetMiniscreen()
     }
     
+    private func changeUserRole(userId: String, userRole: TUIRole) {
+        if let item = getSeatItem(userId) {
+            item.userInfo.userRole = userRole
+            viewResponder?.updateSeatItem(item)
+        }
+        if let shareItem = shareItem, shareItem.userId == userId {
+            shareItem.userInfo.userRole = userRole
+            viewResponder?.updateSeatItem(shareItem)
+        }
+        if let speakerItem = speakerItem, speakerItem.userId == userId {
+            speakerItem.userInfo.userRole = userRole
+            viewResponder?.updateSeatItem(speakerItem)
+        }
+        if let smallItem = smallItem, smallItem.userId == userId {
+            smallItem.userInfo.userRole = userRole
+            viewResponder?.updateSeatItem(smallItem)
+        }
+        if userRole == .roomOwner {
+            reloadSeatItems()
+        }
+    }
+    
     private func getSeatItem(_ userId: String) -> VideoSeatItem? {
         return videoSeatItems.first(where: { $0.userId == userId })
     }
@@ -324,7 +332,13 @@ extension TUIVideoSeatViewModel {
         } else if videoSeatItems.count == 2, isHasVideoStream,!isHasScreenStream {
             // 双人 大小窗切换
             videoSeatViewType = .largeSmallWindowType
-            switchLargeSmallWindow()
+            if isSwitchPosition {
+                let first = listSeatItem[0]
+                listSeatItem[0] = listSeatItem[1]
+                listSeatItem[1] = first
+            }
+            smallItem = listSeatItem[1]
+            listSeatItem = [listSeatItem[0]]
         } else if videoSeatItems.count >= 2, !isHasVideoStream {
             // 多人 纯音频模式
             videoSeatViewType = .pureAudioType
@@ -493,9 +507,11 @@ extension TUIVideoSeatViewModel: RoomEngineEventResponder {
             guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
             removeSeatItem(userInfo.userId)
         case .onUserRoleChanged:
+            guard let userId = param?["userId"] as? String else { return }
+            guard let userRole = param?["userRole"] as? TUIRole else { return }
             engineManager.fetchRoomInfo() { [weak self] in
                 guard let self = self else { return }
-                self.reloadSeatItems()
+                self.changeUserRole(userId: userId, userRole: userRole)
             }
         case .onSeatListChanged:
             guard let left = param?["left"] as? [TUISeatInfo] else { return }

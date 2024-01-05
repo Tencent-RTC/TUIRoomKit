@@ -38,7 +38,8 @@ class EngineManager: NSObject {
         let eventDispatcher = RoomEventDispatcher()
         return eventDispatcher
     }()
-    private let timeOutNumber: Double = 10
+    private let takeSeatTimeOutNumber: Double = 0
+    private let openRemoteDeviceTimeOutNumber: Double = 15
     private let rootRouter: RoomRouter = RoomRouter.shared
     private var isLoginEngine: Bool = false
     private let appGroupString: String = "com.tencent.TUIRoomTXReplayKit-Screen"
@@ -264,7 +265,7 @@ class EngineManager: NSObject {
                   onCancelled: TUIRequestCancelledBlock? = nil,
                   onTimeout: TUIRequestTimeoutBlock? = nil,
                   onError: TUIRequestErrorBlock? = nil) -> TUIRequest {
-        let request = self.roomEngine.takeSeat(-1, timeout: self.timeOutNumber) { [weak self] requestId, userId in
+        let request = self.roomEngine.takeSeat(-1, timeout: takeSeatTimeOutNumber) { [weak self] requestId, userId in
             guard let self = self else { return }
             self.store.currentUser.isOnSeat = true
             onAccepted?(requestId, userId)
@@ -410,7 +411,7 @@ class EngineManager: NSObject {
                                  onCancelled: TUIRequestCancelledBlock? = nil,
                                  onTimeout: TUIRequestTimeoutBlock? = nil,
                                  onError: TUIRequestErrorBlock? = nil) {
-        roomEngine.openRemoteDeviceByAdmin(userId: userId, device: device, timeout: timeOutNumber, onAccepted: { requestId, userId in
+        roomEngine.openRemoteDeviceByAdmin(userId: userId, device: device, timeout: openRemoteDeviceTimeOutNumber, onAccepted: { requestId, userId in
             onAccepted?(requestId, userId)
         }, onRejected: { requestId, userId, message in
             onRejected?(requestId, userId, message)

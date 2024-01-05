@@ -198,7 +198,7 @@ class RoomRouter: NSObject {
     
     class func makeToastInCenter(toast: String, duration:TimeInterval) {
         guard let windowView = shared.getCurrentWindowViewController()?.view else {return}
-        windowView.makeToast(toast,duration: duration,position:windowView.center)
+        windowView.makeToast(toast,duration: duration,position:TUICSToastPositionCenter)
     }
     
     class func getCurrentWindow() -> UIWindow? {
