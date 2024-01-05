@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "room_hand_down.png",
+      "filename" : "room_apply_join_stage.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "room_hand_down@2x.png",
+      "filename" : "room_apply_join_stage@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "room_hand_down@3x.png",
+      "filename" : "room_apply_join_stage@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

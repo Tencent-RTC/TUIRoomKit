@@ -60,6 +60,9 @@
 "TUIRoom.kick" = "طرد من الغرفة";
 "TUIRoom.step.down.seat" = "يرجى التنحي";
 "TUIRoom.invite.seat" = "دعوة إلى المسرح";
+"TUIRoom.set.as.administrator" = "تعيين كمسؤول";
+"TUIRoom.undo.administrator" = "إزالة المسؤول";
+"TUIRoom.revoked.your.administrator" = "لقد تم إبطال حالة المسؤول الخاصة بك";
 
 "TUIRoom.chat" = "محادثة";
 "TUIRoom.beauty" = "جمال";
@@ -67,10 +70,10 @@
 
 "TUIRoom.leave" = "يترك";
 "TUIRoom.member" = "عضو";
-"TUIRoom.raise.hand" = "ارفع يدك";
-"TUIRoom.raise.hand.list" = "قائمة عرض الأيدي";
+"TUIRoom.apply.join.stage" = "تقدم بطلب لتكون على خشبة المسرح";
+"TUIRoom.stage.management" = "الإدارة على المسرح";
 "TUIRoom.leave.seat" = "انزل";
-"TUIRoom.hand.down" = "بدون بذل الكثير من الجهد";
+"TUIRoom.cancel.stage" = "إلغاء المرحلة";
 "TUIRoom.invite.to.speak" = "يدعوك المضيف للتحدث على المسرح";
 "TUIRoom.agree.to.speak" = "يدعوك المضيف للتحدث على خشبة المسرح. وبمجرد صعودك على خشبة المسرح، يمكنك تشغيل الكاميرا وإلغاء كتم صوتك.";
 "TUIRoom.decline" = "يرفض";
@@ -95,16 +98,18 @@
 "TUIRoom.trans.master" = "تعيين مضيف جديد";
 "TUIRoom.appoint.master.and.leave.room" = "حدد واترك";
 "TUIRoom.have.become.master" = "لقد أصبحت مضيفًا";
+"TUIRoom.have.become.administrator" = "لقد تم تعيينك كمسؤول";
 "TUIRoom.have.transferred.master" = "لقد قمت بنقل المالك";
-"TUIRoom.raise.hand.apply" = "أظهر يدك للتقديم";
-"TUIRoom.mute.seat.reason" = "ارفع يدك للتحدث في الغرفة، من فضلك ارفع يدك أولا";
+"TUIRoom.have.set.up.administrator" = "لقد قمت بإعداد مسؤول";
+"TUIRoom.have.removed.administrator" = "لقد قمت بإزالة المسؤول";
+"TUIRoom.mute.seat.reason" = "يمكن تشغيله بعد اعتلاء المسرح";
 "TUIRoom.mute.audio.room.reason" = "لقد قام المضيف بكتم صوت جميع الأعضاء ولا يمكنه تشغيل الميكروفون.";
 "TUIRoom.mute.video.room.reason" = "قام المضيف بتمكين جميع الأعضاء من حظر الصور ولا يمكنه تشغيل الكاميرا.";
-"TUIRoom.all.mute.video.prompt" = "تم تفعيل الحظر على الرسم ولن يتمكن الجمهور من تشغيل الكاميرا";
-"TUIRoom.all.mute.audio.prompt" = "تم تشغيل ميزة كتم الصوت بالكامل، ولن يتمكن الجمهور من تشغيل الميكروفون";
-"TUIRoom.all.unmute.video.prompt" = "يقوم المضيف بإيقاف حظر الفيديو لجميع الأعضاء، ويمكن للجمهور تشغيل الفيديو بأنفسهم";
-"TUIRoom.all.unmute.audio.prompt" = "يقوم المضيف بإيقاف كتم الصوت لجميع الأعضاء، ويمكن للجمهور تشغيل الميكروفون بأنفسهم";
-"TUIRoom.raiseHand.notice" = "إذا كنت تريد التحدث، يرجى رفع يدك أولاً لتقديم طلب للحصول على الميكروفون.";
+"TUIRoom.all.mute.video.prompt" = "تم منع جميع الأعضاء من الرسم";
+"TUIRoom.all.mute.audio.prompt" = "صمت جميع الأعضاء";
+"TUIRoom.all.unmute.video.prompt" = "مغلق لجميع الأعضاء";
+"TUIRoom.all.unmute.audio.prompt" = "مكتوم للجميع";
+"TUIRoom.raiseHand.notice" = "إذا كنت تريد التحدث، وبدء الفيديو، ومشاركة شاشتك، فيرجى التقديم لتكون على المسرح أولاً";
 "TUIRoom.video.conference.title" = "مؤتمر عبر الفيديو";
 
 
@@ -164,13 +169,11 @@
 "TUIRoom.request.open.audio" = "طلب تشغيل الصوت";
 "TUIRoom.toast.shareScreen.title" = "شاشة حية";
 "TUIRoom.toast.shareScreen.message" = "هل تريد إيقاف البث المباشر لشاشة مشاركة شاشة TUIRoom؟";
-"TUIRoom.toast.shareScreen.cancel" = "يلغي";
 "TUIRoom.toast.shareScreen.stop" = "قف";
-"TUIRoom.put.hands.down" = "لقد وضعت يديك";
-"TUIRoom.raised.hand" = "لقد رفعت يدك، يرجى الانتظار حتى يتم تشغيل المشرف";
-"TUIRoom.rejected.take.seat" = "رفض المضيف طلبك للظهور على المسرح";
-"TUIRoom.taken.seat" = "لقد وافق المضيف على طلبك للظهور على المسرح";
+"TUIRoom.rejected.take.seat" = "رفض المالك/المسؤول طلبك";
+"TUIRoom.taken.seat" = "لقد وافق المالك/المسؤول على طلبك";
 "TUIRoom.role.owner" = "صاحب المنزل";
+"TUIRoom.role.administrator" = "مدير";
 "TUIRoom.in.another.room" = "أنت بالفعل في غرفة أخرى";
 "TUIRoom.others.screen.sharing" = "توجد حاليًا مشاركة للأعضاء، يرجى المحاولة مرة أخرى لاحقًا.";
 "TUIRoom.smooth.resolution" = "القرار السلس";
@@ -185,3 +188,20 @@
 "TUIRoom.open.video.invitation.timeout" = "انتهت مهلة الدعوة لبدء الفيديو";
 "TUIRoom.open.audio.invitation.timeout" = "انتهت مهلة الدعوة لتمكين الصوت";
 "TUIRoom.sure.kick.out" = "هل تريد نقل xx خارج الغرفة؟";
+
+"TUIRoom.join.stage.application.sent" = "تم إرسال الطلب، يرجى انتظار موافقة المالك/المسؤول عليه";
+"TUIRoom.join.stage.application.cancelled" = "تم إلغاء طلب المرحلة";
+"TUIRoom.not.yet.join.stage" = "ليس على المسرح بعد";
+"TUIRoom.join.stage.immediately" = "تعال على المسرح على الفور";
+"TUIRoom.set.as.administrator.message" = "لقد تم تعيينك كمسؤول من قبل المضيف. هل تريد تولي المسؤولية على الفور؟";
+"TUIRoom.join.stage" = "تعال على المسرح";
+"TUIRoom.kicked.off.seat" = "لقد طلب منك مغادرة المسرح";
+"TUIRoom.leave.seat.title" = "هل أنت متأكد أنك تريد التنحي؟";
+"TUIRoom.leave.seat.message" = "للصعود إلى المسرح مرة أخرى، يتعين عليك إعادة إرسال الطلب وانتظار موافقة المالك/المسؤول عليه.";
+"TUIRoom.all.mute.title" = "سيتم كتم صوت جميع الأعضاء الجدد";
+"TUIRoom.all.mute.video.title" = "سيتم منع جميع الأعضاء الجدد من الفيديو";
+"TUIRoom.all.mute.message" = "لن يتمكن الأعضاء من تشغيل الميكروفونات الخاصة بهم";
+"TUIRoom.all.mute.video.message" = "لن يتمكن الأعضاء من فتح شاشة الفيديو";
+"TUIRoom.all.unmute.message" = "بعد إطلاق سراحه، يمكن للمستخدم تشغيل الميكروفون بحرية.";
+"TUIRoom.all.unmute.video.message" = "بعد التعطيل، يمكن للمستخدم بدء الفيديو بحرية";
+"TUIRoom.confirm.release" = "تأكيد الافراج";

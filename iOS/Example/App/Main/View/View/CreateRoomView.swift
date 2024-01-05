@@ -149,15 +149,7 @@ class CreateRoomView: UIView {
     
     func updateInputStackView(item: ListCellItemData, index: Int) {
         guard inputViewArray.count > index else { return }
-        inputViewArray[index].removeFromSuperview()
-        let view = ListCellItemView(itemData: item)
-        inputViewArray[index] = view
-        inputStackView.insertArrangedSubview(view, at: index)
-        view.snp.makeConstraints { make in
-            make.height.equalTo(40.scale375())
-            make.width.equalToSuperview()
-        }
-        view.backgroundColor = item.backgroundColor ?? UIColor(0x2A2D38)
+        inputViewArray[index].setupViewState(item: item)
     }
     
     func showSpeechModeControlView() {
