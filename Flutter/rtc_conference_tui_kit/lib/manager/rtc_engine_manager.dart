@@ -83,7 +83,10 @@ class RoomEngineManager {
       if (!isTakeSeatSuccess) {
         result.code = TUIError.errUserNotInSeat;
       }
-      RtcConferenceTuikitPlatform.instance.startForegroundService();
+      RoomStore.to.initItemTouchableState();
+      if (GetPlatform.isAndroid) {
+        RtcConferenceTuikitPlatform.instance.startForegroundService();
+      }
     }
     return result;
   }
@@ -235,13 +238,17 @@ class RoomEngineManager {
   }
 
   Future<TUIActionCallback> exitRoom() async {
-    RtcConferenceTuikitPlatform.instance.stopForegroundService();
+    if (GetPlatform.isAndroid) {
+      RtcConferenceTuikitPlatform.instance.stopForegroundService();
+    }
     RoomStore.to.clearStore();
     return _roomEngine.exitRoom(false);
   }
 
   Future<TUIActionCallback> destroyRoom() {
-    RtcConferenceTuikitPlatform.instance.stopForegroundService();
+    if (GetPlatform.isAndroid) {
+      RtcConferenceTuikitPlatform.instance.stopForegroundService();
+    }
     RoomStore.to.clearStore();
     return _roomEngine.destroyRoom();
   }

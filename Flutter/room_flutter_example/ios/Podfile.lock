@@ -25,7 +25,7 @@ PODS:
     - TXIMSDK_Plus_iOS (>= 7.5.4852)
     - TXLiteAVSDK_Professional
   - TXCustomBeautyProcesserPlugin (1.0.2)
-  - TXIMSDK_Plus_iOS (7.6.5021)
+  - TXIMSDK_Plus_iOS (7.7.5282)
   - TXLiteAVSDK_Professional (11.4.14552):
     - TXLiteAVSDK_Professional/Professional (= 11.4.14552)
   - TXLiteAVSDK_Professional/Professional (11.4.14552)
@@ -78,7 +78,7 @@ SPEC CHECKSUMS:
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   TUIRoomEngine: 5c408c7161dad02a75cffeb82761c5e88396b7f9
   TXCustomBeautyProcesserPlugin: 099393b941cb40eda12b3a80bf6c0319957b1cfd
-  TXIMSDK_Plus_iOS: 76f5f9006b700148662e39c6a20c723a0cd9ad3a
+  TXIMSDK_Plus_iOS: f275cfaf29c86ec4a3758febb849ec0f74826f3d
   TXLiteAVSDK_Professional: 3a3a5fac0a4424d3cba4ff870b977472ea890921
 
 PODFILE CHECKSUM: f1c82f10837f8fdf27aee12401554c9539720e1f

@@ -12,6 +12,7 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
   final String text;
   final String? selectedText;
   final double width;
+  final double opacity;
 
   const BottomButtonItemWidget({
     Key? key,
@@ -22,6 +23,7 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
     required this.text,
     this.selectedText,
     this.width = 52,
+    this.opacity = 1,
   }) : super(key: key);
 
   @override
@@ -30,30 +32,33 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
       onTap: () {
         onPressed();
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: RoomColors.lightGrey,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        width: width.scale375(),
-        height: 52.0.scale375(),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Obx(() => isSelected.value ? selectedImage ?? image : image),
-            const SizedBox(height: 5),
-            SizedBox(
-              child: Obx(
-                () => Text(
-                  isSelected.value ? selectedText ?? text : text,
-                  textAlign: TextAlign.center,
-                  style: RoomTheme.defaultTheme.textTheme.labelSmall,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+      child: Opacity(
+        opacity: opacity,
+        child: Container(
+          decoration: BoxDecoration(
+            color: RoomColors.lightGrey,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          width: width.scale375(),
+          height: 52.0.scale375(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Obx(() => isSelected.value ? selectedImage ?? image : image),
+              const SizedBox(height: 5),
+              SizedBox(
+                child: Obx(
+                  () => Text(
+                    isSelected.value ? selectedText ?? text : text,
+                    textAlign: TextAlign.center,
+                    style: RoomTheme.defaultTheme.textTheme.labelSmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

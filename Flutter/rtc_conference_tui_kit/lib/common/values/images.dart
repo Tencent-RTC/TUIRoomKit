@@ -48,4 +48,14 @@ class AssetsImages {
   static const roomKickOffSeat = 'assets/images/room_kick_off_seat.png';
   static const roomRequestOnSeat = 'assets/images/room_request_on_seat.png';
   static const roomOwner = 'assets/images/room_owner.png';
+  static const roomRoleAdministrator =
+      'assets/images/room_role_administrator.png';
+  static const roomSetAdministrator =
+      'assets/images/room_set_administrator.png';
+  static const roomUndoAdministrator =
+      'assets/images/room_undo_administrator.png';
+  static const roomAdministrator = 'assets/images/room_administrator.png';
+  static const roomHandRaiseList = 'assets/images/room_hand_raise_list.png';
+  static const roomApplyJoinStage = 'assets/images/room_apply_join_stage.png';
+  static const roomCancelRequest = 'assets/images/room_cancel_request.png';
 }

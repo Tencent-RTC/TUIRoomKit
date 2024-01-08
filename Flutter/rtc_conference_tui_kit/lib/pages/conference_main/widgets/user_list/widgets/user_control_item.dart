@@ -11,7 +11,7 @@ class UserControlItemWidget extends GetView<UserListController> {
   final Image image;
   final Image? selectedImage;
   final RxBool isSelected;
-  final bool? isRedText;
+  final TextStyle? textStyle;
 
   const UserControlItemWidget({
     Key? key,
@@ -21,7 +21,10 @@ class UserControlItemWidget extends GetView<UserListController> {
     required this.image,
     this.selectedImage,
     required this.isSelected,
-    this.isRedText,
+    this.textStyle = const TextStyle(
+      fontSize: 14,
+      color: RoomColors.textWhite,
+    ),
   }) : super(key: key);
 
   @override
@@ -42,9 +45,7 @@ class UserControlItemWidget extends GetView<UserListController> {
                   isSelected.value ? selectedImage ?? image : image,
                   SizedBox(width: 10.0.scale375()),
                   Text(isSelected.value ? selectedText ?? text : text,
-                      style: isRedText != null && isRedText == true
-                          ? RoomTheme.defaultTheme.textTheme.labelMedium
-                          : RoomTheme.defaultTheme.textTheme.bodyMedium),
+                      style: textStyle),
                   const Expanded(child: SizedBox()),
                 ],
               ),

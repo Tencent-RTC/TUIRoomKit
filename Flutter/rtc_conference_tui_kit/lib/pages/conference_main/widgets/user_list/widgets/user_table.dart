@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
-import 'package:rtc_room_engine/api/room/tui_room_define.dart';
 import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/widgets.dart';
 
 import 'widgets.dart';
@@ -13,7 +12,8 @@ class UserTableWidget extends GetView<UserListController> {
   Widget build(BuildContext context) {
     return Obx(
       () => SizedBox(
-        height: RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner
+        height: controller.isOwner() ||
+                controller.isAdministrator(RoomStore.to.currentUser)
             ? 550.0.scale375Height()
             : 590.0.scale375Height(),
         child: Column(

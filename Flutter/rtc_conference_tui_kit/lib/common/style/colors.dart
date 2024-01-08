@@ -23,4 +23,5 @@ class RoomColors {
   static const Color textRed = Color(0xFFE5395C);
   static const Color toastBlack = Color(0xCC000000);
   static const Color screenBtnTextRed = Color(0xFFCC3D47);
+  static const Color textOrange = Color(0xFFF06C4B);
 }

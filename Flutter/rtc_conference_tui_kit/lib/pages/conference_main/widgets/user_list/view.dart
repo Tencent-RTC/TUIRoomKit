@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/widgets.dart';
-import 'package:rtc_room_engine/api/room/tui_room_define.dart';
 
 import './widgets/widgets.dart';
 
@@ -41,8 +40,8 @@ class UserListWidget extends GetView<UserListController> {
                   SizedBox(height: 15.0.scale375()),
                   const UserTableWidget(),
                   const Spacer(),
-                  if (RoomStore.to.currentUser.userRole.value ==
-                      TUIRole.roomOwner)
+                  if (controller.isOwner() ||
+                      controller.isAdministrator(RoomStore.to.currentUser))
                     Row(
                       children: [
                         ButtonItemWidget(

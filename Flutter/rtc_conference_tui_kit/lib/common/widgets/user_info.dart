@@ -63,6 +63,25 @@ class UserInfoWidget extends StatelessWidget {
                       ],
                     ),
                   ],
+                  if (userModel.userRole.value == TUIRole.administrator) ...[
+                    SizedBox(height: 2.0.scale375()),
+                    Row(
+                      children: [
+                        Image.asset(
+                          AssetsImages.roomRoleAdministrator,
+                          package: 'rtc_conference_tui_kit',
+                          width: 14.0.scale375(),
+                          height: 14.0.scale375(),
+                        ),
+                        SizedBox(width: 2.0.scale375()),
+                        Text(
+                            RoomContentsTranslations.translate(
+                                'roomAdministrator'),
+                            style: const TextStyle(
+                                color: RoomColors.textOrange, fontSize: 12))
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),

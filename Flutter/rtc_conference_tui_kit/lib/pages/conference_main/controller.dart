@@ -10,6 +10,9 @@ class ConferenceMainController extends GetxController {
   late TUIRoomObserver observer;
   var backRouteName = Get.arguments;
 
+  static const _seatIndex = -1;
+  static const _reqTimeout = 0;
+
   showDialog() {
     showConferenceDialog(
       title: RoomContentsTranslations.translate('liveScreen'),
@@ -55,17 +58,68 @@ class ConferenceMainController extends GetxController {
             RoomContentsTranslations.translate('kickedOutOfRoom'));
       },
       onUserRoleChanged: (userId, role) {
-        if (userId == RoomStore.to.currentUser.userId.value &&
-            role == TUIRole.roomOwner) {
-          showConferenceDialog(
-            title: RoomContentsTranslations.translate('haveBecomeMaster'),
-            confirmText: RoomContentsTranslations.translate('ok'),
-            confirmTextStyle: RoomTheme.defaultTheme.textTheme.displayMedium,
-            onConfirm: () {
-              Get.back();
-            },
-            barrierDismissible: false,
-          );
+        if (userId == RoomStore.to.currentUser.userId.value) {
+          if (role == TUIRole.roomOwner) {
+            showConferenceDialog(
+              title: RoomContentsTranslations.translate('haveBecomeMaster'),
+              confirmText: RoomContentsTranslations.translate('ok'),
+              confirmTextStyle: RoomTheme.defaultTheme.textTheme.displayMedium,
+              onConfirm: () {
+                Get.back();
+              },
+              barrierDismissible: false,
+            );
+          }
+          if (role == TUIRole.administrator) {
+            if (RoomStore.to.roomInfo.speechMode ==
+                    TUISpeechMode.speakAfterTakingSeat &&
+                !RoomStore.to.currentUser.isOnSeat.value) {
+              showConferenceDialog(
+                title: RoomContentsTranslations.translate(
+                    'haveBecomeAdministrator'),
+                message: RoomContentsTranslations.translate(
+                    'haveBecomeAdministratorMessage'),
+                confirmText:
+                    RoomContentsTranslations.translate('joinStageImmediately'),
+                cancelText:
+                    RoomContentsTranslations.translate('noYetJoinStage'),
+                onConfirm: () {
+                  RoomEngineManager().takeSeat(_seatIndex, _reqTimeout, null);
+                  Get.back();
+                },
+              );
+            } else {
+              showConferenceDialog(
+                title: RoomContentsTranslations.translate(
+                    'haveBecomeAdministrator'),
+                confirmText: RoomContentsTranslations.translate('ok'),
+                confirmTextStyle:
+                    RoomTheme.defaultTheme.textTheme.displayMedium,
+                onConfirm: () {
+                  Get.back();
+                },
+                barrierDismissible: false,
+              );
+            }
+          }
+          if (role == TUIRole.generalUser &&
+              RoomStore.to.currentUser.userRole.value ==
+                  TUIRole.administrator) {
+            showConferenceDialog(
+              title: RoomContentsTranslations.translate(
+                  'revokedYourAdministrator'),
+              confirmText: RoomContentsTranslations.translate('ok'),
+              confirmTextStyle: RoomTheme.defaultTheme.textTheme.displayMedium,
+              onConfirm: () {
+                Get.back();
+              },
+              barrierDismissible: false,
+            );
+            RoomStore.to.inviteSeatList.clear();
+            RoomStore.to.inviteSeatMap.clear();
+          }
+          RoomStore.to.currentUser.userRole.value = role;
+          RoomStore.to.updateItemTouchableState();
         }
       },
     );
