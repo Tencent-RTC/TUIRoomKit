@@ -35,54 +35,74 @@ class BaseButtonWidget extends GetView<BottomViewController> {
             ),
           ),
           SizedBox(width: 10.0.scale375()),
-          BottomButtonItemWidget(
-            image: Image.asset(
-              AssetsImages.roomMicOff,
-              package: 'rtc_conference_tui_kit',
-              width: 24,
-              height: 24,
+          Obx(
+            () => Visibility(
+              visible: controller.isMicAndCameraButtonVisible(),
+              child: BottomButtonItemWidget(
+                image: Image.asset(
+                  AssetsImages.roomMicOff,
+                  package: 'rtc_conference_tui_kit',
+                  width: 24,
+                  height: 24,
+                ),
+                selectedImage: Image.asset(
+                  AssetsImages.roomMicOn,
+                  package: 'rtc_conference_tui_kit',
+                  width: 24,
+                  height: 24,
+                ),
+                onPressed: () {
+                  controller.muteAudioAction();
+                },
+                isSelected: RoomStore.to.currentUser.hasAudioStream,
+                text: RoomContentsTranslations.translate('unmute'),
+                selectedText: RoomContentsTranslations.translate('mute'),
+                opacity: RoomStore.to.isMicItemTouchable.value ? 1 : 0.5,
+              ),
             ),
-            selectedImage: Image.asset(
-              AssetsImages.roomMicOn,
-              package: 'rtc_conference_tui_kit',
-              width: 24,
-              height: 24,
-            ),
-            onPressed: () {
-              controller.muteAudioAction();
-            },
-            isSelected: RoomStore.to.currentUser.hasAudioStream,
-            text: RoomContentsTranslations.translate('unmute'),
-            selectedText: RoomContentsTranslations.translate('mute'),
           ),
-          SizedBox(width: 10.0.scale375()),
-          BottomButtonItemWidget(
-            image: Image.asset(
-              AssetsImages.roomCameraOff,
-              package: 'rtc_conference_tui_kit',
-              width: 24,
-              height: 24,
+          Obx(
+            () => Visibility(
+              visible: controller.isMicAndCameraButtonVisible(),
+              child: SizedBox(width: 10.0.scale375()),
             ),
-            selectedImage: Image.asset(
-              AssetsImages.roomCameraOn,
-              package: 'rtc_conference_tui_kit',
-              width: 24,
-              height: 24,
-            ),
-            onPressed: () {
-              controller.muteVideoAction();
-            },
-            isSelected: RoomStore.to.currentUser.hasVideoStream,
-            text: RoomContentsTranslations.translate('openVideo'),
-            selectedText: RoomContentsTranslations.translate('closeVideo'),
           ),
-          SizedBox(width: 10.0.scale375()),
-          Visibility(
-            visible: controller.isSeatMode(),
-            child: Obx(
-              () => RoomStore.to.currentUser.isOnSeat.value &&
-                      RoomStore.to.currentUser.userRole.value !=
-                          TUIRole.roomOwner
+          Obx(
+            () => Visibility(
+              visible: controller.isMicAndCameraButtonVisible(),
+              child: BottomButtonItemWidget(
+                image: Image.asset(
+                  AssetsImages.roomCameraOff,
+                  package: 'rtc_conference_tui_kit',
+                  width: 24,
+                  height: 24,
+                ),
+                selectedImage: Image.asset(
+                  AssetsImages.roomCameraOn,
+                  package: 'rtc_conference_tui_kit',
+                  width: 24,
+                  height: 24,
+                ),
+                onPressed: () {
+                  controller.muteVideoAction();
+                },
+                isSelected: RoomStore.to.currentUser.hasVideoStream,
+                text: RoomContentsTranslations.translate('openVideo'),
+                selectedText: RoomContentsTranslations.translate('closeVideo'),
+                opacity: RoomStore.to.isCameraItemTouchable.value ? 1 : 0.5,
+              ),
+            ),
+          ),
+          Obx(
+            () => Visibility(
+              visible: controller.isMicAndCameraButtonVisible(),
+              child: SizedBox(width: 10.0.scale375()),
+            ),
+          ),
+          Obx(
+            () => Visibility(
+              visible: controller.isRaiseHandButtonVisible(),
+              child: RoomStore.to.currentUser.isOnSeat.value
                   ? BottomButtonItemWidget(
                       image: Image.asset(
                         AssetsImages.roomLeaveSeat,
@@ -98,78 +118,143 @@ class BaseButtonWidget extends GetView<BottomViewController> {
                     )
                   : BottomButtonItemWidget(
                       image: Image.asset(
-                        AssetsImages.roomHand,
+                        AssetsImages.roomApplyJoinStage,
+                        package: 'rtc_conference_tui_kit',
+                        width: 24,
+                        height: 24,
+                      ),
+                      selectedImage: Image.asset(
+                        AssetsImages.roomCancelRequest,
                         package: 'rtc_conference_tui_kit',
                         width: 24,
                         height: 24,
                       ),
                       onPressed: () {
-                        if (RoomStore.to.currentUser.userRole.value ==
-                            TUIRole.roomOwner) {
-                          Get.bottomSheet(const RaiseHandListWidget(),
-                              isScrollControlled: true);
-                        } else {
-                          controller.raiseHandAction();
-                        }
+                        controller.raiseHandAction();
                       },
-                      isSelected: RoomStore.to.currentUser.userRole.value ==
-                              TUIRole.roomOwner
-                          ? false.obs
-                          : controller.isRequestingTakeSeat,
+                      isSelected: controller.isRequestingTakeSeat,
                       text: RoomStore.to.currentUser.userRole.value ==
-                              TUIRole.roomOwner
-                          ? RoomContentsTranslations.translate(
-                              'raiseHandApplication')
-                          : RoomContentsTranslations.translate('raiseHand'),
+                              TUIRole.administrator
+                          ? RoomContentsTranslations.translate('joinStage')
+                          : RoomContentsTranslations.translate(
+                              'applyJoinStage'),
                       selectedText:
-                          RoomContentsTranslations.translate('handDown'),
+                          RoomContentsTranslations.translate('cancelStage'),
                     ),
             ),
           ),
-          Visibility(
-            visible: controller.isSeatMode(),
-            child: SizedBox(width: 10.0.scale375()),
-          ),
-          BottomButtonItemWidget(
-            image: Image.asset(
-              AssetsImages.roomShareScreenOn,
-              package: 'rtc_conference_tui_kit',
-              width: 24,
-              height: 24,
+          Obx(
+            () => Visibility(
+              visible: controller.isRaiseHandButtonVisible(),
+              child: SizedBox(width: 10.0.scale375()),
             ),
-            selectedImage: Image.asset(
-              AssetsImages.roomShareScreenOff,
-              package: 'rtc_conference_tui_kit',
-              width: 24,
-              height: 24,
-            ),
-            onPressed: () {
-              controller.onScreenShareButtonPressed();
-            },
-            isSelected: RoomStore.to.currentUser.hasScreenStream,
-            text: RoomContentsTranslations.translate('shareOn'),
-            selectedText: RoomContentsTranslations.translate('shareOff'),
           ),
-          SizedBox(width: 10.0.scale375()),
-          Visibility(
-            visible: !controller.isSeatMode(),
-            child: BottomButtonItemWidget(
-              image: Image.asset(
-                AssetsImages.roomInvite,
-                package: 'rtc_conference_tui_kit',
-                width: 24,
-                height: 24,
+          Obx(
+            () => Visibility(
+              visible: controller.isRaiseHandListButtonVisible(),
+              child: BottomButtonItemWidget(
+                image: Image.asset(
+                  AssetsImages.roomHandRaiseList,
+                  package: 'rtc_conference_tui_kit',
+                  width: 24,
+                  height: 24,
+                ),
+                onPressed: () {
+                  Get.bottomSheet(const RaiseHandListWidget(),
+                      isScrollControlled: true);
+                },
+                isSelected: false.obs,
+                text: RoomContentsTranslations.translate('stageManagement'),
               ),
-              onPressed: () {
-                Get.bottomSheet(const InviteSheetWidget());
-              },
-              isSelected: false.obs,
-              text: RoomContentsTranslations.translate('invite'),
             ),
           ),
-          Visibility(
-            visible: !controller.isSeatMode(),
-            child: SizedBox(width: 10.0.scale375()),
+          Obx(
+            () => Visibility(
+              visible: controller.isRaiseHandListButtonVisible(),
+              child: SizedBox(width: 10.0.scale375()),
+            ),
+          ),
+          Obx(
+            () => Visibility(
+              visible: controller.isScreenShareButtonInBaseRow(),
+              child: BottomButtonItemWidget(
+                image: Image.asset(
+                  AssetsImages.roomShareScreenOn,
+                  package: 'rtc_conference_tui_kit',
+                  width: 24,
+                  height: 24,
+                ),
+                selectedImage: Image.asset(
+                  AssetsImages.roomShareScreenOff,
+                  package: 'rtc_conference_tui_kit',
+                  width: 24,
+                  height: 24,
+                ),
+                onPressed: () {
+                  controller.onScreenShareButtonPressed();
+                },
+                isSelected: RoomStore.to.currentUser.hasScreenStream,
+                text: RoomContentsTranslations.translate('shareOn'),
+                selectedText: RoomContentsTranslations.translate('shareOff'),
+              ),
+            ),
+          ),
+          Obx(
+            () => Visibility(
+              visible: controller.isScreenShareButtonInBaseRow(),
+              child: SizedBox(width: 10.0.scale375()),
+            ),
+          ),
+          Obx(
+            () => Visibility(
+              visible: controller.isInviteButtonInBaseRow(),
+              child: BottomButtonItemWidget(
+                image: Image.asset(
+                  AssetsImages.roomInvite,
+                  package: 'rtc_conference_tui_kit',
+                  width: 24,
+                  height: 24,
+                ),
+                onPressed: () {
+                  Get.bottomSheet(const InviteSheetWidget());
+                },
+                isSelected: false.obs,
+                text: RoomContentsTranslations.translate('invite'),
+              ),
+            ),
+          ),
+          Obx(
+            () => Visibility(
+              visible: controller.isInviteButtonInBaseRow(),
+              child: SizedBox(width: 10.0.scale375()),
+            ),
+          ),
+          Obx(
+            () => Visibility(
+              visible: controller.isSettingButtonInBaseRow(),
+              child: BottomButtonItemWidget(
+                image: Image.asset(
+                  AssetsImages.roomSetting,
+                  package: 'rtc_conference_tui_kit',
+                  width: 24,
+                  height: 24,
+                ),
+                onPressed: () {
+                  Get.bottomSheet(
+                    const SettingWidget(),
+                    isScrollControlled: true,
+                  );
+                },
+                isSelected: false.obs,
+                text: RoomContentsTranslations.translate('setting'),
+              ),
+            ),
+          ),
+          Obx(
+            () => Visibility(
+              visible: controller.isSettingButtonInBaseRow(),
+              child: SizedBox(width: 10.0.scale375()),
+            ),
           ),
           BottomButtonItemWidget(
             image: Image.asset(

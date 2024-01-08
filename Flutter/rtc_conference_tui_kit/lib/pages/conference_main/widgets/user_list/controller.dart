@@ -42,10 +42,12 @@ class UserListController extends GetxController {
     isAllMute.value = !isAllMute.value;
     var result = await _engineManager.muteAllAudioAction(isAllMute.value);
     if (result.code == TUIError.success) {
-      makeToast(
-          msg: isAllMute.value
-              ? RoomContentsTranslations.translate('allMute')
-              : RoomContentsTranslations.translate('unAllMute'));
+      if (isOwner()) {
+        makeToast(
+            msg: isAllMute.value
+                ? RoomContentsTranslations.translate('allMutePrompt')
+                : RoomContentsTranslations.translate('allUnMutePrompt'));
+      }
     } else {
       isAllMute.value = !isAllMute.value;
       makeToast(msg: result.message!);
@@ -59,8 +61,8 @@ class UserListController extends GetxController {
     if (result.code == TUIError.success) {
       makeToast(
           msg: isAllCameraDisable.value
-              ? RoomContentsTranslations.translate('disableAllVideo')
-              : RoomContentsTranslations.translate('enableAllVideo'));
+              ? RoomContentsTranslations.translate('disableAllVideoPrompt')
+              : RoomContentsTranslations.translate('enableAllVideoPrompt'));
     } else {
       isAllCameraDisable.value = !isAllCameraDisable.value;
       makeToast(msg: result.message!);
@@ -211,6 +213,34 @@ class UserListController extends GetxController {
     }
   }
 
+  void changeAdministratorAction(UserModel userModel) async {
+    TUIActionCallback result;
+    bool isUserAdministrator = isAdministrator(userModel);
+    if (isUserAdministrator) {
+      result = await _engineManager.changeUserRole(
+          userModel.userId.value, TUIRole.generalUser);
+    } else {
+      result = await _engineManager.changeUserRole(
+          userModel.userId.value, TUIRole.administrator);
+    }
+    if (result.code == TUIError.success) {
+      showConferenceDialog(
+        title: isUserAdministrator
+            ? RoomContentsTranslations.translate('haveRevokedAdministrator')
+                .replaceAll('xx', userModel.userName.value)
+            : RoomContentsTranslations.translate('haveSetUpAdministrator')
+                .replaceAll('xx', userModel.userName.value),
+        confirmText: RoomContentsTranslations.translate('ok'),
+        titleTextStyle: RoomTheme.defaultTheme.textTheme.displayLarge,
+        confirmTextStyle: RoomTheme.defaultTheme.textTheme.displayMedium,
+        onConfirm: () {
+          Get.back();
+        },
+        barrierDismissible: false,
+      );
+    }
+  }
+
   void disableMessageAction(UserModel userModel) {
     _engineManager.disableSendingMessageByAdmin(
         userModel.userId.value, userModel.ableSendingMessage.value);
@@ -244,6 +274,14 @@ class UserListController extends GetxController {
     super.onClose();
   }
 
+  void changeSeatStatusAction(UserModel userModel) {
+    if (userModel.isOnSeat.value) {
+      _kickUserOffSeat(userModel.userId.value);
+    } else {
+      takeUserOnSeat(userModel);
+    }
+  }
+
   void takeUserOnSeat(UserModel userModel) {
     makeToast(
         msg: RoomContentsTranslations.translate('takeSeatInvitationSend'));
@@ -270,7 +308,7 @@ class UserListController extends GetxController {
     );
   }
 
-  void kickUserOffSeat(String userId) {
+  void _kickUserOffSeat(String userId) {
     RoomEngineManager().kickUserOffSeat(_seatIndex, userId);
   }
 
@@ -283,20 +321,51 @@ class UserListController extends GetxController {
     return RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner;
   }
 
+  bool isAdministrator(UserModel userModel) {
+    return userModel.userRole.value == TUIRole.administrator;
+  }
+
   double getUserControlWidgetHeight(UserModel userModel) {
-    if (userModel.userId.value == RoomStore.to.currentUser.userId.value) {
+    if (isSelf(userModel)) {
       return 230.0.scale375();
     }
-    if (isSeatMode()) {
-      if (userModel.isOnSeat.value) {
-        return 435.0.scale375();
+    if (isOwner()) {
+      if (isSeatMode()) {
+        if (userModel.isOnSeat.value) {
+          return 485.0.scale375();
+        }
+        return 385.0.scale375();
       }
-      return 335.0.scale375();
+      return 435.0.scale375();
+    } else {
+      if (isSeatMode()) {
+        if (userModel.isOnSeat.value) {
+          return 335.0.scale375();
+        }
+        return 235.0.scale375();
+      }
+      return 285.0.scale375();
     }
-    return 385.0.scale375();
   }
 
   bool isSelf(UserModel userModel) {
     return userModel.userId.value == RoomStore.to.currentUser.userId.value;
+  }
+
+  bool isAbleToControlUser(UserModel userModel) {
+    if (isSelf(userModel)) {
+      return true;
+    }
+    if (isOwner()) {
+      return true;
+    }
+    if (isAdministrator(RoomStore.to.currentUser)) {
+      if (isAdministrator(userModel) ||
+          userModel.userRole.value == TUIRole.roomOwner) {
+        return false;
+      }
+      return true;
+    }
+    return false;
   }
 }

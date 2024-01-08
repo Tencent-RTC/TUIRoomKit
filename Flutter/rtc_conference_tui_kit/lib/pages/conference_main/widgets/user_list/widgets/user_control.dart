@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
-import 'package:rtc_room_engine/api/room/tui_room_define.dart';
 
 import '../index.dart';
 import 'widgets.dart';
@@ -29,7 +28,8 @@ class UserControlWidget extends GetView<UserListController> {
                 Get.back();
                 controller.muteAudioAction(userModel);
               },
-              text: RoomContentsTranslations.translate('unmute'),
+              text: RoomContentsTranslations.translate(
+                  controller.isSelf(userModel) ? 'unmute' : 'requestOpenAudio'),
               selectedText: RoomContentsTranslations.translate('mute'),
               image: Image.asset(
                 AssetsImages.roomMuteAudio,
@@ -73,8 +73,7 @@ class UserControlWidget extends GetView<UserListController> {
               isSelected: userModel.hasVideoStream,
             ),
           ),
-          if (userModel.userRole.value != TUIRole.roomOwner &&
-              RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner) ...[
+          if (controller.isOwner() && !controller.isSelf(userModel)) ...[
             UserControlItemWidget(
               onPressed: () {
                 Get.back();
@@ -89,11 +88,38 @@ class UserControlWidget extends GetView<UserListController> {
               ),
               isSelected: false.obs,
             ),
+            UserControlItemWidget(
+              onPressed: () {
+                Get.back();
+                controller.changeAdministratorAction(userModel);
+              },
+              text: RoomContentsTranslations.translate('setAsAdministrator'),
+              selectedText:
+                  RoomContentsTranslations.translate('undoAdministrator'),
+              image: Image.asset(
+                AssetsImages.roomSetAdministrator,
+                package: 'rtc_conference_tui_kit',
+                width: 20.0.scale375(),
+                height: 20.0.scale375(),
+              ),
+              selectedImage: Image.asset(
+                AssetsImages.roomUndoAdministrator,
+                package: 'rtc_conference_tui_kit',
+                width: 20.0.scale375(),
+                height: 20.0.scale375(),
+              ),
+              isSelected: controller.isAdministrator(userModel).obs,
+            ),
             Divider(
                 height: 3.0.scale375(),
                 thickness: 3.0.scale375(),
                 color: RoomColors.dividerGrey),
-            UserControlItemWidget(
+          ],
+          Visibility(
+            visible: !controller.isSelf(userModel) &&
+                (controller.isOwner() ||
+                    controller.isAdministrator(RoomStore.to.currentUser)),
+            child: UserControlItemWidget(
               onPressed: () {
                 Get.back();
                 controller.disableMessageAction(userModel);
@@ -115,42 +141,37 @@ class UserControlWidget extends GetView<UserListController> {
               ),
               isSelected: userModel.ableSendingMessage,
             ),
-            Visibility(
-              visible: controller.isSeatMode() && controller.isOwner(),
-              child: userModel.isOnSeat.value
-                  ? UserControlItemWidget(
-                      onPressed: () {
-                        controller.kickUserOffSeat(userModel.userId.value);
-                        Get.back();
-                      },
-                      text: RoomContentsTranslations.translate('kickOffSeat'),
-                      image: Image.asset(
-                        AssetsImages.roomKickOffSeat,
-                        package: 'rtc_conference_tui_kit',
-                        width: 20.0.scale375(),
-                        height: 20.0.scale375(),
-                      ),
-                      isSelected: false.obs,
-                      isRedText: false,
-                    )
-                  : UserControlItemWidget(
-                      onPressed: () {
-                        controller.takeUserOnSeat(userModel);
-                        Get.back();
-                      },
-                      text: RoomContentsTranslations.translate(
-                          'inviteToTakeSeat'),
-                      image: Image.asset(
-                        AssetsImages.roomRequestOnSeat,
-                        package: 'rtc_conference_tui_kit',
-                        width: 20.0.scale375(),
-                        height: 20.0.scale375(),
-                      ),
-                      isSelected: false.obs,
-                      isRedText: false,
-                    ),
+          ),
+          Visibility(
+            visible: !controller.isSelf(userModel) &&
+                controller.isSeatMode() &&
+                (controller.isOwner() ||
+                    controller.isAdministrator(RoomStore.to.currentUser)),
+            child: UserControlItemWidget(
+              onPressed: () {
+                controller.changeSeatStatusAction(userModel);
+                Get.back();
+              },
+              text: RoomContentsTranslations.translate('inviteToTakeSeat'),
+              selectedText: RoomContentsTranslations.translate('kickOffSeat'),
+              image: Image.asset(
+                AssetsImages.roomRequestOnSeat,
+                package: 'rtc_conference_tui_kit',
+                width: 20.0.scale375(),
+                height: 20.0.scale375(),
+              ),
+              selectedImage: Image.asset(
+                AssetsImages.roomKickOffSeat,
+                package: 'rtc_conference_tui_kit',
+                width: 20.0.scale375(),
+                height: 20.0.scale375(),
+              ),
+              isSelected: userModel.isOnSeat,
             ),
-            UserControlItemWidget(
+          ),
+          Visibility(
+            visible: controller.isOwner() && !controller.isSelf(userModel),
+            child: UserControlItemWidget(
               onPressed: () {
                 Get.back();
                 controller.kickOutAction(userModel);
@@ -163,9 +184,9 @@ class UserControlWidget extends GetView<UserListController> {
                 height: 20.0.scale375(),
               ),
               isSelected: false.obs,
-              isRedText: true,
+              textStyle: RoomTheme.defaultTheme.textTheme.labelMedium,
             ),
-          ],
+          ),
         ],
       ),
     );

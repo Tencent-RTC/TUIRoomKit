@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
-import 'package:rtc_room_engine/api/room/tui_room_define.dart';
 
 import '../index.dart';
 import 'widgets.dart';
@@ -22,9 +21,7 @@ class UserListItem extends GetView<UserListController> {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
-            if (RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner ||
-                RoomStore.to.currentUser.userId.value ==
-                    userModel.userId.value) {
+            if (controller.isAbleToControlUser(userModel)) {
               Get.bottomSheet(UserControlWidget(userModel: userModel));
             }
           },
@@ -33,9 +30,12 @@ class UserListItem extends GetView<UserListController> {
               UserInfoWidget(userModel: userModel),
               const Expanded(child: SizedBox()),
               Visibility(
-                visible: !userModel.isOnSeat.value &&
+                visible: !controller.isSelf(userModel) &&
+                    !userModel.isOnSeat.value &&
                     controller.isSeatMode() &&
-                    controller.isOwner(),
+                    (controller.isOwner() ||
+                        controller.isAdministrator(RoomStore.to.currentUser) &&
+                            !controller.isAdministrator(userModel)),
                 child: TextButton(
                   style: RoomTheme.defaultTheme.menuButtonTheme.style,
                   onPressed: () {

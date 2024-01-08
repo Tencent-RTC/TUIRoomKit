@@ -22,15 +22,20 @@ class VideoUserInfoWidget extends StatelessWidget {
         children: [
           Obx(
             () => Visibility(
-              visible: userModel.userRole.value == TUIRole.roomOwner,
+              visible: userModel.userRole.value != TUIRole.generalUser,
               child: SizedBox(
                 width: 24,
                 height: 24,
                 child: ClipOval(
-                  child: Image.asset(
-                    AssetsImages.roomOwner,
-                    package: 'rtc_conference_tui_kit',
-                  ),
+                  child: userModel.userRole.value == TUIRole.roomOwner
+                      ? Image.asset(
+                          AssetsImages.roomOwner,
+                          package: 'rtc_conference_tui_kit',
+                        )
+                      : Image.asset(
+                          AssetsImages.roomAdministrator,
+                          package: 'rtc_conference_tui_kit',
+                        ),
                 ),
               ),
             ),

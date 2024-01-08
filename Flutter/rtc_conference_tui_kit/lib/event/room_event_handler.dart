@@ -16,6 +16,7 @@ class RoomEventHandler extends TUIRoomObserver {
       } else {
         makeToast(msg: RoomContentsTranslations.translate('allUnMutePrompt'));
       }
+      _store.updateItemTouchableState();
     };
 
     super.onAllUserCameraDisableChanged = (roomId, isDisable) {
@@ -30,6 +31,7 @@ class RoomEventHandler extends TUIRoomObserver {
         makeToast(
             msg: RoomContentsTranslations.translate('enableAllVideoPrompt'));
       }
+      _store.updateItemTouchableState();
     };
 
     super.onRemoteUserEnterRoom = (roomId, userInfo) {
@@ -159,6 +161,10 @@ class RoomEventHandler extends TUIRoomObserver {
         }
       });
       _store.deleteInviteSeatUser(cancelledUserId);
+    };
+
+    super.onKickedOffSeat = (userId) {
+      makeToast(msg: RoomContentsTranslations.translate('kickedOffSeat'));
     };
 
     super.onKickedOutOfRoom = (roomId, reason, message) {

@@ -14,6 +14,7 @@ class BottomViewController extends GetxController {
   final isUnfold = false.obs;
   final showMoreButton = false.obs;
   final isRequestingTakeSeat = false.obs;
+  final isSeatMode = false.obs;
 
   late RoomEngineManager _engineManager;
   late RoomStore _store;
@@ -25,6 +26,8 @@ class BottomViewController extends GetxController {
     _engineManager = RoomEngineManager();
     _store = RoomStore.to;
     _takeSeatRequestId = '';
+    isSeatMode.value =
+        _store.roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat;
   }
 
   void muteAudioAction() {
@@ -63,7 +66,7 @@ class BottomViewController extends GetxController {
   }
 
   bool _isOffSeatInSeatMode() {
-    if (isSeatMode() && !_store.currentUser.isOnSeat.value) {
+    if (isSeatMode.value && !_store.currentUser.isOnSeat.value) {
       makeToast(
         msg: RoomContentsTranslations.translate('raiseHandTip'),
       );
@@ -107,9 +110,11 @@ class BottomViewController extends GetxController {
     }
     if (!isRequestingTakeSeat.value) {
       isRequestingTakeSeat.value = true;
-      makeToast(
-        msg: RoomContentsTranslations.translate('handRaised'),
-      );
+      if (RoomStore.to.currentUser.userRole.value != TUIRole.administrator) {
+        makeToast(
+          msg: RoomContentsTranslations.translate('joinStageApplicationSent'),
+        );
+      }
       _takeSeatRequestId = _engineManager
           .takeSeat(
             _seatIndex,
@@ -146,17 +151,56 @@ class BottomViewController extends GetxController {
       _takeSeatRequestId = '';
 
       makeToast(
-        msg: RoomContentsTranslations.translate('handDownToast'),
+        msg:
+            RoomContentsTranslations.translate('joinStageApplicationCancelled'),
       );
       isRequestingTakeSeat.value = false;
     }
   }
 
   void leaveSeat() {
-    _engineManager.leaveSeat();
+    showConferenceDialog(
+      title: RoomContentsTranslations.translate('leaveSeatTitle'),
+      message: RoomContentsTranslations.translate('leaveSeatMessage'),
+      confirmText: RoomContentsTranslations.translate('leaveSeat'),
+      cancelText: RoomContentsTranslations.translate('cancel'),
+      onConfirm: () {
+        _engineManager.leaveSeat();
+        Get.back();
+      },
+    );
   }
 
-  bool isSeatMode() {
-    return _store.roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat;
+  bool isMicAndCameraButtonVisible() {
+    return !isSeatMode.value ||
+        RoomStore.to.currentUser.isOnSeat.value ||
+        RoomStore.to.currentUser.userRole.value == TUIRole.administrator;
+  }
+
+  bool isRaiseHandButtonVisible() {
+    return isSeatMode.value &&
+        RoomStore.to.currentUser.userRole.value != TUIRole.roomOwner;
+  }
+
+  bool isRaiseHandListButtonVisible() {
+    return isSeatMode.value &&
+        RoomStore.to.currentUser.userRole.value != TUIRole.generalUser;
+  }
+
+  bool isScreenShareButtonInBaseRow() {
+    return !isSeatMode.value ||
+        RoomStore.to.currentUser.userRole.value != TUIRole.administrator;
+  }
+
+  bool isInviteButtonInBaseRow() {
+    return !isSeatMode.value ||
+        !RoomStore.to.currentUser.isOnSeat.value &&
+            RoomStore.to.currentUser.userRole.value != TUIRole.administrator;
+  }
+
+  bool isSettingButtonInBaseRow() {
+    return isSeatMode.value &&
+        !RoomStore.to.currentUser.isOnSeat.value &&
+        RoomStore.to.currentUser.userRole.value != TUIRole.administrator;
   }
 }

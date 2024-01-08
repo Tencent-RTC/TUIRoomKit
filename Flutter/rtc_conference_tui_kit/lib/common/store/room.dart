@@ -20,6 +20,9 @@ class RoomStore extends GetxController {
   static const _seatIndex = -1;
   static const _reqTimeout = 0;
 
+  RxBool isMicItemTouchable = true.obs;
+  RxBool isCameraItemTouchable = true.obs;
+
   void clearStore() {
     screenShareUser = UserModel();
     userInfoList.clear();
@@ -32,6 +35,8 @@ class RoomStore extends GetxController {
     inviteSeatList.clear();
     inviteSeatMap.clear();
     timeStampOnEnterRoom = 0;
+    isMicItemTouchable = true.obs;
+    isCameraItemTouchable = true.obs;
   }
 
   UserModel get screenShareUser => _screenShareUser;
@@ -123,6 +128,10 @@ class RoomStore extends GetxController {
       makeToast(
           msg: RoomContentsTranslations.translate('cameraTurnedOnByHostToast'));
     } else if (!roomInfo.isCameraDisableForAllUser) {
+      if (roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat &&
+          !currentUser.isOnSeat.value) {
+        return;
+      }
       makeToast(
           msg:
               RoomContentsTranslations.translate('cameraTurnedOffByHostToast'));
@@ -162,10 +171,8 @@ class RoomStore extends GetxController {
   }
 
   void updateSelfRole(TUIRole role) {
-    currentUser.userRole.value = role;
-    if (RoomStore.to.roomInfo.speechMode ==
-            TUISpeechMode.speakAfterTakingSeat &&
-        !RoomStore.to.currentUser.isOnSeat.value &&
+    if (roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat &&
+        !currentUser.isOnSeat.value &&
         role == TUIRole.roomOwner) {
       RoomEngineManager().takeSeat(_seatIndex, _reqTimeout, null);
     }
@@ -196,6 +203,7 @@ class RoomStore extends GetxController {
       if (!isOnSeat) {
         audioSetting.isMicDeviceOpened = false;
       }
+      updateItemTouchableState();
     }
   }
 
@@ -229,5 +237,63 @@ class RoomStore extends GetxController {
   void deleteInviteSeatUser(String userId) {
     inviteSeatList.removeWhere((element) => element.userId.value == userId);
     inviteSeatMap.removeWhere((key, value) => key == userId);
+  }
+
+  void initItemTouchableState() {
+    if (roomInfo.isMicrophoneDisableForAllUser &&
+        currentUser.userRole.value == TUIRole.generalUser) {
+      isMicItemTouchable.value = false;
+    }
+    if (roomInfo.isCameraDisableForAllUser &&
+        currentUser.userRole.value == TUIRole.generalUser) {
+      isCameraItemTouchable.value = false;
+    }
+    if (roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat &&
+        !currentUser.isOnSeat.value) {
+      isMicItemTouchable.value = false;
+      isCameraItemTouchable.value = false;
+    }
+  }
+
+  void updateItemTouchableState() {
+    if (currentUser.userRole.value == TUIRole.roomOwner) {
+      isCameraItemTouchable.value = true;
+      isMicItemTouchable.value = true;
+      return;
+    }
+    if (currentUser.userRole.value == TUIRole.administrator) {
+      if (roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+        if (currentUser.isOnSeat.value) {
+          isCameraItemTouchable.value = true;
+          isMicItemTouchable.value = true;
+        } else {
+          isCameraItemTouchable.value = false;
+          isMicItemTouchable.value = false;
+        }
+        return;
+      }
+      isCameraItemTouchable.value = true;
+      isMicItemTouchable.value = true;
+      return;
+    }
+    if (roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+      if (currentUser.isOnSeat.value) {
+        isCameraItemTouchable.value = true;
+        isMicItemTouchable.value = true;
+      } else {
+        isCameraItemTouchable.value = false;
+        isMicItemTouchable.value = false;
+      }
+    }
+    if (roomInfo.isMicrophoneDisableForAllUser) {
+      isMicItemTouchable.value = false;
+    } else {
+      isMicItemTouchable.value = true;
+    }
+    if (roomInfo.isCameraDisableForAllUser) {
+      isCameraItemTouchable.value = false;
+    } else {
+      isCameraItemTouchable.value = true;
+    }
   }
 }
