@@ -21,23 +21,16 @@ Android
 
 ## 运行示例
 
-### 第一步：创建TRTC的应用
-1. 一键进入腾讯云实时音视频控制台的[应用管理](https://console.cloud.tencent.com/trtc/app)界面，选择创建应用，输入应用名称，例如 `TUIKitDemo` ，单击 **创建**；
-2. 点击对应应用条目后**应用信息**，具体位置如下下图所示：
-    <img src="https://qcloudimg.tencent-cloud.cn/raw/62f58d310dde3de2d765e9a460b8676a.png" width="900">
-3. 进入应用信息后，按下图操作，记录SDKAppID和密钥：
-    <img src="https://qcloudimg.tencent-cloud.cn/raw/bea06852e22a33c77cb41d287cac25db.png" width="900">
-
->! 本功能同时使用了腾讯云 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788) 和 [即时通信 IM](https://cloud.tencent.com/document/product/269) 两个基础 PaaS 服务，开通实时音视频后会同步开通即时通信 IM 服务。 即时通信 IM 属于增值服务，详细计费规则请参见 [即时通信 IM 价格说明](https://cloud.tencent.com/document/product/269/11673)。
-
+### 第一步：开通服务
+请参考官网文档中 [快速接入](https://cloud.tencent.com/document/product/1690/88933) 中获取自己的SDKAppID和SDKSecreKey
 
 [](id:ui.step2)
+
 ### 第二步：下载源码，配置工程
 1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
 2. 找到并打开 `Android/debug/src/main/java/com/tencent/liteav/debug/GenerateTestUserSig.java` 文件。
 3. 配置 `GenerateTestUserSig.java` 文件中的相关参数：
-	<img src="https://main.qcloudimg.com/raw/f9b23b8632058a75b78d1f6fdcdca7da.png" width="900">
-
+	<img src="../Preview/test-user-sig-android.png" width="900">
 	- SDKAPPID：默认为占位符（PLACEHOLDER），请设置为步第一步中记录下的 SDKAppID。
 	- SECRETKEY：默认为占位符（PLACEHOLDER），请设置为步第一步中记录下的密钥信息。
 

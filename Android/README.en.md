@@ -22,14 +22,8 @@ Android
 
 ## Demo Run Example
 
-### Step 1. Create a TRTC application
-1. Go to the [Application management](https://console.cloud.tencent.com/trtc/app) page in the TRTC console, click **Create Application**, enter an application name such as `TUIKitDemo`, and then click **Confirm**.
-2. Click **Application Information** on the right of the application as shown below:
-    <img src="https://qcloudimg.tencent-cloud.cn/raw/62f58d310dde3de2d765e9a460b8676a.png" width="900">
-3. On the application information page, note down the `SDKAppID` and key as shown below:
-    <img src="https://qcloudimg.tencent-cloud.cn/raw/bea06852e22a33c77cb41d287cac25db.png" width="900">
-
->! This feature uses two basic PaaS services of Tencent Cloud: [TRTC](https://www.tencentcloud.com/document/product/647/35078) and [IM](https://www.tencentcloud.com/document/product/1047/33513). When you activate TRTC, IM will be activated automatically. IM is a value-added service.
+### Step 1. Activate the service
+1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/54843) to obtain your own SDKAppID and SDKSecreKey.
 
 
 [](id:ui.step2)
@@ -37,7 +31,7 @@ Android
 1. Clone or directly download the source code in the repository. **Feel free to star our project if you like it.**
 2. Find and open the `Android/debug/src/main/java/com/tencent/liteav/debug/GenerateTestUserSig.java` file.
 3. Set parameters in `GenerateTestUserSig.java`:
-	<img src="https://main.qcloudimg.com/raw/f9b23b8632058a75b78d1f6fdcdca7da.png" width="900">
+	<img src="../Preview/test-user-sig-android.png" width="900">
 
 	- SDKAPPID: A placeholder by default. Set it to the `SDKAppID` that you noted down in step 1.
 	- SECRETKEY: A placeholder by default. Set it to the key information that you noted down in step 1.

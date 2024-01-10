@@ -15,12 +15,8 @@ This document describes how to quickly run the TUIRoomKit demo project to make a
 ## Running the Demo
 
 [](id:ui.step1)
-### Step 1. Active the service
-
-First, please Create an application in the [TRTC Console](https://console.tencentcloud.com/trtc/allapp) and record the SDKAppID and SecretKey parameters. These parameters will be used in the subsequent integration process. The location of the application creation and parameters is shown in the following figure:
-   ![](https://qcloudimg.tencent-cloud.cn/raw/aa6cb270cefd189f07db51dce83c7052.png)
-
->! This component uses two basic PaaS services of Tencent Cloud: [TRTC](https://intl.cloud.tencent.com/document/product/647/35078) and [IM](https://intl.cloud.tencent.com/document/product/1047). When you activate TRTC, IM will be activated automatically. For information about the billing , see [Pricing](https://www.tencentcloud.com/document/product/647/34610).
+### Step 1. Activate the service
+1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/57508) to obtain your own SDKAppID and SDKSecreKey.
 
 [](id:ui.step2)
 ### Step 2. Configure the project
@@ -30,7 +26,7 @@ First, please Create an application in the [TRTC Console](https://console.tencen
 <ul style="margin:0"><li/>SDKAPPID: `0` by default. Set it to the actual `SDKAppID`.
 <li/>SECRETKEY: Left empty by default. Set it to the actual key.</ul
 
-![](https://qcloudimg.tencent-cloud.cn/raw/db5b13a64c315bf933c69109355ec872.png)
+![](../../Preview/test-user-sig-flutter.png)
 
 [](id:ui.step3)
 ### Step 3. Compile and run the application
