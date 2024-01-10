@@ -32,7 +32,7 @@ public class CreateRoomViewModel {
     private boolean mIsOpenAudio  = true;
     private boolean mIsUseSpeaker = true;
 
-    private TUIRoomDefine.SpeechMode mSpeechMode = TUIRoomDefine.SpeechMode.FREE_TO_SPEAK;
+    private boolean mIsSeatEnabled;
 
     public interface GetRoomIdCallback {
         void onGetRoomId(String roomId);
@@ -42,8 +42,8 @@ public class CreateRoomViewModel {
         mContext = context;
     }
 
-    public void setSpeechMode(TUIRoomDefine.SpeechMode speechMode) {
-        mSpeechMode = speechMode;
+    public void setSeatEnable(boolean enable) {
+        mIsSeatEnabled = enable;
     }
 
     public void getRoomId(GetRoomIdCallback callback) {
@@ -67,7 +67,8 @@ public class CreateRoomViewModel {
         TUIRoomDefine.RoomInfo roomInfo = new TUIRoomDefine.RoomInfo();
         roomInfo.roomId = roomId;
         roomInfo.name = truncateString(TUILogin.getNickName());
-        roomInfo.speechMode = mSpeechMode;
+        roomInfo.isSeatEnabled = mIsSeatEnabled;
+        roomInfo.seatMode = TUIRoomDefine.SeatMode.APPLY_TO_TAKE;
         TUIRoomKit roomKit = TUIRoomKit.createInstance();
         roomKit.createRoom(roomInfo, new TUIRoomDefine.ActionCallback() {
             @Override

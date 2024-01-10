@@ -86,7 +86,7 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
 
     public boolean checkPermission(String action) {
         if (TextUtils.equals(ACTION_MEDIA_CONTROL, action)) {
-            return mRoomStore.roomInfo.speechMode == TUIRoomDefine.SpeechMode.FREE_TO_SPEAK || mUser.isOnSeat();
+            return !mRoomStore.roomInfo.isSeatEnabled || mUser.isOnSeat();
         }
         if (TextUtils.equals(ACTION_KICK_OUT_ROOM, action)) {
             return mRoomStore.userModel.role == TUIRoomDefine.Role.ROOM_OWNER;
@@ -110,7 +110,7 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
     }
 
     public boolean isEnableSeatControl() {
-        return isTakeSeatSpeechMode();
+        return isSeatEnable();
     }
 
     public boolean isSelf() {
@@ -280,7 +280,7 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
         if (mUser == null) {
             return;
         }
-        if (!isTakeSeatSpeechMode() || !mUser.isOnSeat()) {
+        if (!isSeatEnable() || !mUser.isOnSeat()) {
             return;
         }
         RoomEngineManager.sharedInstance().kickUserOffSeatByAdmin(SEAT_INDEX, mUser.getUserId(), null);
@@ -290,7 +290,7 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
         if (mUser == null) {
             return;
         }
-        if (!isTakeSeatSpeechMode() || mUser.isOnSeat()) {
+        if (!isSeatEnable() || mUser.isOnSeat()) {
             return;
         }
         RoomEngineManager.sharedInstance().takeUserOnSeatByAdmin(SEAT_INDEX, mUser.getUserId(), INVITE_TIME_OUT, null);
@@ -410,8 +410,8 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
         }
     }
 
-    private boolean isTakeSeatSpeechMode() {
-        return TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT.equals(mRoomStore.roomInfo.speechMode);
+    private boolean isSeatEnable() {
+        return mRoomStore.roomInfo.isSeatEnabled;
     }
 
     private boolean hasAbilityToManageUser(UserEntity user) {

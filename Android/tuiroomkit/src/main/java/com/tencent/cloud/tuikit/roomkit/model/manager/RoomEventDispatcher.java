@@ -99,14 +99,6 @@ public class RoomEventDispatcher extends TUIRoomObserver {
     }
 
     @Override
-    public void onRoomSpeechModeChanged(String roomId, TUIRoomDefine.SpeechMode speechMode) {
-        Map<String, Object> map = new HashMap<>();
-        map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
-        map.put(RoomEventConstant.KEY_SPEECH_MODE, speechMode);
-        RoomEventCenter.getInstance().notifyEngineEvent(RoomEventCenter.RoomEngineEvent.ROOM_SPEECH_MODE_CHANGED, map);
-    }
-
-    @Override
     public void onRemoteUserEnterRoom(String roomId, TUIRoomDefine.UserInfo userInfo) {
         mRoomStore.remoteUserEnterRoom(userInfo);
     }

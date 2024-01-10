@@ -12,15 +12,15 @@ import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 
 public class RoomTypeSelectView extends BottomSheetDialog implements View.OnClickListener {
-    private boolean    mIsFreeSpeech;
+    private boolean    mIsSeatEnabled;
     private Button     mButtonConfirm;
     private Button     mButtonCancel;
     private RadioGroup mGroupRoomType;
 
-    private SpeechModeCallback mSpeechModeCallback;
+    private SeatEnableCallback mSeatEnableCallback;
 
-    public interface SpeechModeCallback {
-        void onSpeechModeChanged(TUIRoomDefine.SpeechMode speechMode);
+    public interface SeatEnableCallback {
+        void onSeatEnableChanged(boolean enable);
     }
 
     public RoomTypeSelectView(@NonNull Context context) {
@@ -29,8 +29,8 @@ public class RoomTypeSelectView extends BottomSheetDialog implements View.OnClic
         initView();
     }
 
-    public void setSpeechModeCallback(SpeechModeCallback speechModeCallback) {
-        mSpeechModeCallback = speechModeCallback;
+    public void setSeatEnableCallback(SeatEnableCallback callback) {
+        mSeatEnableCallback = callback;
     }
 
     private void initView() {
@@ -44,7 +44,7 @@ public class RoomTypeSelectView extends BottomSheetDialog implements View.OnClic
         mGroupRoomType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                mIsFreeSpeech = checkedId == R.id.rb_free_speech;
+                mIsSeatEnabled = checkedId == R.id.rb_raise_hand;
             }
         });
     }
@@ -54,9 +54,8 @@ public class RoomTypeSelectView extends BottomSheetDialog implements View.OnClic
         if (v.getId() == R.id.btn_cancel) {
             dismiss();
         } else if (v.getId() == R.id.btn_confirm) {
-            if (mSpeechModeCallback != null) {
-                mSpeechModeCallback.onSpeechModeChanged(mIsFreeSpeech ? TUIRoomDefine.SpeechMode.FREE_TO_SPEAK :
-                        TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT);
+            if (mSeatEnableCallback != null) {
+                mSeatEnableCallback.onSeatEnableChanged(mIsSeatEnabled);
             }
             dismiss();
         }

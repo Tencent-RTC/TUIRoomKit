@@ -143,7 +143,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         }
 
         private void setMediaState(UserEntity user) {
-            if (TUIRoomDefine.SpeechMode.FREE_TO_SPEAK.equals(mRoomInfo.speechMode) || user.isOnSeat()) {
+            if (!mRoomInfo.isSeatEnabled || user.isOnSeat()) {
                 mImageAudio.setVisibility(View.VISIBLE);
                 mImageVideo.setVisibility(View.VISIBLE);
                 mImageAudio.setSelected(user.isHasAudioStream());
@@ -187,7 +187,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         }
 
         private boolean shouldShowInviteUser(UserEntity user) {
-            if (mRoomInfo.speechMode == TUIRoomDefine.SpeechMode.FREE_TO_SPEAK) {
+            if (!mRoomInfo.isSeatEnabled) {
                 return false;
             }
             if (user.isOnSeat()) {

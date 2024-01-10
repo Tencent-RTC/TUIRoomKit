@@ -65,13 +65,11 @@ public class CreateRoomView extends RelativeLayout
         mTextRoomType = findViewById(R.id.tv_room_type);
         mLayoutSettingContainer = findViewById(R.id.ll_setting_container);
         mRoomTypeDialog = new RoomTypeSelectView(mContext);
-        mRoomTypeDialog.setSpeechModeCallback(new RoomTypeSelectView.SpeechModeCallback() {
+        mRoomTypeDialog.setSeatEnableCallback(new RoomTypeSelectView.SeatEnableCallback() {
             @Override
-            public void onSpeechModeChanged(TUIRoomDefine.SpeechMode speechMode) {
-                mViewModel.setSpeechMode(speechMode);
-                int resId = TUIRoomDefine.SpeechMode.FREE_TO_SPEAK.equals(speechMode)
-                        ? R.string.app_room_free_speech
-                        : R.string.app_room_raise_hand;
+            public void onSeatEnableChanged(boolean enable) {
+                mViewModel.setSeatEnable(enable);
+                int resId = enable ? R.string.app_room_raise_hand : R.string.app_room_free_speech;
                 mTextRoomType.setText(resId);
             }
         });
