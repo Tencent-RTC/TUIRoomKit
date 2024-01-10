@@ -13,8 +13,6 @@
 "Demo.TUIRoomKit.input.room.num" = "请输入房间号";
 "Demo.TUIRoomKit.input.error.room.num.toast" = "请输入正确房间号";
 "Demo.TUIRoomKit.user.name" = "您的姓名";
-"Demo.TUIRoomKit.ok" = "确认";
-"Demo.TUIRoomKit.cancel" = "取消";
 "Demo.TUIRoomKit.raise.speak.model" = "举手发言模式";
 "Demo.TUIRoomKit.freedom.speak.model" = "自由发言模式";
 "Demo.TUIRoomKit.room.type" = "房间类型";

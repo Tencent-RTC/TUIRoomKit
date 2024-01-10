@@ -134,7 +134,7 @@ class CreateRoomView: UIView {
         
         switchSpeakerModelView.snp.makeConstraints { make in
             make.bottom.equalToSuperview()
-            make.height.equalTo(221.scale375())
+            make.height.equalTo(191.scale375())
             make.width.equalToSuperview()
         }
     }

@@ -16,8 +16,7 @@ class CreateRoomViewController: UIViewController {
     weak var rootView: CreateRoomView?
     private(set) var inputViewItems: [ListCellItemData] = []
     private(set) var switchViewItems: [ListCellItemData] = []
-    private var chooseSpeechMode: TUISpeechMode = .freeToSpeak
-    var roomSpeechMode: TUISpeechMode = .freeToSpeak
+    private(set) var isSeatEnable: Bool = false
     private let currentUserName: String = TUILogin.getNickName() ?? ""
     private let currentUserId: String = TUILogin.getUserID() ?? ""
     private let roomInfo: TUIRoomInfo = TUIRoomInfo()
@@ -139,7 +138,8 @@ extension CreateRoomViewController {
         }
         roomInfo.roomId = roomId
         roomInfo.name = currentUserName.truncateUtf8String(maxByteLength: 30)
-        roomInfo.speechMode = roomSpeechMode
+        roomInfo.isSeatEnabled = isSeatEnable
+        roomInfo.seatMode = .applyToTake
         roomInfo.roomType = .conference
         roomKit.createRoom(roomInfo: roomInfo) { [weak self] in
             guard let self = self else { return }
@@ -168,39 +168,24 @@ extension CreateRoomViewController {
         rootView?.showSpeechModeControlView()
     }
     
-    func cancelAction(sender: UIButton, view: RoomTypeView) {
-        sender.isSelected = !sender.isSelected
-        chooseSpeechMode = roomSpeechMode
-        view.raiseHandButton.isSelected = false
-        view.freedomButton.isSelected = false
-        view.isHidden = true
-    }
-    
-    func sureAction(sender: UIButton, view: RoomTypeView) {
-        sender.isSelected = !sender.isSelected
-        roomSpeechMode = chooseSpeechMode
-        view.isHidden = true
-        guard let itemData = inputViewItems.first(where: { $0.titleText == .roomTypeText }) else { return }
-        switch roomSpeechMode {
-        case .freeToSpeak:
-            itemData.messageText = .freedomSpeakText
-        case .applySpeakAfterTakingSeat:
-            itemData.messageText = .raiseHandSpeakText
-        default: break
-        }
-        rootView?.updateInputStackView(item: itemData, index: 0)
-    }
-    
     func freedomAction(sender: UIButton, view: RoomTypeView) {
         sender.isSelected = !sender.isSelected
         view.raiseHandButton.isSelected = false
-        chooseSpeechMode = .freeToSpeak
+        isSeatEnable = false
+        view.isHidden = true
+        guard let itemData = inputViewItems.first(where: { $0.titleText == .roomTypeText }) else { return }
+        itemData.messageText = isSeatEnable ? .raiseHandSpeakText : .freedomSpeakText
+        rootView?.updateInputStackView(item: itemData, index: 0)
     }
     
     func raiseHandAction(sender: UIButton, view: RoomTypeView) {
         sender.isSelected = !sender.isSelected
         view.freedomButton.isSelected = false
-        chooseSpeechMode = .applySpeakAfterTakingSeat
+        isSeatEnable = true
+        view.isHidden = true
+        guard let itemData = inputViewItems.first(where: { $0.titleText == .roomTypeText }) else { return }
+        itemData.messageText = isSeatEnable ? .raiseHandSpeakText : .freedomSpeakText
+        rootView?.updateInputStackView(item: itemData, index: 0)
     }
     
     private func setupRoomId() {

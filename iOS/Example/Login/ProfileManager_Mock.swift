@@ -125,6 +125,7 @@ import TUIRoomKit
             return
         }
         let user = String(userID)
+       
         TUILogin.login(Int32(SDKAPPID), userID: user, userSig: userSig) {
             debugPrint("login success")
             V2TIMManager.sharedInstance()?.getUsersInfo([userID], succ: { [weak self] (infos) in

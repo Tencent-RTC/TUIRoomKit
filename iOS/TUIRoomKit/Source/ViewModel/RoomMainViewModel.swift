@@ -51,7 +51,7 @@ class RoomMainViewModel: NSObject {
     
     func applyConfigs() {
         //如果房间不是自由发言房间并且用户没有上麦，不开启摄像头
-        if roomInfo.speechMode != .freeToSpeak && !currentUser.isOnSeat {
+        if roomInfo.isSeatEnabled && !currentUser.isOnSeat {
             store.videoSetting.isCameraOpened = false
             return
         }
@@ -220,9 +220,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
             case .connectOtherRoom:
                 engineManager.responseRemoteRequest(request.requestId, agree: true)
             case .remoteUserOnSeat:
-                switch roomInfo.speechMode {
-                case .applySpeakAfterTakingSeat:
-                    guard !isShownTakeSeatInviteAlert else { return }
+                    guard roomInfo.isSeatEnabled && !isShownTakeSeatInviteAlert else { return }
                     viewResponder?.showAlert(title: .inviteSpeakOnStageTitle, message: .inviteSpeakOnStageMessage, sureTitle: .agreeSeatText, declineTitle: .declineText, sureBlock: { [weak self] in
                         guard let self = self else { return }
                         self.isShownTakeSeatInviteAlert = false
@@ -233,8 +231,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
                         self.respondUserOnSeat(isAgree: false, requestId: request.requestId)
                     })
                     isShownTakeSeatInviteAlert = true
-                default: break
-                }
+                
             default: break
             }
         }
@@ -264,7 +261,7 @@ extension RoomMainViewModel: RoomMainViewFactory {
     func makeRaiseHandNoticeView() -> UIView {
         let raiseHandNoticeView = RaiseHandNoticeView()
         //只有举手发言房间，并且用户不是房主时才会显示举手上麦提示
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, currentUser.userId != roomInfo.ownerId, store.isShownRaiseHandNotice {
+        if roomInfo.isSeatEnabled, currentUser.userId != roomInfo.ownerId, store.isShownRaiseHandNotice {
             raiseHandNoticeView.isHidden = false
         } else {
             raiseHandNoticeView.isHidden = true
@@ -300,7 +297,7 @@ extension RoomMainViewModel: RoomKitUIEventResponder {
             case .roomOwner:
                 viewResponder?.showAlert(title: .haveBecomeMasterText, message: nil,sureTitle: .alertOkText, declineTitle: nil, sureBlock: nil, declineBlock: nil)
             case .administrator:
-                if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
+                if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
                     viewResponder?.showAlert(title: .haveBecomeAdministratorText, message: .setAsAdministratorMessageText, sureTitle: .joinStageImmediatelyText, declineTitle: .notYetJoinStageText, sureBlock: { [weak self] in
                         guard let self = self else { return }
                         self.engineManager.takeSeat()

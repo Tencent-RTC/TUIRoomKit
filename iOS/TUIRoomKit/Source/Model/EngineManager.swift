@@ -30,7 +30,7 @@ class EngineManager: NSObject {
         return store
     }()
     private(set) lazy var roomEngine: TUIRoomEngine = {
-        let roomEngine = TUIRoomEngine()
+        let roomEngine = TUIRoomEngine.sharedInstance()
         roomEngine.addObserver(eventDispatcher)
         return roomEngine
     }()
@@ -122,6 +122,7 @@ class EngineManager: NSObject {
     
     func destroyEngineManager() {
         roomEngine.removeObserver(eventDispatcher)
+        TUIRoomEngine.destroySharedInstance()
         EngineManager._shared = nil
     }
     
@@ -455,7 +456,7 @@ class EngineManager: NSObject {
     func initUserList(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         self.getUserList(nextSequence: 0, localUserList: []) { [weak self] in
             guard let self = self else { return }
-            if self.store.roomInfo.speechMode == .applySpeakAfterTakingSeat {
+            if self.store.roomInfo.isSeatEnabled {
                 self.getSeatList {
                     onSuccess?()
                 } onError: { code, message in
@@ -604,7 +605,7 @@ extension EngineManager {
             //初始化视频设置
             self.initLocalVideoState()
             //如果是举手发言房间的房主，需要先上麦再跳转到会议主页面
-            if roomInfo.speechMode == .applySpeakAfterTakingSeat, self.store.currentUser.userId == roomInfo.ownerId {
+            if roomInfo.isSeatEnabled, self.store.currentUser.userId == roomInfo.ownerId {
                 self.takeSeat() { [weak self] _,_ in
                     guard let self = self else { return }
                     self.showRoomViewController(roomId: roomInfo.roomId)
@@ -642,7 +643,7 @@ extension EngineManager {
         if store.roomInfo.isMicrophoneDisableForAllUser, store.currentUser.userId != store.roomInfo.ownerId {
             return false
         }
-        if store.roomInfo.speechMode == .applySpeakAfterTakingSeat, store.currentUser.userId != store.roomInfo.ownerId {
+        if store.roomInfo.isSeatEnabled, store.currentUser.userId != store.roomInfo.ownerId {
             return false
         }
         return true
@@ -699,7 +700,7 @@ extension EngineManager {
             } else {
                 self.store.attendeeList = localUserList
                 onSuccess()
-                if self.store.roomInfo.speechMode != .applySpeakAfterTakingSeat {
+                if !self.store.roomInfo.isSeatEnabled {
                     EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewVideoSeatView, param: [:])
                 }
                 EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
@@ -716,11 +717,8 @@ extension EngineManager {
             guard let self = self else { return }
             var localSeatList = [UserEntity]()
             for seatInfo in seatList {
-                var userModel = UserEntity()
-                userModel.userId = seatInfo.userId ?? ""
-                if let user = self.store.attendeeList.first(where: { $0.userId == seatInfo.userId }) {
-                    userModel = user
-                }
+                guard let userId = seatInfo.userId, userId != "" else { continue }
+                guard let userModel = self.store.attendeeList.first(where: { $0.userId == seatInfo.userId }) else { continue }
                 userModel.isOnSeat = true
                 localSeatList.append(userModel)
             }

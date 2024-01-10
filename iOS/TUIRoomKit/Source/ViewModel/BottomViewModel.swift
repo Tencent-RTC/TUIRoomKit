@@ -242,7 +242,7 @@ class BottomViewModel: NSObject {
         viewItems.append(memberItem)
         viewItems.append(muteAudioItem)
         viewItems.append(muteVideoItem)
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat {
+        if roomInfo.isSeatEnabled {
             if currentUser.userRole == .roomOwner {
                 viewItems.append(raiseHandApplyItem)
             } else {
@@ -291,7 +291,7 @@ class BottomViewModel: NSObject {
             return
         }
         //如果是举手发言房间，并且没有上麦，不可打开麦克风
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
+        if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             viewResponder?.makeToast(text: .muteSeatReasonText)
             return
         }
@@ -312,7 +312,7 @@ class BottomViewModel: NSObject {
             return
         }
         //如果是举手发言房间，并且没有上麦，不可打开摄像头
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
+        if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             viewResponder?.makeToast(text: .muteSeatReasonText)
             return
         }
@@ -358,7 +358,7 @@ class BottomViewModel: NSObject {
                     return
                 }
                 //如果现在是举手发言房间，自己又没有上麦，也不能进行屏幕共享
-                guard !(roomInfo.speechMode == .applySpeakAfterTakingSeat && !currentUser.isOnSeat) else {
+                guard !(roomInfo.isSeatEnabled && !currentUser.isOnSeat) else {
                     viewResponder?.makeToast(text: .muteSeatReasonText)
                     return
                 }
@@ -461,7 +461,7 @@ extension BottomViewModel {
     
     //更新申请上台按钮
     private func updateRaiseHandItem() {
-        guard roomInfo.speechMode == .applySpeakAfterTakingSeat else { return }
+        guard roomInfo.isSeatEnabled else { return }
         raiseHandItem.normalTitle = currentUser.userRole == .generalUser ? .applyJoinStageText : .joinStageText
         leaveSeatHandItem.isSelect = false
         raiseHandItem.isSelect = false
@@ -534,7 +534,7 @@ extension BottomViewModel {
     }
     
     private func updateAudioItem() {
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, currentUser.userRole == .generalUser, !currentUser.isOnSeat {
+        if roomInfo.isSeatEnabled, currentUser.userRole == .generalUser, !currentUser.isOnSeat {
             //举手发言房间观众不上麦，则不显示麦克风按钮
             removeViewItem(buttonType: .muteAudioItemType)
         } else if !isContainedViewItem(buttonType: .muteAudioItemType) {
@@ -545,7 +545,7 @@ extension BottomViewModel {
     }
     
     private func updateVideoItem() {
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, currentUser.userRole == .generalUser, !currentUser.isOnSeat {
+        if roomInfo.isSeatEnabled, currentUser.userRole == .generalUser, !currentUser.isOnSeat {
             //举手发言房间观众不上麦，则不显示摄像头按钮
             removeViewItem(buttonType: .muteVideoItemType)
         } else if !isContainedViewItem(buttonType: .muteVideoItemType) {
@@ -561,7 +561,7 @@ extension BottomViewModel {
             return false
         }
         //如果是举手发言房间并且没有上麦，没有麦克风权限
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
+        if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             return false
         }
         return true
@@ -573,14 +573,14 @@ extension BottomViewModel {
             return false
         }
         //如果是举手发言房间并且没有上麦，没有摄像头权限
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
+        if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             return false
         }
         return true
     }
     
     private func updateRaiseHandApplyItem() {
-        guard roomInfo.speechMode == .applySpeakAfterTakingSeat else { return }
+        guard roomInfo.isSeatEnabled else { return }
         raiseHandItem.normalTitle = currentUser.userRole == .generalUser ? .applyJoinStageText : .joinStageText
         if currentUser.userRole == .roomOwner {
             //房主添加上台管理按钮
@@ -599,7 +599,7 @@ extension BottomViewModel: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
         switch key {
         case .TUIRoomKitService_UserOnSeatChanged:
-            guard roomInfo.speechMode == .applySpeakAfterTakingSeat else { return }
+            guard roomInfo.isSeatEnabled else { return }
             updateRaiseHandItem()
             updateAudioItem()
             updateVideoItem()
@@ -616,7 +616,7 @@ extension BottomViewModel: RoomKitUIEventResponder {
             guard let hasAudio = info?["hasAudio"] as? Bool else { return }
             guard let reason = info?["reason"] as? TUIChangeReason else { return }
             if !hasAudio, reason == .byAdmin, !roomInfo.isMicrophoneDisableForAllUser {
-                if roomInfo.speechMode != .applySpeakAfterTakingSeat {
+                if !roomInfo.isSeatEnabled {
                     viewResponder?.makeToast(text: .noticeMicrophoneOffTitleText)
                 } else if currentUser.isOnSeat {
                     viewResponder?.makeToast(text: .noticeMicrophoneOffTitleText)
@@ -628,7 +628,7 @@ extension BottomViewModel: RoomKitUIEventResponder {
             guard let hasVideo = info?["hasVideo"] as? Bool else { return }
             guard let reason = info?["reason"] as? TUIChangeReason else { return }
             if !hasVideo, reason == .byAdmin, !roomInfo.isCameraDisableForAllUser {
-                if roomInfo.speechMode != .applySpeakAfterTakingSeat {
+                if !roomInfo.isSeatEnabled {
                     viewResponder?.makeToast(text: .noticeCameraOffTitleText)
                 } else if currentUser.isOnSeat {
                     viewResponder?.makeToast(text: .noticeCameraOffTitleText)

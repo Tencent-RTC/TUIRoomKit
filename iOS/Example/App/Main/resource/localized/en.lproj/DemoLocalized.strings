@@ -13,8 +13,6 @@
 "Demo.TUIRoomKit.input.room.num" = "Enter a room ID";
 "Demo.TUIRoomKit.input.error.room.num.toast" = "Enter a valid room ID.";
 "Demo.TUIRoomKit.user.name" = "Your Name";
-"Demo.TUIRoomKit.ok" = "OK";
-"Demo.TUIRoomKit.cancel" = "Cancel";
 "Demo.TUIRoomKit.raise.speak.model" = "Raise hand speak model";
 "Demo.TUIRoomKit.freedom.speak.model" = "Freedom speak model";
 "Demo.TUIRoomKit.room.type" = "Room Type";

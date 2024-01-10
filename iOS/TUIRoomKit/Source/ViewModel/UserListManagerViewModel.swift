@@ -93,7 +93,7 @@ class UserListManagerViewModel: NSObject {
     //生成房主的操作列表
     private func createRoomOwnerManagerItems() {
         guard let selectUserInfo = selectUserInfo else { return }
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat { //如果房间是举手发言房间
+        if roomInfo.isSeatEnabled { //如果房间是举手发言房间
             if selectUserInfo.isOnSeat { //如果当前点击的用户已经上麦
                 userListManagerItems.append(muteAudioItem)
                 userListManagerItems.append(muteVideoItem)
@@ -115,7 +115,7 @@ class UserListManagerViewModel: NSObject {
     //生成管理员的操作列表
     private func createAdministratorManagerItems() {
         guard let selectUserInfo = selectUserInfo else { return }
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat { //如果房间是举手发言房间
+        if roomInfo.isSeatEnabled { //如果房间是举手发言房间
             if selectUserInfo.isOnSeat { //如果当前点击的用户已经上麦
                 userListManagerItems.append(muteAudioItem)
                 userListManagerItems.append(muteVideoItem)
@@ -307,7 +307,7 @@ extension UserListManagerViewModel {
             return
         }
         //如果是举手发言房间，并且没有上麦，不可打开麦克风
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
+        if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             viewResponder?.makeToast(text: .muteSeatReasonText)
             return
         }
@@ -328,7 +328,7 @@ extension UserListManagerViewModel {
             return
         }
         //如果是举手发言房间，并且没有上麦，不可打开摄像头
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
+        if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             viewResponder?.makeToast(text: .muteSeatReasonText)
             return
         }
