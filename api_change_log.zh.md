@@ -7,7 +7,7 @@
 |  类型 | 名称 | 说明 | 版本 |
 |-------|-------|-------|-------|
 | 类 | TUIRoomDeviceManager | 设备测试、管理相关类 |v2.0 |
-| 枚举 | TUISeatMode | TUISeatModeFreeToTake: 自由上麦模式，台下观众可以自由上麦，无需申请；TUISeatModeApplyToTake: 申请上麦模式，台下观众上麦需要房主或者管理员同意后才能上麦; | v2.0 |
+| 枚举 | TUISeatMode | TUISeatModeFreeToTake: 自由上麦模式，台下观众可以自由上麦，无需申请；TUISeatModeApplyToTake: 申请上麦模式，台下观众上麦需要房主或者管理员同意后才能上麦; 注: 仅在麦位模式（isSeatEnabled = true）时生效| v2.0 |
 | 枚举 | TUIExtensionType | getExtension接口入参，目前只支持TUIExtensionTypeDeviceManager类型 | v2.0 |
 | 错误码 | TUIErrorRequestIdRepeat = -2312 | 重复请求错误码 | v2.0 |
 | 错误码 | TUIErrorRequestIdConflict = -2313 | 请求冲突错误码 | v2.0 |
