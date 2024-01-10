@@ -5,7 +5,6 @@ import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.RequestAction.R
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.RequestAction.REQUEST_TO_OPEN_REMOTE_MICROPHONE;
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.ResolutionMode.LANDSCAPE;
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.ResolutionMode.PORTRAIT;
-import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT;
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.VideoStreamType.CAMERA_STREAM;
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.VideoStreamType.CAMERA_STREAM_LOW;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomConstant.KEY_ERROR;
@@ -372,7 +371,7 @@ public class RoomEngineManager {
     private RoomEngineManager(Context context) {
         mContext = context.getApplicationContext();
         mRoomStore = new RoomStore();
-        mRoomEngine = TUIRoomEngine.createInstance();
+        mRoomEngine = TUIRoomEngine.sharedInstance();
         Log.d(TAG, "createInstance mRoomEngine=" + mRoomEngine + " manager=" + this);
 
         mObserver = new RoomEventDispatcher(mRoomStore);
@@ -592,7 +591,7 @@ public class RoomEngineManager {
 
     public void autoTakeSeatForOwner(TUIRoomDefine.RequestCallback callback) {
         if (mRoomStore.userModel.role == TUIRoomDefine.Role.ROOM_OWNER
-                && mRoomStore.roomInfo.speechMode == SPEAK_AFTER_TAKING_SEAT && mRoomStore.userModel.isOffSeat()) {
+                && mRoomStore.roomInfo.isSeatEnabled && mRoomStore.userModel.isOffSeat()) {
             takeSeat(0, 0, callback);
             return;
         }
@@ -640,7 +639,7 @@ public class RoomEngineManager {
                 mNextSequence = userListResult.nextSequence;
                 if (mNextSequence != 0) {
                     getUserList();
-                } else if (mRoomStore.roomInfo.speechMode == SPEAK_AFTER_TAKING_SEAT) {
+                } else if (mRoomStore.roomInfo.isSeatEnabled) {
                     getSeatList();
                 } else {
                     RoomEventCenter.getInstance().notifyEngineEvent(GET_USER_LIST_COMPLETED_FOR_ENTER_ROOM, null);
@@ -815,8 +814,7 @@ public class RoomEngineManager {
 
     private boolean isAllowToToggleAudio() {
         Context context = TUILogin.getAppContext();
-        if (TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT == mRoomStore.roomInfo.speechMode
-                && !mRoomStore.userModel.isOnSeat()) {
+        if (mRoomStore.roomInfo.isSeatEnabled && !mRoomStore.userModel.isOnSeat()) {
             ToastUtil.toastShortMessageCenter(context.getString(R.string.tuiroomkit_please_raise_hand));
             return false;
         }

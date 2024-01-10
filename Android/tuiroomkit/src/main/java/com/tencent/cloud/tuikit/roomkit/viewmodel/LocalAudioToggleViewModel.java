@@ -132,7 +132,7 @@ public class LocalAudioToggleViewModel implements LocalAudioToggleViewAction, Ro
 
     private void updateLocalAudioVisibility() {
         RoomStore store = RoomEngineManager.sharedInstance().getRoomStore();
-        if (store.roomInfo.speechMode != TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT) {
+        if (!store.roomInfo.isSeatEnabled) {
             return;
         }
         boolean visible = store.userModel.role != TUIRoomDefine.Role.GENERAL_USER || store.userModel.isOnSeat();
@@ -158,8 +158,7 @@ public class LocalAudioToggleViewModel implements LocalAudioToggleViewAction, Ro
     private boolean isAllowToOperateAudio() {
         RoomStore store = RoomEngineManager.sharedInstance().getRoomStore();
         Context context = TUILogin.getAppContext();
-        if (TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT == store.roomInfo.speechMode
-                && !store.userModel.isOnSeat()) {
+        if (store.roomInfo.isSeatEnabled && !store.userModel.isOnSeat()) {
             ToastUtil.toastShortMessageCenter(context.getString(R.string.tuiroomkit_please_raise_hand));
             return false;
         }

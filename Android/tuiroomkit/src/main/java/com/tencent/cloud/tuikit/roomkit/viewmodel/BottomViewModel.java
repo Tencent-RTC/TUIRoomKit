@@ -45,9 +45,9 @@ import java.util.List;
 import java.util.Map;
 
 public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder {
-    private static final String TAG = "BottomMainViewModel";
-    private static final int SEAT_INDEX   = -1;
-    private static final int REQ_TIME_OUT = 0;
+    private static final String TAG          = "BottomMainViewModel";
+    private static final int    SEAT_INDEX   = -1;
+    private static final int    REQ_TIME_OUT = 0;
 
     private static final int ITEM_NUM_EACH_LINE = 5;
 
@@ -140,7 +140,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     }
 
     private void addMicItemIfNeeded(List<BottomItemData> itemDataList) {
-        if (isTakeSeatSpeechMode() && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER
+        if (isSeatEnabled() && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER
                 && !mRoomStore.userModel.isOnSeat()) {
             return;
         }
@@ -148,7 +148,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     }
 
     private void addCameraItemIfNeeded(List<BottomItemData> itemDataList) {
-        if (isTakeSeatSpeechMode() && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER
+        if (isSeatEnabled() && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER
                 && !mRoomStore.userModel.isOnSeat()) {
             return;
         }
@@ -156,7 +156,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     }
 
     private void addRaiseHandItemIfNeeded(List<BottomItemData> itemDataList) {
-        if (!isTakeSeatSpeechMode()) {
+        if (!isSeatEnabled()) {
             return;
         }
         if (mRoomStore.userModel.role == TUIRoomDefine.Role.ROOM_OWNER) {
@@ -166,7 +166,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     }
 
     private void addApplyListItemIfNeeded(List<BottomItemData> itemDataList) {
-        if (!isTakeSeatSpeechMode()) {
+        if (!isSeatEnabled()) {
             return;
         }
         if (mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER) {
@@ -194,6 +194,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     private void addSettingsItemIfNeeded(List<BottomItemData> itemDataList) {
         itemDataList.add(createSettingItem());
     }
+
     private BottomItemData createChatItem() {
         BottomItemData chatItemData = new BottomItemData();
         chatItemData.setType(BottomItemData.Type.CHAT);
@@ -277,7 +278,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     private BottomItemData createMicItem() {
         BottomItemData micItemData = new BottomItemData();
         micItemData.setType(BottomItemData.Type.AUDIO);
-        micItemData.setEnable(isMicEnable());
+        micItemData.setEnable(isShowMicEnableEffect());
         micItemData.setIconId(R.drawable.tuiroomkit_ic_mic_off);
         micItemData.setDisableIconId(R.drawable.tuiroomkit_ic_mic_off);
         micItemData.setBackground(R.drawable.tuiroomkit_bg_bottom_item_black);
@@ -302,7 +303,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     private BottomItemData createCameraItem() {
         BottomItemData cameraItemData = new BottomItemData();
         cameraItemData.setType(BottomItemData.Type.VIDEO);
-        cameraItemData.setEnable(isCameraEnable());
+        cameraItemData.setEnable(isShowCameraEnableEffect());
         cameraItemData.setIconId(R.drawable.tuiroomkit_ic_camera_off);
         cameraItemData.setBackground(R.drawable.tuiroomkit_bg_bottom_item_black);
         cameraItemData.setDisableIconId(R.drawable.tuiroomkit_ic_camera_off);
@@ -423,17 +424,18 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
             return;
         }
         ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_hands_down));
-        RoomEngineManager.sharedInstance().cancelRequest(mRoomStore.userModel.takeSeatRequestId, new TUIRoomDefine.ActionCallback() {
-            @Override
-            public void onSuccess() {
-                mBottomView.replaceItem(BottomItemData.Type.RAISE_HAND, createRaiseHandItem());
-            }
+        RoomEngineManager.sharedInstance().cancelRequest(mRoomStore.userModel.takeSeatRequestId,
+                new TUIRoomDefine.ActionCallback() {
+                    @Override
+                    public void onSuccess() {
+                        mBottomView.replaceItem(BottomItemData.Type.RAISE_HAND, createRaiseHandItem());
+                    }
 
-            @Override
-            public void onError(TUICommonDefine.Error error, String message) {
-                mBottomView.replaceItem(BottomItemData.Type.RAISE_HAND, createRaiseHandItem());
-            }
-        });
+                    @Override
+                    public void onError(TUICommonDefine.Error error, String message) {
+                        mBottomView.replaceItem(BottomItemData.Type.RAISE_HAND, createRaiseHandItem());
+                    }
+                });
     }
 
     private void getOffStage() {
@@ -516,8 +518,8 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         IntentUtils.safeStartActivity(mContext, intent);
     }
 
-    public boolean isTakeSeatSpeechMode() {
-        return TUIRoomDefine.SpeechMode.SPEAK_AFTER_TAKING_SEAT.equals(mRoomStore.roomInfo.speechMode);
+    public boolean isSeatEnabled() {
+        return mRoomStore.roomInfo.isSeatEnabled;
     }
 
     public int indexOf(BottomItemData.Type type) {
@@ -550,7 +552,8 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
 
     private void updateAudioItemSelectStatus(boolean isSelected) {
         mBottomView.updateItemSelectStatus(BottomItemData.Type.AUDIO, isSelected);
-        if (mRoomStore.roomInfo.isMicrophoneDisableForAllUser) {
+        if (mRoomStore.roomInfo.isMicrophoneDisableForAllUser
+                && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER) {
             mBottomView.updateItemEnableStatus(BottomItemData.Type.AUDIO, isSelected);
         }
     }
@@ -577,7 +580,8 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
 
     private void updateVideoButtonSelectStatus(boolean isSelected) {
         mBottomView.updateItemSelectStatus(BottomItemData.Type.VIDEO, isSelected);
-        if (mRoomStore.roomInfo.isCameraDisableForAllUser) {
+        if (mRoomStore.roomInfo.isCameraDisableForAllUser
+                && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER) {
             mBottomView.updateItemEnableStatus(BottomItemData.Type.VIDEO, isSelected);
         }
     }
@@ -641,7 +645,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         if (mRoomStore.userModel.role != TUIRoomDefine.Role.GENERAL_USER) {
             return;
         }
-        mBottomView.updateItemEnableStatus(BottomItemData.Type.VIDEO, isCameraEnable());
+        mBottomView.updateItemEnableStatus(BottomItemData.Type.VIDEO, isShowCameraEnableEffect());
     }
 
     private void allUserMicrophoneDisableChanged(Map<String, Object> params) {
@@ -651,7 +655,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         if (mRoomStore.userModel.role != TUIRoomDefine.Role.GENERAL_USER) {
             return;
         }
-        mBottomView.updateItemEnableStatus(BottomItemData.Type.AUDIO, isMicEnable());
+        mBottomView.updateItemEnableStatus(BottomItemData.Type.AUDIO, isShowMicEnableEffect());
     }
 
     private void onRemoteUserTakeSeat(Map<String, Object> params) {
@@ -774,17 +778,17 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         return setttingItemData;
     }
 
-    private boolean isMicEnable() {
-        return isOnSeatInSeatMode() && isMicAvailableInAllBanAudioMode();
+    private boolean isShowMicEnableEffect() {
+        return mRoomStore.audioModel.isHasAudioStream() || (isOnSeatInSeatMode() && isMicAvailableInAllBanAudioMode());
     }
 
-    private boolean isCameraEnable() {
-        return isOnSeatInSeatMode() && isCameraAvailableInAllBanCameraMode();
+    private boolean isShowCameraEnableEffect() {
+        return mRoomStore.videoModel.isCameraOpened() || (isOnSeatInSeatMode()
+                && isCameraAvailableInAllBanCameraMode());
     }
 
     private boolean isOnSeatInSeatMode() {
-        return mRoomStore.roomInfo.speechMode == TUIRoomDefine.SpeechMode.FREE_TO_SPEAK
-                || mRoomStore.userModel.isOnSeat();
+        return !mRoomStore.roomInfo.isSeatEnabled || mRoomStore.userModel.isOnSeat();
     }
 
     private boolean isMicAvailableInAllBanAudioMode() {
