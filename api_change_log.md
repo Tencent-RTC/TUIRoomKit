@@ -15,19 +15,19 @@ Change Date: 2024-01-08
 | Type | Name | Description | Version |
 |-------|-------|-------|-------|
 | Class | TUIRoomDeviceManager | Device testing and management related class | v2.0 |
-| Enum | TUISeatMode | TUISeatModeFreeToTake: Free-to-take mic mode, audience can freely take the mic without applying; TUISeatModeApplyToTake: Apply-to-take mic mode, audience needs the consent of the room owner or administrator to take the mic; | v2.0 |
+| Enum | TUISeatMode | TUISeatModeFreeToTake: Free-to-take seat mode, audience can freely take the seat without applying; TUISeatModeApplyToTake: Apply-to-take seat mode, audience needs the consent of the room owner or administrator to take the seat; Note: Only effective when the seat mode (isSeatEnabled = true) is enabled. | v2.0 |
 | Enum | TUIExtensionType | getExtension interface parameter, currently only supports TUIExtensionTypeDeviceManager type | v2.0 |
 | Error Code | TUIErrorRequestIdRepeat = -2312 | Repeat request error code | v2.0 |
 | Error Code | TUIErrorRequestIdConflict = -2313 | Request conflict error code | v2.0 |
 | Error Code | TUIErrorSeatNotSupportLinkMic = -2347 | Current mode does not support link mic error code | v2.0 |
-| Property | TUIRoomInfo.isSeatEnabled | Whether to support mic seat mode | v2.0 |
-| Property | TUIRoomInfo.seatMode | Mic seat mode | v2.0 |
+| Property | TUIRoomInfo.isSeatEnabled | Whether to support seat mode | v2.0 |
+| Property | TUIRoomInfo.seatMode | seat mode | v2.0 |
 
 ### Deprecated & new interfaces
 | Deprecated Interface | New Interface | Description | Version |
 |-------|-------|-------|-------|
-| - (void)updateRoomSpeechModeByAdmin:(TUISpeechMode)mode onSuccess:(TUISuccessBlock)onSuccess onError:(TUIErrorBlock)onError | - (void)updateRoomSeatModeByAdmin:(TUISeatMode)seatMode onSuccess:(TUISuccessBlock)onSuccess onError:(TUIErrorBlock)onError | Optimized room mic mode to reduce customer access comprehension cost | v2.0 |
-| - (void)onRoomSpeechModeChanged:(NSString *)roomId speechMode:(TUISpeechMode)mode | - (void)onRoomSeatModeChanged:(NSString *)roomId seatMode:(TUISeatMode)seatMode | Optimized room mic mode callback to reduce customer access comprehension cost | v2.0 |
+| - (void)updateRoomSpeechModeByAdmin:(TUISpeechMode)mode onSuccess:(TUISuccessBlock)onSuccess onError:(TUIErrorBlock)onError | - (void)updateRoomSeatModeByAdmin:(TUISeatMode)seatMode onSuccess:(TUISuccessBlock)onSuccess onError:(TUIErrorBlock)onError | Optimized room seat mode to reduce customer access comprehension cost | v2.0 |
+| - (void)onRoomSpeechModeChanged:(NSString *)roomId speechMode:(TUISpeechMode)mode | - (void)onRoomSeatModeChanged:(NSString *)roomId seatMode:(TUISeatMode)seatMode | Optimized room seat mode callback to reduce customer access comprehension cost | v2.0 |
 | - (NSInteger)switchCamera:(BOOL)frontCamera | - | It is recommended to use the switchCamera interface in TUIRoomDeviceManager instead | v2.0 |
 | - (NSArray<TXMediaDeviceInfo *> * _Nullable)getDevicesList:(TUIMediaDeviceType)type | - | It is recommended to use the getDevicesList interface in TUIRoomDeviceManager instead | v2.0 |
 | - (NSInteger)setCurrentDevice:(TUIMediaDeviceType)type deviceId:(NSString *)deviceId | - | It is recommended to use the setCurrentDevice interface in TUIRoomDeviceManager instead | v2.0 |
