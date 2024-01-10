@@ -9,10 +9,11 @@ import Foundation
 
 class LocalAudioView: UIView {
     let viewModel: LocalAudioViewModel
-    let muteAudioButton : UIButton = {
+    lazy var muteAudioButton : UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "room_mic_on", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
         button.setImage(UIImage(named: "room_mic_off", in: tuiRoomKitBundle(), compatibleWith: nil), for: .selected)
+        button.isSelected = viewModel.checkMuteAudioSelectedState()
         button.backgroundColor = UIColor(0x2A2D38)
         button.layer.cornerRadius = 12
         return button

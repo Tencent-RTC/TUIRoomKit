@@ -68,10 +68,6 @@ extension RoomEventDispatcher: TUIRoomObserver {
         roomInfo.name = roomName
     }
     
-    func onRoomSpeechModeChanged(roomId: String, speechMode mode: TUISpeechMode) {
-        roomInfo.speechMode = mode
-    }
-    
     // MARK: - 房间内用户事件回调
     func onRemoteUserEnterRoom(roomId: String, userInfo: TUIUserInfo) {
         remoteUserEnterRoom(roomId: roomId, userInfo: userInfo)
@@ -180,7 +176,7 @@ extension RoomEventDispatcher {
     private func remoteUserLeaveRoom(roomId: String, userInfo: TUIUserInfo) {
         engineManager.deleteUserItem(userInfo.userId)
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat {
+        if roomInfo.isSeatEnabled {
             engineManager.deleteSeatItem(userInfo.userId)
             engineManager.deleteInviteSeatUser(userInfo.userId)
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
@@ -214,11 +210,7 @@ extension RoomEventDispatcher {
         for seatInfo: TUISeatInfo in seatList {
             guard let userId = seatInfo.userId else { continue }
             guard let userInfo = store.attendeeList.first(where: { $0.userId == userId }) else { continue }
-            switch roomInfo.speechMode {
-            case .applySpeakAfterTakingSeat:
-                userInfo.isOnSeat = true
-            default: break
-            }
+            userInfo.isOnSeat = true
             engineManager.deleteInviteSeatUser(userId)
             engineManager.addSeatItem(userInfo)
         }
@@ -298,8 +290,8 @@ extension RoomEventDispatcher {
         }
         //转成房主之后需要上麦
         guard isSelfRoleChanged, isRoomOwnerChanged else { return }
-        guard roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat else { return }
-        EngineManager.createInstance().takeSeat { [weak self] _,_ in
+        guard roomInfo.isSeatEnabled, !currentUser.isOnSeat else { return }
+        let _ = EngineManager.createInstance().takeSeat { [weak self] _,_ in
             guard let self = self else { return }
             self.currentUser.isOnSeat = true
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged, param: ["isOnSeat": true])
@@ -323,7 +315,7 @@ extension RoomEventDispatcher {
     private func requestReceived(request: TUIRequest) {
         switch request.requestAction {
         case .takeSeat:
-            if roomInfo.speechMode == .applySpeakAfterTakingSeat {
+            if roomInfo.isSeatEnabled {
                 guard let userModel = store.attendeeList.first(where: {$0.userId == request.userId}) else { return }
                 guard store.inviteSeatMap[request.userId] == nil else { return }
                 engineManager.addInviteSeatUser(userItem: userModel, request: request)

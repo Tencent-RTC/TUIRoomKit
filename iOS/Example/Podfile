@@ -12,8 +12,8 @@ def tool
   pod 'Alamofire'
   pod 'TUICore'
   pod 'TUIChat'
-  pod 'TUIRoomEngine','1.7.1'
-  pod 'TXLiteAVSDK_TRTC','11.4.14552'
+  pod 'TUIRoomEngine','2.0.0'
+  pod 'TXLiteAVSDK_TRTC'
   pod 'TXAppBasic'
   pod 'TIMCommon'
   pod 'TXIMSDK_Plus_iOS'
@@ -53,13 +53,13 @@ post_install do |installer|
         xcconfig_path = config.base_configuration_reference.real_path
         xcconfig = File.read(xcconfig_path)
         if xcconfig.include?("OTHER_LDFLAGS") == false
-          xcconfig = xcconfig + "\n" + 'OTHER_LDFLAGS = $(inherited) "-ld64"'
+          xcconfig = xcconfig + "\n" + 'OTHER_LDFLAGS = $(inherited) "-ld_classic"'
         else
           if xcconfig.include?("OTHER_LDFLAGS = $(inherited)") == false
             xcconfig = xcconfig.sub("OTHER_LDFLAGS", "OTHER_LDFLAGS = $(inherited)")
           end
           if xcconfig.include?("-ld64") == false
-            xcconfig = xcconfig.sub("OTHER_LDFLAGS = $(inherited)", 'OTHER_LDFLAGS = $(inherited) "-ld64"')
+            xcconfig = xcconfig.sub("OTHER_LDFLAGS = $(inherited)", 'OTHER_LDFLAGS = $(inherited) "-ld_classic"')
           end
         end
         File.open(xcconfig_path, "w") { |file| file << xcconfig }

@@ -71,7 +71,7 @@ class LocalAudioViewModel: NSObject {
             return
         }
         //如果是举手发言房间，并且没有上麦，不可打开麦克风
-        if roomInfo.speechMode == .applySpeakAfterTakingSeat, !currentUser.isOnSeat {
+        if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             viewResponder?.makeToast(text: .muteSeatReasonText)
             return
         }
@@ -82,8 +82,12 @@ class LocalAudioViewModel: NSObject {
     
     func checkMuteAudioHiddenState() -> Bool {
         //举手发言房间，没有上麦的普通观众不显示麦克风
-        return roomInfo.speechMode == .applySpeakAfterTakingSeat && currentUser.userRole == .generalUser &&
+        return roomInfo.isSeatEnabled && currentUser.userRole == .generalUser &&
         !currentUser.isOnSeat
+    }
+    
+    func checkMuteAudioSelectedState() -> Bool {
+        return !currentUser.hasAudioStream
     }
 }
 
@@ -91,7 +95,7 @@ extension LocalAudioViewModel: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
         switch key {
         case .TUIRoomKitService_CurrentUserHasAudioStream:
-            viewResponder?.updateMuteAudioButton(isSelected: !currentUser.hasAudioStream)
+            viewResponder?.updateMuteAudioButton(isSelected: checkMuteAudioSelectedState())
         case .TUIRoomKitService_CurrentUserRoleChanged, .TUIRoomKitService_UserOnSeatChanged:
             if ableDisplay, !checkMuteAudioHiddenState() {
                 viewResponder?.show()

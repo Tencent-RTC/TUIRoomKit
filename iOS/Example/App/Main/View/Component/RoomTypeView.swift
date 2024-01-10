@@ -12,24 +12,6 @@ import UIKit
 class RoomTypeView: UIView {
     weak var rootViewController: CreateRoomViewController?
     
-    let cancelButton: UIButton = {
-        let button = UIButton()
-        button.setTitle(.cancelText, for: .normal)
-        button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
-        button.setTitleColor(UIColor(0x146EFA), for: .selected)
-        button.backgroundColor = .clear
-        return button
-    }()
-    
-    let sureButton: UIButton = {
-        let button = UIButton()
-        button.setTitle(.okText, for: .normal)
-        button.setTitleColor(UIColor(0xD1D9EC), for: .normal)
-        button.setTitleColor(UIColor(0x146EFA), for: .selected)
-        button.backgroundColor = .clear
-        return button
-    }()
-    
     let freedomButton: UIButton = {
         let button = UIButton()
         button.setTitle(.freedomSpeakText, for: .normal)
@@ -62,25 +44,13 @@ class RoomTypeView: UIView {
     }
     
     func constructViewHierarchy() {
-        addSubview(cancelButton)
-        addSubview(sureButton)
         addSubview(freedomButton)
         addSubview(raiseHandButton)
     }
     
     func activateConstraints() {
-        cancelButton.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(12)
-            make.top.equalToSuperview().offset(20.scale375())
-            make.width.equalTo(80.scale375())
-            make.height.equalTo(30.scale375())
-        }
-        sureButton.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().offset(-12)
-            make.top.width.height.equalTo(cancelButton)
-        }
         freedomButton.snp.makeConstraints { make in
-            make.top.equalTo(cancelButton.snp.bottom).offset(20.scale375())
+            make.top.equalToSuperview().offset(60.scale375())
             make.width.equalToSuperview()
             make.height.equalTo(46.scale375())
         }
@@ -93,30 +63,14 @@ class RoomTypeView: UIView {
     func bindInteraction() {
         self.layer.cornerRadius = 12
         setupViewState()
-        cancelButton.addTarget(self, action: #selector(cancelAction(sender:)), for: .touchUpInside)
-        sureButton.addTarget(self, action: #selector(sureAction(sender:)), for: .touchUpInside)
         freedomButton.addTarget(self, action: #selector(freedomAction(sender:)), for: .touchUpInside)
         raiseHandButton.addTarget(self, action: #selector(raiseHandAction(sender:)), for: .touchUpInside)
     }
     
     func setupViewState() {
-        switch rootViewController?.roomSpeechMode {
-        case .freeToSpeak:
-            freedomButton.isSelected = true
-            raiseHandButton.isSelected = false
-        case .applySpeakAfterTakingSeat:
-            freedomButton.isSelected = false
-            raiseHandButton.isSelected = true
-        default : break
-        }
-    }
-    
-    @objc func cancelAction(sender: UIButton) {
-        rootViewController?.cancelAction(sender: sender, view: self)
-    }
-    
-    @objc func sureAction(sender: UIButton) {
-        rootViewController?.sureAction(sender: sender, view: self)
+        let isSeatEnable = rootViewController?.isSeatEnable ?? false
+            freedomButton.isSelected = !isSeatEnable
+            raiseHandButton.isSelected = isSeatEnable
     }
     
     @objc func freedomAction(sender: UIButton) {
@@ -133,12 +87,6 @@ class RoomTypeView: UIView {
 }
 
 private extension String {
-    static var okText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.ok")
-    }
-    static var cancelText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.cancel")
-    }
     static var raiseHandSpeakText: String {
         RoomDemoLocalize("Demo.TUIRoomKit.raise.speak.model")
     }
