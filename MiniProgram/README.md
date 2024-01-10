@@ -37,39 +37,8 @@
 │   ├── uni.scss
 └── vite.config.ts
 ```
-### 第一步：创建 TUIRoomKit 应用
-
-在使用 TUIRoomKit 发起会议前，您需要开通 TUIRoomKit 专属的多人音视频互动服务，详细步骤如下：
-
-1. 登录 [实时音视频 TRTC 控制台](https://console.cloud.tencent.com/trtc)，单击左侧应用管理页面，找到需要开通 TUIRoomKit 的应用（SDKAppID），点击**详情**，进入应用概览界面。
-
-   ![](https://qcloudimg.tencent-cloud.cn/image/document/9a4473f562997bd733e47c0351c485b8.png)
-
-2. 在应用概览页面找到**含 UI 低代码集成接入 卡片，选择多人音视频（TUIRoomKit）**，点击**领取体验**，领取7天体验版 TUIRoomKit 进行接入测试。
-   
-
-> **注意：** 
->   - 领取体验版后仅开通 TUIRoomKit 7天的体验资格，测试过程中所产生的音视频时长等资源消耗，仍会按照实时音视频 TRTC 标准计费规则计费；
->   - 新账号首次可前往 [试用中心](https://cloud.tencent.com/act/pro/video_freetrial?from=19654) 免费领取10000分钟音视频时长；
->   - 如果所选 SDKAppID 体验版领取次数已达上限，需要购买 TUIRoomKit 包月套餐才能开通服务，请点击**场景套餐订阅**按钮或前往 [购买页](https://buy.cloud.tencent.com/trtc) 购买；
-
-
-   ![](https://qcloudimg.tencent-cloud.cn/image/document/d26c14cb1737a5005462025bb1bad645.png)
-
-
-   ![](https://qcloudimg.tencent-cloud.cn/image/document/3da16ab53e28de33212b46f429ab1fdc.png)
-
-3. 领取完成后，可以看到体验版的基本信息，包括服务状态、版本信息和功能详情、到期时间。
-
-
-   ![](https://qcloudimg.tencent-cloud.cn/image/document/587965a50a85ce617057ae8b06b609f7.png)
-
-4. 单击**集成指南**，即可参照集成指南开始集成。至此 TUIRoomKit 服务开通完成。
-
-
-   ![](https://qcloudimg.tencent-cloud.cn/image/document/588a5f1d285398143af1fd15aaef49e2.png)
-
-
+### 第一步：开通服务
+请参考官网文档中 [快速接入](https://cloud.tencent.com/document/product/1690/88935) 中开通服务。
 
 ### 第二步：开通小程序权限
 由于 TUIRoomKit 所使用的小程序标签有更苛刻的权限要求，因此集成 TUIRoomKit 的第一步就是要开通小程序的类目和标签使用权限，**否则无法使用**，这包括如下步骤：
@@ -105,7 +74,7 @@ wss://wss.tim.qq.com
 1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
 2. 找到并打开 `MiniProgram/src/roomkit/config/basic-info-config.js` 文件。
 3. 配置 `basic-info-config.js` 文件中的相关参数：
-	<img src="https://qcloudimg.tencent-cloud.cn/raw/d05a18af04758e352f9afcb0925d105c.png" width="900">
+	<img src="../Preview/test-user-sig-web.png" width="900">
 	- SDKAPPID：默认为 0，请设置为步第一步中记录下的 SDKAppID。
 	- SECRETKEY：默认为 ''，请设置为步第一步中记录下的密钥信息。
 
@@ -138,7 +107,7 @@ wss://wss.tim.qq.com
 5. 构建 npm，微信开发者工具【工具】->【构建 npm】。具体如下图：
    
    <img src="https://web.sdk.qcloud.com/component/trtccalling/images/miniProgram/build-npm.png" width="200" align="middle" />
-	 
+  
 6. 点击 **预览**，手机扫码进入小程序。
 
 

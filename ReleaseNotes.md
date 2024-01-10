@@ -1,148 +1,175 @@
-## 发布日志
+English | [简体中文](ReleaseNotes.zh.md)
+## Release Notes:
 
-### Version 1.7.1 @ 2024.01.05
-- Android & iOS：新增管理员功能，房主可以设置/取消管理员，用于辅助房主对会议进行静音、审批上下台等操作；
-- Android : 优化简版 Mic 图标的音量提示效果；
-- Android : 解决演讲者模式冲突：个人视频秀无法进入屏幕分享；
-- Android : 解决快速反复进入/退出会议，可能导致的资源释放不及时问题；
+### Version 2.0.0 @ 2024.01.07
+Optimizations for the Conference scenario across all platforms:
+#### Room Management:
+- Independent room service, no longer relying on IM groups.
+- Added a complete set of room list management APIs.
+- Added reservation-related REST APIs for meetings and improved the capabilities of REST APIs.
+- The SDK provides a singleton interface.
+- Optimized the room entry process for increased stability.
+
+#### Member Management:
+- Independent background service for more accurate member lists.
+- The server-side REST API also supports member management.
+- Unbound from IM groups, chat groups, and conference rooms are no longer coupled.
+- Updated room member offline detection logic, aligning with Tencent meeting offline detection business logic.
+- Support for actively kicking non-online members out of the room, providing a server-side REST API for operations.
+- Optimized administrator & room owner status notifications, fixing several issues related to role feedback in version 1.x.
+
+#### Media Device Management:
+- Independent call control signaling service.
+- Provides server-side operation-related APIs.
+- Call control management messages are separated from IM group history messages and no longer pollute chat records.
+- Independent seat management service, providing a complete set of seat management REST APIs.
+- Unified seat business logic, supporting up to 20.
+- Seat supports queuing, no longer requires a mandatory seat index.
+- Unified logic for ordered and unordered seat positions, no longer distinguishing between meetings and live.
+- Support for pulling the seat request list at any time, solving the problem of lost seat requests in version 1.x when exiting midway.
+
+#### API Changes
+For details, see [API changes](./api_change_log.md).
+
+### Version 1.7.1 @ 2024.01.05:
+- Android and iOS: Added the administrator function, where the host can set/cancel - administrators to assist the host in performing operations such as muting and approving participants for the meeting.
+-  Android: Optimized the volume prompt effect for the simplified Mic icon.
+-  Android: Solved the speaker mode conflict: Personal video show cannot enter screen sharing.
+-  Android: Solved the issue of incomplete resource release caused by rapid and repeated entry/exit of the meeting.
 
 ### Version 1.7.0 @ 2023.12.18
-- Android & iOS：进一步美化UI，对圆角、背景色、大小等进行了调整；
-- Android & iOS：修复了一些特殊场景下的异常问题；
-- Android：细化房间内演讲者小画面的刷新内容，将刷新拆分为 用户、视频、音频三部分；
-- Android：解决底部菜单栏偶现多次点击出现多个设置面板问题；
-- Android：优化开发接入流程，适配了 Gradle 8.0；
-- iOS：修改偶现的画面黑屏问题；
-- iOS：更改房间号的生成逻辑，修改偶现的创建房间失败问题；
+- Android & iOS: Improve beautify UI, adjust rounded corners, background color, size, etc.;
+- Android & iOS: Fixed some issues in special scenarios;
+- Android: Refine the content of the small screen in the room, and split the refresh into user, video, and audio parts;
+- Android: Solve the problem of multiple setting panels appearing when the bottom menu bar is clicked multiple times;
+- Android: Optimize the development access process and adapt to Gradle 8.0;
+- iOS: Fix the occasional black screen problem;
+- iOS: Change the room number generation logic and fix the occasional room creation failure problem;
 
 ### Version 1.6.1 @ 2023.11.10
-- Android & iOS：优化产品体验，进一步美化横屏UI；
-- Android & iOS：优化产品体验，解决演讲者模式小画面切换抖动，设置小画面切换间隔为5秒；
-- Android & iOS：增加源码可读性，调整 UI 的文件目录及文件命名；
+- Android & iOS: Optimize product experience, further beautify the landscape UI;
+- Android & iOS: Optimize product experience, solve the jitter of the small screen switching in speaker mode, and set the small screen switching interval to 5 seconds;
+- Android & iOS: Increase the readability of the source code, adjust the file directory and file naming of the UI;
 
 ### Version 1.6.0 @ 2023.10.27
-- iOS & Android: 优化界面；
-- iOS & Android: 增加横竖屏适配；
+- iOS & Android: Optimize the interface;
+- iOS & Android: Add landscape and portrait screen adaptation;
 
 ### Version 1.5.1 @ 2023.09.28
-- iOS & Android: 优化开发接入流程，更新 TUIRoomKit 的接口；
-- iOS & Android: 优化产品体验，更新 UI 界面；
-- iOS & Android: 优化产品体验，让麦克风开关速度更新顺滑；
-- iOS & Android: 布局适配 RTL，新增阿拉伯语；
+- iOS & Android: Optimize the development access process, update the TUIRoomKit interface;
+- iOS & Android: Optimize product experience, update the UI interface;
+- iOS & Android: Optimize product experience, make microphone switch speed smoother;
+- iOS & Android: Layout adaptation RTL, add Arabic;
 
 ### Version 1.5.0 @ 2023.09.08
-- iOS: 删除美颜；
+- iOS: Remove beauty feature;
 
 ### Version 1.4.5 @ 2023.08.14
-- iOS: 修改IM发送的快速会议消息长按可回复问题；
+- iOS: Modify the problem that the quick meeting message sent by IM can be replied by long press;
 
 ### Version 1.4.4 @ 2023.08.03
-- Android：新增视频悬浮窗功能，优先显示屏幕分享画面，其次房主画面；
-- Android：优化产品体验，进房默认音频输出改为扬声器；
-- Android：优化产品体验，增加账户被踢下线时的提示；
-- Android：优化产品体验，增加转让房主成功的提示；
-- Android：优化开发接入流程，移除 tuivideoseat 模块，将其功能合并到 tuiroomkit 中；
-- iOS: 新增视频悬浮窗功能，优先显示屏幕分享画面，其次房主画面；
-- iOS: 优化产品体验，进房默认音频输出改为扬声器；
-- iOS: 优化产品体验，增加转让房主成功的提示；
-- iOS: 优化开发接入流程，移除 TUIVideoSeat 模块，将其功能合并到 TUIRoomKit 中；
+- Android: Add video floating window function, prioritize screen sharing screen, followed by the owner's screen;
+- Android: Optimize product experience, change the default audio output when entering the room to the speaker;
+- Android: Optimize product experience, add a prompt when the account is kicked offline;
+- Android: Optimize product experience, add a prompt for successful transfer of the homeowner;
+- Android: Optimize the development access process, remove the tuivideoseat module, and merge its functions into tuiroomkit;
+- iOS: Add video floating window function, prioritize screen sharing screen, followed by the owner's screen;
+- iOS: Optimize product experience, change the default audio output when entering the room to the speaker;
+- iOS: Optimize product experience, add a prompt for successful transfer of the homeowner;
+- iOS: Optimize the development access process, remove the TUIVideoSeat module, and merge its functions into TUIRoomKit;
 
 ### Version 1.4.3 @ 2023.07.28
-- iOS: 修复了两个人同时进行屏幕共享，会面重叠问题；
+- iOS: Fix the problem of overlapping meetings when two people share the screen at the same time;
 
 ### Version 1.4.2 @ 2023.07.24
-- Android & iOS: 修复了频繁获取用户信息时，偶现Crash；
-- Android & iOS: 修复了部分场景下，关闭麦克风导致的音频音量回调异常问题；
+- Android & iOS: Fix the occasional Crash when frequently obtaining user information;
+- Android & iOS: Fix the abnormal audio volume callback problem caused by turning off the microphone in some scenarios;
 
 ### Version 1.3.4 @ 2023.07.12
-- Android：增加后台保活逻辑，保证 app 退到后台时，音视频的正常使用；
-- Android：去除 Basic 和 TUIBeauty 模块；
-- Android：优化视频画面闪烁、多次刷新等问题；
-- Android：TUIRoomKit 支持聊天功能；
-- iOS：增加后台保活逻辑，解决退到后台不能听到对方声音的问题
-- iOS：修改预览设置页面没有横竖屏感应问题
-- iOS：系统访问摄像头麦克风权限如果不被允许，之后打开麦克风和摄像头增加权限访问
-- iOS：将TUIRoomKit接入IM
+- Android: Add background survival logic to ensure the normal use of audio and video when the app is in the background;
+- Android: Remove Basic and TUIBeauty modules;
+- Android: Optimize video screen flicker, multiple refreshes, and other issues;
+- Android: TUIRoomKit supports chat function;
+- iOS: Add background survival logic to solve the problem that you can't hear the other party's voice when you go to the background
+- iOS: Modify the problem that the preview setting page does not have horizontal and vertical screen induction
+- iOS: If the system access to the camera and microphone is not allowed, open the microphone and camera to increase the permission access later
+- iOS: Integrate TUIRoomKit with IM
 
 ### Version 1.3.3 @ 2023.06.21
-- iOS：修改举手发言房间收看屏幕共享的问题
-- iOS：修改会议二维码
+- iOS: Modify the problem of watching screen sharing in the hand-raising speaking room
+- iOS: Modify the conference QR code
 
 ### Version 1.3.2 @ 2023.06.05
-- iOS：修改进房时间
+- iOS: Modify the room entry time
 
 ### Version 1.3.1 @ 2023.05.30
-- iOS：根据是否导入美颜和聊天来显示相应按钮
+- iOS: Display the corresponding button according to whether the beauty and chat are imported
 
 ### Version 1.3.0 @ 2023.05.22
-- iOS：修复点击无响应问题
-- iOS：适配OC
-- iOS：增加中英文切换
-- iOS：修复麦克风和摄像头出事状态问题
+- iOS: Fix unresponsive click issue
+- iOS: Adapt to OC
+- iOS: Add Chinese and English switching
+- iOS: Fix the initial state problem of microphone and camera
 
 ### Version 1.2.3 @ 2023.05.06
-- iOS：修复同时接入TUIRoomKit和TUICallKit产生的问题
+- iOS: Fix issues caused by simultaneous access to TUIRoomKit and TUICallKit
 
 ### Version 1.2.2 @ 2023.04.28
-- iOS：修复路由跳转问题
+- iOS: Fix routing jump problem
 
 ### Version 1.2.1 @ 2023.04.27
-- iOS：修复没有预览页面直接显示创建房间或者进入房间页面时的问题
+- iOS: Fix the problem of directly displaying the create room or enter room page without a preview page
 
 ### Version 1.2.0 @ 2023.04.25
-- iOS：TUIRoomKit增加横屏模式
-- iOS：TUIRoomKit增加举手发言房间上麦提示
-- iOS：TUIVideoSeat增加横屏模式和双指放大功能
+- iOS: TUIRoomKit adds landscape mode
+- iOS: TUIRoomKit adds hand-raising speaking room on-mic prompt
+- iOS: TUIVideoSeat adds landscape mode and two-finger zoom function
 
 ### Version 1.1.0 @ 2023.04.14
-- iOS&Android: 适配 `RoomEngine`  `V1.2.0` 修改
-- iOS：VideoSeat增加演讲者模式
-- iOS：修复美颜设置没有保存的问题
-- iOS：修复举手发言请求超时却没有从举手列表中删除该请求的问题
-- iOS：修复每次点击设置，音频和视频参数都是默认值的问题
-- iOS：修复聊天发送图片会崩溃的问题
-- iOS：修复转交房主后离开房间页面的跳转问题
-- Android: 新增横屏模式，提供更好的观看体验
-- Android: 优化UI界面弹窗动画
+- iOS & Android: Adapt `RoomEngine` `V1.2.0` changes
+- iOS: VideoSeat adds speaker mode
+- iOS: Fix the problem that the beauty setting is not saved
+- iOS: Fix the problem that the hand-raising speaking request times out but the request is not removed from the hand-raising list
+- iOS: Fix the problem that every time you click settings, the audio and video parameters are default values
+- iOS: Fix the problem that sending pictures in chat will crash
+- iOS: Fix the problem of jumping after transferring the homeowner and leaving the room page
+- Android: Add landscape mode for a better viewing experience
+- Android: Optimize UI interface popup animation
 
 ### Version 1.0.6 @ 2023.03.27
-- Android: 双人模式支持视频画面点击切换为对方画面
-- Android: 优化视频麦位 `TUIVideoSeat` 布局，提供更好的交互体验
+- Android: Dual-mode supports video screen switching to the other party's screen
+- Android: Optimize video mic position `TUIVideoSeat` layout for better interaction experience
 
 ### Version 1.0.5 @ 2023.03.27
-- Android: 适配 `RoomEngine`  `V1.0.2` 修改，`requestId` 由 `int` 修改为 `String`
-- Android: 更新 `imsdk` 版本为 `7.1.3925`
-- iOS：增加 `TUIChat` 聊天功能
-- iOS：修复视频显示黑屏问题
-- iOS：修复举手发言房间转换房主后无法下台的问题
+- Android: Adapt `RoomEngine` `V1.0.2` changes, `requestId` changed from `int` to `String`
+- Android: Update `imsdk` version to `7.1.3925`
+- iOS: Add `TUIChat` chat function
+- iOS: Fix the problem of black screen display in the video
+- iOS: Fix the problem that the homeowner cannot get off the stage after the hand-raising speaking room is converted
 
 ### Version 1.0.4 @ 2023.03.10
-- iOS&Android: 新增 `logout` 接口
-- Android: 集成 `TUIChat` 聊天功能
-- Android: 修复部分机型上文字显示异常的问题
-- Android: 修复特定情况房主转让后视频麦位房主图标显示异常的问题
-- Android: 优化部分操作后的 `Toast` 提示
-- iOS： 修复房主在成员列表页面对于成员的管理bug
-- iOS： 修复上麦后退房，重新进入房间麦克风和摄像头的bug
+- iOS & Android: Add `logout` interface
+- Android: Integrate `TUIChat` chat function
+- Android: Fix text display issues on some models
+- Android: Fix the problem that the video mic position homeowner icon is displayed abnormally after the homeowner transfers in specific situations
+- Android: Optimize `Toast` prompts after some operations
+- iOS: Fix the problem of homeowner management of members on the member list page
+- iOS: Fix the problem of microphone and camera after getting on the stage and leaving the room, and re-entering the room
 
 ### Version 1.0.3 @ 2023.03.06
-- iOS&Android: 修改 `enterRoom` 回调,删除 `RoomScene` 参数
-- iOS&Android: 修改 `onExitRoom` 回调参数为无参
-- iOS&Android: 修复进房前后置摄像头、视频镜像设置在房间内不生效的bug
-- Android: 修复举手发言模式房主退房后未上麦用户会崩溃的bug
-- Android: 升级工程compileSdkVersion与targetSdkVersion为30
-- Android: 修复房间内人数较多时无法进房的bug
-- Android: gradle版本升级为6.7.1
-- iOS: 修复roomEngine内存泄露引发的回调异常
-- iOS: 修复房主状态显示的异常bug
+- iOS & Android: Modify `enterRoom` callback, delete `RoomScene` parameter
+- iOS & Android: Modify `onExitRoom` callback parameter to no parameter
+- iOS & Android: Fix the problem that the front and rear cameras and video mirroring settings before entering the room do not take effect in the room
+- Android: Fix the problem that the user who has not been on the stage will crash after the homeowner leaves the room in the hand-raising speaking mode
+- Android: Upgrade the project compileSdkVersion and targetSdkVersion to 30
+- Android: Fix the problem that you cannot enter the room when there are too many people in the room
+- Android: Upgrade gradle version to 6.7.1
+- iOS: Fix callback exception caused by memory leak in roomEngine
+- iOS: Fix the abnormal display of homeowner status
 
 ### Version 1.0.2 @ 2023.02.24
-- iOS&Android: 修改 `setUp` 接口 `login` 接口
-- iOS&Android: 新增设置用户头像、昵称接口 `setSelfInfo`
-- iOS&Android: 新增登录结果回调onLogin
-- iOS&Android: 新增准备页面，进房前可进行视频预览
-- iOS&Android: 新增举手发言模式，主持人可对用户进行上下麦控制，观众需要申请上麦之后，才能正常发言
-- iOS&Android: 全新UI改版，多处交互ui进行调整，提供更好的音视频交互体验
-
-### Version 1.0.1 @ 2023.02.22
-- iOS&Android: 更新 `TUIRoomEngine` 依赖
+- iOS & Android: Modify `setUp` interface `login` interface
+- iOS & Android: Add interface for setting user avatar and nickname `setSelfInfo`
+- iOS & Android: Add onLogin login result callback
+- iOS & Android: Add preparation page, you can preview the video before entering the room
+- iOS & Android: Add hand-raising speaking mode, the host can control the user's on and off the microphone, and the audience needs to apply for the microphone before they can speak normally

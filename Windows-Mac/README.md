@@ -35,18 +35,8 @@ TUIRoom
 
 ## 运行示例
 
-### 前提条件
-- 您已 [注册腾讯云](https://cloud.tencent.com/document/product/378/17985) 账号，并完成 [实名认证](https://cloud.tencent.com/document/product/378/3629)。
-
-### 申请 SDKAPPID 和 SECRETKEY
-1. 登录实时音视频控制台，选择【开发辅助】>【[快速跑通Demo](https://console.cloud.tencent.com/trtc/quickstart)】。
-2. 单击【立即开始】，输入您的应用名称，例如`TestTRTC`，单击【创建应用】。
-   <img src="https://qcloudimg.tencent-cloud.cn/raw/4f44a7ca70f28807c91b4a04ccc1b960.png" width="650" height="295"/>
-3. 创建应用完成后，单击【我已下载，下一步】，可以查看 SDKAppID 和密钥信息。
-
-### 集成SDK
-1. 工程默认集成了Windows/Mac端的SDK，您可通过【[官网链接](https://cloud.tencent.com/document/product/647/32689)】了解此版本SDK的具体功能。
-2. 从官网下载了Windows/Mac端最新版本的SDK后，需要将其放到工程下SDK文件夹对应的目录里。
+### 开通服务
+请参考官网文档中 [快速接入](https://cloud.tencent.com/document/product/1690/88936) 中获取自己的SDKAppID和SDKSecreKey。
 
 ### 下载源码，配置工程文件
 克隆或者直接下载此仓库源码，欢迎 Star，感谢~~
@@ -59,7 +49,7 @@ TUIRoom
    <li>SDKAPPID：默认为 0 ，请设置为实际申请的SDKAPPID。</li>
    <li>SECRETKEY：默认为空字符串，请设置为实际申请的SECRETKEY。</li>
    </ul>
-   <img src="https://qcloudimg.tencent-cloud.cn/raw/95e83fb9f4177baa2ff0d2033001e5ba.png" width="650" height="295"/>
+   <img src="../Preview/test-user-sig-win.png" width="900"/>
 4. 返回实时音视频控制台，单击【粘贴完成，下一步】。
 5. 单击【关闭指引，进入控制台管理应用】。
 

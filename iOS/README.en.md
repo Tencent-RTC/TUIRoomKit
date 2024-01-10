@@ -17,29 +17,21 @@ TUIRoomKit
 
 ## Environment Requirements
 - Xcode 13.0 or above
-- 
+
 ## Running the Demo
 
 [](id:ui.step1)
-### Step 1. Create a TRTC application
-1. Enter the [Application Management](https://www.tencentcloud.com/account/login) interface of the Tencent Cloud Live Audio/Video Console, select Create Application, enter the application name,click **Create Application**.
-2. Find your application in the application list and Click **Application Info**.
-    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a12607f338b311ed8088525400463ef7.png" width="900">
-        
-3. Follow the steps below to get the application’s `SDKAppID` and key.
-    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a0eb96e038b311ed8088525400463ef7.png" width="900">
-
->! This component uses two basic PaaS services of Tencent Cloud: [TRTC](https://intl.cloud.tencent.com/document/product/647/35078) and [IM](https://intl.cloud.tencent.com/document/product/1047). When you activate TRTC, IM will be activated automatically. For information about the billing of IM, see [Pricing](https://intl.cloud.tencent.com/document/product/1047/34350).
+### Step 1. Activate the service
+1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/37287) to obtain your own SDKAppID and SDKSecreKey.
 
 [](id:ui.step2)
-### Step 2. Configure the project
-1. Open the demo project `DemoApp.xcworkspace` with Xcode 12.0 or later.
-2. Find the `iOS/Example/Debug/GenerateTestUserSig.swift` file in the project.
-3. Set the following parameters in `GenerateTestUserSig.swift`:
-<ul style="margin:0"><li/>SDKAPPID: `0` by default. Set it to the actual `SDKAppID`.
-<li/>SECRETKEY: Left empty by default. Set it to the actual key.</ul>
-
-![](https://qcloudimg.tencent-cloud.cn/raw/1c4eb799c7e06aa2da54ece87ccf993e.png)
+### Step 2. Download the source code and configure the project
+1. Clone or directly download the source code in the repository. **Feel free to star our project if you like it.**
+2. Find and open the `iOS/Example/Debug/GenerateTestUserSig.swift` file.
+3. Set parameters in `GenerateTestUserSig.swift`:
+	<img src="../Preview/test-user-sig-ios.png" width="900">
+	- SDKAPPID: A placeholder by default. Set it to the `SDKAppID` that you noted down in step 1.
+	- SECRETKEY: A placeholder by default. Set it to the key information that you noted down in step 1.
 
 [](id:ui.step3)
 ### Step 3. Compile and run the application

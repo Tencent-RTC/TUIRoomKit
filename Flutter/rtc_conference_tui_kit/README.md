@@ -31,12 +31,8 @@ Here is an example of integration with UI (ie TUIRoomKit), which is also our rec
 | Android  |- Minimum compatibility with Android 4.1 (SDK API Level 16), recommended to use Android 5.0 (SDK API Level 21) and above。       |
 |  iOS     |iOS 12.0 and higher.     |
 
-### Active the service
-
-First, please Create an application in the [TRTC Console](https://console.tencentcloud.com/trtc/allapp) and record the SDKAppID and SecretKey parameters. These parameters will be used in the subsequent integration process. The location of the application creation and parameters is shown in the following figure:
-   ![](https://qcloudimg.tencent-cloud.cn/raw/aa6cb270cefd189f07db51dce83c7052.png)
-
->! This component uses two basic PaaS services of Tencent Cloud: [TRTC](https://intl.cloud.tencent.com/document/product/647/35078) and [IM](https://intl.cloud.tencent.com/document/product/1047). When you activate TRTC, IM will be activated automatically. For information about the billing , see [Pricing](https://www.tencentcloud.com/document/product/647/34610).
+###  Activate the service
+1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/57508) to obtain your own SDKAppID and SDKSecreKey.
 
 ### Access and use
 

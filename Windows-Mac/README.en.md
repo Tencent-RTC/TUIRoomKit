@@ -35,14 +35,8 @@ TUIRoom
 
 ## Demo Run Example
 
-### Prerequisites
-- You have [signed up for a Tencent Cloud account](https://intl.cloud.tencent.com/document/product/378/17985) and completed [identity verification](https://intl.cloud.tencent.com/document/product/378/3629).
-
-### Obtaining `SDKAPPID` and `SECRETKEY`
-1. Log in to the TRTC console and select **Development Assistance** > **[Demo Quick Run](https://console.cloud.tencent.com/trtc/quickstart)**.
-2. Enter an application name such as `TestTRTC` and click **Create**.
-   <img src="https://qcloudimg.tencent-cloud.cn/raw/4f44a7ca70f28807c91b4a04ccc1b960.png" width="650" height="295"/>
-3. Click **Next** to view your `SDKAppID` and key.
+###  Activate the service
+Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/53567) to obtain your own SDKAppID and SDKSecreKey.
 
 ### Integrating SDK
 1. The project integrates the SDKs for Windows and macOS by default. For more information on the specific SDK features, see [SDK Download](https://cloud.tencent.com/document/product/647/32689).
@@ -59,7 +53,7 @@ Clone or directly download the source code in the repository. **Feel free to sta
    <li>SDKAPPID: 0 by default. Replace it with your actual `SDKAPPID`.</li>
    <li>SECRETKEY: An empty string by default. Replace it with your actual `SECRETKEY`.</li>
    </ul>
-   <img src="https://qcloudimg.tencent-cloud.cn/raw/95e83fb9f4177baa2ff0d2033001e5ba.png" width="650" height="295"/>
+   <img src="../Preview/test-user-sig-win.png" width="900"/>
 4. Return to the TRTC console and click **Next**.
 5. Click **Return to Overview Page**.
 
