@@ -38,35 +38,65 @@ class UserListController extends GetxController {
     _roomEngine.addObserver(observer);
   }
 
-  void muteAllAudioAction() async {
-    isAllMute.value = !isAllMute.value;
-    var result = await _engineManager.muteAllAudioAction(isAllMute.value);
-    if (result.code == TUIError.success) {
-      if (isOwner()) {
-        makeToast(
-            msg: isAllMute.value
-                ? RoomContentsTranslations.translate('allMutePrompt')
-                : RoomContentsTranslations.translate('allUnMutePrompt'));
-      }
-    } else {
-      isAllMute.value = !isAllMute.value;
-      makeToast(msg: result.message!);
-    }
+  void muteAllAudioAction() {
+    showConferenceDialog(
+      title: isAllMute.value
+          ? RoomContentsTranslations.translate('unAllMute')
+          : RoomContentsTranslations.translate('allMuteTitle'),
+      message: isAllMute.value
+          ? RoomContentsTranslations.translate('allUnMuteMessage')
+          : RoomContentsTranslations.translate('allMuteMessage'),
+      cancelText: RoomContentsTranslations.translate('cancel'),
+      confirmText: isAllMute.value
+          ? RoomContentsTranslations.translate('confirmRelease')
+          : RoomContentsTranslations.translate('allMute'),
+      onConfirm: () async {
+        Get.back();
+        isAllMute.value = !isAllMute.value;
+        var result = await _engineManager.muteAllAudioAction(isAllMute.value);
+        if (result.code == TUIError.success) {
+          if (isOwner()) {
+            makeToast(
+                msg: isAllMute.value
+                    ? RoomContentsTranslations.translate('allMutePrompt')
+                    : RoomContentsTranslations.translate('allUnMutePrompt'));
+          }
+        } else {
+          isAllMute.value = !isAllMute.value;
+          makeToast(msg: result.message!);
+        }
+      },
+    );
   }
 
-  void muteAllVideoAction() async {
-    isAllCameraDisable.value = !isAllCameraDisable.value;
-    var result =
-        await _engineManager.muteAllVideoAction(isAllCameraDisable.value);
-    if (result.code == TUIError.success) {
-      makeToast(
-          msg: isAllCameraDisable.value
-              ? RoomContentsTranslations.translate('disableAllVideoPrompt')
-              : RoomContentsTranslations.translate('enableAllVideoPrompt'));
-    } else {
-      isAllCameraDisable.value = !isAllCameraDisable.value;
-      makeToast(msg: result.message!);
-    }
+  void muteAllVideoAction() {
+    showConferenceDialog(
+      title: isAllCameraDisable.value
+          ? RoomContentsTranslations.translate('enableAllVideo')
+          : RoomContentsTranslations.translate('allDisableVideoTitle'),
+      message: isAllCameraDisable.value
+          ? RoomContentsTranslations.translate('allEnableVideoMessage')
+          : RoomContentsTranslations.translate('allDisableVideoMessage'),
+      cancelText: RoomContentsTranslations.translate('cancel'),
+      confirmText: isAllCameraDisable.value
+          ? RoomContentsTranslations.translate('confirmRelease')
+          : RoomContentsTranslations.translate('disableAllVideo'),
+      onConfirm: () async {
+        Get.back();
+        isAllCameraDisable.value = !isAllCameraDisable.value;
+        var result =
+            await _engineManager.muteAllVideoAction(isAllCameraDisable.value);
+        if (result.code == TUIError.success) {
+          makeToast(
+              msg: isAllCameraDisable.value
+                  ? RoomContentsTranslations.translate('disableAllVideoPrompt')
+                  : RoomContentsTranslations.translate('enableAllVideoPrompt'));
+        } else {
+          isAllCameraDisable.value = !isAllCameraDisable.value;
+          makeToast(msg: result.message!);
+        }
+      },
+    );
   }
 
   void searchAction(String value) {
@@ -312,9 +342,9 @@ class UserListController extends GetxController {
     RoomEngineManager().kickUserOffSeat(_seatIndex, userId);
   }
 
-  bool isSeatMode() {
-    return RoomStore.to.roomInfo.speechMode ==
-        TUISpeechMode.speakAfterTakingSeat;
+  bool isRoomNeedTakeSeat() {
+    return RoomStore.to.roomInfo.isSeatEnabled == true &&
+        RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake;
   }
 
   bool isOwner() {
@@ -330,7 +360,7 @@ class UserListController extends GetxController {
       return 230.0.scale375();
     }
     if (isOwner()) {
-      if (isSeatMode()) {
+      if (isRoomNeedTakeSeat()) {
         if (userModel.isOnSeat.value) {
           return 485.0.scale375();
         }
@@ -338,7 +368,7 @@ class UserListController extends GetxController {
       }
       return 435.0.scale375();
     } else {
-      if (isSeatMode()) {
+      if (isRoomNeedTakeSeat()) {
         if (userModel.isOnSeat.value) {
           return 335.0.scale375();
         }

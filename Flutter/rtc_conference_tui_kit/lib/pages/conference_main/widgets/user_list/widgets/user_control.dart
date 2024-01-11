@@ -22,7 +22,8 @@ class UserControlWidget extends GetView<UserListController> {
           UserInfoWidget(userModel: userModel),
           SizedBox(height: 10.0.scale375()),
           Visibility(
-            visible: userModel.isOnSeat.value || !controller.isSeatMode(),
+            visible:
+                userModel.isOnSeat.value || !controller.isRoomNeedTakeSeat(),
             child: UserControlItemWidget(
               onPressed: () {
                 Get.back();
@@ -47,7 +48,8 @@ class UserControlWidget extends GetView<UserListController> {
             ),
           ),
           Visibility(
-            visible: userModel.isOnSeat.value || !controller.isSeatMode(),
+            visible:
+                userModel.isOnSeat.value || !controller.isRoomNeedTakeSeat(),
             child: UserControlItemWidget(
               onPressed: () {
                 Get.back();
@@ -144,7 +146,7 @@ class UserControlWidget extends GetView<UserListController> {
           ),
           Visibility(
             visible: !controller.isSelf(userModel) &&
-                controller.isSeatMode() &&
+                controller.isRoomNeedTakeSeat() &&
                 (controller.isOwner() ||
                     controller.isAdministrator(RoomStore.to.currentUser)),
             child: UserControlItemWidget(

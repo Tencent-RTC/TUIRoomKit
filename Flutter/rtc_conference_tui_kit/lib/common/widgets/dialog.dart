@@ -29,17 +29,21 @@ Future<void> showConferenceDialog({
             const SizedBox(
               height: 24,
             ),
-            Text(
-              title,
-              style: titleTextStyle ??
-                  RoomTheme.defaultTheme.textTheme.headlineMedium,
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+              child: Text(
+                title,
+                style: titleTextStyle ??
+                    RoomTheme.defaultTheme.textTheme.headlineMedium,
+                textAlign: TextAlign.center,
+              ),
             ),
             Visibility(
               visible: message.isNotEmpty,
               child: Column(
                 children: [
                   const SizedBox(
-                    height: 12,
+                    height: 10,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 16.0, right: 16.0),
@@ -54,7 +58,7 @@ Future<void> showConferenceDialog({
               ),
             ),
             const SizedBox(
-              height: 24,
+              height: 20,
             ),
             const Divider(
               height: 0.0,

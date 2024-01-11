@@ -77,7 +77,7 @@ class MoreButtonWidget extends GetView<BottomViewController> {
           ),
           Obx(
             () => Visibility(
-              visible: !controller.isSeatMode.value ||
+              visible: !controller.isRoomNeedTakeSeat.value ||
                   (RoomStore.to.currentUser.isOnSeat.value ||
                       RoomStore.to.currentUser.userRole.value ==
                           TUIRole.administrator),

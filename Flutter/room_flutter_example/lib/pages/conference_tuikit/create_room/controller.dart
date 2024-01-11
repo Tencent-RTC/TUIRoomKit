@@ -11,25 +11,22 @@ class CreateRoomController extends GetxController {
   final int numberOfDigits = 6;
   RxString roomTypeString = 'freeToSpeakRoom'.tr.obs;
   RxString chooseSpeechMode = 'freeToSpeakRoom'.obs;
-  var roomSpeechMode = TUISpeechMode.freeToSpeak;
+  var _isSeatEnabled = false;
+  var _takeSeatMode = TUISeatMode.freeToTake;
 
   void cancelAction() {
     Get.back();
   }
 
   void sureAction() {
-    roomSpeechMode = chooseSpeechMode.value == 'freeToSpeakRoom'
-        ? TUISpeechMode.freeToSpeak
-        : TUISpeechMode.speakAfterTakingSeat;
-    switch (roomSpeechMode) {
-      case TUISpeechMode.freeToSpeak:
-        roomTypeString.value = 'freeToSpeakRoom'.tr;
-        break;
-      case TUISpeechMode.speakAfterTakingSeat:
-        roomTypeString.value = 'applyToSpeakRoom'.tr;
-        break;
-      default:
-        break;
+    if (chooseSpeechMode.value == 'freeToSpeakRoom') {
+      _isSeatEnabled = false;
+      _takeSeatMode = TUISeatMode.freeToTake;
+      roomTypeString.value = 'freeToSpeakRoom'.tr;
+    } else {
+      _isSeatEnabled = true;
+      _takeSeatMode = TUISeatMode.applyToTake;
+      roomTypeString.value = 'applyToSpeakRoom'.tr;
     }
     Get.back();
   }
@@ -51,7 +48,8 @@ class CreateRoomController extends GetxController {
     var roomKit = TUIRoomKit.createInstance();
     TUIRoomInfo roomInfo = TUIRoomInfo(roomId: _getRoomId());
     roomInfo.name = UserStore.to.userModel.userName;
-    roomInfo.speechMode = roomSpeechMode;
+    roomInfo.isSeatEnabled = _isSeatEnabled;
+    roomInfo.seatMode = _takeSeatMode;
     isOperating = true;
     var createRoomResult = await roomKit.createRoom(roomInfo);
     if (createRoomResult.code == TUIError.success) {

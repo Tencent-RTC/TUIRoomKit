@@ -1,3 +1,8 @@
+### 2.0.0(2024-01-11)
+
+- Upgrade the dependencies of rtc_room_engine
+- After adapting to the rtc_room_engine update, the speechMode field in TUIRoomInfo is abandoned and isSeatEnabled and seatMode are used instead.
+
 ### 1.7.1(2024-01-08)
 
 - Added administrator function

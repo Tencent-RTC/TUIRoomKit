@@ -40,7 +40,8 @@ class RoomEventHandler extends TUIRoomObserver {
 
     super.onRemoteUserLeaveRoom = (roomId, userInfo) {
       _store.removeUser(userInfo.userId, _store.userInfoList);
-      if (_store.roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+      if (_store.roomInfo.isSeatEnabled == true &&
+          _store.roomInfo.seatMode == TUISeatMode.applyToTake) {
         _store.deleteInviteSeatUser(userInfo.userId);
       }
     };
@@ -48,7 +49,8 @@ class RoomEventHandler extends TUIRoomObserver {
     super.onUserVideoStateChanged = (userId, streamType, hasVideo, reason) {
       _store.updateUserVideoState(userId, hasVideo, reason, _store.userInfoList,
           isScreenStream: streamType == TUIVideoStreamType.screenStream);
-      if (_store.roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+      if (_store.roomInfo.isSeatEnabled == true &&
+          _store.roomInfo.seatMode == TUISeatMode.applyToTake) {
         _store.updateUserVideoState(
             userId, hasVideo, reason, _store.seatedUserList,
             isScreenStream: streamType == TUIVideoStreamType.screenStream);
@@ -71,7 +73,8 @@ class RoomEventHandler extends TUIRoomObserver {
     super.onUserAudioStateChanged = (userId, hasAudio, reason) {
       _store.updateUserAudioState(
           userId, hasAudio, reason, _store.userInfoList);
-      if (_store.roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+      if (_store.roomInfo.isSeatEnabled == true &&
+          _store.roomInfo.seatMode == TUISeatMode.applyToTake) {
         _store.updateUserAudioState(
             userId, hasAudio, reason, _store.seatedUserList);
       }
@@ -89,7 +92,8 @@ class RoomEventHandler extends TUIRoomObserver {
         }
 
         _store.updateUserTalkingState(userId, isTalking, _store.userInfoList);
-        if (_store.roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+        if (_store.roomInfo.isSeatEnabled == true &&
+            _store.roomInfo.seatMode == TUISeatMode.applyToTake) {
           _store.updateUserTalkingState(
               userId, isTalking, _store.seatedUserList);
         }
@@ -102,7 +106,8 @@ class RoomEventHandler extends TUIRoomObserver {
       }
       _store.updateUserRole(userId, role, _store.userInfoList);
 
-      if (_store.roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+      if (_store.roomInfo.isSeatEnabled == true &&
+          _store.roomInfo.seatMode == TUISeatMode.applyToTake) {
         _store.updateUserRole(userId, role, _store.seatedUserList);
       }
 
@@ -135,13 +140,14 @@ class RoomEventHandler extends TUIRoomObserver {
 
     super.onRequestReceived = (request) {
       if (request.userId == RoomStore.to.currentUser.userId.value) {
-        TUIRoomEngine.createInstance()
+        RoomEngineManager()
+            .getRoomEngine()
             .responseRemoteRequest(request.requestId, true);
       }
       switch (request.requestAction) {
         case TUIRequestAction.requestToTakeSeat:
-          if (_store.roomInfo.speechMode ==
-              TUISpeechMode.speakAfterTakingSeat) {
+          if (_store.roomInfo.isSeatEnabled == true &&
+              _store.roomInfo.seatMode == TUISeatMode.applyToTake) {
             var userModel = _store.getUserById(request.userId);
             if (_store.inviteSeatMap[request.userId] == null &&
                 userModel != null) {
