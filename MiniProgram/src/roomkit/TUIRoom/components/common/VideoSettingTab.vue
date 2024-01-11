@@ -44,15 +44,13 @@ import DeviceSelect from './DeviceSelect.vue';
 import VideoProfile from './VideoProfile.vue';
 import TuiSwitch from './base/TuiSwitch.vue';
 import { useBasicStore } from '../../stores/basic';
-import { isElectronEnv } from '../../utils/utils';
 import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode } from '@tencentcloud/tuiroom-engine-wx';
-import { isMobile }  from '../../utils/useMediaValue';
+import { isElectron, isMobile }  from '../../utils/environment';
 import { storeToRefs } from 'pinia';
 const roomEngine = useGetRoomEngine();
-const isElectron = isElectronEnv();
 
 interface Props {
   withPreview?: boolean,

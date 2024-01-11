@@ -13,23 +13,21 @@
     </div>
     <Dialog
       v-model="showInviteDialog"
-      :title="t('The host invites you to speak on stage')"
+      :title="dialogTitle"
       :modal="true"
       :show-close="false"
       :close-on-click-modal="false"
       width="500px"
       :append-to-room-container="true"
+      :confirm-button="t('Agree to the stage')"
+      :cancel-button="t('Reject')"
+      @confirm="handleInvite(true)"
+      @cancel="handleInvite(false)"
     >
       <span>
-        {{ t('The host invites you to speak on stage and once on stage you can turn on the camera and unmute it.') }}
+        {{ t('You can turn on the microphone and camera once you are on stage') }}
       </span>
-      <template v-if="isMobile" #cancel>
-        <tui-button class="cancel" size="default" type="text" @click="handleInvite(false)">{{ t('Reject') }}</tui-button>
-      </template>
-      <template v-if="isMobile" #agree>
-        <tui-button class="agree" size="default" type="text" :custom-style="customStyle" @click="handleInvite(true)">{{ t('Agree to the stage') }}</tui-button>
-      </template>
-      <template v-if="!isMobile" #footer>
+      <template #footer>
         <tui-button class="agree-button" size="default" @click="handleInvite(true)">{{ t('Agree to the stage') }}</tui-button>
         <tui-button class="cancel-button" size="default" type="primary" @click="handleInvite(false)">{{ t('Reject') }}</tui-button>
       </template>
@@ -53,9 +51,9 @@ import { useI18n } from '../../../locales';
 import { storeToRefs } from 'pinia';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import logger from '../../../utils/common/logger';
-import { TUIRoomEngine, TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-wx';
-import { isMobile } from '../../../utils/useMediaValue';
+import { TUIRoomEngine, TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType, TUIRole } from '@tencentcloud/tuiroom-engine-wx';
 import TuiButton from '../../common/base/Button.vue';
+import useMemberControlHooks from '../../ManageMember/MemberControl/useMemberControlHooks';
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
@@ -72,8 +70,9 @@ const showInviteDialog: Ref<boolean> = ref(false);
 
 const applyToAnchorRequestId: Ref<string> = ref('');
 const inviteToAnchorRequestId: Ref<string> = ref('');
-const customStyle = { color: '#1C66E5' };
+const dialogTitle: Ref<string> = ref('');
 
+const { getRequestIdList, getRequestFirstUserId } = useMemberControlHooks();
 
 watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
   if (localUser.onSeat) {
@@ -92,6 +91,14 @@ watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
   }
 }, { immediate: true, deep: true });
 
+watch(() => roomStore.requestObj[TUIRequestAction.kRequestRemoteUserOnSeat], (val) => {
+  if (val.length) {
+    const requestFirstUserId = getRequestFirstUserId(TUIRequestAction.kRequestRemoteUserOnSeat);
+    const userRole = roomStore.getRemoteUserRole(requestFirstUserId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
+    dialogTitle.value = t('Sb invites you to speak on stage', { role: userRole });
+  }
+}, { deep: true });
+
 async function toggleApplySpeech() {
   hideApplyAttention();
   if (localUser.value.onSeat) {
@@ -107,40 +114,33 @@ async function toggleApplySpeech() {
  * 发送上麦申请
 **/
 async function sendSeatApplication() {
-  try {
-    const request = await roomEngine.instance?.takeSeat({
-      seatIndex: -1,
-      timeout: 0,
-      requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType }) => {
-        isApplyingOnSeat.value = false;
-        const { requestCallbackType } = callbackInfo;
-        switch (requestCallbackType) {
-          case TUIRequestCallbackType.kRequestAccepted:
-            TUIMessage({
-              type: 'success',
-              message: t('The host has approved your application'),
-              duration: MESSAGE_DURATION.NORMAL,
-            });
-            break;
-          case TUIRequestCallbackType.kRequestRejected:
-            TUIMessage({
-              type: 'warning',
-              message: t('The host has rejected your application for the stage'),
-              duration: MESSAGE_DURATION.NORMAL,
-            });
-            break;
-          case TUIRequestCallbackType.kRequestTimeout:
-            break;
-        }
-      },
-    });
-    if (request && request.requestId) {
-      applyToAnchorRequestId.value = request.requestId;
-    }
-    isApplyingOnSeat.value = true;
-  } catch (error) {
-    logger.log('member sendSpeechApplication error', error);
+  if (localUser.value.userRole === TUIRole.kAdministrator) {
+    await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+    TUIMessage({ type: 'success', message: t('Succeed on stage') });
+    return;
   }
+  const request = await roomEngine.instance?.takeSeat({
+    seatIndex: -1,
+    timeout: 0,
+    requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType }) => {
+      isApplyingOnSeat.value = false;
+      const { requestCallbackType } = callbackInfo;
+      switch (requestCallbackType) {
+        case TUIRequestCallbackType.kRequestAccepted:
+          TUIMessage({ type: 'success', message: t('The host has approved your application') });
+          break;
+        case TUIRequestCallbackType.kRequestRejected:
+          TUIMessage({ type: 'warning', message: t('The host has rejected your application for the stage') });
+          break;
+        case TUIRequestCallbackType.kRequestTimeout:
+          break;
+      }
+    },
+  });
+  if (request && request.requestId) {
+    applyToAnchorRequestId.value = request.requestId;
+  }
+  isApplyingOnSeat.value = true;
 }
 
 /**
@@ -172,11 +172,11 @@ function hideApplyAttention() {
 }
 
 async function onRequestReceived(eventInfo: { request: TUIRequest }) {
-  const { request: { requestId, requestAction } } = eventInfo;
+  const { request: { userId, requestId, requestAction } } = eventInfo;
   // Received an invitation from the host to go on the microphone
-  // 收到主持人邀请上麦
   if (requestAction === TUIRequestAction.kRequestRemoteUserOnSeat) {
     inviteToAnchorRequestId.value = requestId;
+    roomStore.setRequestId(TUIRequestAction.kRequestRemoteUserOnSeat, { userId, requestId });
     showInviteDialog.value = true;
   }
 }
@@ -188,6 +188,7 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
   **/
 function onRequestCancelled(eventInfo: { requestId: string, userId: string }) {
   const { requestId } = eventInfo;
+  roomStore.deleteRequestId(TUIRequestAction.kRequestRemoteUserOnSeat, requestId);
   if (inviteToAnchorRequestId.value === requestId) {
     inviteToAnchorRequestId.value = '';
     showInviteDialog.value = false;
@@ -200,11 +201,15 @@ function onRequestCancelled(eventInfo: { requestId: string, userId: string }) {
  * 用户接受/拒绝主讲人的邀请
 **/
 async function handleInvite(agree: boolean) {
-  await roomEngine.instance?.responseRemoteRequest({
-    requestId: inviteToAnchorRequestId.value,
-    agree,
-  });
+  const requestList = getRequestIdList(TUIRequestAction.kRequestRemoteUserOnSeat);
+  for (const inviteRequestId of requestList) {
+    await roomEngine.instance?.responseRemoteRequest({
+      requestId: inviteRequestId,
+      agree,
+    });
+  }
   showInviteDialog.value = false;
+  roomStore.clearRequestId(TUIRequestAction.kRequestRemoteUserOnSeat);
   if (agree) {
     hideApplyAttention();
   }
@@ -234,7 +239,6 @@ onBeforeUnmount(() => {
   roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
   roomEngine.instance?.off(TUIRoomEvents.onKickedOffSeat, onKickedOffSeat);
 });
-
 </script>
 
 <style lang="scss" scoped>

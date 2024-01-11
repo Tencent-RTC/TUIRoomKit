@@ -6,10 +6,14 @@
       v-if="!roomStore.isSpeakAfterTakingSeatMode"
       @tap="() => handleControlClick('chatControl')"
     ></chat-control>
-    <apply-control
-      v-else
-      @tap="() => handleControlClick('applyControl')"
-    ></apply-control>
+    <master-apply-control
+      v-if="roomStore.isSpeakAfterTakingSeatMode && (isMaster || isAdmin)"
+      @tap="() => handleControlClick('MasterApplyControl')"
+    ></master-apply-control>
+    <member-apply-control
+      v-if="roomStore.isSpeakAfterTakingSeatMode && !isMaster"
+      @tap="() => handleControlClick('MemberApplyControl')"
+    ></member-apply-control>
     <manage-member-control
       @tap="() => handleControlClick('manageMemberControl')"
     ></manage-member-control>
@@ -21,7 +25,8 @@ import AudioControl from '../AudioControl.vue';
 import VideoControl from '../VideoControl.vue';
 import ManageMemberControl from '../ManageMemberControl.vue';
 import ChatControl from '../ChatControl.vue';
-import ApplyControl from '../ApplyControl/Index.vue';
+import MasterApplyControl from '../ManageStageControl.vue';
+import MemberApplyControl from '../ApplyControl/MemberApplyControl.vue';
 import MoreControl from '../MoreControl/index.vue';
 import bus from '../../../hooks/useMitt';
 
@@ -31,6 +36,8 @@ import useRoomFooter from './useRoomFooterHooks';
 
 const {
   roomStore,
+  isMaster,
+  isAdmin,
 } = useRoomFooter();
 
 
