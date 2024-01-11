@@ -17,8 +17,3 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
-
-declare module 'rtc-detect' {
-  import RTCDetect from 'rtc-detect';
-  export default RTCDetect;
-}

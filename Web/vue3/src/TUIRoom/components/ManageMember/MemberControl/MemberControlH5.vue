@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isMe" class="member-control-container">
+  <div v-if="!isGeneralUser" class="member-control-container">
     <div class="member-title">
       <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
       <div class="member-title-content">{{ userInfo.userName || userInfo.userId }}</div>
@@ -7,8 +7,8 @@
       <span v-if="isWeChat" v-tap.stop="handleCloseControl" class="tab-cancel">{{ t('Cancel') }}</span>
     </div>
     <div
-      v-for="item, index in controlList"
-      :key="index"
+      v-for="item in controlList"
+      :key="item.key"
       v-tap="() => item.func(userInfo)"
       class="user-operate-item"
     >
@@ -18,19 +18,15 @@
     <Dialog
       v-model="showKickOffDialog"
       :title="t('Note')"
-      :modal="true"
       width="480px"
-      :before-close="handleCancelKickOffDialog"
-      :close-on-click-modal="true"
+      :modal="true"
       :append-to-room-container="true"
+      :confirm-button="t('Confirm')"
+      :cancel-button="t('Cancel')"
+      @confirm="kickOffUser(props.userInfo)"
+      @cancel="handleCancelKickOffDialog"
     >
       <span>{{ kickOffDialogContent }}</span>
-      <template #cancel>
-        <tui-button size="default" class="cancel-button" type="text" @click="handleCancelKickOffDialog">{{ t('Cancel') }}</tui-button>
-      </template>
-      <template #agree>
-        <tui-button size="default" class="agree-button" type="text" :custom-style="customStyle" @click="kickOffUser(props.userInfo)">{{ t('Confirm') }}</tui-button>
-      </template>
     </Dialog>
   </div>
 </template>
@@ -38,9 +34,8 @@
 <script setup lang="ts">
 import Avatar from '../../common/Avatar.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
-import { isWeChat } from '../../../utils/useMediaValue';
+import { isWeChat } from '../../../utils/environment';
 import Dialog from '../../common/base/Dialog';
-import TuiButton from '../../common/base/Button.vue';
 import vTap from '../../../directives/vTap';
 import useMemberControlHooks from './useMemberControlHooks';
 import { useI18n } from '../../../locales';
@@ -48,13 +43,14 @@ import { UserInfo } from '../../../stores/room';
 
 interface Props {
   userInfo: UserInfo,
+  showMemberControl: boolean,
 }
 
 const props = defineProps<Props>();
 
 const { t } = useI18n();
 const {
-  isMe,
+  isGeneralUser,
   controlList,
   showKickOffDialog,
   kickOffDialogContent,
@@ -63,7 +59,6 @@ const {
 } = useMemberControlHooks(props);
 
 const emit = defineEmits(['on-close-control']);
-const customStyle = { color: '#1C66E5' };
 
 function handleCloseControl() {
   emit('on-close-control');

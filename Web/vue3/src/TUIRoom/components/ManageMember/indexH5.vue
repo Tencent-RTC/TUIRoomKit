@@ -14,39 +14,36 @@
         <member-item v-for="(userInfo) in userList" :key="userInfo.userId" :user-info="userInfo"></member-item>
       </div>
     </div>
-    <div v-if="isMaster" class="manage-member-bottom">
+    <div v-if="isMaster || isAdmin" class="manage-member-bottom">
       <div
         class="manage-member-button"
         :class="isMicrophoneDisableForAllUser ? 'lift-all' : ''"
-        @touchstart="toggleManageMember(ManageControlType.AUDIO)"
+        @touchstart="toggleManageAllMember(ManageControlType.AUDIO)"
       >
         {{ audioManageInfo }}
       </div>
       <div
         class="manage-member-button"
         :class="isCameraDisableForAllUser ? 'lift-all' : ''"
-        @touchstart="toggleManageMember(ManageControlType.VIDEO)"
+        @touchstart="toggleManageAllMember(ManageControlType.VIDEO)"
       >
         {{ videoManageInfo }}
       </div>
     </div>
     <Dialog
-      v-model="showManageAllUserDialog" 
-      :title="t('Note')"
-      :modal="true"
+      v-model="showManageAllUserDialog"
+      :title="dialogTitle"
       width="480px"
-      :close-on-click-modal="true"
+      :modal="true"
       :append-to-room-container="true"
+      :confirm-button="t('Confirm')"
+      :cancel-button="t('Cancel')"
+      @confirm="doToggleManageAllMember"
+      @cancel="showManageAllUserDialog = false"
     >
       <span>
-        {{ dialogTitleInfo }}
+        {{ dialogContent }}
       </span>
-      <template #cancel>
-        <tui-button class="cancel" type="text" @click="showManageAllUserDialog = false">{{ t('Cancel') }}</tui-button>
-      </template>
-      <template #agree>
-        <tui-button class="agree" type="text" :custom-style="customStyle" @click="doToggleManageMember">{{ dialogActionInfo }}</tui-button>
-      </template>
     </Dialog>
   </div>
 </template>
@@ -57,7 +54,6 @@ import Dialog from '../common/base/Dialog';
 import useIndex from './useIndexHooks';
 import { storeToRefs } from 'pinia';
 import { useRoomStore } from '../../stores/room';
-import TuiButton from '../common/base/Button.vue';
 const roomStore = useRoomStore();
 const {
   userList,
@@ -66,21 +62,20 @@ const {
   isMicrophoneDisableForAllUser,
   isCameraDisableForAllUser,
   isMaster,
+  isAdmin,
 } = storeToRefs(roomStore);
 
 const {
   audioManageInfo,
   videoManageInfo,
   showManageAllUserDialog,
-  dialogTitleInfo,
-  dialogActionInfo,
+  dialogTitle,
+  dialogContent,
   ManageControlType,
-  toggleManageMember,
-  doToggleManageMember,
+  toggleManageAllMember,
+  doToggleManageAllMember,
   t,
 } = useIndex();
-const customStyle = { color: '#1C66E5' };
-
 </script>
 
 <style lang="scss" scoped>

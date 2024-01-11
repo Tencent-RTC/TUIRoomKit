@@ -6,13 +6,17 @@
     -->
   <div :class="[isMobile ? 'member-info-mobile' : 'member-info']">
     <!-- 用户基础信息 -->
-    <div class="member-basic-info">
+    <div :class="!showStateIcon && isTargetUserAdmin ? 'member-basic-info-admin' : 'member-basic-info'">
       <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
       <div class="user-name">{{ userInfo.userName || userInfo.userId }}</div>
-      <div v-if="userInfo.userRole === TUIRole.kRoomOwner" class="master-icon">
-        <svg-icon :icon="UserIcon" />
+      <div class="role-info">
+        <svg-icon
+          v-if="isTargetUserRoomOwner || isTargetUserAdmin"
+          :icon="UserIcon"
+          :class="isTargetUserAdmin ? 'admin-icon' : 'master-icon'"
+        />
+        <div :class="`user-extra-info ${isTargetUserAdmin ? 'user-extra-info-admin' : ''}`">{{ extraInfo }}</div>
       </div>
-      <div class="user-extra-info">{{ extraInfo }}</div>
     </div>
     <!--
       *User audio and video status information
@@ -44,7 +48,7 @@ import AudioCloseIcon from '../../common/icons/AudioCloseIcon.vue';
 import ScreenOpenIcon from '../../common/icons/ScreenOpenIcon.vue';
 import ApplyActiveIcon from '../../common/icons/ApplyActiveIcon.vue';
 import { useI18n } from '../../../locales';
-import { isMobile } from '../../../utils/useMediaValue';
+import { isMobile } from '../../../utils/environment';
 import UserIcon from '../../common/icons/UserIcon.vue';
 import { TUIRole } from '@tencentcloud/tuiroom-engine-js';
 
@@ -58,19 +62,28 @@ interface Props {
 const props = defineProps<Props>();
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
-const { isMaster, isSpeakAfterTakingSeatMode, masterUserId } = storeToRefs(roomStore);
+const { isMaster, isSpeakAfterTakingSeatMode } = storeToRefs(roomStore);
 
 const isMe = computed(() => basicStore.userId === props.userInfo.userId);
+
+const isTargetUserRoomOwner = computed(() => props.userInfo.userRole === TUIRole.kRoomOwner);
+const isTargetUserAdmin = computed(() => props.userInfo.userRole === TUIRole.kAdministrator);
 
 const extraInfo = computed(() => {
   if (isMaster.value && isMe.value) {
     return `${t('Host')}, ${t('Me')}`;
   }
+  if (isTargetUserRoomOwner.value) {
+    return t('Host');
+  }
+  if (isTargetUserAdmin.value && isMe.value) {
+    return `${t('Admin')}, ${t('Me')}`;
+  }
+  if (isTargetUserAdmin.value) {
+    return t('Admin');
+  }
   if (isMe.value) {
     return t('Me');
-  }
-  if (masterUserId.value === props.userInfo.userId) {
-    return t('Host');
   }
   return '';
 });
@@ -95,7 +108,6 @@ const iconList = computed(() => {
   }
   return list;
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -107,67 +119,85 @@ const iconList = computed(() => {
 .tui-theme-white .member-av-state {
   --icon-color: #B2BBD1;
 }
-.member-info-mobile{
-  display: flex;
-  align-items: center;
-  width: 80vw;
-  justify-content: space-between;
-}
-.member-info{
+.member-info,
+.member-info-mobile {
   display: flex;
   width: 100%;
   height: 100%;
   justify-content: space-between;
-}
-.member-basic-info {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  .avatar-url {
-    width: 32px;
-    height: 32px;
+  .member-basic-info
+  ,.member-basic-info-admin {
     display: flex;
-    border-radius: 50%;
+    flex-direction: row;
     align-items: center;
+    .avatar-url {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      border-radius: 50%;
+      align-items: center;
+    }
+    .user-name {
+      margin-left: 12px;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--font-color-1);
+      line-height: 22px;
+      max-width: 100px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .role-info {
+      display: flex;
+      .master-icon,
+      .admin-icon {
+        color: var(--active-color-2);
+        margin-left: 8px;
+        display: flex;
+      }
+      .admin-icon {
+        color: var(--orange-color);
+      }
+      .user-extra-info,
+      .user-extra-info-admin {
+        line-height: 20px;
+        font-size: 14px;
+        font-weight: 400;
+        margin-left: 4px;
+        padding: 2px;
+        color: var(--active-color-2);
+        padding: 0 6px;
+      }
+      .user-extra-info-admin {
+        transition: none;
+        color: var(--orange-color);
+      }
+    }
   }
-  .user-name {
-    margin-left: 12px;
-    font-size: 14px;
-    font-weight: 400;
-    color: var(--font-color-1);
-    line-height: 22px;
-    max-width: 110px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+
+  .member-basic-info-admin {
+    .user-name {
+      max-width: 40px;
+    }
   }
-  .master-icon {
-    color: var(--active-color-2);
-    margin-left: 8px;
+
+  .member-av-state {
+    height: 100%;
     display: flex;
-  }
-  .user-extra-info {
-    line-height: 20px;
-    font-size: 14px;
-    font-weight: 400;
-    margin-left: 4px;
-    padding: 2px;
-    color: var(--active-color-2);
-    padding: 0 6px;
+    align-items: center;
+    color: var(--icon-color);
+    .state-icon {
+      margin-left: 16px;
+    }
+    .disable-icon {
+      opacity: 0.4;
+    }
   }
 }
 
-.member-av-state {
-  height: 100%;
-  display: flex;
+.member-info-mobile {
   align-items: center;
-  color: var(--icon-color);
-  .state-icon {
-    margin-left: 16px;
-  }
-  .disable-icon {
-    opacity: 0.4;
-  }
+  width: 80vw;
 }
-
 </style>

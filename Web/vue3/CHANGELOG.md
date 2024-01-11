@@ -1,3 +1,20 @@
+## 2023.01.11@1.7.1
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v1.7.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+- 支持设置管理员角色。
+
+**Bug Fixed**
+- 修复最新版 vue3 + vite 脚手架项目中，集成本项目后，字体展示问题。
+- 修复成员被踢出房间时，偶现 dialog 弹框卡住问题。
+- 修复视频九宫格视图，翻页后切换到侧边栏，有用户离开会导致页面流窗口消失问题。
+- 修复移动端 H5 上台申请列表样式问题。
+- 修复移动端 H5 有远端屏幕分享时，会多显示一页视频问题。
+- 修复 home 页面偶现的视频已出现但是 loading icon 还在显示的问题。
+- 修复移动端 H5 举手管理列表中点击全体同意 & 全体拒绝按钮没有响应的问题。
+- 修复移动端 H5 举手发言模式成员管理中，房主针对普通观众操作菜单展示问题。
+
 ## 2023.12.18@1.7.0
 
 **Feature**

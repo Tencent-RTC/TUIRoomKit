@@ -103,7 +103,7 @@ async function handleCreateRoom(mode: string) {
   if (!isSupportTRTC.value) {
     TUIMessageBox({
       title: t('Note'),
-      message: t('The current browser does not support TRTC capability'),
+      message: t('The current browser does not support audio and video communication capabilities'),
       appendToRoomContainer: true,
       confirmButtonText: t('Sure'),
     });
@@ -128,7 +128,7 @@ async function handleEnterRoom(roomId: string) {
   if (!isSupportTRTC.value) {
     TUIMessageBox({
       title: t('Note'),
-      message: t('The current browser does not support TRTC capability'),
+      message: t('The current browser does not support audio and video communication capabilities'),
       appendToRoomContainer: true,
       confirmButtonText: t('Sure'),
     });

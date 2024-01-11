@@ -1,7 +1,7 @@
 {
   "name": "room-uikit-web-vue3",
   "private": true,
-  "version": "1.7.0",
+  "version": "1.7.1",
   "scripts": {
     "dev": "vite --force",
     "build": "vue-tsc --noEmit --skipLibCheck && vite build",
@@ -9,14 +9,14 @@
     "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-js": "^1.7.0",
+    "@tencentcloud/tuiroom-engine-js": "^1.7.1",
     "axios": "^0.27.2",
     "events": "^3.3.0",
     "js-cookie": "^3.0.1",
     "mitt": "^3.0.0",
     "pinia": "^2.0.13",
     "qs": "^6.10.3",
-    "rtc-detect": "^1.0.2",
+    "rtc-detect": "^1.0.3",
     "vue": "^3.2.25",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.0.14"
