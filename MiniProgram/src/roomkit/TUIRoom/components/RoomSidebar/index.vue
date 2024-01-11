@@ -10,6 +10,7 @@
         <manage-member
           v-if="sidebarName === 'manage-member'"
         ></manage-member>
+        <master-apply v-if="sidebarName === 'apply'"></master-apply>
       </div>
     </template>
     <template #sidebarFooter>
@@ -23,6 +24,7 @@
 <script setup lang="ts">
 
 import Chat from '../Chat/index.vue';
+import MasterApply from '../RoomFooter/ApplyControl/MasterApplyControl/index';
 import ManageMember from '../ManageMember/index';
 import popup from '../common/base/PopUpH5.vue';
 import useSideBar from './useSideBarHooks';

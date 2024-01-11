@@ -70,7 +70,7 @@ import { SettingMode } from '../../constants/render';
 import { useI18n } from '../../locales';
 import { storeToRefs } from 'pinia';
 import { useBasicStore } from '../../stores/basic';
-import { isElectronEnv } from '../../utils/utils';
+import { isElectron } from '../../utils/environment';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import TuiButton from '../common/base/Button.vue';
 
@@ -89,7 +89,6 @@ const basicStore = useBasicStore();
 const { userId } = storeToRefs(basicStore);
 const roomStore = useRoomStore();
 const { speakerList, userVolumeObj, currentSpeakerId } = storeToRefs(roomStore);
-const isElectron = isElectronEnv();
 const roomEngine = useGetRoomEngine();
 const trtcCloud = roomEngine.instance?.getTRTCCloud();
 

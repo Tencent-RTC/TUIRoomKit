@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import i18n from '../../locales/index';
-import { isMobile, isWeChat } from '../../utils/useMediaValue';
+import { isMobile, isWeChat } from '../../utils/environment';
 import { computed } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';

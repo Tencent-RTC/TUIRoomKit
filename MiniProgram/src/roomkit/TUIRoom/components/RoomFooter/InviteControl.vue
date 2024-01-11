@@ -20,7 +20,7 @@ import InviteIcon from '../../assets/icons/InviteIcon.svg';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
-import { isMobile }  from '../../utils/useMediaValue';
+import { isMobile }  from '../../utils/environment';
 import roomInvite from '../RoomInvite/index.vue';
 
 const basicStore = useBasicStore();

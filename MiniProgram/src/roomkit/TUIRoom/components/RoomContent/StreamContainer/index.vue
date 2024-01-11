@@ -94,7 +94,6 @@ const streamContainerRef = ref(null);
 const roomStore = useRoomStore();
 const {
   streamList,
-  streamNumber,
   localStream,
   remoteStreamObj,
 } = storeToRefs(roomStore);
@@ -179,7 +178,8 @@ const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
  * 显示左右翻页图标
 **/
 const totalPageNumber = computed(() => {
-  const totalPageOfVideoStream = onlyVideoStreamList.value.length > 6 ?  Math.ceil(streamNumber.value / 6) : 1;
+  const videoStreamNumber = onlyVideoStreamList.value.length;
+  const totalPageOfVideoStream = videoStreamNumber > 6 ? Math.ceil(videoStreamNumber / 6) : 1;
   return enlargeStream.value ? totalPageOfVideoStream + 1 : totalPageOfVideoStream;
 });
 
@@ -290,7 +290,7 @@ const onUserVideoStateChanged = async (eventInfo: {
     if (streamType === TUIVideoStreamType.kCameraStream) {
       TUIMessage({
         type: 'warning',
-        message: t('The host has turned off your camera'),
+        message: t('Your camera has been turned off'),
         duration: MESSAGE_DURATION.NORMAL,
       });
       // When the moderator opens the whole staff forbidden to draw,

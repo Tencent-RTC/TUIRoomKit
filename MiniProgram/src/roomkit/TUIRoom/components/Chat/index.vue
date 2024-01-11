@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import MessageList from './MessageList/index.vue';
 import ChatEditor from './ChatEditor/index.vue';
-import { isMobile }  from '../../utils/useMediaValue';
+import { isMobile }  from '../../utils/environment';
 </script>
 
 <style lang="scss" scoped>

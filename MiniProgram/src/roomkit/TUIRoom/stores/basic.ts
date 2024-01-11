@@ -2,10 +2,10 @@ import { defineStore } from 'pinia';
 import { SpeechMode } from '../constants/room';
 import { getLanguage } from '../utils/common';
 import { LAYOUT } from '../constants/render';
-import { isUndefined, isElectronEnv } from '../utils/utils';
-import { isWeChat } from '../utils/useMediaValue';
+import { isUndefined } from '../utils/utils';
+import { isWeChat, isElectron } from '../utils/environment';
 
-type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | 'transfer-leave' | '';
+type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | 'transfer-leave' | 'apply' | '';
 
 interface BasicState {
   sdkAppId: number,
@@ -75,7 +75,7 @@ export const useBasicStore = defineStore('basic', {
     isSupportSwitchTheme: true,
     showHeaderTool: true,
     shareLink: '',
-    isRoomLinkVisible: !isElectronEnv() && !isWeChat,
+    isRoomLinkVisible: !isElectron && !isWeChat,
     isShowScreenShareAntiFraud: false,
     isOpenMic: false,
   }),

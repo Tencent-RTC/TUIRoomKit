@@ -4,7 +4,7 @@ import { UserInfo, useRoomStore } from '../../../stores/room';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
-import { TUIMediaDevice, TUIRole } from '@tencentcloud/tuiroom-engine-wx';
+import { TUIMediaDevice, TUIRole, TUISpeechMode, TUIRequestAction } from '@tencentcloud/tuiroom-engine-wx';
 import AudioOpenIcon from '../../../assets/icons/AudioOpenIcon.svg';
 import VideoOpenIcon from '../../../assets/icons/VideoOpenIcon.svg';
 import ChatForbiddenIcon from '../../../assets/icons/ChatForbiddenIcon.svg';
@@ -12,11 +12,17 @@ import KickOutIcon from '../../../assets/icons/KickOutIcon.svg';
 import OnStageIcon from '../../../assets/icons/OnStageIcon.svg';
 import OffStageIcon from '../../../assets/icons/OffStageIcon.svg';
 import TransferOwnerIcon from '../../../assets/icons/TransferOwnerIcon.svg';
+import SetAdminIcon from '../../../assets/icons/SetAdminIcon.svg';
+import RevokeAdminIcon from '../../../assets/icons/RevokeAdminIcon.svg';
 import { storeToRefs } from 'pinia';
 import TUIMessage from '../../common/base/Message';
 import { MESSAGE_DURATION } from '../../../constants/message';
 
-export default function useMemberControl(props: any) {
+interface ObjectType {
+  [key: number]: any;
+}
+
+export default function useMemberControl(props?: any) {
   const roomEngine = useGetRoomEngine();
   const { t } = useI18n();
 
@@ -24,7 +30,7 @@ export default function useMemberControl(props: any) {
   const roomStore = useRoomStore();
   const showKickOffDialog: Ref<boolean> = ref(false);
   const kickOffDialogContent = computed(() => t('whether to kick sb off the room', { name: props.userInfo.userName }));
-  const { isFreeSpeakMode, isSpeakAfterTakingSeatMode } = storeToRefs(roomStore);
+  const { speechMode, localUser, isGeneralUser, isSpeakAfterTakingSeatMode } = storeToRefs(roomStore);
   /**
    * Functions related to the Raise Your Hand function
    *
@@ -39,81 +45,34 @@ export default function useMemberControl(props: any) {
   } = useMasterApplyControl();
 
   const isMe = computed(() => basicStore.userId === props.userInfo.userId);
-  const isAnchor = computed(() => props.userInfo.onSeat === true);
-  const isAudience = computed(() => props.userInfo.onSeat !== true);
+  const isTargetUserAnchor = computed(() => props.userInfo.onSeat === true);
+  const isTargetUserAudience = computed(() => props.userInfo.onSeat !== true);
 
-  /**
-  * Control the centralized matching of elements
-  *
-  * Free speech mode
-  * 1. Current user is the anchor.
-  * Banning/unbanning Banning/unbanning drawing
-  * Banning chat
-  * Kicked out of the room
-  *
-  * Raise hand to speak mode
-  * 1. Current user is the host.
-  * Banning/unbanning Banning/unbanning drawing
-  * Invite to step down
-  * Ban chat
-  * Kicked out of the room
-  * 2.
-  * 2. Audience did not request to be on the mic.
-  * Invite on stage / Disinvite on stage * Ban chat
-  * Kicked out of the room
-  * 3.
-  * 3. the audience is applying for the mic.
-  * Agree to go on stage Deny go on stage
-  * Ban chat
-  * Kicked out of the room
-  *
-  * 控制元素的集中匹配情况
-  *
-  * 自由发言模式
-  * 1.当前用户为主播：
-  * 静音/解除静音  请求开启视频/关闭视频
-  *              转交主持人
-  *              停止共享
-  *              禁言
-  *              踢出房间
-  *
-  * 举手发言模式
-  * 1. 当前用户为主播：
-  * 禁言/解除禁言/取消解除禁言  请求开启视频/关闭视频
-  *                         邀请下台
-  *                         转交主持人
-  *                         停止共享
-  *                         禁言
-  *                         踢出房间
-  *
-  * 2. 观众没有申请上麦：
-  * 邀请上台/取消邀请上台   禁言
-  *                      踢出房间
-  *
-  * 3. 观众正在申请上麦：
-  * 同意上台      拒绝上台
-  *              禁言
-  *              踢出房间
-  **/
   const controlList = computed(() => {
-    const list = [transferOwner.value, chatControl.value, kickUser.value];
-    if (isFreeSpeakMode.value) {
-      list.unshift(...[audioControl.value, videoControl.value]);
-    } else if (isSpeakAfterTakingSeatMode.value) {
-      if (isAnchor.value) {
-        list.unshift(...[audioControl.value, videoControl.value, makeOffStage.value]);
-      } else if (isAudience.value) {
-        if (props.userInfo.isUserApplyingToAnchor) {
-          list.unshift(...[agreeOnStage.value, denyOnStage.value]);
-        } else {
-          list.unshift(inviteOnStage.value);
-        }
-      }
-    }
-    return list;
+    const agreeOrDenyStageList = props.userInfo.isUserApplyingToAnchor ? [agreeOnStage.value, denyOnStage.value] : [];
+    const inviteStageList = isTargetUserAudience.value && !props.userInfo.isUserApplyingToAnchor
+      ? [inviteOnStage.value] : [];
+    const onStageControlList = isTargetUserAnchor.value
+      ? [audioControl.value, videoControl.value, makeOffStage.value] : [];
+
+    const controlListObj: ObjectType = {
+      [TUISpeechMode.kFreeToSpeak]: {
+        [TUIRole.kRoomOwner]: [audioControl.value, videoControl.value, chatControl.value,
+          setOrRevokeAdmin.value, transferOwner.value, kickUser.value],
+        [TUIRole.kAdministrator]: [audioControl.value, videoControl.value, chatControl.value],
+      },
+      [TUISpeechMode.kSpeakAfterTakingSeat]: {
+        [TUIRole.kRoomOwner]: [...inviteStageList, ...onStageControlList, ...agreeOrDenyStageList,
+          setOrRevokeAdmin.value, transferOwner.value, chatControl.value, kickUser.value],
+        [TUIRole.kAdministrator]: [...inviteStageList, ...onStageControlList, ...agreeOrDenyStageList,
+          chatControl.value],
+      },
+    };
+    return controlListObj[speechMode.value as keyof ObjectType][localUser.value.userRole as keyof ObjectType] || [];
   });
 
   const audioControl = computed(() => ({
+    key: 'audioControl',
     icon: AudioOpenIcon,
     title: props.userInfo.hasAudioStream ? t('Mute') : t('Unmute'),
     func: muteUserAudio,
@@ -122,42 +81,53 @@ export default function useMemberControl(props: any) {
 
   const videoControl = computed(() => {
     const videoControlTitle = props.userInfo.hasVideoStream ? t('Disable video') : t('Enable video');
-    return { icon: VideoOpenIcon, title: videoControlTitle, func: muteUserVideo };
+    return { key: 'videoControl', icon: VideoOpenIcon, title: videoControlTitle, func: muteUserVideo };
   });
 
   const chatControl = computed(() => ({
+    key: 'chatControl',
     icon: ChatForbiddenIcon,
-    title: props.userInfo.isChatMutedByMaster ? t('Enable chat') : t('Disable chat'),
+    title: props.userInfo.isChatMutedByMasterOrAdmin ? t('Enable chat') : t('Disable chat'),
     func: disableUserChat,
   }));
 
   const transferOwner = computed(() => ({
+    key: 'transferOwner',
     icon: TransferOwnerIcon,
     title: t('Transfer owner'),
     func: handleTransferOwner,
   }));
 
+  const setOrRevokeAdmin = computed(() => ({
+    key: 'setOrRevokeAdmin',
+    icon: props.userInfo.userRole === TUIRole.kAdministrator ?  RevokeAdminIcon : SetAdminIcon,
+    title: props.userInfo.userRole === TUIRole.kAdministrator ? t('Revoke administrator') : t('Set as administrator'),
+    func: handleSetOrRevokeAdmin,
+  }));
+
   const kickUser = computed(() => ({
+    key: 'kickUser',
     icon: KickOutIcon,
     title: t('Kick out'),
     func: handleShowKickOffDialog,
   }));
 
   const inviteOnStage = computed(() => ({
+    key: 'inviteOnStage',
     icon: AudioOpenIcon,
     title: props.userInfo.isInvitingUserToAnchor ?  t('Cancel stage') : t('Invite stage'),
     func: toggleInviteUserOnStage,
   }));
 
   const agreeOnStage = computed(() => ({
+    key: 'agreeOnStage',
     icon: OnStageIcon,
     title: t('Agree to the stage'),
     func: agreeUserOnStage,
   }));
 
-  const denyOnStage = computed(() => ({ icon: OffStageIcon, title: t('Refuse stage'), func: denyUserOnStage }));
-  const makeOffStage = computed(() => ({ icon: OffStageIcon, title: t('Step down'), func: kickUserOffStage }));
-
+  const denyOnStage = computed(() => ({ key: 'denyOnStage', icon: OffStageIcon, title: t('Refuse stage'), func: denyUserOnStage }));
+  const makeOffStage = computed(() => ({ key: 'makeOffStage', icon: OffStageIcon, title: t('Step down'), func: kickUserOffStage }));
   /**
    * Invitation to the stage/uninvitation to the stage
    *
@@ -251,7 +221,7 @@ export default function useMemberControl(props: any) {
    * 允许文字聊天/取消文字聊天
   **/
   function disableUserChat(userInfo: UserInfo) {
-    const currentState = userInfo.isChatMutedByMaster;
+    const currentState = userInfo.isChatMutedByMasterOrAdmin;
     roomStore.setMuteUserChat(userInfo.userId, !currentState);
     roomEngine.instance?.disableSendingMessageByAdmin({
       userId: userInfo.userId,
@@ -288,6 +258,9 @@ export default function useMemberControl(props: any) {
           userId: userInfo.userId,
           userRole: TUIRole.kRoomOwner,
         });
+        if (isSpeakAfterTakingSeatMode.value) {
+          await roomEngine.instance?.leaveSeat();
+        }
         roomStore.setMasterUserId(userInfo.userId);
       } catch (error) {
         TUIMessage({
@@ -299,13 +272,42 @@ export default function useMemberControl(props: any) {
     }
   }
 
+  /**
+   * 设置/撤销管理员权限
+   */
+  async function handleSetOrRevokeAdmin(userInfo: UserInfo) {
+    const newRole = userInfo.userRole === TUIRole.kGeneralUser ? TUIRole.kAdministrator : TUIRole.kGeneralUser;
+    await roomEngine.instance?.changeUserRole({
+      userId: userInfo.userId,
+      userRole: newRole,
+    });
+    const updatedUserName = roomStore.getUserName(userInfo.userId);
+    const action = newRole === TUIRole.kAdministrator ? 'Set' : 'Revoked';
+    const tipMessage = `${t(`${action} the administrator role of sb`, { name: updatedUserName })}`;
+    TUIMessage({ type: 'success', message: tipMessage });
+    roomStore.setRemoteUserRole(userInfo.userId, newRole);
+  }
+
+  function getRequestIdList(requestType: TUIRequestAction) {
+    const items = roomStore.requestObj[requestType] || [];
+    return items.map(item => item.requestId);
+  }
+
+  function getRequestFirstUserId(requestType: TUIRequestAction) {
+    const items = roomStore.requestObj[requestType] || [];
+    return items.length > 0 ? items[0].userId : null;
+  }
+
   return {
     props,
     isMe,
+    isGeneralUser,
     controlList,
     showKickOffDialog,
     kickOffDialogContent,
     kickOffUser,
     handleCancelKickOffDialog,
+    getRequestIdList,
+    getRequestFirstUserId,
   };
 };
