@@ -29,7 +29,7 @@
     <div
       v-else
       :class="['icon-content', iconContentClass, `${disabled && 'disabled'}`]"
-      @click="$emit('click-icon')"
+      @click="handleClickEvent"
     >
       <slot></slot>
       <svg-icon v-if="icon" :icon="icon"></svg-icon>
@@ -47,7 +47,7 @@ import SvgIcon from './SvgIcon.vue';
 import ArrowUp from '../icons/ArrowUpIcon.vue';
 import { IconButtonLayout } from '../../../constants/room';
 import { computed } from 'vue';
-import { isMobile } from '../../../utils/useMediaValue';
+import { isMobile } from '../../../utils/environment';
 import UnSupportIcon from '../icons/UnSupportIcon.vue';
 import vTap from '../../../directives/vTap';
 import type { Component } from 'vue';
@@ -107,6 +107,7 @@ const handleClickEvent = () => {
   .icon-content {
     &.disabled {
       opacity: 0.4;
+      cursor: not-allowed;
     }
     &:hover {
       background: var(--icon-button-hover);

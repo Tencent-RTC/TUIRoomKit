@@ -1,4 +1,4 @@
-import { isWeChat } from './useMediaValue';
+import { isWeChat } from './environment';
 declare let uni: any;
 
 export const clipBoard = (data: any): Promise<{

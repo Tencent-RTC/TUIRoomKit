@@ -6,7 +6,8 @@
   >
     <member-info :show-state-icon="true" :user-info="props.userInfo"></member-info>
     <member-control
-      v-if="showMemberControl"
+      v-show="showMemberControl"
+      :show-member-control="showMemberControl"
       :user-info="props.userInfo"
       @on-close-control="handleDocumentTouchend"
     ></member-control>
@@ -33,7 +34,7 @@ const {
   isMemberControlAccessible,
   openMemberControl,
   closeMemberControl,
-} = useMemberItem(props.userInfo.userId);
+} = useMemberItem(props.userInfo);
 const showMemberControl = ref(false);
 watch(isMemberControlAccessible, (accessible: boolean) => {
   if (accessible === false) {

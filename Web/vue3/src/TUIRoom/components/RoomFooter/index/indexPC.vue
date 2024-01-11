@@ -25,11 +25,16 @@
         class="center-container-item"
         @click="handleControlClick('chatControl')"
       ></chat-control>
-      <apply-control
-        v-if="roomStore.isSpeakAfterTakingSeatMode"
+      <member-apply-control
+        v-if="roomStore.isSpeakAfterTakingSeatMode && !isMaster"
         class="center-container-item"
-        @click="handleControlClick('applyControl')"
-      ></apply-control>
+        @click="handleControlClick('MemberApplyControl')"
+      ></member-apply-control>
+      <master-apply-control
+        v-if="roomStore.isSpeakAfterTakingSeatMode && (isMaster || isAdmin)"
+        class="center-container-item"
+        @click="handleControlClick('MasterApplyControl')"
+      ></master-apply-control>
       <more-control
         class="center-container-item"
         @click="handleControlClick('moreControl')"
@@ -56,7 +61,8 @@ import InviteControl from '../InviteControl.vue';
 import VideoControl from '../VideoControl.vue';
 import ManageMemberControl from '../ManageMemberControl.vue';
 import ChatControl from '../ChatControl.vue';
-import ApplyControl from '../ApplyControl/Index.vue';
+import MasterApplyControl from '../ManageStageControl.vue';
+import MemberApplyControl from '../ApplyControl/MemberApplyControl.vue';
 import MoreControl from '../MoreControl';
 import EndControl from '../EndControl';
 import SettingControl from '../SettingControl.vue';
@@ -69,6 +75,8 @@ import useRoomFooter from './useRoomFooterHooks';
 
 const {
   roomStore,
+  isMaster,
+  isAdmin,
 } = useRoomFooter();
 
 const emit = defineEmits(['on-destroy-room', 'on-exit-room']);
