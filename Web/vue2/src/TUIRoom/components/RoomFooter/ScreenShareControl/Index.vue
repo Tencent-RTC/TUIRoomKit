@@ -5,7 +5,7 @@
       :is-active="isSharing"
       :disabled="screenShareDisabled"
       :title="title"
-      :is-not-support="!isGetUserMediaSupported"
+      :is-not-support="!isScreenShareSupported"
       @click-icon="toggleScreenShare"
     >
       <stop-screen-share-icon v-if="isSharing"></stop-screen-share-icon>
@@ -69,7 +69,7 @@ import { MESSAGE_DURATION } from '../../../constants/message';
 import { useI18n } from '../../../locales';
 import TuiButton from '../../common/base/Button.vue';
 import eventBus from '../../../hooks/useMitt';
-import useMediaDetect from '../../../hooks/useMediaDetect';
+import { isScreenShareSupported } from '../../../utils/mediaAbility';
 
 const roomEngine = useGetRoomEngine();
 
@@ -89,8 +89,6 @@ const isShowFraudDialog: Ref<boolean> = ref(false);
 // 麦下用户不能进行屏幕分享
 const screenShareDisabled = computed(() => isAudience.value);
 const title = computed(() => (isSharing.value ? t('End sharing') : t('Share screen')));
-
-const { isGetUserMediaSupported } = useMediaDetect();
 
 watch(isAnchor, (val: any, oldVal: any) => {
   if (!oldVal && val && isSharing.value) {
@@ -117,6 +115,15 @@ async function toggleScreenShare() {
     TUIMessage({
       type: 'warning',
       message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
+  }
+
+  if (!isScreenShareSupported) {
+    TUIMessage({
+      type: 'warning',
+      message: t('The current browser does not support screen sharing'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;

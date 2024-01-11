@@ -34,7 +34,7 @@ import RoomControl from '@/TUIRoom/components/RoomHome/RoomControl';
 import { getBasicInfo } from '@/config/basic-info-config';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '@/TUIRoom/hooks/useRoomEngine';
-import { isMobile } from '../TUIRoom/utils/useMediaValue';
+import { isMobile } from '../TUIRoom/utils/environment';
 import logger from '../TUIRoom/utils/common/logger';
 import TUIMessageBox from '@/TUIRoom/components/common/base/MessageBox/index';
 import useTRTCDetect from '@/TUIRoom/hooks/useTRTCDetect';
@@ -47,6 +47,12 @@ export default {
     LanguageIcon,
     RoomControl,
     SwitchTheme,
+  },
+  setup() {
+    const { isSupportTRTC } = useTRTCDetect();
+    return {
+      isSupportTRTC,
+    };
   },
   data() {
     return {
@@ -108,11 +114,10 @@ export default {
     },
     // 处理点击【创建房间】
     async handleCreateRoom(mode) {
-      const { isSupportTRTC } = useTRTCDetect();
-      if (!isSupportTRTC.value) {
+      if (!this.isSupportTRTC) {
         TUIMessageBox({
           title: this.$t('Note'),
-          message: this.$t('The current browser does not support TRTC capability'),
+          message: this.$t('The current browser does not support audio and video communication capabilities'),
           appendToRoomContainer: true,
           confirmButtonText: this.$t('Sure'),
         });
@@ -124,11 +129,10 @@ export default {
     },
     // 处理点击【进入房间】
     async handleEnterRoom(roomId) {
-    const { isSupportTRTC } = useTRTCDetect();
-      if (!isSupportTRTC.value) {
+      if (!this.isSupportTRTC) {
         TUIMessageBox({
           title: this.$t('Note'),
-          message: this.$t('The current browser does not support TRTC capability'),
+          message: this.$t('The current browser does not support audio and video communication capabilities'),
           appendToRoomContainer: true,
           confirmButtonText: this.$t('Sure'),
         });

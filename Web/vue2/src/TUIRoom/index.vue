@@ -36,7 +36,7 @@ import { debounce, throttle } from './utils/utils';
 import { useBasicStore } from './stores/basic';
 import { useRoomStore } from './stores/room';
 import { useChatStore } from './stores/chat';
-import { isMobile, isWeChat }  from './utils/useMediaValue';
+import { isMobile, isWeChat }  from './utils/environment';
 import './directives/vTap';
 import TUIRoomEngine, {
   TRTCVideoMirrorType,
@@ -401,7 +401,7 @@ const onError = (error: any) => {
 const onSendMessageForUserDisableChanged = (data: { userId: string, isDisable: boolean }) => {
   const { userId, isDisable } = data;
   if (userId === localUser.value.userId) {
-    const tipMessage = isDisable ? t('You have been banned from text chat by the host') : t('You are allowed to text chat by the host');
+    const tipMessage = isDisable ? t('You have been banned from text chat') : t('You are allowed to text chat');
     TUIMessage({
       type: 'warning',
       message: tipMessage,
@@ -473,7 +473,7 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
 
 // todo: 处理禁言所有人和禁画所有人
 async function handleAudioStateChange(isDisableAudio: boolean) {
-  const tipMessage = isDisableAudio ? t('The host has muted all') : t('The host has unmuted all');
+  const tipMessage = isDisableAudio ? t('Mute has been turned on') : t('All mutes have been lifted');
   TUIMessage({
     type: 'warning',
     message: tipMessage,
@@ -490,7 +490,7 @@ async function handleAudioStateChange(isDisableAudio: boolean) {
 }
 
 async function handleVideoStateChange(isDisableVideo: boolean) {
-  const tipMessage = isDisableVideo ? t('The host has turned on the ban on all paintings') : t('The host has lifted the ban on all paintings');
+  const tipMessage = isDisableVideo ? t('The banning of all paintings has been turned on') : t('The ban on painting has been lifted');
   TUIMessage({
     type: 'warning',
     message: tipMessage,
@@ -507,7 +507,7 @@ async function handleVideoStateChange(isDisableVideo: boolean) {
 }
 
 async function handleMessageStateChange(isDisableMessage: boolean) {
-  const tipMessage = isDisableMessage ? t('The host has turned on the ban on all chat') : t('The host has lifted the ban on all chat');
+  const tipMessage = isDisableMessage ? t('Disabling text chat for all is enabled') : t('Unblocked all text chat');
   TUIMessage({
     type: 'warning',
     message: tipMessage,
@@ -669,6 +669,7 @@ watch(sdkAppId, (val: number) => {
   background-color: var(--background-color-1);
   display: flex;
   flex-direction: column;
+  text-align: left;
   .header {
     width: 100%;
     height: 64px;

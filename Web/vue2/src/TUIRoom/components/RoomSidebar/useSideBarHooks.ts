@@ -31,6 +31,9 @@ export default function useSideBar() {
       case 'more':
         sidebarTitle = t('More');
         break;
+      case 'apply':
+        sidebarTitle = t('Members applying on stage');
+        break;
       case 'manage-member':
         sidebarTitle = `${t('Members')} (${userNumber.value})`;
         break;

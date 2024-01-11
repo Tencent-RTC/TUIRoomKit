@@ -244,6 +244,21 @@ const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }
   const { userId, userRole } = eventInfo;
   if (roomStore.localUser.userId === userId) {
     roomStore.setLocalUser({ userRole });
+    if (eventInfo.userRole === TUIRole.kGeneralUser) {
+      if (roomStore?.isCameraDisableForAllUser && !roomStore.localStream.hasAudioStream) {
+        roomStore.setCanControlSelfAudio(false);
+      }
+      if (roomStore?.isMicrophoneDisableForAllUser && !roomStore.localStream.hasVideoStream) {
+        roomStore.setCanControlSelfVideo(false);
+      }
+    } else if (eventInfo.userRole === TUIRole.kAdministrator) {
+      TUIMessage({
+        type: 'success',
+        message: t('You are now an administrator'),
+      });
+      roomStore.setCanControlSelfAudio(true);
+      roomStore.setCanControlSelfVideo(true);
+    }
   } else {
     roomStore.setRemoteUserRole(userId, userRole);
   }
@@ -260,7 +275,7 @@ const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }
     roomStore.setMasterUserId(userId);
     resetState();
     if (roomStore.isAnchor) return;
-    if (roomStore.isSpeakAfterTakingSeatMode) {
+    if (roomStore.localUser.userId === userId && roomStore.isSpeakAfterTakingSeatMode) {
       await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
     }
   }

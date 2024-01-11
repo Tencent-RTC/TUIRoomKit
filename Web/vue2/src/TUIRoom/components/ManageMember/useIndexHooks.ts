@@ -16,8 +16,6 @@ export default function useIndex() {
   const basicStore = useBasicStore();
   const roomStore = useRoomStore();
   const {
-    isMicrophoneDisableForAllUser,
-    isCameraDisableForAllUser,
     userList,
   } = storeToRefs(roomStore);
 
@@ -38,32 +36,41 @@ export default function useIndex() {
   const videoManageInfo = computed(() => (roomStore.isCameraDisableForAllUser ? t('Lift stop all video') : t('All stop video')));
 
   const showManageAllUserDialog: Ref<boolean> = ref(false);
-  const dialogTitleInfo: Ref<string> = ref('');
+  const dialogContent: Ref<string> = ref('');
+  const dialogTitle: Ref<string> = ref('');
   const dialogActionInfo: Ref<string> = ref('');
+  let stateForAllAudio: boolean = false;
+  let stateForAllVideo: boolean = false;
 
   enum ManageControlType {
     AUDIO = 'audio',
     VIDEO = 'video',
-    Message = 'message',
   }
   const currentControlType: Ref<ManageControlType> = ref(ManageControlType.AUDIO);
 
-  async function toggleManageMember(type: ManageControlType) {
+  async function toggleManageAllMember(type: ManageControlType) {
     showManageAllUserDialog.value = true;
     currentControlType.value = type;
     switch (type) {
       case ManageControlType.AUDIO:
-        dialogTitleInfo.value = roomStore.isMicrophoneDisableForAllUser
-          ? t('Can you lift all mute')
-          : t('All current and new members will be muted.');
+        dialogTitle.value = roomStore.isMicrophoneDisableForAllUser
+          ? t('Enable all audios') : t('All current and new members will be muted');
+        dialogContent.value = roomStore.isMicrophoneDisableForAllUser
+          ? t('After unlocking, users can freely turn on the microphone')
+          : t('Members will not be able to open the microphone');
+        stateForAllAudio =  !roomStore.isMicrophoneDisableForAllUser;
         // 小程序更新视图
         await nextTick();
         dialogActionInfo.value = audioManageInfo.value;
         break;
       case ManageControlType.VIDEO:
-        dialogTitleInfo.value = roomStore.isCameraDisableForAllUser
-          ? t('Should we turn on the video for everyone')
-          : t('All current and new members will turn off their videos.');
+        dialogTitle.value = roomStore.isCameraDisableForAllUser
+          ? t('Enable all videos') : t('All and new members will be banned from the camera');
+        dialogContent.value = roomStore.isCameraDisableForAllUser
+          ? t('After unlocking, users can freely turn on the camera')
+          : t('Members will not be able to open the camera');
+        stateForAllVideo = !roomStore.isCameraDisableForAllUser;
+        // 小程序更新视图
         await nextTick();
         dialogActionInfo.value = videoManageInfo.value;
         break;
@@ -72,7 +79,7 @@ export default function useIndex() {
     }
   }
 
-  async function doToggleManageMember() {
+  async function doToggleManageAllMember() {
     switch (currentControlType.value) {
       case ManageControlType.AUDIO:
         toggleAllAudio();
@@ -90,48 +97,45 @@ export default function useIndex() {
   }
 
   async function toggleAllAudio() {
-    const isMicrophoneDisable = !isMicrophoneDisableForAllUser.value;
     await roomEngine.instance?.disableDeviceForAllUserByAdmin({
-      isDisable: isMicrophoneDisable,
+      isDisable: stateForAllAudio,
       device: TUIMediaDevice.kMicrophone,
     });
-    const tipMessage = isMicrophoneDisable ? t('The host has muted all') : t('The host has unmuted all');
+    const tipMessage = stateForAllAudio ? t('Mute has been turned on') : t('All mutes have been lifted');
     TUIMessage({
       type: 'success',
       message: tipMessage,
       duration: MESSAGE_DURATION.NORMAL,
     });
-    roomStore.setMicrophoneDisableState(isMicrophoneDisable);
+    roomStore.setMicrophoneDisableState(stateForAllAudio);
   }
 
   async function toggleAllVideo() {
-    const isCameraDisable = !isCameraDisableForAllUser.value;
     await roomEngine.instance?.disableDeviceForAllUserByAdmin({
-      isDisable: isCameraDisable,
+      isDisable: stateForAllVideo,
       device: TUIMediaDevice.kCamera,
     });
-    const tipMessage = isCameraDisable ? t('The host has turned on the ban on all paintings') : t('The host has lifted the ban on all paintings');
+    const tipMessage = stateForAllVideo ? t('The banning of all paintings has been turned on') : t('The ban on painting has been lifted');
     TUIMessage({
       type: 'success',
       message: tipMessage,
       duration: MESSAGE_DURATION.NORMAL,
     });
-    roomStore.setCameraDisableState(isCameraDisable);
+    roomStore.setCameraDisableState(stateForAllVideo);
   }
   return {
     showApplyUserLit,
-    toggleAllAudio,
-    toggleAllVideo,
     searchText,
     showUserList,
     handleInvite,
     t,
-    toggleManageMember,
-    doToggleManageMember,
+    toggleManageAllMember,
+    doToggleManageAllMember,
     audioManageInfo,
     videoManageInfo,
     showManageAllUserDialog,
-    dialogTitleInfo,
+    dialogContent,
+    dialogTitle,
     dialogActionInfo,
     ManageControlType,
   };

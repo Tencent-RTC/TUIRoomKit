@@ -21,24 +21,20 @@
     ></video-media-control>
     <Dialog
       v-model="showRequestOpenCameraDialog"
-      :title="title"
+      :title="t('Tips')"
       :modal="true"
       :show-close="false"
       :close-on-click-modal="false"
       width="500px"
       :append-to-room-container="true"
+      :confirm-button="t('Turn on the camera')"
+      :cancel-button="t('Keep it closed')"
+      @confirm="handleAccept"
+      @cancel="handleReject"
     >
       <span>
-        {{ t('The host invites you to turn on the camera') }}
+        {{ dialogContent }}
       </span>
-      <template v-if="isMobile" #cancel>
-        <tui-button class="cancel" size="default" type="text" @click="handleReject">
-          {{ t('Keep it closed') }}
-        </tui-button>
-      </template>
-      <template v-if="isMobile" #agree>
-        <tui-button class="agree" size="default" type="text" :custom-style="customStyle" @click="handleAccept">{{ t('Turn on the camera') }}</tui-button>
-      </template>
       <template #footer>
         <tui-button class="cancel-button" size="default" @click="handleAccept">{{ t('Turn on the camera') }}</tui-button>
         <tui-button class="cancel-button" size="default" type="primary" @click="handleReject">
@@ -59,19 +55,20 @@ import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
-import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
-import { isMobile, isWeChat, isH5 }  from '../../utils/useMediaValue';
+import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRole } from '@tencentcloud/tuiroom-engine-js';
+import { isMobile, isWeChat, isH5 }  from '../../utils/environment';
 import { useBasicStore } from '../../stores/basic';
 import TuiButton from '../common/base/Button.vue';
 import TUIMessage from '../common/base/Message/index';
 import TUIMessageBox from '../common/base/MessageBox/index';
 import { SMALL_VIDEO_ENC_PARAM } from '../../constants/room';
+import useMemberControlHooks from '../ManageMember/MemberControl/useMemberControlHooks';
 const roomEngine = useGetRoomEngine();
 
 const roomStore = useRoomStore();
 const basicStore = useBasicStore();
+const dialogContent: Ref<string> = ref('');
 const emits = defineEmits(['click']);
-const customStyle = { color: '#1C66E5' };
 
 const {
   isCameraDisableForAllUser,
@@ -82,7 +79,7 @@ const {
 const { t } = useI18n();
 const hasMore = computed(() => !isMobile);
 const showVideoSettingTab: Ref<boolean> = ref(false);
-const title = computed(() => (isMobile ? '' : t('Tips')));
+const { getRequestIdList, getRequestFirstUserId } = useMemberControlHooks();
 
 function handleVideoMediaClick() {
   emits('click');
@@ -142,13 +139,17 @@ async function toggleMuteVideo() {
 }
 
 
-// -------- 处理主持人打开/关闭摄像头信令 --------
+// -------- 处理主持人或管理员打开/关闭摄像头信令 --------
 const showRequestOpenCameraDialog: Ref<boolean> = ref(false);
 const requestOpenCameraRequestId: Ref<string> = ref('');
 async function onRequestReceived(eventInfo: { request: TUIRequest }) {
-  const { requestAction, requestId } = eventInfo.request;
-  // 主持人邀请打开麦克风，同意之后将会自动打开摄像头
+  const { userId, requestAction, requestId } = eventInfo.request;
   if (requestAction === TUIRequestAction.kRequestToOpenRemoteCamera) {
+    roomStore.setRequestId(TUIRequestAction.kRequestToOpenRemoteCamera, { userId, requestId });
+    // 主持人/管理员邀请打开麦克风，同意之后将会自动打开摄像头
+    const requestFirstUserId = getRequestFirstUserId(TUIRequestAction.kRequestToOpenRemoteCamera);
+    const userRole = roomStore.getRemoteUserRole(requestFirstUserId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
+    dialogContent.value = t('Sb invites you to turn on the camera', { role: userRole });
     requestOpenCameraRequestId.value = requestId;
     showRequestOpenCameraDialog.value = true;
   }
@@ -160,20 +161,28 @@ async function handleAccept() {
   roomEngine.instance?.setLocalVideoView({
     view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
   });
-  await roomEngine.instance?.responseRemoteRequest({
-    requestId: requestOpenCameraRequestId.value,
-    agree: true,
-  });
+  const requestList = getRequestIdList(TUIRequestAction.kRequestToOpenRemoteCamera);
+  for (const inviteRequestId of requestList) {
+    await roomEngine.instance?.responseRemoteRequest({
+      requestId: inviteRequestId,
+      agree: true,
+    });
+  }
   requestOpenCameraRequestId.value = '';
   showRequestOpenCameraDialog.value = false;
+  roomStore.clearRequestId(TUIRequestAction.kRequestToOpenRemoteCamera);
 }
 
 // 保持静音
 async function handleReject() {
-  await roomEngine.instance?.responseRemoteRequest({
-    requestId: requestOpenCameraRequestId.value,
-    agree: false,
-  });
+  const requestList = getRequestIdList(TUIRequestAction.kRequestToOpenRemoteCamera);
+  for (const inviteRequestId of requestList) {
+    await roomEngine.instance?.responseRemoteRequest({
+      requestId: inviteRequestId,
+      agree: false,
+    });
+  }
+  roomStore.clearRequestId(TUIRequestAction.kRequestToOpenRemoteCamera);
   requestOpenCameraRequestId.value = '';
   showRequestOpenCameraDialog.value = false;
 }

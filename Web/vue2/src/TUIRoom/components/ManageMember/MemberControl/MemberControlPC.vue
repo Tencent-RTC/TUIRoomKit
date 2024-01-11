@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isMe" class="member-control-container">
+  <div v-if="!isGeneralUser" class="member-control-container">
     <tui-button class="button" size="default" @click="singleControl.func(props.userInfo)">
       {{ singleControl.title }}
     </tui-button>
@@ -19,8 +19,8 @@
         :class="['user-operate-list', 'tui-theme-white', dropdownClass ]"
       >
         <div
-          v-for="item, index in moreControlList"
-          :key="index"
+          v-for="item in moreControlList"
+          :key="item.key"
           class="user-operate-item"
           @click="item.func(props.userInfo)"
         >
@@ -66,10 +66,10 @@ const props = defineProps<Props>();
 
 const { t } = useI18n();
 const {
-  isMe,
   controlList,
   showKickOffDialog,
   kickOffDialogContent,
+  isGeneralUser,
   kickOffUser,
   handleCancelKickOffDialog,
 } = useMemberControlHooks(props);

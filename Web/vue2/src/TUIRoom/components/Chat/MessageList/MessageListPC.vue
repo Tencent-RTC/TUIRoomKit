@@ -23,7 +23,7 @@
 import { nextTick, onMounted, onUnmounted } from 'vue';
 import MessageText from '../MessageTypes/MessageText.vue';
 import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
-import { isMobile }  from '../../../utils/useMediaValue';
+import { isMobile }  from '../../../utils/environment';
 import useMessageList from '../useMessageListHook';
 import { useChatStore } from '../../../stores/chat';
 const chatStore = useChatStore();
