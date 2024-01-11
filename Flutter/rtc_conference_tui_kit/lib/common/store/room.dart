@@ -128,8 +128,7 @@ class RoomStore extends GetxController {
       makeToast(
           msg: RoomContentsTranslations.translate('cameraTurnedOnByHostToast'));
     } else if (!roomInfo.isCameraDisableForAllUser) {
-      if (roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat &&
-          !currentUser.isOnSeat.value) {
+      if (isRoomNeedTakeSeat() && !currentUser.isOnSeat.value) {
         return;
       }
       makeToast(
@@ -171,8 +170,8 @@ class RoomStore extends GetxController {
   }
 
   void updateSelfRole(TUIRole role) {
-    if (roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat &&
-        !currentUser.isOnSeat.value &&
+    if (isRoomNeedTakeSeat() &&
+        !RoomStore.to.currentUser.isOnSeat.value &&
         role == TUIRole.roomOwner) {
       RoomEngineManager().takeSeat(_seatIndex, _reqTimeout, null);
     }
@@ -248,8 +247,7 @@ class RoomStore extends GetxController {
         currentUser.userRole.value == TUIRole.generalUser) {
       isCameraItemTouchable.value = false;
     }
-    if (roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat &&
-        !currentUser.isOnSeat.value) {
+    if (isRoomNeedTakeSeat() && !currentUser.isOnSeat.value) {
       isMicItemTouchable.value = false;
       isCameraItemTouchable.value = false;
     }
@@ -262,7 +260,7 @@ class RoomStore extends GetxController {
       return;
     }
     if (currentUser.userRole.value == TUIRole.administrator) {
-      if (roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+      if (isRoomNeedTakeSeat()) {
         if (currentUser.isOnSeat.value) {
           isCameraItemTouchable.value = true;
           isMicItemTouchable.value = true;
@@ -276,7 +274,7 @@ class RoomStore extends GetxController {
       isMicItemTouchable.value = true;
       return;
     }
-    if (roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat) {
+    if (isRoomNeedTakeSeat()) {
       if (currentUser.isOnSeat.value) {
         isCameraItemTouchable.value = true;
         isMicItemTouchable.value = true;
@@ -295,5 +293,10 @@ class RoomStore extends GetxController {
     } else {
       isCameraItemTouchable.value = true;
     }
+  }
+
+  bool isRoomNeedTakeSeat() {
+    return roomInfo.isSeatEnabled == true &&
+        roomInfo.seatMode == TUISeatMode.applyToTake;
   }
 }

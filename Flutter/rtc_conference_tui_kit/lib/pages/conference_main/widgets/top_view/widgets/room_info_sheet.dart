@@ -31,8 +31,8 @@ class RoomInfoSheet extends GetView<TopViewController> {
           SizedBox(height: 15.0.scale375()),
           InfoListItem(
               prefixText: RoomContentsTranslations.translate('roomType'),
-              infoText: controller.roomInfo.speechMode ==
-                      TUISpeechMode.freeToSpeak
+              infoText: controller.roomInfo.isSeatEnabled == false &&
+                      controller.roomInfo.seatMode == TUISeatMode.freeToTake
                   ? RoomContentsTranslations.translate('freeToSpeakRoom')
                   : RoomContentsTranslations.translate('raiseHandSpeakRoom')),
           SizedBox(height: 15.0.scale375()),

@@ -270,10 +270,7 @@ class BaseButtonWidget extends GetView<BottomViewController> {
               height: 24,
             ),
             onPressed: () {
-              Future.delayed(const Duration(milliseconds: 300), () {
-                controller.showMoreButton.value = controller.isUnfold.value;
-              });
-              controller.isUnfold.value = !controller.isUnfold.value;
+              controller.changeFoldState();
             },
             isSelected: controller.isUnfold,
             text: RoomContentsTranslations.translate('unfold'),

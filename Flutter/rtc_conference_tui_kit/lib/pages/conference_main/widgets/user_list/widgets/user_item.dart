@@ -32,7 +32,7 @@ class UserListItem extends GetView<UserListController> {
               Visibility(
                 visible: !controller.isSelf(userModel) &&
                     !userModel.isOnSeat.value &&
-                    controller.isSeatMode() &&
+                    controller.isRoomNeedTakeSeat() &&
                     (controller.isOwner() ||
                         controller.isAdministrator(RoomStore.to.currentUser) &&
                             !controller.isAdministrator(userModel)),
@@ -48,7 +48,8 @@ class UserListItem extends GetView<UserListController> {
                 ),
               ),
               Visibility(
-                visible: userModel.isOnSeat.value || !controller.isSeatMode(),
+                visible: userModel.isOnSeat.value ||
+                    !controller.isRoomNeedTakeSeat(),
                 child: Row(
                   children: [
                     userModel.hasAudioStream.value

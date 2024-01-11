@@ -131,4 +131,11 @@ const Map<String, String> roomContentsZhCN = {
   'leaveSeatTitle': '确定要下台吗',
   'leaveSeatMessage': '再次上台需要重新发送申请，并等待房主/管理员通过',
   'kickedOffSeat': '您已被请下台',
+  'allMuteTitle': '所有及新加入的成员将被静音',
+  'allMuteMessage': '成员将无法开启麦克风',
+  'allDisableVideoTitle': '所有及新加入的成员将被禁止视频',
+  'allDisableVideoMessage': '成员将无法开启视频画面',
+  'allUnMuteMessage': '解除后用户可以自由开启麦克风',
+  'allEnableVideoMessage': '解除后用户可以自由开启视频',
+  'confirmRelease': '确认解除',
 };

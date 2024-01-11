@@ -22,8 +22,9 @@ class VideoPageTurningPage extends GetView<VideoPageTurningController> {
               },
               itemBuilder: (context, index) {
                 return VideoLayoutWidget(
-                  userList: RoomStore.to.roomInfo.speechMode ==
-                          TUISpeechMode.speakAfterTakingSeat
+                  userList: RoomStore.to.roomInfo.isSeatEnabled == true &&
+                          RoomStore.to.roomInfo.seatMode ==
+                              TUISeatMode.applyToTake
                       ? RoomStore.to.seatedUserList
                       : RoomStore.to.userInfoList,
                   startIndex: controller.getPageStarIndex(index),

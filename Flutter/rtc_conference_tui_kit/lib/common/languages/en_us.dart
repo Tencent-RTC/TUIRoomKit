@@ -142,4 +142,13 @@ const Map<String, String> roomContentsEnUS = {
   'leaveSeatMessage':
       'To get on stage again, you need to resend the application and wait for the owner/administrator to approve it.',
   'kickedOffSeat': 'You have been asked to leave stage',
+  'allMuteTitle': 'All and new members will be muted',
+  'allMuteMessage': 'Members will not be able to turn on their microphones',
+  'allDisableVideoTitle': 'All and new members will be banned from video',
+  'allDisableVideoMessage': 'Members will not be able to open the video',
+  'allUnMuteMessage':
+      'After being released, the user can freely turn on the microphone.',
+  'allEnableVideoMessage':
+      'After deactivation, the user can freely start the video',
+  'confirmRelease': 'Confirm release',
 };

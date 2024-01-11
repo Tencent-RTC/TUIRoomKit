@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:get/get.dart';
+import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_conference_tui_kit/manager/rtc_engine_manager.dart';
 import 'package:rtc_room_engine/api/room/tui_room_define.dart';
@@ -14,7 +15,7 @@ class BottomViewController extends GetxController {
   final isUnfold = false.obs;
   final showMoreButton = false.obs;
   final isRequestingTakeSeat = false.obs;
-  final isSeatMode = false.obs;
+  final isRoomNeedTakeSeat = false.obs;
 
   late RoomEngineManager _engineManager;
   late RoomStore _store;
@@ -26,8 +27,8 @@ class BottomViewController extends GetxController {
     _engineManager = RoomEngineManager();
     _store = RoomStore.to;
     _takeSeatRequestId = '';
-    isSeatMode.value =
-        _store.roomInfo.speechMode == TUISpeechMode.speakAfterTakingSeat;
+    isRoomNeedTakeSeat.value = _store.roomInfo.isSeatEnabled == true &&
+        _store.roomInfo.seatMode == TUISeatMode.applyToTake;
   }
 
   void muteAudioAction() {
@@ -66,7 +67,7 @@ class BottomViewController extends GetxController {
   }
 
   bool _isOffSeatInSeatMode() {
-    if (isSeatMode.value && !_store.currentUser.isOnSeat.value) {
+    if (isRoomNeedTakeSeat.value && !_store.currentUser.isOnSeat.value) {
       makeToast(
         msg: RoomContentsTranslations.translate('raiseHandTip'),
       );
@@ -91,14 +92,24 @@ class BottomViewController extends GetxController {
 
     String appGroup = '';
     if (Platform.isIOS) {
-      //TODO appGroup
+      appGroup = 'com.tencent.TUIRoomTXReplayKit-Screen';
+      ReplayKitLauncher.launchReplayKitBroadcast('TXReplayKit_Screen');
     }
     _engineManager.startScreenSharing(appGroup: appGroup);
   }
 
   void onScreenShareButtonPressed() {
     if (_store.currentUser.hasScreenStream.value) {
-      _engineManager.stopScreenSharing();
+      showConferenceDialog(
+        title: RoomContentsTranslations.translate('liveScreen'),
+        message: RoomContentsTranslations.translate('stopTUIRoomScreenShare'),
+        cancelText: RoomContentsTranslations.translate('cancel'),
+        confirmText: RoomContentsTranslations.translate('stop'),
+        onConfirm: () {
+          _engineManager.stopScreenSharing();
+          Get.back();
+        },
+      );
     } else {
       _startScreenSharing();
     }
@@ -172,35 +183,45 @@ class BottomViewController extends GetxController {
   }
 
   bool isMicAndCameraButtonVisible() {
-    return !isSeatMode.value ||
+    return !isRoomNeedTakeSeat.value ||
         RoomStore.to.currentUser.isOnSeat.value ||
         RoomStore.to.currentUser.userRole.value == TUIRole.administrator;
   }
 
   bool isRaiseHandButtonVisible() {
-    return isSeatMode.value &&
+    return isRoomNeedTakeSeat.value &&
         RoomStore.to.currentUser.userRole.value != TUIRole.roomOwner;
   }
 
   bool isRaiseHandListButtonVisible() {
-    return isSeatMode.value &&
+    return isRoomNeedTakeSeat.value &&
         RoomStore.to.currentUser.userRole.value != TUIRole.generalUser;
   }
 
   bool isScreenShareButtonInBaseRow() {
-    return !isSeatMode.value ||
+    return !isRoomNeedTakeSeat.value ||
         RoomStore.to.currentUser.userRole.value != TUIRole.administrator;
   }
 
   bool isInviteButtonInBaseRow() {
-    return !isSeatMode.value ||
+    return !isRoomNeedTakeSeat.value ||
         !RoomStore.to.currentUser.isOnSeat.value &&
             RoomStore.to.currentUser.userRole.value != TUIRole.administrator;
   }
 
   bool isSettingButtonInBaseRow() {
-    return isSeatMode.value &&
+    return isRoomNeedTakeSeat.value &&
         !RoomStore.to.currentUser.isOnSeat.value &&
         RoomStore.to.currentUser.userRole.value != TUIRole.administrator;
+  }
+
+  void changeFoldState() {
+    if (isUnfold.value != showMoreButton.value) {
+      return;
+    }
+    Future.delayed(const Duration(milliseconds: 300), () {
+      showMoreButton.value = isUnfold.value;
+    });
+    isUnfold.value = !isUnfold.value;
   }
 }

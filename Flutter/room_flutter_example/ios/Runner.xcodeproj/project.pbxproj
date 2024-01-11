@@ -7,6 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		060B868C2B3A824A00C6C724 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 060B86012B398BA400C6C724 /* ReplayKit.framework */; };
+		060B86A22B3A839600C6C724 /* ReplayKitLocalized.m in Sources */ = {isa = PBXBuildFile; fileRef = 060B869A2B3A839600C6C724 /* ReplayKitLocalized.m */; };
+		060B86A32B3A839600C6C724 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 060B869B2B3A839600C6C724 /* InfoPlist.strings */; };
+		060B86A42B3A839600C6C724 /* ReplayKitLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = 060B869D2B3A839600C6C724 /* ReplayKitLocalized.strings */; };
+		060B86AD2B3A84EF00C6C724 /* SampleHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 060B86AB2B3A84EF00C6C724 /* SampleHandler.m */; };
+		060B86AF2B3A852A00C6C724 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 060B86652B3A77AA00C6C724 /* Accelerate.framework */; };
+		060B86B02B3A853100C6C724 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 060B86692B3A77C600C6C724 /* libc++.tbd */; };
+		060B86B22B3A853900C6C724 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 060B86B12B3A853900C6C724 /* VideoToolbox.framework */; };
+		060B86B32B3A854200C6C724 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 060B86702B3A784900C6C724 /* libsqlite3.tbd */; };
+		060B86B52B3A854700C6C724 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 060B86B42B3A854700C6C724 /* OpenAL.framework */; };
+		060B86B62B3A854E00C6C724 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 060B86672B3A77BA00C6C724 /* AudioToolbox.framework */; };
+		0685E4FE2B3B338C00E34DB5 /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 060B86742B3A7B6900C6C724 /* TXLiteAVSDK_ReplayKitExt.framework */; };
+		0685E4FF2B3B33D900E34DB5 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 060B86722B3A785800C6C724 /* libresolv.tbd */; };
+		0685E5012B3B34CE00E34DB5 /* TXReplayKit_Screen.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 060B868B2B3A824A00C6C724 /* TXReplayKit_Screen.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -19,6 +33,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		0685E4EE2B3B31D900E34DB5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 060B868A2B3A824900C6C724;
+			remoteInfo = TXReplayKit_Screen;
+		};
 		331C8085294A63A400263BE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
@@ -29,6 +50,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		060B86192B398BA500C6C724 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0685E5002B3B34AF00E34DB5 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0685E5012B3B34CE00E34DB5 /* TXReplayKit_Screen.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9705A1C41CF9048500538489 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -42,6 +84,30 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		060B86012B398BA400C6C724 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
+		060B860D2B398BA400C6C724 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		060B86652B3A77AA00C6C724 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		060B86672B3A77BA00C6C724 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		060B86692B3A77C600C6C724 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		060B866A2B3A77F700C6C724 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib/libc++.tbd"; sourceTree = DEVELOPER_DIR; };
+		060B866B2B3A77FF00C6C724 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/OpenAL.framework; sourceTree = DEVELOPER_DIR; };
+		060B866D2B3A781000C6C724 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/VideoToolbox.framework; sourceTree = DEVELOPER_DIR; };
+		060B86702B3A784900C6C724 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		060B86722B3A785800C6C724 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
+		060B86742B3A7B6900C6C724 /* TXLiteAVSDK_ReplayKitExt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TXLiteAVSDK_ReplayKitExt.framework; path = TXReplayKit_Screen/TXLiteAVSDK_ReplayKitExt.framework; sourceTree = "<group>"; };
+		060B868B2B3A824A00C6C724 /* TXReplayKit_Screen.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TXReplayKit_Screen.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		060B86912B3A824A00C6C724 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		060B869A2B3A839600C6C724 /* ReplayKitLocalized.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplayKitLocalized.m; sourceTree = "<group>"; };
+		060B869C2B3A839600C6C724 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		060B869E2B3A839600C6C724 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ReplayKitLocalized.strings"; sourceTree = "<group>"; };
+		060B869F2B3A839600C6C724 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		060B86A02B3A839600C6C724 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ReplayKitLocalized.strings; sourceTree = "<group>"; };
+		060B86A12B3A839600C6C724 /* ReplayKitLocalized.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplayKitLocalized.h; sourceTree = "<group>"; };
+		060B86AB2B3A84EF00C6C724 /* SampleHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleHandler.m; sourceTree = "<group>"; };
+		060B86AC2B3A84EF00C6C724 /* SampleHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleHandler.h; sourceTree = "<group>"; };
+		060B86B12B3A853900C6C724 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		060B86B42B3A854700C6C724 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		060B86EB2B3AD5AD00C6C724 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/ReplayKit.framework; sourceTree = DEVELOPER_DIR; };
 		1110FCA7531C65092D214EE8 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
@@ -68,6 +134,22 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		060B86882B3A824900C6C724 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0685E4FF2B3B33D900E34DB5 /* libresolv.tbd in Frameworks */,
+				060B86B62B3A854E00C6C724 /* AudioToolbox.framework in Frameworks */,
+				060B86B52B3A854700C6C724 /* OpenAL.framework in Frameworks */,
+				060B86B32B3A854200C6C724 /* libsqlite3.tbd in Frameworks */,
+				060B86B22B3A853900C6C724 /* VideoToolbox.framework in Frameworks */,
+				060B86B02B3A853100C6C724 /* libc++.tbd in Frameworks */,
+				060B86AF2B3A852A00C6C724 /* Accelerate.framework in Frameworks */,
+				0685E4FE2B3B338C00E34DB5 /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */,
+				060B868C2B3A824A00C6C724 /* ReplayKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		90F2F94FE03BB317FE05C495 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -87,6 +169,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		060B868D2B3A824A00C6C724 /* TXReplayKit_Screen */ = {
+			isa = PBXGroup;
+			children = (
+				060B86AC2B3A84EF00C6C724 /* SampleHandler.h */,
+				060B86AB2B3A84EF00C6C724 /* SampleHandler.m */,
+				060B86992B3A839600C6C724 /* Localized */,
+				060B86912B3A824A00C6C724 /* Info.plist */,
+			);
+			path = TXReplayKit_Screen;
+			sourceTree = "<group>";
+		};
+		060B86992B3A839600C6C724 /* Localized */ = {
+			isa = PBXGroup;
+			children = (
+				060B869A2B3A839600C6C724 /* ReplayKitLocalized.m */,
+				060B869B2B3A839600C6C724 /* InfoPlist.strings */,
+				060B869D2B3A839600C6C724 /* ReplayKitLocalized.strings */,
+				060B86A12B3A839600C6C724 /* ReplayKitLocalized.h */,
+			);
+			path = Localized;
+			sourceTree = "<group>";
+		};
 		331C8082294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -98,8 +202,22 @@
 		79BA1D54C41694C34D32DD6F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				060B86EB2B3AD5AD00C6C724 /* ReplayKit.framework */,
+				060B86B42B3A854700C6C724 /* OpenAL.framework */,
+				060B86B12B3A853900C6C724 /* VideoToolbox.framework */,
+				060B86742B3A7B6900C6C724 /* TXLiteAVSDK_ReplayKitExt.framework */,
+				060B86722B3A785800C6C724 /* libresolv.tbd */,
+				060B86702B3A784900C6C724 /* libsqlite3.tbd */,
+				060B866D2B3A781000C6C724 /* VideoToolbox.framework */,
+				060B866B2B3A77FF00C6C724 /* OpenAL.framework */,
+				060B86692B3A77C600C6C724 /* libc++.tbd */,
+				060B866A2B3A77F700C6C724 /* libc++.tbd */,
+				060B86672B3A77BA00C6C724 /* AudioToolbox.framework */,
+				060B86652B3A77AA00C6C724 /* Accelerate.framework */,
 				1110FCA7531C65092D214EE8 /* Pods_Runner.framework */,
 				4D8CBE528D511403C037B4CB /* Pods_RunnerTests.framework */,
+				060B86012B398BA400C6C724 /* ReplayKit.framework */,
+				060B860D2B398BA400C6C724 /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -120,6 +238,7 @@
 			children = (
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
+				060B868D2B3A824A00C6C724 /* TXReplayKit_Screen */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				C12F1DE8035B024F90AF4B45 /* Pods */,
@@ -132,6 +251,7 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
+				060B868B2B3A824A00C6C724 /* TXReplayKit_Screen.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -167,6 +287,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		060B868A2B3A824900C6C724 /* TXReplayKit_Screen */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 060B86952B3A824B00C6C724 /* Build configuration list for PBXNativeTarget "TXReplayKit_Screen" */;
+			buildPhases = (
+				060B86872B3A824900C6C724 /* Sources */,
+				060B86882B3A824900C6C724 /* Frameworks */,
+				060B86892B3A824900C6C724 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TXReplayKit_Screen;
+			productName = TXReplayKit_Screen;
+			productReference = 060B868B2B3A824A00C6C724 /* TXReplayKit_Screen.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		331C8080294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
@@ -191,17 +328,20 @@
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
 			buildPhases = (
 				A403A212A118E39986168E10 /* [CP] Check Pods Manifest.lock */,
+				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				060B86192B398BA500C6C724 /* Embed Foundation Extensions */,
+				3C755CBE0F195A37E2934EC5 /* [CP] Embed Pods Frameworks */,
 				9740EEB61CF901F6004384FC /* Run Script */,
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
-				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				0685E5002B3B34AF00E34DB5 /* Embed App Extensions */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
-				3C755CBE0F195A37E2934EC5 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				0685E4EF2B3B31D900E34DB5 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -214,9 +354,13 @@
 		97C146E61CF9000F007C117D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1300;
+				LastSwiftUpdateCheck = 1510;
+				LastUpgradeCheck = 1430;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
+					060B868A2B3A824900C6C724 = {
+						CreatedOnToolsVersion = 15.1;
+					};
 					331C8080294A63A400263BE5 = {
 						CreatedOnToolsVersion = 14.0;
 						TestTargetID = 97C146ED1CF9000F007C117D;
@@ -234,6 +378,8 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
+				English,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -242,11 +388,21 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
+				060B868A2B3A824900C6C724 /* TXReplayKit_Screen */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		060B86892B3A824900C6C724 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				060B86A42B3A839600C6C724 /* ReplayKitLocalized.strings in Resources */,
+				060B86A32B3A839600C6C724 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		331C807F294A63A400263BE5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -363,6 +519,15 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		060B86872B3A824900C6C724 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				060B86AD2B3A84EF00C6C724 /* SampleHandler.m in Sources */,
+				060B86A22B3A839600C6C724 /* ReplayKitLocalized.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		331C807D294A63A400263BE5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -383,6 +548,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		0685E4EF2B3B31D900E34DB5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 060B868A2B3A824900C6C724 /* TXReplayKit_Screen */;
+			targetProxy = 0685E4EE2B3B31D900E34DB5 /* PBXContainerItemProxy */;
+		};
 		331C8086294A63A400263BE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;
@@ -391,6 +561,24 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		060B869B2B3A839600C6C724 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				060B869C2B3A839600C6C724 /* zh-Hans */,
+				060B869F2B3A839600C6C724 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		060B869D2B3A839600C6C724 /* ReplayKitLocalized.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				060B869E2B3A839600C6C724 /* zh-Hans */,
+				060B86A02B3A839600C6C724 /* en */,
+			);
+			name = ReplayKitLocalized.strings;
+			sourceTree = "<group>";
+		};
 		97C146FA1CF9000F007C117D /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -410,6 +598,142 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		060B86962B3A824B00C6C724 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = F8A3GH6Q4W;
+				ENABLE_BITCODE = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/TXReplayKit_Screen",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TXReplayKit_Screen/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "TUIRoomKit屏幕共享";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.fx.rtmpdemo.Upload;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = abyWildcardDev;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		060B86972B3A824B00C6C724 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FN2V63AD2J;
+				ENABLE_BITCODE = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/TXReplayKit_Screen",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TXReplayKit_Screen/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "TUIRoomKit屏幕共享";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.fx.rtmpdemo.TCLVBIMDemoUploadUI;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = com.tencent.fx.rtmpdemo.TCLVBIMDemoUploadUI_Production_SignProvision;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		060B86982B3A824B00C6C724 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = F8A3GH6Q4W;
+				ENABLE_BITCODE = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/TXReplayKit_Screen",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TXReplayKit_Screen/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "TUIRoomKit屏幕共享";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.fx.rtmpdemo.Upload;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = abyWildcardDev;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Profile;
+		};
 		249021D3217E4FDB00AE95B9 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -464,6 +788,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Manual;
@@ -697,8 +1022,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
@@ -775,8 +1102,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
@@ -851,6 +1180,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		060B86952B3A824B00C6C724 /* Build configuration list for PBXNativeTarget "TXReplayKit_Screen" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				060B86962B3A824B00C6C724 /* Debug */,
+				060B86972B3A824B00C6C724 /* Release */,
+				060B86982B3A824B00C6C724 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -18,7 +18,7 @@ class RoomEngineManager {
 
   RoomEngineManager._internal() {
     Get.put<RoomStore>(RoomStore(), permanent: true);
-    _roomEngine = TUIRoomEngine.createInstance();
+    _roomEngine = TUIRoomEngine.sharedInstance();
     _roomEngine.addObserver(RoomEventHandler());
   }
 
@@ -45,8 +45,8 @@ class RoomEngineManager {
       if (result.data?.nextSequence != 0) {
         _nextSequence = result.data!.nextSequence;
         _getUserList();
-      } else if (RoomStore.to.roomInfo.speechMode ==
-          TUISpeechMode.speakAfterTakingSeat) {
+      } else if (RoomStore.to.roomInfo.isSeatEnabled == true &&
+          RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake) {
         _getSeatedUserList();
       }
     }
@@ -93,8 +93,8 @@ class RoomEngineManager {
 
   Future<bool> _autoTakeSeatForOwner() {
     Completer<bool> takeSeatCompleter = Completer();
-    if (RoomStore.to.roomInfo.speechMode !=
-            TUISpeechMode.speakAfterTakingSeat ||
+    if (RoomStore.to.roomInfo.isSeatEnabled != true ||
+        RoomStore.to.roomInfo.seatMode != TUISeatMode.applyToTake ||
         RoomStore.to.currentUser.userRole.value != TUIRole.roomOwner) {
       takeSeatCompleter.complete(true);
       return takeSeatCompleter.future;

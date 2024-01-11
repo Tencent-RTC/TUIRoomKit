@@ -46,8 +46,8 @@ class VideoPageTurningController extends GetxController {
   }
 
   bool _noVideoAvailable() {
-    if (RoomStore.to.roomInfo.speechMode ==
-        TUISpeechMode.speakAfterTakingSeat) {
+    if (RoomStore.to.roomInfo.isSeatEnabled == true &&
+        RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake) {
       for (var element in RoomStore.to.seatedUserList) {
         if (element.hasVideoStream.value) {
           return false;
@@ -76,8 +76,8 @@ class VideoPageTurningController extends GetxController {
   }
 
   int _getUserListLength() {
-    return RoomStore.to.roomInfo.speechMode ==
-            TUISpeechMode.speakAfterTakingSeat
+    return RoomStore.to.roomInfo.isSeatEnabled == true &&
+            RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake
         ? RoomStore.to.seatedUserList.length
         : RoomStore.to.userInfoList.length;
   }

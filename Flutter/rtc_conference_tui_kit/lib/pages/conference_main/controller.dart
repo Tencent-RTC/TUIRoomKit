@@ -71,8 +71,8 @@ class ConferenceMainController extends GetxController {
             );
           }
           if (role == TUIRole.administrator) {
-            if (RoomStore.to.roomInfo.speechMode ==
-                    TUISpeechMode.speakAfterTakingSeat &&
+            if (RoomStore.to.roomInfo.isSeatEnabled == true &&
+                RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake &&
                 !RoomStore.to.currentUser.isOnSeat.value) {
               showConferenceDialog(
                 title: RoomContentsTranslations.translate(

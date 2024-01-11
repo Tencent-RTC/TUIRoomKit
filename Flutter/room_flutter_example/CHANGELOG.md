@@ -1,3 +1,8 @@
+### 2.0.0(2024-01-11)
+
+- Solved the problem that screen sharing outside the application cannot be performed when running on iOS
+- Upgrade the dependencies of rtc_conference_tui_kit
+
 ### 1.7.1(2024-01-08)
 
 - Upgrade the dependencies of rtc_conference_tui_kit
