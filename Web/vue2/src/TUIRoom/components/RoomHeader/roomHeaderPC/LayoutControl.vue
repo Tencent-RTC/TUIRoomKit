@@ -8,9 +8,10 @@
   * 在 template 中使用 <layout-control />
 -->
 <template>
-  <div v-if="streamNumber > 1" v-click-outside="handleClickOutSide" class="layout-container">
+  <div v-click-outside="handleClickOutSide" class="layout-container">
     <icon-button
       :title="t('Layout')"
+      :disabled="isStreamNumberLessThanTwo"
       :layout="IconButtonLayout.HORIZONTAL"
       @click-icon="handleClickLayoutIcon"
     >
@@ -85,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from 'vue';
+import { ref, Ref, computed } from 'vue';
 import { LAYOUT } from '../../../constants/render';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
@@ -104,7 +105,8 @@ const { layout } = storeToRefs(basicStore);
 const roomStore = useRoomStore();
 const { streamNumber } = storeToRefs(roomStore);
 
-const showLayoutList:Ref<boolean> = ref(false);
+const showLayoutList: Ref<boolean> = ref(false);
+const isStreamNumberLessThanTwo = computed(() => streamNumber.value < 2);
 
 function handleClick(layout: any) {
   basicStore.setLayout(layout);
@@ -112,6 +114,9 @@ function handleClick(layout: any) {
 }
 
 function handleClickLayoutIcon() {
+  if (isStreamNumberLessThanTwo.value) {
+    return;
+  }
   showLayoutList.value = !showLayoutList.value;
 }
 

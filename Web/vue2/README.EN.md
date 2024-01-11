@@ -22,15 +22,22 @@ This document describes how to quickly run the TUIRoom demo project to try out g
 └── vue.config.js   // vue configuration file
 ```
 
-### Step 1. Activate the service
-1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/54845) to obtain your own SDKAppID and SDKSecreKey.
+### Step 1. Create a TRTC application
+1. Enter the [Application Management](https://www.tencentcloud.com/account/login) interface of the Tencent Cloud Live Audio/Video Console, select Create Application, enter the application name,click **Create Application**.
+2. Find your application in the application list and Click **Application Info**.
+    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a12607f338b311ed8088525400463ef7.png" width="900">
+		
+3. Follow the steps below to get the application’s `SDKAppID` and key.
+    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a0eb96e038b311ed8088525400463ef7.png" width="900">
+
+>! This component uses two basic PaaS services of Tencent Cloud: [TRTC](https://intl.cloud.tencent.com/document/product/647/35078) and [IM](https://intl.cloud.tencent.com/document/product/1047). When you activate TRTC, IM will be activated automatically. For information about the billing of IM, see [Pricing](https://intl.cloud.tencent.com/document/product/1047/34350).
 
 ### Step 2: Download the source code and configure the project
 1. Clone or download the source code in our repository (**You can start the repository to save it**).
 2. Find and open `Web/vue2/src/config/basic-info-config.js`.
 
 3. Configure parameters in `basic-info-config.js`:
-	<img src="../../Preview/test-user-sig-web.png" width="900">
+	<img src="https://qcloudimg.tencent-cloud.cn/raw/d05a18af04758e352f9afcb0925d105c.png" width="900">
 	
 	- SDKAPPID: 0 by default. Set it to the `SDKAppID` obtained in step 1.
 	- SECRETKEY: '' by default. Set it to the key obtained in step 1.
@@ -100,6 +107,6 @@ Make sure you used an HTTPS URL. For the sake of data security and privacy prote
 ## Other
 
 - Welcome to join our Telegram Group to communicate with our professional engineers! We are more than happy to hear from you~
-  Click to join: [https://t.me/+EPk6TMZEZMM5OGY1](https://t.me/+EPk6TMZEZMM5OGY1)   
-  Or scan the QR code   
+Click to join: [https://t.me/+EPk6TMZEZMM5OGY1](https://t.me/+EPk6TMZEZMM5OGY1)   
+Or scan the QR code   
   <img src="https://qcloudimg.tencent-cloud.cn/raw/79cbfd13877704ff6e17f30de09002dd.jpg" width="300px">    

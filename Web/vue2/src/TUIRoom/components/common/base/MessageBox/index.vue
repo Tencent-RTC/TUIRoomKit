@@ -31,7 +31,7 @@ import { ref, watch, onMounted, computed } from 'vue';
 import TuiButton from '../Button.vue';
 import SvgIcon from '../SvgIcon.vue';
 import CloseIcon from '../../icons/CloseIcon.vue';
-import { isMobile } from '../../../../utils/useMediaValue';
+import { isMobile } from '../../../../utils/environment';
 import useZIndex from '../../../../hooks/useZIndex';
 
 const visible = ref(false);

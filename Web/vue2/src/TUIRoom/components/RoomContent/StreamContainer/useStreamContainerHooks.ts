@@ -7,7 +7,7 @@ import { useI18n } from '../../../locales';
 import { useBasicStore } from '../../../stores/basic';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { storeToRefs } from 'pinia';
-import { isMobile, isWeChat } from '../../../utils/useMediaValue';
+import { isMobile, isWeChat } from '../../../utils/environment';
 import logger from '../../../utils/common/logger';
 import { SMALL_VIDEO_ENC_PARAM } from '../../../constants/room';
 
@@ -53,7 +53,7 @@ export default function useStreamContainer() {
       // 主持人关闭麦克风
       TUIMessage({
         type: 'warning',
-        message: t('The host has turned off your microphone'),
+        message: t('Your microphone has been turned off'),
         duration: MESSAGE_DURATION.NORMAL,
       });
       /**

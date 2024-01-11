@@ -24,13 +24,26 @@ _[English](README.EN.md) | 简体中文_
 └── vue.config.js      // vue 配置文件
 ```
 ### 第一步：开通服务
-请参考官网文档中 [快速接入](https://cloud.tencent.com/document/product/1690/88934) 中获取自己的SDKAppID和SDKSecreKey。
+
+在使用 TUIRoomKit 发起会议前，您需要开通 TUIRoomKit 专属的多人音视频互动服务，详细步骤如下：
+
+1. 登录  [腾讯云视立方 SDK 控制台](https://console.cloud.tencent.com/vcube/project/manage)，单击创建项目按钮后，选择多人音视频互动场景和集成方式，这里我们推荐“含 UI 快速集成”，即 TUIRoomKit。
+<img src="https://qcloudimg.tencent-cloud.cn/image/document/a7ff9c2e362530504c00afad3f60b443.png" width="900" />
+
+2. 在选定接入场景和集成方式以后，您需要开通多人音视频房间 SDK 使用的两项腾讯云基础的 PaaS 能力，即 [即时通信 IM](https://cloud.tencent.com/document/product/269/1498) 和 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788)，开通后，单击创建项目并下一步按钮。
+<img src="https://qcloudimg.tencent-cloud.cn/image/document/c0e9905f8db488e90bb03b168afb42ab.png" width="900" />
+
+3. 在项目创建完成以后，您需要为该项目匹配一个 IM 应用，因为多人音视频房间 SDK 依赖了 IM SDK 提供的基础能力，这里创建或者管理已有的 IM 应用均可，在关联成功后，就可以领取 7天的免费体验版，用于后续的开发调试工作，当然如果您之前已经体验过，也可以直接在该页面单击 [购买正式版本](https://buy.cloud.tencent.com/vcube)。
+<img src="https://qcloudimg.tencent-cloud.cn/image/document/77427e4ca940924cd0bb9aefecfd8a40.png" width="900" />
+
+4. 单击前往集成按钮，选择项目配置，查看详细的配置页面，找到 **SDKAppID 和密钥** 并记录下来，它们会在后续步骤用到，至此 **多人音视频房间 SDK 服务** 开通完成。
+<img src="https://qcloudimg.tencent-cloud.cn/image/document/d7495fa5c7e26ff861783916655cf9fd.png" width="900" />
 
 ### 第二步：下载源码，配置工程
 1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
 2. 找到并打开 `Web/vue2/src/config/basic-info-config.js` 文件。
 3. 配置 `basic-info-config.js` 文件中的相关参数：
-	<img src="../../Preview/test-user-sig-web.png" width="900">
+	<img src="https://qcloudimg.tencent-cloud.cn/raw/d05a18af04758e352f9afcb0925d105c.png" width="900">
 	- SDKAPPID：默认为 0，请设置为步第一步中记录下的 SDKAppID。
 	- SECRETKEY：默认为 ''，请设置为步第一步中记录下的密钥信息。
 

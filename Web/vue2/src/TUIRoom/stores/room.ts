@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
-import { TUIRole, TUIVideoStreamType, TUIRoomInfo, TUIUserInfo, TUIVideoQuality, TUISeatInfo, TUISpeechMode } from '@tencentcloud/tuiroom-engine-js';
+import { TUIRole, TUIVideoStreamType, TUIRoomInfo, TUIUserInfo, TUIVideoQuality, TUISeatInfo, TUISpeechMode, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
 import { useBasicStore } from './basic';
 import { isVue3 } from '../utils/constants';
 import Vue from '../utils/vue';
 import useGetRoomEngine from '../hooks/useRoomEngine';
-import { isMobile } from '../utils/useMediaValue';
+import { isMobile } from '../utils/environment';
 
 const roomEngine = useGetRoomEngine();
 
@@ -31,7 +31,7 @@ export type UserInfo = {
   userRole?: TUIRole,
   // 是否在麦上
   onSeat?: boolean,
-  isChatMutedByMaster?: boolean,
+  isChatMutedByMasterOrAdmin?: boolean,
   // 是否正在请求用户打开麦克风
   isRequestingUserOpenMic?: boolean,
   // 请求用户打开麦克风的 requestId
@@ -81,6 +81,11 @@ interface RoomState {
   hasVideoStreamObject: Record<string, UserInfo>,
   currentStreamIdListInVisibleView: string[],
   hasOtherScreenShare: boolean,
+  requestObj: Record<TUIRequestAction, RequestInfo[]>,
+}
+interface RequestInfo {
+  userId: string,
+  requestId: string,
 }
 
 export const useRoomStore = defineStore('room', {
@@ -135,11 +140,17 @@ export const useRoomStore = defineStore('room', {
     // 可视区域用户流列表
     currentStreamIdListInVisibleView: [],
     hasOtherScreenShare: false,
+    requestObj: {} as Record<TUIRequestAction, RequestInfo[]>,
   }),
   getters: {
-    // 当前用户是否是主持人
     isMaster(state) {
       return state.localUser.userId === state.masterUserId;
+    },
+    isAdmin(state) {
+      return state.localUser.userRole === TUIRole.kAdministrator;
+    },
+    isGeneralUser(state) {
+      return state.localUser.userRole === TUIRole.kGeneralUser;
     },
     // 当前用户是否在麦上
     isAnchor(state) {
@@ -167,12 +178,12 @@ export const useRoomStore = defineStore('room', {
     },
     isLocalAudioIconDisable(): boolean {
       // 全员禁麦状态
-      const micForbidden = !this.isMaster && !this.canControlSelfAudio;
+      const micForbidden = this.isGeneralUser && !this.canControlSelfAudio;
       return micForbidden as any || this.isAudience;
     },
     isLocalVideoIconDisable(): boolean {
       // 全员禁画状态
-      const cameraForbidden = !this.isMaster && !this.canControlSelfVideo;
+      const cameraForbidden = this.isGeneralUser && !this.canControlSelfVideo;
       return cameraForbidden as any || this.isAudience;
     },
     localStream: (state) => {
@@ -253,6 +264,9 @@ export const useRoomStore = defineStore('room', {
       }
       return this.remoteUserObj[userId]?.userName || userId;
     },
+    getRemoteUserRole(userId: string) {
+      return this.remoteUserObj[userId]?.userRole;
+    },
     getNewUserInfo(userId: string) {
       const newUserInfo = {
         userId,
@@ -265,6 +279,9 @@ export const useRoomStore = defineStore('room', {
         isScreenVisible: false,
         userRole: TUIRole.kGeneralUser,
         onSeat: !this.isSpeakAfterTakingSeatMode,
+        isChatMutedByMasterOrAdmin: false,
+        isUserApplyingToAnchor: false,
+        isInvitingUserToAnchor: false,
         cameraStreamInfo: {
           userId,
           userName: '',
@@ -283,14 +300,6 @@ export const useRoomStore = defineStore('room', {
           isVisible: false,
         },
       };
-      // 本端为主持人，则记录用户禁言禁画, 申请发言等信息
-      if (this.isMaster) {
-        Object.assign(newUserInfo, {
-          isChatMutedByMaster: false,
-          isUserApplyingToAnchor: false,
-          isInvitingUserToAnchor: false,
-        });
-      }
       return newUserInfo;
     },
     setUserList(userList: any[]) {
@@ -616,7 +625,7 @@ export const useRoomStore = defineStore('room', {
     setMuteUserChat(userId: string, muted: boolean) {
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
-        remoteUserInfo.isChatMutedByMaster = muted;
+        remoteUserInfo.isChatMutedByMasterOrAdmin = muted;
       }
     },
     setRemoteUserRole(userId: string, role: TUIRole) {
@@ -650,12 +659,13 @@ export const useRoomStore = defineStore('room', {
         remoteUserInfo.applyToAnchorTimestamp = timestamp;
       }
     },
-    removeApplyToAnchorUser(userId: string) {
-      const remoteUserInfo = this.remoteUserObj[userId];
-      if (remoteUserInfo) {
-        remoteUserInfo.isUserApplyingToAnchor = false;
-        remoteUserInfo.applyToAnchorRequestId = '';
-        remoteUserInfo.applyToAnchorTimestamp = 0;
+    removeApplyToAnchorUser(requestId: string) {
+      const applyToAnchorItem = Object.values(this.remoteUserObj)
+        .find(item => item.isUserApplyingToAnchor && item.applyToAnchorRequestId === requestId);
+      if (applyToAnchorItem) {
+        applyToAnchorItem.isUserApplyingToAnchor = false;
+        applyToAnchorItem.applyToAnchorRequestId = '';
+        applyToAnchorItem.applyToAnchorTimestamp = 0;
       }
     },
     addInviteToAnchorUser(options: { userId: string, requestId: string }) {
@@ -675,6 +685,30 @@ export const useRoomStore = defineStore('room', {
     },
     setHasOtherScreenShare(hasScreenShare: boolean) {
       this.hasOtherScreenShare = hasScreenShare;
+    },
+    setRequestId(requestType: TUIRequestAction, requestParam: { userId: string, requestId: string }) {
+      if (!this.requestObj[requestType]) {
+        this.requestObj[requestType] = [];
+      }
+      if (isVue3) {
+        this.requestObj[requestType].push(requestParam);
+      } else {
+        // @ts-ignore
+        Vue.set(this.requestObj, requestType, [...this.requestObj[requestType], requestParam]);
+      }
+    },
+    deleteRequestId(requestType: TUIRequestAction, requestId: string) {
+      this.requestObj[requestType] = this.requestObj[requestType].filter(item => item.requestId !== requestId);
+    },
+    clearRequestId(requestType: TUIRequestAction) {
+      if (this.requestObj[requestType]) {
+        if (isVue3) {
+          this.requestObj[requestType] = [];
+        } else {
+          // @ts-ignore
+          Vue.set(this.requestObj, requestType, []);
+        }
+      }
     },
     reset() {
       this.localUser = {
@@ -724,6 +758,7 @@ export const useRoomStore = defineStore('room', {
       this.speechMode = TUISpeechMode.kFreeToSpeak;
       this.hasVideoStreamObject = {};
       this.hasOtherScreenShare = false;
+      this.requestObj = {} as Record<TUIRequestAction, RequestInfo[]>;
     },
   },
 });

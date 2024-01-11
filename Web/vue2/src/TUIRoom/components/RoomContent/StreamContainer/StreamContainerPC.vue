@@ -156,7 +156,7 @@ watch([() => showStreamList.value.map(item => item.userId), currentPageIndex], (
 });
 
 watch(streamNumber, (val) => {
-  if (currentPageIndex.value > Math.ceil(val / 9) - 1) {
+  if (layout.value === LAYOUT.NINE_EQUAL_POINTS && currentPageIndex.value > Math.ceil(val / 9) - 1) {
     currentPageIndex.value = Math.ceil(val / 9) - 1;
     handleNineEqualPointsLayout();
   }
@@ -529,7 +529,7 @@ const onUserVideoStateChanged = (eventInfo: {
     if (streamType === TUIVideoStreamType.kCameraStream) {
       TUIMessage({
         type: 'warning',
-        message: t('The host has turned off your camera'),
+        message: t('Your camera has been turned off'),
         duration: MESSAGE_DURATION.NORMAL,
       });
       // When the moderator opens the whole staff forbidden to draw,
