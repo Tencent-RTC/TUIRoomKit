@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { SpeechMode } from '../constants/room';
 import { getLanguage } from '../utils/common';
 import { LAYOUT } from '../constants/render';
 import { isUndefined } from '../utils/utils';
@@ -116,9 +115,6 @@ export const useBasicStore = defineStore('basic', {
     setRoomId(roomId: string) {
       this.roomId = roomId;
       this.useStringRoomId = typeof roomId === 'string';
-    },
-    setRoomMode(mode: SpeechMode) {
-      this.roomMode = mode;
     },
     setSidebarOpenStatus(isOpen: boolean) {
       this.isSidebarOpen = isOpen;

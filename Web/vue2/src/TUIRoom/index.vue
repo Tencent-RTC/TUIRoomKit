@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, Ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, Ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import RoomHeader from './components/RoomHeader/index';
 import RoomFooter from './components/RoomFooter/index';
@@ -39,19 +39,19 @@ import { useChatStore } from './stores/chat';
 import { isMobile, isWeChat }  from './utils/environment';
 import './directives/vTap';
 import TUIRoomEngine, {
-  TRTCVideoMirrorType,
-  TRTCVideoRotation,
-  TRTCVideoFillMode,
-  TUIRoomEvents,
-  TUIRoomType,
-  TRTCDeviceType,
   TRTCDeviceState,
-  TUISpeechMode,
-  TUIKickedOutOfRoomReason,
-  TRTCVideoResolution,
+  TRTCDeviceType,
   TRTCVideoEncParam,
+  TRTCVideoFillMode,
+  TRTCVideoMirrorType,
+  TRTCVideoResolution,
+  TRTCVideoRotation,
+  TUIKickedOutOfRoomReason,
   TUIRole,
+  TUIRoomEvents,
   TUIRoomInfo,
+  TUIRoomType,
+  TUISeatMode,
 } from '@tencentcloud/tuiroom-engine-js';
 
 
@@ -252,7 +252,7 @@ const doEnterRoom = async (roomId: string) => {
   trtcCloud.enableSmallVideoStream(!isH5, smallParam);
   const roomInfo = await roomEngine.instance?.enterRoom({ roomId }) as TUIRoomInfo;
   roomEngine.instance?.muteLocalAudio();
-  if (roomInfo.speechMode === TUISpeechMode.kFreeToSpeak) {
+  if (!roomInfo.isSeatEnabled) {
     roomEngine.instance?.openLocalMicrophone();
     basicStore.setIsOpenMic(true);
   }
@@ -278,11 +278,12 @@ async function createRoom(options: {
     };
     if (roomMode === 'FreeToSpeak') {
       Object.assign(roomParams, {
-        speechMode: TUISpeechMode.kFreeToSpeak,
+        isSeatEnabled: false,
       });
     } else {
       Object.assign(roomParams, {
-        speechMode: TUISpeechMode.kSpeakAfterTakingSeat,
+        isSeatEnabled: true,
+        seatMode: TUISeatMode.kApplyToTake,
       });
     }
     await roomEngine.instance?.createRoom(roomParams);
@@ -297,11 +298,14 @@ async function createRoom(options: {
     });
     roomStore.setRoomInfo(roomInfo);
     // 申请发言模式房主上麦
-    if (roomInfo.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) {
+    if (roomInfo.isSeatEnabled) {
       await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
     }
 
     await getUserList();
+    if (roomInfo.isSeatEnabled) {
+      await getSeatList();
+    }
     /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
    * about whether or not to turn on the no-mac ban.
@@ -331,6 +335,9 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
       await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
     }
     await getUserList();
+    if (roomInfo.isSeatEnabled) {
+      await getSeatList();
+    }
     /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
    * about whether or not to turn on the no-mac ban.
@@ -347,6 +354,15 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
     logger.error(`${logPrefix}enterRoom error:`, error);
     basicStore.reset();
     throw error;
+  }
+}
+
+async function getSeatList() {
+  try {
+    const seatList = await roomEngine.instance?.getSeatList() as any;
+    roomStore.setSeatList(seatList);
+  } catch (error: any) {
+    logger.error('TUIRoomEngine.getSeatList', error.code, error.message);
   }
 }
 

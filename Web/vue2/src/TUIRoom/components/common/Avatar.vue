@@ -1,21 +1,27 @@
 <template>
   <div class="avatar-container">
-    <img class="avatar" :src="imgSrc || defaultAvatar" :onerror="showDefaultAvatar">
+    <img class="avatar" :src="src" :onerror="handleError" />
   </div>
 </template>
 
 <script setup lang="ts">
-import defaultAvatar from '../../assets/imgs/avatar.png';
+import { ref, computed } from "vue";
+import defaultAvatar from "../../assets/imgs/avatar.png";
 
 interface Props {
-  imgSrc?: string | undefined
+  imgSrc?: string | undefined;
 }
-defineProps<Props>();
-
-function showDefaultAvatar(e:any) {
-  e.target.src = defaultAvatar;
+const props = defineProps<Props>();
+const src = computed(() => {
+  if (isError.value) {
+    return defaultAvatar;
+  }
+  return props.imgSrc || defaultAvatar;
+});
+const isError = ref(false);
+function handleError() {
+  isError.value = true;
 }
-
 </script>
 
 <style lang="scss" scoped>
