@@ -19,7 +19,7 @@ import { useBasicStore } from '../../stores/basic';
 import MoreIcon from '../common/icons/MoreIcon.vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
-import { isMobile }  from '../../utils/useMediaValue';
+import { isMobile }  from '../../utils/environment';
 import roomContact from '../RoomMore/index.vue';
 
 const basicStore = useBasicStore();

@@ -3,7 +3,8 @@ import { useBasicStore } from '../../stores/basic';
 import TUIMessage from '../common/base/Message/index';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
-import { isElectronEnv, clipBoard } from '../../utils/utils';
+import { clipBoard } from '../../utils/utils';
+import { isElectron } from '../../utils/environment';
 
 export default function useRoomInvite() {
   const { t } = useI18n();
@@ -12,7 +13,6 @@ export default function useRoomInvite() {
   const { roomId, shareLink, isRoomLinkVisible } = storeToRefs(basicStore);
 
   const { origin, pathname } = location || {};
-  const isElectron = isElectronEnv();
   const isShowLink = ref(true);
 
   const inviteLink = computed(() => {

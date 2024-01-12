@@ -19,7 +19,7 @@ import { reactive, watch } from 'vue';
 import SvgIcon from '../common/base/SvgIcon.vue';
 import VerifyIcon from '../common/icons/VerifyIcon.vue';
 import { useI18n } from '../../locales';
-import { isMobile }  from '../../utils/useMediaValue';
+import { isMobile }  from '../../utils/environment';
 const { t } = useI18n();
 const emit = defineEmits(['update-verify-code', 'send-verify-code']);
 interface VerifyStates{

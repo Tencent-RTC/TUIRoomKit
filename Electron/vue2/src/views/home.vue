@@ -34,7 +34,7 @@ import RoomControl from '@/TUIRoom/components/RoomHome/RoomControl';
 import { getBasicInfo } from '@/config/basic-info-config';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
 import useGetRoomEngine from '@/TUIRoom/hooks/useRoomEngine';
-import { isMobile } from '../TUIRoom/utils/useMediaValue';
+import { isMobile } from '../TUIRoom/utils/environment';
 import logger from '../TUIRoom/utils/common/logger';
 
 const roomEngine = useGetRoomEngine();

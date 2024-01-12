@@ -1,3 +1,27 @@
+## 2023.01.12@2.0.0
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v2.0.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。
+
+**Bug Fixed**
+- 修复管理员请求打开摄像头的时候，后面几次没有toast提示。
+- 修复英文模式部分文案。
+- 修复修复麦上用户刷新页面或异常退出等情况回到 room 房间需要重新上麦的问题。
+
+## 2023.01.11@1.7.1
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v1.7.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。
+- 支持设置管理员角色。
+
+**Bug Fixed**
+- 修复成员被踢出房间时，偶现 dialog 弹框卡住问题。
+- 修复视频九宫格视图，翻页后切换到侧边栏，有用户离开会导致页面流窗口消失问题。
+- 修复 home 页面偶现的视频已出现但是 loading icon 还在显示的问题。
+
+
 ## 2023.12.18@1.7.0
 
 **Feature**

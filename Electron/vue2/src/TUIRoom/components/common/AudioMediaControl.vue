@@ -20,7 +20,7 @@
         :title="t('Mic')"
         :has-more="hasMore"
         :disabled="isDisabled"
-        :is-not-support="!isGetUserMediaSupported"
+        :is-not-support="!isSupportAudioMedia"
         @click-icon="handleClickIcon"
         @click-more="handleMore"
       >
@@ -41,13 +41,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, watch } from 'vue';
+import { ref, Ref } from 'vue';
 import IconButton from '../common/base/IconButton.vue';
+import TUIMessageBox from '../common/base/MessageBox/index';
 import AudioSettingTab from '../common/AudioSettingTab.vue';
 import AudioIcon from '../common/AudioIcon.vue';
 import { useI18n } from '../../locales';
 import '../../directives/vClickOutside';
-import useMediaDetect from '../../hooks/useMediaDetect';
+import { isGetUserMediaSupported, isEnumerateDevicesSupported } from '../../utils/mediaAbility';
 
 interface Props {
   hasMore?: boolean,
@@ -55,8 +56,6 @@ interface Props {
   isDisabled?: boolean,
   audioVolume: number,
 }
-
-const { isGetUserMediaSupported } = useMediaDetect();
 
 withDefaults(defineProps<Props>(), {
   hasMore: true,
@@ -66,9 +65,19 @@ withDefaults(defineProps<Props>(), {
 const emits = defineEmits(['click']);
 
 const showAudioSettingTab: Ref<boolean> = ref(false);
+const isSupportAudioMedia = isGetUserMediaSupported && isEnumerateDevicesSupported;
 const { t } = useI18n();
 
 async function handleClickIcon() {
+  if (!isSupportAudioMedia) {
+    TUIMessageBox({
+      title: t('Note'),
+      message: t('The current browser does not support capturing audio'),
+      appendToRoomContainer: true,
+      confirmButtonText: t('Sure'),
+    });
+    return;
+  }
   emits('click');
   showAudioSettingTab.value = false;
 }
