@@ -1,10 +1,10 @@
-import { computed, Ref, ref } from 'vue';
+import { computed, Ref, ref, onBeforeUnmount } from 'vue';
 import { useI18n } from '../../../locales';
 import { UserInfo, useRoomStore } from '../../../stores/room';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
-import { TUIMediaDevice, TUIRole, TUISpeechMode, TUIRequestAction } from '@tencentcloud/tuiroom-engine-wx';
+import { TUIMediaDevice, TUIRole, TUIRequestAction } from '@tencentcloud/tuiroom-engine-wx';
 import AudioOpenIcon from '../../../assets/icons/AudioOpenIcon.svg';
 import VideoOpenIcon from '../../../assets/icons/VideoOpenIcon.svg';
 import ChatForbiddenIcon from '../../../assets/icons/ChatForbiddenIcon.svg';
@@ -19,7 +19,7 @@ import TUIMessage from '../../common/base/Message';
 import { MESSAGE_DURATION } from '../../../constants/message';
 
 interface ObjectType {
-  [key: number]: any;
+  [key: string]: any;
 }
 
 export default function useMemberControl(props?: any) {
@@ -30,7 +30,7 @@ export default function useMemberControl(props?: any) {
   const roomStore = useRoomStore();
   const showKickOffDialog: Ref<boolean> = ref(false);
   const kickOffDialogContent = computed(() => t('whether to kick sb off the room', { name: props.userInfo.userName }));
-  const { speechMode, localUser, isGeneralUser, isSpeakAfterTakingSeatMode } = storeToRefs(roomStore);
+  const { isFreeSpeakMode, isSpeakAfterTakingSeatMode, localUser, isGeneralUser } = storeToRefs(roomStore);
   /**
    * Functions related to the Raise Your Hand function
    *
@@ -56,19 +56,34 @@ export default function useMemberControl(props?: any) {
       ? [audioControl.value, videoControl.value, makeOffStage.value] : [];
 
     const controlListObj: ObjectType = {
-      [TUISpeechMode.kFreeToSpeak]: {
-        [TUIRole.kRoomOwner]: [audioControl.value, videoControl.value, chatControl.value,
-          setOrRevokeAdmin.value, transferOwner.value, kickUser.value],
-        [TUIRole.kAdministrator]: [audioControl.value, videoControl.value, chatControl.value],
+      freeSpeak: {
+        [TUIRole.kRoomOwner]: [
+          audioControl.value, videoControl.value, chatControl.value,
+          setOrRevokeAdmin.value, transferOwner.value, kickUser.value,
+        ],
+        [TUIRole.kAdministrator]: [
+          audioControl.value, videoControl.value, chatControl.value,
+        ],
       },
-      [TUISpeechMode.kSpeakAfterTakingSeat]: {
-        [TUIRole.kRoomOwner]: [...inviteStageList, ...onStageControlList, ...agreeOrDenyStageList,
-          setOrRevokeAdmin.value, transferOwner.value, chatControl.value, kickUser.value],
-        [TUIRole.kAdministrator]: [...inviteStageList, ...onStageControlList, ...agreeOrDenyStageList,
-          chatControl.value],
+      speakAfterTakeSeat: {
+        [TUIRole.kRoomOwner]: [
+          ...inviteStageList, ...onStageControlList, ...agreeOrDenyStageList,
+          setOrRevokeAdmin.value, transferOwner.value, chatControl.value,
+          kickUser.value,
+        ],
+        [TUIRole.kAdministrator]: [
+          ...inviteStageList, ...onStageControlList, ...agreeOrDenyStageList,
+          chatControl.value,
+        ],
       },
     };
-    return controlListObj[speechMode.value as keyof ObjectType][localUser.value.userRole as keyof ObjectType] || [];
+    if (isFreeSpeakMode.value) {
+      return controlListObj['freeSpeak'][localUser.value.userRole as keyof ObjectType] || [];
+    }
+    if (isSpeakAfterTakingSeatMode.value) {
+      return controlListObj['speakAfterTakeSeat'][localUser.value.userRole as keyof ObjectType] || [];
+    }
+    return [];
   });
 
   const audioControl = computed(() => ({
@@ -297,6 +312,11 @@ export default function useMemberControl(props?: any) {
     const items = roomStore.requestObj[requestType] || [];
     return items.length > 0 ? items[0].userId : null;
   }
+
+  // 当用户被踢出房间的时候会先销毁组件
+  onBeforeUnmount(() => {
+    showKickOffDialog.value = false;
+  });
 
   return {
     props,

@@ -19,17 +19,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import MessageText from '../MessageTypes/MessageText.vue';
-import { TUIRoomEngine, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-wx';
 import useMessageList from '../useMessageListHook';
 import { useChatStore } from '../../../stores/chat';
 const chatStore = useChatStore();
 const {
   messageAimId,
-  roomEngine,
   getMessageList,
-  onReceiveTextMessage,
   messageList,
 } = useMessageList();
 const scrollTop = ref(5000);
@@ -40,14 +37,6 @@ onMounted(async () => {
   const filterCurrentMessageList = currentMessageList.filter((item: any) => item.type === 'TIMTextElem');
   chatStore.setMessageListInfo(filterCurrentMessageList, isCompleted, nextReqMessageId);
   scrollTop.value += 300;
-});
-
-TUIRoomEngine.once('ready', () => {
-  roomEngine.instance?.on(TUIRoomEvents.onReceiveTextMessage, onReceiveTextMessage);
-});
-
-onUnmounted(() => {
-  roomEngine.instance?.off(TUIRoomEvents.onReceiveTextMessage, onReceiveTextMessage);
 });
 </script>
 
