@@ -86,8 +86,9 @@ import VideoMediaControl from '../../common/VideoMediaControl.vue';
 import TUIRoomEngine, { TUIRoomEvents, TRTCDeviceType, TRTCVideoMirrorType, TRTCVideoRotation, TRTCDeviceState, TRTCVideoFillMode } from '@tencentcloud/tuiroom-engine-electron';
 import vClickOutside from '../../../directives/vClickOutside';
 import logger from '../../../utils/common/logger';
-import { isElectronEnv } from '../../../utils/utils';
+import { isElectron } from '../../../utils/environment';
 import TUIMessageBox from '../../common/base/MessageBox/index';
+import { isEnumerateDevicesSupported, isGetUserMediaSupported } from '../../../utils/mediaAbility';
 
 const roomStore = useRoomStore();
 const basicStore = useBasicStore();
@@ -109,7 +110,6 @@ defineExpose({
 
 const roomEngine = useGetRoomEngine();
 const isCameraLoading = ref(false);
-const isElectron = isElectronEnv();
 
 const audioVolume = ref(0);
 const isMicMuted = ref(false);
@@ -203,6 +203,9 @@ const onUserVoiceVolume = (result: any) => {
 };
 
 async function startStreamPreview() {
+  if (!isEnumerateDevicesSupported) {
+    return;
+  }
   isCameraLoading.value = true;
   const cameraList = await roomEngine.instance?.getCameraDevicesList();
   const microphoneList = await roomEngine.instance?.getMicDevicesList();
@@ -243,12 +246,12 @@ async function startStreamPreview() {
     roomStore.setCurrentSpeakerId(speakerInfo.deviceId);
   }
 
-  if (hasCameraDevice) {
-    await openCamera();
+  if (!isGetUserMediaSupported) {
+    isCameraLoading.value = false;
+    return;
   }
-  if (hasMicrophoneDevice) {
-    await openAudio();
-  }
+  hasMicrophoneDevice && openAudio();
+  hasCameraDevice && await openCamera();
   isCameraLoading.value = false;
 }
 

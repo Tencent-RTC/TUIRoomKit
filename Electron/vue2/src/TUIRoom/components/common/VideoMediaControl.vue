@@ -20,7 +20,7 @@
         :title="t('Camera')"
         :has-more="hasMore"
         :disabled="isDisabled"
-        :is-not-support="!isGetUserMediaSupported"
+        :is-not-support="!isSupportVideoMedia"
         @click-icon="handleClickIcon"
         @click-more="handleMore"
       >
@@ -39,21 +39,20 @@
 <script setup lang="ts">
 import { ref, computed, Ref } from 'vue';
 import IconButton from '../common/base/IconButton.vue';
+import TUIMessageBox from '../common/base/MessageBox/index';
 import SvgIcon from '../common/base/SvgIcon.vue';
 import CameraOnIcon from '../common/icons/CameraOnIcon.vue';
 import CameraOffIcon from '../common/icons/CameraOffIcon.vue';
 import VideoSettingTab from '../common/VideoSettingTab.vue';
 import { useI18n } from '../../locales';
 import '../../directives/vClickOutside';
-import useMediaDetect from '../../hooks/useMediaDetect';
+import { isGetUserMediaSupported, isEnumerateDevicesSupported } from '../../utils/mediaAbility';
 
 interface Props {
   hasMore?: boolean,
   isMuted: boolean,
   isDisabled?: boolean,
 }
-
-const { isGetUserMediaSupported } = useMediaDetect();
 
 const props = withDefaults(defineProps<Props>(), {
   hasMore: true,
@@ -65,10 +64,20 @@ const emits = defineEmits(['click']);
 
 const { t } = useI18n();
 const showVideoSettingTab: Ref<boolean> = ref(false);
+const isSupportVideoMedia = isGetUserMediaSupported && isEnumerateDevicesSupported;
 
 const icon = computed(() => (props.isMuted ? CameraOffIcon : CameraOnIcon));
 
 async function handleClickIcon() {
+  if (!isSupportVideoMedia) {
+    TUIMessageBox({
+      title: t('Note'),
+      message: t('The current browser does not support capturing video'),
+      appendToRoomContainer: true,
+      confirmButtonText: t('Sure'),
+    });
+    return;
+  }
   emits('click');
   showVideoSettingTab.value = false;
 }

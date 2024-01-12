@@ -135,21 +135,13 @@ export function deepClone(data: any) {
   return res;
 }
 
-export function isElectronEnv() {
-  const userAgent = navigator?.userAgent.toLowerCase();
-  return userAgent?.indexOf(' electron/') > -1;
-}
-
-export function isUndefined(value: any) {
-  return typeof value === 'undefined';
-}
-
 export { clipBoard } from './adapter';
 
-
+export const isUndefined = (value: any) => typeof value === 'undefined';
 export const isString = (value: any) => typeof value === 'string';
 export const isNumber = (value: any) => typeof value === 'number';
 export const isStringNumber = (value: any) => typeof value === 'string' && !isNaN(Number(value));
+export const isFunction = (value: any) => typeof value === 'function';
 
 export function addSuffix(value: string | number, suffix = 'px') {
   if (isNumber(value) || isStringNumber(value)) {

@@ -20,17 +20,17 @@ import { UserInfo } from '../../../stores/room';
 import useMemberItem from './useMemberItemHooks';
 import { ref, watch } from 'vue';
 
-
 interface Props {
   userInfo: UserInfo,
 }
 
 const props = defineProps<Props>();
+
 const {
   isMemberControlAccessible,
   openMemberControl,
   closeMemberControl,
-} = useMemberItem(props.userInfo.userId);
+} = useMemberItem(props.userInfo);
 
 const showMemberControl = ref(false);
 

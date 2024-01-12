@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia';
 import TUIMessage from '../../common/base/Message/index';
 import { clipBoard } from '../../../utils/utils';
 import useRoomInviteControl from '../../RoomInvite/useRoomInviteHooks';
-import { isWeChat } from '../../../utils/useMediaValue';
+import { isWeChat } from '../../../utils/environment';
 
 export default function useRoomInfo() {
   const { inviteLink } = useRoomInviteControl();

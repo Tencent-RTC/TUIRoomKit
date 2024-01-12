@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { emojiUrl, emojiMap, emojiList } from '../util';
-import { isMobile } from '../../../utils/useMediaValue';
+import { isMobile } from '../../../utils/environment';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import EmojiIcon from '../../common/icons/EmojiIcon.vue';
 import '../../../directives/vClickOutside';

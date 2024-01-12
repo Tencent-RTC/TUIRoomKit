@@ -31,42 +31,52 @@ export default function () {
 
   // 远端用户取消上麦申请
   function onRequestCancelled(eventInfo: { requestId: string, userId: string }) {
-    const { userId } = eventInfo;
-    roomStore.removeApplyToAnchorUser(userId);
+    const { requestId } = eventInfo;
+    roomStore.removeApplyToAnchorUser(requestId);
   }
 
   // 处理用户请求
   async function handleUserApply(applyUserId: string, agree: boolean) {
     // TUIRoomCore.replySpeechApplication(applyUserId, agree);
     const userInfo = roomStore.remoteUserObj[applyUserId];
-    if (userInfo) {
-      const requestId = userInfo.applyToAnchorRequestId;
-      requestId && await roomEngine.instance?.responseRemoteRequest({
+    const requestId = userInfo.applyToAnchorRequestId;
+    if (requestId) {
+      await roomEngine.instance?.responseRemoteRequest({
         requestId,
         agree,
       });
+      roomStore.removeApplyToAnchorUser(requestId);
+    } else {
+      logger.warn('处理上台申请失败，数据异常，请重试！', userInfo);
     }
-    roomStore.removeApplyToAnchorUser(applyUserId);
   }
 
   // 同意用户上台
   async function agreeUserOnStage(userInfo: UserInfo) {
     const requestId = userInfo.applyToAnchorRequestId;
-    requestId && await roomEngine.instance?.responseRemoteRequest({
-      requestId,
-      agree: true,
-    });
-    roomStore.removeApplyToAnchorUser(userInfo.userId);
+    if (requestId) {
+      await roomEngine.instance?.responseRemoteRequest({
+        requestId,
+        agree: true,
+      });
+      roomStore.removeApplyToAnchorUser(requestId);
+    } else {
+      logger.warn('同意上台申请失败，数据异常，请重试！', userInfo);
+    }
   }
 
   // 拒绝用户上台
   async function denyUserOnStage(userInfo: UserInfo) {
     const requestId = userInfo.applyToAnchorRequestId;
-    requestId && await roomEngine.instance?.responseRemoteRequest({
-      requestId,
-      agree: false,
-    });
-    roomStore.removeApplyToAnchorUser(userInfo.userId);
+    if (requestId) {
+      await roomEngine.instance?.responseRemoteRequest({
+        requestId,
+        agree: false,
+      });
+      roomStore.removeApplyToAnchorUser(requestId);
+    } else {
+      logger.warn('拒绝上台申请失败，数据异常，请重试！', userInfo);
+    }
   }
 
   // 拒绝全部用户上麦请求
@@ -80,11 +90,15 @@ export default function () {
     while (index >= 0 && index < applyUserList.length) {
       const { userId, userName, applyToAnchorRequestId } = applyUserList[index];
       try {
-        applyToAnchorRequestId && await roomEngine.instance?.responseRemoteRequest({
-          requestId: applyToAnchorRequestId,
-          agree: false,
-        });
-        roomStore.removeApplyToAnchorUser(userId);
+        if (applyToAnchorRequestId) {
+          await roomEngine.instance?.responseRemoteRequest({
+            requestId: applyToAnchorRequestId,
+            agree: false,
+          });
+          roomStore.removeApplyToAnchorUser(applyToAnchorRequestId);
+        } else {
+          logger.warn('拒绝上台申请失败，数据异常，请重试！', applyUserList);
+        }
       } catch (error) {
         logger.error(`拒绝 ${userName || userId} 上台申请失败，请重试！`);
         TUIMessage({
@@ -94,6 +108,35 @@ export default function () {
         });
       }
       index += 1;
+    }
+  }
+
+  // 处理全部用户上麦请求
+  async function handleAllUserApply(isAgreeOrRejectAllUserApply: boolean) {
+    const applyUserList = applyToAnchorList.value.map(item => ({
+      userId: item.userId,
+      userName: item.userName,
+      applyToAnchorRequestId: item.applyToAnchorRequestId,
+    }));
+    for (const { userId, userName, applyToAnchorRequestId } of applyUserList) {
+      const action = isAgreeOrRejectAllUserApply ? 'Agree' : 'Reject';
+      const actionFailedMessage = `${action} ${userName || userId} 上台申请失败，请重试！`;
+      try {
+        if (applyToAnchorRequestId) {
+          await roomEngine.instance?.responseRemoteRequest({
+            requestId: applyToAnchorRequestId,
+            agree: isAgreeOrRejectAllUserApply,
+          });
+          roomStore.removeApplyToAnchorUser(applyToAnchorRequestId);
+        }
+      } catch (error) {
+        logger.error(actionFailedMessage);
+        TUIMessage({
+          type: 'warning',
+          message: t(`${action} sb on stage failed, please retry`, { name: userName || userId }),
+          duration: MESSAGE_DURATION.NORMAL,
+        });
+      }
     }
   }
 
@@ -180,5 +223,7 @@ export default function () {
     cancelInviteUserOnStage,
     // 将用户踢下麦
     kickUserOffStage,
+    // 处理所有用户请求
+    handleAllUserApply,
   };
 }

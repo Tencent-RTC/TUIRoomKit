@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, Ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, Ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import RoomHeader from './components/RoomHeader/index/index.vue';
 import RoomFooter from './components/RoomFooter/index/index.vue';
@@ -36,22 +36,22 @@ import { debounce, throttle } from './utils/utils';
 import { useBasicStore } from './stores/basic';
 import { useRoomStore } from './stores/room';
 import { useChatStore } from './stores/chat';
-import { isMobile, isWeChat }  from './utils/useMediaValue';
+import { isMobile, isWeChat }  from './utils/environment';
 import './directives/vTap';
 import TUIRoomEngine, {
-  TRTCVideoMirrorType,
-  TRTCVideoRotation,
-  TRTCVideoFillMode,
-  TUIRoomEvents,
-  TUIRoomType,
-  TRTCDeviceType,
   TRTCDeviceState,
-  TUISpeechMode,
-  TUIKickedOutOfRoomReason,
-  TRTCVideoResolution,
+  TRTCDeviceType,
   TRTCVideoEncParam,
+  TRTCVideoFillMode,
+  TRTCVideoMirrorType,
+  TRTCVideoResolution,
+  TRTCVideoRotation,
+  TUIKickedOutOfRoomReason,
   TUIRole,
+  TUIRoomEvents,
   TUIRoomInfo,
+  TUIRoomType,
+  TUISeatMode,
 } from '@tencentcloud/tuiroom-engine-electron';
 
 
@@ -250,7 +250,7 @@ const doEnterRoom = async (roomId: string) => {
   trtcCloud.enableSmallVideoStream(!isH5, smallParam);
   const roomInfo = await roomEngine.instance?.enterRoom({ roomId }) as TUIRoomInfo;
   roomEngine.instance?.muteLocalAudio();
-  if (roomInfo.speechMode === TUISpeechMode.kFreeToSpeak) {
+  if (!roomInfo.isSeatEnabled) {
     roomEngine.instance?.openLocalMicrophone();
     basicStore.setIsOpenMic(true);
   }
@@ -276,11 +276,12 @@ async function createRoom(options: {
     };
     if (roomMode === 'FreeToSpeak') {
       Object.assign(roomParams, {
-        speechMode: TUISpeechMode.kFreeToSpeak,
+        isSeatEnabled: false,
       });
     } else {
       Object.assign(roomParams, {
-        speechMode: TUISpeechMode.kSpeakAfterTakingSeat,
+        isSeatEnabled: true,
+        seatMode: TUISeatMode.kApplyToTake,
       });
     }
     await roomEngine.instance?.createRoom(roomParams);
@@ -295,11 +296,14 @@ async function createRoom(options: {
     });
     roomStore.setRoomInfo(roomInfo);
     // 申请发言模式房主上麦
-    if (roomInfo.speechMode === TUISpeechMode.kSpeakAfterTakingSeat) {
+    if (roomInfo.isSeatEnabled) {
       await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
     }
 
     await getUserList();
+    if (roomInfo.isSeatEnabled) {
+      await getSeatList();
+    }
     /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
    * about whether or not to turn on the no-mac ban.
@@ -329,6 +333,9 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
       await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
     }
     await getUserList();
+    if (roomInfo.isSeatEnabled) {
+      await getSeatList();
+    }
     /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
    * about whether or not to turn on the no-mac ban.
@@ -345,6 +352,15 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
     logger.error(`${logPrefix}enterRoom error:`, error);
     basicStore.reset();
     throw error;
+  }
+}
+
+async function getSeatList() {
+  try {
+    const seatList = await roomEngine.instance?.getSeatList() as any;
+    roomStore.setSeatList(seatList);
+  } catch (error: any) {
+    logger.error('TUIRoomEngine.getSeatList', error.code, error.message);
   }
 }
 
@@ -399,7 +415,7 @@ const onError = (error: any) => {
 const onSendMessageForUserDisableChanged = (data: { userId: string, isDisable: boolean }) => {
   const { userId, isDisable } = data;
   if (userId === localUser.value.userId) {
-    const tipMessage = isDisable ? t('You have been banned from text chat by the host') : t('You are allowed to text chat by the host');
+    const tipMessage = isDisable ? t('You have been banned from text chat') : t('You are allowed to text chat');
     TUIMessage({
       type: 'warning',
       message: tipMessage,
@@ -471,7 +487,7 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
 
 // todo: 处理禁言所有人和禁画所有人
 async function handleAudioStateChange(isDisableAudio: boolean) {
-  const tipMessage = isDisableAudio ? t('The host has muted all') : t('The host has unmuted all');
+  const tipMessage = isDisableAudio ? t('Mute has been turned on') : t('All mutes have been lifted');
   TUIMessage({
     type: 'warning',
     message: tipMessage,
@@ -488,7 +504,7 @@ async function handleAudioStateChange(isDisableAudio: boolean) {
 }
 
 async function handleVideoStateChange(isDisableVideo: boolean) {
-  const tipMessage = isDisableVideo ? t('The host has turned on the ban on all paintings') : t('The host has lifted the ban on all paintings');
+  const tipMessage = isDisableVideo ? t('The banning of all paintings has been turned on') : t('The ban on painting has been lifted');
   TUIMessage({
     type: 'warning',
     message: tipMessage,
@@ -505,7 +521,7 @@ async function handleVideoStateChange(isDisableVideo: boolean) {
 }
 
 async function handleMessageStateChange(isDisableMessage: boolean) {
-  const tipMessage = isDisableMessage ? t('The host has turned on the ban on all chat') : t('The host has lifted the ban on all chat');
+  const tipMessage = isDisableMessage ? t('Disabling text chat for all is enabled') : t('Unblocked all text chat');
   TUIMessage({
     type: 'warning',
     message: tipMessage,
@@ -667,6 +683,7 @@ watch(sdkAppId, (val: number) => {
   background-color: var(--background-color-1);
   display: flex;
   flex-direction: column;
+  text-align: left;
   .header {
     width: 100%;
     height: 64px;

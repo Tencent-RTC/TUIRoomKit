@@ -21,23 +21,41 @@
     <div id="memberListContainer" class="member-list-container">
       <member-item v-for="(userInfo) in showUserList" :key="userInfo.userId" :user-info="userInfo"></member-item>
     </div>
-    <div v-if="isMaster" class="global-setting">
-      <tui-button class="button" size="default" @click="toggleAllAudio">
+    <div v-if="isMaster || isAdmin" class="global-setting">
+      <tui-button class="button" size="default" @click="toggleManageAllMember(ManageControlType.AUDIO)">
         {{ isMicrophoneDisableForAllUser ? t('Enable all audios') : t('Disable all audios') }}
       </tui-button>
-      <tui-button class="button" size="default" @click="toggleAllVideo">
+      <tui-button class="button" size="default" @click="toggleManageAllMember(ManageControlType.VIDEO)">
         {{ isCameraDisableForAllUser ? t('Enable all videos') : t('Disable all videos') }}
       </tui-button>
     </div>
+    <Dialog
+      v-model="showManageAllUserDialog"
+      :title="dialogTitle"
+      width="480px"
+      :modal="true"
+      :append-to-room-container="true"
+    >
+      <span>
+        {{ dialogContent }}
+      </span>
+      <template #footer>
+        <tui-button size="default" @click="doToggleManageAllMember">{{ t('Confirm') }}</tui-button>
+        <tui-button class="cancel-button" size="default" type="primary" @click="showManageAllUserDialog = false">
+          {{ t('Cancel') }}
+        </tui-button>
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang='ts'>
+import { storeToRefs } from 'pinia';
 import MemberItem from '../ManageMember/MemberItem/index.vue';
 import SvgIcon from '../common/base/SvgIcon.vue';
 import SearchIcon from '../common/icons/SearchIcon.vue';
 import InviteSolidIcon from '../common/icons/InviteSolidIcon.vue';
-import { storeToRefs } from 'pinia';
+import Dialog from '../common/base/Dialog/index.vue';
 import { useRoomStore } from '../../stores/room';
 import useIndex from './useIndexHooks';
 import TuiButton from '../common/base/Button.vue';
@@ -49,6 +67,7 @@ const {
   isMicrophoneDisableForAllUser,
   isCameraDisableForAllUser,
   isMaster,
+  isAdmin,
 } = storeToRefs(roomStore);
 
 const {
@@ -57,8 +76,12 @@ const {
   showUserList,
   handleInvite,
   showApplyUserLit,
-  toggleAllAudio,
-  toggleAllVideo,
+  showManageAllUserDialog,
+  dialogTitle,
+  dialogContent,
+  toggleManageAllMember,
+  doToggleManageAllMember,
+  ManageControlType,
 } = useIndex();
 
 </script>
@@ -155,6 +178,8 @@ const {
     justify-content: space-around;
     margin: 20px;
   }
-
+}
+.cancel-button {
+  margin-left: 12px;
 }
 </style>

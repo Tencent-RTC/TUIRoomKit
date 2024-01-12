@@ -67,6 +67,8 @@ import useZIndex from '../../../../hooks/useZIndex';
 
 type DoneFn = () => void;
 type BeforeCloseFn = (done: DoneFn) => void;
+type ConfirmFn = () => void;
+type CancelFn = () => void;
 
 interface Props {
   title?: string;

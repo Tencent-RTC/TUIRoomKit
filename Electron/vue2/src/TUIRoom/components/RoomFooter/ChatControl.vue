@@ -1,13 +1,13 @@
 <template>
   <div class="chat-control-container">
-    <Badge :hidden="chatStore.unReadCount === 0" :value="chatStore.unReadCount" :max="10">
+    <tui-badge :hidden="chatStore.unReadCount === 0" :value="chatStore.unReadCount" :max="10">
       <icon-button
         :title="t('Chat')"
         :icon="ChatIcon"
         :is-active="sidebarName === 'chat'"
         @click-icon="toggleChatSidebar"
       ></icon-button>
-    </Badge>
+    </tui-badge>
   </div>
 </template>
 
@@ -18,7 +18,7 @@ import { useBasicStore } from '../../stores/basic';
 import { useChatStore } from '../../stores/chat';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
-import Badge from '../common/base/Badge.vue';
+import TuiBadge from '../common/base/Badge.vue';
 const { t } = useI18n();
 
 const basicStore = useBasicStore();
