@@ -30,11 +30,11 @@
 - 支持随时拉取排麦（上麦请求）列表，解决1.x 版本中，中途退出后，之前的上麦申请会丢失的问题。
 
 #### 接口变更
-详情见 
-[ios api变更](./iOS/api_change_log.zh.md)
-[Android api变更](./Android/api_change_log.zh.md)
-[Flutter api变更](./Flutter/api_change_log.zh.md)
-[Windows-Mac api变更](./Windows-Mac/api_change_log.zh.md)
+详情见:
+- [ios api变更](./iOS/api_change_log.zh.md)
+- [Android api变更](./Android/api_change_log.zh.md)
+- [Flutter api变更](./Flutter/api_change_log.zh.md)
+- [Windows-Mac api变更](./Windows-Mac/api_change_log.zh.md)
 
 ### Version 1.7.1 @ 2024.01.05
 - Android & iOS：新增管理员功能，房主可以设置/取消管理员，用于辅助房主对会议进行静音、审批上下台等操作；
