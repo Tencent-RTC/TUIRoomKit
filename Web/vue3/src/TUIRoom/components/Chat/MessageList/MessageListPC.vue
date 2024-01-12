@@ -20,9 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted } from 'vue';
+import { nextTick, onMounted } from 'vue';
 import MessageText from '../MessageTypes/MessageText.vue';
-import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import { isMobile }  from '../../../utils/environment';
 import useMessageList from '../useMessageListHook';
 import { useChatStore } from '../../../stores/chat';
@@ -30,10 +29,8 @@ const chatStore = useChatStore();
 
 const {
   messageAimId,
-  roomEngine,
   messageBottomEl,
   handleMessageListScroll,
-  onReceiveTextMessage,
   messageList,
   getMessageList,
 } = useMessageList();
@@ -55,15 +52,6 @@ onMounted(async () => {
     }
   });
   window.addEventListener('scroll', handleMessageListScroll, true);
-});
-
-TUIRoomEngine.once('ready', () => {
-  roomEngine.instance?.on(TUIRoomEvents.onReceiveTextMessage, onReceiveTextMessage);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleMessageListScroll, true);
-  roomEngine.instance?.off(TUIRoomEvents.onReceiveTextMessage, onReceiveTextMessage);
 });
 </script>
 

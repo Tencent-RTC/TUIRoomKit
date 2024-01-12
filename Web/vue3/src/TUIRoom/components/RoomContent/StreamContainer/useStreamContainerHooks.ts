@@ -36,8 +36,8 @@ export default function useStreamContainer() {
 
   // 麦位变化
   const onSeatListChanged = (eventInfo: { seatList: any[], seatedList: any[], leftList: any[] }) => {
-    const { seatList, seatedList, leftList } = eventInfo;
-    roomStore.updateOnSeatList(seatList, seatedList, leftList);
+    const { seatedList, leftList } = eventInfo;
+    roomStore.updateOnSeatList(seatedList, leftList);
   };
 
   // 用户音频状态发生改变
