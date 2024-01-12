@@ -1,9 +1,22 @@
+## 2023.01.12@2.0.0
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-wx](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-wx) 到 v2.0.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。
+
+**Bug Fixed**
+- 修复小程序头像加载错误没有使用默认头像。
+- 修复小程序端上麦关闭摄像头麦克风其它端无法在麦位列表看到小程序用户。
+- 修复管理员请求打开摄像头的时候，后面几次没有toast提示。
+- 修复英文模式部分文案。
+
 ## 2023.01.11@1.7.1
 
 **Feature**
 
 - 升级 [@tencentcloud/tuiroom-engine-wx](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-wx) 到 v1.7.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)。
 - 支持设置管理员角色。
+- 优化小程序接口调用逻辑，增加异步任务状态机，提高了推拉流稳定性。
 
 **Bug Fixed**
 - 修复成员被踢出房间时，偶现 dialog 弹框卡住问题。
@@ -12,6 +25,7 @@
 - 优化 README.md 文件，简化代码跑通流程。
 - 修复移动端小程序举手管理列表中点击全体同意 & 全体拒绝按钮没有响应的问题。
 - 修复移动端小程序举手发言模式成员管理中，房主针对普通观众操作菜单展示问题。
+- 修复windows 无 bash 环境执行 wxmini_dev.sh 报错，提供 windows 脚本 wxmini_dev.bat。
 
 ## 2023.12.18@1.7.0
 
