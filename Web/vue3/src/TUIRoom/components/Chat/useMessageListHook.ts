@@ -1,8 +1,9 @@
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useChatStore } from '../../stores/chat';
 import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
+import TUIRoomEngine, { TencentCloudChat } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 
 export default function useMessageList() {
@@ -132,29 +133,49 @@ export default function useMessageList() {
 
     return result;
   };
-  const onReceiveTextMessage = (data: { roomId: string, message: any }) => {
-    const { message } = data;
-    chatStore.updateMessageList({
-      ID: message.messageId,
-      type: 'TIMTextElem',
-      payload: {
-        text: message.message,
-      },
-      nick: message?.userName || message.userId,
-      from: message.userId,
-      flow: 'in',
-      sequence: Math.random(),
+  const onReceiveMessage = (options: { data: any }) => {
+    if (!options || !options.data) {
+      return;
+    }
+    options.data.forEach((message: any) => {
+      if (message.type !== TencentCloudChat.TYPES.MSG_TEXT) {
+        return;
+      }
+      const { ID, payload: { text }, nick: userName, from: userId } = message;
+      chatStore.updateMessageList({
+        ID,
+        type: 'TIMTextElem',
+        payload: {
+          text,
+        },
+        nick: userName || userId,
+        from: userId,
+        flow: 'in',
+        sequence: Math.random(),
+      });
     });
   };
+
+  let tim = roomEngine.instance?.getTIM();
+  if (!tim) {
+    tim = TencentCloudChat.create({ SDKAppID: basicStore.sdkAppId });
+  }
+
+  TUIRoomEngine.once('ready', () => {
+    tim?.on(TencentCloudChat.EVENT.MESSAGE_RECEIVED, onReceiveMessage);
+  });
+  onUnmounted(() => {
+    tim?.off(TencentCloudChat.EVENT.MESSAGE_RECEIVED, onReceiveMessage);
+  });
+
   return {
     t,
-    roomEngine,
     historyMessageList,
     messageAimId,
     messageBottomEl,
     handleMessageListScroll,
     handleGetHistoryMessageList,
-    onReceiveTextMessage,
+    onReceiveMessage,
     messageList,
     isScrollNotAtBottom,
     getMessageList,
