@@ -24,11 +24,11 @@
 | - (NSArray<TXMediaDeviceInfo *> * _Nullable)getDevicesList:(TUIMediaDeviceType)type | - | 建议使用TUIRoomDeviceManager中的getDevicesList接口代替 | v2.0 |
 | - (NSInteger)setCurrentDevice:(TUIMediaDeviceType)type deviceId:(NSString *)deviceId | - |建议使用TUIRoomDeviceManager中的setCurrentDevice接口代替 | v2.0 |
 |-|- (id) getExtension:(TUIExtensionType)extensionType|新增获取扩展接口，v2.0版本目前仅支持获取DeviceManager扩展|v2.0|
+|-|+ (instancetype)sharedInstance|创建 TUIRoomEngine 实例（单例模式）|v2.0|
+|-|+ (void)destroySharedInstance|销毁 TUIRoomEngine 实例（单例模式）|v2.0|
 
 ### 移除接口
 | 移除接口 | 建议使用 | 说明 | 版本 |
 |-------|-------|-------|-------|
 | - (instancetype)init | + (instancetype)sharedInstance | 建议使用sharedInstance接口创建单例对象 | v2.0 |
 | + (instancetype)new | + (instancetype)sharedInstance |建议使用sharedInstance接口创建单例对象 | v2.0 |
-| createInstance(); | + (instancetype)sharedInstance |建议使用sharedInstance接口创建单例对象 | v2.0 |
-| void destroyTUIRoomEngine(tuikit::TUIRoomEngine* roomEngine) | + (void)destroySharedInstance | 建议使用destroySharedInstance接口销毁单例对象 | v2.0 |

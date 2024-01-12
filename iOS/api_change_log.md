@@ -32,11 +32,11 @@ Change Date: 2024-01-08
 | - (NSArray<TXMediaDeviceInfo *> * _Nullable)getDevicesList:(TUIMediaDeviceType)type | - | It is recommended to use the getDevicesList interface in TUIRoomDeviceManager instead | v2.0 |
 | - (NSInteger)setCurrentDevice:(TUIMediaDeviceType)type deviceId:(NSString *)deviceId | - | It is recommended to use the setCurrentDevice interface in TUIRoomDeviceManager instead | v2.0 |
 |-|- (id) getExtension:(TUIExtensionType)extensionType|Newly added getExtension interface, v2.0 version currently only supports getting DeviceManager extension|v2.0|
+|-|+ (instancetype)sharedInstance|Create a TUIRoomEngine instance (singleton pattern)|v2.0| 
+|-|+ (void)destroySharedInstance|Destroy the TUIRoomEngine instance (singleton pattern)|v2.0|
 
 ### Removed interfaces
 | Removed Interface | Suggested Usage | Description | Version |
 |-------|-------|-------|-------|
 | - (instancetype)init | + (instancetype)sharedInstance | It is recommended to use the sharedInstance interface to create a singleton object | v2.0 |
 | + (instancetype)new | + (instancetype)sharedInstance | It is recommended to use the sharedInstance interface to create a singleton object | v2.0 |
-| createInstance(); | + (instancetype)sharedInstance | It is recommended to use the sharedInstance interface to create a singleton object | v2.0 |
-| void destroyTUIRoomEngine(tuikit::TUIRoomEngine* roomEngine) | + (void)destroySharedInstance | It is recommended to use the destroySharedInstance interface to destroy the singleton object | v2.0 |
