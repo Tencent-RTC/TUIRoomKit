@@ -1,3 +1,14 @@
+## 2023.01.12@2.0.0
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v2.0.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+
+**Bug Fixed**
+- 修复管理员请求打开摄像头的时候，后面几次没有toast提示。
+- 修复英文模式部分文案。
+- 修复修复麦上用户刷新页面或异常退出等情况回到 room 房间需要重新上麦的问题。
+
 ## 2023.01.11@1.7.1
 
 **Feature**

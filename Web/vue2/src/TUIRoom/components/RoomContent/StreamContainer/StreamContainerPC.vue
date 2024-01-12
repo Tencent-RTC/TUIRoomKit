@@ -577,8 +577,8 @@ const onUserVideoStateChanged = (eventInfo: {
 // 麦位变化
 const onSeatListChanged = (eventInfo:
   { seatList: TUISeatInfo[], seatedList: TUISeatInfo[], leftList: TUISeatInfo[] }) => {
-  const { seatList, seatedList, leftList } = eventInfo;
-  roomStore.updateOnSeatList(seatList, seatedList, leftList);
+  const { seatedList, leftList } = eventInfo;
+  roomStore.updateOnSeatList(seatedList, leftList);
   const leftUserIdList = leftList.map(item => item.userId);
   // 最大屏用户下麦时，需要更换最大屏用户
   if (enlargeStream.value && leftUserIdList.includes(enlargeStream.value?.userId)) {
