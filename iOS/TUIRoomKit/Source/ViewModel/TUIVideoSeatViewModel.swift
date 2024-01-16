@@ -234,21 +234,17 @@ extension TUIVideoSeatViewModel {
             stopPlayVideo(item: seatItem)
         }
         videoSeatItems.removeAll(where: { $0.userId == userId })
-        if let index = listSeatItem.firstIndex(where: { $0.userId == userId && $0.type != .share }),
-            let item = listSeatItem.first(where: { $0.userId == userId && $0.type != .share }) {
-            listSeatItem.remove(at: index)
-            if ((viewResponder?.getVideoVisibleCell(item)) != nil) {
-                viewResponder?.reloadData()
-            } else {
-                viewResponder?.deleteItems(at: [IndexPath(item: index, section: 0)])
-            }
-        }
+        guard let index = listSeatItem.firstIndex(where: { $0.userId == userId && $0.type != .share }),
+              let item = listSeatItem.first(where: { $0.userId == userId && $0.type != .share }) else { return }
+        listSeatItem.remove(at: index)
         let type = videoSeatViewType
-        self.refreshListSeatItem()
-        if type != videoSeatViewType {
+        refreshListSeatItem()
+        resetMiniscreen()
+        if type != videoSeatViewType || ((viewResponder?.getVideoVisibleCell(item)) != nil) {
             viewResponder?.reloadData()
+        } else {
+            viewResponder?.deleteItems(at: [IndexPath(item: index, section: 0)])
         }
-        self.resetMiniscreen()
     }
     
     private func changeUserRole(userId: String, userRole: TUIRole) {
@@ -551,34 +547,45 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
             viewResponder?.showScreenCaptureMaskView(isShow: hasVideo)
             return
         }
-        if hasVideo {
-            let renderParams = TRTCRenderParams()
-            renderParams.fillMode = (streamType == .screenStream) ? .fit : .fill
-            let trtcStreamType: TRTCVideoStreamType = (streamType == .screenStream) ? .sub : .big
-            engineManager.setRemoteRenderParams(userId: userId, streamType: trtcStreamType, params: renderParams)
-        }
         guard var seatItem = getSeatItem(userId) else { return }
         if streamType == .cameraStream {
             seatItem.hasVideoStream = hasVideo
-            viewResponder?.updateSeatItem(seatItem)
         } else if streamType == .screenStream {
             seatItem.hasScreenStream = hasVideo
-            if let item = shareItem, item.userId == userId, item.streamType == .screenStream {
-                seatItem = item
-            }
         }
         if hasVideo {
+            setRemoteRenderParams(userId: userId, streamType: streamType)
             startPlayVideo(item: seatItem, renderView: viewResponder?.getVideoVisibleCell(seatItem)?.renderView)
         } else {
             stopPlayVideo(item: seatItem)
         }
-        if streamType == .screenStream, hasVideo, videoSeatItems.filter({ $0.hasScreenStream }).count == 1 {
-            refreshListSeatItem()
-            viewResponder?.insertItems(at: [IndexPath(item: 0, section: 0)])
-            resetMiniscreen()
-        } else {
+        if streamType == .cameraStream {
             reloadSeatItems()
+        } else if streamType == .screenStream {
+            updateScreenStreamView(hasVideo: hasVideo)
         }
+    }
+    
+    private func updateScreenStreamView(hasVideo: Bool) {
+        if !hasVideo {
+            reloadSeatItems()
+        } else {
+            guard videoSeatItems.filter({ $0.hasScreenStream }).count == 1 else { return }
+            if videoSeatViewType == .largeSmallWindowType {
+                reloadSeatItems()
+            } else {
+                refreshListSeatItem()
+                viewResponder?.insertItems(at: [IndexPath(item: 0, section: 0)])
+                resetMiniscreen()
+            }
+        }
+    }
+    
+    private func setRemoteRenderParams(userId: String, streamType: TUIVideoStreamType) {
+        let renderParams = TRTCRenderParams()
+        renderParams.fillMode = (streamType == .screenStream) ? .fit : .fill
+        let trtcStreamType: TRTCVideoStreamType = (streamType == .screenStream) ? .sub : .big
+        engineManager.setRemoteRenderParams(userId: userId, streamType: trtcStreamType, params: renderParams)
     }
     
     // seatList: 当前麦位列表  seated: 新增上麦的用户列表 left: 下麦的用户列表
