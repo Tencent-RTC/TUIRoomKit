@@ -36,21 +36,6 @@ TUIKIT_API tuikit::TUIRoomEngine* sharedInstance();
  * @note 使用 destroySharedInstance 释放单例对象。
  */
 TUIKIT_API void destroySharedInstance();
-
-/**
- * 创建 TUIRoomEngine 实例（如果有不同实例进入多个房间需求的请使用该方法创建实例，否则推荐使用 sharedInstance 创建单例对象）
- *
- * @note 如果您使用 createTUIRoomEngine 获取 tuikit::TUIRoomEngine实例，并请使用 destroyTUIRoomEngine 释放对象指针。
- */
-TUIKIT_API tuikit::TUIRoomEngine* createTUIRoomEngine();
-
-/**
- * 销毁 TUIRoomEngine 实例
- *
- * @param roomEngine TUIRoomEngine实例指针，该指针只能通过 createTUIRoomEngine 接口获取。
- * @note 使用 destroyTUIRoomEngine 释放对象指针。
- */
-TUIKIT_API void destroyTUIRoomEngine(tuikit::TUIRoomEngine* roomEngine);
 }
 
 namespace tuikit {
@@ -108,7 +93,7 @@ class TUIRoomEngine : IDeprecatedRoomEngineAPI {
     /**
      * 1.6 设置事件回调
      *
-     * 您可以通过 TUIRoomObserver 获得各类事件通知（比如：错误码，远端用户进房，音视频状态参数等）
+     * 您可以通过 TUIRoomObserver 获得各类事件通知（例如：错误码，远端用户进房，音视频状态参数等）
      * @param observer 监听的实例
      */
     virtual void addObserver(TUIRoomObserver* observer) = 0;
@@ -666,7 +651,7 @@ class TUIRoomEngine : IDeprecatedRoomEngineAPI {
      *
      * @param  jsonStr 接口信息
      */
-    virtual void callExperimentalAPI(const char* jsonStr) = 0;
+    static void callExperimentalAPI(const char* jsonStr);
 };
 
 }  // namespace tuikit

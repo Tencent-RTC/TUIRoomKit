@@ -44,7 +44,7 @@ TUIRoomCoreImpl::~TUIRoomCoreImpl() {
 
     if (room_engine_ != nullptr) {
         room_engine_->removeObserver(this);
-        destroyTUIRoomEngine(room_engine_);
+        destroySharedInstance();
         room_engine_ = nullptr;
         device_manager_ = nullptr;
         screen_share_manager_ = nullptr;
@@ -75,7 +75,7 @@ int TUIRoomCoreImpl::Login(int sdk_appid, const std::string& user_id, const std:
     room_user_map_[user_id] = local_user_info_;
     LINFO("User Login,sdk_app_id : %d , user_id : %s , user_sig : %s", sdk_appid, user_id.c_str(), user_sig.c_str());
     if (room_engine_ == nullptr) {
-      room_engine_ = createTUIRoomEngine();
+      room_engine_ = sharedInstance();
         if (room_engine_ != nullptr) {
             trtc_cloud_ = getTRTCShareInstance();
             room_engine_->addObserver(this);
@@ -121,7 +121,7 @@ int TUIRoomCoreImpl::Logout() {
         room_core_callback_->OnLogout(0, "logout success.");
     }
 
-    destroyTUIRoomEngine(room_engine_);
+    destroySharedInstance();
     room_engine_ = nullptr;
 
     if (screen_share_manager_) {
