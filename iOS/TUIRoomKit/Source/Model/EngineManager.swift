@@ -783,7 +783,7 @@ extension EngineManager {
                 }
             }
         """
-        roomEngine.callExperimentalAPI(jsonStr: jsonStr)
+        TUIRoomEngine.callExperimentalAPI(jsonStr: jsonStr)
     }
 }
 
