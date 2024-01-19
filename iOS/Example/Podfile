@@ -12,7 +12,7 @@ def tool
   pod 'Alamofire'
   pod 'TUICore'
   pod 'TUIChat'
-  pod 'TUIRoomEngine','2.0.0'
+  pod 'TUIRoomEngine','2.0.1'
   pod 'TXLiteAVSDK_TRTC'
   pod 'TXAppBasic'
   pod 'TIMCommon'
