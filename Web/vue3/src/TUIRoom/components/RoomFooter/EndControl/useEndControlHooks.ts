@@ -1,10 +1,12 @@
-import { ref, Ref, computed } from 'vue';
+import { ref, Ref, computed, onUnmounted } from 'vue';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../../locales';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
+import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import logger from '../../../utils/common/logger';
+import TUIMessage from '../../common/base/Message/index';
 
 export default function useEndControl() {
   const { t } = useI18n();
@@ -82,6 +84,56 @@ export default function useEndControl() {
       roomEngine.instance?.closeLocalCamera();
     }
   }
+
+  const onUserRoleChanged = async (eventInfo: { userId: string, userRole: TUIRole }) => {
+    const { userId, userRole } = eventInfo;
+    const isLocal = roomStore.localUser.userId === userId;
+    const oldUserRole = roomStore.getUserRole(userId);
+    if (isLocal) {
+      roomStore.setLocalUser({ userRole });
+    } else {
+      roomStore.setRemoteUserRole(userId, userRole);
+    }
+    switch (userRole) {
+      case TUIRole.kGeneralUser:
+        if (isLocal) {
+          if (roomStore?.isCameraDisableForAllUser && !roomStore.localStream.hasAudioStream) {
+            roomStore.setCanControlSelfAudio(false);
+          }
+          if (roomStore?.isMicrophoneDisableForAllUser && !roomStore.localStream.hasVideoStream) {
+            roomStore.setCanControlSelfVideo(false);
+          }
+          if (oldUserRole === TUIRole.kAdministrator) {
+            TUIMessage({ type: 'warning', message: t('The RoomOwner has withdrawn your administrator privileges') });
+          }
+        }
+        break;
+      case TUIRole.kAdministrator:
+        if (isLocal) {
+          TUIMessage({ type: 'success', message: t('You are now an administrator') });
+          roomStore.setCanControlSelfAudio(true);
+          roomStore.setCanControlSelfVideo(true);
+        }
+        break;
+      case TUIRole.kRoomOwner: {
+        roomStore.setMasterUserId(userId);
+        const transferUserName = isLocal ? t('me') : roomStore.getUserName(userId) || userId;
+        TUIMessage({ type: 'success', message: `${t('Moderator changed to sb', { name: transferUserName })}` });
+        if (isLocal && roomStore.isSpeakAfterTakingSeatMode && !roomStore.isAnchor) {
+          await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+        }
+        break;
+      }
+    }
+  };
+
+  TUIRoomEngine.once('ready', () => {
+    roomEngine.instance?.on(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
+  });
+
+  onUnmounted(() => {
+    roomEngine.instance?.off(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
+  });
   return {
     t,
     basicStore,

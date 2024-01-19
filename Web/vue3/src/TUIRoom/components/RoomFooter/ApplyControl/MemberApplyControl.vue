@@ -94,7 +94,7 @@ watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
 watch(() => roomStore.requestObj[TUIRequestAction.kRequestRemoteUserOnSeat], (val) => {
   if (val.length) {
     const requestFirstUserId = getRequestFirstUserId(TUIRequestAction.kRequestRemoteUserOnSeat);
-    const userRole = roomStore.getRemoteUserRole(requestFirstUserId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
+    const userRole = roomStore.getUserRole(requestFirstUserId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
     dialogTitle.value = t('Sb invites you to speak on stage', { role: userRole });
   }
 }, { deep: true });
