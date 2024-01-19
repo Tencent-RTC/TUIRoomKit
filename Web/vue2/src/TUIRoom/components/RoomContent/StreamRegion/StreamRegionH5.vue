@@ -13,7 +13,7 @@
       <Avatar class="avatar-region" :img-src="stream.avatarUrl"></Avatar>
     </div>
     <div class="corner-user-info-container">
-      <div v-if="showMasterIcon" class="master-icon">
+      <div v-if="showIcon" :class="showMasterIcon ? 'master-icon' : 'admin-icon' ">
         <svg-icon :icon="UserIcon"></svg-icon>
       </div>
       <audio-icon
@@ -47,6 +47,7 @@ import {
   TRTCVideoFillMode,
   TRTCVideoMirrorType,
   TRTCVideoRotation,
+  TUIRole,
 } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { isInnerScene } from '../../../utils/constants';
@@ -77,6 +78,14 @@ const showMasterIcon = computed(() => {
   const { userId, streamType } = props.stream;
   return userId === roomStore.masterUserId && streamType === TUIVideoStreamType.kCameraStream;
 });
+
+const showAdminIcon = computed(() => {
+  const { userId, streamType } = props.stream;
+  return roomStore.getUserRole(userId) === TUIRole.kAdministrator
+    && streamType === TUIVideoStreamType.kCameraStream;
+});
+
+const showIcon = computed(() => showMasterIcon.value || showAdminIcon.value);
 
 const isScreenStream = computed(() => props.stream.streamType === TUIVideoStreamType.kScreenStream);
 
@@ -288,7 +297,8 @@ onMounted(() => {
       overflow: hidden;
       padding-right: 5px;
     }
-    .master-icon {
+    .master-icon,
+    .admin-icon {
       margin-left: 0;
       width: 32px;
       height: 32px;
@@ -296,6 +306,9 @@ onMounted(() => {
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+    .admin-icon {
+      background-color: var(--orange-color);
     }
     .screen-icon {
       transform: scale(0.8);

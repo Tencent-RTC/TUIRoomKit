@@ -95,10 +95,10 @@ function handleAudioMediaClick() {
 async function toggleMuteAudio() {
   if (isLocalAudioIconDisable.value) {
     let warningMessage = '';
-    if (isMicrophoneDisableForAllUser.value) {
-      warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_MUTE_ALL;
-    } else if (isAudience.value) {
+    if (isAudience.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_AUDIENCE;
+    } else if (isMicrophoneDisableForAllUser.value) {
+      warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_MUTE_ALL;
     }
     TUIMessage({
       type: 'warning',
@@ -143,7 +143,7 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
     // 主持人/管理员邀请打开麦克风，同意之后将会自动打开麦克风
     roomStore.setRequestId(TUIRequestAction.kRequestToOpenRemoteMicrophone, { userId, requestId });
     const requestFirstUserId = getRequestFirstUserId(TUIRequestAction.kRequestToOpenRemoteMicrophone);
-    const userRole = roomStore.getRemoteUserRole(requestFirstUserId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
+    const userRole = roomStore.getUserRole(requestFirstUserId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
     dialogContent.value = t('Sb invites you to turn on the microphone', { role: userRole });
     requestOpenMicRequestId.value = requestId;
     showRequestOpenMicDialog.value = true;
