@@ -91,7 +91,7 @@ export default {
   Agree: 'Agree',
   Chat: 'Chat',
   Cancel: 'Cancel',
-  Exit: 'Exit',
+  Exit: 'Exit full screen',
   'Full screen': 'Full screen',
   Members: 'Members',
   'Search Member': 'Search Member',
@@ -121,7 +121,8 @@ export default {
   Confirm: 'Confirm',
   Leave: 'Leave',
   Dismiss: 'Dismiss',
-  'Moderator changed to ': 'Moderator changed to ',
+  // @ts-ignore
+  'Moderator changed to sb': ({ named }) => `Moderator changed to ${named('name')}`,
   'The administrator has been changed to ': 'The administrator has been changed to ',
   'Muted by the moderator': 'Muted by the moderator',
   'Type a message': 'Type a message',
@@ -276,4 +277,5 @@ export default {
   'After unlocking, users can freely turn on the camera': 'After unlocking, users can freely turn on the camera',
   'Members will not be able to open the camera': 'Members will not be able to open the camera',
   'You are now an administrator': 'You are now an administrator',
+  'The RoomOwner has withdrawn your administrator privileges': 'The RoomOwner has withdrawn your administrator privileges',
 };

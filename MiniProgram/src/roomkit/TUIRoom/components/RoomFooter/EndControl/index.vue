@@ -103,7 +103,6 @@ import CorrectIcon from '../../../assets/icons/CorrectIcon.svg';
 import SearchIcon from '../../../assets/icons/SearchIcon.svg';
 import Avatar from '../../common/Avatar.vue';
 import EndRoomIcon from '../../../assets/icons/EndRoomIcon.svg';
-import TUIMessage from '../../common/base/Message/index';
 import TUIMessageBox from '../../common/base/MessageBox/index';
 
 const {
@@ -112,7 +111,6 @@ const {
   roomStore,
   basicStore,
   roomEngine,
-  localUser,
   stopMeeting,
   cancel,
   DialogType,
@@ -234,61 +232,12 @@ const onRoomDismissed = async (eventInfo: { roomId: string}) => {
   }
 };
 
-/**
- * By listening for a change in ownerId,
- * the audience receives a notification that the host has handed over the privileges
- *
-**/
-
-const onUserRoleChanged = async (eventInfo: {userId: string, userRole: TUIRole }) => {
-  const { userId, userRole } = eventInfo;
-  if (roomStore.localUser.userId === userId) {
-    roomStore.setLocalUser({ userRole });
-    if (eventInfo.userRole === TUIRole.kGeneralUser) {
-      if (roomStore?.isCameraDisableForAllUser && !roomStore.localStream.hasAudioStream) {
-        roomStore.setCanControlSelfAudio(false);
-      }
-      if (roomStore?.isMicrophoneDisableForAllUser && !roomStore.localStream.hasVideoStream) {
-        roomStore.setCanControlSelfVideo(false);
-      }
-    } else if (eventInfo.userRole === TUIRole.kAdministrator) {
-      TUIMessage({
-        type: 'success',
-        message: t('You are now an administrator'),
-      });
-      roomStore.setCanControlSelfAudio(true);
-      roomStore.setCanControlSelfVideo(true);
-    }
-  } else {
-    roomStore.setRemoteUserRole(userId, userRole);
-  }
-  if (eventInfo.userRole === TUIRole.kRoomOwner) {
-    let newName = roomStore.getUserName(userId) || userId;
-    if (userId === localUser.value.userId) {
-      newName = t('me');
-    }
-    const tipMessage = `${t('Moderator changed to ')}${newName}`;
-    TUIMessage({
-      type: 'success',
-      message: tipMessage,
-    });
-    roomStore.setMasterUserId(userId);
-    resetState();
-    if (roomStore.isAnchor) return;
-    if (roomStore.localUser.userId === userId && roomStore.isSpeakAfterTakingSeatMode) {
-      await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
-    }
-  }
-};
-
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRoomDismissed, onRoomDismissed);
-  roomEngine.instance?.on(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
 });
 
 onUnmounted(() => {
   roomEngine.instance?.off(TUIRoomEvents.onRoomDismissed, onRoomDismissed);
-  roomEngine.instance?.off(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
 });
 
 </script>
