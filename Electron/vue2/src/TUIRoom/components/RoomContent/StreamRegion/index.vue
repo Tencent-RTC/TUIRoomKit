@@ -22,7 +22,7 @@
         <Avatar class="avatar-region" :img-src="stream.avatarUrl"></Avatar>
       </div>
       <div class="corner-user-info-container">
-        <div v-if="showMasterIcon" class="master-icon">
+        <div v-if="showIcon" :class="showMasterIcon ? 'master-icon' : 'admin-icon' ">
           <user-icon></user-icon>
         </div>
         <audio-icon
@@ -59,7 +59,7 @@ import SvgIcon from '../../common/base/SvgIcon.vue';
 import UserIcon from '../../common/icons/UserIcon.vue';
 import LoadingIcon from '../../common/icons/LoadingIcon.vue';
 import { useI18n } from '../../../locales';
-import { TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-electron';
+import { TUIRole, TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-electron';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { isInnerScene } from '../../../utils/constants';
 import ScreenOpenIcon from '../../common/icons/ScreenOpenIcon.vue';
@@ -101,6 +101,13 @@ const showMasterIcon = computed(() => {
   return userId === roomStore.masterUserId && streamType === TUIVideoStreamType.kCameraStream;
 });
 
+const showAdminIcon = computed(() => {
+  const { userId, streamType } = props.stream;
+  return roomStore.getUserRole(userId) === TUIRole.kAdministrator
+    && streamType === TUIVideoStreamType.kCameraStream;
+});
+
+const showIcon = computed(() => showMasterIcon.value || showAdminIcon.value);
 const isScreenStream = computed(() => props.stream.streamType === TUIVideoStreamType.kScreenStream);
 const userInfo = computed(() => {
   if (isInnerScene) {
@@ -301,7 +308,8 @@ watch(
       text-overflow: ellipsis;
       overflow: hidden;
     }
-    .master-icon {
+    .master-icon,
+    .admin-icon {
       margin-left: 0;
       width: 32px;
       height: 32px;
@@ -310,6 +318,9 @@ watch(
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+    .admin-icon {
+      background-color: var(--orange-color);
     }
     .screen-icon {
       transform: scale(0.8);

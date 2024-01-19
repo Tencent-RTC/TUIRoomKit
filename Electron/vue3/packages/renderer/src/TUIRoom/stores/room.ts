@@ -275,7 +275,10 @@ export const useRoomStore = defineStore('room', {
       }
       return this.remoteUserObj[userId]?.userName || userId;
     },
-    getRemoteUserRole(userId: string) {
+    getUserRole(userId: string) {
+      if (userId === this.localUser.userId) {
+        return this.localUser.userRole;
+      }
       return this.remoteUserObj[userId]?.userRole;
     },
     getNewUserInfo(userId: string) {

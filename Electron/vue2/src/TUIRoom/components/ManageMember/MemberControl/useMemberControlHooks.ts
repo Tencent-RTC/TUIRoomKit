@@ -205,6 +205,11 @@ export default function useMemberControl(props?: any) {
       });
     } else {
       if (userInfo.isRequestingUserOpenCamera) {
+        TUIMessage({
+          type: 'info',
+          message: `${t('An invitation to open the camera has been sent to sb.', { name: userInfo.userName })}`,
+          duration: MESSAGE_DURATION.NORMAL,
+        });
         return;
       }
       const request = await roomEngine.instance?.openRemoteDeviceByAdmin({
@@ -273,9 +278,6 @@ export default function useMemberControl(props?: any) {
           userId: userInfo.userId,
           userRole: TUIRole.kRoomOwner,
         });
-        if (isSpeakAfterTakingSeatMode.value) {
-          await roomEngine.instance?.leaveSeat();
-        }
         roomStore.setMasterUserId(userInfo.userId);
       } catch (error) {
         TUIMessage({
