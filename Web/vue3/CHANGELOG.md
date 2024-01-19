@@ -1,3 +1,15 @@
+## 2023.01.19@2.0.1
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v2.0.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+- 被撤销管理员增加相关提示&&视频流区域增加管理员icon.
+
+**Bug Fixed**
+- 发送信令无操作处理时，增加消息提示。
+- 上台发言房间打开邀请摄像头/麦克风文案显示优先级。
+- 更正英文模式下 “退出全屏”文案。
+
 ## 2023.01.12@2.0.0
 
 **Feature**
