@@ -26,7 +26,7 @@ class TUIRoomObserver {
     /**
      * 1.1 错误事件回调
      *
-     * 错误事件，表示 SDK 抛出的不可恢复的错误，比如进入房间失败或设备开启失败等。
+     * 错误事件，表示 SDK 抛出的不可恢复的错误，例如进入房间失败或设备开启失败等。
      * @param errorCode 错误码，请参考：{@link TUIError}
      * @param message  错误信息
      */

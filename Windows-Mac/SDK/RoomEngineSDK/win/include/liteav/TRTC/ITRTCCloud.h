@@ -617,7 +617,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * 当用户将手机或 Pad 上下颠倒时，由于摄像头的采集方向没有变，所以房间中其他用户所看到的画面会变成上下颠倒的，
      * 在这种情况下，您可以通过调用该接口将 SDK 编码出的画面方向旋转180度，如此一来，房间中其他用户所看到的画面可保持正常的方向。
      * 如果您希望实现上述这种友好的交互体验，我们更推荐您直接调用 {@link setGSensorMode} 实现更加智能的方向适配，无需您手动调用本接口。
-     * @param rotation 目前支持 0、90、180、270 两个旋转角度，默认值：TRTCVideoRotation_0，即不旋转。
+     * @param rotation 目前支持 0、90、180、270 四个旋转角度，默认值：TRTCVideoRotation0，即不旋转。
      */
     virtual void setVideoEncoderRotation(TRTCVideoRotation rotation) = 0;
 
@@ -918,7 +918,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
     virtual ITXAudioEffectManager* getAudioEffectManager() = 0;
 
 /**
- * 8.2 开启系统声音采集（仅适用于桌面系统）
+ * 8.2 开启系统声音采集（iOS 端暂未支持）
  *
  * 该接口会从电脑的声卡中采集音频数据，并将其混入到 SDK 当前的音频数据流中，从而使房间中的其他用户也能听到主播的电脑所播放出的声音。
  * 在线教育场景中，老师可以使用此功能让 SDK 采集教学影片中的声音，并广播给同房间中的学生。
@@ -933,7 +933,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
 #endif
 
 /**
- * 8.3 停止系统声音采集（仅适用于桌面系统和 Android 系统）
+ * 8.3 停止系统声音采集（iOS 端暂未支持）
  */
 #if TARGET_PLATFORM_DESKTOP
     virtual void stopSystemAudioLoopback() = 0;
@@ -1170,7 +1170,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * - channel：声道数（如果是立体声，数据是交叉的），单声道：1； 双声道：2。
      * - timestamp：时间戳，单位为毫秒（ms），请使用音频帧在采集时被记录下来的时间戳（可以在采集到一帧音频帧之后，通过调用 {@link generateCustomPTS} 获取时间戳）。
      *
-     * 参考文档：[自定义采集和渲染](https://cloud.tencent.com/document/product/647/34066)。
+     * 参考文档：[自定义采集和渲染](https://cloud.tencent.com/document/product/647/74692)。
      * @param frame 音频数据
      * @note 请您精准地按每帧时长的间隔调用本接口，数据投送间隔不均匀时极易触发声音卡顿。
      */
@@ -1516,7 +1516,8 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * 用户退出房间后，SDK 会自动关闭私有加密。如需重新开启私有加密，您需要在用户再次加入房间前调用该方法。
      * @param enabled 是否开启媒体流私有加密。
      * @param config 配置媒体流私有加密的算法和密钥，参见 {@link TRTCPayloadPrivateEncryptionConfig}。
-     * @return 接口调用结果，0: 方法调用成功， -1: 传入参数无效， -2: 功能已过期。若需解锁：请前往中国大陆站点开通 [TRTC 旗舰版套餐](https://buy.cloud.tencent.com/trtc?tab=month&trtcversion=ultimate)。
+     * @return 接口调用结果，0: 方法调用成功， -1: 传入参数无效， -2: 功能已过期。若需解锁：请前往中国大陆站点开通 [TRTC 旗舰版套餐](https://buy.cloud.tencent.com/trtc?tab=month&trtcversion=ultimate)，并填写
+     * [申请](https://cloud.tencent.com/apply/p/diifjcmffhw)，审核通过后方可使用。
      * @note TRTC 已经内置对媒体流进行加密后再传输，启用媒体流私有加密后将使用您传入的密匙与初始向量进行再次加密。
      */
     virtual int enablePayloadPrivateEncryption(bool enabled, const TRTCPayloadPrivateEncryptionConfig& config) = 0;

@@ -375,6 +375,12 @@ class V2TXLivePusher {
      * @param enable      是否开启自定义视频预处理。【默认值】：false。
      * @param pixelFormat 自定义视频预处理回调的视频像素格式 {@link V2TXLivePixelFormat}。
      * @param bufferType  自定义视频预处理的视频数据格式 {@link V2TXLiveBufferType}。
+     * @return 返回值 {@link V2TXLiveCode}。
+     *         - V2TXLIVE_OK: 成功。
+     *         - V2TXLIVE_ERROR_NOT_SUPPORTED: 不支持的格式。
+     * @note 支持的格式组合：
+     *         V2TXLivePixelFormatBGRA32+V2TXLiveBufferTypeByteBuffer
+     *         V2TXLivePixelFormatI420+V2TXLiveBufferTypeByteBuffer
      */
     virtual int32_t enableCustomVideoProcess(bool enable, V2TXLivePixelFormat pixelFormat, V2TXLiveBufferType bufferType) = 0;
 
@@ -421,7 +427,6 @@ class V2TXLivePusher {
      * @return 返回值 {@link V2TXLiveCode}。
      *         - V2TXLIVE_OK: 成功。
      *         - V2TXLIVE_ERROR_INVALID_PARAMETER: 发送失败，视频帧数据不合法。
-     *         - V2TXLIVE_ERROR_REFUSED: 发送失败，您必须先调用 enableCustomVideoCapture 开启自定义视频采集。
      * @note  需要在 {@link startPush} 之前调用 {@link enableCustomVideoCapture} 开启自定义采集。
      */
     virtual int32_t sendCustomVideoFrame(V2TXLiveVideoFrame* videoFrame) = 0;
@@ -433,7 +438,7 @@ class V2TXLivePusher {
      *  @param audioFrame 向 SDK 发送的 音频帧数据 {@link V2TXLiveAudioFrame}。
      *  @return 返回值 {@link V2TXLiveCode}。
      *            - V2TXLIVE_OK: 成功。
-     *            - V2TXLIVE_ERROR_REFUSED: 发送失败，您必须先调用 enableCustomAudioCapture 开启自定义音频采集。
+     *            - V2TXLIVE_ERROR_INVALID_PARAMETER: 发送失败，音频帧数据不合法。
      *  @note   需要在 {@link startPush} 之前调用  {@link enableCustomAudioCapture} 开启自定义采集。
      */
     virtual int32_t sendCustomAudioFrame(V2TXLiveAudioFrame* audioFrame) = 0;
