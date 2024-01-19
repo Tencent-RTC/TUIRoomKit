@@ -89,10 +89,10 @@ function handleVideoMediaClick() {
 async function toggleMuteVideo() {
   if (isLocalVideoIconDisable.value) {
     let warningMessage = '';
-    if (isCameraDisableForAllUser.value) {
-      warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_MUTE_ALL;
-    } else if (isAudience.value) {
+    if (isAudience.value) {
       warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_AUDIENCE;
+    } else if (isCameraDisableForAllUser.value) {
+      warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_MUTE_ALL;
     }
     TUIMessage({
       type: 'warning',
@@ -148,7 +148,7 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
     roomStore.setRequestId(TUIRequestAction.kRequestToOpenRemoteCamera, { userId, requestId });
     // 主持人/管理员邀请打开麦克风，同意之后将会自动打开摄像头
     const requestFirstUserId = getRequestFirstUserId(TUIRequestAction.kRequestToOpenRemoteCamera);
-    const userRole = roomStore.getRemoteUserRole(requestFirstUserId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
+    const userRole = roomStore.getUserRole(requestFirstUserId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
     dialogContent.value = t('Sb invites you to turn on the camera', { role: userRole });
     requestOpenCameraRequestId.value = requestId;
     showRequestOpenCameraDialog.value = true;

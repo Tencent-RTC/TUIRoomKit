@@ -119,7 +119,8 @@ export default {
   Confirm: '确认',
   Leave: '离开房间',
   Dismiss: '结束房间',
-  'Moderator changed to ': '主持人已变更为',
+  // @ts-ignore
+  'Moderator changed to sb': ({ named }) => `主持人已变更为${named('name')}`,
   'The administrator has been changed to ': '管理员已变更为',
   'Muted by the moderator': '已被主持人禁言',
   'Type a message': '说点什么...',
@@ -276,4 +277,5 @@ export default {
   'After unlocking, users can freely turn on the camera': '解除后用户可以自由开启视频',
   'Members will not be able to open the camera': '成员将无法开启视频画面',
   'You are now an administrator': '您已成为管理员',
+  'The RoomOwner has withdrawn your administrator privileges': '房主已收回您的管理员权限',
 };
