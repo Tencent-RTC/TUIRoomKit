@@ -126,7 +126,7 @@ class RoomEngineManager {
   void _setFramework() {
     String jsonStr =
         "{\n  \"api\":\"setFramework\",\n  \"params\":\n  {\n    \"framework\": 7, \n    \"component\": 18, \n    \"language\": 9\n  }\n}";
-    _roomEngine.callExperimentalAPI(jsonStr);
+    TUIRoomEngine.callExperimentalAPI(jsonStr);
   }
 
   Future<TUIActionCallback> openLocalCamera() async {

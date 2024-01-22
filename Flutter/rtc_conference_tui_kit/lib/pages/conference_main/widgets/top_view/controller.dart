@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/store/index.dart';
 import 'package:rtc_conference_tui_kit/manager/rtc_engine_manager.dart';
+import 'package:rtc_conference_tui_kit/pages/conference_main/index.dart';
 import 'package:rtc_room_engine/api/room/tui_room_define.dart';
 
 class TopViewController extends GetxController {
@@ -10,13 +11,10 @@ class TopViewController extends GetxController {
 
   final RoomEngineManager _engineManager = RoomEngineManager();
   late TUIRoomInfo roomInfo;
+  final conferenceMainController = Get.find<ConferenceMainController>();
 
   Timer? topMenuTimer;
   RxString timerText = '00:00'.obs;
-
-  var isSpeakerPhone = true.obs;
-
-  void onTap() {}
 
   @override
   void onInit() {

@@ -120,6 +120,7 @@ class RoomStore extends GetxController {
     } else {
       currentUser.hasVideoStream.value = hasVideo;
     }
+    updateItemTouchableState();
 
     if (reason != TUIChangeReason.changedByAdmin) {
       return;
@@ -159,6 +160,7 @@ class RoomStore extends GetxController {
                 'microphoneTurnedOffByHostToast'));
       }
     }
+    updateItemTouchableState();
   }
 
   void updateUserRole(String userId, TUIRole role, RxList<UserModel> destList) {
@@ -283,12 +285,14 @@ class RoomStore extends GetxController {
         isMicItemTouchable.value = false;
       }
     }
-    if (roomInfo.isMicrophoneDisableForAllUser) {
+    if (roomInfo.isMicrophoneDisableForAllUser &&
+        !currentUser.hasAudioStream.value) {
       isMicItemTouchable.value = false;
     } else {
       isMicItemTouchable.value = true;
     }
-    if (roomInfo.isCameraDisableForAllUser) {
+    if (roomInfo.isCameraDisableForAllUser &&
+        !currentUser.hasVideoStream.value) {
       isCameraItemTouchable.value = false;
     } else {
       isCameraItemTouchable.value = true;

@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_conference_tui_kit/manager/rtc_engine_manager.dart';
 import 'package:rtc_room_engine/rtc_room_engine.dart';
+
+import 'widgets/widgets.dart';
 
 class ConferenceMainController extends GetxController {
   ConferenceMainController();
@@ -12,6 +16,13 @@ class ConferenceMainController extends GetxController {
 
   static const _seatIndex = -1;
   static const _reqTimeout = 0;
+
+  Timer? _hideTimer;
+  RxBool areWidgetsVisible = true.obs;
+  int _hideDuration = 6;
+
+  late TopViewWidget topViewWidget;
+  late BottomViewWidget bottomWidget;
 
   showDialog() {
     showConferenceDialog(
@@ -28,6 +39,8 @@ class ConferenceMainController extends GetxController {
 
   @override
   void onInit() {
+    topViewWidget = const TopViewWidget();
+    bottomWidget = const BottomViewWidget();
     observer = TUIRoomObserver(
       onRequestReceived: (request) {
         switch (request.requestAction) {
@@ -60,15 +73,8 @@ class ConferenceMainController extends GetxController {
       onUserRoleChanged: (userId, role) {
         if (userId == RoomStore.to.currentUser.userId.value) {
           if (role == TUIRole.roomOwner) {
-            showConferenceDialog(
-              title: RoomContentsTranslations.translate('haveBecomeMaster'),
-              confirmText: RoomContentsTranslations.translate('ok'),
-              confirmTextStyle: RoomTheme.defaultTheme.textTheme.displayMedium,
-              onConfirm: () {
-                Get.back();
-              },
-              barrierDismissible: false,
-            );
+            makeToast(
+                msg: RoomContentsTranslations.translate('haveBecomeHost'));
           }
           if (role == TUIRole.administrator) {
             if (RoomStore.to.roomInfo.isSeatEnabled == true &&
@@ -89,32 +95,17 @@ class ConferenceMainController extends GetxController {
                 },
               );
             } else {
-              showConferenceDialog(
-                title: RoomContentsTranslations.translate(
-                    'haveBecomeAdministrator'),
-                confirmText: RoomContentsTranslations.translate('ok'),
-                confirmTextStyle:
-                    RoomTheme.defaultTheme.textTheme.displayMedium,
-                onConfirm: () {
-                  Get.back();
-                },
-                barrierDismissible: false,
-              );
+              makeToast(
+                  msg: RoomContentsTranslations.translate(
+                      'haveBecomeAdministrator'));
             }
           }
           if (role == TUIRole.generalUser &&
               RoomStore.to.currentUser.userRole.value ==
                   TUIRole.administrator) {
-            showConferenceDialog(
-              title: RoomContentsTranslations.translate(
-                  'revokedYourAdministrator'),
-              confirmText: RoomContentsTranslations.translate('ok'),
-              confirmTextStyle: RoomTheme.defaultTheme.textTheme.displayMedium,
-              onConfirm: () {
-                Get.back();
-              },
-              barrierDismissible: false,
-            );
+            makeToast(
+                msg: RoomContentsTranslations.translate(
+                    'revokedYourAdministrator'));
             RoomStore.to.inviteSeatList.clear();
             RoomStore.to.inviteSeatMap.clear();
           }
@@ -128,8 +119,17 @@ class ConferenceMainController extends GetxController {
   }
 
   @override
+  void onReady() {
+    resetHideTimer();
+    _hideDuration = 3;
+    super.onReady();
+  }
+
+  @override
   void onClose() {
     RoomEngineManager().getRoomEngine().removeObserver(observer);
+    Get.delete<BottomViewController>(force: true);
+    Get.delete<TopViewController>(force: true);
     super.onClose();
   }
 
@@ -193,5 +193,29 @@ class ConferenceMainController extends GetxController {
       },
       barrierDismissible: false,
     );
+  }
+
+  void cancelHideTimer() {
+    _hideTimer?.cancel();
+  }
+
+  void resetHideTimer() {
+    if (Get.find<BottomViewController>().isUnfold.value) {
+      return;
+    }
+    cancelHideTimer();
+    _hideTimer = Timer(Duration(seconds: _hideDuration), () {
+      areWidgetsVisible.value = false;
+    });
+  }
+
+  void onMainViewClick() {
+    if (Get.find<BottomViewController>().isUnfold.value) {
+      return;
+    }
+    areWidgetsVisible.value = !areWidgetsVisible.value;
+    if (areWidgetsVisible.value) {
+      resetHideTimer();
+    }
   }
 }

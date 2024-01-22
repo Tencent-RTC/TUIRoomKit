@@ -26,8 +26,13 @@ class RoomInfoSheet extends GetView<TopViewController> {
           ),
           SizedBox(height: 20.0.scale375()),
           InfoListItem(
-              prefixText: RoomContentsTranslations.translate('host'),
-              infoText: controller.roomInfo.ownerId),
+            prefixText: RoomContentsTranslations.translate('host'),
+            infoText: RoomStore.to.userInfoList
+                .firstWhere((element) =>
+                    element.userId.value == controller.roomInfo.ownerId)
+                .userName
+                .value,
+          ),
           SizedBox(height: 15.0.scale375()),
           InfoListItem(
               prefixText: RoomContentsTranslations.translate('roomType'),

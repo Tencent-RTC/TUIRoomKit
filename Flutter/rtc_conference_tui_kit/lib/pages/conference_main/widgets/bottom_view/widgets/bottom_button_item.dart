@@ -12,6 +12,7 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
   final String text;
   final String? selectedText;
   final double width;
+  final double height;
   final double opacity;
 
   const BottomButtonItemWidget({
@@ -20,9 +21,10 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
     required this.onPressed,
     this.selectedImage,
     required this.isSelected,
-    required this.text,
+    this.text = "",
     this.selectedText,
     this.width = 52,
+    this.height = 52,
     this.opacity = 1,
   }) : super(key: key);
 
@@ -30,6 +32,9 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        if (text.isNotEmpty) {
+          controller.conferenceMainController.resetHideTimer();
+        }
         onPressed();
       },
       child: Opacity(
@@ -40,23 +45,24 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
             borderRadius: BorderRadius.circular(10),
           ),
           width: width.scale375(),
-          height: 52.0.scale375(),
+          height: height.scale375(),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Obx(() => isSelected.value ? selectedImage ?? image : image),
               const SizedBox(height: 5),
-              SizedBox(
-                child: Obx(
-                  () => Text(
-                    isSelected.value ? selectedText ?? text : text,
-                    textAlign: TextAlign.center,
-                    style: RoomTheme.defaultTheme.textTheme.labelSmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+              if (text.isNotEmpty)
+                SizedBox(
+                  child: Obx(
+                    () => Text(
+                      isSelected.value ? selectedText ?? text : text,
+                      textAlign: TextAlign.center,
+                      style: RoomTheme.defaultTheme.textTheme.labelSmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
