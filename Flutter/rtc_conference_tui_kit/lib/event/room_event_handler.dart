@@ -64,7 +64,8 @@ class RoomEventHandler extends TUIRoomObserver {
         }
       }
 
-      if (userId == _store.currentUser.userId.value) {
+      if (userId == _store.currentUser.userId.value &&
+          streamType != TUIVideoStreamType.cameraStreamLow) {
         _store.updateSelfVideoState(hasVideo, reason,
             isScreenStream: streamType == TUIVideoStreamType.screenStream);
       }

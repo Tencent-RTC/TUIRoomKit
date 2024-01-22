@@ -10,8 +10,8 @@ class BottomViewWidget extends GetView<BottomViewController> {
 
   Widget _buildView() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SizedBox(width: 16.0.scale375()),
         Obx(
           () => AnimatedContainer(
             duration: const Duration(milliseconds: 300),
@@ -21,7 +21,9 @@ class BottomViewWidget extends GetView<BottomViewController> {
                   : RoomColors.darkBlack,
               borderRadius: BorderRadius.circular(10),
             ),
-            width: Get.width - 32.0.scale375(),
+            width: controller.isUnfold.value
+                ? Get.width - 16.0.scale375()
+                : Get.width - 32.0.scale375(),
             height:
                 controller.isUnfold.value ? 114.0.scale375() : 52.0.scale375(),
             child: Column(
@@ -40,7 +42,6 @@ class BottomViewWidget extends GetView<BottomViewController> {
             ),
           ),
         ),
-        SizedBox(width: 16.0.scale375()),
       ],
     );
   }
@@ -56,6 +57,7 @@ class BottomViewWidget extends GetView<BottomViewController> {
           child: _buildView(),
         );
       },
+      autoRemove: false,
     );
   }
 }

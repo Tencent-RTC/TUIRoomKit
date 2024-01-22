@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:replay_kit_launcher/replay_kit_launcher.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_conference_tui_kit/manager/rtc_engine_manager.dart';
+import 'package:rtc_conference_tui_kit/pages/conference_main/index.dart';
 import 'package:rtc_room_engine/api/room/tui_room_define.dart';
 
 class BottomViewController extends GetxController {
@@ -20,6 +21,8 @@ class BottomViewController extends GetxController {
   late RoomEngineManager _engineManager;
   late RoomStore _store;
   late String _takeSeatRequestId;
+
+  final conferenceMainController = Get.find<ConferenceMainController>();
 
   @override
   void onInit() {
@@ -41,7 +44,7 @@ class BottomViewController extends GetxController {
       return;
     }
     if (_store.roomInfo.isMicrophoneDisableForAllUser &&
-        _store.currentUser.userRole.value != TUIRole.roomOwner) {
+        _store.currentUser.userRole.value == TUIRole.generalUser) {
       makeToast(msg: RoomContentsTranslations.translate('muteRoomReason'));
       return;
     }
@@ -58,7 +61,7 @@ class BottomViewController extends GetxController {
       return;
     }
     if (_store.roomInfo.isCameraDisableForAllUser &&
-        _store.currentUser.userRole.value != TUIRole.roomOwner) {
+        _store.currentUser.userRole.value == TUIRole.generalUser) {
       makeToast(
           msg: RoomContentsTranslations.translate('disableVideoRoomReason'));
       return;
@@ -170,6 +173,10 @@ class BottomViewController extends GetxController {
   }
 
   void leaveSeat() {
+    if (RoomStore.to.currentUser.userRole.value == TUIRole.administrator) {
+      _engineManager.leaveSeat();
+      return;
+    }
     showConferenceDialog(
       title: RoomContentsTranslations.translate('leaveSeatTitle'),
       message: RoomContentsTranslations.translate('leaveSeatMessage'),
@@ -223,5 +230,10 @@ class BottomViewController extends GetxController {
       showMoreButton.value = isUnfold.value;
     });
     isUnfold.value = !isUnfold.value;
+    if (isUnfold.value) {
+      conferenceMainController.cancelHideTimer();
+    } else {
+      conferenceMainController.resetHideTimer();
+    }
   }
 }

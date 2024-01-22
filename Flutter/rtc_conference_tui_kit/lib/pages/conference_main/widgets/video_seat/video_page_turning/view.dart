@@ -46,9 +46,6 @@ class VideoPageTurningPage extends GetView<VideoPageTurningController> {
             ),
           ),
         ),
-        const SizedBox(
-          height: 25,
-        ),
       ],
     );
   }

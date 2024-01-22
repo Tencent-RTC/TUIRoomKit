@@ -3,6 +3,8 @@ PODS:
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
+  - open_file (0.0.1):
+    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -12,9 +14,9 @@ PODS:
     - Flutter
   - rtc_conference_tui_kit (0.0.1):
     - Flutter
-  - rtc_room_engine (2.0.0):
+  - rtc_room_engine (2.0.1):
     - Flutter
-    - TUIRoomEngine/Professional (= 2.0.0)
+    - TUIRoomEngine/Professional (= 2.0.1)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -23,18 +25,19 @@ PODS:
     - TXCustomBeautyProcesserPlugin (= 1.0.2)
     - TXLiteAVSDK_Professional (~> 11.4.14445)
   - Toast (4.1.0)
-  - TUIRoomEngine/Professional (2.0.0):
+  - TUIRoomEngine/Professional (2.0.1):
     - TXIMSDK_Plus_iOS (>= 7.7.5294)
     - TXLiteAVSDK_Professional
   - TXCustomBeautyProcesserPlugin (1.0.2)
   - TXIMSDK_Plus_iOS (7.7.5294)
-  - TXLiteAVSDK_Professional (11.4.14552):
-    - TXLiteAVSDK_Professional/Professional (= 11.4.14552)
-  - TXLiteAVSDK_Professional/Professional (11.4.14552)
+  - TXLiteAVSDK_Professional (11.4.14571):
+    - TXLiteAVSDK_Professional/Professional (= 11.4.14571)
+  - TXLiteAVSDK_Professional/Professional (11.4.14571)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - open_file (from `.symlinks/plugins/open_file/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - replay_kit_launcher (from `.symlinks/plugins/replay_kit_launcher/ios`)
@@ -56,6 +59,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
+  open_file:
+    :path: ".symlinks/plugins/open_file/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
@@ -74,18 +79,19 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   fluttertoast: 31b00dabfa7fb7bacd9e7dbee580d7a2ff4bf265
+  open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   replay_kit_launcher: 828739da18c9785d5e9aafd4f075ea11d6b61499
   rtc_conference_tui_kit: e6a8fb13894a30ecdfb180e3e6997df20e4d202d
-  rtc_room_engine: afe0d760932041d37d330d499200a5ca492db0a5
+  rtc_room_engine: f3b0f8e211e7b284700f323d0be41ba2fc4c239c
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
   tencent_trtc_cloud: 8b55aa23005a77db473cdbc13841a4b13b261946
   Toast: ec33c32b8688982cecc6348adeae667c1b9938da
-  TUIRoomEngine: 286603fae50d874e6843757f0e9a8b24899eb60a
+  TUIRoomEngine: a2c49c71b5b2ab780e8e5239133d5797f72ebaad
   TXCustomBeautyProcesserPlugin: 099393b941cb40eda12b3a80bf6c0319957b1cfd
   TXIMSDK_Plus_iOS: 81fcb20ad754ea5164207970772f00ea9f94bc8f
-  TXLiteAVSDK_Professional: 3a3a5fac0a4424d3cba4ff870b977472ea890921
+  TXLiteAVSDK_Professional: d4db8d4ee81a7dc5d653b72b44463322bbe58f24
 
 PODFILE CHECKSUM: f1c82f10837f8fdf27aee12401554c9539720e1f
 

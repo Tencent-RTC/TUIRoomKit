@@ -22,7 +22,8 @@ class UserListItem extends GetView<UserListController> {
           behavior: HitTestBehavior.opaque,
           onTap: () {
             if (controller.isAbleToControlUser(userModel)) {
-              Get.bottomSheet(UserControlWidget(userModel: userModel));
+              Get.bottomSheet(UserControlWidget(userModel: userModel),
+                  isScrollControlled: true);
             }
           },
           child: Row(

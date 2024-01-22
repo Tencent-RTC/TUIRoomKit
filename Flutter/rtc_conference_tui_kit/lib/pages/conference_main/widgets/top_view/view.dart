@@ -21,7 +21,7 @@ class TopViewWidget extends GetView<TopViewController> {
       ),
       child: Column(
         children: [
-          SizedBox(height: 52.0.scale375()),
+          SizedBox(height: 44.0.scale375Height()),
           Obx(
             () => Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -84,6 +84,7 @@ class TopViewWidget extends GetView<TopViewController> {
           child: _buildView(),
         );
       },
+      autoRemove: false,
     );
   }
 }

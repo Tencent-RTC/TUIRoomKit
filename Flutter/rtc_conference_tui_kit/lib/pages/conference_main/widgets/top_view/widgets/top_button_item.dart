@@ -27,6 +27,7 @@ class TopButtonItemWidget extends GetView<TopViewController> {
       height: 53.0.scale375(),
       child: GestureDetector(
         onTap: () {
+          controller.conferenceMainController.resetHideTimer();
           onPressed();
         },
         child: Row(

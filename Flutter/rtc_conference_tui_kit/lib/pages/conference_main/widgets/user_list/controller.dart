@@ -39,6 +39,7 @@ class UserListController extends GetxController {
   }
 
   void muteAllAudioAction() {
+    var isAllMuteTemp = isAllMute.value;
     showConferenceDialog(
       title: isAllMute.value
           ? RoomContentsTranslations.translate('unAllMute')
@@ -52,8 +53,8 @@ class UserListController extends GetxController {
           : RoomContentsTranslations.translate('allMute'),
       onConfirm: () async {
         Get.back();
-        isAllMute.value = !isAllMute.value;
-        var result = await _engineManager.muteAllAudioAction(isAllMute.value);
+        isAllMute.value = !isAllMuteTemp;
+        var result = await _engineManager.muteAllAudioAction(!isAllMuteTemp);
         if (result.code == TUIError.success) {
           if (isOwner()) {
             makeToast(
@@ -70,6 +71,7 @@ class UserListController extends GetxController {
   }
 
   void muteAllVideoAction() {
+    var isAllCameraDisableTemp = isAllCameraDisable.value;
     showConferenceDialog(
       title: isAllCameraDisable.value
           ? RoomContentsTranslations.translate('enableAllVideo')
@@ -83,9 +85,9 @@ class UserListController extends GetxController {
           : RoomContentsTranslations.translate('disableAllVideo'),
       onConfirm: () async {
         Get.back();
-        isAllCameraDisable.value = !isAllCameraDisable.value;
+        isAllCameraDisable.value = !isAllCameraDisableTemp;
         var result =
-            await _engineManager.muteAllVideoAction(isAllCameraDisable.value);
+            await _engineManager.muteAllVideoAction(!isAllCameraDisableTemp);
         if (result.code == TUIError.success) {
           makeToast(
               msg: isAllCameraDisable.value
@@ -224,23 +226,26 @@ class UserListController extends GetxController {
     }
   }
 
-  void transferHostAction(String userId) async {
-    var result = await _engineManager.changeUserRole(userId, TUIRole.roomOwner);
-    if (result.code == TUIError.success) {
-      Get.back();
-      showConferenceDialog(
-        title: RoomContentsTranslations.translate('haveTransferredHost'),
-        confirmText: RoomContentsTranslations.translate('ok'),
-        titleTextStyle: RoomTheme.defaultTheme.textTheme.displayLarge,
-        confirmTextStyle: RoomTheme.defaultTheme.textTheme.displayMedium,
-        onConfirm: () {
-          Get.back();
-        },
-        barrierDismissible: false,
-      );
-      RoomStore.to.inviteSeatList.clear();
-      RoomStore.to.inviteSeatMap.clear();
-    }
+  void transferHostAction(UserModel userModel) async {
+    showConferenceDialog(
+      title: RoomContentsTranslations.translate('transferHostTitle')
+          .replaceAll('xx', userModel.userName.value),
+      message: RoomContentsTranslations.translate('transferHostMessage'),
+      confirmText: RoomContentsTranslations.translate('sureToTransfer'),
+      cancelText: RoomContentsTranslations.translate('cancel'),
+      onConfirm: () async {
+        Get.back();
+        var result = await _engineManager.changeUserRole(
+            userModel.userId.value, TUIRole.roomOwner);
+        if (result.code == TUIError.success) {
+          makeToast(
+              msg: RoomContentsTranslations.translate('haveTransferredHost')
+                  .replaceAll('xx', userModel.userName.value));
+          RoomStore.to.inviteSeatList.clear();
+          RoomStore.to.inviteSeatMap.clear();
+        }
+      },
+    );
   }
 
   void changeAdministratorAction(UserModel userModel) async {
@@ -254,20 +259,12 @@ class UserListController extends GetxController {
           userModel.userId.value, TUIRole.administrator);
     }
     if (result.code == TUIError.success) {
-      showConferenceDialog(
-        title: isUserAdministrator
-            ? RoomContentsTranslations.translate('haveRevokedAdministrator')
-                .replaceAll('xx', userModel.userName.value)
-            : RoomContentsTranslations.translate('haveSetUpAdministrator')
-                .replaceAll('xx', userModel.userName.value),
-        confirmText: RoomContentsTranslations.translate('ok'),
-        titleTextStyle: RoomTheme.defaultTheme.textTheme.displayLarge,
-        confirmTextStyle: RoomTheme.defaultTheme.textTheme.displayMedium,
-        onConfirm: () {
-          Get.back();
-        },
-        barrierDismissible: false,
-      );
+      makeToast(
+          msg: isUserAdministrator
+              ? RoomContentsTranslations.translate('haveRevokedAdministrator')
+                  .replaceAll('xx', userModel.userName.value)
+              : RoomContentsTranslations.translate('haveSetUpAdministrator')
+                  .replaceAll('xx', userModel.userName.value));
     }
   }
 
@@ -384,7 +381,7 @@ class UserListController extends GetxController {
 
   bool isAbleToControlUser(UserModel userModel) {
     if (isSelf(userModel)) {
-      return true;
+      return false;
     }
     if (isOwner()) {
       return true;

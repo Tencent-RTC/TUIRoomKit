@@ -79,7 +79,7 @@ class UserControlWidget extends GetView<UserListController> {
             UserControlItemWidget(
               onPressed: () {
                 Get.back();
-                controller.transferHostAction(userModel.userId.value);
+                controller.transferHostAction(userModel);
               },
               text: RoomContentsTranslations.translate('changeHost'),
               image: Image.asset(
