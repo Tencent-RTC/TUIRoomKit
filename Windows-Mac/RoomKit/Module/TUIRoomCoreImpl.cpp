@@ -1500,6 +1500,10 @@ void TUIRoomCoreImpl::onRequestCancelled(const char* request_id,
         received_request_ids_.erase(iter);
     }
 }
+
+void TUIRoomCoreImpl::onRequestProcessed(const char* request_id,
+                                         const char* user_id) {}
+
 void TUIRoomCoreImpl::onReceiveTextMessage(const char* room_id, const tuikit::TUIMessage& message) {
     if (TOSTRING(room_id) != room_info_.room_id) {
         LINFO("room engine onReceiveTextMessage, room_id %s ,messgae : %s", room_id, message.message);

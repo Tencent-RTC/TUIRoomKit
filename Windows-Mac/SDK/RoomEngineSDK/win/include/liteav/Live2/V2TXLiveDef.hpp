@@ -219,7 +219,10 @@ enum V2TXLivePixelFormat {
     V2TXLivePixelFormatI420,
 
     /// BGRA8888。
-    V2TXLivePixelFormatBGRA32
+    V2TXLivePixelFormatBGRA32,
+
+    /// RGBA32
+    V2TXLivePixelFormatRGBA32
 
 };
 

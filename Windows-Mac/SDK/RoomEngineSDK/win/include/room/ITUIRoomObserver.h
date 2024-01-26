@@ -249,6 +249,14 @@ class TUIRoomObserver {
      */
     virtual void onRequestCancelled(const char* requestId, const char* userId) = 0;
 
+    /**
+     * 6.3 收到请求被其他 管理员/房主 处理事件
+     *
+     * @param requestId 请求ID
+     * @param userId 管理员/房主 的用户ID
+     */
+    virtual void onRequestProcessed(const char* requestId, const char* userId) = 0;
+
     /////////////////////////////////////////////////////////////////////////////////
     //
     //                   房间内消息事件回调

@@ -543,6 +543,11 @@ class TUIRoomEngine : IDeprecatedRoomEngineAPI {
      */
     virtual void kickUserOffSeatByAdmin(int seatIndex, const char* userId, TUICallback* callback) = 0;
 
+    /**
+     * 9.8  主持人/管理员 获取房间内申请上麦用户的请求列表
+     */
+    virtual void getSeatApplicationList(TUIListCallback<TUIRequest>* callback) = 0;
+
     /////////////////////////////////////////////////////////////////////////////////
     //
     //                   文本消息
