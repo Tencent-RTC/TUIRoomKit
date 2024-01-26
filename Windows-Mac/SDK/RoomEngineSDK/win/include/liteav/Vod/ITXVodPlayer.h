@@ -58,7 +58,7 @@ class ITXVodPlayer {
     /**
      * 视频渲染回调。
      *
-     * 仅硬解支持,全平台接口软解硬解均支持
+     * 全平台接口软解硬解均支持
      */
     virtual void setDataCallback(ITXVodPlayerDataCallback* callback) = 0;
 
@@ -147,7 +147,7 @@ class ITXVodPlayer {
     /**
      * 设置播放速率
      *
-     * @param rate 播放速度（0.5-2.0）
+     * @param rate 播放速度
      */
     virtual void setRate(float rate) = 0;
 

@@ -190,6 +190,7 @@ private:
     void onKickedOffSeat(const char* user_id) override;
     void onRequestReceived(const tuikit::TUIRequest* request) override;
     void onRequestCancelled(const char* request_id, const char* user_id) override;
+    void onRequestProcessed(const char* request_id, const char* user_id) override;
     void onReceiveTextMessage(const char* room_id, const tuikit::TUIMessage& message) override;
     void onReceiveCustomMessage(const char* room_id, const tuikit::TUIMessage& message) override;
     void onDeviceChanged(const char* deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) override;
