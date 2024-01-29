@@ -99,9 +99,9 @@ export default {
   'Set as administrator': 'Set as administrator',
   'Revoke administrator': 'Revoke administrator',
   // @ts-ignore
-  'Revoked the administrator role of sb': ({ named }) => `Revoked the administrator role of  ${named('name')}.`,
+  'The administrator status of sb has been withdrawn': ({ named }) => `The administrator status of ${named('name')} has been withdrawn`,
   // @ts-ignore
-  'Set the administrator role of sb': ({ named }) => `Set the administrator role of ${named('name')}`,
+  'sb has been set as administrator': ({ named }) => `${named('name')} has been set as administrator`,
   'You have been invited by the administrator to step down, please raise your hand if you need to speak': 'You have been invited by the administrator to step down, please raise your hand if you need to speak',
   Invite: 'Invite',
   Settings: 'Settings',
@@ -169,8 +169,10 @@ export default {
   'Sb invites you to speak on stage': ({ named }) => `${named('role')} invites you to speak on stage`,
   'After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?': 'After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?',
   'Hand down': 'Hand down',
-  'The host has approved your application': 'The host has approved your application',
-  'The host has rejected your application for the stage': 'The host has rejected your application for the stage',
+  // @ts-ignore
+  'sb has approved your application': ({ named }) => `${named('role')} has approved your application`,
+  // @ts-ignore
+  'sb has rejected your application for the stage': ({ named }) => `${named('role')} has rejected your application for the stage`,
   'You have been invited by the host to step down, please raise your hand if you need to speak': 'You have been invited by the host to step down, please raise your hand if you need to speak',
   'If you have any questions, please email us.': 'If you have any questions, please email us.',
   'Join our product discussion group': 'Join our product discussion group',
@@ -220,13 +222,13 @@ export default {
   'Copied successfully': 'Copied successfully',
   'accepted the invitation to the stage': 'accepted the invitation to the stage',
   'declined the invitation to the stage': 'declined the invitation to the stage',
-  'Mute has been turned on': 'Mute has been turned on',
-  'All mutes have been lifted': 'All mutes have been lifted',
+  'All audios disabled': 'All audios disabled',
+  'All audios enabled': 'All audios enabled',
   'Your microphone has been turned off': 'Your microphone has been turned off',
   // @ts-ignore
   'Sb invites you to turn on the microphone': ({ named }) => `${named('role')} invites you to turn on the microphone`,
-  'The banning of all paintings has been turned on': 'The banning of all paintings has been turned on',
-  'The ban on painting has been lifted': 'The ban on painting has been lifted',
+  'All videos disabled': 'All videos disabled',
+  'All videos enabled': 'All videos enabled',
   'Disabling text chat for all is enabled': 'Disabling text chat for all is enabled',
   'Unblocked all text chat': 'Unblocked all text chat',
   'Your camera has been turned off': 'Your camera has been turned off',
@@ -276,6 +278,10 @@ export default {
   'Members will not be able to open the microphone': 'Members will not be able to open the microphone',
   'After unlocking, users can freely turn on the camera': 'After unlocking, users can freely turn on the camera',
   'Members will not be able to open the camera': 'Members will not be able to open the camera',
-  'You are now an administrator': 'You are now an administrator',
-  'The RoomOwner has withdrawn your administrator privileges': 'The RoomOwner has withdrawn your administrator privileges',
+  'You have become a administrator': 'You have become a administrator',
+  'Your administrator status has been revoked': 'Your administrator status has been revoked',
+  'After transfer the room owner, you will become a general user': 'After transfer the room owner, you will become a general user',
+  // @ts-ignore
+  'Transfer the roomOwner to sb': ({ named }) => `Transfer the roomOwner to ${named('name')}`,
+  'Confirm transfer': 'Confirm transfer',
 };

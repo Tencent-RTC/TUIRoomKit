@@ -1,6 +1,6 @@
 {
   "name": "room-uikit-electron-vue2",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "private": true,
   "main": "main.electron.js",
   "license": "MIT",
@@ -60,7 +60,7 @@
     ]
   },
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-electron": "^2.0.1",
+    "@tencentcloud/tuiroom-engine-electron": "^2.0.2",
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
     "js-cookie": "^3.0.1",
