@@ -249,6 +249,7 @@ export const useRoomStore = defineStore('room', {
     streamNumber(): number {
       return this.streamList.length;
     },
+    remoteUserList: state => [...Object.values(state.remoteUserObj)],
     remoteAnchorList: state => [...Object.values(state.remoteUserObj)].filter(item => item.onSeat),
     userList: state => [state.localUser, ...Object.values(state.remoteUserObj)],
     userNumber(): number {

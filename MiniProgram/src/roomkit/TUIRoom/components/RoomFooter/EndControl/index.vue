@@ -7,7 +7,7 @@
       </div>
     </div>
     <div v-if="visible" class="end-main-content">
-      <div :class="isShowLeaveRoomDialog ? 'end-dialog-leave':'end-dialog-dismiss'">
+      <div :class="isShowLeaveRoomDialog ? 'end-dialog-leave' : 'end-dialog-dismiss'">
         <div v-if="currentDialogType === DialogType.BasicDialog">
           <div v-if="roomStore.isMaster" class="end-dialog-header">
             <span v-if="roomStore.isMaster" class="end-dialog-text">
@@ -20,7 +20,7 @@
         <div v-if="currentDialogType === DialogType.BasicDialog" class="dialog-middle-content">
           <span
             v-if="roomStore.isMaster"
-            :class="isShowLeaveRoomDialog ? 'end-button-dismiss':'end-button-dismiss-single'"
+            :class="isShowLeaveRoomDialog ? 'end-button-dismiss' : 'end-button-dismiss-single'"
             @click.stop="dismissRoom"
           >
             {{ t('Dismiss') }}
@@ -28,7 +28,7 @@
           <span
             v-if="isShowLeaveRoomDialog"
             @tap="handleEndLeaveClick"
-            :class="roomStore.isMaster ?'end-button-leave':'end-button-leave-single'"
+            :class="roomStore.isMaster ? 'end-button-leave' : 'end-button-leave-single'"
           >
             {{ t('Leave') }}
           </span>
@@ -39,13 +39,9 @@
         </div>
       </div>
     </div>
-    <popup
-      v-show="showSideBar"
-      :title="t('Appoint a new host')"
-      class="transfer-container"
-    >
+    <popup v-show="showSideBar" :title="t('Appoint a new host')" class="transfer-container">
       <template #sidebarContent>
-        <div style="height:100%">
+        <div style="height: 100%">
           <div class="transfer-list-container">
             <div class="transfer-header">
               <div class="search-container">
@@ -56,7 +52,7 @@
                   class="searching-input"
                   :placeholder="t('Search for conference attendees')"
                   enterkeyhint="done"
-                >
+                />
               </div>
             </div>
             <div class="transfer-body">
@@ -69,13 +65,7 @@
                 <div class="member-basic-info">
                   <Avatar class="avatar-url" :img-src="user.avatarUrl"></Avatar>
                   <div class="user-name">{{ user.userName || user.userId }}</div>
-                  <svg-icon
-                    style="display: flex"
-                    v-if="selectedUser === user.userId"
-                    :icon="CorrectIcon"
-                    class="correct"
-                  >
-                  </svg-icon>
+                  <svg-icon style="display: flex" v-if="selectedUser === user.userId" :icon="CorrectIcon" class="correct"> </svg-icon>
                 </div>
               </div>
               <div v-if="hasNoData" class="member-hasNoData">{{ t('No relevant user found.') }}</div>
@@ -126,11 +116,10 @@ const {
   filteredList,
   selectedUser,
   showSideBar,
-  remoteAnchorList,
-  isMasterWithOneRemoteAnchor,
-  isMasterWithRemoteAnchors,
+  remoteUserList,
+  isMasterWithOneRemoteUser,
+  isMasterWithRemoteUser,
 } = useEndControl();
-
 
 const emit = defineEmits(['on-exit-room', 'on-destroy-room']);
 function handleEndBtnClick() {
@@ -141,9 +130,9 @@ function handleEndLeaveClick() {
     leaveRoom();
     return;
   }
-  if (isMasterWithRemoteAnchors.value) {
-    selectedUser.value = remoteAnchorList.value[0].userId;
-    if (isMasterWithOneRemoteAnchor.value) {
+  if (isMasterWithRemoteUser.value) {
+    selectedUser.value = remoteUserList.value[0].userId;
+    if (isMasterWithOneRemoteUser.value) {
       transferAndLeave();
       return;
     }
@@ -158,7 +147,7 @@ function handleEndLeaveClick() {
  * Active room dismissal
  *
  * 主动解散房间
-**/
+ **/
 async function dismissRoom() {
   try {
     logger.log(`${logPrefix}dismissRoom: enter`);
@@ -175,8 +164,9 @@ async function dismissRoom() {
  * Leave the room voluntarily
  *
  * 主动离开房间
-**/
-async function leaveRoom() { // eslint-disable-line
+ **/
+async function leaveRoom() {
+  // eslint-disable-line
   try {
     closeMediaBeforeLeave();
     const response = await roomEngine.instance?.exitRoom();
@@ -212,8 +202,8 @@ async function transferAndLeave() {
  * notification of room dismissal from the host
  *
  * 收到主持人解散房间通知
-**/
-const onRoomDismissed = async (eventInfo: { roomId: string}) => {
+ **/
+const onRoomDismissed = async (eventInfo: { roomId: string }) => {
   try {
     const { roomId } = eventInfo;
     logger.log(`${logPrefix}onRoomDismissed:`, roomId);
@@ -239,14 +229,13 @@ TUIRoomEngine.once('ready', () => {
 onUnmounted(() => {
   roomEngine.instance?.off(TUIRoomEvents.onRoomDismissed, onRoomDismissed);
 });
-
 </script>
 <style lang="scss" scoped>
-.end-control-container{
+.end-control-container {
   .end-button {
     font-weight: 400;
     font-size: 12px;
-    color: #FF2E2E;
+    color: #ff2e2e;
     letter-spacing: 0;
     cursor: pointer;
     text-align: center;
@@ -257,12 +246,12 @@ onUnmounted(() => {
     }
   }
 }
-.dialog-middle-content{
+.dialog-middle-content {
   width: 100%;
   display: flex;
   flex-direction: column;
 }
-.end-main-content{
+.end-main-content {
   position: fixed;
   left: 0;
   top: 0;
@@ -272,7 +261,8 @@ onUnmounted(() => {
   box-sizing: border-box;
   background-color: var(--log-out-mobile);
   backdrop-filter: blur(10px);
-  .end-dialog-leave,.end-dialog-dismiss {
+  .end-dialog-leave,
+  .end-dialog-dismiss {
     width: 90%;
     border-radius: 14px;
     position: fixed;
@@ -281,12 +271,12 @@ onUnmounted(() => {
     bottom: 10vh;
     z-index: 9;
     margin: auto;
-    .manage-transfer{
+    .manage-transfer {
       position: absolute;
       top: 0;
     }
     .end-dialog-header {
-      background: #CACACB;
+      background: #cacacb;
       font-family: 'PingFang SC';
       font-style: normal;
       font-weight: 500;
@@ -299,7 +289,7 @@ onUnmounted(() => {
       margin: 0 auto;
       border-top-left-radius: 14px;
       border-top-right-radius: 14px;
-      border-bottom: .5px solid #4f4e4e;
+      border-bottom: 0.5px solid #4f4e4e;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -307,7 +297,11 @@ onUnmounted(() => {
         width: 230px;
       }
     }
-    .end-button-dismiss,.end-button-leave,.end-button-cancel,.end-button-dismiss-single,.end-button-leave-single {
+    .end-button-dismiss,
+    .end-button-leave,
+    .end-button-cancel,
+    .end-button-dismiss-single,
+    .end-button-leave-single {
       width: 100%;
       font-family: 'PingFang SC';
       font-style: normal;
@@ -315,18 +309,18 @@ onUnmounted(() => {
       font-size: 20px;
       line-height: 24px;
       text-align: center;
-      color: #FF2E2E;
+      color: #ff2e2e;
       border-style: none;
-      background: #CACACB;
+      background: #cacacb;
       padding: 20px 0;
     }
     .end-button-leave {
-      color: #007AFF;
+      color: #007aff;
       border-bottom-left-radius: 14px;
       border-bottom-right-radius: 14px;
-      border-top: .5px solid #8f8e8e;
+      border-top: 0.5px solid #8f8e8e;
     }
-    .end-button-leave-single{
+    .end-button-leave-single {
       position: absolute;
       bottom: 1vh;
       border-radius: 14px;
@@ -338,9 +332,9 @@ onUnmounted(() => {
       position: absolute;
       bottom: -9vh;
       left: 0;
-      background-color: #FFFFFF;
+      background-color: #ffffff;
       border-radius: 14px;
-      color: #007AFF;
+      color: #007aff;
       font-weight: 600;
       display: flex;
       align-items: center;
@@ -356,7 +350,7 @@ onUnmounted(() => {
   }
   .end-dialog-dismiss {
     bottom: 12vh;
-    .end-button-cancel{
+    .end-button-cancel {
       bottom: -9vh;
     }
   }
@@ -367,7 +361,7 @@ onUnmounted(() => {
   top: 0;
   height: 100vh;
   z-index: 102;
-  .transfer-list-container{
+  .transfer-list-container {
     position: relative;
     height: 100%;
     display: flex;
@@ -392,15 +386,15 @@ onUnmounted(() => {
         border: none;
         background: none;
         width: 100%;
-      ::placeholder {
-        font-size: 16px;
-        line-height: 18px;
-        color: #676c80;
+        ::placeholder {
+          font-size: 16px;
+          line-height: 18px;
+          color: #676c80;
+        }
+        &:focus-visible {
+          outline: none;
+        }
       }
-      &:focus-visible {
-        outline: none;
-      }
-    }
     }
   }
   .transfer-body {
@@ -410,23 +404,23 @@ onUnmounted(() => {
     flex-direction: column;
     min-height: 0;
     margin-top: 20px;
-    .transfer-list-content{
+    .transfer-list-content {
       padding-bottom: 5px;
-    .transfer-item-container {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      height: 69px;
-      justify-content: space-between;
-      padding: 0 32px;
-    }
-    .member-basic-info {
-      display: flex;
-      position: relative;
-      width: 100%;
-      flex-direction: row;
-      align-items: center;
-      padding: 24px 20px 0 24px;
+      .transfer-item-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        height: 69px;
+        justify-content: space-between;
+        padding: 0 32px;
+      }
+      .member-basic-info {
+        display: flex;
+        position: relative;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        padding: 24px 20px 0 24px;
         .avatar-url {
           width: 40px !important;
           height: 40px !important;
@@ -456,7 +450,7 @@ onUnmounted(() => {
         }
       }
     }
-    .member-hasNoData{
+    .member-hasNoData {
       position: fixed;
       top: 30%;
       left: 30%;
@@ -471,17 +465,17 @@ onUnmounted(() => {
     }
   }
 }
-.transfer-leave{
+.transfer-leave {
   position: fixed;
   bottom: 2vh;
   left: 7vw;
   display: flex;
   align-items: center;
   justify-content: center;
-  .transfer-button{
+  .transfer-button {
     width: 86vw;
     height: 5vh;
-    background: linear-gradient(315deg, #006EFF 0%, #0C59F2 98.81%);
+    background: linear-gradient(315deg, #006eff 0%, #0c59f2 98.81%);
     border-radius: 8px;
     font-family: 'PingFang SC';
     font-style: normal;
@@ -492,7 +486,7 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: #FFFFFF;
+    color: #ffffff;
     border-style: none;
   }
 }
