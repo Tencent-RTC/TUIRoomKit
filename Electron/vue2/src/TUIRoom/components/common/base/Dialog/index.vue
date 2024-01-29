@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onBeforeUnmount } from 'vue';
 import SvgIcon from '../SvgIcon.vue';
 import CloseIcon from '../../icons/CloseIcon.vue';
 import { addSuffix } from '../../../../utils/utils';
@@ -153,6 +153,13 @@ function handleOverlayClick(event: any) {
   }
   handleClose();
 }
+
+onBeforeUnmount(() => {
+  if (props.appendToBody || props.appendToRoomContainer) {
+    dialogRef.value.parentNode.removeChild(dialogRef.value);
+  }
+});
+
 </script>
 
 <style lang="scss" scoped>

@@ -23,25 +23,25 @@ export default function useEndControl() {
   logger.log(`${logPrefix} basicStore:`, basicStore);
 
   const roomStore = useRoomStore();
-  const { localUser, remoteAnchorList } = storeToRefs(roomStore);
+  const { localUser, remoteUserList } = storeToRefs(roomStore);
   const title = computed(() => (currentDialogType.value === DialogType.BasicDialog ? t('Leave room?') : t('Select a new host')));
   const isShowLeaveRoomDialog = computed(() => (
-    roomStore.isMaster && remoteAnchorList.value.length > 0)
+    roomStore.isMaster && remoteUserList.value.length > 0)
   || !roomStore.isMaster);
   const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
   const showSideBar = computed(() => isSidebarOpen.value && sidebarName.value === 'transfer-leave');
   const selectedUser: Ref<string> = ref('');
   const showTransfer = ref(false);
   const searchName = ref('');
-  const filteredList = computed(() => remoteAnchorList.value.filter(searchUser => (
+  const filteredList = computed(() => remoteUserList.value.filter(searchUser => (
     searchUser.userId.includes(searchName.value)) || (searchUser.userName?.includes(searchName.value))));
   const hasNoData = computed(() => filteredList.value.length === 0);
-  const isMasterWithOneRemoteAnchor = computed(() => remoteAnchorList.value.length === 1);
-  const isMasterWithRemoteAnchors = computed(() => remoteAnchorList.value.length > 0);
-  const isMasterWithoutRemoteAnchors = computed(() => roomStore.isMaster && remoteAnchorList.value.length === 0);
+  const isMasterWithOneRemoteUser = computed(() => remoteUserList.value.length === 1);
+  const isMasterWithRemoteUser = computed(() => remoteUserList.value.length > 0);
+  const isMasterWithoutRemoteUser = computed(() => roomStore.isMaster && remoteUserList.value.length === 0);
   const showEndButtonContent = computed(() => (roomStore.isMaster ? t('EndPC') : t('Leave')));
   const showEndDialogContent = computed(() => (
-    roomStore.isMaster ? (isMasterWithoutRemoteAnchors.value
+    roomStore.isMaster ? (isMasterWithoutRemoteUser.value
       ? t('You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed.')
       : t('You are currently the host of the room, please choose the corresponding operation. If you choose "End Room", the current room will be disbanded and all members will be removed. If you choose "Leave Room", the current room will not be disbanded, and your hosting privileges will be transferred to other members.')
     )
@@ -104,20 +104,20 @@ export default function useEndControl() {
             roomStore.setCanControlSelfVideo(false);
           }
           if (oldUserRole === TUIRole.kAdministrator) {
-            TUIMessage({ type: 'warning', message: t('The RoomOwner has withdrawn your administrator privileges') });
+            TUIMessage({ type: 'warning', message: t('Your administrator status has been revoked') });
           }
         }
         break;
       case TUIRole.kAdministrator:
         if (isLocal) {
-          TUIMessage({ type: 'success', message: t('You are now an administrator') });
+          TUIMessage({ type: 'success', message: t('You have become a administrator') });
           roomStore.setCanControlSelfAudio(true);
           roomStore.setCanControlSelfVideo(true);
         }
         break;
       case TUIRole.kRoomOwner: {
         roomStore.setMasterUserId(userId);
-        const transferUserName = isLocal ? t('me') : roomStore.getUserName(userId) || userId;
+        const transferUserName = isLocal ? t('me') : roomStore.getUserName(userId);
         TUIMessage({ type: 'success', message: `${t('Moderator changed to sb', { name: transferUserName })}` });
         if (isLocal && roomStore.isSpeakAfterTakingSeatMode && !roomStore.isAnchor) {
           await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
@@ -141,7 +141,6 @@ export default function useEndControl() {
     roomStore,
     roomEngine,
     localUser,
-    remoteAnchorList,
     stopMeeting,
     cancel,
     selectedUser,
@@ -162,7 +161,8 @@ export default function useEndControl() {
     showTransfer,
     sidebarName,
     showSideBar,
-    isMasterWithOneRemoteAnchor,
-    isMasterWithRemoteAnchors,
+    isMasterWithOneRemoteUser,
+    isMasterWithRemoteUser,
+    remoteUserList,
   };
 }
