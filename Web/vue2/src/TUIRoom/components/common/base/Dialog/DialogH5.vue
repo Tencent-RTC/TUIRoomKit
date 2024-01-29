@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onBeforeUnmount } from 'vue';
 import useZIndex from '../../../../hooks/useZIndex';
 import '../../../../directives/vTap';
 
@@ -63,7 +63,9 @@ watch(
 watch(visible, (val) => {
   if (val) {
     overlayContainerStyle.value = { zIndex: nextZIndex() };
-    if (props.appendToRoomContainer) {
+    if (props.appendToBody) {
+      document.body.appendChild(dialogRef.value);
+    } else if (props.appendToRoomContainer) {
       document.getElementById('roomContainer')?.appendChild(dialogRef.value);
     }
   }
@@ -93,6 +95,12 @@ function handleOverlayClick(event: any) {
   }
   handleClose();
 }
+
+onBeforeUnmount(() => {
+  if (props.appendToBody || props.appendToRoomContainer) {
+    dialogRef.value.parentNode.removeChild(dialogRef.value);
+  }
+});
 </script>
 
 <style lang="scss" scoped>
