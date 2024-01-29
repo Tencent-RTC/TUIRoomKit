@@ -5,8 +5,6 @@ import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
 import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-js';
 import { Ref, computed, nextTick, ref } from 'vue';
-import TUIMessage from '../common/base/Message/index';
-import { MESSAGE_DURATION } from '../../constants/message';
 
 export default function useIndex() {
   const roomEngine = useGetRoomEngine();
@@ -101,12 +99,6 @@ export default function useIndex() {
       isDisable: stateForAllAudio,
       device: TUIMediaDevice.kMicrophone,
     });
-    const tipMessage = stateForAllAudio ? t('Mute has been turned on') : t('All mutes have been lifted');
-    TUIMessage({
-      type: 'success',
-      message: tipMessage,
-      duration: MESSAGE_DURATION.NORMAL,
-    });
     roomStore.setMicrophoneDisableState(stateForAllAudio);
   }
 
@@ -114,12 +106,6 @@ export default function useIndex() {
     await roomEngine.instance?.disableDeviceForAllUserByAdmin({
       isDisable: stateForAllVideo,
       device: TUIMediaDevice.kCamera,
-    });
-    const tipMessage = stateForAllVideo ? t('The banning of all paintings has been turned on') : t('The ban on painting has been lifted');
-    TUIMessage({
-      type: 'success',
-      message: tipMessage,
-      duration: MESSAGE_DURATION.NORMAL,
     });
     roomStore.setCameraDisableState(stateForAllVideo);
   }

@@ -30,18 +30,20 @@
       </div>
     </div>
     <Dialog
-      v-model="showKickOffDialog"
-      :title="t('Note')"
+      v-model="isDialogVisible"
+      :title="dialogData.title"
       :modal="true"
       width="480px"
-      :before-close="handleCancelKickOffDialog"
+      :before-close="handleCancelDialog"
       :close-on-click-modal="true"
       :append-to-room-container="true"
     >
-      <span>{{ kickOffDialogContent }}</span>
+      <span>{{ dialogData.content }}</span>
       <template #footer>
-        <tui-button size="default" @click="kickOffUser(props.userInfo)"> {{ t('Confirm') }} </tui-button>
-        <tui-button class="cancel" size="default" type="primary" @click="handleCancelKickOffDialog"> {{ t('Cancel') }}</tui-button>
+        <tui-button size="default" @click="handleAction(props.userInfo)"> {{ dialogData.confirmText }} </tui-button>
+        <tui-button class="cancel" size="default" type="primary" @click="handleCancelDialog">
+          {{ t('Cancel') }}
+        </tui-button>
       </template>
     </Dialog>
   </div>
@@ -67,11 +69,11 @@ const props = defineProps<Props>();
 const { t } = useI18n();
 const {
   controlList,
-  showKickOffDialog,
-  kickOffDialogContent,
   isGeneralUser,
-  kickOffUser,
-  handleCancelKickOffDialog,
+  handleCancelDialog,
+  handleAction,
+  isDialogVisible,
+  dialogData,
 } = useMemberControlHooks(props);
 
 const singleControl = computed(() => controlList.value[0]);
