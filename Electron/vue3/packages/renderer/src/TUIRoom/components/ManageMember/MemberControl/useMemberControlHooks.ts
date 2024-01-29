@@ -1,4 +1,4 @@
-import { computed, Ref, ref, onBeforeUnmount } from 'vue';
+import { computed, Ref, ref } from 'vue';
 import { useI18n } from '../../../locales';
 import { UserInfo, useRoomStore } from '../../../stores/room';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
@@ -9,6 +9,8 @@ import AudioOpenIcon from '../../common/icons/AudioOpenIcon.vue';
 import VideoOpenIcon from '../../common/icons/VideoOpenIcon.vue';
 import ChatForbiddenIcon from '../../common/icons/ChatForbiddenIcon.vue';
 import KickOutIcon from '../../common/icons/KickOutIcon.vue';
+import InviteOnStageIcon from '../../common/icons/InviteOnStageIcon.vue';
+import DenyOnStageIcon from '../../common/icons/DenyOnStageIcon.vue';
 import OnStageIcon from '../../common/icons/OnStageIcon.vue';
 import OffStageIcon from '../../common/icons/OffStageIcon.vue';
 import TransferOwnerIcon from '../../common/icons/TransferOwnerIcon.vue';
@@ -22,14 +24,22 @@ interface ObjectType {
   [key: string]: any;
 }
 
+type ActionType = 'transferOwner' | 'kickUser' | '';
 export default function useMemberControl(props?: any) {
   const roomEngine = useGetRoomEngine();
   const { t } = useI18n();
 
   const basicStore = useBasicStore();
   const roomStore = useRoomStore();
-  const showKickOffDialog: Ref<boolean> = ref(false);
-  const kickOffDialogContent = computed(() => t('whether to kick sb off the room', { name: props.userInfo.userName }));
+  const isDialogVisible: Ref<boolean> = ref(false);
+  const dialogData: Ref<{ title: string; content: string; confirmText: string; actionType: ActionType }> = ref({
+    title: '',
+    content: '',
+    confirmText: '',
+    actionType: '' as ActionType,
+  });
+  const kickOffDialogContent = computed(() => t('whether to kick sb off the room', { name: props.userInfo.userName || props.userInfo.userId }));
+  const transferOwnerTitle = computed(() => t('Transfer the roomOwner to sb', { name: props.userInfo.userName || props.userInfo.userId }));
   const { isFreeSpeakMode, isSpeakAfterTakingSeatMode, localUser, isGeneralUser } = storeToRefs(roomStore);
   /**
    * Functions related to the Raise Your Hand function
@@ -78,10 +88,10 @@ export default function useMemberControl(props?: any) {
       },
     };
     if (isFreeSpeakMode.value) {
-      return controlListObj['freeSpeak'][localUser.value.userRole as keyof ObjectType] || [];
+      return controlListObj.freeSpeak[localUser.value.userRole as keyof ObjectType] || [];
     }
     if (isSpeakAfterTakingSeatMode.value) {
-      return controlListObj['speakAfterTakeSeat'][localUser.value.userRole as keyof ObjectType] || [];
+      return controlListObj.speakAfterTakeSeat[localUser.value.userRole as keyof ObjectType] || [];
     }
     return [];
   });
@@ -110,7 +120,7 @@ export default function useMemberControl(props?: any) {
     key: 'transferOwner',
     icon: TransferOwnerIcon,
     title: t('Transfer owner'),
-    func: handleTransferOwner,
+    func: () => handleOpenDialog('transferOwner'),
   }));
 
   const setOrRevokeAdmin = computed(() => ({
@@ -124,12 +134,12 @@ export default function useMemberControl(props?: any) {
     key: 'kickUser',
     icon: KickOutIcon,
     title: t('Kick out'),
-    func: handleShowKickOffDialog,
+    func: () => handleOpenDialog('kickUser'),
   }));
 
   const inviteOnStage = computed(() => ({
     key: 'inviteOnStage',
-    icon: AudioOpenIcon,
+    icon: props.userInfo.isInvitingUserToAnchor ? DenyOnStageIcon : InviteOnStageIcon,
     title: props.userInfo.isInvitingUserToAnchor ?  t('Cancel stage') : t('Invite stage'),
     func: toggleInviteUserOnStage,
   }));
@@ -141,7 +151,7 @@ export default function useMemberControl(props?: any) {
     func: agreeUserOnStage,
   }));
 
-  const denyOnStage = computed(() => ({ key: 'denyOnStage', icon: OffStageIcon, title: t('Refuse stage'), func: denyUserOnStage }));
+  const denyOnStage = computed(() => ({ key: 'denyOnStage', icon: DenyOnStageIcon, title: t('Refuse stage'), func: denyUserOnStage }));
   const makeOffStage = computed(() => ({ key: 'makeOffStage', icon: OffStageIcon, title: t('Step down'), func: kickUserOffStage }));
   /**
    * Invitation to the stage/uninvitation to the stage
@@ -254,17 +264,10 @@ export default function useMemberControl(props?: any) {
    *
    * 将用户踢出房间
   **/
-  function handleShowKickOffDialog() {
-    showKickOffDialog.value = true;
-  }
-  function handleCancelKickOffDialog() {
-    showKickOffDialog.value = false;
-  }
   async function kickOffUser(userInfo: UserInfo) {
     await roomEngine.instance?.kickRemoteUserOutOfRoom({
       userId: userInfo.userId,
     });
-    showKickOffDialog.value = false;
   }
 
   /**
@@ -299,12 +302,12 @@ export default function useMemberControl(props?: any) {
       userRole: newRole,
     });
     const updatedUserName = roomStore.getUserName(userInfo.userId);
-    const action = newRole === TUIRole.kAdministrator ? 'Set' : 'Revoked';
-    const tipMessage = `${t(`${action} the administrator role of sb`, { name: updatedUserName })}`;
+    const tipMessage = newRole === TUIRole.kAdministrator
+      ? `${t('sb has been set as administrator', { name: updatedUserName })}`
+      : `${t('The administrator status of sb has been withdrawn', { name: updatedUserName })}`;
     TUIMessage({ type: 'success', message: tipMessage });
     roomStore.setRemoteUserRole(userInfo.userId, newRole);
   }
-
   function getRequestIdList(requestType: TUIRequestAction) {
     const items = roomStore.requestObj[requestType] || [];
     return items.map(item => item.requestId);
@@ -315,21 +318,54 @@ export default function useMemberControl(props?: any) {
     return items.length > 0 ? items[0].userId : null;
   }
 
-  // 当用户被踢出房间的时候会先销毁组件
-  onBeforeUnmount(() => {
-    showKickOffDialog.value = false;
-  });
+  function handleOpenDialog(action: string) {
+    isDialogVisible.value = true;
+    switch (action) {
+      case 'kickUser':
+        dialogData.value = {
+          title: t('Note'),
+          content: kickOffDialogContent.value,
+          confirmText: t('Confirm'),
+          actionType: action,
+        };
+        break;
+      case 'transferOwner':
+        dialogData.value = {
+          title: transferOwnerTitle.value,
+          content: t('After transfer the room owner, you will become a general user'),
+          confirmText: t('Confirm transfer'),
+          actionType: action,
+        };
+        break;
+    }
+  }
+
+  function handleAction(userInfo: UserInfo) {
+    switch (dialogData.value.actionType) {
+      case 'kickUser':
+        kickOffUser(userInfo);
+        break;
+      case 'transferOwner':
+        handleTransferOwner(userInfo);
+        break;
+    } isDialogVisible.value = false;
+  }
+
+  function handleCancelDialog() {
+    isDialogVisible.value = false;
+  }
 
   return {
     props,
     isMe,
     isGeneralUser,
     controlList,
-    showKickOffDialog,
     kickOffDialogContent,
-    kickOffUser,
-    handleCancelKickOffDialog,
+    handleCancelDialog,
+    handleAction,
     getRequestIdList,
     getRequestFirstUserId,
+    isDialogVisible,
+    dialogData,
   };
 };

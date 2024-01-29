@@ -18,14 +18,9 @@
       <div v-if="currentDialogType === DialogType.TransferDialog">
         <div>{{ t('New host') }}</div>
         <div>
-          <tui-select
-            v-model="selectedUser"
-            :teleported="false"
-            :popper-append-to-body="false"
-            theme="white"
-          >
+          <tui-select v-model="selectedUser" :teleported="false" :popper-append-to-body="false" theme="white">
             <tui-option
-              v-for="user in remoteAnchorList"
+              v-for="user in remoteUserList"
               :key="user.userId"
               :value="user.userId"
               :label="user.userName"
@@ -76,7 +71,6 @@ const {
   roomStore,
   basicStore,
   roomEngine,
-  remoteAnchorList,
   stopMeeting,
   cancel,
   selectedUser,
@@ -89,10 +83,10 @@ const {
   visible,
   closeMediaBeforeLeave,
   resetState,
-  isMasterWithOneRemoteAnchor,
-  isMasterWithRemoteAnchors,
+  isMasterWithOneRemoteUser,
+  isMasterWithRemoteUser,
+  remoteUserList,
 } = useEndControl();
-
 
 const emit = defineEmits(['on-exit-room', 'on-destroy-room']);
 
@@ -104,9 +98,9 @@ function handleEndLeaveClick() {
     leaveRoom();
     return;
   }
-  if (isMasterWithRemoteAnchors.value) {
-    selectedUser.value = remoteAnchorList.value[0].userId;
-    if (isMasterWithOneRemoteAnchor.value) {
+  if (isMasterWithRemoteUser.value) {
+    selectedUser.value = remoteUserList.value[0].userId;
+    if (isMasterWithOneRemoteUser.value) {
       transferAndLeave();
       return;
     }
@@ -118,7 +112,7 @@ function handleEndLeaveClick() {
  * Active room dismissal
  *
  * 主动解散房间
-**/
+ **/
 async function dismissRoom() {
   try {
     logger.log(`${logPrefix}dismissRoom: enter`);
@@ -135,8 +129,9 @@ async function dismissRoom() {
  * Leave the room voluntarily
  *
  * 主动离开房间
-**/
-async function leaveRoom() { // eslint-disable-line
+ **/
+async function leaveRoom() {
+  // eslint-disable-line
   try {
     closeMediaBeforeLeave();
     const response = await roomEngine.instance?.exitRoom();
@@ -172,8 +167,8 @@ async function transferAndLeave() {
  * notification of room dismissal from the host
  *
  * 收到主持人解散房间通知
-**/
-const onRoomDismissed = async (eventInfo: { roomId: string}) => {
+ **/
+const onRoomDismissed = async (eventInfo: { roomId: string }) => {
   try {
     const { roomId } = eventInfo;
     logger.log(`${logPrefix}onRoomDismissed:`, roomId);
@@ -199,10 +194,9 @@ TUIRoomEngine.once('ready', () => {
 onUnmounted(() => {
   roomEngine.instance?.off(TUIRoomEvents.onRoomDismissed, onRoomDismissed);
 });
-
 </script>
 <style lang="scss" scoped>
-.end-control-container{
+.end-control-container {
   .end-button {
     padding: 9px 20px;
     font-size: 14px;
@@ -216,7 +210,7 @@ onUnmounted(() => {
     }
   }
 }
-  .button {
-    margin-left: 20px;
-  }
+.button {
+  margin-left: 20px;
+}
 </style>

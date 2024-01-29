@@ -96,9 +96,9 @@ export default {
   'Set as administrator': '设为管理员',
   'Revoke administrator': '撤销管理员',
   // @ts-ignore
-  'Revoked the administrator role of sb': ({ named }) => `已撤销 ${named('name')} 的管理员角色`,
+  'The administrator status of sb has been withdrawn': ({ named }) => `已将 ${named('name')} 的管理员身份撤回`,
   // @ts-ignore
-  'Set the administrator role of sb': ({ named }) => `已设置 ${named('name')} 的管理员角色`,
+  'sb has been set as administrator': ({ named }) => `已将 ${named('name')} 设为管理员`,
   'You have been invited by the administrator to step down, please raise your hand if you need to speak': '您已被管理员邀请下台，需要发言请先举手',
   Invite: '邀请',
   Settings: '设置',
@@ -171,8 +171,10 @@ export default {
   'Hand down': '手放下',
   'Step down(Master)': '邀请下台',
   'Step down': '下台',
-  'The host has approved your application': '主持人同意了你的上台申请',
-  'The host has rejected your application for the stage': '主持人拒绝了你的上台申请',
+  // @ts-ignore
+  'sb has approved your application': ({ named }) => `${named('role')}同意了你的上台申请`,
+  // @ts-ignore
+  'sb has rejected your application for the stage': ({ named }) => `${named('role')}拒绝了你的上台申请`,
   'You have been invited by the host to step down, please raise your hand if you need to speak': '您已被主持人邀请下台，需要发言请先举手',
   'Select a screen/window': '选择屏幕/窗口',
   Screen: '屏幕',
@@ -220,13 +222,13 @@ export default {
   'Copied successfully': '复制成功',
   'accepted the invitation to the stage': '接受了上台邀请',
   'declined the invitation to the stage': '拒绝了上台邀请',
-  'Mute has been turned on': '已开启全体静音',
-  'All mutes have been lifted': '已解除全体静音',
+  'All audios disabled': '已开启全体静音',
+  'All audios enabled': '已解除全体静音',
   'Your microphone has been turned off': '已关闭您的麦克风',
   // @ts-ignore
   'Sb invites you to turn on the microphone': ({ named }) => `${named('role')}邀请你打开麦克风`,
-  'The banning of all paintings has been turned on': '已开启全体禁画',
-  'The ban on painting has been lifted': '已解除全体禁画',
+  'All videos disabled': '已开启全体禁画',
+  'All videos enabled': '已解除全体禁画',
   'Disabling text chat for all is enabled': '已开启全体禁止文字聊天',
   'Unblocked all text chat': '已解除全体禁止文字聊天',
   'Your camera has been turned off': '已关闭您的摄像头',
@@ -276,6 +278,10 @@ export default {
   'Members will not be able to open the microphone': '成员将无法开启麦克风',
   'After unlocking, users can freely turn on the camera': '解除后用户可以自由开启视频',
   'Members will not be able to open the camera': '成员将无法开启视频画面',
-  'You are now an administrator': '您已成为管理员',
-  'The RoomOwner has withdrawn your administrator privileges': '房主已收回您的管理员权限',
+  'You have become a administrator': '您已成为管理员',
+  'Your administrator status has been revoked': '您的管理员身份被收回',
+  'After transfer the room owner, you will become a general user': '转交房主后将成为普通成员',
+  // @ts-ignore
+  'Transfer the roomOwner to sb': ({ named }) => `将房主转移给${named('name')}`,
+  'Confirm transfer': '确认转交',
 };

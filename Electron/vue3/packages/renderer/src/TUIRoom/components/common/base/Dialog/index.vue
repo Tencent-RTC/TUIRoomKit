@@ -24,40 +24,41 @@
   * 在 template 中使用 <Dialog title="there is title" v-model="showDialog"></Dialog>
 -->
 <template>
-  <teleport to="body" :disabled="teleportDisable">
-    <div
-      v-show="visible"
-      ref="dialogRef"
-      class="overlay-container"
-      :class="[modal && 'overlay']"
-      :style="overlayContainerStyle"
-      @click="handleOverlayClick"
-    >
-      <div class="tui-dialog-container" :style="drawerContainerStyle">
-        <div class="tui-dialog-header">
-          <div class="tui-dialog-header-title">
-            {{ title }}
+  <div v-if="visible">
+    <teleport :to="targetName" :disabled="teleportDisable">
+      <div
+        ref="dialogRef"
+        class="overlay-container"
+        :class="[modal && 'overlay']"
+        :style="overlayContainerStyle"
+        @click="handleOverlayClick"
+      >
+        <div class="tui-dialog-container" :style="drawerContainerStyle">
+          <div class="tui-dialog-header">
+            <div class="tui-dialog-header-title">
+              {{ title }}
+            </div>
+            <template v-if="$slots.title">
+              <slot name="title"></slot>
+            </template>
+            <div v-if="showClose" class="close">
+              <svg-icon :size="16" @click="handleClose">
+                <close-icon></close-icon>
+              </svg-icon>
+            </div>
           </div>
-          <template v-if="$slots.title">
-            <slot name="title"></slot>
+          <div class="tui-dialog-content">
+            <slot></slot>
+          </div>
+          <template v-if="$slots.footer">
+            <div class="tui-dialog-footer">
+              <slot name="footer"></slot>
+            </div>
           </template>
-          <div v-if="showClose" class="close">
-            <svg-icon :size="16" @click="handleClose">
-              <close-icon></close-icon>
-            </svg-icon>
-          </div>
         </div>
-        <div class="tui-dialog-content">
-          <slot></slot>
-        </div>
-        <template v-if="$slots.footer">
-          <div class="tui-dialog-footer">
-            <slot name="footer"></slot>
-          </div>
-        </template>
       </div>
-    </div>
-  </teleport>
+    </teleport>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -98,7 +99,14 @@ const emit = defineEmits(['update:modelValue', 'close']);
 
 const { nextZIndex } = useZIndex();
 
-const teleportDisable = computed(() => !props.appendToBody);
+const teleportDisable = computed(() => !props.appendToBody && !props.appendToRoomContainer);
+
+const targetName = computed(() => {
+  if (props.appendToRoomContainer) {
+    return '#roomContainer';
+  }
+  return 'body';
+});
 
 const overlayContainerStyle = ref({});
 
@@ -124,9 +132,6 @@ watch(
 watch(visible, (val) => {
   if (val) {
     overlayContainerStyle.value = { zIndex: nextZIndex() };
-    if (props.appendToRoomContainer) {
-      document.getElementById('roomContainer')?.appendChild(dialogRef.value);
-    }
   }
 });
 
