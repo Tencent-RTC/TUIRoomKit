@@ -485,37 +485,38 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
   });
 };
 
-// todo: 处理禁言所有人和禁画所有人
 async function handleAudioStateChange(isDisableAudio: boolean) {
-  const tipMessage = isDisableAudio ? t('Mute has been turned on') : t('All mutes have been lifted');
+  const tipMessage = isDisableAudio ? t('All audios disabled') : t('All audios enabled');
   TUIMessage({
-    type: 'warning',
+    type: 'success',
     message: tipMessage,
     duration: MESSAGE_DURATION.NORMAL,
   });
   /**
-   * If the host lifts the full ban and does not actively turn up the user microphone
+   * If the moderator unmutes the entire staff, users does not actively bring up the user's microphone;
+   * if the moderator turns on the full staff mute, users actively turns off the user's microphone
    *
-   * 如果主持人解除全员禁言，不主动调起用户麦克风
+   * 如果主持人解除全员静音，不主动调起用户麦克风；如果主持人开启全员静音，则主动关闭用户麦克风
   **/
-  if (isDisableAudio) {
+  if (isDisableAudio && localUser.value.userRole === TUIRole.kGeneralUser) {
     await roomEngine.instance?.muteLocalAudio();
   }
 }
 
 async function handleVideoStateChange(isDisableVideo: boolean) {
-  const tipMessage = isDisableVideo ? t('The banning of all paintings has been turned on') : t('The ban on painting has been lifted');
+  const tipMessage = isDisableVideo ? t('All videos disabled') : t('All videos enabled');
   TUIMessage({
-    type: 'warning',
+    type: 'success',
     message: tipMessage,
     duration: MESSAGE_DURATION.NORMAL,
   });
   /**
-   * If the host lifts the full ban on drawing and does not actively turn up the user camera
+   * If the host lifts the full ban on video, users does not actively turn up the user camera,
+   * If the host open and does not actively turn up the user camera
    *
-   * 如果主持人解除全员禁画，不主动调起用户摄像头
+   * 如果主持人解除全员禁画，不主动调起用户摄像头；如果主持人开启全员禁画，则主动关闭用户摄像头
   **/
-  if (isDisableVideo) {
+  if (isDisableVideo && localUser.value.userRole === TUIRole.kGeneralUser) {
     await roomEngine.instance?.closeLocalCamera();
   }
 }
@@ -523,7 +524,7 @@ async function handleVideoStateChange(isDisableVideo: boolean) {
 async function handleMessageStateChange(isDisableMessage: boolean) {
   const tipMessage = isDisableMessage ? t('Disabling text chat for all is enabled') : t('Unblocked all text chat');
   TUIMessage({
-    type: 'warning',
+    type: 'success',
     message: tipMessage,
     duration: MESSAGE_DURATION.NORMAL,
   });
@@ -532,18 +533,18 @@ async function handleMessageStateChange(isDisableMessage: boolean) {
 const onAllUserCameraDisableChanged =  async (eventInfo: { roomId: string, isDisable: boolean }) => {
   const { isDisable } = eventInfo;
   if (isDisable !== roomStore.isCameraDisableForAllUser && localUser.value.userRole === TUIRole.kGeneralUser) {
-    handleVideoStateChange(isDisable);
     roomStore.setCanControlSelfVideo(!isDisable);
   }
+  handleVideoStateChange(isDisable);
   roomStore.setDisableCameraForAllUserByAdmin(isDisable);
 };
 
 const onAllUserMicrophoneDisableChanged = async (eventInfo: { roomId: string, isDisable: boolean }) => {
   const { isDisable } = eventInfo;
   if (isDisable !== roomStore.isMicrophoneDisableForAllUser && localUser.value.userRole === TUIRole.kGeneralUser) {
-    handleAudioStateChange(isDisable);
     roomStore.setCanControlSelfAudio(!isDisable);
   }
+  handleAudioStateChange(isDisable);
   roomStore.setDisableMicrophoneForAllUserByAdmin(isDisable);
 };
 

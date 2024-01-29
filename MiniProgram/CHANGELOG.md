@@ -1,3 +1,18 @@
+## 2023.01.29@2.0.2
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-wx](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-wx) 到 v2.0.2 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+- 转交房主新增 Dialog 确认框。
+
+**Bug Fixed**
+
+- 修复移动端小程序 IOS 设备中部分 icon 展示模糊的问题。
+- 修复将远端用户踢出房间后 Dialog 未消失的问题。
+- 修复房主 && 管理员端在上台发言模式下远端用户未上台不展示离开房间选项的问题。
+- 修复举手申请处理端 Toast 展示无法区分角色的问题。
+- 修复全体静音/取消全体静音 && 全体禁画/取消全体禁画 Toast 无法通知到所有成员的问题。
+
 ## 2023.01.19@2.0.1
 
 **Feature**
