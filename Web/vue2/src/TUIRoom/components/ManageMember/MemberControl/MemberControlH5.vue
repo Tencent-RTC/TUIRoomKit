@@ -16,17 +16,17 @@
       <div class="control-title">{{ item.title }}</div>
     </div>
     <Dialog
-      v-model="showKickOffDialog"
-      :title="t('Note')"
+      v-model="isDialogVisible"
+      :title="dialogData.title"
       width="480px"
       :modal="true"
       :append-to-room-container="true"
-      :confirm-button="t('Confirm')"
+      :confirm-button="dialogData.confirmText"
       :cancel-button="t('Cancel')"
-      @confirm="kickOffUser(props.userInfo)"
-      @cancel="handleCancelKickOffDialog"
+      @confirm="handleAction(props.userInfo)"
+      @cancel="handleCancelDialog"
     >
-      <span>{{ kickOffDialogContent }}</span>
+      <span>{{ dialogData.content }}</span>
     </Dialog>
   </div>
 </template>
@@ -52,10 +52,10 @@ const { t } = useI18n();
 const {
   isGeneralUser,
   controlList,
-  showKickOffDialog,
-  kickOffDialogContent,
-  kickOffUser,
-  handleCancelKickOffDialog,
+  handleCancelDialog,
+  handleAction,
+  isDialogVisible,
+  dialogData,
 } = useMemberControlHooks(props);
 
 const emit = defineEmits(['on-close-control']);

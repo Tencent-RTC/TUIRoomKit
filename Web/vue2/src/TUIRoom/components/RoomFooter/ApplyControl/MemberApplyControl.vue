@@ -122,15 +122,16 @@ async function sendSeatApplication() {
   const request = await roomEngine.instance?.takeSeat({
     seatIndex: -1,
     timeout: 0,
-    requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType }) => {
+    requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType, userId: string }) => {
       isApplyingOnSeat.value = false;
-      const { requestCallbackType } = callbackInfo;
+      const { requestCallbackType, userId } = callbackInfo;
+      const userRole = roomStore.getUserRole(userId) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
       switch (requestCallbackType) {
         case TUIRequestCallbackType.kRequestAccepted:
-          TUIMessage({ type: 'success', message: t('The host has approved your application') });
+          TUIMessage({ type: 'success', message: t('sb has approved your application', { role: userRole || userId }) });
           break;
         case TUIRequestCallbackType.kRequestRejected:
-          TUIMessage({ type: 'warning', message: t('The host has rejected your application for the stage') });
+          TUIMessage({ type: 'warning', message: t('sb has rejected your application for the stage', { role: userRole || userId }) });
           break;
         case TUIRequestCallbackType.kRequestTimeout:
           break;
