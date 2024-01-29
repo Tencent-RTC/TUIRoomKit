@@ -36,7 +36,7 @@ export default function useMemberControl(props?: any) {
     title: '',
     content: '',
     confirmText: '',
-    actionType: '',
+    actionType: '' as ActionType,
   });
   const kickOffDialogContent = computed(() => t('whether to kick sb off the room', { name: props.userInfo.userName || props.userInfo.userId }));
   const transferOwnerTitle = computed(() => t('Transfer the roomOwner to sb', { name: props.userInfo.userName || props.userInfo.userId }));
