@@ -217,6 +217,7 @@ extension TUIVideoSeatViewModel {
 
 extension TUIVideoSeatViewModel {
     private func addUserInfo(_ userId: String) {
+        guard !videoSeatItems.contains(where: { $0.userId == userId }) else { return }
         guard let userInfo = store.attendeeList.first(where: { $0.userId == userId }) else { return }
         let seatItem = VideoSeatItem(userInfo: userInfo)
         videoSeatItems.append(seatItem)
@@ -234,16 +235,15 @@ extension TUIVideoSeatViewModel {
             stopPlayVideo(item: seatItem)
         }
         videoSeatItems.removeAll(where: { $0.userId == userId })
-        guard let index = listSeatItem.firstIndex(where: { $0.userId == userId && $0.type != .share }),
-              let item = listSeatItem.first(where: { $0.userId == userId && $0.type != .share }) else { return }
-        listSeatItem.remove(at: index)
+        let index = listSeatItem.firstIndex(where: { $0.userId == userId && $0.type != .share })
+        let item = listSeatItem.first(where: { $0.userId == userId && $0.type != .share })
         let type = videoSeatViewType
         refreshListSeatItem()
         resetMiniscreen()
-        if type != videoSeatViewType || ((viewResponder?.getVideoVisibleCell(item)) != nil) {
-            viewResponder?.reloadData()
-        } else {
+        if type == videoSeatViewType, let index = index, let item = item, viewResponder?.getVideoVisibleCell(item) == nil {
             viewResponder?.deleteItems(at: [IndexPath(item: index, section: 0)])
+        } else {
+            viewResponder?.reloadData()
         }
     }
     
