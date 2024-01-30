@@ -53,6 +53,14 @@ class UserListController extends GetxController {
           : RoomContentsTranslations.translate('allMute'),
       onConfirm: () async {
         Get.back();
+        if (RoomStore.to.roomInfo.isMicrophoneDisableForAllUser ==
+            !isAllMute.value) {
+          makeToast(
+              msg: isAllMute.value
+                  ? RoomContentsTranslations.translate('allMutePrompt')
+                  : RoomContentsTranslations.translate('allUnMutePrompt'));
+          return;
+        }
         isAllMute.value = !isAllMuteTemp;
         var result = await _engineManager.muteAllAudioAction(!isAllMuteTemp);
         if (result.code == TUIError.success) {
@@ -85,6 +93,14 @@ class UserListController extends GetxController {
           : RoomContentsTranslations.translate('disableAllVideo'),
       onConfirm: () async {
         Get.back();
+        if (RoomStore.to.roomInfo.isCameraDisableForAllUser ==
+            !isAllCameraDisable.value) {
+          makeToast(
+              msg: isAllCameraDisable.value
+                  ? RoomContentsTranslations.translate('disableAllVideoPrompt')
+                  : RoomContentsTranslations.translate('enableAllVideoPrompt'));
+          return;
+        }
         isAllCameraDisable.value = !isAllCameraDisableTemp;
         var result =
             await _engineManager.muteAllVideoAction(!isAllCameraDisableTemp);
@@ -146,23 +162,27 @@ class UserListController extends GetxController {
         makeToast(msg: RoomContentsTranslations.translate('muteErrorToast'));
       }
     } else {
-      TUIRequestCallback callback = TUIRequestCallback(onAccepted:
-          (String requestId, String userId) {
-        makeToast(
-            msg: userModel.userName +
-                RoomContentsTranslations.translate('muteSuccessToast'));
-      }, onRejected: (String requestId, String userId, String message) {
-        makeToast(
-            msg: userModel.userName +
-                RoomContentsTranslations.translate('muteRejectToast'));
-      }, onCancelled: (String requestId, String userId) {
-        makeToast(msg: RoomContentsTranslations.translate('muteErrorToast'));
-      }, onTimeout: (String requestId, String userId) {
-        makeToast(msg: RoomContentsTranslations.translate('muteErrorToast'));
-      }, onError:
-          (String requestId, String userId, TUIError error, String message) {
-        makeToast(msg: RoomContentsTranslations.translate('muteErrorToast'));
-      });
+      TUIRequestCallback callback = TUIRequestCallback(
+          onAccepted: (String requestId, String userId) {
+            makeToast(
+                msg: userModel.userName +
+                    RoomContentsTranslations.translate('muteSuccessToast'));
+          },
+          onRejected: (String requestId, String userId, String message) {
+            makeToast(
+                msg: userModel.userName +
+                    RoomContentsTranslations.translate('muteRejectToast'));
+          },
+          onCancelled: (String requestId, String userId) {
+            makeToast(
+                msg: RoomContentsTranslations.translate('muteErrorToast'));
+          },
+          onTimeout: (String requestId, String userId) {
+            makeToast(
+                msg: RoomContentsTranslations.translate('muteErrorToast'));
+          },
+          onError: (String requestId, String userId, TUIError error,
+              String message) {});
       _engineManager.openRemoteDeviceByAdmin(
           userModel.userId.value, TUIMediaDevice.microphone, callback);
     }
@@ -201,26 +221,31 @@ class UserListController extends GetxController {
             msg: RoomContentsTranslations.translate('disableVideoErrorToast'));
       }
     } else {
-      TUIRequestCallback callback = TUIRequestCallback(onAccepted:
-          (String requestId, String userId) {
-        makeToast(
-            msg: userModel.userName +
-                RoomContentsTranslations.translate('disableVideoSuccessToast'));
-      }, onRejected: (String requestId, String userId, String message) {
-        makeToast(
-            msg: userModel.userName +
-                RoomContentsTranslations.translate('disableVideoRejectToast'));
-      }, onCancelled: (String requestId, String userId) {
-        makeToast(
-            msg: RoomContentsTranslations.translate('disableVideoErrorToast'));
-      }, onTimeout: (String requestId, String userId) {
-        makeToast(
-            msg: RoomContentsTranslations.translate('disableVideoErrorToast'));
-      }, onError:
-          (String requestId, String userId, TUIError error, String message) {
-        makeToast(
-            msg: RoomContentsTranslations.translate('disableVideoErrorToast'));
-      });
+      TUIRequestCallback callback = TUIRequestCallback(
+          onAccepted: (String requestId, String userId) {
+            makeToast(
+                msg: userModel.userName +
+                    RoomContentsTranslations.translate(
+                        'disableVideoSuccessToast'));
+          },
+          onRejected: (String requestId, String userId, String message) {
+            makeToast(
+                msg: userModel.userName +
+                    RoomContentsTranslations.translate(
+                        'disableVideoRejectToast'));
+          },
+          onCancelled: (String requestId, String userId) {
+            makeToast(
+                msg: RoomContentsTranslations.translate(
+                    'disableVideoErrorToast'));
+          },
+          onTimeout: (String requestId, String userId) {
+            makeToast(
+                msg: RoomContentsTranslations.translate(
+                    'disableVideoErrorToast'));
+          },
+          onError: (String requestId, String userId, TUIError error,
+              String message) {});
       _engineManager.openRemoteDeviceByAdmin(
           userModel.userId.value, TUIMediaDevice.camera, callback);
     }
@@ -228,9 +253,9 @@ class UserListController extends GetxController {
 
   void transferHostAction(UserModel userModel) async {
     showConferenceDialog(
-      title: RoomContentsTranslations.translate('transferHostTitle')
+      title: RoomContentsTranslations.translate('transferOwnerTitle')
           .replaceAll('xx', userModel.userName.value),
-      message: RoomContentsTranslations.translate('transferHostMessage'),
+      message: RoomContentsTranslations.translate('transferOwnerMessage'),
       confirmText: RoomContentsTranslations.translate('sureToTransfer'),
       cancelText: RoomContentsTranslations.translate('cancel'),
       onConfirm: () async {
@@ -239,7 +264,7 @@ class UserListController extends GetxController {
             userModel.userId.value, TUIRole.roomOwner);
         if (result.code == TUIError.success) {
           makeToast(
-              msg: RoomContentsTranslations.translate('haveTransferredHost')
+              msg: RoomContentsTranslations.translate('haveTransferredOwner')
                   .replaceAll('xx', userModel.userName.value));
           RoomStore.to.inviteSeatList.clear();
           RoomStore.to.inviteSeatMap.clear();
@@ -330,7 +355,11 @@ class UserListController extends GetxController {
         },
         onCancelled: (requestId, userId) {},
         onTimeout: (requestId, userId) {},
-        onError: (requestId, userId, error, message) {},
+        onError: (requestId, userId, error, message) {
+          if (error == TUIError.errRequestIdRepeat) {
+            makeToast(msg: RoomContentsTranslations.translate('requestRepeat'));
+          }
+        },
       ),
     );
   }

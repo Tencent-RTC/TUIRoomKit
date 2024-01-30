@@ -14,9 +14,6 @@ class ConferenceMainController extends GetxController {
   late TUIRoomObserver observer;
   var backRouteName = Get.arguments;
 
-  static const _seatIndex = -1;
-  static const _reqTimeout = 0;
-
   Timer? _hideTimer;
   RxBool areWidgetsVisible = true.obs;
   int _hideDuration = 6;
@@ -72,42 +69,28 @@ class ConferenceMainController extends GetxController {
       },
       onUserRoleChanged: (userId, role) {
         if (userId == RoomStore.to.currentUser.userId.value) {
-          if (role == TUIRole.roomOwner) {
-            makeToast(
-                msg: RoomContentsTranslations.translate('haveBecomeHost'));
-          }
-          if (role == TUIRole.administrator) {
-            if (RoomStore.to.roomInfo.isSeatEnabled == true &&
-                RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake &&
-                !RoomStore.to.currentUser.isOnSeat.value) {
-              showConferenceDialog(
-                title: RoomContentsTranslations.translate(
-                    'haveBecomeAdministrator'),
-                message: RoomContentsTranslations.translate(
-                    'haveBecomeAdministratorMessage'),
-                confirmText:
-                    RoomContentsTranslations.translate('joinStageImmediately'),
-                cancelText:
-                    RoomContentsTranslations.translate('noYetJoinStage'),
-                onConfirm: () {
-                  RoomEngineManager().takeSeat(_seatIndex, _reqTimeout, null);
-                  Get.back();
-                },
-              );
-            } else {
+          switch (role) {
+            case TUIRole.roomOwner:
+              makeToast(
+                  msg: RoomContentsTranslations.translate('haveBecomeOwner'));
+              break;
+            case TUIRole.administrator:
               makeToast(
                   msg: RoomContentsTranslations.translate(
                       'haveBecomeAdministrator'));
-            }
-          }
-          if (role == TUIRole.generalUser &&
-              RoomStore.to.currentUser.userRole.value ==
+              break;
+            case TUIRole.generalUser:
+              if (RoomStore.to.currentUser.userRole.value ==
                   TUIRole.administrator) {
-            makeToast(
-                msg: RoomContentsTranslations.translate(
-                    'revokedYourAdministrator'));
-            RoomStore.to.inviteSeatList.clear();
-            RoomStore.to.inviteSeatMap.clear();
+                makeToast(
+                    msg: RoomContentsTranslations.translate(
+                        'revokedYourAdministrator'));
+                RoomStore.to.inviteSeatList.clear();
+                RoomStore.to.inviteSeatMap.clear();
+              }
+              break;
+            default:
+              break;
           }
           RoomStore.to.currentUser.userRole.value = role;
           RoomStore.to.updateItemTouchableState();

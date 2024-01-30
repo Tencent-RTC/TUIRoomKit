@@ -51,9 +51,25 @@ class PreparePage extends GetView<PrepareController> {
             backgroundColor: Colors.white,
             iconTheme: const IconThemeData(color: Colors.black),
             actions: [
+              Visibility(
+                visible: GetPlatform.isIOS,
+                child: IconButton(
+                  onPressed: () => controller.showFileBrowser(),
+                  icon: Image.asset(
+                    AssetsImages.debug,
+                    width: 28,
+                    height: 28,
+                  ),
+                ),
+              ),
               IconButton(
                 onPressed: () => controller.switchLanguage(),
-                icon: Image.asset(AssetsImages.switchLanguage),
+                icon: Image.asset(
+                  AssetsImages.switchLanguage,
+                  width: 28,
+                  height: 28,
+                  fit: BoxFit.fill,
+                ),
               ),
               const SizedBox(width: 10.0),
             ],

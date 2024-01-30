@@ -14,25 +14,25 @@ PODS:
     - Flutter
   - rtc_conference_tui_kit (0.0.1):
     - Flutter
-  - rtc_room_engine (2.0.1):
+  - rtc_room_engine (2.0.2):
     - Flutter
-    - TUIRoomEngine/Professional (= 2.0.1)
+    - TUIRoomEngine/Professional (= 2.0.2)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - tencent_trtc_cloud (10.7):
     - Flutter
     - TXCustomBeautyProcesserPlugin (= 1.0.2)
-    - TXLiteAVSDK_Professional (~> 11.4.14445)
+    - TXLiteAVSDK_Professional (~> 11.6.15007)
   - Toast (4.1.0)
-  - TUIRoomEngine/Professional (2.0.1):
+  - TUIRoomEngine/Professional (2.0.2):
     - TXIMSDK_Plus_iOS (>= 7.7.5294)
     - TXLiteAVSDK_Professional
   - TXCustomBeautyProcesserPlugin (1.0.2)
   - TXIMSDK_Plus_iOS (7.7.5294)
-  - TXLiteAVSDK_Professional (11.4.14571):
-    - TXLiteAVSDK_Professional/Professional (= 11.4.14571)
-  - TXLiteAVSDK_Professional/Professional (11.4.14571)
+  - TXLiteAVSDK_Professional (11.6.15041):
+    - TXLiteAVSDK_Professional/Professional (= 11.6.15041)
+  - TXLiteAVSDK_Professional/Professional (11.6.15041)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -84,15 +84,15 @@ SPEC CHECKSUMS:
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   replay_kit_launcher: 828739da18c9785d5e9aafd4f075ea11d6b61499
   rtc_conference_tui_kit: e6a8fb13894a30ecdfb180e3e6997df20e4d202d
-  rtc_room_engine: f3b0f8e211e7b284700f323d0be41ba2fc4c239c
+  rtc_room_engine: 4ec425b48f2291bd6e61fa7dea57ae58c9c9b74c
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
-  tencent_trtc_cloud: 8b55aa23005a77db473cdbc13841a4b13b261946
+  tencent_trtc_cloud: 2dae072f1a50fae1c3d42597a09f5ee05d5d2979
   Toast: ec33c32b8688982cecc6348adeae667c1b9938da
-  TUIRoomEngine: a2c49c71b5b2ab780e8e5239133d5797f72ebaad
+  TUIRoomEngine: 235e13d378fa5a00d963131e7d2e8e5198ad8a95
   TXCustomBeautyProcesserPlugin: 099393b941cb40eda12b3a80bf6c0319957b1cfd
   TXIMSDK_Plus_iOS: 81fcb20ad754ea5164207970772f00ea9f94bc8f
-  TXLiteAVSDK_Professional: d4db8d4ee81a7dc5d653b72b44463322bbe58f24
+  TXLiteAVSDK_Professional: 1a4712d9ad3c80338207efa2327085d3a2488c5f
 
 PODFILE CHECKSUM: f1c82f10837f8fdf27aee12401554c9539720e1f
 
-COCOAPODS: 1.14.2
+COCOAPODS: 1.14.3

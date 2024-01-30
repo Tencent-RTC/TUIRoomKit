@@ -1,3 +1,7 @@
+### 2.0.2(2024-1-26)
+
+- Upgrade the dependencies of rtc_conference_tui_kit
+
 ### 2.0.1(2024-1-19)
 
 - Upgrade the dependencies of rtc_conference_tui_kit
