@@ -1,5 +1,6 @@
 class Constants {
   static const storageUserModelKey = 'user_model';
+  static const storageLanguageKey = 'language';
 
   static const userAvatarURLArray = {
     "https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar1.png",

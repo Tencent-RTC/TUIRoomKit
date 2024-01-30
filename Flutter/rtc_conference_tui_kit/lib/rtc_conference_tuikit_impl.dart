@@ -40,6 +40,12 @@ class TUIRoomKitImpl implements TUIRoomKit {
   Future<void> _decideMediaStatus(
       bool enableMic, bool enableCamera, bool isSoundOnSpeaker) async {
     RoomEngineManager().setAudioRoute(isSoundOnSpeaker);
+    if (RoomStore.to.roomInfo.isSeatEnabled &&
+        RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake &&
+        RoomStore.to.roomInfo.ownerId !=
+            RoomStore.to.currentUser.userId.value) {
+      return;
+    }
     var hasPermission = await Permission.microphone.isGranted;
     var isPushAudio = _isPushAudio(enableMic);
 

@@ -9,9 +9,13 @@ class LoginController extends GetxController {
   final userIdController = TextEditingController();
 
   @override
-  void onReady() {
+  Future<void> onReady() async {
     super.onReady();
+    await Get.putAsync<StorageService>(() => StorageService().init());
     autoLogin();
+    if (TranslationService.isSetLanguageBefore()) {
+      Get.updateLocale(Locale(TranslationService.loadLanguage()));
+    }
   }
 
   autoLogin() async {

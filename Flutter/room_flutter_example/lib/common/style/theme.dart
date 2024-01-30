@@ -6,6 +6,7 @@ class AppTheme {
         appBarTheme: const AppBarTheme(
           elevation: 0,
           backgroundColor: AppColors.mainBlack,
+          iconTheme: IconThemeData(color: Colors.white),
           titleTextStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,

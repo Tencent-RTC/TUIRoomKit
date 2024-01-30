@@ -35,7 +35,7 @@ const Map<String, String> roomContentsEnUS = {
   'requestOpenAudio': 'Request open audio',
   'requestOpenVideo': 'Request open video',
   'changeHost': 'Change Host',
-  'haveTransferredHost': 'The host has been transferred to xx',
+  'haveTransferredOwner': 'The room owner has been transferred to xx',
   'ok': 'Ok',
   'disableMessage': 'Disable message',
   'enableMessage': 'Enable message',
@@ -114,11 +114,11 @@ const Map<String, String> roomContentsEnUS = {
   'stageManagement': 'Stage Management',
   'agreeAll': 'Agree to all',
   'disagreeSeat': 'Disagree to come on stage',
-  'haveBecomeHost': 'You have become the Host',
+  'haveBecomeOwner': 'You are now a room owner',
   'takeSeatInvitationSend':
       'Invitation to the audience have been sent to the stage',
-  'takeSeatInvitationAccepted': ' accepted your invitation',
-  'takeSeatInvitationRejected': ' rejected your invitation',
+  'takeSeatInvitationAccepted': ' is on stage',
+  'takeSeatInvitationRejected': ' refused to go on stage',
   'otherUserScreenSharing': 'Other users have turned on screen sharing',
   'sureLeaveRoomTip': 'Are you sure you want to leave the room?',
   'joinStageApplicationSent':
@@ -128,12 +128,12 @@ const Map<String, String> roomContentsEnUS = {
   'sure': 'Sure',
   'setAsAdministrator': 'Set as administrator',
   'undoAdministrator': 'Undo administrator',
-  'haveSetUpAdministrator': 'xx has been set as manager',
-  'haveRevokedAdministrator': 'Manager role of xx has been revoked',
-  'haveBecomeAdministrator': 'You have become a manager',
+  'haveSetUpAdministrator': 'xx has been set as room admin',
+  'haveRevokedAdministrator': 'The room admin status of xxx has been withdrawn',
+  'haveBecomeAdministrator': 'You have become a room admin',
   'haveBecomeAdministratorMessage':
       'You have been set as an administrator by the host. Do you want to join stage immediately?',
-  'revokedYourAdministrator': 'Your administrator status is revoked',
+  'revokedYourAdministrator': 'Your room admin status has been revoked',
   'joinStageImmediately': 'Join stage immediately',
   'noYetJoinStage': 'Not yet join stage',
   'leaveSeatTitle': 'Are you sure you want to step down?',
@@ -149,8 +149,10 @@ const Map<String, String> roomContentsEnUS = {
   'allEnableVideoMessage':
       'After unlocking, users can freely turn on the camera',
   'confirmRelease': 'Confirm release',
-  'transferHostTitle': 'Transfer the host to xx',
-  'transferHostMessage':
-      'Will become an ordinary member after being transferred to the host',
+  'transferOwnerTitle': 'Transfer the room owner to xx',
+  'transferOwnerMessage':
+      'After transfer the room owner, you will become a general user',
   'sureToTransfer': 'Confirm transfer',
+  'requestRepeat':
+      'This member has already received the same request, please try again later',
 };
