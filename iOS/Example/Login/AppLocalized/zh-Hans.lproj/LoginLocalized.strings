@@ -20,3 +20,5 @@
 "Demo.TRTC.Login.limit20count" = "仅限中文、字母、数字和下划线";
 "Demo.TRTC.Login.registsuccess" = "注册成功";
 "Demo.TRTC.Login.registsfailure.nameTooLong" = "您的昵称过长";
+"Demo.TRTC.Login.user.name" = "用户名";
+"Demo.TRTC.Login.nickname" = "昵称";

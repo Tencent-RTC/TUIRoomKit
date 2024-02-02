@@ -32,8 +32,8 @@ class UserListViewModel: NSObject {
     var roomInfo: TUIRoomInfo {
         engineManager.store.roomInfo
     }
-    let timeoutNumber: Double = 0
-    weak var viewResponder: UserListViewResponder? = nil
+    let timeoutNumber: Double = 60
+    weak var viewResponder: UserListViewResponder?
     
     override init() {
         super.init()
@@ -65,10 +65,15 @@ class UserListViewModel: NSObject {
                                  sureTitle: sender.isSelected ? .confirmReleaseText : .allMuteActionText,
                                  declineTitle: .cancelText, sureBlock: { [weak self] in
             guard let self = self else { return }
-            self.engineManager.muteAllAudioAction(isMute: !isSelected) {
-            } onError: { [weak self] _, message in
-                guard let self = self else { return }
-                self.viewResponder?.makeToast(text:message)
+            if self.roomInfo.isMicrophoneDisableForAllUser != !isSelected {
+                self.engineManager.muteAllAudioAction(isMute: !isSelected) {
+                } onError: { [weak self] _, message in
+                    guard let self = self else { return }
+                    self.viewResponder?.makeToast(text:message)
+                }
+            } else {
+                let text: String = isSelected ? .allUnMuteAudioText : .allMuteAudioText
+                self.viewResponder?.makeToast(text: text)
             }
         }, declineBlock: nil)
     }
@@ -80,10 +85,15 @@ class UserListViewModel: NSObject {
                                  sureTitle: sender.isSelected ? .confirmReleaseText : .allMuteVideoActionText,
                                  declineTitle: .cancelText, sureBlock: { [weak self] in
             guard let self = self else { return }
-            self.engineManager.muteAllVideoAction(isMute: !isSelected) {
-            } onError: { [weak self] _, message in
-                guard let self = self else { return }
-                self.viewResponder?.makeToast(text:message)
+            if self.roomInfo.isCameraDisableForAllUser != !isSelected {
+                self.engineManager.muteAllVideoAction(isMute: !isSelected) {
+                } onError: { [weak self] _, message in
+                    guard let self = self else { return }
+                    self.viewResponder?.makeToast(text:message)
+                }
+            } else {
+                let text: String = isSelected ? .allUnMuteVideoText : .allMuteVideoText
+                self.viewResponder?.makeToast(text: text)
             }
         }, declineBlock: nil)
     }
@@ -108,19 +118,22 @@ class UserListViewModel: NSObject {
     
     func inviteSeatAction(sender: UIButton) {
         guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { return }
-        //如果已经邀请了，不需要再次发出邀请
-        if !engineManager.store.extendedInvitationList.contains(userId) {
-            engineManager.takeUserOnSeatByAdmin(userId: userId, timeout: timeoutNumber) { _,_ in
-            } onRejected: { [weak self] requestId, userId, message in
-                guard let self = self else { return }
-                self.viewResponder?.makeToast(text: (userInfo.userName) + .refusedTakeSeatInvitationText)
-            } onTimeout: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.viewResponder?.makeToast(text: .takeSeatInvitationTimeoutText)
-            } onError: { [weak self] _, _, _, message in
-                guard let self = self else { return }
-                self.viewResponder?.makeToast(text: message)
-            }
+        engineManager.takeUserOnSeatByAdmin(userId: userId, timeout: timeoutNumber) { [weak self] _,_ in
+            guard let self = self else { return }
+            let text: String = localizedReplace(.onStageText, replace: userInfo.userName)
+            self.viewResponder?.makeToast(text: text)
+        } onRejected: { [weak self] requestId, userId, message in
+            guard let self = self else { return }
+            let text: String = localizedReplace(.refusedTakeSeatInvitationText, replace: userInfo.userName)
+            self.viewResponder?.makeToast(text: text)
+        } onTimeout: { [weak self] _, _ in
+            guard let self = self else { return }
+            let text: String = localizedReplace(.takeSeatInvitationTimeoutText, replace: userInfo.userName)
+            self.viewResponder?.makeToast(text: text)
+        } onError: { [weak self] _, _, code, message in
+            guard let self = self else { return }
+            let text: String = code == .requestIdRepeat ? .receivedSameRequestText : message
+            self.viewResponder?.makeToast(text: text)
         }
         viewResponder?.makeToast(text: .invitedTakeSeatText)
     }
@@ -211,5 +224,23 @@ private extension String {
     }
     static var confirmReleaseText: String {
         localized("TUIRoom.confirm.release")
+    }
+    static var allMuteAudioText: String {
+        localized("TUIRoom.all.mute.audio.prompt")
+    }
+    static var allUnMuteAudioText: String {
+        localized("TUIRoom.all.unmute.audio.prompt")
+    }
+    static var allMuteVideoText: String {
+        localized("TUIRoom.all.mute.video.prompt")
+    }
+    static var allUnMuteVideoText: String {
+        localized("TUIRoom.all.unmute.video.prompt")
+    }
+    static var receivedSameRequestText: String {
+        localized("TUIRoom.member.already.received.same.request")
+    }
+    static var onStageText: String {
+        localized("TUIRoom.on.stage")
     }
 }

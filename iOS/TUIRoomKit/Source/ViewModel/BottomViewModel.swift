@@ -20,7 +20,6 @@ protocol BottomViewModelResponder: AnyObject {
 
 class BottomViewModel: NSObject {
     private(set) var viewItems: [ButtonItemData] = []
-    private(set) var requestList: [String: String] = [:]
     weak var viewResponder: BottomViewModelResponder?
     
     var engineManager: EngineManager {
@@ -181,6 +180,7 @@ class BottomViewModel: NSObject {
         item.selectedTitle = .cancelStageText
         item.resourceBundle = tuiRoomKitBundle()
         item.buttonType = .raiseHandItemType
+        item.isSelect = engineManager.store.selfTakeSeatRequestId != nil
         item.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.raiseHandAction(sender: button)
@@ -328,23 +328,45 @@ class BottomViewModel: NSObject {
         sender.isSelected = !sender.isSelected
         engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": true])
         if sender.isSelected {
-            joinStage()
-            changeItemSelectState(type: .raiseHandItemType)
+            handleRaiseHandAction()
         } else {
-            guard let requestId = requestList["takeSeat"] else { return }
-            engineManager.cancelRequest(requestId)
-            changeItemSelectState(type: .raiseHandItemType)
-            viewResponder?.makeToast(text: .joinStageApplicationCancelledText)
+            handleCancelRaiseHandAction()
         }
+    }
+    
+    func handleRaiseHandAction() {
+        _ = engineManager.takeSeat() { [weak self] _,_ in
+            guard let self = self else { return }
+            self.viewResponder?.makeToast(text: .takenSeatText)
+        } onRejected: { [weak self] _, _, _ in
+            guard let self = self else { return }
+            self.viewResponder?.makeToast(text: .rejectedTakeSeatText)
+            self.changeItemSelectState(type: .raiseHandItemType, isSelected: false)
+        } onError: { [weak self] _, _, code, message in
+            guard let self = self else { return }
+            self.changeItemSelectState(type: .raiseHandItemType, isSelected: false)
+        }
+        changeItemSelectState(type: .raiseHandItemType)
+        guard currentUser.userRole == .generalUser else { return }
+        viewResponder?.makeToast(text: .applicationHasSentText)
+    }
+    
+    func handleCancelRaiseHandAction() {
+        engineManager.cancelTakeSeatRequest()
+        changeItemSelectState(type: .raiseHandItemType)
+        viewResponder?.makeToast(text: .joinStageApplicationCancelledText)
     }
     
     func leaveSeatAction(sender: UIButton) {
         engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, param: ["isDelay": true])
-        viewResponder?.showAlert(title: .leaveSeatTitle, message: .leaveSeatMessage, sureTitle: .leaveSeatText, declineTitle: .toastCancelText, sureBlock: { [weak self] in
-            guard let self = self else { return }
-            self.changeItemSelectState(type: .leaveSeatItemType)
-            self.engineManager.leaveSeat()
-        }, declineBlock: nil)
+        if currentUser.userRole == .administrator {
+            engineManager.leaveSeat()
+        } else {
+            viewResponder?.showAlert(title: .leaveSeatTitle, message: .leaveSeatMessage, sureTitle: .leaveSeatText, declineTitle: .toastCancelText, sureBlock: { [weak self] in
+                guard let self = self else { return }
+                self.engineManager.leaveSeat()
+            }, declineBlock: nil)
+        }
     }
     
     func shareScreenAction(sender: UIButton) {
@@ -490,30 +512,6 @@ extension BottomViewModel {
         guard let index = viewItems.firstIndex(where: { $0.buttonType == .moreItemType }), index != 5 else { return }
         viewItems.remove(at: index)
         viewItems.insert(moreItem, at: 5)
-    }
-    
-    private func joinStage() {
-        let request = engineManager.takeSeat() { [weak self] _,_ in
-            guard let self = self else { return }
-            self.viewResponder?.makeToast(text: .takenSeatText)
-        } onRejected: { [weak self] _, _, _ in
-            guard let self = self else { return }
-            self.requestList.removeValue(forKey: "takeSeat")
-            self.viewResponder?.makeToast(text: .rejectedTakeSeatText)
-        } onCancelled: { [weak self] _, _ in
-            guard let self = self else { return }
-            self.requestList.removeValue(forKey: "takeSeat")
-        } onTimeout: { [weak self] _, _ in
-            guard let self = self else { return }
-            self.requestList.removeValue(forKey: "takeSeat")
-        } onError: { [weak self] _, _, code, message in
-            guard let self = self else { return }
-            self.requestList.removeValue(forKey: "takeSeat")
-            self.viewResponder?.makeToast(text: message)
-        }
-        requestList["takeSeat"] = request.requestId
-        guard currentUser.userRole == .generalUser else { return }
-        viewResponder?.makeToast(text: .applicationHasSentText)
     }
     
     private func removeViewItem(buttonType: ButtonItemData.ButtonType) {

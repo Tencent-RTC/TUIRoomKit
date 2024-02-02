@@ -227,13 +227,38 @@ class UserListManagerView: UIView {
 }
 
 extension UserListManagerView: UserListManagerViewEventResponder {
-    func showKickOutAlert(title: String, sureAction: (() -> ())?) {
-        RoomRouter.presentAlert(title: title, message: nil, sureTitle: .alertOkText, declineTitle: .cancelText, sureBlock: sureAction, declineBlock: nil)
+    func showAlert(title: String?, message: String?, sureTitle: String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?) {
+        RoomRouter.presentAlert(title: title, message: message, sureTitle: sureTitle, declineTitle: declineTitle, sureBlock: sureBlock, declineBlock: declineBlock)
     }
     
     func updateUI(item: ButtonItemData) {
         guard let view = viewArray.first(where: { $0.itemData.buttonType == item.buttonType }) else { return }
         view.setupViewState(item: item)
+    }
+    
+    func addStackView(item: ButtonItemData, index: Int?) {
+        let view = ButtonItemView(itemData: item)
+        if let index = index, viewArray.count > index + 1 {
+            viewArray.insert(view, at: index)
+            stackView.insertArrangedSubview(view, at: index)
+        } else {
+            viewArray.append(view)
+            stackView.addArrangedSubview(view)
+        }
+        view.snp.makeConstraints { make in
+            make.height.equalTo(53.scale375())
+            make.width.equalToSuperview()
+        }
+    }
+    
+    func removeStackView(itemType: ButtonItemData.ButtonType) {
+        let views = viewArray.filter({ view in
+            view.itemData.buttonType == itemType
+        })
+        views.forEach { view in
+            view.removeFromSuperview()
+        }
+        viewArray.removeAll(where: { $0.itemData.buttonType == itemType })
     }
     
     func dismissView() {
@@ -244,10 +269,6 @@ extension UserListManagerView: UserListManagerViewEventResponder {
         RoomRouter.makeToastInCenter(toast: text, duration: 0.5)
     }
     
-    func showAlert(message: String) {
-        RoomRouter.presentAlert(title: message, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: nil, declineBlock: nil)
-    }
-    
     func setUserListManagerViewHidden(isHidden: Bool) {
         self.isHidden = true
     }
@@ -256,15 +277,6 @@ extension UserListManagerView: UserListManagerViewEventResponder {
 private extension String {
     static var meText: String {
         localized("TUIRoom.me")
-    }
-    static var alertOkText: String {
-        localized("TUIRoom.ok")
-    }
-    static var haveTransferredMasterText: String {
-        localized("TUIRoom.have.transferred.master")
-    }
-    static var cancelText: String {
-        localized("TUIRoom.cancel")
     }
 }
 
