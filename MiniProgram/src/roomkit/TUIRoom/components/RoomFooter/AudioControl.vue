@@ -65,7 +65,6 @@ import TuiButton from '../common/base/Button.vue';
 import AudioMediaControl from '../common/AudioMediaControl.vue';
 import { useBasicStore } from '../../stores/basic';
 import TUIMessageBox from '../common/base/MessageBox/index';
-import useMemberControlHooks from '../ManageMember/MemberControl/useMemberControlHooks';
 
 
 const roomEngine = useRoomEngine();
@@ -80,7 +79,6 @@ const {
   isMicrophoneDisableForAllUser,
   userVolumeObj,
 } = storeToRefs(roomStore);
-const { getRequestIdList, getRequestFirstUserId } = useMemberControlHooks();
 
 const emits = defineEmits(['click']);
 const hasMore = computed(() => !isMobile);
@@ -134,16 +132,17 @@ async function toggleMuteAudio() {
   }
 }
 
-// -------- 处理主持人/管理员打开/关闭麦克风信令 --------
+/**
+ * Handling host or administrator turn on/off microphone signalling
+ *
+ * 处理主持人或管理员打开/关闭麦克风信令
+**/
 const showRequestOpenMicDialog: Ref<boolean> = ref(false);
 const requestOpenMicRequestId: Ref<string> = ref('');
 async function onRequestReceived(eventInfo: { request: TUIRequest }) {
   const { userId, requestAction, requestId } = eventInfo.request;
   if (requestAction === TUIRequestAction.kRequestToOpenRemoteMicrophone) {
-    // 主持人/管理员邀请打开麦克风，同意之后将会自动打开麦克风
-    roomStore.setRequestId(TUIRequestAction.kRequestToOpenRemoteMicrophone, { userId, requestId });
-    const requestFirstUserId = getRequestFirstUserId(TUIRequestAction.kRequestToOpenRemoteMicrophone);
-    const userRole = roomStore.getUserRole(requestFirstUserId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
+    const userRole = roomStore.getUserRole(userId) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
     dialogContent.value = t('Sb invites you to turn on the microphone', { role: userRole });
     requestOpenMicRequestId.value = requestId;
     showRequestOpenMicDialog.value = true;
@@ -152,28 +151,20 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
 // 接受主持人邀请，打开麦克风
 async function handleAccept() {
   roomStore.setCanControlSelfAudio(true);
-  const requestList = getRequestIdList(TUIRequestAction.kRequestToOpenRemoteMicrophone);
-  for (const inviteRequestId of requestList) {
-    await roomEngine.instance?.responseRemoteRequest({
-      requestId: inviteRequestId,
-      agree: true,
-    });
-  }
+  await roomEngine.instance?.responseRemoteRequest({
+    requestId: requestOpenMicRequestId.value,
+    agree: true,
+  });
   requestOpenMicRequestId.value = '';
   showRequestOpenMicDialog.value = false;
-  roomStore.clearRequestId(TUIRequestAction.kRequestToOpenRemoteMicrophone);
 }
 
 // 保持静音
 async function handleReject() {
-  const requestList = getRequestIdList(TUIRequestAction.kRequestToOpenRemoteMicrophone);
-  for (const inviteRequestId of requestList) {
-    await roomEngine.instance?.responseRemoteRequest({
-      requestId: inviteRequestId,
-      agree: false,
-    });
-  }
-  roomStore.clearRequestId(TUIRequestAction.kRequestToOpenRemoteMicrophone);
+  await roomEngine.instance?.responseRemoteRequest({
+    requestId: requestOpenMicRequestId.value,
+    agree: false,
+  });
   requestOpenMicRequestId.value = '';
   showRequestOpenMicDialog.value = false;
 }
