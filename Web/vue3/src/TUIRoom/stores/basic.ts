@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { getLanguage } from '../utils/common';
 import { LAYOUT } from '../constants/render';
 import { isUndefined } from '../utils/utils';
-import { isWeChat, isElectron } from '../utils/environment';
+import { isWeChat, isElectron, isMobile } from '../utils/environment';
 
 type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | 'transfer-leave' | 'apply' | '';
 
@@ -32,6 +32,7 @@ interface BasicState {
   showHeaderTool: boolean,
   shareLink: string,
   isRoomLinkVisible: boolean,
+  isSchemeLinkVisible: boolean,
   isShowScreenShareAntiFraud: boolean,
   isOpenMic: boolean,
 }
@@ -75,6 +76,7 @@ export const useBasicStore = defineStore('basic', {
     showHeaderTool: true,
     shareLink: '',
     isRoomLinkVisible: !isElectron && !isWeChat,
+    isSchemeLinkVisible: !isMobile,
     isShowScreenShareAntiFraud: false,
     isOpenMic: false,
   }),
@@ -154,6 +156,9 @@ export const useBasicStore = defineStore('basic', {
     },
     setIsRoomLinkVisible(isRoomLinkVisible: boolean) {
       this.isRoomLinkVisible = isRoomLinkVisible;
+    },
+    setIsSchemeLinkVisible(isSchemeLinkVisible: boolean) {
+      this.isSchemeLinkVisible = isSchemeLinkVisible;
     },
     setIsShowScreenShareAntiFraud(isShowScreenShareAntiFraud: boolean) {
       this.isShowScreenShareAntiFraud = isShowScreenShareAntiFraud;

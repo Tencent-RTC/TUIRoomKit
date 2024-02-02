@@ -8,6 +8,7 @@
   * @param closeOnClickModal Boolean [Whether or not clicking on the mask layer to close the dialog is supported]
   * @param showClose Boolean [Whether to show the close button]
   * @param appendToBody Boolean [Whether to append into body element]
+  * @param appendToRoomContainer Boolean [Whether to append into roomContainer element]
   * Usage:
   * Use <Dialog title="there is title" v-model="showDialog"></Dialog> in template
   *
@@ -20,6 +21,7 @@
   * @param closeOnClickModal Boolean [是否支持点击遮罩层关闭 dialog]
   * @param showClose Boolean [是否展示关闭按钮]
   * @param appendToBody Boolean [是否插入到 body 中]
+  * @param appendToRoomContainer Boolean [是否插入到 roomContainer 中]
   * 使用方式：
   * 在 template 中使用 <Dialog title="there is title" v-model="showDialog"></Dialog>
 -->
