@@ -20,3 +20,5 @@
 "Demo.TRTC.Login.limit20count" = "Chinese characters, letters, numbers and underscores";
 "Demo.TRTC.Login.registsuccess" = "Registration successful";
 "Demo.TRTC.Login.registsfailure.nameTooLong" = "Your Nickname is too long";
+"Demo.TRTC.Login.user.name" = "User Name";
+"Demo.TRTC.Login.nickname" = "Nickname";

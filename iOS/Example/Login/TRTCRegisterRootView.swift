@@ -8,20 +8,6 @@
 
 import UIKit
 
-class CustomTextField:UITextField{
-
-    var leftPadding: CGFloat = 15
-    override func textRect(forBounds bounds:CGRect)->CGRect{
-        let originalRect = super.textRect(forBounds: bounds)
-        return originalRect.insetBy(dx: leftPadding, dy: 0)
-    }
-    
-    override func editingRect(forBounds bounds:CGRect)->CGRect{
-        let originalRect = super.editingRect(forBounds: bounds)
-        return originalRect.insetBy(dx: leftPadding, dy: 0)
-    }
-}
-
 class TRTCRegisterRootView: UIView {
     
     lazy var headImageView: UIImageView = {
@@ -32,12 +18,16 @@ class TRTCRegisterRootView: UIView {
         return imageView
     }()
     
-    lazy var textField: UITextField = {
+    lazy var textLable: UILabel = {
         let label = UILabel()
-        label.text = "昵称"
+        label.text = .nicknameText
+        label.font = UIFont(name: "PingFangSC-Regular", size: 16)
+        label.adjustsFontSizeToFitWidth = true
+        return label
+    }()
+    
+    lazy var textField: UITextField = {
         let textField = createTextField(.nicknamePlaceholderText)
-        textField.leftView = label
-        textField.leftViewMode = .always
         return textField
     }()
     
@@ -72,7 +62,7 @@ class TRTCRegisterRootView: UIView {
     }()
     
     private func createTextField(_ placeholder: String) -> UITextField {
-        let textField = CustomTextField(frame: .zero)
+        let textField = UITextField(frame: .zero)
         textField.backgroundColor = .white
         textField.font = UIFont(name: "PingFangSC-Regular", size: 16)
         textField.textColor = UIColor.tui_color(withHex: "333333")
@@ -163,6 +153,7 @@ class TRTCRegisterRootView: UIView {
     
     func constructViewHierarchy() {
         addSubview(headImageView)
+        addSubview(textLable)
         addSubview(textField)
         addSubview(textFieldSpacingLine)
         addSubview(descLabel)
@@ -174,14 +165,21 @@ class TRTCRegisterRootView: UIView {
             make.top.equalToSuperview().offset(kDeviceSafeTopHeight + 70)
             make.size.equalTo(CGSize(width: 100, height: 100))
         }
-        textField.snp.makeConstraints { (make) in
-            make.top.equalTo(headImageView.snp_bottom).offset(convertPixel(h: 40))
+        textLable.snp.makeConstraints { (make) in
+            make.top.equalTo(headImageView.snp.bottom).offset(convertPixel(h: 40))
             make.leading.equalToSuperview().offset(convertPixel(w: 40))
+            make.height.equalTo(convertPixel(h: 57))
+            make.width.equalTo(convertPixel(w: 60))
+        }
+        textField.snp.makeConstraints { (make) in
+            make.top.equalTo(textLable)
+            make.leading.equalTo(textLable.snp.trailing).offset(convertPixel(w: 5))
             make.trailing.equalToSuperview().offset(-convertPixel(w: 40))
             make.height.equalTo(convertPixel(h: 57))
         }
         textFieldSpacingLine.snp.makeConstraints { (make) in
-            make.bottom.leading.trailing.equalTo(textField)
+            make.bottom.trailing.equalTo(textField)
+            make.leading.equalTo(textLable)
             make.height.equalTo(1)
         }
         descLabel.snp.makeConstraints { (make) in
@@ -292,4 +290,5 @@ fileprivate extension String {
     static let descText = LoginLocalize(key:"Demo.TRTC.Login.limit20count")
     static let registText = LoginLocalize(key:"Demo.TRTC.Login.regist")
     static let nameTooLongText = LoginLocalize(key:"Demo.TRTC.Login.registsfailure.nameTooLong")
+    static let nicknameText = LoginLocalize(key:"Demo.TRTC.Login.nickname")
 }

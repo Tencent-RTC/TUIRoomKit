@@ -244,6 +244,10 @@ extension RaiseHandApplicationListView: RaiseHandApplicationListViewResponder {
         guard !isSearching else { return }
         applyTableView.reloadData()
     }
+    
+    func makeToast(text: String) {
+        RoomRouter.makeToastInCenter(toast: text, duration: 1)
+    }
 }
 
 class ApplyTableCell: UITableViewCell {

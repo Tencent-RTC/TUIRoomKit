@@ -138,6 +138,7 @@ extension RoomEventDispatcher: TUIRoomObserver {
     }
     
     func OnSendMessageForUserDisableChanged(roomId: String, userId: String, isDisable muted: Bool) {
+        store.updateUserDisableSendingMessage(userId: userId, isDisable: muted)
         let param = [
             "roomId": roomId,
             "userId": userId,
@@ -277,9 +278,6 @@ extension RoomEventDispatcher {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: ["userRole": userRole])
         }
         if isSelfRoleChanged {
-            if userRole == .generalUser, store.currentUser.userRole == .administrator {
-                RoomRouter.presentAlert(title: .revokedAdministratorText, message: nil, sureTitle: .okText, declineTitle: nil, sureBlock: nil, declineBlock: nil)
-            }
             store.currentUser.userRole = userRole
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, param: ["userRole": userRole])
         }
@@ -336,14 +334,5 @@ extension RoomEventDispatcher {
         currentUser.hasScreenStream = false
         guard let userModel = store.attendeeList.first(where: { $0.userId == currentUser.userId }) else { return }
         userModel.hasScreenStream = false
-    }
-}
-
-private extension String {
-    static var revokedAdministratorText: String {
-        localized("TUIRoom.revoked.your.administrator")
-    }
-    static var okText: String {
-        localized("TUIRoom.ok")
     }
 }

@@ -43,9 +43,11 @@ class RoomMainViewModel: NSObject {
     private var isShownOpenMicrophoneInviteAlert = false
     private var isShownTakeSeatInviteAlert = false
     private weak var localAudioViewModel: LocalAudioViewModel?
+    private var selfRole: TUIRole?
     
     override init() {
         super.init()
+        selfRole = currentUser.userRole
         subscribeEngine()
     }
     
@@ -104,15 +106,6 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
     
-    func respondUserOnSeat(isAgree: Bool, requestId: String) {
-        engineManager.responseRemoteRequest(requestId, agree: isAgree) { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.deleteInviteSeatUser(self.currentUser.userId)
-        } onError: { code, message in
-            debugPrint("responseRemoteRequest:code:\(code),message:\(message)")
-        }
-    }
-    
     func hideLocalAudioView() {
         localAudioViewModel?.hideLocalAudioView()
     }
@@ -129,111 +122,172 @@ class RoomMainViewModel: NSObject {
 
 extension RoomMainViewModel: RoomEngineEventResponder {
     func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
-        if name == .onRoomDismissed {
-            engineManager.destroyEngineManager()
-            viewResponder?.showAlert(title: .destroyAlertText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: { [weak self] in
-                guard let self = self else { return }
-                self.roomRouter.dismissAllRoomPopupViewController()
-                self.roomRouter.popToRoomEntranceViewController()
-            }, declineBlock: nil)
-        }
-        
-        if name == .onKickedOutOfRoom {
-            engineManager.destroyEngineManager()
-            viewResponder?.showAlert(title: .kickOffTitleText, message: nil, sureTitle: .alertOkText, declineTitle: nil , sureBlock: { [weak self] in
-                guard let self = self else { return }
-                self.roomRouter.dismissAllRoomPopupViewController()
-                self.roomRouter.popToRoomEntranceViewController()
-            }, declineBlock: nil)
-        }
-        
-        if name == .onAllUserMicrophoneDisableChanged {
+        switch name {
+        case .onRoomDismissed:
+            handleRoomDismissed()
+        case .onKickedOutOfRoom:
+            handleKickedOutOfRoom()
+        case .onAllUserMicrophoneDisableChanged:
             guard let isDisable = param?["isDisable"] as? Bool else { return }
-            if isDisable {
-                RoomRouter.makeToastInCenter(toast: .allMuteAudioText, duration: 1.5)
-            } else {
-                RoomRouter.makeToastInCenter(toast: .allUnMuteAudioText, duration: 1.5)
-            }
-        }
-        
-        if name == .onAllUserCameraDisableChanged {
+            handleAllUserMicrophoneDisableChanged(isDisable: isDisable)
+        case .onAllUserCameraDisableChanged:
             guard let isDisable = param?["isDisable"] as? Bool else { return }
-            if isDisable {
-                RoomRouter.makeToastInCenter(toast: .allMuteVideoText, duration: 1.5)
-            } else {
-                RoomRouter.makeToastInCenter(toast: .allUnMuteVideoText, duration: 1.5)
-            }
-        }
-        
-        if name == .onKickedOffSeat {
-            guard let userId = param?["userId"] as? String else { return }
+            handleAllUserCameraDisableChanged(isDisable: isDisable)
+        case .onKickedOffSeat:
             viewResponder?.makeToast(text: .kickedOffSeat)
-        }
-        
-        if name == .onRequestReceived {
+        case .onRequestReceived:
             guard let request = param?["request"] as? TUIRequest else { return }
-            switch request.requestAction {
-            case .openRemoteCamera:
-                guard !isShownOpenCameraInviteAlert else { return }
-                viewResponder?.showAlert(title: .inviteTurnOnVideoText, message: nil, sureTitle: .agreeText, declineTitle: .declineText, sureBlock: { [weak self] in
-                    guard let self = self else { return }
-                    self.isShownOpenCameraInviteAlert = false
-                    // FIXME: - 打开摄像头前需要先设置一个view
-                    self.engineManager.setLocalVideoView(streamType: .cameraStream, view: nil)
-                    // 需要先判断是否有摄像头权限
-                    if RoomCommon.checkAuthorCamaraStatusIsDenied() {
-                        self.engineManager.responseRemoteRequest(request.requestId, agree: true)
-                    } else {
-                        //如果没有摄像头权限，需要先去打开摄像头权限
-                        RoomCommon.cameraStateActionWithPopCompletion { [weak self] granted in
-                            guard let self = self else { return }
-                            self.engineManager.responseRemoteRequest(request.requestId, agree: granted)
-                        }
-                    }
-                }, declineBlock: { [weak self] in
-                    guard let self = self else { return }
-                    self.isShownOpenCameraInviteAlert = false
-                    self.engineManager.responseRemoteRequest(request.requestId, agree: false)
-                })
-                isShownOpenCameraInviteAlert = true
-            case .openRemoteMicrophone:
-                guard !isShownOpenMicrophoneInviteAlert else { return }
-                viewResponder?.showAlert(title: .inviteTurnOnAudioText, message: nil, sureTitle: .agreeText, declineTitle: .declineText, sureBlock: { [weak self] in
-                    guard let self = self else { return }
-                    self.isShownOpenMicrophoneInviteAlert = false
-                    if RoomCommon.checkAuthorMicStatusIsDenied() {
-                        self.engineManager.responseRemoteRequest(request.requestId, agree: true)
-                    } else {
-                        RoomCommon.micStateActionWithPopCompletion { [weak self] granted in
-                            guard let self = self else { return }
-                            self.engineManager.responseRemoteRequest(request.requestId, agree: granted)
-                        }
-                    }
-                }, declineBlock: { [weak self] in
-                    guard let self = self else { return }
-                    self.isShownOpenMicrophoneInviteAlert = false
-                    self.engineManager.responseRemoteRequest(request.requestId, agree: false)
-                })
-                isShownOpenMicrophoneInviteAlert = true
-            case .invalidAction:
-                break
-            case .connectOtherRoom:
-                engineManager.responseRemoteRequest(request.requestId, agree: true)
-            case .remoteUserOnSeat:
-                    guard roomInfo.isSeatEnabled && !isShownTakeSeatInviteAlert else { return }
-                    viewResponder?.showAlert(title: .inviteSpeakOnStageTitle, message: .inviteSpeakOnStageMessage, sureTitle: .agreeSeatText, declineTitle: .declineText, sureBlock: { [weak self] in
-                        guard let self = self else { return }
-                        self.isShownTakeSeatInviteAlert = false
-                        self.respondUserOnSeat(isAgree: true, requestId: request.requestId)
-                    }, declineBlock: { [weak self] in
-                        guard let self = self else { return }
-                        self.isShownTakeSeatInviteAlert = false
-                        self.respondUserOnSeat(isAgree: false, requestId: request.requestId)
-                    })
-                    isShownTakeSeatInviteAlert = true
-                
+            handleReceivedRequest(request: request)
+        default: break
+        }
+    }
+    
+    private func handleRoomDismissed() {
+        engineManager.destroyEngineManager()
+        viewResponder?.showAlert(title: .destroyAlertText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: { [weak self] in
+            guard let self = self else { return }
+            self.roomRouter.dismissAllRoomPopupViewController()
+            self.roomRouter.popToRoomEntranceViewController()
+        }, declineBlock: nil)
+    }
+    
+    private func handleKickedOutOfRoom() {
+        engineManager.destroyEngineManager()
+        viewResponder?.showAlert(title: .kickOffTitleText, message: nil, sureTitle: .alertOkText, declineTitle: nil , sureBlock: { [weak self] in
+            guard let self = self else { return }
+            self.roomRouter.dismissAllRoomPopupViewController()
+            self.roomRouter.popToRoomEntranceViewController()
+        }, declineBlock: nil)
+    }
+    
+    private func handleAllUserMicrophoneDisableChanged(isDisable: Bool) {
+        if isDisable {
+            RoomRouter.makeToastInCenter(toast: .allMuteAudioText, duration: 1.5)
+        } else {
+            RoomRouter.makeToastInCenter(toast: .allUnMuteAudioText, duration: 1.5)
+        }
+    }
+    
+    private func handleAllUserCameraDisableChanged(isDisable: Bool) {
+        if isDisable {
+            RoomRouter.makeToastInCenter(toast: .allMuteVideoText, duration: 1.5)
+        } else {
+            RoomRouter.makeToastInCenter(toast: .allUnMuteVideoText, duration: 1.5)
+        }
+    }
+    
+    private func handleReceivedRequest(request: TUIRequest) {
+        switch request.requestAction {
+        case .openRemoteCamera:
+            handleOpenCameraRequest(request: request)
+        case .openRemoteMicrophone:
+            handleOpenMicrophoneRequest(request: request)
+        case .invalidAction:
+            break
+        case .connectOtherRoom:
+            engineManager.responseRemoteRequest(request.requestId, agree: true)
+        case .remoteUserOnSeat:
+            handleOnSeatRequest(request: request)
+        default: break
+        }
+    }
+    
+    private func handleOpenCameraRequest(request: TUIRequest) {
+        guard !isShownOpenCameraInviteAlert else { return }
+        guard let userInfo = store.attendeeList.first(where: { $0.userId == request.userId }) else { return }
+        let nameText: String = userInfo.userRole == .roomOwner ? .hostText : .administratorText
+        let title = nameText + .inviteTurnOnVideoText
+        viewResponder?.showAlert(title: title, message: nil, sureTitle: .agreeText, declineTitle: .declineText, sureBlock: { [weak self] in
+            guard let self = self else { return }
+            self.isShownOpenCameraInviteAlert = false
+            self.agreeOpenLocalCamera(request: request)
+        }, declineBlock: { [weak self] in
+            guard let self = self else { return }
+            self.isShownOpenCameraInviteAlert = false
+            self.engineManager.responseRemoteRequest(request.requestId, agree: false)
+        })
+        isShownOpenCameraInviteAlert = true
+    }
+    
+    private func agreeOpenLocalCamera(request: TUIRequest) {
+        engineManager.setLocalVideoView(streamType: .cameraStream, view: nil)
+        if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+            engineManager.responseRemoteRequest(request.requestId, agree: true)
+        } else {
+            RoomCommon.cameraStateActionWithPopCompletion { [weak self] granted in
+                guard let self = self else { return }
+                self.engineManager.responseRemoteRequest(request.requestId, agree: granted)
+            }
+        }
+    }
+    
+    private func handleOpenMicrophoneRequest(request: TUIRequest) {
+        guard !isShownOpenMicrophoneInviteAlert else { return }
+        guard let userInfo = store.attendeeList.first(where: { $0.userId == request.userId }) else { return }
+        let nameText: String = userInfo.userRole == .roomOwner ? .hostText : .administratorText
+        let title = nameText + .inviteTurnOnAudioText
+        viewResponder?.showAlert(title: title, message: nil, sureTitle: .agreeText, declineTitle: .declineText, sureBlock: { [weak self] in
+            guard let self = self else { return }
+            self.isShownOpenMicrophoneInviteAlert = false
+            self.agreeOpenLocalMic(request: request)
+        }, declineBlock: { [weak self] in
+            guard let self = self else { return }
+            self.isShownOpenMicrophoneInviteAlert = false
+            self.engineManager.responseRemoteRequest(request.requestId, agree: false)
+        })
+        isShownOpenMicrophoneInviteAlert = true
+    }
+    
+    private func agreeOpenLocalMic(request: TUIRequest) {
+        if RoomCommon.checkAuthorMicStatusIsDenied() {
+            self.engineManager.responseRemoteRequest(request.requestId, agree: true)
+        } else {
+            RoomCommon.micStateActionWithPopCompletion { [weak self] granted in
+                guard let self = self else { return }
+                self.engineManager.responseRemoteRequest(request.requestId, agree: granted)
+            }
+        }
+    }
+    
+    private func handleOnSeatRequest(request: TUIRequest) {
+        guard roomInfo.isSeatEnabled && !isShownTakeSeatInviteAlert else { return }
+        guard let userInfo = store.attendeeList.first(where: { $0.userId == request.userId }) else { return }
+        let nameText: String = userInfo.userRole == .roomOwner ? .hostText : .administratorText
+        let title = nameText + .inviteSpeakOnStageTitle
+        viewResponder?.showAlert(title: title, message: .inviteSpeakOnStageMessage, sureTitle: .agreeSeatText, declineTitle: .declineText, sureBlock: { [weak self] in
+            guard let self = self else { return }
+            self.isShownTakeSeatInviteAlert = false
+            self.agreeOnSeatRequest(requestId: request.requestId)
+        }, declineBlock: { [weak self] in
+            guard let self = self else { return }
+            self.isShownTakeSeatInviteAlert = false
+            self.disagreeOnSeatRequest(requestId: request.requestId)
+        })
+        isShownTakeSeatInviteAlert = true
+    }
+    
+    private func agreeOnSeatRequest(requestId: String) {
+        engineManager.responseRemoteRequest(requestId, agree: true) { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.deleteInviteSeatUser(self.currentUser.userId)
+        } onError: { [weak self] code, message in
+            guard let self = self else { return }
+            switch code {
+            case .failed:
+                self.viewResponder?.makeToast(text: .goOnStageTimedOutText)
+            case .allSeatOccupied:
+                self.viewResponder?.makeToast(text: .onStageNumberReachedLimitText)
             default: break
             }
+        }
+    }
+    
+    private func disagreeOnSeatRequest(requestId: String) {
+        engineManager.responseRemoteRequest(requestId, agree: false) { [weak self] in
+            guard let self = self else { return }
+            self.engineManager.deleteInviteSeatUser(self.currentUser.userId)
+        } onError: { code, message in
+            debugPrint("responseRemoteRequest:code:\(code),message:\(message)")
         }
     }
 }
@@ -293,20 +347,7 @@ extension RoomMainViewModel: RoomKitUIEventResponder {
         switch key{
         case .TUIRoomKitService_CurrentUserRoleChanged:
             guard let userRole = info?["userRole"] as? TUIRole else { return }
-            switch userRole {
-            case .roomOwner:
-                viewResponder?.showAlert(title: .haveBecomeMasterText, message: nil,sureTitle: .alertOkText, declineTitle: nil, sureBlock: nil, declineBlock: nil)
-            case .administrator:
-                if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
-                    viewResponder?.showAlert(title: .haveBecomeAdministratorText, message: .setAsAdministratorMessageText, sureTitle: .joinStageImmediatelyText, declineTitle: .notYetJoinStageText, sureBlock: { [weak self] in
-                        guard let self = self else { return }
-                        self.engineManager.takeSeat()
-                    }, declineBlock: nil)
-                } else {
-                    viewResponder?.showAlert(title: .haveBecomeAdministratorText, message: nil,sureTitle: .alertOkText, declineTitle: nil, sureBlock: nil, declineBlock: nil)
-                }
-            default: break
-            }
+            handleSelfRoleChanged(userRole: userRole)
         case .TUIRoomKitService_CurrentUserMuteMessage:
             guard let isMute = info?["isMute"] as? Bool else { return }
             viewResponder?.makeToast(text: isMute ? .messageTurnedOffText : .messageTurnedOnText)
@@ -321,6 +362,21 @@ extension RoomMainViewModel: RoomKitUIEventResponder {
             viewResponder?.showBeautyView()
         default: break
         }
+    }
+    
+    private func handleSelfRoleChanged(userRole: TUIRole) {
+        switch userRole {
+        case .roomOwner:
+            viewResponder?.makeToast(text: .haveBecomeMasterText)
+        case .administrator:
+            viewResponder?.makeToast(text: .haveBecomeAdministratorText)
+        case .generalUser:
+            if selfRole == .administrator {
+                viewResponder?.makeToast(text: .revokedAdministratorText)
+            }
+        default: break
+        }
+        selfRole = userRole
     }
 }
 
@@ -382,16 +438,22 @@ private extension String {
     static var allUnMuteVideoText: String {
         localized("TUIRoom.all.unmute.video.prompt")
     }
-    static var notYetJoinStageText: String {
-        localized("TUIRoom.not.yet.join.stage")
-    }
-    static var joinStageImmediatelyText: String {
-        localized("TUIRoom.join.stage.immediately")
-    }
-    static var setAsAdministratorMessageText: String {
-        localized("TUIRoom.set.as.administrator.message")
-    }
     static var kickedOffSeat: String {
         localized("TUIRoom.kicked.off.seat")
+    }
+    static var hostText: String {
+        localized("TUIRoom.host")
+    }
+    static var administratorText: String {
+        localized("TUIRoom.role.administrator")
+    }
+    static var revokedAdministratorText: String {
+        localized("TUIRoom.revoked.your.administrator")
+    }
+    static var onStageNumberReachedLimitText: String {
+        localized("TUIRoom.on.stage.number.reached.limit")
+    }
+    static var goOnStageTimedOutText: String {
+        localized("TUIRoom.go.on.stage.timed.out")
     }
 }

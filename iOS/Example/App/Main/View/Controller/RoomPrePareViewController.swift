@@ -56,14 +56,6 @@ class RoomPrePareViewController: UIViewController {
         navigationController?.pushViewController(debugVC, animated: true)
     }
     
-    func switchLanguageAction() {
-        if languageID == "zh-Hans" {
-            TUIGlobalization.setPreferredLanguage("en")
-        } else if languageID == "en" {
-            TUIGlobalization.setPreferredLanguage("zh-Hans")
-        }
-    }
-    
     deinit {
         debugPrint("deinit \(self)")
     }

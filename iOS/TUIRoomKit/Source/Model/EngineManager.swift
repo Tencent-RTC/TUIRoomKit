@@ -231,26 +231,15 @@ class EngineManager: NSObject {
                                onCancelled: TUIRequestCancelledBlock? =  nil,
                                onTimeout: TUIRequestTimeoutBlock? = nil,
                                onError: TUIRequestErrorBlock? = nil) {
-        store.extendedInvitationList.append(userId)
-        roomEngine.takeUserOnSeatByAdmin(-1, userId: userId, timeout: timeout) { [weak self] requestId, userId in
-            guard let self = self else { return }
-            self.store.extendedInvitationList.removeAll(where: { $0 == userId })
+        roomEngine.takeUserOnSeatByAdmin(-1, userId: userId, timeout: timeout) { requestId, userId in
             onAccepted?(requestId, userId)
-        } onRejected: { [weak self] requestId, userId, message in
-            guard let self = self else { return }
-            self.store.extendedInvitationList.removeAll(where: { $0 == userId })
+        } onRejected: { requestId, userId, message in
             onRejected?( requestId, userId, message)
-        } onCancelled: { [weak self] requestId, userId in
-            guard let self = self else { return }
-            self.store.extendedInvitationList.removeAll(where: { $0 == userId })
+        } onCancelled: { requestId, userId in
             onCancelled?(requestId, userId)
-        } onTimeout: { [weak self] requestId, userId in
-            guard let self = self else { return }
-            self.store.extendedInvitationList.removeAll(where: { $0 == userId })
+        } onTimeout: { requestId, userId in
             onTimeout?(requestId, userId)
-        } onError: { [weak self] requestId, userId, code, message in
-            guard let self = self else { return }
-            self.store.extendedInvitationList.removeAll(where: { $0 == userId })
+        } onError: { requestId, userId, code, message in
             onError?(requestId, userId, code, message)
         }
     }
@@ -269,17 +258,34 @@ class EngineManager: NSObject {
         let request = self.roomEngine.takeSeat(-1, timeout: takeSeatTimeOutNumber) { [weak self] requestId, userId in
             guard let self = self else { return }
             self.store.currentUser.isOnSeat = true
+            self.store.selfTakeSeatRequestId = nil
             onAccepted?(requestId, userId)
-        } onRejected: { requestId, userId, message in
+        } onRejected: { [weak self] requestId, userId, message in
+            guard let self = self else { return }
+            self.store.selfTakeSeatRequestId = nil
             onRejected?(requestId, userId, message)
-        } onCancelled: { requestId, userId in
+        } onCancelled: { [weak self] requestId, userId in
+            guard let self = self else { return }
+            self.store.selfTakeSeatRequestId = nil
             onCancelled?(requestId, userId)
-        } onTimeout: { requestId, userId in
+        } onTimeout: { [weak self] requestId, userId in
+            guard let self = self else { return }
+            self.store.selfTakeSeatRequestId = nil
             onTimeout?(requestId, userId)
-        } onError: { requestId, userId, code, message in
+        } onError: { [weak self] requestId, userId, code, message in
+            guard let self = self else { return }
+            self.store.selfTakeSeatRequestId = nil
             onError?(requestId, userId, code, message)
         }
+        store.selfTakeSeatRequestId = request.requestId
         return request
+    }
+    
+    //取消上麦
+    func cancelTakeSeatRequest() {
+        guard let requestId = store.selfTakeSeatRequestId else { return }
+        cancelRequest(requestId)
+        store.selfTakeSeatRequestId = nil
     }
     
     func fetchRoomInfo(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
@@ -598,42 +604,50 @@ extension EngineManager {
             //更新store存储的进房数据
             self.store.roomInfo = roomInfo
             self.store.initialRoomCurrentUser()
-            self.store.isEnteredRoom = true
-            self.store.timeStampOnEnterRoom = Int(Date().timeIntervalSince1970)
+            self.store.initalEnterRoomMessage()
             //初始化用户列表
             self.initUserList()
             //初始化视频设置
             self.initLocalVideoState()
             //如果是举手发言房间的房主，需要先上麦再跳转到会议主页面
-            if roomInfo.isSeatEnabled, self.store.currentUser.userId == roomInfo.ownerId {
-                self.takeSeat() { [weak self] _,_ in
+            if !self.isNeededAutoTakeSeat() {
+                self.operateLocalMicrophone(enableAudio: enableAudio)
+                self.showRoomViewController(roomId: roomInfo.roomId)
+            } else {
+                self.autoTakeSeatForOwner { [weak self] in
                     guard let self = self else { return }
-                    self.showRoomViewController(roomId: roomInfo.roomId)
                     self.operateLocalMicrophone(enableAudio: enableAudio)
-                    onSuccess()
-                } onError: { [weak self] _, _, code, message in
+                    self.showRoomViewController(roomId: roomInfo.roomId)
+                } onError: { [weak self] code, message in
                     guard let self = self else { return }
-                    self.store.currentUser.userId == roomInfo.ownerId ? self.destroyRoom() : self.exitRoom()
                     self.rootRouter.dismissAllRoomPopupViewController()
                     self.rootRouter.popToRoomEntranceViewController()
-                    onError(code, message)
                 }
-            } else {
-                //跳转到会议主界面
-                if self.store.isShowRoomMainViewAutomatically {
-                    self.showRoomViewController(roomId: roomInfo.roomId)
-                }
-                //操作麦克风
-                self.operateLocalMicrophone(enableAudio: enableAudio)
-                onSuccess()
             }
         } onError: { code, message in
             onError(code, message)
         }
     }
     
+    private func isNeededAutoTakeSeat() -> Bool {
+        return store.roomInfo.isSeatEnabled && store.currentUser.userId == store.roomInfo.ownerId
+    }
+    
+    private func autoTakeSeatForOwner(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
+        _ = self.takeSeat() { _,_ in
+            onSuccess()
+        } onError: { _, _, code, message in
+            if code == .alreadyInSeat {
+                onSuccess()
+            } else {
+                onError(code, message)
+            }
+        }
+    }
+    
     private func showRoomViewController(roomId: String) {
-        self.rootRouter.pushMainViewController(roomId: roomId)
+        guard store.isShowRoomMainViewAutomatically else { return }
+        rootRouter.pushMainViewController(roomId: roomId)
     }
     
     private func isPushLocalAudioStream(enableAudio: Bool) -> Bool {
@@ -715,17 +729,8 @@ extension EngineManager {
     private func getSeatList(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         roomEngine.getSeatList { [weak self] seatList in
             guard let self = self else { return }
-            var localSeatList = [UserEntity]()
-            for seatInfo in seatList {
-                guard let userId = seatInfo.userId, userId != "" else { continue }
-                guard let userModel = self.store.attendeeList.first(where: { $0.userId == seatInfo.userId }) else { continue }
-                userModel.isOnSeat = true
-                localSeatList.append(userModel)
-            }
-            self.store.seatList = localSeatList
+            self.store.initialSeatList(seatList: seatList)
             onSuccess()
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewVideoSeatView, param: [:])
         } onError: { code, message in
             onError(code, message)
             debugPrint("getSeatList:code:\(code),message:\(message)")
