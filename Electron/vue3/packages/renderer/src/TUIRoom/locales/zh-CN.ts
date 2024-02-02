@@ -120,7 +120,6 @@ export default {
   Leave: '离开房间',
   Dismiss: '结束房间',
   // @ts-ignore
-  'Moderator changed to sb': ({ named }) => `主持人已变更为${named('name')}`,
   'The administrator has been changed to ': '管理员已变更为',
   'Muted by the moderator': '已被主持人禁言',
   'Type a message': '说点什么...',
@@ -172,8 +171,6 @@ export default {
   'Step down(Master)': '邀请下台',
   'Step down': '下台',
   // @ts-ignore
-  'sb has approved your application': ({ named }) => `${named('role')}同意了你的上台申请`,
-  // @ts-ignore
   'sb has rejected your application for the stage': ({ named }) => `${named('role')}拒绝了你的上台申请`,
   'You have been invited by the host to step down, please raise your hand if you need to speak': '您已被主持人邀请下台，需要发言请先举手',
   'Select a screen/window': '选择屏幕/窗口',
@@ -202,6 +199,7 @@ export default {
   'Invite via room link': '通过房间链接邀请',
   'Room Link': '房间链接',
   'You can share the room number or link to invite more people to join the room.': '您可以分享房间号或链接邀请更多人加入房间。',
+  'You can share the room number to invite more people to join the room': '您可以分享房间号邀请更多人加入房间',
   'If you have any questions, please feel free to join our QQ group or send an email': '如果有任何问题欢迎加入我们的QQ群或者发送邮件。',
   'If you have any questions, please email us.': '如果有任何问题欢迎加入我们的交流群或者发送邮件。',
   'Join our product discussion group': '加入产品交流群',
@@ -279,9 +277,16 @@ export default {
   'After unlocking, users can freely turn on the camera': '解除后用户可以自由开启视频',
   'Members will not be able to open the camera': '成员将无法开启视频画面',
   'You have become a administrator': '您已成为管理员',
+  'You are now a room owner': '您已成为房主',
   'Your administrator status has been revoked': '您的管理员身份被收回',
   'After transfer the room owner, you will become a general user': '转交房主后将成为普通成员',
   // @ts-ignore
   'Transfer the roomOwner to sb': ({ named }) => `将房主转移给${named('name')}`,
   'Confirm transfer': '确认转交',
+  // @ts-ignore
+  'The room owner has been transferred to sb': ({ named }) => `已将房主转交给${named('name')}`,
+  'Application to go on stage was rejected': '上台申请被拒绝',
+  'You are now an administrator': '您已成为管理员',
+  'The RoomOwner has withdrawn your administrator privileges': '房主已收回您的管理员权限',
+  'This member has already received the same request,please try again later': '该成员已收到相同请求，请稍后再试',
 };

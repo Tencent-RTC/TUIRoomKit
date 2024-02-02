@@ -2,7 +2,7 @@
 // 主持人：同意/拒绝用户的申请发言，踢人下麦，邀请用户上麦，取消邀请用户上麦
 
 import { onBeforeUnmount } from 'vue';
-import TUIRoomEngine, { TUIRoomEvents, TUIRequestAction, TUIRequest, TUIRequestCallbackType } from '@tencentcloud/tuiroom-engine-electron';
+import TUIRoomEngine, { TUIRoomEvents, TUIRequestAction, TUIRequest, TUIRequestCallbackType, TUIErrorCode } from '@tencentcloud/tuiroom-engine-electron';
 import useGetRoomEngine from './useRoomEngine';
 import TUIMessage from '../components/common/base/Message/index';
 import { MESSAGE_DURATION } from '../constants/message';
@@ -159,9 +159,12 @@ export default function () {
       seatIndex: -1,
       userId,
       timeout: 0,
-      requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType, userId: string }) => {
-        const { requestCallbackType, userId } = callbackInfo;
+      requestCallback: (callbackInfo: {
+        requestCallbackType: TUIRequestCallbackType, userId: string, code: TUIErrorCode
+      }) => {
+        const { requestCallbackType, userId, code } = callbackInfo;
         const userName = roomStore.getUserName(userId);
+        roomStore.removeInviteToAnchorUser(userId);
         switch (requestCallbackType) {
           case TUIRequestCallbackType.kRequestAccepted:
             TUIMessage({
@@ -169,7 +172,6 @@ export default function () {
               message: `${userName || userId} ${t('accepted the invitation to the stage')}`,
               duration: MESSAGE_DURATION.NORMAL,
             });
-            roomStore.removeInviteToAnchorUser(userId);
             break;
           case TUIRequestCallbackType.kRequestRejected:
             TUIMessage({
@@ -177,9 +179,17 @@ export default function () {
               message: `${userName || userId} ${t('declined the invitation to the stage')}`,
               duration: MESSAGE_DURATION.NORMAL,
             });
-            roomStore.removeInviteToAnchorUser(userId);
             break;
           case TUIRequestCallbackType.kRequestTimeout:
+            break;
+          case TUIRequestCallbackType.kRequestError:
+            if (code === TUIErrorCode.ERR_REQUEST_ID_REPEAT) {
+              TUIMessage({
+                type: 'warning',
+                message: t('This member has already received the same request,please try again later'),
+                duration: MESSAGE_DURATION.NORMAL,
+              });
+            }
             break;
           default:
             break;
