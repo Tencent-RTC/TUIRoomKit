@@ -4,7 +4,7 @@ import { UserInfo, useRoomStore } from '../../../stores/room';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
-import { TUIMediaDevice, TUIRole, TUIRequestAction } from '@tencentcloud/tuiroom-engine-js';
+import { TUIMediaDevice, TUIRole, TUIRequestCallbackType, TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import AudioOpenIcon from '../../common/icons/AudioOpenIcon.vue';
 import VideoOpenIcon from '../../common/icons/VideoOpenIcon.vue';
 import ChatForbiddenIcon from '../../common/icons/ChatForbiddenIcon.vue';
@@ -180,20 +180,36 @@ export default function useMemberControl(props?: any) {
       });
     } else {
       if (userInfo.isRequestingUserOpenMic) {
+        TUIMessage({
+          type: 'info',
+          message: `${t('An invitation to open the microphone has been sent to sb.', { name: userInfo.userName || userInfo.userId })}`,
+          duration: MESSAGE_DURATION.NORMAL,
+        });
         return;
       }
       const request = await roomEngine.instance?.openRemoteDeviceByAdmin({
         userId: userInfo.userId,
         device: TUIMediaDevice.kMicrophone,
         timeout: 0,
-        requestCallback: () => {
-          // 处理请求超时，应答，拒绝的情况
+        requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType, code: TUIErrorCode }) => {
           roomStore.setRequestUserOpenMic({ userId: userInfo.userId, isRequesting: false });
+          const { requestCallbackType, code } = callbackInfo;
+          switch (requestCallbackType) {
+            case TUIRequestCallbackType.kRequestError:
+              if (code === TUIErrorCode.ERR_REQUEST_ID_REPEAT) {
+                TUIMessage({
+                  type: 'warning',
+                  message: t('This member has already received the same request, please try again later'),
+                  duration: MESSAGE_DURATION.NORMAL,
+                });
+              }
+              break;
+          }
         },
       });
       TUIMessage({
         type: 'info',
-        message: `${t('An invitation to open the microphone has been sent to sb.', { name: userInfo.userName })}`,
+        message: `${t('An invitation to open the microphone has been sent to sb.', { name: userInfo.userName || userInfo.userId })}`,
         duration: MESSAGE_DURATION.NORMAL,
       });
       if (request && request.requestId) {
@@ -217,7 +233,7 @@ export default function useMemberControl(props?: any) {
       if (userInfo.isRequestingUserOpenCamera) {
         TUIMessage({
           type: 'info',
-          message: `${t('An invitation to open the camera has been sent to sb.', { name: userInfo.userName })}`,
+          message: `${t('An invitation to open the camera has been sent to sb.', { name: userInfo.userName || userInfo.userId })}`,
           duration: MESSAGE_DURATION.NORMAL,
         });
         return;
@@ -226,22 +242,29 @@ export default function useMemberControl(props?: any) {
         userId: userInfo.userId,
         device: TUIMediaDevice.kCamera,
         timeout: 0,
-        requestCallback: () => {
-          // 处理请求超时，应答，拒绝的情况
+        requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType, code: TUIErrorCode }) => {
           roomStore.setRequestUserOpenCamera({ userId: userInfo.userId, isRequesting: false });
+          const { requestCallbackType, code } = callbackInfo;
+          switch (requestCallbackType) {
+            case TUIRequestCallbackType.kRequestError:
+              if (code === TUIErrorCode.ERR_REQUEST_ID_REPEAT) {
+                TUIMessage({
+                  type: 'warning',
+                  message: t('This member has already received the same request, please try again later'),
+                  duration: MESSAGE_DURATION.NORMAL,
+                });
+              }
+              break;
+          }
         },
       });
+      TUIMessage({
+        type: 'info',
+        message: `${t('An invitation to open the camera has been sent to sb.', { name: userInfo.userName || userInfo.userId })}`,
+        duration: MESSAGE_DURATION.NORMAL,
+      });
       if (request && request.requestId) {
-        roomStore.setRequestUserOpenCamera({
-          userId: userInfo.userId,
-          isRequesting: true,
-          requestId: request.requestId,
-        });
-        TUIMessage({
-          type: 'info',
-          message: `${t('An invitation to open the camera has been sent to sb.', { name: userInfo.userName })}`,
-          duration: MESSAGE_DURATION.NORMAL,
-        });
+        roomStore.setRequestUserOpenCamera({ userId: userInfo.userId, isRequesting: true, requestId: request.requestId });
       }
     }
   }
@@ -282,6 +305,11 @@ export default function useMemberControl(props?: any) {
           userRole: TUIRole.kRoomOwner,
         });
         roomStore.setMasterUserId(userInfo.userId);
+        TUIMessage({
+          type: 'success',
+          message: t('The room owner has been transferred to sb', { name: userInfo.userName || userInfo.userId }),
+          duration: MESSAGE_DURATION.NORMAL,
+        });
       } catch (error) {
         TUIMessage({
           type: 'error',
@@ -307,15 +335,6 @@ export default function useMemberControl(props?: any) {
       : `${t('The administrator status of sb has been withdrawn', { name: updatedUserName })}`;
     TUIMessage({ type: 'success', message: tipMessage });
     roomStore.setRemoteUserRole(userInfo.userId, newRole);
-  }
-  function getRequestIdList(requestType: TUIRequestAction) {
-    const items = roomStore.requestObj[requestType] || [];
-    return items.map(item => item.requestId);
-  }
-
-  function getRequestFirstUserId(requestType: TUIRequestAction) {
-    const items = roomStore.requestObj[requestType] || [];
-    return items.length > 0 ? items[0].userId : null;
   }
 
   function handleOpenDialog(action: string) {
@@ -363,8 +382,6 @@ export default function useMemberControl(props?: any) {
     kickOffDialogContent,
     handleCancelDialog,
     handleAction,
-    getRequestIdList,
-    getRequestFirstUserId,
     isDialogVisible,
     dialogData,
   };
