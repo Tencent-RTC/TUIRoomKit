@@ -10,7 +10,7 @@
       <svg-icon v-tap="() => onCopy(item.copyLink)" :icon="CopyIcon" class="copy"></svg-icon>
     </div>
     <span class="invite-bottom">
-      {{ t('You can share the room number or link to invite more people to join the room.') }}
+      {{ inviteBarTitle }}
     </span>
   </div>
 </template>
@@ -25,6 +25,7 @@ const {
   t,
   onCopy,
   visibleInviteContentList,
+  inviteBarTitle,
 } = useRoomInviteControl();
 
 

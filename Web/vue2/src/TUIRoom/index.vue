@@ -425,6 +425,7 @@ const onSendMessageForUserDisableChanged = (data: { userId: string, isDisable: b
     });
     chatStore.setSendMessageDisableChanged(isDisable);
   }
+  roomStore.setMuteUserChat(userId, isDisable);
 };
 
 const onKickedOutOfRoom = async (eventInfo: { roomId: string, reason: TUIKickedOutOfRoomReason, message: string }) => {
