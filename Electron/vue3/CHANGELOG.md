@@ -1,3 +1,17 @@
+## 2023.02.02@2.0.3
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) v2.0.3 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+
+**Improvement**
+- 优化转交主持人，同意/拒绝上台，请求打开摄像头/麦克风的 toast 展示时机及文案提示；
+
+**Bug Fixed**
+- 修复管理员被撤销后的音视频状态错误问题；
+- 修复普通成员被禁言后未同步给其他管理员的问题；
+- 修复 electron 环境判断不准确的问题；
+
 ## 2023.01.29@2.0.2
 
 **Feature**

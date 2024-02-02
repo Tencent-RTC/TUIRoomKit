@@ -53,7 +53,6 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import logger from '../../../utils/common/logger';
 import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType, TUIRole } from '@tencentcloud/tuiroom-engine-electron';
 import TuiButton from '../../common/base/Button.vue';
-import useMemberControlHooks from '../../ManageMember/MemberControl/useMemberControlHooks';
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
@@ -72,8 +71,6 @@ const applyToAnchorRequestId: Ref<string> = ref('');
 const inviteToAnchorRequestId: Ref<string> = ref('');
 const dialogTitle: Ref<string> = ref('');
 
-const { getRequestIdList, getRequestFirstUserId } = useMemberControlHooks();
-
 watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
   if (localUser.onSeat) {
     iconName.value = ICON_NAME.GoOffSeat;
@@ -90,14 +87,6 @@ watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
     }
   }
 }, { immediate: true, deep: true });
-
-watch(() => roomStore.requestObj[TUIRequestAction.kRequestRemoteUserOnSeat], (val) => {
-  if (val.length) {
-    const requestFirstUserId = getRequestFirstUserId(TUIRequestAction.kRequestRemoteUserOnSeat);
-    const userRole = roomStore.getUserRole(requestFirstUserId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
-    dialogTitle.value = t('Sb invites you to speak on stage', { role: userRole });
-  }
-}, { deep: true });
 
 async function toggleApplySpeech() {
   hideApplyAttention();
@@ -122,16 +111,15 @@ async function sendSeatApplication() {
   const request = await roomEngine.instance?.takeSeat({
     seatIndex: -1,
     timeout: 0,
-    requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType, userId: string }) => {
+    requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType }) => {
       isApplyingOnSeat.value = false;
-      const { requestCallbackType, userId } = callbackInfo;
-      const userRole = roomStore.getUserRole(userId) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
+      const { requestCallbackType } = callbackInfo;
       switch (requestCallbackType) {
         case TUIRequestCallbackType.kRequestAccepted:
-          TUIMessage({ type: 'success', message: t('sb has approved your application', { role: userRole || userId }) });
+          TUIMessage({ type: 'success', message: t('Succeed on stage') });
           break;
         case TUIRequestCallbackType.kRequestRejected:
-          TUIMessage({ type: 'warning', message: t('sb has rejected your application for the stage', { role: userRole || userId }) });
+          TUIMessage({ type: 'warning', message: t('Application to go on stage was rejected') });
           break;
         case TUIRequestCallbackType.kRequestTimeout:
           break;
@@ -172,12 +160,17 @@ function hideApplyAttention() {
   showMemberApplyAttention.value = false;
 }
 
+/**
+ * Handling host or administrator invitation to on-stage signalling
+ *
+ * 处理主持人或管理员邀请上台信令
+**/
 async function onRequestReceived(eventInfo: { request: TUIRequest }) {
   const { request: { userId, requestId, requestAction } } = eventInfo;
-  // Received an invitation from the host to go on the microphone
   if (requestAction === TUIRequestAction.kRequestRemoteUserOnSeat) {
     inviteToAnchorRequestId.value = requestId;
-    roomStore.setRequestId(TUIRequestAction.kRequestRemoteUserOnSeat, { userId, requestId });
+    const userRole = roomStore.getUserRole(userId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
+    dialogTitle.value = t('Sb invites you to speak on stage', { role: userRole });
     showInviteDialog.value = true;
   }
 }
@@ -187,9 +180,8 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
    *
    * 主持人取消邀请上麦
   **/
-function onRequestCancelled(eventInfo: { requestId: string, userId: string }) {
+function onRequestCancelled(eventInfo: { requestId: string; userId: string }) {
   const { requestId } = eventInfo;
-  roomStore.deleteRequestId(TUIRequestAction.kRequestRemoteUserOnSeat, requestId);
   if (inviteToAnchorRequestId.value === requestId) {
     inviteToAnchorRequestId.value = '';
     showInviteDialog.value = false;
@@ -202,15 +194,11 @@ function onRequestCancelled(eventInfo: { requestId: string, userId: string }) {
  * 用户接受/拒绝主讲人的邀请
 **/
 async function handleInvite(agree: boolean) {
-  const requestList = getRequestIdList(TUIRequestAction.kRequestRemoteUserOnSeat);
-  for (const inviteRequestId of requestList) {
-    await roomEngine.instance?.responseRemoteRequest({
-      requestId: inviteRequestId,
-      agree,
-    });
-  }
+  await roomEngine.instance?.responseRemoteRequest({
+    requestId: inviteToAnchorRequestId.value,
+    agree,
+  });
   showInviteDialog.value = false;
-  roomStore.clearRequestId(TUIRequestAction.kRequestRemoteUserOnSeat);
   if (agree) {
     hideApplyAttention();
   }
@@ -283,7 +271,8 @@ onBeforeUnmount(() => {
     }
   }
 }
-.agree, .cancel {
+.agree,
+.cancel {
   padding: 14px;
   width: 50%;
   display: flex;

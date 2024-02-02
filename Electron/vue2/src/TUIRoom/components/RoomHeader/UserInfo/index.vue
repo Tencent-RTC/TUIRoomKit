@@ -20,7 +20,7 @@
       :modal="true"
       width="480px"
       :close-on-click-modal="true"
-      :append-to-room-container="true"
+      :append-to-body="true"
     >
       <div class="edit-content">
         <span>{{ t('User Name') }}</span>

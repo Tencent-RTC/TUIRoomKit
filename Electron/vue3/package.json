@@ -1,6 +1,6 @@
 {
   "name": "room-uikit-electron-vue3",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "This is an interactive multimedia room solution that published by Tencent Cloud RTC team for PC base on Electron, vue and so on.",
   "main": "dist/main/index.cjs",
   "author": "",
@@ -48,7 +48,7 @@
     "vue"
   ],
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-electron": "^2.0.2",
+    "@tencentcloud/tuiroom-engine-electron": "^2.0.3",
     "axios": "^0.27.2",
     "js-cookie": "^3.0.1",
     "lodash.isequal": "^4.5.0",

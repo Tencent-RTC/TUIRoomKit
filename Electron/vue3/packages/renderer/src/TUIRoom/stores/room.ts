@@ -7,7 +7,6 @@ import {
   TUIUserInfo,
   TUIVideoQuality,
   TUIVideoStreamType,
-  TUIRequestAction,
 } from '@tencentcloud/tuiroom-engine-electron';
 import { useBasicStore } from './basic';
 import { isVue3 } from '../utils/constants';
@@ -91,11 +90,6 @@ interface RoomState {
   hasVideoStreamObject: Record<string, UserInfo>,
   currentStreamIdListInVisibleView: string[],
   hasOtherScreenShare: boolean,
-  requestObj: Record<TUIRequestAction, RequestInfo[]>,
-}
-interface RequestInfo {
-  userId: string,
-  requestId: string,
 }
 
 export const useRoomStore = defineStore('room', {
@@ -151,7 +145,6 @@ export const useRoomStore = defineStore('room', {
     // 可视区域用户流列表
     currentStreamIdListInVisibleView: [],
     hasOtherScreenShare: false,
-    requestObj: {} as Record<TUIRequestAction, RequestInfo[]>,
   }),
   getters: {
     isMaster(state) {
@@ -710,30 +703,6 @@ export const useRoomStore = defineStore('room', {
     setHasOtherScreenShare(hasScreenShare: boolean) {
       this.hasOtherScreenShare = hasScreenShare;
     },
-    setRequestId(requestType: TUIRequestAction, requestParam: { userId: string, requestId: string }) {
-      if (!this.requestObj[requestType]) {
-        this.requestObj[requestType] = [];
-      }
-      if (isVue3) {
-        this.requestObj[requestType].push(requestParam);
-      } else {
-        // @ts-ignore
-        Vue.set(this.requestObj, requestType, [...this.requestObj[requestType], requestParam]);
-      }
-    },
-    deleteRequestId(requestType: TUIRequestAction, requestId: string) {
-      this.requestObj[requestType] = this.requestObj[requestType].filter(item => item.requestId !== requestId);
-    },
-    clearRequestId(requestType: TUIRequestAction) {
-      if (this.requestObj[requestType]) {
-        if (isVue3) {
-          this.requestObj[requestType] = [];
-        } else {
-          // @ts-ignore
-          Vue.set(this.requestObj, requestType, []);
-        }
-      }
-    },
     reset() {
       this.localUser = {
         userId: '',
@@ -783,7 +752,6 @@ export const useRoomStore = defineStore('room', {
       this.seatMode = TUISeatMode.kFreeToTake;
       this.hasVideoStreamObject = {};
       this.hasOtherScreenShare = false;
-      this.requestObj = {} as Record<TUIRequestAction, RequestInfo[]>;
     },
   },
 });

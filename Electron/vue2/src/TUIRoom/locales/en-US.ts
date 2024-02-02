@@ -122,7 +122,6 @@ export default {
   Leave: 'Leave',
   Dismiss: 'Dismiss',
   // @ts-ignore
-  'Moderator changed to sb': ({ named }) => `Moderator changed to ${named('name')}`,
   'The administrator has been changed to ': 'The administrator has been changed to ',
   'Muted by the moderator': 'Muted by the moderator',
   'Type a message': 'Type a message',
@@ -170,8 +169,6 @@ export default {
   'After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?': 'After agreeing to go on stage, you can turn on the camera and microphone. Do you agree to go on stage?',
   'Hand down': 'Hand down',
   // @ts-ignore
-  'sb has approved your application': ({ named }) => `${named('role')} has approved your application`,
-  // @ts-ignore
   'sb has rejected your application for the stage': ({ named }) => `${named('role')} has rejected your application for the stage`,
   'You have been invited by the host to step down, please raise your hand if you need to speak': 'You have been invited by the host to step down, please raise your hand if you need to speak',
   'If you have any questions, please email us.': 'If you have any questions, please email us.',
@@ -204,6 +201,7 @@ export default {
   'Invite via room link': 'Invite via room link',
   'Room Link': 'Room Link',
   'You can share the room number or link to invite more people to join the room.': 'You can share the room number or link to invite more people to join the room.',
+  'You can share the room number to invite more people to join the room': 'You can share the room number to invite more people to join the room',
   'If you have any questions, please feel free to join our QQ group or send an email': 'If you have any questions, please feel free to join our QQ group or send an email',
   'Room QR code': 'Room QR code',
   'Search for conference attendees': 'Search for conference attendees',
@@ -279,9 +277,16 @@ export default {
   'After unlocking, users can freely turn on the camera': 'After unlocking, users can freely turn on the camera',
   'Members will not be able to open the camera': 'Members will not be able to open the camera',
   'You have become a administrator': 'You have become a administrator',
+  'You are now a room owner': 'You are now a room owner',
   'Your administrator status has been revoked': 'Your administrator status has been revoked',
   'After transfer the room owner, you will become a general user': 'After transfer the room owner, you will become a general user',
   // @ts-ignore
   'Transfer the roomOwner to sb': ({ named }) => `Transfer the roomOwner to ${named('name')}`,
   'Confirm transfer': 'Confirm transfer',
+  // @ts-ignore
+  'The room owner has been transferred to sb': ({ named }) => `The room owner has been transferred to ${named('name')}`,
+  'Application to go on stage was rejected': 'Application to go on stage was rejected',
+  'You are now an administrator': 'You are now an administrator',
+  'The RoomOwner has withdrawn your administrator privileges': 'The RoomOwner has withdrawn your administrator privileges',
+  'This member has already received the same request,please try again later': 'This member has already received the same request,please try again later',
 };
