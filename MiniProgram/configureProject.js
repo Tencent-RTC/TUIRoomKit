@@ -120,7 +120,13 @@ class InitProject {
         path.join(this.destBase, file),
       );
     });
-
+    ['wxmini_dev.bat', 'wxmini_prod.bat'].forEach((file) => {
+      fs.copyFileSync(
+        path.join(this.sourceBase, file),
+        path.join(this.destBase, file),
+      );
+    });
+    
     // Copy TUIRoomEngine.wasm.br file
     const wasmDest = './static/TUIRoomEngine.wasm.br';
     createDirIfNotExist(path.dirname(wasmDest));

@@ -97,10 +97,10 @@ export default function useEndControl() {
     switch (userRole) {
       case TUIRole.kGeneralUser:
         if (isLocal) {
-          if (roomStore?.isCameraDisableForAllUser && !roomStore.localStream.hasAudioStream) {
+          if (roomStore?.isMicrophoneDisableForAllUser && !roomStore.localStream.hasAudioStream) {
             roomStore.setCanControlSelfAudio(false);
           }
-          if (roomStore?.isMicrophoneDisableForAllUser && !roomStore.localStream.hasVideoStream) {
+          if (roomStore?.isCameraDisableForAllUser && !roomStore.localStream.hasVideoStream) {
             roomStore.setCanControlSelfVideo(false);
           }
           if (oldUserRole === TUIRole.kAdministrator) {
@@ -117,10 +117,11 @@ export default function useEndControl() {
         break;
       case TUIRole.kRoomOwner: {
         roomStore.setMasterUserId(userId);
-        const transferUserName = isLocal ? t('me') : roomStore.getUserName(userId);
-        TUIMessage({ type: 'success', message: `${t('Moderator changed to sb', { name: transferUserName })}` });
-        if (isLocal && roomStore.isSpeakAfterTakingSeatMode && !roomStore.isAnchor) {
-          await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+        if (isLocal) {
+          TUIMessage({ type: 'success', message: `${t('You are now a room owner')}` });
+          if (roomStore.isSpeakAfterTakingSeatMode && !roomStore.isAnchor) {
+            await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+          }
         }
         break;
       }
