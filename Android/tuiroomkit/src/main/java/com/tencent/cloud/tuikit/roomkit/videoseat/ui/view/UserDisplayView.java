@@ -123,21 +123,16 @@ public class UserDisplayView extends FrameLayout {
         if (videoView == null) {
             return;
         }
-        // addView 需要在 ViewGroup 测量、布局之后才能执行；
-        post(new Runnable() {
-            @Override
-            public void run() {
-                ViewParent viewParent = videoView.getParent();
-                if (viewParent != null && (viewParent instanceof ViewGroup)) {
-                    if (viewParent == mVideoContainer) {
-                        return;
-                    }
-                    ((ViewGroup) viewParent).removeView(videoView);
-                }
-                mVideoContainer.removeAllViews();
-                mVideoContainer.addView(videoView);
+
+        ViewParent viewParent = videoView.getParent();
+        if (viewParent != null && (viewParent instanceof ViewGroup)) {
+            if (viewParent == mVideoContainer) {
+                return;
             }
-        });
+            ((ViewGroup) viewParent).removeView(videoView);
+        }
+        mVideoContainer.removeAllViews();
+        mVideoContainer.addView(videoView);
     }
 
     public void clearUserEntity() {

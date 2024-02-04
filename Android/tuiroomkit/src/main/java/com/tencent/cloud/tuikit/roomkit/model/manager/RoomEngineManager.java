@@ -1,5 +1,6 @@
 package com.tencent.cloud.tuikit.roomkit.model.manager;
 
+import static com.tencent.cloud.tuikit.engine.common.TUICommonDefine.Error.ALREADY_IN_SEAT;
 import static com.tencent.cloud.tuikit.engine.common.TUICommonDefine.Error.PERMISSION_DENIED;
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.RequestAction.REQUEST_TO_OPEN_REMOTE_CAMERA;
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.RequestAction.REQUEST_TO_OPEN_REMOTE_MICROPHONE;
@@ -109,8 +110,22 @@ public class RoomEngineManager {
             return;
         }
 
-        mRoomEngine.responseRemoteRequest(requestId, agree, callback);
-        mRoomStore.removeTakeSeatRequest(requestId);
+        mRoomEngine.responseRemoteRequest(requestId, agree, new TUIRoomDefine.ActionCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback != null) {
+                    callback.onSuccess();
+                }
+                mRoomStore.removeTakeSeatRequest(requestId);
+            }
+
+            @Override
+            public void onError(TUICommonDefine.Error error, String s) {
+                if (callback != null) {
+                    callback.onError(error, s);
+                }
+            }
+        });
     }
 
     public void cancelRequest(String requestId, TUIRoomDefine.ActionCallback callback) {
@@ -175,7 +190,7 @@ public class RoomEngineManager {
             @Override
             public void onGranted() {
                 Log.d(TAG, "openLocalCamera");
-                mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, TUIRoomDefine.VideoQuality.Q_1080P,
+                mRoomEngine.openLocalCamera(mRoomStore.videoModel.isFrontCamera, mRoomStore.videoModel.getResolution(),
                         cameraCallback);
             }
 
@@ -399,6 +414,7 @@ public class RoomEngineManager {
             @Override
             public void onSuccess() {
                 Log.i(TAG, "createRoom roomInfo=" + roomInfo + " thread.name=" + Thread.currentThread().getName());
+                mRoomStore.userModel.setRole(TUIRoomDefine.Role.ROOM_OWNER);
                 mRoomEngine.createRoom(roomInfo, new TUIRoomDefine.ActionCallback() {
                     @Override
                     public void onSuccess() {
@@ -476,7 +492,6 @@ public class RoomEngineManager {
                             @Override
                             public void onError(String requestId, String userId, TUICommonDefine.Error error,
                                                 String message) {
-
                             }
                         });
                         KeepAliveService.startKeepAliveService(
@@ -516,11 +531,7 @@ public class RoomEngineManager {
             @Override
             public void onAccepted(String requestId, String userId) {
                 Log.d(TAG, "takeSeat onAccepted requestId=" + requestId + " userId=" + userId);
-                mRoomStore.userModel.setSeatStatus(UserModel.SeatStatus.ON_SEAT);
-                mRoomStore.userModel.takeSeatRequestId = null;
-                if (callback != null) {
-                    callback.onAccepted(requestId, userId);
-                }
+                handleTakeSeatAccepted(requestId, userId);
             }
 
             @Override
@@ -556,10 +567,22 @@ public class RoomEngineManager {
             @Override
             public void onError(String requestId, String userId, TUICommonDefine.Error code, String message) {
                 Log.e(TAG, "takeSeat onError userId=" + userId + " code=" + code + " message=" + message);
+                if (code == ALREADY_IN_SEAT) {
+                    handleTakeSeatAccepted(requestId, userId);
+                    return;
+                }
                 mRoomStore.userModel.setSeatStatus(UserModel.SeatStatus.OFF_SEAT);
                 mRoomStore.userModel.takeSeatRequestId = null;
                 if (callback != null) {
                     callback.onError(requestId, userId, code, message);
+                }
+            }
+
+            private void handleTakeSeatAccepted(String requestId, String userId) {
+                mRoomStore.userModel.setSeatStatus(UserModel.SeatStatus.ON_SEAT);
+                mRoomStore.userModel.takeSeatRequestId = null;
+                if (callback != null) {
+                    callback.onAccepted(requestId, userId);
                 }
             }
         });
@@ -590,9 +613,9 @@ public class RoomEngineManager {
     }
 
     public void autoTakeSeatForOwner(TUIRoomDefine.RequestCallback callback) {
-        if (mRoomStore.userModel.role == TUIRoomDefine.Role.ROOM_OWNER
+        if (mRoomStore.userModel.getRole() == TUIRoomDefine.Role.ROOM_OWNER
                 && mRoomStore.roomInfo.isSeatEnabled && mRoomStore.userModel.isOffSeat()) {
-            takeSeat(0, 0, callback);
+            takeSeat(-1, 0, callback);
             return;
         }
         if (callback != null) {
@@ -623,7 +646,7 @@ public class RoomEngineManager {
                     + "  }\n"
                     + "}";
         }
-        mRoomEngine.callExperimentalAPI(jsonStr);
+        TUIRoomEngine.callExperimentalAPI(jsonStr);
     }
 
     private long mNextSequence = 0;
@@ -660,6 +683,9 @@ public class RoomEngineManager {
             public void onSuccess(List<TUIRoomDefine.SeatInfo> list) {
                 Log.d(TAG, "getSeatList onSuccess");
                 for (TUIRoomDefine.SeatInfo item : list) {
+                    if (TextUtils.isEmpty(item.userId)) {
+                        continue;
+                    }
                     mRoomEngine.getUserInfo(item.userId, new TUIRoomDefine.GetUserInfoCallback() {
                         @Override
                         public void onSuccess(TUIRoomDefine.UserInfo userInfo) {
@@ -685,9 +711,9 @@ public class RoomEngineManager {
     private void updateRoomStore(TUIRoomDefine.RoomInfo engineRoomInfo) {
         mRoomStore.roomInfo = engineRoomInfo;
         mRoomStore.userModel.enterRoomTime = System.currentTimeMillis();
-        mRoomStore.userModel.role =
+        mRoomStore.userModel.setRole(
                 TextUtils.equals(engineRoomInfo.ownerId, TUILogin.getUserId()) ? TUIRoomDefine.Role.ROOM_OWNER :
-                        TUIRoomDefine.Role.GENERAL_USER;
+                        TUIRoomDefine.Role.GENERAL_USER);
     }
 
     public void exitRoom(TUIRoomDefine.ActionCallback callback) {
@@ -765,7 +791,6 @@ public class RoomEngineManager {
         mRoomFloatWindowManager.destroy();
         mRoomEngine.removeObserver(mObserver);
         sInstance = null;
-        mRoomStore = null;
         Log.d(TAG, "destroyInstance manager=" + this + " mRoomStore=" + mRoomStore);
     }
 
@@ -819,7 +844,7 @@ public class RoomEngineManager {
             return false;
         }
         if (mRoomStore.roomInfo.isMicrophoneDisableForAllUser
-                && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER) {
+                && mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
             ToastUtil.toastShortMessageCenter(context.getString(R.string.tuiroomkit_can_not_open_mic));
             return false;
         }

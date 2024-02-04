@@ -24,6 +24,7 @@ import com.tencent.cloud.tuikit.roomkit.view.page.widget.UserControlPanel.UserMa
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventResponder,
@@ -89,9 +90,9 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
             return !mRoomStore.roomInfo.isSeatEnabled || mUser.isOnSeat();
         }
         if (TextUtils.equals(ACTION_KICK_OUT_ROOM, action)) {
-            return mRoomStore.userModel.role == TUIRoomDefine.Role.ROOM_OWNER;
+            return mRoomStore.userModel.getRole() == TUIRoomDefine.Role.ROOM_OWNER;
         }
-        TUIRoomDefine.Role localUserRole = RoomEngineManager.sharedInstance().getRoomStore().userModel.role;
+        TUIRoomDefine.Role localUserRole = RoomEngineManager.sharedInstance().getRoomStore().userModel.getRole();
         TUIRoomDefine.Role userRole = mUser.getRole();
         if (localUserRole == TUIRoomDefine.Role.ROOM_OWNER) {
             return true;
@@ -139,35 +140,7 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
             return;
         }
         RoomEngineManager.sharedInstance()
-                .openRemoteDeviceByAdmin(userId, TUIRoomDefine.MediaDevice.MICROPHONE, REQ_TIME_OUT,
-                        new TUIRoomDefine.RequestCallback() {
-                            @Override
-                            public void onAccepted(String s, String s1) {
-                                ToastUtil.toastShortMessageCenter(mContext.getString(
-                                        R.string.tuiroomkit_open_mic_agree, mUser.getUserName()));
-                            }
-
-                            @Override
-                            public void onRejected(String s, String s1, String s2) {
-                                ToastUtil.toastShortMessageCenter(mContext.getString(
-                                        R.string.tuiroomkit_open_mic_reject, mUser.getUserName()));
-                            }
-
-                            @Override
-                            public void onCancelled(String s, String s1) {
-
-                            }
-
-                            @Override
-                            public void onTimeout(String s, String s1) {
-
-                            }
-
-                            @Override
-                            public void onError(String s, String s1, TUICommonDefine.Error error, String s2) {
-
-                            }
-                        });
+                .openRemoteDeviceByAdmin(userId, TUIRoomDefine.MediaDevice.MICROPHONE, REQ_TIME_OUT, null);
     }
 
 
@@ -192,73 +165,24 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
             return;
         }
         RoomEngineManager.sharedInstance()
-                .openRemoteDeviceByAdmin(userId, TUIRoomDefine.MediaDevice.CAMERA, REQ_TIME_OUT,
-                        new TUIRoomDefine.RequestCallback() {
-                            @Override
-                            public void onAccepted(String s, String s1) {
-                                ToastUtil.toastShortMessageCenter(mContext.getString(
-                                        R.string.tuiroomkit_open_camera_agree, mUser.getUserName()));
-                            }
-
-                            @Override
-                            public void onRejected(String s, String s1, String s2) {
-                                ToastUtil.toastShortMessageCenter(mContext.getString(
-                                        R.string.tuiroomkit_open_camera_reject, mUser.getUserName()));
-                            }
-
-                            @Override
-                            public void onCancelled(String s, String s1) {
-
-                            }
-
-                            @Override
-                            public void onTimeout(String s, String s1) {
-
-                            }
-
-                            @Override
-                            public void onError(String s, String s1, TUICommonDefine.Error error, String s2) {
-
-                            }
-                        });
+                .openRemoteDeviceByAdmin(userId, TUIRoomDefine.MediaDevice.CAMERA, REQ_TIME_OUT, null);
     }
 
-    public void forwardMaster() {
+    public void forwardMaster(TUIRoomDefine.ActionCallback callback) {
         if (mUser == null) {
             return;
         }
-        RoomEngineManager.sharedInstance()
-                .changeUserRole(mUser.getUserId(), TUIRoomDefine.Role.ROOM_OWNER, new TUIRoomDefine.ActionCallback() {
-                    @Override
-                    public void onSuccess() {
-                        mUserManagementView.showTransferRoomSuccessDialog();
-                    }
-
-                    @Override
-                    public void onError(TUICommonDefine.Error error, String s) {
-                        Log.e(TAG, "changeUserRole onError error=" + error + " s=" + s);
-                    }
-                });
+        RoomEngineManager.sharedInstance().changeUserRole(mUser.getUserId(), TUIRoomDefine.Role.ROOM_OWNER, callback);
     }
 
-    public void switchManagerRole() {
+    public void switchManagerRole(TUIRoomDefine.ActionCallback callback) {
         if (mUser == null) {
             return;
         }
         TUIRoomDefine.Role role = mUser.getRole() == TUIRoomDefine.Role.MANAGER ? TUIRoomDefine.Role.GENERAL_USER :
                 TUIRoomDefine.Role.MANAGER;
 
-        RoomEngineManager.sharedInstance().changeUserRole(mUser.getUserId(), role, new TUIRoomDefine.ActionCallback() {
-            @Override
-            public void onSuccess() {
-                Log.d(TAG, "changeUserRole onSuccess");
-            }
-
-            @Override
-            public void onError(TUICommonDefine.Error error, String s) {
-                Log.e(TAG, "changeUserRole onError error=" + error + " s=" + s);
-            }
-        });
+        RoomEngineManager.sharedInstance().changeUserRole(mUser.getUserId(), role, callback);
     }
 
     public void switchSendingMessageAbility() {
@@ -293,7 +217,9 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
         if (!isSeatEnable() || mUser.isOnSeat()) {
             return;
         }
-        RoomEngineManager.sharedInstance().takeUserOnSeatByAdmin(SEAT_INDEX, mUser.getUserId(), INVITE_TIME_OUT, null);
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", mUser.getUserId());
+        RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.INVITE_TAKE_SEAT, params);
     }
 
 
@@ -415,10 +341,10 @@ public class UserManagementViewModel implements RoomEventCenter.RoomEngineEventR
     }
 
     private boolean hasAbilityToManageUser(UserEntity user) {
-        if (mRoomStore.userModel.role == TUIRoomDefine.Role.ROOM_OWNER) {
+        if (mRoomStore.userModel.getRole() == TUIRoomDefine.Role.ROOM_OWNER) {
             return true;
         }
-        if (mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER) {
+        if (mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
             return TextUtils.equals(mRoomStore.userModel.userId, user.getUserId());
         }
         if (TextUtils.equals(mRoomStore.userModel.userId, user.getUserId())) {

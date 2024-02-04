@@ -8,15 +8,20 @@ import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEv
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.DISAGREE_TAKE_SEAT;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant.KEY_USER_POSITION;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.entity.TakeSeatRequestEntity;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel.RaiseHandApplicationListPanel;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +35,10 @@ public class RaiseHandApplicationListViewModel
 
     private List<TakeSeatRequestEntity> mTakeSeatRequestList;
 
-    public RaiseHandApplicationListViewModel(RaiseHandApplicationListPanel view) {
+    private Context mContext;
+
+    public RaiseHandApplicationListViewModel(Context context, RaiseHandApplicationListPanel view) {
+        mContext = context;
         mApplyView = view;
 
         mTakeSeatRequestList = RoomEngineManager.sharedInstance().getRoomStore().takeSeatRequestList;
@@ -169,6 +177,20 @@ public class RaiseHandApplicationListViewModel
         }
 
         RoomEngineManager.sharedInstance()
-                .responseRemoteRequest(request.getRequest().requestAction, request.getRequest().requestId, agree, null);
+                .responseRemoteRequest(request.getRequest().requestAction, request.getRequest().requestId, agree,
+                        new TUIRoomDefine.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                            }
+
+                            @Override
+                            public void onError(TUICommonDefine.Error error, String message) {
+                                Log.e(TAG, "responseUserOnStage onError error=" + error + " message=" + message);
+                                if (error == TUICommonDefine.Error.ALL_SEAT_OCCUPIED) {
+                                    ToastUtil.toastShortMessageCenter(
+                                            mContext.getString(R.string.tuiroomkit_all_seat_occupied));
+                                }
+                            }
+                        });
     }
 }

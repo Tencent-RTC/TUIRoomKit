@@ -47,7 +47,8 @@ import java.util.Map;
 public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder {
     private static final String TAG          = "BottomMainViewModel";
     private static final int    SEAT_INDEX   = -1;
-    private static final int    REQ_TIME_OUT = 0;
+
+    private static final int NEVER_TIME_OUT = 0;
 
     private static final int ITEM_NUM_EACH_LINE = 5;
 
@@ -140,7 +141,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     }
 
     private void addMicItemIfNeeded(List<BottomItemData> itemDataList) {
-        if (isSeatEnabled() && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER
+        if (isSeatEnabled() && mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER
                 && !mRoomStore.userModel.isOnSeat()) {
             return;
         }
@@ -148,7 +149,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     }
 
     private void addCameraItemIfNeeded(List<BottomItemData> itemDataList) {
-        if (isSeatEnabled() && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER
+        if (isSeatEnabled() && mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER
                 && !mRoomStore.userModel.isOnSeat()) {
             return;
         }
@@ -159,7 +160,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         if (!isSeatEnabled()) {
             return;
         }
-        if (mRoomStore.userModel.role == TUIRoomDefine.Role.ROOM_OWNER) {
+        if (mRoomStore.userModel.getRole() == TUIRoomDefine.Role.ROOM_OWNER) {
             return;
         }
         itemDataList.add(createRaiseHandItem());
@@ -169,7 +170,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         if (!isSeatEnabled()) {
             return;
         }
-        if (mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER) {
+        if (mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
             return;
         }
         itemDataList.add(createApplyListItem());
@@ -370,17 +371,17 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
 
 
     private void raiseHand() {
-        if (mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER) {
+        if (mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
             ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_raised_hand));
         }
-        RoomEngineManager.sharedInstance().takeSeat(SEAT_INDEX, REQ_TIME_OUT, new TUIRoomDefine.RequestCallback() {
+        RoomEngineManager.sharedInstance().takeSeat(SEAT_INDEX, NEVER_TIME_OUT, new TUIRoomDefine.RequestCallback() {
             @Override
             public void onAccepted(String requestId, String userId) {
                 if (mBottomView == null) {
                     return;
                 }
                 mBottomView.replaceItem(BottomItemData.Type.RAISE_HAND, createRaiseHandItem());
-                ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_take_seat_request_accepted));
+                ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_take_seat_success));
             }
 
             @Override
@@ -389,7 +390,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
                     return;
                 }
                 mBottomView.replaceItem(BottomItemData.Type.RAISE_HAND, createRaiseHandItem());
-                ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_take_seat_request_rejected));
+                ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_take_seat_rejected));
             }
 
             @Override
@@ -439,7 +440,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     }
 
     private void getOffStage() {
-        if (mRoomStore.userModel.role != TUIRoomDefine.Role.GENERAL_USER) {
+        if (mRoomStore.userModel.getRole() != TUIRoomDefine.Role.GENERAL_USER) {
             leaveSeat();
             return;
         }
@@ -553,7 +554,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     private void updateAudioItemSelectStatus(boolean isSelected) {
         mBottomView.updateItemSelectStatus(BottomItemData.Type.AUDIO, isSelected);
         if (mRoomStore.roomInfo.isMicrophoneDisableForAllUser
-                && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER) {
+                && mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
             mBottomView.updateItemEnableStatus(BottomItemData.Type.AUDIO, isSelected);
         }
     }
@@ -581,7 +582,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     private void updateVideoButtonSelectStatus(boolean isSelected) {
         mBottomView.updateItemSelectStatus(BottomItemData.Type.VIDEO, isSelected);
         if (mRoomStore.roomInfo.isCameraDisableForAllUser
-                && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER) {
+                && mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
             mBottomView.updateItemEnableStatus(BottomItemData.Type.VIDEO, isSelected);
         }
     }
@@ -642,7 +643,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         if (params == null) {
             return;
         }
-        if (mRoomStore.userModel.role != TUIRoomDefine.Role.GENERAL_USER) {
+        if (mRoomStore.userModel.getRole() != TUIRoomDefine.Role.GENERAL_USER) {
             return;
         }
         mBottomView.updateItemEnableStatus(BottomItemData.Type.VIDEO, isShowCameraEnableEffect());
@@ -652,7 +653,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         if (params == null) {
             return;
         }
-        if (mRoomStore.userModel.role != TUIRoomDefine.Role.GENERAL_USER) {
+        if (mRoomStore.userModel.getRole() != TUIRoomDefine.Role.GENERAL_USER) {
             return;
         }
         mBottomView.updateItemEnableStatus(BottomItemData.Type.AUDIO, isShowMicEnableEffect());
@@ -793,11 +794,11 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
 
     private boolean isMicAvailableInAllBanAudioMode() {
         return !(mRoomStore.roomInfo.isMicrophoneDisableForAllUser
-                && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER);
+                && mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER);
     }
 
     private boolean isCameraAvailableInAllBanCameraMode() {
         return !(mRoomStore.roomInfo.isCameraDisableForAllUser
-                && mRoomStore.userModel.role == TUIRoomDefine.Role.GENERAL_USER);
+                && mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER);
     }
 }

@@ -97,21 +97,7 @@ public class VideoSeatViewModel extends TUIRoomObserver implements IVideoSeatVie
         mRoomEngine.setRemoteVideoView(realUserId, videoStreamType, videoView);
         Log.d(TAG, "startPlayRemoteVideo userId=" + userId + " videoStreamType=" + videoStreamType + " userName="
                 + entity.getUserName());
-        mRoomEngine.startPlayRemoteVideo(realUserId, videoStreamType, new TUIRoomDefine.PlayCallback() {
-            @Override
-            public void onPlaying(String s) {
-                Log.d(TAG, "startPlayRemoteVideo onPlaying userId=" + userId + " videoStreamType=" + videoStreamType);
-            }
-
-            @Override
-            public void onLoading(String s) {
-            }
-
-            @Override
-            public void onPlayError(String s, TUICommonDefine.Error error, String s1) {
-                Log.e(TAG, "on play error s=" + s + " error=" + error + " s1=" + s1);
-            }
-        });
+        mRoomEngine.startPlayRemoteVideo(realUserId, videoStreamType, null);
         entity.setVideoPlaying(true);
         notifyUserVideoVisibilityStageChanged(userId);
     }
@@ -422,6 +408,10 @@ public class VideoSeatViewModel extends TUIRoomObserver implements IVideoSeatVie
         for (TUIRoomDefine.SeatInfo info : addList) {
             final UserEntity entity = createUserEntity(info);
             Log.d(TAG, "addNewUsers getUserInfo info.userId=" + info.userId);
+            if (TextUtils.isEmpty(info.userId)) {
+                notifyUiUpdateIfCompleteUserInfoFetch(resultCount, totalCount);
+                continue;
+            }
             mRoomEngine.getUserInfo(info.userId, new TUIRoomDefine.GetUserInfoCallback() {
                 @Override
                 public void onSuccess(TUIRoomDefine.UserInfo userInfo) {
@@ -452,8 +442,6 @@ public class VideoSeatViewModel extends TUIRoomObserver implements IVideoSeatVie
         entity.setRoomVideoView(roomVideoView);
         if (info.userId.equals(mSelfUserId)) {
             entity.setSelf(true);
-            // 刚进房时，sdk 可能不回调自己视频已打开的信息
-            setLocalVideoView(entity);
         }
         return entity;
     }
@@ -512,6 +500,10 @@ public class VideoSeatViewModel extends TUIRoomObserver implements IVideoSeatVie
         int position = mUserListSorter.insertUser(mUserEntityList, entity);
         mVideoSeatView.notifyItemInserted(position);
         mUserEntityMap.put(entity.getUserId(), entity);
+        if (entity.isSelf()) {
+            // 刚进房时，sdk 可能不回调自己视频已打开的信息
+            setLocalVideoView(entity);
+        }
     }
 
     private void removeMemberEntity(String userId) {

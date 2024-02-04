@@ -3,26 +3,35 @@ package com.tencent.cloud.tuikit.roomkit.view.page.widget.UserControlPanel;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.DISMISS_USER_MANAGEMENT;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserEntity;
+import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseBottomDialog;
+import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
 import com.tencent.cloud.tuikit.roomkit.view.component.ConfirmDialog;
+import com.tencent.cloud.tuikit.roomkit.view.component.TipToast;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.UserManagementViewModel;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserManagementPanel extends BaseBottomDialog {
+    private static final String TAG = "UserManagementPanel";
+
     private Context                 mContext;
     private UserEntity              mUser;
     private TextView                mTextMessageDisable;
@@ -226,7 +235,7 @@ public class UserManagementPanel extends BaseBottomDialog {
         layoutTransferOwner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewModel.forwardMaster();
+                showTransferOwnerDialog();
                 dismiss();
             }
         });
@@ -244,7 +253,21 @@ public class UserManagementPanel extends BaseBottomDialog {
         layoutManagerControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewModel.switchManagerRole();
+                mViewModel.switchManagerRole(new TUIRoomDefine.ActionCallback() {
+                    @Override
+                    public void onSuccess() {
+                        TipToast.build()
+                                .setDuration(Toast.LENGTH_LONG)
+                                .setMessage(mContext.getString(R.string.tuiroomkit_make_user_as_manager,
+                                        mUser.getUserName()))
+                                .show(mContext);
+                    }
+
+                    @Override
+                    public void onError(TUICommonDefine.Error error, String message) {
+                        Log.e(TAG, "onError error=" + error + " message=" + message);
+                    }
+                });
                 dismiss();
             }
         });
@@ -262,7 +285,21 @@ public class UserManagementPanel extends BaseBottomDialog {
         layoutManagerControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewModel.switchManagerRole();
+                mViewModel.switchManagerRole(new TUIRoomDefine.ActionCallback() {
+                    @Override
+                    public void onSuccess() {
+                        TipToast.build()
+                                .setDuration(Toast.LENGTH_LONG)
+                                .setMessage(mContext.getString(R.string.tuiroomkit_make_user_as_general,
+                                        mUser.getUserName()))
+                                .show(mContext);
+                    }
+
+                    @Override
+                    public void onError(TUICommonDefine.Error error, String message) {
+                        Log.e(TAG, "onError error=" + error + " message=" + message);
+                    }
+                });
                 dismiss();
             }
         });
@@ -317,5 +354,39 @@ public class UserManagementPanel extends BaseBottomDialog {
                 dismiss();
             }
         });
+    }
+
+    private void showTransferOwnerDialog() {
+        AppCompatActivity activity = null;
+        if (mContext instanceof AppCompatActivity) {
+            activity = (AppCompatActivity) mContext;
+        }
+        if (activity == null) {
+            return;
+        }
+        BaseDialogFragment.build()
+                .setTitle(mContext.getString(R.string.tuiroomkit_dialog_transfer_owner_title, mUser.getUserName()))
+                .setContent(mContext.getString(R.string.tuiroomkit_dialog_transfer_owner_content))
+                .setNegativeName(mContext.getString(R.string.tuiroomkit_cancel))
+                .setPositiveName(mContext.getString(R.string.tuiroomkit_dialog_transfer_owner_confirm))
+                .setPositiveListener(new BaseDialogFragment.ClickListener() {
+                    @Override
+                    public void onClick() {
+                        mViewModel.forwardMaster(new TUIRoomDefine.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                                TipToast.build().setDuration(Toast.LENGTH_LONG).setMessage(
+                                        mContext.getString(R.string.tuiroomkit_toast_transfer_owner_success,
+                                                mUser.getUserName())).show(mContext);
+                            }
+
+                            @Override
+                            public void onError(TUICommonDefine.Error error, String message) {
+                                Log.e(TAG, "forwardMaster onError error=" + error + " message=" + message);
+                            }
+                        });
+                    }
+                })
+                .showDialog(activity.getSupportFragmentManager(), "showTransferOwnerDialog");
     }
 }

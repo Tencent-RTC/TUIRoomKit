@@ -32,7 +32,6 @@ import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.UserListViewModel;
-import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 public class UserListPanel extends BaseBottomDialog implements View.OnClickListener {
@@ -212,20 +211,32 @@ public class UserListPanel extends BaseBottomDialog implements View.OnClickListe
             return;
         }
         AppCompatActivity activity = (AppCompatActivity) mContext;
-        boolean isEnable = RoomEngineManager.sharedInstance().getRoomStore().roomInfo.isMicrophoneDisableForAllUser;
+        boolean isDisable = RoomEngineManager.sharedInstance().getRoomStore().roomInfo.isMicrophoneDisableForAllUser;
         BaseDialogFragment.build()
-                .setTitle(mContext.getString(isEnable ? R.string.tuiroomkit_dialog_unmute_all_audio_title :
+                .setTitle(mContext.getString(isDisable ? R.string.tuiroomkit_dialog_unmute_all_audio_title :
                         R.string.tuiroomkit_dialog_mute_all_audio_title))
-                .setContent(mContext.getString(isEnable ? R.string.tuiroomkit_dialog_unmute_all_audio_content :
+                .setContent(mContext.getString(isDisable ? R.string.tuiroomkit_dialog_unmute_all_audio_content :
                         R.string.tuiroomkit_dialog_mute_all_audio_content))
                 .setNegativeName(mContext.getString(R.string.tuiroomkit_cancel))
-                .setPositiveName(mContext.getString(isEnable ? R.string.tuiroomkit_dialog_unmute_all_confirm :
+                .setPositiveName(mContext.getString(isDisable ? R.string.tuiroomkit_dialog_unmute_all_confirm :
                         R.string.tuiroomkit_mute_all_audio))
                 .setPositiveListener(new BaseDialogFragment.ClickListener() {
                     @Override
                     public void onClick() {
+                        if (isDisable && !RoomEngineManager.sharedInstance()
+                                .getRoomStore().roomInfo.isMicrophoneDisableForAllUser) {
+                            ToastUtil.toastShortMessageCenter(
+                                    getContext().getString(R.string.tuiroomkit_toast_not_mute_all_audio));
+                            return;
+                        }
+                        if (!isDisable && RoomEngineManager.sharedInstance()
+                                .getRoomStore().roomInfo.isMicrophoneDisableForAllUser) {
+                            ToastUtil.toastShortMessageCenter(
+                                    getContext().getString(R.string.tuiroomkit_mute_all_mic_toast));
+                            return;
+                        }
                         RoomEngineManager.sharedInstance()
-                                .disableDeviceForAllUserByAdmin(TUIRoomDefine.MediaDevice.MICROPHONE, !isEnable, null);
+                                .disableDeviceForAllUserByAdmin(TUIRoomDefine.MediaDevice.MICROPHONE, !isDisable, null);
 
                     }
                 }).showDialog(activity.getSupportFragmentManager(), "disableDeviceForAllUserByAdmin");
@@ -237,20 +248,32 @@ public class UserListPanel extends BaseBottomDialog implements View.OnClickListe
             return;
         }
         AppCompatActivity activity = (AppCompatActivity) mContext;
-        boolean isEnable = RoomEngineManager.sharedInstance().getRoomStore().roomInfo.isCameraDisableForAllUser;
+        boolean isDisable = RoomEngineManager.sharedInstance().getRoomStore().roomInfo.isCameraDisableForAllUser;
         BaseDialogFragment.build()
-                .setTitle(mContext.getString(isEnable ? R.string.tuiroomkit_dialog_unmute_all_video_title :
+                .setTitle(mContext.getString(isDisable ? R.string.tuiroomkit_dialog_unmute_all_video_title :
                         R.string.tuiroomkit_dialog_mute_all_video_title))
-                .setContent(mContext.getString(isEnable ? R.string.tuiroomkit_dialog_unmute_all_video_content :
+                .setContent(mContext.getString(isDisable ? R.string.tuiroomkit_dialog_unmute_all_video_content :
                         R.string.tuiroomkit_dialog_mute_all_video_content))
                 .setNegativeName(mContext.getString(R.string.tuiroomkit_cancel))
-                .setPositiveName(mContext.getString(isEnable ? R.string.tuiroomkit_dialog_unmute_all_confirm :
+                .setPositiveName(mContext.getString(isDisable ? R.string.tuiroomkit_dialog_unmute_all_confirm :
                         R.string.tuiroomkit_mute_all_video))
                 .setPositiveListener(new BaseDialogFragment.ClickListener() {
                     @Override
                     public void onClick() {
+                        if (isDisable && !RoomEngineManager.sharedInstance()
+                                .getRoomStore().roomInfo.isCameraDisableForAllUser) {
+                            ToastUtil.toastShortMessageCenter(
+                                    getContext().getString(R.string.tuiroomkit_toast_not_mute_all_video));
+                            return;
+                        }
+                        if (!isDisable && RoomEngineManager.sharedInstance()
+                                .getRoomStore().roomInfo.isCameraDisableForAllUser) {
+                            ToastUtil.toastShortMessageCenter(
+                                    getContext().getString(R.string.tuiroomkit_mute_all_camera_toast));
+                            return;
+                        }
                         RoomEngineManager.sharedInstance()
-                                .disableDeviceForAllUserByAdmin(TUIRoomDefine.MediaDevice.CAMERA, !isEnable, null);
+                                .disableDeviceForAllUserByAdmin(TUIRoomDefine.MediaDevice.CAMERA, !isDisable, null);
 
                     }
                 })

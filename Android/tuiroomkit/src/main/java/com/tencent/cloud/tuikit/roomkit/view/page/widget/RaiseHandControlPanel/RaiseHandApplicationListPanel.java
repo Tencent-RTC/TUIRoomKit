@@ -32,7 +32,7 @@ public class RaiseHandApplicationListPanel extends BaseBottomDialog implements V
     public RaiseHandApplicationListPanel(Context context) {
         super(context);
         mContext = context;
-        mViewModel = new RaiseHandApplicationListViewModel(this);
+        mViewModel = new RaiseHandApplicationListViewModel(context, this);
     }
 
     @Override
@@ -100,7 +100,6 @@ public class RaiseHandApplicationListPanel extends BaseBottomDialog implements V
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        updateHeightToMatchParent();
     }
 
     public void notifyItemInserted(int position) {

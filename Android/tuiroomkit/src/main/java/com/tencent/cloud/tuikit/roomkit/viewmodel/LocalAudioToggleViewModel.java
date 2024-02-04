@@ -135,7 +135,7 @@ public class LocalAudioToggleViewModel implements LocalAudioToggleViewAction, Ro
         if (!store.roomInfo.isSeatEnabled) {
             return;
         }
-        boolean visible = store.userModel.role != TUIRoomDefine.Role.GENERAL_USER || store.userModel.isOnSeat();
+        boolean visible = store.userModel.getRole() != TUIRoomDefine.Role.GENERAL_USER || store.userModel.isOnSeat();
         mViewResponder.onLocalAudioVisibilityChanged(visible);
     }
 
@@ -162,7 +162,8 @@ public class LocalAudioToggleViewModel implements LocalAudioToggleViewAction, Ro
             ToastUtil.toastShortMessageCenter(context.getString(R.string.tuiroomkit_please_raise_hand));
             return false;
         }
-        if (store.roomInfo.isMicrophoneDisableForAllUser && store.userModel.role != TUIRoomDefine.Role.ROOM_OWNER) {
+        if (store.roomInfo.isMicrophoneDisableForAllUser
+                && store.userModel.getRole() != TUIRoomDefine.Role.ROOM_OWNER) {
             ToastUtil.toastShortMessageCenter(context.getString(R.string.tuiroomkit_can_not_open_mic));
             return false;
         }

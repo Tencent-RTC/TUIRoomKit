@@ -88,7 +88,7 @@ public class BottomLayout extends LinearLayout {
     private boolean shouldShowRaiseHandTip() {
         boolean shouldShow = RoomEngineManager.sharedInstance().getRoomStore().roomInfo.isSeatEnabled
                 && !TUIRoomDefine.Role.ROOM_OWNER.equals(
-                RoomEngineManager.sharedInstance().getRoomStore().userModel.role);
+                RoomEngineManager.sharedInstance().getRoomStore().userModel.getRole());
         boolean isShowedBefore = SPUtils.getInstance().getBoolean(KEY_ROOM_RAISE_HAND_TIP_SHOWED, false);
         return shouldShow && !isShowedBefore;
     }

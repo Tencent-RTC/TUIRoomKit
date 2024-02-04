@@ -141,10 +141,10 @@ public class TUIRoomKitImpl extends TUIRoomKit {
         if (!enableVideo) {
             return;
         }
-        if (roomStore.roomInfo.isCameraDisableForAllUser && roomStore.userModel.role == GENERAL_USER) {
+        if (roomStore.roomInfo.isCameraDisableForAllUser && roomStore.userModel.getRole() == GENERAL_USER) {
             return;
         }
-        if (!roomStore.roomInfo.isSeatEnabled || roomStore.userModel.role == ROOM_OWNER) {
+        if (!roomStore.roomInfo.isSeatEnabled || roomStore.userModel.getRole() == ROOM_OWNER) {
             RoomEngineManager.sharedInstance().openLocalCamera(null);
         }
     }
@@ -154,10 +154,10 @@ public class TUIRoomKitImpl extends TUIRoomKit {
         if (!enableAudio) {
             return false;
         }
-        if (roomStore.roomInfo.isMicrophoneDisableForAllUser && roomStore.userModel.role == GENERAL_USER) {
+        if (roomStore.roomInfo.isMicrophoneDisableForAllUser && roomStore.userModel.getRole() == GENERAL_USER) {
             return false;
         }
-        if (roomStore.userModel.role == ROOM_OWNER) {
+        if (roomStore.userModel.getRole() == ROOM_OWNER) {
             return true;
         }
         return !roomStore.roomInfo.isSeatEnabled;
