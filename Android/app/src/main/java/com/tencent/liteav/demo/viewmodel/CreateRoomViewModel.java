@@ -34,33 +34,12 @@ public class CreateRoomViewModel {
 
     private boolean mIsSeatEnabled;
 
-    public interface GetRoomIdCallback {
-        void onGetRoomId(String roomId);
-    }
-
     public CreateRoomViewModel(Context context) {
         mContext = context;
     }
 
     public void setSeatEnable(boolean enable) {
         mIsSeatEnabled = enable;
-    }
-
-    public void getRoomId(GetRoomIdCallback callback) {
-        String roomId = generateRandomRoomId(6);
-        isRoomIdExisted(roomId, new TUICallback() {
-            @Override
-            public void onSuccess() {
-                getRoomId(callback);
-            }
-
-            @Override
-            public void onError(int errorCode, String errorMessage) {
-                if (callback != null) {
-                    callback.onGetRoomId(roomId);
-                }
-            }
-        });
     }
 
     public void createRoom(String roomId) {
@@ -144,43 +123,5 @@ public class CreateRoomViewModel {
         }).setCheck(mIsOpenVideo);
         settingItemList.add(videoItem);
         return settingItemList;
-    }
-
-    private String generateRandomRoomId(int numberOfDigits) {
-        Random random = new Random();
-        int minNumber = (int) Math.pow(10, numberOfDigits - 1);
-        int maxNumber = (int) Math.pow(10, numberOfDigits) - 1;
-        int randomNumber = random.nextInt(maxNumber - minNumber) + minNumber;
-        String roomId = randomNumber + "";
-        Log.d(TAG, "generateRandomRoomId : " + roomId);
-        return roomId;
-    }
-
-    private void isRoomIdExisted(String roomId, TUICallback callback) {
-        List<String> idList = new ArrayList<>(1);
-        idList.add(roomId);
-        Log.d(TAG, "getGroupsInfo roomId=" + roomId);
-        V2TIMManager.getGroupManager().getGroupsInfo(idList, new V2TIMValueCallback<List<V2TIMGroupInfoResult>>() {
-            @Override
-            public void onSuccess(List<V2TIMGroupInfoResult> v2TIMGroupInfoResults) {
-                Log.d(TAG, "getGroupsInfo onSuccess");
-                if (v2TIMGroupInfoResults == null || v2TIMGroupInfoResults.isEmpty()) {
-                    callback.onError(0, "result is empty");
-                    return;
-                }
-                if (v2TIMGroupInfoResults.get(0).getResultCode() == ERR_SUCC) {
-                    callback.onSuccess();
-                    return;
-                }
-                callback.onError(v2TIMGroupInfoResults.get(0).getResultCode(),
-                        v2TIMGroupInfoResults.get(0).getResultMessage());
-            }
-
-            @Override
-            public void onError(int code, String desc) {
-                Log.d(TAG, "getGroupsInfo onError code=" + code + " desc=" + desc);
-                callback.onError(code, desc);
-            }
-        });
     }
 }

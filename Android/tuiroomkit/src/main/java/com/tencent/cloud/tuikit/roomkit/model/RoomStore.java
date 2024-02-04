@@ -55,9 +55,6 @@ public class RoomStore {
     }
 
     public void handleUserRoleChanged(String userId, TUIRoomDefine.Role role) {
-        if (TextUtils.equals(userId, userModel.userId)) {
-            userModel.role = role;
-        }
         if (role == TUIRoomDefine.Role.ROOM_OWNER) {
             roomInfo.ownerId = userId;
         }
@@ -100,6 +97,24 @@ public class RoomStore {
         map.put(RoomEventConstant.KEY_USER_POSITION, takeSeatRequestList.size() - 1);
         RoomEventCenter.getInstance()
                 .notifyEngineEvent(RoomEventCenter.RoomEngineEvent.USER_TAKE_SEAT_REQUEST_ADD, map);
+    }
+
+    public void removeTakeSeatRequestByUserId(String userId) {
+        int index = -1;
+        for (int i = 0; i < takeSeatRequestList.size(); i++) {
+            if (TextUtils.equals(userId, takeSeatRequestList.get(i).getUserId())) {
+                index = i;
+                takeSeatRequestList.remove(i);
+                break;
+            }
+        }
+        if (index == -1) {
+            return;
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put(RoomEventConstant.KEY_USER_POSITION, index);
+        RoomEventCenter.getInstance()
+                .notifyEngineEvent(RoomEventCenter.RoomEngineEvent.USER_TAKE_SEAT_REQUEST_REMOVE, map);
     }
 
     public void removeTakeSeatRequest(String requestId) {
@@ -166,8 +181,11 @@ public class RoomStore {
     }
 
     public void remoteUserEnterRoom(TUIRoomDefine.UserInfo userInfo) {
+        if (findUser(allUserList, userInfo.userId) != null) {
+            return;
+        }
         if (TextUtils.equals(userInfo.userId, userModel.userId)) {
-            userModel.role = userInfo.userRole;
+            userModel.setRole(userInfo.userRole);
         }
         if (userInfo.hasScreenStream) {
             allUserList.add(0, UserEntity.toUserEntityForScreenStream(userInfo));

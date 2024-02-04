@@ -39,48 +39,6 @@
         app:layout_constraintStart_toEndOf="@+id/img_head_prepare"
         app:layout_constraintTop_toTopOf="@+id/img_head_prepare" />
 
-    <ImageView
-        android:id="@+id/img_language_change"
-        android:layout_width="20dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="20dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/tuiroomkit_ic_change_language"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_name_prepare"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_name_prepare" />
-
-    <RelativeLayout
-        android:id="@+id/rl_product_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
-        android:gravity="center"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/img_head_prepare">
-
-        <ImageView
-            android:id="@+id/img_tencent_cloud"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/tuiroomkit_ic_tencent_cloud_prepare" />
-
-        <TextView
-            android:id="@+id/tv_product_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/img_tencent_cloud"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:text="@string/app_product_name"
-            android:textSize="24sp"
-            android:textStyle="italic|bold" />
-    </RelativeLayout>
-
-
     <LinearLayout
         android:id="@+id/ll_enter_room"
         android:layout_width="204dp"
@@ -134,31 +92,6 @@
             android:textColor="@color/white"
             android:textSize="16sp" />
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/img_cloud_icon_bottom"
-        android:layout_width="136dp"
-        android:layout_height="36dp"
-        android:layout_marginTop="96dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/tuiroomkit_icon_tencent_cloud"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rl_product_logo" />
-
-    <TextView
-        android:id="@+id/txt_multi_video_conferencing"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/app_multi_video_conferencing"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.500"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/img_cloud_icon_bottom" />
 
     <TextView
         android:id="@+id/tuiroomkit_version"

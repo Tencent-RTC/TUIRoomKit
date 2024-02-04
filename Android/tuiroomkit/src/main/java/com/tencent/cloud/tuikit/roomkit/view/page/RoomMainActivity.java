@@ -1,7 +1,11 @@
 package com.tencent.cloud.tuikit.roomkit.view.page;
 
+import static com.tencent.cloud.tuikit.engine.common.TUICommonDefine.Error.ALL_SEAT_OCCUPIED;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_DESTROY_ROOM;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_EXIT_ROOM;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_GENERAL_TO_MANAGER;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_MANAGER_TO_GENERAL;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_TO_OWNER;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.REQUEST_RECEIVED;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.ENTER_FLOAT_WINDOW;
 
@@ -14,15 +18,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
+import com.tencent.cloud.tuikit.roomkit.view.component.TipToast;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.Map;
 
@@ -89,15 +97,24 @@ public class RoomMainActivity extends AppCompatActivity
     public void finish() {
         super.finish();
         Log.d(TAG, "finish");
-        unSubscribeEvent();
-        mRootView.removeAllViews();
-        mRootView = null;
+        release();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy : " + this);
+        release();
+    }
+
+    private void release() {
+        if (mRootView == null) {
+            return;
+        }
+        Log.d(TAG, "release");
+        mRootView.removeAllViews();
+        mRootView = null;
+        unSubscribeEvent();
     }
 
     @Override
@@ -117,6 +134,9 @@ public class RoomMainActivity extends AppCompatActivity
         RoomEventCenter.getInstance().subscribeEngine(LOCAL_USER_DESTROY_ROOM, this);
         RoomEventCenter.getInstance().subscribeEngine(LOCAL_USER_EXIT_ROOM, this);
         RoomEventCenter.getInstance().subscribeEngine(REQUEST_RECEIVED, this);
+        RoomEventCenter.getInstance().subscribeEngine(LOCAL_USER_GENERAL_TO_MANAGER, this);
+        RoomEventCenter.getInstance().subscribeEngine(LOCAL_USER_MANAGER_TO_GENERAL, this);
+        RoomEventCenter.getInstance().subscribeEngine(LOCAL_USER_TO_OWNER, this);
 
         RoomEventCenter.getInstance().subscribeUIEvent(ENTER_FLOAT_WINDOW, this);
     }
@@ -125,6 +145,9 @@ public class RoomMainActivity extends AppCompatActivity
         RoomEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_DESTROY_ROOM, this);
         RoomEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_EXIT_ROOM, this);
         RoomEventCenter.getInstance().unsubscribeEngine(REQUEST_RECEIVED, this);
+        RoomEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_GENERAL_TO_MANAGER, this);
+        RoomEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_MANAGER_TO_GENERAL, this);
+        RoomEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_TO_OWNER, this);
 
         RoomEventCenter.getInstance().unsubscribeUIEvent(ENTER_FLOAT_WINDOW, this);
     }
@@ -151,6 +174,18 @@ public class RoomMainActivity extends AppCompatActivity
                 finish();
                 break;
 
+            case LOCAL_USER_GENERAL_TO_MANAGER:
+                toastForGeneralToManager();
+                break;
+
+            case LOCAL_USER_MANAGER_TO_GENERAL:
+                toastForManagerToGeneral();
+                break;
+
+            case LOCAL_USER_TO_OWNER:
+                toastForToOwner();
+                break;
+
             case REQUEST_RECEIVED:
                 showRequestDialog(params);
                 break;
@@ -161,23 +196,46 @@ public class RoomMainActivity extends AppCompatActivity
         }
     }
 
+    private void toastForGeneralToManager() {
+        TipToast.build()
+                .setDuration(Toast.LENGTH_LONG)
+                .setMessage(getString(R.string.tuiroomkit_have_become_manager))
+                .show(this);
+    }
+
+    private void toastForManagerToGeneral() {
+        TipToast.build()
+                .setDuration(Toast.LENGTH_LONG)
+                .setMessage(getString(R.string.tuiroomkit_have_been_cancel_manager))
+                .show(this);
+    }
+
+    private void toastForToOwner() {
+        TipToast.build()
+                .setDuration(Toast.LENGTH_LONG)
+                .setMessage(getString(R.string.tuiroomkit_toast_become_to_owner))
+                .show(this);
+    }
 
     private void showRequestDialog(Map<String, Object> params) {
         if (params == null) {
             return;
         }
         TUIRoomDefine.Request request = (TUIRoomDefine.Request) params.get(RoomEventConstant.KEY_REQUEST);
+        TUIRoomDefine.Role role = (TUIRoomDefine.Role) params.get(RoomEventConstant.KEY_ROLE);
+        String userRole = getString(role == TUIRoomDefine.Role.ROOM_OWNER ? R.string.tuiroomkit_role_owner :
+                R.string.tuiroomkit_role_manager);
         switch (request.requestAction) {
             case REQUEST_TO_OPEN_REMOTE_CAMERA:
-                showInvitedOpenCamera(request);
+                showInvitedOpenCamera(request, userRole);
                 break;
 
             case REQUEST_TO_OPEN_REMOTE_MICROPHONE:
-                showInvitedOpenMic(request);
+                showInvitedOpenMic(request, userRole);
                 break;
 
             case REQUEST_REMOTE_USER_ON_SEAT:
-                showInvitedTakeSeatDialog(request);
+                showInvitedTakeSeatDialog(request, userRole);
                 break;
 
             default:
@@ -186,9 +244,9 @@ public class RoomMainActivity extends AppCompatActivity
         }
     }
 
-    private void showInvitedOpenCamera(TUIRoomDefine.Request request) {
+    private void showInvitedOpenCamera(TUIRoomDefine.Request request, String userRole) {
         BaseDialogFragment.build()
-                .setTitle(getString(R.string.tuiroomkit_request_open_camera))
+                .setTitle(getString(R.string.tuiroomkit_request_open_camera, userRole))
                 .setNegativeName(getString(R.string.tuiroomkit_refuse))
                 .setPositiveName(getString(R.string.tuiroomkit_agree))
                 .setNegativeListener(new BaseDialogFragment.ClickListener() {
@@ -206,42 +264,66 @@ public class RoomMainActivity extends AppCompatActivity
                 .showDialog(getSupportFragmentManager(), "REQUEST_TO_OPEN_REMOTE_CAMERA");
     }
 
-    private void showInvitedOpenMic(TUIRoomDefine.Request request) {
+    private void showInvitedOpenMic(TUIRoomDefine.Request request, String userRole) {
         BaseDialogFragment.build()
-                .setTitle(getString(R.string.tuiroomkit_request_open_microphone))
+                .setTitle(getString(R.string.tuiroomkit_request_open_microphone, userRole))
                 .setNegativeName(getString(R.string.tuiroomkit_refuse))
                 .setPositiveName(getString(R.string.tuiroomkit_agree))
                 .setNegativeListener(new BaseDialogFragment.ClickListener() {
                     @Override
                     public void onClick() {
-                        RoomEngineManager.sharedInstance().responseRemoteRequest(request.requestAction, request.requestId, false, null);
+                        RoomEngineManager.sharedInstance()
+                                .responseRemoteRequest(request.requestAction, request.requestId, false, null);
                     }
                 })
                 .setPositiveListener(new BaseDialogFragment.ClickListener() {
                     @Override
                     public void onClick() {
-                        RoomEngineManager.sharedInstance().responseRemoteRequest(request.requestAction, request.requestId, true, null);
+                        RoomEngineManager.sharedInstance()
+                                .responseRemoteRequest(request.requestAction, request.requestId, true, null);
                     }
                 })
                 .showDialog(getSupportFragmentManager(), "REQUEST_TO_OPEN_REMOTE_MICROPHONE");
     }
 
-    private void showInvitedTakeSeatDialog(TUIRoomDefine.Request request) {
+    private void showInvitedTakeSeatDialog(TUIRoomDefine.Request request, String userRole) {
         BaseDialogFragment.build()
-                .setTitle(getString(R.string.tuiroomkit_receive_invitation_title))
+                .setTitle(getString(R.string.tuiroomkit_receive_invitation_title, userRole))
                 .setContent(getString(R.string.tuiroomkit_receive_invitation_content))
                 .setNegativeName(getString(R.string.tuiroomkit_refuse))
                 .setPositiveName(getString(R.string.tuiroomkit_agree_on_stage))
                 .setNegativeListener(new BaseDialogFragment.ClickListener() {
                     @Override
                     public void onClick() {
-                        RoomEngineManager.sharedInstance().responseRemoteRequest(request.requestAction, request.requestId, false, null);
+                        RoomEngineManager.sharedInstance()
+                                .responseRemoteRequest(request.requestAction, request.requestId, false, null);
                     }
                 })
                 .setPositiveListener(new BaseDialogFragment.ClickListener() {
                     @Override
                     public void onClick() {
-                        RoomEngineManager.sharedInstance().responseRemoteRequest(request.requestAction, request.requestId, true, null);
+                        RoomEngineManager.sharedInstance()
+                                .responseRemoteRequest(request.requestAction, request.requestId, true,
+                                        new TUIRoomDefine.ActionCallback() {
+                                            @Override
+                                            public void onSuccess() {
+                                                Log.d(TAG, "responseRemoteRequest takeSeat onSuccess");
+                                            }
+
+                                            @Override
+                                            public void onError(TUICommonDefine.Error error, String message) {
+                                                Log.e(TAG, "responseRemoteRequest takeSeat onError error=" + error
+                                                        + " message=" + message);
+                                                if (ALL_SEAT_OCCUPIED == error) {
+                                                    ToastUtil.toastShortMessageCenter(
+                                                            getString(R.string.tuiroomkit_all_seat_occupied));
+                                                } else {
+                                                    ToastUtil.toastShortMessageCenter(
+                                                            getString(R.string.tuiroomkit_invited_take_seat_time_out));
+                                                }
+
+                                            }
+                                        });
                     }
                 })
                 .showDialog(getSupportFragmentManager(), "REQUEST_REMOTE_USER_ON_SEAT");

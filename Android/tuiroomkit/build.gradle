@@ -51,12 +51,12 @@ dependencies {
     implementation project(':timcommon')
     implementation project(':tuichat')
 
-    api rootProject.getProperties().containsKey("roomEngineSdk") ? rootProject.ext.roomEngineSdk : "com.tencent.liteav.tuikit:tuiroomengine:2.0.2.6"
+     api rootProject.getProperties().containsKey("roomEngineSdk") ? rootProject.ext.roomEngineSdk : "com.tencent.liteav.tuikit:tuiroomengine:2.0.3.5"
     implementation rootProject.getProperties().containsKey("liteavSdk") ? rootProject.ext.liteavSdk : "com.tencent.liteav:LiteAVSDK_TRTC:11.6.0.13641"
     if (projects.contains("tuicore")) {
         api project(':tuicore')
     } else {
-        api "com.tencent.liteav.tuikit:tuicore:7.7.5285"
-        implementation rootProject.getProperties().containsKey("imSdk") ? rootProject.ext.imSdk : "com.tencent.imsdk:imsdk-plus:7.7.5294"
+        api "com.tencent.liteav.tuikit:tuicore:7.8.5484"
+        implementation rootProject.getProperties().containsKey("imSdk") ? rootProject.ext.imSdk : "com.tencent.imsdk:imsdk-plus:7.8.5484"
     }
 }

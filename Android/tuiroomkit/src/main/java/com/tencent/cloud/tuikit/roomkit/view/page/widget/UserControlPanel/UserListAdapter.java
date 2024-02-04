@@ -92,7 +92,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
             mLayoutRoomManager = itemView.findViewById(R.id.tuiroomkit_ll_room_manager);
         }
 
-        public void bind(Context context, final UserEntity user) {
+        private void bind(Context context, final UserEntity user) {
             if (hideItemForScreenSharing(user)) {
                 return;
             }
@@ -193,10 +193,10 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
             if (user.isOnSeat()) {
                 return false;
             }
-            if (mLocalUser.role == TUIRoomDefine.Role.GENERAL_USER) {
+            if (mLocalUser.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
                 return false;
             }
-            if (mLocalUser.role == TUIRoomDefine.Role.ROOM_OWNER) {
+            if (mLocalUser.getRole() == TUIRoomDefine.Role.ROOM_OWNER) {
                 return true;
             }
             return user.getRole() == TUIRoomDefine.Role.GENERAL_USER;
@@ -206,10 +206,10 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
             if (TextUtils.equals(mLocalUser.userId, user.getUserId())) {
                 return false;
             }
-            if (mLocalUser.role == TUIRoomDefine.Role.ROOM_OWNER) {
+            if (mLocalUser.getRole() == TUIRoomDefine.Role.ROOM_OWNER) {
                 return true;
             }
-            if (mLocalUser.role == TUIRoomDefine.Role.GENERAL_USER) {
+            if (mLocalUser.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
                 return TextUtils.equals(mLocalUser.userId, user.getUserId());
             }
             if (TextUtils.equals(mLocalUser.userId, user.getUserId())) {

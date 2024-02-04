@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+import com.tencent.cloud.tuikit.roomkit.model.utils.FetchRoomId;
 import com.tencent.liteav.demo.R;
 import com.tencent.liteav.demo.viewmodel.CreateRoomViewModel;
 import com.tencent.qcloud.tuicore.TUILogin;
@@ -23,7 +24,6 @@ public class CreateRoomView extends RelativeLayout
     private Context             mContext;
     private Toolbar             mToolbar;
     private TextView            mTextCreateRoom;
-    
     private TextView            mTextUserName;
     private TextView            mTextRoomType;
     private LinearLayout        mLayoutSettingContainer;
@@ -50,7 +50,7 @@ public class CreateRoomView extends RelativeLayout
     private void initData() {
         String userName = TUILogin.getNickName();
         mTextUserName.setText(userName);
-        mViewModel.getRoomId(new CreateRoomViewModel.GetRoomIdCallback() {
+        FetchRoomId.fetch(new FetchRoomId.GetRoomIdCallback() {
             @Override
             public void onGetRoomId(String roomId) {
                 mRoomId = roomId;

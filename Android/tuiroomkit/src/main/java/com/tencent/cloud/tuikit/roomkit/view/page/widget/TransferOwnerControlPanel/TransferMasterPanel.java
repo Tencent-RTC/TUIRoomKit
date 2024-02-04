@@ -99,7 +99,6 @@ public class TransferMasterPanel extends BaseBottomDialog implements View.OnClic
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        updateHeightToMatchParent();
     }
 
     public void onNotifyUserEnter(int position) {

@@ -148,7 +148,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     }
 
     public boolean isOwner() {
-        return TUIRoomDefine.Role.ROOM_OWNER.equals(mRoomStore.userModel.role);
+        return TUIRoomDefine.Role.ROOM_OWNER.equals(mRoomStore.userModel.getRole());
     }
 
     public void responseRequest(TUIRoomDefine.RequestAction requestAction, String requestId, boolean agree) {
@@ -361,7 +361,6 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     }
 
     private void onRoomDisMissed() {
-        ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_end_room));
         if (isOwner()) {
             showDestroyDialog();
         } else {
@@ -419,36 +418,20 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         if (params == null) {
             return;
         }
-        if (isOwner()) {
-            return;
-        }
-
         boolean isDisable = (Boolean) params.get(RoomEventConstant.KEY_IS_DISABLE);
         int stringResId = isDisable
                 ? R.string.tuiroomkit_mute_all_camera_toast
                 : R.string.tuiroomkit_toast_not_mute_all_video;
         ToastUtil.toastShortMessageCenter(mContext.getString(stringResId));
-
-        if (isDisable) {
-            RoomEngineManager.sharedInstance().closeLocalCamera();
-        }
     }
 
     private void allUserMicrophoneDisableChanged(Map<String, Object> params) {
         if (params == null) {
             return;
         }
-        if (isOwner()) {
-            return;
-        }
-
         boolean isDisable = (Boolean) params.get(RoomEventConstant.KEY_IS_DISABLE);
         int resId = isDisable ? R.string.tuiroomkit_mute_all_mic_toast : R.string.tuiroomkit_toast_not_mute_all_audio;
         ToastUtil.toastShortMessageCenter(mContext.getString(resId));
-
-        if (isDisable) {
-            RoomEngineManager.sharedInstance().closeLocalMicrophone();
-        }
     }
 
     private void sendMessageForAllUserDisableChanged(Map<String, Object> params) {

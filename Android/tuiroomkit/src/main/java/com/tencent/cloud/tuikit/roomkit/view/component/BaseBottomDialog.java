@@ -57,14 +57,6 @@ public abstract class BaseBottomDialog extends BottomSheetDialog {
         mBehavior.setPeekHeight(getContext().getResources().getDisplayMetrics().heightPixels);
     }
 
-    protected void updateHeightToMatchParent() {
-        if (bottomSheetView != null) {
-            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) bottomSheetView.getLayoutParams();
-            params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-            bottomSheetView.setLayoutParams(params);
-        }
-    }
-
     protected abstract int getLayoutId();
 
     protected abstract void initView();
