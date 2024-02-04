@@ -1,9 +1,14 @@
-### 2.0.2(2024-1-26)
+### 2.0.3(2024-02-02)
+
+- Fixed some known bugs and issues
+- Upgrade the dependencies of rtc_room_engine
+
+### 2.0.2(2024-01-26)
 
 - Fixed some UI details
 - Upgrade the dependencies of rtc_room_engine
 
-### 2.0.1(2024-1-19)
+### 2.0.1(2024-01-19)
 
 - Fixed some known bugs and issues
 - Added auto-hide function for top and bottom toolbars

@@ -157,12 +157,21 @@ class ConferenceMainController extends GetxController {
           isMicrophoneInviteDialogShow = false;
         }
       },
-      onConfirm: () {
-        RoomEngineManager()
+      onConfirm: () async {
+        var result = await RoomEngineManager()
             .getRoomEngine()
             .responseRemoteRequest(request.requestId, true);
         Get.back();
+        if (result.code == TUIError.errFailed) {
+          makeToast(
+              msg: RoomContentsTranslations.translate('goOnStageTimeOut'));
+        } else if (result.code == TUIError.errAllSeatOccupied) {
+          makeToast(
+              msg: RoomContentsTranslations.translate(
+                  'stageMemberReachedLimit'));
+        }
       },
+      barrierDismissible: false,
     );
   }
 

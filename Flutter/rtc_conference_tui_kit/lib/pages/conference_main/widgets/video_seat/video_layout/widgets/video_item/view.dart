@@ -112,7 +112,8 @@ class _VideoItemState extends State<VideoItemWidget> {
               ),
               Obx(
                 () => Visibility(
-                  visible: widget.userModel.isTalking.value,
+                  visible: widget.userModel.isTalking.value &&
+                      RoomStore.to.audioSetting.volumePrompt,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),

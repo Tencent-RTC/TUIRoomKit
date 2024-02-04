@@ -8,29 +8,17 @@ class RoomEventHandler extends TUIRoomObserver {
   RoomEventHandler() {
     super.onAllUserMicrophoneDisableChanged = (roomId, isDisable) {
       _store.roomInfo.isMicrophoneDisableForAllUser = isDisable;
-      if (_store.currentUser.userRole.value == TUIRole.roomOwner) {
-        return;
-      }
-      if (isDisable) {
-        makeToast(msg: RoomContentsTranslations.translate('allMutePrompt'));
-      } else {
-        makeToast(msg: RoomContentsTranslations.translate('allUnMutePrompt'));
-      }
+      makeToast(
+          msg: RoomContentsTranslations.translate(
+              isDisable ? 'allMutePrompt' : 'allUnMutePrompt'));
       _store.updateItemTouchableState();
     };
 
     super.onAllUserCameraDisableChanged = (roomId, isDisable) {
       _store.roomInfo.isCameraDisableForAllUser = isDisable;
-      if (_store.currentUser.userRole.value == TUIRole.roomOwner) {
-        return;
-      }
-      if (isDisable) {
-        makeToast(
-            msg: RoomContentsTranslations.translate('disableAllVideoPrompt'));
-      } else {
-        makeToast(
-            msg: RoomContentsTranslations.translate('enableAllVideoPrompt'));
-      }
+      makeToast(
+          msg: RoomContentsTranslations.translate(
+              isDisable ? 'disableAllVideoPrompt' : 'enableAllVideoPrompt'));
       _store.updateItemTouchableState();
     };
 
