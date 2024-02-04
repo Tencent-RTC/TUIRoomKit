@@ -36,7 +36,7 @@ class RoomEngineManager {
     return TUIRoomEngine.setSelfInfo(userName, avatarURL);
   }
 
-  void _getUserList() async {
+  Future<void> _getUserList() async {
     var result =
         await RoomEngineManager().getRoomEngine().getUserList(_nextSequence);
     if (result.code == TUIError.success) {
@@ -47,12 +47,12 @@ class RoomEngineManager {
         _getUserList();
       } else if (RoomStore.to.roomInfo.isSeatEnabled == true &&
           RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake) {
-        _getSeatedUserList();
+        await _getSeatedUserList();
       }
     }
   }
 
-  void _getSeatedUserList() async {
+  Future<void> _getSeatedUserList() async {
     var getSeatResult = await _roomEngine.getSeatList();
     if (getSeatResult.code != TUIError.success) {
       return;
@@ -75,9 +75,9 @@ class RoomEngineManager {
     _setFramework();
     TUIValueCallBack<TUIRoomInfo> result = await _roomEngine.enterRoom(roomId);
     if (result.code == TUIError.success) {
-      _getUserList();
       RoomStore.to.roomInfo = result.data!;
       RoomStore.to.timeStampOnEnterRoom = DateTime.now().millisecondsSinceEpoch;
+      await _getUserList();
       await RoomStore.to.initialCurrentUser();
       bool isTakeSeatSuccess = await _autoTakeSeatForOwner();
       if (!isTakeSeatSuccess) {

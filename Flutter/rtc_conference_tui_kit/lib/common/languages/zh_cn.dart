@@ -142,4 +142,7 @@ const Map<String, String> roomContentsZhCN = {
   'transferOwnerMessage': '转交房主后将成为普通成员',
   'sureToTransfer': '确认转交',
   'requestRepeat': '该成员已收到相同请求，请稍后再试',
+  'stageMemberReachedLimit': '当前上台人数已达上限',
+  'takeSeatInvitationTimeOut': '对xx的上台邀请已超时',
+  'goOnStageTimeOut': '上台失败，邀请已超时',
 };

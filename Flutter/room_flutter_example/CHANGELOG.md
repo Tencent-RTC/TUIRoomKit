@@ -1,8 +1,13 @@
-### 2.0.2(2024-1-26)
+### 2.0.3(2024-02-02)
+
+- Implement the language switching record of the app
+- Upgrade the dependencies of rtc_conference_tui_kit
+
+### 2.0.2(2024-01-26)
 
 - Upgrade the dependencies of rtc_conference_tui_kit
 
-### 2.0.1(2024-1-19)
+### 2.0.1(2024-01-19)
 
 - Upgrade the dependencies of rtc_conference_tui_kit
 

@@ -21,14 +21,9 @@ class ShowUserInfoWidget extends GetView<PrepareController> {
         const SizedBox(
           width: 15,
         ),
-        SizedBox(
-          width: 150,
-          child: Text(
-            UserStore.to.userModel.userName,
-            style: AppTheme.defaultTheme.textTheme.headlineMedium,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+        Text(
+          UserStore.to.userModel.userName,
+          style: AppTheme.defaultTheme.textTheme.headlineMedium,
         )
       ],
     );

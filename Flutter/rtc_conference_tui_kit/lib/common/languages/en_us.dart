@@ -155,4 +155,9 @@ const Map<String, String> roomContentsEnUS = {
   'sureToTransfer': 'Confirm transfer',
   'requestRepeat':
       'This member has already received the same request, please try again later',
+  'stageMemberReachedLimit':
+      'The current number of people on stage has reached the limit',
+  'takeSeatInvitationTimeOut':
+      'The invitation to xx to go on stage has timed out',
+  'goOnStageTimeOut': 'Failed to go on stage, invitation has timed out',
 };
