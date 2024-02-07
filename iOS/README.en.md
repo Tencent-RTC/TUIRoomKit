@@ -2,7 +2,7 @@
 
 _[中文](README.md) | English_
 
-This document describes how to quickly run the TUIRoomKit demo project to make a high-quality audio/video call. For more information on the TUIRoomKit component connection process, see **[Integrating TUIRoomKit (iOS)](https://cloud.tencent.com/document/product/647/84237)**.
+This document describes how to quickly run the TUIRoomKit demo project to make a high-quality audio/video call. For more information on the TUIRoomKit component connection process, see **[Integrating TUIRoomKit (iOS)](https://trtc.io/document/54842)**.
 
 ## Directory Structure
 ```
@@ -22,7 +22,7 @@ TUIRoomKit
 
 [](id:ui.step1)
 ### Step 1. Activate the service
-1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/37287) to obtain your own SDKAppID and SDKSecreKey.
+1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/54842) to obtain your own SDKAppID and SDKSecreKey.
 
 [](id:ui.step2)
 ### Step 2. Download the source code and configure the project

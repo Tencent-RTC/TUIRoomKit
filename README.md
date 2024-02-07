@@ -29,17 +29,17 @@ English | [简体中文](README.zh.md)
 ## Make a first video Conference 
 
 Here is an example of integration with UI (ie TUIRoomKit), which is also our recommended integration method. The key steps are as follows:
-- **Step1**：Refer to the official website document to quickly connect TUIRoomKit to your project, the detailed access process of each platform/framework: [Web](https://cloud.tencent.com/document/product/1640/81132) 、[Android ](https://cloud.tencent.com/document/product/647/78729)、 [iOS](https://cloud.tencent.com/document/product/647/78730)、 [微信小程序](https://cloud.tencent.com/document/product/647/78733)、[uni-app](https://cloud.tencent.com/document/product/647/78732)
+- **Step1**：Refer to the official website document to quickly connect TUIRoomKit to your project, the detailed access process of each platform/framework: [Web](https://trtc.io/document/54845) 、[Android ](https://trtc.io/document/54843)、 [iOS](https://trtc.io/document/54842)、 [Electron](https://trtc.io/document/54844)、[Flutter](https://trtc.io/document/57508)、[Windows](https://trtc.io/document/53567)
 - **Step2**：Create your first multiplayer video conference.
 
 
 
 ## Quick link
-- If you encounter difficulties, you can refer to [FAQs](https://cloud.tencent.com/document/product/647/78767), here are the most frequently encountered problems of developers, covering various platforms, I hope you can Help you solve problems quickly.
+- If you encounter difficulties, you can refer to [FAQs](https://trtc.io/document/54894), here are the most frequently encountered problems of developers, covering various platforms, I hope you can Help you solve problems quickly.
 - If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](Web/), [Android](Android/), [iOS](iOS/).
 
-- If you would like to see some of our latest product features, you can check the [Update Log](https://cloud.tencent.com/document/product/647/80931), here are the latest features of TUICallKit, as well as the historical version features iterate
-- For complete API documentation, see [Audio Video Call SDK API Example](https://cloud.tencent.com/document/product/647/78748): including TUICallKit (with UIKit), TUICallEngine (without UIKit), and call events Callbacks, etc.
+- If you would like to see some of our latest product features, you can check the [Update Log](https://trtc.io/document/54634), here are the latest features of TUICallKit, as well as the historical version features iterate
+- For complete API documentation, see [Audio Video Call SDK API Example](https://trtc.io/document/54877): including TUICallKit (with UIKit), TUICallEngine (without UIKit), and call events Callbacks, etc.
 - If you want to learn more about the projects maintained by Tencent Cloud  Media Services Team, you can check our [Product Official Website](https://cloud.tencent.com/product/rtcube), [Github Organizations](https://github .com/LiteAVSDK) etc.
 
 
