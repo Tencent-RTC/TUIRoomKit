@@ -3,7 +3,7 @@
 _English | [简体中文](README.md)_
 
 This document describes how to quickly run the TUIRoom demo project to make a multi-person audio/video call. For more information on the TUIRoom component connection process, see:
-[Integrating TUIRoom (Windows and macOS)](https://cloud.tencent.com/document/product/647/63494)
+[Integrating TUIRoom (Windows and macOS)](https://trtc.io/document/53567)
 
 ## Directory Structure
 

@@ -2,7 +2,7 @@
 
 _[中文](README.zh-CN.md) | English_
 
-This document describes how to quickly run the TUIRoomKit demo project to make a high-quality audio/video conference. For more information on the TUIRoomKit component connection process, see [**Integrating TUIRoomKit (Flutter)** ](https://cloud.tencent.com/document/product/1690/94555)...
+This document describes how to quickly run the TUIRoomKit demo project to make a high-quality audio/video conference. For more information on the TUIRoomKit component connection process, see [**Integrating TUIRoomKit (Flutter)** ](https://trtc.io/document/57508)...
 
 ## Environment preparation
 

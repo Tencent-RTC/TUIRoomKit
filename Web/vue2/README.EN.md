@@ -2,7 +2,8 @@
 
 _English | [简体中文](README.md)_
 
-This document describes how to quickly run the TUIRoom demo project to try out group audio/video interaction. 
+This document describes how to quickly run the TUIRoom demo project to try out group audio/video interaction. For more information on the TUIRoomKit component connection process, **[Integrating TUIRoomKit (Web)](https://trtc.io/document/54845)**.
+
 ## Directory structure
 
 ```

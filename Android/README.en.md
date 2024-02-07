@@ -1,7 +1,7 @@
 # Quick Run of TUIRoomKit Demo for Android
 _[中文](README.md) | English_
 
-This document describes how to quickly run the `TUIRoomKit` demo project to try out multi-person audio/video interactions. For more information on the TUIRoomKit component connection process, see **[Integrating TUIRoomKit (Android)](https://cloud.tencent.com/document/product/647/81961)**.
+This document describes how to quickly run the `TUIRoomKit` demo project to try out multi-person audio/video interactions. For more information on the TUIRoomKit component connection process, see **[Integrating TUIRoomKit (Android)](https://trtc.io/document/54843)**.
 
 
 ## Directory Structure
