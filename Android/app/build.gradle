@@ -9,8 +9,8 @@ android {
 
     defaultConfig {
         applicationId 'com.tencent.liteav.tuiroom'
-        versionName "2.0.3"
-        versionCode 203
+        versionName "2.1.0"
+        versionCode 210
         minSdkVersion 19
         targetSdkVersion 30
         multiDexEnabled true
