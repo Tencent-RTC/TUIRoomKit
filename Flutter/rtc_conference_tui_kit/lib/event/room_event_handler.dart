@@ -113,7 +113,6 @@ class RoomEventHandler extends TUIRoomObserver {
     super.onSeatListChanged = (seatList, seatedList, leftList) async {
       for (var element in seatedList) {
         _store.updateUserSeatedState(element.userId, true);
-        _store.deleteInviteSeatUser(element.userId);
         var result = await RoomEngineManager()
             .getRoomEngine()
             .getUserInfo(element.userId);
@@ -149,13 +148,11 @@ class RoomEventHandler extends TUIRoomObserver {
     };
 
     super.onRequestCancelled = (requestId, userId) {
-      var cancelledUserId = userId;
-      _store.inviteSeatMap.forEach((key, value) {
-        if (value == requestId) {
-          cancelledUserId = key;
-        }
-      });
-      _store.deleteInviteSeatUser(cancelledUserId);
+      _store.deleteTakeSeatRequest(requestId);
+    };
+
+    super.onRequestProcessed = (requestId, userId) {
+      _store.deleteTakeSeatRequest(requestId);
     };
 
     super.onKickedOffSeat = (userId) {
