@@ -199,7 +199,7 @@ export default function useMemberControl(props?: any) {
               if (code === TUIErrorCode.ERR_REQUEST_ID_REPEAT) {
                 TUIMessage({
                   type: 'warning',
-                  message: t('This member has already received the same request,please try again later'),
+                  message: t('This member has already received the same request, please try again later'),
                   duration: MESSAGE_DURATION.NORMAL,
                 });
               }
@@ -250,7 +250,7 @@ export default function useMemberControl(props?: any) {
               if (code === TUIErrorCode.ERR_REQUEST_ID_REPEAT) {
                 TUIMessage({
                   type: 'warning',
-                  message: t('This member has already received the same request,please try again later'),
+                  message: t('This member has already received the same request, please try again later'),
                   duration: MESSAGE_DURATION.NORMAL,
                 });
               }
