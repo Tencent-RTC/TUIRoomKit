@@ -700,7 +700,7 @@ struct V2TXLiveScreenCaptureProperty {
     /// 是否开启高性能模式（只会在分享屏幕时会生效），开启后屏幕采集性能最佳，但无法过滤远端的高亮边框，默认为 true。
     bool enableHighPerformance;
 
-    /// 指定高亮边框颜色，RGB 格式，传入 0 时采用默认颜色，默认颜色为 #8CBF26。
+    /// 指定高亮边框颜色，RGB 格式，传入 0 时采用默认颜色，默认颜色为 #FFE640。
     int highlightBorderColor;
 
     /// 指定高亮边框的宽度，传入0时采用默认描边宽度，默认宽度为 5，最大值为 50。

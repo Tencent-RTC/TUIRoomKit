@@ -9,6 +9,7 @@
 
 #include "ITUIRoomDefine.h"
 #include "ITUIRoomObserver.h"
+#include "ITUIRoomDeviceManager.h"
 #include "IDeprecatedRoomEngineAPI.h"
 
 namespace liteav {
@@ -525,7 +526,7 @@ class TUIRoomEngine : IDeprecatedRoomEngineAPI {
      * 9.6  主持人/管理员 邀请用户上麦
      *
      * 接口调用成功后,SDK会通过 {@link $TUIRoomObserver$} 中的 {@link onRequestReceived} 通知被邀请用户
-     * @param seatIndex 麦位编号。会议场景无需关心，填0即可。
+     * @param seatIndex 麦位编号。未开启麦位，不关心麦位序列的情况下，填-1即可。
      * @param userId 用户ID
      * @param timeout 超时时间，单位秒，如果设置为 0，SDK 不会做超时检测，也不会触发超时回调
      * @param callback 调用接口的回调，用于通知请求的回调状态，详细定义参考: {@link TUIRequestCallback}
@@ -644,6 +645,11 @@ class TUIRoomEngine : IDeprecatedRoomEngineAPI {
      * @param extensionType 插件类型。
      */
     virtual void* getExtension(TUIExtensionType extensionType) = 0;
+
+    /**
+     * 8.4 获取设备管理类
+     */
+    virtual ITUIRoomDeviceManager* getMediaDeviceManager() = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //
