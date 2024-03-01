@@ -6,9 +6,13 @@ const roomEngine = useGetRoomEngine();
 export default function () {
   const roomStore = useRoomStore();
   async function fetchUserList() {
+    let nextSequence = 0;
     try {
-      const { userInfoList } = await roomEngine.instance?.getUserList() as any;
-      roomStore.setUserList(userInfoList);
+      do {
+        const result = await roomEngine.instance?.getUserList({ nextSequence }) as any;
+        roomStore.updateUserList(result.userInfoList);
+        nextSequence = result.nextSequence;
+      } while (nextSequence !== 0);
     } catch (error: any) {
       logger.error('TUIRoomEngine.getUserList', error.code, error.message);
     }
