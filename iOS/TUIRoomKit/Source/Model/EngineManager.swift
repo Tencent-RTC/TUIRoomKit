@@ -226,21 +226,21 @@ class EngineManager: NSObject {
     
     //主持人/管理员 邀请用户上麦
     func takeUserOnSeatByAdmin(userId: String, timeout: Double,
-                               onAccepted: TUIRequestAcceptedBlock? = nil,
-                               onRejected: TUIRequestRejectedBlock? = nil,
-                               onCancelled: TUIRequestCancelledBlock? =  nil,
-                               onTimeout: TUIRequestTimeoutBlock? = nil,
-                               onError: TUIRequestErrorBlock? = nil) {
+                               onAccepted: @escaping TUIRequestAcceptedBlock,
+                               onRejected: @escaping TUIRequestRejectedBlock,
+                               onCancelled: @escaping TUIRequestCancelledBlock,
+                               onTimeout: @escaping TUIRequestTimeoutBlock,
+                               onError: @escaping TUIRequestErrorBlock) {
         roomEngine.takeUserOnSeatByAdmin(-1, userId: userId, timeout: timeout) { requestId, userId in
-            onAccepted?(requestId, userId)
+            onAccepted(requestId, userId)
         } onRejected: { requestId, userId, message in
-            onRejected?( requestId, userId, message)
+            onRejected( requestId, userId, message)
         } onCancelled: { requestId, userId in
-            onCancelled?(requestId, userId)
+            onCancelled(requestId, userId)
         } onTimeout: { requestId, userId in
-            onTimeout?(requestId, userId)
+            onTimeout(requestId, userId)
         } onError: { requestId, userId, code, message in
-            onError?(requestId, userId, code, message)
+            onError(requestId, userId, code, message)
         }
     }
     
@@ -484,10 +484,7 @@ class EngineManager: NSObject {
     
     //删除举手用户
     func deleteInviteSeatUser(_ userId: String) {
-        store.inviteSeatList = store.inviteSeatList.filter { userModel in
-            userModel.userId != userId
-        }
-        store.inviteSeatMap.removeValue(forKey: userId)
+        store.deleteInviteSeatItem(userId: userId)
     }
     
     //增加房间用户
@@ -540,7 +537,7 @@ class EngineManager: NSObject {
     }
     
     func getBeautyManager() -> TXBeautyManager {
-        roomEngine.getBeautyManager()
+        roomEngine.getTRTCCloud().getBeautyManager()
     }
 }
 
