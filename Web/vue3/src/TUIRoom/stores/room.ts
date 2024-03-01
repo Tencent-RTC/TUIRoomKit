@@ -7,6 +7,7 @@ import {
   TUIUserInfo,
   TUIVideoQuality,
   TUIVideoStreamType,
+  TUIMediaDeviceType,
 } from '@tencentcloud/tuiroom-engine-js';
 import { useBasicStore } from './basic';
 import { isVue3 } from '../utils/constants';
@@ -535,6 +536,21 @@ export const useRoomStore = defineStore('room', {
         }
       });
     },
+    setCurrentDeviceId(type: TUIMediaDeviceType, deviceId: string) {
+      switch (type) {
+        case TUIMediaDeviceType.kMediaDeviceTypeVideoCamera:
+          this.setCurrentCameraId(deviceId);
+          break;
+        case TUIMediaDeviceType.kMediaDeviceTypeAudioInput:
+          this.setCurrentMicrophoneId(deviceId);
+          break;
+        case TUIMediaDeviceType.kMediaDeviceTypeAudioOutput:
+          this.setCurrentSpeakerId(deviceId);
+          break;
+        default:
+          break;
+      }
+    },
     setCurrentCameraId(deviceId: string) {
       this.currentCameraId = deviceId;
     },
@@ -611,6 +627,21 @@ export const useRoomStore = defineStore('room', {
     },
     updateVideoQuality(quality: TUIVideoQuality) {
       this.localVideoQuality = quality;
+    },
+    setDeviceList(type: TUIMediaDeviceType, deviceList: {deviceId: string, deviceName: string}[]) {
+      switch (type) {
+        case TUIMediaDeviceType.kMediaDeviceTypeVideoCamera:
+          this.setCameraList(deviceList);
+          break;
+        case TUIMediaDeviceType.kMediaDeviceTypeAudioInput:
+          this.setMicrophoneList(deviceList);
+          break;
+        case TUIMediaDeviceType.kMediaDeviceTypeAudioOutput:
+          this.setSpeakerList(deviceList);
+          break;
+        default:
+          break;
+      }
     },
     setCameraList(deviceList: {deviceId: string, deviceName: string}[]) {
       this.cameraList = deviceList;

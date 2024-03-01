@@ -25,9 +25,9 @@
 <template>
   <div
     v-if="visible"
+    ref="drawerRef"
     class="overlay-container"
     :class="[modal && 'overlay']"
-    ref="drawerRef"
     @mouseup="handleOverlayMouseUp"
     @mousedown="handleOverlayMouseDown"
     @click="handleOverlayClick"
@@ -141,7 +141,7 @@ function handleOverlayClick() {
 
 <style lang="scss" scoped>
 .overlay-container {
-  position: fixed;
+  position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
