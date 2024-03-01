@@ -519,6 +519,20 @@ class IDeprecatedTRTCCloud {
 #if TARGET_PLATFORM_DESKTOP
     trtc_attribute_deprecated virtual void selectScreenCaptureTarget(const TRTCScreenCaptureSourceInfo& source, const RECT& captureRect, bool captureMouse = true, bool highlightWindow = true) = 0;
 #endif
+
+    /**
+     * 设置视频编码器输出的画面方向
+     *
+     * @deprecated v11.7 版本开始不推荐使用。
+     */
+    trtc_attribute_deprecated virtual void setVideoEncoderRotation(TRTCVideoRotation rotation) = 0;
+
+    /**
+     * 设置编码器输出的画面镜像模式
+     *
+     * @deprecated v11.7 版本开始不推荐使用。
+     */
+    trtc_attribute_deprecated virtual void setVideoEncoderMirror(bool mirror) = 0;
 };
 }  // namespace liteav
 #endif

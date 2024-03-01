@@ -243,8 +243,10 @@ enum TXLiteAVWarning {
     ///硬编码启动出现问题，自动切换到软编码
     WARNING_HW_ENCODER_START_FAIL = 1103,
 
-    ///表示编码器发生改变，可以通过 onWarning 函数的扩展信息中的 type 字段来获取当前的编码格式。
-    ///其中 1 代表 265 编码，0 代表 264 编码。注意 Windows 端不支持此错误码的扩展信息。
+    ///表示编码器发生改变，可以通过 onWarning 函数的扩展信息中的相关字段来获取当前的编码格式和类型。
+    /// type 字段值为 0 代表 H.264 编码，1 代表 H.265 编码
+    /// hardware 字段值为 0 代表软件编码，1 代表硬件编码
+    /// stream 字段值为 0 代表大流，1 代表小流，2 代表辅流
     WARNING_CURRENT_ENCODE_TYPE_CHANGED = 1104,
 
     ///当前 CPU 使用率太高，无法满足软件编码需求，自动切换到硬件编码
@@ -267,6 +269,21 @@ enum TXLiteAVWarning {
 
     ///内存不足，部分功能可能不正常。
     WARNING_OUT_OF_MEMORY = 1113,
+
+    ///摄像头被占用.
+    WARNING_CAMERA_IS_OCCUPIED = 1114,
+
+    ///摄像头设备异常.
+    WARNING_CAMERA_DEVICE_ERROR = 1115,
+
+    ///摄像头无法连接.
+    WARNING_CAMERA_DISCONNECTED = 1116,
+
+    ///摄像头启动失败.
+    WARNING_CAMERA_START_FAILED = 1117,
+
+    ///系统异常.
+    WARNING_CAMERA_SERVER_DIED = 1118,
 
     ///用户未授权当前应用使用屏幕录制
     WARNING_SCREEN_CAPTURE_NOT_AUTHORIZED = 1206,

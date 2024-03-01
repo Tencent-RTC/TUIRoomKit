@@ -57,7 +57,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
 /**
  * 1.1 创建 TRTCCloud 实例（单例模式）
  *
- * @param context 仅适用于 Android 平台，SDK 内部会将其转化为 Android 平台的 ApplicationContext 用于调用 Androud System API。
+ * @param context 仅适用于 Android 平台，SDK 内部会将其转化为 Android 平台的 ApplicationContext 用于调用 Android System API。
  *        如果传入的 context 参数为空，SDK 内部会自动获取当前进程的 ApplicationContext。
  * @note
  * 1. 如果您使用 delete ITRTCCloud* 会导致编译错误，请使用 destroyTRTCCloud 释放对象指针。
@@ -611,25 +611,6 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
     virtual void setRemoteRenderParams(const char* userId, TRTCVideoStreamType streamType, const TRTCRenderParams& params) = 0;
 
     /**
-     * 4.17 设置视频编码器输出的画面方向
-     *
-     * 该设置不影响本地画面的预览方向，但会影响房间中其他用户所观看到（以及云端录制文件）的画面方向。
-     * 当用户将手机或 Pad 上下颠倒时，由于摄像头的采集方向没有变，所以房间中其他用户所看到的画面会变成上下颠倒的，
-     * 在这种情况下，您可以通过调用该接口将 SDK 编码出的画面方向旋转180度，如此一来，房间中其他用户所看到的画面可保持正常的方向。
-     * 如果您希望实现上述这种友好的交互体验，我们更推荐您直接调用 {@link setGSensorMode} 实现更加智能的方向适配，无需您手动调用本接口。
-     * @param rotation 目前支持 0、90、180、270 四个旋转角度，默认值：TRTCVideoRotation0，即不旋转。
-     */
-    virtual void setVideoEncoderRotation(TRTCVideoRotation rotation) = 0;
-
-    /**
-     * 4.18 设置编码器输出的画面镜像模式
-     *
-     * 该设置不影响本地画面的镜像模式，但会影响房间中其他用户所观看到（以及云端录制文件）的镜像模式。
-     * @param mirror 是否开启远端镜像，true：开启远端画面镜像；false：关闭远端画面镜像，默认值：false。
-     */
-    virtual void setVideoEncoderMirror(bool mirror) = 0;
-
-    /**
      * 4.20 开启大小画面双路编码模式
      *
      * 开启双路编码模式后，当前用户的编码器会同时输出【高清大画面】和【低清小画面】两路视频流（但只有一路音频流）。
@@ -664,6 +645,18 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
 #if _WIN32 || __APPLE__ || (!__ANDROID__ && __linux__)
     virtual void snapshotVideo(const char* userId, TRTCVideoStreamType streamType, TRTCSnapshotSourceType sourceType) = 0;
 #endif
+
+    /**
+     * 4.25 设置重力感应的适配模式（11.7 及以上版本）
+     *
+     * 开启重力感应后，如果采集端的设备发生旋转，采集端和观众端的画面都会进行相应地渲染以确保视野中的画面始终朝上。
+     * 只在sdk内部摄像头采集场景生效，并且只在移动端生效。
+     * 1. 该接口仅对采集端起作用，如果只是观看房间中的画面，开启此接口是无效的
+     * 2. 当采集端设备发生 90 度或 270 度旋转时，采集端或者观众看到的画面可能会被裁剪以保持比例的协调
+     * @param mode 重力感应模式，详情请参见 {@link TRTCGravitySensorAdaptiveMode_Disable}、{@link TRTCGravitySensorAdaptiveMode_FillByCenterCrop} 和 {@link TRTCGravitySensorAdaptiveMode_FitWithBlackBorder} 默认值：{@link
+     * TRTCGravitySensorAdaptiveMode_Disable}。
+     */
+    virtual void setGravitySensorAdaptiveMode(TRTCGravitySensorAdaptiveMode mode) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //
@@ -1031,7 +1024,6 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * - {@link setVideoEncoderParam} 用于设置主路画面（{@link TRTCVideoStreamTypeBig}，一般用于摄像头）的视频编码参数。
      * - {@link setSubStreamEncoderParam} 用于设置辅路画面（{@link TRTCVideoStreamTypeSub}，一般用于屏幕分享）的视频编码参数。
      * @param param 辅流编码参数，详情请参见 {@link TRTCVideoEncParam}。
-     * @note 即使您使用主路传输屏幕分享（在调用 startScreenCapture 时设置 type = TRTCVideoStreamTypeBig），依然要使用 {@link setSubStreamEncoderParam} 设定屏幕分享的编码参数，而不要使用 {@link setVideoEncoderParam} 。
      */
     virtual void setSubStreamEncoderParam(const TRTCVideoEncParam& param) = 0;
 
@@ -1266,7 +1258,7 @@ class ITRTCCloud : public IDeprecatedTRTCCloud {
      * 10.11 设置远端视频自定义渲染回调
      *
      * 设置该回调之后，SDK 内部会跳过原来的渲染流程，并把采集到的数据回调出来，您需要自己完成画面渲染。
-     * - 您可以通过调用 setLocalVideoRenderCallback(TRTCVideoPixelFormat_Unknown, TRTCVideoBufferType_Unknown, nullptr) 停止回调。
+     * - 您可以通过调用 setRemoteVideoRenderCallback(TRTCVideoPixelFormat_Unknown, TRTCVideoBufferType_Unknown, nullptr) 停止回调。
      * - iOS、Mac、Windows 平台目前仅支持回调 {@link TRTCVideoPixelFormat_I420} 或 {@link TRTCVideoPixelFormat_BGRA32} 像素格式的视频帧。
      * - Android 平台目前仅支持传入 {@link TRTCVideoPixelFormat_I420}, {@link TRTCVideoPixelFormat_RGBA32} 或 {@link TRTCVideoPixelFormat_Texture_2D} 像素格式的视频帧。
      *
