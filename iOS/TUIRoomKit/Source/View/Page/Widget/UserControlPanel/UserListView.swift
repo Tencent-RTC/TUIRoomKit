@@ -57,11 +57,12 @@ class UserListView: UIView {
         button.setTitleColor(UIColor(0xB2BBD1), for: .normal)
         button.setTitle(.allUnMuteAudioText, for: .selected)
         button.setTitleColor(UIColor(0xF2504B), for: .selected)
+        button.setTitle(.allUnMuteAudioText, for: [.selected, .highlighted])
+        button.setTitleColor(UIColor(0xF2504B), for: [.selected, .highlighted])
         button.backgroundColor = UIColor(0x4F586B, alpha: 0.3)
         button.layer.cornerRadius = 6
         button.clipsToBounds = true
         button.titleLabel?.adjustsFontSizeToFitWidth = true
-        button.adjustsImageWhenHighlighted = false
         return button
     }()
     
@@ -72,11 +73,12 @@ class UserListView: UIView {
         button.setTitleColor(UIColor(0xB2BBD1), for: .normal)
         button.setTitle(.allUnMuteVideoText, for: .selected)
         button.setTitleColor(UIColor(0xF2504B), for: .selected)
+        button.setTitle(.allUnMuteVideoText, for: [.selected, .highlighted])
+        button.setTitleColor(UIColor(0xF2504B), for: [.selected, .highlighted])
         button.backgroundColor = UIColor(0x4F586B, alpha: 0.3)
         button.layer.cornerRadius = 6
         button.clipsToBounds = true
         button.titleLabel?.adjustsFontSizeToFitWidth = true
-        button.adjustsImageWhenHighlighted = false
         return button
     }()
     

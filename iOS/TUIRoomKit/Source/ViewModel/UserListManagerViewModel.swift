@@ -354,22 +354,19 @@ extension UserListManagerViewModel {
         guard let userInfo = selectUserInfo else { return }
         sender.isSelected = !sender.isSelected
         if sender.isSelected {
-            engineManager.takeUserOnSeatByAdmin(userId: selectUserId, timeout: timeoutNumber) { [weak self] _,_ in
-                guard let self = self, let userInfo = self.selectUserInfo else { return }
+            engineManager.takeUserOnSeatByAdmin(userId: selectUserId, timeout: timeoutNumber) { _,_ in
                 let text: String = localizedReplace(.onStageText, replace: userInfo.userName)
-                self.viewResponder?.makeToast(text: text)
-            } onRejected: { [weak self] requestId, userId, message in
-                guard let self = self else { return }
+                RoomRouter.makeToastInCenter(toast: text, duration: 0.5)
+            } onRejected: { requestId, userId, message in
                 let text: String = localizedReplace(.refusedTakeSeatInvitationText, replace: userInfo.userName)
-                self.viewResponder?.makeToast(text: text)
-            } onTimeout: { [weak self] _, _ in
-                guard let self = self else { return }
+                RoomRouter.makeToastInCenter(toast: text, duration: 0.5)
+            } onCancelled: { _, _ in
+            } onTimeout: { _, _ in
                 let text: String = localizedReplace(.takeSeatInvitationTimeoutText, replace: userInfo.userName)
-                self.viewResponder?.makeToast(text: text)
-            } onError: { [weak self] _, _, code, message in
-                guard let self = self else { return }
+                RoomRouter.makeToastInCenter(toast: text, duration: 0.5)
+            } onError: { _, _, code, message in
                 let text: String = code == .requestIdRepeat ? .receivedSameRequestText : message
-                self.viewResponder?.makeToast(text: text)
+                RoomRouter.makeToastInCenter(toast: text, duration: 0.5)
             }
             viewResponder?.makeToast(text: .invitedTakeSeatText)
         } else {
