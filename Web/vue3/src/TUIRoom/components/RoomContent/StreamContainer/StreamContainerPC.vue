@@ -77,6 +77,7 @@ import ArrowStrokeTurnPageIcon from '../../common/icons/ArrowStrokeTurnPageIcon.
 import TUIRoomEngine, { TUIUserInfo, TUIChangeReason, TUIRoomEvents,  TUIVideoStreamType, TUISeatInfo } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import useStreamContainer from './useStreamContainerHooks';
+import { EventType, roomService } from '../../../services';
 
 const logPrefix = '[StreamContainer]';
 const {
@@ -489,12 +490,14 @@ async function handleResize() {
 
 onMounted(() => {
   handleLayout();
+  roomService.on(EventType.ROOM_CONTAINER_RESIZE, handleResize);
   ['resize', 'pageshow'].forEach((event) => {
     window.addEventListener(event, handleResize);
   });
 });
 
 onUnmounted(() => {
+  roomService.off(EventType.ROOM_CONTAINER_RESIZE, handleResize);
   ['resize', 'pageshow'].forEach((event) => {
     window.removeEventListener(event, handleResize);
   });

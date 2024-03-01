@@ -148,6 +148,7 @@ function handleClickOutside() {
 .select-container {
   position: relative;
   .select-content {
+    box-sizing: border-box;
     position: relative;
     border: 1px solid var(--border-color);
     background-color: var(--background-color-7);
