@@ -1,6 +1,7 @@
 import { ref, Ref, computed, onUnmounted } from 'vue';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
+import { useChatStore } from '../../../stores/chat';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../../locales';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
@@ -20,6 +21,7 @@ export default function useEndControl() {
   const roomEngine = useGetRoomEngine();
   const visible: Ref<boolean> = ref(false);
   const basicStore = useBasicStore();
+  const chatStore = useChatStore();
   logger.log(`${logPrefix} basicStore:`, basicStore);
 
   const roomStore = useRoomStore();
@@ -121,6 +123,12 @@ export default function useEndControl() {
           TUIMessage({ type: 'success', message: `${t('You are now a room owner')}` });
           if (roomStore.isSpeakAfterTakingSeatMode && !roomStore.isAnchor) {
             await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
+          }
+          if (chatStore.isMessageDisableByAdmin) {
+            roomEngine.instance?.disableSendingMessageByAdmin({
+              userId,
+              isDisable: false,
+            });
           }
         }
         break;
