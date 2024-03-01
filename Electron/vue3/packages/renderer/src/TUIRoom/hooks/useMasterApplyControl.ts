@@ -35,33 +35,52 @@ export default function () {
     roomStore.removeApplyToAnchorUser(requestId);
   }
 
+  // 远端用户的请求被其他 管理员/房主 处理事件
+  function onRequestProcessed(eventInfo: { requestId: string, userId: string }) {
+    const { requestId } = eventInfo;
+    roomStore.removeApplyToAnchorUser(requestId);
+  }
+
   // 处理用户请求
   async function handleUserApply(applyUserId: string, agree: boolean) {
-    // TUIRoomCore.replySpeechApplication(applyUserId, agree);
-    const userInfo = roomStore.remoteUserObj[applyUserId];
-    const requestId = userInfo.applyToAnchorRequestId;
-    if (requestId) {
-      await roomEngine.instance?.responseRemoteRequest({
-        requestId,
-        agree,
-      });
-      roomStore.removeApplyToAnchorUser(requestId);
-    } else {
-      logger.warn('处理上台申请失败，数据异常，请重试！', userInfo);
+    try {
+      // TUIRoomCore.replySpeechApplication(applyUserId, agree);
+      const userInfo = roomStore.remoteUserObj[applyUserId];
+      const requestId = userInfo.applyToAnchorRequestId;
+      if (requestId) {
+        await roomEngine.instance?.responseRemoteRequest({
+          requestId,
+          agree,
+        });
+        roomStore.removeApplyToAnchorUser(requestId);
+      } else {
+        logger.warn('处理上台申请失败，数据异常，请重试！', userInfo);
+      }
+    } catch (error: any) {
+      if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
+        TUIMessage({ type: 'warning', message: t('The current number of people on stage has reached the limit') });
+      } else {
+        logger.error('Failure to process a user request', error);
+      }
     }
   }
 
   // 同意用户上台
   async function agreeUserOnStage(userInfo: UserInfo) {
-    const requestId = userInfo.applyToAnchorRequestId;
-    if (requestId) {
-      await roomEngine.instance?.responseRemoteRequest({
-        requestId,
-        agree: true,
-      });
-      roomStore.removeApplyToAnchorUser(requestId);
-    } else {
-      logger.warn('同意上台申请失败，数据异常，请重试！', userInfo);
+    try {
+      const requestId = userInfo.applyToAnchorRequestId;
+      if (requestId) {
+        await roomEngine.instance?.responseRemoteRequest({ requestId, agree: true });
+        roomStore.removeApplyToAnchorUser(requestId);
+      } else {
+        logger.warn('同意上台申请失败，数据异常，请重试！', userInfo);
+      }
+    } catch (error: any) {
+      if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
+        TUIMessage({ type: 'warning', message: t('The current number of people on stage has reached the limit') });
+      } else {
+        logger.error('Failed application for consent to go on stage', error);
+      }
     }
   }
 
@@ -143,11 +162,13 @@ export default function () {
   TUIRoomEngine.once('ready', () => {
     roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
     roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
+    roomEngine.instance?.on(TUIRoomEvents.onRequestProcessed, onRequestProcessed);
   });
 
   onBeforeUnmount(() => {
     roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
     roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
+    roomEngine.instance?.off(TUIRoomEvents.onRequestProcessed, onRequestProcessed);
   });
 
   // --------- 以下处理主持人主动操作 ----------
@@ -158,7 +179,7 @@ export default function () {
     const request = await roomEngine.instance?.takeUserOnSeatByAdmin({
       seatIndex: -1,
       userId,
-      timeout: 0,
+      timeout: 60,
       requestCallback: (callbackInfo: {
         requestCallbackType: TUIRequestCallbackType, userId: string, code: TUIErrorCode
       }) => {
@@ -181,12 +202,17 @@ export default function () {
             });
             break;
           case TUIRequestCallbackType.kRequestTimeout:
+            TUIMessage({
+              type: 'warning',
+              message: t('The invitation to sb to go on stage has timed out', { name: userName || userId }),
+              duration: MESSAGE_DURATION.NORMAL,
+            });
             break;
           case TUIRequestCallbackType.kRequestError:
             if (code === TUIErrorCode.ERR_REQUEST_ID_REPEAT) {
               TUIMessage({
                 type: 'warning',
-                message: t('This member has already received the same request,please try again later'),
+                message: t('This member has already received the same request, please try again later'),
                 duration: MESSAGE_DURATION.NORMAL,
               });
             }

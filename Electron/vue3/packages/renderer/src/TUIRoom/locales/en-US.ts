@@ -288,5 +288,9 @@ export default {
   'Application to go on stage was rejected': 'Application to go on stage was rejected',
   'You are now an administrator': 'You are now an administrator',
   'The RoomOwner has withdrawn your administrator privileges': 'The RoomOwner has withdrawn your administrator privileges',
-  'This member has already received the same request,please try again later': 'This member has already received the same request,please try again later',
+  'This member has already received the same request, please try again later': 'This member has already received the same request, please try again later',
+  'Failed to go on stage, invitation has timed out': '上台失败，邀请已超时',
+  'The current number of people on stage has reached the limit': '当前上台人数已达上限',
+  // @ts-ignore
+  'The invitation to sb to go on stage has timed out': ({ named }) => `对${named('name')}的上台邀请已超时`,
 };

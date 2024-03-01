@@ -68,12 +68,10 @@ export default function useStreamContainer() {
   const {
     isDefaultOpenCamera,
     isDefaultOpenMicrophone,
-    isLocalAudioIconDisable,
-    isLocalVideoIconDisable,
   } = storeToRefs(roomStore);
 
   watch(isDefaultOpenCamera, async (val) => {
-    if (val && !isLocalVideoIconDisable.value) {
+    if (val) {
       /**
        * Turn on the local camera
        *
@@ -132,12 +130,7 @@ export default function useStreamContainer() {
   });
 
   watch(isDefaultOpenMicrophone, async (val) => {
-    if (val && !isLocalAudioIconDisable.value) {
-      /**
-       * Advance the timing of startMicrophone to ensure that it is executed before startCameraPreview
-       *
-       * 提前 startMicrophone 的时机，保证在 startCameraPreview 之前执行
-       **/
+    if (val) {
       await roomEngine.instance?.unmuteLocalAudio();
       if (!basicStore.isOpenMic) {
         roomEngine.instance?.openLocalMicrophone();

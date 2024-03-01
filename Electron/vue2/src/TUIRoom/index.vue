@@ -295,14 +295,11 @@ async function createRoom(options: {
       message: 'enter room success',
     });
     roomStore.setRoomInfo(roomInfo);
-    // 申请发言模式房主上麦
-    if (roomInfo.isSeatEnabled) {
-      await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
-    }
-
     await getUserList();
     if (roomInfo.isSeatEnabled) {
       await getSeatList();
+      // 申请发言模式房主上麦(takeSeat 在 getSeatList 拉数据完成之后执行)
+      await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
     }
     /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
@@ -329,12 +326,10 @@ async function enterRoom(options: {roomId: string, roomParam?: RoomParam }) {
     logger.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
     const roomInfo = await doEnterRoom(roomId);
     roomStore.setRoomInfo(roomInfo);
-    if (roomStore.isMaster && roomStore.isSpeakAfterTakingSeatMode) {
-      await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
-    }
     await getUserList();
     if (roomInfo.isSeatEnabled) {
       await getSeatList();
+      roomStore.isMaster && await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
     }
     /**
    * setRoomParam must come after setRoomInfo,because roomInfo contains information
@@ -365,9 +360,13 @@ async function getSeatList() {
 }
 
 async function getUserList() {
+  let nextSequence = 0;
   try {
-    const { userInfoList } = await roomEngine.instance?.getUserList() as any;
-    roomStore.setUserList(userInfoList);
+    do {
+      const result = await roomEngine.instance?.getUserList({ nextSequence }) as any;
+      roomStore.updateUserList(result.userInfoList);
+      nextSequence = result.nextSequence;
+    } while (nextSequence !== 0);
   } catch (error: any) {
     logger.error('TUIRoomEngine.getUserList', error.code, error.message);
   }
@@ -702,14 +701,6 @@ watch(sdkAppId, (val: number) => {
     background-color: var(--background-color-1);
     position: absolute;
     top: 0;
-  }
-  .footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 76px;
-    background-color: var(--background-color-2);
-    box-shadow: 0px -8px 30px var(--footer-shadow-color);
   }
 }
 </style>
