@@ -289,4 +289,8 @@ export default {
   'You are now an administrator': '您已成为管理员',
   'The RoomOwner has withdrawn your administrator privileges': '房主已收回您的管理员权限',
   'This member has already received the same request, please try again later': '该成员已收到相同请求，请稍后再试',
+  'Failed to go on stage, invitation has timed out': '上台失败，邀请已超时',
+  'The current number of people on stage has reached the limit': '当前上台人数已达上限',
+  // @ts-ignore
+  'The invitation to sb to go on stage has timed out': ({ named }) => `对${named('name')}的上台邀请已超时`,
 };

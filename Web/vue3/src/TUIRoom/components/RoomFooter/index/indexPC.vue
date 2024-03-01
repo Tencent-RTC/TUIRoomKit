@@ -99,12 +99,19 @@ function handleControlClick(name: string) {
 
 <style lang="scss" scoped>
 .footer-container {
+  position: absolute;
+  bottom: 0;
   width: 100%;
-  height: 100%;
+  padding: 0.7rem 0;
   padding-left: 9px;
   padding-right: 24px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  background-color: var(--background-color-2);
+  box-shadow: 0px -8px 30px var(--footer-shadow-color);
   .left-container {
     height: 100%;
     display: flex;
