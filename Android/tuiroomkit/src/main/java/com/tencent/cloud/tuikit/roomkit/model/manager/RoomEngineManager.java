@@ -30,6 +30,7 @@ import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.imaccess.utils.BusinessSceneUtil;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
+import com.tencent.cloud.tuikit.roomkit.model.entity.UserEntity;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.service.KeepAliveService;
 import com.tencent.cloud.tuikit.roomkit.utils.DrawOverlaysPermissionUtil;
@@ -621,6 +622,17 @@ public class RoomEngineManager {
         if (callback != null) {
             callback.onAccepted(null, null);
         }
+    }
+
+    public void enableSendingMessageForOwner() {
+        if (mRoomStore.userModel.getRole() != TUIRoomDefine.Role.ROOM_OWNER) {
+            return;
+        }
+        UserEntity user = mRoomStore.findUserWithCameraStream(mRoomStore.allUserList, mRoomStore.userModel.userId);
+        if (user.isEnableSendingMessage()) {
+            return;
+        }
+        disableSendingMessageByAdmin(user.getUserId(), false, null);
     }
 
     private void setFramework() {

@@ -1,5 +1,6 @@
 package com.tencent.cloud.tuikit.roomkit.model.manager;
 
+import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.VideoStreamType.CAMERA_STREAM_LOW;
 import static com.tencent.cloud.tuikit.engine.room.TUIRoomDefine.VideoStreamType.SCREEN_STREAM;
 import static com.tencent.cloud.tuikit.roomkit.videoseat.Constants.VOLUME_CAN_HEARD_MIN_LIMIT;
 
@@ -116,6 +117,7 @@ public class RoomEventDispatcher extends TUIRoomObserver {
         if (TextUtils.equals(userId, mRoomStore.userModel.userId)) {
             mRoomStore.userModel.setRole(role);
             RoomEngineManager.sharedInstance().autoTakeSeatForOwner(null);
+            RoomEngineManager.sharedInstance().enableSendingMessageForOwner();
         }
         mRoomStore.handleUserRoleChanged(userId, role);
     }
@@ -123,6 +125,9 @@ public class RoomEventDispatcher extends TUIRoomObserver {
     @Override
     public void onUserVideoStateChanged(String userId, TUIRoomDefine.VideoStreamType streamType, boolean hasVideo,
                                         TUIRoomDefine.ChangeReason reason) {
+        if (TextUtils.equals(userId, mRoomStore.userModel.userId) && streamType == CAMERA_STREAM_LOW) {
+            return;
+        }
         if (streamType == SCREEN_STREAM) {
             mRoomStore.handleUserScreenStateChanged(userId, hasVideo);
         } else {
@@ -233,11 +238,11 @@ public class RoomEventDispatcher extends TUIRoomObserver {
 
     @Override
     public void onRequestCancelled(String requestId, String userId) {
-        Map<String, Object> map = new HashMap<>();
-        map.put(RoomEventConstant.KEY_REQUEST_ID, requestId);
-        map.put(RoomEventConstant.KEY_USER_ID, userId);
-        RoomEventCenter.getInstance().notifyEngineEvent(RoomEventCenter.RoomEngineEvent.REQUEST_CANCELLED, map);
+        mRoomStore.removeTakeSeatRequest(requestId);
+    }
 
+    @Override
+    public void onRequestProcessed(String requestId, String userId) {
         mRoomStore.removeTakeSeatRequest(requestId);
     }
 
