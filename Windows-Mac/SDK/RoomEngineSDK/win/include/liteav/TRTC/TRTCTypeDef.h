@@ -839,6 +839,23 @@ enum TRTCSpeedTestScene {
 
 };
 
+/**
+ * 4.15 设置重力感应的适配模式（仅适用于移动端）
+ * v11.7版本开始支持，只在sdk内部摄像头采集场景生效
+ */
+enum TRTCGravitySensorAdaptiveMode {
+
+    ///关闭重力感应，根据当前采集分辨率与设置的编码分辨率决策，如果两者不一致，则通过旋转90度，保证最大画幅。
+    TRTCGravitySensorAdaptiveMode_Disable = 0,
+
+    ///开启重力感应，始终保证远端画面图像为正，中间过程需要处理分辨率不一致时，采用居中裁剪模式。
+    TRTCGravitySensorAdaptiveMode_FillByCenterCrop = 1,
+
+    ///开启重力感应，始终保证远端画面图像为正，中间过程需要处理分辨率不一致时，采用叠加黑边模式。
+    TRTCGravitySensorAdaptiveMode_FitWithBlackBorder = 2,
+
+};
+
 /////////////////////////////////////////////////////////////////////////////////
 //
 //                      TRTC 核心类型定义
@@ -1041,6 +1058,9 @@ struct TRTCVolumeInfo {
     ///是否检测到人声，0：非人声 1：人声。
     int32_t vad;
 
+    ///本地用户的人声频率（单位：Hz），取值范围[0 - 4000]，对于远端用户，该值始终为0。
+    float pitch;
+
     ///音频频谱数据是将音频数据在频率域中的分布，划分为 256 个频率段，使用 spectrumData 记录各个频率段的能量值，每个能量值的取值范围为 [-300, 0]，单位为 dBFS。
     ///@note 本地频谱使用编码前的音频数据计算，会受到本地采集音量、BGM等影响；远端频谱使用接收到的音频数据计算，本地调整远端播放音量等操作不会对其产生影响。
     const float *spectrumData;
@@ -1048,7 +1068,7 @@ struct TRTCVolumeInfo {
     /// spectrumDataLength 记录音频频谱数据的长度，为 256。
     uint32_t spectrumDataLength;
 
-    TRTCVolumeInfo() : userId(nullptr), volume(0), vad(0), spectrumData(nullptr), spectrumDataLength(0) {
+    TRTCVolumeInfo() : userId(nullptr), volume(0), vad(0), pitch(0), spectrumData(nullptr), spectrumDataLength(0) {
     }
 };
 
@@ -1661,7 +1681,7 @@ struct TRTCScreenCaptureProperty {
     ///【特殊说明】开启后屏幕采集性能最佳，但会丧失抗遮挡能力，如果您同时开启 enableHighLight + enableHighPerformance，远端用户可以看到高亮的边框。
     bool enableHighPerformance;
 
-    ///【字段含义】指定高亮边框的颜色，RGB 格式，传入 0 时代表采用默认颜色，默认颜色为 #8CBF26。
+    ///【字段含义】指定高亮边框的颜色，RGB 格式，传入 0 时代表采用默认颜色，默认颜色为 #FFE640。
     int highLightColor;
 
     ///【字段含义】指定高亮边框的宽度，传入0时采用默认描边宽度，默认宽度为 5px，您可以设置的最大值为 50。
@@ -2005,10 +2025,13 @@ struct TRTCAudioVolumeEvaluateParams {
     ///【请您注意】在 startLocalAudio 之前调用才可以生效。
     bool enableVadDetection;
 
+    ///【字段含义】是否开启本地人声频率计算
+    bool enablePitchCalculation;
+
     ///【字段含义】是否开启声音频谱计算。
     bool enableSpectrumCalculation;
 
-    TRTCAudioVolumeEvaluateParams() : interval(300), enableVadDetection(false), enableSpectrumCalculation(false) {
+    TRTCAudioVolumeEvaluateParams() : interval(300), enableVadDetection(false), enablePitchCalculation(false), enableSpectrumCalculation(false) {
     }
 };
 

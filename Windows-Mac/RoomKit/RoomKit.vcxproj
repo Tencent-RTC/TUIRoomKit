@@ -147,25 +147,25 @@
     <ProjectGuid>{9090ED41-A34F-4663-98D3-541018CA75C1}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <ProjectName>RoomKit</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
@@ -233,7 +233,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\win\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\extension;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\common;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)3rdParty\zlib\x86_64\;$(ProjectDir)bin\;$(ProjectDir)..\SDK\RoomEngineSDK\win\lib\Win64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -255,7 +255,7 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\extension;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\common;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)3rdParty\zlib\x86\;$(ProjectDir)bin\;$(ProjectDir)..\SDK\RoomEngineSDK\win\lib\Win32\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -277,7 +277,7 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\extension;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\common;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)3rdParty\zlib\x86_64\;$(ProjectDir)bin\;$(ProjectDir)..\SDK\RoomEngineSDK\win\lib\Win64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -299,7 +299,7 @@ if exist $(TargetDir)*.ilk del $(TargetDir)*.ilk</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../utils;$(ProjectDir)/../utils/BugReport;$(ProjectDir)/../utils/jsoncpp;$(ProjectDir)/../Common;$(ProjectDir)Module\include;.\;$(ProjectDir)App;$(ProjectDir)App\Common;$(ProjectDir)3rdParty\zlib\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\extension;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\common;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\room;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav;$(ProjectDir)..\SDK\RoomEngineSDK\win\include\liteav\TRTC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)3rdParty\zlib\x86\;$(ProjectDir)bin\;$(ProjectDir)..\SDK\RoomEngineSDK\win\lib\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
