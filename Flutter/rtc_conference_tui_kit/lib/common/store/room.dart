@@ -177,6 +177,10 @@ class RoomStore extends GetxController {
         role == TUIRole.roomOwner) {
       RoomEngineManager().takeSeat(_seatIndex, _reqTimeout, null);
     }
+    if (role == TUIRole.roomOwner && !currentUser.ableSendingMessage.value) {
+      RoomEngineManager()
+          .disableSendingMessageByAdmin(currentUser.userId.value, false);
+    }
   }
 
   void updateUserTalkingState(
@@ -238,6 +242,18 @@ class RoomStore extends GetxController {
   void deleteInviteSeatUser(String userId) {
     inviteSeatList.removeWhere((element) => element.userId.value == userId);
     inviteSeatMap.removeWhere((key, value) => key == userId);
+  }
+
+  void deleteTakeSeatRequest(String requestId) {
+    String userId = inviteSeatMap.entries
+        .firstWhere(
+          (entry) => entry.value == requestId,
+          orElse: () => const MapEntry('', ''),
+        )
+        .key;
+    if (userId.isNotEmpty) {
+      deleteInviteSeatUser(userId);
+    }
   }
 
   void initItemTouchableState() {

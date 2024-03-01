@@ -1,3 +1,9 @@
+### 2.1.0(2024-03-01)
+
+- Fix the issue where the on-stage management list does not refresh for other administrators after a stage application is rejected
+- Fix the issue where a user who is prohibited from sending messages cannot speak after becoming the room owner.
+- Upgrade the dependencies of rtc_room_engine
+
 ### 2.0.3(2024-02-02)
 
 - Fixed some known bugs and issues
