@@ -310,7 +310,7 @@ export const useRoomStore = defineStore('room', {
       };
       return newUserInfo;
     },
-    setUserList(userList: any[]) {
+    updateUserList(userList: any[]) {
       userList.forEach((user) => {
         if (user.userId === this.localUser.userId) {
           Object.assign(this.localUser, user);

@@ -51,7 +51,7 @@ import { useI18n } from '../../../locales';
 import { storeToRefs } from 'pinia';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import logger from '../../../utils/common/logger';
-import { TUIRoomEngine, TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType, TUIRole } from '@tencentcloud/tuiroom-engine-wx';
+import { TUIRoomEngine, TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType, TUIRole, TUIErrorCode } from '@tencentcloud/tuiroom-engine-wx';
 import TuiButton from '../../common/base/Button.vue';
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
@@ -110,7 +110,7 @@ async function sendSeatApplication() {
   }
   const request = await roomEngine.instance?.takeSeat({
     seatIndex: -1,
-    timeout: 0,
+    timeout: 60,
     requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType }) => {
       isApplyingOnSeat.value = false;
       const { requestCallbackType } = callbackInfo;
@@ -122,6 +122,7 @@ async function sendSeatApplication() {
           TUIMessage({ type: 'warning', message: t('Application to go on stage was rejected') });
           break;
         case TUIRequestCallbackType.kRequestTimeout:
+          TUIMessage({ type: 'warning', message: t('Failed to go on stage, invitation has timed out') });
           break;
       }
     },
@@ -194,13 +195,19 @@ function onRequestCancelled(eventInfo: { requestId: string; userId: string }) {
  * 用户接受/拒绝主讲人的邀请
 **/
 async function handleInvite(agree: boolean) {
-  await roomEngine.instance?.responseRemoteRequest({
-    requestId: inviteToAnchorRequestId.value,
-    agree,
-  });
-  showInviteDialog.value = false;
-  if (agree) {
-    hideApplyAttention();
+  try {
+    await roomEngine.instance?.responseRemoteRequest({
+      requestId: inviteToAnchorRequestId.value,
+      agree,
+    });
+  } catch (error: any) {
+    if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
+      TUIMessage({ type: 'warning', message: t('The current number of people on stage has reached the limit') });
+    } else {
+      logger.error('Failure of a user to accept/reject a roomOwner invitation', error);
+    }
+  } finally {
+    showInviteDialog.value = false;
   }
 }
 

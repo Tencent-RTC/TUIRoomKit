@@ -1,3 +1,22 @@
+## 2023.02.29@2.1.0
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-wx](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-wx) 到 v2.1.0 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+
+**Improvement**
+- 新增邀请/举手超时处理以及上麦人数超过 20 个限制处理;
+- 优化主持人/管理员重复进行全体静音/禁画的交互体验;
+- 优化登录逻辑;
+- 新增获取上麦请求列表接口 (getSeatApplicationList), 新增信令被处理回调 (onRequestProcessed), 优化主持人和多管理员处理上台申请逻辑;
+- 新增主持人/管理员发送 邀请上台/上麦申请 的 60 秒超时, 普通成员超时未处理弹窗自动消失;
+
+**Bug Fixed**
+- 修复时机问题导致的 trtc 角色未切换问题, 调整 getSeatList 与 takeSeat 的调用顺序;
+- 修复进会人数拉取不准确的问题;
+- 修复创建举手发言房间后不能默认打开摄像头和麦克风的问题;
+- 修复 @tencentcloud/tuiroom-engine-wx 版本与 kit 版本不匹配问题;
+
 ## 2023.02.02@2.0.3
 
 **Feature**

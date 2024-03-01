@@ -52,9 +52,13 @@ function handleControlClick(name: string) {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 100%;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  padding: 0.7rem;
+  background-color: var(--background-color-2);
+  box-shadow: 0px -8px 30px var(--footer-shadow-color);
 }
 </style>
