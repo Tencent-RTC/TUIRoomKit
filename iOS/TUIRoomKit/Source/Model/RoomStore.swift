@@ -105,8 +105,29 @@ class RoomStore: NSObject {
     }
     
     func updateUserDisableSendingMessage(userId: String, isDisable: Bool) {
+        if userId == currentUser.userId {
+            currentUser.disableSendingMessage = isDisable
+        }
         guard let userItem = getUserItem(userId) else { return }
         userItem.disableSendingMessage = isDisable
+    }
+    
+    func deleteTakeSeatRequest(requestId: String, userId: String) {
+        var userId = userId
+        inviteSeatMap.forEach { (key, value) in
+            if value == requestId {
+                userId = key
+            }
+        }
+        deleteInviteSeatItem(userId: userId)
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+    }
+    
+    func deleteInviteSeatItem(userId: String) {
+        inviteSeatList = inviteSeatList.filter { userModel in
+            userModel.userId != userId
+        }
+        inviteSeatMap.removeValue(forKey: userId)
     }
     
     private func getUserItem(_ userId: String) -> UserEntity? {

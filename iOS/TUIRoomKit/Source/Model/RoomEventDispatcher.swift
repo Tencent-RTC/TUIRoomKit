@@ -154,7 +154,11 @@ extension RoomEventDispatcher: TUIRoomObserver {
     }
     
     func onRequestCancelled(requestId: String, userId: String) {
-        requestCancelled(requestId: requestId, userId: userId)
+        store.deleteTakeSeatRequest(requestId: requestId, userId: userId)
+    }
+    
+    func onRequestProcessed(requestId: String, userId: String) {
+        store.deleteTakeSeatRequest(requestId: requestId, userId: userId)
     }
     
     func onKickedOffSeat(userId: String) {
@@ -286,28 +290,24 @@ extension RoomEventDispatcher {
                 EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RoomOwnerChanged, param: ["owner": userId])
             }
         }
-        //转成房主之后需要上麦
-        guard isSelfRoleChanged, isRoomOwnerChanged else { return }
-        guard roomInfo.isSeatEnabled, !currentUser.isOnSeat else { return }
-        let _ = EngineManager.createInstance().takeSeat { [weak self] _,_ in
-            guard let self = self else { return }
-            self.currentUser.isOnSeat = true
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged, param: ["isOnSeat": true])
-        } onError: { _, _, code, message in
-            debugPrint("takeSeat,code:\(code),message:\(message)")
+        if checkAutoTakeSeatForOwner(userId: userId, userRole: userRole) {
+           let _ = engineManager.takeSeat()
+        }
+        if checkAutoSendingMessageForOwner(userId: userId, userRole: userRole) {
+            engineManager.disableSendingMessageByAdmin(userId: userId, isDisable: false)
         }
     }
     
-    private func requestCancelled(requestId: String, userId: String) {
-        var userId = userId
-        //如果是请求超时被取消，userId是房主，需要通过requestId找到用户的userId
-        store.inviteSeatMap.forEach { (key, value) in
-            if value == requestId {
-                userId = key
-            }
-        }
-        engineManager.deleteInviteSeatUser(userId)
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+    private func checkAutoTakeSeatForOwner(userId: String, userRole: TUIRole) -> Bool {
+        let isSelfRoleChanged = userId == currentUser.userId
+        let isRoomOwnerChanged = userRole == .roomOwner
+        return isSelfRoleChanged && isRoomOwnerChanged && roomInfo.isSeatEnabled && !currentUser.isOnSeat
+    }
+    
+    private func checkAutoSendingMessageForOwner(userId: String, userRole: TUIRole) -> Bool {
+        let isSelfRoleChanged = userId == currentUser.userId
+        let isRoomOwnerChanged = userRole == .roomOwner
+        return isSelfRoleChanged && isRoomOwnerChanged && currentUser.disableSendingMessage
     }
     
     private func requestReceived(request: TUIRequest) {

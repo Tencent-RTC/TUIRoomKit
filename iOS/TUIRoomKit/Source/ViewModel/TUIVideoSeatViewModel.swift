@@ -145,7 +145,8 @@ extension TUIVideoSeatViewModel {
     func switchPosition() {
         if videoSeatViewType == .largeSmallWindowType {
             isSwitchPosition = !isSwitchPosition
-            reloadSeatItems()
+            refreshListSeatItem()
+            resetMiniscreen()
             viewResponder?.reloadData()
         }
     }
