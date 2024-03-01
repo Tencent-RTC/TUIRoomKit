@@ -400,7 +400,7 @@ public class RoomStore {
         Map<String, Object> map = new HashMap<>();
         map.put(RoomEventConstant.KEY_SEAT_USER_POSITION, seatPosition);
         map.put(RoomEventConstant.KEY_USER_POSITION, userPosition);
-        map.put(KEY_ERROR, reason);
+        map.put(KEY_REASON, reason);
         RoomEventCenter.getInstance().notifyEngineEvent(RoomEventCenter.RoomEngineEvent.USER_MIC_STATE_CHANGED, map);
     }
 
