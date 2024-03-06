@@ -7,7 +7,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import useDeviceManager from '../../../hooks/useDeviceManager';
+import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import { storeToRefs } from 'pinia';
 import CameraSwitchIcon from '../../common/icons/CameraSwitchIcon.vue';
@@ -15,10 +15,10 @@ import { useBasicStore } from '../../../stores/basic';
 import vTap from '../../../directives/vTap';
 const basicStore = useBasicStore();
 const { isFrontCamera } = storeToRefs(basicStore);
-const { deviceManager } = useDeviceManager();
+const roomEngine = useGetRoomEngine();
 
 async function handleSwitchCamera() {
-  await deviceManager.instance?.switchCamera({ isFrontCamera: !isFrontCamera.value });
+  await roomEngine.instance?.switchCamera({ isFrontCamera: !isFrontCamera.value });
   basicStore.setIsFrontCamera(!isFrontCamera.value);
 }
 </script>

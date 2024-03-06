@@ -293,18 +293,4 @@ export default {
   'The current number of people on stage has reached the limit': '当前上台人数已达上限',
   // @ts-ignore
   'The invitation to sb to go on stage has timed out': ({ named }) => `对${named('name')}的上台邀请已超时`,
-
-  // Room Chat 融合卡片翻译
-  'quick meeting': 'quick meeting',
-  Meeting: 'Meeting',
-  'Meeting in progress': 'Meeting in progress',
-  Initiating: 'Initiating',
-  'X people have joined': ({ values }: any) => `${values?.number} people have joined`,
-  'Waiting for members to join the meeting': 'Waiting for members to join the meeting',
-  'X people are in the meeting': ({ values }: any) => `${values?.number} people are in the meeting`,
-  'Already joined': 'Already joined',
-  'Enter the meeting': 'Enter the meeting',
-  'Ending meeting': 'Ending meeting',
-  'The meeting has ended': 'The meeting has ended',
-  'Currently in a meeting, please exit the current meeting before proceeding.': 'Currently in a meeting, please exit the current meeting before proceeding.',
 };

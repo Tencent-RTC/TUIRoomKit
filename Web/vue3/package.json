@@ -1,6 +1,7 @@
 {
-  "name": "@tencentcloud/room-uikit-vue",
-  "version": "0.0.1",
+  "name": "room-uikit-web-vue3",
+  "private": true,
+  "version": "2.1.0",
   "scripts": {
     "dev": "vite --force",
     "build": "vue-tsc --noEmit --skipLibCheck && vite build",
@@ -9,11 +10,8 @@
   },
   "dependencies": {
     "@tencentcloud/tuiroom-engine-js": "^2.1.0",
-    "@tencentcloud/chat": "latest",
-    "@tencentcloud/tui-core": "latest",
     "axios": "^0.27.2",
     "events": "^3.3.0",
-    "interactjs": "^1.10.26",
     "js-cookie": "^3.0.1",
     "mitt": "^3.0.0",
     "pinia": "^2.0.13",

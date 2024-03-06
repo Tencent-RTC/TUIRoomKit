@@ -76,7 +76,7 @@ Because Element Plus components are imported manually, it may take a relatively 
 
 | 1 | 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/caf8a9f6d5322ef5b07420bef0ff9f42.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/c3982208a81f5b0f774c5bfadc6e7b99.png" width="320"/> |
+| <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/home-create-en.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room-en.png" width="320"/> |
 
 **Participant (userId: audience)**
 
@@ -85,7 +85,7 @@ Because Element Plus components are imported manually, it may take a relatively 
 
 | 1 | 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/6e0db32e8497c00221018a80bd7ceaab.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/c3982208a81f5b0f774c5bfadc6e7b99.png" width="320"/> |
+| <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/home-join-en.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room-en.png" width="320"/> |
 
 ### Step 5: Production Environment Deployment
 - 1. Generate a DIST file
