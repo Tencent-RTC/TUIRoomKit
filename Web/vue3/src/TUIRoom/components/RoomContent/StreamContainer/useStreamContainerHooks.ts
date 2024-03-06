@@ -1,7 +1,7 @@
 import { watch } from 'vue';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import {  useRoomStore } from '../../../stores/room';
-import  { TUIChangeReason, TUIMediaDeviceType,  TUIUserInfo } from '@tencentcloud/tuiroom-engine-js';
+import  { TUIChangeReason,  TUIUserInfo } from '@tencentcloud/tuiroom-engine-js';
 import TUIMessage from '../../common/base/Message/index';
 import { useI18n } from '../../../locales';
 import { useBasicStore } from '../../../stores/basic';
@@ -10,7 +10,6 @@ import { storeToRefs } from 'pinia';
 import { isMobile, isWeChat } from '../../../utils/environment';
 import logger from '../../../utils/common/logger';
 import { SMALL_VIDEO_ENC_PARAM } from '../../../constants/room';
-import useDeviceManager from '../../../hooks/useDeviceManager';
 
 const logPrefix = '[StreamContainer]';
 
@@ -24,7 +23,6 @@ export default function useStreamContainer() {
   const basicStore = useBasicStore();
   const roomStore = useRoomStore();
   const { t } = useI18n();
-  const { deviceManager } = useDeviceManager();
 
   // 远端用户进入
   const onRemoteUserEnterRoom = (eventInfo: { userInfo: TUIUserInfo }) => {
@@ -112,17 +110,12 @@ export default function useStreamContainer() {
          * 设置设备id
         **/
         if (!roomStore.currentCameraId) {
-          const cameraList = await deviceManager.instance?.getDevicesList({
-            type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
-          });
+          const cameraList = await roomEngine.instance?.getCameraDevicesList();
           if (cameraList && cameraList.length > 0) {
             roomStore.setCurrentCameraId(cameraList[0].deviceId);
           }
         }
-        await deviceManager.instance?.setCurrentDevice({
-          type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
-          deviceId: roomStore.currentCameraId,
-        });
+        await roomEngine.instance?.setCurrentCameraDevice({ deviceId: roomStore.currentCameraId });
         /**
          * Turn on the local camera
          *
