@@ -3,7 +3,7 @@
     <div class="left-container">
       <switch-theme class="header-item"></switch-theme>
       <layout-control class="header-item"></layout-control>
-      <!-- <network-info></network-info> -->
+      <network-info class="header-item"></network-info>
     </div>
     <div class="center-container">
       <room-info class="header-item"></room-info>
@@ -29,6 +29,7 @@ import Language from '../../common/Language.vue';
 import SwitchTheme from '../../common/SwitchTheme.vue';
 import RoomInfo from '../RoomInfo';
 import LayoutControl from './LayoutControl.vue';
+import NetworkInfo from './NetworkInfo.vue';
 import { useBasicStore } from '../../../stores/basic';
 import { storeToRefs } from 'pinia';
 

@@ -8,6 +8,7 @@ import { useChatStore } from '../../../stores/chat';
 import { useRoomStore } from '../../../stores/room';
 import { useI18n } from '../../../locales';
 import { useBasicStore } from '../../../stores/basic';
+import { decodeSendTextMsg } from '../util';
 export default function useChatEditor() {
   const roomEngine = useGetRoomEngine();
 
@@ -35,11 +36,11 @@ export default function useChatEditor() {
   });
   const cannotSendMessage = computed(() => Boolean(isMessageDisableByAdmin.value || isMessageDisableForAllUser.value));
   const sendMessage = async () => {
-    const msg = sendMsg.value.replace('\n', '');
-    sendMsg.value = '';
-    if (msg === '') {
+    const result = decodeSendTextMsg(sendMsg.value);
+    if (result === '') {
       return;
     }
+    sendMsg.value = '';
     isEmojiToolbarVisible.value = false;
     try {
       const tim = roomEngine.instance?.getTIM();
@@ -47,7 +48,7 @@ export default function useChatEditor() {
         to: roomId.value,
         conversationType: TencentCloudChat.TYPES.CONV_GROUP,
         payload: {
-          text: msg,
+          text: result,
         },
       });
       await tim.sendMessage(message);
@@ -55,7 +56,7 @@ export default function useChatEditor() {
         ID: Math.random().toString(),
         type: 'TIMTextElem',
         payload: {
-          text: msg,
+          text: result,
         },
         nick: roomStore.localUser.userName || roomStore.localUser.userId,
         from: roomStore.localUser.userId,
