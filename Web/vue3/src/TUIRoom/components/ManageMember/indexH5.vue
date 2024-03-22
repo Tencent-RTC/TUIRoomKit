@@ -1,8 +1,14 @@
 <template>
   <div class="manage-member-container">
-    <div v-if="applyToAnchorList.length > 0" class="apply-on-stage-info">
-      <div class="apply-info">
-        {{ `${applyToAnchorList[0].userName || applyToAnchorList[0].userId} ${t('Applying for the stage')}` }}
+    <div class="manage-member-header">
+      <div v-if="roomStore.isSpeakAfterTakingSeatMode" class="apply-count" @click="handleToggleStaged">
+        <span :class="['apply-staged', {'apply-count-active': isOnStateTabActive }]">{{ alreadyStaged }}</span>
+        <span :class="['apply-not-stage', { 'apply-count-active': !isOnStateTabActive }]">{{ notStaged }}</span>
+      </div>
+      <div v-if="applyToAnchorList.length > 0 && !isGeneralUser" class="apply-on-stage-info">
+        <svg-icon :icon="ApplyTipsIcon" class="apply-icon"></svg-icon>
+        <div class="apply-info"> {{ applyToAnchorUserContent }} </div>
+        <div class="apply-check" @click="showApplyUserList">{{ t('Check') }}</div>
       </div>
     </div>
     <div class="member-list-container">
@@ -10,11 +16,11 @@
         {{ t('Member List') }}
         <span class="member-count">({{ userNumber }}{{ t('members') }})</span>
       </div>
-      <div class="member-list-content">
-        <member-item v-for="(userInfo) in userList" :key="userInfo.userId" :user-info="userInfo"></member-item>
+      <div class="member-list-container">
+        <member-item v-for="(userInfo) in filteredUserList" :key="userInfo.userId" :user-info="userInfo"></member-item>
       </div>
     </div>
-    <div v-if="isMaster || isAdmin" class="manage-member-bottom">
+    <div v-if="!isGeneralUser" class="manage-member-bottom">
       <div
         class="manage-member-button"
         :class="isMicrophoneDisableForAllUser ? 'lift-all' : ''"
@@ -54,15 +60,15 @@ import Dialog from '../common/base/Dialog';
 import useIndex from './useIndexHooks';
 import { storeToRefs } from 'pinia';
 import { useRoomStore } from '../../stores/room';
+import SvgIcon from '../common/base/SvgIcon.vue';
+import ApplyTipsIcon from '../common/icons/ApplyTipsIcon.vue';
 const roomStore = useRoomStore();
 const {
-  userList,
   userNumber,
   applyToAnchorList,
   isMicrophoneDisableForAllUser,
   isCameraDisableForAllUser,
-  isMaster,
-  isAdmin,
+  isGeneralUser,
 } = storeToRefs(roomStore);
 
 const {
@@ -75,7 +81,15 @@ const {
   toggleManageAllMember,
   doToggleManageAllMember,
   t,
+  alreadyStaged,
+  notStaged,
+  filteredUserList,
+  isOnStateTabActive,
+  handleToggleStaged,
+  applyToAnchorUserContent,
+  showApplyUserList,
 } = useIndex();
+
 </script>
 
 <style lang="scss" scoped>
@@ -84,15 +98,69 @@ const {
   height: 100%;
   display: flex;
   flex-direction: column;
-  .apply-on-stage-info {
-    width: 100%;
-    height: 6vh;
-    background-image: linear-gradient(235deg, #1883FF 0%, #0062F5 100%);
-    padding: 9px 20px 10px 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px 0 10px 0 ;
+  .manage-member-header {
+    .apply-count {
+      height: 36px;
+      border-radius: 10px;
+      margin: 16px 16px 8px 16px;
+      background-color: var(--background-color-11);
+      position: relative;
+      display: flex;
+      .apply-staged,
+      .apply-not-stage {
+        position: absolute;
+        left: 0;
+        top: 3px;
+        width: 49%;
+        height: 80%;
+        filter: drop-shadow(0px 2px 4px rgba(32, 77, 141, 0.03)) drop-shadow(0px 6px 10px rgba(32, 77, 141, 0.06))
+          drop-shadow(0px 3px 14px rgba(32, 77, 141, 0.05));
+        border-radius: 10px;
+        transform: translateX(4px);
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        flex-wrap: wrap;
+        color: var(--font-color-1);
+        font-size: 14px;
+        font-weight: 400;
+      }
+      .apply-not-stage {
+        top: 50%;
+        left: 50%;
+        height: 30px;
+        transform: translateY(-50%);
+      }
+      .apply-count-active {
+        background-color: var(--background-color-12);
+      }
+    }
+    .apply-on-stage-info {
+      width: 100%;
+      height: 40px;
+      padding: 0 20px 0 26px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .apply-icon {
+        color: var(--font-color-2);
+      }
+      .apply-info {
+        font-weight: 400;
+        font-size: 14px;
+        color: var(--font-color-8);
+        padding-left: 4px;
+        flex: 1;
+      }
+      .apply-check {
+        text-align: center;
+        line-height: 32px;
+        font-weight: 400;
+        font-size: 14px;
+        color: var(--active-color-2);
+        cursor: pointer;
+      }
+    }
     .apply-info {
       font-weight: 400;
       font-size: 14px;

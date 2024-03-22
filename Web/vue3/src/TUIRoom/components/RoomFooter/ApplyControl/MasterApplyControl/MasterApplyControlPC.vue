@@ -1,206 +1,163 @@
 <template>
-  <div class="apply-control-container">
-    <div
-      ref="masterApplyListRef"
-      class="apply-list-container"
-      :style="applyListContainerStyle"
+  <div>
+    <Dialog
+      v-model="showApplyUserList"
+      :title="t('Member Onstage Application')"
+      :modal="true"
+      :show-close="true"
+      :close-on-click-modal="true"
+      :before-close="hideApplyList"
+      width="500px"
+      :append-to-room-container="true"
     >
-      <div class="title-container">
-        <span class="title">{{ t('Apply to stage application') }}</span>
-        <svg-icon :icon="CloseIcon" class="close" @click="hideApplyList"></svg-icon>
-      </div>
-      <div class="apply-list">
+      <div v-if="applyToAnchorUserCount" class="apply-list">
+        <div class="apply-list-title">
+          <span class="apply-list-name">{{ t('Members') }}</span>
+          <span class="apply-list-operate">{{ t('Operate') }}</span>
+        </div>
         <div v-for="item in applyToAnchorList" :key="item.userId" class="apply-item">
           <div class="user-info">
             <Avatar class="avatar-url" :img-src="item.avatarUrl"></Avatar>
             <span class="user-name" :title="item.userName || item.userId">{{ item.userName || item.userId }}</span>
           </div>
           <div class="control-container">
-            <tui-button size="default" @click="handleUserApply(item.userId, true)">
-              {{ t('Agree') }}
+            <tui-button size="default" class="agree" @click="handleUserApply(item.userId, true)">
+              {{ t('Agree to the stage') }}
             </tui-button>
-            <tui-button size="default" type="primary" @click="handleUserApply(item.userId, false)">
+            <tui-button size="default" class="reject" @click="handleUserApply(item.userId, false)">
               {{ t('Reject') }}
             </tui-button>
           </div>
         </div>
       </div>
-      <div class="apply-footer">
-        <tui-button size="default" class="deny-all" @click="denyAllUserApply">{{ t('Reject All') }}</tui-button>
+      <div v-else class="apply-nobody">
+        <svg-icon :icon="ApplyStageLabelIcon"></svg-icon>
+        <span class="apply-text">{{ t('Currently no member has applied to go on stage') }}</span>
       </div>
-    </div>
+      <template #footer>
+        <tui-button size="default" :disabled="noUserApply" @click="handleAllUserApply(true)"> {{ t('Agree All') }} </tui-button>
+        <tui-button class="cancel-button" size="default" :disabled="noUserApply" @click="handleAllUserApply(false)">
+          {{ t('Reject All') }}
+        </tui-button>
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import ApplyStageLabelIcon from '../../../common/icons/ApplyStageLabelIcon.vue';
+import useMasterApplyControl from './useMasterApplyControlHooks';
 import Avatar from '../../../common/Avatar.vue';
-import IconButton from '../../../common/base/IconButton.vue';
+import Dialog from '../../../common/base/Dialog';
 import SvgIcon from '../../../common/base/SvgIcon.vue';
-import CloseIcon from '../../../common/icons/CloseIcon.vue';
 import TuiButton from '../../../common/base/Button.vue';
-import { useBasicStore } from '../../../../stores/basic';
-import { useRoomStore } from '../../../../stores/room';
-import useMasterApplyControl from '../../../../hooks/useMasterApplyControl';
-import { useI18n } from '../../../../locales';
-import useZIndex from '../../../../hooks/useZIndex';
 
-const { t } = useI18n();
-const { nextZIndex } = useZIndex();
-
-const basicStore = useBasicStore();
-const roomStore = useRoomStore();
-const { handleUserApply, denyAllUserApply } = useMasterApplyControl();
-const { showApplyUserList } = storeToRefs(basicStore);
-const applyListContainerStyle = ref({});
-const { applyToAnchorList } = storeToRefs(roomStore);
-const masterApplyControlRef = ref<InstanceType<typeof IconButton>>();
-const masterApplyListRef = ref();
-
-function hideApplyList() {
-  basicStore.setShowApplyUserList(false);
-}
-
-watch(showApplyUserList, (val) => {
-  if (val) {
-    applyListContainerStyle.value = { zIndex: nextZIndex() };
-  }
-});
-
-function handleDocumentClick(event: MouseEvent) {
-  if (
-    showApplyUserList.value
-    && !masterApplyControlRef.value?.$el.contains(event.target)
-    && !masterApplyListRef.value?.contains(event.target)
-  ) {
-    basicStore.setShowApplyUserList(false);
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleDocumentClick, true);
-});
-
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleDocumentClick, true);
-});
+const {
+  t,
+  showApplyUserList,
+  hideApplyList,
+  applyToAnchorUserCount,
+  applyToAnchorList,
+  handleAllUserApply,
+  handleUserApply,
+  noUserApply,
+} = useMasterApplyControl();
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .apply-control-container {
   position: relative;
-  .attention {
-    background: rgba(19, 124, 253, 0.96);
-    box-shadow: 0 4px 16px 0 rgba(47, 48, 164, 0.1);
-    position: absolute;
-    border-radius: 4px;
+}
+.cancel-button {
+  margin-left: 10px;
+  background-color: #f0f3fa;
+  border: 1px solid #f0f3fa;
+  color: #4f586b;
+  &:hover {
+    background-color: #f0f3fa;
+    border: 1px solid #f0f3fa;
+  }
+}
+.apply-list {
+  height: 290px;
+  overflow: scroll;
+  margin-top: 4px;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  .apply-list-title {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    top: -6px;
-    left: 50%;
-    transform: translate(-50%, -100%);
-    &::after {
-      content: '';
-      display: block;
-      border: 4px solid transparent;
-      border-top-color: rgba(19, 124, 253, 0.96);
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-  }
-  .master-attention {
-    display: flex;
-    flex-direction: column;
-    padding: 4px;
-    .apply-big-icon {
-      width: 40px;
-      height: 40px;
-      justify-content: center;
-      color: #ffffff;
-    }
-    .info {
-      color: #ffffff;
+    border-bottom: 1px solid #f0f3fa;
+    padding-bottom: 10px;
+    .apply-list-name,
+    .apply-list-operate {
+      width: calc(100% - 310px);
+      color: #4f586b;
       font-size: 14px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 22px;
     }
   }
-  .apply-list-container {
-    width: 470px;
-    height: 286px;
-    background: var(--apply-list-container-bg-color);
-    box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.3);
-    position: absolute;
-    top: -60px;
-    left: 50%;
-    transform: translate(-50%, -100%);
-    padding: 12px 20px;
-    color: #cfd4e6;
-    .title-container {
+  .apply-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 48px;
+    margin-top: 8px;
+    border-bottom: 1px solid #f0f3fa;
+    .user-info {
+      width: calc(100% - 176px);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      .avatar-url {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+      }
+      .user-name {
+        font-weight: 400;
+        font-size: 14px;
+        color: #4f586b;
+        line-height: 22px;
+        margin-left: 12px;
+        max-width: 180px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+    .control-container {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      .title {
-        font-weight: 500;
-        font-size: 16px;
-        color: var(--apply-list-container-color);
+      .agree,
+      .reject {
+        padding: 2px 12px;
       }
-      .close {
-        cursor: pointer;
-      }
-    }
-    .apply-list {
-      height: 190px;
-      overflow: scroll;
-      margin-top: 4px;
-      &::-webkit-scrollbar {
-        display: none;
-      }
-      .apply-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 48px;
-        margin-top: 8px;
-        .user-info {
-          width: calc(100% - 176px);
-          height: 100%;
-          display: flex;
-          align-items: center;
-          .avatar-url {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-          }
-          .user-name {
-            font-weight: 500;
-            font-size: 14px;
-            color: #7c85a6;
-            line-height: 22px;
-            margin-left: 9px;
-            max-width: 180px;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-          }
-        }
-        .control-container {
-          display: flex;
-          justify-content: space-between;
-          button:last-child {
-            margin-left: 10px;
-          }
-        }
+      .reject {
+        margin-left: 8px;
+        background-color: #f0f3fa;
+        border: 1px solid #f0f3fa;
+        color: #4f586b;
       }
     }
-    .apply-footer {
-      margin-top: 8px;
-      .deny-all {
-        float: right;
-      }
-    }
+  }
+}
+.apply-nobody {
+  height: 290px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  .apply-text {
+    color: #8f9ab2;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+    margin-top: 10px;
   }
 }
 </style>

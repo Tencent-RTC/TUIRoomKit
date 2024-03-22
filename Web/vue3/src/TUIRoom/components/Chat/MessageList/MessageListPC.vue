@@ -1,57 +1,86 @@
 <template>
   <div :class="isMobile ? 'message-list-container-h5' : 'message-list-container'">
-    <div class="message-list">
+    <div id="messageScrollList" ref="messageListRef" class="message-list">
       <div
         v-for="(item, index) in messageList"
         :key="item.ID"
         ref="messageAimId"
         :class="['message-item', `${'out' === item.flow ? 'is-me' : ''}`]"
       >
-        <div v-if="handleDisplaySenderName(index)" class="message-header" :title="item.nick || item.from">
+        <div v-if="getDisplaySenderName(index)" class="message-header" :title="item.nick || item.from">
           {{ item.nick || item.from }}
         </div>
         <div class="message-body">
-          <message-text v-if="item.type === 'TIMTextElem'" :data="item.payload.text" />
+          <message-text :data="item.payload.text" />
         </div>
       </div>
     </div>
-    <div ref="messageBottomEl" class="message-bottom" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import MessageText from '../MessageTypes/MessageText.vue';
 import { isMobile }  from '../../../utils/environment';
-import useMessageList from '../useMessageListHook';
-import { useChatStore } from '../../../stores/chat';
-const chatStore = useChatStore();
+import useMessageList from './useMessageListHook';
+import { getScrollInfo } from '../../../utils/domOperation';
+import { throttle } from '../../../utils/utils';
+
+const messageListRef = ref<HTMLElement>();
 
 const {
-  messageAimId,
-  messageBottomEl,
-  handleMessageListScroll,
   messageList,
-  getMessageList,
+  setMessageListInfo,
+  handleGetHistoryMessageList,
+  isCompleted,
+  getDisplaySenderName,
 } = useMessageList();
 
-function handleDisplaySenderName(index: number) {
-  if (index === 0) return true;
-  return messageList.value[index].from !== messageList.value[index - 1].from;
+let isScrollAtBottom = true;
+
+
+const handleMessageListScroll = (e: Event) => {
+  const messageContainer = e.target as HTMLElement;
+  const bottom = messageContainer.scrollHeight - messageContainer.scrollTop - messageContainer.clientHeight;
+  isScrollAtBottom = (bottom <= 80);
+  if (messageContainer.scrollTop < 40 && !isCompleted.value) {
+    handleGetHistoryMessageList();
+  }
+};
+
+const handleScroll = throttle(handleMessageListScroll, 1000);
+
+
+async function scrollToLatestMessage() {
+  const { scrollHeight } = await getScrollInfo('#messageScrollList');
+  if (messageListRef.value) {
+    messageListRef.value.scrollTop = scrollHeight;
+  }
 }
 
-onMounted(async () => {
-  const { currentMessageList, isCompleted, nextReqMessageId } = await getMessageList();
-  const filterCurrentMessageList = currentMessageList.filter((item: any) => item.type === 'TIMTextElem');
-  chatStore.setMessageListInfo(filterCurrentMessageList, isCompleted, nextReqMessageId);
+watch(messageList, async (newMessageList, oldMessageList) => {
+  if ((newMessageList as any).length === 0) return;
+  const lastMessage = (newMessageList as any).slice(-1);
+  const oldLastMessage = (oldMessageList as any).slice(-1);
+  const isSendByMe = lastMessage[0].flow === 'out';
+  const isNewMessage = lastMessage[0].ID !== oldLastMessage[0]?.ID;
+  await nextTick();
+  if (isScrollAtBottom) {
+    scrollToLatestMessage();
+    return;
+  }
+  if (isSendByMe && isNewMessage) {
+    scrollToLatestMessage();
+  }
+});
 
-  await nextTick(() => {
-    if (messageAimId?.value?.length > 0) {
-      const target = messageAimId?.value[messageAimId?.value?.length - 1];
-      target.scrollIntoView();
-    }
-  });
-  window.addEventListener('scroll', handleMessageListScroll, true);
+onMounted(() => {
+  setMessageListInfo();
+  messageListRef.value?.addEventListener('scroll', handleScroll);
+});
+
+onUnmounted(() => {
+  messageListRef.value?.removeEventListener('scroll', handleScroll);
 });
 </script>
 
@@ -66,13 +95,17 @@ onMounted(async () => {
   --user-font-color: var(--background-color-4);
   --host-font-color: var(--background-color-4);
 }
-
 .message-list-container {
+  height: 100%;
   overflow: auto;
   flex: 1;
-
-  &::-webkit-scrollbar {
-    display: none;
+  .message-list {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
   .message-top {
     display: flex;
@@ -119,10 +152,6 @@ onMounted(async () => {
       border-radius: 8px;
     }
   }
-  .message-bottom {
-    width: 0;
-    height: 0;
-  }
 }
 
 .message-list-container-h5 {
@@ -130,10 +159,13 @@ onMounted(async () => {
   background-color: var(--message-list-color-h5);
   height: 100%;
   width: 100%;
-  overflow: scroll;
-
-  &::-webkit-scrollbar {
-    display: none;
+  .message-list{
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
   .message-top {
     display: flex;
@@ -185,11 +217,6 @@ onMounted(async () => {
         border-radius: 8px;
       }
     }
-  }
-
-  .message-bottom {
-    width: 0;
-    height: 0;
   }
 }
 </style>

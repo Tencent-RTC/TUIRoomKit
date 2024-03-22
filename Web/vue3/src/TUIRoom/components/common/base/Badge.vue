@@ -10,8 +10,8 @@ import { computed } from 'vue';
 
 interface Props {
   type?: 'primary' | 'danger';
-  value: string | number;
-  max: number;
+  value?: string | number;
+  max?: number;
   hidden?: boolean;
   isDot?: boolean;
 }
@@ -43,12 +43,13 @@ const badgeClass = computed(() => ['tui-badge', `tui-badge-${props.type}`, props
 
   .tui-badge-count {
     position: absolute;
-    top: -10px;
-    left: 40px;
+    top: 0;
+    right: 15px;
     display: inline-block;
     padding: 1px 6px;
     font-size: 12px;
     color: var(--white-color);
+    transform: translateY(-50%) translateX(100%);
     font-weight: bold;
     border-radius: 10px;
   }
@@ -68,7 +69,7 @@ const badgeClass = computed(() => ['tui-badge', `tui-badge-${props.type}`, props
 
 .tui-badge-isDot {
   .tui-badge-count {
-    top: -4px;
+    top: 0;
     height: 8px;
     width: 8px;
     padding: 0;

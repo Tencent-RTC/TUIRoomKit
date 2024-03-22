@@ -117,7 +117,7 @@ async function toggleMuteAudio() {
     if (!hasMicrophoneDevice && !isWeChat) {
       TUIMessageBox({
         title: t('Note'),
-        message: t('Microphone not detected on current device.'),
+        message: t('Microphone not detected on current device'),
         appendToRoomContainer: true,
         confirmButtonText: t('Sure'),
       });
@@ -176,12 +176,6 @@ async function onRequestCancelled(eventInfo: { requestId: string }) {
     showRequestOpenMicDialog.value = false;
   }
 }
-watch(isAudience, (newValue) => {
-  if (newValue) {
-    // 离开麦位sdk内部会closeMic，因此需要在此处同步业务逻辑
-    basicStore.setIsOpenMic(false);
-  }
-});
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
   roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);

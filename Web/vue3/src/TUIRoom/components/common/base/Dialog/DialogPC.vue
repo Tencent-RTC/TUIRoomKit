@@ -83,6 +83,8 @@ interface Props {
   showClose?: boolean;
   appendToBody?: boolean;
   appendToRoomContainer?: boolean;
+  confirmButton?: string;
+  cancelButton?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -95,9 +97,11 @@ const props = withDefaults(defineProps<Props>(), {
   showClose: true,
   appendToBody: false,
   appendToRoomContainer: false,
+  confirmButton: '',
+  cancelButton: '',
 });
 
-const emit = defineEmits(['update:modelValue', 'close']);
+const emit = defineEmits(['update:modelValue', 'close', 'confirm', 'cancel']);
 
 const { nextZIndex } = useZIndex();
 

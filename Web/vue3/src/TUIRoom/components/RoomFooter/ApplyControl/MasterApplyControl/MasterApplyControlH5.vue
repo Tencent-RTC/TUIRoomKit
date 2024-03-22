@@ -1,6 +1,6 @@
 <template>
   <div class="apply-control-container">
-    <div class="apply-list-mobile">
+    <div v-if="applyToAnchorUserCount" class="apply-list-mobile">
       <div v-for="item in applyToAnchorList" :key="item.userId" class="apply-item">
         <div class="user-info">
           <Avatar class="avatar-url" :img-src="item.avatarUrl"></Avatar>
@@ -15,25 +15,36 @@
         </div>
       </div>
     </div>
+    <div v-else class="apply-control-nobody">
+      <svg-icon :icon="ApplyStageLabelIcon"></svg-icon>
+      <span class="apply-text">{{ t('Currently no member has applied to go on stage') }}</span>
+    </div>
     <div class="apply-list-footer">
-      <div class="reject-all-button" @click="handleAllUserApply(false)">{{ t('Reject All') }}</div>
-      <div class="agree-all-button" @click="handleAllUserApply(true)">{{ t('Agree All') }}</div>
+      <div class="action-button" :class="{ 'disabled': noUserApply }" @click="handleAllUserApply(false)">
+        {{ t('Reject All') }}
+      </div>
+      <div class="action-button agree" :class="{ 'disabled': noUserApply }" @click="handleAllUserApply(true)">
+        {{ t('Agree All') }}
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
 import Avatar from '../../../common/Avatar.vue';
-import { useRoomStore } from '../../../../stores/room';
-import useMasterApplyControl from '../../../../hooks/useMasterApplyControl';
-import { useI18n } from '../../../../locales';
+import ApplyStageLabelIcon from '../../../common/icons/ApplyStageLabelIcon.vue';
+import useMasterApplyControl from './useMasterApplyControlHooks';
+import SvgIcon from '../../../common/base/SvgIcon.vue';
 
-const { t } = useI18n();
+const {
+  t,
+  applyToAnchorList,
+  handleAllUserApply,
+  handleUserApply,
+  applyToAnchorUserCount,
+  noUserApply,
+} = useMasterApplyControl();
 
-const roomStore = useRoomStore();
-const { handleUserApply, handleAllUserApply } = useMasterApplyControl();
-const { applyToAnchorList } = storeToRefs(roomStore);
 </script>
 
 <style lang="scss" scoped>
@@ -118,14 +129,20 @@ const { applyToAnchorList } = storeToRefs(roomStore);
       }
     }
   }
+  .apply-control-nobody {
+    height: 290px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
   .apply-list-footer {
     width: 100%;
     display: flex;
     justify-content: space-around;
     position: absolute;
     bottom: 0;
-    .reject-all-button,
-    .agree-all-button {
+    .action-button {
       width: 167px;
       height: 40px;
       background-color: var(--background-color-3);
@@ -134,11 +151,17 @@ const { applyToAnchorList } = storeToRefs(roomStore);
       justify-content: center;
       align-items: center;
       border-radius: 8px;
+      cursor: pointer;
     }
-    .agree-all-button {
+    .action-button.agree {
       margin-left: 10px;
       background-color: var(--active-color-1);
       color: var(--white-color);
+    }
+    .action-button.disabled {
+      cursor: not-allowed;
+      pointer-events: none;
+      opacity: 0.4;
     }
   }
 }

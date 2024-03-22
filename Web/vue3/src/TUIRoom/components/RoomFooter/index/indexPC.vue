@@ -1,8 +1,21 @@
 <template>
   <div class="footer-container">
     <div class="left-container">
-      <audio-control class="left-container-item" @click="handleControlClick('audioControl')"></audio-control>
-      <video-control class="left-container-item" @click="handleControlClick('videoControl')"></video-control>
+      <audio-control
+        v-if="!isAudience || isAdmin"
+        class="left-container-item"
+        @click="handleControlClick('audioControl')"
+      ></audio-control>
+      <video-control
+        v-if="!isAudience || isAdmin"
+        class="left-container-item"
+        @click="handleControlClick('videoControl')"
+      ></video-control>
+      <member-apply-control
+        v-if="roomStore.isSpeakAfterTakingSeatMode && !isMaster"
+        class="left-container-item"
+        @click="handleControlClick('MemberApplyControl')"
+      ></member-apply-control>
     </div>
     <div class="center-container">
       <screen-share-control
@@ -25,11 +38,6 @@
         class="center-container-item"
         @click="handleControlClick('chatControl')"
       ></chat-control>
-      <member-apply-control
-        v-if="roomStore.isSpeakAfterTakingSeatMode && !isMaster"
-        class="center-container-item"
-        @click="handleControlClick('MemberApplyControl')"
-      ></member-apply-control>
       <master-apply-control
         v-if="roomStore.isSpeakAfterTakingSeatMode && (isMaster || isAdmin)"
         class="center-container-item"
@@ -68,7 +76,6 @@ import EndControl from '../EndControl';
 import SettingControl from '../SettingControl.vue';
 import bus from '../../../hooks/useMitt';
 
-
 import TUIRoomAegis from '../../../utils/aegis';
 
 import useRoomFooter from './useRoomFooterHooks';
@@ -77,6 +84,7 @@ const {
   roomStore,
   isMaster,
   isAdmin,
+  isAudience,
 } = useRoomFooter();
 
 const emit = defineEmits(['on-destroy-room', 'on-exit-room']);
@@ -136,5 +144,4 @@ function handleControlClick(name: string) {
     align-items: center;
   }
 }
-
 </style>

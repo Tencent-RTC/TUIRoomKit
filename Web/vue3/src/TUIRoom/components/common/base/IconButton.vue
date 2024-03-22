@@ -34,7 +34,10 @@
       <slot></slot>
       <svg-icon v-if="icon" :icon="icon"></svg-icon>
       <svg-icon v-if="isNotSupport" class="unsupport-icon" :icon="UnSupportIcon"></svg-icon>
-      <span class="title">{{ title }}</span>
+      <span class="title">
+        {{ title }}
+        <slot name="title"></slot>
+      </span>
     </div>
     <div v-if="hasMore" ref="moreSpanRef" class="icon-arrow" @click="$emit('click-more')">
       <svg-icon :icon="ArrowUp"></svg-icon>
@@ -53,7 +56,7 @@ import vTap from '../../../directives/vTap';
 import type { Component } from 'vue';
 
 interface Props {
-  title: string,
+  title?: string,
   hasMore?: boolean,
   hideHoverEffect?: boolean,
   disabled?: boolean,
@@ -64,6 +67,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  title: '',
   icon: null,
   hasMore: false,
   hideHoverEffect: false,
