@@ -1,4 +1,10 @@
-html, body {
+body, html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+#roomContainer {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -8,6 +14,6 @@ html, body {
   touch-action: manipulation;
 }
 
-*, ::before, ::after{
+#roomContainer *, ::before, ::after{
 	box-sizing: border-box;
 }

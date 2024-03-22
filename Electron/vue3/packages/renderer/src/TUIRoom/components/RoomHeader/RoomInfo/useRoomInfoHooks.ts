@@ -7,6 +7,7 @@ import TUIMessage from '../../common/base/Message/index';
 import { clipBoard } from '../../../utils/utils';
 import useRoomInviteControl from '../../RoomInvite/useRoomInviteHooks';
 import { isWeChat } from '../../../utils/environment';
+import { roomService } from '../../../services';
 
 export default function useRoomInfo() {
   const { inviteLink } = useRoomInviteControl();
@@ -18,6 +19,7 @@ export default function useRoomInfo() {
   const isShowRoomInfo = ref(false);
   const roomType = computed(() => (roomStore.isFreeSpeakMode ? t('Free Speech Room') : t('On-stage Speaking Room')));
   const arrowDirection = ref(false);
+  const [roomLinkConfig] = roomService.getComponentConfig(['RoomLink']);
 
   const masterUserName = computed(() => roomStore.getUserName(masterUserId.value) || masterUserId.value);
 
@@ -29,7 +31,7 @@ export default function useRoomInfo() {
     { id: 1, title: 'Host', content: masterUserName.value, copyLink: '', isShowCopyIcon: false, visible: true },
     { id: 2, title: 'Room Type', content: roomType.value, copyLink: '', isShowCopyIcon: false, visible: true },
     { id: 3, title: 'Room ID', content: roomId.value, copyLink: roomId.value, isShowCopyIcon: true, visible: true },
-    { id: 4, title: 'Room Link', content: inviteLink.value, copyLink: inviteLink.value, isShowCopyIcon: true, visible: isRoomLinkVisible.value },
+    { id: 4, title: 'Room Link', content: inviteLink.value, copyLink: inviteLink.value, isShowCopyIcon: true, visible: isRoomLinkVisible.value && roomLinkConfig.visible },
   ]);
 
   function toggleShowRoomInfoStatus() {

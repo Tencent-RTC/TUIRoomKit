@@ -182,6 +182,7 @@ handleInit();
   font-family: PingFang SC;
   color: var(--font-color-1);
   .header {
+    box-sizing: border-box;
     width: 100%;
     position: absolute;
     top: 0;
