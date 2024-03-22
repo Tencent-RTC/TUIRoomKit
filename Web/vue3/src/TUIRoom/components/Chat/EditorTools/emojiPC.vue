@@ -12,7 +12,7 @@
         class="emoji-item"
         @click="chooseEmoji(childrenItem)"
       >
-        <img :src="emojiUrl + emojiMap[childrenItem]" />
+        <img :src="emojiBaseUrl + emojiMap[childrenItem]" />
       </div>
     </div>
   </div>
@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { emojiUrl, emojiMap, emojiList } from '../util';
+import { emojiBaseUrl, emojiMap, emojiList } from '../util';
 import { isMobile } from '../../../utils/environment';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import EmojiIcon from '../../common/icons/EmojiIcon.vue';
