@@ -98,38 +98,6 @@ export default function () {
     }
   }
 
-  // 拒绝全部用户上麦请求
-  async function denyAllUserApply() {
-    const applyUserList = applyToAnchorList.value.map(item => ({
-      userId: item.userId,
-      userName: item.userName,
-      applyToAnchorRequestId: item.applyToAnchorRequestId,
-    }));
-    let index = 0;
-    while (index >= 0 && index < applyUserList.length) {
-      const { userId, userName, applyToAnchorRequestId } = applyUserList[index];
-      try {
-        if (applyToAnchorRequestId) {
-          await roomEngine.instance?.responseRemoteRequest({
-            requestId: applyToAnchorRequestId,
-            agree: false,
-          });
-          roomStore.removeApplyToAnchorUser(applyToAnchorRequestId);
-        } else {
-          logger.warn('拒绝上台申请失败，数据异常，请重试！', applyUserList);
-        }
-      } catch (error) {
-        logger.error(`拒绝 ${userName || userId} 上台申请失败，请重试！`);
-        TUIMessage({
-          type: 'warning',
-          message: t('Reject on Stage failed, please retry', { userName: userName || userId }),
-          duration: MESSAGE_DURATION.NORMAL,
-        });
-      }
-      index += 1;
-    }
-  }
-
   // 处理全部用户上麦请求
   async function handleAllUserApply(isAgreeOrRejectAllUserApply: boolean) {
     const applyUserList = applyToAnchorList.value.map(item => ({
@@ -251,8 +219,6 @@ export default function () {
     agreeUserOnStage,
     // 拒绝普通用户上台
     denyUserOnStage,
-    // 拒绝所有申请上麦用户
-    denyAllUserApply,
     // 邀请用户上台
     inviteUserOnStage,
     // 取消邀请用户上台

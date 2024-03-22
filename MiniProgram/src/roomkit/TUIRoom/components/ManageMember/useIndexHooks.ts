@@ -1,12 +1,13 @@
+import { Ref, computed, nextTick, ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { UserInfo, useRoomStore } from '../../stores/room';
 import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
 import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-wx';
-import { Ref, computed, nextTick, ref } from 'vue';
 import TUIMessage from '../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../constants/message';
+import { isMobile } from '../../utils/environment';
 
 export default function useIndex() {
   const roomEngine = useGetRoomEngine();
@@ -17,16 +18,34 @@ export default function useIndex() {
   const roomStore = useRoomStore();
   const {
     userList,
+    anchorUserList,
+    applyToAnchorList,
+    isOnStateTabActive,
   } = storeToRefs(roomStore);
 
+  const audienceUserList = computed(() => userList.value.filter(user => !anchorUserList.value.includes(user)));
+
   const searchText = ref('');
-  const showUserList = computed(() => {
-    if (searchText.value === '') {
-      return userList.value;
+
+  function handleToggleStaged() {
+    isOnStateTabActive.value = !isOnStateTabActive.value;
+    roomStore.setOnStageTabStatus(isOnStateTabActive.value);
+  }
+
+  const filteredUserList = computed(() => {
+    let list: UserInfo[] = [];
+    if (roomStore.isFreeSpeakMode) {
+      list = userList.value;
+    } else if (roomStore.isSpeakAfterTakingSeatMode) {
+      list = isOnStateTabActive.value ? anchorUserList.value : audienceUserList.value;
     }
-    return userList.value.filter((item: UserInfo) => item.userName?.includes(searchText.value)
-      || item.userId.includes(searchText.value));
+    if (!searchText.value) {
+      return list;
+    }
+    return list.filter((item: UserInfo) => item.userName?.includes(searchText.value) || item.userId.includes(searchText.value));
   });
+  const alreadyStaged = computed(() => `${t('Already on stage')} (${(anchorUserList.value.length)})`);
+  const notStaged = computed(() => `${t('Not on stage')} (${(audienceUserList.value.length)})`);
 
   function handleInvite() {
     basicStore.setSidebarName('invite');
@@ -92,8 +111,13 @@ export default function useIndex() {
     }
     showManageAllUserDialog.value = false;
   }
-  function showApplyUserLit() {
-    basicStore.setShowApplyUserList(true);
+  function showApplyUserList() {
+    if (isMobile) {
+      basicStore.setSidebarOpenStatus(true);
+      basicStore.setSidebarName('apply');
+    } else {
+      basicStore.setShowApplyUserList(true);
+    }
   }
 
   async function toggleAllAudio() {
@@ -129,10 +153,18 @@ export default function useIndex() {
     });
     roomStore.setCameraDisableState(stateForAllVideo);
   }
+
+  const applyToAnchorUserContent = computed(() => {
+    const userName = applyToAnchorList.value[0]?.userName || applyToAnchorList.value[0]?.userId;
+    if (applyToAnchorList.value.length === 1) {
+      return `${userName} ${t('Applying for the stage')}`;
+    }
+    return  `${userName} ${t('and so on number people applying to stage', { number: applyToAnchorList.value.length })}`;
+  });
+
   return {
-    showApplyUserLit,
+    showApplyUserList,
     searchText,
-    showUserList,
     handleInvite,
     t,
     toggleManageAllMember,
@@ -144,5 +176,11 @@ export default function useIndex() {
     dialogTitle,
     dialogActionInfo,
     ManageControlType,
+    alreadyStaged,
+    notStaged,
+    filteredUserList,
+    isOnStateTabActive,
+    handleToggleStaged,
+    applyToAnchorUserContent,
   };
 }

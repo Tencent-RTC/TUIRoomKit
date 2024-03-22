@@ -1,5 +1,5 @@
 <template>
-  <div class="invite-control-container">
+  <div class="invite-control-container" v-if="inviteControlConfig.visible">
     <icon-button
       :is-active="sidebarName === 'invite'"
       :title="t('Invite')"
@@ -22,12 +22,14 @@ import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
 import { isMobile }  from '../../utils/environment';
 import roomInvite from '../RoomInvite/index.vue';
+import { roomService } from '../../services';
 
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);
 const { t } = useI18n();
 const isShowInviteTab = ref(false);
 const inviteRef = ref();
+const [inviteControlConfig] = roomService.getComponentConfig(['InviteControl']);
 
 function toggleInviteSidebar() {
   if (isMobile) {

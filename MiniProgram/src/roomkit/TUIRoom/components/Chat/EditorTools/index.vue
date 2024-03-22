@@ -6,13 +6,13 @@
       @tap="() => chooseEmoji(childrenItem)"
       class="emoji-item"
     >
-      <img class="emoji-image" :src="emojiUrl + emojiMap[childrenItem]" />
+      <img class="emoji-image" :src="emojiBaseUrl + emojiMap[childrenItem]" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { emojiUrl, emojiMap, emojiList } from '../util';
+import { emojiBaseUrl, emojiMap, emojiList } from '../util';
 
 
 const emit = defineEmits(['choose-emoji']);
@@ -27,7 +27,7 @@ const chooseEmoji = (itemName: string) => {
   .emoji-tool{
     display: flex;
     justify-content: center;
-    background: white;
+    background: var(--background-color-8);
     flex-wrap: wrap;
     width: 100%;
     height: 200px;

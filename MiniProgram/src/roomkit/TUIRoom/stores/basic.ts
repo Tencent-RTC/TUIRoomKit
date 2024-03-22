@@ -3,6 +3,7 @@ import { getLanguage } from '../utils/common';
 import { LAYOUT } from '../constants/render';
 import { isUndefined } from '../utils/utils';
 import { isWeChat, isElectron, isMobile } from '../utils/environment';
+import { TUINetwork } from '@tencentcloud/tuiroom-engine-wx';
 
 type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | 'transfer-leave' | 'apply' | '';
 
@@ -25,7 +26,7 @@ interface BasicState {
   sidebarName: SideBarType,
   masterUserId: string,
   localQuality: number,
-  // statistics: TRTCStatistics,
+  networkInfo: TUINetwork,
   lang: string,
   defaultTheme: string,
   isSupportSwitchTheme: boolean,
@@ -35,6 +36,24 @@ interface BasicState {
   isSchemeLinkVisible: boolean,
   isShowScreenShareAntiFraud: boolean,
   isOpenMic: boolean,
+  componentConfig: {
+    'InviteControl': {
+      visible?: boolean,
+      [key: string]: any,
+    },
+    'SwitchTheme': {
+      visible?: boolean,
+      [key: string]: any,
+    },
+    'RoomLink': {
+      visible?: boolean,
+      [key: string]: any,
+    },
+    [key: string]: {
+      visible?: boolean,
+      [key: string]: any,
+    }
+  }
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -57,19 +76,13 @@ export const useBasicStore = defineStore('basic', {
     sidebarName: '',
     masterUserId: '',
     localQuality: 0,
-    // statistics: {
-    //   appCpu: 0,
-    //   downLoss: 0,
-    //   localStatisticsArray: [],
-    //   localStatisticsArraySize: 0,
-    //   receivedBytes: 0,
-    //   remoteStatisticsArray: [],
-    //   remoteStatisticsArraySize: 0,
-    //   rtt: 0,
-    //   sentBytes: 0,
-    //   systemCpu: 0,
-    //   upLoss: 0,
-    // },
+    networkInfo: {
+      userId: '',
+      downLoss: 0,
+      quality: 0,
+      upLoss: 0,
+      delay: 0,
+    },
     lang: getLanguage(),
     defaultTheme: 'black',
     isSupportSwitchTheme: true,
@@ -79,24 +92,19 @@ export const useBasicStore = defineStore('basic', {
     isSchemeLinkVisible: !isMobile,
     isShowScreenShareAntiFraud: false,
     isOpenMic: false,
+    componentConfig: {
+      SwitchTheme: {
+        visible: true
+      },
+      InviteControl: {
+        visible: true
+      },
+      RoomLink: {
+        visible: true
+      },
+    },
   }),
   getters: {
-    // localVideoBitrate: (state) => {
-    //   const localStatistics = state.statistics.localStatisticsArray
-    //     .find(item => item.streamType === TRTCVideoStreamType.TRTCVideoStreamTypeBig);
-    //   if (localStatistics && localStatistics.videoBitrate)  {
-    //     return localStatistics.videoBitrate;
-    //   }
-    //   return 0;
-    // },
-    // localFrameRate: (state) => {
-    //   const localStatistics = state.statistics.localStatisticsArray
-    //     .find(item => item.streamType === TRTCVideoStreamType.TRTCVideoStreamTypeBig);
-    //   if (localStatistics && localStatistics.frameRate)  {
-    //     return localStatistics.frameRate;
-    //   }
-    //   return 0;
-    // },
   },
   actions: {
     setSdkAppId(sdkAppId: number) {
@@ -185,9 +193,11 @@ export const useBasicStore = defineStore('basic', {
       const localUser = userNetworkList.find(item => item.userId === this.userId);
       this.localQuality = localUser.quality;
     },
-    // setStatistics(statistics: TRTCStatistics) {
-    //   this.statistics = statistics;
-    // },
+    setNetworkInfo(networkInfo: TUINetwork) {
+      if (networkInfo.userId === this.userId) {
+        this.networkInfo = networkInfo;
+      }
+    },
     setLang(lang: string) {
       this.lang = lang;
     },

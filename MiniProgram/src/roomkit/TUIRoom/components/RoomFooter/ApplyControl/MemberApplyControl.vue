@@ -3,44 +3,48 @@
     <div class="apply-control-container">
       <icon-button
         :title="iconTitle"
-        :icon="ApplyIcon"
+        :icon="iconName"
         @click-icon="toggleApplySpeech"
       />
       <div v-if="showMemberApplyAttention" class="attention member-attention">
-        <span class="info">{{ t('Please raise your hand to apply') }}</span>
+        <span :class="isMobile ? 'mobile-info' : 'info'">{{ t('Please raise your hand to apply') }}</span>
         <svg-icon style="display: flex" :icon="CloseIcon" class="close" @click="hideApplyAttention"></svg-icon>
       </div>
     </div>
     <Dialog
-      v-model="showInviteDialog"
-      :title="dialogTitle"
+      v-model="showDialog"
+      :title="currentDialogTitle"
       :modal="true"
       :show-close="false"
       :close-on-click-modal="false"
       width="500px"
       :append-to-room-container="true"
-      :confirm-button="t('Agree to the stage')"
-      :cancel-button="t('Reject')"
-      @confirm="handleInvite(true)"
-      @cancel="handleInvite(false)"
+      :confirm-button="dialogInfoMap[currentDialogType]?.confirmButtonText"
+      :cancel-button="dialogInfoMap[currentDialogType]?.cancelButtonText"
+      @confirm="dialogInfoMap[currentDialogType]?.handleConfirm"
+      @cancel="dialogInfoMap[currentDialogType]?.handleCancel"
     >
-      <span>
-        {{ t('You can turn on the microphone and camera once you are on stage') }}
-      </span>
+      <span>{{ dialogInfoMap[currentDialogType]?.content }}</span>
       <template #footer>
-        <tui-button class="agree-button" size="default" @click="handleInvite(true)">{{ t('Agree to the stage') }}</tui-button>
-        <tui-button class="cancel-button" size="default" type="primary" @click="handleInvite(false)">{{ t('Reject') }}</tui-button>
+        <tui-button size="default" @click="dialogInfoMap[currentDialogType]?.handleConfirm">
+          {{ dialogInfoMap[currentDialogType]?.confirmButtonText }}
+        </tui-button>
+        <tui-button class="cancel-button" size="default" type="primary" @click="dialogInfoMap[currentDialogType]?.handleCancel">
+          {{ dialogInfoMap[currentDialogType]?.cancelButtonText }}
+        </tui-button>
       </template>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, watch, onBeforeUnmount } from 'vue';
-import { ICON_NAME } from '../../../constants/icon';
+import { ref, Ref, watch, onBeforeUnmount, computed } from 'vue';
+import { isMobile } from '../../../utils/environment';
 import IconButton from '../../common/base/IconButton.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
-import ApplyIcon from '../../../assets/icons/ApplyIcon.svg';
+import StepDownIcon from '../../../assets/icons/StepDownIcon.svg';
+import ApplyStageIcon from '../../../assets/icons/ApplyStageIcon.svg';
+import CancelStageIcon from '../../../assets/icons/CancelStageIcon.svg';
 import CloseIcon from '../../../assets/icons/CloseIcon.svg';
 import Dialog from '../../common/base/Dialog/index.vue';
 import TUIMessage from '../../common/base/Message/index';
@@ -53,37 +57,39 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import logger from '../../../utils/common/logger';
 import { TUIRoomEngine, TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType, TUIRole, TUIErrorCode } from '@tencentcloud/tuiroom-engine-wx';
 import TuiButton from '../../common/base/Button.vue';
+
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
 const { lang } = storeToRefs(basicStore);
-const { localUser } = storeToRefs(roomStore);
+const { localUser, isGeneralUser, isAdmin } = storeToRefs(roomStore);
 
 const isApplyingOnSeat: Ref<Boolean> = ref(false);
 const showMemberApplyAttention: Ref<boolean> = ref(true);
-const iconName: Ref<string> = ref('');
+const iconName = ref();
 const iconTitle: Ref<string> = ref('');
-const showInviteDialog: Ref<boolean> = ref(false);
-
 const applyToAnchorRequestId: Ref<string> = ref('');
 const inviteToAnchorRequestId: Ref<string> = ref('');
-const dialogTitle: Ref<string> = ref('');
+const showDialog: Ref<boolean> = ref(false);
+const currentDialogTitle: Ref<string> = ref('');
+const currentConfirmButton: Ref<string> = ref('');
+type DialogType = 'inviteDialog' | 'leaveSeatDialog';
+const currentDialogType: Ref<DialogType> = ref('inviteDialog');
 
 watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
   if (localUser.onSeat) {
-    iconName.value = ICON_NAME.GoOffSeat;
+    iconName.value = StepDownIcon;
     iconTitle.value = t('Step down');
-    showMemberApplyAttention.value = false;
+    hideApplyAttention();
   } else {
     if (isApplyingOnSeat) {
-      iconName.value = ICON_NAME.ApplyActive;
-      iconTitle.value = t('Hand down');
+      iconName.value = CancelStageIcon;
+      iconTitle.value = t('Cancel Apply');
     } else {
-      iconName.value = ICON_NAME.ApplyOnSeat;
-      iconTitle.value = t('Raise hand');
-      showMemberApplyAttention.value = true;
+      iconName.value = ApplyStageIcon;
+      iconTitle.value = t('Apply for the stage');
     }
   }
 }, { immediate: true, deep: true });
@@ -91,22 +97,51 @@ watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
 async function toggleApplySpeech() {
   hideApplyAttention();
   if (localUser.value.onSeat) {
-    leaveSeat();
+    handleStepDownDialogVisible();
   } else {
     isApplyingOnSeat.value ? cancelSeatApplication() : sendSeatApplication();
   }
 };
 
+const dialogInfoMap = computed(() => ({
+  inviteDialog: {
+    content: t('You can turn on the microphone and camera once you are on stage'),
+    confirmButtonText: t('Agree to the stage'),
+    cancelButtonText: t('Reject'),
+    handleConfirm: () => {
+      handleInvite(true);
+    }, handleCancel: () => {
+      handleInvite(false);
+    },
+  },
+  leaveSeatDialog: {
+    content: (localUser.value.userRole === TUIRole.kAdministrator ? t('To go on stage again, a new application needs to be initiated') : t('To go on stage again, you need to reapply and wait for the roomOwner/administrator to approve')),
+    confirmButtonText: t('Step down'),
+    cancelButtonText: t('Cancel'),
+    handleConfirm: () => {
+      leaveSeat();
+    }, handleCancel: () => {
+      handleStepDownDialogVisible();
+    },
+  },
+}));
 /**
  * Send a request to be on the mike
  *
  * 发送上麦申请
 **/
 async function sendSeatApplication() {
-  if (localUser.value.userRole === TUIRole.kAdministrator) {
+  if (isAdmin.value) {
     await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
     TUIMessage({ type: 'success', message: t('Succeed on stage') });
     return;
+  }
+  if (isGeneralUser.value) {
+    TUIMessage({
+      type: 'info',
+      message: `${t('The request to go on stage has been sent out, please wait for the roomOwner/administrator to approve it')}`,
+      duration: MESSAGE_DURATION.NORMAL,
+    });
   }
   const request = await roomEngine.instance?.takeSeat({
     seatIndex: -1,
@@ -140,6 +175,11 @@ async function sendSeatApplication() {
 **/
 // 取消上麦申请
 async function cancelSeatApplication() {
+  TUIMessage({
+    type: 'info',
+    message: `${t('Canceled application to go on stage')}`,
+    duration: MESSAGE_DURATION.NORMAL,
+  });
   try {
     await roomEngine.instance?.cancelRequest({ requestId: applyToAnchorRequestId.value });
     isApplyingOnSeat.value = false;
@@ -153,8 +193,15 @@ async function cancelSeatApplication() {
  *
  * 用户下麦
 **/
+function handleStepDownDialogVisible() {
+  showDialog.value = !showDialog.value;
+  currentDialogType.value = 'leaveSeatDialog';
+  currentDialogTitle.value = t('Are you sure you want to step down');
+}
+
 async function leaveSeat() {
   await roomEngine.instance?.leaveSeat();
+  showDialog.value = false;
 }
 
 function hideApplyAttention() {
@@ -171,8 +218,10 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
   if (requestAction === TUIRequestAction.kRequestRemoteUserOnSeat) {
     inviteToAnchorRequestId.value = requestId;
     const userRole = roomStore.getUserRole(userId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
-    dialogTitle.value = t('Sb invites you to speak on stage', { role: userRole });
-    showInviteDialog.value = true;
+    currentDialogTitle.value = t('Sb invites you to speak on stage', { role: userRole });
+    currentConfirmButton.value = t('Agree to the stage');
+    showDialog.value = true;
+    currentDialogType.value = 'inviteDialog';
   }
 }
 
@@ -185,7 +234,7 @@ function onRequestCancelled(eventInfo: { requestId: string; userId: string }) {
   const { requestId } = eventInfo;
   if (inviteToAnchorRequestId.value === requestId) {
     inviteToAnchorRequestId.value = '';
-    showInviteDialog.value = false;
+    showDialog.value = false;
   }
 }
 
@@ -207,7 +256,7 @@ async function handleInvite(agree: boolean) {
       logger.error('Failure of a user to accept/reject a roomOwner invitation', error);
     }
   } finally {
-    showInviteDialog.value = false;
+    showDialog.value = false;
   }
 }
 
@@ -241,40 +290,43 @@ onBeforeUnmount(() => {
 .apply-control-container {
   position: relative;
   .attention {
-    background: rgba(19, 124, 253, 0.96);
+    background: var(--active-color-1);
     box-shadow: 0 4px 16px 0 rgba(47, 48, 164, 0.1);
     position: absolute;
-    border-radius: 4px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    top: -6px;
-    left: 50%;
-    transform: translate(-50%, -100%);
+    bottom: 70px;
     &::after {
       content: '';
       display: block;
-      border: 4px solid transparent;
-      border-top-color: rgba(19, 124, 253, 0.96);
+      border: 5px solid transparent;
+      border-top-color: var(--active-color-1);
       position: absolute;
       top: 100%;
-      left: 50%;
+      left: 10%;
       transform: translateX(-50%);
     }
   }
   .member-attention {
-    padding: 7px 12px;
-    .info {
-      width: 210px;
+    padding: 12px;
+    .info, .mobile-info {
       height: 20px;
-      font-weight: 400;
+      font-weight: 500;
       font-size: 14px;
       color: #ffffff;
       line-height: 20px;
+      white-space: nowrap;
+    }
+    .mobile-info {
+      min-width: 50vw;
+      white-space: normal;
     }
     .close {
       cursor: pointer;
       color: #ffffff;
+      padding-left: 12px;
     }
   }
 }

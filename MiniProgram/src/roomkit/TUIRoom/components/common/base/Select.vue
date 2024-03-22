@@ -34,6 +34,7 @@ import { ref, provide, computed, reactive, watch } from 'vue';
 import SvgIcon from './SvgIcon.vue';
 import ArrowStrokeSelectDownIcon from '../../../assets/icons/ArrowStrokeSelectDownIcon.svg';
 import useZIndex from '../../../hooks/useZIndex';
+import { roomService } from '../../../services';
 
 const { nextZIndex } = useZIndex();
 
@@ -120,7 +121,8 @@ function handleClickSelect() {
 // 根据页面位置确定下拉框的定位
 function handleDropDownPosition() {
   const { top, bottom } = selectContainerRef.value?.getBoundingClientRect();
-  const bottomSize = document?.body.offsetHeight - bottom;
+  const container = roomService.getRoomContainer();
+  const bottomSize = container instanceof HTMLElement ? container.offsetHeight - bottom : -1;
   let dropDownContainerHeight = 0;
   if (!showSelectDropdown.value) {
     selectDropDownRef.value.style = 'display:block;position:absolute;z-index:-1000';
@@ -147,6 +149,7 @@ function handleClickOutside() {
 .select-container {
   position: relative;
   .select-content {
+    box-sizing: border-box;
     position: relative;
     border: 1px solid var(--border-color);
     background-color: var(--background-color-7);
