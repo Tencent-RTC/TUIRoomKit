@@ -115,7 +115,7 @@ Tips：TUIRoomKit 完整功能体验，至少需要两个 userId 不同的用户
 
 | 步骤1 | 步骤2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/8acad0f524c325e1f62ca0fcf9e9f54b.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room.png" width="320"/> |
+| <img src="https://qcloudimg.tencent-cloud.cn/raw/cbbbaca43e68dce6aa013010a4c1ec03.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/3e613a846143979cdc95518adc6c201c.png" width="320"/> |
 
 **普通成员（userId：audience）**
 
@@ -124,7 +124,7 @@ Tips：TUIRoomKit 完整功能体验，至少需要两个 userId 不同的用户
 
 | 步骤1 | 步骤2 |
 |---------|---------|
-| <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-home.png" width="320"/> | <img src="https://web.sdk.qcloud.com/component/tuiroom/assets/page-room.png" width="320"/> |
+| <img src="https://qcloudimg.tencent-cloud.cn/raw/499c87056c183d39a41efc95e9bc89ce.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/3e613a846143979cdc95518adc6c201c.png" width="320"/> |
 ## 常见问题
 
 - 欢迎加入 QQ 群：695855795，进行技术交流和反馈~

@@ -55,7 +55,8 @@ import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
-import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRole } from '@tencentcloud/tuiroom-engine-electron';
+import useDeviceManager from '../../hooks/useDeviceManager';
+import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRole, TUIMediaDeviceType } from '@tencentcloud/tuiroom-engine-electron';
 import { isMobile, isWeChat, isH5 }  from '../../utils/environment';
 import { useBasicStore } from '../../stores/basic';
 import TuiButton from '../common/base/Button.vue';
@@ -63,6 +64,7 @@ import TUIMessage from '../common/base/Message/index';
 import TUIMessageBox from '../common/base/MessageBox/index';
 import { SMALL_VIDEO_ENC_PARAM } from '../../constants/room';
 const roomEngine = useGetRoomEngine();
+const { deviceManager } = useDeviceManager();
 
 const roomStore = useRoomStore();
 const basicStore = useBasicStore();
@@ -107,8 +109,10 @@ async function toggleMuteVideo() {
       roomStore.setCanControlSelfVideo(false);
     }
   } else {
-    const cameraList = await roomEngine.instance?.getCameraDevicesList();
-    const hasCameraDevice = cameraList.length > 0;
+    const cameraList = await deviceManager.instance?.getDevicesList({
+      type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
+    });
+    const hasCameraDevice = cameraList && cameraList.length > 0;
     // 无摄像头列表
     if (!hasCameraDevice && !isWeChat) {
       TUIMessageBox({

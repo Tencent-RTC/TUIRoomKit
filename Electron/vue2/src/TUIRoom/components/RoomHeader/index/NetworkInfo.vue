@@ -8,135 +8,199 @@
   * 在 template 中使用 <network-info />
 -->
 <template>
-  <!-- <div class="network-info-container">
-    <div :class="['network-info-icon', `${showNetworkInfo ? 'active' : ''}`]" @click.stop="handleClickNetworkIcon">
-      <div
-        v-for="(item, index) in new Array(4)"
-        :key="index"
-        :class="[`network-quality-${index + 1}`, `${showGreen(index) ? 'green' : ''}`]"
-      >
-      </div>
-    </div>
+  <div v-click-outside="handleClickOutSide" class="network-info-container">
+    <icon-button
+      :layout="IconButtonLayout.HORIZONTAL"
+      :icon="state.networkIcon"
+      @click-icon="handleClickNetworkIcon"
+    >
+      <template #title>
+        <span :class="[`title-type-${state.titleType}`]">{{ t(`${state.title}`) }}</span>
+      </template>
+    </icon-button>
     <div v-if="showNetworkInfo" ref="networkBoard" class="network-info-board">
-      <div class="network-state">{{ `${t('Network ')}${networkDes[localQuality]}` }}</div>
       <div class="network-detail-item">
-        <span>{{ t('Latency: ') }}</span>
-        <span>{{ `${statistics.rtt} ms` }}</span>
+        <span>{{ t('Latency') }}</span>
+        <span :class="['title-latency',`title-type-${state.titleType}`]">{{ `${networkInfo.delay} ms` }}</span>
       </div>
       <div class="network-detail-item">
-        <span>{{ t('Frame rate: ') }}</span>
-        <span>{{ `${localFrameRate} fps` }}</span>
-      </div>
-      <div class="network-detail-item">
-        <span>{{ t('Bitrate: ') }}</span>
-        <span>{{ `${localVideoBitrate} Kbps` }}</span>
+        <span>{{ t('Packet loss') }}</span>
+        <div class="network-detail-packet">
+          <div class="network-detail-packet-item">
+            <ArrowStrokeUpIcon />
+            <span>{{ `${(networkInfo.upLoss)}%` }}</span>
+          </div>
+          <div class="network-detail-packet-item">
+            <ArrowStrokeUpIcon class="arrow-down" />
+            <span>{{ `${(networkInfo.downLoss)}%` }}</span>
+          </div>
+        </div>
       </div>
     </div>
-  </div> -->
-  <div></div>
+  </div>
 </template>
 
 <script setup lang="ts">
-// import { ref, Ref, computed } from 'vue';
-// import { useBasicStore } from '../../stores/basic';
-// import { storeToRefs } from 'pinia';
-// import TUIRoomAegis from '../../utils/aegis';
-// import { useI18n } from '../../locales';
+import { ref, Ref, onUnmounted, watchEffect, reactive, shallowRef } from 'vue';
+import { useBasicStore } from '../../../stores/basic';
+import { storeToRefs } from 'pinia';
+import TUIRoomAegis from '../../../utils/aegis';
+import { useI18n } from '../../../locales';
+import TUIRoomEngine, { TUIRoomEvents, TUINetwork, TUINetworkQuality } from '@tencentcloud/tuiroom-engine-electron';
+import useRoomEngine from '../../../hooks/useRoomEngine';
+import IconButton from '../../common/base/IconButton.vue';
+import '../../../directives/vClickOutside';
+import NetworkStabilityIcon from '../../common/icons/NetworkStabilityIcon.vue';
+import NetworkFluctuationIcon from '../../common/icons/NetworkFluctuationIcon.vue';
+import NetworkLagIcon from '../../common/icons/NetworkLagIcon.vue';
+import NetworkDisconnectedIcon from '../../common/icons/NetworkDisconnectedIcon.vue';
+import ArrowStrokeUpIcon from '../../common/icons/ArrowStrokeUpIcon.vue';
+import { IconButtonLayout } from '../../../constants/room';
 
-// const { t } = useI18n();
+const roomEngine = useRoomEngine();
+const { t } = useI18n();
+const basicStore = useBasicStore();
+const { networkInfo } = storeToRefs(basicStore);
+const networkBoard = ref();
+const showNetworkInfo: Ref<boolean> = ref(false);
 
-// const networkDes = computed(() => [t('Unknown'), t('Excellent'), t('Good'), t('Fair'), t('Poor'), t('Very poor'), t('Disconnected')]);
+type TitleType = 'success' | 'warning' | 'danger' | 'info' | undefined;
 
-// const basicStore = useBasicStore();
-// const { localQuality, statistics, localVideoBitrate, localFrameRate } = storeToRefs(basicStore);
+interface StateType {
+  title: string;
+  titleType: TitleType | undefined;
+  networkIcon: any;
+}
 
-// const networkBoard = ref();
-// const showNetworkInfo: Ref<boolean> = ref(false);
+const state = reactive<StateType>({
+  title: '',
+  titleType: undefined,
+  networkIcon: null,
+});
 
-// function showGreen(index: number) {
-//   if (localQuality.value === 0) {
-//     return false;
-//   }
-//   return 5 - localQuality.value > index;
-// }
+const qualityMap: { [key in TUINetworkQuality]?: { title: string; titleType: TitleType; icon: any } } = {
+  [TUINetworkQuality.kQualityExcellent]: {
+    title: 'Stability',
+    titleType: 'success',
+    icon: shallowRef(NetworkStabilityIcon),
+  },
+  [TUINetworkQuality.kQualityPoor]: {
+    title: 'Fluctuation',
+    titleType: 'warning',
+    icon: shallowRef(NetworkFluctuationIcon),
+  },
+  [TUINetworkQuality.kQualityVeryBad]: {
+    title: 'Lag',
+    titleType: 'danger',
+    icon: shallowRef(NetworkLagIcon),
+  },
+  [TUINetworkQuality.kQualityDown]: {
+    title: 'Disconnected',
+    titleType: 'info',
+    icon: shallowRef(NetworkDisconnectedIcon),
+  },
+};
 
-// function handleClickNetworkIcon() {
-//   if (!showNetworkInfo.value) {
-//     showNetworkInfo.value = true;
-//     document.addEventListener('click', handleDocumentClick, false);
-//   } else {
-//     document.removeEventListener('click', handleDocumentClick, false);
-//     showNetworkInfo.value = false;
-//   }
-//   TUIRoomAegis.reportEvent({ name: 'networkInfo', ext1: 'networkInfo' });
-// }
+watchEffect(() => {
+  const quality = qualityMap[networkInfo.value.quality];
+  if (quality) {
+    state.title = quality.title;
+    state.titleType = quality.titleType;
+    state.networkIcon = quality.icon;
+  }
+});
 
-// function handleDocumentClick(event: MouseEvent) {
-//   if (showNetworkInfo.value && networkBoard.value && !networkBoard.value.contains(event.target as Node)) {
-//     document.removeEventListener('click', handleDocumentClick);
-//     showNetworkInfo.value = false;
-//   }
-// }
+function handleClickNetworkIcon() {
+  showNetworkInfo.value = !showNetworkInfo.value;
+  TUIRoomAegis.reportEvent({ name: 'networkInfo', ext1: 'networkInfo' });
+}
+
+function handleClickOutSide() {
+  if (showNetworkInfo.value) {
+    showNetworkInfo.value = false;
+  }
+}
+
+async function onUserNetworkQualityChanged({ userNetworkList }: { userNetworkList: TUINetwork[] }) {
+  userNetworkList.forEach((userNetwork: TUINetwork) => {
+    basicStore.setNetworkInfo(userNetwork);
+  });
+}
+
+TUIRoomEngine.once('ready', () => {
+  roomEngine.instance?.on(TUIRoomEvents.onUserNetworkQualityChanged, onUserNetworkQualityChanged);
+});
+
+onUnmounted(() => {
+  roomEngine.instance?.off(TUIRoomEvents.onUserNetworkQualityChanged, onUserNetworkQualityChanged);
+});
 
 </script>
 
 <style lang="scss" scoped>
+.tui-theme-white .network-info-board {
+  --title-font-color: var(--font-color-1);
+  --item-font-color: var(--font-color-6);
+  --filter-color: drop-shadow(0px 0px 4px rgba(32, 77, 141, 0.03)) drop-shadow(0px 4px 10px rgba(32, 77, 141, 0.06))
+    drop-shadow(0px 1px 14px rgba(32, 77, 141, 0.05));
+}
+.tui-theme-black .network-info-board {
+  --title-font-color: #8f9ab2;
+  --item-font-color: var(--font-color-1);
+  --filter-color: drop-shadow(0px 8px 40px rgba(23, 25, 31, 0.6)) drop-shadow(0px 4px 12px rgba(23, 25, 31, 0.4));
+}
+
 .network-info-container {
   position: relative;
-  width: 20px;
-  height: 20px;
-  .network-info-icon {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-end;
-    padding: 4px 2px;
-    &.active {
-      background: rgba(46,50,61,0.60);
-      border-radius: 2px;
-    }
-    cursor: pointer;
-    div {
-      width: 3px;
-      background-color: #CFD4E6;
-      border-radius: 4px;
-      &.green {
-        background-color: $levelHighLightColor;
-      }
-    }
-    .network-quality-1 {
-      height: 5px;
-    }
-    .network-quality-2 {
-      height: 7px;
-    }
-    .network-quality-3 {
-      height: 9.5px;
-    }
-    .network-quality-4 {
-      height: 12px;
-    }
-  }
   .network-info-board {
     position: absolute;
-    top: 47px;
-    right: 0;
-    background-color: $toolBarBackgroundColor;
-    box-shadow: 0 1px 10px 0 rgba(0,0,0,0.30);
-    border-radius: 4px;
-    padding: 20px;
-    width: 263px;
-    height: 186px;
-    padding: 32px;
+    background-color: var(--background-color-2);
+    border-radius: 10px;
+    width: 161px;
+    height: 130px;
+    filter: var(--filter-color);
+    padding: 24px;
+    top: 40px;
     .network-state {
       margin-bottom: 18px;
     }
     .network-detail-item {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 30px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: var(--title-font-color);
+      .title-latency {
+        font-weight: 500;
+        line-height: 22px;
+      }
+      .network-detail-packet {
+        display: flex;
+        flex-direction: column;
+        font-weight: 500;
+        color: var(--item-font-color);
+        .network-detail-packet-item {
+          display: flex;
+          .arrow-down {
+            transform: rotate(180deg);
+          }
+        }
+      }
     }
+  }
+  .title-type-success {
+    color: #27C39F;
+  }
+  .title-type-warning {
+    color: #F39843;
+  }
+  .title-type-danger {
+    color: #ED414D;
+  }
+  .title-type-info {
+    color: #4F586B;
   }
 }
 </style>

@@ -11,7 +11,14 @@
       <stop-screen-share-icon v-if="isSharing"></stop-screen-share-icon>
       <screen-share-icon v-else></screen-share-icon>
     </icon-button>
-    <Dialog v-model="showStopShareRegion" width="420px" :title="t('End sharing')" :modal="true">
+    <Dialog
+      v-model="showStopShareRegion"
+      width="420px"
+      :title="t('End sharing')"
+      :modal="true"
+      :close-on-click-modal="true"
+      :append-to-room-container="true"
+    >
       <span>
         {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
       <template #footer>
@@ -35,6 +42,8 @@
       :modal="true"
       :append-to-body="true"
       width="480px"
+      :close-on-click-modal="true"
+      :append-to-room-container="true"
     >
       <div>
         {{

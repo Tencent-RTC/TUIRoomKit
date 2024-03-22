@@ -13,14 +13,14 @@ const activeMessages = [] as any;
 const createInstance = ({ type, message, duration = 3000 }: MessageProps) => {
   const container = document.createElement('div');
   container.setAttribute('class', 't-message-container');
-  const fullscreenElement = document.fullscreenElement || document.body;
+  const fullscreenElement = document.fullscreenElement || document.getElementById('roomContainer') || document.body;
   fullscreenElement.appendChild(container);
   const uniqueKey = `message-${Date.now()}-${Math.random()}`;
 
 
   const updateTopValues = () => {
     activeMessages.forEach((msg: any, index: number) => {
-      msg.updateTop(`calc(6% + ${index * 6}%)`);
+      msg.updateTop(`calc(6% + ${index * 50}px)`);
     });
   };
 
@@ -33,10 +33,10 @@ const createInstance = ({ type, message, duration = 3000 }: MessageProps) => {
   };
   const onRemove = () => {
     render(null, container);
-    document.body.removeChild(container);
+    fullscreenElement.removeChild(container);
     removeMessage(messageInstance);
   };
-  const topValue = ref(`calc(6% + ${activeMessages.length * 6}%)`);
+  const topValue = ref(`calc(6% + ${activeMessages.length * 50}px)`);
 
   const messageInstance = {
     key: uniqueKey,

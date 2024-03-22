@@ -18,9 +18,11 @@
 }
 
 .t-message {
+  display: inline-block;
+  max-height: 50px;
   border-radius: 8px;
   padding: 10px;
-  position: fixed;
+  position: absolute;
   z-index: 9999;
   left: 50%;
   transform: translateX(-50%);

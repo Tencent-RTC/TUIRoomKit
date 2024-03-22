@@ -1,10 +1,10 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import resolve from 'vite-plugin-resolve'
-import electron from 'vite-plugin-electron/renderer'
-import pkg from '../../package.json'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import resolve from 'vite-plugin-resolve';
+import electron from 'vite-plugin-electron/renderer';
+import pkg from '../../package.json';
 
-const path = require('path')
+const path = require('path');
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -20,9 +20,8 @@ export default defineConfig({
   plugins: [
     vue({}),
     electron(),
-    resolve(
-      {
-        "trtc-electron-sdk": `
+    resolve({
+      'trtc-electron-sdk': `
           const TRTCCloud = require("trtc-electron-sdk");
           const TRTCParams = TRTCCloud.TRTCParams;
           const TRTCAppScene = TRTCCloud.TRTCAppScene;
@@ -76,8 +75,7 @@ export default defineConfig({
           };
           export default TRTCCloud.default;
         `,
-      }
-    ),
+    }),
   ],
   css: {
     preprocessorOptions: {
@@ -89,12 +87,13 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['@tencentcloud/tuiroom-engine-electron']
+    include: ['@tencentcloud/tuiroom-engine-electron'],
   },
   build: {
     outDir: '../../dist/renderer',
     emptyOutDir: true,
     sourcemap: true,
+    cssCodeSplit: true,
     commonjsOptions: {
       exclude: ['@tencentcloud/tuiroom-engine-electron'],
       include: [],
@@ -104,11 +103,11 @@ export default defineConfig({
     host: pkg.env.VITE_DEV_SERVER_HOST,
     port: pkg.env.VITE_DEV_SERVER_PORT,
     proxy: {
-      "/api": {
-        target: `https://service.trtc.qcloud.com/`,
+      '/api': {
+        target: 'https://service.trtc.qcloud.com/',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: path => path.replace(/^\/api/, ''),
       },
     },
   },
-})
+});

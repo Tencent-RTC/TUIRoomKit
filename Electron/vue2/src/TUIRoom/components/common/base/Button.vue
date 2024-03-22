@@ -102,9 +102,10 @@ const buttonClassList = computed(() => [
   border-radius: 999999px;
 }
 
-.tui-button-disable {
+.tui-button-disabled {
   cursor: not-allowed;
-  opacity: 0.3;
+  pointer-events: none;
+  opacity: 0.4;
 }
 
 .tui-button-icon {
