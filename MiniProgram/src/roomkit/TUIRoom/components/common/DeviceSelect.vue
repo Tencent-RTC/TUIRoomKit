@@ -37,14 +37,14 @@ import { storeToRefs } from 'pinia';
 import TuiSelect from './base/Select.vue';
 import TuiOption from './base/Option.vue';
 
-import useGetRoomEngine from '../../hooks/useRoomEngine';
-import { TRTCDeviceInfo } from '@tencentcloud/tuiroom-engine-wx';
-const roomEngine = useGetRoomEngine();
+import { TRTCDeviceInfo, TUIMediaDeviceType } from '@tencentcloud/tuiroom-engine-wx';
+import useDeviceManager from '../../hooks/useDeviceManager';
+const { deviceManager } = useDeviceManager();
 
 interface Props {
   deviceType: string,
   onChange?: (id: string) => void,
-  disabled?: Boolean
+  disabled?: boolean
 }
 // eslint-disable-next-line vue/no-setup-props-destructure
 const { deviceType, onChange, disabled = false } = defineProps<Props>();
@@ -93,15 +93,24 @@ async function handleChange(deviceId: string) {
   onChange && onChange(deviceId);
   switch (deviceType) {
     case 'camera':
-      await roomEngine.instance?.setCurrentCameraDevice({ deviceId });
+      await deviceManager.instance?.setCurrentDevice({
+        type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
+        deviceId,
+      });
       roomStore.setCurrentCameraId(deviceId);
       break;
     case 'microphone':
-      await roomEngine.instance?.setCurrentMicDevice({ deviceId });
+      await deviceManager.instance?.setCurrentDevice({
+        type: TUIMediaDeviceType.kMediaDeviceTypeAudioInput,
+        deviceId,
+      });
       roomStore.setCurrentMicrophoneId(deviceId);
       break;
     case 'speaker':
-      await roomEngine.instance?.setCurrentSpeakerDevice({ deviceId });
+      await deviceManager.instance?.setCurrentDevice({
+        type: TUIMediaDeviceType.kMediaDeviceTypeAudioOutput,
+        deviceId,
+      });
       roomStore.setCurrentSpeakerId(deviceId);
       break;
     default:

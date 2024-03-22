@@ -1,7 +1,13 @@
 <template>
   <div class="footer-container">
-    <audio-control @tap="() => handleControlClick('audioControl')"></audio-control>
-    <video-control @tap="() => handleControlClick('videoControl')"></video-control>
+    <audio-control
+      v-if="!isAudience || isAdmin"
+      @tap="() => handleControlClick('audioControl')"
+    ></audio-control>
+    <video-control
+      v-if="!isAudience || isAdmin"
+      @tap="() => handleControlClick('videoControl')"
+    ></video-control>
     <chat-control
       v-if="!roomStore.isSpeakAfterTakingSeatMode"
       @tap="() => handleControlClick('chatControl')"
@@ -38,6 +44,7 @@ const {
   roomStore,
   isMaster,
   isAdmin,
+  isAudience,
 } = useRoomFooter();
 
 

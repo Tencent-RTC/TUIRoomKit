@@ -59,7 +59,6 @@ const {
         caret-color: var(--caret-color);
         border-radius: 8px;
         resize: none;
-        border: 1px solid aliceblue;
         .chat-emoji {
           display: flex;
           align-items: center;
@@ -100,7 +99,7 @@ const {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding-top: 5px;
+      padding: 5px 0;
     }
     .emoji-icon{
       width: 20px;

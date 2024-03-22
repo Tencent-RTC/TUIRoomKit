@@ -70,7 +70,7 @@ export default function useSideBar() {
       tim = TencentCloudChat.create({ SDKAppID: basicStore.sdkAppId });
     }
     tim?.on(TencentCloudChat.EVENT.MESSAGE_RECEIVED, onReceiveMessage);
-  });
+  }, { immediate: true });
 
   onUnmounted(() => {
     tim?.off(TencentCloudChat.EVENT.MESSAGE_RECEIVED, onReceiveMessage);

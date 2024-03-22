@@ -1,5 +1,213 @@
-export const emojiUrl:string = 'https://web.sdk.qcloud.com/im/assets/emoji/';
-export const emojiMap:any = {
+/**
+ * 聊天界面表情输入界面
+ * 需要注意的是， TUIRoomKit 里面的表情包都是有版权限制的，购买的 IM 服务不包括表情包的使用权，请在上线的时候替换成自己的表情包，否则会面临法律风险
+ * 黄脸表情为腾讯云版权所有，如要使用需获得授权，请通过以下链接联系我们。
+ *
+ * Emoji input interface in the chat screen.
+ * It should be noted that the emoticons in TUIRoomKit are copyrighted. The purchased IM service does not include the
+ * right to use the emoticons. Please replace them with your own emoticons when you go online, otherwise you will
+ * face legal risks.
+ * The yellow face emoji is copyrighted by Tencent Cloud. To use it, authorization is required.
+ * Please contact us through the following link.
+ *
+ * https://cloud.tencent.com/document/product/269/59590
+ */
+
+export const emojiBaseUrl = 'https://web.sdk.qcloud.com/im/assets/emoji-plugin/';
+const deprecatedEmojiBaseUrl = 'https://web.sdk.qcloud.com/im/assets/emoji/';
+export const emojiMap: Record<string, string> = {
+  '[期待]': 'emoji_0@2x.png',
+  '[眨眼]': 'emoji_1@2x.png',
+  '[大笑]': 'emoji_2@2x.png',
+  '[姨母笑]': 'emoji_3@2x.png',
+  '[哈哈哈]': 'emoji_4@2x.png',
+  '[愉快]': 'emoji_5@2x.png',
+  '[微笑]': 'emoji_6@2x.png',
+  '[悲伤]': 'emoji_7@2x.png',
+  '[无语]': 'emoji_8@2x.png',
+  '[惊讶]': 'emoji_9@2x.png',
+  '[得意]': 'emoji_10@2x.png',
+  '[色]': 'emoji_11@2x.png',
+  '[星星眼]': 'emoji_12@2x.png',
+  '[憨笑]': 'emoji_13@2x.png',
+  '[恶魔]': 'emoji_14@2x.png',
+  '[恶魔怒]': 'emoji_15@2x.png',
+  '[打哈欠]': 'emoji_16@2x.png',
+  '[哭笑]': 'emoji_17@2x.png',
+  '[傻了]': 'emoji_18@2x.png',
+  '[大哭]': 'emoji_19@2x.png',
+  '[亲亲]': 'emoji_20@2x.png',
+  '[困]': 'emoji_21@2x.png',
+  '[恐惧]': 'emoji_22@2x.png',
+  '[龇牙]': 'emoji_23@2x.png',
+  '[发怒]': 'emoji_24@2x.png',
+  '[机智]': 'emoji_25@2x.png',
+  '[便便]': 'emoji_26@2x.png',
+  '[闭嘴]': 'emoji_27@2x.png',
+  '[叹气]': 'emoji_28@2x.png',
+  '[呵呵]': 'emoji_29@2x.png',
+  '[收声]': 'emoji_30@2x.png',
+  '[骷髅]': 'emoji_31@2x.png',
+  '[口罩]': 'emoji_32@2x.png',
+  '[啤酒]': 'emoji_33@2x.png',
+  '[蛋糕]': 'emoji_34@2x.png',
+  '[红包]': 'emoji_35@2x.png',
+  '[炸弹]': 'emoji_36@2x.png',
+  '[AI]': 'emoji_37@2x.png',
+  '[庆祝]': 'emoji_38@2x.png',
+  '[福]': 'emoji_39@2x.png',
+  '[花]': 'emoji_40@2x.png',
+  '[瓜]': 'emoji_41@2x.png',
+  '[牛]': 'emoji_42@2x.png',
+  '[衰]': 'emoji_43@2x.png',
+  '[惊喜]': 'emoji_44@2x.png',
+  '[白眼]': 'emoji_45@2x.png',
+  '[怪兽]': 'emoji_46@2x.png',
+  '[猪]': 'emoji_47@2x.png',
+  '[咖啡]': 'emoji_48@2x.png',
+  '[OK]': 'emoji_49@2x.png',
+  '[爱心]': 'emoji_50@2x.png',
+  '[太阳]': 'emoji_51@2x.png',
+  '[月亮]': 'emoji_52@2x.png',
+  '[星星]': 'emoji_53@2x.png',
+  '[壕]': 'emoji_54@2x.png',
+  '[发]': 'emoji_55@2x.png',
+  '[857]': 'emoji_56@2x.png',
+  '[666]': 'emoji_57@2x.png',
+  '[禁]': 'emoji_58@2x.png',
+  '[服]': 'emoji_59@2x.png',
+  '[刀]': 'emoji_60@2x.png',
+  '[赞]': 'emoji_61@2x.png',
+};
+const emojiNameMapping: Record<string, string> = {
+  '[微笑]': '[TUIEmoji_Smile]',
+  '[期待]': '[TUIEmoji_Expect]',
+  '[眨眼]': '[TUIEmoji_Blink]',
+  '[大笑]': '[TUIEmoji_Guffaw]',
+  '[姨母笑]': '[TUIEmoji_KindSmile]',
+  '[哈哈哈]': '[TUIEmoji_Haha]',
+  '[愉快]': '[TUIEmoji_Cheerful]',
+  '[无语]': '[TUIEmoji_Speechless]',
+  '[惊讶]': '[TUIEmoji_Amazed]',
+  '[悲伤]': '[TUIEmoji_Sorrow]',
+  '[得意]': '[TUIEmoji_Complacent]',
+  '[傻了]': '[TUIEmoji_Silly]',
+  '[色]': '[TUIEmoji_Lustful]',
+  '[憨笑]': '[TUIEmoji_Giggle]',
+  '[亲亲]': '[TUIEmoji_Kiss]',
+  '[大哭]': '[TUIEmoji_Wail]',
+  '[哭笑]': '[TUIEmoji_TearsLaugh]',
+  '[困]': '[TUIEmoji_Trapped]',
+  '[口罩]': '[TUIEmoji_Mask]',
+  '[恐惧]': '[TUIEmoji_Fear]',
+  '[龇牙]': '[TUIEmoji_BareTeeth]',
+  '[发怒]': '[TUIEmoji_FlareUp]',
+  '[打哈欠]': '[TUIEmoji_Yawn]',
+  '[机智]': '[TUIEmoji_Tact]',
+  '[星星眼]': '[TUIEmoji_Stareyes]',
+  '[闭嘴]': '[TUIEmoji_ShutUp]',
+  '[叹气]': '[TUIEmoji_Sigh]',
+  '[呵呵]': '[TUIEmoji_Hehe]',
+  '[收声]': '[TUIEmoji_Silent]',
+  '[惊喜]': '[TUIEmoji_Surprised]',
+  '[白眼]': '[TUIEmoji_Askance]',
+  '[OK]': '[TUIEmoji_Ok]',
+  '[便便]': '[TUIEmoji_Shit]',
+  '[怪兽]': '[TUIEmoji_Monster]',
+  '[恶魔]': '[TUIEmoji_Daemon]',
+  '[恶魔怒]': '[TUIEmoji_Rage]',
+  '[衰]': '[TUIEmoji_Fool]',
+  '[猪]': '[TUIEmoji_Pig]',
+  '[牛]': '[TUIEmoji_Cow]',
+  '[AI]': '[TUIEmoji_Ai]',
+  '[骷髅]': '[TUIEmoji_Skull]',
+  '[炸弹]': '[TUIEmoji_Bombs]',
+  '[咖啡]': '[TUIEmoji_Coffee]',
+  '[蛋糕]': '[TUIEmoji_Cake]',
+  '[啤酒]': '[TUIEmoji_Beer]',
+  '[花]': '[TUIEmoji_Flower]',
+  '[瓜]': '[TUIEmoji_Watermelon]',
+  '[壕]': '[TUIEmoji_Rich]',
+  '[爱心]': '[TUIEmoji_Heart]',
+  '[月亮]': '[TUIEmoji_Moon]',
+  '[太阳]': '[TUIEmoji_Sun]',
+  '[星星]': '[TUIEmoji_Star]',
+  '[红包]': '[TUIEmoji_RedPacket]',
+  '[庆祝]': '[TUIEmoji_Celebrate]',
+  '[福]': '[TUIEmoji_Bless]',
+  '[发]': '[TUIEmoji_Fortune]',
+  '[服]': '[TUIEmoji_Convinced]',
+  '[禁]': '[TUIEmoji_Prohibit]',
+  '[666]': '[TUIEmoji_666]',
+  '[857]': '[TUIEmoji_857]',
+  '[刀]': '[TUIEmoji_Knife]',
+  '[赞]': '[TUIEmoji_Like]',
+};
+const emojiUrlMapping: Record<string, string> = {
+  '[TUIEmoji_Expect]': 'emoji_0@2x.png',
+  '[TUIEmoji_Blink]': 'emoji_1@2x.png',
+  '[TUIEmoji_Guffaw]': 'emoji_2@2x.png',
+  '[TUIEmoji_KindSmile]': 'emoji_3@2x.png',
+  '[TUIEmoji_Haha]': 'emoji_4@2x.png',
+  '[TUIEmoji_Cheerful]': 'emoji_5@2x.png',
+  '[TUIEmoji_Smile]': 'emoji_6@2x.png',
+  '[TUIEmoji_Sorrow]': 'emoji_7@2x.png',
+  '[TUIEmoji_Speechless]': 'emoji_8@2x.png',
+  '[TUIEmoji_Amazed]': 'emoji_9@2x.png',
+  '[TUIEmoji_Complacent]': 'emoji_10@2x.png',
+  '[TUIEmoji_Lustful]': 'emoji_11@2x.png',
+  '[TUIEmoji_Stareyes]': 'emoji_12@2x.png',
+  '[TUIEmoji_Giggle]': 'emoji_13@2x.png',
+  '[TUIEmoji_Daemon]': 'emoji_14@2x.png',
+  '[TUIEmoji_Rage]': 'emoji_15@2x.png',
+  '[TUIEmoji_Yawn]': 'emoji_16@2x.png',
+  '[TUIEmoji_TearsLaugh]': 'emoji_17@2x.png',
+  '[TUIEmoji_Silly]': 'emoji_18@2x.png',
+  '[TUIEmoji_Wail]': 'emoji_19@2x.png',
+  '[TUIEmoji_Kiss]': 'emoji_20@2x.png',
+  '[TUIEmoji_Trapped]': 'emoji_21@2x.png',
+  '[TUIEmoji_Fear]': 'emoji_22@2x.png',
+  '[TUIEmoji_BareTeeth]': 'emoji_23@2x.png',
+  '[TUIEmoji_FlareUp]': 'emoji_24@2x.png',
+  '[TUIEmoji_Tact]': 'emoji_25@2x.png',
+  '[TUIEmoji_Shit]': 'emoji_26@2x.png',
+  '[TUIEmoji_ShutUp]': 'emoji_27@2x.png',
+  '[TUIEmoji_Sigh]': 'emoji_28@2x.png',
+  '[TUIEmoji_Hehe]': 'emoji_29@2x.png',
+  '[TUIEmoji_Silent]': 'emoji_30@2x.png',
+  '[TUIEmoji_Skull]': 'emoji_31@2x.png',
+  '[TUIEmoji_Mask]': 'emoji_32@2x.png',
+  '[TUIEmoji_Beer]': 'emoji_33@2x.png',
+  '[TUIEmoji_Cake]': 'emoji_34@2x.png',
+  '[TUIEmoji_RedPacket]': 'emoji_35@2x.png',
+  '[TUIEmoji_Bombs]': 'emoji_36@2x.png',
+  '[TUIEmoji_Ai]': 'emoji_37@2x.png',
+  '[TUIEmoji_Celebrate]': 'emoji_38@2x.png',
+  '[TUIEmoji_Bless]': 'emoji_39@2x.png',
+  '[TUIEmoji_Flower]': 'emoji_40@2x.png',
+  '[TUIEmoji_Watermelon]': 'emoji_41@2x.png',
+  '[TUIEmoji_Cow]': 'emoji_42@2x.png',
+  '[TUIEmoji_Fool]': 'emoji_43@2x.png',
+  '[TUIEmoji_Surprised]': 'emoji_44@2x.png',
+  '[TUIEmoji_Askance]': 'emoji_45@2x.png',
+  '[TUIEmoji_Monster]': 'emoji_46@2x.png',
+  '[TUIEmoji_Pig]': 'emoji_47@2x.png',
+  '[TUIEmoji_Coffee]': 'emoji_48@2x.png',
+  '[TUIEmoji_Ok]': 'emoji_49@2x.png',
+  '[TUIEmoji_Heart]': 'emoji_50@2x.png',
+  '[TUIEmoji_Sun]': 'emoji_51@2x.png',
+  '[TUIEmoji_Moon]': 'emoji_52@2x.png',
+  '[TUIEmoji_Star]': 'emoji_53@2x.png',
+  '[TUIEmoji_Rich]': 'emoji_54@2x.png',
+  '[TUIEmoji_Fortune]': 'emoji_55@2x.png',
+  '[TUIEmoji_857]': 'emoji_56@2x.png',
+  '[TUIEmoji_666]': 'emoji_57@2x.png',
+  '[TUIEmoji_Prohibit]': 'emoji_58@2x.png',
+  '[TUIEmoji_Convinced]': 'emoji_59@2x.png',
+  '[TUIEmoji_Knife]': 'emoji_60@2x.png',
+  '[TUIEmoji_Like]': 'emoji_61@2x.png',
+};
+const deprecatedEmojiMap: Record<string, string> = {
   '[NO]': 'emoji_0@2x.png',
   '[OK]': 'emoji_1@2x.png',
   '[下雨]': 'emoji_2@2x.png',
@@ -143,150 +351,24 @@ export const emojiMap:any = {
   '[鼓掌]': 'emoji_140@2x.png',
   '[龇牙]': 'emoji_141@2x.png',
 };
-export const emojiList = [
-  '[龇牙]',
-  '[调皮]',
-  '[流汗]',
-  '[偷笑]',
-  '[再见]',
-  '[敲打]',
-  '[擦汗]',
-  '[猪头]',
-  '[玫瑰]',
-  '[流泪]',
-  '[大哭]',
-  '[嘘]',
-  '[酷]',
-  '[抓狂]',
-  '[委屈]',
-  '[便便]',
-  '[炸弹]',
-  '[菜刀]',
-  '[可爱]',
-  '[色]',
-  '[害羞]',
-  '[得意]',
-  '[吐]',
-  '[微笑]',
-  '[怒]',
-  '[尴尬]',
-  '[惊恐]',
-  '[冷汗]',
-  '[爱心]',
-  '[示爱]',
-  '[白眼]',
-  '[傲慢]',
-  '[难过]',
-  '[惊讶]',
-  '[疑问]',
-  '[困]',
-  '[么么哒]',
-  '[憨笑]',
-  '[爱情]',
-  '[衰]',
-  '[撇嘴]',
-  '[阴险]',
-  '[奋斗]',
-  '[发呆]',
-  '[右哼哼]',
-  '[抱抱]',
-  '[坏笑]',
-  '[飞吻]',
-  '[鄙视]',
-  '[晕]',
-  '[大兵]',
-  '[可怜]',
-  '[强]',
-  '[弱]',
-  '[握手]',
-  '[胜利]',
-  '[抱拳]',
-  '[凋谢]',
-  '[米饭]',
-  '[蛋糕]',
-  '[西瓜]',
-  '[啤酒]',
-  '[瓢虫]',
-  '[勾引]',
-  '[OK]',
-  '[爱你]',
-  '[咖啡]',
-  '[月亮]',
-  '[刀]',
-  '[发抖]',
-  '[差劲]',
-  '[拳头]',
-  '[心碎了]',
-  '[太阳]',
-  '[礼物]',
-  '[皮球]',
-  '[骷髅]',
-  '[挥手]',
-  '[闪电]',
-  '[饥饿]',
-  '[咒骂]',
-  '[折磨]',
-  '[抠鼻]',
-  '[鼓掌]',
-  '[糗大了]',
-  '[左哼哼]',
-  '[打哈欠]',
-  '[快哭了]',
-  '[吓]',
-  '[篮球]',
-  '[乒乓]',
-  '[NO]',
-  '[跳跳]',
-  '[怄火]',
-  '[转圈]',
-  '[磕头]',
-  '[回头]',
-  '[跳绳]',
-  '[激动]',
-  '[街舞]',
-  '[献吻]',
-  '[左太极]',
-  '[右太极]',
-  '[闭嘴]',
-  '[猫咪]',
-  '[红双喜]',
-  '[鞭炮]',
-  '[红灯笼]',
-  '[麻将]',
-  '[麦克风]',
-  '[礼品袋]',
-  '[信封]',
-  '[象棋]',
-  '[彩带]',
-  '[蜡烛]',
-  '[爆筋]',
-  '[棒棒糖]',
-  '[奶瓶]',
-  '[面条]',
-  '[香蕉]',
-  '[飞机]',
-  '[左车头]',
-  '[车厢]',
-  '[右车头]',
-  '[多云]',
-  '[下雨]',
-  '[钞票]',
-  '[熊猫]',
-  '[灯泡]',
-  '[风车]',
-  '[闹钟]',
-  '[雨伞]',
-  '[彩球]',
-  '[钻戒]',
-  '[沙发]',
-  '[纸巾]',
-  '[手枪]',
-  '[青蛙]',
-];
-export const faceUrl:string = 'https://web.sdk.qcloud.com/im/assets/face-elem/';
+export const emojiList = Object.keys(emojiMap);
 
 export function decodeMessageText(payload: string) {
-  const renderDom = [];
+  const renderDom: { name: string; text?: string; src?: string; }[] = [];
+  function pushTextNode(text: string) {
+    renderDom.push({
+      name: 'text',
+      text,
+    });
+  }
+
+  function pushEmojiNode(src: string) {
+    renderDom.push({
+      name: 'img',
+      src,
+    });
+  }
+
   /**
    * Text Message
    *
@@ -301,43 +383,78 @@ export function decodeMessageText(payload: string) {
     switch (left) {
       case 0:
         if (right === -1) {
-          renderDom.push({
-            name: 'text',
-            text: temp,
-          });
+          pushTextNode(temp);
           temp = '';
         } else {
           const emojiKey = temp.slice(0, right + 1);
-          if (emojiMap[emojiKey]) {
-            renderDom.push({
-              name: 'img',
-              src: emojiUrl + emojiMap[emojiKey],
-            });
+          const emojiSrc = emojiUrlMapping[emojiKey]
+            ? emojiBaseUrl + emojiUrlMapping[emojiKey]
+            : deprecatedEmojiMap[emojiKey]
+              ? deprecatedEmojiBaseUrl + deprecatedEmojiMap[emojiKey]
+              : null;
+          if (emojiSrc) {
+            pushEmojiNode(emojiSrc);
             temp = temp.substring(right + 1);
           } else {
-            renderDom.push({
-              name: 'text',
-              text: '[',
-            });
+            pushTextNode('[');
             temp = temp.slice(1);
           }
         }
         break;
       case -1:
-        renderDom.push({
-          name: 'text',
-          text: temp,
-        });
+        pushTextNode(temp);
         temp = '';
         break;
       default:
-        renderDom.push({
-          name: 'text',
-          text: temp.slice(0, left),
-        });
+        pushTextNode(temp.slice(0, left));
         temp = temp.substring(left);
         break;
     }
   }
   return renderDom;
+}
+
+export function decodeSendTextMsg(payload: string) {
+  /**
+   * Text Message
+   *
+   * 文本消息
+  **/
+  let temp = payload;
+  let left = -1;
+  let right = -1;
+  let result = '';
+
+  while (temp !== '') {
+    temp = temp.replace('\n', '');
+    left = temp.indexOf('[');
+    right = temp.indexOf(']');
+
+    switch (left) {
+      case 0:
+        if (right === -1) {
+          result += temp;
+          temp = '';
+        } else {
+          const emojiKey = temp.slice(0, right + 1);
+          if (emojiKey in emojiNameMapping) {
+            result += emojiNameMapping[emojiKey];
+            temp = temp.substring(right + 1);
+          } else {
+            result += '[';
+            temp = temp.slice(1);
+          }
+        }
+        break;
+      case -1:
+        result += temp;
+        temp = '';
+        break;
+      default:
+        result += temp.slice(0, left);
+        temp = temp.substring(left);
+        break;
+    }
+  }
+  return result;
 }

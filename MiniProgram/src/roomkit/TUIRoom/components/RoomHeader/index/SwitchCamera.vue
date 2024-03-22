@@ -8,17 +8,17 @@
   </div>
 </template>
 <script setup lang="ts">
-import useGetRoomEngine from '../../../hooks/useRoomEngine';
+import useDeviceManager from '../../../hooks/useDeviceManager';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import { storeToRefs } from 'pinia';
 import CameraSwitchIcon from '../../../assets/icons/CameraSwitchIcon.svg';
 import { useBasicStore } from '../../../stores/basic';
 const basicStore = useBasicStore();
 const { isFrontCamera } = storeToRefs(basicStore);
-const roomEngine = useGetRoomEngine();
+const { deviceManager } = useDeviceManager();
 
 async function handleSwitchCamera() {
-  await roomEngine.instance?.switchCamera({ isFrontCamera: !isFrontCamera.value });
+  await deviceManager.instance?.switchCamera({ isFrontCamera: !isFrontCamera.value });
   basicStore.setIsFrontCamera(!isFrontCamera.value);
 }
 </script>

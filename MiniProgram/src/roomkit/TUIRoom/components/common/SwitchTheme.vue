@@ -9,7 +9,7 @@
 -->
 <template>
   <icon-button
-    v-if="visible"
+    v-if="visible && switchThemeConfig.visible"
     :title="t('Switch Theme')"
     :layout="IconButtonLayout.HORIZONTAL"
     :icon="SwitchThemeIcon"
@@ -26,9 +26,11 @@ import { watch } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
+import { roomService } from '../../services';
 const basicStore = useBasicStore();
 const { defaultTheme } = storeToRefs(basicStore);
 const { t } = useI18n();
+const [switchThemeConfig] = roomService.getComponentConfig(['SwitchTheme']);
 
 interface Props {
   visible?: boolean,
