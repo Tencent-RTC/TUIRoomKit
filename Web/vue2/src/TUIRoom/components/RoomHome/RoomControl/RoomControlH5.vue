@@ -237,6 +237,7 @@ onUnmounted(() => {
 </script>
 <style lang="scss" scoped>
 .control-container{
+    box-sizing: border-box;
     width: 100vw;
     height: 100%;
     display: flex;

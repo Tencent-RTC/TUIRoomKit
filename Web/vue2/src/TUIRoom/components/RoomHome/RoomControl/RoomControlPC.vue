@@ -83,18 +83,18 @@ import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import AudioMediaControl from '../../common/AudioMediaControl.vue';
 import VideoMediaControl from '../../common/VideoMediaControl.vue';
-import TUIRoomEngine, { TUIRoomEvents, TRTCDeviceType, TRTCVideoMirrorType, TRTCVideoRotation, TRTCDeviceState, TRTCVideoFillMode } from '@tencentcloud/tuiroom-engine-js';
+import TUIRoomEngine, { TUIRoomEvents, TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode, TUIRoomDeviceMangerEvents } from '@tencentcloud/tuiroom-engine-js';
 import '../../../directives/vClickOutside';
-import logger from '../../../utils/common/logger';
 import { isElectron } from '../../../utils/environment';
-import TUIMessageBox from '../../common/base/MessageBox/index';
 import { isEnumerateDevicesSupported, isGetUserMediaSupported } from '../../../utils/mediaAbility';
+import useDeviceManager from '../../../hooks/useDeviceManager';
 
 const roomStore = useRoomStore();
 const basicStore = useBasicStore();
 const {
   t,
 } = useRoomControl();
+const { deviceManager, initMediaDeviceList } = useDeviceManager({ listenForDeviceChange: true });
 
 const props = withDefaults(defineProps<{
   showLogo?: boolean,
@@ -198,8 +198,8 @@ function getRoomParam() {
   return tuiRoomParam;
 }
 
-const onUserVoiceVolume = (result: any) => {
-  audioVolume.value = result;
+const onUserVoiceVolume = (options: { volume: number }) => {
+  audioVolume.value = options.volume;
 };
 
 async function startStreamPreview() {
@@ -207,51 +207,19 @@ async function startStreamPreview() {
     return;
   }
   isCameraLoading.value = true;
-  const cameraList = await roomEngine.instance?.getCameraDevicesList();
-  const microphoneList = await roomEngine.instance?.getMicDevicesList();
-  const speakerList = await roomEngine.instance?.getSpeakerDevicesList();
 
-  const hasCameraDevice = cameraList && cameraList.length > 0;
-  const hasMicrophoneDevice = microphoneList && microphoneList.length > 0;
-  let alertMessage = '';
-  if (hasCameraDevice && !hasMicrophoneDevice) {
-    alertMessage = 'Microphone not detected on current device';
-  } else if (!hasCameraDevice && hasMicrophoneDevice) {
-    alertMessage = 'Camera not detected on current device';
-  } else if (!hasCameraDevice && !hasMicrophoneDevice) {
-    alertMessage = 'Camera And Microphone not detected on current device';
-  }
-  if (alertMessage) {
-    TUIMessageBox({
-      title: t('Note'),
-      message: t(alertMessage),
-      appendToRoomContainer: true,
-      confirmButtonText: t('Sure'),
-    });
-  }
-
-  cameraList && roomStore.setCameraList(cameraList);
-  microphoneList && roomStore.setMicrophoneList(microphoneList);
-  speakerList && roomStore.setSpeakerList(speakerList);
-  const cameraInfo = roomEngine.instance?.getCurrentCameraDevice();
-  const micInfo = roomEngine.instance?.getCurrentMicDevice();
-  const speakerInfo = roomEngine.instance?.getCurrentSpeakerDevice();
-  if (cameraInfo && cameraInfo.deviceId) {
-    roomStore.setCurrentCameraId(cameraInfo.deviceId);
-  }
-  if (micInfo && micInfo.deviceId) {
-    roomStore.setCurrentMicrophoneId(micInfo.deviceId);
-  }
-  if (speakerInfo && speakerInfo.deviceId) {
-    roomStore.setCurrentSpeakerId(speakerInfo.deviceId);
-  }
+  await initMediaDeviceList();
 
   if (!isGetUserMediaSupported) {
     isCameraLoading.value = false;
     return;
   }
-  hasMicrophoneDevice && openAudio();
-  hasCameraDevice && await openCamera();
+  if (roomStore.microphoneList && roomStore.microphoneList.length > 0) {
+    openAudio();
+  }
+  if (roomStore.cameraList && roomStore.cameraList.length > 0) {
+    await openCamera();
+  }
   isCameraLoading.value = false;
 }
 
@@ -289,53 +257,13 @@ function enterRoom() {
   emit('enter-room', String(roomId.value));
 }
 
-/**
- * Device changes: device switching, device plugging and unplugging events
- *
- * 设备变化：设备切换、设备插拔事件
- **/
-async function onDeviceChange(eventInfo: {deviceId: string, type: number, state: number}) {
-  const stateList = ['add', 'remove', 'active'];
-  const { deviceId, type, state } = eventInfo;
-  if (type === TRTCDeviceType.TRTCDeviceTypeMic) {
-    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: microphone, state: ${stateList[state]}`);
-    const deviceList = await roomEngine.instance?.getMicDevicesList();
-    roomStore.setMicrophoneList(deviceList);
-    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
-      roomStore.setCurrentMicrophoneId(deviceId);
-    }
-    return;
-  }
-  if (type === TRTCDeviceType.TRTCDeviceTypeSpeaker) {
-    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: speaker, state: ${stateList[state]}`);
-    const deviceList = await roomEngine.instance?.getSpeakerDevicesList();
-    roomStore.setSpeakerList(deviceList);
-    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
-      roomStore.setCurrentSpeakerId(deviceId);
-    }
-    return;
-  }
-  if (type === TRTCDeviceType.TRTCDeviceTypeCamera) {
-    logger.log(`onDeviceChange: deviceId: ${deviceId}, type: camera, state: ${stateList[state]}`);
-    const deviceList = await roomEngine.instance?.getCameraDevicesList();
-    roomStore.setCameraList(deviceList);
-    if (state === TRTCDeviceState.TRTCDeviceStateActive) {
-      roomStore.setCurrentCameraId(deviceId);
-    }
-  }
-}
-
 TUIRoomEngine.once('ready', () => {
   startStreamPreview();
-
   if (isElectron) {
     roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
   } else {
-    // 兼容没有打开音频前，roomEngine 没有抛出音量事件的问题
-    const trtcCloud = roomEngine.instance?.getTRTCCloud();
-    trtcCloud?.on('onTestMicVolume', onUserVoiceVolume);
+    deviceManager.instance?.on(TUIRoomDeviceMangerEvents.onTestMicVolume, onUserVoiceVolume);
   }
-  roomEngine.instance?.on(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 
 onBeforeUnmount(async () => {
@@ -345,10 +273,8 @@ onBeforeUnmount(async () => {
   if (isElectron) {
     roomEngine.instance?.off(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
   } else {
-    const trtcCloud = roomEngine.instance?.getTRTCCloud();
-    trtcCloud?.off('onTestMicVolume', onUserVoiceVolume);
+    deviceManager.instance?.off(TUIRoomDeviceMangerEvents.onTestMicVolume, onUserVoiceVolume);
   }
-  roomEngine.instance?.off(TUIRoomEvents.onDeviceChange, onDeviceChange);
 });
 </script>
 
@@ -387,6 +313,7 @@ onBeforeUnmount(async () => {
 }
 
 .control-container {
+  box-sizing: border-box;
   width: 760px;
   height: 544px;
   border-radius: 24px;

@@ -7,6 +7,7 @@ import {
   TUIUserInfo,
   TUIVideoQuality,
   TUIVideoStreamType,
+  TUIMediaDeviceType,
 } from '@tencentcloud/tuiroom-engine-js';
 import { useBasicStore } from './basic';
 import { isVue3 } from '../utils/constants';
@@ -90,6 +91,7 @@ interface RoomState {
   hasVideoStreamObject: Record<string, UserInfo>,
   currentStreamIdListInVisibleView: string[],
   hasOtherScreenShare: boolean,
+  isOnStateTabActive: boolean,
 }
 
 export const useRoomStore = defineStore('room', {
@@ -145,6 +147,7 @@ export const useRoomStore = defineStore('room', {
     // 可视区域用户流列表
     currentStreamIdListInVisibleView: [],
     hasOtherScreenShare: false,
+    isOnStateTabActive: true,
   }),
   getters: {
     isMaster(state) {
@@ -248,6 +251,7 @@ export const useRoomStore = defineStore('room', {
     userNumber(): number {
       return this.userList.length;
     },
+    anchorUserList: state => [state.localUser, ...Object.values(state.remoteUserObj)].filter(item => item.onSeat),
     applyToAnchorList: state => [...Object.values(state.remoteUserObj)]
       .filter(item => item.isUserApplyingToAnchor)
       .sort((item1, item2) => (item1?.applyToAnchorTimestamp || 0) - (item2?.applyToAnchorTimestamp || 0)) || [],
@@ -404,6 +408,8 @@ export const useRoomStore = defineStore('room', {
       leftList.forEach((seat) => {
         if (seat.userId === this.localUser.userId) {
           Object.assign(this.localUser, { onSeat: false });
+          const basicStore = useBasicStore();
+          basicStore.setIsOpenMic(false);
         } else {
           const user = this.remoteUserObj[seat.userId];
           user && Object.assign(user, { onSeat: false });
@@ -535,6 +541,21 @@ export const useRoomStore = defineStore('room', {
         }
       });
     },
+    setCurrentDeviceId(type: TUIMediaDeviceType, deviceId: string) {
+      switch (type) {
+        case TUIMediaDeviceType.kMediaDeviceTypeVideoCamera:
+          this.setCurrentCameraId(deviceId);
+          break;
+        case TUIMediaDeviceType.kMediaDeviceTypeAudioInput:
+          this.setCurrentMicrophoneId(deviceId);
+          break;
+        case TUIMediaDeviceType.kMediaDeviceTypeAudioOutput:
+          this.setCurrentSpeakerId(deviceId);
+          break;
+        default:
+          break;
+      }
+    },
     setCurrentCameraId(deviceId: string) {
       this.currentCameraId = deviceId;
     },
@@ -611,6 +632,21 @@ export const useRoomStore = defineStore('room', {
     },
     updateVideoQuality(quality: TUIVideoQuality) {
       this.localVideoQuality = quality;
+    },
+    setDeviceList(type: TUIMediaDeviceType, deviceList: {deviceId: string, deviceName: string}[]) {
+      switch (type) {
+        case TUIMediaDeviceType.kMediaDeviceTypeVideoCamera:
+          this.setCameraList(deviceList);
+          break;
+        case TUIMediaDeviceType.kMediaDeviceTypeAudioInput:
+          this.setMicrophoneList(deviceList);
+          break;
+        case TUIMediaDeviceType.kMediaDeviceTypeAudioOutput:
+          this.setSpeakerList(deviceList);
+          break;
+        default:
+          break;
+      }
     },
     setCameraList(deviceList: {deviceId: string, deviceName: string}[]) {
       this.cameraList = deviceList;
@@ -703,7 +739,12 @@ export const useRoomStore = defineStore('room', {
     setHasOtherScreenShare(hasScreenShare: boolean) {
       this.hasOtherScreenShare = hasScreenShare;
     },
+    setOnStageTabStatus(isOnStateTabActive: boolean) {
+      this.isOnStateTabActive = isOnStateTabActive;
+    },
     reset() {
+      const basicStore = useBasicStore();
+      basicStore.setIsOpenMic(false);
       this.localUser = {
         userId: '',
         userName: '',
@@ -752,6 +793,7 @@ export const useRoomStore = defineStore('room', {
       this.seatMode = TUISeatMode.kFreeToTake;
       this.hasVideoStreamObject = {};
       this.hasOtherScreenShare = false;
+      this.isOnStateTabActive = true;
     },
   },
 });
