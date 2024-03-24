@@ -22,11 +22,14 @@ class MicButton extends GetView<BottomViewController> {
                 width: 24,
                 height: 24,
               ),
-              selectedImage: Image.asset(
-                AssetsImages.roomMicOn,
-                package: 'rtc_conference_tui_kit',
+              selectedWidget: SizedBox(
                 width: 24,
                 height: 24,
+                child: VolumeBarWidget(
+                  lineWidth: 1,
+                  volume: RoomStore.to.currentUser.volume,
+                  imageName: AssetsImages.roomUnMuteAudio,
+                ),
               ),
               onPressed: () {
                 controller.muteAudioAction();

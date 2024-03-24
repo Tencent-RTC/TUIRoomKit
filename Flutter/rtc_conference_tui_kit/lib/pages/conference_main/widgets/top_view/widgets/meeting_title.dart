@@ -41,7 +41,7 @@ class MeetingTitleWidget extends GetView<TopViewController> {
                   ]),
               onTap: () {
                 controller.conferenceMainController.resetHideTimer();
-                Get.bottomSheet(const RoomInfoSheet());
+                showConferenceBottomSheet(const RoomInfoSheet());
               }),
           SizedBox(height: 5.0.scale375()),
           Obx(() => Text(controller.timerText.value,

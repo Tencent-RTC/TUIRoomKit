@@ -30,7 +30,7 @@ class UserTableWidget extends GetView<UserListController> {
                   child: ElevatedButton(
                     onPressed: () {
                       Get.back();
-                      Get.bottomSheet(const InviteSheetWidget());
+                      showConferenceBottomSheet(const InviteSheetWidget());
                     },
                     style: ButtonStyle(
                       backgroundColor:

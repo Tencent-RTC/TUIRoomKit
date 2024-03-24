@@ -62,7 +62,7 @@ class MoreButtonWidget extends GetView<BottomViewController> {
                   height: 24,
                 ),
                 onPressed: () {
-                  Get.bottomSheet(const InviteSheetWidget());
+                  showConferenceBottomSheet(const InviteSheetWidget());
                 },
                 isSelected: false.obs,
                 text: RoomContentsTranslations.translate('invite'),
@@ -89,7 +89,7 @@ class MoreButtonWidget extends GetView<BottomViewController> {
                   height: 24,
                 ),
                 onPressed: () {
-                  Get.bottomSheet(
+                  showConferenceBottomSheet(
                     const SettingWidget(),
                     isScrollControlled: true,
                   );

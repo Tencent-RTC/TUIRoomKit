@@ -7,6 +7,7 @@ import '../index.dart';
 class BottomButtonItemWidget extends GetView<BottomViewController> {
   final Image image;
   final Image? selectedImage;
+  final Widget? selectedWidget;
   final VoidCallback onPressed;
   final RxBool isSelected;
   final String text;
@@ -20,6 +21,7 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
     required this.image,
     required this.onPressed,
     this.selectedImage,
+    this.selectedWidget,
     required this.isSelected,
     this.text = "",
     this.selectedText,
@@ -49,7 +51,9 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Obx(() => isSelected.value ? selectedImage ?? image : image),
+              Obx(() => isSelected.value
+                  ? selectedImage ?? selectedWidget ?? image
+                  : image),
               const SizedBox(height: 5),
               if (text.isNotEmpty)
                 SizedBox(

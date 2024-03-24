@@ -91,45 +91,82 @@ _简体中文 | [English](README.md)_
     // login error
   }
   ```
+**参数说明**
+
+这里详细介绍一下 login 函数中所需要用到的几个关键参数：
+- **SDKAppID**：在 [开通服务](#开通服务) 中的第4步中您已经获取到，这里不再赘述。
+
+- **UserID**：当前用户的 ID，字符串类型，只允许包含英文字母（a-z 和 A-Z）、数字（0-9）、连词符（-）和下划线（_）。
+
+- **UserSig**：使用 [开通服务](#开通服务) 的第4步中获取的 SDKSecretKey 对 SDKAppID、UserID 等信息进行加密，就可以得到 UserSig，它是一个鉴权用的票据，用于腾讯云识别当前用户是否能够使用 TRTC 的服务。您可以通过控制台中的 [辅助工具](https://console.cloud.tencent.com/im/tool-usersig) 生成一个临时可用的 UserSig。
+
+
+   更多信息请参见 [如何计算及使用 UserSig](https://cloud.tencent.com/document/product/647/17275)。
+   
+
+> **注意：**
+> 
+>   - **这个步骤也是目前我们收到的开发者反馈最多的步骤，常见问题如下：**
+>   - `SDKAppID`设置错误，国内站的`SDKAppID`一般是以140开头的10位整数。
+>   - `UserSig`被错配成了加密密钥（`SDKSecretKey`），`UserSig`是用`SDKSecretKey`把`SDKAppID`、`UserID`以及过期时间等信息加密得来的，而不是直接把`SDKSecretKey`配置成`UserSig`。
+>   - `UserID`被设置成“1”、“123”、“111”等简单字符串，由于 **TUIRoomEngine不支持同一个 UserID 多端登录**，所以在多人协作开发时，形如 “1”、“123”、“111” 这样的`UserID`很容易被您的同事占用，导致登录失败，因此我们建议您在调试的时候设置一些辨识度高的`UserID`。
+>   - `Github`中的[示例代码](https://github.com/tencentyun/TUIRoomKit/blob/main/Flutter/room_flutter_example/lib/debug/generate_test_user_sig.dart)使用了`genTestUserSig`函数在本地计算 UserSig 是为了更快地让您跑通当前的接入流程，但该方案会将您的 `SDKSecretKey`暴露在 App 的代码当中，这并不利于您后续升级和保护您的 SDKSecretKey，所以我们强烈建议您将`UserSig`的计算逻辑放在服务端进行，并由 App 在每次使用`TUIRoomKit`组件时向您的服务器请求实时计算出的 UserSig。
+
 
 - 步骤四：使用 `rtc_conference_tui_kit` 组件
 
-  - 设置自己头像、昵称
+  - 设置自己头像、昵称（可选）
     ```dart
-    import 'package:rtc_conference_tui_kit/rtc_conference_tuikit.dart';
+    import 'package:rtc_room_engine/rtc_room_engine.dart';
 
-    var roomKit = TUIRoomKit.createInstance();
-    roomKit.setSelfInfo(userName, avatarURL);
+    TUIRoomEngine.setSelfInfo(userName, avatarURL);
     ```
 
-  - 创建房间
+  - 开始快速会议
     ```dart
-    import 'package:rtc_conference_tui_kit/rtc_conference_tuikit.dart';
+    import 'package:rtc_conference_tui_kit/rtc_conference_tui_kit.dart';
 
-    var roomKit = TUIRoomKit.createInstance();
-    TUIRoomInfo roomInfo = TUIRoomInfo(roomId: '您的roomId');
+    ConferenceSession.newInstance('roomId')   //您的room id
+      ..onActionSuccess = _quickStartSuccess
+      ..onActionError = _quickStartError
+      ..quickStart();
 
-    var result = await roomKit.createRoom(roomInfo);
-    if (result.code == TUIError.success) {
-        // create room success
-    } else {
-        // create room error
+    void _quickStartSuccess() {
+      //您可以在开始快速会议的成功回调中,自行导航至会议页面。
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConferenceMainPage(),
+        ),
+      );
+    }
+
+    void _quickStartError(ConferenceError error, String message) {
+      debugPrint("code: $error message: $message");
     }
     ```
 
-  - 加入房间(**调用该接口后会为您拉起UI界面进入房间**)
+  - 加入会议
     ```dart
-    import 'package:rtc_conference_tui_kit/rtc_conference_tuikit.dart';
+    import 'package:rtc_conference_tui_kit/rtc_conference_tui_kit.dart';
 
-    var roomKit = TUIRoomKit.createInstance();
-    var result = await roomKit.enterRoom('roomId',         // 您的room id
-                                         isOpenMicrophone, // 进房是否开启麦克风
-                                         isOpenCamera,     // 进房是否开启摄像头
-                                         userSpeaker);     // 进房是否使用扬声器播放声音
-    if (result.code == TUIError.success) {
-        // enter room success
-    } else {
-        // enter room success
+    ConferenceSession.newInstance('roomId')   //您的room id
+      ..onActionSuccess = _joinSuccess
+      ..onActionError = _joinError
+      ..join();
+
+    void _joinSuccess() {
+      //您可以在加入会议的成功回调中,自行导航至会议页面。
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConferenceMainPage(),
+        ),
+      );
+    }
+
+    void _joinError(ConferenceError error, String message) {
+      debugPrint("code: $error message: $message");
     }
     ```
 

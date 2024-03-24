@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:room_flutter_example/common/store/user.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
-import 'package:rtc_conference_tui_kit/rtc_conference_tuikit.dart';
-import 'package:rtc_room_engine/api/common/tui_common_define.dart';
+import 'package:rtc_conference_tui_kit/rtc_conference_tui_kit.dart';
 
 class EnterRoomController extends GetxController {
   EnterRoomController();
@@ -23,15 +22,21 @@ class EnterRoomController extends GetxController {
       return;
     }
     isOperating = true;
-    var roomKit = TUIRoomKit.createInstance();
-    var result = await roomKit.enterRoom(
-        roomIdController.text,
-        UserStore.to.openMicrophone.value,
-        UserStore.to.openCamera.value,
-        UserStore.to.userSpeaker.value);
+    ConferenceSession.newInstance(roomIdController.text)
+      ..isMuteMicrophone = !UserStore.to.openMicrophone.value
+      ..isOpenCamera = UserStore.to.openCamera.value
+      ..isSoundOnSpeaker = UserStore.to.userSpeaker.value
+      ..onActionSuccess = _enterRoomSuccess
+      ..onActionError = _enterRoomError
+      ..join();
     isOperating = false;
-    if (result.code != TUIError.success) {
-      makeToast(msg: result.message!);
-    }
+  }
+
+  void _enterRoomSuccess() {
+    Get.to(const ConferenceMainPage());
+  }
+
+  void _enterRoomError(ConferenceError error, String message) {
+    makeToast(msg: "code: $error message: $message");
   }
 }

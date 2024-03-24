@@ -68,7 +68,8 @@ class UserListWidget extends GetView<UserListController> {
                         ButtonItemWidget(
                           onPressed: () {
                             Get.back();
-                            Get.bottomSheet(const InviteSheetWidget());
+                            showConferenceBottomSheet(
+                                const InviteSheetWidget());
                           },
                           text: RoomContentsTranslations.translate('more'),
                           isSelected: false.obs,

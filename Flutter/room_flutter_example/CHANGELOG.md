@@ -1,3 +1,8 @@
+### 2.2.0(2024-03-22)
+
+- Changed the method of starting and joining conference to use `ConferenceSession`.
+- Upgraded rtc_conference_tui_kit dependencies.
+
 ### 2.1.0(2024-03-01)
 
 - Upgrade the dependencies of rtc_conference_tui_kit

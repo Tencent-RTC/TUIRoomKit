@@ -24,7 +24,7 @@ class BaseButtonWidget extends GetView<BottomViewController> {
                 height: 24,
               ),
               onPressed: () {
-                Get.bottomSheet(
+                showConferenceBottomSheet(
                   const UserListWidget(),
                   isScrollControlled: true,
                 );
@@ -45,11 +45,14 @@ class BaseButtonWidget extends GetView<BottomViewController> {
                   width: 24,
                   height: 24,
                 ),
-                selectedImage: Image.asset(
-                  AssetsImages.roomMicOn,
-                  package: 'rtc_conference_tui_kit',
+                selectedWidget: SizedBox(
                   width: 24,
                   height: 24,
+                  child: VolumeBarWidget(
+                    lineWidth: 1,
+                    volume: RoomStore.to.currentUser.volume,
+                    imageName: AssetsImages.roomUnMuteAudio,
+                  ),
                 ),
                 onPressed: () {
                   controller.muteAudioAction();
@@ -160,7 +163,7 @@ class BaseButtonWidget extends GetView<BottomViewController> {
                   height: 24,
                 ),
                 onPressed: () {
-                  Get.bottomSheet(const RaiseHandListWidget(),
+                  showConferenceBottomSheet(const RaiseHandListWidget(),
                       isScrollControlled: true);
                 },
                 isSelected: false.obs,
@@ -216,7 +219,7 @@ class BaseButtonWidget extends GetView<BottomViewController> {
                   height: 24,
                 ),
                 onPressed: () {
-                  Get.bottomSheet(const InviteSheetWidget());
+                  showConferenceBottomSheet(const InviteSheetWidget());
                 },
                 isSelected: false.obs,
                 text: RoomContentsTranslations.translate('invite'),
@@ -240,7 +243,7 @@ class BaseButtonWidget extends GetView<BottomViewController> {
                   height: 24,
                 ),
                 onPressed: () {
-                  Get.bottomSheet(
+                  showConferenceBottomSheet(
                     const SettingWidget(),
                     isScrollControlled: true,
                   );

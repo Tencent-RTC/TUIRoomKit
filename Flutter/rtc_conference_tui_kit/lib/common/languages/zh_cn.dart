@@ -145,4 +145,6 @@ const Map<String, String> roomContentsZhCN = {
   'stageMemberReachedLimit': '当前上台人数已达上限',
   'takeSeatInvitationTimeOut': '对xx的上台邀请已超时',
   'goOnStageTimeOut': '上台失败，邀请已超时',
+  'differentRoomIdTip': '请先退出当前会议，再进入其它会议',
+  'haveNotEnteredRoomTip': '您尚未加入会议',
 };

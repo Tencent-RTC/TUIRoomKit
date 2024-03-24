@@ -60,7 +60,8 @@ class TopViewWidget extends GetView<TopViewController> {
                     width: 20,
                     height: 20,
                   ),
-                  onPressed: () => {Get.bottomSheet(const ExitWidget())},
+                  onPressed: () =>
+                      {showConferenceBottomSheet(const ExitWidget())},
                   isSelected: false.obs,
                   text: RoomContentsTranslations.translate('exit'),
                 ),

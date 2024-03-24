@@ -57,7 +57,7 @@ class RaiseHandListWidget extends GetView<RaiseHandListController> {
                         style: RoomTheme.defaultTheme.elevatedButtonTheme.style,
                         onPressed: () {
                           Get.back();
-                          Get.bottomSheet(const UserListWidget(),
+                          showConferenceBottomSheet(const UserListWidget(),
                               isScrollControlled: true);
                         },
                         child: Text(

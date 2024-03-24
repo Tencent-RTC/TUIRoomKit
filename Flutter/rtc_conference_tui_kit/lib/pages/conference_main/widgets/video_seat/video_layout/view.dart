@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
+import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/video_seat/video_page_turning/index.dart';
 
 import 'index.dart';
 import 'widgets/widgets.dart';
@@ -24,9 +25,26 @@ class VideoLayoutWidget extends GetView<VideoLayoutController> {
 
   Widget _buildView() {
     if (isScreenLayout) {
-      return VideoItemWidget(
-        isScreenStream: true,
-        userModel: RoomStore.to.screenShareUser,
+      var videoPageTurningController = Get.find<VideoPageTurningController>();
+      return WithDraggableWindowWidget(
+        mainWidget: VideoItemWidget(
+          isScreenStream: true,
+          userModel: RoomStore.to.screenShareUser,
+        ),
+        draggableWidget: Obx(() {
+          return controller.isDraggableWidgetVisible.value &&
+                  videoPageTurningController.isVideoPageStop.value &&
+                  RoomStore.to.audioSetting.volumePrompt
+              ? SizedBox(
+                  width: 100.0,
+                  height: controller.speakingUser.value.hasVideoStream.value
+                      ? 180.0
+                      : 100.0,
+                  child:
+                      VideoItemWidget(userModel: controller.speakingUser.value),
+                )
+              : const SizedBox.shrink();
+        }),
       );
     } else if (isTwoUserLayout) {
       return Obx(
@@ -35,10 +53,17 @@ class VideoLayoutWidget extends GetView<VideoLayoutController> {
             userModel: userList[0],
           ),
           draggableWidget: userList.length == 2
-              ? VideoItemWidget(
-                  userModel: userList[1],
+              ? SizedBox(
+                  width: 100.0,
+                  height:
+                      (userList.length == 2 && userList[1].hasVideoStream.value)
+                          ? 180.0
+                          : 100.0,
+                  child: VideoItemWidget(
+                    userModel: userList[1],
+                  ),
                 )
-              : null,
+              : const SizedBox.shrink(),
           draggableWidgetHeight:
               (userList.length == 2 && userList[1].hasVideoStream.value)
                   ? 180.0

@@ -1,25 +1,38 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
+import 'package:rtc_conference_tui_kit/conference/conference_error.dart';
+import 'package:rtc_conference_tui_kit/conference/conference_observer.dart';
+import 'package:rtc_conference_tui_kit/conference/conference_params.dart';
+import 'package:rtc_conference_tui_kit/conference/conference_session.dart';
 import 'package:rtc_conference_tui_kit/manager/rtc_engine_manager.dart';
 import 'package:rtc_room_engine/rtc_room_engine.dart';
 
 import 'widgets/widgets.dart';
 
 class ConferenceMainController extends GetxController {
-  ConferenceMainController();
+  ConferenceMainController({
+    this.roomId,
+    this.isCreateRoom,
+    this.conferenceParams,
+    this.conferenceObserver,
+  });
+
+  final String? roomId;
+  final bool? isCreateRoom;
+  final ConferenceParams? conferenceParams;
+  final ConferenceObserver? conferenceObserver;
+
   bool isMicrophoneInviteDialogShow = false;
   bool isCameraInviteDialogShow = false;
-  late TUIRoomObserver observer;
-  var backRouteName = Get.arguments;
+  TUIRoomObserver? observer;
 
   Timer? _hideTimer;
   RxBool areWidgetsVisible = true.obs;
   int _hideDuration = 6;
-
-  late TopViewWidget topViewWidget;
-  late BottomViewWidget bottomWidget;
+  RxBool isEnteredRoom = false.obs;
 
   showDialog() {
     showConferenceDialog(
@@ -35,9 +48,17 @@ class ConferenceMainController extends GetxController {
   }
 
   @override
-  void onInit() {
-    topViewWidget = const TopViewWidget();
-    bottomWidget = const BottomViewWidget();
+  Future<void> onInit() async {
+    if (!Get.isRegistered<RoomStore>() || !RoomStore.to.isEnteredRoom) {
+      if (roomId == null || isCreateRoom == null) {
+        _showNotEnteredRoomDialog();
+        return;
+      }
+      await _enterConference(roomId!, isCreateRoom!, conferenceParams);
+    } else if (roomId != null && roomId != RoomStore.to.roomInfo.roomId) {
+      _showDifferentRoomIdDialog();
+    }
+    isEnteredRoom.value = RoomStore.to.isEnteredRoom;
     observer = TUIRoomObserver(
       onRequestReceived: (request) {
         switch (request.requestAction) {
@@ -61,9 +82,15 @@ class ConferenceMainController extends GetxController {
         }
       },
       onRoomDismissed: (roomId) {
+        conferenceObserver?.onConferenceFinished
+            ?.call(RoomStore.to.roomInfo.roomId);
+        RoomStore.to.clearStore();
         showExitRoomDialog(RoomContentsTranslations.translate('roomDestroyed'));
       },
       onKickedOutOfRoom: (roomId, reason, message) {
+        conferenceObserver?.onConferenceExited
+            ?.call(RoomStore.to.roomInfo.roomId);
+        RoomStore.to.clearStore();
         showExitRoomDialog(
             RoomContentsTranslations.translate('kickedOutOfRoom'));
       },
@@ -71,10 +98,18 @@ class ConferenceMainController extends GetxController {
         if (userId == RoomStore.to.currentUser.userId.value) {
           switch (role) {
             case TUIRole.roomOwner:
+              if (RoomStore.to.currentUser.userRole.value ==
+                  TUIRole.generalUser) {
+                RoomEngineManager().getSeatApplicationList();
+              }
               makeToast(
                   msg: RoomContentsTranslations.translate('haveBecomeOwner'));
               break;
             case TUIRole.administrator:
+              if (RoomStore.to.currentUser.userRole.value ==
+                  TUIRole.generalUser) {
+                RoomEngineManager().getSeatApplicationList();
+              }
               makeToast(
                   msg: RoomContentsTranslations.translate(
                       'haveBecomeAdministrator'));
@@ -85,9 +120,9 @@ class ConferenceMainController extends GetxController {
                 makeToast(
                     msg: RoomContentsTranslations.translate(
                         'revokedYourAdministrator'));
-                RoomStore.to.inviteSeatList.clear();
-                RoomStore.to.inviteSeatMap.clear();
               }
+              RoomStore.to.inviteSeatList.clear();
+              RoomStore.to.inviteSeatMap.clear();
               break;
             default:
               break;
@@ -97,20 +132,24 @@ class ConferenceMainController extends GetxController {
         }
       },
     );
-    RoomEngineManager().getRoomEngine().addObserver(observer);
+    RoomEngineManager().addObserver(observer!);
     super.onInit();
   }
 
   @override
   void onReady() {
-    resetHideTimer();
-    _hideDuration = 3;
+    if (isEnteredRoom.value) {
+      resetHideTimer();
+      _hideDuration = 3;
+    }
     super.onReady();
   }
 
   @override
   void onClose() {
-    RoomEngineManager().getRoomEngine().removeObserver(observer);
+    if (observer != null) {
+      RoomEngineManager().removeObserver(observer!);
+    }
     Get.delete<BottomViewController>(force: true);
     Get.delete<TopViewController>(force: true);
     super.onClose();
@@ -181,7 +220,11 @@ class ConferenceMainController extends GetxController {
       confirmText: RoomContentsTranslations.translate('ok'),
       confirmTextStyle: RoomTheme.defaultTheme.textTheme.labelMedium,
       onConfirm: () {
-        Get.until((route) => route.settings.name == backRouteName);
+        Get.key.currentState?.popUntil((route) {
+          return route.settings.name != '/dialog' &&
+              route.settings.name != '/bottom_sheet';
+        });
+        Get.back();
       },
       barrierDismissible: false,
     );
@@ -202,12 +245,78 @@ class ConferenceMainController extends GetxController {
   }
 
   void onMainViewClick() {
-    if (Get.find<BottomViewController>().isUnfold.value) {
+    if (!isEnteredRoom.value ||
+        Get.find<BottomViewController>().isUnfold.value) {
       return;
     }
     areWidgetsVisible.value = !areWidgetsVisible.value;
     if (areWidgetsVisible.value) {
       resetHideTimer();
     }
+  }
+
+  Future<void> _enterConference(String roomId, bool isCreateRoom,
+      ConferenceParams? conferenceParams) async {
+    ConferenceSession conferenceSession = ConferenceSession.newInstance(roomId);
+    if (conferenceParams != null) {
+      conferenceSession
+        ..isMuteMicrophone = conferenceParams.isMuteMicrophone
+        ..isOpenCamera = conferenceParams.isOpenCamera
+        ..isSoundOnSpeaker = conferenceParams.isSoundOnSpeaker;
+      if (isCreateRoom) {
+        conferenceSession
+          ..name = conferenceParams.name ?? roomId
+          ..enableCameraForAllUser = conferenceParams.enableCameraForAllUsers
+          ..enableMicrophoneForAllUser =
+              conferenceParams.enableMicrophoneForAllUsers
+          ..enableMessageForAllUser = conferenceParams.enableMessageForAllUsers
+          ..enableSeatControl = conferenceParams.enableSeatControl;
+      }
+    }
+    conferenceSession
+      ..onActionSuccess = () {
+        isEnteredRoom.value = true;
+        isCreateRoom
+            ? conferenceObserver?.onConferenceStarted
+                ?.call(roomId, ConferenceError.success)
+            : conferenceObserver?.onConferenceJoined
+                ?.call(roomId, ConferenceError.success);
+      }
+      ..onActionError = (error, code) {
+        isCreateRoom
+            ? conferenceObserver?.onConferenceStarted?.call(roomId, error)
+            : conferenceObserver?.onConferenceJoined?.call(roomId, error);
+      };
+
+    isCreateRoom
+        ? await conferenceSession.quickStart()
+        : await conferenceSession.join();
+  }
+
+  void _showNotEnteredRoomDialog() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showConferenceDialog(
+        title: RoomContentsTranslations.translate('haveNotEnteredRoomTip'),
+        confirmText: RoomContentsTranslations.translate('ok'),
+        onConfirm: () {
+          Get.back();
+          Get.back();
+        },
+        barrierDismissible: false,
+      );
+    });
+  }
+
+  void _showDifferentRoomIdDialog() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showConferenceDialog(
+        title: RoomContentsTranslations.translate('differentRoomIdTip'),
+        confirmText: RoomContentsTranslations.translate('ok'),
+        onConfirm: () {
+          Get.back();
+        },
+        barrierDismissible: false,
+      );
+    });
   }
 }

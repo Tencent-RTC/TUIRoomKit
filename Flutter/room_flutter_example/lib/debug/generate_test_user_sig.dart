@@ -5,7 +5,7 @@ import 'package:crypto/crypto.dart';
 class GenerateTestUserSig {
   /// Tencent Cloud `SDKAppID`. Set it to the `SDKAppID` of your account.
   ///
-  /// You can view your `SDKAppID` after creating an application in the [TRTC console](https://console.cloud.tencent.com/trtc).
+  /// You can view your `SDKAppID` after creating an application in the [TRTC console](https://console.trtc.io/).
   /// `SDKAppID` uniquely identifies a Tencent Cloud account.
   static int sdkAppId = 0;
 
@@ -17,13 +17,13 @@ class GenerateTestUserSig {
 
   /// Follow the steps below to obtain the key required for UserSig calculation.
   ///
-  /// Step 1. Log in to the [TRTC console](https://console.cloud.tencent.com/trtc), and create an application if you don’t have one.
+  /// Step 1. Log in to the [TRTC console](https://console.trtc.io/), and create an application if you don’t have one.
   /// Step 2. Find your application, click “Application Info”, and click the “Quick Start” tab.
   /// Step 3. Copy and paste the key to the code, as shown below.
   ///
   /// Note: this method is for testing only. Before commercial launch, please migrate the UserSig calculation code and key to your backend server to prevent key disclosure and traffic stealing.
-  /// Reference: https://cloud.tencent.com/document/product/647/17275#Server
-  static String secretKey = '';
+  /// Reference: https://trtc.io/document/35166
+  static String sdkSecretKey = '';
   static genTestSig(String userId) {
     int currTime = _getCurrentTime();
     String sig = '';
@@ -57,15 +57,20 @@ class GenerateTestUserSig {
     required int expire,
   }) {
     int sdkappid = sdkAppId;
-    String contentToBeSigned = "TLS.identifier:$identifier\nTLS.sdkappid:$sdkappid\nTLS.time:$currTime\nTLS.expire:$expire\n";
-    Hmac hmacSha256 = Hmac(sha256, utf8.encode(secretKey));
-    Digest hmacSha256Digest = hmacSha256.convert(utf8.encode(contentToBeSigned));
+    String contentToBeSigned =
+        "TLS.identifier:$identifier\nTLS.sdkappid:$sdkappid\nTLS.time:$currTime\nTLS.expire:$expire\n";
+    Hmac hmacSha256 = Hmac(sha256, utf8.encode(sdkSecretKey));
+    Digest hmacSha256Digest =
+        hmacSha256.convert(utf8.encode(contentToBeSigned));
     return base64.encode(hmacSha256Digest.bytes);
   }
 
   static String _escape({
     required String content,
   }) {
-    return content.replaceAll('+', '*').replaceAll('/', '-').replaceAll('=', '_');
+    return content
+        .replaceAll('+', '*')
+        .replaceAll('/', '-')
+        .replaceAll('=', '_');
   }
 }

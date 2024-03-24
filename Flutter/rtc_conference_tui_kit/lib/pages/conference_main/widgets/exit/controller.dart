@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
-import 'package:rtc_conference_tui_kit/common/store/room.dart';
+import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_conference_tui_kit/manager/rtc_engine_manager.dart';
+import 'package:rtc_conference_tui_kit/pages/conference_main/index.dart';
 import 'package:rtc_room_engine/api/common/tui_common_define.dart';
 import 'package:rtc_room_engine/api/room/tui_room_define.dart';
 
@@ -10,11 +11,13 @@ class ExitController extends GetxController {
   ExitController();
 
   final RoomEngineManager _engineManager = RoomEngineManager();
+  final conferenceMainController = Get.find<ConferenceMainController>();
 
   void exitRoomAction() async {
     if (isRoomOwner()) {
       if (RoomStore.to.userInfoList.length > 2) {
-        Get.bottomSheet(const TransferHostWidget(), isScrollControlled: true);
+        showConferenceBottomSheet(const TransferHostWidget(),
+            isScrollControlled: true);
       } else if (RoomStore.to.userInfoList.length == 2) {
         var nextOwnerId = RoomStore.to.userInfoList
             .firstWhere((element) =>
@@ -24,20 +27,27 @@ class ExitController extends GetxController {
         var result =
             await _engineManager.changeUserRole(nextOwnerId, TUIRole.roomOwner);
         if (result.code == TUIError.success) {
-          _engineManager.exitRoom();
-          Get.back();
+          _exitRoom();
         }
       } else {
         destroyRoomAction();
       }
       return;
     }
-    _engineManager.exitRoom();
-    Get.back();
+    _exitRoom();
   }
 
   void destroyRoomAction() {
+    conferenceMainController.conferenceObserver?.onConferenceFinished
+        ?.call(RoomStore.to.roomInfo.roomId);
     _engineManager.destroyRoom();
+    Get.back();
+  }
+
+  void _exitRoom() {
+    conferenceMainController.conferenceObserver?.onConferenceExited
+        ?.call(RoomStore.to.roomInfo.roomId);
+    _engineManager.exitRoom();
     Get.back();
   }
 

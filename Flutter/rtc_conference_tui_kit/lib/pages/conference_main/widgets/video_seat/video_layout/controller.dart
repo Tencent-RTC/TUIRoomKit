@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
@@ -10,6 +12,10 @@ class VideoLayoutController extends GetxController {
   final _top = 5.0.obs;
   final _isSwitchMainDraggableAndWindow = false.obs;
   final Map<String, int> _viewPtrMap = {};
+  late TUIRoomObserver _observer;
+  Timer? _speakingUserUpdateTimer;
+  RxBool isDraggableWidgetVisible = false.obs;
+  var speakingUser = UserModel().obs;
 
   double get rightPadding => _right.value;
   double get topPadding => _top.value;
@@ -19,6 +25,44 @@ class VideoLayoutController extends GetxController {
   set topPadding(double value) => _top.value = value;
   set isSwitchMainDraggableAndWindow(value) =>
       _isSwitchMainDraggableAndWindow.value = value;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _observer = TUIRoomObserver(
+      onUserVoiceVolumeChanged: (volumeMap) {
+        if (!RoomStore.to.isSharing.value ||
+            _speakingUserUpdateTimer?.isActive == true) {
+          return;
+        }
+        var speakingUserId = volumeMap.entries
+            .firstWhere(
+              (entry) => entry.value >= 10,
+              orElse: () => const MapEntry<String, int>('', -1),
+            )
+            .key;
+        if (speakingUserId.isEmpty) {
+          isDraggableWidgetVisible.value = false;
+          speakingUser.value = UserModel();
+          return;
+        }
+        speakingUser.value =
+            RoomStore.to.getUserById(speakingUserId) ?? UserModel();
+        isDraggableWidgetVisible.value = true;
+        _speakingUserUpdateTimer = Timer(const Duration(seconds: 5), () {});
+      },
+    );
+    RoomEngineManager().addObserver(_observer);
+  }
+
+  @override
+  void dispose() {
+    if (_speakingUserUpdateTimer != null) {
+      _speakingUserUpdateTimer!.cancel();
+    }
+    RoomEngineManager().removeObserver(_observer);
+    super.dispose();
+  }
 
   onPanUpdate(DragUpdateDetails details, double widgetWidth) {
     rightPadding = (rightPadding -= details.delta.dx)
