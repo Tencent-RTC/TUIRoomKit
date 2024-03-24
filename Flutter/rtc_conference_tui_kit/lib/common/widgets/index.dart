@@ -12,3 +12,4 @@ export './single_select_list.dart';
 export './toast.dart';
 export './user_info.dart';
 export './dialog.dart';
+export './volume_bar.dart';

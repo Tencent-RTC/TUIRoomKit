@@ -22,4 +22,5 @@ class UserModel {
   var ableSendingMessage = true.obs;
   var isOnSeat = false.obs;
   var isTalking = false.obs;
+  var volume = 0.obs;
 }

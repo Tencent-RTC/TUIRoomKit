@@ -13,7 +13,7 @@ class RoomColors {
   static const Color btnLightGrey = Color(0x4D4f586B);
   static const Color btnRed = Color(0xFFED414D);
   static const Color translucentLightBlack = Color(0x88121723);
-  static const Color fluorescentGreen = Color(0xffA5FE33);
+  static const Color fluorescentGreen = Color(0xFFA5FE33);
   static const Color grey = Color(0xff888888);
   static const Color dividerGrey = Color(0x4C4F586B);
   static const Color btnTextGrey = Color(0xFFB2BBD1);

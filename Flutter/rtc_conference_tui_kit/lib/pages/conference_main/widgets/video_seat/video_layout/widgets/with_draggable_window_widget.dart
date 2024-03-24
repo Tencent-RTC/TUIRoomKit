@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,19 +26,25 @@ class WithDraggableWindowWidget extends GetView<VideoLayoutController> {
           () => Positioned(
             right: controller.rightPadding,
             top: controller.topPadding,
-            child: GestureDetector(
-              onTap: () {},
-              onPanUpdate: (details) {
-                controller.onPanUpdate(details, draggableWidgetWidth);
+            child: RawGestureDetector(
+              gestures: {
+                CustomPanGestureRecognizer:
+                    GestureRecognizerFactoryWithHandlers<
+                        CustomPanGestureRecognizer>(
+                  () => CustomPanGestureRecognizer(),
+                  (CustomPanGestureRecognizer instance) {
+                    instance
+                      ..onUpdate = (details) {
+                        controller.onPanUpdate(details, draggableWidgetWidth);
+                      }
+                      ..onEnd = (details) {
+                        controller.onPanEnd(details, draggableWidgetWidth);
+                      };
+                  },
+                ),
               },
-              onPanEnd: (details) {
-                controller.onPanEnd(details, draggableWidgetWidth);
-              },
-              child: SizedBox(
-                width: draggableWidgetWidth,
-                height: draggableWidgetHeight,
-                child: draggableWidget,
-              ),
+              behavior: HitTestBehavior.opaque,
+              child: draggableWidget,
             ),
           ),
         ),
@@ -48,5 +55,13 @@ class WithDraggableWindowWidget extends GetView<VideoLayoutController> {
   @override
   Widget build(BuildContext context) {
     return _buildView();
+  }
+}
+
+class CustomPanGestureRecognizer extends PanGestureRecognizer {
+  @override
+  void addPointer(PointerDownEvent event) {
+    super.addPointer(event);
+    resolve(GestureDisposition.accepted);
   }
 }

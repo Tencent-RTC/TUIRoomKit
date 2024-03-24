@@ -105,6 +105,7 @@ Future<void> showConferenceDialog({
                         },
                         child: Text(
                           confirmText,
+                          textAlign: TextAlign.center,
                           style: confirmTextStyle ??
                               RoomTheme.defaultTheme.textTheme.displayMedium,
                         ),
@@ -119,5 +120,6 @@ Future<void> showConferenceDialog({
       ),
     ),
     barrierDismissible: barrierDismissible,
+    routeSettings: const RouteSettings(name: '/dialog'),
   );
 }

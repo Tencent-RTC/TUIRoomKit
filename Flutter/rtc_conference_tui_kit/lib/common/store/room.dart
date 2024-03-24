@@ -16,6 +16,7 @@ class RoomStore extends GetxController {
   VideoModel videoSetting = VideoModel();
   AudioModel audioSetting = AudioModel();
   int timeStampOnEnterRoom = 0;
+  bool isEnteredRoom = false;
 
   static const _seatIndex = -1;
   static const _reqTimeout = 0;
@@ -35,6 +36,7 @@ class RoomStore extends GetxController {
     inviteSeatList.clear();
     inviteSeatMap.clear();
     timeStampOnEnterRoom = 0;
+    isEnteredRoom = false;
     isMicItemTouchable = true.obs;
     isCameraItemTouchable = true.obs;
   }
@@ -184,7 +186,7 @@ class RoomStore extends GetxController {
   }
 
   void updateUserTalkingState(
-      String userId, bool isTalking, RxList<UserModel> destList) {
+      String userId, bool isTalking, RxList<UserModel> destList, int volume) {
     var index = getUserIndex(userId, destList);
     if (index == -1) {
       return;
@@ -194,6 +196,11 @@ class RoomStore extends GetxController {
       return;
     }
     destList[index].isTalking.value = isTalking;
+    destList[index].volume.value = volume;
+
+    if (userId == currentUser.userId.value) {
+      currentUser.volume.value = volume;
+    }
   }
 
   void updateUserSeatedState(String userId, bool isOnSeat) {

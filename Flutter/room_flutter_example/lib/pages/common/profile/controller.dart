@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:room_flutter_example/common/index.dart';
-import 'package:rtc_conference_tui_kit/rtc_conference_tuikit.dart';
+import 'package:rtc_room_engine/rtc_room_engine.dart';
 
 class ProfileController extends GetxController {
   ProfileController();
@@ -39,8 +39,7 @@ class ProfileController extends GetxController {
     }
     UserStore.to.userModel.userName = userNameController.text;
     UserStore.to.saveUserModel();
-    var roomKit = TUIRoomKit.createInstance();
-    roomKit.setSelfInfo(
+    TUIRoomEngine.setSelfInfo(
         UserStore.to.userModel.userName, UserStore.to.userModel.avatarURL);
     Get.toNamed(RouteNames.commonMain);
   }

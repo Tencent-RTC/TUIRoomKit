@@ -7,7 +7,6 @@ import 'package:rtc_conference_tui_kit/event/room_event_handler.dart';
 import 'package:rtc_conference_tui_kit/platform/rtc_conference_tuikit_platform_interface.dart';
 import 'package:rtc_room_engine/rtc_room_engine.dart';
 import 'package:tencent_trtc_cloud/trtc_cloud.dart';
-import 'package:tencent_trtc_cloud/trtc_cloud_def.dart';
 
 class RoomEngineManager {
   static const _seatIndex = -1;
@@ -75,7 +74,9 @@ class RoomEngineManager {
     _setFramework();
     TUIValueCallBack<TUIRoomInfo> result = await _roomEngine.enterRoom(roomId);
     if (result.code == TUIError.success) {
+      _decideMediaStatus(enableMic, enableCamera, isSoundOnSpeaker);
       RoomStore.to.roomInfo = result.data!;
+      RoomStore.to.isEnteredRoom = true;
       RoomStore.to.timeStampOnEnterRoom = DateTime.now().millisecondsSinceEpoch;
       await _getUserList();
       await RoomStore.to.initialCurrentUser();
@@ -180,19 +181,19 @@ class RoomEngineManager {
     _roomEngine.closeLocalCamera();
   }
 
-  Future<int?> switchCamera() {
+  void switchCamera() {
     RoomStore.to.videoSetting.isFrontCamera =
         !RoomStore.to.videoSetting.isFrontCamera;
-    return _roomEngine.switchCamera(RoomStore.to.videoSetting.isFrontCamera);
+    _roomEngine
+        .getMediaDeviceManager()
+        .switchCamera(RoomStore.to.videoSetting.isFrontCamera);
   }
 
-  Future<void> setAudioRoute(bool isSoundOnSpeaker) async {
+  void setAudioRoute(bool isSoundOnSpeaker) {
     RoomStore.to.audioSetting.isSoundOnSpeaker.value = isSoundOnSpeaker;
-    int route = isSoundOnSpeaker
-        ? TRTCCloudDef.TRTC_AUDIO_ROUTE_SPEAKER
-        : TRTCCloudDef.TRTC_AUDIO_ROUTE_EARPIECE;
-    var trtcCloud = (await TRTCCloud.sharedInstance())!;
-    return trtcCloud.getDeviceManager().setAudioRoute(route);
+    TUIAudioRoute route =
+        isSoundOnSpeaker ? TUIAudioRoute.speakerphone : TUIAudioRoute.earpiece;
+    return _roomEngine.getMediaDeviceManager().setAudioRoute(route);
   }
 
   Future<TUIActionCallback> muteAllAudioAction(bool isMute) async {
@@ -330,5 +331,78 @@ class RoomEngineManager {
 
   void kickUserOffSeat(int seatIndex, String userId) {
     _roomEngine.kickUserOffSeatByAdmin(seatIndex, userId);
+  }
+
+  void addObserver(TUIRoomObserver observer) {
+    _roomEngine.addObserver(observer);
+  }
+
+  void removeObserver(TUIRoomObserver observer) {
+    _roomEngine.removeObserver(observer);
+  }
+
+  Future<void> getSeatApplicationList() async {
+    var result = await _roomEngine.getSeatApplicationList();
+    if (result.code == TUIError.success) {
+      List<TUIRequest> applicationList = result.data ?? <TUIRequest>[];
+      for (var request in applicationList) {
+        var userModel = RoomStore.to.getUserById(request.userId) ?? UserModel();
+        RoomStore.to.addInviteSeatUser(userModel, request);
+      }
+    }
+  }
+
+  Future<void> _decideMediaStatus(
+      bool enableMic, bool enableCamera, bool isSoundOnSpeaker) async {
+    setAudioRoute(isSoundOnSpeaker);
+    if (RoomStore.to.roomInfo.isSeatEnabled &&
+        RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake &&
+        RoomStore.to.roomInfo.ownerId !=
+            RoomStore.to.currentUser.userId.value) {
+      return;
+    }
+    var hasPermission = await Permission.microphone.isGranted;
+    var isPushAudio = _isPushAudio(enableMic);
+
+    if (hasPermission) {
+      if (!isPushAudio) {
+        muteLocalAudio();
+      }
+      openLocalMicrophone().then((value) => _decideCameraStatus(enableCamera));
+    } else {
+      if (isPushAudio) {
+        openLocalMicrophone()
+            .then((value) => _decideCameraStatus(enableCamera));
+      } else {
+        _decideCameraStatus(enableCamera);
+      }
+    }
+  }
+
+  bool _isPushAudio(bool enableMic) {
+    if (!enableMic) {
+      return false;
+    }
+    if (_isOwner()) {
+      return true;
+    }
+    if (!RoomStore.to.roomInfo.isMicrophoneDisableForAllUser) {
+      return true;
+    }
+    return false;
+  }
+
+  void _decideCameraStatus(bool enableCamera) {
+    if (!enableCamera) {
+      return;
+    }
+    if (RoomStore.to.roomInfo.isCameraDisableForAllUser && !_isOwner()) {
+      return;
+    }
+    openLocalCamera();
+  }
+
+  bool _isOwner() {
+    return RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner;
   }
 }

@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_room_engine/api/room/tui_room_define.dart';
 
-import 'widgets.dart';
-
 class VideoUserInfoWidget extends StatelessWidget {
   final UserModel userModel;
   const VideoUserInfoWidget({super.key, required this.userModel});
@@ -46,8 +44,13 @@ class VideoUserInfoWidget extends StatelessWidget {
           SizedBox(
             width: 14,
             height: 14,
-            child: VolumeBarWidget(
-              userModel: userModel,
+            child: Obx(
+              () => userModel.hasAudioStream.value
+                  ? VolumeBarWidget(volume: userModel.volume)
+                  : Image.asset(
+                      AssetsImages.roomNoVolumeBg,
+                      package: 'rtc_conference_tui_kit',
+                    ),
             ),
           ),
           const SizedBox(

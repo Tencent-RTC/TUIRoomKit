@@ -69,7 +69,7 @@ class VideoSettingWidget extends GetView<SettingController> {
             title: RoomContentsTranslations.translate('videoResolution'),
             child: InkWell(
               onTap: () {
-                Get.bottomSheet(
+                showConferenceBottomSheet(
                   BottomSheetWidget(
                     width: double.infinity,
                     height: Get.height * 0.88,
@@ -107,7 +107,7 @@ class VideoSettingWidget extends GetView<SettingController> {
             title: RoomContentsTranslations.translate('videoFps'),
             child: InkWell(
               onTap: () {
-                Get.bottomSheet(
+                showConferenceBottomSheet(
                   BottomSheetWidget(
                     width: double.infinity,
                     height: Get.height * 0.88,

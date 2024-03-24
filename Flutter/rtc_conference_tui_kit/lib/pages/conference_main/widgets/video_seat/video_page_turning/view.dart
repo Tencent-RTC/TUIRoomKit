@@ -17,6 +17,7 @@ class VideoPageTurningPage extends GetView<VideoPageTurningController> {
         Expanded(
           child: Obx(
             () => PageView.builder(
+              controller: controller.pageController,
               onPageChanged: (value) {
                 controller.currentIndex = value;
               },

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_room_engine/rtc_room_engine.dart';
 
@@ -10,6 +11,29 @@ class VideoPageTurningController extends GetxController {
   final _currentIndex = 0.obs;
   int get currentIndex => _currentIndex.value;
   set currentIndex(int value) => _currentIndex.value = value;
+  RxBool isVideoPageStop = true.obs;
+
+  PageController pageController = PageController();
+
+  @override
+  void onReady() {
+    pageController.position.isScrollingNotifier.addListener(_handleScrolling);
+  }
+
+  @override
+  void onClose() {
+    pageController.removeListener(_handleScrolling);
+    pageController.dispose();
+    super.onClose();
+  }
+
+  void _handleScrolling() {
+    if (pageController.position.isScrollingNotifier.value) {
+      isVideoPageStop.value = false;
+    } else if (pageController.page! % 1 == 0) {
+      isVideoPageStop.value = true;
+    }
+  }
 
   int getStartIndex(int pageIndex) {
     return pageIndex * pageSize;

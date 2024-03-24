@@ -14,10 +14,10 @@ PODS:
     - Flutter
   - rtc_conference_tui_kit (0.0.1):
     - Flutter
-  - rtc_room_engine (2.1.0):
+  - rtc_room_engine (2.2.0):
     - Flutter
-    - RTCRoomEngine/Professional (= 2.1.0)
-  - RTCRoomEngine/Professional (2.1.0):
+    - RTCRoomEngine/Professional (= 2.2.0)
+  - RTCRoomEngine/Professional (2.2.0):
     - TXIMSDK_Plus_iOS (>= 7.7.5294)
     - TXLiteAVSDK_Professional
   - shared_preferences_foundation (0.0.1):
@@ -26,13 +26,13 @@ PODS:
   - tencent_trtc_cloud (10.7):
     - Flutter
     - TXCustomBeautyProcesserPlugin (= 1.0.2)
-    - TXLiteAVSDK_Professional (~> 11.6.15007)
+    - TXLiteAVSDK_Professional (~> 11.4.14445)
   - Toast (4.1.0)
   - TXCustomBeautyProcesserPlugin (1.0.2)
-  - TXIMSDK_Plus_iOS (7.8.5483)
-  - TXLiteAVSDK_Professional (11.6.15041):
-    - TXLiteAVSDK_Professional/Professional (= 11.6.15041)
-  - TXLiteAVSDK_Professional/Professional (11.6.15041)
+  - TXIMSDK_Plus_iOS (7.8.5505)
+  - TXLiteAVSDK_Professional (11.4.14571):
+    - TXLiteAVSDK_Professional/Professional (= 11.4.14571)
+  - TXLiteAVSDK_Professional/Professional (11.4.14571)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -77,21 +77,21 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/tencent_trtc_cloud/ios"
 
 SPEC CHECKSUMS:
-  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   fluttertoast: 31b00dabfa7fb7bacd9e7dbee580d7a2ff4bf265
   open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
-  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
+  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   replay_kit_launcher: 828739da18c9785d5e9aafd4f075ea11d6b61499
   rtc_conference_tui_kit: e6a8fb13894a30ecdfb180e3e6997df20e4d202d
-  rtc_room_engine: caaa467d95ab77fb495da93c45eba695d77933dc
-  RTCRoomEngine: 8f0fde6a9537727d82388d1403b4c3de2ed9783c
-  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
-  tencent_trtc_cloud: 2dae072f1a50fae1c3d42597a09f5ee05d5d2979
+  rtc_room_engine: fc352fce05b4dfd2feb57768e931cbb424ca62fe
+  RTCRoomEngine: 773b6b3b877da3773c19fd9a86b22f63c8684ad3
+  shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
+  tencent_trtc_cloud: 8b55aa23005a77db473cdbc13841a4b13b261946
   Toast: ec33c32b8688982cecc6348adeae667c1b9938da
   TXCustomBeautyProcesserPlugin: 099393b941cb40eda12b3a80bf6c0319957b1cfd
-  TXIMSDK_Plus_iOS: 9559f6aebc6d69314521d17235bdb3ab58599be3
-  TXLiteAVSDK_Professional: 1a4712d9ad3c80338207efa2327085d3a2488c5f
+  TXIMSDK_Plus_iOS: 753908b8ad2fd7dfac36fe0e9d12485493fbb6a7
+  TXLiteAVSDK_Professional: d4db8d4ee81a7dc5d653b72b44463322bbe58f24
 
 PODFILE CHECKSUM: f1c82f10837f8fdf27aee12401554c9539720e1f
 

@@ -80,11 +80,12 @@ class RoomEventHandler extends TUIRoomObserver {
           isTalking = true;
         }
 
-        _store.updateUserTalkingState(userId, isTalking, _store.userInfoList);
+        _store.updateUserTalkingState(
+            userId, isTalking, _store.userInfoList, volume);
         if (_store.roomInfo.isSeatEnabled == true &&
             _store.roomInfo.seatMode == TUISeatMode.applyToTake) {
           _store.updateUserTalkingState(
-              userId, isTalking, _store.seatedUserList);
+              userId, isTalking, _store.seatedUserList, volume);
         }
       });
     };
@@ -157,14 +158,6 @@ class RoomEventHandler extends TUIRoomObserver {
 
     super.onKickedOffSeat = (userId) {
       makeToast(msg: RoomContentsTranslations.translate('kickedOffSeat'));
-    };
-
-    super.onKickedOutOfRoom = (roomId, reason, message) {
-      _store.clearStore();
-    };
-
-    super.onRoomDismissed = (roomId) {
-      _store.clearStore();
     };
   }
 }

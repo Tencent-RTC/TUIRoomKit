@@ -1,5 +1,17 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
+
+Future<void> showConferenceBottomSheet(
+  Widget bottomSheet, {
+  bool isScrollControlled = false,
+}) {
+  return Get.bottomSheet(
+    bottomSheet,
+    isScrollControlled: isScrollControlled,
+    settings: const RouteSettings(name: '/bottom_sheet'),
+  );
+}
 
 class BottomSheetWidget extends StatelessWidget {
   final Widget child;

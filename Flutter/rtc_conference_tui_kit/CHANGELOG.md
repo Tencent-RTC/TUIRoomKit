@@ -1,3 +1,11 @@
+### 2.2.0(2024-03-22)
+
+- Renamed **rtc_conference_tuikit.dart** to **rtc_conference_tui_kit.dart**.
+- Added dynamic volume display on the user's microphone button and the microphone icon below the video screen.
+- Displayed the person speaking in the top-right corner while watching screen sharing.
+- Deprecated `TUIRoomKit`, use `ConferenceSession` instead. After starting a quick meeting or joining a meeting, you can control the route navigation to the conference page(`ConferenceMainPage`) on your own. For more details, please refer to README.md.
+- Upgraded rtc_room_engine dependencies.
+
 ### 2.1.0(2024-03-01)
 
 - Fix the issue where the on-stage management list does not refresh for other administrators after a stage application is rejected

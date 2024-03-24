@@ -2,8 +2,7 @@ import 'dart:math';
 import 'package:get/get.dart';
 import 'package:room_flutter_example/common/index.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
-import 'package:rtc_conference_tui_kit/rtc_conference_tuikit.dart';
-import 'package:rtc_room_engine/rtc_room_engine.dart';
+import 'package:rtc_conference_tui_kit/rtc_conference_tui_kit.dart';
 
 class CreateRoomController extends GetxController {
   var isOperating = false;
@@ -11,8 +10,7 @@ class CreateRoomController extends GetxController {
   final int numberOfDigits = 6;
   RxString roomTypeString = 'freeToSpeakRoom'.tr.obs;
   RxString chooseSpeechMode = 'freeToSpeakRoom'.obs;
-  var _isSeatEnabled = false;
-  var _takeSeatMode = TUISeatMode.freeToTake;
+  var _isSeatControlEnable = false;
 
   void cancelAction() {
     Get.back();
@@ -20,12 +18,10 @@ class CreateRoomController extends GetxController {
 
   void sureAction() {
     if (chooseSpeechMode.value == 'freeToSpeakRoom') {
-      _isSeatEnabled = false;
-      _takeSeatMode = TUISeatMode.freeToTake;
+      _isSeatControlEnable = false;
       roomTypeString.value = 'freeToSpeakRoom'.tr;
     } else {
-      _isSeatEnabled = true;
-      _takeSeatMode = TUISeatMode.applyToTake;
+      _isSeatControlEnable = true;
       roomTypeString.value = 'applyToSpeakRoom'.tr;
     }
     Get.back();
@@ -44,27 +40,24 @@ class CreateRoomController extends GetxController {
     if (isOperating) {
       return;
     }
-
-    var roomKit = TUIRoomKit.createInstance();
-    TUIRoomInfo roomInfo = TUIRoomInfo(roomId: _getRoomId());
-    roomInfo.name = UserStore.to.userModel.userName;
-    roomInfo.isSeatEnabled = _isSeatEnabled;
-    roomInfo.seatMode = _takeSeatMode;
     isOperating = true;
-    var createRoomResult = await roomKit.createRoom(roomInfo);
-    if (createRoomResult.code == TUIError.success) {
-      var enterRoomResult = await roomKit.enterRoom(
-          roomInfo.roomId,
-          UserStore.to.openMicrophone.value,
-          UserStore.to.openCamera.value,
-          UserStore.to.userSpeaker.value);
-
-      if (enterRoomResult.code != TUIError.success) {
-        makeToast(msg: enterRoomResult.message!);
-      }
-    } else {
-      makeToast(msg: createRoomResult.message!);
-    }
+    ConferenceSession.newInstance(_getRoomId())
+      ..name = UserStore.to.userModel.userName
+      ..enableSeatControl = _isSeatControlEnable
+      ..isMuteMicrophone = !UserStore.to.openMicrophone.value
+      ..isOpenCamera = UserStore.to.openCamera.value
+      ..isSoundOnSpeaker = UserStore.to.userSpeaker.value
+      ..onActionSuccess = _createRoomSuccess
+      ..onActionError = _createRoomError
+      ..quickStart();
     isOperating = false;
+  }
+
+  void _createRoomSuccess() {
+    Get.to(const ConferenceMainPage());
+  }
+
+  void _createRoomError(ConferenceError error, String message) {
+    makeToast(msg: "code: $error message: $message");
   }
 }

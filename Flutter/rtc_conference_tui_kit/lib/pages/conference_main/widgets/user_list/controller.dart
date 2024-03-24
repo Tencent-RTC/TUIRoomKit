@@ -11,7 +11,6 @@ class UserListController extends GetxController {
 
   var store = RoomStore.to;
   final RoomEngineManager _engineManager = RoomEngineManager();
-  late TUIRoomEngine _roomEngine;
   late TUIRoomObserver observer;
   RxList<UserModel> searchResults = RxList<UserModel>();
   RxBool isSearchBarEmpty = true.obs;
@@ -22,7 +21,6 @@ class UserListController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _roomEngine = _engineManager.getRoomEngine();
     addObserver();
   }
 
@@ -35,7 +33,7 @@ class UserListController extends GetxController {
         isAllCameraDisable.value = isDisable;
       },
     );
-    _roomEngine.addObserver(observer);
+    _engineManager.addObserver(observer);
   }
 
   void muteAllAudioAction() {
@@ -236,8 +234,6 @@ class UserListController extends GetxController {
           makeToast(
               msg: RoomContentsTranslations.translate('haveTransferredOwner')
                   .replaceAll('xx', userModel.userName.value));
-          RoomStore.to.inviteSeatList.clear();
-          RoomStore.to.inviteSeatMap.clear();
         }
       },
     );
@@ -292,7 +288,7 @@ class UserListController extends GetxController {
 
   @override
   void onClose() {
-    _roomEngine.removeObserver(observer);
+    _engineManager.removeObserver(observer);
     super.onClose();
   }
 
