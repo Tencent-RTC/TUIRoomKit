@@ -21,7 +21,7 @@ class RaiseHandApplicationListViewModel: NSObject {
     var roomInfo: TUIRoomInfo {
         EngineManager.createInstance().store.roomInfo
     }
-    var inviteSeatList: [UserEntity] = []
+    var inviteSeatList: [RequestEntity] = []
     
     override init() {
         super.init()
@@ -30,11 +30,10 @@ class RaiseHandApplicationListViewModel: NSObject {
     }
     
     func allAgreeStageAction(sender: UIButton, view: RaiseHandApplicationListView) {
-        for userInfo in engineManager.store.inviteSeatList {
-            guard let requestId = engineManager.store.inviteSeatMap[userInfo.userId] else { continue }
-            engineManager.responseRemoteRequest(requestId, agree: true) { [weak self] in
+        for requestEntity in engineManager.store.inviteSeatList {
+            engineManager.responseRemoteRequest(requestEntity.requestId, agree: true) { [weak self] in
                 guard let self = self else { return }
-                self.engineManager.deleteInviteSeatUser(userInfo.userId)
+                self.engineManager.store.deleteTakeSeatRequest(requestId: requestEntity.requestId)
                 self.reloadApplyListView()
             } onError: { _, _ in
                 debugPrint("")
@@ -43,15 +42,13 @@ class RaiseHandApplicationListViewModel: NSObject {
     }
     
     func inviteMemberAction(sender: UIButton, view: RaiseHandApplicationListView) {
-        RoomRouter.shared.dismissPopupViewController(viewType: .raiseHandApplicationListViewType)
         RoomRouter.shared.presentPopUpViewController(viewType: .userListViewType, height: 720.scale375Height())
     }
     
-    func agreeStageAction(sender: UIButton, isAgree: Bool, userId: String) {
-        guard let requestId = engineManager.store.inviteSeatMap[userId] else { return }
-        engineManager.responseRemoteRequest(requestId, agree: isAgree) { [weak self] in
+    func respondRequest(isAgree: Bool, request: RequestEntity) {
+        engineManager.responseRemoteRequest(request.requestId, agree: isAgree) { [weak self] in
             guard let self = self else { return }
-            self.engineManager.deleteInviteSeatUser(userId)
+            self.engineManager.store.deleteTakeSeatRequest(requestId: request.requestId)
             self.reloadApplyListView()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
@@ -66,7 +63,7 @@ class RaiseHandApplicationListViewModel: NSObject {
     }
     
     func backAction() {
-        RoomRouter.shared.dismissPopupViewController(viewType: .raiseHandApplicationListViewType)
+        RoomRouter.shared.dismissPopupViewController()
     }
     
     deinit {

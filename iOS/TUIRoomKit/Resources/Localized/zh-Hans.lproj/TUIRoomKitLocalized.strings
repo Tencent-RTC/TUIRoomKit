@@ -210,3 +210,4 @@
 "TUIRoom.on.stage" = "xx已上台";
 "TUIRoom.on.stage.number.reached.limit" = "当前上台人数已达上限";
 "TUIRoom.go.on.stage.timed.out" = "上台失败，邀请已超时";
+"TUIRoom.kiecked.off.line" = "您已在其它地方登录";

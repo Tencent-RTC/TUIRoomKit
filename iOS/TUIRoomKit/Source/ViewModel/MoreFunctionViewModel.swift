@@ -54,12 +54,11 @@ class MoreFunctionViewModel {
     
     func settingAction(sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        RoomRouter.shared.dismissPopupViewController(viewType: .moreViewType)
         RoomRouter.shared.presentPopUpViewController(viewType: .mediaSettingViewType, height: 300.scale375())
     }
     
     func chatAction(sender: UIButton) {
-        RoomRouter.shared.dismissPopupViewController(viewType: .moreViewType)
+        RoomRouter.shared.dismissPopupViewController()
         let user = engineManager.store.currentUser
         let roomInfo = engineManager.store.roomInfo
         RoomRouter.shared.pushToChatController(user: user, roomInfo: roomInfo)

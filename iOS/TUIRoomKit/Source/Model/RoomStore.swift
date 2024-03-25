@@ -17,18 +17,18 @@ class RoomStore: NSObject {
     var roomInfo: TUIRoomInfo = TUIRoomInfo()
     var videoSetting: VideoModel = VideoModel()
     var audioSetting: AudioModel = AudioModel()
-    var attendeeList: [UserEntity] = []//用户列表
-    var seatList: [UserEntity] = []// 已经上麦的用户列表
-    var inviteSeatList: [UserEntity] = []//申请上麦的用户列表（针对举手发言房间）
-    var inviteSeatMap: [String:String] = [:]
-    var isEnteredRoom: Bool = false //是否已经进入房间
-    var timeStampOnEnterRoom: Int = 0 //进入会议的时间戳
-    var isShowRoomMainViewAutomatically: Bool = true //true 调用createRoom或者enterRoom会自动进入主界面; false 需要调用 showRoomMainView 才能进入主界面。
-    var isImAccess: Bool = false //是否由IM进入的TUIRoomKit
-    var selfTakeSeatRequestId: String? //自己进行上台申请的id
+    var attendeeList: [UserEntity] = []        // User list
+    var seatList: [UserEntity] = []            // List of users who have taken the stage
+    var inviteSeatList: [RequestEntity] = []   // List of users who apply to be on stage
+    var isEnteredRoom: Bool = false
+    var timeStampOnEnterRoom: Int = 0          // Timestamp of entering the meeting
+    var isImAccess: Bool = false               // Whether TUIRoomKit is entered by IM
+    var selfTakeSeatRequestId: String?         // Self ID for applying on stage
     private let openCameraKey = "isOpenCamera"
     private let openMicrophoneKey = "isOpenMicrophone"
     private let shownRaiseHandNoticeKey = "isShownRaiseHandNotice"
+    weak var conferenceObserver: ConferenceObserver?
+    
     var isOpenMicrophone: Bool {
         didSet {
             UserDefaults.standard.set(isOpenMicrophone, forKey: openMicrophoneKey)
@@ -112,22 +112,25 @@ class RoomStore: NSObject {
         userItem.disableSendingMessage = isDisable
     }
     
-    func deleteTakeSeatRequest(requestId: String, userId: String) {
-        var userId = userId
-        inviteSeatMap.forEach { (key, value) in
-            if value == requestId {
-                userId = key
-            }
+    func deleteTakeSeatRequest(requestId: String) {
+        inviteSeatList = inviteSeatList.filter { requestItem in
+            requestItem.requestId != requestId
         }
-        deleteInviteSeatItem(userId: userId)
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
     
-    func deleteInviteSeatItem(userId: String) {
-        inviteSeatList = inviteSeatList.filter { userModel in
-            userModel.userId != userId
+    func deleteInviteSeatUser(_ userId: String) {
+        inviteSeatList = inviteSeatList.filter { requestItem in
+            requestItem.userId != userId
         }
-        inviteSeatMap.removeValue(forKey: userId)
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+    }
+    
+    func addInviteSeatUser(request: TUIRequest) {
+        guard !inviteSeatList.contains(where: { $0.userId == request.userId }) else { return }
+        let requestEntity = RequestEntity(requestId: request.requestId, userId: request.userId)
+        inviteSeatList.append(requestEntity)
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
     
     private func getUserItem(_ userId: String) -> UserEntity? {
@@ -136,6 +139,27 @@ class RoomStore: NSObject {
     
     private func getSeatItem(_ userId: String) -> UserEntity? {
         return seatList.first(where: { $0.userId == userId })
+    }
+    
+    func setCameraOpened(_ isCameraOpened: Bool) {
+        videoSetting.isCameraOpened = isCameraOpened
+    }
+    
+    func setSoundOnSpeaker(_ isSoundOnSpeaker: Bool) {
+        audioSetting.isSoundOnSpeaker = isSoundOnSpeaker
+    }
+    
+    func setConferenceObserver(_ observer: ConferenceObserver?) {
+        conferenceObserver = observer
+    }
+    
+    func setInviteSeatList(list: [TUIRequest]) {
+        inviteSeatList = []
+        for request in list {
+            let requestEntity = RequestEntity(requestId: request.requestId, userId: request.userId)
+            inviteSeatList.append(requestEntity)
+        }
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
     
     deinit {

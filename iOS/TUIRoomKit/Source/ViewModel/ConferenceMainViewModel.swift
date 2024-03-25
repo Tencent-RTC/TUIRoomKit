@@ -1,5 +1,5 @@
 //
-//  RoomMainViewModel.swift
+//  ConferenceMainViewModel.swift
 //  TUIRoomKit
 //
 //  Created by aby on 2022/12/27.
@@ -15,7 +15,7 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
-protocol RoomMainViewResponder: AnyObject {
+protocol ConferenceMainViewResponder: AnyObject {
     func makeToast(text: String)
     func changeToolBarHiddenState()
     func setToolBarDelayHidden(isDelay: Bool)
@@ -24,8 +24,8 @@ protocol RoomMainViewResponder: AnyObject {
     func showBeautyView()
 }
 
-class RoomMainViewModel: NSObject {
-    weak var viewResponder: RoomMainViewResponder? = nil
+class ConferenceMainViewModel: NSObject {
+    weak var viewResponder: ConferenceMainViewResponder? = nil
     var engineManager: EngineManager {
         EngineManager.createInstance()
     }
@@ -44,6 +44,7 @@ class RoomMainViewModel: NSObject {
     private var isShownTakeSeatInviteAlert = false
     private weak var localAudioViewModel: LocalAudioViewModel?
     private var selfRole: TUIRole?
+    var conferenceParams: ConferenceParams = ConferenceParams()
     
     override init() {
         super.init()
@@ -83,6 +84,7 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onAllUserMicrophoneDisableChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onAllUserCameraDisableChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOffSeat, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onKickedOffLine, observer: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserMuteMessage, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
@@ -98,6 +100,7 @@ class RoomMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onAllUserMicrophoneDisableChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onAllUserCameraDisableChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOffSeat, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOffLine, observer: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserMuteMessage, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
@@ -114,13 +117,54 @@ class RoomMainViewModel: NSObject {
         localAudioViewModel?.showLocalAudioView()
     }
     
+    func quickStartConference(conferenceId: String) {
+        let session = ConferenceSession(conferenceId: conferenceId)
+        session.conferenceParams = conferenceParams
+        session.quickStart { [weak self] in
+            guard let self = self else { return }
+            self.store.conferenceObserver?.onConferenceStarted?(conferenceId: conferenceId, error: .success)
+        } onError: { [weak self] code, message in
+            guard let self = self else { return }
+            let conferenceError = self.getConferenceError(error: code)
+            self.store.conferenceObserver?.onConferenceStarted?(conferenceId: conferenceId, error: conferenceError)
+        }
+    }
+    
+    func joinConference(conferenceId: String) {
+        let sessin = ConferenceSession(conferenceId: conferenceId)
+        sessin.conferenceParams = conferenceParams
+        sessin.join { [weak self] in
+            guard let self = self else { return }
+            self.store.conferenceObserver?.onConferenceJoined?(conferenceId: conferenceId, error: .success)
+        } onError: {  [weak self] code, message in
+            guard let self = self else { return }
+            let conferenceError = self.getConferenceError(error: code)
+            self.store.conferenceObserver?.onConferenceJoined?(conferenceId: conferenceId, error: conferenceError)
+        }
+    }
+    
+    func getConferenceError(error: TUIError) -> ConferenceError {
+        guard let conferenceError = ConferenceError(rawValue: error.rawValue) else { return .failed }
+        return conferenceError
+    }
+    
+    func setConferenceParams(params: ConferenceParams) {
+        conferenceParams = params
+        store.setCameraOpened(params.isOpenCamera)
+        store.setSoundOnSpeaker(params.isSoundOnSpeaker)
+    }
+    
+    func setConferenceObserver(observer: ConferenceObserver?) {
+        store.setConferenceObserver(observer)
+    }
+    
     deinit {
         unsubscribeEngine()
         debugPrint("deinit \(self)")
     }
 }
 
-extension RoomMainViewModel: RoomEngineEventResponder {
+extension ConferenceMainViewModel: RoomEngineEventResponder {
     func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
         switch name {
         case .onRoomDismissed:
@@ -138,25 +182,34 @@ extension RoomMainViewModel: RoomEngineEventResponder {
         case .onRequestReceived:
             guard let request = param?["request"] as? TUIRequest else { return }
             handleReceivedRequest(request: request)
+        case .onKickedOffLine:
+            handleKickedOffLine()
         default: break
         }
     }
     
     private func handleRoomDismissed() {
+#if RTCube_APPSTORE
+        if currentUser.userRole == .roomOwner {
+            let selector = NSSelectorFromString("showAlertUserLiveTimeOut")
+            if UIViewController.responds(to: selector) {
+                UIViewController.perform(selector)
+            }
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
+            engineManager.destroyEngineManager()
+            return
+        }
+#endif
         engineManager.destroyEngineManager()
-        viewResponder?.showAlert(title: .destroyAlertText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: { [weak self] in
-            guard let self = self else { return }
-            self.roomRouter.dismissAllRoomPopupViewController()
-            self.roomRouter.popToRoomEntranceViewController()
+        viewResponder?.showAlert(title: .destroyAlertText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: {
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
         }, declineBlock: nil)
     }
     
     private func handleKickedOutOfRoom() {
         engineManager.destroyEngineManager()
-        viewResponder?.showAlert(title: .kickOffTitleText, message: nil, sureTitle: .alertOkText, declineTitle: nil , sureBlock: { [weak self] in
-            guard let self = self else { return }
-            self.roomRouter.dismissAllRoomPopupViewController()
-            self.roomRouter.popToRoomEntranceViewController()
+        viewResponder?.showAlert(title: .kickOffTitleText, message: nil, sureTitle: .alertOkText, declineTitle: nil , sureBlock: {
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
         }, declineBlock: nil)
     }
     
@@ -267,9 +320,7 @@ extension RoomMainViewModel: RoomEngineEventResponder {
     }
     
     private func agreeOnSeatRequest(requestId: String) {
-        engineManager.responseRemoteRequest(requestId, agree: true) { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.deleteInviteSeatUser(self.currentUser.userId)
+        engineManager.responseRemoteRequest(requestId, agree: true) {
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             switch code {
@@ -283,16 +334,20 @@ extension RoomMainViewModel: RoomEngineEventResponder {
     }
     
     private func disagreeOnSeatRequest(requestId: String) {
-        engineManager.responseRemoteRequest(requestId, agree: false) { [weak self] in
-            guard let self = self else { return }
-            self.engineManager.deleteInviteSeatUser(self.currentUser.userId)
+        engineManager.responseRemoteRequest(requestId, agree: false) {
         } onError: { code, message in
             debugPrint("responseRemoteRequest:code:\(code),message:\(message)")
         }
     }
+    
+    private func handleKickedOffLine() {
+        viewResponder?.showAlert(title: .kieckedOffLineText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: {
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
+        }, declineBlock: nil)
+    }
 }
 
-extension RoomMainViewModel: RoomMainViewFactory {
+extension ConferenceMainViewModel: ConferenceMainViewFactory {
     func makeTopView() -> TopView {
         let viewModel = TopViewModel()
         let topView = TopView(viewModel: viewModel)
@@ -342,7 +397,7 @@ extension RoomMainViewModel: RoomMainViewFactory {
     }
 }
 
-extension RoomMainViewModel: RoomKitUIEventResponder {
+extension ConferenceMainViewModel: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
         switch key{
         case .TUIRoomKitService_CurrentUserRoleChanged:
@@ -455,5 +510,8 @@ private extension String {
     }
     static var goOnStageTimedOutText: String {
         localized("TUIRoom.go.on.stage.timed.out")
+    }
+    static var kieckedOffLineText: String {
+        localized("TUIRoom.kiecked.off.line")
     }
 }

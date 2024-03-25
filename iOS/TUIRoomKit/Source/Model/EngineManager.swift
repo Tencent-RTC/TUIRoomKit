@@ -101,6 +101,7 @@ class EngineManager: NSObject {
     func exitRoom(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         roomEngine.exitRoom(syncWaiting: false) { [weak self] in
             guard let self = self else { return }
+            self.store.conferenceObserver?.onConferenceExited?(conferenceId: self.store.roomInfo.roomId)
             self.destroyEngineManager()
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ExitedRoom, param: [:])
             onSuccess?()
@@ -112,6 +113,7 @@ class EngineManager: NSObject {
     func destroyRoom(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         roomEngine.destroyRoom { [weak self] in
             guard let self = self else { return }
+            self.store.conferenceObserver?.onConferenceFinished?(conferenceId: self.store.roomInfo.roomId)
             self.destroyEngineManager()
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DestroyedRoom, param: [:])
             onSuccess?()
@@ -476,17 +478,6 @@ class EngineManager: NSObject {
         }
     }
     
-    //赠加举手用户
-    func addInviteSeatUser(userItem: UserEntity, request: TUIRequest) {
-        store.inviteSeatList.append(userItem)
-        store.inviteSeatMap[request.userId] = request.requestId
-    }
-    
-    //删除举手用户
-    func deleteInviteSeatUser(_ userId: String) {
-        store.deleteInviteSeatItem(userId: userId)
-    }
-    
     //增加房间用户
     func addUserItem(_ userItem: UserEntity) {
         guard getUserItem(userItem.userId) == nil else { return }
@@ -538,6 +529,15 @@ class EngineManager: NSObject {
     
     func getBeautyManager() -> TXBeautyManager {
         roomEngine.getTRTCCloud().getBeautyManager()
+    }
+    
+    func updateSeatApplicationList() {
+        roomEngine.getSeatApplicationList { [weak self] list in
+            guard let self = self else { return }
+            self.store.setInviteSeatList(list: list)
+        } onError: { code, message in
+            debugPrint("getSeatApplicationList,code:\(code),message:\(message)")
+        }
     }
 }
 
@@ -598,27 +598,24 @@ extension EngineManager {
         roomEngine.enterRoom(roomId) { [weak self] roomInfo in
             guard let self = self else { return }
             guard let roomInfo = roomInfo else { return }
-            //更新store存储的进房数据
+            //Update the room entry data stored
             self.store.roomInfo = roomInfo
             self.store.initialRoomCurrentUser()
             self.store.initalEnterRoomMessage()
-            //初始化用户列表
+            //Initialize user list
             self.initUserList()
-            //初始化视频设置
+            //Initialize video settings
             self.initLocalVideoState()
-            //如果是举手发言房间的房主，需要先上麦再跳转到会议主页面
             if !self.isNeededAutoTakeSeat() {
                 self.operateLocalMicrophone(enableAudio: enableAudio)
-                self.showRoomViewController(roomId: roomInfo.roomId)
+                onSuccess()
             } else {
                 self.autoTakeSeatForOwner { [weak self] in
                     guard let self = self else { return }
                     self.operateLocalMicrophone(enableAudio: enableAudio)
-                    self.showRoomViewController(roomId: roomInfo.roomId)
-                } onError: { [weak self] code, message in
-                    guard let self = self else { return }
-                    self.rootRouter.dismissAllRoomPopupViewController()
-                    self.rootRouter.popToRoomEntranceViewController()
+                    onSuccess()
+                } onError: { code, message in
+                    onError(code, message)
                 }
             }
         } onError: { code, message in
@@ -640,11 +637,6 @@ extension EngineManager {
                 onError(code, message)
             }
         }
-    }
-    
-    private func showRoomViewController(roomId: String) {
-        guard store.isShowRoomMainViewAutomatically else { return }
-        rootRouter.pushMainViewController(roomId: roomId)
     }
     
     private func isPushLocalAudioStream(enableAudio: Bool) -> Bool {

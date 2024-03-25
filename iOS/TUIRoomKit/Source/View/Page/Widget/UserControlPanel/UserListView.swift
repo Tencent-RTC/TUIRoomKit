@@ -218,7 +218,6 @@ class UserListView: UIView {
     }
     
     @objc func inviteMemberAction(sender: UIButton) {
-        RoomRouter.shared.dismissPopupViewController(viewType: .userListViewType,animated: false)
         RoomRouter.shared.presentPopUpViewController(viewType: .inviteViewType, height: 186)
     }
     
@@ -231,7 +230,6 @@ class UserListView: UIView {
     }
     
     @objc func moreFunctionAction(sender: UIButton) {
-        RoomRouter.shared.dismissPopupViewController(viewType: .userListViewType,animated: false)
         RoomRouter.shared.presentPopUpViewController(viewType: .inviteViewType, height: 186)
     }
     

@@ -153,7 +153,7 @@ class PopUpView: UIView {
     }
     
     @objc func dropDownPopUpViewAction(sender: UIView) {
-        RoomRouter.shared.dismissPopupViewController(viewType: viewModel.viewType, animated: true)
+        RoomRouter.shared.dismissPopupViewController()
     }
     
     override func layoutSubviews() {

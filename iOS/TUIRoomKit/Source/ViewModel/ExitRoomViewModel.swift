@@ -54,8 +54,7 @@ class ExitRoomViewModel {
         engineManager.exitRoom { [weak self] in
             guard let self = self else { return }
             self.viewResponder?.dismissView()
-            RoomRouter.shared.dismissAllRoomPopupViewController()
-            RoomRouter.shared.popToRoomEntranceViewController()
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.viewResponder?.makeToast(message: message)
@@ -66,8 +65,7 @@ class ExitRoomViewModel {
         engineManager.destroyRoom { [weak self] in
             guard let self = self else { return }
             self.viewResponder?.dismissView()
-            RoomRouter.shared.dismissAllRoomPopupViewController()
-            RoomRouter.shared.popToRoomEntranceViewController()
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.viewResponder?.makeToast(message: message)

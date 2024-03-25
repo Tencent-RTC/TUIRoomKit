@@ -8,7 +8,6 @@
 
 import SnapKit
 import UIKit
-import TUIRoomEngine
 import TUIRoomKit
 import TUICore
 
@@ -23,6 +22,7 @@ class EnterRoomViewController: UIViewController {
     private var enableLocalAudio: Bool = true
     private var enableLocalVideo: Bool = true
     private var isSoundOnSpeaker: Bool = true
+    private var conferenceViewController: ConferenceMainViewController?
     
     let backButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -142,6 +142,21 @@ extension EnterRoomViewController {
         roomId = roomIDStr
         rootView?.updateEnterButtonState(isEnabled: false)
         rootView?.updateLoadingState(isStarted: true)
+        joinConference(roomId: roomId)
+    }
+    
+    private func joinConference(roomId: String) {
+        conferenceViewController = ConferenceMainViewController()
+        let params = ConferenceParams()
+        params.isMuteMicrophone = !enableLocalAudio
+        params.isOpenCamera = enableLocalVideo
+        params.isSoundOnSpeaker = isSoundOnSpeaker
+        conferenceViewController?.setConferenceParams(params: params)
+        conferenceViewController?.setConferenceObserver(observer: self)
+        conferenceViewController?.joinConference(conferenceId: roomId)
+    }
+    
+    private func enterRoom(roomId: String) {
         TUIRoomKit.createInstance().enterRoom(roomId: roomId, enableAudio: enableLocalAudio, enableVideo: enableLocalVideo,
                                               isSoundOnSpeaker: isSoundOnSpeaker) { [weak self] in
             guard let self = self else { return }
@@ -156,6 +171,24 @@ extension EnterRoomViewController {
     private func renewRootViewState() {
         rootView?.updateEnterButtonState(isEnabled: true)
         rootView?.updateLoadingState(isStarted: false)
+    }
+}
+
+extension EnterRoomViewController: ConferenceObserver {
+    func onConferenceJoined(conferenceId: String, error: ConferenceError) {
+        guard error == .success else { return }
+        guard let vc = conferenceViewController else { return }
+        navigationController?.pushViewController(vc, animated: true)
+        conferenceViewController = nil
+        renewRootViewState()
+    }
+    
+    func onConferenceFinished(conferenceId: String) {
+        debugPrint("onConferenceFinished,conferenceId:\(conferenceId)")
+    }
+    
+    func onConferenceExited(conferenceId: String) {
+        debugPrint("onConferenceExited,conferenceId:\(conferenceId)")
     }
 }
 

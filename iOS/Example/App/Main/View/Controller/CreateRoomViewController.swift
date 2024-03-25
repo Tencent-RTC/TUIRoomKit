@@ -25,6 +25,7 @@ class CreateRoomViewController: UIViewController {
     private var enableLocalVideo: Bool = true
     private var isSoundOnSpeaker: Bool = true
     let roomHashNumber: Int = 0x3B9AC9FF
+    private var conferenceViewController: ConferenceMainViewController?
     var roomId: String?
     
     let backButton: UIButton = {
@@ -136,6 +137,23 @@ extension CreateRoomViewController {
             self.renewRootViewState()
             return
         }
+        quickStartConference(roomId: roomId)
+    }
+    
+    private func quickStartConference(roomId: String) {
+        conferenceViewController = ConferenceMainViewController()
+        let params = ConferenceParams()
+        params.name = currentUserName.truncateUtf8String(maxByteLength: 30)
+        params.enableSeatControl = isSeatEnable
+        params.isMuteMicrophone = !enableLocalAudio
+        params.isOpenCamera = enableLocalVideo
+        params.isSoundOnSpeaker = isSoundOnSpeaker
+        conferenceViewController?.setConferenceParams(params: params)
+        conferenceViewController?.quickStartConference(conferenceId: roomId)
+        conferenceViewController?.setConferenceObserver(observer: self)
+    }
+    
+    private func createRoom(roomId: String) {
         roomInfo.roomId = roomId
         roomInfo.name = currentUserName.truncateUtf8String(maxByteLength: 30)
         roomInfo.isSeatEnabled = isSeatEnable
@@ -219,6 +237,24 @@ extension CreateRoomViewController {
         } fail: { code, message in
             onNotExist()
         }
+    }
+}
+
+extension CreateRoomViewController: ConferenceObserver {
+    func onConferenceStarted(conferenceId: String, error: ConferenceError) {
+        guard error == .success else { return }
+        guard let vc = conferenceViewController else { return }
+        navigationController?.pushViewController(vc, animated: true)
+        conferenceViewController = nil
+        renewRootViewState()
+    }
+    
+    func onConferenceFinished(conferenceId: String) {
+        debugPrint("onConferenceFinished,conferenceId:\(conferenceId)")
+    }
+    
+    func onConferenceExited(conferenceId: String) {
+        debugPrint("onConferenceExited,conferenceId:\(conferenceId)")
     }
 }
 

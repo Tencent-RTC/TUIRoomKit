@@ -213,3 +213,4 @@
 "TUIRoom.on.stage" = "xx is on stage";
 "TUIRoom.on.stage.number.reached.limit" = "The current number of people on stage has reached the limit";
 "TUIRoom.go.on.stage.timed.out" = "Failed to go on stage, invitation has timed out";
+"TUIRoom.kiecked.off.line" = "You are already logged in elsewhere";

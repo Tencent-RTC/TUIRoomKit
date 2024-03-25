@@ -89,6 +89,7 @@ class EngineEventCenter: NSObject {
         case TUIRoomKitService_ShowExitRoomView //显示离开房间页面
         case TUIRoomKitService_RenewVideoSeatView //更新视频页面
         case TUIRoomKitService_ShowBeautyView
+        case TUIRoomKitService_DismissConferenceViewController
     }
     
     /// 注册UI响应相关监听事件
