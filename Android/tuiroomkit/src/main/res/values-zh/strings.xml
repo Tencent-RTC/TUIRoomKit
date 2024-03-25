@@ -3,6 +3,7 @@
     <string name="tuiroomkit_role_owner">主持人</string>
     <string name="tuiroomkit_role_manager">管理员</string>
     <string name="tuiroomkit_copy_room_id_success">房间号复制成功</string>
+    <string name="tuiroomkit_tip_exit_first_title">请先退出当前会议，再进入其它会议</string>
     <string name="tuiroomkit_permission_camera_reason_title">%s申请获取相机权限</string>
     <string name="tuiroomkit_permission_camera_reason">需要访问您的相机权限，开启后用于视频互动、秀场直播、视频通话、多人视频通话、多人音视频房间等功能，在您使用美颜功能时，我们会对您实时拍摄的面部的像素信息进行实时智能识别，在识别过程中会实时收集您面部的像素信息，以为您提供更好的美颜效果。</string>
     <string name="tuiroomkit_permission_mic_reason_title">%s申请获取麦克风权限</string>

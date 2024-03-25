@@ -17,8 +17,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
+import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
+import com.tencent.cloud.tuikit.roomkit.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
@@ -26,7 +27,6 @@ import com.tencent.qcloud.tuicore.TUIConfig;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.interfaces.TUICallback;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
@@ -113,7 +113,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void setProfile() {
         final String userName = mEditUserName.getText().toString().trim();
         if (TextUtils.isEmpty(userName)) {
-            ToastUtil.toastLongMessage(getString(R.string.app_hint_user_name));
+            RoomToast.toastLongMessage(getString(R.string.app_hint_user_name));
             return;
         }
         String reg = "^[a-z0-9A-Z\\u4e00-\\u9fa5\\_]*$";
@@ -121,11 +121,11 @@ public class ProfileActivity extends AppCompatActivity {
             mTvInputTips.setTextColor(getResources().getColor(R.color.color_input_no_match));
             return;
         }
-        if(userName.getBytes(StandardCharsets.UTF_8).length > 30) {
-            ToastUtil.toastLongMessage(getString(R.string.app_toast_username_too_long));
+        if (userName.getBytes(StandardCharsets.UTF_8).length > 30) {
+            RoomToast.toastLongMessage(getString(R.string.app_toast_username_too_long));
             return;
         } else if (userName.getBytes(StandardCharsets.UTF_8).length < 2) {
-            ToastUtil.toastLongMessage(getString(R.string.app_toast_username_too_short));
+            RoomToast.toastLongMessage(getString(R.string.app_toast_username_too_short));
             return;
         }
         mTvInputTips.setTextColor(getResources().getColor(R.color.text_color_hint));
@@ -134,7 +134,7 @@ public class ProfileActivity extends AppCompatActivity {
         model.userAvatar = mAvatarUrl;
         UserModelManager.getInstance().setUserModel(model);
         Log.i(TAG, "set profile success.");
-        ToastUtil.toastLongMessage(getString(R.string.app_toast_register_success_and_logging_in));
+        RoomToast.toastLongMessage(getString(R.string.app_toast_register_success_and_logging_in));
         startPrepareActivity();
     }
 
@@ -150,7 +150,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onSuccess() {
                 Log.d(TAG, "TUILogin.login onSuccess");
                 String userName = TextUtils.isEmpty(userModel.userName) ? userModel.userId : userModel.userName;
-                TUIRoomKit.createInstance().setSelfInfo(userName, userModel.userAvatar, null);
+                TUIRoomEngine.setSelfInfo(userName, userModel.userAvatar, null);
                 TUIConfig.setSelfNickName(userName);
                 TUIConfig.setSelfFaceUrl(userModel.userAvatar);
                 TUICore.startActivity("PrepareActivity", null);

@@ -1,11 +1,16 @@
 package com.tencent.cloud.tuikit.roomkit.view.page;
 
+import static com.tencent.cloud.tuikit.engine.common.TUICommonDefine.Error.ALL_SEAT_OCCUPIED;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.DISMISS_MAIN_ACTIVITY;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,44 +22,50 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
+import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
+import com.tencent.cloud.tuikit.roomkit.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.TUIVideoSeatView;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
+import com.tencent.cloud.tuikit.roomkit.view.component.ConfirmDialog;
+import com.tencent.cloud.tuikit.roomkit.view.component.QRCodeView;
+import com.tencent.cloud.tuikit.roomkit.view.component.TipToast;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.BottomNavigationBar.BottomLayout;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.ExitRoomDialog;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.InviteUserDialog;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.RoomInfoDialog;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.LocalAudioIndicator.LocalAudioToggleView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.MediaSettings.MediaSettingPanel;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel.RaiseHandApplicationListPanel;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.TopNavigationBar.TopView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.TransferOwnerControlPanel.TransferMasterPanel;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.UserControlPanel.UserListPanel;
-import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.ExitRoomDialog;
-import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.InviteUserDialog;
-import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.RoomInfoDialog;
-import com.tencent.cloud.tuikit.roomkit.view.component.ConfirmDialog;
-import com.tencent.cloud.tuikit.roomkit.view.component.QRCodeView;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.RoomMainViewModel;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
-public class RoomMainView extends RelativeLayout {
-    private static final String TAG = "RoomMainView";
+public class ConferenceMainView extends RelativeLayout {
+    private static final String TAG = "ConferenceMainView";
 
     private static final int ROOM_BARS_DISMISS_DELAY_MS   = 3 * 1000;
     private static final int ROOM_BARS_FIRST_SHOW_TIME_MS = 6 * 1000;
 
-    private Context                      mContext;
-    private View                         mFloatingWindow;
-    private TUIVideoSeatView             mVideoSeatView;
-    private Button                       mBtnStopScreenShare;
-    private FrameLayout                  mLayoutTopView;
-    private FrameLayout                  mLayoutVideoSeat;
-    private FrameLayout                  mLayoutLocalAudio;
-    private View                         mLayoutScreenCaptureGroup;
+    private Context           mContext;
+    private View              mFloatingWindow;
+    private TUIVideoSeatView  mVideoSeatView;
+    private Button            mBtnStopScreenShare;
+    private FrameLayout       mLayoutTopView;
+    private FrameLayout       mLayoutVideoSeat;
+    private FrameLayout       mLayoutLocalAudio;
+    private View              mLayoutScreenCaptureGroup;
     private FrameLayout       mLayoutBottomView;
     private BottomLayout      mBottomLayout;
     private RoomMainViewModel mViewModel;
@@ -65,8 +76,143 @@ public class RoomMainView extends RelativeLayout {
     private boolean mIsBarsShowed         = true;
     private boolean mIsBottomViewExpanded = false;
 
-    public RoomMainView(Context context) {
-        super(context);
+    public ConferenceMainView(Context context) {
+        this(context,null);
+    }
+
+    public ConferenceMainView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context);
+        cacheConferenceActivity(context);
+    }
+
+    public void toastForGeneralToManager() {
+        TipToast.build()
+                .setDuration(Toast.LENGTH_LONG)
+                .setMessage(mContext.getString(R.string.tuiroomkit_have_become_manager))
+                .show(mContext);
+    }
+
+    public void toastForManagerToGeneral() {
+        TipToast.build()
+                .setDuration(Toast.LENGTH_LONG)
+                .setMessage(mContext.getString(R.string.tuiroomkit_have_been_cancel_manager))
+                .show(mContext);
+    }
+
+    public void toastForToOwner() {
+        TipToast.build()
+                .setDuration(Toast.LENGTH_LONG)
+                .setMessage(mContext.getString(R.string.tuiroomkit_toast_become_to_owner))
+                .show(mContext);
+    }
+
+    public void showRequestDialog(Map<String, Object> params) {
+        if (params == null) {
+            return;
+        }
+        TUIRoomDefine.Request request = (TUIRoomDefine.Request) params.get(RoomEventConstant.KEY_REQUEST);
+        TUIRoomDefine.Role role = (TUIRoomDefine.Role) params.get(RoomEventConstant.KEY_ROLE);
+        String userRole = mContext.getString(role == TUIRoomDefine.Role.ROOM_OWNER ? R.string.tuiroomkit_role_owner :
+                R.string.tuiroomkit_role_manager);
+        switch (request.requestAction) {
+            case REQUEST_TO_OPEN_REMOTE_CAMERA:
+                showInvitedOpenCamera(request, userRole);
+                break;
+
+            case REQUEST_TO_OPEN_REMOTE_MICROPHONE:
+                showInvitedOpenMic(request, userRole);
+                break;
+
+            case REQUEST_REMOTE_USER_ON_SEAT:
+                showInvitedTakeSeatDialog(request, userRole);
+                break;
+
+            default:
+                Log.e(TAG, "showRequestDialog un handle action : " + request.requestAction);
+                break;
+        }
+    }
+
+    private void showInvitedOpenCamera(TUIRoomDefine.Request request, String userRole) {
+        BaseDialogFragment.build().setTitle(mContext.getString(R.string.tuiroomkit_request_open_camera, userRole))
+                .setNegativeName(mContext.getString(R.string.tuiroomkit_refuse))
+                .setPositiveName(mContext.getString(R.string.tuiroomkit_agree))
+                .setNegativeListener(new BaseDialogFragment.ClickListener() {
+                    @Override
+                    public void onClick() {
+                        RoomEngineManager.sharedInstance()
+                                .responseRemoteRequest(request.requestAction, request.requestId, false, null);
+                    }
+                }).setPositiveListener(new BaseDialogFragment.ClickListener() {
+                    @Override
+                    public void onClick() {
+                        RoomEngineManager.sharedInstance()
+                                .responseRemoteRequest(request.requestAction, request.requestId, true, null);
+                    }
+                }).showDialog(mContext, "REQUEST_TO_OPEN_REMOTE_CAMERA");
+    }
+
+    private void showInvitedOpenMic(TUIRoomDefine.Request request, String userRole) {
+        BaseDialogFragment.build().setTitle(mContext.getString(R.string.tuiroomkit_request_open_microphone, userRole))
+                .setNegativeName(mContext.getString(R.string.tuiroomkit_refuse))
+                .setPositiveName(mContext.getString(R.string.tuiroomkit_agree))
+                .setNegativeListener(new BaseDialogFragment.ClickListener() {
+                    @Override
+                    public void onClick() {
+                        RoomEngineManager.sharedInstance()
+                                .responseRemoteRequest(request.requestAction, request.requestId, false, null);
+                    }
+                }).setPositiveListener(new BaseDialogFragment.ClickListener() {
+                    @Override
+                    public void onClick() {
+                        RoomEngineManager.sharedInstance()
+                                .responseRemoteRequest(request.requestAction, request.requestId, true, null);
+                    }
+                }).showDialog(mContext, "REQUEST_TO_OPEN_REMOTE_MICROPHONE");
+    }
+
+    private void showInvitedTakeSeatDialog(TUIRoomDefine.Request request, String userRole) {
+        BaseDialogFragment.build().setTitle(mContext.getString(R.string.tuiroomkit_receive_invitation_title, userRole))
+                .setContent(mContext.getString(R.string.tuiroomkit_receive_invitation_content))
+                .setNegativeName(mContext.getString(R.string.tuiroomkit_refuse))
+                .setPositiveName(mContext.getString(R.string.tuiroomkit_agree_on_stage))
+                .setNegativeListener(new BaseDialogFragment.ClickListener() {
+                    @Override
+                    public void onClick() {
+                        RoomEngineManager.sharedInstance()
+                                .responseRemoteRequest(request.requestAction, request.requestId, false, null);
+                    }
+                }).setPositiveListener(new BaseDialogFragment.ClickListener() {
+                    @Override
+                    public void onClick() {
+                        RoomEngineManager.sharedInstance()
+                                .responseRemoteRequest(request.requestAction, request.requestId, true,
+                                        new TUIRoomDefine.ActionCallback() {
+                                            @Override
+                                            public void onSuccess() {
+                                                Log.d(TAG, "responseRemoteRequest takeSeat onSuccess");
+                                            }
+
+                                            @Override
+                                            public void onError(TUICommonDefine.Error error, String message) {
+                                                Log.e(TAG, "responseRemoteRequest takeSeat onError error=" + error
+                                                        + " message=" + message);
+                                                if (ALL_SEAT_OCCUPIED == error) {
+                                                    RoomToast.toastShortMessageCenter(
+                                                            mContext.getString(R.string.tuiroomkit_all_seat_occupied));
+                                                } else {
+                                                    RoomToast.toastShortMessageCenter(mContext.getString(
+                                                            R.string.tuiroomkit_invited_take_seat_time_out));
+                                                }
+
+                                            }
+                                        });
+                    }
+                }).showDialog(mContext, "REQUEST_REMOTE_USER_ON_SEAT");
+    }
+
+    private void init(Context context) {
         mContext = context;
         mViewModel = new RoomMainViewModel(mContext, this);
         mVideoSeatView = new TUIVideoSeatView(mContext);
@@ -189,7 +335,7 @@ public class RoomMainView extends RelativeLayout {
         showRoomBars();
     }
 
-    public void showExitRoomConfirmDialog(String message) {
+    public void showLeavedRoomConfirmDialog(String message) {
         final ConfirmDialog confirmDialog = new ConfirmDialog(mContext);
         confirmDialog.setCancelable(true);
         confirmDialog.setMessage(message);
@@ -201,8 +347,9 @@ public class RoomMainView extends RelativeLayout {
         confirmDialog.setPositiveClickListener(new ConfirmDialog.PositiveClickListener() {
             @Override
             public void onClick() {
-                RoomEngineManager.sharedInstance().exitRoom(null);
+                RoomEngineManager.sharedInstance().release();
                 confirmDialog.dismiss();
+                RoomEventCenter.getInstance().notifyUIEvent(DISMISS_MAIN_ACTIVITY, null);
             }
         });
         confirmDialog.show();
@@ -305,17 +452,17 @@ public class RoomMainView extends RelativeLayout {
 
     public void onCameraMuted(boolean muted) {
         if (muted) {
-            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_mute_video_by_master));
+            RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_mute_video_by_master));
         } else {
-            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_un_mute_video_by_master));
+            RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_un_mute_video_by_master));
         }
     }
 
     public void onMicrophoneMuted(boolean muted) {
         if (muted) {
-            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_mute_audio_by_master));
+            RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_mute_audio_by_master));
         } else {
-            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_un_mute_audio_by_master));
+            RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_un_mute_audio_by_master));
         }
     }
 
@@ -364,4 +511,16 @@ public class RoomMainView extends RelativeLayout {
         mLayoutLocalAudio.setVisibility(VISIBLE);
         mMainHandler.removeCallbacksAndMessages(null);
     }
+
+
+    private void cacheConferenceActivity(Context context) {
+        if (!(context instanceof Activity)) {
+            Log.e(TAG, "cacheConferenceActivity context is not instance of Activity");
+            return;
+        }
+        Activity activity = (Activity) context;
+        RoomStore store = RoomEngineManager.sharedInstance().getRoomStore();
+        store.setMainActivityClass(activity.getClass());
+    }
+
 }

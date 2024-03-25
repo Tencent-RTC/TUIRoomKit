@@ -8,7 +8,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
+import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
 import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
@@ -57,7 +57,7 @@ public class SplashActivity extends Activity {
             public void onSuccess() {
                 Log.d(TAG, "TUILogin.login onSuccess");
                 String userName = TextUtils.isEmpty(userModel.userName) ? userModel.userId : userModel.userName;
-                TUIRoomKit.createInstance().setSelfInfo(userName, userModel.userAvatar, null);
+                TUIRoomEngine.setSelfInfo(userName, userModel.userAvatar, null);
                 TUIConfig.setSelfNickName(userName);
                 TUIConfig.setSelfFaceUrl(userModel.userAvatar);
                 TUICore.startActivity("PrepareActivity", null);

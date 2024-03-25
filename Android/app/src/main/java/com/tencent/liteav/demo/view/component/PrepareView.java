@@ -14,11 +14,11 @@ import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
+import com.tencent.cloud.tuikit.roomkit.utils.RoomToast;
 import com.tencent.liteav.demo.R;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.interfaces.TUICallback;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -136,7 +136,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
 
     private void createRoom() {
         if (RoomEngineManager.sharedInstance().getRoomStore().isInFloatWindow()) {
-            ToastUtil.toastLongMessage(mContext.getString(R.string.app_room_msg_joined));
+            RoomToast.toastLongMessage(mContext.getString(R.string.app_room_msg_joined));
             return;
         }
         TUICore.startActivity("CreateRoomActivity", null);
@@ -144,7 +144,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
 
     private void enterRoom() {
         if (RoomEngineManager.sharedInstance().getRoomStore().isInFloatWindow()) {
-            ToastUtil.toastLongMessage(mContext.getString(R.string.app_room_msg_joined));
+            RoomToast.toastLongMessage(mContext.getString(R.string.app_room_msg_joined));
             return;
         }
         TUICore.startActivity("EnterRoomActivity", null);

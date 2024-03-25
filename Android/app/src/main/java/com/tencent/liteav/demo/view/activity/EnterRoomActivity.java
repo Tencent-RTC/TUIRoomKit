@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.liteav.demo.R;
 import com.tencent.liteav.demo.view.component.EnterRoomView;
-import com.tencent.qcloud.tuicore.interfaces.TUICallback;
 
 import java.util.Map;
 
@@ -23,17 +22,6 @@ public class EnterRoomActivity extends AppCompatActivity implements RoomEventCen
         EnterRoomView enterRoomView = new EnterRoomView(this);
         ViewGroup root = findViewById(R.id.ll_root_enter_room);
         root.addView(enterRoomView);
-        enterRoomView.setFinishCallback(new TUICallback() {
-            @Override
-            public void onSuccess() {
-                finish();
-            }
-
-            @Override
-            public void onError(int errorCode, String errorMessage) {
-
-            }
-        });
         registerRoomEnteredEvent();
     }
 
@@ -55,7 +43,6 @@ public class EnterRoomActivity extends AppCompatActivity implements RoomEventCen
     public void onEngineEvent(RoomEventCenter.RoomEngineEvent event, Map<String, Object> params) {
         if (LOCAL_USER_ENTER_ROOM == event) {
             finish();
-            return;
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.tencent.liteav.demo.view.component;
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -12,6 +13,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
+import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+import com.tencent.cloud.tuikit.roomkit.utils.RoomToast;
 import com.tencent.liteav.demo.R;
 import com.tencent.liteav.demo.viewmodel.EnterRoomViewModel;
 import com.tencent.qcloud.tuicore.TUILogin;
@@ -28,8 +32,6 @@ public class EnterRoomView extends RelativeLayout {
     private EditText           mTextRoomId;
     private LinearLayout       mSettingContainer;
     private EnterRoomViewModel mViewModel;
-    private TUICallback        mFinishCallback;
-
 
     public EnterRoomView(Context context) {
         super(context);
@@ -37,10 +39,6 @@ public class EnterRoomView extends RelativeLayout {
         mContext = context;
         mViewModel = new EnterRoomViewModel(mContext);
         initView();
-    }
-
-    public void setFinishCallback(TUICallback finishCallback) {
-        mFinishCallback = finishCallback;
     }
 
     private void initView() {
@@ -54,15 +52,27 @@ public class EnterRoomView extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 mTextEnterRoom.setClickable(false);
-                mViewModel.enterRoom(mTextRoomId.getText().toString());
+                mViewModel.enterRoom(mTextRoomId.getText().toString(), new TUIRoomDefine.ActionCallback() {
+                    @Override
+                    public void onSuccess() {
+                    }
+
+                    @Override
+                    public void onError(TUICommonDefine.Error error, String message) {
+                        RoomToast.toastLongMessage("error=" + error + " message=" + message);
+                        mTextEnterRoom.setClickable(true);
+                    }
+                });
             }
         });
         mToolbar.setNavigationOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mFinishCallback != null) {
-                    mFinishCallback.onSuccess();
+                if (!(mContext instanceof Activity)) {
+                    return;
                 }
+                Activity activity = (Activity) mContext;
+                activity.finish();
             }
         });
         mTextRoomId.addTextChangedListener(new TextWatcher() {

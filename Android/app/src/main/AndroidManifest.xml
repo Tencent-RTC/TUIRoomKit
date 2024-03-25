@@ -12,6 +12,11 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:allowBackup">
         <activity
+            android:name="com.tencent.liteav.demo.view.activity.ConferenceMainActivity"
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
             android:name="com.tencent.liteav.demo.view.activity.PrepareActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
@@ -39,7 +44,7 @@
         <activity
             android:name="com.tencent.liteav.demo.SplashActivity"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+            android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
 

@@ -9,13 +9,14 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.model.utils.FetchRoomId;
+import com.tencent.cloud.tuikit.roomkit.utils.RoomToast;
 import com.tencent.liteav.demo.R;
 import com.tencent.liteav.demo.viewmodel.CreateRoomViewModel;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.interfaces.TUICallback;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.ArrayList;
 
@@ -110,10 +111,22 @@ public class CreateRoomView extends RelativeLayout
             mRoomTypeDialog.show();
         } else if (view.getId() == R.id.tv_create) {
             if (TextUtils.isEmpty(mRoomId)) {
-                ToastUtil.toastShortMessage(mContext.getString(R.string.app_tip_creating_room_id));
+                RoomToast.toastShortMessage(mContext.getString(R.string.app_tip_creating_room_id));
                 return;
             }
-            mViewModel.createRoom(mRoomId);
+            mViewModel.createRoom(mRoomId, new TUIRoomDefine.ActionCallback() {
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onError(TUICommonDefine.Error error, String message) {
+                    RoomToast.toastLongMessage("error=" + error + " message=" + message);
+                    mTextCreateRoom.setClickable(true);
+                    mRoomId = null;
+                    initData();
+                }
+            });
             mTextCreateRoom.setClickable(false);
         }
     }

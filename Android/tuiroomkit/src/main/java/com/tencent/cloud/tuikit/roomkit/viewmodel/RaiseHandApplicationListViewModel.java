@@ -1,6 +1,7 @@
 package com.tencent.cloud.tuikit.roomkit.viewmodel;
 
 import static com.tencent.cloud.tuikit.roomkit.model.RoomConstant.USER_NOT_FOUND;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.USER_ROLE_CHANGED;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.USER_TAKE_SEAT_REQUEST_ADD;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.USER_TAKE_SEAT_REQUEST_REMOVE;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.AGREE_TAKE_SEAT;
@@ -18,10 +19,12 @@ import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
+import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.entity.TakeSeatRequestEntity;
+import com.tencent.cloud.tuikit.roomkit.model.entity.UserEntity;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
+import com.tencent.cloud.tuikit.roomkit.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel.RaiseHandApplicationListPanel;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +53,7 @@ public class RaiseHandApplicationListViewModel
         RoomEventCenter eventCenter = RoomEventCenter.getInstance();
         eventCenter.subscribeEngine(USER_TAKE_SEAT_REQUEST_ADD, this);
         eventCenter.subscribeEngine(USER_TAKE_SEAT_REQUEST_REMOVE, this);
+        eventCenter.subscribeEngine(USER_ROLE_CHANGED, this);
 
         eventCenter.subscribeUIEvent(AGREE_TAKE_SEAT, this);
         eventCenter.subscribeUIEvent(DISAGREE_TAKE_SEAT, this);
@@ -64,6 +68,7 @@ public class RaiseHandApplicationListViewModel
         RoomEventCenter eventCenter = RoomEventCenter.getInstance();
         eventCenter.unsubscribeEngine(USER_TAKE_SEAT_REQUEST_ADD, this);
         eventCenter.unsubscribeEngine(USER_TAKE_SEAT_REQUEST_REMOVE, this);
+        eventCenter.unsubscribeEngine(USER_ROLE_CHANGED, this);
 
         eventCenter.unsubscribeUIEvent(AGREE_TAKE_SEAT, this);
         eventCenter.unsubscribeUIEvent(DISAGREE_TAKE_SEAT, this);
@@ -114,6 +119,10 @@ public class RaiseHandApplicationListViewModel
                 onRemoveTakeSeatRequest(params);
                 break;
 
+            case USER_ROLE_CHANGED:
+                onUserRoleChanged(params);
+                break;
+
             default:
                 break;
         }
@@ -139,6 +148,22 @@ public class RaiseHandApplicationListViewModel
             return;
         }
         mApplyView.notifyItemRemoved(position);
+    }
+
+    private void onUserRoleChanged(Map<String, Object> params) {
+        if (params == null) {
+            return;
+        }
+        int position = (int) params.get(KEY_USER_POSITION);
+        if (position == USER_NOT_FOUND) {
+            return;
+        }
+        RoomStore store = RoomEngineManager.sharedInstance().getRoomStore();
+        UserEntity user = store.allUserList.get(position);
+        if (TextUtils.equals(user.getUserId(), store.userModel.userId)
+                && user.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
+            mApplyView.dismiss();
+        }
     }
 
     @Override
@@ -187,7 +212,7 @@ public class RaiseHandApplicationListViewModel
                             public void onError(TUICommonDefine.Error error, String message) {
                                 Log.e(TAG, "responseUserOnStage onError error=" + error + " message=" + message);
                                 if (error == TUICommonDefine.Error.ALL_SEAT_OCCUPIED) {
-                                    ToastUtil.toastShortMessageCenter(
+                                    RoomToast.toastShortMessageCenter(
                                             mContext.getString(R.string.tuiroomkit_all_seat_occupied));
                                 }
                             }
