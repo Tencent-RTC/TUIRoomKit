@@ -1408,6 +1408,11 @@ void TUIRoomCoreImpl::onUserVoiceVolumeChanged(tuikit::TUIMap<const char*, int>*
     }
 }
 
+void TUIRoomCoreImpl::onScreenShareForAllUserDisableChanged(const char* room_id, bool is_disable) {
+  LINFO("onScreenShareForAllUserDisableChanged,room_id:%s, is_disable :%d",
+      room_id, is_disable);
+}
+
 void TUIRoomCoreImpl::onSendMessageForUserDisableChanged(const char* room_id, const char* user_id, bool is_disable) {
   LINFO("onSendMessageForUserDisableChanged,room_id:%s, user_id :%s, is_disable :%d",
       room_id, user_id, is_disable);
