@@ -1,5 +1,5 @@
 //
-//  RoomMainView.swift
+//  ConferenceMainView.swift
 //  TUIRoomKit
 //
 //  Created by aby on 2022/12/27.
@@ -9,7 +9,7 @@
 
 import Foundation
 
-protocol RoomMainViewFactory {
+protocol ConferenceMainViewFactory {
     func makeBottomView() -> BottomView
     func makeTopView() -> TopView
     func makeVideoSeatView() -> UIView
@@ -18,7 +18,7 @@ protocol RoomMainViewFactory {
     func makeBeautyView() -> UIView?
 }
 
-struct RoomMainViewLayout { //横竖屏切换时的布局变化
+struct ConferenceMainViewLayout { //Layout changes when switching between horizontal and vertical screens
     let bottomViewLandscapeSpace: Float = 0
     let bottomViewPortraitSpace: Float = 34.0
     let topViewLandscapeHight: Float = 75.0
@@ -27,12 +27,12 @@ struct RoomMainViewLayout { //横竖屏切换时的布局变化
     let videoSeatViewLandscapeSpace: Float = 82.0
 }
 
-class RoomMainView: UIView {
-    let viewModel: RoomMainViewModel
-    let viewFactory: RoomMainViewFactory
-    let layout: RoomMainViewLayout = RoomMainViewLayout()
-    init(viewModel: RoomMainViewModel,
-         viewFactory: RoomMainViewFactory) {
+class ConferenceMainView: UIView {
+    let viewModel: ConferenceMainViewModel
+    let viewFactory: ConferenceMainViewFactory
+    let layout: ConferenceMainViewLayout = ConferenceMainViewLayout()
+    init(viewModel: ConferenceMainViewModel,
+         viewFactory: ConferenceMainViewFactory) {
         self.viewModel = viewModel
         self.viewFactory = viewFactory
         super.init(frame: .zero)
@@ -40,7 +40,7 @@ class RoomMainView: UIView {
     private var currentLandscape: Bool = isLandscape
     private let firstDelayDisappearanceTime = 6.0
     private let delayDisappearanceTime = 3.0
-
+    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -174,7 +174,7 @@ class RoomMainView: UIView {
     }
 }
 
-extension RoomMainView: RoomMainViewResponder {
+extension ConferenceMainView: ConferenceMainViewResponder {
     func showBeautyView() {
         beautyView?.isHidden = false
     }

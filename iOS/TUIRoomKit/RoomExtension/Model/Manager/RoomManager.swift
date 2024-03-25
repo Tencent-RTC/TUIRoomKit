@@ -36,27 +36,26 @@ class RoomManager {
     func createRoom(roomInfo: TUIRoomInfo) {
         roomId = roomInfo.roomId
         roomObserver.registerObserver()
-        engineManager.store.isShowRoomMainViewAutomatically = false
-        TUIRoomKit.createInstance().createRoom(roomInfo: roomInfo) { [weak self] in
+        engineManager.createRoom(roomInfo: roomInfo) { [weak self] in
             guard let self = self else { return }
             self.roomObserver.createdRoom()
-            self.enterRoom(roomId: roomInfo.roomId)
-        } onError: { code, message in
-            RoomCommon.getCurrentWindowViewController()?.view.makeToast(message)
-            debugPrint("createRoom:code:\(code),message:\(message)")
+            self.enterRoom(roomId: roomInfo.roomId, isShownConferenceViewController: false)
+        } onError: { _, message in
+            RoomRouter.makeToast(toast: message)
         }
     }
     
-    func enterRoom(roomId: String) {
+    func enterRoom(roomId: String, isShownConferenceViewController: Bool = true) {
         roomObserver.registerObserver()
         engineManager.store.isImAccess = true
-        engineManager.enterRoom(roomId: roomId, enableAudio: engineManager.store.isOpenMicrophone, enableVideo:
-                                    engineManager.store.isOpenCamera, isSoundOnSpeaker: true) { [weak self] in
+        engineManager.enterRoom(roomId: roomId, enableAudio: engineManager.store.isOpenMicrophone, enableVideo: engineManager.store.isOpenCamera, isSoundOnSpeaker: true) { [weak self] in
             guard let self = self else { return }
             self.roomObserver.enteredRoom()
-        } onError: { code, message in
-            RoomCommon.getCurrentWindowViewController()?.view.makeToast(message)
-            debugPrint("enterRoom:code:\(code),message:\(message)")
+            guard isShownConferenceViewController else { return }
+            let vc = ConferenceMainViewController()
+            RoomRouter.shared.push(viewController: vc)
+        } onError: { _, message in
+            RoomRouter.makeToast(toast: message)
         }
     }
     

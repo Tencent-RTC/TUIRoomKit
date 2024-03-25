@@ -52,10 +52,12 @@ extension RoomEventDispatcher: TUIRoomObserver {
     }
     
     func onRoomDismissed(roomId: String) {
+        store.conferenceObserver?.onConferenceFinished?(conferenceId: roomId)
         EngineEventCenter.shared.notifyEngineEvent(event: .onRoomDismissed, param: ["roomId" : roomId,])
     }
     
     func onKickedOutOfRoom(roomId: String, reason: TUIKickedOutOfRoomReason, message: String) {
+        store.conferenceObserver?.onConferenceExited?(conferenceId: roomId)
         let param = [
             "roomId" : roomId,
             "reason" : reason,
@@ -154,11 +156,11 @@ extension RoomEventDispatcher: TUIRoomObserver {
     }
     
     func onRequestCancelled(requestId: String, userId: String) {
-        store.deleteTakeSeatRequest(requestId: requestId, userId: userId)
+        store.deleteTakeSeatRequest(requestId: requestId)
     }
     
     func onRequestProcessed(requestId: String, userId: String) {
-        store.deleteTakeSeatRequest(requestId: requestId, userId: userId)
+        store.deleteTakeSeatRequest(requestId: requestId)
     }
     
     func onKickedOffSeat(userId: String) {
@@ -166,6 +168,14 @@ extension RoomEventDispatcher: TUIRoomObserver {
             "userId": userId,
         ] as [String : Any]
         EngineEventCenter.shared.notifyEngineEvent(event: .onKickedOffSeat, param: param)
+    }
+    
+    func onKickedOffLine(message: String) {
+        kickedOffLine()
+        let param = [
+            "message": message,
+        ] as [String : Any]
+        EngineEventCenter.shared.notifyEngineEvent(event: .onKickedOffLine, param: param)
     }
 }
 
@@ -183,8 +193,7 @@ extension RoomEventDispatcher {
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
         if roomInfo.isSeatEnabled {
             engineManager.deleteSeatItem(userInfo.userId)
-            engineManager.deleteInviteSeatUser(userInfo.userId)
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+            store.deleteInviteSeatUser(userInfo.userId)
         }
     }
     
@@ -216,7 +225,6 @@ extension RoomEventDispatcher {
             guard let userId = seatInfo.userId else { continue }
             guard let userInfo = store.attendeeList.first(where: { $0.userId == userId }) else { continue }
             userInfo.isOnSeat = true
-            engineManager.deleteInviteSeatUser(userId)
             engineManager.addSeatItem(userInfo)
         }
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
@@ -231,7 +239,6 @@ extension RoomEventDispatcher {
             if let userItem = store.attendeeList.first(where: { $0.userId == userId }) {
                 userItem.isOnSeat = false
             }
-            engineManager.deleteInviteSeatUser(userId)
             engineManager.deleteSeatItem(userId)
         }
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
@@ -296,6 +303,9 @@ extension RoomEventDispatcher {
         if checkAutoSendingMessageForOwner(userId: userId, userRole: userRole) {
             engineManager.disableSendingMessageByAdmin(userId: userId, isDisable: false)
         }
+        if isSelfRoleChanged, userRole != .generalUser {
+            engineManager.updateSeatApplicationList()
+        }
     }
     
     private func checkAutoTakeSeatForOwner(userId: String, userRole: TUIRole) -> Bool {
@@ -313,12 +323,7 @@ extension RoomEventDispatcher {
     private func requestReceived(request: TUIRequest) {
         switch request.requestAction {
         case .takeSeat:
-            if roomInfo.isSeatEnabled {
-                guard let userModel = store.attendeeList.first(where: {$0.userId == request.userId}) else { return }
-                guard store.inviteSeatMap[request.userId] == nil else { return }
-                engineManager.addInviteSeatUser(userItem: userModel, request: request)
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
-            }
+            store.addInviteSeatUser(request: request)
         default: break
         }
     }
@@ -334,5 +339,16 @@ extension RoomEventDispatcher {
         currentUser.hasScreenStream = false
         guard let userModel = store.attendeeList.first(where: { $0.userId == currentUser.userId }) else { return }
         userModel.hasScreenStream = false
+    }
+    
+    private func kickedOffLine() {
+        if store.isEnteredRoom {
+            if roomInfo.ownerId == currentUser.userId {
+                engineManager.destroyRoom()
+            } else {
+                engineManager.exitRoom()
+            }
+        }
+        engineManager.destroyEngineManager()
     }
 }

@@ -176,7 +176,6 @@ class RaiseHandApplicationListView: UIView {
     }
     
     private func setupViewState() {
-        let currentUser = viewModel.engineManager.store.currentUser
         let roomInfo = viewModel.engineManager.store.roomInfo
         allAgreeButton.isSelected = roomInfo.isMicrophoneDisableForAllUser
         inviteMemberButton.isSelected = roomInfo.isCameraDisableForAllUser
@@ -251,7 +250,7 @@ extension RaiseHandApplicationListView: RaiseHandApplicationListViewResponder {
 }
 
 class ApplyTableCell: UITableViewCell {
-    let attendeeModel: UserEntity
+    let attendeeModel: RequestEntity
     let viewModel: RaiseHandApplicationListViewModel
     
     let avatarImageView: UIImageView = {
@@ -269,20 +268,6 @@ class ApplyTableCell: UITableViewCell {
         label.font = UIFont.systemFont(ofSize: 16)
         label.numberOfLines = 1
         return label
-    }()
-    
-    let muteAudioButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(named: "room_mic_on", in: tuiRoomKitBundle(), compatibleWith: nil)?.checkOverturn(), for: .normal)
-        button.setImage(UIImage(named: "room_mic_off", in: tuiRoomKitBundle(), compatibleWith: nil)?.checkOverturn(), for: .selected)
-        return button
-    }()
-    
-    let muteVideoButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "room_camera_on", in: tuiRoomKitBundle(), compatibleWith: nil)?.checkOverturn(), for: .normal)
-        button.setImage(UIImage(named: "room_camera_off", in: tuiRoomKitBundle(), compatibleWith: nil)?.checkOverturn(), for: .selected)
-        return button
     }()
     
     let agreeStageButton: UIButton = {
@@ -315,7 +300,7 @@ class ApplyTableCell: UITableViewCell {
         return view
     }()
     
-    init(attendeeModel: UserEntity ,viewModel: RaiseHandApplicationListViewModel) {
+    init(attendeeModel: RequestEntity ,viewModel: RaiseHandApplicationListViewModel) {
         self.attendeeModel = attendeeModel
         self.viewModel = viewModel
         super.init(style: .default, reuseIdentifier: "UserListCell")
@@ -337,8 +322,6 @@ class ApplyTableCell: UITableViewCell {
     func constructViewHierarchy() {
         contentView.addSubview(avatarImageView)
         contentView.addSubview(userLabel)
-        contentView.addSubview(muteAudioButton)
-        contentView.addSubview(muteVideoButton)
         contentView.addSubview(agreeStageButton)
         contentView.addSubview(disagreeStageButton)
         contentView.addSubview(downLineView)
@@ -349,16 +332,6 @@ class ApplyTableCell: UITableViewCell {
             make.width.height.equalTo(40)
             make.leading.equalToSuperview()
             make.centerY.equalToSuperview()
-        }
-        muteVideoButton.snp.makeConstraints { make in
-            make.width.height.equalTo(36)
-            make.trailing.equalToSuperview().offset(-12)
-            make.centerY.equalTo(self.avatarImageView)
-        }
-        muteAudioButton.snp.makeConstraints { make in
-            make.width.height.equalTo(36)
-            make.trailing.equalTo(self.muteVideoButton.snp.leading).offset(-12)
-            make.centerY.equalTo(self.avatarImageView)
         }
         disagreeStageButton.snp.makeConstraints { make in
             make.width.equalTo(62.scale375())
@@ -393,7 +366,7 @@ class ApplyTableCell: UITableViewCell {
         disagreeStageButton.addTarget(self, action: #selector(disagreeStageAction(sender:)), for: .touchUpInside)
     }
     
-    func setupViewState(item: UserEntity) {
+    func setupViewState(item: RequestEntity) {
         let placeholder = UIImage(named: "room_default_user", in: tuiRoomKitBundle(), compatibleWith: nil)
         if let url = URL(string: item.avatarUrl) {
             avatarImageView.sd_setImage(with: url, placeholderImage: placeholder)
@@ -405,27 +378,14 @@ class ApplyTableCell: UITableViewCell {
         } else {
             userLabel.text = item.userName
         }
-        muteAudioButton.isSelected = !item.hasAudioStream
-        muteVideoButton.isSelected = !item.hasVideoStream
-        if item.isOnSeat {
-            agreeStageButton.isHidden = true
-            disagreeStageButton.isHidden = true
-            muteAudioButton.isHidden = false
-            muteVideoButton.isHidden = false
-        } else {
-            agreeStageButton.isHidden = false
-            disagreeStageButton.isHidden = false
-            muteAudioButton.isHidden = true
-            muteVideoButton.isHidden = true
-        }
     }
     
     @objc func agreeStageAction(sender: UIButton) {
-        viewModel.agreeStageAction(sender: sender, isAgree: true, userId: attendeeModel.userId)
+        viewModel.respondRequest(isAgree: true, request: attendeeModel)
     }
     
     @objc func disagreeStageAction(sender: UIButton) {
-        viewModel.agreeStageAction(sender: sender, isAgree: false, userId: attendeeModel.userId)
+        viewModel.respondRequest(isAgree: false, request: attendeeModel)
     }
     
     deinit {

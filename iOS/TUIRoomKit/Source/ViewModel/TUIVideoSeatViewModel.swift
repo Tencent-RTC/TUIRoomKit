@@ -265,7 +265,12 @@ extension TUIVideoSeatViewModel {
             smallItem.userInfo.userRole = userRole
             viewResponder?.updateSeatItem(smallItem)
         }
-        if userRole == .roomOwner {
+        guard userRole == .roomOwner else { return }
+        if videoSeatViewType == .largeSmallWindowType {
+            refreshListSeatItem()
+            viewResponder?.reloadData()
+            resetMiniscreen()
+        } else {
             reloadSeatItems()
         }
     }
@@ -573,12 +578,12 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
         } else {
             guard videoSeatItems.filter({ $0.hasScreenStream }).count == 1 else { return }
             if videoSeatViewType == .largeSmallWindowType {
-                reloadSeatItems()
-            } else {
-                refreshListSeatItem()
-                viewResponder?.insertItems(at: [IndexPath(item: 0, section: 0)])
-                resetMiniscreen()
+                listSeatItem = Array(videoSeatItems)
+                viewResponder?.reloadData()
             }
+            refreshListSeatItem()
+            viewResponder?.insertItems(at: [IndexPath(item: 0, section: 0)])
+            resetMiniscreen()
         }
     }
     

@@ -177,39 +177,55 @@ class TUIVideoSeatView: UIView {
 // MARK: - TUIVideoSeatViewResponder
 
 extension TUIVideoSeatView: TUIVideoSeatViewResponder {
+    private func freshCollectionView(block: () -> Void) {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        block()
+        CATransaction.commit()
+    }
+    
     func reloadData() {
-        self.attendeeCollectionView.reloadData()
+        freshCollectionView { [weak self] in
+            guard let self = self else { return }
+            self.attendeeCollectionView.reloadData()
+        }
     }
     
     func insertItems(at indexPaths: [IndexPath]) {
-        self.attendeeCollectionView.performBatchUpdates { [weak self] in
+        freshCollectionView { [weak self] in
             guard let self = self else { return }
-            //如果当前的cell数量已经和数据源相同，不再进行插入操作而是直接reloadData
-            if self.attendeeCollectionView.numberOfItems(inSection: 0) == self.viewModel.listSeatItem.count {
-                self.attendeeCollectionView.reloadData()
-            } else {
-                self.attendeeCollectionView.insertItems(at: indexPaths)
+            self.attendeeCollectionView.performBatchUpdates { [weak self] in
+                guard let self = self else { return }
+                //如果当前的cell数量已经和数据源相同，不再进行插入操作而是直接reloadData
+                if self.attendeeCollectionView.numberOfItems(inSection: 0) == self.viewModel.listSeatItem.count {
+                    self.attendeeCollectionView.reloadData()
+                } else {
+                    self.attendeeCollectionView.insertItems(at: indexPaths)
+                }
             }
         }
     }
     
     func deleteItems(at indexPaths: [IndexPath]) {
-        self.attendeeCollectionView.performBatchUpdates { [weak self] in
+        freshCollectionView { [weak self] in
             guard let self = self else { return }
-            //如果当前cell的数量已经和数据源相同，不再进行删除操作，而是直接reloadData
-            if self.attendeeCollectionView.numberOfItems(inSection: 0) == self.viewModel.listSeatItem.count {
-                self.attendeeCollectionView.reloadData()
-            } else {
-                var resultArray: [IndexPath] = []
-                let numberOfSections = self.attendeeCollectionView.numberOfSections
-                for indexPath in indexPaths {
-                    let section = indexPath.section
-                    let item = indexPath.item
-                    guard section < numberOfSections && item < self.attendeeCollectionView.numberOfItems(inSection: section)
-                    else { continue } // indexPath越界，不执行删除操作
-                    resultArray.append(indexPath)
+            self.attendeeCollectionView.performBatchUpdates { [weak self] in
+                guard let self = self else { return }
+                //如果当前cell的数量已经和数据源相同，不再进行删除操作，而是直接reloadData
+                if self.attendeeCollectionView.numberOfItems(inSection: 0) == self.viewModel.listSeatItem.count {
+                    self.attendeeCollectionView.reloadData()
+                } else {
+                    var resultArray: [IndexPath] = []
+                    let numberOfSections = self.attendeeCollectionView.numberOfSections
+                    for indexPath in indexPaths {
+                        let section = indexPath.section
+                        let item = indexPath.item
+                        guard section < numberOfSections && item < self.attendeeCollectionView.numberOfItems(inSection: section)
+                        else { continue } // indexPath越界，不执行删除操作
+                        resultArray.append(indexPath)
+                    }
+                    self.attendeeCollectionView.deleteItems(at: resultArray)
                 }
-                self.attendeeCollectionView.deleteItems(at: resultArray)
             }
         }
     }

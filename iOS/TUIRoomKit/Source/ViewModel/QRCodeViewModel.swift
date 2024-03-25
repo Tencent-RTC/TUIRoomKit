@@ -28,7 +28,7 @@ class QRCodeViewModel {
     }
     
     func backAction() {
-        RoomRouter.shared.dismissPopupViewController(viewType: .QRCodeViewType)
+        RoomRouter.shared.dismissPopupViewController()
     }
     
     func createQRCodeImageView(url: String, imageView: UIImageView) {

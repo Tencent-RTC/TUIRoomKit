@@ -207,3 +207,4 @@
 "TUIRoom.on.stage" = "لقد وصل xx إلى السلطة";
 "TUIRoom.on.stage.number.reached.limit" = "لقد وصل العدد الحالي للأشخاص على المسرح إلى الحد الأعلى";
 "TUIRoom.go.on.stage.timed.out" = "فشل الصعود على خشبة المسرح، انتهت مهلة الدعوة";
+"TUIRoom.kiecked.off.line" = "لقد قمت بالفعل بتسجيل الدخول في مكان آخر";

@@ -1,54 +1,56 @@
-# TUIRoomKit iOS 示例工程快速跑通
+# Quick Run of TUIRoomKit Demo for iOS
 
-_中文 | [English](README.en.md)_
+_[中文](README.md) | English_
 
-本文档主要介绍如何快速跑通TUIRoomKit 示例工程，体验高质量多人视频会议，更详细的TUIRoomKit组件接入流程，请点击腾讯云官网文档： [**TUIRoomKit 组件 iOS 接入说明** ](https://cloud.tencent.com/document/product/647/84237)...
+This document describes how to quickly run the TUIRoomKit demo project to make a high-quality audio/video call. For more information on the TUIRoomKit component connection process, see **[Integrating TUIRoomKit (iOS)](https://trtc.io/document/54842)**.
 
-## 目录结构
 
+> [!IMPORTANT]
+> The commercial version of TRTC Conference (TUIRoomKit) is coming soon. Please contact us to get a free trial of the powerful features of the commercial SDK (version 2.0). <br>
+The default download on GitHub is the 2.0 version SDK. You need to contact us through the following method to activate its use:<br>
+·Send an email to: chaooliang@tencent.com, please be sure to include the SDKAPPID in your email, so we can quickly respond and activate it for you.(Recommended for a quick response)<br>
+·Join the Telegram group: https://t.me/+EPk6TMZEZMM5OGY1?s_url=https%3A%2F%2Ftrtc.io.
+
+## Directory Structure
 ```
 TUIRoomKit
-├─ Example                      // 多人视频会议Demo工程
-│   ├─ App                      // 进入/创建多人视频会议UI代码以及用到的图片及国际化字符串资源文件夹
-│   ├─ Debug                    // 工程调试运行所需的关键业务代码文件夹
-│   ├─ Login                    // 登录UI及业务逻辑代码文件夹
-│   └─ TXReplayKit_Screen       // 共享屏幕逻辑代码文件夹
-└─ TUIRoomKit                   // 多人视频会议主要UI代码以及所需的图片、国际化字符串资源文件夹
+├─ Example                    // multi-person video conferencing demo project
+│   ├─ App                    // Folder of entering/creating multi-person video conferencing UI code and used images and internationalization string resources
+│   ├─ Debug                  // Folder of the key business code required for project debugging and running
+│   ├─ Login                  // Folder of the login UI and business logic code
+│   └─ TXReplayKit_Screen     // Folder of sharing screen
+└─ TUIRoomKit                 // Folder of multi-person video conferencing UI code and used images and internationalization string resources
 ```
 
-## 环境准备
+## Environment Requirements
+- iOS 13.0 or above
 
-iOS 13.0及更高。
-
-## 运行并体验 App
+## Running the Demo
 
 [](id:ui.step1)
-### 第一步：开通服务
-请参考官网文档中 [快速接入](https://cloud.tencent.com/document/product/1690/88932) 中获取自己的SDKAppID和SDKSecreKey
+### Step 1. Activate the service
+1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/54842) to obtain your own SDKAppID and SDKSecreKey.
 
-### 第二步：配置工程
-1. 使用Xcode(12.0及以上)打开源码工程`DemoApp.xcworkspace`。
-2. 工程内找到 `iOS/Example/Debug/GenerateTestUserSig.swift` 文件。
-3. 设置 `GenerateTestUserSig.swift` 文件中的相关参数：
-<ul style="margin:0"><li/>SDKAPPID：默认为0，请设置为实际的 SDKAppID。
-<li/>SECRETKEY：默认为空字符串，请设置为实际的密钥信息。</ul>
-
-![](../Preview/test-user-sig-ios.png)
+[](id:ui.step2)
+### Step 2. Download the source code and configure the project
+1. Clone or directly download the source code in the repository. **Feel free to star our project if you like it.**
+2. Find and open the `iOS/Example/Debug/GenerateTestUserSig.swift` file.
+3. Set parameters in `GenerateTestUserSig.swift`:
+	<img src="../Preview/test-user-sig-ios.png" width="900">
+	- SDKAPPID: A placeholder by default. Set it to the `SDKAppID` that you noted down in step 1.
+	- SECRETKEY: A placeholder by default. Set it to the key information that you noted down in step 1.
 
 [](id:ui.step3)
-### 第三步：编译运行
+### Step 3. Compile and run the application
 
-1. 打开Terminal（终端）进入到工程目录下执行`pod install`指令，等待完成。
-2. Xcode（12.0及以上的版本）打开源码工程 `TUIRoomKit/iOS/Example/DemoApp.xcworkspace`，单击 **运行** 即可开始调试本 App。
+1. Open Terminal, enter the project directory, run the `pod install` command, and wait for it to complete.
+2. Open the demo project `TUIRoomKit/Example/DemoApp.xcworkspace` with Xcode 12.0 or later and click **Run**.
 
 [](id:ui.step4)
 
->? 如果您在使用过程中，有什么建议或者意见，欢迎您加入我们的 TUIKit 组件交流群 QQ 群：592465424，进行技术交流和产品沟通。
+## Have any questions?
+Welcome to join our Telegram Group to communicate with our professional engineers! We are more than happy to hear from you~
+Click to join: https://t.me/+EPk6TMZEZMM5OGY1
+Or scan the QR code
 
-
-
-
-
-
-
-
+<img src="https://qcloudimg.tencent-cloud.cn/raw/9c67ed5746575e256b81ce5a60216c5a.jpg" width="320"/>

@@ -41,6 +41,7 @@ class RoomVideoFloatViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserAudioStateChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserVoiceVolumeChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onKickedOffLine, observer: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RoomOwnerChanged, responder: self)
     }
     
@@ -50,6 +51,7 @@ class RoomVideoFloatViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOutOfRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserAudioStateChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserVoiceVolumeChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOffLine, observer: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RoomOwnerChanged, responder: self)
     }
     
@@ -174,6 +176,8 @@ extension RoomVideoFloatViewModel: RoomEngineEventResponder {
             guard let volumeNumber = param?[self.userId] as? NSNumber else { return }
             guard let userModel = getUserEntity(userId: self.userId) else { return }
             viewResponder?.updateUserAudioVolume(hasAudio: userModel.hasAudioStream, volume: volumeNumber.intValue)
+        case .onKickedOffLine:
+            RoomVideoFloatView.dismiss()
         default: break
         }
     }

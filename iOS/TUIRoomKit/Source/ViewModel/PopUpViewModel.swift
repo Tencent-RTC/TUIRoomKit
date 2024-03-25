@@ -18,7 +18,6 @@ enum PopUpViewType {
     case transferMasterViewType //转换房主页面
     case QRCodeViewType // 二维码页面
     case chatViewType //聊天页面
-    case navigationControllerType
     case inviteViewType
 }
 
@@ -39,11 +38,11 @@ class PopUpViewModel {
     }
     
     func panelControlAction() {
-        searchControllerActiveChange()
-        RoomRouter.shared.dismissPopupViewController(viewType: viewType)
+        changeSearchControllerActive()
+        RoomRouter.shared.dismissPopupViewController()
     }
     
-    func searchControllerActiveChange() {
+    func changeSearchControllerActive() {
         viewResponder?.searchControllerChangeActive(isActive: false)
     }
     
