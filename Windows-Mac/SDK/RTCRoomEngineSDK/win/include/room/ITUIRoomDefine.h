@@ -255,6 +255,9 @@ enum class TUIRequestAction {
     /// 向管理员请求打开本地麦克风
     kApplyToAdminToOpenLocalMicrophone = 7,
 
+    /// 向管理员请求打开屏幕分享
+    kApplyToAdminToOpenLocalScreenShare = 8,
+
 };
 
 /**
@@ -316,6 +319,9 @@ struct TUIRoomInfo {
     /// 是否禁止打开麦克风（创建房间可选参数），默认值：{@link false}。
     bool isMicrophoneDisableForAllUser;
 
+    /// 是否禁止打开屏幕分享（创建房间可选参数），默认值：{@link false}。
+    bool isScreenShareDisableForAllUser;
+
     /// 是否禁止发送消息（创建房间可选参数），默认值：{@link false}。
     bool isMessageDisableForAllUser;
 
@@ -342,6 +348,7 @@ struct TUIRoomInfo {
           speechMode(TUISpeechMode::kNone),
           isCameraDisableForAllUser(false),
           isMicrophoneDisableForAllUser(false),
+          isScreenShareDisableForAllUser(false),
           isMessageDisableForAllUser(false),
           isSeatEnabled(false),
           seatMode(TUISeatMode::kFreeToTake),

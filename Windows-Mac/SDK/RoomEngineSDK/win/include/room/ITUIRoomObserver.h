@@ -81,7 +81,15 @@ class TUIRoomObserver {
     virtual void onAllUserCameraDisableChanged(const char* roomId, bool isDisable) = 0;
 
     /**
-     * 3.4 房间内用户发送文本消息被禁用事件
+     * 3.4 房间内所有用户屏幕分享被禁用事件
+     *
+     * @param roomId 房间ID
+     * @param isDisable 是否被禁用
+     */
+    virtual void onScreenShareForAllUserDisableChanged(const char* roomId, bool isDisable) = 0;
+
+    /**
+     * 3.5 房间内用户发送文本消息被禁用事件
      *
      * @param roomId 房间ID
      * @param isDisable 是否被禁用
@@ -89,14 +97,14 @@ class TUIRoomObserver {
     virtual void onSendMessageForAllUserDisableChanged(const char* roomId, bool isDisable) = 0;
 
     /**
-     * 3.5 房间被解散事件
+     * 3.6 房间被解散事件
      *
      * @param roomId 房间ID
      */
     virtual void onRoomDismissed(const char* roomId) = 0;
 
     /**
-     * 3.6 被踢出房间事件
+     * 3.7 被踢出房间事件
      *
      * @param roomId 房间ID
      * @param reason 被踢出原因
@@ -105,7 +113,7 @@ class TUIRoomObserver {
     virtual void onKickedOutOfRoom(const char* roomId, TUIKickedOutOfRoomReason reason, const char* message) = 0;
 
     /**
-     * 3.7 房间麦控模式发生变化
+     * 3.8 房间麦控模式发生变化
      *
      * @deprecated v2.0 版本开始，该功能已废弃，建议使用isSeatEnabled代替
      * @param roomId 房间ID
@@ -114,7 +122,7 @@ class TUIRoomObserver {
     room_engine_attribute_deprecated virtual void onRoomSpeechModeChanged(const char* roomId, TUISpeechMode speechMode) = 0;
 
     /**
-     * 3.8 房间上麦模式发生变化
+     * 3.9 房间上麦模式发生变化
      * @param roomId 房间ID
      * @param seatMode 上麦模式
      */

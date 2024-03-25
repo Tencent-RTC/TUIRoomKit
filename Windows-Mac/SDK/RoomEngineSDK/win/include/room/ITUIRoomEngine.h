@@ -425,11 +425,12 @@ class TUIRoomEngine : IDeprecatedRoomEngineAPI {
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 8.1 控制当前房间内所有用户是否可打开音频流、视频流采集设备的权限状态，例如：全员禁止打开麦克风、全员禁止打开摄像头（目前仅会议场景下可用，并且只有管理员或房主能够调用，device不支持SCREEN_SHARING类型）
+     * 8.1 控制当前房间内所有用户是否可打开音频流、视频流采集设备的权限状态，例如：全员禁止打开麦克风、全员禁止打开摄像头（目前仅会议场景下可用，并且只有管理员或房主能够调用）
      *
      * 接口调用成功后：
      * 若device类型为 {@link MICROPHONE} ，SDK会通过 {@link $TUIRoomObserver$} 中的 {@link onAllUserMicrophoneDisableChanged} 通知房间内用户
      * 若device类型为 {@link CAMERA} ，SDK会通过 {@link $TUIRoomObserver$} 中的 {@link onAllUserCameraDisableChanged} 通知房间内用户
+     * 若device类型为 {@link SCREEN_SHARING} ，SDK会通过 {@link $TUIRoomObserver$} 中的 {@link onScreenShareForAllUserDisableChanged} 通知房间内用户
      * @param device 设备。 详细定义参考:{@link TUIMediaDevice}
      * @param isDisable 否禁用
      * @param callback 操作回调

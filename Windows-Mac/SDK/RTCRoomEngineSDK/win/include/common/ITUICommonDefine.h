@@ -164,6 +164,12 @@ enum class TUIError {
     /// 需要向房主或管理员申请后打开摄像头
     ERR_OPEN_CAMERA_NEED_PERMISSION_FROM_ADMIN = -2371,
 
+    /// 当前麦位视频被锁, 需要由房主解锁麦位后，才能打开屏幕分享
+    ERR_OPEN_SCREEN_SHARE_NEED_SEAT_UNLOCK = -2372,
+
+    /// 需要向房主或管理员申请后打开屏幕分享
+    ERR_OPEN_SCREEN_SHARE_NEED_PERMISSION_FROM_ADMIN = -2373,
+
     /// 当前房间已开启全员禁言
     ERR_SEND_MESSAGE_DISABLED_FOR_ALL = -2380,
 

@@ -182,6 +182,7 @@ private:
     void onUserAudioStateChanged(const char* user_id, bool has_video, tuikit::TUIChangeReason reason) override;
     void onUserVoiceVolumeChanged(tuikit::TUIMap<const char*, int>* volume_map) override;
 
+    void onScreenShareForAllUserDisableChanged(const char* room_id, bool is_disable) override;
     void onSendMessageForUserDisableChanged(const char* room_id, const char* user_id, bool is_disable) override;
     void onUserNetworkQualityChanged(tuikit::TUIList<tuikit::TUINetwork>* network_list) override;
     void onUserScreenCaptureStopped(int reason) override;
