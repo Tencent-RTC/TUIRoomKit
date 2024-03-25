@@ -10,6 +10,7 @@ import android.util.Log;
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomObserver;
+import com.tencent.cloud.tuikit.roomkit.ConferenceObserver;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
@@ -30,6 +31,7 @@ public class RoomEventDispatcher extends TUIRoomObserver {
 
     @Override
     public void onError(TUICommonDefine.Error errorCode, String message) {
+        Log.d(TAG, "onError errorCode=" + errorCode + " message=" + message);
         Map<String, Object> map = new HashMap<>();
         map.put(RoomEventConstant.KEY_ERROR_CODE, errorCode);
         map.put(RoomEventConstant.KEY_MESSAGE, message);
@@ -38,6 +40,7 @@ public class RoomEventDispatcher extends TUIRoomObserver {
 
     @Override
     public void onKickedOffLine(String message) {
+        Log.d(TAG, "onKickedOffLine message=" + message);
         Map<String, Object> map = new HashMap<>();
         map.put(RoomEventConstant.KEY_MESSAGE, message);
         RoomEventCenter.getInstance().notifyEngineEvent(RoomEventCenter.RoomEngineEvent.KICKED_OFF_LINE, map);
@@ -45,6 +48,7 @@ public class RoomEventDispatcher extends TUIRoomObserver {
 
     @Override
     public void onUserSigExpired() {
+        Log.d(TAG, "onUserSigExpired");
         RoomEventCenter.getInstance().notifyEngineEvent(RoomEventCenter.RoomEngineEvent.USER_SIG_EXPIRED, null);
     }
 
@@ -87,17 +91,31 @@ public class RoomEventDispatcher extends TUIRoomObserver {
 
     @Override
     public void onRoomDismissed(String roomId) {
+        Log.d(TAG, "onRoomDismissed roomId=" + roomId);
         Map<String, Object> map = new HashMap<>();
         map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
         RoomEventCenter.getInstance().notifyEngineEvent(RoomEventCenter.RoomEngineEvent.ROOM_DISMISSED, map);
+
+        ConferenceObserver observer = mRoomStore.getConferenceObserver();
+        if (observer != null) {
+            Log.i(TAG, "onConferenceFinished : " + roomId);
+            observer.onConferenceFinished(roomId);
+        }
     }
 
     @Override
     public void onKickedOutOfRoom(String roomId, TUIRoomDefine.KickedOutOfRoomReason reason, String message) {
+        Log.d(TAG, "onKickedOutOfRoom roomId=" + roomId + " reason=" + reason + " message=" + message);
         Map<String, Object> map = new HashMap<>();
         map.put(RoomEventConstant.KEY_ROOM_ID, roomId);
         map.put(RoomEventConstant.KEY_MESSAGE, message);
         RoomEventCenter.getInstance().notifyEngineEvent(RoomEventCenter.RoomEngineEvent.KICKED_OUT_OF_ROOM, map);
+
+        ConferenceObserver observer = mRoomStore.getConferenceObserver();
+        if (observer != null) {
+            Log.i(TAG, "onConferenceExisted : " + roomId);
+            observer.onConferenceExisted(roomId);
+        }
     }
 
     @Override
@@ -115,7 +133,11 @@ public class RoomEventDispatcher extends TUIRoomObserver {
     public void onUserRoleChanged(String userId, TUIRoomDefine.Role role) {
         Log.d(TAG, "onUserRoleChanged userId=" + userId + " role=" + role);
         if (TextUtils.equals(userId, mRoomStore.userModel.userId)) {
-            mRoomStore.userModel.setRole(role);
+            if (mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER
+                    && role != TUIRoomDefine.Role.GENERAL_USER) {
+                RoomEngineManager.sharedInstance().getSeatApplicationList();
+            }
+            mRoomStore.userModel.changeRole(role);
             RoomEngineManager.sharedInstance().autoTakeSeatForOwner(null);
             RoomEngineManager.sharedInstance().enableSendingMessageForOwner();
         }

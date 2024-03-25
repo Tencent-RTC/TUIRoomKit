@@ -129,6 +129,5 @@
         android:text="@string/app_create_room"
         android:textColor="@color/tuiroomkit_color_text_light_grey"
         android:textSize="14sp" />
-
 </RelativeLayout>
 

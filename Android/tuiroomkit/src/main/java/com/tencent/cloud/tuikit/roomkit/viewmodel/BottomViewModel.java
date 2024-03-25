@@ -22,7 +22,6 @@ import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
-import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.entity.BottomItemData;
 import com.tencent.cloud.tuikit.roomkit.model.entity.BottomSelectItemData;
@@ -30,14 +29,13 @@ import com.tencent.cloud.tuikit.roomkit.model.entity.UserEntity;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.utils.DrawOverlaysPermissionUtil;
 import com.tencent.cloud.tuikit.roomkit.utils.IntentUtils;
+import com.tencent.cloud.tuikit.roomkit.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.BottomNavigationBar.BottomView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.Chat.ChatActivity;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
-import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.interfaces.TUIServiceCallback;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -232,7 +230,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
             public void onItemSelected(boolean isSelected) {
                 RoomEventCenter.getInstance().notifyUIEvent(BAR_SHOW_TIME_RECOUNT, null);
                 if (!isOnSeatInSeatMode()) {
-                    ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_please_raise_hand));
+                    RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_please_raise_hand));
                     return;
                 }
                 if (RoomEngineManager.sharedInstance().getRoomStore().videoModel.isScreenSharing()) {
@@ -266,7 +264,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
 
     private void startScreenShare() {
         if (RoomEngineManager.sharedInstance().getRoomStore().hasScreenSharingInRoom()) {
-            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_other_user_in_screen_sharing));
+            RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_other_user_in_screen_sharing));
             return;
         }
         if (!DrawOverlaysPermissionUtil.isGrantedDrawOverlays()) {
@@ -372,7 +370,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
 
     private void raiseHand() {
         if (mRoomStore.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
-            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_raised_hand));
+            RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_raised_hand));
         }
         RoomEngineManager.sharedInstance().takeSeat(SEAT_INDEX, NEVER_TIME_OUT, new TUIRoomDefine.RequestCallback() {
             @Override
@@ -381,7 +379,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
                     return;
                 }
                 mBottomView.replaceItem(BottomItemData.Type.RAISE_HAND, createRaiseHandItem());
-                ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_take_seat_success));
+                RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_take_seat_success));
             }
 
             @Override
@@ -390,7 +388,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
                     return;
                 }
                 mBottomView.replaceItem(BottomItemData.Type.RAISE_HAND, createRaiseHandItem());
-                ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_take_seat_rejected));
+                RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_take_seat_rejected));
             }
 
             @Override
@@ -424,7 +422,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
         if (TextUtils.isEmpty(mRoomStore.userModel.takeSeatRequestId)) {
             return;
         }
-        ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_hands_down));
+        RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_toast_hands_down));
         RoomEngineManager.sharedInstance().cancelRequest(mRoomStore.userModel.takeSeatRequestId,
                 new TUIRoomDefine.ActionCallback() {
                     @Override
@@ -462,7 +460,7 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
                         leaveSeat();
                     }
                 })
-                .showDialog(activity.getSupportFragmentManager(), "leaveSeat");
+                .showDialog(activity, "leaveSeat");
     }
 
     private void leaveSeat() {
@@ -565,11 +563,11 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
             return;
         }
         if (!isOnSeatInSeatMode()) {
-            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_please_raise_hand));
+            RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_please_raise_hand));
             return;
         }
         if (!isCameraAvailableInAllBanCameraMode()) {
-            ToastUtil.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_can_not_open_camera));
+            RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_can_not_open_camera));
             return;
         }
         RoomEngineManager.sharedInstance().openLocalCamera(null);

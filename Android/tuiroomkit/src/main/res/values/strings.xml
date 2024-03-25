@@ -3,6 +3,7 @@
     <string name="tuiroomkit_role_owner">Host</string>
     <string name="tuiroomkit_role_manager">Manager</string>
     <string name="tuiroomkit_copy_room_id_success">Room ID copied successfully.</string>
+    <string name="tuiroomkit_tip_exit_first_title">Please exit the current meeting before entering other meetings</string>
     <string name="tuiroomkit_permission_mic_reason_title">%s applies for access to the microphone</string>
     <string name="tuiroomkit_permission_mic_reason">Needs access to your microphone, and it can be used for functions such as Interactive Video Streaming, Show Live, Video Call, Group Video Call, Multi-person audio and video room, etc.</string>
     <string name="tuiroomkit_permission_camera_reason_title">%s applies for camera permission</string>

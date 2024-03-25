@@ -1,15 +1,14 @@
 package com.tencent.liteav.demo.viewmodel;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 
-import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
-import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
+import com.tencent.liteav.demo.R;
+import com.tencent.liteav.demo.view.activity.ConferenceMainActivity;
 import com.tencent.liteav.demo.view.component.BaseSettingItem;
 import com.tencent.liteav.demo.view.component.SwitchSettingItem;
-import com.tencent.liteav.demo.R;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.util.ArrayList;
 
@@ -24,22 +23,17 @@ public class EnterRoomViewModel {
         mContext = context;
     }
 
-    public void enterRoom(String roomId) {
+    public void enterRoom(String roomId, TUIRoomDefine.ActionCallback callback) {
         if (TextUtils.isEmpty(roomId)) {
             return;
         }
-        TUIRoomKit tuiRoomKit = TUIRoomKit.createInstance();
-        tuiRoomKit.enterRoom(roomId, mIsOpenAudio, mIsOpenVideo, mIsUseSpeaker,
-                new TUIRoomDefine.GetRoomInfoCallback() {
-                    @Override
-                    public void onSuccess(TUIRoomDefine.RoomInfo roomInfo) {
-                    }
-
-                    @Override
-                    public void onError(TUICommonDefine.Error error, String message) {
-                        ToastUtil.toastLongMessage("error=" + error + " message=" + message);
-                    }
-                });
+        Intent intent = new Intent(mContext, ConferenceMainActivity.class);
+        intent.putExtra("id", roomId);
+        intent.putExtra("muteMicrophone", !mIsOpenAudio);
+        intent.putExtra("openCamera", mIsOpenVideo);
+        intent.putExtra("soundOnSpeaker", mIsUseSpeaker);
+        intent.putExtra("isCreate", false);
+        mContext.startActivity(intent);
     }
 
     public ArrayList<SwitchSettingItem> createSwitchSettingItemList() {

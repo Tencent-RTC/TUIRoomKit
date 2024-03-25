@@ -3,6 +3,7 @@
     <string name="tuiroomkit_role_owner">يستضيف</string>
     <string name="tuiroomkit_role_manager">مدير</string>
     <string name="tuiroomkit_copy_room_id_success">تم نسخ معرف الغرفة بنجاح.</string>
+    <string name="tuiroomkit_tip_exit_first_title">الرجاء الخروج من الاجتماع الحالي قبل الدخول إلى الاجتماعات الأخرى</string>
     <string name="tuiroomkit_permission_mic_reason_title">%s يتقدم بطلب للوصول إلى الميكروفون</string>
     <string name="tuiroomkit_permission_mic_reason">يحتاج الوصول إلى ميكروفونك، ويمكن استخدامه لوظائف مثل البث التفاعلي للفيديو، وعرض البث المباشر، والمكالمات الفيديو، والمكالمات الفيديو الجماعية، وغرف الصوت والفيديو لعدة أشخاص، وما إلى ذلك.</string>
     <string name="tuiroomkit_permission_camera_reason_title">%s يتقدم بطلب للحصول على إذن الكاميرا</string>

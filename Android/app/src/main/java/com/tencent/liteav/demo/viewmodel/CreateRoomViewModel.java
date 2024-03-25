@@ -1,27 +1,17 @@
 package com.tencent.liteav.demo.viewmodel;
 
-import static com.tencent.imsdk.BaseConstants.ERR_SUCC;
-
 import android.content.Context;
-import android.util.Log;
+import android.content.Intent;
 
-import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
-import com.tencent.cloud.tuikit.roomkit.TUIRoomKit;
-import com.tencent.imsdk.v2.V2TIMGroupInfoResult;
-import com.tencent.imsdk.v2.V2TIMManager;
-import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.tencent.liteav.demo.R;
+import com.tencent.liteav.demo.view.activity.ConferenceMainActivity;
 import com.tencent.liteav.demo.view.component.BaseSettingItem;
 import com.tencent.liteav.demo.view.component.SwitchSettingItem;
 import com.tencent.qcloud.tuicore.TUILogin;
-import com.tencent.qcloud.tuicore.interfaces.TUICallback;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 public class CreateRoomViewModel {
     private static final String TAG = "CreateRoomViewModel";
@@ -42,34 +32,16 @@ public class CreateRoomViewModel {
         mIsSeatEnabled = enable;
     }
 
-    public void createRoom(String roomId) {
-        TUIRoomDefine.RoomInfo roomInfo = new TUIRoomDefine.RoomInfo();
-        roomInfo.roomId = roomId;
-        roomInfo.name = truncateString(TUILogin.getNickName());
-        roomInfo.isSeatEnabled = mIsSeatEnabled;
-        roomInfo.seatMode = TUIRoomDefine.SeatMode.APPLY_TO_TAKE;
-        TUIRoomKit roomKit = TUIRoomKit.createInstance();
-        roomKit.createRoom(roomInfo, new TUIRoomDefine.ActionCallback() {
-            @Override
-            public void onSuccess() {
-                roomKit.enterRoom(roomId, mIsOpenAudio, mIsOpenVideo, mIsUseSpeaker,
-                        new TUIRoomDefine.GetRoomInfoCallback() {
-                            @Override
-                            public void onSuccess(TUIRoomDefine.RoomInfo roomInfo) {
-                            }
-
-                            @Override
-                            public void onError(TUICommonDefine.Error error, String message) {
-                                ToastUtil.toastLongMessage("error=" + error + " message=" + message);
-                            }
-                        });
-            }
-
-            @Override
-            public void onError(TUICommonDefine.Error error, String message) {
-                ToastUtil.toastLongMessage("error=" + error + " message=" + message);
-            }
-        });
+    public void createRoom(String conferenceId, TUIRoomDefine.ActionCallback callback) {
+        Intent intent = new Intent(mContext, ConferenceMainActivity.class);
+        intent.putExtra("id", conferenceId);
+        intent.putExtra("name", truncateString(TUILogin.getNickName()));
+        intent.putExtra("enableSeatControl", mIsSeatEnabled);
+        intent.putExtra("muteMicrophone", !mIsOpenAudio);
+        intent.putExtra("openCamera", mIsOpenVideo);
+        intent.putExtra("soundOnSpeaker", mIsUseSpeaker);
+        intent.putExtra("isCreate", true);
+        mContext.startActivity(intent);
     }
 
     private String truncateString(String string) {
