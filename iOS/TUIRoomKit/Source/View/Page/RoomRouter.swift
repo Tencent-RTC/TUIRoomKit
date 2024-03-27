@@ -136,7 +136,8 @@ class RoomRouter: NSObject {
             navController?.dismiss(animated: true)
             context.rootNavigation = nil
         } else {
-            if let vc = viewControllerArray.last, vc is ConferenceMainViewController {                navController?.popViewController(animated: animated)
+            if let vc = viewControllerArray.last, vc is ConferenceMainViewController {                
+                navController?.popViewController(animated: animated)
                 context.rootNavigation = nil
             } else {
                 navController?.popViewController(animated: animated)

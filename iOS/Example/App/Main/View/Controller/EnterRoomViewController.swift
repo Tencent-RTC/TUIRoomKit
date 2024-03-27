@@ -176,9 +176,9 @@ extension EnterRoomViewController {
 
 extension EnterRoomViewController: ConferenceObserver {
     func onConferenceJoined(conferenceId: String, error: ConferenceError) {
-        guard error == .success else { return }
-        guard let vc = conferenceViewController else { return }
-        navigationController?.pushViewController(vc, animated: true)
+        if error == .success, let vc = conferenceViewController {
+            navigationController?.pushViewController(vc, animated: true)
+        }
         conferenceViewController = nil
         renewRootViewState()
     }
