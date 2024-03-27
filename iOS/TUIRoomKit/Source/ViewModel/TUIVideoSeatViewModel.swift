@@ -14,7 +14,7 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
-protocol TUIVideoSeatViewResponder: AnyObject {
+protocol TUIVideoSeatViewModelResponder: AnyObject {
     func reloadData()
     func insertItems(at indexPaths: [IndexPath])
     func deleteItems(at indexPaths: [IndexPath])
@@ -29,6 +29,8 @@ protocol TUIVideoSeatViewResponder: AnyObject {
     func updateSeatVolume(_ item: VideoSeatItem)
     
     func showScreenCaptureMaskView(isShow: Bool)
+    
+    func destroyVideoSeatResponder()
 }
 
 // 视图类型
@@ -72,7 +74,7 @@ class TUIVideoSeatViewModel: NSObject {
         return videoSeatItems.firstIndex(where: { $0.hasScreenStream }) != nil
     }
     
-    weak var viewResponder: TUIVideoSeatViewResponder?
+    weak var viewResponder: TUIVideoSeatViewModelResponder?
     var videoSeatViewType: TUIVideoSeatViewType = .unknown
     var engineManager: EngineManager {
         EngineManager.createInstance()
@@ -115,6 +117,7 @@ class TUIVideoSeatViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onSeatListChanged, observer: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, responder: self)
     }
     
     private func unsubscribeUIEvent() {
@@ -127,6 +130,7 @@ class TUIVideoSeatViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onSeatListChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, responder: self)
     }
     
     deinit {
@@ -135,36 +139,9 @@ class TUIVideoSeatViewModel: NSObject {
     }
 }
 
-// MARK: - Public
-
 extension TUIVideoSeatViewModel {
-    func isHomeOwner(_ userId: String) -> Bool {
-        return roomInfo.ownerId == userId
-    }
     
-    func switchPosition() {
-        if videoSeatViewType == .largeSmallWindowType {
-            isSwitchPosition = !isSwitchPosition
-            refreshListSeatItem()
-            resetMiniscreen()
-            viewResponder?.reloadData()
-        }
-    }
-    
-    func updateSpeakerPlayVideoState(currentPageIndex: Int) {
-        // currentPageIndex : 0,1,2,3
-        if videoSeatViewType != .speechType {
-            return
-        }
-        if currentPageIndex == 0 {
-            viewResponder?.updateMiniscreen(speakerItem)
-        } else if let item = videoSeatItems.first(where: { $0.userId == speakerItem?.userId }),
-                  let renderView = viewResponder?.getVideoVisibleCell(item)?.renderView {
-            startPlayVideo(item: item, renderView: renderView)
-        }
-    }
-    
-    func startPlayVideo(item: VideoSeatItem, renderView: UIView?) {
+    private func startPlayVideo(item: VideoSeatItem, renderView: UIView?) {
         guard let renderView = renderView else { return }
         if item.userId == currentUserId {
             engineManager.setLocalVideoView(streamType: item.streamType, view: renderView)
@@ -182,7 +159,7 @@ extension TUIVideoSeatViewModel {
         seatCell.updateUI(item: item)
     }
     
-    func stopPlayVideo(item: VideoSeatItem) {
+    private func stopPlayVideo(item: VideoSeatItem) {
         unboundCell(item: item)
         if item.userId != currentUserId {
             engineManager.stopPlayRemoteVideo(userId: item.userId, streamType: item.streamType)
@@ -202,21 +179,6 @@ extension TUIVideoSeatViewModel {
         }
     }
     
-    func clickVideoSeat() {
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, param: [:])
-        guard RoomRouter.shared.hasChatWindow() else { return }
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_HiddenChatWindow, param: [:])
-    }
-    
-    func stopScreenCapture() {
-        EngineEventCenter.shared.notifyEngineEvent(event: .onUserScreenCaptureStopped, param: [:])
-        engineManager.stopScreenCapture()
-    }
-}
-
-// MARK: - Private
-
-extension TUIVideoSeatViewModel {
     private func addUserInfo(_ userId: String) {
         guard !videoSeatItems.contains(where: { $0.userId == userId }) else { return }
         guard let userInfo = store.attendeeList.first(where: { $0.userId == userId }) else { return }
@@ -266,13 +228,9 @@ extension TUIVideoSeatViewModel {
             viewResponder?.updateSeatItem(smallItem)
         }
         guard userRole == .roomOwner else { return }
-        if videoSeatViewType == .largeSmallWindowType {
-            refreshListSeatItem()
-            viewResponder?.reloadData()
-            resetMiniscreen()
-        } else {
-            reloadSeatItems()
-        }
+        refreshListSeatItem()
+        viewResponder?.reloadData()
+        resetMiniscreen()
     }
     
     private func getSeatItem(_ userId: String) -> VideoSeatItem? {
@@ -291,8 +249,6 @@ extension TUIVideoSeatViewModel {
             let roomOwnerItem = videoSeatItems.remove(at: roomOwnerItemIndex)
             videoSeatItems.insert(roomOwnerItem, at: 0)
         }
-        
-        viewResponder?.reloadData()
     }
     
     private func checkNeededSort() -> Bool {
@@ -477,6 +433,9 @@ extension TUIVideoSeatViewModel: RoomKitUIEventResponder {
         switch key {
         case .TUIRoomKitService_RenewVideoSeatView:
             initVideoSeatItems()
+        case .TUIRoomKitService_DismissConferenceViewController:
+            viewResponder?.destroyVideoSeatResponder()
+            viewResponder = nil
         default: break
         }
     }
@@ -613,5 +572,46 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
         guard let seatItem = getSeatItem(currentUserId) else { return }
         seatItem.hasScreenStream = false
         reloadSeatItems()
+    }
+}
+
+extension TUIVideoSeatViewModel: TUIVideoSeatViewResponder {
+    func switchPosition() {
+        guard videoSeatViewType == .largeSmallWindowType else { return }
+        isSwitchPosition = !isSwitchPosition
+        refreshListSeatItem()
+        resetMiniscreen()
+        viewResponder?.reloadData()
+    }
+    
+    func clickVideoSeat() {
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, param: [:])
+        guard RoomRouter.shared.hasChatWindow() else { return }
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_HiddenChatWindow, param: [:])
+    }
+    
+    func startPlayVideoStream(item: VideoSeatItem, renderView: UIView?) {
+        startPlayVideo(item: item, renderView: renderView)
+    }
+    
+    func stopPlayVideoStream(item: VideoSeatItem) {
+        stopPlayVideo(item: item)
+    }
+    
+    func updateSpeakerPlayVideoState(currentPageIndex: Int) {
+        if videoSeatViewType != .speechType {
+            return
+        }
+        if currentPageIndex == 0 {
+            viewResponder?.updateMiniscreen(speakerItem)
+        } else if let item = videoSeatItems.first(where: { $0.userId == speakerItem?.userId }),
+                  let renderView = viewResponder?.getVideoVisibleCell(item)?.renderView {
+            startPlayVideo(item: item, renderView: renderView)
+        }
+    }
+    
+    func stopScreenCapture() {
+        EngineEventCenter.shared.notifyEngineEvent(event: .onUserScreenCaptureStopped, param: [:])
+        engineManager.stopScreenCapture()
     }
 }

@@ -14,10 +14,20 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
+protocol TUIVideoSeatViewResponder: AnyObject {
+    func switchPosition()
+    func clickVideoSeat()
+    func startPlayVideoStream(item: VideoSeatItem, renderView: UIView?)
+    func stopPlayVideoStream(item: VideoSeatItem)
+    func updateSpeakerPlayVideoState(currentPageIndex: Int)
+    func stopScreenCapture()
+}
+
 class TUIVideoSeatView: UIView {
     private let CellID_Normal = "VideoSeatCell_Normal"
     private let viewModel: TUIVideoSeatViewModel
     private var isViewReady: Bool = false
+    weak var responder: TUIVideoSeatViewResponder?
     
     private var pageControl: UIPageControl = {
         let control = UIPageControl()
@@ -28,10 +38,11 @@ class TUIVideoSeatView: UIView {
         return control
     }()
     
-    init() {
-        viewModel = TUIVideoSeatViewModel()
+    init(viewModel: TUIVideoSeatViewModel) {
+        self.viewModel = viewModel
         super.init(frame: .zero)
         viewModel.viewResponder = self
+        responder = viewModel
         isUserInteractionEnabled = true
     }
     
@@ -95,7 +106,7 @@ class TUIVideoSeatView: UIView {
     lazy var moveMiniscreen: TUIVideoSeatDragCell = {
         let cell = TUIVideoSeatDragCell(frame: videoSeatLayout.getMiniscreenFrame(item: nil)) { [weak self] in
             guard let self = self else { return }
-            self.viewModel.switchPosition()
+            self.responder?.switchPosition()
         }
         cell.isHidden = true
         addSubview(cell)
@@ -104,7 +115,7 @@ class TUIVideoSeatView: UIView {
     
     lazy var screenCaptureMaskView: ScreenCaptureMaskView = {
         let view = ScreenCaptureMaskView(frameType: .fullScreen)
-        view.viewModel = self.viewModel
+        view.responder = self.responder
         view.isHidden = true
         return view
     }()
@@ -152,7 +163,7 @@ class TUIVideoSeatView: UIView {
     }
     
     @objc private func clickVideoSeat() {
-        viewModel.clickVideoSeat()
+        responder?.clickVideoSeat()
     }
     
     func updatePageControl() {
@@ -162,9 +173,9 @@ class TUIVideoSeatView: UIView {
         
         if let seatItem = moveMiniscreen.seatItem, seatItem.hasVideoStream {
             if pageControl.currentPage == 0 && !moveMiniscreen.isHidden {
-                viewModel.startPlayVideo(item: seatItem, renderView: moveMiniscreen.renderView)
+                responder?.startPlayVideoStream(item: seatItem, renderView: moveMiniscreen.renderView)
             } else {
-                viewModel.startPlayVideo(item: seatItem, renderView: getVideoVisibleCell(seatItem)?.renderView)
+                responder?.startPlayVideoStream(item: seatItem, renderView: getVideoVisibleCell(seatItem)?.renderView)
             }
         }
     }
@@ -174,9 +185,9 @@ class TUIVideoSeatView: UIView {
     }
 }
 
-// MARK: - TUIVideoSeatViewResponder
+// MARK: - TUIVideoSeatViewModelResponder
 
-extension TUIVideoSeatView: TUIVideoSeatViewResponder {
+extension TUIVideoSeatView: TUIVideoSeatViewModelResponder {
     private func freshCollectionView(block: () -> Void) {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
@@ -237,9 +248,9 @@ extension TUIVideoSeatView: TUIVideoSeatViewResponder {
         guard let cell = getVideoVisibleCell(item) else { return }
         cell.updateUI(item: item)
         if item.hasVideoStream {
-            viewModel.startPlayVideo(item: item, renderView: cell.renderView)
+            responder?.startPlayVideoStream(item: item, renderView: cell.renderView)
         } else {
-            viewModel.stopPlayVideo(item: item)
+            responder?.stopPlayVideoStream(item: item)
         }
     }
     
@@ -269,14 +280,14 @@ extension TUIVideoSeatView: TUIVideoSeatViewResponder {
             return
         }
         if let seatItem = moveMiniscreen.seatItem, seatItem.userId != item.userId, (getVideoVisibleCell(seatItem) == nil) {
-            viewModel.stopPlayVideo(item: seatItem)
+            responder?.stopPlayVideoStream(item: seatItem)
         }
         moveMiniscreen.updateSize(size: videoSeatLayout.getMiniscreenFrame(item: item).size)
         moveMiniscreen.isHidden = false
         bringSubviewToFront(moveMiniscreen)
         moveMiniscreen.updateUI(item: item)
         if item.isHasVideoStream {
-            viewModel.startPlayVideo(item: item, renderView: moveMiniscreen.renderView)
+            responder?.startPlayVideoStream(item: item, renderView: moveMiniscreen.renderView)
         }
     }
     
@@ -294,6 +305,12 @@ extension TUIVideoSeatView: TUIVideoSeatViewResponder {
             screenCaptureMaskView.superview?.bringSubviewToFront(screenCaptureMaskView)
         }
     }
+    
+    func destroyVideoSeatResponder() {
+        responder = nil
+        attendeeCollectionView.delegate = nil
+        attendeeCollectionView.dataSource = nil
+    }
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
@@ -303,23 +320,23 @@ extension TUIVideoSeatView: UICollectionViewDelegateFlowLayout {
         guard let seatItem = viewModel.listSeatItem[safe: indexPath.item] else { return }
         guard let seatCell = cell as? VideoSeatCell else { return }
         if seatItem.isHasVideoStream {
-            viewModel.startPlayVideo(item: seatItem, renderView: seatCell.renderView)
+            responder?.startPlayVideoStream(item: seatItem, renderView: seatCell.renderView)
         } else {
-            viewModel.stopPlayVideo(item: seatItem)
+            responder?.stopPlayVideoStream(item: seatItem)
         }
         seatCell.updateUI(item: seatItem)
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let seatItem = viewModel.listSeatItem[safe: indexPath.item] else { return }
-        viewModel.stopPlayVideo(item: seatItem)
+        responder?.stopPlayVideoStream(item: seatItem)
     }
 }
 
 extension TUIVideoSeatView: UIScrollViewDelegate {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let currentPageIndex = Int(scrollView.contentOffset.x / scrollView.mm_w)
-        viewModel.updateSpeakerPlayVideoState(currentPageIndex: currentPageIndex)
+        responder?.updateSpeakerPlayVideoState(currentPageIndex: currentPageIndex)
         if currentPageIndex == 0 {
             addSubview(moveMiniscreen)
         } else {
@@ -351,7 +368,6 @@ extension TUIVideoSeatView: UICollectionViewDataSource {
         if indexPath.item >= viewModel.listSeatItem.count {
             return cell
         }
-        cell.viewModel = self.viewModel
         return cell
     }
 }

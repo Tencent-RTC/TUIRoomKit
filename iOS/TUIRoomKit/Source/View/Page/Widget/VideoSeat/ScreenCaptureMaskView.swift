@@ -15,7 +15,7 @@ enum ScreenCaptureMaskViewFrameType {
 
 class ScreenCaptureMaskView: UIView {
     private var dotsTimer: Timer = Timer()
-    var viewModel: TUIVideoSeatViewModel?
+    weak var responder: TUIVideoSeatViewResponder?
     let frameType: ScreenCaptureMaskViewFrameType
     
     let contentView: UIView = {
@@ -124,7 +124,7 @@ class ScreenCaptureMaskView: UIView {
     @objc func stopScreenCaptureAction(sender: UIButton) {
         RoomRouter.presentAlert(title: .toastTitleText, message: .toastMessageText, sureTitle: .toastStopText, declineTitle: .toastCancelText, sureBlock: { [weak self] in
             guard let self = self else { return }
-            self.viewModel?.stopScreenCapture()
+            self.responder?.stopScreenCapture()
         }, declineBlock: nil)
     }
     

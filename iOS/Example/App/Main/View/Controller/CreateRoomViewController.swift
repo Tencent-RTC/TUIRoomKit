@@ -242,9 +242,9 @@ extension CreateRoomViewController {
 
 extension CreateRoomViewController: ConferenceObserver {
     func onConferenceStarted(conferenceId: String, error: ConferenceError) {
-        guard error == .success else { return }
-        guard let vc = conferenceViewController else { return }
-        navigationController?.pushViewController(vc, animated: true)
+        if error == .success, let vc = conferenceViewController {
+            navigationController?.pushViewController(vc, animated: true)
+        }
         conferenceViewController = nil
         renewRootViewState()
     }

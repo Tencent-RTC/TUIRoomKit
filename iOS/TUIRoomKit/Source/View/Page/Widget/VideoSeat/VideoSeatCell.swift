@@ -12,7 +12,6 @@ import UIKit
 
 class VideoSeatCell: UICollectionViewCell {
     var seatItem: VideoSeatItem?
-    var viewModel: TUIVideoSeatViewModel?
     
     let renderView: UIView = {
         let view = UIView(frame: .zero)

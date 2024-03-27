@@ -362,7 +362,8 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
     }
     
     func makeVideoSeatView() -> UIView {
-        let videoSeatView = TUIVideoSeatView()
+        let viewModel = TUIVideoSeatViewModel()
+        let videoSeatView = TUIVideoSeatView(viewModel: viewModel)
         videoSeatView.backgroundColor = UIColor(0x0F1014)
         return videoSeatView
     }
