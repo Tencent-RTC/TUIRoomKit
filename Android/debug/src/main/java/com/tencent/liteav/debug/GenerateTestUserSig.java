@@ -19,14 +19,14 @@ import javax.crypto.spec.SecretKeySpec;
  * Description: Generates UserSig for testing. UserSig is a security signature designed
  *           by Tencent Cloud for its cloud services.
  *           It is calculated based on `SDKAppID`, `UserID`,
- *           and `EXPIRETIME` using the HMAC-SHA256 encryption algorithm.
+ *           and `EXPIRE_TIME` using the HMAC-SHA256 encryption algorithm.
  *
  * Attention: For the following reasons, do not use the code below in your commercial application.
  *
  *            The code may be able to calculate UserSig correctly, b
  *            ut it is only for quick testing of the SDK’s basic features,
  *            not for commercial applications.
- *            `SECRETKEY` in client code can be easily decompiled and reversed, especially on web.
+ *            `SDKSecretKey` in client code can be easily decompiled and reversed, especially on web.
  *            Once your key is disclosed, attackers will be able to steal your Tencent Cloud traffic.
  *
  *            The correct method is to deploy the `UserSig` calculation code and encryption key on your server
@@ -45,7 +45,7 @@ public class GenerateTestUserSig {
      * You can view your `SDKAppId` after creating an application in the [Tencent Cloud IM console](https://console.cloud.tencent.com/avc).
      * SDKAppID uniquely identifies a Tencent Cloud account.
      */
-    public static final int SDKAPPID = PLACEHOLDER;
+    public static final int SDKAppID = PLACEHOLDER;
 
 
     /**
@@ -54,7 +54,7 @@ public class GenerateTestUserSig {
      * Unit: Second
      * Default value: 604800 (seven days)
      */
-    private static final int EXPIRETIME = 604800;
+    private static final int EXPIRE_TIME = 604800;
 
     /**
      * Follow the steps below to obtain the key required for UserSig calculation.
@@ -69,20 +69,20 @@ public class GenerateTestUserSig {
      * to prevent key disclosure and traffic stealing.
      * Documentation: https://cloud.tencent.com/document/product/269/32688#Server
      */
-    private static final String SECRETKEY = "PLACEHOLDER";
+    private static final String SDKSecretKey = "PLACEHOLDER";
 
     /**
      * Calculating UserSig
      * <p>
      * The asymmetric encryption algorithm HMAC-SHA256 is used in the
-     * function to calculate UserSig based on `SDKAppID`, `UserID`, and `EXPIRETIME`.
+     * function to calculate UserSig based on `SDKAppID`, `UserID`, and `EXPIRE_TIME`.
      *
      * @note: For the following reasons, do not use the code below in your commercial application.
      * <p>
      * The code may be able to calculate UserSig correctly,
      * but it is only for quick testing of the SDK’s basic features,
      * not for commercial applications.
-     * SECRETKEY in client code can be easily decompiled and reversed, especially on web.
+     * SDKSecretKey in client code can be easily decompiled and reversed, especially on web.
      * Once your key is disclosed, attackers will be able to steal your Tencent Cloud traffic.
      * <p>
      * The correct method is to deploy the `UserSig` calculation code and encryption key on your server
@@ -94,7 +94,7 @@ public class GenerateTestUserSig {
      * Documentation: https://cloud.tencent.com/document/product/269/32688#Server
      */
     public static String genTestUserSig(String userId) {
-        return genTLSSignature(SDKAPPID, userId, EXPIRETIME, null, SECRETKEY);
+        return genTLSSignature(SDKAppID, userId, EXPIRE_TIME, null, SDKSecretKey);
     }
 
     /**
