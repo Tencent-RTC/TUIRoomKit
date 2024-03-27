@@ -47,7 +47,7 @@ public class SplashActivity extends Activity {
 
     private void startPrepareActivity() {
         final UserModel userModel = UserModelManager.getInstance().getUserModel();
-        int sdkAppId = GenerateTestUserSig.SDKAPPID;
+        int sdkAppId = GenerateTestUserSig.SDKAppID;
         String userId = userModel.userId;
         String userSig = GenerateTestUserSig.genTestUserSig(userModel.userId);
         Log.d(TAG,

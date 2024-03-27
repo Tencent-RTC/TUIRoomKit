@@ -140,7 +140,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void startPrepareActivity() {
         final UserModel userModel = UserModelManager.getInstance().getUserModel();
-        int sdkAppId = GenerateTestUserSig.SDKAPPID;
+        int sdkAppId = GenerateTestUserSig.SDKAppID;
         String userId = userModel.userId;
         String userSig = GenerateTestUserSig.genTestUserSig(userModel.userId);
         Log.d(TAG, "TUILogin.login sdkAppId=" + sdkAppId + " userId=" + userId + " userSig=" + !TextUtils.isEmpty(
