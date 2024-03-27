@@ -78,12 +78,12 @@
    
    <img src="https://web.sdk.qcloud.com/component/trtccalling/images/miniProgram/build-npm.png" width="200" align="middle" />
 
-6. 找到并打开 `MiniProgram/src/roomkit/config/basic-info-config.js` 文件，配置 `basic-info-config.js` 文件中的相关参数（[获取 SDKAppID 与 SecretKey](#开通多人音视频互动服务)）：
+6. 找到并打开 `MiniProgram/src/roomkit/config/basic-info-config.js` 文件，配置 `basic-info-config.js` 文件中的相关参数（[获取 SDKAppID 与 SDKSECRETKEY](#开通多人音视频互动服务)）：
 
  - SDKAPPID：默认为 0
- - SECRETKEY：默认为 ''
+ - SDKSECRETKEY：默认为 ''
 
-	<img src="https://qcloudimg.tencent-cloud.cn/raw/d05a18af04758e352f9afcb0925d105c.png" width="900">
+	<img src="https://qcloudimg.tencent-cloud.cn/raw/36fc2cb8a3cc8a90a02d1ab0d9e4ffb7.png" width="900">
 
 7. 点击 **预览**，手机扫码进入小程序。
 ![](https://qcloudimg.tencent-cloud.cn/raw/5e2afbb25ade4cf8e678911e6bca6101.png)
