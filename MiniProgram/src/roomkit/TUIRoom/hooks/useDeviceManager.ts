@@ -9,6 +9,7 @@ import TUIMessageBox from '../components/common/base/MessageBox/index';
 import { isWeChat } from '../utils/environment';
 
 const roomEngine = useGetRoomEngine();
+// @ts-ignore
 const deviceManager: { instance: TUIRoomDeviceManager | null | undefined } = {
   instance: null,
 };
