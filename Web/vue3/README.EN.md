@@ -38,9 +38,9 @@ This document describes how to quickly run the TUIRoom demo project to try out g
 2. Find and open `Web/vue3/src/config/basic-info-config.js`.
 3. Configure parameters in `basic-info-config.js`:
 
-	<img src="https://qcloudimg.tencent-cloud.cn/raw/d05a18af04758e352f9afcb0925d105c.png" width="900">
+	<img src="https://qcloudimg.tencent-cloud.cn/raw/36fc2cb8a3cc8a90a02d1ab0d9e4ffb7.png" width="900">
 	- SDKAPPID: 0 by default. Set it to the `SDKAppID` obtained in step 1.
-	- SECRETKEY: '' by default. Set it to the key obtained in step 1.
+	- SDKSECRETKEY: '' by default. Set it to the key obtained in step 1.
 
 ### Step 3: Run the example
 
