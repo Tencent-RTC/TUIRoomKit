@@ -1,6 +1,6 @@
 # TUIRoomKit iOS 示例工程快速跑通
 
-_中文 | [English](README.en.md)_
+_中文 | [English](README.md)_
 
 本文档主要介绍如何快速跑通TUIRoomKit 示例工程，体验高质量多人视频会议，更详细的TUIRoomKit组件接入流程，请点击腾讯云官网文档： [**TUIRoomKit 组件 iOS 接入说明** ](https://cloud.tencent.com/document/product/647/84237)...
 
@@ -30,8 +30,8 @@ iOS 13.0及更高。
 1. 使用Xcode(12.0及以上)打开源码工程`DemoApp.xcworkspace`。
 2. 工程内找到 `iOS/Example/Debug/GenerateTestUserSig.swift` 文件。
 3. 设置 `GenerateTestUserSig.swift` 文件中的相关参数：
-<ul style="margin:0"><li/>SDKAPPID：默认为0，请设置为实际的 SDKAppID。
-<li/>SECRETKEY：默认为空字符串，请设置为实际的密钥信息。</ul>
+<ul style="margin:0"><li/>SDKAppID：默认为0，请设置为实际的 SDKAppID。
+<li/>SDKSecretKey：默认为空字符串，请设置为实际的密钥信息。</ul>
 
 ![](../Preview/test-user-sig-ios.png)
 

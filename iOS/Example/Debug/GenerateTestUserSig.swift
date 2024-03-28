@@ -11,10 +11,10 @@ import zlib
 
 /**
  * Tencent Cloud SDKAppID. Set it to the SDKAppID of your account.
- * You can view your `SDKAppId` after creating an application in the [IM console](https://console.cloud.tencent.com/avc).
+ * You can view your `SDKAppID` after creating an application in the [IM console](https://console.cloud.tencent.com/avc).
  * SDKAppID uniquely identifies a Tencent Cloud account.
  */
-let SDKAPPID: Int = 0
+let SDKAppID: Int = 0
 
 /**
  * Signature validity period, which should not be set too short
@@ -32,7 +32,7 @@ let EXPIRETIME: Int = 604_800
  * please migrate the UserSig calculation code and key to your backend server to prevent key disclosure and traffic stealing.
  * Documentation: https://cloud.tencent.com/document/product/269/32688#Server
  */
-let SECRETKEY = ""
+let SDKSecretKey = ""
 
 /**
  * XMagic License【Optional】
@@ -52,7 +52,7 @@ class GenerateTestUserSig {
         var obj: [String: Any] = [
             "TLS.ver": "2.0",
             "TLS.identifier": identifier,
-            "TLS.sdkappid": SDKAPPID,
+            "TLS.sdkappid": SDKAppID,
             "TLS.expire": EXPIRETIME,
             "TLS.time": TLSTime,
         ]
@@ -100,11 +100,11 @@ class GenerateTestUserSig {
     }
     
     class func hmac(_ plainText: String) -> String? {
-        guard let cKey = SECRETKEY.cString(using: String.Encoding.ascii) else {
-            print("hmac SECRETKEY error: \(SECRETKEY)")
+        guard let cKey = SDKSecretKey.cString(using: String.Encoding.ascii) else {
+            print("hmac SDKSecretKey error: \(SDKSecretKey)")
             return nil
         }
-        print("hmac SECRETKEY: \(SECRETKEY)")
+        print("hmac SDKSecretKey: \(SDKSecretKey)")
         print("hmac cKey: \(cKey)")
         guard let cData = plainText.cString(using: String.Encoding.ascii) else{
             print("hmac plainText error: \(plainText)")
@@ -112,7 +112,7 @@ class GenerateTestUserSig {
         }
         print("hmac plainText: \(plainText)")
         print("hmac cData: \(cData)")
-        let cKeyLen = SECRETKEY.lengthOfBytes(using: .ascii)
+        let cKeyLen = SDKSecretKey.lengthOfBytes(using: .ascii)
         let cDataLen = plainText.lengthOfBytes(using: .ascii)
         
         var cHMAC = [CUnsignedChar].init(repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
