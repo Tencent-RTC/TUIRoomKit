@@ -1,6 +1,6 @@
 # Quick Run of TUIRoomKit Demo for iOS
 
-_[中文](README.md) | English_
+_[中文](README.zh.md) | English_
 
 This document describes how to quickly run the TUIRoomKit demo project to make a high-quality audio/video call. For more information on the TUIRoomKit component connection process, see **[Integrating TUIRoomKit (iOS)](https://trtc.io/document/54842)**.
 
@@ -8,7 +8,7 @@ This document describes how to quickly run the TUIRoomKit demo project to make a
 > [!IMPORTANT]
 > The commercial version of TRTC Conference (TUIRoomKit) is coming soon. Please contact us to get a free trial of the powerful features of the commercial SDK (version 2.0). <br>
 The default download on GitHub is the 2.0 version SDK. You need to contact us through the following method to activate its use:<br>
-·Send an email to: chaooliang@tencent.com, please be sure to include the SDKAPPID in your email, so we can quickly respond and activate it for you.(Recommended for a quick response)<br>
+·Send an email to: chaooliang@tencent.com, please be sure to include the SDKAppID in your email, so we can quickly respond and activate it for you.(Recommended for a quick response)<br>
 ·Join the Telegram group: https://t.me/+EPk6TMZEZMM5OGY1?s_url=https%3A%2F%2Ftrtc.io.
 
 ## Directory Structure
@@ -37,8 +37,8 @@ TUIRoomKit
 2. Find and open the `iOS/Example/Debug/GenerateTestUserSig.swift` file.
 3. Set parameters in `GenerateTestUserSig.swift`:
 	<img src="../Preview/test-user-sig-ios.png" width="900">
-	- SDKAPPID: A placeholder by default. Set it to the `SDKAppID` that you noted down in step 1.
-	- SECRETKEY: A placeholder by default. Set it to the key information that you noted down in step 1.
+	- SDKAppID: A placeholder by default. Set it to the `SDKAppID` that you noted down in step 1.
+	- SDKSecretKey: A placeholder by default. Set it to the key information that you noted down in step 1.
 
 [](id:ui.step3)
 ### Step 3. Compile and run the application
