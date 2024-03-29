@@ -307,6 +307,18 @@ enum TXLiteAVWarning {
     ///视频渲染失败
     WARNING_VIDEO_RENDER_FAIL = 2110,
 
+    ///虚拟背景设备不支持
+    WARNING_VIRTUAL_BACKGROUND_DEVICE_UNSURPORTED = 8001,
+
+    ///虚拟背景未授权
+    WARNING_VIRTUAL_BACKGROUND_NOT_AUTHORIZED = 8002,
+
+    ///虚拟背景参数异常
+    WARNING_VIRTUAL_BACKGROUND_INVALID_PARAMETER = 8003,
+
+    ///虚拟背景性能不足
+    WARNING_VIRTUAL_BACKGROUND_PERFORMANCE_INSUFFICIENT = 8004,
+
     /////////////////////////////////////////////////////////////////////////////////
     //       音频相关警告码
     /////////////////////////////////////////////////////////////////////////////////
