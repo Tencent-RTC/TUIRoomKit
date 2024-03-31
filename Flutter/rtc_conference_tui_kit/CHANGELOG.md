@@ -1,3 +1,7 @@
+### 2.2.1(2024-03-29)
+
+- Upgraded rtc_room_engine dependencies.
+
 ### 2.2.0(2024-03-22)
 
 - Renamed **rtc_conference_tuikit.dart** to **rtc_conference_tui_kit.dart**.
