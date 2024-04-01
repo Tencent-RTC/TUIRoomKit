@@ -35,6 +35,7 @@ import com.tencent.cloud.tuikit.roomkit.view.page.widget.BottomNavigationBar.Bot
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.Chat.ChatActivity;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
+import com.tencent.qcloud.tuicore.interfaces.ITUIService;
 import com.tencent.qcloud.tuicore.interfaces.TUIServiceCallback;
 
 import java.util.ArrayList;
@@ -179,6 +180,10 @@ public class BottomViewModel implements RoomEventCenter.RoomEngineEventResponder
     }
 
     private void addChatItemIfNeeded(List<BottomItemData> itemDataList) {
+        ITUIService service = TUICore.getService(TUIConstants.TUIChat.SERVICE_NAME);
+        if (service == null) {
+            return;
+        }
         itemDataList.add(createChatItem());
     }
 
