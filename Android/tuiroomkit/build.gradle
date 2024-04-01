@@ -49,7 +49,6 @@ dependencies {
     implementation 'androidx.core:core:1.0.2'
 
     implementation project(':timcommon')
-    implementation project(':tuichat')
 
     api rootProject.getProperties().containsKey("roomEngineSdk") ? rootProject.ext.roomEngineSdk : "com.tencent.liteav.tuikit:tuiroomengine:2.2.1.26"
     implementation rootProject.getProperties().containsKey("liteavSdk") ? rootProject.ext.liteavSdk : "com.tencent.liteav:LiteAVSDK_TRTC:11.7.0.13946"
