@@ -32,11 +32,16 @@ class EngineManager: NSObject {
     private(set) lazy var roomEngine: TUIRoomEngine = {
         let roomEngine = TUIRoomEngine.sharedInstance()
         roomEngine.addObserver(eventDispatcher)
+        roomEngine.getTRTCCloud().addDelegate(observer)
         return roomEngine
     }()
     private lazy var eventDispatcher: RoomEventDispatcher = {
         let eventDispatcher = RoomEventDispatcher()
         return eventDispatcher
+    }()
+    private lazy var observer: TRTCObserver = {
+        let observer = TRTCObserver()
+        return observer
     }()
     private let takeSeatTimeOutNumber: Double = 0
     private let openRemoteDeviceTimeOutNumber: Double = 15
@@ -124,6 +129,7 @@ class EngineManager: NSObject {
     
     func destroyEngineManager() {
         roomEngine.removeObserver(eventDispatcher)
+        roomEngine.getTRTCCloud().removeDelegate(observer)
         TUIRoomEngine.destroySharedInstance()
         EngineManager._shared = nil
     }
