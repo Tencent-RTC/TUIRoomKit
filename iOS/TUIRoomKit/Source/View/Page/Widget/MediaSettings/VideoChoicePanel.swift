@@ -161,7 +161,7 @@ class ResolutionTableViewCell: UITableViewCell {
 class AlertContentView: UIView {
     let space: Int = 16
     let landscapeHight: CGFloat = min(kScreenWidth, kScreenHeight)
-    let portraitHight: CGFloat = 718
+    let portraitHight: CGFloat = 718.scale375Height()
     private var currentLandscape: Bool = isLandscape
     let bgView: UIView = {
         let view = UIView(frame: .zero)

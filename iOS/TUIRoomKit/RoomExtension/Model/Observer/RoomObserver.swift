@@ -187,7 +187,7 @@ extension RoomObserver: RoomKitUIEventResponder {
         case .TUIRoomKitService_ExitedRoom:
             self.exitedRoom()
         case .TUIRoomKitService_RoomOwnerChanged:
-            guard let userId = info?["userId"] as? String else { return }
+            guard let userId = info?["owner"] as? String else { return }
             messageManager.resendRoomMessage(message: messageModel, dic: ["owner": userId])
         default: break
         }

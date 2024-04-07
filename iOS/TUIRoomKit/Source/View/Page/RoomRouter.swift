@@ -99,6 +99,8 @@ class RoomRouter: NSObject {
             TUICore_TUIChatObjectFactory_ChatViewController_Enable_Poll  : String(0),
             TUICore_TUIChatObjectFactory_ChatViewController_Enable_GroupNote  : String(0),
             TUICore_TUIChatObjectFactory_ChatViewController_Enable_WelcomeCustomMessage :String(0),
+            TUICore_TUIChatObjectFactory_ChatViewController_Enable_TakePhoto :String(0),
+            TUICore_TUIChatObjectFactory_ChatViewController_Enable_RecordVideo :String(0),
         ]
         return TUICore.createObject(TUICore_TUIChatObjectFactory, key: TUICore_TUIChatObjectFactory_ChatViewController_Classic,
                                     param: param) as? UIViewController
