@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/room-uikit-vue",
-  "version": "2.2.0",
+  "version": "2.2.2",
   "scripts": {
     "dev": "vite --force",
     "build": "vue-tsc --noEmit --skipLibCheck && vite build",
@@ -8,9 +8,10 @@
     "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-js": "^2.2.0",
     "@tencentcloud/chat": "latest",
     "@tencentcloud/tui-core": "latest",
+    "@tencentcloud/tuiroom-engine-js": "^2.2.2",
+    "@tencentcloud/universal-api": "^2.0.9",
     "axios": "^0.27.2",
     "events": "^3.3.0",
     "interactjs": "^1.10.26",
