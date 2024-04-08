@@ -1,3 +1,19 @@
+## 2024.04.08@2.2.2
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-electron](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-electron) 到 v2.2.2 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+
+**Improvement**
+- 优化 onKickedOffLine 回调时清理资源并执行 TRTC 退房操作;
+
+**Bug Fixed**
+- 修复结束屏幕分享摄像头视频流状态异常;
+- 修复收不到 onKickedOffLine 回调;
+- 修复主动调用 logout 退房逻辑异常问题;
+- 修复 isMobile 状态异常问题;
+- 修复邀请上台和下台 dialog 组件显示问题;
+
 ## 2024.03.22@2.2.0
 
 **Feature**
