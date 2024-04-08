@@ -19,18 +19,18 @@
       :close-on-click-modal="false"
       width="500px"
       :append-to-room-container="true"
-      :confirm-button="dialogInfoMap[currentDialogType]?.confirmButtonText"
-      :cancel-button="dialogInfoMap[currentDialogType]?.cancelButtonText"
-      @confirm="dialogInfoMap[currentDialogType]?.handleConfirm"
-      @cancel="dialogInfoMap[currentDialogType]?.handleCancel"
+      :confirm-button="currentDialogInfo.confirmButtonText"
+      :cancel-button="currentDialogInfo.cancelButtonText"
+      @confirm="currentDialogInfo.handleConfirm"
+      @cancel="currentDialogInfo.handleCancel"
     >
-      <span>{{ dialogInfoMap[currentDialogType]?.content }}</span>
+      <span>{{ currentDialogInfo.content }}</span>
       <template #footer>
-        <tui-button size="default" @click="dialogInfoMap[currentDialogType]?.handleConfirm">
-          {{ dialogInfoMap[currentDialogType]?.confirmButtonText }}
+        <tui-button size="default" @click="currentDialogInfo.handleConfirm">
+          {{ currentDialogInfo.confirmButtonText }}
         </tui-button>
-        <tui-button class="cancel-button" size="default" type="primary" @click="dialogInfoMap[currentDialogType]?.handleCancel">
-          {{ dialogInfoMap[currentDialogType]?.cancelButtonText }}
+        <tui-button class="cancel-button" size="default" type="primary" @click="currentDialogInfo.handleCancel">
+          {{ currentDialogInfo.cancelButtonText }}
         </tui-button>
       </template>
     </Dialog>
@@ -103,28 +103,25 @@ async function toggleApplySpeech() {
   }
 };
 
-const dialogInfoMap = computed(() => ({
-  inviteDialog: {
-    content: t('You can turn on the microphone and camera once you are on stage'),
-    confirmButtonText: t('Agree to the stage'),
-    cancelButtonText: t('Reject'),
-    handleConfirm: () => {
-      handleInvite(true);
-    }, handleCancel: () => {
-      handleInvite(false);
-    },
-  },
-  leaveSeatDialog: {
-    content: (localUser.value.userRole === TUIRole.kAdministrator ? t('To go on stage again, a new application needs to be initiated') : t('To go on stage again, you need to reapply and wait for the roomOwner/administrator to approve')),
-    confirmButtonText: t('Step down'),
-    cancelButtonText: t('Cancel'),
-    handleConfirm: () => {
-      leaveSeat();
-    }, handleCancel: () => {
-      handleStepDownDialogVisible();
-    },
-  },
+const inviteDialogInfo = {
+  content: t('You can turn on the microphone and camera once you are on stage'),
+  confirmButtonText: t('Agree to the stage'),
+  cancelButtonText: t('Reject'),
+  handleConfirm: () => handleInvite(true),
+  handleCancel: () => handleInvite(false),
+};
+
+const leaveSeatDialogInfo = computed(() => ({
+  content: (localUser.value.userRole === TUIRole.kAdministrator ? t('To go on stage again, a new application needs to be initiated') : t('To go on stage again, you need to reapply and wait for the roomOwner/administrator to approve')),
+  confirmButtonText: t('Step down'),
+  cancelButtonText: t('Cancel'),
+  handleConfirm: () => leaveSeat(),
+  handleCancel: () => handleStepDownDialogVisible(),
 }));
+
+const currentDialogInfo = computed(() => (currentDialogType.value === 'inviteDialog'
+  ? inviteDialogInfo
+  : leaveSeatDialogInfo.value));
 /**
  * Send a request to be on the mike
  *
