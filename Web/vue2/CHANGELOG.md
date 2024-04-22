@@ -1,3 +1,10 @@
+## 2024.04.15@2.2.3
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-js](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-js) 到 v2.2.3 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+- 依赖 [@tencentcloud/roomkit-web-vue2.7](https://www.npmjs.com/package/@tencentcloud/roomkit-web-vue2.7) v2.2.3 版本，@tencentcloud/roomkit-web-vue2.7 接入信息请查看 [roomkit 快速接入](https://cloud.tencent.com/document/product/647/81962);
+
 ## 2024.04.08@2.2.2
 
 **Feature**
