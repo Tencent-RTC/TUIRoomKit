@@ -12,7 +12,7 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
-public class ConferenceMainViewController: UIViewController {
+@objcMembers public class ConferenceMainViewController: UIViewController {
     private var viewModel: ConferenceMainViewModel = ConferenceMainViewModel()
     public override var shouldAutorotate: Bool {
         return true
