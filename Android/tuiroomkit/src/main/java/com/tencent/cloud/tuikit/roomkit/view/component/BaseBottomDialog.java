@@ -1,10 +1,11 @@
 package com.tencent.cloud.tuikit.roomkit.view.component;
 
 
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.DISMISS_MAIN_ACTIVITY;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -15,14 +16,15 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-
-
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.qcloud.tuicore.util.ScreenUtil;
 
-public abstract class BaseBottomDialog extends BottomSheetDialog {
+import java.util.Map;
+
+public abstract class BaseBottomDialog extends BottomSheetDialog implements RoomEventCenter.RoomKitUIEventResponder {
     private static final String TAG = "BaseBottomDialog";
 
     private View                      bottomSheetView;
@@ -33,6 +35,13 @@ public abstract class BaseBottomDialog extends BottomSheetDialog {
     public BaseBottomDialog(@NonNull Context context) {
         super(context);
         mContext = context;
+        RoomEventCenter.getInstance().subscribeUIEvent(DISMISS_MAIN_ACTIVITY, this);
+    }
+
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        RoomEventCenter.getInstance().unsubscribeUIEvent(DISMISS_MAIN_ACTIVITY, this);
     }
 
     @Override
@@ -40,6 +49,21 @@ public abstract class BaseBottomDialog extends BottomSheetDialog {
         super.onCreate(savedInstanceState);
 
         initRootView();
+    }
+
+    public void setPortraitHeightPercentOfScreen(View view, float percentOfScreen) {
+        Configuration configuration = mContext.getResources().getConfiguration();
+        if (configuration.orientation != Configuration.ORIENTATION_PORTRAIT) {
+            return;
+        }
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        if (layoutParams == null) {
+            return;
+        }
+        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        int screenHeight = ScreenUtil.getScreenHeight(mContext);
+        layoutParams.height = (int) (screenHeight * percentOfScreen);
+        view.setLayoutParams(layoutParams);
     }
 
     private void initRootView() {
@@ -112,5 +136,13 @@ public abstract class BaseBottomDialog extends BottomSheetDialog {
                 : R.drawable.tuiroomkit_bg_bottom_dialog_black_portrait;
         getWindow().findViewById(com.google.android.material.R.id.design_bottom_sheet)
                 .setBackgroundResource(resId);
+    }
+
+    @Override
+    public void onNotifyUIEvent(String key, Map<String, Object> params) {
+        if (key != DISMISS_MAIN_ACTIVITY) {
+            return;
+        }
+        dismiss();
     }
 }

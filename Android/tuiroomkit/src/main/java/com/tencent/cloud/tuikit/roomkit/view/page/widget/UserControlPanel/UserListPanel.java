@@ -36,6 +36,8 @@ import com.tencent.cloud.tuikit.roomkit.viewmodel.UserListViewModel;
 public class UserListPanel extends BaseBottomDialog implements View.OnClickListener {
     private static final String TAG = "UserListPanel";
 
+    private static final float PORTRAIT_HEIGHT_OF_SCREEN = 0.9f;
+
     private Context           mContext;
     private TextView          mMuteAudioAllBtn;
     private TextView          mMuteVideoAllBtn;
@@ -117,6 +119,9 @@ public class UserListPanel extends BaseBottomDialog implements View.OnClickListe
 
         mUserListAdapter.setDataList(mViewModel.getUserList());
         mViewModel.updateViewInitState();
+
+        View view = findViewById(R.id.tuiroomkit_root_user_management_panel);
+        setPortraitHeightPercentOfScreen(view, PORTRAIT_HEIGHT_OF_SCREEN);
     }
 
     public void updateMemberCount(int memberCount) {

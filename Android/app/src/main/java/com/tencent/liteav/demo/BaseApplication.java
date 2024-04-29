@@ -1,5 +1,7 @@
 package com.tencent.liteav.demo;
 
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.START_LOGIN;
+
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,14 +37,14 @@ public class BaseApplication extends MultiDexApplication implements RoomEventCen
             builder.detectFileUriExposure();
         }
         closeAndroidPDialog();
-        RoomEventCenter.getInstance().subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.KICKED_OFF_LINE, this);
+        RoomEventCenter.getInstance().subscribeUIEvent(START_LOGIN, this);
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
     }
 
     @Override
     public void onNotifyUIEvent(String key, Map<String, Object> params) {
         Log.i(TAG, "on receive event key=" + key);
-        if (RoomEventCenter.RoomKitUIEvent.KICKED_OFF_LINE.equals(key)) {
+        if (START_LOGIN.equals(key)) {
             UserModelManager.getInstance().clearUserModel();
             for (Activity activity : mActivityList) {
                 activity.finish();

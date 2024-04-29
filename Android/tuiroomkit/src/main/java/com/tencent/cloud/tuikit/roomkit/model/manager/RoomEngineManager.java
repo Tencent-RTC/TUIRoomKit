@@ -657,7 +657,7 @@ public class RoomEngineManager {
 
     public void autoTakeSeatForOwner(TUIRoomDefine.RequestCallback callback) {
         if (mRoomStore.userModel.getRole() == ROOM_OWNER
-                && mRoomStore.roomInfo.isSeatEnabled && mRoomStore.userModel.isOffSeat()) {
+                && mRoomStore.roomInfo.isSeatEnabled && !mRoomStore.userModel.isOnSeat()) {
             takeSeat(-1, 0, callback);
             return;
         }
@@ -785,8 +785,8 @@ public class RoomEngineManager {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "exitRoom onSuccess");
-                notifyExitRoomResult(TUICommonDefine.Error.SUCCESS);
                 destroyInstance();
+                notifyExitRoomResult(TUICommonDefine.Error.SUCCESS);
                 if (callback != null) {
                     callback.onSuccess();
                 }
@@ -795,8 +795,8 @@ public class RoomEngineManager {
             @Override
             public void onError(TUICommonDefine.Error error, String s) {
                 Log.e(TAG, "exitRoom onError error=" + error + " s=" + s);
-                notifyExitRoomResult(error);
                 destroyInstance();
+                notifyExitRoomResult(error);
                 if (callback != null) {
                     callback.onError(error, s);
                 }
@@ -805,7 +805,6 @@ public class RoomEngineManager {
             private void notifyExitRoomResult(TUICommonDefine.Error error) {
                 Map<String, Object> params = new HashMap<>(2);
                 params.put(KEY_ERROR, error);
-                params.put(KEY_ROOM_ID, roomId);
                 RoomEventCenter.getInstance().notifyEngineEvent(LOCAL_USER_EXIT_ROOM, params);
 
                 ConferenceObserver observer = mRoomStore.getConferenceObserver();
@@ -828,8 +827,8 @@ public class RoomEngineManager {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "destroyRoom onSuccess");
-                notifyDestroyRoomResult(TUICommonDefine.Error.SUCCESS);
                 destroyInstance();
+                notifyDestroyRoomResult(TUICommonDefine.Error.SUCCESS);
                 if (callback != null) {
                     callback.onSuccess();
                 }
@@ -838,8 +837,8 @@ public class RoomEngineManager {
             @Override
             public void onError(TUICommonDefine.Error error, String s) {
                 Log.e(TAG, "destroyRoom onError error=" + error + " s=" + s);
-                notifyDestroyRoomResult(error);
                 destroyInstance();
+                notifyDestroyRoomResult(error);
                 if (callback != null) {
                     callback.onError(error, s);
                 }
@@ -848,7 +847,6 @@ public class RoomEngineManager {
             private void notifyDestroyRoomResult(TUICommonDefine.Error error) {
                 Map<String, Object> params = new HashMap<>(2);
                 params.put(KEY_ERROR, error);
-                params.put(KEY_ROOM_ID, roomId);
                 RoomEventCenter.getInstance().notifyEngineEvent(LOCAL_USER_DESTROY_ROOM, params);
 
                 ConferenceObserver observer = mRoomStore.getConferenceObserver();
@@ -869,6 +867,8 @@ public class RoomEngineManager {
     }
 
     private void destroyInstance() {
+        mRoomEngine.removeObserver(mObserver);
+        mTRTCCloud.removeListener(mTRTCObserver);
         mRoomStore.roomInfo = null;
         BusinessSceneUtil.clearJoinRoomFlag();
         if (mRoomStore.audioModel.isMicOpen()) {
@@ -876,8 +876,6 @@ public class RoomEngineManager {
         }
         KeepAliveService.stopKeepAliveService();
         mRoomFloatWindowManager.destroy();
-        mRoomEngine.removeObserver(mObserver);
-        mTRTCCloud.removeListener(mTRTCObserver);
         sInstance = null;
         Log.d(TAG, "destroyInstance manager=" + this + " mRoomStore=" + mRoomStore);
     }

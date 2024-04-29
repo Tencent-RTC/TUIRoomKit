@@ -21,6 +21,8 @@ import com.tencent.cloud.tuikit.roomkit.view.component.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.RaiseHandApplicationListViewModel;
 
 public class RaiseHandApplicationListPanel extends BaseBottomDialog implements View.OnClickListener {
+    private static final float PORTRAIT_HEIGHT_OF_SCREEN = 0.9f;
+
     private Context                           mContext;
     private TextView                          mTextAgreeAll;
     private TextView                          mTextInviteMember;
@@ -95,6 +97,9 @@ public class RaiseHandApplicationListPanel extends BaseBottomDialog implements V
         mAdapter.setDataList(mViewModel.getApplyList());
         mRecyclerApplyList.setAdapter(mAdapter);
         mRecyclerApplyList.setHasFixedSize(true);
+
+        View view = findViewById(R.id.tuiroomkit_cl_raise_hand_panel);
+        setPortraitHeightPercentOfScreen(view, PORTRAIT_HEIGHT_OF_SCREEN);
     }
 
     @Override

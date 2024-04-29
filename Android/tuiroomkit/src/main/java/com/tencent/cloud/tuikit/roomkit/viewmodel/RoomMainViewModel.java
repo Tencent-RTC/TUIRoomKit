@@ -2,6 +2,7 @@ package com.tencent.cloud.tuikit.roomkit.viewmodel;
 
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomConstant.USER_NOT_FOUND;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.GET_USER_LIST_COMPLETED_FOR_ENTER_ROOM;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.KICKED_OFF_SEAT;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_SCREEN_STATE_CHANGED;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_GENERAL_TO_MANAGER;
@@ -28,6 +29,8 @@ import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEv
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.SHOW_QRCODE_VIEW;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.SHOW_USER_LIST;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant.KEY_USER_POSITION;
+import static com.tencent.qcloud.tuicore.TUIConstants.TUILogin.EVENT_IMSDK_INIT_STATE_CHANGED;
+import static com.tencent.qcloud.tuicore.TUIConstants.TUILogin.EVENT_SUB_KEY_START_UNINIT;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -43,14 +46,16 @@ import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
 import com.tencent.cloud.tuikit.roomkit.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.view.page.ConferenceMainView;
+import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
+import com.tencent.qcloud.tuicore.interfaces.ITUINotification;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponder,
-        RoomEventCenter.RoomEngineEventResponder {
+        RoomEventCenter.RoomEngineEventResponder, ITUINotification {
     private static final String TAG = "MeetingViewModel";
 
     private Context            mContext;
@@ -72,6 +77,8 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     }
 
     private void subscribeEvent() {
+        TUICore.registerEvent(EVENT_IMSDK_INIT_STATE_CHANGED, EVENT_SUB_KEY_START_UNINIT, this);
+
         RoomEventCenter eventCenter = RoomEventCenter.getInstance();
         eventCenter.subscribeUIEvent(SHOW_MEETING_INFO, this);
         eventCenter.subscribeUIEvent(DISMISS_MEETING_INFO, this);
@@ -97,6 +104,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         eventCenter.subscribeEngine(LOCAL_USER_MANAGER_TO_GENERAL, this);
         eventCenter.subscribeEngine(LOCAL_USER_TO_OWNER, this);
 
+        eventCenter.subscribeEngine(GET_USER_LIST_COMPLETED_FOR_ENTER_ROOM, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.ROOM_DISMISSED, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.KICKED_OUT_OF_ROOM, this);
         eventCenter.subscribeEngine(RoomEventCenter.RoomEngineEvent.KICKED_OFF_LINE, this);
@@ -116,6 +124,8 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     }
 
     private void unSubscribeEvent() {
+        TUICore.unRegisterEvent(EVENT_IMSDK_INIT_STATE_CHANGED, EVENT_SUB_KEY_START_UNINIT, this);
+
         RoomEventCenter eventCenter = RoomEventCenter.getInstance();
         eventCenter.unsubscribeUIEvent(SHOW_MEETING_INFO, this);
         eventCenter.unsubscribeUIEvent(DISMISS_MEETING_INFO, this);
@@ -141,6 +151,7 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
         eventCenter.unsubscribeEngine(LOCAL_USER_MANAGER_TO_GENERAL, this);
         eventCenter.unsubscribeEngine(LOCAL_USER_TO_OWNER, this);
 
+        eventCenter.unsubscribeEngine(GET_USER_LIST_COMPLETED_FOR_ENTER_ROOM, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.ROOM_DISMISSED, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.KICKED_OUT_OF_ROOM, this);
         eventCenter.unsubscribeEngine(RoomEventCenter.RoomEngineEvent.KICKED_OFF_LINE, this);
@@ -165,6 +176,10 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
 
     public void setCameraResolutionMode(Configuration configuration) {
         RoomEngineManager.sharedInstance().setCameraResolutionMode(configuration.orientation == ORIENTATION_PORTRAIT);
+    }
+
+    public String getWaterMakText() {
+        return TUILogin.getUserId() + "(" + TUILogin.getNickName() + ")";
     }
 
     public UserModel getUserModel() {
@@ -325,6 +340,14 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
     }
 
     @Override
+    public void onNotifyEvent(String key, String subKey, Map<String, Object> param) {
+        if (TextUtils.equals(key, EVENT_IMSDK_INIT_STATE_CHANGED) && TextUtils.equals(subKey,
+                EVENT_SUB_KEY_START_UNINIT)) {
+            mRoomMainView.showLogoutDialog();
+        }
+    }
+
+    @Override
     public void onEngineEvent(RoomEventCenter.RoomEngineEvent event, Map<String, Object> params) {
         switch (event) {
             case ROOM_DISMISSED:
@@ -379,6 +402,10 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
                 mRoomMainView.showRequestDialog(params);
                 break;
 
+            case GET_USER_LIST_COMPLETED_FOR_ENTER_ROOM:
+                mRoomMainView.showAlertUserLiveTips();
+                break;
+
             default:
                 break;
         }
@@ -386,7 +413,6 @@ public class RoomMainViewModel implements RoomEventCenter.RoomKitUIEventResponde
 
     private void onRoomDisMissed() {
         if (isOwner() && showRTCubeAppLegalDialog()) {
-            RoomEngineManager.sharedInstance().release();
             return;
         }
         mRoomMainView.showLeavedRoomConfirmDialog(mContext.getString(R.string.tuiroomkit_room_room_destroyed));

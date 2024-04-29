@@ -7,20 +7,20 @@
     android:background="@drawable/tuiroomkit_bg_bottom_item_black">
 
     <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/image_button"
+        android:id="@+id/tuiroomkit_btn_bottom_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:clickable="false"
         android:maxWidth="24dp"
         android:scaleType="fitXY"
-        app:layout_constraintBottom_toTopOf="@+id/tv_item_name"
+        app:layout_constraintBottom_toTopOf="@+id/tuiroomkit_tv_bottom_item"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_item_name"
+        android:id="@+id/tuiroomkit_tv_bottom_item"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"

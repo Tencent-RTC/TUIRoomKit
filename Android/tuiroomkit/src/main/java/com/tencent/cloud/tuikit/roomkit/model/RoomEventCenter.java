@@ -70,7 +70,7 @@ public class RoomEventCenter {
     public static class RoomKitUIEvent {
         public static final String ROOM_KIT_EVENT        = "ROOM_KIT_EVENT";
         public static final String CONFIGURATION_CHANGE  = "CONFIGURATION_CHANGE";
-        public static final String KICKED_OFF_LINE       = "KICKED_OFF_LINE";
+        public static final String START_LOGIN           = "START_LOGIN";
         public static final String AGREE_TAKE_SEAT       = "AGREE_TAKE_SEAT";
         public static final String DISAGREE_TAKE_SEAT    = "DISAGREE_TAKE_SEAT";
         public static final String INVITE_TAKE_SEAT      = "INVITE_TAKE_SEAT";

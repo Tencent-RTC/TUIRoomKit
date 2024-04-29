@@ -85,6 +85,7 @@
     <string name="tuiroomkit_room_raise_hand">غرفة الرفع اليدوي</string>
     <string name="tuiroomkit_logout">تسجيل الخروج</string>
     <string name="tuiroomkit_kiecked_off_line">لقد قمت بتسجيل الدخول في مكان آخر</string>
+    <string name="tuiroomkit_dialog_logout_title">لقد قمت بتسجيل الخروج</string>
     <string name="tuiroomkit_cancel">إلغاء</string>
     <string name="tuiroomkit_microphone">الميكروفون</string>
     <string name="tuiroomkit_camera">الكاميرا</string>
@@ -139,8 +140,8 @@
     <string name="tuiroomkit_invited_take_seat_time_out">فشل الصعود على خشبة المسرح، انتهت مهلة الدعوة</string>
     <string name="tuiroomkit_all_seat_occupied">لقد وصل العدد الحالي للأشخاص على المسرح إلى الحد الأقصى</string>
     <string name="tuiroomkit_receive_invitation_content">يمكنك تشغيل الكاميرا وإلغاء كتم صوتها بمجرد صعودك إلى المسرح</string>
-    <string name="tuiroomkit_can_not_open_mic">لقد قام المضيف بكتم صوت كافة الأعضاء ولا يمكنه إعادة صوت نفسه</string>
-    <string name="tuiroomkit_can_not_open_camera">لقد كتم المالك الكاميرا لجميع الأعضاء، ولا يمكن فتح الكاميرا</string>
+    <string name="tuiroomkit_can_not_open_mic">تم تمكين كتم الصوت للجميع ولا يمكن إعادة كتم الصوت بنفسه</string>
+    <string name="tuiroomkit_can_not_open_camera">تم تفعيل حظر الفيديو لجميع الأعضاء، ولا يمكن فتح الفيديو بنفسه</string>
     <string name="tuiroomkit_mute_all_mic_toast">جميع الصوتيات معطلة</string>
     <string name="tuiroomkit_mute_all_camera_toast">تم تعطيل جميع مقاطع الفيديو</string>
     <string name="tuiroomkit_item_close_camera">أوقف الفيديو</string>
@@ -168,8 +169,8 @@
     <string name="tuiroomkit_toast_off_stage_by_self">لقد قمت بالتحرك بشكل تلقائي من المنصة، فيرجى رفع يدك مرة أخرى إذا كنت تريد التحدث</string>
     <string name="tuiroomkit_toast_take_seat_success">النجاح على المسرح</string>
     <string name="tuiroomkit_toast_take_seat_rejected">تم رفض طلب الصعود على المسرح</string>
-    <string name="tuiroomkit_toast_raised_hand">لقد رفعت يدك، فيرجى الانتظار حتى يقوم المالك بالعملية</string>
-    <string name="tuiroomkit_toast_hands_down">لقد أخفضت يدك</string>
+    <string name="tuiroomkit_toast_raised_hand">تم إرسال الطلب، يرجى الانتظار حتى يعمل المضيف/المسؤول</string>
+    <string name="tuiroomkit_toast_hands_down">تم إلغاء طلب المرحلة</string>
     <string name="tuiroomkit_toast_invite_audience_to_stage">تمت دعوة الجمهور إلى المنصة</string>
     <string name="tuiroomkit_room_msg_display_suffix">اجتماع سريع لـ</string>
     <string name="tuiroomkit_chat_access_room">اجتماع سريع</string>
