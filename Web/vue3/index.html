@@ -10,6 +10,29 @@
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
     <title>TUIRoom</title>
+    <script type="text/javascript">
+      // ref: https://cn.vitejs.dev/config/build-options.html#build-target
+      function isSupportsES6Modules() {
+        const script = document.createElement('script');
+        if ('noModule' in script) {
+          return true;
+        }
+        script.type = 'module';
+        return script.type === 'module';
+      }
+      function isSupportDynamicImport() {
+         try {
+          new Function('import("")');
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+      if (!isSupportsES6Modules() || !isSupportDynamicImport()) {
+        console.error(`isSupportsES6Modules: ${isSupportsES6Modules()}, isSupportDynamicImport: ${isSupportDynamicImport()}.`)
+        alert("The current browser failed to load the page, we recommend you use the latest version of chrome browser.");
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>
