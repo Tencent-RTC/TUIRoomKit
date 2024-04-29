@@ -18,7 +18,7 @@ import Room from '@/TUIRoom/index.vue';
 import { useRoute } from 'vue-router';
 import router from '@/router';
 import { checkNumber } from '@/TUIRoom/utils/common';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '@/TUIRoom/locales';
 import TUIMessageBox from '@/TUIRoom/components/common/base/MessageBox';
 import {
   TUIKickedOutOfRoomReason,
@@ -64,7 +64,6 @@ onMounted(async () => {
           title: t('Note'),
           message,
           confirmButtonText: t('Sure'),
-          appendToRoomContainer: true,
           callback: async () => {
             router.replace({ path: 'home' });
           },
@@ -79,7 +78,6 @@ onMounted(async () => {
           title: t('Note'),
           message,
           confirmButtonText: t('Sure'),
-          appendToRoomContainer: true,
           callback: async () => {
             router.replace({ path: 'home' });
           },
@@ -92,7 +90,6 @@ onMounted(async () => {
       title: t('Note'),
       message,
       confirmButtonText: t('Sure'),
-      appendToRoomContainer: true,
       callback: async () => {
         sessionStorage.removeItem('tuiRoom-currentUserInfo');
         router.replace({ path: 'home' });

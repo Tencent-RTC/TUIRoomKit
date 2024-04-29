@@ -21,7 +21,7 @@ export default function useMessageList() {
 
   async function handleGetHistoryMessageList() {
     const tim = roomEngine.instance?.getTIM();
-    const imResponse = await tim.getMessageList({
+    const imResponse = await tim?.getMessageList({
       conversationID: `GROUP${roomId.value}`,
       nextReqMessageID: nextReqMessageId.value,
     });

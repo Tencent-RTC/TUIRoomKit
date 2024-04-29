@@ -27,11 +27,13 @@ import { useI18n } from '../../locales';
 import TuiBadge from '../common/base/Badge.vue';
 import { isMobile } from '../../utils/environment';
 import MasterApplyControl from './ApplyControl/MasterApplyControl/index.vue';
+import useMasterApplyControl from '../../hooks/useMasterApplyControl';
 
 const { t } = useI18n();
 
 const basicStore = useBasicStore();
 const roomStore = useRoomStore();
+const { handleShowNotification } = useMasterApplyControl();
 const { sidebarName, showApplyUserList } = storeToRefs(basicStore);
 const { applyToAnchorList } = storeToRefs(roomStore);
 
@@ -48,4 +50,7 @@ function toggleManageStage() {
     basicStore.setSidebarName('apply');
   }
 }
+
+handleShowNotification();
+
 </script>

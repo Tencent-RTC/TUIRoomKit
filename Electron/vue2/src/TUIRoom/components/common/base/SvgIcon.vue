@@ -25,6 +25,7 @@ interface Props {
   responseSize?: string | number,
   customClass?: string,
   icon?: Component,
+  color?: string,
 }
 
 const props = defineProps<Props>();

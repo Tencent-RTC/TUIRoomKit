@@ -118,7 +118,6 @@ async function toggleMuteVideo() {
       TUIMessageBox({
         title: t('Note'),
         message: t('Camera not detected on current device'),
-        appendToRoomContainer: true,
         confirmButtonText: t('Sure'),
       });
       return;

@@ -64,13 +64,15 @@ export default function useSideBar() {
   };
 
   let tim = roomEngine.instance?.getTIM();
+  tim?.on(TencentCloudChat.EVENT.MESSAGE_RECEIVED, onReceiveMessage);
+
 
   watch(sdkAppId, () => {
-    if (!tim) {
+    if (!tim && sdkAppId.value) {
       tim = TencentCloudChat.create({ SDKAppID: basicStore.sdkAppId });
+      tim?.on(TencentCloudChat.EVENT.MESSAGE_RECEIVED, onReceiveMessage);
     }
-    tim?.on(TencentCloudChat.EVENT.MESSAGE_RECEIVED, onReceiveMessage);
-  }, { immediate: true });
+  });
 
   onUnmounted(() => {
     tim?.off(TencentCloudChat.EVENT.MESSAGE_RECEIVED, onReceiveMessage);

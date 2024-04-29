@@ -189,7 +189,6 @@ export class RoomService {
         title: t('Note'),
         message: notice,
         confirmButtonText: t('Sure'),
-        appendToRoomContainer: true,
         callback: async () => {
           this.emit(EventType.ROOM_KICKED_OUT, { roomId, reason, message });
           this.resetStore();
@@ -220,7 +219,6 @@ export class RoomService {
       title: t('Note'),
       message: t('userSig 已过期'),
       confirmButtonText: t('Sure'),
-      appendToRoomContainer: true,
       callback: () => {
         this.emit(EventType.ROOM_USER_SIG_EXPIRED, {});
       },
@@ -233,7 +231,6 @@ export class RoomService {
       title: t('Note'),
       message: t('系统检测到您的账号被踢下线'),
       confirmButtonText: t('Sure'),
-      appendToRoomContainer: true,
       callback: async () => {
         this.emit(EventType.ROOM_KICKED_OFFLINE, { message });
       },
@@ -338,13 +335,15 @@ export class RoomService {
     await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
   }
 
-  private async doEnterRoom(roomId: string) {
+  private async doEnterRoom(options: { roomId: string; roomType: TUIRoomType}) {
+    const { roomId, roomType } = options;
     const isH5 = isMobile && !isWeChat;
     const trtcCloud = roomEngine.instance?.getTRTCCloud();
     trtcCloud?.setDefaultStreamRecvMode(true, false);
     trtcCloud?.enableSmallVideoStream(!isH5, smallParam);
     const roomInfo = (await roomEngine.instance?.enterRoom({
       roomId,
+      roomType,
     })) as TUIRoomInfo;
     roomEngine.instance?.muteLocalAudio();
     if (!roomInfo.isSeatEnabled) {
@@ -453,7 +452,11 @@ export class RoomService {
       }
       this.basicStore.setRoomId(roomId);
       logger.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
-      const roomInfo = await this.doEnterRoom(roomId);
+      const roomParams = {
+        roomId,
+        roomType: TUIRoomType.kConference,
+      };
+      const roomInfo = await this.doEnterRoom(roomParams);
       this.roomStore.setRoomInfo(roomInfo);
       await this.getUserList();
       if (roomInfo.isSeatEnabled) {

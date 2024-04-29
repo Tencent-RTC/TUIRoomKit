@@ -224,7 +224,6 @@ const {
       }
     }
   .member-list-container {
-    overflow-y: scroll;
     flex: 1;
     margin-top: 10px;
     overflow-y: scroll;

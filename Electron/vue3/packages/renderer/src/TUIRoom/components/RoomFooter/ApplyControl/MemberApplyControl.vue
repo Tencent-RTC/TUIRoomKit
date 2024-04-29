@@ -199,6 +199,12 @@ function handleStepDownDialogVisible() {
 async function leaveSeat() {
   await roomEngine.instance?.leaveSeat();
   showDialog.value = false;
+  if (roomStore.isCameraDisableForAllUser && isGeneralUser.value) {
+    roomStore.setCanControlSelfVideo(false);
+  }
+  if (roomStore.isMicrophoneDisableForAllUser && isGeneralUser.value) {
+    roomStore.setCanControlSelfAudio(false);
+  }
 }
 
 function hideApplyAttention() {
@@ -318,7 +324,6 @@ onBeforeUnmount(() => {
     }
     .mobile-info {
       min-width: 50vw;
-      white-space: normal;
     }
     .close {
       cursor: pointer;

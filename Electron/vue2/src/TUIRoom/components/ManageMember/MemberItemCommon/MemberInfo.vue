@@ -13,6 +13,7 @@
         <svg-icon
           v-if="isTargetUserRoomOwner || isTargetUserAdmin"
           :icon="UserIcon"
+          :color="isTargetUserAdmin ? '#F06C4B' : '#4791FF'"
           :class="isTargetUserAdmin ? 'admin-icon' : 'master-icon'"
         />
         <div :class="`user-extra-info ${isTargetUserAdmin ? 'user-extra-info-admin' : ''}`">{{ extraInfo }}</div>

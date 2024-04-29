@@ -2,7 +2,6 @@ import { createApp } from 'vue';
 import App from '@/App.vue';
 import { createPinia } from 'pinia';
 import router from './router/index';
-import VueI18n from './TUIRoom/locales/index';
 import { ipcRenderer } from 'electron';
 if (window.isHasScreen === undefined) {
   window.isHasScreen = false;
@@ -18,5 +17,4 @@ ipcRenderer.on('main-process-message', (_event, ...args) => {
 const app = createApp(App);
 app.use(router);
 app.use(createPinia());
-app.use(VueI18n);
 app.mount('#app').$nextTick(window.removeLoading);

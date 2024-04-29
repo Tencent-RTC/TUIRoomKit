@@ -9,7 +9,13 @@
       ></stream-region>
     </div>
     <div :class="['stream-list-container', `${showSideList ? '' : 'hide-list'}`]">
-      <div ref="streamListRef" :style="streamListStyle" class="stream-list">
+      <div
+        ref="streamListRef"
+        :style="streamListStyle"
+        class="stream-list"
+        @scroll="handleStreamContainerScrollDebounce"
+        @wheel="handleWheel"
+      >
         <stream-region
           v-for="(stream) in streamList"
           v-show="showStreamList.indexOf(stream) > -1"
@@ -652,6 +658,11 @@ const handleStreamContainerScroll = async () => {
   // 修改对应的 streamInfo 的 isVisible 为 true
   roomStore.updateUserStreamVisible(streamUserIdList);
 };
+
+// 处理顶部布局水平滑动
+function handleWheel(event: WheelEvent) {
+  streamListRef.value.scrollLeft += event.deltaY;
+}
 
 const handleStreamContainerScrollDebounce = debounce(handleStreamContainerScroll, 300);
 
