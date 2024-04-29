@@ -2,7 +2,7 @@
 //  UserListView.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/1/4.
+//  Created by janejntang on 2023/1/4.
 //  Copyright © 2023 Tencent. All rights reserved.
 //
 
@@ -508,7 +508,6 @@ class UserListCell: UITableViewCell {
         roleLabel.isHidden = item.userRole == .generalUser
         muteAudioButton.isSelected = !item.hasAudioStream
         muteVideoButton.isSelected = !item.hasVideoStream
-        //判断是否显示邀请上台的按钮(房主在举手发言房间中可以邀请其他没有上台的用户)
         guard viewModel.roomInfo.isSeatEnabled else { return }
         muteAudioButton.isHidden = !attendeeModel.isOnSeat
         muteVideoButton.isHidden = !attendeeModel.isOnSeat

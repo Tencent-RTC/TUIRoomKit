@@ -2,7 +2,7 @@
 //  RoomaInviteView.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/5/24.
+//  Created by janejntang on 2023/5/24.
 //
 
 import Foundation

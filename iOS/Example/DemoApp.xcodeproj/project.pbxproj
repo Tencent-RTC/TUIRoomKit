@@ -24,6 +24,7 @@
 		7D67424628C05FCA0051E46D /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D67424528C05FC00051E46D /* libsqlite3.tbd */; };
 		7D67424828C05FDB0051E46D /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D67424728C05FDB0051E46D /* OpenAL.framework */; };
 		7D67424A28C05FE80051E46D /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D67424928C05FE80051E46D /* VideoToolbox.framework */; };
+		7D916A1D2B26B9740044D38E /* RoomNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D916A1C2B26B9740044D38E /* RoomNavigationController.swift */; };
 		7D93C8522A80C9780062B2CC /* RoomTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C8512A80C9780062B2CC /* RoomTypeView.swift */; };
 		7D93C85D2A80CB3D0062B2CC /* ListCellItemData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C85C2A80CB3D0062B2CC /* ListCellItemData.swift */; };
 		7D93C85F2A80CBB30062B2CC /* PrePareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C85E2A80CBB30062B2CC /* PrePareView.swift */; };
@@ -34,7 +35,8 @@
 		7D93C86D2A80D0F80062B2CC /* EnterRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C86C2A80D0F80062B2CC /* EnterRoomViewController.swift */; };
 		7D93C86F2A80D3B40062B2CC /* ListCellItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C86E2A80D3B40062B2CC /* ListCellItemView.swift */; };
 		7D93C8722A80DE280062B2CC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C8712A80DE280062B2CC /* String+Extension.swift */; };
-		7D9FC0D72B2C97EB0029F834 /* RoomNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9FC0D62B2C97EB0029F834 /* RoomNavigationController.swift */; };
+		7DFDF68F294B03D90067CAC9 /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DFDF686294AFCFA0067CAC9 /* TXLiteAVSDK_ReplayKitExt.framework */; };
+		A09BF847922778B2A068D300 /* Pods_TXReplayKit_Screen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4E0A458AE66DD08397D7122 /* Pods_TXReplayKit_Screen.framework */; };
 		C18CE615279005D10071C120 /* ReplayKitLocalized.m in Sources */ = {isa = PBXBuildFile; fileRef = C18CE607279005D10071C120 /* ReplayKitLocalized.m */; };
 		C18CE616279005D10071C120 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE608279005D10071C120 /* InfoPlist.strings */; };
 		C18CE617279005D10071C120 /* ReplayKitLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE60A279005D10071C120 /* ReplayKitLocalized.strings */; };
@@ -58,7 +60,6 @@
 		C659799F2680897900CCAA4C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C659799D2680897900CCAA4C /* LaunchScreen.storyboard */; };
 		C685C0F626A67931007A7A6F /* DemoLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = C685C0EE26A67931007A7A6F /* DemoLocalized.strings */; };
 		C685C0F726A67931007A7A6F /* DemoLocalized.swift in Sources */ = {isa = PBXBuildFile; fileRef = C685C0F126A67931007A7A6F /* DemoLocalized.swift */; };
-		EEEFC4BEDE08C2B999313806 /* Pods_TXReplayKit_Screen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 906FB864AA4AD0E6330C2287 /* Pods_TXReplayKit_Screen.framework */; };
 		FA3A4ABB2A5424FE0061C7DC /* RoomFileBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3A4ABA2A5424FE0061C7DC /* RoomFileBrowserViewController.swift */; };
 		FA3A4ABF2A543A660061C7DC /* RoomFileBroswerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3A4ABE2A543A660061C7DC /* RoomFileBroswerModel.swift */; };
 		FA3A4AC12A543E9B0061C7DC /* RoomFileBroswerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3A4AC02A543E9B0061C7DC /* RoomFileBroswerCell.swift */; };
@@ -89,7 +90,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		123F258178722AACD5F6D35B /* Pods-TXReplayKit_Screen.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TXReplayKit_Screen.debug.xcconfig"; path = "Target Support Files/Pods-TXReplayKit_Screen/Pods-TXReplayKit_Screen.debug.xcconfig"; sourceTree = "<group>"; };
+		5364A5B5EFBCD9158D1EEDF5 /* Pods-TXReplayKit_Screen.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TXReplayKit_Screen.debug.xcconfig"; path = "Target Support Files/Pods-TXReplayKit_Screen/Pods-TXReplayKit_Screen.debug.xcconfig"; sourceTree = "<group>"; };
 		7D5B0C8D2A3AB75500CC1585 /* TRTCRegisterRootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TRTCRegisterRootView.swift; sourceTree = "<group>"; };
 		7D5B0C8E2A3AB75600CC1585 /* TRTCLoginRootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TRTCLoginRootView.swift; sourceTree = "<group>"; };
 		7D5B0C8F2A3AB75600CC1585 /* UserAgreementViewController+UI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserAgreementViewController+UI.swift"; sourceTree = "<group>"; };
@@ -107,6 +108,7 @@
 		7D67424528C05FC00051E46D /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		7D67424728C05FDB0051E46D /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		7D67424928C05FE80051E46D /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		7D916A1C2B26B9740044D38E /* RoomNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomNavigationController.swift; sourceTree = "<group>"; };
 		7D93C8512A80C9780062B2CC /* RoomTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomTypeView.swift; sourceTree = "<group>"; };
 		7D93C85C2A80CB3D0062B2CC /* ListCellItemData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCellItemData.swift; sourceTree = "<group>"; };
 		7D93C85E2A80CBB30062B2CC /* PrePareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrePareView.swift; sourceTree = "<group>"; };
@@ -117,12 +119,11 @@
 		7D93C86C2A80D0F80062B2CC /* EnterRoomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterRoomViewController.swift; sourceTree = "<group>"; };
 		7D93C86E2A80D3B40062B2CC /* ListCellItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCellItemView.swift; sourceTree = "<group>"; };
 		7D93C8712A80DE280062B2CC /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
-		7D9FC0D62B2C97EB0029F834 /* RoomNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomNavigationController.swift; sourceTree = "<group>"; };
-		906FB864AA4AD0E6330C2287 /* Pods_TXReplayKit_Screen.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TXReplayKit_Screen.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		90F2D7D94B9B392568BE9C57 /* Pods-TXReplayKit_Screen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TXReplayKit_Screen.release.xcconfig"; path = "Target Support Files/Pods-TXReplayKit_Screen/Pods-TXReplayKit_Screen.release.xcconfig"; sourceTree = "<group>"; };
+		7DFDF686294AFCFA0067CAC9 /* TXLiteAVSDK_ReplayKitExt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TXLiteAVSDK_ReplayKitExt.framework; path = ../../SDK/TXLiteAVSDK_ReplayKitExt.framework; sourceTree = "<group>"; };
+		7DFDF68E294B03CB0067CAC9 /* TXLiteAVSDK_ReplayKitExt */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = TXLiteAVSDK_ReplayKitExt; path = ../../SDK/TXLiteAVSDK_ReplayKitExt.framework/TXLiteAVSDK_ReplayKitExt; sourceTree = "<group>"; };
 		9A118A5B5DE110B8217C48CB /* Pods-DemoApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp.release.xcconfig"; path = "Target Support Files/Pods-DemoApp/Pods-DemoApp.release.xcconfig"; sourceTree = "<group>"; };
-		9BBF5668A4EAAF4314521FBB /* Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig"; path = "Target Support Files/Pods-DemoApp-TXReplayKit_Screen/Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig"; sourceTree = "<group>"; };
 		9CA7D17F6CB864C86F7B41C8 /* Pods-DemoApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp.debug.xcconfig"; path = "Target Support Files/Pods-DemoApp/Pods-DemoApp.debug.xcconfig"; sourceTree = "<group>"; };
+		B4E0A458AE66DD08397D7122 /* Pods_TXReplayKit_Screen.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TXReplayKit_Screen.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C18CE607279005D10071C120 /* ReplayKitLocalized.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplayKitLocalized.m; sourceTree = "<group>"; };
 		C18CE609279005D10071C120 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		C18CE60B279005D10071C120 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ReplayKitLocalized.strings"; sourceTree = "<group>"; };
@@ -156,8 +157,8 @@
 		C685C0EF26A67931007A7A6F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/DemoLocalized.strings"; sourceTree = "<group>"; };
 		C685C0F026A67931007A7A6F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/DemoLocalized.strings; sourceTree = "<group>"; };
 		C685C0F126A67931007A7A6F /* DemoLocalized.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoLocalized.swift; sourceTree = "<group>"; };
-		D6AF979DB363A77B86E35374 /* Pods-DemoApp-TXReplayKit_Screen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApp-TXReplayKit_Screen.release.xcconfig"; path = "Target Support Files/Pods-DemoApp-TXReplayKit_Screen/Pods-DemoApp-TXReplayKit_Screen.release.xcconfig"; sourceTree = "<group>"; };
 		E4CD7F588EA29064C4C9474A /* Pods_DemoApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DemoApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED97CCC2BE129BEB1AA71C9F /* Pods-TXReplayKit_Screen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TXReplayKit_Screen.release.xcconfig"; path = "Target Support Files/Pods-TXReplayKit_Screen/Pods-TXReplayKit_Screen.release.xcconfig"; sourceTree = "<group>"; };
 		FA3A4ABA2A5424FE0061C7DC /* RoomFileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomFileBrowserViewController.swift; sourceTree = "<group>"; };
 		FA3A4ABE2A543A660061C7DC /* RoomFileBroswerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomFileBroswerModel.swift; sourceTree = "<group>"; };
 		FA3A4AC02A543E9B0061C7DC /* RoomFileBroswerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomFileBroswerCell.swift; sourceTree = "<group>"; };
@@ -169,6 +170,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C1F2C778278FD65C00216EB8 /* Accelerate.framework in Frameworks */,
+				7DFDF68F294B03D90067CAC9 /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */,
 				C1F2C776278FD65300216EB8 /* libc++.tbd in Frameworks */,
 				7D67424A28C05FE80051E46D /* VideoToolbox.framework in Frameworks */,
 				7D67424628C05FCA0051E46D /* libsqlite3.tbd in Frameworks */,
@@ -176,7 +178,7 @@
 				7D67424228C05F7D0051E46D /* AudioToolbox.framework in Frameworks */,
 				C1F2C762278FD4E000216EB8 /* ReplayKit.framework in Frameworks */,
 				7D67424428C05FAF0051E46D /* libresolv.tbd in Frameworks */,
-				EEEFC4BEDE08C2B999313806 /* Pods_TXReplayKit_Screen.framework in Frameworks */,
+				A09BF847922778B2A068D300 /* Pods_TXReplayKit_Screen.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,10 +198,8 @@
 			children = (
 				9CA7D17F6CB864C86F7B41C8 /* Pods-DemoApp.debug.xcconfig */,
 				9A118A5B5DE110B8217C48CB /* Pods-DemoApp.release.xcconfig */,
-				9BBF5668A4EAAF4314521FBB /* Pods-DemoApp-TXReplayKit_Screen.debug.xcconfig */,
-				D6AF979DB363A77B86E35374 /* Pods-DemoApp-TXReplayKit_Screen.release.xcconfig */,
-				123F258178722AACD5F6D35B /* Pods-TXReplayKit_Screen.debug.xcconfig */,
-				90F2D7D94B9B392568BE9C57 /* Pods-TXReplayKit_Screen.release.xcconfig */,
+				5364A5B5EFBCD9158D1EEDF5 /* Pods-TXReplayKit_Screen.debug.xcconfig */,
+				ED97CCC2BE129BEB1AA71C9F /* Pods-TXReplayKit_Screen.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -264,7 +264,7 @@
 		7D93C8502A80C9500062B2CC /* Component */ = {
 			isa = PBXGroup;
 			children = (
-				7D9FC0D62B2C97EB0029F834 /* RoomNavigationController.swift */,
+				7D916A1C2B26B9740044D38E /* RoomNavigationController.swift */,
 				7D93C8512A80C9780062B2CC /* RoomTypeView.swift */,
 				7D93C86E2A80D3B40062B2CC /* ListCellItemView.swift */,
 			);
@@ -400,6 +400,8 @@
 		F6F6B85282DF8397356DE795 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7DFDF68E294B03CB0067CAC9 /* TXLiteAVSDK_ReplayKitExt */,
+				7DFDF686294AFCFA0067CAC9 /* TXLiteAVSDK_ReplayKitExt.framework */,
 				7D67424928C05FE80051E46D /* VideoToolbox.framework */,
 				7D67424728C05FDB0051E46D /* OpenAL.framework */,
 				7D67424528C05FC00051E46D /* libsqlite3.tbd */,
@@ -409,7 +411,7 @@
 				C1F2C775278FD65300216EB8 /* libc++.tbd */,
 				E4CD7F588EA29064C4C9474A /* Pods_DemoApp.framework */,
 				C1F2C761278FD4E000216EB8 /* ReplayKit.framework */,
-				906FB864AA4AD0E6330C2287 /* Pods_TXReplayKit_Screen.framework */,
+				B4E0A458AE66DD08397D7122 /* Pods_TXReplayKit_Screen.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -431,7 +433,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C1F2C76E278FD4E000216EB8 /* Build configuration list for PBXNativeTarget "TXReplayKit_Screen" */;
 			buildPhases = (
-				79F15EE963C0A22187A6DE22 /* [CP] Check Pods Manifest.lock */,
+				A86449AB8331AEE64841FC6A /* [CP] Check Pods Manifest.lock */,
 				C1F2C75C278FD4E000216EB8 /* Sources */,
 				C1F2C75D278FD4E000216EB8 /* Frameworks */,
 				C1F2C75E278FD4E000216EB8 /* Resources */,
@@ -536,7 +538,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		79F15EE963C0A22187A6DE22 /* [CP] Check Pods Manifest.lock */ = {
+		813CE8E421B021F6521A9D1A /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DemoApp/Pods-DemoApp-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DemoApp/Pods-DemoApp-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DemoApp/Pods-DemoApp-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A86449AB8331AEE64841FC6A /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -556,23 +575,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		813CE8E421B021F6521A9D1A /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DemoApp/Pods-DemoApp-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DemoApp/Pods-DemoApp-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DemoApp/Pods-DemoApp-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		BEEBF9DEEBA7ECA612C2B72A /* [CP] Embed Pods Frameworks */ = {
@@ -646,7 +648,7 @@
 				FA3A4AC12A543E9B0061C7DC /* RoomFileBroswerCell.swift in Sources */,
 				7D5B0C9D2A3AB75600CC1585 /* UserAgreementViewController+UI.swift in Sources */,
 				7D93C85D2A80CB3D0062B2CC /* ListCellItemData.swift in Sources */,
-				7D9FC0D72B2C97EB0029F834 /* RoomNavigationController.swift in Sources */,
+				7D916A1D2B26B9740044D38E /* RoomNavigationController.swift in Sources */,
 				7D5B0C9B2A3AB75600CC1585 /* TRTCRegisterRootView.swift in Sources */,
 				7D93C86B2A80D0E50062B2CC /* CreateRoomViewController.swift in Sources */,
 				FA3A4ABF2A543A660061C7DC /* RoomFileBroswerModel.swift in Sources */,
@@ -755,7 +757,7 @@
 /* Begin XCBuildConfiguration section */
 		C1F2C76C278FD4E000216EB8 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 123F258178722AACD5F6D35B /* Pods-TXReplayKit_Screen.debug.xcconfig */;
+			baseConfigurationReference = 5364A5B5EFBCD9158D1EEDF5 /* Pods-TXReplayKit_Screen.debug.xcconfig */;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -767,6 +769,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../SDK",
+					"$(PROJECT_DIR)/TXReplayKit_Screen",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TXReplayKit_Screen/Info.plist;
@@ -778,95 +781,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"\"-ld_classic\"",
-					"-ObjC",
-					"-l\"c++\"",
-					"-l\"iconv\"",
-					"-l\"resolv\"",
-					"-l\"sqlite3\"",
-					"-l\"stdc++\"",
-					"-l\"swiftCoreGraphics\"",
-					"-l\"z\"",
-					"-framework",
-					"\"AVFoundation\"",
-					"-framework",
-					"\"AVKit\"",
-					"-framework",
-					"\"Accelerate\"",
-					"-framework",
-					"\"Alamofire\"",
-					"-framework",
-					"\"AssetsLibrary\"",
-					"-framework",
-					"\"AudioToolbox\"",
-					"-framework",
-					"\"CFNetwork\"",
-					"-framework",
-					"\"CoreFoundation\"",
-					"-framework",
-					"\"CoreML\"",
-					"-framework",
-					"\"CoreMedia\"",
-					"-framework",
-					"\"CoreMotion\"",
-					"-framework",
-					"\"CoreServices\"",
-					"-framework",
-					"\"CoreTelephony\"",
-					"-framework",
-					"\"Foundation\"",
-					"-framework",
-					"\"ImSDK_Plus\"",
-					"-framework",
-					"\"ImageIO\"",
-					"-framework",
-					"\"JavaScriptCore\"",
-					"-framework",
-					"\"Masonry\"",
-					"-framework",
-					"\"MetalKit\"",
-					"-framework",
-					"\"MetalPerformanceShaders\"",
-					"-framework",
-					"\"ReactiveObjC\"",
-					"-framework",
-					"\"ReplayKit\"",
-					"-framework",
-					"\"SDWebImage\"",
-					"-framework",
-					"\"SSZipArchive\"",
-					"-framework",
-					"\"Security\"",
-					"-framework",
-					"\"SnapKit\"",
-					"-framework",
-					"\"SystemConfiguration\"",
-					"-framework",
-					"\"TIMCommon\"",
-					"-framework",
-					"\"TUIChat\"",
-					"-framework",
-					"\"TUICore\"",
-					"-framework",
-					"\"TXAppBasic\"",
-					"-framework",
-					"\"TXFFmpeg\"",
-					"-framework",
-					"\"TXLiteAVSDK_ReplayKitExt\"",
-					"-framework",
-					"\"TXSoundTouch\"",
-					"-framework",
-					"\"UIKit\"",
-					"-framework",
-					"\"VideoToolbox\"",
-					"-framework",
-					"\"libpag\"",
-					"\"-Wl\"",
-					"\"-weak-lswiftCoreGraphics\"",
-				);
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.tuiroom.apiexample.Upload;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = abyWildcardDev;
@@ -879,7 +794,7 @@
 		};
 		C1F2C76D278FD4E000216EB8 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 90F2D7D94B9B392568BE9C57 /* Pods-TXReplayKit_Screen.release.xcconfig */;
+			baseConfigurationReference = ED97CCC2BE129BEB1AA71C9F /* Pods-TXReplayKit_Screen.release.xcconfig */;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
@@ -891,6 +806,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../SDK",
+					"$(PROJECT_DIR)/TXReplayKit_Screen",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TXReplayKit_Screen/Info.plist;
@@ -902,95 +818,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"\"-ld_classic\"",
-					"-ObjC",
-					"-l\"c++\"",
-					"-l\"iconv\"",
-					"-l\"resolv\"",
-					"-l\"sqlite3\"",
-					"-l\"stdc++\"",
-					"-l\"swiftCoreGraphics\"",
-					"-l\"z\"",
-					"-framework",
-					"\"AVFoundation\"",
-					"-framework",
-					"\"AVKit\"",
-					"-framework",
-					"\"Accelerate\"",
-					"-framework",
-					"\"Alamofire\"",
-					"-framework",
-					"\"AssetsLibrary\"",
-					"-framework",
-					"\"AudioToolbox\"",
-					"-framework",
-					"\"CFNetwork\"",
-					"-framework",
-					"\"CoreFoundation\"",
-					"-framework",
-					"\"CoreML\"",
-					"-framework",
-					"\"CoreMedia\"",
-					"-framework",
-					"\"CoreMotion\"",
-					"-framework",
-					"\"CoreServices\"",
-					"-framework",
-					"\"CoreTelephony\"",
-					"-framework",
-					"\"Foundation\"",
-					"-framework",
-					"\"ImSDK_Plus\"",
-					"-framework",
-					"\"ImageIO\"",
-					"-framework",
-					"\"JavaScriptCore\"",
-					"-framework",
-					"\"Masonry\"",
-					"-framework",
-					"\"MetalKit\"",
-					"-framework",
-					"\"MetalPerformanceShaders\"",
-					"-framework",
-					"\"ReactiveObjC\"",
-					"-framework",
-					"\"ReplayKit\"",
-					"-framework",
-					"\"SDWebImage\"",
-					"-framework",
-					"\"SSZipArchive\"",
-					"-framework",
-					"\"Security\"",
-					"-framework",
-					"\"SnapKit\"",
-					"-framework",
-					"\"SystemConfiguration\"",
-					"-framework",
-					"\"TIMCommon\"",
-					"-framework",
-					"\"TUIChat\"",
-					"-framework",
-					"\"TUICore\"",
-					"-framework",
-					"\"TXAppBasic\"",
-					"-framework",
-					"\"TXFFmpeg\"",
-					"-framework",
-					"\"TXLiteAVSDK_ReplayKitExt\"",
-					"-framework",
-					"\"TXSoundTouch\"",
-					"-framework",
-					"\"UIKit\"",
-					"-framework",
-					"\"VideoToolbox\"",
-					"-framework",
-					"\"libpag\"",
-					"\"-Wl\"",
-					"\"-weak-lswiftCoreGraphics\"",
-				);
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.fx.rtmpdemo.TCLVBIMDemoUploadUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = com.tencent.fx.rtmpdemo.TCLVBIMDemoUploadUI_Production_SignProvision;
@@ -1125,7 +953,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = F8A3GH6Q4W;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/App/Info.plist";
@@ -1134,7 +962,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.tuiroom.apiexample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = abyWildcardDev;
@@ -1151,7 +979,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = FN2V63AD2J;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FN2V63AD2J;
 				ENABLE_BITCODE = NO;
@@ -1161,7 +989,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.fx.rtmpdemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = com.tencent.fx.rtmpdemo_Production_SignProvision;

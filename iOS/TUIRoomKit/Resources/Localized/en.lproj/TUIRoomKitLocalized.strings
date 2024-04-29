@@ -79,7 +79,6 @@
 "TUIRoom.float" = "Float";
 "TUIRoom.beauty" = "Beauty";
 "TUIRoom.drop" = "Drop";
-"TUIRoom.beauty" = "Beauty";
 "TUIRoom.switch.layout" = "Switch layout";
 
 "TUIRoom.leave" = "Leave";
@@ -88,7 +87,7 @@
 "TUIRoom.stage.management" = "Applies";
 "TUIRoom.leave.seat" = "Leave stage";
 "TUIRoom.cancel.stage" = "Cancel the stage";
-"TUIRoom.invite.to.speak" = "invites you to speak on stage";
+"TUIRoom.invite.to.speak" = "xx invites you to speak on stage";
 "TUIRoom.agree.to.speak" = "You can turn on the camera and unmute it once you are on stage";
 "TUIRoom.decline" = "Decline";
 "TUIRoom.agree" = "Agree";
@@ -104,8 +103,8 @@
 "TUIRoom.code" = "Room QR code";
 "TUIRoom.scan.code" = "Scan the code to enter the room";
 "TUIRoom.save.into.album" = "Save into the album";
-"TUIRoom.invite.turn.on.audio" = "invites you to turn on the microphone";
-"TUIRoom.invite.turn.on.video" = "invites you to turn on the camera";
+"TUIRoom.invite.turn.on.audio" = "xx invites you to turn on the microphone";
+"TUIRoom.invite.turn.on.video" = "xx invites you to turn on the camera";
 "TUIRoom.dismiss.meeting.Title" = "If you don't want to end the meeting";
 "TUIRoom.appoint.new.host" = "Please appoint a new host before leaving the meeting";
 "TUIRoom.appoint.owner" = "If you do not want to end the room, please appoint a new moderator before leaving the room";

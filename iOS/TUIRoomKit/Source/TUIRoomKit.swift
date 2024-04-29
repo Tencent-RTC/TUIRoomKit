@@ -7,8 +7,9 @@
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 
+@available(*, deprecated, message: "Use ConferenceMainViewController instead.")
 @objcMembers public class TUIRoomKit: NSObject {
     typealias Weak<T> = () -> T?
     private static var _shared: TUIRoomKit?

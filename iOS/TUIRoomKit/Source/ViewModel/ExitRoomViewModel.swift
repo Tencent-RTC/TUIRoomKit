@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import TUIRoomEngine
 
 protocol ExitRoomViewModelResponder: AnyObject {
     func makeToast(message: String)

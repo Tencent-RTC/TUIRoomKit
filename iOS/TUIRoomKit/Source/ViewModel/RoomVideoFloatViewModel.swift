@@ -2,11 +2,11 @@
 //  RoomVideoFloatViewModel.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/7/11.
+//  Created by janejntang on 2023/7/11.
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 
 protocol RoomVideoFloatViewResponder: NSObject {
     func updateUserStatus(user: UserEntity)
@@ -16,8 +16,8 @@ protocol RoomVideoFloatViewResponder: NSObject {
 }
 
 class RoomVideoFloatViewModel: NSObject {
-    var userId: String = "" // 现在悬浮窗显示的成员
-    var streamType: TUIVideoStreamType = .cameraStream // 现在悬浮窗显示的流
+    var userId: String = ""
+    var streamType: TUIVideoStreamType = .cameraStream
     weak var renderView: UIView?
     weak var viewResponder: RoomVideoFloatViewResponder?
     var engineManager: EngineManager {
@@ -63,9 +63,9 @@ class RoomVideoFloatViewModel: NSObject {
     
     func showFloatWindowViewVideo(renderView: UIView?) {
         self.renderView = renderView
-        if let userModel = getScreenUserModel() { //如果有人正在进行屏幕共享，优先显示屏幕共享
+        if let userModel = getScreenUserModel() { //If someone is screen sharing, show the screen share first
             showScreenStream(userModel: userModel)
-        } else { //没有屏幕共享就显示房主
+        } else { //Show host without screen sharing
             showOwnerCameraStream()
         }
     }
@@ -156,7 +156,7 @@ extension RoomVideoFloatViewModel: RoomEngineEventResponder {
                 }
                 return
             }
-            guard getScreenUserModel() == nil else { return } //如果有人在进行屏幕共享，不显示房主画面
+            guard getScreenUserModel() == nil else { return } //If someone is screen sharing, don't show the host screen
             guard userId == roomInfo.ownerId else { return }
             if hasVideo {
                 startPlayVideo(userId: userId, streamType: streamType)
@@ -187,7 +187,7 @@ extension RoomVideoFloatViewModel: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
         switch key {
         case .TUIRoomKitService_RoomOwnerChanged:
-            guard getScreenUserModel() == nil else { return } //如果有人正在进行屏幕共享，不显示房主画面
+            guard getScreenUserModel() == nil else { return } //If someone is screen sharing, don't show the host screen
             stopPlayVideo(userId: self.userId, streamType: .cameraStream)
             showOwnerCameraStream()
         default: break

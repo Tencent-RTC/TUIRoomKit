@@ -2,12 +2,12 @@
 //  MediaSettingViewModel.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/1/16.
+//  Created by janejntang on 2023/1/16.
 //  Copyright © 2023 Tencent. All rights reserved.
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 #if TXLiteAVSDK_TRTC
 import TXLiteAVSDK_TRTC
 #elseif TXLiteAVSDK_Professional
@@ -101,7 +101,6 @@ class MediaSettingViewModel {
         captureVolumeItem.maximumValue = 100
         captureVolumeItem.sliderStep = 1
         captureVolumeItem.sliderDefault = Float(audioSetting.captureVolume)
-        captureVolumeItem.type = .captureVolumeType
         captureVolumeItem.hasDownLineView = true
         captureVolumeItem.action = { [weak self] sender in
             guard let self = self, let view = sender as? UISlider else { return }
@@ -117,7 +116,6 @@ class MediaSettingViewModel {
         playingVolumeItem.maximumValue = 100
         playingVolumeItem.sliderStep = 1
         playingVolumeItem.sliderDefault = Float(audioSetting.playVolume)
-        playingVolumeItem.type = .playingVolumeType
         playingVolumeItem.hasDownLineView = true
         playingVolumeItem.action = { [weak self] sender in
             guard let self = self, let view = sender as? UISlider else { return }
@@ -129,7 +127,6 @@ class MediaSettingViewModel {
         volumePromptItem.titleText = .volumePromptText
         volumePromptItem.hasSwitch = true
         volumePromptItem.isSwitchOn = audioSetting.volumePrompt
-        volumePromptItem.type = .volumePromptType
         volumePromptItem.action = { [weak self] sender in
             guard let self = self, let view = sender as? UISwitch else { return }
             self.volumePromptAction(sender: view)

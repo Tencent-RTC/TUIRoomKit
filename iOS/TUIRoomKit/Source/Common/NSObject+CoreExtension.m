@@ -9,13 +9,6 @@
 #import "NSObject+CoreExtension.h"
 @implementation NSObject (CoreExtension)
 
-+ (void)load {
-    #pragma GCC diagnostic ignored "-Wundeclared-selector"
-    if ([self respondsToSelector:@selector(tuiRoomKitSwiftLoad)]) {
-        [self performSelector:@selector(tuiRoomKitSwiftLoad)];
-    }
-}
-
 + (NSString *)getRoomEngineKey {
     return @"TUIRoomKit.Room.Engine.Key";
 }

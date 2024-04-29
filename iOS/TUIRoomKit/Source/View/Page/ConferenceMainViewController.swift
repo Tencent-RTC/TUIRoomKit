@@ -2,7 +2,7 @@
 //  ConferenceMainViewController.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2024/3/6.
+//  Created by janejntang on 2024/3/6.
 //
 
 import UIKit

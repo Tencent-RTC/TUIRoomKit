@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 #if TXLiteAVSDK_TRTC
 import TXLiteAVSDK_TRTC
 #elseif TXLiteAVSDK_Professional
@@ -33,29 +33,25 @@ protocol TUIVideoSeatViewModelResponder: AnyObject {
     func destroyVideoSeatResponder()
 }
 
-// 视图类型
 enum TUIVideoSeatViewType {
     case unknown
-    case singleType // 单人模式
-    case pureAudioType // 纯音频
-    case largeSmallWindowType // 大小窗
-    case speechType // 演讲者模式
-    case equallyDividedType // 等分模式
+    case singleType
+    case pureAudioType
+    case largeSmallWindowType
+    case speechType
+    case equallyDividedType
 }
 
 class TUIVideoSeatViewModel: NSObject {
     private var videoSeatItems: [VideoSeatItem] = []
-    // 当前分享者
     private var shareItem: VideoSeatItem?
-    // 当前说话者
     private var speakerItem: VideoSeatItem?
-    // 小画面item
     private var smallItem: VideoSeatItem?
     
     private var isSwitchPosition: Bool = false
     
-    private var speakerUpdateTimer: Int = 0 //演讲者更新的时间戳
-    private let speakerUpdateTimeInterval = 5 //演讲者更新的时间间隔
+    private var speakerUpdateTimer: Int = 0
+    private let speakerUpdateTimeInterval = 5
     private var itemStreamType: TUIVideoStreamType {
         if listSeatItem.filter({ $0.hasVideoStream }).count > 5 {
             return .cameraStreamLow
@@ -184,7 +180,13 @@ extension TUIVideoSeatViewModel {
         guard let userInfo = store.attendeeList.first(where: { $0.userId == userId }) else { return }
         let seatItem = VideoSeatItem(userInfo: userInfo)
         videoSeatItems.append(seatItem)
-        reloadSeatItems()
+        if checkNeededSort() {
+            refreshListSeatItem()
+            viewResponder?.reloadData()
+            resetMiniscreen()
+        } else {
+            reloadSeatItems()
+        }
     }
     
     private func removeSeatItem(_ userId: String) {
@@ -202,12 +204,12 @@ extension TUIVideoSeatViewModel {
         let item = listSeatItem.first(where: { $0.userId == userId && $0.type != .share })
         let type = videoSeatViewType
         refreshListSeatItem()
-        resetMiniscreen()
         if type == videoSeatViewType, let index = index, let item = item, viewResponder?.getVideoVisibleCell(item) == nil {
             viewResponder?.deleteItems(at: [IndexPath(item: index, section: 0)])
         } else {
             viewResponder?.reloadData()
         }
+        resetMiniscreen()
     }
     
     private func changeUserRole(userId: String, userRole: TUIRole) {
@@ -239,12 +241,12 @@ extension TUIVideoSeatViewModel {
     
     private func sortSeatItems() {
         guard checkNeededSort() else { return }
-        //  自己在第二位
+        //  I'm second
         if let currentItemIndex = videoSeatItems.firstIndex(where: { $0.userId == self.currentUserId }) {
             let currentItem = videoSeatItems.remove(at: currentItemIndex)
             videoSeatItems.insert(currentItem, at: 0)
         }
-        // 房主永远在第一位
+        // Homeowners always come first
         if let roomOwnerItemIndex = videoSeatItems.firstIndex(where: { $0.userId == roomInfo.ownerId }) {
             let roomOwnerItem = videoSeatItems.remove(at: roomOwnerItemIndex)
             videoSeatItems.insert(roomOwnerItem, at: 0)
@@ -277,18 +279,15 @@ extension TUIVideoSeatViewModel {
         return currentSpeakerItem
     }
     
-    //判断type状态
     private func refreshListSeatItem() {
         sortSeatItems()
         listSeatItem = Array(videoSeatItems)
         if videoSeatItems.count == 1 {
-            // 单人
             videoSeatViewType = .singleType
             if isHasScreenStream {
                 refreshMultiVideo()
             }
         } else if videoSeatItems.count == 2, isHasVideoStream,!isHasScreenStream {
-            // 双人 大小窗切换
             videoSeatViewType = .largeSmallWindowType
             if isSwitchPosition {
                 let first = listSeatItem[0]
@@ -298,7 +297,6 @@ extension TUIVideoSeatViewModel {
             smallItem = listSeatItem[1]
             listSeatItem = [listSeatItem[0]]
         } else if videoSeatItems.count >= 2, !isHasVideoStream {
-            // 多人 纯音频模式
             videoSeatViewType = .pureAudioType
         } else {
             refreshMultiVideo()
@@ -310,25 +308,21 @@ extension TUIVideoSeatViewModel {
         let videoResult = videoSeatItems.filter({ $0.hasVideoStream })
         var speechItem: VideoSeatItem?
         if screenResult.count == 1, let item = screenResult.first {
-            // 有分享
             speechItem = item
         } else if videoResult.count == 1, let item = videoResult.first {
-            // 只有一路视频
             speechItem = item
         }
-        
         if let item = speechItem, let seatItemIndex = videoSeatItems.firstIndex(where: { $0.userId == item.userId }) {
-            // 演讲者
             videoSeatViewType = .speechType
             if item.hasScreenStream, item.userId != currentUserId {
-                // 屏幕分享 克隆，放到第一个位置
+                //Screen share clone, put in the first position
                 videoSeatViewType = .speechType
                 let shareItem = item.cloneShare()
                 listSeatItem.insert(shareItem, at: 0)
                 self.shareItem = shareItem
             } else {
                 shareItem = nil
-                // 唯一视频流 前置第一个位置
+                // The only video stream precedes the first position
                 listSeatItem.remove(at: seatItemIndex)
                 listSeatItem.insert(item, at: 0)
                 if item.userId == speakerItem?.userId {
@@ -338,13 +332,11 @@ extension TUIVideoSeatViewModel {
             if let currentSpeakerItem = findCurrentSpeaker(list: listSeatItem), currentSpeakerItem.hasAudioStream {
                 speakerItem = currentSpeakerItem
             } else {
-                // 全部静音，且speakerItem已经离开了
                 if let item = speakerItem, videoSeatItems.firstIndex(where: { $0.userId == item.userId }) == nil {
                     speakerItem = nil
                 }
             }
         } else {
-            // 多人 多视频
             videoSeatViewType = .equallyDividedType
         }
     }
@@ -512,7 +504,7 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
             viewResponder?.showScreenCaptureMaskView(isShow: hasVideo)
             return
         }
-        guard var seatItem = getSeatItem(userId) else { return }
+        guard let seatItem = getSeatItem(userId) else { return }
         if streamType == .cameraStream {
             seatItem.hasVideoStream = hasVideo
         } else if streamType == .screenStream {
@@ -553,7 +545,6 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
         engineManager.setRemoteRenderParams(userId: userId, streamType: trtcStreamType, params: renderParams)
     }
     
-    // seatList: 当前麦位列表  seated: 新增上麦的用户列表 left: 下麦的用户列表
     private func seatListChanged(seated: [TUISeatInfo], left: [TUISeatInfo]) {
         for leftSeat in left {
             if let userId = leftSeat.userId {
@@ -580,8 +571,8 @@ extension TUIVideoSeatViewModel: TUIVideoSeatViewResponder {
         guard videoSeatViewType == .largeSmallWindowType else { return }
         isSwitchPosition = !isSwitchPosition
         refreshListSeatItem()
-        resetMiniscreen()
         viewResponder?.reloadData()
+        resetMiniscreen()
     }
     
     func clickVideoSeat() {

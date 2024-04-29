@@ -39,12 +39,6 @@ import TUIRoomKit
     var sessionId: String = ""
     @objc var curUserModel: LoginResultModel? = nil
     
-    /// 自动登录
-    /// - Parameters:
-    ///   - success: 成功回调
-    ///   - failed: 失败回调
-    ///   - error: 错误信息
-    /// - Returns:是否可以自动登录
     @objc public func autoLogin(success: @escaping ()->Void,
                                 failed: @escaping (_ error: String)->Void) -> Bool {
         let tokenKey = "com.tencent.trtcScences.demo"
@@ -62,11 +56,6 @@ import TUIRoomKit
         return false
     }
     
-    /// 登录
-    /// - Parameters:
-    ///   - success: 登录成功
-    ///   - failed: 登录失败
-    ///   - error: 错误信息
     @objc public func login(phone: String, name: String, success: @escaping ()->Void,
                             failed: ((_ error: String) -> Void)? = nil , auto: Bool = false) {
         let phoneValue = phone
@@ -95,12 +84,6 @@ import TUIRoomKit
         }
     }
     
-    /// 设置昵称
-    /// - Parameters:
-    ///   - name: 昵称
-    ///   - success: 成功回调
-    ///   - failed: 失败回调
-    ///   - error: 错误信息
     @objc public func setNickName(name: String, success: @escaping ()->Void,
                                   failed: @escaping (_ error: String)->Void) {
         let userInfo = V2TIMUserFullInfo()
@@ -114,11 +97,7 @@ import TUIRoomKit
             debugPrint("set profile failed.")
         })
     }
-    
-    /// IM 登录当前用户
-    /// - Parameters:
-    ///   - success: 成功
-    ///   - failed: 失败
+
     @objc func IMLogin(userSig: String, success: @escaping ()->Void, failed: @escaping (_ error: String)->Void) {
         guard let userID = curUserModel?.userId else {
             failed("userID wrong")

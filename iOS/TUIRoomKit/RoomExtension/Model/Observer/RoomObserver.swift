@@ -2,11 +2,10 @@
 //  RoomObserver.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/7/3.
-//  监听TUIRoomEngine，并且处理回调
+//  Created by janejntang on 2023/7/3.
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 import TUICore
 
 @objc public protocol RoomObserverListener {

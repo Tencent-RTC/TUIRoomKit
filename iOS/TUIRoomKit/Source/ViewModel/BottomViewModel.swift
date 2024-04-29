@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 import TUICore
 
 protocol BottomViewModelResponder: AnyObject {
@@ -44,7 +44,6 @@ class BottomViewModel: NSObject {
         memberItem.normalTitle = localizedReplace(.memberText,replace: String(attendeeList.count))
         memberItem.normalIcon = "room_member"
         memberItem.resourceBundle = tuiRoomKitBundle()
-        memberItem.buttonType = .memberItemType
         memberItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.memberAction(sender: button)
@@ -100,7 +99,6 @@ class BottomViewModel: NSObject {
         chatItem.normalIcon = "room_chat"
         chatItem.normalTitle = .chatText
         chatItem.resourceBundle = tuiRoomKitBundle()
-        chatItem.buttonType = .chatItemType
         chatItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.chatAction(sender: button)
@@ -127,7 +125,6 @@ class BottomViewModel: NSObject {
         floatItem.normalTitle = .floatText
         floatItem.normalIcon = "room_float"
         floatItem.resourceBundle = tuiRoomKitBundle()
-        floatItem.buttonType = .floatWindowItemType
         floatItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.floatAction(sender: button)
@@ -139,7 +136,6 @@ class BottomViewModel: NSObject {
         setupItem.normalTitle = .setupText
         setupItem.normalIcon = "room_setting"
         setupItem.resourceBundle = tuiRoomKitBundle()
-        setupItem.buttonType = .setupItemType
         setupItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.setupAction(sender: button)
@@ -151,7 +147,6 @@ class BottomViewModel: NSObject {
         inviteItem.normalTitle = .inviteText
         inviteItem.normalIcon = "room_invite"
         inviteItem.resourceBundle = tuiRoomKitBundle()
-        inviteItem.buttonType = .inviteItemType
         inviteItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.inviteAction(sender: button)
@@ -202,19 +197,6 @@ class BottomViewModel: NSObject {
         }
         return item
     }()
-    
-    var beautyItem: ButtonItemData {
-        let beautyItem = ButtonItemData()
-        beautyItem.normalTitle = .beautyText
-        beautyItem.resourceBundle = tuiRoomKitBundle()
-        beautyItem.normalIcon = "room_beauty"
-        beautyItem.buttonType = .beautyItemType
-        beautyItem.action = { [weak self] sender in
-            guard let self = self, let button = sender as? UIButton else { return }
-            self.beautyAction(sender: button)
-        }
-        return beautyItem
-    }
     
     override init() {
         super.init()
@@ -268,9 +250,6 @@ class BottomViewModel: NSObject {
     func createMoreBottomData(){
         viewItems.append(inviteItem)
         viewItems.append(floatItem)
-        if hasBeautyItem() {
-            viewItems.append(beautyItem)
-        }
         viewItems.append(setupItem)
         reorderTheMoreItem()
     }
@@ -285,12 +264,12 @@ class BottomViewModel: NSObject {
             engineManager.muteLocalAudio()
             return
         }
-        //如果房主全体静音，房间普通成员不可打开麦克风
+        //If all hosts are muted, ordinary members of the room cannot turn on their microphones.
         if self.roomInfo.isMicrophoneDisableForAllUser && currentUser.userRole == .generalUser {
             viewResponder?.makeToast(text: .muteAudioRoomReasonText)
             return
         }
-        //如果是举手发言房间，并且没有上麦，不可打开麦克风
+        //If you are speaking in a room with your hand raised and you are not on the microphone, you cannot turn on the microphone.
         if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             viewResponder?.makeToast(text: .muteSeatReasonText)
             return
@@ -306,12 +285,12 @@ class BottomViewModel: NSObject {
             engineManager.closeLocalCamera()
             return
         }
-        //如果房主全体禁画，房间普通成员不可打开摄像头
+        //If the entire host bans paintings, ordinary members of the room cannot turn on the camera.
         if self.roomInfo.isCameraDisableForAllUser && self.currentUser.userRole == .generalUser {
             viewResponder?.makeToast(text: .muteVideoRoomReasonText)
             return
         }
-        //如果是举手发言房间，并且没有上麦，不可打开摄像头
+        //If you are speaking in a room with your hands raised and you are not on the mic, you cannot turn on the camera.
         if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             viewResponder?.makeToast(text: .muteSeatReasonText)
             return
@@ -374,12 +353,12 @@ class BottomViewModel: NSObject {
             guard let item = viewItems.first(where: { $0.buttonType == .shareScreenItemType })
             else { return }
             if !item.isSelect {
-                //如果有人正在进行屏幕共享，自己就不能再进行屏幕共享
+                //If someone else is screen sharing, you can no longer screen share yourself
                 guard engineManager.store.attendeeList.first(where: {$0.hasScreenStream}) == nil else {
                     viewResponder?.makeToast(text: .othersScreenSharingText)
                     return
                 }
-                //如果现在是举手发言房间，自己又没有上麦，也不能进行屏幕共享
+                //If you are in a room where you are raising your hand to speak, and you are not on the mic, you cannot share your screen.
                 guard !(roomInfo.isSeatEnabled && !currentUser.isOnSeat) else {
                     viewResponder?.makeToast(text: .muteSeatReasonText)
                     return
@@ -432,10 +411,6 @@ class BottomViewModel: NSObject {
         RoomRouter.shared.presentPopUpViewController(viewType: .mediaSettingViewType, height: 709.scale375Height())
     }
     
-    func beautyAction(sender: UIButton) {
-        engineEventCenter.notifyUIEvent(key: .TUIRoomKitService_ShowBeautyView, param: [:])
-    }
-    
     @objc func onUserScreenCaptureStarted(notification:Notification)
     {
         guard let screen = notification.object as? UIScreen else {return}
@@ -465,11 +440,6 @@ extension BottomViewModel {
         return TUICore.getService(TUICore_TUIChatService) != nil
     }
     
-    private func hasBeautyItem() -> Bool {
-        return TUICore.getService(TUICore_TUIBeautyService) != nil
-    }
-    
-    //修改item的点击情况，type用于区分item，isSelected用来设置点击状态，如果不传入isSelected则点击状态默认取反
     private func changeItemSelectState(type: ButtonItemData.ButtonType, isSelected: Bool? = nil) {
         guard let item = viewItems.first(where: { $0.buttonType == type })
         else { return }
@@ -481,14 +451,12 @@ extension BottomViewModel {
         viewResponder?.updateButtonView(item: item)
     }
     
-    //更新申请上台按钮
     private func updateRaiseHandItem() {
         guard roomInfo.isSeatEnabled else { return }
         raiseHandItem.normalTitle = currentUser.userRole == .generalUser ? .applyJoinStageText : .joinStageText
         leaveSeatHandItem.isSelect = false
         raiseHandItem.isSelect = false
         if currentUser.userRole == .roomOwner {
-            //房主不显示上台或者下台按钮
             guard let index = viewItems.firstIndex(where:{ $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType }) else { return }
             viewItems.remove(at: index)
         } else if let index = viewItems.firstIndex(where:{ $0.buttonType == .leaveSeatItemType || $0.buttonType == .raiseHandItemType }) {
@@ -506,7 +474,6 @@ extension BottomViewModel {
         }
     }
     
-    //保持moreItem的位置，在第六位
     private func reorderTheMoreItem() {
         guard viewItems.count > 6 else { return }
         guard let index = viewItems.firstIndex(where: { $0.buttonType == .moreItemType }), index != 5 else { return }
@@ -533,7 +500,7 @@ extension BottomViewModel {
     
     private func updateAudioItem() {
         if roomInfo.isSeatEnabled, currentUser.userRole == .generalUser, !currentUser.isOnSeat {
-            //举手发言房间观众不上麦，则不显示麦克风按钮
+            //If the audience in the room who raises their hand to speak is not on the microphone, the microphone button will not be displayed.
             removeViewItem(buttonType: .muteAudioItemType)
         } else if !isContainedViewItem(buttonType: .muteAudioItemType) {
             addViewItem(buttonItem: muteAudioItem, index: 1)
@@ -544,7 +511,6 @@ extension BottomViewModel {
     
     private func updateVideoItem() {
         if roomInfo.isSeatEnabled, currentUser.userRole == .generalUser, !currentUser.isOnSeat {
-            //举手发言房间观众不上麦，则不显示摄像头按钮
             removeViewItem(buttonType: .muteVideoItemType)
         } else if !isContainedViewItem(buttonType: .muteVideoItemType) {
             addViewItem(buttonItem: muteVideoItem, index: 2)
@@ -552,25 +518,21 @@ extension BottomViewModel {
         muteVideoItem.isSelect = !currentUser.hasVideoStream
         muteVideoItem.alpha = checkCameraAuthority() || currentUser.hasVideoStream  ? 1 : 0.5
     }
-    //检查麦克风权限
+    
     private func checkMicAuthority() -> Bool {
-        //如果房主全体静音，房间普通成员没有麦克风权限
         if self.roomInfo.isMicrophoneDisableForAllUser && currentUser.userRole == .generalUser {
             return false
         }
-        //如果是举手发言房间并且没有上麦，没有麦克风权限
         if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             return false
         }
         return true
     }
-    //检查摄像头权限
+    
     private func checkCameraAuthority() -> Bool {
-        //如果房主全体静音，房间普通成员没有摄像头权限
         if self.roomInfo.isCameraDisableForAllUser && currentUser.userRole == .generalUser {
             return false
         }
-        //如果是举手发言房间并且没有上麦，没有摄像头权限
         if roomInfo.isSeatEnabled, !currentUser.isOnSeat {
             return false
         }
@@ -581,13 +543,10 @@ extension BottomViewModel {
         guard roomInfo.isSeatEnabled else { return }
         raiseHandItem.normalTitle = currentUser.userRole == .generalUser ? .applyJoinStageText : .joinStageText
         if currentUser.userRole == .roomOwner {
-            //房主添加上台管理按钮
             addViewItem(buttonItem: raiseHandApplyItem, index: 3)
         } else if currentUser.userRole == .administrator {
-            //管理员增加上台管理按钮
             addViewItem(buttonItem: raiseHandApplyItem, index: 4)
         } else {
-            //普通观众去掉上台管理按钮
             removeViewItem(buttonType: .raiseHandApplyItemType)
         }
     }
@@ -769,8 +728,5 @@ private extension String {
     }
     static var joinStageApplicationCancelledText: String {
         localized("TUIRoom.join.stage.application.cancelled")
-    }
-    static var beautyText: String {
-        localized("TUIRoom.beauty")
     }
 }

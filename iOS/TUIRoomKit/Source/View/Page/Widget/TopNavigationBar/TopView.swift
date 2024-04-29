@@ -2,7 +2,7 @@
 //  TopView.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2022/12/30.
+//  Created by janejntang on 2022/12/30.
 //  Copyright © 2022 Tencent. All rights reserved.
 //
 
@@ -200,7 +200,7 @@ class TopView: UIView {
     }
     
     func updateRootViewOrientation(isLandscape: Bool) {
-        if isLandscape { //横屏时，会议时间放在会议名称的右边
+        if isLandscape {
             contentView.snp.updateConstraints() { make in
                 make.top.equalToSuperview()
             }
@@ -212,7 +212,7 @@ class TopView: UIView {
                 make.width.equalTo(150.scale375())
                 make.height.equalTo(24.scale375Height())
             }
-        } else { //竖屏时，会议时间放在会议名称的下边
+        } else {
             contentView.snp.updateConstraints() { make in
                 make.top.equalToSuperview().offset(44.scale375Height())
             }

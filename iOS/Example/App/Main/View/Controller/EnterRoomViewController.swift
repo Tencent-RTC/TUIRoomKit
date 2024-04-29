@@ -142,7 +142,23 @@ extension EnterRoomViewController {
         roomId = roomIDStr
         rootView?.updateEnterButtonState(isEnabled: false)
         rootView?.updateLoadingState(isStarted: true)
+        //1.Use ConferenceMainViewController, first enter the room and then display the page
         joinConference(roomId: roomId)
+        //2.Use ConferenceMainViewController and enter the room and display the page at the same time
+        //        joinConferenceAndShowViewController(roomId: roomId)
+        //3.Using TUIRoomKit
+        //        enterRoom(roomId: roomId)
+    }
+    
+    private func joinConferenceAndShowViewController(roomId: String) {
+        let vc = ConferenceMainViewController()
+        let params = ConferenceParams()
+        params.isMuteMicrophone = !enableLocalAudio
+        params.isOpenCamera = enableLocalVideo
+        params.isSoundOnSpeaker = isSoundOnSpeaker
+        vc.setConferenceParams(params: params)
+        vc.joinConference(conferenceId: roomId)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     private func joinConference(roomId: String) {
@@ -176,8 +192,14 @@ extension EnterRoomViewController {
 
 extension EnterRoomViewController: ConferenceObserver {
     func onConferenceJoined(conferenceId: String, error: ConferenceError) {
-        if error == .success, let vc = conferenceViewController {
+        //1.Go to the first room and then show the page
+        if error == .success {
+            guard let vc = conferenceViewController else { return }
             navigationController?.pushViewController(vc, animated: true)
+        } else {
+            let errorText = "Error : " + String(describing: error)
+            SceneDelegate.getCurrentWindow()?.makeToast(errorText, duration: 1, position:TUICSToastPositionCenter)
+            navigationController?.popViewController(animated: true)
         }
         conferenceViewController = nil
         renewRootViewState()

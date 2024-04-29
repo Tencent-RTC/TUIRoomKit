@@ -8,7 +8,7 @@
 
 import Foundation
 import TUICore
-import TUIRoomEngine
+import RTCRoomEngine
 
 let roomHashNumber: Int = 0x3B9AC9FF
 
@@ -72,7 +72,9 @@ class RoomStore: NSObject {
     }
     
     func initialRoomCurrentUser() {
-        EngineManager.createInstance().getUserInfo(TUILogin.getUserID() ?? "") { [weak self] userInfo in
+        currentUser.userId = TUILogin.getUserID() ?? ""
+        currentUser.userName = TUILogin.getNickName() ?? ""
+        EngineManager.createInstance().getUserInfo(currentUser.userId) { [weak self] userInfo in
             guard let self = self else { return }
             guard let userInfo = userInfo else { return }
             self.currentUser.update(userInfo: userInfo)
@@ -81,7 +83,6 @@ class RoomStore: NSObject {
         }
     }
     
-    //初始化麦上用户列表
     func initialSeatList(seatList: [TUISeatInfo]) {
         var localSeatList = [UserEntity]()
         for seatInfo in seatList {
@@ -98,7 +99,6 @@ class RoomStore: NSObject {
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewVideoSeatView, param: [:])
     }
     
-    //更新自己的上麦状态
     func updateSelfOnSeatState(isOnSeat: Bool) {
         currentUser.isOnSeat = isOnSeat
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged, param: ["isOnSeat": isOnSeat])

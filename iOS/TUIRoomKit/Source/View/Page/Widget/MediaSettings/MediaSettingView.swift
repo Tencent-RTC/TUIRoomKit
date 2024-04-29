@@ -2,9 +2,8 @@
 //  MediaSettingView.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/1/16.
+//  Created by janejntang on 2023/1/16.
 //  Copyright © 2023 Tencent. All rights reserved.
-//  设置页面
 //
 
 import Foundation

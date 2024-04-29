@@ -6,7 +6,6 @@
 //  Copyright © 2022 Tencent. All rights reserved.
 //
 
-import TUIRoomEngine
 import UIKit
 #if TXLiteAVSDK_TRTC
 import TXLiteAVSDK_TRTC
@@ -152,7 +151,6 @@ class TUIVideoSeatView: UIView {
     }
     
     func bindInteraction() {
-        //如果自己在进行屏幕共享，显示遮挡层
         screenCaptureMaskView.isHidden = !EngineManager.createInstance().store.currentUser.hasScreenStream
         addGesture()
     }
@@ -207,7 +205,6 @@ extension TUIVideoSeatView: TUIVideoSeatViewModelResponder {
             guard let self = self else { return }
             self.attendeeCollectionView.performBatchUpdates { [weak self] in
                 guard let self = self else { return }
-                //如果当前的cell数量已经和数据源相同，不再进行插入操作而是直接reloadData
                 if self.attendeeCollectionView.numberOfItems(inSection: 0) == self.viewModel.listSeatItem.count {
                     self.attendeeCollectionView.reloadData()
                 } else {
@@ -222,7 +219,6 @@ extension TUIVideoSeatView: TUIVideoSeatViewModelResponder {
             guard let self = self else { return }
             self.attendeeCollectionView.performBatchUpdates { [weak self] in
                 guard let self = self else { return }
-                //如果当前cell的数量已经和数据源相同，不再进行删除操作，而是直接reloadData
                 if self.attendeeCollectionView.numberOfItems(inSection: 0) == self.viewModel.listSeatItem.count {
                     self.attendeeCollectionView.reloadData()
                 } else {
@@ -232,7 +228,7 @@ extension TUIVideoSeatView: TUIVideoSeatViewModelResponder {
                         let section = indexPath.section
                         let item = indexPath.item
                         guard section < numberOfSections && item < self.attendeeCollectionView.numberOfItems(inSection: section)
-                        else { continue } // indexPath越界，不执行删除操作
+                        else { continue }
                         resultArray.append(indexPath)
                     }
                     self.attendeeCollectionView.deleteItems(at: resultArray)
@@ -328,8 +324,10 @@ extension TUIVideoSeatView: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let seatItem = viewModel.listSeatItem[safe: indexPath.item] else { return }
-        responder?.stopPlayVideoStream(item: seatItem)
+        guard let seatCell = cell as? VideoSeatCell else { return }
+        if let seatItem = seatCell.seatItem {
+            responder?.stopPlayVideoStream(item: seatItem)
+        }
     }
 }
 

@@ -8,7 +8,7 @@
 
 import Foundation
 import TUICore
-import TUIRoomEngine
+import RTCRoomEngine
 #if TXLiteAVSDK_TRTC
 import TXLiteAVSDK_TRTC
 #elseif TXLiteAVSDK_Professional
@@ -88,7 +88,6 @@ class EngineManager: NSObject {
         store.videoSetting.isCameraOpened = enableVideo
         store.audioSetting.isSoundOnSpeaker = isSoundOnSpeaker
         setFramework()
-        //先判断是否登录
         if !isLoginEngine {
             self.login(sdkAppId: Int(TUILogin.getSdkAppID()), userId: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "")
             { [weak self] in
@@ -130,16 +129,13 @@ class EngineManager: NSObject {
     func destroyEngineManager() {
         roomEngine.removeObserver(eventDispatcher)
         roomEngine.getTRTCCloud().removeDelegate(observer)
-        TUIRoomEngine.destroySharedInstance()
         EngineManager._shared = nil
     }
     
-    //关闭本地音频
     func muteLocalAudio() {
         roomEngine.muteLocalAudio()
     }
     
-    //打开本地音频
     func unmuteLocalAudio(onSuccess:TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         roomEngine.unmuteLocalAudio {
             onSuccess?()
@@ -148,7 +144,6 @@ class EngineManager: NSObject {
         }
     }
     
-    //打开本地麦克风
     func openLocalMicrophone(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         let actionBlock = { [weak self] in
             guard let self = self else { return }
@@ -171,13 +166,11 @@ class EngineManager: NSObject {
         }
     }
     
-    //关闭本地摄像头
     func closeLocalCamera() {
         store.videoSetting.isCameraOpened = false
         roomEngine.closeLocalCamera()
     }
     
-    //打开本地摄像头
     func openLocalCamera(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         let actionBlock = { [weak self] in
             guard let self = self else { return }
@@ -232,7 +225,6 @@ class EngineManager: NSObject {
         }
     }
     
-    //主持人/管理员 邀请用户上麦
     func takeUserOnSeatByAdmin(userId: String, timeout: Double,
                                onAccepted: @escaping TUIRequestAcceptedBlock,
                                onRejected: @escaping TUIRequestRejectedBlock,
@@ -257,7 +249,6 @@ class EngineManager: NSObject {
         roomEngine.getTRTCCloud().setAudioRoute(route)
     }
     
-    //上麦
     func takeSeat(onAccepted: TUIRequestAcceptedBlock? = nil,
                   onRejected: TUIRequestRejectedBlock? = nil,
                   onCancelled: TUIRequestCancelledBlock? = nil,
@@ -289,7 +280,6 @@ class EngineManager: NSObject {
         return request
     }
     
-    //取消上麦
     func cancelTakeSeatRequest() {
         guard let requestId = store.selfTakeSeatRequestId else { return }
         cancelRequest(requestId)
@@ -319,12 +309,10 @@ class EngineManager: NSObject {
         roomEngine.setLocalVideoView(streamType: streamType, view: view)
     }
     
-    //修改用户角色（只有管理员或房主能够调用）
     func changeUserRole(userId: String, role: TUIRole, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         roomEngine.changeUserRole(userId: userId, role: role, onSuccess: onSuccess, onError: onError)
     }
     
-    //回复请求
     func responseRemoteRequest(_ requestId: String, agree: Bool, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         roomEngine.responseRemoteRequest(requestId, agree: agree) {
             onSuccess?()
@@ -333,12 +321,10 @@ class EngineManager: NSObject {
         }
     }
     
-    //获取成员信息
     func getUserInfo(_ userId: String, onSuccess: @escaping TUIUserInfoBlock, onError: @escaping TUIErrorBlock) {
         roomEngine.getUserInfo(userId, onSuccess: onSuccess, onError: onError)
     }
     
-    //结束屏幕分享
     func stopScreenCapture() {
         roomEngine.stopScreenCapture()
     }
@@ -347,7 +333,6 @@ class EngineManager: NSObject {
         roomEngine.getTRTCCloud().setVideoEncoderParam(param)
     }
     
-    //取消请求
     func cancelRequest(_ requestId: String, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         roomEngine.cancelRequest(requestId) {
             onSuccess?()
@@ -356,7 +341,6 @@ class EngineManager: NSObject {
         }
     }
     
-    //下麦
     func leaveSeat(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         roomEngine.leaveSeat {
             onSuccess?()
@@ -365,22 +349,18 @@ class EngineManager: NSObject {
         }
     }
     
-    //开始屏幕分享
     func startScreenCapture() {
         roomEngine.startScreenCapture(appGroup: appGroupString)
     }
     
-    //停止播放远端用户视频
     func stopPlayRemoteVideo(userId: String, streamType: TUIVideoStreamType) {
         roomEngine.stopPlayRemoteVideo(userId: userId, streamType: streamType)
     }
     
-    //设置远端用户视频渲染的视图控件
     func setRemoteVideoView(userId: String, streamType: TUIVideoStreamType, view: UIView?) {
         roomEngine.setRemoteVideoView(userId: userId, streamType: streamType, view: view)
     }
     
-    //开始播放远端用户视频
     func startPlayRemoteVideo(userId: String, streamType: TUIVideoStreamType, onSuccess: TUISuccessBlock? = nil,
                               onLoading: TUIPlayOnLoadingBlock? = nil, onError: TUIPlayOnErrorBlock? = nil) {
         roomEngine.startPlayRemoteVideo(userId: userId, streamType: streamType, onPlaying: { _ in
@@ -414,12 +394,10 @@ class EngineManager: NSObject {
         }
     }
     
-    //关闭远端用户媒体设备（只有管理员或房主能够调用）
     func closeRemoteDeviceByAdmin(userId: String, device: TUIMediaDevice, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         roomEngine.closeRemoteDeviceByAdmin(userId: userId, device: device, onSuccess: onSuccess, onError: onError)
     }
     
-    //请求远端用户打开媒体设备（只有管理员或房主能够调用）
     func openRemoteDeviceByAdmin(userId: String, device: TUIMediaDevice,
                                  onAccepted: TUIRequestAcceptedBlock? = nil,
                                  onRejected: TUIRequestRejectedBlock? = nil,
@@ -439,7 +417,6 @@ class EngineManager: NSObject {
         }
     }
     
-    //禁用远端用户的发送文本消息能力（只有管理员或房主能够调用）
     func disableSendingMessageByAdmin(userId: String, isDisable: Bool, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         roomEngine.disableSendingMessageByAdmin(userId: userId, isDisable: isDisable) {
             onSuccess?()
@@ -448,7 +425,6 @@ class EngineManager: NSObject {
         }
     }
     
-    //主持人/管理员 将用户踢下麦
     func kickUserOffSeatByAdmin(userId: String, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         roomEngine.kickUserOffSeatByAdmin(-1, userId: userId) {
             onSuccess?()
@@ -457,7 +433,6 @@ class EngineManager: NSObject {
         }
     }
     
-    //将远端用户踢出房间（只有管理员或房主能够调用）
     func kickRemoteUserOutOfRoom(userId: String, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         roomEngine.kickRemoteUserOutOfRoom(userId) {
             onSuccess?()
@@ -466,7 +441,6 @@ class EngineManager: NSObject {
         }
     }
     
-    //初始化用户列表
     func initUserList(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         self.getUserList(nextSequence: 0, localUserList: []) { [weak self] in
             guard let self = self else { return }
@@ -484,7 +458,6 @@ class EngineManager: NSObject {
         }
     }
     
-    //增加房间用户
     func addUserItem(_ userItem: UserEntity) {
         guard getUserItem(userItem.userId) == nil else { return }
         if userItem.userName.isEmpty {
@@ -492,27 +465,24 @@ class EngineManager: NSObject {
         }
         store.attendeeList.append(userItem)
     }
-    //删除房间用户
+    
     func deleteUserItem(_ userId: String) {
         store.attendeeList = store.attendeeList.filter({ userItem in
             userItem.userId != userId
         })
     }
     
-    //增加麦上用户
     func addSeatItem(_ userItem: UserEntity) {
         guard getSeatItem(userItem.userId) == nil else { return }
         store.seatList.append(userItem)
     }
     
-    //删除麦上用户
     func deleteSeatItem(_ userId: String) {
         store.seatList = store.seatList.filter({ userItem in
             userItem.userId != userId
         })
     }
     
-    //更新本地视频编码质量设置
     func updateVideoQuality(quality: TUIVideoQuality) {
         roomEngine.updateVideoQuality(quality)
     }
@@ -531,10 +501,6 @@ class EngineManager: NSObject {
     
     func setRemoteRenderParams(userId: String, streamType: TRTCVideoStreamType, params: TRTCRenderParams) {
         roomEngine.getTRTCCloud().setRemoteRenderParams(userId, streamType: streamType, params: params)
-    }
-    
-    func getBeautyManager() -> TXBeautyManager {
-        roomEngine.getTRTCCloud().getBeautyManager()
     }
     
     func updateSeatApplicationList() {
@@ -658,18 +624,15 @@ extension EngineManager {
         return true
     }
     
-    //进房后操作麦克风
     private func operateLocalMicrophone(enableAudio: Bool ,onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
         if isPushLocalAudioStream(enableAudio: enableAudio) {
             openLocalMicrophone()
         } else if RoomCommon.checkAuthorMicStatusIsDenied() {
-            //检查麦克风权限
             muteLocalAudio()
             openLocalMicrophone()
         }
     }
     
-    //进房后视频设置
     private func initLocalVideoState() {
         setVideoParam()
         updateVideoQuality(quality: store.videoSetting.videoQuality)
@@ -691,7 +654,6 @@ extension EngineManager {
         setLocalRenderParams(params: params)
     }
     
-    //获取用户列表
     private func getUserList(nextSequence: Int, localUserList: [UserEntity], onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         roomEngine.getUserList(nextSequence: nextSequence) { [weak self] list, nextSequence in
             guard let self = self else { return }
@@ -720,7 +682,6 @@ extension EngineManager {
         }
     }
     
-    //获取麦上用户列表
     private func getSeatList(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         roomEngine.getSeatList { [weak self] seatList in
             guard let self = self else { return }

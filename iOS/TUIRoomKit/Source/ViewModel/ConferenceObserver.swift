@@ -2,7 +2,7 @@
 //  ConferenceObserver.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2024/3/15.
+//  Created by janejntang on 2024/3/15.
 //
 
 import Foundation

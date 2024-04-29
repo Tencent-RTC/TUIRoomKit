@@ -2,8 +2,8 @@
 //  ScreenCaptureMaskView.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/7/17.
-//  开启屏幕共享的蒙层View
+//  Created by janejntang on 2023/7/17.
+//  Turn on masked View for screen sharing
 //
 
 import Foundation

@@ -2,9 +2,9 @@
 //  VideoChoicePanel.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/1/17.
+//  Created by janejntang on 2023/1/17.
 //  Copyright © 2023 Tencent. All rights reserved.
-//  视频的分辨率或者帧率的选择面板
+//  Video resolution or frame rate selection panel
 //
 
 import Foundation
@@ -14,10 +14,7 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
-
-
 // MARK: Resolution
-
 class VideoChoicePanel: AlertContentView {
     var dataSource: [String] = []
     var selectIndex = 3

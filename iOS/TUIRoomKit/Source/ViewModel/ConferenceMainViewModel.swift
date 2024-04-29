@@ -8,7 +8,7 @@
 
 import Foundation
 import TUICore
-import TUIRoomEngine
+import RTCRoomEngine
 #if TXLiteAVSDK_TRTC
 import TXLiteAVSDK_TRTC
 #elseif TXLiteAVSDK_Professional
@@ -21,7 +21,6 @@ protocol ConferenceMainViewResponder: AnyObject {
     func setToolBarDelayHidden(isDelay: Bool)
     func showExitRoomView()
     func showAlert(title: String?, message: String?, sureTitle:String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?)
-    func showBeautyView()
 }
 
 class ConferenceMainViewModel: NSObject {
@@ -45,6 +44,7 @@ class ConferenceMainViewModel: NSObject {
     private weak var localAudioViewModel: LocalAudioViewModel?
     private var selfRole: TUIRole?
     var conferenceParams: ConferenceParams = ConferenceParams()
+    var isShownWaterMark: Bool = FeatureSwitch.switchTextWaterMark
     
     override init() {
         super.init()
@@ -53,14 +53,13 @@ class ConferenceMainViewModel: NSObject {
     }
     
     func applyConfigs() {
-        //如果房间不是自由发言房间并且用户没有上麦，不开启摄像头
+        //If the room is not a free speech room and the user is not on the microphone, the camera will not be turned on.
         if roomInfo.isSeatEnabled && !currentUser.isOnSeat {
             store.videoSetting.isCameraOpened = false
             return
         }
         let openLocalCameraActionBlock = { [weak self] in
             guard let self = self else { return }
-            // FIXME: - 打开摄像头前需要先设置一个view
             self.engineManager.setLocalVideoView(streamType: .cameraStream, view: nil)
             self.engineManager.openLocalCamera()
         }
@@ -90,7 +89,6 @@ class ConferenceMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowExitRoomView, responder: self)
-        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
     
     private func unsubscribeEngine() {
@@ -106,7 +104,6 @@ class ConferenceMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowExitRoomView, responder: self)
-        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowBeautyView, responder: self)
     }
     
     func hideLocalAudioView() {
@@ -249,7 +246,7 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
         guard !isShownOpenCameraInviteAlert else { return }
         guard let userInfo = store.attendeeList.first(where: { $0.userId == request.userId }) else { return }
         let nameText: String = userInfo.userRole == .roomOwner ? .hostText : .administratorText
-        let title = nameText + .inviteTurnOnVideoText
+        let title = localizedReplace(.inviteTurnOnVideoText, replace: nameText)
         viewResponder?.showAlert(title: title, message: nil, sureTitle: .agreeText, declineTitle: .declineText, sureBlock: { [weak self] in
             guard let self = self else { return }
             self.isShownOpenCameraInviteAlert = false
@@ -278,7 +275,7 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
         guard !isShownOpenMicrophoneInviteAlert else { return }
         guard let userInfo = store.attendeeList.first(where: { $0.userId == request.userId }) else { return }
         let nameText: String = userInfo.userRole == .roomOwner ? .hostText : .administratorText
-        let title = nameText + .inviteTurnOnAudioText
+        let title = localizedReplace(.inviteTurnOnAudioText, replace: nameText)
         viewResponder?.showAlert(title: title, message: nil, sureTitle: .agreeText, declineTitle: .declineText, sureBlock: { [weak self] in
             guard let self = self else { return }
             self.isShownOpenMicrophoneInviteAlert = false
@@ -306,7 +303,7 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
         guard roomInfo.isSeatEnabled && !isShownTakeSeatInviteAlert else { return }
         guard let userInfo = store.attendeeList.first(where: { $0.userId == request.userId }) else { return }
         let nameText: String = userInfo.userRole == .roomOwner ? .hostText : .administratorText
-        let title = nameText + .inviteSpeakOnStageTitle
+        let title = localizedReplace(.inviteSpeakOnStageTitle, replace: nameText)
         viewResponder?.showAlert(title: title, message: .inviteSpeakOnStageMessage, sureTitle: .agreeSeatText, declineTitle: .declineText, sureBlock: { [weak self] in
             guard let self = self else { return }
             self.isShownTakeSeatInviteAlert = false
@@ -370,7 +367,6 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
     
     func makeRaiseHandNoticeView() -> UIView {
         let raiseHandNoticeView = RaiseHandNoticeView()
-        //只有举手发言房间，并且用户不是房主时才会显示举手上麦提示
         if roomInfo.isSeatEnabled, currentUser.userId != roomInfo.ownerId, store.isShownRaiseHandNotice {
             raiseHandNoticeView.isHidden = false
         } else {
@@ -387,14 +383,14 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
         return view
     }
     
-    func makeBeautyView() -> UIView? {
-        let beautyManager = engineManager.getBeautyManager()
-        let beautyList = TUICore.getExtensionList(TUICore_TUIBeautyExtension_BeautyView, param: [
-            TUICore_TUIBeautyExtension_BeautyView_BeautyManager: beautyManager,])
-        guard beautyList.count > 0 else { return nil }
-        guard let view = beautyList[0].data?[TUICore_TUIBeautyExtension_BeautyView_View] as? UIView else { return nil }
-        view.isHidden = true
-        return view
+    func makeWaterMarkLayer() -> WaterMarkLayer {
+        let layer = WaterMarkLayer()
+        layer.backgroundColor = UIColor.clear.cgColor
+        layer.anchorPoint = CGPointZero
+        layer.text = currentUser.userId + "(" + currentUser.userName + ")"
+        layer.lineStyle = .multiLine
+        layer.cornerRadius = 16
+        return layer
     }
 }
 
@@ -414,8 +410,6 @@ extension ConferenceMainViewModel: RoomKitUIEventResponder {
             viewResponder?.setToolBarDelayHidden(isDelay: isDelay)
         case .TUIRoomKitService_ShowExitRoomView:
             viewResponder?.showExitRoomView()
-        case .TUIRoomKitService_ShowBeautyView:
-            viewResponder?.showBeautyView()
         default: break
         }
     }
