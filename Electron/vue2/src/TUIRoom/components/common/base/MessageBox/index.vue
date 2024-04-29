@@ -1,8 +1,7 @@
 <template>
-  <transition name="tui-message-box-fade" :disabled="teleportDisable">
+  <transition name="tui-message-box-fade">
     <div
       v-show="visible"
-      ref="messageRef"
       :style="overlayContentStyle"
       :class="['overlay']"
       class="message-box-overlay"
@@ -27,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import TuiButton from '../Button.vue';
 import SvgIcon from '../SvgIcon.vue';
 import CloseIcon from '../../icons/CloseIcon.vue';
@@ -37,8 +36,6 @@ import useZIndex from '../../../../hooks/useZIndex';
 const visible = ref(false);
 const overlayContentStyle = ref({});
 const { nextZIndex } = useZIndex();
-const messageRef = ref();
-const teleportDisable = computed(() => !props.appendToBody);
 
 type BeforeCloseFn = () => void;
 
@@ -48,8 +45,6 @@ interface Props {
   callback?: BeforeCloseFn | null;
   confirmButtonText: string;
   remove: Function;
-  appendToBody?: boolean;
-  appendToRoomContainer?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -58,16 +53,11 @@ const props = withDefaults(defineProps<Props>(), {
   callback: null,
   confirmButtonText: '',
   remove: () => {},
-  appendToBody: false,
-  appendToRoomContainer: false,
 });
 
 watch(visible, (val) => {
   if (val) {
     overlayContentStyle.value = { zIndex: nextZIndex() };
-    if (props.appendToRoomContainer) {
-      document.getElementById('roomContainer')?.appendChild(messageRef.value);
-    }
   }
 });
 

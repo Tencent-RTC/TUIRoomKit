@@ -98,14 +98,14 @@ function toggleClickMoreBtn() {
   }
 }
 
-// 根据页面位置确定下拉框的定位
 function handleDropDownPosition() {
   const { top, bottom } = moreBtnRef.value?.getBoundingClientRect();
-  const containerBottom = document.getElementById('memberListContainer')?.getBoundingClientRect()?.bottom;
-  if (!containerBottom) {
+  const { top: containerTop, bottom: containerBottom } = document.getElementById('memberListContainer')?.getBoundingClientRect() as DOMRect;
+  if (!containerBottom || !containerTop) {
     return;
   }
   const bottomSize = containerBottom - bottom;
+  const topSize = top - containerTop;
   let dropDownContainerHeight = 0;
   if (!showMoreControl.value) {
     operateListRef.value.style = 'display:block;position:absolute;z-index:-1000';
@@ -114,7 +114,10 @@ function handleDropDownPosition() {
   } else {
     dropDownContainerHeight = operateListRef.value?.offsetHeight;
   }
-  if (bottomSize < top && bottomSize < dropDownContainerHeight) {
+  if (topSize < dropDownContainerHeight) {
+    return;
+  }
+  if (bottomSize < dropDownContainerHeight) {
     dropdownClass.value = 'up';
   }
 }

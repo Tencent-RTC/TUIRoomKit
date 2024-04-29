@@ -74,21 +74,18 @@ const showMessageBox = (data: {
   message: string;
   title: string;
   confirmButtonText: string;
-  appendToRoomContainer?: boolean;
   callback?: () => void;
 }) => {
   const {
     message,
     title = roomService.t('Note'),
     confirmButtonText = roomService.t('Sure'),
-    appendToRoomContainer = true,
     callback = () => { },
   } = data;
   TUIMessageBox({
     title,
     message,
     confirmButtonText,
-    appendToRoomContainer,
     callback: async () => {
       callback && callback();
     },
@@ -120,6 +117,7 @@ onUnmounted(() => {
   roomService.off(EventType.ROOM_KICKED_OUT, onKickedOutOfRoom);
   roomService.off(EventType.ROOM_USER_SIG_EXPIRED, onUserSigExpired);
   roomService.off(EventType.ROOM_KICKED_OFFLINE, onKickedOffLine);
+  roomService.resetStore();
 });
 
 const { sdkAppId, showHeaderTool } = roomService.basicStore;

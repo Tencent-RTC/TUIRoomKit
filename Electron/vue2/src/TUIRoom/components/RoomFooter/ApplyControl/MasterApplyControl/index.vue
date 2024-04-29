@@ -35,8 +35,19 @@
         <span class="apply-text">{{ t('Currently no member has applied to go on stage') }}</span>
       </div>
       <template #footer>
-        <tui-button size="default" :disabled="noUserApply" @click="handleAllUserApply(true)"> {{ t('Agree All') }} </tui-button>
-        <tui-button class="cancel-button" size="default" :disabled="noUserApply" @click="handleAllUserApply(false)">
+        <tui-button
+          size="default"
+          :disabled="applyToAnchorUserCount === 0"
+          @click="handleAllUserApply(true)"
+        >
+          {{ t('Agree All') }}
+        </tui-button>
+        <tui-button
+          class="cancel-button"
+          size="default"
+          :disabled="applyToAnchorUserCount === 0"
+          @click="handleAllUserApply(false)"
+        >
           {{ t('Reject All') }}
         </tui-button>
       </template>
@@ -46,7 +57,7 @@
 
 <script setup lang="ts">
 import ApplyStageLabelIcon from '../../../common/icons/ApplyStageLabelIcon.vue';
-import useMasterApplyControl from './useMasterApplyControlHooks';
+import useMasterApplyControl from '../../../../hooks/useMasterApplyControl';
 import Avatar from '../../../common/Avatar.vue';
 import Dialog from '../../../common/base/Dialog/index.vue';
 import SvgIcon from '../../../common/base/SvgIcon.vue';
@@ -60,7 +71,6 @@ const {
   applyToAnchorList,
   handleAllUserApply,
   handleUserApply,
-  noUserApply,
 } = useMasterApplyControl();
 </script>
 

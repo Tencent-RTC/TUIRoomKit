@@ -83,9 +83,8 @@ import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import AudioMediaControl from '../../common/AudioMediaControl.vue';
 import VideoMediaControl from '../../common/VideoMediaControl.vue';
-import TUIRoomEngine, { TUIRoomEvents, TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode, TUIRoomDeviceMangerEvents } from '@tencentcloud/tuiroom-engine-electron';
+import TUIRoomEngine, { TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode, TUIRoomDeviceMangerEvents } from '@tencentcloud/tuiroom-engine-electron';
 import '../../../directives/vClickOutside';
-import { isElectron } from '../../../utils/environment';
 import { isEnumerateDevicesSupported, isGetUserMediaSupported } from '../../../utils/mediaAbility';
 import useDeviceManager from '../../../hooks/useDeviceManager';
 
@@ -134,38 +133,21 @@ async function openCamera() {
     rotation: TRTCVideoRotation.TRTCVideoRotation0,
     fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
   });
-  if (isElectron) {
-    roomEngine.instance?.setLocalVideoView({ view: 'stream-preview' });
-    await roomEngine.instance?.openLocalCamera();
-  } else {
-    await roomEngine.instance?.startCameraDeviceTest({
-      view: 'stream-preview',
-    });
-  }
+  await roomEngine.instance?.startCameraDeviceTest({
+    view: 'stream-preview',
+  });
 }
 
 async function closeCamera() {
-  if (isElectron) {
-    await roomEngine.instance?.closeLocalCamera();
-  } else {
-    await roomEngine.instance?.stopCameraDeviceTest();
-  }
+  await roomEngine.instance?.stopCameraDeviceTest();
 }
 
 async function openAudio() {
-  if (isElectron) {
-    await roomEngine.instance?.openLocalMicrophone();
-  } else {
-    await roomEngine.instance?.startMicDeviceTest({ interval: 200 });
-  }
+  await roomEngine.instance?.startMicDeviceTest({ interval: 200 });
 }
 
 async function closeAudio() {
-  if (isElectron) {
-    await roomEngine.instance?.closeLocalMicrophone();
-  } else {
-    await roomEngine.instance?.stopMicDeviceTest();
-  }
+  await roomEngine.instance?.stopMicDeviceTest();
 }
 
 async function toggleMuteAudio() {
@@ -259,22 +241,13 @@ function enterRoom() {
 
 TUIRoomEngine.once('ready', () => {
   startStreamPreview();
-  if (isElectron) {
-    roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
-  } else {
-    deviceManager.instance?.on(TUIRoomDeviceMangerEvents.onTestMicVolume, onUserVoiceVolume);
-  }
+  deviceManager.instance?.on(TUIRoomDeviceMangerEvents.onTestMicVolume, onUserVoiceVolume);
 });
 
 onBeforeUnmount(async () => {
   await closeAudio();
   await closeCamera();
-
-  if (isElectron) {
-    roomEngine.instance?.off(TUIRoomEvents.onUserVoiceVolumeChanged, onUserVoiceVolume);
-  } else {
-    deviceManager.instance?.off(TUIRoomDeviceMangerEvents.onTestMicVolume, onUserVoiceVolume);
-  }
+  deviceManager.instance?.off(TUIRoomDeviceMangerEvents.onTestMicVolume, onUserVoiceVolume);
 });
 </script>
 

@@ -4,17 +4,20 @@ export type MessageProps = {
     title: string,
     message: string,
     callback?: () => Promise<void>,
-    appendToRoomContainer?: boolean,
     confirmButtonText?: string,
 }
-const MessageBox = ({ title, message, callback, appendToRoomContainer, confirmButtonText }: MessageProps) => {
+
+const MessageBox = ({ title, message, callback, confirmButtonText }: MessageProps) => {
   const container = document.createElement('div');
-  document.body.appendChild(container);
+  const fullscreenElement = document.fullscreenElement || document.getElementById('roomContainer') || document.body;
+  fullscreenElement.appendChild(container);
+
+
   const onRemove = () => {
     vm.$destroy();
-    document.body.removeChild(container);
+    fullscreenElement.removeChild(container);
   };
-  const messageBoxConstruct = Vue.extend({
+  const MessageBoxConstruct = Vue.extend({
     render: (h: any) => h(TUIMessageBox, {
       props: {
         title,
@@ -22,14 +25,10 @@ const MessageBox = ({ title, message, callback, appendToRoomContainer, confirmBu
         callback,
         confirmButtonText,
         remove: onRemove,
-        appendToRoomContainer,
-      },
-      on: {
-        remove: onRemove,
       },
     }),
   });
-  const vm = new messageBoxConstruct({el: document.createElement('div')}).$mount()
-  container.appendChild(vm.$el)
+  const vm = new MessageBoxConstruct({ el: document.createElement('div') }).$mount();
+  container.appendChild(vm.$el);
 };
 export default MessageBox;

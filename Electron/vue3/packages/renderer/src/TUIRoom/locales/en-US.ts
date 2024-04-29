@@ -243,9 +243,9 @@ export default {
   'kicked out of the room by other device': 'kicked out of the room by other device',
   'kicked out of the room by serve': 'kicked out of the room by serve',
   // @ts-ignore
-  'Reject on Stage failed, please retry': ({ named }) => `Reject ${named('name')} on Stage failed, please retry`,
+  'Reject sb stage failed, please retry': ({ named }) => `Reject ${named('name')} on Stage failed, please retry`,
   // @ts-ignore
-  'Agree on Stage failed, please retry': ({ named }) => `Agree ${named('name')} on Stage failed, please retry`,
+  'Agree sb stage failed, please retry': ({ named }) => `Agree ${named('name')} on Stage failed, please retry`,
   'Has been fully muted and cannot open the microphone': 'Has been fully muted and cannot open the microphone',
   'Has been muted by the host and cannot open the microphone': 'Has been muted by the host and cannot open the microphone',
   'To apply to speak in the room, please raise your hand first to apply for the microphone': 'To apply to speak in the room, please raise your hand first to apply for the microphone',

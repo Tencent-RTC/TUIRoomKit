@@ -1,6 +1,6 @@
 import { ref, Ref, computed, onUnmounted } from 'vue';
 import { useBasicStore } from '../../../stores/basic';
-import { useRoomStore } from '../../../stores/room';
+import { useRoomStore, UserInfo } from '../../../stores/room';
 import { useChatStore } from '../../../stores/chat';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../../locales';
@@ -25,7 +25,7 @@ export default function useEndControl() {
   logger.log(`${logPrefix} basicStore:`, basicStore);
 
   const roomStore = useRoomStore();
-  const { localUser, remoteUserList } = storeToRefs(roomStore);
+  const { localUser, remoteUserList, applyToAnchorList } = storeToRefs(roomStore);
   const title = computed(() => (currentDialogType.value === DialogType.BasicDialog ? t('Leave room?') : t('Select a new host')));
   const isShowLeaveRoomDialog = computed(() => (
     roomStore.isMaster && remoteUserList.value.length > 0)
@@ -87,6 +87,24 @@ export default function useEndControl() {
     }
   }
 
+  async function handleUpdateSeatApplicationList() {
+    if (!roomStore.isSpeakAfterTakingSeatMode) {
+      return;
+    }
+    if (applyToAnchorList.value.length > 0) {
+      applyToAnchorList.value.forEach((user: UserInfo) => {
+        user.applyToAnchorRequestId && roomStore.removeApplyToAnchorUser(user.applyToAnchorRequestId);
+      });
+    }
+    const applicationList = await roomEngine.instance?.getSeatApplicationList();
+    if (applicationList && applicationList.length > 0) {
+      for (const applicationInfo of applicationList) {
+        const { userId, requestId, timestamp } = applicationInfo;
+        roomStore.addApplyToAnchorUser({ userId, requestId, timestamp });
+      }
+    }
+  }
+
   const onUserRoleChanged = async (eventInfo: { userId: string, userRole: TUIRole }) => {
     const { userId, userRole } = eventInfo;
     const isLocal = roomStore.localUser.userId === userId;
@@ -108,6 +126,12 @@ export default function useEndControl() {
           if (oldUserRole === TUIRole.kAdministrator) {
             TUIMessage({ type: 'warning', message: t('Your administrator status has been revoked') });
           }
+          if (roomStore.localStream.hasAudioStream) {
+            roomStore.setCanControlSelfAudio(true);
+          }
+          if (roomStore.localStream.hasVideoStream) {
+            roomStore.setCanControlSelfVideo(true);
+          }
         }
         break;
       case TUIRole.kAdministrator:
@@ -115,6 +139,9 @@ export default function useEndControl() {
           TUIMessage({ type: 'success', message: t('You have become a administrator') });
           roomStore.setCanControlSelfAudio(true);
           roomStore.setCanControlSelfVideo(true);
+          if (roomStore.isSpeakAfterTakingSeatMode) {
+            handleUpdateSeatApplicationList();
+          }
         }
         break;
       case TUIRole.kRoomOwner: {
@@ -125,13 +152,7 @@ export default function useEndControl() {
             if (!roomStore.isAnchor) {
               await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
             }
-            const applicationList = await roomEngine.instance?.getSeatApplicationList();
-            if (applicationList) {
-              for (const applicationInfo of applicationList) {
-                const { userId, requestId, timestamp } = applicationInfo;
-                roomStore.addApplyToAnchorUser({ userId, requestId, timestamp });
-              }
-            }
+            handleUpdateSeatApplicationList();
           }
           if (chatStore.isMessageDisableByAdmin) {
             roomEngine.instance?.disableSendingMessageByAdmin({

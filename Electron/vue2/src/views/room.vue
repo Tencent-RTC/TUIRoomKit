@@ -62,7 +62,6 @@ export default {
           TUIMessageBox({
             title: this.$t('Note'),
             message,
-            appendToRoomContainer: true,
             confirmButtonText: this.$t('Sure'),
             callback: () => {
               this.$router.push({ path: 'home' });
@@ -77,7 +76,6 @@ export default {
           TUIMessageBox({
             title: this.$t('Note'),
             message,
-            appendToRoomContainer: true,
             confirmButtonText: this.$t('Sure'),
             callback: () => {
               this.$router.push({ path: 'home' });
@@ -90,7 +88,6 @@ export default {
       TUIMessageBox({
         title: this.$t('Note'),
         message,
-        appendToRoomContainer: true,
         confirmButtonText: this.$t('Sure'),
         callback: () => {
           sessionStorage.removeItem('tuiRoom-currentUserInfo');
