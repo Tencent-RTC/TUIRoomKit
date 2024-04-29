@@ -6,7 +6,7 @@ import logger from '../utils/common/logger';
 import { onUnmounted } from 'vue';
 import i18n from '../locales';
 import TUIMessageBox from '../components/common/base/MessageBox/index';
-import { isWeChat } from '../utils/environment';
+import { isElectron, isWeChat } from '../utils/environment';
 
 const roomEngine = useGetRoomEngine();
 // @ts-ignore
@@ -51,7 +51,6 @@ export default function (options?: { listenForDeviceChange: boolean }) {
         TUIMessageBox({
           title: t('Note'),
           message: t(alertMessage),
-          appendToRoomContainer: true,
           confirmButtonText: t('Sure'),
         });
       }
@@ -99,6 +98,14 @@ export default function (options?: { listenForDeviceChange: boolean }) {
     deviceList && roomStore.setDeviceList(type, deviceList);
     if (state === TUIMediaDeviceState.kMediaDeviceStateActive) {
       roomStore.setCurrentDeviceId(type, deviceId);
+    }
+    if (isElectron && state === TUIMediaDeviceState.kMediaDeviceStateRemove && type === TUIMediaDeviceType.kMediaDeviceTypeVideoCamera) {
+      const currentCameraInfo = deviceManager.instance?.getCurrentDevice({
+        type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
+      });
+      if (currentCameraInfo && currentCameraInfo.deviceId) {
+        roomStore.setCurrentCameraId(currentCameraInfo.deviceId);
+      }
     }
   }
 

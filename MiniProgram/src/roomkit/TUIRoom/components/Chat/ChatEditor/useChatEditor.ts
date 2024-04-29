@@ -44,6 +44,9 @@ export default function useChatEditor() {
     isEmojiToolbarVisible.value = false;
     try {
       const tim = roomEngine.instance?.getTIM();
+      if (!tim) {
+        throw new Error('tim is null');
+      }
       const message = tim.createTextMessage({
         to: roomId.value,
         conversationType: TencentCloudChat.TYPES.CONV_GROUP,

@@ -118,7 +118,6 @@ async function toggleMuteAudio() {
       TUIMessageBox({
         title: t('Note'),
         message: t('Microphone not detected on current device'),
-        appendToRoomContainer: true,
         confirmButtonText: t('Sure'),
       });
       return;

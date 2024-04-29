@@ -134,7 +134,7 @@ export default function useStreamContainer() {
         await roomEngine.instance?.openLocalCamera();
       }
     }
-  });
+  }, {immediate: true});
 
   watch(isDefaultOpenMicrophone, async (val) => {
     if (val) {
@@ -158,7 +158,7 @@ export default function useStreamContainer() {
     } else {
       await roomEngine.instance?.muteLocalAudio();
     }
-  });
+  }, {immediate: true});
   return {
     onRemoteUserEnterRoom,
     onRemoteUserLeaveRoom,

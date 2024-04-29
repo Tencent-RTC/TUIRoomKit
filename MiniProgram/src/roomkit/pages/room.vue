@@ -20,7 +20,7 @@ import Room from '@TUIRoom/index.vue';
 import { useRoute } from '@/router/wxRouter';
 import router from '@/router';
 import { checkNumber } from '@TUIRoom/utils/common';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from '@TUIRoom/locales';
 import TUIMessageBox from '@TUIRoom/components/common/base/MessageBox/index';
 import useWxPageShow from '../TUIRoom/hooks/useWxPageShow';
 
@@ -64,7 +64,6 @@ onMounted(async () => {
           title: t('Note'),
           message,
           confirmButtonText: t('Sure'),
-          appendToRoomContainer: true,
           callback: async () => {
             router.replace({ path: 'home' });
           },
@@ -79,7 +78,6 @@ onMounted(async () => {
           title: t('Note'),
           message,
           confirmButtonText: t('Sure'),
-          appendToRoomContainer: true,
           callback: async () => {
             router.replace({ path: 'home' });
           },
@@ -92,7 +90,6 @@ onMounted(async () => {
       title: t('Note'),
       message,
       confirmButtonText: t('Sure'),
-      appendToRoomContainer: true,
       callback: async () => {
         uni.removeStorageSync('tuiRoom-currentUserInfo');
         router.replace({ path: 'home' });

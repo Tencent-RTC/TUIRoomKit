@@ -72,7 +72,6 @@ async function handleClickIcon() {
     TUIMessageBox({
       title: t('Note'),
       message: t('The current browser does not support capturing video'),
-      appendToRoomContainer: true,
       confirmButtonText: t('Sure'),
     });
     return;
