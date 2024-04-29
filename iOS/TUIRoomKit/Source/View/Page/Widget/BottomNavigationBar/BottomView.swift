@@ -12,7 +12,7 @@ class BottomView: UIView {
     // MARK: - store property
     let viewModel: BottomViewModel
     private var viewArray: [BottomItemView] = []
-    var isUnfold: Bool = false //是否展开
+    var isUnfold: Bool = false
     let unfoldHeight = Float(130.scale375Height())
     let packUpHeight = Float(68.scale375Height())
 

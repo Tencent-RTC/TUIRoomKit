@@ -2,12 +2,12 @@
 //  TopViewModel.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2022/12/30.
+//  Created by janejntang on 2022/12/30.
 //  Copyright © 2022 Tencent. All rights reserved.
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 #if TXLiteAVSDK_TRTC
 import TXLiteAVSDK_TRTC
 #elseif TXLiteAVSDK_Professional
@@ -53,7 +53,6 @@ class TopViewModel: NSObject {
         micItem.selectedIcon = "room_speakerphone"
         micItem.backgroundColor = UIColor(0xA3AEC7)
         micItem.resourceBundle = tuiRoomKitBundle()
-        micItem.buttonType = .switchMicItemType
         micItem.isSelect = engineManager.store.audioSetting.isSoundOnSpeaker
         micItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }

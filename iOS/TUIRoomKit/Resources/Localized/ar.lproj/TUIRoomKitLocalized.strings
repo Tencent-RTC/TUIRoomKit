@@ -72,7 +72,7 @@
 "TUIRoom.stage.management" = "الإدارة على المسرح";
 "TUIRoom.leave.seat" = "مرحلة المغادرة";
 "TUIRoom.cancel.stage" = "إلغاء المرحلة";
-"TUIRoom.invite.to.speak" = "أدعوك للتحدث على خشبة المسرح";
+"TUIRoom.invite.to.speak" = "يدعوك xx للتحدث على المسرح";
 "TUIRoom.agree.to.speak" = "يمكنك تشغيل الكاميرا وإلغاء كتم صوتها بمجرد صعودك على المسرح";
 "TUIRoom.decline" = "يرفض";
 "TUIRoom.agree" = "يوافق";
@@ -87,8 +87,8 @@
 "TUIRoom.code" = "رمز الاستجابة السريعة للغرفة";
 "TUIRoom.scan.code" = "قم بمسح الرمز ضوئيًا للدخول إلى الغرفة";
 "TUIRoom.save.into.album" = "حفظ في الألبوم";
-"TUIRoom.invite.turn.on.audio" = "أدعوك لبدء الصوت";
-"TUIRoom.invite.turn.on.video" = "أدعوك لفتح شاشة الفيديو";
+"TUIRoom.invite.turn.on.audio" = "يدعوك xx إلى تشغيل الميكروفون";
+"TUIRoom.invite.turn.on.video" = "يدعوك xx لتشغيل الكاميرا";
 "TUIRoom.dismiss.meeting.Title" = "إذا كنت لا تريد إنهاء الاجتماع";
 "TUIRoom.appoint.new.host" = "الرجاء تعيين مضيف جديد قبل مغادرة الاجتماع";
 "TUIRoom.leave.meeting" = "ترك الاجتماع";
@@ -157,7 +157,6 @@
 "TUIRoom.share.off" = "التوقف عن المشاركة";
 "TUIRoom.unfold" = "أكثر";
 "TUIRoom.drop" = "وضع بعيدا";
-"TUIRoom.beauty" = "جمال";
 "TUIRoom.appoint.owner" = "إذا كنت لا ترغب في إنهاء الغرفة، فقم بتعيين مضيف جديد قبل مغادرة الغرفة";
 "TUIRoom.leave.room.tip" = "هل أنت متأكد أنك تريد مغادرة الغرفة؟";
 "TUIRoom.room.type" = "نوع الغرفة";

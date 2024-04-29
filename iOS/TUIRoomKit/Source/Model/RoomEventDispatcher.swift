@@ -2,11 +2,11 @@
 //  RoomEventDispatcher.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/8/14.
+//  Created by janejntang on 2023/8/14.
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 
 class RoomEventDispatcher: NSObject {
     var engineManager: EngineManager {
@@ -28,7 +28,7 @@ class RoomEventDispatcher: NSObject {
 }
 
 extension RoomEventDispatcher: TUIRoomObserver {
-    // MARK: - 房间内事件回调
+    // MARK: - Room event callback
     func onAllUserMicrophoneDisableChanged(roomId: String, isDisable: Bool) {
         roomInfo.isMicrophoneDisableForAllUser = isDisable
         let param = [
@@ -70,7 +70,7 @@ extension RoomEventDispatcher: TUIRoomObserver {
         roomInfo.name = roomName
     }
     
-    // MARK: - 房间内用户事件回调
+    // MARK: - User event callback in the room
     func onRemoteUserEnterRoom(roomId: String, userInfo: TUIUserInfo) {
         remoteUserEnterRoom(roomId: roomId, userInfo: userInfo)
         let param = [
@@ -149,7 +149,7 @@ extension RoomEventDispatcher: TUIRoomObserver {
         EngineEventCenter.shared.notifyEngineEvent(event: .onSendMessageForUserDisableChanged, param: param)
     }
     
-    // MARK: - 信令请求相关回调
+    // MARK: - Signaling request related callbacks
     func onRequestReceived(request: TUIRequest) {
         requestReceived(request: request)
         EngineEventCenter.shared.notifyEngineEvent(event: .onRequestReceived, param: ["request": request,])
@@ -179,7 +179,6 @@ extension RoomEventDispatcher: TUIRoomObserver {
     }
 }
 
-//收到事件回调后的处理逻辑
 extension RoomEventDispatcher {
     private func remoteUserEnterRoom(roomId: String, userInfo: TUIUserInfo) {
         let userItem = UserEntity()
@@ -198,18 +197,13 @@ extension RoomEventDispatcher {
     }
     
     private func seatListChanged(seatList: [TUISeatInfo], seated: [TUISeatInfo], left leftList: [TUISeatInfo]) {
-        //判断自己是否下麦
         if leftList.first(where: { $0.userId == currentUser.userId }) != nil {
             currentUser.isOnSeat = false
             store.audioSetting.isMicOpened = false
-            if currentUser.hasScreenStream { //如果正在进行屏幕共享，要把屏幕共享关闭。
-                engineManager.stopScreenCapture()
-            }
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
                                                    param: ["isOnSeat":false])
         }
         updateLeftList(leftList: leftList)
-        //判断自己是否新上麦
         if seated.first(where: { $0.userId == currentUser.userId }) != nil {
             currentUser.isOnSeat = true
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
@@ -218,7 +212,6 @@ extension RoomEventDispatcher {
         updateSeatList(seatList: seatList)
     }
     
-    //更新在麦上的用户列表
     private func updateSeatList(seatList: [TUISeatInfo]) {
         guard seatList.count > 0 else { return }
         for seatInfo: TUISeatInfo in seatList {
@@ -229,7 +222,7 @@ extension RoomEventDispatcher {
         }
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
-    //更新下台的用户
+    
     private func updateLeftList(leftList: [TUISeatInfo]) {
         guard leftList.count > 0 else { return }
         for seatInfo: TUISeatInfo in leftList {

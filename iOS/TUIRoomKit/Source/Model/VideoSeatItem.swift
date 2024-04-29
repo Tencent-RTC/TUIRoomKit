@@ -6,12 +6,11 @@
 //  Copyright © 2023 Tencent. All rights reserved.
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 
-// VideoSeatItem类型
 enum VideoSeatItemType {
-    case original // 原始
-    case share // original -> share
+    case original
+    case share 
 }
 
 class VideoSeatItem: Equatable {

@@ -2,7 +2,7 @@
 //  RaiseHandApplicationListView.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/1/13.
+//  Created by janejntang on 2023/1/13.
 //  Copyright © 2023 Tencent. All rights reserved.
 //
 
@@ -176,9 +176,8 @@ class RaiseHandApplicationListView: UIView {
     }
     
     private func setupViewState() {
-        let roomInfo = viewModel.engineManager.store.roomInfo
-        allAgreeButton.isSelected = roomInfo.isMicrophoneDisableForAllUser
-        inviteMemberButton.isSelected = roomInfo.isCameraDisableForAllUser
+        allAgreeButton.isSelected = viewModel.roomInfo.isMicrophoneDisableForAllUser
+        inviteMemberButton.isSelected = viewModel.roomInfo.isCameraDisableForAllUser
     }
     
     deinit {

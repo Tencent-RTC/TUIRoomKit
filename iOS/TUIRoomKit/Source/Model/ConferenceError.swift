@@ -2,7 +2,7 @@
 //  ConferenceError.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2024/3/14.
+//  Created by janejntang on 2024/3/14.
 //
 
 import Foundation

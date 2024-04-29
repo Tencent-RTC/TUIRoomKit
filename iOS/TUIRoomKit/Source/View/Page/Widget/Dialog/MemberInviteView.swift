@@ -2,13 +2,10 @@
 //  MemberInviteView.swift
 //  TUIRoomKit
 //
-//  Created by 于西巍 on 2023/8/21.
-//  邀请页面
+//  Created by krabyu on 2023/8/21.
 //
 
 import Foundation
-
-import TUIRoomEngine
 
 class MemberInviteView: UIView {
     let viewModel: MemberInviteViewModel

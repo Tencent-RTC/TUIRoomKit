@@ -2,12 +2,12 @@
 //  UserListManagerViewModel.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/2/10.
+//  Created by janejntang on 2023/2/10.
 //  Copyright © 2023 Tencent. All rights reserved.
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 
 protocol UserListManagerViewEventResponder: AnyObject {
     func makeToast(text: String)
@@ -93,7 +93,6 @@ class UserListManagerViewModel: NSObject {
         }
     }
     
-    //禁音其他用户
     private lazy var muteAudioItem: ButtonItemData = {
         let item = ButtonItemData()
         item.normalTitle = .muteText
@@ -111,7 +110,6 @@ class UserListManagerViewModel: NSObject {
         return item
     }()
     
-    //禁画其他用户
     private lazy var muteVideoItem: ButtonItemData = {
         let item = ButtonItemData()
         item.normalTitle = .closeVideoText
@@ -129,7 +127,6 @@ class UserListManagerViewModel: NSObject {
         return item
     }()
     
-    //邀请上台
     private lazy var inviteSeatItem: ButtonItemData = {
         let item = ButtonItemData()
         item.normalTitle = .inviteSeatText
@@ -137,7 +134,6 @@ class UserListManagerViewModel: NSObject {
         item.selectedTitle = .stepDownSeatText
         item.selectedIcon = "room_step_down_seat"
         item.resourceBundle = tuiRoomKitBundle()
-        item.buttonType = .inviteSeatItemType
         item.isSelect = selectUserInfo?.isOnSeat ?? false
         item.hasLineView = true
         item.action = { [weak self] sender in
@@ -147,13 +143,11 @@ class UserListManagerViewModel: NSObject {
         return item
     }()
     
-    //转交主持人
     private lazy var changeHostItem: ButtonItemData = {
         let item = ButtonItemData()
         item.normalTitle = .changeHostText
         item.normalIcon = "room_change_host"
         item.resourceBundle = tuiRoomKitBundle()
-        item.buttonType = .changeHostItemType
         item.hasLineView = true
         item.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
@@ -162,7 +156,6 @@ class UserListManagerViewModel: NSObject {
         return item
     }()
     
-    //禁言
     private lazy var muteMessageItem: ButtonItemData = {
         let item = ButtonItemData()
         item.normalTitle = .muteMessageText
@@ -170,7 +163,6 @@ class UserListManagerViewModel: NSObject {
         item.selectedTitle = .unMuteMessageText
         item.selectedIcon = "room_unMute_message"
         item.resourceBundle = tuiRoomKitBundle()
-        item.buttonType = .muteMessageItemType
         item.isSelect = selectUserInfo?.disableSendingMessage ?? false
         item.hasLineView = true
         item.action = { [weak self] sender in
@@ -180,13 +172,11 @@ class UserListManagerViewModel: NSObject {
         return item
     }()
     
-    //踢出房间
     private lazy var kickOutItem: ButtonItemData = {
         let item = ButtonItemData()
         item.normalTitle = .kickOutRoomText
         item.normalIcon = "room_kickOut_room"
         item.resourceBundle = tuiRoomKitBundle()
-        item.buttonType = .kickOutItemType
         item.hasLineView = true
         item.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
@@ -195,7 +185,6 @@ class UserListManagerViewModel: NSObject {
         return item
     }()
     
-    //设置管理员
     private lazy var setAdministratorItem: ButtonItemData = {
         let item = ButtonItemData()
         item.normalTitle = .setAsAdministratorText
@@ -203,7 +192,6 @@ class UserListManagerViewModel: NSObject {
         item.normalIcon = "room_set_administrator"
         item.selectedIcon = "room_undo_administrator"
         item.resourceBundle = tuiRoomKitBundle()
-        item.buttonType = .setAdministratorItemType
         item.isSelect = selectUserInfo?.userRole == .administrator
         item.hasLineView = true
         item.action = {  [weak self] sender in
@@ -410,7 +398,6 @@ extension UserListManagerViewModel {
     private func setAdministratorAction(sender: UIButton) {
         guard let userInfo = selectUserInfo else { return }
         let role: TUIRole = userInfo.userRole == .administrator ? .generalUser : .administrator
-        //设置或者撤销管理员
         engineManager.changeUserRole(userId: selectUserId, role: role) {  [weak self] in
             guard let self = self else { return }
             let setAdministratorText = localizedReplace(.setUpAdministratorText, replace: userInfo.userName)

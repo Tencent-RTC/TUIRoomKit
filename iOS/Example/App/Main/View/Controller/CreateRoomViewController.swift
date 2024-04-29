@@ -8,7 +8,7 @@
 
 import SnapKit
 import UIKit
-import TUIRoomEngine
+import RTCRoomEngine
 import TUIRoomKit
 import TUICore
 
@@ -137,7 +137,27 @@ extension CreateRoomViewController {
             self.renewRootViewState()
             return
         }
+        //1.Use ConferenceMainViewController, first enter the room and then display the page
         quickStartConference(roomId: roomId)
+        //2.Use ConferenceMainViewController and enter the room and display the page at the same time
+        //        quickStartConferenceAndShowViewController(roomId: roomId)
+        //3.Using TUIRoomKit
+        //        createRoom(roomId: roomId)
+    }
+    
+    private func quickStartConferenceAndShowViewController(roomId: String) {
+        let vc = ConferenceMainViewController()
+        let params = ConferenceParams()
+        params.name = currentUserName.truncateUtf8String(maxByteLength: 30)
+        params.enableSeatControl = isSeatEnable
+        params.isMuteMicrophone = !enableLocalAudio
+        params.isOpenCamera = enableLocalVideo
+        params.isSoundOnSpeaker = isSoundOnSpeaker
+        vc.setConferenceParams(params: params)
+        vc.quickStartConference(conferenceId: roomId)
+        vc.setConferenceObserver(observer: self)
+        navigationController?.pushViewController(vc, animated: true)
+        renewRootViewState()
     }
     
     private func quickStartConference(roomId: String) {
@@ -217,7 +237,6 @@ extension CreateRoomViewController {
         }
     }
     
-    //获取随机数roomId，numberOfDigits为位数
     private func getRandomRoomId(numberOfDigits: Int) -> String {
         var numberOfDigit = numberOfDigits > 0 ? numberOfDigits : 1
         numberOfDigit = numberOfDigit < 10 ? numberOfDigit : 9
@@ -242,8 +261,14 @@ extension CreateRoomViewController {
 
 extension CreateRoomViewController: ConferenceObserver {
     func onConferenceStarted(conferenceId: String, error: ConferenceError) {
-        if error == .success, let vc = conferenceViewController {
+        //1.Go to the first room and then show the page
+        if error == .success {
+            guard let vc = conferenceViewController else { return }
             navigationController?.pushViewController(vc, animated: true)
+        } else {
+            let errorText = "Error : " + String(describing: error)
+            SceneDelegate.getCurrentWindow()?.makeToast(errorText, duration: 1, position:TUICSToastPositionCenter)
+            navigationController?.popViewController(animated: true)
         }
         conferenceViewController = nil
         renewRootViewState()

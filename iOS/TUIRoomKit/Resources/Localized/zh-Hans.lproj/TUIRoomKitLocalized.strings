@@ -76,7 +76,6 @@
 "TUIRoom.float" = "悬浮窗";
 "TUIRoom.beauty" = "美颜";
 "TUIRoom.drop" = "收起";
-"TUIRoom.beauty" = "美颜";
 "TUIRoom.switch.layout" = "切换布局";
 
 "TUIRoom.leave" = "离开";
@@ -85,7 +84,7 @@
 "TUIRoom.stage.management" = "上台管理";
 "TUIRoom.leave.seat" = "下台";
 "TUIRoom.cancel.stage" = "取消上台";
-"TUIRoom.invite.to.speak" = "邀请您上台发言";
+"TUIRoom.invite.to.speak" = "xx邀请您上台发言";
 "TUIRoom.agree.to.speak" = "您上台后可以打开摄像头和取消静音";
 "TUIRoom.decline" = "拒绝";
 "TUIRoom.agree" = "同意";
@@ -101,8 +100,8 @@
 "TUIRoom.code" = "房间二维码";
 "TUIRoom.scan.code" = "扫码进入房间";
 "TUIRoom.save.into.album" = "保存到相册";
-"TUIRoom.invite.turn.on.audio" = "邀请您开启语音";
-"TUIRoom.invite.turn.on.video" = "邀请您开启视频画面";
+"TUIRoom.invite.turn.on.audio" = "xx邀请您开启语音";
+"TUIRoom.invite.turn.on.video" = "xx邀请您开启视频画面";
 "TUIRoom.dismiss.meeting.Title" = "如果您不想结束会议";
 "TUIRoom.appoint.new.host" = "请在离开会议前指定新的主持人";
 "TUIRoom.appoint.owner" = "如果您不想结束房间，请在离开房间前指定新的主持人";

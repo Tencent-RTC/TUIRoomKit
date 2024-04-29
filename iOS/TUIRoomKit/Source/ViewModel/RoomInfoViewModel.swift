@@ -2,12 +2,12 @@
 //  RoomInfoViewModel.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/1/3.
+//  Created by janejntang on 2023/1/3.
 //  Copyright © 2022 Tencent. All rights reserved.
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 
 enum CopyType {
     case copyRoomIdType
@@ -27,7 +27,6 @@ class RoomInfoViewModel {
         store.roomInfo
     }
     weak var viewResponder: RoomInfoResponder?
-    //房间链接
     var roomLink: String? {
         guard let bundleId = Bundle.main.bundleIdentifier else { return nil }
         if bundleId == "com.tencent.tuiroom.apiexample" || bundleId == "com.tencent.fx.rtmpdemo" {

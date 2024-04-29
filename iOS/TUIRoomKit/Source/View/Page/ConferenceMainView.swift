@@ -4,7 +4,7 @@
 //
 //  Created by aby on 2022/12/27.
 //  Copyright © 2022 Tencent. All rights reserved.
-//  会议主界面，负责布置并管理顶部栏、底部栏以及视频界面等
+//  The main conference interface is responsible for arranging and managing the top bar, bottom bar, video interface, etc.
 //
 
 import Foundation
@@ -15,7 +15,7 @@ protocol ConferenceMainViewFactory {
     func makeVideoSeatView() -> UIView
     func makeRaiseHandNoticeView() -> UIView
     func makeLocalAudioView() -> UIView
-    func makeBeautyView() -> UIView?
+    func makeWaterMarkLayer() -> WaterMarkLayer
 }
 
 struct ConferenceMainViewLayout { //Layout changes when switching between horizontal and vertical screens
@@ -40,7 +40,7 @@ class ConferenceMainView: UIView {
     private var currentLandscape: Bool = isLandscape
     private let firstDelayDisappearanceTime = 6.0
     private let delayDisappearanceTime = 3.0
-    
+
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -66,8 +66,8 @@ class ConferenceMainView: UIView {
         return viewFactory.makeLocalAudioView()
     }()
     
-    lazy var beautyView: UIView? = {
-        return viewFactory.makeBeautyView()
+    lazy var waterMarkLayer: CALayer = {
+        return viewFactory.makeWaterMarkLayer()
     }()
     
     // MARK: - view layout
@@ -91,13 +91,13 @@ class ConferenceMainView: UIView {
     
     func constructViewHierarchy() {
         addSubview(videoSeatView)
+        if viewModel.isShownWaterMark {
+            layer.addSublayer(waterMarkLayer)
+        }
         addSubview(topView)
         addSubview(bottomView)
         addSubview(localAudioView)
         addSubview(raiseHandNoticeView)
-        if let beautyView = beautyView {
-            addSubview(beautyView)
-        }
     }
     
     func activateConstraints() {
@@ -113,9 +113,6 @@ class ConferenceMainView: UIView {
             make.width.height.equalTo(40.scale375())
             make.bottom.equalToSuperview().offset(-40.scale375Height())
         }
-        beautyView?.snp.makeConstraints({ make in
-            make.edges.equalToSuperview()
-        })
     }
     
     private func bindInteraction() {
@@ -157,15 +154,15 @@ class ConferenceMainView: UIView {
             }
         }
         topView.updateRootViewOrientation(isLandscape: isLandscape)
-        beautyView?.snp.remakeConstraints({ make in
-            if !isLandscape {
-                make.edges.equalToSuperview()
-            } else {
-                make.top.bottom.equalToSuperview()
-                make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing)
-                make.width.equalTo(min(kScreenWidth, kScreenHeight))
-            }
-        })
+        setupWaterMarkLayerOrientation(isLandscape: isLandscape)
+    }
+    
+    private func setupWaterMarkLayerOrientation(isLandscape: Bool) {
+        guard viewModel.isShownWaterMark else { return }
+        let widthSpace = isLandscape ? CGFloat(layout.videoSeatViewLandscapeSpace) : 0
+        let heightSpace = isLandscape ? 0 : CGFloat(layout.videoSeatViewPortraitSpace)
+        waterMarkLayer.frame = CGRect(x: widthSpace, y: heightSpace, width: kScreenWidth - widthSpace * 2, height: kScreenHeight - heightSpace * 2)
+        waterMarkLayer.setNeedsDisplay()
     }
     
     deinit {
@@ -175,10 +172,6 @@ class ConferenceMainView: UIView {
 }
 
 extension ConferenceMainView: ConferenceMainViewResponder {
-    func showBeautyView() {
-        beautyView?.isHidden = false
-    }
-    
     func showExitRoomView() {
         let view = ExitRoomView(viewModel: ExitRoomViewModel())
         view.show(rootView: self)

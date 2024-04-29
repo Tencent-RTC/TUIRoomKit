@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 
 class ExitRoomView: UIView {
     private let viewModel: ExitRoomViewModel

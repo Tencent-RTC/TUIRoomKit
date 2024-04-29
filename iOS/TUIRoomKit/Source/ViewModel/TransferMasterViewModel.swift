@@ -2,7 +2,7 @@
 //  TransferMasterViewModel.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/2/20.
+//  Created by janejntang on 2023/2/20.
 //
 
 import Foundation

@@ -2,11 +2,11 @@
 //  MemberInviteViewModel.swift
 //  TUIRoomKit
 //
-//  Created by 于西巍 on 2023/8/21.
+//  Created by krabyu on 2023/8/21.
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 
 protocol MemberInviteResponder : NSObjectProtocol {
     func showCopyToast(copyType: CopyType)
@@ -20,7 +20,6 @@ class MemberInviteViewModel {
     var roomInfo: TUIRoomInfo {
         store.roomInfo
     }
-    //房间链接
     var roomLink: String? {
         guard let bundleId = Bundle.main.bundleIdentifier else { return nil }
         if bundleId == "com.tencent.tuiroom.apiexample" || bundleId == "com.tencent.fx.rtmpdemo" {

@@ -2,7 +2,7 @@
 //  RoomKitNavigationController.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/4/20.
+//  Created by janejntang on 2023/4/20.
 //
 
 import Foundation

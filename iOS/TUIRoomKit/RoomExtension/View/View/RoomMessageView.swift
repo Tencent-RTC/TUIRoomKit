@@ -2,7 +2,7 @@
 //  RoomMessageView.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/5/9.
+//  Created by janejntang on 2023/5/9.
 //  Copyright © 2023 Tencent. All rights reserved.
 //
 
@@ -181,7 +181,6 @@ class RoomMessageView: UIView {
         }
         switch viewModel.message.roomState {
         case .creating:
-            //正在发起会议
             roomStatusImageView.image = UIImage(named: "room_is_creating", in: tuiRoomKitBundle(), compatibleWith: nil)
             roomStatusLabel.text = .meetingText
             enterRoomStatusLabel.isHidden = false
@@ -190,7 +189,6 @@ class RoomMessageView: UIView {
             enterRoomButton.isHidden = true
             roomStatusView.backgroundColor = UIColor(0xDCEAFD)
         case .created:
-            //创建房间成功
             roomStatusImageView.image = UIImage(named: "room_created_success", in: tuiRoomKitBundle(), compatibleWith: nil)
             roomStatusLabel.text = .meetingText + "." + .inProgressText
             roomStatusLabel.textColor = UIColor(0x15B72D)
@@ -204,7 +202,6 @@ class RoomMessageView: UIView {
             }
             roomStatusView.backgroundColor = UIColor(0xDCEAFD)
         case .destroyed:
-            //房间解散
             roomStatusImageView.image = UIImage(named: "room_has_destroyed", in: tuiRoomKitBundle(), compatibleWith: nil)
             roomStatusLabel.text = .meetingText
             roomStatusLabel.textColor = UIColor(0x888888)

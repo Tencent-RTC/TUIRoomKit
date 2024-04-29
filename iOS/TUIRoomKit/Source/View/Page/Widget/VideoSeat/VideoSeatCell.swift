@@ -7,19 +7,33 @@
 //
 
 import SnapKit
-import TUIRoomEngine
 import UIKit
 
 class VideoSeatCell: UICollectionViewCell {
     var seatItem: VideoSeatItem?
+    var isSupportedAmplification: Bool {
+        return seatItem?.type == .share
+    }
+    
+    private lazy var scrollRenderView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.backgroundColor = UIColor(0x17181F)
+        scrollView.layer.cornerRadius = 16
+        scrollView.layer.masksToBounds = true
+        scrollView.layer.borderWidth = 2
+        scrollView.layer.borderColor = UIColor.clear.cgColor
+        
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.maximumZoomScale = 3
+        scrollView.minimumZoomScale = 1
+        scrollView.delegate = self
+        return scrollView
+    }()
     
     let renderView: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(0x17181F)
-        view.layer.cornerRadius = 16
-        view.layer.masksToBounds = true
-        view.layer.borderWidth = 2
-        view.layer.borderColor = UIColor.clear.cgColor
+        view.backgroundColor = .clear
         return view
     }()
     
@@ -28,8 +42,6 @@ class VideoSeatCell: UICollectionViewCell {
         view.backgroundColor = UIColor(0x17181F)
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true
-        view.layer.borderWidth = 2
-        view.layer.borderColor = UIColor.clear.cgColor
         return view
     }()
     
@@ -57,18 +69,24 @@ class VideoSeatCell: UICollectionViewCell {
     }
     
     private func constructViewHierarchy() {
-        contentView.addSubview(renderView)
-        contentView.addSubview(backgroundMaskView)
+        scrollRenderView.addSubview(renderView)
+        scrollRenderView.addSubview(backgroundMaskView)
+        contentView.addSubview(scrollRenderView)
         contentView.addSubview(avatarImageView)
         contentView.addSubview(userInfoView)
     }
     
     private func activateConstraints() {
+        scrollRenderView.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(2)
+        }
         renderView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(3)
+            make.center.equalToSuperview()
+            make.width.equalToSuperview()
+            make.height.equalToSuperview()
         }
         backgroundMaskView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(3)
+            make.edges.equalToSuperview()
         }
         userInfoView.snp.makeConstraints { make in
             make.height.equalTo(24)
@@ -81,13 +99,18 @@ class VideoSeatCell: UICollectionViewCell {
     @objc private func resetVolumeView() {
         guard let seatItem = seatItem else { return }
         userInfoView.updateUserVolume(hasAudio: seatItem.hasAudioStream, volume: 0)
-        renderView.layer.borderColor = UIColor.clear.cgColor
-        backgroundMaskView.layer.borderColor = UIColor.clear.cgColor
+        scrollRenderView.layer.borderColor = UIColor.clear.cgColor
     }
     
     deinit {
         NSObject.cancelPreviousPerformRequests(withTarget: self)
         debugPrint("deinit \(self)")
+    }
+}
+
+extension VideoSeatCell: UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return isSupportedAmplification ? renderView : nil
     }
 }
 
@@ -118,12 +141,10 @@ extension VideoSeatCell {
         userInfoView.updateUserVolume(hasAudio: item.hasAudioStream, volume: item.audioVolume)
         if item.audioVolume > 0 && item.hasAudioStream {
             if item.type != .share {
-                renderView.layer.borderColor = UIColor(0xA5FE33).cgColor
-                backgroundMaskView.layer.borderColor = UIColor(0xA5FE33).cgColor
+                scrollRenderView.layer.borderColor = UIColor(0xA5FE33).cgColor
             }
         } else {
-            renderView.layer.borderColor = UIColor.clear.cgColor
-            backgroundMaskView.layer.borderColor = UIColor.clear.cgColor
+            scrollRenderView.layer.borderColor = UIColor.clear.cgColor
         }
         resetVolume()
     }
@@ -171,7 +192,6 @@ extension TUIVideoSeatDragCell {
     
     @objc private func dragViewDidDrag(gesture: UIPanGestureRecognizer) {
         guard let viewSuperview = superview else { return }
-        // 移动状态
         let moveState = gesture.state
         let viewCenter = center
         switch moveState {
@@ -182,14 +202,12 @@ extension TUIVideoSeatDragCell {
         case .ended:
             let point = gesture.translation(in: viewSuperview)
             let newPoint = CGPoint(x: viewCenter.x + point.x, y: viewCenter.y + point.y)
-            // 自动吸边动画
             UIView.animate(withDuration: 0.2) {
                 self.center = self.adsorption(centerPoint: newPoint)
             }
             break
         default: break
         }
-        // 重置 panGesture
         gesture.setTranslation(.zero, in: viewSuperview)
     }
     
@@ -199,7 +217,6 @@ extension TUIVideoSeatDragCell {
         let frame = self.frame
         let point = CGPoint(x: centerPoint.x - frame.width / 2, y: centerPoint.y - frame.height / 2)
         var newPoint = point
-        // 吸边
         if centerPoint.x < (viewSuperview.frame.width / 2) {
             newPoint.x = limitMargin
         } else {

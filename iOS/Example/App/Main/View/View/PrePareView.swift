@@ -7,7 +7,6 @@
 
 import UIKit
 import TUICore
-import TUIRoomEngine
 
 class PrePareView: UIView {
     

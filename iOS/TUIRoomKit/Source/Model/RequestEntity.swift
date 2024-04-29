@@ -2,11 +2,10 @@
 //  RequestEntity.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2024/3/20.
+//  Created by janejntang on 2024/3/20.
 //
 
 import Foundation
-import TUIRoomEngine
 
 class RequestEntity {
     let requestId: String

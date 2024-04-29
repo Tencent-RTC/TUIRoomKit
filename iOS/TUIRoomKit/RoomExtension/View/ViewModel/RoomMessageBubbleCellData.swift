@@ -2,14 +2,14 @@
 //  RoomMsgViewModel.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/5/8.
+//  Created by janejntang on 2023/5/8.
 //  Copyright © 2023 Tencent. All rights reserved.
 //
 
 import Foundation
 import TIMCommon
 import TUICore
-import TUIRoomEngine
+import RTCRoomEngine
 
 @objc(RoomMessageBubbleCellData)
 class RoomMessageBubbleCellData: TUIBubbleMessageCellData {

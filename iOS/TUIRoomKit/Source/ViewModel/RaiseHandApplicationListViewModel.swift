@@ -2,12 +2,12 @@
 //  RaiseHandApplicationListViewModel.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/1/13.
+//  Created by janejntang on 2023/1/13.
 //  Copyright © 2023 Tencent. All rights reserved.
 //
 
 import Foundation
-import TUIRoomEngine
+import RTCRoomEngine
 
 protocol RaiseHandApplicationListViewResponder: NSObject {
     func reloadApplyListView()
@@ -17,9 +17,11 @@ protocol RaiseHandApplicationListViewResponder: NSObject {
 
 class RaiseHandApplicationListViewModel: NSObject {
     weak var viewResponder: RaiseHandApplicationListViewResponder? = nil
-    let engineManager: EngineManager = EngineManager.createInstance()
+    var engineManager: EngineManager {
+        EngineManager.createInstance()
+    }
     var roomInfo: TUIRoomInfo {
-        EngineManager.createInstance().store.roomInfo
+        engineManager.store.roomInfo
     }
     var inviteSeatList: [RequestEntity] = []
     

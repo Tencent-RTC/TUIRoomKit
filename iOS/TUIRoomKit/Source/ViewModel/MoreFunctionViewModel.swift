@@ -2,7 +2,7 @@
 //  MoreFunctionViewModel.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2023/1/12.
+//  Created by janejntang on 2023/1/12.
 //  Copyright © 2023 Tencent. All rights reserved.
 //
 
@@ -24,7 +24,6 @@ class MoreFunctionViewModel {
     }
     
     func createBottomData() {
-        //聊天
         if hasTUIChatItem() {
             let chatItem = ButtonItemData()
             chatItem.normalIcon = "room_chat"
@@ -36,7 +35,6 @@ class MoreFunctionViewModel {
             }
             viewItems.append(chatItem)
         }
-        //设置
         let settingItem = ButtonItemData()
         settingItem.normalIcon = "room_setting"
         settingItem.normalTitle = .settingText
