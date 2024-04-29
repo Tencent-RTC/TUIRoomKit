@@ -9,9 +9,9 @@
     ></room-header>
     <room-content
       ref="roomContentRef"
-      @tap="handleRoomContentTap"
       :show-room-tool="showRoomTool"
       class="content"
+      @tap="handleRoomContentTap"
     ></room-content>
     <room-footer v-show="showRoomTool" class="footer" @on-destroy-room="onDestroyRoom" @on-exit-room="onExitRoom" />
     <room-sidebar></room-sidebar>
@@ -73,21 +73,18 @@ const showMessageBox = (data: {
   message: string;
   title: string;
   confirmButtonText: string;
-  appendToRoomContainer?: boolean;
   callback?: () => void;
 }) => {
   const {
     message,
     title = roomService.t('Note'),
     confirmButtonText = roomService.t('Sure'),
-    appendToRoomContainer = true,
     callback = () => { },
   } = data;
   TUIMessageBox({
     title,
     message,
     confirmButtonText,
-    appendToRoomContainer,
     callback: async () => {
       callback && callback();
     },
@@ -119,6 +116,7 @@ onUnmounted(() => {
   roomService.off(EventType.ROOM_KICKED_OUT, onKickedOutOfRoom);
   roomService.off(EventType.ROOM_USER_SIG_EXPIRED, onUserSigExpired);
   roomService.off(EventType.ROOM_KICKED_OFFLINE, onKickedOffLine);
+  roomService.resetStore();
 });
 
 const { sdkAppId, showHeaderTool } = roomService.basicStore;

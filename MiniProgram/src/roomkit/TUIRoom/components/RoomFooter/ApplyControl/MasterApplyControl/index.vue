@@ -20,10 +20,18 @@
       <span class="apply-text">{{ t('Currently no member has applied to go on stage') }}</span>
     </div>
     <div class="apply-list-footer">
-      <div class="action-button" :class="{ 'disabled': noUserApply }" @click="handleAllUserApply(false)">
+      <div
+        class="action-button"
+        :class="{ 'disabled': applyToAnchorUserCount === 0 }"
+        @click="handleAllUserApply(false)"
+      >
         {{ t('Reject All') }}
       </div>
-      <div class="action-button agree" :class="{ 'disabled': noUserApply }" @click="handleAllUserApply(true)">
+      <div
+        class="action-button agree"
+        :class="{ 'disabled': applyToAnchorUserCount === 0 }"
+        @click="handleAllUserApply(true)"
+      >
         {{ t('Agree All') }}
       </div>
     </div>
@@ -33,7 +41,7 @@
 <script setup lang="ts">
 import Avatar from '../../../common/Avatar.vue';
 import ApplyStageLabelIcon from '../../../../assets/icons/ApplyStageLabelIcon.svg';
-import useMasterApplyControl from './useMasterApplyControlHooks';
+import useMasterApplyControl from '../../../../hooks/useMasterApplyControl';
 import SvgIcon from '../../../common/base/SvgIcon.vue';
 
 const {
@@ -42,7 +50,6 @@ const {
   handleAllUserApply,
   handleUserApply,
   applyToAnchorUserCount,
-  noUserApply,
 } = useMasterApplyControl();
 
 </script>

@@ -243,9 +243,9 @@ export default {
   'kicked out of the room by other device': '相同账号在其他客户端进入房间',
   'kicked out of the room by serve': '被服务端踢出房间',
   // @ts-ignore
-  'Reject on Stage failed, please retry': ({ named }) => `拒绝 ${named('name')} 上台失败, 请重试`,
+  'Reject sb stage failed, please retry': ({ named }) => `拒绝 ${named('name')} 上台失败, 请重试`,
   // @ts-ignore
-  'Agree on Stage failed, please retry': ({ named }) => `同意 ${named('name')} 上台失败, 请重试`,
+  'Agree sb stage failed, please retry': ({ named }) => `同意 ${named('name')} 上台失败, 请重试`,
   'Has been fully muted and cannot open the microphone': '已被全员静音，无法打开麦克风',
   'Has been muted by the host and cannot open the microphone': '已被主持人静音，无法打开麦克风',
   'To apply to speak in the room, please raise your hand first to apply for the microphone': '申请发言房间，请先举手申请上麦',

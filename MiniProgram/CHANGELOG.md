@@ -1,3 +1,20 @@
+## 2024.04.29@2.3.1
+
+**Feature**
+
+- 升级 [@tencentcloud/tuiroom-engine-wx](https://www.npmjs.com/package/@tencentcloud/tuiroom-engine-wx) 到 v2.3.1 版本，详情请查看 [发布日志](https://cloud.tencent.com/document/product/1690/89361)；
+
+**Bug Fixed**
+- 修复小程序入会时间展示不全的问题;
+- 修复小程序上台提示信息出现换行的问题;
+- 修复小程序成员管理列表无法滚动问题;
+- 修复小程序创建房间后，点击左上角 home 按钮回到主页，再次新建的房间异常;
+- 修复小程序转交房主之后 icon 无法切换的问题;
+- 修复获取主持人和管理员身份后没有更新申请上麦列表的问题;
+- 修复聊天消息未读数不准确的问题;
+- 修复 Notification 组件收到其他成员处理事件时显隐展示的问题;
+- 修复转交房主或管理员状态下多次点击麦克风和摄像头按钮 disable 状态错误的问题。
+
 ## 2024.04.08@2.2.2
 
 **Feature**

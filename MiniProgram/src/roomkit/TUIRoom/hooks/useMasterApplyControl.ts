@@ -1,7 +1,7 @@
 // 举手发言逻辑
 // 主持人：同意/拒绝用户的申请发言，踢人下麦，邀请用户上麦，取消邀请用户上麦
 
-import { onBeforeUnmount } from 'vue';
+import { onBeforeUnmount, computed, watch } from 'vue';
 import { TUIRoomEngine, TUIRoomEvents, TUIRequestAction, TUIRequest, TUIRequestCallbackType, TUIErrorCode } from '@tencentcloud/tuiroom-engine-wx';
 import useGetRoomEngine from './useRoomEngine';
 import TUIMessage from '../components/common/base/Message/index';
@@ -10,13 +10,21 @@ import { useRoomStore, UserInfo } from '../stores/room';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../locales';
 import logger from '../utils/common/logger';
+import { useBasicStore } from '../stores/basic';
+import TUINotification from '../components/common/base/Notification';
+import { isMobile } from '../utils/environment';
 
 const roomEngine = useGetRoomEngine();
 
 export default function () {
   const roomStore = useRoomStore();
+  const basicStore = useBasicStore();
   const { applyToAnchorList } = storeToRefs(roomStore);
+  const { showApplyUserList } = storeToRefs(basicStore);
   const { t } = useI18n();
+  let notification: { close: Function } | null;
+  const applyToAnchorUserIdList = computed(() => applyToAnchorList.value.map(item => item.userId));
+  const applyToAnchorUserCount = computed(() => applyToAnchorList.value.length);
 
   // ------ 以下处理普通用户操作 ---------
 
@@ -212,7 +220,60 @@ export default function () {
     });
   }
 
+  const handleConfirm = async (onlyOneUserTakeStage: boolean, userId: string) => {
+    if (isMobile) {
+      basicStore.setSidebarOpenStatus(true);
+      basicStore.setSidebarName('apply');
+    } else {
+      if (onlyOneUserTakeStage) {
+        handleUserApply(userId, true);
+      } else {
+        basicStore.setShowApplyUserList(true);
+      }
+    }
+  };
+
+  const handleCancel = async (onlyOneUserTakeStage: boolean, userId: string) => {
+    if (!isMobile && onlyOneUserTakeStage) {
+      handleUserApply(userId, false);
+    }
+  };
+
+  function hideApplyList() {
+    basicStore.setShowApplyUserList(false);
+  }
+
+  function handleShowNotification() {
+    watch(applyToAnchorUserIdList, (newVal, oldVal) => {
+      if (newVal.length === oldVal.length && newVal === oldVal) {
+        return;
+      }
+      if (newVal.length === 0) {
+        notification && notification.close();
+        notification = null;
+        return;
+      }
+      const onlyOneUserTakeStage = newVal.length === 1;
+      const firstUser = applyToAnchorList.value[0];
+      const userName = firstUser?.userName || firstUser?.userId;
+      const message = onlyOneUserTakeStage
+        ? `${userName} ${t('Applying for the stage')}`
+        : `${userName} ${t('and so on number people applying to stage', { number: applyToAnchorList.value.length })}`;
+      const confirmButtonText = isMobile ? t('Check') : (onlyOneUserTakeStage ? t('Agree to the stage') : t('Check'));
+      const cancelButtonText = isMobile ? undefined : (onlyOneUserTakeStage ? t('Reject') : t('Neglect'));
+      const confirm = () => handleConfirm(onlyOneUserTakeStage, firstUser?.userId);
+      const cancel = () => handleCancel(onlyOneUserTakeStage, firstUser?.userId);
+      notification = TUINotification({ message, confirmButtonText, cancelButtonText, confirm, cancel });
+    });
+  }
+
   return {
+    t,
+    roomStore,
+    showApplyUserList,
+    hideApplyList,
+    applyToAnchorUserCount,
+    applyToAnchorList,
     // 处理用户上麦申请（同意/拒绝）
     handleUserApply,
     // 同意普通用户上台
@@ -227,5 +288,6 @@ export default function () {
     kickUserOffStage,
     // 处理所有用户请求
     handleAllUserApply,
+    handleShowNotification,
   };
 }

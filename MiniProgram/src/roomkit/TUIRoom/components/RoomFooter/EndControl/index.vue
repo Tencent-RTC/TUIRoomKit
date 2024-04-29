@@ -210,7 +210,6 @@ const onRoomDismissed = async (eventInfo: { roomId: string }) => {
     TUIMessageBox({
       title: t('Note'),
       message: t('The host closed the room.'),
-      appendToRoomContainer: true,
       confirmButtonText: t('Sure'),
       callback: async () => {
         resetState();

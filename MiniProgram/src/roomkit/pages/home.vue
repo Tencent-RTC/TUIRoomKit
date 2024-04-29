@@ -66,7 +66,7 @@ async function checkRoomExistWhenCreateRoom(roomId: string) {
   let isRoomExist = false;
   const tim = roomEngine.instance?.getTIM();
   try {
-    await tim.searchGroupByID(roomId);
+    await tim?.searchGroupByID(roomId);
     isRoomExist = true;
   } catch (error: any) {
     // 房间不存在
