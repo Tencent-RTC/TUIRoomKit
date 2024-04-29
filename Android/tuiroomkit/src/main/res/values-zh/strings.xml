@@ -85,6 +85,7 @@
     <string name="tuiroomkit_room_raise_hand">举手发言房间</string>
     <string name="tuiroomkit_logout">退出登录</string>
     <string name="tuiroomkit_kiecked_off_line">您已在其它地方登录</string>
+    <string name="tuiroomkit_dialog_logout_title">您已退出登录</string>
     <string name="tuiroomkit_cancel">取消</string>
     <string name="tuiroomkit_microphone">麦克风</string>
     <string name="tuiroomkit_camera">摄像头</string>
@@ -139,8 +140,8 @@
     <string name="tuiroomkit_invited_take_seat_time_out">上台失败，邀请已超时</string>
     <string name="tuiroomkit_all_seat_occupied">当前上台人数已达上限</string>
     <string name="tuiroomkit_receive_invitation_content">您上台后可以打开摄像头和取消静音</string>
-    <string name="tuiroomkit_can_not_open_mic">主持人开启了全员静音，无法自行取消静音</string>
-    <string name="tuiroomkit_can_not_open_camera">主持人开启了全员禁画，无法开启视频</string>
+    <string name="tuiroomkit_can_not_open_mic">全员静音已启用，无法自行取消静音</string>
+    <string name="tuiroomkit_can_not_open_camera">全员禁画已启用，无法自行打开视频</string>
     <string name="tuiroomkit_mute_all_mic_toast">已开启全员静音</string>
     <string name="tuiroomkit_mute_all_camera_toast">已开启全体禁画</string>
     <string name="tuiroomkit_item_close_camera">关闭视频</string>
@@ -168,8 +169,8 @@
     <string name="tuiroomkit_toast_off_stage_by_self">您已主动下台，如需发言请再次举手申请</string>
     <string name="tuiroomkit_toast_take_seat_success">上台成功</string>
     <string name="tuiroomkit_toast_take_seat_rejected">上台申请被拒绝</string>
-    <string name="tuiroomkit_toast_raised_hand">您已举手，请等待主持人操作</string>
-    <string name="tuiroomkit_toast_hands_down">您已将手放下</string>
+    <string name="tuiroomkit_toast_raised_hand">申请已发出，请等待主持人/管理员操作</string>
+    <string name="tuiroomkit_toast_hands_down">已取消上台申请</string>
     <string name="tuiroomkit_toast_invite_audience_to_stage">已向观众发出上台邀请</string>
     <string name="tuiroomkit_room_msg_display_suffix">的快速会议</string>
     <string name="tuiroomkit_chat_access_room">快速会议</string>

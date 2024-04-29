@@ -1,11 +1,11 @@
 package com.tencent.cloud.tuikit.roomkit.view.page;
 
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.KICKED_OFF_LINE;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.KICKED_OUT_OF_ROOM;
-import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_DESTROY_ROOM;
-import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_EXIT_ROOM;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.ROOM_DISMISSED;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.ENTER_FLOAT_WINDOW;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.EXIT_FLOAT_WINDOW;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.START_LOGIN;
 import static com.tencent.qcloud.tuicore.TUIConstants.TUILogin.EVENT_IMSDK_INIT_STATE_CHANGED;
 import static com.tencent.qcloud.tuicore.TUIConstants.TUILogin.EVENT_SUB_KEY_START_UNINIT;
 
@@ -20,7 +20,6 @@ import com.tencent.cloud.tuikit.roomkit.utils.DrawOverlaysPermissionUtil;
 import com.tencent.cloud.tuikit.roomkit.utils.IntentUtils;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.FloatWindow.VideoPlaying.RoomFloatViewService;
 import com.tencent.qcloud.tuicore.TUICore;
-import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.interfaces.ITUINotification;
 
 import java.util.Map;
@@ -39,6 +38,7 @@ public class RoomWindowManager
     public void destroy() {
         Log.d(TAG, "destroy");
         unRegisterKitEvent();
+        dismissFloatWindow();
     }
 
     private void enterFloatWindow() {
@@ -58,9 +58,8 @@ public class RoomWindowManager
         RoomEventCenter.getInstance().subscribeUIEvent(ENTER_FLOAT_WINDOW, this);
         RoomEventCenter.getInstance().subscribeUIEvent(EXIT_FLOAT_WINDOW, this);
         RoomEventCenter.getInstance().subscribeEngine(ROOM_DISMISSED, this);
+        RoomEventCenter.getInstance().subscribeEngine(KICKED_OFF_LINE, this);
         RoomEventCenter.getInstance().subscribeEngine(KICKED_OUT_OF_ROOM, this);
-        RoomEventCenter.getInstance().subscribeEngine(LOCAL_USER_EXIT_ROOM, this);
-        RoomEventCenter.getInstance().subscribeEngine(LOCAL_USER_DESTROY_ROOM, this);
         TUICore.registerEvent(EVENT_IMSDK_INIT_STATE_CHANGED, EVENT_SUB_KEY_START_UNINIT, this);
     }
 
@@ -68,9 +67,8 @@ public class RoomWindowManager
         RoomEventCenter.getInstance().unsubscribeUIEvent(ENTER_FLOAT_WINDOW, this);
         RoomEventCenter.getInstance().unsubscribeUIEvent(EXIT_FLOAT_WINDOW, this);
         RoomEventCenter.getInstance().unsubscribeEngine(ROOM_DISMISSED, this);
+        RoomEventCenter.getInstance().unsubscribeEngine(KICKED_OFF_LINE, this);
         RoomEventCenter.getInstance().unsubscribeEngine(KICKED_OUT_OF_ROOM, this);
-        RoomEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_EXIT_ROOM, this);
-        RoomEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_DESTROY_ROOM, this);
         TUICore.unRegisterEvent(EVENT_IMSDK_INIT_STATE_CHANGED, EVENT_SUB_KEY_START_UNINIT, this);
     }
 
@@ -120,17 +118,14 @@ public class RoomWindowManager
         switch (event) {
             case KICKED_OUT_OF_ROOM:
             case ROOM_DISMISSED:
-                if (RoomEngineManager.sharedInstance(mAppContext).getRoomStore().isInFloatWindow()) {
-                    dismissFloatWindow();
-                    RoomEngineManager.sharedInstance(mAppContext).exitRoom(null);
-                }
+                dismissFloatWindow();
+                RoomEngineManager.sharedInstance().release();
                 break;
 
-            case LOCAL_USER_EXIT_ROOM:
-            case LOCAL_USER_DESTROY_ROOM:
-                if (RoomEngineManager.sharedInstance(mAppContext).getRoomStore().isInFloatWindow()) {
-                    dismissFloatWindow();
-                }
+            case KICKED_OFF_LINE:
+                dismissFloatWindow();
+                startLoginIfNeeded();
+                RoomEngineManager.sharedInstance().release();
                 break;
 
             default:
@@ -143,15 +138,15 @@ public class RoomWindowManager
     public void onNotifyEvent(String key, String subKey, Map<String, Object> param) {
         Log.d(TAG, "onNotifyEvent key=" + key + " subKey=" + subKey);
         if (TextUtils.equals(key, EVENT_IMSDK_INIT_STATE_CHANGED) && TextUtils.equals(subKey,
-                EVENT_SUB_KEY_START_UNINIT) && RoomEngineManager.sharedInstance(mAppContext).getRoomStore()
-                .isInFloatWindow()) {
+                EVENT_SUB_KEY_START_UNINIT)) {
             dismissFloatWindow();
-            if (TextUtils.equals(TUILogin.getUserId(),
-                    RoomEngineManager.sharedInstance().getRoomStore().roomInfo.ownerId)) {
-                RoomEngineManager.sharedInstance().destroyRoom(null);
-            } else {
-                RoomEngineManager.sharedInstance().exitRoom(null);
-            }
+            RoomEngineManager.sharedInstance().release();
+        }
+    }
+
+    private void startLoginIfNeeded() {
+        if (RoomEngineManager.sharedInstance().getRoomStore().isInFloatWindow()) {
+            RoomEventCenter.getInstance().notifyUIEvent(START_LOGIN, null);
         }
     }
 }

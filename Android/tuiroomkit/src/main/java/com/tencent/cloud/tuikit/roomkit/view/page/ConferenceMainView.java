@@ -2,6 +2,7 @@ package com.tencent.cloud.tuikit.roomkit.view.page;
 
 import static com.tencent.cloud.tuikit.engine.common.TUICommonDefine.Error.ALL_SEAT_OCCUPIED;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.DISMISS_MAIN_ACTIVITY;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.START_LOGIN;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+import com.tencent.cloud.tuikit.roomkit.FeatureSwitch;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
@@ -47,6 +49,7 @@ import com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel.R
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.TopNavigationBar.TopView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.TransferOwnerControlPanel.TransferMasterPanel;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.UserControlPanel.UserListPanel;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.WaterMark.TextWaterMarkView;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.RoomMainViewModel;
 
 import java.lang.reflect.Method;
@@ -235,6 +238,11 @@ public class ConferenceMainView extends RelativeLayout {
             ((ViewGroup) parent).removeView(mVideoSeatView);
         }
         mLayoutVideoSeat.addView(mVideoSeatView);
+        if (FeatureSwitch.SWITCH_TEXT_WATER_MARK) {
+            TextWaterMarkView textWaterMarkView = new TextWaterMarkView(mContext);
+            textWaterMarkView.setText(mViewModel.getWaterMakText());
+            mLayoutVideoSeat.addView(textWaterMarkView);
+        }
 
         mLayoutScreenCaptureGroup = findViewById(R.id.tuiroomkit_group_screen_capture);
         mLayoutScreenCaptureGroup.setOnClickListener(this::onClick);
@@ -259,7 +267,6 @@ public class ConferenceMainView extends RelativeLayout {
         mLayoutLocalAudio = findViewById(R.id.tuiroomit_local_audio_container);
         mLayoutLocalAudio.addView(new LocalAudioToggleView(mContext));
 
-        showAlertUserLiveTips();
         if (RoomEngineManager.sharedInstance().getRoomStore().videoModel.isScreenSharing()) {
             onScreenShareStarted();
         }
@@ -273,7 +280,7 @@ public class ConferenceMainView extends RelativeLayout {
         mBottomLayout.stopScreenShare();
     }
 
-    private void showAlertUserLiveTips() {
+    public void showAlertUserLiveTips() {
         try {
             Class clz = Class.forName("com.tencent.liteav.privacy.util.RTCubeAppLegalUtils");
             Method method = clz.getDeclaredMethod("showAlertUserLiveTips", Context.class);
@@ -347,7 +354,6 @@ public class ConferenceMainView extends RelativeLayout {
         confirmDialog.setPositiveClickListener(new ConfirmDialog.PositiveClickListener() {
             @Override
             public void onClick() {
-                RoomEngineManager.sharedInstance().release();
                 confirmDialog.dismiss();
                 RoomEventCenter.getInstance().notifyUIEvent(DISMISS_MAIN_ACTIVITY, null);
             }
@@ -363,11 +369,27 @@ public class ConferenceMainView extends RelativeLayout {
         confirmDialog.setPositiveClickListener(new ConfirmDialog.PositiveClickListener() {
             @Override
             public void onClick() {
-                RoomEventCenter.getInstance().notifyUIEvent(RoomEventCenter.RoomKitUIEvent.KICKED_OFF_LINE, null);
                 confirmDialog.dismiss();
+                RoomEventCenter.getInstance().notifyUIEvent(DISMISS_MAIN_ACTIVITY, null);
+                RoomEventCenter.getInstance().notifyUIEvent(START_LOGIN, null);
             }
         });
         confirmDialog.show();
+    }
+
+    public void showLogoutDialog() {
+        BaseDialogFragment.build()
+                .setTitle(mContext.getString(R.string.tuiroomkit_dialog_logout_title))
+                .hideNegativeView()
+                .setPositiveName(mContext.getString(R.string.tuiroomkit_confirm))
+                .setPositiveListener(new BaseDialogFragment.ClickListener() {
+                    @Override
+                    public void onClick() {
+                        RoomEventCenter.getInstance().notifyUIEvent(DISMISS_MAIN_ACTIVITY, null);
+                        RoomEventCenter.getInstance().notifyUIEvent(START_LOGIN, null);
+                    }
+                })
+                .showDialog(mContext, "showLogoutDialog");
     }
 
     public void showSingleConfirmDialog(String message) {

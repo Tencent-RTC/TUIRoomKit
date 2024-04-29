@@ -29,7 +29,7 @@ public class BottomView extends LinearLayout {
     public static int MAINVIEW = 0;
     public static int EXTENSIONVIEW = 4;
     public static int TALK_FREEDOM = 5;
-    public static int TALK_SEAT_MODE = 6;
+
     private Context                                        mContext;
     private BottomViewModel                                mViewModel;
     private List<BottomItemData>                           mDataList;
@@ -105,34 +105,12 @@ public class BottomView extends LinearLayout {
     }
 
     public void addItem(final BottomItemData itemData) {
-        if (itemData == null) {
-            return;
-        }
         View layout = View.inflate(mContext, R.layout.tuiroomkit_bottom_button, null);
-        final AppCompatImageButton button = layout.findViewById(R.id.image_button);
-        final TextView textItemName = layout.findViewById(R.id.tv_item_name);
-        if (TextUtils.isEmpty(itemData.getName())) {
-            textItemName.setVisibility(GONE);
-        } else {
-            textItemName.setText(itemData.getName());
-        }
+        TextView textItemName = layout.findViewById(R.id.tuiroomkit_tv_bottom_item);
+        textItemName.setText(itemData.getName());
         layout.setBackgroundResource(itemData.getBackground());
 
-        int width = itemData.getWidth() == 0 ? getResources()
-                .getDimensionPixelSize(R.dimen.tuiroomkit_bottom_item_icon_width) : itemData.getWidth();
-        int height = itemData.getHeight() == 0 ? getResources()
-                .getDimensionPixelSize(R.dimen.tuiroomkit_bottom_item_icon_height) : itemData.getHeight();
-        if (itemData.getView() != null) {
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
-            params.bottomMargin = 15;
-            params.addRule(RelativeLayout.CENTER_IN_PARENT);
-            params.addRule(RelativeLayout.ABOVE, R.id.tv_item_name);
-            ((ViewGroup) layout).removeView(button);
-            ((ViewGroup) layout).addView(itemData.getView(), params);
-            addView(layout);
-            updateItemsPosition();
-            return;
-        }
+        AppCompatImageButton button = layout.findViewById(R.id.tuiroomkit_btn_bottom_item);
         button.setScaleType(ImageView.ScaleType.FIT_XY);
         StateListDrawable stateListDrawable = createStateListDrawable(itemData);
         button.setBackground(stateListDrawable);

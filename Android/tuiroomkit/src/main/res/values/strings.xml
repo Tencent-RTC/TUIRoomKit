@@ -85,6 +85,7 @@
     <string name="tuiroomkit_room_raise_hand">Raise Hand Room</string>
     <string name="tuiroomkit_logout">Logout</string>
     <string name="tuiroomkit_kiecked_off_line">You are already logged in elsewhere</string>
+    <string name="tuiroomkit_dialog_logout_title">You are logged out</string>
     <string name="tuiroomkit_cancel">Cancel</string>
     <string name="tuiroomkit_microphone">Microphone</string>
     <string name="tuiroomkit_camera">Camera</string>
@@ -139,8 +140,8 @@
     <string name="tuiroomkit_invited_take_seat_time_out">Failed to go on stage, invitation has timed out</string>
     <string name="tuiroomkit_all_seat_occupied">The current number of people on stage has reached the limit</string>
     <string name="tuiroomkit_receive_invitation_content">You can turn on the camera and unmute it once you are on stage</string>
-    <string name="tuiroomkit_can_not_open_mic">The host has muted all members and cannot unmute himself</string>
-    <string name="tuiroomkit_can_not_open_camera">The Master has muted camera for all members, and cannot open the camera</string>
+    <string name="tuiroomkit_can_not_open_mic">Mute for all is enabled and cannot be unmuted by oneself</string>
+    <string name="tuiroomkit_can_not_open_camera">The video ban for all members has been enabled, and the video cannot be opened by oneself.</string>
     <string name="tuiroomkit_mute_all_mic_toast">All audios disabled</string>
     <string name="tuiroomkit_mute_all_camera_toast">All videos disabled</string>
     <string name="tuiroomkit_item_close_camera">Stop video</string>
@@ -168,8 +169,8 @@
     <string name="tuiroomkit_toast_off_stage_by_self">You have taken the initiative to step down, please raise your hand again if you want to speak</string>
     <string name="tuiroomkit_toast_take_seat_success">Succeed on stage</string>
     <string name="tuiroomkit_toast_take_seat_rejected">Application to go on stage was rejected</string>
-    <string name="tuiroomkit_toast_raised_hand">You have raised your hand, please wait for the master to operate</string>
-    <string name="tuiroomkit_toast_hands_down">You put your hands down</string>
+    <string name="tuiroomkit_toast_raised_hand">The application has been sent, please wait for the host/administrator to operate</string>
+    <string name="tuiroomkit_toast_hands_down">Application for stage has been canceled</string>
     <string name="tuiroomkit_toast_invite_audience_to_stage">The audience has been invited to the stage</string>
     <string name="tuiroomkit_room_msg_display_suffix">\'s fast meeting</string>
     <string name="tuiroomkit_chat_access_room">Fast meeting</string>

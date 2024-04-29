@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,7 +110,6 @@ public class ConferenceMainFragment extends Fragment {
         mActivity.finish();
         release();
     }
-
 
     private void keepScreenOn(boolean keep) {
         Window window = getActivity().getWindow();

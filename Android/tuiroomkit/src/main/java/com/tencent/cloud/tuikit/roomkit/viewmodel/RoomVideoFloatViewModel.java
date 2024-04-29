@@ -171,8 +171,12 @@ public class RoomVideoFloatViewModel implements RoomEventCenter.RoomEngineEventR
         if (params == null || mFloatUser == null) {
             return;
         }
-        TUIRoomDefine.Role role = (TUIRoomDefine.Role) params.get(RoomEventConstant.KEY_ROLE);
-        if (role != TUIRoomDefine.Role.ROOM_OWNER) {
+        int position = (int) params.get(RoomEventConstant.KEY_USER_POSITION);
+        if (position == USER_NOT_FOUND) {
+            return;
+        }
+        UserEntity user = RoomEngineManager.sharedInstance().getRoomStore().allUserList.get(position);
+        if (user.getRole() != TUIRoomDefine.Role.ROOM_OWNER) {
             return;
         }
         if (mFloatUser.isHasVideoStream() && mFloatUser.getVideoStreamType() == SCREEN_STREAM) {
@@ -181,7 +185,7 @@ public class RoomVideoFloatViewModel implements RoomEventCenter.RoomEngineEventR
         if (mFloatUser.isHasVideoStream() && mFloatUser.getVideoStreamType() != SCREEN_STREAM) {
             stopVideoPlay(mFloatUser);
         }
-        String userId = (String) params.get(RoomEventConstant.KEY_USER_ID);
+        String userId = user.getUserId();
         mFloatUser = findUser(userId, CAMERA_STREAM);
         if (mFloatUser.isHasVideoStream()) {
             startVideoPlay(mFloatUser);
