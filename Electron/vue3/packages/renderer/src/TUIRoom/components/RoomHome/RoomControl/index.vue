@@ -2,7 +2,6 @@
   <div class="room-control-container">
     <Logo v-show="showLogo" class="logo" />
     <div class="control-container">
-      <!-- 视频预览区域 -->
       <div class="stream-preview-container">
         <div id="stream-preview" class="stream-preview"></div>
         <div class="attention-info">
@@ -11,7 +10,6 @@
         </div>
       </div>
       <div class="control-region">
-        <!-- 麦克风，摄像头操作区域 -->
         <div class="media-control-region">
           <audio-media-control
             class="media-control-item"
@@ -28,7 +26,6 @@
           ></video-media-control>
         </div>
         <div class="room-control-region">
-          <!-- 创建房间逻辑 -->
           <div class="create-room-region">
             <tui-button class="button-item" @click.stop="handleCreateRoom">
               <svg-icon :icon="CreateRoomIcon" />
@@ -49,7 +46,6 @@
               </div>
             </div>
           </div>
-          <!-- 加入房间逻辑 -->
           <div class="enter-room-region">
             <tui-button v-if="!showEnterRoomAction" class="button-item" @click="handleEnterRoom">
               <svg-icon :icon="EnterRoomIcon" />

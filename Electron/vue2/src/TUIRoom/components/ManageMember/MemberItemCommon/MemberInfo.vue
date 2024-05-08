@@ -1,11 +1,9 @@
 <template>
   <!--
-      *User base information
+      * User base information
       *
-      *用户基础信息
     -->
   <div :class="[isMobile ? 'member-info-mobile' : 'member-info']">
-    <!-- 用户基础信息 -->
     <div :class="!showStateIcon && isTargetUserAdmin ? 'member-basic-info-admin' : 'member-basic-info'">
       <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
       <div class="user-name">{{ userInfo.userName || userInfo.userId }}</div>
@@ -22,7 +20,6 @@
     <!--
       *User audio and video status information
       *
-      *用户音视频状态信息
     -->
     <div v-if="showStateIcon" class="member-av-state">
       <svg-icon

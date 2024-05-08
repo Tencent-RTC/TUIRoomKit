@@ -141,8 +141,6 @@ async function toggleScreenShare() {
 async function onPermissionScreenShare() {
   const { shell } = require('electron');
   shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture');
-  // todo: 这里不能注释，防止应用不出现在屏幕录制权限列表里
-  // return;
   showPermissionVisible.value = false;
 }
 
@@ -172,7 +170,6 @@ async function stopScreenShare() {
   }
 }
 
-/** 收到停止屏幕共享事件(用户点击浏览器自带的 ""结束共享" 按钮或上台发言模式被主持人踢下台)*/
 function screenCaptureStopped() {
   isSharing.value = false;
 }

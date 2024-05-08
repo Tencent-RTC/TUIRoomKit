@@ -2,7 +2,6 @@ import { app, BrowserWindow, shell, screen, systemPreferences, crashReporter, ip
 import { release } from 'os'
 import { join, resolve } from 'path'
 
-// 开启crash捕获
 crashReporter.start({
   productName: 'electron-tui-room',
   companyName: 'Tencent Cloud',
@@ -14,15 +13,13 @@ crashReporter.start({
 let crashFilePath = '';
 let crashDumpsDir = '';
 try {
-  // electron 低版本
   crashFilePath = join(app.getPath('temp'), app.getName() + ' Crashes');
   console.log('————————crash path:', crashFilePath);
 
-  // electron 高版本
   crashDumpsDir = app.getPath('crashDumps');
   console.log('————————crashDumpsDir:', crashDumpsDir);
 } catch (e) {
-  console.error('获取奔溃文件路径失败', e);
+  console.error('Failed to get path to crashed file', e);
 }
 
 const PROTOCOL = 'tuiroom';
@@ -66,10 +63,8 @@ let schemeRoomId = '';
 function registerScheme() {
   const args = [];
   if (!app.isPackaged) {
-    // 如果是开发阶段，需要把我们的脚本的绝对路径加入参数中
     args.push(resolve(process.argv[1]));
   }
-  // 加一个 `--` 以确保后面的参数不被 Electron 处理
   args.push('--');
   app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, args);
   handleArgv(process.argv);
@@ -77,8 +72,6 @@ function registerScheme() {
 
 function handleArgv(argv: string[]) {
   const prefix = `${PROTOCOL}:`;
-  // 开发阶段，跳过前两个参数（`electron.exe .`）
-  // 打包后，跳过第一个参数（`myapp.exe`）
   const offset = app.isPackaged ? 1 : 2;
   const url = argv.find((arg, i) => i >= offset && arg.startsWith(prefix));
   if (url) handleUrl(url);
@@ -171,7 +164,6 @@ app.on('activate', () => {
   }
 })
 
-// macOS 下通过协议URL启动时，主实例会通过 open-url 事件接收这个 URL
 app.on('open-url', (event, urlStr) => {
   handleUrl(urlStr);
 });

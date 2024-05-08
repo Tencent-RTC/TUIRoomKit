@@ -3,9 +3,6 @@
   * Usage:
   * Use <layout-control /> in template
   *
-  * 名称: LayoutControl
-  * 使用方式：
-  * 在 template 中使用 <layout-control />
 -->
 <template>
   <div v-click-outside="handleClickOutSide" class="layout-container">
@@ -21,7 +18,6 @@
       <!--
         *Sidebar and upper sidebar arrows
         *
-        *侧边栏和上边栏箭头
       -->
       <div
         :class="['layout1', 'layout-item', `${layout === LAYOUT.NINE_EQUAL_POINTS ? 'checked' : ''}`]"
@@ -38,9 +34,7 @@
         <span class="layout-title">{{ t('Grid') }}</span>
       </div>
       <!--
-        *Right side member list
-        *
-        *右侧成员列表
+        * Right side member list
       -->
       <div
         :class="['layout2', 'layout-item', `${layout === LAYOUT.RIGHT_SIDE_LIST ? 'checked' : ''}`]"
@@ -60,9 +54,7 @@
         <span class="layout-title">{{ t('Gallery on right') }}</span>
       </div>
       <!--
-        *Top Member List
-        *
-        *顶部成员列表
+        * Top Member List
       -->
       <div
         :class="['layout3', 'layout-item', `${layout === LAYOUT.TOP_SIDE_LIST ? 'checked' : ''}`]"

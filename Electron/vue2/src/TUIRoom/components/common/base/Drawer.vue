@@ -10,17 +10,6 @@
   * Usage:
   * Use <Drawer title="there is title" v-model="showDrawer"></Drawer> in template
   *
-  * 名称: Drawer
-  * @param title String required [Drawer 的标题]
-  * @param value Boolean [控制是否显示 Drawer]
-  * @param modal Boolean [Drawer 是否有遮罩层]
-  * @param size number | string [Drawer 的宽度]
-  * @param beforeClose (done: DoneFn) => void; [Drawer 关闭前的回调函数]
-  * @param closeOnClickModal Boolean [是否支持点击遮罩层关闭 Drawer]
-  * @param showClose Boolean [是否展示关闭按钮]
-  * @param appendToBody Boolean [是否插入到 body 中]
-  * 使用方式：
-  * 在 template 中使用 <Drawer title="there is title" v-model="showDrawer"></Drawer>
 -->
 <template>
   <div

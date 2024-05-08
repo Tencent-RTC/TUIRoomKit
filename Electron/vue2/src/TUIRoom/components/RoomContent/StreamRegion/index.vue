@@ -81,13 +81,11 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// 是否是本地屏幕分享占位窗口
 const isLocalScreen = computed(() => (
   props.stream
   && (props.stream.userId === basicStore.userId && props.stream.streamType === TUIVideoStreamType.kScreenStream)
 ));
 
-// 是否为小窗口
 const isMiniRegion = computed(() => !!(props.enlargeDomId && `${props.stream.userId}_${props.stream.streamType}` !== props.enlargeDomId));
 
 const streamRegionRef = ref();
@@ -116,7 +114,6 @@ const userInfo = computed(() => {
   return props.stream.userName || props.stream.userId;
 });
 
-// 要拉取远端用户的流类型
 const streamTypeToFetch = computed(() => {
   const { streamType, userId } = props.stream;
   const { kScreenStream, kCameraStream } = TUIVideoStreamType;
@@ -136,11 +133,9 @@ const streamTypeToFetch = computed(() => {
 
 const startPlayRemoteVideo = async () => {
   const { userId } = props.stream;
-  // 播放远端流
   loading.value = true;
   roomEngine.instance?.setRemoteVideoView({ userId, streamType: streamTypeToFetch.value, view: `${playRegionDomId.value}` });
   await roomEngine.instance?.startPlayRemoteVideo({ userId, streamType: streamTypeToFetch.value });
-  // 播放远端流成功
   loading.value = false;
 };
 
@@ -169,7 +164,6 @@ if (props.stream.streamType === TUIVideoStreamType.kCameraStream
       }
       if (oldVal) {
         const [oldHasVideoStream, oldIsVisible] = oldVal;
-        // 从有流且可见状态变为有流但不可见，无流但可见，无流且不可见状态，停止播放流
         if ((oldHasVideoStream && oldIsVisible) && (!hasVideoStream || !isVisible)) {
           await stopPlayRemoteVideo();
         }
@@ -197,7 +191,6 @@ if (props.stream.streamType === TUIVideoStreamType.kScreenStream) {
       }
       if (oldVal) {
         const [oldHasScreenStream, oldIsVisible] = oldVal;
-        // 从有流且可见状态变为有流但不可见，无流但可见，无流且不可见状态，停止播放流
         if ((oldHasScreenStream && oldIsVisible) && (!hasScreenStream || !isVisible)) {
           await stopPlayRemoteVideo();
         }
@@ -212,7 +205,6 @@ if (props.stream.streamType === TUIVideoStreamType.kScreenStream) {
  * enlargeUserId The switch requires that both the small window
  * corresponding to the previously played stream and the stream that needs to be newly played be replayed.
  *
- * enlargeUserId 切换的时候需要让之前播放流对应的小窗口和需要新播放的流都重新播放
 **/
 watch(
   () => props.enlargeDomId,
@@ -225,7 +217,6 @@ watch(
           /**
            * Replay local video streams only when they are open
            *
-           * 只有当本地视频流是打开状态的时候，才重新播放本地流
           **/
           if (props.stream.hasVideoStream) {
             await roomEngine.instance?.setLocalVideoView({

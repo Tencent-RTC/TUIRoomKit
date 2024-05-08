@@ -46,15 +46,15 @@ const getRoomOptions = () => ({
 });
 export interface CustomMessagePayload {
   version: number
-  businessID: string // 固定值，用于在IM上区分当前消息是哪类自定义消息。
-  groupId: string // 邀请群成员入会时，需要用到groupId来获取群成员列表。
-  messageId: string // 用于观众成为房主后，通过messageId 来查找并更新指定消息。
-  roomId: string // 房间的id，enterRoom 必须的参数
-  owner: string // 房主的userId
-  ownerName: string // 房主的userName
-  roomState: RoomState // 当前的房间状态，有creating/created/destroying/destroyed 四种状态
-  memberCount: 1 // 当前房间内有多少人，需要在ui上展示有多少人在会议中。
-  userList: Array<{ faceUrl: string; nickName: string; userId: string }> // 包括房主在内的被邀请用户的列表，最多展示5个，防止消息长度超出限制。
+  businessID: string
+  groupId: string
+  messageId: string
+  roomId: string
+  owner: string
+  ownerName: string
+  roomState: RoomState
+  memberCount: 1
+  userList: Array<{ faceUrl: string; nickName: string; userId: string }>
 }
 export enum RoomState {
   CREATING = 'creating',
@@ -68,7 +68,6 @@ export enum ChatType {
   CUSTOM_SERVICE = 'customerService',
   ROOM = 'room'
 }
-// message 的编辑都交给房主处理，因此需要拿到每条message 然后对比 userid 相同的时候将其赋给message
 export class ChatExtension {
   static instance?: ChatExtension;
   private message = {} as Message;
@@ -225,8 +224,8 @@ export class ChatExtension {
       const [profile] = profileResult.data;
       const { userID, nick } = profile;
       await this.modifyMessage(this.message.ID, {
-        owner: userID, // 房主的userId
-        ownerName: nick, // 房主的userName
+        owner: userID,
+        ownerName: nick,
       });
     }
   }
@@ -248,7 +247,7 @@ export class ChatExtension {
         },
       },
     };
-    if (!chatType) return extension; // 老版本 chatType === undefined 忽略配置直接 return
+    if (!chatType) return extension;
     if (!this.chatExtensionSetting[chatType]) return;
     return extension;
   }
@@ -308,7 +307,6 @@ export class ChatExtension {
   public async onNotifyEvent(eventName: string, subKey: string, params?: Record<string, any>) {
     if (eventName === TUIConstants.TUILogin.EVENT.LOGIN_STATE_CHANGED) {
       if (subKey === TUIConstants.TUILogin.EVENT_SUB_KEY.USER_LOGIN_SUCCESS) {
-        // 收到登录成功时执行自己的业务逻辑处理
         !isMobile && setDragAndResize('#roomContainer');
         TUIRoomEngine?.callExperimentalAPI(JSON.stringify({
           api: 'setFramework',
@@ -345,17 +343,11 @@ export class ChatExtension {
     const { SDKAppID, userID, userSig } = this.chatContext;
     const { nick = '', avatar = defaultAvatarUrl } = this.myProfile;
     this.service && this.service[deep ? 'initRoomKit' : 'storeInit']({
-      // 获取 sdkAppId 请您参考 步骤一
       sdkAppId: SDKAppID,
-      // 用户在您业务中的唯一标示 Id
       userId: userID,
-      // 本地开发调试可在 https://console.cloud.tencent.com/trtc/usersigtool 页面快速生成 userSig, 注意 userSig 与 userId 为一一对应关系
       userSig,
-      // 用户在您业务中使用的昵称
       userName: nick,
-      // 用户在您业务中使用的头像链接
       avatarUrl: avatar,
-      // 用户在您业务中需要的皮肤主题颜色及是否支持切换皮肤主题
       theme: {
         isSupportSwitchTheme: false,
       },
@@ -435,20 +427,20 @@ export class ChatExtension {
       data: JSON.stringify({
         version: 1,
         businessID: 'group_room_message',
-        groupId: conversationID, // todo 当前版本暂不修改，等待im方案
-        messageId: '', // 用于观众成为房主后，通过 messageId 来查找并更新指定消息。
-        roomId, // 房间的id，enterRoom 必须的参数
-        owner: userID, // 房主的userId
-        ownerName: nick, // 房主的userName
-        roomState, // 当前的房间状态，有creating/created/destroying/destroyed 四种状态
-        memberCount: 1, // 当前房间内有多少人，需要在ui上展示有多少人在会议中。
+        groupId: conversationID,
+        messageId: '',
+        roomId,
+        owner: userID,
+        ownerName: nick,
+        roomState,
+        memberCount: 1,
         userList: [
           {
             faceUrl: avatar,
             nickName: nick,
             userId: userID,
           },
-        ], // 包括房主在内的被邀请用户的列表，最多展示5个，防止消息长度超出限制。
+        ],
       }),
     };
     return payload;
@@ -466,7 +458,7 @@ export class ChatExtension {
   private getUserProfile(userIDList: Array<string>) {
     const { chat } = this.chatContext;
     return chat.getUserProfile({
-      userIDList, // 请注意：即使只拉取一个用户的资料，也需要用数组类型，例如：userIDList: ['user1']
+      userIDList,
     });
   }
 

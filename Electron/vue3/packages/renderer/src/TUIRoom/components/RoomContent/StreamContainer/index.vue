@@ -30,8 +30,6 @@
     </div>
     <!--
      *Sidebar and upper sidebar arrows
-     *
-     *侧边栏和上边栏箭头
     -->
     <arrow-stroke
       v-if="showIconControl && (showRoomTool || showSideList)"
@@ -44,7 +42,6 @@
     <!--
     *Nine-pane left and right page flip control bar
     *
-    *九宫格左右翻页控制栏
     -->
     <div v-if="showTurnPageControl && showRoomTool" class="turn-page-container">
       <div
@@ -93,11 +90,8 @@ const {
 } = useStreamContainer();
 const roomEngine = useGetRoomEngine();
 
-// 流容器垂直方向 padding 的大小
 const verticalPadding = 50;
-// 流容器水平方向 padding 的大小
 const horizontalPadding = 40;
-// 单个视频流窗口 margin 大小
 const singleStreamMargin = 8;
 
 defineProps<{
@@ -117,7 +111,6 @@ const enlargeStream: Ref<StreamInfo | null> = ref(null);
 const enlargeDomId = computed(() => (enlargeStream.value ? `${enlargeStream.value.userId}_${enlargeStream.value.streamType}` : ''));
 
 watch(() => remoteStreamList.value.length, (val) => {
-  // 当没有远端流的时候，将流布局改为九宫格
   if (val === 0) {
     basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
     enlargeStream.value = null;
@@ -139,8 +132,6 @@ watch(() => enlargeDomId.value, () => {
 
 /**
  * ----- The following handles the nine-pane page flip logic -----
- *
- * ----- 以下处理九宫格翻页逻辑 -----
 **/
 const currentPageIndex = ref(0);
 const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
@@ -150,7 +141,6 @@ const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
   return streamList.value.slice(currentPageIndex.value * 9, currentPageIndex.value * 9 + 9);
 });
 
-// 当展示页面中的用户改变或者当前页面改变时，重新计算可视区域的用户
 watch([() => showStreamList.value.map(item => item.userId), currentPageIndex], () => {
   if (layout.value === LAYOUT.NINE_EQUAL_POINTS) {
     const streamIdList: string[] = [];
@@ -172,26 +162,22 @@ watch(streamNumber, (val) => {
 /**
  * Show left and right page flip icons
  *
- * 显示左右翻页图标
 **/
 const showTurnPageControl = computed(() => layout.value === LAYOUT.NINE_EQUAL_POINTS && streamNumber.value > 9);
 /**
  * Whether or not to show the nine-page-to-left button
  *
- * 是否展示九宫格朝左翻页按钮
 **/
 const showTurnPageLeftArrow = computed(() => currentPageIndex.value > 0);
 /**
  * Whether or not to display the nine-pane rightward-facing page button
  *
- * 是否展示九宫格朝右翻页按钮
 **/
 const showTurnPageRightArrow = computed(() => streamNumber.value > currentPageIndex.value * 9 + 9);
 
 /**
  * Nine grid layout towards the left to turn the page
  *
- * 九宫格布局朝左翻页
 **/
 function handleTurnPageLeft() {
   currentPageIndex.value = currentPageIndex.value - 1;
@@ -201,7 +187,6 @@ function handleTurnPageLeft() {
 /**
  * Nine grid layout towards the right to turn the page
  *
- * 九宫格布局朝右翻页
 **/
 function handleTurnPageRight() {
   currentPageIndex.value = currentPageIndex.value + 1;
@@ -211,7 +196,6 @@ function handleTurnPageRight() {
 /**
  * ----- The following processing stream layout ---------
  *
- * ----- 以下处理流布局 ---------
 **/
 const streamContainerClass = ref('');
 const enlargedContainerRef = ref();
@@ -261,7 +245,6 @@ function handleClickIcon() {
     /**
      * Modify the width and height of the enlargedContainer
      *
-     * 修改 enlargedContainer 的宽和高
     **/
     if (layout.value === LAYOUT.RIGHT_SIDE_LIST) {
       enlargedContainerRef.value.style.width = '100%';
@@ -289,7 +272,6 @@ function handleClickIcon() {
 /**
  * Handle nine-pattern layout
  *
- * 处理九宫格布局
 **/
 async function handleNineEqualPointsLayout() {
   streamContainerClass.value = 'stream-container-flatten';
@@ -303,7 +285,6 @@ async function handleNineEqualPointsLayout() {
   if (!roomContainerElement) {
     return;
   }
-  // 容器的实际宽高为 offsetWidth/offsetHeight 减去 padding 的大小
   const containerWidth = roomContainerElement!.offsetWidth - horizontalPadding;
   const containerHeight = roomContainerElement!.offsetHeight - verticalPadding;
   let horizontalStreamNumber = 1;
@@ -315,7 +296,6 @@ async function handleNineEqualPointsLayout() {
     horizontalStreamNumber = 3;
     verticalStreamNumber = Math.ceil(number / 3);
   }
-  // 减去单个视频流的 margin 大小，保证 width 和 height 的比例为 16:9
   const contentWidth = (containerWidth - horizontalStreamNumber * singleStreamMargin) / horizontalStreamNumber;
   const contentHeight = (containerHeight - verticalStreamNumber * singleStreamMargin) / verticalStreamNumber;
 
@@ -329,18 +309,15 @@ async function handleNineEqualPointsLayout() {
     width = contentWidth;
     height = (contentWidth / 16) * 9;
   }
-  // 九宫格模式需要减掉 streamRegion 的 margin 的尺寸
   streamStyle.value.width = `${width}px`;
   streamStyle.value.height = `${height}px`;
 
-  // 设置九宫格布局容器的大小，保证横向最多只能有 3 个视频流
   streamListStyle.value.width = `${horizontalStreamNumber * (width + singleStreamMargin)}px`;
 }
 
 /**
  * Get stream information for large region areas
  *
- * 获取大窗口区域的流信息
  */
 function getEnlargeStream() {
   if (roomStore.localScreenStream?.hasScreenStream) {
@@ -358,7 +335,6 @@ function getEnlargeStream() {
 /**
  * Handle sidebar layout
  *
- * 处理侧边栏布局
 **/
 async function handleRightSideListLayout() {
   streamContainerClass.value = 'stream-container-right';
@@ -397,7 +373,6 @@ async function handleRightSideListLayout() {
 /**
  * Handle top bar layout
  *
- * 处理顶部栏布局
 **/
 async function handleTopSideListLayout() {
   streamContainerClass.value = 'stream-container-top';
@@ -437,7 +412,6 @@ async function handleTopSideListLayout() {
 /**
  * Double-click to switch the stream to the zoom in section
  *
- * 双击切换流到放大区域
 **/
 function handleEnlargeStreamRegion(stream: StreamInfo) {
   if (layout.value === LAYOUT.NINE_EQUAL_POINTS) {
@@ -449,7 +423,6 @@ function handleEnlargeStreamRegion(stream: StreamInfo) {
 /**
  * Handle the page layout when the page loads or the layout changes
  *
- * 页面加载或者 layout 改变时，处理页面布局
 **/
 async function handleLayout() {
   switch (layout.value as any) {
@@ -474,7 +447,6 @@ async function handleLayout() {
 /**
  * Processing stream window size when page rescaling
  *
- * 页面 resize 时，处理流窗口尺寸
 **/
 async function handleResize() {
   switch (layout.value as any) {
@@ -529,12 +501,9 @@ const onUserVideoStateChanged = (eventInfo: {
   reason: TUIChangeReason,
 }) => {
   const { userId, streamType, hasVideo, reason } = eventInfo;
-  // 更新 roomStore 流状态数据
   roomStore.updateUserVideoState(userId, streamType, hasVideo);
 
-  // 处理状态变更
   if (userId === basicStore.userId && !hasVideo && reason === TUIChangeReason.kChangedByAdmin) {
-    // 主持人关闭摄像头
     if (streamType === TUIVideoStreamType.kCameraStream) {
       TUIMessage({
         type: 'warning',
@@ -544,10 +513,8 @@ const onUserVideoStateChanged = (eventInfo: {
       // When the moderator opens the whole staff forbidden to draw,
       // open and then close the single person's camera alone, at this time
       // the corresponding user's camera status for inoperable
-      // 主持人开启全员禁画时，单独打开再关闭单人的摄像头，此时对应用户的摄像头状态为无法操作
       roomStore.setCanControlSelfVideo(!roomStore.isCameraDisableForAllUser);
     }
-    // 主持人关闭屏幕分享
     if (streamType === TUIVideoStreamType.kScreenStream) {
       TUIMessage({
         type: 'warning',
@@ -557,7 +524,6 @@ const onUserVideoStateChanged = (eventInfo: {
     }
   }
 
-  // 当屏幕分享流变化的时候，处理流布局
   if (streamType === TUIVideoStreamType.kScreenStream) {
     if (hasVideo) {
       enlargeStream.value = userId === basicStore.userId ? roomStore.localScreenStream : roomStore.remoteStreamObj[`${userId}_${streamType}`];
@@ -583,19 +549,16 @@ const onUserVideoStateChanged = (eventInfo: {
   }
 };
 
-// 麦位变化
 const onSeatListChanged = (eventInfo:
   { seatList: TUISeatInfo[], seatedList: TUISeatInfo[], leftList: TUISeatInfo[] }) => {
   const { seatedList, leftList } = eventInfo;
   roomStore.updateOnSeatList(seatedList, leftList);
   const leftUserIdList = leftList.map(item => item.userId);
-  // 最大屏用户下麦时，需要更换最大屏用户
   if (enlargeStream.value && leftUserIdList.includes(enlargeStream.value?.userId)) {
     handleLargeStreamLeave();
   }
 };
 
-// 远端用户离开
 const onRemoteUserLeaveRoom = (eventInfo: { userInfo: TUIUserInfo }) => {
   const { userInfo: { userId } } = eventInfo;
   roomStore.removeRemoteUser(userId);
@@ -604,7 +567,6 @@ const onRemoteUserLeaveRoom = (eventInfo: { userInfo: TUIUserInfo }) => {
   }
 };
 
-// 处理大窗口流离开
 const handleLargeStreamLeave = () => {
   if (roomStore.remoteStreamList.length === 0) {
     basicStore.setLayout(LAYOUT.NINE_EQUAL_POINTS);
@@ -614,16 +576,12 @@ const handleLargeStreamLeave = () => {
   }
 };
 
-// 处理侧边栏&顶部栏的视频懒加载
 const handleStreamContainerScroll = async () => {
   const childDom = streamListRef.value.children[0];
-  // 添加 nextTick 处理顶部栏模式下新增用户触发 scroll，但是拿到的 streamListRef.value.offsetWidth 还没有更新的问题
   await nextTick();
 
-  // 从第几个
   let index = 0;
   let finalIndex = 0;
-  // 可视区域有几个
   let number = 0;
 
   if (layout.value === LAYOUT.RIGHT_SIDE_LIST) {
@@ -655,11 +613,9 @@ const handleStreamContainerScroll = async () => {
   });
   streamUserIdList.push(enlargeDomId.value);
 
-  // 修改对应的 streamInfo 的 isVisible 为 true
   roomStore.updateUserStreamVisible(streamUserIdList);
 };
 
-// 处理顶部布局水平滑动
 function handleWheel(event: WheelEvent) {
   streamListRef.value.scrollLeft += event.deltaY;
 }

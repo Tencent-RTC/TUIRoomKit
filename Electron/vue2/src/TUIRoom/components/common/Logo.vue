@@ -1,15 +1,12 @@
 <!-- eslint-disable max-len -->
 <template>
   <div class="logo-container">
-    <!-- PC 端中文黑色主题下 logo -->
     <div v-if="!isMobile && isZH && isBlackTheme">
       <svg-icon :icon="LogoOfPCInChineseBlackIcon"></svg-icon>
     </div>
-    <!-- PC 端中文白色主题下 logo -->
     <div v-if="!isMobile && isZH && isWhiteTheme">
       <svg-icon :icon="LogoOfPCInChineseWhiteIcon"></svg-icon>
     </div>
-    <!-- 移动端中文黑白主题 logo -->
     <div v-if="isMobile && isZH" class="mobile-zh-logo">
       <span class="logo" :class="isWhiteTheme ? 'white' : 'black'">
         <svg-icon :icon="LogoOfMobileInChinese"></svg-icon>
@@ -18,7 +15,6 @@
         <svg-icon :icon="LogoTitleOfMobileInChinese"></svg-icon>
       </span>
     </div>
-    <!-- 英文黑白主题 logo -->
     <div v-if="isEN" :class="['pc-en-logo', { 'mobile': isMobile }]">
       <span class="logo">
         <svg-icon :icon="LogoInEnglish"></svg-icon>

@@ -100,18 +100,15 @@ onMounted(async () => {
 
 /**
  * Processing users click [Logout Login] in the upper left corner of the page
- * 处理用户点击页面左上角【退出登录】
 **/
 function handleLogOut() {
 /**
  * The accessor handles the logout method
- * 接入方处理 logout 方法
 **/
 }
 
 /**
  * Hosts create room callbacks
- * 主持人创建房间回调
 **/
 function onCreateRoom(info: { code: number; message: string }) {
   logger.debug('onEnterRoom:', info);
@@ -119,7 +116,6 @@ function onCreateRoom(info: { code: number; message: string }) {
 
 /**
  * Ordinary members enter the room callback
- * 普通成员进入房间回调
 **/
 function onEnterRoom(info: { code: number; message: string }) {
   logger.debug('onCreateRoom:', info);
@@ -127,7 +123,6 @@ function onEnterRoom(info: { code: number; message: string }) {
 
 /**
  * Hosts destroy room callbacks
- * 主持人销毁房间回调
 **/
 const onDestroyRoom = (info: { code: number; message: string }) => {
   logger.debug('onDestroyRoom:', info);
@@ -137,7 +132,6 @@ const onDestroyRoom = (info: { code: number; message: string }) => {
 
 /**
  * Ordinary members exit the room callback
- * 普通成员退出房间回调
 **/
 const onExitRoom = (info: { code: number; message: string }) => {
   logger.debug('onExitRoom:', info);
@@ -147,7 +141,6 @@ const onExitRoom = (info: { code: number; message: string }) => {
 
 /**
  * Ordinary members were kicked out of the room by the host
- * 普通成员被主持人踢出房间
 **/
 const onKickedOutOfRoom = (info: { roomId: string; reason: TUIKickedOutOfRoomReason, message: string }) => {
   logger.debug('onKickedOutOfRoom:', info);
@@ -157,7 +150,6 @@ const onKickedOutOfRoom = (info: { roomId: string; reason: TUIKickedOutOfRoomRea
 
 /**
  * Users are kicked offline
- * 被踢下线
  */
 const onKickedOffLine = (info: { message: string }) => {
   logger.debug('onKickedOffLine:', info);
@@ -167,7 +159,6 @@ const onKickedOffLine = (info: { message: string }) => {
 
 /**
  * Ordinary members were kicked out of the room by the host
- * userSig 过期，需要获取新的 userSig
  */
 const onUserSigExpired = () => {
   logger.debug('onUserSigExpired');

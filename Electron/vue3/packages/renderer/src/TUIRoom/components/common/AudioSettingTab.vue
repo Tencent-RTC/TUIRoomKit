@@ -5,11 +5,6 @@
   * Usage:
   * Use <video-tab></video-tab> in the template
   *
-  * 名称: VideoTab
-  * @param name String required
-  * @param size String 'large'|'medium'|'small'
-  * 使用方式：
-  * 在 template 中使用 <video-tab></video-tab>
 -->
 <template>
   <div :class="['audio-setting-tab', themeClass]">
@@ -108,7 +103,6 @@ const isTestingMicrophone = ref(false);
 /**
  * Click on the microphone [Test] button
  *
- * 点击麦克风【测试】按钮
 **/
 function handleMicrophoneTest() {
   isTestingMicrophone.value = !isTestingMicrophone.value;
@@ -121,7 +115,6 @@ const { t } = useI18n();
 /**
  * Click on the speaker [Test] button
  *
- * 点击扬声器【测试】按钮
 **/
 async function handleSpeakerTest() {
   const SPEAKER_TEST_URL = 'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';

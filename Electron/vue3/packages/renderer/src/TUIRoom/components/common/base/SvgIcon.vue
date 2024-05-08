@@ -1,12 +1,9 @@
 <!--
-  * 名称：SvgIcon
+  * Name：SvgIcon
   * @param name String required
   * @param size String | number
   * Usage:
   * Use <svg-icon><chat-icon></chat-icon></svg-icon> in template
-
-  * 使用方式：
-  * 在 template 中使用 <svg-icon><chat-icon></chat-icon></svg-icon>
 -->
 <template>
   <span class="svg-icon" :class="[customClass]" :style="customStyle" @click="handleClick">

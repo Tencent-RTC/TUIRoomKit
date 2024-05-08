@@ -125,7 +125,6 @@ const currentDialogInfo = computed(() => (currentDialogType.value === 'inviteDia
 /**
  * Send a request to be on the mike
  *
- * 发送上麦申请
 **/
 async function sendSeatApplication() {
   if (isAdmin.value) {
@@ -168,9 +167,7 @@ async function sendSeatApplication() {
 /**
  * Cancellation of on-mike application
  *
- * 处理点击【创建房间】
 **/
-// 取消上麦申请
 async function cancelSeatApplication() {
   TUIMessage({
     type: 'info',
@@ -188,7 +185,6 @@ async function cancelSeatApplication() {
 /**
  * User Down Mack
  *
- * 用户下麦
 **/
 function handleStepDownDialogVisible() {
   showDialog.value = !showDialog.value;
@@ -214,7 +210,6 @@ function hideApplyAttention() {
 /**
  * Handling host or administrator invitation to on-stage signalling
  *
- * 处理主持人或管理员邀请上台信令
 **/
 async function onRequestReceived(eventInfo: { request: TUIRequest }) {
   const { request: { userId, requestId, requestAction } } = eventInfo;
@@ -231,7 +226,6 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
 /**
    * The host canceled the invitation to the microphone
    *
-   * 主持人取消邀请上麦
   **/
 function onRequestCancelled(eventInfo: { requestId: string; userId: string }) {
   const { requestId } = eventInfo;
@@ -244,7 +238,6 @@ function onRequestCancelled(eventInfo: { requestId: string; userId: string }) {
 /**
  * User accepts/rejects the presenter's invitation
  *
- * 用户接受/拒绝主讲人的邀请
 **/
 async function handleInvite(agree: boolean) {
   try {
@@ -265,10 +258,8 @@ async function handleInvite(agree: boolean) {
 
 /**
  * Kicked off the seat by the host
- * 被主持人踢下麦
  */
 async function onKickedOffSeat() {
-  // 被主持人踢下麦
   TUIMessage({
     type: 'warning',
     message: t('You have been invited by the host to step down, please raise your hand if you need to speak'),
