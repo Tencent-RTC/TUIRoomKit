@@ -5,11 +5,6 @@
   * Usage:
   * Use <device-select></device-select> in template
   *
-  * 名称: DeviceSelect
-  * @param deviceType String required
-  * @param size String 'large'|'medium'|'small'
-  * 使用方式：
-  * 在 template 中使用 <device-select></device-select>
 -->
 <template>
   <tui-select

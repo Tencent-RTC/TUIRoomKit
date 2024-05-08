@@ -312,7 +312,6 @@ export default {
   'people applying to stage': 'people applying to stage',
   // @ts-ignore
   'and so on number people applying to stage': ({ named }) => `and so on ${named('number')} people applying to stage`,
-  // Room Chat 融合卡片翻译
   'quick meeting': 'quick meeting',
   Meeting: 'Meeting',
   'Meeting in progress': 'Meeting in progress',

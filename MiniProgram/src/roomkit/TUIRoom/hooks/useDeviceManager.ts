@@ -83,7 +83,6 @@ export default function (options?: { listenForDeviceChange: boolean }) {
   /**
    * Device changes: device switching, device plugging and unplugging events
    *
-   * 设备变化：设备切换、设备插拔事件
   **/
   async function onDeviceChanged(eventInfo: {deviceId: string, type: TUIMediaDeviceType, state: TUIMediaDeviceState}) {
     if (!deviceManager.instance) {

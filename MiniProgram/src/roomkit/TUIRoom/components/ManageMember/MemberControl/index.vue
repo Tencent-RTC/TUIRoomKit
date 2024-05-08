@@ -3,7 +3,6 @@
     <div class="member-title">
       <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
       <div class="member-title-content">{{ userInfo.userName || userInfo.userId }}</div>
-      <!-- TODO: 完善 @tap 的 .stop 修饰符 -->
       <span v-if="isWeChat" @tap.stop="handleCloseControl" class="tab-cancel">{{ t('Cancel') }}</span>
     </div>
     <div

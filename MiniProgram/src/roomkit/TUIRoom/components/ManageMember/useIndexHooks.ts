@@ -78,7 +78,6 @@ export default function useIndex() {
           ? t('After unlocking, users can freely turn on the microphone')
           : t('Members will not be able to open the microphone');
         stateForAllAudio =  !roomStore.isMicrophoneDisableForAllUser;
-        // 小程序更新视图
         await nextTick();
         dialogActionInfo.value = audioManageInfo.value;
         break;
@@ -89,7 +88,6 @@ export default function useIndex() {
           ? t('After unlocking, users can freely turn on the camera')
           : t('Members will not be able to open the camera');
         stateForAllVideo = !roomStore.isCameraDisableForAllUser;
-        // 小程序更新视图
         await nextTick();
         dialogActionInfo.value = videoManageInfo.value;
         break;

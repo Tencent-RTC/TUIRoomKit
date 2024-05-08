@@ -44,7 +44,6 @@ export default function useMemberControl(props?: any) {
   /**
    * Functions related to the Raise Your Hand function
    *
-   * 举手发言功能相关函数
   **/
   const {
     agreeUserOnStage,
@@ -156,7 +155,6 @@ export default function useMemberControl(props?: any) {
   /**
    * Invitation to the stage/uninvitation to the stage
    *
-   * 邀请上台/取消邀请上台
   **/
   async function toggleInviteUserOnStage(userInfo: UserInfo) {
     const { isInvitingUserToAnchor } = userInfo;
@@ -170,7 +168,6 @@ export default function useMemberControl(props?: any) {
   /**
    * Banning/Unbanning
    *
-   * 禁麦/邀请打开麦克风
   **/
   async function muteUserAudio(userInfo: UserInfo) {
     if (userInfo.hasAudioStream) {
@@ -221,7 +218,6 @@ export default function useMemberControl(props?: any) {
   /**
    * Banned painting/unbanned painting
    *
-   * 禁画/取消禁画
   **/
   async function muteUserVideo(userInfo: UserInfo) {
     if (userInfo.hasVideoStream) {
@@ -271,7 +267,6 @@ export default function useMemberControl(props?: any) {
   /**
    * Allow text chat / Cancel text chat
    *
-   * 允许文字聊天/取消文字聊天
   **/
   function disableUserChat(userInfo: UserInfo) {
     const currentState = userInfo.isChatMutedByMasterOrAdmin;
@@ -285,7 +280,6 @@ export default function useMemberControl(props?: any) {
   /**
    * Kick the user out of the room
    *
-   * 将用户踢出房间
   **/
   async function kickOffUser(userInfo: UserInfo) {
     await roomEngine.instance?.kickRemoteUserOutOfRoom({
@@ -293,9 +287,6 @@ export default function useMemberControl(props?: any) {
     });
   }
 
-  /**
-   * 转移房主给用户
-   */
   async function handleTransferOwner(userInfo: UserInfo) {
     const roomInfo = await roomEngine.instance?.fetchRoomInfo();
     if (roomInfo?.roomOwner === roomStore.localUser.userId) {
@@ -320,9 +311,6 @@ export default function useMemberControl(props?: any) {
     }
   }
 
-  /**
-   * 设置/撤销管理员权限
-   */
   async function handleSetOrRevokeAdmin(userInfo: UserInfo) {
     const newRole = userInfo.userRole === TUIRole.kGeneralUser ? TUIRole.kAdministrator : TUIRole.kGeneralUser;
     await roomEngine.instance?.changeUserRole({

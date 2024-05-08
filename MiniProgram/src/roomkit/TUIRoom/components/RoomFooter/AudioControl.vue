@@ -1,15 +1,10 @@
 <!--
-  * 名称: IconButton
+  * Name: IconButton
   * @param name String required
   * @param size String 'large'|'medium'|'small'
   * Usage:
   * Use <audio-control /> in the template
   *
-  * Name: IconButton
-  * @param name String required
-  * @param size String 'large'|'medium'|'small'
-  * 使用方式：
-  * 在 template 中使用 <audio-control />
 -->
 <template>
   <div>
@@ -107,7 +102,6 @@ async function toggleMuteAudio() {
   }
   if (localStream.value.hasAudioStream) {
     await roomEngine.instance?.muteLocalAudio();
-    // 如果是全员禁言状态下，用户主动关闭麦克风之后不能再自己打开
     if (roomStore.isMicrophoneDisableForAllUser) {
       roomStore.setCanControlSelfAudio(false);
     }
@@ -122,7 +116,6 @@ async function toggleMuteAudio() {
       });
       return;
     }
-    // 有麦克风列表且有权限
     await roomEngine.instance?.unmuteLocalAudio();
     if (!basicStore.isOpenMic) {
       roomEngine.instance?.openLocalMicrophone();
@@ -134,7 +127,6 @@ async function toggleMuteAudio() {
 /**
  * Handling host or administrator turn on/off microphone signalling
  *
- * 处理主持人或管理员打开/关闭麦克风信令
 **/
 const showRequestOpenMicDialog: Ref<boolean> = ref(false);
 const requestOpenMicRequestId: Ref<string> = ref('');
@@ -147,7 +139,6 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
     showRequestOpenMicDialog.value = true;
   }
 }
-// 接受主持人邀请，打开麦克风
 async function handleAccept() {
   roomStore.setCanControlSelfAudio(true);
   await roomEngine.instance?.responseRemoteRequest({
@@ -158,7 +149,6 @@ async function handleAccept() {
   showRequestOpenMicDialog.value = false;
 }
 
-// 保持静音
 async function handleReject() {
   await roomEngine.instance?.responseRemoteRequest({
     requestId: requestOpenMicRequestId.value,
@@ -168,7 +158,6 @@ async function handleReject() {
   showRequestOpenMicDialog.value = false;
 }
 
-// 请求被取消
 async function onRequestCancelled(eventInfo: { requestId: string }) {
   const { requestId } = eventInfo;
   if (requestOpenMicRequestId.value === requestId) {
