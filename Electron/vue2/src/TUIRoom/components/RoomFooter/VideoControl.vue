@@ -1,15 +1,10 @@
 <!--
-  * 名称: IconButton
+  * Name: IconButton
   * @param name String required
   * @param size String 'large'|'medium'|'small'
   * Usage:
   * Use <audio-control /> in the template
   *
-  * Name: IconButton
-  * @param name String required
-  * @param size String 'large'|'medium'|'small'
-  * 使用方式：
-  * 在 template 中使用 <audio-control />
 -->
 <template>
   <div>
@@ -104,7 +99,6 @@ async function toggleMuteVideo() {
 
   if (localStream.value.hasVideoStream) {
     await roomEngine.instance?.closeLocalCamera();
-    // 如果是全员禁画状态下，用户主动关闭摄像头之后不能再自己打开
     if (roomStore.isCameraDisableForAllUser) {
       roomStore.setCanControlSelfVideo(false);
     }
@@ -113,7 +107,6 @@ async function toggleMuteVideo() {
       type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
     });
     const hasCameraDevice = cameraList && cameraList.length > 0;
-    // 无摄像头列表
     if (!hasCameraDevice && !isWeChat) {
       TUIMessageBox({
         title: t('Note'),
@@ -122,7 +115,6 @@ async function toggleMuteVideo() {
       });
       return;
     }
-    // 有摄像头列表
     roomEngine.instance?.setLocalVideoView({
       view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
     });
@@ -143,7 +135,6 @@ async function toggleMuteVideo() {
 /**
  * Handling host or administrator turn on/off camera signalling
  *
- * 处理主持人或管理员打开/关闭摄像头信令
 **/
 const showRequestOpenCameraDialog: Ref<boolean> = ref(false);
 const requestOpenCameraRequestId: Ref<string> = ref('');
@@ -157,7 +148,6 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
   }
 }
 
-// 接受主持人邀请，打开摄像头
 async function handleAccept() {
   roomStore.setCanControlSelfVideo(true);
   roomEngine.instance?.setLocalVideoView({
@@ -171,7 +161,6 @@ async function handleAccept() {
   showRequestOpenCameraDialog.value = false;
 }
 
-// 保持静音
 async function handleReject() {
   await roomEngine.instance?.responseRemoteRequest({
     requestId: requestOpenCameraRequestId.value,
@@ -181,7 +170,6 @@ async function handleReject() {
   showRequestOpenCameraDialog.value = false;
 }
 
-// 请求被取消
 async function onRequestCancelled(eventInfo: { requestId: string }) {
   const { requestId } = eventInfo;
   if (requestOpenCameraRequestId.value === requestId) {

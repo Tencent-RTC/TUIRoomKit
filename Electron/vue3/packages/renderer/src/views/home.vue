@@ -68,7 +68,6 @@ async function checkRoomExistWhenCreateRoom(roomId: string) {
     await tim?.searchGroupByID(roomId);
     isRoomExist = true;
   } catch (error: any) {
-    // 房间不存在
   }
   return isRoomExist;
 }
@@ -76,7 +75,6 @@ async function checkRoomExistWhenCreateRoom(roomId: string) {
 /**
  * Generate room number when creating a room
  *
- * 创建房间时生成房间号
 **/
 async function generateRoomId(): Promise<string> {
   const roomId = String(Math.ceil(Math.random() * 1000000));
@@ -90,7 +88,6 @@ async function generateRoomId(): Promise<string> {
 /**
  * Processing Click [Create Room]
  *
- * 处理点击【创建房间】
 **/
 async function handleCreateRoom(mode: string) {
   setTUIRoomData('createRoom', mode);
@@ -106,7 +103,6 @@ async function handleCreateRoom(mode: string) {
 /**
  * Processing Click [Enter Room]
  *
- * 处理点击【进入房间】
 **/
 async function handleEnterRoom(roomId: string) {
   setTUIRoomData('enterRoom');
@@ -121,13 +117,11 @@ async function handleEnterRoom(roomId: string) {
 /**
  * Processing users click [Logout Login] in the upper left corner of the page
  *
- * 处理用户点击页面左上角【退出登录】
 **/
 async function handleLogOut() {
 /**
  * The accessor handles the logout method
  *
- * 接入方处理 logout 方法
 **/
 }
 
@@ -149,7 +143,6 @@ async function handleInit() {
   /**
    * TUIRoomCore.checkRoomExistence method can only be used after logging into TUIRoomCore.
    *
-   * 登录 TUIRoomCore, 只有登录 TUIRoomCore 之后，才可以使用 TUIRoomCore.checkRoomExistence 方法
   **/
   await TUIRoomEngine.login({ sdkAppId, userId: userId.value, userSig });
 }

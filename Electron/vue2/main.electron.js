@@ -1,7 +1,6 @@
 const { app, BrowserWindow, systemPreferences, crashReporter } = require('electron');
 const path = require('path');
 
-// 开启crash捕获
 crashReporter.start({
   productName: 'electron-tui-room-vue2',
   companyName: 'Tencent',
@@ -10,19 +9,16 @@ crashReporter.start({
   ignoreSystemCrashHandler: false,
 });
 
-// 开启crash捕获
 let crashFilePath = '';
 let crashDumpsDir = '';
 try {
-  // electron 低版本
   crashFilePath = path.join(app.getPath('temp'), `${app.getName()} Crashes`);
   console.log('————————crash path:', crashFilePath);
 
-  // electron 高版本
   crashDumpsDir = app.getPath('crashDumps');
   console.log('————————crashDumpsDir:', crashDumpsDir);
 } catch (e) {
-  console.error('获取奔溃文件路径失败', e);
+  console.error('Failed to get path to crashed file', e);
 }
 
 let win = null;
@@ -84,7 +80,6 @@ async function checkAndApplyDeviceAccessPrivilege() {
 
 async function createWindow() {
   await checkAndApplyDeviceAccessPrivilege();
-  // 创建浏览器窗口
   win = new BrowserWindow({
     width: 1366,
     height: 1024,
@@ -98,8 +93,6 @@ async function createWindow() {
     },
   });
 
-  // 在执行 npm run start 后，经常会窗口已经显示出来了，但代码还未构建好，
-  // 此时捕获到 did-fail-load 事件，在之后延迟重载
   win.webContents.on('did-fail-load', () => {
     console.log(`createWindow: did-fail-load, reload ${param.TRTC_ENV} soon...`);
     setTimeout(() => {

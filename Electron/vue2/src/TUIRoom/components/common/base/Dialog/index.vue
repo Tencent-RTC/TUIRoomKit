@@ -11,19 +11,6 @@
   * @param appendToRoomContainer Boolean [Whether to append into roomContainer element]
   * Usage:
   * Use <Dialog title="there is title" v-model="showDialog"></Dialog> in template
-  *
-  * 名称: Dialog
-  * @param title String required [dialog 的标题]
-  * @param modelValue Boolean [控制是否显示 dialog]
-  * @param modal Boolean [dialog 是否有遮罩层]
-  * @param width number | string [dialog 的宽度]
-  * @param beforeClose (done: DoneFn) => void; [dialog 关闭前的回调函数]
-  * @param closeOnClickModal Boolean [是否支持点击遮罩层关闭 dialog]
-  * @param showClose Boolean [是否展示关闭按钮]
-  * @param appendToBody Boolean [是否插入到 body 中]
-  * @param appendToRoomContainer Boolean [是否插入到 roomContainer 中]
-  * 使用方式：
-  * 在 template 中使用 <Dialog title="there is title" v-model="showDialog"></Dialog>
 -->
 <template>
   <div

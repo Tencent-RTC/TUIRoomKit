@@ -97,28 +97,22 @@ export default {
     }
   },
   methods: {
-    // 处理用户点击页面左上角【退出登录】
     handleLogOut() {
-      // 接入方处理 logout 方法
     },
 
-    // 主持人创建房间回调
     onCreateRoom(info) {
       logger.debug('onEnterRoom:', info);
     },
 
-    // 普通成员进入房间回调
     onEnterRoom(info) {
       logger.debug('onCreateRoom:', info);
     },
 
-    // 主持人销毁房间回调
     onDestroyRoom(info) {
       logger.debug('onDestroyRoom:', info);
       this.$router.replace({ path: '/home' });
     },
 
-    // 普通成员退出房间回调
     onExitRoom(info) {
       logger.debug('onExitRoom:', info);
       this.$router.replace({ path: '/home' });
@@ -126,7 +120,6 @@ export default {
 
     /**
      * Ordinary members were kicked out of the room by the host
-     * 普通成员被主持人踢出房间
      **/
     onKickedOutOfRoom(info) {
       logger.debug('onKickedOutOfRoom:', info);
@@ -136,7 +129,6 @@ export default {
 
     /**
      * Users are kicked offline
-     * 被踢下线
      */
     onKickedOffLine(info) {
       logger.debug('onKickedOffLine:', info);
@@ -146,7 +138,6 @@ export default {
 
     /**
      * Ordinary members were kicked out of the room by the host
-     * userSig 过期，需要获取新的 userSig
      */
     onUserSigExpired() {
       logger.debug('onUserSigExpired');

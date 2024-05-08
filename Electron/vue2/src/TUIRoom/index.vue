@@ -59,11 +59,8 @@ const emit = defineEmits([
   'on-enter-room',
   'on-exit-room',
   'on-destroy-room',
-  // 用户被踢出房间
   'on-kicked-out-of-room',
-  // 用户被踢下线
   'on-kicked-off-line',
-  // 用户 userSig 过期
   'on-userSig-expired',
 ]);
 
@@ -137,7 +134,6 @@ const tuiRoomClass = computed(() => (isMobile ? ['tui-room', `tui-theme-${roomSe
 /**
  * Handle page mouse hover display toolbar logic
  *
- * 处理页面鼠标悬浮显示工具栏逻辑
  **/
 const roomContentRef = ref<InstanceType<typeof RoomContent>>();
 const showRoomTool: Ref<boolean> = ref(true);
@@ -147,7 +143,6 @@ function handleHideRoomTool() {
 }
 
 watch(() => roomRef.value, (newValue, oldValue) => {
-  // PC 端处理 room 控制栏交互
   if (!isWeChat && !isMobile) {
     if (newValue) {
       addRoomContainerEvent(newValue);
@@ -182,7 +177,6 @@ const removeRoomContainerEvent = (container: Node) => {
   container.removeEventListener('mousemove', showToolThrottle);
   container.removeEventListener('mouseleave', hideTool);
 };
-// H5 及小程序端处理 room 控制栏交互
 function handleRoomContentTap() {
   showRoomTool.value = !showRoomTool.value;
   if (showRoomTool.value) {
@@ -229,11 +223,6 @@ async function enterRoom(options: { roomId: string; roomParam?: RoomParam }) {
     message: 'enter room success',
   });
 }
-
-// To do 临时注释，待放开
-// const onStatistics = (statistics: TRTCStatistics) => {
-//   basicStore.setStatistics(statistics);
-// };
 
 function resetStore() {
   roomService.resetStore();

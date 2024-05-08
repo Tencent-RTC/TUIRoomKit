@@ -18,7 +18,6 @@ export default function useStreamContainer() {
   /**
    * --- The following processing stream events ----
    *
-   * --- 以下处理流事件 ----
    **/
   const roomEngine = useGetRoomEngine();
   const basicStore = useBasicStore();
@@ -26,23 +25,19 @@ export default function useStreamContainer() {
   const { t } = useI18n();
   const { deviceManager } = useDeviceManager();
 
-  // 远端用户进入
   const onRemoteUserEnterRoom = (eventInfo: { userInfo: TUIUserInfo }) => {
     roomStore.addRemoteUser(eventInfo.userInfo);
   };
 
-  // 远端用户离开
   const onRemoteUserLeaveRoom = (eventInfo: { userInfo: TUIUserInfo }) => {
     roomStore.removeRemoteUser(eventInfo.userInfo.userId);
   };
 
-  // 麦位变化
   const onSeatListChanged = (eventInfo: { seatList: any[], seatedList: any[], leftList: any[] }) => {
     const { seatedList, leftList } = eventInfo;
     roomStore.updateOnSeatList(seatedList, leftList);
   };
 
-  // 用户音频状态发生改变
   const onUserAudioStateChanged = (eventInfo: {
     userId: string,
     hasAudio: boolean,
@@ -50,9 +45,7 @@ export default function useStreamContainer() {
   }) => {
     const { userId, hasAudio, reason } = eventInfo;
     roomStore.updateUserAudioState(userId, hasAudio);
-    // 处理状态变更
     if (userId === basicStore.userId && !hasAudio && reason === TUIChangeReason.kChangedByAdmin) {
-      // 主持人关闭麦克风
       TUIMessage({
         type: 'warning',
         message: t('Your microphone has been turned off'),
@@ -62,7 +55,6 @@ export default function useStreamContainer() {
        * When the host turns on a full ban, the microphone of a single person is turned on
        * and off separately, and the microphone status of the corresponding user is inoperable at this time
        *
-       * 主持人开启全员禁言时，单独打开再关闭单人的麦克风，此时对应用户的麦克风状态为无法操作
        **/
       roomStore.setCanControlSelfAudio(!roomStore.isMicrophoneDisableForAllUser);
     }
@@ -77,7 +69,6 @@ export default function useStreamContainer() {
       /**
        * Turn on the local camera
        *
-       * 开启本地摄像头
        **/
 
       if (isWeChat) {
@@ -109,7 +100,6 @@ export default function useStreamContainer() {
         /**
          * Set device id
          *
-         * 设置设备id
         **/
         if (!roomStore.currentCameraId) {
           const cameraList = await deviceManager.instance?.getDevicesList({
@@ -126,7 +116,6 @@ export default function useStreamContainer() {
         /**
          * Turn on the local camera
          *
-         * 开启本地摄像头
         **/
         await roomEngine.instance?.setLocalVideoView({
           view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,

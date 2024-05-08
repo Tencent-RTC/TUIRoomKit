@@ -3,9 +3,6 @@
   * Usage:
   * Use <info-control /> in template
   *
-  * 名称: infoControl
-  * 使用方式：
-  * 在 template 中使用 <info-control />
 -->
 <template>
   <div class="info-container">

@@ -217,7 +217,7 @@ export class RoomService {
   private onUserSigExpired() {
     this.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
       title: t('Note'),
-      message: t('userSig 已过期'),
+      message: t('userSig expired'),
       confirmButtonText: t('Sure'),
       callback: () => {
         this.emit(EventType.ROOM_USER_SIG_EXPIRED, {});
@@ -229,7 +229,7 @@ export class RoomService {
     const { message } = eventInfo;
     this.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
       title: t('Note'),
-      message: t('系统检测到您的账号被踢下线'),
+      message: t('The system has detected that your account has been kicked offline.'),
       confirmButtonText: t('Sure'),
       callback: async () => {
         this.emit(EventType.ROOM_KICKED_OFFLINE, { message });
@@ -260,7 +260,6 @@ export class RoomService {
      * If the host lifts the full ban on video, users does not actively turn up the user camera,
      * If the host open and does not actively turn up the user camera
      *
-     * 如果主持人解除全员禁画，不主动调起用户摄像头；如果主持人开启全员禁画，则主动关闭用户摄像头
      **/
     if (isDisableVideo && this.roomStore.localUser.userRole === TUIRole.kGeneralUser) {
       await roomEngine.instance?.closeLocalCamera();
@@ -310,7 +309,6 @@ export class RoomService {
      * If the moderator unmutes the entire staff, users does not actively bring up the user's microphone;
      * if the moderator turns on the full staff mute, users actively turns off the user's microphone
      *
-     * 如果主持人解除全员静音，不主动调起用户麦克风；如果主持人开启全员静音，则主动关闭用户麦克风
      **/
     if (isDisableAudio && this.roomStore.localUser.userRole === TUIRole.kGeneralUser) {
       await roomEngine.instance?.muteLocalAudio();
@@ -467,7 +465,6 @@ export class RoomService {
        * setRoomParam must come after setRoomInfo,because roomInfo contains information
        * about whether or not to turn on the no-mac ban.
        *
-       * setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
        **/
       this.roomStore.setRoomParam(roomParam);
       TUIRoomAegis.reportEvent({
@@ -484,7 +481,6 @@ export class RoomService {
   public async handleRoomKitOnMounted() {
     const storageCurrentTheme = localStorage.getItem('tuiRoom-currentTheme');
     storageCurrentTheme && this.basicStore.setDefaultTheme(storageCurrentTheme);
-    // 设置本地视频默认渲染模式
     const trtcCloud = roomEngine.instance?.getTRTCCloud();
     const mirrorType = isMobile
       ? TRTCVideoMirrorType.TRTCVideoMirrorType_Auto

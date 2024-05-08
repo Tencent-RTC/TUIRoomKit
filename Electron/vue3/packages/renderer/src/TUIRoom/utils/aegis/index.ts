@@ -14,9 +14,9 @@ script.onload = () => {
   aegis = new Aegis({
     id: aegisId,
     uin: '',
-    reportApiSpeed: true, // 接口测速
-    reportAssetSpeed: true, // 静态资源测速
-    spa: true, // spa 页面开启
+    reportApiSpeed: true,
+    reportAssetSpeed: true,
+    spa: true,
   });
   if (roomAegis.storedReportEventList) {
     roomAegis.storedReportEventList.forEach((data) => {

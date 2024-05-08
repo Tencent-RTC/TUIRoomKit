@@ -3,9 +3,6 @@
   * Usage:
   * Use <network-info /> in template
   *
-  * 名称: NetworkInfo
-  * 使用方式：
-  * 在 template 中使用 <network-info />
 -->
 <template>
   <div v-click-outside="handleClickOutSide" class="network-info-container">

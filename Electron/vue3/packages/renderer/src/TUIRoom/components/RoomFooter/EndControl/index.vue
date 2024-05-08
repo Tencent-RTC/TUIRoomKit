@@ -111,7 +111,6 @@ function handleEndLeaveClick() {
 /**
  * Active room dismissal
  *
- * 主动解散房间
  **/
 async function dismissRoom() {
   try {
@@ -128,7 +127,6 @@ async function dismissRoom() {
 /**
  * Leave the room voluntarily
  *
- * 主动离开房间
  **/
 async function leaveRoom() {
   // eslint-disable-line
@@ -166,7 +164,6 @@ async function transferAndLeave() {
 /**
  * notification of room dismissal from the host
  *
- * 收到主持人解散房间通知
  **/
 const onRoomDismissed = async (eventInfo: { roomId: string }) => {
   try {

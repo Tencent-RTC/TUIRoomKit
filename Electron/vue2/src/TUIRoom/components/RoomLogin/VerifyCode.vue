@@ -37,7 +37,6 @@ watch(() => verifyStates.verifyCode, (val) => {
   /**
    * Get the verification code
    *
-   * 获取到验证码
   **/
   emit('update-verify-code', verifyStates.verifyCode);
 });

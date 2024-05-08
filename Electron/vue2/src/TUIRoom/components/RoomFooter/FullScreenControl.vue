@@ -23,7 +23,6 @@ const { t } = useI18n();
 /**
  * Whether the current state is full screen, default is false
  *
- * 当前是否为全屏状态, 默认为 false
 **/
 const isFullScreen = ref(false);
 

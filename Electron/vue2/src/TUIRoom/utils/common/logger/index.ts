@@ -46,7 +46,6 @@ const logger = {
       );
       currentLogLevel = newLevel;
 
-      // 通知主进程
       if ((window as any).electron?.ipcRenderer) {
         (window as any).electron.ipcRenderer.send(
           EUserEventNames.ON_CHANGE_LOG_LEVEL,

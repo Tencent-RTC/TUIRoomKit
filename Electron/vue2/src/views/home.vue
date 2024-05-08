@@ -71,7 +71,6 @@ export default {
     this.userAvatar = this.basicInfo.userAvatar;
     this.userId = this.basicInfo.userId;
     const { sdkAppId, userId, userSig } = this.basicInfo;
-    // 登录 TUIRoomEngine
     await TUIRoomEngine.login({ sdkAppId, userId, userSig });
   },
   methods: {
@@ -91,11 +90,9 @@ export default {
         await tim?.searchGroupByID(roomId);
         isRoomExist = true;
       } catch (error) {
-        // 房间不存在
       }
       return isRoomExist;
     },
-    // 创建房间时生成房间号
     async generateRoomId() {
       const roomId = Math.ceil(Math.random() * 1000000);
       const isRoomExist = await this.checkRoomExistWhenCreateRoom(String(roomId));
@@ -104,13 +101,11 @@ export default {
       }
       return roomId;
     },
-    // 处理点击【创建房间】
     async handleCreateRoom(mode) {
       this.setTUIRoomData('createRoom', mode);
       const roomId = await this.generateRoomId();
       this.$router.push({ path: 'room', query: { roomId } });
     },
-    // 处理点击【进入房间】
     async handleEnterRoom(roomId) {
       this.setTUIRoomData('enterRoom');
       this.$router.push({
@@ -120,11 +115,8 @@ export default {
         },
       });
     },
-    // 处理用户点击页面左上角【退出登录】
     handleLogOut() {
-      // 接入方处理 logout 方法
     },
-    // 更新用户自己修改的userName
     handleUpdateUserName(userName) {
       try {
         const storageUserInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo'));
