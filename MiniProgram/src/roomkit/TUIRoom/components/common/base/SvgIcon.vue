@@ -1,12 +1,9 @@
 <!--
-  * 名称：SvgIcon
+  * Name：SvgIcon
   * @param name String required
   * @param size String | number
   * Usage:
   * Use <svg-icon><chat-icon></chat-icon></svg-icon> in template
-
-  * 使用方式：
-  * 在 template 中使用 <svg-icon><chat-icon></chat-icon></svg-icon>
 -->
 <template>
   <span class="svg-icon" :class="customClass" :style="customStyle" @click="handleClick">
@@ -43,7 +40,6 @@ const customStyle: Ref<{
   height?: string,
 }> = ref({});
 
-// 从 svg 文件里读取宽高参数
 uni.getFileSystemManager().readFile({
   filePath: props.icon,
   encoding: 'binary',
@@ -95,7 +91,6 @@ const themeColorMap: Record<string, any> = {
 
 watch([defaultTheme, currentColor, () => props.icon], ([theme, currentColor]) => {
   const { baseColor, activeColor } = themeColorMap[theme];
-  // 读取 svg 内容编码为 base64
   uni.getFileSystemManager().readFile({
     filePath: props.icon,
     encoding: 'binary',
@@ -103,7 +98,6 @@ watch([defaultTheme, currentColor, () => props.icon], ([theme, currentColor]) =>
       const baseStr = res.data
         .replace(/currentColor/g, currentColor || baseColor)
         .replace(/var\(--active-color-2\)/g, activeColor);
-      // 将 svg 数据进行 URL 编码
       customStyle.value.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(baseStr)}");`;
     },
   });

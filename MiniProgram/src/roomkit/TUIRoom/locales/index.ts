@@ -1,29 +1,3 @@
-/**
- * i18n 使用说明：
- *
- * <script>
- * import i18n, { useI18n } from '../locale';
- * const { t } = useI18n();
- *
- * // case 1: 翻译文本中没有变量
- * t('happy');
- * i18n.t('happy');
- * // case 2: 翻译文本中存在变量
- * t('kick sb. out of room', { someOneName: 'xiaoming' });
- * i18n.t('kick sb. out of room', { someOneName: 'xiaoming' });
- *
- * // 切换语言
- * switch (i18n.global.locale.value) {
- *  case 'en-US':
- *    i18n.global.locale.value = 'zh-CN';
- *    break;
- *  case 'zh-CN':
- *    i18n.global.locale.value = 'en-US';
- *    break;
- * }
- * </script>
- */
-
 import { getLanguage } from '../utils/common';
 import ZH from './zh-CN';
 import EN from './en-US';
@@ -58,7 +32,6 @@ class TUIKitI18n {
     return message[key];
   }
 
-  // 兼容 App.use 不报错
   public install() {
   }
 }

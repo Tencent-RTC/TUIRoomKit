@@ -183,7 +183,6 @@ onMounted(() => {
  * enlargeUserId The switch requires that both the small window
  * corresponding to the previously played stream and the stream that needs to be newly played be replayed.
  *
- * enlargeUserId 切换的时候需要让之前播放流对应的小窗口和需要新播放的流都重新播放
 **/
 onMounted(() => {
   watch(
@@ -194,7 +193,6 @@ onMounted(() => {
           /**
            * Replay local video streams only when they are open
            *
-           * 只有当本地视频流是打开状态的时候，才重新播放本地流
           **/
           if (props.stream.hasVideoStream) {
             await roomEngine.instance?.setLocalVideoView({
