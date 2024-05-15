@@ -6,7 +6,6 @@ import 'package:room_flutter_example/pages/common/profile/index.dart';
 import 'package:room_flutter_example/pages/conference_tuikit/index.dart';
 
 class RoutePages {
-  // 列表
   static List<GetPage> list = [
     GetPage(
       name: RouteNames.commonLogin,
