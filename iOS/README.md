@@ -1,6 +1,6 @@
 # Quick Run of TUIRoomKit Demo for iOS
 
-_[中文](README.zh.md) | English_
+_[简体中文](README.zh.md) | English_
 
 This document describes how to quickly run the TUIRoomKit demo project to make a high-quality audio/video call. For more information on the TUIRoomKit component connection process, see **[Integrating TUIRoomKit (iOS)](https://trtc.io/document/54842)**.
 
