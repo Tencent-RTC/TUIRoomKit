@@ -248,7 +248,6 @@ public class RoomStore {
         if (TextUtils.equals(userInfo.userId, TUILogin.getUserId())) {
             userModel.setSeatStatus(UserModel.SeatStatus.ON_SEAT);
         }
-        // 规避刚进房时 onSeatListChanged 的回调
         if (findUser(allUserList, userInfo.userId) == null) {
             return;
         }
