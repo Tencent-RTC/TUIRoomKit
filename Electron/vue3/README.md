@@ -1,73 +1,69 @@
-# TUIRoomKit Electron 示例工程快速跑通
+# Quick Run of TUIRoom Electron Demo
 
-本文档主要介绍如何快速跑通 TUIRoomKit Electron 示例工程，体验多人音视频互动，更详细的 TUIRoomKit Electron 组件接入流程，请点击腾讯云官网文档：[TUIRoomKit 组件 Electron 接入说明](https://cloud.tencent.com/document/product/647/84238)...
+English | [简体中文](README.zh.md)
+
+This document mainly introduces how to quickly run through the TUIRoomKit Electron sample project, experience multi-person audio and video interaction, more detailed TUIRoomKit Electron component access process, please click on the Tencent Cloud official website documentation!：[TUIRoomKit component Electron access instructions](https://cloud.tencent.com/document/product/647/84238)...
 
 
-## 目录结构
+## Directory structure
 
 ```
 .
-├── dist                      构建后，根据 packages 目录生成
+├── dist                      After the build, the packages directory is used to generate the
 |   ├── main
 |   ├── preload
 |   └── renderer
 |
 ├── scripts
-|   ├── build.mjs             项目开发脚本 npm run build
-|   └── watch.mjs             项目开发脚本 npm run dev
+|   ├── build.mjs             Project Development Scripts npm run build
+|   └── watch.mjs             Project development scripts npm run dev
 |
 ├── packages
-|   ├── main                  主进程源码
+|   ├── main                  Master process source code
 |   |   |── vite.config.ts
 |   |   └── index.ts
-|   ├── preload               预加载脚本源码
+|   ├── preload               Preloaded script source code
 |   |   ├── vite.config.ts
 |   |   ├── index.ts
 |   |   ├── loading.ts
 |   |   └── utils.ts
-|   └── renderer              渲染进程源码
+|   └── renderer              Rendering process source code
 |       ├── auto-imports.d.ts
 |       ├── components.d.ts
 |       ├── tsconfig.json
 |       ├── index.html
 |       ├── src
-│       |   ├── App.vue   // 示例工程主页面
-│       |   ├── TUIRoom   // TUIRoom UI 组件源文件
-│       |   ├── assets    // 公共资源
-│       |   ├── config    // TUIRoom 配置文件
+│       |   ├── App.vue   // Sample Project Main Page
+│       |   ├── TUIRoom   // TUIRoom UI component source files
+│       |   ├── assets    // Public resources
+│       |   ├── config    // TUIRoom Configuration File
 │       |   ├── env.d.ts
-│       |   ├── main.ts   // 示例工程入口文件
-│       |   ├── router    // 示例工程路由配置
-│       |   └── views     // 示例工程路由页面
+│       |   ├── main.ts   // Sample Project Entry File
+│       |   ├── router    // Sample Project Routing Configuration
+│       |   └── views     // Sample Project Routing Page
 |       └── vite.config.ts
 ```
-### 第一步：开通服务
+### Step 1. Create a TRTC application
+1. Enter the [Application Management](https://www.tencentcloud.com/account/login) interface of the Tencent Cloud Live Audio/Video Console, select Create Application, enter the application name,click **Create Application**.
+2. Find your application in the application list and Click **Application Info**.
+    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a12607f338b311ed8088525400463ef7.png" width="900">
+		
+3. Follow the steps below to get the application’s `SDKAppID` and key.
+    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a0eb96e038b311ed8088525400463ef7.png" width="900">
 
-在使用 TUIRoomKit 发起会议前，您需要开通 TUIRoomKit 专属的多人音视频互动服务，详细步骤如下：
+>! This component uses two basic PaaS services of Tencent Cloud: [TRTC](https://intl.cloud.tencent.com/document/product/647/35078) and [IM](https://intl.cloud.tencent.com/document/product/1047). When you activate TRTC, IM will be activated automatically. For information about the billing of IM, see [Pricing](https://intl.cloud.tencent.com/document/product/1047/34350).
 
-1. 登录  [腾讯云视立方 SDK 控制台](https://console.cloud.tencent.com/vcube/project/manage)，单击创建项目按钮后，选择多人音视频互动场景和集成方式，这里我们推荐“含 UI 快速集成”，即 TUIRoomKit。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/a7ff9c2e362530504c00afad3f60b443.png" width="900" />
-
-2. 在选定接入场景和集成方式以后，您需要开通多人音视频房间 SDK 使用的两项腾讯云基础的 PaaS 能力，即 [即时通信 IM](https://cloud.tencent.com/document/product/269/1498) 和 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788)，开通后，单击创建项目并下一步按钮。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/c0e9905f8db488e90bb03b168afb42ab.png" width="900" />
-
-3. 在项目创建完成以后，您需要为该项目匹配一个 IM 应用，因为多人音视频房间 SDK 依赖了 IM SDK 提供的基础能力，这里创建或者管理已有的 IM 应用均可，在关联成功后，就可以领取 7天的免费体验版，用于后续的开发调试工作，当然如果您之前已经体验过，也可以直接在该页面单击 [购买正式版本](https://buy.cloud.tencent.com/vcube)。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/77427e4ca940924cd0bb9aefecfd8a40.png" width="900" />
-
-4. 单击前往集成按钮，选择项目配置，查看详细的配置页面，找到 **SDKAppID 和密钥** 并记录下来，它们会在后续步骤用到，至此 **多人音视频房间 SDK 服务** 开通完成。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/d7495fa5c7e26ff861783916655cf9fd.png" width="900" />
-
-### 第二步：下载源码，配置工程
-1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
-2. 找到并打开 ` Electron/vue3/packages/renderer/src/config/basic-info-config.js` 文件。
-3. 配置 `basic-info-config.js` 文件中的相关参数：
+### Step 2: Download the source code and configure the project
+1. Clone or download the repository source code directly，**Welcome Star**，Thanks~~
+2. Find and open ` Electron/vue3/packages/renderer/src/config/basic-info-config.js` file。
+3. Configure `basic-info-config.js` Relevant parameters in the document：
 	<img src="https://qcloudimg.tencent-cloud.cn/raw/36fc2cb8a3cc8a90a02d1ab0d9e4ffb7.png" width="900">
-	- SDKAPPID：默认为 0，请设置为步骤一中记录下的 SDKAppID。
-	- SDKSECRETKEY：默认为 ''，请设置为步骤一中记录下的密钥信息。
+	- SDKAPPID：The default is 0. Please set it to the SDKAppID recorded in step one.
+	- SDKSECRETKEY：The default is ‘’, please set it to the key information recorded in step one.
 
-### 第三步：运行示例
+### Step 3: Run the example
 
-1. 安装依赖
+1. Installation of dependencies
 
    ```bash
    cd TUIRoomKit/Electron/vue3
@@ -75,56 +71,60 @@
    npm install
    ```
 
-    > **注意**
+    > **Note**
     >
-    > 如果依赖安装过程缓慢或者出现网络超时报错，如 “ERR_SOCKET_TIMEOUT” 或者 “Error: Socket timeout”，可设置就近的 npm 库镜像和 Electron 下载镜像，中国大陆地区，可在项目根目录下创建 .npmrc 文件，文件中增加如下镜像设置。
+    > If the dependency installation process is slow or there is a network timeout error, such as ‘ERR_SOCKET_TIMEOUT’ or ‘Error: Socket timeout’, you can set the nearest npm library mirror and the Electron download mirrors, in mainland China, you can create a .npmrc file in the root directory of your project, and add the following mirror settings to the file.
     > ```
     > registry=https://registry.npmmirror.com
     > ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/
     > ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/
     > ```
 
-2. 开发环境运行示例工程
+2. Development environment to run the sample project
 
    ```bash
    npm run dev
    ```
 
 
-3. 构建安装包、运行
-   - 构建符合当前机器 CPU 类型的安装包。适合 Windows 和 Mac 操作系统。
+3. Build the installer, run
+   - Builds an installer that matches the CPU type of the current machine. Suitable for Windows and Mac operating systems.
 
    ```bash
-   npm run build                 // 构建 mac 单架构包、windows 包 
-   npm run build:mac-universal   // 构建 mac 双架构包
+   npm run build                 // Build mac single-architecture packages, windows packages 
+   npm run build:mac-universal   // Building mac dual-architecture packages
    ```
-   > 注意：构建好的安装包位于 release 目录下。默认只能使用 Mac 电脑构建 Mac 安装包，使用 Windows 电脑构建 Windows 安装包。
+   > Note: The built installer is located in the release directory. By default, you can only build Mac installers using Mac computers, and Windows installers using Windows computers.
 
 
-### 第四步：示例体验
+### Step 4: Sample Experience
 
-开发环境运行示例工程后，可直接体验 TUIRoomKit 功能。
+After running the sample project in the development environment, you can experience TUIRoomKit features directly.
 
-注意：因 TUIRoomKit 按需引入 element-plus 组件，会导致开发环境路由页面第一次加载时反应较慢，等待 element-plus 按需加载完成即可正常使用。element-plus 按需加载不会影响打包之后的页面加载。
+Note: Because TUIRoomKit introduces element-plus component on-demand, it will lead to slower response when the development environment routing page is loaded for the first time, wait for element-plus to finish loading on-demand and then you can use it normally. element-plus on-demand will not affect the loading of the packaged page after it is loaded.
 
-Tips：TUIRoomKit 完整功能体验，至少需要两个 userId 不同的用户。需要您在两台设备上参考第二步配置 TUIRoomKit 示例工程并运行代码：
+Tips: To experience the full functionality of TUIRoomKit, at least two users with different userIds are required. You will need to configure the TUIRoomKit sample project and run the code on both devices as described in step two:
 
-**主持人（userId：anchor）**
-- 步骤1、在 home 页面，点击【创建房间】按钮；
-- 步骤2、进入 TUIRoom 房间；
+**Host（userId：anchor）**
+- Step 1: On the home page, click the [Create Room] button;
+- Step 2: Enter the TUIRoom room;
 
-| 步骤1 | 步骤2 |
+| Step 1 | Step 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/cbbbaca43e68dce6aa013010a4c1ec03.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/3e613a846143979cdc95518adc6c201c.png" width="320"/> |
+| <img src="https://qcloudimg.tencent-cloud.cn/raw/caf8a9f6d5322ef5b07420bef0ff9f42.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/c3982208a81f5b0f774c5bfadc6e7b99.png" width="320"/> |
 
-**普通成员（userId：audience）**
+**Member（userId：audience）**
 
-- 步骤1、在 home 页面，输入主持人创建的房间 Id，点击【加入房间】按钮；
-- 步骤2、加入房间；
+- Step 1: On the home page, enter the Room Id created by the host and click the [Join Room] button;
+- Step 2: Join the room;
 
-| 步骤1 | 步骤2 |
+| Step 1 | Step 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/499c87056c183d39a41efc95e9bc89ce.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/3e613a846143979cdc95518adc6c201c.png" width="320"/> |
-## 常见问题
+| <img src="https://qcloudimg.tencent-cloud.cn/raw/6e0db32e8497c00221018a80bd7ceaab.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/c3982208a81f5b0f774c5bfadc6e7b99.png" width="320"/> |
 
-- 欢迎加入 QQ 群：695855795，进行技术交流和反馈~
+## Other
+
+- Welcome to join our Telegram Group to communicate with our professional engineers! We are more than happy to hear from you~
+Click to join: [https://t.me/+EPk6TMZEZMM5OGY1](https://t.me/+EPk6TMZEZMM5OGY1)   
+Or scan the QR code   
+  <img src="https://qcloudimg.tencent-cloud.cn/raw/79cbfd13877704ff6e17f30de09002dd.jpg" width="300px">    
