@@ -2,7 +2,7 @@
 //  File.swift
 //  TUIRoomKit
 //
-//  Created by 唐佳宁 on 2024/4/15.
+//  Created by janejntang on 2024/4/15.
 //
 
 import Foundation
