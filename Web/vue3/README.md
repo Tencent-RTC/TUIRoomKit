@@ -1,10 +1,10 @@
-# TUIRoomKit Web 示例工程快速跑通
+# Quick Run of TUIRoom Web Demo
 
-_[English](README.EN.md) | 简体中文_
+English | [简体中文](README.zh.md)
 
-本文档主要介绍如何快速跑通 TUIRoomKit 示例工程，体验多人音视频互动，更详细的 TUIRoomKit 组件接入流程，请点击腾讯云官网文档：[TUIRoomKit 组件 Web 接入说明](https://cloud.tencent.com/document/product/647/81962)...
+This document describes how to quickly run the TUIRoom demo project to try out group audio/video interaction.
 
-## 目录结构
+## Directory structure
 
 ```
 .
@@ -12,44 +12,39 @@ _[English](README.EN.md) | 简体中文_
 ├── auto-imports.d.ts
 ├── components.d.ts
 ├── index.html
-├── src
-│   ├── App.vue   // 示例工程主页面
-│   ├── TUIRoom   // TUIRoom UI 组件源文件
-│   ├── assets    // 公共资源
-│   ├── config    // TUIRoom 配置文件
-│   ├── env.d.ts
-│   ├── main.ts   // 示例工程入口文件
-│   ├── router    // 示例工程路由配置
-│   └── views     // 示例工程路由页面
+├─ src
+│ ├─ App.vue // main page of the sample project
+│ ├── TUIRoom // TUIRoom UI component source files
+│ ├── assets // public resources
+│ ├── config // TUIRoom configuration file
+│ ├── env.d.ts
+│ ├── main.ts // Example project entry file
+│ ├── router // Example project routing configuration
+│ └── views // Example project routing page
 └── vite.config.ts
 ```
-### 第一步：开通服务
+### Step 1. Create a TRTC application
+1. Enter the [Application Management](https://www.tencentcloud.com/account/login) interface of the Tencent Cloud Live Audio/Video Console, select Create Application, enter the application name,click **Create Application**.
+2. Find your application in the application list and Click **Application Info**.
+    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a12607f338b311ed8088525400463ef7.png" width="900">
+		
+3. Follow the steps below to get the application’s `SDKAppID` and key.
+    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a0eb96e038b311ed8088525400463ef7.png" width="900">
 
-在使用 TUIRoomKit 发起会议前，您需要开通 TUIRoomKit 专属的多人音视频互动服务，详细步骤如下：
+>! This component uses two basic PaaS services of Tencent Cloud: [TRTC](https://intl.cloud.tencent.com/document/product/647/35078) and [IM](https://intl.cloud.tencent.com/document/product/1047). When you activate TRTC, IM will be activated automatically. For information about the billing of IM, see [Pricing](https://intl.cloud.tencent.com/document/product/1047/34350).
 
-1. 登录  [腾讯云视立方 SDK 控制台](https://console.cloud.tencent.com/vcube/project/manage)，单击创建项目按钮后，选择多人音视频互动场景和集成方式，这里我们推荐“含 UI 快速集成”，即 TUIRoomKit。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/a7ff9c2e362530504c00afad3f60b443.png" width="900" />
+### Step 2: Download the source code and configure the project
+1. Clone or download the source code in our repository (**You can start the repository to save it**).
+2. Find and open `Web/vue3/src/config/basic-info-config.js`.
+3. Configure parameters in `basic-info-config.js`:
 
-2. 在选定接入场景和集成方式以后，您需要开通多人音视频房间 SDK 使用的两项腾讯云基础的 PaaS 能力，即 [即时通信 IM](https://cloud.tencent.com/document/product/269/1498) 和 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788)，开通后，单击创建项目并下一步按钮。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/c0e9905f8db488e90bb03b168afb42ab.png" width="900" />
-
-3. 在项目创建完成以后，您需要为该项目匹配一个 IM 应用，因为多人音视频房间 SDK 依赖了 IM SDK 提供的基础能力，这里创建或者管理已有的 IM 应用均可，在关联成功后，就可以领取 7天的免费体验版，用于后续的开发调试工作，当然如果您之前已经体验过，也可以直接在该页面单击 [购买正式版本](https://buy.cloud.tencent.com/vcube)。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/77427e4ca940924cd0bb9aefecfd8a40.png" width="900" />
-
-4. 单击前往集成按钮，选择项目配置，查看详细的配置页面，找到 **SDKAppID 和密钥** 并记录下来，它们会在后续步骤用到，至此 **多人音视频房间 SDK 服务** 开通完成。
-<img src="https://qcloudimg.tencent-cloud.cn/image/document/d7495fa5c7e26ff861783916655cf9fd.png" width="900" />
-
-### 第二步：下载源码，配置工程
-1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
-2. 找到并打开 `Web/vue3/src/config/basic-info-config.js` 文件。
-3. 配置 `basic-info-config.js` 文件中的相关参数：
 	<img src="https://qcloudimg.tencent-cloud.cn/raw/36fc2cb8a3cc8a90a02d1ab0d9e4ffb7.png" width="900">
-	- SDKAPPID：默认为 0，请设置为步第一步中记录下的 SDKAppID。
-	- SDKSECRETKEY：默认为 ''，请设置为步第一步中记录下的密钥信息。
+	- SDKAPPID: 0 by default. Set it to the `SDKAppID` obtained in step 1.
+	- SDKSECRETKEY: '' by default. Set it to the key obtained in step 1.
 
-### 第三步：运行示例
+### Step 3: Run the example
 
-1. 安装依赖
+1. install dependencies
 
    ```bash
    cd TUIRoomKit/Web/vue3
@@ -57,60 +52,63 @@ _[English](README.EN.md) | 简体中文_
    npm install
    ```
 
-2. 开发环境运行示例工程
+2. Run the sample project in the development environment
 
    ```bash
    npm run dev
    ```
 
-3. 打包 dist 文件
+3. Generate a DIST file
 
    ```bash
    npm run build
    ```
-### 第四步：示例体验
+### Step 4. Try out the demo
 
-开发环境运行示例工程后，在浏览器中打开页面 http://localhost:3000/#/home 即可体验 TUIRoomKit 功能。
+Open `http://localhost:3000/#/home` in a browser to try out TUIRoom.
 
-注意：因 TUIRoomKit 按需引入 element-plus 组件，会导致开发环境路由页面第一次加载时反应较慢，等待 element-plus 按需加载完成即可正常使用。element-plus 按需加载不会影响打包之后的页面加载。
+Because Element Plus components are imported manually, it may take a relatively long time for the page to load in the development environment for the first time. This will not be an issue after building.
 
-**主持人（userId：anchor）**
+**Anchor (userId: anchor)**
 
-- 步骤1、在 home 页面，点击【创建房间】按钮；
-- 步骤2、进入 TUIRoomKit 房间；
+- 1. On the home page, click **New Room**.
+- 2. Enter a room.
 
-| 步骤1 | 步骤2 |
+| 1 | 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/cbbbaca43e68dce6aa013010a4c1ec03.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/3e613a846143979cdc95518adc6c201c.png" width="320"/> |
+| <img src="https://qcloudimg.tencent-cloud.cn/raw/caf8a9f6d5322ef5b07420bef0ff9f42.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/c3982208a81f5b0f774c5bfadc6e7b99.png" width="320"/> |
 
-**普通成员（userId：audience）**
+**Participant (userId: audience)**
 
-- 步骤1、在 home 页面，输入主持人创建的房间 Id，点击【加入房间】按钮；
-- 步骤2、加入房间；
+- 1. On the home page, enter the ID of the room created by the anchor and click **Join Room**.
+- 2. Enter the room.
 
-| 步骤1 | 步骤2 |
+| 1 | 2 |
 |---------|---------|
-| <img src="https://qcloudimg.tencent-cloud.cn/raw/499c87056c183d39a41efc95e9bc89ce.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/3e613a846143979cdc95518adc6c201c.png" width="320"/> |
+| <img src="https://qcloudimg.tencent-cloud.cn/raw/6e0db32e8497c00221018a80bd7ceaab.png" width="320"/> | <img src="https://qcloudimg.tencent-cloud.cn/raw/c3982208a81f5b0f774c5bfadc6e7b99.png" width="320"/> |
 
-### 第五步：生产环境部署
-- 步骤一：打包 dist 文件
+### Step 5: Production Environment Deployment
+- 1. Generate a DIST file
 
    ```bash
    npm run build
    ```
-- 步骤二： 部署 dist 文件到服务器上
+- 2. Deploy the dist file to the server
 
->! 生产环境要求使用 https 域名
+>! Production environments require the use of https domains
 
-<img src="https://qcloudimg.tencent-cloud.cn/raw/a9dc181dd2c9a60852a538de7c477c3e.png" width="100%"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/3af0ebbc654340a27ed4a2780f64e510.png" width="100%"/>
 
-## 常见问题
+## FAQs
 
-### Q：项目打包之后部署到测试/生产环境，无法正常使用麦克风和摄像头是什么原因呢？
+### I deployed the demo project in the testing/development environment. The mic and camera did not work. What should I do?
 
-A: 请检查部署的链接是否为 https 协议，出于对用户安全、隐私等问题的考虑，浏览器限制网页在 https 协议下才能正常使用 TRTC Web SDK（WebRTC）的全部功能。
+Make sure you used an HTTPS URL. For the sake of data security and privacy protection, your browser may restrict HTTP URLs. To access all features of the TRTC web SDK (WebRTC), please use an HTTPS URL.
 
 
-## 其他
+## Other
 
-- 欢迎加入 QQ 群：592465424，进行技术交流和反馈~
+- Welcome to join our Telegram Group to communicate with our professional engineers! We are more than happy to hear from you~
+Click to join: [https://t.me/+EPk6TMZEZMM5OGY1](https://t.me/+EPk6TMZEZMM5OGY1)   
+Or scan the QR code   
+  <img src="https://qcloudimg.tencent-cloud.cn/raw/79cbfd13877704ff6e17f30de09002dd.jpg" width="300px">
