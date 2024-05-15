@@ -62,7 +62,7 @@ extension AlertTransitionAnimator {
         else { return }
         guard let fromView = fromController.view, let toView = toController.view else { return }
         fromView.isUserInteractionEnabled = false
-        toView.isUserInteractionEnabled = false//禁止两个页面产生用户交互
+        toView.isUserInteractionEnabled = false
         let contentView = transitionContext.containerView
         UIView.animate(withDuration: duration, animations: { [weak self] in
             guard let self = self else { return }

@@ -8,9 +8,6 @@
 
 #import <ReplayKit/ReplayKit.h>
 
-/**
- 屏幕分享
- */
 @interface SampleHandler : RPBroadcastSampleHandler
 
 @end
