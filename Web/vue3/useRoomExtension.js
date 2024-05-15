@@ -34,7 +34,7 @@ function changeLine(inputFile, outputFile, matchStrings) {
   readInterface.on('line', (line) => {
     const needReplace = matchStrings.some(ms => line.includes(ms));
     if (needReplace) {
-      // 取消注释
+      // Uncomment
       line = line.replace(/\/\/\s*/, '');
       line = line.replace(/<!--\s*/, '').replace(/\s*-->/, '');
       line = line.replace(/import MessageRoom from '.\/message-room\/message-room-default.vue';/, `// import MessageRoom from './message-room/message-room-default.vue';`)
@@ -65,7 +65,7 @@ function changeLine(inputFile, outputFile, matchStrings) {
 function processDirectory(directoryPath, callback) {
   fs.readdir(directoryPath, (err, files) => {
     if (err) {
-      console.error(`无法读取文件夹：${err.message}`);
+      console.error(`Unable to read folder：${err.message}`);
       return;
     }
 
@@ -73,7 +73,7 @@ function processDirectory(directoryPath, callback) {
       const filePath = path.join(directoryPath, file);
       fs.stat(filePath, (err, stats) => {
         if (err) {
-          console.error(`无法获取文件信息：${err.message}`);
+          console.error(`Unable to get folder：${err.message}`);
           return;
         }
 
@@ -111,17 +111,17 @@ function copyDir(src, dest) {
   }
 }
 function findDirPath(dir, dirname, skipDirs = []) {
-  // 读取目录内容
+  // Read the contents of the catalogue
   const files = fs.readdirSync(dir);
 
   for (const file of files) {
     const fullPath = path.join(dir, file);
 
-    // 检查文件是目录还是文件
+    // Checking whether a file is a directory or a file
     const stat = fs.statSync(fullPath);
 
     if (stat.isDirectory()) {
-      // 跳过 skipDirs 数组中包含的文件夹
+      // Skip folders contained in the skipDirs array
       if (skipDirs.includes(file)) {
         continue;
       }
@@ -130,7 +130,7 @@ function findDirPath(dir, dirname, skipDirs = []) {
         console.log(`${dirname} folder found at:`, fullPath);
         return fullPath;
       } else {
-        // 否则，递归遍历子目录
+        // Otherwise, recursively traverse the subdirectories
         const result = findDirPath(fullPath, dirname, skipDirs);
         if (result) {
           return result;
@@ -139,7 +139,7 @@ function findDirPath(dir, dirname, skipDirs = []) {
     }
   }
 
-  // 如果在当前目录和子目录中未找到指定文件夹，返回 null
+  // Returns null if the specified folder is not found in the current directory or subdirectories.
   return null;
 }
 
