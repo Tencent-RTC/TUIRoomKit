@@ -1,6 +1,6 @@
 # Quick Run of TUIRoom Demo for Windows and macOS
 
-_English | [简体中文](README.md)_
+_English | [简体中文](README.zh.md)_
 
 This document describes how to quickly run the TUIRoom demo project to make a multi-person audio/video call. For more information on the TUIRoom component connection process, see:
 [Integrating TUIRoom (Windows and macOS)](https://trtc.io/document/53567)

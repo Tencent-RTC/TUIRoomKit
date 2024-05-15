@@ -1,6 +1,6 @@
 # TUIRoom Window-Mac 示例工程快速跑通
 
-_[English](README.en.md) | 简体中文_
+_[English](README.md) | 简体中文_
 
 本文档主要介绍如何快速跑通TUIRoom 示例工程，多人音视频通话，更详细的TUIRoom组件接入流程，请点击腾讯云官网文档:
 [TUIRoom组件Windows-Mac接入说明](https://cloud.tencent.com/document/product/647/63494)
