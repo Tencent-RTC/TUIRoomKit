@@ -41,13 +41,14 @@ export const EXPIRETIME = 604800;
 
 /**
  * Set user information on the push side
+ *
  */
 export const userInfo = {
-  // userId
+  // UserId
   userId: `user_${Math.ceil(Math.random() * 100000)}`,
-  // userName
+  // UserName
   userName: 'myName',
-  // userAvatar
+  // UserAvatar
   avatarUrl: '',
 };
 

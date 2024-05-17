@@ -1,8 +1,8 @@
 
 /**
- * 从 window.location.href 中获取指定key的value
- * @param {*} key 要获取的 key
- * @returns window.location.href 中指定key对应的value
+ * Get the value of the specified key from window.location.href
+ * @param {*} key key to get
+ * @returns Get the value of the specified key from window.location.href
  * @example
  * const value = getUrlParam(key);
  */
@@ -15,7 +15,7 @@ export function getUrlParam(key: string) {
 }
 
 /**
- * 获取语言
+ * Get language
  * @returns language
  */
 export function getLanguage() {

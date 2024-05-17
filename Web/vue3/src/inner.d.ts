@@ -1,5 +1,5 @@
 
-// 该声明文件用于声明仅内部使用的变量
+// This declaration file is used to declare variables that are used internally only
 
 interface Window {
   trtc: any;
