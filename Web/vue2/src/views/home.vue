@@ -45,7 +45,7 @@ export default {
       this.userInfo && sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(this.userInfo));
     }
     const { sdkAppId, userId, userSig } = this.userInfo;
-    // 登录 TUIRoomEngine
+    // Login TUIRoomEngine
     await TUIRoomEngine.login({ sdkAppId, userId, userSig });
   },
   methods: {
@@ -62,11 +62,11 @@ export default {
         await tim?.searchGroupByID(roomId);
         isRoomExist = true;
       } catch (error) {
-        // 房间不存在
+        // The room doesn't exist.
       }
       return isRoomExist;
     },
-    // 创建房间时生成房间号
+    // Generate room number when creating a room
     async generateRoomId() {
       const roomId = Math.ceil(Math.random() * 1000000);
       const isRoomExist = await this.checkRoomExistWhenCreateRoom(String(roomId));
@@ -75,13 +75,13 @@ export default {
       }
       return roomId;
     },
-    // 处理点击【创建房间】
+    // Processing click on [Create Room]
     async handleCreateRoom(roomOption) {
       this.setTUIRoomData('createRoom', roomOption);
       const roomId = await this.generateRoomId();
       this.$router.push({ path: 'room', query: { roomId } });
     },
-    // 处理点击【进入房间】
+    // Processing click on [enter room]
     async handleEnterRoom(roomOption) {
       const { roomId } = roomOption;
       this.setTUIRoomData('enterRoom', roomOption);
@@ -92,11 +92,11 @@ export default {
         },
       });
     },
-    // 处理用户点击页面左上角【退出登录】
+    // Processing user clicks [Logout] in the upper left corner of the page
     handleLogOut() {
-      // 接入方处理 logout 方法
+      // The accessor handles the logout method
     },
-    // 更新用户自己修改的userName
+    // Update userName modified by the user himself
     handleUpdateUserName(userName) {
       try {
         const storageUserInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo'));

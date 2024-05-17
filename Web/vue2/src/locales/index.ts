@@ -5,7 +5,7 @@ import { getLanguage } from '../utils/utils';
 import ZH from './zh-CN';
 import EN from './en-US';
 
-// 参考文档：https://vue-i18n.intlify.dev/guide/migration/vue2.html#vue-i18n-bridge
+// reference document：https://vue-i18n.intlify.dev/guide/migration/vue2.html#vue-i18n-bridge
 Vue.use(VueI18n, { bridge: true });
 
 export default createI18n({

@@ -1,6 +1,6 @@
 
 /**
- * 判断字符串是否是数字
+ * Determine if a string is a number
  * @returns boolean
  */
 export function checkNumber(roomId: string) {
@@ -9,9 +9,9 @@ export function checkNumber(roomId: string) {
 }
 
 /**
- * 从 window.location.href 中获取指定key的value
- * @param {*} key 要获取的 key
- * @returns window.location.href 中指定key对应的value
+ * Gets the value of the specified key from window.location.href.
+ * @param {*} key The key to get
+ * @returns The value corresponding to the key specified in window.location.href.
  * @example
  * const value = getUrlParam(key);
  */
@@ -24,7 +24,7 @@ export function getUrlParam(key: string) {
 }
 
 /**
- * 获取语言
+ * Get Language
  * @returns language
  */
 export function getLanguage() {
