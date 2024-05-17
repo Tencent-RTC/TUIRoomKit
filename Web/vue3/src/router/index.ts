@@ -21,7 +21,7 @@ const router = createRouter({
 });
 router.beforeEach((to, from, next) => {
   if (to.name === from.name && to.params === from.params) {
-    // 如果当前路由和上一个路由相同，则禁用返回
+    // Disable return if current route is the same as previous route
     next(false);
   } else {
     next();

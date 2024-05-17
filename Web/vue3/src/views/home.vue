@@ -41,15 +41,13 @@ async function checkRoomExistWhenCreateRoom(roomId: string) {
     await tim?.searchGroupByID(roomId);
     isRoomExist = true;
   } catch (error: any) {
-    // 房间不存在
+    // room does not exist
   }
   return isRoomExist;
 }
 
 /**
  * Generate room number when creating a room
- *
- * 创建房间时生成房间号
 **/
 async function generateRoomId(): Promise<string> {
   const roomId = String(Math.ceil(Math.random() * 1000000));
@@ -62,8 +60,6 @@ async function generateRoomId(): Promise<string> {
 
 /**
  * Processing Click [Create Room]
- *
- * 处理点击【创建房间】
 **/
 async function handleCreateRoom(roomOption: Record<string, any>) {
   setTUIRoomData('createRoom', roomOption);
@@ -78,8 +74,6 @@ async function handleCreateRoom(roomOption: Record<string, any>) {
 
 /**
  * Processing Click [Enter Room]
- *
- * 处理点击【进入房间】
 **/
 async function handleEnterRoom(roomOption: Record<string, any>) {
   setTUIRoomData('enterRoom', roomOption);
@@ -103,14 +97,10 @@ function handleUpdateUserName(userName: string) {
 
 /**
  * Processing users click [Logout Login] in the upper left corner of the page
- *
- * 处理用户点击页面左上角【退出登录】
 **/
 async function handleLogOut() {
 /**
  * The accessor handles the logout method
- *
- * 接入方处理 logout 方法
 **/
 }
 

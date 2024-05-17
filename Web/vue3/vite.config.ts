@@ -5,7 +5,7 @@ const path = require('path');
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // 静态资源基础路径 base: './' || '',
+  // Static Resource Base Path base: './' || '',
   base: process.env.NODE_ENV === 'production' ? './' : '/',
   resolve: {
     alias: {
@@ -17,7 +17,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // 自定义拆分策略
+        // Custom Split Strategy
         manualChunks: {
           roomEngine: ['@tencentcloud/tuiroom-engine-js'],
           roomkit: ['@tencentcloud/roomkit-web-vue3'],
@@ -27,7 +27,7 @@ export default defineConfig({
   },
   plugins: [
     vue({
-      // 说明：解决了引入生成userSig 文件的问题
+      // Explanation: Solved the problem of introducing the generation of userSig files.
       // reactivityTransform: true,
     }),
     visualizer({
@@ -36,7 +36,7 @@ export default defineConfig({
   ],
   server: {
     open: true,
-    // 解决 whistle 代理之后无限刷新页面问题
+    // Solve the problem of infinite page refresh after whistle proxy
     hmr: {
       protocol: 'ws',
       host: '127.0.0.1',

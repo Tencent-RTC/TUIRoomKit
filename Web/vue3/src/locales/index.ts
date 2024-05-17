@@ -1,9 +1,9 @@
-import { createI18n, useI18n } from 'vue-i18n';        // 引入vue-i18n组件
+import { createI18n, useI18n } from 'vue-i18n';
 import { getLanguage } from '../utils/utils';
 import ZH from './zh-CN';
 import EN from './en-US';
 
-// 注册i8n实例并引入语言文件
+// Register i8n instance and introduce language files
 const i18n = createI18n({
   legacy: false,
   locale: getLanguage() || 'zh-CN',
