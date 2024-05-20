@@ -43,6 +43,7 @@ import com.tencent.cloud.tuikit.roomkit.view.page.widget.BottomNavigationBar.Bot
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.ExitRoomDialog;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.InviteUserDialog;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.RoomInfoDialog;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.FloatChat.FloatChatView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.LocalAudioIndicator.LocalAudioToggleView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.MediaSettings.MediaSettingPanel;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel.RaiseHandApplicationListPanel;
@@ -64,10 +65,12 @@ public class ConferenceMainView extends RelativeLayout {
     private Context           mContext;
     private View              mFloatingWindow;
     private TUIVideoSeatView  mVideoSeatView;
+    private FloatChatView     mFloatChatView;
     private Button            mBtnStopScreenShare;
     private FrameLayout       mLayoutTopView;
     private FrameLayout       mLayoutVideoSeat;
     private FrameLayout       mLayoutLocalAudio;
+    private FrameLayout       mLayoutFloatChatView;
     private View              mLayoutScreenCaptureGroup;
     private FrameLayout       mLayoutBottomView;
     private BottomLayout      mBottomLayout;
@@ -220,6 +223,7 @@ public class ConferenceMainView extends RelativeLayout {
         mViewModel = new RoomMainViewModel(mContext, this);
         mVideoSeatView = new TUIVideoSeatView(mContext);
         mVideoSeatView.setViewClickListener(this::onClick);
+        mFloatChatView = new FloatChatView(mContext);
         initView();
     }
 
@@ -231,6 +235,13 @@ public class ConferenceMainView extends RelativeLayout {
 
         mLayoutTopView = findViewById(R.id.tuiroomit_top_view_container);
         mLayoutTopView.addView(new TopView(mContext));
+
+        mLayoutFloatChatView = findViewById(R.id.tuiroomkit_float_chat_view_container);
+        ViewParent floatChatViewParent = mFloatChatView.getParent();
+        if (floatChatViewParent != null && floatChatViewParent instanceof ViewGroup) {
+            ((ViewGroup) floatChatViewParent).removeView(mFloatChatView);
+        }
+        mLayoutFloatChatView.addView(mFloatChatView);
 
         mLayoutVideoSeat = findViewById(R.id.tuiroomkit_video_seat_container);
         ViewParent parent = mVideoSeatView.getParent();
@@ -417,6 +428,9 @@ public class ConferenceMainView extends RelativeLayout {
         mViewModel.destroy();
         if (mVideoSeatView != null) {
             mVideoSeatView.destroy();
+        }
+        if (mFloatChatView != null) {
+            mFloatChatView.destroy();
         }
     }
 

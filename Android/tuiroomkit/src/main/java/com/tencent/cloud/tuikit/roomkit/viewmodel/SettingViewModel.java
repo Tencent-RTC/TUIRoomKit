@@ -73,6 +73,10 @@ public class SettingViewModel
         RoomEngineManager.sharedInstance().enableAudioVolumeEvaluation(enable);
     }
 
+    public void enableFloatChat(boolean enable) {
+        RoomEngineManager.sharedInstance().enableFloatChat(enable);
+    }
+
     @Override
     public void onEngineEvent(RoomEventCenter.RoomEngineEvent event, Map<String, Object> params) {
         switch (event) {

@@ -1,12 +1,12 @@
 package com.tencent.cloud.tuikit.roomkit.view.page.widget.MediaSettings;
 
+
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.DISMISS_MEDIA_SETTING_PANEL;
 
 import android.content.Context;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,6 +23,9 @@ public class MediaSettingPanel extends BaseBottomDialog {
 
     private ConstraintLayout mClVideoResolution;
     private TextView         mTvVideoResolution;
+
+    private ConstraintLayout mClQualityCheck;
+    private SwitchCompat     mSwitchEnableFloatChat;
 
     private ConstraintLayout mClVideoFps;
     private TextView         mTvVideoFps;
@@ -82,6 +85,7 @@ public class MediaSettingPanel extends BaseBottomDialog {
         initAudioCaptureVolumeView();
         initAudioPlayVolumeView();
         initAudioVolumeEvaluationView();
+        initQualityInfoView();
 
         mViewModel.updateViewInitState();
     }
@@ -97,6 +101,26 @@ public class MediaSettingPanel extends BaseBottomDialog {
             }
         });
     }
+
+    private void initQualityInfoView() {
+        mClQualityCheck = findViewById(R.id.tuiroomkit_quality_check);
+        mSwitchEnableFloatChat = findViewById(R.id.tuiroomkit_enable_float_chat);
+        mClQualityCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                QualityInfoPanel qualityInfoPanel = new QualityInfoPanel(mContext);
+                qualityInfoPanel.show();
+            }
+        });
+        mSwitchEnableFloatChat.setChecked(RoomEngineManager.sharedInstance().getRoomStore().getEnableFloatChat());
+        mSwitchEnableFloatChat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mViewModel.enableFloatChat(isChecked);
+            }
+        });
+    }
+
 
     private void initVideoFpsView() {
         mClVideoFps = findViewById(R.id.tuiroomkit_settings_video_fps);

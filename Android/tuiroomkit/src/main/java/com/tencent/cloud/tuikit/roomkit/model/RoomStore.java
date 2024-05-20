@@ -45,6 +45,7 @@ public class RoomStore {
 
     private boolean isInFloatWindow      = false;
     private boolean isAutoShowRoomMainUi = true;
+    private boolean enableFloatChat      = true;
 
     public RoomStore() {
         Log.d(TAG, "new RoomStore instance : " + this);
@@ -529,5 +530,13 @@ public class RoomStore {
             }
         }
         return null;
+    }
+
+    public void setEnableFloatChat(boolean enable) {
+        enableFloatChat = enable;
+    }
+
+    public boolean getEnableFloatChat () {
+        return enableFloatChat;
     }
 }

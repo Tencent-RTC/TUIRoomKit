@@ -45,6 +45,15 @@
     <string name="tuiroomkit_mute_video_by_master">您已被关闭摄像头</string>
     <string name="tuiroomkit_un_mute_video_by_master">主持人解禁了你的摄像头</string>
     <string name="tuiroomkit_title_collection_volume">采集音量</string>
+    <string name="tuiroomkit_title_quality_check">质量检测</string>
+    <string name="tuiroomkit_title_network">网络</string>
+    <string name="tuiroomkit_title_network_delay">延迟</string>
+    <string name="tuiroomkit_title_packet_loss_rate">丢包率</string>
+    <string name="tuiroomkit_title_trtc_statistics_audio">音频</string>
+    <string name="tuiroomkit_title_trtc_statistics_video">视频</string>
+    <string name="tuiroomkit_title_bitrate">码率</string>
+    <string name="tuiroomkit_title_resolution">分辨率</string>
+    <string name="tuiroomkit_title_frame_rate">帧率</string>
     <string name="tuiroomkit_title_play_volume">播放音量</string>
     <string name="tuiroomkit_title_volume_reminder">音量提示</string>
     <string name="tuiroomkit_title_audio_recording">音频录制</string>
@@ -52,10 +61,8 @@
     <string name="tuiroomkit_toast_recording_file_path_copied">录音文件路径已复制: %s</string>
     <string name="tuiroomkit_title_video">视频设置</string>
     <string name="tuiroomkit_title_audio">音频设置</string>
+    <string name="tuiroomkit_title_other_setting">其他设置</string>
     <string name="tuiroomkit_title_sharing">共享屏幕</string>
-    <string name="tuiroomkit_title_bitrate">码率</string>
-    <string name="tuiroomkit_title_resolution">分辨率</string>
-    <string name="tuiroomkit_title_frame_rate">帧率</string>
     <string name="tuiroomkit_title_local_mirror">本地镜像</string>
     <string name="tuiroomkit_title_enable">开启</string>
     <string name="tuiroomkit_title_disable">关闭</string>
@@ -203,4 +210,15 @@
     <string name="tuiroomkit_video_resolution_sd">标清</string>
     <string name="tuiroomkit_video_resolution_hd">高清</string>
     <string name="tuiroomkit_video_resolution_uhd">超清</string>
+
+    <string name="tuiroomkit_toast_conference_id_not_exist">不存在该会议，请重新加入</string>
+    <string name="tuiroomkit_toast_conference_id_invalid">当前会议号无效，请检查输入</string>
+    <string name="tuiroomkit_toast_conference_id_occupied">已存在该会议，请使用其它会议号</string>
+    <string name="tuiroomkit_toast_conference_name_invalid">当前会议名称无效，请检查输入</string>
+
+    <string name="tuiroomkit_float_chat_entered_room">进入房间</string>
+    <string name="tuiroomkit_float_chat_warning_not_empty">输入不能为空</string>
+    <string name="tuiroomkit_float_chat_btn_send">发送</string>
+    <string name="tuiroomkit_float_chat_hint">聊聊吧~</string>
+    <string name="tuiroomkit_float_chat_enable">开启聊天弹幕</string>
 </resources>

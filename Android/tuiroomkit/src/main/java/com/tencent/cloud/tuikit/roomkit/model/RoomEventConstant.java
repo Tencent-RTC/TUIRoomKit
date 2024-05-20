@@ -28,4 +28,6 @@ public class RoomEventConstant {
 
     public static final String KEY_USER_POSITION      = "KEY_USER_POSITION";
     public static final String KEY_SEAT_USER_POSITION = "KEY_SEAT_USER_POSITION";
+    public static final String KEY_ON_STATISTICS = "KEY_ON_STATISTICS";
+    public static final String KEY_ENABLE_FLOAT_CHAT = "KEY_ENABLE_FLOAT_CHAT";
 }

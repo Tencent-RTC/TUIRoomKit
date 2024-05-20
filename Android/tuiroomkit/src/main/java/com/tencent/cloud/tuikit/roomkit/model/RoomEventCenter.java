@@ -65,6 +65,7 @@ public class RoomEventCenter {
         LOCAL_USER_GENERAL_TO_MANAGER,
         LOCAL_USER_MANAGER_TO_GENERAL,
         LOCAL_USER_TO_OWNER,
+        ON_STATISTICS,
     }
 
     public static class RoomKitUIEvent {
@@ -103,6 +104,7 @@ public class RoomEventCenter {
 
         public static final String BAR_SHOW_TIME_RECOUNT = "BAR_SHOW_TIME_RECOUNT";
         public static final String DISMISS_MAIN_ACTIVITY = "DISMISS_MAIN_ACTIVITY";
+        public static final String ENABLE_FLOAT_CHAT = "ENABLE_FLOAT_CHAT";
     }
 
     public interface RoomEngineEventResponder {
