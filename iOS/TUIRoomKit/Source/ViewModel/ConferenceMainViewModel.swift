@@ -392,6 +392,16 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
         layer.cornerRadius = 16
         return layer
     }
+    
+    func makeFloatChatButton() -> FloatChatButton {
+        let floatchatButton = FloatChatButton(roomId: store.roomInfo.roomId)
+        return floatchatButton
+    }
+    
+    func makeFloatChatDisplayView() -> FloatChatDisplayView {
+        let view = FloatChatDisplayView()
+        return view
+    }
 }
 
 extension ConferenceMainViewModel: RoomKitUIEventResponder {

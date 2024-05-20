@@ -24,6 +24,7 @@ class RoomStore: NSObject {
     var timeStampOnEnterRoom: Int = 0          // Timestamp of entering the meeting
     var isImAccess: Bool = false               // Whether TUIRoomKit is entered by IM
     var selfTakeSeatRequestId: String?         // Self ID for applying on stage
+    var shouldShowFloatChatView = true
     private let openCameraKey = "isOpenCamera"
     private let openMicrophoneKey = "isOpenMicrophone"
     private let shownRaiseHandNoticeKey = "isShownRaiseHandNotice"
@@ -160,6 +161,11 @@ class RoomStore: NSObject {
             inviteSeatList.append(requestEntity)
         }
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+    }
+    
+    func updateFloatChatShowState(shouldShow: Bool) {
+        shouldShowFloatChatView = shouldShow
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ShowFloatChatView, param: ["shouldShow": shouldShow])
     }
     
     deinit {

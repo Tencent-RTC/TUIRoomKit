@@ -16,6 +16,8 @@ protocol ConferenceMainViewFactory {
     func makeRaiseHandNoticeView() -> UIView
     func makeLocalAudioView() -> UIView
     func makeWaterMarkLayer() -> WaterMarkLayer
+    func makeFloatChatButton() -> FloatChatButton
+    func makeFloatChatDisplayView() -> FloatChatDisplayView
 }
 
 struct ConferenceMainViewLayout { //Layout changes when switching between horizontal and vertical screens
@@ -36,6 +38,7 @@ class ConferenceMainView: UIView {
         self.viewModel = viewModel
         self.viewFactory = viewFactory
         super.init(frame: .zero)
+        subscribeUIEvent()
     }
     private var currentLandscape: Bool = isLandscape
     private let firstDelayDisappearanceTime = 6.0
@@ -70,6 +73,14 @@ class ConferenceMainView: UIView {
         return viewFactory.makeWaterMarkLayer()
     }()
     
+    lazy var floatChatDisplayView: FloatChatDisplayView = {
+        return viewFactory.makeFloatChatDisplayView()
+    }()
+    
+    lazy var floatChatButton: FloatChatButton = {
+        return viewFactory.makeFloatChatButton()
+    }()
+    
     // MARK: - view layout
     private var isViewReady: Bool = false
     override func didMoveToWindow() {
@@ -98,6 +109,8 @@ class ConferenceMainView: UIView {
         addSubview(bottomView)
         addSubview(localAudioView)
         addSubview(raiseHandNoticeView)
+        addSubview(floatChatDisplayView)
+        addSubview(floatChatButton)
     }
     
     func activateConstraints() {
@@ -112,6 +125,18 @@ class ConferenceMainView: UIView {
             make.centerX.equalToSuperview()
             make.width.height.equalTo(40.scale375())
             make.bottom.equalToSuperview().offset(-40.scale375Height())
+        }
+        floatChatButton.snp.makeConstraints { make in
+            make.bottom.equalTo(bottomView.snp.top).offset(-5)
+            make.height.equalTo(40)
+            make.leading.equalToSuperview()
+            make.width.equalTo(100)
+        }
+        floatChatDisplayView.snp.makeConstraints { make in
+            make.bottom.equalTo(floatChatButton.snp.top).offset(-5)
+            make.height.equalTo(200)
+            make.leading.equalToSuperview()
+            make.width.equalTo(200)
         }
     }
     
@@ -165,8 +190,17 @@ class ConferenceMainView: UIView {
         waterMarkLayer.setNeedsDisplay()
     }
     
+    private func subscribeUIEvent() {
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowFloatChatView, responder: self)
+    }
+    
+    private func unsubscribeEvent() {
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowFloatChatView, responder: self)
+    }
+    
     deinit {
         NSObject.cancelPreviousPerformRequests(withTarget: self)
+        unsubscribeEvent()
         debugPrint("deinit \(self)")
     }
 }
@@ -215,5 +249,17 @@ extension ConferenceMainView: ConferenceMainViewResponder {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(hideToolBar), object: nil)
         guard !bottomView.isUnfold, isDelay else { return }
         perform(#selector(hideToolBar),with: nil,afterDelay: delayDisappearanceTime)
+    }
+}
+
+extension ConferenceMainView: RoomKitUIEventResponder {
+    func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
+        switch key {
+        case .TUIRoomKitService_ShowFloatChatView:
+            guard let shouldShow = info?["shouldShow"] as? Bool else { return }
+            floatChatButton.isHidden = !shouldShow
+            floatChatDisplayView.isHidden = !shouldShow
+        default: break
+        }
     }
 }

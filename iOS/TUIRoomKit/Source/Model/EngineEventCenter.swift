@@ -64,6 +64,7 @@ class EngineEventCenter: NSObject {
         case onAllUserCameraDisableChanged
         case onAllUserMicrophoneDisableChanged
         case onKickedOffSeat
+        case onStatistics
     }
     
     enum RoomUIEvent: String {
@@ -87,6 +88,7 @@ class EngineEventCenter: NSObject {
         case TUIRoomKitService_ShowExitRoomView
         case TUIRoomKitService_RenewVideoSeatView
         case TUIRoomKitService_DismissConferenceViewController
+        case TUIRoomKitService_ShowFloatChatView
     }
     
     func subscribeUIEvent(key: RoomUIEvent, responder: RoomKitUIEventResponder) {
