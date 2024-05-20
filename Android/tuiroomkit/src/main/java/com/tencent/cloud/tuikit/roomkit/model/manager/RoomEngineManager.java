@@ -16,6 +16,7 @@ import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineE
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_DESTROY_ROOM;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_ENTER_ROOM;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_EXIT_ROOM;
+import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.ENABLE_FLOAT_CHAT;
 import static com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant.KEY_ROOM_ID;
 
 import android.content.Context;
@@ -33,6 +34,7 @@ import com.tencent.cloud.tuikit.roomkit.ConferenceObserver;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.imaccess.utils.BusinessSceneUtil;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.cloud.tuikit.roomkit.model.entity.TakeSeatRequestEntity;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserEntity;
@@ -352,6 +354,13 @@ public class RoomEngineManager {
         mRoomStore.audioModel.setEnableVolumeEvaluation(enable);
     }
 
+    public void enableFloatChat(boolean enable) {
+        Map<String, Object> params = new HashMap<>();
+        mRoomStore.setEnableFloatChat(enable);
+        params.put(RoomEventConstant.KEY_ENABLE_FLOAT_CHAT, enable);
+        RoomEventCenter.getInstance().notifyUIEvent(ENABLE_FLOAT_CHAT, params);
+    }
+
     public void setAudioRoute(boolean isSoundOnSpeaker) {
         mRoomEngine.getDeviceManager().setAudioRoute(
                 isSoundOnSpeaker ? TXDeviceManager.TXAudioRoute.TXAudioRouteSpeakerphone :
@@ -403,7 +412,7 @@ public class RoomEngineManager {
         mRoomEngine.addObserver(mObserver);
         mRoomFloatWindowManager = new RoomWindowManager(mContext);
 
-        mTRTCCloud = TRTCCloud.sharedInstance(mContext);
+        mTRTCCloud = TUIRoomEngine.sharedInstance().getTRTCCloud();
         mTRTCObserver = new TRTCObserver();
         mTRTCCloud.addListener(mTRTCObserver);
     }

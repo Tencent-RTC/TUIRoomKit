@@ -45,6 +45,15 @@
     <string name="tuiroomkit_mute_video_by_master">قام مالك الغرفة بإيقاف تشغيل كاميراك.</string>
     <string name="tuiroomkit_un_mute_video_by_master">قام مالك الغرفة بتشغيل كاميراك.</string>
     <string name="tuiroomkit_title_collection_volume">مستوى جمع الصوت</string>
+    <string name="tuiroomkit_title_quality_check">اختبار الجودة</string>
+    <string name="tuiroomkit_title_network">شبكة</string>
+    <string name="tuiroomkit_title_network_delay">تأخير الشبكة</string>
+    <string name="tuiroomkit_title_packet_loss_rate">معدل فقدان الحزم</string>
+    <string name="tuiroomkit_title_trtc_statistics_audio">الصوت</string>
+    <string name="tuiroomkit_title_trtc_statistics_video">فيديو</string>
+    <string name="tuiroomkit_title_bitrate">معدل البت</string>
+    <string name="tuiroomkit_title_resolution">الدقة</string>
+    <string name="tuiroomkit_title_frame_rate">معدل الإطارات</string>
     <string name="tuiroomkit_title_play_volume">مستوى تشغيل الصوت</string>
     <string name="tuiroomkit_title_volume_reminder">تذكير بالصوت</string>
     <string name="tuiroomkit_title_audio_recording">تسجيل الصوت</string>
@@ -52,10 +61,8 @@
     <string name="tuiroomkit_toast_recording_file_path_copied">مسار حفظ ملف التسجيل: %s</string>
     <string name="tuiroomkit_title_video">الفيديو</string>
     <string name="tuiroomkit_title_audio">الصوت</string>
+    <string name="tuiroomkit_title_other_setting">إعدادات أخرى</string>
     <string name="tuiroomkit_title_sharing">المشاركة</string>
-    <string name="tuiroomkit_title_bitrate">معدل البت</string>
-    <string name="tuiroomkit_title_resolution">الدقة</string>
-    <string name="tuiroomkit_title_frame_rate">معدل الإطارات</string>
     <string name="tuiroomkit_title_local_mirror">المرآة المحلية</string>
     <string name="tuiroomkit_title_enable">تفعيل</string>
     <string name="tuiroomkit_title_disable">تعطيل</string>
@@ -203,4 +210,15 @@
     <string name="tuiroomkit_video_resolution_sd">الوضوح القياسي</string>
     <string name="tuiroomkit_video_resolution_hd">الوضوح العالي</string>
     <string name="tuiroomkit_video_resolution_uhd">الوضوح الفائق</string>
+
+    <string name="tuiroomkit_toast_conference_id_not_exist">هذا المؤتمر غير موجود، يرجى الانضمام مرة أخرى</string>
+    <string name="tuiroomkit_toast_conference_id_invalid">رقم المؤتمر الحالي غير صالح، يرجى التحقق من إدخالاتك</string>
+    <string name="tuiroomkit_toast_conference_id_occupied">المؤتمر موجود بالفعل، يرجى استخدام رقم مؤتمر آخر</string>
+    <string name="tuiroomkit_toast_conference_name_invalid">اسم المؤتمر الحالي غير صالح، يرجى التحقق من مدخلاتك</string>
+
+    <string name="tuiroomkit_float_chat_entered_room">دخول الغرفة</string>
+    <string name="tuiroomkit_float_chat_warning_not_empty">لا يمكن أن يكون الإدخال فارغًا</string>
+    <string name="tuiroomkit_float_chat_hint">دعونا نتحدث</string>
+    <string name="tuiroomkit_float_chat_btn_send">يرسل</string>
+    <string name="tuiroomkit_float_chat_enable">الدردشة العائمة</string>
 </resources>

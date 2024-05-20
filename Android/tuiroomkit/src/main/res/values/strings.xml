@@ -45,6 +45,15 @@
     <string name="tuiroomkit_mute_video_by_master">The room owner disabled your video.</string>
     <string name="tuiroomkit_un_mute_video_by_master">The room owner enabled your video.</string>
     <string name="tuiroomkit_title_collection_volume">Collection Volume</string>
+    <string name="tuiroomkit_title_quality_check">QualityCheck</string>
+    <string name="tuiroomkit_title_network">Network</string>
+    <string name="tuiroomkit_title_network_delay">NetworkDelay</string>
+    <string name="tuiroomkit_title_packet_loss_rate">PacketLossRate</string>
+    <string name="tuiroomkit_title_trtc_statistics_audio">Audio</string>
+    <string name="tuiroomkit_title_trtc_statistics_video">Video</string>
+    <string name="tuiroomkit_title_bitrate">Bitrate</string>
+    <string name="tuiroomkit_title_resolution">Resolution</string>
+    <string name="tuiroomkit_title_frame_rate">Frame Rate</string>
     <string name="tuiroomkit_title_play_volume">Playback Volume</string>
     <string name="tuiroomkit_title_volume_reminder">Volume Reminder</string>
     <string name="tuiroomkit_title_audio_recording">Audio Recording</string>
@@ -52,10 +61,8 @@
     <string name="tuiroomkit_toast_recording_file_path_copied">Recording file save path: %s</string>
     <string name="tuiroomkit_title_video">Video</string>
     <string name="tuiroomkit_title_audio">Audio</string>
+    <string name="tuiroomkit_title_other_setting">Other Setting</string>
     <string name="tuiroomkit_title_sharing">Share</string>
-    <string name="tuiroomkit_title_bitrate">Bitrate</string>
-    <string name="tuiroomkit_title_resolution">Resolution</string>
-    <string name="tuiroomkit_title_frame_rate">Frame Rate</string>
     <string name="tuiroomkit_title_local_mirror">Local Mirror</string>
     <string name="tuiroomkit_title_enable">Enable</string>
     <string name="tuiroomkit_title_disable">Disable</string>
@@ -203,4 +210,16 @@
     <string name="tuiroomkit_video_resolution_sd">Standard Definition</string>
     <string name="tuiroomkit_video_resolution_hd">High Definition</string>
     <string name="tuiroomkit_video_resolution_uhd">Ultra High Definition</string>
+
+    <string name="tuiroomkit_toast_conference_id_not_exist">This conference does not exist, please join again</string>
+    <string name="tuiroomkit_toast_conference_id_invalid">The current conference number is invalid, please check your input</string>
+    <string name="tuiroomkit_toast_conference_id_occupied">The conference already exists, please use another conference number</string>
+    <string name="tuiroomkit_toast_conference_name_invalid">The current conference name is invalid, please check your input</string>
+
+    <string name="tuiroomkit_float_chat_entered_room">Entered room</string>
+    <string name="tuiroomkit_float_chat_warning_not_empty">"input can't be empty!"</string>
+    <string name="tuiroomkit_float_chat_hint">Let\'s chat</string>
+    <string name="tuiroomkit_float_chat_btn_send">Send</string>
+    <string name="tuiroomkit_float_chat_enable">Floating Chat</string>
+
 </resources>

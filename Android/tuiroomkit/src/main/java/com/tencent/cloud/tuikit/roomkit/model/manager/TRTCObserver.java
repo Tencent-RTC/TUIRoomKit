@@ -8,6 +8,7 @@ import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.RoomStore;
 import com.tencent.trtc.TRTCCloudListener;
+import com.tencent.trtc.TRTCStatistics;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,4 +49,12 @@ public class TRTCObserver extends TRTCCloudListener {
     public void onConnectionRecovery() {
         Log.d(TAG, "onConnectionRecovery");
     }
+
+    @Override
+    public void onStatistics(TRTCStatistics statistics) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(RoomEventConstant.KEY_ON_STATISTICS, statistics);
+        RoomEventCenter.getInstance().notifyEngineEvent(RoomEventCenter.RoomEngineEvent.ON_STATISTICS, map);
+    }
+
 }
