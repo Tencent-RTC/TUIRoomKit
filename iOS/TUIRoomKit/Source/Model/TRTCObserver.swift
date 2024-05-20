@@ -20,4 +20,8 @@ class TRTCObserver: NSObject, TRTCCloudDelegate {
         guard reason == 2 else { return }
         EngineEventCenter.shared.notifyEngineEvent(event: .onRoomDismissed, param: ["roomId": roomId])
     }
+    
+    func onStatistics(_ statistics: TRTCStatistics) {
+        EngineEventCenter.shared.notifyEngineEvent(event: .onStatistics, param: ["statistics": statistics])
+    }
 }

@@ -140,11 +140,19 @@
 "TUIRoom.share.off" = "Stop";
 "TUIRoom.video.settings" = "Video settings";
 "TUIRoom.audio.settings" = "Audio settings";
+"TUIRoom.other.settings" = "Other settings";
 "TUIRoom.setting" = "Settings";
 "TUIRoom.advancedSetting" = "Advanced Settings";
 "TUIRoom.frame.rate" = "Frame Rate";
 "TUIRoom.bitrate" = "Bitrate";
 "TUIRoom.local.mirror" = "Local Mirror";
+"TUIRoom.quality.inspection" = "Quality Inspection";
+"TUIRoom.show.floatChat" = "Open Floating Chat";
+"TUIRoom.network" = "Network";
+"TUIRoom.audio" = "Audio";
+"TUIRoom.video" = "Video";
+"TUIRoom.rtt" = "Latency";
+"TUIRoom.loss" = "Package Loss";
 "TUIRoom.version.too.low" = "Your system version is below 12.0. Please update.";
 
 "TUIRoom.quick.conference" = "Quick meeting";
@@ -213,3 +221,6 @@
 "TUIRoom.on.stage.number.reached.limit" = "The current number of people on stage has reached the limit";
 "TUIRoom.go.on.stage.timed.out" = "Failed to go on stage, invitation has timed out";
 "TUIRoom.kiecked.off.line" = "You are already logged in elsewhere";
+
+"TUIRoom.floatChat.send" = "Send";
+"TUIRoom.floatChat.saySomething" = "Say something";

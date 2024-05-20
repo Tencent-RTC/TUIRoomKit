@@ -138,11 +138,19 @@
 "TUIRoom.share.off" = "停止共享";
 "TUIRoom.video.settings" = "视频设置";
 "TUIRoom.audio.settings" = "音频设置";
+"TUIRoom.other.settings" = "其他设置";
 "TUIRoom.setting" = "设置";
 "TUIRoom.advancedSetting" = "高级设置";
 "TUIRoom.frame.rate" = "帧率";
 "TUIRoom.bitrate" = "码率";
 "TUIRoom.local.mirror" = "本地镜像";
+"TUIRoom.quality.inspection" = "质量检测";
+"TUIRoom.show.floatChat" = "开启聊天弹幕";
+"TUIRoom.network" = "网络";
+"TUIRoom.audio" = "音频";
+"TUIRoom.video" = "视频";
+"TUIRoom.rtt" = "延迟";
+"TUIRoom.loss" = "丢包率";
 "TUIRoom.version.too.low" = "系统版本低于12.0，请升级系统";
 
 "TUIRoom.quick.conference" = "快速会议";
@@ -210,3 +218,6 @@
 "TUIRoom.on.stage.number.reached.limit" = "当前上台人数已达上限";
 "TUIRoom.go.on.stage.timed.out" = "上台失败，邀请已超时";
 "TUIRoom.kiecked.off.line" = "您已在其它地方登录";
+
+"TUIRoom.floatChat.send" = "发送";
+"TUIRoom.floatChat.saySomething" = "说点什么";

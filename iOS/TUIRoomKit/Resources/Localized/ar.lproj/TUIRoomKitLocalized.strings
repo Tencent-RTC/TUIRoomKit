@@ -118,11 +118,19 @@
 "TUIRoom.share" = "شاشة المشاركة";
 "TUIRoom.video.settings" = "اعدادات الفيديو";
 "TUIRoom.audio.settings" = "إعدادات الصوت";
+"TUIRoom.other.settings" = "اعدادات اخرى";
 "TUIRoom.setting" = "يثبت";
 "TUIRoom.advancedSetting" = "إعدادات متقدمة";
 "TUIRoom.frame.rate" = "معدل الإطار";
 "TUIRoom.bitrate" = "معدل الكود";
 "TUIRoom.local.mirror" = "مرآة محلية";
+"TUIRoom.quality.inspection" = "فحص الجودة";
+"TUIRoom.show.floatChat" = "افتح الدردشة العائمة";
+"TUIRoom.network" = "شبكة";
+"TUIRoom.audio" = "صوتي";
+"TUIRoom.video" = "فيديو";
+"TUIRoom.rtt" = "تأخير الشبكة";
+"TUIRoom.loss" = "فقدان الحزمة";
 "TUIRoom.version.too.low" = "إصدار النظام أقل من 12.0، يرجى ترقية النظام";
 
 "TUIRoom.quick.conference" = "اجتماع سريع";
@@ -207,3 +215,6 @@
 "TUIRoom.on.stage.number.reached.limit" = "لقد وصل العدد الحالي للأشخاص على المسرح إلى الحد الأعلى";
 "TUIRoom.go.on.stage.timed.out" = "فشل الصعود على خشبة المسرح، انتهت مهلة الدعوة";
 "TUIRoom.kiecked.off.line" = "لقد قمت بالفعل بتسجيل الدخول في مكان آخر";
+
+"TUIRoom.floatChat.send" = "يرسل";
+"TUIRoom.floatChat.saySomething" = "قل شيئا";

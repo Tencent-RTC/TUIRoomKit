@@ -17,6 +17,7 @@ import TXLiteAVSDK_Professional
 protocol MediaSettingViewEventResponder: AnyObject {
     func showResolutionAlert()
     func showFrameRateAlert()
+    func showQualityView()
     func updateStackView(item: ListCellItemData)
     func makeToast(text: String)
 }
@@ -24,9 +25,13 @@ protocol MediaSettingViewEventResponder: AnyObject {
 class MediaSettingViewModel {
     private(set) var videoItems: [ListCellItemData] = []
     private(set) var audioItems: [ListCellItemData] = []
+    private(set) var otherItems: [ListCellItemData] = []
     weak var viewResponder: MediaSettingViewEventResponder? = nil
     var engineManager: EngineManager {
         EngineManager.createInstance()
+    }
+    var store: RoomStore {
+        engineManager.store
     }
     var videoSetting: VideoModel {
         engineManager.store.videoSetting
@@ -37,12 +42,13 @@ class MediaSettingViewModel {
     let resolutionNameItems: [String] = [.smoothResolutionText, .standardResolutionText, .highResolutionText, .superResolutionText]
     private let resolutionItems: [TUIVideoQuality] = [.quality360P, .quality540P, .quality720P, .quality1080P]
     private let bitrateArray = [550, 850, 1_200, 2_000]
-    let topItems: [String] = [.videoText, .audioText]
+    let topItems: [String] = [.videoText, .audioText, .otherText]
     let frameRateArray = ["15", "20"]
     
     init() {
         createVideoItem()
         createAudioItem()
+        createOtherItem()
     }
     
     private func createVideoItem() {
@@ -138,6 +144,45 @@ class MediaSettingViewModel {
         viewResponder?.showResolutionAlert()
     }
     
+    private func createOtherItem() {
+        let qualityItem = ListCellItemData()
+        qualityItem.titleText = .qualityInspectionText
+        qualityItem.hasOverAllAction = true
+        qualityItem.hasRightButton = true
+        let buttonData = ButtonItemData()
+        buttonData.orientation = .right
+        buttonData.normalIcon = "room_right_arrow1"
+        buttonData.resourceBundle = tuiRoomKitBundle()
+        buttonData.titleFont = UIFont.systemFont(ofSize: 16, weight: .regular)
+        buttonData.titleColor = UIColor(0xD1D9EC)
+        buttonData.size = CGSize(width: 80, height: 30)
+        buttonData.isEnabled = false
+        qualityItem.buttonData = buttonData
+        qualityItem.action = { [weak self] sender in
+            guard let self = self else { return }
+            self.showQualityAction()
+        }
+        otherItems.append(qualityItem)
+        
+        let floatChatItem = ListCellItemData()
+        floatChatItem.titleText = .floatChatText
+        floatChatItem.hasSwitch = true
+        floatChatItem.isSwitchOn = store.shouldShowFloatChatView
+        floatChatItem.action = { [weak self] sender in
+            guard let self = self, let view = sender as? UISwitch else { return }
+            self.floatChatShowAction(shouldShow: view.isOn)
+        }
+        otherItems.append(floatChatItem)
+    }
+    
+    private func showQualityAction() {
+        viewResponder?.showQualityView()
+    }
+    
+    private func floatChatShowAction(shouldShow: Bool) {
+        store.updateFloatChatShowState(shouldShow: shouldShow)
+    }
+    
     private func updateVideoBitrateEncoderParam() {
         guard let bitrate = getBitrate(videoQuality: videoSetting.videoQuality) else { return }
         videoSetting.videoBitrate = bitrate
@@ -225,6 +270,9 @@ private extension String {
     static var audioText: String {
         localized("TUIRoom.audio.settings")
     }
+    static var otherText: String {
+        localized("TUIRoom.other.settings")
+    }
     static var versionLowToastText: String {
         localized("TUIRoom.version.too.low")
     }
@@ -263,5 +311,11 @@ private extension String {
     }
     static var superResolutionText: String {
         localized("TUIRoom.super.resolution")
+    }
+    static var qualityInspectionText: String {
+        localized("TUIRoom.quality.inspection")
+    }
+    static var floatChatText: String {
+        localized("TUIRoom.show.floatChat")
     }
 }
