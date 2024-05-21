@@ -6,6 +6,7 @@ console.log(`[preload.js] __dirname: ${__dirname}`);
 console.log(`[preload.js] env.NODE_ENV: ${process.env.NODE_ENV}`);
 
 const { ipcRenderer } = require('electron');
+// Print the directory where the crash dump file from the master process is stored
 ipcRenderer.on('crash-file-path', (event, args) => {
   console.warn('crash-file-path:', args);
 });

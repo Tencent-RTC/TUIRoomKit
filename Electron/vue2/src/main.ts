@@ -2,6 +2,7 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import { createPinia, PiniaVuePlugin } from 'pinia';
+import i18n from './locales';
 import { ipcRenderer } from 'electron';
 if (window.isHasScreen === undefined) {
   window.isHasScreen = false;
@@ -17,6 +18,7 @@ Vue.use(PiniaVuePlugin);
 const pinia = createPinia();
 
 Vue.config.productionTip = false;
+Vue.use(i18n);
 
 new Vue({
   pinia,

@@ -61,6 +61,7 @@ let vueCliConfig = {
             param.TRTC_ENV === 'development' 
               ? './node_modules/trtc-electron-sdk/build/Release' 
               : (targetPlatform === 'win32' ? './resources' : '../Resources')
+            // For development environments
             // rewritePath: './node_modules/trtc-electron-sdk/build/Release'
  
           }

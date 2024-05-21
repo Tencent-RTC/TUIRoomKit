@@ -9,7 +9,6 @@ import LibGenerateTestUserSig from './lib-generate-test-usersig-es.min';
  * Enter Tencent Cloud TRTC [Console] (https://console.cloud.tencent.com/trtc ) to create an application,
  * and you will see the SDKAppId.
  * It is a unique identifier used by Tencent Cloud to identify users.
- *
  */
 
 export const SDKAPPID = 0;
@@ -27,7 +26,6 @@ export const SDKAPPID = 0;
  * please migrate the UserSig calculation code and key to your backend server to avoid
  * unauthorized traffic use caused by the leakage of encryption key.
  * Document: https://intl.cloud.tencent.com/document/product/647/35166#Server
- *
  */
 export const SDKSECRETKEY = '';
 
