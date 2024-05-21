@@ -1,58 +1,35 @@
 <template>
-  <div class="home-container">
-    <div class="header">
-      <div class="left-header">
-        <switch-theme class="header-item"></switch-theme>
-      </div>
-      <div class="right-header">
-        <language-icon class="header-item language"></language-icon>
-        <user-info
-          class="header-item user-info"
-          :user-id="userId"
-          :user-name="userName"
-          :avatar-url="userAvatar"
-          @log-out="handleLogOut"
-        ></user-info>
-      </div>
-    </div>
-    <room-control
-      ref="roomControlRef"
-      :given-room-id="givenRoomId"
-      :user-name="userName"
-      @create-room="handleCreateRoom"
-      @enter-room="handleEnterRoom"
-      @update-user-name="handleUpdateUserName"
-    ></room-control>
+  <div id="app">
+    <pre-conference-view
+      :user-info="userInfo"
+      :room-id="givenRoomId"
+      @on-create-room="handleCreateRoom"
+      @on-enter-room="handleEnterRoom"
+      @on-logout="handleLogOut"
+      @on-update-user-name="handleUpdateUserName"
+    ></pre-conference-view>
   </div>
 </template>
 
 <script>
-import UserInfo from '@/TUIRoom/components/RoomHeader/UserInfo';
-import LanguageIcon from '@/TUIRoom/components/common/Language.vue';
-import SwitchTheme from '@/TUIRoom/components/common/SwitchTheme.vue';
-import RoomControl from '@/TUIRoom/components/RoomHome/RoomControl';
+import { PreConferenceView, conference } from '@tencentcloud/roomkit-electron-vue2.7';
 import { getBasicInfo } from '@/config/basic-info-config';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
-import useGetRoomEngine from '@/TUIRoom/hooks/useRoomEngine';
-import { isMobile } from '../TUIRoom/utils/environment';
-import logger from '../TUIRoom/utils/common/logger';
+import { isMobile } from '@tencentcloud/roomkit-electron-vue2.7/es/utils/environment';
 
-const roomEngine = useGetRoomEngine();
 export default {
   name: 'Home',
   components: {
-    UserInfo,
-    LanguageIcon,
-    RoomControl,
-    SwitchTheme,
+    PreConferenceView,
   },
   data() {
     return {
       givenRoomId: '',
-      basicInfo: null,
-      userName: '',
-      userAvatar: '',
-      userId: '',
+      userInfo: {
+        userId: '',
+        userName: '',
+        userAvatar: '',
+      },
       isMobile,
     };
   },
@@ -62,37 +39,34 @@ export default {
     this.givenRoomId = this.$route.query.roomId || '';
 
     if (sessionStorage.getItem('tuiRoom-userInfo')) {
-      this.basicInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo'));
+      this.userInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo'));
     } else {
-      this.basicInfo = await getBasicInfo();
-      this.basicInfo && sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(this.basicInfo));
+      this.userInfo = await getBasicInfo();
+      this.userInfo && sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(this.userInfo));
     }
-    this.userName = this.basicInfo.userName;
-    this.userAvatar = this.basicInfo.userAvatar;
-    this.userId = this.basicInfo.userId;
-    const { sdkAppId, userId, userSig } = this.basicInfo;
+    const { sdkAppId, userId, userSig } = this.userInfo;
+    // Login TUIRoomEngine
     await TUIRoomEngine.login({ sdkAppId, userId, userSig });
   },
   methods: {
-    setTUIRoomData(action, mode) {
-      const roomParam = this.$refs.roomControlRef.getRoomParam();
-      const roomData = {
+    setTUIRoomData(action, roomOption) {
+      sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify({
         action,
-        roomMode: mode || 'FreeToSpeak',
-        roomParam,
-      };
-      sessionStorage.setItem('tuiRoom-roomInfo', JSON.stringify(roomData));
+        ...roomOption,
+      }));
     },
     async checkRoomExistWhenCreateRoom(roomId) {
       let isRoomExist = false;
-      const tim = roomEngine.instance?.getTIM();
+      const tim = conference.getRoomEngine()?.getTIM();
       try {
         await tim?.searchGroupByID(roomId);
         isRoomExist = true;
       } catch (error) {
+        // The room doesn't exist.
       }
       return isRoomExist;
     },
+    // Generate room number when creating a room
     async generateRoomId() {
       const roomId = Math.ceil(Math.random() * 1000000);
       const isRoomExist = await this.checkRoomExistWhenCreateRoom(String(roomId));
@@ -101,13 +75,16 @@ export default {
       }
       return roomId;
     },
-    async handleCreateRoom(mode) {
-      this.setTUIRoomData('createRoom', mode);
+    // Processing click on [Create Room]
+    async handleCreateRoom(roomOption) {
+      this.setTUIRoomData('createRoom', roomOption);
       const roomId = await this.generateRoomId();
       this.$router.push({ path: 'room', query: { roomId } });
     },
-    async handleEnterRoom(roomId) {
-      this.setTUIRoomData('enterRoom');
+    // Processing click on [enter room]
+    async handleEnterRoom(roomOption) {
+      const { roomId } = roomOption;
+      this.setTUIRoomData('enterRoom', roomOption);
       this.$router.push({
         path: 'room',
         query: {
@@ -115,64 +92,20 @@ export default {
         },
       });
     },
+    // Processing user clicks [Logout] in the upper left corner of the page
     handleLogOut() {
+      // The accessor handles the logout method
     },
+    // Update userName modified by the user himself
     handleUpdateUserName(userName) {
       try {
         const storageUserInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo'));
         storageUserInfo.userName = userName;
         sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(storageUserInfo));
       } catch (error) {
-        logger.log('sessionStorage error', error);
+        console.log('sessionStorage error', error);
       }
     },
   },
 };
 </script>
-
-<style>
-@import '../TUIRoom/assets/style/global.scss';
-@import '../TUIRoom/assets/style/black-theme.scss';
-@import '../TUIRoom/assets/style/white-theme.scss';
-
-</style>
-
-<style lang="scss" scoped>
-.tui-theme-black .home-container {
-  --background: var(--background-color-1);
-}
-.tui-theme-white .home-container {
-  --background: url(../TUIRoom/assets/imgs/background-white.png);
-}
-
-.home-container {
-  width: 100%;
-  height: 100%;
-  background: var(--background);
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: PingFang SC;
-  color: var(--font-color-1);
-  .header {
-    box-sizing: border-box;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    padding: 22px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    .left-header, .right-header {
-      display: flex;
-      align-items: center;
-      .header-item {
-        &:not(:first-child) {
-          margin-left: 16px;
-        }
-      }
-    }
-  }
-}
-</style>
