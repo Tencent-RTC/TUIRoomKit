@@ -1,6 +1,7 @@
 const { app, BrowserWindow, systemPreferences, crashReporter } = require('electron');
 const path = require('path');
 
+// Enable crash capture
 crashReporter.start({
   productName: 'electron-tui-room-vue2',
   companyName: 'Tencent',
@@ -9,12 +10,15 @@ crashReporter.start({
   ignoreSystemCrashHandler: false,
 });
 
+// Enable crash capture
 let crashFilePath = '';
 let crashDumpsDir = '';
 try {
+  // Low version of electron
   crashFilePath = path.join(app.getPath('temp'), `${app.getName()} Crashes`);
   console.log('————————crash path:', crashFilePath);
 
+  // High version of electron
   crashDumpsDir = app.getPath('crashDumps');
   console.log('————————crashDumpsDir:', crashDumpsDir);
 } catch (e) {
@@ -80,6 +84,7 @@ async function checkAndApplyDeviceAccessPrivilege() {
 
 async function createWindow() {
   await checkAndApplyDeviceAccessPrivilege();
+  // Creating a Browser Window
   win = new BrowserWindow({
     width: 1366,
     height: 1024,
@@ -93,6 +98,8 @@ async function createWindow() {
     },
   });
 
+  // After running npm run start, the window is often displayed, but the code is not yet built,
+  // The did-fail-load event is captured at this point, and the reload is delayed afterwards.
   win.webContents.on('did-fail-load', () => {
     console.log(`createWindow: did-fail-load, reload ${param.TRTC_ENV} soon...`);
     setTimeout(() => {

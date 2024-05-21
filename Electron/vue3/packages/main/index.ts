@@ -2,6 +2,7 @@ import { app, BrowserWindow, shell, screen, systemPreferences, crashReporter, ip
 import { release } from 'os'
 import { join, resolve } from 'path'
 
+// Enable crash capture
 crashReporter.start({
   productName: 'electron-tui-room',
   companyName: 'Tencent Cloud',
@@ -13,9 +14,11 @@ crashReporter.start({
 let crashFilePath = '';
 let crashDumpsDir = '';
 try {
+  // Low version of electron
   crashFilePath = join(app.getPath('temp'), app.getName() + ' Crashes');
   console.log('————————crash path:', crashFilePath);
 
+  // High version of electron
   crashDumpsDir = app.getPath('crashDumps');
   console.log('————————crashDumpsDir:', crashDumpsDir);
 } catch (e) {
@@ -63,8 +66,10 @@ let schemeRoomId = '';
 function registerScheme() {
   const args = [];
   if (!app.isPackaged) {
+    // If you are in the development phase, you need to add the absolute path of our script to the parameter
     args.push(resolve(process.argv[1]));
   }
+  // Add a `--` to ensure that subsequent arguments are not processed by Electron.
   args.push('--');
   app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, args);
   handleArgv(process.argv);
@@ -72,6 +77,8 @@ function registerScheme() {
 
 function handleArgv(argv: string[]) {
   const prefix = `${PROTOCOL}:`;
+  // development phase, skipping the first two parameters（`electron.exe .`）
+  // After packing, skip the first parameter（`myapp.exe`）
   const offset = app.isPackaged ? 1 : 2;
   const url = argv.find((arg, i) => i >= offset && arg.startsWith(prefix));
   if (url) handleUrl(url);
@@ -164,6 +171,7 @@ app.on('activate', () => {
   }
 })
 
+// When started via protocol URL on macOS, the master instance receives this URL via the open-url event
 app.on('open-url', (event, urlStr) => {
   handleUrl(urlStr);
 });
