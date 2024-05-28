@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright (c) 2023 Tencent. All rights reserved.
+ * Copyright (c) 2024 Tencent. All rights reserved.
  * Module:   TUIRoomDeviceManager @ TUIKitEngine
  * Function: 设备测试、管理相关接口
  */
@@ -70,26 +70,26 @@ class TUIRoomDeviceManagerObserver {
     /**
      * 本地设备添加事件
      *
-     * @note 当本地设备（包括摄像头、麦克风以及扬声器）添加时，SDK 便会抛出此事件回调
+     * @note 当本地设备（包括摄像头、麦克风以及扬声器）添加时，SDK 便会抛出此事件回调。
      * @param deviceId 设备 ID。
      * @param type 设备类型。
-     * @param state 通断状态，0：设备已添加；1：设备已被移除；2：设备已启用
+     * @param state 通断状态，0：设备已添加；1：设备已被移除；2：设备已启用。
      */
     virtual void onDeviceChanged(const char* deviceId, TUIMediaDeviceType type, TUIMediaDeviceState state) = 0;
 
     /**
      * 测试摄像头画面渲染成功回调
      *
-     * @note 当本地测试摄像头画面渲染成功时，SDK 便会抛出此事件回调
-     * @param width 画面的宽度
-     * @param height 画面的高度
+     * @note 当本地测试摄像头画面渲染成功时，SDK 便会抛出此事件回调。
+     * @param width 画面的宽度。
+     * @param height 画面的高度。
      */
     virtual void onTestCameraVideoFrameRendered(int width, int height) = 0;
 
     /**
      * 测试麦克风时的音量回调
      *
-     * @note 当本地测试麦克风时，SDK 便会抛出此事件回调
+     * @note 当本地测试麦克风时，SDK 便会抛出此事件回调。
      * @param volume 麦克风采集到的音量值，取值范围0 - 100。
      */
     virtual void onTestMicVolume(int volume) = 0;
@@ -97,7 +97,7 @@ class TUIRoomDeviceManagerObserver {
     /**
      * 测试扬声器时的音量回调
      *
-     * @note 当本地测试扬声器时，SDK 便会抛出此事件回调
+     * @note 当本地测试扬声器时，SDK 便会抛出此事件回调。
      * @param volume SDK 提交给扬声器去播放的声音的音量，取值范围0 - 100。
      */
     virtual void onTestSpeakerVolume(int volume) = 0;
@@ -114,8 +114,8 @@ class ITUIRoomDeviceManager {
     /**
      * 设置事件回调
      *
-     * 您可以通过 TUIRoomDeviceManagerObserver 获得各类事件通知
-     * @param observer 监听的实例
+     * 您可以通过 TUIRoomDeviceManagerObserver 获得各类事件通知。
+     * @param observer 监听的实例。
      */
     virtual void setObserver(TUIRoomDeviceManagerObserver* observer) = 0;
 
@@ -149,7 +149,7 @@ class ITUIRoomDeviceManager {
      * 开始扬声器测试（仅适用于桌面端）
      *
      * 该接口通过播放指定的音频文件，用于测试播放设备是否能正常工作。如果用户在测试时能听到声音，说明播放设备能正常工作。
-     * @param filePath 声音文件的路径
+     * @param filePath 声音文件的路径。
      */
     virtual void startSpeakerDeviceTest(const char* filePath) = 0;
 

@@ -1,11 +1,11 @@
 ﻿/**
  * Copyright (c) 2021 Tencent. All rights reserved.
  * Module:   V2TXLivePlayerObserver @ TXLiteAVSDK
- * Function: 腾讯云直播的播放器回调通知
- * <H2>功能
- * 腾讯云直播的播放器回调通知。
- * <H2>介绍
- * 可以接收 {@link V2TXLivePlayer} 播放器的一些回调通知，包括播放器状态、播放音量回调、音视频首帧回调、统计数据、警告和错误信息等。
+ * Function: Tencent Cloud live player callback notification
+ * <H2>Function
+ * Player callback notification for Tencent Cloud Live.
+ * <H2>Introduce
+ * You can receive some callback notifications from the {@link V2TXLivePlayer} player, including player status, playback volume callback, audio and video first frame callback, statistical data, warning and error messages, etc.
  */
 #ifndef MODULE_CPP_V2TXLIVEPLAYEROBSERVER_H_
 #define MODULE_CPP_V2TXLIVEPLAYEROBSERVER_H_
@@ -22,161 +22,163 @@ class V2TXLivePlayerObserver {
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                   直播播放器事件回调
+    //                    Live Player Event Callback
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 直播播放器错误通知，播放器出现错误时，会回调该通知
+     * live player error notification, which is called back when the player encounters an error
      *
-     * @param player    回调该通知的播放器对象。
-     * @param code      错误码 {@link V2TXLiveCode}。
-     * @param msg       错误信息。
-     * @param extraInfo 扩展信息。
+     * @param player    Player object that calls back this notification.
+     * @param code      Error code {@link V2TXLiveCode}.
+     * @param msg       Error message.
+     * @param extraInfo Extended information.
      */
     virtual void onError(V2TXLivePlayer* player, int32_t code, const char* msg, void* extraInfo) {
     }
 
     /**
-     * 直播播放器警告通知
+     * live player warning notification
      *
-     * @param player    回调该通知的播放器对象。
-     * @param code      警告码 {@link V2TXLiveCode}。
-     * @param msg       警告信息。
-     * @param extraInfo 扩展信息。
+     * @param player    Player object that calls back this notification.
+     * @param code      Warning code {@link V2TXLiveCode}.
+     * @param msg       Warning message.
+     * @param extraInfo Extended information.
      */
     virtual void onWarning(V2TXLivePlayer* player, int32_t code, const char* msg, void* extraInfo) {
     }
 
     /**
-     * 直播播放器分辨率变化通知
+     * live player resolution change notification
      *
-     * @param player    回调该通知的播放器对象。
-     * @param width     视频宽。
-     * @param height    视频高。
+     * @param player    Player object that calls back this notification.
+     * @param width     Video width.
+     * @param height    Video height.
      */
     virtual void onVideoResolutionChanged(V2TXLivePlayer* player, int width, int height) {
     }
 
     /**
-     * 已经成功连接到服务器
+     * live player has successfully connected to the server notification
      *
-     * @param player    回调该通知的播放器对象。
-     * @param extraInfo 扩展信息。
+     * @param player    Player object that calls back this notification.
+     * @param extraInfo Extended information.
      */
     virtual void onConnected(V2TXLivePlayer* player, void* extraInfo) {
     }
 
     /**
-     * 视频播放事件
+     * Video playback event
      *
-     * @param player    回调该通知的播放器对象。
-     * @param firstPlay 第一次播放标志。
-     * @param extraInfo 扩展信息。
+     * @param player    Player object that calls back this notification.
+     * @param firstPlay Play for the first time.
+     * @param extraInfo Extended information.
      */
     virtual void onVideoPlaying(V2TXLivePlayer* player, bool firstPlay, void* extraInfo) {
     }
 
     /**
-     * 音频播放事件
+     * Audio playback event
      *
-     * @param player    回调该通知的播放器对象。
-     * @param firstPlay 第一次播放标志。
-     * @param extraInfo 扩展信息。
+     * @param player    Player object that calls back this notification.
+     * @param firstPlay Play for the first time.
+     * @param extraInfo Extended information.
      */
     virtual void onAudioPlaying(V2TXLivePlayer* player, bool firstPlay, void* extraInfo) {
     }
 
     /**
-     * 视频加载事件
+     * Video loading event
      *
-     * @param player    回调该通知的播放器对象。
-     * @param extraInfo 扩展信息。
+     * @param player    Player object that calls back this notification.
+     * @param extraInfo Extended information.
      */
     virtual void onVideoLoading(V2TXLivePlayer* player, void* extraInfo) {
     }
 
     /**
-     * 音频加载事件
+     * Audio loading event
      *
-     * @param player    回调该通知的播放器对象。
-     * @param extraInfo 扩展信息。
+     * @param player    Player object that calls back this notification.
+     * @param extraInfo Extended information.
      */
     virtual void onAudioLoading(V2TXLivePlayer* player, void* extraInfo) {
     }
 
     /**
-     * 播放器音量大小回调
+     * Player playback volume callback
      *
-     * @param player 回调该通知的播放器对象。
-     * @param volume 音量大小。
-     * @note  调用 {@link enableVolumeEvaluation} 开启播放音量大小提示之后，会收到这个回调通知。
+     * @note  This callback notification is received after {@link enableVolumeEvaluation} is called to enable playback volume display.
+     * @param player Player object that calls back this notification.
+     * @param volume Current playback volume.
      */
     virtual void onPlayoutVolumeUpdate(V2TXLivePlayer* player, int32_t volume) {
     }
 
     /**
-     * 直播播放器统计数据回调
+     * Live player statistics callback
      *
-     * @param player     回调该通知的播放器对象。
-     * @param statistics 播放器统计数据 {@link V2TXLivePlayerStatistics}。
+     * @param player     Player object that calls back this notification.
+     * @param statistics Player statistics {@link V2TXLivePlayerStatistics}.
      */
     virtual void onStatisticsUpdate(V2TXLivePlayer* player, V2TXLivePlayerStatistics statistics) {
     }
 
     /**
-     * 截图回调
+     * Screenshot callback
      *
-     * @note  调用 {@link snapshot} 截图之后，会收到这个回调通知。
-     * @param player 回调该通知的播放器对象。
-     * @param image  已截取的视频画面。
-     * @param length 截图数据长度，对于BGRA32而言，length = width * height * 4。
-     * @param width  截图画面的宽度。
-     * @param height 截图画面的高度。
-     * @param format 截图数据格式，目前只支持 V2TXLivePixelFormatBGRA32。
+     * @note This callback notification is received after {@link snapshot} is called to snapshot.
+     * @param player Player object that calls back this notification.
+     * @param image  Screenshot data. If it is `nullptr`, it indicates that the SDK failed to take the screenshot.
+     * @param length Screenshot data length. In BGRA32 format, length = width * height * 4.
+     * @param width  Screenshot width.
+     * @param height Screenshot height.
+     * @param format Screenshot data format. Only `TRTCVideoPixelFormat_BGRA32` is supported now.
      */
     virtual void onSnapshotComplete(V2TXLivePlayer* player, const char* image, int length, int width, int height, V2TXLivePixelFormat format) {
     }
 
     /**
-     * 自定义视频渲染回调
+     * Custom video rendering callback
      *
-     * @param player     回调该通知的播放器对象。
-     * @param videoFrame 视频帧数据 {@link V2TXLiveVideoFrame}。
-     * @note  需要您调用 {@link enableObserveVideoFrame} 开启回调开关。
+     * @note  Need you call {@link enableObserveVideoFrame} to turn on the callback switch.
+     * @param player     Player object that calls back this notification.
+     * @param videoFrame Video frame data {@link V2TXLiveVideoFrame}.
      */
     virtual void onRenderVideoFrame(V2TXLivePlayer* player, const V2TXLiveVideoFrame* videoFrame) {
     }
 
     /**
-     * 音频数据回调
+     * Audio Data callback
      *
-     * @param player     回调该通知的播放器对象。
-     * @param audioFrame 音频帧数据 {@link V2TXLiveAudioFrame}。
-     * @note  需要您调用 {@link enableObserveAudioFrame} 开启回调开关。请在当前回调中使用 audioFrame 的 data。
+     * @note  Need you call {@link enableObserveAudioFrame} to turn on the callback switch. Please use the data of audioFrame in the current callback.
+     * @param player     Player object that calls back this notification.
+     * @param aduioFrame Audio frame data {@link V2TXLiveAudioFrame}.
      */
     virtual void onPlayoutAudioFrame(V2TXLivePlayer* player, const V2TXLiveAudioFrame* audioFrame) {
     }
 
     /**
-     * 收到 SEI 消息的回调，发送端通过 {@link V2TXLivePusher} 中的 `sendSeiMessage` 来发送 SEI 消息
+     * Callback of receiving an SEI message. The sender calls `sendSeiMessage` in {@link V2TXLivePusher} to send an SEI
+     * message
      *
-     * @note  调用 {@link V2TXLivePlayer} 中的 `enableReceiveSeiMessage` 开启接收 SEI 消息之后，会收到这个回调通知。
-     * @param player        回调该通知的播放器对象。
-     * @param payloadType   收到 SEI 消息的 payloadType。
-     * @param data          数据。
-     * @param dataSize      数据大小。
+     * @note You will receive this callback after calling `enableReceiveSeiMessage` in {@link V2TXLivePlayer} to enable the receiving of SEI
+     * messages.
+     * @param player       Player object that calls back this notification.
+     * @param payloadType  The payload type of the received sei message.
+     * @param data         sei message data.
+     * @param dataSize     sei message data size.
      */
     virtual void onReceiveSeiMessage(V2TXLivePlayer* player, int payloadType, const uint8_t* data, uint32_t dataSize) {
     }
 
     /**
-     * 分辨率无缝切换回调
+     * Resolution stream switch callback
      *
-     * @note  调用 {@link V2TXLivePlayer} 中的 `switchStream` 切换分辨率，会收到这个回调通知。
-     * @param player 回调该通知的播放器对象。
-     * @param url    切换的播放地址。
-     * @param code   状态码，0：成功，-1：切换超时，-2：切换失败，服务端错误，-3：切换失败，客户端错误。
+     * @note  This callback notification is received after {@link switchStream} is called to switch stream.
+     * @param player Player object that calls back this notification.
+     * @param code   Status code, 0:success, -1:timeout, -2:failed, server error, -3:failed, client error.
+     * @param url    Switched playback address.
      */
     virtual void onStreamSwitched(V2TXLivePlayer* player, const char* url, int32_t code) {
     }

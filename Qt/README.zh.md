@@ -1,23 +1,23 @@
-# TUIRoom Window-Mac 示例工程快速跑通
+# TUIRoomKit Qt 示例工程快速跑通
 
 _[English](README.md) | 简体中文_
 
-本文档主要介绍如何快速跑通TUIRoom 示例工程，多人音视频通话，更详细的TUIRoom组件接入流程，请点击腾讯云官网文档:
-[TUIRoom组件Windows-Mac接入说明](https://cloud.tencent.com/document/product/647/63494)
+本文档主要介绍如何快速跑通TUIRoom 示例工程，多人音视频通话，更详细的TUIRoomKit组件接入流程，请点击腾讯云官网文档:
+[TUIRoomKit组件Qt接入说明](https://cloud.tencent.com/document/product/647/63494)
 
 ## 目录结构
 
 ```
-TUIRoom
-├─ RoomApp              // 程序的主目录
+TUIRoomKit
+├─ RoomKit              // 程序的主目录
    ├─ App               // 程序的源代码
    ├─ bin               // 工程输出的可执行文件和调试所需的程序数据库文件
-   ├─ Resources         // RoomApp所需的图片资源文件、QSS样式文件以及国际化翻译文件
-   └─ 3rdParty          // RoomApp所依赖的第三方库
-├─ Common               // RoomApp的通用类
+   ├─ Resources         // RoomKit所需的图片资源文件、QSS样式文件以及国际化翻译文件
+   └─ 3rdParty          // RoomKit所依赖的第三方库
+├─ Common               // RoomKit的通用类
 ├─ utils                // 工具类文件夹
-├─ Module               // RoomApp的数据模型交互层源代码
-└─ SDK                  // RoomApp所依赖的Liteav SDK库文件和IM SDK库文件
+├─ Module               // RoomKit的数据模型交互层源代码
+└─ SDK                  // RoomKit所依赖的Liteav SDK库文件和IM SDK库文件
 ```
 
 ## 环境准备
@@ -28,11 +28,6 @@ TUIRoom
 - 最低支持系统：Windows 8。
 - 请确保您的集成开发环境能够正常开发。
 
-#### Mac环境：
-- QT5.9.1及以上版本的QT开发库。
-- QtCreator集成开发环境，在安装QT时选择同时安装QtCreator即可，版本跟随QT官方安装包。
-- 请确保您的QtCreator集成开发环境能够正常开发。
-
 ## 运行示例
 
 ### 开通服务
@@ -42,8 +37,8 @@ TUIRoom
 克隆或者直接下载此仓库源码，欢迎 Star，感谢~~
 
 #### Windows端的配置
-1. 使用Visual Studio(VS 2015及以上)打开源码工程`RoomApp.vcxproj`。
-2. 工程内找到`TUIRoom\Windows-Mac\utils\usersig\win\GenerateTestUserSig.h`文件 。
+1. 使用Visual Studio(VS 2015及以上)打开源码工程`RoomKit.vcxproj`。
+2. 工程内找到`TUIRoomKit\Qt\utils\usersig\win\GenerateTestUserSig.h`文件 。
 3. 设置`GenerateTestUserSig.h`文件中的相关参数：
    <ul>
    <li>SDKAPPID：默认为 0 ，请设置为实际申请的SDKAPPID。</li>
@@ -53,32 +48,18 @@ TUIRoom
 4. 返回实时音视频控制台，单击【粘贴完成，下一步】。
 5. 单击【关闭指引，进入控制台管理应用】。
 
-#### Mac端的配置
-1. 使用QtCreator开发源码工程的`RoomApp.pro`。
-2. 工程内找到`TUIRoom\Windows-Mac\utils\usersig\mac\UserSigConfig.h`文件 。
-3. 设置`UserSigConfig.h`文件中的相关参数：
-   <ul>
-   <li>SDKAPPID_：默认为 0 ，请设置为实际申请的SDKAPPID。</li>
-   <li>SecretKey_：默认为空字符串，请设置为实际申请的SECRETKEY。</li>
-   </ul>
-4. 返回实时音视频控制台，单击【粘贴完成，下一步】。
-5. 单击【关闭指引，进入控制台管理应用】。
-
 >本文提到的生成 UserSig 的方案是在客户端代码中配置 SECRETKEY，该方法中 SECRETKEY 很容易被反编译逆向破解，一旦您的密钥泄露，攻击者就可以盗用您的腾讯云流量，因此**该方法仅适合本地跑通工程和功能调试**。
 >正确的 UserSig 签发方式是将 UserSig 的计算代码集成到您的服务端，并提供面向 App 的接口，在需要 UserSig 时由您的 App 向业务服务器发起请求获取动态 UserSig。更多详情请参见 [服务端生成 UserSig](https://cloud.tencent.com/document/product/647/17275#Server)。
 
 ### 运行 App
 请先确保qt环境配置正常
 #### Windows端:
-- Windows端使用Visual Studio（VS 2015及以上版本）打开源码工程 `RoomApp.vcxproj`，
+- Windows端使用Visual Studio（VS 2015及以上版本）打开源码工程 `RoomKit.vcxproj`，
 - 在项目右键>>属性>>QtProjectSetting>>General>>QtInstallation 重新选择一下目前已经安装的Qt环境
 
    <img src="https://qcloudimg.tencent-cloud.cn/raw/f7246267e5fbee96e481e6e491f6a3ea.png" width="500" height="280"/>
 
 - 单击【运行】即可开始调试运行本App。
-
-#### Mac端:
-- Mac端先配置系统环境变量 QTDIR 指向QT的安装目录，然后使用QtCreator打开源码工程`RoomApp.pro`，构建并运行本App。
 
 ### 体验应用（**体验应用至少需要两台设备**）
 

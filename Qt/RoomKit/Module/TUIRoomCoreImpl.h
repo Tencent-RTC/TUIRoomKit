@@ -172,15 +172,15 @@ private:
     void onAllUserMicrophoneDisableChanged(const char* room_id, bool is_disable) override;
     void onAllUserCameraDisableChanged(const char* room_id, bool is_disable) override;
     void onSendMessageForAllUserDisableChanged(const char* room_id, bool is_disable) override;
-    void onRoomDismissed(const char* room_id) override;
+    void onRoomDismissed(const char* room_id, tuikit::TUIRoomDismissedReason reason) override;
     void onKickedOutOfRoom(const char* room_id, tuikit::TUIKickedOutOfRoomReason reason, const char* message) override;
-    void onRoomSpeechModeChanged(const char* room_id, tuikit::TUISpeechMode speech_mode) override;
     void onRemoteUserEnterRoom(const char* room_id, const tuikit::TUIUserInfo& user_info) override;
     void onRemoteUserLeaveRoom(const char* room_id, const tuikit::TUIUserInfo& user_info) override;
-    void onUserRoleChanged(const char* user_id, tuikit::TUIRole role) override;
+    void onUserRoleChanged(const tuikit::TUIUserInfo& user_info) override;
     void onUserVideoStateChanged(const char* user_id, tuikit::TUIVideoStreamType stream_type, bool has_video, tuikit::TUIChangeReason reason) override;
     void onUserAudioStateChanged(const char* user_id, bool has_video, tuikit::TUIChangeReason reason) override;
     void onUserVoiceVolumeChanged(tuikit::TUIMap<const char*, int>* volume_map) override;
+    void onRoomUserCountChanged(const char* room_id, int user_count) override;
 
     void onScreenShareForAllUserDisableChanged(const char* room_id, bool is_disable) override;
     void onSendMessageForUserDisableChanged(const char* room_id, const char* user_id, bool is_disable) override;
@@ -188,13 +188,12 @@ private:
     void onUserScreenCaptureStopped(int reason) override;
     void onRoomMaxSeatCountChanged(const char* room_id, int max_seat_count) override;
     void onSeatListChanged(tuikit::TUIList<tuikit::TUISeatInfo>* seat_list, tuikit::TUIList<tuikit::TUISeatInfo>* seated_list, tuikit::TUIList<tuikit::TUISeatInfo>* left_list) override;
-    void onKickedOffSeat(const char* user_id) override;
+    void onKickedOffSeat(int seat_index, const tuikit::TUIUserInfo& operate_user) override;
     void onRequestReceived(const tuikit::TUIRequest* request) override;
-    void onRequestCancelled(const char* request_id, const char* user_id) override;
-    void onRequestProcessed(const char* request_id, const char* user_id) override;
+    void onRequestCancelled(const tuikit::TUIRequest& request, const tuikit::TUIUserInfo& operate_user) override;
+    void onRequestProcessed(const tuikit::TUIRequest& request, const tuikit::TUIUserInfo& operate_user) override;
     void onReceiveTextMessage(const char* room_id, const tuikit::TUIMessage& message) override;
     void onReceiveCustomMessage(const char* room_id, const tuikit::TUIMessage& message) override;
-    void onDeviceChanged(const char* deviceId, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) override;
     void onRoomSeatModeChanged(const char* room_id, tuikit::TUISeatMode seat_mode) override;
     ///
 
@@ -205,6 +204,14 @@ private:
     void RemoteUserAduioStateChanged(const std::string& user_id, bool has_audio);
 
  private:
+    void onDeviceChanged(const char* device_id, liteav::TXMediaDeviceType type, liteav::TXMediaDeviceState state) override {}
+    void onRoomDismissed(const char* room_id) override {}
+    void onRoomSpeechModeChanged(const char* room_id, tuikit::TUISpeechMode speech_mode) override {}
+    void onUserRoleChanged(const char* user_id, tuikit::TUIRole role) override {}
+    void onKickedOffSeat(const char* user_id) override {}
+    void onRequestCancelled(const char* request_id, const char* user_id)  override {}
+    void onRequestProcessed(const char* request_id, const char* user_id)  override {}
+     
     void ClearRoomInfo();
     void TakeSeat(SuccessCallback success_callback, ErrorCallback error_callback);
     void GetSeatList();

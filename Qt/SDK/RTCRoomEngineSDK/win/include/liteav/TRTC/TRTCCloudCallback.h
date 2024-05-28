@@ -1,7 +1,7 @@
 ﻿/**
  * Copyright (c) 2021 Tencent. All rights reserved.
  * Module:   ITRTCCloudCallback @ TXLiteAVSDK
- * Function: 腾讯云实时音视频的事件回调接口
+ * Function: event callback APIs for TRTC’s video call feature
  */
 #ifndef __TRTCCLOUDCALLBACK_H__
 #define __TRTCCLOUDCALLBACK_H__
@@ -20,377 +20,386 @@ class ITRTCCloudCallback {
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    错误和警告事件
+    //                    Error and warning events
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 1.1 错误事件回调
+     * 1.1 Error event callback
      *
-     * 错误事件，表示 SDK 抛出的不可恢复的错误，比如进入房间失败或设备开启失败等。
-     * 参考文档：[错误码表](https://cloud.tencent.com/document/product/647/38308)
-     * @param errCode 错误码
-     * @param errMsg  错误信息
-     * @param extInfo 扩展信息字段，个别错误码可能会带额外的信息帮助定位问题
+     * Error event, which indicates that the SDK threw an irrecoverable error such as room entry failure or failure to start device
+     * For more information, see [Error Codes](https://intl.cloud.tencent.com/document/product/647/35135).
+     * @param errCode Error code
+     * @param errMsg Error message
+     * @param extInfo Extended field. Certain error codes may carry extra information for troubleshooting.
      */
     virtual void onError(TXLiteAVError errCode, const char* errMsg, void* extraInfo) = 0;
 
     /**
-     * 1.2 警告事件回调
+     * 1.2 Warning event callback
      *
-     * 警告事件，表示 SDK 抛出的提示性问题，比如视频出现卡顿或 CPU 使用率太高等。
-     * 参考文档：[错误码表](https://cloud.tencent.com/document/product/647/38308)
-     * @param warningCode 警告码
-     * @param warningMsg 警告信息
-     * @param extInfo 扩展信息字段，个别警告码可能会带额外的信息帮助定位问题
+     * Warning event, which indicates that the SDK threw an error requiring attention, such as video lag or high CPU usage
+     * For more information, see [Error Codes](https://intl.cloud.tencent.com/document/product/647/35135).
+     * @param warningCode Warning code
+     * @param warningMsg Warning message
+     * @param extInfo Extended field. Certain warning codes may carry extra information for troubleshooting.
      */
     virtual void onWarning(TXLiteAVWarning warningCode, const char* warningMsg, void* extraInfo) = 0;
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    房间相关事件回调
+    //                    Room event callback
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 2.1 进入房间成功与否的事件回调
+     * 2.1 Whether room entry is successful
      *
-     * 调用 TRTCCloud 中的 enterRoom() 接口执行进房操作后，会收到来自 ITRTCCloudCallback 的 onEnterRoom(result) 回调：
-     * - 如果加入成功，回调 result 会是一个正数（result > 0），代表进入房间所消耗的时间，单位是毫秒（ms）。
-     * - 如果加入失败，回调 result 会是一个负数（result < 0），代表失败原因的错误码。
-     *  进房失败的错误码含义请参见[错误码表](https://cloud.tencent.com/document/product/647/38308)。
-     * @param result result > 0 时为进房耗时（ms），result < 0 时为进房错误码。
+     * After calling the `enterRoom()` API in `TRTCCloud` to enter a room, you will receive the `onEnterRoom(result)` callback from `TRTCCloudDelegate`.
+     *  - If room entry succeeded, `result` will be a positive number (`result` > 0), indicating the time in milliseconds (ms) the room entry takes.
+     *  - If room entry failed, `result` will be a negative number (result < 0), indicating the error code for the failure.
+     *  For more information on the error codes for room entry failure, see [Error Codes](https://intl.cloud.tencent.com/document/product/647/35135).
      * @note
-     * 1. 在 Ver6.6 之前的版本，只有进房成功会抛出 onEnterRoom(result) 回调，进房失败由 onError() 回调抛出。
-     * 2. 在 Ver6.6 之后的版本：无论进房成功或失败，均会抛出 onEnterRoom(result) 回调，同时进房失败也会有 onError() 回调抛出。
+     * 1. In TRTC versions below 6.6, the `onEnterRoom(result)` callback is returned only if room entry succeeds, and the `onError()` callback is returned if room entry fails.
+     * 2. In TRTC 6.6 and above, the `onEnterRoom(result)` callback is returned regardless of whether room entry succeeds or fails, and the `onError()` callback is also returned if room entry fails.
+     * @param result If `result` is greater than 0, it indicates the time (in ms) the room entry takes; if `result` is less than 0, it represents the error code for room entry.
      */
     virtual void onEnterRoom(int result) = 0;
 
     /**
-     * 2.2 离开房间的事件回调
+     * 2.2 Room exit
      *
-     * 调用 TRTCCloud 中的 exitRoom 接口会执行退出房间的相关逻辑，例如释放音视频设备资源和编解码器资源等。
-     * 待 SDK 占用的所有资源释放完毕后，SDK 会抛出 onExitRoom() 回调通知到您。
-     * 如果您要再次调用 enterRoom 或者切换到其他的音视频 SDK，请等待 onExitRoom 回调到来后再执行相关操作。否则可能会遇到例如摄像头、麦克风设备被强占等各种异常问题。
-     * @param reason 离开房间原因，0：主动调用 exitRoom 退出房间；1：被服务器踢出当前房间；2：当前房间整个被解散。
+     * Calling the `exitRoom()` API in `TRTCCloud` will trigger the execution of room exit-related logic, such as releasing resources of audio/video devices and codecs.
+     * After all resources occupied by the SDK are released, the SDK will return the `onExitRoom()` callback.
+     * If you need to call `enterRoom()` again or switch to another audio/video SDK, please wait until you receive the `onExitRoom()` callback.
+     * Otherwise, you may encounter problems such as the camera or mic being occupied.
+     * @param reason Reason for room exit. `0`: the user called `exitRoom` to exit the room; `1`: the user was removed from the room by the server; `2`: the room was dismissed.
      */
     virtual void onExitRoom(int reason) = 0;
 
     /**
-     * 2.3 切换角色的事件回调
+     * 2.3 Role switching
      *
-     * 调用 TRTCCloud 中的 switchRole() 接口会切换主播和观众的角色，该操作会伴随一个线路切换的过程，待 SDK 切换完成后，会抛出 onSwitchRole() 事件回调。
-     * @param errCode 错误码，ERR_NULL 代表切换成功，其他请参见[错误码](https://cloud.tencent.com/document/product/647/32257)。
-     * @param errMsg  错误信息。
+     * You can call the `switchRole()` API in `TRTCCloud` to switch between the anchor and audience roles. This is accompanied by a line switching process.
+     * After the switching, the SDK will return the `onSwitchRole()` event callback.
+     * @param errCode Error code. `ERR_NULL` indicates a successful switch. For more information, please see [Error Codes](https://intl.cloud.tencent.com/document/product/647/35135).
+     * @param errMsg  Error message
      */
     virtual void onSwitchRole(TXLiteAVError errCode, const char* errMsg) {
     }
 
     /**
-     * 2.4 切换房间的结果回调
+     * 2.4 Result of room switching
      *
-     * 调用 TRTCCloud 中的 switchRoom() 接口可以让用户快速地从一个房间切换到另一个房间，待 SDK 切换完成后，会抛出 onSwitchRoom() 事件回调。
-     * @param errCode 错误码，ERR_NULL 代表切换成功，其他请参见[错误码](https://cloud.tencent.com/document/product/647/32257)。
-     * @param errMsg  错误信息。
+     * You can call the `switchRoom()` API in `TRTCCloud` to switch from one room to another.
+     * After the switching, the SDK will return the `onSwitchRoom()` event callback.
+     * @param errCode Error code. `ERR_NULL` indicates a successful switch. For more information, please see [Error Codes](https://intl.cloud.tencent.com/document/product/647/35124).
+     * @param errMsg  Error message
      */
     virtual void onSwitchRoom(TXLiteAVError errCode, const char* errMsg) {
     }
 
     /**
-     * 2.5 请求跨房通话的结果回调
+     * 2.5 Result of requesting cross-room call
      *
-     * 调用 TRTCCloud 中的 connectOtherRoom() 接口会将两个不同房间中的主播拉通视频通话，也就是所谓的“主播PK”功能。
-     * 调用者会收到 onConnectOtherRoom() 回调来获知跨房通话是否成功，
-     * 如果成功，两个房间中的所有用户都会收到来自另一个房间中的 PK 主播的 onUserVideoAvailable() 回调。
-     * @param userId  要跨房通话的另一个房间中的主播的用户 ID。
-     * @param errCode 错误码，ERR_NULL 代表切换成功，其他请参见[错误码](https://cloud.tencent.com/document/product/647/32257)。
-     * @param errMsg  错误信息。
+     * You can call the `connectOtherRoom()` API in `TRTCCloud` to establish a video call with the anchor of another room. This is the “anchor competition” feature.
+     * The caller will receive the `onConnectOtherRoom()` callback, which can be used to determine whether the cross-room call is successful.
+     * If it is successful, all users in either room will receive the `onUserVideoAvailable()` callback from the anchor of the other room.
+     * @param userId  The user ID of the anchor (in another room) to be called
+     * @param errCode Error code. `ERR_NULL` indicates that cross-room connection is established successfully. For more information, please see [Error Codes](https://intl.cloud.tencent.com/document/product/647/35135).
+     * @param errMsg  Error message
      */
     virtual void onConnectOtherRoom(const char* userId, TXLiteAVError errCode, const char* errMsg) {
     }
 
     /**
-     * 2.6 结束跨房通话的结果回调
+     * 2.6 Result of ending cross-room call
      */
     virtual void onDisconnectOtherRoom(TXLiteAVError errCode, const char* errMsg) {
     }
 
     /**
-     * 2.7 更改跨房主播上行能力的结果回调
+     * 2.7 Result of changing the upstream capability of the cross-room anchor
      */
     virtual void onUpdateOtherRoomForwardMode(TXLiteAVError errCode, const char* errMsg) {
     }
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    用户相关事件回调
+    //                    User event callback
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 3.1 有用户加入当前房间
+     * 3.1 A user entered the room
      *
-     * 出于性能方面的考虑，在 TRTC 两种不同的应用场景（即 AppScene，在 enterRoom 时通过第二个参数指定）下，该通知的行为会有差别：
-     * - 直播类场景（TRTCAppSceneLIVE 和 TRTCAppSceneVoiceChatRoom）：该场景下的用户区分主播和观众两种角色，只有主播进入房间时才会触发该通知，观众进入房间时不会触发该通知。
-     * - 通话类场景（TRTCAppSceneVideoCall 和 TRTCAppSceneAudioCall）：该场景下的用户没有角色的区分（可认为都是主播），任何用户进入房间都会触发该通知。
-     * @param userId 远端用户的用户标识。
+     * Due to performance concerns, this callback works differently in different scenarios (i.e., `AppScene`, which you can specify by setting the second parameter when calling `enterRoom`).
+     *  - Live streaming scenarios (`TRTCAppSceneLIVE` or `TRTCAppSceneVoiceChatRoom`): in live streaming scenarios, a user is either in the role of an anchor or audience. The callback is returned only when an anchor enters the room.
+     *  - Call scenarios (`TRTCAppSceneVideoCall` or `TRTCAppSceneAudioCall`): in call scenarios, the concept of roles does not apply (all users can be considered as anchors), and the callback is returned when any user enters the room.
+     * @param userId User ID of the remote user
      * @note
-     * 1. 事件回调 onRemoteUserEnterRoom 和 onRemoteUserLeaveRoom 只适用于维护当前房间里的“用户列表”，有此事件回调不代表一定有视频画面。
-     * 2. 如果需要显示远程画面，请监听代表某个用户是否有视频画面的 onUserVideoAvailable() 事件回调。
+     * 1. The `onRemoteUserEnterRoom` callback indicates that a user entered the room, but it does not necessarily mean that the user enabled audio or video.
+     * 2. If you want to know whether a user enabled video, we recommend you use the `onUserVideoAvailable()` callback.
      */
     virtual void onRemoteUserEnterRoom(const char* userId) {
     }
 
     /**
-     * 3.2 有用户离开当前房间
+     * 3.2 A user exited the room
      *
-     * 与 onRemoteUserEnterRoom 相对应，在两种不同的应用场景（即 AppScene，在 enterRoom 时通过第二个参数指定）下，该通知的行为会有差别：
-     * - 直播类场景（TRTCAppSceneLIVE 和 TRTCAppSceneVoiceChatRoom）：只有主播离开房间时才会触发该通知，观众离开房间不会触发该通知。
-     * - 通话类场景（TRTCAppSceneVideoCall 和 TRTCAppSceneAudioCall）：该场景下用户没有角色的区别，任何用户的离开都会触发该通知。
-     * @param userId 远端用户的用户标识。
-     * @param reason 离开原因，0表示用户主动退出房间，1表示用户超时退出，2表示被踢出房间，3表示主播因切换到观众退出房间。
+     * As with `onRemoteUserEnterRoom`, this callback works differently in different scenarios (i.e., `AppScene`, which you can specify by setting the second parameter when calling `enterRoom`).
+     *  - Live streaming scenarios (`TRTCAppSceneLIVE` or `TRTCAppSceneVoiceChatRoom`): the callback is triggered only when an anchor exits the room.
+     *  - Call scenarios (`TRTCAppSceneVideoCall` or `TRTCAppSceneAudioCall`): in call scenarios, the concept of roles does not apply, and the callback is returned when any user exits the room.
+     * @param userId User ID of the remote user
+     * @param reason Reason for room exit. `0`: the user exited the room voluntarily; `1`: the user exited the room due to timeout; `2`: the user was removed from the room; `3`: the anchor user exited the room due to switch to audience.
      */
     virtual void onRemoteUserLeaveRoom(const char* userId, int reason) {
     }
 
     /**
-     * 3.3 某远端用户发布/取消了主路视频画面
+     * 3.3 A remote user published/unpublished primary stream video
      *
-     * **主路画面** 一般被用于承载摄像头画面。当您收到 onUserVideoAvailable(userId, true) 通知时，表示该路画面已经有可播放的视频帧到达。
-     * 此时，您需要调用 {@link startRemoteView} 接口订阅该用户的远程画面，订阅成功后，您会继续收到该用户的首帧画面渲染回调 onFirstVideoFrame(userid)。
-     * 当您收到 onUserVideoAvailable(userId, false) 通知时，表示该路远程画面已经被关闭，关闭的原因可能是该用户调用了 {@link muteLocalVideo} 或 {@link stopLocalPreview}。
-     * @param userId 远端用户的用户标识。
-     * @param available 该用户是否发布（或取消发布）了主路视频画面，true：发布；false：取消发布。
+     * The primary stream is usually used for camera images. If you receive the `onUserVideoAvailable(userId, true)` callback, it indicates that the user has available primary stream video.
+     * You can then call {@link startRemoteView} to subscribe to the remote user’s video. If the subscription is successful, you will receive the `onFirstVideoFrame(userid)` callback, which indicates that the first video frame of the user is
+     * rendered. If you receive the `onUserVideoAvailable(userId, false)` callback, it indicates that the video of the remote user is disabled, which may be because the user called {@link muteLocalVideo} or {@link stopLocalPreview}.
+     * @param userId User ID of the remote user
+     * @param available Whether the user published (or unpublished) primary stream video. `true`: published; `false`: unpublished
      */
     virtual void onUserVideoAvailable(const char* userId, bool available) {
     }
 
     /**
-     * 3.4 某远端用户发布/取消了辅路视频画面
+     * 3.4 A remote user published/unpublished substream video
      *
-     * “辅路画面”一般被用于承载屏幕分享的画面。当您收到 onUserSubStreamAvailable(userId, true) 通知时，表示该路画面已经有可播放的视频帧到达。
-     * 此时，您需要调用 {@link startRemoteView} 接口订阅该用户的远程画面，订阅成功后，您会继续收到该用户的首帧画面渲染回调 onFirstVideoFrame(userid)。
-     * @param userId 远端用户的用户标识。
-     * @param available 该用户是否发布（或取消发布）了辅路视频画面，true: 发布；false：取消发布。
-     * @note 显示辅路画面使用的函数是 {@link startRemoteView} 而非 {@link startRemoteSubStreamView}，startRemoteSubStreamView 已经被废弃。
+     * The substream is usually used for screen sharing images. If you receive the `onUserSubStreamAvailable(userId, true)` callback, it indicates that the user has available substream video.
+     * You can then call {@link startRemoteView} to subscribe to the remote user’s video. If the subscription is successful, you will receive the `onFirstVideoFrame(userid)` callback, which indicates that the first frame of the user is rendered.
+     * @param userId User ID of the remote user
+     * @param available Whether the user published (or unpublished) substream video. `true`: published; `false`: unpublished
+     * @note The API used to display substream images is {@link startRemoteView}, not {@link startRemoteSubStreamView}, startRemoteSubStreamView is deprecated.
      */
     virtual void onUserSubStreamAvailable(const char* userId, bool available) {
     }
 
     /**
-     * 3.5 某远端用户发布/取消了自己的音频
+     * 3.5 A remote user published/unpublished audio
      *
-     * 当您收到 onUserAudioAvailable(userId, true) 通知时，表示该用户发布了自己的声音，此时 SDK 的表现为：
-     * - 在自动订阅模式下，您无需做任何操作，SDK 会自动播放该用户的声音。
-     * - 在手动订阅模式下，您可以通过 {@link muteRemoteAudio}(userid, false) 来播放该用户的声音。
-     * @param userId 远端用户的用户标识。
-     * @param available 该用户是否发布（或取消发布）了自己的音频，true: 发布；false：取消发布。
-     * @note SDK 默认使用自动订阅模式，您可以通过 {@link setDefaultStreamRecvMode} 设置为手动订阅，但需要在您进入房间之前调用才生效。
+     * If you receive the `onUserAudioAvailable(userId, true)` callback, it indicates that the user published audio.
+     * - In auto-subscription mode, the SDK will play the user’s audio automatically.
+     * - In manual subscription mode, you can call {@link muteRemoteAudio}(userid, false) to play the user’s audio.
+     * @param userId User ID of the remote user
+     * @param available Whether the user published (or unpublished) audio. `true`: published; `false`: unpublished
+     * @note The auto-subscription mode is used by default. You can switch to the manual subscription mode by calling {@link setDefaultStreamRecvMode}, but it must be called before room entry for the switch to take effect.
      */
     virtual void onUserAudioAvailable(const char* userId, bool available) {
     }
 
     /**
-     * 3.6 SDK 开始渲染自己本地或远端用户的首帧画面
+     * 3.6 The SDK started rendering the first video frame of the local or a remote user
      *
-     * SDK 会在渲染自己本地或远端用户的首帧画面时抛出该事件，您可以通过回调事件中的 userId 参数来判断事件来自于“本地”还是来自于“远端”。
-     * - 如果 userId 为空值，代表 SDK 已经开始渲染自己本地的视频画面，不过前提是您已经调用了 {@link startLocalPreview} 或 {@link startScreenCapture}。
-     * - 如果 userId 不为空，代表 SDK 已经开始渲染远端用户的视频画面，不过前提是您已经调用了 {@link startRemoteView} 订阅了该用户的视频画面。
-     * @param userId 本地或远端的用户标识，如果 userId 为空值代表自己本地的首帧画面已到来，userId 不为空则代表远端用户的首帧画面已到来。
-     * @param streamType 视频流类型：主路（Main）一般用于承载摄像头画面，辅路（Sub）一般用于承载屏幕分享画面。
-     * @param width  画面的宽度。
-     * @param height 画面的高度。
+     * The SDK returns this event callback when it starts rendering your first video frame or that of a remote user. The `userId` in the callback can help you determine whether the frame is yours or a remote user’s.
+     * - If `userId` is empty, it indicates that the SDK has started rendering your first video frame. The precondition is that you have called {@link startLocalPreview} or {@link startScreenCapture}.
+     * - If `userId` is not empty, it indicates that the SDK has started rendering the first video frame of a remote user. The precondition is that you have called {@link startRemoteView} to subscribe to the user’s video.
+     * @param userId The user ID of the local or a remote user. If it is empty, it indicates that the first local video frame is available; if it is not empty, it indicates that the first video frame of a remote user is available.
+     * @param streamType Video stream type. The primary stream (`Main`) is usually used for camera images, and the substream (`Sub`) for screen sharing images.
+     * @param width  Video width
+     * @param height Video height
      * @note
-     * 1. 只有当您调用了 {@link startLocalPreview} 或 {@link startScreenCapture} 之后，才会触发自己本地的首帧画面事件回调。
-     * 2. 只有当您调用了 {@link startRemoteView} 或 {@link startRemoteSubStreamView} 之后，才会触发远端用户的首帧画面事件回调。
+     * 1. The callback of the first local video frame being rendered is triggered only after you call {@link startLocalPreview} or {@link startScreenCapture}.
+     * 2. The callback of the first video frame of a remote user being rendered is triggered only after you call {@link startRemoteView} or {@link startRemoteSubStreamView}.
      */
     virtual void onFirstVideoFrame(const char* userId, const TRTCVideoStreamType streamType, const int width, const int height) {
     }
 
     /**
-     * 3.7 SDK 开始播放远端用户的首帧音频
+     * 3.7 The SDK started playing the first audio frame of a remote user
      *
-     * SDK 会在播放远端用户的首帧音频时抛出该事件，本地音频的首帧事件暂不抛出。
-     * @param userId 远端用户的用户标识。
+     * The SDK returns this callback when it plays the first audio frame of a remote user. The callback is not returned for the playing of the first audio frame of the local user.
+     * @param userId User ID of the remote user
      */
     virtual void onFirstAudioFrame(const char* userId) {
     }
 
     /**
-     * 3.8 自己本地的首个视频帧已被发布出去
+     * 3.8 The first local video frame was published
      *
-     * 当您成功进入房间并通过 {@link startLocalPreview} 或 {@link startScreenCapture} 开启本地视频采集之后（开启采集和进入房间的先后顺序无影响），SDK 就会开始进行视频编码，并通过自身的网络模块向云端发布自己本地的视频数据。当 SDK
-     * 成功地向云端送出自己的第一帧视频数据帧以后，就会抛出 onSendFirstLocalVideoFrame 事件回调。
-     * @param streamType 视频流类型：主路（Main）一般用于承载摄像头画面，辅路（Sub）一般用于承载屏幕分享画面。
+     * After you enter a room and call {@link startLocalPreview} or {@link startScreenCapture} to enable local video capturing (whichever happens first),
+     * the SDK will start video encoding and publish the local video data via its network module to the cloud.
+     * It returns the `onSendFirstLocalVideoFrame` callback after publishing the first local video frame.
+     * @param streamType Video stream type. The primary stream (`Main`) is usually used for camera images, and the substream (`Sub`) for screen sharing images.
      */
     virtual void onSendFirstLocalVideoFrame(const TRTCVideoStreamType streamType) {
     }
 
     /**
-     * 3.9 自己本地的首个音频帧已被发布出去
+     * 3.9 The first local audio frame was published
      *
-     * 当您成功进入房间并通过 {@link startLocalAudio} 开启本地音频采集之后（开启采集和进入房间的先后顺序无影响），SDK 就会开始进行音频编码，并通过自身的网络模块向云端发布自己本地的音频数据。当 SDK 成功地向云端送出自己的第一帧音频数据帧以后，就会抛出
-     * onSendFirstLocalAudioFrame 事件回调。
+     * After you enter a room and call {@link startLocalAudio} to enable audio capturing (whichever happens first),
+     * the SDK will start audio encoding and publish the local audio data via its network module to the cloud.
+     * The SDK returns the `onSendFirstLocalAudioFrame` callback after sending the first local audio frame.
      */
     virtual void onSendFirstLocalAudioFrame() {
     }
 
     /**
-     * 3.10 远端视频状态变化的事件回调
+     * 3.10 Change of remote video status
      *
-     * 您可以通过此事件回调获取远端每一路画面的播放状态（包括 Playing、Loading 和 Stopped 三种状态），从而进行相应的 UI 展示。
-     * @param userId 用户标识。
-     * @param streamType 视频流类型：主路（Main）一般用于承载摄像头画面，辅路（Sub）一般用于承载屏幕分享画面。
-     * @param status 视频状态：包括 Playing、Loading 和 Stopped 三种状态。
-     * @param reason 视频状态改变的原因。
-     * @param extrainfo 额外信息。
+     * You can use this callback to get the status (`Playing`, `Loading`, or `Stopped`) of the video of each remote user and display it on the UI.
+     * @param userId User ID
+     * @param streamType Video stream type. The primary stream (`Main`) is usually used for camera images, and the substream (`Sub`) for screen sharing images.
+     * @param status Video status, which may be `Playing`, `Loading`, or `Stopped`
+     * @param reason Reason for the change of status
+     * @param extraInfo Extra information
      */
     virtual void onRemoteVideoStatusUpdated(const char* userId, TRTCVideoStreamType streamType, TRTCAVStatusType status, TRTCAVStatusChangeReason reason, void* extrainfo) {
     }
 
     /**
-     * 3.11 远端音频状态变化的事件回调
+     * 3.11 Change of remote audio status
      *
-     * 您可以通过此事件回调获取远端每一路音频的播放状态（包括 Playing、Loading 和 Stopped 三种状态），从而进行相应的 UI 展示。
-     * @param userId 用户标识。
-     * @param status 音频状态：包括 Playing、Loading 和 Stopped 三种状态。
-     * @param reason 音频状态改变的原因。
-     * @param extrainfo 额外信息。
+     * You can use this callback to get the status (`Playing`, `Loading`, or `Stopped`) of the audio of each remote user and display it on the UI.
+     * @param userId User ID
+     * @param status Audio status, which may be `Playing`, `Loading`, or `Stopped`
+     * @param reason Reason for the change of status
+     * @param extraInfo Extra information
      */
     virtual void onRemoteAudioStatusUpdated(const char* userId, TRTCAVStatusType status, TRTCAVStatusChangeReason reason, void* extrainfo) {
     }
 
     /**
-     * 3.12 用户视频大小发生改变回调
+     * 3.12 Change of remote video size
      *
-     * 当您收到 onUserVideoSizeChanged(userId, streamtype, newWidth, newHeight) 通知时，表示该路画面大小发生了调整，调整的原因可能是该用户调用了 setVideoEncoderParam 或者 setSubStreamEncoderParam 重新设置了画面尺寸。
-     * @param userId 用户标识。
-     * @param streamType 视频流类型：主路（Main）一般用于承载摄像头画面，辅路（Sub）一般用于承载屏幕分享画面。
-     * @param newWidth 视频流的宽度（像素）。
-     * @param newHeight 视频流的高度（像素）。
+     * If you receive the `onUserVideoSizeChanged(userId, streamtype, newWidth, newHeight)` callback, it indicates that the user changed the video size. It may be triggered by `setVideoEncoderParam` or `setSubStreamEncoderParam`.
+     * @param userId User ID
+     * @param streamType Video stream type. The primary stream (`Main`) is usually used for camera images, and the substream (`Sub`) for screen sharing images.
+     * @param newWidth Video width
+     * @param newHeight Video height
      */
     virtual void onUserVideoSizeChanged(const char* userId, TRTCVideoStreamType streamType, int newWidth, int newHeight) {
     }
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    网络和技术指标统计回调
+    //                    Callback of statistics on network and technical metrics
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 4.1 网络质量的实时统计回调
+     * 4.1 Real-time network quality statistics
      *
-     * 该统计回调每间隔2秒抛出一次，用于通知 SDK 感知到的当前网络的上行和下行质量。
-     * SDK 会使用一组内嵌的自研算法对当前网络的延迟高低、带宽大小以及稳定情况进行评估，并计算出一个评估结果：如果评估结果为 1（Excellent） 代表当前的网络情况非常好，如果评估结果为 6（Down）代表当前网络无法支撑 TRTC 的正常通话。
-     * @param localQuality 上行网络质量。
-     * @param remoteQuality 下行网络质量，代表数据流历经“远端->云端->本端”这样一条完整的传输链路后，最终在本端统计到的数据质量。因此，这里的下行网络质量代表的是远端上行链路与本端下行链路共同影响的结果。
-     * @note 暂时无法通过该接口单独判定远端用户的上行质量。
+     * This callback is returned every 2 seconds and notifies you of the upstream and downstream network quality detected by the SDK.
+     * The SDK uses a built-in proprietary algorithm to assess the current latency, bandwidth, and stability of the network and returns a result.
+     * If the result is `1` (excellent), it means that the current network conditions are excellent; if it is `6` (down), it means that the current network conditions are too bad to support TRTC calls.
+     * @param localQuality Upstream network quality
+     * @param remoteQuality Downstream network quality, it refers to the data quality finally measured on the local side after the data flow passes through a complete transmission link of "remote ->cloud ->local". Therefore, the downlink network
+     * quality here represents the joint impact of the remote uplink and the local downlink.
+     * @note The uplink quality of remote users cannot be determined independently through this interface.
      */
     virtual void onNetworkQuality(TRTCQualityInfo localQuality, TRTCQualityInfo* remoteQuality, uint32_t remoteQualityCount) {
     }
 
     /**
-     * 4.2 音视频技术指标的实时统计回调
+     * 4.2 Real-time statistics on technical metrics
      *
-     * 该统计回调每间隔2秒抛出一次，用于通知 SDK 内部音频、视频以及网络相关的专业技术指标，这些信息在 {@link TRTCStatistics} 均有罗列：
-     * - 视频统计信息：视频的分辨率（resolution）、帧率（FPS）和比特率（bitrate）等信息。
-     * - 音频统计信息：音频的采样率（samplerate）、声道（channel）和比特率（bitrate）等信息。
-     * - 网络统计信息：SDK 和云端一次往返（SDK > Cloud > SDK）的网络耗时（rtt）、丢包率（loss）、上行流量（sentBytes）和下行流量（receivedBytes）等信息。
-     * @param statistics 统计数据，包括自己本地的统计信息和远端用户的统计信息，详情请参考 {@link TRTCStatistics}。
-     * @note 如果您只需要获知当前网络质量的好坏，并不需要花太多时间研究本统计回调，更推荐您使用 {@link onNetworkQuality} 来解决问题。
+     * This callback is returned every 2 seconds and notifies you of the statistics on technical metrics related to video, audio, and network. The metrics are listed in {@link TRTCStatistics}:
+     * - Video statistics: video resolution (`resolution`), frame rate (`FPS`), bitrate (`bitrate`), etc.
+     * - Audio statistics: audio sample rate (`samplerate`), number of audio channels (`channel`), bitrate (`bitrate`), etc.
+     * - Network statistics: the round trip time (`rtt`) between the SDK and the cloud (SDK -> Cloud -> SDK), package loss rate (`loss`), upstream traffic (`sentBytes`), downstream traffic (`receivedBytes`), etc.
+     * @param statistics Statistics, including local statistics and the statistics of remote users. For details, please see {@link TRTCStatistics}.
+     * @note If you want to learn about only the current network quality and do not want to spend much time analyzing the statistics returned by this callback, we recommend you use {@link onNetworkQuality}.
      */
     virtual void onStatistics(const TRTCStatistics& statistics) {
     }
 
     /**
-     * 4.3 网速测试的结果回调
+     * 4.3 Callback of network speed test
      *
-     * 该统计回调由 {@link startSpeedTest:} 触发。
-     * @param result 网速测试结果，包括丢包、往返延迟、上下行的带宽速率，详情请参见 {@link TRTCSpeedTestResult}。
+     * The callback is triggered by {@link startSpeedTest:}.
+     * @param result Speed test data, including loss rates, rtt and bandwidth rates, please refer to {@link TRTCSpeedTestResult} for details.
      */
     virtual void onSpeedTestResult(const TRTCSpeedTestResult& result) {
     }
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    与云端连接情况的事件回调
+    //                    Callback of connection to the cloud
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 5.1 SDK 与云端的连接已经断开
+     * 5.1 The SDK was disconnected from the cloud
      *
-     * SDK 会在跟云端的连接断开时抛出此事件回调，导致断开的原因大多是网络不可用或者网络切换所致，比如用户在通话中走进电梯时就可能会遇到此事件。
-     * 在抛出此事件之后，SDK 会努力跟云端重新建立连接，重连过程中会抛出 {@link onTryToReconnect}，连接恢复后会抛出 {@link onConnectionRecovery} 。
-     * 所以，SDK 会在如下三个连接相关的事件中按如下规律切换：
+     * The SDK returns this callback when it is disconnected from the cloud, which may be caused by network unavailability or change of network, for example, when the user walks into an elevator.
+     * After returning this callback, the SDK will attempt to reconnect to the cloud, and will return the {@link onTryToReconnect} callback. When it is reconnected, it will return the {@link onConnectionRecovery} callback.
+     * In other words, the SDK proceeds from one event to the next in the following order:
      * ![](https://qcloudimg.tencent-cloud.cn/raw/fb3c40a4fca55b0010d385cf3b2472cd.png)
      */
     virtual void onConnectionLost() {
     }
 
     /**
-     * 5.2 SDK 正在尝试重新连接到云端
+     * 5.2 The SDK is reconnecting to the cloud
      *
-     * SDK 会在跟云端的连接断开时抛出 {@link onConnectionLost}，之后会努力跟云端重新建立连接并抛出本事件，连接恢复后会抛出 {@link onConnectionRecovery}。
+     * When the SDK is disconnected from the cloud, it returns the {@link onConnectionLost} callback. It then attempts to reconnect and returns this callback ({@link onTryToReconnect}). After it is reconnected, it returns the {@link
+     * onConnectionRecovery} callback.
      */
     virtual void onTryToReconnect() {
     }
 
     /**
-     * 5.3 SDK 与云端的连接已经恢复
+     * 5.3 The SDK is reconnected to the cloud
      *
-     * SDK 会在跟云端的连接断开时抛出 {@link onConnectionLost}，之后会努力跟云端重新建立连接并抛出 {@link onTryToReconnect}，连接恢复后会抛出本事件回调。
+     * When the SDK is disconnected from the cloud, it returns the {@link onConnectionLost} callback. It then attempts to reconnect and returns the {@link onTryToReconnect} callback. After it is reconnected, it returns this callback ({@link
+     * onConnectionRecovery}).
      */
     virtual void onConnectionRecovery() {
     }
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    硬件设备相关事件回调
+    //                    Callback of hardware events
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 6.1 摄像头准备就绪
+     * 6.1 The camera is ready
      *
-     * 当您调用 {@link startLocalPreivew} 之后，SDK 会尝试启动摄像头，如果摄像头能够启动成功就会抛出本事件。
-     * 如果启动失败，大概率是因为当前应用没有获得访问摄像头的权限，或者摄像头当前正在被其他程序独占使用中。
-     * 您可以通过捕获 {@link onError} 事件回调获知这些异常情况并通过 UI 界面提示用户。
+     * After you call {@link startLocalPreivew}, the SDK will try to start the camera and return this callback if the camera is started.
+     * If it fails to start the camera, it’s probably because the application does not have access to the camera or the camera is being used.
+     * You can capture the {@link onError} callback to learn about the exception and let users know via UI messages.
      */
     virtual void onCameraDidReady() {
     }
 
     /**
-     * 6.2 麦克风准备就绪
+     * 6.2 The mic is ready
      *
-     * 当您调用 {@link startLocalAudio} 之后，SDK 会尝试启动麦克风，如果麦克风能够启动成功就会抛出本事件。
-     * 如果启动失败，大概率是因为当前应用没有获得访问麦克风的权限，或者麦克风当前正在被其他程序独占使用中。
-     * 您可以通过捕获 {@link onError} 事件回调获知这些异常情况并通过 UI 界面提示用户。
+     * After you call {@link startLocalAudio}, the SDK will try to start the mic and return this callback if the mic is started.
+     * If it fails to start the mic, it’s probably because the application does not have access to the mic or the mic is being used.
+     * You can capture the {@link onError} callback to learn about the exception and let users know via UI messages.
      */
     virtual void onMicDidReady() {
     }
 
     /**
-     * 6.4 音量大小的反馈回调
+     * 6.4 Volume
      *
-     * SDK 可以评估每一路音频的音量大小，并每隔一段时间抛出该事件回调，您可以根据音量大小在 UI 上做出相应的提示，比如`波形图`或`音量槽`。
-     * 要完成这个功能， 您需要先调用 {@link enableAudioVolumeEvaluation} 开启这个能力并设定事件抛出的时间间隔。
-     * 需要补充说明的是，无论当前房间中是否有人说话，SDK 都会按照您设定的时间间隔定时抛出此事件回调。
-     * @param userVolumes 是一个数组，用于承载所有正在说话的用户的音量大小，取值范围 0 - 100。
-     * @param totalVolume 所有远端用户的总音量大小，取值范围 0 - 100。
-     * @note userVolumes 为一个数组，对于数组中的每一个元素，当 userId 为空时表示本地麦克风采集的音量大小，当 userId 不为空时代表远端用户的音量大小。
+     * The SDK can assess the volume of each channel and return this callback on a regular basis. You can display, for example, a waveform or volume bar on the UI based on the statistics returned.
+     * You need to first call {@link enableAudioVolumeEvaluation} to enable the feature and set the interval for the callback.
+     * Note that the SDK returns this callback at the specified interval regardless of whether someone is speaking in the room.
+     * @param userVolumes An array that represents the volume of all users who are speaking in the room. Value range: 0-100
+     * @param totalVolume The total volume of all remote users. Value range: 0-100
+     * @note `userVolumes` is an array. If `userId` is empty, the elements in the array represent the volume of the local user’s audio. Otherwise, they represent the volume of a remote user’s audio.
      */
     virtual void onUserVoiceVolume(TRTCVolumeInfo* userVolumes, uint32_t userVolumesCount, uint32_t totalVolume) {
     }
 
 /**
- * 6.5 本地设备的通断状态发生变化（仅适用于桌面系统）
+ * 6.5 The status of a local device changed (for desktop OS only)
  *
- * 当本地设备（包括摄像头、麦克风以及扬声器）被插入或者拔出时，SDK 便会抛出此事件回调。
- * @param deviceId 设备 ID。
- * @param deviceType 设备类型。
- * @param state 通断状态，0：设备已添加；1：设备已被移除；1：设备已启用。
+ * The SDK returns this callback when a local device (camera, mic, or speaker) is connected or disconnected.
+ * @param deviceId Device ID
+ * @param deviceType Device type
+ * @param state Device status. `0`: connected; `1`: disconnected; `2`: started
  */
 #if TARGET_PLATFORM_DESKTOP
     virtual void onDeviceChange(const char* deviceId, TRTCDeviceType type, TRTCDeviceState state) {
@@ -398,15 +407,15 @@ class ITRTCCloudCallback {
 #endif
 
 /**
- * 6.6 当前麦克风的系统采集音量发生变化
+ * 6.6 The capturing volume of the mic changed
  *
- * 在 Mac 或 Windows 这样的桌面操作系统上，用户可以在设置中心找到声音相关的设置面板，并设置麦克风的采集音量大小。
- * 用户将麦克风的采集音量设置得越大，麦克风采集到的声音的原始音量也就会越大，反之就会越小。
- * 在有些型号的键盘以及笔记本电脑上，用户还可以通过按下`禁用麦克风`按钮（图标是一个`话筒`叠加了一道代表禁用的斜线）来将麦克风静音。
- * 当用户通过系统设置界面或者通过键盘上的快捷键设定操作系统的麦克风采集音量时，SDK 便会抛出此事件。
- * @param volume 系统采集音量，取值范围 0 - 100，用户可以在系统的声音设置面板上进行拖拽调整。
- * @param muted 麦克风是否被用户禁用了：true 被禁用，false 被启用。
- * @note 您需要调用 {@link enableAudioVolumeEvaluation} 接口并设定 interval 大于 0 开启次事件回调，设定 interval 等于 0 关闭此事件回调。
+ * On desktop OS such as macOS and Windows, users can set the capturing volume of the mic in the audio control panel.
+ * The higher volume a user sets, the higher the volume of raw audio captured by the mic.
+ * On some keyboards and laptops, users can also mute the mic by pressing a key (whose icon is a crossed out mic).
+ * When users set the mic capturing volume via the UI or a keyboard shortcut, the SDK will return this callback.
+ * @param volume System audio capturing volume, which users can set in the audio control panel. Value range: 0-100
+ * @param muted Whether the mic is muted. `true`: muted; `false`: unmuted
+ * @note You need to call {@link enableAudioVolumeEvaluation} and set the callback interval (`interval` > 0) to enable the callback. To disable the callback, set `interval` to `0`.
  */
 #if TARGET_PLATFORM_DESKTOP
     virtual void onAudioDeviceCaptureVolumeChanged(uint32_t volume, bool muted) {
@@ -414,14 +423,14 @@ class ITRTCCloudCallback {
 #endif
 
 /**
- * 6.7 当前系统的播放音量发生变化
+ * 6.7 The playback volume changed
  *
- * 在 Mac 或 Windows 这样的桌面操作系统上，用户可以在设置中心找到声音相关的设置面板，并设置系统的播放音量大小。
- * 在有些型号的键盘以及笔记本电脑上，用户还可以通过按下“静音”按钮（图标是一个喇叭上叠加了一道代表禁用的斜线）来将系统静音。
- * 当用户通过系统设置界面或者通过键盘上的快捷键设定操作系统的播放音量时，SDK 便会抛出此事件。
- * @param volume 系统播放音量，取值范围 0 - 100，用户可以在系统的声音设置面板上进行拖拽调整。
- * @param muted 系统是否被用户静音了：true 被静音，false 已恢复。
- * @note 您需要调用 {@link enableAudioVolumeEvaluation} 接口并设定 interval 大于 0 开启次事件回调，设定 interval 等于 0 关闭此事件回调。
+ * On desktop OS such as macOS and Windows, users can set the system’s playback volume in the audio control panel.
+ * On some keyboards and laptops, users can also mute the speaker by pressing a key (whose icon is a crossed out speaker).
+ * When users set the system’s playback volume via the UI or a keyboard shortcut, the SDK will return this callback.
+ * @param volume The system playback volume, which users can set in the audio control panel. Value range: 0-100
+ * @param muted Whether the speaker is muted. `true`: muted; `false`: unmuted
+ * @note You need to call {@link enableAudioVolumeEvaluation} and set the callback interval (`interval` > 0) to enable the callback. To disable the callback, set `interval` to `0`.
  */
 #if TARGET_PLATFORM_DESKTOP
     virtual void onAudioDevicePlayoutVolumeChanged(uint32_t volume, bool muted) {
@@ -429,12 +438,12 @@ class ITRTCCloudCallback {
 #endif
 
 /**
- * 6.8 系统声音采集是否被成功开启的事件回调（仅适用于 Mac 系统）
+ * 6.8 Whether system audio capturing is enabled successfully (for macOS only)
  *
- * 在 Mac 系统上，您可以通过调用 {@link startSystemAudioLoopback} 为当前系统安装一个音频驱动，并让 SDK 通过该音频驱动捕获当前 Mac 系统播放出的声音。
- * 当用于播片教学或音乐直播中，比如老师端可以使用此功能，让 SDK 能够采集老师所播放的电影中的声音，使同房间的学生端也能听到电影中的声音。
- * SDK 会将系统声音采集是否被成功开启的结果，通过本事件回调抛出，需要您关注参数中的错误码。
- * @param err ERR_NULL 表示成功，其余值表示失败。
+ * On macOS, you can call {@link startSystemAudioLoopback} to install an audio driver and have the SDK capture the audio played back by the system.
+ * In use cases such as video teaching and music live streaming, the teacher can use this feature to let the SDK capture the sound of the video played by his or her computer, so that students in the room can hear the sound too.
+ * The SDK returns this callback after trying to enable system audio capturing. To determine whether it is actually enabled, pay attention to the error parameter in the callback.
+ * @param err If it is `ERR_NULL`, system audio capturing is enabled successfully. Otherwise, it is not.
  */
 #if TARGET_PLATFORM_MAC
     virtual void onSystemAudioLoopbackError(TXLiteAVError errCode) {
@@ -442,11 +451,11 @@ class ITRTCCloudCallback {
 #endif
 
 /**
- * 6.9 测试麦克风时的音量回调
+ * 6.9 Volume during mic test
  *
- * 当您调用 {@link startMicDeviceTest} 测试麦克风是否正常工作时，SDK 会不断地抛出此回调，参数中的 volume 代表当前麦克风采集到的音量大小。
- * 如果在测试期间 volume 出现了大小波动的情况，说明麦克风状态健康；如果 volume 的数值始终是 0，说明麦克风的状态异常，需要提示用户进行更换。
- * @param volume 麦克风采集到的音量值，取值范围0 - 100。
+ * When you call {@link startMicDeviceTest} to test the mic, the SDK will keep returning this callback. The `volume` parameter represents the volume of the audio captured by the mic.
+ * If the value of the `volume` parameter fluctuates, the mic works properly. If it is `0` throughout the test, it indicates that there is a problem with the mic, and users should be prompted to switch to a different mic.
+ * @param volume Captured mic volume. Value range: 0-100
  */
 #if TARGET_PLATFORM_DESKTOP
     virtual void onTestMicVolume(uint32_t volume) {
@@ -454,11 +463,11 @@ class ITRTCCloudCallback {
 #endif
 
 /**
- * 6.10 测试扬声器时的音量回调
+ * 6.10 Volume during speaker test
  *
- * 当您调用 {@link startSpeakerDeviceTest} 测试扬声器是否正常工作时，SDK 会不断地抛出此回调。
- * 参数中的 volume 代表的是 SDK 提交给系统扬声器去播放的声音的音量值大小，如果该数值持续变化，但用户反馈听不到声音，则说明扬声器状态异常。
- * @param volume SDK 提交给扬声器去播放的声音的音量，取值范围0 - 100。
+ * When you call {@link startSpeakerDeviceTest} to test the speaker, the SDK will keep returning this callback.
+ * The `volume` parameter in the callback represents the volume of audio sent by the SDK to the speaker for playback. If its value fluctuates but users cannot hear any sound, the speaker is not working properly.
+ * @param volume The volume of audio sent by the SDK to the speaker for playback. Value range: 0-100
  */
 #if TARGET_PLATFORM_DESKTOP
     virtual void onTestSpeakerVolume(uint32_t volume) {
@@ -467,214 +476,227 @@ class ITRTCCloudCallback {
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    自定义消息的接收事件回调
+    //                    Callback of the receipt of a custom message
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 7.1 收到自定义消息的事件回调
+     * 7.1 Receipt of custom message
      *
-     * 当房间中的某个用户使用 {@link sendCustomCmdMsg} 发送自定义 UDP 消息时，房间中的其他用户可以通过 onRecvCustomCmdMsg 事件回调接收到该条消息。
-     * @param userId 用户标识。
-     * @param cmdID 命令 ID。
-     * @param seq   消息序号。
-     * @param message 消息数据。
+     * When a user in a room uses {@link sendCustomCmdMsg} to send a custom message, other users in the room can receive the message through the `onRecvCustomCmdMsg` callback.
+     *
+     * @param userId User ID
+     * @param cmdID Command ID
+     * @param seq   Message serial number
+     * @param message Message data
      */
     virtual void onRecvCustomCmdMsg(const char* userId, int32_t cmdID, uint32_t seq, const uint8_t* message, uint32_t messageSize) {
     }
 
     /**
-     * 7.2 自定义消息丢失的事件回调
+     * 7.2 Loss of custom message
      *
-     * 当您使用 {@link sendCustomCmdMsg} 发送自定义 UDP 消息时，即使设置了可靠传输（reliable），也无法确 100% 不丢失，只是丢消息概率极低，能满足常规可靠性要求。
-     * 在发送端设置了可靠运输（reliable）后，SDK 都会通过此回调通知过去时间段内（通常为5s）传输途中丢失的自定义消息数量统计信息。
-     * @param userId 用户标识。
-     * @param cmdID 命令 ID。
-     * @param errCode 错误码。
-     * @param missed 丢失的消息数量。
-     * @note  只有在发送端设置了可靠传输（reliable），接收方才能收到消息的丢失回调。
+     * When you use {@link sendCustomCmdMsg} to send a custom UDP message, even if you enable reliable transfer (by setting `reliable` to `true`), there is still a chance of message loss. Reliable transfer only helps maintain a low probability of
+     * message loss, which meets the reliability requirements in most cases. If the sender sets `reliable` to `true`, the SDK will use this callback to notify the recipient of the number of custom messages lost during a specified time period (usually
+     * 5s) in the past.
+     * @param userId User ID
+     * @param cmdID Command ID
+     * @param errCode Error code
+     * @param missed Number of lost messages
+     * @note The recipient receives this callback only if the sender sets `reliable` to `true`.
      */
     virtual void onMissCustomCmdMsg(const char* userId, int32_t cmdID, int32_t errCode, int32_t missed) {
     }
 
     /**
-     * 7.3 收到 SEI 消息的回调
+     * 7.3 Receipt of SEI message
      *
-     * 当房间中的某个用户使用 {@link sendSEIMsg} 借助视频数据帧发送 SEI 消息时，房间中的其他用户可以通过 onRecvSEIMsg 事件回调接收到该条消息。
-     * @param userId   用户标识。
-     * @param message  数据。
+     * If a user in the room uses {@link sendSEIMsg} to send an SEI message via video frames, other users in the room can receive the message through the `onRecvSEIMsg` callback.
+     *
+     * @param userId User ID
+     * @param message  Data
      */
     virtual void onRecvSEIMsg(const char* userId, const uint8_t* message, uint32_t messageSize) {
     }
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    CDN 相关事件回调
+    //                    CDN event callback
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 8.1 开始向腾讯云直播 CDN 上发布音视频流的事件回调
+     * 8.1 Started publishing to Tencent Cloud CSS CDN
      *
-     * 当您调用 {@link startPublishing} 开始向腾讯云直播 CDN 上发布音视频流时，SDK 会立刻将这一指令同步给云端服务器。
-     * 随后 SDK 会收到来自云端服务器的处理结果，并将指令的执行结果通过本事件回调通知给您。
-     * @param err 0表示成功，其余值表示失败。
-     * @param errMsg 具体错误原因。
+     * When you call {@link startPublishing} to publish streams to Tencent Cloud CSS CDN, the SDK will sync the command to the CVM immediately.
+     * The SDK will then receive the execution result from the CVM and return the result to you via this callback.
+     *
+     * @param err `0`: successful; other values: failed
+     * @param errMsg Error message
      */
     virtual void onStartPublishing(int err, const char* errMsg) {
     }
 
     /**
-     * 8.2 停止向腾讯云直播 CDN 上发布音视频流的事件回调
+     * 8.2 Stopped publishing to Tencent Cloud CSS CDN
      *
-     * 当您调用 {@link stopPublishing} 停止向腾讯云直播 CDN 上发布音视频流时，SDK 会立刻将这一指令同步给云端服务器。
-     * 随后 SDK 会收到来自云端服务器的处理结果，并将指令的执行结果通过本事件回调通知给您。
-     * @param err 0表示成功，其余值表示失败。
-     * @param errMsg 具体错误原因。
+     * When you call {@link stopPublishing} to stop publishing streams to Tencent Cloud CSS CDN, the SDK will sync the command to the CVM immediately.
+     * The SDK will then receive the execution result from the CVM and return the result to you via this callback.
+     * @param err `0`: successful; other values: failed
+     * @param errMsg Error message
      */
     virtual void onStopPublishing(int err, const char* errMsg) {
     }
 
     /**
-     * 8.3 开始向非腾讯云 CDN 上发布音视频流的事件回调
+     * 8.3 Started publishing to non-Tencent Cloud’s live streaming CDN
      *
-     * 当您调用 {@link startPublishCDNStream} 开始向非腾讯云直播 CDN 上发布音视频流时，SDK 会立刻将这一指令同步给云端服务器。随后 SDK 会收到来自云端服务器的处理结果，并将指令的执行结果通过本事件回调通知给您。
-     * @param err 0表示成功，其余值表示失败。
-     * @param errMsg 具体错误原因。
-     * @note 当您收到成功的事件回调时，只是说明您的发布指令已经同步到腾讯云后台服务器，但如果目标 CDN 厂商的服务器不接收该条视频流，依然可能导致发布失败。
+     * When you call {@link startPublishCDNStream} to start publishing streams to a non-Tencent Cloud’s live streaming CDN, the SDK will sync the command to the CVM immediately.
+     * The SDK will then receive the execution result from the CVM and return the result to you via this callback.
+     * @param err `0`: successful; other values: failed
+     * @param errMsg Error message
+     * @note If you receive a callback that the command is executed successfully, it only means that your command was sent to Tencent Cloud’s backend server. If the CDN vendor does not accept your streams, the publishing will still fail.
      */
     virtual void onStartPublishCDNStream(int errCode, const char* errMsg) {
     }
 
     /**
-     * 8.4 停止向非腾讯云 CDN 上发布音视频流的事件回调
+     * 8.4 Stopped publishing to non-Tencent Cloud’s live streaming CDN
      *
-     * 当您调用 {@link stopPublishCDNStream} 开始向非腾讯云直播 CDN 上发布音视频流时，SDK 会立刻将这一指令同步给云端服务器。随后 SDK 会收到来自云端服务器的处理结果，并将指令的执行结果通过本事件回调通知给您。
-     * @param err 0表示成功，其余值表示失败。
-     * @param errMsg 具体错误原因。
+     * When you call {@link stopPublishCDNStream} to stop publishing to a non-Tencent Cloud’s live streaming CDN, the SDK will sync the command to the CVM immediately.
+     * The SDK will then receive the execution result from the CVM and return the result to you via this callback.
+     * @param err `0`: successful; other values: failed
+     * @param errMsg Error message
      */
     virtual void onStopPublishCDNStream(int errCode, const char* errMsg) {
     }
 
     /**
-     * 8.5 设置云端混流的排版布局和转码参数的事件回调
+     * 8.5 Set the layout and transcoding parameters for On-Cloud MixTranscoding
      *
-     * 当您调用 {@link setMixTranscodingConfig} 调整云端混流的排版布局和转码参数时，SDK 会立刻将这一调整指令同步给云端服务器。随后 SDK 会收到来自云端服务器的处理结果，并将指令的执行结果通过本事件回调通知给您。
-     * @param err 错误码：0表示成功，其余值表示失败。
-     * @param errMsg 具体的错误原因。
+     * When you call {@link setMixTranscodingConfig} to modify the layout and transcoding parameters for On-Cloud MixTranscoding, the SDK will sync the command to the CVM immediately.
+     * The SDK will then receive the execution result from the CVM and return the result to you via this callback.
+     * @param err `0`: successful; other values: failed
+     * @param errMsg Error message
      */
     virtual void onSetMixTranscodingConfig(int err, const char* errMsg) {
     }
 
     /**
-     * 8.6 开始发布媒体流的事件回调
+     * 8.6 Callback for starting to publish
      *
-     * 当您调用 {@link startPublishMediaStream} 开始向 TRTC 后台服务发布媒体流时，SDK 会立刻将这一指令同步给云端服务器，随后 SDK 会收到来自云端服务器的处理结果，并将指令的执行结果通过本事件回调通知给您。
-     * @param taskId 当请求成功时，TRTC 后台会在回调中提供给您这项任务的 taskId，后续您可以通过该 taskId 结合 {@link updatePublishMediaStream} 和 {@link stopPublishMediaStream} 进行更新和停止。
-     * @param code 回调结果，0 表示成功，其余值表示失败。
-     * @param message 具体回调信息。
-     * @param extraInfo 扩展信息字段，个别错误码可能会带额外的信息帮助定位问题。
+     * When you call {@link startPublishMediaStream} to publish a stream to the TRTC backend, the SDK will immediately update the command to the cloud server.
+     * The SDK will then receive the publishing result from the cloud server and will send the result to you via this callback.
+     * @param taskId: If a request is successful, a task ID will be returned via the callback. You need to provide this task ID when you call {@link updatePublishMediaStream} to modify publishing parameters or {@link stopPublishMediaStream} to stop
+     * publishing.
+     * @param code: `0`: Successful; other values: Failed.
+     * @param message: The callback information.
+     * @param extraInfo: Additional information. For some error codes, there may be additional information to help you troubleshoot the issues.
      */
     virtual void onStartPublishMediaStream(const char* taskId, int code, const char* message, void* extraInfo) {
     }
 
     /**
-     * 8.7 更新媒体流的事件回调
+     * 8.7 Callback for modifying publishing parameters
      *
-     * 当您调用媒体流发布接口 ({@link updatePublishMediaStream}) 开始向 TRTC 后台服务更新媒体流时，SDK 会立刻将这一指令同步给云端服务器，随后 SDK 会收到来自云端服务器的处理结果，并将指令的执行结果通过本事件回调通知给您。
-     * @param taskId 您调用媒体流发布接口 ({@link updatePublishMediaStream}) 时传入的 taskId，会通过此回调再带回给您，用于标识该回调属于哪一次更新请求。
-     * @param code 回调结果，0 表示成功，其余值表示失败。
-     * @param message 具体回调信息。
-     * @param extraInfo 扩展信息字段，个别错误码可能会带额外的信息帮助定位问题。
+     * When you call {@link updatePublishMediaStream} to modify publishing parameters, the SDK will immediately update the command to the cloud server.
+     * The SDK will then receive the modification result from the cloud server and will send the result to you via this callback.
+     * @param taskId: The task ID you pass in when calling {@link updatePublishMediaStream}, which is used to identify a request.
+     * @param code: `0`: Successful; other values: Failed.
+     * @param message: The callback information.
+     * @param extraInfo: Additional information. For some error codes, there may be additional information to help you troubleshoot the issues.
      */
     virtual void onUpdatePublishMediaStream(const char* taskId, int code, const char* message, void* extraInfo) {
     }
 
     /**
-     * 8.8 停止媒体流的事件回调
+     * 8.8 Callback for stopping publishing
      *
-     * 当您调用停止发布媒体流 ({@link stopPublishMediaStream}) 开始向 TRTC 后台服务停止媒体流时，SDK 会立刻将这一指令同步给云端服务器，随后 SDK 会收到来自云端服务器的处理结果，并将指令的执行结果通过本事件回调通知给您。
-     * @param taskId 您调用停止发布媒体流 ({@link stopPublishMediaStream}) 时传入的 taskId，会通过此回调再带回给您，用于标识该回调属于哪一次停止请求。
-     * @param code 回调结果，0 表示成功，其余值表示失败。
-     * @param message 具体回调信息。
-     * @param extraInfo 扩展信息字段，个别错误码可能会带额外的信息帮助定位问题。
+     * When you call {@link stopPublishMediaStream} to stop publishing, the SDK will immediately update the command to the cloud server.
+     * The SDK will then receive the modification result from the cloud server and will send the result to you via this callback.
+     * @param taskId: The task ID you pass in when calling {@link stopPublishMediaStream}, which is used to identify a request.
+     * @param code: `0`: Successful; other values: Failed.
+     * @param message: The callback information.
+     * @param extraInfo: Additional information. For some error codes, there may be additional information to help you troubleshoot the issues.
      */
     virtual void onStopPublishMediaStream(const char* taskId, int code, const char* message, void* extraInfo) {
     }
 
     /**
-     * 8.9 RTMP/RTMPS 推流状态发生改变回调
+     * 8.9 Callback for change of RTMP/RTMPS publishing status
      *
-     * 当您调用 {@link startPublishMediaStream} 开始向 TRTC 后台服务发布媒体流时，SDK 会立刻将这一指令同步给云端服务。
-     * 若您在目标推流配置 ({@link TRTCPublishTarget}) 设置了向腾讯或者第三方 CDN 上发布音视频流的 URL 配置，则具体 RTMP 或者 RTMPS 推流状态将通过此回调同步给您。
-     * @param cdnUrl 您调用 {@link startPublishMediaStream} 时通过目标推流配置 ({@link TRTCPublishTarget}) 传入的 url，在推流状态变更时，会通过此回调同步给您。
-     * @param status 推流状态。
-     * - 0：推流未开始或者已结束。在您调用 {@link stopPublishMediaStream} 时会返回该状态。
-     * - 1：正在连接 TRTC 服务器和 CDN 服务器。若无法立刻成功，TRTC 后台服务会多次重试尝试推流，并返回该状态（5s回调一次）。如成功进行推流，则进入状态 2；如服务器出错或 60 秒内未成功推流，则进入状态 4。
-     * - 2：CDN 推流正在进行。在成功推流后，会返回该状态。
-     * - 3：TRTC 服务器和 CDN 服务器推流中断，正在恢复。当 CDN 出现异常，或推流短暂中断时，TRTC 后台服务会自动尝试恢复推流，并返回该状态（5s回调一次）。如成功恢复推流，则进入状态 2；如服务器出错或 60 秒内未成功恢复，则进入状态 4。
-     * - 4：TRTC 服务器和 CDN 服务器推流中断，且恢复或连接超时。即此时推流失败，你可以再次调用 {@link updatePublishMediaStream} 尝试推流。
-     * - 5：正在断开 TRTC 服务器和 CDN 服务器。在您调用 {@link stopPublishMediaStream} 时，TRTC 后台服务会依次同步状态 5 和状态 0。
-     * @param code 推流结果，0 表示成功，其余值表示出错。
-     * @param message 具体推流信息。
-     * @param extraInfo 扩展信息字段，个别错误码可能会带额外的信息帮助定位问题。
+     * When you call {@link startPublishMediaStream} to publish a stream to the TRTC backend, the SDK will immediately update the command to the cloud server.
+     * If you set the publishing destination ({@link TRTCPublishTarget}) to the URL of Tencent Cloud or a third-party CDN, you will be notified of the RTMP/RTMPS publishing status via this callback.
+     * @param cdnUrl: The URL you specify in {@link TRTCPublishTarget} when you call {@link startPublishMediaStream}.
+     * @param status: The publishing status.
+     *  - 0: The publishing has not started yet or has ended. This value will be returned after you call {@link stopPublishMediaStream}.
+     *  - 1: The TRTC server is connecting to the CDN server. If the first attempt fails, the TRTC backend will retry multiple times and will return this value via the callback (every five seconds). After publishing succeeds, the value `2` will be
+     * returned. If a server error occurs or publishing is still unsuccessful after 60 seconds, the value `4` will be returned.
+     *  - 2: The TRTC server is publishing to the CDN. This value will be returned if the publishing succeeds.
+     *  - 3: The TRTC server is disconnected from the CDN server and is reconnecting. If a CDN error occurs or publishing is interrupted, the TRTC backend will try to reconnect and resume publishing and will return this value via the callback (every
+     * five seconds). After publishing resumes, the value `2` will be returned. If a server error occurs or the attempt to resume publishing is still unsuccessful after 60 seconds, the value `4` will be returned.
+     *  - 4: The TRTC server is disconnected from the CDN server and failed to reconnect within the timeout period. In this case, the publishing is deemed to have failed. You can call {@link updatePublishMediaStream} to try again.
+     *  - 5: The TRTC server is disconnecting from the CDN server. After you call {@link stopPublishMediaStream}, the SDK will return this value first and then the value `0`.
+     * @param code: The publishing result. `0`: Successful; other values: Failed.
+     * @param message: The publishing information.
+     * @param extraInfo: Additional information. For some error codes, there may be additional information to help you troubleshoot the issues.
      */
     virtual void onCdnStreamStateChanged(const char* cdnUrl, int status, int code, const char* msg, void* extraInfo) {
     }
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    屏幕分享相关事件回调
+    //                    Screen sharing event callback
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 9.1 屏幕分享开启的事件回调
+     * 9.1 Screen sharing started
      *
-     * 当您通过 {@link startScreenCapture} 等相关接口启动屏幕分享时，SDK 便会抛出此事件回调。
+     * The SDK returns this callback when you call {@link startScreenCapture} and other APIs to start screen sharing.
      */
     virtual void onScreenCaptureStarted() {
     }
 
     /**
-     * 9.2 屏幕分享暂停的事件回调
+     * 9.2 Screen sharing was paused
      *
-     * 当您通过 {@link pauseScreenCapture} 暂停屏幕分享时，SDK 便会抛出此事件回调。
-     * @param reason 原因。
-     * - 0：用户主动暂停。
-     * - 1：注意此字段的含义在 MAC 和 Windows 平台有稍微差异。屏幕窗口不可见暂停（Mac）。表示设置屏幕分享参数导致的暂停（Windows）。
-     * - 2：表示屏幕分享窗口被最小化导致的暂停（仅 Windows）。
-     * - 3：表示屏幕分享窗口被隐藏导致的暂停（仅 Windows）。
+     * The SDK returns this callback when you call {@link pauseScreenCapture} to pause screen sharing.
+     * @param reason Reason.
+     * - `0`: the user paused screen sharing.
+     * - `1`: screen sharing was paused because the shared window became invisible(Mac). screen sharing was paused because setting parameters(Windows).
+     * - `2`: screen sharing was paused because the shared window became minimum(only for Windows).
+     * - `3`: screen sharing was paused because the shared window became invisible(only for Windows).
      */
     virtual void onScreenCapturePaused(int reason) {
     }
 
     /**
-     * 9.3 屏幕分享恢复的事件回调
+     * 9.3 Screen sharing was resumed
      *
-     * 当您通过 {@link resumeScreenCapture} 恢复屏幕分享时，SDK 便会抛出此事件回调。
-     * @param reason 恢复原因。
-     * - 0：用户主动恢复。
-     * - 1：注意此字段的含义在 MAC 和 Windows 平台有稍微差异。屏幕窗口恢复可见从而恢复分享（Mac）。屏幕分享参数设置完毕后自动恢复（Windows）。
-     * - 2：表示屏幕分享窗口从最小化被恢复（仅 Windows）。
-     * - 3：表示屏幕分享窗口从隐藏被恢复（仅 Windows）。
+     * The SDK returns this callback when you call {@link resumeScreenCapture} to resume screen sharing.
+     * @param reason Reason.
+     * - `0`: the user resumed screen sharing.
+     * - `1`: screen sharing was resumed automatically after the shared window became visible again(Mac). screen sharing was resumed automatically after setting parameters(Windows).
+     * - `2`: screen sharing was resumed automatically after the shared window became minimize recovery(only for Windows).
+     * - `3`: screen sharing was resumed automatically after the shared window became visible again(only for Windows).
      */
     virtual void onScreenCaptureResumed(int reason) {
     }
 
     /**
-     * 9.4 屏幕分享停止的事件回调
+     * 9.4 Screen sharing stopped
      *
-     * 当您通过 {@link stopScreenCapture} 停止屏幕分享时，SDK 便会抛出此事件回调。
-     * @param reason 停止原因，0：用户主动停止；1：屏幕窗口关闭导致停止；2：表示屏幕分享的显示屏状态变更（如接口被拔出、投影模式变更等）。
+     * The SDK returns this callback when you call {@link stopScreenCapture} to stop screen sharing.
+     * @param reason Reason. `0`: the user stopped screen sharing; `1`: screen sharing stopped because the shared window was closed.
      */
     virtual void onScreenCaptureStoped(int reason) {
     }
 
 /**
- * 9.5 屏幕分享的目标窗口被遮挡的事件回调（仅适用于 Windows 操作系统）
+ * 9.5 The shared window was covered (for Windows only)
  *
- * 当屏幕分享的目标窗口被遮挡无法正常捕获时，SDK 会抛出此事件回调，你可以在捕获到该事件回调后，通过 UI 上的一些变化来提示用户移开遮盖窗口。
+ * The SDK returns this callback when the shared window is covered and cannot be captured. Upon receiving this callback, you can prompt users via the UI to move and expose the window.
  */
 #ifdef _WIN32
     virtual void onScreenCaptureCovered() {
@@ -683,113 +705,117 @@ class ITRTCCloudCallback {
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    本地录制和本地截图的事件回调
+    //                    Callback of local recording and screenshot events
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 10.1 本地录制任务已经开始的事件回调
+     * 10.1 Local recording started
      *
-     * 当您调用 {@link startLocalRecording} 启动本地媒体录制任务时，SDK 会抛出该事件回调，用于通知您录制任务是否已经顺利启动。
-     * @param errCode 状态码。
-     *               - 0：录制任务启动成功。
-     *               - -1：内部错误导致录制任务启动失败。
-     *               - -2：文件后缀名有误（比如不支持的录制格式）。
-     *               - -6：录制已经启动，需要先停止录制。
-     *               - -7：录制文件已存在，需要先删除文件。
-     *               - -8：录制目录无写入权限，请检查目录权限问题。
-     * @param storagePath 录制文件存储路径。
+     * When you call {@link startLocalRecording} to start local recording, the SDK returns this callback to notify you whether recording is started successfully.
+     * @param errCode status.
+     *               -  0: successful.
+     *               - -1: failed.
+     *               - -2: unsupported format.
+     *               - -6: recording has been started. Stop recording first.
+     *               - -7: recording file already exists and needs to be deleted.
+     *               - -8: recording directory does not have the write permission. Please check the directory permission.
+     * @param storagePath Storage path of recording file
      */
     virtual void onLocalRecordBegin(int errCode, const char* storagePath) {
     }
 
     /**
-     * 10.2 本地录制任务正在进行中的进展事件回调
+     * 10.2 Local media is being recorded
      *
-     * 当您调用 {@link startLocalRecording} 成功启动本地媒体录制任务后，SDK 会定时地抛出本事件回调。
-     * 您可通过捕获该事件回调来获知录制任务的健康状况。
-     * 您可以在 {@link startLocalRecording} 时设定本事件回调的抛出间隔。
-     * @param duration 已经录制的累计时长，单位毫秒。
-     * @param storagePath 录制文件存储路径。
+     * The SDK returns this callback regularly after local recording is started successfully via the calling of {@link startLocalRecording}.
+     * You can capture this callback to stay up to date with the status of the recording task.
+     * You can set the callback interval when calling {@link startLocalRecording}.
+     *
+     * @param duration Cumulative duration of recording, in milliseconds
+     * @param storagePath Storage path of recording file
      */
     virtual void onLocalRecording(long duration, const char* storagePath) {
     }
 
     /**
-     * 10.3 本地录制分片的事件回调
+     * 10.3 Record fragment finished.
      *
-     * 当您开启分片录制时，每完成一个分片，都会通过此接口回调。
-     * @param storagePath 分片文件存储路径。
+     * When fragment recording is enabled, this callback will be invoked when each fragment file is finished.
+     * @param storagePath Storage path of the fragment.
      */
     virtual void onLocalRecordFragment(const char* storagePath) {
     }
 
     /**
-     * 10.4 本地录制任务已经结束的事件回调
+     * 10.4 Local recording stopped
      *
-     * 当您调用 {@link stopLocalRecording} 停止本地媒体录制任务时，SDK 会抛出该事件回调，用于通知您录制任务的最终结果。
-     * @param errCode 状态码。
-     *               -  0：结束录制任务成功。
-     *               - -1：录制失败。
-     *               - -2：切换分辨率或横竖屏导致录制结束。
-     *               - -3：录制时间太短，或未采集到任何视频或音频数据，请检查录制时长，或是否已开启音、视频采集。
-     * @param storagePath 录制文件存储路径。
+     * When you call {@link stopLocalRecording} to stop local recording, the SDK returns this callback to notify you of the recording result.
+     * @param errCode status
+     *               -  0: successful.
+     *               - -1: failed.
+     *               - -2: Switching resolution or horizontal and vertical screen causes the recording to stop.
+     *               - -3: recording duration is too short or no video or audio data is received. Check the recording duration or whether audio or video capture is enabled.
+     * @param storagePath Storage path of recording file
      */
     virtual void onLocalRecordComplete(int errCode, const char* storagePath) {
     }
 
     /**
-     * 10.5 本地截图完成的事件回调
+     * 10.5 Finished taking a local screenshot
      *
-     * @param userId 用户标识，如果 userId 为空字符串，则代表截取的是本地画面。
-     * @param type   视频流类型。
-     * @param data   截图数据，为 nullptr 表示截图失败。
-     * @param length 截图数据长度，对于BGRA32而言，length = width * height * 4。
-     * @param width  截图画面的宽度。
-     * @param height 截图画面的高度。
-     * @param format 截图数据格式，目前只支持 TRTCVideoPixelFormat_BGRA32。
-     * @param bmp 截图结果，如果 bmp 为 null 代表本次截图操作失败。
-     * @note 全平台 C++ 接口和 Java 接口在参数上是不一样的，C++ 接口用 7 个参数描述一个截图画面，Java 接口只用一个 Bitmap 描述一个截图画面。
+     * @param userId User ID. If it is empty, the screenshot is a local image.
+     * @param type   Video stream type
+     * @param data   Screenshot data. If it is `nullptr`, it indicates that the SDK failed to take the screenshot.
+     * @param length Screenshot data length. In BGRA32 format, length = width * height * 4.
+     * @param width  Screenshot width
+     * @param height Screenshot height
+     * @param format Screenshot data format. Only `TRTCVideoPixelFormat_BGRA32` is supported now.
+     * @param bmp Screenshot result. If it is `null`, the screenshot failed to be taken.
+     * @note The parameters of the full-platform C++ interface and the Java interface are different. The C++ interface uses 7 parameters to describe a screenshot, while the Java interface uses only one Bitmap to describe a screenshot.
      */
     virtual void onSnapshotComplete(const char* userId, TRTCVideoStreamType type, char* data, uint32_t length, uint32_t width, uint32_t height, TRTCVideoPixelFormat format) {
     }
 
+    /// @}
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                    废弃的事件回调（建议使用对应的新回调）
+    //                    Disused callbacks (please use the new ones)
     //
     /////////////////////////////////////////////////////////////////////////////////
+    /// @name  Disused callbacks (please use the new ones)
+    /// @{
 
     /**
-     * 有主播加入当前房间（已废弃）
+     * An anchor entered the room (disused)
      *
-     * @deprecated 新版本开始不推荐使用，建议使用 {@link onRemoteUserEnterRoom} 替代之。
+     * @deprecated This callback is not recommended in the new version. Please use {@link onRemoteUserEnterRoom} instead.
      */
     trtc_attribute_deprecated virtual void onUserEnter(const char* userId) {
     }
 
     /**
-     * 有主播离开当前房间（已废弃）
+     * An anchor left the room (disused)
      *
-     * @deprecated 新版本开始不推荐使用，建议使用 {@link onRemoteUserLeaveRoom} 替代之。
+     * @deprecated This callback is not recommended in the new version. Please use {@link onRemoteUserLeaveRoom} instead.
      */
     trtc_attribute_deprecated virtual void onUserExit(const char* userId, int reason) {
     }
 
     /**
-     * 音效播放已结束（已废弃）
+     * Audio effects ended (disused)
      *
-     * @deprecated 新版本开始不推荐使用，建议使用 {@link ITXAudioEffectManager} 接口替代之。
-     * 新的接口中不再区分背景音乐和音效，而是统一用 {@link startPlayMusic} 取代之。
+     * @deprecated This callback is not recommended in the new version. Please use {@link ITXAudioEffectManager} instead.
+     * Audio effects and background music can be started using the same API ({@link startPlayMusic}) now instead of separate ones.
      */
     trtc_attribute_deprecated virtual void onAudioEffectFinished(int effectId, int code) {
     }
 
 /**
- * 开始播放背景音乐（已废弃）
+ * Started playing background music (disused)
  *
- * @deprecated 新版本开始不推荐使用，建议使用 {@link ITXMusicPlayObserver} 接口替代之。
- * 新的接口中不再区分背景音乐和音效，而是统一用 {@link startPlayMusic} 取代之。
+ * @deprecated This callback is not recommended in the new version. Please use {@link ITXMusicPlayObserver} instead.
+ * Audio effects and background music can be started using the same API ({@link startPlayMusic}) now instead of separate ones.
  */
 #ifdef _WIN32
     trtc_attribute_deprecated virtual void onPlayBGMBegin(TXLiteAVError errCode) {
@@ -797,10 +823,10 @@ class ITRTCCloudCallback {
 #endif
 
 /**
- * 背景音乐的播放进度回调（已废弃）
+ * Playback progress of background music (disused)
  *
- * @deprecated 新版本开始不推荐使用，建议使用 {@link ITXMusicPlayObserver} 接口替代之。
- * 新的接口中不再区分背景音乐和音效，而是统一用 {@link startPlayMusic} 取代之。
+ * @deprecated This callback is not recommended in the new version. Please use {@link ITXMusicPlayObserver} instead.
+ * Audio effects and background music can be started using the same API ({@link startPlayMusic}) now instead of separate ones.
  */
 #ifdef _WIN32
     trtc_attribute_deprecated virtual void onPlayBGMProgress(uint32_t progressMS, uint32_t durationMS) {
@@ -808,10 +834,10 @@ class ITRTCCloudCallback {
 #endif
 
 /**
- * 背景音乐播放已经结束（已废弃）
+ * Background music stopped (disused)
  *
- * @deprecated 新版本开始不推荐使用，建议使用 {@link ITXMusicPlayObserver} 接口替代之。
- * 新的接口中不再区分背景音乐和音效，而是统一用 {@link startPlayMusic} 取代之。
+ * @deprecated This callback is not recommended in the new version. Please use {@link ITXMusicPlayObserver} instead.
+ * Audio effects and background music can be started using the same API ({@link startPlayMusic}) now instead of separate ones.
  */
 #ifdef _WIN32
     trtc_attribute_deprecated virtual void onPlayBGMComplete(TXLiteAVError errCode) {
@@ -819,9 +845,9 @@ class ITRTCCloudCallback {
 #endif
 
     /**
-     * 服务器测速的结果回调（已废弃）
+     * Result of server speed testing (disused)
      *
-     * @deprecated 新版本开始不推荐使用，建议使用 {@link onSpeedTestResult} 接口替代之。
+     * @deprecated This callback is not recommended in the new version. Please use {@link onSpeedTestResult:} instead.
      */
     trtc_attribute_deprecated virtual void onSpeedTest(const TRTCSpeedTestResult& currentResult, uint32_t finishedCount, uint32_t totalCount) {
     }
@@ -829,7 +855,7 @@ class ITRTCCloudCallback {
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                    视频数据自定义回调
+//                    Callback of custom video processing
 //
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -839,12 +865,12 @@ class ITRTCVideoRenderCallback {
     }
 
     /**
-     * 自定义视频渲染回调
+     * Custom video rendering
      *
-     * 当您设置了本地或者远端的视频自定义渲染回调之后，SDK 就会将原本要交给渲染控件进行渲染的视频帧通过此回调接口抛送给您，以便于您进行自定义渲染。
-     * @param frame  待渲染的视频帧信息。
-     * @param userId 视频源的 userId，如果是本地视频回调（setLocalVideoRenderDelegate），该参数可以忽略。
-     * @param streamType 频流类型：主路（Main）一般用于承载摄像头画面，辅路（Sub）一般用于承载屏幕分享画面。
+     * If you have configured the callback of custom rendering for local or remote video, the SDK will return to you via this callback video frames that are otherwise sent to the rendering control, so that you can customize rendering.
+     * @param frame Video frames to be rendered
+     * @param userId `userId` of the video source. This parameter can be ignored if the callback is for local video (`setLocalVideoRenderDelegate`).
+     * @param streamType Stream type. The primary stream (`Main`) is usually used for camera images, and the substream (`Sub`) for screen sharing images.
      */
     virtual void onRenderVideoFrame(const char* userId, TRTCVideoStreamType streamType, TRTCVideoFrame* frame) {
     }
@@ -856,18 +882,18 @@ class ITRTCVideoFrameCallback {
     }
 
     /**
-     * SDK 内部 OpenGL 环境已经创建的通知
+     * An OpenGL context was created in the SDK.
      */
     virtual void onGLContextCreated() {
     }
 
     /**
-     * 用于对接第三方美颜组件的视频处理回调
+     * Video processing by third-party beauty filters
      *
-     * 如果您选购了第三方美颜组件，就需要在 TRTCCloud 中设置第三方美颜回调，之后 TRTC 就会将原本要进行预处理的视频帧通过此回调接口抛送给您。
-     * 之后您就可以将 TRTC 抛出的视频帧交给第三方美颜组件进行图像处理，由于抛出的数据是可读且可写的，因此第三方美颜的处理结果也可以同步给 TRTC 进行后续的编码和发送。
-     * 情况一：美颜组件自身会产生新的纹理。
-     * 如果您使用的美颜组件会在处理图像的过程中产生一帧全新的纹理（用于承载处理后的图像），那请您在回调函数中将 dstFrame.textureId 设置为新纹理的 ID：
+     * If you use a third-party beauty filter component, you need to configure this callback in `TRTCCloud` to have the SDK return to you video frames that are otherwise pre-processed by TRTC.
+     * You can then send the video frames to the third-party beauty filter component for processing. As the data returned can be read and modified, the result of processing can be synced to TRTC for subsequent encoding and publishing.
+     * Case 1: the beauty filter component generates new textures
+     * If the beauty filter component you use generates a frame of new texture (for the processed image) during image processing, please set `dstFrame.textureId` to the ID of the new texture in the callback function.
      * <pre>
      * int onProcessVideoFrame(TRTCVideoFrame * srcFrame, TRTCVideoFrame *dstFrame) {
      *     dstFrame->textureId = mFURenderer.onDrawFrameSingleInput(srcFrame->textureId);
@@ -875,8 +901,8 @@ class ITRTCVideoFrameCallback {
      * }
      * </pre>
      *
-     * 情况二：美颜组件需要您提供目标纹理。
-     * 如果您使用的第三方美颜模块并不生成新的纹理，而是需要您设置给该模块一个输入纹理和一个输出纹理，则可以考虑如下方案：
+     * Case 2: you need to provide target textures to the beauty filter component
+     * If the third-party beauty filter component you use does not generate new textures and you need to manually set an input texture and an output texture for the component, you can consider the following scheme:
      * <pre>
      * int onProcessVideoFrame(TRTCVideoFrame *srcFrame, TRTCVideoFrame *dstFrame) {
      *     thirdparty_process(srcFrame->textureId, srcFrame->width, srcFrame->height, dstFrame->textureId);
@@ -884,26 +910,29 @@ class ITRTCVideoFrameCallback {
      * }
      * </pre>
      *
-     * @param srcFrame 用于承载 TRTC 采集到的摄像头画面。
-     * @param dstFrame 用于接收第三方美颜处理过的视频画面。
-     * @note 目前仅支持 OpenGL 纹理方案（ PC 仅支持 TRTCVideoBufferType_Buffer 格式）。
+     * @param srcFrame Used to carry images captured by TRTC via the camera
+     * @param dstFrame Used to receive video images processed by third-party beauty filters
+     * @note Currently, only the OpenGL texture scheme is supported(PC supports TRTCVideoBufferType_Buffer format Only)
      */
     virtual int onProcessVideoFrame(TRTCVideoFrame* srcFrame, TRTCVideoFrame* dstFrame) {
         return 0;
     }
 
     /**
-     * SDK 内部 OpenGL 环境被销毁的通知
+     * The OpenGL context in the SDK was destroyed
      */
     virtual void onGLContextDestroy() {
     }
 };
 
+/// @}
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                    音频数据自定义回调
+//                    Callback of custom audio processing
 //
 /////////////////////////////////////////////////////////////////////////////////
+/// @name Callback of custom audio processing
+/// @{
 
 class ITRTCAudioFrameCallback {
    public:
@@ -911,74 +940,95 @@ class ITRTCAudioFrameCallback {
     }
 
     /**
-     * 本地采集并经过音频模块前处理后的音频数据回调
+     * Audio data captured by the local mic and pre-processed by the audio module
      *
-     * 当您设置完音频数据自定义回调之后，SDK 内部会把刚采集到并经过前处理(ANS、AEC、AGC）之后的数据，以 PCM 格式的形式通过本接口回调给您。
-     * - 此接口回调出的音频时间帧长固定为0.02s，格式为 PCM 格式。
-     * - 由时间帧长转化为字节帧长的公式为 `采样率 × 时间帧长 × 声道数 × 采样点位宽`。
-     * - 以 TRTC 默认的音频录制格式48000采样率、单声道、16采样点位宽为例，字节帧长为 `48000 × 0.02s × 1 × 16bit = 15360bit = 1920字节`。
-     * @param frame PCM 格式的音频数据帧。
+     * After you configure the callback of custom audio processing, the SDK will return via this callback the data captured and pre-processed (ANS, AEC, and AGC) in PCM format.
+     * - The audio returned is in PCM format and has a fixed frame length (time) of 0.02s.
+     * - The formula to convert a frame length in seconds to one in bytes is **sample rate * frame length in seconds * number of sound channels * audio bit depth**.
+     * - Assume that the audio is recorded on a single channel with a sample rate of 48,000 Hz and audio bit depth of 16 bits, which are the default settings of TRTC. The frame length in bytes will be **48000 * 0.02s * 1 * 16 bits = 15360 bits = 1920
+     * bytes**.
+     * @param frame Audio frames in PCM format
      * @note
-     * 1. 请不要在此回调函数中做任何耗时操作，由于 SDK 每隔 20ms 就要处理一帧音频数据，如果您的处理时间超过 20ms，就会导致声音异常。
-     * 2. 此接口回调出的音频数据是可读写的，也就是说您可以在回调函数中同步修改音频数据，但请保证处理耗时。
-     * 3. 此接口回调出的音频数据已经经过了前处理(ANS、AEC、AGC），但**不包含**背景音、音效、混响等前处理效果，延迟较低。
+     * 1. Please avoid time-consuming operations in this callback function. The SDK processes an audio frame every 20 ms, so if your operation takes more than 20 ms, it will cause audio exceptions.
+     * 2. The audio data returned via this callback can be read and modified, but please keep the duration of your operation short.
+     * 3. The audio data is returned via this callback after ANS, AEC and AGC, but it **does not include** pre-processing effects like background music, audio effects, or reverb, and therefore has a short delay.
      */
     virtual void onCapturedAudioFrame(TRTCAudioFrame* frame) {
     }
 
     /**
-     * 本地采集并经过音频模块前处理、音效处理和混 BGM 后的音频数据回调
+     * Audio data captured by the local mic, pre-processed by the audio module, effect-processed and BGM-mixed
      *
-     * 当您设置完音频数据自定义回调之后，SDK 内部会把刚采集到并经过前处理、音效处理和混 BGM 之后的数据，在最终进行网络编码之前，以 PCM 格式的形式通过本接口回调给您。
-     * - 此接口回调出的音频时间帧长固定为0.02s，格式为 PCM 格式。
-     * - 由时间帧长转化为字节帧长的公式为`采样率 × 时间帧长 × 声道数 × 采样点位宽`。
-     * - 以 TRTC 默认的音频录制格式48000采样率、单声道、16采样点位宽为例，字节帧长为`48000 × 0.02s × 1 × 16bit = 15360bit = 1920字节`。
-     * 特殊说明：
-     * 您可以通过设置接口中的 `TRTCAudioFrame.extraData` 字段，达到传输信令的目的。由于音频帧头部的数据块不能太大，建议您写入 `extraData` 时，尽量将信令控制在几个字节的大小，如果超过 100 个字节，写入的数据不会被发送。
-     * 房间内其他用户可以通过 {@link ITRTCAudioFrameCallback} 中的 `onRemoteUserAudioFrame` 中的 `TRTCAudioFrame.extraData` 字段回调接收数据。
-     * @param frame PCM 格式的音频数据帧。
+     * After you configure the callback of custom audio processing, the SDK will return via this callback the data captured, pre-processed (ANS, AEC, and AGC), effect-processed and BGM-mixed in PCM format, before it is submitted to the network module
+     * for encoding.
+     * - The audio data returned via this callback is in PCM format and has a fixed frame length (time) of 0.02s.
+     * - The formula to convert a frame length in seconds to one in bytes is **sample rate * frame length in seconds * number of sound channels * audio bit depth**.
+     * - Assume that the audio is recorded on a single channel with a sample rate of 48,000 Hz and audio bit depth of 16 bits, which are the default settings of TRTC. The frame length in bytes will be **48000 * 0.02s * 1 * 16 bits = 15360 bits = 1920
+     * bytes**. Instructions: You could write data to the `TRTCAudioFrame.extraData` filed, in order to achieve the purpose of transmitting signaling. Because the data block of the audio frame header cannot be too large, we recommend you limit the
+     * size of the signaling data to only a few bytes when using this API. If extra data more than 100 bytes, it won't be sent. Other users in the room can receive the message through the `TRTCAudioFrame.extraData` in `onRemoteUserAudioFrame`
+     * callback in {@link TRTCAudioFrameDelegate}.
+     * @param frame Audio frames in PCM format
      * @note
-     * 1. 请不要在此回调函数中做任何耗时操作，由于 SDK 每隔 20ms 就要处理一帧音频数据，如果您的处理时间超过 20ms，就会导致声音异常。
-     * 2. 此接口回调出的音频数据是可读写的，也就是说您可以在回调函数中同步修改音频数据，但请保证处理耗时。
-     * 3. 此接口回调出的数据已经经过了前处理(ANS、AEC、AGC）、音效和混 BGM 处理，声音的延迟相比于 {@link onCapturedAudioFrame} 要高一些。
+     * 1. Please avoid time-consuming operations in this callback function. The SDK processes an audio frame every 20 ms, so if your operation takes more than 20 ms, it will cause audio exceptions.
+     * 2. The audio data returned via this callback can be read and modified, but please keep the duration of your operation short.
+     * 3. Audio data is returned via this callback after ANS, AEC, AGC, effect-processing and BGM-mixing, and therefore the delay is longer than that with {@link onCapturedAudioFrame}.
      */
     virtual void onLocalProcessedAudioFrame(TRTCAudioFrame* frame) {
     }
 
     /**
-     * 混音前的每一路远程用户的音频数据
+     * Audio data of each remote user before audio mixing
      *
-     * 当您设置完音频数据自定义回调之后，SDK 内部会把远端的每一路原始数据，在最终混音之前，以 PCM 格式的形式通过本接口回调给您。
-     * - 此接口回调出的音频时间帧长固定为0.02s，格式为 PCM 格式。
-     * - 由时间帧长转化为字节帧长的公式为`采样率 × 时间帧长 × 声道数 × 采样点位宽`。
-     * - 以 TRTC 默认的音频录制格式48000采样率、单声道、16采样点位宽为例，字节帧长为`48000 × 0.02s × 1 × 16bit = 15360bit = 1920字节`。
-     * @param frame PCM 格式的音频数据帧。
-     * @param userId 用户标识。
-     * @note 此接口回调出的音频数据是只读的，不支持修改。
+     * After you configure the callback of custom audio processing, the SDK will return via this callback the raw audio data (PCM format) of each remote user before mixing.
+     * - The audio data returned via this callback is in PCM format and has a fixed frame length (time) of 0.02s.
+     * - The formula to convert a frame length in seconds to one in bytes is **sample rate * frame length in seconds * number of sound channels * audio bit depth**.
+     * - Assume that the audio is recorded on a single channel with a sample rate of 48,000 Hz and audio bit depth of 16 bits, which are the default settings of TRTC. The frame length in bytes will be **48000 * 0.02s * 1 * 16 bits = 15360 bits = 1920
+     * bytes**.
+     * @param frame Audio frames in PCM format
+     * @param userId User ID
+     * @note The audio data returned via this callback can be read but not modified.
      */
     virtual void onPlayAudioFrame(TRTCAudioFrame* frame, const char* userId) {
     }
 
     /**
-     * 将各路待播放音频混合之后并在最终提交系统播放之前的数据回调
+     * Data mixed from each channel before being submitted to the system for playback
      *
-     * 当您设置完音频数据自定义回调之后，SDK 内部会把各路待播放的音频混合之后的音频数据，在提交系统播放之前，以 PCM 格式的形式通过本接口回调给您。
-     * - 此接口回调出的音频时间帧长固定为0.02s，格式为 PCM 格式。
-     * - 由时间帧长转化为字节帧长的公式为 `采样率 × 时间帧长 × 声道数 × 采样点位宽`。
-     * - 以 TRTC 默认的音频录制格式48000采样率、单声道、16采样点位宽为例，字节帧长为 `48000 × 0.02s × 1 × 16bit = 15360bit = 1920字节`。
-     * @param frame PCM 格式的音频数据帧。
+     * After you configure the callback of custom audio processing, the SDK will return to you via this callback the data (PCM format) mixed from each channel before it is submitted to the system for playback.
+     * - The audio data returned via this callback is in PCM format and has a fixed frame length (time) of 0.02s.
+     * - The formula to convert a frame length in seconds to one in bytes is **sample rate * frame length in seconds * number of sound channels * audio bit depth**.
+     * - Assume that the audio is recorded on a single channel with a sample rate of 48,000 Hz and audio bit depth of 16 bits, which are the default settings of TRTC. The frame length in bytes will be **48000 * 0.02s * 1 * 16 bits = 15360 bits = 1920
+     * bytes**.
+     * @param frame Audio frames in PCM format
      * @note
-     * 1. 请不要在此回调函数中做任何耗时操作，由于 SDK 每隔 20ms 就要处理一帧音频数据，如果您的处理时间超过 20ms，就会导致声音异常。
-     * 2. 此接口回调出的音频数据是可读写的，也就是说您可以在回调函数中同步修改音频数据，但请保证处理耗时。
-     * 3. 此接口回调出的是对各路待播放音频数据的混合，但其中并不包含耳返的音频数据。
+     * 1. Please avoid time-consuming operations in this callback function. The SDK processes an audio frame every 20 ms, so if your operation takes more than 20 ms, it will cause audio exceptions.
+     * 2. The audio data returned via this callback can be read and modified, but please keep the duration of your operation short.
+     * 3. The audio data returned via this callback is the audio data mixed from each channel before it is played. It does not include the in-ear monitoring data.
      */
     virtual void onMixedPlayAudioFrame(TRTCAudioFrame* frame) {
+    }
+
+    /**
+     * Data mixed from all the captured and to-be-played audio in the SDK
+     *
+     * After you configure the callback of custom audio processing, the SDK will return via this callback the data (PCM format) mixed from all captured and to-be-played audio in the SDK, so that you can customize recording.
+     * - The audio data returned via this callback is in PCM format and has a fixed frame length (time) of 0.02s.
+     * - The formula to convert a frame length in seconds to one in bytes is **sample rate * frame length in seconds * number of sound channels * audio bit depth**.
+     * - Assume that the audio is recorded on a single channel with a sample rate of 48,000 Hz and audio bit depth of 16 bits, which are the default settings of TRTC. The frame length in bytes will be **48000 * 0.02s * 1 * 16 bits = 15360 bits = 1920
+     * bytes**.
+     * @param frame Audio frames in PCM format
+     * @note
+     * 1. This data returned via this callback is mixed from all audio in the SDK, including local audio after pre-processing (ANS, AEC, and AGC), special effects application, and music mixing, as well as all remote audio, but it does not include the
+     * in-ear monitoring data.
+     * 2. The audio data returned via this callback cannot be modified.
+     */
+    virtual void onMixedAllAudioFrame(TRTCAudioFrame* frame) {
     }
 };
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                    更多事件回调接口
+//                    Other event callbacks
 //
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -988,12 +1038,12 @@ class ITRTCLogCallback {
     }
 
     /**
-     * 本地 LOG 的打印回调
+     * Printing of local log
      *
-     * 如果您希望捕获 SDK 的本地日志打印行为，可以通过设置日志回调，让 SDK 将要打印的日志都通过本回调接口抛送给您。
-     * @param log 日志内容。
-     * @param level 日志等级请参见 TRTC_LOG_LEVEL。
-     * @param module 保留字段，暂无具体意义，目前为固定值 TXLiteAVSDK。
+     * If you want to capture the local log printing event, you can configure the log callback to have the SDK return to you via this callback all logs that are to be printed.
+     * @param log Log content
+     * @param level Log level. For more information, please see `TRTC_LOG_LEVEL`.
+     * @param module Reserved field, which is not defined at the moment and has a fixed value of `TXLiteAVSDK`.
      */
     virtual void onLog(const char* log, TRTCLogLevel level, const char* module) {
     }

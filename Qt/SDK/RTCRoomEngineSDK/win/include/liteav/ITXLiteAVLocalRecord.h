@@ -1,7 +1,7 @@
 ﻿/**
  * Copyright (c) 2021 Tencent. All rights reserved.
- * Module:   TRTC 本地录制模块
- * Function: 用于对本地推流内容的录制
+ * Module:   TRTC local recorder
+ * Function: For recording local streaming content
  */
 #ifndef _ITXLITEAV_LOCAL_RECORD_H_
 #define _ITXLITEAV_LOCAL_RECORD_H_
@@ -13,82 +13,82 @@ class ITXLiteAVLocalRecord;
 extern "C" {
 
 /**
- * 创建 ITXLiteAVLocalRecord 对象
+ * create ITXLiteAVLocalRecord instance
  */
 LITEAV_API ITXLiteAVLocalRecord* createLocalRecordInstance();
 
 /**
- * 销毁 ITXLiteAVLocalRecord 对象
+ * destory ITXLiteAVLocalRecord instance
  */
 LITEAV_API void destroyLocalRecordInstance(ITXLiteAVLocalRecord* txliteav_localrecord);
 }
 
 /**
- * 本地录制错误码
+ * local record error
  */
 enum TXLiteAVLocalRecordError {
 
-    ///启动录制成功
+    /// start record success
     ERR_RECORD_SUCCESS = 0,
 
-    ///非法参数
+    /// invalid param
     ERR_RECORD_PARAM_INVALID = -1,
 
-    ///录制已经开始
+    /// record has begin
     ERR_RECORD_HAS_BEGIN = -2,
 
-    ///非法的文件路径
+    /// invalid file path
     ERR_RECORD_FILE_PATH_INVALID = -3,
 
-    ///非法文件格式,目前只支持mp4格式
+    /// invalid file path,only support .mp4
     ERR_RECORD_FILE_FORMAT_INVALID = -4,
 
-    ///非法窗口ID
+    /// invalid window id
     ERR_RECORD_WINDOW_ID_INVALID = -5,
 
-    ///非法桌面ID
+    /// invalid desktop id
     ERR_RECORD_DESKTOP_ID_INVALID = -6,
 
-    ///录制文件创建失败
+    /// create record file failed
     ERR_CREATE_RECORD_FILE_FAILURE = -7,
 
-    ///桌面或者窗口录制失败，例如录制中窗口被关闭
+    /// record desktop or window fail，eg. windows is closed
     ERR_CREATE_RECORD_CAPTURE_FAILED = -8,
 
-    ///没有麦克风
+    /// no microphone device
     ERR_RECORD_NO_MICROPHONE_DEVICE = -9,
 
-    ///没有扬声器
+    /// no speaker device
     ERR_RECORD_NO_SPEAKER_DEVICE = -10,
 
-    ///没有录制目标
+    /// no record target
     ERR_RECORD_NO_RECORD_TARGET = -11,
 
-    ///录制麦克风声音失败
+    /// record microphone fail
     ERROR_RECORD_MICROPHONE_FAILURE = -12,
 
-    ///录制系统声音失败
+    /// record systemaudio fail
     ERROR_RECORD_SYSTEMAUDIO_FAILURE = -13
 
 };
 
 /**
- * 录制配置
+ * record config
  */
 struct RecordConfig {
-    ///保存录制的文件名，必须要是包含扩展名的全路径。录制文件格式通过扩展名给出。支持mp4、wav、aac、pcm格式。为必填字段
+    /// record faile name,must be absoulute path。record file format is given by file externion name. only support mp4. must be filled
     const char* filePath;
 
-    ///最大单个录制文件大小，单位为兆。必填字段。录制文件超过该大小后，录制会被保存为新文件。新文件的命名方式为原来文件名后加上(1)、(2)..，以此类推
+    /// max single file size,in Mb,must be filled.when record file size is greater than this value,record content will be save as new file.new file named is old file name append (1)、(2)..，
     int maxSingleFileSize;
 
-    ///录制文件的fps，为0时候使用采集帧率
+    /// record file fps,use capture fps when this value is zero
     int fps;
 
-    ///录制宽度,为0时候使用源宽度
+    /// record width. use capture width when value is zero
     int recordWidth;
 
-    ///录制高度，为0时候使用源高度
+    /// record height. use capture width when value is zero
     int recordHeight;
 
     RecordConfig() : filePath(nullptr), maxSingleFileSize(0), fps(0), recordWidth(0), recordHeight(0) {
@@ -101,17 +101,17 @@ class TXLiteAVLocalRecordCallback {
     }
 
     /**
-     * 本地录制开始,当录制纯音频时候videoWidth/videoHeight为0
+     * record started,when record pure audio videoWidth/videoHeight is zero.
      */
     virtual void OnRecordStarted(int videoWidth, int videoHeight, int fps) = 0;
 
     /**
-     * 本地录制错误回调，发生错误的时候会停止录制，并保证之前录制文件的完整性
+     * local record error callbak
      */
     virtual void OnRecordError(TXLiteAVLocalRecordError err, const char* msg) = 0;
 
     /**
-     * 本地录制结果回调。停止录制后和录制文件超出指定大小后有该回调
+     * local record result callback
      */
     virtual void OnRecordComplete(const char* path) = 0;
 };
@@ -123,32 +123,32 @@ class ITXLiteAVLocalRecord {
 
    public:
     /**
-     * 设置本地录制回调事件接口
+     * set local record event callback
      */
     virtual void setCallback(TXLiteAVLocalRecordCallback* callback) = 0;
 
     /**
-     * 获取可以录制的窗口列表
+     * enum record window list
      */
     virtual liteav::ITRTCScreenCaptureSourceList* getScreenCaptureSources(const SIZE& thumbnailSize, const SIZE& iconSize) = 0;
 
     /**
-     * 开始本地录制
+     *  start local record
      */
     virtual TXLiteAVLocalRecordError startLocalRecord(const RecordConfig& config, TRTCScreenCaptureSourceType type, TXView sourceId, const RECT& captureRect) = 0;
 
     /**
-     * 停止本地录制
+     * stop local record
      */
     virtual void stopLocalRecord() = 0;
 
     /**
-     * 开启/关闭麦克风声音的录制
+     * enable/disable microphone audio record
      */
     virtual void enableRecordMicrophone(bool enable) = 0;
 
     /**
-     * 开启/关闭系统混音的录制
+     * enable/disable system audio record
      */
     virtual void enableRecordSystemAudio(bool enable) = 0;
 };

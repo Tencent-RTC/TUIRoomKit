@@ -1,7 +1,7 @@
 ﻿/**
  * Copyright (c) 2021 Tencent. All rights reserved.
- * Module:   TRTC 关键类型定义
- * Function: 分辨率、质量等级等枚举和常量值的定义
+ * Module: TRTC key class definition
+ * Description: definitions of enumerated and constant values such as resolution and quality level
  */
 #ifndef __TRTCTYPEDEF_H__
 #define __TRTCTYPEDEF_H__
@@ -64,48 +64,48 @@ struct SIZE {
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                    渲染控件
+//                    Rendering control
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 /**
- * [VIEW] 用于渲染视频画面的渲染控件
- * TRTC 中有很多需要操控视频画面的接口，这些接口都需要您指定视频渲染控件。
- * 1. ObjectiveC 接口 iOS 和 MAC。
- * - 在 iOS 系统中，您可以直接使用 UIView 作为视频渲染控件，SDK 会在您提供的 UIView 上绘制视频画面。
- * - 在 Mac 系统中，您可以直接使用 NSView 作为视频渲染控件，SDK 会在您提供的 NSView 上绘制视频画面。
- * 示例代码如下：
+ * [VIEW] Rendering control that renders the video image
+ * 1. ObjectiveC interface in iOS and MAC
+ * There are many APIs in TRTC that need to manipulate the video image, for which you should specify the video rendering control.
+ * - On iOS, you can directly use `UIView` as the video rendering control, and the SDK will draw the video image on the `UIView` you provide.
+ * - On macOS, you can directly use `NSView` as the video rendering control, and the SDK will draw the video image on the `NSView` you provide.
+ * Below is the sample code:
  * UIView *videoView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 360, 640)];
  * [self.view addSubview:videoView];
  * [trtcCloud startLocalPreview:YES view:_localView];
- * 2. 在 Android 平台中，您可以使用我们提供的 TXCloudVideoView 作为视频渲染控件，它支持 SurfaceView 和 TextureView 两种渲染方案。
- * - 当用于渲染本地的视频画面时：TXCloudVideoView 会优先使用 SurfaceView，该方案性能较好，但是不支持对 View 做动画或者变形特效。
- * - 当用于渲染远端的视频画面时：TXCloudVideoView 会优先使用 TextureView，该方案灵活度高，能够更好地支持动画或者变形特效。
- * 如果您希望强制使用某一种方案，可以按照如下方法进行编码：
- * 用法一：强制使用 TextureView：
+ * 2. On Android, you can use the `TXCloudVideoView` provided by us as the video rendering control, which supports two rendering schemes: `SurfaceView` and `TextureView`.
+ * - When rendering the local video image, `TXCloudVideoView` uses `SurfaceView` preferably. This scheme has better performance, but it does not support animation or transformation effects on the `View`.
+ * - When rendering the remote video image, `TXCloudVideoView` uses `TextureView` preferably. This scheme is highly flexible and supports animation and transformation effects.
+ * If you want to force the use of a certain scheme, you can write the code as follows:
+ * Usage 1. Force the use of `TextureView`:
  * TXCloudVideoView localView = findViewById(R.id.trtc_tc_cloud_view_main);
  * localView.addVideoView(new TextureView(context));
  * mTRTCCloud.startLocalPreview(true, localView);
- * 用法二：强制使用 SurfaceView：
+ * Usage 2. Force the use of `SurfaceView`:
  * SurfaceView surfaceView = new SurfaceView(this);
  * TXCloudVideoView localView = new TXCloudVideoView(surfaceView);
  * mTRTCCloud.startLocalPreview(true, localView);
- * 3. 全平台方案 View。
- * 由于全平台 C++ 接口需要使用统一的参数类型，所以您需要在调用这些接口时，将渲染控件统一转换成 TXView 类型的指针：
- * - iOS 平台：您可以使用 UIView 对象作为渲染控件，在调用 C++ 接口时请传入 UIView 对象的指针（需强转为 void* 类型）。
- * - Mac 平台：您可以使用 NSView 对象作为渲染控件，在调用 C++ 接口时请传入 NSView 对象的指针（需强转为 void* 类型）。
- * - Android 平台：在调用 C++ 接口时请传入指向 TXCloudVideoView 对象的 jobject 指针（需强转为 void* 类型）。
- * - Windows 平台：您可以使用窗口句柄 HWND 作为渲染控件，在调用 C++ 接口时需要将 HWND 强转为 void* 类型。
- * 代码示例一：在 QT 下使用 C++ 全平台接口
+ * 3. All platform with C++
+ * As the all-platform C++ APIs need to use a unified parameter type, you should uniformly convert the rendering controls into pointers in `TXView` type when calling these APIs:
+ * - iOS: you can use the `UIView` object as the rendering control. When calling the C++ APIs, please pass in the pointer to the `UIView` object (which needs to be forcibly converted to the `void*` type).
+ * - macOS: you can use the `NSView` object as the rendering control. When calling the C++ APIs, please pass in the pointer to the `NSView` object (which needs to be forcibly converted to the `void*` type).
+ * - Android: when calling the C++ APIs, please pass in the `jobject` pointer to the `TXCloudVideoView` object (which needs to be forcibly converted to the `void*` type).
+ * - Windows: you can use the window handle `HWND` as the rendering control. When calling the C++ APIs, you need to forcibly convert the `HWND` to `void*` type.
+ * Code sample 1. Use the all-platform C++ APIs under QT
  * QWidget *videoView;
  * // The relevant code for setting the videoView is omitted here...
  * getTRTCShareInstance()->startLocalPreview(reinterpret_cast<TXView>(videoView->winId()));
- * 代码示例二：在 Android 平台下，通过 JNI 调用 C++ 全平台接口
+ * Code sample 2. Call the all-platform C++ APIs through JNI on Android
  * native void nativeStartLocalPreview(String userId, int streamType, TXCloudVideoView view);
  * //...
  * Java_com_example_test_MainActivity_nativeStartRemoteView(JNIEnv *env, jobject thiz, jstring user_id, jint stream_type, jobject view) {
  *     const char *user_id_chars = env->GetStringUTFChars(user_id, nullptr);
- *     trtc_cloud->startRemoteView(user_id_chars, (liteav::TRTCVideoStreamType)stream_type, view);
+ *     trtc_cloud->startRemoteView(user_id_chars, (trtc::TRTCVideoStreamType)stream_type, view);
  *     env->ReleaseStringUTFChars(user_id, user_id_chars);
  * }
  */
@@ -117,618 +117,635 @@ typedef void *TXView;
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                    视频相关枚举值定义
+//                    Definitions of video enumerated values
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 1.1 视频分辨率
+ * 1.1 Video resolution
  *
- * 此处仅定义横屏分辨率（如 640 × 360），如需使用竖屏分辨率（如360 × 640），需要同时指定 TRTCVideoResolutionMode 为 Portrait。
+ * Here, only the landscape resolution (e.g., 640x360) is defined. If the portrait resolution (e.g., 360x640) needs to be used, `Portrait` must be selected for `TRTCVideoResolutionMode`.
  */
 enum TRTCVideoResolution {
 
-    ///宽高比 1:1；分辨率 120x120；建议码率（VideoCall）80kbps; 建议码率（LIVE）120kbps。
+    /// Aspect ratio: 1:1; resolution: 120x120; recommended bitrate (VideoCall): 80 Kbps; recommended bitrate (LIVE): 120 Kbps.
     TRTCVideoResolution_120_120 = 1,
 
-    ///宽高比 1:1 分辨率 160x160；建议码率（VideoCall）100kbps; 建议码率（LIVE）150kbps。
+    /// Aspect ratio: 1:1; resolution: 160x160; recommended bitrate (VideoCall): 100 Kbps; recommended bitrate (LIVE): 150 Kbps.
     TRTCVideoResolution_160_160 = 3,
 
-    ///宽高比 1:1；分辨率 270x270；建议码率（VideoCall）200kbps; 建议码率（LIVE）300kbps。
+    /// Aspect ratio: 1:1; resolution: 270x270; recommended bitrate (VideoCall): 200 Kbps; recommended bitrate (LIVE): 300 Kbps.
     TRTCVideoResolution_270_270 = 5,
 
-    ///宽高比 1:1；分辨率 480x480；建议码率（VideoCall）350kbps; 建议码率（LIVE）500kbps。
+    /// Aspect ratio: 1:1; resolution: 480x480; recommended bitrate (VideoCall): 350 Kbps; recommended bitrate (LIVE): 500 Kbps.
     TRTCVideoResolution_480_480 = 7,
 
-    ///宽高比4:3；分辨率 160x120；建议码率（VideoCall）100kbps; 建议码率（LIVE）150kbps。
+    /// Aspect ratio: 4:3; resolution: 160x120; recommended bitrate (VideoCall): 100 Kbps; recommended bitrate (LIVE): 150 Kbps.
     TRTCVideoResolution_160_120 = 50,
 
-    ///宽高比 4:3；分辨率 240x180；建议码率（VideoCall）150kbps; 建议码率（LIVE）250kbps。
+    /// Aspect ratio: 4:3; resolution: 240x180; recommended bitrate (VideoCall): 150 Kbps; recommended bitrate (LIVE): 250 Kbps.
     TRTCVideoResolution_240_180 = 52,
 
-    ///宽高比 4:3；分辨率 280x210；建议码率（VideoCall）200kbps; 建议码率（LIVE）300kbps。
+    /// Aspect ratio: 4:3; resolution: 280x210; recommended bitrate (VideoCall): 200 Kbps; recommended bitrate (LIVE): 300 Kbps.
     TRTCVideoResolution_280_210 = 54,
 
-    ///宽高比 4:3；分辨率 320x240；建议码率（VideoCall）250kbps; 建议码率（LIVE）375kbps。
+    /// Aspect ratio: 4:3; resolution: 320x240; recommended bitrate (VideoCall): 250 Kbps; recommended bitrate (LIVE): 375 Kbps.
     TRTCVideoResolution_320_240 = 56,
 
-    ///宽高比 4:3；分辨率 400x300；建议码率（VideoCall）300kbps; 建议码率（LIVE）450kbps。
+    /// Aspect ratio: 4:3; resolution: 400x300; recommended bitrate (VideoCall): 300 Kbps; recommended bitrate (LIVE): 450 Kbps.
     TRTCVideoResolution_400_300 = 58,
 
-    ///宽高比 4:3；分辨率 480x360；建议码率（VideoCall）400kbps; 建议码率（LIVE）600kbps。
+    /// Aspect ratio: 4:3; resolution: 480x360; recommended bitrate (VideoCall): 400 Kbps; recommended bitrate (LIVE): 600 Kbps.
     TRTCVideoResolution_480_360 = 60,
 
-    ///宽高比 4:3；分辨率 640x480；建议码率（VideoCall）600kbps; 建议码率（LIVE）900kbps。
+    /// Aspect ratio: 4:3; resolution: 640x480; recommended bitrate (VideoCall): 600 Kbps; recommended bitrate (LIVE): 900 Kbps.
     TRTCVideoResolution_640_480 = 62,
 
-    ///宽高比 4:3；分辨率 960x720；建议码率（VideoCall）1000kbps; 建议码率（LIVE）1500kbps。
+    /// Aspect ratio: 4:3; resolution: 960x720; recommended bitrate (VideoCall): 1000 Kbps; recommended bitrate (LIVE): 1500 Kbps.
     TRTCVideoResolution_960_720 = 64,
 
-    ///宽高比 16:9；分辨率 160x90；建议码率（VideoCall）150kbps; 建议码率（LIVE）250kbps。
+    /// Aspect ratio: 16:9; resolution: 160x90; recommended bitrate (VideoCall): 150 Kbps; recommended bitrate (LIVE): 250 Kbps.
     TRTCVideoResolution_160_90 = 100,
 
-    ///宽高比 16:9；分辨率 256x144；建议码率（VideoCall）200kbps; 建议码率（LIVE）300kbps。
+    /// Aspect ratio: 16:9; resolution: 256x144; recommended bitrate (VideoCall): 200 Kbps; recommended bitrate (LIVE): 300 Kbps.
     TRTCVideoResolution_256_144 = 102,
 
-    ///宽高比 16:9；分辨率 320x180；建议码率（VideoCall）250kbps; 建议码率（LIVE）400kbps。
+    /// Aspect ratio: 16:9; resolution: 320x180; recommended bitrate (VideoCall): 250 Kbps; recommended bitrate (LIVE): 400 Kbps.
     TRTCVideoResolution_320_180 = 104,
 
-    ///宽高比 16:9；分辨率 480x270；建议码率（VideoCall）350kbps; 建议码率（LIVE）550kbps。
+    /// Aspect ratio: 16:9; resolution: 480x270; recommended bitrate (VideoCall): 350 Kbps; recommended bitrate (LIVE): 550 Kbps.
     TRTCVideoResolution_480_270 = 106,
 
-    ///宽高比 16:9；分辨率 640x360；建议码率（VideoCall）500kbps; 建议码率（LIVE）900kbps。
+    /// Aspect ratio: 16:9; resolution: 640x360; recommended bitrate (VideoCall): 500 Kbps; recommended bitrate (LIVE): 900 Kbps.
     TRTCVideoResolution_640_360 = 108,
 
-    ///宽高比 16:9；分辨率 960x540；建议码率（VideoCall）850kbps; 建议码率（LIVE）1300kbps。
+    /// Aspect ratio: 16:9; resolution: 960x540; recommended bitrate (VideoCall): 850 Kbps; recommended bitrate (LIVE): 1300 Kbps.
     TRTCVideoResolution_960_540 = 110,
 
-    ///宽高比 16:9；分辨率 1280x720；建议码率（VideoCall）1200kbps; 建议码率（LIVE）1800kbps。
+    /// Aspect ratio: 16:9; resolution: 1280x720; recommended bitrate (VideoCall): 1200 Kbps; recommended bitrate (LIVE): 1800 Kbps.
     TRTCVideoResolution_1280_720 = 112,
 
-    ///宽高比 16:9；分辨率 1920x1080；建议码率（VideoCall）2000kbps; 建议码率（LIVE）3000kbps。
+    /// Aspect ratio: 16:9; resolution: 1920x1080; recommended bitrate (VideoCall): 2000 Kbps; recommended bitrate (LIVE): 3000 Kbps.
     TRTCVideoResolution_1920_1080 = 114,
 
 };
 
 /**
- * 1.2 视频宽高比模式
+ * 1.2 Video aspect ratio mode
  *
- * TRTCVideoResolution 中仅定义了横屏分辨率（如 640 × 360），如需使用竖屏分辨率（如360 × 640），需要同时指定 TRTCVideoResolutionMode 为 Portrait。
+ * Only the landscape resolution (e.g., 640x360) is defined in `TRTCVideoResolution`. If the portrait resolution (e.g., 360x640) needs to be used, `Portrait` must be selected for `TRTCVideoResolutionMode`.
  */
 enum TRTCVideoResolutionMode {
 
-    ///横屏分辨率，例如：TRTCVideoResolution_640_360 + TRTCVideoResolutionModeLandscape = 640 × 360。
+    /// Landscape resolution, such as TRTCVideoResolution_640_360 + TRTCVideoResolutionModeLandscape = 640x360.
     TRTCVideoResolutionModeLandscape = 0,
 
-    ///竖屏分辨率，例如：TRTCVideoResolution_640_360 + TRTCVideoResolutionModePortrait  = 360 × 640。
+    /// Portrait resolution, such as TRTCVideoResolution_640_360 + TRTCVideoResolutionModePortrait = 360x640.
     TRTCVideoResolutionModePortrait = 1,
 
 };
 
 /**
- * 1.3 视频流类型
+ * 1.3 Video stream type
  *
- * TRTC 内部有三种不同的视频流，分别是：
- *  - 高清大画面：一般用来传输摄像头的视频数据。
- *  - 低清小画面：小画面和大画面的内容相互，但是分辨率和码率都比大画面低，因此清晰度也更低。
- *  - 辅流画面：一般用于屏幕分享，同一时间在同一个房间中只允许一个用户发布辅流视频，其他用户必须要等该用户关闭之后才能发布自己的辅流。
- * @note 不支持单独开启低清小画面，小画面必须依附于大画面而存在，SDK 会自动设定低清小画面的分辨率和码率。
+ * TRTC provides three different video streams, including:
+ *  - HD big image: it is generally used to transfer video data from the camera.
+ *  - Smooth small image: it has the same content as the big image, but with lower resolution and bitrate and thus lower definition.
+ *  - Substream image: it is generally used for screen sharing. Only one user in the room is allowed to publish the substream video image at any time, while other users must wait for this user to close the substream before they can publish their own
+ * substream.
+ * @note The SDK does not support enabling the smooth small image alone, which must be enabled together with the big image. It will automatically set the resolution and bitrate of the small image.
  */
 enum TRTCVideoStreamType {
 
-    ///高清大画面，一般用来传输摄像头的视频数据。
+    /// HD big image: it is generally used to transfer video data from the camera.
     TRTCVideoStreamTypeBig = 0,
 
-    ///低清小画面：小画面和大画面的内容相互，但是分辨率和码率都比大画面低，因此清晰度也更低。
+    /// Smooth small image: it has the same content as the big image, but with lower resolution and bitrate and thus lower definition.
     TRTCVideoStreamTypeSmall = 1,
 
-    ///辅流画面：一般用于屏幕分享，同一时间在同一个房间中只允许一个用户发布辅流视频，其他用户必须要等该用户关闭之后才能发布自己的辅流。
+    /// Substream image: it is generally used for screen sharing. Only one user in the room is allowed to publish the substream video image at any time, while other users must wait for this user to close the substream before they can publish their
+    /// own substream.
     TRTCVideoStreamTypeSub = 2,
 
 };
 
 /**
- * 1.4 视频画面填充模式
+ * 1.4 Video image fill mode
  *
- * 如果视频显示区域的宽高比不等于视频内容的宽高比时，需要指定画面的填充模式。
+ * If the aspect ratio of the video display area is not equal to that of the video image, you need to specify the fill mode:
  */
 enum TRTCVideoFillMode {
 
-    ///填充模式：即将画面内容居中等比缩放以充满整个显示区域，超出显示区域的部分将会被裁剪掉，此模式下画面可能不完整。
+    /// Fill mode: the video image will be centered and scaled to fill the entire display area, where parts that exceed the area will be cropped. The displayed image may be incomplete in this mode.
     TRTCVideoFillMode_Fill = 0,
 
-    ///适应模式：即按画面长边进行缩放以适应显示区域，短边部分会被填充为黑色，此模式下图像完整但可能留有黑边。
+    /// Fit mode: the video image will be scaled based on its long side to fit the display area, where the short side will be filled with black bars. The displayed image is complete in this mode, but there may be black bars.
     TRTCVideoFillMode_Fit = 1,
 
 };
 
 /**
- * 1.5 视频画面旋转方向
+ * 1.5 Video image rotation direction
  *
- * TRTC 提供了对本地和远程画面的旋转角度设置 API，下列的旋转角度都是指顺时针方向的。
+ * TRTC provides rotation angle setting APIs for local and remote images. The following rotation angles are all clockwise.
  */
 enum TRTCVideoRotation {
 
-    ///不旋转。
+    /// No rotation
     TRTCVideoRotation0 = 0,
 
-    ///顺时针旋转90度。
+    /// Clockwise rotation by 90 degrees
     TRTCVideoRotation90 = 1,
 
-    ///顺时针旋转180度。
+    /// Clockwise rotation by 180 degrees
     TRTCVideoRotation180 = 2,
 
-    ///顺时针旋转270度。
+    /// Clockwise rotation by 270 degrees
     TRTCVideoRotation270 = 3,
 
 };
 
 /**
- * 1.6 美颜（磨皮）算法
+ * 1.6 Beauty (skin smoothing) filter algorithm
  *
- * TRTC 内置多种不同的磨皮算法，您可以选择最适合您产品定位的方案。
+ * TRTC has multiple built-in skin smoothing algorithms. You can select the one most suitable for your product.
  */
 enum TRTCBeautyStyle {
 
-    ///光滑，算法比较激进，磨皮效果比较明显，适用于秀场直播。
+    /// Smooth style, which uses a more radical algorithm for more obvious effect and is suitable for show live streaming.
     TRTCBeautyStyleSmooth = 0,
 
-    ///自然，算法更多地保留了面部细节，磨皮效果更加自然，适用于绝大多数直播场景。
+    /// Natural style, which retains more facial details for more natural effect and is suitable for most live streaming use cases.
     TRTCBeautyStyleNature = 1,
 
 };
 
 /**
- * 1.7 视频像素格式
+ * 1.7 Video pixel format
  *
- * TRTC 提供针对视频的自定义采集和自定义渲染功能：
- * - 在自定义采集功能中，您可以用下列枚举值描述您采集的视频像素格式。
- * - 在自定义渲染功能中，您可以指定您期望 SDK 回调出的视频像素格式。
+ * TRTC provides custom video capturing and rendering features.
+ * - For the custom capturing feature, you can use the following enumerated values to describe the pixel format of the video you capture.
+ * - For the custom rendering feature, you can specify the pixel format of the video you expect the SDK to call back.
  */
 enum TRTCVideoPixelFormat {
 
-    ///未定义的格式。
+    /// Undefined format
     TRTCVideoPixelFormat_Unknown = 0,
 
-    /// YUV420P(I420) 格式。
+    /// YUV420P (I420) format
     TRTCVideoPixelFormat_I420 = 1,
 
-    /// OpenGL 2D 纹理格式。
+    /// OpenGL 2D texture format
     TRTCVideoPixelFormat_Texture_2D = 2,
 
-    /// BGRA 格式
+    /// BGRA32 format
     TRTCVideoPixelFormat_BGRA32 = 3,
 
-    /// NV21 格式。
+    /// NV21 format
     TRTCVideoPixelFormat_NV21 = 4,
 
-    /// RGBA 格式。
+    /// RGBA format
     TRTCVideoPixelFormat_RGBA32 = 5,
 
 };
 
 /**
- * 1.8 视频数据传递方式
+ * 1.8 Video data transfer method
  *
- * 在自定义采集和自定义渲染功能，您需要用到下列枚举值来指定您希望以什么方式传递视频数据：
- * - 方案一：使用内存 Buffer 传递视频数据，该方案在 iOS 效率尚可，但在 Android 系统上效率较差，Windows 暂时仅支持内存 Buffer 的传递方式。
- * - 方案二：使用 Texture 纹理传递视频数据，该方案在 iOS 和 Android 系统下均有较高的效率，Windows 暂不支持，需要您有一定的 OpenGL 编程基础。
+ * For custom capturing and rendering features, you need to use the following enumerated values to specify the method of transferring video data:
+ * - Method 1. This method uses memory buffer to transfer video data. It is efficient on iOS but inefficient on Android. It is the only method supported on Windows currently.
+ * - Method 2. This method uses texture to transfer video data. It is efficient on both iOS and Android but is not supported on Windows. To use this method, you should have a general familiarity with OpenGL programming.
  */
 enum TRTCVideoBufferType {
 
-    ///未定义的传递方式。
+    /// Undefined transfer method
     TRTCVideoBufferType_Unknown = 0,
 
-    ///使用内存 Buffer 传递视频数据，iOS：PixelBuffer；Android：用于 JNI 层的 Direct Buffer；Win：内存数据块。
+    /// Use memory buffer to transfer video data. iOS: `PixelBuffer`; Android: `Direct Buffer` for JNI layer; Windows: memory data block.
     TRTCVideoBufferType_Buffer = 1,
 
-    ///使用 Texture 纹理传递视频数据。
+    /// Use OpenGL texture to transfer video data
     TRTCVideoBufferType_Texture = 3,
+
+    /// Use D3D11 texture to transfer video data
+    TRTCVideoBufferType_TextureD3D11 = 4,
 
 };
 
 /**
- * 1.9 视频的镜像类型
+ * 1.9 Video mirror type
  *
- * 视频的镜像是指对视频内容进行左右翻转，尤其是对本地的摄像头预览视频，开启镜像后能给主播带来熟悉的“照镜子”体验。
+ * Video mirroring refers to the left-to-right flipping of the video image, especially for the local camera preview image. After mirroring is enabled, it can bring anchors a familiar "look into the mirror" experience.
  */
 enum TRTCVideoMirrorType {
 
-///自动模式：如果正使用前置摄像头则开启镜像，如果是后置摄像头则不开启镜像（仅适用于移动设备）。
+/// Auto mode: mirror the front camera's image but not the rear camera's image (for mobile devices only).
 #if TARGET_PLATFORM_PHONE
     TRTCVideoMirrorType_Auto = 0,
 #endif
 
-    ///强制开启镜像，不论当前使用的是前置摄像头还是后置摄像头。
+    /// Mirror the images of both the front and rear cameras.
     TRTCVideoMirrorType_Enable = 1,
 
-    ///强制关闭镜像，不论当前使用的是前置摄像头还是后置摄像头。
+    /// Disable mirroring for both the front and rear cameras.
     TRTCVideoMirrorType_Disable = 2,
 
 };
 
 /**
- * 1.10 本地视频截图的数据源
+ * 1.10 Data source of local video screenshot
  *
- * SDK 支持从如下两种数据源中截取图片并保存成本地文件：
- * - 视频流：从视频流中截取原生的视频内容，截取的内容不受渲染控件的显示控制。
- * - 渲染层：从渲染控件中截取显示的视频内容，可以做到用户所见即所得的效果，但如果显示区域过小，截取出的图片也会很小。
+ * The SDK can take screenshots from the following two data sources and save them as local files:
+ * - Video stream: the SDK screencaptures the native video content from the video stream. The screenshots are not controlled by the display of the rendering control.
+ * - Rendering layer: the SDK screencaptures the displayed video content from the rendering control, which can achieve the effect of WYSIWYG, but if the display area is too small, the screenshots will also be very small.
  */
 enum TRTCSnapshotSourceType {
 
-    ///从视频流中截取原生的视频内容，截取的内容不受渲染控件的显示控制。
+    /// The SDK screencaptures the native video content from the video stream. The screenshots are not controlled by the display of the rendering control.
     TRTCSnapshotSourceTypeStream = 0,
 
-    ///从渲染控件中截取显示的视频内容，可以做到用户所见即所得的效果，但如果显示区域过小，截取出的图片也会很小。
+    /// The SDK screencaptures the displayed video content from the rendering control, which can achieve the effect of WYSIWYG, but if the display area is too small, the screenshots will also be very small.
     TRTCSnapshotSourceTypeView = 1,
 
 };
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                    网络相关枚举值定义
+//                    Definitions of network enumerated values
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 2.1 应用场景
+ * 2.1 Use cases
  *
- * TRTC 针对常见的音视频应用场景都进行了定向优化，以满足各种垂直场景下的差异化要求，主要场景可以分为如下两类：
- * - 直播（LIVE）场景：包括 LIVE 和 VoiceChatRoom，前者是音频+视频，后者是纯音频。
- *   直播场景下，用户被分成“主播”和“观众”两种角色，单个房间中同时最多支持10万人在线，适合于观众人数众多的直播场景。
- * - 实时（RTC）场景：包括 VideoCall 和 AudioCall，前者是音频+视频，后者是纯音频。
- *   实时场景下，用户没有角色的差异，但单个房间中同时最多支持 300 人在线，适合于小范围实时通信的场景。
+ * TRTC features targeted optimizations for common audio/video application scenarios to meet the differentiated requirements in various verticals. The main scenarios can be divided into the following two categories:
+ * - Live streaming scenario (LIVE): including `LIVE` (audio + video) and `VoiceChatRoom` (pure audio).
+ *   In the live streaming scenario, users are divided into two roles: "anchor" and "audience". A single room can sustain up to 100,000 concurrent online users. This is suitable for live streaming to a large audience.
+ * - Real-Time scenario (RTC): including `VideoCall` (audio + video) and `AudioCall` (pure audio).
+ *   In the real-time scenario, there is no role difference between users, but a single room can sustain only up to 300 concurrent online users. This is suitable for small-scale real-time communication.
  */
 enum TRTCAppScene {
 
-    ///视频通话场景，支持720P、1080P高清画质，单个房间最多支持300人同时在线，最高支持50人同时发言。
-    ///适用于[1对1视频通话]、[300人视频会议]、[在线问诊]、[教育小班课]、[远程面试]等业务场景。
+    /// In the video call scenario, 720p and 1080p HD image quality is supported. A single room can sustain up to 300 concurrent online users, and up to 50 of them can speak simultaneously.
+    /// Use cases: [one-to-one video call], [video conferencing with up to 300 participants], [online medical diagnosis], [small class], [video interview], etc.
     TRTCAppSceneVideoCall = 0,
 
-    ///视频互动直播，支持平滑上下麦，切换过程无需等待，主播延时小于300ms；支持十万级别观众同时播放，播放延时低至1000ms。
-    ///适用于[低延时互动直播]、[大班课]、[主播PK]、[视频相亲]、[在线互动课堂]、[远程培训]、[超大型会议]等业务场景。
-    ///@note 此场景下，您必须通过 TRTCParams 中的 role 字段指定当前用户的角色。
+    /// In the interactive video live streaming scenario, mic can be turned on/off smoothly without waiting for switchover, and the anchor latency is as low as less than 300 ms. Live streaming to hundreds of thousands of concurrent users in the
+    /// audience role is supported with the playback latency down to 1,000 ms.
+    /// Use cases: [low-latency interactive live streaming], [big class], [anchor competition], [video dating room], [online interactive classroom], [remote training], [large-scale conferencing], etc.
+    ///@note In this scenario, you must use the `role` field in `TRTCParams` to specify the role of the current user.
     TRTCAppSceneLIVE = 1,
 
-    ///语音通话场景，默认采用 SPEECH 音质，单个房间最多支持300人同时在线，最高支持50人同时发言。
-    ///适用于 [1对1语音通话]、[300人语音会议]、[语音聊天]、[语音会议]、[在线狼人杀] 等业务场景。
+    /// Audio call scenario, where the `SPEECH` sound quality is used by default. A single room can sustain up to 300 concurrent online users, and up to 50 of them can speak simultaneously.
+    /// Use cases: [one-to-one audio call], [audio conferencing with up to 300 participants], [audio chat], [online Werewolf], etc.
     TRTCAppSceneAudioCall = 2,
 
-    ///语音互动直播，支持平滑上下麦，切换过程无需等待，主播延时小于 300ms；支持十万级别观众同时播放，播放延时低至 1000ms。
-    ///适用于 [语音俱乐部]、[在线K歌房]、[音乐直播间]、[FM电台] 等业务场景。
-    ///@note 此场景下，您必须通过 TRTCParams 中的 role 字段指定当前用户的角色。
+    /// In the interactive audio live streaming scenario, mic can be turned on/off smoothly without waiting for switchover, and the anchor latency is as low as less than 300 ms. Live streaming to hundreds of thousands of concurrent users in the
+    /// audience role is supported with the playback latency down to 1,000 ms.
+    /// Use cases: [audio club], [online karaoke room], [music live room], [FM radio], etc.
+    ///@note In this scenario, you must use the `role` field in `TRTCParams` to specify the role of the current user.
     TRTCAppSceneVoiceChatRoom = 3,
 
 };
 
 /**
- * 2.2 角色
+ * 2.2 Role
  *
- * 仅适用于直播类场景（即 TRTCAppSceneLIVE 和 TRTCAppSceneVoiceChatRoom），把用户区分成两种不同的身份：
- * - 主播：可以随时发布自己的音视频流，但人数有限制，同一个房间中最多只允许 50 个主播同时发布自己的音视频流。
- * - 观众：只能观看其他用户的音视频流，要发布音视频流，需要先通过 {@link switchRole} 切换成主播，同一个房间中最多能容纳10万观众。
+ * Role is applicable only to live streaming scenarios (`TRTCAppSceneLIVE` and `TRTCAppSceneVoiceChatRoom`). Users are divided into two roles:
+ * - Anchor, who can publish their audio/video streams. There is a limit on the number of anchors. Up to 50 anchors are allowed to publish streams at the same time in one room.
+ * - Audience, who can only listen to or watch audio/video streams of anchors in the room. If they want to publish their streams, they need to switch to the "anchor" role first through {@link switchRole}. One room can sustain up to 100,000 concurrent
+ * online users in the audience role.
  */
 enum TRTCRoleType {
 
-    ///主播：可以随时发布自己的音视频流，但人数有限制，同一个房间中最多只允许 50 个主播同时发布自己的音视频流。
+    /// An anchor can publish their audio/video streams. There is a limit on the number of anchors. Up to 50 anchors are allowed to publish streams at the same time in one room.
     TRTCRoleAnchor = 20,
 
-    ///观众：只能观看其他用户的音视频流，要发布音视频流，需要先通过 {@link switchRole} 切换成主播，同一个房间中最多能容纳10万观众。
+    /// Audience can only listen to or watch audio/video streams of anchors in the room. If they want to publish their streams, they need to switch to the "anchor" role first through {@link switchRole}. One room can sustain up to 100,000 concurrent
+    /// online users in the audience role.
     TRTCRoleAudience = 21,
 
 };
 
 /**
- * 2.3 流控模式（已废弃）
+ * 2.3 QoS control mode (disused)
  */
 enum TRTCQosControlMode {
 
-    ///本地控制，用于 SDK 开发内部调试，客户请勿使用。
+    /// Client-based control, which is for internal debugging of SDK and shall not be used by users.
     TRTCQosControlModeClient = 0,
 
-    ///云端控制，默认模式，推荐选择。
+    /// On-cloud control, which is the default and recommended mode.
     TRTCQosControlModeServer = 1,
 
 };
 
 /**
- * 2.4 画质偏好
+ * 2.4 Image quality preference
  *
- * TRTC 在弱网络环境下有两种调控模式：“优先保证画面清晰”或“优先保证画面流畅”，两种模式均会优先保障声音数据的传输。
+ * TRTC has two control modes in weak network environments: "ensuring clarity" and "ensuring smoothness". Both modes will give priority to the transfer of audio data.
  */
 enum TRTCVideoQosPreference {
 
-    ///流畅优先：即当前网络不足以传输既清晰又流畅的画面时，优先保证画面的流畅性，代价就是画面会比较模糊且伴随有较多的马赛克。
+    /// Ensuring smoothness: in this mode, when the current network is unable to transfer a clear and smooth video image, the smoothness of the image will be given priority, but there will be blurs.
     TRTCVideoQosPreferenceSmooth = 1,
 
-    ///清晰优先（默认值）：即当前网络不足以传输既清晰又流畅的画面时，优先保证画面的清晰度，代价就是画面会比较卡顿。
+    /// Ensuring clarity (default value): in this mode, when the current network is unable to transfer a clear and smooth video image, the clarity of the image will be given priority, but there will be lags.
     TRTCVideoQosPreferenceClear = 2,
 
 };
 
 /**
- * 2.5 网络质量
+ * 2.5 Network quality
  *
- * TRTC 会每隔两秒对当前的网络质量进行评估，评估结果为六个等级：Excellent 表示最好，Down 表示最差。
+ * TRTC evaluates the current network quality once every two seconds. The evaluation results are divided into six levels: `Excellent` indicates the best, and `Down` indicates the worst.
  */
 enum TRTCQuality {
 
-    ///未定义。
+    /// Undefined
     TRTCQuality_Unknown = 0,
 
-    ///当前网络非常好。
+    /// The current network is excellent
     TRTCQuality_Excellent = 1,
 
-    ///当前网络比较好。
+    /// The current network is good
     TRTCQuality_Good = 2,
 
-    ///当前网络一般。
+    /// The current network is fair
     TRTCQuality_Poor = 3,
 
-    ///当前网络较差。
+    /// The current network is bad
     TRTCQuality_Bad = 4,
 
-    ///当前网络很差。
+    /// The current network is very bad
     TRTCQuality_Vbad = 5,
 
-    ///当前网络不满足 TRTC 的最低要求。
+    /// The current network cannot meet the minimum requirements of TRTC
     TRTCQuality_Down = 6,
 
 };
 
 /**
- * 2.6 视频状态类型
+ * 2.6 Audio/Video playback status
  *
- * 该枚举类型用于视频状态变化回调接口{@link onRemoteVideoStatusUpdated}，用于指定当前的视频状态。
+ * This enumerated type is used in the audio status changed API {@link onRemoteAudioStatusUpdated} and the video status changed API {@link onRemoteVideoStatusUpdated} to specify the current audio/video status.
  */
 enum TRTCAVStatusType {
 
-    ///停止播放。
+    /// Stopped
     TRTCAVStatusStopped = 0,
 
-    ///正在播放。
+    /// Playing
     TRTCAVStatusPlaying = 1,
 
-    ///正在加载。
+    /// Loading
     TRTCAVStatusLoading = 2,
 
 };
 
 /**
- * 2.7 视频状态变化原因类型
+ * 2.7 Reasons for playback status changes
  *
- * 该枚举类型用于视频状态变化回调接口 {@link onRemoteVideoStatusUpdated} ，用于指定当前的视频状态原因。
+ * This enumerated type is used in the audio status changed API {@link onRemoteAudioStatusUpdated} and the video status changed API {@link onRemoteVideoStatusUpdated} to specify the reason for the current audio/video status change.
  */
 enum TRTCAVStatusChangeReason {
 
-    ///缺省值。
+    /// Default value
     TRTCAVStatusChangeReasonInternal = 0,
 
-    ///网络缓冲。
+    /// The stream enters the `Loading` state due to network congestion
     TRTCAVStatusChangeReasonBufferingBegin = 1,
 
-    ///结束缓冲。
+    /// The stream enters the `Playing` state after network recovery
     TRTCAVStatusChangeReasonBufferingEnd = 2,
 
-    ///本地启动视频流播放。
+    /// As a start-related API was directly called locally, the stream enters the `Playing` state
     TRTCAVStatusChangeReasonLocalStarted = 3,
 
-    ///本地停止视频流播放。
+    /// As a stop-related API was directly called locally, the stream enters the `Stopped` state
     TRTCAVStatusChangeReasonLocalStopped = 4,
 
-    ///远端视频流开始（或继续）。
+    /// As the remote user started (or resumed) publishing the audio or video stream, the stream enters the `Loading` or `Playing` state
     TRTCAVStatusChangeReasonRemoteStarted = 5,
 
-    ///远端视频流停止（或中断）。
+    /// As the remote user stopped (or paused) publishing the audio or video stream, the stream enters the "Stopped" state
     TRTCAVStatusChangeReasonRemoteStopped = 6,
 
 };
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                    音频相关枚举值定义
+//                    Definitions of audio enumerated values
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 3.2 声音音质
+ * 3.2 Sound quality
  *
- * TRTC 提供了三种精心校调好的模式，用来满足各种垂直场景下对音质的差异化追求：
- * - 人声模式（Speech）：适用于以人声沟通为主的应用场景，该模式下音频传输的抗性较强，TRTC 会通过各种人声处理技术保障在弱网络环境下的流畅度最佳。
- * - 音乐模式（Music）：适用于对声乐要求很苛刻的场景，该模式下音频传输的数据量很大，TRTC 会通过各项技术确保音乐信号在各频段均能获得高保真的细节还原度。
- * - 默认模式（Default）：介于 Speech 和 Music 之间的档位，对音乐的还原度比人声模式要好，但传输数据量比音乐模式要低很多，对各种场景均有不错的适应性。
+ * TRTC provides three well-tuned modes to meet the differentiated requirements for sound quality in various verticals:
+ * - Speech mode (Speech): it is suitable for application scenarios that focus on human communication. In this mode, the audio transfer is more resistant, and TRTC uses various voice processing technologies to ensure the optimal smoothness even in
+ * weak network environments.
+ * - Music mode (Music): it is suitable for scenarios with demanding requirements for music. In this mode, the amount of transferred audio data is very large, and TRTC uses various technologies to ensure that the high-fidelity details of music
+ * signals can be restored in each frequency band.
+ * - Default mode (Default): it is between `Speech` and `Music`. In this mode, the reproduction of music is better than that in `Speech` mode, and the amount of transferred data is much lower than that in `Music` mode; therefore, this mode has good
+ * adaptability to various scenarios.
  */
 enum TRTCAudioQuality {
 
-    ///人声模式：采样率：16k；单声道；编码码率：16kbps；具备几个模式中最强的网络抗性，适合语音通话为主的场景，比如在线会议，语音通话等。
+    /// Speech mode: sample rate: 16 kHz; mono channel; bitrate: 16 Kbps. This mode has the best resistance among all modes and is suitable for audio call scenarios, such as online meeting and audio call.
     TRTCAudioQualitySpeech = 1,
 
-    ///默认模式：采样率：48k；单声道；编码码率：50kbps；介于 Speech 和 Music 之间的档位，SDK 默认档位，推荐选择。
+    /// Default mode: sample rate: 48 kHz; mono channel; bitrate: 50 Kbps. This mode is between the speech mode and the music mode as the default mode in the SDK and is recommended.
     TRTCAudioQualityDefault = 2,
 
-    ///音乐模式：采样率：48k；全频带立体声；编码码率：128kbps；适合需要高保真传输音乐的场景，比如在线K歌、音乐直播等。
+    /// Music mode: sample rate: 48 kHz; full-band stereo; bitrate: 128 Kbps. This mode is suitable for scenarios where Hi-Fi music transfer is required, such as online karaoke and music live streaming.
     TRTCAudioQualityMusic = 3,
 
 };
 
 /**
- * 3.7 音频帧的内容格式
+ * 3.7 Audio frame content format
  */
 enum TRTCAudioFrameFormat {
 
     /// None
     TRTCAudioFrameFormatNone = 0,
 
-    /// PCM 格式的音频数据。
+    /// Audio data in PCM format
     TRTCAudioFrameFormatPCM,
 
 };
 
 /**
- * 3.9 音频回调数据读写模式
+ * 3.9 Audio callback data operation mode
  *
- * TRTC 提供了两种音频回调数据的操作模式。
- * - 读写模式（ReadWrite）：可以获取并修改回调的音频数据，默认模式。
- * - 只读模式（ReadOnly）：仅从回调中获取音频数据。
+ * TRTC provides two modes of operation for audio callback data.
+ * - Read-only mode (ReadOnly): Get audio data only from the callback.
+ * - ReadWrite mode (ReadWrite): You can get and modify the audio data of the callback.
  */
 enum TRTCAudioFrameOperationMode {
 
-    ///读写模式：可以获取并修改回调的音频数据。
+    /// Read-write mode: You can get and modify the audio data of the callback, the default mode.
     TRTCAudioFrameOperationModeReadWrite = 0,
 
-    ///只读模式：仅从回调中获取音频数据。
+    /// Read-only mode: Get audio data from callback only.
     TRTCAudioFrameOperationModeReadOnly = 1,
 
 };
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                      更多枚举值定义
+//                      Definitions of other enumerated values
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 4.1 Log 级别
+ * 4.1 Log level
  *
- * 不同的日志等级定义了不同的详实程度和日志数量，推荐一般情况下将日志等级设置为：TRTCLogLevelInfo。
+ * Different log levels indicate different levels of details and number of logs. We recommend you set the log level to `TRTCLogLevelInfo` generally.
  */
 enum TRTCLogLevel {
 
-    ///输出所有级别的 Log。
+    /// Output logs at all levels
     TRTCLogLevelVerbose = 0,
 
-    ///输出 DEBUG，INFO，WARNING，ERROR 和 FATAL 级别的 Log。
+    /// Output logs at the DEBUG, INFO, WARNING, ERROR, and FATAL levels
     TRTCLogLevelDebug = 1,
 
-    ///输出 INFO，WARNING，ERROR 和 FATAL 级别的 Log。
+    /// Output logs at the INFO, WARNING, ERROR, and FATAL levels
     TRTCLogLevelInfo = 2,
 
-    ///输出WARNING，ERROR 和 FATAL 级别的 Log。
+    /// Output logs at the WARNING, ERROR, and FATAL levels
     TRTCLogLevelWarn = 3,
 
-    ///输出ERROR 和 FATAL 级别的 Log。
+    /// Output logs at the ERROR and FATAL levels
     TRTCLogLevelError = 4,
 
-    ///仅输出 FATAL 级别的 Log。
+    /// Output logs at the FATAL level
     TRTCLogLevelFatal = 5,
 
-    ///不输出任何 SDK Log。
+    /// Do not output any SDK logs
     TRTCLogLevelNone = 6,
 
 };
 
 /**
- * 4.3 屏幕分享的目标类型（仅适用于桌面端）
+ * 4.3 Screen sharing target type (for desktops only)
  */
 enum TRTCScreenCaptureSourceType {
 
-    ///未定义。
+    /// Undefined
     TRTCScreenCaptureSourceTypeUnknown = -1,
 
-    ///该分享目标是某一个应用的窗口。
+    /// The screen sharing target is the window of an application
     TRTCScreenCaptureSourceTypeWindow = 0,
 
-    ///该分享目标是某一台显示器的屏幕。
+    /// The screen sharing target is the entire screen
     TRTCScreenCaptureSourceTypeScreen = 1,
 
-    ///该分享目标是用户自定义的数据源。
+    /// The screen sharing target is a user-defined data source
     TRTCScreenCaptureSourceTypeCustom = 2,
 
 };
 
 /**
- * 4.4 云端混流的排版模式
+ * 4.4 Layout mode of On-Cloud MixTranscoding
  *
- * TRTC 的云端混流服务能够将房间中的多路音视频流混合成一路，因此您需要指定画面的排版方案，我们提供了如下几种排版模式。
+ * TRTC's On-Cloud MixTranscoding service can mix multiple audio/video streams in the room into one stream. Therefore, you need to specify the layout scheme of the video images. The following layout modes are provided:
  */
 enum TRTCTranscodingConfigMode {
 
-    ///未定义。
+    /// Undefined
     TRTCTranscodingConfigMode_Unknown = 0,
 
-    ///全手动排版模式。
-    ///该模式下，您需要指定每一路画面的精确排版位置。该模式的自由度最高，但易用性也最差：
-    ///- 您需要填写 TRTCTranscodingConfig 中的所有参数，包括每一路画面（TRTCMixUser）的位置坐标。
-    ///- 您需要监听 ITRTCCloudCallback 中的 onUserVideoAvailable() 和 onUserAudioAvailable() 事件回调，并根据当前房间中各个麦上用户的音视频状态不断地调整 mixUsers 参数。
+    /// Manual layout mode
+    /// In this mode, you need to specify the precise position of each video image. This mode has the highest degree of freedom, but its ease of use is the worst:
+    ///- You need to enter all the parameters in `TRTCTranscodingConfig`, including the position coordinates of each video image (TRTCMixUser).
+    ///- You need to listen on the `onUserVideoAvailable()` and `onUserAudioAvailable()` event callbacks in `TRTCCloudDelegate` and constantly adjust the `mixUsers` parameter according to the audio/video status of each user with mic on in the current
+    /// room.
     TRTCTranscodingConfigMode_Manual = 1,
 
-    ///纯音频模式。
-    ///该模式适用于语音通话（AudioCall）和语音聊天室（VoiceChatRoom）等纯音频的应用场景。
-    ///- 您只需要在进入房间后，通过 setMixTranscodingConfig 接口设置一次，之后 SDK 就会自动把房间内所有上麦用户的声音混流到当前用户的直播流上。
-    ///- 您无需设置 TRTCTranscodingConfig 中的 mixUsers 参数，只需设置 audioSampleRate、audioBitrate 和 audioChannels 等参数即可。
+    /// Pure audio mode
+    /// This mode is suitable for pure audio scenarios such as audio call (AudioCall) and audio chat room (VoiceChatRoom).
+    ///- You only need to set it once through the `setMixTranscodingConfig()` API after room entry, and then the SDK will automatically mix the audio of all mic-on users in the room into the current user's live stream.
+    ///- You don't need to set the `mixUsers` parameter in `TRTCTranscodingConfig`; instead, you only need to set the `audioSampleRate`, `audioBitrate` and `audioChannels` parameters.
     TRTCTranscodingConfigMode_Template_PureAudio = 2,
 
-    ///预排版模式。
-    ///最受欢迎的排版模式，因为该模式支持您通过占位符提前对各路画面的位置进行设定，之后 SDK 会自动根据房间中画面的路数动态进行适配调整。
-    ///此模式下，您依然需要设置 mixUsers 参数，但可以将 userId 设置为“占位符”，可选的占位符有：
-    /// - "$PLACE_HOLDER_REMOTE$"     :  指代远程用户的画面，可以设置多个。
-    /// - "$PLACE_HOLDER_LOCAL_MAIN$" ： 指代本地摄像头画面，只允许设置一个。
-    /// - "$PLACE_HOLDER_LOCAL_SUB$"  :  指代本地屏幕分享画面，只允许设置一个。
-    ///此模式下，您不需要监听 ITRTCCloudCallback 中的 onUserVideoAvailable 和 onUserAudioAvailable 回调进行实时调整，只需要在进房成功后调用一次 setMixTranscodingConfig 即可，之后 SDK 会自动将真实的 userId 补位到您设置的占位符上。
+    /// Preset layout mode
+    /// This is the most popular layout mode, because it allows you to set the position of each video image in advance through placeholders, and then the SDK automatically adjusts it dynamically according to the number of video images in the room.
+    /// In this mode, you still need to set the `mixUsers` parameter, but you can set `userId` as a "placeholder". Placeholder values include:
+    /// - "$PLACE_HOLDER_REMOTE$": image of remote user. Multiple images can be set.
+    /// - "$PLACE_HOLDER_LOCAL_MAIN$": local camera image. Only one image can be set.
+    /// - "$PLACE_HOLDER_LOCAL_SUB$": local screen sharing image. Only one image can be set.
+    /// In this mode, you don't need to listen on the `onUserVideoAvailable()` and `onUserAudioAvailable()` callbacks in `TRTCCloudDelegate` to make real-time adjustments.
+    /// Instead, you only need to call `setMixTranscodingConfig()` once after successful room entry. Then, the SDK will automatically populate the placeholders you set with real `userId` values.
     TRTCTranscodingConfigMode_Template_PresetLayout = 3,
 
-    ///屏幕分享模式。
-    ///适用于在线教育场景等以屏幕分享为主的应用场景，仅支持 Windows 和 Mac 两个平台的 SDK。
-    ///该模式下，SDK 会先根据您通过 videoWidth 和 videoHeight 参数设置的目标分辨率构建一张画布，
-    ///- 当老师未开启屏幕分享时，SDK 会将老师的摄像头画面等比例拉伸绘制到该画布上；
-    ///- 当老师开启屏幕分享之后，SDK 会将屏幕分享画面绘制到同样的画布上。
-    ///此种排版模式的目的是为了确保混流模块的输出分辨率一致，避免课程回放和网页观看的花屏问题（网页播放器不支持可变分辨率）。
-    ///同时，连麦学生的声音也会被默认混合到老师的音视频流中。
-    ///由于教学模式下的视频内容以屏幕分享为主，因此同时传输摄像头画面和屏幕分享画面是非常浪费带宽的。
-    ///推荐的做法是直接将摄像头画面通过 setLocalVideoRenderCallback 接口自定义绘制到当前屏幕上。
-    ///在该模式下，您无需设置 TRTCTranscodingConfig 中的 mixUsers 参数，SDK 不会混合学生的画面，以免干扰屏幕分享的效果。
-    ///您可以将 TRTCTranscodingConfig 中的 width x height 设为 0px × 0px，SDK 会自动根据用户当前屏幕的宽高比计算出一个合适的分辨率：
-    ///- 如果老师当前屏幕宽度 <= 1920px，SDK 会使用老师当前屏幕的实际分辨率。
-    ///- 如果老师当前屏幕宽度 >  1920px，SDK 会根据当前屏幕宽高比，选择 1920x1080(16:9)、1920x1200(16:10)、1920x1440(4:3) 三种分辨率中的一种。
+    /// Screen sharing mode
+    /// This mode is suitable for screen sharing-based use cases such as online education and supported only by the SDKs for Windows and macOS.
+    /// In this mode, the SDK will first build a canvas according to the target resolution you set (through the `videoWidth` and `videoHeight` parameters).
+    ///- Before the teacher enables screen sharing, the SDK will scale up the teacher's camera image and draw it onto the canvas.
+    ///- After the teacher enables screen sharing, the SDK will draw the video image shared on the screen onto the same canvas.
+    /// The purpose of this layout mode is to ensure consistency in the output resolution of the mixtranscoding module and avoid problems with blurred screen during course replay and webpage playback (web players don't support adjustable resolution).
+    /// Meanwhile, the audio of mic-on students will be mixed into the teacher's audio/video stream by default.
+    /// Video content is primarily the shared screen in teaching mode, and it is a waste of bandwidth to transfer camera image and screen image at the same time.
+    /// Therefore, the recommended practice is to directly draw the camera image onto the current screen through the `setLocalVideoRenderCallback` API.
+    /// In this mode, you don't need to set the `mixUsers` parameter in `TRTCTranscodingConfig`, and the SDK will not mix students' images so as not to interfere with the screen sharing effect.
+    /// You can set width x height in `TRTCTranscodingConfig` to 0 px x 0 px, and the SDK will automatically calculate a suitable resolution based on the aspect ratio of the user's current screen.
+    ///- If the teacher's current screen width is less than or equal to 1920 px, the SDK will use the actual resolution of the teacher's current screen.
+    ///- If the teacher's current screen width is greater than 1920 px, the SDK will select one of the three resolutions of 1920x1080 (16:9), 1920x1200 (16:10), and 1920x1440 (4:3) according to the current screen aspect ratio.
     TRTCTranscodingConfigMode_Template_ScreenSharing = 4,
 
 };
 
 /**
- * 4.5 媒体录制类型
+ * 4.5 Media recording type
  *
- * 该枚举类型用于本地媒体录制接口 {@link startLocalRecording}，用于指定是录制音视频文件还是纯音频文件。
+ * This enumerated type is used in the local media recording API {@link startLocalRecording} to specify whether to record audio/video files or pure audio files.
  */
 enum TRTCLocalRecordType {
 
-    ///仅录制音频。
+    /// Record audio only
     TRTCLocalRecordType_Audio = 0,
 
-    ///仅录制视频。
+    /// Record video only
     TRTCLocalRecordType_Video = 1,
 
-    ///同时录制音频和视频。
+    /// Record both audio and video
     TRTCLocalRecordType_Both = 2,
 
 };
 
 /**
- * 4.6 混流输入类型
+ * 4.6 Stream mix input type
  */
 enum TRTCMixInputType {
 
-    ///默认值，考虑到针对老版本的兼容性，如果您指定了 inputType 为 Undefined，SDK 会根据另一个参数 pureAudio 的数值决定混流输入类型。
+    /// Default.
+    /// Considering the compatibility with older versions, if you specify the inputType as Undefined, the SDK will determine the stream mix input type according to the value of the `pureAudio` parameter
     TRTCMixInputTypeUndefined = 0,
 
-    ///混入音频和视频。
+    /// Mix both audio and video
     TRTCMixInputTypeAudioVideo = 1,
 
-    ///只混入视频。
+    /// Mix video only
     TRTCMixInputTypePureVideo = 2,
 
-    ///只混入音频。
+    /// Mix audio only
     TRTCMixInputTypePureAudio = 3,
 
-    ///混入水印，此时您无需指定 userId 字段，但需要指定 image 字段，推荐使用 png 格式的图片。
+    /// Mix watermark
+    /// In this case, you don't need to specify the `userId` parameter, but you need to specify the `image` parameter. It is recommended to use png format.
     TRTCMixInputTypeWatermark = 4,
 
 };
 
 /**
- * 4.7 设备类型（仅适用于桌面平台）
+ * 4.7 Device type (for desktop platforms only)
  *
- * 该枚举值用于定义三种类型的音视频设备，即摄像头、麦克风和扬声器，以便让一套设备管理接口可以操控三种不同类型的设备。
- * 自 Ver8.0 版本开始，TRTC 在 TXDeviceManager 中重新定义了 `TXMediaDeviceType` 用于替换老版本中的 `TRTCMediaDeviceType`，此处仅保留 `TRTCMediaDeviceType` 的定义，用于兼容老版本的客户代码。
+ * This enumerated value is used to define three types of audio/video devices, namely, camera, mic, and speaker, so that the same device management API can control the three different types of devices.
+ * Starting from v8.0, TRTC redefines `TXMediaDeviceType` in `TXDeviceManager` to replace `TRTCMediaDeviceType` on legacy versions.
+ * Only the definition of `TRTCMediaDeviceType` is retained here for compatibility with customer code on legacy versions.
  */
 typedef TXMediaDeviceType TRTCDeviceType;
 #define TRTCDeviceTypeUnknow TXMediaDeviceTypeUnknown
@@ -737,25 +754,23 @@ typedef TXMediaDeviceType TRTCDeviceType;
 #define TRTCDeviceTypeCamera TXMediaDeviceTypeCamera
 
 /**
- * 4.8 水印图片的源类型
+ * 4.8 Watermark image source type
  */
 enum TRTCWaterMarkSrcType {
 
-    ///图片文件路径，支持 BMP、GIF、JPEG、PNG、TIFF、Exif、WMF 和 EMF 文件格式。
+    /// Path of the image file, which can be in BMP, GIF, JPEG, PNG, TIFF, Exif, WMF, or EMF format
     TRTCWaterMarkSrcTypeFile = 0,
 
-    /// BGRA32格式内存块
+    /// Memory block in BGRA32 format
     TRTCWaterMarkSrcTypeBGRA32 = 1,
 
-    /// RGBA32格式内存块。
+    /// Memory block in RGBA32 format
     TRTCWaterMarkSrcTypeRGBA32 = 2,
 
 };
 
 /**
- * 4.9 设备操作
- *
- * 该枚举值用于本地设备的状态变化通知{@link onDeviceChange}。
+ * 4.9 Device operation This enumerated value is used to notify the status change of the local device {@link onDeviceChange}.
  */
 typedef TXMediaDeviceState TRTCDeviceState;
 #define TRTCDeviceStateAdd TXMediaDeviceStateAdd
@@ -763,53 +778,56 @@ typedef TXMediaDeviceState TRTCDeviceState;
 #define TRTCDeviceStateActive TXMediaDeviceStateActive
 
 /**
- * 4.11 音频录制内容类型
+ * 4.11 Audio recording content type
  *
- * 该枚举类型用于音频录制接口 {@link startAudioRecording}，用于指定录制音频的内容。
+ * This enumerated type is used in the audio recording API {@link startAudioRecording} to specify the content of the recorded audio.
  */
 enum TRTCAudioRecordingContent {
 
-    ///录制本地和远端所有音频。
+    /// Record both local and remote audio
     TRTCAudioRecordingContentAll = 0,
 
-    ///仅录制本地音频。
+    /// Record local audio only
     TRTCAudioRecordingContentLocal = 1,
 
-    ///仅录制远端音频。
+    /// Record remote audio only
     TRTCAudioRecordingContentRemote = 2,
 
 };
 
 /**
- * 4.12 媒体流发布模式
+ * 4.12 The publishing mode
  *
- * 该枚举类型用于媒体流发布接口 {@link startPublishMediaStream} TRTC 的媒体流发布服务能够将房间中的多路音视频流混合成一路发布至 CDN 或者回推到房间内，也可以将您当前的这路音视频发布到腾讯或者第三方 CDN
- * 因此您需要指定对应媒体流的发布模式，我们提供了如下几种模式。
+ * This enum type is used by the publishing API {@link startPublishMediaStream}.
+ * TRTC can mix multiple streams in a room and publish the mixed stream to a CDN or to a TRTC room. It can also publish the stream of the local user to Tencent Cloud or a third-party CDN.
+ * You can specify one of the following publishing modes to use:
  */
 enum TRTCPublishMode {
 
-    ///未定义。
+    /// Undefined
     TRTCPublishModeUnknown = 0,
 
-    ///您可以通过设置该参数将您房间内的主路流（{@link TRTCVideoStreamTypeBig}）发布到腾讯或者第三方直播 CDN 服务商（仅支持标准 RTMP 协议）。
+    /// Use this parameter to publish the primary stream ({@link TRTCVideoStreamTypeBig}) in the room to Tencent Cloud or a third-party CDN (only RTMP is supported).
     TRTCPublishBigStreamToCdn = 1,
 
-    ///您可以通过设置该参数将您房间内的辅路流（{@link TRTCVideoStreamTypeSub}）发布到腾讯或者第三方直播 CDN 服务商（仅支持标准 RTMP 协议）。
+    /// Use this parameter to publish the substream ({@link TRTCVideoStreamTypeSub}) in the room to Tencent Cloud or a third-party CDN (only RTMP is supported).
     TRTCPublishSubStreamToCdn = 2,
 
-    ///您可以通过设置该参数，配合编码输出参数 ({@link TRTCStreamEncoderParam}) 和混流转码参数 ({@link TRTCStreamMixingConfig})，将您指定的多路音视频流进行转码并发布到腾讯或者第三方直播 CDN 服务商（仅支持标准 RTMP 协议）。
+    /// Use this parameter together with the encoding parameter {@link TRTCStreamEncoderParam} and On-Cloud MixTranscoding parameter {@link TRTCStreamMixingConfig} to transcode the streams you specify and publish the mixed stream to Tencent Cloud or
+    /// a third-party CDN (only RTMP is supported).
     TRTCPublishMixStreamToCdn = 3,
 
-    ///您可以通过设置该参数，配合媒体流编码输出参数 ({@link TRTCStreamEncoderParam}) 和混流转码参数 ({@link TRTCStreamMixingConfig})，将您指定的多路音视频流进行转码并发布到您指定的房间中。
-    ///- 通过 {@link TRTCPublishTarget} 中的 TRTCUser 进行指定回推房间的机器人信息。
+    /// Use this parameter together with the encoding parameter {@link TRTCStreamEncoderParam} and On-Cloud MixTranscoding parameter {@link TRTCStreamMixingConfig} to transcode the streams you specify and publish the mixed stream to the room you
+    /// specify.
+    ///- Use `TRTCUser` in {@link TRTCPublishTarget} to specify the robot that publishes the transcoded stream to a TRTC room.
     TRTCPublishMixStreamToRoom = 4,
 
 };
 
 /**
- * 4.13 加密算法
+ * 4.13 Encryption Algorithm
  *
- * 该枚举类型用于媒体流私有加密算法选择。
+ * This enumeration type is used for media stream private encryption algorithm selection.
  */
 enum TRTCEncryptionAlgorithm {
 
@@ -822,112 +840,112 @@ enum TRTCEncryptionAlgorithm {
 };
 
 /**
- * 4.14 测速场景
+ * 4.14 Speed Test Scene
  *
- * 该枚举类型用于测速场景选择。
+ * This enumeration type is used for speed test scene selection.
  */
 enum TRTCSpeedTestScene {
 
-    ///延迟测试。
+    /// Delay testing.
     TRTCSpeedTestScene_DelayTesting = 1,
 
-    ///延迟与带宽测试。
+    /// Delay and bandwidth testing.
     TRTCSpeedTestScene_DelayAndBandwidthTesting = 2,
 
-    ///在线合唱测试。
+    /// Online chorus testing.
     TRTCSpeedTestScene_OnlineChorusTesting = 3,
 
 };
 
 /**
- * 4.15 设置重力感应的适配模式（仅适用于移动端）
- * v11.7版本开始支持，只在sdk内部摄像头采集场景生效
+ * 4.15 Set the adaptation mode of gravity sensing (only applicable to mobile terminals)
+ * Begin from v11.7 version，It only takes effect when the camera capture scene inside SDK is used.
  */
 enum TRTCGravitySensorAdaptiveMode {
 
-    ///关闭重力感应，根据当前采集分辨率与设置的编码分辨率决策，如果两者不一致，则通过旋转90度，保证最大画幅。
+    /// Turn off the gravity sensor and make a decision based on the current acquisition resolution and the set encoding resolution. If the two are inconsistent, rotate 90 degrees to ensure the maximum frame.
     TRTCGravitySensorAdaptiveMode_Disable = 0,
 
-    ///开启重力感应，始终保证远端画面图像为正，中间过程需要处理分辨率不一致时，采用居中裁剪模式。
+    /// Turn on the gravity sensor to always ensure that the remote screen image is positive. When the intermediate process needs to deal with inconsistent resolutions, use the center cropping mode.
     TRTCGravitySensorAdaptiveMode_FillByCenterCrop = 1,
 
-    ///开启重力感应，始终保证远端画面图像为正，中间过程需要处理分辨率不一致时，采用叠加黑边模式。
+    /// Turn on the gravity sensor to always ensure that the remote screen image is positive. When the resolution needs to be processed inconsistently in the intermediate process, use the superimposed black border mode.
     TRTCGravitySensorAdaptiveMode_FitWithBlackBorder = 2,
 
 };
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                      TRTC 核心类型定义
+//                      Definitions of core TRTC classes
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 5.1 进房参数
+ * 5.1 Room entry parameters
  *
- * 作为 TRTC SDK 的进房参数，只有该参数填写正确，才能顺利进入 roomId 或者 strRoomId 所指定的音视频房间。
- * 由于历史原因，TRTC 支持数字和字符串两种类型的房间号，分别是 roomId 和 strRoomId。
- * 请注意：不要混用 roomId 和 strRoomId，因为它们之间是不互通的，比如数字 123 和字符串 “123” 在 TRTC 看来是两个完全不同的房间。
+ * As the room entry parameters in the TRTC SDK, these parameters must be correctly set so that the user can successfully enter the audio/video room specified by `roomId` or `strRoomId`.
+ * For historical reasons, TRTC supports two types of room IDs: `roomId` and `strRoomId`.
+ * Note: do not mix `roomId` and `strRoomId`, because they are not interchangeable. For example, the number `123` and the string `123` are two completely different rooms in TRTC.
  */
 struct TRTCParams {
-    ///【字段含义】应用标识（必填），腾讯云基于 sdkAppId 完成计费统计。
-    ///【推荐取值】在 [实时音视频控制台](https://console.cloud.tencent.com/rav/) 创建应用后可以在账号信息页面中得到该 ID。
+    /// Field description: application ID, which is required. Tencent Cloud generates bills based on `sdkAppId`.
+    /// Recommended value: the ID can be obtained on the account information page in the [TRTC console](https://console.cloud.tencent.com/rav/) after the corresponding application is created.
     uint32_t sdkAppId;
 
-    ///【字段含义】用户标识（必填），当前用户的 userId，相当于用户名，使用 UTF-8 编码。
-    ///【推荐取值】如果一个用户在您的账号系统中的 ID 为“mike”，则 userId 即可设置为“mike”。
+    /// Field description: user ID, which is required. It is the `userId` of the local user in UTF-8 encoding and acts as the username.
+    /// Recommended value: if the ID of a user in your account system is "mike", `userId` can be set to "mike".
     const char *userId;
 
-    ///【字段含义】用户签名（必填），当前 userId 对应的验证签名，相当于使用云服务的登录密码。
-    ///【推荐取值】具体计算方法请参见 [如何计算UserSig](https://cloud.tencent.com/document/product/647/17275)。
+    /// Field description: user signature, which is required. It is the authentication signature corresponding to the current `userId` and acts as the login password for Tencent Cloud services.
+    /// Recommended value: for the calculation method, please see [UserSig](https://www.tencentcloud.com/document/product/647/35166).
     const char *userSig;
 
-    ///【字段含义】数字房间号，在同一个房间里的用户（userId）可以彼此看到对方并进行音视频通话。
-    ///【推荐取值】取值范围：1 - 4294967294。
-    ///【特别说明】roomId 与 strRoomId 是互斥的，若您选用 strRoomId，则 roomId 需要填写为 0。若两者都填，SDK 将优先选用 roomId。
-    ///【请您注意】不要混用 roomId 和 strRoomId，因为它们之间是不互通的，比如数字 123 和字符串 `123` 在 TRTC 看来是两个完全不同的房间。
+    /// Field description: numeric room ID. Users (userId) in the same room can see one another and make audio/video calls.
+    /// Recommended value: value range: 1–4294967294.
+    ///@note `roomId` and `strRoomId` are mutually exclusive. If you decide to use `strRoomId`, then `roomId` should be entered as 0. If both are entered, `roomId` will be used.
+    ///@note do not mix `roomId` and `strRoomId`, because they are not interchangeable. For example, the number `123` and the string `123` are two completely different rooms in TRTC.
     uint32_t roomId;
 
-    ///【字段含义】字符串房间号，在同一个房间里的用户（userId）可以彼此看到对方并进行音视频通话。
-    ///【特别说明】roomId 与 strRoomId 是互斥的，若您选用 strRoomId，则 roomId 需要填写为0。若两者都填，SDK 将优先选用 roomId。
-    ///【请您注意】不要混用 roomId 和 strRoomId，因为它们之间是不互通的，比如数字 123 和字符串 `123` 在 TRTC 看来是两个完全不同的房间。
-    ///【推荐取值】限制长度为 64 字节。以下为支持的字符集范围（共 89 个字符）:
-    /// - 大小写英文字母（a-zA-Z）；
-    /// - 数字（0-9）；
-    /// - 空格、`!`、`#`、`$`、`%`、`&`、`(`、`)`、`+`、`-`、`:`、`;`、`<`、`=`、`.`、`>`、`?`、`@`、`[`、`]`、`^`、`_`、`{`、`}`、`|`、`~`、`,`。
+    /// Field description: string-type room ID. Users (userId) in the same room can see one another and make audio/video calls.
+    ///@note `roomId` and `strRoomId` are mutually exclusive. If you decide to use `strRoomId`, then `roomId` should be entered as 0. If both are entered, `roomId` will be used.
+    ///@note do not mix `roomId` and `strRoomId`, because they are not interchangeable. For example, the number `123` and the string `123` are two completely different rooms in TRTC.
+    /// Recommended value: the length limit is 64 bytes. The following 89 characters are supported:
+    ///  - Uppercase and lowercase letters (a–z and A–Z)
+    ///  - Digits (0–9)
+    ///  - Space, "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", "{", "}", "|", "~", and ",".
     const char *strRoomId;
 
-    ///【字段含义】直播场景下的角色，仅适用于直播场景（{@link TRTCAppSceneLIVE} 和 {@link TRTCAppSceneVoiceChatRoom}），通话场景下指定该参数是无效的。
-    ///【推荐取值】默认值：主播（{@link TRTCRoleAnchor}）。
+    /// Field description: role in the live streaming scenario, which is applicable only to the live streaming scenario ({@link TRTCAppSceneLIVE} or {@link TRTCAppSceneVoiceChatRoom}) but doesn't take effect in the call scenario.
+    /// Recommended value: default value: anchor ({@link TRTCRoleAnchor}).
     TRTCRoleType role;
 
-    ///【字段含义】用于指定在腾讯云直播平台上的 streamId（选填），设置之后，您可以在腾讯云直播 CDN 上通过标准拉流方案（FLV 或 HLS）播放该用户的音视频流。
-    ///【推荐取值】限制长度为64字节，可以不填写，一种推荐的方案是使用 `sdkappid_roomid_userid_main` 作为 streamid，这种命名方式容易辨认且不会在您的多个应用中发生冲突。
-    ///【特殊说明】要使用腾讯云直播 CDN，您需要先在 [控制台](https://console.cloud.tencent.com/trtc/) 中的功能配置页开启“启动自动旁路直播”开关。
-    ///【参考文档】[CDN 旁路直播](https://cloud.tencent.com/document/product/647/16826)。
+    /// Field description: specified `streamId` in Tencent Cloud CSS, which is optional. After setting this field, you can play back the user's audio/video stream on Tencent Cloud CSS CDN through a standard pull scheme (FLV or HLS).
+    /// Recommended value: this parameter can contain up to 64 bytes and can be left empty. We recommend you use `sdkappid_roomid_userid_main` as the `streamid`, which is easier to identify and will not cause conflicts in your multiple applications.
+    ///@note to use Tencent Cloud CSS CDN, you need to enable the auto-relayed live streaming feature on the "Function Configuration" page in the [console](https://console.cloud.tencent.com/trtc/) first.
+    /// For more information, please see [CDN Relayed Live Streaming](https://www.tencentcloud.com/document/product/647/35242).
     const char *streamId;
 
-    ///【字段含义】云端录制开关（选填），用于指定是否要在云端将该用户的音视频流录制下来。
-    ///【参考文档】[云端录制](https://cloud.tencent.com/document/product/647/16823)。
-    ///【推荐取值】限制长度为64字节，只允许包含大小写英文字母（a-zA-Z）、数字（0-9）及下划线和连词符。
-    ///方案一：手动录制方案：
-    /// 1. 在 [控制台](https://console.cloud.tencent.com/trtc)>应用管理>云端录制配置 中开启云端录制。
-    /// 2. 设置 `录制形式` 为 `手动录制`。
-    /// 3. 设置手动录制后，在一个 TRTC 房间中只有设置了 userDefineRecordId 参数的用户才会在云端录制出视频文件，不指定该参数的用户不会产生录制行为。
-    /// 4. 云端会以 “userDefineRecordId_起始时间_结束时间” 的格式命名录制下来的文件。
-    ///方案二：自动录制方案：
-    /// 1. 需要在 [控制台](https://console.cloud.tencent.com/trtc)>应用管理>云端录制配置 中开启云端录制。
-    /// 2. 设置`录制形式`为`自动录制`。
-    /// 3. 设置自动录制后，在一个 TRTC 房间中的任何一个有音视频上行的用户，均会在云端录制出视频文件。
-    /// 4. 文件会以 `userDefineRecordId_起始时间_结束时间` 的格式命名，如果不指定 userDefineRecordId，则文件会以 `streamId_起始时间_结束时间` 命名。
+    /// Field description: on-cloud recording field, which is optional and used to specify whether to record the user's audio/video stream in the cloud.
+    /// For more information, please see [On-Cloud Recording and Playback](https://www.tencentcloud.com/document/product/647/35426).
+    /// Recommended value: it can contain up to 64 bytes. Letters (a–z and A–Z), digits (0–9), underscores, and hyphens are allowed.
+    /// Scheme 1. Manual recording
+    ///  1. Enable on-cloud recording in "Application Management" > "On-cloud Recording Configuration" in the [console](https://console.cloud.tencent.com/trtc).
+    ///  2. Set "Recording Mode" to "Manual Recording".
+    ///  3. After manual recording is set, in a TRTC room, only users with the `userDefineRecordId` parameter set will have video recording files in the cloud, while users without this parameter set will not.
+    ///  4. The recording file will be named in the format of "userDefineRecordId_start time_end time" in the cloud.
+    /// Scheme 2. Auto-recording
+    ///  1. You need to enable on-cloud recording in "Application Management" > "On-cloud Recording Configuration" in the [console](https://console.cloud.tencent.com/trtc).
+    ///  2. Set "Recording Mode" to "Auto-recording".
+    ///  3. After auto-recording is set, any user who upstreams audio/video in a TRTC room will have a video recording file in the cloud.
+    ///  4. The file will be named in the format of "userDefineRecordId_start time_end time". If `userDefineRecordId` is not specified, the file will be named in the format of "streamId_start time_end time".
     const char *userDefineRecordId;
 
-    ///【字段含义】用于权限控制的权限票据（选填），当您希望某个房间只能让特定的 userId 进入时，需要使用 privateMapKey 进行权限保护。
-    ///【推荐取值】仅建议有高级别安全需求的客户使用，更多详情请参见 [进房权限保护](https://cloud.tencent.com/document/product/647/32240)。
+    /// Field description: permission credential used for permission control, which is optional. If you want only users with the specified `userId` values to enter a room, you need to use `privateMapKey` to restrict the permission.
+    /// Recommended value: we recommend you use this parameter only if you have high security requirements. For more information, please see [Enabling Advanced Permission Control](https://www.tencentcloud.com/document/product/647/35157).
     const char *privateMapKey;
 
-    ///【字段含义】业务数据字段（选填），部分高级特性才需要用到此字段。
-    ///【推荐取值】请不要自行设置该字段。
+    /// Field description: business data, which is optional. This field is needed only by some advanced features.
+    /// Recommended value: do not set this field on your own.
     const char *businessInfo;
 
     TRTCParams() : sdkAppId(0), userId(nullptr), userSig(nullptr), roomId(0), strRoomId(nullptr), role(TRTCRoleAnchor), streamId(nullptr), userDefineRecordId(nullptr), privateMapKey(nullptr), businessInfo(nullptr) {
@@ -935,48 +953,51 @@ struct TRTCParams {
 };
 
 /**
- * 5.2 视频编码参数
+ * 5.2 Video encoding parameters
  *
- * 该设置决定远端用户看到的画面质量，同时也决定了云端录制出的视频文件的画面质量。
+ * These settings determine the quality of image viewed by remote users as well as the image quality of recorded video files in the cloud.
  */
 struct TRTCVideoEncParam {
-    ///【字段含义】视频分辨率。
-    ///【特别说明】如需使用竖屏分辨率，请指定 resMode 为 Portrait，例如： 640 × 360 + Portrait = 360 × 640。
-    ///【推荐取值】
-    /// - 手机视频通话：建议选择 360 × 640 及以下分辨率，resMode 选择 Portrait，即竖屏分辨率。
-    /// - 手机在线直播：建议选择 540 × 960，resMode 选择 Portrait，即竖屏分辨率。
-    /// - 桌面平台（Win + Mac）：建议选择 640 × 360 及以上分辨率，resMode 选择 Landscape，即横屏分辨率。
+    /// Field description: video resolution
+    /// Recommended value
+    ///  - For mobile video call, we recommend you select a resolution of 360x640 or below and select `Portrait` (portrait resolution) for `resMode`.
+    ///  - For mobile live streaming, we recommend you select a resolution of 540x960 and select `Portrait` (portrait resolution) for `resMode`.
+    ///  - For desktop platforms (Windows and macOS), we recommend you select a resolution of 640x360 or above and select `Landscape` (landscape resolution) for `resMode`.
+    ///@note to use a portrait resolution, please specify `resMode` as `Portrait`; for example, when used together with `Portrait`, 640x360 represents 360x640.
     TRTCVideoResolution videoResolution;
 
-    ///【字段含义】分辨率模式（横屏分辨率 or 竖屏分辨率）。
-    ///【推荐取值】手机平台（iOS、Android）建议选择 Portrait，桌面平台（Windows、Mac）建议选择 Landscape。
-    ///【特别说明】如需使用竖屏分辨率，请指定 resMode 为 Portrait，例如： 640 × 360 + Portrait = 360 × 640。
+    /// Field description: resolution mode (landscape/portrait)
+    /// Recommended value: for mobile platforms (iOS and Android), `Portrait` is recommended; for desktop platforms (Windows and macOS), `Landscape` is recommended.
+    ///@note to use a portrait resolution, please specify `resMode` as `Portrait`; for example, when used together with `Portrait`, 640x360 represents 360x640.
     TRTCVideoResolutionMode resMode;
 
-    ///【字段含义】视频采集帧率。
-    ///【推荐取值】15fps或20fps。5fps以下，卡顿感明显。10fps以下，会有轻微卡顿感。20fps以上，会浪费带宽（电影的帧率为24fps）。
-    ///【特别说明】部分 Android 手机的前置摄像头并不支持15fps以上的采集帧率，部分主打美颜功能的 Android 手机的前置摄像头的采集帧率可能低于10fps。
+    /// Field description: video capturing frame rate
+    /// Recommended value: 15 or 20 fps. If the frame rate is lower than 5 fps, there will be obvious lagging; if lower than 10 fps but higher than 5 fps, there will be slight lagging; if higher than 20 fps, the bandwidth will be wasted (the frame
+    /// rate of movies is generally 24 fps).
+    ///@note the front cameras on certain Android phones do not support a capturing frame rate higher than 15 fps. For some Android phones that focus on beautification features, the capturing frame rate of the front cameras may be lower than 10 fps.
     uint32_t videoFps;
 
-    ///【字段含义】目标视频码率，SDK 会按照目标码率进行编码，只有在弱网络环境下才会主动降低视频码率。
-    ///【推荐取值】请参见本 TRTCVideoResolution 在各档位注释的最佳码率，也可以在此基础上适当调高。比如：TRTCVideoResolution_1280_720 对应 1200kbps 的目标码率，您也可以设置为 1500kbps 用来获得更好的观感清晰度。
-    ///【特别说明】您可以通过同时设置 videoBitrate 和 minVideoBitrate 两个参数，用于约束 SDK 对视频码率的调整范围：
-    /// - 如果您追求“弱网络下允许卡顿但要保持清晰”的效果，可以设置 minVideoBitrate 为 videoBitrate 的 60%。
-    /// - 如果您追求“弱网络下允许模糊但要保持流畅”的效果，可以设置 minVideoBitrate 为一个较低的数值（比如 100kbps）。
-    /// - 如果您将 videoBitrate 和 minVideoBitrate 设置为同一个值，等价于关闭 SDK 对视频码率的自适应调节能力。
+    /// Field description: target video bitrate. The SDK encodes streams at the target video bitrate and will actively reduce the bitrate only in weak network environments.
+    /// Recommended value: please see the optimal bitrate for each specification in `TRTCVideoResolution`. You can also slightly increase the optimal bitrate.
+    ///            For example, `TRTCVideoResolution_1280_720` corresponds to the target bitrate of 1,200 Kbps. You can also set the bitrate to 1,500 Kbps for higher definition.
+    ///@note you can set the `videoBitrate` and `minVideoBitrate` parameters at the same time to restrict the SDK's adjustment range of the video bitrate:
+    ///  - If you want to "ensure clarity while allowing lag in weak network environments", you can set `minVideoBitrate` to 60% of `videoBitrate`.
+    ///  - If you want to "ensure smoothness while allowing blur in weak network environments", you can set `minVideoBitrate` to a low value, for example, 100 Kbps.
+    ///  - If you set `videoBitrate` and `minVideoBitrate` to the same value, it is equivalent to disabling the adaptive adjustment capability of the SDK for the video bitrate.
     uint32_t videoBitrate;
 
-    ///【字段含义】最低视频码率，SDK 会在网络不佳的情况下主动降低视频码率以保持流畅度，最低会降至 minVideoBitrate 所设定的数值。
-    ///【特别说明】 默认值：0，此时最低码率由 SDK 会根据您指定的分辨率，自动计算出合适的数值。
-    ///【推荐取值】您可以通过同时设置 videoBitrate 和 minVideoBitrate 两个参数，用于约束 SDK 对视频码率的调整范围：
-    /// - 如果您追求`弱网络下允许卡顿但要保持清晰`的效果，可以设置 minVideoBitrate 为 videoBitrate 的 60%。
-    /// - 如果您追求`弱网络下允许模糊但要保持流畅`的效果，可以设置 minVideoBitrate 为一个较低的数值（比如 100kbps）。
-    /// - 如果您将 videoBitrate 和 minVideoBitrate 设置为同一个值，等价于关闭 SDK 对视频码率的自适应调节能力。
+    /// Field description: minimum video bitrate. The SDK will reduce the bitrate to as low as the value specified by `minVideoBitrate` to ensure the smoothness only if the network conditions are poor.
+    /// Note: default value: 0, indicating that a reasonable value of the lowest bitrate will be automatically calculated by the SDK according to the resolution you specify.
+    /// Recommended value: you can set the `videoBitrate` and `minVideoBitrate` parameters at the same time to restrict the SDK's adjustment range of the video bitrate:
+    ///  - If you want to "ensure clarity while allowing lag in weak network environments", you can set `minVideoBitrate` to 60% of `videoBitrate`.
+    ///  - If you want to "ensure smoothness while allowing blur in weak network environments", you can set `minVideoBitrate` to a low value, for example, 100 Kbps.
+    ///  - If you set `videoBitrate` and `minVideoBitrate` to the same value, it is equivalent to disabling the adaptive adjustment capability of the SDK for the video bitrate.
     uint32_t minVideoBitrate;
 
-    ///【字段含义】是否允许动态调整分辨率（开启后会对云端录制产生影响）。
-    ///【推荐取值】该功能适用于不需要云端录制的场景，开启后 SDK 会根据当前网络情况，智能选择出一个合适的分辨率，避免出现“大分辨率+小码率”的低效编码模式。
-    ///【特别说明】默认值：关闭。如有云端录制的需求，请不要开启此功能，因为如果视频分辨率发生变化后，云端录制出的 MP4 在普通的播放器上无法正常播放。
+    /// Field description: whether to allow dynamic resolution adjustment. Once enabled, this field will affect on-cloud recording.
+    /// Recommended value: this feature is suitable for scenarios that don't require on-cloud recording. After it is enabled, the SDK will intelligently select a suitable resolution according to the current network conditions to avoid the inefficient
+    /// encoding mode of "large resolution + small bitrate".
+    ///@note default value: false. If you need on-cloud recording, please do not enable this feature, because if the video resolution changes, the MP4 file recorded in the cloud cannot be played back normally by common players.
     bool enableAdjustRes;
 
     TRTCVideoEncParam() : videoResolution(TRTCVideoResolution_640_360), resMode(TRTCVideoResolutionModeLandscape), videoFps(15), videoBitrate(550), minVideoBitrate(0), enableAdjustRes(false) {
@@ -984,21 +1005,21 @@ struct TRTCVideoEncParam {
 };
 
 /**
- * 5.3 网络流控（Qos）参数集
+ * 5.3 Network QoS control parameter set
  *
- * 网络流控相关参数，该设置决定 SDK 在弱网络环境下的调控策略（例如：“清晰优先”或“流畅优先”）。
+ * Network QoS control parameter. The settings determine the QoS control policy of the SDK in weak network conditions (e.g., whether to "ensure clarity" or "ensure smoothness").
  */
 struct TRTCNetworkQosParam {
-    ///【字段含义】清晰优先还是流畅优先。
-    ///【推荐取值】清晰优先。
-    ///【特别说明】该参数主要影响 TRTC 在较差网络环境下的音视频表现：
-    ///- 流畅优先：即当前网络不足以传输既清晰又流畅的画面时，优先保证画面的流畅性，代价就是画面会比较模糊且伴随有较多的马赛克。参见 {@link TRTCVideoQosPreferenceSmooth}
-    ///- 清晰优先（默认值）：即当前网络不足以传输既清晰又流畅的画面时，优先保证画面的清晰度，代价就是画面会比较卡顿。参见 {@link TRTCVideoQosPreferenceClear}
+    /// Field description: whether to ensure smoothness or clarity
+    /// Recommended value: ensuring clarity
+    ///@note this parameter mainly affects the audio/video performance of TRTC in weak network environments:
+    ///  - Ensuring smoothness: in this mode, when the current network is unable to transfer a clear and smooth video image, the smoothness of the image will be given priority, but there will be blurs. See {@link TRTCVideoQosPreferenceSmooth}
+    ///  - Ensuring clarity (default value): in this mode, when the current network is unable to transfer a clear and smooth video image, the clarity of the image will be given priority, but there will be lags. See {@link TRTCVideoQosPreferenceClear}
     TRTCVideoQosPreference preference;
 
-    ///【字段含义】流控模式（已废弃）。
-    ///【推荐取值】云端控制。
-    ///【特别说明】请设置为云端控制模式（TRTCQosControlModeServer）。
+    /// Field description: QoS control mode (disused)
+    /// Recommended value: on-cloud control
+    ///@note please set the on-cloud control mode (TRTCQosControlModeServer).
     TRTCQosControlMode controlMode;
 
     TRTCNetworkQosParam() : preference(TRTCVideoQosPreferenceClear), controlMode(TRTCQosControlModeServer) {
@@ -1006,21 +1027,21 @@ struct TRTCNetworkQosParam {
 };
 
 /**
- * 5.4 视频画面的渲染参数
+ * 5.4 Rendering parameters of video image
  *
- * 您可以通过设置此参数来控制画面的旋转角度、填充模式和左右镜像模式。
+ * You can use these parameters to control the video image rotation angle, fill mode, and mirror mode.
  */
 struct TRTCRenderParams {
-    ///【字段含义】图像的顺时针旋转角度。
-    ///【推荐取值】支持 90、180 以及 270 旋转角度，默认值：{@link TRTCVideoRotation0}。
+    /// Field description: clockwise image rotation angle
+    /// Recommended value: rotation angles of 90, 180, and 270 degrees are supported. Default value: {@link TRTCVideoRotation_0}
     TRTCVideoRotation rotation;
 
-    ///【字段含义】画面填充模式。
-    ///【推荐取值】填充（画面可能会被拉伸裁剪）或适应（画面可能会有黑边），默认值：{@link TRTCVideoFillMode_Fill}。
+    /// Field description: image fill mode
+    /// Recommended value: fill (the image may be stretched or cropped) or fit (there may be black bars in unmatched areas). Default value: {@link TRTCVideoFillMode_Fill}
     TRTCVideoFillMode fillMode;
 
-    ///【字段含义】画面镜像模式。
-    ///【推荐取值】默认值：{@link TRTCVideoMirrorType_Auto}。
+    /// Field description: image mirror mode
+    /// Recommended value: default value: {@link TRTCVideoMirrorType_Auto}
     TRTCVideoMirrorType mirrorType;
 
     TRTCRenderParams() : rotation(TRTCVideoRotation0), fillMode(TRTCVideoFillMode_Fit), mirrorType(TRTCVideoMirrorType_Disable) {
@@ -1028,15 +1049,15 @@ struct TRTCRenderParams {
 };
 
 /**
- * 5.5 网络质量
+ * 5.5 Network quality
  *
- * 表征网络质量的好坏，您可以通过该数值在用户界面上展示每个用户的网络质量。
+ * This indicates the quality of the network. You can use it to display the network quality of each user on the UI.
  */
 struct TRTCQualityInfo {
-    ///用户 ID
+    /// User ID
     const char *userId;
 
-    ///网络质量
+    /// Network quality
     TRTCQuality quality;
 
     TRTCQualityInfo() : userId(nullptr), quality(TRTCQuality_Unknown) {
@@ -1044,28 +1065,30 @@ struct TRTCQualityInfo {
 };
 
 /**
- * 5.6 音量大小
+ * 5.6 Volume
  *
- * 表征语音音量的评估值，您可以通过该数值在用户界面上展示每个用户的音量大小。
+ * This indicates the audio volume value. You can use it to display the volume of each user in the UI.
  */
 struct TRTCVolumeInfo {
-    ///说话者的 userId, 如果 userId 为空则代表是当前用户自己。
+    ///`userId` of the speaker. An empty value indicates the local user.
     const char *userId;
 
-    ///说话者的音量大小, 取值范围[0 - 100]。
+    /// Volume of the speaker. Value range: 0–100.
     uint32_t volume;
 
-    ///是否检测到人声，0：非人声 1：人声。
+    /// Vad result of the local user. 0: not speech 1: speech.
     int32_t vad;
 
-    ///本地用户的人声频率（单位：Hz），取值范围[0 - 4000]，对于远端用户，该值始终为0。
+    /// The local user's vocal frequency (unit: Hz), the value range is [0 - 4000]. For remote users, this value is always 0.
     float pitch;
 
-    ///音频频谱数据是将音频数据在频率域中的分布，划分为 256 个频率段，使用 spectrumData 记录各个频率段的能量值，每个能量值的取值范围为 [-300, 0]，单位为 dBFS。
-    ///@note 本地频谱使用编码前的音频数据计算，会受到本地采集音量、BGM等影响；远端频谱使用接收到的音频数据计算，本地调整远端播放音量等操作不会对其产生影响。
+    /// Audio spectrum data, which divides the sound frequency into 256 frequency domains, spectrumData records the energy value of each frequency domain,
+    /// The value range of each energy value is [-300, 0] in dBFS.
+    ///@note The local spectrum is calculated using the audio data before encoding, which will be affected by the capture volume, BGM, etc.; the remote spectrum is calculated using the received audio data, and operations such as adjusting the remote
+    /// playback volume locally will not affect it.
     const float *spectrumData;
 
-    /// spectrumDataLength 记录音频频谱数据的长度，为 256。
+    /// The length of recorded audio spectrum data, which is 256.
     uint32_t spectrumDataLength;
 
     TRTCVolumeInfo() : userId(nullptr), volume(0), vad(0), pitch(0), spectrumData(nullptr), spectrumDataLength(0) {
@@ -1073,29 +1096,29 @@ struct TRTCVolumeInfo {
 };
 
 /**
- * 5.7 测速参数
+ * 5.7 Network speed testing parameters
  *
- * 您可以在用户进入房间前通过 {@link startSpeedTest} 接口测试网速（注意：请不要在通话中调用）。
+ * You can test the network speed through the {@link startSpeedTest:} interface before the user enters the room (this API cannot be called during a call).
  */
 struct TRTCSpeedTestParams {
-    ///应用标识，请参见 {@link TRTCParams} 中的相关说明。
+    /// Application identification, please refer to the relevant instructions in {@link TRTCParams}.
     int sdkAppId;
 
-    ///用户标识，请参见 {@link TRTCParams} 中的相关说明。
+    /// User identification, please refer to the relevant instructions in {@link TRTCParams}.
     const char *userId;
 
-    ///用户签名，请参见 {@link TRTCParams} 中的相关说明。
+    /// User signature, please refer to the relevant instructions in {@link TRTCParams}.
     const char *userSig;
 
-    ///预期的上行带宽（kbps，取值范围： 10 ～ 5000，为 0 时不测试）。
-    ///@note 当参数 scene 设置为 TRTCSpeedTestScene_OnlineChorusTesting 时，为了获取更准确的 rtt / jitter 等信息，取值范围限制为 10 ～ 1000。
+    /// Expected upstream bandwidth (kbps, value range: 10 to 5000, no uplink bandwidth test when it is 0).
+    ///@note When the parameter `scene` is set to `TRTCSpeedTestScene_OnlineChorusTesting`, in order to obtain more accurate information such as rtt / jitter, the value range is limited to 10 ~ 1000.
     int expectedUpBandwidth;
 
-    ///预期的下行带宽（kbps，取值范围： 10 ～ 5000，为 0 时不测试）。
-    ///@note 当参数 scene 设置为 TRTCSpeedTestScene_OnlineChorusTesting 时，为了获取更准确的 rtt / jitter 等信息，取值范围限制为 10 ～ 1000。
+    /// Expected downstream bandwidth (kbps, value range: 10 to 5000, no downlink bandwidth test when it is 0).
+    ///@note When the parameter `scene` is set to `TRTCSpeedTestScene_OnlineChorusTesting`, in order to obtain more accurate information such as rtt / jitter, the value range is limited to 10 ~ 1000.
     int expectedDownBandwidth;
 
-    ///测速场景。
+    /// Speed test scene.
     TRTCSpeedTestScene scene;
 
     TRTCSpeedTestParams() : sdkAppId(0), userId(nullptr), userSig(nullptr), expectedUpBandwidth(0), expectedDownBandwidth(0), scene(TRTCSpeedTestScene::TRTCSpeedTestScene_DelayAndBandwidthTesting) {
@@ -1103,42 +1126,44 @@ struct TRTCSpeedTestParams {
 };
 
 /**
- * 5.8 网络测速结果
+ * 5.8 Network speed test result
  *
- * 您可以在用户进入房间前通过 {@link startSpeedTest} 接口进行测速（注意：请不要在通话中调用）。
+ * The {@link startSpeedTest:} API can be used to test the network speed before a user enters a room (this API cannot be called during a call).
  */
 struct TRTCSpeedTestResult {
-    ///测试是否成功。
+    /// Whether the network speed test is successful.
     bool success;
 
-    ///带宽测试错误信息。
+    /// Error message for network speed test.
     const char *errMsg;
 
-    ///服务器 IP 地址。
+    /// Server IP address.
     const char *ip;
 
-    ///内部通过评估算法测算出的网络质量，更多信息请参见 {@link TRTCQuality}。
+    /// Network quality, which is tested and calculated based on the internal evaluation algorithm. For more information, please see {@link TRTCQuality}
     TRTCQuality quality;
 
-    ///上行丢包率，取值范围是 [0 - 1.0]，例如 0.3 表示每向服务器发送 10 个数据包可能会在中途丢失 3 个。
+    /// Upstream packet loss rate between 0 and 1.0. For example, 0.3 indicates that 3 data packets may be lost in every 10 packets sent to the server.
     float upLostRate;
 
-    ///下行丢包率，取值范围是 [0 - 1.0]，例如 0.2 表示每从服务器收取 10 个数据包可能会在中途丢失 2 个。
+    /// Downstream packet loss rate between 0 and 1.0. For example, 0.2 indicates that 2 data packets may be lost in every 10 packets received from the server.
     float downLostRate;
 
-    ///延迟（毫秒），指当前设备到 TRTC 服务器的一次网络往返时间，该值越小越好，正常数值范围是10ms - 100ms。
+    /// Delay in milliseconds, which is the round-trip time between the current device and TRTC server. The smaller the value, the better. The normal value range is 10–100 ms.
     int rtt;
 
-    ///上行带宽（kbps，-1：无效值）。
+    /// Upstream bandwidth (in kbps, -1: invalid value).
     int availableUpBandwidth;
 
-    ///下行带宽（kbps，-1：无效值）。
+    /// Downstream bandwidth (in kbps, -1: invalid value).
     int availableDownBandwidth;
 
-    ///上行数据包抖动（ms)，指用户当前网络环境下数据通信的稳定性，该值越小越好，正常数值范围是0ms - 100ms，-1 代表此次测速没有成功测得有效值，一般情况下 WiFi 网络的 Jitter 会比 4G/5G 环境稍大。
+    /// Uplink data packet jitter (ms) refers to the stability of data communication in the user's current network environment. The smaller the value, the better. The normal value range is 0ms - 100ms. -1 means that the speed test failed to obtain an
+    /// effective value. Generally, the Jitter of the WiFi network will be slightly larger than that of the 4G/5G environment.
     int upJitter;
 
-    ///下行数据包抖动（ms)，指用户当前网络环境下数据通信的稳定性，该值越小越好，正常数值范围是0ms - 100ms，-1 代表此次测速没有成功测得有效值，一般情况下 WiFi 网络的 Jitter 会比 4G/5G 环境稍大。
+    /// Downlink data packet jitter (ms) refers to the stability of data communication in the user's current network environment. The smaller the value, the better. The normal value range is 0ms - 100ms. -1 means that the speed test failed to obtain
+    /// an effective value. Generally, the Jitter of the WiFi network will be slightly larger than that of the 4G/5G environment.
     int downJitter;
 
     TRTCSpeedTestResult() : success(false), errMsg(nullptr), ip(nullptr), quality(TRTCQuality_Unknown), upLostRate(0.0f), downLostRate(0.0f), rtt(0), availableUpBandwidth(0), availableDownBandwidth(0), upJitter(0), downJitter(0) {
@@ -1146,57 +1171,56 @@ struct TRTCSpeedTestResult {
 };
 
 /**
- * 5.9 视频纹理数据
+ * 5.9 Video texture data
  */
 struct TRTCTexture {
-    ///【字段含义】视频纹理 ID。
+    /// Field description: video texture ID
     int glTextureId;
 
-#if defined(__ANDROID__) || defined(_WIN32)
-
-    ///【字段含义】纹理所在的 OpenGL 上下文环境。
+    /// Field description: The OpenGL context to which the texture corresponds, for Windows and Android.
     void *glContext;
 
-    TRTCTexture() : glTextureId(0), glContext(nullptr) {
+    /// Field description: The D3D11 texture, which is the pointer of ID3D11Texture2D, only for Windows.
+    void *d3d11TextureId;
+
+    TRTCTexture() : glTextureId(0), glContext(nullptr), d3d11TextureId(nullptr) {
     }
-#else
-    TRTCTexture() : glTextureId(0) {
-    }
-#endif
 };
 
 /**
- * 5.10 视频帧信息
+ * 5.10 Video frame information
  *
- * TRTCVideoFrame 用来描述一帧视频画面的裸数据，也就是编码前或者解码后的视频画面数据。
+ * `TRTCVideoFrame` is used to describe the raw data of a frame of the video image, which is the image data before frame encoding or after frame decoding.
  */
 struct TRTCVideoFrame {
-    ///【字段含义】视频的像素格式。
+    /// Field description: video pixel format
     TRTCVideoPixelFormat videoFormat;
 
-    ///【字段含义】视频数据结构类型。
+    /// Field description: video data structure type
     TRTCVideoBufferType bufferType;
 
-    ///【字段含义】bufferType 为 {@link TRTCVideoBufferType_Texture} 时的视频数据，承载用于 OpenGL 渲染的纹理数据。
+    /// Field description: video data when `bufferType` is {@link TRTCVideoBufferType_Texture}, which carries the texture data used for OpenGL rendering.
     TRTCTexture *texture;
 
-    ///【字段含义】bufferType 为 {@link TRTCVideoBufferType_Buffer} 时的视频数据，承载用于 C++ 层的内存数据块。
+    /// Field description: video data when `bufferType` is {@link TRTCVideoBufferType_Buffer}, which carries the memory data blocks for the C++ layer.
     char *data;
 
-    ///【字段含义】视频数据的长度，单位是字节。对于 i420 而言：length = width * height * 3 / 2；对于 BGRA32 而言：length = width * height * 4。
+    /// Field description: video data length in bytes. For I420, length = width * height * 3 / 2; for BGRA32, length = width * height * 4.
     uint32_t length;
 
-    ///【字段含义】视频宽度。
+    /// Field description: video width
+    /// Recommended value: please enter the width of the video data passed in.
     uint32_t width;
 
-    ///【字段含义】视频高度。
+    /// Field description: video height
+    /// Recommended value: please enter the height of the video data passed in.
     uint32_t height;
 
-    ///【字段含义】视频帧的时间戳，单位毫秒。
-    ///【推荐取值】自定义视频采集时可以设置为0。若该参数为0，SDK 会自定填充 timestamp 字段，但请“均匀”地控制 sendCustomVideoData 的调用间隔。
+    /// Field description: video frame timestamp in milliseconds
+    /// Recommended value: this parameter can be set to 0 for custom video capturing. In this case, the SDK will automatically set the `timestamp` field. However, please "evenly" set the calling interval of `sendCustomVideoData`.
     uint64_t timestamp;
 
-    ///【字段含义】视频像素的顺时针旋转角度。
+    /// Field description: clockwise rotation angle of video pixels
     TRTCVideoRotation rotation;
 
     TRTCVideoFrame() : videoFormat(TRTCVideoPixelFormat_Unknown), bufferType(TRTCVideoBufferType_Unknown), texture(nullptr), data(nullptr), length(0), width(640), height(360), timestamp(0), rotation(TRTCVideoRotation0) {
@@ -1204,31 +1228,31 @@ struct TRTCVideoFrame {
 };
 
 /**
- * 5.11 音频帧数据
+ * 5.11 Audio frame data
  */
 struct TRTCAudioFrame {
-    ///【字段含义】音频帧的格式。
+    /// Field description: audio frame format
     TRTCAudioFrameFormat audioFormat;
 
-    ///【字段含义】音频数据。
+    /// Field description: audio data
     char *data;
 
-    ///【字段含义】音频数据的长度。
+    /// Field description: audio data length
     uint32_t length;
 
-    ///【字段含义】采样率。
+    /// Field description: sample rate
     uint32_t sampleRate;
 
-    ///【字段含义】声道数。
+    /// Field description: number of sound channels
     uint32_t channel;
 
-    ///【字段含义】时间戳，单位ms。
+    /// Field description: timestamp in ms
     uint64_t timestamp;
 
-    ///【字段含义】音频额外数据，远端用户通过 `onLocalProcessedAudioFrame` 写入的数据会通过该字段回调。
+    /// Field description: extra data in audio frame, message sent by remote users through `onLocalProcessedAudioFrame` that add to audio frame will be callback through this field.
     char *extraData;
 
-    ///【字段含义】音频消息数据的长度。
+    /// Field description: extra data length
     uint32_t extraDataLength;
 
     TRTCAudioFrame() : audioFormat(TRTCAudioFrameFormatNone), data(nullptr), length(0), sampleRate(48000), channel(1), timestamp(0), extraData(nullptr), extraDataLength(0) {
@@ -1236,61 +1260,55 @@ struct TRTCAudioFrame {
 };
 
 /**
- * 5.12 云端混流中各路画面的描述信息
+ * 5.12 Description information of each video image in On-Cloud MixTranscoding
  *
- * TRTCMixUser 用于指定云端混流中每一路视频画面的位置、大小、图层以及流类型等信息。
+ * `TRTCMixUser` is used to specify the location, size, layer, and stream type of each video image in On-Cloud MixTranscoding.
  */
 struct TRTCMixUser {
-    ///【字段含义】用户 ID
+    /// Field description: user ID
     const char *userId;
 
-    ///【字段含义】该路音视频流所在的房间号（设置为空值代表当前用户所在的房间号）。
+    /// Field description: ID of the room where this audio/video stream is located (an empty value indicates the local room ID)
     const char *roomId;
 
-    ///【字段含义】指定该路画面的坐标区域（单位：像素）。
+    /// Field description: specify the coordinate area of this video image in px
     RECT rect;
 
-    ///【字段含义】指定该路画面的层级（取值范围：1 - 15，不可重复）。
+    /// Field description: specify the level of this video image (value range: 1–15; the value must be unique)
     int zOrder;
 
-    ///【字段含义】指定该路画面是主路画面（{@link TRTCVideoStreamTypeBig}）还是辅路画面（{@link TRTCVideoStreamTypeSub}）。
+    /// Field description: specify whether this video image is the primary stream image ({@link TRTCVideoStreamTypeBig}) or substream image ({@link TRTCVideoStreamTypeSub}).
     TRTCVideoStreamType streamType;
 
-    ///【字段含义】指定该路流是不是只混合声音。
-    ///【推荐取值】默认值：false。
-    ///【特别说明】已废弃，推荐使用8.5版本开始新引入的字段：inputType。
+    /// Field description: specify whether this stream mixes audio only
+    /// Recommended value: default value: false
+    ///@note this field has been disused. We recommend you use the new field `inputType` introduced in v8.5.
     bool pureAudio;
 
-    ///【字段含义】指定该路流的混合内容（只混音频、只混视频、混合音视频、混入水印）。
-    ///【默认取值】默认值：TRTCMixInputTypeUndefined。
-    ///【特别说明】
-    ///   - 当指定 inputType 为 TRTCMixInputTypeUndefined 并设置 pureAudio 为 YES 时，等效于设置 inputType 为 TRTCMixInputTypePureAudio。
-    ///   - 当指定 inputType 为 TRTCMixInputTypeUndefined 并设置 pureAudio 为 NO 时，等效于设置 inputType 为 TRTCMixInputTypeAudioVideo。
-    ///   - 当指定 inputType 为 TRTCMixInputTypeWatermark 时，您可以不指定 userId 字段，但需要指定 image 字段。
+    /// Field description: specify the mixed content of this stream (audio only, video only, audio and video, or watermark).
+    /// Recommended value: default value: TRTCMixInputTypeUndefined.
+    ///@note
+    ///- When specifying `inputType` as TRTCMixInputTypeUndefined and specifying `pureAudio` to YES, it is equivalent to setting `inputType` to `TRTCMixInputTypePureAudio`.
+    ///- When specifying `inputType` as TRTCMixInputTypeUndefined and specifying `pureAudio` to NO, it is equivalent to setting `inputType` to `TRTCMixInputTypeAudioVideo`.
+    ///- When specifying `inputType` as TRTCMixInputTypeWatermark, you don't need to specify the `userId` field, but you need to specify the `image` field.
     TRTCMixInputType inputType;
 
-    ///【字段含义】该画面在输出时的显示模式。
-    ///【推荐取值】默认值：视频流默认为0。0为裁剪，1为缩放，2为缩放并显示黑底。
-    ///【特别说明】水印图和占位图暂时不支持设置 renderMode，默认强制拉伸处理。
+    /// Field description: specify the display mode of this stream.
+    /// Recommended value: default value: 0. 0 is cropping, 1 is zooming, 2 is zooming and displaying black background.
+    ///@note image doesn't support setting `renderMode` temporarily, the default display mode is forced stretch.
     uint32_t renderMode;
 
-    ///【字段含义】该路音频参与混音时的音量等级（取值范围：0 - 100）。
-    ///【默认取值】默认值：100。
+    /// Field description: specify the target volumn level of On-Cloud MixTranscoding. (value range: 0-100)
+    /// Recommended value: default value: 100.
     uint32_t soundLevel;
 
-    ///【字段含义】占位图或水印图
-    ///   - 占位图是指当对应 userId 混流内容为纯音频时，混合后的画面中显示的是占位图片。
-    ///   - 水印图是指一张贴在混合后画面中的半透明图片，这张图片会一直覆盖于混合后的画面上。
-    ///   - 当指定 inputType 为 TRTCMixInputTypePureAudio 时，image 为占位图，此时需要您指定 userId。
-    ///   - 当指定 inputType 为 TRTCMixInputTypeWatermark 时，image 为水印图，此时不需要您指定 userId。
-    ///【推荐取值】默认值：空值，即不设置占位图或者水印图。
-    ///【特别说明】
-    ///   - 您可以将 image 设置为控制台中的某一个素材 ID，这需要您事先在 “[控制台](https://console.cloud.tencent.com/trtc) => 应用管理 => 功能配置 => 素材管理” 中单击 [新增图片] 按钮进行上传。
-    ///   - 上传成功后可以获得对应的“图片ID”，然后将“图片ID”转换成字符串类型并设置给 image 字段即可（比如假设“图片ID” 为 63，可以设置 image = @"63"）。
-    ///   - 您也可以将 image 设置为图片的 URL 地址，腾讯云的后台服务器会将该 URL 地址指定的图片混合到最终的画面中。
-    ///   - URL 链接长度限制为 512 字节。图片大小限制不超过 2MB。
-    ///   - 图片格式支持 png、jpg、jpeg、bmp 格式，推荐使用 png 格式的半透明图片作为水印。
-    ///   - image 仅在 inputType 为 TRTCMixInputTypePureAudio 或者 TRTCMixInputTypeWatermark 时才生效。
+    /// Field description: specify the placeholder or watermark image. The placeholder image will be displayed when there is no upstream video.A watermark image is a semi-transparent image posted in the mixed image, and this image will always be
+    /// overlaid on the mixed image.
+    ///- When the `inputType` field is set to TRTCMixInputTypePureAudio, the image is a placeholder image, and you need to specify `userId`.
+    ///- When the `inputType` field is set to TRTCMixInputTypeWatermark, the image is a watermark image, and you don't need to specify `userId`.
+    /// Recommended value: default value: null, indicating not to set the placeholder or watermark image.
+    ///@note TRTC's backend service will mix the image specified by the URL address into the final stream.URL link length is limited to 512 bytes. The image size is limited to 10MB.Support png, jpg, jpeg, bmp format. Take effects iff the `inputType`
+    /// field is set to TRTCMixInputTypePureAudio or TRTCMixInputTypeWatermark.
     const char *image;
 
     TRTCMixUser() : userId(nullptr), roomId(nullptr), rect(), zOrder(0), streamType(TRTCVideoStreamTypeBig), pureAudio(false), inputType(TRTCMixInputTypeUndefined), renderMode(0), soundLevel(100), image(nullptr) {
@@ -1302,106 +1320,103 @@ struct TRTCMixUser {
 };
 
 /**
- * 5.13 云端混流的排版布局和转码参数
+ * 5.13 Layout and transcoding parameters of On-Cloud MixTranscoding
  *
- * 用于指定混流时各路画面的排版位置信息和云端转码的编码参数。
+ * These parameters are used to specify the layout position information of each video image and the encoding parameters of mixtranscoding during On-Cloud MixTranscoding.
  */
 struct TRTCTranscodingConfig {
-    ///【字段含义】排版模式。
-    ///【推荐取值】请根据您的业务场景要求自行选择，预排版模式是适用性较好的一种模式。
+    /// Field description: layout mode
+    /// Recommended value: please choose a value according to your business needs. The preset mode has better applicability.
     TRTCTranscodingConfigMode mode;
 
-    ///【字段含义】腾讯云直播服务的 AppID。
-    ///【推荐取值】请在 [实时音视频控制台](https://console.cloud.tencent.com/trtc) 依次单击【应用管理】=>【应用信息】，并在【旁路直播信息】中获取 appid。
+    /// Field description: `appId` of Tencent Cloud CSS
+    /// Recommended value: please click `Application Management` > `Application Information` in the [TRTC console](https://console.cloud.tencent.com/trtc) and get the `appId` in `Relayed Live Streaming Info`.
     uint32_t appId;
 
-    ///【字段含义】腾讯云直播服务的 bizid。
-    ///【推荐取值】请在 [实时音视频控制台](https://console.cloud.tencent.com/trtc) 依次单击【应用管理】=>【应用信息】，并在【旁路直播信息】中获取 bizid。
+    /// Field description: `bizId` of Tencent Cloud CSS
+    /// Recommended value: please click `Application Management` > `Application Information` in the [TRTC console](https://console.cloud.tencent.com/trtc) and get the `bizId` in `Relayed Live Streaming Info`.
     uint32_t bizId;
 
-    ///【字段含义】指定云端转码的目标分辨率（宽度）。
-    ///【推荐取值】单位：像素值，推荐值：360，如果你只混合音频流，请将 width 和 height 均设置为 0，否则混流转码后的直播流中会有黑色背景。
+    /// Field description: specify the target resolution (width) of On-Cloud MixTranscoding
+    /// Recommended value: 360 px. If you only mix audio streams, please set both `width` and `height` to 0; otherwise, there will be a black background in the live stream after mixtranscoding.
     uint32_t videoWidth;
 
-    ///【字段含义】指定云端转码的目标分辨率（高度）。
-    ///【推荐取值】单位：像素值，推荐值：640，如果你只混合音频流，请将 width 和 height 均设置为 0，否则混流转码后的直播流中会有黑色背景。
+    /// Field description: specify the target resolution (height) of On-Cloud MixTranscoding
+    /// Recommended value: 640 px. If you only mix audio streams, please set both `width` and `height` to 0; otherwise, there will be a black background in the live stream after mixtranscoding.
     uint32_t videoHeight;
 
-    ///【字段含义】指定云端转码的目标视频码率（kbps）。
-    ///【推荐取值】如果填0，TRTC 会根据 videoWidth 和 videoHeight 估算出一个合理的码率值，您也可以参考视频分辨率枚举定义中所推荐的码率值（见注释部分）。
+    /// Field description: specify the target video bitrate (Kbps) of On-Cloud MixTranscoding
+    /// Recommended value: if you enter 0, TRTC will estimate a reasonable bitrate value based on `videoWidth` and `videoHeight`. You can also refer to the recommended bitrate value in the video resolution enumeration definition (in the comment
+    /// section).
     uint32_t videoBitrate;
 
-    ///【字段含义】指定云端转码的目标视频帧率（FPS）。
-    ///【推荐取值】默认值：15fps，取值范围是 (0,30]。
+    /// Field description: specify the target video frame rate (fps) of On-Cloud MixTranscoding
+    /// Recommended value: default value: 15 fps. Value range: (0,30].
     uint32_t videoFramerate;
 
-    ///【字段含义】指定云端转码的目标视频关键帧间隔（GOP）。
-    ///【推荐取值】默认值：2，单位为秒，取值范围是 [1,8]。
+    /// Field description: specify the target video keyframe interval (GOP) of On-Cloud MixTranscoding
+    /// Recommended value: default value: 2 (in seconds). Value range: [1,8].
     uint32_t videoGOP;
 
-    ///【字段含义】指定混合画面的底色颜色。
-    ///【推荐取值】默认值：0x000000 代表黑色。格式为十六进制数字，比如：“0x61B9F1” 代表 RGB 分别为(97,158,241)。
+    /// Field description: specify the background color of the mixed video image.
+    /// Recommended value: default value: 0x000000, which means black and is in the format of hex number; for example: "0x61B9F1" represents the RGB color (97,158,241).
     uint32_t backgroundColor;
 
-    ///【字段含义】指定混合画面的背景图片。
-    ///【推荐取值】默认值：空值，即不设置背景图片。
-    ///【特别说明】
-    ///   - 您可以将 image 设置为控制台中的某一个素材 ID，这需要您事先在 “[控制台](https://console.cloud.tencent.com/trtc) => 应用管理 => 功能配置 => 素材管理” 中单击 [新增图片] 按钮进行上传。
-    ///   - 上传成功后可以获得对应的“图片ID”，然后将“图片ID”转换成字符串类型并设置给 image 字段即可（比如假设“图片ID” 为 63，可以设置 image = @"63"）。
-    ///   - 您也可以将 image 设置为图片的 URL 地址，腾讯云的后台服务器会将该 URL 地址指定的图片混合到最终的画面中。
-    ///   - URL 链接长度限制为 512 字节。图片大小限制不超过 2MB。
-    ///   - 图片格式支持 png、jpg、jpeg、bmp 格式。
+    /// Field description: specify the background image of the mixed video image.
+    ///**Recommended value: default value: null, indicating not to set the background image.
+    ///@note TRTC's backend service will mix the image specified by the URL address into the final stream.URL link length is limited to 512 bytes. The image size is limited to 10MB.Support png, jpg, jpeg, bmp format.
     const char *backgroundImage;
 
-    ///【字段含义】指定云端转码的目标音频采样率。
-    ///【推荐取值】默认值：48000Hz。支持12000HZ、16000HZ、22050HZ、24000HZ、32000HZ、44100HZ、48000HZ。
+    /// Field description: specify the target audio sample rate of On-Cloud MixTranscoding
+    /// Recommended value: default value: 48000 Hz. Valid values: 12000 Hz, 16000 Hz, 22050 Hz, 24000 Hz, 32000 Hz, 44100 Hz, 48000 Hz.
     uint32_t audioSampleRate;
 
-    ///【字段含义】指定云端转码的目标音频码率。
-    ///【推荐取值】默认值：64kbps，取值范围是 [32，192]。
+    /// Field description: specify the target audio bitrate of On-Cloud MixTranscoding
+    /// Recommended value: default value: 64 Kbps. Value range: [32,192].
     uint32_t audioBitrate;
 
-    ///【字段含义】指定云端转码的音频声道数。
-    ///【推荐取值】默认值：1，代表单声道。可设定的数值只有两个数字：1-单声道，2-双声道。
+    /// Field description: specify the number of sound channels of On-Cloud MixTranscoding
+    /// Recommended value: default value: 1, which means mono channel. Valid values: 1: mono channel; 2: dual channel.
     uint32_t audioChannels;
 
-    ///【字段含义】指定云端转码的输出流音频编码类型。
-    ///【推荐取值】默认值：0，代表LC-AAC。可设定的数值只有三个数字：0 - LC-AAC，1 - HE-AAC，2 - HE-AACv2。
-    ///【特别说明】HE-AAC 和 HE-AACv2 支持的输出流音频采样率范围为[48000, 44100, 32000, 24000, 16000]。
-    ///【特别说明】当音频编码设置为 HE-AACv2 时，只支持输出流音频声道数为双声道。
-    ///【特别说明】HE-AAC 和 HE-AACv2 取值仅在输出流为您额外设置的 streamId 上时才生效。
+    /// Field description: specify the audio encoding type of On-Cloud MixTranscoding
+    /// Recommended value: default value: 0, which means LC-AAC. Valid values: 0:  LC-AAC; 1: HE-AAC; 2: HE-AACv2.
+    ///@note
+    ///- HE-AAC and HE-AACv2 only support [48000, 44100, 32000, 24000, 16000]  sample rate.
+    ///- HE-AACv2  only support dual channel.
+    ///- HE-AAC and HE-AACv2 take effects iff the output streamId is specified.
     uint32_t audioCodec;
 
-    ///【字段含义】指定云端混流中每一路视频画面的位置、大小、图层以及流类型等信息。
-    ///【推荐取值】该字段是一个 TRTCMixUser 类型的数组，数组中的每一个元素都用来代表每一路画面的信息。
+    /// Field description: specify the position, size, layer, and stream type of each video image in On-Cloud MixTranscoding
+    /// Recommended value: this field is an array in `TRTCMixUser` type, where each element represents the information of a video image.
     TRTCMixUser *mixUsersArray;
 
-    ///【字段含义】 数组 mixUsersArray 的元素个数。
+    /// Field description: number of elements in the `mixUsersArray` array
     uint32_t mixUsersArraySize;
 
-    ///【字段含义】输出到 CDN 上的直播流 ID。
-    ///【推荐取值】默认值：空值，即房间里的多路音视频流最终会混合到接口调用者的那一路音视频流上。
-    ///    - 如不设置该参数，SDK 会执行默认逻辑，即房间里的多路音视频流会混合到该接口调用者的那一路音视频流上，也就是 A + B => A。
-    ///    - 如您设置该参数，SDK 会将房间里的多路音视频流混合到您指定的直播流上，也就是 A + B => C（C 代表您指定的 streamId）。
+    /// Field description: ID of the live stream output to CDN
+    /// Recommended value: default value: null, that is, the audio/video streams in the room will be mixed into the audio/video stream of the caller of this API.
+    ///     - If you don't set this parameter, the SDK will execute the default logic, that is, it will mix the multiple audio/video streams in the room into the audio/video stream of the caller of this API, i.e., A + B => A.
+    ///     - If you set this parameter, the SDK will mix the audio/video streams in the room into the live stream you specify, i.e., A + B => C (C is the `streamId` you specify).
     const char *streamId;
 
-    ///【字段含义】混流 SEI 参数，默认不填写。
-    ///【特别说明】参数以 json 字符串形式传入，示例如下：
+    /// Field description: SEI parameters. default value: null
+    ///@note the parameter is passed in the form of a JSON string. Here is an example to use it:
     ///```json
     ///{
-    ///  "payLoadContent":"xxx",
-    ///  "payloadType":5,
-    ///  "payloadUuid":"1234567890abcdef1234567890abcdef",
-    ///  "interval":1000,
-    ///  "followIdr":false
-    ///}
+    ///   "payLoadContent":"xxx",
+    ///   "payloadType":5,
+    ///   "payloadUuid":"1234567890abcdef1234567890abcdef",
+    ///   "interval":1000,
+    ///   "followIdr":false
+    /// }
     ///```
-    ///当前支持的字段及含义：
-    ///- payloadContent: 必填。透传 sei 的 payload 内容，不能为空；
-    ///- payloadType: 必填。sei 消息的类型，取值范围: 5 或 [100, 254] 范围内的整数（244 除外，244 是内部自定义的时间戳 sei）；
-    ///- payloadUuid: 当 payloadType 为 5 时必须填写，其他情况下该值会被忽略。该值必须是长度为 32 的十六进制数字；
-    ///- interval: 选填，默认 1000。sei 的发送间隔，单位毫秒；
-    ///- followIdr: 选填，默认 false。该值为 true 时，发送关键帧时会确保带 sei，否则不确保。
+    /// The currently supported fields and their meanings are as follows:
+    ///- payloadContent: Required. The payload content of the passthrough SEI, which cannot be empty.
+    ///- payloadType: Required. The type of the SEI message, with a value range of 5 or an integer within the range of [100, 254] (excluding 244, which is an internally defined timestamp SEI).
+    ///- payloadUuid: Required when payloadType is 5, and ignored in other cases. The value must be a 32-digit hexadecimal number.
+    ///- interval: Optional, default is 1000. The sending interval of the SEI, in milliseconds.
+    ///- followIdr: Optional, default is false. When this value is true, the SEI will be ensured to be carried when sending a key frame, otherwise it is not guaranteed.
     const char *videoSeiParams;
 
     TRTCTranscodingConfig()
@@ -1427,27 +1442,28 @@ struct TRTCTranscodingConfig {
 };
 
 /**
- * 5.14 向非腾讯云 CDN 上发布音视频流时需设置的转推参数
+ * 5.14 Push parameters required to be set when publishing audio/video streams to non-Tencent Cloud CDN
  *
- * TRTC 的后台服务支持通过标准 RTMP 协议，将其中的音视频流发布到第三方直播 CDN 服务商。
- * 如果您使用腾讯云直播 CDN 服务，可无需关注此参数，直接使用 {@link startPublish} 接口即可。
+ * TRTC's backend service supports publishing audio/video streams to third-party live CDN service providers through the standard RTMP protocol.
+ * If you use the Tencent Cloud CSS CDN service, you don't need to care about this parameter; instead, just use the {@link startPublish} API.
  */
 struct TRTCPublishCDNParam {
-    ///【字段含义】腾讯云直播服务的 AppID。
-    ///【推荐取值】请在 [实时音视频控制台](https://console.cloud.tencent.com/trtc) 依次单击【应用管理】=>【应用信息】，并在【旁路直播信息】中获取 appid。
+    /// Field description: `appId` of Tencent Cloud CSS
+    /// Recommended value: please click `Application Management` > `Application Information` in the [TRTC console](https://console.cloud.tencent.com/trtc) and get the `appId` in `Relayed Live Streaming Info`.
     uint32_t appId;
 
-    ///【字段含义】腾讯云直播服务的 bizid。
-    ///【推荐取值】请在 [实时音视频控制台](https://console.cloud.tencent.com/trtc) 依次单击【应用管理】=>【应用信息】，并在【旁路直播信息】中获取 bizid。
+    /// Field description: `bizId` of Tencent Cloud CSS
+    /// Recommended value: please click `Application Management` > `Application Information` in the [TRTC console](https://console.cloud.tencent.com/trtc) and get the `bizId` in `Relayed Live Streaming Info`.
     uint32_t bizId;
 
-    ///【字段含义】指定该路音视频流在第三方直播服务商的推流地址（RTMP 格式）。
-    ///【推荐取值】各家服务商的推流地址规则差异较大，请根据目标服务商的要求填写合法的推流 URL，TRTC 的后台服务器会按照您填写的 URL 向第三方服务商推送标准格式音视频流。
-    ///【特别说明】推流 URL 必须为 RTMP 格式，必须符合您的目标直播服务商的规范要求，否则目标服务商会拒绝来自 TRTC 后台服务的推流请求。
+    /// Field description: specify the push address (in RTMP format) of this audio/video stream at the third-party live streaming service provider
+    /// Recommended value: the push URL rules vary greatly by service provider. Please enter a valid push URL according to the requirements of the target service provider. TRTC's backend server will push audio/video streams in the standard format to
+    /// the third-party service provider according to the URL you enter.
+    ///@note the push URL must be in RTMP format and meet the specifications of your target live streaming service provider; otherwise, the target service provider will reject the push requests from TRTC's backend service.
     const char *url;
 
-    ///【字段含义】需要转推的 streamId。
-    ///【推荐取值】默认值：空值。如果不填写，则默认转推调用者的旁路流。
+    /// Field description: specify the push address (in RTMP format) of this audio/video stream at the third-party live streaming service provider
+    /// Recommended value: default value: null,that is, the audio/video streams in the room will be pushed to the target service provider of the caller of this API.
     const char *streamId;
 
     TRTCPublishCDNParam() : appId(0), bizId(0), url(nullptr), streamId(nullptr) {
@@ -1455,22 +1471,22 @@ struct TRTCPublishCDNParam {
 };
 
 /**
- * 5.15 本地音频文件的录制参数
+ * 5.15 Local audio file recording parameters
  *
- * 该参数用于在音频录制接口 {@link startAudioRecording} 中指定录制参数。
+ * This parameter is used to specify the recording parameters in the audio recording API {@link startAudioRecording}.
  */
 struct TRTCAudioRecordingParams {
-    ///【字段含义】录音文件的保存路径（必填）。
-    ///【特别说明】该路径需精确到文件名及格式后缀，格式后缀用于决定录音文件的格式，目前支持的格式有 PCM、WAV 和 AAC。
-    ///           例如：假如您指定路径为 "mypath/record/audio.aac"，代表您希望 SDK 生成一个 AAC 格式的音频录制文件。
-    ///           请您指定一个有读写权限的合法路径，否则录音文件无法生成。
+    /// Field description: storage path of the audio recording file, which is required.
+    ///@note this path must be accurate to the file name and extension. The extension determines the format of the audio recording file. Currently, supported formats include PCM, WAV, and AAC.
+    /// For example, if you specify the path as `mypath/record/audio.aac`, it means that you want the SDK to generate an audio recording file in AAC format.Please specify a valid path with read/write permissions; otherwise, the audio recording file
+    /// cannot be generated.
     const char *filePath;
 
-    ///【字段含义】音频录制内容类型。
-    ///【特别说明】默认录制所有本地和远端音频。
+    /// Field description: Audio recording content type.
+    /// Note: Record all local and remote audio by default.
     TRTCAudioRecordingContent recordingContent;
 
-    ///【字段含义】maxDurationPerFile 录制文件分片时长，单位毫秒，最小值10000。默认值为0，表示不分片。
+    /// Field description: `maxDurationPerFile` is the max duration of each recorded file segments, in milliseconds, with a minimum value of 10000. The default value is 0, indicating no segmentation.
     int maxDurationPerFile = 0;
 
     TRTCAudioRecordingParams() : filePath(nullptr), recordingContent(TRTCAudioRecordingContentAll), maxDurationPerFile(0) {
@@ -1478,54 +1494,55 @@ struct TRTCAudioRecordingParams {
 };
 
 /**
- * 5.16 本地媒体文件的录制参数
+ * 5.16 Local media file recording parameters
  *
- * 该参数用于在本地媒体文件的录制接口 {@link startLocalRecording} 中指定录制相关参数。
- * 接口 startLocalRecording 是接口 startAudioRecording 的能力加强版本，前者可以录制视频文件，后者只能录制音频文件。
+ * This parameter is used to specify the recording parameters in the local media file recording API {@link startLocalRecording}.
+ * The `startLocalRecording` API is an enhanced version of the `startAudioRecording` API. The former can record video files, while the latter can only record audio files.
  */
 struct TRTCLocalRecordingParams {
-    ///【字段含义】录制的文件地址（必填），请确保路径有读写权限且合法，否则录制文件无法生成。
-    ///【特别说明】该路径需精确到文件名及格式后缀，格式后缀用于决定录制出的文件格式，目前支持的格式暂时只有 MP4。
-    ///           例如：假如您指定路径为 "mypath/record/test.mp4"，代表您希望 SDK 生成一个 MP4 格式的本地视频文件。
-    ///           请您指定一个有读写权限的合法路径，否则录制文件无法生成。
+    /// Field description: address of the recording file, which is required. Please ensure that the path is valid with read/write permissions; otherwise, the recording file cannot be generated.
+    ///@note this path must be accurate to the file name and extension. The extension determines the format of the recording file. Currently, only the MP4 format is supported.
+    ///            For example, if you specify the path as `mypath/record/test.mp4`, it means that you want the SDK to generate a local video file in MP4 format.
+    ///            Please specify a valid path with read/write permissions; otherwise, the recording file cannot be generated.
     const char *filePath = "";
 
-    ///【字段含义】媒体录制类型，默认值：TRTCRecordTypeBoth，即同时录制音频和视频。
+    /// Field description: media recording type, which is `TRTCRecordTypeBoth` by default, indicating to record both audio and video.
     TRTCLocalRecordType recordType = TRTCLocalRecordType_Both;
 
-    ///【字段含义】interval 录制信息更新频率，单位毫秒，有效范围：1000-10000。默认值为-1，表示不回调。
+    /// Field description: `interval` is the update frequency of the recording information in milliseconds. Value range: 1000–10000. Default value: -1, indicating not to call back
     int interval = -1;
 
-    ///【字段含义】maxDurationPerFile 录制文件分片时长，单位毫秒，最小值10000。默认值为0，表示不分片。
+    /// Field description: `maxDurationPerFile` is the max duration of each recorded file segments, in milliseconds, with a minimum value of 10000. The default value is 0, indicating no segmentation.
     int maxDurationPerFile = 0;
 };
 
 /**
- * 5.17 音效参数（已废弃）
+ * 5.17 Sound effect parameter (disused)
  *
- * TRTC 中的“音效”特指一些短暂的音频文件，通常仅有几秒钟的播放时间，比如“鼓掌声”、“欢笑声”等。
- * 该参数用于在早期版本的音效播放接口 {@link playAudioEffect} 中指定音效文件（即短音频文件）的路径和播放次数等。
- * 在 7.3 版本以后，音效接口已被新的接口 {@link startPlayMusic} 所取代。
- * 您在指定 startPlayMusic 的参数 {@link TXAudioMusicParam} 时，如果将 “isShortFile” 设置为 true，即为“音效”文件。
+ * "Sound effects" in TRTC refer to some short audio files (usually only a few seconds), such as "applause" and "laughter".
+ * This parameter is used to specify the path and number of playback times of a sound effect file (short audio file) in the sound effect playback API {@link TRTCCloud#playAudioEffect} on legacy versions.
+ * After v7.3, the sound effect API has been replaced by a new {@link TXAudioEffectManager#startPlayMusic} API.
+ * When you specify the {@link TXAudioMusicParam} parameter of `startPlayMusic`, if `isShortFile` is set to `true`, the file is a "sound effect" file.
  */
 struct TRTCAudioEffectParam {
-    ///【字段含义】音效 ID
-    ///【特别说明】SDK 允许播放多路音效，因此需要音效 ID 进行标记，用于控制音效的开始、停止、音量等。
+    /// Field description: sound effect ID
+    /// Note: the SDK supports playing multiple sound effects. IDs are used to distinguish different sound effects and control their start, end, volume, etc.
     int effectId;
 
-    ///【字段含义】音效文件路径，支持的文件格式：aac、mp3、m4a。
+    /// Field description: sound effect file path. Supported file formats include AAC, MP3, and M4A.
     const char *path;
 
-    ///【字段含义】循环播放次数。
-    ///【推荐取值】取值范围为0 - 任意正整数，默认值：0，表示播放音效一次；1表示播放音效两次；以此类推。
+    /// Field description: number of times the sound effect is looped
+    /// Valid values: 0 or any positive integer. 0 (default) indicates that the sound effect is played once, 1 twice, and so on.
     int loopCount;
 
-    ///【字段含义】音效是否上行。
-    ///【推荐取值】true：音效在本地播放的同时，会上行至云端，因此远端用户也能听到该音效；false：音效不会上行至云端，因此只能在本地听到该音效。默认值：false。
+    /// Field description: whether the sound effect is upstreamed
+    /// Recommended value: true: when the sound effect is played back locally, it will be upstreamed to the cloud and can be heard by remote users. false: the sound effect will not be upstreamed to the cloud and can only be heard locally. Default
+    /// value: false
     bool publish;
 
-    ///【字段含义】音效音量。
-    ///【推荐取值】取值范围为0 - 100；默认值：100。
+    /// Field description: sound effect volume
+    /// Recommended value: value range: 0–100. Default value: 100
     int volume;
 
     TRTCAudioEffectParam(const int _effectId, const char *_path) : loopCount(0), publish(false), volume(100) {
@@ -1535,28 +1552,28 @@ struct TRTCAudioEffectParam {
 };
 
 /**
- * 5.18 房间切换参数
+ * 5.18 Room switch parameter
  *
- * 该参数用于切换房间接口{@link switchRoom}，可以让用户从一个房间快速切换到另一个房间。
+ * This parameter is used for the room switch API {@link switchRoom}, which can quickly switch a user from one room to another.
  */
 struct TRTCSwitchRoomConfig {
-    ///【字段含义】数字房间号码 [选填]，在同一个房间内的用户可以看到彼此并能够进行音视频通话。
-    ///【推荐取值】取值范围：1 - 4294967294。
-    ///【特别说明】roomId 和 strRoomId 必须并且只能填一个。若两者都填，则优先选择 roomId。
+    /// Field description: numeric room ID, which is optional. Users in the same room can see one another and make audio/video calls.
+    /// Recommended value: value range: 1–4294967294.
+    ///@note either `roomId` or `strRoomId` must be entered. If both are entered, `roomId` will be used.
     uint32_t roomId;
 
-    ///【字段含义】字符串房间号码 [选填]，在同一个房间内的用户可以看到彼此并能够进行音视频通话。
-    ///【特别说明】roomId 和 strRoomId 必须并且只能填一个。若两者都填，则优先选择 roomId。
+    /// Field description: string-type room ID, which is optional. Users in the same room can see one another and make audio/video calls.
+    ///@note either `roomId` or `strRoomId` must be entered. If both are entered, `roomId` will be used.
     const char *strRoomId;
 
-    ///【字段含义】用户签名 [选填]，当前 userId 对应的验证签名，相当于登录密码。
-    ///           如果您在切换房间时不指定新计算出的 userSig，SDK 会继续使用您在进入房间时（enterRoom）时所指定的 userSig。
-    ///           这就需要您必须保证旧的 userSig 在切换房间的那一刻仍在签名允许的效期内，否则会导致房间切换失败。
-    ///【推荐取值】具体计算方法请参见 [如何计算UserSig](https://cloud.tencent.com/document/product/647/17275)。
+    /// Field description: user signature, which is optional. It is the authentication signature corresponding to the current `userId` and acts as the login password.
+    ///            If you don't specify the newly calculated `userSig` during room switch, the SDK will continue to use the `userSig` you specified during room entry (enterRoom).
+    ///            This requires you to ensure that the old `userSig` is still within the validity period allowed by the signature at the moment of room switch; otherwise, room switch will fail.
+    /// Recommended value: for the calculation method, please see [UserSig](https://www.tencentcloud.com/document/product/647/35166).
     const char *userSig;
 
-    ///【字段含义】用于权限控制的权限票据（选填），当您希望某个房间只能让特定的 userId 进入时，需要使用 privateMapKey 进行权限保护。
-    ///【推荐取值】仅建议有高级别安全需求的客户使用，更多详情请参见 [进房权限保护](https://cloud.tencent.com/document/product/647/32240)。
+    /// Field description: permission credential used for permission control, which is optional. If you want only users with the specified `userId` values to enter a room, you need to use `privateMapKey` to restrict the permission.
+    /// Recommended value: we recommend you use this parameter only if you have high security requirements. For more information, please see [Enabling Advanced Permission Control](https://www.tencentcloud.com/document/product/647/35157).
     const char *privateMapKey;
 
     TRTCSwitchRoomConfig() : roomId(0), strRoomId(nullptr), userSig(nullptr), privateMapKey(nullptr) {
@@ -1564,25 +1581,25 @@ struct TRTCSwitchRoomConfig {
 };
 
 /**
- * 5.19 音频自定义回调的格式参数
+ * 5.19 Format parameter of custom audio callback
  *
- * 该参数用于在音频自定义回调相关的接口中，设置 SDK 回调出来的音频数据的相关格式（包括采样率、声道数等）。
+ * This parameter is used to set the relevant format (including sample rate and number of channels) of the audio data called back by the SDK in the APIs related to custom audio callback.
  */
 struct TRTCAudioFrameCallbackFormat {
-    ///【字段含义】采样率。
-    ///【推荐取值】默认值：48000Hz。支持 16000, 32000, 44100, 48000。
+    /// Field description: sample rate
+    /// Recommended value: default value: 48000 Hz. Valid values: 16000, 32000, 44100, 48000.
     int sampleRate;
 
-    ///【字段含义】声道数。
-    ///【推荐取值】默认值：1，代表单声道。可设定的数值只有两个数字：1-单声道，2-双声道。
+    /// Field description: number of sound channels
+    /// Recommended value: default value: 1, which means mono channel. Valid values: 1: mono channel; 2: dual channel.
     int channel;
 
-    ///【字段含义】采样点数。
-    ///【推荐取值】取值必须是 sampleRate/100 的整数倍。
+    /// Field description: number of sample points
+    /// Recommended value: the value must be an integer multiple of sampleRate/100.
     int samplesPerCall;
 
-    ///【字段含义】回调数据读写模式
-    ///【推荐取值】TRTCAudioFrameOperationModeReadOnly：仅从回调中获取音频数据。可设定的模式有 TRTCAudioFrameOperationModeReadOnly，TRTCAudioFrameOperationModeReadWrite。
+    /// Field description: audio callback data operation mode
+    /// Recommended value: TRTCAudioFrameOperationModeReadOnly, get audio data from callback only. The modes that can be set are TRTCAudioFrameOperationModeReadOnly, TRTCAudioFrameOperationModeReadWrite.
     TRTCAudioFrameOperationMode mode;
 
     TRTCAudioFrameCallbackFormat() : sampleRate(0), channel(0), samplesPerCall(0), mode(TRTCAudioFrameOperationModeReadWrite) {
@@ -1590,19 +1607,19 @@ struct TRTCAudioFrameCallbackFormat {
 };
 
 /**
- * 5.20 TRTC 屏幕分享图标信息以及 mute image 垫片
+ * 5.20 Structure for storing window thumbnails and icons.
  */
 struct TRTCImageBuffer {
-    ///图像存储的内容，一般为 BGRA 结构。
+    /// image content in BGRA format
     const char *buffer;
 
-    ///图像数据的大小。
+    /// buffer size
     uint32_t length;
 
-    ///图像的宽度。
+    /// image width
     uint32_t width;
 
-    ///图像的高度。
+    /// image height
     uint32_t height;
 
     TRTCImageBuffer() : buffer(nullptr), length(0), width(0), height(0) {
@@ -1610,49 +1627,48 @@ struct TRTCImageBuffer {
 };
 
 /**
- * 5.21 屏幕分享的目标信息（仅适用于桌面系统）
+ * 5.21 Screen sharing target information (for desktop systems only)
  *
- * 在用户进行屏幕分享时，可以选择抓取整个桌面，也可以仅抓取某个程序的窗口。
- * TRTCScreenCaptureSourceInfo 用于描述待分享目标的信息，包括 ID、名称、缩略图等，该结构体中的字段信息均是只读的。
+ * When users share the screen, they can choose to share the entire desktop or only the window of a certain program.
+ * `TRTCScreenCaptureSourceInfo` is used to describe the information of the target to be shared, including ID, name, and thumbnail. The fields in this structure are read-only.
  */
 struct TRTCScreenCaptureSourceInfo {
-    ///【字段含义】采集源类型（是分享整个屏幕？还是分享某个窗口？）。
+    /// Field description: capturing source type (i.e., whether to share the entire screen or a certain window)
     TRTCScreenCaptureSourceType type;
 
-    ///【字段含义】采集源的ID，对于窗口，该字段代表窗口的 ID；对于屏幕，该字段代表显示器的 ID。
+    /// Field description: capturing source ID. For a window, this field indicates a window ID; for a screen, this field indicates a display ID.
     TXView sourceId;
 
-    ///【字段含义】采集源名称（采用 UTF8 编码）。
+    /// Field description: capturing source name (encoded in UTF-8)
     const char *sourceName;
 
-    ///【字段含义】分享窗口的缩略图。
+    /// Field description: thumbnail of the shared window
     TRTCImageBuffer thumbBGRA;
 
-    ///【字段含义】分享窗口的图标。
+    /// Field description: icon of the shared window
     TRTCImageBuffer iconBGRA;
 
-    ///【字段含义】是否为最小化窗口。
+    /// Field description: is minimized window or not
     bool isMinimizeWindow;
 
-    ///【字段含义】是否为主显示屏（适用于多显示器的情况）。
+    /// Field description: Whether it is the main display (applicable to the case of multiple displays)
     bool isMainScreen;
 
-    ///【字段含义】屏幕/窗口 x 坐标，单位:像素点。
+    /// Field description: The x (in pixels) of the shared window/screen
     int32_t x;
 
-    ///【字段含义】屏幕/窗口 y 坐标，单位:像素点。
+    /// Field description: The y (in pixels) of the shared window/screen
     int32_t y;
 
-    ///【字段含义】屏幕/窗口宽，单位:像素点。
+    /// Field description: The width (in pixels) of the shared window/screen
     uint32_t width;
 
-    ///【字段含义】屏幕/窗口高，单位:像素点。
+    /// Field description: The height (in pixels) of the shared window/screen
     uint32_t height;
 
     TRTCScreenCaptureSourceInfo() : type(TRTCScreenCaptureSourceTypeUnknown), sourceId(nullptr), sourceName(nullptr), isMinimizeWindow(false), isMainScreen(false), x(0), y(0), width(0), height(0) {
     }
 };
-
 class ITRTCScreenCaptureSourceList {
    protected:
     virtual ~ITRTCScreenCaptureSourceList() {
@@ -1665,29 +1681,30 @@ class ITRTCScreenCaptureSourceList {
 };
 
 /**
- * 5.23 屏幕分享的进阶控制参数
+ * 5.23 Advanced control parameter of screen sharing
  *
- * 该参数用于屏幕分享相关的接口{@link selectScreenCaptureTarget}，用于在指定分享目标时设定一系列进阶控制参数。
- * 比如：是否采集鼠标、是否要采集子窗口、是否要在被分享目标周围绘制一个边框等。
+ * This parameter is used in the screen sharing-related API {@link selectScreenCaptureTarget} to set a series of advanced control parameters when specifying the sharing target.
+ * For example, whether to capture the cursor, whether to capture the subwindow, and whether to draw a frame around the shared target.
  */
 struct TRTCScreenCaptureProperty {
-    ///【字段含义】是否采集目标内容的同时采集鼠标，默认为 true。
+    /// Field description: whether to capture the cursor while capturing the target content. Default value: true.
     bool enableCaptureMouse;
 
-    ///【字段含义】是否高亮正在共享的窗口（在被分享目标周围绘制一个边框），默认为 true。
+    /// Field description: whether to highlight the window being shared (i.e., drawing a frame around the shared target). Default value: true.
     bool enableHighLight;
 
-    ///【字段含义】是否开启高性能模式（只会在分享屏幕时会生效），默认为 true。
-    ///【特殊说明】开启后屏幕采集性能最佳，但会丧失抗遮挡能力，如果您同时开启 enableHighLight + enableHighPerformance，远端用户可以看到高亮的边框。
+    /// Field description: whether to enable the high performance mode (which will take effect only during screen sharing). Default value: true.
+    ///@note the screen capturing performance is the best after this mode is enabled, but the anti-blocking ability will be lost. If you enable `enableHighLight` and `enableHighPerformance` at the same time, remote users will see the highlighted
+    /// frame.
     bool enableHighPerformance;
 
-    ///【字段含义】指定高亮边框的颜色，RGB 格式，传入 0 时代表采用默认颜色，默认颜色为 #FFE640。
+    /// Field description: specify the color of the highlighted frame in RGB format. 0 indicates to use the default color of #FFE640.
     int highLightColor;
 
-    ///【字段含义】指定高亮边框的宽度，传入0时采用默认描边宽度，默认宽度为 5px，您可以设置的最大值为 50。
+    /// Field description: specify the width of the highlighted frame. 0 indicates to use the default width of 5 px. The maximum value you can set is 50.
     int highLightWidth;
 
-    ///【字段含义】窗口采集时是否采集子窗口（需要子窗口与被采集窗口具有 Owner 或 Popup 属性），默认为 false。
+    /// Field description: whether to capture the subwindow during window capturing (the subwindow and the captured window need to have an `Owner` or `Popup` attribute). Default value: false.
     bool enableCaptureChildWindow;
 
     TRTCScreenCaptureProperty() : enableCaptureMouse(true), enableHighLight(true), enableHighPerformance(true), highLightColor(0), highLightWidth(0), enableCaptureChildWindow(false) {
@@ -1697,20 +1714,20 @@ typedef ITXDeviceCollection ITRTCDeviceCollection;
 typedef ITXDeviceInfo ITRTCDeviceInfo;
 
 /**
- * 5.24 远端音频流智能并发播放策略的参数
+ * 5.24 parameter of the parallel strategy of remote audio streams
  *
- * 该参数用于设置远端音频流智能并发播放策略。
+ * This parameter is used to set the parallel strategy of remote audio streams.
  */
 struct TRTCAudioParallelParams {
-    ///【字段含义】最大并发播放数。默认值：0。
-    ///- 如果 maxCount > 0，且实际人数 > maxCount，会实时智能选出 maxCount 路数据进行播放，这会极大的降低性能消耗。
-    ///- 如果 maxCount = 0，SDK 不限制并发播放数，在上麦人数比较多的房间可能会引发性能问题。
+    /// Field description: Max number of remote audio streams. Default value: 0
+    ///- if maxCount > 0 and the number of people in the room is more than `maxCount`，SDK will select `maxCount` of remote audio streams in real time, which can reduce performance cost greatly.
+    ///- if maxCount = 0，SDK won't limit the number of remote audio streams, which may cause performance cost when there are many speakers in one room.
     uint32_t maxCount;
 
-    ///【字段含义】指定用户必定能并发播放。
-    ///【特殊说明】指定必定并发播放的用户 ID 列表。这些用户不参与智能选择。
-    /// includeUsers 的数量必须小于 maxCount，否则本次并发播放设置失效。
-    /// includeUsers 仅在 maxCount > 0 时有效。当 includeUsers 生效时，参与智能并发选择的最大播放数 = maxCount - 有效 includeUsers 的数量。
+    /// Field description: Users included that must be able to play.
+    ///@note A list of user IDs. These users must be able to play and do not participate in smart selection.
+    /// The number of `incluseUsers` must be less than `maxCount`. Otherwise, the setting of the parallel strategy of remote audio streams is invalid.
+    ///`incluseUsers` is valid when `maxCount` > 0. When `incluseUsers` takes effect, the max number of remote audio streams is (`maxCount` - the number of valid users in `incluseUsers`).
     char **includeUsers;
     uint32_t includeUsersCount;
 
@@ -1719,26 +1736,27 @@ struct TRTCAudioParallelParams {
 };
 
 /**
- * 5.25 媒体流发布相关配置的用户信息
+ * 5.25 The users whose streams to publish
  *
- * 您可以通过设置该参数，配合媒体流目标发布参数 ({@link TRTCPublishTarget}) 和混流转码参数 ({@link TRTCStreamMixingConfig})，将您指定的多路音视频流进行转码并发布到您填写的目标发布地址中
+ * You can use this parameter together with the publishing destination parameter {@link TRTCPublishTarget} and On-Cloud MixTranscoding parameter {@link TRTCStreamMixingConfig} to transcode the streams you specify and publish the mixed stream to the
+ * destination you specify.
  */
 struct TRTCUser {
-    ///【字段含义】用户标识，当前用户的 userId，相当于用户名，使用 UTF-8 编码。
-    ///【推荐取值】如果一个用户在您的账号系统中的 ID 为“mike”，则 userId 即可设置为“mike”。
+    ////**Description**: UTF-8-encoded user ID (required)
+    ///**Value:** For example, if the ID of a user in your account system is "mike", set it to `mike`.
     const char *userId;
 
-    ///【字段含义】数字房间号，需要和您的进房参数 ({@link TRTCParams}) 中的房间号类型相匹配。
-    ///【推荐取值】取值范围：1 - 4294967294。
-    ///【特别说明】intRoomId 与 strRoomId 是互斥的，若您进房参数中选用 strRoomId，则 intRoomId 需要填写为0。若两者都填，SDK 将优先选用 intRoomId。
+    ///**Description:** Numeric room ID. The room ID must be of the same type as that in {@link TRTCParams}.
+    ///**Value:** Value range: 1-4294967294
+    ///**Note:** You cannot use both `intRoomId` and `strRoomId`. If you specify `strRoomId`, you need to set `intRoomId` to `0`. If you set both, only `intRoomId` will be used.
     uint32_t intRoomId;
 
-    ///【字段含义】字符串房间号，需要和您的进房参数 ({@link TRTCParams}) 中的房间号类型相匹配。
-    ///【特别说明】intRoomId 与 strRoomId 是互斥的，若您进房参数中选用 roomId，则 strRoomId 无需填写。若两者都填，SDK 将优先选用 intRoomId。
-    ///【推荐取值】限制长度为 64 字节。以下为支持的字符集范围（共 89 个字符）:
-    /// - 大小写英文字母（a-zA-Z）；
-    /// - 数字（0-9）；
-    /// - 空格、`!`、`#`、`$`、`%`、`&`、`(`、`)`、`+`、`-`、`:`、`;`、`<`、`=`、`.`、`>`、`?`、`@`、`[`、`]`、`^`、`_`、`{`、`}`、`|`、`~`、`,`。
+    ///**Description:** String-type room ID. The room ID must be of the same type as that in {@link TRTCParams}.
+    ///**Note:** You cannot use both `intRoomId` and `strRoomId`. If you specify `roomId`, you need to leave `strRoomId` empty. If you set both, only `intRoomId` will be used.
+    ///**Value:** 64 bytes or shorter; supports the following character set (89 characters):
+    /// - Uppercase and lowercase letters (a-z and A-Z)
+    /// - Numbers (0-9)
+    /// - Space, "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", "{", "}", "|", "~", ","
     const char *strRoomId;
 
     TRTCUser() : userId(nullptr), intRoomId(0), strRoomId(nullptr) {
@@ -1746,19 +1764,19 @@ struct TRTCUser {
 };
 
 /**
- * 5.26 向腾讯或者第三方 CDN 上发布音视频流时需设置的 url 配置
+ * 5.26 The destination URL when you publish to Tencent Cloud or a third-party CDN
  *
- * 该配置用于媒体流发布接口 {@link startPublishMediaStream} 中的目标推流配置 ({@link TRTCPublishTarget})
+ * This enum type is used by the publishing destination parameter {@link TRTCPublishTarget} of the publishing API {@link startPublishMediaStream}.
  */
 struct TRTCPublishCdnUrl {
-    ///【字段含义】指定该路音视频流在腾讯或者第三方直播服务商的推流地址（RTMP 格式）。
-    ///【推荐取值】各家服务商的推流地址规则差异较大，请根据目标服务商的要求填写合法的推流 URL，TRTC 的后台服务器会按照您填写的 URL 向第三方服务商推送标准格式音视频流。
-    ///【特别说明】推流 URL 必须为 RTMP 格式，必须符合您的目标直播服务商的规范要求，否则目标服务商会拒绝来自 TRTC 后台服务的推流请求。
+    ///**Description:** The destination URL (RTMP) when you publish to Tencent Cloud or a third-party CDN.
+    ///**Value:** The URLs of different CDN providers may vary greatly in format. Please enter a valid URL as required by your service provider. TRTC's backend server will push audio/video streams in the standard format to the URL you provide.
+    ///**Note:** The URL must be in RTMP format. It must also meet the requirements of your service provider, or your service provider may reject push requests from the TRTC backend.
     const char *rtmpUrl;
 
-    ///【字段含义】指定该路音视频流是否发布至腾讯云。
-    ///【推荐取值】默认值：true。
-    ///【特别说明】若您的目标直播服务商为腾讯，请将此参数设置为 true，此时后台计费系统不会对此计算转推服务费。
+    ///**Description:** Whether to publish to Tencent Cloud
+    ///**Value:** The default value is `true`.
+    ///**Note:** If the destination URL you set is provided by Tencent Cloud, set this parameter to `true`, and you will not be charged relaying fees.
     bool isInternalLine;
 
     TRTCPublishCdnUrl() : rtmpUrl(nullptr), isInternalLine(true) {
@@ -1766,32 +1784,32 @@ struct TRTCPublishCdnUrl {
 };
 
 /**
- * 5.27 目标推流配置
+ * 5.27 The publishing destination
  *
- * 该配置用于媒体流发布接口 {@link startPublishMediaStream}。
+ * This enum type is used by the publishing API {@link startPublishMediaStream}.
  */
 struct TRTCPublishTarget {
-    ///【字段含义】媒体流发布模式。
-    ///【推荐取值】请根据您的业务场景要求自行选择，TRTC 支持转推、转码和回推到 RTC 房间的模式。
-    ///【特别说明】若您的业务场景需要多个发布模式，您可以通过多次调用媒体流发布接口 ({@link startPublishMediaStream}) 并分别设置不同的 TRTCPublishTarget。
-    ///【特别说明】同一个 mode 请对应一个媒体流发布接口 ({@link startPublishMediaStream})，并在后续需要调整时，使用 {@link updatePublishCDNStream} 进行更新。
+    ///`Description:` The publishing mode.
+    ///`Value:` You can relay streams to a CDN, transcode streams, or publish streams to an RTC room. Select the mode that fits your needs.
+    ///@note If you need to use more than one publishing mode, you can call {@link startPublishMediaStream} multiple times and set `TRTCPublishTarget` to a different value each time.You can use one mode each time you call the {@link
+    /// startPublishMediaStream}) API. To modify the configuration, call {@link updatePublishCDNStream}.
     TRTCPublishMode mode;
 
-    ///【字段含义】发布至腾讯或者第三方直播服务商的推流地址（RTMP 格式）。
-    ///【特别说明】若您的 mode 选择为 TRTCPublishMixStreamToRoom，此时您不需要设置该参数。
+    ///`Description:` The destination URLs (RTMP) when you publish to Tencent Cloud or third-party CDNs.
+    ///`Note:` You don’t need to set this parameter if you set the publishing mode to `TRTCPublishMixStreamToRoom`.
     TRTCPublishCdnUrl *cdnUrlList;
 
-    ///【字段含义】数组 cdnUrlList 的元素个数。
-    ///【特别说明】若您的 mode 选择为 TRTCPublishMixStreamToRoom，此时您不需要设置该参数。
+    ///`Description:` The length of the `cdnUrlList` array.
+    ///`Note:` You don’t need to set this parameter if you set the publishing mode to `TRTCPublishMixStreamToRoom`.
     uint32_t cdnUrlListSize;
 
-    ///【字段含义】回推房间机器人信息。
-    ///【特别说明】仅当您的 mode 选择为 TRTCPublishMixStreamToRoom 时，您需要设置该参数。
-    ///【特别说明】设置后，该路转码音视频数据将回推到您指定的房间中。建议设置为特殊的 userId，以避免难以区分回推机器人和您通过 TRTC SDK 进房的主播。
-    ///【特别说明】参与混流的用户不支持订阅该转码流。
-    ///【特别说明】当您进房前设置的订阅模式({@link setDefaultStreamRecvMode}) 均为手动时，您需要自行管理您想要拉取的音视频流（通常当您拉取回推房间的转码流时，您应该取消订阅参与转码的对应音视频单流）。
-    ///【特别说明】当您进房前设置的订阅模式({@link setDefaultStreamRecvMode}) 均为自动时，不参与转码的用户将自动收到后台下发的转码流并不再继续接收参与转码的音视频单流。除非您明确进行取消订阅（{@link muteRemoteVideoStream} 和 {@link
-    /// muteRemoteAudio}），否则转码流数据将持续下发。
+    ///`Description:` The information of the robot that publishes the transcoded stream to a TRTC room.
+    ///`Note:` You need to set this parameter only if you set the publishing mode to `TRTCPublishMixStreamToRoom`.
+    ///`Note:` After you set this parameter, the stream will be pushed to the room you specify. We recommend you set it to a special user ID to distinguish the robot from the anchor who enters the room via the TRTC SDK.
+    ///`Note:` Users whose streams are transcoded cannot subscribe to the transcoded stream.
+    ///`Note:` If you set the subscription mode (@link setDefaultStreamRecvMode}) to manual before room entry, you need to manage the streams to receive by yourself (normally, if you receive the transcoded stream, you need to unsubscribe from the
+    /// streams that are transcoded). `Note:` If you set the subscription mode ({@link setDefaultStreamRecvMode}) to auto before room entry, users whose streams are not transcoded will receive the transcoded stream automatically and will unsubscribe
+    /// from the users whose streams are transcoded. You call {@link muteRemoteVideoStream} and {@link muteRemoteAudio} to unsubscribe from the transcoded stream.
     TRTCUser *mixStreamIdentity;
 
     TRTCPublishTarget() : mode(TRTCPublishMode::TRTCPublishModeUnknown), cdnUrlList(nullptr), cdnUrlListSize(0), mixStreamIdentity(nullptr) {
@@ -1799,39 +1817,39 @@ struct TRTCPublishTarget {
 };
 
 /**
- * 5.28 转码视频布局
+ * 5.28 The video layout of the transcoded stream
  *
- * 该配置用于媒体流发布接口（{@link startPublishMediaStream}）中的转码配置（{@link TRTCStreamMixingConfig}）。
- * 用于指定转码流中每一路视频画面的位置、大小、图层以及流类型等信息。
+ * This enum type is used by the On-Cloud MixTranscoding parameter {@link TRTCStreamMixingConfig} of the publishing API {@link startPublishMediaStream}.
+ * You can use this parameter to specify the position, size, layer, and stream type of each video in the transcoded stream.
  */
 struct TRTCVideoLayout {
-    ///【字段含义】指定该路画面的坐标区域（单位：像素）。
+    ///`Description:` The coordinates (in pixels) of the video.
     RECT rect;
 
-    ///【字段含义】指定该路画面的层级（取值范围：0 - 15，不可重复）。
+    ///`Description:` The layer of the video, which must be unique. Value range: 0-15.
     int zOrder;
 
-    ///【字段含义】画面填充模式。
-    ///【推荐取值】填充（画面可能会被拉伸裁剪）或适应（画面可能会有黑边），默认值：{@link TRTCVideoFillMode_Fill}。
+    ///`Description:` The rendering mode.
+    ///`Value:` The rendering mode may be fill (the image may be stretched or cropped) or fit (there may be black bars). Default value: {@link TRTCVideoFillMode_Fill}.
     TRTCVideoFillMode fillMode;
 
-    ///【字段含义】指定混合画面的底色颜色。
-    ///【推荐取值】默认值：0x000000 代表黑色。格式为十六进制数字，比如：“0x61B9F1” 代表 RGB 分别为 (97,158,241)。
+    ///`Description:` The background color of the mixed stream.
+    ///`Value:` The value must be a hex number. For example, "0x61B9F1" represents the RGB color value (97,158,241). Default value: 0x000000 (black).
     uint32_t backgroundColor;
 
-    ///【字段含义】占位图 URL，即当指定用户暂时仅上行音频时，腾讯云的后台服务器会将该 URL 地址指定的图片混合到最终的画面中。
-    ///【推荐取值】默认值：空值，即不设置占位图。
-    ///【特别说明】此时需要您指定用户信息 fixedVideoUser 中的 userId。
-    ///【特别说明】
-    ///   - URL 链接长度限制为 512 字节。图片大小限制不超过 2MB。
-    ///   - 图片格式支持 png、jpg、jpeg、bmp 格式，推荐使用 png 格式的半透明图片作为占位图。
+    ///`Description:` The URL of the placeholder image. If a user sends only audio, the image specified by the URL will be mixed during On-Cloud MixTranscoding.
+    ///`Value:` This parameter is left empty by default, which means no placeholder image will be used.
+    ///@note
+    ///   - You need to specify the `userId` parameter in `fixedVideoUser`.
+    ///   - The URL can be 512 bytes long at most, and the image must not exceed 2 MB.
+    ///   - The image can be in PNG, JPG, JPEG, or BMP format. We recommend you use a semitransparent image in PNG format.
     const char *placeHolderImage;
 
-    ///【字段含义】参与转码的用户信息。
-    ///【特别说明】用户信息 ({@link TRTCUser}) 支持不填写（即 userId、intRoomId 和 strRoomId 均不填写）。此时当发起混流的房间中有主播上行音视频数据时，TRTC 后台服务器将自动将对应主播音视频填充到您指定的布局中。
+    ///`Description:` The users whose streams are transcoded.
+    ///@note If you do not specify {@link TRTCUser} (`userId`, `intRoomId`, `strRoomId`), the TRTC backend will automatically mix the streams of anchors who are sending audio/video in the room according to the video layout you specify.
     TRTCUser *fixedVideoUser;
 
-    ///【字段含义】指定该路画面是主路画面（{@link TRTCVideoStreamTypeBig}）还是辅路画面（{@link TRTCVideoStreamTypeSub}）。
+    ///`Description:` Whether the video is the primary stream ({@link TRTCVideoStreamTypeBig}) or substream ({@linke TRTCVideoStreamTypeSub}).
     TRTCVideoStreamType fixedVideoStreamType;
 
     TRTCVideoLayout() : zOrder(0), fillMode(TRTCVideoFillMode_Fill), backgroundColor(0), placeHolderImage(nullptr), fixedVideoUser(nullptr), fixedVideoStreamType(TRTCVideoStreamTypeBig) {
@@ -1839,21 +1857,21 @@ struct TRTCVideoLayout {
 };
 
 /**
- * 5.29 水印布局
+ * 5.29 The watermark layout
  *
- * 该配置用于媒体流发布接口 ({@link startPublishMediaStream}) 中的转码配置 ({@link TRTCStreamMixingConfig})
+ * This enum type is used by the On-Cloud MixTranscoding parameter {@link TRTCStreamMixingConfig} of the publishing API {@link startPublishMediaStream}.
  */
 struct TRTCWatermark {
-    ///【字段含义】水印 URL，腾讯云的后台服务器会将该 URL 地址指定的图片混合到最终的画面中。
-    ///【特别说明】
-    ///   - URL 链接长度限制为 512 字节。图片大小限制不超过 2MB。
-    ///   - 图片格式支持 png、jpg、jpeg、bmp 格式，推荐使用 png 格式的半透明图片作为水印。
+    ///`Description:` The URL of the watermark image. The image specified by the URL will be mixed during On-Cloud MixTranscoding.
+    ///@note
+    ///   - The URL can be 512 bytes long at most, and the image must not exceed 2 MB.
+    ///   - The image can be in PNG, JPG, JPEG, or BMP format. We recommend you use a semitransparent image in PNG format.
     const char *watermarkUrl;
 
-    ///【字段含义】指定该路水印画面的坐标区域（单位：像素）。
+    ///`Description:` The coordinates (in pixels) of the watermark.
     RECT rect;
 
-    ///【字段含义】指定该路水印画面的层级（取值范围：0 - 15，不可重复）。
+    ///`Description:` The layer of the watermark, which must be unique. Value range: 0-15.
     int zOrder;
 
     TRTCWatermark() : watermarkUrl(nullptr), zOrder(0) {
@@ -1861,57 +1879,58 @@ struct TRTCWatermark {
 };
 
 /**
- * 5.30 媒体流编码输出参数
+ * 5.30 The encoding parameters
  *
- * 【字段含义】该配置用于媒体流发布接口（{@link startPublishMediaStream}）。
- * 【特别说明】当您的发布目标（{@link TRTCPublishTarget}）中的 mode 配置为 TRTCPublish_MixStream_ToCdn 或者 TRTCPublish_MixStream_ToRoom 时，该参数为必填。
- * 【特别说明】当您使用转推服务（mode 为 TRTCPublish_BigStream_ToCdn 或者 TRTCPublish_SubStream_ToCdn）时，为了更好的转推稳定性以及更好的 CDN 播放兼容性，也建议您填写该配置的具体参数。
+ * `Description:` This enum type is used by the publishing API {@link startPublishMediaStream}.
+ * `Note:` This parameter is required if you set the publishing mode to `TRTCPublish_MixStream_ToCdn` or `TRTCPublish_MixStream_ToRoom` in {@link TRTCPublishTarget}.
+ * `Note:` If you use the relay to CDN feature (the publishing mode set to `RTCPublish_BigStream_ToCdn` or `TRTCPublish_SubStream_ToCdn`), to improve the relaying stability and playback compatibility, we also recommend you set this parameter.
  */
 struct TRTCStreamEncoderParam {
-    ///【字段含义】指定媒体发布流的目标分辨率（宽度）。
-    ///【推荐取值】单位：像素值，推荐值：368，如果你只混合音频流，请将 width 和 height 均设置为 0，否则混流转码后的直播流中会有黑色背景。
+    ///`Description:` The resolution (width) of the stream to publish.
+    ///`Value:` Recommended value: 368. If you mix only audio streams, to avoid displaying a black video in the transcoded stream, set both `width` and `height` to `0`.
     uint32_t videoEncodedWidth;
 
-    ///【字段含义】指定媒体发布流的目标分辨率（高度）。
-    ///【推荐取值】单位：像素值，推荐值：640，如果你只混合音频流，请将 width 和 height 均设置为 0，否则混流转码后的直播流中会有黑色背景。
+    ///`Description:` The resolution (height) of the stream to publish.
+    ///`Value:` Recommended value: 640. If you mix only audio streams, to avoid displaying a black video in the transcoded stream, set both `width` and `height` to `0`.
     uint32_t videoEncodedHeight;
 
-    ///【字段含义】指定媒体发布流的目标视频帧率（FPS）。
-    ///【推荐取值】推荐值：20fps，取值范围是 (0,30]。
+    ///`Description:` The frame rate (fps) of the stream to publish.
+    ///`Value:` Value range: (0,30]. Default: 20.
     uint32_t videoEncodedFPS;
 
-    ///【字段含义】指定媒体发布流的目标视频关键帧间隔（GOP）。
-    ///【推荐取值】推荐值：3，单位为秒，取值范围是 [1,5]。
+    ///`Description:` The keyframe interval (GOP) of the stream to publish.
+    ///`Value:` Value range: [1,5]. Default: 3 (seconds).
     uint32_t videoEncodedGOP;
 
-    ///【字段含义】指定媒体发布流的目标视频码率（kbps）。
-    ///【推荐取值】如果填 0，TRTC 会根据 videoEncodedWidth 和 videoEncodedHeight 估算出一个合理的码率值，您也可以参考视频分辨率枚举定义中所推荐的码率值（见注释部分）。
+    ///`Description:` The video bitrate (Kbps) of the stream to publish.
+    ///`Value:` If you set this parameter to `0`, TRTC will work out a bitrate based on `videoWidth` and `videoHeight`. For details, refer to the recommended bitrates for the constants of the resolution enum type (see comment).
     uint32_t videoEncodedKbps;
 
-    ///【字段含义】指定媒体发布流的目标音频采样率。
-    ///【推荐取值】默认值：48000Hz。取值为 [48000, 44100, 32000, 24000, 16000, 8000]，单位是 Hz。
+    ///`Description:` The audio sample rate of the stream to publish.
+    ///`Value:` Valid values: [48000, 44100, 32000, 24000, 16000, 8000]. Default: 48000 (Hz).
     uint32_t audioEncodedSampleRate;
 
-    ///【字段含义】指定媒体发布流的目标音频声道数。
-    ///【推荐取值】默认值：1，代表单声道。可设定的数值只有两个数字：1-单声道，2-双声道。
+    ///`Description:` The sound channels of the stream to publish.
+    ///`Value:` Valid values: 1 (mono channel); 2 (dual-channel). Default: 1.
     uint32_t audioEncodedChannelNum;
 
-    ///【字段含义】指定媒体发布流的目标音频码率（kbps）。
-    ///【推荐取值】默认值：50kbps，取值范围是 [32，192]。
+    ///`Description:` The audio bitrate (Kbps) of the stream to publish.
+    ///`Value:` Value range: [32,192]. Default: 50.
     uint32_t audioEncodedKbps;
 
-    ///【字段含义】指定媒体发布流的目标音频编码类型。
-    ///【推荐取值】默认值：0，代表 LC-AAC。可设定的数值只有三个数字：0 - LC-AAC，1 - HE-AAC，2 - HE-AACv2。
-    ///【特别说明】HE-AAC 和 HE-AACv2 支持的输出流音频采样率范围为[48000, 44100, 32000, 24000, 16000]。
-    ///【特别说明】当音频编码设置为 HE-AACv2 时，只支持输出流音频声道数为双声道。
+    ///`Description:` The audio codec of the stream to publish.
+    ///`Value:` Valid values: 0 (LC-AAC); 1 (HE-AAC); 2 (HE-AACv2). Default: 0.
+    ///@note
+    /// - The audio sample rates supported by HE-AAC and HE-AACv2 are 48000, 44100, 32000, 24000, and 16000.
+    /// - When HE-AACv2 is used, the output stream can only be dual-channel.
     uint32_t audioEncodedCodecType;
 
-    ///【字段含义】指定媒体发布流的目标视频编码类型。
-    ///【推荐取值】默认值：0，代表 H264。可设定的数值只有两个数字：0 - H264，1 - H265。
+    ///`Description:` The video codec of the stream to publish.
+    ///`Value:` Valid values: 0 (H264); 1 (H265). Default: 0.
     uint32_t videoEncodedCodecType;
 
-    ///【字段含义】混流 SEI 参数，默认不填写。
-    ///【特别说明】参数以 json 字符串形式传入，示例如下：
+    ///`Description:` SEI parameters. Default: null
+    ///`Note:` the parameter is passed in the form of a JSON string. Here is an example to use it:
     ///```json
     ///{
     ///  "payLoadContent":"xxx",
@@ -1921,12 +1940,12 @@ struct TRTCStreamEncoderParam {
     ///  "followIdr":false
     ///}
     ///```
-    ///当前支持的字段及含义：
-    ///- payloadContent: 必填。透传 sei 的 payload 内容，不能为空；
-    ///- payloadType: 必填。sei 消息的类型，取值范围: 5 或 [100, 254] 范围内的整数（244 除外，244 是内部自定义的时间戳 sei）；
-    ///- payloadUuid: 当 payloadType 为 5 时必须填写，其他情况下该值会被忽略。该值必须是长度为 32 的十六进制数字；
-    ///- interval: 选填，默认 1000。sei 的发送间隔，单位毫秒；
-    ///- followIdr: 选填，默认 false。该值为 true 时，发送关键帧时会确保带 sei，否则不确保。
+    /// The currently supported fields and their meanings are as follows:
+    ///- payloadContent: Required. The payload content of the passthrough SEI, which cannot be empty.
+    ///- payloadType: Required. The type of the SEI message, with a value range of 5 or an integer within the range of [100, 254] (excluding 244, which is an internally defined timestamp SEI).
+    ///- payloadUuid: Required when payloadType is 5, and ignored in other cases. The value must be a 32-digit hexadecimal number.
+    ///- interval: Optional, default is 1000. The sending interval of the SEI, in milliseconds.
+    ///- followIdr: Optional, default is false. When this value is true, the SEI will be ensured to be carried when sending a key frame, otherwise it is not guaranteed.
     const char *videoSeiParams;
 
     TRTCStreamEncoderParam()
@@ -1945,43 +1964,44 @@ struct TRTCStreamEncoderParam {
 };
 
 /**
- * 5.31 媒体流转码配置参数
+ * 5.31 The transcoding parameters
  *
- * 该配置用于媒体流发布接口（{@link startPublishMediaStream}）。
- * 用于指定转码时各路画面的排版位置信息和输入的音频信息。
+ * This enum type is used by the publishing API {@link startPublishMediaStream}.
+ * You can use this parameter to specify the video layout and input audio information for On-Cloud MixTranscoding.
  */
 struct TRTCStreamMixingConfig {
-    ///【字段含义】指定混合画面的底色颜色。
-    ///【推荐取值】默认值：0x000000 代表黑色。格式为十六进制数字，比如：“0x61B9F1” 代表 RGB 分别为 （97、158、241）。
+    ///`Description:` The background color of the mixed stream.
+    ///`Value:` The value must be a hex number. For example, "0x61B9F1" represents the RGB color value (97,158,241). Default value: 0x000000 (black).
     uint32_t backgroundColor;
 
-    ///【字段含义】指定混合画面的背景图 URL，腾讯云的后台服务器会将该 URL 地址指定的图片混合到最终的画面中。
-    ///【推荐取值】默认值：空值，即不设置背景图片。
-    ///【特别说明】
-    ///   - URL 链接长度限制为 512 字节。图片大小限制不超过 2MB。
-    ///   - 图片格式支持 png、jpg、jpeg、bmp 格式，推荐使用 png 格式的半透明图片作为背景图。
+    ///`Description:` The URL of the background image of the mixed stream. The image specified by the URL will be mixed during On-Cloud MixTranscoding.
+    ///`Value:` This parameter is left empty by default, which means no background image will be used.
+    ///@note
+    ///   - The URL can be 512 bytes long at most, and the image must not exceed 2 MB.
+    ///   - The image can be in PNG, JPG, JPEG, or BMP format. We recommend you use a semitransparent image in PNG format.
     const char *backgroundImage;
 
-    ///【字段含义】指定混合画面中的每一路视频画面的位置、大小、图层以及流类型等信息。
-    ///【推荐取值】该字段是一个 TRTCVideoLayout 类型的数组，数组中的每一个元素都用来代表每一路画面的信息。
+    ///`Description:` The position, size, layer, and stream type of each video in On-Cloud MixTranscoding.
+    ///`Value:` This parameter is an array. Each `TRTCVideoLayout` element in the array indicates the information of a video in On-Cloud MixTranscoding.
     TRTCVideoLayout *videoLayoutList;
 
-    ///【字段含义】 数组 videoLayoutList 的元素个数。
+    ///**Description:** The length of the `videoLayoutList` array.
     uint32_t videoLayoutListSize;
 
-    ///【字段含义】指定转码流中的每一路输入音频的信息。
-    ///【推荐取值】该字段是一个 TRTCUser 类型的数组，数组中的每一个元素都用来代表每一路输入音频的信息。
-    ///【特别说明】用户信息支持不填写（即 audioMixUserList 为空）。此时若设置了 TRTCStreamEncoderParam 中音频相关编码输出参数，TRTC 后台服务器将自动将所有主播的音频混合输出（当前仅支持最高 16 路音视频输入）。
+    ///`Description:` The information of each audio stream to mix.
+    ///`Value:` This parameter is an array. Each `TRTCUser` element in the array indicates the information of an audio stream.
+    ///@note If you do not specify this array, the TRTC backend will automatically mix all streams of the anchors who are sending audio in the room according to the audio encode param {@link TRTCStreamEncoderParam} you specify (currently only
+    /// supports up to 16 audio and video inputs).
     TRTCUser *audioMixUserList;
 
-    ///【字段含义】 数组 audioMixUserList 的元素个数。
+    ///**Description:** The length of the `audioMixUserList` array.
     uint32_t audioMixUserListSize;
 
-    ///【字段含义】指定混合画面中的每一路水印画面的位置、大小、图层等信息。
-    ///【推荐取值】该字段是一个 TRTCWatermark 类型的数组，数组中的每一个元素都用来代表每一路水印的信息。
+    ///`Description:` The position, size, and layer of each watermark image in On-Cloud MixTranscoding.
+    ///`Value:` This parameter is an array. Each `TRTCWatermark` element in the array indicates the information of a watermark.
     TRTCWatermark *watermarkList;
 
-    ///【字段含义】 数组 watermarkList 的元素个数。
+    ///`Description:` The length of the `watermarkList` array.
     uint32_t watermarkListSize;
 
     TRTCStreamMixingConfig() : backgroundColor(0), backgroundImage(nullptr), videoLayoutList(nullptr), videoLayoutListSize(0), audioMixUserList(nullptr), audioMixUserListSize(0), watermarkList(nullptr), watermarkListSize(0) {
@@ -1989,20 +2009,21 @@ struct TRTCStreamMixingConfig {
 };
 
 /**
- * 5.32 媒体流私有加密配置
+ * 5.32 Media Stream Private Encryption Configuration
  *
- * 该配置用于设置媒体流私有加密的算法和密钥。
+ * This configuration is used to set the algorithm and key for media stream private encryption.
  */
 struct TRTCPayloadPrivateEncryptionConfig {
-    ///【字段含义】加密算法，默认为 TRTCEncryptionAlgorithmAes128Gcm。
+    ///`Description:` Encryption algorithm, the default is TRTCEncryptionAlgorithmAes128Gcm.
     TRTCEncryptionAlgorithm encryptionAlgorithm;
 
-    ///【字段含义】加密用密钥，字符串类型。
-    ///【推荐取值】若加密算法为 TRTCEncryptionAlgorithmAes128Gcm，密匙长度需为 16 字节，若加密算法为 TRTCEncryptionAlgorithmAes256Gcm，密匙长度需为 32 字节。
+    ///`Description:` encryption key, string type.
+    ///`Value:` If the encryption algorithm is TRTCEncryptionAlgorithmAes128Gcm, the key length must be 16 bytes;
+    ///         if the encryption algorithm is TRTCEncryptionAlgorithmAes256Gcm, the key length must be 32 bytes.
     const char *encryptionKey;
 
-    ///【字段含义】盐，加密用初始向量。
-    ///【推荐取值】需确保填入该参数的数组不为空、不全为 0 且数据长度为 32 字节。
+    ///`Description:` Salt, initialization vector for encryption.
+    ///`Value:` It is necessary to ensure that the array filled in this parameter is not empty, not all 0 and the data length is 32 bytes.
     uint8_t encryptionSalt[32];
 
     TRTCPayloadPrivateEncryptionConfig() : encryptionAlgorithm(TRTCEncryptionAlgorithm::TRTCEncryptionAlgorithmAes128Gcm), encryptionKey(nullptr) {
@@ -2011,24 +2032,24 @@ struct TRTCPayloadPrivateEncryptionConfig {
 };
 
 /**
- * 5.33 音量评估等相关参数设置
+ * 5.33 Volume evaluation and other related parameter settings.
  *
- * 该设置用于开启人声检测、声音频谱计算。
+ * This setting is used to enable vocal detection and sound spectrum calculation.
  */
 struct TRTCAudioVolumeEvaluateParams {
-    ///【字段含义】设置 onUserVoiceVolume 回调的触发间隔，单位为毫秒，最小间隔为 100ms，如果小于等于 0 则会关闭回调。
-    ///【推荐取值】推荐值：300，单位为毫秒。
-    ///【特别说明】interval 大于 0 时，音量提示将默认开启，无需另外设置。
+    ///`Description:` Set the trigger interval of the onUserVoiceVolume callback, the unit is milliseconds, the minimum interval is 100ms, if it is less than or equal to 0, the callback will be closed.
+    ///`Value:` Recommended value: 300, in milliseconds.
+    ///@note When the interval is greater than 0, the volume prompt will be enabled by default, no additional setting is required.
     uint32_t interval;
 
-    ///【字段含义】是否开启本地人声检测。
-    ///【请您注意】在 startLocalAudio 之前调用才可以生效。
+    ///`Description:` Whether to enable local voice detection.
+    ///@note Call before startLocalAudio.
     bool enableVadDetection;
 
-    ///【字段含义】是否开启本地人声频率计算
+    ///`Description:` Whether to enable local vocal frequency calculation.
     bool enablePitchCalculation;
 
-    ///【字段含义】是否开启声音频谱计算。
+    ///`Description:` Whether to enable sound spectrum calculation.
     bool enableSpectrumCalculation;
 
     TRTCAudioVolumeEvaluateParams() : interval(300), enableVadDetection(false), enablePitchCalculation(false), enableSpectrumCalculation(false) {
@@ -2040,4 +2061,5 @@ struct TRTCAudioVolumeEvaluateParams {
 #ifdef _WIN32
 using namespace liteav;
 #endif
+
 #endif
