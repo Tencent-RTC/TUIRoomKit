@@ -3,8 +3,8 @@
 
 /**
  * Module:  ITXVodPlayer @ TXLiteAVSDK
- * Function: 腾讯云视频通话播片功能的主要接口类
- * 创建/使用/销毁ITXVodPlayer对象的示例代码：
+ * Function: Tencent Cloud TRTC Core VOD Player Function Interface
+ * Create/Use/Destroy ITXVodPlayer sample code:
  * <pre>
  *     ITXVodPlayer *vodPlayer = createTXVodPlayer("D:/video/test.mp4");
  *     if(vodPlayer)
@@ -21,26 +21,25 @@
 #include <memory>
 
 class ITXVodPlayer;
-
 extern "C" {
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                    VOD 播放器相关接口
+//                    VOD player interface
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 用于动态加载dll时，导出TXVodPlayer C++对象。
+ * Used to dynamically load dll, export TXVodPlayer C++ object.
  *
- * @param mediaFile 媒体文件名称
- * @param repeat 是否需要重复播放 true：此媒体文件将重复播放 false：媒体文件仅播放一次，结束后自动停止
- * @return ITXVodPlayer对象指针，注意：delete ITXVodPlayer*会编译错误，需要调用destroyTXVodPlayer释放。
+ * @param mediaFile meida file name
+ * @param repeat Does it need to be played repeatedly true: this media file will be played repeatedly false: the media file will be played only once, and it will stop automatically after the end
+ * @return ITXVodPlayer pointer note: a compilation error occurred if delete ITXVodPlayer*, please use destroyTXVodPlayer.
  */
 LITEAV_API ITXVodPlayer* createTXVodPlayer(const char* mediaFile, bool repeat = false);
 
 /**
- * 析构ITXVodPlayer对象
+ * Destruct the ITXVodPlayer object
  */
 LITEAV_API void destroyTXVodPlayer(ITXVodPlayer** pTXVodPlayer);
 }
@@ -51,141 +50,142 @@ class ITXVodPlayer {
 
    public:
     /**
-     * 事件回调
+     * Set event delegate
      */
     virtual void setEventCallback(ITXVodPlayerEventCallback* callback) = 0;
 
     /**
-     * 视频渲染回调。
+     * Video rendering callback.
      *
-     * 全平台接口软解硬解均支持
+     * both hard solution and soft solution are supported on all platform interfaces.
      */
     virtual void setDataCallback(ITXVodPlayerDataCallback* callback) = 0;
 
 /**
- * setupContainView 创建Video渲染View,该控件承载着视频内容的展示。
+ * Set view for video rendering
  */
 #if _WIN32
     virtual void setView(HWND hwnd) = 0;
 #endif
 
     /**
-     * 启动从指定URL播放,此接口的全平台版本没有参数
-     * @note 10.7版本开始，需要通过 {@link TXLiveBase#setLicence} 设置 Licence 后方可成功播放， 否则将播放失败（黑屏），全局仅设置一次即可。直播 Licence、短视频 Licence 和视频播放 Licence 均可使用，若您暂未获取上述 Licence ，可[快速免费申请测试版
-     * Licence](https://cloud.tencent.com/act/event/License) 以正常播放，正式版 License 需[购买](https://cloud.tencent.com/document/product/881/74588#.E8.B4.AD.E4.B9.B0.E5.B9.B6.E6.96.B0.E5.BB.BA.E6.AD.A3.E5.BC.8F.E7.89.88-license)。
+     * Start playback from the specified URL, the full platform version of this interface has no parameters
+     * @note Starting from version 10.7, the Licence needs to be set through {@link TXLiveBase#setLicence} before it can be played successfully, otherwise the playback will fail (black screen), and it can only be set once globally. Live Licence, UGC
+     * Licence, and Player Licence can all be used. If you have not obtained the above Licence, you can [quickly apply for a beta Licence for free](https://cloud.tencent.com/act/event/License) To play, the official licence needs to be
+     * [purchased](https://cloud.tencent.com/document/product/881/74588#.E8.B4.AD.E4.B9.B0.E5.B9.B6.E6.96 .B0.E5.BB.BA.E6.AD.A3.E5.BC.8F.E7.89.88-license).
      *
-     * 开始多媒体文件播放 注意此接口的全平台版本没有参数
-     * 支持的视频格式包括：mp4、avi、mkv、wmv、m4v。
-     * 支持的音频格式包括：mp3、wav、wma、aac。
+     * Start multimedia file playback Note that the full platform version of this interface has no parameters
+     * Supported video formats include: mp4, avi, mkv, wmv, m4v.
+     * Supported audio formats include: mp3, wav, wma, aac.
      */
     virtual void start() = 0;
 
     /**
-     * 停止播放音视频流
+     * Stop play
      */
     virtual void stop() = 0;
 
     /**
-     * 暂停播放
+     * Pause play
      */
     virtual void pause() = 0;
 
     /**
-     * 继续播放
+     * Resume play
      */
     virtual void resume() = 0;
 
     /**
-     * 播放跳转到音视频流某个时间
+     * Seek to timestamp of the video
      */
     virtual void seek(uint64_t msPos) = 0;
 
     /**
-     * 获取视频总时长
+     * Get video duration
      */
     virtual long getDuration() = 0;
 
     /**
-     * 视频宽度
+     * Set video render width
      */
     virtual int getWidth() = 0;
 
     /**
-     * 视频高度
+     * Set video render height
      */
     virtual int getHeight() = 0;
 
     /**
-     * 设置画面的方向
+     * Set the orientation of the rendered picture
      *
-     * @info 设置本地图像的顺时针旋转角度
-     * @param rotation 支持 TRTCVideoRotation90 、 TRTCVideoRotation180 以及 TRTCVideoRotation270 旋转角度，默认值：TRTCVideoRotation0
-     * @note 用于窗口渲染模式
+     * @info Set the clockwise rotation angle of the local image.
+     * @param rotation Support TRTCVideoRotation90 、 TRTCVideoRotation180 and TRTCVideoRotation270 default is TRTCVideoRotation0.
+     * @note For windowed rendering mode.
      */
     virtual void setRenderRotation(TRTCVideoRotation rotation) = 0;
 
     /**
-     * 设置画面的裁剪模式
+     * Set video render fill mode
      *
-     * @param mode 填充（画面可能会被拉伸裁剪）或适应（画面可能会有黑边），默认值：TRTCVideoFillMode_Fit
-     * @note 用于窗口渲染模式
+     * @param mode Fill (the picture may be stretched and cropped) or fit (the picture may have black borders),default: TRTCVideoFillMode_Fit
+     * @note For windowed rendering mode.
      */
     virtual void setFillMode(TRTCVideoFillMode mode) = 0;
 
     /**
-     * 设置静音
+     * Mute the audio
      */
     virtual void mute(bool mute) = 0;
 
     /**
-     * 设置音量大小
+     * Set the audio volume
      *
-     * @param volume 音量大小，100为原始音量，范围是：[0 ~ 150]，默认值为100
+     * @param volume Volume level, 100 is the original volume, the range is: [0 ~ 150], the default value is 100.
      */
     virtual void setVolume(int volume) = 0;
 
     /**
-     * 设置播放速率
+     * Set play rate
      *
-     * @param rate 播放速度
+     * @param rate Play speed
      */
     virtual void setRate(float rate) = 0;
 
     /**
-     * 设置画面镜像
+     * Set video render mirror mode
      */
     virtual void setMirror(bool mirror) = 0;
 
     /**
-     * 将当前vodPlayer附着至TRTC
+     * Attach the vod player to some TRTCCloud instance
      *
-     * @param trtcCloud TRTC 实例指针
-     * @note 用于辅流推送，绑定后音频播放由TRTC接管
+     * @param trtcCloud TRTC instance
+     * @note It is used for auxiliary stream push. After binding, the audio playback is taken over by TRTC.
      */
     virtual void attachTRTC(void* trtcCloud) = 0;
 
     /**
-     * 将当前vodPlayer和TRTC分离
+     * Detach the vod player to some TRTCCloud instance
      */
     virtual void detachTRTC() = 0;
 
     /**
-     * 开始向TRTC发布辅路视频流
+     * Publish the video stream to attached TRTCCloud instance
      */
     virtual void publishVideo() = 0;
 
     /**
-     * 开始向TRTC发布辅路音频流
+     * Publish the audio stream to attached TRTCCloud instance
      */
     virtual void publishAudio() = 0;
 
     /**
-     * 结束向TRTC发布辅路视频流
+     * Unpublish the video stream to attached TRTCCloud instance
      */
     virtual void unpublishVideo() = 0;
 
     /**
-     * 结束向TRTC发布辅路音频流
+     * Unpublish the audio stream to attached TRTCCloud instance
      */
     virtual void unpublishAudio() = 0;
 };

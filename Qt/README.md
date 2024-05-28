@@ -1,9 +1,9 @@
-# Quick Run of TUIRoom Demo for Windows and macOS
+# Quick Run of TUIRoomKit Demo for Windows
 
 _English | [简体中文](README.zh.md)_
 
-This document describes how to quickly run the TUIRoom demo project to make a multi-person audio/video call. For more information on the TUIRoom component connection process, see:
-[Integrating TUIRoom (Windows and macOS)](https://trtc.io/document/53567)
+This document describes how to quickly run the TUIRoomKit demo project to make a multi-person audio/video call. For more information on the TUIRoomKit component connection process, see:
+[Integrating TUIRoomKit (Qt)](https://trtc.io/document/53567)
 
 
 > [!IMPORTANT]
@@ -15,16 +15,16 @@ The default download on GitHub is the 2.0 version SDK. You need to contact us th
 ## Directory Structure
 
 ```
-TUIRoom
-├─ RoomApp              // Main program directory
+TUIRoomKit
+├─ RoomKit              // Main program directory
    ├─ App               // Program source code
    ├─ bin               // Executable files output by the project and program database files required for debugging
-   ├─ Resources         // Image source files, QSS style files, and internationalization files required by `RoomApp`
-   └─ 3rdParty          // Third-party libraries depended on by `RoomApp`
-├─ Common               // General class of `RoomApp`
+   ├─ Resources         // Image source files, QSS style files, and internationalization files required by `RoomKit`
+   └─ 3rdParty          // Third-party libraries depended on by `RoomKit`
+├─ Common               // General class of `RoomKit`
 ├─ utils                // Tool class folder
-├─ Module               // Data model interaction layer source code of `RoomApp`
-└─ SDK                  // Liteav SDK and IM SDK library files depended on by `RoomApp`
+├─ Module               // Data model interaction layer source code of `RoomKit`
+└─ SDK                  // Liteav SDK and IM SDK library files depended on by `RoomKit`
 ```
 
 ## Environment Requirements
@@ -35,26 +35,21 @@ TUIRoom
 - Operating system: Windows 8 or later.
 - Make sure that you can develop the project normally in the integrated development environment.
 
-#### macOS
-- Qt 5.9.1 or later.
-- QtCreator integrated development environment. To use QtCreator, select it when installing Qt, and its version is the same as that of the Qt official installation package.
-- Make sure that you can develop the project normally in the QtCreator integrated development environment.
-
 ## Demo Run Example
 
 ###  Activate the service
 Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/53567) to obtain your own SDKAppID and SDKSecreKey.
 
 ### Integrating SDK
-1. The project integrates the SDKs for Windows and macOS by default. For more information on the specific SDK features, see [SDK Download](https://cloud.tencent.com/document/product/647/32689).
-2. After downloading the latest SDKs for Windows/macOS from the official website, you need to move them to the corresponding directory in the SDK folder under the project.
+1. The project integrates the SDKs for Windows by default. For more information on the specific SDK features, see [SDK Download](https://cloud.tencent.com/document/product/647/32689).
+2. After downloading the latest SDKs for Windows from the official website, you need to move them to the corresponding directory in the SDK folder under the project.
 
 ### Downloading source code and configuring the project file
 Clone or directly download the source code in the repository. **Feel free to star our project if you like it.**
 
 #### Windows
-1. Open the source code project `RoomApp.vcxproj` with Visual Studio 2015 or later.
-2. Find the `TUIRoom\Windows-Mac\utils\usersig\win\GenerateTestUserSig.h` file in the project.
+1. Open the source code project `RoomKit.vcxproj` with Visual Studio 2015 or later.
+2. Find the `TUIRoomKit\Qt\utils\usersig\win\GenerateTestUserSig.h` file in the project.
 3. Set parameters in the `GenerateTestUserSig.h` file.
    <ul>
    <li>SDKAPPID: 0 by default. Replace it with your actual `SDKAPPID`.</li>
@@ -64,32 +59,18 @@ Clone or directly download the source code in the repository. **Feel free to sta
 4. Return to the TRTC console and click **Next**.
 5. Click **Return to Overview Page**.
 
-#### macOS
-1. Use QtCreator to develop `RoomApp.pro` of the source code project.
-2. Find the `TUIRoom\Windows-Mac\utils\usersig\mac\UserSigConfig.h` file in the project.
-3. Set the relevant parameters in the `UserSigConfig.h` file:
-   <ul>
-   <li>SDKAPPID_: 0 by default. Replace it with your actual `SDKAPPID`.</li>
-   <li>SecretKey_: An empty string by default. Replace it with your actual `SECRETKEY`.</li>
-   </ul>
-4. Return to the TRTC console and click **Next**.
-5. Click **Return to Overview Page**.
-
 >In this document, the method to obtain UserSig is to configure a SECRETKEY in the client code. In this method, the SECRETKEY is vulnerable to decompilation and reverse engineering. Once your SECRETKEY is leaked, attackers can steal your Tencent Cloud traffic. Therefore, **this method is only suitable for locally running a demo project and feature debugging**.
 >The correct `UserSig` distribution method is to integrate the calculation code of `UserSig` into your server and provide an application-oriented API. When `UserSig` is needed, your application can send a request to the business server for a dynamic `UserSig`. For more information, see [How do I calculate `UserSig` during production?](https://intl.cloud.tencent.com/document/product/647/35166).
 
 ### Running the application
 Make sure that the Qt environment configuration is normal.
 #### Windows
-- On Windows, open the source code project `RoomApp.vcxproj` with Visual Studio 2015 or later.
+- On Windows, open the source code project `RoomKit.vcxproj` with Visual Studio 2015 or later.
 - Right-click the project and select **Properties** > **QtProjectSetting** > **General** > **QtInstallation** to select an installed Qt environment.
 
    <img src="https://qcloudimg.tencent-cloud.cn/raw/f7246267e5fbee96e481e6e491f6a3ea.png" width="500" height="280"/>
 
 - Click **Run** to start debugging and running this application.
-
-#### macOS
-- On macOS, configure the system environment variable `QTDIR` to point to the Qt installation directory and open the source code project `RoomApp.pro` in QtCreator to build and run the application.
 
 ### Trying out application (**at least two devices required**)
 

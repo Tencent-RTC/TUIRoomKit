@@ -1,7 +1,7 @@
 ﻿/**
  * Copyright (c) 2021 Tencent. All rights reserved.
  * Module:   V2TXLiveCode @ TXLiteAVSDK
- * Function: 腾讯云直播服务(LVB)错误码和警告码的定义。
+ * Function: Definitions of error codes and warning codes of Tencent Cloud LVB
  */
 #ifndef MODULE_CPP_V2TXLIVECODE_H_
 #define MODULE_CPP_V2TXLIVECODE_H_
@@ -10,118 +10,116 @@ namespace liteav {
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                             V2 错误码和警告码
+//                   V2 Error codes and warning codes
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 /**
- * V2 错误码和警告码
+ * V2 Error codes and warning codes
  */
 enum V2TXLiveCode {
 
-    /// 没有错误。
+    /// No error.
     V2TXLIVE_OK = 0,
 
-    /// 暂未归类的通用错误。
+    /// Unclassified error.
     V2TXLIVE_ERROR_FAILED = -1,
 
-    ///调用 API 时，传入的参数不合法。
+    /// An invalid parameter was input during the API call.
     V2TXLIVE_ERROR_INVALID_PARAMETER = -2,
 
-    /// API 调用被拒绝。
+    /// The API call was rejected.
     V2TXLIVE_ERROR_REFUSED = -3,
 
-    ///当前 API 不支持调用。
+    /// The API is currently not suppoted.
     V2TXLIVE_ERROR_NOT_SUPPORTED = -4,
 
-    /// license 不合法，调用失败。
+    /// Failed to call the API because the license was invalid.
     V2TXLIVE_ERROR_INVALID_LICENSE = -5,
 
-    /// 请求服务器超时。
+    /// The server request timed out.
     V2TXLIVE_ERROR_REQUEST_TIMEOUT = -6,
 
-    /// 服务器无法处理您的请求。
+    /// The server cannot process the request.
     V2TXLIVE_ERROR_SERVER_PROCESS_FAILED = -7,
 
-    /// 连接断开。
+    /// Disconnect.
     V2TXLIVE_ERROR_DISCONNECTED = -8,
 
-    /// 找不到可用的 HEVC 解码器。
+    /// could not find available hevc decoder.
     V2TXLIVE_ERROR_NO_AVAILABLE_HEVC_DECODERS = -2304,
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //      网络相关的警告码
+    //      Network warning codes
     //
     /////////////////////////////////////////////////////////////////////////////////
 
-    /// 网络状况不佳：上行带宽太小，上传数据受阻。
+    /// Data upload was jammed because the upstream bandwidth was too low.
     V2TXLIVE_WARNING_NETWORK_BUSY = 1101,
 
-    ///当前视频播放出现卡顿。
+    /// Blocking occurred during video playback.
     V2TXLIVE_WARNING_VIDEO_BLOCK = 2105,
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //             摄像头相关的警告码
+    //             Camera-related warning codes
     //
     /////////////////////////////////////////////////////////////////////////////////
 
-    ///摄像头打开失败。
+    /// Failed to start the camera.
     V2TXLIVE_WARNING_CAMERA_START_FAILED = -1301,
 
-    ///摄像头正在被占用中，可尝试打开其他摄像头。
+    /// The camera is being occupied.
     V2TXLIVE_WARNING_CAMERA_OCCUPIED = -1316,
 
-    /// 摄像头设备未授权，通常在移动设备出现，可能是权限被用户拒绝了。
+    /// The camera is not authorized. This warning usually occurs on mobile devices due to the camera permission is denied by the user.
     V2TXLIVE_WARNING_CAMERA_NO_PERMISSION = -1314,
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //             麦克风相关的警告码
+    //             Mic-related warning codes
     //
     /////////////////////////////////////////////////////////////////////////////////
 
-    ///麦克风打开失败。
+    /// Failed to enable the mic.
     V2TXLIVE_WARNING_MICROPHONE_START_FAILED = -1302,
 
-    /// 麦克风正在被占用中，例如移动设备正在通话时，打开麦克风会失败。
+    /// The mic is being used. If a call is in progress on the mobile device, the mic cannot be enabled.
     V2TXLIVE_WARNING_MICROPHONE_OCCUPIED = -1319,
 
-    /// 麦克风设备未授权，通常在移动设备出现，可能是权限被用户拒绝了。
+    /// The mic is not authorized. This warning usually occurs on mobile devices due to the mic permission is denied by the user.
     V2TXLIVE_WARNING_MICROPHONE_NO_PERMISSION = -1317,
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //             屏幕分享相关警告码
+    //             ScreenCapture-related warning codes
     //
     /////////////////////////////////////////////////////////////////////////////////
 
-    ///当前系统不支持屏幕分享。
+    /// Screen capture is not supported in curent system.
     V2TXLIVE_WARNING_SCREEN_CAPTURE_NOT_SUPPORTED = -1309,
 
-    /// 开始录屏失败，如果在移动设备出现，可能是权限被用户拒绝了。
+    /// Failed to enable the screen capture.
     V2TXLIVE_WARNING_SCREEN_CAPTURE_START_FAILED = -1308,
 
-    /// 录屏被系统中断。
+    /// Screen capture is interrupted by system.
     V2TXLIVE_WARNING_SCREEN_CAPTURE_INTERRUPTED = -7001,
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //             编解码相关警告码
+    //             Codec-related warning codes
     //
     /////////////////////////////////////////////////////////////////////////////////
 
-    /// 表示编码器发生改变，可以通过 onWarning 函数的扩展信息中的 codec_type 字段来获取当前的编码格式。
-    /// 其中 1 代表 265 编码，0 代表 264 编码。注意 Windows 端不支持此错误码的扩展信息。
+    /// The codec changed. The additional field `codec_type` in `onWarning` indicates the codec currently in use.
+    /// `1` indicates H.265, and `0` indicates H.264. This field is not supported on Windows.
     V2TXLIVE_WARNING_CURRENT_ENCODE_TYPE_CHANGED = 1104,
 
-    /// 表示解码器发生改变，可以通过 onWarning 函数的扩展信息中的 codec_type 字段来获取当前的解码格式。
-    /// 其中 1 代表 265 解码，0 代表 264 解码。注意 Windows 端不支持此错误码的扩展信息。
+    /// The codec changed. The additional field `codec_type` in `onWarning` indicates the codec currently in use.
+    /// `1` indicates H.265, and `0` indicates H.264. This field is not supported on Windows.
     V2TXLIVE_WARNING_CURRENT_DECODE_TYPE_CHANGED = 2008,
 
 };
-
 }  // namespace liteav
-
 #endif

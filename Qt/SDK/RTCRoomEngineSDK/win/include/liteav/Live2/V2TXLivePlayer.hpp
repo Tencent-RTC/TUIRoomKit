@@ -1,16 +1,16 @@
 ﻿/**
  * Copyright (c) 2021 Tencent. All rights reserved.
  * Module:   V2TXLivePlayer @ TXLiteAVSDK
- * Function: 腾讯云直播播放器
- * <H2>功能
- * 腾讯云直播播放器。
- * 主要负责从指定的直播流地址拉取音视频数据，并进行解码和本地渲染播放。
- * <H2>介绍
- * 播放器包含如下能力：
- * - 支持 RTMP、HTTP-FLV、HLS、TRTC、WebRTC 协议。
- * - 屏幕截图，可以截取当前直播流的视频画面。
- * - 延时调节，可以设置播放器缓存自动调整的最小和最大时间。
- * - 自定义的视频数据处理，您可以根据项目需要处理直播流中的视频数据后，再进行渲染以及播放。
+ * Function: Tencent Cloud live player
+ * <H2>Function
+ * Tencent Cloud Live Player.
+ * It is mainly responsible for pulling audio and video data from the specified live stream address, decoding and rendering locally.
+ * <H2>Introduce
+ * The player includes the following capabilities:
+ * - Support RTMP, HTTP-FLV, HLS, TRTC, WebRTC protocols.
+ * - Screen capture, you can capture the video screen of the current live stream.
+ * - Delay adjustment, you can set the minimum and maximum time for automatic adjustment of the player cache.
+ * - Customized video data processing, you can process the video data in the live stream according to the needs of the project, and then render and play it.
  */
 #ifndef MODULE_CPP_IV2TXLIVEPLAYER_H_
 #define MODULE_CPP_IV2TXLIVEPLAYER_H_
@@ -27,33 +27,33 @@ extern "C" {
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                    播放器相关接口
+//                   V2TXLivePlayer Interface
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 用于动态加载 dll 时，获取 V2TXLivePlayer 对象指针
+ * Gets the `V2TXLivePlayer` object pointer during dynamic DLL loading
  *
- * @return 返回 V2TXLivePlayer 对象的指针，注意：请调用 releaseV2TXLivePlayer 析构。
- * @param context Android 上下文，内部会转为 ApplicationContext 用于系统 API 调用。
- * @note 本接口仅适用于Android平台。
+ * @return The `V2TXLivePlayer` object pointer is returned. Please call `releaseV2TXLivePlayer` to destruct the object.
+ * @param context Android context, which will be converted to `ApplicationContext` for the calling of system APIs.
+ * @note This API works only on Android.
  */
 V2_API liteav::V2TXLivePlayer* createV2TXLivePlayer(void* context);
 #else
 
 /**
- * 用于动态加载 dll 时，获取 V2TXLivePlayer 对象指针
+ * Gets the `V2TXLivePlayer` object pointer during dynamic DLL loading
  *
- * @return 返回 V2TXLivePlayer 对象的指针，注意：请调用 releaseV2TXLivePlayer 析构。
- * @note 本接口适用于Windows、Mac、iOS平台。
+ * @return The `V2TXLivePlayer` object pointer is returned. Please call `releaseV2TXLivePlayer` to destruct the object.
+ * @note This API works on Windows, macOS, and iOS.
  */
 V2_API liteav::V2TXLivePlayer* createV2TXLivePlayer();
 #endif
 
 /**
- * 析构 V2TXLivePlayer 对象
+ * Destructs the `V2TXLivePlayer` object
  *
- * @param player V2TXLivePlayer 对象的指针。
+ * @param player Pointer to the `V2TXLivePlayer` object.
  */
 V2_API void releaseV2TXLivePlayer(liteav::V2TXLivePlayer* player);
 }
@@ -63,204 +63,205 @@ namespace liteav {
 class V2TXLivePlayer {
    public:
     /**
-     * 设置播放器回调
+     * Sets the player callback
      *
-     * 通过设置回调，可以监听 V2TXLivePlayer 播放器的一些回调事件，
-     * 包括播放器状态、播放音量回调、音视频首帧回调、统计数据、警告和错误信息等。
-     * @param observer 播放器的回调目标对象，更多信息请查看 {@link V2TXLivePlayerObserver}
+     * By setting the callback, you can listen to some callback events of V2TXLivePlayer,
+     * including the player status, playback volume callback, first frame audio/video callback, statistics, warnings, and error messages.
+     * @param observer Callback target of the player. For more information, see {@link V2TXLivePlayerObserver}.
      */
     virtual void setObserver(V2TXLivePlayerObserver* observer) = 0;
 
     /**
-     * 设置播放器的视频渲染 View，该控件负责显示视频内容
+     * Sets the rendering view of the player. This control is responsible for presenting the video content
      *
-     * @param view 播放器渲染 View。
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK：成功。
+     * @param view Player rendering view.
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t setRenderView(void* view) = 0;
 
     /**
-     * 设置播放器画面的旋转角度
+     * Sets the rotation angle of the player view
      *
-     * @param rotation 旋转角度 {@link V2TXLiveRotation}。
-     *         - V2TXLiveRotation0【默认值】: 0度, 不旋转。
-     *         - V2TXLiveRotation90:  顺时针旋转90度。
-     *         - V2TXLiveRotation180: 顺时针旋转180度。
-     *         - V2TXLiveRotation270: 顺时针旋转270度。
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
+     * @param rotation Rotation angle of the view {@link V2TXLiveRotation}.
+     *         - V2TXLiveRotation0 **Default**: 0 degrees, which means the view is not rotated.
+     *         - V2TXLiveRotation90:  rotate 90 degrees clockwise.
+     *         - V2TXLiveRotation180: rotate 180 degrees clockwise.
+     *         - V2TXLiveRotation270: rotate 270 degrees clockwise.
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t setRenderRotation(V2TXLiveRotation rotation) = 0;
 
     /**
-     * 设置画面的填充模式
+     * Sets the fill mode of the view
      *
-     * @param mode 画面填充模式 {@link V2TXLiveFillMode}。
-     *         - V2TXLiveFillModeFill 【默认值】: 图像铺满屏幕，不留黑边，如果图像宽高比不同于屏幕宽高比，部分画面内容会被裁剪掉。
-     *         - V2TXLiveFillModeFit: 图像适应屏幕，保持画面完整，但如果图像宽高比不同于屏幕宽高比，会有黑边的存在。
-     *         - V2TXLiveFillModeScaleFill: 图像拉伸铺满，因此长度和宽度可能不会按比例变化。
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
+     * @param mode Fill mode of the view {@link V2TXLiveFillMode}.
+     *         - V2TXLiveFillModeFill: **Default**: fill the screen with the image without leaving any black edges. If the aspect ratio of the view is different from that of the screen, part of the view will be cropped.
+     *         - V2TXLiveFillModeFit  make the view fit the screen without cropping. If the aspect ratio of the view is different from that of the screen, black edges will appear.
+     *         - V2TXLiveFillModeScaleFill  fill the screen with the stretched image, thus the length and width may not change proportionally.
+     * @return Return code {@link V2TXLiveCode}
+     *         - V2TXLIVE_OK: successful
      */
     virtual int32_t setRenderFillMode(V2TXLiveFillMode mode) = 0;
 
     /**
-     * 开始播放音视频流
+     * Starts playing the audio and video streams
      *
-     * @param url 音视频流的播放地址，支持 RTMP, HTTP-FLV, TRTC。
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK：操作成功，开始连接并播放。
-     *         - V2TXLIVE_ERROR_INVALID_PARAMETER：操作失败，url 不合法。
-     *         - V2TXLIVE_ERROR_REFUSED：RTC 不支持同一设备上同时推拉同一个 StreamId。
+     * @param url URL of the audio and video streams to be played. The RTMP, HTTP-FLV and TRTC streaming protocols are supported.
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: operation succeeded. The player starts connecting to the URL and playing the audio and video streams.
+     *         - V2TXLIVE_ERROR_INVALID_PARAMETER: operation failed. The URL is invalid.
+     *         - V2TXLIVE_ERROR_REFUSED: operation failed. Duplicate streamId, please ensure that no other player or pusher is using this streamId now.
      */
     virtual int32_t startPlay(const char* url) = 0;
 
     /**
-     * 停止播放音视频流
+     * Stops playing the audio and video streams
      *
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t stopPlay() = 0;
 
     /**
-     * 播放器是否正在播放中
+     * Indicates whether the player is playing the audio and video streams
      *
-     * @return 是否正在播放。
-     *         - 1: 正在播放中。
-     *         - 0: 已经停止播放。
+     * @return Indicates whether the player is playing the audio and video streams.
+     *         - 1: yes.
+     *         - 0: no.
      */
     virtual int32_t isPlaying() = 0;
 
     /**
-     * 暂停播放器的音频流
+     * Pauses the audio stream of the player
      *
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t pauseAudio() = 0;
 
     /**
-     * 恢复播放器的音频流
+     * Resumes the audio stream of the player
      *
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t resumeAudio() = 0;
 
     /**
-     * 暂停播放器的视频流
+     * Pauses the video stream of the player
      *
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t pauseVideo() = 0;
 
     /**
-     * 恢复播放器的视频流
+     * Resumes the video stream of the player
      *
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t resumeVideo() = 0;
 
     /**
-     * 设置播放器音量
+     * Sets the volume
      *
-     * @param volume 音量大小，取值范围0 - 100。【默认值】: 100。
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
+     * @param volume Volume. Valid range: 0 - 100. **Default**: 100.
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t setPlayoutVolume(int32_t volume) = 0;
 
     /**
-     * 设置播放器缓存自动调整的最小和最大时间 ( 单位：秒 )
+     * Set the minimum time and maximum time (unit: s) for auto adjustment of the player cache
      *
-     * @param minTime 缓存自动调整的最小时间，取值需要大于0。【默认值】：1。
-     * @param maxTime 缓存自动调整的最大时间，取值需要大于0。【默认值】：5。
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
-     *         - V2TXLIVE_ERROR_INVALID_PARAMETER: 操作失败，minTime 和 maxTime 需要大于0。
-     *         - V2TXLIVE_ERROR_REFUSED: 播放器处于播放状态，不支持修改缓存策略。
+     * @param minTime Minimum time for auto cache adjustment. The value must be greater than 0. **Default**: 1.
+     * @param maxTime Maximum time for auto cache adjustment. The value must be greater than 0. **Default**: 5.
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
+     *         - V2TXLIVE_ERROR_INVALID_PARAMETER: operation failed. MinTime and maxTime must be greater than 0.
+     *         - V2TXLIVE_ERROR_REFUSED: operation failed. Change of cache is not suppoted when playing.
      */
     virtual int32_t setCacheParams(float minTime, float maxTime) = 0;
 
     /**
-     * 直播流无缝切换，支持 FLV 和 LEB
+     * Seamlessly switch live stream urls, supporting  FLV and LEB protocols
      *
-     * @param newUrl 新的拉流地址。
+     * @param newUrl New pull address.
      */
     virtual int32_t switchStream(const char* newUrl) = 0;
 
     /**
-     * 启用播放音量大小提示
+     * Enables playback volume update
      *
-     * 开启后可以在 {@link V2TXLivePlayerObserver} 回调中获取到 SDK 对音量大小值的评估。
-     * @param intervalMs 决定了 onPlayoutVolumeUpdate 回调的触发间隔，单位为ms，最小间隔为100ms，如果小于等于0则会关闭回调，建议设置为300ms；【默认值】：0，不开启。
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
+     * After this feature is enabled, you can obtain the SDK’s volume evaluation through the {@link onPlayoutVolumeUpdate} callback.
+     * @param intervalMs Interval for triggering the volume callback. The unit is ms. The minimum interval is 100 ms. If the value is equal to or smaller than 0, the callback is disabled. We recommend that you set this parameter to 300 ms.
+     * **Default**: 0.
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t enableVolumeEvaluation(int32_t intervalMs) = 0;
 
     /**
-     * 截取播放过程中的视频画面
+     * Captures the video view in the playback process
      *
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
-     *         - V2TXLIVE_ERROR_REFUSED: 播放器处于停止状态，不允许调用截图操作。
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
+     *         - V2TXLIVE_ERROR_REFUSED: playback is stopped, the snapshot operation cannot be called.
      */
     virtual int32_t snapshot() = 0;
 
     /**
-     * 开启/关闭对视频帧的监听回调
+     * Turn on/off the monitoring callback of the video frame
      *
-     * SDK 在您开启此开关后将不再渲染视频画面，您可以通过 V2TXLivePlayerObserver 获得视频帧，并执行自定义的渲染逻辑。
-     * @param enable      是否开启自定义渲染。【默认值】：false。
-     * @param pixelFormat 自定义渲染回调的视频像素格式 {@link V2TXLivePixelFormat}。
-     * @param bufferType  自定义渲染回调的视频数据格式 {@link V2TXLiveBufferType}。
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
-     *         - V2TXLIVE_ERROR_NOT_SUPPORTED: 像素格式或者数据格式不支持。
+     * The SDK will no longer render the video after you turn on this switch. You can get the video frame through V2TXLivePlayerObserver and execute custom rendering logic.
+     * @param enable      Whether to enable custom rendering. **Default**: false.
+     * @param pixelFormat Video pixel format for custom rendering callback {@link V2TXLivePixelFormat}。
+     * @param bufferType  Video data format for custom rendering callback {@link V2TXLiveBufferType}。
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
+     *         - V2TXLIVE_ERROR_NOT_SUPPORTED: the pixel format or data format is not supported.
      */
     virtual int32_t enableObserveVideoFrame(bool enable, V2TXLivePixelFormat pixelFormat, V2TXLiveBufferType bufferType) = 0;
 
     /**
-     * 开启/关闭对音频数据的监听回调
+     * Turn on/off the monitoring callback of the audio frame
      *
-     * 如果您开启此开关，您可以通过 V2TXLivePlayerObserver 获得音频数据，并执行自定义的逻辑。
-     * @param enable 是否开启音频数据回调。【默认值】：false。
-     * @return 返回值 {@link V2TXLiveCode}
-     *         - V2TXLIVE_OK: 成功
+     * if you turn on this switch, You can get the audio frame through V2TXLivePlayerObserver and execute custom logic.
+     * @param enable Whether to enable the callback of the audio frame. **Default**: false.
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t enableObserveAudioFrame(bool enable) = 0;
 
     /**
-     * 开启接收 SEI 消息
+     * Enables the receiving of SEI messages
      *
-     * @param enable      true: 开启接收 SEI 消息; false: 关闭接收 SEI 消息。【默认值】: false。
-     * @param payloadType 指定接收 SEI 消息的 payloadType，支持 5、242，请与发送端的 payloadType 保持一致。
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
+     * @param enable `true`: enable; `false` (**default**): disable.
+     * @param payloadType The payload type of SEI messages. Valid values: `5`, `242`, please be consistent with the payload type of the sender.
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
      */
     virtual int32_t enableReceiveSeiMessage(bool enable, int payloadType) = 0;
 
     /**
-     * 是否显示播放器状态信息的调试浮层
+     * Indicates whether the debug view of the player video status information is displayed
      *
-     * @param isShow 是否显示。【默认值】：false。
+     * @param isShow Specifies whether to display the debug view. **Default**: false.
      */
     virtual void showDebugView(bool isShow) = 0;
 
     /**
-     * 调用 V2TXLivePlayer 的高级 API 接口
+     * Calls the advanced API of V2TXLivePlayer
      *
-     * @note  该接口用于调用一些高级功能。
-     * @param key   高级 API 对应的 key。
-     * @param value 调用 key 所对应的高级 API 时，需要的参数。
-     * @return 返回值 {@link V2TXLiveCode}。
-     *         - V2TXLIVE_OK: 成功。
-     *         - V2TXLIVE_ERROR_INVALID_PARAMETER: 操作失败，key 不允许为 null。
+     * @note  This API is used to call some advanced features.
+     * @param key   Key of the advanced API.
+     * @param value Parameter needed to call the advanced API corresponding to the key.
+     * @return Return code {@link V2TXLiveCode}.
+     *         - V2TXLIVE_OK: successful.
+     *         - V2TXLIVE_ERROR_INVALID_PARAMETER: operation failed. The key cannot be null.
      */
     virtual int32_t setProperty(const char* key, const void* value) = 0;
 

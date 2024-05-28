@@ -1,11 +1,11 @@
 ﻿/**
  * Copyright (c) 2021 Tencent. All rights reserved.
  * Module:   V2TXLivePusherObserver @ TXLiteAVSDK
- * Function: 腾讯云直播推流的回调通知
- * <H2>功能
- * 腾讯云直播的推流回调通知。
- * <H2>介绍
- * 可以接收 {@link V2TXLivePusher} 推流器的一些推流通知，包括推流器连接状态、音视频首帧回调、统计数据、警告和错误信息等。
+ * Function: Tencent Cloud live pusher callback notification
+ * <H2>Function
+ * Callback notification for push streaming of Tencent Cloud Live.
+ * <H2>Introduce
+ * You can receive some push notifications from the {@link V2TXLivePusher} pusher, including the connection status of the pusher, callback of the first frame of audio and video, statistical data, warning and error messages, etc.
  */
 #ifndef MODULE_CPP_V2TXLIVEPUSHEROBSERVER_H_
 #define MODULE_CPP_V2TXLIVEPUSHEROBSERVER_H_
@@ -21,117 +21,117 @@ class V2TXLivePusherObserver {
 
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //                   直播推流器事件回调
+    //                   Live pusher Event Callback
     //
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 直播推流器错误通知，推流器出现错误时，会回调该通知
+     * Live pusher error notification, which is called back when the pusher encounters an error
      *
-     * @param code      错误码 {@link V2TXLiveCode}。
-     * @param msg       错误信息。
-     * @param extraInfo 扩展信息。
+     * @param code      Error code {@link V2TXLiveCode}.
+     * @param msg       Error message.
+     * @param extraInfo Extended information.
      */
     virtual void onError(int32_t code, const char* msg, void* extraInfo) {
     }
 
     /**
-     * 直播推流器警告通知
+     * Live pusher warning notification
      *
-     * @param code      警告码 {@link V2TXLiveCode}。
-     * @param msg       警告信息。
-     * @param extraInfo 扩展信息。
+     * @param code      Warning code {@link V2TXLiveCode}.
+     * @param msg       Warning message.
+     * @param extraInfo Extended information.
      */
     virtual void onWarning(int32_t code, const char* msg, void* extraInfo) {
     }
 
     /**
-     * 首帧音频采集完成的回调通知
+     * Callback notification indicating that collection of the first audio frame is complete
      */
     virtual void onCaptureFirstAudioFrame() {
     }
 
     /**
-     * 首帧视频采集完成的回调通知
+     * Callback notification indicating that collection of the first video frame is complete
      */
     virtual void onCaptureFirstVideoFrame() {
     }
 
     /**
-     * 麦克风采集音量值回调
+     * Microphone-collected volume callback
      *
-     * @param volume 音量大小。
-     * @note  调用 {@link enableVolumeEvaluation} 开启采集音量大小提示之后，会收到这个回调通知。
+     * @note  This callback notification is received after {@link enableVolumeEvaluation} is called.
+     * @param volume Current volume value for collection.
      */
     virtual void onMicrophoneVolumeUpdate(int32_t volume) {
     }
 
     /**
-     * 推流器连接状态回调通知
+     * Callback notification of the pusher connection status
      *
-     * @param status    推流器连接状态 {@link V2TXLivePushStatus}。
-     * @param msg       连接状态信息。
-     * @param extraInfo 扩展信息。
+     * @param status    Pusher connection status {@link V2TXLivePushStatus} .
+     * @param msg       Connection status message.
+     * @param extraInfo Extended information.
      */
     virtual void onPushStatusUpdate(V2TXLivePushStatus state, const char* msg, void* extraInfo) {
     }
 
     /**
-     * 直播推流器统计数据回调
+     * Live pusher statistics callback
      *
-     * @param statistics 推流器统计数据 {@link V2TXLivePusherStatistics}
+     * @param statistics Pusher statistics {@link V2TXLivePusherStatistics} .
      */
     virtual void onStatisticsUpdate(V2TXLivePusherStatistics statistics) {
     }
 
     /**
-     * 截图回调
+     * Screenshot callback
      *
-     * @note  调用 {@link snapshot} 截图之后，会收到这个回调通知。
-     * @param image  已截取的视频画面。
-     * @param length 截图数据长度，对于BGRA32而言，length = width * height * 4。
-     * @param width  截图画面的宽度。
-     * @param height 截图画面的高度。
-     * @param format 截图数据格式，目前只支持 V2TXLivePixelFormatBGRA32。
+     * @note  This callback notification will be received after calling {@link snapshot} .
+     * @param image  Screenshot data. If it is `nullptr`, it indicates that the SDK failed to take the screenshot.
+     * @param length Screenshot data length. In BGRA32 format, length = width * height * 4.
+     * @param width  Screenshot width.
+     * @param height Screenshot height.
+     * @param format Screenshot data format. Only `TRTCVideoPixelFormat_BGRA32` is supported now.
      */
     virtual void onSnapshotComplete(const char* image, int length, int width, int height, V2TXLivePixelFormat format) {
     }
 
     /**
-     * 自定义视频渲染回调
+     * Custom video rendering callback
      *
-     * @note  调用 {@link enableCustomVideoRender} 开启本地视频自定义渲染之后，会收到这个回调通知。
-     * @param videoFrame 视频帧数据 {@link V2TXLiveVideoFrame}。
+     * @note You will receive this callback after calling {@link enableCustomVideoRender} to enable
+     * local custom video rendering.
+     * @param videoFrame Video frames to be rendered {@link V2TXLiveVideoFrame} .
      */
     virtual void onRenderVideoFrame(const V2TXLiveVideoFrame* videoFrame) {
     }
 
     /**
-     * 自定义视频预处理数据回调
+     * Callback of video data for custom pre-processing
      *
-     * @note  调用 {@link enableCustomVideoProcessing} 接口开启/关闭自定义视频处理回调。Windows 暂时只支持 YUV420 格式。
-     * @param srcFrame 处理前的视频帧。
-     * @param dstFrame 处理后的视频帧。
-     * @return - 0：   成功。
-     *         - 其他： 错误。
+     * @note You can call {@link enableCustomVideoProcess} to enable/disable custom video pre-processing.
+     *       Only the YUV420 format is supported on Windows currently.
+     * @param srcFrame Used to carry images captured by SDK via the camera.
+     * @param dstFrame Used to receive video images processed by third-party beauty filters.
      */
     virtual int onProcessVideoFrame(V2TXLiveVideoFrame* srcFrame, V2TXLiveVideoFrame* dstFrame) {
         return 0;
     }
 
     /**
-     * 当屏幕分享开始时，SDK 会通过此回调通知
+     * The SDK returns this callback when you call {@link startScreenCapture} and other APIs to start screen sharing.
      */
     virtual void onScreenCaptureStarted() {
     }
 
     /**
-     * 当屏幕分享停止时，SDK 会通过此回调通知
+     * The SDK returns this callback when you call {@link stopScreenCapture} to stop screen sharing
      *
-     * @param reason 停止原因
-     *               - 0：表示用户主动停止。
-     *               - 1：iOS 表示录屏被系统中断；Mac、Windows 表示屏幕分享窗口被关闭。
-     *               - 2：Windows 表示屏幕分享的显示屏状态变更（如接口被拔出、投影模式变更等）；其他平台不抛出。
+     * @param Reason for stop.
+     *               - `0`: Screen capture stopped by user.
+     *               - `1`: On iOS platform means the screen recording is interrupted by the system; Mac, Windows means the screen sharing window is closed.
+     *               - `2`: On windows platform indicates that the display screen status of screen sharing is changed (such as the interface is pulled out, the projection mode is changed, etc.); other platforms do not throw.
      */
     virtual void onScreenCaptureStoped(int reason) {
     }

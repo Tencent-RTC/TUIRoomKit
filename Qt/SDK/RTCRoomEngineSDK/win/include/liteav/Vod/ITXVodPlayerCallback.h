@@ -3,24 +3,24 @@
 #include "TXLiteAVBase.h"
 
 /**
- * VOD 播放器错误码
+ * VOD player error code
  */
 enum TXVodPlayerError {
 
-    ///文件不存在
+    /// file not exist
     TXVodPlayerErrorFileNotExist,
 
-    ///格式不支持
+    /// file format not support
     TXVodPlayerErrorFormatNotSupport,
 
-    ///文件打开失败
+    /// file open failed
     TXVodPlayerErrorOpenfailed,
 
 };
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                      VOD 相关回调
+//                      VOD callback
 //
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -29,43 +29,43 @@ class ITXVodPlayerEventCallback {
     virtual ~ITXVodPlayerEventCallback(){};
 
     /**
-     * 当多媒体文件播放开始时，SDK会通过此回调通知
+     * When the multimedia file playback starts, the SDK will notify through this callback.
      *
-     * @param msLength 多媒体文件总长度，单位毫秒
+     * @param msLength The total length of the multimedia file, in milliseconds.
      */
     virtual void onVodPlayerStarted(uint64_t msLength) {
     }
 
     /**
-     * 当多媒体文件播放进度改变时，SDK会通过此回调通知
+     * When the playback progress of the multimedia file is changed,the SDK will notify through this callback.
      *
-     * @param msPos 多媒体文件播放进度，单位毫秒
+     * @param msPos Multimedia file playback progress, in milliseconds.
      */
     virtual void onVodPlayerProgress(uint64_t msPos) {
     }
 
     /**
-     * 当多媒体文件播放暂停时，SDK会通过此回调通知
+     * When multimedia file playback is paused,the SDK will notify through this callback.
      */
     virtual void onVodPlayerPaused() {
     }
 
     /**
-     * 当多媒体文件播放恢复时，SDK会通过此回调通知
+     * When multimedia file playback is resumed,the SDK will notify through this callback.
      */
     virtual void onVodPlayerResumed() {
     }
 
     /**
-     * 当多媒体文件播放停止时，SDK会通过此回调通知
+     * When multimedia file playback is stopped,the SDK will notify through this callback.
      *
-     * @param reason 停止原因，0表示用户主动停止，1表示文件播放完，2表示视频断流
+     * @param reason Stop reason, 0 means the user stops actively, 1 means the file is finished playing, 2 means the video is cut off.
      */
     virtual void onVodPlayerStoped(int reason) {
     }
 
     /**
-     * 当多媒体文件播放出错时，SDK会通过此回调通知
+     * When an error occurs when a multimedia file is played,the SDK will notify through this callback.
      */
     virtual void onVodPlayerError(int error) = 0;
 };
@@ -75,12 +75,12 @@ class ITXVodPlayerDataCallback {
     virtual ~ITXVodPlayerDataCallback(){};
 
     /**
-     * Vod视频帧回调
+     * Vod video frames callback.
      */
     virtual int onVodVideoFrame(TRTCVideoFrame& frame) = 0;
 
     /**
-     * Vod 音频帧回调
+     * Vod audio frames callback.
      */
     virtual int onVodAudioFrame(TRTCAudioFrame& frame) = 0;
 };

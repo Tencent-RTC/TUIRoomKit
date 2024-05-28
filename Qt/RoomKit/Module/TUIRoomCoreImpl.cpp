@@ -1257,28 +1257,11 @@ void TUIRoomCoreImpl::onSendMessageForAllUserDisableChanged(const char* room_id,
   }
 }
 
-void TUIRoomCoreImpl::onRoomSpeechModeChanged(const char* room_id, tuikit::TUISpeechMode speech_mode) {
-  LINFO("onRoomSpeechModeChanged, room_id:%s, speech_mode:%d", room_id, static_cast<int>(speech_mode));
-  room_info_.mode = speech_mode;
-}
-
-void TUIRoomCoreImpl::onRoomDismissed(const char* room_id) {
-  LINFO("onRoomDismissed [room_id:%s]", room_id);
-    //if (room_engine_) {
-    //    TUIRoomEngineCallback* callback = new TUIRoomEngineCallback;
-    //    callback->SetCallback([=]() {
-    //            delete callback;
-    //        },
-    //        [=](const tuikit::TUIError code, const std::string& message) {
-    //            delete callback;
-    //        });
-    //    room_engine_->exitRoom(true, callback);
-    //}
-
-    // TODO：RoomEngine 的 ExitRoom 会返回失败，这里强制界面退出
-    if (room_core_callback_ != nullptr) {
-        room_core_callback_->OnExitRoom(TUIExitRoomType::kRoomDestoryed, "room dismissed.");
-    }
+void TUIRoomCoreImpl::onRoomDismissed(const char* room_id,tuikit::TUIRoomDismissedReason reason) {
+  LINFO("onRoomDismissed room_id:%s, reason:%d", room_id, static_cast<int>(reason));
+  if (room_core_callback_ != nullptr) {
+    room_core_callback_->OnExitRoom(TUIExitRoomType::kRoomDestoryed, "room dismissed.");
+  }
 }
 
 void TUIRoomCoreImpl::onRemoteUserEnterRoom(const char* room_id, const tuikit::TUIUserInfo& user_info) {
@@ -1334,19 +1317,19 @@ void TUIRoomCoreImpl::onRemoteUserLeaveRoom(
     room_core_callback_->OnRemoteUserLeave(TOSTRING(user_info.userId));
   }
 }
-void TUIRoomCoreImpl::onUserRoleChanged(const char* user_id, tuikit::TUIRole role) {
-  LINFO("onUserRoleChanged, user_id:%s, role:%d", user_id, static_cast<int>(role));
-  auto str_user_id = TOSTRING(user_id);
+void TUIRoomCoreImpl::onUserRoleChanged(const tuikit::TUIUserInfo& user_info) {
+  LINFO("onUserRoleChanged, user_id:%s, role:%d", user_info.userId, static_cast<int>(user_info.userRole));
+  auto str_user_id = TOSTRING(user_info.userId);
   auto iter = room_user_map_.find(str_user_id);
   if (iter != room_user_map_.end()) {
-    iter->second.role = role;
+    iter->second.role = user_info.userRole;
   }
   if (local_user_info_.user_id == str_user_id) {
-    iter->second.role = role;
+    iter->second.role = user_info.userRole;
   }
 
   // 房主更改数据同步
-  if (role == tuikit::TUIRole::kRoomOwner) {
+  if (user_info.userRole == tuikit::TUIRole::kRoomOwner) {
     auto old_owner = room_info_.owner_id;
     room_info_.owner_id = str_user_id;
 
@@ -1408,6 +1391,10 @@ void TUIRoomCoreImpl::onUserVoiceVolumeChanged(tuikit::TUIMap<const char*, int>*
     }
 }
 
+void TUIRoomCoreImpl::onRoomUserCountChanged(const char* room_id, int user_count) {
+  LINFO("onRoomUserCountChanged,room_id:%s, user_count:%d", room_id, user_count);
+}
+
 void TUIRoomCoreImpl::onScreenShareForAllUserDisableChanged(const char* room_id, bool is_disable) {
   LINFO("onScreenShareForAllUserDisableChanged,room_id:%s, is_disable :%d",
       room_id, is_disable);
@@ -1449,8 +1436,8 @@ void TUIRoomCoreImpl::onSeatListChanged(
   LINFO("onSeatListChanged");
 }
 
-void TUIRoomCoreImpl::onKickedOffSeat(const char* userId) {
-  LINFO("onKickedOffSeat, userId:%d", userId);
+void TUIRoomCoreImpl::onKickedOffSeat(int seat_index, const tuikit::TUIUserInfo& operate_user) {
+  LINFO("onKickedOffSeat, seatIndex:%d", seat_index);
 }
 
 void TUIRoomCoreImpl::onRequestReceived(const tuikit::TUIRequest* request) {
@@ -1496,18 +1483,16 @@ void TUIRoomCoreImpl::onRequestReceived(const tuikit::TUIRequest* request) {
     }
   }
 }
-void TUIRoomCoreImpl::onRequestCancelled(const char* request_id,
-                                         const char* user_id) {
-  LINFO("onRequestCancelled, request_id:%s", request_id);
+void TUIRoomCoreImpl::onRequestCancelled(const tuikit::TUIRequest& request, const tuikit::TUIUserInfo& operate_user) {
+  LINFO("onRequestCancelled, request_id:%s", request.requestId);
   auto iter = std::find(received_request_ids_.begin(),
-                        received_request_ids_.end(), TOSTRING(request_id));
+                        received_request_ids_.end(), TOSTRING(request.requestId));
     if (iter != received_request_ids_.end()) {
         received_request_ids_.erase(iter);
     }
 }
 
-void TUIRoomCoreImpl::onRequestProcessed(const char* request_id,
-                                         const char* user_id) {}
+void TUIRoomCoreImpl::onRequestProcessed(const tuikit::TUIRequest& request, const tuikit::TUIUserInfo& operate_user) {}
 
 void TUIRoomCoreImpl::onReceiveTextMessage(const char* room_id, const tuikit::TUIMessage& message) {
     if (TOSTRING(room_id) != room_info_.room_id) {
@@ -1537,10 +1522,6 @@ void TUIRoomCoreImpl::onReceiveCustomMessage(const char* room_id, const tuikit::
         room_core_callback_->OnReceiveCustomMessage(TOSTRING(message.userId), message.message);
     }
 }
-
-void TUIRoomCoreImpl::onDeviceChanged(const char* deviceId,
-                                      liteav::TXMediaDeviceType type,
-                                      liteav::TXMediaDeviceState state) {}
 
 void TUIRoomCoreImpl::onRoomSeatModeChanged(const char* room_id, tuikit::TUISeatMode seat_mode){}
 

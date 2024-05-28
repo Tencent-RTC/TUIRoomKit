@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright (c) 2021 Tencent. All rights reserved.
+ * Copyright (c) 2024 Tencent. All rights reserved.
  * Module:   TUIRoomDefine @ TUIKitEngine
  * Function: TUIRoomEngine 关键类型定义
  */
@@ -31,28 +31,28 @@ namespace tuikit {
  */
 enum class TUIRoomType {
 
-    /// 会议类型房间，适用于会议，教育场景，该房间中可以开启自由发言，申请发言、上麦发言等不同模式
+    /// 会议类型房间，适用于会议，教育场景，该房间中可以开启自由发言，申请发言、上麦发言等不同模式。
     kConference = 1,
 
-    /// 直播类型房间，适用于直播场景，该房间可以开启自由发言，上麦发言模式
-    kLivingRoom = 2,
+    /// 直播类型房间，适用于直播场景，该房间可以开启自由发言，上麦发言模式。
+    kLive = 2,
 
 };
 
 /**
  * 1.2 麦控模式
  *
- * @deprecated v2.0 版本开始，该功能已废弃，建议使用 isSeatEnabled（是否开启麦位控制） 代替
+ * @deprecated v2.0 版本开始，该功能已废弃，建议使用 isSeatEnabled（是否开启麦位控制） 代替。
  */
 enum class TUISpeechMode {
 
-    /// 未设置
+    /// 未设置。
     kNone = 0,
 
-    /// 自由发言模式
+    /// 自由发言模式。
     kFreeToSpeak = 1,
 
-    /// 申请发言模式。（仅在会议类型房间下生效）
+    /// 申请发言模式（仅在会议类型房间下生效）。
     kApplyToSpeak = 2,
 
     /// 上麦发言模式。
@@ -61,47 +61,60 @@ enum class TUISpeechMode {
 };
 
 /**
- * 上麦模式
+ * 1.3 上麦模式
  */
 enum class TUISeatMode {
 
-    /// 自由上麦模式，台下观众可以自由上麦，无需申请
+    /// 自由上麦模式，台下观众可以自由上麦，无需申请。
     kFreeToTake = 1,
 
-    /// 申请上麦模式，台下观众上麦需要房主或者管理员同意后才能上麦
+    /// 申请上麦模式，台下观众上麦需要房主或者管理员同意后才能上麦。
     kApplyToTake = 2,
 
 };
 
 /**
- * 1.3 房间内媒体设备类型
+ * 1.4 房间内媒体设备类型
  */
 enum class TUIMediaDevice {
 
-    /// 麦克风
+    /// 麦克风。
     kMicrophone = 1,
 
-    /// 摄像头
+    /// 摄像头。
     kCamera = 2,
 
-    /// 屏幕共享
+    /// 屏幕共享。
     kScreenSharing = 3,
 
 };
 
 /**
- * 1.4 房间内角色类型
+ * 1.5 房间内角色类型
  */
 enum class TUIRole {
 
     /// 房主，一般指房间的创建者，房间内最高权限拥有者。
     kRoomOwner = 0,
 
-    /// 房间管理员
+    /// 房间管理员。
     kAdministrator = 1,
 
-    /// 房间内普通成员
+    /// 房间内普通成员。
     kGeneralUser = 2,
+
+};
+
+/**
+ * 1.6 房间解散原因
+ */
+enum class TUIRoomDismissedReason {
+
+    /// 被房主解散。
+    kByOwner = 1,
+
+    /// 被服务器解散。
+    kByServer = 2,
 
 };
 
@@ -116,16 +129,16 @@ enum class TUIRole {
  */
 enum class TUIVideoQuality {
 
-    /// 低清360P
+    /// 低清360P。
     kVideoQuality_360P = 1,
 
-    /// 标清540P
+    /// 标清540P。
     kVideoQuality_540P = 2,
 
-    /// 高清720P
+    /// 高清720P。
     kVideoQuality_720P = 3,
 
-    /// 超清1080P
+    /// 超清1080P。
     kVideoQuality_1080P = 4,
 
 };
@@ -135,13 +148,13 @@ enum class TUIVideoQuality {
  */
 enum class TUIAudioQuality {
 
-    /// 人声模式
+    /// 人声模式。
     kAudioQualitySpeech = 0,
 
-    /// 默认模式
+    /// 默认模式。
     kAudioQualityDefault = 1,
 
-    /// 音乐模式
+    /// 音乐模式。
     kAudioQualityMusic = 2,
 
 };
@@ -151,13 +164,13 @@ enum class TUIAudioQuality {
  */
 enum class TUIVideoStreamType {
 
-    /// 高清摄像头视频流
+    /// 高清摄像头视频流。
     kCameraStream = 0,
 
-    /// 屏幕分享视频流
+    /// 屏幕分享视频流。
     kScreenStream = 1,
 
-    /// 低清摄像头视频流
+    /// 低清摄像头视频流。
     kCameraStreamLow = 2,
 
 };
@@ -167,10 +180,10 @@ enum class TUIVideoStreamType {
  */
 enum class TUIChangeReason {
 
-    /// 自己操作
+    /// 自己操作。
     kChangedBySelf = 0,
 
-    /// 房主或管理员操作
+    /// 房主或管理员操作。
     kChangedByAdmin = 1,
 
 };
@@ -180,13 +193,13 @@ enum class TUIChangeReason {
  */
 enum class TUIKickedOutOfRoomReason {
 
-    /// 被主持人或管理员踢出
+    /// 被主持人或管理员踢出。
     kKickedByAdmin = 0,
 
-    /// 在其它设备进入房间被踢出
+    /// 在其它设备进入房间被踢出。
     kKickedByLoggedOnOtherDevice = 1,
 
-    /// 被服务端踢出
+    /// 被服务端踢出。
     kKickedByServer = 2,
 
 };
@@ -196,10 +209,10 @@ enum class TUIKickedOutOfRoomReason {
  */
 enum class TUIResolutionMode {
 
-    /// 横屏
+    /// 横屏。
     kResolutionMode_Landscape = 0,
 
-    /// 竖屏
+    /// 竖屏。
     kResolutionMode_Portrait = 1,
 
 };
@@ -209,13 +222,13 @@ enum class TUIResolutionMode {
  */
 enum class TUICaptureSourceType {
 
-    /// 未定义
+    /// 未定义。
     kUnknown = -1,
 
-    /// 窗口
+    /// 窗口。
     kWindow = 0,
 
-    /// 屏幕
+    /// 屏幕。
     kScreen = 1,
 
 };
@@ -231,31 +244,31 @@ enum class TUICaptureSourceType {
  */
 enum class TUIRequestAction {
 
-    /// 无效请求
+    /// 无效请求。
     kInvalidAction = 0,
 
-    /// 请求远端用户打开摄像头
+    /// 请求远端用户打开摄像头。
     kRequestToOpenRemoteCamera = 1,
 
-    /// 请求远端用户打开麦克风
+    /// 请求远端用户打开麦克风。
     kRequestToOpenRemoteMicrophone = 2,
 
-    /// 请求连接到其他房间
+    /// 请求连接到其他房间。
     kRequestToConnectOtherRoom = 3,
 
-    /// 请求上麦
+    /// 请求上麦。
     kRequestToTakeSeat = 4,
 
-    /// 请求远端用户上麦
+    /// 请求远端用户上麦。
     kRequestRemoteUserOnSeat = 5,
 
-    /// 向管理员请求打开本地摄像头
+    /// 向管理员请求打开本地摄像头。
     kApplyToAdminToOpenLocalCamera = 6,
 
-    /// 向管理员请求打开本地麦克风
+    /// 向管理员请求打开本地麦克风。
     kApplyToAdminToOpenLocalMicrophone = 7,
 
-    /// 向管理员请求打开屏幕分享
+    /// 向管理员请求打开屏幕分享。
     kApplyToAdminToOpenLocalScreenShare = 8,
 
 };
@@ -295,22 +308,22 @@ class TUIKIT_API TUIMap {
 /**
  * 5.1 房间信息
  *
- * TUIRoomEngine 只支持字符串房间ID
+ * TUIRoomEngine 只支持字符串房间ID。
  */
 struct TUIRoomInfo {
-    /// 房间ID(创建房间必填参数)
+    /// 房间ID(创建房间必填参数)。
     const char* roomId;
 
-    /// 主持人ID: 默认为房间创建者（只读）
+    /// 主持人ID: 默认为房间创建者（只读）。
     const char* ownerId;
 
-    /// 房间类型（创建房间可选参数，默认Group类型），请参考：{@link TUIRoomType}。
+    /// 房间类型（创建房间可选参数，默认Group类型），请参见：{@link TUIRoomType}。
     TUIRoomType roomType;
 
-    /// 房间名称（创建房间可选参数，默认房间ID）
+    /// 房间名称（创建房间可选参数，默认房间ID）。
     const char* name;
 
-    /// 房间麦控模式（v2.0 版本开始，该功能已废弃，建议使用 isSeatEnabled（是否开启麦位控制） 代替）
+    /// 房间麦控模式（v2.0 版本开始，该功能已废弃，建议使用 isSeatEnabled（是否开启麦位控制） 代替）。
     TUISpeechMode speechMode;
 
     /// 是否禁止打开摄像头（创建房间可选参数），默认值：{@link false}。
@@ -325,19 +338,19 @@ struct TUIRoomInfo {
     /// 是否禁止发送消息（创建房间可选参数），默认值：{@link false}。
     bool isMessageDisableForAllUser;
 
-    /// 是否开启麦位控制
+    /// 是否开启麦位控制。
     bool isSeatEnabled;
 
-    /// 上麦模式(只有开启麦位控制后生效)
+    /// 上麦模式(只有开启麦位控制后生效)。
     TUISeatMode seatMode;
 
-    /// 最大麦位数
+    /// 最大麦位数。
     int maxSeatCount;
 
-    /// 房间创建时间（只读）
+    /// 房间创建时间（只读）。
     uint64_t createTime;
 
-    /// 房间内成员数量（只读）
+    /// 房间内成员数量（只读）。
     int memberCount;
 
     TUIRoomInfo()
@@ -362,13 +375,13 @@ struct TUIRoomInfo {
  * 5.2 用户登录信息
  */
 struct TUILoginUserInfo {
-    /// 用户ID
+    /// 用户ID。
     const char* userId;
 
-    /// 用户名称
+    /// 用户名称。
     const char* userName;
 
-    /// 用户头像URL
+    /// 用户头像URL。
     const char* avatarUrl;
 
     TUILoginUserInfo() : userId(nullptr), userName(nullptr), avatarUrl(nullptr) {
@@ -379,16 +392,16 @@ struct TUILoginUserInfo {
  * 5.3 房间内用户信息
  */
 struct TUIUserInfo {
-    /// 用户ID
+    /// 用户ID。
     const char* userId;
 
-    /// 用户名称
+    /// 用户名称。
     const char* userName;
 
-    /// 用户头像URL
+    /// 用户头像URL。
     const char* avatarUrl;
 
-    /// 用户角色类型, 请参考：{@link TUIRole}。
+    /// 用户角色类型, 请参见：{@link TUIRole}。
     TUIRole userRole;
 
     /// 是否有音频流，默认值：{@link false}。
@@ -400,7 +413,10 @@ struct TUIUserInfo {
     /// 是否有屏幕分享流，默认值：{@link false}。
     bool hasScreenStream;
 
-    TUIUserInfo() : userRole(TUIRole::kGeneralUser), hasAudioStream(false), hasVideoStream(false), hasScreenStream(false) {
+    /// 是否被禁止发送消息，默认值：{@link false}。
+    bool isMessageDisabled;
+
+    TUIUserInfo() : userRole(TUIRole::kGeneralUser), hasAudioStream(false), hasVideoStream(false), hasScreenStream(false), isMessageDisabled(false) {
     }
 };
 
@@ -408,16 +424,16 @@ struct TUIUserInfo {
  * 5.3 视频编码参数
  */
 struct TUIRoomVideoEncoderParams {
-    /// 视频质量, 请参考：{@link TUIVideoQuality}。
+    /// 视频质量, 请参见：{@link TUIVideoQuality}。
     TUIVideoQuality videoResolution;
 
-    /// 分辨率模式, 请参考：{@link TUIResolutionMode}。
+    /// 分辨率模式, 请参见：{@link TUIResolutionMode}。
     TUIResolutionMode resolutionMode;
 
-    /// 视频采集帧率
+    /// 视频采集帧率。
     int fps;
 
-    /// 目标视频码率
+    /// 目标视频码率。
     int bitrate;
 
     TUIRoomVideoEncoderParams() : videoResolution(TUIVideoQuality::kVideoQuality_720P), resolutionMode(TUIResolutionMode::kResolutionMode_Landscape), fps(15), bitrate(1500) {
@@ -428,11 +444,17 @@ struct TUIRoomVideoEncoderParams {
  * 5.4 房间内座位信息
  */
 struct TUISeatInfo {
-    /// 麦位序号
+    /// 麦位序号。
     int index;
 
-    /// 用户ID
+    /// 用户ID。
     const char* userId;
+
+    /// 用户昵称
+    const char* userName;
+
+    /// 用户头像URL
+    const char* avatarUrl;
 
     /// 麦位是否被锁定，默认值：{@link false}。
     bool isLocked;
@@ -468,10 +490,10 @@ struct TUISeatLockParams {
  * 5.6 房间内用户音量
  */
 struct TUIUserVoiceVolume {
-    /// 用户ID
+    /// 用户ID。
     const char* userId;
 
-    /// 音量 用于承载所有正在说话的用户的音量大小，取值范围 0 - 100
+    /// 音量 用于承载所有正在说话的用户的音量大小，取值范围 0 - 100。
     int volume;
 
     TUIUserVoiceVolume() : userId(nullptr), volume(0) {
@@ -482,22 +504,28 @@ struct TUIUserVoiceVolume {
  * 5.7 信令请求
  */
 struct TUIRequest {
-    /// 请求ID
+    /// 请求ID。
     const char* requestId;
 
-    /// 请求类型
+    /// 请求类型。
     TUIRequestAction requestAction;
 
-    /// 用户ID
+    /// 用户ID。
     const char* userId;
 
-    /// 信令内容
+    /// 用户昵称。
+    const char* userName;
+
+    /// 用户头像URL。
+    const char* avatarUrl;
+
+    /// 信令内容。
     const char* content;
 
-    /// 时间戳
+    /// 时间戳。
     uint32_t timestamp;
 
-    TUIRequest() : requestId(nullptr), requestAction(TUIRequestAction::kInvalidAction), userId(nullptr), content(nullptr), timestamp(0) {
+    TUIRequest() : requestId(nullptr), requestAction(TUIRequestAction::kInvalidAction), userId(nullptr), userName(nullptr), avatarUrl(nullptr), content(nullptr), timestamp(0) {
     }
 };
 
@@ -512,10 +540,10 @@ struct TUIRequest {
  * TUIUserListResult定义
  */
 struct TUIUserListResult {
-    /// 获取下一批成员列表的序号
+    /// 获取下一批成员列表的序号。
     uint64_t nextSequence;
 
-    /// 成员信息列表
+    /// 成员信息列表。
     TUIList<TUIUserInfo>* userInfoList;
 
     TUIUserListResult() : nextSequence(0), userInfoList(nullptr) {
@@ -549,15 +577,15 @@ class TUICallback : public TUICallbackBase {
     /**
      * 接口调用失败
      *
-     * @param code 错误码
-     * @param message 错误信息
+     * @param code 错误码。
+     * @param message 错误信息。
      */
     virtual void onError(const TUIError code, const char* message) = 0;
 };
 
 /**
- * TUIValueCallback定义
- * 带有返回参数的接口的回调类
+ * TUIValueCallback定义。
+ * 带有返回参数的接口的回调类。
  */
 template <class T>
 class TUIValueCallback : public TUICallbackBase {
@@ -568,15 +596,15 @@ class TUIValueCallback : public TUICallbackBase {
     /**
      * 接口调用成功
      *
-     * @param value 接口回调的值
+     * @param value 接口回调的值。
      */
     virtual void onSuccess(T* value) = 0;
 
     /**
      * 接口调用失败
      *
-     * @param code 错误码
-     * @param message 错误信息
+     * @param code 错误码。
+     * @param message 错误信息。
      */
     virtual void onError(const TUIError code, const char* message) = 0;
 };
@@ -594,15 +622,15 @@ class TUIListCallback : public TUICallbackBase {
     /**
      * 接口调用成功
      *
-     * @param list 接口回调的数据列表
+     * @param list 接口回调的数据列表。
      */
     virtual void onSuccess(TUIList<T>* list) = 0;
 
     /**
      * 接口调用失败
      *
-     * @param code 错误码
-     * @param message 错误信息
+     * @param code 错误码。
+     * @param message 错误信息。
      */
     virtual void onError(const TUIError code, const char* message) = 0;
 };
@@ -619,23 +647,23 @@ class TUIPlayCallback : public TUICallbackBase {
     /**
      * 视频播放成功
      *
-     * @param userId 用户ID
+     * @param userId 用户ID。
      */
     virtual void onPlaying(const char* userId) = 0;
 
     /**
      * 视频正在加载。
      *
-     * @param userId 用户ID
+     * @param userId 用户ID。
      */
     virtual void onLoading(const char* userId) = 0;
 
     /**
      * 接口调用失败
      *
-     * @param userId 用户ID
-     * @param code 错误码
-     * @param message 错误信息
+     * @param userId 用户ID。
+     * @param code 错误码。
+     * @param message 错误信息。
      */
     virtual void onError(const char* userId, const TUIError code, const char* message) = 0;
 };
@@ -652,70 +680,70 @@ class TUIRequestCallback : public TUICallbackBase {
     /**
      * 请求被接受
      *
-     * @param requestId  请求ID
-     * @param userId  用户ID
+     * @param requestId  请求ID。
+     * @param userId  用户ID。
      */
     virtual void onAccepted(const char* requestId, const char* userId) = 0;
 
     /**
      * 请求被拒绝
      *
-     * @param requestId  请求ID
-     * @param userId  用户ID
-     * @param message  错误信息
+     * @param requestId  请求ID。
+     * @param userId  用户ID。
+     * @param message  错误信息。
      */
     virtual void onRejected(const char* requestId, const char* userId, const char* message) = 0;
 
     /**
      * 请求被取消
      *
-     * @param requestId  请求ID
-     * @param userId  用户ID
+     * @param requestId  请求ID。
+     * @param userId  用户ID。
      */
     virtual void onCancelled(const char* requestId, const char* userId) = 0;
 
     /**
      * 请求超时
      *
-     * @param requestId  请求ID
-     * @param userId  用户ID
+     * @param requestId  请求ID。
+     * @param userId  用户ID。
      */
     virtual void onTimeout(const char* requestId, const char* userId) = 0;
 
     /**
      * 请求错误。
      *
-     * @param requestId  请求ID
-     * @param userId  用户ID
-     * @param code 错误码
-     * @param message  错误信息
+     * @param requestId  请求ID。
+     * @param userId  用户ID。
+     * @param code 错误码。
+     * @param message  错误信息。
      */
     virtual void onError(const char* requestId, const char* userId, const TUIError code, const char* message) = 0;
 };
 
-/// 屏幕分享源句柄
+/// 屏幕分享源句柄。
 typedef void* TUISourceId;
 
 /**
  * 屏幕分享采集源信息
  */
 struct TUIShareTarget {
-    /// 采集源的ID，对于窗口，该字段代表窗口的 ID；对于屏幕，该字段代表显示器的 ID
+    /// 采集源的ID，对于窗口，该字段代表窗口的 ID；对于屏幕，该字段代表显示器的 ID。
     TUISourceId id;
 
-    /// 采集源类型
+    /// 采集源类型。
     TUICaptureSourceType sourceType;
 
-    /// 采集源名称
+    /// 采集源名称。
     const char* sourceName;
 
-    /// 缩略图
+    /// 缩略图。
     TUIImageBuffer thumbnailImage;
 
-    /// 图标
+    /// 图标。
     TUIImageBuffer iconImage;
 
-    /// 是否最小化
+    /// 是否最小化。
     bool isMinimized;
 
     TUIShareTarget() : id(nullptr), sourceType(TUICaptureSourceType::kUnknown), sourceName(nullptr), isMinimized(false) {
