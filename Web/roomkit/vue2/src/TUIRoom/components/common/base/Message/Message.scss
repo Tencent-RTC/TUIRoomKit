@@ -1,0 +1,58 @@
+@import './mixins';
+.message {
+  &-enter {
+    &-from {
+      transform: translate3d(0, -75px, 0);
+      opacity: 0;
+    }
+
+    &-active {
+      transition: all 0.3s;
+    }
+
+    &-to {
+      transform: none;
+      opacity: 1;
+    }
+  }
+}
+
+.t-message {
+  border-radius: 8px;
+  padding: 10px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 6%;
+  background: #f5f5f5;
+  color: #999;
+  white-space: nowrap;
+  
+  .t-message-text {
+    vertical-align: middle;
+    font-size: .875rem;
+  }
+
+  .t-message-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-size: cover;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+}
+
+.t-message.t-message-error {
+  @include err_color();
+}
+.t-message.t-message-success {
+  @include success_color();
+}
+.t-message.t-message-warning {
+  @include warning_color();
+}
+.t-message.t-message-info {
+  @include info_color();
+}

@@ -1,0 +1,47 @@
+{
+  "name": "@tencentcloud/roomkit-web-vue3",
+  "version": "2.4.0",
+  "main": "./lib/index.js",
+  "module": "./es/index.mjs",
+  "types": "./es/index.d.ts",
+  "homepage": "https://cloud.tencent.com/document/product/647/81962",
+  "author": "Tencent Cloud Client R&D Center",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tencentyun/TUIRoomKit.git"
+  },
+  "keywords": [
+    "conference",
+    "tuiroomkit",
+    "webrtc",
+    "javascript"
+  ],
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@tencentcloud/chat": "latest",
+    "@tencentcloud/tui-core": "latest",
+    "@tencentcloud/tuiroom-engine-js": "workspace:^2.4.0",
+    "@tencentcloud/universal-api": "^2.0.9",
+    "interactjs": "^1.10.26",
+    "mitt": "^3.0.0",
+    "rtc-detect": "^1.0.3"
+  },
+  "peerDependencies": {
+    "pinia": "^2.1.7",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "sass": "^1.72.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0",
+    "vite-plugin-css-injected-by-js": "^3.5.0",
+    "vite-plugin-dts": "^3.7.3",
+    "vue": "^3.4.21",
+    "vue-tsc": "^2.0.6"
+  }
+}
