@@ -1,20 +1,20 @@
 package com.tencent.liteav.demo.view.activity;
 
-import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomEngineEvent.LOCAL_USER_ENTER_ROOM;
+import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomEngineEvent.LOCAL_USER_ENTER_ROOM;
 
 import android.os.Bundle;
 import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.liteav.demo.R;
 import com.tencent.liteav.demo.view.component.CreateRoomView;
 import com.tencent.qcloud.tuicore.interfaces.TUICallback;
 
 import java.util.Map;
 
-public class CreateRoomActivity extends AppCompatActivity implements RoomEventCenter.RoomEngineEventResponder {
+public class CreateRoomActivity extends AppCompatActivity implements ConferenceEventCenter.RoomEngineEventResponder {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,15 +44,15 @@ public class CreateRoomActivity extends AppCompatActivity implements RoomEventCe
     }
 
     private void registerRoomEnteredEvent() {
-        RoomEventCenter.getInstance().subscribeEngine(LOCAL_USER_ENTER_ROOM, this);
+        ConferenceEventCenter.getInstance().subscribeEngine(LOCAL_USER_ENTER_ROOM, this);
     }
 
     private void unRegisterRoomEnteredEvent() {
-        RoomEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_ENTER_ROOM, this);
+        ConferenceEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_ENTER_ROOM, this);
     }
 
     @Override
-    public void onEngineEvent(RoomEventCenter.RoomEngineEvent event, Map<String, Object> params) {
+    public void onEngineEvent(ConferenceEventCenter.RoomEngineEvent event, Map<String, Object> params) {
         if (LOCAL_USER_ENTER_ROOM == event) {
             finish();
             return;

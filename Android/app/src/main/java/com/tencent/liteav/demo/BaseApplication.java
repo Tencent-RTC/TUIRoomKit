@@ -1,6 +1,6 @@
 package com.tencent.liteav.demo;
 
-import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.START_LOGIN;
+import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomKitUIEvent.START_LOGIN;
 
 import android.app.Activity;
 import android.os.Build;
@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 
-import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
-import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
+import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
+import com.tencent.cloud.tuikit.roomkit.common.utils.UserModelManager;
 import com.tencent.qcloud.tuicore.TUICore;
 
 import java.lang.reflect.Constructor;
@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class BaseApplication extends MultiDexApplication implements RoomEventCenter.RoomKitUIEventResponder {
+public class BaseApplication extends MultiDexApplication implements ConferenceEventCenter.RoomKitUIEventResponder {
     private static String TAG = "BaseApplication";
 
     private List<Activity> mActivityList = new LinkedList<>();
@@ -37,7 +37,7 @@ public class BaseApplication extends MultiDexApplication implements RoomEventCen
             builder.detectFileUriExposure();
         }
         closeAndroidPDialog();
-        RoomEventCenter.getInstance().subscribeUIEvent(START_LOGIN, this);
+        ConferenceEventCenter.getInstance().subscribeUIEvent(START_LOGIN, this);
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
     }
 

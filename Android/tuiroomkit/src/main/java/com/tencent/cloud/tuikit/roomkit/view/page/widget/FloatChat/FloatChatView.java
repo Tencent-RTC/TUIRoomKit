@@ -6,24 +6,19 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.viewmodel.FloatChatViewModel;
 
 public class FloatChatView extends FrameLayout {
     private Context                 mContext;
-    private String                  mRoomId;
     private TUIFloatChatButton      mBarrageButton;
     private TUIFloatChatDisplayView mBarrageDisplay;
     private FrameLayout             mLayoutBarrageButtonContainer;
     private FrameLayout             mLayoutBarrageDisplayContainer;
-    private FloatChatViewModel      mViewModel;
 
-    public FloatChatView(Context context) {
+    public FloatChatView(Context context, String roomId) {
         super(context);
         mContext = context;
-        mViewModel = new FloatChatViewModel(this);
-        mRoomId = mViewModel.getRoomId();
-        mBarrageButton = new TUIFloatChatButton(mContext, mRoomId);
-        mBarrageDisplay = new TUIFloatChatDisplayView(mContext, mRoomId);
+        mBarrageButton = new TUIFloatChatButton(mContext, roomId);
+        mBarrageDisplay = new TUIFloatChatDisplayView(mContext, roomId);
         initView();
     }
 
@@ -36,14 +31,16 @@ public class FloatChatView extends FrameLayout {
         mLayoutBarrageButtonContainer.addView(mBarrageButton);
     }
 
-    public void enableFloatChat(boolean enable) {
+    public void isShow(boolean enable) {
         mBarrageButton.setVisibility(enable ? View.VISIBLE : View.INVISIBLE);
         mBarrageDisplay.setVisibility(enable ? View.VISIBLE : View.INVISIBLE);
     }
 
     public void destroy() {
-        mViewModel.destroy();
         mBarrageDisplay.destroyPresenter();
     }
 
+    public void setViewClickListener(OnClickListener clickListener) {
+        mBarrageDisplay.setViewClickListener(clickListener);
+    }
 }

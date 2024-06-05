@@ -85,7 +85,7 @@
                 <TextView
                     android:id="@+id/tuiroomkit_packet_loss_rate_upload"
                     android:gravity="right"
-                    android:layout_width="42dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:textSize="16sp"
                     android:textColor="#E7ECF6"/>
@@ -97,10 +97,14 @@
                     android:scaleType="centerInside"
                     android:src="@drawable/tuiroomkit_quality_check_panel_up" />
 
+                <Space
+                    android:layout_width="16dp"
+                    android:layout_height="wrap_content" />
+
                 <TextView
                     android:id="@+id/tuiroomkit_packet_loss_rate_download"
                     android:gravity="right"
-                    android:layout_width="42dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:textSize="16sp" android:textColor="#E7ECF6"/>
 
@@ -158,7 +162,7 @@
                 <TextView
                     android:id="@+id/tuiroomkit_audio_bitrate_upload"
                     android:gravity="right"
-                    android:layout_width="70dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:textSize="16sp"
                     android:textColor="#E7ECF6"/>
@@ -170,10 +174,14 @@
                     android:layout_marginLeft="4dp"
                     android:src="@drawable/tuiroomkit_quality_check_panel_up" />
 
+                <Space
+                    android:layout_width="16dp"
+                    android:layout_height="wrap_content" />
+
                 <TextView
                     android:id="@+id/tuiroomkit_audio_bitrate_download"
                     android:gravity="right"
-                    android:layout_width="70dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:textSize="16sp"
                     android:textColor="#E7ECF6"/>
@@ -233,7 +241,7 @@
                 <TextView
                     android:id="@+id/tuiroomkit_video_resolution_upload"
                     android:gravity="right"
-                    android:layout_width="86dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:textSize="16sp"
                     android:textColor="#E7ECF6"/>
@@ -245,10 +253,14 @@
                     android:scaleType="centerInside"
                     android:src="@drawable/tuiroomkit_quality_check_panel_up" />
 
+                <Space
+                    android:layout_width="16dp"
+                    android:layout_height="wrap_content" />
+
                 <TextView
                     android:id="@+id/tuiroomkit_video_resolution_download"
                     android:gravity="right"
-                    android:layout_width="86dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:textSize="16sp"
                     android:textColor="#E7ECF6"/>
@@ -284,8 +296,7 @@
                 <TextView
                     android:id="@+id/tuiroomkit_video_frame_upload"
                     android:gravity="right"
-                    android:layout_marginLeft="179dp"
-                    android:layout_width="62dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:textSize="16sp"
                     android:textColor="#E7ECF6"/>
@@ -297,10 +308,14 @@
                     android:scaleType="centerInside"
                     android:src="@drawable/tuiroomkit_quality_check_panel_up"/>
 
+                <Space
+                    android:layout_width="16dp"
+                    android:layout_height="wrap_content" />
+
                 <TextView
                     android:id="@+id/tuiroomkit_video_frame_download"
                     android:gravity="right"
-                    android:layout_width="62dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:textSize="16sp"
                     android:textColor="#E7ECF6"/>
@@ -335,7 +350,7 @@
                 <TextView
                     android:id="@+id/tuiroomkit_video_bitrate_upload"
                     android:gravity="right"
-                    android:layout_width="86dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:textSize="16sp"
                     android:textColor="#E7ECF6"/>
@@ -347,10 +362,14 @@
                     android:scaleType="centerInside"
                     android:src="@drawable/tuiroomkit_quality_check_panel_up"/>
 
+                <Space
+                    android:layout_width="16dp"
+                    android:layout_height="wrap_content" />
+
                 <TextView
                     android:id="@+id/tuiroomkit_video_bitrate_download"
                     android:gravity="right"
-                    android:layout_width="86dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:textSize="16sp"
                     android:textColor="#E7ECF6" />

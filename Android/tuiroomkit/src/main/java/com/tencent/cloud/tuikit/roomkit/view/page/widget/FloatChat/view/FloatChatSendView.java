@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,16 +97,10 @@ public class FloatChatSendView extends Dialog implements IFloatChatSendView, OnD
 
         mLayoutOutSide.addOnLayoutChangeListener(
                 (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-                    int screenHeight = ScreenUtil.getScreenHeight(mContext);
                     int currentScreenOrientation = getScreenOrientation(mContext);
                     if (mLastScreenOrientation != currentScreenOrientation) {
                         mLastScreenOrientation = currentScreenOrientation;
-                        return;
-                    }
-
-                    int defaultHeight = screenHeight / 3;
-                    if (oldBottom != 0 && bottom != 0 && (bottom - oldBottom > defaultHeight)) {
-                        dismiss();
+                        changeScreenOrientation(mLastScreenOrientation);
                     }
                 });
 
@@ -130,12 +125,25 @@ public class FloatChatSendView extends Dialog implements IFloatChatSendView, OnD
                     mBottomPlaceholder.getChildAt(0).setVisibility(View.VISIBLE);
                     mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
                 }
+                if (isLandscape()) {
+                    DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
+                    layoutParams.height = metrics.heightPixels * 2 / 3;
+                    mBottomPlaceholder.getChildAt(0).setVisibility(View.VISIBLE);
+                    mBottomPlaceholder.setLayoutParams(layoutParams);
+                    mBottomPlaceholder.setVisibility(View.VISIBLE);
+                }
             } else {
                 mEmojiSwitchImage.setTag(R.drawable.tuiroomkit_float_chat_ic_emoticons);
                 mEmojiSwitchImage.setBackgroundResource(R.drawable.tuiroomkit_float_chat_ic_emoticons);
                 if (layoutParams.height > 0) {
                     mBottomPlaceholder.getChildAt(0).setVisibility(View.GONE);
                     mInputMethodManager.showSoftInput(mEditText, InputMethodManager.SHOW_FORCED);
+                }
+                if (isLandscape()) {
+                    layoutParams.height = 0;
+                    mBottomPlaceholder.getChildAt(0).setVisibility(View.GONE);
+                    mBottomPlaceholder.setLayoutParams(layoutParams);
+                    mBottomPlaceholder.setVisibility(View.GONE);
                 }
             }
         });
@@ -218,7 +226,17 @@ public class FloatChatSendView extends Dialog implements IFloatChatSendView, OnD
 
     @Override
     public void onAttachedToWindow() {
+        addOnGlobalLayoutListener();
         super.onAttachedToWindow();
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        removeOnGlobalLayoutListener();
+        super.onDetachedFromWindow();
+    }
+
+    private void addOnGlobalLayoutListener() {
         Window window = getWindow();
         if (window != null) {
             final View decorView = window.getDecorView();
@@ -229,8 +247,7 @@ public class FloatChatSendView extends Dialog implements IFloatChatSendView, OnD
         }
     }
 
-    @Override
-    public void onDetachedFromWindow() {
+    private void removeOnGlobalLayoutListener() {
         Window window = getWindow();
         if (window != null) {
             final View decorView = window.getDecorView();
@@ -239,7 +256,25 @@ public class FloatChatSendView extends Dialog implements IFloatChatSendView, OnD
                 decorView.getViewTreeObserver().removeOnGlobalLayoutListener(mOnGlobalLayoutListener);
             }
         }
-        super.onDetachedFromWindow();
+    }
+
+    private void changeScreenOrientation(int orientation) {
+        mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+        mEmojiSwitchImage.setTag(R.drawable.tuiroomkit_float_chat_ic_emoticons);
+        mEmojiSwitchImage.setBackgroundResource(R.drawable.tuiroomkit_float_chat_ic_emoticons);
+        mBottomPlaceholder.getChildAt(0).setVisibility(View.GONE);
+        ViewGroup.LayoutParams layoutParams = mBottomPlaceholder.getLayoutParams();
+        layoutParams.height = 0;
+        mBottomPlaceholder.setLayoutParams(layoutParams);
+        mBottomPlaceholder.setVisibility(View.GONE);
+    }
+
+    private int getScreenOrientation() {
+        return getContext().getResources().getConfiguration().orientation;
+    }
+
+    private boolean isLandscape() {
+        return Configuration.ORIENTATION_LANDSCAPE == getScreenOrientation();
     }
 
     @Override

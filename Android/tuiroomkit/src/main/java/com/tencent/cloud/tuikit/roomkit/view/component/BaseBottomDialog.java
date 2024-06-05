@@ -1,7 +1,7 @@
 package com.tencent.cloud.tuikit.roomkit.view.component;
 
 
-import static com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter.RoomKitUIEvent.DISMISS_MAIN_ACTIVITY;
+import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomKitUIEvent.DISMISS_MAIN_ACTIVITY;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,12 +19,12 @@ import androidx.annotation.NonNull;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.qcloud.tuicore.util.ScreenUtil;
 
 import java.util.Map;
 
-public abstract class BaseBottomDialog extends BottomSheetDialog implements RoomEventCenter.RoomKitUIEventResponder {
+public abstract class BaseBottomDialog extends BottomSheetDialog implements ConferenceEventCenter.RoomKitUIEventResponder {
     private static final String TAG = "BaseBottomDialog";
 
     private View                      bottomSheetView;
@@ -35,13 +35,13 @@ public abstract class BaseBottomDialog extends BottomSheetDialog implements Room
     public BaseBottomDialog(@NonNull Context context) {
         super(context);
         mContext = context;
-        RoomEventCenter.getInstance().subscribeUIEvent(DISMISS_MAIN_ACTIVITY, this);
+        ConferenceEventCenter.getInstance().subscribeUIEvent(DISMISS_MAIN_ACTIVITY, this);
     }
 
     @Override
     public void dismiss() {
         super.dismiss();
-        RoomEventCenter.getInstance().unsubscribeUIEvent(DISMISS_MAIN_ACTIVITY, this);
+        ConferenceEventCenter.getInstance().unsubscribeUIEvent(DISMISS_MAIN_ACTIVITY, this);
     }
 
     @Override

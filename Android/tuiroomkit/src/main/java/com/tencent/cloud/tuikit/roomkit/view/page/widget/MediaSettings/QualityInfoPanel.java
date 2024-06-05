@@ -9,15 +9,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.model.RoomEventCenter;
-import com.tencent.cloud.tuikit.roomkit.model.RoomEventConstant;
+import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseBottomDialog;
 import com.tencent.trtc.TRTCStatistics;
 
 import java.util.Map;
 
-public class QualityInfoPanel extends BaseBottomDialog implements RoomEventCenter.RoomKitUIEventResponder,
-        RoomEventCenter.RoomEngineEventResponder {
+public class QualityInfoPanel extends BaseBottomDialog implements ConferenceEventCenter.RoomKitUIEventResponder,
+        ConferenceEventCenter.RoomEngineEventResponder {
     private static final String NETWORK_DELAY_UNITS    = "ms";
     private static final String PACKET_LOOS_RATE_UNITS = "%";
     private static final String BITRATE_UNITS         = "kbps";
@@ -60,17 +60,15 @@ public class QualityInfoPanel extends BaseBottomDialog implements RoomEventCente
         int videoResolutionWidthDownload = 0;
         int videoResolutionHeightDownload = 0;
         for (TRTCStatistics.TRTCRemoteStatistics remote : statistics.remoteArray) {
-            if (remote.streamType == TRTC_VIDEO_STREAM_TYPE_BIG) {
-                if (remote.frameRate > videoFrameDownload) {
-                    videoFrameDownload = remote.frameRate;
-                }
-                if ((remote.width * remote.height) > (videoResolutionWidthDownload * videoResolutionHeightDownload)) {
-                    videoResolutionWidthDownload = remote.width;
-                    videoResolutionHeightDownload = remote.height;
-                }
-                audioBitrateDownload += remote.audioBitrate;
-                videoBitrateDownload += remote.videoBitrate;
+            if (remote.frameRate > videoFrameDownload) {
+                videoFrameDownload = remote.frameRate;
             }
+            if ((remote.width * remote.height) > (videoResolutionWidthDownload * videoResolutionHeightDownload)) {
+                videoResolutionWidthDownload = remote.width;
+                videoResolutionHeightDownload = remote.height;
+            }
+            audioBitrateDownload += remote.audioBitrate;
+            videoBitrateDownload += remote.videoBitrate;
         }
         mTextVideoFrameDownload.setText(String.valueOf(videoFrameDownload) + VIDEO_FRAME_UNITS);
         mTextVideoResolutionDownload.setText(String.valueOf(videoResolutionWidthDownload)
@@ -82,30 +80,30 @@ public class QualityInfoPanel extends BaseBottomDialog implements RoomEventCente
 
     public QualityInfoPanel(@NonNull Context context) {
         super(context);
-        RoomEventCenter.getInstance().subscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
-        RoomEventCenter.getInstance().subscribeEngine(RoomEventCenter.RoomEngineEvent.ON_STATISTICS, this);
+        ConferenceEventCenter.getInstance().subscribeUIEvent(ConferenceEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
+        ConferenceEventCenter.getInstance().subscribeEngine(ConferenceEventCenter.RoomEngineEvent.ON_STATISTICS, this);
     }
 
     @Override
     public void dismiss() {
         super.dismiss();
-        RoomEventCenter.getInstance().unsubscribeUIEvent(RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
-        RoomEventCenter.getInstance().unsubscribeEngine(RoomEventCenter.RoomEngineEvent.ON_STATISTICS, this);
+        ConferenceEventCenter.getInstance().unsubscribeUIEvent(ConferenceEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE, this);
+        ConferenceEventCenter.getInstance().unsubscribeEngine(ConferenceEventCenter.RoomEngineEvent.ON_STATISTICS, this);
     }
 
 
     @Override
     public void onNotifyUIEvent(String key, Map<String, Object> params) {
-        if (RoomEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE.equals(key) && params != null) {
-            Configuration configuration = (Configuration) params.get(RoomEventConstant.KEY_CONFIGURATION);
+        if (ConferenceEventCenter.RoomKitUIEvent.CONFIGURATION_CHANGE.equals(key) && params != null) {
+            Configuration configuration = (Configuration) params.get(ConferenceEventConstant.KEY_CONFIGURATION);
             changeConfiguration(configuration);
         }
     }
 
     @Override
-    public void onEngineEvent(RoomEventCenter.RoomEngineEvent event, Map<String, Object> params) {
-        if (RoomEventCenter.RoomEngineEvent.ON_STATISTICS.equals(event) && params != null) {
-            TRTCStatistics statistics = (TRTCStatistics) params.get(RoomEventConstant.KEY_ON_STATISTICS);
+    public void onEngineEvent(ConferenceEventCenter.RoomEngineEvent event, Map<String, Object> params) {
+        if (ConferenceEventCenter.RoomEngineEvent.ON_STATISTICS.equals(event) && params != null) {
+            TRTCStatistics statistics = (TRTCStatistics) params.get(ConferenceEventConstant.KEY_ON_STATISTICS);
             if (statistics != null) {
                 setQualityInfo(statistics);
             }

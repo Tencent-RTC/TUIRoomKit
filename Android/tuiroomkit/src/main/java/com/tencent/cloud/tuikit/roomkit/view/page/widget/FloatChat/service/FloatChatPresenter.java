@@ -12,14 +12,11 @@ public class FloatChatPresenter implements IFloatChatPresenter, IFloatChatMessag
     protected final Context               mContext;
     private         IFloatChatDisplayView mDisplayView;
     private final   IFloatChatMessage     mFloatChatService;
-    private final   RoomEngineService     mRoomEngineService;
 
     public FloatChatPresenter(Context context, IFloatChatMessage service) {
         mContext = context;
         mFloatChatService = service;
         mFloatChatService.setDelegate(this);
-        mRoomEngineService = new RoomEngineService(context);
-        mRoomEngineService.setDelegate(this);
     }
 
     @Override
@@ -31,7 +28,6 @@ public class FloatChatPresenter implements IFloatChatPresenter, IFloatChatMessag
     public void destroyPresenter() {
         mDisplayView = null;
         mFloatChatService.setDelegate(null);
-        mRoomEngineService.setDelegate(null);
     }
 
     @Override
