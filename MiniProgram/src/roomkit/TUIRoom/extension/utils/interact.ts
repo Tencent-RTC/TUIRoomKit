@@ -18,6 +18,7 @@ export const setDragAndResize = (domSelect: string) => {
         let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
         let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
+        // 限制拖拽边界不超过屏幕
         x = Math.min(screenWidth - target.offsetWidth + minWidth - 100, Math.max(-minWidth + 100, x));
         y = Math.min(screenHeight - target.offsetHeight + minHeight - 100, Math.max(-minHeight + 100, y));
 
@@ -35,6 +36,7 @@ export const setDragAndResize = (domSelect: string) => {
           x = (parseFloat(x) || 0) + event.deltaRect.left;
           y = (parseFloat(y) || 0) + event.deltaRect.top;
 
+          // 限制缩放最小值
           const width = Math.max(minWidth, event.rect.width);
           const height = Math.max(minHeight, event.rect.height);
 

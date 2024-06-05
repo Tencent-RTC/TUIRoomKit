@@ -78,6 +78,7 @@ export default function useIndex() {
           ? t('After unlocking, users can freely turn on the microphone')
           : t('Members will not be able to open the microphone');
         stateForAllAudio =  !roomStore.isMicrophoneDisableForAllUser;
+        // 小程序更新视图
         await nextTick();
         dialogActionInfo.value = audioManageInfo.value;
         break;
@@ -88,6 +89,7 @@ export default function useIndex() {
           ? t('After unlocking, users can freely turn on the camera')
           : t('Members will not be able to open the camera');
         stateForAllVideo = !roomStore.isCameraDisableForAllUser;
+        // 小程序更新视图
         await nextTick();
         dialogActionInfo.value = videoManageInfo.value;
         break;
@@ -153,11 +155,12 @@ export default function useIndex() {
   }
 
   const applyToAnchorUserContent = computed(() => {
-    const userName = applyToAnchorList.value[0]?.userName || applyToAnchorList.value[0]?.userId;
+    const lastIndex = applyToAnchorList.value.length - 1;
+    const userName = applyToAnchorList.value[lastIndex]?.userName || applyToAnchorList.value[lastIndex]?.userId;
     if (applyToAnchorList.value.length === 1) {
       return `${userName} ${t('Applying for the stage')}`;
     }
-    return  `${userName} ${t('and so on number people applying to stage', { number: applyToAnchorList.value.length })}`;
+    return `${userName} ${t('and so on number people applying to stage', { number: applyToAnchorList.value.length })}`;
   });
 
   return {

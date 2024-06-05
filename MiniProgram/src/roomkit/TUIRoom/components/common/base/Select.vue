@@ -118,6 +118,7 @@ function handleClickSelect() {
   }
 }
 
+// 根据页面位置确定下拉框的定位
 function handleDropDownPosition() {
   const { top, bottom } = selectContainerRef.value?.getBoundingClientRect();
   const container = roomService.getRoomContainer();

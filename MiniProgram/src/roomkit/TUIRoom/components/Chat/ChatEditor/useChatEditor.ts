@@ -69,6 +69,8 @@ export default function useChatEditor() {
     } catch (e) {
     /**
      * Message delivery failure
+     *
+     * 消息发送失败
     **/
       TUIMessage({ type: 'error', message: t('Failed to send the message') });
     }

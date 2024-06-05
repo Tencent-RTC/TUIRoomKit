@@ -14,7 +14,7 @@ export default function useRoomInfo() {
   const basicStore = useBasicStore();
   const roomStore = useRoomStore();
   const { roomId, isRoomLinkVisible } = storeToRefs(basicStore);
-  const { masterUserId } = storeToRefs(roomStore);
+  const { masterUserId, roomName } = storeToRefs(roomStore);
   const { t } = useI18n();
   const isShowRoomInfo = ref(false);
   const roomType = computed(() => (roomStore.isFreeSpeakMode ? t('Free Speech Room') : t('On-stage Speaking Room')));
@@ -25,7 +25,7 @@ export default function useRoomInfo() {
 
   const isShowRoomInfoTitle = computed(() => masterUserName.value);
 
-  const conferenceTitle = computed(() => `${masterUserName.value}${t('Quick Meeting')}`);
+  const conferenceTitle = computed(() => `${roomName.value}`);
 
   const roomInfoTabList = computed(() => [
     { id: 1, title: 'Host', content: masterUserName.value, copyLink: '', isShowCopyIcon: false, visible: true },

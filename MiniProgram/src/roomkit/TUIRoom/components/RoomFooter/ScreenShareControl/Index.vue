@@ -85,6 +85,7 @@ const isSharing: Ref<boolean> = ref(false);
 const dialogVisible: Ref<boolean> = ref(false);
 const isShowFraudDialog: Ref<boolean> = ref(false);
 
+// 麦下用户不能进行屏幕分享
 const screenShareDisabled = computed(() => isAudience.value);
 const title = computed(() => (isSharing.value ? t('End sharing') : t('Share screen')));
 
@@ -138,18 +139,23 @@ async function startScreenShare() {
   } catch (error: any) {
     logger.error(`${logPrefix}startScreenShare error:`, error.name, error.message, error.code);
     let message = '';
+    // 当屏幕分享流初始化失败时, 提醒用户并停止后续进房发布流程
     switch (error.name) {
       case 'NotReadableError':
+        // 提醒用户确保系统允许当前浏览器获取屏幕内容
         message = '系统禁止当前浏览器获取屏幕内容';
         break;
       case 'NotAllowedError':
         if (error.message.includes('Permission denied by system')) {
+          // 提醒用户确保系统允许当前浏览器获取屏幕内容
           message = '系统禁止当前浏览器获取屏幕内容';
         } else {
+          // 用户拒绝/取消屏幕分享
           message = '用户拒绝/取消屏幕分享';
         }
         break;
       default:
+        // 初始化屏幕分享流时遇到了未知错误，提醒用户重试
         message = '屏幕分享遇到未知错误';
         break;
     }
@@ -173,6 +179,7 @@ async function stopScreenShare() {
   }
 }
 
+/** 用户点击浏览器自带的 "停止共享" 按钮*/
 function screenCaptureStopped() {
   isSharing.value = false;
 }

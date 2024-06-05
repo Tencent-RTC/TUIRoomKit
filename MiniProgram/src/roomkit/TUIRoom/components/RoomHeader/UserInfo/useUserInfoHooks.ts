@@ -21,6 +21,7 @@ export default function useUserInfo() {
   /**
      * Whether to display the user information operation box
      *
+     * 是否显示用户信息操作框
     **/
   function handleUserControl() {
     showUserControl.value = !showUserControl.value;
@@ -29,6 +30,7 @@ export default function useUserInfo() {
   /**
      * Hide the user information action box
      *
+     * 隐藏用户信息操作框
     **/
   function hideUserControl(event: Event) {
     if (!userInfoRef.value.contains(event.target)) {
@@ -39,6 +41,7 @@ export default function useUserInfo() {
   /**
      * Show change name dialog
      *
+     * 展示修改名字 dialog
     **/
   function showEditUserNameDialog() {
     showUserNameEdit.value = true;
@@ -48,6 +51,7 @@ export default function useUserInfo() {
   /**
      * Close the modify name dialog
      *
+     * 关闭修改名字的 dialog
     **/
   function closeEditUserNameDialog() {
     showUserNameEdit.value = false;
@@ -56,6 +60,7 @@ export default function useUserInfo() {
   /**
      * Save the new userName
      *
+     * 保存新的 userName
     **/
   async function handleSaveUserName(userName: string) {
     if (userName.length === 0) {

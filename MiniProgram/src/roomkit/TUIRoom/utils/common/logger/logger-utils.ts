@@ -4,7 +4,7 @@ export const LogLevelType = {
   LOG_LEVEL_INFO: 1,
   LOG_LEVEL_WARN: 2,
   LOG_LEVEL_ERROR: 3,
-  LOG_LEVEL_NON_LOGGING: 4,
+  LOG_LEVEL_NON_LOGGING: 4, // 无日志记录级别，将不打印任何日志
 };
 
 export enum LogContext {

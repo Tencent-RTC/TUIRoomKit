@@ -2,6 +2,19 @@ const { requestAnimationFrame, cancelAnimationFrame } =  window;
 const canvasWidth = 1280;
 const canvasHeight = 720;
 
+/*
+@des 将video内容绘制到canvas上面
+@example
+const video = document?.getElementById('video');
+const canvas = new ToCanvas(video);
+// 获取 canvas element 元素
+const canvasElement = canvas.element;
+// 在用户交互事件的回调中执行play方法
+canvas.play();
+window?.setTimeout(() => {
+  canvas.stop();
+}, 2000);
+*/
 type CanvasImageSource = HTMLImageElement | HTMLVideoElement | HTMLCanvasElement;
 
 export default class ToCanvas {
@@ -47,13 +60,17 @@ export default class ToCanvas {
   }
 }
 
+// 控制requestAnimationFrame的频率
 function setAnimationFrame(render: Function, stepTime = 24) {
+  // 记录每次动画执行结束的时间
   let lastTime = Date.now();
+  // 计时器ID
   let currentTime;
   const timer = {
     id: -1,
   };
   function animeLoop() {
+    // 记录当前时间
     currentTime = Date.now();
     if (currentTime - lastTime > stepTime) {
       lastTime = currentTime;
@@ -66,6 +83,7 @@ function setAnimationFrame(render: Function, stepTime = 24) {
 }
 
 
+// 清除AnimationFrame
 function clearAnimationFrame(timer: any) {
   cancelAnimationFrame(timer.id);
 }

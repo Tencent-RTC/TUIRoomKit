@@ -100,6 +100,7 @@ const {
       justify-content: center;
       align-items: center;
       padding: 5px 0;
+      background-color: var(--background-color-1);
     }
     .emoji-icon{
       width: 20px;

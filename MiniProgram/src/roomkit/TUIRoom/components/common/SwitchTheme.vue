@@ -3,6 +3,9 @@
   * Usage:
   * Use <switch-theme /> in template
   *
+  * 名称: Switchtheme
+  * 使用方式：
+  * 在 template 中使用 <switch-theme />
 -->
 <template>
   <icon-button

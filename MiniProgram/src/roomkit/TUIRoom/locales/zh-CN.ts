@@ -59,7 +59,7 @@ export default {
   'Join Room': '进入房间',
   'Enter room ID': '输入房间号',
   'video conferencing': ' 的视频会议',
-  'Quick Meeting': '的快速会议',
+  'Quick Conference': '的快速会议',
   'Room ID': '房间号',
   'Low Definition': '流畅',
   'Standard Definition': '标清',
@@ -92,9 +92,9 @@ export default {
   'Full screen': '全屏',
   Members: '成员',
   'Search Member': '搜索成员',
-  'Transfer owner': '转交房主',
+  'Make host': '转交房主',
   'Set as administrator': '设为管理员',
-  'Revoke administrator': '撤销管理员',
+  'Remove administrator': '撤销管理员',
   // @ts-ignore
   'The administrator status of sb has been withdrawn': ({ named }) => `已将 ${named('name')} 的管理员身份撤回`,
   // @ts-ignore
@@ -243,9 +243,9 @@ export default {
   'kicked out of the room by other device': '相同账号在其他客户端进入房间',
   'kicked out of the room by serve': '被服务端踢出房间',
   // @ts-ignore
-  'Reject sb stage failed, please retry': ({ named }) => `拒绝 ${named('name')} 上台失败, 请重试`,
+  'Reject sb on stage failed, please retry': ({ named }) => `拒绝 ${named('name')} 上台失败, 请重试`,
   // @ts-ignore
-  'Agree sb stage failed, please retry': ({ named }) => `同意 ${named('name')} 上台失败, 请重试`,
+  'Agree sb on stage failed, please retry': ({ named }) => `同意 ${named('name')} 上台失败, 请重试`,
   'Has been fully muted and cannot open the microphone': '已被全员静音，无法打开麦克风',
   'Has been muted by the host and cannot open the microphone': '已被主持人静音，无法打开麦克风',
   'To apply to speak in the room, please raise your hand first to apply for the microphone': '申请发言房间，请先举手申请上麦',
@@ -273,7 +273,7 @@ export default {
   'An invitation to open the microphone has been sent to sb.': ({ named }) => `已向 ${named('name')} 发出开启麦克风邀请`,
   // @ts-ignore
   'An invitation to open the camera has been sent to sb.': ({ named }) => `已向 ${named('name')} 发出开启摄像头邀请`,
-  'Transfer owner failed, please try again.': '转交房主失败，请重试',
+  'Make host failed, please try again.': '转交房主失败，请重试',
   // @ts-ignore
   'Sb has been set as an administrator': ({ named }) => `已将 ${named('name')} 设为管理员`,
   'Succeed on stage': '上台成功',
@@ -294,8 +294,7 @@ export default {
   'You are now an administrator': '您已成为管理员',
   'The RoomOwner has withdrawn your administrator privileges': '房主已收回您的管理员权限',
   'This member has already received the same request, please try again later': '该成员已收到相同请求，请稍后再试',
-  'Failed to go on stage, invitation has timed out': '上台失败，邀请已超时',
-  'The current number of people on stage has reached the limit': '当前上台人数已达上限',
+  'The request to go on stage has timed out': '上台请求已超时',
   // @ts-ignore
   'The invitation to sb to go on stage has timed out': ({ named }) => `对${named('name')}的上台邀请已超时`,
   'Currently no member has applied to go on stage': '暂无成员申请上台',
@@ -303,6 +302,8 @@ export default {
   'Stage management': '上台管理',
   'Already on stage': '已上台',
   'Not on stage': '未上台',
+  'The stage is full, please contact the host': '台上人数已满，请联系主持人',
+  'The stage is full': '台上人数已满',
   'To go on stage again, you need to reapply and wait for the roomOwner/administrator to approve': '再次上台需重新发起申请，并等待房主/管理员通过',
   'To go on stage again, a new application needs to be initiated': '再次上台需重新发起申请',
   'The request to go on stage has been sent out, please wait for the roomOwner/administrator to approve it': '上台申请已发出，请等待房主/管理员通过',
@@ -313,7 +314,7 @@ export default {
   // @ts-ignore
   'and so on number people applying to stage': ({ named }) => `等 ${named('number')} 人正在申请上台`,
   // Room Chat 融合卡片翻译
-  'quick meeting': '快速会议',
+  'quick conference': '快速会议',
   Meeting: '会议',
   'Meeting in progress': '会议 进行中',
   Initiating: '正在发起',

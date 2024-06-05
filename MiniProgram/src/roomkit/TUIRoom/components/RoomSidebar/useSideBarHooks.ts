@@ -48,6 +48,7 @@ export default function useSideBar() {
     done();
   }
 
+  /** 监听消息接收，放在这里是为了打开 chat 之前只记录消息未读数 */
   const onReceiveMessage = (options: { data: any }) => {
     if (!options || !options.data) {
       return;

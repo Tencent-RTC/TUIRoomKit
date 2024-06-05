@@ -20,6 +20,7 @@ interface Props {
   strokePosition: string;
   // 'up' | 'down' | 'left' | 'right'
   arrowDirection: string;
+  // 是否展示线条
   hasStroke: boolean,
 }
 

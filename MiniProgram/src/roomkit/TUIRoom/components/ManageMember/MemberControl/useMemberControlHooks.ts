@@ -40,10 +40,18 @@ export default function useMemberControl(props?: any) {
   });
   const kickOffDialogContent = computed(() => t('whether to kick sb off the room', { name: props.userInfo.userName || props.userInfo.userId }));
   const transferOwnerTitle = computed(() => t('Transfer the roomOwner to sb', { name: props.userInfo.userName || props.userInfo.userId }));
-  const { isFreeSpeakMode, isSpeakAfterTakingSeatMode, localUser, isGeneralUser } = storeToRefs(roomStore);
+  const {
+    isFreeSpeakMode,
+    isSpeakAfterTakingSeatMode,
+    localUser,
+    isGeneralUser,
+    anchorUserList,
+    maxSeatCount,
+  } = storeToRefs(roomStore);
   /**
    * Functions related to the Raise Your Hand function
    *
+   * 举手发言功能相关函数
   **/
   const {
     agreeUserOnStage,
@@ -118,14 +126,14 @@ export default function useMemberControl(props?: any) {
   const transferOwner = computed(() => ({
     key: 'transferOwner',
     icon: TransferOwnerIcon,
-    title: t('Transfer owner'),
+    title: t('Make host'),
     func: () => handleOpenDialog('transferOwner'),
   }));
 
   const setOrRevokeAdmin = computed(() => ({
     key: 'setOrRevokeAdmin',
     icon: props.userInfo.userRole === TUIRole.kAdministrator ?  RevokeAdminIcon : SetAdminIcon,
-    title: props.userInfo.userRole === TUIRole.kAdministrator ? t('Revoke administrator') : t('Set as administrator'),
+    title: props.userInfo.userRole === TUIRole.kAdministrator ? t('Remove administrator') : t('Set as administrator'),
     func: handleSetOrRevokeAdmin,
   }));
 
@@ -155,12 +163,21 @@ export default function useMemberControl(props?: any) {
   /**
    * Invitation to the stage/uninvitation to the stage
    *
+   * 邀请上台/取消邀请上台
   **/
   async function toggleInviteUserOnStage(userInfo: UserInfo) {
     const { isInvitingUserToAnchor } = userInfo;
     if (isInvitingUserToAnchor) {
       cancelInviteUserOnStage(userInfo);
     } else {
+      if (anchorUserList.value.length === maxSeatCount.value) {
+        TUIMessage({
+          type: 'warning',
+          message: `${t('The stage is full')}`,
+          duration: MESSAGE_DURATION.NORMAL,
+        });
+        return;
+      }
       inviteUserOnStage(userInfo);
     }
   }
@@ -168,6 +185,7 @@ export default function useMemberControl(props?: any) {
   /**
    * Banning/Unbanning
    *
+   * 禁麦/邀请打开麦克风
   **/
   async function muteUserAudio(userInfo: UserInfo) {
     if (userInfo.hasAudioStream) {
@@ -218,6 +236,7 @@ export default function useMemberControl(props?: any) {
   /**
    * Banned painting/unbanned painting
    *
+   * 禁画/取消禁画
   **/
   async function muteUserVideo(userInfo: UserInfo) {
     if (userInfo.hasVideoStream) {
@@ -267,6 +286,7 @@ export default function useMemberControl(props?: any) {
   /**
    * Allow text chat / Cancel text chat
    *
+   * 允许文字聊天/取消文字聊天
   **/
   function disableUserChat(userInfo: UserInfo) {
     const currentState = userInfo.isChatMutedByMasterOrAdmin;
@@ -280,6 +300,7 @@ export default function useMemberControl(props?: any) {
   /**
    * Kick the user out of the room
    *
+   * 将用户踢出房间
   **/
   async function kickOffUser(userInfo: UserInfo) {
     await roomEngine.instance?.kickRemoteUserOutOfRoom({
@@ -287,6 +308,9 @@ export default function useMemberControl(props?: any) {
     });
   }
 
+  /**
+   * 转移房主给用户
+   */
   async function handleTransferOwner(userInfo: UserInfo) {
     const roomInfo = await roomEngine.instance?.fetchRoomInfo();
     if (roomInfo?.roomOwner === roomStore.localUser.userId) {
@@ -304,13 +328,16 @@ export default function useMemberControl(props?: any) {
       } catch (error) {
         TUIMessage({
           type: 'error',
-          message: t('Transfer owner failed, please try again.'),
+          message: t('Make host failed, please try again.'),
           duration: MESSAGE_DURATION.NORMAL,
         });
       }
     }
   }
 
+  /**
+   * 设置/撤销管理员权限
+   */
   async function handleSetOrRevokeAdmin(userInfo: UserInfo) {
     const newRole = userInfo.userRole === TUIRole.kGeneralUser ? TUIRole.kAdministrator : TUIRole.kGeneralUser;
     await roomEngine.instance?.changeUserRole({

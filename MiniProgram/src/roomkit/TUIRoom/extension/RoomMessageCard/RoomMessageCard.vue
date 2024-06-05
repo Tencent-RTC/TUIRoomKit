@@ -12,7 +12,7 @@
         </div>
         <div class="content-desc">
           <div class="title">
-            {{ `${roomCardData.ownerName || roomCardData.owner}${t('Quick Meeting')}` }}
+            {{ `${roomCardData.ownerName || roomCardData.owner}${t('Quick Conference')}` }}
           </div>
           <ul class="users">
             <template
