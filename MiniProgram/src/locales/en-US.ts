@@ -62,7 +62,7 @@ export default {
   'Join Room': 'Join Room',
   'Enter room ID': 'Enter room ID',
   'video conferencing': ' \'s video conferencing',
-  'Quick Meeting': ' \'s Quick Meeting',
+  'Quick Conference': ' \'s Quick Conference',
   'Room ID': 'Room ID',
   'Low Definition': 'Low Definition',
   'Standard Definition': 'Standard Definition',
@@ -95,9 +95,9 @@ export default {
   'Full screen': 'Full screen',
   Members: 'Members',
   'Search Member': 'Search Member',
-  'Transfer owner': 'Transfer owner',
+  'Make host': 'Make host',
   'Set as administrator': 'Set as administrator',
-  'Revoke administrator': 'Revoke administrator',
+  'Remove administrator': 'Remove administrator',
   // @ts-ignore
   'The administrator status of sb has been withdrawn': ({ named }) => `The administrator status of ${named('name')} has been withdrawn`,
   // @ts-ignore
@@ -243,9 +243,9 @@ export default {
   'kicked out of the room by other device': 'kicked out of the room by other device',
   'kicked out of the room by serve': 'kicked out of the room by serve',
   // @ts-ignore
-  'Reject sb stage failed, please retry': ({ named }) => `Reject ${named('name')} on Stage failed, please retry`,
+  'Reject sb on stage failed, please retry': ({ named }) => `Reject ${named('name')} on Stage failed, please retry`,
   // @ts-ignore
-  'Agree sb stage failed, please retry': ({ named }) => `Agree ${named('name')} on Stage failed, please retry`,
+  'Agree sb on stage failed, please retry': ({ named }) => `Agree ${named('name')} on Stage failed, please retry`,
   'Has been fully muted and cannot open the microphone': 'Has been fully muted and cannot open the microphone',
   'Has been muted by the host and cannot open the microphone': 'Has been muted by the host and cannot open the microphone',
   'To apply to speak in the room, please raise your hand first to apply for the microphone': 'To apply to speak in the room, please raise your hand first to apply for the microphone',
@@ -273,7 +273,7 @@ export default {
   'An invitation to open the microphone has been sent to sb.': ({ named }) => `An invitation to open the microphone has been sent to ${named('name')}`,
   // @ts-ignore
   'An invitation to open the camera has been sent to sb.': ({ named }) => `An invitation to open the camera has been sent to ${named('name')}`,
-  'Transfer owner failed, please try again.': 'Transfer owner failed, please try again.',
+  'Make host failed, please try again.': 'Make host failed, please try again.',
   // @ts-ignore
   'Sb has been set as an administrator': ({ named }) => `${named('name')} has been set as an administrator.`,
   'Succeed on stage': 'Succeed on stage',
@@ -294,8 +294,7 @@ export default {
   'You are now an administrator': 'You are now an administrator',
   'The RoomOwner has withdrawn your administrator privileges': 'The RoomOwner has withdrawn your administrator privileges',
   'This member has already received the same request, please try again later': 'This member has already received the same request, please try again later',
-  'Failed to go on stage, invitation has timed out': 'Failed to go on stage, invitation has timed out',
-  'The current number of people on stage has reached the limit': 'The current number of people on stage has reached the limit',
+  'The request to go on stage has timed out': 'The request to go on stage has timed out',
   // @ts-ignore
   'The invitation to sb to go on stage has timed out': ({ named }) => `The invitation to ${named('name')} to go on stage has timed out`,
   'Currently no member has applied to go on stage': 'Currently no member has applied to go on stage',
@@ -303,6 +302,8 @@ export default {
   'Stage management': 'Stage management',
   'Already on stage': 'Already on stage',
   'Not on stage': 'Not on stage',
+  'The stage is full, please contact the host': 'The stage is full, please contact the host',
+  'The stage is full': 'The stage is full',
   'To go on stage again, you need to reapply and wait for the roomOwner/administrator to approve': 'To go on stage again, you need to reapply and wait for the roomOwner/administrator to approve',
   'To go on stage again, a new application needs to be initiated': 'To go on stage again, a new application needs to be initiated',
   'The request to go on stage has been sent out, please wait for the roomOwner/administrator to approve it': 'The request to go on stage has been sent out, please wait for the roomOwner/administrator to approve it',
@@ -312,7 +313,8 @@ export default {
   'people applying to stage': 'people applying to stage',
   // @ts-ignore
   'and so on number people applying to stage': ({ named }) => `and so on ${named('number')} people applying to stage`,
-  'quick meeting': 'quick meeting',
+  // Room Chat 融合卡片翻译
+  'quick conference': 'quick conference',
   Meeting: 'Meeting',
   'Meeting in progress': 'Meeting in progress',
   Initiating: 'Initiating',

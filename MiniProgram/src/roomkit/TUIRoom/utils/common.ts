@@ -1,7 +1,7 @@
 import { getUrlParam } from './utils';
 
 /**
- * get Language
+ * 获取语言
  * @returns language
  */
 export function getLanguage() {
@@ -17,7 +17,7 @@ export function getLanguage() {
 }
 
 /**
- * Determine if a string is a number
+ * 判断字符串是否是数字
  * @returns boolean
  */
 export function checkNumber(roomId: string) {

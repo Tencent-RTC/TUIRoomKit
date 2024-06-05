@@ -45,6 +45,7 @@
         </div>
       </div>
     </div>
+    <!--左右滑动控制栏 -->
     <div v-if="totalPageNumber > 1" class="swipe">
       <div
         v-for="(item, index) in totalPageNumber"
@@ -148,6 +149,8 @@ const isFirstPageInSixPointLayout: Ref<Boolean> = computed(() => {
 
 /**
  * ----- The following handles the nine-pane page flip logic -----
+ *
+ * ----- 以下处理六宫格翻页逻辑 -----
 **/
 const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
   if (layout.value === LAYOUT.SIX_EQUAL_POINTS) {
@@ -171,6 +174,8 @@ const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
 
 /**
  * Show left and right page flip icons
+ *
+ * 显示左右翻页图标
 **/
 const totalPageNumber = computed(() => {
   const videoStreamNumber = onlyVideoStreamList.value.length;
@@ -191,6 +196,7 @@ function isActiveDot(index: number) {
 /**
  * Swipe left to turn the page
  *
+ * 向左滑动翻页
 **/
 async function handleTurnPageLeft() {
   if (currentPageIndex.value === 0) {
@@ -205,6 +211,7 @@ async function handleTurnPageLeft() {
 /**
  * Swipe right to turn the page
  *
+ * 向右滑动翻页
 **/
 async function handleTurnPageRight() {
   if (currentPageIndex.value === totalPageNumber.value - 1) {
@@ -219,6 +226,7 @@ async function handleTurnPageRight() {
 /**
  * ----- The following processing stream layout ---------
  *
+ * ----- 以下处理流布局 ---------
 **/
 const enlargedContainerRef = ref();
 const streamListRef = ref();
@@ -250,9 +258,11 @@ function handleTouchEnd(event:any) {
     return;
   }
   if (moveDirectionX < 0) {
+    // 右滑
     handleTurnPageRight();
   }
   if (moveDirectionX > 0) {
+    // 左滑
     handleTurnPageLeft();
   }
 }
@@ -260,6 +270,7 @@ function handleTouchEnd(event:any) {
 /**
  * --- The following processing stream events ----
  *
+ * --- 以下处理流事件 ----
 **/
 
 
@@ -270,9 +281,12 @@ const onUserVideoStateChanged = async (eventInfo: {
   reason: TUIChangeReason,
 }) => {
   const { userId, streamType, hasVideo, reason } = eventInfo;
+  // 更新 roomStore 流状态数据
   roomStore.updateUserVideoState(userId, streamType, hasVideo);
 
+  // 处理状态变更
   if (userId === basicStore.userId && !hasVideo && reason === TUIChangeReason.kChangedByAdmin) {
+    // 主持人关闭摄像头
     if (streamType === TUIVideoStreamType.kCameraStream) {
       TUIMessage({
         type: 'warning',
@@ -282,8 +296,10 @@ const onUserVideoStateChanged = async (eventInfo: {
       // When the moderator opens the whole staff forbidden to draw,
       // open and then close the single person's camera alone, at this time
       // the corresponding user's camera status for inoperable
+      // 主持人开启全员禁画时，单独打开再关闭单人的摄像头，此时对应用户的摄像头状态为无法操作
       roomStore.setCanControlSelfVideo(!roomStore.isCameraDisableForAllUser);
     }
+    // 主持人关闭屏幕分享
     if (streamType === TUIVideoStreamType.kScreenStream) {
       TUIMessage({
         type: 'warning',
@@ -293,6 +309,7 @@ const onUserVideoStateChanged = async (eventInfo: {
     }
   }
 
+  // 当远端屏幕分享变化的时候，处理流布局
   if (userId !== basicStore.userId && streamType === TUIVideoStreamType.kScreenStream) {
     if (hasVideo) {
       const largeStream = roomStore.remoteStreamObj[`${userId}_${streamType}`] as StreamInfo;
@@ -306,6 +323,7 @@ const onUserVideoStateChanged = async (eventInfo: {
         /**
          * Reset the stream playback layout when the remote screen sharing stream is stopped
          *
+         * 远端屏幕分享流停止的时候，重新设置流播放布局
         **/
         logger.debug(`${logPrefix} onUserVideoStateChanged: stop`, userId, streamType);
         roomEngine.instance?.stopPlayRemoteVideo({
@@ -326,6 +344,7 @@ const onUserVideoStateChanged = async (eventInfo: {
   }
 };
 
+// 计算音量最大的 userId
 function handleLargestVoice(userVolumeList: Array<TRTCVolumeInfo>) {
   if (currentSpeakerUserId.value) {
     const lastSpeakerUserVolumeInfo = userVolumeList.find((item: TRTCVolumeInfo) => (
@@ -353,6 +372,7 @@ function handleLargestVoice(userVolumeList: Array<TRTCVolumeInfo>) {
 
 const handleLargestVoiceThrottle = throttle(handleLargestVoice, 1000);
 
+// 音量变化
 const onUserVoiceVolumeChanged = (eventInfo: {
   userVolumeList: any[],
 }) => {

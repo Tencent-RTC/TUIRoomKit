@@ -7,6 +7,13 @@
   * Usage:
   * Use <icon-button :icon="chatIcon"><icon-button> in template
   *
+  * 名称: IconButton
+  * @param title String required
+  * @param hasMore Boolean
+  * @param hideHoverEffect Boolean
+  * @param layout IconButtonLayout.VERTICAl | IconButtonLayout.HORIZONTAL
+  * 使用方式：
+  * 在 template 中使用 <icon-button :icon="chatIcon"><icon-button>
 -->
 <template>
   <div class="icon-button-container">

@@ -122,11 +122,11 @@ class InitProject {
       );
     });
 
-    // Copy TUIRoomEngine.wasm.br file
-    const wasmDest = './static/TUIRoomEngine.wasm.br';
+    // Copy RTCRoomEngine.wasm.br file
+    const wasmDest = './static/RTCRoomEngine.wasm.br';
     createDirIfNotExist(path.dirname(wasmDest));
     fs.copyFileSync(
-      './node_modules/@tencentcloud/tuiroom-engine-wx/TUIRoomEngine.wasm.br',
+      './node_modules/@tencentcloud/tuiroom-engine-wx/RTCRoomEngine.wasm.br',
       path.join(this.srcPath, wasmDest),
     );
 

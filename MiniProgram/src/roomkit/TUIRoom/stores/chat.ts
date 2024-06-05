@@ -17,6 +17,7 @@ interface ChatState {
   isMessageDisableByAdmin: boolean;
   unReadCount: number;
   isCompleted: boolean;
+  // 是否已经拉完所有消息列表
   // Is the list of all messages pulled
   nextReqMessageId: string;
 }

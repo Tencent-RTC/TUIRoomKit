@@ -55,7 +55,7 @@ onMounted(async () => {
     });
     if (action === 'createRoom' && !hasCreated) {
       try {
-        await TUIRoomRef.value?.createRoom({ roomId, roomName: roomId, roomMode, roomParam });
+        await TUIRoomRef.value?.createRoom({ roomId, roomName: `${userName || userId}${t('Quick Conference')}`, roomMode, roomParam });
         const newRoomInfo = { action, roomId, roomName: roomId, roomMode, roomParam, hasCreated: true };
         uni.setStorageSync('tuiRoom-roomInfo', JSON.stringify(newRoomInfo));
       } catch (error: any) {
@@ -100,15 +100,18 @@ onMounted(async () => {
 
 /**
  * Processing users click [Logout Login] in the upper left corner of the page
+ * 处理用户点击页面左上角【退出登录】
  **/
 function handleLogOut() {
   /**
    * The accessor handles the logout method
+   * 接入方处理 logout 方法
    **/
 }
 
 /**
  * Hosts create room callbacks
+ * 主持人创建房间回调
  **/
 function onCreateRoom(info: { code: number; message: string }) {
   console.debug('onEnterRoom:', info);
@@ -116,6 +119,7 @@ function onCreateRoom(info: { code: number; message: string }) {
 
 /**
  * Ordinary members enter the room callback
+ * 普通成员进入房间回调
  **/
 function onEnterRoom(info: { code: number; message: string }) {
   console.debug('onCreateRoom:', info);
@@ -123,6 +127,7 @@ function onEnterRoom(info: { code: number; message: string }) {
 
 /**
  * Hosts destroy room callbacks
+ * 主持人销毁房间回调
  **/
 const onDestroyRoom = (info: { code: number; message: string }) => {
   console.debug('onDestroyRoom:', info);
@@ -132,6 +137,7 @@ const onDestroyRoom = (info: { code: number; message: string }) => {
 
 /**
  * Ordinary members exit the room callback
+ * 普通成员退出房间回调
  **/
 const onExitRoom = (info: { code: number; message: string }) => {
   console.debug('onExitRoom:', info);
@@ -141,6 +147,7 @@ const onExitRoom = (info: { code: number; message: string }) => {
 
 /**
  * Ordinary members were kicked out of the room by the host
+ * 普通成员被主持人踢出房间
  **/
 const onKickedOutOfRoom = (info: { roomId: string; message: string }) => {
   console.debug('onKickedOutOfRoom:', info);
@@ -150,6 +157,7 @@ const onKickedOutOfRoom = (info: { roomId: string; message: string }) => {
 
 /**
  * Users are kicked offline
+ * 被踢下线
  */
 const onKickedOffLine = (info: { message: string }) => {
   console.debug('onKickedOffLine:', info);
@@ -159,6 +167,7 @@ const onKickedOffLine = (info: { message: string }) => {
 
 /**
  * Ordinary members were kicked out of the room by the host
+ * userSig 过期，需要获取新的 userSig
  */
 const onUserSigExpired = () => {
   console.debug('onUserSigExpired');
