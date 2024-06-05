@@ -69,7 +69,7 @@ export default {
       await conference.setSelfInfo({ userName, avatarUrl });
       if (action === 'createRoom' && !hasCreated) {
         await conference.start(this.roomId, {
-          roomName: this.roomId,
+          roomName: `${userName || userId}${this.$t('Quick Conference')}`,
           isSeatEnabled,
           ...roomParam,
         });

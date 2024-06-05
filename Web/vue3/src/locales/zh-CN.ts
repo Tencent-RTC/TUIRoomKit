@@ -31,4 +31,5 @@ export default {
   'Failed to enter the room.': '进入房间失败！',
   'This action causes the room to be exited, does it continue?': '该操作会导致退出房间，是否继续？',
   'This action causes the room to be disbanded, does it continue?': '该操作会导致解散房间，是否继续？',
+  'Quick Conference': '的快速会议',
 };

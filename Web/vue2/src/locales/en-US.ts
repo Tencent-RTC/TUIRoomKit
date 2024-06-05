@@ -31,4 +31,5 @@ export default {
   'Failed to enter the room.': 'Failed to enter the room.',
   'This action causes the room to be disbanded, does it continue?': 'This action causes the room to be disbanded, does it continue?',
   'This action causes the room to be exited, does it continue?': 'This action causes the room to be exited, does it continue?',
+  'Quick Conference': ' \'s Quick Conference',
 };

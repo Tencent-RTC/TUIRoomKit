@@ -35,7 +35,7 @@ onMounted(async () => {
     await conference.setSelfInfo({ userName, avatarUrl });
     if (action === 'createRoom' && !hasCreated) {
       await conference.start(roomId, {
-        roomName: roomId,
+        roomName: `${userName || userId}${t('Quick Conference')}`,
         isSeatEnabled,
         ...roomParam,
       });

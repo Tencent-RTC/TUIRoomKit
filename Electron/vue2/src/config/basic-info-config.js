@@ -43,7 +43,7 @@ export const userInfo = {
   // userId
   userId: `user_${Math.ceil(Math.random() * 100000)}`,
   // userName
-  userName: 'myName',
+  userName: '',
   // userAvatar
   avatarUrl: '',
 };
