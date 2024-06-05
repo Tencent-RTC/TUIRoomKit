@@ -14,7 +14,6 @@ import com.tencent.cloud.tuikit.roomkit.ConferenceMainFragment;
 import com.tencent.cloud.tuikit.roomkit.ConferenceObserver;
 import com.tencent.cloud.tuikit.roomkit.ConferenceParams;
 import com.tencent.liteav.demo.R;
-import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 public class ConferenceMainActivity extends AppCompatActivity {
     private static final String TAG = "ConferenceMainAy";
@@ -72,7 +71,6 @@ public class ConferenceMainActivity extends AppCompatActivity {
 
     private void showFragment(Fragment fragment, ConferenceError error) {
         if (error != ConferenceError.SUCCESS) {
-            ToastUtil.toastLongMessageCenter("Error : " + error);
             finish();
             return;
         }

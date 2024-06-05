@@ -9,8 +9,8 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
-import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
-import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
+import com.tencent.cloud.tuikit.roomkit.common.utils.UserModel;
+import com.tencent.cloud.tuikit.roomkit.common.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
 import com.tencent.qcloud.tuicore.TUIConfig;
 import com.tencent.qcloud.tuicore.TUICore;

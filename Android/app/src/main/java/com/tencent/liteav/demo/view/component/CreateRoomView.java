@@ -11,8 +11,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
-import com.tencent.cloud.tuikit.roomkit.model.utils.FetchRoomId;
-import com.tencent.cloud.tuikit.roomkit.utils.RoomToast;
+import com.tencent.cloud.tuikit.roomkit.common.utils.FetchRoomId;
+import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.liteav.demo.R;
 import com.tencent.liteav.demo.viewmodel.CreateRoomViewModel;
 import com.tencent.qcloud.tuicore.TUILogin;

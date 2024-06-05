@@ -12,8 +12,8 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tencent.cloud.tuikit.roomkit.utils.UserModel;
-import com.tencent.cloud.tuikit.roomkit.utils.UserModelManager;
+import com.tencent.cloud.tuikit.roomkit.common.utils.UserModel;
+import com.tencent.cloud.tuikit.roomkit.common.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
 
 import java.util.Random;

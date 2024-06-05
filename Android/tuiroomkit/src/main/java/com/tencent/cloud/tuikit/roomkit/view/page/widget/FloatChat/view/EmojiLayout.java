@@ -27,7 +27,9 @@ public class EmojiLayout extends FrameLayout {
     private final RecyclerView emojiView;
     private final CardView deleteView;
 
-    private final int emojiSpace;
+    private int emojiSpanCount;
+    private int emojiSpace;
+    private int emojiSize;
 
     private EmojiListener emojiListener;
     private  final List<Integer> emojiResIds = new ArrayList<>();
@@ -37,26 +39,43 @@ public class EmojiLayout extends FrameLayout {
         inflate(context, R.layout.tuiroomkit_float_chat_emoji_view, this);
         this.context = context;
         this.emojiResIds.addAll(emojiResIds);
-        this.emojiSpace = ScreenUtil.dip2px(16);
+        this.emojiSize = ScreenUtil.dip2px(50);
         emojiView = findViewById(R.id.rv_emoji_list);
         deleteView = findViewById(R.id.cd_delete);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        initEmojiConfig();
         initViews();
+    }
+
+    private void initEmojiConfig() {
+        int width = context.getResources().getDisplayMetrics().widthPixels;
+        emojiSpanCount = 5;
+        emojiSpace = emojiSize;
+        while (emojiSpace * 2 > emojiSize) {
+            emojiSpanCount++;
+            emojiSpace = width - emojiSize * emojiSpanCount;
+        }
+        if (emojiSpace < emojiSize / 3) {
+            emojiSpace = emojiSize / 3;
+            emojiSize = (width - emojiSpace) / emojiSpanCount;
+        }
     }
 
     private void initViews() {
         int padding = emojiSpace / 2;
         emojiView.setPadding(padding, padding, padding, padding);
-        int emojiSpanCount = 7;
         GridLayoutManager gridLayoutManager = new GridLayoutManager(context, emojiSpanCount);
         emojiView.setLayoutManager(gridLayoutManager);
         emojiView.setAdapter(new RecyclerView.Adapter<ImageViewHolder>() {
             @NonNull
             @Override
             public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                int parentWidth = ((ViewGroup) emojiView.getParent()).getWidth();
-                int itemSize = (parentWidth - 16 * padding) / 7 + 2 * padding;
                 ImageView imageView = new ImageView(context);
-                ViewGroup.LayoutParams params = new LayoutParams(itemSize, itemSize);
+                ViewGroup.LayoutParams params = new LayoutParams(emojiSize, emojiSize);
                 imageView.setLayoutParams(params);
                 return new ImageViewHolder(imageView, padding);
             }

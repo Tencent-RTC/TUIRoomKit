@@ -9,6 +9,9 @@ package com.tencent.cloud.tuikit.roomkit;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.model.TUIRoomKitImpl;
 
+/**
+ * @deprecated Please use ConferenceMainFragment for conference UI integration.
+ */
 @Deprecated
 public abstract class TUIRoomKit {
     /**

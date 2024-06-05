@@ -35,7 +35,6 @@ public class CreateRoomViewModel {
     public void createRoom(String conferenceId, TUIRoomDefine.ActionCallback callback) {
         Intent intent = new Intent(mContext, ConferenceMainActivity.class);
         intent.putExtra("id", conferenceId);
-        intent.putExtra("name", truncateString(TUILogin.getNickName()));
         intent.putExtra("enableSeatControl", mIsSeatEnabled);
         intent.putExtra("muteMicrophone", !mIsOpenAudio);
         intent.putExtra("openCamera", mIsOpenVideo);

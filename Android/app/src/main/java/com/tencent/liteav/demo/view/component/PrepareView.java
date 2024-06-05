@@ -12,9 +12,9 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 
-import com.tencent.cloud.tuikit.roomkit.model.manager.RoomEngineManager;
-import com.tencent.cloud.tuikit.roomkit.utils.ImageLoader;
-import com.tencent.cloud.tuikit.roomkit.utils.RoomToast;
+import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
+import com.tencent.cloud.tuikit.roomkit.common.utils.ImageLoader;
+import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.liteav.demo.R;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
@@ -135,7 +135,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
     }
 
     private void createRoom() {
-        if (RoomEngineManager.sharedInstance().getRoomStore().isInFloatWindow()) {
+        if (ConferenceController.sharedInstance().getConferenceState().isInFloatWindow()) {
             RoomToast.toastLongMessage(mContext.getString(R.string.app_room_msg_joined));
             return;
         }
@@ -143,7 +143,7 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener 
     }
 
     private void enterRoom() {
-        if (RoomEngineManager.sharedInstance().getRoomStore().isInFloatWindow()) {
+        if (ConferenceController.sharedInstance().getConferenceState().isInFloatWindow()) {
             RoomToast.toastLongMessage(mContext.getString(R.string.app_room_msg_joined));
             return;
         }

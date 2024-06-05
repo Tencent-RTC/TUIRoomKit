@@ -5,12 +5,15 @@ import com.tencent.cloud.tuikit.roomkit.view.page.widget.FloatChat.model.TUIFloa
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.FloatChat.model.DefaultEmojiResource;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.FloatChat.service.IEmojiResource;
 
+import java.util.ArrayList;
+
 public class FloatChatStore {
     private static FloatChatStore sInstance;
 
     public LiveData<TUIFloatChat> mSendBarrage = new LiveData<>();
 
-    public final IEmojiResource   mEmojiResource;
+    public final IEmojiResource          mEmojiResource;
+    public       ArrayList<TUIFloatChat> mRecordedMessage;
 
     public static FloatChatStore sharedInstance() {
         if (sInstance == null) {
@@ -25,6 +28,10 @@ public class FloatChatStore {
 
     private FloatChatStore() {
         mEmojiResource = new DefaultEmojiResource();
+        mRecordedMessage = new ArrayList<>();
     }
 
+    public void destroyInstance() {
+        sInstance = null;
+    }
 }

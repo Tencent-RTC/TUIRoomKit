@@ -10,11 +10,12 @@ import com.google.gson.Gson;
 import com.tencent.imsdk.v2.V2TIMGroupMemberInfo;
 import com.tencent.imsdk.v2.V2TIMManager;
 import com.tencent.imsdk.v2.V2TIMMessage;
-import com.tencent.imsdk.v2.V2TIMMessageManager;
 import com.tencent.imsdk.v2.V2TIMSimpleMsgListener;
 import com.tencent.imsdk.v2.V2TIMValueCallback;
 import com.tencent.liteav.base.Log;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.FloatChat.model.TUIFloatChat;
+import com.tencent.qcloud.tuicore.util.ErrorMessageConverter;
+import com.tencent.qcloud.tuicore.util.ToastUtil;
 
 
 public class FloatChatIMService implements IFloatChatMessage {
@@ -35,7 +36,6 @@ public class FloatChatIMService implements IFloatChatMessage {
             V2TIMManager.getInstance().setGroupListener(null);
             V2TIMManager.getInstance().removeSimpleMsgListener(mSimpleListener);
         } else {
-            V2TIMMessageManager messageManager = V2TIMManager.getMessageManager();
             if (mSimpleListener == null) {
                 mSimpleListener = new SimpleListener();
             }
@@ -64,6 +64,7 @@ public class FloatChatIMService implements IFloatChatMessage {
                     @Override
                     public void onError(int i, String s) {
                         Log.e(TAG, " sendGroupCustomMessage error " + i + " errorMessage:" + s);
+                        ToastUtil.toastLongMessageCenter(ErrorMessageConverter.convertIMError(i, s));
                         if (callback != null) {
                             callback.onFailed(i, s);
                         }
