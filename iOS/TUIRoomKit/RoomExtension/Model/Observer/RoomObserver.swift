@@ -85,11 +85,9 @@ class RoomObserver: NSObject {
     
     func exitedRoom() {
         RoomVideoFloatView.dismiss()
-        userList = userList.filter { userDic in
-            if let userId = userDic["userId"] as? String, userId != userId {
-                return true
-            }
-            return false
+        userList = userList.filter { [weak self] userDic in
+            guard let self = self, let userId = userDic["userId"] as? String else { return false }
+            return userId != self.userId
         }
         if messageModel.owner == userId {
             let prefixUserList = Array(userList.prefix(5))

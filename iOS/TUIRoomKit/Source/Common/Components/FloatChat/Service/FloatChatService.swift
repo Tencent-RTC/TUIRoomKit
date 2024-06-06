@@ -7,8 +7,13 @@
 
 import Foundation
 import RTCRoomEngine
-import Combine
 import ImSDK_Plus
+import TUICore
+#if USE_OPENCOMBINE
+import OpenCombine
+#else
+import Combine
+#endif
 
 class FloatChatService: NSObject {
     @WeakLazyInjected private var store: FloatChatStoreProvider?
@@ -30,7 +35,9 @@ class FloatChatService: NSObject {
             self.imManager?.sendGroupTextMessage(message, to: self.roomId, priority: .PRIORITY_NORMAL, succ: {
                 promise(.success((message)))
             }, fail: { code, message in
-                debugPrint("FloatChat send custom message failed, code: \(code), message: \(message ?? "")")
+                let errorMsg = TUITool.convertIMError(Int(code), msg: message)
+                //TODO: show toast from store.dispatch
+                RoomRouter.makeToastInWindow(toast:errorMsg ?? "send message fail", duration: 2)
             })
         }
         .eraseToAnyPublisher()

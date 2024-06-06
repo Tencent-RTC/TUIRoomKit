@@ -135,7 +135,6 @@ class PopUpView: UIView {
             rootView = UserListView(viewModel: model)
         case .raiseHandApplicationListViewType:
             let model = RaiseHandApplicationListViewModel()
-            viewModel.viewResponder = model
             rootView = RaiseHandApplicationListView(viewModel: model)
         case .transferMasterViewType:
             let model = TransferMasterViewModel()

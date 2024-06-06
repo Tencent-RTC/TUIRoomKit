@@ -155,21 +155,21 @@ class ScreenCaptureMaskView: UIView {
 
 private extension String {
     static var sharingScreenText: String {
-        localized("TUIRoom.sharing.screen")
+        localized("You are sharing your screen")
     }
     static var shareOffText: String {
-        localized("TUIRoom.share.off")
+        localized("Stop")
     }
     static var toastTitleText: String {
-        localized("TUIRoom.toast.shareScreen.title")
+        localized("Share Screen")
     }
     static var toastMessageText: String {
-        localized("TUIRoom.toast.shareScreen.message")
+        localized("Stop TUIRoom screen sharing screen live?")
     }
     static var toastCancelText: String {
-        localized("TUIRoom.cancel")
+        localized("Cancel")
     }
     static var toastStopText: String {
-        localized("TUIRoom.toast.shareScreen.stop")
+        localized("Stop")
     }
 }

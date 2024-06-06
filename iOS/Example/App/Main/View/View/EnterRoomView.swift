@@ -160,6 +160,6 @@ class EnterRoomView: UIView {
 
 private extension String {
     static var enterRoomText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.join.room")
+        RoomDemoLocalize("Join Room")
     }
 }

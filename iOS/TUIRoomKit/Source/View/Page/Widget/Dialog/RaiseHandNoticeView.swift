@@ -81,6 +81,6 @@ class RaiseHandNoticeView: UIView {
 
 private extension String {
     static var raiseHandNotice: String {
-        localized("TUIRoom.raiseHand.notice")
+        localized("Raise your hand to speak")
     }
 }

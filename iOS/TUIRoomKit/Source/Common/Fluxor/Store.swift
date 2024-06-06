@@ -6,11 +6,15 @@
 
 import Dispatch
 import Foundation
-#if canImport(Combine)
-    import Combine
+#if USE_OPENCOMBINE
+import OpenCombine
+import OpenCombineDispatch
+public typealias ObservableObjectCompat = OpenCombine.ObservableObject
+public typealias PublishedCompat = OpenCombine.Published
 #else
-    import OpenCombine
-    import OpenCombineDispatch
+import Combine
+public typealias ObservableObjectCompat = Combine.ObservableObject
+public typealias PublishedCompat = Combine.Published
 #endif
 
 /**
@@ -30,9 +34,9 @@ import Foundation
  ## Interceptors
  It is possible to intercept all `Action`s and `State` changes by registering an `Interceptor`.
  */
-open class Store<State, Environment>: ObservableObject {
+open class Store<State, Environment>: ObservableObjectCompat {
     /// The state of the `Store`. It can only be modified by the registered `Reducer`s when `Action`s are dispatched.
-    @Published public private(set) var state: State
+    @PublishedCompat public private(set) var state: State
     /// The environment passed to the `Effects`. The `Environment` can contain services and other dependencies.
     public let environment: Environment
     internal private(set) var stateHash = UUID()
@@ -264,11 +268,11 @@ private extension Store {
         switch effect {
         case let .dispatchingOne(effectCreator):
             return effectCreator(actions.eraseToAnyPublisher(), environment)
-                .receive(on: DispatchQueue.main)
+                .receive(on: DispatchQueue.mainQueue)
                 .sink(receiveValue: dispatch(action:))
         case let .dispatchingMultiple(effectCreator):
             return effectCreator(actions.eraseToAnyPublisher(), environment)
-                .receive(on: DispatchQueue.main)
+                .receive(on: DispatchQueue.mainQueue)
                 .sink { $0.forEach(self.dispatch(action:)) }
         case let .nonDispatching(effectCreator):
             return effectCreator(actions.eraseToAnyPublisher(), environment)

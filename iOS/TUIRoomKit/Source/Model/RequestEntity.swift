@@ -12,8 +12,10 @@ class RequestEntity {
     let userId: String
     var userName: String = ""
     var avatarUrl: String = ""
+    let timestamp: TimeInterval
     
     init(requestId: String, userId: String) {
+        timestamp = Date().timeIntervalSince1970
         self.requestId = requestId
         self.userId = userId
         guard let userItem = EngineManager.createInstance().store.attendeeList.first(where: { $0.userId == userId }) else { return }

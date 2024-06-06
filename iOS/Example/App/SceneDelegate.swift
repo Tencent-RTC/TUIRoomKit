@@ -10,6 +10,7 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
+    @available(iOS 13.0, *)
     func scene(_ scene: UIScene,
                willConnectTo session: UISceneSession,
                options connectionOptions: UIScene.ConnectionOptions) {
@@ -23,25 +24,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.makeKeyAndVisible()
     }
 
-    func sceneDidDisconnect(_ scene: UIScene) {
-    }
-
-    func sceneDidBecomeActive(_ scene: UIScene) {
-    }
-
-    func sceneWillResignActive(_ scene: UIScene) {
-    }
-
-    func sceneWillEnterForeground(_ scene: UIScene) {
-    }
-
-    func sceneDidEnterBackground(_ scene: UIScene) {
-    }
-
     static func getCurrentWindow() -> UIWindow? {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            if let keyWindow = windowScene.windows.first {
-                return keyWindow
+        if #available(iOS 13, *) {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                if let keyWindow = windowScene.windows.first {
+                    return keyWindow
+                }
+            }
+        } else {
+            for window in UIApplication.shared.windows {
+                if window.isMember(of: UIWindow.self), window.isKeyWindow {
+                    return window
+                }
             }
         }
         return nil

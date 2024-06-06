@@ -16,12 +16,16 @@ class RouteContext {
     typealias Weak<T> = () -> T?
     var alterControllers: [Weak<UIViewController>] = []
     var popUpViewController: Weak<PopUpViewController>?
-    let appearance: UINavigationBarAppearance = UINavigationBarAppearance()
+    var appearance: AnyObject?
     let navigationDelegate = RoomRouter.RoomNavigationDelegate()
     var chatWindow : UIWindow?
     var currentLandscape: Bool = isLandscape
     weak var rootViewController: UIViewController?
-    init() {}
+    init() {
+        if #available(iOS 13, *) {
+            appearance = UINavigationBarAppearance()
+        }
+    }
 }
 
 class RoomRouter: NSObject {
@@ -66,9 +70,13 @@ class RoomRouter: NSObject {
         if !isLandscape {
             push(viewController: chatVC, animated: false)
         } else {
-            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+            if #available(iOS 13, *) {
+                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+                context.chatWindow = UIWindow(windowScene: windowScene)
+            } else {
+                context.chatWindow = UIWindow(frame: UIScreen.main.bounds)
+            }
             let chatWidth = min(kScreenWidth, kScreenHeight)
-            context.chatWindow = UIWindow(windowScene: windowScene)
             context.chatWindow?.frame = CGRect(x: kScreenWidth - chatWidth - kDeviceSafeBottomHeight, y: 0, width: chatWidth, height: chatWidth)
             context.chatWindow?.rootViewController = nav
             context.chatWindow?.windowLevel = UIWindow.Level.statusBar + 1
@@ -223,6 +231,11 @@ class RoomRouter: NSObject {
         windowView.makeToast(toast,duration: duration,position:TUICSToastPositionCenter)
     }
     
+    class func makeToastInWindow(toast: String, duration:TimeInterval) {
+        guard let window = RoomRouter.getCurrentWindow() else {return}
+        window.makeToast(toast,duration: duration,position:TUICSToastPositionCenter)
+    }
+    
     class func getCurrentWindow() -> UIWindow? {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             if let keyWindow = windowScene.windows.first {
@@ -263,8 +276,12 @@ extension RoomRouter {
         navController.pushViewController(viewController, animated: animated)
     }
     
-    private func present(viewController: UIViewController, style: UIModalPresentationStyle = .automatic, animated: Bool = true) {
-        viewController.modalPresentationStyle = style
+    private func present(viewController: UIViewController, animated: Bool = true) {
+        if #available(iOS 13.0, *) {
+            viewController.modalPresentationStyle = .automatic
+        } else {
+            viewController.modalPresentationStyle = .overFullScreen
+        }
         if let navController = navController {
             navController.present(viewController, animated: animated)
         } else if let vc = context.rootViewController {
@@ -278,8 +295,14 @@ extension RoomRouter {
         context.rootNavigation = navigationController
         if #available(iOS 13.0, *) {
             setupNavigationBarAppearance()
-            navigationController.navigationBar.standardAppearance = context.appearance
-            navigationController.navigationBar.scrollEdgeAppearance = context.appearance
+            if let appearance = context.appearance as? UINavigationBarAppearance {
+                navigationController.navigationBar.standardAppearance = appearance
+                navigationController.navigationBar.scrollEdgeAppearance = appearance
+            }
+        } else {
+            navigationController.navigationBar.barTintColor = UIColor(0x1B1E26)
+            navigationController.navigationBar.shadowImage = UIImage()
+            navigationController.navigationBar.barStyle = .default
         }
         navigationController.delegate = context.navigationDelegate
         let weakObserver = { [weak navigationController] in
@@ -291,7 +314,9 @@ extension RoomRouter {
     
     @available(iOS 13.0, *)
     private func setupNavigationBarAppearance() {
-        let barAppearance = context.appearance
+        guard let barAppearance = context.appearance as? UINavigationBarAppearance else {
+            return
+        }
         barAppearance.configureWithDefaultBackground()
         barAppearance.shadowColor = nil
         barAppearance.backgroundEffect = nil
@@ -345,11 +370,17 @@ extension RoomRouter {
 extension RoomRouter.RoomNavigationDelegate: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
         if viewController is ConferenceMainViewController {
-            let appearance = RoomRouter.shared.context.appearance
-            appearance.backgroundColor = UIColor(0x1B1E26)
-            navigationController.navigationBar.standardAppearance = appearance
-            navigationController.navigationBar.scrollEdgeAppearance = appearance
-            navigationController.navigationBar.tintColor = UIColor.white
+            if #available(iOS 13.0, *) {
+                if let appearance = RoomRouter.shared.context.appearance as? UINavigationBarAppearance {
+                    appearance.backgroundColor = UIColor(0x1B1E26)
+                    navigationController.navigationBar.standardAppearance = appearance
+                    navigationController.navigationBar.scrollEdgeAppearance = appearance
+                    navigationController.navigationBar.tintColor = UIColor.white
+                }
+            } else {
+                navigationController.navigationBar.tintColor = UIColor.white
+                navigationController.navigationBar.backgroundColor = UIColor(0x1B1E26)
+            }
         }
     }
 }
@@ -389,6 +420,6 @@ extension RoomRouter: RoomKitUIEventResponder {
 
 private extension String {
     static var chatText: String {
-        localized("TUIRoom.chat")
+        localized("Chat")
     }
 }

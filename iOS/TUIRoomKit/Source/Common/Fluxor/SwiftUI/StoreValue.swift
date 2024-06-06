@@ -6,7 +6,11 @@
 
 #if canImport(SwiftUI)
 
+#if USE_OPENCOMBINE
+import OpenCombine
+#else
 import Combine
+#endif
 import SwiftUI
 
 /**

@@ -69,9 +69,9 @@ class MoreFunctionViewModel {
 
 private extension String {
     static var settingText: String {
-        localized("TUIRoom.setting")
+        localized("Settings")
     }
     static var chatText: String {
-        localized("TUIRoom.chat")
+        localized("Chat")
     }
 }

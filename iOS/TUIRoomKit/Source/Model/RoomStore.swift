@@ -19,6 +19,7 @@ class RoomStore: NSObject {
     var audioSetting: AudioModel = AudioModel()
     var attendeeList: [UserEntity] = []        // User list
     var seatList: [UserEntity] = []            // List of users who have taken the stage
+    var offSeatList: [UserEntity] = []         // List of users who not on stage
     var inviteSeatList: [RequestEntity] = []   // List of users who apply to be on stage
     var isEnteredRoom: Bool = false
     var timeStampOnEnterRoom: Int = 0          // Timestamp of entering the meeting
@@ -93,11 +94,15 @@ class RoomStore: NSObject {
             localSeatList.append(userModel)
         }
         self.seatList = localSeatList
-        if getSeatItem(currentUser.userId) != nil {
+        if seatList.contains(where: { $0.userId == currentUser.userId }) {
             updateSelfOnSeatState(isOnSeat: true)
         }
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewVideoSeatView, param: [:])
+    }
+    
+    func initialOffSeatList() {
+        offSeatList = attendeeList.filter({ !$0.isOnSeat })
     }
     
     func updateSelfOnSeatState(isOnSeat: Bool) {
@@ -114,9 +119,11 @@ class RoomStore: NSObject {
     }
     
     func deleteTakeSeatRequest(requestId: String) {
+        let requestUserId = inviteSeatList.first(where: { $0.requestId == requestId })?.userId
         inviteSeatList = inviteSeatList.filter { requestItem in
             requestItem.requestId != requestId
         }
+        EngineEventCenter.shared.notifyEngineEvent(event: .onDeletedTakeSeatRequest, param: ["userId": requestUserId ?? ""])
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
     
@@ -132,14 +139,6 @@ class RoomStore: NSObject {
         let requestEntity = RequestEntity(requestId: request.requestId, userId: request.userId)
         inviteSeatList.append(requestEntity)
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
-    }
-    
-    private func getUserItem(_ userId: String) -> UserEntity? {
-        return attendeeList.first(where: {$0.userId == userId})
-    }
-    
-    private func getSeatItem(_ userId: String) -> UserEntity? {
-        return seatList.first(where: { $0.userId == userId })
     }
     
     func setCameraOpened(_ isCameraOpened: Bool) {
@@ -163,6 +162,58 @@ class RoomStore: NSObject {
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
     
+    func updateLeftSeatList(leftList: [TUISeatInfo]) {
+        guard leftList.count > 0 else { return }
+        if leftList.contains(where: { $0.userId == currentUser.userId }) {
+            currentUser.isOnSeat = false
+            audioSetting.isMicOpened = false
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
+                                                   param: ["isOnSeat":false])
+        }
+        for seatInfo: TUISeatInfo in leftList {
+            guard let userId = seatInfo.userId else { continue }
+            if let userItem = attendeeList.first(where: { $0.userId == userId }) {
+                userItem.isOnSeat = false
+                addOffSeatItem(userItem)
+            }
+            deleteOnSeatItem(userId)
+        }
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+    }
+    
+    func updateSeatedList(seatList: [TUISeatInfo]) {
+        guard seatList.count > 0 else { return }
+        if seatList.contains(where: { $0.userId == currentUser.userId }) {
+            currentUser.isOnSeat = true
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
+                                                   param: ["isOnSeat":true])
+        }
+        for seatInfo: TUISeatInfo in seatList {
+            guard let userId = seatInfo.userId else { continue }
+            guard let userInfo = attendeeList.first(where: { $0.userId == userId }) else { continue }
+            userInfo.isOnSeat = true
+            addOnSeatItem(userInfo)
+            deleteOffSeatItem(userId)
+        }
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+    }
+    
+    func remoteUserEnterRoom(userInfo: TUIUserInfo) {
+        let userItem = UserEntity()
+        userItem.update(userInfo: userInfo)
+        addUserItem(userItem)
+        if roomInfo.isSeatEnabled, !userItem.isOnSeat {
+            addOffSeatItem(userItem)
+        }
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+    }
+    
+    func remoteUserLeaveRoom(userInfo: TUIUserInfo) {
+        deleteUserItem(userInfo.userId)
+        deleteOffSeatItem(userInfo.userId)
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+    }
+    
     func updateFloatChatShowState(shouldShow: Bool) {
         shouldShowFloatChatView = shouldShow
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ShowFloatChatView, param: ["shouldShow": shouldShow])
@@ -170,5 +221,41 @@ class RoomStore: NSObject {
     
     deinit {
         debugPrint("self:\(self),deinit")
+    }
+}
+
+extension RoomStore {
+    private func getUserItem(_ userId: String) -> UserEntity? {
+        return attendeeList.first(where: {$0.userId == userId})
+    }
+    
+    private func addUserItem(_ userItem: UserEntity) {
+        guard getUserItem(userItem.userId) == nil else { return }
+        if userItem.userName.isEmpty {
+            userItem.userName = userItem.userId
+        }
+        attendeeList.append(userItem)
+    }
+    
+    private func deleteUserItem(_ userId: String) {
+        attendeeList.removeAll(where: { $0.userId == userId })
+    }
+    
+    private func addOnSeatItem(_ userItem: UserEntity) {
+        guard !seatList.contains(where: { $0.userId == userItem.userId }) else { return }
+        seatList.append(userItem)
+    }
+    
+    private func deleteOnSeatItem(_ userId: String) {
+        seatList.removeAll(where: { $0.userId == userId })
+    }
+    
+    private func addOffSeatItem(_ userItem: UserEntity) {
+        guard !offSeatList.contains(where: { $0.userId == userItem.userId }) else { return }
+        offSeatList.append(userItem)
+    }
+    
+    private func deleteOffSeatItem(_ userId: String) {
+        offSeatList.removeAll(where: { $0.userId == userId })
     }
 }

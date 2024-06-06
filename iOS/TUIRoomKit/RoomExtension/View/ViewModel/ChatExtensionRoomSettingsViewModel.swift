@@ -39,9 +39,9 @@ class ChatExtensionRoomSettingsViewModel {
 }
 private extension String {
     static var cameraSetText: String {
-        localized("TUIRoom.camera.set")
+        localized("Join the meeting and start the camera")
     }
     static var micSeatText: String {
-        localized("TUIRoom.mic.set")
+        localized("Join the conference and turn on the mic")
     }
 }

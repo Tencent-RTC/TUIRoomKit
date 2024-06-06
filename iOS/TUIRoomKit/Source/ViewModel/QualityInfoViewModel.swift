@@ -132,7 +132,7 @@ extension QualityInfoViewModel: RoomEngineEventResponder {
     
     private func handleStatistics(data: TRTCStatistics) {
         let localStatistics = data.localStatistics.first(where: { $0.streamType == .big })
-        let remoteStatistics = data.remoteStatistics.filter { $0.streamType == .big}
+        let remoteStatistics = data.remoteStatistics ?? []
         
         self.rttCellModel.normalString = String(data.rtt) + QualityInfoViewModel.timeSuffix
         // assemble uplink data
@@ -163,28 +163,28 @@ extension QualityInfoViewModel: RoomEngineEventResponder {
 
 private extension String {
     static var networkString: String {
-        localized("TUIRoom.network")
+        localized("Network")
     }
     static var audioString: String {
-        localized("TUIRoom.audio")
+        localized("Audio")
     }
     static var videoString: String {
-        localized("TUIRoom.video")
+        localized("Video")
     }
     static var rttString: String {
-        localized("TUIRoom.rtt")
+        localized("Latency")
     }
     static var lossString: String {
-        localized("TUIRoom.loss")
+        localized("Package Loss")
     }
     static var bitrateString: String {
-        localized("TUIRoom.bitrate")
+        localized("Bitrate")
     }
     static var resolutionString: String {
-        localized("TUIRoom.resolution")
+        localized("Resolution")
     }
     static var frameRateString: String {
-        localized("TUIRoom.frame.rate")
+        localized("Frame Rate")
     }
 }
 

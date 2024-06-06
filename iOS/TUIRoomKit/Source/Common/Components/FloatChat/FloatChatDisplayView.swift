@@ -7,15 +7,36 @@
 //
 
 import UIKit
+#if USE_OPENCOMBINE
+import OpenCombine
+import OpenCombineDispatch
+#else
 import Combine
+#endif
 
 class FloatChatDisplayView: UIView {
     @Injected private var store: FloatChatStoreProvider
     private lazy var messageListPublisher = self.store.select(FloatChatSelectors.getMessageList)
-    private var messageList: [FloatChatMessage] {
-        self.store.selectCurrent(FloatChatSelectors.getMessageList)
-    }
+    private var messageList: [FloatChatMessage] = []
     var cancellableSet = Set<AnyCancellable>()
+    
+    private lazy var blurLayer: CALayer = {
+        let layer = CAGradientLayer()
+        layer.colors = [
+            UIColor.black.withAlphaComponent(0).cgColor,
+            UIColor.black.withAlphaComponent(1).cgColor
+        ]
+        layer.locations = [0, 0.2]
+        layer.startPoint = CGPoint(x: 0.5, y: 0)
+        layer.endPoint = CGPoint(x: 0.5, y: 1)
+
+        return layer
+    }()
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        blurLayer.frame = self.bounds
+    }
     
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
@@ -41,6 +62,7 @@ class FloatChatDisplayView: UIView {
 
     private func constructViewHierarchy() {
         addSubview(tableView)
+        self.layer.mask = blurLayer
     }
 
     private func activateConstraints() {
@@ -51,16 +73,30 @@ class FloatChatDisplayView: UIView {
     
     func bindInteraction() {
         tableView.dataSource = self
+        
         messageListPublisher
             .filter{ !$0.isEmpty }
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.mainQueue)
             .sink { [weak self] floatMessages in
                 guard let self = self else { return }
-                let newIndexPath = IndexPath(row: floatMessages.count - 1, section: 0)
-                self.tableView.beginUpdates()
-                self.tableView.insertRows(at: [newIndexPath], with: .automatic)
-                self.tableView.endUpdates()
-                self.tableView.scrollToRow(at: newIndexPath, at: .bottom, animated: true)
+                let rowsBefore = self.messageList.count
+                let rowsAfter = floatMessages.count
+                let numberOfRowsInserted = rowsAfter - rowsBefore
+                if numberOfRowsInserted > 0 {
+                    var insertIndexs = [IndexPath]()
+                    for i in 0..<numberOfRowsInserted {
+                        insertIndexs.append(IndexPath(row: rowsBefore + i, section: 0))
+                    }
+                    self.messageList = floatMessages
+                    self.tableView.beginUpdates()
+                    self.tableView.insertRows(at: insertIndexs, with: .automatic)
+                    self.tableView.endUpdates()
+                } else {
+                    self.messageList = floatMessages
+                    self.tableView.reloadData()
+                }
+                let lastIndexPath = IndexPath(row: rowsAfter - 1, section: 0)
+                self.tableView.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
             }
             .store(in: &cancellableSet)
     }
@@ -82,3 +118,12 @@ extension FloatChatDisplayView: UITableViewDataSource {
     }
 }
 
+extension FloatChatDisplayView {
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+         let view = super.hitTest(point, with: event)
+         if view == tableView {
+             return nil
+         }
+         return view
+     }
+}

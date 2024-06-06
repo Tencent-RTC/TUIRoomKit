@@ -276,7 +276,7 @@ extension UserListManagerView: UserListManagerViewEventResponder {
 
 private extension String {
     static var meText: String {
-        localized("TUIRoom.me")
+        localized("Me")
     }
 }
 

@@ -43,7 +43,7 @@ class EngineManager: NSObject {
         let observer = TRTCObserver()
         return observer
     }()
-    private let takeSeatTimeOutNumber: Double = 0
+    private let takeSeatTimeOutNumber: Double = 60
     private let openRemoteDeviceTimeOutNumber: Double = 15
     private let rootRouter: RoomRouter = RoomRouter.shared
     private var isLoginEngine: Bool = false
@@ -129,6 +129,7 @@ class EngineManager: NSObject {
     func destroyEngineManager() {
         roomEngine.removeObserver(eventDispatcher)
         roomEngine.getTRTCCloud().removeDelegate(observer)
+        unsubLogoutNotification()
         EngineManager._shared = nil
     }
     
@@ -329,8 +330,15 @@ class EngineManager: NSObject {
         roomEngine.stopScreenCapture()
     }
     
-    func setVideoEncoderParam(_ param: TRTCVideoEncParam) {
-        roomEngine.getTRTCCloud().setVideoEncoderParam(param)
+    func setVideoEncoder(videoQuality: TUIVideoQuality? = nil, bitrate: Int? = nil, fps: Int? = nil) {
+        let param = TUIRoomVideoEncoderParams()
+        store.videoSetting.videoQuality = videoQuality ?? store.videoSetting.videoQuality
+        param.videoResolution = store.videoSetting.videoQuality
+        store.videoSetting.videoBitrate = bitrate ?? store.videoSetting.videoBitrate
+        param.bitrate = store.videoSetting.videoBitrate
+        store.videoSetting.videoFps = fps ?? store.videoSetting.videoFps
+        param.fps = store.videoSetting.videoFps
+        roomEngine.updateVideoQualityEx(streamType: .cameraStream, params: param)
     }
     
     func cancelRequest(_ requestId: String, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
@@ -458,31 +466,6 @@ class EngineManager: NSObject {
         }
     }
     
-    func addUserItem(_ userItem: UserEntity) {
-        guard getUserItem(userItem.userId) == nil else { return }
-        if userItem.userName.isEmpty {
-            userItem.userName = userItem.userId
-        }
-        store.attendeeList.append(userItem)
-    }
-    
-    func deleteUserItem(_ userId: String) {
-        store.attendeeList = store.attendeeList.filter({ userItem in
-            userItem.userId != userId
-        })
-    }
-    
-    func addSeatItem(_ userItem: UserEntity) {
-        guard getSeatItem(userItem.userId) == nil else { return }
-        store.seatList.append(userItem)
-    }
-    
-    func deleteSeatItem(_ userId: String) {
-        store.seatList = store.seatList.filter({ userItem in
-            userItem.userId != userId
-        })
-    }
-    
     func updateVideoQuality(quality: TUIVideoQuality) {
         roomEngine.updateVideoQuality(quality)
     }
@@ -527,17 +510,6 @@ extension EngineManager {
         }
     }
     
-    private func logout(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
-        guard isLoginEngine else { return }
-        TUIRoomEngine.logout { [weak self] in
-            guard let self = self else { return }
-            self.isLoginEngine = false
-            onSuccess?()
-        } onError: { code, message in
-            onError?(code, message)
-        }
-    }
-    
     private func createEngineRoom(roomInfo: TUIRoomInfo, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         guard !store.isEnteredRoom else {
             if store.roomInfo.roomId == roomInfo.roomId {
@@ -548,12 +520,22 @@ extension EngineManager {
             }
             return
         }
+        roomInfo.name = transferConferenceName(conferenceName: roomInfo.name)
         self.store.roomInfo = roomInfo
         self.roomEngine.createRoom(roomInfo) {
             onSuccess()
         } onError: { code, message in
             onError(code, message)
         }
+    }
+    
+    private func transferConferenceName(conferenceName: String?) -> String {
+        if let confName = conferenceName, !confName.isEmpty {
+            return confName
+        }
+        let selfInfo = TUIRoomEngine.getSelfInfo()
+        let name: String = selfInfo.userName.isEmpty ? selfInfo.userId : selfInfo.userName
+        return name + .quickConferenceText
     }
     
     private func enterEngineRoom(roomId: String, enableAudio: Bool, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
@@ -578,6 +560,7 @@ extension EngineManager {
             self.initUserList()
             //Initialize video settings
             self.initLocalVideoState()
+            self.subLogoutNotification()
             if !self.isNeededAutoTakeSeat() {
                 self.operateLocalMicrophone(enableAudio: enableAudio)
                 onSuccess()
@@ -635,7 +618,6 @@ extension EngineManager {
     
     private func initLocalVideoState() {
         setVideoParam()
-        updateVideoQuality(quality: store.videoSetting.videoQuality)
         enableGravitySensor(enable: true)
         setGSensorMode(mode: .uiFixLayout)
         let resolutionMode: TUIResolutionMode = isLandscape ? .landscape : .portrait
@@ -643,11 +625,8 @@ extension EngineManager {
     }
     
     private func setVideoParam() {
-        let param = TRTCVideoEncParam()
-        param.videoBitrate = Int32(store.videoSetting.videoBitrate)
-        param.videoFps = Int32(store.videoSetting.videoFps)
-        param.enableAdjustRes = true
-        setVideoEncoderParam(param)
+        setVideoEncoder(videoQuality: store.videoSetting.videoQuality, bitrate: store.videoSetting.videoBitrate, 
+                        fps: store.videoSetting.videoFps)
         let params = TRTCRenderParams()
         params.fillMode = .fill
         params.rotation = ._0
@@ -686,6 +665,7 @@ extension EngineManager {
         roomEngine.getSeatList { [weak self] seatList in
             guard let self = self else { return }
             self.store.initialSeatList(seatList: seatList)
+            self.store.initialOffSeatList()
             onSuccess()
         } onError: { code, message in
             onError(code, message)
@@ -693,13 +673,19 @@ extension EngineManager {
         }
     }
     
-    private func getUserItem(_ userId: String) -> UserEntity? {
-        return store.attendeeList.first(where: {$0.userId == userId})
+    private func subLogoutNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(handleLogout),
+                                                       name: NSNotification.Name.TUILogoutSuccess, object: nil)
     }
     
-    private func getSeatItem(_ userId: String) -> UserEntity? {
-        return store.seatList.first(where: { $0.userId == userId })
+    private func unsubLogoutNotification() {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.TUILogoutSuccess, object: nil)
     }
+    
+    @objc private func handleLogout() {
+        destroyEngineManager()
+    }
+    
 }
 // MARK: - TUIExtensionProtocol
 
@@ -750,6 +736,9 @@ extension EngineManager {
 
 private extension String {
     static var inAnotherRoomText: String {
-        localized("TUIRoom.in.another.room")
+        localized("You are already in another room")
+    }
+    static var quickConferenceText: String {
+        localized("'s quick meeting")
     }
 }

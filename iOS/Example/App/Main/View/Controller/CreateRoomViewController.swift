@@ -163,7 +163,6 @@ extension CreateRoomViewController {
     private func quickStartConference(roomId: String) {
         conferenceViewController = ConferenceMainViewController()
         let params = ConferenceParams()
-        params.name = currentUserName.truncateUtf8String(maxByteLength: 30)
         params.enableSeatControl = isSeatEnable
         params.isMuteMicrophone = !enableLocalAudio
         params.isOpenCamera = enableLocalVideo
@@ -285,31 +284,31 @@ extension CreateRoomViewController: ConferenceObserver {
 
 private extension String {
     static var userNameText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.user.name")
+        RoomDemoLocalize("Your Name")
     }
     static var roomTypeText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.room.type")
+        RoomDemoLocalize("Room Type")
     }
     static var openCameraText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.open.video")
+        RoomDemoLocalize("Video")
     }
     static var openMicText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.open.mic")
+        RoomDemoLocalize("Mic")
     }
     static var openSpeakerText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.open.speaker")
+        RoomDemoLocalize("Speaker")
     }
     static var freedomSpeakText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.freedom.speaker")
+        RoomDemoLocalize("Free Speech Conference")
     }
     static var raiseHandSpeakText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.raise.speaker")
+        RoomDemoLocalize("On-stage Speech Conference")
     }
     static var videoConferenceText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.video.conference")
+        RoomDemoLocalize("`s quick meeting")
     }
     static var generatingRoomIdText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.generating.roomId")
+        RoomDemoLocalize("Generating room number, please try again later")
     }
     func truncateUtf8String(maxByteLength: Int) -> String {
         let length = self.utf8.count

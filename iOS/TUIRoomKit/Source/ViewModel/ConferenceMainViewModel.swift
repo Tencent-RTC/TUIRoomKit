@@ -50,6 +50,7 @@ class ConferenceMainViewModel: NSObject {
         super.init()
         selfRole = currentUser.userRole
         subscribeEngine()
+        subLogoutNotification()
     }
     
     func applyConfigs() {
@@ -89,6 +90,16 @@ class ConferenceMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowExitRoomView, responder: self)
+    }
+    
+    private func subLogoutNotification() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(dismissConferenceViewForLogout),
+                                               name: NSNotification.Name.TUILogoutSuccess, object: nil)
+    }
+    
+    private func unsubLogoutNotification() {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.TUILogoutSuccess, object: nil)
     }
     
     private func unsubscribeEngine() {
@@ -155,8 +166,15 @@ class ConferenceMainViewModel: NSObject {
         store.setConferenceObserver(observer)
     }
     
+    @objc func dismissConferenceViewForLogout() {
+        viewResponder?.showAlert(title: .logoutText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: {
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
+        }, declineBlock: nil)
+    }
+    
     deinit {
         unsubscribeEngine()
+        unsubLogoutNotification()
         debugPrint("deinit \(self)")
     }
 }
@@ -395,12 +413,20 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
     
     func makeFloatChatButton() -> FloatChatButton {
         let floatchatButton = FloatChatButton(roomId: store.roomInfo.roomId)
+        floatchatButton.isHidden = !store.shouldShowFloatChatView
         return floatchatButton
     }
     
     func makeFloatChatDisplayView() -> FloatChatDisplayView {
         let view = FloatChatDisplayView()
+        view.isHidden = !store.shouldShowFloatChatView
         return view
+    }
+    
+    func makeRaiseHandApplicationNotificationView() -> RaiseHandApplicationNotificationView {
+        let viewModel = RaiseHandApplicationNotificationViewModel()
+        let notificationView = RaiseHandApplicationNotificationView(viewModel: viewModel)
+        return notificationView
     }
 }
 
@@ -442,81 +468,84 @@ extension ConferenceMainViewModel: RoomKitUIEventResponder {
 
 private extension String {
     static var kickOffTitleText: String {
-        localized("TUIRoom.kick.off.title")
+        localized("You were removed by the room owner.")
     }
     static var destroyAlertText: String {
-        localized("TUIRoom.room.destroy")
+        localized("The room was closed.")
     }
     static var inviteTurnOnAudioText: String {
-        localized("TUIRoom.invite.turn.on.audio")
+        localized("xx invites you to turn on the microphone")
     }
     static var inviteTurnOnVideoText: String {
-        localized("TUIRoom.invite.turn.on.video")
+        localized("xx invites you to turn on the camera")
     }
     static var inviteSpeakOnStageTitle: String {
-        localized("TUIRoom.invite.to.speak")
+        localized("xx invites you to speak on stage")
     }
     static var inviteSpeakOnStageMessage: String {
-        localized("TUIRoom.agree.to.speak")
+        localized("You can turn on the camera and unmute it once you are on stage")
     }
     static var messageTurnedOffText: String {
-        localized("TUIRoom.homeowners.notice.message.turned.off")
+        localized("You were muted message by the room owner.")
     }
     static var messageTurnedOnText: String {
-        localized("TUIRoom.homeowners.notice.message.turned.on")
+        localized("You were unmuted message by the room owner.")
     }
     static var haveBecomeMasterText: String {
-        localized("TUIRoom.have.become.master")
+        localized("You are now a room owner")
     }
     static var haveBecomeAdministratorText: String {
-        localized("TUIRoom.have.become.administrator")
+        localized("You have become a room admin")
     }
     static var kickedOffLineText: String {
-        localized("TUIRoom.kicked.off.line")
+        localized("You are already logged in elsewhere")
     }
     static var alertOkText: String {
-        localized("TUIRoom.ok")
+        localized("OK")
     }
     static var declineText: String {
-        localized("TUIRoom.decline")
+        localized("Decline")
     }
     static var agreeText: String {
-        localized("TUIRoom.agree")
+        localized("Agree")
     }
     static var agreeSeatText: String {
-        localized("TUIRoom.agree.seat")
+        localized("Approve")
     }
     static var allMuteAudioText: String {
-        localized("TUIRoom.all.mute.audio.prompt")
+        localized("All audios disabled")
     }
     static var allMuteVideoText: String {
-        localized("TUIRoom.all.mute.video.prompt")
+        localized("All videos disabled")
     }
     static var allUnMuteAudioText: String {
-        localized("TUIRoom.all.unmute.audio.prompt")
+        localized("All audios enabled")
     }
     static var allUnMuteVideoText: String {
-        localized("TUIRoom.all.unmute.video.prompt")
+        localized("All videos enabled")
     }
     static var kickedOffSeat: String {
-        localized("TUIRoom.kicked.off.seat")
+        localized("You have been asked to leave stage")
     }
     static var hostText: String {
-        localized("TUIRoom.host")
+        localized("Host")
     }
     static var administratorText: String {
-        localized("TUIRoom.role.administrator")
+        localized("Administrator")
     }
     static var revokedAdministratorText: String {
-        localized("TUIRoom.revoked.your.administrator")
+        localized("Your room admin status has been revoked")
     }
     static var onStageNumberReachedLimitText: String {
-        localized("TUIRoom.on.stage.number.reached.limit")
+        localized("The stage is full, please contact the host")
     }
     static var goOnStageTimedOutText: String {
-        localized("TUIRoom.go.on.stage.timed.out")
+        localized("Failed to go on stage, invitation has timed out")
     }
     static var kieckedOffLineText: String {
-        localized("TUIRoom.kiecked.off.line")
+        localized("You are already logged in elsewhere")
+    }
+    static var logoutText: String {
+        localized("You are logged out")
     }
 }

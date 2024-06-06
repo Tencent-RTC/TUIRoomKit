@@ -9,8 +9,9 @@
 
 import Foundation
 import TUICore
+import RTCRoomEngine
 
-class RoomMessageManager {
+class RoomMessageManager: NSObject {
     static let shared = RoomMessageManager()
     private var engineManager: EngineManager {
         EngineManager.createInstance()
@@ -21,7 +22,10 @@ class RoomMessageManager {
     weak var navigateController: UINavigationController?
     var isReadyToSendMessage: Bool = true
     var groupId: String = ""
-    private init() {}
+    private override init() {
+        super.init()
+        TUICore.registerEvent(TUICore_TUIChatNotify, subKey: TUICore_TUIChatNotify_SendMessageSubKey, object: self)
+    }
     
     func sendRoomMessageToGroup() {
         DispatchQueue.main.async { [weak self] in
@@ -88,11 +92,11 @@ class RoomMessageManager {
     
     private func modifyMessage(message: RoomMessageModel, dic:[String: Any]) {
         guard let message = message.getMessage() else { return }
-        guard var dict = TUITool.jsonData2Dictionary(message.customElem.data) as? [String: Any] else { return }
+        guard var customElemDic = TUITool.jsonData2Dictionary(message.customElem.data) as? [String: Any] else { return }
         for (key, value) in dic {
-            dict[key] = value
+            customElemDic[key] = value
         }
-        guard let jsonString = dic.convertToString() else { return }
+        guard let jsonString = customElemDic.convertToString() else { return }
         let jsonData = jsonString.data(using: String.Encoding.utf8)
         message.customElem.data = jsonData
         V2TIMManager.sharedInstance().modifyMessage(message) { code, desc, msg in
@@ -118,9 +122,22 @@ extension RoomMessageManager {
     }
 }
 
-private extension String {
-    static var quickMeetingText: String {
-        localized("TUIRoom.quick.meeting")
+extension RoomMessageManager: TUINotificationProtocol {
+    func onNotifyEvent(_ key: String, subKey: String, object anObject: Any?, param: [AnyHashable : Any]?) {
+        guard key == TUICore_TUIChatNotify, subKey == TUICore_TUIChatNotify_SendMessageSubKey else { return }
+        guard let code = param?[TUICore_TUIChatNotify_SendMessageSubKey_Code] as? Int else { return }
+        if code == 0 {
+            guard let message = param?[TUICore_TUIChatNotify_SendMessageSubKey_Message] as? V2TIMMessage else { return }
+            let messageModel = RoomMessageModel()
+            messageModel.updateMessage(message: message)
+            guard messageModel.messageId.count > 0, messageModel.roomState == .creating, messageModel.roomId == RoomManager.shared.roomId else { return }
+            let roomInfo = TUIRoomInfo()
+            roomInfo.roomId = messageModel.roomId
+            RoomManager.shared.createRoom(roomInfo: roomInfo)
+        } else {
+            guard let errorMessage = param?[TUICore_TUIChatNotify_SendMessageSubKey_Desc] as? String else { return }
+            RoomRouter.makeToast(toast: errorMessage)
+        }
     }
 }
 

@@ -7,7 +7,6 @@
 
 import SnapKit
 import UIKit
-import Combine
 
 class FloatChatDefaultCell: UITableViewCell {
     static let identifier = "FloatChatDefaultCell"
@@ -90,8 +89,7 @@ class FloatChatDefaultCell: UITableViewCell {
      
      private func getAttributedText(from message: FloatChatMessage) -> NSMutableAttributedString {
          let userName = message.user.userName + ": "
-         let userNameAttributes: [NSAttributedString.Key: Any] =
-         [.foregroundColor: UIColor.tui_color(withHex: "80BEF6"), .font: UIFont.systemFont(ofSize: 12)]
+         let userNameAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: 12)]
          let userNameAttributedText = NSMutableAttributedString(string: userName,
                                                                 attributes: userNameAttributes)
 

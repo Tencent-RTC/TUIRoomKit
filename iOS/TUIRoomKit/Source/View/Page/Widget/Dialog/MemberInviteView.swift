@@ -116,12 +116,12 @@ extension MemberInviteView: MemberInviteResponder {
 
 private extension String {
     static var copyRoomIdSuccess: String {
-        localized("TUIRoom.copy.roomId.success")
+        localized("Room ID copied.")
     }
     static var copyRoomLinkSuccess: String {
-        localized("TUIRoom.copy.roomLink.success")
+        localized("Room Link copied.")
     }
     static var inviteMemberText: String {
-        localized("TUIRoom.inviteMember")
+        localized("Invite member")
     }
 }

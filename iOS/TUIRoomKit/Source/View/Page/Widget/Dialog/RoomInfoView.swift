@@ -119,7 +119,7 @@ class RoomInfoView: UIView {
     }
     
     func setupViewState(item: RoomInfoViewModel) {
-        nameLabel.text = EngineManager.createInstance().store.roomInfo.name + .quickMeetingText
+        nameLabel.text = EngineManager.createInstance().store.roomInfo.name
     }
     
     @objc func codeAction(sender: UIButton) {
@@ -140,13 +140,10 @@ extension RoomInfoView: RoomInfoResponder {
 
 private extension String {
     static var copyRoomIdSuccess: String {
-        localized("TUIRoom.copy.roomId.success")
+        localized("Room ID copied.")
     }
     static var copyRoomLinkSuccess: String {
-        localized("TUIRoom.copy.roomLink.success")
-    }
-    static var quickMeetingText: String {
-        localized("TUIRoom.video.conference")
+        localized("Room Link copied.")
     }
 }
 

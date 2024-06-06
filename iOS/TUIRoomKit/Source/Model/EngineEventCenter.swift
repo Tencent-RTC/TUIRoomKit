@@ -65,6 +65,7 @@ class EngineEventCenter: NSObject {
         case onAllUserMicrophoneDisableChanged
         case onKickedOffSeat
         case onStatistics
+        case onDeletedTakeSeatRequest
     }
     
     enum RoomUIEvent: String {

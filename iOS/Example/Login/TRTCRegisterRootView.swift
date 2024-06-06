@@ -286,9 +286,9 @@ func validateString(_ string: String) -> Bool {
 
 /// MARK: - internationalization string
 fileprivate extension String {
-    static let nicknamePlaceholderText = LoginLocalize(key:"Demo.TRTC.Login.enterusername")
-    static let descText = LoginLocalize(key:"Demo.TRTC.Login.limit20count")
-    static let registText = LoginLocalize(key:"Demo.TRTC.Login.regist")
-    static let nameTooLongText = LoginLocalize(key:"Demo.TRTC.Login.registsfailure.nameTooLong")
-    static let nicknameText = LoginLocalize(key:"Demo.TRTC.Login.nickname")
+    static let nicknamePlaceholderText = LoginLocalize(key:"Please enter a nickname")
+    static let descText = LoginLocalize(key:"Letters, numbers and underscores")
+    static let registText = LoginLocalize(key:"Sign Up")
+    static let nameTooLongText = LoginLocalize(key:"Your Nickname is too long")
+    static let nicknameText = LoginLocalize(key:"Nickname")
 }

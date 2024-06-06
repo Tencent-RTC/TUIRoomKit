@@ -18,6 +18,7 @@ protocol ConferenceMainViewFactory {
     func makeWaterMarkLayer() -> WaterMarkLayer
     func makeFloatChatButton() -> FloatChatButton
     func makeFloatChatDisplayView() -> FloatChatDisplayView
+    func makeRaiseHandApplicationNotificationView() -> RaiseHandApplicationNotificationView
 }
 
 struct ConferenceMainViewLayout { //Layout changes when switching between horizontal and vertical screens
@@ -81,6 +82,11 @@ class ConferenceMainView: UIView {
         return viewFactory.makeFloatChatButton()
     }()
     
+    lazy var raiseHandApplicationNotificationView: RaiseHandApplicationNotificationView = {
+        let applicationNotificationView = viewFactory.makeRaiseHandApplicationNotificationView()
+        return applicationNotificationView
+    }()
+    
     // MARK: - view layout
     private var isViewReady: Bool = false
     override func didMoveToWindow() {
@@ -106,11 +112,12 @@ class ConferenceMainView: UIView {
             layer.addSublayer(waterMarkLayer)
         }
         addSubview(topView)
+        addSubview(floatChatDisplayView)
+        addSubview(floatChatButton)
         addSubview(bottomView)
         addSubview(localAudioView)
         addSubview(raiseHandNoticeView)
-        addSubview(floatChatDisplayView)
-        addSubview(floatChatButton)
+        addSubview(raiseHandApplicationNotificationView)
     }
     
     func activateConstraints() {
@@ -127,16 +134,22 @@ class ConferenceMainView: UIView {
             make.bottom.equalToSuperview().offset(-40.scale375Height())
         }
         floatChatButton.snp.makeConstraints { make in
-            make.bottom.equalTo(bottomView.snp.top).offset(-5)
-            make.height.equalTo(40)
+            make.bottom.equalTo(localAudioView.snp.top).offset(-18)
+            make.height.equalTo(30)
             make.leading.equalToSuperview()
             make.width.equalTo(100)
         }
         floatChatDisplayView.snp.makeConstraints { make in
-            make.bottom.equalTo(floatChatButton.snp.top).offset(-5)
-            make.height.equalTo(200)
+            make.bottom.equalTo(floatChatButton.snp.top).offset(-8)
+            make.height.equalTo(128)
             make.leading.equalToSuperview()
-            make.width.equalTo(200)
+            make.width.equalTo(313)
+        }
+        raiseHandApplicationNotificationView.snp.makeConstraints { make in
+            make.top.equalTo(topView.snp.bottom)
+            make.width.equalTo(359.scale375())
+            make.centerX.equalToSuperview()
+            make.height.equalTo(40.scale375Height())
         }
     }
     

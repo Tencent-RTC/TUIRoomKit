@@ -12,7 +12,7 @@ import UIKit
 class VideoSeatCell: UICollectionViewCell {
     var seatItem: VideoSeatItem?
     var isSupportedAmplification: Bool {
-        return seatItem?.type == .share
+        return seatItem?.videoStreamType == .screenStream
     }
     
     private lazy var scrollRenderView: UIScrollView = {
@@ -25,8 +25,9 @@ class VideoSeatCell: UICollectionViewCell {
         
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
-        scrollView.maximumZoomScale = 3
+        scrollView.maximumZoomScale = 5
         scrollView.minimumZoomScale = 1
+        scrollView.isScrollEnabled = false
         scrollView.delegate = self
         return scrollView
     }()
@@ -102,6 +103,10 @@ class VideoSeatCell: UICollectionViewCell {
         scrollRenderView.layer.borderColor = UIColor.clear.cgColor
     }
     
+    override func prepareForReuse() {
+        scrollRenderView.zoomScale = 1.0
+    }
+    
     deinit {
         NSObject.cancelPreviousPerformRequests(withTarget: self)
         debugPrint("deinit \(self)")
@@ -121,8 +126,8 @@ extension VideoSeatCell {
         seatItem = item
         let placeholder = UIImage(named: "room_default_user", in: tuiRoomKitBundle(), compatibleWith: nil)
         avatarImageView.sd_setImage(with: URL(string: item.avatarUrl), placeholderImage: placeholder)
-        avatarImageView.isHidden = item.type == .share ? item.isHasVideoStream : item.hasVideoStream
-        backgroundMaskView.isHidden = item.type == .share ? item.isHasVideoStream : item.hasVideoStream
+        avatarImageView.isHidden = item.videoStreamType == .screenStream ? true : item.hasVideoStream
+        backgroundMaskView.isHidden = item.videoStreamType == .screenStream ? true : item.hasVideoStream
         userInfoView.updateUserStatus(item)
         resetVolumeView()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
@@ -138,9 +143,9 @@ extension VideoSeatCell {
     }
     
     func updateUIVolume(item: VideoSeatItem) {
-        userInfoView.updateUserVolume(hasAudio: item.hasAudioStream, volume: item.audioVolume)
-        if item.audioVolume > 0 && item.hasAudioStream {
-            if item.type != .share {
+        userInfoView.updateUserVolume(hasAudio: item.hasAudioStream, volume: item.userVoiceVolume)
+        if item.userVoiceVolume > 0 && item.hasAudioStream {
+            if item.videoStreamType != .screenStream {
                 scrollRenderView.layer.borderColor = UIColor(0xA5FE33).cgColor
             }
         } else {
@@ -157,15 +162,20 @@ extension VideoSeatCell {
 
 class TUIVideoSeatDragCell: VideoSeatCell {
     typealias DragCellClickBlock = () -> Void
-    private let clickBlock: DragCellClickBlock
-    init(frame: CGRect, clickBlock: @escaping DragCellClickBlock) {
-        self.clickBlock = clickBlock
-        super.init(frame: frame)
-        addGesture()
+    var clickBlock: DragCellClickBlock?
+    
+    private var isViewReady = false
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard !isViewReady else {
+            return
+        }
+        isViewReady = true
+        bindInteraction()
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func bindInteraction() {
+        addGesture()
     }
     
     func updateSize(size: CGSize) {
@@ -187,7 +197,7 @@ extension TUIVideoSeatDragCell {
     }
     
     @objc private func click() {
-        clickBlock()
+        clickBlock?()
     }
     
     @objc private func dragViewDidDrag(gesture: UIPanGestureRecognizer) {
