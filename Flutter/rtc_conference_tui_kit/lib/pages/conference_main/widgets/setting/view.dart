@@ -8,31 +8,36 @@ import 'widgets/widgets.dart';
 class SettingWidget extends GetView<SettingController> {
   const SettingWidget({Key? key}) : super(key: key);
 
-  Widget _buildSettingPage() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const DropDownButton(),
-        Text(
-          RoomContentsTranslations.translate('videoSetting'),
-          style: RoomTheme.defaultTheme.textTheme.bodyMedium,
-        ),
-        const SizedBox(
-          height: 8.0,
-        ),
-        const VideoSettingWidget(),
-        const SizedBox(
-          height: 24.0,
-        ),
-        Text(
-          RoomContentsTranslations.translate('audioSetting'),
-          style: RoomTheme.defaultTheme.textTheme.bodyMedium,
-        ),
-        const SizedBox(
-          height: 8.0,
-        ),
-        const AudioSettingWidget(),
-      ],
+  Widget _buildSettingPage(Orientation orientation) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Visibility(
+            visible: orientation == Orientation.landscape,
+            child: SizedBox(height: 25.0.scale375()),
+          ),
+          Text(
+            RoomContentsTranslations.translate('videoSetting'),
+            style: RoomTheme.defaultTheme.textTheme.bodyMedium,
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          VideoSettingWidget(orientation: orientation),
+          const SizedBox(
+            height: 24.0,
+          ),
+          Text(
+            RoomContentsTranslations.translate('audioSetting'),
+            style: RoomTheme.defaultTheme.textTheme.bodyMedium,
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          const AudioSettingWidget(),
+        ],
+      ),
     );
   }
 
@@ -42,10 +47,16 @@ class SettingWidget extends GetView<SettingController> {
       init: SettingController(),
       id: "setting",
       builder: (_) {
-        return BottomSheetWidget(
-          width: double.infinity,
-          height: Get.height * 0.88,
-          child: _buildSettingPage(),
+        return OrientationBuilder(
+          builder: (BuildContext context, Orientation orientation) {
+            return BottomSheetWidget(
+              height: orientation == Orientation.portrait
+                  ? Get.height * 0.88
+                  : Get.height,
+              orientation: orientation,
+              child: _buildSettingPage(orientation),
+            );
+          },
         );
       },
     );

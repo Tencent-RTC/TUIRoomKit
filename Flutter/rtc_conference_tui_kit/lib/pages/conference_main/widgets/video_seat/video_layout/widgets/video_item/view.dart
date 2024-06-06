@@ -31,10 +31,10 @@ class _VideoItemState extends State<VideoItemWidget> {
 
   @override
   void didUpdateWidget(covariant VideoItemWidget oldWidget) {
-    if (widget.userModel.userId.value != oldWidget.userModel.userId.value) {
-      controller.removeVideoView(
-          oldWidget.userModel.userId.value, _nativeViewPtr);
-      controller.setVideoView(widget.userModel.userId.value, _nativeViewPtr);
+    if (widget.isScreenStream != oldWidget.isScreenStream ||
+        widget.userModel.userId.value != oldWidget.userModel.userId.value) {
+      controller.updateVideoItem(oldWidget.userModel.userId.value,
+          _nativeViewPtr, widget.userModel.userId.value, widget.isScreenStream);
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -124,7 +124,7 @@ class _VideoItemState extends State<VideoItemWidget> {
                 ),
               ),
               Positioned(
-                bottom: 12,
+                bottom: 4,
                 left: 7,
                 child: VideoUserInfoWidget(
                   userModel: widget.userModel,

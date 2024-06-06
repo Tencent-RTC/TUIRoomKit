@@ -12,9 +12,9 @@ class UserTableWidget extends GetView<TransferHostController> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => SizedBox(
-        height: 569.0.scale375Height(),
+      () => Expanded(
         child: ListView.builder(
+          padding: EdgeInsets.zero,
           itemCount: controller.isSearchBarEmpty.value
               ? RoomStore.to.userInfoList.length
               : controller.searchResults.length,

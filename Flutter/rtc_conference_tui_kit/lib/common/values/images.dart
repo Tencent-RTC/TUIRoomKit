@@ -58,4 +58,5 @@ class AssetsImages {
   static const roomHandRaiseList = 'assets/images/room_hand_raise_list.png';
   static const roomApplyJoinStage = 'assets/images/room_apply_join_stage.png';
   static const roomCancelRequest = 'assets/images/room_cancel_request.png';
+  static const roomRightArrow = 'assets/images/room_right_arrow.png';
 }

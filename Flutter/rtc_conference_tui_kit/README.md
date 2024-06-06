@@ -3,7 +3,7 @@ _English | [简体中文](README.zh-CN.md)_
 
 <img src="https://qcloudimg.tencent-cloud.cn/raw/1539bcd27bb2f03a019d55bf65f6c1f5.png" align="left" width=120 height=120>  TUIRoomKit (rtc_conference_tui_kit) is Tencent Cloud launched a positioning enterprise meeting, online class, network salon and other scenes of the UI component, through the integration of the component, you only need to write a few lines of code can add similar video conference functions for your App, and support screen sharing, member management, ban the ban painting, chat and other functions. TUIRoomKit supports Windows, Mac, Android, iOS, Flutter, Web, Electron and other development platforms.
 
-<a href="https://apps.apple.com/cn/app/%E8%85%BE%E8%AE%AF%E4%BA%91%E9%9F%B3%E8%A7%86%E9%A2%91/id1400663224"><img src="https://qcloudimg.tencent-cloud.cn/raw/348148fb6fd16423c03b7c6de2929c2e.svg" height=40></a> <a href="https://dldir1.qq.com/hudongzhibo/liteav/TRTCDemo.apk"><img src="https://qcloudimg.tencent-cloud.cn/raw/83597d40f8aded40a65b801392fdc724.svg" height=40></a> <a href="https://web.sdk.qcloud.com/trtc/webrtc/demo/api-sample/login.html"><img src="https://qcloudimg.tencent-cloud.cn/raw/623bd0e0c83a4762155f8363e845b052.svg" height=40></a>
+<a href="https://apps.apple.com/cn/app/%E8%85%BE%E8%AE%AF%E4%BA%91%E9%9F%B3%E8%A7%86%E9%A2%91/id1400663224"><img src="https://qcloudimg.tencent-cloud.cn/raw/348148fb6fd16423c03b7c6de2929c2e.svg" height=40></a> <a href="https://dldir1.qq.com/hudongzhibo/liteav/TRTCDemo.apk"><img src="https://qcloudimg.tencent-cloud.cn/raw/83597d40f8aded40a65b801392fdc724.svg" height=40></a> <a href="https://trtc.io/demo/homepage/#/detail?scene=roomkit"><img src="https://qcloudimg.tencent-cloud.cn/raw/623bd0e0c83a4762155f8363e845b052.svg" height=40></a>
 
 
 
@@ -25,34 +25,55 @@ Here is an example of integration with UI (ie TUIRoomKit), which is also our rec
 
 ### Environment preparation
 
-| Platform | Version|
-| -------------------- | ------ |
-| Flutter  |3.0.0 And Above Versions.|
-| Android  |- Minimum compatibility with Android 4.1 (SDK API Level 16), recommended to use Android 5.0 (SDK API Level 21) and above。       |
-|  iOS     |iOS 12.0 and higher.     |
+<table>
+<tr>
+<td rowspan="1" colSpan="1" >Platform</td>
+
+<td rowspan="1" colSpan="1" >Version</td>
+</tr>
+
+<tr>
+<td rowspan="1" colSpan="1" >Flutter</td>
+
+<td rowspan="1" colSpan="1" >3.0.0 and above versions.</td>
+</tr>
+
+<tr>
+<td rowspan="1" colSpan="1" >Android</td>
+
+<td rowspan="1" colSpan="1" >- Android 4.1 (SDK API level 16) or later (Android 5.0 (SDK API level 21) or later is recommended).<br>- Android Studio 3.5 or later (Gradle 3.5.4 or later). <br>- Mobile phone on Android 4.1 or later.</td>
+</tr>
+
+<tr>
+<td rowspan="1" colSpan="1" >iOS</td>
+
+<td rowspan="1" colSpan="1" >iOS 12.0 and higher.</td>
+</tr>
+</table>
+
 
 ###  Activate the service
-1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/57508) to obtain your own SDKAppID and SDKSecreKey.
+1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/57508) to obtain your own SDKAppID and SDKSecretKey.
 
 ### Access and use
 
 - Step 1: Add the dependency
 
-  Add the rtc_conference_tui_kit plugin dependency in `pubspec.yaml` file in your project
+  Add the rtc_conference_tui_kit plugin dependency in `pubspec.yaml` file in your project.
   ```
   dependencies:  
    rtc_conference_tui_kit: latest release version
   ```
-  Execute the following command to install the plugin
+  Execute the following command to install the plugin.
   ```
   flutter pub get
   ```
 
 - Step 2: Complete Project Configuration
 
-  - Since the `rtc_conference_tui_kit` component uses the `GetX` state management library for navigation, you need to use `GetMaterialApp` instead of `MaterialApp` in your application. Or you can set the `navigatorKey` property in your `MaterialApp` to `Get.key` to achieve the same effect.
+  - Since the `rtc_conference_tui_kit` has utilized the relevant features of the `GetX` state management library,, you need to use `GetMaterialApp` instead of `MaterialApp` in your application. Or you can set the `navigatorKey` property in your `MaterialApp` to `Get.key` to achieve the same effect.
 
-  - Use `Xcode` to open your project, select [Project] -> [Building Settings] -> [Deployment], and set the [Strip Style] to `Non-Global Symbols` to retain all global symbol information.
+  - Use `Xcode` to open your project, select [Project] -> [Building Settings] -> [Deployment], and set the [Strip Style] to **Non-Global Symbols** to retain all global symbol information.
 
   - To use the audio and video functions on **iOS**, you need to authorize the use of the mic and camera (For Android, the relevant permissions have been declared in the SDK, so you do not need to manually configure them). 
     
@@ -81,6 +102,7 @@ Here is an example of integration with UI (ie TUIRoomKit), which is also our rec
 
 - Step 3: Login `rtc_conference_tui_kit` plugin
 
+  Add the following code to your project, which serves to log in to the component by calling the relevant APIs in TUIRoomKit. This step is extremely critical, as only after logging in can you use the various functions of TUIRoomKit, so please be patient and check if the relevant parameters are configured correctly:
   ```dart
   import 'package:rtc_room_engine/rtc_room_engine.dart';
 
@@ -100,27 +122,28 @@ Here is an example of integration with UI (ie TUIRoomKit), which is also our rec
 **Parameter Description**
 
 Here is a detailed introduction to the key parameters used in the login function:
-- **SDKAppID**：You have already obtained it in [Active the service](#active-the-service), so it will not be repeated here.
+- **SDKAppID**：Obtained it in [Active the service](#active-the-service).
 
-- **UserID**：The ID of the current user, string type, only allows to contain English letters (a-z and A-Z), numbers (0-9), hyphens (-), and underscores (_).
+- **UserID**：The ID of the current user, which is a string that can only contain English letters (a-z and A-Z), numbers (0-9), hyphens (-), and underscores (_).
 
-- **UserSig**：Encrypt the SDKAppID, UserID, etc. with the SDKSecretKey obtained in [Active the service](#active-the-service) to get the UserSig, which is a ticket for authorization and is used for Tencent Cloud to recognize whether the current user can use the TRTC service. You can create a temporarily available UserSig through the [UserSig Tools](https://console.trtc.io/usersig) through the project sidebar in the console.![](https://qcloudimg.tencent-cloud.cn/raw/1a7924c7e94b4f32b3d4d99053850a56.png)
+- **UserSig**：The authentication credential used by Tencent Cloud to verify whether the current user is allowed to use the TRTC service. You can get it by using the SDKSecretKey to encrypt information such as SDKAppID and UserID. You can generate a temporary UserSig on the [UserSig Tools](https://console.trtc.io/usersig) page in the TRTC console.
+![](https://qcloudimg.tencent-cloud.cn/raw/1a7924c7e94b4f32b3d4d99053850a56.png)
 
-- For more information, please refer to the [UserSig related](https://trtc.io/document/35166).
+- For more information, please refer to the [UserSig](https://trtc.io/document/35166).
    
 
 > **Note:**
 > 
->   - **This step is also the step with the most feedback from developers we have received so far. Common problems are as follows:**
->   - `SDKAppID` is set incorrectly. Please use the `SDKAppID` of the international site correctly, otherwise, you will not be able to access it.
->   - `UserSig` is misconfigured as an encryption key (`SDKSecretKey`). `UserSig` is obtained by encrypting the `SDKAppID`, `UserID`, and expiration time with the SDKSecretKey, not by directly configuring the `SDKSecretKey` as `UserSig`.
->   - `UserID` is set to simple strings like "1", "123", "111", etc. **Since TUIRoomEngine does not support multi-terminal login with the same UserID**, simple UserIDs like "1", "123", "111" are easily occupied by your colleagues, causing login failure. Therefore, we recommend that you set some UserIDs with high identifiability when debugging.
->   - The [sample code](https://github.com/tencentyun/TUIRoomKit/blob/main/Flutter/room_flutter_example/lib/debug/generate_test_user_sig.dart) in Github uses the `genTestUserSig` function to calculate UserSig locally to quickly get you through the current access process. However, this solution exposes your SDKSecretKey in the App code, which is not conducive to your subsequent upgrades and protection of your` SDKSecretKey`. Therefore, we strongly recommend that you put the calculation logic of `UserSig `on the server side and have the app request the real-time calculated UserSig from your server every time it uses the TUIRoomKit Component.
+>   - **Many developers have contacted us with questions regarding this step. Below are some of the frequently encountered problems:**
+>     - The `SDKAppID` is set incorrectly.
+>     - `UserSig` is set to the value of `SDKSecretKey` mistakenly. The `UserSig` is generated by using the `SDKSecretKey` for the purpose of encrypting information such as `SDKAppID`, `UserID`, and the expiration time. But the value of the `UserSig` cannot be directly substituted with the value of the `SDKSecretKey`.
+>     - The `UserID` is set to a simple string such as 1, 123, or 111, and your colleague may be using the same UserID while working on a project simultaneously. In this case, login will fail as TUIRoomKit doesn't support login on multiple terminals with the same UserID. Therefore, we recommend you use some distinguishable UserID values during debugging.
+>   - The [sample code](https://github.com/tencentyun/TUIRoomKit/blob/main/Flutter/room_flutter_example/lib/debug/generate_test_user_sig.dart) on GitHub uses the `genTestUserSig` function to calculate `UserSig` locally, so as to help you complete the current integration process more quickly. However, this scheme exposes your `SDKSecretKey` in the application code, which makes it difficult for you to upgrade and protect your `SDKSecretKey` subsequently. Therefore, we strongly recommend you run the `UserSig` calculation logic on the server and make the application request the `UserSig` calculated in real time every time the application uses the TUIRoomKit component from the server.
 
 
 - Step 4: User `rtc_conference_tui_kit` plugin
 
-  - Set self nickName and avatar (optional)
+  - Set self username and profile photo (optional)
 
     ```dart
     import 'package:rtc_room_engine/rtc_room_engine.dart';
@@ -182,12 +205,12 @@ Here is a detailed introduction to the key parameters used in the login function
 ## Quick link
 
 - If you encounter difficulties, you can refer to [FAQs](https://trtc.io/document/57598), here are the most frequently encountered problems of developers, covering various platforms, I hope it can Help you solve problems quickly.
-- If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](../../Web/), [Android](../../Android/), [iOS](../../iOS/), [Electron](../../Electron/), [Windows](../../Windows-Mac/).
+- If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](../../Web/), [Android](../../Android/), [iOS](../../iOS/), [Electron](../../Electron/), [Qt](../../Qt/).
 
 - If you would like to see some of our latest product features, you can check the [Update Log](https://pub.dev/packages/rtc_conference_tui_kit/changelog), here are the latest features of rtc_conference_tui_kit, as well as the historical version features iterate
-- For complete API documentation, see [API reference](https://trtc.io/document/57512): including TUIRoomKit、 (with UIKit), TUIRoomEngine (without UIKit), and events Callbacks, etc.
-- If you want to learn more about the projects maintained by Tencent Cloud  Media Services Team, you can check our [Product Official Website](https://trtc.io/), [Github Organizations](https://github.com/LiteAVSDK) etc.
+- For complete API documentation, see [API reference](https://trtc.io/document/57512): including TUIRoomKit (with UIKit), TUIRoomEngine (without UIKit), and events Callbacks, etc.
+- If you want to learn more about the projects maintained by Tencent Cloud  Media Services Team, you can check our [Product Official Website](https://trtc.io/products/conference), [Github Organizations](https://github.com/Tencent-RTC) etc.
 
 ## Communication and feedback
 
-If you have any suggestions or comments during the use of our product, please feel free to contact us at info_rtc@tencent.com or submit an [issue](https://github.com/tencentyun/TUIRoomKit/issues). Your feedback is greatly appreciated. 
+If you have any suggestions or comments during the use of our product, please feel free to contact us at info_rtc@tencent.com or submit an [issue](https://github.com/Tencent-RTC/TUIRoomKit/issues). Your feedback is greatly appreciated. 

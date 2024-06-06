@@ -1,3 +1,13 @@
+### 2.4.0(2024-06-06)
+
+- Added support for landscape mode.
+- Changed the default language to the system language.
+- Fixed an issue where the conference name in the top bar did not match the settings.
+- Fixed an issue with dragging in the large and small window layout.
+- Modified the parameters in `ConferenceMainPage` from `roomId` to `conferenceId`, and `isCreateRoom` to `isCreateConference`.
+- Improved the parameters in each callback within the `ConferenceObserver`.
+- Upgraded rtc_room_engine dependencies.
+
 ### 2.2.1(2024-03-29)
 
 - Upgraded rtc_room_engine dependencies.

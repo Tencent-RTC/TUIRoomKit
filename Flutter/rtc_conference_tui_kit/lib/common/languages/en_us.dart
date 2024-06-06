@@ -129,7 +129,7 @@ const Map<String, String> roomContentsEnUS = {
   'setAsAdministrator': 'Set as administrator',
   'undoAdministrator': 'Undo administrator',
   'haveSetUpAdministrator': 'xx has been set as room admin',
-  'haveRevokedAdministrator': 'The room admin status of xxx has been withdrawn',
+  'haveRevokedAdministrator': 'The room admin status of xx has been withdrawn',
   'haveBecomeAdministrator': 'You have become a room admin',
   'haveBecomeAdministratorMessage':
       'You have been set as an administrator by the host. Do you want to join stage immediately?',

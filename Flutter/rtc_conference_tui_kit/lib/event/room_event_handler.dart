@@ -90,19 +90,21 @@ class RoomEventHandler extends TUIRoomObserver {
       });
     };
 
-    super.onUserRoleChanged = (String userId, TUIRole role) {
-      if (role == TUIRole.roomOwner) {
-        _store.roomInfo.ownerId = userId;
+    super.onUserRoleChanged = (TUIUserInfo userInfo) {
+      if (userInfo.userRole == TUIRole.roomOwner) {
+        _store.roomInfo.ownerId = userInfo.userId;
       }
-      _store.updateUserRole(userId, role, _store.userInfoList);
+      _store.updateUserRole(
+          userInfo.userId, userInfo.userRole, _store.userInfoList);
 
       if (_store.roomInfo.isSeatEnabled == true &&
           _store.roomInfo.seatMode == TUISeatMode.applyToTake) {
-        _store.updateUserRole(userId, role, _store.seatedUserList);
+        _store.updateUserRole(
+            userInfo.userId, userInfo.userRole, _store.seatedUserList);
       }
 
-      if (userId == _store.currentUser.userId.value) {
-        _store.updateSelfRole(role);
+      if (userInfo.userId == _store.currentUser.userId.value) {
+        _store.updateSelfRole(userInfo.userRole);
       }
     };
 
@@ -148,15 +150,15 @@ class RoomEventHandler extends TUIRoomObserver {
       }
     };
 
-    super.onRequestCancelled = (requestId, userId) {
-      _store.deleteTakeSeatRequest(requestId);
+    super.onRequestCancelled = (TUIRequest request, TUIUserInfo operateUser) {
+      _store.deleteTakeSeatRequest(request.requestId);
     };
 
-    super.onRequestProcessed = (requestId, userId) {
-      _store.deleteTakeSeatRequest(requestId);
+    super.onRequestProcessed = (TUIRequest request, TUIUserInfo operateUser) {
+      _store.deleteTakeSeatRequest(request.requestId);
     };
 
-    super.onKickedOffSeat = (userId) {
+    super.onKickedOffSeat = (int seatIndex, TUIUserInfo operateUser) {
       makeToast(msg: RoomContentsTranslations.translate('kickedOffSeat'));
     };
   }

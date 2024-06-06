@@ -42,7 +42,7 @@ class CreateRoomController extends GetxController {
     }
     isOperating = true;
     ConferenceSession.newInstance(_getRoomId())
-      ..name = UserStore.to.userModel.userName
+      ..name = UserStore.to.userModel.userName + 'quickConference'.tr
       ..enableSeatControl = _isSeatControlEnable
       ..isMuteMicrophone = !UserStore.to.openMicrophone.value
       ..isOpenCamera = UserStore.to.openCamera.value
@@ -50,14 +50,15 @@ class CreateRoomController extends GetxController {
       ..onActionSuccess = _createRoomSuccess
       ..onActionError = _createRoomError
       ..quickStart();
-    isOperating = false;
   }
 
   void _createRoomSuccess() {
+    isOperating = false;
     Get.to(const ConferenceMainPage());
   }
 
   void _createRoomError(ConferenceError error, String message) {
+    isOperating = false;
     makeToast(msg: "code: $error message: $message");
   }
 }

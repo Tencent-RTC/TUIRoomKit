@@ -9,6 +9,7 @@ class WithDraggableWindowWidget extends GetView<VideoLayoutController> {
   final Widget? draggableWidget;
   final double draggableWidgetWidth;
   final double draggableWidgetHeight;
+  final Orientation orientation;
 
   const WithDraggableWindowWidget({
     super.key,
@@ -16,9 +17,13 @@ class WithDraggableWindowWidget extends GetView<VideoLayoutController> {
     this.draggableWidget,
     this.draggableWidgetWidth = 100.0,
     this.draggableWidgetHeight = 100.0,
+    this.orientation = Orientation.portrait,
   });
 
   Widget _buildView() {
+    controller.updateVideoLayoutSize(orientation);
+    controller.updatePadding(
+        orientation, draggableWidgetWidth, draggableWidgetHeight);
     return Stack(
       children: [
         mainWidget,
@@ -35,16 +40,22 @@ class WithDraggableWindowWidget extends GetView<VideoLayoutController> {
                   (CustomPanGestureRecognizer instance) {
                     instance
                       ..onUpdate = (details) {
-                        controller.onPanUpdate(details, draggableWidgetWidth);
+                        controller.onPanUpdate(details, draggableWidgetWidth,
+                            draggableWidgetHeight);
                       }
                       ..onEnd = (details) {
-                        controller.onPanEnd(details, draggableWidgetWidth);
+                        controller.onPanEnd(details, draggableWidgetWidth,
+                            draggableWidgetHeight);
                       };
                   },
                 ),
               },
               behavior: HitTestBehavior.opaque,
-              child: draggableWidget,
+              child: SizedBox(
+                width: draggableWidgetWidth,
+                height: draggableWidgetHeight,
+                child: draggableWidget,
+              ),
             ),
           ),
         ),

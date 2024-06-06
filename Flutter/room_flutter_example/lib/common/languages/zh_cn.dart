@@ -1,6 +1,6 @@
 const Map<String, String> zhCN = {
   'userName': '您的姓名',
-  'login': '登陆',
+  'login': '登录',
   'register': '注册',
   'ok': '确认',
   'cancel': '取消',
@@ -21,6 +21,7 @@ const Map<String, String> zhCN = {
   'applyToSpeakRoom': '举手发言房间',
   'speakAfterTakingSeat': '上麦发言',
   'multiVideoConferencing': '多人视频会议',
+  'quickConference': '的快速会议',
   'userNameTips': '仅限中文、字母、数字和下划线',
   'custom_name_1': '路飞',
   'custom_name_2': '山治',

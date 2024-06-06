@@ -31,6 +31,10 @@ class RoomEngineManager {
     return _roomEngine.createRoom(roomInfo);
   }
 
+  TUILoginUserInfo getSelfInfo() {
+    return TUIRoomEngine.getSelfInfo();
+  }
+
   Future<TUIActionCallback> setSelfInfo(String userName, String avatarURL) {
     return TUIRoomEngine.setSelfInfo(userName, avatarURL);
   }
@@ -74,7 +78,6 @@ class RoomEngineManager {
     _setFramework();
     TUIValueCallBack<TUIRoomInfo> result = await _roomEngine.enterRoom(roomId);
     if (result.code == TUIError.success) {
-      _decideMediaStatus(enableMic, enableCamera, isSoundOnSpeaker);
       RoomStore.to.roomInfo = result.data!;
       RoomStore.to.isEnteredRoom = true;
       RoomStore.to.timeStampOnEnterRoom = DateTime.now().millisecondsSinceEpoch;
@@ -85,6 +88,7 @@ class RoomEngineManager {
         result.code = TUIError.errUserNotInSeat;
       }
       RoomStore.to.initItemTouchableState();
+      _decideMediaStatus(enableMic, enableCamera, isSoundOnSpeaker);
       if (GetPlatform.isAndroid) {
         RtcConferenceTuikitPlatform.instance.startForegroundService();
       }

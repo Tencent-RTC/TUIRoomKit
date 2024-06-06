@@ -14,25 +14,25 @@ PODS:
     - Flutter
   - rtc_conference_tui_kit (0.0.1):
     - Flutter
-  - rtc_room_engine (2.2.0):
+  - rtc_room_engine (2.4.0):
     - Flutter
-    - RTCRoomEngine/Professional (= 2.2.0)
-  - RTCRoomEngine/Professional (2.2.0):
-    - TXIMSDK_Plus_iOS (>= 7.7.5294)
-    - TXLiteAVSDK_Professional
+    - RTCRoomEngine/Professional (= 2.4.0)
+  - RTCRoomEngine/Professional (2.4.0):
+    - TXIMSDK_Plus_iOS (>= 7.9.5666)
+    - TXLiteAVSDK_Professional (>= 11.7.15304)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - tencent_trtc_cloud (10.7):
     - Flutter
     - TXCustomBeautyProcesserPlugin (= 1.0.2)
-    - TXLiteAVSDK_Professional (~> 11.4.14445)
-  - Toast (4.1.0)
+    - TXLiteAVSDK_Professional (~> 11.8.15687)
+  - Toast (4.1.1)
   - TXCustomBeautyProcesserPlugin (1.0.2)
-  - TXIMSDK_Plus_iOS (7.8.5505)
-  - TXLiteAVSDK_Professional (11.4.14571):
-    - TXLiteAVSDK_Professional/Professional (= 11.4.14571)
-  - TXLiteAVSDK_Professional/Professional (11.4.14571)
+  - TXIMSDK_Plus_iOS (7.9.5680)
+  - TXLiteAVSDK_Professional (11.8.15687):
+    - TXLiteAVSDK_Professional/Professional (= 11.8.15687)
+  - TXLiteAVSDK_Professional/Professional (11.8.15687)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -78,21 +78,21 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  fluttertoast: 31b00dabfa7fb7bacd9e7dbee580d7a2ff4bf265
+  fluttertoast: 9f2f8e81bb5ce18facb9748d7855bf5a756fe3db
   open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
-  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   replay_kit_launcher: 828739da18c9785d5e9aafd4f075ea11d6b61499
   rtc_conference_tui_kit: e6a8fb13894a30ecdfb180e3e6997df20e4d202d
-  rtc_room_engine: fc352fce05b4dfd2feb57768e931cbb424ca62fe
-  RTCRoomEngine: 773b6b3b877da3773c19fd9a86b22f63c8684ad3
-  shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
-  tencent_trtc_cloud: 8b55aa23005a77db473cdbc13841a4b13b261946
-  Toast: ec33c32b8688982cecc6348adeae667c1b9938da
+  rtc_room_engine: 62f2d689885b16d32007d52adb796f351538adc6
+  RTCRoomEngine: 6a370b6ed7f0f1a07f9505c8d02a3b792d2b0dd8
+  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  tencent_trtc_cloud: 110bcd85006934314d3836346126c065218fb8b8
+  Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
   TXCustomBeautyProcesserPlugin: 099393b941cb40eda12b3a80bf6c0319957b1cfd
-  TXIMSDK_Plus_iOS: 753908b8ad2fd7dfac36fe0e9d12485493fbb6a7
-  TXLiteAVSDK_Professional: d4db8d4ee81a7dc5d653b72b44463322bbe58f24
+  TXIMSDK_Plus_iOS: aa7dc7bf2273c9c90839d3ba8e93aacef4fea03e
+  TXLiteAVSDK_Professional: 2f284284ae14c31309216c97577534a87545fafc
 
 PODFILE CHECKSUM: f1c82f10837f8fdf27aee12401554c9539720e1f
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2

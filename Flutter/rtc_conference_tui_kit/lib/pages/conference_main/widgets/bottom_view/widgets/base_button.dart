@@ -12,7 +12,7 @@ class BaseButtonWidget extends GetView<BottomViewController> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Get.width - 32.0.scale375(),
+      width: 343.0.scale375(),
       child: Row(
         children: [
           Obx(
@@ -24,10 +24,7 @@ class BaseButtonWidget extends GetView<BottomViewController> {
                 height: 24,
               ),
               onPressed: () {
-                showConferenceBottomSheet(
-                  const UserListWidget(),
-                  isScrollControlled: true,
-                );
+                showConferenceBottomSheet(const UserListWidget());
               },
               isSelected: false.obs,
               text:
@@ -163,8 +160,7 @@ class BaseButtonWidget extends GetView<BottomViewController> {
                   height: 24,
                 ),
                 onPressed: () {
-                  showConferenceBottomSheet(const RaiseHandListWidget(),
-                      isScrollControlled: true);
+                  showConferenceBottomSheet(const RaiseHandListWidget());
                 },
                 isSelected: false.obs,
                 text: RoomContentsTranslations.translate('stageManagement'),
@@ -243,10 +239,7 @@ class BaseButtonWidget extends GetView<BottomViewController> {
                   height: 24,
                 ),
                 onPressed: () {
-                  showConferenceBottomSheet(
-                    const SettingWidget(),
-                    isScrollControlled: true,
-                  );
+                  showConferenceBottomSheet(const SettingWidget());
                 },
                 isSelected: false.obs,
                 text: RoomContentsTranslations.translate('setting'),

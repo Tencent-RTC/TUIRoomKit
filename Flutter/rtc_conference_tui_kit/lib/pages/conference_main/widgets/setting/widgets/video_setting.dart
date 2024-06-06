@@ -6,7 +6,9 @@ import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/setting/con
 import 'widgets.dart';
 
 class VideoSettingWidget extends GetView<SettingController> {
-  const VideoSettingWidget({super.key});
+  final Orientation orientation;
+
+  const VideoSettingWidget({required this.orientation, super.key});
 
   Widget _buildFpsSelectWidget() {
     return SettingInfoSelectWidget(
@@ -67,37 +69,47 @@ class VideoSettingWidget extends GetView<SettingController> {
         children: [
           SettingItemWidget(
             title: RoomContentsTranslations.translate('videoResolution'),
-            child: InkWell(
-              onTap: () {
-                showConferenceBottomSheet(
-                  BottomSheetWidget(
-                    width: double.infinity,
-                    height: Get.height * 0.88,
-                    child: _buildResolutionSelectWidget(),
+            onChildTap: () {
+              showConferenceBottomSheet(
+                LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    Orientation orientation =
+                        MediaQuery.of(context).orientation;
+                    return BottomSheetWidget(
+                      width: orientation == Orientation.portrait
+                          ? Get.width
+                          : 363.0.scale375(),
+                      height: orientation == Orientation.portrait
+                          ? Get.height * 0.88
+                          : Get.height,
+                      isNeedDropDownButton: false,
+                      orientation: orientation,
+                      child: _buildResolutionSelectWidget(),
+                    );
+                  },
+                ),
+                landScapeWidth: 363.0.scale375(),
+              );
+            },
+            child: Row(
+              children: [
+                Obx(
+                  () => Text(
+                    RoomContentsTranslations.translate(
+                        controller.resolutionName),
+                    style: RoomTheme.defaultTheme.textTheme.bodyLarge,
                   ),
-                  isScrollControlled: true,
-                );
-              },
-              child: Row(
-                children: [
-                  Obx(
-                    () => Text(
-                      RoomContentsTranslations.translate(
-                          controller.resolutionName),
-                      style: RoomTheme.defaultTheme.textTheme.bodyLarge,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 14,
-                  ),
-                  Image.asset(
-                    AssetsImages.roomArrowRight,
-                    package: 'rtc_conference_tui_kit',
-                    width: 20.0,
-                    height: 20.0,
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(
+                  width: 14,
+                ),
+                Image.asset(
+                  AssetsImages.roomArrowRight,
+                  package: 'rtc_conference_tui_kit',
+                  width: 20.0,
+                  height: 20.0,
+                ),
+              ],
             ),
           ),
           const Divider(
@@ -105,36 +117,46 @@ class VideoSettingWidget extends GetView<SettingController> {
           ),
           SettingItemWidget(
             title: RoomContentsTranslations.translate('videoFps'),
-            child: InkWell(
-              onTap: () {
-                showConferenceBottomSheet(
-                  BottomSheetWidget(
-                    width: double.infinity,
-                    height: Get.height * 0.88,
-                    child: _buildFpsSelectWidget(),
+            onChildTap: () {
+              showConferenceBottomSheet(
+                LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    Orientation orientation =
+                        MediaQuery.of(context).orientation;
+                    return BottomSheetWidget(
+                      width: orientation == Orientation.portrait
+                          ? Get.width
+                          : 363.0.scale375(),
+                      height: orientation == Orientation.portrait
+                          ? Get.height * 0.88
+                          : Get.height,
+                      isNeedDropDownButton: false,
+                      orientation: orientation,
+                      child: _buildFpsSelectWidget(),
+                    );
+                  },
+                ),
+                landScapeWidth: 363.0.scale375(),
+              );
+            },
+            child: Row(
+              children: [
+                Obx(
+                  () => Text(
+                    '${RoomStore.to.videoSetting.videoFps}',
+                    style: RoomTheme.defaultTheme.textTheme.bodyLarge,
                   ),
-                  isScrollControlled: true,
-                );
-              },
-              child: Row(
-                children: [
-                  Obx(
-                    () => Text(
-                      '${RoomStore.to.videoSetting.videoFps}',
-                      style: RoomTheme.defaultTheme.textTheme.bodyLarge,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 14,
-                  ),
-                  Image.asset(
-                    AssetsImages.roomArrowRight,
-                    package: 'rtc_conference_tui_kit',
-                    width: 20.0,
-                    height: 20.0,
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(
+                  width: 14,
+                ),
+                Image.asset(
+                  AssetsImages.roomArrowRight,
+                  package: 'rtc_conference_tui_kit',
+                  width: 20.0,
+                  height: 20.0,
+                ),
+              ],
             ),
           ),
         ],
