@@ -4,10 +4,10 @@
  *  MIT license, see LICENSE file for details
  */
 
-#if canImport(Combine)
-import Combine
-#else
+#if USE_OPENCOMBINE
 import OpenCombine
+#else
+import Combine
 #endif
 
 /**

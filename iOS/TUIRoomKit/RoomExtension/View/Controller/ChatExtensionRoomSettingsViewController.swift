@@ -37,6 +37,6 @@ class ChatExtensionRoomSettingsViewController: UIViewController {
 }
 private extension String {
     static var roomDeviceSetText: String {
-        localized("TUIRoom.device.set")
+        localized("Meeting Settings")
     }
 }

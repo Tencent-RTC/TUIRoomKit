@@ -72,7 +72,7 @@ extension RoomEventDispatcher: TUIRoomObserver {
     
     // MARK: - User event callback in the room
     func onRemoteUserEnterRoom(roomId: String, userInfo: TUIUserInfo) {
-        remoteUserEnterRoom(roomId: roomId, userInfo: userInfo)
+        store.remoteUserEnterRoom(userInfo: userInfo)
         let param = [
             "roomId" : roomId,
             "userInfo" : userInfo,
@@ -81,7 +81,7 @@ extension RoomEventDispatcher: TUIRoomObserver {
     }
     
     func onRemoteUserLeaveRoom(roomId: String, userInfo: TUIUserInfo) {
-        remoteUserLeaveRoom(roomId: roomId, userInfo: userInfo)
+        store.remoteUserLeaveRoom(userInfo: userInfo)
         let param = [
             "roomId" : roomId,
             "userInfo" : userInfo,
@@ -180,65 +180,9 @@ extension RoomEventDispatcher: TUIRoomObserver {
 }
 
 extension RoomEventDispatcher {
-    private func remoteUserEnterRoom(roomId: String, userInfo: TUIUserInfo) {
-        let userItem = UserEntity()
-        userItem.update(userInfo: userInfo)
-        engineManager.addUserItem(userItem)
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
-    }
-    
-    private func remoteUserLeaveRoom(roomId: String, userInfo: TUIUserInfo) {
-        engineManager.deleteUserItem(userInfo.userId)
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
-        if roomInfo.isSeatEnabled {
-            engineManager.deleteSeatItem(userInfo.userId)
-            store.deleteInviteSeatUser(userInfo.userId)
-        }
-    }
-    
     private func seatListChanged(seatList: [TUISeatInfo], seated: [TUISeatInfo], left leftList: [TUISeatInfo]) {
-        if leftList.first(where: { $0.userId == currentUser.userId }) != nil {
-            currentUser.isOnSeat = false
-            store.audioSetting.isMicOpened = false
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
-                                                   param: ["isOnSeat":false])
-        }
-        updateLeftList(leftList: leftList)
-        if seated.first(where: { $0.userId == currentUser.userId }) != nil {
-            currentUser.isOnSeat = true
-            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_UserOnSeatChanged,
-                                                   param: ["isOnSeat":true])
-        }
-        updateSeatList(seatList: seatList)
-    }
-    
-    private func updateSeatList(seatList: [TUISeatInfo]) {
-        guard seatList.count > 0 else { return }
-        for seatInfo: TUISeatInfo in seatList {
-            guard let userId = seatInfo.userId else { continue }
-            guard let userInfo = store.attendeeList.first(where: { $0.userId == userId }) else { continue }
-            userInfo.isOnSeat = true
-            engineManager.addSeatItem(userInfo)
-        }
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
-    }
-    
-    private func updateLeftList(leftList: [TUISeatInfo]) {
-        guard leftList.count > 0 else { return }
-        for seatInfo: TUISeatInfo in leftList {
-            guard let userId = seatInfo.userId else {
-                continue
-            }
-            if let userItem = store.attendeeList.first(where: { $0.userId == userId }) {
-                userItem.isOnSeat = false
-            }
-            engineManager.deleteSeatItem(userId)
-        }
-        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
-    }
-    
-    private func getUserItem(_ userId: String) -> UserEntity? {
-        return store.attendeeList.first(where: {$0.userId == userId})
+        store.updateLeftSeatList(leftList: leftList)
+        store.updateSeatedList(seatList: seated)
     }
     
     private func userAudioStateChanged(userId: String, hasAudio: Bool, reason: TUIChangeReason) {
@@ -335,13 +279,6 @@ extension RoomEventDispatcher {
     }
     
     private func kickedOffLine() {
-        if store.isEnteredRoom {
-            if roomInfo.ownerId == currentUser.userId {
-                engineManager.destroyRoom()
-            } else {
-                engineManager.exitRoom()
-            }
-        }
         engineManager.destroyEngineManager()
     }
 }

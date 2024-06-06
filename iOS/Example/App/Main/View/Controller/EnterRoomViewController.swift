@@ -216,24 +216,24 @@ extension EnterRoomViewController: ConferenceObserver {
 
 private extension String {
     static var enterRoomIdErrorToast: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.input.error.room.num.toast")
+        RoomDemoLocalize("Enter a valid room ID.")
     }
     static var placeholderTipsText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.input.room.num")
+        RoomDemoLocalize("Enter a room ID")
     }
     static var userNameText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.user.name")
+        RoomDemoLocalize("Your Name")
     }
     static var roomNumText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.room.num")
+        RoomDemoLocalize("Room ID")
     }
     static var openCameraText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.open.video")
+        RoomDemoLocalize("Video")
     }
     static var openMicText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.open.mic")
+        RoomDemoLocalize("Mic")
     }
     static var openSpeakerText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.open.speaker")
+        RoomDemoLocalize("Speaker")
     }
 }

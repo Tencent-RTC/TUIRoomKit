@@ -88,9 +88,9 @@ class RoomTypeView: UIView {
 
 private extension String {
     static var raiseHandSpeakText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.raise.speak.model")
+        RoomDemoLocalize("On-stage Speech Conference")
     }
     static var freedomSpeakText: String {
-        RoomDemoLocalize("Demo.TUIRoomKit.freedom.speak.model")
+        RoomDemoLocalize("Free Speech Conference")
     }
 }

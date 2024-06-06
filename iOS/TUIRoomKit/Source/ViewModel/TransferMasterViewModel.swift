@@ -30,10 +30,6 @@ class TransferMasterViewModel: NSObject {
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
     }
     
-    func backAction() {
-        RoomRouter.shared.dismissPopupViewController()
-    }
-    
     func appointMasterAction(sender: UIButton) {
         guard userId != "" else { return }
         engineManager.changeUserRole(userId: userId, role: .roomOwner) { [weak self] in

@@ -7,8 +7,13 @@
 //
 
 import UIKit
-import Combine
 import Foundation
+#if USE_OPENCOMBINE
+import OpenCombine
+import OpenCombineDispatch
+#else
+import Combine
+#endif
 
 class FloatChatButton: UIView {
     @Injected private var store: FloatChatStoreProvider
@@ -87,18 +92,19 @@ class FloatChatButton: UIView {
     private func bindInteraction() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(showInputView))
         clickView.addGestureRecognizer(tap)
-        
+
         floatInputViewShowState
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.mainQueue)
             .sink { [weak self] showFloatChatInput in
                 guard let self = self else { return }
                 if showFloatChatInput {
                     let inputController = FloatChatInputController()
                     inputController.view.backgroundColor = .clear
-                    let navC = UINavigationController(rootViewController: inputController)
-                    navC.navigationBar.prefersLargeTitles = true
-                    navC.modalPresentationStyle = .overFullScreen
-                    RoomCommon.getCurrentWindowViewController()?.present(navC, animated: true, completion: nil)
+                    let navController = UINavigationController(rootViewController: inputController)
+                    navController.isNavigationBarHidden = true
+                    navController.navigationBar.prefersLargeTitles = true
+                    navController.modalPresentationStyle = .overFullScreen
+                    RoomCommon.getCurrentWindowViewController()?.present(navController, animated: true, completion: nil)
                     self.inputController = inputController
                 } else {
                     self.inputController?.dismiss(animated: true)
@@ -114,6 +120,6 @@ class FloatChatButton: UIView {
 
 private extension String {
     static var placeHolderText: String {
-        localized("TUIRoom.floatChat.saySomething")
+        localized("Say something")
     }
 }

@@ -76,10 +76,10 @@ extension RoomMessageExtensionObserver: TUIExtensionProtocol {
 
 private extension String {
     static var meetingText: String {
-        localized("TUIRoom.quick.meeting")
+        localized("Quick meeting")
     }
     static var roomDeviceSetText: String {
-        localized("TUIRoom.device.set")
+        localized("Meeting Settings")
     }
 }
 

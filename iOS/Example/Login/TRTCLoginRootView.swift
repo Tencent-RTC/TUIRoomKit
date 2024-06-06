@@ -288,10 +288,10 @@ extension TRTCLoginRootView: UITextFieldDelegate {
 
 /// MARK: - internationalization string
 fileprivate extension String {
-    static let titleText = LoginLocalize(key: "Demo.TRTC.Login.welcome")
-    static let phoneNumPlaceholderText = LoginLocalize(key:"V2.Live.LinkMicNew.enterphonenumber")
-    static let verifyCodePlaceholderText = LoginLocalize(key:"V2.Live.LinkMicNew.enterverificationcode")
-    static let getVerifyCodeText = LoginLocalize(key:"V2.Live.LinkMicNew.getverificationcode")
-    static let loginText = LoginLocalize(key:"V2.Live.LoginMock.login")
-    static let useNameText = LoginLocalize(key: "Demo.TRTC.Login.user.name")
+    static let titleText = LoginLocalize(key: "Welcome to Tencent Real-Time Communication")
+    static let phoneNumPlaceholderText = LoginLocalize(key:"Enter a User Id")
+    static let verifyCodePlaceholderText = LoginLocalize(key:"Enter a verification code")
+    static let getVerifyCodeText = LoginLocalize(key:"Get")
+    static let loginText = LoginLocalize(key:"Log In")
+    static let useNameText = LoginLocalize(key: "User Name")
 }

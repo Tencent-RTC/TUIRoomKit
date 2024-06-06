@@ -81,21 +81,20 @@ class EmotionHelper {
         }
 
         let keyFont = String(format: "%@%.1f", imageKey, font.pointSize)
-        var imageAttributedString = cacheAttributedDictionary[keyFont]
-        if imageAttributedString == nil {
+        if let result = cacheAttributedDictionary[keyFont] {
+            return result
+        }
+        guard let image = cacheTotalImageDictionary[imageKey] else {
             return NSAttributedString(string: "")
         }
-        let image = cacheTotalImageDictionary[imageKey]
-        if image == nil {
-            return NSAttributedString(string: "")
-        }
+
         let emotionAttachment = EmotionAttachment()
         emotionAttachment.displayText = imageKey
         emotionAttachment.image = image
         emotionAttachment.bounds = CGRect(x: 0, y: font.descender, width: font.lineHeight, height: font.lineHeight)
-        imageAttributedString = NSAttributedString(attachment: emotionAttachment)
-        cacheAttributedDictionary[keyFont] = imageAttributedString
-        return imageAttributedString ?? NSAttributedString(string: "")
+        let result = NSAttributedString(attachment: emotionAttachment)
+        cacheAttributedDictionary[keyFont] = result
+        return result
     }
 
     private func createTotalEmotions() {

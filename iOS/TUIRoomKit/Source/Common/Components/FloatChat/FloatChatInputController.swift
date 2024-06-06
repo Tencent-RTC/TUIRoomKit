@@ -267,7 +267,7 @@ class LargeTapAreaButton: UIButton {
 
 private extension String {
     static var sendText: String {
-        localized("TUIRoom.floatChat.send")
+        localized("Send")
     }
 }
 

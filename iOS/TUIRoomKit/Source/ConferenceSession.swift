@@ -50,7 +50,7 @@ class ConferenceSession {
         roomInfo.isCameraDisableForAllUser = !conferenceParams.enableCameraForAllUser
         roomInfo.isMessageDisableForAllUser = !conferenceParams.enableMessageForAllUser
         roomInfo.isSeatEnabled = conferenceParams.enableSeatControl
-        roomInfo.name = conferenceParams.name ?? conferenceId
+        roomInfo.name = conferenceParams.name ?? ""
         roomInfo.seatMode = .applyToTake
         return roomInfo
     }

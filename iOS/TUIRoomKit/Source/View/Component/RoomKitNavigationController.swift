@@ -17,6 +17,10 @@ class RoomKitNavigationController: UINavigationController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+    
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         guard let supportedInterfaceOrientations = topViewController?.supportedInterfaceOrientations as? UIInterfaceOrientationMask
         else { return .portrait }

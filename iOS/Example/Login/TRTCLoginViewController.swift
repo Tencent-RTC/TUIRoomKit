@@ -90,7 +90,7 @@ class TRTCLoginViewController: UIViewController {
             complete(true)
         } failed: { [weak self] (error) in
             guard let `self` = self else { return }
-            self.view.makeToast(LoginLocalize(key: "App.PortalViewController.loginimfailed"))
+            self.view.makeToast(LoginLocalize(key: "Failed to log in to IM"))
             complete(false)
         }
     }
@@ -99,7 +99,7 @@ class TRTCLoginViewController: UIViewController {
         if ProfileManager.shared.curUserModel?.name.count == 0 {
             showRegisterVC()
         } else {
-            self.view.makeToast(LoginLocalize(key:"V2.Live.LinkMicNew.loginsuccess"))
+            self.view.makeToast(LoginLocalize(key:"Logged in"))
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 AppUtils.shared.showMainController()
             }

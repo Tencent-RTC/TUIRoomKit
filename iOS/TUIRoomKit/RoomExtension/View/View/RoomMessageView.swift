@@ -296,33 +296,33 @@ extension RoomMessageView: RoomMessageViewResponder {
 
 private extension String {
     static var inviteMeetingText: String {
-        localized("TUIRoom.invite.meeting")
+        localized("Invite you to a meeting")
     }
     static var enterMeetingText: String {
-        localized("TUIRoom.enter.meeting")
+        localized("Enter the meeting")
     }
     static var alreadyEnteredMeeting: String {
-        localized("TUIRoom.already.entered.meeting")
+        localized("Already entered the meeting")
     }
     static var meetingText: String {
-        localized("TUIRoom.meeting")
+        localized("Meeting")
     }
     static var inProgressText: String {
-        localized("TUIRoom.in.progress")
+        localized("In progress")
     }
     static var peopleEnteredMeetingText: String {
-        localized("TUIRoom.people.entered.meeting")
+        localized("People have entered the meeting")
     }
     static var startingMeetingText: String {
-        localized("TUIRoom.starting.meeting")
+        localized("Starting meeting")
     }
     static var waitingMembersEnterMeetingText: String {
-        localized("TUIRoom.waiting.members.enter.meeting")
+        localized("Waiting for members to enter the meeting")
     }
     static var meetingEnded: String {
-        localized("TUIRoom.meeting.ended")
+        localized("Meeting ended")
     }
     static var quickMeetingText: String {
-        localized("TUIRoom.quick.meeting")
+        localized("Quick meeting")
     }
 }

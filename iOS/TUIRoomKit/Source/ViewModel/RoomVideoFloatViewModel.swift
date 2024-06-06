@@ -33,6 +33,7 @@ class RoomVideoFloatViewModel: NSObject {
     override init() {
         super.init()
         subscribeEngine()
+        subLogoutNotification()
     }
     
     private func subscribeEngine() {
@@ -55,6 +56,16 @@ class RoomVideoFloatViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RoomOwnerChanged, responder: self)
     }
     
+    private func subLogoutNotification() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(dismissFloatViewForLogout),
+                                               name: NSNotification.Name.TUILogoutSuccess, object: nil)
+    }
+    
+    private func unsubLogoutNotification() {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.TUILogoutSuccess, object: nil)
+    }
+    
     func showRoomMainView() {
         if engineManager.store.isEnteredRoom {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ShowRoomMainView, param: [:])
@@ -74,9 +85,14 @@ class RoomVideoFloatViewModel: NSObject {
         return engineManager.store.attendeeList.first(where: { $0.userId == userId })
     }
     
+    @objc private func dismissFloatViewForLogout() {
+        RoomVideoFloatView.dismiss()
+    }
+    
     deinit {
         engineManager.stopPlayRemoteVideo(userId: userId, streamType: streamType)
         unsubscribeEngine()
+        unsubLogoutNotification()
         debugPrint("deinit \(self)")
     }
 }

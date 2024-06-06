@@ -18,7 +18,6 @@ class QRCodeView: UIView {
         button.setTitleColor(UIColor(0xADB6CC), for: .normal)
         let image = UIImage(named: "room_back_white", in: tuiRoomKitBundle(), compatibleWith: nil)?.checkOverturn()
         button.setImage(image, for: .normal)
-        button.setTitle(.videoConferenceTitle, for: .normal)
         button.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 18)
         button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 25, bottom: 0, right: 0)
         button.imageEdgeInsets = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 0)
@@ -242,12 +241,9 @@ class QRCodeView: UIView {
 
 private extension String {
     static var scanCodeText: String {
-        localized("TUIRoom.scan.code")
+        localized("Scan the code to enter the room")
     }
     static var saveIntoAlbumText: String {
-        localized("TUIRoom.save.into.album")
-    }
-    static var videoConferenceTitle: String {
-        localized("TUIRoom.video.conference.title")
+        localized("Save into the album")
     }
 }

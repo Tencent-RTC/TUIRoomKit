@@ -20,6 +20,7 @@ public extension Store {
      - Parameter actionTemplate: The `ActionTemplate` to use for dispatching an `Action` when the value changes
      - Returns: A `Binding` based on the given `Selector` and `ActionTemplate`
      */
+    @available(iOS 13.0, *)
     func binding<Value>(get selector: Selector<State, Value>,
                         send actionTemplate: ActionTemplate<Value>) -> Binding<Value> {
         .init(get: { self.selectCurrent(selector) },
@@ -39,6 +40,7 @@ public extension Store {
                                         when the value should be disabled
      - Returns: A `Binding` based on the given `Selector` and `ActionTemplate`s
      */
+    @available(iOS 13.0, *)
     func binding(get selector: Selector<State, Bool>,
                  enable enableActionTemplate: ActionTemplate<Void>,
                  disable disableActionTemplate: ActionTemplate<Void>)
@@ -57,6 +59,7 @@ public extension Store {
      - Parameter value: The value used to decide which `Action` to be dispatched.
      - Returns: A `Binding` based on the given `Selector` and closure
      */
+    @available(iOS 13.0, *)
     func binding<Value>(get selector: Selector<State, Value>,
                         send action: @escaping (_ value: Value) -> Action)
         -> Binding<Value> {

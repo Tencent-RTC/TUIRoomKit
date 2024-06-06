@@ -99,9 +99,12 @@ extension VideoSeatLayout {
             let cell = getFullScreenAttributes(indexPath: indexPath)
             layoutAttributeArray.append(cell)
         } else if viewModel.videoSeatViewType == .largeSmallWindowType {
-            let indexPath = IndexPath(item: 0, section: section)
-            let cell = getFullScreenAttributes(indexPath: indexPath)
-            layoutAttributeArray.append(cell)
+            let largeIndexPath = IndexPath(item: 0, section: section)
+            let largeCell = getFullScreenAttributes(indexPath: largeIndexPath)
+            layoutAttributeArray.append(largeCell)
+            let smallIndexPath = IndexPath(item: 1, section: section)
+            let smallCell = getSmallAttributes(indexPath: smallIndexPath)
+            layoutAttributeArray.append(smallCell)
         } else if viewModel.videoSeatViewType == .pureAudioType || viewModel.videoSeatViewType == .equallyDividedType {
             guard let itemCount = collectionView?.numberOfItems(inSection: section) else { return }
             let isMultipage = itemCount >= kMaxShowCellCount
@@ -145,6 +148,12 @@ extension VideoSeatLayout {
         UICollectionViewLayoutAttributes {
         let cell = UICollectionViewLayoutAttributes(forCellWith: indexPath)
         cell.frame = CGRect(x: 0, y: 0, width: collectionViewWidth, height: collectionViewHeight)
+        return cell
+    }
+
+    private func getSmallAttributes(indexPath: IndexPath) -> UICollectionViewLayoutAttributes {
+        let cell = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+        cell.frame = getMiniscreenFrame(item: nil)
         return cell
     }
 

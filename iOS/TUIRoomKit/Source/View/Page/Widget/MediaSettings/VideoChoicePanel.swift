@@ -185,6 +185,7 @@ class AlertContentView: UIView {
         let label = UILabel(frame: .zero)
         label.textColor = UIColor(0xD1D9EC)
         label.textAlignment = .center
+        label.adjustsFontSizeToFitWidth = true
         label.font = UIFont(name: "PingFangSC-Medium", size: 16)
         return label
     }()
@@ -280,7 +281,6 @@ class AlertContentView: UIView {
         titleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(space.scale375Height())
             make.centerX.equalToSuperview()
-            make.width.equalTo(64.scale375())
         }
     }
 

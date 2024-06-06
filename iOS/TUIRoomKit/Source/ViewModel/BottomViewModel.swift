@@ -37,6 +37,9 @@ class BottomViewModel: NSObject {
     var attendeeList: [UserEntity] {
         engineManager.store.attendeeList
     }
+    var inviteSeatList: [RequestEntity] {
+        engineManager.store.inviteSeatList
+    }
     var isCalledFromShareScreen = false
     
     private lazy var memberItem: ButtonItemData = {
@@ -160,6 +163,8 @@ class BottomViewModel: NSObject {
         item.normalIcon = "room_hand_raise_list"
         item.resourceBundle = tuiRoomKitBundle()
         item.buttonType = .raiseHandApplyItemType
+        item.noticeText = String(inviteSeatList.count)
+        item.hasNotice = inviteSeatList.count > 0
         item.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.raiseHandApplyAction(sender: button)
@@ -300,7 +305,7 @@ class BottomViewModel: NSObject {
     }
     
     func raiseHandApplyAction(sender: UIButton) {
-        RoomRouter.shared.presentPopUpViewController(viewType: .raiseHandApplicationListViewType, height: 720.scale375Height())
+        RoomRouter.shared.presentPopUpViewController(viewType: .raiseHandApplicationListViewType, height: 720.scale375Height(), backgroundColor: UIColor(0x22262E))
     }
     
     func raiseHandAction(sender: UIButton) {
@@ -320,6 +325,10 @@ class BottomViewModel: NSObject {
         } onRejected: { [weak self] _, _, _ in
             guard let self = self else { return }
             self.viewResponder?.makeToast(text: .rejectedTakeSeatText)
+            self.changeItemSelectState(type: .raiseHandItemType, isSelected: false)
+        } onTimeout: { [weak self] requestId, userId in
+            guard let self = self else { return }
+            self.viewResponder?.makeToast(text: .joinStageApplicationTimedOutText)
             self.changeItemSelectState(type: .raiseHandItemType, isSelected: false)
         } onError: { [weak self] _, _, code, message in
             guard let self = self else { return }
@@ -601,9 +610,13 @@ extension BottomViewModel: RoomKitUIEventResponder {
             if !hasVideo {
                 isCalledFromShareScreen = false
             }
-        case .TUIRoomKitService_RenewUserList, .TUIRoomKitService_RenewSeatList:
+        case .TUIRoomKitService_RenewUserList:
             memberItem.normalTitle = localizedReplace(.memberText,replace: String(attendeeList.count))
             viewResponder?.updateButtonView(item: memberItem)
+        case .TUIRoomKitService_RenewSeatList:
+            raiseHandApplyItem.noticeText = String(inviteSeatList.count)
+            raiseHandApplyItem.hasNotice = inviteSeatList.count > 0
+            viewResponder?.updateButtonView(item: raiseHandApplyItem)
         default: break
         }
     }
@@ -625,108 +638,111 @@ extension BottomViewModel: RoomEngineEventResponder {
 
 private extension String {
     static var memberText: String {
-        localized("TUIRoom.member")
+        localized("Participants(xx)")
     }
     static var muteAudioText: String {
-        localized("TUIRoom.mute")
+        localized("Mute")
     }
     static var unMuteAudioText: String {
-        localized("TUIRoom.unmute")
+        localized("Unmute")
     }
     static var muteVideoText: String {
-        localized("TUIRoom.close.video")
+        localized("Stop video")
     }
     static var unMuteVideoText: String {
-        localized("TUIRoom.open.video")
+        localized("Start video")
     }
     static var stageManagementText: String {
-        localized("TUIRoom.stage.management")
+        localized("Applies")
     }
     static var cancelStageText: String {
-        localized("TUIRoom.cancel.stage")
+        localized("Cancel")
     }
     static var applyJoinStageText: String {
-        localized("TUIRoom.apply.join.stage")
+        localized("Join stage")
     }
     static var leaveSeatText: String {
-        localized("TUIRoom.leave.seat")
+        localized("Leave stage")
     }
     static var muteSeatReasonText: String {
-        localized("TUIRoom.mute.seat.reason")
+        localized("Can be turned on after taking the stage")
     }
     static var muteAudioRoomReasonText: String {
-        localized("TUIRoom.mute.audio.room.reason")
+        localized("All on mute audio, unable to turn on microphone")
     }
     static var muteVideoRoomReasonText: String {
-        localized("TUIRoom.mute.video.room.reason")
+        localized("All on mute video, unable to turn on camera")
     }
     static var noticeCameraOffTitleText: String {
-        localized("TUIRoom.homeowners.notice.camera.turned.off")
+        localized("The conference owner disabled your video.")
     }
     static var noticeMicrophoneOffTitleText: String {
-        localized("TUIRoom.homeowners.notice.microphone.turned.off")
+        localized("You were muted by the conference owner.")
     }
     static var shareScreenOnText: String {
-        localized("TUIRoom.share.on")
+        localized("Share")
     }
     static var shareScreenOffText: String {
-        localized("TUIRoom.share.off")
+        localized("Stop")
     }
     static var versionLowToastText: String {
-        localized("TUIRoom.version.too.low")
+        localized("Your system version is below 12.0. Please update.")
     }
     static var chatText: String {
-        localized("TUIRoom.chat")
+        localized("Chat")
     }
     static var unfoldText: String {
-        localized("TUIRoom.unfold")
+        localized("More")
     }
     static var inviteText: String {
-        localized("TUIRoom.invite")
+        localized("Invite")
     }
     static var floatText: String {
-        localized("TUIRoom.float")
+        localized("Floating")
     }
     static var setupText: String {
-        localized("TUIRoom.setting")
+        localized("Settings")
     }
     static var dropText: String {
-        localized("TUIRoom.drop")
+        localized("Drop")
     }
     static var rejectedTakeSeatText: String {
-        localized("TUIRoom.rejected.take.seat")
+        localized("Application to go on stage was rejected")
     }
     static var takenSeatText: String {
-        localized("TUIRoom.taken.seat")
+        localized("Succeed on stage")
     }
     static var othersScreenSharingText: String {
-        localized("TUIRoom.others.screen.sharing")
+        localized("An existing member is sharing. Please try again later")
     }
     static var toastTitleText: String {
-        localized("TUIRoom.toast.shareScreen.title")
+        localized("Share Screen")
     }
     static var toastMessageText: String {
-        localized("TUIRoom.toast.shareScreen.message")
+        localized("Stop TUIRoom screen sharing screen live?")
     }
     static var toastCancelText: String {
-        localized("TUIRoom.cancel")
+        localized("Cancel")
     }
     static var toastStopText: String {
-        localized("TUIRoom.toast.shareScreen.stop")
+        localized("Stop")
     }
     static var applicationHasSentText: String {
-        localized("TUIRoom.join.stage.application.sent")
+        localized("Application has been sent, please wait for the owner/administrator to approve")
     }
     static var joinStageText: String {
-        localized("TUIRoom.join.stage")
+        localized("Join stage")
     }
     static var leaveSeatTitle: String {
-        localized("TUIRoom.leave.seat.title")
+        localized("Are you sure you want to step down?")
     }
     static var leaveSeatMessage: String {
-        localized("TUIRoom.leave.seat.message")
+        localized("To get on stage again, you need to resend the application and wait for the owner/administrator to approve it.")
     }
     static var joinStageApplicationCancelledText: String {
-        localized("TUIRoom.join.stage.application.cancelled")
+        localized("Application for stage has been cancelled")
+    }
+    static var joinStageApplicationTimedOutText: String {
+        localized("The request to go on stage has timed out")
     }
 }

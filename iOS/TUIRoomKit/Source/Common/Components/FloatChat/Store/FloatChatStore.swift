@@ -8,7 +8,11 @@
 
 import Foundation
 import RTCRoomEngine
+#if USE_OPENCOMBINE
+import OpenCombine
+#else
 import Combine
+#endif
 
 protocol FloatChatStoreProvider {
     func dispatch(action: Action)

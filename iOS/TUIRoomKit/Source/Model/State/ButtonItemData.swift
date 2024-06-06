@@ -51,6 +51,9 @@ class ButtonItemData {
         return UIImage(named: disabledIcon, in: resourceBundle, compatibleWith: nil)?.checkOverturn()
     }
     
+    var hasNotice: Bool = false
+    var noticeText: String = ""
+    
     var cornerRadius: CGFloat?
     var hasLineView: Bool = false
     var orientation: Orientation = .left

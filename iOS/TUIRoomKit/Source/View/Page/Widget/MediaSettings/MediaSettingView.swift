@@ -223,10 +223,10 @@ class MediaSettingViewCell: UITableViewCell {
 
 private extension String {
     static var resolutionText: String {
-        localized("TUIRoom.resolution")
+        localized("Resolution")
     }
     static var frameRateText: String {
-        localized("TUIRoom.frame.rate")
+        localized("Frame Rate")
     }
 }
 

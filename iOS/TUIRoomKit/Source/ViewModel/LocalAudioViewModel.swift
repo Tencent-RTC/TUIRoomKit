@@ -108,10 +108,10 @@ extension LocalAudioViewModel: RoomKitUIEventResponder {
 
 private extension String {
     static var muteAudioRoomReasonText: String {
-        localized("TUIRoom.mute.audio.room.reason")
+        localized("All on mute audio, unable to turn on microphone")
     }
     static var muteSeatReasonText: String {
-        localized("TUIRoom.mute.seat.reason")
+        localized("Can be turned on after taking the stage")
     }
 }
 

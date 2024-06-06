@@ -80,12 +80,12 @@ class MemberInviteViewModel {
 
 private extension String {
     static var roomIdText: String {
-        localized("TUIRoom.room.num")
+        localized("RoomID")
     }
     static var roomLinkText: String {
-        localized("TUIRoom.room.link")
+        localized("Link")
     }
     static var copyText: String {
-        localized("TUIRoom.room.copy")
+        localized("Copy")
     }
 }

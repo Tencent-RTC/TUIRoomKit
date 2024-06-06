@@ -6,7 +6,11 @@
 //
 
 import Foundation
+#if USE_OPENCOMBINE
+import OpenCombine
+#else
 import Combine
+#endif
 
 class FloatChatStore {
     private(set) lazy var store: Store<FloatChatState, FloatChatService> = Store(initialState: FloatChatState(), environment: FloatChatService())

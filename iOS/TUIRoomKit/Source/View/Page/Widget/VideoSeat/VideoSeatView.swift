@@ -24,6 +24,7 @@ protocol TUIVideoSeatViewResponder: AnyObject {
 
 class TUIVideoSeatView: UIView {
     private let CellID_Normal = "VideoSeatCell_Normal"
+    private let CellID_Mini = "VideoSeatCell_Mini"
     private let viewModel: TUIVideoSeatViewModel
     private var isViewReady: Bool = false
     weak var responder: TUIVideoSeatViewResponder?
@@ -81,6 +82,7 @@ class TUIVideoSeatView: UIView {
         let collection = UICollectionView(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: frame.size.height), collectionViewLayout:
                                             videoSeatLayout)
         collection.register(VideoSeatCell.self, forCellWithReuseIdentifier: CellID_Normal)
+        collection.register(TUIVideoSeatDragCell.self, forCellWithReuseIdentifier: CellID_Mini)
         collection.isPagingEnabled = true
         collection.showsVerticalScrollIndicator = false
         collection.showsHorizontalScrollIndicator = false
@@ -103,10 +105,8 @@ class TUIVideoSeatView: UIView {
     }()
     
     lazy var moveMiniscreen: TUIVideoSeatDragCell = {
-        let cell = TUIVideoSeatDragCell(frame: videoSeatLayout.getMiniscreenFrame(item: nil)) { [weak self] in
-            guard let self = self else { return }
-            self.responder?.switchPosition()
-        }
+        let cell = TUIVideoSeatDragCell()
+        cell.frame = videoSeatLayout.getMiniscreenFrame(item: nil)
         cell.isHidden = true
         addSubview(cell)
         return cell
@@ -124,7 +124,7 @@ class TUIVideoSeatView: UIView {
         view.isHidden = true
         return view
     }()
-    
+        
     func constructViewHierarchy() {
         backgroundColor = .clear
         addSubview(placeholderView)
@@ -203,13 +203,12 @@ extension TUIVideoSeatView: TUIVideoSeatViewModelResponder {
     func insertItems(at indexPaths: [IndexPath]) {
         freshCollectionView { [weak self] in
             guard let self = self else { return }
+            let cellNumber = self.attendeeCollectionView.numberOfItems(inSection: 0)
+            let listSeatItemNumber = self.viewModel.listSeatItem.count
+            guard cellNumber + indexPaths.count == listSeatItemNumber else { return }
             self.attendeeCollectionView.performBatchUpdates { [weak self] in
                 guard let self = self else { return }
-                if self.attendeeCollectionView.numberOfItems(inSection: 0) == self.viewModel.listSeatItem.count {
-                    self.attendeeCollectionView.reloadData()
-                } else {
-                    self.attendeeCollectionView.insertItems(at: indexPaths)
-                }
+                self.attendeeCollectionView.insertItems(at: indexPaths)
             }
         }
     }
@@ -217,37 +216,31 @@ extension TUIVideoSeatView: TUIVideoSeatViewModelResponder {
     func deleteItems(at indexPaths: [IndexPath]) {
         freshCollectionView { [weak self] in
             guard let self = self else { return }
+            var resultArray: [IndexPath] = []
+            let numberOfSections = self.attendeeCollectionView.numberOfSections
+            for indexPath in indexPaths {
+                let section = indexPath.section
+                let item = indexPath.item
+                guard section < numberOfSections && item < self.attendeeCollectionView.numberOfItems(inSection: section)
+                else { continue }
+                resultArray.append(indexPath)
+            }
+            let cellNumber = self.attendeeCollectionView.numberOfItems(inSection: 0)
+            let listSeatItemNumber = self.viewModel.listSeatItem.count
+            guard cellNumber - indexPaths.count == listSeatItemNumber else { return }
             self.attendeeCollectionView.performBatchUpdates { [weak self] in
                 guard let self = self else { return }
-                if self.attendeeCollectionView.numberOfItems(inSection: 0) == self.viewModel.listSeatItem.count {
-                    self.attendeeCollectionView.reloadData()
-                } else {
-                    var resultArray: [IndexPath] = []
-                    let numberOfSections = self.attendeeCollectionView.numberOfSections
-                    for indexPath in indexPaths {
-                        let section = indexPath.section
-                        let item = indexPath.item
-                        guard section < numberOfSections && item < self.attendeeCollectionView.numberOfItems(inSection: section)
-                        else { continue }
-                        resultArray.append(indexPath)
-                    }
-                    self.attendeeCollectionView.deleteItems(at: resultArray)
-                }
+                self.attendeeCollectionView.deleteItems(at: resultArray)
             }
         }
     }
-
-    func updateSeatItem(_ item: VideoSeatItem) {
+    
+    func updateVideoSeatCellUI(_ item: VideoSeatItem) {
         if let seatItem = moveMiniscreen.seatItem, seatItem.userId == item.userId {
             moveMiniscreen.updateUI(item: seatItem)
         }
         guard let cell = getVideoVisibleCell(item) else { return }
         cell.updateUI(item: item)
-        if item.hasVideoStream {
-            responder?.startPlayVideoStream(item: item, renderView: cell.renderView)
-        } else {
-            responder?.stopPlayVideoStream(item: item)
-        }
     }
     
     func updateSeatVolume(_ item: VideoSeatItem) {
@@ -360,13 +353,19 @@ extension TUIVideoSeatView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: CellID_Normal,
-            for: indexPath) as! VideoSeatCell
-        if indexPath.item >= viewModel.listSeatItem.count {
+        if viewModel.videoSeatViewType == .largeSmallWindowType, indexPath.row == 1 {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellID_Mini, for: indexPath) as! TUIVideoSeatDragCell
+            cell.clickBlock = {[weak self] in
+                guard let self = self else { return }
+                self.viewModel.switchPosition()
+            }
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: CellID_Normal,
+                for: indexPath) as! VideoSeatCell
             return cell
         }
-        return cell
     }
 }
 

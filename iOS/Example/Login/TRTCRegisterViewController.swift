@@ -14,7 +14,16 @@ import ImSDK_Plus
 import TUICore
 
 class TRTCRegisterViewController: UIViewController {
-    let loading = UIActivityIndicatorView(style: .large)
+    lazy var loading: UIActivityIndicatorView = {
+        let activityIndicatorStyle: UIActivityIndicatorView.Style
+        if #available(iOS 13, *) {
+            activityIndicatorStyle = .large
+        } else {
+            activityIndicatorStyle = .whiteLarge
+        }
+        return UIActivityIndicatorView(style: activityIndicatorStyle)
+    }()
+    
     
     override var shouldAutorotate: Bool {
         return false
@@ -76,7 +85,7 @@ class TRTCRegisterViewController: UIViewController {
 
 /// MARK: - internationalization string
 fileprivate extension String {
-    static let titleText = LoginLocalize(key:"Demo.TRTC.Login.regist")
-    static let registSuccessText = LoginLocalize(key:"Demo.TRTC.Login.registsuccess")
+    static let titleText = LoginLocalize(key:"Sign Up")
+    static let registSuccessText = LoginLocalize(key:"Sign Up successfully")
 }
 
