@@ -6,27 +6,37 @@ import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/widgets.dar
 import 'widgets/widgets.dart';
 
 class TopViewWidget extends GetView<TopViewController> {
-  const TopViewWidget({Key? key}) : super(key: key);
+  const TopViewWidget(this.orientation, {Key? key}) : super(key: key);
+
+  final Orientation orientation;
 
   Widget _buildView() {
     return Container(
       width: Get.width,
-      height: 105.0.scale375(),
+      height: orientation == Orientation.portrait
+          ? 105.0.scale375()
+          : 73.0.scale375(),
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(AssetsImages.roomTopBackGround,
-              package: 'rtc_conference_tui_kit'),
+          image: AssetImage(
+            AssetsImages.roomTopBackGround,
+            package: 'rtc_conference_tui_kit',
+          ),
           fit: BoxFit.cover,
         ),
       ),
       child: Column(
         children: [
-          SizedBox(height: 44.0.scale375Height()),
+          SizedBox(
+            height: orientation == Orientation.portrait
+                ? 44.0.scale375Height()
+                : 20.0.scale375(),
+          ),
           Obx(
             () => Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(width: 12.0.scale375()),
+                SizedBox(width: 16.0.scale375()),
                 TopButtonItemWidget(
                     image: Image.asset(
                       AssetsImages.roomEarpiece,
@@ -34,24 +44,30 @@ class TopViewWidget extends GetView<TopViewController> {
                       width: 20,
                       height: 20,
                     ),
-                    selectedImage: Image.asset(AssetsImages.roomSpeakerphone,
-                        package: 'rtc_conference_tui_kit',
-                        width: 20,
-                        height: 20),
+                    selectedImage: Image.asset(
+                      AssetsImages.roomSpeakerphone,
+                      package: 'rtc_conference_tui_kit',
+                      width: 20,
+                      height: 20,
+                    ),
                     onPressed: () => {controller.switchSpeakerAction()},
                     isSelected: RoomStore.to.audioSetting.isSoundOnSpeaker),
+                SizedBox(width: 24.0.scale375()),
                 RoomStore.to.currentUser.hasVideoStream.value
                     ? TopButtonItemWidget(
-                        image: Image.asset(AssetsImages.roomSwitchCamera,
-                            package: 'rtc_conference_tui_kit',
-                            width: 20,
-                            height: 20),
+                        image: Image.asset(
+                          AssetsImages.roomSwitchCamera,
+                          package: 'rtc_conference_tui_kit',
+                          width: 20,
+                          height: 20,
+                        ),
                         onPressed: () => {controller.switchCameraAction()},
                         isSelected: false.obs,
                       )
-                    : SizedBox(width: 40.0.scale375()),
+                    : SizedBox(width: 20.0.scale375()),
+                SizedBox(width: 16.0.scale375()),
                 const Spacer(),
-                const MeetingTitleWidget(),
+                MeetingTitleWidget(orientation),
                 const Spacer(),
                 TopButtonItemWidget(
                   image: Image.asset(
@@ -60,12 +76,14 @@ class TopViewWidget extends GetView<TopViewController> {
                     width: 20,
                     height: 20,
                   ),
-                  onPressed: () =>
-                      {showConferenceBottomSheet(const ExitWidget())},
+                  onPressed: () => {
+                    showConferenceBottomSheet(const ExitWidget(),
+                        alwaysFromBottom: true)
+                  },
                   isSelected: false.obs,
                   text: RoomContentsTranslations.translate('exit'),
                 ),
-                SizedBox(width: 12.0.scale375()),
+                SizedBox(width: 16.0.scale375()),
               ],
             ),
           ),

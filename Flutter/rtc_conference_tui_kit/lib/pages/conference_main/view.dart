@@ -10,19 +10,19 @@ import 'index.dart';
 
 class ConferenceMainPage extends GetView<ConferenceMainController> {
   const ConferenceMainPage(
-      {this.roomId,
-      this.isCreateRoom,
+      {this.conferenceId,
+      this.isCreateConference,
       this.conferenceParams,
       this.conferenceObserver,
       Key? key})
       : super(key: key);
 
-  final String? roomId;
-  final bool? isCreateRoom;
+  final String? conferenceId;
+  final bool? isCreateConference;
   final ConferenceParams? conferenceParams;
   final ConferenceObserver? conferenceObserver;
 
-  Widget _buildView() {
+  Widget _buildView(Orientation orientation) {
     return GestureDetector(
       onTap: () {
         controller.onMainViewClick();
@@ -30,37 +30,41 @@ class ConferenceMainPage extends GetView<ConferenceMainController> {
       behavior: HitTestBehavior.translucent,
       child: WillPopScope(
         onWillPop: () async {
-          showConferenceBottomSheet(const ExitWidget());
+          showConferenceBottomSheet(const ExitWidget(), alwaysFromBottom: true);
           return false;
         },
         child: Stack(
           children: [
-            Obx(
-              () {
-                return Column(
-                  children: [
-                    SizedBox(height: 100.0.scale375Height()),
-                    Expanded(
-                      child: SizedBox(
-                        width: Get.width,
-                        height: 660.0.scale375Height(),
-                        child: controller.isEnteredRoom.value
-                            ? RoomStore.to.currentUser.hasScreenStream.value
-                                ? const LocalScreenSharingWidget()
-                                : const VideoPageTurningPage()
-                            : const SizedBox.shrink(),
-                      ),
+            Column(
+              children: [
+                Visibility(
+                  visible: orientation == Orientation.portrait,
+                  child: SizedBox(height: 90.0.scale375Height()),
+                ),
+                Center(
+                  child: SizedBox(
+                    width: orientation == Orientation.portrait
+                        ? Get.width
+                        : 648.0.scale375(),
+                    height: orientation == Orientation.portrait
+                        ? 665.0.scale375Height()
+                        : Get.height,
+                    child: Obx(
+                      () => controller.isEnteredRoom.value
+                          ? RoomStore.to.currentUser.hasScreenStream.value
+                              ? const LocalScreenSharingWidget()
+                              : const VideoPageTurningPage()
+                          : const SizedBox.shrink(),
                     ),
-                    SizedBox(height: 50.0.scale375Height()),
-                  ],
-                );
-              },
+                  ),
+                ),
+              ],
             ),
             Obx(
               () => Visibility(
                 visible: controller.areWidgetsVisible.value &&
                     controller.isEnteredRoom.value,
-                child: const TopViewWidget(),
+                child: TopViewWidget(orientation),
               ),
             ),
             Column(
@@ -70,14 +74,22 @@ class ConferenceMainPage extends GetView<ConferenceMainController> {
                   () => Visibility(
                     visible: controller.areWidgetsVisible.value &&
                         controller.isEnteredRoom.value,
-                    child: const BottomViewWidget(),
+                    child: BottomViewWidget(orientation),
                   ),
                 ),
                 Obx(
                   () => Visibility(
                     visible: !controller.areWidgetsVisible.value &&
                         RoomStore.to.isMicItemTouchable.value,
-                    child: const MicButton(),
+                    child: Column(
+                      children: [
+                        const MicButton(),
+                        SizedBox(
+                            height: orientation == Orientation.landscape
+                                ? 10.0.scale375()
+                                : 29.0.scale375()),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -92,18 +104,19 @@ class ConferenceMainPage extends GetView<ConferenceMainController> {
   Widget build(BuildContext context) {
     return GetBuilder<ConferenceMainController>(
       init: ConferenceMainController(
-          roomId: roomId,
-          isCreateRoom: isCreateRoom,
+          conferenceId: conferenceId,
+          isCreateConference: isCreateConference,
           conferenceParams: conferenceParams,
           conferenceObserver: conferenceObserver),
       id: "conference_main",
       builder: (_) {
         return Scaffold(
-          resizeToAvoidBottomInset: true,
+          resizeToAvoidBottomInset: false,
           backgroundColor: RoomTheme.defaultTheme.scaffoldBackgroundColor,
-          body: SafeArea(
-            top: false,
-            child: _buildView(),
+          body: OrientationBuilder(
+            builder: (BuildContext context, Orientation orientation) {
+              return _buildView(orientation);
+            },
           ),
         );
       },

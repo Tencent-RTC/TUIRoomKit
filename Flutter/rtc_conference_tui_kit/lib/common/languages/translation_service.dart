@@ -14,8 +14,19 @@ class RoomContentsTranslations {
   static const String fallbackLocale = 'en';
 
   static String translate(String key) {
-    final locale = Get.locale ?? const Locale(fallbackLocale);
-    final language = locale.languageCode;
+    final deviceLocale = Get.deviceLocale;
+    final languageCode = deviceLocale?.languageCode;
+
+    switch (languageCode) {
+      case 'zh':
+      case 'en':
+        Get.locale ??= deviceLocale;
+        break;
+      default:
+        Get.locale = const Locale(fallbackLocale);
+    }
+
+    final language = Get.locale?.languageCode ?? fallbackLocale;
     return translations[language]?[key] ?? key;
   }
 }

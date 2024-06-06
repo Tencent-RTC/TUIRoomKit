@@ -14,14 +14,14 @@ import 'widgets/widgets.dart';
 
 class ConferenceMainController extends GetxController {
   ConferenceMainController({
-    this.roomId,
-    this.isCreateRoom,
+    this.conferenceId,
+    this.isCreateConference,
     this.conferenceParams,
     this.conferenceObserver,
   });
 
-  final String? roomId;
-  final bool? isCreateRoom;
+  final String? conferenceId;
+  final bool? isCreateConference;
   final ConferenceParams? conferenceParams;
   final ConferenceObserver? conferenceObserver;
 
@@ -50,12 +50,14 @@ class ConferenceMainController extends GetxController {
   @override
   Future<void> onInit() async {
     if (!Get.isRegistered<RoomStore>() || !RoomStore.to.isEnteredRoom) {
-      if (roomId == null || isCreateRoom == null) {
+      if (conferenceId == null || isCreateConference == null) {
         _showNotEnteredRoomDialog();
         return;
       }
-      await _enterConference(roomId!, isCreateRoom!, conferenceParams);
-    } else if (roomId != null && roomId != RoomStore.to.roomInfo.roomId) {
+      await _enterConference(
+          conferenceId!, isCreateConference!, conferenceParams);
+    } else if (conferenceId != null &&
+        conferenceId != RoomStore.to.roomInfo.roomId) {
       _showDifferentRoomIdDialog();
     }
     isEnteredRoom.value = RoomStore.to.isEnteredRoom;
@@ -81,7 +83,7 @@ class ConferenceMainController extends GetxController {
           isMicrophoneInviteDialogShow = false;
         }
       },
-      onRoomDismissed: (roomId) {
+      onRoomDismissed: (roomId, reason) {
         conferenceObserver?.onConferenceFinished
             ?.call(RoomStore.to.roomInfo.roomId);
         RoomStore.to.clearStore();
@@ -94,9 +96,9 @@ class ConferenceMainController extends GetxController {
         showExitRoomDialog(
             RoomContentsTranslations.translate('kickedOutOfRoom'));
       },
-      onUserRoleChanged: (userId, role) {
-        if (userId == RoomStore.to.currentUser.userId.value) {
-          switch (role) {
+      onUserRoleChanged: (userInfo) {
+        if (userInfo.userId == RoomStore.to.currentUser.userId.value) {
+          switch (userInfo.userRole) {
             case TUIRole.roomOwner:
               if (RoomStore.to.currentUser.userRole.value ==
                   TUIRole.generalUser) {
@@ -127,7 +129,7 @@ class ConferenceMainController extends GetxController {
             default:
               break;
           }
-          RoomStore.to.currentUser.userRole.value = role;
+          RoomStore.to.currentUser.userRole.value = userInfo.userRole;
           RoomStore.to.updateItemTouchableState();
         }
       },
@@ -265,7 +267,7 @@ class ConferenceMainController extends GetxController {
         ..isSoundOnSpeaker = conferenceParams.isSoundOnSpeaker;
       if (isCreateRoom) {
         conferenceSession
-          ..name = conferenceParams.name ?? roomId
+          ..name = conferenceParams.name ?? ""
           ..enableCameraForAllUser = conferenceParams.enableCameraForAllUsers
           ..enableMicrophoneForAllUser =
               conferenceParams.enableMicrophoneForAllUsers

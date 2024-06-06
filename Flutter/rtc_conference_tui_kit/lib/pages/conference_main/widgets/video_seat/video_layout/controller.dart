@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +11,8 @@ class VideoLayoutController extends GetxController {
   VideoLayoutController();
   final _right = 5.0.obs;
   final _top = 5.0.obs;
-  final _isSwitchMainDraggableAndWindow = false.obs;
+  double videoLayoutHeight = 665.0.scale375Height();
+  double videoLayoutWidth = Get.width;
   final Map<String, int> _viewPtrMap = {};
   late TUIRoomObserver _observer;
   Timer? _speakingUserUpdateTimer;
@@ -19,12 +21,9 @@ class VideoLayoutController extends GetxController {
 
   double get rightPadding => _right.value;
   double get topPadding => _top.value;
-  get isSwitchMainDraggableAndWindow => _isSwitchMainDraggableAndWindow.value;
 
   set rightPadding(double value) => _right.value = value;
   set topPadding(double value) => _top.value = value;
-  set isSwitchMainDraggableAndWindow(value) =>
-      _isSwitchMainDraggableAndWindow.value = value;
 
   @override
   void onInit() {
@@ -42,6 +41,9 @@ class VideoLayoutController extends GetxController {
             )
             .key;
         if (speakingUserId.isEmpty) {
+          if (!isDraggableWidgetVisible.value) {
+            return;
+          }
           isDraggableWidgetVisible.value = false;
           speakingUser.value = UserModel();
           return;
@@ -64,19 +66,37 @@ class VideoLayoutController extends GetxController {
     super.dispose();
   }
 
-  onPanUpdate(DragUpdateDetails details, double widgetWidth) {
+  updateVideoLayoutSize(Orientation orientation) {
+    videoLayoutWidth =
+        orientation == Orientation.portrait ? Get.width : 648.0.scale375();
+    videoLayoutHeight = orientation == Orientation.portrait
+        ? 665.0.scale375Height()
+        : Get.height;
+  }
+
+  updatePadding(
+      Orientation orientation, double widgetWidth, double widgetHeight) {
+    if (rightPadding != 5.0) {
+      rightPadding = videoLayoutWidth - 5 - widgetWidth;
+    }
+    topPadding = min(topPadding, videoLayoutHeight - 5 - widgetHeight);
+  }
+
+  onPanUpdate(
+      DragUpdateDetails details, double widgetWidth, double widgetHeight) {
     rightPadding = (rightPadding -= details.delta.dx)
-        .clamp(5, Get.width - 5 - widgetWidth);
+        .clamp(5, videoLayoutWidth - 5 - widgetWidth);
     if (topPadding + details.delta.dy > 5) {
-      topPadding += details.delta.dy;
+      topPadding = (topPadding += details.delta.dy)
+          .clamp(5, videoLayoutHeight - 5 - widgetHeight);
     }
   }
 
-  onPanEnd(DragEndDetails details, double widgetWidth) {
-    if (rightPadding < (Get.width - widgetWidth) / 2) {
+  onPanEnd(DragEndDetails details, double widgetWidth, double widgetHeight) {
+    if (rightPadding < (videoLayoutWidth - widgetWidth) / 2) {
       rightPadding = 5.0;
     } else {
-      rightPadding = Get.width - 5 - widgetWidth;
+      rightPadding = videoLayoutWidth - 5 - widgetWidth;
     }
   }
 
@@ -93,7 +113,7 @@ class VideoLayoutController extends GetxController {
     _viewPtrMap[userId] = id;
   }
 
-  void removeVideoView(String userId, int id) {
+  void _removeVideoView(String userId, int id) {
     if (_viewPtrMap[userId] != id) {
       return;
     }
@@ -123,5 +143,11 @@ class VideoLayoutController extends GetxController {
     return (RoomStore.to.isSharing.value || userList.length > 6)
         ? WrapAlignment.start
         : WrapAlignment.center;
+  }
+
+  void updateVideoItem(
+      String oldUserId, int nativeViewPtr, String userId, bool isScreenStream) {
+    _removeVideoView(oldUserId, nativeViewPtr);
+    setVideoView(userId, nativeViewPtr, isScreenStream: isScreenStream);
   }
 }

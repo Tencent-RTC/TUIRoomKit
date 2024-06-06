@@ -16,8 +16,7 @@ class ExitController extends GetxController {
   void exitRoomAction() async {
     if (isRoomOwner()) {
       if (RoomStore.to.userInfoList.length > 2) {
-        showConferenceBottomSheet(const TransferHostWidget(),
-            isScrollControlled: true);
+        showConferenceBottomSheet(const TransferHostWidget());
       } else if (RoomStore.to.userInfoList.length == 2) {
         var nextOwnerId = RoomStore.to.userInfoList
             .firstWhere((element) =>

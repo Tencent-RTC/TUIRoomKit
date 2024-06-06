@@ -23,7 +23,7 @@ class TopButtonItemWidget extends GetView<TopViewController> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: text != null ? 80.0.scale375() : 40.0.scale375(),
+      width: text != null ? 64.0.scale375() : 20.0.scale375(),
       height: 53.0.scale375(),
       child: GestureDetector(
         onTap: () {

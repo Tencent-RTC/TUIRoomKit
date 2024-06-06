@@ -29,14 +29,15 @@ class EnterRoomController extends GetxController {
       ..onActionSuccess = _enterRoomSuccess
       ..onActionError = _enterRoomError
       ..join();
-    isOperating = false;
   }
 
   void _enterRoomSuccess() {
+    isOperating = false;
     Get.to(const ConferenceMainPage());
   }
 
   void _enterRoomError(ConferenceError error, String message) {
+    isOperating = false;
     makeToast(msg: "code: $error message: $message");
   }
 }

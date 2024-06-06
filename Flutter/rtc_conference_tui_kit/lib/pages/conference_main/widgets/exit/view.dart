@@ -20,7 +20,6 @@ class ExitWidget extends GetView<ExitController> {
       ),
       child: Column(
         children: [
-          const DropDownButton(),
           SizedBox(
             height: 45.0.scale375(),
             child: Text(
@@ -81,7 +80,11 @@ class ExitWidget extends GetView<ExitController> {
       init: ExitController(),
       id: "exit",
       builder: (_) {
-        return _buildView();
+        return OrientationBuilder(
+          builder: (BuildContext context, Orientation orientation) {
+            return _buildView();
+          },
+        );
       },
     );
   }

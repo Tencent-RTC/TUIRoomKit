@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_conference_tui_kit/manager/rtc_engine_manager.dart';
 import 'package:rtc_conference_tui_kit/rtc_conference_tui_kit.dart';
 import 'package:rtc_room_engine/rtc_room_engine.dart';
@@ -20,7 +21,7 @@ class ConferenceSession {
   set enableSeatControl(bool value) => _enableSeatControl = value;
 
   set onActionSuccess(VoidCallback callback) => _onActionSuccess = callback;
-  set onActionError(Function(ConferenceError, String) callback) =>
+  set onActionError(Function(ConferenceError error, String message) callback) =>
       _onActionError = callback;
 
   ConferenceSession._internal(this._conferenceId);
@@ -43,7 +44,9 @@ class ConferenceSession {
   Future<void> quickStart() async {
     var roomInfo = TUIRoomInfo(roomId: _conferenceId);
     if (_name == null || _name!.isEmpty) {
-      _name = _conferenceId;
+      var loginUserInfo = RoomEngineManager().getSelfInfo();
+      _name = (loginUserInfo.userName ?? loginUserInfo.userId) +
+          RoomContentsTranslations.translate('quickConference');
     }
     roomInfo.name = _name;
     roomInfo.isMicrophoneDisableForAllUser = !_enableMicrophoneForAllUser;

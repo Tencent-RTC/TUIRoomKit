@@ -17,7 +17,7 @@ class MoreButtonWidget extends GetView<BottomViewController> {
         borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
       ),
-      width: Get.width - 32.0.scale375(),
+      width: 343.0.scale375(),
       child: Row(
         children: [
           Obx(
@@ -89,10 +89,7 @@ class MoreButtonWidget extends GetView<BottomViewController> {
                   height: 24,
                 ),
                 onPressed: () {
-                  showConferenceBottomSheet(
-                    const SettingWidget(),
-                    isScrollControlled: true,
-                  );
+                  showConferenceBottomSheet(const SettingWidget());
                 },
                 isSelected: false.obs,
                 text: RoomContentsTranslations.translate('setting'),

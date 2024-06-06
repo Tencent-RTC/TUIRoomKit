@@ -11,11 +11,7 @@ class UserTableWidget extends GetView<UserListController> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => SizedBox(
-        height: controller.isOwner() ||
-                controller.isAdministrator(RoomStore.to.currentUser)
-            ? 550.0.scale375Height()
-            : 590.0.scale375Height(),
+      () => Expanded(
         child: Column(
           children: [
             Row(
@@ -70,6 +66,7 @@ class UserTableWidget extends GetView<UserListController> {
             SizedBox(height: 14.0.scale375()),
             Expanded(
               child: ListView.builder(
+                padding: EdgeInsets.zero,
                 itemCount: controller.isSearchBarEmpty.value
                     ? RoomStore.to.userInfoList.length
                     : controller.searchResults.length,

@@ -6,11 +6,32 @@ This document describes how to quickly run the TUIRoomKit demo project to make a
 
 ## Environment preparation
 
-| Platform | Version                 |
-| -------- | ----------------------- |
-| Flutter  |3.0.0 And Above Versions.|
-| Android  |- Minimum compatibility with Android 4.1 (SDK API Level 16), recommended to use Android 5.0 (SDK API Level 21) and above。                              |
-|    iOS   |iOS 12.0 and higher.     |
+<table>
+<tr>
+<td rowspan="1" colSpan="1" >Platform</td>
+
+<td rowspan="1" colSpan="1" >Version</td>
+</tr>
+
+<tr>
+<td rowspan="1" colSpan="1" >Flutter</td>
+
+<td rowspan="1" colSpan="1" >3.0.0 and above versions.</td>
+</tr>
+
+<tr>
+<td rowspan="1" colSpan="1" >Android</td>
+
+<td rowspan="1" colSpan="1" >- Android 4.1 (SDK API level 16) or later (Android 5.0 (SDK API level 21) or later is recommended).<br>- Android Studio 3.5 or later (Gradle 3.5.4 or later). <br>- Mobile phone on Android 4.1 or later.</td>
+</tr>
+
+<tr>
+<td rowspan="1" colSpan="1" >iOS</td>
+
+<td rowspan="1" colSpan="1" >iOS 12.0 and higher.</td>
+</tr>
+</table>
+
 
 ## Running the Demo
 

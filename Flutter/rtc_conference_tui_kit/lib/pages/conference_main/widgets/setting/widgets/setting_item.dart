@@ -19,6 +19,7 @@ class SettingItemWidget extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () => onChildTap!(),
+          behavior: HitTestBehavior.opaque,
           child: child,
         ),
       ],

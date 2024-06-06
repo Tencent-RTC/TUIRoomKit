@@ -11,9 +11,9 @@ class UserTableWidget extends GetView<RaiseHandListController> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => SizedBox(
-        height: 534.0.scale375Height(),
+      () => Expanded(
         child: ListView.builder(
+          padding: EdgeInsets.zero,
           itemCount: controller.isSearchBarEmpty.value
               ? RoomStore.to.inviteSeatList.length
               : controller.searchResults.length,

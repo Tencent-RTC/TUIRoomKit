@@ -29,7 +29,7 @@ _简体中文 | [English](README.md)_
 | iOS     |iOS 12.0 及更高。|
 
 ### 第一步：开通服务
-请参考官网文档中 [快速接入](https://cloud.tencent.com/document/product/1690/94555) 中获取自己的SDKAppID和SDKSecreKey。
+请参考官网文档中 [快速接入](https://cloud.tencent.com/document/product/1690/94555) 中获取自己的SDKAppID和SDKSecretKey。
 
 ### 接入使用
 - 步骤一：安装 `rtc_conference_tui_kit` 依赖
@@ -46,7 +46,7 @@ _简体中文 | [English](README.md)_
 
 - 步骤二：完成工程配置
 
-  - 由于`rtc_conference_tui_kit`组件使用了`GetX`状态管理库进行导航，您需要在您的应用程序中使用 `GetMaterialApp` 来代替 `MaterialApp`。或者您也可以将您 `MaterialApp` 中的 `navigatorKey` 属性设置为 `Get.key` 以实现相同的效果。
+  - 由于`rtc_conference_tui_kit`组件使用了`GetX`状态管理库的相关功能，您需要在您的应用程序中使用 `GetMaterialApp` 来代替 `MaterialApp`。或者您也可以将您 `MaterialApp` 中的 `navigatorKey` 属性设置为 `Get.key` 以实现相同的效果。
 
   - 使用`Xcode`打开您的工程，选择【项目】->【Building Settings】->【Deployment】，将其下的【Strip Style】设置为`Non-Global Symbols`，以保留所需要的全局符号信息。
 
@@ -174,10 +174,10 @@ _简体中文 | [English](README.md)_
 ## 快速访问
 
 - 如果你遇到了困难，可以先参阅 [常见问题](https://cloud.tencent.com/document/product/1690/90103)，这里整理开发者最常出现的问题，覆盖各个平台，希望可以帮助您快速解决问题
-- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](../../Web/)、[Android](../../Android/)、[iOS](../../iOS/)、[Electron](../../Electron/)、[Windows](../../Windows-Mac/)
+- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](../../Web/)、[Android](../../Android/)、[iOS](../../iOS/)、[Electron](../../Electron/)、[Qt](../../Qt/)
 - 如果您想了解我们最新的一些产品特性，可以查看 [更新日志](https://cloud.tencent.com/document/product/1690/89361)，这里有 TUIRoomKit 最新的功能特性，以及历史版本功能迭代
 - 完整的 API 文档见 [多人音视频 SDK API 示例](https://cloud.tencent.com/document/product/1690/94557)：包含TUIRoomKit（含 UI）、TUIRoomEngine（无 UI）、以及事件回调等介绍。
-- 如果你想了解更多腾讯云音视频团队维护的项目，可以查看我们的 [产品官网](https://cloud.tencent.com/product/rtcube)、[Github Organizations](https://github.com/LiteAVSDK) 等
+- 如果你想了解更多腾讯云音视频团队维护的项目，可以查看我们的 [产品官网](https://cloud.tencent.com/product/rtcube)、[Github Organizations](https://github.com/Tencent-RTC) 等
 
 
 

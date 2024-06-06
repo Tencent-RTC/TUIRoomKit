@@ -20,6 +20,7 @@ const Map<String, String> enUS = {
   'applyToSpeakRoom': 'Raise hand speaker room',
   'speakAfterTakingSeat': 'Speak after taking seat',
   'multiVideoConferencing': 'Multi-person video conferencing',
+  'quickConference': '\'s quick meeting',
   'userNameTips': 'Only Chinese, letters, numbers and underscores',
   'custom_name_1': 'Martijn',
   'custom_name_2': 'irfan',

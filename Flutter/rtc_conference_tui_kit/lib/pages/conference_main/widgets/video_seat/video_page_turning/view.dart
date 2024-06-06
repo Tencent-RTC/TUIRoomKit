@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_conference_tui_kit/pages/conference_main/widgets/video_seat/video_layout/index.dart';
@@ -10,11 +11,13 @@ import 'widgets/widgets.dart';
 class VideoPageTurningPage extends GetView<VideoPageTurningController> {
   const VideoPageTurningPage({Key? key}) : super(key: key);
 
-  Widget _buildView() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildView(Orientation orientation) {
+    return Stack(
       children: [
-        Expanded(
+        SizedBox(
+          height: orientation == Orientation.portrait
+              ? 665.0.scale375Height()
+              : Get.height,
           child: Obx(
             () => PageView.builder(
               controller: controller.pageController,
@@ -41,9 +44,18 @@ class VideoPageTurningPage extends GetView<VideoPageTurningController> {
         Obx(
           () => Visibility(
             visible: controller.getIndicatorVisibility(),
-            child: PageIndicatorWidget(
-              currentIndex: controller.currentIndex,
-              pageCount: controller.getTotalPageCount(),
+            child: Column(
+              children: [
+                const Expanded(child: SizedBox()),
+                PageIndicatorWidget(
+                  currentIndex: controller.currentIndex,
+                  pageCount: controller.getTotalPageCount(),
+                ),
+                Visibility(
+                  visible: orientation == Orientation.portrait,
+                  child: SizedBox(height: 20.0.scale375()),
+                )
+              ],
             ),
           ),
         ),
@@ -57,7 +69,11 @@ class VideoPageTurningPage extends GetView<VideoPageTurningController> {
       init: VideoPageTurningController(),
       id: "video_page_turning",
       builder: (_) {
-        return _buildView();
+        return OrientationBuilder(
+          builder: (BuildContext context, Orientation orientation) {
+            return _buildView(orientation);
+          },
+        );
       },
     );
   }

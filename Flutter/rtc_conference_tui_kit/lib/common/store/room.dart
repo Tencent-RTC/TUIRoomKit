@@ -3,7 +3,7 @@ import 'package:rtc_conference_tui_kit/manager/rtc_engine_manager.dart';
 import 'package:rtc_conference_tui_kit/common/index.dart';
 import 'package:rtc_room_engine/rtc_room_engine.dart';
 
-class RoomStore extends GetxController {
+class RoomStore {
   static RoomStore get to => Get.find();
   final _screenShareUser = UserModel();
   final seatedUserList = <UserModel>[].obs;
