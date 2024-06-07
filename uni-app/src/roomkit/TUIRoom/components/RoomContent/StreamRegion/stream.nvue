@@ -1,0 +1,91 @@
+<template>
+  <div v-if="basicStore.userId === props.stream.userId" class="stream-region-container">
+    <TencentCloud-LocalViewComponent class="stream-region"></TencentCloud-LocalViewComponent>
+  </div>
+  <div v-if="basicStore.userId !== props.stream.userId" class="stream-region-container">
+    <TencentCloud-RemoteViewComponent :view="playRegionDomId" class="stream-region"></TencentCloud-RemoteViewComponent>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, watch, nextTick, computed, onMounted } from 'vue';
+import { StreamInfo } from '../../../stores/room';
+import { useBasicStore } from '../../../stores/basic';
+import useGetRoomEngine from '../../../hooks/useRoomEngine';
+import { LAYOUT } from '../../../constants/render';
+const roomEngine = useGetRoomEngine();
+
+const logPrefix = '[StreamRegion]';
+const basicStore = useBasicStore();
+
+interface Props {
+  stream: StreamInfo;
+  userId?:string,
+  layout: LAYOUT,
+}
+
+const props = defineProps<Props>();
+
+const streamRegionRef = ref();
+const playRegionDomId = computed(() => `${props.stream.userId}${props.stream.streamType}${props.layout}`);
+
+async function playStream() {
+  if (basicStore.userId === props.stream.userId) {
+    if (props.stream.hasVideoStream) {
+      await roomEngine.instance?.setLocalVideoView({
+        view: `${playRegionDomId.value}`,
+      });
+    }
+  } else {
+  await roomEngine.instance?.setRemoteVideoView({
+      userId: props.stream.userId,
+      streamType: props.stream.streamType,
+      view: `${playRegionDomId.value}`,
+    });
+    await roomEngine.instance?.startPlayRemoteVideo({
+      userId: props.stream.userId,
+      streamType: props.stream.streamType,
+    });	
+  }
+}
+
+onMounted(() => {
+  watch(
+    () => props.stream.hasVideoStream,
+    async (val) => {
+      if (val) {
+        await nextTick();
+        console.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId,);
+        playStream();
+      }
+    },
+    { immediate: true, deep: true },
+  );
+});
+
+onMounted(() => {
+  watch(
+    () => props.stream.hasScreenStream,
+    async (hasScreenStream) => {
+      if (hasScreenStream) {
+        await nextTick();
+        await playStream();
+      }
+    },
+    { immediate: true, deep: true },
+  );
+});
+</script>
+
+<style lang="scss" scoped>
+.stream-region-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  background-color: #000000;
+  border-radius: 6px;
+}
+.stream-region {
+  flex: 1;
+}
+</style>

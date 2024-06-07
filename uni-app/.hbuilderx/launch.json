@@ -1,0 +1,19 @@
+{
+    "version" : "1.0",
+    "configurations" : [
+        {
+            "playground" : "custom",
+            "type" : "uni-app:app-ios"
+        },
+        {
+            "app-plus" : {
+                "launchtype" : "local"
+            },
+            "type" : "uniCloud"
+        },
+        {
+            "playground" : "custom",
+            "type" : "uni-app:app-android"
+        }
+    ]
+}
