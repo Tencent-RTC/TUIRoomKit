@@ -237,13 +237,18 @@ class RoomRouter: NSObject {
     }
     
     class func getCurrentWindow() -> UIWindow? {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            if let keyWindow = windowScene.windows.first {
-                return keyWindow
-            }
+        var windows: [UIWindow]
+        if #available(iOS 13.0, *), let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            windows = windowScene.windows
+        } else {
+            windows = UIApplication.shared.windows
         }
-        return UIApplication.shared.windows.first(where: { $0.windowLevel == .normal && $0.isHidden == false &&
-            CGRectEqualToRect($0.bounds , UIScreen.main.bounds )})
+        if let keyWindow = windows.first(where: { $0.isKeyWindow }) {
+            return keyWindow
+        } else {
+            return windows.last(where: { $0.windowLevel == .normal && $0.isHidden == false &&
+                CGRectEqualToRect($0.bounds , UIScreen.main.bounds) })
+        }
     }
     
     func initializeNavigationController(rootViewController: UIViewController) {
