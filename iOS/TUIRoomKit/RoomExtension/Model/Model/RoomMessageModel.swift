@@ -50,7 +50,9 @@ class RoomMessageModel {
     }
     
     private func getMessageCustomElemDic(message: V2TIMMessage) -> [String: Any]? {
-        guard let dataString = String(data: message.customElem.data, encoding: String.Encoding.utf8) else { return nil }
+        guard let customElem = message.customElem else { return nil }
+        guard let customData = customElem.data else { return nil }
+        guard let dataString = String(data: customData, encoding: String.Encoding.utf8) else { return nil }
         guard let data = dataString.data(using: String.Encoding.utf8) else { return nil }
         guard let dict = try? JSONSerialization.jsonObject(with: data,
                                                            options: .mutableContainers) as? [String : Any] else { return nil }
