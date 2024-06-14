@@ -1,17 +1,17 @@
 <template>
-  <div :class="['chat-editor', cannotSendMessage ? 'disable-editor' : '']">
+  <div :class="['chat-editor', isMessageDisabled ? 'disable-editor' : '']">
     <div class="chat-input-container">
       <div class="input-content">
         <svg-icon
-          v-tap="togglePopover" :icon="EmojiIcon" :class="['emoji-icon', { 'disable-emoji': cannotSendMessage }]"
+          v-tap="togglePopover" :icon="EmojiIcon" :class="['emoji-icon', { 'disable-emoji': isMessageDisabled }]"
         />
         <input
           ref="editorInputEle"
           v-model="sendMsg"
           type="text"
-          :disabled="cannotSendMessage"
+          :disabled="isMessageDisabled"
           class="content-bottom-input"
-          :placeholder="cannotSendMessage ? t('Muted by the moderator') : t('Type a message')"
+          :placeholder="isMessageDisabled ? t('Muted by the moderator') : t('Type a message')"
           enterkeyhint="send"
           @keyup.enter="sendMessage"
         />
@@ -33,7 +33,7 @@ const {
   editorInputEle,
   sendMsg,
   isEmojiToolbarVisible,
-  cannotSendMessage,
+  isMessageDisabled,
   sendMessage,
   handleChooseEmoji,
   togglePopover,

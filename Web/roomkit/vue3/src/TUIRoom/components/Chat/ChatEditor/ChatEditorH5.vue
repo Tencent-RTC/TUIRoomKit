@@ -1,14 +1,14 @@
 <template>
-  <div :class="['chat-editor', { 'disable': cannotSendMessage }]">
+  <div :class="['chat-editor', { 'disable': isMessageDisabled }]">
     <div class="input-content">
       <emoji class="chat-emoji" @choose-emoji="handleChooseEmoji"></emoji>
       <input
         ref="editorInputEle"
         v-model="sendMsg"
         type="text"
-        :disabled="cannotSendMessage"
+        :disabled="isMessageDisabled"
         class="content-bottom-input"
-        :placeholder="cannotSendMessage ? t('Muted by the moderator') : t('Type a message')"
+        :placeholder="isMessageDisabled ? t('Muted by the moderator') : t('Type a message')"
         enterkeyhint="send"
         @keyup.enter="sendMessage"
       />
@@ -23,7 +23,7 @@ const {
   t,
   editorInputEle,
   sendMsg,
-  cannotSendMessage,
+  isMessageDisabled,
   sendMessage,
   handleChooseEmoji,
 } = useChatEditor();
