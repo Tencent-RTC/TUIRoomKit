@@ -5,11 +5,11 @@ def projects = this.rootProject.getAllprojects().stream().map { project -> proje
 
 android {
     namespace "com.tencent.cloud.tuikit.roomkit"
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdk 30
 
     defaultConfig {
         minSdkVersion 19
+        multiDexEnabled = true
         targetSdkVersion 30
     }
 
