@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import TUIMessage from '../../common/base/Message/index';
 
@@ -18,23 +18,15 @@ export default function useChatEditor() {
   const roomStore = useRoomStore();
 
   const { roomId } = storeToRefs(basicStore);
-  const { isMessageDisableByAdmin } = storeToRefs(chatStore);
-  const { isMessageDisableForAllUser } = storeToRefs(roomStore);
+  const { isMessageDisabled } = storeToRefs(chatStore);
   const editorInputEle = ref();
   const sendMsg = ref('');
   const isEmojiToolbarVisible = ref(false);
-  watch(isMessageDisableByAdmin, (value) => {
+  watch(isMessageDisabled, (value) => {
     if (value) {
       sendMsg.value = '';
     }
   });
-
-  watch(isMessageDisableForAllUser, (value) => {
-    if (value) {
-      sendMsg.value = '';
-    }
-  });
-  const cannotSendMessage = computed(() => Boolean(isMessageDisableByAdmin.value || isMessageDisableForAllUser.value));
   const sendMessage = async () => {
     const result = decodeSendTextMsg(sendMsg.value);
     if (result === '') {
@@ -85,8 +77,7 @@ export default function useChatEditor() {
     t,
     editorInputEle,
     sendMsg,
-    isMessageDisableByAdmin,
-    cannotSendMessage,
+    isMessageDisabled,
     sendMessage,
     handleChooseEmoji,
     isEmojiToolbarVisible,

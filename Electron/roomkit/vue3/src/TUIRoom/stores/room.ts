@@ -36,10 +36,10 @@ export type UserInfo = {
   hasScreenStream?: boolean,
   isVideoVisible?: boolean,
   isScreenVisible?: boolean,
+  isMessageDisabled?: boolean,
   userRole?: TUIRole,
   // Is it on the seat
   onSeat?: boolean,
-  isChatMutedByMasterOrAdmin?: boolean,
   // Whether the user is being asked to turn on the microphone
   isRequestingUserOpenMic?: boolean,
   // The requestId for requesting the user to turn on the microphone
@@ -83,7 +83,6 @@ interface RoomState {
   masterUserId: string,
   isMicrophoneDisableForAllUser: boolean,
   isCameraDisableForAllUser: boolean,
-  isMessageDisableForAllUser: boolean,
   isSeatEnabled: boolean,
   seatMode: TUISeatMode,
   maxMembersCount: number,
@@ -140,7 +139,6 @@ export const useRoomStore = defineStore('room', {
     masterUserId: '',
     isMicrophoneDisableForAllUser: false,
     isCameraDisableForAllUser: false,
-    isMessageDisableForAllUser: false,
     isSeatEnabled: false,
     seatMode: TUISeatMode.kFreeToTake,
     maxMembersCount: 5, // Includes local streams and screen shares, above which subsequent streams are played
@@ -292,9 +290,9 @@ export const useRoomStore = defineStore('room', {
         hasScreenStream: false,
         isVideoVisible: false,
         isScreenVisible: false,
+        isMessageDisabled: false,
         userRole: TUIRole.kGeneralUser,
         onSeat: !this.isSpeakAfterTakingSeatMode,
-        isChatMutedByMasterOrAdmin: false,
         isUserApplyingToAnchor: false,
         isInvitingUserToAnchor: false,
         cameraStreamInfo: {
@@ -521,7 +519,7 @@ export const useRoomStore = defineStore('room', {
     setRoomInfo(roomInfo: TUIRoomInfo) {
       const {
         roomOwner, isMicrophoneDisableForAllUser,
-        isCameraDisableForAllUser, isMessageDisableForAllUser,
+        isCameraDisableForAllUser,
         isSeatEnabled, seatMode, maxSeatCount, roomName,
       } = roomInfo;
       if (this.localUser.userId === roomOwner) {
@@ -531,7 +529,6 @@ export const useRoomStore = defineStore('room', {
       this.masterUserId = roomOwner;
       this.isMicrophoneDisableForAllUser = isMicrophoneDisableForAllUser;
       this.isCameraDisableForAllUser = isCameraDisableForAllUser;
-      this.isMessageDisableForAllUser = isMessageDisableForAllUser;
       this.isSeatEnabled = isSeatEnabled;
       this.seatMode = seatMode;
       this.canControlSelfAudio = !this.isMicrophoneDisableForAllUser;
@@ -544,9 +541,6 @@ export const useRoomStore = defineStore('room', {
     },
     setDisableCameraForAllUserByAdmin(isDisable: boolean) {
       this.isCameraDisableForAllUser = isDisable;
-    },
-    setDisableMessageAllUserByAdmin(isDisable: boolean) {
-      this.isMessageDisableForAllUser = isDisable;
     },
     setMasterUserId(userId: string) {
       this.masterUserId = userId;
@@ -633,7 +627,7 @@ export const useRoomStore = defineStore('room', {
     setMuteUserChat(userId: string, muted: boolean) {
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
-        remoteUserInfo.isChatMutedByMasterOrAdmin = muted;
+        remoteUserInfo.isMessageDisabled = muted;
       }
     },
     setRemoteUserRole(userId: string, role: TUIRole) {
@@ -743,7 +737,6 @@ export const useRoomStore = defineStore('room', {
       this.masterUserId = '';
       this.isMicrophoneDisableForAllUser = false;
       this.isCameraDisableForAllUser = false;
-      this.isMessageDisableForAllUser = false;
       this.isSeatEnabled = false;
       this.seatMode = TUISeatMode.kFreeToTake;
       this.hasVideoStreamObject = {};

@@ -208,8 +208,6 @@ export default {
   'Sb invites you to turn on the microphone': ({ named }) => `${named('role')} invites you to turn on the microphone`,
   'All videos disabled': 'All videos disabled',
   'All videos enabled': 'All videos enabled',
-  'Disabling text chat for all is enabled': 'Disabling text chat for all is enabled',
-  'Unblocked all text chat': 'Unblocked all text chat',
   'Your camera has been turned off': 'Your camera has been turned off',
   // @ts-ignore
   'Sb invites you to turn on the camera': ({ named }) => `${named('role')} invites you to turn on the camera`,
@@ -307,4 +305,5 @@ export default {
   'Currently in a meeting, please exit the current meeting before proceeding.': 'Currently in a meeting, please exit the current meeting before proceeding.',
   'Failed to initiate meeting': 'Failed to initiate meeting',
   'Failed to enter the meeting': 'Failed to enter the meeting',
+  'Failed to disable chat': 'Failed to disable chat',
 };

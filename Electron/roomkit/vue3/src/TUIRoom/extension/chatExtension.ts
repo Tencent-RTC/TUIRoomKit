@@ -318,8 +318,10 @@ export class ChatExtension {
         roomService.basicStore.setScene('chat');
         roomService.componentManager.setComponentConfig({
           SwitchTheme: { visible: false },
+          Language: { visible: false },
           InviteControl: { visible: false },
           RoomLink: { visible: false },
+          UserInfo: { visible: false },
         });
         this.chatContext = TUILogin.getContext();
         this.myProfile =  await this.getMyProfile();

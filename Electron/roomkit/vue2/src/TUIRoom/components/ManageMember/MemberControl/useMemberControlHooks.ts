@@ -117,7 +117,7 @@ export default function useMemberControl(props?: any) {
   const chatControl = computed(() => ({
     key: 'chatControl',
     icon: ChatForbiddenIcon,
-    title: props.userInfo.isChatMutedByMasterOrAdmin ? t('Enable chat') : t('Disable chat'),
+    title: props.userInfo.isMessageDisabled ? t('Enable chat') : t('Disable chat'),
     func: disableUserChat,
   }));
 
@@ -278,13 +278,21 @@ export default function useMemberControl(props?: any) {
   /**
    * Allow text chat / Cancel text chat
   **/
-  function disableUserChat(userInfo: UserInfo) {
-    const currentState = userInfo.isChatMutedByMasterOrAdmin;
-    roomStore.setMuteUserChat(userInfo.userId, !currentState);
-    roomEngine.instance?.disableSendingMessageByAdmin({
-      userId: userInfo.userId,
-      isDisable: !currentState,
-    });
+  async function disableUserChat(userInfo: UserInfo) {
+    const { isMessageDisabled } = userInfo;
+    try {
+      await roomEngine.instance?.disableSendingMessageByAdmin({
+        userId: userInfo.userId,
+        isDisable: !isMessageDisabled,
+      });
+      roomStore.setMuteUserChat(userInfo.userId, !isMessageDisabled);
+    } catch (error) {
+      TUIMessage({
+        type: 'error',
+        message: t('Failed to disable chat'),
+        duration: MESSAGE_DURATION.NORMAL,
+      });
+    }
   }
 
   /**
