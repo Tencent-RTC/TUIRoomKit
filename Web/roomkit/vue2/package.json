@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-web-vue2.7",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
@@ -37,7 +37,7 @@
   "dependencies": {
     "@tencentcloud/chat": "latest",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-js": "workspace:^2.4.0",
+    "@tencentcloud/tuiroom-engine-js": "^2.4.1",
     "@tencentcloud/universal-api": "^2.0.9",
     "interactjs": "^1.10.26",
     "mitt": "^3.0.0",

@@ -208,8 +208,6 @@ export default {
   'Sb invites you to turn on the microphone': ({ named }) => `${named('role')}邀请你打开麦克风`,
   'All videos disabled': '已开启全体禁画',
   'All videos enabled': '已解除全体禁画',
-  'Disabling text chat for all is enabled': '已开启全体禁止文字聊天',
-  'Unblocked all text chat': '已解除全体禁止文字聊天',
   'Your camera has been turned off': '已关闭您的摄像头',
   // @ts-ignore
   'Sb invites you to turn on the camera': ({ named }) => `${named('role')}邀请你打开摄像头`,
@@ -307,4 +305,5 @@ export default {
   'Currently in a meeting, please exit the current meeting before proceeding.': '正在会议中，请先退出当前会议后再进行操作',
   'Failed to initiate meeting': '发起会议失败',
   'Failed to enter the meeting': '进入会议失败',
+  'Failed to disable chat': '禁言失败',
 };

@@ -74,7 +74,6 @@ export class RoomService implements IRoomService {
     this.onKickedOffLine = this.onKickedOffLine.bind(this);
     this.onAllUserCameraDisableChanged = this.onAllUserCameraDisableChanged.bind(this);
     this.onAllUserMicrophoneDisableChanged = this.onAllUserMicrophoneDisableChanged.bind(this);
-    this.onSendMessageForAllUserDisableChanged = this.onSendMessageForAllUserDisableChanged.bind(this);
   }
 
   static getInstance(): RoomService {
@@ -119,10 +118,6 @@ export class RoomService implements IRoomService {
     roomEngine.instance?.on(TUIRoomEvents.onKickedOffLine, this.onKickedOffLine);
     roomEngine.instance?.on(TUIRoomEvents.onAllUserCameraDisableChanged, this.onAllUserCameraDisableChanged);
     roomEngine.instance?.on(TUIRoomEvents.onAllUserMicrophoneDisableChanged, this.onAllUserMicrophoneDisableChanged);
-    roomEngine.instance?.on(
-      TUIRoomEvents.onSendMessageForAllUserDisableChanged,
-      this.onSendMessageForAllUserDisableChanged,
-    );
   }
 
   public unBindRoomEngineEvents() {
@@ -136,10 +131,6 @@ export class RoomService implements IRoomService {
     roomEngine.instance?.off(TUIRoomEvents.onKickedOffLine, this.onKickedOffLine);
     roomEngine.instance?.off(TUIRoomEvents.onAllUserCameraDisableChanged, this.onAllUserCameraDisableChanged);
     roomEngine.instance?.off(TUIRoomEvents.onAllUserMicrophoneDisableChanged, this.onAllUserMicrophoneDisableChanged);
-    roomEngine.instance?.off(
-      TUIRoomEvents.onSendMessageForAllUserDisableChanged,
-      this.onSendMessageForAllUserDisableChanged,
-    );
   }
 
   private onError(error: any) {
@@ -285,26 +276,6 @@ export class RoomService implements IRoomService {
     }
     this.handleAudioStateChange(isDisable);
     this.roomStore.setDisableMicrophoneForAllUserByAdmin(isDisable);
-  }
-
-  private async onSendMessageForAllUserDisableChanged(eventInfo: { roomId: string; isDisable: boolean }) {
-    const { isDisable } = eventInfo;
-    if (
-      isDisable !== this.roomStore.isMessageDisableForAllUser
-      && this.roomStore.localUser.userRole === TUIRole.kGeneralUser
-    ) {
-      this.handleMessageStateChange(isDisable);
-    }
-    this.roomStore.setDisableMessageAllUserByAdmin(isDisable);
-  }
-
-  private async handleMessageStateChange(isDisableMessage: boolean) {
-    const tipMessage = isDisableMessage ? t('Disabling text chat for all is enabled') : t('Unblocked all text chat');
-    this.emit(EventType.ROOM_NOTICE_MESSAGE, {
-      type: 'success',
-      message: tipMessage,
-      duration: MESSAGE_DURATION.NORMAL,
-    });
   }
 
   private async handleAudioStateChange(isDisableAudio: boolean) {

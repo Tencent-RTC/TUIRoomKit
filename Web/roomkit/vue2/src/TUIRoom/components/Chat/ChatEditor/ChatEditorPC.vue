@@ -1,12 +1,12 @@
 <template>
-  <div :class="['chat-editor', { 'disable': cannotSendMessage }]">
+  <div :class="['chat-editor', { 'disable': isMessageDisabled }]">
     <emoji class="chat-emoji" @choose-emoji="handleChooseEmoji"></emoji>
     <textarea
       ref="editorInputEle"
       v-model="sendMsg"
-      :disabled="cannotSendMessage"
+      :disabled="isMessageDisabled"
       class="content-bottom-input"
-      :placeholder="cannotSendMessage ? t('Muted by the moderator') : t('Type a message')"
+      :placeholder="isMessageDisabled ? t('Muted by the moderator') : t('Type a message')"
       @keyup.enter="sendMessage"
     />
   </div>
@@ -19,7 +19,7 @@ const {
   t,
   editorInputEle,
   sendMsg,
-  cannotSendMessage,
+  isMessageDisabled,
   sendMessage,
   handleChooseEmoji,
 } = useChatEditor();
