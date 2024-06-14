@@ -154,7 +154,7 @@ export default function useEndControl() {
             }
             handleUpdateSeatApplicationList();
           }
-          if (chatStore.isMessageDisableByAdmin) {
+          if (chatStore.isMessageDisabled) {
             roomEngine.instance?.disableSendingMessageByAdmin({
               userId,
               isDisable: false,

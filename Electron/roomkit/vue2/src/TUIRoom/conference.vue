@@ -298,6 +298,7 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
   width: 100%;
   height: 100%;
   min-width: 850px;
+  min-height: 400px;
   position: relative;
   color: var(--font-color-1);
   background-color: var(--background-color-1);
@@ -328,6 +329,7 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
     width: 100%;
     height: 100%;
     min-width: initial;
+    min-height: initial;
   }
 }
 
