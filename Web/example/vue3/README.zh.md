@@ -4,44 +4,54 @@
 
 本文档主要介绍如何快速跑通 TUIRoomKit 示例工程，体验多人音视频互动，更详细的 TUIRoomKit 组件接入流程，请点击腾讯云官网文档：[TUIRoomKit 组件 Web 接入说明](https://cloud.tencent.com/document/product/647/81962)...
 
+> 提示：<br>
+> 本示例工程集成 TUIRoomKit 的 npm 包 [@tencentcloud/roomkit-web-vue3
+](https://www.npmjs.com/package/@tencentcloud/roomkit-web-vue3)。该 npm 包提供了会前预览组件、会中组件以及发起会议、加入会议和界面微调的方法。如需了解更多，请参考 [RoomKit API](https://cloud.tencent.com/document/product/647/81969)。若这些 API 无法满足您的业务需求，您可以参考 [UIKit 源码导出](https://cloud.tencent.com/document/product/647/81965#7076b44f-846d-4b20-90f1-3e2594f20ec3) 方案接入 TUIRoomKit 源码。
+
 ## 目录结构
 
 ```
 .
 ├── README.md
-├── auto-imports.d.ts
-├── components.d.ts
+├── README.zh.md
 ├── index.html
+├── package.json
+├── public
+│   └── favicon.ico
 ├── src
-│   ├── App.vue   // 示例工程主页面
-│   ├── TUIRoom   // TUIRoom UI 组件源文件
-│   ├── assets    // 公共资源
-│   ├── config    // TUIRoom 配置文件
+│   ├── App.vue         -- 示例工程主页面
+│   ├── config          -- 用户信息配置文件及测试 userSig 生成文件
 │   ├── env.d.ts
-│   ├── main.ts   // 示例工程入口文件
-│   ├── router    // 示例工程路由配置
-│   └── views     // 示例工程路由页面
+│   ├── locales         -- 本地语言，支持中文，英文
+│   ├── main.ts         -- 示例工程入口文件
+│   ├── router          -- 示例工程路由配置
+│   ├── utils           -- 通用方法
+│   └── views           -- 示例工程页面（包括进房前预览页面及进房后页面）
+├── tsconfig.json
+├── tsconfig.node.json
+├── useRoomExtension.js
 └── vite.config.ts
 ```
 ### 第一步：开通服务
 
 在使用 TUIRoomKit 发起会议前，您需要开通 TUIRoomKit 专属的多人音视频互动服务，详细步骤如下：
 
-1. 登录  [腾讯云视立方 SDK 控制台](https://console.cloud.tencent.com/vcube/project/manage)，单击创建项目按钮后，选择多人音视频互动场景和集成方式，这里我们推荐“含 UI 快速集成”，即 TUIRoomKit。
+1. 登录 [腾讯云视立方 SDK 控制台](https://console.cloud.tencent.com/vcube/project/manage)，单击创建项目按钮后，选择多人音视频互动场景和集成方式，这里我们推荐“含 UI 快速集成”，即 TUIRoomKit。<br>
 <img src="https://qcloudimg.tencent-cloud.cn/image/document/a7ff9c2e362530504c00afad3f60b443.png" width="900" />
 
-2. 在选定接入场景和集成方式以后，您需要开通多人音视频房间 SDK 使用的两项腾讯云基础的 PaaS 能力，即 [即时通信 IM](https://cloud.tencent.com/document/product/269/1498) 和 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788)，开通后，单击创建项目并下一步按钮。
+2. 在选定接入场景和集成方式以后，您需要开通多人音视频房间 SDK 使用的两项腾讯云基础的 PaaS 能力，即 [即时通信 IM](https://cloud.tencent.com/document/product/269/1498) 和 [实时音视频 TRTC](https://cloud.tencent.com/document/product/647/16788)，开通后，单击创建项目并下一步按钮。<br>
 <img src="https://qcloudimg.tencent-cloud.cn/image/document/c0e9905f8db488e90bb03b168afb42ab.png" width="900" />
 
-3. 在项目创建完成以后，您需要为该项目匹配一个 IM 应用，因为多人音视频房间 SDK 依赖了 IM SDK 提供的基础能力，这里创建或者管理已有的 IM 应用均可，在关联成功后，就可以领取 7天的免费体验版，用于后续的开发调试工作，当然如果您之前已经体验过，也可以直接在该页面单击 [购买正式版本](https://buy.cloud.tencent.com/vcube)。
+3. 在项目创建完成以后，您需要为该项目匹配一个 IM 应用，因为多人音视频房间 SDK 依赖了 IM SDK 提供的基础能力，这里创建或者管理已有的 IM 应用均可，在关联成功后，就可以领取 7天的免费体验版，用于后续的开发调试工作，当然如果您之前已经体验过，也可以直接在该页面单击 [购买正式版本](https://buy.cloud.tencent.com/vcube)。<br>
 <img src="https://qcloudimg.tencent-cloud.cn/image/document/77427e4ca940924cd0bb9aefecfd8a40.png" width="900" />
 
-4. 单击前往集成按钮，选择项目配置，查看详细的配置页面，找到 **SDKAppID 和密钥** 并记录下来，它们会在后续步骤用到，至此 **多人音视频房间 SDK 服务** 开通完成。
+4. 单击前往集成按钮，选择项目配置，查看详细的配置页面，找到 **SDKAppID 和密钥** 并记录下来，它们会在后续步骤用到，至此 **多人音视频房间 SDK 服务** 开通完成。<br>
 <img src="https://qcloudimg.tencent-cloud.cn/image/document/d7495fa5c7e26ff861783916655cf9fd.png" width="900" />
 
 ### 第二步：下载源码，配置工程
+
 1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
-2. 找到并打开 `Web/vue3/src/config/basic-info-config.js` 文件。
+2. 找到并打开 `Web/example/vue3/src/config/basic-info-config.js` 文件。
 3. 配置 `basic-info-config.js` 文件中的相关参数：
 	<img src="https://qcloudimg.tencent-cloud.cn/raw/36fc2cb8a3cc8a90a02d1ab0d9e4ffb7.png" width="900">
 	- SDKAPPID：默认为 0，请设置为步第一步中记录下的 SDKAppID。
@@ -52,10 +62,13 @@
 1. 安装依赖
 
    ```bash
-   cd TUIRoomKit/Web/vue3
+   cd TUIRoomKit/Web/example/vue3
    
    npm install
    ```
+
+   > 注意<br>
+   > 若在安装过程中遇到报错，请执行 `npm get registry` 检查 npm 源是否为 `https://registry.npmjs.org/`。若不是，请使用 `npm config set registry https://registry.npmjs.org/` 命令将 npm 源还原为默认设置，然后重新执行 `npm install`。
 
 2. 开发环境运行示例工程
 
@@ -71,8 +84,6 @@
 ### 第四步：示例体验
 
 开发环境运行示例工程后，在浏览器中打开页面 http://localhost:3000/#/home 即可体验 TUIRoomKit 功能。
-
-注意：因 TUIRoomKit 按需引入 element-plus 组件，会导致开发环境路由页面第一次加载时反应较慢，等待 element-plus 按需加载完成即可正常使用。element-plus 按需加载不会影响打包之后的页面加载。
 
 **主持人（userId：anchor）**
 
@@ -111,6 +122,6 @@
 A: 请检查部署的链接是否为 https 协议，出于对用户安全、隐私等问题的考虑，浏览器限制网页在 https 协议下才能正常使用 TRTC Web SDK（WebRTC）的全部功能。
 
 
-## 其他
+## 交流&反馈
 
-- 欢迎加入 QQ 群：592465424，进行技术交流和反馈~
+如果您在使用过程中有遇到什么问题，欢迎提交 [**issue**](https://github.com/Tencent-RTC/TUIRoomKit/issues)，或者访问 [腾讯云通信官方社群](https://zhiliao.qq.com/) 进行咨询和反馈。
