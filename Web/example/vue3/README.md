@@ -2,27 +2,37 @@
 
 English | [简体中文](README.zh.md)
 
-This document describes how to quickly run the TUIRoom demo project to try out group audio/video interaction.
+This document describes how to quickly run the TUIRoom demo project to try out group audio/video interaction. If you need to integrate TUIRoomKit into your existing business, please refer to [TUIRoomKIt Integration](https://trtc.io/document/54845?platform=web&product=conference).
 
-## Directory structure
+> Notice：<br>
+> This example project integrates with the TUIRoomKit npm package [@tencentcloud/roomkit-web-vue3
+](https://www.npmjs.com/package/@tencentcloud/roomkit-web-vue3). This npm package provides a pre-meeting preview component, an in-meeting component, and methods for starting meetings, joining meetings, and fine-tuning the interface. For more, see [RoomKit API](https://trtc.io/document/54880?platform=web&product=conference). If these APIs don't meet your business needs, you can refer to [UIKit source code export](https://trtc.io/document/54851?platform=web&product=conference#method-2.3A-modify-the-uikit-source-code) for accessing the TUIRoomKit source code.
+
+## Directory
 
 ```
 .
 ├── README.md
-├── auto-imports.d.ts
-├── components.d.ts
+├── README.zh.md
 ├── index.html
-├─ src
-│ ├─ App.vue // main page of the sample project
-│ ├── TUIRoom // TUIRoom UI component source files
-│ ├── assets // public resources
-│ ├── config // TUIRoom configuration file
-│ ├── env.d.ts
-│ ├── main.ts // Example project entry file
-│ ├── router // Example project routing configuration
-│ └── views // Example project routing page
+├── package.json
+├── public
+│   └── favicon.ico
+├── src
+│   ├── App.vue         -- Sample Project Main Page
+│   ├── config          -- User information configuration file and test userSig generation file
+│   ├── env.d.ts
+│   ├── locales         -- Local language, support English, Chinese
+│   ├── main.ts         -- Sample Project Entry File
+│   ├── router          -- Sample Project Routing Configuration
+│   ├── utils
+│   └── views           -- Sample project pages (including pre-session preview pages and in-session pages)
+├── tsconfig.json
+├── tsconfig.node.json
+├── useRoomExtension.js
 └── vite.config.ts
 ```
+
 ### Step 1. Create a TRTC application
 1. Enter the [Application Management](https://www.tencentcloud.com/account/login) interface of the Tencent Cloud Live Audio/Video Console, select Create Application, enter the application name,click **Create Application**.
 2. Find your application in the application list and Click **Application Info**.
@@ -35,7 +45,7 @@ This document describes how to quickly run the TUIRoom demo project to try out g
 
 ### Step 2: Download the source code and configure the project
 1. Clone or download the source code in our repository (**You can start the repository to save it**).
-2. Find and open `Web/vue3/src/config/basic-info-config.js`.
+2. Find and open `Web/example/vue3/src/config/basic-info-config.js`.
 3. Configure parameters in `basic-info-config.js`:
 
 	<img src="https://qcloudimg.tencent-cloud.cn/raw/36fc2cb8a3cc8a90a02d1ab0d9e4ffb7.png" width="900">
@@ -47,7 +57,7 @@ This document describes how to quickly run the TUIRoom demo project to try out g
 1. install dependencies
 
    ```bash
-   cd TUIRoomKit/Web/vue3
+   cd TUIRoomKit/Web/example/vue3
    
    npm install
    ```
