@@ -6,7 +6,7 @@
 
 > 提示：<br>
 > 本示例工程集成 TUIRoomKit 的 npm 包 [@tencentcloud/roomkit-web-vue2.7
-](https://www.npmjs.com/package/@tencentcloud/roomkit-web-vue2.7)。该 npm 包提供了会前预览组件、会中组件以及发起会议、加入会议和界面微调的方法。如需了解更多，请参考 [RoomKit API](https://cloud.tencent.com/document/product/647/81969)。若这些 API 无法满足您的业务需求，您可以参考 [UIKit 源码导出](https://cloud.tencent.com/document/product/647/81965#7076b44f-846d-4b20-90f1-3e2594f20ec3) 方案接入 TUIRoomKit 源码。
+](https://www.npmjs.com/package/@tencentcloud/roomkit-web-vue2.7)。该 npm 包提供了会前预览组件、会中组件以及发起会议、加入会议和界面微调的方法。如需了解更多，请参考 [TUIRoomKit API](https://cloud.tencent.com/document/product/647/81969)。若这些 API 无法满足您的业务需求，您可以参考 [TUIRoomKit 源码导出](https://cloud.tencent.com/document/product/647/81965#7076b44f-846d-4b20-90f1-3e2594f20ec3) 方案接入 TUIRoomKit 源码。
 
 ## 目录结构
 
@@ -30,7 +30,7 @@
 │   ├── shims-tsx.d.ts
 │   ├── shims-vue.d.ts
 │   ├── utils            -- 通用方法
-│   └── views            -- 示例工程页面（包括进房前预览页面及进房后页面）
+│   └── views            -- 示例工程页面（包括进会前预览页面及会中页面）
 ├── tsconfig.json
 └── vue.config.js
 ```
@@ -53,7 +53,7 @@
 ### 第二步：下载源码，配置工程
 
 1. 克隆或者直接下载此仓库源码，**欢迎 Star**，感谢~~
-2. 找到并打开 `Web/example/vue2/src/config/basic-info-config.js` 文件。
+2. 找到并打开 `Web/example/webpack-vue2.7-ts/src/config/basic-info-config.js` 文件。
 3. 配置 `basic-info-config.js` 文件中的相关参数：
 	<img src="https://qcloudimg.tencent-cloud.cn/raw/36fc2cb8a3cc8a90a02d1ab0d9e4ffb7.png" width="900">
 	- SDKAPPID：默认为 0，请设置为步第一步中记录下的 SDKAppID。
@@ -64,7 +64,7 @@
 1. 安装依赖
 
    ```bash
-   cd TUIRoomKit/Web/example/vue2
+   cd TUIRoomKit/Web/example/webpack-vue2.7-ts
    
    npm install
    ```
@@ -78,11 +78,6 @@
    npm run dev
    ```
 
-3. 打包 dist 文件
-
-   ```bash
-   npm run build
-   ```
 ### 第四步：示例体验
 
 开发环境运行示例工程后，在浏览器中打开页面 http://localhost:3000/#/home 即可体验 TUIRoomKit 功能。
@@ -126,4 +121,4 @@ A: 请检查部署的链接是否为 https 协议，出于对用户安全、隐�
 
 ## 交流&反馈
 
-如果您在使用过程中有遇到什么问题，欢迎提交 [**issue**](https://github.com/Tencent-RTC/TUIRoomKit/issues)，或者访问 [腾讯云通信官方社群](https://zhiliao.qq.com/) 进行咨询和反馈。
+如果您在使用过程中有遇到什么问题，欢迎提交 [**issue**](https://github.com/Tencent-RTC/TUIRoomKit/issues)，或者访问 [腾讯云通信官方社群](https://zhiliao.qq.com/s/cWSPGIIM62CC/cFUPGIIM62CF) 进行咨询和反馈。
