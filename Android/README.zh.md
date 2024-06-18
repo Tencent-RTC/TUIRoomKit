@@ -22,7 +22,7 @@ Android
 ## 运行示例
 
 ### 第一步：开通服务
-请参考官网文档中 [快速接入](https://cloud.tencent.com/document/product/1690/88933) 中获取自己的SDKAppID和SDKSecreKey
+请参考官网文档中 [快速接入](https://cloud.tencent.com/document/product/1690/88933) 中获取自己的SDKAppID和SDKSecretKey
 
 [](id:ui.step2)
 
