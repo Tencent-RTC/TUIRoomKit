@@ -28,7 +28,7 @@ Android
 ## Demo Run Example
 
 ### Step 1. Activate the service
-1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/54843) to obtain your own SDKAppID and SDKSecreKey.
+1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/54843) to obtain your own SDKAppID and SDKSecretKey.
 
 
 [](id:ui.step2)
