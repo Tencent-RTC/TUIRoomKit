@@ -3,6 +3,10 @@ import 'package:get/get.dart';
 import 'package:room_flutter_example/common/index.dart';
 import 'package:room_flutter_example/debug/index.dart';
 import 'package:rtc_room_engine/rtc_room_engine.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimSDKListener.dart';
+import 'package:tencent_cloud_chat_sdk/enum/log_level_enum.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 
 class LoginController extends GetxController {
   LoginController();
@@ -21,17 +25,8 @@ class LoginController extends GetxController {
   autoLogin() async {
     if (UserStore.to.haveLoggedInBefore()) {
       UserStore.to.loadUserModel();
-      var result = await TUIRoomEngine.login(
-          GenerateTestUserSig.sdkAppId,
-          UserStore.to.userModel.userId,
-          GenerateTestUserSig.genTestSig(UserStore.to.userModel.userId));
-      if (result.code == TUIError.success) {
-        Get.toNamed(RouteNames.commonMain);
-      } else {
-        Get.snackbar(
-            "error", "login error,code:${result.code},msg:${result.message}",
-            snackPosition: SnackPosition.BOTTOM);
-      }
+      await _loginRoomAndIm(UserStore.to.userModel.userId,
+          haveLoggedInBefore: true);
     }
   }
 
@@ -41,16 +36,28 @@ class LoginController extends GetxController {
           snackPosition: SnackPosition.BOTTOM);
       return;
     }
-    var result = await TUIRoomEngine.login(
+    await _loginRoomAndIm(userIdController.text);
+  }
+
+  _loginRoomAndIm(String userId, {bool? haveLoggedInBefore}) async {
+    var roomLoginResult = await TUIRoomEngine.login(
         GenerateTestUserSig.sdkAppId,
-        userIdController.text,
-        GenerateTestUserSig.genTestSig(userIdController.text));
-    if (result.code == TUIError.success) {
-      UserStore.to.userModel.userId = userIdController.text;
-      Get.toNamed(RouteNames.commonProfile);
+        userId,
+        GenerateTestUserSig.genTestSig(userId));
+    await TencentImSDKPlugin.v2TIMManager.initSDK(
+        sdkAppID: GenerateTestUserSig.sdkAppId,
+        loglevel: LogLevelEnum.V2TIM_LOG_INFO,
+        listener: V2TimSDKListener());
+    V2TimCallback imLoginResult = await TencentImSDKPlugin.v2TIMManager
+        .login(userID: userId, userSig: GenerateTestUserSig.genTestSig(userId));
+    if (roomLoginResult.code == TUIError.success && imLoginResult.code == 0) {
+      UserStore.to.userModel.userId = userId;
+      Get.toNamed(haveLoggedInBefore == true
+          ? RouteNames.commonMain
+          : RouteNames.commonProfile);
     } else {
-      Get.snackbar(
-          "error", "login error,code:${result.code},msg:${result.message}",
+      Get.snackbar("error",
+          "login error,code:${roomLoginResult.code},msg:${roomLoginResult.message}",
           snackPosition: SnackPosition.BOTTOM);
     }
   }

@@ -3,16 +3,15 @@ PODS:
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
+  - HydraAsync (2.0.6)
   - open_file (0.0.1):
     - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - permission_handler_apple (9.1.1):
+  - permission_handler_apple (9.3.0):
     - Flutter
   - replay_kit_launcher (1.0.0):
-    - Flutter
-  - rtc_conference_tui_kit (0.0.1):
     - Flutter
   - rtc_room_engine (2.4.0):
     - Flutter
@@ -23,6 +22,14 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - tencent_cloud_chat_sdk (7.0.0):
+    - Flutter
+    - HydraAsync
+    - TXIMSDK_Plus_iOS (>= 7.9.5680)
+  - tencent_conference_uikit (0.0.1):
+    - Flutter
+  - tencent_float_chat_widget (1.0.0):
+    - Flutter
   - tencent_trtc_cloud (10.7):
     - Flutter
     - TXCustomBeautyProcesserPlugin (= 1.0.2)
@@ -41,13 +48,16 @@ DEPENDENCIES:
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - replay_kit_launcher (from `.symlinks/plugins/replay_kit_launcher/ios`)
-  - rtc_conference_tui_kit (from `.symlinks/plugins/rtc_conference_tui_kit/ios`)
   - rtc_room_engine (from `.symlinks/plugins/rtc_room_engine/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - tencent_cloud_chat_sdk (from `.symlinks/plugins/tencent_cloud_chat_sdk/ios`)
+  - tencent_conference_uikit (from `.symlinks/plugins/tencent_conference_uikit/ios`)
+  - tencent_float_chat_widget (from `.symlinks/plugins/tencent_float_chat_widget/ios`)
   - tencent_trtc_cloud (from `.symlinks/plugins/tencent_trtc_cloud/ios`)
 
 SPEC REPOS:
   trunk:
+    - HydraAsync
     - RTCRoomEngine
     - Toast
     - TXCustomBeautyProcesserPlugin
@@ -67,26 +77,33 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   replay_kit_launcher:
     :path: ".symlinks/plugins/replay_kit_launcher/ios"
-  rtc_conference_tui_kit:
-    :path: ".symlinks/plugins/rtc_conference_tui_kit/ios"
   rtc_room_engine:
     :path: ".symlinks/plugins/rtc_room_engine/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  tencent_cloud_chat_sdk:
+    :path: ".symlinks/plugins/tencent_cloud_chat_sdk/ios"
+  tencent_conference_uikit:
+    :path: ".symlinks/plugins/tencent_conference_uikit/ios"
+  tencent_float_chat_widget:
+    :path: ".symlinks/plugins/tencent_float_chat_widget/ios"
   tencent_trtc_cloud:
     :path: ".symlinks/plugins/tencent_trtc_cloud/ios"
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  fluttertoast: 9f2f8e81bb5ce18facb9748d7855bf5a756fe3db
+  fluttertoast: e9a18c7be5413da53898f660530c56f35edfba9c
+  HydraAsync: 8d589bd725b0224f899afafc9a396327405f8063
   open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   replay_kit_launcher: 828739da18c9785d5e9aafd4f075ea11d6b61499
-  rtc_conference_tui_kit: e6a8fb13894a30ecdfb180e3e6997df20e4d202d
   rtc_room_engine: 62f2d689885b16d32007d52adb796f351538adc6
   RTCRoomEngine: 6a370b6ed7f0f1a07f9505c8d02a3b792d2b0dd8
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  tencent_cloud_chat_sdk: 692e2c6b3024086a62a9fbb047441f17f122dab4
+  tencent_conference_uikit: 93a0fb0b91c6d007b25ced5ee8a2c4eeaf921959
+  tencent_float_chat_widget: 8908003c03fecc53bf6e4dd6acabbfda99b4696c
   tencent_trtc_cloud: 110bcd85006934314d3836346126c065218fb8b8
   Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
   TXCustomBeautyProcesserPlugin: 099393b941cb40eda12b3a80bf6c0319957b1cfd
