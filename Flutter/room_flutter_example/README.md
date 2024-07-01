@@ -36,7 +36,7 @@ This document describes how to quickly run the TUIRoomKit demo project to make a
 ## Running the Demo
 
 ### Step 1. Activate the service
-1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/57508) to obtain your own SDKAppID and SDKSecretKey.
+Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/57508) to obtain your own SDKAppID and SDKSecretKey.
 
 ### Step 2. Configure the project
 

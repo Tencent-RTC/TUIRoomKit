@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'package:get/get.dart';
 import 'package:room_flutter_example/common/index.dart';
-import 'package:rtc_conference_tui_kit/common/index.dart';
-import 'package:rtc_conference_tui_kit/rtc_conference_tui_kit.dart';
+import 'package:tencent_conference_uikit/common/index.dart';
+import 'package:tencent_conference_uikit/tencent_conference_uikit.dart';
 
 class CreateRoomController extends GetxController {
   var isOperating = false;
