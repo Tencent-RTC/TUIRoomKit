@@ -57,7 +57,7 @@ TUIRoomKit
 - Windows端使用Visual Studio（VS 2015及以上版本）打开源码工程 `RoomKit.vcxproj`，
 - 在项目右键>>属性>>QtProjectSetting>>General>>QtInstallation 重新选择一下目前已经安装的Qt环境
 
-   <img src="https://qcloudimg.tencent-cloud.cn/raw/f7246267e5fbee96e481e6e491f6a3ea.png" width="500" height="280"/>
+   <img src="https://qcloudimg.tencent-cloud.cn/raw/c103688591c12c5b3a3f30c0d2e12fc5.png" width="500" height="280"/>
 
 - 单击【运行】即可开始调试运行本App。
 
@@ -65,7 +65,7 @@ TUIRoomKit
 
 <img src="https://qcloudimg.tencent-cloud.cn/raw/bf53f125f17bf697080752eebfe91df4.png" width="600" height="300"/>
 
-<img src="https://qcloudimg.tencent-cloud.cn/raw/1d3a03bed647d33bf1ea91f8333da921.png" width="600" height="340"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/2ae3f0ba5bf13d86edc65d320f62a566.png" width="600" height="340"/>
 
 #### 用户 A
 - 步骤一：登录输入用户名与房间号，点击进入房间按钮。(用户名请保证唯一性，例如：user_A，房间号为数字组合，最多不超过9位，例如：123456)
