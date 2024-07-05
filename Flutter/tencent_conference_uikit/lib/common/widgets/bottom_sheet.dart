@@ -44,7 +44,6 @@ Future<void> showConferenceBottomSheet(Widget bottomSheet,
         },
       );
     },
-    routeSettings: const RouteSettings(name: '/bottom_sheet'),
   );
 }
 

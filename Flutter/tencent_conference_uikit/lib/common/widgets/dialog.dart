@@ -120,6 +120,5 @@ Future<void> showConferenceDialog({
       ),
     ),
     barrierDismissible: barrierDismissible,
-    routeSettings: const RouteSettings(name: '/dialog'),
   );
 }

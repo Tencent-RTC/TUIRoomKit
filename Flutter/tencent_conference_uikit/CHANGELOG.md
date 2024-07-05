@@ -1,3 +1,8 @@
+### 2.4.3(2024-07-05)
+
+- Added an example project.
+- Added support for in-conference chat configurations: `chatWidget` parameter added to `ConferenceMainPage`. For detailed usage, please refer to [In-Conference Chat](https://trtc.io/document/61632) or the example project.
+
 ### 2.4.2(2024-07-01)
 
 - **Breaking Change**: The plugin has been renamed from `rtc_conference_tui_kit` to `tencent_conference_uikit`.If you want to access versions 2.4.1 or earlier, you can visit [rtc_conference_tui_kit](https://pub.dev/packages/rtc_conference_tui_kit).
