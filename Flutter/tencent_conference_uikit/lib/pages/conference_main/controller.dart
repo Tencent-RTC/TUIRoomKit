@@ -19,12 +19,14 @@ class ConferenceMainController extends GetxController {
     this.isCreateConference,
     this.conferenceParams,
     this.conferenceObserver,
+    this.chatWidget,
   });
 
   final String? conferenceId;
   final bool? isCreateConference;
   final ConferenceParams? conferenceParams;
   final ConferenceObserver? conferenceObserver;
+  final Widget? chatWidget;
 
   bool isMicrophoneInviteDialogShow = false;
   bool isCameraInviteDialogShow = false;
@@ -226,8 +228,11 @@ class ConferenceMainController extends GetxController {
       confirmTextStyle: RoomTheme.defaultTheme.textTheme.labelMedium,
       onConfirm: () {
         Get.until((route) {
-          return route.settings.name != '/dialog' &&
-              route.settings.name != '/bottom_sheet';
+          var args = route.settings.arguments;
+          if (args is Map) {
+            return route is! PopupRoute && args['from'] != 'ConferenceMainPage';
+          }
+          return route is! PopupRoute;
         });
         Get.back();
       },

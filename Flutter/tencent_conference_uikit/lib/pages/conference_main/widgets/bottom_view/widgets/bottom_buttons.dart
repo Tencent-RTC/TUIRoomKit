@@ -162,6 +162,20 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
         text: RoomContentsTranslations.translate('shareOn'),
         selectedText: RoomContentsTranslations.translate('shareOff'),
       ),
+      Visibility(
+        visible: controller.conferenceMainController.chatWidget != null,
+        child: BottomButtonItemWidget(
+          image: Image.asset(
+            AssetsImages.roomChat,
+            package: 'tencent_conference_uikit',
+          ),
+          onPressed: () {
+            Get.to(() => controller.conferenceMainController.chatWidget!,
+                arguments: {'from': 'ConferenceMainPage'});
+          },
+          text: RoomContentsTranslations.translate('chat'),
+        ),
+      ),
       BottomButtonItemWidget(
         image: Image.asset(
           AssetsImages.roomInvite,
@@ -188,6 +202,9 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
         if (visibilityWidget is Visibility) {
           return visibilityWidget.visible;
         }
+      }
+      if (widget is Visibility) {
+        return widget.visible;
       }
       return true;
     }).toList();

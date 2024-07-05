@@ -1,7 +1,7 @@
 name: tencent_conference_uikit
 description: tencent_conference_uikit is a UIKit about audio&video room launched by Tencent Cloud.
-version: 2.4.2
-repository: https://github.com/tencentyun/TUIRoomKit/tree/main/Flutter/rtc_conference_tui_kit
+version: 2.4.3
+repository: https://github.com/Tencent-RTC/TUIRoomKit/tree/main/Flutter/tencent_conference_uikit
 homepage: https://trtc.io/products/conference
 
 environment:
@@ -18,7 +18,7 @@ dependencies:
   fluttertoast: ^8.2.2
   tencent_trtc_cloud: ^2.7.0
   replay_kit_launcher: ^1.0.0
-  tencent_float_chat_widget: ^1.0.0
+  tencent_float_chat_widget: ^1.0.1
 
 dev_dependencies:
   flutter_test:

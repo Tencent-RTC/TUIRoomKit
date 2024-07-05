@@ -124,9 +124,9 @@ _简体中文 | [English](README.md)_
   >   - `Github`中的[示例代码](https://github.com/tencentyun/TUIRoomKit/blob/main/Flutter/room_flutter_example/lib/debug/generate_test_user_sig.dart)使用了`genTestUserSig`函数在本地计算 UserSig 是为了更快地让您跑通当前的接入流程，但该方案会将您的 `SDKSecretKey`暴露在 App 的代码当中，这并不利于您后续升级和保护您的 SDKSecretKey，所以我们强烈建议您将`UserSig`的计算逻辑放在服务端进行，并由 App 在每次使用`TUIRoomKit`组件时向您的服务器请求实时计算出的 UserSig。
 
 
-  **登录聊天（可选）**
+  **登录弹幕聊天（可选）**
 
-    Flutter **TUIRoomKit**（**tencent_conference_uikit**）自**2.4.1**版本开始引入**弹幕聊天功能**。如您需要使用弹幕聊天功能，需要完成以下初始化及登录：
+    Flutter **TUIRoomKit**（**tencent_conference_uikit**）自**2.4.1**版本开始引入**弹幕聊天功能**。如您需要使用弹幕聊天功能，需要完成以下初始化及登录（如您还需要使用[会中聊天](https://cloud.tencent.com/document/product/647/108289)页面，可忽略此步骤，完成会中聊天的[初始化及登录](https://cloud.tencent.com/document/product/647/108289#1060dffc-abe4-436d-bd6d-407ed60995ba)即可）：
     ``` dart
     import 'package:tencent_cloud_chat_sdk/enum/V2TimSDKListener.dart';
     import 'package:tencent_cloud_chat_sdk/enum/log_level_enum.dart';

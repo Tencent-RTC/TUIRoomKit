@@ -152,9 +152,9 @@ Please refer to the official documentation at [Integration (TUIRoomKit)](https:/
   >   - The [sample code](https://github.com/tencentyun/TUIRoomKit/blob/main/Flutter/room_flutter_example/lib/debug/generate_test_user_sig.dart) on GitHub uses the `genTestUserSig` function to calculate `UserSig` locally, so as to help you complete the current integration process more quickly. However, this scheme exposes your `SDKSecretKey` in the application code, which makes it difficult for you to upgrade and protect your `SDKSecretKey` subsequently. Therefore, we strongly recommend you run the `UserSig` calculation logic on the server and make the application request the `UserSig` calculated in real time every time the application uses the TUIRoomKit component from the server.
 
 
-  **Log in to Chat (optional)**
+  **Log in to Floating Chat (optional)**
 
-    Flutter **TUIRoomKit** (**tencent_conference_uikit**) introduced the **floating chat feature** starting from version **2.4.1**. If you need to use the floating chat feature, you need to complete the following initialization and log in to:
+    Flutter **TUIRoomKit** (**tencent_conference_uikit**) introduced the **floating chat feature** starting from version **2.4.1**. If you need to use the floating chat feature, you need to complete the following initialization and login (If you also need to use the [In-Conference Chat](https://trtc.io/document/61632) page, you can Ignore this step and complete the [initialization and login for In-Conference Chat](https://trtc.io/document/61632#3d0fd007-2189-48e0-8391-27d840e075f4)):
     ``` dart
     import 'package:tencent_cloud_chat_sdk/enum/V2TimSDKListener.dart';
     import 'package:tencent_cloud_chat_sdk/enum/log_level_enum.dart';
