@@ -1,3 +1,7 @@
+### 2.4.4(2024-07-08)
+
+- Compatible with Android API 34.
+
 ### 2.4.3(2024-07-05)
 
 - Added an example project.
