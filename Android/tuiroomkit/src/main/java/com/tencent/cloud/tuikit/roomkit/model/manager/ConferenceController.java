@@ -20,6 +20,7 @@ import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomK
 import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY_ROOM_ID;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -973,6 +974,7 @@ public class ConferenceController {
     }
 
     private void decideMediaStatus(boolean enableAudio, boolean enableVideo, boolean isSoundOnSpeaker) {
+        setCameraResolutionMode(Configuration.ORIENTATION_PORTRAIT == mContext.getResources().getConfiguration().orientation);
         decideAudioRoute(isSoundOnSpeaker);
 
         boolean isPushAudio = isPushAudio(enableAudio);
