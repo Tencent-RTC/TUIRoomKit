@@ -17,6 +17,7 @@ public class UserEntity {
     private boolean isCameraAvailable;
     private boolean isScreenShareAvailable;
     private boolean isVideoPlaying;
+    private boolean isSelected;
 
     private TUIRoomDefine.VideoStreamType videoStreamType = TUIRoomDefine.VideoStreamType.CAMERA_STREAM;
 
@@ -125,6 +126,14 @@ public class UserEntity {
 
     public void setVideoPlaying(boolean videoPlaying) {
         isVideoPlaying = videoPlaying;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
     public TUIRoomDefine.VideoStreamType getVideoStreamType() {

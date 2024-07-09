@@ -98,6 +98,28 @@ public class VideoSeatViewModel extends TUIRoomObserver
     }
 
     @Override
+    public void enterFullscreenOnDoubleClick(int position) {
+        Log.d(TAG, "enterFullscreenOnDoubleClick position=" + position);
+        UserEntity curUser = mUserEntityList.get(position);
+        if (curUser.isSelected()) {
+            return;
+        }
+        UserEntity preUser = mUserEntityList.get(0);
+        if (preUser.isSelected()) {
+            preUser.setSelected(false);
+            int preFromIndex = mUserListSorter.removeUser(mUserEntityList, preUser);
+            int preToIndex = mUserListSorter.insertUser(mUserEntityList, preUser);
+            mVideoSeatView.notifyItemMoved(preFromIndex, preToIndex);
+        }
+
+        curUser.setSelected(true);
+        int fromIndex = mUserListSorter.removeUser(mUserEntityList, curUser);
+        int toIndex = mUserListSorter.insertUser(mUserEntityList, curUser);
+        mVideoSeatView.notifyItemMoved(fromIndex, toIndex);
+        notifyUiForUserListChanged();
+    }
+
+    @Override
     public void startPlayVideo(String userId, TUIVideoView videoView, boolean isSharingScreen) {
         UserEntity entity = mUserEntityMap.get(userId);
         if (entity == null) {
@@ -548,6 +570,9 @@ public class VideoSeatViewModel extends TUIRoomObserver
     private void notifySpeakerModeChangedIfNeeded() {
         @Constants.SpeakerMode int newSpeakerMode = getSpeakerModeFromData();
         if (mLatestSpeakerMode == newSpeakerMode) {
+            if (newSpeakerMode == Constants.SPEAKER_MODE_SELECTED) {
+                mVideoSeatView.enableSpeakerMode(true);
+            }
             return;
         }
         mVideoSeatView.enableSpeakerMode(newSpeakerMode != Constants.SPEAKER_MODE_NONE);
@@ -563,6 +588,9 @@ public class VideoSeatViewModel extends TUIRoomObserver
         }
         if (mUserListSorter.isSpeakerOfPersonalVideoShow(mUserEntityList)) {
             return Constants.SPEAKER_MODE_PERSONAL_VIDEO_SHOW;
+        }
+        if (mUserListSorter.isSpeakerOfSelected(mUserEntityList)) {
+            return Constants.SPEAKER_MODE_SELECTED;
         }
         return Constants.SPEAKER_MODE_NONE;
     }

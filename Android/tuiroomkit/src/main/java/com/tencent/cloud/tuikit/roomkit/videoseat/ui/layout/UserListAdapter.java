@@ -42,7 +42,12 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private final int mRoundRadius;
 
-    private View.OnClickListener mClickListener;
+    private OnItemClickListener mClickListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+        void onItemDoubleClick(View view, int position);
+    }
 
     public UserListAdapter(Context context, List<UserEntity> list) {
         this.mContext = context;
@@ -50,9 +55,8 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         mRoundRadius = (int) context.getResources().getDimension(R.dimen.tuivideoseat_video_view_conor);
     }
 
-    public void setItemClickListener(View.OnClickListener clickListener) {
+    public void setItemClickListener(OnItemClickListener clickListener) {
         mClickListener = clickListener;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -134,16 +138,18 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             initView(itemView);
         }
 
-        private final GestureDetector mSimpleOnGestureListener = new GestureDetector(mContext,
+        private final GestureDetector gestureDetector = new GestureDetector(mContext,
                 new GestureDetector.SimpleOnGestureListener() {
 
                     @Override
                     public boolean onSingleTapConfirmed(MotionEvent e) {
+                        mClickListener.onItemClick(mTopLayout, getBindingAdapterPosition());
                         return true;
                     }
 
                     @Override
                     public boolean onDoubleTap(MotionEvent e) {
+                        mClickListener.onItemDoubleClick(mTopLayout, getBindingAdapterPosition());
                         return true;
                     }
 
@@ -152,6 +158,8 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         return true;
                     }
                 });
+
+        private final View.OnTouchListener touchListener = (v, event) -> gestureDetector.onTouchEvent(event);
 
         public void updateUserInfoVisibility(UserEntity model) {
             if (model.isSelf()) {
@@ -166,14 +174,6 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 mIvRoomManage.setBackgroundResource(R.drawable.tuiroomkit_icon_video_room_owner);
             } else if (model.getRole() == TUIRoomDefine.Role.MANAGER) {
                 mIvRoomManage.setBackgroundResource(R.drawable.tuiroomkit_icon_video_room_manager);
-            }
-            if (mViewType == TYPE_SELF) {
-                itemView.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return mSimpleOnGestureListener.onTouchEvent(event);
-                    }
-                });
             }
         }
 
@@ -216,7 +216,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 return;
             }
             ViewParent viewParent = videoView.getParent();
-            if (viewParent != null && (viewParent instanceof ViewGroup)) {
+            if (viewParent instanceof ViewGroup) {
                 if (viewParent == mVideoContainer) {
                     return;
                 }
@@ -224,7 +224,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             mVideoContainer.removeAllViews();
             mVideoContainer.addView(videoView);
-            videoView.setOnClickListener(mClickListener);
+            videoView.setOnTouchListener(touchListener);
         }
 
         private void initView(final View itemView) {

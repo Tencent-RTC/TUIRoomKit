@@ -5,7 +5,6 @@ import static com.tencent.cloud.tuikit.roomkit.videoseat.Constants.VOLUME_NO_SOU
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -16,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.videoseat.Constants;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.LandscapePageLayoutManager;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.PageLayoutManager;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.layout.PagerSnapHelper;
@@ -47,7 +47,7 @@ public class TUIVideoSeatView extends RelativeLayout {
     private UserDisplayView   mUserDisplayView;
 
     private List<String>     mVisibleVideoStreams;
-    private List<UserEntity> mMemberEntityList;
+    private List<UserEntity> mMemberEntityList = new ArrayList<>();
 
     private IVideoSeatViewModel mViewModel;
 
@@ -83,7 +83,6 @@ public class TUIVideoSeatView extends RelativeLayout {
 
     public void setViewClickListener(OnClickListener clickListener) {
         mClickListener = clickListener;
-        mMemberListAdapter.setItemClickListener(mClickListener);
     }
 
     public void setMemberEntityList(List<UserEntity> memberEntityList) {
@@ -185,6 +184,22 @@ public class TUIVideoSeatView extends RelativeLayout {
             public boolean onTouch(View v, MotionEvent event) {
                 mRecyclerView.onTouchEvent(event);
                 return recognizeClickEventFromTouch(event);
+            }
+        });
+        mMemberListAdapter.setItemClickListener(new UserListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (mClickListener != null) {
+                    mClickListener.onClick(view);
+                }
+            }
+
+            @Override
+            public void onItemDoubleClick(View view, int position) {
+                if (mMemberEntityList.size() < Constants.SPEAKER_MODE_MEMBER_MIN_LIMIT) {
+                    return;
+                }
+                mViewModel.enterFullscreenOnDoubleClick(position);
             }
         });
     }
@@ -470,6 +485,12 @@ public class TUIVideoSeatView extends RelativeLayout {
         if (mMemberListAdapter != null) {
             mMemberListAdapter.notifyItemRemoved(position);
             updateCircleIndicator();
+        }
+    }
+
+    public void notifyItemMoved(int fromPosition, int toPosition) {
+        if (mMemberListAdapter != null) {
+            mMemberListAdapter.notifyItemMoved(fromPosition, toPosition);
         }
     }
 
