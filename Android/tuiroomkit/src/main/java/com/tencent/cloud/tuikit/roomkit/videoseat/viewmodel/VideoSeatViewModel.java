@@ -98,25 +98,33 @@ public class VideoSeatViewModel extends TUIRoomObserver
     }
 
     @Override
-    public void enterFullscreenOnDoubleClick(int position) {
-        Log.d(TAG, "enterFullscreenOnDoubleClick position=" + position);
-        UserEntity curUser = mUserEntityList.get(position);
-        if (curUser.isSelected()) {
+    public void toggleScreenSizeOnDoubleClick(int position) {
+        Log.d(TAG, "toggleScreenSizeOnDoubleClick position=" + position);
+        UserEntity firstUser = mUserEntityList.get(0);
+        if (position == 0) {
+            if (firstUser.isSelected()) {
+                handleUserSelectStateChanged(firstUser);
+            } else {
+                firstUser.setSelected(true);
+            }
+            notifyUiForUserListChanged();
             return;
         }
-        UserEntity preUser = mUserEntityList.get(0);
-        if (preUser.isSelected()) {
-            preUser.setSelected(false);
-            int preFromIndex = mUserListSorter.removeUser(mUserEntityList, preUser);
-            int preToIndex = mUserListSorter.insertUser(mUserEntityList, preUser);
-            mVideoSeatView.notifyItemMoved(preFromIndex, preToIndex);
-        }
 
-        curUser.setSelected(true);
-        int fromIndex = mUserListSorter.removeUser(mUserEntityList, curUser);
-        int toIndex = mUserListSorter.insertUser(mUserEntityList, curUser);
-        mVideoSeatView.notifyItemMoved(fromIndex, toIndex);
+        UserEntity curUser = mUserEntityList.get(position);
+        if (firstUser.isSelected()) {
+            handleUserSelectStateChanged(firstUser);
+        }
+        handleUserSelectStateChanged(curUser);
         notifyUiForUserListChanged();
+        mVideoSeatView.enableSpeakerMode(true);
+    }
+
+    private void handleUserSelectStateChanged(UserEntity user) {
+        user.setSelected(!user.isSelected());
+        int fromIndex = mUserListSorter.removeUser(mUserEntityList, user);
+        int toIndex = mUserListSorter.insertUser(mUserEntityList, user);
+        mVideoSeatView.notifyItemMoved(fromIndex, toIndex);
     }
 
     @Override
@@ -570,9 +578,6 @@ public class VideoSeatViewModel extends TUIRoomObserver
     private void notifySpeakerModeChangedIfNeeded() {
         @Constants.SpeakerMode int newSpeakerMode = getSpeakerModeFromData();
         if (mLatestSpeakerMode == newSpeakerMode) {
-            if (newSpeakerMode == Constants.SPEAKER_MODE_SELECTED) {
-                mVideoSeatView.enableSpeakerMode(true);
-            }
             return;
         }
         mVideoSeatView.enableSpeakerMode(newSpeakerMode != Constants.SPEAKER_MODE_NONE);
@@ -580,17 +585,17 @@ public class VideoSeatViewModel extends TUIRoomObserver
     }
 
     private @Constants.SpeakerMode int getSpeakerModeFromData() {
-        if (mUserListSorter.isSpeakerOfScreenSharing(mUserEntityList)) {
-            return Constants.SPEAKER_MODE_SCREEN_SHARING;
-        }
         if (mUserEntityList.size() < Constants.SPEAKER_MODE_MEMBER_MIN_LIMIT) {
             return Constants.SPEAKER_MODE_NONE;
         }
-        if (mUserListSorter.isSpeakerOfPersonalVideoShow(mUserEntityList)) {
-            return Constants.SPEAKER_MODE_PERSONAL_VIDEO_SHOW;
-        }
         if (mUserListSorter.isSpeakerOfSelected(mUserEntityList)) {
             return Constants.SPEAKER_MODE_SELECTED;
+        }
+        if (mUserListSorter.isSpeakerOfScreenSharing(mUserEntityList)) {
+            return Constants.SPEAKER_MODE_SCREEN_SHARING;
+        }
+        if (mUserListSorter.isSpeakerOfPersonalVideoShow(mUserEntityList)) {
+            return Constants.SPEAKER_MODE_PERSONAL_VIDEO_SHOW;
         }
         return Constants.SPEAKER_MODE_NONE;
     }

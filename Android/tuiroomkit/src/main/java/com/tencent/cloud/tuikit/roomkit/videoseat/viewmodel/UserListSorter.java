@@ -29,6 +29,9 @@ public class UserListSorter {
 
     public void sortList(List<UserEntity> userList) {
         Collections.sort(userList, mUserSortComparator);
+        if (isSpeakerOfSelected(userList)) {
+            return;
+        }
         advanceSingleVideoUserForSpeaker(userList);
     }
 
@@ -37,6 +40,9 @@ public class UserListSorter {
             return false;
         }
         if (isSpeakerOfScreenSharing(userList)) {
+            return false;
+        }
+        if (isSpeakerOfSelected(userList)) {
             return false;
         }
         if (sortForPersonalVideoShowOnIfNeeded(userList)) {
