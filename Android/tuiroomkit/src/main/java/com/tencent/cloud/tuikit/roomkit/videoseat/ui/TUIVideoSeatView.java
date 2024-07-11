@@ -199,7 +199,7 @@ public class TUIVideoSeatView extends RelativeLayout {
                 if (mMemberEntityList.size() < Constants.SPEAKER_MODE_MEMBER_MIN_LIMIT) {
                     return;
                 }
-                mViewModel.enterFullscreenOnDoubleClick(position);
+                mViewModel.toggleScreenSizeOnDoubleClick(position);
             }
         });
     }

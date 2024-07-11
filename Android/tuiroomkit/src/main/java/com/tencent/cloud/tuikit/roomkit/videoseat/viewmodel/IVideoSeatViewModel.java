@@ -15,5 +15,5 @@ public interface IVideoSeatViewModel {
 
     void setLocalVideoView(UserEntity selfEntity);
 
-    void enterFullscreenOnDoubleClick(int position);
+    void toggleScreenSizeOnDoubleClick(int position);
 }
