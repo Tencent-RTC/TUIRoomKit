@@ -391,7 +391,7 @@ public class TUIVideoSeatView extends RelativeLayout {
         }
         if (entity.isSelf()) {
             mViewModel.setLocalVideoView(entity);
-            notifyItemVideoVisibilityStageChanged(mMemberEntityList.indexOf(entity));
+            notifyItemVideoVisibilityStageChanged(entity);
             return;
         }
         if (!entity.isVideoAvailable()) {
@@ -413,14 +413,18 @@ public class TUIVideoSeatView extends RelativeLayout {
         }
     }
 
-    public void notifyItemVideoVisibilityStageChanged(int position) {
+    public void notifyItemVideoVisibilityStageChanged(UserEntity user) {
         if (mMemberListAdapter == null) {
             return;
         }
         post(new Runnable() {
             @Override
             public void run() {
-                mMemberListAdapter.notifyItemChanged(position, UserListAdapter.PAYLOAD_VIDEO);
+                int index = mMemberEntityList.indexOf(user);
+                if (index < 0 || index >= mMemberEntityList.size()) {
+                    return;
+                }
+                mMemberListAdapter.notifyItemChanged(index, UserListAdapter.PAYLOAD_VIDEO);
             }
         });
     }
@@ -438,7 +442,7 @@ public class TUIVideoSeatView extends RelativeLayout {
         }
         UserEntity entity = mMemberEntityList.get(position);
         if (entity.isSelf()) {
-            notifyItemVideoVisibilityStageChanged(position);
+            notifyItemVideoVisibilityStageChanged(entity);
         } else if (entity.isCameraAvailable()) {
             startVideoPlay(entity);
         } else {
@@ -519,6 +523,7 @@ public class TUIVideoSeatView extends RelativeLayout {
         mIsTwoPersonVideoOn = enable;
         updateUserTalkingViewVisible();
         if (enable) {
+            startScreenPlayForTwoPersonVideoMeeting(mIsTwoPersonSwitched ? 1 : 0);
             initUserTalkingViewLayout();
             updateUserInTwoPersonMode(mIsTwoPersonSwitched ? 0 : 1);
             setUserDisplayViewClickListener();
@@ -557,6 +562,14 @@ public class TUIVideoSeatView extends RelativeLayout {
             }
         }
         return null;
+    }
+
+    private void startScreenPlayForTwoPersonVideoMeeting(int position) {
+        UserEntity user = mMemberEntityList.get(position);
+        if (!user.isScreenShareAvailable()) {
+            return;
+        }
+        startVideoPlay(user);
     }
 
     private void setUserDisplayViewClickListener() {

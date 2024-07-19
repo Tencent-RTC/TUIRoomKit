@@ -16,8 +16,11 @@ import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -33,7 +36,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MessageBarrageView extends LinearLayout {
+public class MessageBarrageView extends ScrollView {
     private static final String TAG = "MessageBarrageView";
 
     private static final int MAX_ITEM_COUNT           = 5;
@@ -46,13 +49,20 @@ public class MessageBarrageView extends LinearLayout {
 
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
 
+    private final LinearLayout mRootView;
+
     public MessageBarrageView(Context context) {
         this(context, null);
     }
 
     public MessageBarrageView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        setOrientation(VERTICAL);
+        mRootView = new LinearLayout(context);
+        mRootView.setOrientation(LinearLayout.VERTICAL);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        addView(mRootView, layoutParams);
     }
 
     public void addMessage(TUIFloatChat message) {
@@ -85,6 +95,16 @@ public class MessageBarrageView extends LinearLayout {
         }
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        return false;
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        return false;
+    }
+
     private void recycleFirstItem() {
         removeFirstView();
         recycleMessageHolder();
@@ -93,7 +113,13 @@ public class MessageBarrageView extends LinearLayout {
     private void addItem(TUIFloatChat message) {
         MessageHolder messageHolder = obtainMessageHolder();
         messageHolder.messageView.setText(parseMessage(message, messageHolder.messageView));
-        addView(messageHolder.parent);
+        mRootView.addView(messageHolder.parent);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                fullScroll(View.FOCUS_DOWN);
+            }
+        });
     }
 
     private MessageHolder obtainMessageHolder() {
@@ -123,15 +149,15 @@ public class MessageBarrageView extends LinearLayout {
     }
 
     private void removeFirstView() {
-        int count = getChildCount();
+        int count = mRootView.getChildCount();
         if (count <= 0) {
             Log.w(TAG, "removeFirstView at no child");
             return;
         }
-        removeViewAt(0);
+        mRootView.removeViewAt(0);
     }
 
-    private String parseMessage(TUIFloatChat barrage, TextView tvMessage) {
+    private SpannableStringBuilder parseMessage(TUIFloatChat barrage, TextView tvMessage) {
         String userName = TextUtils.isEmpty(barrage.user.userName) ? barrage.user.userId : barrage.user.userName;
         userName = TextUtils.isEmpty(userName) ? "" : userName;
         String result = userName + ": " + barrage.content;
@@ -145,7 +171,7 @@ public class MessageBarrageView extends LinearLayout {
         int fontSize = (int) (Math.abs(fontMetrics.ascent) + Math.abs(fontMetrics.descent));
         Rect rect = new Rect(0, 0, fontSize, fontSize);
         processEmojiSpan(builder, mEmojiResource, rect);
-        return builder.toString();
+        return builder;
     }
 
     private void processEmojiSpan(SpannableStringBuilder sb, IEmojiResource emojiResource, Rect rect) {
