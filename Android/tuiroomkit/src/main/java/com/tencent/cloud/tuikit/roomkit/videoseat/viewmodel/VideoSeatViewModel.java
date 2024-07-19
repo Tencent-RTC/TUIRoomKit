@@ -15,9 +15,9 @@ import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomObserver;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
-import com.tencent.cloud.tuikit.roomkit.videoseat.ui.TUIVideoSeatView;
-import com.tencent.cloud.tuikit.roomkit.videoseat.ui.view.ScaleVideoView;
 import com.tencent.cloud.tuikit.roomkit.videoseat.Constants;
+import com.tencent.cloud.tuikit.roomkit.videoseat.ui.TUIVideoSeatView;
+import com.tencent.cloud.tuikit.roomkit.videoseat.ui.view.ConferenceVideoView;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.interfaces.ITUINotification;
@@ -168,7 +168,7 @@ public class VideoSeatViewModel extends TUIRoomObserver
             Log.w(TAG, "notifyUserVideoStageChanged entity is null");
             return;
         }
-        mVideoSeatView.notifyItemVideoVisibilityStageChanged(mUserEntityList.indexOf(entity));
+        mVideoSeatView.notifyItemVideoVisibilityStageChanged(entity);
     }
 
     @Override
@@ -207,7 +207,8 @@ public class VideoSeatViewModel extends TUIRoomObserver
                 Log.w(TAG, "Screen sharing is started");
                 return;
             }
-            separateScreenShareUser(entity);
+            UserEntity shareUser = separateScreenShareUser(entity);
+            startPlayVideo(shareUser.getUserId(), shareUser.getRoomVideoView(), true);
             return;
         }
 
@@ -389,18 +390,18 @@ public class VideoSeatViewModel extends TUIRoomObserver
         });
     }
 
-    private void separateScreenShareUser(UserEntity entity) {
+    private UserEntity separateScreenShareUser(UserEntity entity) {
         entity.setScreenShareAvailable(false);
         entity.setVideoAvailable(entity.isCameraAvailable());
         UserEntity shareUserEntity = entity.copy();
-        final ScaleVideoView roomVideoView = new ScaleVideoView(mContext);
-        roomVideoView.enableScale(true);
+        final ConferenceVideoView roomVideoView = new ConferenceVideoView(mContext);
         shareUserEntity.setRoomVideoView(roomVideoView);
         shareUserEntity.setCameraAvailable(false);
         shareUserEntity.setScreenShareAvailable(true);
         shareUserEntity.setVideoAvailable(true);
         shareUserEntity.setUserId(entity.getUserId() + "-sub");
         addMemberEntity(shareUserEntity);
+        return shareUserEntity;
     }
 
     private void addNewFreeUsers(List<TUIRoomDefine.UserInfo> addList) {
@@ -416,7 +417,7 @@ public class VideoSeatViewModel extends TUIRoomObserver
     private UserEntity getNewFreeUser(TUIRoomDefine.UserInfo userInfo) {
         UserEntity entity = new UserEntity();
         entity.setUserId(userInfo.userId);
-        final TUIVideoView roomVideoView = new TUIVideoView(mContext);
+        final ConferenceVideoView roomVideoView = new ConferenceVideoView(mContext);
         roomVideoView.setUserId(userInfo.userId);
         entity.setRoomVideoView(roomVideoView);
         if (userInfo.userId.equals(mSelfUserId)) {
@@ -483,7 +484,7 @@ public class VideoSeatViewModel extends TUIRoomObserver
     private UserEntity createUserEntity(TUIRoomDefine.SeatInfo info) {
         UserEntity entity = new UserEntity();
         entity.setUserId(info.userId);
-        final TUIVideoView roomVideoView = new TUIVideoView(mContext);
+        final ConferenceVideoView roomVideoView = new ConferenceVideoView(mContext);
         roomVideoView.setUserId(info.userId);
         entity.setRoomVideoView(roomVideoView);
         if (info.userId.equals(mSelfUserId)) {
@@ -621,9 +622,6 @@ public class VideoSeatViewModel extends TUIRoomObserver
             return false;
         }
         if (!mUserEntityList.get(0).isVideoAvailable() && !mUserEntityList.get(1).isVideoAvailable()) {
-            return false;
-        }
-        if (mUserEntityList.get(0).isScreenShareAvailable() || mUserEntityList.get(1).isScreenShareAvailable()) {
             return false;
         }
         return true;

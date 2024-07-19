@@ -4,9 +4,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.content.Context;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -18,10 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.utils.widget.ImageFilterView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.common.utils.ImageLoader;
+import com.tencent.cloud.tuikit.roomkit.videoseat.ui.view.ConferenceVideoView;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.view.RoundRelativeLayout;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.view.UserVolumePromptView;
 import com.tencent.cloud.tuikit.roomkit.videoseat.viewmodel.UserEntity;
@@ -42,7 +40,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private final int mRoundRadius;
 
-    private OnItemClickListener mClickListener;
+    private OnItemClickListener mItemClickListener;
 
     public interface OnItemClickListener {
         void onItemClick(View view, int position);
@@ -56,7 +54,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void setItemClickListener(OnItemClickListener clickListener) {
-        mClickListener = clickListener;
+        mItemClickListener = clickListener;
     }
 
     @NonNull
@@ -122,6 +120,22 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         private FrameLayout          mVideoContainer;
         private RoundRelativeLayout  mTopLayout;
 
+        private final ConferenceVideoView.ClickListener clickListener = new ConferenceVideoView.ClickListener() {
+            @Override
+            public void onSingleClick(View view) {
+                if (mItemClickListener != null) {
+                    mItemClickListener.onItemClick(view, getBindingAdapterPosition());
+                }
+            }
+
+            @Override
+            public void onDoubleClick(View view) {
+                if (mItemClickListener != null) {
+                    mItemClickListener.onItemDoubleClick(view, getBindingAdapterPosition());
+                }
+            }
+        };
+
         private final Runnable mRunnable = new Runnable() {
             @Override
             public void run() {
@@ -137,29 +151,6 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mViewType = type;
             initView(itemView);
         }
-
-        private final GestureDetector gestureDetector = new GestureDetector(mContext,
-                new GestureDetector.SimpleOnGestureListener() {
-
-                    @Override
-                    public boolean onSingleTapConfirmed(MotionEvent e) {
-                        mClickListener.onItemClick(mTopLayout, getBindingAdapterPosition());
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onDoubleTap(MotionEvent e) {
-                        mClickListener.onItemDoubleClick(mTopLayout, getBindingAdapterPosition());
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onDown(MotionEvent e) {
-                        return true;
-                    }
-                });
-
-        private final View.OnTouchListener touchListener = (v, event) -> gestureDetector.onTouchEvent(event);
 
         public void updateUserInfoVisibility(UserEntity model) {
             if (model.isSelf()) {
@@ -211,7 +202,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         private void addRoomVideoView(UserEntity userEntity) {
-            TUIVideoView videoView = userEntity.getRoomVideoView();
+            ConferenceVideoView videoView = userEntity.getRoomVideoView();
             if (videoView == null) {
                 return;
             }
@@ -224,7 +215,8 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             mVideoContainer.removeAllViews();
             mVideoContainer.addView(videoView);
-            videoView.setOnTouchListener(touchListener);
+            videoView.setClickListener(clickListener);
+            videoView.enableScale(userEntity.isScreenShareAvailable());
         }
 
         private void initView(final View itemView) {
