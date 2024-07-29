@@ -4,7 +4,7 @@ import { UserInfo, useRoomStore } from '../../../stores/room';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
 import useMasterApplyControl from '../../../hooks/useMasterApplyControl';
-import { TUIMediaDevice, TUIRole, TUIRequestCallbackType, TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
+import  { TUIMediaDevice, TUIRole, TUIRequestCallbackType, TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import AudioOpenIcon from '../../common/icons/AudioOpenIcon.vue';
 import VideoOpenIcon from '../../common/icons/VideoOpenIcon.vue';
 import ChatForbiddenIcon from '../../common/icons/ChatForbiddenIcon.vue';
@@ -16,15 +16,20 @@ import OffStageIcon from '../../common/icons/OffStageIcon.vue';
 import TransferOwnerIcon from '../../common/icons/TransferOwnerIcon.vue';
 import SetAdminIcon from '../../common/icons/SetAdminIcon.vue';
 import RevokeAdminIcon from '../../common/icons/RevokeAdminIcon.vue';
+import EditNameCardIcon from '../../common/icons/EditNameCardIcon.vue';
 import { storeToRefs } from 'pinia';
 import TUIMessage from '../../common/base/Message';
 import { MESSAGE_DURATION } from '../../../constants/message';
-
+import eventBus from '../../../hooks/useMitt';
+import useMemberItemHooks from '../MemberItem/useMemberItemHooks';
+import { roomService } from '../../../services';
+import { isMobile } from '../../../utils/environment';
+import { calculateByteLength } from '../../../utils/utils';
 interface ObjectType {
   [key: string]: any;
 }
 
-type ActionType = 'transferOwner' | 'kickUser' | '';
+type ActionType = 'transferOwner' | 'kickUser' | 'changeUserNameCard' | '';
 export default function useMemberControl(props?: any) {
   const roomEngine = useGetRoomEngine();
   const { t } = useI18n();
@@ -32,14 +37,19 @@ export default function useMemberControl(props?: any) {
   const basicStore = useBasicStore();
   const roomStore = useRoomStore();
   const isDialogVisible: Ref<boolean> = ref(false);
-  const dialogData: Ref<{ title: string; content: string; confirmText: string; actionType: ActionType }> = ref({
+  const isShowInput: Ref<boolean> = ref(false);
+  const editorInputEle = ref();
+  const editorInputEleContainer = ref();
+  const tempUserName = ref(props.userInfo.nameCard || props.userInfo.userName);
+  const dialogData: Ref<{ title: string; content: string; confirmText: string; actionType: ActionType, showInput: boolean }> = ref({
     title: '',
     content: '',
     confirmText: '',
     actionType: '' as ActionType,
+    showInput: false,
   });
-  const kickOffDialogContent = computed(() => t('whether to kick sb off the room', { name: props.userInfo.userName || props.userInfo.userId }));
-  const transferOwnerTitle = computed(() => t('Transfer the roomOwner to sb', { name: props.userInfo.userName || props.userInfo.userId }));
+  const kickOffDialogContent = computed(() => t('whether to kick sb off the room', { name: roomService.getDisplayName(props.userInfo) }));
+  const transferOwnerTitle = computed(() => t('Transfer the roomOwner to sb', { name: roomService.getDisplayName(props.userInfo) }));
   const {
     isFreeSpeakMode,
     isSpeakAfterTakingSeatMode,
@@ -59,11 +69,16 @@ export default function useMemberControl(props?: any) {
     kickUserOffStage,
   } = useMasterApplyControl();
 
+  const { isCanOperateMySelf } = useMemberItemHooks(props.userInfo);
+
   const isMe = computed(() => basicStore.userId === props.userInfo.userId);
   const isTargetUserAnchor = computed(() => props.userInfo.onSeat === true);
   const isTargetUserAudience = computed(() => props.userInfo.onSeat !== true);
 
   const controlList = computed(() => {
+    if (isCanOperateMySelf.value) {
+      return [changeUserNameCard.value];
+    }
     const agreeOrDenyStageList = props.userInfo.isUserApplyingToAnchor ? [agreeOnStage.value, denyOnStage.value] : [];
     const inviteStageList = isTargetUserAudience.value && !props.userInfo.isUserApplyingToAnchor
       ? [inviteOnStage.value] : [];
@@ -75,20 +90,22 @@ export default function useMemberControl(props?: any) {
         [TUIRole.kRoomOwner]: [
           audioControl.value, videoControl.value, chatControl.value,
           setOrRevokeAdmin.value, transferOwner.value, kickUser.value,
+          changeUserNameCard.value,
         ],
         [TUIRole.kAdministrator]: [
           audioControl.value, videoControl.value, chatControl.value,
+          changeUserNameCard.value,
         ],
       },
       speakAfterTakeSeat: {
         [TUIRole.kRoomOwner]: [
           ...inviteStageList, ...onStageControlList, ...agreeOrDenyStageList,
           setOrRevokeAdmin.value, transferOwner.value, chatControl.value,
-          kickUser.value,
+          kickUser.value, changeUserNameCard.value,
         ],
         [TUIRole.kAdministrator]: [
           ...inviteStageList, ...onStageControlList, ...agreeOrDenyStageList,
-          chatControl.value,
+          chatControl.value, changeUserNameCard.value,
         ],
       },
     };
@@ -158,6 +175,13 @@ export default function useMemberControl(props?: any) {
 
   const denyOnStage = computed(() => ({ key: 'denyOnStage', icon: DenyOnStageIcon, title: t('Refuse stage'), func: denyUserOnStage }));
   const makeOffStage = computed(() => ({ key: 'makeOffStage', icon: OffStageIcon, title: t('Step down'), func: kickUserOffStage }));
+
+  const changeUserNameCard = computed(() => ({
+    key: 'changeUserNameCard',
+    icon: EditNameCardIcon,
+    title: t('change name'),
+    func: () => handleOpenDialog('changeUserNameCard'),
+  }));
   /**
    * Invitation to the stage/uninvitation to the stage
   **/
@@ -191,7 +215,7 @@ export default function useMemberControl(props?: any) {
       if (userInfo.isRequestingUserOpenMic) {
         TUIMessage({
           type: 'info',
-          message: `${t('An invitation to open the microphone has been sent to sb.', { name: userInfo.userName || userInfo.userId })}`,
+          message: `${t('An invitation to open the microphone has been sent to sb.', { name: roomService.getDisplayName(userInfo) })}`,
           duration: MESSAGE_DURATION.NORMAL,
         });
         return;
@@ -218,7 +242,7 @@ export default function useMemberControl(props?: any) {
       });
       TUIMessage({
         type: 'info',
-        message: `${t('An invitation to open the microphone has been sent to sb.', { name: userInfo.userName || userInfo.userId })}`,
+        message: `${t('An invitation to open the microphone has been sent to sb.', { name: roomService.getDisplayName(userInfo) })}`,
         duration: MESSAGE_DURATION.NORMAL,
       });
       if (request && request.requestId) {
@@ -240,7 +264,7 @@ export default function useMemberControl(props?: any) {
       if (userInfo.isRequestingUserOpenCamera) {
         TUIMessage({
           type: 'info',
-          message: `${t('An invitation to open the camera has been sent to sb.', { name: userInfo.userName || userInfo.userId })}`,
+          message: `${t('An invitation to open the camera has been sent to sb.', { name: roomService.getDisplayName(userInfo) })}`,
           duration: MESSAGE_DURATION.NORMAL,
         });
         return;
@@ -267,7 +291,7 @@ export default function useMemberControl(props?: any) {
       });
       TUIMessage({
         type: 'info',
-        message: `${t('An invitation to open the camera has been sent to sb.', { name: userInfo.userName || userInfo.userId })}`,
+        message: `${t('An invitation to open the camera has been sent to sb.', { name: roomService.getDisplayName(userInfo) })}`,
         duration: MESSAGE_DURATION.NORMAL,
       });
       if (request && request.requestId) {
@@ -302,6 +326,7 @@ export default function useMemberControl(props?: any) {
     await roomEngine.instance?.kickRemoteUserOutOfRoom({
       userId: userInfo.userId,
     });
+    roomStore.removeRemoteUser(userInfo.userId);
   }
 
   /**
@@ -311,6 +336,9 @@ export default function useMemberControl(props?: any) {
     const roomInfo = await roomEngine.instance?.fetchRoomInfo();
     if (roomInfo?.roomOwner === roomStore.localUser.userId) {
       try {
+        if (roomStore.localUser.hasScreenStream) {
+          eventBus.emit('ScreenShare:stopScreenShare');
+        }
         await roomEngine.instance?.changeUserRole({
           userId: userInfo.userId,
           userRole: TUIRole.kRoomOwner,
@@ -318,7 +346,7 @@ export default function useMemberControl(props?: any) {
         roomStore.setMasterUserId(userInfo.userId);
         TUIMessage({
           type: 'success',
-          message: t('The room owner has been transferred to sb', { name: userInfo.userName || userInfo.userId }),
+          message: t('The room owner has been transferred to sb', { name: roomService.getDisplayName(userInfo) }),
           duration: MESSAGE_DURATION.NORMAL,
         });
       } catch (error) {
@@ -346,27 +374,86 @@ export default function useMemberControl(props?: any) {
       : `${t('The administrator status of sb has been withdrawn', { name: updatedUserName })}`;
     TUIMessage({ type: 'success', message: tipMessage });
     roomStore.setRemoteUserRole(userInfo.userId, newRole);
+    if (newRole === TUIRole.kGeneralUser && userInfo.hasScreenStream) {
+      await roomEngine.instance?.closeRemoteDeviceByAdmin({
+        userId: userInfo.userId,
+        device: TUIMediaDevice.kScreen,
+      });
+    }
   }
 
   function handleOpenDialog(action: string) {
-    isDialogVisible.value = true;
     switch (action) {
       case 'kickUser':
+        isDialogVisible.value = true;
         dialogData.value = {
           title: t('Note'),
           content: kickOffDialogContent.value,
           confirmText: t('Confirm'),
           actionType: action,
+          showInput: false,
         };
         break;
       case 'transferOwner':
+        isDialogVisible.value = true;
         dialogData.value = {
           title: transferOwnerTitle.value,
           content: t('After transfer the room owner, you will become a general user'),
           confirmText: t('Confirm transfer'),
           actionType: action,
+          showInput: false,
         };
         break;
+      case 'changeUserNameCard':
+        if (isMobile) {
+          isShowInput.value = true;
+          document?.body?.appendChild(editorInputEleContainer.value);
+        } else {
+          isDialogVisible.value = true;
+        }
+        dialogData.value = {
+          title: t('change name'),
+          content: '',
+          confirmText: t('Confirm'),
+          actionType: action,
+          showInput: true,
+        };
+        break;
+    }
+  }
+
+
+  const nameCardCheck = () => {
+    const result  = calculateByteLength(tempUserName.value) <= 32;
+    !result && TUIMessage({
+      type: 'warning',
+      message: t('The user name cannot exceed 32 characters'),
+      duration: MESSAGE_DURATION.NORMAL,
+    });
+    return result;
+  };
+
+  /**
+   * change UserNameCard
+   */
+  async function handleChangeUserNameCard(userInfo: UserInfo) {
+    if (!nameCardCheck()) return;
+    try {
+      await roomEngine.instance?.changeUserNameCard({
+        userId: userInfo.userId,
+        nameCard: tempUserName.value,
+      });
+      TUIMessage({
+        type: 'success',
+        message: t('Name changed successfully'),
+        duration: MESSAGE_DURATION.NORMAL,
+      });
+    } catch (error) {
+      TUIMessage({
+        type: 'error',
+        message: t('change name failed, please try again.'),
+        duration: MESSAGE_DURATION.NORMAL,
+      });
     }
   }
 
@@ -378,12 +465,17 @@ export default function useMemberControl(props?: any) {
       case 'transferOwner':
         handleTransferOwner(userInfo);
         break;
+      case 'changeUserNameCard':
+        handleChangeUserNameCard(userInfo);
+        isShowInput.value = false;
     } isDialogVisible.value = false;
   }
 
   function handleCancelDialog() {
+    tempUserName.value = props.userInfo.nameCard || props.userInfo.userName;
     isDialogVisible.value = false;
   }
+
 
   return {
     props,
@@ -395,5 +487,9 @@ export default function useMemberControl(props?: any) {
     handleAction,
     isDialogVisible,
     dialogData,
+    tempUserName,
+    isShowInput,
+    editorInputEle,
+    editorInputEleContainer,
   };
 };

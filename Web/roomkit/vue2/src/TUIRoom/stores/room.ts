@@ -20,6 +20,7 @@ export type StreamInfo = {
   userId: string,
   userName?: string,
   avatarUrl?: string,
+  nameCard?: string,
   hasAudioStream?: boolean,
   hasVideoStream?: boolean,
   hasScreenStream?: boolean,
@@ -31,6 +32,7 @@ export type UserInfo = {
   userId: string,
   userName?: string,
   avatarUrl?: string,
+  nameCard?: string,
   hasAudioStream?: boolean,
   hasVideoStream?: boolean,
   hasScreenStream?: boolean,
@@ -83,6 +85,7 @@ interface RoomState {
   masterUserId: string,
   isMicrophoneDisableForAllUser: boolean,
   isCameraDisableForAllUser: boolean,
+  isScreenShareDisableForAllUser: boolean,
   isSeatEnabled: boolean,
   seatMode: TUISeatMode,
   maxMembersCount: number,
@@ -100,6 +103,7 @@ export const useRoomStore = defineStore('room', {
       userId: '',
       userName: '',
       avatarUrl: '',
+      nameCard: '',
       hasAudioStream: false,
       hasVideoStream: false,
       hasScreenStream: false,
@@ -109,6 +113,7 @@ export const useRoomStore = defineStore('room', {
         userId: '',
         userName: '',
         avatarUrl: '',
+        nameCard: '',
         hasAudioStream: false,
         hasVideoStream: false,
         streamType: TUIVideoStreamType.kCameraStream,
@@ -118,6 +123,7 @@ export const useRoomStore = defineStore('room', {
         userId: '',
         userName: '',
         avatarUrl: '',
+        nameCard: '',
         hasScreenStream: false,
         streamType: TUIVideoStreamType.kScreenStream,
         isVisible: true,
@@ -139,6 +145,7 @@ export const useRoomStore = defineStore('room', {
     masterUserId: '',
     isMicrophoneDisableForAllUser: false,
     isCameraDisableForAllUser: false,
+    isScreenShareDisableForAllUser: false,
     isSeatEnabled: false,
     seatMode: TUISeatMode.kFreeToTake,
     maxMembersCount: 5, // Includes local streams and screen shares, above which subsequent streams are played
@@ -195,10 +202,10 @@ export const useRoomStore = defineStore('room', {
       return cameraForbidden as any || this.isAudience;
     },
     localStream: (state) => {
-      const { userId, userName, avatarUrl, hasAudioStream, hasVideoStream } = state.localUser;
+      const { userId, userName, avatarUrl, nameCard, hasAudioStream, hasVideoStream } = state.localUser;
       Object.assign(
         state.localUser.cameraStreamInfo,
-        { userId, userName, avatarUrl, hasAudioStream, hasVideoStream },
+        { userId, userName, avatarUrl, nameCard, hasAudioStream, hasVideoStream },
       );
       return state.localUser.cameraStreamInfo;
     },
@@ -217,6 +224,7 @@ export const useRoomStore = defineStore('room', {
           userId,
           avatarUrl,
           userName,
+          nameCard,
           onSeat,
           hasAudioStream,
           hasVideoStream,
@@ -225,10 +233,10 @@ export const useRoomStore = defineStore('room', {
           isScreenVisible,
         } = userInfo;
         if (onSeat) {
-          obj[`${userId}_${TUIVideoStreamType.kCameraStream}`] = Object.assign(userInfo.cameraStreamInfo, { userId, avatarUrl, userName, hasAudioStream, hasVideoStream, streamType: TUIVideoStreamType.kCameraStream, isVisible: isVideoVisible });
+          obj[`${userId}_${TUIVideoStreamType.kCameraStream}`] = Object.assign(userInfo.cameraStreamInfo, { userId, avatarUrl, userName,nameCard, hasAudioStream, hasVideoStream, streamType: TUIVideoStreamType.kCameraStream, isVisible: isVideoVisible });
         }
         if (hasScreenStream) {
-          obj[`${userId}_${TUIVideoStreamType.kScreenStream}`] = Object.assign(userInfo.screenStreamInfo, { userId, avatarUrl, userName, hasScreenStream, streamType: TUIVideoStreamType.kScreenStream, isVisible: isScreenVisible });
+          obj[`${userId}_${TUIVideoStreamType.kScreenStream}`] = Object.assign(userInfo.screenStreamInfo, { userId, avatarUrl, userName, nameCard, hasScreenStream, streamType: TUIVideoStreamType.kScreenStream, isVisible: isScreenVisible });
         }
       });
       return obj;
@@ -243,12 +251,21 @@ export const useRoomStore = defineStore('room', {
       }
       return list;
     },
+    cameraStreamList(): Array<StreamInfo> {
+      const list = [
+        this.localStream,
+        ...(Object.values(this.remoteStreamObj)
+          .filter(stream => stream.streamType === TUIVideoStreamType.kCameraStream)),
+      ];
+      return list;
+    },
     streamNumber(): number {
       return this.streamList.length;
     },
     remoteUserList: state => [...Object.values(state.remoteUserObj)],
     remoteAnchorList: state => [...Object.values(state.remoteUserObj)].filter(item => item.onSeat),
     userList: state => [state.localUser, ...Object.values(state.remoteUserObj)],
+    generalUserScreenStreamList: state => [...Object.values(state.remoteUserObj)].filter(item => item.hasScreenStream && item.userRole === TUIRole.kGeneralUser),
     userNumber(): number {
       return this.userList.length;
     },
@@ -260,6 +277,15 @@ export const useRoomStore = defineStore('room', {
       return Object.keys(this.hasVideoStreamObject).length > this.maxMembersCount
         ? TUIVideoStreamType.kCameraStreamLow : TUIVideoStreamType.kCameraStream;
     },
+    getDisplayName: (state) =>  {
+      return (userId: string) => {
+      const userInfo = userId === state.localUser.userId ? state.localUser : state.remoteUserObj[userId];
+      if (userInfo) {
+        const { nameCard, userName, userId } = userInfo;
+        return nameCard || userName || userId;
+      }
+      }
+    }
   },
   actions: {
     setLocalUser(obj: Record<string, any>) {
@@ -270,9 +296,9 @@ export const useRoomStore = defineStore('room', {
     },
     getUserName(userId: string) {
       if (userId === this.localUser.userId) {
-        return this.localUser.userName || userId;
+        return this.localUser.nameCard || this.localUser.userName || userId;
       }
-      return this.remoteUserObj[userId]?.userName || userId;
+      return this.remoteUserObj[userId]?.nameCard || this.remoteUserObj[userId]?.userName || userId;
     },
     getUserRole(userId: string) {
       if (userId === this.localUser.userId) {
@@ -285,6 +311,7 @@ export const useRoomStore = defineStore('room', {
         userId,
         userName: '',
         avatarUrl: '',
+        nameCard: '',
         hasAudioStream: false,
         hasVideoStream: false,
         hasScreenStream: false,
@@ -299,6 +326,7 @@ export const useRoomStore = defineStore('room', {
           userId,
           userName: '',
           avatarUrl: '',
+          nameCard: '',
           hasAudioStream: false,
           hasVideoStream: false,
           streamType: TUIVideoStreamType.kCameraStream,
@@ -308,6 +336,7 @@ export const useRoomStore = defineStore('room', {
           userId,
           userName: '',
           avatarUrl: '',
+          nameCard: '',
           hasScreenStream: false,
           streamType: TUIVideoStreamType.kScreenStream,
           isVisible: false,
@@ -517,11 +546,19 @@ export const useRoomStore = defineStore('room', {
       this.currentSpeakerId = deviceId;
     },
     setRoomInfo(roomInfo: TUIRoomInfo) {
+      if (!roomInfo) return;
+
       const {
-        roomOwner, isMicrophoneDisableForAllUser,
-        isCameraDisableForAllUser,
-        isSeatEnabled, seatMode, maxSeatCount, roomName,
+        roomOwner = this.masterUserId,
+        isMicrophoneDisableForAllUser = this.isMicrophoneDisableForAllUser,
+        isCameraDisableForAllUser = this.isCameraDisableForAllUser,
+        isScreenShareDisableForAllUser = this.isScreenShareDisableForAllUser,
+        isSeatEnabled = this.isSeatEnabled,
+        seatMode = this.seatMode,
+        maxSeatCount = this.maxSeatCount,
+        roomName = this.roomName,
       } = roomInfo;
+
       if (this.localUser.userId === roomOwner) {
         this.localUser.userRole = TUIRole.kRoomOwner;
       }
@@ -529,18 +566,23 @@ export const useRoomStore = defineStore('room', {
       this.masterUserId = roomOwner;
       this.isMicrophoneDisableForAllUser = isMicrophoneDisableForAllUser;
       this.isCameraDisableForAllUser = isCameraDisableForAllUser;
+      this.isScreenShareDisableForAllUser = isScreenShareDisableForAllUser;
       this.isSeatEnabled = isSeatEnabled;
       this.seatMode = seatMode;
-      this.canControlSelfAudio = !this.isMicrophoneDisableForAllUser;
-      this.canControlSelfVideo = !this.isCameraDisableForAllUser;
       this.maxSeatCount = maxSeatCount;
       this.roomName = roomName;
+
+      this.canControlSelfAudio = !this.isMicrophoneDisableForAllUser;
+      this.canControlSelfVideo = !this.isCameraDisableForAllUser;
     },
     setDisableMicrophoneForAllUserByAdmin(isDisable: boolean) {
       this.isMicrophoneDisableForAllUser = isDisable;
     },
     setDisableCameraForAllUserByAdmin(isDisable: boolean) {
       this.isCameraDisableForAllUser = isDisable;
+    },
+    setDisableScreenShareForAllUserByAdmin(isDisable: boolean) {
+      this.isScreenShareDisableForAllUser = isDisable;
     },
     setMasterUserId(userId: string) {
       this.masterUserId = userId;
@@ -615,14 +657,6 @@ export const useRoomStore = defineStore('room', {
         this.setCurrentSpeakerId(deviceList[0].deviceId);
       }
     },
-    // Set everyone's mute status when banning/cancelling the ban
-    setMicrophoneDisableState(isDisable: boolean) {
-      this.isMicrophoneDisableForAllUser = isDisable;
-    },
-    // Set everyone's video banned status when banning/cancelling a ban
-    setCameraDisableState(isDisable: boolean) {
-      this.isCameraDisableForAllUser = isDisable;
-    },
     // Moderator individually modifies the mute status of a user's outgoing text messages
     setMuteUserChat(userId: string, muted: boolean) {
       const remoteUserInfo = this.remoteUserObj[userId];
@@ -634,6 +668,12 @@ export const useRoomStore = defineStore('room', {
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.userRole = role;
+      }
+    },
+    setRemoteUserNameCard(userId: string, nameCard: string) {
+      const remoteUserInfo = this.remoteUserObj[userId];
+      if (remoteUserInfo) {
+        remoteUserInfo.nameCard = nameCard;
       }
     },
     setRequestUserOpenMic(options: { userId: string, isRequesting: boolean, requestId?: string }) {
@@ -737,6 +777,7 @@ export const useRoomStore = defineStore('room', {
       this.masterUserId = '';
       this.isMicrophoneDisableForAllUser = false;
       this.isCameraDisableForAllUser = false;
+      this.isScreenShareDisableForAllUser = false;
       this.isSeatEnabled = false;
       this.seatMode = TUISeatMode.kFreeToTake;
       this.hasVideoStreamObject = {};

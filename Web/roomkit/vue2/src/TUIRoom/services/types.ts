@@ -3,7 +3,9 @@ import { useBasicStore } from '../stores/basic';
 import { useRoomStore } from '../stores/room';
 import { useChatStore } from '../stores/chat';
 import { LifeCycleManager } from './manager/lifeCycleManager';
-
+import { ScheduleConferenceManager } from './manager/scheduleConferenceManager';
+import { RoomActionManager } from './manager/roomActionManager';
+import { ErrorHandler } from './function/errorHandler';
 export interface IRoomService {
   t: any;
   roomEngine: Record<string, any>;
@@ -11,6 +13,9 @@ export interface IRoomService {
   roomStore: ReturnType<typeof useRoomStore>;
   chatStore: ReturnType<typeof useChatStore>;
   lifeCycleManager: LifeCycleManager;
+  roomActionManager?: RoomActionManager;
+  scheduleConferenceManager: ScheduleConferenceManager;
+  errorHandler: ErrorHandler;
   on: (eventType: EventType, callback: (data?: any) => any) => void;
   off: (eventType: EventType, callback: (data?: any) => void) => void;
   emit: (eventType: EventType, data?: any) => void;
@@ -40,6 +45,8 @@ export interface RoomParam {
 }
 
 export enum EventType {
+  SERVICE_READY = 'ServiceReady',
+  ROOM_LOGIN = 'RoomLogin',
   ROOM_CONTAINER_RESIZE = 'RoomContainerResize',
   ROOM_NOTICE_MESSAGE = 'RoomNoticeMessage',
   ROOM_NOTICE_MESSAGE_BOX = 'RoomNoticeMessageBox',

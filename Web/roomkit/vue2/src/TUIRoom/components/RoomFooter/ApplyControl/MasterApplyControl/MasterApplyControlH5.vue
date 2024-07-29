@@ -5,7 +5,7 @@
         <div class="user-info">
           <Avatar class="avatar-url" :img-src="item.avatarUrl"></Avatar>
           <div class="stage-info">
-            <span class="user-name" :title="item.userName || item.userId">{{ item.userName || item.userId }}</span>
+            <span class="user-name" :title="roomService.getDisplayName(item)">{{ roomService.getDisplayName(item) }}</span>
             <span class="apply-tip">{{ t('Apply for the stage') }}</span>
           </div>
         </div>
@@ -43,6 +43,7 @@ import Avatar from '../../../common/Avatar.vue';
 import ApplyStageLabelIcon from '../../../common/icons/ApplyStageLabelIcon.vue';
 import useMasterApplyControl from '../../../../hooks/useMasterApplyControl';
 import SvgIcon from '../../../common/base/SvgIcon.vue';
+import { roomService } from '../../../../services';
 
 const {
   t,

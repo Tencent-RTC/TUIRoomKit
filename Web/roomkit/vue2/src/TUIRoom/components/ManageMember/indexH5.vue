@@ -35,6 +35,25 @@
       >
         {{ videoManageInfo }}
       </div>
+      <div
+        class="manage-member-button"
+        @touchstart="toggleClickMoreBtn"
+      >
+        {{ t('More') }}
+        <div v-show="showMoreControl" class="moreControl-container">
+          <div class="moreControl-container-main">
+            <div
+              v-for="item in moreControlList"
+              :key="item.type"
+              class="user-operate-item"
+              @touchstart="item.func(item.type)"
+            >
+              <svg-icon :icon="item.icon"></svg-icon>
+              <span class="operate-text">{{ item.title }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <Dialog
       v-model="showManageAllUserDialog"
@@ -88,6 +107,9 @@ const {
   handleToggleStaged,
   applyToAnchorUserContent,
   showApplyUserList,
+  showMoreControl,
+  moreControlList,
+  toggleClickMoreBtn
 } = useIndex();
 
 </script>
@@ -271,5 +293,54 @@ const {
   }
   .cancel{
     color: var(--font-color-4);
+  }
+  .moreControl-container{
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100vw;
+    height: auto;
+    box-sizing: border-box;
+    background-color: var(--log-out-mobile);
+    .moreControl-container-main{
+      width: 100%;
+      background: var(--background-color-1);
+      border-radius: 15px 15px 0px 0px;
+      position: fixed;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      animation-duration: 200ms;
+      animation-name: popup;
+      padding-bottom: 4vh;
+      gap: 5px;
+      padding: 50px 25px;
+      @keyframes popup {
+        from {
+          transform-origin: bottom;
+          transform: scaleY(0);
+        }
+        to {
+          transform-origin: bottom;
+          transform: scaleY(1);
+        }
+      }
+    }
+    .user-operate-item {
+      cursor: pointer;
+      color: var(--popup-title-color-h5);
+      height: 20px;
+      display: flex;
+      align-items: center;
+      .operate-text {
+        font-family: PingFang SC;
+        margin-left: 8px;
+        font-size: 14px;
+        white-space: nowrap;
+        line-height: 22px;
+        font-weight: 400;
+      }
+    }
   }
 </style>
