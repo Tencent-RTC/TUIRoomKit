@@ -64,7 +64,7 @@
               >
                 <div class="member-basic-info">
                   <Avatar class="avatar-url" :img-src="user.avatarUrl"></Avatar>
-                  <div class="user-name">{{ user.userName || user.userId }}</div>
+                  <div class="user-name">{{ roomService.getDisplayName(user) }}</div>
                   <svg-icon style="display: flex" v-if="selectedUser === user.userId" :icon="CorrectIcon" class="correct"> </svg-icon>
                 </div>
               </div>
@@ -83,8 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { onUnmounted } from 'vue';
-import { TUIRoomEngine, TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-wx';
+import { TUIRole } from '@tencentcloud/tuiroom-engine-wx';
 import useEndControl from './useEndControlHooks';
 import logger from '../../../utils/common/logger';
 import popup from '../../common/base/PopUpH5.vue';
@@ -93,13 +92,12 @@ import CorrectIcon from '../../../assets/icons/CorrectIcon.svg';
 import SearchIcon from '../../../assets/icons/SearchIcon.svg';
 import Avatar from '../../common/Avatar.vue';
 import EndRoomIcon from '../../../assets/icons/EndRoomIcon.svg';
-import TUIMessageBox from '../../common/base/MessageBox/index';
+import { roomService } from '../../../services';
 
 const {
   t,
   isShowLeaveRoomDialog,
   roomStore,
-  basicStore,
   roomEngine,
   stopMeeting,
   cancel,
@@ -107,7 +105,6 @@ const {
   logPrefix,
   currentDialogType,
   visible,
-  closeMediaBeforeLeave,
   resetState,
   toggleMangeMemberSidebar,
   searchName,
@@ -121,7 +118,6 @@ const {
   isMasterWithRemoteUser,
 } = useEndControl();
 
-const emit = defineEmits(['on-exit-room', 'on-destroy-room']);
 function handleEndBtnClick() {
   stopMeeting();
 }
@@ -145,16 +141,12 @@ function handleEndLeaveClick() {
 
 /**
  * Active room dismissal
- *
- * 主动解散房间
  **/
 async function dismissRoom() {
   try {
     logger.log(`${logPrefix}dismissRoom: enter`);
-    closeMediaBeforeLeave();
-    await roomEngine.instance?.destroyRoom();
     resetState();
-    emit('on-destroy-room', { code: 0, message: '' });
+    await roomService.dismissRoom();
   } catch (error) {
     logger.error(`${logPrefix}dismissRoom error:`, error);
   }
@@ -162,17 +154,12 @@ async function dismissRoom() {
 
 /**
  * Leave the room voluntarily
- *
- * 主动离开房间
  **/
 async function leaveRoom() {
   // eslint-disable-line
   try {
-    closeMediaBeforeLeave();
-    const response = await roomEngine.instance?.exitRoom();
-    logger.log(`${logPrefix}leaveRoom:`, response);
     resetState();
-    emit('on-exit-room', { code: 0, message: '' });
+    await roomService.leaveRoom();
   } catch (error) {
     logger.error(`${logPrefix}leaveRoom error:`, error);
   }
@@ -186,48 +173,13 @@ async function transferAndLeave() {
     const userId = selectedUser.value;
     const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({ userId, userRole: TUIRole.kRoomOwner });
     logger.log(`${logPrefix}transferAndLeave:`, changeUserRoleResponse);
-    closeMediaBeforeLeave();
-    const exitRoomResponse = await roomEngine.instance?.exitRoom();
-    logger.log(`${logPrefix}exitRoom:`, exitRoomResponse);
-    basicStore.setSidebarOpenStatus(false);
-    basicStore.setSidebarName('');
     resetState();
-    emit('on-exit-room', { code: 0, message: '' });
+    await roomService.leaveRoom();
   } catch (error) {
     logger.error(`${logPrefix}transferAndLeave error:`, error);
   }
 }
 
-/**
- * notification of room dismissal from the host
- *
- * 收到主持人解散房间通知
- **/
-const onRoomDismissed = async (eventInfo: { roomId: string }) => {
-  try {
-    const { roomId } = eventInfo;
-    logger.log(`${logPrefix}onRoomDismissed:`, roomId);
-    TUIMessageBox({
-      title: t('Note'),
-      message: t('The host closed the room.'),
-      confirmButtonText: t('Sure'),
-      callback: async () => {
-        resetState();
-        emit('on-destroy-room', { code: 0, message: '' });
-      },
-    });
-  } catch (error) {
-    logger.error(`${logPrefix}onRoomDestroyed error:`, error);
-  }
-};
-
-TUIRoomEngine.once('ready', () => {
-  roomEngine.instance?.on(TUIRoomEvents.onRoomDismissed, onRoomDismissed);
-});
-
-onUnmounted(() => {
-  roomEngine.instance?.off(TUIRoomEvents.onRoomDismissed, onRoomDismissed);
-});
 </script>
 <style lang="scss" scoped>
 .end-control-container {

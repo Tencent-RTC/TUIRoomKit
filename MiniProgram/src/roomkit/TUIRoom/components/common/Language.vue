@@ -1,5 +1,6 @@
 <template>
   <icon-button
+    v-if="languageConfig.visible"
     :title="title"
     :layout="IconButtonLayout.HORIZONTAL"
     :icon="LanguageIcon"
@@ -15,10 +16,12 @@ import LanguageIcon from '../../assets/icons/LanguageIcon.svg';
 import { useBasicStore } from '../../stores/basic';
 import i18n from '../../locales/index';
 import { computed } from 'vue';
+import { roomService } from '../../services';
 
 const basicStore = useBasicStore();
 
 const title = computed(() => (basicStore.lang === 'en-US' ? 'English' : '中文'));
+const languageConfig = roomService.getComponentConfig('Language');
 
 const handleChange = (): void => {
   switch (i18n.global.locale.value) {

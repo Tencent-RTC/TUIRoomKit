@@ -3,6 +3,7 @@ function TUIMessageBox(params ?: {
   title?: string,
   confirmButtonText?: string;
   cancelButtonText?: string;
+  appendToRoomContainer?: boolean
   callback?: any;
 }) {
   const { confirmButtonText = '确定', cancelButtonText = '取消', callback } = params || {};

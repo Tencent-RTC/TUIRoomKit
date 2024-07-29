@@ -1,12 +1,37 @@
+import { ChatSDK } from '@tencentcloud/chat';
+import { useBasicStore } from '../stores/basic';
+import { useRoomStore } from '../stores/room';
+import { useChatStore } from '../stores/chat';
+import { LifeCycleManager } from './manager/lifeCycleManager';
+import { ScheduleConferenceManager } from './manager/scheduleConferenceManager';
+import { RoomActionManager } from './manager/roomActionManager';
+import { ErrorHandler } from './function/errorHandler';
+export interface IRoomService {
+  t: any;
+  roomEngine: Record<string, any>;
+  basicStore: ReturnType<typeof useBasicStore>;
+  roomStore: ReturnType<typeof useRoomStore>;
+  chatStore: ReturnType<typeof useChatStore>;
+  lifeCycleManager: LifeCycleManager;
+  roomActionManager?: RoomActionManager;
+  scheduleConferenceManager: ScheduleConferenceManager;
+  errorHandler: ErrorHandler;
+  on: (eventType: EventType, callback: (data?: any) => any) => void;
+  off: (eventType: EventType, callback: (data?: any) => void) => void;
+  emit: (eventType: EventType, data?: any) => void;
+  resetStore: () => void;
+}
+
 export interface RoomInitData {
   sdkAppId: number;
   userId: string;
   userSig: string;
-  userName: string;
-  avatarUrl: string;
+  userName?: string;
+  avatarUrl?: string;
   showHeaderTool?: boolean;
+  tim?: ChatSDK;
   theme?: {
-    defaultTheme?: "black" | "white";
+    defaultTheme?: 'black' | 'white';
     isSupportSwitchTheme: boolean;
   };
 }
@@ -20,13 +45,18 @@ export interface RoomParam {
 }
 
 export enum EventType {
-  VISIBLE_CHANGE = "RoomVisibleChange",
-  ROOM_DESTROY = "RoomDestroy",
-  ROOM_CONTAINER_RESIZE = "RoomContainerResize",
-  ROOM_ERROR = 'RoomError',
+  SERVICE_READY = 'ServiceReady',
+  ROOM_LOGIN = 'RoomLogin',
+  ROOM_CONTAINER_RESIZE = 'RoomContainerResize',
   ROOM_NOTICE_MESSAGE = 'RoomNoticeMessage',
   ROOM_NOTICE_MESSAGE_BOX = 'RoomNoticeMessageBox',
-  ROOM_KICKED_OUT = 'RoomKickedOut',
-  ROOM_USER_SIG_EXPIRED = 'RoomUserSigExpired',
-  ROOM_KICKED_OFFLINE = 'RoomKickedOffline',
+  ROOM_START = 'RoomStart',
+  ROOM_JOIN = 'RoomJoin',
+  ROOM_LEAVE = 'RoomLeave',
+  ROOM_DISMISS = 'RoomDestroy',
+  ROOM_ERROR = 'RoomError',
+  KICKED_OUT = 'KickedOut',
+  KICKED_OFFLINE = 'KickedOffline',
+  USER_SIG_EXPIRED = 'UserSigExpired',
+  USER_LOGOUT = 'UserLogout',
 }

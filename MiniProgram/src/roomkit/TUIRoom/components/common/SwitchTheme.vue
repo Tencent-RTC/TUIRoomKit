@@ -3,9 +3,6 @@
   * Usage:
   * Use <switch-theme /> in template
   *
-  * 名称: Switchtheme
-  * 使用方式：
-  * 在 template 中使用 <switch-theme />
 -->
 <template>
   <icon-button
@@ -30,7 +27,7 @@ import { roomService } from '../../services';
 const basicStore = useBasicStore();
 const { defaultTheme } = storeToRefs(basicStore);
 const { t } = useI18n();
-const [switchThemeConfig] = roomService.getComponentConfig(['SwitchTheme']);
+const switchThemeConfig = roomService.getComponentConfig('SwitchTheme');
 
 interface Props {
   visible?: boolean,

@@ -5,11 +5,6 @@
   * Usage:
   * Use <video-tab></video-tab> in the template
   *
-  * 名称: VideoTab
-  * @param name String required
-  * @param size String 'large'|'medium'|'small'
-  * 使用方式：
-  * 在 template 中使用 <video-tab></video-tab>
 -->
 <template>
   <div :class="['video-tab', themeClass]">
@@ -32,7 +27,6 @@
       <tui-switch v-model="isLocalStreamMirror"></tui-switch>
     </div>
     <div v-if="withMore" class="item-setting">
-      <!-- TODO: <div class="item">美颜与虚拟背景</div> -->
       <div class="item" @click="handleMoreCameraSetting">{{ t('More Camera Settings') }}</div>
     </div>
   </div>
@@ -81,8 +75,6 @@ const { t } = useI18n();
 
 /**
  * Click [More Camera Settings].
- *
- * 点击【更多摄像头设置】
 **/
 function handleMoreCameraSetting() {
   basicStore.setShowSettingDialog(true);
@@ -93,7 +85,7 @@ if (props.withPreview) {
   onMounted(async () => {
     roomEngine.instance?.startCameraDeviceTest({ view: 'test-camera-preview' });
     if (isElectron) {
-      // Electron 需要首次设置 mirrorType
+      // Electron requires mirrorType to be set for the first time
       const trtcCloud = roomEngine.instance?.getTRTCCloud();
       await trtcCloud?.setLocalRenderParams({
         mirrorType: isLocalStreamMirror.value

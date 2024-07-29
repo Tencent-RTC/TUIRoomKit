@@ -28,10 +28,6 @@ export interface MessageData {
   ownerName: string
   owner: string
 }
-const loadStyle = () => {
-  import('./index.scss');
-};
-
 const getRoomOptions = () => ({
   roomId: String(Math.ceil(Math.random() * 1000000)),
   roomMode: 'FreeToSpeak',
@@ -47,15 +43,15 @@ const getRoomOptions = () => ({
 });
 export interface CustomMessagePayload {
   version: number
-  businessID: string // 固定值，用于在IM上区分当前消息是哪类自定义消息。
-  groupId: string // 邀请群成员入会时，需要用到groupId来获取群成员列表。
-  messageId: string // 用于观众成为房主后，通过messageId 来查找并更新指定消息。
-  roomId: string // 房间的id，enterRoom 必须的参数
-  owner: string // 房主的userId
-  ownerName: string // 房主的userName
-  roomState: RoomState // 当前的房间状态，有creating/created/destroying/destroyed 四种状态
-  memberCount: 1 // 当前房间内有多少人，需要在ui上展示有多少人在会议中。
-  userList: Array<{ faceUrl: string; nickName: string; userId: string }> // 包括房主在内的被邀请用户的列表，最多展示5个，防止消息长度超出限制。
+  businessID: string // Fixed value, used to distinguish the type of custom message on IM.
+  groupId: string // When inviting group members to join, groupId is needed to get the list of group members.
+  messageId: string // Used to find and update a specific message after the audience becomes the host.
+  roomId: string // The id of the room, a required parameter for enterRoom.
+  owner: string // The userId of the room owner.
+  ownerName: string // The userName of the room owner.
+  roomState: RoomState // The current room state, there are four states: creating/created/destroying/destroyed.
+  memberCount: 1 // The number of people in the current room, it needs to be displayed on the UI how many people are in the meeting.
+  userList: Array<{ faceUrl: string; nickName: string; userId: string }> // The list of invited users including the room owner, display up to 5 to prevent the message length from exceeding the limit.
 }
 export enum RoomState {
   CREATING = 'creating',
@@ -69,7 +65,7 @@ export enum ChatType {
   CUSTOM_SERVICE = 'customerService',
   ROOM = 'room'
 }
-// message 的编辑都交给房主处理，因此需要拿到每条message 然后对比 userid 相同的时候将其赋给message
+// The editing of messages is left to the homeowner, so you need to get each message and compare it with the userid and assign it to the message if it is the same.
 export class ChatExtension {
   static instance?: ChatExtension;
   private message = {} as Message;
@@ -177,7 +173,7 @@ export class ChatExtension {
     this.onUserRoleChanged = this.onUserRoleChanged.bind(this);
   }
   private bindRoomServiceEvent() {
-    this.service?.on(EventType.ROOM_DESTROY, this.onRoomDestroy);
+    this.service?.on(EventType.ROOM_DISMISS, this.onRoomDestroy);
   }
   private bindRoomEngineEvent() {
     roomEngine.instance?.on(TUIRoomEvents.onRemoteUserEnterRoom, this.onRemoteUserEnterRoom);
@@ -185,7 +181,7 @@ export class ChatExtension {
     roomEngine.instance?.on(TUIRoomEvents.onUserRoleChanged, this.onUserRoleChanged);
   }
   private unBindRoomServiceEvent() {
-    this.service?.off(EventType.ROOM_DESTROY, this.onRoomDestroy);
+    this.service?.off(EventType.ROOM_DISMISS, this.onRoomDestroy);
   }
   private unBindRoomEngineEvent() {
     roomEngine.instance?.off(TUIRoomEvents.onRemoteUserEnterRoom, this.onRemoteUserEnterRoom);
@@ -200,7 +196,7 @@ export class ChatExtension {
       ...userList,
       {
         faceUrl: userInfo.avatarUrl,
-        nickName: userInfo.userName,
+        nickName: userInfo.nameCard || userInfo.userName,
         userId: userInfo.userId,
       },
     ];
@@ -226,8 +222,8 @@ export class ChatExtension {
       const [profile] = profileResult.data;
       const { userID, nick } = profile;
       await this.modifyMessage(this.message.ID, {
-        owner: userID, // 房主的userId
-        ownerName: nick, // 房主的userName
+        owner: userID, // Homeowner’s userId
+        ownerName: nick, // Homeowner’s userName
       });
     }
   }
@@ -249,7 +245,7 @@ export class ChatExtension {
         },
       },
     };
-    if (!chatType) return extension; // 老版本 chatType === undefined 忽略配置直接 return
+    if (!chatType) return extension; // Old version chatType === undefined ignores configuration and returns directly
     if (!this.chatExtensionSetting[chatType]) return;
     return extension;
   }
@@ -294,7 +290,7 @@ export class ChatExtension {
       this.messagePayload = this.parseMessageData(message);
       await this.sendMessage(message);
       await this.modifyMessage(message.ID, { messageId: message.ID, roomState: RoomState.CREATED });
-    } catch(error) {
+    } catch (error) {
       this.service?.emit(EventType.ROOM_NOTICE_MESSAGE, {
         code: -1,
         type: 'error',
@@ -309,7 +305,7 @@ export class ChatExtension {
   public async onNotifyEvent(eventName: string, subKey: string, params?: Record<string, any>) {
     if (eventName === TUIConstants.TUILogin.EVENT.LOGIN_STATE_CHANGED) {
       if (subKey === TUIConstants.TUILogin.EVENT_SUB_KEY.USER_LOGIN_SUCCESS) {
-        // 收到登录成功时执行自己的业务逻辑处理
+        // Execute your own business logic processing when receiving successful login
         !isMobile && setDragAndResize('#roomContainer');
         TUIRoomEngine?.callExperimentalAPI(JSON.stringify({
           api: 'setFramework',
@@ -320,11 +316,13 @@ export class ChatExtension {
         }));
         this.bindRoomEngineEvent();
         this.bindRoomServiceEvent();
-        loadStyle();
-        roomService.setComponentConfig({
-          SwitchTheme: {visible: false},
-          InviteControl: {visible: false},
-          RoomLink: {visible: false},
+        roomService.basicStore.setScene('chat');
+        roomService.componentManager.setComponentConfig({
+          SwitchTheme: { visible: false },
+          Language: { visible: false },
+          InviteControl: { visible: false },
+          RoomLink: { visible: false },
+          UserInfo: { visible: false },
         });
         this.chatContext = TUILogin.getContext();
         this.myProfile =  await this.getMyProfile();
@@ -346,17 +344,17 @@ export class ChatExtension {
     const { SDKAppID, userID, userSig } = this.chatContext;
     const { nick = '', avatar = defaultAvatarUrl } = this.myProfile;
     this.service && this.service[deep ? 'initRoomKit' : 'storeInit']({
-      // 获取 sdkAppId 请您参考 步骤一
+      // To get sdkAppId, please refer to Step One
       sdkAppId: SDKAppID,
-      // 用户在您业务中的唯一标示 Id
+      // The unique Id of the user in your business
       userId: userID,
-      // 本地开发调试可在 https://console.cloud.tencent.com/trtc/usersigtool 页面快速生成 userSig, 注意 userSig 与 userId 为一一对应关系
+      // For local development and debugging, you can quickly generate userSig on the page https://console.cloud.tencent.com/trtc/usersigtool. Note that userSig and userId have a one-to-one correspondence
       userSig,
-      // 用户在您业务中使用的昵称
+      // The nickname used by the user in your business
       userName: nick,
-      // 用户在您业务中使用的头像链接
+      // The avatar link used by the user in your business
       avatarUrl: avatar,
-      // 用户在您业务中需要的皮肤主题颜色及是否支持切换皮肤主题
+      // The skin theme color needed by the user in your business and whether to support switching skin themes
       theme: {
         isSupportSwitchTheme: false,
       },
@@ -436,20 +434,20 @@ export class ChatExtension {
       data: JSON.stringify({
         version: 1,
         businessID: 'group_room_message',
-        groupId: conversationID, // todo 当前版本暂不修改，等待im方案
-        messageId: '', // 用于观众成为房主后，通过 messageId 来查找并更新指定消息。
-        roomId, // 房间的id，enterRoom 必须的参数
-        owner: userID, // 房主的userId
-        ownerName: nick, // 房主的userName
-        roomState, // 当前的房间状态，有creating/created/destroying/destroyed 四种状态
-        memberCount: 1, // 当前房间内有多少人，需要在ui上展示有多少人在会议中。
+        groupId: conversationID, // todo The current version does not modify this, waiting for the IM solution
+        messageId: '', // Used to find and update a specific message after the audience becomes the host.
+        roomId, // The id of the room, a required parameter for enterRoom
+        owner: userID, // The userId of the room owner
+        ownerName: nick, // The userName of the room owner
+        roomState, // The current room state, there are four states: creating/created/destroying/destroyed
+        memberCount: 1, // The number of people in the current room, it needs to be displayed on the UI how many people are in the meeting.
         userList: [
           {
             faceUrl: avatar,
             nickName: nick,
             userId: userID,
           },
-        ], // 包括房主在内的被邀请用户的列表，最多展示5个，防止消息长度超出限制。
+        ], // A list of invited users, including the host, can be displayed at most 5 to prevent the message length from exceeding the limit.
       }),
     };
     return payload;
@@ -467,7 +465,7 @@ export class ChatExtension {
   private getUserProfile(userIDList: Array<string>) {
     const { chat } = this.chatContext;
     return chat.getUserProfile({
-      userIDList, // 请注意：即使只拉取一个用户的资料，也需要用数组类型，例如：userIDList: ['user1']
+      userIDList, // Please note: Even if you only pull the information of one user, you still need to use the array type, for example: userIDList: ['user1']
     });
   }
 

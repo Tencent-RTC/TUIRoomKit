@@ -36,8 +36,6 @@ import MemberApplyControl from '../ApplyControl/MemberApplyControl.vue';
 import MoreControl from '../MoreControl/index.vue';
 import bus from '../../../hooks/useMitt';
 
-import TUIRoomAegis from '../../../utils/aegis';
-
 import useRoomFooter from './useRoomFooterHooks';
 
 const {
@@ -49,7 +47,6 @@ const {
 
 
 function handleControlClick(name: string) {
-  TUIRoomAegis.reportEvent({ name, ext1: name });
   bus.emit('experience-communication', name);
 }
 </script>

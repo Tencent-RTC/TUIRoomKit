@@ -29,7 +29,6 @@ interface Props {
   responseSize?: string | number,
   customClass?: string,
   icon?: string,
-  color?: string,
 }
 
 const props = defineProps<Props>();
@@ -69,12 +68,6 @@ watch(() => props.size, (val) => {
     customStyle.value.height = addSuffix(val);
   }
 });
-
-watch(() => props.color, (val) => {
-  if (val) {
-    currentColor.value = val;
-  }
-}, { immediate: true });
 
 onMounted(() => {
   watch(defaultTheme, async () => {

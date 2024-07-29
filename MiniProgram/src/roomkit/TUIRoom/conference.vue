@@ -1,26 +1,24 @@
 <template>
-  <div v-if="basicStore.roomId" id="roomContainer" ref="roomRef" :class="tuiRoomClass">
+  <div v-if="conferenceShow" id="roomContainer" ref="roomRef" :class="tuiRoomClass">
     <room-header
       v-show="showRoomTool && showHeaderTool"
       class="header"
       @log-out="logOut"
-      @on-destroy-room="onDestroyRoom"
-      @on-exit-room="onExitRoom"
     ></room-header>
     <room-content
       ref="roomContentRef"
+      @tap="handleRoomContentTap"
       :show-room-tool="showRoomTool"
       class="content"
-      @tap="handleRoomContentTap"
     ></room-content>
-    <room-footer v-show="showRoomTool" class="footer" @on-destroy-room="onDestroyRoom" @on-exit-room="onExitRoom" />
+    <room-footer v-show="showRoomTool" class="footer" />
     <room-sidebar></room-sidebar>
     <room-setting></room-setting>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, Ref, watch, computed } from 'vue';
+import { ref, onMounted, onUnmounted, Ref, watch, computed, withDefaults, defineProps } from 'vue';
 import RoomHeader from './components/RoomHeader/index/index.vue';
 import RoomFooter from './components/RoomFooter/index/index.vue';
 import RoomSidebar from './components/RoomSidebar/index.vue';
@@ -31,13 +29,20 @@ import { useBasicStore } from './stores/basic';
 import { isMobile, isWeChat } from './utils/environment';
 import { TUIKickedOutOfRoomReason } from '@tencentcloud/tuiroom-engine-wx';
 
-import TUIRoomAegis from './utils/aegis';
 import { MESSAGE_DURATION } from './constants/message';
 
 import TUIMessageBox from './components/common/base/MessageBox/index';
 import TUIMessage from './components/common/base/Message/index';
 import { roomService, EventType, RoomParam, RoomInitData } from './services/index';
 import useDeviceManager from './hooks/useDeviceManager';
+
+const props = withDefaults(defineProps<{
+  displayMode: 'permanent' | 'wake-up'
+}>(), {
+  displayMode: 'permanent',
+});
+
+const conferenceShow = computed(() => (props.displayMode === 'permanent' || !!basicStore.roomId));
 
 useDeviceManager({ listenForDeviceChange: true });
 
@@ -58,11 +63,8 @@ const emit = defineEmits([
   'on-enter-room',
   'on-exit-room',
   'on-destroy-room',
-  // 用户被踢出房间
   'on-kicked-out-of-room',
-  // 用户被踢下线
   'on-kicked-off-line',
-  // 用户 userSig 过期
   'on-userSig-expired',
 ]);
 
@@ -72,22 +74,23 @@ const showMessageBox = (data: {
   code?: number;
   message: string;
   title: string;
+  cancelButtonText: string,
   confirmButtonText: string;
   callback?: () => void;
 }) => {
   const {
     message,
     title = roomService.t('Note'),
+    cancelButtonText,
     confirmButtonText = roomService.t('Sure'),
-    callback = () => { },
+    callback = () => {},
   } = data;
   TUIMessageBox({
     title,
     message,
+    cancelButtonText,
     confirmButtonText,
-    callback: async () => {
-      callback && callback();
-    },
+    callback,
   });
 };
 const showMessage = (data: {
@@ -106,37 +109,44 @@ const showMessage = (data: {
 onMounted(() => {
   roomService.on(EventType.ROOM_NOTICE_MESSAGE, showMessage);
   roomService.on(EventType.ROOM_NOTICE_MESSAGE_BOX, showMessageBox);
-  roomService.on(EventType.ROOM_KICKED_OUT, onKickedOutOfRoom);
-  roomService.on(EventType.ROOM_USER_SIG_EXPIRED, onUserSigExpired);
-  roomService.on(EventType.ROOM_KICKED_OFFLINE, onKickedOffLine);
+  roomService.on(EventType.KICKED_OUT, onKickedOutOfRoom);
+  roomService.on(EventType.USER_SIG_EXPIRED, onUserSigExpired);
+  roomService.on(EventType.KICKED_OFFLINE, onKickedOffLine);
+  roomService.on(EventType.ROOM_START, onStartRoom);
+  roomService.on(EventType.ROOM_JOIN, onJoinRoom);
+  roomService.on(EventType.ROOM_LEAVE, onLeaveRoom);
+  roomService.on(EventType.ROOM_DISMISS, onDismissRoom);
+  roomService.on(EventType.USER_LOGOUT, onLogout);
 });
 onUnmounted(() => {
   roomService.off(EventType.ROOM_NOTICE_MESSAGE, showMessage);
   roomService.off(EventType.ROOM_NOTICE_MESSAGE_BOX, showMessageBox);
-  roomService.off(EventType.ROOM_KICKED_OUT, onKickedOutOfRoom);
-  roomService.off(EventType.ROOM_USER_SIG_EXPIRED, onUserSigExpired);
-  roomService.off(EventType.ROOM_KICKED_OFFLINE, onKickedOffLine);
+  roomService.off(EventType.KICKED_OUT, onKickedOutOfRoom);
+  roomService.off(EventType.USER_SIG_EXPIRED, onUserSigExpired);
+  roomService.off(EventType.KICKED_OFFLINE, onKickedOffLine);
+  roomService.off(EventType.ROOM_START, onStartRoom);
+  roomService.off(EventType.ROOM_JOIN, onJoinRoom);
+  roomService.off(EventType.ROOM_LEAVE, onLeaveRoom);
+  roomService.off(EventType.ROOM_DISMISS, onDismissRoom);
+  roomService.off(EventType.USER_LOGOUT, onLogout);
   roomService.resetStore();
 });
 
 const { sdkAppId, showHeaderTool } = roomService.basicStore;
-watch(
-  () => sdkAppId,
-  (val: number) => {
-    if (val) {
-      TUIRoomAegis.setSdkAppId(val);
-      TUIRoomAegis.reportEvent({
-        name: 'loaded',
-        ext1: 'loaded-success',
-      });
-    }
-  },
-);
-const tuiRoomClass = computed(() => (isMobile ? ['tui-room', `tui-theme-${roomService.basicStore.defaultTheme}`, 'tui-room-h5'] : ['tui-room', `tui-theme-${roomService.basicStore.defaultTheme}`]));
+const tuiRoomClass = computed(() => {
+  const roomClassList = ['tui-room', `tui-theme-${roomService.basicStore.defaultTheme}`];
+  if (isMobile) {
+    roomClassList.push('tui-room-h5');
+  }
+  if (basicStore.scene === 'chat') {
+    roomClassList.push('chat-room');
+  }
+  return roomClassList;
+});
+
 /**
  * Handle page mouse hover display toolbar logic
  *
- * 处理页面鼠标悬浮显示工具栏逻辑
  **/
 const roomContentRef = ref<InstanceType<typeof RoomContent>>();
 const showRoomTool: Ref<boolean> = ref(true);
@@ -146,7 +156,6 @@ function handleHideRoomTool() {
 }
 
 watch(() => roomRef.value, (newValue, oldValue) => {
-  // PC 端处理 room 控制栏交互
   if (!isWeChat && !isMobile) {
     if (newValue) {
       addRoomContainerEvent(newValue);
@@ -181,7 +190,7 @@ const removeRoomContainerEvent = (container: Node) => {
   container.removeEventListener('mousemove', showToolThrottle);
   container.removeEventListener('mouseleave', hideTool);
 };
-// H5 及小程序端处理 room 控制栏交互
+
 function handleRoomContentTap() {
   showRoomTool.value = !showRoomTool.value;
   if (showRoomTool.value) {
@@ -191,12 +200,10 @@ function handleRoomContentTap() {
 
 async function dismissRoom() {
   await roomService.dismissRoom();
-  emit('on-destroy-room');
 }
 
 async function leaveRoom() {
   await roomService.leaveRoom();
-  emit('on-exit-room');
 }
 
 async function init(option: RoomInitData) {
@@ -209,30 +216,18 @@ async function createRoom(options: {
   roomMode: 'FreeToSpeak' | 'SpeakAfterTakingSeat';
   roomParam?: RoomParam;
 }) {
-  await roomService.createRoom(options);
-  emit('on-create-room', {
-    code: 0,
-    message: 'create room success',
-  });
-  await roomService.enterRoom(options);
-  emit('on-enter-room', {
-    code: 0,
-    message: 'enter room success',
+  const { roomId, roomName, roomMode, roomParam } = options;
+  roomService.createRoom({
+    roomId,
+    roomName,
+    roomMode,
+    roomParam,
   });
 }
 
 async function enterRoom(options: { roomId: string; roomParam?: RoomParam }) {
   await roomService.enterRoom(options);
-  emit('on-enter-room', {
-    code: 0,
-    message: 'enter room success',
-  });
 }
-
-// To do 临时注释，待放开
-// const onStatistics = (statistics: TRTCStatistics) => {
-//   basicStore.setStatistics(statistics);
-// };
 
 function resetStore() {
   roomService.resetStore();
@@ -240,18 +235,27 @@ function resetStore() {
 
 const logOut = () => {
   roomService.logOut();
-  emit('on-log-out');
 };
 
-const onDestroyRoom = (info: { code: number; message: string }) => {
-  roomService.emit(EventType.ROOM_DESTROY);
-  roomService.resetStore();
-  emit('on-destroy-room', info);
+const onStartRoom = () => {
+  emit('on-create-room',  { code: 0, message: 'create room' });
 };
 
-const onExitRoom = (info: { code: number; message: string }) => {
-  roomService.resetStore();
-  emit('on-exit-room', info);
+const onJoinRoom = () => {
+  emit('on-enter-room',  { code: 0, message: 'enter room' });
+};
+
+
+const onLeaveRoom = () => {
+  emit('on-exit-room',  { code: 0, message: 'exit room' });
+};
+
+const onDismissRoom = () => {
+  emit('on-destroy-room', { code: 0, message: 'destroy room' });
+};
+
+const onLogout = () => {
+  emit('on-log-out', { code: 0, message: 'user logout' });
 };
 
 const onKickedOutOfRoom = async (eventInfo: { roomId: string; reason: TUIKickedOutOfRoomReason; message: string }) => {
@@ -290,9 +294,21 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
   --footer-shadow-color: rgba(34, 38, 46, 0.3);
 }
 
+.tui-theme-white.tui-room {
+  --header-shadow-color: #e3eaf7;
+  --footer-shadow-color: rgba(197, 210, 229, 0.2);
+}
+
+.tui-theme-black.tui-room {
+  --header-shadow-color: rgba(34, 38, 46, 0.3);
+  --footer-shadow-color: rgba(34, 38, 46, 0.3);
+}
+
 .tui-room {
   width: 100%;
   height: 100%;
+  min-width: 850px;
+  min-height: 400px;
   position: relative;
   color: var(--font-color-1);
   background-color: var(--background-color-1);
@@ -317,6 +333,32 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
     background-color: var(--background-color-1);
     position: absolute;
     top: 0;
+  }
+
+  &.tui-room-h5 {
+    width: 100%;
+    height: 100%;
+    min-width: initial;
+    min-height: initial;
+  }
+}
+
+#roomContainer {
+  &.chat-room {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
+    height: 80%;
+    width: 80%;
+    border-radius: 10px;
+  }
+  &.tui-room-h5,.chat-room {
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

@@ -1,4 +1,4 @@
-// 事件总线第三方库
+// Event bus third-party library
 import mitt from 'mitt';
 const bus = mitt();
 export default bus;
