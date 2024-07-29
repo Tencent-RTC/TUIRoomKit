@@ -1,15 +1,21 @@
 <template>
-  <div :class="['option-container', { 'active': isSelected }]" @click="handleChooseOption">
-    <span class="option-content">{{ label || value }}</span>
+  <div ref="optionRef" :class="['option-container', { 'active': isSelected }]" @click="handleChooseOption">
+    <template v-if="$slots.customOptionContent">
+      <slot name="customOptionContent"></slot>
+    </template>
+    <template v-else>
+      <span :style="props.customOptionContentStyle" class="option-content">{{ label || value }}</span>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject, watch, computed, onBeforeUnmount } from 'vue';
+import { ref, inject, watch, computed, onBeforeUnmount, StyleValue, onMounted } from 'vue';
 
 interface OptionData {
   label: string,
   value: string | number | boolean | object,
+  customOptionContentStyle?: StyleValue,
 }
 
 interface SelectData {
@@ -21,6 +27,7 @@ interface SelectData {
   onOptionSelected: (optionData: OptionData) => void,
 }
 
+const optionRef = ref(null);
 const props = defineProps<OptionData>();
 
 const select: SelectData | undefined = inject('select');
@@ -30,9 +37,12 @@ const isSelected = computed(() => select && select.selectedValue === props.value
 const optionData = computed(() => ({
   label: props.label,
   value: props.value,
+  ref: optionRef,
 }));
 
-select?.onOptionCreated(optionData.value);
+onMounted(() => {
+  select?.onOptionCreated(optionData.value);
+});
 
 onBeforeUnmount(() => {
   select?.onOptionDestroyed(props.value);

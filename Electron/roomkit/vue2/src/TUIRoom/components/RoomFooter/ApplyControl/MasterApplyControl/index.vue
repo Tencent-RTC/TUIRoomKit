@@ -18,7 +18,7 @@
         <div v-for="item in applyToAnchorList" :key="item.userId" class="apply-item">
           <div class="user-info">
             <Avatar class="avatar-url" :img-src="item.avatarUrl"></Avatar>
-            <span class="user-name" :title="item.userName || item.userId">{{ item.userName || item.userId }}</span>
+            <span class="user-name" :title="roomService.getDisplayName(item)">{{ roomService.getDisplayName(item) }}</span>
           </div>
           <div class="control-container">
             <tui-button size="default" class="agree" @click="handleUserApply(item.userId, true)">
@@ -62,6 +62,7 @@ import Avatar from '../../../common/Avatar.vue';
 import Dialog from '../../../common/base/Dialog/index.vue';
 import SvgIcon from '../../../common/base/SvgIcon.vue';
 import TuiButton from '../../../common/base/Button.vue';
+import { roomService } from '../../../../services';
 
 const {
   t,

@@ -1,7 +1,7 @@
 <template>
-  <div v-if="!isGeneralUser" class="member-control-container">
-    <tui-button class="button" size="default" @click="singleControl.func(props.userInfo)">
-      {{ singleControl.title }}
+  <div class="member-control-container">
+    <tui-button class="button" size="default" @click="singleControl.func(props.userInfo)" v-if="!isCanOperateMySelf">
+      {{ singleControl?.title }}
     </tui-button>
     <div ref="moreBtnRef" class="more-container">
       <tui-button class="button" type="primary" @click="toggleClickMoreBtn">
@@ -38,9 +38,12 @@
       :close-on-click-modal="true"
       :append-to-room-container="true"
     >
-      <span>{{ dialogData.content }}</span>
+      <div class="dialog-content">
+        <span>{{ dialogData.content }}</span>
+        <tui-input v-if="dialogData.showInput" v-model="tempUserName" class="dialog-input" :placeholder="t('Please input user name')" />
+      </div>
       <template #footer>
-        <tui-button size="default" @click="handleAction(props.userInfo)"> {{ dialogData.confirmText }} </tui-button>
+        <tui-button size="default" @click="handleAction(props.userInfo)" :disabled="tempUserName.length === 0"> {{ dialogData.confirmText }} </tui-button>
         <tui-button class="cancel" size="default" type="primary" @click="handleCancelDialog">
           {{ t('Cancel') }}
         </tui-button>
@@ -54,9 +57,11 @@ import { ref, watch, computed, nextTick } from 'vue';
 import { useI18n } from '../../../locales';
 import TuiButton from '../../common/base/Button.vue';
 import Dialog from '../../common/base/Dialog/index.vue';
+import TuiInput from '../../common/base/Input/index.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import ArrowUpIcon from '../../common/icons/ArrowUpIcon.vue';
 import useMemberControlHooks from './useMemberControlHooks';
+import useMemberItemHooks from '../MemberItem/useMemberItemHooks';
 import { UserInfo } from '../../../stores/room';
 
 interface Props {
@@ -69,15 +74,19 @@ const props = defineProps<Props>();
 const { t } = useI18n();
 const {
   controlList,
-  isGeneralUser,
   handleCancelDialog,
   handleAction,
   isDialogVisible,
   dialogData,
+  tempUserName,
 } = useMemberControlHooks(props);
 
+const { isCanOperateMySelf } = useMemberItemHooks(props.userInfo);
+
 const singleControl = computed(() => controlList.value[0]);
-const moreControlList = computed(() => controlList.value.slice(1));
+const moreControlList = computed(() =>{
+  return isCanOperateMySelf ? controlList.value : controlList.value.slice(1)
+});
 const dropdownClass = ref('down');
 const moreBtnRef = ref();
 const operateListRef = ref();
@@ -218,6 +227,13 @@ async function handleDropDownPosition() {
         bottom: -20px;
       }
     }
+  }
+}
+.dialog-content {
+  display: flex;
+  align-items: center;
+  .dialog-input {
+    flex-grow: 1;
   }
 }
 .cancel {

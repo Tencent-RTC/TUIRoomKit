@@ -25,13 +25,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from 'vue';
+import { ref, Ref, watch } from 'vue';
 import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
 import TuiSelect from './base/Select.vue';
 import TuiOption from './base/Option.vue';
 
-import { TRTCDeviceInfo, TUIMediaDeviceType } from '@tencentcloud/tuiroom-engine-electron';
+import { TRTCDeviceInfo, TUIDeviceInfo, TUIMediaDeviceType } from '@tencentcloud/tuiroom-engine-electron';
 import useDeviceManager from '../../hooks/useDeviceManager';
 const { deviceManager } = useDeviceManager();
 
@@ -59,15 +59,39 @@ const currentDeviceId = ref(getInitDeviceId());
 
 function getInitDeviceId() {
   if (deviceType === 'camera') {
-    return currentCameraId;
+    return currentCameraId.value;
   }
   if (deviceType === 'microphone') {
-    return currentMicrophoneId;
+    return currentMicrophoneId.value;
   }
   if (deviceType === 'speaker') {
-    return currentSpeakerId;
+    return currentSpeakerId.value;
   }
   return '';
+}
+
+if (deviceType === 'camera') {
+  watch(currentCameraId, (val) => {
+    if (currentDeviceId.value !== val) {
+      currentDeviceId.value = val;
+    }
+  }, { immediate: true });
+}
+
+if (deviceType === 'microphone') {
+  watch(currentMicrophoneId, (val) => {
+    if (currentDeviceId.value !== val) {
+      currentDeviceId.value = val;
+    }
+  }, { immediate: true });
+}
+
+if (deviceType === 'speaker') {
+  watch(currentSpeakerId, (val) => {
+    if (currentDeviceId.value !== val) {
+      currentDeviceId.value = val;
+    }
+  }, { immediate: true });
 }
 
 function getDeviceList() {
@@ -87,25 +111,43 @@ async function handleChange(deviceId: string) {
   onChange && onChange(deviceId);
   switch (deviceType) {
     case 'camera':
-      await deviceManager.instance?.setCurrentDevice({
-        type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
-        deviceId,
-      });
-      roomStore.setCurrentCameraId(deviceId);
+      try {
+        await deviceManager.instance?.setCurrentDevice({
+          type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
+          deviceId,
+        });
+        roomStore.setCurrentCameraId(deviceId);
+      } catch (error) {
+        if (cameraList.value.map((item: TUIDeviceInfo) => item.deviceId).includes(currentCameraId.value)) {
+          currentDeviceId.value = currentCameraId.value;
+        }
+      }
       break;
     case 'microphone':
-      await deviceManager.instance?.setCurrentDevice({
-        type: TUIMediaDeviceType.kMediaDeviceTypeAudioInput,
-        deviceId,
-      });
-      roomStore.setCurrentMicrophoneId(deviceId);
+      try {
+        await deviceManager.instance?.setCurrentDevice({
+          type: TUIMediaDeviceType.kMediaDeviceTypeAudioInput,
+          deviceId,
+        });
+        roomStore.setCurrentMicrophoneId(deviceId);
+      } catch (error) {
+        if (microphoneList.value.map((item: TUIDeviceInfo) => item.deviceId).includes(currentMicrophoneId.value)) {
+          currentDeviceId.value = currentMicrophoneId.value;
+        }
+      }
       break;
     case 'speaker':
-      await deviceManager.instance?.setCurrentDevice({
-        type: TUIMediaDeviceType.kMediaDeviceTypeAudioOutput,
-        deviceId,
-      });
-      roomStore.setCurrentSpeakerId(deviceId);
+      try {
+        await deviceManager.instance?.setCurrentDevice({
+          type: TUIMediaDeviceType.kMediaDeviceTypeAudioOutput,
+          deviceId,
+        });
+        roomStore.setCurrentSpeakerId(deviceId);
+      } catch (error) {
+        if (speakerList.value.map((item: TUIDeviceInfo) => item.deviceId).includes(currentSpeakerId.value)) {
+          currentDeviceId.value = currentSpeakerId.value;
+        }
+      }
       break;
     default:
       break;

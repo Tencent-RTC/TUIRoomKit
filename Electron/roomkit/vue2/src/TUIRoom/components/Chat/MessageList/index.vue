@@ -8,7 +8,7 @@
         :class="['message-item', `${'out' === item.flow ? 'is-me' : ''}`]"
       >
         <div v-if="getDisplaySenderName(index)" class="message-header" :title="item.nick || item.from">
-          {{ item.nick || item.from }}
+          {{ getDisplayName(item.from) }}
         </div>
         <div class="message-body">
           <message-text :data="item.payload.text" />
@@ -20,13 +20,17 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 import MessageText from '../MessageTypes/MessageText.vue';
 import { isMobile }  from '../../../utils/environment';
 import useMessageList from './useMessageListHook';
 import { getScrollInfo } from '../../../utils/domOperation';
 import { throttle } from '../../../utils/utils';
+import { useRoomStore } from '../../../stores/room';
 
 const messageListRef = ref<HTMLElement>();
+const roomStore = useRoomStore();
+const { getDisplayName } = storeToRefs(roomStore)
 
 const {
   messageList,

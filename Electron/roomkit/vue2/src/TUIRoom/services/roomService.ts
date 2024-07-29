@@ -10,7 +10,7 @@ import TUIRoomEngine, {
   TUIRoomEvents,
 } from '@tencentcloud/tuiroom-engine-electron';
 import { useBasicStore } from '../stores/basic';
-import { useRoomStore } from '../stores/room';
+import { UserInfo, useRoomStore } from '../stores/room';
 import { useChatStore } from '../stores/chat';
 import useDeviceManager from '../hooks/useDeviceManager';
 import logger from '../utils/common/logger';
@@ -24,6 +24,9 @@ import { LifeCycleManager } from './manager/lifeCycleManager';
 import { JoinParams, RoomActionManager, StartParams } from './manager/roomActionManager';
 import { WaterMark } from './function/waterMark';
 import { VirtualBackground } from './function/virtualBackground';
+import { ScheduleConferenceManager } from './manager/scheduleConferenceManager';
+import { ErrorHandler } from './function/errorHandler';
+
 const { t } = i18n.global;
 
 const logPrefix = '[RoomService]';
@@ -35,9 +38,11 @@ export class RoomService implements IRoomService {
   public configManager = new ConfigManager(this);
   public userManager = new UserManager(this);
   public lifeCycleManager: LifeCycleManager = new LifeCycleManager(this);
-  public roomActionManager = new RoomActionManager(this);
+  public roomActionManager: RoomActionManager = new RoomActionManager(this);
   public waterMark = new WaterMark(this);
   public virtualBackground = new VirtualBackground(this);
+  public scheduleConferenceManager: ScheduleConferenceManager = new ScheduleConferenceManager(this);
+  public errorHandler: ErrorHandler = new ErrorHandler(this);
 
   public roomEngine = roomEngine;
   public t = t;
@@ -60,6 +65,7 @@ export class RoomService implements IRoomService {
     TUIRoomEngine.once('ready', () => {
       this.bindRoomEngineEvents();
       this.handleRoomEngineReady();
+      this.emit(EventType.SERVICE_READY);
     });
   }
 
@@ -74,6 +80,8 @@ export class RoomService implements IRoomService {
     this.onKickedOffLine = this.onKickedOffLine.bind(this);
     this.onAllUserCameraDisableChanged = this.onAllUserCameraDisableChanged.bind(this);
     this.onAllUserMicrophoneDisableChanged = this.onAllUserMicrophoneDisableChanged.bind(this);
+    this.onScreenShareForAllUserDisableChanged = this.onScreenShareForAllUserDisableChanged.bind(this);
+    this.onUserInfoChanged = this.onUserInfoChanged.bind(this);
   }
 
   static getInstance(): RoomService {
@@ -89,6 +97,7 @@ export class RoomService implements IRoomService {
     RoomService.instance.unBindRoomEngineEvents();
     RoomService.instance.waterMark.dispose();
     RoomService.instance.virtualBackground.dispose();
+    RoomService.instance.scheduleConference.dispose();
     RoomService.instance = undefined;
   }
 
@@ -118,6 +127,11 @@ export class RoomService implements IRoomService {
     roomEngine.instance?.on(TUIRoomEvents.onKickedOffLine, this.onKickedOffLine);
     roomEngine.instance?.on(TUIRoomEvents.onAllUserCameraDisableChanged, this.onAllUserCameraDisableChanged);
     roomEngine.instance?.on(TUIRoomEvents.onAllUserMicrophoneDisableChanged, this.onAllUserMicrophoneDisableChanged);
+    roomEngine.instance?.on(
+      TUIRoomEvents.onScreenShareForAllUserDisableChanged,
+      this.onScreenShareForAllUserDisableChanged,
+    );
+    roomEngine.instance?.on(TUIRoomEvents.onUserInfoChanged, this.onUserInfoChanged);
   }
 
   public unBindRoomEngineEvents() {
@@ -131,20 +145,16 @@ export class RoomService implements IRoomService {
     roomEngine.instance?.off(TUIRoomEvents.onKickedOffLine, this.onKickedOffLine);
     roomEngine.instance?.off(TUIRoomEvents.onAllUserCameraDisableChanged, this.onAllUserCameraDisableChanged);
     roomEngine.instance?.off(TUIRoomEvents.onAllUserMicrophoneDisableChanged, this.onAllUserMicrophoneDisableChanged);
+    roomEngine.instance?.off(
+      TUIRoomEvents.onScreenShareForAllUserDisableChanged,
+      this.onScreenShareForAllUserDisableChanged,
+    );
+    roomEngine.instance?.off(TUIRoomEvents.onUserInfoChanged, this.onUserInfoChanged);
   }
 
   private onError(error: any) {
     logger.error('roomEngine.onError: ', error);
-    if (error.message === 'enter trtc room failed , error code : -1') {
-      this.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
-        type: 'warning',
-        message: t('Failed to enter the meeting'),
-        callback: () => {
-          this.emit(EventType.ROOM_ERROR);
-          this.resetStore();
-        },
-      });
-    }
+    this.errorHandler.handleError(error, 'onError');
   }
 
   private onRoomDismissed(eventInfo: { roomId: string }) {
@@ -266,6 +276,16 @@ export class RoomService implements IRoomService {
     }
   }
 
+  private async onUserInfoChanged(eventInfo: { userInfo: UserInfo })  {
+    const { userId, nameCard } = eventInfo.userInfo;
+    const isLocal = this.roomStore.localUser.userId === userId;
+    if (isLocal) {
+      this.roomStore.setLocalUser({ nameCard });
+    } else {
+      this.roomStore.setRemoteUserNameCard(userId, nameCard as string);
+    }
+  };
+
   private async onAllUserMicrophoneDisableChanged(eventInfo: { roomId: string; isDisable: boolean }) {
     const { isDisable } = eventInfo;
     if (
@@ -294,7 +314,10 @@ export class RoomService implements IRoomService {
       await roomEngine.instance?.muteLocalAudio();
     }
   }
-
+  private async onScreenShareForAllUserDisableChanged(eventInfo: { roomId: string; isDisable: boolean }) {
+    const { isDisable } = eventInfo;
+    this.roomStore.setDisableScreenShareForAllUserByAdmin(isDisable);
+  }
   public resetStore() {
     this.basicStore.reset();
     this.chatStore.reset();
@@ -311,6 +334,7 @@ export class RoomService implements IRoomService {
     const { sdkAppId, userId, userSig, userName = userId, avatarUrl = '' } = option;
     await TUIRoomEngine.login({ sdkAppId, userId, userSig });
     await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
+    this.emit(EventType.ROOM_LOGIN);
   }
 
   public async start(roomId: string, params?: StartParams) {
@@ -393,6 +417,10 @@ export class RoomService implements IRoomService {
   // User Manager
   setSelfInfo(options: SelfInfoOptions) {
     return this.userManager.setSelfInfo(options);
+  }
+
+  getDisplayName(options: UserInfo) {
+    return this.userManager.getDisplayName(options);
   }
 }
 

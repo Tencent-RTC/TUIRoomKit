@@ -13,7 +13,7 @@ export default function useSideBar() {
 
   const chatStore = useChatStore();
   const basicStore = useBasicStore();
-  const { sdkAppId, isSidebarOpen, sidebarName } = storeToRefs(basicStore);
+  const { sdkAppId, isSidebarOpen, sidebarName, roomId } = storeToRefs(basicStore);
   const roomStore = useRoomStore();
   const { userNumber } = storeToRefs(roomStore);
 
@@ -53,8 +53,9 @@ export default function useSideBar() {
     if (!options || !options.data) {
       return;
     }
+    const currentConversationId = `GROUP${roomId.value}`
     options.data.forEach((message: any) => {
-      if (message.type === TencentCloudChat.TYPES.MSG_TEXT) {
+      if (message.conversationID === currentConversationId && message.type === TencentCloudChat.TYPES.MSG_TEXT) {
         if (!basicStore.isSidebarOpen || basicStore.sidebarName !== 'chat') {
           // eslint-disable-next-line no-plusplus
           chatStore.updateUnReadCount(++chatStore.unReadCount);

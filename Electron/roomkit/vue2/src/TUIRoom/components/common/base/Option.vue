@@ -1,11 +1,11 @@
 <template>
-  <div :class="['option-container', { 'active': isSelected }]" @click="handleChooseOption">
+  <div ref="optionRef" :class="['option-container', { 'active': isSelected }]" @click="handleChooseOption">
     <span class="option-content">{{ label || value }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject, watch, computed, onBeforeUnmount } from 'vue';
+import { ref, inject, watch, computed, onBeforeUnmount } from 'vue';
 
 interface OptionData {
   label: string,
@@ -20,6 +20,7 @@ interface SelectData {
   onOptionSelected: (optionData: OptionData) => void,
 }
 
+const optionRef = ref(null);
 const props = defineProps<OptionData>();
 
 const select: SelectData | undefined = inject('select');
@@ -29,6 +30,7 @@ const isSelected = computed(() => select && select.selectedValue === props.value
 const optionData = computed(() => ({
   label: props.label,
   value: props.value,
+  ref: optionRef,
 }));
 
 select?.onOptionCreated(optionData.value);

@@ -144,15 +144,7 @@ export class RoomActionManager {
       await this.handleRoomCreation(roomParams, options);
     } catch (error) {
       logger.error(`${logPrefix}createRoom error:`, error);
-      this.service.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
-        title: this.service.t('Note'),
-        message: this.service.t('Failed to initiate meeting'),
-        confirmButtonText: this.service.t('Sure'),
-        callback: async () => {
-          this.service.emit(EventType.ROOM_ERROR, error);
-          this.service.resetStore();
-        },
-      });
+      this.service.errorHandler.handleError(error, 'createRoom');
       throw error;
     }
   }
@@ -180,6 +172,7 @@ export class RoomActionManager {
 
       this.service.roomStore.setRoomInfo(roomInfo);
       await this.getUserList();
+      await this.syncUserInfo(this.service.basicStore.userId);
 
       if (roomInfo.isSeatEnabled) {
         await this.getSeatList();
@@ -193,15 +186,7 @@ export class RoomActionManager {
       this.service.roomStore.setRoomParam(roomParam);
     } catch (error) {
       logger.error(`${logPrefix}enterRoom error:`, error);
-      this.service.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
-        title: this.service.t('Note'),
-        message: this.service.t('Failed to enter the meeting'),
-        confirmButtonText: this.service.t('Sure'),
-        callback: async () => {
-          this.service.emit(EventType.ROOM_ERROR, error);
-          this.service.roomStore.reset();
-        },
-      });
+      this.service.errorHandler.handleError(error, 'enterRoom');
       throw error;
     }
   }
@@ -248,6 +233,13 @@ export class RoomActionManager {
     } catch (error: any) {
       logger.error('TUIRoomEngine.getUserList', error.code, error.message);
     }
+  }
+
+  private async syncUserInfo(userId: string) {
+    const { roomEngine } = this.service;
+    const userInfo = (await roomEngine.instance?.getUserInfo({ userId })) as any;
+    const { isMessageDisabled } = userInfo;
+    this.service.chatStore.setSendMessageDisableChanged(isMessageDisabled);
   }
 
   private async getSeatList() {
