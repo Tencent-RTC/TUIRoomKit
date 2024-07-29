@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import i18n from '../../locales/index';
-import { isMobile, isWeChat } from '../../utils/environment';
+import { isMobile } from '../../utils/environment';
 import { computed } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
@@ -48,8 +48,8 @@ const basicStore = useBasicStore();
 
 const { defaultTheme } = storeToRefs(basicStore);
 
-const isEN = computed(() => !isWeChat && i18n.global.locale.value === 'en-US');
-const isZH = computed(() => isWeChat || i18n.global.locale.value === 'zh-CN');
+const isEN = computed(() => i18n.global.locale.value === 'en-US');
+const isZH = computed(() => i18n.global.locale.value === 'zh-CN');
 const isBlackTheme = computed(() => defaultTheme.value === 'black');
 const isWhiteTheme = computed(() => defaultTheme.value === 'white');
 

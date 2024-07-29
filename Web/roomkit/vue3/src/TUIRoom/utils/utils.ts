@@ -146,3 +146,45 @@ export function addSuffix(value: string | number, suffix = 'px') {
   }
   return value;
 }
+
+export function getUrlWithRoomId(roomId: string): string {
+  const currentUrl = window.location.href;
+  const urlObj = new URL(currentUrl);
+  const params = new URLSearchParams(urlObj.search);
+  if (params.has('roomId')) {
+    params.delete('roomId');
+  }
+  params.append('roomId', roomId);
+  return `${urlObj.origin + urlObj.pathname + '#/home?' + params.toString()}`; 
+}
+
+export function calculateByteLength(str: string) {
+  let byteLength = 0;
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    if (code <= 0x7f) {
+      byteLength += 1;
+    } else if (code <= 0x7ff) {
+      byteLength += 2;
+    } else if (code <= 0xffff) {
+      byteLength += 3;
+    } else {
+      byteLength += 4;
+    }
+  }
+  return byteLength;
+}
+
+
+export function objectMerge(...args: any[]) {
+  return args.reduce((acc, cur) => {
+    Object.keys(cur).forEach((key) => {
+      if (acc[key] && typeof acc[key] === 'object') {
+        acc[key] = objectMerge(acc[key], cur[key]);
+      } else {
+        acc[key] = cur[key];
+      }
+    });
+    return acc;
+  }, {});
+}

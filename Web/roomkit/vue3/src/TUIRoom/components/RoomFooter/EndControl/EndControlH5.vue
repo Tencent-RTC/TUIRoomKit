@@ -64,7 +64,7 @@
               >
                 <div class="member-basic-info">
                   <Avatar class="avatar-url" :img-src="user.avatarUrl"></Avatar>
-                  <div class="user-name">{{ user.userName || user.userId }}</div>
+                  <div class="user-name">{{ roomService.getDisplayName(user) }}</div>
                   <svg-icon v-if="selectedUser === user.userId" :icon="CorrectIcon" class="correct"> </svg-icon>
                 </div>
               </div>

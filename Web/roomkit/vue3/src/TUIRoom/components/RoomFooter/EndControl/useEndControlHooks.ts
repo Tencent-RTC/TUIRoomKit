@@ -8,6 +8,7 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import TUIRoomEngine, { TUIRole, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import logger from '../../../utils/common/logger';
 import TUIMessage from '../../common/base/Message/index';
+import { roomService } from '../../../services';
 
 export default function useEndControl() {
   const { t } = useI18n();
@@ -35,8 +36,7 @@ export default function useEndControl() {
   const selectedUser: Ref<string> = ref('');
   const showTransfer = ref(false);
   const searchName = ref('');
-  const filteredList = computed(() => remoteUserList.value.filter(searchUser => (
-    searchUser.userId.includes(searchName.value)) || (searchUser.userName?.includes(searchName.value))));
+  const filteredList = computed(() => remoteUserList.value.filter(searchUser => (searchUser.nameCard?.includes(searchName.value)) || (searchUser.userId.includes(searchName.value)) || (searchUser.userName?.includes(searchName.value))));
   const hasNoData = computed(() => filteredList.value.length === 0);
   const isMasterWithOneRemoteUser = computed(() => remoteUserList.value.length === 1);
   const isMasterWithRemoteUser = computed(() => remoteUserList.value.length > 0);
@@ -169,9 +169,16 @@ export default function useEndControl() {
   TUIRoomEngine.once('ready', () => {
     roomEngine.instance?.on(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
   });
-
+  const handleMount = () => {
+    const { userRole } = roomService.roomStore.localUser;
+    if (userRole === TUIRole.kRoomOwner || userRole === TUIRole.kAdministrator) {
+      handleUpdateSeatApplicationList();
+    }
+  };
+  roomService.lifeCycleManager.on('mount', handleMount);
   onUnmounted(() => {
     roomEngine.instance?.off(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
+    roomService.lifeCycleManager.off('mount', handleMount);
   });
   return {
     t,

@@ -11,6 +11,8 @@ export default {
   'Terms of Use': 'Terms of Use',
   Login: 'Login',
   'Mobile number': 'Mobile number',
+  'Please enter your full English name': 'Please enter your full English name',
+  'Please enter a standardised English name': 'Please enter a standardised English name',
   'Verification code': 'Verification code',
   'Email address': 'Email address',
   'Please enter a valid phone number!': 'Please enter a valid phone number!',

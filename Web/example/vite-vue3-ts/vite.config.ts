@@ -41,5 +41,12 @@ export default defineConfig({
       protocol: 'ws',
       host: '127.0.0.1',
     },
+    proxy: {
+      '/api': {
+        target: 'https://service.trtc.qcloud.com',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
+    },
   },
 });

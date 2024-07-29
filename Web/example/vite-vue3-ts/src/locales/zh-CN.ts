@@ -11,6 +11,8 @@ export default {
   'Terms of Use': '用户协议',
   Login: '登录',
   'Mobile number': '请输入您的手机号',
+  'Please enter your full English name': '请输入您的完整英文名称',
+  'Please enter a standardised English name': '请输入符合规范的英文名称',
   'Verification code': '请输入验证码',
   'Email address': '请输入邮箱',
   'Please enter a valid phone number!': '请输入正确的手机号！',

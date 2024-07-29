@@ -53,7 +53,7 @@ export default function useChatEditor() {
         payload: {
           text: result,
         },
-        nick: roomStore.localUser.userName || roomStore.localUser.userId,
+        nick: roomStore.localUser.nameCard || roomStore.localUser.userName || roomStore.localUser.userId,
         from: roomStore.localUser.userId,
         flow: 'out',
         sequence: Math.random(),

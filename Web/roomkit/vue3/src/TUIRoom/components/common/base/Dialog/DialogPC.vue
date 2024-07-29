@@ -25,7 +25,8 @@
         <div class="tui-dialog-container" :style="drawerContainerStyle">
           <div class="tui-dialog-header">
             <div class="tui-dialog-header-title">
-              {{ title }}
+              <svg-icon :icon="titleIcon"></svg-icon>
+              <div class="tui-dialog-header-title-content">{{ title }}</div>
             </div>
             <template v-if="$slots.title">
               <slot name="title"></slot>
@@ -72,6 +73,7 @@ interface Props {
   appendToRoomContainer?: boolean;
   confirmButton?: string;
   cancelButton?: string;
+  titleIcon?: any;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -86,6 +88,7 @@ const props = withDefaults(defineProps<Props>(), {
   appendToRoomContainer: false,
   confirmButton: '',
   cancelButton: '',
+  titleIcon: null,
 });
 
 const emit = defineEmits(['update:modelValue', 'close', 'confirm', 'cancel']);
@@ -119,6 +122,9 @@ watch(
   () => props.modelValue,
   (val) => {
     visible.value = val;
+  },
+  {
+    immediate: true,
   },
 );
 
@@ -185,11 +191,15 @@ function handleOverlayClick(event: any) {
     align-items: center;
     box-shadow: 0px 7px 10px -5px rgba(230, 236, 245, 0.8);
     .tui-dialog-header-title {
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 600;
-      line-height: 24px;
-      color: #0f1014;
+      display: flex;
+      .tui-dialog-header-title-content{
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px;
+        color: #0f1014;
+        margin-left: 8px;
+      }
     }
     .close {
       width: 32px;
@@ -217,7 +227,7 @@ function handleOverlayClick(event: any) {
   .tui-dialog-footer {
     padding: 20px 30px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
   }
 }
 </style>
