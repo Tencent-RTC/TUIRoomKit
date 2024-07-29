@@ -7,7 +7,7 @@ import TuiBadge from './Badge.vue';
 import TuiButton from './Button.vue';
 import TuiDrawer from './Drawer.vue';
 import IconButton from './IconButton.vue';
-import TuiInput from './Input.vue';
+import TuiInput from './Input';
 import TuiOption from './Option.vue';
 import TuiPopUpH5 from './PopUpH5.vue';
 import TuiSelect from './Select.vue';

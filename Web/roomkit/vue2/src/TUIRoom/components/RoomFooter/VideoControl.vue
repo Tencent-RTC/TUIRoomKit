@@ -116,10 +116,6 @@ async function toggleMuteVideo() {
       });
       return;
     }
-    // There is a list of camera
-    roomEngine.instance?.setLocalVideoView({
-      view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
-    });
     if (isMobile) {
       if (isH5) {
         const trtcCloud = roomEngine.instance?.getTRTCCloud();
@@ -152,9 +148,6 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
 // Accept the host invitation and turn on the camera
 async function handleAccept() {
   roomStore.setCanControlSelfVideo(true);
-  roomEngine.instance?.setLocalVideoView({
-    view: `${roomStore.localStream.userId}_${roomStore.localStream.streamType}`,
-  });
   await roomEngine.instance?.responseRemoteRequest({
     requestId: requestOpenCameraRequestId.value,
     agree: true,

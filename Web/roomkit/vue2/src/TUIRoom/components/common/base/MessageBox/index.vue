@@ -17,8 +17,24 @@
         <div class="tui-message-box-body">
           <div>{{ message }}</div>
         </div>
-        <div class="tui-message-box-footer">
-          <tui-button size="default" class="button" @click="handleClose">{{ confirmButtonText }}</tui-button>
+        <div v-if="isMobile" class="tui-message-box-footer">
+          <div v-if="cancelButtonText" class="button-container" @click="handleClose('cancel')">
+            <tui-button type="text" size="default" class="button">{{ cancelButtonText }}</tui-button>
+          </div>
+          <div class="button-container" @click="handleClose('confirm')">
+            <tui-button type="text" size="default" class="button confirm-button">{{ confirmButtonText }}</tui-button>
+          </div>
+        </div>
+        <div v-else class="tui-message-box-footer">
+          <tui-button size="default" @click="handleClose('confirm')">{{ confirmButtonText }}</tui-button>
+          <tui-button
+            v-if="cancelButtonText"
+            type="primary"
+            size="default"
+            @click="handleClose('cancel')"
+          >
+            {{ cancelButtonText }}
+          </tui-button>
         </div>
       </div>
     </div>
@@ -37,12 +53,13 @@ const visible = ref(false);
 const overlayContentStyle = ref({});
 const { nextZIndex } = useZIndex();
 
-type BeforeCloseFn = () => void;
+type BeforeCloseFn = (action?: Action) => void;
 
 interface Props {
   title: string;
   message: string;
   callback?: BeforeCloseFn | null;
+  cancelButtonText: string,
   confirmButtonText: string;
   remove: Function;
 }
@@ -51,6 +68,7 @@ const props = withDefaults(defineProps<Props>(), {
   title: '',
   message: '',
   callback: null,
+  cancelButtonText: '',
   confirmButtonText: '',
   remove: () => {},
 });
@@ -63,8 +81,9 @@ watch(visible, (val) => {
 
 const emit = defineEmits(['close']);
 
-function handleClose() {
-  props.callback && props.callback();
+type Action = 'cancel' | 'confirm' | 'close';
+function handleClose(action: Action) {
+  props.callback && props.callback(action);
   doClose();
 }
 
@@ -78,7 +97,7 @@ function handleOverlayClick(event: any) {
   if (event.target !== event.currentTarget) {
     return;
   }
-  handleClose();
+  handleClose('close');
 }
 
 function onOpen() {
@@ -143,7 +162,25 @@ onMounted(async () => {
       cursor: pointer;
     }
   }
+  .tui-message-box-body {
+    flex: 1;
+    padding: 20px 24px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+    color: #4f586b;
+  }
+  .tui-message-box-footer {
+    padding: 20px 30px;
+    display: flex;
+    justify-content: center;
+    & > :not(:first-child) {
+      margin-left: 16px;
+    }
+  }
 }
+
 .tui-message-box-h5 {
   min-width: 80vw;
   max-width: 80vw;
@@ -181,32 +218,26 @@ onMounted(async () => {
     width: 100%;
     border-top: 1px solid #d5e0f2;
     display: flex;
-    justify-content: center;
-    padding: 11px 0;
+    justify-content: space-around;
+    .button-container {
+      padding: 11px 0;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      &:not(:first-child) {
+        border-left: 1px solid #d5e0f2;
+      }
+    }
     .button {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .confirm-button {
       background-color: #fff;
       color: var(--active-color-1);
       border: none;
       text-align: center;
-      font-size: 16px;
-      font-weight: 500;
     }
   }
-}
-
-.tui-message-box-body {
-  flex: 1;
-  padding: 20px 24px;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 22px;
-  color: #4f586b;
-}
-
-.tui-message-box-footer {
-  padding: 20px 30px;
-  display: flex;
-  justify-content: flex-end;
 }
 </style>

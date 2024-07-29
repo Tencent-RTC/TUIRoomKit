@@ -3,6 +3,7 @@
     <pre-conference-view
       :user-info="userInfo"
       :room-id="givenRoomId"
+      :enable-scheduled-conference="true"
       @on-create-room="handleCreateRoom"
       @on-enter-room="handleEnterRoom"
       @on-logout="handleLogOut"
@@ -14,7 +15,6 @@
 <script>
 import { PreConferenceView, conference } from '@tencentcloud/roomkit-web-vue2.7';
 import { getBasicInfo } from '@/config/basic-info-config';
-import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import { isMobile } from '@tencentcloud/roomkit-web-vue2.7/es/utils/environment';
 
 export default {
@@ -46,7 +46,7 @@ export default {
     }
     const { sdkAppId, userId, userSig } = this.userInfo;
     // Login TUIRoomEngine
-    await TUIRoomEngine.login({ sdkAppId, userId, userSig });
+    await conference.login({ sdkAppId, userId, userSig });
   },
   methods: {
     setTUIRoomData(action, roomOption) {
