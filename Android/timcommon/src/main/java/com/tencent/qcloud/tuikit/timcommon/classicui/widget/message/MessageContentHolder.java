@@ -113,12 +113,6 @@ public abstract class MessageContentHolder<T extends TUIMessageBean> extends Mes
         return mForwardDataSource;
     }
 
-    public void resetSelectableText() {
-        if (selectableTextHelper != null) {
-            selectableTextHelper.reset();
-        }
-    }
-
     @Override
     public void layoutViews(final T msg, final int position) {
         hasRiskContent = msg.hasRiskContent();
@@ -127,7 +121,9 @@ public abstract class MessageContentHolder<T extends TUIMessageBean> extends Mes
         setUserName(msg);
         loadAvatar(msg);
         setSendingProgress(msg);
+        setStatusImage(msg);
         setMessageBubbleBackground(msg, position);
+        setOnClickListener(msg, position);
 
         if (isForwardMode || isReplyDetailMode) {
             setGravity(true);
@@ -202,13 +198,10 @@ public abstract class MessageContentHolder<T extends TUIMessageBean> extends Mes
             } else {
                 setMessageBubbleBackground(R.drawable.chat_message_popup_risk_content_border_left);
             }
-            statusImage.setVisibility(View.VISIBLE);
         } else {
-            statusImage.setVisibility(View.GONE);
             setRiskContent(null);
             if (isForwardMode || isReplyDetailMode) {
                 setMessageBubbleBackground(TUIThemeManager.getAttrResId(itemView.getContext(), R.attr.chat_bubble_other_bg));
-                statusImage.setVisibility(View.GONE);
             } else {
                 if (msg.isSelf()) {
                     if (properties.getRightBubble() != null && properties.getRightBubble().getConstantState() != null) {
@@ -225,7 +218,25 @@ public abstract class MessageContentHolder<T extends TUIMessageBean> extends Mes
                 }
             }
         }
-        setOnClickListener(msg, position);
+    }
+
+    protected void setStatusImage(T msg) {
+        statusImage.setVisibility(View.GONE);
+        if (hasRiskContent) {
+            statusImage.setVisibility(View.VISIBLE);
+        } else {
+            if (msg.getStatus() == TUIMessageBean.MSG_STATUS_SEND_FAIL) {
+                statusImage.setVisibility(View.VISIBLE);
+                statusImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (onItemClickListener != null) {
+                            onItemClickListener.onSendFailBtnClick(statusImage, msg);
+                        }
+                    }
+                });
+            }
+        }
     }
 
     protected void setRiskContent(String riskContent) {
@@ -279,20 +290,11 @@ public abstract class MessageContentHolder<T extends TUIMessageBean> extends Mes
         }
 
         if (msg.getStatus() == TUIMessageBean.MSG_STATUS_SEND_FAIL) {
-            statusImage.setVisibility(View.VISIBLE);
             msgContentFrame.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (onItemClickListener != null) {
                         onItemClickListener.onMessageLongClick(msgContentFrame, msg);
-                    }
-                }
-            });
-            statusImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (onItemClickListener != null) {
-                        onItemClickListener.onSendFailBtnClick(statusImage, msg);
                     }
                 }
             });
@@ -305,7 +307,6 @@ public abstract class MessageContentHolder<T extends TUIMessageBean> extends Mes
                     }
                 }
             });
-            statusImage.setVisibility(View.GONE);
         }
     }
 
@@ -424,6 +425,9 @@ public abstract class MessageContentHolder<T extends TUIMessageBean> extends Mes
                 V2TIMManager.getInstance().getUsersInfo(idList, new V2TIMValueCallback<List<V2TIMUserFullInfo>>() {
                     @Override
                     public void onSuccess(List<V2TIMUserFullInfo> v2TIMUserFullInfos) {
+                        if (v2TIMUserFullInfos == null || v2TIMUserFullInfos.isEmpty()) {
+                            return;
+                        }
                         V2TIMUserFullInfo userInfo = v2TIMUserFullInfos.get(0);
                         String faceUrl = userInfo.getFaceUrl();
                         if (TextUtils.isEmpty(userInfo.getFaceUrl())) {
@@ -574,6 +578,7 @@ public abstract class MessageContentHolder<T extends TUIMessageBean> extends Mes
     public abstract void layoutVariableViews(final T msg, final int position);
 
     public void onRecycled() {
+        super.onRecycled();
         if (selectableTextHelper != null) {
             selectableTextHelper.destroy();
         }
@@ -588,16 +593,18 @@ public abstract class MessageContentHolder<T extends TUIMessageBean> extends Mes
     protected void setSelectableTextHelper(TUIMessageBean msg, TextView textView, int position) {
         if (selectableTextHelper != null) {
             selectableTextHelper.destroy();
+            selectableTextHelper.setTextView(textView);
+        } else {
+            selectableTextHelper = new SelectTextHelper.Builder(textView)
+                                       .setCursorHandleColor(TIMCommonService.getAppContext().getResources().getColor(R.color.font_blue))
+                                       .setCursorHandleSizeInDp(18)
+                                       .setSelectedColor(TIMCommonService.getAppContext().getResources().getColor(R.color.test_blue))
+                                       .setSelectAll(true)
+                                       .setScrollShow(false)
+                                       .setSelectedAllNoPop(true)
+                                       .setMagnifierShow(false)
+                                       .build();
         }
-        selectableTextHelper = new SelectTextHelper.Builder(textView)
-                                   .setCursorHandleColor(TIMCommonService.getAppContext().getResources().getColor(R.color.font_blue))
-                                   .setCursorHandleSizeInDp(18)
-                                   .setSelectedColor(TIMCommonService.getAppContext().getResources().getColor(R.color.test_blue))
-                                   .setSelectAll(true)
-                                   .setScrollShow(false)
-                                   .setSelectedAllNoPop(true)
-                                   .setMagnifierShow(false)
-                                   .build();
 
         selectableTextHelper.setSelectListener(new SelectTextHelper.OnSelectListener() {
             @Override
@@ -613,6 +620,7 @@ public abstract class MessageContentHolder<T extends TUIMessageBean> extends Mes
                     selectedText = content.toString();
                     msg.setSelectText(selectedText);
                     TIMCommonLog.d("TextMessageHolder", "onTextSelected selectedText = " + selectedText);
+                    SelectTextHelper.setSelected(selectableTextHelper);
                     if (onItemClickListener != null) {
                         onItemClickListener.onTextSelected(msgArea, position, msg);
                     }

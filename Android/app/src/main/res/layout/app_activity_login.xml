@@ -36,7 +36,6 @@
             android:layout_marginRight="30dp"
             android:background="@null"
             android:hint="@string/app_hint_user_id"
-            android:inputType="number"
             android:maxLength="11"
             android:maxLines="1"
             android:singleLine="true"
