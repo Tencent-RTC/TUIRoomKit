@@ -1,4 +1,4 @@
-import { isElectron } from '../../utils/environment';
+import { isElectron, isWeChat } from '../../utils/environment';
 import { IRoomService } from '../types';
 
 interface IVirtualBackground {
@@ -18,7 +18,7 @@ export class VirtualBackground implements IVirtualBackground {
 
   constructor(service: IRoomService) {
     this.service = service;
-    if (isElectron) return;
+    if (isElectron || isWeChat) return;
     this.bindEvent();
   }
 
@@ -36,7 +36,7 @@ export class VirtualBackground implements IVirtualBackground {
   }
 
   public async initVirtualBackground(): Promise<void> {
-    if (!this.virtualBackgroundPluginReady) {
+    if (!this.virtualBackgroundPluginReady && this.trtcCloud?.useVirtualBackground) {
       await this.trtcCloud.useVirtualBackground();
       this.virtualBackgroundPluginReady = true;
     }

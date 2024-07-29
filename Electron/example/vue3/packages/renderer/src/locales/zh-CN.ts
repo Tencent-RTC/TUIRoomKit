@@ -32,4 +32,6 @@ export default {
   'This action causes the room to be exited, does it continue?': '该操作会导致退出房间，是否继续？',
   'This action causes the room to be disbanded, does it continue?': '该操作会导致解散房间，是否继续？',
   'Quick Conference': '的快速会议',
+  'Please enter your full English name': '请输入您的完整英文名称',
+  'Please enter a standardised English name': '请输入符合规范的英文名称',
 };

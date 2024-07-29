@@ -2,6 +2,7 @@
   <pre-conference-view
     :user-info="userInfo"
     :room-id="givenRoomId"
+    :enable-scheduled-conference="true"
     @on-create-room="handleCreateRoom"
     @on-enter-room="handleEnterRoom"
     @on-logout="handleLogOut"

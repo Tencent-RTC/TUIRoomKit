@@ -1,5 +1,6 @@
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
 import { IRoomService } from '../types';
+import { UserInfo } from '../../stores/room';
 
 interface IUserManager {
   setSelfInfo(options: SelfInfoOptions): Promise<void>;
@@ -36,5 +37,10 @@ export class UserManager implements IUserManager {
   public async setCustomInfoForUser(options: CustomInfoForUser) {
     const roomEngine = this.service.roomEngine.instance;
     return roomEngine?.setCustomInfoForUser(options);
+  }
+
+  public getDisplayName(options: UserInfo) {
+    const { nameCard, userName, userId} = options
+    return nameCard || userName || userId
   }
 }

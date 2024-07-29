@@ -85,7 +85,7 @@ import logger from '../../../utils/common/logger';
 const { t } = useI18n();
 
 const roomStore = useRoomStore();
-const { isAudience, hasOtherScreenShare } = storeToRefs(roomStore);
+const { isAudience, hasOtherScreenShare, isGeneralUser, isScreenShareDisableForAllUser } = storeToRefs(roomStore);
 const roomEngine = useGetRoomEngine();
 
 const logPrefix = '[ScreenShareControl]';
@@ -125,6 +125,16 @@ async function toggleScreenShare() {
     });
     return;
   }
+
+  if (isGeneralUser.value && isScreenShareDisableForAllUser.value) {
+    TUIMessage({
+      type: 'warning',
+      message: t('Failed to initiate screen sharing, currently only host/admin can share screen.'),
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
+  }
+
   if (!(window as any).isHasScreen && process.platform === 'darwin') {
     showPermissionVisible.value = true;
   }

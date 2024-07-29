@@ -32,4 +32,6 @@ export default {
   'This action causes the room to be disbanded, does it continue?': 'This action causes the room to be disbanded, does it continue?',
   'This action causes the room to be exited, does it continue?': 'This action causes the room to be exited, does it continue?',
   'Quick Conference': ' \'s Quick Conference',
+  'Please enter your full English name': 'Please enter your full English name',
+  'Please enter a standardised English name': 'Please enter a standardised English name',
 };

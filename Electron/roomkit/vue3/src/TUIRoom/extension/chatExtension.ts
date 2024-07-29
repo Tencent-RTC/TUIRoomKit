@@ -195,7 +195,7 @@ export class ChatExtension {
       ...userList,
       {
         faceUrl: userInfo.avatarUrl,
-        nickName: userInfo.userName,
+        nickName: userInfo.nameCard || userInfo.userName,
         userId: userInfo.userId,
       },
     ];
