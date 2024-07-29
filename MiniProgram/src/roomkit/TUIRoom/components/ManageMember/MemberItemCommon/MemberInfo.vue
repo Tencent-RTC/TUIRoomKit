@@ -1,14 +1,9 @@
 <template>
-  <!--
-      *User base information
-      *
-      *用户基础信息
-    -->
+  <!-- User base information -->
   <div :class="[isMobile ? 'member-info-mobile' : 'member-info']">
-    <!-- 用户基础信息 -->
     <div :class="!showStateIcon && isTargetUserAdmin ? 'member-basic-info-admin' : 'member-basic-info'">
       <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
-      <div class="user-name">{{ userInfo.userName || userInfo.userId }}</div>
+      <div class="user-name">{{ roomService.getDisplayName(userInfo) }}</div>
       <div class="role-info">
         <svg-icon
           style="display: flex"
@@ -20,11 +15,7 @@
         <div :class="`user-extra-info ${isTargetUserAdmin ? 'user-extra-info-admin' : ''}`">{{ extraInfo }}</div>
       </div>
     </div>
-    <!--
-      *User audio and video status information
-      *
-      *用户音视频状态信息
-    -->
+    <!-- User audio and video status information -->
     <div v-if="showStateIcon" class="member-av-state">
       <svg-icon
         style="display: flex"
@@ -54,6 +45,7 @@ import { useI18n } from '../../../locales';
 import { isMobile } from '../../../utils/environment';
 import UserIcon from '../../../assets/icons/UserIcon.svg';
 import { TUIRole } from '@tencentcloud/tuiroom-engine-wx';
+import { roomService } from '../../../services';
 
 const { t } = useI18n();
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="invite-control-container" v-if="inviteControlConfig.visible">
+  <div v-if="inviteControlConfig.visible" class="invite-control-container">
     <icon-button
       :is-active="sidebarName === 'invite'"
       :title="t('Invite')"
@@ -29,8 +29,7 @@ const { sidebarName } = storeToRefs(basicStore);
 const { t } = useI18n();
 const isShowInviteTab = ref(false);
 const inviteRef = ref();
-const [inviteControlConfig] = roomService.getComponentConfig(['InviteControl']);
-
+const inviteControlConfig = roomService.getComponentConfig('InviteControl');
 function toggleInviteSidebar() {
   if (isMobile) {
     isShowInviteTab.value = true;

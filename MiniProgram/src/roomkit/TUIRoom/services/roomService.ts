@@ -1,41 +1,53 @@
 import mitt from 'mitt';
 import useGetRoomEngine from '../hooks/useRoomEngine';
-import { EventType, RoomInitData, RoomParam } from './types';
+import { EventType, IRoomService, RoomInitData, RoomParam } from './types';
 import {
   TUIRoomEngine,
-  TRTCVideoEncParam,
   TRTCVideoFillMode,
   TRTCVideoMirrorType,
-  TRTCVideoResolution,
   TRTCVideoRotation,
   TUIKickedOutOfRoomReason,
   TUIRole,
   TUIRoomEvents,
-  TUIRoomInfo,
-  TUIRoomType,
-  TUISeatMode,
 } from '@tencentcloud/tuiroom-engine-wx';
 import { useBasicStore } from '../stores/basic';
-import { useRoomStore } from '../stores/room';
+import { UserInfo, useRoomStore } from '../stores/room';
 import { useChatStore } from '../stores/chat';
 import useDeviceManager from '../hooks/useDeviceManager';
 import logger from '../utils/common/logger';
-import { isMobile, isWeChat } from '../utils/environment';
-import TUIRoomAegis from '../utils/aegis';
+import { isMobile } from '../utils/environment';
 import i18n from '../locales';
 import { MESSAGE_DURATION } from '../constants/message';
+import { ComponentConfig, ComponentManager, ComponentName } from './manager/componentManager';
+import { ConfigManager, LanguageOption, ThemeOption } from './manager/configManager';
+import { SelfInfoOptions, UserManager } from './manager/userManager';
+import { LifeCycleManager } from './manager/lifeCycleManager';
+import { JoinParams, RoomActionManager, StartParams } from './manager/roomActionManager';
+import { WaterMark } from './function/waterMark';
+import { VirtualBackground } from './function/virtualBackground';
+import { ScheduleConferenceManager } from './manager/scheduleConferenceManager';
+import { ErrorHandler } from './function/errorHandler';
+
 const { t } = i18n.global;
 
 const logPrefix = '[RoomService]';
 export const roomEngine = useGetRoomEngine();
-const smallParam = new TRTCVideoEncParam();
-smallParam.videoResolution = TRTCVideoResolution.TRTCVideoResolution_640_360;
-smallParam.videoFps = 10;
-smallParam.videoBitrate = 550;
-
-export class RoomService {
+export class RoomService implements IRoomService {
   static instance?: RoomService;
   private emitter = mitt();
+  public componentManager = new ComponentManager(this);
+  public configManager = new ConfigManager(this);
+  public userManager = new UserManager(this);
+  public lifeCycleManager: LifeCycleManager = new LifeCycleManager(this);
+  public roomActionManager: RoomActionManager = new RoomActionManager(this);
+  public waterMark = new WaterMark(this);
+  public virtualBackground = new VirtualBackground(this);
+  public scheduleConferenceManager: ScheduleConferenceManager = new ScheduleConferenceManager(this);
+  public errorHandler: ErrorHandler = new ErrorHandler(this);
+
+  public roomEngine = roomEngine;
+  public t = t;
+
   get basicStore() {
     return useBasicStore();
   }
@@ -48,17 +60,19 @@ export class RoomService {
     return useChatStore();
   }
 
-  public t = t;
   constructor() {
+    this.lifeCycleManager.start();
     this.initEventCtx();
     TUIRoomEngine.once('ready', () => {
       this.bindRoomEngineEvents();
-      this.handleRoomKitOnMounted();
+      this.handleRoomEngineReady();
+      this.emit(EventType.SERVICE_READY);
     });
   }
 
   private initEventCtx() {
     this.onError = this.onError.bind(this);
+    this.onRoomDismissed = this.onRoomDismissed.bind(this);
     this.onUserVoiceVolumeChanged = this.onUserVoiceVolumeChanged.bind(this);
     this.onUserNetworkQualityChanged = this.onUserNetworkQualityChanged.bind(this);
     this.onKickedOutOfRoom = this.onKickedOutOfRoom.bind(this);
@@ -67,7 +81,8 @@ export class RoomService {
     this.onKickedOffLine = this.onKickedOffLine.bind(this);
     this.onAllUserCameraDisableChanged = this.onAllUserCameraDisableChanged.bind(this);
     this.onAllUserMicrophoneDisableChanged = this.onAllUserMicrophoneDisableChanged.bind(this);
-    this.onSendMessageForAllUserDisableChanged = this.onSendMessageForAllUserDisableChanged.bind(this);
+    this.onScreenShareForAllUserDisableChanged = this.onScreenShareForAllUserDisableChanged.bind(this);
+    this.onUserInfoChanged = this.onUserInfoChanged.bind(this);
   }
 
   static getInstance(): RoomService {
@@ -79,31 +94,16 @@ export class RoomService {
 
   static destroyInstance(): void {
     if (!RoomService.instance) return;
+    RoomService.instance.lifeCycleManager.stop();
     RoomService.instance.unBindRoomEngineEvents();
+    RoomService.instance.waterMark.dispose();
+    RoomService.instance.virtualBackground.dispose();
+    RoomService.instance.scheduleConference.dispose();
     RoomService.instance = undefined;
   }
 
   public useExtension(extension: any) {
     extension._bind(this);
-  }
-
-  public getComponentConfig(names: string[]) {
-    return names.map(name => this.basicStore.componentConfig[name] || {});
-  }
-
-  public setComponentConfig(options: { [name: string]: { [key: string]: any } }) {
-    try {
-      for (const name in options) {
-        const current = options[name];
-        for (const key in current) {
-          this.basicStore.componentConfig[name][key] = current[key];
-        }
-      }
-      return true;
-    } catch (error) {
-      logger.error(error);
-      return false;
-    }
   }
 
   public getRoomContainer(): HTMLElement | Element {
@@ -116,6 +116,7 @@ export class RoomService {
 
   public bindRoomEngineEvents() {
     roomEngine.instance?.on(TUIRoomEvents.onError, this.onError);
+    roomEngine.instance?.on(TUIRoomEvents.onRoomDismissed, this.onRoomDismissed);
     roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, this.onUserVoiceVolumeChanged);
     roomEngine.instance?.on(TUIRoomEvents.onUserNetworkQualityChanged, this.onUserNetworkQualityChanged);
     roomEngine.instance?.on(TUIRoomEvents.onKickedOutOfRoom, this.onKickedOutOfRoom);
@@ -128,13 +129,15 @@ export class RoomService {
     roomEngine.instance?.on(TUIRoomEvents.onAllUserCameraDisableChanged, this.onAllUserCameraDisableChanged);
     roomEngine.instance?.on(TUIRoomEvents.onAllUserMicrophoneDisableChanged, this.onAllUserMicrophoneDisableChanged);
     roomEngine.instance?.on(
-      TUIRoomEvents.onSendMessageForAllUserDisableChanged,
-      this.onSendMessageForAllUserDisableChanged,
+      TUIRoomEvents.onScreenShareForAllUserDisableChanged,
+      this.onScreenShareForAllUserDisableChanged,
     );
+    roomEngine.instance?.on(TUIRoomEvents.onUserInfoChanged, this.onUserInfoChanged);
   }
 
   public unBindRoomEngineEvents() {
     roomEngine.instance?.off(TUIRoomEvents.onError, this.onError);
+    roomEngine.instance?.off(TUIRoomEvents.onRoomDismissed, this.onRoomDismissed);
     roomEngine.instance?.off(TUIRoomEvents.onUserVoiceVolumeChanged, this.onUserVoiceVolumeChanged);
     roomEngine.instance?.off(TUIRoomEvents.onUserNetworkQualityChanged, this.onUserNetworkQualityChanged);
     roomEngine.instance?.off(TUIRoomEvents.onKickedOutOfRoom, this.onKickedOutOfRoom);
@@ -144,22 +147,29 @@ export class RoomService {
     roomEngine.instance?.off(TUIRoomEvents.onAllUserCameraDisableChanged, this.onAllUserCameraDisableChanged);
     roomEngine.instance?.off(TUIRoomEvents.onAllUserMicrophoneDisableChanged, this.onAllUserMicrophoneDisableChanged);
     roomEngine.instance?.off(
-      TUIRoomEvents.onSendMessageForAllUserDisableChanged,
-      this.onSendMessageForAllUserDisableChanged,
+      TUIRoomEvents.onScreenShareForAllUserDisableChanged,
+      this.onScreenShareForAllUserDisableChanged,
     );
+    roomEngine.instance?.off(TUIRoomEvents.onUserInfoChanged, this.onUserInfoChanged);
   }
 
   private onError(error: any) {
     logger.error('roomEngine.onError: ', error);
-    if (error.message === 'enter trtc room failed , error code : -1') {
-      this.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
-        type: 'warning',
-        message: t('Failed to enter the meeting'),
-        callback: () => {
-          this.resetStore();
-        },
-      });
-    }
+    this.errorHandler.handleError(error, 'onError');
+  }
+
+  private onRoomDismissed(eventInfo: { roomId: string }) {
+    const { roomId } = eventInfo;
+    logger.log(`${logPrefix}onRoomDismissed:`, roomId);
+    this.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
+      title: t('Note'),
+      message: t('The host closed the room.'),
+      confirmButtonText: t('Sure'),
+      callback: async () => {
+        this.emit(EventType.ROOM_DISMISS, {});
+        this.resetStore();
+      },
+    });
   }
 
   private onUserVoiceVolumeChanged(eventInfo: { userVolumeList: [] }) {
@@ -191,7 +201,7 @@ export class RoomService {
         message: notice,
         confirmButtonText: t('Sure'),
         callback: async () => {
-          this.emit(EventType.ROOM_KICKED_OUT, { roomId, reason, message });
+          this.emit(EventType.KICKED_OUT, { roomId, reason, message });
           this.resetStore();
         },
       });
@@ -218,10 +228,10 @@ export class RoomService {
   private onUserSigExpired() {
     this.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
       title: t('Note'),
-      message: t('userSig 已过期'),
+      message: t('userSig has expired'),
       confirmButtonText: t('Sure'),
       callback: () => {
-        this.emit(EventType.ROOM_USER_SIG_EXPIRED, {});
+        this.emit(EventType.USER_SIG_EXPIRED, {});
       },
     });
   }
@@ -230,10 +240,10 @@ export class RoomService {
     const { message } = eventInfo;
     this.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
       title: t('Note'),
-      message: t('系统检测到您的账号被踢下线'),
+      message: t('The system has detected that your account has been kicked offline'),
       confirmButtonText: t('Sure'),
       callback: async () => {
-        this.emit(EventType.ROOM_KICKED_OFFLINE, { message });
+        this.emit(EventType.KICKED_OFFLINE, { message });
       },
     });
   }
@@ -261,12 +271,21 @@ export class RoomService {
      * If the host lifts the full ban on video, users does not actively turn up the user camera,
      * If the host open and does not actively turn up the user camera
      *
-     * 如果主持人解除全员禁画，不主动调起用户摄像头；如果主持人开启全员禁画，则主动关闭用户摄像头
      **/
     if (isDisableVideo && this.roomStore.localUser.userRole === TUIRole.kGeneralUser) {
       await roomEngine.instance?.closeLocalCamera();
     }
   }
+
+  private async onUserInfoChanged(eventInfo: { userInfo: UserInfo })  {
+    const { userId, nameCard } = eventInfo.userInfo;
+    const isLocal = this.roomStore.localUser.userId === userId;
+    if (isLocal) {
+      this.roomStore.setLocalUser({ nameCard });
+    } else {
+      this.roomStore.setRemoteUserNameCard(userId, nameCard as string);
+    }
+  };
 
   private async onAllUserMicrophoneDisableChanged(eventInfo: { roomId: string; isDisable: boolean }) {
     const { isDisable } = eventInfo;
@@ -280,26 +299,6 @@ export class RoomService {
     this.roomStore.setDisableMicrophoneForAllUserByAdmin(isDisable);
   }
 
-  private async onSendMessageForAllUserDisableChanged(eventInfo: { roomId: string; isDisable: boolean }) {
-    const { isDisable } = eventInfo;
-    if (
-      isDisable !== this.roomStore.isMessageDisableForAllUser
-      && this.roomStore.localUser.userRole === TUIRole.kGeneralUser
-    ) {
-      this.handleMessageStateChange(isDisable);
-    }
-    this.roomStore.setDisableMessageAllUserByAdmin(isDisable);
-  }
-
-  private async handleMessageStateChange(isDisableMessage: boolean) {
-    const tipMessage = isDisableMessage ? t('Disabling text chat for all is enabled') : t('Unblocked all text chat');
-    this.emit(EventType.ROOM_NOTICE_MESSAGE, {
-      type: 'success',
-      message: tipMessage,
-      duration: MESSAGE_DURATION.NORMAL,
-    });
-  }
-
   private async handleAudioStateChange(isDisableAudio: boolean) {
     const tipMessage = isDisableAudio ? t('All audios disabled') : t('All audios enabled');
     this.emit(EventType.ROOM_NOTICE_MESSAGE, {
@@ -311,13 +310,15 @@ export class RoomService {
      * If the moderator unmutes the entire staff, users does not actively bring up the user's microphone;
      * if the moderator turns on the full staff mute, users actively turns off the user's microphone
      *
-     * 如果主持人解除全员静音，不主动调起用户麦克风；如果主持人开启全员静音，则主动关闭用户麦克风
      **/
     if (isDisableAudio && this.roomStore.localUser.userRole === TUIRole.kGeneralUser) {
       await roomEngine.instance?.muteLocalAudio();
     }
   }
-
+  private async onScreenShareForAllUserDisableChanged(eventInfo: { roomId: string; isDisable: boolean }) {
+    const { isDisable } = eventInfo;
+    this.roomStore.setDisableScreenShareForAllUserByAdmin(isDisable);
+  }
   public resetStore() {
     this.basicStore.reset();
     this.chatStore.reset();
@@ -331,49 +332,18 @@ export class RoomService {
 
   public async initRoomKit(option: RoomInitData) {
     this.storeInit(option);
-    const { sdkAppId, userId, userSig, userName, avatarUrl } = option;
+    const { sdkAppId, userId, userSig, userName = userId, avatarUrl = '' } = option;
     await TUIRoomEngine.login({ sdkAppId, userId, userSig });
     await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
+    this.emit(EventType.ROOM_LOGIN);
   }
 
-  private async doEnterRoom(options: { roomId: string; roomType: TUIRoomType}) {
-    const { roomId, roomType } = options;
-    const isH5 = isMobile && !isWeChat;
-    const trtcCloud = roomEngine.instance?.getTRTCCloud();
-    trtcCloud?.setDefaultStreamRecvMode(true, false);
-    trtcCloud?.enableSmallVideoStream(!isH5, smallParam);
-    const roomInfo = (await roomEngine.instance?.enterRoom({
-      roomId,
-      roomType,
-    })) as TUIRoomInfo;
-    roomEngine.instance?.muteLocalAudio();
-    if (!roomInfo.isSeatEnabled) {
-      roomEngine.instance?.openLocalMicrophone();
-      this.basicStore.setIsOpenMic(true);
-    }
-    return roomInfo;
+  public async start(roomId: string, params?: StartParams) {
+    return this.roomActionManager.start(roomId, params);
   }
 
-  private async getUserList() {
-    let nextSequence = 0;
-    try {
-      do {
-        const result = await roomEngine.instance?.getUserList({ nextSequence }) as any;
-        this.roomStore.updateUserList(result.userInfoList);
-        nextSequence = result.nextSequence;
-      } while (nextSequence !== 0);
-    } catch (error: any) {
-      logger.error('TUIRoomEngine.getUserList', error.code, error.message);
-    }
-  }
-
-  private async getSeatList() {
-    try {
-      const seatList = (await roomEngine.instance?.getSeatList()) as any;
-      this.roomStore.setSeatList(seatList);
-    } catch (error: any) {
-      logger.error('TUIRoomEngine.getSeatList', error.code, error.message);
-    }
+  public async join(roomId: string, params?: JoinParams) {
+    return this.roomActionManager.join(roomId, params);
   }
 
   public async createRoom(options: {
@@ -382,110 +352,25 @@ export class RoomService {
     roomMode: 'FreeToSpeak' | 'SpeakAfterTakingSeat';
     roomParam?: RoomParam;
   }) {
-    const { roomId, roomName, roomMode, roomParam } = options;
-    try {
-      if (!roomEngine.instance) {
-        return;
-      }
-      this.basicStore.setRoomId(roomId);
-      logger.debug(`${logPrefix}createRoom:`, roomId, roomMode, roomParam);
-      const roomParams = {
-        roomId,
-        roomName,
-        roomType: TUIRoomType.kConference,
-      };
-      if (roomMode === 'FreeToSpeak') {
-        Object.assign(roomParams, {
-          isSeatEnabled: false,
-        });
-      } else {
-        Object.assign(roomParams, {
-          isSeatEnabled: true,
-          seatMode: TUISeatMode.kApplyToTake,
-        });
-      }
-      await roomEngine.instance?.createRoom(roomParams);
-      TUIRoomAegis.reportEvent({
-        name: 'createRoom',
-        ext1: 'createRoom-success',
-      });
-    } catch (error) {
-      logger.error(`${logPrefix}createRoom error:`, error);
-      this.basicStore.reset();
-      throw error;
-    }
-  }
-
-  private closeMediaBeforeLeave() {
-    if (this.roomStore.localUser.hasAudioStream) {
-      roomEngine.instance?.closeLocalMicrophone();
-    }
-    if (this.roomStore.localUser.hasVideoStream) {
-      roomEngine.instance?.closeLocalCamera();
-    }
-  }
-
-  public async leaveRoom() {
-    try {
-      this.closeMediaBeforeLeave();
-      const response = await roomEngine.instance?.exitRoom();
-      logger.log(`${logPrefix}leaveRoom:`, response);
-    } catch (error) {
-      logger.error(`${logPrefix}leaveRoom error:`, error);
-    }
-  }
-
-  public async dismissRoom() {
-    try {
-      logger.log(`${logPrefix}dismissRoom: enter`);
-      this.closeMediaBeforeLeave();
-      await roomEngine.instance?.destroyRoom();
-    } catch (error) {
-      logger.error(`${logPrefix}dismissRoom error:`, error);
-    }
+    await this.roomActionManager.createRoom(options);
   }
 
   public async enterRoom(options: { roomId: string; roomParam?: RoomParam }) {
-    const { roomId, roomParam } = options;
-    try {
-      if (!roomEngine.instance) {
-        return;
-      }
-      this.basicStore.setRoomId(roomId);
-      logger.debug(`${logPrefix}enterRoom:`, roomId, roomParam);
-      const roomParams = {
-        roomId,
-        roomType: TUIRoomType.kConference,
-      };
-      const roomInfo = await this.doEnterRoom(roomParams);
-      this.roomStore.setRoomInfo(roomInfo);
-      await this.getUserList();
-      if (roomInfo.isSeatEnabled) {
-        await this.getSeatList();
-        this.roomStore.isMaster && await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
-      }
-      /**
-       * setRoomParam must come after setRoomInfo,because roomInfo contains information
-       * about whether or not to turn on the no-mac ban.
-       *
-       * setRoomParam 必须在 setRoomInfo 之后，因为 roomInfo 中有是否开启全员禁麦禁画的信息
-       **/
-      this.roomStore.setRoomParam(roomParam);
-      TUIRoomAegis.reportEvent({
-        name: 'enterRoom',
-        ext1: 'enterRoom-success',
-      });
-    } catch (error) {
-      logger.error(`${logPrefix}enterRoom error:`, error);
-      this.basicStore.reset();
-      throw error;
-    }
+    await this.roomActionManager.enterRoom(options);
   }
 
-  public async handleRoomKitOnMounted() {
+  public async leaveRoom() {
+    await this.roomActionManager.leaveRoom();
+  }
+
+  public async dismissRoom() {
+    await this.roomActionManager.dismissRoom();
+  }
+
+  public async handleRoomEngineReady() {
     const storageCurrentTheme = uni.getStorageSync('tuiRoom-currentTheme');
     storageCurrentTheme && this.basicStore.setDefaultTheme(storageCurrentTheme);
-    // 设置本地视频默认渲染模式
+    // Set the default rendering mode of local video
     const trtcCloud = roomEngine.instance?.getTRTCCloud();
     const mirrorType = isMobile
       ? TRTCVideoMirrorType.TRTCVideoMirrorType_Auto
@@ -500,6 +385,7 @@ export class RoomService {
   }
 
   public logOut() {
+    this.emit(EventType.USER_LOGOUT);
     this.resetStore();
   }
 
@@ -514,5 +400,30 @@ export class RoomService {
   emit(eventType: EventType, data?: any) {
     this.emitter.emit(eventType, data);
   }
+
+  // Component Manager
+  public getComponentConfig(name: ComponentName) {
+    return this.componentManager.getComponentConfig(name);
+  }
+  public setComponentConfig(options: Partial<ComponentConfig>) {
+    return this.componentManager.setComponentConfig(options);
+  }
+  // Config Manager
+  public setTheme(theme: ThemeOption) {
+    return this.configManager.setTheme(theme);
+  };
+  public setLanguage(language: LanguageOption) {
+    return this.configManager.setLanguage(language);
+  }
+  // User Manager
+  setSelfInfo(options: SelfInfoOptions) {
+    return this.userManager.setSelfInfo(options);
+  }
+
+  getDisplayName(options: UserInfo) {
+    return this.userManager.getDisplayName(options);
+  }
 }
+
+
 export const roomService = RoomService.getInstance();

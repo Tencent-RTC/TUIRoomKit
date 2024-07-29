@@ -1,9 +1,9 @@
 
 
 /**
- * 防抖函数
- * @param {*} fn 要执行的函数
- * @param {*} delay 间隔时间
+ * debounce function
+ * @param {*} fn Functions to execute
+ * @param {*} delay Interval time
  * @returns function
  */
 export function debounce(fn: { apply: (arg0: any, arg1: any) => void; }, delay: number | undefined) {
@@ -20,9 +20,9 @@ export function debounce(fn: { apply: (arg0: any, arg1: any) => void; }, delay: 
 }
 
 /**
- * 节流函数
- * @param {*} fn 要执行的函数
- * @param {*} delay 间隔时间
+ * throttle function
+ * @param {*} fn Functions to execute
+ * @param {*} delay Interval time
  * @returns function
  */
 export function throttle(fn: { apply: (arg0: any, arg1: any[]) => void; }, delay: number) {
@@ -38,11 +38,11 @@ export function throttle(fn: { apply: (arg0: any, arg1: any[]) => void; }, delay
 };
 
 /**
- * 将 dom 元素全屏
- * @param {dom} element dom元素
+ * Make the dom element fullscreen
+ * @param {dom} element dom element
  * @example
- * setFullscreen(document?.documentElement) // 整个页面进入全屏
- * setFullscreen(document?.getElementById("id")) // 某个元素进入全屏
+ * setFullscreen(document?.documentElement) // The entire page goes full screen
+ * setFullscreen(document?.getElementById("id")) // An element goes full screen
  */
 export function setFullScreen(element: HTMLElement) {
   const fullScreenElement = element as HTMLElement & {
@@ -52,20 +52,17 @@ export function setFullScreen(element: HTMLElement) {
   };
   if (fullScreenElement?.requestFullscreen) {
     fullScreenElement?.requestFullscreen();
-    // 兼容Firefox
   } else if (fullScreenElement?.mozRequestFullScreen) {
     fullScreenElement?.mozRequestFullScreen();
-    // 兼容 chrome，safari,opera等
   } else if (fullScreenElement?.webkitRequestFullScreen) {
     fullScreenElement?.webkitRequestFullScreen();
-    // 兼容IE/Edge
   } else if (fullScreenElement?.msRequestFullscreen) {
     fullScreenElement?.msRequestFullscreen();
   }
 }
 
 /**
- * 退出全屏
+ * exitFullscreen
  * @example
  * exitFullscreen();
  */
@@ -92,9 +89,9 @@ export function exitFullScreen() {
 
 
 /**
- * 从 window?.location?.href 中获取指定key的value
- * @param {*} key 要获取的 key
- * @returns window?.location?.href 中指定key对应的value
+ * Get the value of the specified key from window?.location?.href
+ * @param {*} key The key to get
+ * @returns The value corresponding to the key specified in window?.location?.href.
  * @example
  * const value = getUrlParam(key);
  */
@@ -108,9 +105,9 @@ export function getUrlParam(key: string) {
 
 
 /**
- * 深拷贝
- * @param data 任意类型的 data 原数据
- * @returns 深拷贝之后的数据
+ * deepClone
+ * @param data Raw data of any type
+ * @returns Data after deepClone
  */
 export function deepClone(data: any) {
   let res: any = null;
@@ -148,4 +145,46 @@ export function addSuffix(value: string | number, suffix = 'px') {
     return value + suffix;
   }
   return value;
+}
+
+export function getUrlWithRoomId(roomId: string): string {
+  const currentUrl = window?.location?.href;
+  const urlObj = new URL(currentUrl);
+  const params = new URLSearchParams(urlObj.search);
+  if (params.has('roomId')) {
+    params.delete('roomId');
+  }
+  params.append('roomId', roomId);
+  return `${urlObj.origin + urlObj.pathname + '#/home?' + params.toString()}`; 
+}
+
+export function calculateByteLength(str: string) {
+  let byteLength = 0;
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    if (code <= 0x7f) {
+      byteLength += 1;
+    } else if (code <= 0x7ff) {
+      byteLength += 2;
+    } else if (code <= 0xffff) {
+      byteLength += 3;
+    } else {
+      byteLength += 4;
+    }
+  }
+  return byteLength;
+}
+
+
+export function objectMerge(...args: any[]) {
+  return args.reduce((acc, cur) => {
+    Object.keys(cur).forEach((key) => {
+      if (acc[key] && typeof acc[key] === 'object') {
+        acc[key] = objectMerge(acc[key], cur[key]);
+      } else {
+        acc[key] = cur[key];
+      }
+    });
+    return acc;
+  }, {});
 }

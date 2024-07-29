@@ -5,13 +5,6 @@
   * @param isDisabled boolean Whether the audio is disabled or not
   * Usage:
   * Use <audio-media-control /> in the template
-  *
-  * 名称: AudioMediaControl 音频媒体操作组件（开关麦克风）
-  * @param hasMore boolean 是否展示【更多】icon, 可以切换麦克风和扬声器
-  * @param isMuted boolean 音频是否被静音状态
-  * @param isDisabled boolean 音频是否 disabled 状态
-  * 使用方式：
-  * 在 template 中使用 <audio-media-control />
 -->
 <template>
   <div>

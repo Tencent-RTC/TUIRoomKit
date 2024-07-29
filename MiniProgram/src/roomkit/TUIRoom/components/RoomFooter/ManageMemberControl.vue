@@ -1,5 +1,5 @@
 <template>
-  <div class="manage-member-control-container">
+  <div v-if="manageMemberControlConfig.visible" class="manage-member-control-container">
     <icon-button
       :is-active="sidebarName === 'manage-member'"
       :title="memberTitle"
@@ -18,7 +18,9 @@ import { useBasicStore } from '../../stores/basic';
 import { useRoomStore } from '../../stores/room';
 import { useI18n } from '../../locales';
 import { computed } from 'vue';
+import { roomService } from '../../services';
 
+const manageMemberControlConfig = roomService.getComponentConfig('ManageMemberControl');
 const { t } = useI18n();
 
 const basicStore = useBasicStore();

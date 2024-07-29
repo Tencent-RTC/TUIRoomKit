@@ -6,10 +6,7 @@
         <switch-mirror />
       </div>
       <room-info />
-      <end-control
-        @on-destroy-room="onDestroyRoom"
-        @on-exit-room="onExitRoom"
-      />
+      <end-control />
     </div>
     <switch-theme :visible="false"></switch-theme>
   </div>
@@ -19,20 +16,7 @@ import EndControl from '../../RoomFooter/EndControl/index.vue';
 import SwitchCamera from './SwitchCamera.vue';
 import SwitchMirror from './SwitchMirror.vue';
 import RoomInfo from '../RoomInfo/index.vue';
-import TUIRoomAegis from '../../../utils/aegis';
 import SwitchTheme from '../../common/SwitchTheme.vue';
-
-const emit = defineEmits(['log-out', 'on-destroy-room', 'on-exit-room']);
-
-const onDestroyRoom = (info: { code: number; message: string }) => {
-  emit('on-destroy-room', info);
-  TUIRoomAegis.reportEvent({ name: 'destroyRoom', ext1: 'destroyRoom-success' });
-};
-
-const onExitRoom = (info: { code: number; message: string }) => {
-  emit('on-exit-room', info);
-  TUIRoomAegis.reportEvent({ name: 'exitRoom', ext1: 'exitRoom-success' });
-};
 
 </script>
 <style scoped>

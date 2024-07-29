@@ -1,5 +1,5 @@
 <template>
-  <div ref="userInfoRef" class="user-info-container">
+  <div v-if="userInfoConfig.visible" ref="userInfoRef" class="user-info-container">
     <div @tap="handleUserControl" class="user-info-content">
       <Avatar class="avatar" :img-src="avatarUrl"></Avatar>
       <div class="name">{{ userName || userId }}</div>
@@ -8,7 +8,7 @@
     <div v-if="showUserControl" class="user-control-container">
       <div class="logout-mobile">
         <div class="logout-mobile-main">
-          <div class="logout" @tap="() => $emit('log-out')">
+          <div @tap="() => $emit('log-out')" class="logout">
             <i> {{ t('Log out') }}</i>
           </div>
           <div class="close" @click.stop="showUserControl = false">
@@ -22,6 +22,10 @@
 <script setup lang="ts">
 import Avatar from '../../common/Avatar.vue';
 import useUserInfo from './useUserInfoHooks';
+import { roomService } from '../../../services';
+
+const userInfoConfig = roomService.getComponentConfig('UserInfo');
+
 const {
   userInfoRef,
   showUserControl,

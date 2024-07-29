@@ -208,16 +208,24 @@ function handleDocumentClick(event: MouseEvent) {
 
 function handleRoomOption(type:string) {
   emit('update-user-name', currentUserName.value);
+  const roomParam = getRoomParam();
   switch (type) {
     case 'Join':
       if (!roomId.value) {
         TUIMessage({ type: 'error', message: t('Please enter the room number') });
         return;
       }
-      emit('enter-room', String(roomId.value));
+      emit('enter-room', {
+        roomId: String(roomId.value),
+        roomParam,
+      });
       break;
     case 'New':
-      emit('create-room', mode.value);
+      emit('create-room', {
+        roomMode: mode.value,
+        roomParam,
+        isSeatEnabled: Boolean(mode.value === 'SpeakAfterTakingSeat'),
+      });
       break;
     default:
       break;

@@ -1,6 +1,4 @@
-// 举手发言逻辑
-// 主持人：同意/拒绝用户的申请发言，踢人下麦，邀请用户上麦，取消邀请用户上麦
-
+// Raise hands to speak logic
 import { onBeforeUnmount, computed, watch } from 'vue';
 import { TUIRoomEngine, TUIRoomEvents, TUIRequestAction, TUIRequest, TUIRequestCallbackType, TUIErrorCode } from '@tencentcloud/tuiroom-engine-wx';
 import useGetRoomEngine from './useRoomEngine';
@@ -26,30 +24,30 @@ export default function () {
   const applyToAnchorUserIdList = computed(() => applyToAnchorList.value.map(item => item.userId));
   const applyToAnchorUserCount = computed(() => applyToAnchorList.value.length);
 
-  // ------ 以下处理普通用户操作 ---------
+  // ------ The following handles common user operations ---------
 
-  // new: 收到来自用户的上麦申请
+  // new: Receive an application from a user
   function onRequestReceived(eventInfo: { request: TUIRequest }) {
     const { requestAction, requestId, userId, timestamp } = eventInfo.request;
     if (requestAction === TUIRequestAction.kRequestToTakeSeat) {
-      // 用户申请上麦
+      // User application for stage
       userId && roomStore.addApplyToAnchorUser({ userId, requestId, timestamp });
     }
   }
 
-  // 远端用户取消上麦申请
+  // The remote user cancels the application to connect to the stage
   function onRequestCancelled(eventInfo: { requestId: string, userId: string }) {
     const { requestId } = eventInfo;
     roomStore.removeApplyToAnchorUser(requestId);
   }
 
-  // 远端用户的请求被其他 管理员/房主 处理事件
+  // The remote user's request is handled by other administrators/hosts.
   function onRequestProcessed(eventInfo: { requestId: string, userId: string }) {
     const { requestId } = eventInfo;
     roomStore.removeApplyToAnchorUser(requestId);
   }
 
-  // 处理用户请求
+  // Handle user requests
   async function handleUserApply(applyUserId: string, agree: boolean) {
     try {
       // TUIRoomCore.replySpeechApplication(applyUserId, agree);
@@ -62,7 +60,7 @@ export default function () {
         });
         roomStore.removeApplyToAnchorUser(requestId);
       } else {
-        logger.warn('处理上台申请失败，数据异常，请重试！', userInfo);
+        logger.warn('Failed to process the stage application. The data is abnormal. Please try again！', userInfo);
       }
     } catch (error: any) {
       if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
@@ -73,7 +71,7 @@ export default function () {
     }
   }
 
-  // 同意用户上台
+  // agree user to stage
   async function agreeUserOnStage(userInfo: UserInfo) {
     try {
       const requestId = userInfo.applyToAnchorRequestId;
@@ -81,7 +79,7 @@ export default function () {
         await roomEngine.instance?.responseRemoteRequest({ requestId, agree: true });
         roomStore.removeApplyToAnchorUser(requestId);
       } else {
-        logger.warn('同意上台申请失败，数据异常，请重试！', userInfo);
+        logger.warn('Failed to process the stage application. The data is abnormal. Please try again！', userInfo);
       }
     } catch (error: any) {
       if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
@@ -92,7 +90,7 @@ export default function () {
     }
   }
 
-  // 拒绝用户上台
+  // reject user to stage
   async function denyUserOnStage(userInfo: UserInfo) {
     const requestId = userInfo.applyToAnchorRequestId;
     if (requestId) {
@@ -102,21 +100,21 @@ export default function () {
       });
       roomStore.removeApplyToAnchorUser(requestId);
     } else {
-      logger.warn('拒绝上台申请失败，数据异常，请重试！', userInfo);
+      logger.warn('Failed to process the stage application. The data is abnormal. Please try again！', userInfo);
     }
   }
 
-  // 处理全部用户上麦请求
+  // Process all users’ requests to access the microphone
   async function handleAllUserApply(isAgreeOrRejectAllUserApply: boolean) {
     let hasErrorOccurred = false;
     const applyUserList = applyToAnchorList.value.map(item => ({
       userId: item.userId,
-      userName: item.userName,
+      userName: item.nameCard || item.userName,
       applyToAnchorRequestId: item.applyToAnchorRequestId,
     }));
-    for (const { userId, userName, applyToAnchorRequestId } of applyUserList) {
+    for (const { applyToAnchorRequestId } of applyUserList) {
       const action = isAgreeOrRejectAllUserApply ? 'Agree' : 'Reject';
-      const actionFailedMessage = `${action} ${userName || userId} 上台申请失败，请重试！`;
+      const actionFailedMessage = `${action} sb on stage failed, please retry`;
       try {
         if (applyToAnchorRequestId) {
           await roomEngine.instance?.responseRemoteRequest({
@@ -151,9 +149,9 @@ export default function () {
     roomEngine.instance?.off(TUIRoomEvents.onRequestProcessed, onRequestProcessed);
   });
 
-  // --------- 以下处理主持人主动操作 ----------
+  // --------- The following handles the moderator’s active operations ----------
 
-  // 邀请用户上台
+  // Invite users to the stage
   async function inviteUserOnStage(userInfo: UserInfo) {
     const { userId } = userInfo;
     const request = await roomEngine.instance?.takeUserOnSeatByAdmin({
@@ -207,7 +205,7 @@ export default function () {
     }
   }
 
-  // 取消邀请用户上台
+  // Cancel invite users to the stage
   function cancelInviteUserOnStage(userInfo: UserInfo) {
     const { userId, inviteToAnchorRequestId } = userInfo;
     roomStore.removeInviteToAnchorUser(userId);
@@ -216,7 +214,7 @@ export default function () {
     }
   }
 
-  // 邀请下台
+  // Invite to step down
   function kickUserOffStage(userInfo: UserInfo) {
     roomEngine.instance?.kickUserOffSeatByAdmin({
       seatIndex: -1,
@@ -260,7 +258,7 @@ export default function () {
       const onlyOneUserTakeStage = newVal.length === 1;
       const firstUser = applyToAnchorList.value[0];
       const lastIndex = applyToAnchorList.value.length - 1;
-      const userName = applyToAnchorList.value[lastIndex]?.userName || applyToAnchorList.value[lastIndex]?.userId;
+      const userName = applyToAnchorList.value[lastIndex]?.nameCard || applyToAnchorList.value[lastIndex]?.userName || applyToAnchorList.value[lastIndex]?.userId;
       const message = onlyOneUserTakeStage
         ? `${userName} ${t('Applying for the stage')}`
         : `${userName} ${t('and so on number people applying to stage', { number: applyToAnchorList.value.length })}`;
@@ -279,19 +277,19 @@ export default function () {
     hideApplyList,
     applyToAnchorUserCount,
     applyToAnchorList,
-    // 处理用户上麦申请（同意/拒绝）
+    // Process the user's application for accessing the stage (agree/reject)
     handleUserApply,
-    // 同意普通用户上台
+    // Allow ordinary users to take the stage
     agreeUserOnStage,
-    // 拒绝普通用户上台
+    // Reject ordinary users to take the stage
     denyUserOnStage,
-    // 邀请用户上台
+    // Invite users to the stage
     inviteUserOnStage,
-    // 取消邀请用户上台
+    // Cancel invite users to the stage
     cancelInviteUserOnStage,
-    // 将用户踢下麦
+    // Kick the user off the stage
     kickUserOffStage,
-    // 处理所有用户请求
+    // Handle all user requests
     handleAllUserApply,
     handleShowNotification,
   };

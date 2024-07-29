@@ -80,8 +80,9 @@ export default function useMessageList() {
     if (!options || !options.data) {
       return;
     }
+    const currentConversationId = `GROUP${roomId.value}`
     options.data.forEach((message: any) => {
-      if (message.type !== TencentCloudChat.TYPES.MSG_TEXT) {
+      if (message.conversationID !== currentConversationId || message.type !== TencentCloudChat.TYPES.MSG_TEXT) {
         return;
       }
       const { ID, payload: { text }, nick: userName, from: userId } = message;
