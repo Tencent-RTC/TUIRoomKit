@@ -5,6 +5,7 @@ import { conference, RoomEvent, FeatureButton } from './conference';
 import RoomMessageCard from './extension/RoomMessageCard/RoomMessageCard.vue';
 import { roomService } from './services';
 export * from './components/common/base/index';
+export * from './services/manager/scheduleConferenceManager';
 export {
   ConferenceMainView,
   PreConferenceView,

@@ -104,9 +104,9 @@ const isScreenStream = computed(() => props.stream.streamType === TUIVideoStream
 
 const userInfo = computed(() => {
   if (isInnerScene) {
-    return `${props.stream.userName} | ${props.stream.userId}` || props.stream.userId;
+    return `${props.stream.nameCard || props.stream.userName} | ${props.stream.userId}`;
   }
-  return props.stream.userName || props.stream.userId;
+  return props.stream.nameCard || props.stream.userName || props.stream.userId;
 });
 
 onMounted(() => {
@@ -141,6 +141,12 @@ onMounted(() => {
               fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
             });
           }
+        }
+      } else {
+        if (basicStore.userId === props.stream.userId && props.stream.streamType === TUIVideoStreamType.kCameraStream) {
+          await roomEngine.instance?.setLocalVideoView({
+            view: null,
+          });
         }
       }
     },

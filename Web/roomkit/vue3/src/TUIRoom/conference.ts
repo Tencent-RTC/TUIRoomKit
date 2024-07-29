@@ -63,6 +63,8 @@ interface IConference {
   enableVirtualBackground: () => void;
 
   hideFeatureButton: (name: FeatureButton) => void;
+
+  replaceFriendList: (userList: Array<any>) => void;
 }
 class Conference implements IConference {
   public login(params: {
@@ -143,6 +145,10 @@ class Conference implements IConference {
 
   public hideFeatureButton(name: FeatureButton) {
     roomService.setComponentConfig({ [name]: { visible: false } });
+  }
+
+  public replaceFriendList(userList: Array<any>) {
+    return roomService.scheduleConferenceManager.replaceFriendList(userList);
   }
 }
 

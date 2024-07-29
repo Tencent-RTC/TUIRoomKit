@@ -24,7 +24,7 @@
           :enlarge-dom-id="enlargeDomId"
           class="single-stream"
           :style="streamStyle"
-          @room_dblclick="handleEnlargeStreamRegion(stream)"
+          @room-dblclick="handleEnlargeStreamRegion(stream)"
         ></stream-region>
       </div>
     </div>
@@ -65,6 +65,7 @@ import { useBasicStore } from '../../../stores/basic';
 import { LAYOUT } from '../../../constants/render';
 import StreamRegion from '../StreamRegion';
 import TUIMessage from '../../common/base/Message/index';
+import TUIMessageBox from '../../common/base/MessageBox/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { debounce } from '../../../utils/utils';
 import logger from '../../../utils/common/logger';
@@ -510,10 +511,10 @@ const onUserVideoStateChanged = (eventInfo: {
     }
     // Host turns off screen sharing
     if (streamType === TUIVideoStreamType.kScreenStream) {
-      TUIMessage({
-        type: 'warning',
-        message: t('The host has turned off your screen sharing'),
-        duration: MESSAGE_DURATION.NORMAL,
+      TUIMessageBox({
+        title: t('Your screen sharing has been stopped'),
+        message: t('Your screen sharing has been stopped, Now only the host/admin can share the screen'),
+        confirmButtonText: t('I got it'),
       });
     }
   }
@@ -577,10 +578,10 @@ const handleLargeStreamLeave = () => {
 
 // Handle lazy loading of videos in sidebar & top bar
 const handleStreamContainerScroll = async () => {
-  const childDom = streamListRef.value.children[0];
   // Add nextTick to handle the problem of new users triggering scroll in top bar mode,
   // but the obtained streamListRef.value.offsetWidth has not been updated yet.
   await nextTick();
+  const childDom = streamListRef.value.children[0];
 
   // From which number
   let index = 0;

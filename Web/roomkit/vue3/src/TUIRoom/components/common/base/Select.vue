@@ -8,9 +8,14 @@
       :class="['select-content', { 'disabled': disabled }]"
       @click="handleClickSelect"
     >
-      <span class="select-text">
-        {{ selectedLabel || selectedValue }}
-      </span>
+      <template v-if="$slots.customSelectContent">
+        <slot name="customSelectContent"></slot>
+      </template>
+      <template v-else>
+        <span class="select-text" :style="props.customSelectContentStyle">
+          {{ selectedLabel || selectedValue }}
+        </span>
+      </template>
       <svg-icon
         :class="['arrow-icon', { 'reverse': showSelectDropdown }]"
         :icon="ArrowStrokeSelectDownIcon"
@@ -30,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, provide, computed, reactive, watch } from 'vue';
+import { ref, provide, computed, reactive, watch, StyleValue } from 'vue';
 import SvgIcon from './SvgIcon.vue';
 import ArrowStrokeSelectDownIcon from '../icons/ArrowStrokeSelectDownIcon.vue';
 import useZIndex from '../../../hooks/useZIndex';
@@ -43,6 +48,7 @@ interface Props {
   modelValue: string | number | boolean | object,
   disabled?: boolean,
   theme?: 'white' | 'black',
+  customSelectContentStyle?: StyleValue,
 }
 
 const props = defineProps<Props>();
@@ -53,18 +59,16 @@ const showSelectDropdown = ref(false);
 const optionObj = ref(new Map());
 const optionDataList = computed(() => Array.from(optionObj.value.values()));
 const selectedLabel = ref('');
-const selectedValue = ref(props.modelValue);
 const selectContainerRef = ref();
 const selectDropDownRef = ref();
 const dropDirection = ref('down');
 const themeClass = computed(() => (props.theme ? `tui-theme-${props.theme}` : ''));
 
 watch(() => props.modelValue, (val) => {
-  selectedValue.value = val;
   if (optionObj.value.get(val)) {
     selectedLabel.value = optionObj.value.get(props.modelValue).label;
   }
-});
+}, { immediate: true });
 
 watch(optionDataList, () => {
   if (optionObj.value.get(props.modelValue)) {
@@ -88,14 +92,12 @@ function onOptionDestroyed(value: string | number | boolean | object) {
 }
 
 function onOptionSelected(option: OptionData) {
-  selectedValue.value = option.value;
   showSelectDropdown.value = false;
   emits('update:modelValue', option.value);
+  emits('change', option.value);
 }
 
-watch(selectedValue, (val) => {
-  emits('change', val);
-});
+const selectedValue = computed(() => props.modelValue);
 
 provide('select', reactive({
   selectedValue,
@@ -116,6 +118,7 @@ function handleClickSelect() {
     handleDropDownPosition();
     dropDownStyle.value = { zIndex: nextZIndex() };
     showSelectDropdown.value = true;
+    optionObj.value.get(props.modelValue).ref.scrollIntoView({ block: 'center' });
   }
 }
 
@@ -149,6 +152,7 @@ function handleClickOutside() {
 
 .select-container {
   position: relative;
+  height: 100%;
   .select-content {
     box-sizing: border-box;
     position: relative;
@@ -156,10 +160,11 @@ function handleClickOutside() {
     background-color: var(--background-color-7);
     color: var(--font-color-3);
     border-radius: 8px;
-    height: 42px;
-    padding: 10px 16px;
+    padding: 0px 16px;
     cursor: pointer;
     display: flex;
+    align-items: center;
+    height: 42px;
     &.disabled {
       background-color: rgba(255, 255, 255, 0.50);
       color: #8F9AB2;
