@@ -16,12 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
+import com.tencent.qcloud.tuicore.interfaces.TUICallback;
 import com.tencent.qcloud.tuicore.interfaces.TUIExtensionEventListener;
 import com.tencent.qcloud.tuicore.interfaces.TUIExtensionInfo;
 import com.tencent.qcloud.tuicore.interfaces.TUIValueCallback;
 import com.tencent.qcloud.tuicore.util.ErrorMessageConverter;
 import com.tencent.qcloud.tuicore.util.ToastUtil;
 import com.tencent.qcloud.tuikit.timcommon.bean.TUIMessageBean;
+import com.tencent.qcloud.tuikit.timcommon.classicui.widget.message.SelectTextHelper;
 import com.tencent.qcloud.tuikit.timcommon.component.CustomLinearLayoutManager;
 import com.tencent.qcloud.tuikit.timcommon.component.MessageProperties;
 import com.tencent.qcloud.tuikit.timcommon.component.dialog.TUIKitDialog;
@@ -47,6 +49,7 @@ import com.tencent.qcloud.tuikit.tuichat.interfaces.OnEmptySpaceClickListener;
 import com.tencent.qcloud.tuikit.tuichat.interfaces.OnGestureScrollListener;
 import com.tencent.qcloud.tuikit.tuichat.presenter.ChatFileDownloadPresenter;
 import com.tencent.qcloud.tuikit.tuichat.presenter.ChatPresenter;
+import com.tencent.qcloud.tuikit.tuichat.presenter.GroupChatPresenter;
 import com.tencent.qcloud.tuikit.tuichat.util.TUIChatLog;
 import com.tencent.qcloud.tuikit.tuichat.util.TUIChatUtils;
 import java.util.ArrayList;
@@ -60,7 +63,6 @@ import java.util.Set;
 public class MessageRecyclerView extends RecyclerView implements IMessageRecyclerView, IMessageLayout {
     private static final String TAG = MessageRecyclerView.class.getSimpleName();
 
-    
     // Take a large enough offset to scroll to the bottom at one time
     private static final int SCROLL_TO_END_OFFSET = -999999;
     private static final int SOUND_PLAY_DELAYED = 500;
@@ -79,9 +81,7 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
     private TUIValueCallback downloadSoundCallback;
     private ChatPresenter presenter;
 
-    private int mSelectedPosition = -1;
     private ChatPopMenu mChatPopMenu;
-
     private final Handler soundPlayHandler = new Handler();
 
     public MessageRecyclerView(Context context) {
@@ -115,6 +115,17 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
             animator.setSupportsChangeAnimations(false);
         }
         setClickEmptySpaceEvent();
+        addOnLayoutChangeListener(new OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                // When the view above the message list expands, scroll down the corresponding distance.
+                int oldHeight = oldBottom - oldTop;
+                int newHeight = bottom - top;
+                if (oldHeight != 0 && oldHeight > newHeight && oldTop < top) {
+                    scrollBy(0, oldHeight - newHeight);
+                }
+            }
+        });
     }
 
     // Always return last visible item for laying out other items from tail to head.
@@ -172,14 +183,6 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
         });
     }
 
-    public void setSelectedPosition(int position) {
-        this.mSelectedPosition = position;
-    }
-
-    public int getSelectedPosition() {
-        return mSelectedPosition;
-    }
-
     public void showItemPopMenu(final TUIMessageBean messageInfo, View view) {
         initPopActions(messageInfo);
 
@@ -197,9 +200,7 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
         mChatPopMenu.setEmptySpaceClickListener(new OnEmptySpaceClickListener() {
             @Override
             public void onClick() {
-                if (mAdapter != null) {
-                    mAdapter.resetSelectableText();
-                }
+                SelectTextHelper.resetSelected();
             }
         });
         mChatPopMenu.show(view, location[1]);
@@ -259,6 +260,7 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
         ChatPopMenu.ChatPopMenuAction replyAction = null;
         ChatPopMenu.ChatPopMenuAction revokeAction = null;
         ChatPopMenu.ChatPopMenuAction deleteAction = null;
+        ChatPopMenu.ChatPopMenuAction groupPinAction = null;
         boolean textIsAllSelected = true;
         if (msg instanceof TextMessageBean || msg instanceof QuoteMessageBean) {
             String selectText = msg.getSelectText();
@@ -333,6 +335,51 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
             }
         }
 
+        if (presenter instanceof GroupChatPresenter && TUIChatConfigs.getGeneralConfig().isEnableGroupChatPinMessage()
+            && ((GroupChatPresenter) presenter).canPinnedMessage() && msg.getStatus() != TUIMessageBean.MSG_STATUS_SEND_FAIL
+            && msg.getStatus() != TUIMessageBean.MSG_STATUS_SENDING) {
+            groupPinAction = new ChatPopMenu.ChatPopMenuAction();
+            if (((GroupChatPresenter) presenter).isMessagePinned(msg.getId())) {
+                groupPinAction.setActionName(getContext().getResources().getString(R.string.chat_group_unpin_message));
+                groupPinAction.setActionIcon(R.drawable.chat_pop_menu_cancel_pin);
+                groupPinAction.setActionClickListener(new ChatPopMenu.ChatPopMenuAction.OnClickListener() {
+                    @Override
+                    public void onClick() {
+                        ((GroupChatPresenter) presenter).unpinnedMessage(msg, new TUICallback() {
+                            @Override
+                            public void onSuccess() {
+                                // do nothing
+                            }
+
+                            @Override
+                            public void onError(int errorCode, String errorMessage) {
+                                ToastUtil.toastShortMessage(errorMessage);
+                            }
+                        });
+                    }
+                });
+            } else {
+                groupPinAction.setActionName(getContext().getResources().getString(R.string.chat_group_pin_message));
+                groupPinAction.setActionIcon(R.drawable.chat_pop_menu_pin);
+                groupPinAction.setActionClickListener(new ChatPopMenu.ChatPopMenuAction.OnClickListener() {
+                    @Override
+                    public void onClick() {
+                        ((GroupChatPresenter) presenter).pinnedMessage(msg, new TUICallback() {
+                            @Override
+                            public void onSuccess() {
+                                // do nothing
+                            }
+
+                            @Override
+                            public void onError(int errorCode, String errorMessage) {
+                                ToastUtil.toastShortMessage(errorMessage);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
         if (speakerModeSwitchAction != null) {
             speakerModeSwitchAction.setPriority(11000);
             mPopActions.add(speakerModeSwitchAction);
@@ -356,6 +403,10 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
         if (deleteAction != null) {
             deleteAction.setPriority(4000);
             mPopActions.add(deleteAction);
+        }
+        if (groupPinAction != null) {
+            groupPinAction.setPriority(3000);
+            mPopActions.add(groupPinAction);
         }
 
         if (isDefaultMessage(msg)) {
@@ -443,16 +494,6 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
         if (getAdapter() != null && position < getAdapter().getItemCount()) {
             super.smoothScrollToPosition(position);
         }
-    }
-
-    public void setHighShowPosition(int position) {
-        if (mAdapter != null) {
-            mAdapter.setHighShowPosition(position);
-        }
-    }
-
-    public OnLoadMoreHandler getLoadMoreHandler() {
-        return mHandler;
     }
 
     public void setLoadMoreMessageHandler(OnLoadMoreHandler mHandler) {
@@ -549,7 +590,7 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
                 if (messageBean instanceof ReplyMessageBean) {
                     showRootMessageReplyDetail(((ReplyMessageBean) messageBean).getMsgRootId());
                 } else if (messageBean instanceof QuoteMessageBean) {
-                    locateOriginMessage(((QuoteMessageBean) messageBean).getOriginMsgId());
+                    presenter.locateQuoteOriginMessage((QuoteMessageBean) messageBean);
                 }
             }
 
@@ -586,9 +627,7 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
                 if (TUIChatUtils.chatEventOnMessageLongClicked(view, messageInfo)) {
                     return;
                 }
-                if (mOnItemClickListener != null) {
-                    mOnItemClickListener.onTextSelected(view, position, messageInfo);
-                }
+                showItemPopMenu(messageInfo, view);
             }
         });
     }
@@ -646,10 +685,12 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
     }
 
     private void updateMessageView(TUIMessageBean messageBean) {
-        Adapter adapter = getAdapter();
-        if (adapter instanceof MessageAdapter) {
-            ((MessageAdapter) adapter).onViewNeedRefresh(DATA_CHANGE_TYPE_UPDATE, messageBean);
-        }
+        ThreadUtils.runOnUiThread(() -> {
+            Adapter adapter = getAdapter();
+            if (adapter instanceof MessageAdapter) {
+                ((MessageAdapter) adapter).onViewNeedRefresh(DATA_CHANGE_TYPE_UPDATE, messageBean);
+            }
+        });
     }
 
     private void getSound(final SoundMessageBean messageBean) {
@@ -673,21 +714,6 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
         ChatFileDownloadPresenter.downloadSound(messageBean, downloadSoundCallback);
     }
 
-    private void locateOriginMessage(String originMsgId) {
-        if (TextUtils.isEmpty(originMsgId)) {
-            ToastUtil.toastShortMessage(getContext().getString(R.string.locate_origin_msg_failed_tip));
-            return;
-        }
-        presenter.locateMessage(originMsgId, new IUIKitCallback<Void>() {
-            @Override
-            public void onSuccess(Void data) {}
-
-            @Override
-            public void onError(String module, int errCode, String errMsg) {
-                ToastUtil.toastShortMessage(getContext().getString(R.string.locate_origin_msg_failed_tip));
-            }
-        });
-    }
 
     private void showRootMessageReplyDetail(TUIMessageBean messageBean) {
         if (presenter.getChatInfo() == null) {
@@ -704,25 +730,34 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
         if (presenter.getChatInfo() == null) {
             return;
         }
-        presenter.findMessage(rootMessageId, new IUIKitCallback<TUIMessageBean>() {
-            @Override
-            public void onSuccess(TUIMessageBean data) {
-                if (data.getStatus() == TUIMessageBean.MSG_STATUS_REVOKE) {
-                    ToastUtil.toastShortMessage(getContext().getString(R.string.locate_origin_msg_failed_tip));
-                    return;
+        TUIMessageBean messageBean = presenter.getLoadedMessage(rootMessageId);
+        if (messageBean != null) {
+            showMessageReplyDetail(messageBean);
+        } else {
+            presenter.findMessage(rootMessageId, new IUIKitCallback<TUIMessageBean>() {
+                @Override
+                public void onSuccess(TUIMessageBean data) {
+                    showMessageReplyDetail(data);
                 }
-                Intent intent = new Intent(getContext(), MessageReplyDetailActivity.class);
-                intent.putExtra(TUIChatConstants.MESSAGE_BEAN, data);
-                intent.putExtra(TUIChatConstants.CHAT_INFO, presenter.getChatInfo());
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getContext().startActivity(intent);
-            }
 
-            @Override
-            public void onError(String module, int errCode, String errMsg) {
-                ToastUtil.toastShortMessage(getContext().getString(R.string.locate_origin_msg_failed_tip) + " code = " + errCode + " message = " + errMsg);
-            }
-        });
+                @Override
+                public void onError(String module, int errCode, String errMsg) {
+                    ToastUtil.toastShortMessage(getContext().getString(R.string.locate_origin_msg_failed_tip) + " code = " + errCode + " message = " + errMsg);
+                }
+            });
+        }
+    }
+
+    private void showMessageReplyDetail(TUIMessageBean messageBean) {
+        if (messageBean.getStatus() == TUIMessageBean.MSG_STATUS_REVOKE) {
+            ToastUtil.toastShortMessage(getContext().getString(R.string.locate_origin_msg_failed_tip));
+            return;
+        }
+        Intent intent = new Intent(getContext(), MessageReplyDetailActivity.class);
+        intent.putExtra(TUIChatConstants.MESSAGE_BEAN, messageBean);
+        intent.putExtra(TUIChatConstants.CHAT_INFO, presenter.getChatInfo());
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(intent);
     }
 
     @Override
@@ -960,5 +995,4 @@ public class MessageRecyclerView extends RecyclerView implements IMessageRecycle
 
         void scrollMessageFinish();
     }
-
 }

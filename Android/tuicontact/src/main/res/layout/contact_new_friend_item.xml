@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingTop="11.52dp"
+    android:focusable="true"
+    android:paddingBottom="11.52dp">
+
+    <com.tencent.qcloud.tuikit.timcommon.component.gatherimage.ShadeImageView
+        android:id="@+id/avatar"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="15.36dp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="11.52dp"
+        android:layout_weight="1"
+        android:gravity="start"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="17.28sp" />
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="@color/text_gray1"
+            android:textSize="11.52sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/agree"
+        android:layout_width="55dp"
+        android:layout_height="28.8dp"
+        android:background="@drawable/agree_btn_bg"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:gravity="center"
+        android:layout_marginEnd="9.6dp"
+        android:layout_gravity="center"
+        tools:text="agree"/>
+
+    <TextView
+        android:id="@+id/reject"
+        android:layout_width="55dp"
+        android:layout_height="28.8dp"
+        android:background="@drawable/reject_btn_bg"
+        android:textColor="?attr/core_primary_color"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:layout_marginEnd="15.36dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        tools:text="refuse"/>
+
+    <TextView
+        android:id="@+id/result_tv"
+        android:textSize="14sp"
+        android:text="@string/accepted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15.36dp"
+        android:autoSizeMaxTextSize="14sp"
+        android:visibility="gone"/>
+
+</LinearLayout>

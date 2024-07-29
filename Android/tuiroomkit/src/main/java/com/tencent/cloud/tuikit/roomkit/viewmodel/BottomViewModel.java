@@ -410,7 +410,9 @@ public class BottomViewModel implements ConferenceEventCenter.RoomEngineEventRes
                     return;
                 }
                 mBottomView.replaceItem(BottomItemData.Type.RAISE_HAND, createRaiseHandItem());
-                RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_apply_take_seat_time_out));
+                if (mConferenceState.userModel.isOffSeat()) {
+                    RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_apply_take_seat_time_out));
+                }
             }
 
             @Override

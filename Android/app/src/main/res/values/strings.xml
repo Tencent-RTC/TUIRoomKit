@@ -41,15 +41,9 @@
     <string name="app_version">Tencent Cloud TUIRoomKit v%s</string>
     <string name="app_product_name">Multi-person Audio/Video Interactions</string>
     <string name="app_please_input_room_number">Enter a conference ID</string>
-    <string name="app_enter_room">Join conference</string>
-    <string name="app_create_room">Create conference</string>
+    <string name="app_enter_room">Join room</string>
+    <string name="app_create_room">Create room</string>
     <string name="app_enter_live_room">Join conference</string>
 
-    <string name="app_turn_on_audio">Mic</string>
-    <string name="app_turn_on_speaker">Speaker</string>
-    <string name="app_turn_on_video">Camera</string>
-    <string name="app_tip_creating_room_id">Generating conference number, please try again later</string>
-    <string name="app_room_msg_joined">Joined</string>
-    <string name="app_room_free_speech">Free Speech conference</string>
-    <string name="app_room_raise_hand">On-stage speaking conference</string>
+    <string name="app_user_id_empty_toast">userId can not be empty!</string>
 </resources>

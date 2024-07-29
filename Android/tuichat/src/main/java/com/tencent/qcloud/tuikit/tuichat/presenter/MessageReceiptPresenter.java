@@ -2,14 +2,14 @@ package com.tencent.qcloud.tuikit.tuichat.presenter;
 
 import android.text.TextUtils;
 import com.tencent.qcloud.tuikit.timcommon.bean.MessageReceiptInfo;
-import com.tencent.qcloud.tuikit.timcommon.bean.MessageRepliesBean;
 import com.tencent.qcloud.tuikit.timcommon.bean.TUIMessageBean;
 import com.tencent.qcloud.tuikit.timcommon.bean.UserBean;
 import com.tencent.qcloud.tuikit.timcommon.component.interfaces.IUIKitCallback;
 import com.tencent.qcloud.tuikit.tuichat.TUIChatService;
+import com.tencent.qcloud.tuikit.tuichat.bean.C2CChatInfo;
 import com.tencent.qcloud.tuikit.tuichat.bean.ChatInfo;
-import com.tencent.qcloud.tuikit.tuichat.bean.GroupInfo;
-import com.tencent.qcloud.tuikit.tuichat.bean.message.GroupMessageReadMembersInfo;
+import com.tencent.qcloud.tuikit.tuichat.bean.GroupChatInfo;
+import com.tencent.qcloud.tuikit.tuichat.bean.GroupMessageReadMembersInfo;
 import com.tencent.qcloud.tuikit.tuichat.interfaces.C2CChatEventListener;
 import com.tencent.qcloud.tuikit.tuichat.interfaces.IMessageDetailListener;
 import com.tencent.qcloud.tuikit.tuichat.model.ChatProvider;
@@ -58,12 +58,12 @@ public class MessageReceiptPresenter {
 
     public void setChatInfo(ChatInfo chatInfo) {
         this.chatInfo = chatInfo;
-        if (chatInfo.getType() == ChatInfo.TYPE_C2C) {
+        if (chatInfo.getType() == C2CChatInfo.TYPE_C2C) {
             chatPresenter = new C2CChatPresenter();
-            ((C2CChatPresenter) chatPresenter).setChatInfo(chatInfo);
+            ((C2CChatPresenter) chatPresenter).setChatInfo((C2CChatInfo) chatInfo);
         } else {
             chatPresenter = new GroupChatPresenter();
-            ((GroupChatPresenter) chatPresenter).setGroupInfo((GroupInfo) chatInfo);
+            ((GroupChatPresenter) chatPresenter).setGroupInfo((GroupChatInfo) chatInfo);
         }
     }
 
@@ -72,12 +72,13 @@ public class MessageReceiptPresenter {
             TUIChatUtils.callbackOnSuccess(callback, null);
             return;
         }
-        Set<String> userIds = new HashSet<>(chatPresenter.getReplyUserNames(Collections.singletonList(message)));
+        Set<String> userIds = new HashSet<>(message.getAdditionalUserIDList());
         chatPresenter.getUserBean(userIds, new IUIKitCallback<Map<String, UserBean>>() {
             @Override
             public void onSuccess(Map<String, UserBean> data) {
-                MessageRepliesBean repliesBean = message.getMessageRepliesBean();
-                chatPresenter.setMessageReplyBean(repliesBean, data);
+                for (UserBean userBean : data.values()) {
+                    message.setUserBean(userBean.getUserId(), userBean);
+                }
                 TUIChatUtils.callbackOnSuccess(callback, null);
             }
 
