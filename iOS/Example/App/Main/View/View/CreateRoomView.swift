@@ -171,6 +171,6 @@ class CreateRoomView: UIView {
 
 private extension String {
     static var createRoomText: String {
-        RoomDemoLocalize("Create Room")
+        RoomDemoLocalize("Create Conference")
     }
 }

@@ -204,10 +204,10 @@ class PrePareView: UIView {
 
 private extension String {
     static var joinRoomText: String {
-        RoomDemoLocalize("Join Room")
+        RoomDemoLocalize("Join Conference")
     }
     static var createRoomText: String {
-        RoomDemoLocalize("Create Room")
+        RoomDemoLocalize("Create Conference")
     }
 }
 

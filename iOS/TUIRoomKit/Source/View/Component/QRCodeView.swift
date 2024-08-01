@@ -241,7 +241,7 @@ class QRCodeView: UIView {
 
 private extension String {
     static var scanCodeText: String {
-        localized("Scan the code to enter the room")
+        localized("Scan the code to enter the conference")
     }
     static var saveIntoAlbumText: String {
         localized("Save into the album")

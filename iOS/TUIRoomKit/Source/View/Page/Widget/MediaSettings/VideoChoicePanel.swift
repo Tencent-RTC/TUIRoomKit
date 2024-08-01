@@ -8,11 +8,6 @@
 //
 
 import Foundation
-#if TXLiteAVSDK_TRTC
-import TXLiteAVSDK_TRTC
-#elseif TXLiteAVSDK_Professional
-import TXLiteAVSDK_Professional
-#endif
 
 // MARK: Resolution
 class VideoChoicePanel: AlertContentView {

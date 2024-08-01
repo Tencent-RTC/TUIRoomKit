@@ -18,6 +18,57 @@
         }
       }
     },
+    "All members" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有成员"
+          }
+        }
+      }
+    },
+    "Conference Type" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conference Type"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "会议类型"
+          }
+        }
+      }
+    },
+    "Create Conference" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Conference"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建会议"
+          }
+        }
+      }
+    },
     "Create Room" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -30,7 +81,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "创建房间"
+            "value" : "创建会议"
           }
         }
       }
@@ -47,7 +98,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请输入房间号"
+            "value" : "请输入会议号"
           }
         }
       }
@@ -69,6 +120,23 @@
         }
       }
     },
+    "Enter userID or username" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter userID or username"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入用户ID或用户名"
+          }
+        }
+      }
+    },
     "Free Speech Conference" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -81,7 +149,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自由发言房间"
+            "value" : "自由发言会议"
           }
         }
       }
@@ -98,7 +166,24 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在生成房间号，请稍后重试"
+            "value" : "正在生成会议号，请稍后重试"
+          }
+        }
+      }
+    },
+    "Join Conference" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join Conference"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加入会议"
           }
         }
       }
@@ -115,7 +200,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "加入直播房间"
+            "value" : "加入直播会议"
           }
         }
       }
@@ -154,6 +239,23 @@
         }
       }
     },
+    "OK" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确定"
+          }
+        }
+      }
+    },
     "On-stage Speech Conference" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -166,7 +268,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "举手发言房间"
+            "value" : "举手发言会议"
           }
         }
       }
@@ -205,19 +307,53 @@
         }
       }
     },
-    "Room Type" : {
+    "Schedule Room" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Room Type"
+            "value" : "Schedule"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "房间类型"
+            "value" : "预定房间"
+          }
+        }
+      }
+    },
+    "Select Members" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Members"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择成员"
+          }
+        }
+      }
+    },
+    "Selected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "已选择"
           }
         }
       }

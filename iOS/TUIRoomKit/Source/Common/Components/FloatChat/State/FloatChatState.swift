@@ -53,8 +53,8 @@ struct FloatChatUser: Codable, Equatable {
     }
     
     init(memberInfo: V2TIMGroupMemberInfo) {
-        self.userId = memberInfo.userID
-        self.userName = memberInfo.nickName
+        self.userId = memberInfo.userID ?? ""
+        self.userName = memberInfo.nickName ?? userId
         self.avatarUrl = memberInfo.faceURL
     }
 }
