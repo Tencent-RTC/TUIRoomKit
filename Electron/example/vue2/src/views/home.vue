@@ -15,7 +15,6 @@
 <script>
 import { PreConferenceView, conference } from '@tencentcloud/roomkit-electron-vue2.7';
 import { getBasicInfo } from '@/config/basic-info-config';
-import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
 import { isMobile } from '@tencentcloud/roomkit-electron-vue2.7/es/utils/environment';
 
 export default {
@@ -47,7 +46,7 @@ export default {
     }
     const { sdkAppId, userId, userSig } = this.userInfo;
     // Login TUIRoomEngine
-    await TUIRoomEngine.login({ sdkAppId, userId, userSig });
+    await conference.login({ sdkAppId, userId, userSig });
   },
   methods: {
     setTUIRoomData(action, roomOption) {
