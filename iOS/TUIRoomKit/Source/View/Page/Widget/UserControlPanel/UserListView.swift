@@ -294,7 +294,7 @@ class UserListView: UIView {
     }
     
     func setupViewState() {
-        memberLabel.text = localizedReplace(.memberText, replace: String(viewModel.allUserCount))
+        memberLabel.text = String(format: .memberText, viewModel.allUserCount)
         let roomInfo = viewModel.roomInfo
         muteAllAudioButton.isSelected = roomInfo.isMicrophoneDisableForAllUser
         muteAllVideoButton.isSelected = roomInfo.isCameraDisableForAllUser
@@ -401,7 +401,7 @@ extension UserListView: UserListViewResponder {
     }
     
     func updateMemberLabel(count: Int) {
-        memberLabel.text = localizedReplace(.memberText, replace: String(count))
+        memberLabel.text = String(format: .memberText, viewModel.allUserCount)
     }
     
     func updateListStateView(onStage: Int, offStage: Int) {
@@ -447,19 +447,19 @@ private extension String {
         localized("Mute All")
     }
     static var allMuteVideoText: String {
-        localized("Freeze video")
+        localized("Stop all video")
     }
     static var allUnMuteAudioText: String {
-        localized("Ask all to unmute")
+        localized("Unmute all")
     }
     static var allUnMuteVideoText: String {
-        localized("Ask all to video")
+        localized("Enable all video")
     }
     static var moreText: String {
         localized("More")
     }
     static var memberText: String {
-        localized("Participants(xx)")
+        localized("Participants(%lld)")
     }
     static var searchMemberText: String {
         localized("Search for participants")

@@ -142,23 +142,7 @@ extension EnterRoomViewController {
         roomId = roomIDStr
         rootView?.updateEnterButtonState(isEnabled: false)
         rootView?.updateLoadingState(isStarted: true)
-        //1.Use ConferenceMainViewController, first enter the room and then display the page
         joinConference(roomId: roomId)
-        //2.Use ConferenceMainViewController and enter the room and display the page at the same time
-        //        joinConferenceAndShowViewController(roomId: roomId)
-        //3.Using TUIRoomKit
-        //        enterRoom(roomId: roomId)
-    }
-    
-    private func joinConferenceAndShowViewController(roomId: String) {
-        let vc = ConferenceMainViewController()
-        let params = ConferenceParams()
-        params.isMuteMicrophone = !enableLocalAudio
-        params.isOpenCamera = enableLocalVideo
-        params.isSoundOnSpeaker = isSoundOnSpeaker
-        vc.setConferenceParams(params: params)
-        vc.joinConference(conferenceId: roomId)
-        navigationController?.pushViewController(vc, animated: true)
     }
     
     private func joinConference(roomId: String) {
@@ -172,18 +156,6 @@ extension EnterRoomViewController {
         conferenceViewController?.joinConference(conferenceId: roomId)
     }
     
-    private func enterRoom(roomId: String) {
-        TUIRoomKit.createInstance().enterRoom(roomId: roomId, enableAudio: enableLocalAudio, enableVideo: enableLocalVideo,
-                                              isSoundOnSpeaker: isSoundOnSpeaker) { [weak self] in
-            guard let self = self else { return }
-            self.renewRootViewState()
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            self.renewRootViewState()
-            self.rootView?.makeToast(message)
-        }
-    }
-    
     private func renewRootViewState() {
         rootView?.updateEnterButtonState(isEnabled: true)
         rootView?.updateLoadingState(isStarted: false)
@@ -192,7 +164,6 @@ extension EnterRoomViewController {
 
 extension EnterRoomViewController: ConferenceObserver {
     func onConferenceJoined(conferenceId: String, error: ConferenceError) {
-        //1.Go to the first room and then show the page
         if error == .success {
             guard let vc = conferenceViewController else { return }
             navigationController?.pushViewController(vc, animated: true)

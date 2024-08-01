@@ -54,8 +54,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             debugPrint("not login")
             return
         }
-        let prePareViewController = RoomPrePareViewController()
-        let nav = RoomNavigationController(rootViewController: prePareViewController)
+        let prepareViewController = ConferenceOptionsViewController()
+        let nav = RoomNavigationController(rootViewController: prepareViewController)
         nav.modalPresentationStyle = .fullScreen
         getCurrentWindowViewController()?.present(nav, animated: true)
     }
