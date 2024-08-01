@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { TUIRoomEngine, PreConferenceView, conference } from '@tencentcloud/roomkit-web-vue3';
+import { PreConferenceView, conference } from '@tencentcloud/roomkit-web-vue3';
 import { getBasicInfo } from '@/config/basic-info-config';
 import router from '@/router';
 import { useRoute } from 'vue-router';
@@ -119,7 +119,7 @@ async function handleInit() {
   userInfo.userName = currentUserInfo?.userName;
   userInfo.avatarUrl = currentUserInfo?.avatarUrl;
   const { userId, sdkAppId, userSig } = currentUserInfo;
-  await TUIRoomEngine.login({ sdkAppId, userId, userSig });
+  await conference.login({ sdkAppId, userId, userSig });
 }
 
 handleInit();
