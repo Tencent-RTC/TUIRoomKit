@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:tencent_conference_uikit/common/index.dart';
 import 'package:tencent_conference_uikit/pages/conference_main/widgets/widgets.dart';
 
-import 'widgets.dart';
-
 class OtherSettingWidget extends GetView<SettingController> {
   const OtherSettingWidget({super.key});
 
@@ -12,7 +10,7 @@ class OtherSettingWidget extends GetView<SettingController> {
   Widget build(BuildContext context) {
     return RoundedContainerWidget(
       child: SettingItemWidget(
-        title: RoomContentsTranslations.translate('openFloatingChat'),
+        title: 'openFloatingChat'.roomTr,
         child: SizedBox(
           height: 24,
           child: Obx(

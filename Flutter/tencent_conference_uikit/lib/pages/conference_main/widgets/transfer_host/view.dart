@@ -20,7 +20,6 @@ class TransferHostWidget extends GetView<TransferHostController> {
           const TitleWidget(),
           SearchBarWidget(
             searchAction: (value) => controller.searchAction(value),
-            width: 342,
           ),
           SizedBox(height: 10.0.scale375Height()),
           const UserTableWidget(),
@@ -34,11 +33,12 @@ class TransferHostWidget extends GetView<TransferHostController> {
               style: RoomTheme.defaultTheme.menuButtonTheme.style,
               onPressed: () => controller.appointAndLeaveAction(),
               child: Text(
-                RoomContentsTranslations.translate('appointAndLeave'),
+                'appointAndLeave'.roomTr,
                 style: RoomTheme.defaultTheme.textTheme.bodyLarge,
               ),
             ),
-          )
+          ),
+          SizedBox(height: 10.0.scale375Height()),
         ],
       ),
     );
@@ -50,8 +50,9 @@ class TransferHostWidget extends GetView<TransferHostController> {
       init: TransferHostController(),
       id: "transfer_host",
       builder: (_) {
-        return OrientationBuilder(
-          builder: (BuildContext context, Orientation orientation) {
+        return LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            Orientation orientation = MediaQuery.of(context).orientation;
             return _buildView(orientation);
           },
         );

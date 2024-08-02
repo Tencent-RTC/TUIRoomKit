@@ -7,6 +7,7 @@ const Map<String, String> zhCN = {
   'exit': '退出',
   'createRoom': '创建房间',
   'enterRoom': '进入房间',
+  'scheduleRoom': '预定房间',
   'speechMode': '发言模式',
   'roomId': '房间号',
   'roomType': '房间类型',

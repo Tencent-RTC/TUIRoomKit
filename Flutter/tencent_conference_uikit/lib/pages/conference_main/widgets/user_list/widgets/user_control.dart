@@ -34,11 +34,10 @@ class UserControlWidget extends GetView<UserListController> {
                       Get.back();
                       controller.muteAudioAction(userModel);
                     },
-                    text: RoomContentsTranslations.translate(
-                        controller.isSelf(userModel)
-                            ? 'unmute'
-                            : 'requestOpenAudio'),
-                    selectedText: RoomContentsTranslations.translate('mute'),
+                    text: controller.isSelf(userModel)
+                        ? 'unmute'.roomTr
+                        : 'requestOpenAudio'.roomTr,
+                    selectedText: 'mute'.roomTr,
                     image: Image.asset(
                       AssetsImages.roomMuteAudio,
                       package: 'tencent_conference_uikit',
@@ -62,12 +61,10 @@ class UserControlWidget extends GetView<UserListController> {
                       Get.back();
                       controller.muteVideoAction(userModel);
                     },
-                    text: RoomContentsTranslations.translate(
-                        controller.isSelf(userModel)
-                            ? 'openVideo'
-                            : 'requestOpenVideo'),
-                    selectedText:
-                        RoomContentsTranslations.translate('closeVideo'),
+                    text: controller.isSelf(userModel)
+                        ? 'openVideo'.roomTr
+                        : 'requestOpenVideo'.roomTr,
+                    selectedText: 'closeVideo'.roomTr,
                     image: Image.asset(
                       AssetsImages.roomMuteVideo,
                       package: 'tencent_conference_uikit',
@@ -89,7 +86,7 @@ class UserControlWidget extends GetView<UserListController> {
                       Get.back();
                       controller.transferHostAction(userModel);
                     },
-                    text: RoomContentsTranslations.translate('changeHost'),
+                    text: 'changeHost'.roomTr,
                     image: Image.asset(
                       AssetsImages.roomChangeHost,
                       package: 'tencent_conference_uikit',
@@ -103,10 +100,8 @@ class UserControlWidget extends GetView<UserListController> {
                       Get.back();
                       controller.changeAdministratorAction(userModel);
                     },
-                    text: RoomContentsTranslations.translate(
-                        'setAsAdministrator'),
-                    selectedText:
-                        RoomContentsTranslations.translate('undoAdministrator'),
+                    text: 'setAsAdministrator'.roomTr,
+                    selectedText: 'undoAdministrator'.roomTr,
                     image: Image.asset(
                       AssetsImages.roomSetAdministrator,
                       package: 'tencent_conference_uikit',
@@ -135,9 +130,8 @@ class UserControlWidget extends GetView<UserListController> {
                       Get.back();
                       controller.disableMessageAction(userModel);
                     },
-                    text: RoomContentsTranslations.translate('enableMessage'),
-                    selectedText:
-                        RoomContentsTranslations.translate('disableMessage'),
+                    text: 'enableMessage'.roomTr,
+                    selectedText: 'disableMessage'.roomTr,
                     image: Image.asset(
                       AssetsImages.roomEnableMessage,
                       package: 'tencent_conference_uikit',
@@ -163,10 +157,8 @@ class UserControlWidget extends GetView<UserListController> {
                       controller.changeSeatStatusAction(userModel);
                       Get.back();
                     },
-                    text:
-                        RoomContentsTranslations.translate('inviteToTakeSeat'),
-                    selectedText:
-                        RoomContentsTranslations.translate('kickOffSeat'),
+                    text: 'inviteToTakeSeat'.roomTr,
+                    selectedText: 'kickOffSeat'.roomTr,
                     image: Image.asset(
                       AssetsImages.roomRequestOnSeat,
                       package: 'tencent_conference_uikit',
@@ -190,7 +182,7 @@ class UserControlWidget extends GetView<UserListController> {
                       Get.back();
                       controller.kickOutAction(userModel);
                     },
-                    text: RoomContentsTranslations.translate('kick'),
+                    text: 'kick'.roomTr,
                     image: Image.asset(
                       AssetsImages.roomKickOutRoom,
                       package: 'tencent_conference_uikit',

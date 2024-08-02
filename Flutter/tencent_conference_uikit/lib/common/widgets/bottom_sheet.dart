@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_conference_uikit/common/index.dart';
@@ -11,38 +13,41 @@ Future<void> showConferenceBottomSheet(Widget bottomSheet,
     transitionDuration: const Duration(milliseconds: 250),
     pageBuilder: (BuildContext context, Animation<double> animation,
         Animation<double> secondaryAnimation) {
-      return OrientationBuilder(
-        builder: (BuildContext context, Orientation orientation) {
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: (orientation == Orientation.portrait || alwaysFromBottom)
-                  ? const Offset(0, 1)
-                  : const Offset(1, 0),
-              end: Offset.zero,
-            ).animate(animation),
-            child: Align(
-              alignment:
-                  (orientation == Orientation.portrait || alwaysFromBottom)
-                      ? Alignment.bottomCenter
-                      : Alignment.centerRight,
-              child: Material(
-                color: Colors.transparent,
-                child: SizedBox(
-                  width:
+      return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+          child: OrientationBuilder(
+            builder: (BuildContext context, Orientation orientation) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin:
                       (orientation == Orientation.portrait || alwaysFromBottom)
+                          ? const Offset(0, 1)
+                          : const Offset(1, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: Align(
+                  alignment:
+                      (orientation == Orientation.portrait || alwaysFromBottom)
+                          ? Alignment.bottomCenter
+                          : Alignment.centerRight,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: SizedBox(
+                      width: (orientation == Orientation.portrait ||
+                              alwaysFromBottom)
                           ? Get.width
                           : landScapeWidth ?? 387.0.scale375(),
-                  height:
-                      (orientation == Orientation.portrait || alwaysFromBottom)
+                      height: (orientation == Orientation.portrait ||
+                              alwaysFromBottom)
                           ? null
                           : Get.height,
-                  child: bottomSheet,
+                      child: bottomSheet,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
-      );
+              );
+            },
+          ));
     },
   );
 }
@@ -54,6 +59,7 @@ class BottomSheetWidget extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final Orientation orientation;
   final bool isNeedDropDownButton;
+  final Color? color;
 
   BottomSheetWidget({
     Key? key,
@@ -63,9 +69,12 @@ class BottomSheetWidget extends StatelessWidget {
     this.padding,
     this.orientation = Orientation.portrait,
     this.isNeedDropDownButton = true,
+    this.color,
   })  : width = width ??
             (orientation == Orientation.portrait
-                ? Get.width
+                ? Get.width < Get.height
+                    ? Get.width
+                    : Get.height
                 : 387.0.scale375()),
         super(key: key);
 
@@ -75,7 +84,7 @@ class BottomSheetWidget extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: RoomColors.mainBlack,
+        color: color ?? RoomColors.mainBlack,
         borderRadius: orientation == Orientation.portrait
             ? const BorderRadius.only(
                 topLeft: Radius.circular(20.0),
@@ -106,9 +115,10 @@ class BottomSheetWidget extends StatelessWidget {
                     : isNeedDropDownButton
                         ? width - 32.0.scale375()
                         : width - 8.0.scale375(),
-                height: orientation == Orientation.portrait
-                    ? height - 40.0.scale375()
-                    : height,
+                height:
+                    orientation == Orientation.portrait && isNeedDropDownButton
+                        ? height - 40.0.scale375()
+                        : height,
                 padding: padding ??
                     (orientation == Orientation.portrait ||
                             !isNeedDropDownButton

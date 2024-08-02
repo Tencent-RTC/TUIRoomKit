@@ -33,6 +33,7 @@ class VideoPageTurningPage extends GetView<VideoPageTurningController> {
                       : RoomStore.to.userInfoList,
                   startIndex: controller.getPageStarIndex(index),
                   endIndex: controller.getPageEndIndex(index),
+                  currentPageIndex: index,
                   isScreenLayout: controller.isScreenShareLayout(index),
                   isTwoUserLayout: controller.isTwoUserLayout(),
                 );

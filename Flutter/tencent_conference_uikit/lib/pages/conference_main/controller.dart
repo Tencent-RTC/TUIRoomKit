@@ -40,10 +40,10 @@ class ConferenceMainController extends GetxController {
 
   showDialog() {
     showConferenceDialog(
-      title: RoomContentsTranslations.translate('liveScreen'),
-      message: RoomContentsTranslations.translate('stopTUIRoomScreenShare'),
-      cancelText: RoomContentsTranslations.translate('cancel'),
-      confirmText: RoomContentsTranslations.translate('stop'),
+      title: 'liveScreen'.roomTr,
+      message: 'stopTUIRoomScreenShare'.roomTr,
+      cancelText: 'cancel'.roomTr,
+      confirmText: 'stop'.roomTr,
       onConfirm: () {
         RoomEngineManager().stopScreenSharing();
         Get.back();
@@ -91,16 +91,18 @@ class ConferenceMainController extends GetxController {
         conferenceObserver?.onConferenceFinished
             ?.call(RoomStore.to.roomInfo.roomId);
         RoomStore.to.clearStore();
-        showExitRoomDialog(RoomContentsTranslations.translate('roomDestroyed'));
+        showExitRoomDialog('roomDestroyed'.roomTr);
       },
       onKickedOutOfRoom: (roomId, reason, message) {
         conferenceObserver?.onConferenceExited
             ?.call(RoomStore.to.roomInfo.roomId);
         RoomStore.to.clearStore();
-        showExitRoomDialog(
-            RoomContentsTranslations.translate('kickedOutOfRoom'));
+        showExitRoomDialog('kickedOutOfRoom'.roomTr);
       },
-      onUserRoleChanged: (userInfo) {
+      onUserInfoChanged: (userInfo, modifyFlagList) {
+        if (!modifyFlagList.contains(TUIUserInfoModifyFlag.userRole)) {
+          return;
+        }
         if (userInfo.userId == RoomStore.to.currentUser.userId.value) {
           switch (userInfo.userRole) {
             case TUIRole.roomOwner:
@@ -108,24 +110,19 @@ class ConferenceMainController extends GetxController {
                   TUIRole.generalUser) {
                 RoomEngineManager().getSeatApplicationList();
               }
-              makeToast(
-                  msg: RoomContentsTranslations.translate('haveBecomeOwner'));
+              makeToast(msg: 'haveBecomeOwner'.roomTr);
               break;
             case TUIRole.administrator:
               if (RoomStore.to.currentUser.userRole.value ==
                   TUIRole.generalUser) {
                 RoomEngineManager().getSeatApplicationList();
               }
-              makeToast(
-                  msg: RoomContentsTranslations.translate(
-                      'haveBecomeAdministrator'));
+              makeToast(msg: 'haveBecomeAdministrator'.roomTr);
               break;
             case TUIRole.generalUser:
               if (RoomStore.to.currentUser.userRole.value ==
                   TUIRole.administrator) {
-                makeToast(
-                    msg: RoomContentsTranslations.translate(
-                        'revokedYourAdministrator'));
+                makeToast(msg: 'revokedYourAdministrator'.roomTr);
               }
               RoomStore.to.inviteSeatList.clear();
               RoomStore.to.inviteSeatMap.clear();
@@ -166,25 +163,25 @@ class ConferenceMainController extends GetxController {
     String title = '';
     String message = '';
     String confirmText = '';
-    String cancelText = RoomContentsTranslations.translate('doNotOpen');
+    String cancelText = 'doNotOpen'.roomTr;
 
     if (request.requestAction == TUIRequestAction.requestToOpenRemoteCamera) {
       isCameraInviteDialogShow = true;
-      title = RoomContentsTranslations.translate('cameraInviteTitle');
-      message = RoomContentsTranslations.translate('cameraInviteMessage');
-      confirmText = RoomContentsTranslations.translate('confirmOpenCamera');
+      title = 'cameraInviteTitle'.roomTr;
+      message = 'cameraInviteMessage'.roomTr;
+      confirmText = 'confirmOpenCamera'.roomTr;
     } else if (request.requestAction ==
         TUIRequestAction.requestToOpenRemoteMicrophone) {
       isMicrophoneInviteDialogShow = true;
-      title = RoomContentsTranslations.translate('microphoneInviteTitle');
-      message = RoomContentsTranslations.translate('microphoneInviteMessage');
-      confirmText = RoomContentsTranslations.translate('confirmOpenMicrophone');
+      title = 'microphoneInviteTitle'.roomTr;
+      message = 'microphoneInviteMessage'.roomTr;
+      confirmText = 'confirmOpenMicrophone'.roomTr;
     } else if (request.requestAction ==
         TUIRequestAction.requestRemoteUserOnSeat) {
-      title = RoomContentsTranslations.translate('takeSeatInviteTitle');
-      message = RoomContentsTranslations.translate('takeSeatInviteMessage');
-      confirmText = RoomContentsTranslations.translate('agreeTakeSeat');
-      cancelText = RoomContentsTranslations.translate('refuse');
+      title = 'takeSeatInviteTitle'.roomTr;
+      message = 'takeSeatInviteMessage'.roomTr;
+      confirmText = 'agreeTakeSeat'.roomTr;
+      cancelText = 'refuse'.roomTr;
     }
     showConferenceDialog(
       title: title,
@@ -209,12 +206,9 @@ class ConferenceMainController extends GetxController {
             .responseRemoteRequest(request.requestId, true);
         Get.back();
         if (result.code == TUIError.errFailed) {
-          makeToast(
-              msg: RoomContentsTranslations.translate('goOnStageTimeOut'));
+          makeToast(msg: 'goOnStageTimeOut'.roomTr);
         } else if (result.code == TUIError.errAllSeatOccupied) {
-          makeToast(
-              msg: RoomContentsTranslations.translate(
-                  'stageMemberReachedLimit'));
+          makeToast(msg: 'stageMemberReachedLimit'.roomTr);
         }
       },
       barrierDismissible: false,
@@ -223,8 +217,8 @@ class ConferenceMainController extends GetxController {
 
   void showExitRoomDialog(String title) {
     showConferenceDialog(
-      title: RoomContentsTranslations.translate(title),
-      confirmText: RoomContentsTranslations.translate('ok'),
+      title: title.roomTr,
+      confirmText: 'ok'.roomTr,
       confirmTextStyle: RoomTheme.defaultTheme.textTheme.labelMedium,
       onConfirm: () {
         Get.until((route) {
@@ -306,8 +300,8 @@ class ConferenceMainController extends GetxController {
   void _showNotEnteredRoomDialog() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showConferenceDialog(
-        title: RoomContentsTranslations.translate('haveNotEnteredRoomTip'),
-        confirmText: RoomContentsTranslations.translate('ok'),
+        title: 'haveNotEnteredRoomTip'.roomTr,
+        confirmText: 'ok'.roomTr,
         onConfirm: () {
           Get.back();
           Get.back();
@@ -320,8 +314,8 @@ class ConferenceMainController extends GetxController {
   void _showDifferentRoomIdDialog() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showConferenceDialog(
-        title: RoomContentsTranslations.translate('differentRoomIdTip'),
-        confirmText: RoomContentsTranslations.translate('ok'),
+        title: 'differentRoomIdTip'.roomTr,
+        confirmText: 'ok'.roomTr,
         onConfirm: () {
           Get.back();
         },

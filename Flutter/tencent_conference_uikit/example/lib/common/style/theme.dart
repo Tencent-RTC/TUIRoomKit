@@ -13,6 +13,7 @@ class AppTheme {
           ),
         ),
         dividerColor: Colors.white,
+        useMaterial3: false,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             elevation: MaterialStateProperty.all(0),

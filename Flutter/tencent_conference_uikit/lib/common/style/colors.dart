@@ -24,4 +24,20 @@ class RoomColors {
   static const Color toastBlack = Color(0xCC000000);
   static const Color screenBtnTextRed = Color(0xFFCC3D47);
   static const Color textOrange = Color(0xFFF06C4B);
+  static const Color dividerLightGrey = Color(0xFFE7ECF6);
+  static const Color textHintGrey = Color(0xFFADB6CC);
+  static const Color chosenGrey = Color(0xFF4F515A);
+  static const Color backgroundGrey = Color(0xFFF8F9FB);
+  static const Color titleBlack = Color(0xFF2B2E38);
+  static const Color infoBlack = Color(0xB22B2E38);
+  static const Color switchTrackGrey = Color(0xFFC5CCDB);
+  static const Color menuButtonBlue = Color(0xFF1C66E5);
+  static const Color textBlack = Color(0xFF22262E);
+  static const Color dividerWhite = Color(0xFFF2F5FC);
+  static const Color searchBarGrey = Color(0xFFF4F5F9);
+  static const Color titleTimeGrey = Color(0xFF969EB4);
+  static const Color newLightGrey = Color(0xFFF0F3FA);
+  static const Color btnTextBlack = Color(0xFF4E5461);
+  static const Color btnTextBlue = Color(0xFF0961F7);
+  static const Color lightPink = Color(0xFFFAF0F0);
 }

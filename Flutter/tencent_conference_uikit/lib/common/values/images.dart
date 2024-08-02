@@ -41,6 +41,8 @@ class AssetsImages {
   static const roomArrowRight = 'assets/images/room_arrow_right.png';
   static const roomArrowLeft = 'assets/images/room_arrow_left.png';
   static const roomCheckMark = 'assets/images/room_check_mark.png';
+  static const roomCheckMarkUnselect =
+      'assets/images/room_check_mark_unselect.png';
   static const roomTopBackGround = 'assets/images/room_top_background.png';
   static const roomScreenSharing = 'assets/images/room_screen_sharing.png';
   static const roomHand = 'assets/images/room_hand.png';
@@ -59,4 +61,11 @@ class AssetsImages {
   static const roomApplyJoinStage = 'assets/images/room_apply_join_stage.png';
   static const roomCancelRequest = 'assets/images/room_cancel_request.png';
   static const roomRightArrow = 'assets/images/room_right_arrow.png';
+  static const roomNoSchedule = 'assets/images/room_no_schedule.png';
+  static const dropDown = 'assets/images/drop_down.png';
+  static const roomWrong = 'assets/images/room_wrong.png';
+  static const roomRight = 'assets/images/room_right.png';
+  static const roomUpArrow = 'assets/images/room_up_arrow.png';
+  static const roomDelete = 'assets/images/room_delete.png';
+  static const roomCalender = 'assets/images/room_calendar.png';
 }

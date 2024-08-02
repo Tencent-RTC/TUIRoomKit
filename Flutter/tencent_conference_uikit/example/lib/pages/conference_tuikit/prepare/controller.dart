@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:ui';
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:room_flutter_example/common/index.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:room_flutter_example/common/index.dart';
+import 'package:tencent_conference_uikit/tencent_conference_uikit.dart';
 
 import 'widgets/widgets.dart';
 
@@ -18,6 +20,10 @@ class PrepareController extends GetxController {
 
   toEnterRoomPage() {
     Get.toNamed(RouteNames.conferenceEnterRoom);
+  }
+
+  toScheduleRoomPage() {
+    Get.to(() => const ScheduleConferencePage());
   }
 
   finishPage() {

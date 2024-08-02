@@ -111,7 +111,7 @@ class ConferenceSession {
     if (_name == null || _name!.isEmpty) {
       var loginUserInfo = RoomEngineManager().getSelfInfo();
       _name = (loginUserInfo.userName ?? loginUserInfo.userId) +
-          RoomContentsTranslations.translate('quickConference');
+          'quickConference'.roomTr;
     }
     roomInfo.name = _name;
     roomInfo.isMicrophoneDisableForAllUser = !_enableMicrophoneForAllUser;

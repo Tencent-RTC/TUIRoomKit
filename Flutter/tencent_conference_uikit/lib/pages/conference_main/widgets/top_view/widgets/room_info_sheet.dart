@@ -10,11 +10,13 @@ class RoomInfoSheet extends GetView<TopViewController> {
 
   @override
   Widget build(BuildContext context) {
-    return OrientationBuilder(
-      builder: (BuildContext context, Orientation orientation) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        Orientation orientation = MediaQuery.of(context).orientation;
+
         return BottomSheetWidget(
           height: orientation == Orientation.portrait
-              ? 258.0.scale375()
+              ? 225.0.scale375()
               : Get.height,
           orientation: orientation,
           child: Column(
@@ -25,46 +27,46 @@ class RoomInfoSheet extends GetView<TopViewController> {
               ),
               SizedBox(
                 width: Get.width,
-                child: Text(
-                    controller.roomInfo.name ?? controller.roomInfo.roomId,
+                child: Obx(
+                  () => Text(
+                    controller.roomName.value,
                     style: RoomTheme.defaultTheme.textTheme.headlineLarge,
-                    textAlign: TextAlign.left),
-              ),
-              SizedBox(height: 20.0.scale375()),
-              InfoListItem(
-                prefixText: RoomContentsTranslations.translate('host'),
-                infoText: RoomStore.to.userInfoList
-                    .firstWhere((element) =>
-                        element.userId.value == controller.roomInfo.ownerId)
-                    .userName
-                    .value,
-              ),
-              SizedBox(height: 15.0.scale375()),
-              InfoListItem(
-                  prefixText: RoomContentsTranslations.translate('roomType'),
-                  infoText: controller.roomInfo.isSeatEnabled == false &&
-                          controller.roomInfo.seatMode == TUISeatMode.freeToTake
-                      ? RoomContentsTranslations.translate('freeToSpeakRoom')
-                      : RoomContentsTranslations.translate(
-                          'raiseHandSpeakRoom')),
-              SizedBox(height: 15.0.scale375()),
-              InfoListItem(
-                prefixText: RoomContentsTranslations.translate('roomId'),
-                infoText: controller.roomInfo.roomId,
-                child: CopyTextButton(
-                  infoText: controller.roomInfo.roomId,
-                  successToast:
-                      RoomContentsTranslations.translate('copyRoomIdSuccess'),
+                    textAlign: TextAlign.left,
+                  ),
                 ),
               ),
+              SizedBox(height: 20.0.scale375()),
+              InfoItemWidget(
+                prefixText: 'host'.roomTr,
+                infoText: controller.roomInfo.ownerName ??
+                    controller.roomInfo.ownerId,
+                prefixTextStyle: RoomTheme.defaultTheme.textTheme.titleSmall,
+                infoTextStyle: RoomTheme.defaultTheme.textTheme.bodyMedium,
+                isLeftAlign: true,
+                endPadding: 60.0.scale375(),
+              ),
               SizedBox(height: 15.0.scale375()),
-              InfoListItem(
-                prefixText: RoomContentsTranslations.translate('roomLink'),
-                infoText: Constants.roomLink + controller.roomInfo.roomId,
+              InfoItemWidget(
+                prefixText: 'roomType'.roomTr,
+                infoText: controller.roomInfo.isSeatEnabled == false &&
+                        controller.roomInfo.seatMode == TUISeatMode.freeToTake
+                    ? 'freeToSpeakRoom'.roomTr
+                    : 'onStageSpeakingRoom'.roomTr,
+                prefixTextStyle: RoomTheme.defaultTheme.textTheme.titleSmall,
+                infoTextStyle: RoomTheme.defaultTheme.textTheme.bodyMedium,
+                isLeftAlign: true,
+                endPadding: 60.0.scale375(),
+              ),
+              SizedBox(height: 15.0.scale375()),
+              InfoItemWidget(
+                prefixText: 'roomId'.roomTr,
+                infoText: controller.roomInfo.roomId,
+                prefixTextStyle: RoomTheme.defaultTheme.textTheme.titleSmall,
+                infoTextStyle: RoomTheme.defaultTheme.textTheme.bodyMedium,
+                isLeftAlign: true,
                 child: CopyTextButton(
-                  infoText: Constants.roomLink + controller.roomInfo.roomId,
-                  successToast:
-                      RoomContentsTranslations.translate('copyRoomLinkSuccess'),
+                  infoText: controller.roomInfo.roomId,
+                  successToast: 'copyRoomIdSuccess'.roomTr,
                 ),
               ),
             ],

@@ -45,7 +45,7 @@ class BottomViewController extends GetxController {
     }
     if (_store.roomInfo.isMicrophoneDisableForAllUser &&
         _store.currentUser.userRole.value == TUIRole.generalUser) {
-      makeToast(msg: RoomContentsTranslations.translate('muteRoomReason'));
+      makeToast(msg: 'muteRoomReason'.roomTr);
       return;
     }
     _engineManager.unMuteLocalAudio();
@@ -62,8 +62,7 @@ class BottomViewController extends GetxController {
     }
     if (_store.roomInfo.isCameraDisableForAllUser &&
         _store.currentUser.userRole.value == TUIRole.generalUser) {
-      makeToast(
-          msg: RoomContentsTranslations.translate('disableVideoRoomReason'));
+      makeToast(msg: 'disableVideoRoomReason'.roomTr);
       return;
     }
     _engineManager.openLocalCamera();
@@ -72,7 +71,7 @@ class BottomViewController extends GetxController {
   bool _isOffSeatInSeatMode() {
     if (isRoomNeedTakeSeat.value && !_store.currentUser.isOnSeat.value) {
       makeToast(
-        msg: RoomContentsTranslations.translate('raiseHandTip'),
+        msg: 'raiseHandTip'.roomTr,
       );
       return true;
     }
@@ -88,7 +87,7 @@ class BottomViewController extends GetxController {
         _store.screenShareUser.userId.value !=
             _store.currentUser.userId.value) {
       makeToast(
-        msg: RoomContentsTranslations.translate('otherUserScreenSharing'),
+        msg: 'otherUserScreenSharing'.roomTr,
       );
       return;
     }
@@ -104,10 +103,10 @@ class BottomViewController extends GetxController {
   void onScreenShareButtonPressed() {
     if (_store.currentUser.hasScreenStream.value) {
       showConferenceDialog(
-        title: RoomContentsTranslations.translate('liveScreen'),
-        message: RoomContentsTranslations.translate('stopTUIRoomScreenShare'),
-        cancelText: RoomContentsTranslations.translate('cancel'),
-        confirmText: RoomContentsTranslations.translate('stop'),
+        title: 'liveScreen'.roomTr,
+        message: 'stopTUIRoomScreenShare'.roomTr,
+        cancelText: 'cancel'.roomTr,
+        confirmText: 'stop'.roomTr,
         onConfirm: () {
           _engineManager.stopScreenSharing();
           Get.back();
@@ -126,7 +125,7 @@ class BottomViewController extends GetxController {
       isRequestingTakeSeat.value = true;
       if (RoomStore.to.currentUser.userRole.value != TUIRole.administrator) {
         makeToast(
-          msg: RoomContentsTranslations.translate('joinStageApplicationSent'),
+          msg: 'joinStageApplicationSent'.roomTr,
         );
       }
       _takeSeatRequestId = _engineManager
@@ -136,15 +135,13 @@ class BottomViewController extends GetxController {
             TUIRequestCallback(
               onAccepted: (requestId, userId) {
                 makeToast(
-                  msg: RoomContentsTranslations.translate(
-                      'takeSeatRequestAgreed'),
+                  msg: 'takeSeatRequestAgreed'.roomTr,
                 );
                 isRequestingTakeSeat.value = false;
               },
               onRejected: (requestId, userId, message) {
                 makeToast(
-                  msg: RoomContentsTranslations.translate(
-                      'takeSeatRequestRejected'),
+                  msg: 'takeSeatRequestRejected'.roomTr,
                 );
                 isRequestingTakeSeat.value = false;
               },
@@ -165,8 +162,7 @@ class BottomViewController extends GetxController {
       _takeSeatRequestId = '';
 
       makeToast(
-        msg:
-            RoomContentsTranslations.translate('joinStageApplicationCancelled'),
+        msg: 'joinStageApplicationCancelled'.roomTr,
       );
       isRequestingTakeSeat.value = false;
     }
@@ -178,10 +174,10 @@ class BottomViewController extends GetxController {
       return;
     }
     showConferenceDialog(
-      title: RoomContentsTranslations.translate('leaveSeatTitle'),
-      message: RoomContentsTranslations.translate('leaveSeatMessage'),
-      confirmText: RoomContentsTranslations.translate('leaveSeat'),
-      cancelText: RoomContentsTranslations.translate('cancel'),
+      title: 'leaveSeatTitle'.roomTr,
+      message: 'leaveSeatMessage'.roomTr,
+      confirmText: 'leaveSeat'.roomTr,
+      cancelText: 'cancel'.roomTr,
       onConfirm: () {
         _engineManager.leaveSeat();
         Get.back();

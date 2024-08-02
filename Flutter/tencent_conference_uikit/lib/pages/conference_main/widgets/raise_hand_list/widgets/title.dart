@@ -25,7 +25,7 @@ class TitleWidget extends GetView<RaiseHandListController> {
           ),
           SizedBox(width: 10.0.scale375()),
           Text(
-            RoomContentsTranslations.translate('stageManagement'),
+            'stageManagement'.roomTr,
             style: RoomTheme.defaultTheme.textTheme.bodyLarge,
           ),
         ],

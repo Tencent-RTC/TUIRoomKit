@@ -48,8 +48,7 @@ class RoomEngineManager {
       if (result.data?.nextSequence != 0) {
         _nextSequence = result.data!.nextSequence;
         _getUserList();
-      } else if (RoomStore.to.roomInfo.isSeatEnabled == true &&
-          RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake) {
+      } else if (_isApplySpeakRoom()) {
         await _getSeatedUserList();
       }
     }
@@ -89,6 +88,9 @@ class RoomEngineManager {
       }
       RoomStore.to.initItemTouchableState();
       _decideMediaStatus(enableMic, enableCamera, isSoundOnSpeaker);
+      if (RoomStore.to.currentUser.userRole.value != TUIRole.generalUser) {
+        getSeatApplicationList();
+      }
       if (GetPlatform.isAndroid) {
         RtcConferenceTuikitPlatform.instance.startForegroundService();
       }
@@ -98,8 +100,7 @@ class RoomEngineManager {
 
   Future<bool> _autoTakeSeatForOwner() {
     Completer<bool> takeSeatCompleter = Completer();
-    if (RoomStore.to.roomInfo.isSeatEnabled != true ||
-        RoomStore.to.roomInfo.seatMode != TUISeatMode.applyToTake ||
+    if (!_isApplySpeakRoom() ||
         RoomStore.to.currentUser.userRole.value != TUIRole.roomOwner) {
       takeSeatCompleter.complete(true);
       return takeSeatCompleter.future;
@@ -346,6 +347,9 @@ class RoomEngineManager {
   }
 
   Future<void> getSeatApplicationList() async {
+    if (!_isApplySpeakRoom()) {
+      return;
+    }
     var result = await _roomEngine.getSeatApplicationList();
     if (result.code == TUIError.success) {
       List<TUIRequest> applicationList = result.data ?? <TUIRequest>[];
@@ -356,11 +360,14 @@ class RoomEngineManager {
     }
   }
 
+  dynamic getExtension(TUIExtensionType type) {
+    return _roomEngine.getExtension(type);
+  }
+
   Future<void> _decideMediaStatus(
       bool enableMic, bool enableCamera, bool isSoundOnSpeaker) async {
     setAudioRoute(isSoundOnSpeaker);
-    if (RoomStore.to.roomInfo.isSeatEnabled &&
-        RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake &&
+    if (_isApplySpeakRoom() &&
         RoomStore.to.roomInfo.ownerId !=
             RoomStore.to.currentUser.userId.value) {
       return;
@@ -408,5 +415,10 @@ class RoomEngineManager {
 
   bool _isOwner() {
     return RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner;
+  }
+
+  bool _isApplySpeakRoom() {
+    return RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake &&
+        RoomStore.to.roomInfo.isSeatEnabled;
   }
 }

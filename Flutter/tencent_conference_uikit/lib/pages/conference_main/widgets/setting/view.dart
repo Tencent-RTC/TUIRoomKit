@@ -18,21 +18,21 @@ class SettingWidget extends GetView<SettingController> {
             child: SizedBox(height: 25.0.scale375()),
           ),
           Text(
-            RoomContentsTranslations.translate('videoSetting'),
+            'videoSetting'.roomTr,
             style: RoomTheme.defaultTheme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 8.0),
           VideoSettingWidget(orientation: orientation),
           const SizedBox(height: 24.0),
           Text(
-            RoomContentsTranslations.translate('audioSetting'),
+            'audioSetting'.roomTr,
             style: RoomTheme.defaultTheme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 8.0),
           const AudioSettingWidget(),
           const SizedBox(height: 24.0),
           Text(
-            RoomContentsTranslations.translate('otherSettings'),
+            'otherSettings'.roomTr,
             style: RoomTheme.defaultTheme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 8.0),
@@ -48,8 +48,9 @@ class SettingWidget extends GetView<SettingController> {
       init: SettingController(),
       id: "setting",
       builder: (_) {
-        return OrientationBuilder(
-          builder: (BuildContext context, Orientation orientation) {
+        return LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            Orientation orientation = MediaQuery.of(context).orientation;
             return BottomSheetWidget(
               height: orientation == Orientation.portrait
                   ? Get.height * 0.88

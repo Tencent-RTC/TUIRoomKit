@@ -18,9 +18,7 @@ class ShowUserInfoWidget extends GetView<PrepareController> {
             backgroundImage: NetworkImage(UserStore.to.userModel.avatarURL),
           ),
         ),
-        const SizedBox(
-          width: 15,
-        ),
+        const SizedBox(width: 15),
         Text(
           UserStore.to.userModel.userName,
           style: AppTheme.defaultTheme.textTheme.headlineMedium,

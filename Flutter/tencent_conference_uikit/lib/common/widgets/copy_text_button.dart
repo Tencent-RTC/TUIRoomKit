@@ -5,18 +5,22 @@ import 'package:tencent_conference_uikit/common/index.dart';
 class CopyTextButton extends StatelessWidget {
   final String infoText;
   final String successToast;
+  final Color? backgroundColor;
+  final Color? textColor;
 
   const CopyTextButton({
     Key? key,
     required this.infoText,
     required this.successToast,
+    this.backgroundColor,
+    this.textColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: RoomColors.btnGrey,
+        color: backgroundColor ?? RoomColors.btnGrey,
         borderRadius: BorderRadius.circular(5),
       ),
       alignment: Alignment.center,
@@ -31,15 +35,17 @@ class CopyTextButton extends StatelessWidget {
               child: Image.asset(
                 AssetsImages.roomCopy,
                 package: 'tencent_conference_uikit',
-                color: RoomColors.textWhite,
+                color: textColor ?? RoomColors.textWhite,
               ),
             ),
             SizedBox(width: 1.0.scale375()),
             SizedBox(
               width: 34.0.scale375(),
               child: Text(
-                RoomContentsTranslations.translate('copy'),
-                style: RoomTheme.defaultTheme.textTheme.bodyMedium,
+                'copy'.roomTr,
+                style: textColor == null
+                    ? RoomTheme.defaultTheme.textTheme.bodyMedium
+                    : TextStyle(color: textColor, fontSize: 12),
                 textAlign: TextAlign.center,
               ),
             ),

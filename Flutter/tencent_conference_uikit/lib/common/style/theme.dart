@@ -32,7 +32,7 @@ class RoomTheme {
         menuButtonTheme: MenuButtonThemeData(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(
-              RoomColors.btnBackgroundBlue,
+              RoomColors.menuButtonBlue,
             ),
             shape: MaterialStateProperty.all(
               RoundedRectangleBorder(

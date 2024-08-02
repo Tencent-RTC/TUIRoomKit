@@ -12,16 +12,18 @@ class VideoLayoutWidget extends GetView<VideoLayoutController> {
   final List<UserModel> userList;
   final startIndex;
   final endIndex;
+  final currentPageIndex;
   final isScreenLayout;
   final isTwoUserLayout;
-  const VideoLayoutWidget(
-      {Key? key,
-      required this.userList,
-      required this.startIndex,
-      required this.endIndex,
-      this.isScreenLayout = false,
-      this.isTwoUserLayout = false})
-      : super(key: key);
+  const VideoLayoutWidget({
+    Key? key,
+    required this.userList,
+    required this.startIndex,
+    required this.endIndex,
+    required this.currentPageIndex,
+    this.isScreenLayout = false,
+    this.isTwoUserLayout = false,
+  }) : super(key: key);
 
   Widget _buildView(Orientation orientation) {
     if (isScreenLayout) {
@@ -34,12 +36,12 @@ class VideoLayoutWidget extends GetView<VideoLayoutController> {
           ),
           draggableWidgetHeight: (orientation == Orientation.portrait &&
                   controller.speakingUser.value.hasVideoStream.value)
-              ? 180.0
-              : 100.0,
+              ? 180.0.scale375()
+              : 100.0.scale375(),
           draggableWidgetWidth: (orientation == Orientation.landscape &&
                   controller.speakingUser.value.hasVideoStream.value)
-              ? 180.0
-              : 100.0,
+              ? 180.0.scale375()
+              : 100.0.scale375(),
           draggableWidget: controller.isDraggableWidgetVisible.value &&
                   videoPageTurningController.isVideoPageStop.value &&
                   RoomStore.to.audioSetting.volumePrompt
@@ -66,13 +68,13 @@ class VideoLayoutWidget extends GetView<VideoLayoutController> {
           draggableWidgetHeight: (orientation == Orientation.portrait &&
                   userList.length == 2 &&
                   userList[1].hasVideoStream.value)
-              ? 180.0
-              : 100.0,
+              ? 180.0.scale375()
+              : 100.0.scale375(),
           draggableWidgetWidth: (orientation == Orientation.landscape &&
                   userList.length == 2 &&
                   userList[1].hasVideoStream.value)
-              ? 180.0
-              : 100.0,
+              ? 180.0.scale375()
+              : 100.0.scale375(),
           orientation: orientation,
         ),
       );
@@ -99,8 +101,10 @@ class VideoLayoutWidget extends GetView<VideoLayoutController> {
           child: Wrap(
             spacing: 7.0.scale375(),
             runSpacing: 7.0.scale375(),
-            alignment: controller.getWrapAlignment(userList),
-            runAlignment: controller.getWrapAlignment(userList),
+            alignment:
+                controller.getWrapAlignment(userList.length, currentPageIndex),
+            runAlignment:
+                controller.getWrapAlignment(userList.length, currentPageIndex),
             children: List.generate(
               endIndex - startIndex + 1,
               (index) {

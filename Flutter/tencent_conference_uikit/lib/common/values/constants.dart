@@ -4,6 +4,9 @@ class Constants {
   static const roomLink =
       "https://web.sdk.qcloud.com/trtc/webrtc/test/tuiroom-inner/index.html#/room?roomId=";
 
+  static const defaultAvatarUrl =
+      "https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar1.png";
+
   static const videoResolutionNameArray = [
     'smoothDefinition',
     'standardDefinition',

@@ -15,6 +15,8 @@ class LoginController extends GetxController {
   LoginController();
   final userIdController = TextEditingController();
 
+  FocusNode focusNode = FocusNode();
+
   @override
   Future<void> onReady() async {
     super.onReady();
@@ -84,13 +86,38 @@ class LoginController extends GetxController {
     );
     if (loginResult.code == TUIError.success) {
       UserStore.to.userModel.userId = userId;
-      Get.toNamed(haveLoggedInBefore == true
+      final targetRoute = haveLoggedInBefore == true
           ? RouteNames.conferencePrepare
-          : RouteNames.commonProfile);
+          : (await _shouldSetProfile()
+              ? RouteNames.commonProfile
+              : RouteNames.conferencePrepare);
+      Get.toNamed(targetRoute);
+      focusNode.unfocus();
     } else {
       Get.snackbar("error",
           "login error,code:${loginResult.code},msg:${loginResult.message}",
           snackPosition: SnackPosition.BOTTOM);
     }
+  }
+
+  Future<bool> _shouldSetProfile() async {
+    final infoList = await TencentImSDKPlugin.v2TIMManager
+        .getUsersInfo(userIDList: [UserStore.to.userModel.userId]);
+    final selfInfo = infoList.data?.first;
+
+    if (selfInfo == null ||
+        selfInfo.nickName == null ||
+        selfInfo.nickName!.isEmpty ||
+        selfInfo.faceUrl == null ||
+        selfInfo.faceUrl!.isEmpty) {
+      return true;
+    }
+
+    UserStore.to.userModel
+      ..userName = selfInfo.nickName!
+      ..avatarURL = selfInfo.faceUrl!;
+    UserStore.to.saveUserModel();
+
+    return false;
   }
 }
