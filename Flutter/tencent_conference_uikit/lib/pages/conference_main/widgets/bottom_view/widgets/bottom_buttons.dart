@@ -46,8 +46,7 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
           onPressed: () {
             showConferenceBottomSheet(const UserListWidget());
           },
-          text:
-              '${RoomContentsTranslations.translate('member')}(${RoomStore.to.userInfoList.length})',
+          text: '${'member'.roomTr}(${RoomStore.to.userInfoList.length})',
         ),
       ),
       Obx(
@@ -67,8 +66,8 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
               controller.muteAudioAction();
             },
             isSelected: RoomStore.to.currentUser.hasAudioStream,
-            text: RoomContentsTranslations.translate('unmute'),
-            selectedText: RoomContentsTranslations.translate('mute'),
+            text: 'unmute'.roomTr,
+            selectedText: 'mute'.roomTr,
             opacity: RoomStore.to.isMicItemTouchable.value ? 1 : 0.5,
           ),
         ),
@@ -89,8 +88,8 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
               controller.muteVideoAction();
             },
             isSelected: RoomStore.to.currentUser.hasVideoStream,
-            text: RoomContentsTranslations.translate('openVideo'),
-            selectedText: RoomContentsTranslations.translate('closeVideo'),
+            text: 'openVideo'.roomTr,
+            selectedText: 'closeVideo'.roomTr,
             opacity: RoomStore.to.isCameraItemTouchable.value ? 1 : 0.5,
           ),
         ),
@@ -107,7 +106,7 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
                   onPressed: () {
                     controller.leaveSeat();
                   },
-                  text: RoomContentsTranslations.translate('leaveSeat'),
+                  text: 'leaveSeat'.roomTr,
                 )
               : BottomButtonItemWidget(
                   image: Image.asset(
@@ -124,10 +123,9 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
                   isSelected: controller.isRequestingTakeSeat,
                   text: RoomStore.to.currentUser.userRole.value ==
                           TUIRole.administrator
-                      ? RoomContentsTranslations.translate('joinStage')
-                      : RoomContentsTranslations.translate('applyJoinStage'),
-                  selectedText:
-                      RoomContentsTranslations.translate('cancelStage'),
+                      ? 'joinStage'.roomTr
+                      : 'applyJoinStage'.roomTr,
+                  selectedText: 'cancelStage'.roomTr,
                 ),
         ),
       ),
@@ -142,7 +140,7 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
             onPressed: () {
               showConferenceBottomSheet(const RaiseHandListWidget());
             },
-            text: RoomContentsTranslations.translate('stageManagement'),
+            text: 'stageManagement'.roomTr,
           ),
         ),
       ),
@@ -159,8 +157,8 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
           controller.onScreenShareButtonPressed();
         },
         isSelected: RoomStore.to.currentUser.hasScreenStream,
-        text: RoomContentsTranslations.translate('shareOn'),
-        selectedText: RoomContentsTranslations.translate('shareOff'),
+        text: 'shareOn'.roomTr,
+        selectedText: 'shareOff'.roomTr,
       ),
       Visibility(
         visible: controller.conferenceMainController.chatWidget != null,
@@ -173,7 +171,7 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
             Get.to(() => controller.conferenceMainController.chatWidget!,
                 arguments: {'from': 'ConferenceMainPage'});
           },
-          text: RoomContentsTranslations.translate('chat'),
+          text: 'chat'.roomTr,
         ),
       ),
       BottomButtonItemWidget(
@@ -184,7 +182,7 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
         onPressed: () {
           showConferenceBottomSheet(const InviteSheetWidget());
         },
-        text: RoomContentsTranslations.translate('invite'),
+        text: 'invite'.roomTr,
       ),
       BottomButtonItemWidget(
         image: Image.asset(
@@ -194,7 +192,7 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
         onPressed: () {
           showConferenceBottomSheet(const SettingWidget());
         },
-        text: RoomContentsTranslations.translate('setting'),
+        text: 'setting'.roomTr,
       ),
     ].where((widget) {
       if (widget is Obx) {
@@ -229,8 +227,8 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
           controller.changeFoldState();
         },
         isSelected: controller.isUnfold,
-        text: RoomContentsTranslations.translate('unfold'),
-        selectedText: RoomContentsTranslations.translate('drop'),
+        text: 'unfold'.roomTr,
+        selectedText: 'drop'.roomTr,
         width: 33,
       ),
     );

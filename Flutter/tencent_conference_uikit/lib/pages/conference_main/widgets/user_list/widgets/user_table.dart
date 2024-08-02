@@ -16,51 +16,58 @@ class UserTableWidget extends GetView<UserListController> {
           children: [
             Row(
               children: [
-                SearchBarWidget(searchAction: (String value) {
-                  controller.searchAction(value);
-                }),
+                Expanded(
+                  flex: 7,
+                  child: SearchBarWidget(searchAction: (String value) {
+                    controller.searchAction(value);
+                  }),
+                ),
                 SizedBox(width: 12.0.scale375()),
-                SizedBox(
-                  height: 36.0.scale375(),
-                  width: 68.0.scale375(),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Get.back();
-                      showConferenceBottomSheet(const InviteSheetWidget());
-                    },
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.transparent),
-                      side: MaterialStateProperty.all<BorderSide>(
-                        BorderSide(
-                            color: RoomColors.btnBlue, width: 1.0.scale375()),
-                      ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)),
-                      ),
-                      padding:
-                          MaterialStateProperty.all(const EdgeInsets.all(0)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          AssetsImages.roomInviteBlue,
-                          package: 'tencent_conference_uikit',
-                          width: 20.0.scale375(),
-                          height: 20.0.scale375(),
+                Expanded(
+                  flex: 2,
+                  child: SizedBox(
+                    height: 36.0.scale375(),
+                    width: 68.0.scale375(),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.back();
+                        showConferenceBottomSheet(const InviteSheetWidget());
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.transparent),
+                        side: MaterialStateProperty.all<BorderSide>(
+                          BorderSide(
+                              color: RoomColors.btnBlue, width: 1.0.scale375()),
                         ),
-                        SizedBox(width: 4.0.scale375()),
-                        Text(
-                          RoomContentsTranslations.translate('invite'),
-                          style: const TextStyle(
-                              fontSize: 14, color: RoomColors.btnBlue),
-                        )
-                      ],
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6)),
+                        ),
+                        padding:
+                            MaterialStateProperty.all(const EdgeInsets.all(0)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            AssetsImages.roomInviteBlue,
+                            package: 'tencent_conference_uikit',
+                            width: 20.0,
+                            height: 20.0,
+                          ),
+                          SizedBox(width: 4.0.scale375()),
+                          Text(
+                            'invite'.roomTr,
+                            style: const TextStyle(
+                                fontSize: 14, color: RoomColors.btnBlue),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                )
+                ),
               ],
             ),
             SizedBox(height: 14.0.scale375()),

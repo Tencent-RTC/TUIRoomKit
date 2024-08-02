@@ -18,49 +18,54 @@ class MeetingTitleWidget extends GetView<TopViewController> {
 
   Widget _buildPortraitLayout() {
     return SizedBox(
-      width: 145.0.scale375(),
       height: 53.0.scale375(),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: _meetingTitleContent(),
+        children: _meetingTitleContent(Orientation.portrait),
       ),
     );
   }
 
   Widget _buildLandscapeLayout() {
     return SizedBox(
-      width: 210.0.scale375(),
       height: 24.0.scale375(),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: _meetingTitleContent(),
+        children: _meetingTitleContent(Orientation.landscape),
       ),
     );
   }
 
-  List<Widget> _meetingTitleContent() {
+  List<Widget> _meetingTitleContent(Orientation orientation) {
     return [
       GestureDetector(
+        behavior: HitTestBehavior.opaque,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 125.0.scale375(),
-              height: 24.0.scale375(),
-              child: Text(
-                controller.roomInfo.name ?? controller.roomInfo.roomId,
-                style: RoomTheme.defaultTheme.textTheme.bodyLarge,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            Container(
+              constraints: BoxConstraints(
+                  maxWidth: orientation == Orientation.portrait
+                      ? 160.0.scale375()
+                      : 220.0.scale375()),
+              child: Obx(
+                () => Text(
+                  controller.roomName.value,
+                  style: RoomTheme.defaultTheme.textTheme.bodyLarge,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
+            const SizedBox(width: 2),
             Image.asset(
               AssetsImages.roomDropDown,
               package: 'tencent_conference_uikit',
-              width: 18.0.scale375(),
-              height: 18.0.scale375(),
+              width: 18.0,
+              height: 18.0,
+              fit: BoxFit.contain,
               color: RoomColors.hintGrey,
             ),
           ],

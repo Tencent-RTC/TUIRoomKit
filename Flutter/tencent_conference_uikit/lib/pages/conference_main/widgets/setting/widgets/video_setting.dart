@@ -12,7 +12,7 @@ class VideoSettingWidget extends GetView<SettingController> {
 
   Widget _buildFpsSelectWidget() {
     return SettingInfoSelectWidget(
-      title: RoomContentsTranslations.translate('videoFps'),
+      title: 'videoFps'.roomTr,
       defaultSelect: controller.getFpsDefaultIndex(),
       items: [
         Text(
@@ -32,27 +32,23 @@ class VideoSettingWidget extends GetView<SettingController> {
 
   Widget _buildResolutionSelectWidget() {
     return SettingInfoSelectWidget(
-      title: RoomContentsTranslations.translate('videoResolution'),
+      title: 'videoResolution'.roomTr,
       defaultSelect: controller.getResolutionDefaultIndex(),
       items: [
         Text(
-          RoomContentsTranslations.translate(
-              Constants.videoResolutionNameArray.elementAt(0)),
+          Constants.videoResolutionNameArray.elementAt(0).roomTr,
           style: RoomTheme.defaultTheme.textTheme.bodyLarge,
         ),
         Text(
-          RoomContentsTranslations.translate(
-              Constants.videoResolutionNameArray.elementAt(1)),
+          Constants.videoResolutionNameArray.elementAt(1).roomTr,
           style: RoomTheme.defaultTheme.textTheme.bodyLarge,
         ),
         Text(
-          RoomContentsTranslations.translate(
-              Constants.videoResolutionNameArray.elementAt(2)),
+          Constants.videoResolutionNameArray.elementAt(2).roomTr,
           style: RoomTheme.defaultTheme.textTheme.bodyLarge,
         ),
         Text(
-          RoomContentsTranslations.translate(
-              Constants.videoResolutionNameArray.elementAt(3)),
+          Constants.videoResolutionNameArray.elementAt(3).roomTr,
           style: RoomTheme.defaultTheme.textTheme.bodyLarge,
         ),
       ],
@@ -68,7 +64,7 @@ class VideoSettingWidget extends GetView<SettingController> {
       child: Column(
         children: [
           SettingItemWidget(
-            title: RoomContentsTranslations.translate('videoResolution'),
+            title: 'videoResolution'.roomTr,
             onChildTap: () {
               showConferenceBottomSheet(
                 LayoutBuilder(
@@ -95,8 +91,7 @@ class VideoSettingWidget extends GetView<SettingController> {
               children: [
                 Obx(
                   () => Text(
-                    RoomContentsTranslations.translate(
-                        controller.resolutionName),
+                    controller.resolutionName.roomTr,
                     style: RoomTheme.defaultTheme.textTheme.bodyLarge,
                   ),
                 ),
@@ -116,7 +111,7 @@ class VideoSettingWidget extends GetView<SettingController> {
             height: 36,
           ),
           SettingItemWidget(
-            title: RoomContentsTranslations.translate('videoFps'),
+            title: 'videoFps'.roomTr,
             onChildTap: () {
               showConferenceBottomSheet(
                 LayoutBuilder(

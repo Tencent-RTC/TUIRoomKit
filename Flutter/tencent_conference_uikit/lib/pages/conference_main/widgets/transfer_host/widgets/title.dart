@@ -25,7 +25,7 @@ class TitleWidget extends GetView<TransferHostController> {
           ),
           SizedBox(width: 10.0.scale375()),
           Text(
-            RoomContentsTranslations.translate('transferHost'),
+            'transferHost'.roomTr,
             style: RoomTheme.defaultTheme.textTheme.bodyLarge,
           ),
         ],

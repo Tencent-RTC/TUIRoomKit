@@ -139,9 +139,12 @@ class VideoLayoutController extends GetxController {
     }
   }
 
-  WrapAlignment getWrapAlignment(List<UserModel> userList) {
-    return (RoomStore.to.isSharing.value || userList.length > 6)
-        ? WrapAlignment.start
+  WrapAlignment getWrapAlignment(int userListLength, int currentPageIndex) {
+    return (RoomStore.to.isSharing.value || userListLength > 6)
+        ? (_getTotalPageCount(userListLength) == currentPageIndex + 1 &&
+                userListLength % 6 != 0)
+            ? WrapAlignment.start
+            : WrapAlignment.center
         : WrapAlignment.center;
   }
 
@@ -149,5 +152,11 @@ class VideoLayoutController extends GetxController {
       String oldUserId, int nativeViewPtr, String userId, bool isScreenStream) {
     _removeVideoView(oldUserId, nativeViewPtr);
     setVideoView(userId, nativeViewPtr, isScreenStream: isScreenStream);
+  }
+
+  int _getTotalPageCount(int userListLength) {
+    return RoomStore.to.isSharing.value
+        ? (userListLength / 6).ceil() + 1
+        : (userListLength / 6).ceil();
   }
 }

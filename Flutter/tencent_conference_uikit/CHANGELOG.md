@@ -1,3 +1,9 @@
+### 2.5.0(2024-08-02)
+
+- Adapted UI for large screens such as iPad.
+- Added a schedule conference feature: a new ConferenceListWidget for the conference list and a ScheduleConferencePage for the schedule conference interface.
+- Upgraded rtc_room_engine dependencies.
+
 ### 2.4.4(2024-07-08)
 
 - Compatible with Android API 34.

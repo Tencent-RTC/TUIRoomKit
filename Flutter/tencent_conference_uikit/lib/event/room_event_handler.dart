@@ -9,16 +9,16 @@ class RoomEventHandler extends TUIRoomObserver {
     super.onAllUserMicrophoneDisableChanged = (roomId, isDisable) {
       _store.roomInfo.isMicrophoneDisableForAllUser = isDisable;
       makeToast(
-          msg: RoomContentsTranslations.translate(
-              isDisable ? 'allMutePrompt' : 'allUnMutePrompt'));
+          msg: isDisable ? 'allMutePrompt'.roomTr : 'allUnMutePrompt'.roomTr);
       _store.updateItemTouchableState();
     };
 
     super.onAllUserCameraDisableChanged = (roomId, isDisable) {
       _store.roomInfo.isCameraDisableForAllUser = isDisable;
       makeToast(
-          msg: RoomContentsTranslations.translate(
-              isDisable ? 'disableAllVideoPrompt' : 'enableAllVideoPrompt'));
+          msg: isDisable
+              ? 'disableAllVideoPrompt'.roomTr
+              : 'enableAllVideoPrompt'.roomTr);
       _store.updateItemTouchableState();
     };
 
@@ -90,9 +90,14 @@ class RoomEventHandler extends TUIRoomObserver {
       });
     };
 
-    super.onUserRoleChanged = (TUIUserInfo userInfo) {
+    super.onUserInfoChanged =
+        (TUIUserInfo userInfo, List<TUIUserInfoModifyFlag> modifyFlagList) {
+      if (!modifyFlagList.contains(TUIUserInfoModifyFlag.userRole)) {
+        return;
+      }
       if (userInfo.userRole == TUIRole.roomOwner) {
         _store.roomInfo.ownerId = userInfo.userId;
+        _store.roomInfo.ownerName = userInfo.userName;
       }
       _store.updateUserRole(
           userInfo.userId, userInfo.userRole, _store.userInfoList);
@@ -159,7 +164,7 @@ class RoomEventHandler extends TUIRoomObserver {
     };
 
     super.onKickedOffSeat = (int seatIndex, TUIUserInfo operateUser) {
-      makeToast(msg: RoomContentsTranslations.translate('kickedOffSeat'));
+      makeToast(msg: 'kickedOffSeat'.roomTr);
     };
   }
 }

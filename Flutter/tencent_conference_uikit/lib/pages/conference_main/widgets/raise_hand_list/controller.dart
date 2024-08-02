@@ -35,9 +35,7 @@ class RaiseHandListController extends GetxController {
           RoomStore.to.deleteInviteSeatUser(userInfo.userId.value);
         }
         if (value.code == TUIError.errAllSeatOccupied) {
-          makeToast(
-              msg: RoomContentsTranslations.translate(
-                  'stageMemberReachedLimit'));
+          makeToast(msg: 'stageMemberReachedLimit'.roomTr);
           return;
         }
       });
@@ -54,8 +52,7 @@ class RaiseHandListController extends GetxController {
         RoomStore.to.deleteInviteSeatUser(userId);
         searchResults.removeWhere((element) => element.userId.value == userId);
       } else if (value.code == TUIError.errAllSeatOccupied) {
-        makeToast(
-            msg: RoomContentsTranslations.translate('stageMemberReachedLimit'));
+        makeToast(msg: 'stageMemberReachedLimit'.roomTr);
       }
     });
   }

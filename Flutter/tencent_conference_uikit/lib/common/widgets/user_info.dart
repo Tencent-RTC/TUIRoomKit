@@ -39,7 +39,7 @@ class UserInfoWidget extends StatelessWidget {
                   Text(
                     userModel.userId.value ==
                             RoomStore.to.currentUser.userId.value
-                        ? '${userModel.userName.value}（${RoomContentsTranslations.translate('me')}）'
+                        ? '${userModel.userName.value}（${'me'.roomTr}）'
                         : userModel.userName.value.isEmpty
                             ? userModel.userId.value
                             : userModel.userName.value,
@@ -57,7 +57,7 @@ class UserInfoWidget extends StatelessWidget {
                           height: 14.0.scale375(),
                         ),
                         SizedBox(width: 2.0.scale375()),
-                        Text(RoomContentsTranslations.translate('roomOwner'),
+                        Text('roomOwner'.roomTr,
                             style: const TextStyle(
                                 color: RoomColors.btnBlue, fontSize: 12))
                       ],
@@ -75,10 +75,10 @@ class UserInfoWidget extends StatelessWidget {
                         ),
                         SizedBox(width: 2.0.scale375()),
                         Text(
-                            RoomContentsTranslations.translate(
-                                'roomAdministrator'),
-                            style: const TextStyle(
-                                color: RoomColors.textOrange, fontSize: 12))
+                          'roomAdministrator'.roomTr,
+                          style: const TextStyle(
+                              color: RoomColors.textOrange, fontSize: 12),
+                        )
                       ],
                     ),
                   ],

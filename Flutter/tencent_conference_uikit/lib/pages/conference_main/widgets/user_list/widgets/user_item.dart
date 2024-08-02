@@ -43,7 +43,7 @@ class UserListItem extends GetView<UserListController> {
                     controller.takeUserOnSeat(userModel);
                   },
                   child: Text(
-                    RoomContentsTranslations.translate('inviteToTakeSeat'),
+                    'inviteToTakeSeat'.roomTr,
                     style: RoomTheme.defaultTheme.textTheme.bodyMedium,
                   ),
                 ),

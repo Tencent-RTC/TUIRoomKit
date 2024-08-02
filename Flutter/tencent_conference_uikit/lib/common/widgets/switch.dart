@@ -5,7 +5,13 @@ import 'package:tencent_conference_uikit/common/style/index.dart';
 class SwitchWidget extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
-  const SwitchWidget({super.key, required this.value, required this.onChanged});
+  final Color? trackColor;
+  const SwitchWidget({
+    super.key,
+    required this.value,
+    required this.onChanged,
+    this.trackColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +21,9 @@ class SwitchWidget extends StatelessWidget {
         onChanged(value);
       },
       activeColor: RoomColors.btnBackgroundBlue,
-      trackColor: value ? RoomColors.btnBackgroundBlue : RoomColors.btnGrey,
+      trackColor: value
+          ? RoomColors.btnBackgroundBlue
+          : trackColor ?? RoomColors.btnGrey,
     );
   }
 }

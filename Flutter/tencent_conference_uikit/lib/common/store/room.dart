@@ -128,15 +128,12 @@ class RoomStore {
       return;
     }
     if (currentUser.hasVideoStream.value) {
-      makeToast(
-          msg: RoomContentsTranslations.translate('cameraTurnedOnByHostToast'));
+      makeToast(msg: 'cameraTurnedOnByHostToast'.roomTr);
     } else if (!roomInfo.isCameraDisableForAllUser) {
       if (isRoomNeedTakeSeat() && !currentUser.isOnSeat.value) {
         return;
       }
-      makeToast(
-          msg:
-              RoomContentsTranslations.translate('cameraTurnedOffByHostToast'));
+      makeToast(msg: 'cameraTurnedOffByHostToast'.roomTr);
     }
   }
 
@@ -153,13 +150,9 @@ class RoomStore {
     currentUser.hasAudioStream.value = hasAudio;
     if (reason == TUIChangeReason.changedByAdmin) {
       if (hasAudio) {
-        makeToast(
-            msg: RoomContentsTranslations.translate(
-                'microphoneTurnedOnByHostToast'));
+        makeToast(msg: 'microphoneTurnedOnByHostToast'.roomTr);
       } else if (!roomInfo.isMicrophoneDisableForAllUser) {
-        makeToast(
-            msg: RoomContentsTranslations.translate(
-                'microphoneTurnedOffByHostToast'));
+        makeToast(msg: 'microphoneTurnedOffByHostToast'.roomTr);
       }
     }
     updateItemTouchableState();
@@ -230,13 +223,9 @@ class RoomStore {
     if (userId == currentUser.userId.value) {
       currentUser.ableSendingMessage.value = !isDisable;
       if (isDisable) {
-        makeToast(
-            msg: RoomContentsTranslations.translate(
-                'messageTurnedOffByHostToast'));
+        makeToast(msg: 'messageTurnedOffByHostToast'.roomTr);
       } else {
-        makeToast(
-            msg: RoomContentsTranslations.translate(
-                'messageTurnedOnByHostToast'));
+        makeToast(msg: 'messageTurnedOnByHostToast'.roomTr);
       }
     }
   }

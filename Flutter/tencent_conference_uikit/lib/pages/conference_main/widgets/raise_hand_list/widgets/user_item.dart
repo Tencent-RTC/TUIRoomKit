@@ -26,7 +26,7 @@ class UserItemWidget extends GetView<RaiseHandListController> {
               onPressed: () =>
                   controller.agreeStageAction(userModel.userId.value, true),
               child: Text(
-                RoomContentsTranslations.translate('agreeTakeSeat'),
+                'agreeTakeSeat'.roomTr,
                 style: RoomTheme.defaultTheme.textTheme.bodySmall,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -41,7 +41,7 @@ class UserItemWidget extends GetView<RaiseHandListController> {
               onPressed: () =>
                   controller.agreeStageAction(userModel.userId.value, false),
               child: Text(
-                RoomContentsTranslations.translate('disagreeSeat'),
+                'disagreeSeat'.roomTr,
                 style: RoomTheme.defaultTheme.textTheme.bodySmall,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

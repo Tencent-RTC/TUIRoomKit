@@ -25,7 +25,7 @@ class UserListWidget extends GetView<UserListController> {
               height: 24.0.scale375Height(),
               width: Get.width - 32.0.scale375(),
               child: Text(
-                  '${RoomContentsTranslations.translate('member')}（${RoomStore.to.userInfoList.length}）',
+                  '${'member'.roomTr}（${RoomStore.to.userInfoList.length}）',
                   textAlign: TextAlign.left,
                   style: RoomTheme.defaultTheme.textTheme.bodyLarge),
             ),
@@ -36,33 +36,37 @@ class UserListWidget extends GetView<UserListController> {
                 controller.isAdministrator(RoomStore.to.currentUser))
               Row(
                 children: [
-                  ButtonItemWidget(
-                    onPressed: () {
-                      controller.muteAllAudioAction();
-                    },
-                    text: RoomContentsTranslations.translate('allMute'),
-                    selectedText:
-                        RoomContentsTranslations.translate('unAllMute'),
-                    isSelected: controller.isAllMute,
+                  Expanded(
+                    child: ButtonItemWidget(
+                      onPressed: () {
+                        controller.muteAllAudioAction();
+                      },
+                      text: 'allMute'.roomTr,
+                      selectedText: 'unAllMute'.roomTr,
+                      isSelected: controller.isAllMute,
+                    ),
                   ),
                   SizedBox(width: 9.0.scale375()),
-                  ButtonItemWidget(
-                    onPressed: () {
-                      controller.muteAllVideoAction();
-                    },
-                    text: RoomContentsTranslations.translate('disableAllVideo'),
-                    selectedText:
-                        RoomContentsTranslations.translate('enableAllVideo'),
-                    isSelected: controller.isAllCameraDisable,
+                  Expanded(
+                    child: ButtonItemWidget(
+                      onPressed: () {
+                        controller.muteAllVideoAction();
+                      },
+                      text: 'disableAllVideo'.roomTr,
+                      selectedText: 'enableAllVideo'.roomTr,
+                      isSelected: controller.isAllCameraDisable,
+                    ),
                   ),
                   SizedBox(width: 9.0.scale375()),
-                  ButtonItemWidget(
-                    onPressed: () {
-                      Get.back();
-                      showConferenceBottomSheet(const InviteSheetWidget());
-                    },
-                    text: RoomContentsTranslations.translate('more'),
-                    isSelected: false.obs,
+                  Expanded(
+                    child: ButtonItemWidget(
+                      onPressed: () {
+                        Get.back();
+                        showConferenceBottomSheet(const InviteSheetWidget());
+                      },
+                      text: 'more'.roomTr,
+                      isSelected: false.obs,
+                    ),
                   ),
                 ],
               ),
@@ -83,8 +87,9 @@ class UserListWidget extends GetView<UserListController> {
       init: UserListController(),
       id: "user_list",
       builder: (_) {
-        return OrientationBuilder(
-            builder: (BuildContext context, Orientation orientation) {
+        return LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+          Orientation orientation = MediaQuery.of(context).orientation;
           return _buildView(orientation);
         });
       },

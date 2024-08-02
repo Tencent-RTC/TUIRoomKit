@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:get/get.dart';
 import 'package:room_flutter_example/common/index.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message.dart';
-import 'package:tencent_conference_uikit/common/index.dart';
+import 'package:tencent_conference_uikit/common/widgets/toast.dart';
 import 'package:tencent_conference_uikit/tencent_conference_uikit.dart';
 import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_message_options.dart';
 

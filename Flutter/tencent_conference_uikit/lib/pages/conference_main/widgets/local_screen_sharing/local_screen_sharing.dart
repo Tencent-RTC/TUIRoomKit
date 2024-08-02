@@ -20,9 +20,7 @@ class LocalScreenSharingWidget extends GetView<ConferenceMainController> {
           package: 'tencent_conference_uikit',
         ),
         Text(
-          RoomContentsTranslations.translate(
-            'screenSharingTip',
-          ),
+          'screenSharingTip'.roomTr,
           style: RoomTheme.defaultTheme.textTheme.bodyLarge,
         ),
         const SizedBox(
@@ -44,7 +42,7 @@ class LocalScreenSharingWidget extends GetView<ConferenceMainController> {
             controller.showDialog();
           },
           child: Text(
-            RoomContentsTranslations.translate('stopScreenShare'),
+            'stopScreenShare'.roomTr,
             style: RoomTheme.defaultTheme.textTheme.bodySmall,
           ),
         ),

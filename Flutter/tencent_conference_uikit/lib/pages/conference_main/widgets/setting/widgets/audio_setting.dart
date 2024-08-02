@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:tencent_conference_uikit/common/index.dart';
 import 'package:tencent_conference_uikit/pages/conference_main/widgets/widgets.dart';
 
-import 'widgets.dart';
-
 class AudioSettingWidget extends GetView<SettingController> {
   const AudioSettingWidget({super.key});
 
@@ -14,7 +12,7 @@ class AudioSettingWidget extends GetView<SettingController> {
       child: Column(
         children: [
           SettingItemWidget(
-            title: RoomContentsTranslations.translate('audioCaptureVolume'),
+            title: 'audioCaptureVolume'.roomTr,
             child: Obx(
               () => SliderWidget(
                 prefixText: '${RoomStore.to.audioSetting.captureVolume}',
@@ -29,7 +27,7 @@ class AudioSettingWidget extends GetView<SettingController> {
             height: 36,
           ),
           SettingItemWidget(
-            title: RoomContentsTranslations.translate('audioPlayVolume'),
+            title: 'audioPlayVolume'.roomTr,
             child: Obx(
               () => SliderWidget(
                 prefixText: '${RoomStore.to.audioSetting.playVolume}',
@@ -44,7 +42,7 @@ class AudioSettingWidget extends GetView<SettingController> {
             height: 36,
           ),
           SettingItemWidget(
-            title: RoomContentsTranslations.translate('volumePrompt'),
+            title: 'volumePrompt'.roomTr,
             child: SizedBox(
               height: 24,
               child: Obx(

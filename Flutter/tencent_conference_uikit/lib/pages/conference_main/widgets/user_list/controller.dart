@@ -39,24 +39,19 @@ class UserListController extends GetxController {
   void muteAllAudioAction() {
     var isAllMuteTemp = isAllMute.value;
     showConferenceDialog(
-      title: isAllMute.value
-          ? RoomContentsTranslations.translate('unAllMute')
-          : RoomContentsTranslations.translate('allMuteTitle'),
-      message: isAllMute.value
-          ? RoomContentsTranslations.translate('allUnMuteMessage')
-          : RoomContentsTranslations.translate('allMuteMessage'),
-      cancelText: RoomContentsTranslations.translate('cancel'),
-      confirmText: isAllMute.value
-          ? RoomContentsTranslations.translate('confirmRelease')
-          : RoomContentsTranslations.translate('allMute'),
+      title: isAllMute.value ? 'unAllMute'.roomTr : 'allMuteTitle'.roomTr,
+      message:
+          isAllMute.value ? 'allUnMuteMessage'.roomTr : 'allMuteMessage'.roomTr,
+      cancelText: 'cancel'.roomTr,
+      confirmText: isAllMute.value ? 'confirmRelease'.roomTr : 'allMute'.roomTr,
       onConfirm: () async {
         Get.back();
         if (RoomStore.to.roomInfo.isMicrophoneDisableForAllUser ==
             !isAllMuteTemp) {
           makeToast(
               msg: isAllMute.value
-                  ? RoomContentsTranslations.translate('allMutePrompt')
-                  : RoomContentsTranslations.translate('allUnMutePrompt'));
+                  ? 'allMutePrompt'.roomTr
+                  : 'allUnMutePrompt'.roomTr);
           return;
         }
         isAllMute.value = !isAllMuteTemp;
@@ -73,23 +68,23 @@ class UserListController extends GetxController {
     var isAllCameraDisableTemp = isAllCameraDisable.value;
     showConferenceDialog(
       title: isAllCameraDisable.value
-          ? RoomContentsTranslations.translate('enableAllVideo')
-          : RoomContentsTranslations.translate('allDisableVideoTitle'),
+          ? 'enableAllVideo'.roomTr
+          : 'allDisableVideoTitle'.roomTr,
       message: isAllCameraDisable.value
-          ? RoomContentsTranslations.translate('allEnableVideoMessage')
-          : RoomContentsTranslations.translate('allDisableVideoMessage'),
-      cancelText: RoomContentsTranslations.translate('cancel'),
+          ? 'allEnableVideoMessage'.roomTr
+          : 'allDisableVideoMessage'.roomTr,
+      cancelText: 'cancel'.roomTr,
       confirmText: isAllCameraDisable.value
-          ? RoomContentsTranslations.translate('confirmRelease')
-          : RoomContentsTranslations.translate('disableAllVideo'),
+          ? 'confirmRelease'.roomTr
+          : 'disableAllVideo'.roomTr,
       onConfirm: () async {
         Get.back();
         if (RoomStore.to.roomInfo.isCameraDisableForAllUser ==
             !isAllCameraDisableTemp) {
           makeToast(
               msg: isAllCameraDisable.value
-                  ? RoomContentsTranslations.translate('disableAllVideoPrompt')
-                  : RoomContentsTranslations.translate('enableAllVideoPrompt'));
+                  ? 'disableAllVideoPrompt'.roomTr
+                  : 'enableAllVideoPrompt'.roomTr);
           return;
         }
         isAllCameraDisable.value = !isAllCameraDisableTemp;
@@ -133,7 +128,7 @@ class UserListController extends GetxController {
     }
     if (RoomStore.to.roomInfo.isMicrophoneDisableForAllUser &&
         RoomStore.to.currentUser.userRole.value != TUIRole.roomOwner) {
-      makeToast(msg: RoomContentsTranslations.translate('muteRoomReason'));
+      makeToast(msg: 'muteRoomReason'.roomTr);
       return;
     }
 
@@ -145,19 +140,17 @@ class UserListController extends GetxController {
       var result = await _engineManager.closeRemoteDeviceByAdmin(
           userModel.userId.value, TUIMediaDevice.microphone);
       if (result.code != TUIError.success) {
-        makeToast(msg: RoomContentsTranslations.translate('muteErrorToast'));
+        makeToast(msg: 'muteErrorToast'.roomTr);
       }
     } else {
       TUIRequestCallback callback = TUIRequestCallback(
           onAccepted: (String requestId, String userId) {},
           onRejected: (String requestId, String userId, String message) {},
           onCancelled: (String requestId, String userId) {
-            makeToast(
-                msg: RoomContentsTranslations.translate('muteErrorToast'));
+            makeToast(msg: 'muteErrorToast'.roomTr);
           },
           onTimeout: (String requestId, String userId) {
-            makeToast(
-                msg: RoomContentsTranslations.translate('muteErrorToast'));
+            makeToast(msg: 'muteErrorToast'.roomTr);
           },
           onError: (String requestId, String userId, TUIError error,
               String message) {});
@@ -182,8 +175,7 @@ class UserListController extends GetxController {
     }
     if (RoomStore.to.roomInfo.isCameraDisableForAllUser &&
         RoomStore.to.currentUser.userRole.value != TUIRole.roomOwner) {
-      makeToast(
-          msg: RoomContentsTranslations.translate('disableVideoRoomReason'));
+      makeToast(msg: 'disableVideoRoomReason'.roomTr);
       return;
     }
 
@@ -195,22 +187,17 @@ class UserListController extends GetxController {
       var result = await _engineManager.closeRemoteDeviceByAdmin(
           userModel.userId.value, TUIMediaDevice.camera);
       if (result.code != TUIError.success) {
-        makeToast(
-            msg: RoomContentsTranslations.translate('disableVideoErrorToast'));
+        makeToast(msg: 'disableVideoErrorToast'.roomTr);
       }
     } else {
       TUIRequestCallback callback = TUIRequestCallback(
           onAccepted: (String requestId, String userId) {},
           onRejected: (String requestId, String userId, String message) {},
           onCancelled: (String requestId, String userId) {
-            makeToast(
-                msg: RoomContentsTranslations.translate(
-                    'disableVideoErrorToast'));
+            makeToast(msg: 'disableVideoErrorToast'.roomTr);
           },
           onTimeout: (String requestId, String userId) {
-            makeToast(
-                msg: RoomContentsTranslations.translate(
-                    'disableVideoErrorToast'));
+            makeToast(msg: 'disableVideoErrorToast'.roomTr);
           },
           onError: (String requestId, String userId, TUIError error,
               String message) {});
@@ -221,18 +208,20 @@ class UserListController extends GetxController {
 
   void transferHostAction(UserModel userModel) async {
     showConferenceDialog(
-      title: RoomContentsTranslations.translate('transferOwnerTitle')
+      title: 'transferOwnerTitle'
+          .roomTr
           .replaceAll('xx', userModel.userName.value),
-      message: RoomContentsTranslations.translate('transferOwnerMessage'),
-      confirmText: RoomContentsTranslations.translate('sureToTransfer'),
-      cancelText: RoomContentsTranslations.translate('cancel'),
+      message: 'transferOwnerMessage'.roomTr,
+      confirmText: 'sureToTransfer'.roomTr,
+      cancelText: 'cancel'.roomTr,
       onConfirm: () async {
         Get.back();
         var result = await _engineManager.changeUserRole(
             userModel.userId.value, TUIRole.roomOwner);
         if (result.code == TUIError.success) {
           makeToast(
-              msg: RoomContentsTranslations.translate('haveTransferredOwner')
+              msg: 'haveTransferredOwner'
+                  .roomTr
                   .replaceAll('xx', userModel.userName.value));
         }
       },
@@ -252,9 +241,11 @@ class UserListController extends GetxController {
     if (result.code == TUIError.success) {
       makeToast(
           msg: isUserAdministrator
-              ? RoomContentsTranslations.translate('haveRevokedAdministrator')
+              ? 'haveRevokedAdministrator'
+                  .roomTr
                   .replaceAll('xx', userModel.userName.value)
-              : RoomContentsTranslations.translate('haveSetUpAdministrator')
+              : 'haveSetUpAdministrator'
+                  .roomTr
                   .replaceAll('xx', userModel.userName.value));
     }
   }
@@ -266,10 +257,9 @@ class UserListController extends GetxController {
 
   void kickOutAction(UserModel userModel) {
     showConferenceDialog(
-      title: RoomContentsTranslations.translate('sureKickOut')
-          .replaceAll('xx', userModel.userName.value),
-      confirmText: RoomContentsTranslations.translate('sure'),
-      cancelText: RoomContentsTranslations.translate('cancel'),
+      title: 'sureKickOut'.roomTr.replaceAll('xx', userModel.userName.value),
+      confirmText: 'sure'.roomTr,
+      cancelText: 'cancel'.roomTr,
       confirmTextStyle: RoomTheme.defaultTheme.textTheme.titleMedium,
       cancelTextStyle: RoomTheme.defaultTheme.textTheme.titleLarge,
       onConfirm: () {
@@ -301,8 +291,7 @@ class UserListController extends GetxController {
   }
 
   void takeUserOnSeat(UserModel userModel) {
-    makeToast(
-        msg: RoomContentsTranslations.translate('takeSeatInvitationSend'));
+    makeToast(msg: 'takeSeatInvitationSend'.roomTr);
 
     RoomEngineManager().takeUserOnSeat(
       _seatIndex,
@@ -312,23 +301,23 @@ class UserListController extends GetxController {
         onAccepted: (requestId, userId) {
           makeToast(
               msg:
-                  '${userModel.userName.value}${RoomContentsTranslations.translate('takeSeatInvitationAccepted')}');
+                  '${userModel.userName.value}${'takeSeatInvitationAccepted'.roomTr}');
         },
         onRejected: (requestId, userId, message) {
           makeToast(
               msg:
-                  '${userModel.userName.value}${RoomContentsTranslations.translate('takeSeatInvitationRejected')}');
+                  '${userModel.userName.value}${'takeSeatInvitationRejected'.roomTr}');
         },
         onCancelled: (requestId, userId) {},
         onTimeout: (requestId, userId) {
           makeToast(
-              msg: RoomContentsTranslations.translate(
-                      'takeSeatInvitationTimeOut')
+              msg: 'takeSeatInvitationTimeOut'
+                  .roomTr
                   .replaceAll('xx', userModel.userName.value));
         },
         onError: (requestId, userId, error, message) {
           if (error == TUIError.errRequestIdRepeat) {
-            makeToast(msg: RoomContentsTranslations.translate('requestRepeat'));
+            makeToast(msg: 'requestRepeat'.roomTr);
           }
         },
       ),

@@ -16,14 +16,15 @@ class RoutePages {
     ),
     GetPage(
       name: RouteNames.conferencePrepare,
-      page: () => const PreparePage(),
+      page: () => const ConferencePreparePage(),
     ),
     GetPage(
       name: RouteNames.conferenceCreateRoom,
       page: () => const ConferenceCreateRoomPage(),
     ),
     GetPage(
-        name: RouteNames.conferenceEnterRoom,
-        page: () => const ConferenceEnterRoomPage()),
+      name: RouteNames.conferenceEnterRoom,
+      page: () => const ConferenceEnterRoomPage(),
+    ),
   ];
 }

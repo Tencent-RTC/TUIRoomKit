@@ -24,8 +24,8 @@ class ExitWidget extends GetView<ExitController> {
             height: 45.0.scale375(),
             child: Text(
               RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner
-                  ? RoomContentsTranslations.translate('leaveRoomTip')
-                  : RoomContentsTranslations.translate('sureLeaveRoomTip'),
+                  ? 'leaveRoomTip'.roomTr
+                  : 'sureLeaveRoomTip'.roomTr,
               style: RoomTheme.defaultTheme.textTheme.displaySmall,
               textAlign: TextAlign.center,
             ),
@@ -44,7 +44,7 @@ class ExitWidget extends GetView<ExitController> {
               child: SizedBox(
                 height: 50.0.scale375(),
                 child: Center(
-                  child: Text(RoomContentsTranslations.translate('leaveRoom'),
+                  child: Text('leaveRoom'.roomTr,
                       style: RoomTheme.defaultTheme.textTheme.titleLarge),
                 ),
               ),
@@ -64,7 +64,7 @@ class ExitWidget extends GetView<ExitController> {
               child: SizedBox(
                 height: 50.0.scale375(),
                 child: Center(
-                  child: Text(RoomContentsTranslations.translate('dismissRoom'),
+                  child: Text('dismissRoom'.roomTr,
                       style: RoomTheme.defaultTheme.textTheme.titleMedium),
                 ),
               ),

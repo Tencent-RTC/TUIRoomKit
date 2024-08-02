@@ -1,41 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_conference_uikit/common/index.dart';
 
-class SearchBarWidget extends StatelessWidget {
+class SearchBarWidget extends StatefulWidget {
+  final Color? backgroundColor;
+  final Color? textColor;
+  final Color? iconColor;
+  final double? height;
+  final double? radius;
+  final String? hintText;
   final void Function(String value) searchAction;
-  final double width;
 
   const SearchBarWidget({
     Key? key,
+    this.backgroundColor,
+    this.textColor,
+    this.iconColor,
+    this.height,
+    this.radius,
+    this.hintText,
     required this.searchAction,
-    this.width = 263,
   }) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _SearchBarWidgetState();
+}
+
+class _SearchBarWidgetState extends State<SearchBarWidget> {
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 36.0.scale375(),
-      width: width.scale375(),
+      height: widget.height ?? 36.0.scale375(),
       child: TextField(
-        style: const TextStyle(color: RoomColors.textWhite),
+        focusNode: _focusNode,
+        style: TextStyle(color: widget.textColor ?? RoomColors.textWhite),
         textInputAction: TextInputAction.search,
         decoration: InputDecoration(
-          hintText: RoomContentsTranslations.translate('searchMember'),
+          hintText: widget.hintText ?? 'searchMember'.roomTr,
           hintStyle: const TextStyle(color: RoomColors.hintGrey),
-          fillColor: RoomColors.lightGrey,
+          fillColor: widget.backgroundColor ?? RoomColors.lightGrey,
           filled: true,
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(widget.radius ?? 10),
             borderSide: const BorderSide(color: Colors.transparent),
           ),
-          prefixIcon: const Icon(Icons.search, color: RoomColors.btnGrey),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(widget.radius ?? 10),
+            borderSide: const BorderSide(color: Colors.transparent),
+          ),
+          prefixIcon:
+              Icon(Icons.search, color: widget.iconColor ?? RoomColors.btnGrey),
           contentPadding: const EdgeInsets.symmetric(vertical: 8),
         ),
         onChanged: (value) {
-          searchAction(value);
+          widget.searchAction(value);
+        },
+        onTapOutside: (event) {
+          _focusNode.unfocus();
         },
       ),
     );

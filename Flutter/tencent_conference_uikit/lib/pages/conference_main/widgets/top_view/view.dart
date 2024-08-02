@@ -81,7 +81,7 @@ class TopViewWidget extends GetView<TopViewController> {
                         alwaysFromBottom: true)
                   },
                   isSelected: false.obs,
-                  text: RoomContentsTranslations.translate('exit'),
+                  text: 'exit'.roomTr,
                 ),
                 SizedBox(width: 16.0.scale375()),
               ],

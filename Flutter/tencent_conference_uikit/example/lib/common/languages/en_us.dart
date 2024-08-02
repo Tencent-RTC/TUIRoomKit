@@ -6,6 +6,7 @@ const Map<String, String> enUS = {
   'cancel': 'Cancel',
   'createRoom': 'Create Room',
   'enterRoom': 'Enter Room',
+  'scheduleRoom': 'Schedule Room',
   'speechMode': 'Speech mode',
   'roomId': 'RoomId',
   'roomType': 'Room Type',
