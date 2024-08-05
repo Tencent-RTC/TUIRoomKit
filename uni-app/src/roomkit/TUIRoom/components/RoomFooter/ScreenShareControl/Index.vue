@@ -5,10 +5,9 @@
       :is-active="isSharing"
       :disabled="screenShareDisabled"
       :title="title"
+      :icon="isSharing ? 'StopScreenShareIcon' : 'ScreenShareIcon'"
       @click-icon="toggleScreenShare"
     >
-      <stop-screen-share-icon v-if="isSharing"></stop-screen-share-icon>
-      <screen-share-icon v-else></screen-share-icon>
     </icon-button>
     <Dialog
       :model-value="isShowFraudDialog && isShowScreenShareAntiFraud"
@@ -32,21 +31,20 @@
       </template>
     </Dialog>
     <Dialog
-      :model-value="dialogVisible"
+      v-model="dialogVisible"
       width="420px"
       :title="t('End sharing')"
       :modal="true"
-      :before-close="cancelStop"
+      :close-on-click-modal="true"
       :append-to-room-container="true"
+      :confirm-button="t('End sharing')"
+      :cancel-button="t('Cancel')"
+      @confirm="stopScreenShare"
+      @cancel="cancelStop"
     >
-      <span>
-        {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
-      <template #footer>
-        <span>
-          <tui-button class="button" size="default" @click="stopScreenShare">{{ t('End sharing') }}</tui-button>
-          <tui-button type="primary" size="default" @click="cancelStop">{{ t('Cancel') }}</tui-button>
-        </span>
-      </template>
+      <text class="text-toast">
+        {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}
+      </text>
     </Dialog>
   </div>
 </template>
@@ -57,9 +55,6 @@ import { storeToRefs } from 'pinia';
 import TUIMessage from '../../common/base/Message';
 import Dialog from '../../common/base/Dialog/index.vue';
 import IconButton from '../../common/base/IconButton.vue';
-import ScreenShareIcon from '../../../assets/icons/ScreenShareIcon.svg';
-import StopScreenShareIcon from '../../../assets/icons/StopScreenShareIcon.svg';
-import { TUIRoomEngine, TUIRoomEvents } from '@tencentcloud/tuiroom-engine-uniapp-app';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useRoomStore } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
@@ -81,13 +76,14 @@ const { isShowScreenShareAntiFraud } = storeToRefs(basicStore);
 const { t } = useI18n();
 
 const btnStopRef = ref();
-const isSharing: Ref<boolean> = ref(false);
 const dialogVisible: Ref<boolean> = ref(false);
 const isShowFraudDialog: Ref<boolean> = ref(false);
 
 // 麦下用户不能进行屏幕分享
 const screenShareDisabled = computed(() => isAudience.value);
-const title = computed(() => (isSharing.value ? t('End sharing') : t('Share screen')));
+const title = computed(() => (roomStore.localUser.hasScreenStream ? t('End sharing') : t('Share screen')));
+
+const isSharing = computed(() => roomStore.localUser.hasScreenStream);
 
 watch(isAnchor, (val: any, oldVal: any) => {
   if (!oldVal && val && isSharing.value) {
@@ -133,38 +129,7 @@ function cancelStop() {
 
 async function startScreenShare() {
   isShowFraudDialog.value = false;
-  try {
-    await roomEngine.instance?.startScreenSharing();
-    isSharing.value = true;
-  } catch (error: any) {
-    logger.error(`${logPrefix}startScreenShare error:`, error.name, error.message, error.code);
-    let message = '';
-    // 当屏幕分享流初始化失败时, 提醒用户并停止后续进房发布流程
-    switch (error.name) {
-      case 'NotReadableError':
-        // 提醒用户确保系统允许当前浏览器获取屏幕内容
-        message = '系统禁止当前浏览器获取屏幕内容';
-        break;
-      case 'NotAllowedError':
-        if (error.message.includes('Permission denied by system')) {
-          // 提醒用户确保系统允许当前浏览器获取屏幕内容
-          message = '系统禁止当前浏览器获取屏幕内容';
-        } else {
-          // 用户拒绝/取消屏幕分享
-          message = '用户拒绝/取消屏幕分享';
-        }
-        break;
-      default:
-        // 初始化屏幕分享流时遇到了未知错误，提醒用户重试
-        message = '屏幕分享遇到未知错误';
-        break;
-    }
-    TUIMessage({
-      type: 'warning',
-      message,
-      duration: MESSAGE_DURATION.LONG,
-    });
-  }
+  await roomEngine.instance?.startScreenSharing();
 }
 
 async function stopScreenShare() {
@@ -172,33 +137,20 @@ async function stopScreenShare() {
     try {
       await roomEngine.instance?.stopScreenSharing();
       dialogVisible.value = false;
-      isSharing.value = false;
     } catch (error) {
       logger.error(`${logPrefix}stopScreenShare error:`, error);
     }
   }
 }
 
-/** 用户点击浏览器自带的 "停止共享" 按钮*/
-function screenCaptureStopped() {
-  isSharing.value = false;
-}
-
 eventBus.on('ScreenShare:stopScreenShare', stopScreenShare);
-
-TUIRoomEngine.once('ready', () => {
-  roomEngine.instance?.on(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
-});
 
 onUnmounted(() => {
   eventBus.off('ScreenShare:stopScreenShare', stopScreenShare);
-  roomEngine.instance?.off(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
 });
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/style/element-custom.scss';
-
 .screen-share-control-container {
   position: relative;
 }
@@ -225,5 +177,12 @@ onUnmounted(() => {
 }
 .button {
   margin-left: 20px;
+}
+.text-toast {
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px;
+  color: #4f586b;
 }
 </style>

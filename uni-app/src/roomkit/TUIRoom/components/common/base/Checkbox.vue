@@ -1,60 +1,68 @@
 <template>
   <div class="tui-checkbox">
-    <input
-      v-model="checked"
-      type="checkbox"
-      @change="handleValueChange"
-    />
-    <span @click="handleCheckBoxClick">
+    <input v-model="checked" type="checkbox" @change="handleValueChange" />
+    <span class="tui-checkbox-slot-container" @click="handleCheckBoxClick">
       <slot></slot>
     </span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from 'vue';
+import { ref, Ref, watch } from 'vue';
 interface Props {
   modelValue: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
+  slotCustomStyle: () => ({}),
+});
+const checked: Ref<boolean> = ref(props.modelValue);
+const emit = defineEmits(['input']);
+
+
+watch(() => props.modelValue, (value) => {
+  checked.value = value;
 });
 
-const checked: Ref<boolean> = ref(props.modelValue);
 
 function handleCheckBoxClick() {
   checked.value = !checked.value;
+  emit('input', checked.value);
 }
 
-const emit = defineEmits(['update:modelValue']);
 
 function handleValueChange(event: any) {
   checked.value = event.target.checked;
-  emit('update:modelValue', event.target.checked);
+  emit('input', event.target.checked);
 }
 </script>
 
 <style lang="scss" scoped>
 .tui-checkbox {
   position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: center;
   cursor: pointer;
+  .tui-checkbox-slot-container {
+    flex: 1;
+    overflow: auto;
+  }
 }
 
 input {
-  color: #0F1014;
-  border: 1px solid #E4EAF7;
+  color: var(--title-color);
+  border: 1px solid var(--stroke-color);
   border-radius: 4px;
   cursor: pointer;
 }
 
 input:focus {
-  border-color: #1C66E5;
+  border-color: var(--active-color-1);
   outline: 0;
 }
 
 input:disabled {
-  background-color: #F7F9FC;
+  background-color: var(--background-color-9);
 }
 </style>
