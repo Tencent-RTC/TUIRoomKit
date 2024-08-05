@@ -6,81 +6,84 @@
     @touchstart="handleTouchStart"
     @touchend="handleTouchEnd"
   >
-    <div class="stream-swiper" :style="swiperContainerStyle">
-      <div v-if="enlargeStream" class="stream-container-large-small" :style="swiperItemStyle">
-        <div
-          id="enlargedStreamContainer"
-          ref="enlargedContainerRef"
-          class="enlarged-stream-container"
-        >
-          <stream-region
-            v-if="enlargeStream"
-            :enlarge-dom-id="enlargeDomId"
-            :stream="enlargeStream"
-            :audio-volume="userVolumeObj[enlargeStream.userId] || 0"
-            :style-object="flexStyle"
-            :is-play-stream="currentPageIndex === 0"
-            :layout="LAYOUT.LARGE_SMALL_WINDOW"
-          ></stream-region>
+    <local-screen-stream v-if="isLocalScreen"></local-screen-stream>
+    <template v-else>
+      <div class="stream-swiper" :style="swiperContainerStyle">
+        <div v-if="enlargeStream" class="stream-container-large-small" :style="swiperItemStyle">
+          <div
+            id="enlargedStreamContainer"
+            ref="enlargedContainerRef"
+            class="enlarged-stream-container"
+          >
+            <stream-region
+              v-if="enlargeStream"
+              :enlarge-dom-id="enlargeDomId"
+              :stream="enlargeStream"
+              :audio-volume="userVolumeObj[enlargeStream.userId] || 0"
+              :style-object="flexStyle"
+              :is-play-stream="currentPageIndex === 0"
+              :layout="LAYOUT.LARGE_SMALL_WINDOW"
+            ></stream-region>
+          </div>
+          <div
+            ref="streamListRef"
+            :class="[
+              'stream-list',
+              `${isFirstPageInSixPointLayout ? '' : 'not-first-page'}`,
+              `${onlyVideoStreamList.length > 1 ? '' : 'single-stream'}`
+            ]"
+            :style="streamListStyleObject[0]"
+          >
+            <stream-region
+              :stream="topRightStream"
+              :audio-volume="userVolumeObj[topRightStream.userId] || 0"
+              :enlarge-dom-id="enlargeDomId"
+              :style-object="styleObject"
+              :is-play-stream="currentPageIndex === 0"
+              :layout="LAYOUT.LARGE_SMALL_WINDOW"
+              :class="[onlyVideoStreamList.length > 1 ? 'multi-stream' : 'single-stream']"
+            >
+            </stream-region>
+          </div>
         </div>
         <div
-          ref="streamListRef"
+          v-for="(item, key) in Math.ceil(onlyVideoStreamList.length / 6)"
+          :key="key"
+          :style="swiperItemStyle"
+          class="stream-container-flatten"
           :class="[
-            'stream-list',
-            `${isFirstPageInSixPointLayout ? '' : 'not-first-page'}`,
-            `${onlyVideoStreamList.length > 1 ? '' : 'single-stream'}`
+            onlyVideoStreamList.length > 1 ? 'multi-stream-container' : '',
+            `${isFirstPageInSixPointLayout ? '' : 'not-first-page'}`
           ]"
-          :style="streamListStyleObject[0]"
         >
-          <stream-region
-            :stream="topRightStream"
-            :audio-volume="userVolumeObj[topRightStream.userId] || 0"
-            :enlarge-dom-id="enlargeDomId"
-            :style-object="styleObject"
-            :is-play-stream="currentPageIndex === 0"
-            :layout="LAYOUT.LARGE_SMALL_WINDOW"
-            :class="[onlyVideoStreamList.length > 1 ? 'multi-stream' : 'single-stream']"
+          <div
+            ref="streamListRef"
+            class="stream-list"
+            :style="streamListStyleObject[item]"
           >
-          </stream-region>
+            <stream-region
+              v-for="(stream) in onlyVideoStreamList.slice(key * 6, key * 6 + 6)"
+              :key="`${stream.userId}_${stream.streamType}`"
+              :stream="stream"
+              :audio-volume="userVolumeObj[stream.userId] || 0"
+              :enlarge-dom-id="enlargeDomId"
+              :style-object="styleObject"
+              :layout="LAYOUT.SIX_EQUAL_POINTS"
+              :is-play-stream="(enlargeStream && currentPageIndex === item) || (!enlargeStream && currentPageIndex === item - 1)"
+            >
+            </stream-region>
+          </div>
         </div>
       </div>
-      <div
-        v-for="(item, key) in Math.ceil(onlyVideoStreamList.length / 6)"
-        :key="key"
-        :style="swiperItemStyle"
-        class="stream-container-flatten"
-        :class="[
-          onlyVideoStreamList.length > 1 ? 'multi-stream-container' : '',
-          `${isFirstPageInSixPointLayout ? '' : 'not-first-page'}`
-        ]"
-      >
+      <div v-if="totalPageNumber > 1" class="swipe">
         <div
-          ref="streamListRef"
-          class="stream-list"
-          :style="streamListStyleObject[item]"
-        >
-          <stream-region
-            v-for="(stream) in onlyVideoStreamList.slice(key * 6, key * 6 + 6)"
-            :key="`${stream.userId}_${stream.streamType}`"
-            :stream="stream"
-            :audio-volume="userVolumeObj[stream.userId] || 0"
-            :enlarge-dom-id="enlargeDomId"
-            :style-object="styleObject"
-            :layout="LAYOUT.SIX_EQUAL_POINTS"
-            :is-play-stream="(enlargeStream && currentPageIndex === item) || (!enlargeStream && currentPageIndex === item - 1)"
-          >
-          </stream-region>
-        </div>
+          v-for="(item, index) in totalPageNumber"
+          :key="item"
+          class="swipe-dots"
+          :class="[isActiveDot(index) ? 'swipe-current-dots' : '']"
+        ></div>
       </div>
-    </div>
-    <div v-if="totalPageNumber > 1" class="swipe">
-      <div
-        v-for="(item, index) in totalPageNumber"
-        :key="item"
-        class="swipe-dots"
-        :class="[isActiveDot(index) ? 'swipe-current-dots' : '']"
-      ></div>
-    </div>
+    </template>
   </div>
 </template>
 <script setup lang="ts">
@@ -94,7 +97,7 @@ import { MESSAGE_DURATION } from '../../../constants/message';
 import logger from '../../../utils/common/logger';
 import { throttle } from '../../../utils/utils';
 import { useRoomStore, StreamInfo } from '../../../stores/room';
-
+import LocalScreenStream from '../LocalScreenStream/index.vue';
 import { TUIRoomEngine, TUIChangeReason, TUIRoomEvents,  TUIVideoStreamType, TRTCVolumeInfo } from '@tencentcloud/tuiroom-engine-uniapp-app';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import useStreamContainer from './useStreamContainerHooks';
@@ -136,7 +139,7 @@ const onlyVideoStreamList = computed(() => (
   streamList.value.filter(stream => stream.streamType === TUIVideoStreamType.kCameraStream)
 ));
 
-
+const isLocalScreen = computed(() => roomStore.localUser.hasScreenStream);
 const currentPageIndex = ref(0);
 
 watch(() => onlyVideoStreamList.value.length, (val) => {
@@ -296,6 +299,9 @@ const onUserVideoStateChanged = async (eventInfo: {
         await setLayout(LAYOUT.LARGE_SMALL_WINDOW);
         currentPageIndex.value = 0;
       }
+      if (userId !== basicStore.userId) {
+        roomStore.setHasOtherScreenShare(true);
+      }
     } else {
       if (userId === enlargeStream.value?.userId) {
         /**
@@ -317,6 +323,9 @@ const onUserVideoStateChanged = async (eventInfo: {
         } else if (layout.value === LAYOUT.SIX_EQUAL_POINTS && currentPageIndex.value > 0) {
           currentPageIndex.value = currentPageIndex.value - 1;
         }
+      }
+      if (userId !== basicStore.userId) {
+        roomStore.setHasOtherScreenShare(false);
       }
     }
   }

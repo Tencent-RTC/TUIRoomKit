@@ -1,39 +1,37 @@
 <template>
   <div class="local-screen-container">
-    <div :class="['local-screen-control-container', { mini: isMiniRegion }]">
-      <div class="local-screen-info">
-        <svg-icon style="display: flex" :icon="ScreenSharingIcon"></svg-icon>
-        <span class="text">{{ t('You are sharing the screen...') }}</span>
-      </div>
-      <tui-button size="default" class="stop-button" @click="openStopConfirmDialog">
-        {{ t('End sharing') }}
-      </tui-button>
-      <Dialog
-        v-model="showStopShareRegion"
-        width="420px"
-        :title="t('End sharing')"
-        :modal="true"
-        :close-on-click-modal="true"
-        :append-to-room-container="true"
-      >
-        <span>
-          {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
-        <template #footer>
-          <span>
-            <tui-button class="dialog-button" size="default" @click="stopScreenSharing">{{ t('End sharing') }}</tui-button>
-            <tui-button type="primary" size="default" @click="showStopShareRegion = false">{{ t('Cancel') }}</tui-button>
-          </span>
-        </template>
-      </Dialog>
+    <div class="local-screen-control-container">
+      <svg-icon size="48" icon="ScreenSharingIcon"></svg-icon>
+      <text class="text">{{ t('You are sharing the screen...') }}</text>
+      <span class="stop-button" @click="openStopConfirmDialog" @click.stop>
+        <text class="text-end">
+          {{ t('End sharing') }}
+        </text>
+      </span>
     </div>
+    <Dialog
+      v-model="showStopShareRegion"
+      width="420px"
+      :title="t('End sharing')"
+      :modal="true"
+      :close-on-click-modal="true"
+      :append-to-room-container="true"
+      :confirm-button="t('End sharing')"
+      :cancel-button="t('Cancel')"
+      @confirm="stopScreenSharing"
+      @cancel="showStopShareRegion = false"
+      @click.stop
+    >
+      <text class="text-toast">
+        {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}
+      </text>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
-import ScreenSharingIcon from '../../../assets/icons/ScreenSharingIcon.png';
-import TuiButton from '../../common/base/Button.vue';
 import Dialog from '../../common/base/Dialog/index.vue';
 import eventBus from '../../../hooks/useMitt';
 import { useI18n } from '../../../locales';
@@ -58,59 +56,52 @@ function stopScreenSharing() {
 
 <style lang="scss" scoped>
 
-// .tui-theme-white .local-screen-container {
-//   --local-screen-stream-bg-color: rgba(228, 232, 238, 0.40);
-// }
+.tui-theme-white .local-screen-container {
+  --local-screen-stream-bg-color: rgba(228, 232, 238, 0.40);
+}
 
 // .tui-theme-black .local-screen-container {
 //   --local-screen-stream-bg-color: rgba(34, 38, 46, 0.50);
 // }
 
 .local-screen-container {
-  width: 100%;
-  height: 100%;
-  background-color: #FFFFFF;
   display: flex;
+  flex: 1;
+  background-color: rgba(228, 232, 238, 0.40);
   justify-content: center;
   align-items: center;
-  &::before {
-    content: '';
-    width: 100%;
-    height: 100%;
-    background-color: rgba(228, 232, 238, 0.40);
-  }
   .local-screen-control-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    // color: var(--screen-font-color);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    &.mini {
-      transform: translate(-50%, -50%) scale(0.7);
-    }
-    .local-screen-info {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+		flex: 1;
+		justify-content: center;
+		align-items: center;
       .text {
         font-size: 16px;
         font-style: normal;
         font-weight: 400;
         line-height: 24px;
         white-space: nowrap;
+        color: #B2BBD1;
       }
-    }
     .stop-button {
+      display: flex;
       margin-top: 30px;
+      padding: 10px 20px;
       background-color: #E5395C;
       border: 1.5px solid #E5395C;
+      border-radius: 6px;
+      .text-end{
+        color: #FFFFFF;
+      }
     }
   }
 }
-.dialog-button {
-  margin-right: 12px;
+
+.text-toast {
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px;
+  color: #4f586b;
 }
+
 </style>

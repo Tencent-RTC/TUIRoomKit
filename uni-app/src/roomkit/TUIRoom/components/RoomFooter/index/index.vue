@@ -16,6 +16,10 @@
       v-if="roomStore.isSpeakAfterTakingSeatMode && (isMaster || isAdmin)"
       @tap="() => handleControlClick('MasterApplyControl')"
     ></master-apply-control>
+    <screen-share-control
+      class="center-container-item"
+      @click="handleControlClick('screenShareControl')"
+    ></screen-share-control>
     <member-apply-control
       v-if="roomStore.isSpeakAfterTakingSeatMode && !isMaster"
       @tap="() => handleControlClick('MemberApplyControl')"
@@ -35,6 +39,7 @@ import ManageMemberControl from '../ManageMemberControl.vue';
 import MasterApplyControl from '../ManageStageControl.vue';
 import MemberApplyControl from '../ApplyControl/MemberApplyControl.vue';
 import MoreControl from '../MoreControl/index.vue';
+import ScreenShareControl from '../ScreenShareControl/Index.vue';
 import bus from '../../../hooks/useMitt';
 
 import TUIRoomAegis from '../../../utils/aegis';

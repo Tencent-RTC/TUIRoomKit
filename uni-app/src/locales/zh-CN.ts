@@ -327,4 +327,6 @@ export default {
   'Currently in a meeting, please exit the current meeting before proceeding.': '正在会议中，请先退出当前会议后再进行操作',
   'Failed to initiate meeting': '发起会议失败',
   'Failed to enter the meeting': '进入会议失败',
+  Attention: '注意',
+  'Media playback failed. Click the "Confirm" to resume playback': '音视频播放失败，请点击“确认”按钮恢复播放。',
 };
