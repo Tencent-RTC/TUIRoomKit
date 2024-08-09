@@ -1,5 +1,7 @@
 package com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.ConferenceList;
 
+import static com.tencent.cloud.tuikit.roomkit.ConferenceDefine.KEY_JOIN_CONFERENCE_PARAMS;
+
 import android.content.Context;
 
 import android.content.Intent;
@@ -15,11 +17,10 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tencent.cloud.tuikit.roomkit.ConferenceDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceConstant;
-import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
-import com.tencent.cloud.tuikit.roomkit.view.activity.ConferenceMainActivity;
+import com.tencent.cloud.tuikit.roomkit.ConferenceMainActivity;
 import com.tencent.qcloud.tuicore.TUICore;
 
 import java.util.Calendar;
@@ -129,7 +130,13 @@ public class ScheduledConferenceAdapter extends RecyclerView.Adapter<RecyclerVie
             mLlEnterRoom.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    enterRoom();
+                    ConferenceDefine.JoinConferenceParams params = new ConferenceDefine.JoinConferenceParams(mRoomId);
+                    params.isOpenMicrophone = true;
+                    params.isOpenCamera = false;
+                    params.isOpenSpeaker = true;
+                    Intent intent = new Intent(mContext, ConferenceMainActivity.class);
+                    intent.putExtra(KEY_JOIN_CONFERENCE_PARAMS, params);
+                    mContext.startActivity(intent);
                 }
             });
             mLayoutRoomInfo.setOnClickListener(new View.OnClickListener() {
@@ -140,20 +147,6 @@ public class ScheduledConferenceAdapter extends RecyclerView.Adapter<RecyclerVie
                     TUICore.startActivity("ScheduledConferenceDetailActivity", param);
                 }
             });
-        }
-
-        private void enterRoom() {
-            if (ConferenceController.sharedInstance().getConferenceState().isInFloatWindow()) {
-                RoomToast.toastLongMessage(mContext.getString(R.string.tuiroomkit_room_msg_joined));
-                return;
-            }
-            Intent intent = new Intent(mContext, ConferenceMainActivity.class);
-            intent.putExtra("id", mRoomId);
-            intent.putExtra("muteMicrophone", false);
-            intent.putExtra("openCamera", false);
-            intent.putExtra("soundOnSpeaker", true);
-            intent.putExtra("isCreate", false);
-            mContext.startActivity(intent);
         }
 
         public void bind(final ScheduledConferenceItemInfo item) {

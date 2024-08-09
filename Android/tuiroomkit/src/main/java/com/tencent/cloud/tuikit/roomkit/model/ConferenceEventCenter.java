@@ -94,6 +94,8 @@ public class ConferenceEventCenter {
         public static final String DISMISS_INVITE_PANEL          = "DISMISS_INVITE_PANEL";
         public static final String SHOW_INVITE_PANEL_SECOND      = "SHOW_INVITE_PANEL_SECOND";
         public static final String DISMISS_INVITE_PANEL_SECOND   = "DISMISS_INVITE_PANEL_SECOND";
+        public static final String SHOW_SHARE_ROOM_PANEL         = "SHOW_SHARE_ROOM_PANEL";
+        public static final String DISMISS_SHARE_ROOM_PANEL      = "DISMISS_SHARE_ROOM_PANEL";
         public static final String SHOW_OWNER_EXIT_ROOM_PANEL    = "SHOW_OWNER_EXIT_ROOM_PANEL";
         public static final String DISMISS_OWNER_EXIT_ROOM_PANEL = "DISMISS_OWNER_EXIT_ROOM_PANEL";
 

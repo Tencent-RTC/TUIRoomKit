@@ -2,6 +2,7 @@ package com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.Con
 
 import static com.tencent.cloud.tuikit.engine.common.TUICommonDefine.Error.FAILED;
 import static com.tencent.cloud.tuikit.engine.extension.TUIConferenceListManager.ConferenceStatus.RUNNING;
+import static com.tencent.cloud.tuikit.roomkit.ConferenceDefine.KEY_JOIN_CONFERENCE_PARAMS;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -21,14 +22,14 @@ import androidx.core.content.ContextCompat;
 
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+import com.tencent.cloud.tuikit.roomkit.ConferenceDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.common.utils.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceConstant;
 import com.tencent.cloud.tuikit.roomkit.model.controller.ScheduleController;
 import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
-import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
-import com.tencent.cloud.tuikit.roomkit.view.activity.ConferenceMainActivity;
+import com.tencent.cloud.tuikit.roomkit.ConferenceMainActivity;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.view.AttendeesDisplayView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.view.ScheduleInviteMemberView;
@@ -211,16 +212,12 @@ public class ScheduledConferenceDetailView extends FrameLayout {
     }
 
     private void enterConference() {
-        if (ConferenceController.sharedInstance().getConferenceState().isInFloatWindow()) {
-            RoomToast.toastLongMessage(mContext.getString(R.string.tuiroomkit_room_msg_joined));
-            return;
-        }
+        ConferenceDefine.JoinConferenceParams params = new ConferenceDefine.JoinConferenceParams(mRoomId);
+        params.isOpenMicrophone = true;
+        params.isOpenCamera = false;
+        params.isOpenSpeaker = true;
         Intent intent = new Intent(mContext, ConferenceMainActivity.class);
-        intent.putExtra("id", mRoomId);
-        intent.putExtra("muteMicrophone", false);
-        intent.putExtra("openCamera", false);
-        intent.putExtra("soundOnSpeaker", true);
-        intent.putExtra("isCreate", false);
+        intent.putExtra(KEY_JOIN_CONFERENCE_PARAMS, params);
         mContext.startActivity(intent);
         finishActivity();
     }

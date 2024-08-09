@@ -298,4 +298,24 @@
     <string name="tuiroomkit_please_input_room_number">请输入房间号</string>
     <string name="tuiroomkit_enter_room">加入房间</string>
     <string name="tuiroomkit_create_room">新建房间</string>
+    <string name="tuiroomkit_repeat_start_room_dialog_title">当前已在房间中</string>
+    <string name="tuiroomkit_repeat_start_room_dialog_content">请先退出后再加入新的房间</string>
+    <string name="tuiroomkit_i_see">我知道了</string>
+
+    <string name="tuiroomkit_invite_yout_to_join_conference">%s邀请你加入会议</string>
+    <string name="tuiroomkit_participant">参会人：</string>
+    <string name="tuiroomkit_join_now">立即加入</string>
+    <string name="tuiroomkit_do_not_enter_for_now">暂不进入</string>
+    <string name="tuiroomkit_conference_host">主持人：</string>
+    <string name="tuiroomkit_add_user">添加成员</string>
+    <string name="tuiroomkit_share_room">分享房间</string>
+    <string name="tuiroomkit_already_entered_room">已进房(%s)</string>
+    <string name="tuiroomkit_not_entered_room">未进房(%s)</string>
+    <string name="tuiroomkit_not_entered">未进入(%s)</string>
+    <string name="tuiroomkit_call">呼叫</string>
+    <string name="tuiroomkit_calling">呼叫中</string>
+    <string name="tuiroomkit_not_join_for_now">暂不入会</string>
+    <string name="tuiroomkit_call_everyone">呼叫所有人</string>
+    <string name="tuiroomkit_copy_room_id_and_link">复制房间号与链接</string>
+    <string name="tuiroomkit_copy_success">复制成功</string>
 </resources>

@@ -4,7 +4,7 @@ import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.trtc.tuikit.common.livedata.LiveData;
 
 public class RoomState {
-    public String                           roomId        = "";
+    public LiveData<String>                 roomId        = new LiveData<>("");
     public long                             createTime    = 0L;
     public LiveData<String>                 ownerId       = new LiveData<>("");
     public LiveData<String>                 roomName      = new LiveData<>("");
@@ -13,7 +13,7 @@ public class RoomState {
     public LiveData<TUIRoomDefine.SeatMode> seatMode      = new LiveData<>(TUIRoomDefine.SeatMode.FREE_TO_TAKE);
 
     public void updateState(TUIRoomDefine.RoomInfo roomInfo) {
-        roomId = roomInfo.roomId;
+        roomId.set(roomInfo.roomId);
         createTime = roomInfo.createTime;
         ownerId.set(roomInfo.ownerId);
         roomName.set(roomInfo.name);

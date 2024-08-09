@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
@@ -18,7 +17,7 @@
     <application>
 
         <activity
-            android:name="com.tencent.cloud.tuikit.roomkit.view.activity.ConferenceMainActivity"
+            android:name="com.tencent.cloud.tuikit.roomkit.ConferenceMainActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat.NoActionBar" />

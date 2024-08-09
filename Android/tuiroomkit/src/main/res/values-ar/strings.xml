@@ -298,4 +298,24 @@
     <string name="tuiroomkit_please_input_room_number">الرجاء إدخال رقم الغرفة</string>
     <string name="tuiroomkit_enter_room">انضم إلى الغرفة</string>
     <string name="tuiroomkit_create_room">إنشاء غرفة</string>
+    <string name="tuiroomkit_repeat_start_room_dialog_title">حاليا في الغرفة</string>
+    <string name="tuiroomkit_repeat_start_room_dialog_content">خروج الإيجار قبل الانضمام إلى غرفة جديدة</string>
+    <string name="tuiroomkit_i_see">أرى</string>
+
+    <string name="tuiroomkit_invite_yout_to_join_conference">دعوتك للمشاركة في الاجتماع%s</string>
+    <string name="tuiroomkit_participant">المشاركون في الاجتماع:</string>
+    <string name="tuiroomkit_join_now">انضم الآن</string>
+    <string name="tuiroomkit_do_not_enter_for_now">لن أدخل الآن</string>
+    <string name="tuiroomkit_conference_host">يستضيف:</string>
+    <string name="tuiroomkit_add_user">إضافة أعضاء</string>
+    <string name="tuiroomkit_share_room">مشاركة الغرفة</string>
+    <string name="tuiroomkit_not_entered_room">لم أدخل الغرفة بعد(%s)</string>
+    <string name="tuiroomkit_not_entered">لم أدخل بعد(%s)</string>
+    <string name="tuiroomkit_call">"النداء  "</string>
+    <string name="tuiroomkit_calling">النداء قيد التنفيذ</string>
+    <string name="tuiroomkit_not_join_for_now">لن أدخل الاجتماع الآن</string>
+    <string name="tuiroomkit_call_everyone">نداء الجميع</string>
+    <string name="tuiroomkit_already_entered_room">دخلت الغرفة(%s)</string>
+    <string name="tuiroomkit_copy_room_id_and_link">نسخ رقم الغرفة والربط</string>
+    <string name="tuiroomkit_copy_success">تم النسخ بنجاح</string>
 </resources>
