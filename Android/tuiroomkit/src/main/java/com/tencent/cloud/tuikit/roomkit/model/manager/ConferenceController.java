@@ -18,6 +18,10 @@ import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomE
 import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomEngineEvent.LOCAL_USER_ENTER_ROOM;
 import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomEngineEvent.LOCAL_USER_EXIT_ROOM;
 import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomKitUIEvent.ENABLE_FLOAT_CHAT;
+import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY_CONFERENCE;
+import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY_CONFERENCE_EXITED;
+import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY_CONFERENCE_FINISHED;
+import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY_CONFERENCE_ID;
 import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY_ROOM_ID;
 
 import android.content.Context;
@@ -34,7 +38,6 @@ import com.tencent.cloud.tuikit.engine.extension.TUIRoomDeviceManager;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomObserver;
-import com.tencent.cloud.tuikit.roomkit.ConferenceObserver;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.common.KeepAliveService;
 import com.tencent.cloud.tuikit.roomkit.common.utils.BusinessSceneUtil;
@@ -45,6 +48,7 @@ import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceState;
 import com.tencent.cloud.tuikit.roomkit.model.controller.MediaController;
+import com.tencent.cloud.tuikit.roomkit.model.controller.RoomController;
 import com.tencent.cloud.tuikit.roomkit.model.controller.UserController;
 import com.tencent.cloud.tuikit.roomkit.model.controller.ViewController;
 import com.tencent.cloud.tuikit.roomkit.model.data.RoomState;
@@ -56,6 +60,7 @@ import com.tencent.cloud.tuikit.roomkit.model.entity.UserEntity;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.view.page.RoomWindowManager;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.FloatChat.store.FloatChatStore;
+import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.permission.PermissionCallback;
 import com.tencent.trtc.TRTCCloud;
@@ -72,6 +77,7 @@ public class ConferenceController {
 
     private ViewController  mViewController;
     private UserController  mUserController;
+    private RoomController  mRoomController;
     private MediaController mMediaController;
 
     private boolean mIsLoginSuccess = false;
@@ -110,6 +116,10 @@ public class ConferenceController {
 
     public UserController getUserController() {
         return mUserController;
+    }
+
+    public RoomController getRoomController() {
+        return mRoomController;
     }
 
     public MediaController getMediaController() {
@@ -454,6 +464,7 @@ public class ConferenceController {
 
         mViewController = new ViewController(mConferenceState, mRoomEngine);
         mUserController = new UserController(mConferenceState, mRoomEngine);
+        mRoomController = new RoomController(mConferenceState, mRoomEngine);
         mMediaController = new MediaController(mConferenceState, mRoomEngine);
     }
 
@@ -471,6 +482,7 @@ public class ConferenceController {
     }
 
     public void createRoom(TUIRoomDefine.RoomInfo roomInfo, TUIRoomDefine.ActionCallback callback) {
+        mViewController.updateRoomProcess(ViewState.RoomProcess.COMING);
         roomInfo.name = transferConferenceName(roomInfo.name);
         loginRoomEngine(new TUIRoomDefine.ActionCallback() {
             @Override
@@ -493,6 +505,7 @@ public class ConferenceController {
                     @Override
                     public void onError(TUICommonDefine.Error error, String message) {
                         Log.e(TAG, "createRoom onError error=" + error + " message=" + message);
+                        mViewController.updateRoomProcess(ViewState.RoomProcess.NONE);
                         Map<String, Object> params = new HashMap<>(1);
                         params.put(KEY_ERROR, error);
                         params.put(KEY_ROOM_ID, roomInfo.roomId);
@@ -506,6 +519,7 @@ public class ConferenceController {
 
             @Override
             public void onError(TUICommonDefine.Error error, String message) {
+                mViewController.updateRoomProcess(ViewState.RoomProcess.NONE);
                 Map<String, Object> params = new HashMap<>(1);
                 params.put(KEY_ERROR, error);
                 params.put(KEY_ROOM_ID, roomInfo.roomId);
@@ -519,6 +533,7 @@ public class ConferenceController {
 
     public void enterRoom(String roomId, boolean enableAudio, boolean enableVideo, boolean isSoundOnSpeaker,
                           TUIRoomDefine.GetRoomInfoCallback callback) {
+        mViewController.updateRoomProcess(ViewState.RoomProcess.COMING);
         loginRoomEngine(new TUIRoomDefine.ActionCallback() {
             @Override
             public void onSuccess() {
@@ -529,6 +544,7 @@ public class ConferenceController {
                     @Override
                     public void onSuccess(TUIRoomDefine.RoomInfo engineRoomInfo) {
                         Log.i(TAG, "enterRoom onSuccess thread.name=" + Thread.currentThread().getName());
+                        mViewController.updateRoomProcess(ViewState.RoomProcess.IN);
                         initRoomStore(engineRoomInfo);
                         setVideoEncoderParam();
                         getSeatApplicationList();
@@ -571,6 +587,7 @@ public class ConferenceController {
                     @Override
                     public void onError(TUICommonDefine.Error error, String message) {
                         Log.e(TAG, "enterRoom onError error=" + error + " message=" + message);
+                        mViewController.updateRoomProcess(ViewState.RoomProcess.NONE);
                         if (callback != null) {
                             callback.onError(error, message);
                         }
@@ -584,6 +601,7 @@ public class ConferenceController {
 
             @Override
             public void onError(TUICommonDefine.Error error, String message) {
+                mViewController.updateRoomProcess(ViewState.RoomProcess.NONE);
                 if (callback != null) {
                     callback.onError(error, message);
                 }
@@ -866,11 +884,9 @@ public class ConferenceController {
                 params.put(KEY_ERROR, error);
                 ConferenceEventCenter.getInstance().notifyEngineEvent(LOCAL_USER_EXIT_ROOM, params);
 
-                ConferenceObserver observer = mConferenceState.getConferenceObserver();
-                if (observer != null) {
-                    Log.i(TAG, "onConferenceFinished : " + roomId);
-                    observer.onConferenceExisted(roomId);
-                }
+                Map<String, Object> param = new HashMap<>(1);
+                param.put(KEY_CONFERENCE_ID, roomId);
+                TUICore.notifyEvent(KEY_CONFERENCE, KEY_CONFERENCE_EXITED, param);
             }
         });
     }
@@ -904,11 +920,9 @@ public class ConferenceController {
                 params.put(KEY_ERROR, error);
                 ConferenceEventCenter.getInstance().notifyEngineEvent(LOCAL_USER_DESTROY_ROOM, params);
 
-                ConferenceObserver observer = mConferenceState.getConferenceObserver();
-                if (observer != null) {
-                    Log.i(TAG, "onConferenceFinished : " + roomId);
-                    observer.onConferenceFinished(roomId);
-                }
+                Map<String, Object> param = new HashMap<>(1);
+                param.put(KEY_CONFERENCE_ID, roomId);
+                TUICore.notifyEvent(KEY_CONFERENCE, KEY_CONFERENCE_FINISHED, param);
             }
         });
     }
@@ -934,6 +948,7 @@ public class ConferenceController {
         mRoomFloatWindowManager.destroy();
         mViewController.destroy();
         mUserController.destroy();
+        mRoomController.destroy();
         mMediaController.destroy();
         FloatChatStore.sharedInstance().destroyInstance();
         sInstance = null;

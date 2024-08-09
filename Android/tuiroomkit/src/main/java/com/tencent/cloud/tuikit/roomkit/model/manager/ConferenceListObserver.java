@@ -27,7 +27,7 @@ public class ConferenceListObserver extends TUIConferenceListManager.Observer {
     @Override
     public void onConferenceInfoChanged(TUIConferenceListManager.ConferenceInfo conferenceInfo, List<TUIConferenceListManager.ConferenceModifyFlag> modifyFlagList) {
         Log.d(TAG, "onConferenceInfoChanged conferenceId=" + conferenceInfo.basicRoomInfo.roomId + " name=" + conferenceInfo.basicRoomInfo.name);
-        if (!TextUtils.equals(mRoomState.roomId, conferenceInfo.basicRoomInfo.roomId)) {
+        if (!TextUtils.equals(mRoomState.roomId.get(), conferenceInfo.basicRoomInfo.roomId)) {
             return;
         }
         if (!isConferenceNameChanged(modifyFlagList)) {

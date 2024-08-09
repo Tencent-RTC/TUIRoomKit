@@ -16,12 +16,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.tencent.cloud.tuikit.roomkit.ConferenceListFragment;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.common.utils.ImageLoader;
-import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
-import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
-import com.tencent.cloud.tuikit.roomkit.ConferenceListFragment;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.view.ScheduleInviteMemberView;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
@@ -146,18 +144,10 @@ public class PrepareView extends RelativeLayout implements View.OnClickListener,
     }
 
     private void createRoom() {
-        if (ConferenceController.sharedInstance().getConferenceState().isInFloatWindow()) {
-            RoomToast.toastLongMessage(mContext.getString(R.string.tuiroomkit_room_msg_joined));
-            return;
-        }
         TUICore.startActivity("CreateConferenceActivity", null);
     }
 
     private void enterRoom() {
-        if (ConferenceController.sharedInstance().getConferenceState().isInFloatWindow()) {
-            RoomToast.toastLongMessage(mContext.getString(R.string.tuiroomkit_room_msg_joined));
-            return;
-        }
         TUICore.startActivity("EnterConferenceActivity", null);
     }
 

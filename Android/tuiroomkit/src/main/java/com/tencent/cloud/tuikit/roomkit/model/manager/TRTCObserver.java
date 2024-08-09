@@ -1,12 +1,15 @@
 package com.tencent.cloud.tuikit.roomkit.model.manager;
 
+import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY_CONFERENCE;
+import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY_CONFERENCE_FINISHED;
+import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY_CONFERENCE_ID;
+
 import android.util.Log;
 
-import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
-import com.tencent.cloud.tuikit.roomkit.ConferenceObserver;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceState;
+import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.trtc.TRTCCloudListener;
 import com.tencent.trtc.TRTCStatistics;
 
@@ -27,12 +30,9 @@ public class TRTCObserver extends TRTCCloudListener {
         map.put(ConferenceEventConstant.KEY_ROOM_ID, store.roomInfo.roomId);
         ConferenceEventCenter.getInstance().notifyEngineEvent(ConferenceEventCenter.RoomEngineEvent.ROOM_DISMISSED, map);
 
-        ConferenceObserver observer = store.getConferenceObserver();
-        if (observer != null) {
-            Log.i(TAG, "onConferenceFinished : " + store.roomInfo.roomId);
-            observer.onConferenceFinished(store.roomInfo.roomId);
-        }
-        TUIRoomEngine.destroySharedInstance();
+        Map<String, Object> param = new HashMap<>(1);
+        param.put(KEY_CONFERENCE_ID, store.roomInfo.roomId);
+        TUICore.notifyEvent(KEY_CONFERENCE, KEY_CONFERENCE_FINISHED, param);
     }
 
     @Override
