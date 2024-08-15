@@ -91,6 +91,7 @@ public class ConferenceMainFragment extends Fragment {
 
             @Override
             public void onError(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message) {
+                onDismiss();
                 Map<String, Object> param = new HashMap<>(3);
                 param.put(KEY_CONFERENCE_INFO, roomInfo);
                 param.put(KEY_CONFERENCE_ERROR, error);

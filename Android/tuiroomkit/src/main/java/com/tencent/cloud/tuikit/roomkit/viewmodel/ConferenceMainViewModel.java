@@ -27,8 +27,8 @@ public class ConferenceMainViewModel
     private final ConferenceMainFragment mFragment;
 
     public interface GetConferenceInfoCallback {
-        public void onSuccess(TUIRoomDefine.RoomInfo roomInfo);
-        public void onError(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message);
+        void onSuccess(TUIRoomDefine.RoomInfo roomInfo);
+        void onError(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message);
     }
 
     public ConferenceMainViewModel(ConferenceMainFragment fragment) {
