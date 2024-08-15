@@ -73,6 +73,7 @@ public class ScheduleConferenceView extends FrameLayout {
         mLayoutStartScheduleConference.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                mLayoutStartScheduleConference.setClickable(false);
                 scheduleConference(new TUIRoomDefine.ActionCallback() {
                     @Override
                     public void onSuccess() {
@@ -85,11 +86,10 @@ public class ScheduleConferenceView extends FrameLayout {
                     }
 
                     @Override
-                    public void onError(TUICommonDefine.Error error, String s) {
+                    public void onError(TUICommonDefine.Error error, String message) {
                         mLayoutStartScheduleConference.setClickable(true);
                     }
                 });
-                mLayoutStartScheduleConference.setClickable(false);
             }
         });
         mConferenceDetailView.setStateHolder(mStateHolder);
@@ -122,15 +122,18 @@ public class ScheduleConferenceView extends FrameLayout {
                 conferenceInfo.basicRoomInfo.password = conferenceEncryptViewUiState.password;
                 if (conferenceInfo.scheduleStartTime < System.currentTimeMillis()) {
                     RoomToast.toastLongMessageCenter(mContext.getString(R.string.tuiroomkit_start_time_earlier_than_current_time));
+                    callback.onError(TUICommonDefine.Error.FAILED, null);
                     return;
                 }
                 String conferenceName = conferenceInfo.basicRoomInfo.name;
                 if (TextUtils.isEmpty(conferenceName)) {
-                    RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_conference_name_empty));
+                    RoomToast.toastLongMessageCenter(mContext.getString(R.string.tuiroomkit_conference_name_empty));
+                    callback.onError(TUICommonDefine.Error.FAILED, null);
                     return;
                 }
                 if (conferenceName.getBytes(StandardCharsets.UTF_8).length > 100) {
-                    RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_conference_name_exceeds_max_length));
+                    RoomToast.toastLongMessageCenter(mContext.getString(R.string.tuiroomkit_conference_name_exceeds_max_length));
+                    callback.onError(TUICommonDefine.Error.FAILED, null);
                     return;
                 }
                 ScheduleController.sharedInstance().scheduleConference(conferenceInfo, callback);
