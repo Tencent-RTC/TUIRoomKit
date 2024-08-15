@@ -13,12 +13,16 @@ export default function useMemberItem(userInfo: UserInfo) {
   const isCanOperateCurrentMember = computed(() => {
     const isTargetUserRoomOwner = userInfo.userRole === TUIRole.kRoomOwner;
     const isTargetUserGeneral = userInfo.userRole === TUIRole.kGeneralUser;
-    return (isMaster.value && !isTargetUserRoomOwner) || (isAdmin.value && isTargetUserGeneral);
+    const isTargetUserMySelf = userInfo.userId === roomStore.localUser.userId;
+    return (isMaster.value && !isTargetUserRoomOwner) || (isAdmin.value && isTargetUserGeneral) || isTargetUserMySelf;
   });
-  const isMemberControlAccessible = computed(() => (
-    // Only the homeowner or administrator can open the control panel
-    userInfo.userId === showUserId.value) && isCanOperateCurrentMember.value);
 
+  const isCanOperateMySelf = computed(() => {
+    return userInfo.userId === roomStore.localUser.userId;
+  })
+  const isMemberControlAccessible = computed(() => (
+    userInfo.userId === showUserId.value) && (isCanOperateMySelf.value || isCanOperateCurrentMember.value));
+  
   function openMemberControl() {
     showUserId.value = userInfo.userId;
   }
@@ -31,6 +35,7 @@ export default function useMemberItem(userInfo: UserInfo) {
     isMemberControlAccessible,
     openMemberControl,
     closeMemberControl,
+    isCanOperateMySelf,
   };
 }
 

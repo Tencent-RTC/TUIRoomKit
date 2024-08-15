@@ -19,7 +19,7 @@ export default function useRoomInfo() {
   const isShowRoomInfo = ref(false);
   const roomType = computed(() => (roomStore.isFreeSpeakMode ? t('Free Speech Room') : t('On-stage Speaking Room')));
   const arrowDirection = ref(false);
-  const [roomLinkConfig] = roomService.getComponentConfig(['RoomLink']);
+  const roomLinkConfig = roomService.getComponentConfig('RoomLink');
 
   const masterUserName = computed(() => roomStore.getUserName(masterUserId.value) || masterUserId.value);
 

@@ -20,7 +20,6 @@ class CreateRoomViewController: UIViewController {
     private let currentUserName: String = TUILogin.getNickName() ?? ""
     private let currentUserId: String = TUILogin.getUserID() ?? ""
     private let roomInfo: TUIRoomInfo = TUIRoomInfo()
-    private let roomKit: TUIRoomKit = TUIRoomKit.createInstance()
     private var enableLocalAudio: Bool = true
     private var enableLocalVideo: Bool = true
     private var isSoundOnSpeaker: Bool = true
@@ -137,27 +136,7 @@ extension CreateRoomViewController {
             self.renewRootViewState()
             return
         }
-        //1.Use ConferenceMainViewController, first enter the room and then display the page
         quickStartConference(roomId: roomId)
-        //2.Use ConferenceMainViewController and enter the room and display the page at the same time
-        //        quickStartConferenceAndShowViewController(roomId: roomId)
-        //3.Using TUIRoomKit
-        //        createRoom(roomId: roomId)
-    }
-    
-    private func quickStartConferenceAndShowViewController(roomId: String) {
-        let vc = ConferenceMainViewController()
-        let params = ConferenceParams()
-        params.name = currentUserName.truncateUtf8String(maxByteLength: 30)
-        params.enableSeatControl = isSeatEnable
-        params.isMuteMicrophone = !enableLocalAudio
-        params.isOpenCamera = enableLocalVideo
-        params.isSoundOnSpeaker = isSoundOnSpeaker
-        vc.setConferenceParams(params: params)
-        vc.quickStartConference(conferenceId: roomId)
-        vc.setConferenceObserver(observer: self)
-        navigationController?.pushViewController(vc, animated: true)
-        renewRootViewState()
     }
     
     private func quickStartConference(roomId: String) {
@@ -168,32 +147,8 @@ extension CreateRoomViewController {
         params.isOpenCamera = enableLocalVideo
         params.isSoundOnSpeaker = isSoundOnSpeaker
         conferenceViewController?.setConferenceParams(params: params)
-        conferenceViewController?.quickStartConference(conferenceId: roomId)
         conferenceViewController?.setConferenceObserver(observer: self)
-    }
-    
-    private func createRoom(roomId: String) {
-        roomInfo.roomId = roomId
-        roomInfo.name = currentUserName.truncateUtf8String(maxByteLength: 30)
-        roomInfo.isSeatEnabled = isSeatEnable
-        roomInfo.seatMode = .applyToTake
-        roomInfo.roomType = .conference
-        roomKit.createRoom(roomInfo: roomInfo) { [weak self] in
-            guard let self = self else { return }
-            self.roomKit.enterRoom(roomId: self.roomInfo.roomId, enableAudio: self.enableLocalAudio, enableVideo:
-                                    self.enableLocalVideo, isSoundOnSpeaker: self.isSoundOnSpeaker) { [weak self] in
-                guard let self = self else { return }
-                self.renewRootViewState()
-            } onError: { [weak self] code, message in
-                guard let self = self else { return }
-                self.renewRootViewState()
-                self.rootView?.makeToast(message)
-            }
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            self.renewRootViewState()
-            self.rootView?.makeToast(message)
-        }
+        conferenceViewController?.quickStartConference(conferenceId: roomId)
     }
     
     private func renewRootViewState() {
@@ -260,7 +215,6 @@ extension CreateRoomViewController {
 
 extension CreateRoomViewController: ConferenceObserver {
     func onConferenceStarted(conferenceId: String, error: ConferenceError) {
-        //1.Go to the first room and then show the page
         if error == .success {
             guard let vc = conferenceViewController else { return }
             navigationController?.pushViewController(vc, animated: true)
@@ -287,7 +241,7 @@ private extension String {
         RoomDemoLocalize("Your Name")
     }
     static var roomTypeText: String {
-        RoomDemoLocalize("Room Type")
+        RoomDemoLocalize("Conference Type")
     }
     static var openCameraText: String {
         RoomDemoLocalize("Video")

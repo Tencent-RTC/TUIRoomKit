@@ -327,4 +327,6 @@ export default {
   'Currently in a meeting, please exit the current meeting before proceeding.': 'Currently in a meeting, please exit the current meeting before proceeding.',
   'Failed to initiate meeting': 'Failed to initiate meeting',
   'Failed to enter the meeting': 'Failed to enter the meeting',
+  Attention: 'Attention',
+  'Media playback failed. Click the "Confirm" to resume playback': 'Media playback failed. Click the "Confirm" to resume playback.',
 };

@@ -11,6 +11,7 @@
   --background-color-10: #2B2F38;
   --background-color-11: #2B303A;
   --background-color-12: #4F586B;
+  --hover-background-colo-1: rgba(213, 224, 242, 0.5);
   --font-color-1: #D5E0F2;
   --font-color-2: #6B758A;
   --font-color-3: #B3B8C8;
@@ -19,6 +20,8 @@
   --font-color-6: #CFD5E6;
   --font-color-7: #FFFFFF;
   --font-color-8: #8F9AB2;
+  --font-color-9: #969EB4;
+  --font-color-10: #FF643D;
   --title-color: #000000;
   --stroke-color: rgba(79, 88, 107, 0.30);
   --stroke-color-2: #434956;
@@ -124,7 +127,7 @@
   --el-message-box-title: #CFD4E6;
   --el-button-text-color: #7C85A6;
   --selected-screen-share-dialog: #006EFF;
-  /* H5新增 */
+  /* H5 New Content */
   --log-out-mobile: rgba(0, 0, 0, 0.7);
   --log-out: #2C2C2E;
   --log-out-cancel: #2C2C2E;
@@ -156,5 +159,4 @@
   --user-extra-info-color-h5: #FFFFFF;
   --apply-container-background-outline-h5: #292D38;
   --apply-container-outline-h5: #CFD5E6;
-  --mute-all-h5: #FF2E2E
 }

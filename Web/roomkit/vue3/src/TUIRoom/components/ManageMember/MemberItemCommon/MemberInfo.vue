@@ -3,7 +3,7 @@
   <div :class="[isMobile ? 'member-info-mobile' : 'member-info']">
     <div :class="!showStateIcon && isTargetUserAdmin ? 'member-basic-info-admin' : 'member-basic-info'">
       <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
-      <div class="user-name">{{ userInfo.userName || userInfo.userId }}</div>
+      <div class="user-name">{{ roomService.getDisplayName(userInfo) }}</div>
       <div class="role-info">
         <svg-icon
           v-if="isTargetUserRoomOwner || isTargetUserAdmin"
@@ -43,6 +43,7 @@ import { useI18n } from '../../../locales';
 import { isMobile } from '../../../utils/environment';
 import UserIcon from '../../common/icons/UserIcon.vue';
 import { TUIRole } from '@tencentcloud/tuiroom-engine-js';
+import { roomService } from '../../../services';
 
 const { t } = useI18n();
 

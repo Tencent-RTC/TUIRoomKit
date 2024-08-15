@@ -7,31 +7,40 @@
   >
     <div :class="streamContainerClass">
       <div
-        v-show="layout === LAYOUT.LARGE_SMALL_WINDOW"
+        v-if="layout === LAYOUT.LARGE_SMALL_WINDOW"
         ref="enlargedContainerRef"
         class="enlarged-stream-container"
       >
         <stream-region
           v-if="enlargeStream"
+          :layout="layout"
           :stream="enlargeStream"
+          :enlarge-dom-id="enlargeDomId"
+          :is-enlarge="true"
         ></stream-region>
       </div>
       <div
         class="stream-list-container"
-        :class="[onlyVideoStreamList.length > 1 ? 'multi-stream-container' : 'single-stream-container']"
+        :class="[
+          cameraStreamList.length > 1 ? 'multi-stream-container' : 'single-stream-container',
+          showRoomTool ? 'show-room-tool' : '',
+        ]"
       >
         <div
           ref="streamListRef"
           :class="['stream-list', `${isFirstPageInSixPointLayout ? '' : 'not-first-page'}`]"
         >
           <stream-region
-            v-for="(stream) in onlyVideoStreamList"
+            v-for="(stream) in streamList"
             v-show="showStreamList.indexOf(stream) > -1"
             :key="`${stream.userId}_${stream.streamType}`"
             :stream="stream"
+            :layout="layout"
             :enlarge-dom-id="enlargeDomId"
             :show-room-tool="showRoomTool"
-            :class="[onlyVideoStreamList.length > 1 ? 'multi-stream' : 'single-stream']"
+            :class="[cameraStreamList.length > 1 ? 'multi-stream' : 'single-stream']"
+            @click="handelStreamRegionClick"
+            @room-dblclick="handleEnlargeStreamRegion(stream)"
           >
           </stream-region>
         </div>
@@ -58,28 +67,29 @@ import StreamRegion from '../StreamRegion';
 import TUIMessage from '../../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import logger from '../../../utils/common/logger';
-import { throttle } from '../../../utils/utils';
 
-import TUIRoomEngine, { TUIChangeReason, TUIRoomEvents,  TUIVideoStreamType, TRTCVolumeInfo } from '@tencentcloud/tuiroom-engine-js';
+import TUIRoomEngine, { TUIChangeReason, TUIRoomEvents, TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import useStreamContainer from './useStreamContainerHooks';
 
 const logPrefix = '[StreamContainer]';
 const {
-  onRemoteUserEnterRoom,
-  onRemoteUserLeaveRoom,
-  onSeatListChanged,
+  currentRemoteSpeakerUserId,
+  currentSpeakerUserId,
   onUserAudioStateChanged,
+  onRemoteUserEnterRoom,
+  onSeatListChanged,
+  onRemoteUserLeaveRoom,
+  onUserVoiceVolumeChanged,
+  isSameStream,
   t,
 } = useStreamContainer();
 
 const roomEngine = useGetRoomEngine();
 
-
 defineProps<{
   showRoomTool: boolean,
 }>();
-
 
 const streamContainerRef = ref(null);
 
@@ -87,30 +97,73 @@ const roomStore = useRoomStore();
 const {
   streamList,
   localStream,
+  masterUserId,
   remoteStreamObj,
+  remoteStreamList,
 } = storeToRefs(roomStore);
 const basicStore = useBasicStore();
-// The default layout of the mini program is six-square grid mode
-basicStore.setLayout(LAYOUT.SIX_EQUAL_POINTS);
 const { layout } = storeToRefs(basicStore);
 
-const enlargeStream: Ref<StreamInfo | null> = ref(null);
+const screenStream: Ref<StreamInfo | null> = ref(null);
+const fixedStream: Ref<StreamInfo | null> = ref(null);
+
+const enlargeStream = computed(() => {
+  if (fixedStream.value) {
+    return fixedStream.value;
+  }
+  if (screenStream.value) {
+    return screenStream.value;
+  }
+  if (currentRemoteSpeakerUserId.value) {
+    return remoteStreamObj.value[`${currentRemoteSpeakerUserId.value}_${TUIVideoStreamType.kCameraStream}`];
+  }
+  if (remoteStreamList.value.length === 1) {
+    return remoteStreamList.value[0];
+  }
+  if (remoteStreamList.value.length > 1) {
+    if (!masterUserId.value || masterUserId.value === localStream.value.userId || !remoteStreamObj.value[`${masterUserId.value}_${TUIVideoStreamType.kCameraStream}`]) {
+      return remoteStreamList.value[0];
+    }
+    return remoteStreamObj.value[`${masterUserId.value}_${TUIVideoStreamType.kCameraStream}`];
+  }
+  return localStream.value;
+});
+
 const enlargeDomId = computed(() => (enlargeStream.value ? `${enlargeStream.value.userId}_${enlargeStream.value.streamType}` : ''));
-const currentSpeakerUserId: Ref<string> = ref('');
 const startX = ref();
 const startY = ref();
 
-const onlyVideoStreamList = computed(() => (
-  streamList.value.filter(stream => stream.streamType === TUIVideoStreamType.kCameraStream)
-));
 const currentPageIndex = ref(0);
 
-watch(() => onlyVideoStreamList.value.length, (val) => {
+const cameraStreamList = computed(() => (
+  streamList.value.filter((stream: StreamInfo) => stream.streamType === TUIVideoStreamType.kCameraStream)
+));
+
+watch(() => cameraStreamList.value.length, (val) => {
   if (layout.value === LAYOUT.SIX_EQUAL_POINTS) {
     const equalPointIndex = enlargeStream.value ? currentPageIndex.value - 1 : currentPageIndex.value;
     if (Math.ceil(val / 6) < equalPointIndex + 1 && equalPointIndex > 0) {
       currentPageIndex.value = currentPageIndex.value - 1;
     }
+  }
+});
+
+watch(() => streamList.value.length, (val) => {
+  if (val <= 2) {
+    basicStore.setLayout(LAYOUT.LARGE_SMALL_WINDOW);
+    currentPageIndex.value = 0;
+  }
+});
+
+watch(() => streamList.value.map((stream: StreamInfo) => `${stream.userId}-${stream.streamType}`), (val) => {
+  if (fixedStream.value && !val.includes(`${fixedStream.value.userId}-${fixedStream.value.streamType}`)) {
+    fixedStream.value = null;
+  }
+  if (screenStream.value && !val.includes(`${screenStream.value.userId}-${screenStream.value.streamType}`)) {
+    screenStream.value = null;
+  }
+  if (currentRemoteSpeakerUserId.value && !val.includes(`${currentRemoteSpeakerUserId.value}-${TUIVideoStreamType.kCameraStream}`)) {
+    currentRemoteSpeakerUserId.value = '';
   }
 });
 
@@ -125,20 +178,33 @@ const isFirstPageInSixPointLayout: Ref<Boolean> = computed(() => {
  * ----- The following handles the nine-pane page flip logic -----
 **/
 const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
+  if (streamList.value.length <= 1) {
+    return [];
+  }
   if (layout.value === LAYOUT.SIX_EQUAL_POINTS) {
     if (enlargeStream.value) {
-      return onlyVideoStreamList.value.slice((currentPageIndex.value - 1) * 6, (currentPageIndex.value - 1) * 6 + 6);
+      return cameraStreamList.value.slice((currentPageIndex.value - 1) * 6, (currentPageIndex.value - 1) * 6 + 6);
     }
-    return onlyVideoStreamList.value.slice(currentPageIndex.value * 6, currentPageIndex.value * 6 + 6);
   }
   if (layout.value === LAYOUT.LARGE_SMALL_WINDOW) {
-    const userId = enlargeStream.value?.userId;
-    if (currentSpeakerUserId.value) {
-      return currentSpeakerUserId.value === localStream.value.userId
-        ? [localStream.value]
-        : [remoteStreamObj.value[`${currentSpeakerUserId.value}_${TUIVideoStreamType.kCameraStream}`]];
+    if (fixedStream.value
+      && screenStream.value
+      && !isSameStream(fixedStream.value, screenStream.value)) {
+      return [screenStream.value];
     }
-    return [remoteStreamObj.value[`${userId}_${TUIVideoStreamType.kCameraStream}`]];
+    if (isSameStream(enlargeStream.value, screenStream.value)) {
+      if (currentSpeakerUserId.value && currentSpeakerUserId.value !== basicStore.userId) {
+        return [remoteStreamObj.value[`${currentSpeakerUserId.value}_${TUIVideoStreamType.kCameraStream}`]];
+      }
+      return [localStream.value];
+    }
+    if (isSameStream(enlargeStream.value, localStream.value)) {
+      if (currentRemoteSpeakerUserId.value) {
+        return [remoteStreamObj.value[`${currentRemoteSpeakerUserId.value}_${TUIVideoStreamType.kCameraStream}`]];
+      }
+      return [remoteStreamList.value[0]];
+    }
+    return [localStream.value];
   }
   return [];
 });
@@ -148,7 +214,10 @@ const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
  * Show left and right page flip icons
 **/
 const totalPageNumber = computed(() => {
-  const videoStreamNumber = onlyVideoStreamList.value.length;
+  if (streamList.value.length <= 2) {
+    return 1;
+  }
+  const videoStreamNumber = cameraStreamList.value.length;
   const totalPageOfVideoStream = videoStreamNumber > 6 ? Math.ceil(videoStreamNumber / 6) : 1;
   return enlargeStream.value ? totalPageOfVideoStream + 1 : totalPageOfVideoStream;
 });
@@ -212,12 +281,12 @@ const streamContainerClass = computed(() => {
   return containerClass;
 });
 
-function handleTouchStart(event:any) {
+function handleTouchStart(event: any) {
   startX.value = event?.changedTouches[0]?.pageX;
   startY.value = event?.changedTouches[0]?.pageY;
 }
 
-function handleTouchEnd(event:any) {
+function handleTouchEnd(event: any) {
   const moveDirectionX = event?.changedTouches[0].pageX - startX.value;
   const moveDirectionY = event?.changedTouches[0].pageY - startY.value;
   if (Math.abs(moveDirectionY) > Math.abs(moveDirectionX) || Math.abs(moveDirectionX) < 5) {
@@ -234,10 +303,28 @@ function handleTouchEnd(event:any) {
 }
 
 /**
+ * Double-click to switch the stream to the zoom in section
+**/
+function handleEnlargeStreamRegion(stream: StreamInfo) {
+  if (!stream.hasVideoStream) {
+    return;
+  }
+  if (layout.value === LAYOUT.SIX_EQUAL_POINTS) {
+    basicStore.setLayout(LAYOUT.LARGE_SMALL_WINDOW);
+    currentPageIndex.value = 0;
+    fixedStream.value = stream;
+  }
+}
+
+function handelStreamRegionClick(event: Event) {
+  if (layout.value === LAYOUT.LARGE_SMALL_WINDOW) {
+    event.stopPropagation();
+  }
+}
+
+/**
  * --- The following processing stream events ----
 **/
-
-
 const onUserVideoStateChanged = (eventInfo: {
   userId: string,
   streamType: TUIVideoStreamType,
@@ -272,80 +359,22 @@ const onUserVideoStateChanged = (eventInfo: {
     }
   }
 
-  // Handle flow layout when remote screen sharing changes
-  if (userId !== basicStore.userId && streamType === TUIVideoStreamType.kScreenStream) {
+  if (streamType === TUIVideoStreamType.kScreenStream) {
     if (hasVideo) {
-      enlargeStream.value = roomStore.remoteStreamObj[`${userId}_${streamType}`] as StreamInfo;
-      if (enlargeStream.value) {
-        basicStore.setLayout(LAYOUT.LARGE_SMALL_WINDOW);
-        currentPageIndex.value = 0;
-      }
+      screenStream.value = roomStore.remoteStreamObj[`${userId}_${streamType}`] as StreamInfo;
+      fixedStream.value = null;
+      basicStore.setLayout(LAYOUT.LARGE_SMALL_WINDOW);
+      currentPageIndex.value = 0;
     } else {
-      if (userId === enlargeStream.value?.userId) {
-        /**
-         * Reset the stream playback layout when the remote screen sharing stream is stopped
-        **/
-        logger.debug(`${logPrefix} onUserVideoStateChanged: stop`, userId, streamType);
-        roomEngine.instance?.stopPlayRemoteVideo({
-          userId,
-          streamType,
-        });
-        if (enlargeStream.value) {
-          enlargeStream.value = null;
-        }
-        if (layout.value === LAYOUT.LARGE_SMALL_WINDOW) {
-          basicStore.setLayout(LAYOUT.SIX_EQUAL_POINTS);
-          currentPageIndex.value = 0;
-        } else if (layout.value === LAYOUT.SIX_EQUAL_POINTS && currentPageIndex.value > 0) {
-          currentPageIndex.value = currentPageIndex.value - 1;
-        }
-      }
+      logger.debug(`${logPrefix} onUserVideoStateChanged: stop`, userId, streamType);
+      roomEngine.instance?.stopPlayRemoteVideo({
+        userId,
+        streamType,
+      });
+      screenStream.value = null;
     }
   }
 };
-
-// Calculate the userId with the loudest volume
-function handleLargestVoice(userVolumeList: Array<TRTCVolumeInfo>) {
-  if (currentSpeakerUserId.value) {
-    const lastSpeakerUserVolumeInfo = userVolumeList.find((item: TRTCVolumeInfo) => (
-      item.userId === currentSpeakerUserId.value
-    ));
-    if (lastSpeakerUserVolumeInfo && lastSpeakerUserVolumeInfo.volume > 0) {
-      return;
-    }
-  }
-  let largestVolume = 0;
-  let largestUserId = '';
-  userVolumeList.forEach((item: TRTCVolumeInfo) => {
-    const { userId, volume } = item;
-    if (volume > largestVolume) {
-      largestVolume = volume;
-      largestUserId = userId;
-    }
-  });
-  if (largestVolume === 0) {
-    currentSpeakerUserId.value = '';
-  } else {
-    currentSpeakerUserId.value = largestUserId;
-  }
-}
-
-const handleLargestVoiceThrottle = throttle(handleLargestVoice, 1000);
-
-// volume change
-const onUserVoiceVolumeChanged = (eventInfo: {
-  userVolumeList: any[],
-}) => {
-  const { userVolumeList } = eventInfo;
-  if (layout.value === LAYOUT.LARGE_SMALL_WINDOW) {
-    if (userVolumeList.length === 0) {
-      currentSpeakerUserId.value = '';
-    } else {
-      handleLargestVoiceThrottle(userVolumeList);
-    }
-  }
-};
-
 
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance?.on(TUIRoomEvents.onRemoteUserEnterRoom, onRemoteUserEnterRoom);
@@ -383,19 +412,23 @@ onUnmounted(() => {
   justify-content: flex-start;
   align-items: center;
   align-content: center;
+
   .stream-list-container {
     width: 100%;
     padding-top: 150%;
     height: 0;
     position: relative;
+
     &.multi-stream-container {
       padding-top: 150%;
       height: 0;
     }
+
     &.single-stream-container {
       height: 100%;
     }
   }
+
   .stream-list {
     width: 100%;
     height: 100%;
@@ -407,15 +440,18 @@ onUnmounted(() => {
     justify-content: flex-start;
     align-items: center;
     align-content: center;
+
     &.not-first-page {
       align-content: flex-start;
     }
+
     .single-stream {
       width: 100%;
       height: 100%;
       padding: 1px;
       border-radius: 10px;
     }
+
     .multi-stream {
       width: 50%;
       padding-top: 50%;
@@ -432,28 +468,37 @@ onUnmounted(() => {
   height: 100%;
   background-color: var(--stream-container-flatten-bg-color);
   overflow: hidden;
+
   .enlarged-stream-container {
     width: 100%;
     height: 100%;
   }
+
   .stream-list-container {
     width: 50%;
     padding-top: 50%;
     position: absolute;
     top: 0;
     right: 0;
+
+    &.show-room-tool {
+      top: 64px;
+    }
+
     .stream-list {
       width: 100%;
       height: 100%;
       position: absolute;
       top: 0;
       left: 0;
+
       .single-stream {
         width: 100%;
         height: 100%;
         padding: 1px;
         border-radius: 10px;
       }
+
       .multi-stream {
         width: 100%;
         height: 100%;
@@ -480,7 +525,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  }
+}
+
 .swipe-dots {
   width: 8px;
   height: 8px;
@@ -489,6 +535,7 @@ onUnmounted(() => {
   border-radius: 20px;
   margin: 5px;
 }
+
 .swipe-current-dots {
   width: 8px;
   height: 8px;
@@ -496,5 +543,5 @@ onUnmounted(() => {
   opacity: 1;
   border-radius: 20px;
   margin: 5px;
-  }
+}
 </style>

@@ -22,12 +22,12 @@ TUIRoomKit supports major PC and mobile browsers, please refer to [Browser Suppo
 .
 ├── README.md
 ├── README.zh.md
-├── example        -- TUIRoomKit quick run-through demo
-│   ├── vue2       -- TUIRoomKit quick run-through demo (Webpack + vue2.7 + ts)
-│   └── vue3       -- TUIRoomKit quick run-through demo (Vite + vue3 + ts)
-└── roomkit        -- TUIRoomKit Source Code
-    ├── vue2       -- TUIRoomKit Source Code (support vue2.7)
-    └── vue3       -- TUIRoomKit Source Code (support vue3)
+├── example                 -- TUIRoomKit quick run-through demo
+│   ├── vite-vue3-ts        -- TUIRoomKit quick run-through demo (Vite + vue3 + ts)
+│   └── webpack-vue2.7-ts   -- TUIRoomKit quick run-through demo (Webpack + vue2.7 + ts)
+└── roomkit                 -- TUIRoomKit Source Code
+    ├── vue2                -- TUIRoomKit Source Code (support vue2.7)
+    └── vue3                -- TUIRoomKit Source Code (support vue3)
 ```
 
 ## Contact Us

@@ -13,7 +13,7 @@ export default function useSideBar() {
 
   const chatStore = useChatStore();
   const basicStore = useBasicStore();
-  const { sdkAppId, isSidebarOpen, sidebarName } = storeToRefs(basicStore);
+  const { sdkAppId, isSidebarOpen, sidebarName, roomId } = storeToRefs(basicStore);
   const roomStore = useRoomStore();
   const { userNumber } = storeToRefs(roomStore);
 
@@ -48,13 +48,14 @@ export default function useSideBar() {
     done();
   }
 
-  /** 监听消息接收，放在这里是为了打开 chat 之前只记录消息未读数 */
+  /** Monitor message reception, placed here to only record unread messages before opening chat */
   const onReceiveMessage = (options: { data: any }) => {
     if (!options || !options.data) {
       return;
     }
+    const currentConversationId = `GROUP${roomId.value}`
     options.data.forEach((message: any) => {
-      if (message.type === TencentCloudChat.TYPES.MSG_TEXT) {
+      if (message.conversationID === currentConversationId && message.type === TencentCloudChat.TYPES.MSG_TEXT) {
         if (!basicStore.isSidebarOpen || basicStore.sidebarName !== 'chat') {
           // eslint-disable-next-line no-plusplus
           chatStore.updateUnReadCount(++chatStore.unReadCount);

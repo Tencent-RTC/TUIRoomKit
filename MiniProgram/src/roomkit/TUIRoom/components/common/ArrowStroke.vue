@@ -16,11 +16,8 @@ import SvgIcon from './base/SvgIcon.vue';
 import ArrowStrokeLeftIcon from '../../assets/icons/ArrowStrokeLeftIcon.svg';
 
 interface Props {
-  // 'bottom' | 'left'
   strokePosition: string;
-  // 'up' | 'down' | 'left' | 'right'
   arrowDirection: string;
-  // 是否展示线条
   hasStroke: boolean,
 }
 

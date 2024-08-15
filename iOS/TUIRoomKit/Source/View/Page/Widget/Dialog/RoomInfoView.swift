@@ -119,7 +119,7 @@ class RoomInfoView: UIView {
     }
     
     func setupViewState(item: RoomInfoViewModel) {
-        nameLabel.text = EngineManager.createInstance().store.roomInfo.name
+        nameLabel.text = EngineManager.shared.store.roomInfo.name
     }
     
     @objc func codeAction(sender: UIButton) {
@@ -132,6 +132,10 @@ class RoomInfoView: UIView {
 }
 
 extension RoomInfoView: RoomInfoResponder {
+    func updateNameLabel(_ text: String) {
+        nameLabel.text = text
+    }
+    
     func showCopyToast(copyType: CopyType) {
         RoomRouter.makeToastInCenter(toast: copyType == .copyRoomIdType ?
             .copyRoomIdSuccess : .copyRoomLinkSuccess,duration: 0.5)
@@ -140,10 +144,10 @@ extension RoomInfoView: RoomInfoResponder {
 
 private extension String {
     static var copyRoomIdSuccess: String {
-        localized("Room ID copied.")
+        localized("Conference ID copied.")
     }
     static var copyRoomLinkSuccess: String {
-        localized("Room Link copied.")
+        localized("Conference Link copied.")
     }
 }
 

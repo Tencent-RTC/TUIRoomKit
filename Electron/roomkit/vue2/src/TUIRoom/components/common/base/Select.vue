@@ -47,6 +47,7 @@ interface Props {
 interface OptionData {
   label: string,
   value: string | number | boolean | object,
+  ref: HTMLElement,
 }
 
 const props = defineProps<Props>();
@@ -115,6 +116,8 @@ function handleClickSelect() {
     handleDropDownPosition();
     dropDownStyle.value = { zIndex: nextZIndex() };
     showSelectDropdown.value = true;
+    const option = optionArray.value.find(item => item.value === props.value);
+    option?.ref.scrollIntoView({ block: 'center' });
   }
 }
 
@@ -147,16 +150,19 @@ function handleClickOutside() {
 
 .select-container {
   position: relative;
+  height: 100%;
   .select-content {
+    box-sizing: border-box;
     position: relative;
     border: 1px solid var(--border-color);
     background-color: var(--background-color-7);
     color: var(--font-color-3);
     border-radius: 8px;
-    height: 42px;
-    padding: 10px 16px;
+    padding: 0px 16px;
     cursor: pointer;
     display: flex;
+    align-items: center;
+    height: 42px;
     &.disabled {
       background-color: rgba(255, 255, 255, 0.50);
       color: #8F9AB2;

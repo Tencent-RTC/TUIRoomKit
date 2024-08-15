@@ -3,20 +3,26 @@ import { UserInfo, useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
 import { TUIRole } from '@tencentcloud/tuiroom-engine-wx';
 
-const showUserId = ref(''); // 需要展示操作面板的用户id
+// The user ID that needs to display the operation panel
+const showUserId = ref('');
 
 export default function useMemberItem(userInfo: UserInfo) {
   const roomStore = useRoomStore();
   const { isMaster, isAdmin } = storeToRefs(roomStore);
-  // 是否有权限操作当前用户
+  // Does the current user have permission to operate
   const isCanOperateCurrentMember = computed(() => {
     const isTargetUserRoomOwner = userInfo.userRole === TUIRole.kRoomOwner;
     const isTargetUserGeneral = userInfo.userRole === TUIRole.kGeneralUser;
-    return (isMaster.value && !isTargetUserRoomOwner) || (isAdmin.value && isTargetUserGeneral);
+    const isTargetUserMySelf = userInfo.userId === roomStore.localUser.userId;
+    return (isMaster.value && !isTargetUserRoomOwner) || (isAdmin.value && isTargetUserGeneral) || isTargetUserMySelf;
   });
-  const isMemberControlAccessible = computed(() => (
-    userInfo.userId === showUserId.value) && isCanOperateCurrentMember.value); // 只有房主或管理员才打开操作面板
 
+  const isCanOperateMySelf = computed(() => {
+    return userInfo.userId === roomStore.localUser.userId;
+  })
+  const isMemberControlAccessible = computed(() => (
+    userInfo.userId === showUserId.value) && (isCanOperateMySelf.value || isCanOperateCurrentMember.value));
+  
   function openMemberControl() {
     showUserId.value = userInfo.userId;
   }
@@ -29,6 +35,7 @@ export default function useMemberItem(userInfo: UserInfo) {
     isMemberControlAccessible,
     openMemberControl,
     closeMemberControl,
+    isCanOperateMySelf,
   };
 }
 

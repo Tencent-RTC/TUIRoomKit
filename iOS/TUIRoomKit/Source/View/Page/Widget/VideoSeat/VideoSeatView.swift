@@ -7,11 +7,6 @@
 //
 
 import UIKit
-#if TXLiteAVSDK_TRTC
-import TXLiteAVSDK_TRTC
-#elseif TXLiteAVSDK_Professional
-import TXLiteAVSDK_Professional
-#endif
 
 protocol TUIVideoSeatViewResponder: AnyObject {
     func switchPosition()
@@ -151,7 +146,7 @@ class TUIVideoSeatView: UIView {
     }
     
     func bindInteraction() {
-        screenCaptureMaskView.isHidden = !EngineManager.createInstance().store.currentUser.hasScreenStream
+        screenCaptureMaskView.isHidden = !EngineManager.shared.store.currentUser.hasScreenStream
         addGesture()
     }
     

@@ -68,15 +68,15 @@ Make sure that the Qt environment configuration is normal.
 - On Windows, open the source code project `RoomKit.vcxproj` with Visual Studio 2015 or later.
 - Right-click the project and select **Properties** > **QtProjectSetting** > **General** > **QtInstallation** to select an installed Qt environment.
 
-   <img src="https://qcloudimg.tencent-cloud.cn/raw/f7246267e5fbee96e481e6e491f6a3ea.png" width="500" height="280"/>
+   <img src="https://qcloudimg.tencent-cloud.cn/raw/badae57db14a5e0791387647eb1d706c.png" width="500" height="280"/>
 
 - Click **Run** to start debugging and running this application.
 
 ### Trying out application (**at least two devices required**)
 
-<img src="https://qcloudimg.tencent-cloud.cn/raw/bf53f125f17bf697080752eebfe91df4.png" width="600" height="300"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/90aac14daaa7ee2703ed95549e81824c.png" width="600" height="300"/>
 
-<img src="https://qcloudimg.tencent-cloud.cn/raw/1d3a03bed647d33bf1ea91f8333da921.png" width="600" height="340"/>
+<img src="https://qcloudimg.tencent-cloud.cn/raw/6f4080b9f94355cb1ecf9305bef2d75b.png" width="600" height="340"/>
 
 #### User A
 - Step 1: Log in to the application, enter the username and room ID (the username must be unique, such as `user_A`; the room ID can contain up to nine digits, such as `123456`), and click **Enter room**.

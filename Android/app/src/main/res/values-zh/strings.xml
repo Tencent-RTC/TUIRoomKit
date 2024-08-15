@@ -48,12 +48,5 @@
     <string name="app_create_room">新建房间</string>
     <string name="app_enter_live_room">加入直播房间</string>
 
-    <string name="app_turn_on_audio">打开音频</string>
-    <string name="app_turn_on_speaker">打开扬声器</string>
-    <string name="app_turn_on_video">打开视频</string>
-    <string name="app_tip_creating_room_id">正在生成房间号，请稍后重试</string>
-
-    <string name="app_room_msg_joined">已入会</string>
-    <string name="app_room_free_speech">自由发言房间</string>
-    <string name="app_room_raise_hand">举手发言房间</string>
+    <string name="app_user_id_empty_toast">用户ID不能为空!</string>
 </resources>

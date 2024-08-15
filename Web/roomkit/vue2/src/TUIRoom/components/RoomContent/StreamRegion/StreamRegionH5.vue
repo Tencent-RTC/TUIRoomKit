@@ -1,7 +1,8 @@
 <template>
   <div
-    v-if="playRegionDomId !== enlargeDomId"
+    v-if="props.layout === LAYOUT.SIX_EQUAL_POINTS || (playRegionDomId !== enlargeDomId)"
     ref="streamRegionRef"
+    v-dbl-touch="() => { $emit('room-dblclick') }"
     class="user-stream-container"
     :class="[showVoiceBorder ? 'border' : '']"
   >
@@ -52,6 +53,9 @@ import {
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { isInnerScene } from '../../../utils/constants';
 import { storeToRefs } from 'pinia';
+import '../../../directives/vDblTouch';
+import { LAYOUT } from '../../../constants/render';
+
 const roomEngine = useGetRoomEngine();
 
 const logPrefix = '[StreamRegion]';
@@ -63,16 +67,25 @@ const { t } = useI18n();
 
 interface Props {
   stream: StreamInfo;
+  layout: LAYOUT;
   enlargeDomId?: string;
+  isEnlarge?: Boolean;
 }
 
 const props = defineProps<Props>();
+defineEmits(['room-dblclick']);
 
 const streamRegionRef = ref();
 const showVoiceBorder = computed(() => (
   props.stream.hasAudioStream && userVolumeObj.value[props.stream.userId] !== 0
 ));
-const playRegionDomId = computed(() => `${props.stream.userId}_${props.stream.streamType}`);
+
+const playRegionDomId = computed(() => {
+  if (props.isEnlarge) {
+    return `${props.stream.userId}_${props.stream.streamType}_enlarge`;
+  }
+  return `${props.stream.userId}_${props.stream.streamType}`;
+});
 
 const showMasterIcon = computed(() => {
   const { userId, streamType } = props.stream;
@@ -91,9 +104,52 @@ const isScreenStream = computed(() => props.stream.streamType === TUIVideoStream
 
 const userInfo = computed(() => {
   if (isInnerScene) {
-    return `${props.stream.userName} | ${props.stream.userId}` || props.stream.userId;
+    return `${props.stream.nameCard || props.stream.userName} | ${props.stream.userId}`;
   }
-  return props.stream.userName || props.stream.userId;
+  return props.stream.nameCard || props.stream.userName || props.stream.userId;
+});
+
+async function playStream() {
+  if (props.stream.streamType === TUIVideoStreamType.kCameraStream && !props.stream.hasVideoStream) {
+    return;
+  }
+  if (props.stream.streamType === TUIVideoStreamType.kScreenStream && !props.stream.hasScreenStream) {
+    return;
+  }
+  if (basicStore.userId === props.stream.userId) {
+    await roomEngine.instance?.setLocalVideoView({
+      view: `${playRegionDomId.value}`,
+    });
+  } else {
+    roomEngine.instance?.setRemoteVideoView({
+      userId: props.stream.userId,
+      streamType: props.stream.streamType,
+      view: `${playRegionDomId.value}`,
+    });
+    await roomEngine.instance?.startPlayRemoteVideo({
+      userId: props.stream.userId,
+      streamType: props.stream.streamType,
+    });
+    const trtcCloud = roomEngine.instance?.getTRTCCloud();
+    const fillMode =  props.stream.streamType === TUIVideoStreamType.kScreenStream
+      ? TRTCVideoFillMode.TRTCVideoFillMode_Fill
+      : TRTCVideoFillMode.TRTCVideoFillMode_Fill;
+    await trtcCloud?.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeBig, {
+      mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+      rotation: TRTCVideoRotation.TRTCVideoRotation0,
+      fillMode,
+    });
+  }
+}
+
+watch(() => props.layout, async () => {
+  await nextTick();
+  if (props.enlargeDomId === `${props.stream.userId}_${props.stream.streamType}` && props.layout === LAYOUT.LARGE_SMALL_WINDOW && props.isEnlarge) {
+    playStream();
+  }
+  if (props.enlargeDomId === `${props.stream.userId}_${props.stream.streamType}` && props.layout !== LAYOUT.LARGE_SMALL_WINDOW && !props.isEnlarge) {
+    playStream();
+  }
 });
 
 onMounted(() => {
@@ -105,29 +161,13 @@ onMounted(() => {
         const userIdEl = document?.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
         if (userIdEl) {
           logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, userIdEl);
-          if (basicStore.userId === props.stream.userId) {
-            if (props.stream.hasVideoStream) {
-              await roomEngine.instance?.setLocalVideoView({
-                view: `${playRegionDomId.value}`,
-              });
-            }
-          } else {
-            roomEngine.instance?.setRemoteVideoView({
-              userId: props.stream.userId,
-              streamType: props.stream.streamType,
-              view: `${playRegionDomId.value}`,
-            });
-            await roomEngine.instance?.startPlayRemoteVideo({
-              userId: props.stream.userId,
-              streamType: props.stream.streamType,
-            });
-            const trtcCloud = roomEngine.instance?.getTRTCCloud();
-            await trtcCloud?.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeBig, {
-              mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-              rotation: TRTCVideoRotation.TRTCVideoRotation0,
-              fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
-            });
-          }
+          playStream();
+        }
+      } else {
+        if (basicStore.userId === props.stream.userId && props.stream.streamType === TUIVideoStreamType.kCameraStream) {
+          await roomEngine.instance?.setLocalVideoView({
+            view: null,
+          });
         }
       }
     },
@@ -144,21 +184,7 @@ onMounted(() => {
         const userIdEl = document?.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
         if (userIdEl) {
           logger.debug(`${logPrefix}watch isScreenStreamAvailable:`, props.stream.userId, userIdEl);
-          roomEngine.instance?.setRemoteVideoView({
-            userId: props.stream.userId,
-            streamType: props.stream.streamType,
-            view: `${playRegionDomId.value}`,
-          });
-          await roomEngine.instance?.startPlayRemoteVideo({
-            userId: props.stream.userId,
-            streamType: props.stream.streamType,
-          });
-          const trtcCloud = roomEngine.instance?.getTRTCCloud();
-          await trtcCloud?.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeSub, {
-            mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-            rotation: TRTCVideoRotation.TRTCVideoRotation0,
-            fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fit,
-          });
+          await playStream();
         }
       }
     },
@@ -174,30 +200,11 @@ onMounted(() => {
   watch(
     () => props.enlargeDomId,
     async (val, oldVal) => {
-      if (playRegionDomId.value === oldVal || playRegionDomId.value === val) {
+      if (props.isEnlarge || playRegionDomId.value === oldVal || playRegionDomId.value === val) {
         await nextTick();
         const userIdEl = document?.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
         if (userIdEl) {
-          if (basicStore.userId === props.stream.userId) {
-            /**
-             * Replay local video streams only when they are open
-            **/
-            if (props.stream.hasVideoStream) {
-              await roomEngine.instance?.setLocalVideoView({
-                view: `${playRegionDomId.value}`,
-              });
-            }
-          } else {
-            roomEngine.instance?.setRemoteVideoView({
-              userId: props.stream.userId,
-              streamType: props.stream.streamType,
-              view: `${playRegionDomId.value}`,
-            });
-            await roomEngine.instance?.startPlayRemoteVideo({
-              userId: props.stream.userId,
-              streamType: props.stream.streamType,
-            });
-          };
+          playStream();
         }
       }
     },

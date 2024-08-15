@@ -6,41 +6,35 @@
   * @param layout IconButtonLayout.VERTICAl | IconButtonLayout.HORIZONTAL
   * Usage:
   * Use <icon-button :icon="chatIcon"><icon-button> in template
-  *
-  * 名称: IconButton
-  * @param title String required
-  * @param hasMore Boolean
-  * @param hideHoverEffect Boolean
-  * @param layout IconButtonLayout.VERTICAl | IconButtonLayout.HORIZONTAL
-  * 使用方式：
-  * 在 template 中使用 <icon-button :icon="chatIcon"><icon-button>
 -->
 <template>
-  <div class="icon-button-container">
-    <div
-      v-if="isMobile"
-      @tap="handleClickEvent"
-      :class="['icon-content', iconContentClass, `${disabled && 'disabled'}`]"
-    >
-      <slot></slot>
-      <svg-icon style="display: flex" v-if="icon" :icon="icon"></svg-icon>
-      <span class="title">{{ title }}</span>
-    </div>
-    <div
-      v-else
-      :class="['icon-content', iconContentClass, `${disabled && 'disabled'}`]"
-      @click="handleClickEvent"
-    >
-      <slot></slot>
-      <svg-icon style="display: flex" v-if="icon" :icon="icon"></svg-icon>
-      <svg-icon style="display: flex" v-if="isNotSupport" class="unsupport-icon" :icon="UnSupportIcon"></svg-icon>
-      <span class="title">
-        {{ title }}
-        <slot name="title"></slot>
-      </span>
-    </div>
-    <div v-if="hasMore" ref="moreSpanRef" class="icon-arrow" @click="$emit('click-more')">
-      <svg-icon style="display: flex" :icon="ArrowUp"></svg-icon>
+  <div :class="[themeClass]">
+    <div class="icon-button-container">
+      <div
+        v-if="isMobile"
+        @tap="handleClickEvent"
+        :class="['icon-content', iconContentClass, `${disabled && 'disabled'}`]"
+      >
+        <slot></slot>
+        <svg-icon style="display: flex" v-if="icon" :icon="icon"></svg-icon>
+        <span class="title">{{ title }}</span>
+      </div>
+      <div
+        v-else
+        :class="['icon-content', iconContentClass, `${disabled && 'disabled'}`]"
+        @click="handleClickEvent"
+      >
+        <slot></slot>
+        <svg-icon style="display: flex" v-if="icon" :icon="icon"></svg-icon>
+        <svg-icon style="display: flex" v-if="isNotSupport" class="unsupport-icon" :icon="UnSupportIcon"></svg-icon>
+        <span class="title">
+          {{ title }}
+          <slot name="title"></slot>
+        </span>
+      </div>
+      <div v-if="hasMore" ref="moreSpanRef" class="icon-arrow" @click="$emit('click-more')">
+        <svg-icon style="display: flex" :icon="ArrowUp"></svg-icon>
+      </div>
     </div>
   </div>
 </template>
@@ -63,6 +57,7 @@ interface Props {
   layout?: IconButtonLayout,
   icon?: Component | null,
   isNotSupport?: boolean,
+  theme?: 'white' | 'black',
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -74,8 +69,11 @@ const props = withDefaults(defineProps<Props>(), {
   isActive: false,
   layout: IconButtonLayout.VERTICAl,
   isNotSupport: false,
+  theme: undefined,
 });
 const emit = defineEmits(['click-icon', 'click-more']);
+
+const themeClass = computed(() => (props.theme ? `tui-theme-${props.theme}` : ''));
 
 const iconContentClass = computed(() => {
   if (props.layout === IconButtonLayout.HORIZONTAL) {

@@ -5,13 +5,6 @@
   * @param isDisabled boolean Whether the video is disabled or not
   * Usage:
   * Use <video-media-control :isMuted="isMuted" /> in the template
-  *
-  * 名称: VideoMediaControl 视频媒体操作组件（开关摄像头）
-  * @param hasMore boolean 是否展示【更多】icon, 可以切换摄像头
-  * @param isMuted boolean 视频是否被静画状态
-  * @param isDisabled boolean 视频是否 disabled 状态
-  * 使用方式：
-  * 在 template 中使用 <video-media-control :isMuted="isMuted" />
 -->
 <template>
   <div>

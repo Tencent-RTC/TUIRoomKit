@@ -23,7 +23,7 @@
               v-for="user in remoteUserList"
               :key="user.userId"
               :value="user.userId"
-              :label="user.userName"
+              :label="user.nameCard || user.userName"
               theme="white"
             />
           </tui-select>

@@ -3,11 +3,12 @@ import TUIMessageBox from './index.vue';
 export type MessageProps = {
     title: string,
     message: string,
-    callback?: () => Promise<void>,
+    callback?: () => void,
+    cancelButtonText?: string,
     confirmButtonText?: string,
 }
 
-const MessageBox = ({ title, message, callback, confirmButtonText }: MessageProps) => {
+const MessageBox = ({ title, message, callback, cancelButtonText, confirmButtonText }: MessageProps) => {
   const container = document.createElement('div');
   const fullscreenElement = document.fullscreenElement || document.getElementById('roomContainer') || document.getElementById('pre-conference-container');
   if (!fullscreenElement) return;
@@ -23,6 +24,7 @@ const MessageBox = ({ title, message, callback, confirmButtonText }: MessageProp
         title,
         message,
         callback,
+        cancelButtonText,
         confirmButtonText,
         remove: onRemove,
       },

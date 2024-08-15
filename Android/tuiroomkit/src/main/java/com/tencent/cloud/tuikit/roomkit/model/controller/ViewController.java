@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceState;
+import com.tencent.cloud.tuikit.roomkit.model.data.ViewState;
 
 public class ViewController extends Controller {
     public ViewController(ConferenceState roomStore, TUIRoomEngine engine) {
@@ -37,5 +38,13 @@ public class ViewController extends Controller {
             return;
         }
         mViewState.searchUserKeyWord.set(newWord);
+    }
+
+    public void updateRoomProcess(ViewState.RoomProcess roomProcess) {
+        mViewState.roomProcess.set(roomProcess);
+    }
+
+    public boolean isProcessRoom() {
+        return mViewState.roomProcess.get() != ViewState.RoomProcess.NONE;
     }
 }

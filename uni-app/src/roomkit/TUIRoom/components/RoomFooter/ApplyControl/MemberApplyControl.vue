@@ -27,14 +27,6 @@
       @cancel="currentDialogInfo.handleCancel"
     >
       <span>{{ currentDialogInfo.content }}</span>
-      <template #footer>
-        <tui-button size="default" @click="currentDialogInfo.handleConfirm">
-          {{ currentDialogInfo.confirmButtonText }}
-        </tui-button>
-        <tui-button class="cancel-button" size="default" type="primary" @click="currentDialogInfo.handleCancel">
-          {{ currentDialogInfo.cancelButtonText }}
-        </tui-button>
-      </template>
     </Dialog>
   </div>
 </template>

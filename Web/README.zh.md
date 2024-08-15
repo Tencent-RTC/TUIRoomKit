@@ -24,14 +24,14 @@ TUIRoomKit 支持主流的 PC 及移动端浏览器，具体信息请参考 [浏
 .
 ├── README.md
 ├── README.zh.md
-├── example        -- TUIRoomKit 示例 Demo，您可以快速下载运行
-│   ├── vue2       -- TUIRoomKit 示例 Demo (Webpack + vue2.7 + ts)
-│   └── vue3       -- TUIRoomKit 示例 Demo (Vite + vue3 + ts)
-└── roomkit        -- TUIRoomKit 源码，可根据需求任意修改代码
-    ├── vue2       -- TUIRoomKit vue2 源码
-    └── vue3       -- TUIRoomKit vue3 源码
+├── example                 -- TUIRoomKit 示例 Demo，您可以快速下载运行
+│   ├── vite-vue3-ts        -- TUIRoomKit 示例 Demo (Vite + vue3 + ts)
+│   └── webpack-vue2.7-ts   -- TUIRoomKit 示例 Demo (Webpack + vue2.7 + ts)
+└── roomkit                 -- TUIRoomKit 源码，可根据需求任意修改代码
+    ├── vue2                -- TUIRoomKit vue2 源码
+    └── vue3                -- TUIRoomKit vue3 源码
 ```
 
 ## 交流&反馈
 
-如果您在使用过程中有遇到什么问题，欢迎提交 [**issue**](https://github.com/Tencent-RTC/TUIRoomKit/issues)，或者访问 [腾讯云通信官方社群](https://zhiliao.qq.com/) 进行咨询和反馈。
+如果您在使用过程中有遇到什么问题，欢迎提交 [**issue**](https://github.com/Tencent-RTC/TUIRoomKit/issues)，或者访问 [腾讯云通信官方社群](https://zhiliao.qq.com/s/cWSPGIIM62CC/cFUPGIIM62CF) 进行咨询和反馈。

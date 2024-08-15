@@ -9,40 +9,15 @@
       ></svg-icon>
     </div>
     <div v-if="showUserControl" class="user-control-container">
-      <div v-show="showEditNameContainer">
-        <div class="user-control-item-head" @click="showEditUserNameDialog">{{ t('Edit profile') }}</div>
-      </div>
       <div class="user-control-item-foot" @click="$emit('log-out')">{{ t('Log out') }}</div>
     </div>
-    <Dialog
-      v-model="showUserNameEdit"
-      :title="t('Edit profile')"
-      :modal="true"
-      width="480px"
-      :close-on-click-modal="true"
-      :append-to-body="true"
-    >
-      <div class="edit-content">
-        <span>{{ t('User Name') }}</span>
-        <tui-input v-model="tempUserName" class="edit-name-input" :placeholder="t('Please input user name')" />
-      </div>
-      <template #footer>
-        <tui-button class="button" size="default" @click="closeEditUserNameDialog">{{ t('Cancel') }}</tui-button>
-        <tui-button class="button" size="default" type="primary" @click="handleSaveUserName(tempUserName)">
-          {{ t('Save') }}
-        </tui-button>
-      </template>
-    </Dialog>
   </div>
 </template>
 <script setup lang="ts">
-import Dialog from '../../common/base/Dialog/index.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import ArrowStrokeSelectDownIcon from '../../common/icons/ArrowStrokeSelectDownIcon.vue';
 import useUserInfo from './useUserInfoHooks';
 import Avatar from '../../common/Avatar.vue';
-import TuiButton from '../../common/base/Button.vue';
-import TuiInput from '../../common/base/Input.vue';
 import { isInnerScene } from '../../../utils/constants';
 import { roomService } from '../../../services';
 import TUIMessage from '../../common/base/Message/index';
@@ -61,11 +36,8 @@ const roomStore = useRoomStore();
 const {
   t,
   showUserControl,
-  showUserNameEdit,
   userInfoRef,
-  tempUserName,
   handleUserControl,
-  showEditUserNameDialog,
   closeEditUserNameDialog,
 } = useUserInfo();
 
@@ -73,31 +45,28 @@ const props = withDefaults(defineProps<{
   userId: string,
   userName: string,
   avatarUrl?: string,
-  isShowEditName?: boolean,
 }>(), {
-  isShowEditName: false,
 });
-const showEditNameContainer = isInnerScene && props.isShowEditName;
 
-/**
- * Save the new userName
- *
-**/
-async function handleSaveUserName(userName: string) {
-  if (userName.length === 0) {
-    TUIMessage({
-      type: 'warning',
-      message: t('Username length should be greater than 0'),
-      duration: MESSAGE_DURATION.NORMAL,
-    });
-    return;
-  }
-  emits('update-user-name', userName);
-  basicStore.setUserName(userName);
-  TUIRoomEngine.setSelfInfo({ userName, avatarUrl: roomStore.localUser.avatarUrl || '' });
-  roomStore.setLocalUser({ userName });
-  closeEditUserNameDialog();
-}
+// /**
+//  * Save the new userName
+//  *
+// **/
+// async function handleSaveUserName(userName: string) {
+//   if (userName.length === 0) {
+//     TUIMessage({
+//       type: 'warning',
+//       message: t('Username length should be greater than 0'),
+//       duration: MESSAGE_DURATION.NORMAL,
+//     });
+//     return;
+//   }
+//   emits('update-user-name', userName);
+//   basicStore.setUserName(userName);
+//   TUIRoomEngine.setSelfInfo({ userName, avatarUrl: roomStore.localUser.avatarUrl || '' });
+//   roomStore.setLocalUser({ userName });
+//   closeEditUserNameDialog();
+// }
 
 </script>
 <style lang="scss" scoped>

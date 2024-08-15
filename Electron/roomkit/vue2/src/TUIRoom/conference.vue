@@ -7,7 +7,7 @@
     ></room-header>
     <room-content
       ref="roomContentRef"
-      v-tap="handleRoomContentTap"
+      v-tap.lazy="handleRoomContentTap"
       :show-room-tool="showRoomTool"
       class="content"
     ></room-content>
@@ -75,22 +75,23 @@ const showMessageBox = (data: {
   code?: number;
   message: string;
   title: string;
+  cancelButtonText: string,
   confirmButtonText: string;
   callback?: () => void;
 }) => {
   const {
     message,
     title = roomService.t('Note'),
+    cancelButtonText,
     confirmButtonText = roomService.t('Sure'),
-    callback = () => { },
+    callback = () => {},
   } = data;
   TUIMessageBox({
     title,
     message,
+    cancelButtonText,
     confirmButtonText,
-    callback: async () => {
-      callback && callback();
-    },
+    callback,
   });
 };
 const showMessage = (data: {
@@ -290,6 +291,16 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
 }
 
 .tui-theme-black .tui-room {
+  --header-shadow-color: rgba(34, 38, 46, 0.3);
+  --footer-shadow-color: rgba(34, 38, 46, 0.3);
+}
+
+.tui-theme-white.tui-room {
+  --header-shadow-color: #e3eaf7;
+  --footer-shadow-color: rgba(197, 210, 229, 0.2);
+}
+
+.tui-theme-black.tui-room {
   --header-shadow-color: rgba(34, 38, 46, 0.3);
   --footer-shadow-color: rgba(34, 38, 46, 0.3);
 }

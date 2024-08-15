@@ -8,6 +8,8 @@ import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-electron';
 import TUIMessage from '../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../constants/message';
 import { isMobile } from '../../utils/environment';
+import AllMembersShareScreenIcon from '../common/icons/AllMembersShareScreenIcon.vue';
+import HostShareScreenIcon from '../common/icons/HostShareScreenIcon.vue';
 
 export default function useIndex() {
   const roomEngine = useGetRoomEngine();
@@ -21,11 +23,19 @@ export default function useIndex() {
     anchorUserList,
     applyToAnchorList,
     isOnStateTabActive,
+    generalUserScreenStreamList,
   } = storeToRefs(roomStore);
+
+  enum ManageControlType {
+    AUDIO = 'audio',
+    VIDEO = 'video',
+    SCREEN = 'screen',
+  }
 
   const audienceUserList = computed(() => userList.value.filter(user => !anchorUserList.value.includes(user)));
 
   const searchText = ref('');
+  const showMoreControl = ref(false);
 
   function handleToggleStaged() {
     isOnStateTabActive.value = !isOnStateTabActive.value;
@@ -42,7 +52,7 @@ export default function useIndex() {
     if (!searchText.value) {
       return list;
     }
-    return list.filter((item: UserInfo) => item.userName?.includes(searchText.value) || item.userId.includes(searchText.value));
+    return list.filter((item: UserInfo) => item.nameCard?.includes(searchText.value) || item.userName?.includes(searchText.value) || item.userId.includes(searchText.value));
   });
   const alreadyStaged = computed(() => `${t('Already on stage')} (${(anchorUserList.value.length)})`);
   const notStaged = computed(() => `${t('Not on stage')} (${(audienceUserList.value.length)})`);
@@ -54,24 +64,30 @@ export default function useIndex() {
   const audioManageInfo = computed(() => (roomStore.isMicrophoneDisableForAllUser ? t('Lift all mute') : t('All mute')));
   const videoManageInfo = computed(() => (roomStore.isCameraDisableForAllUser ? t('Lift stop all video') : t('All stop video')));
 
+  const moreControlList = computed(() => ([
+    {
+      title: roomStore.isScreenShareDisableForAllUser ?  t('All members can share screen') :  t('Screen sharing for host/admin only'),
+      icon: roomStore.isScreenShareDisableForAllUser ? AllMembersShareScreenIcon : HostShareScreenIcon,
+      func: toggleManageAllMember,
+      type: ManageControlType.SCREEN,
+    },
+  ]));
+
   const showManageAllUserDialog: Ref<boolean> = ref(false);
   const dialogContent: Ref<string> = ref('');
   const dialogTitle: Ref<string> = ref('');
   const dialogActionInfo: Ref<string> = ref('');
   let stateForAllAudio: boolean = false;
   let stateForAllVideo: boolean = false;
+  let stateForScreenShare: boolean = false;
 
-  enum ManageControlType {
-    AUDIO = 'audio',
-    VIDEO = 'video',
-  }
   const currentControlType: Ref<ManageControlType> = ref(ManageControlType.AUDIO);
 
   async function toggleManageAllMember(type: ManageControlType) {
-    showManageAllUserDialog.value = true;
     currentControlType.value = type;
     switch (type) {
       case ManageControlType.AUDIO:
+        showManageAllUserDialog.value = true;
         dialogTitle.value = roomStore.isMicrophoneDisableForAllUser
           ? t('Enable all audios') : t('All current and new members will be muted');
         dialogContent.value = roomStore.isMicrophoneDisableForAllUser
@@ -83,6 +99,7 @@ export default function useIndex() {
         dialogActionInfo.value = audioManageInfo.value;
         break;
       case ManageControlType.VIDEO:
+        showManageAllUserDialog.value = true;
         dialogTitle.value = roomStore.isCameraDisableForAllUser
           ? t('Enable all videos') : t('All and new members will be banned from the camera');
         dialogContent.value = roomStore.isCameraDisableForAllUser
@@ -92,6 +109,16 @@ export default function useIndex() {
         // Mini program update view
         await nextTick();
         dialogActionInfo.value = videoManageInfo.value;
+        break;
+      case ManageControlType.SCREEN:
+        stateForScreenShare = !roomStore.isScreenShareDisableForAllUser;
+        if (generalUserScreenStreamList.value.length === 0) {
+          toggleAllScreenShare();
+          break;
+        }
+        showManageAllUserDialog.value = true;
+        dialogTitle.value = t('Is it turned on that only the host/admin can share the screen?');
+        dialogContent.value = t("Other member is sharing the screen is now, the member's sharing will be terminated after you turning on");
         break;
       default:
         break;
@@ -106,10 +133,25 @@ export default function useIndex() {
       case ManageControlType.VIDEO:
         toggleAllVideo();
         break;
+      case ManageControlType.SCREEN:
+        await roomEngine.instance?.closeRemoteDeviceByAdmin({
+          userId: generalUserScreenStreamList.value[0].userId,
+          device: TUIMediaDevice.kScreen,
+        });
+        toggleAllScreenShare();
+        break;
       default:
         break;
     }
     showManageAllUserDialog.value = false;
+  }
+  async function toggleAllScreenShare() {
+    await roomEngine.instance?.disableDeviceForAllUserByAdmin({
+      isDisable: stateForScreenShare,
+      device: TUIMediaDevice.kScreen,
+    });
+    roomStore.setDisableScreenShareForAllUserByAdmin(stateForScreenShare);
+    showMoreControl.value = false;
   }
   function showApplyUserList() {
     if (isMobile) {
@@ -134,7 +176,7 @@ export default function useIndex() {
       isDisable: stateForAllAudio,
       device: TUIMediaDevice.kMicrophone,
     });
-    roomStore.setMicrophoneDisableState(stateForAllAudio);
+    roomStore.setDisableMicrophoneForAllUserByAdmin(stateForAllAudio);
   }
 
   async function toggleAllVideo() {
@@ -151,17 +193,21 @@ export default function useIndex() {
       isDisable: stateForAllVideo,
       device: TUIMediaDevice.kCamera,
     });
-    roomStore.setCameraDisableState(stateForAllVideo);
+    roomStore.setDisableCameraForAllUserByAdmin(stateForAllVideo);
   }
 
   const applyToAnchorUserContent = computed(() => {
     const lastIndex = applyToAnchorList.value.length - 1;
-    const userName = applyToAnchorList.value[lastIndex]?.userName || applyToAnchorList.value[lastIndex]?.userId;
+    const userName = applyToAnchorList.value[lastIndex]?.nameCard || applyToAnchorList.value[lastIndex]?.userName || applyToAnchorList.value[lastIndex]?.userId;
     if (applyToAnchorList.value.length === 1) {
       return `${userName} ${t('Applying for the stage')}`;
     }
     return `${userName} ${t('and so on number people applying to stage', { number: applyToAnchorList.value.length })}`;
   });
+
+  function toggleClickMoreBtn() {
+    showMoreControl.value = !showMoreControl.value;
+  }
 
   return {
     showApplyUserList,
@@ -183,5 +229,8 @@ export default function useIndex() {
     isOnStateTabActive,
     handleToggleStaged,
     applyToAnchorUserContent,
+    toggleClickMoreBtn,
+    showMoreControl,
+    moreControlList,
   };
 }

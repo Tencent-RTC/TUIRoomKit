@@ -104,7 +104,7 @@ export default defineConfig({
     port: pkg.env.VITE_DEV_SERVER_PORT,
     proxy: {
       '/api': {
-        target: 'https://service.trtc.qcloud.com/',
+        target: 'https://service.trtc.qcloud.com',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
       },

@@ -37,7 +37,7 @@
 		7D93C86F2A80D3B40062B2CC /* ListCellItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C86E2A80D3B40062B2CC /* ListCellItemView.swift */; };
 		7D93C8722A80DE280062B2CC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C8712A80DE280062B2CC /* String+Extension.swift */; };
 		7DFDF68F294B03D90067CAC9 /* TXLiteAVSDK_ReplayKitExt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DFDF686294AFCFA0067CAC9 /* TXLiteAVSDK_ReplayKitExt.framework */; };
-        A09BF847922778B2A068D300 /* Pods_TXReplayKit_Screen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4E0A458AE66DD08397D7122 /* Pods_TXReplayKit_Screen.framework */; };
+		A09BF847922778B2A068D300 /* Pods_TXReplayKit_Screen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4E0A458AE66DD08397D7122 /* Pods_TXReplayKit_Screen.framework */; };
 		C18CE615279005D10071C120 /* ReplayKitLocalized.m in Sources */ = {isa = PBXBuildFile; fileRef = C18CE607279005D10071C120 /* ReplayKitLocalized.m */; };
 		C18CE616279005D10071C120 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE608279005D10071C120 /* InfoPlist.strings */; };
 		C18CE617279005D10071C120 /* ReplayKitLocalized.strings in Resources */ = {isa = PBXBuildFile; fileRef = C18CE60A279005D10071C120 /* ReplayKitLocalized.strings */; };
@@ -60,9 +60,14 @@
 		C659799B2680895E00CCAA4C /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = C65979992680895E00CCAA4C /* LaunchScreen.strings */; };
 		C659799F2680897900CCAA4C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C659799D2680897900CCAA4C /* LaunchScreen.storyboard */; };
 		C685C0F726A67931007A7A6F /* DemoLocalized.swift in Sources */ = {isa = PBXBuildFile; fileRef = C685C0F126A67931007A7A6F /* DemoLocalized.swift */; };
-		FA3A4ABB2A5424FE0061C7DC /* RoomFileBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3A4ABA2A5424FE0061C7DC /* RoomFileBrowserViewController.swift */; };
-		FA3A4ABF2A543A660061C7DC /* RoomFileBroswerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3A4ABE2A543A660061C7DC /* RoomFileBroswerModel.swift */; };
-		FA3A4AC12A543E9B0061C7DC /* RoomFileBroswerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3A4AC02A543E9B0061C7DC /* RoomFileBroswerCell.swift */; };
+		FAA1193D2C3696B5007F8E4B /* members.json in Resources */ = {isa = PBXBuildFile; fileRef = FAA1193C2C3696B5007F8E4B /* members.json */; };
+		FAEADAE42C5121A100C48332 /* ConferenceOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAE32C5121A100C48332 /* ConferenceOptionsView.swift */; };
+		FAEADAE52C5121A100C48332 /* ConferenceOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAE22C5121A100C48332 /* ConferenceOptionsViewController.swift */; };
+		FAEADAE62C5121A100C48332 /* ConferenceOptionsDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAE12C5121A100C48332 /* ConferenceOptionsDataHelper.swift */; };
+		FAEADAEC2C58D0E300C48332 /* SelectMembersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAEB2C58D0E300C48332 /* SelectMembersViewModel.swift */; };
+		FAEADAED2C58D0E300C48332 /* SelectMemberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAE92C58D0E200C48332 /* SelectMemberView.swift */; };
+		FAEADAEE2C58D0E300C48332 /* SelectMemberViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAEA2C58D0E300C48332 /* SelectMemberViewController.swift */; };
+		FAEADAF12C59E2A900C48332 /* SelectedMembersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAF02C59E2A900C48332 /* SelectedMembersViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -156,10 +161,15 @@
 		C659799E2680897900CCAA4C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C685C0F126A67931007A7A6F /* DemoLocalized.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoLocalized.swift; sourceTree = "<group>"; };
 		E4CD7F588EA29064C4C9474A /* Pods_DemoApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DemoApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-        ED97CCC2BE129BEB1AA71C9F /* Pods-TXReplayKit_Screen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TXReplayKit_Screen.release.xcconfig"; path = "Target Support Files/Pods-TXReplayKit_Screen/Pods-TXReplayKit_Screen.release.xcconfig"; sourceTree = "<group>"; };
-		FA3A4ABA2A5424FE0061C7DC /* RoomFileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomFileBrowserViewController.swift; sourceTree = "<group>"; };
-		FA3A4ABE2A543A660061C7DC /* RoomFileBroswerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomFileBroswerModel.swift; sourceTree = "<group>"; };
-		FA3A4AC02A543E9B0061C7DC /* RoomFileBroswerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomFileBroswerCell.swift; sourceTree = "<group>"; };
+		ED97CCC2BE129BEB1AA71C9F /* Pods-TXReplayKit_Screen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TXReplayKit_Screen.release.xcconfig"; path = "Target Support Files/Pods-TXReplayKit_Screen/Pods-TXReplayKit_Screen.release.xcconfig"; sourceTree = "<group>"; };
+		FAA1193C2C3696B5007F8E4B /* members.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = members.json; sourceTree = "<group>"; };
+		FAEADAE12C5121A100C48332 /* ConferenceOptionsDataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceOptionsDataHelper.swift; sourceTree = "<group>"; };
+		FAEADAE22C5121A100C48332 /* ConferenceOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceOptionsViewController.swift; sourceTree = "<group>"; };
+		FAEADAE32C5121A100C48332 /* ConferenceOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceOptionsView.swift; sourceTree = "<group>"; };
+		FAEADAE92C58D0E200C48332 /* SelectMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMemberView.swift; sourceTree = "<group>"; };
+		FAEADAEA2C58D0E300C48332 /* SelectMemberViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMemberViewController.swift; sourceTree = "<group>"; };
+		FAEADAEB2C58D0E300C48332 /* SelectMembersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMembersViewModel.swift; sourceTree = "<group>"; };
+		FAEADAF02C59E2A900C48332 /* SelectedMembersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectedMembersViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -205,7 +215,6 @@
 		7D5B0C8C2A3AB75500CC1585 /* Login */ = {
 			isa = PBXGroup;
 			children = (
-				FA3A4ABD2A5439CC0061C7DC /* SandBoxBroswer */,
 				7D5B0C8D2A3AB75500CC1585 /* TRTCRegisterRootView.swift */,
 				7D5B0C8E2A3AB75600CC1585 /* TRTCLoginRootView.swift */,
 				7D5B0C8F2A3AB75600CC1585 /* UserAgreementViewController+UI.swift */,
@@ -242,6 +251,7 @@
 		7D93C84E2A80C6850062B2CC /* View */ = {
 			isa = PBXGroup;
 			children = (
+				FAEADAE32C5121A100C48332 /* ConferenceOptionsView.swift */,
 				7D93C85E2A80CBB30062B2CC /* PrePareView.swift */,
 				7D93C8602A80CBDB0062B2CC /* CreateRoomView.swift */,
 				7D93C8622A80CC010062B2CC /* EnterRoomView.swift */,
@@ -255,6 +265,8 @@
 				7D93C8662A80CC4D0062B2CC /* RoomPrePareViewController.swift */,
 				7D93C86A2A80D0E50062B2CC /* CreateRoomViewController.swift */,
 				7D93C86C2A80D0F80062B2CC /* EnterRoomViewController.swift */,
+				FAEADAE12C5121A100C48332 /* ConferenceOptionsDataHelper.swift */,
+				FAEADAE22C5121A100C48332 /* ConferenceOptionsViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -262,6 +274,7 @@
 		7D93C8502A80C9500062B2CC /* Component */ = {
 			isa = PBXGroup;
 			children = (
+				FAEADAEF2C59C60F00C48332 /* SelectMember */,
 				7D916A1C2B26B9740044D38E /* RoomNavigationController.swift */,
 				7D93C8512A80C9780062B2CC /* RoomTypeView.swift */,
 				7D93C86E2A80D3B40062B2CC /* ListCellItemView.swift */,
@@ -381,6 +394,7 @@
 		C685C0EC26A67931007A7A6F /* Resource */ = {
 			isa = PBXGroup;
 			children = (
+				FAA1193C2C3696B5007F8E4B /* members.json */,
 				C685C0ED26A67931007A7A6F /* Localized */,
 			);
 			path = Resource;
@@ -414,14 +428,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		FA3A4ABD2A5439CC0061C7DC /* SandBoxBroswer */ = {
+		FAEADAEF2C59C60F00C48332 /* SelectMember */ = {
 			isa = PBXGroup;
 			children = (
-				FA3A4ABA2A5424FE0061C7DC /* RoomFileBrowserViewController.swift */,
-				FA3A4ABE2A543A660061C7DC /* RoomFileBroswerModel.swift */,
-				FA3A4AC02A543E9B0061C7DC /* RoomFileBroswerCell.swift */,
+				FAEADAEA2C58D0E300C48332 /* SelectMemberViewController.swift */,
+				FAEADAEB2C58D0E300C48332 /* SelectMembersViewModel.swift */,
+				FAEADAE92C58D0E200C48332 /* SelectMemberView.swift */,
+				FAEADAF02C59E2A900C48332 /* SelectedMembersViewController.swift */,
 			);
-			path = SandBoxBroswer;
+			path = SelectMember;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -431,7 +446,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C1F2C76E278FD4E000216EB8 /* Build configuration list for PBXNativeTarget "TXReplayKit_Screen" */;
 			buildPhases = (
-				A86449AB8331AEE64841FC6A /* [CP] Check Pods Manifest.lock */,
 				C1F2C75C278FD4E000216EB8 /* Sources */,
 				C1F2C75D278FD4E000216EB8 /* Frameworks */,
 				C1F2C75E278FD4E000216EB8 /* Resources */,
@@ -523,6 +537,7 @@
 				C6597943268079C500CCAA4C /* LaunchImage@3x.png in Resources */,
 				C659799B2680895E00CCAA4C /* LaunchScreen.strings in Resources */,
 				1402D0232BF75E8400396825 /* DemoLocalized.xcstrings in Resources */,
+				FAA1193D2C3696B5007F8E4B /* members.json in Resources */,
 				C6597946268079C500CCAA4C /* LaunchImage_en@3x.png in Resources */,
 				C6597942268079C500CCAA4C /* LaunchImage@2x.png in Resources */,
 				C6597995268088B400CCAA4C /* LaunchScreen_en.storyboard in Resources */,
@@ -552,28 +567,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DemoApp/Pods-DemoApp-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A86449AB8331AEE64841FC6A /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-TXReplayKit_Screen-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		BEEBF9DEEBA7ECA612C2B72A /* [CP] Embed Pods Frameworks */ = {
@@ -633,33 +626,37 @@
 			files = (
 				7D5B0CA42A3AB75600CC1585 /* UserAgreementViewController.swift in Sources */,
 				7D93C85F2A80CBB30062B2CC /* PrePareView.swift in Sources */,
+				FAEADAF12C59E2A900C48332 /* SelectedMembersViewController.swift in Sources */,
 				7D93C8612A80CBDB0062B2CC /* CreateRoomView.swift in Sources */,
 				7D93C8672A80CC4D0062B2CC /* RoomPrePareViewController.swift in Sources */,
+				FAEADAEE2C58D0E300C48332 /* SelectMemberViewController.swift in Sources */,
 				C6597949268079C500CCAA4C /* AppDelegate.swift in Sources */,
 				C659794F268079CD00CCAA4C /* GenerateTestUserSig.swift in Sources */,
 				7D93C86F2A80D3B40062B2CC /* ListCellItemView.swift in Sources */,
-				FA3A4ABB2A5424FE0061C7DC /* RoomFileBrowserViewController.swift in Sources */,
 				7D93C8722A80DE280062B2CC /* String+Extension.swift in Sources */,
 				C6597941268079C500CCAA4C /* ViewController.swift in Sources */,
 				7D5B0CA22A3AB75600CC1585 /* AppUtils.swift in Sources */,
 				7D5B0CA02A3AB75600CC1585 /* TRTCLoginViewController.swift in Sources */,
 				7D5B0CA52A3AB75600CC1585 /* LayoutDefine.swift in Sources */,
-				FA3A4AC12A543E9B0061C7DC /* RoomFileBroswerCell.swift in Sources */,
 				7D5B0C9D2A3AB75600CC1585 /* UserAgreementViewController+UI.swift in Sources */,
 				7D93C85D2A80CB3D0062B2CC /* ListCellItemData.swift in Sources */,
+				FAEADAED2C58D0E300C48332 /* SelectMemberView.swift in Sources */,
 				7D916A1D2B26B9740044D38E /* RoomNavigationController.swift in Sources */,
 				7D5B0C9B2A3AB75600CC1585 /* TRTCRegisterRootView.swift in Sources */,
 				7D93C86B2A80D0E50062B2CC /* CreateRoomViewController.swift in Sources */,
-				FA3A4ABF2A543A660061C7DC /* RoomFileBroswerModel.swift in Sources */,
 				7D93C86D2A80D0F80062B2CC /* EnterRoomViewController.swift in Sources */,
+				FAEADAE62C5121A100C48332 /* ConferenceOptionsDataHelper.swift in Sources */,
 				7D93C8522A80C9780062B2CC /* RoomTypeView.swift in Sources */,
+				FAEADAE52C5121A100C48332 /* ConferenceOptionsViewController.swift in Sources */,
 				C685C0F726A67931007A7A6F /* DemoLocalized.swift in Sources */,
 				7D5B0C9F2A3AB75600CC1585 /* LoginLocalized.swift in Sources */,
 				7D93C8632A80CC010062B2CC /* EnterRoomView.swift in Sources */,
 				7D5B0CA12A3AB75600CC1585 /* ProfileManager_Mock.swift in Sources */,
 				C659794B268079C500CCAA4C /* SceneDelegate.swift in Sources */,
+				FAEADAEC2C58D0E300C48332 /* SelectMembersViewModel.swift in Sources */,
 				7D5B0CA32A3AB75600CC1585 /* TRTCRegisterViewController.swift in Sources */,
 				7D5B0C9C2A3AB75600CC1585 /* TRTCLoginRootView.swift in Sources */,
+				FAEADAE42C5121A100C48332 /* ConferenceOptionsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -756,13 +753,102 @@
 				INFOPLIST_FILE = TXReplayKit_Screen/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "TUIRoomKit屏幕共享";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"c++\"",
+					"-l\"iconv\"",
+					"-l\"resolv\"",
+					"-l\"sqlite3\"",
+					"-l\"stdc++\"",
+					"-l\"swiftCoreGraphics\"",
+					"-l\"z\"",
+					"-framework",
+					"\"AVFoundation\"",
+					"-framework",
+					"\"AVKit\"",
+					"-framework",
+					"\"Accelerate\"",
+					"-framework",
+					"\"Alamofire\"",
+					"-framework",
+					"\"AssetsLibrary\"",
+					"-framework",
+					"\"AudioToolbox\"",
+					"-framework",
+					"\"CFNetwork\"",
+					"-framework",
+					"\"CoreFoundation\"",
+					"-framework",
+					"\"CoreML\"",
+					"-framework",
+					"\"CoreMedia\"",
+					"-framework",
+					"\"CoreMotion\"",
+					"-framework",
+					"\"CoreServices\"",
+					"-framework",
+					"\"CoreTelephony\"",
+					"-framework",
+					"\"Factory\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"ImSDK_Plus\"",
+					"-framework",
+					"\"ImageIO\"",
+					"-framework",
+					"\"JavaScriptCore\"",
+					"-framework",
+					"\"Masonry\"",
+					"-framework",
+					"\"MetalKit\"",
+					"-framework",
+					"\"MetalPerformanceShaders\"",
+					"-framework",
+					"\"ReactiveObjC\"",
+					"-framework",
+					"\"ReplayKit\"",
+					"-framework",
+					"\"SDWebImage\"",
+					"-framework",
+					"\"SSZipArchive\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SnapKit\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"TIMCommon\"",
+					"-framework",
+					"\"TUIChat\"",
+					"-framework",
+					"\"TUICore\"",
+					"-framework",
+					"\"TXAppBasic\"",
+					"-framework",
+					"\"TXFFmpeg\"",
+					"-framework",
+					"\"TXLiteAVSDK_ReplayKitExt\"",
+					"-framework",
+					"\"TXSoundTouch\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"VideoToolbox\"",
+					"-framework",
+					"\"libpag\"",
+					"\"-Wl\"",
+					"\"-weak-lswiftCoreGraphics\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.tuiroom.apiexample.Upload;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = abyWildcardDev;
@@ -793,13 +879,102 @@
 				INFOPLIST_FILE = TXReplayKit_Screen/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "TUIRoomKit屏幕共享";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"c++\"",
+					"-l\"iconv\"",
+					"-l\"resolv\"",
+					"-l\"sqlite3\"",
+					"-l\"stdc++\"",
+					"-l\"swiftCoreGraphics\"",
+					"-l\"z\"",
+					"-framework",
+					"\"AVFoundation\"",
+					"-framework",
+					"\"AVKit\"",
+					"-framework",
+					"\"Accelerate\"",
+					"-framework",
+					"\"Alamofire\"",
+					"-framework",
+					"\"AssetsLibrary\"",
+					"-framework",
+					"\"AudioToolbox\"",
+					"-framework",
+					"\"CFNetwork\"",
+					"-framework",
+					"\"CoreFoundation\"",
+					"-framework",
+					"\"CoreML\"",
+					"-framework",
+					"\"CoreMedia\"",
+					"-framework",
+					"\"CoreMotion\"",
+					"-framework",
+					"\"CoreServices\"",
+					"-framework",
+					"\"CoreTelephony\"",
+					"-framework",
+					"\"Factory\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"ImSDK_Plus\"",
+					"-framework",
+					"\"ImageIO\"",
+					"-framework",
+					"\"JavaScriptCore\"",
+					"-framework",
+					"\"Masonry\"",
+					"-framework",
+					"\"MetalKit\"",
+					"-framework",
+					"\"MetalPerformanceShaders\"",
+					"-framework",
+					"\"ReactiveObjC\"",
+					"-framework",
+					"\"ReplayKit\"",
+					"-framework",
+					"\"SDWebImage\"",
+					"-framework",
+					"\"SSZipArchive\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SnapKit\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"TIMCommon\"",
+					"-framework",
+					"\"TUIChat\"",
+					"-framework",
+					"\"TUICore\"",
+					"-framework",
+					"\"TXAppBasic\"",
+					"-framework",
+					"\"TXFFmpeg\"",
+					"-framework",
+					"\"TXLiteAVSDK_ReplayKitExt\"",
+					"-framework",
+					"\"TXSoundTouch\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"VideoToolbox\"",
+					"-framework",
+					"\"libpag\"",
+					"\"-Wl\"",
+					"\"-weak-lswiftCoreGraphics\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.fx.rtmpdemo.TCLVBIMDemoUploadUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = com.tencent.fx.rtmpdemo.TCLVBIMDemoUploadUI_Production_SignProvision;

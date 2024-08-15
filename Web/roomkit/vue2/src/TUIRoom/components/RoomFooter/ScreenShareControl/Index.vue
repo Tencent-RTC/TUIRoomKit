@@ -83,7 +83,7 @@ const screenShareConfig = roomService.getComponentConfig('ScreenShare');
 
 const roomStore = useRoomStore();
 const basicStore = useBasicStore();
-const { isAnchor, isAudience, hasOtherScreenShare } = storeToRefs(roomStore);
+const { isAnchor, isAudience, hasOtherScreenShare, isGeneralUser, isScreenShareDisableForAllUser } = storeToRefs(roomStore);
 const { isShowScreenShareAntiFraud } = storeToRefs(basicStore);
 const { t } = useI18n();
 
@@ -130,6 +130,14 @@ async function toggleScreenShare() {
     TUIMessage({
       type: 'warning',
       message: t('The current browser does not support screen sharing'),
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
+  }
+  if (isGeneralUser.value && isScreenShareDisableForAllUser.value) {
+    TUIMessage({
+      type: 'warning',
+      message: t('Failed to initiate screen sharing, currently only host/admin can share screen.'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;

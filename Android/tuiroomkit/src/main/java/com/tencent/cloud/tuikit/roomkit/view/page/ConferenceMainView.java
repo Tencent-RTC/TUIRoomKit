@@ -29,13 +29,13 @@ import android.widget.Toast;
 
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
-import com.tencent.cloud.tuikit.roomkit.FeatureSwitch;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceState;
+import com.tencent.cloud.tuikit.roomkit.model.FeatureSwitch;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
-import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.TUIVideoSeatView;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
 import com.tencent.cloud.tuikit.roomkit.view.component.ConfirmDialog;
@@ -43,8 +43,9 @@ import com.tencent.cloud.tuikit.roomkit.view.component.QRCodeView;
 import com.tencent.cloud.tuikit.roomkit.view.component.TipToast;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.BottomNavigationBar.BottomLayout;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.ExitRoomDialog;
-import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.InviteUserDialog;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.InviteDialog;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.RoomInfoDialog;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.ShareRoomDialog;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.FloatChat.FloatChatView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.LocalAudioIndicator.LocalAudioToggleView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.MediaSettings.MediaSettingPanel;
@@ -54,6 +55,7 @@ import com.tencent.cloud.tuikit.roomkit.view.page.widget.TransferOwnerControlPan
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.UserControlPanel.UserListPanel;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.WaterMark.TextWaterMarkView;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.RoomMainViewModel;
+import com.trtc.tuikit.common.livedata.Observer;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -90,6 +92,8 @@ public class ConferenceMainView extends RelativeLayout {
     private boolean         mIsClickAction;
     private float           mTouchDownPointX;
     private float           mTouchDownPointY;
+
+    private final Observer<String> mRoomIdObserver = this::updateRoomId;
 
     public ConferenceMainView(Context context) {
         this(context,null);
@@ -232,8 +236,6 @@ public class ConferenceMainView extends RelativeLayout {
         mViewModel = new RoomMainViewModel(mContext, this);
         mVideoSeatView = new TUIVideoSeatView(mContext);
         mVideoSeatView.setViewClickListener(this::onClick);
-        mFloatChatView = new FloatChatView(mContext, mViewModel.getRoomId());
-        mFloatChatView.setViewClickListener(this::onClick);
         initView();
     }
 
@@ -245,14 +247,6 @@ public class ConferenceMainView extends RelativeLayout {
 
         mLayoutTopView = findViewById(R.id.tuiroomit_top_view_container);
         mLayoutTopView.addView(new TopView(mContext));
-
-        mLayoutFloatChatView = findViewById(R.id.tuiroomkit_float_chat_view_container);
-        ViewParent floatChatViewParent = mFloatChatView.getParent();
-        if (floatChatViewParent != null && floatChatViewParent instanceof ViewGroup) {
-            ((ViewGroup) floatChatViewParent).removeView(mFloatChatView);
-        }
-        mFloatChatView.isShow(mViewModel.isFloatChatEnable());
-        mLayoutFloatChatView.addView(mFloatChatView);
 
         mLayoutVideoSeat = findViewById(R.id.tuiroomkit_video_seat_container);
         ViewParent parent = mVideoSeatView.getParent();
@@ -266,6 +260,7 @@ public class ConferenceMainView extends RelativeLayout {
             mLayoutVideoSeat.addView(textWaterMarkView);
         }
         initScreenCaptureView();
+        initFloatChatView();
 
         mBottomLayout = new BottomLayout(mContext);
         mBottomLayout.setExpandStateListener(this::onExpandStateChanged);
@@ -335,8 +330,13 @@ public class ConferenceMainView extends RelativeLayout {
     }
 
     public void showMemberInvitePanel() {
-        InviteUserDialog memberInviteView = new InviteUserDialog(mContext);
-        memberInviteView.show();
+        InviteDialog inviteView = new InviteDialog(mContext);
+        inviteView.show();
+    }
+
+    public void showShareRoomPanel() {
+        ShareRoomDialog shareRoomDialog = new ShareRoomDialog(mContext);
+        shareRoomDialog.show();
     }
 
     public void showApplyList() {
@@ -440,6 +440,7 @@ public class ConferenceMainView extends RelativeLayout {
         super.onAttachedToWindow();
         Configuration curConfig = mContext.getResources().getConfiguration();
         ConferenceController.sharedInstance().getViewController().updateScreenOrientation(curConfig);
+        ConferenceController.sharedInstance().getRoomState().roomId.observe(mRoomIdObserver);
     }
 
     @Override
@@ -450,9 +451,29 @@ public class ConferenceMainView extends RelativeLayout {
         if (mVideoSeatView != null) {
             mVideoSeatView.destroy();
         }
-        if (mFloatChatView != null) {
-            mFloatChatView.destroy();
+        ConferenceController.sharedInstance().getRoomState().roomId.removeObserver(mRoomIdObserver);
+    }
+
+    private void updateRoomId(String roomId) {
+        if (TextUtils.isEmpty(roomId)) {
+            return;
         }
+        mFloatChatView = new FloatChatView(mContext, roomId);
+        mFloatChatView.setViewClickListener(this::onClick);
+        initFloatChatView();
+    }
+
+    private void initFloatChatView() {
+        if (mFloatChatView == null) {
+            return;
+        }
+        mLayoutFloatChatView = findViewById(R.id.tuiroomkit_float_chat_view_container);
+        ViewParent floatChatViewParent = mFloatChatView.getParent();
+        if (floatChatViewParent instanceof ViewGroup) {
+            ((ViewGroup) floatChatViewParent).removeView(mFloatChatView);
+        }
+        mFloatChatView.isShow(mViewModel.isFloatChatEnable());
+        mLayoutFloatChatView.addView(mFloatChatView);
     }
 
     public void onScreenShareStarted() {

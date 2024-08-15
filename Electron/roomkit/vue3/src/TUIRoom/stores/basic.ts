@@ -8,6 +8,13 @@ import { TUINetwork } from '@tencentcloud/tuiroom-engine-electron';
 type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | 'transfer-leave' | 'apply' | '';
 type SceneType = 'chat' | 'default';
 
+function getDefaultLayout() {
+  if (isMobile) {
+    return isWeChat ? LAYOUT.SIX_EQUAL_POINTS : LAYOUT.LARGE_SMALL_WINDOW;
+  }
+  return LAYOUT.NINE_EQUAL_POINTS;
+}
+
 interface BasicState {
   sdkAppId: number,
   userId: string,
@@ -69,7 +76,7 @@ export const useBasicStore = defineStore('basic', {
     roomId: '',
     roomMode: 'FreeSpeech',
     isSidebarOpen: false,
-    layout: isWeChat ? LAYOUT.SIX_EQUAL_POINTS :  LAYOUT.NINE_EQUAL_POINTS,
+    layout: getDefaultLayout(),
     showSettingDialog: false,
     showApplyUserList: false,
     activeSettingTab: 'audio',
@@ -212,7 +219,7 @@ export const useBasicStore = defineStore('basic', {
     },
     reset() {
       this.isSidebarOpen = false;
-      this.layout = isWeChat ? LAYOUT.SIX_EQUAL_POINTS :  LAYOUT.NINE_EQUAL_POINTS;
+      this.layout = getDefaultLayout();
       this.showSettingDialog = false;
       this.activeSettingTab = 'audio';
       this.isLocalStreamMirror = true;

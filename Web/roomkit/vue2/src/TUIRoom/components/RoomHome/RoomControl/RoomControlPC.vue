@@ -1,70 +1,83 @@
 <template>
   <div class="room-control-container">
-    <Logo v-show="showLogo" class="logo" />
-    <div class="control-container">
-      <!-- Video preview area -->
-      <div class="stream-preview-container">
-        <div id="stream-preview" class="stream-preview"></div>
-        <div class="attention-info">
-          <span v-if="isCameraMuted" class="off-camera-info">{{ t('Off Camera') }}</span>
-          <svg-icon v-if="isCameraLoading" :icon="LoadingIcon" class="loading"></svg-icon>
+    <div class="room-control-main">
+      <div class="control-container">
+        <!-- Video preview area -->
+        <div class="stream-preview-container">
+          <div id="stream-preview" class="stream-preview"></div>
+          <div class="attention-info">
+            <span v-if="isCameraMuted" class="off-camera-info">{{ t('Off Camera') }}</span>
+            <svg-icon v-if="isCameraLoading" :icon="LoadingIcon" class="loading"></svg-icon>
+          </div>
         </div>
-      </div>
-      <div class="control-region">
-        <!-- Microphone, Camera operating area -->
-        <div class="media-control-region">
-          <audio-media-control
-            class="media-control-item"
-            :has-more="true"
-            :is-muted="isMicMuted"
-            :audio-volume="audioVolume"
-            @click="toggleMuteAudio"
-          ></audio-media-control>
-          <video-media-control
-            class="media-control-item"
-            :has-more="true"
-            :is-muted="isCameraMuted"
-            @click="toggleMuteVideo"
-          ></video-media-control>
-        </div>
-        <div class="room-control-region">
-          <!-- Create room logic -->
-          <div class="create-room-region">
-            <tui-button class="button-item" @click.stop="handleCreateRoom">
-              <svg-icon :icon="CreateRoomIcon" />
-              <span class="button-text">{{ t('New Room') }}</span>
-            </tui-button>
-            <div
-              v-if="showCreateRoomItems"
-              v-click-outside="handleClickOutsideCreateRoomItems"
-              class="create-room-items"
-            >
-              <div class="create-room-item" @click="createRoom('SpeakAfterTakingSeat')">
-                <span :title="t('On-stage Speaking Room')" class="create-room-option">{{ t('On-stage Speaking Room') }}</span>
-                <svg-icon class="create-room-icon" :icon="NextIcon"></svg-icon>
-              </div>
-              <div class="create-room-item" @click="createRoom('FreeToSpeak')">
-                <span :title="t('Free Speech Room')" class="create-room-option">{{ t('Free Speech Room') }}</span>
-                <svg-icon class="create-room-icon" :icon="NextIcon"></svg-icon>
+        <div class="control-region">
+          <!-- Microphone, Camera operating area -->
+          <div class="media-control-region">
+            <audio-media-control
+              class="media-control-item"
+              :has-more="true"
+              :is-muted="isMicMuted"
+              :audio-volume="audioVolume"
+              @click="toggleMuteAudio"
+            ></audio-media-control>
+            <video-media-control
+              class="media-control-item"
+              :has-more="true"
+              :is-muted="isCameraMuted"
+              @click="toggleMuteVideo"
+            ></video-media-control>
+          </div>
+          <div class="room-control-region">
+            <!-- Create room logic -->
+            <div class="create-room-region">
+              <tui-button class="button-item" style="width: 170px;" @click.stop="handleCreateRoom">
+                <svg-icon :icon="CreateRoomIcon" />
+                <span class="button-text">{{ t('New Room') }}</span>
+              </tui-button>
+              <div
+                v-if="showCreateRoomItems"
+                v-click-outside="handleClickOutsideCreateRoomItems"
+                class="create-room-items"
+              >
+                <div class="create-room-item" @click="createRoom('SpeakAfterTakingSeat')">
+                  <span :title="t('On-stage Speaking Room')" class="create-room-option">{{ t('On-stage Speaking Room') }}</span>
+                  <svg-icon class="create-room-icon" :icon="NextIcon"></svg-icon>
+                </div>
+                <div class="create-room-item" @click="createRoom('FreeToSpeak')">
+                  <span :title="t('Free Speech Room')" class="create-room-option">{{ t('Free Speech Room') }}</span>
+                  <svg-icon class="create-room-icon" :icon="NextIcon"></svg-icon>
+                </div>
               </div>
             </div>
-          </div>
-          <!-- Enter room logic -->
-          <div class="enter-room-region">
-            <tui-button v-if="!showEnterRoomAction" class="button-item" @click="handleEnterRoom">
-              <svg-icon :icon="EnterRoomIcon" />
-              <span class="button-text">{{ t('Join Room') }}</span>
-            </tui-button>
-            <div v-if="showEnterRoomAction" class="enter-room-action">
-              <input v-model="roomId" class="input" :placeholder="t('Enter room ID')" @keyup.enter="enterRoom">
-              <div :class="['enter-button', {'active': roomId.length > 0 }]" @click="enterRoom">
+            <!-- Enter room logic -->
+            <div class="enter-room-region">
+              <tui-button v-if="!showEnterRoomAction" class="button-item" style="width: 170px;" @click="handleEnterRoom">
                 <svg-icon :icon="EnterRoomIcon" />
+                <span class="button-text">{{ t('Join Room') }}</span>
+              </tui-button>
+              <div v-if="showEnterRoomAction" class="enter-room-action">
+                <input v-model="roomId" class="input" :placeholder="t('Enter room ID')" @keyup.enter="enterRoom">
+                <div :class="['enter-button', {'active': roomId.length > 0 }]" @click="enterRoom">
+                  <svg-icon :icon="EnterRoomIcon" />
+                </div>
               </div>
+            </div>
+            <!-- Schedule room logic -->
+            <div class="schedule-room-region" v-if="props.enableScheduledConference">
+              <tui-button class="button-item" style="width: 170px;" @click="scheduleConference">
+                <svg-icon :icon="ScheduleRoomIcon" />
+                <span class="button-text">{{ t('Schedule') }}</span>
+              </tui-button>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <ScheduleConferencePanel
+      :visible="scheduleConferenceDialogVisible"
+      :user-name="props.userName"
+      @input="scheduleConferenceDialogVisible = $event"
+    ></ScheduleConferencePanel>
   </div>
 </template>
 
@@ -74,15 +87,16 @@ import SvgIcon from '../../common/base/SvgIcon.vue';
 import LoadingIcon from '../../common/icons/LoadingIcon.vue';
 import NextIcon from '../../common/icons/NextIcon.vue';
 import TuiButton from '../../common/base/Button.vue';
-import Logo from '../../common/Logo.vue';
 import useRoomControl from './useRoomControlHooks';
 import CreateRoomIcon from '../../common/icons/CreateRoomIcon.vue';
 import EnterRoomIcon from '../../common/icons/EnterRoomIcon.vue';
+import ScheduleRoomIcon from '../../common/icons/ScheduleRoomIcon.vue';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import AudioMediaControl from '../../common/AudioMediaControl.vue';
 import VideoMediaControl from '../../common/VideoMediaControl.vue';
+import ScheduleConferencePanel from '../../ScheduleConference/ScheduleConferencePanel.vue';
 import TUIRoomEngine, { TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode, TUIRoomDeviceMangerEvents } from '@tencentcloud/tuiroom-engine-js';
 import '../../../directives/vClickOutside';
 import { isEnumerateDevicesSupported, isGetUserMediaSupported } from '../../../utils/mediaAbility';
@@ -96,12 +110,15 @@ const {
 const { deviceManager, initMediaDeviceList } = useDeviceManager({ listenForDeviceChange: true });
 
 const props = withDefaults(defineProps<{
+  userName?: string,
   showLogo?: boolean,
   givenRoomId: string | null,
+  enableScheduledConference?: boolean,
 }>(), {
   showLogo: true,
+  userName: '',
+  enableScheduledConference: true,
 });
-
 defineExpose({
   getRoomParam,
   startStreamPreview,
@@ -116,6 +133,12 @@ const isCameraMuted = ref(false);
 
 const showCreateRoomItems = ref(false);
 const showEnterRoomAction = ref(Boolean(props.givenRoomId));
+
+const scheduleConferenceDialogVisible = ref(false);
+
+const scheduleConference = () => {
+  scheduleConferenceDialogVisible.value = true;
+};
 
 const tuiRoomParam = {
   isOpenCamera: true,
@@ -166,6 +189,7 @@ async function toggleMuteVideo() {
   tuiRoomParam.isOpenCamera = !isCameraMuted.value;
   if (isCameraMuted.value) {
     await closeCamera();
+    isCameraLoading.value = false;
   } else {
     isCameraLoading.value = true;
     await openCamera();
@@ -281,17 +305,8 @@ onBeforeUnmount(async () => {
   }
 }
 
-.room-control-container {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+.room-control-main {
   display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-
-.logo {
-  margin-bottom: 56px;
 }
 
 .control-container {
@@ -422,12 +437,12 @@ onBeforeUnmount(async () => {
       .enter-room-region {
         margin-left: 20px;
         .enter-room-action {
-          width: 260px;
+          width: 170px;
           height: 60px;
           border-radius: 30px;
           background-color: var(--background-color);
           border: 2px solid var(--active-color-1);
-          padding: 0px 24px;
+          padding: 0px 14px;
           position: relative;
           line-height: 60px;
           .input {
@@ -462,22 +477,25 @@ onBeforeUnmount(async () => {
             }
           }
           .enter-button {
-            width: 72px;
-            height: 52px;
+            width: 40px;
+            height: 40px;
             background-color: #90B3F0;
             border-radius: 26px;
             display: flex;
             justify-content: center;
             align-items: center;
             position: absolute;
-            right: 2px;
-            top: 2px;
+            right: 8px;
+            top: 8px;
             &.active {
               cursor: pointer;
               background-color: var(--active-color-1);
             }
           }
         }
+      }
+      .schedule-room-region {
+        margin-left: 20px;
       }
     }
   }

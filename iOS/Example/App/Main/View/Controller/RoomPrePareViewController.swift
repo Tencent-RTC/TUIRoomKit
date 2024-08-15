@@ -8,6 +8,7 @@
 
 import UIKit
 import TUICore
+import TUIRoomKit
 
 class RoomPrePareViewController: UIViewController {
     var languageID: String {
@@ -52,8 +53,8 @@ class RoomPrePareViewController: UIViewController {
     }
     
     func showDebugVC() {
-        let debugVC = RoomFileBrowserViewController(bathPath: NSHomeDirectory())
-        navigationController?.pushViewController(debugVC, animated: true)
+//        let debugVC = RoomFileBrowserViewController(bathPath: NSHomeDirectory())
+//        navigationController?.pushViewController(debugVC, animated: true)
     }
     
     deinit {

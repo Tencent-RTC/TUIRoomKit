@@ -109,7 +109,7 @@ export default function () {
     let hasErrorOccurred = false;
     const applyUserList = applyToAnchorList.value.map(item => ({
       userId: item.userId,
-      userName: item.userName,
+      userName: item.nameCard || item.userName,
       applyToAnchorRequestId: item.applyToAnchorRequestId,
     }));
     for (const { applyToAnchorRequestId } of applyUserList) {
@@ -258,7 +258,7 @@ export default function () {
       const onlyOneUserTakeStage = newVal.length === 1;
       const firstUser = applyToAnchorList.value[0];
       const lastIndex = applyToAnchorList.value.length - 1;
-      const userName = applyToAnchorList.value[lastIndex]?.userName || applyToAnchorList.value[lastIndex]?.userId;
+      const userName = applyToAnchorList.value[lastIndex]?.nameCard || applyToAnchorList.value[lastIndex]?.userName || applyToAnchorList.value[lastIndex]?.userId;
       const message = onlyOneUserTakeStage
         ? `${userName} ${t('Applying for the stage')}`
         : `${userName} ${t('and so on number people applying to stage', { number: applyToAnchorList.value.length })}`;

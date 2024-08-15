@@ -13,7 +13,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
-import com.tencent.cloud.tuikit.roomkit.ConferenceObserver;
 import com.tencent.cloud.tuikit.roomkit.model.data.RoomState;
 import com.tencent.cloud.tuikit.roomkit.model.data.SeatState;
 import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
@@ -25,7 +24,6 @@ import com.tencent.cloud.tuikit.roomkit.model.entity.UserModel;
 import com.tencent.cloud.tuikit.roomkit.model.entity.VideoModel;
 import com.tencent.qcloud.tuicore.TUILogin;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +47,6 @@ public class ConferenceState {
 
     public List<TakeSeatRequestEntity> takeSeatRequestList;
 
-    private WeakReference<ConferenceObserver> conferenceObserverRef;
     private Class                             mainActivityClass;
 
     private boolean isInFloatWindow      = false;
@@ -65,24 +62,6 @@ public class ConferenceState {
         allUserList = new CopyOnWriteArrayList<>();
         seatUserList = new CopyOnWriteArrayList<>();
         takeSeatRequestList = new CopyOnWriteArrayList<>();
-    }
-
-    public ConferenceObserver getConferenceObserver() {
-        if (conferenceObserverRef == null) {
-            Log.d(TAG, "getConferenceObserver conferenceObserverRef is null");
-            return null;
-        }
-        ConferenceObserver observer = conferenceObserverRef.get();
-        Log.d(TAG, "getConferenceObserver : " + observer);
-        return observer;
-    }
-
-    public void setConferenceObserver(ConferenceObserver conferenceObserver) {
-        Log.d(TAG, "setConferenceObserver : " + conferenceObserver);
-        if (conferenceObserver == null) {
-            return;
-        }
-        conferenceObserverRef = new WeakReference<>(conferenceObserver);
     }
 
     public Class getMainActivityClass() {
@@ -125,13 +104,8 @@ public class ConferenceState {
     }
 
     public void addTakeSeatRequest(TUIRoomDefine.Request request) {
-        UserEntity user = findUser(allUserList, request.userId);
-        if (user == null) {
-            Log.e(TAG, "addTakeSeatRequest user is null");
-            return;
-        }
         TakeSeatRequestEntity takeSeatRequestEntity =
-                new TakeSeatRequestEntity(user.getUserId(), user.getUserName(), user.getAvatarUrl(), request);
+                new TakeSeatRequestEntity(request.userId, request.userName, request.avatarUrl, request);
         takeSeatRequestList.add(takeSeatRequestEntity);
 
         Map<String, Object> map = new HashMap<>();

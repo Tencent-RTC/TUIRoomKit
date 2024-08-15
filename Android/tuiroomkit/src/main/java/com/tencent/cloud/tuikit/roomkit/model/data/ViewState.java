@@ -13,6 +13,8 @@ public class ViewState {
     public LiveData<String>  searchUserKeyWord   = new LiveData<>("");
     public LiveData<Boolean> isSeatedTabSelected = new LiveData<>(true);
 
+    public LiveData<RoomProcess> roomProcess = new LiveData<>(RoomProcess.NONE);
+
     public void addPendingTakeSeatRequest(String requestId) {
         pendingTakeSeatRequests.add(requestId);
     }
@@ -32,5 +34,12 @@ public class ViewState {
 
     public void clearPendingTakeSeatRequests() {
         pendingTakeSeatRequests.clear();
+    }
+
+    public enum RoomProcess {
+        NONE,
+        COMING,
+        IN,
+        OUTING
     }
 }

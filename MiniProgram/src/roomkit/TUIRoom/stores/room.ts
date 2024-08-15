@@ -10,8 +10,7 @@ import {
   TUIMediaDeviceType,
 } from '@tencentcloud/tuiroom-engine-wx';
 import { useBasicStore } from './basic';
-import { isVue3 } from '../utils/constants';
-import Vue from '../utils/vue';
+import { set, del } from '../utils/vue';
 import useGetRoomEngine from '../hooks/useRoomEngine';
 import { isMobile } from '../utils/environment';
 
@@ -21,6 +20,7 @@ export type StreamInfo = {
   userId: string,
   userName?: string,
   avatarUrl?: string,
+  nameCard?: string,
   hasAudioStream?: boolean,
   hasVideoStream?: boolean,
   hasScreenStream?: boolean,
@@ -32,35 +32,36 @@ export type UserInfo = {
   userId: string,
   userName?: string,
   avatarUrl?: string,
+  nameCard?: string,
   hasAudioStream?: boolean,
   hasVideoStream?: boolean,
   hasScreenStream?: boolean,
   isVideoVisible?: boolean,
   isScreenVisible?: boolean,
+  isMessageDisabled?: boolean,
   userRole?: TUIRole,
-  // 是否在麦上
+  // Is it on the seat
   onSeat?: boolean,
-  isChatMutedByMasterOrAdmin?: boolean,
-  // 是否正在请求用户打开麦克风
+  // Whether the user is being asked to turn on the microphone
   isRequestingUserOpenMic?: boolean,
-  // 请求用户打开麦克风的 requestId
+  // The requestId for requesting the user to turn on the microphone
   requestUserOpenMicRequestId?: string,
-  // 是否正在请求用户打开摄像头
+  // Whether the user is being asked to open the camera
   isRequestingUserOpenCamera?: boolean,
-  // 请求用户打开摄像头的 requestId
+  // The requestId for the user to turn on the camera
   requestUserOpenCameraRequestId?: string,
-  // 用户是否正在申请上麦
+  // Whether the user is applying for seat
   isUserApplyingToAnchor?: boolean,
-  // 用户申请上麦的 requestId
+  // The requestId of the user requesting to be on the seat
   applyToAnchorRequestId?: string,
-  // 用户申请上麦的时间点
+  // The time at which a user applies to be on the seat
   applyToAnchorTimestamp?: number,
-  // 是否正在邀请用户上麦
+  // Whether or not you are inviting users to the seat
   isInvitingUserToAnchor?: boolean,
-  // 邀请用户上麦的 requestId
+  // The requestId to invite the user to the seat
   inviteToAnchorRequestId?: string,
-  // cameraStreamInfo 和 screenStreamInfo 存在的意义时，流渲染保持使用同一个引用传递的数据
-  // 避免出现大窗口和实际数据显示不一致的问题
+  // The meaning of cameraStreamInfo and screenStreamInfo is to keep the stream rendering using the same reference to the passed data,
+  // avoiding the problem of inconsistency between the large window and the actual data display.
   cameraStreamInfo: StreamInfo,
   screenStreamInfo: StreamInfo,
 }
@@ -71,7 +72,7 @@ interface RoomState {
   userVolumeObj: Record<string, number>,
   isDefaultOpenCamera: boolean,
   isDefaultOpenMicrophone: boolean,
-  // 主持人全员禁麦，但是单独取消某个用户音视频禁止状态的时候，是可以自己 unmute audio/video 的
+  // Moderators can unmute audio/video by themselves when they have all users unmuted, but when they unmute a user individually.
   canControlSelfAudio: boolean,
   canControlSelfVideo: boolean,
   localVideoQuality: TUIVideoQuality,
@@ -84,7 +85,7 @@ interface RoomState {
   masterUserId: string,
   isMicrophoneDisableForAllUser: boolean,
   isCameraDisableForAllUser: boolean,
-  isMessageDisableForAllUser: boolean,
+  isScreenShareDisableForAllUser: boolean,
   isSeatEnabled: boolean,
   seatMode: TUISeatMode,
   maxMembersCount: number,
@@ -102,6 +103,7 @@ export const useRoomStore = defineStore('room', {
       userId: '',
       userName: '',
       avatarUrl: '',
+      nameCard: '',
       hasAudioStream: false,
       hasVideoStream: false,
       hasScreenStream: false,
@@ -111,6 +113,7 @@ export const useRoomStore = defineStore('room', {
         userId: '',
         userName: '',
         avatarUrl: '',
+        nameCard: '',
         hasAudioStream: false,
         hasVideoStream: false,
         streamType: TUIVideoStreamType.kCameraStream,
@@ -120,6 +123,7 @@ export const useRoomStore = defineStore('room', {
         userId: '',
         userName: '',
         avatarUrl: '',
+        nameCard: '',
         hasScreenStream: false,
         streamType: TUIVideoStreamType.kScreenStream,
         isVisible: true,
@@ -141,14 +145,14 @@ export const useRoomStore = defineStore('room', {
     masterUserId: '',
     isMicrophoneDisableForAllUser: false,
     isCameraDisableForAllUser: false,
-    isMessageDisableForAllUser: false,
+    isScreenShareDisableForAllUser: false,
     isSeatEnabled: false,
     seatMode: TUISeatMode.kFreeToTake,
-    maxMembersCount: 5, // 包含本地流和屏幕分享，超过该数目后续都播放小流
+    maxMembersCount: 5, // Includes local streams and screen shares, above which subsequent streams are played
     maxSeatCount: 20,
     roomName: '',
     hasVideoStreamObject: {},
-    // 可视区域用户流列表
+    // Visual area user flow list
     currentStreamIdListInVisibleView: [],
     hasOtherScreenShare: false,
     isOnStateTabActive: true,
@@ -163,7 +167,7 @@ export const useRoomStore = defineStore('room', {
     isGeneralUser(state) {
       return state.localUser.userRole === TUIRole.kGeneralUser;
     },
-    // 当前用户是否在麦上
+    // Whether the current user is on the stage
     isAnchor(state) {
       if (this.isFreeSpeakMode) {
         return true;
@@ -172,7 +176,7 @@ export const useRoomStore = defineStore('room', {
         return state.localUser.onSeat;
       }
     },
-    // 当前用户是否是在麦下
+    // Whether the current user is under the stage
     isAudience(state) {
       if (this.isFreeSpeakMode) {
         return false;
@@ -188,20 +192,20 @@ export const useRoomStore = defineStore('room', {
       return !this.isSeatEnabled;
     },
     isLocalAudioIconDisable(): boolean {
-      // 全员禁麦状态
+      // All mute status
       const micForbidden = this.isGeneralUser && !this.canControlSelfAudio;
       return micForbidden as any || this.isAudience;
     },
     isLocalVideoIconDisable(): boolean {
-      // 全员禁画状态
+      // All stop video status
       const cameraForbidden = this.isGeneralUser && !this.canControlSelfVideo;
       return cameraForbidden as any || this.isAudience;
     },
     localStream: (state) => {
-      const { userId, userName, avatarUrl, hasAudioStream, hasVideoStream } = state.localUser;
+      const { userId, userName, avatarUrl, nameCard, hasAudioStream, hasVideoStream } = state.localUser;
       Object.assign(
         state.localUser.cameraStreamInfo,
-        { userId, userName, avatarUrl, hasAudioStream, hasVideoStream },
+        { userId, userName, avatarUrl, nameCard, hasAudioStream, hasVideoStream },
       );
       return state.localUser.cameraStreamInfo;
     },
@@ -220,6 +224,7 @@ export const useRoomStore = defineStore('room', {
           userId,
           avatarUrl,
           userName,
+          nameCard,
           onSeat,
           hasAudioStream,
           hasVideoStream,
@@ -228,10 +233,10 @@ export const useRoomStore = defineStore('room', {
           isScreenVisible,
         } = userInfo;
         if (onSeat) {
-          obj[`${userId}_${TUIVideoStreamType.kCameraStream}`] = Object.assign(userInfo.cameraStreamInfo, { userId, avatarUrl, userName, hasAudioStream, hasVideoStream, streamType: TUIVideoStreamType.kCameraStream, isVisible: isVideoVisible });
+          obj[`${userId}_${TUIVideoStreamType.kCameraStream}`] = Object.assign(userInfo.cameraStreamInfo, { userId, avatarUrl, userName,nameCard, hasAudioStream, hasVideoStream, streamType: TUIVideoStreamType.kCameraStream, isVisible: isVideoVisible });
         }
         if (hasScreenStream) {
-          obj[`${userId}_${TUIVideoStreamType.kScreenStream}`] = Object.assign(userInfo.screenStreamInfo, { userId, avatarUrl, userName, hasScreenStream, streamType: TUIVideoStreamType.kScreenStream, isVisible: isScreenVisible });
+          obj[`${userId}_${TUIVideoStreamType.kScreenStream}`] = Object.assign(userInfo.screenStreamInfo, { userId, avatarUrl, userName, nameCard, hasScreenStream, streamType: TUIVideoStreamType.kScreenStream, isVisible: isScreenVisible });
         }
       });
       return obj;
@@ -246,12 +251,21 @@ export const useRoomStore = defineStore('room', {
       }
       return list;
     },
+    cameraStreamList(): Array<StreamInfo> {
+      const list = [
+        this.localStream,
+        ...(Object.values(this.remoteStreamObj)
+          .filter(stream => stream.streamType === TUIVideoStreamType.kCameraStream)),
+      ];
+      return list;
+    },
     streamNumber(): number {
       return this.streamList.length;
     },
     remoteUserList: state => [...Object.values(state.remoteUserObj)],
     remoteAnchorList: state => [...Object.values(state.remoteUserObj)].filter(item => item.onSeat),
     userList: state => [state.localUser, ...Object.values(state.remoteUserObj)],
+    generalUserScreenStreamList: state => [...Object.values(state.remoteUserObj)].filter(item => item.hasScreenStream && item.userRole === TUIRole.kGeneralUser),
     userNumber(): number {
       return this.userList.length;
     },
@@ -263,6 +277,15 @@ export const useRoomStore = defineStore('room', {
       return Object.keys(this.hasVideoStreamObject).length > this.maxMembersCount
         ? TUIVideoStreamType.kCameraStreamLow : TUIVideoStreamType.kCameraStream;
     },
+    getDisplayName: (state) =>  {
+      return (userId: string) => {
+      const userInfo = userId === state.localUser.userId ? state.localUser : state.remoteUserObj[userId];
+      if (userInfo) {
+        const { nameCard, userName, userId } = userInfo;
+        return nameCard || userName || userId;
+      }
+      }
+    }
   },
   actions: {
     setLocalUser(obj: Record<string, any>) {
@@ -273,9 +296,9 @@ export const useRoomStore = defineStore('room', {
     },
     getUserName(userId: string) {
       if (userId === this.localUser.userId) {
-        return this.localUser.userName || userId;
+        return this.localUser.nameCard || this.localUser.userName || userId;
       }
-      return this.remoteUserObj[userId]?.userName || userId;
+      return this.remoteUserObj[userId]?.nameCard || this.remoteUserObj[userId]?.userName || userId;
     },
     getUserRole(userId: string) {
       if (userId === this.localUser.userId) {
@@ -288,20 +311,22 @@ export const useRoomStore = defineStore('room', {
         userId,
         userName: '',
         avatarUrl: '',
+        nameCard: '',
         hasAudioStream: false,
         hasVideoStream: false,
         hasScreenStream: false,
         isVideoVisible: false,
         isScreenVisible: false,
+        isMessageDisabled: false,
         userRole: TUIRole.kGeneralUser,
         onSeat: !this.isSpeakAfterTakingSeatMode,
-        isChatMutedByMasterOrAdmin: false,
         isUserApplyingToAnchor: false,
         isInvitingUserToAnchor: false,
         cameraStreamInfo: {
           userId,
           userName: '',
           avatarUrl: '',
+          nameCard: '',
           hasAudioStream: false,
           hasVideoStream: false,
           streamType: TUIVideoStreamType.kCameraStream,
@@ -311,6 +336,7 @@ export const useRoomStore = defineStore('room', {
           userId,
           userName: '',
           avatarUrl: '',
+          nameCard: '',
           hasScreenStream: false,
           streamType: TUIVideoStreamType.kScreenStream,
           isVisible: false,
@@ -328,16 +354,11 @@ export const useRoomStore = defineStore('room', {
           Object.assign(this.remoteUserObj[user.userId], user);
         } else {
           const newUserInfo = Object.assign(this.getNewUserInfo(user.userId), user);
-          if (isVue3) {
-            this.remoteUserObj[user.userId] = newUserInfo;
-          } else {
-            // @ts-ignore
-            Vue.set(this.remoteUserObj, user.userId, newUserInfo);
-          }
+          set(this.remoteUserObj, user.userId, newUserInfo);
         }
       });
     },
-    // 远端用户进入房间（IM事件）
+    // Remote user enters the room (IM event)
     addRemoteUser(userInfo: TUIUserInfo) {
       const { userId } = userInfo;
       const basicStore = useBasicStore();
@@ -348,12 +369,7 @@ export const useRoomStore = defineStore('room', {
         Object.assign(this.remoteUserObj[userId], userInfo);
       } else {
         const newUserInfo = Object.assign(this.getNewUserInfo(userId), userInfo);
-        if (isVue3) {
-          this.remoteUserObj[userId] = newUserInfo;
-        } else {
-          // @ts-ignore
-          Vue.set(this.remoteUserObj, userId, newUserInfo);
-        }
+        set(this.remoteUserObj, userId, newUserInfo);
       }
     },
     updateRemoteUser(userId: string, newUserInfo: { nick: string, avatar: string }) {
@@ -376,19 +392,14 @@ export const useRoomStore = defineStore('room', {
             Object.assign(user, { onSeat: true });
           } else {
             const newUserInfo = Object.assign(this.getNewUserInfo(userId), { onSeat: true });
-            if (isVue3) {
-              this.remoteUserObj[userId] = newUserInfo;
-            } else {
-              // @ts-ignore
-              Vue.set(this.remoteUserObj, userId, newUserInfo);
-            }
+            set(this.remoteUserObj, userId, newUserInfo);
           }
         };
       });
     },
-    // 更新 seatList 的变更
-    // 进入房间后会立即通知 onSeatListChanged， onUserVideoAvailable，onUserAudioAvailable 事件，因此先更新到 userMap 中
-    // 等待 getUserList 获取到全部用户列表后再做更新
+    // Updating changes to seatList
+    // The onSeatListChanged, onUserVideoAvailable, onUserAudioAvailable events are notified as soon as the room is entered, so they are updated to the userMap first.
+    // Wait for getUserList to get the full list of users before updating it.
     updateOnSeatList(seatedList: TUISeatInfo[], leftList: TUISeatInfo[]) {
       seatedList.forEach((seat) => {
         const { userId } = seat;
@@ -400,12 +411,7 @@ export const useRoomStore = defineStore('room', {
             Object.assign(user, { onSeat: true });
           } else {
             const newUserInfo = Object.assign(this.getNewUserInfo(userId), { onSeat: true });
-            if (isVue3) {
-              this.remoteUserObj[userId] = newUserInfo;
-            } else {
-              // @ts-ignore
-              Vue.set(this.remoteUserObj, userId, newUserInfo);
-            }
+            set(this.remoteUserObj, userId, newUserInfo);
           }
         };
       });
@@ -423,15 +429,10 @@ export const useRoomStore = defineStore('room', {
     updateUserVideoState(userId: string, streamType: TUIVideoStreamType, hasVideo: boolean) {
       const basicStore = useBasicStore();
       let user = userId === basicStore.userId ? this.localUser : this.remoteUserObj[userId];
-      // 需要判断 hasVideo 是否为 true，避免视频取消事件在 onRemoteUserLeaveRoom 之后抛出的情况
+      // You need to determine whether hasVideo is true or not to avoid the video cancellation event being thrown after onRemoteUserLeaveRoom
       if (!user && hasVideo) {
         user = this.getNewUserInfo(userId);
-        if (isVue3) {
-          this.remoteUserObj[userId] = user;
-        } else {
-          // @ts-ignore
-          Vue.set(this.remoteUserObj, userId, user);
-        }
+        set(this.remoteUserObj, userId, user);
       }
       if (user) {
         this.updatehasVideoStreamObject(user, hasVideo,  userId === basicStore.userId);
@@ -447,33 +448,18 @@ export const useRoomStore = defineStore('room', {
       const { userId, cameraStreamInfo, screenStreamInfo, hasVideoStream } = userInfo;
       const streamId = `${userId}_${hasVideoStream ? cameraStreamInfo.streamType : screenStreamInfo.streamType}`;
       if (hasVideo) {
-        if (isVue3) {
-          this.hasVideoStreamObject[streamId] = userInfo;
-        } else {
-          // @ts-ignore
-          Vue.set(this.hasVideoStreamObject, streamId, userInfo);
-        }
+        set(this.hasVideoStreamObject, streamId, userInfo);
       } else {
-        if (isVue3) {
-          delete this.hasVideoStreamObject[streamId];
-        } else {
-          // @ts-ignore
-          Vue.delete(this.hasVideoStreamObject, streamId);
-        }
+        del(this.hasVideoStreamObject, streamId);
       }
     },
     updateUserAudioState(userId: string, hasAudio: boolean) {
       const basicStore = useBasicStore();
       let user = userId === basicStore.userId ? this.localUser : this.remoteUserObj[userId];
-      // 需要判断 hasAudio 是否为 true，避免音频取消事件在 onRemoteUserLeaveRoom 之后抛出的情况
+      // You need to determine if hasAudio is true to avoid audio cancellation events being thrown after onRemoteUserLeaveRoom
       if (!user && hasAudio) {
         user = this.getNewUserInfo(userId);
-        if (isVue3) {
-          this.remoteUserObj[userId] = user;
-        } else {
-          // @ts-ignore
-          Vue.set(this.remoteUserObj, userId, user);
-        }
+        set(this.remoteUserObj, userId, user);
       }
       if (user) {
         user.hasAudioStream = hasAudio;
@@ -485,12 +471,7 @@ export const useRoomStore = defineStore('room', {
       if (!userId || userId === basicStore.userId) {
         return;
       }
-      if (isVue3) {
-        delete this.remoteUserObj[userId];
-      } else {
-        // @ts-ignore
-        Vue.delete(this.remoteUserObj, userId);
-      }
+      del(this.remoteUserObj, userId);
     },
 
     updateUserStreamVisible(streamIdList: string[]) {
@@ -510,7 +491,7 @@ export const useRoomStore = defineStore('room', {
           user.isScreenVisible = true;
         }
       });
-      // 在新的 streamIdList 里面没有的流, isVideoVisible 要设置为 false
+      // For streams that are not in the new streamIdList, isVideoVisible should be set to false.
       this.currentStreamIdListInVisibleView.forEach((item: string) => {
         const userId = item.slice(0, item.length - 2);
         const streamType = Number(item.slice(-1)) as TUIVideoStreamType;
@@ -537,12 +518,7 @@ export const useRoomStore = defineStore('room', {
         if (userId === '') {
           userId = basicStore.userId;
         }
-        if (isVue3) {
-          this.userVolumeObj[userId] = volume;
-        } else {
-          // @ts-ignore
-          Vue.set(this.userVolumeObj, userId, volume);
-        }
+        set(this.userVolumeObj, userId, volume);
       });
     },
     setCurrentDeviceId(type: TUIMediaDeviceType, deviceId: string) {
@@ -570,11 +546,19 @@ export const useRoomStore = defineStore('room', {
       this.currentSpeakerId = deviceId;
     },
     setRoomInfo(roomInfo: TUIRoomInfo) {
+      if (!roomInfo) return;
+
       const {
-        roomOwner, isMicrophoneDisableForAllUser,
-        isCameraDisableForAllUser, isMessageDisableForAllUser,
-        isSeatEnabled, seatMode, maxSeatCount, roomName,
+        roomOwner = this.masterUserId,
+        isMicrophoneDisableForAllUser = this.isMicrophoneDisableForAllUser,
+        isCameraDisableForAllUser = this.isCameraDisableForAllUser,
+        isScreenShareDisableForAllUser = this.isScreenShareDisableForAllUser,
+        isSeatEnabled = this.isSeatEnabled,
+        seatMode = this.seatMode,
+        maxSeatCount = this.maxSeatCount,
+        roomName = this.roomName,
       } = roomInfo;
+
       if (this.localUser.userId === roomOwner) {
         this.localUser.userRole = TUIRole.kRoomOwner;
       }
@@ -582,13 +566,14 @@ export const useRoomStore = defineStore('room', {
       this.masterUserId = roomOwner;
       this.isMicrophoneDisableForAllUser = isMicrophoneDisableForAllUser;
       this.isCameraDisableForAllUser = isCameraDisableForAllUser;
-      this.isMessageDisableForAllUser = isMessageDisableForAllUser;
+      this.isScreenShareDisableForAllUser = isScreenShareDisableForAllUser;
       this.isSeatEnabled = isSeatEnabled;
       this.seatMode = seatMode;
-      this.canControlSelfAudio = !this.isMicrophoneDisableForAllUser;
-      this.canControlSelfVideo = !this.isCameraDisableForAllUser;
       this.maxSeatCount = maxSeatCount;
       this.roomName = roomName;
+
+      this.canControlSelfAudio = !this.isMicrophoneDisableForAllUser;
+      this.canControlSelfVideo = !this.isCameraDisableForAllUser;
     },
     setDisableMicrophoneForAllUserByAdmin(isDisable: boolean) {
       this.isMicrophoneDisableForAllUser = isDisable;
@@ -596,8 +581,8 @@ export const useRoomStore = defineStore('room', {
     setDisableCameraForAllUserByAdmin(isDisable: boolean) {
       this.isCameraDisableForAllUser = isDisable;
     },
-    setDisableMessageAllUserByAdmin(isDisable: boolean) {
-      this.isMessageDisableForAllUser = isDisable;
+    setDisableScreenShareForAllUserByAdmin(isDisable: boolean) {
+      this.isScreenShareDisableForAllUser = isDisable;
     },
     setMasterUserId(userId: string) {
       this.masterUserId = userId;
@@ -619,12 +604,12 @@ export const useRoomStore = defineStore('room', {
         this.setCurrentSpeakerId(defaultSpeakerId);
         roomEngine.instance?.setCurrentSpeakerDevice({ deviceId: defaultSpeakerId });
       }
-      // 如果已经开启全员禁言/当前为申请发言模式，则忽略默认打开麦克风的设置
+      // Ignore the setting to turn on the microphone by default if all hands are already turned on/currently in request-to-speak mode
       if (this.isMaster || (!this.isMicrophoneDisableForAllUser
         && this.isFreeSpeakMode)) {
         typeof isOpenMicrophone === 'boolean' && (this.isDefaultOpenMicrophone = isOpenMicrophone);
       }
-      // 如果已经开启全员禁画/当前为申请发言模式，则忽略默认打开摄像头的设置
+      // Ignore the setting to turn on the camera by default if the all-persons ban is already on/currently in request-to-speak mode
       if (this.isMaster || (!this.isCameraDisableForAllUser
         && this.isFreeSpeakMode)) {
         typeof isOpenCamera === 'boolean' && (this.isDefaultOpenCamera = isOpenCamera);
@@ -672,25 +657,23 @@ export const useRoomStore = defineStore('room', {
         this.setCurrentSpeakerId(deviceList[0].deviceId);
       }
     },
-    // 全员禁麦/取消禁麦时设置所有人的禁麦状态
-    setMicrophoneDisableState(isDisable: boolean) {
-      this.isMicrophoneDisableForAllUser = isDisable;
-    },
-    // 全员禁画/取消禁画时设置所有人的禁画状态
-    setCameraDisableState(isDisable: boolean) {
-      this.isCameraDisableForAllUser = isDisable;
-    },
-    // 主持人单个修改用户的发文字消息 mute 状态
+    // Moderator individually modifies the mute status of a user's outgoing text messages
     setMuteUserChat(userId: string, muted: boolean) {
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
-        remoteUserInfo.isChatMutedByMasterOrAdmin = muted;
+        remoteUserInfo.isMessageDisabled = muted;
       }
     },
     setRemoteUserRole(userId: string, role: TUIRole) {
       const remoteUserInfo = this.remoteUserObj[userId];
       if (remoteUserInfo) {
         remoteUserInfo.userRole = role;
+      }
+    },
+    setRemoteUserNameCard(userId: string, nameCard: string) {
+      const remoteUserInfo = this.remoteUserObj[userId];
+      if (remoteUserInfo) {
+        remoteUserInfo.nameCard = nameCard;
       }
     },
     setRequestUserOpenMic(options: { userId: string, isRequesting: boolean, requestId?: string }) {
@@ -794,7 +777,7 @@ export const useRoomStore = defineStore('room', {
       this.masterUserId = '';
       this.isMicrophoneDisableForAllUser = false;
       this.isCameraDisableForAllUser = false;
-      this.isMessageDisableForAllUser = false;
+      this.isScreenShareDisableForAllUser = false;
       this.isSeatEnabled = false;
       this.seatMode = TUISeatMode.kFreeToTake;
       this.hasVideoStreamObject = {};

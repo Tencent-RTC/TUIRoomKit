@@ -3,7 +3,7 @@
     v-if="playRegionDomId !== enlargeDomId"
     ref="streamRegionRef"
     class="user-stream-container"
-    @dblclick="$emit('room_dblclick')"
+    @dblclick="$emit('room-dblclick')"
   >
     <local-screen-stream
       v-if="isLocalScreen"
@@ -80,6 +80,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+defineEmits(['room-dblclick']);
 
 // Whether it is a local screen sharing placeholder window
 const isLocalScreen = computed(() => (
@@ -111,10 +112,33 @@ const showIcon = computed(() => showMasterIcon.value || showAdminIcon.value);
 const isScreenStream = computed(() => props.stream.streamType === TUIVideoStreamType.kScreenStream);
 const userInfo = computed(() => {
   if (isInnerScene) {
-    return `${props.stream.userName} | ${props.stream.userId}` || props.stream.userId;
+    return `${props.stream.nameCard || props.stream.userName} | ${props.stream.userId}`;
   }
-  return props.stream.userName || props.stream.userId;
+  return props.stream.nameCard || props.stream.userName || props.stream.userId;
 });
+
+watch(
+  () => props.stream.hasVideoStream,
+  async (val) => {
+    if (props.stream.userId === basicStore.userId && props.stream.streamType === TUIVideoStreamType.kCameraStream) {
+      if (val) {
+        await nextTick();
+        const userIdEl = document?.getElementById(`${playRegionDomId.value}`) as HTMLDivElement;
+        if (userIdEl) {
+          logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, userIdEl);
+          await roomEngine.instance?.setLocalVideoView({
+            view: `${playRegionDomId.value}`,
+          });
+        }
+      } else {
+        await roomEngine.instance?.setLocalVideoView({
+          view: null,
+        });
+      }
+    }
+  },
+  { immediate: true },
+);
 
 // The stream type to be pulled from the remote user
 const streamTypeToFetch = computed(() => {

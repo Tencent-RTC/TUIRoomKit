@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="more-control-container">
+    <div v-if="moreControlConfig.visible" class="more-control-container">
       <icon-button
         @tap="showMore"
         :is-active="sidebarName === 'more'"
@@ -31,8 +31,9 @@ import { useRoomStore } from '../../../stores/room';
 import { ref, onMounted, onUnmounted } from 'vue';
 import ExtensionIcon from '../../../assets/icons/ExtensionIcon.svg';
 import bus from '../../../hooks/useMitt';
-import TUIRoomAegis from '../../../utils/aegis';
+import { roomService } from '../../../services';
 
+const moreControlConfig = roomService.getComponentConfig('MoreControl');
 const showMoreContent = ref(false);
 const moreContentRef = ref();
 
@@ -50,7 +51,6 @@ function handleCancelControl() {
   showMoreContent.value = false;
 }
 function handleControlClick(name: string) {
-  TUIRoomAegis.reportEvent({ name, ext1: name });
   bus.emit('experience-communication', name);
 }
 

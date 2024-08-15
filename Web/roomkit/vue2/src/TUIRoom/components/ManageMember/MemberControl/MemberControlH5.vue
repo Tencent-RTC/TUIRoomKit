@@ -1,8 +1,8 @@
 <template>
-  <div v-if="!isGeneralUser" class="member-control-container">
+  <div class="member-control-container">
     <div class="member-title">
       <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
-      <div class="member-title-content">{{ userInfo.userName || userInfo.userId }}</div>
+      <div class="member-title-content">{{ roomService.getDisplayName(userInfo) }}</div>
       <span v-if="isWeChat" v-tap.stop="handleCloseControl" class="tab-cancel">{{ t('Cancel') }}</span>
     </div>
     <div
@@ -27,6 +27,20 @@
     >
       <span>{{ dialogData.content }}</span>
     </Dialog>
+    <div class="input-content-container" ref="editorInputEleContainer" v-tap.stop="handleCloseInput" v-show="isShowInput">
+      <div class="input-content" >
+        <div class="input">
+          <tui-input ref="editorInputEle"
+            :theme="roomService.basicStore.defaultTheme"
+            :model-value="tempUserName"
+            type="text"
+            enterkeyhint="done"
+            @input="tempUserName = $event"
+            @done="handleAction(props.userInfo)">
+          </tui-input>
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
@@ -39,6 +53,8 @@ import '../../../directives/vTap';
 import useMemberControlHooks from './useMemberControlHooks';
 import { useI18n } from '../../../locales';
 import { UserInfo } from '../../../stores/room';
+import { roomService } from '../../../services';
+import TuiInput from '../../common/base/Input';
 
 interface Props {
   userInfo: UserInfo,
@@ -49,18 +65,32 @@ const props = defineProps<Props>();
 
 const { t } = useI18n();
 const {
-  isGeneralUser,
   controlList,
   handleCancelDialog,
   handleAction,
   isDialogVisible,
   dialogData,
+  tempUserName,
+  isShowInput,
+  editorInputEleContainer,
+  editorInputEle,
 } = useMemberControlHooks(props);
 
 const emit = defineEmits(['on-close-control']);
 
 function handleCloseControl() {
+  isShowInput.value = false;
   emit('on-close-control');
+}
+
+function handleCloseInput(event: any) {
+  if(isWeChat) {
+    isShowInput.value = false;
+  } else if (event.target !== event.currentTarget) {
+    return;
+  } else {
+    isShowInput.value = false;
+  }
 }
 </script>
 
@@ -130,5 +160,55 @@ function handleCloseControl() {
   flex: 1;
   text-align: end;
   padding-right: 30px
+}
+.input-content-container{
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100vw;
+  height: auto;
+  box-sizing: border-box;
+  background-color: var(--log-out-mobile);
+  z-index: 9999;
+  .input-content {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    color: #676c80;
+    background: var(--background-color-1);
+    border: none;
+    box-sizing: border-box;
+    font-family: "PingFang SC";
+    font-style: normal;
+    font-weight: 450;
+    font-size: 16px;
+    line-height: 4vh;
+    resize: none;
+    padding: 10px;
+    position: absolute;
+    bottom: 0;
+  }
+  .input{
+    width: 100%;
+  }
+  .content-bottom-input {
+    color: #676c80;
+    width: 100%;
+    height: 35px;
+    border: none;
+    box-sizing: border-box;
+    font-family: 'PingFang SC';
+    font-style: normal;
+    font-weight: 450;
+    font-size: 16px;
+    line-height: 4vh;
+    background-color: var(--chat-editor-input-color-h5);
+    caret-color: var(--caret-color);
+    border-radius: 45px;
+    resize: none;
+    padding-left: 12px;
+  }
 }
 </style>

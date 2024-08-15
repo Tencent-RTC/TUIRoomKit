@@ -1,15 +1,15 @@
 <!-- eslint-disable max-len -->
 <template>
   <div class="logo-container">
-    <!-- PC 端中文黑色主题下 logo -->
+    <!-- Logo under Chinese black theme on PC -->
     <div v-if="!isMobile && isZH && isBlackTheme">
       <svg-icon style="display: flex" :icon="LogoOfPCInChineseBlackIcon"></svg-icon>
     </div>
-    <!-- PC 端中文白色主题下 logo -->
+    <!-- Logo under Chinese white theme on PC -->
     <div v-if="!isMobile && isZH && isWhiteTheme">
       <svg-icon style="display: flex" :icon="LogoOfPCInChineseWhiteIcon"></svg-icon>
     </div>
-    <!-- 移动端中文黑白主题 logo -->
+    <!-- Mobile Chinese black and white theme logo -->
     <div v-if="isMobile && isZH" class="mobile-zh-logo">
       <span class="logo" :class="isWhiteTheme ? 'white' : 'black'">
         <svg-icon style="display: flex" :icon="LogoOfMobileInChinese"></svg-icon>
@@ -18,7 +18,7 @@
         <svg-icon style="display: flex" :icon="LogoTitleOfMobileInChinese"></svg-icon>
       </span>
     </div>
-    <!-- 英文黑白主题 logo -->
+    <!-- English black and white theme logo -->
     <div v-if="isEN" :class="['pc-en-logo', { 'mobile': isMobile }]">
       <span class="logo">
         <svg-icon style="display: flex" :icon="LogoInEnglish"></svg-icon>
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import i18n from '../../locales/index';
-import { isMobile, isWeChat } from '../../utils/environment';
+import { isMobile } from '../../utils/environment';
 import { computed } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
@@ -48,8 +48,8 @@ const basicStore = useBasicStore();
 
 const { defaultTheme } = storeToRefs(basicStore);
 
-const isEN = computed(() => !isWeChat && i18n.global.locale.value === 'en-US');
-const isZH = computed(() => isWeChat || i18n.global.locale.value === 'zh-CN');
+const isEN = computed(() => i18n.global.locale.value === 'en-US');
+const isZH = computed(() => i18n.global.locale.value === 'zh-CN');
 const isBlackTheme = computed(() => defaultTheme.value === 'black');
 const isWhiteTheme = computed(() => defaultTheme.value === 'white');
 

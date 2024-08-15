@@ -7,3 +7,4 @@ export * from './manager/configManager';
 export * from './manager/userManager';
 export * from './manager/lifeCycleManager';
 export * from './manager/roomActionManager';
+export * from './manager/scheduleConferenceManager';

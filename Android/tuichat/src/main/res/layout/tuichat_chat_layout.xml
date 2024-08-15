@@ -19,45 +19,52 @@
         android:background="@color/chat_title_line_color" />
 
     <FrameLayout
-        android:id="@+id/chat_top_extension_layout"
+        android:id="@+id/custom_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/view_line"
+        android:layout_below="@id/view_line"
         android:layout_marginTop="0dp"
         android:visibility="gone" />
 
     <FrameLayout
-        android:id="@+id/custom_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/chat_top_extension_layout"
-        android:layout_marginTop="0dp"
-        android:visibility="gone" />
-
-    <com.tencent.qcloud.tuikit.tuichat.classicui.component.noticelayout.NoticeLayout
-        android:id="@+id/chat_group_apply_layout"
+        android:id="@+id/chat_top_extension_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/custom_layout"
+        android:layout_marginTop="0dp"
         android:visibility="gone" />
 
     <com.tencent.qcloud.tuikit.tuichat.classicui.component.noticelayout.NoticeLayout
         android:id="@+id/chat_notice_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/chat_group_apply_layout"
+        android:layout_below="@+id/chat_top_extension_layout"
         android:layout_marginTop="1dp"
         android:visibility="gone" />
+
+    <com.tencent.qcloud.tuikit.tuichat.classicui.component.noticelayout.NoticeLayout
+        android:id="@+id/chat_group_apply_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/chat_notice_layout"
+        android:visibility="gone" />
+
+    <com.tencent.qcloud.tuikit.tuichat.component.pinned.GroupPinnedView
+        android:id="@+id/group_pinned_message_view"
+        android:layout_below="@id/chat_group_apply_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
     <com.tencent.qcloud.tuikit.tuichat.classicui.widget.message.MessageRecyclerView
         android:id="@+id/chat_message_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/fl_input_float"
-        android:layout_below="@+id/chat_notice_layout"
+        android:layout_below="@id/group_pinned_message_view"
         android:baselineAligned="false"
         android:clickable="false"
-        android:descendantFocusability="blocksDescendants" />
+        android:descendantFocusability="afterDescendants" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
@@ -170,9 +177,9 @@
         android:background="#E6E9EB"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        android:paddingStart="38.4dp"
+        android:paddingStart="16dp"
         android:paddingTop="15.36dp"
-        android:paddingEnd="38.4dp"
+        android:paddingEnd="16dp"
         android:paddingBottom="46.08dp"
         android:visibility="gone"
         tools:visibility="visible">
@@ -183,7 +190,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.33"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
 
             <ImageView
                 android:layout_width="38.4dp"
@@ -195,6 +204,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5.76dp"
                 android:text="@string/forward_mode_onebyone"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
                 android:textColor="#444444"
                 android:textSize="11.52sp" />
 
@@ -207,7 +218,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.33"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
+
 
             <ImageView
                 android:layout_width="38.4dp"
@@ -219,6 +233,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5.76dp"
                 android:text="@string/forward_mode_merge"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
                 android:textColor="#444444"
                 android:textSize="11.52sp" />
 
@@ -231,7 +247,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.33"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
 
             <ImageView
                 android:layout_width="38.4dp"
@@ -243,6 +261,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5.76dp"
                 android:text="@string/delete_button"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
                 android:textColor="#444444"
                 android:textSize="11.52sp" />
         </LinearLayout>

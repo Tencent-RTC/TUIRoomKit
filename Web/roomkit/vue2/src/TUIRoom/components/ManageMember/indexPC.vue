@@ -30,11 +30,35 @@
     </div>
     <div v-if="!isGeneralUser" class="global-setting">
       <tui-button class="button" size="default" @click="toggleManageAllMember(ManageControlType.AUDIO)">
-        {{ isMicrophoneDisableForAllUser ? t('Enable all audios') : t('Disable all audios') }}
+        {{ audioManageInfo }}
       </tui-button>
       <tui-button class="button" size="default" @click="toggleManageAllMember(ManageControlType.VIDEO)">
-        {{ isCameraDisableForAllUser ? t('Enable all videos') : t('Disable all videos') }}
+        {{ videoManageInfo }}
       </tui-button>
+      <div class="more-container" v-click-outside="handleShowMoreControl">
+        <tui-button class="button" size="default" @click="toggleClickMoreBtn">
+          {{ t('More') }}
+          <svg-icon
+            size="12"
+            :class="['more-arrow', showMoreControl ? 'up' : 'down']"
+            :icon="ArrowUpIcon"
+          />
+        </tui-button>
+        <div
+          v-show="showMoreControl"
+          :class="['tui-theme-white', 'drop-down']"
+        >
+          <div
+            v-for="item in moreControlList"
+            :key="item.type"
+            class="user-operate-item"
+            @click="item.func(item.type)"
+          >
+            <svg-icon :icon="item.icon"></svg-icon>
+            <span class="operate-text">{{ item.title }}</span>
+          </div>
+        </div>
+      </div>
     </div>
     <Dialog
       v-model="showManageAllUserDialog"
@@ -67,13 +91,13 @@ import Dialog from '../common/base/Dialog';
 import { useRoomStore } from '../../stores/room';
 import useIndex from './useIndexHooks';
 import TuiButton from '../common/base/Button.vue';
+import ArrowUpIcon from '../common/icons/ArrowUpIcon.vue';
+import '../../directives/vClickOutside';
 
 const roomStore = useRoomStore();
 
 const {
   applyToAnchorList,
-  isMicrophoneDisableForAllUser,
-  isCameraDisableForAllUser,
   isGeneralUser,
 } = storeToRefs(roomStore);
 
@@ -94,7 +118,18 @@ const {
   isOnStateTabActive,
   handleToggleStaged,
   applyToAnchorUserContent,
+  audioManageInfo,
+  videoManageInfo,
+  toggleClickMoreBtn,
+  showMoreControl,
+  moreControlList,
 } = useIndex();
+
+const handleShowMoreControl = () => {
+  if(showMoreControl.value) {
+    showMoreControl.value = false;
+  }
+}
 
 </script>
 
@@ -109,6 +144,15 @@ const {
   --font-color: var(--font-color-1);
 }
 
+.tui-theme-black .more-container {
+  --operation-font-color: #6B758A;
+  --operation-box-shadow: 0px 3px 8px rgba(34, 38, 46, 0.30), 0px 6px 40px rgba(34, 38, 46, 0.30);
+}
+
+.tui-theme-white .more-container {
+  --operation-font-color: #6B758A;
+  --operation-box-shadow: 0px 3px 8px #E9F0FB, 0px 6px 40px rgba(0, 0, 0, 0.10);
+}
   .manage-member-container {
     position: relative;
     height: 100%;
@@ -234,10 +278,46 @@ const {
   .global-setting {
     display: flex;
     justify-content: space-around;
-    margin: 20px;
+    margin: 20px 0;
   }
 }
 .cancel-button {
   margin-left: 12px;
+}
+.more-container{
+  display: flex;
+  position: relative;
+  .more-arrow {
+      margin-left: 2px;
+      &.down {
+        transform: rotate(180deg);
+      }
+    }
+  .drop-down{
+    position: absolute;
+    bottom: 40px;
+    background: var(--background-color-1);
+    box-shadow: var(--operation-box-shadow);
+    border-radius: 8px;
+    z-index: 1;
+    right: 3px;
+    padding: 8px 7px;
+    .user-operate-item {
+      margin: 5px 7px;
+      cursor: pointer;
+      color: var(--operation-font-color);
+      height: 20px;
+      display: flex;
+      align-items: center;
+      .operate-text {
+        font-family: PingFang SC;
+        margin-left: 8px;
+        font-size: 14px;
+        white-space: nowrap;
+        line-height: 22px;
+        font-weight: 400;
+      }
+    }
+  }
 }
 </style>
