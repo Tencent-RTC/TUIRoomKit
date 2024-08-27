@@ -52,12 +52,10 @@ extension RoomEventDispatcher: TUIRoomObserver {
     }
     
     func onRoomDismissed(roomId: String) {
-        store.conferenceObserver?.onConferenceFinished?(conferenceId: roomId)
         EngineEventCenter.shared.notifyEngineEvent(event: .onRoomDismissed, param: ["roomId" : roomId,])
     }
     
     func onKickedOutOfRoom(roomId: String, reason: TUIKickedOutOfRoomReason, message: String) {
-        store.conferenceObserver?.onConferenceExited?(conferenceId: roomId)
         let param = [
             "roomId" : roomId,
             "reason" : reason,

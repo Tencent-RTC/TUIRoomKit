@@ -131,6 +131,7 @@ class ScheduleDetailsDataHelper: ScheduleConferenceDataHelper {
         item.selectClosure = {
             let conferenceId = store.conferenceInfo.basicInfo.roomId
             operation.dispatch(action: RoomActions.joinConference(payload: conferenceId))
+            operation.dispatch(action: ScheduleViewActions.popDetailView())
         }
         return item
     }
@@ -141,7 +142,7 @@ class ScheduleDetailsDataHelper: ScheduleConferenceDataHelper {
         item.backgroudColor = UIColor(0xF0F3FA)
         item.selectClosure = {
             let view = InviteEnterRoomView(roomId: store.conferenceInfo.basicInfo.roomId)
-                    route.present(route: .popup(view: view))
+            route.present(route: .popup(view: view))
         }
         return item
     }

@@ -105,6 +105,7 @@ class ConferenceListCell: UITableViewCell {
         }
         if !info.basicInfo.roomId.isEmpty {
             store.dispatch(action: RoomActions.joinConference(payload: info.basicInfo.roomId))
+            store.dispatch(action: ScheduleViewActions.popDetailView())
         }
     }
     

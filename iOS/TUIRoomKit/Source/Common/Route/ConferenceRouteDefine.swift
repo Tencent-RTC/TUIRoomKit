@@ -10,7 +10,7 @@ import Foundation
 enum ConferenceRoute {
     case none
     case schedule(memberSelectFactory: MemberSelectionFactory?)
-    case main
+    case main(conferenceParams: ConferenceParamType)
     case selectMember(memberSelectParams: MemberSelectParams?)
     case selectedMember(showDeleteButton: Bool, selectedMembers: [UserInfo])
     case timeZone
@@ -31,7 +31,14 @@ enum ConferenceRoute {
     init(viewController: UIViewController) {
         switch viewController {
             case is ConferenceMainViewController:
-                self = .main
+                let vc = viewController as? ConferenceMainViewController
+                if let startParams = vc?.startConferenceParams {
+                    self = .main(conferenceParams: ConferenceParamType(startParams: startParams))
+                } else if let joinParams = vc?.joinConferenceParams {
+                    self = .main(conferenceParams: ConferenceParamType(joinParams: joinParams))
+                } else {
+                    self = .none
+                }
             case is ScheduleConferenceViewController:
                 guard let vc = viewController as? ScheduleConferenceViewController else {
                     self = .none
@@ -69,8 +76,14 @@ enum ConferenceRoute {
 extension ConferenceRoute {
     var viewController: UIViewController {
         switch self {
-            case .main:
-                return ConferenceMainViewController()
+            case .main(let params):
+                let vc = ConferenceMainViewController()
+                if case .startConferecneParams(let startConferenceParams) = params {
+                    vc.setStartConferenceParams(params: startConferenceParams)
+                } else if case .joinConferenceParams(let joinConferenceParams) = params {
+                    vc.setJoinConferenceParams(params: joinConferenceParams)
+                }
+                return vc
             case .schedule(memberSelectFactory: let factory):
                 return ScheduleConferenceViewController(memberSelectFactory: factory)
             case .selectMember(memberSelectParams: let memberSelectParams):
@@ -145,6 +158,19 @@ extension ConferenceRoute: Equatable {
     var message: String?
     var sureAction: UIAlertAction?
     var declineAction: UIAlertAction?
+}
+
+enum ConferenceParamType {
+    case startConferecneParams(StartConferenceParams)
+    case joinConferenceParams(JoinConferenceParams)
+    
+    init(startParams: StartConferenceParams) {
+        self = .startConferecneParams(startParams)
+    }
+    
+    init(joinParams: JoinConferenceParams) {
+        self = .joinConferenceParams(joinParams)
+    }
 }
 
 #if DEBUG

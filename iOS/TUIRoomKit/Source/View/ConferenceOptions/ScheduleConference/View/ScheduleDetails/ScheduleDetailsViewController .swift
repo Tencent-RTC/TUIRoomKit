@@ -57,6 +57,7 @@ class ScheduleDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         initState()
+        ConferenceSession.sharedInstance.addObserver(observer: self)
         subscribeToast()
         subscribeScheduleSubject()
         navigationItem.title = .roomDetailsText
@@ -153,6 +154,19 @@ extension ScheduleDetailsViewController {
                 self.route.pop()
             }
             .store(in: &cancellableSet)
+    }
+}
+
+extension ScheduleDetailsViewController: ConferenceObserver {
+    public func onConferenceJoined(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
+        if error != .success {
+            let errorText = "Error: " + String(describing: error) + ", Message: " + message
+            self.view.makeToast(errorText, duration: 3, position: TUICSToastPositionCenter)
+            route.pop()
+            if error == .roomIdNotExist {
+                operation.dispatch(action: ScheduleViewActions.refreshConferenceList())
+            }
+        }
     }
 }
 

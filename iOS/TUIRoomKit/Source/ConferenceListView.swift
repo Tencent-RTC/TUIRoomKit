@@ -9,6 +9,7 @@ import UIKit
 import Combine
 import Factory
 import TUICore
+import RTCRoomEngine
 
 struct ConferenceSection {
     let date: Date
@@ -157,6 +158,7 @@ struct ConferenceSection {
     }
     
     private func bindInteraction() {
+        ConferenceSession.sharedInstance.addObserver(observer: self)
         subscribeToast()
         subscribeScheduleSubject()
         store.dispatch(action: ConferenceListActions.fetchConferenceList(payload: (fetchListCursor, conferencesPerFetch)))
@@ -343,6 +345,19 @@ extension ConferenceListView {
                 }
             }
             .store(in: &cancellableSet)
+    }
+}
+
+extension ConferenceListView: ConferenceObserver {
+    public func onConferenceJoined(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
+        if error != .success {
+            let errorText = "Error: " + String(describing: error) + ", Message: " + message
+            self.makeToast(errorText, duration: 3, position: TUICSToastPositionCenter)
+            navigation.pop()
+            if error == .roomIdNotExist {
+                store.dispatch(action: ScheduleViewActions.refreshConferenceList())
+            }
+        }
     }
 }
 
