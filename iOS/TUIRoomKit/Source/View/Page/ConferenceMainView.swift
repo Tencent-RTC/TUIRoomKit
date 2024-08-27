@@ -8,6 +8,7 @@
 //
 
 import Foundation
+import RTCRoomEngine
 
 protocol ConferenceMainViewFactory {
     func makeBottomView() -> BottomView
@@ -155,7 +156,6 @@ class ConferenceMainView: UIView {
     
     private func bindInteraction() {
         viewModel.viewResponder = self
-        viewModel.applyConfigs()
         perform(#selector(hideToolBar),with: nil,afterDelay: firstDelayDisappearanceTime)
     }
     
@@ -219,6 +219,10 @@ class ConferenceMainView: UIView {
 }
 
 extension ConferenceMainView: ConferenceMainViewResponder {
+    func dismissVideoFloatView() {
+        RoomVideoFloatView.dismiss()
+    }
+    
     func showExitRoomView() {
         let view = ExitRoomView(viewModel: ExitRoomViewModel())
         view.show(rootView: self)
@@ -230,6 +234,14 @@ extension ConferenceMainView: ConferenceMainViewResponder {
     
     func makeToast(text: String) {
         RoomRouter.makeToastInCenter(toast: text, duration: 1)
+    }
+    
+    func showRaiseHandNoticeView() {
+        raiseHandNoticeView.isHidden = false
+    }
+    
+    func updateRoomInfo(roomInfo: TUIRoomInfo) {
+        floatChatButton.updateRoomId(roomId: roomInfo.roomId)
     }
     
     private func showToolBar() {

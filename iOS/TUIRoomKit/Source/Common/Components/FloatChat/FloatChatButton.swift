@@ -21,16 +21,13 @@ class FloatChatButton: UIView {
     private lazy var floatInputViewShowState = self.store.select(FloatChatSelectors.getShowFloatInputView)
     var cancellableSet = Set<AnyCancellable>()
     weak var inputController: UIViewController?
-    var roomId: String
+    var roomId = ""
+    private let emojiLabelSpacing: CGFloat = 6
+    private let horizonSpacing: CGFloat = 10
     
-    init(roomId: String) {
+    func updateRoomId(roomId: String) {
         self.roomId = roomId
-        super.init(frame: .zero)
         store.dispatch(action: FloatChatActions.setRoomId(payload: roomId))
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     private let emojiView: UIImageView = {

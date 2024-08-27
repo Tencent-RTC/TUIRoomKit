@@ -24,13 +24,13 @@ import UIKit
     public override func viewDidLoad() {
         super.viewDidLoad()
         RoomRouter.shared.initializeNavigationController(rootViewController: self)
-        RoomVideoFloatView.dismiss()
 #if RTCube_APPSTORE
         let selector = NSSelectorFromString("showAlertUserLiveTips")
         if responds(to: selector) {
             perform(selector)
         }
 #endif
+        viewModel.onViewDidLoadAction()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -44,21 +44,26 @@ import UIKit
         navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
-    public func quickStartConference(conferenceId: String) {
-        viewModel.quickStartConference(conferenceId: conferenceId)
+    public func setStartConferenceParams(params: StartConferenceParams) {
+        viewModel.setStartConferenceParams(params: params)
     }
     
-    public func joinConference(conferenceId: String) {
-        viewModel.joinConference(conferenceId: conferenceId)
+    public func setJoinConferenceParams(params: JoinConferenceParams) {
+        viewModel.setJoinConferenceParams(params: params)
+    }
+        
+    var startConferenceParams: StartConferenceParams? {
+        get {
+            return viewModel.startConferenceParams
+        }
     }
     
-    public func setConferenceParams(params: ConferenceParams) {
-        viewModel.setConferenceParams(params: params)
+    var joinConferenceParams: JoinConferenceParams? {
+        get {
+            return viewModel.joinConferenceParams
+        }
     }
-    
-    public func setConferenceObserver(observer: ConferenceObserver) {
-        viewModel.setConferenceObserver(observer: observer)
-    }
+
     
     deinit {
         debugPrint("deinit \(self)")

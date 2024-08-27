@@ -23,7 +23,7 @@ class RoomService {
             self.engineManager.enterRoom(roomId: roomId,
                                          enableAudio: enableAudio,
                                          enableVideo: enableVideo,
-                                         isSoundOnSpeaker: isSoundOnSpeaker) {
+                                         isSoundOnSpeaker: isSoundOnSpeaker) { roomInfo in
                 promise(.success(()))
             } onError: { error, message in
                 let error = RoomError(error: error, message: message)

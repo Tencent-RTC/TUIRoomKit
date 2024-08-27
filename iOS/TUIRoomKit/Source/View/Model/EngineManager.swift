@@ -82,7 +82,7 @@ class EngineManager: NSObject {
     }
     
     func enterRoom(roomId: String, enableAudio: Bool, enableVideo: Bool, isSoundOnSpeaker: Bool,
-                   onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
+                   onSuccess: @escaping TUIRoomInfoBlock, onError: @escaping TUIErrorBlock) {
         store.videoSetting.isCameraOpened = enableVideo
         store.audioSetting.isSoundOnSpeaker = isSoundOnSpeaker
         setFramework()
@@ -535,10 +535,10 @@ extension EngineManager {
         return name + .quickConferenceText
     }
     
-    private func enterEngineRoom(roomId: String, enableAudio: Bool, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
+    private func enterEngineRoom(roomId: String, enableAudio: Bool, onSuccess: @escaping TUIRoomInfoBlock, onError: @escaping TUIErrorBlock) {
         guard !store.isEnteredRoom else {
             if store.roomInfo.roomId == roomId {
-                onSuccess()
+                onSuccess(store.roomInfo)
             } else {
                 onError(.failed, .inAnotherRoomText)
             }
@@ -549,7 +549,7 @@ extension EngineManager {
             guard let roomInfo = roomInfo else { return }
             //Update the room entry data stored
             self.addEngineObserver()
-            self.store.roomInfo = roomInfo
+            self.store.initialRoomInfo(roomInfo)
             self.store.initialRoomCurrentUser()
             self.store.initalEnterRoomMessage()
             //Initialize user list
@@ -560,12 +560,14 @@ extension EngineManager {
             self.updateSeatApplicationList()
             if !self.isNeededAutoTakeSeat() {
                 self.operateLocalMicrophone(enableAudio: enableAudio)
-                onSuccess()
+                self.updateCameraState()
+                onSuccess(roomInfo)
             } else {
                 self.autoTakeSeatForOwner { [weak self] in
                     guard let self = self else { return }
                     self.operateLocalMicrophone(enableAudio: enableAudio)
-                    onSuccess()
+                    self.updateCameraState()
+                    onSuccess(roomInfo)
                 } onError: { code, message in
                     onError(code, message)
                 }
@@ -573,6 +575,14 @@ extension EngineManager {
         } onError: { code, message in
             onError(code, message)
         }
+    }
+    
+    private func updateCameraState() {
+        if store.roomInfo.isSeatEnabled && !store.currentUser.isOnSeat {
+            store.videoSetting.isCameraOpened = false
+            return
+        }
+        operateLocalCamera()
     }
     
     private func isNeededAutoTakeSeat() -> Bool {
@@ -610,6 +620,25 @@ extension EngineManager {
         } else if RoomCommon.checkAuthorMicStatusIsDenied() {
             muteLocalAudio()
             openLocalMicrophone()
+        }
+    }
+    
+    private func operateLocalCamera() {
+        let openLocalCameraActionBlock = { [weak self] in
+            guard let self = self else { return }
+            setLocalVideoView(streamType: .cameraStream, view: nil)
+            openLocalCamera()
+        }
+        if store.videoSetting.isCameraOpened && !store.roomInfo.isCameraDisableForAllUser {
+            if RoomCommon.checkAuthorCamaraStatusIsDenied() {
+                openLocalCameraActionBlock()
+            } else {
+                RoomCommon.cameraStateActionWithPopCompletion { granted in
+                    if granted {
+                        openLocalCameraActionBlock()
+                    }
+                }
+            }
         }
     }
     
@@ -696,15 +725,13 @@ extension EngineManager {
     }
     
     private func handleDestroyRoomResult() {
-        store.conferenceObserver?.onConferenceFinished?(conferenceId: store.roomInfo.roomId)
         destroyEngineManager()
-        EngineEventCenter.shared.notifyEngineEvent(event: .onDestroyedRoom, param: [:])
+        EngineEventCenter.shared.notifyEngineEvent(event: .onDestroyedRoom, param: [ "roomId" : store.roomInfo.roomId ])
     }
     
     private func handleExitRoomResult() {
-        store.conferenceObserver?.onConferenceExited?(conferenceId: store.roomInfo.roomId)
         destroyEngineManager()
-        EngineEventCenter.shared.notifyEngineEvent(event: .onExitedRoom, param: [:])
+        EngineEventCenter.shared.notifyEngineEvent(event: .onExitedRoom, param: [ "roomId" : store.roomInfo.roomId ])
     }
     
 }

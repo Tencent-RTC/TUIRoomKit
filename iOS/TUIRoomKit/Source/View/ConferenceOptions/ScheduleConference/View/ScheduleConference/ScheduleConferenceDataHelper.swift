@@ -169,7 +169,7 @@ extension ScheduleConferenceDataHelper {
         var participatingMembersItem = ListItem(title: .participatingMembersText)
         participatingMembersItem.showButton = true
         participatingMembersItem.buttonIcon = "room_right_arrow1"
-        participatingMembersItem.selectClosure = {
+        participatingMembersItem.selectClosure = { [weak viewController] in
             guard let vc = viewController else { return }
             let users = store.conferenceInfo.attendeeListResult.attendeeList.map { $0.convertToUser() }
             route.showMemberSelectView(delegte: vc, selectedlist: users)

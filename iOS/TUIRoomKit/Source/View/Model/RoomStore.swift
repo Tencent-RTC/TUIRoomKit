@@ -68,6 +68,11 @@ class RoomStore: NSObject {
         }
     }
     
+    func initialRoomInfo(_ roomInfo: TUIRoomInfo) {
+        self.roomInfo = roomInfo
+        EngineEventCenter.shared.notifyEngineEvent(event: .onInitialRoomInfo, param: ["roomInfo": roomInfo])
+    }
+    
     func initalEnterRoomMessage() {
         isEnteredRoom = true
         timeStampOnEnterRoom = Int(Date().timeIntervalSince1970)

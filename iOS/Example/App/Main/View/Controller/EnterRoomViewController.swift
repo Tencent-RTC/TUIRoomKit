@@ -10,6 +10,7 @@ import SnapKit
 import UIKit
 import TUIRoomKit
 import TUICore
+import RTCRoomEngine
 
 class EnterRoomViewController: UIViewController {
     weak var rootView: EnterRoomView?
@@ -22,7 +23,6 @@ class EnterRoomViewController: UIViewController {
     private var enableLocalAudio: Bool = true
     private var enableLocalVideo: Bool = true
     private var isSoundOnSpeaker: Bool = true
-    private var conferenceViewController: ConferenceMainViewController?
     
     let backButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -55,6 +55,11 @@ class EnterRoomViewController: UIViewController {
         rootView.rootViewController = self
         view = rootView
         self.rootView = rootView
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        ConferenceSession.sharedInstance.addObserver(observer: self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -146,14 +151,13 @@ extension EnterRoomViewController {
     }
     
     private func joinConference(roomId: String) {
-        conferenceViewController = ConferenceMainViewController()
-        let params = ConferenceParams()
-        params.isMuteMicrophone = !enableLocalAudio
+        let vc =  ConferenceMainViewController()
+        let params = JoinConferenceParams(roomId: roomId)
+        params.isOpenMicrophone = enableLocalAudio
         params.isOpenCamera = enableLocalVideo
-        params.isSoundOnSpeaker = isSoundOnSpeaker
-        conferenceViewController?.setConferenceParams(params: params)
-        conferenceViewController?.setConferenceObserver(observer: self)
-        conferenceViewController?.joinConference(conferenceId: roomId)
+        params.isOpenSpeaker = isSoundOnSpeaker
+        vc.setJoinConferenceParams(params: params)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     private func renewRootViewState() {
@@ -163,16 +167,12 @@ extension EnterRoomViewController {
 }
 
 extension EnterRoomViewController: ConferenceObserver {
-    func onConferenceJoined(conferenceId: String, error: ConferenceError) {
-        if error == .success {
-            guard let vc = conferenceViewController else { return }
-            navigationController?.pushViewController(vc, animated: true)
-        } else {
-            let errorText = "Error : " + String(describing: error)
-            SceneDelegate.getCurrentWindow()?.makeToast(errorText, duration: 1, position:TUICSToastPositionCenter)
-            navigationController?.popViewController(animated: true)
+    func onConferenceJoined(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
+        if error != .success {
+            let errorText = "Error: " + String(describing: error) + ", Message: " + message
+           SceneDelegate.getCurrentWindow()?.makeToast(errorText, duration: 1, position:TUICSToastPositionCenter)
+           navigationController?.popViewController(animated: true)
         }
-        conferenceViewController = nil
         renewRootViewState()
     }
     
