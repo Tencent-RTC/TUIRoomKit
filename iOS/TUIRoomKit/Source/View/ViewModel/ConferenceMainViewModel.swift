@@ -276,8 +276,6 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
             handleOpenMicrophoneRequest(request: request)
         case .invalidAction:
             break
-        case .connectOtherRoom:
-            engineManager.responseRemoteRequest(request.requestId, agree: true)
         case .remoteUserOnSeat:
             handleOnSeatRequest(request: request)
         default: break
