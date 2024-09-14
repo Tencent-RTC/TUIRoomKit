@@ -9,6 +9,7 @@
 import Foundation
 import TUICore
 import RTCRoomEngine
+import Factory
 
 protocol ConferenceMainViewResponder: AnyObject {
     func makeToast(text: String)
@@ -16,9 +17,12 @@ protocol ConferenceMainViewResponder: AnyObject {
     func setToolBarDelayHidden(isDelay: Bool)
     func showExitRoomView()
     func showAlert(title: String?, message: String?, sureTitle:String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?)
+    func showAlertWithAutoConfirm(title: String?, message: String?, sureTitle:String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?, autoConfirmSeconds: Int?)
     func showRaiseHandNoticeView()
     func updateRoomInfo(roomInfo: TUIRoomInfo)
-    func dismissVideoFloatView()
+    func showPasswordView(roomId: String)
+    func hidePasswordView()
+    func showRepeatJoinRoomAlert()
 }
 
 class ConferenceMainViewModel: NSObject {
@@ -43,7 +47,7 @@ class ConferenceMainViewModel: NSObject {
     private var selfRole: TUIRole?
     var joinConferenceParams: JoinConferenceParams?
     var startConferenceParams: StartConferenceParams?
-    var isShownWaterMark: Bool = FeatureSwitch.switchTextWaterMark
+    var isShownWaterMark: Bool = ConferenceSession.sharedInstance.implementation.isEnableWaterMark;
     
     override init() {
         super.init()
@@ -51,7 +55,7 @@ class ConferenceMainViewModel: NSObject {
         subscribeEngine()
         subLogoutNotification()
     }
-
+        
     private func subscribeEngine() {
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
@@ -65,8 +69,10 @@ class ConferenceMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_ShowExitRoomView, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, responder: self)
         EngineEventCenter.shared.subscribeEngine(event: .onStartedRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onJoinedRoom, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onGetUserListFinished, observer: self)
     }
     
     private func subLogoutNotification() {
@@ -92,8 +98,10 @@ class ConferenceMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_SetToolBarDelayHidden, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ChangeToolBarHiddenState, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_ShowExitRoomView, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, responder: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onStartedRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onJoinedRoom, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onGetUserListFinished, observer: self)
     }
     
     func hideLocalAudioView() {
@@ -105,6 +113,13 @@ class ConferenceMainViewModel: NSObject {
     }
     
     func onViewDidLoadAction() {
+        if store.isEnteredRoom {
+            let roomId = startConferenceParams?.roomId ?? joinConferenceParams?.roomId
+            if let roomId = roomId, store.roomInfo.roomId != roomId {
+                viewResponder?.showRepeatJoinRoomAlert()
+            }
+            return
+        }
         if startConferenceParams != nil {
             quickStartConference()
             return
@@ -120,11 +135,11 @@ class ConferenceMainViewModel: NSObject {
         }
         ConferenceOptions.quickStart(startConferenceParams: startParams) { [weak self] roomInfo in
             guard let self = self else { return }
+            guard !self.viewStore.isInternalCreation else { return }
             self.notifySuccess(roomInfo: roomInfo, event: .onStartedRoom)
-            self.viewResponder?.dismissVideoFloatView()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.notifyError(roomId: startParams.roomId, event: .onStartedRoom, error: code, message: message)
+            self.handleOperateConferenceFailedResult(roomId: startParams.roomId, event: .onStartedRoom, error: code, message: message)
         }
     }
     
@@ -134,11 +149,17 @@ class ConferenceMainViewModel: NSObject {
         }
         ConferenceOptions.join(joinConferenParams: joinParams) { [weak self] roomInfo in
             guard let self = self else { return }
+            self.viewResponder?.hidePasswordView()
             self.notifySuccess(roomInfo: roomInfo, event: .onJoinedRoom)
-            self.viewResponder?.dismissVideoFloatView()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
-            self.notifyError(roomId: joinParams.roomId, event: .onJoinedRoom, error: code, message: message)
+            if code == .needPassword {
+                self.viewResponder?.showPasswordView(roomId: joinParams.roomId)
+            } else if code == .wrongPassword {
+                self.viewResponder?.makeToast(text: .wrongPasswordText)
+            } else {
+                self.handleOperateConferenceFailedResult(roomId: joinParams.roomId, event: .onJoinedRoom, error: code, message: message)
+            }
         }
     }
     
@@ -179,9 +200,23 @@ class ConferenceMainViewModel: NSObject {
     }
     
     @objc func dismissConferenceViewForLogout() {
-        viewResponder?.showAlert(title: .logoutText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: {
+        viewResponder?.showAlertWithAutoConfirm(title: .logoutText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
-        }, declineBlock: nil)
+        }, declineBlock: nil, autoConfirmSeconds: 5)
+    }
+    
+    func handleWrongPasswordFault(roomId: String) {
+        handleOperateConferenceFailedResult(roomId: roomId, event: .onJoinedRoom, error: .wrongPassword, message: "password is wrong")
+    }
+    
+    private func handleOperateConferenceFailedResult(roomId: String, event: EngineEventCenter.RoomEngineEvent, error: TUIError, message: String) {
+        if viewStore.isInternalCreation {
+            roomRouter.pop()
+            let errorText = "Error: " + String(describing: error) + ", Message: " + message
+            conferenceStore.dispatch(action: ViewActions.showToast(payload: ToastInfo(message: errorText)))
+        } else {
+            notifyError(roomId: roomId, event: event, error: error, message: message)
+        }
     }
     
     deinit {
@@ -189,6 +224,9 @@ class ConferenceMainViewModel: NSObject {
         unsubLogoutNotification()
         debugPrint("deinit \(self)")
     }
+    
+    @Injected(\.conferenceStore) var conferenceStore: ConferenceStore
+    @Injected(\.conferenceMainViewStore) var viewStore: ConferenceMainViewStore
 }
 
 extension ConferenceMainViewModel: RoomEngineEventResponder {
@@ -216,13 +254,19 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
             guard let error = param?["error"] as? TUIError else { return }
             if error == .success {
                 handleStartRoom(roomInfo: roomInfo)
+                conferenceStore.dispatch(action: RoomActions.updateRoomState(payload: RoomInfo(with: roomInfo)))
             }
         case .onJoinedRoom:
             guard let roomInfo = param?["roomInfo"] as? TUIRoomInfo else { return }
             guard let error = param?["error"] as? TUIError else { return }
             if error == .success {
                 handleJoinRoom(roomInfo: roomInfo)
+                conferenceStore.dispatch(action: RoomActions.updateRoomState(payload: RoomInfo(with: roomInfo)))
             }
+        case .onGetUserListFinished:
+            let allUsers = self.store.attendeeList.map{ UserInfo(userEntity: $0) }
+            conferenceStore.dispatch(action: UserActions.updateAllUsers(payload: allUsers))
+            conferenceStore.dispatch(action: ConferenceInvitationActions.getInvitationList(payload: (store.roomInfo.roomId, "", [])))
         default: break
         }
     }
@@ -240,16 +284,16 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
         }
 #endif
         engineManager.destroyEngineManager()
-        viewResponder?.showAlert(title: .destroyAlertText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: {
+        viewResponder?.showAlertWithAutoConfirm(title: .destroyAlertText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
-        }, declineBlock: nil)
+        }, declineBlock: nil, autoConfirmSeconds: 5)
     }
     
     private func handleKickedOutOfRoom() {
         engineManager.destroyEngineManager()
-        viewResponder?.showAlert(title: .kickOffTitleText, message: nil, sureTitle: .alertOkText, declineTitle: nil , sureBlock: {
+        viewResponder?.showAlertWithAutoConfirm(title: .kickOffTitleText, message: nil, sureTitle: .alertOkText, declineTitle: nil , sureBlock: {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
-        }, declineBlock: nil)
+        }, declineBlock: nil, autoConfirmSeconds: 5)
     }
     
     private func handleAllUserMicrophoneDisableChanged(isDisable: Bool) {
@@ -378,9 +422,9 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
     }
     
     private func handleKickedOffLine() {
-        viewResponder?.showAlert(title: .kieckedOffLineText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: {
+        viewResponder?.showAlertWithAutoConfirm(title: .kieckedOffLineText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
-        }, declineBlock: nil)
+        }, declineBlock: nil, autoConfirmSeconds: 5)
     }
     
     private func handleStartRoom(roomInfo: TUIRoomInfo) {
@@ -396,6 +440,13 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
 }
 
 extension ConferenceMainViewModel: ConferenceMainViewFactory {
+    func makeConferencePasswordView() -> ConferencePasswordView {
+        let passwordView = ConferencePasswordView()
+        passwordView.isHidden = true
+        passwordView.viewModel = self
+        return passwordView
+    }
+    
     func makeTopView() -> TopView {
         let viewModel = TopViewModel()
         let topView = TopView(viewModel: viewModel)
@@ -434,12 +485,7 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
         let layer = WaterMarkLayer()
         layer.backgroundColor = UIColor.clear.cgColor
         layer.anchorPoint = CGPointZero
-        let userId = TUILogin.getUserID() ?? currentUser.userId
-        let userName = TUILogin.getNickName() ?? currentUser.userName
-        layer.text = userId
-        if userName.count > 0 {
-            layer.text = layer.text + "(\(userName))"
-        }
+        layer.text = getWaterMarkText()
         layer.lineStyle = .multiLine
         layer.cornerRadius = 16
         return layer
@@ -462,6 +508,21 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
         let notificationView = RaiseHandApplicationNotificationView(viewModel: viewModel)
         return notificationView
     }
+    
+    private func getWaterMarkText() -> String {
+        let customizeText = ConferenceSession.sharedInstance.implementation.waterMarkText
+        if !customizeText.isEmpty {
+            return customizeText
+        }
+        
+        let userId = TUILogin.getUserID() ?? currentUser.userId
+        let userName = TUILogin.getNickName() ?? currentUser.userName
+        var defaultText = userId
+        if !userName.isEmpty {
+            defaultText = defaultText + "(\(userName))"
+        }
+        return defaultText
+    }
 }
 
 extension ConferenceMainViewModel: RoomKitUIEventResponder {
@@ -480,6 +541,9 @@ extension ConferenceMainViewModel: RoomKitUIEventResponder {
             viewResponder?.setToolBarDelayHidden(isDelay: isDelay)
         case .TUIRoomKitService_ShowExitRoomView:
             viewResponder?.showExitRoomView()
+        case .TUIRoomKitService_DismissConferenceViewController:
+            conferenceStore.dispatch(action: ConferenceInvitationActions.clearInvitationList())
+            conferenceStore.dispatch(action: RoomActions.clearRoomState())
         default: break
         }
     }
@@ -582,4 +646,5 @@ private extension String {
     static var logoutText: String {
         localized("You are logged out")
     }
+    static let wrongPasswordText = localized("Wrong password, please re-enter")
 }

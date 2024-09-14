@@ -12,21 +12,22 @@ import RTCRoomEngine
 import Factory
 import TUIRoomKit
 
-class SelectMemberViewController: UIViewController, SelectMemberControllerProtocol {
-    weak var delegate: MemberSelectionDelegate?
+class SelectMemberViewController: UIViewController, ContactViewProtocol {
+    weak var delegate: ContactViewSelectDelegate?
     private var viewModel = SelectMembersViewModel()
     private var cancellableSet = Set<AnyCancellable>()
     
-    init(selectedUsers: [User]) {
+    init(participants: ConferenceParticipants) {
         super.init(nibName: nil, bundle: nil)
-        viewModel.selectMembers(selectedUsers)
+        viewModel.selectMembers(participants.selectedList)
+        viewModel.setDisabledMembers(participants.unSelectableList)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setDelegate(_ selector: MemberSelectionDelegate) {
+    func setDelegate(_ selector: ContactViewSelectDelegate) {
         self.delegate = selector
     }
     
@@ -37,9 +38,19 @@ class SelectMemberViewController: UIViewController, SelectMemberControllerProtoc
         view = rootView
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         bindInteraction()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
     func bindInteraction() {
@@ -105,6 +116,9 @@ extension SelectMemberViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let member = viewModel.filteredMembers[indexPath.row]
+        if viewModel.disabledMembers.contains(where: { $0.userId == member.userId}) {
+            return
+        }
         if viewModel.selectedMembers.contains(where: { $0.userId == member.userId }) {
             viewModel.deSelectMember(member)
         } else {
@@ -126,7 +140,8 @@ extension SelectMemberViewController: UITableViewDataSource {
         }
         let member = viewModel.filteredMembers[indexPath.row]
         let isSelected = viewModel.selectedMembers.contains(where: { $0.userId == member.userId})
-        cell.setupViewState(with: member, isSelected: isSelected)
+        let isDisabled = viewModel.disabledMembers.contains(where: { $0.userId == member.userId})
+        cell.setupViewState(with: member, isSelected: isSelected, isDisaled: isDisabled)
         return cell
     }
 }

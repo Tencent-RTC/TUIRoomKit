@@ -64,6 +64,8 @@ class FloatChatButton: UIView {
     }
     
     private func constructViewHierarchy() {
+        backgroundColor = UIColor.tui_color(withHex: "22262E80", alpha: 0.5)
+        layer.cornerRadius = 15
         addSubview(emojiView)
         addSubview(label)
         addSubview(clickView)
@@ -71,15 +73,15 @@ class FloatChatButton: UIView {
     
     private func activateConstraints() {
         emojiView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(4)
+            make.leading.equalToSuperview().offset(horizonSpacing)
             make.centerY.equalToSuperview()
             make.width.equalTo(24)
             make.height.equalTo(24)
         }
         label.snp.makeConstraints { make in
-            make.leading.equalTo(emojiView.snp.trailing).offset(6)
+            make.leading.equalTo(emojiView.snp.trailing).offset(emojiLabelSpacing)
             make.centerY.equalToSuperview()
-            make.trailing.equalToSuperview()
+            make.trailing.equalToSuperview().offset(-horizonSpacing)
             make.height.equalTo(24)
         }
         clickView.snp.makeConstraints { make in

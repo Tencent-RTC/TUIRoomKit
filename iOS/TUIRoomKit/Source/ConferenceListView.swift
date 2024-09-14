@@ -158,7 +158,6 @@ struct ConferenceSection {
     }
     
     private func bindInteraction() {
-        ConferenceSession.sharedInstance.addObserver(observer: self)
         subscribeToast()
         subscribeScheduleSubject()
         store.dispatch(action: ConferenceListActions.fetchConferenceList(payload: (fetchListCursor, conferencesPerFetch)))
@@ -320,8 +319,8 @@ extension ConferenceListView {
             .filter { $0.id == ScheduleResponseActions.onScheduleSuccess.id }
             .sink { [weak self] action in
                 guard let self = self else { return }
-                if let action = action as? AnonymousAction<String> {
-                    let view = InviteEnterRoomView(roomId: action.payload, style: .inviteWhenSuccess)
+                if let action = action as? AnonymousAction<TUIConferenceInfo> {
+                    let view = InviteEnterRoomView(conferenceInfo: ConferenceInfo(with: action.payload), style: .inviteWhenSuccess)
                     self.navigation.present(route: .popup(view: view))
                 }
             }
@@ -345,19 +344,6 @@ extension ConferenceListView {
                 }
             }
             .store(in: &cancellableSet)
-    }
-}
-
-extension ConferenceListView: ConferenceObserver {
-    public func onConferenceJoined(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
-        if error != .success {
-            let errorText = "Error: " + String(describing: error) + ", Message: " + message
-            self.makeToast(errorText, duration: 3, position: TUICSToastPositionCenter)
-            navigation.pop()
-            if error == .roomIdNotExist {
-                store.dispatch(action: ScheduleViewActions.refreshConferenceList())
-            }
-        }
     }
 }
 

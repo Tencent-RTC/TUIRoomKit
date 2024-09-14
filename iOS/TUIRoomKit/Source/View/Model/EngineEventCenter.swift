@@ -73,6 +73,7 @@ class EngineEventCenter: NSObject {
         case onConferenceInfoChanged
         case onInitialSelfUserInfo
         case onInitialRoomInfo
+        case onGetUserListFinished
     }
     
     enum RoomUIEvent: String {

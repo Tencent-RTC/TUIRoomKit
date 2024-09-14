@@ -16,7 +16,7 @@ class ScheduleDetailsViewController: UIViewController {
     private var cancellableSet = Set<AnyCancellable>()
     
     private lazy var rootView: ScheduleConferenceTableView = {
-        return ScheduleConferenceTableView(menus: ScheduleDetailsDataHelper.generateScheduleConferenceData(route: route, store: store, operation: operation))
+        return ScheduleConferenceTableView(menus: ScheduleDetailsDataHelper.generateScheduleDetailsConferenceData(route: route, store: store, operation: operation, viewStore: viewStore))
     }()
     
     private lazy var conferenceListPublisher = {
@@ -57,7 +57,6 @@ class ScheduleDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         initState()
-        ConferenceSession.sharedInstance.addObserver(observer: self)
         subscribeToast()
         subscribeScheduleSubject()
         navigationItem.title = .roomDetailsText
@@ -75,6 +74,17 @@ class ScheduleDetailsViewController: UIViewController {
                 if !cursor.isEmpty {
                     self.store.fetchAttendees(cursor: cursor)
                 }
+            }
+            .store(in: &cancellableSet)
+        
+        let selector = Selector(keyPath: \ConferenceInfo.basicInfo.isPasswordEnabled)
+        store.select(selector)
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isPasswordEnabled in
+                guard let self = self else { return }
+                self.rootView.menus = ScheduleDetailsDataHelper.generateScheduleDetailsConferenceData(route: self.route, store: self.store, operation: self.operation, viewStore: self.viewStore)
+                self.rootView.tableView.reloadData()
             }
             .store(in: &cancellableSet)
         
@@ -99,16 +109,18 @@ class ScheduleDetailsViewController: UIViewController {
                 var conferenceInfo = self.store.conferenceInfo
                 conferenceInfo.status = selectedConferenceInfo.status
                 self.store.update(conference: conferenceInfo)
-                let menus = ScheduleDetailsDataHelper.generateScheduleConferenceData(route: self.route, store: self.store, operation: self.operation)
+                let menus = ScheduleDetailsDataHelper.generateScheduleDetailsConferenceData(route: self.route, store: self.store, operation: self.operation, viewStore: self.viewStore)
                 self.rootView.menus = menus
                 self.rootView.tableView.reloadData()
             }
             .store(in: &cancellableSet)
+        store.fetchRoomInfo(roomId: conferenceInfo.basicInfo.roomId)
     }
     
     private func initState() {
         self.operation.dispatch(action: UserActions.getSelfInfo())
         self.operation.dispatch(action: ScheduleViewActions.resetPopDetailFlag())
+        
     }
     
     @objc func modifyAction(sender: UIButton) {
@@ -123,6 +135,7 @@ class ScheduleDetailsViewController: UIViewController {
     @Injected(\.navigation) private var route
     @Injected(\.scheduleStore) private var store
     @Injected(\.conferenceStore) private var operation
+    @Injected(\.conferenceMainViewStore) private var viewStore
 }
 
 extension ScheduleDetailsViewController {
@@ -154,19 +167,6 @@ extension ScheduleDetailsViewController {
                 self.route.pop()
             }
             .store(in: &cancellableSet)
-    }
-}
-
-extension ScheduleDetailsViewController: ConferenceObserver {
-    public func onConferenceJoined(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
-        if error != .success {
-            let errorText = "Error: " + String(describing: error) + ", Message: " + message
-            self.view.makeToast(errorText, duration: 3, position: TUICSToastPositionCenter)
-            route.pop()
-            if error == .roomIdNotExist {
-                operation.dispatch(action: ScheduleViewActions.refreshConferenceList())
-            }
-        }
     }
 }
 

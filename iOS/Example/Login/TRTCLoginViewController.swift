@@ -100,8 +100,9 @@ class TRTCLoginViewController: UIViewController {
             showRegisterVC()
         } else {
             self.view.makeToast(LoginLocalize(key:"Logged in"))
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                AppUtils.shared.showMainController()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self = self else { return }
+                AppUtils.shared.showConferenceOptionsViewController(nav: self.navigationController)
             }
         }
     }

@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import RTCRoomEngine
+import Factory
 
 enum ConferenceRoute {
     case none
@@ -18,10 +20,11 @@ enum ConferenceRoute {
     case modifySchedule(conferenceInfo: ConferenceInfo)
     case popup(view: UIView)
     case alert(state: AlertState)
+    case invitation(roomInfo: TUIRoomInfo, invitation: TUIInvitation)
     
     func hideNavigationBar() -> Bool {
         switch self {
-        case .main, .selectMember, .timeZone:
+        case .main, .selectMember, .timeZone, .invitation:
                 return true
             default:
                 return false
@@ -45,7 +48,7 @@ enum ConferenceRoute {
                     break
                 }
                 self = .schedule(memberSelectFactory: vc.memberSelectionFactory)
-            case _ as SelectMemberControllerProtocol:
+            case _ as ContactViewProtocol:
                 self = .selectMember(memberSelectParams: nil)
             case is SelectedMembersViewController:
                 let vc = viewController as? SelectedMembersViewController
@@ -60,6 +63,9 @@ enum ConferenceRoute {
             case is ModifyScheduleViewController:
                 let vc = viewController as? ModifyScheduleViewController
                 self = .modifySchedule(conferenceInfo: vc?.conferenceInfo ?? ConferenceInfo())
+            case is ConferenceInvitationViewController:
+                let vc = viewController as? ConferenceInvitationViewController
+                self = .invitation(roomInfo: vc?.roomInfo ?? TUIRoomInfo(), invitation: vc?.invitation ?? TUIInvitation())
             case is PopupViewController:
                 let vc = viewController as? PopupViewController
                 self = .popup(view: vc?.contentView ?? viewController.view)
@@ -90,10 +96,11 @@ extension ConferenceRoute {
                 guard let params = memberSelectParams else {
                     return UIViewController()
                 }
-                let selectedUsers = params.selectedUsers
-                let delegate = params.delegate
-                let vc = params.factory(selectedUsers)
-                vc.delegate = delegate
+                let participants = params.participants
+                guard let vc = getSelectMemberViewController(participants: participants) else {
+                    return UIViewController()
+                }
+                vc.delegate = params.delegate
                 return vc
             case .selectedMember(showDeleteButton: let isShow, let selectedMembers):
                 return SelectedMembersViewController(showDeleteButton: isShow, selectedMembers: selectedMembers)
@@ -103,6 +110,8 @@ extension ConferenceRoute {
                 return ScheduleDetailsViewController(conferenceInfo: info)
             case .modifySchedule(conferenceInfo: let info):
                 return ModifyScheduleViewController(conferenceInfo: info)
+            case .invitation(roomInfo: let info, invitation: let invitation):
+                return ConferenceInvitationViewController(roomInfo: info, invitation: invitation)
             case .popup(view: let view):
                 return PopupViewController(contentView: view)
             case .alert(state: let alertState):
@@ -120,6 +129,13 @@ extension ConferenceRoute {
                 return UIViewController()
         }
     }
+    
+    func getSelectMemberViewController(participants: ConferenceParticipants) -> (ContactViewProtocol & UIViewController)? {
+        guard let vc = Container.shared.contactViewController(participants) as? (ContactViewProtocol & UIViewController) else {
+            return nil
+        }
+        return vc
+    }
 }
 
 extension ConferenceRoute: Equatable {
@@ -132,7 +148,8 @@ extension ConferenceRoute: Equatable {
                 (.selectedMember, .selectedMember),
                 (.timeZone, .timeZone),
                 (.scheduleDetails, .scheduleDetails),
-                (.modifySchedule, .modifySchedule):
+                (.modifySchedule, .modifySchedule),
+                (.invitation, .invitation):
                 return true
             case let (.popup(l), .popup(r)):
                 return l == r
@@ -147,7 +164,8 @@ extension ConferenceRoute: Equatable {
                 (.scheduleDetails, _),
                 (.modifySchedule, _),
                 (.alert, _),
-                (.popup, _):
+                (.popup, _),
+                (.invitation, _):
                 return false
         }
     }

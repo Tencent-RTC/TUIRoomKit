@@ -17,11 +17,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         window?.backgroundColor = UIColor.white
-
+        processOfflinePush(connectionOptions: connectionOptions)
         let loginVC = TRTCLoginViewController()
         let nav = RoomNavigationController(rootViewController: loginVC)
         window?.rootViewController = nav
         window?.makeKeyAndVisible()
+    }
+    
+    private func processOfflinePush(connectionOptions: UIScene.ConnectionOptions) {
+        guard let pushNotification = connectionOptions.notificationResponse?.notification.request.content.userInfo else { return }
+        guard let extString = pushNotification["ext"] as? String else { return }
+        guard let dict = extString.convertToDic() else { return }
+        guard let roomId = dict["RoomId"] as? String else { return }
+        AppUtils.shared.roomId = roomId
     }
 
     static func getCurrentWindow() -> UIWindow? {

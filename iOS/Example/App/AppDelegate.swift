@@ -9,6 +9,13 @@ import ImSDK_Plus
 import TUIRoomKit
 import UIKit
 import TUIRoomKit
+import TIMPush
+
+#if DEBUG
+let businessID: Int32 = 0
+#else
+let businessID: Int32 = 0
+#endif
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -49,50 +56,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
     }
     
-    func showMainViewController() {
-        guard ProfileManager.shared.curUserID() != nil else {
-            debugPrint("not login")
-            return
-        }
-        let prepareViewController = ConferenceOptionsViewController()
-        let nav = RoomNavigationController(rootViewController: prepareViewController)
-        nav.modalPresentationStyle = .fullScreen
-        getCurrentWindowViewController()?.present(nav, animated: true)
+}
+
+extension AppDelegate: TIMPushDelegate {
+    func offlinePushCertificateID() -> Int32 {
+        return businessID
     }
     
-    func showLoginViewController() {
-        let loginVC = TRTCLoginViewController()
-        let nav = RoomNavigationController(rootViewController: loginVC)
-        if let keyWindow = SceneDelegate.getCurrentWindow() {
-            keyWindow.rootViewController = nav
-            keyWindow.makeKeyAndVisible()
-        } else {
-            debugPrint("window error")
+    func onRemoteNotificationReceived(_ notice: String?) -> Bool {
+        guard let notice = notice else { return false }
+        guard let dict = notice.convertToDic() else { return false }
+        guard let roomId = dict["RoomId"] as? String else { return false }
+        if V2TIMManager.sharedInstance().getLoginStatus() == .STATUS_LOGINED {
+            AppUtils.shared.showConferenceMainViewController(roomId: roomId)
         }
-    }
-    
-    private func getCurrentWindowViewController() -> UIViewController? {
-        var keyWindow: UIWindow?
-        for window in UIApplication.shared.windows {
-            if window.isMember(of: UIWindow.self), window.isKeyWindow {
-                keyWindow = window
-                break
-            }
-        }
-        guard let rootController = keyWindow?.rootViewController else {
-            return nil
-        }
-        func findCurrentController(from vc: UIViewController?) -> UIViewController? {
-            if let nav = vc as? UINavigationController {
-                return findCurrentController(from: nav.topViewController)
-            } else if let tabBar = vc as? UITabBarController {
-                return findCurrentController(from: tabBar.selectedViewController)
-            } else if let presented = vc?.presentedViewController {
-                return findCurrentController(from: presented)
-            }
-            return vc
-        }
-        let viewController = findCurrentController(from: rootController)
-        return viewController
+        return true
     }
 }

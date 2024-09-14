@@ -9,7 +9,7 @@ import Foundation
 
 @objcMembers public class ConferenceSession: NSObject {
     @objc public static let sharedInstance = ConferenceSession()
-    private let implementation = ConferenceSessionImp()
+    let implementation = ConferenceSessionImp()
     
     @objc public func addObserver(observer: ConferenceObserver) {
         implementation.addObserver(observer: observer)
@@ -23,5 +23,16 @@ import Foundation
         sharedInstance.implementation.destroy()
     }
     
+    @objc public func enableWaterMark() {
+        implementation.enableWaterMark()
+    }
     
+    @objc public func setWaterMarkText(waterMarkText: String) {
+        implementation.setWaterMarkText(waterMarkText: waterMarkText)
+    }
+    
+    @objc public func setContactsViewProvider(_ provider: @escaping (ConferenceParticipants) -> ContactViewProtocol) {
+        implementation.setContactsViewProvider(provider)
+    }
+        
 }

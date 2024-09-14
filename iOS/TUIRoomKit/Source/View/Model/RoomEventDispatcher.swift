@@ -228,7 +228,7 @@ extension RoomEventDispatcher {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, param: ["userRole": userRole])
         }
         if isRoomOwnerChanged {
-            EngineManager.shared.fetchRoomInfo() {
+            EngineManager.shared.fetchRoomInfo(roomId: roomInfo.roomId) { _ in
                 EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RoomOwnerChanged, param: ["owner": userId])
             }
         }

@@ -67,7 +67,8 @@ class ConferenceOptionsView: UIView {
     init(viewController: ConferenceOptionsViewController) {
         rootViewController = viewController
         listView = ConferenceListView(viewController: viewController, memberSelectFactory: { selectedList in
-            return SelectMemberViewController(selectedUsers: selectedList)
+            let participants = ConferenceParticipants(selectedList: selectedList)
+            return SelectMemberViewController(participants: participants)
         })
         super.init(frame: .zero)
     }
@@ -200,9 +201,9 @@ class ConferenceOptionsView: UIView {
         let index = sender.tag - 1_000
         switch index {
         case 0:
-            rootViewController?.joinRoom()
-        case 1:
             rootViewController?.createRoom()
+        case 1:
+            rootViewController?.joinRoom()
         case 2:
             rootViewController?.scheduleRoom()
         default:

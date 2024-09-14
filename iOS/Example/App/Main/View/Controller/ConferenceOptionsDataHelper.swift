@@ -25,11 +25,11 @@ struct ConferenceOptionInfo {
 class ConferenceOptionsDataHelper {
     func generateOptionsData() -> [ConferenceOptionInfo] {
         var options: [ConferenceOptionInfo] = []
-        let enterRoom = ConferenceOptionInfo(normalText: .joinRoomText, normalIcon: "enter_conference", backgroundColor: "0x146EFA")
-        options.append(enterRoom)
-        
         let createRoom = ConferenceOptionInfo(normalText: .createRoomText, normalIcon: "create_conference", backgroundColor: "0x146EFA")
         options.append(createRoom)
+        
+        let enterRoom = ConferenceOptionInfo(normalText: .joinRoomText, normalIcon: "enter_conference", backgroundColor: "0x146EFA")
+        options.append(enterRoom)
         
         let scheduleRoom = ConferenceOptionInfo(normalText: .scheduleRoomText, normalIcon: "schedule_conference", backgroundColor: "0x146EFA")
         options.append(scheduleRoom)

@@ -7,10 +7,15 @@
 
 import Foundation
 import RTCRoomEngine
+import Factory
 
 class ConferenceSessionImp: NSObject {
+    private(set) var isEnableWaterMark = false;
+    private(set) var waterMarkText     = "";
+    
     private var observers = NSHashTable<ConferenceObserver>.weakObjects()
     
+    // MARK: - Public
     override init() {
         super.init()
         subscribeEngine()
@@ -30,11 +35,26 @@ class ConferenceSessionImp: NSObject {
         unsubscribeEngine()
         observers.removeAllObjects()
     }
+
+    func enableWaterMark() {
+        self.isEnableWaterMark = true
+    }
+
+    func setWaterMarkText(waterMarkText: String) {
+        self.waterMarkText = waterMarkText
+    }
+    
+    func setContactsViewProvider(_ provider: @escaping (ConferenceParticipants) -> ContactViewProtocol) {
+        Container.shared.contactViewController.register { participants in
+            provider(participants)
+        }
+    }
     
     deinit {
         unsubscribeEngine()
     }
     
+    // MARK: - Private
     private func subscribeEngine() {
         EngineEventCenter.shared.subscribeEngine(event: .onExitedRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onDestroyedRoom, observer: self)
@@ -50,6 +70,7 @@ class ConferenceSessionImp: NSObject {
     }
 }
 
+// MARK: - callback
 extension ConferenceSessionImp: RoomEngineEventResponder {
     func onEngineEvent(name: EngineEventCenter.RoomEngineEvent, param: [String : Any]?) {
         switch name {
@@ -97,5 +118,10 @@ extension ConferenceSessionImp: RoomEngineEventResponder {
             observer.onConferenceExited?(roomId: roomId)
         }
     }
-    
+}
+
+extension Container {
+    var contactViewController: ParameterFactory<ConferenceParticipants, ContactViewProtocol?> {
+        promised().scope(.unique)
+    }
 }

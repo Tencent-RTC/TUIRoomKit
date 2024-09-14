@@ -13,7 +13,8 @@ import Combine
 class RoomService {
     private let engineManager = EngineManager.shared
     
-    func enterRoom(roomId: String, 
+    func enterRoom(roomId: String,
+                   options: TUIEnterRoomOptions? = nil,
                    enableAudio: Bool,
                    enableVideo: Bool,
                    isSoundOnSpeaker: Bool) -> AnyPublisher<Void, RoomError> {
@@ -21,6 +22,7 @@ class RoomService {
             guard let self = self else { return }
             //TODO: use RTCRoomEngine directly
             self.engineManager.enterRoom(roomId: roomId,
+                                         options: options,
                                          enableAudio: enableAudio,
                                          enableVideo: enableVideo,
                                          isSoundOnSpeaker: isSoundOnSpeaker) { roomInfo in

@@ -67,7 +67,6 @@ class EnterRoomViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         UIApplication.shared.isIdleTimerDisabled = false
-        renewRootViewState()
     }
     
     @objc func backButtonClick(sender: UIButton) {
@@ -145,8 +144,6 @@ extension EnterRoomViewController {
             return
         }
         roomId = roomIDStr
-        rootView?.updateEnterButtonState(isEnabled: false)
-        rootView?.updateLoadingState(isStarted: true)
         joinConference(roomId: roomId)
     }
     
@@ -160,10 +157,6 @@ extension EnterRoomViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    private func renewRootViewState() {
-        rootView?.updateEnterButtonState(isEnabled: true)
-        rootView?.updateLoadingState(isStarted: false)
-    }
 }
 
 extension EnterRoomViewController: ConferenceObserver {
@@ -173,7 +166,6 @@ extension EnterRoomViewController: ConferenceObserver {
            SceneDelegate.getCurrentWindow()?.makeToast(errorText, duration: 1, position:TUICSToastPositionCenter)
            navigationController?.popViewController(animated: true)
         }
-        renewRootViewState()
     }
     
     func onConferenceFinished(conferenceId: String) {
