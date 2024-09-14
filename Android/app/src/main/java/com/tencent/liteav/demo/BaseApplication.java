@@ -1,20 +1,33 @@
 package com.tencent.liteav.demo;
 
+import static com.tencent.cloud.tuikit.roomkit.ConferenceDefine.KEY_JOIN_CONFERENCE_PARAMS;
 import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomKitUIEvent.START_LOGIN;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 
+import com.tencent.cloud.tuikit.roomkit.ConferenceDefine;
+import com.tencent.cloud.tuikit.roomkit.ConferenceMainActivity;
+import com.tencent.cloud.tuikit.roomkit.common.utils.UserModel;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.common.utils.UserModelManager;
+import com.tencent.liteav.debug.GenerateTestUserSig;
+import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
+import com.tencent.qcloud.tuicore.TUILogin;
+import com.tencent.qcloud.tuicore.interfaces.ITUINotification;
+import com.tencent.qcloud.tuicore.interfaces.TUICallback;
+
+import org.json.JSONObject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -39,6 +52,52 @@ public class BaseApplication extends MultiDexApplication implements ConferenceEv
         closeAndroidPDialog();
         ConferenceEventCenter.getInstance().subscribeUIEvent(START_LOGIN, this);
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
+        registerConferenceReminderEvent();
+    }
+
+    private void registerConferenceReminderEvent() {
+        TUICore.registerEvent(TUIConstants.TIMPush.EVENT_NOTIFY, TUIConstants.TIMPush.EVENT_NOTIFY_NOTIFICATION, new ITUINotification() {
+            @Override
+            public void onNotifyEvent(String key, String subKey, Map<String, Object> param) {
+                Log.d(TAG, "onNotifyEvent key = " + key + "subKey = " + subKey);
+                if (TUIConstants.TIMPush.EVENT_NOTIFY.equals(key) && TUIConstants.TIMPush.EVENT_NOTIFY_NOTIFICATION.equals(subKey) && param != null) {
+                    String extString = (String) param.get(TUIConstants.TIMPush.NOTIFICATION_EXT_KEY);
+                    try {
+                        JSONObject roomObject = new JSONObject(extString);
+                        String roomId = roomObject.getString("RoomId");
+                        if (!TextUtils.isEmpty(roomId)) {
+                            loginAndEnterRoom(roomId);
+                        }
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        });
+    }
+
+    private void loginAndEnterRoom(String roomId) {
+        final UserModel userModel = UserModelManager.getInstance().getUserModel();
+        int sdkAppId = GenerateTestUserSig.SDKAppID;
+        String userId = userModel.userId;
+        String userSig = GenerateTestUserSig.genTestUserSig(userModel.userId);
+        Log.d(TAG, "TUILogin.login sdkAppId=" + sdkAppId + " userId=" + userId + " userSig=" + TextUtils.isEmpty(userSig));
+        TUILogin.login(this.getApplicationContext(), sdkAppId, userId, userSig, new TUICallback() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "TUILogin.login onSuccess");
+                ConferenceDefine.JoinConferenceParams params = new ConferenceDefine.JoinConferenceParams(roomId);
+                Intent intent = new Intent(getApplicationContext(), ConferenceMainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(KEY_JOIN_CONFERENCE_PARAMS, params);
+                getApplicationContext().startActivity(intent);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMessage) {
+                Log.d(TAG, "TUILogin.login onError errorCode=" + errorCode + " errorMessage=" + errorMessage);
+                UserModelManager.getInstance().clearUserModel();
+            }
+        });
     }
 
     @Override

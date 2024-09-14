@@ -21,6 +21,17 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
+            android:name="com.tencent.liteav.demo.ConferenceOptionsActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
+            android:name="com.tencent.liteav.demo.SelectParticipants.SelectParticipantActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
             android:name="com.tencent.liteav.demo.SplashActivity"
             android:screenOrientation="portrait"
             android:exported="true"

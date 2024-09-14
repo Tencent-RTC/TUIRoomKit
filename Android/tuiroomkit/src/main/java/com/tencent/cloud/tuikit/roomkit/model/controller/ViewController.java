@@ -1,6 +1,7 @@
 package com.tencent.cloud.tuikit.roomkit.model.controller;
 
 import android.content.res.Configuration;
+import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
@@ -28,8 +29,8 @@ public class ViewController extends Controller {
         mViewState.isScreenPortrait.set(isPortrait);
     }
 
-    public void updateOnSeatPanelSelected(boolean isSelected) {
-        mViewState.isSeatedTabSelected.set(isSelected);
+    public void updateUserTypeSelected(ViewState.UserListType type) {
+        mViewState.userListType.set(type);
     }
 
     public void updateSearchUserKeyWord(String newWord) {
@@ -46,5 +47,9 @@ public class ViewController extends Controller {
 
     public boolean isProcessRoom() {
         return mViewState.roomProcess.get() != ViewState.RoomProcess.NONE;
+    }
+
+    public void anchorEnterRoomTimeFromBoot() {
+        mViewState.enterRoomTimeFromBoot.set(SystemClock.elapsedRealtime());
     }
 }

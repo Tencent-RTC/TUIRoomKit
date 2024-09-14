@@ -13,6 +13,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+import com.tencent.cloud.tuikit.roomkit.model.data.MediaState;
+import com.tencent.cloud.tuikit.roomkit.model.data.InvitationState;
 import com.tencent.cloud.tuikit.roomkit.model.data.RoomState;
 import com.tencent.cloud.tuikit.roomkit.model.data.SeatState;
 import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
@@ -32,10 +34,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ConferenceState {
     private static final String TAG = "ConferenceState";
 
-    public ViewState viewState = new ViewState();
-    public SeatState seatState = new SeatState();
-    public RoomState roomState = new RoomState();
-    public UserState userState = new UserState();
+    public ViewState       viewState       = new ViewState();
+    public SeatState       seatState       = new SeatState();
+    public RoomState       roomState       = new RoomState();
+    public UserState       userState       = new UserState();
+    public MediaState      mediaState      = new MediaState();
+    public InvitationState invitationState = new InvitationState();
 
     public TUIRoomDefine.RoomInfo roomInfo;
     public UserModel              userModel;
@@ -47,7 +51,7 @@ public class ConferenceState {
 
     public List<TakeSeatRequestEntity> takeSeatRequestList;
 
-    private Class                             mainActivityClass;
+    private Class mainActivityClass;
 
     private boolean isInFloatWindow      = false;
     private boolean isAutoShowRoomMainUi = true;
@@ -519,7 +523,7 @@ public class ConferenceState {
         enableFloatChat = enable;
     }
 
-    public boolean getEnableFloatChat () {
+    public boolean getEnableFloatChat() {
         return enableFloatChat;
     }
 }

@@ -10,6 +10,7 @@ import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY
 import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY_CONFERENCE_STARTED;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
@@ -22,6 +23,8 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ConferenceObserverManager implements ITUINotification {
+    private static final String TAG = "ConferenceObserverMg";
+
     private final List<ConferenceDefine.ConferenceObserver> mObserverList = new CopyOnWriteArrayList<>();
 
     public ConferenceObserverManager() {
@@ -33,12 +36,14 @@ public class ConferenceObserverManager implements ITUINotification {
     }
 
     public void addObserver(ConferenceDefine.ConferenceObserver observer) {
+        Log.i(TAG, "addObserver : " + observer);
         if (observer != null && !mObserverList.contains(observer)) {
             mObserverList.add(observer);
         }
     }
 
     public void removeObserver(ConferenceDefine.ConferenceObserver observer) {
+        Log.i(TAG, "removeObserver : " + observer);
         if (observer != null) {
             mObserverList.remove(observer);
         }
@@ -94,9 +99,12 @@ public class ConferenceObserverManager implements ITUINotification {
         if (!TextUtils.equals(subKey, KEY_CONFERENCE_EXITED)) {
             return;
         }
-        String roomId = (String) param.get(ConferenceEventConstant.KEY_CONFERENCE_ID);
+        TUIRoomDefine.RoomInfo roomInfo = (TUIRoomDefine.RoomInfo) param.get(ConferenceEventConstant.KEY_CONFERENCE);
+        ConferenceDefine.ConferenceExitedReason reason = (ConferenceDefine.ConferenceExitedReason) param.get(ConferenceEventConstant.KEY_REASON);
+        assert roomInfo != null;
+        Log.i(TAG, "onConferenceExisted roomId=" + roomInfo.roomId + " ownerId=" + roomInfo.ownerId + " roomName=" + roomInfo.name + " reason=" + reason);
         for (ConferenceDefine.ConferenceObserver observer : mObserverList) {
-            observer.onConferenceExisted(roomId);
+            observer.onConferenceExisted(roomInfo, reason);
         }
     }
 
@@ -104,9 +112,12 @@ public class ConferenceObserverManager implements ITUINotification {
         if (!TextUtils.equals(subKey, KEY_CONFERENCE_FINISHED)) {
             return;
         }
-        String roomId = (String) param.get(ConferenceEventConstant.KEY_CONFERENCE_ID);
+        TUIRoomDefine.RoomInfo roomInfo = (TUIRoomDefine.RoomInfo) param.get(ConferenceEventConstant.KEY_CONFERENCE);
+        ConferenceDefine.ConferenceFinishedReason reason = (ConferenceDefine.ConferenceFinishedReason) param.get(ConferenceEventConstant.KEY_REASON);
+        assert roomInfo != null;
+        Log.i(TAG, "onConferenceFinished roomId=" + roomInfo.roomId + " ownerId=" + roomInfo.ownerId + " roomName=" + roomInfo.name + " reason=" + reason);
         for (ConferenceDefine.ConferenceObserver observer : mObserverList) {
-            observer.onConferenceFinished(roomId);
+            observer.onConferenceFinished(roomInfo, reason);
         }
     }
 }

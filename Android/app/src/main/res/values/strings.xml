@@ -46,4 +46,14 @@
     <string name="app_enter_live_room">Join conference</string>
 
     <string name="app_user_id_empty_toast">userId can not be empty!</string>
+
+    <string name="app_selected_text">Selected</string>
+    <string name="app_dialog_ok">OK</string>
+    <string name="app_hint_search_member_id_or_name">Enter user ID or name</string>
+    <string name="app_select_schedule_participant">Select members</string>
+    <string name="app_selected_participant_size">Selected：%d people</string>
+    <string name="app_confirm_select_participant">OK(%d)</string>
+    <string name="app_all_participant">All members(%d)</string>
+    <string name="app_participant_name_and_id">%s(%s)</string>
+    <string name="app_format_select_participant">%s (%d)</string>
 </resources>

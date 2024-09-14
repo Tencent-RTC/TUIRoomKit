@@ -10,10 +10,13 @@ public class ViewState {
 
     public LiveData<Boolean> isScreenPortrait = new LiveData<>(true);
 
-    public LiveData<String>  searchUserKeyWord   = new LiveData<>("");
-    public LiveData<Boolean> isSeatedTabSelected = new LiveData<>(true);
+    public LiveData<String>       searchUserKeyWord = new LiveData<>("");
+    public LiveData<UserListType> userListType      = new LiveData<>(UserListType.ALL_USER_ENTERED_THE_ROOM);
 
-    public LiveData<RoomProcess> roomProcess = new LiveData<>(RoomProcess.NONE);
+    public LiveData<RoomProcess> roomProcess           = new LiveData<>(RoomProcess.NONE);
+    public LiveData<Long>        enterRoomTimeFromBoot = new LiveData<>(0L);
+
+    public LiveData<Boolean> isInvitationPending = new LiveData<>(false);
 
     public void addPendingTakeSeatRequest(String requestId) {
         pendingTakeSeatRequests.add(requestId);
@@ -41,5 +44,12 @@ public class ViewState {
         COMING,
         IN,
         OUTING
+    }
+    
+    public enum UserListType {
+        ON_SEAT_INSIDE_THE_ROOM,
+        OFF_SEAT_INSIDE_THE_ROOM,
+        ALL_USER_ENTERED_THE_ROOM,
+        ALL_USER_NOT_ENTERED_THE_ROOM
     }
 }

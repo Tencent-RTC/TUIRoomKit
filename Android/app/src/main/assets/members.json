@@ -1,0 +1,28 @@
+[
+    {
+        "userId": "111111",
+        "userName": "Olivia",
+        "avatarUrl": "https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar1.png"
+    },
+    {
+        "userId": "222222",
+        "userName": "Sophia",
+        "avatarUrl": "https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar2.png"
+    },
+    {
+        "userId": "333333",
+        "userName": "William",
+        "avatarUrl": "https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar3.png"
+    },
+    {
+        "userId": "444444",
+        "userName": "James",
+        "avatarUrl": "https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar4.png"
+    },
+    {
+        "userId": "555555",
+        "userName": "Charlotte",
+        "avatarUrl": "https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar5.png"
+    }
+]
+

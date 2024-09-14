@@ -50,7 +50,9 @@ public class InviteDialog extends BaseBottomDialog implements ConferenceEventCen
         mLayoutAddUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                ConferenceEventCenter.getInstance().notifyUIEvent(
+                        ConferenceEventCenter.RoomKitUIEvent.SHOW_SELECT_USER_TO_CALL_VIEW, null);
+                dismiss();
             }
         });
 

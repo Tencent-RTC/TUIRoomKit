@@ -76,6 +76,7 @@ public class VideoSeatViewModel extends TUIRoomObserver
         mRoomEngine.removeObserver(this);
         mUserEntityList.clear();
         mUserEntityMap.clear();
+        clearLocalVideoViewIfNeeded();
         ConferenceEventCenter.getInstance().unsubscribeEngine(LOCAL_USER_ENTER_ROOM, this);
     }
 
@@ -118,6 +119,12 @@ public class VideoSeatViewModel extends TUIRoomObserver
         handleUserSelectStateChanged(curUser);
         notifyUiForUserListChanged();
         mVideoSeatView.enableSpeakerMode(true);
+    }
+
+    private void clearLocalVideoViewIfNeeded() {
+        if (!ConferenceController.sharedInstance().getConferenceState().isInFloatWindow()) {
+            mRoomEngine.setLocalVideoView(null);
+        }
     }
 
     private void handleUserSelectStateChanged(UserEntity user) {
