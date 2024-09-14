@@ -44,6 +44,7 @@ class TimeZoneSelector extends GetView<ScheduleConferenceController> {
         iconTheme: const IconThemeData(color: RoomColors.titleBlack, size: 22),
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
+        elevation: 0,
       ),
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,

@@ -98,6 +98,7 @@ class AttendeesSelectorPage extends GetView<AttendeesSelectorController> {
             iconTheme:
                 const IconThemeData(color: RoomColors.titleBlack, size: 22),
             backgroundColor: Colors.white,
+            elevation: 0,
           ),
           backgroundColor: Colors.white,
           resizeToAvoidBottomInset: false,

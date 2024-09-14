@@ -28,6 +28,7 @@ class DetailsButtonItem extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
+          shadowColor: Colors.transparent,
         ),
         child: Text(
           title,

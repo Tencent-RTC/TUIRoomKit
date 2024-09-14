@@ -82,6 +82,7 @@ class ScheduleConferencePage extends GetView<ScheduleConferenceController> {
                 const IconThemeData(color: RoomColors.titleBlack, size: 22),
             backgroundColor: Colors.white,
             centerTitle: true,
+            elevation: 0,
           ),
           backgroundColor: RoomColors.backgroundGrey,
           resizeToAvoidBottomInset: false,

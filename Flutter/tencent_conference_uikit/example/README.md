@@ -16,7 +16,7 @@ This document describes how to quickly run the TUIRoomKit demo project to make a
 <tr>
 <td rowspan="1" colSpan="1" >Flutter</td>
 
-<td rowspan="1" colSpan="1" >3.0.0 and above versions.</td>
+<td rowspan="1" colSpan="1" >3.22.0 and above versions.</td>
 </tr>
 
 <tr>

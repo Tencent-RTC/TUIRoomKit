@@ -22,7 +22,7 @@ _简体中文 | [English](README.md)_
 
 |         平台          |  版本   |
 | -------------------- | ------ |
-| Flutter |3.0.0 及以上版本。|
+| Flutter |3.7.0 及以上版本。|
 | Android | 最低兼容 Android 4.1（SDK API Level 16），建议使用 Android 5.0 （SDK API Level 21）及以上版本|
 | iOS     |iOS 12.0 及更高。|
 
