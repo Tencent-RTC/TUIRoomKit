@@ -33,8 +33,9 @@ import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant;
+import com.tencent.cloud.tuikit.roomkit.model.ConferenceSessionImpl;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceState;
-import com.tencent.cloud.tuikit.roomkit.model.FeatureSwitch;
+import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
 import com.tencent.cloud.tuikit.roomkit.videoseat.ui.TUIVideoSeatView;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
@@ -50,6 +51,9 @@ import com.tencent.cloud.tuikit.roomkit.view.page.widget.FloatChat.FloatChatView
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.LocalAudioIndicator.LocalAudioToggleView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.MediaSettings.MediaSettingPanel;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel.RaiseHandApplicationListPanel;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.SelectScheduleParticipant.ConferenceParticipants;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.SelectScheduleParticipant.ParticipantSelector;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.SelectScheduleParticipant.User;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.TopNavigationBar.TopView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.TransferOwnerControlPanel.TransferMasterPanel;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.UserControlPanel.UserListPanel;
@@ -58,6 +62,7 @@ import com.tencent.cloud.tuikit.roomkit.viewmodel.RoomMainViewModel;
 import com.trtc.tuikit.common.livedata.Observer;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 public class ConferenceMainView extends RelativeLayout {
@@ -65,8 +70,9 @@ public class ConferenceMainView extends RelativeLayout {
 
     private static final int CLICK_ACTION_MAX_MOVE_DISTANCE = 8;
 
-    private static final int ROOM_BARS_DISMISS_DELAY_MS   = 3 * 1000;
-    private static final int ROOM_BARS_FIRST_SHOW_TIME_MS = 6 * 1000;
+    private static final int ROOM_BARS_DISMISS_DELAY_MS          = 3 * 1000;
+    private static final int ROOM_BARS_FIRST_SHOW_TIME_MS        = 6 * 1000;
+    private static final int CONFIRM_DIALOG_AUTO_DISMISS_SECONDS = 5;
 
     private Context           mContext;
     private View              mFloatingWindow;
@@ -82,6 +88,8 @@ public class ConferenceMainView extends RelativeLayout {
     private BottomLayout      mBottomLayout;
     private RoomMainViewModel mViewModel;
 
+    private final ParticipantSelector mParticipantSelector = new ParticipantSelector();
+
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
 
     private boolean mIsBarsFirstShow      = true;
@@ -96,7 +104,7 @@ public class ConferenceMainView extends RelativeLayout {
     private final Observer<String> mRoomIdObserver = this::updateRoomId;
 
     public ConferenceMainView(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public ConferenceMainView(Context context, AttributeSet attrs) {
@@ -254,7 +262,7 @@ public class ConferenceMainView extends RelativeLayout {
             ((ViewGroup) parent).removeView(mVideoSeatView);
         }
         mLayoutVideoSeat.addView(mVideoSeatView);
-        if (FeatureSwitch.SWITCH_TEXT_WATER_MARK) {
+        if (ConferenceSessionImpl.sharedInstance().mIsEnableWaterMark) {
             TextWaterMarkView textWaterMarkView = new TextWaterMarkView(mContext);
             textWaterMarkView.setText(mViewModel.getWaterMakText());
             mLayoutVideoSeat.addView(textWaterMarkView);
@@ -339,6 +347,30 @@ public class ConferenceMainView extends RelativeLayout {
         shareRoomDialog.show();
     }
 
+    public void showSelectAttendeeView() {
+        mParticipantSelector.startParticipantSelect(mContext, getParticipants(), new ParticipantSelector.ParticipantSelectCallback() {
+            @Override
+            public void onParticipantSelected(List<UserState.UserInfo> participants) {
+                if (participants == null || participants.isEmpty()) {
+                    return;
+                }
+                ConferenceController.sharedInstance().getInvitationController().inviteUsers(participants, null);
+            }
+        });
+    }
+
+    private ConferenceParticipants getParticipants() {
+        ConferenceParticipants participants = new ConferenceParticipants();
+        for (UserState.UserInfo userInfo : ConferenceController.sharedInstance().getUserState().allUsers.getList()) {
+            User user = new User();
+            user.userId = userInfo.userId;
+            user.userName = userInfo.userName;
+            user.avatarUrl = userInfo.avatarUrl;
+            participants.unSelectableList.add(user);
+        }
+        return participants;
+    }
+
     public void showApplyList() {
         RaiseHandApplicationListPanel raiseHandApplicationListView = new RaiseHandApplicationListPanel(mContext);
         raiseHandApplicationListView.show();
@@ -365,6 +397,7 @@ public class ConferenceMainView extends RelativeLayout {
 
     public void showLeavedRoomConfirmDialog(String message) {
         final ConfirmDialog confirmDialog = new ConfirmDialog(mContext);
+        confirmDialog.setAutoConfirmSeconds(CONFIRM_DIALOG_AUTO_DISMISS_SECONDS);
         confirmDialog.setCancelable(true);
         confirmDialog.setMessage(message);
         if (confirmDialog.isShowing()) {
@@ -384,6 +417,7 @@ public class ConferenceMainView extends RelativeLayout {
 
     public void showKickedOffLineDialog() {
         final ConfirmDialog confirmDialog = new ConfirmDialog(mContext);
+        confirmDialog.setAutoConfirmSeconds(CONFIRM_DIALOG_AUTO_DISMISS_SECONDS);
         confirmDialog.setCancelable(true);
         confirmDialog.setMessage(mContext.getString(R.string.tuiroomkit_kiecked_off_line));
         confirmDialog.setPositiveText(mContext.getString(R.string.tuiroomkit_dialog_ok));

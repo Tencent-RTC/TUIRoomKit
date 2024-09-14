@@ -240,6 +240,21 @@ public class ScheduleController {
         conferenceInfo.hadScheduledAttendeeCount.set(0);
     }
 
+    public void fetchRoomInfo(String roomId, TUIRoomDefine.GetRoomInfoCallback callback) {
+        TUIRoomEngine.sharedInstance().fetchRoomInfo(roomId, TUIRoomDefine.RoomType.CONFERENCE, new TUIRoomDefine.GetRoomInfoCallback() {
+            @Override
+            public void onSuccess(TUIRoomDefine.RoomInfo roomInfo) {
+                callback.onSuccess(roomInfo);
+            }
+
+            @Override
+            public void onError(TUICommonDefine.Error error, String message) {
+                Log.d(TAG, "fetchRoomInfo onError error=" + error + " message=" + message);
+                callback.onError(error, message);
+            }
+        });
+    }
+
     private class ConferenceListObserver extends TUIConferenceListManager.Observer {
         @Override
         public void onConferenceScheduled(TUIConferenceListManager.ConferenceInfo conferenceInfo) {

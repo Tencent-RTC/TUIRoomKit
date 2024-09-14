@@ -14,4 +14,10 @@ public abstract class ConferenceSession {
     public abstract void addObserver(ConferenceDefine.ConferenceObserver observer);
 
     public abstract void removeObserver(ConferenceDefine.ConferenceObserver observer);
+
+    public abstract void enableWaterMark();
+
+    public abstract void setWaterMarkText(String waterMarkText);
+
+    public abstract void setContactsViewProvider(Class<?> contactsActivity);
 }

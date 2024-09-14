@@ -135,10 +135,10 @@ public class ProfileActivity extends AppCompatActivity {
         UserModelManager.getInstance().setUserModel(model);
         Log.i(TAG, "set profile success.");
         RoomToast.toastLongMessage(getString(R.string.app_toast_register_success_and_logging_in));
-        startPrepareActivity();
+        startConferenceOptionsActivity();
     }
 
-    private void startPrepareActivity() {
+    private void startConferenceOptionsActivity() {
         final UserModel userModel = UserModelManager.getInstance().getUserModel();
         int sdkAppId = GenerateTestUserSig.SDKAppID;
         String userId = userModel.userId;
@@ -153,7 +153,7 @@ public class ProfileActivity extends AppCompatActivity {
                 TUIRoomEngine.setSelfInfo(userName, userModel.userAvatar, null);
                 TUIConfig.setSelfNickName(userName);
                 TUIConfig.setSelfFaceUrl(userModel.userAvatar);
-                TUICore.startActivity("PrepareActivity", null);
+                TUICore.startActivity("ConferenceOptionsActivity", null);
                 finish();
             }
 

@@ -68,6 +68,7 @@ public class ModifyConferenceView extends FrameLayout {
         mLayoutClose.setOnClickListener(view -> finishActivity());
         mLayoutSetConferenceDetail = parent.findViewById(R.id.fl_set_scheduled_conference_info);
         mLayoutSetConferenceEncrypt = parent.findViewById(R.id.fl_set_conference_password);
+        mLayoutSetConferenceEncrypt.setVisibility(GONE);
         mLayoutSetConferenceDevice = parent.findViewById(R.id.fl_set_conference_device);
         mTvSaveConference = parent.findViewById(R.id.tv_save_conference_text);
         mTvSaveConference.setText(mContext.getString(R.string.tuiroomkit_save_conference));
@@ -75,6 +76,7 @@ public class ModifyConferenceView extends FrameLayout {
         mLayoutModifyConference.setOnClickListener(v -> modifyConference(new TUIRoomDefine.ActionCallback() {
             @Override
             public void onSuccess() {
+                RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_conference_modify_success));
                 finishActivity();
             }
 

@@ -4,12 +4,17 @@ import com.tencent.cloud.tuikit.roomkit.ConferenceDefine;
 import com.tencent.cloud.tuikit.roomkit.ConferenceSession;
 
 public class ConferenceSessionImpl extends ConferenceSession {
+    public boolean mIsEnableWaterMark = false;
+    public String  mWaterMarkText     = "";
+
+    public Class<?> mContactsActivity;
+
     private static ConferenceSessionImpl     sInstance;
     private final  ConferenceObserverManager mConferenceObserverManager = new ConferenceObserverManager();
 
     private ConferenceSessionImpl() {}
 
-    public static ConferenceSession sharedInstance() {
+    public static ConferenceSessionImpl sharedInstance() {
         if (sInstance == null) {
             synchronized (ConferenceSessionImpl.class) {
                 if (sInstance == null) {
@@ -37,6 +42,21 @@ public class ConferenceSessionImpl extends ConferenceSession {
     @Override
     public void removeObserver(ConferenceDefine.ConferenceObserver observer) {
         mConferenceObserverManager.removeObserver(observer);
+    }
+
+    @Override
+    public void enableWaterMark() {
+        mIsEnableWaterMark = true;
+    }
+
+    @Override
+    public void setWaterMarkText(String waterMarkText) {
+        mWaterMarkText = waterMarkText;
+    }
+
+    @Override
+    public void setContactsViewProvider(Class<?> contactsActivity) {
+        mContactsActivity = contactsActivity;
     }
 
     private void destroy() {

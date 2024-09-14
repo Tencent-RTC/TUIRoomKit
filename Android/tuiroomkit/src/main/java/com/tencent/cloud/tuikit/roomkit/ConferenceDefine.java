@@ -72,8 +72,22 @@ public class ConferenceDefine {
 
         public void onConferenceJoined(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message) {}
 
-        public  void onConferenceExisted(String roomId) {}
+        public  void onConferenceExisted(TUIRoomDefine.RoomInfo roomInfo, ConferenceExitedReason reason) {}
 
-        public void onConferenceFinished(String roomId) {}
+        public void onConferenceFinished(TUIRoomDefine.RoomInfo roomInfo, ConferenceFinishedReason reason) {}
+    }
+
+    public enum ConferenceFinishedReason {
+        FINISHED_BY_OWNER,
+        FINISHED_BY_SERVER
+    }
+
+    public enum ConferenceExitedReason {
+        EXITED_BY_SELF,
+        EXITED_BY_ADMIN_KICK_OUT,
+        EXITED_BY_SERVER_KICK_OUT,
+        EXITED_BY_JOINED_ON_OTHER_DEVICE,
+        EXITED_BY_KICKED_OUT_OF_LINE,
+        EXITED_BY_USER_SIG_EXPIRED
     }
 }

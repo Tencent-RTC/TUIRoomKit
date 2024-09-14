@@ -41,11 +41,11 @@ public class SplashActivity extends Activity {
             startActivity(intent);
             finish();
         } else {
-            startPrepareActivity();
+            startConferenceOptionsActivity();
         }
     }
 
-    private void startPrepareActivity() {
+    private void startConferenceOptionsActivity() {
         final UserModel userModel = UserModelManager.getInstance().getUserModel();
         int sdkAppId = GenerateTestUserSig.SDKAppID;
         String userId = userModel.userId;
@@ -60,7 +60,7 @@ public class SplashActivity extends Activity {
                 TUIRoomEngine.setSelfInfo(userName, userModel.userAvatar, null);
                 TUIConfig.setSelfNickName(userName);
                 TUIConfig.setSelfFaceUrl(userModel.userAvatar);
-                TUICore.startActivity("PrepareActivity", null);
+                TUICore.startActivity("ConferenceOptionsActivity", null);
                 finish();
             }
 

@@ -37,6 +37,7 @@ public class ConferenceListObserver extends TUIConferenceListManager.Observer {
         Map<String, Object> map = new HashMap<>();
         map.put(ConferenceEventConstant.KEY_ROOM_ID, conferenceInfo.basicRoomInfo.roomId);
         map.put(ConferenceEventConstant.KEY_ROOM_NAME, conferenceInfo.basicRoomInfo.name);
+        mRoomState.roomName.set(conferenceInfo.basicRoomInfo.name);
         ConferenceEventCenter.getInstance().notifyEngineEvent(ConferenceEventCenter.RoomEngineEvent.ROOM_NAME_CHANGED, map);
     }
 

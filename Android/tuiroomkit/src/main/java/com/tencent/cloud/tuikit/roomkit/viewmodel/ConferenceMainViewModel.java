@@ -20,15 +20,15 @@ import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
 
 import java.util.Map;
 
-public class ConferenceMainViewModel
-        implements ConferenceEventCenter.RoomEngineEventResponder, ConferenceEventCenter.RoomKitUIEventResponder {
+public class ConferenceMainViewModel implements ConferenceEventCenter.RoomEngineEventResponder, ConferenceEventCenter.RoomKitUIEventResponder {
     private static final String TAG = "ConferenceMainViewModel";
 
     private final ConferenceMainFragment mFragment;
 
     public interface GetConferenceInfoCallback {
-        void onSuccess(TUIRoomDefine.RoomInfo roomInfo);
-        void onError(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message);
+        public void onSuccess(TUIRoomDefine.RoomInfo roomInfo);
+
+        public void onError(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message);
     }
 
     public ConferenceMainViewModel(ConferenceMainFragment fragment) {
@@ -81,6 +81,22 @@ public class ConferenceMainViewModel
 
     public void joinConference(ConferenceDefine.JoinConferenceParams params, @NonNull GetConferenceInfoCallback callback) {
         ConferenceController.sharedInstance().enterRoom(params.roomId, params.isOpenMicrophone, params.isOpenCamera, params.isOpenSpeaker, new TUIRoomDefine.GetRoomInfoCallback() {
+            @Override
+            public void onSuccess(TUIRoomDefine.RoomInfo engineRoomInfo) {
+                callback.onSuccess(engineRoomInfo);
+            }
+
+            @Override
+            public void onError(TUICommonDefine.Error error, String message) {
+                TUIRoomDefine.RoomInfo roomInfo = new TUIRoomDefine.RoomInfo();
+                roomInfo.roomId = params.roomId;
+                callback.onError(roomInfo, error, message);
+            }
+        });
+    }
+
+    public void joinEncryptRoom(ConferenceDefine.JoinConferenceParams params, String password, @NonNull GetConferenceInfoCallback callback) {
+        ConferenceController.sharedInstance().enterEncryptRoom(params.roomId, params.isOpenMicrophone, params.isOpenCamera, params.isOpenSpeaker, password, new TUIRoomDefine.GetRoomInfoCallback() {
             @Override
             public void onSuccess(TUIRoomDefine.RoomInfo engineRoomInfo) {
                 callback.onSuccess(engineRoomInfo);

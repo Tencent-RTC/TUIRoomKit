@@ -11,6 +11,7 @@ import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant.KEY
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,7 @@ import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.view.EnterConferencePasswordView;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.ConferenceMainViewModel;
 import com.tencent.qcloud.tuicore.ServiceInitializer;
 import com.tencent.qcloud.tuicore.TUICore;
@@ -41,9 +43,10 @@ import java.util.Map;
 public class ConferenceMainFragment extends Fragment {
     private static final String TAG = "ConferenceMainFm";
 
-    private       FragmentActivity        mActivity;
-    private       OnBackPressedCallback   mBackPressedCallback;
-    private final ConferenceMainViewModel mViewModel = new ConferenceMainViewModel(this);
+    private       FragmentActivity            mActivity;
+    private       OnBackPressedCallback       mBackPressedCallback;
+    private final ConferenceMainViewModel     mViewModel = new ConferenceMainViewModel(this);
+    private       EnterConferencePasswordView mPasswordPopView;
 
     public void startConference(ConferenceDefine.StartConferenceParams startConferenceParams) {
         if (ConferenceController.sharedInstance().getRoomController().isInRoom()) {
@@ -91,12 +94,63 @@ public class ConferenceMainFragment extends Fragment {
 
             @Override
             public void onError(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message) {
-                onDismiss();
+                if (error == TUICommonDefine.Error.NEED_PASSWORD) {
+                    popEnterPasswordView(joinConferenceParams);
+                } else {
+                    Map<String, Object> param = new HashMap<>(3);
+                    param.put(KEY_CONFERENCE_INFO, roomInfo);
+                    param.put(KEY_CONFERENCE_ERROR, error);
+                    param.put(KEY_CONFERENCE_MESSAGE, message);
+                    TUICore.notifyEvent(KEY_CONFERENCE, KEY_CONFERENCE_JOINED, param);
+                    RoomToast.toastLongMessageCenter(message);
+                    onDismiss();
+                }
+            }
+        });
+    }
+
+    public void popEnterPasswordView(ConferenceDefine.JoinConferenceParams joinConferenceParams) {
+        mPasswordPopView = new EnterConferencePasswordView();
+        mPasswordPopView.showDialog(mActivity, null);
+        mPasswordPopView.setCallback(new EnterConferencePasswordView.PasswordPopViewCallback() {
+            @Override
+            public void onCancel() {
+                mActivity.finish();
+            }
+
+            @Override
+            public void onConfirm(String password) {
+                if (TextUtils.isEmpty(password)) {
+                    RoomToast.toastShortMessageCenter(getContext().getString(R.string.tuiroomkit_password_is_empty));
+                    return;
+                }
+                mPasswordPopView.enableJoinRoomButton(false);
+                enterEncryptRoom(joinConferenceParams, password);
+            }
+        });
+    }
+
+    public void enterEncryptRoom(ConferenceDefine.JoinConferenceParams joinConferenceParams, String password) {
+        mViewModel.joinEncryptRoom(joinConferenceParams, password, new ConferenceMainViewModel.GetConferenceInfoCallback() {
+            @Override
+            public void onSuccess(TUIRoomDefine.RoomInfo roomInfo) {
                 Map<String, Object> param = new HashMap<>(3);
                 param.put(KEY_CONFERENCE_INFO, roomInfo);
-                param.put(KEY_CONFERENCE_ERROR, error);
-                param.put(KEY_CONFERENCE_MESSAGE, message);
+                param.put(KEY_CONFERENCE_ERROR, SUCCESS);
+                param.put(KEY_CONFERENCE_MESSAGE, "");
                 TUICore.notifyEvent(KEY_CONFERENCE, KEY_CONFERENCE_JOINED, param);
+                mPasswordPopView.dismiss();
+            }
+
+            @Override
+            public void onError(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message) {
+                if (error == TUICommonDefine.Error.WRONG_PASSWORD) {
+                    mPasswordPopView.enableJoinRoomButton(true);
+                    RoomToast.toastShortMessageCenter(getContext().getString(R.string.tuiroomkit_room_password_error));
+                } else {
+                    RoomToast.toastLongMessageCenter(message);
+                    onDismiss();
+                }
             }
         });
     }
