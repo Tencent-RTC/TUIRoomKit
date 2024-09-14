@@ -150,6 +150,7 @@ class RoomEventHandler extends TUIRoomObserver {
               _store.addInviteSeatUser(userModel, request);
             }
           }
+          break;
         default:
           break;
       }

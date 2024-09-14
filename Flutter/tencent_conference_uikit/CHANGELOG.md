@@ -1,3 +1,11 @@
+### 2.6.0(2024-09-14)
+
+- Upgraded rtc_room_engine dependencies.
+
+### 2.5.1(2024-09-09)
+
+- Lowered the minimum Flutter version to 3.7.0, Lowered the minimum Dart version to 2.19.0.
+
 ### 2.5.0(2024-08-02)
 
 - Adapted UI for large screens such as iPad.

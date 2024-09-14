@@ -33,7 +33,7 @@ _English | [简体中文](README.zh-CN.md)_
 <tr>
 <td rowspan="1" colSpan="1" >Flutter</td>
 
-<td rowspan="1" colSpan="1" >3.0.0 and above versions.</td>
+<td rowspan="1" colSpan="1" >3.7.0 and above versions.</td>
 </tr>
 
 <tr>

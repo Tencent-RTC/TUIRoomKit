@@ -66,6 +66,7 @@ class ScheduleDetailsPage extends GetView<ScheduleDetailsController> {
             iconTheme:
                 const IconThemeData(color: RoomColors.titleBlack, size: 22),
             backgroundColor: Colors.white,
+            elevation: 0,
             actions: [
               Obx(
                 () => Visibility(
