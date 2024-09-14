@@ -67,7 +67,6 @@ class CreateRoomViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         UIApplication.shared.isIdleTimerDisabled = false
-        renewRootViewState()
         setupRoomId()
     }
     
@@ -133,11 +132,8 @@ extension CreateRoomViewController {
     }
     
     func enterButtonClick(sender: UIButton) {
-        rootView?.updateEnterButtonState(isEnabled: false)
-        rootView?.updateLoadingState(isStarted: true)
         guard let roomId = self.roomId else {
             self.view.makeToast(.generatingRoomIdText)
-            self.renewRootViewState()
             return
         }
         quickStartConference(roomId: roomId)
@@ -152,11 +148,6 @@ extension CreateRoomViewController {
         params.isOpenSpeaker = isSoundOnSpeaker
         vc.setStartConferenceParams(params: params)
         navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    private func renewRootViewState() {
-        rootView?.updateEnterButtonState(isEnabled: true)
-        rootView?.updateLoadingState(isStarted: false)
     }
     
     func switchRoomTypeClick() {
@@ -223,7 +214,6 @@ extension CreateRoomViewController: ConferenceObserver {
             SceneDelegate.getCurrentWindow()?.makeToast(errorText, duration: 1, position:TUICSToastPositionCenter)
             navigationController?.popViewController(animated: true)
         }
-        renewRootViewState()
     }
     
     func onConferenceFinished(conferenceId: String) {

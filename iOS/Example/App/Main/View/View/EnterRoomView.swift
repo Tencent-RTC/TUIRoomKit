@@ -41,6 +41,7 @@ class EnterRoomView: UIView {
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 19)
         button.setTitleColor(.white, for: .normal)
         button.setTitle(.enterRoomText, for: .normal)
+        button.titleLabel?.adjustsFontSizeToFitWidth = true
         return button
     }()
     
@@ -136,14 +137,6 @@ class EnterRoomView: UIView {
         rootViewController?.enterButtonClick(sender: sender)
     }
     
-    func updateEnterButtonState(isEnabled: Bool) {
-        enterButton.isEnabled = isEnabled
-    }
-    
-    func updateLoadingState(isStarted: Bool) {
-        isStarted ? loading.startAnimating() : loading.stopAnimating()
-    }
-    
     private func resignTextFieldFirstResponder() {
         for subView in inputStackView.subviews {
             guard subView is ListCellItemView, let view = subView as? ListCellItemView else { continue }
@@ -160,6 +153,6 @@ class EnterRoomView: UIView {
 
 private extension String {
     static var enterRoomText: String {
-        RoomDemoLocalize("Join Conference")
+        RoomDemoLocalize("Join Room")
     }
 }

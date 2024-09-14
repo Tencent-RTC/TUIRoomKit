@@ -41,6 +41,7 @@ class CreateRoomView: UIView {
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 19)
         button.setTitleColor(.white, for: .normal)
         button.setTitle(.createRoomText, for: .normal)
+        button.titleLabel?.adjustsFontSizeToFitWidth = true
         return button
     }()
     
@@ -156,14 +157,6 @@ class CreateRoomView: UIView {
         switchSpeakerModelView.isHidden = false
     }
     
-    func updateEnterButtonState(isEnabled: Bool) {
-        enterButton.isEnabled = isEnabled
-    }
-    
-    func updateLoadingState(isStarted: Bool) {
-        isStarted ? loading.startAnimating() : loading.stopAnimating()
-    }
-    
     deinit {
         debugPrint("deinit \(self)")
     }
@@ -171,6 +164,6 @@ class CreateRoomView: UIView {
 
 private extension String {
     static var createRoomText: String {
-        RoomDemoLocalize("Create Conference")
+        RoomDemoLocalize("Create Room")
     }
 }

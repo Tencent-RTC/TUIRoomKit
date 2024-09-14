@@ -10,11 +10,12 @@ def tool
   pod 'Alamofire'
   pod 'TUICore'
   pod 'TUIChat'
-  pod 'RTCRoomEngine','~> 2.5.0'
+  pod 'RTCRoomEngine','~> 2.6.0'
   pod 'TXLiteAVSDK_TRTC'
   pod 'TXAppBasic'
   pod 'TIMCommon'
   pod 'TUIBeauty'
+  pod 'TIMPush'
 end
 
 def local

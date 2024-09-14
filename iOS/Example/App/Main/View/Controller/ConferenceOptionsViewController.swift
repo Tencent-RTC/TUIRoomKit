@@ -45,6 +45,14 @@ class ConferenceOptionsViewController: UIViewController {
         self.view = view
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        ConferenceSession.sharedInstance.setContactsViewProvider { participants in
+            return SelectMemberViewController(participants: participants)
+        }
+        ConferenceSession.sharedInstance.enableWaterMark()
+    }
+    
     deinit {
         debugPrint("deinit \(self)")
     }
@@ -79,7 +87,8 @@ extension ConferenceOptionsViewController {
     
     func scheduleRoom() {
         let scheduleViewController = ScheduleConferenceViewController { selectedList in
-           return SelectMemberViewController(selectedUsers: selectedList)
+            let participants = ConferenceParticipants(selectedList: selectedList)
+            return SelectMemberViewController(participants: participants)
         }
         navigationController?.pushViewController(scheduleViewController, animated: true)
     }

@@ -14,6 +14,7 @@ import ImSDK_Plus
 import TUICore
 
 class TRTCRegisterViewController: UIViewController {
+    
     lazy var loading: UIActivityIndicatorView = {
         let activityIndicatorStyle: UIActivityIndicatorView.Style
         if #available(iOS 13, *) {
@@ -68,9 +69,9 @@ class TRTCRegisterViewController: UIViewController {
         self.view.makeToast(.registSuccessText)
         ProfileManager.shared.localizeUserModel()
         ProfileManager.shared.synchronizUserInfo()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            //show main vc
-            AppUtils.shared.showMainController()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self = self else { return }
+            AppUtils.shared.showConferenceOptionsViewController(nav: self.navigationController)
         }
     }
     

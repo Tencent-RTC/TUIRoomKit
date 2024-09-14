@@ -355,7 +355,7 @@ class ContactCell: UITableViewCell {
         }
     }
     
-    func setupViewState(with info: User, isSelected: Bool) {
+    func setupViewState(with info: User, isSelected: Bool, isDisaled: Bool) {
         let placeholder = UIImage(named: "room_default_avatar_rect")
         if let url = URL(string: info.avatarUrl) {
             avatarImageView.sd_setImage(with: url, placeholderImage: placeholder)
@@ -368,7 +368,13 @@ class ContactCell: UITableViewCell {
         } else {
             nameLabel.text = info.userId
         }
-        checkBox.isSelected = isSelected
+        checkBox.isSelected = isSelected || isDisaled
+        
+        if isDisaled {
+            contentView.alpha = 0.5
+        } else {
+            contentView.alpha = 1
+        }
     }
 }
 

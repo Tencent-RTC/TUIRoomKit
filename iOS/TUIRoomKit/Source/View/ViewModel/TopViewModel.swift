@@ -41,6 +41,7 @@ class TopViewModel: NSObject {
         createBottomData()
         initialStatus()
         subscribeUIEvent()
+        updateTimerLabelText()
     }
     
     private func createBottomData() {
@@ -124,7 +125,7 @@ class TopViewModel: NSObject {
     }
     
     func dropDownAction(sender: UIView) {
-        RoomRouter.shared.presentPopUpViewController(viewType: .roomInfoViewType, height: 258)
+        RoomRouter.shared.presentPopUpViewController(viewType: .roomInfoViewType, height: 290.scale375Height())
     }
     
     func exitAction(sender: UIView) {
@@ -134,10 +135,8 @@ class TopViewModel: NSObject {
     func updateTimerLabelText() {
         let timeInterval: TimeInterval = Date().timeIntervalSince1970
         let timeStamp = Int(timeInterval)
-        var totalSeconds: UInt = 0
-        if store.timeStampOnEnterRoom > 0 {
-            totalSeconds = UInt(labs(timeStamp - store.timeStampOnEnterRoom))
-        }
+        var totalSeconds: UInt = UInt(labs(timeStamp - store.timeStampOnEnterRoom))
+        guard topMenuTimer == nil, store.isEnteredRoom else { return }
         updateTimer(totalSeconds: totalSeconds)
         topMenuTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
         topMenuTimer?.schedule(deadline: .now(), repeating: .seconds(1))

@@ -21,14 +21,14 @@ class ConferenceOptions {
                              onError: onError)
     }
     
-    private static func quickStartConference(roomInfo: TUIRoomInfo,
+    private static func quickStartConference(roomInfo: TUIRoomInfo, 
                                              enableAudio: Bool,
                                              enableVideo: Bool,
                                              isSoundOnSpeaker: Bool,
                                              onSuccess: TUIRoomInfoBlock?,
                                              onError: TUIErrorBlock?) {
         EngineManager.shared.createRoom(roomInfo: roomInfo) {
-            EngineManager.shared.enterRoom(roomId: roomInfo.roomId,
+            EngineManager.shared.enterRoom(roomId: roomInfo.roomId, 
                                            enableAudio: enableAudio,
                                            enableVideo: enableVideo,
                                            isSoundOnSpeaker: isSoundOnSpeaker) { roomInfo in
@@ -45,7 +45,13 @@ class ConferenceOptions {
     static func join(joinConferenParams: JoinConferenceParams,
                      onSuccess: TUIRoomInfoBlock? = nil,
                      onError: TUIErrorBlock? = nil) {
+        var options:TUIEnterRoomOptions?
+        if let password = joinConferenParams.password, password.count > 0 {
+            options = TUIEnterRoomOptions()
+            options?.password = password
+        }
         EngineManager.shared.enterRoom(roomId: joinConferenParams.roomId,
+                                       options: options,
                                        enableAudio: joinConferenParams.isOpenMicrophone,
                                        enableVideo: joinConferenParams.isOpenCamera,
                                        isSoundOnSpeaker: joinConferenParams.isOpenSpeaker) { roomInfo in

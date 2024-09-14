@@ -9,6 +9,7 @@
 
 import Foundation
 import RTCRoomEngine
+import Factory
 
 protocol ConferenceMainViewFactory {
     func makeBottomView() -> BottomView
@@ -20,6 +21,7 @@ protocol ConferenceMainViewFactory {
     func makeFloatChatButton() -> FloatChatButton
     func makeFloatChatDisplayView() -> FloatChatDisplayView
     func makeRaiseHandApplicationNotificationView() -> RaiseHandApplicationNotificationView
+    func makeConferencePasswordView() -> ConferencePasswordView
 }
 
 struct ConferenceMainViewLayout { //Layout changes when switching between horizontal and vertical screens
@@ -35,11 +37,13 @@ class ConferenceMainView: UIView {
     let viewModel: ConferenceMainViewModel
     let viewFactory: ConferenceMainViewFactory
     let layout: ConferenceMainViewLayout = ConferenceMainViewLayout()
+    @Injected(\.navigation) private var route
     init(viewModel: ConferenceMainViewModel,
          viewFactory: ConferenceMainViewFactory) {
         self.viewModel = viewModel
         self.viewFactory = viewFactory
         super.init(frame: .zero)
+        viewModel.viewResponder = self
         subscribeUIEvent()
     }
     private var currentLandscape: Bool = isLandscape
@@ -88,6 +92,10 @@ class ConferenceMainView: UIView {
         return applicationNotificationView
     }()
     
+    lazy var conferencePasswordView: ConferencePasswordView = {
+        return viewFactory.makeConferencePasswordView()
+    }()
+    
     // MARK: - view layout
     private var isViewReady: Bool = false
     override func didMoveToWindow() {
@@ -119,6 +127,7 @@ class ConferenceMainView: UIView {
         addSubview(localAudioView)
         addSubview(raiseHandNoticeView)
         addSubview(raiseHandApplicationNotificationView)
+        addSubview(conferencePasswordView)
     }
     
     func activateConstraints() {
@@ -137,13 +146,12 @@ class ConferenceMainView: UIView {
         floatChatButton.snp.makeConstraints { make in
             make.bottom.equalTo(localAudioView.snp.top).offset(-18)
             make.height.equalTo(30)
-            make.leading.equalToSuperview()
-            make.width.equalTo(100)
+            make.leading.equalTo(videoSeatView.snp.leading)
         }
         floatChatDisplayView.snp.makeConstraints { make in
             make.bottom.equalTo(floatChatButton.snp.top).offset(-8)
             make.height.equalTo(128)
-            make.leading.equalToSuperview()
+            make.leading.equalToSuperview().offset(5)
             make.width.equalTo(313)
         }
         raiseHandApplicationNotificationView.snp.makeConstraints { make in
@@ -152,10 +160,12 @@ class ConferenceMainView: UIView {
             make.centerX.equalToSuperview()
             make.height.equalTo(40.scale375Height())
         }
+        conferencePasswordView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     private func bindInteraction() {
-        viewModel.viewResponder = self
         perform(#selector(hideToolBar),with: nil,afterDelay: firstDelayDisappearanceTime)
     }
     
@@ -219,8 +229,12 @@ class ConferenceMainView: UIView {
 }
 
 extension ConferenceMainView: ConferenceMainViewResponder {
-    func dismissVideoFloatView() {
-        RoomVideoFloatView.dismiss()
+    func hidePasswordView() {
+        conferencePasswordView.hide()
+    }
+    
+    func showPasswordView(roomId: String) {
+        conferencePasswordView.show(roomId: roomId)
     }
     
     func showExitRoomView() {
@@ -230,6 +244,10 @@ extension ConferenceMainView: ConferenceMainViewResponder {
     
     func showAlert(title: String?, message: String?, sureTitle:String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?) {
         RoomRouter.presentAlert(title: title, message: message, sureTitle: sureTitle, declineTitle: declineTitle, sureBlock: sureBlock, declineBlock: declineBlock)
+    }
+    
+    func showAlertWithAutoConfirm(title: String?, message: String?, sureTitle:String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?, autoConfirmSeconds: Int?) {
+        RoomRouter.presentAlert(title: title, message: message, sureTitle: sureTitle, declineTitle: declineTitle, sureBlock: sureBlock, declineBlock: declineBlock, autoConfirmSeconds: autoConfirmSeconds)
     }
     
     func makeToast(text: String) {
@@ -275,6 +293,13 @@ extension ConferenceMainView: ConferenceMainViewResponder {
         guard !bottomView.isUnfold, isDelay else { return }
         perform(#selector(hideToolBar),with: nil,afterDelay: delayDisappearanceTime)
     }
+    
+    func showRepeatJoinRoomAlert() {
+        let sureAction = UIAlertAction(title: .repeatJoinRoomSureText, style: .default) { _ in
+        }
+        let alertState = AlertState(title: .repeatJoinRoomTitle, message: .repeatJoinRoomMessage, sureAction: sureAction, declineAction: nil)
+        route.present(route: .alert(state: alertState))
+    }
 }
 
 extension ConferenceMainView: RoomKitUIEventResponder {
@@ -287,4 +312,10 @@ extension ConferenceMainView: RoomKitUIEventResponder {
         default: break
         }
     }
+}
+
+private extension String {
+    static let repeatJoinRoomTitle = localized("Currently in the room")
+    static let repeatJoinRoomMessage = localized("Please exit before joining a new room")
+    static let repeatJoinRoomSureText = localized("I see")
 }
