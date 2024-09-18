@@ -10,7 +10,10 @@ export default defineConfig({
     // compressed
     minify: false,
     rollupOptions: {
-      external: [...Object.keys(dependencies), ...Object.keys(peerDependencies)],
+      external: [
+        ...Object.keys(dependencies),
+        ...Object.keys(peerDependencies),
+      ],
       input: ['src/TUIRoom/index.ts'],
       output: [
         {

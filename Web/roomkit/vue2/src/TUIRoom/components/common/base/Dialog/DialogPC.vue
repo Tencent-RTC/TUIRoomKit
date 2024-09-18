@@ -32,7 +32,7 @@
         </template>
         <div v-if="showClose" class="close">
           <svg-icon :size="16" @click="handleClose">
-            <close-icon></close-icon>
+            <close-icon />
           </svg-icon>
         </div>
       </div>
@@ -104,12 +104,12 @@ const drawerContainerStyle = computed(() => {
 
 watch(
   () => props.value,
-  (val) => {
+  val => {
     visible.value = val;
-  },
+  }
 );
 
-watch(visible, (val) => {
+watch(visible, val => {
   if (val) {
     overlayContainerStyle.value = { zIndex: nextZIndex() };
     if (props.appendToBody) {
@@ -149,16 +149,16 @@ onBeforeUnmount(() => {
     dialogRef.value.parentNode.removeChild(dialogRef.value);
   }
 });
-
 </script>
 
 <style lang="scss" scoped>
 .overlay-container {
   position: fixed;
   top: 0;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
+
   &.overlay {
     background-color: rgba(15, 16, 20, 0.6);
   }
@@ -166,23 +166,26 @@ onBeforeUnmount(() => {
 
 .tui-dialog-container {
   --tui-dialog-width: 480px;
-  background-color: #ffffff;
+
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  border-radius: 20px;
   width: var(--tui-dialog-width, 50%);
-  box-shadow: 0px 3px 1px #e9f0fb;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 3px 1px #e9f0fb;
+  transform: translate(-50%, -50%);
+
   .tui-dialog-header {
-    height: 64px;
     position: relative;
     display: flex;
-    padding: 0 24px;
     align-items: center;
-    box-shadow: 0px 1px 0px rgba(230, 236, 245, 0.8);
+    height: 64px;
+    padding: 0 24px;
+    box-shadow: 0 1px 0 rgba(230, 236, 245, 0.8);
+
     .tui-dialog-header-title {
       font-size: 16px;
       font-style: normal;
@@ -190,20 +193,22 @@ onBeforeUnmount(() => {
       line-height: 24px;
       color: #0f1014;
     }
+
     .close {
-      width: 32px;
-      height: 32px;
       position: absolute;
       top: 50%;
-      transform: translateY(-50%);
       right: 20px;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
       color: #4f586b;
       cursor: pointer;
+      transform: translateY(-50%);
     }
   }
+
   .tui-dialog-content {
     flex: 1;
     padding: 20px 24px;
@@ -213,10 +218,11 @@ onBeforeUnmount(() => {
     line-height: 22px;
     color: #4f586b;
   }
+
   .tui-dialog-footer {
-    padding: 20px 30px;
     display: flex;
     justify-content: flex-end;
+    padding: 20px 30px;
   }
 }
 </style>

@@ -5,7 +5,7 @@
       :title="title"
       @click-icon="toggleScreen"
     >
-      <full-screen-icon></full-screen-icon>
+      <full-screen-icon />
     </icon-button>
   </div>
 </template>
@@ -25,10 +25,12 @@ const fullScreenConfig = roomService.getComponentConfig('FullScreen');
 
 /**
  * Whether the current state is full screen, default is false
-**/
+ **/
 const isFullScreen = ref(false);
 
-const title = computed((): string => (isFullScreen.value ? t('Exit') : t('Full screen')));
+const title = computed((): string =>
+  isFullScreen.value ? t('Exit') : t('Full screen')
+);
 
 function toggleScreen() {
   if (isFullScreen.value) {
@@ -45,22 +47,30 @@ function toggleScreen() {
 }
 
 function handleFullScreenChange() {
-  isFullScreen.value = !!(document.fullscreenElement);
+  isFullScreen.value = !!document.fullscreenElement;
 }
 
 onMounted(() => {
-  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach((item) => {
+  [
+    'fullscreenchange',
+    'webkitfullscreenchange',
+    'mozfullscreenchange',
+    'msfullscreenchange',
+  ].forEach(item => {
     window.addEventListener(item, handleFullScreenChange);
   });
 });
 
 onUnmounted(() => {
-  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach((item) => {
+  [
+    'fullscreenchange',
+    'webkitfullscreenchange',
+    'mozfullscreenchange',
+    'msfullscreenchange',
+  ].forEach(item => {
     window.removeEventListener(item, handleFullScreenChange);
   });
 });
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

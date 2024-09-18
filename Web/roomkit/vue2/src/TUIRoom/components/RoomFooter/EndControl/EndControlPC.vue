@@ -18,9 +18,14 @@
       <div v-if="currentDialogType === DialogType.TransferDialog">
         <div>{{ t('New host') }}</div>
         <div>
-          <tui-select v-model="selectedUser" :teleported="false" :popper-append-to-body="false" theme="white">
+          <tui-select
+            v-model="selectedUser"
+            :teleported="false"
+            :popper-append-to-body="false"
+            theme="white"
+          >
             <tui-option
-              v-for="user in remoteUserList"
+              v-for="user in remoteEnteredUserList"
               :key="user.userId"
               :value="user.userId"
               :label="user.nameCard || user.userName"
@@ -31,13 +36,28 @@
       </div>
       <template #footer>
         <div v-if="currentDialogType === DialogType.BasicDialog">
-          <tui-button v-if="roomStore.isMaster" class="button" size="default" @click="dismissRoom">
+          <tui-button
+            v-if="roomStore.isMaster"
+            class="button"
+            size="default"
+            @click="dismissRoom"
+          >
             {{ t('Dismiss') }}
           </tui-button>
-          <tui-button v-if="isShowLeaveRoomDialog" class="button" size="default" @click="handleEndLeaveClick">
+          <tui-button
+            v-if="isShowLeaveRoomDialog"
+            class="button"
+            size="default"
+            @click="handleEndLeaveClick"
+          >
             {{ t('Leave') }}
           </tui-button>
-          <tui-button class="button" type="primary" size="default" @click="cancel">
+          <tui-button
+            class="button"
+            type="primary"
+            size="default"
+            @click="cancel"
+          >
             {{ t('Cancel') }}
           </tui-button>
         </div>
@@ -45,7 +65,12 @@
           <tui-button class="button" size="default" @click="transferAndLeave">
             {{ t('Transfer and leave') }}
           </tui-button>
-          <tui-button class="button" size="default" type="primary" @click="cancel">
+          <tui-button
+            class="button"
+            size="default"
+            type="primary"
+            @click="cancel"
+          >
             {{ t('Cancel') }}
           </tui-button>
         </div>
@@ -56,8 +81,8 @@
 
 <script setup lang="ts">
 import TuiButton from '../../common/base/Button.vue';
-import TuiSelect from '../../common/base/Select.vue';
-import TuiOption from '../../common/base/Option.vue';
+import TuiSelect from '../../common/base/Select';
+import TuiOption from '../../common/base/Option';
 import Dialog from '../../common/base/Dialog';
 import { TUIRole } from '@tencentcloud/tuiroom-engine-js';
 import useEndControl from './useEndControlHooks';
@@ -82,7 +107,7 @@ const {
   resetState,
   isMasterWithOneRemoteUser,
   isMasterWithRemoteUser,
-  remoteUserList,
+  remoteEnteredUserList,
 } = useEndControl();
 
 function handleEndBtnClick() {
@@ -94,7 +119,7 @@ function handleEndLeaveClick() {
     return;
   }
   if (isMasterWithRemoteUser.value) {
-    selectedUser.value = remoteUserList.value[0].userId;
+    selectedUser.value = remoteEnteredUserList.value[0].userId;
     if (isMasterWithOneRemoteUser.value) {
       transferAndLeave();
       return;
@@ -135,7 +160,10 @@ async function transferAndLeave() {
   }
   try {
     const userId = selectedUser.value;
-    const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({ userId, userRole: TUIRole.kRoomOwner });
+    const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({
+      userId,
+      userRole: TUIRole.kRoomOwner,
+    });
     logger.log(`${logPrefix}transferAndLeave:`, changeUserRoleResponse);
     resetState();
     await roomService.leaveRoom();
@@ -149,16 +177,18 @@ async function transferAndLeave() {
   .end-button {
     padding: 9px 20px;
     font-size: 14px;
-    border-radius: 20px;
-    border: 1.5px solid var(--red-color-2);
     color: var(--red-color-2);
+    border: 1.5px solid var(--red-color-2);
+    border-radius: 20px;
+
     &:hover {
-      background: var(--red-color-2);
       color: var(--font-color-7);
+      background: var(--red-color-2);
       border: 1px solid var(--red-color-2);
     }
   }
 }
+
 .button {
   margin-left: 20px;
 }

@@ -13,15 +13,27 @@
         <slot></slot>
       </div>
       <div class="dialog-footer">
-        <div v-tap="handleCancel" class="cancel-button">{{ props.cancelButton }}</div>
-        <div v-tap="handleConfirm" class="confirm-button">{{ props.confirmButton }}</div>
+        <div v-tap="handleCancel" class="cancel-button">
+          {{ props.cancelButton }}
+        </div>
+        <div v-tap="handleConfirm" class="confirm-button">
+          {{ props.confirmButton }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onBeforeUnmount } from 'vue';
+import {
+  ref,
+  watch,
+  computed,
+  onBeforeUnmount,
+  withDefaults,
+  defineProps,
+  defineEmits,
+} from 'vue';
 import useZIndex from '../../../../hooks/useZIndex';
 import '../../../../directives/vTap';
 
@@ -55,12 +67,12 @@ const emit = defineEmits(['input', 'close', 'confirm', 'cancel']);
 
 watch(
   () => props.value,
-  (val) => {
+  val => {
     visible.value = val;
-  },
+  }
 );
 
-watch(visible, (val) => {
+watch(visible, val => {
   if (val) {
     overlayContainerStyle.value = { zIndex: nextZIndex() };
     if (props.appendToBody) {
@@ -73,11 +85,9 @@ watch(visible, (val) => {
 
 function handleConfirm() {
   emit('confirm');
-  handleClose();
 }
 function handleCancel() {
   emit('cancel');
-  handleClose();
 }
 
 function handleClose() {
@@ -107,60 +117,66 @@ onBeforeUnmount(() => {
 .overlay-container {
   position: fixed;
   top: 0;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
   background-color: rgba(15, 16, 20, 0.6);
+
   .dialog-container {
-    min-width: 80vw;
     position: fixed;
-    background-color: #ffffff;
-    border-radius: 8px;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
+    min-width: 80vw;
     font-style: normal;
     color: var(--black-color);
+    background-color: #fff;
+    border-radius: 8px;
+    transform: translate(-50%, -50%);
+
     .dialog-title {
-      display: inline-block;
-      font-size: 16px;
-      text-align: center;
-      font-weight: 500;
-      padding-top: 14px;
-      padding: 24px 24px 12px 24px;
       box-sizing: border-box;
-    }
-    .dialog-content {
-      font-weight: 400;
-      font-size: 14px;
+      display: inline-block;
+      padding: 24px 24px 12px;
+      padding-top: 14px;
+      font-size: 16px;
+      font-weight: 500;
       text-align: center;
+    }
+
+    .dialog-content {
+      padding: 0 24px 20px;
+      font-size: 14px;
       font-weight: 400;
       color: var(--font-color-4);
-      padding: 0 24px 20px 24px;
+      text-align: center;
     }
+
     .dialog-content-notitle {
+      padding: 40px;
       font-size: 14px;
       text-align: center;
-      padding: 40px;
     }
+
     .dialog-footer {
-      border-top: 1px solid #d5e0f2;
       display: flex;
+      border-top: 1px solid #d5e0f2;
+
       .confirm-button,
       .cancel-button {
-        color: var(--font-color-4);
-        text-align: center;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: normal;
-        padding: 14px;
-        width: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 50%;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: normal;
+        color: var(--font-color-4);
+        text-align: center;
       }
+
       .confirm-button {
         color: var(--active-color-1);
         border-left: 1px solid #d5e0f2;

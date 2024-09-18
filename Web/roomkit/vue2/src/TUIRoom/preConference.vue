@@ -1,11 +1,14 @@
 <template>
-  <div id="pre-conference-container" :class="['pre-conference-container', tuiRoomThemeClass]">
+  <div
+    id="pre-conference-container"
+    :class="['pre-conference-container', tuiRoomThemeClass]"
+  >
     <div class="header">
       <div class="left-header">
-        <switch-theme class="header-item"></switch-theme>
+        <switch-theme class="header-item" />
       </div>
       <div class="right-header">
-        <language-icon class="header-item language"></language-icon>
+        <language-icon class="header-item language" />
         <user-info
           class="header-item user-info"
           :user-id="props.userInfo.userId"
@@ -14,7 +17,7 @@
           :is-show-edit-name="props.showEditNameInPc"
           @update-user-name="handleUpdateUserName"
           @log-out="handleLogOut"
-        ></user-info>
+        />
       </div>
     </div>
     <room-home-control
@@ -25,7 +28,7 @@
       @create-room="handleCreateRoom"
       @enter-room="handleEnterRoom"
       @update-user-name="handleUpdateUserName"
-    ></room-home-control>
+    />
     <div class="pre-home-control" v-else>
       <Logo v-show="props.isShowLogo" class="logo" />
       <div class="pre-home-control-container">
@@ -37,18 +40,27 @@
           @create-room="handleCreateRoom"
           @enter-room="handleEnterRoom"
           @update-user-name="handleUpdateUserName"
-        ></room-home-control>
+        />
         <schedule-room-list
           :is-show-scheduled-conference="props.enableScheduledConference"
           @join-conference="handleEnterRoom"
-        ></schedule-room-list>
+        />
       </div>
     </div>
+    <InvitationNotification @join-conference="handleEnterRoom" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import {
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  withDefaults,
+  defineProps,
+  defineEmits,
+} from 'vue';
 import UserInfo from './components/RoomHeader/UserInfo';
 import RoomHomeControl from './components/RoomHome/RoomControl';
 import LanguageIcon from './components/common/Language.vue';
@@ -60,34 +72,44 @@ import TUIMessageBox from './components/common/base/MessageBox/index';
 import TUIMessage from './components/common/base/Message/index';
 import { MESSAGE_DURATION } from './constants/message';
 import { isMobile } from './utils/environment';
+import InvitationNotification from './components/RoomInvite/InvitationNotification.vue';
 
 const roomControlRef = ref();
+const props = withDefaults(
+  defineProps<{
+    userInfo: {
+      userId: string;
+      userName: string;
+      avatarUrl: string;
+    };
+    showEditNameInPc: boolean;
+    roomId: string;
+    enableScheduledConference: boolean;
+    isShowLogo?: boolean;
+  }>(),
+  {
+    userInfo: () => ({
+      userId: '',
+      userName: '',
+      avatarUrl: '',
+    }),
+    showEditNameInPc: false,
+    roomId: '',
+    enableScheduledConference: true,
+    isShowLogo: true,
+  }
+);
 
-const props = withDefaults(defineProps<{
-  userInfo: {
-    userId: string,
-    userName: string,
-    avatarUrl: string,
-  },
-  showEditNameInPc: boolean,
-  roomId: string,
-  enableScheduledConference: boolean,
-  isShowLogo?: boolean
-}>(), {
-  userInfo: () => ({
-    userId: '',
-    userName: '',
-    avatarUrl: '',
-  }),
-  showEditNameInPc: false,
-  roomId: '',
-  enableScheduledConference: true,
-  isShowLogo: true,
-});
+const emits = defineEmits([
+  'on-create-room',
+  'on-enter-room',
+  'on-update-user-name',
+  'on-logout',
+]);
 
-const emits = defineEmits(['on-create-room', 'on-enter-room', 'on-update-user-name', 'on-logout']);
-
-const tuiRoomThemeClass = computed(() => `tui-theme-${roomService.basicStore.defaultTheme}`);
+const tuiRoomThemeClass = computed(
+  () => `tui-theme-${roomService.basicStore.defaultTheme}`
+);
 
 async function handleCreateRoom(roomOption: Record<string, any>) {
   emits('on-create-room', roomOption);
@@ -109,13 +131,15 @@ const showMessageBox = (data: {
   code?: number;
   message: string;
   title: string;
-  cancelButtonText: string,
+  duration?: number;
+  cancelButtonText: string;
   confirmButtonText: string;
   callback?: () => void;
 }) => {
   const {
     message,
     title = roomService.t('Note'),
+    duration,
     cancelButtonText,
     confirmButtonText = roomService.t('Sure'),
     callback = () => {},
@@ -123,6 +147,7 @@ const showMessageBox = (data: {
   TUIMessageBox({
     title,
     message,
+    duration,
     cancelButtonText,
     confirmButtonText,
     callback,
@@ -158,40 +183,33 @@ onUnmounted(() => {
 </style>
 
 <style lang="scss" scoped>
-
-.tui-theme-black .pre-conference-container {
-  --background: var(--background-color-1);
-}
-.tui-theme-white .pre-conference-container {
-  --background: url(./assets/imgs/background-white.png);
-}
-
-.tui-theme-black.pre-conference-container {
-  --background: var(--background-color-1);
-}
-
 .pre-conference-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
+  font-family: 'PingFang SC';
+  color: var(--font-color-1);
   background: var(--background);
   background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: PingFang SC;
-  color: var(--font-color-1);
+
   .header {
-    box-sizing: border-box;
-    width: 100%;
     position: absolute;
     top: 0;
-    padding: 22px 24px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    .left-header, .right-header {
+    width: 100%;
+    height: 4rem;
+    padding: 0 24px;
+
+    .left-header,
+    .right-header {
       display: flex;
       align-items: center;
+
       .header-item {
         &:not(:first-child) {
           margin-left: 16px;
@@ -199,20 +217,30 @@ onUnmounted(() => {
       }
     }
   }
+
   .pre-home-control {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
     display: flex;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+
     .logo {
       margin-bottom: 56px;
     }
+
     .pre-home-control-container {
       display: flex;
     }
   }
 }
 
+.tui-theme-black.pre-conference-container {
+  background: var(--background-color-1);
+}
+
+.tui-theme-white.pre-conference-container {
+  background: url('./assets/imgs/background-white.png');
+}
 </style>

@@ -4,13 +4,13 @@
     v-tap="handleOpenMemberControl"
     class="member-item-container"
   >
-    <member-info :show-state-icon="true" :user-info="props.userInfo"></member-info>
+    <member-info :show-state-icon="true" :user-info="props.userInfo" />
     <member-control
       v-show="showMemberControl"
       :show-member-control="showMemberControl"
       :user-info="props.userInfo"
       @on-close-control="handleDocumentTouchend"
-    ></member-control>
+    />
   </div>
 </template>
 
@@ -22,19 +22,15 @@ import { UserInfo } from '../../../stores/room';
 import useMemberItem from './useMemberItemHooks';
 import '../../../directives/vTap';
 
-
 interface Props {
-  userInfo: UserInfo,
+  userInfo: UserInfo;
 }
 const props = defineProps<Props>();
 
 const memberItemContainerRef = ref();
 
-const {
-  isMemberControlAccessible,
-  openMemberControl,
-  closeMemberControl,
-} = useMemberItem(props.userInfo);
+const { isMemberControlAccessible, openMemberControl, closeMemberControl } =
+  useMemberItem(props.userInfo);
 const showMemberControl = ref(false);
 watch(isMemberControlAccessible, (accessible: boolean) => {
   if (accessible === false) {
@@ -64,7 +60,6 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('touchend', handleDocumentTouchend);
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -72,9 +67,10 @@ onUnmounted(() => {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   height: 69px;
   padding: 0 32px;
-  justify-content: space-between;
+
   &:hover {
     background: var(--member-item-container-hover-bg-color);
   }

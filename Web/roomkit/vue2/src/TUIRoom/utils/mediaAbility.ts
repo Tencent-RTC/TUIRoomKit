@@ -7,16 +7,24 @@ export const isGetUserMediaSupported = (function () {
   if (isElectron || isWeChat) {
     return true;
   }
-  return navigator && navigator.mediaDevices && isFunction(navigator.mediaDevices.getUserMedia);
-}());
+  return (
+    navigator &&
+    navigator.mediaDevices &&
+    isFunction(navigator.mediaDevices.getUserMedia)
+  );
+})();
 
 // Whether or not getDisplayMedia is supported to capture screen sharing
 export const isGetDisplaySupported = (function () {
   if (isElectron || isWeChat) {
     return true;
   }
-  return navigator && navigator.mediaDevices && isFunction(navigator.mediaDevices.getDisplayMedia);
-}());
+  return (
+    navigator &&
+    navigator.mediaDevices &&
+    isFunction(navigator.mediaDevices.getDisplayMedia)
+  );
+})();
 
 // Whether or not screen sharing capability is supported
 // Unsupported Browsers: mac 360 Browser
@@ -28,6 +36,9 @@ export const isEnumerateDevicesSupported = (function () {
   if (isElectron || isWeChat) {
     return true;
   }
-  return navigator
-    && navigator.mediaDevices && isFunction(navigator.mediaDevices.enumerateDevices);
-}());
+  return (
+    navigator &&
+    navigator.mediaDevices &&
+    isFunction(navigator.mediaDevices.enumerateDevices)
+  );
+})();

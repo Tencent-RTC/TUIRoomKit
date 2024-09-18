@@ -1,14 +1,16 @@
 <template>
-  <div :class="['chat-editor', { 'disable': isMessageDisabled }]">
+  <div :class="['chat-editor', { disable: isMessageDisabled }]">
     <div class="input-content">
-      <emoji class="chat-emoji" @choose-emoji="handleChooseEmoji"></emoji>
+      <emoji class="chat-emoji" @choose-emoji="handleChooseEmoji" />
       <input
         ref="editorInputEle"
         v-model="sendMsg"
         type="text"
         :disabled="isMessageDisabled"
         class="content-bottom-input"
-        :placeholder="isMessageDisabled ? t('Muted by the moderator') : t('Type a message')"
+        :placeholder="
+          isMessageDisabled ? t('Muted by the moderator') : t('Type a message')
+        "
         enterkeyhint="send"
         @keyup.enter="sendMessage"
       />
@@ -27,73 +29,77 @@ const {
   sendMessage,
   handleChooseEmoji,
 } = useChatEditor();
-
 </script>
 
 <style lang="scss" scoped>
+.chat-editor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  padding-bottom: 5px;
 
-  .chat-editor {
-    width: 100vw;
+  .input-content {
+    box-sizing: border-box;
     display: flex;
-    justify-content: center;
     align-items: center;
-    padding-bottom: 5px;
-    .input-content {
+    justify-content: center;
+    width: 90%;
+    height: 34px;
+    font-family: 'PingFang SC';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 450;
+    line-height: 4vh;
+    color: #676c80;
+    caret-color: var(--caret-color);
+    resize: none;
+    background: var(--chat-editor-input-color-h5);
+    border: none;
+    border-radius: 8px;
+
+    .chat-emoji {
       display: flex;
-      width: 90%;
       align-items: center;
       justify-content: center;
-      color: #676c80;
-      height: 34px;
-      background: var(--chat-editor-input-color-h5);
-      border: none;
+    }
+
+    .content-bottom-input {
       box-sizing: border-box;
+      width: 84%;
+      height: 34px;
+      padding-left: 10px;
       font-family: 'PingFang SC';
+      font-size: 16px;
       font-style: normal;
       font-weight: 450;
-      font-size: 16px;
       line-height: 4vh;
+      color: #676c80;
       caret-color: var(--caret-color);
-      border-radius: 8px;
       resize: none;
-      .chat-emoji {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    .content-bottom-input {
-        color: #676c80;
-        width: 84%;
-        height: 34px;
-        background: var(--chat-editor-input-color-h5);
-        border: none;
-        box-sizing: border-box;
+      background: var(--chat-editor-input-color-h5);
+      border: none;
+      border-radius: 8px;
+
+      ::placeholder {
         font-family: 'PingFang SC';
-        font-style: normal;
-        font-weight: 450;
         font-size: 16px;
-        line-height: 4vh;
-        caret-color: var(--caret-color);
-        border-radius: 8px;
-        resize: none;
-        padding-left: 10px;
-        ::placeholder {
-          font-family: 'PingFang SC';
-          font-style: normal;
-          font-weight: 400;
-          font-size: 16px;
-          line-height: 18px;
-          color: #676c80;
-        }
-        &:focus-visible {
-          outline: none;
-        }
+        font-style: normal;
+        font-weight: 400;
+        line-height: 18px;
+        color: #676c80;
       }
-    }
-    &.disable {
-      .chat-emoji {
-        pointer-events: none;
+
+      &:focus-visible {
+        outline: none;
       }
     }
   }
+
+  &.disable {
+    .chat-emoji {
+      pointer-events: none;
+    }
+  }
+}
 </style>

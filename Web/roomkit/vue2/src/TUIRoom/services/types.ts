@@ -6,6 +6,7 @@ import { LifeCycleManager } from './manager/lifeCycleManager';
 import { ScheduleConferenceManager } from './manager/scheduleConferenceManager';
 import { RoomActionManager } from './manager/roomActionManager';
 import { ErrorHandler } from './function/errorHandler';
+import { ConferenceInvitationManager } from './manager/conferenceInvitationManager';
 export interface IRoomService {
   t: any;
   roomEngine: Record<string, any>;
@@ -15,6 +16,7 @@ export interface IRoomService {
   lifeCycleManager: LifeCycleManager;
   roomActionManager?: RoomActionManager;
   scheduleConferenceManager: ScheduleConferenceManager;
+  conferenceInvitationManager: ConferenceInvitationManager;
   errorHandler: ErrorHandler;
   on: (eventType: EventType, callback: (data?: any) => any) => void;
   off: (eventType: EventType, callback: (data?: any) => void) => void;
@@ -42,6 +44,7 @@ export interface RoomParam {
   defaultCameraId?: string;
   defaultMicrophoneId?: string;
   defaultSpeakerId?: string;
+  password?: string;
 }
 
 export enum EventType {
@@ -55,8 +58,11 @@ export enum EventType {
   ROOM_LEAVE = 'RoomLeave',
   ROOM_DISMISS = 'RoomDestroy',
   ROOM_ERROR = 'RoomError',
+  ROOM_NEED_PASSWORD = 'RoomNeedPassword',
   KICKED_OUT = 'KickedOut',
   KICKED_OFFLINE = 'KickedOffline',
   USER_SIG_EXPIRED = 'UserSigExpired',
   USER_LOGOUT = 'UserLogout',
+  LANGUAGE_CHANGED = 'LanguageChanged',
+  THEME_CHANGED = 'ThemeChanged',
 }

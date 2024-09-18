@@ -1,5 +1,11 @@
 <template>
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <g id="Frame" clip-path="url(#clip0_6318_5268)">
       <g id="Group 7672">
         <g id="Group 7784">
