@@ -1,16 +1,27 @@
 <template>
-  <div v-if="showSettingDialog" class="overlay-container overlay" @click="handleOverlayClick">
+  <div
+    v-if="showSettingDialog"
+    class="overlay-container overlay"
+    @click="handleOverlayClick"
+  >
     <div class="setting-container">
       <div class="setting-header">
         <span class="setting-title">{{ t('Settings') }}</span>
-        <svg-icon class="close-icon" :icon="CloseIcon" @click="handleCloseSettingDialog" />
+        <svg-icon
+          class="close-icon"
+          :icon="CloseIcon"
+          @click="handleCloseSettingDialog"
+        />
       </div>
       <div class="setting-body">
         <div class="setting-tabs">
           <div
             v-for="(item, index) in settingTabsTitleList"
             :key="index"
-            :class="['tabs-title', `${activeSettingTab === item.value ? 'active' : ''}`]"
+            :class="[
+              'tabs-title',
+              `${activeSettingTab === item.value ? 'active' : ''}`,
+            ]"
             @click="handleUpdateActiveTab(item.value)"
           >
             {{ item.label }}
@@ -23,13 +34,13 @@
             class="setting-tab"
             :mode="SettingMode.DETAIL"
             theme="white"
-          ></audio-setting-tab>
+          />
           <video-setting-tab
             v-else-if="activeSettingTab === 'video'"
             class="setting-tab"
             :with-preview="true"
             theme="white"
-          ></video-setting-tab>
+          />
         </div>
       </div>
     </div>
@@ -79,94 +90,101 @@ function handleOverlayClick(event: any) {
 .overlay-container {
   position: fixed;
   top: 0;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
   z-index: 2007;
+
   &.overlay {
     background-color: rgba(15, 16, 20, 0.6);
   }
 }
 
 .setting-container {
-  width: 610px;
-  height: 590px;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   display: flex;
-  background-color: #ffffff;
-  border-radius: 20px;
   flex-direction: column;
+  width: 610px;
+  height: 590px;
+  background-color: #fff;
+  border-radius: 20px;
+  transform: translate(-50%, -50%);
 
   .setting-header {
-    height: 64px;
-    border-bottom: 1px solid rgba(235, 240, 247, 1);
-    box-shadow: 0px 7px 10px -5px rgba(230, 236, 245, 0.8);
+    position: relative;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    position: relative;
+    height: 64px;
+    border-bottom: 1px solid rgba(235, 240, 247, 1);
+    box-shadow: 0 7px 10px -5px rgba(230, 236, 245, 0.8);
+
     .close-icon {
-      width: 32px;
-      height: 32px;
       position: absolute;
       top: 50%;
-      transform: translateY(-50%);
       right: 20px;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
       color: #4f586b;
       cursor: pointer;
+      transform: translateY(-50%);
     }
+
     .setting-title {
       display: inline-block;
-      font-weight: 500;
-      line-height: 24px;
-      color: #000;
       padding: 20px 0 20px 24px;
       font-size: 16px;
       font-style: normal;
       font-weight: 600;
       line-height: 24px;
+      color: #000;
     }
   }
+
   .setting-body {
-    height: 100%;
     display: flex;
+    height: 100%;
+
     .setting-tabs {
       width: 170px;
-      background-color: #f0f3fa;
       padding-top: 7px;
+      background-color: #f0f3fa;
       border-bottom-left-radius: 10px;
 
       .tabs-title {
+        position: relative;
         width: 100%;
         height: 36px;
         padding-left: 32px;
-        font-weight: 400;
         font-size: 14px;
-        color: #4f586b;
+        font-weight: 400;
         line-height: 36px;
-        position: relative;
+        color: #4f586b;
         cursor: pointer;
+
         &.active {
-          background-color: #1c66e5;
-          color: #fff;
           font-weight: 400;
+          color: #fff;
+          background-color: #1c66e5;
         }
       }
     }
+
     .divide-line {
       width: 1px;
       height: 100%;
       background: var(--divide-line-color-setting);
     }
+
     .setting-content {
       flex-grow: 1;
       padding: 16px 30px;
+
       .setting-tab {
         width: 100%;
       }

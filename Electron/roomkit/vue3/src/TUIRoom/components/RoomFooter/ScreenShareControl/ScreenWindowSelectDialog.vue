@@ -67,7 +67,7 @@ watch(
     if (props.screenList.length > 0) {
       onSelect(props.screenList[0]);
     }
-  },
+  }
 );
 
 function onSelect(screenInfo: any) {
@@ -93,33 +93,37 @@ function onClose() {
 
 <style lang="scss" scoped>
 .screen-content {
-  height: auto;
   min-width: 200px;
+  height: auto;
   max-height: 500px;
   overflow: auto;
+
   &::-webkit-scrollbar {
     display: none;
   }
 }
+
 .screen-list,
 .window-list {
-  list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
   margin-bottom: 0;
+  list-style: none;
 }
 
 .screen-title,
 .window-title {
-  color: #4f586b;
+  margin-bottom: 12px;
   font-size: 14px;
   font-weight: 400;
-  margin-bottom: 12px;
+  color: #4f586b;
 }
+
 .selected {
   color: #fff;
   background-color: #1c66e5;
 }
+
 ul {
   padding-left: 0;
 }

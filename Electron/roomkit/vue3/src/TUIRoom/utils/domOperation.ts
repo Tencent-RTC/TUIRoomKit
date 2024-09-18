@@ -21,7 +21,7 @@ interface IScrollInfo {
 }
 
 interface IFields {
-  [key: string] :any;
+  [key: string]: any;
 }
 
 declare const uni: any;
@@ -36,13 +36,26 @@ export const instanceMapping = new Map<registeredPage, any>();
  * @param instanceName string
  * @returns Promise<IDomRect>
  */
-export function getBoundingClientRect(selector: string | HTMLElement, instanceName?: registeredPage):
-Promise<IDomRect> {
-  if (!selector) return Promise.reject(new Error(`getBoundingClientRect() get error selector ${typeof selector}.`));
+export function getBoundingClientRect(
+  selector: string | HTMLElement,
+  instanceName?: registeredPage
+): Promise<IDomRect> {
+  if (!selector)
+    return Promise.reject(
+      new Error(
+        `getBoundingClientRect() get error selector ${typeof selector}.`
+      )
+    );
 
   if (window || document) {
-    const dom: HTMLElement | null = typeof selector === 'object' ? selector : document.querySelector(selector);
-    if (!dom) return Promise.reject(new Error(`getBoundingClientRect() can't find ${selector} dom.`));
+    const dom: HTMLElement | null =
+      typeof selector === 'object'
+        ? selector
+        : document.querySelector(selector);
+    if (!dom)
+      return Promise.reject(
+        new Error(`getBoundingClientRect() can't find ${selector} dom.`)
+      );
     const domRect = dom.getBoundingClientRect();
     return Promise.resolve({
       id: dom.id,
@@ -58,32 +71,49 @@ Promise<IDomRect> {
   }
 
   if (isWeChat) {
-    if (!instanceName) return Promise.reject(new Error('uni.getBoundingClientRect() need instanceName in params.'));
-    const _query = uni.createSelectorQuery().in(instanceMapping.get(instanceName));
+    if (!instanceName)
+      return Promise.reject(
+        new Error('uni.getBoundingClientRect() need instanceName in params.')
+      );
+    const _query = uni
+      .createSelectorQuery()
+      .in(instanceMapping.get(instanceName));
     return new Promise((resolve, reject) => {
-      _query.select(selector).boundingClientRect((data: IDomRect) => {
-        if (data) {
-          resolve(data);
-        }
-      })
+      _query
+        .select(selector)
+        .boundingClientRect((data: IDomRect) => {
+          if (data) {
+            resolve(data);
+          }
+        })
         .exec();
-      setTimeout(() => reject(new Error(`uni.getBoundingClientRect(${selector}) timeout.`)), 500);
+      setTimeout(
+        () =>
+          reject(new Error(`uni.getBoundingClientRect(${selector}) timeout.`)),
+        500
+      );
     });
   }
 
   return Promise.reject(new Error('getBoundingClientRect() occur error'));
 }
 
-export function getBoundingClientRectSync(selector: string | HTMLElement): IDomRect {
+export function getBoundingClientRectSync(
+  selector: string | HTMLElement
+): IDomRect {
   if (isWeChat) {
     throw new Error('getBoundingClientRectSync() can not use in uni-app.');
   }
 
   if (window || document) {
-    const dom: HTMLElement | null =      typeof selector === 'object'
-      ? selector
-      : document.querySelector(selector);
-    if (!dom) throw new Error(`getBoundingClientRectSync() can't find ${selector} dom.`);
+    const dom: HTMLElement | null =
+      typeof selector === 'object'
+        ? selector
+        : document.querySelector(selector);
+    if (!dom)
+      throw new Error(
+        `getBoundingClientRectSync() can't find ${selector} dom.`
+      );
     const domRect = dom.getBoundingClientRect();
     return {
       id: dom.id,
@@ -107,12 +137,24 @@ export function getBoundingClientRectSync(selector: string | HTMLElement): IDomR
  * @param instanceName string
  * @returns Promise<IScrollInfo>
  */
-export function getScrollInfo(selector: string | HTMLElement, instanceName?: registeredPage): Promise<IScrollInfo> {
-  if (!selector) return Promise.reject(new Error(`getScrollInfo() get error selector ${typeof selector}.`));
+export function getScrollInfo(
+  selector: string | HTMLElement,
+  instanceName?: registeredPage
+): Promise<IScrollInfo> {
+  if (!selector)
+    return Promise.reject(
+      new Error(`getScrollInfo() get error selector ${typeof selector}.`)
+    );
 
   if (!isWeChat && window) {
-    const dom: HTMLElement | null = typeof selector === 'object' ? selector : document.querySelector(selector);
-    if (!dom) return Promise.reject(new Error(`getScrollInfo() can't find ${selector} dom.`));
+    const dom: HTMLElement | null =
+      typeof selector === 'object'
+        ? selector
+        : document.querySelector(selector);
+    if (!dom)
+      return Promise.reject(
+        new Error(`getScrollInfo() can't find ${selector} dom.`)
+      );
     return Promise.resolve({
       id: dom.id,
       scrollTop: dom.scrollTop,
@@ -123,16 +165,26 @@ export function getScrollInfo(selector: string | HTMLElement, instanceName?: reg
   }
 
   if (isWeChat) {
-    if (!instanceName) return Promise.reject(new Error('uni.getScrollInfo() need instanceName in params.'));
-    const _query = uni.createSelectorQuery().in(instanceMapping.get(instanceName));
+    if (!instanceName)
+      return Promise.reject(
+        new Error('uni.getScrollInfo() need instanceName in params.')
+      );
+    const _query = uni
+      .createSelectorQuery()
+      .in(instanceMapping.get(instanceName));
     return new Promise((resolve, reject) => {
-      _query.select(selector).scrollOffset((data: IScrollInfo) => {
-        if (data) {
-          resolve(data);
-        }
-      })
+      _query
+        .select(selector)
+        .scrollOffset((data: IScrollInfo) => {
+          if (data) {
+            resolve(data);
+          }
+        })
         .exec();
-      setTimeout(() => reject(new Error(`uni.getScrollInfo(${selector}) timeout.`)), 500);
+      setTimeout(
+        () => reject(new Error(`uni.getScrollInfo(${selector}) timeout.`)),
+        500
+      );
     });
   }
 
@@ -145,10 +197,12 @@ export function getScrollInfoSync(selector: string | HTMLElement): IScrollInfo {
   }
 
   if (!isWeChat && window) {
-    const dom: HTMLElement | null =      typeof selector === 'object'
-      ? selector
-      : document.querySelector(selector);
-    if (!dom) throw new Error(`getScrollInfoSync() can't find ${selector} dom.`);
+    const dom: HTMLElement | null =
+      typeof selector === 'object'
+        ? selector
+        : document.querySelector(selector);
+    if (!dom)
+      throw new Error(`getScrollInfoSync() can't find ${selector} dom.`);
     return {
       id: dom.id,
       scrollTop: dom.scrollTop,
@@ -161,22 +215,38 @@ export function getScrollInfoSync(selector: string | HTMLElement): IScrollInfo {
   throw new Error('getScrollInfoSync() occur error.');
 }
 
-export function getFields(selector: string | HTMLElement, instanceName?: registeredPage): Promise<IFields> {
+export function getFields(
+  selector: string | HTMLElement,
+  instanceName?: registeredPage
+): Promise<IFields> {
   if (isWeChat) {
-    if (!instanceName) return Promise.reject(new Error('uni.getFields() need instanceName in params.'));
-    const _query = uni.createSelectorQuery().in(instanceMapping.get(instanceName));
+    if (!instanceName)
+      return Promise.reject(
+        new Error('uni.getFields() need instanceName in params.')
+      );
+    const _query = uni
+      .createSelectorQuery()
+      .in(instanceMapping.get(instanceName));
     return new Promise((resolve, reject) => {
-      _query.select(selector).fields({
-        rect: true,
-        size: true,
-        scrollOffset: true,
-      }, (data: IFields) => {
-        if (data) {
-          resolve(data);
-        }
-      })
+      _query
+        .select(selector)
+        .fields(
+          {
+            rect: true,
+            size: true,
+            scrollOffset: true,
+          },
+          (data: IFields) => {
+            if (data) {
+              resolve(data);
+            }
+          }
+        )
         .exec();
-      setTimeout(() => reject(new Error(`get ${selector} fields timeout.`)), 500);
+      setTimeout(
+        () => reject(new Error(`get ${selector} fields timeout.`)),
+        500
+      );
     });
   }
 

@@ -1,12 +1,19 @@
 <template>
-  <div v-if="componentConfig.visible" class="virtualBackground-control-container">
+  <div
+    v-if="componentConfig.visible"
+    class="virtualBackground-control-container"
+  >
     <icon-button :title="t('VirtualBackground')" @click-icon="openSettingPanel">
-      <virtual-background-icon></virtual-background-icon>
+      <virtual-background-icon />
     </icon-button>
 
     <Dialog
-      v-model="isDialogVisible" :title="t('VirtualBackground')" width="600px" :modal="true"
-      :append-to-room-container="true" @close="closeSettingPanel"
+      v-model="isDialogVisible"
+      :title="t('VirtualBackground')"
+      width="600px"
+      :modal="true"
+      :append-to-room-container="true"
+      @close="closeSettingPanel"
     >
       <div id="stream-preview" class="stream-preview">
         <div v-if="isLoading" class="mask"></div>
@@ -15,18 +22,24 @@
       <div class="setting">
         <div
           :class="[
-            'setting-item', selectedBackground === 'close' ? 'active' : ''
+            'setting-item',
+            selectedBackground === 'close' ? 'active' : '',
           ]"
           @click="applyVirtualBackground('close')"
         >
           <i class="setting-item-icon">
-            <img :src="CloseVirtualBackground" alt="close" style="width: 32px;" />
+            <img
+              :src="CloseVirtualBackground"
+              alt="close"
+              style="width: 32px"
+            />
           </i>
           <span>{{ t('Close') }}</span>
         </div>
         <div
           :class="[
-            'setting-item', selectedBackground === 'blur' ? 'active' : ''
+            'setting-item',
+            selectedBackground === 'blur' ? 'active' : '',
           ]"
           @click="applyVirtualBackground('blur')"
         >
@@ -38,11 +51,15 @@
       </div>
       <div class="footer">
         <TuiButton
-          class="button" :disabled="!isAllowed" @click="confirmVirtualBackground"
+          class="button"
+          :disabled="!isAllowed"
+          @click="confirmVirtualBackground"
         >
           {{ t('Save') }}
         </TuiButton>
-        <TuiButton class="button" type="primary" @click="closeSettingPanel">{{ t('Cancel') }}</TuiButton>
+        <TuiButton class="button" type="primary" @click="closeSettingPanel">{{
+          t('Cancel')
+        }}</TuiButton>
       </div>
     </Dialog>
   </div>
@@ -60,8 +77,11 @@ import BlurredBackground from '../../assets/imgs/blurred-background.png';
 import TuiButton from '../common/base/Button.vue';
 
 const { t } = useI18n();
-const componentConfig = roomService.componentManager.getComponentConfig('VirtualBackground');
-const isAllowed = computed(() => roomService.roomStore.localStream.hasVideoStream);
+const componentConfig =
+  roomService.componentManager.getComponentConfig('VirtualBackground');
+const isAllowed = computed(
+  () => roomService.roomStore.localStream.hasVideoStream
+);
 const appliedBackground = ref<'close' | 'blur'>('close');
 const selectedBackground = ref<'close' | 'blur'>('close');
 const isDialogVisible = ref(false);
@@ -71,7 +91,9 @@ const openSettingPanel = async () => {
   isDialogVisible.value = true;
   isLoading.value = true;
   await nextTick();
-  await roomService.roomEngine.instance?.startCameraDeviceTest({ view: 'stream-preview' });
+  await roomService.roomEngine.instance?.startCameraDeviceTest({
+    view: 'stream-preview',
+  });
   await applyVirtualBackground(appliedBackground.value);
   isLoading.value = false;
 };
@@ -98,7 +120,9 @@ const applyVirtualBackground = async (type: 'close' | 'blur') => {
   isLoading.value = true;
   try {
     selectedBackground.value = type;
-    await roomService.virtualBackground.toggleTestVirtualBackground(type === 'blur');
+    await roomService.virtualBackground.toggleTestVirtualBackground(
+      type === 'blur'
+    );
   } finally {
     isLoading.value = false;
   }
@@ -107,81 +131,83 @@ const applyVirtualBackground = async (type: 'close' | 'blur') => {
 
 <style lang="scss" scoped>
 .stream-preview {
+  position: relative;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  border-radius: 8px;
-  overflow: hidden;
   min-height: 310px;
+  overflow: hidden;
   background-color: #000;
-  position: relative;
+  border-radius: 8px;
 }
 
 .setting {
   display: flex;
-  align-items: center;
   gap: 16px;
-  margin-top: 10px;
+  align-items: center;
   padding: 1rem;
-  border: 1px solid #E4E8EE;
+  margin-top: 10px;
+  border: 1px solid #e4e8ee;
   border-radius: 8px;
 
   &-item {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    text-align: center;
-    border-radius: 8px;
-    color: #4F586B;
     font-size: 12px;
-    border: 1px solid transparent;
+    color: #4f586b;
+    text-align: center;
     cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 8px;
 
     &-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #f0f3fa;
-      border-radius: 8px;
       width: 54px;
       height: 54px;
       overflow: hidden;
+      background-color: #f0f3fa;
+      border-radius: 8px;
     }
   }
 
   &-item.active {
-    background-color: #1C66E5;
-    border: 1px solid #1C66E5;
     color: #fff;
+    background-color: #1c66e5;
+    border: 1px solid #1c66e5;
   }
 }
 
 .spinner {
-  z-index: 3;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  z-index: 3;
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #1C66E5;
+  border-top: 4px solid #1c66e5;
   border-radius: 50%;
+  transform: translate(-50%, -50%);
   animation: spin 1s linear infinite;
 }
+
 .mask {
   position: absolute;
+  z-index: 2;
   width: 100%;
   height: 100%;
   background-color: #000;
-  z-index: 2;
 }
 
 @keyframes spin {
   0% {
     transform: translate(-50%, -50%) rotate(0deg);
   }
+
   100% {
     transform: translate(-50%, -50%) rotate(360deg);
   }
@@ -189,12 +215,13 @@ const applyVirtualBackground = async (type: 'close' | 'blur') => {
 
 .footer {
   display: flex;
+  gap: 1rem;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  margin-top: 10px;
   padding: 1rem;
+  margin-top: 10px;
   border-radius: 8px;
+
   .button {
     width: 84px;
     height: 32px;

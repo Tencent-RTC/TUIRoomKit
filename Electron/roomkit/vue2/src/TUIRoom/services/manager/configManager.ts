@@ -1,17 +1,16 @@
 import i18n from '../../locales';
-import { IRoomService } from '../types';
+import { IRoomService, EventType } from '../types';
 
 interface IConfigManager {
-  setTheme(theme: ThemeOption): void;
+  setTheme(theme: Theme): void;
   setLanguage(language: LanguageOption): void;
 }
 
 export type LanguageOption = 'zh-CN' | 'en-US';
-export type ThemeOption = 'LIGHT' | 'DARK';
-
+export type Theme = 'white' | 'black';
 const THEME = {
-  LIGHT: 'tui-theme-white',
-  DARK: 'tui-theme-black',
+  LIGHT: 'white',
+  DARK: 'black',
 };
 
 export class ConfigManager implements IConfigManager {
@@ -21,18 +20,23 @@ export class ConfigManager implements IConfigManager {
     this.service = service;
   }
 
-  public setTheme(theme: ThemeOption) {
-    const isDarkTheme = theme === 'DARK';
-    document.body.classList.toggle(THEME.DARK, isDarkTheme);
-    document.body.classList.toggle(THEME.LIGHT, !isDarkTheme);
-    localStorage.setItem('tuiRoom-currentTheme', isDarkTheme ? THEME.DARK : THEME.LIGHT);
+  public setTheme(theme: Theme) {
+    const isDarkTheme = theme === THEME.DARK;
+    document.body.classList.toggle(`tui-theme-${THEME.DARK}`, isDarkTheme);
+    document.body.classList.toggle(`tui-theme-${THEME.LIGHT}`, !isDarkTheme);
+    this.service.basicStore.setDefaultTheme(
+      isDarkTheme ? THEME.DARK : THEME.LIGHT
+    );
+    this.service.emit(
+      EventType.THEME_CHANGED,
+      isDarkTheme ? THEME.DARK : THEME.LIGHT
+    );
   }
 
-  public setLanguage(language: LanguageOption): void {
+  public setLanguage(language: LanguageOption) {
+    if (language === i18n.global.locale.value) return;
     i18n.global.locale.value = language;
     this.service.basicStore.setLang(language);
-    localStorage.setItem('tuiRoom-language', language);
+    this.service.emit(EventType.LANGUAGE_CHANGED, language);
   }
 }
-
-

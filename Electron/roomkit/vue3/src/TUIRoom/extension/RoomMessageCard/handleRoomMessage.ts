@@ -28,7 +28,10 @@ export class HandleRoomMessage {
   }
 
   public destroy() {
-    chatExtension.setHistoryMeetingMessageList('delete', { ID: this.message.ID, messageData: this.messageData });
+    chatExtension.setHistoryMeetingMessageList('delete', {
+      ID: this.message.ID,
+      messageData: this.messageData,
+    });
   }
 
   // Get card information
@@ -37,19 +40,14 @@ export class HandleRoomMessage {
     const currentUser = chatExtension.chatContext?.userID;
     const messagePayload = this.parseMessageData(message);
     if (!getIsRoomCardMessage(message)) return;
-    const {
-      businessID,
-      owner,
-      roomId,
-      roomState,
-      userList,
-      ownerName,
-    } = messagePayload;
+    const { businessID, owner, roomId, roomState, userList, ownerName } =
+      messagePayload;
     const isRoomDestroyed = roomState === RoomState.DESTROYED;
-    const isInnerRoom = chatExtension.getOnGoingRoomId() === roomId
-      && userList.some(u => u.userId === currentUser)
-      && !isRoomDestroyed;
-    const isRoomCreateByMe =  owner === currentUser;
+    const isInnerRoom =
+      chatExtension.getOnGoingRoomId() === roomId &&
+      userList.some(u => u.userId === currentUser) &&
+      !isRoomDestroyed;
+    const isRoomCreateByMe = owner === currentUser;
     if (isRoomCreateByMe && isInnerRoom && !isRoomDestroyed) {
       chatExtension.setActiveMeetingMessage(message, messagePayload);
     }
@@ -65,7 +63,10 @@ export class HandleRoomMessage {
       ownerName,
       owner,
     };
-    chatExtension.setHistoryMeetingMessageList('add', { ID: message.ID, messageData: this.messageData });
+    chatExtension.setHistoryMeetingMessageList('add', {
+      ID: message.ID,
+      messageData: this.messageData,
+    });
   }
 
   public parseMessageData(message: Message) {

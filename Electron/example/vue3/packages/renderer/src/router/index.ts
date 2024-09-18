@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 
 import Home from '@/views/home.vue';
 import Room from '@/views/room.vue';
+import Whiteboard from '@/views/whiteboard.vue';
 
 const routes = [
   {
@@ -15,6 +16,10 @@ const routes = [
   {
     path: '/room',
     component: Room,
+  },
+  {
+    path: '/whiteboard',
+    component: Whiteboard,
   },
 ];
 

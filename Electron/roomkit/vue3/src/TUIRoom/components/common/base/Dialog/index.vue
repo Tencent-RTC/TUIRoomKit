@@ -25,7 +25,7 @@
         <div class="tui-dialog-container" :style="drawerContainerStyle">
           <div class="tui-dialog-header">
             <div class="tui-dialog-header-title">
-              <svg-icon :icon="titleIcon"></svg-icon>
+              <svg-icon :icon="titleIcon" />
               <div class="tui-dialog-header-title-content">{{ title }}</div>
             </div>
             <template v-if="$slots.title">
@@ -33,7 +33,7 @@
             </template>
             <div v-if="showClose" class="close">
               <svg-icon :size="16" @click="handleClose">
-                <close-icon></close-icon>
+                <close-icon />
               </svg-icon>
             </div>
           </div>
@@ -95,7 +95,9 @@ const emit = defineEmits(['update:modelValue', 'close', 'confirm', 'cancel']);
 
 const { nextZIndex } = useZIndex();
 
-const teleportDisable = computed(() => !props.appendToBody && !props.appendToRoomContainer);
+const teleportDisable = computed(
+  () => !props.appendToBody && !props.appendToRoomContainer
+);
 
 const targetName = computed(() => {
   if (props.appendToRoomContainer) {
@@ -120,15 +122,15 @@ const drawerContainerStyle = computed(() => {
 
 watch(
   () => props.modelValue,
-  (val) => {
+  val => {
     visible.value = val;
   },
   {
     immediate: true,
-  },
+  }
 );
 
-watch(visible, (val) => {
+watch(visible, val => {
   if (val) {
     overlayContainerStyle.value = { zIndex: nextZIndex() };
   }
@@ -163,9 +165,10 @@ function handleOverlayClick(event: any) {
 .overlay-container {
   position: fixed;
   top: 0;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
+
   &.overlay {
     background-color: rgba(15, 16, 20, 0.6);
   }
@@ -173,48 +176,54 @@ function handleOverlayClick(event: any) {
 
 .tui-dialog-container {
   --tui-dialog-width: 480px;
-  background-color: #ffffff;
+
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  border-radius: 20px;
   width: var(--tui-dialog-width, 50%);
-  box-shadow: 0px 3px 1px #e9f0fb;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 3px 1px #e9f0fb;
+  transform: translate(-50%, -50%);
+
   .tui-dialog-header {
-    height: 64px;
     position: relative;
     display: flex;
-    padding: 0 24px;
     align-items: center;
-    box-shadow: 0px 7px 10px -5px rgba(230, 236, 245, 0.8);
+    height: 64px;
+    padding: 0 24px;
+    box-shadow: 0 7px 10px -5px rgba(230, 236, 245, 0.8);
+
     .tui-dialog-header-title {
       display: flex;
-      .tui-dialog-header-title-content{
+
+      .tui-dialog-header-title-content {
+        margin-left: 8px;
         font-size: 16px;
         font-style: normal;
         font-weight: 600;
         line-height: 24px;
         color: #0f1014;
-        margin-left: 8px;
       }
     }
+
     .close {
-      width: 32px;
-      height: 32px;
       position: absolute;
       top: 50%;
-      transform: translateY(-50%);
       right: 20px;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
       color: #4f586b;
       cursor: pointer;
+      transform: translateY(-50%);
     }
   }
+
   .tui-dialog-content {
     flex: 1;
     padding: 20px 24px;
@@ -224,10 +233,11 @@ function handleOverlayClick(event: any) {
     line-height: 22px;
     color: #4f586b;
   }
+
   .tui-dialog-footer {
-    padding: 20px 30px;
     display: flex;
     justify-content: center;
+    padding: 20px 30px;
   }
 }
 </style>

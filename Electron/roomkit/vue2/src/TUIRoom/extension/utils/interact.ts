@@ -19,8 +19,14 @@ export const setDragAndResize = (domSelect: string) => {
         let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
         // Limit the dragging boundary to not exceed the screen
-        x = Math.min(screenWidth - target.offsetWidth + minWidth - 100, Math.max(-minWidth + 100, x));
-        y = Math.min(screenHeight - target.offsetHeight + minHeight - 100, Math.max(-minHeight + 100, y));
+        x = Math.min(
+          screenWidth - target.offsetWidth + minWidth - 100,
+          Math.max(-minWidth + 100, x)
+        );
+        y = Math.min(
+          screenHeight - target.offsetHeight + minHeight - 100,
+          Math.max(-minHeight + 100, y)
+        );
 
         target.style.transform = `translate(${x}px, ${y}px)`;
         target.setAttribute('data-x', x);

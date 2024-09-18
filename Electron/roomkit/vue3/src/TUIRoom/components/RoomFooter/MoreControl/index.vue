@@ -5,8 +5,7 @@
       :title="t('More')"
       :icon="MoreIcon"
       @click-icon="toggleMoreSidebar"
-    >
-    </icon-button>
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -16,11 +15,7 @@ import userMoreControl from './useMoreControlHooks';
 import { roomService } from '../../../services';
 
 const moreControlConfig = roomService.getComponentConfig('MoreControl');
-const {
-  t,
-  basicStore,
-  sidebarName,
-} = userMoreControl();
+const { t, basicStore, sidebarName } = userMoreControl();
 
 function toggleMoreSidebar() {
   if (basicStore.setSidebarOpenStatus && basicStore.sidebarName === 'more') {
@@ -32,6 +27,4 @@ function toggleMoreSidebar() {
   basicStore.setSidebarName('more');
 }
 </script>
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

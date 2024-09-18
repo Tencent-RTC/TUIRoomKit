@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="47px" height="40px" viewBox="0 0 47 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 60.1 (88133) - https://sketch.com -->
+    <title>text-cursor</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M16,26.5 C15.7238576,26.5 15.5,26.2761424 15.5,26 C15.5,25.7545401 15.6768752,25.5503916 15.9101244,25.5080557 L16,25.5 L19.5,25.5 L19.5,14.5 L16,14.5 C15.7238576,14.5 15.5,14.2761424 15.5,14 C15.5,13.7545401 15.6768752,13.5503916 15.9101244,13.5080557 L16,13.5 L24,13.5 C24.2761424,13.5 24.5,13.7238576 24.5,14 C24.5,14.2454599 24.3231248,14.4496084 24.0898756,14.4919443 L24,14.5 L20.5,14.5 L20.5,25.5 L24,25.5 C24.2761424,25.5 24.5,25.7238576 24.5,26 C24.5,26.2454599 24.3231248,26.4496084 24.0898756,26.4919443 L24,26.5 L16,26.5 Z" id="path-1"></path>
+        <filter x="-284.0%" y="-81.5%" width="668.1%" height="293.9%" filterUnits="objectBoundingBox" id="filter-2">
+            <feMorphology radius="1" operator="dilate" in="SourceAlpha" result="shadowSpreadOuter1"></feMorphology>
+            <feOffset dx="0" dy="2" in="shadowSpreadOuter1" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="3" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.16 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Whiteboard-Guidelines" transform="translate(-388.000000, -672.000000)">
+            <g id="text-cursor" transform="translate(392.000000, 672.000000)">
+                <rect  fill="#FFFFFF" opacity="0.01" x="0" y="0" width="40" height="40" rx="2"></rect>
+                <g  fill-rule="nonzero">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                    <path stroke="#FFFFFF" stroke-width="1" d="M19,25 L19,15 L16,15 C15.4477153,15 15,14.5522847 15,14 C15,13.5145897 15.3479993,13.101915 15.8654877,13.0100521 L16,13 L24,13 C24.5522847,13 25,13.4477153 25,14 C25,14.4854103 24.6520007,14.898085 24.1345123,14.9899479 L24,15 L21,15 L21,25 L24,25 C24.5522847,25 25,25.4477153 25,26 C25,26.4854103 24.6520007,26.898085 24.1345123,26.9899479 L24,27 L16,27 C15.4477153,27 15,26.5522847 15,26 C15,25.5145897 15.3479993,25.101915 15.8654877,25.0100521 L16,25 L19,25 Z" fill="#212324" fill-rule="evenodd"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -8,7 +8,10 @@
 -->
 <template>
   <div>
-    <div v-click-outside="handleHideVideoSettingTab" class="video-control-container">
+    <div
+      v-click-outside="handleHideVideoSettingTab"
+      class="video-control-container"
+    >
       <icon-button
         :title="t('Camera')"
         :has-more="hasMore"
@@ -17,14 +20,14 @@
         @click-icon="handleClickIcon"
         @click-more="handleMore"
       >
-        <svg-icon :icon="icon"></svg-icon>
+        <svg-icon :icon="icon" />
       </icon-button>
       <video-setting-tab
         v-show="showVideoSettingTab"
         class="video-tab"
         :with-mirror="true"
         theme="white"
-      ></video-setting-tab>
+      />
     </div>
   </div>
 </template>
@@ -39,12 +42,15 @@ import CameraOffIcon from '../common/icons/CameraOffIcon.vue';
 import VideoSettingTab from '../common/VideoSettingTab.vue';
 import { useI18n } from '../../locales';
 import vClickOutside from '../../directives/vClickOutside';
-import { isGetUserMediaSupported, isEnumerateDevicesSupported } from '../../utils/mediaAbility';
+import {
+  isGetUserMediaSupported,
+  isEnumerateDevicesSupported,
+} from '../../utils/mediaAbility';
 
 interface Props {
-  hasMore?: boolean,
-  isMuted: boolean,
-  isDisabled?: boolean,
+  hasMore?: boolean;
+  isMuted: boolean;
+  isDisabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -57,7 +63,8 @@ const emits = defineEmits(['click']);
 
 const { t } = useI18n();
 const showVideoSettingTab: Ref<boolean> = ref(false);
-const isSupportVideoMedia = isGetUserMediaSupported && isEnumerateDevicesSupported;
+const isSupportVideoMedia =
+  isGetUserMediaSupported && isEnumerateDevicesSupported;
 
 const icon = computed(() => (props.isMuted ? CameraOffIcon : CameraOnIcon));
 
@@ -83,36 +90,36 @@ function handleHideVideoSettingTab() {
     showVideoSettingTab.value = false;
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
-
 $videoTabWidth: 305px;
 
 .video-control-container {
   position: relative;
+
   .video-tab {
     position: absolute;
     bottom: calc(100% + 12px);
     left: -5px;
     width: $videoTabWidth;
+    padding: 20px 20px 24px;
     background: var(--background-color-1);
-    padding: 20px 20px 24px 20px;
     border-radius: 8px;
     box-shadow:
-      0px 2px 4px -3px rgba(32, 77, 141, 0.03),
-      0px 6px 10px 1px rgba(32, 77, 141, 0.06),
-      0px 3px 14px 2px rgba(32, 77, 141, 0.05);
+      0 2px 4px -3px rgba(32, 77, 141, 0.03),
+      0 6px 10px 1px rgba(32, 77, 141, 0.06),
+      0 3px 14px 2px rgba(32, 77, 141, 0.05);
+
     &::before {
-      content: '';
       position: absolute;
-      left: 30px;
       bottom: -10px;
+      left: 30px;
+      content: '';
       border-top: 5px solid var(--background-color-1);
-      border-left: 5px solid transparent;
       border-right: 5px solid transparent;
       border-bottom: 5px solid transparent;
+      border-left: 5px solid transparent;
     }
   }
 }

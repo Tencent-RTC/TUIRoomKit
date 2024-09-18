@@ -22,7 +22,7 @@ const componentNames = [
   'VirtualBackground',
 ] as const;
 
-export type ComponentName = typeof componentNames[number];
+export type ComponentName = (typeof componentNames)[number];
 
 type ComponentConfigItem = {
   visible: boolean;
@@ -47,7 +47,7 @@ const defaultConfig = {
   ManageMemberControl: { visible: true },
   InviteControl: { visible: true },
   ChatControl: { visible: true },
-  MoreControl: { visible: false },
+  MoreControl: { visible: true },
   VirtualBackground: { visible: false },
 };
 
@@ -56,12 +56,14 @@ export class ComponentManager implements IComponentManager {
 
   private service: IRoomService;
 
-  private componentConfig: ComponentConfig = Object.fromEntries(componentNames.map(name => [
-    name,
-    {
-      ...defaultConfig[name],
-    },
-  ])) as ComponentConfig;
+  private componentConfig: ComponentConfig = Object.fromEntries(
+    componentNames.map(name => [
+      name,
+      {
+        ...defaultConfig[name],
+      },
+    ])
+  ) as ComponentConfig;
 
   constructor(service: IRoomService) {
     this.service = service;
@@ -89,7 +91,7 @@ export class ComponentManager implements IComponentManager {
         this.componentConfig[name as ComponentName] = Object.assign(
           {},
           this.componentConfig[name as ComponentName],
-          current,
+          current
         );
       });
       return true;

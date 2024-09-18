@@ -14,9 +14,4 @@ const aegisId = 'iHWefAYqooXkVQhcyK';
 
 const projectName = 'TUIRoomKit-Electron';
 
-export {
-  isUploadLoaded,
-  isUploadDetailEvent,
-  aegisId,
-  projectName,
-};
+export { isUploadLoaded, isUploadDetailEvent, aegisId, projectName };

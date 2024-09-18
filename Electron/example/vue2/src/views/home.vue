@@ -13,9 +13,11 @@
 </template>
 
 <script>
-import { PreConferenceView, conference } from '@tencentcloud/roomkit-electron-vue2.7';
+import { PreConferenceView, conference, RoomEvent } from '@tencentcloud/roomkit-electron-vue2.7';
 import { getBasicInfo } from '@/config/basic-info-config';
 import { isMobile } from '@tencentcloud/roomkit-electron-vue2.7/es/utils/environment';
+import i18n from '../locales/index';
+import { getLanguage, getTheme } from  '../utils/utils';
 
 export default {
   name: 'Home',
@@ -36,6 +38,10 @@ export default {
   async mounted() {
     sessionStorage.removeItem('tuiRoom-roomInfo');
     sessionStorage.removeItem('tuiRoom-userInfo');
+    conference.setLanguage(getLanguage());
+    conference.setTheme(getTheme());
+    conference.on(RoomEvent.LANGUAGE_CHANGED, this.changeLanguage);
+    conference.on(RoomEvent.THEME_CHANGED, this.changeTheme);
     this.givenRoomId = this.$route.query.roomId || '';
 
     if (sessionStorage.getItem('tuiRoom-userInfo')) {
@@ -47,6 +53,10 @@ export default {
     const { sdkAppId, userId, userSig } = this.userInfo;
     // Login TUIRoomEngine
     await conference.login({ sdkAppId, userId, userSig });
+  },
+  destroyed() {
+    conference.off(RoomEvent.LANGUAGE_CHANGED,  this.changeLanguage);
+    conference.off(RoomEvent.THEME_CHANGED,  this.changeTheme);
   },
   methods: {
     setTUIRoomData(action, roomOption) {
@@ -105,6 +115,13 @@ export default {
       } catch (error) {
         console.log('sessionStorage error', error);
       }
+    },
+    changeTheme(theme) {
+      localStorage.setItem('tuiRoom-currentTheme', theme);
+    },
+    changeLanguage(language) {
+      i18n.global.locale.value = language;
+      localStorage.setItem('tuiRoom-language', language);
     },
   },
 };

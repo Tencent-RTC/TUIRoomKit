@@ -34,7 +34,7 @@ class TUIKitI18n {
   messages: Record<string, any>;
   global: Record<string, any>;
 
-  constructor(options: { messages: Record<string, any>, locale: string }) {
+  constructor(options: { messages: Record<string, any>; locale: string }) {
     this.messages = options.messages;
     locale.value = options.locale;
     this.global = {};
@@ -58,8 +58,7 @@ class TUIKitI18n {
     return message[key];
   }
 
-  public install() {
-  }
+  public install() {}
 }
 
 const i18n = new TUIKitI18n({

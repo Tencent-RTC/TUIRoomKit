@@ -5,16 +5,16 @@
     :class="['select-container', themeClass]"
   >
     <div
-      :class="['select-content', { 'disabled': disabled }]"
+      :class="['select-content', { disabled: disabled }]"
       @click="handleClickSelect"
     >
       <span class="select-text">
         {{ selectedLabel || selectedValue }}
       </span>
       <svg-icon
-        :class="['arrow-icon', { 'reverse': showSelectDropdown }]"
+        :class="['arrow-icon', { reverse: showSelectDropdown }]"
         :icon="ArrowStrokeSelectDownIcon"
-      ></svg-icon>
+      />
     </div>
     <Transition name="select-fade">
       <div
@@ -39,15 +39,15 @@ import '../../../directives/vClickOutside';
 const { nextZIndex } = useZIndex();
 
 interface Props {
-  value: string | number | boolean | object,
-  disabled?: boolean,
-  theme?: 'white' | 'black',
+  value: string | number | boolean | object;
+  disabled?: boolean;
+  theme?: 'white' | 'black';
 }
 
 interface OptionData {
-  label: string,
-  value: string | number | boolean | object,
-  ref: HTMLElement,
+  label: string;
+  value: string | number | boolean | object;
+  ref: HTMLElement;
 }
 
 const props = defineProps<Props>();
@@ -61,22 +61,31 @@ const selectedValue = ref(props.value);
 const selectContainerRef = ref();
 const selectDropDownRef = ref();
 const dropDirection = ref('down');
-const themeClass = computed(() => (props.theme ? `tui-theme-${props.theme}` : ''));
+const themeClass = computed(() =>
+  props.theme ? `tui-theme-${props.theme}` : ''
+);
 
-watch(() => props.value, (val) => {
-  selectedValue.value = val;
-  const option = optionArray.value.find(item => item.value === val);
-  if (option) {
-    selectedLabel.value = option.label;
+watch(
+  () => props.value,
+  val => {
+    selectedValue.value = val;
+    const option = optionArray.value.find(item => item.value === val);
+    if (option) {
+      selectedLabel.value = option.label;
+    }
   }
-});
+);
 
-watch(() => optionArray, () => {
-  const option = optionArray.value.find(item => item.value === props.value);
-  if (option) {
-    selectedLabel.value = option.label;
-  }
-}, { deep: true });
+watch(
+  () => optionArray,
+  () => {
+    const option = optionArray.value.find(item => item.value === props.value);
+    if (option) {
+      selectedLabel.value = option.label;
+    }
+  },
+  { deep: true }
+);
 
 const dropDownStyle = ref({});
 
@@ -95,16 +104,19 @@ function onOptionSelected(option: OptionData) {
   emits('input', option.value);
 }
 
-watch(selectedValue, (val) => {
+watch(selectedValue, val => {
   emits('change', val);
 });
 
-provide('select', reactive({
-  selectedValue,
-  onOptionCreated,
-  onOptionDestroyed,
-  onOptionSelected,
-}));
+provide(
+  'select',
+  reactive({
+    selectedValue,
+    onOptionCreated,
+    onOptionDestroyed,
+    onOptionSelected,
+  })
+);
 
 function handleClickSelect() {
   if (props.disabled) {
@@ -127,7 +139,8 @@ function handleDropDownPosition() {
   const bottomSize = document.body.offsetHeight - bottom;
   let dropDownContainerHeight = 0;
   if (!showSelectDropdown.value) {
-    selectDropDownRef.value.style = 'display:block;position:absolute;z-index:-1000';
+    selectDropDownRef.value.style =
+      'display:block;position:absolute;z-index:-1000';
     dropDownContainerHeight = selectDropDownRef.value.offsetHeight;
     selectDropDownRef.value.style = '';
   } else {
@@ -143,45 +156,48 @@ function handleClickOutside() {
     showSelectDropdown.value = false;
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
-
 .select-container {
   position: relative;
   height: 100%;
+
   .select-content {
-    box-sizing: border-box;
     position: relative;
-    border: 1px solid var(--border-color);
-    background-color: var(--background-color-7);
-    color: var(--font-color-3);
-    border-radius: 8px;
-    padding: 0px 16px;
-    cursor: pointer;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     height: 42px;
+    padding: 0 16px;
+    color: var(--font-color-3);
+    cursor: pointer;
+    background-color: var(--background-color-7);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+
     &.disabled {
-      background-color: rgba(255, 255, 255, 0.50);
-      color: #8F9AB2;
+      color: #8f9ab2;
       cursor: not-allowed;
+      background-color: rgba(255, 255, 255, 0.5);
     }
+
     .select-text {
+      flex: 1;
       width: 0;
+      overflow: hidden;
       font-size: 14px;
       font-style: normal;
       font-weight: 500;
       line-height: 22px;
-      flex: 1;
       white-space: nowrap;
-      overflow: hidden;
     }
+
     .arrow-icon {
       margin-left: 10px;
       transition: transform 0.2s;
       transform: rotate(0deg);
+
       &.reverse {
         transform: rotate(-180deg);
       }
@@ -189,19 +205,21 @@ function handleClickOutside() {
   }
 
   .select-dropdown-container {
+    position: absolute;
     min-width: 100%;
     max-height: 254px;
-    padding: 7px 0px;
-    position: absolute;
+    padding: 7px 0;
+    overflow: auto;
     background-color: var(--background-color-7);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    overflow: auto;
+
     &.down {
       top: calc(100% + 6px);
       left: 0;
       transform-origin: 50% 0;
     }
+
     &.up {
       bottom: calc(100% + 6px);
       left: 0;
@@ -212,15 +230,15 @@ function handleClickOutside() {
 
 .select-fade-enter-active,
 .select-fade-leave-to {
-  transform: scaleY(0);
   opacity: 0;
   transition: all 0.2s ease;
+  transform: scaleY(0);
 }
 
 .select-fade-enter-to,
 .select-fade-leave-from {
-  transform: scaleY(1);
   opacity: 1;
   transition: all 0.2s ease;
+  transform: scaleY(1);
 }
 </style>
