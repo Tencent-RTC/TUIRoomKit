@@ -8,8 +8,8 @@
       :disabled="screenShareDisabled"
       @click-icon="toggleScreenShare"
     >
-      <stop-screen-share-icon v-if="isSharing"></stop-screen-share-icon>
-      <screen-share-icon v-else></screen-share-icon>
+      <stop-screen-share-icon v-if="isSharing" />
+      <screen-share-icon v-else />
     </icon-button>
     <Dialog
       v-model="showStopShareRegion"
@@ -20,11 +20,24 @@
       :append-to-room-container="true"
     >
       <span>
-        {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
+        {{
+          t(
+            'Others will no longer see your screen after you stop sharing. Are you sure you want to stop?'
+          )
+        }}
+      </span>
       <template #footer>
         <span>
-          <tui-button size="default" @click="stopScreenShare">{{ t('End sharing') }}</tui-button>
-          <tui-button class="button" type="primary" size="default" @click="showStopShareRegion = false">{{ t('Cancel') }}</tui-button>
+          <tui-button size="default" @click="stopScreenShare">{{
+            t('End sharing')
+          }}</tui-button>
+          <tui-button
+            class="button"
+            type="primary"
+            size="default"
+            @click="showStopShareRegion = false"
+            >{{ t('Cancel') }}
+          </tui-button>
         </span>
       </template>
     </Dialog>
@@ -48,7 +61,7 @@
       <div>
         {{
           t(
-            'Due to macOS 10.15 system requirements, please check the current application in "System Preferences - Security & Privacy - Screen Recording".',
+            'Due to macOS 10.15 system requirements, please check the current application in "System Preferences - Security & Privacy - Screen Recording".'
           )
         }}
       </div>
@@ -56,7 +69,12 @@
         <tui-button size="default" @click="onPermissionScreenShare">
           {{ t('Open the system preferences settings') }}
         </tui-button>
-        <tui-button class="button" type="primary" size="default" @click="showPermissionVisible = false">
+        <tui-button
+          class="button"
+          type="primary"
+          size="default"
+          @click="showPermissionVisible = false"
+        >
           {{ t('Cancel') }}
         </tui-button>
       </template>
@@ -65,11 +83,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, computed, onUnmounted, watch } from 'vue';
+import { ref, Ref, computed, onUnmounted } from 'vue';
+import { ipcRenderer } from 'electron';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../../locales';
 import IconButton from '../../common/base/IconButton.vue';
-import TUIRoomEngine, { TUIRoomEvents, TRTCScreenCaptureSourceType, TRTCScreenCaptureSourceInfo } from '@tencentcloud/tuiroom-engine-electron';
+import TUIRoomEngine, {
+  TUIRoomEvents,
+  TRTCScreenCaptureSourceType,
+  TRTCScreenCaptureSourceInfo,
+} from '@tencentcloud/tuiroom-engine-electron';
 import ScreenWindowSelectDialog from './ScreenWindowSelectDialog.vue';
 import ScreenShareIcon from '../../common/icons/ScreenShareIcon.vue';
 import StopScreenShareIcon from '../../common/icons/StopScreenShareIcon.vue';
@@ -81,11 +104,19 @@ import eventBus from '../../../hooks/useMitt';
 import Dialog from '../../common/base/Dialog/index.vue';
 import TuiButton from '../../common/base/Button.vue';
 import logger from '../../../utils/common/logger';
+import { useBasicStore } from '../../../stores/basic';
 
 const { t } = useI18n();
 
 const roomStore = useRoomStore();
-const { isAudience, hasOtherScreenShare, isGeneralUser, isScreenShareDisableForAllUser } = storeToRefs(roomStore);
+const basicStore = useBasicStore();
+
+const {
+  isAudience,
+  hasOtherScreenShare,
+  isGeneralUser,
+  isScreenShareDisableForAllUser,
+} = storeToRefs(roomStore);
 const roomEngine = useGetRoomEngine();
 
 const logPrefix = '[ScreenShareControl]';
@@ -95,8 +126,12 @@ const isSharing: Ref<boolean> = ref(false);
 const showPermissionVisible: Ref<boolean> = ref(false);
 const showStopShareRegion: Ref<boolean> = ref(false);
 
-const screenShareDisabled = computed(() => isAudience.value);
-const title = computed(() => (isSharing.value ? t('End sharing') : t('Share screen')));
+const screenShareDisabled = computed(
+  () => isAudience.value || basicStore.isWhiteboardVisiable
+);
+const title = computed(() =>
+  isSharing.value ? t('End sharing') : t('Share screen')
+);
 
 const selectDialogVisible: Ref<boolean> = ref(false);
 const screenList: Ref<Array<TRTCScreenCaptureSourceInfo>> = ref([]);
@@ -111,7 +146,9 @@ async function toggleScreenShare() {
   if (isAudience.value) {
     TUIMessage({
       type: 'warning',
-      message: t('You currently do not have sharing permission, please raise your hand to apply for sharing permission first'),
+      message: t(
+        'You currently do not have sharing permission, please raise your hand to apply for sharing permission first'
+      ),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
@@ -120,7 +157,18 @@ async function toggleScreenShare() {
   if (hasOtherScreenShare.value) {
     TUIMessage({
       type: 'warning',
-      message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
+      message: t(
+        'Another user is currently sharing the screen, screen sharing is not possible.'
+      ),
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
+  }
+
+  if (basicStore.isWhiteboardVisiable) {
+    TUIMessage({
+      type: 'warning',
+      message: t('You are sharing the screen, please stop sharing first'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
@@ -129,7 +177,9 @@ async function toggleScreenShare() {
   if (isGeneralUser.value && isScreenShareDisableForAllUser.value) {
     TUIMessage({
       type: 'warning',
-      message: t('Failed to initiate screen sharing, currently only host/admin can share screen.'),
+      message: t(
+        'Failed to initiate screen sharing, currently only host/admin can share screen.'
+      ),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
@@ -139,18 +189,27 @@ async function toggleScreenShare() {
     showPermissionVisible.value = true;
   }
   if (!isSharing.value && !selectDialogVisible.value) {
-    const screenCaptureList: any = await roomEngine.instance?.getScreenSharingTarget();
-    screenList.value = screenCaptureList.filter((screen: TRTCScreenCaptureSourceInfo) =>
+    const screenCaptureList: any =
+      await roomEngine.instance?.getScreenSharingTarget();
+    screenList.value = screenCaptureList.filter(
+      (screen: TRTCScreenCaptureSourceInfo) =>
         screen.type === TRTCScreenCaptureSourceType.TRTCScreenCaptureSourceTypeScreen, // eslint-disable-line
     );
-    windowList.value = screenCaptureList.filter((screen: TRTCScreenCaptureSourceInfo) => screen.type === TRTCScreenCaptureSourceType.TRTCScreenCaptureSourceTypeWindow);
+    windowList.value = screenCaptureList.filter(
+      (screen: TRTCScreenCaptureSourceInfo) =>
+        screen.type ===
+        TRTCScreenCaptureSourceType.TRTCScreenCaptureSourceTypeWindow
+    );
     selectDialogVisible.value = true;
   }
 }
 
 async function onPermissionScreenShare() {
+  // eslint-disable-next-line
   const { shell } = require('electron');
-  shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture');
+  shell.openExternal(
+    'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture'
+  );
   showPermissionVisible.value = false;
 }
 
@@ -158,14 +217,30 @@ async function onConfirmScreenShare(screenInfo: TRTCScreenCaptureSourceInfo) {
   if (hasOtherScreenShare.value) {
     TUIMessage({
       type: 'warning',
-      message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
+      message: t(
+        'Another user is currently sharing the screen, screen sharing is not possible.'
+      ),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
   }
-  await roomEngine.instance?.startScreenSharingElectron({ targetId: screenInfo.sourceId });
+  await roomEngine.instance?.startScreenSharingElectron({
+    targetId: screenInfo.sourceId,
+  });
   isSharing.value = true;
+  basicStore.setIsSharing(true);
   selectDialogVisible.value = false;
+  if (screenInfo.type === 1) {
+    const { x } = screenInfo;
+    const { y } = screenInfo;
+    basicStore.setIsSharingScreen(true);
+    notifyScreenShareStarted({
+      x,
+      y,
+    });
+  } else {
+    basicStore.setIsSharingScreen(false);
+  }
 }
 
 async function stopScreenShare() {
@@ -174,6 +249,7 @@ async function stopScreenShare() {
       await roomEngine.instance?.stopScreenSharingElectron();
       showStopShareRegion.value = false;
       isSharing.value = false;
+      basicStore.setIsSharing(false);
     } catch (error) {
       logger.error(`${logPrefix}stopScreenShare error:`, error);
     }
@@ -184,16 +260,32 @@ async function stopScreenShare() {
  * (user clicked the ‘’End Sharing‘’ button that comes with the browser or was kicked off the stage by the moderator in speak on stage mode)*/
 function screenCaptureStopped() {
   isSharing.value = false;
+  basicStore.setIsSharing(false);
+  notifyScreenShareStopped();
+}
+
+function notifyScreenShareStarted(param: any) {
+  ipcRenderer.send('annotation:screen-share-started', param);
+}
+
+function notifyScreenShareStopped() {
+  ipcRenderer.send('annotation:screen-share-stopped');
 }
 
 eventBus.on('ScreenShare:stopScreenShare', stopScreenShare);
 TUIRoomEngine.once('ready', () => {
-  roomEngine.instance?.on(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
+  roomEngine.instance?.on(
+    TUIRoomEvents.onUserScreenCaptureStopped,
+    screenCaptureStopped
+  );
 });
 
 onUnmounted(() => {
   eventBus.off('ScreenShare:stopScreenShare', stopScreenShare);
-  roomEngine.instance?.off(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
+  roomEngine.instance?.off(
+    TUIRoomEvents.onUserScreenCaptureStopped,
+    screenCaptureStopped
+  );
 });
 </script>
 
@@ -201,27 +293,30 @@ onUnmounted(() => {
 .screen-share-control-container {
   position: relative;
 }
+
 .stop-share-region {
-  width: 131px;
-  height: 48px;
-  background: var(--stop-share-region-bg-color);
-  border-radius: 4px;
   position: absolute;
   top: -58px;
   left: 50%;
-  transform: translateX(-50%);
   display: flex;
-  justify-content: center;
   align-items: center;
-  cursor: pointer;
+  justify-content: center;
+  width: 131px;
+  height: 48px;
   font-size: 14px;
   color: var(--color-font);
+  cursor: pointer;
+  background: var(--stop-share-region-bg-color);
+  border-radius: 4px;
+  transform: translateX(-50%);
 }
+
 .stop-share-icon {
   width: 24px;
   height: 24px;
   margin-right: 10px;
 }
+
 .button {
   margin-left: 12px;
 }

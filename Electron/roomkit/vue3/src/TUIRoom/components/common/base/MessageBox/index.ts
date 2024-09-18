@@ -3,15 +3,26 @@ import { createVNode, render } from 'vue';
 import TUIMessageBox from './index.vue';
 
 export type MessageProps = {
-    title: string,
-    message: string,
-    callback?: () => void,
-    cancelButtonText?: string,
-    confirmButtonText?: string,
-}
-const MessageBox = ({ title, message, callback, cancelButtonText, confirmButtonText }: MessageProps) => {
+  title: string;
+  message: string;
+  callback?: () => void;
+  duration?: number;
+  cancelButtonText?: string;
+  confirmButtonText?: string;
+};
+const MessageBox = ({
+  title,
+  message,
+  callback,
+  duration,
+  cancelButtonText,
+  confirmButtonText,
+}: MessageProps) => {
   const container = document.createElement('div');
-  const fullscreenElement = document.fullscreenElement || document.getElementById('roomContainer') || document.getElementById('pre-conference-container');
+  const fullscreenElement =
+    document.fullscreenElement ||
+    document.getElementById('roomContainer') ||
+    document.getElementById('pre-conference-container');
   if (!fullscreenElement) return;
   fullscreenElement.appendChild(container);
 
@@ -24,6 +35,7 @@ const MessageBox = ({ title, message, callback, cancelButtonText, confirmButtonT
     title,
     message,
     callback,
+    duration,
     cancelButtonText,
     confirmButtonText,
     remove: onRemove,

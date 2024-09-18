@@ -3,16 +3,19 @@
     color: #00B89C;
     background-color: #EBFFFA;
   }
+
   .tui-theme-black & {
     color: #1CEACB;
     background-color: #19423C;
   }
 }
+
 @mixin err_color() {
   .tui-theme-white & {
     color: #E04343;
     background-color: #FFEBEE;
   }
+
   .tui-theme-black & {
     color: #F46262;
     background-color: #421414;
@@ -24,6 +27,7 @@
     color: #E59753;
     background-color: #FFF4EB;
   }
+
   .tui-theme-black & {
     color: #FFAD66;
     background-color: #3F2712;
@@ -35,6 +39,7 @@
     color: #494F6A;
     background-color: #EBF2FF;
   }
+
   .tui-theme-black & {
     color: #DCE7FA;
     background-color: #4A506B;

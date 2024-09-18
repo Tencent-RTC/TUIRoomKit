@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>redo</title>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g transform="translate(-88.000000, -80.000000)" stroke="#444E60">
+            <polyline transform="translate(97.000000, 90.000000) rotate(-360.000000) translate(-97.000000, -90.000000) " points="99 94 97 92 95 90 97 88 99 86"></polyline>
+            <path d="M95,90 L103,90 C104.104569,90 105,90.8954305 105,92 L105,98 L105,98"></path>
+        </g>
+    </g>
+</svg>

@@ -13,18 +13,23 @@ const readline = require('readline').createInterface({
 
 const defaultTargetDir = './src/components/TUIRoom';
 
-readline.question(`This script copies the TUIRoomKit source code to the ${defaultTargetDir} path, do you want to change the copy path? (y|n)`, (answer) => {
-  if (answer.toLocaleLowerCase() === 'y' || answer.toLocaleLowerCase() === 'yes') {
-    readline.question('Please enter your copy path: ', (targetDir) => {
-      copyTUIRoomKit(targetDir);
+readline.question(
+  `This script copies the TUIRoomKit source code to the ${defaultTargetDir} path, do you want to change the copy path? (y|n)`,
+  answer => {
+    if (
+      answer.toLocaleLowerCase() === 'y' ||
+      answer.toLocaleLowerCase() === 'yes'
+    ) {
+      readline.question('Please enter your copy path: ', targetDir => {
+        copyTUIRoomKit(targetDir);
+        readline.close();
+      });
+    } else {
+      copyTUIRoomKit();
       readline.close();
-    });
-  } else {
-    copyTUIRoomKit();
-    readline.close();
+    }
   }
-});
-
+);
 
 function copyTUIRoomKit(targetDir) {
   if (!targetDir) {
@@ -35,18 +40,22 @@ function copyTUIRoomKit(targetDir) {
 
   try {
     fs.accessSync(targetPath);
-    errorLog(`${targetDir} path already exists, if you want to copy it, please delete the target path first or re-specify it!`);
+    errorLog(
+      `${targetDir} path already exists, if you want to copy it, please delete the target path first or re-specify it!`
+    );
     return;
   } catch (error) {
     fs.mkdirSync(targetPath, { recursive: true });
   }
   copyExitsFolder(sourcePath, targetPath);
-  successLog(`The TUIRoomKit source code has been successfully copied to the ${targetDir} path!`);
+  successLog(
+    `The TUIRoomKit source code has been successfully copied to the ${targetDir} path!`
+  );
 }
 
 function copyExitsFolder(src, dest) {
   const files = fs.readdirSync(src);
-  files.forEach((file) => {
+  files.forEach(file => {
     const srcPath = path.join(src, file);
     const destPath = path.join(dest, file);
     if (fs.statSync(srcPath).isDirectory()) {

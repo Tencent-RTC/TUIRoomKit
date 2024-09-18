@@ -4,7 +4,8 @@
 
 <script>
 import { ConferenceMainView, conference, RoomEvent } from '@tencentcloud/roomkit-electron-vue2.7';
-
+import i18n from '../locales/index';
+import { getLanguage, getTheme } from  '../utils/utils';
 let isExpectedJump = false;
 
 export default {
@@ -41,6 +42,8 @@ export default {
   async mounted() {
     this.roomInfo = sessionStorage.getItem('tuiRoom-roomInfo');
     this.userInfo = sessionStorage.getItem('tuiRoom-userInfo');
+    conference.setLanguage(getLanguage());
+    conference.setTheme(getTheme());
     this.roomId = this.$route.query.roomId;
 
     if (!this.roomId) {
@@ -65,6 +68,8 @@ export default {
       conference.on(RoomEvent.KICKED_OFFLINE, this.backToHome);
       conference.on(RoomEvent.USER_SIG_EXPIRED, this.backToHomeAndClearUserInfo);
       conference.on(RoomEvent.USER_LOGOUT, this.backToHomeAndClearUserInfo);
+      conference.on(RoomEvent.LANGUAGE_CHANGED, this.changeLanguage);
+      conference.on(RoomEvent.THEME_CHANGED,  this.changeTheme);
       await conference.login({ sdkAppId, userId, userSig });
       await conference.setSelfInfo({ userName, avatarUrl });
       if (action === 'createRoom' && !hasCreated) {
@@ -85,13 +90,15 @@ export default {
     }
   },
   destroyed() {
-    conference.on(RoomEvent.ROOM_DISMISS, this.backToHome);
-    conference.on(RoomEvent.ROOM_LEAVE, this.backToHome);
-    conference.on(RoomEvent.KICKED_OUT, this.backToHome);
-    conference.on(RoomEvent.ROOM_ERROR, this.backToHome);
-    conference.on(RoomEvent.KICKED_OFFLINE, this.backToHome);
-    conference.on(RoomEvent.USER_SIG_EXPIRED, this.backToHomeAndClearUserInfo);
-    conference.on(RoomEvent.USER_LOGOUT, this.backToHomeAndClearUserInfo);
+    conference.off(RoomEvent.ROOM_DISMISS, this.backToHome);
+    conference.off(RoomEvent.ROOM_LEAVE, this.backToHome);
+    conference.off(RoomEvent.KICKED_OUT, this.backToHome);
+    conference.off(RoomEvent.ROOM_ERROR, this.backToHome);
+    conference.off(RoomEvent.KICKED_OFFLINE, this.backToHome);
+    conference.off(RoomEvent.USER_SIG_EXPIRED, this.backToHomeAndClearUserInfo);
+    conference.off(RoomEvent.USER_LOGOUT, this.backToHomeAndClearUserInfo);
+    conference.off(RoomEvent.LANGUAGE_CHANGED,  this.changeLanguage);
+    conference.off(RoomEvent.THEME_CHANGED,  this.changeTheme);
   },
   methods: {
     backToPage(page, shouldClearUserInfo) {
@@ -114,17 +121,24 @@ export default {
         console.warn('vue-router error:', error);
       });
     },
+    changeTheme(theme) {
+      localStorage.setItem('tuiRoom-currentTheme', theme);
+    },
+    changeLanguage(Language) {
+      i18n.global.locale.value = Language;
+      localStorage.setItem('tuiRoom-language', Language);
+    },
   },
 };
 </script>
 
 <style lang="scss">
 #app {
-  font-family: PingFang SC;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   position: relative;
   width: 100%;
   height: 100%;
+  font-family: 'PingFang SC';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 </style>

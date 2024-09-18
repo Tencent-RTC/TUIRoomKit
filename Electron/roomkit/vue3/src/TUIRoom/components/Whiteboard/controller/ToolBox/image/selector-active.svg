@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.1 (78136) - https://sketchapp.com -->
+    <title>selector</title>
+    <desc>Created with Sketch.</desc>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="selector" transform="translate(1.000000, 1.000000)">
+            <path d="M7,14 L2,14 C0.8954305,14 0,13.1045695 0,12 L0,2 C0,0.8954305 0.8954305,0 2,0 L12,0 C13.1045695,0 14,0.8954305 14,2 L14,7 L14,7" stroke="#3381FF" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polygon fill="#3381FF" fill-rule="nonzero" points="8 8 14 10 11.3333333 11.3333333 10 14"></polygon>
+        </g>
+    </g>
+</svg>

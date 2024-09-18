@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>click@1x</title>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g stroke="#444E60">
+            <polygon points="7 5.07179677 8.66987298 17.9641016 11.9090909 13.5745916 17.330127 12.9641016"></polygon>
+            <line x1="12" y1="13.7320508" x2="15" y2="18.9282032"></line>
+            <polygon points="7 5.07179677 8.66987298 17.9641016 11.9090909 13.5745916 17.330127 12.9641016"></polygon>
+            <line x1="12" y1="13.7320508" x2="15" y2="18.9282032"></line>
+        </g>
+    </g>
+</svg>

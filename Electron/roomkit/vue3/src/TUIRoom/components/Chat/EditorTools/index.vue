@@ -1,6 +1,10 @@
 <template>
   <div class="emoji-tool">
-    <svg-icon :icon="EmojiIcon" class="emoji-icon" @click.stop="handleEmojiToobar"></svg-icon>
+    <svg-icon
+      :icon="EmojiIcon"
+      class="emoji-icon"
+      @click.stop="handleEmojiToobar"
+    />
     <div
       v-show="showEmojiToolbar"
       v-click-outside="handleClickOutsideEmojiToobar"
@@ -44,14 +48,13 @@ const handleClickOutsideEmojiToobar = () => {
 
 <style lang="scss" scoped>
 .tui-theme-white .emoji-list {
-  --emoji-box-shadow:
-    0px 2px 4px -3px rgba(32, 77, 141, 0.03),
+  --emoji-box-shadow: 0px 2px 4px -3px rgba(32, 77, 141, 0.03),
     0px 6px 10px 1px rgba(32, 77, 141, 0.06),
     0px 3px 14px 2px rgba(32, 77, 141, 0.05);
 }
+
 .tui-theme-black .emoji-list {
-  --emoji-box-shadow:
-    0px 8px 40px 0px rgba(23, 25, 31, 0.6),
+  --emoji-box-shadow: 0px 8px 40px 0px rgba(23, 25, 31, 0.6),
     0px 4px 12px 0px rgba(23, 25, 31, 0.8);
 }
 
@@ -59,41 +62,45 @@ const handleClickOutsideEmojiToobar = () => {
   .emoji-icon {
     cursor: pointer;
   }
+
   .emoji-list,
   .emoji-list-h5 {
-    height: 204px;
-    width: 100%;
     position: absolute;
     bottom: 160px;
-    left: 0px;
+    left: 0;
     display: flex;
     flex-wrap: wrap;
+    gap: 5px;
+    width: 100%;
+    height: 204px;
+    padding: 10px;
     overflow-y: auto;
     background-color: var(--background-color-8);
-    padding: 10px;
     border-radius: 8px;
     box-shadow: var(--emoji-box-shadow);
-    gap: 5px;
 
     &::-webkit-scrollbar {
       display: none;
     }
+
     .emoji-item {
       &:hover {
         cursor: pointer;
       }
     }
+
     img {
       width: 23px;
       height: 23px;
     }
   }
+
   .emoji-list-h5 {
-    width: 298px;
-    height: 148px;
     position: fixed;
     bottom: 77px;
     left: 30px;
+    width: 298px;
+    height: 148px;
   }
 }
 </style>

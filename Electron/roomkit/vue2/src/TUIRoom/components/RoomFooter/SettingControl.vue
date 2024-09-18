@@ -5,7 +5,7 @@
       :title="t('Settings')"
       @click-icon="handleShowSettingDialog"
     >
-      <setting-icon></setting-icon>
+      <setting-icon />
     </icon-button>
   </div>
 </template>
@@ -27,5 +27,4 @@ function handleShowSettingDialog() {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

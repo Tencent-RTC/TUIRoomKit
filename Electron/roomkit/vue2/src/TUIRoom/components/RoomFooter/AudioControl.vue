@@ -10,11 +10,11 @@
   <div>
     <audio-media-control
       :has-more="hasMore"
-      :is-muted="!localStream.hasAudioStream"
+      :is-muted="!localUser.hasAudioStream"
       :is-disabled="isLocalAudioIconDisable"
-      :audio-volume="userVolumeObj[localStream.userId]"
+      :audio-volume="userVolumeObj[localUser.userId]"
       @click="handleAudioMediaClick"
-    ></audio-media-control>
+    />
     <Dialog
       v-model="showRequestOpenMicDialog"
       :title="t('Tips')"
@@ -30,14 +30,15 @@
     >
       <span>{{ dialogContent }}</span>
       <template #footer>
-        <tui-button
-          class="agree-button"
-          size="default"
-          @click="handleAccept"
-        >
+        <tui-button class="agree-button" size="default" @click="handleAccept">
           {{ t('Turn on the microphone') }}
         </tui-button>
-        <tui-button class="cancel-button" size="default" type="primary" @click="handleReject">
+        <tui-button
+          class="cancel-button"
+          size="default"
+          type="primary"
+          @click="handleReject"
+        >
           {{ t('Keep it closed') }}
         </tui-button>
       </template>
@@ -46,21 +47,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, onUnmounted, computed, watch } from 'vue';
+import { ref, Ref, onUnmounted, computed, defineEmits } from 'vue';
 import { storeToRefs } from 'pinia';
 import TUIMessage from '../common/base/Message/index';
 import Dialog from '../common/base/Dialog/index.vue';
 import { useRoomStore } from '../../stores/room';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../constants/message';
 import { useI18n } from '../../locales';
-import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRole } from '@tencentcloud/tuiroom-engine-electron';
+import TUIRoomEngine, {
+  TUIRoomEvents,
+  TUIRequest,
+  TUIRequestAction,
+  TUIRole,
+} from '@tencentcloud/tuiroom-engine-electron';
 import useRoomEngine from '../../hooks/useRoomEngine';
 import { isMobile, isWeChat } from '../../utils/environment';
 import TuiButton from '../common/base/Button.vue';
 import AudioMediaControl from '../common/AudioMediaControl.vue';
 import { useBasicStore } from '../../stores/basic';
 import TUIMessageBox from '../common/base/MessageBox/index';
-
 
 const roomEngine = useRoomEngine();
 
@@ -69,7 +74,7 @@ const basicStore = useBasicStore();
 
 const {
   isAudience,
-  localStream,
+  localUser,
   isLocalAudioIconDisable,
   isMicrophoneDisableForAllUser,
   userVolumeObj,
@@ -100,7 +105,7 @@ async function toggleMuteAudio() {
     });
     return;
   }
-  if (localStream.value.hasAudioStream) {
+  if (localUser.value.hasAudioStream) {
     await roomEngine.instance?.muteLocalAudio();
     // If everyone is muted, the user will not be able to turn the microphone back on after voluntarily turning it off.
     if (roomStore.isMicrophoneDisableForAllUser) {
@@ -128,14 +133,19 @@ async function toggleMuteAudio() {
 
 /**
  * Handling host or administrator turn on/off microphone signalling
-**/
+ **/
 const showRequestOpenMicDialog: Ref<boolean> = ref(false);
 const requestOpenMicRequestId: Ref<string> = ref('');
 async function onRequestReceived(eventInfo: { request: TUIRequest }) {
   const { userId, requestAction, requestId } = eventInfo.request;
   if (requestAction === TUIRequestAction.kRequestToOpenRemoteMicrophone) {
-    const userRole = roomStore.getUserRole(userId) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
-    dialogContent.value = t('Sb invites you to turn on the microphone', { role: userRole });
+    const userRole =
+      roomStore.getUserRole(userId) === TUIRole.kRoomOwner
+        ? t('RoomOwner')
+        : t('Admin');
+    dialogContent.value = t('Sb invites you to turn on the microphone', {
+      role: userRole,
+    });
     requestOpenMicRequestId.value = requestId;
     showRequestOpenMicDialog.value = true;
   }
@@ -175,9 +185,11 @@ TUIRoomEngine.once('ready', () => {
 
 onUnmounted(() => {
   roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
-  roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
+  roomEngine.instance?.off(
+    TUIRoomEvents.onRequestCancelled,
+    onRequestCancelled
+  );
 });
-
 </script>
 
 <style lang="scss" scoped>

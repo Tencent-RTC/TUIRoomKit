@@ -9,10 +9,10 @@
   <div>
     <video-media-control
       :has-more="hasMore"
-      :is-muted="!localStream.hasVideoStream"
+      :is-muted="!localUser.hasVideoStream"
       :is-disabled="isLocalVideoIconDisable"
       @click="handleVideoMediaClick"
-    ></video-media-control>
+    />
     <Dialog
       v-model="showRequestOpenCameraDialog"
       :title="t('Tips')"
@@ -30,8 +30,15 @@
         {{ dialogContent }}
       </span>
       <template #footer>
-        <tui-button class="cancel-button" size="default" @click="handleAccept">{{ t('Turn on the camera') }}</tui-button>
-        <tui-button class="cancel-button" size="default" type="primary" @click="handleReject">
+        <tui-button class="cancel-button" size="default" @click="handleAccept">
+          {{ t('Turn on the camera') }}
+        </tui-button>
+        <tui-button
+          class="cancel-button"
+          size="default"
+          type="primary"
+          @click="handleReject"
+        >
           {{ t('Keep it closed') }}
         </tui-button>
       </template>
@@ -40,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted, Ref } from 'vue';
+import { ref, computed, onUnmounted, Ref, defineEmits } from 'vue';
 import { storeToRefs } from 'pinia';
 import Dialog from '../common/base/Dialog/index.vue';
 import VideoMediaControl from '../common/VideoMediaControl.vue';
@@ -50,13 +57,18 @@ import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import useDeviceManager from '../../hooks/useDeviceManager';
-import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRole, TUIMediaDeviceType } from '@tencentcloud/tuiroom-engine-electron';
-import { isMobile, isWeChat, isH5 }  from '../../utils/environment';
+import TUIRoomEngine, {
+  TUIRoomEvents,
+  TUIRequest,
+  TUIRequestAction,
+  TUIRole,
+  TUIMediaDeviceType,
+} from '@tencentcloud/tuiroom-engine-electron';
+import { isMobile, isWeChat } from '../../utils/environment';
 import { useBasicStore } from '../../stores/basic';
 import TuiButton from '../common/base/Button.vue';
 import TUIMessage from '../common/base/Message/index';
 import TUIMessageBox from '../common/base/MessageBox/index';
-import { SMALL_VIDEO_ENC_PARAM } from '../../constants/room';
 const roomEngine = useGetRoomEngine();
 const { deviceManager } = useDeviceManager();
 
@@ -68,7 +80,7 @@ const emits = defineEmits(['click']);
 const {
   isCameraDisableForAllUser,
   isAudience,
-  localStream,
+  localUser,
   isLocalVideoIconDisable,
 } = storeToRefs(roomStore);
 const { t } = useI18n();
@@ -96,7 +108,7 @@ async function toggleMuteVideo() {
     return;
   }
 
-  if (localStream.value.hasVideoStream) {
+  if (localUser.value.hasVideoStream) {
     await roomEngine.instance?.closeLocalCamera();
     // If the picture is banned for all members, the user cannot turn it on again after voluntarily turning off the camera.
     if (roomStore.isCameraDisableForAllUser) {
@@ -117,11 +129,9 @@ async function toggleMuteVideo() {
       return;
     }
     if (isMobile) {
-      if (isH5) {
-        const trtcCloud = roomEngine.instance?.getTRTCCloud();
-        trtcCloud.enableSmallVideoStream(false, SMALL_VIDEO_ENC_PARAM);
-      }
-      await roomEngine.instance?.openLocalCamera({ isFrontCamera: basicStore.isFrontCamera });
+      await roomEngine.instance?.openLocalCamera({
+        isFrontCamera: basicStore.isFrontCamera,
+      });
     } else {
       await roomEngine.instance?.openLocalCamera();
     }
@@ -129,17 +139,21 @@ async function toggleMuteVideo() {
   showVideoSettingTab.value = false;
 }
 
-
 /**
  * Handling host or administrator turn on/off camera signalling
-**/
+ **/
 const showRequestOpenCameraDialog: Ref<boolean> = ref(false);
 const requestOpenCameraRequestId: Ref<string> = ref('');
 async function onRequestReceived(eventInfo: { request: TUIRequest }) {
   const { userId, requestAction, requestId } = eventInfo.request;
   if (requestAction === TUIRequestAction.kRequestToOpenRemoteCamera) {
-    const userRole = roomStore.getUserRole(userId) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
-    dialogContent.value = t('Sb invites you to turn on the camera', { role: userRole });
+    const userRole =
+      roomStore.getUserRole(userId) === TUIRole.kRoomOwner
+        ? t('RoomOwner')
+        : t('Admin');
+    dialogContent.value = t('Sb invites you to turn on the camera', {
+      role: userRole,
+    });
     requestOpenCameraRequestId.value = requestId;
     showRequestOpenCameraDialog.value = true;
   }
@@ -181,40 +195,15 @@ TUIRoomEngine.once('ready', () => {
 
 onUnmounted(() => {
   roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
-  roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
+  roomEngine.instance?.off(
+    TUIRoomEvents.onRequestCancelled,
+    onRequestCancelled
+  );
 });
-
 </script>
 
 <style lang="scss" scoped>
-
-$videoTabWidth: 320px;
-
-.video-control-container {
-    position: relative;
-    .video-tab {
-      position: absolute;
-      bottom: 90px;
-      left: -60px;
-      width: $videoTabWidth;
-      background: var(--room-videotab-bg-color);
-      padding: 20px;
-    }
-  }
-  .agree, .cancel{
-    padding: 14px;
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--active-color-1);
-    font-size: 16px;
-    font-weight: 500;
-  }
-  .cancel{
-    color: var(--font-color-4);
-  }
- .cancel-button {
+.cancel-button {
   margin-left: 20px;
 }
 </style>

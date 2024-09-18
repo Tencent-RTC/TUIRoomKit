@@ -1,13 +1,15 @@
 <template>
   <Transition name="message">
     <div
-      v-show="isShow" ref="messageRef" :class="['t-message', `t-message-${props.type}`]"
+      v-show="isShow"
+      ref="messageRef"
+      :class="['t-message', `t-message-${props.type}`]"
       :style="{
         top: props.top.value,
-        zIndex: props.zIndex
+        zIndex: props.zIndex,
       }"
     >
-      <svg-icon :icon="svgName" class="t-message-icon"></svg-icon>
+      <svg-icon :icon="svgName" class="t-message-icon" />
       <span class="t-message-text">{{ props.message }}</span>
     </div>
   </Transition>
@@ -19,7 +21,6 @@ import success from './images/success.vue';
 import error from './images/error.vue';
 import warning from './images/warning.vue';
 import info from './images/info.vue';
-
 
 const props = defineProps({
   type: {
@@ -74,5 +75,5 @@ const onClose = () => {
 </script>
 
 <style lang="scss" scoped>
-@import "./Message.scss";
+@import './Message.scss';
 </style>

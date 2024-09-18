@@ -13,7 +13,7 @@
         @click-icon="toggleManageStage"
       />
     </tui-badge>
-    <master-apply-control v-show="showApplyUserList"></master-apply-control>
+    <master-apply-control v-show="showApplyUserList" />
   </div>
 </template>
 
@@ -52,5 +52,4 @@ function toggleManageStage() {
 }
 
 handleShowNotification();
-
 </script>

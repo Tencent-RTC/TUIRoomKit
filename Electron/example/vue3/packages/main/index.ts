@@ -1,6 +1,16 @@
-import { app, BrowserWindow, shell, screen, systemPreferences, crashReporter, ipcMain } from 'electron'
-import { release } from 'os'
-import { join, resolve } from 'path'
+import {
+  app,
+  BrowserWindow,
+  shell,
+  screen,
+  systemPreferences,
+  crashReporter,
+  ipcMain,
+} from 'electron';
+import { release } from 'os';
+import { join, resolve } from 'path';
+import { initWhiteboardWindow } from './whiteboard';
+import { initAnnotationWindow } from './annotation';
 
 // Enable crash capture
 crashReporter.start({
@@ -15,7 +25,7 @@ let crashFilePath = '';
 let crashDumpsDir = '';
 try {
   // Low version of electron
-  crashFilePath = join(app.getPath('temp'), app.getName() + ' Crashes');
+  crashFilePath = join(app.getPath('temp'), `${app.getName()} Crashes`);
   console.log('————————crash path:', crashFilePath);
 
   // High version of electron
@@ -28,16 +38,16 @@ try {
 const PROTOCOL = 'tuiroom';
 
 // Disable GPU Acceleration for Windows 7
-if (release().startsWith('6.1')) app.disableHardwareAcceleration()
+if (release().startsWith('6.1')) app.disableHardwareAcceleration();
 
 // Set application name for Windows 10+ notifications
-if (process.platform === 'win32') app.setAppUserModelId(app.getName())
+if (process.platform === 'win32') app.setAppUserModelId(app.getName());
 
 if (!app.requestSingleInstanceLock()) {
-  app.quit()
-  process.exit(0)
+  app.quit();
+  process.exit(0);
 }
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
 
 let isHasScreen = false;
 async function checkAndApplyDevicePrivilege() {
@@ -60,7 +70,7 @@ async function checkAndApplyDevicePrivilege() {
   }
 }
 
-let win: BrowserWindow | null = null
+let mainWin: BrowserWindow | null = null;
 let schemeRoomId = '';
 
 function registerScheme() {
@@ -89,15 +99,15 @@ function handleUrl(url: string) {
   const urlObj = new URL(url);
   const { searchParams } = urlObj;
   schemeRoomId = searchParams.get('roomId') || '';
-  if (win && win.webContents) {
-    win?.webContents.send('launch-room', schemeRoomId);
+  if (mainWin && mainWin.webContents) {
+    mainWin?.webContents.send('launch-room', schemeRoomId);
   }
 }
 
 async function createWindow() {
   await checkAndApplyDevicePrivilege();
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  win = new BrowserWindow({
+  mainWin = new BrowserWindow({
     title: 'Main window',
     width,
     height,
@@ -108,68 +118,78 @@ async function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
-  })
+  });
+
+  mainWin.on('close', () => {
+    mainWin = null;
+  });
 
   if (app.isPackaged) {
     if (schemeRoomId) {
-      win.loadFile(join(__dirname, `../renderer/index.html`), {
-        hash: `home?roomId=${schemeRoomId}`
+      mainWin.loadFile(join(__dirname, `../renderer/index.html`), {
+        hash: `home?roomId=${schemeRoomId}`,
       });
     } else {
-      win.loadFile(join(__dirname, '../renderer/index.html'))
+      mainWin.loadFile(join(__dirname, '../renderer/index.html'));
     }
   } else {
     // 🚧 Use ['ENV_NAME'] avoid vite:define plugin
-    const installExtension = require('electron-devtools-installer')
-    installExtension.default(installExtension.VUEJS_DEVTOOLS)
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const installExtension = require('electron-devtools-installer');
+    installExtension
+      .default(installExtension.VUEJS_DEVTOOLS)
       .then(() => {})
       .catch((err: Error) => {
-        console.log('Unable to install `vue-devtools`: \n', err)
+        console.log('Unable to install `vue-devtools`: \n', err);
       });
-    const url = `http://${process.env['VITE_DEV_SERVER_HOST']}:${process.env['VITE_DEV_SERVER_PORT']}`
+    // eslint-disable-next-line
+    const url = `http://${process.env['VITE_DEV_SERVER_HOST']}:${process.env['VITE_DEV_SERVER_PORT']}`;
 
-    win.loadURL(url)
-    // win.webContents.openDevTools()
+    mainWin.loadURL(url);
+    // mainWin.webContents.openDevTools();
   }
 
   // Test active push message to Renderer-process
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', {
-      isHasScreen
-    })
-  })
+  mainWin.webContents.on('did-finish-load', () => {
+    mainWin?.webContents.send('main-process-message', {
+      isHasScreen,
+    });
+  });
 
   // Make all links open with the browser, not with the application
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('https:')) shell.openExternal(url)
-    return { action: 'deny' }
-  })
+  mainWin.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https:')) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
+  initWhiteboardWindow(mainWin);
+  initAnnotationWindow(mainWin);
 }
 
 registerScheme();
-app.whenReady().then(createWindow)
+app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
-  win = null
-  if (process.platform !== 'darwin') app.quit()
-})
+  mainWin = null;
+  if (process.platform !== 'darwin') app.quit();
+});
 
 app.on('second-instance', () => {
-  if (win) {
+  if (mainWin) {
     // Focus on the main window if the user tried to open another
-    if (win.isMinimized()) win.restore()
-    win.focus()
+    if (mainWin.isMinimized()) mainWin.restore();
+    mainWin.focus();
   }
-})
+});
 
 app.on('activate', () => {
-  const allWindows = BrowserWindow.getAllWindows()
+  const allWindows = BrowserWindow.getAllWindows();
   if (allWindows.length) {
-    allWindows[0].focus()
+    allWindows[0].focus();
   } else {
-    createWindow()
+    createWindow();
   }
-})
+});
 
 // When started via protocol URL on macOS, the master instance receives this URL via the open-url event
 app.on('open-url', (event, urlStr) => {
@@ -177,26 +197,26 @@ app.on('open-url', (event, urlStr) => {
 });
 
 // new window example arg: new windows url
-ipcMain.handle("open-win", (event, arg) => {
+ipcMain.handle('open-win', (event, arg) => {
   const childWindow = new BrowserWindow({
     webPreferences: {
-      preload: join(__dirname, "../preload/index.cjs"),
+      preload: join(__dirname, '../preload/index.cjs'),
     },
   });
 
   if (app.isPackaged) {
     childWindow.loadFile(join(__dirname, `../renderer/index.html`), {
       hash: `${arg}`,
-    })
+    });
   } else {
     // 🚧 Use ['ENV_NAME'] avoid vite:define plugin
-    const url = `http://${process.env["VITE_DEV_SERVER_HOST"]}:${process.env["VITE_DEV_SERVER_PORT"]}/#${arg}`
+    const url = `http://${process.env.VITE_DEV_SERVER_HOST}:${process.env.VITE_DEV_SERVER_PORT}/#${arg}`;
     childWindow.loadURL(url);
     // childWindow.webContents.openDevTools({ mode: "undocked", activate: true })
   }
 });
 
 ipcMain.on('app-exit', () => {
-  win?.close();
+  mainWin?.close();
   app.exit();
-})
+});

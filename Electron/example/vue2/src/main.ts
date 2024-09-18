@@ -25,4 +25,5 @@ new Vue({
   // @ts-ignore
   router,
   render: h => h(App),
-}).$mount('#app').$nextTick(window.removeLoading);
+}).$mount('#app')
+  .$nextTick(window.removeLoading);

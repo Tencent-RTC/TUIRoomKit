@@ -3,16 +3,32 @@
     <div v-if="isShowRoomInfoTitle">
       <div class="title-container" @click.stop="toggleShowRoomInfoStatus">
         <span class="text">{{ conferenceTitle }}</span>
-        <svg-icon :class="['arrow-icon', { 'arrow-down-icon': arrowDirection }]" :icon="Arrow"></svg-icon>
-        <room-time class="room-timing"></room-time>
+        <svg-icon
+          :class="['arrow-icon', { 'arrow-down-icon': arrowDirection }]"
+          :icon="Arrow"
+        />
+        <room-time class="room-timing" />
       </div>
     </div>
-    <div v-if="isShowRoomInfo" v-click-outside="handleClickOutsideRoomInfoContainer" class="roomInfo-container">
-      <div v-for="item in roomInfoTabList" v-show="item.visible" :key="item.id" class="roomInfo-content">
+    <div
+      v-if="isShowRoomInfo"
+      v-click-outside="handleClickOutsideRoomInfoContainer"
+      class="roomInfo-container"
+    >
+      <div
+        v-for="item in roomInfoTabList"
+        v-show="item.visible"
+        :key="item.id"
+        class="roomInfo-content"
+      >
         <span class="roomInfo-title">{{ t(item.title) }}</span>
         <span class="roomInfo-item">{{ item.content }}</span>
-        <div v-if="item.isShowCopyIcon" class="copy-container" @click="onCopy(item.copyLink)">
-          <svg-icon class="copy" :icon="copyIcon"></svg-icon>
+        <div
+          v-if="item.isShowCopyIcon"
+          class="copy-container"
+          @click="onCopy(item.copyLink)"
+        >
+          <svg-icon class="copy" :icon="copyIcon" />
           <span>{{ t('Copy') }}</span>
         </div>
       </div>
@@ -44,18 +60,21 @@ const {
 .tui-theme-white .roomInfo-container {
   --title-font-color: var(--font-color-1);
   --item-font-color: var(--font-color-6);
-  --filter-color: drop-shadow(0px 0px 4px rgba(32, 77, 141, 0.03)) drop-shadow(0px 4px 10px rgba(32, 77, 141, 0.06))
+  --filter-color: drop-shadow(0px 0px 4px rgba(32, 77, 141, 0.03))
+    drop-shadow(0px 4px 10px rgba(32, 77, 141, 0.06))
     drop-shadow(0px 1px 14px rgba(32, 77, 141, 0.05));
 }
+
 .tui-theme-black .roomInfo-container {
   --title-font-color: #8f9ab2;
   --item-font-color: var(--font-color-1);
-  --filter-color: drop-shadow(0px 8px 40px rgba(23, 25, 31, 0.6)) drop-shadow(0px 4px 12px rgba(23, 25, 31, 0.4));
+  --filter-color: drop-shadow(0px 8px 40px rgba(23, 25, 31, 0.6))
+    drop-shadow(0px 4px 12px rgba(23, 25, 31, 0.4));
 }
 
 .conference-container {
-  min-width: 140px;
   position: relative;
+  min-width: 140px;
 }
 
 .title-container {
@@ -68,59 +87,68 @@ const {
   line-height: 24px;
   cursor: pointer;
 }
+
 .arrow-icon {
   display: flex;
-  margin-left: 5px;
-  background-size: cover;
+  align-items: center;
   width: 16px;
   height: 16px;
-  align-items: center;
+  margin-left: 5px;
+  background-size: cover;
   transform: rotateX(180deg);
 }
+
 .arrow-down-icon {
   transform: rotateX(0);
 }
+
 .room-timing {
   padding-left: 12px;
 }
+
 .roomInfo-container {
   position: absolute;
-  left: 50%;
   top: calc(100% - 12px);
-  transform: translateX(-50%);
-  padding: 20px;
+  left: 50%;
   box-sizing: border-box;
-  background-color: var(--background-color-2);
-  border-radius: 16px;
-  filter: var(--filter-color);
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 20px;
+  background-color: var(--background-color-2);
+  filter: var(--filter-color);
+  border-radius: 16px;
+  transform: translateX(-50%);
+
   .roomInfo-content {
     display: flex;
-    min-width: 300px;
     align-items: stretch;
+    min-width: 300px;
     font-size: 14px;
     font-weight: 400;
     line-height: normal;
     letter-spacing: -0.24px;
+
     .roomInfo-title {
       flex-basis: 30%;
       color: var(--title-font-color);
     }
+
     .roomInfo-item {
       flex-basis: 50%;
-      overflow: hidden;
       max-width: 300px;
+      overflow: hidden;
+      color: var(--item-font-color);
       text-overflow: ellipsis;
       white-space: nowrap;
-      color: var(--item-font-color);
     }
+
     .copy-container {
-      margin-left: auto;
       display: flex;
-      cursor: pointer;
+      margin-left: auto;
       color: var(--active-color-2);
+      cursor: pointer;
+
       .copy {
         width: 20px;
         height: 20px;

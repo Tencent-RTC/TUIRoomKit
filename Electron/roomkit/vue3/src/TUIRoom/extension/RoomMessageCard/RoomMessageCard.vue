@@ -1,41 +1,55 @@
 <template>
   <div
     v-if="roomCardData.isRoomMessage"
-    :class="['room-message-container', roomCardData.isMessageFromMe ? 'isMe' : 'notMe']"
+    :class="[
+      'room-message-container',
+      roomCardData.isMessageFromMe ? 'isMe' : 'notMe',
+    ]"
   >
     <div :class="['room-message-card-container', roomCardData.roomState]">
       <div class="content">
         <div :class="['content-title', contentTitleClass]">
           <span class="icon"></span>
-          <p v-if="RoomState.CREATED === roomCardData.roomState">{{ t('Meeting in progress') }}</p>
+          <p v-if="RoomState.CREATED === roomCardData.roomState">
+            {{ t('Meeting in progress') }}
+          </p>
           <p v-else>{{ t('Meeting') }}</p>
         </div>
         <div class="content-desc">
           <div class="title">
-            {{ `${roomCardData.ownerName || roomCardData.owner}${t('Quick Conference')}` }}
+            {{
+              `${roomCardData.ownerName || roomCardData.owner}${t('Quick Conference')}`
+            }}
           </div>
           <ul class="users">
-            <template
-              v-for="(user, index) in roomCardData.userList"
-              :key="user.userId"
-            >
-              <li v-if="index <= 4">
+            <template v-for="(user, index) in roomCardData.userList">
+              <li v-if="index <= 4" :key="user.userId">
                 <img
                   :src="user.faceUrl || defaultAvatarUrl"
-                  :alt="user.nickName || user.userId" :onerror="avatarLoadError"
+                  :alt="user.nickName || user.userId"
+                  :onerror="avatarLoadError"
                 />
               </li>
-              <li v-if="index === 5" class="more">
-                ...
-              </li>
+              <li v-if="index === 5" class="more" :key="user.userId">...</li>
             </template>
           </ul>
         </div>
       </div>
-      <div :class="['footer', footerClass, roomCardData.isInnerRoom && 'in-room']">
-        <span v-if="roomInfo.visible" class="room-info">{{ roomInfo.message }}</span>
-        <span v-if="roomStatus.visible" :class="['room-status']" @click="enterRoom">{{ roomStatus.message }}</span>
-        <span v-if="roomDestroy.visible" :class="['room-info', 'center']">{{ roomDestroy.message }}</span>
+      <div
+        :class="['footer', footerClass, roomCardData.isInnerRoom && 'in-room']"
+      >
+        <span v-if="roomInfo.visible" class="room-info">{{
+          roomInfo.message
+        }}</span>
+        <span
+          v-if="roomStatus.visible"
+          :class="['room-status']"
+          @click="enterRoom"
+          >{{ roomStatus.message }}
+        </span>
+        <span v-if="roomDestroy.visible" :class="['room-info', 'center']">{{
+          roomDestroy.message
+        }}</span>
       </div>
     </div>
   </div>
@@ -49,7 +63,7 @@ import { Message, Profile } from '@tencentcloud/chat';
 import { useI18n } from '../../locales/index';
 const { t } = useI18n();
 const props = defineProps<{
-  message: Message
+  message: Message;
 }>();
 const roomCardData = ref<MessageData>({
   roomId: '',
@@ -69,7 +83,8 @@ watchEffect(() => {
   const {
     isRoomMessage,
     isRoomCreateByMe,
-    roomState, userList,
+    roomState,
+    userList,
     roomId,
     isInnerRoom,
     myProfile,
@@ -118,18 +133,29 @@ const roomInfo = computed(() => {
       message: `${t('Initiating')}...`,
     };
   }
-  if (roomCardData.value.isRoomCreateByMe && roomCardData.value.roomState === RoomState.CREATED) {
+  if (
+    roomCardData.value.isRoomCreateByMe &&
+    roomCardData.value.roomState === RoomState.CREATED
+  ) {
     return {
       visible: true,
-      message: roomCardData.value.userList.length > 1
-        ? t('X people have joined', { number: roomCardData.value.userList.length - 1 })
-        : t('Waiting for members to join the meeting'),
+      message:
+        roomCardData.value.userList.length > 1
+          ? t('X people have joined', {
+              number: roomCardData.value.userList.length - 1,
+            })
+          : t('Waiting for members to join the meeting'),
     };
   }
-  if (!roomCardData.value.isRoomCreateByMe && roomCardData.value.roomState === RoomState.CREATED) {
+  if (
+    !roomCardData.value.isRoomCreateByMe &&
+    roomCardData.value.roomState === RoomState.CREATED
+  ) {
     return {
       visible: true,
-      message: t('X people are in the meeting', { number: roomCardData.value.userList.length }),
+      message: t('X people are in the meeting', {
+        number: roomCardData.value.userList.length,
+      }),
     };
   }
   return {
@@ -141,7 +167,9 @@ const roomStatus = computed(() => {
   if (roomCardData.value.roomState === RoomState.CREATED) {
     return {
       visible: true,
-      message: roomCardData.value.isInnerRoom ? t('Already joined') : t('Enter the meeting'),
+      message: roomCardData.value.isInnerRoom
+        ? t('Already joined')
+        : t('Enter the meeting'),
     };
   }
   return {
@@ -167,7 +195,8 @@ const roomDestroy = computed(() => {
     message: '',
   };
 });
-const defaultAvatarUrl = 'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png';
+const defaultAvatarUrl =
+  'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png';
 const enterRoom = () => {
   chatExtension.enterRoom(roomCardData.value.roomId, props.message);
 };

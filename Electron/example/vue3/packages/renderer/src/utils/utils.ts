@@ -1,4 +1,3 @@
-
 /**
  * Gets the value of the specified key from window.location.href.
  * @param {*} key The key to get
@@ -19,13 +18,30 @@ export function getUrlParam(key: string) {
  * @returns language
  */
 export function getLanguage() {
-  let language = getUrlParam('lang') || navigator.language || 'zh';
+  let language =
+    getUrlParam('lang') ||
+    localStorage.getItem('tuiRoom-language') ||
+    navigator.language ||
+    'en-US';
   language = language.replace(/_/, '-').toLowerCase();
+  const isZh = language.startsWith('zh');
+  language = isZh ? 'zh-CN' : 'en-US';
 
-  if (language === 'zh-cn' || language === 'zh') {
-    language = 'zh-CN';
-  } else if (language === 'en' || language === 'en-us' || language === 'en-GB') {
-    language = 'en-US';
-  }
   return language;
+}
+
+/**
+ * Get Theme
+ * @returns Theme
+ */
+export function getTheme() {
+  let storedTheme = localStorage.getItem('tuiRoom-currentTheme') || 'LIGHT';
+
+  if (storedTheme === 'white') {
+    storedTheme = 'LIGHT';
+  } else if (storedTheme === 'black') {
+    storedTheme = 'DARK';
+  }
+
+  return storedTheme;
 }
