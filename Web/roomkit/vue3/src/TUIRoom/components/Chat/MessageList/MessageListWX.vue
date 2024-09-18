@@ -1,15 +1,23 @@
 <template>
   <div class="message-list-container-wx">
     <scroll-view
-      id="messageScrollList" ref="messageListRef" class="message-list" scroll-y="true"
-      :scroll-top="scrollTop" @scroll="handleScroll"
+      id="messageScrollList"
+      ref="messageListRef"
+      class="message-list"
+      scroll-y="true"
+      :scroll-top="scrollTop"
+      @scroll="handleScroll"
     >
       <div
         v-for="(item, index) in messageList"
         :key="item.ID"
         :class="['message-item', `${'out' === item.flow ? 'is-me' : ''}`]"
       >
-        <div v-if="getDisplaySenderName(index)" class="message-header" :title="item.nick || item.from">
+        <div
+          v-if="getDisplaySenderName(index)"
+          class="message-header"
+          :title="item.nick || item.from"
+        >
           {{ getDisplayName(item.from) }}
         </div>
         <div class="message-body">
@@ -25,14 +33,18 @@ import { getCurrentInstance, nextTick, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import MessageText from '../MessageTypes/MessageText.vue';
 import useMessageList from './useMessageListHook';
-import { getBoundingClientRect, getScrollInfo, instanceMapping } from '../../../utils/domOperation';
+import {
+  getBoundingClientRect,
+  getScrollInfo,
+  instanceMapping,
+} from '../../../utils/domOperation';
 import { throttle } from '../../../utils/utils';
 import { useRoomStore } from '../../../stores/room';
 
 const thisInstance = getCurrentInstance()?.proxy || getCurrentInstance();
 const scrollTop = ref();
 const roomStore = useRoomStore();
-const { getDisplayName } = storeToRefs(roomStore)
+const { getDisplayName } = storeToRefs(roomStore);
 let isScrollAtBottom = true;
 const {
   setMessageListInfo,
@@ -43,15 +55,24 @@ const {
 } = useMessageList();
 
 async function scrollToLatestMessage() {
-  const { scrollHeight } = await getScrollInfo('#messageScrollList', 'messageList');
+  const { scrollHeight } = await getScrollInfo(
+    '#messageScrollList',
+    'messageList'
+  );
   scrollTop.value = scrollHeight;
 }
 
 const handleMessageListScroll = async (e: any) => {
   const messageContainer = e.target as HTMLElement;
-  const { scrollTop } = await getScrollInfo('#messageScrollList', 'messageList');
-  const { height } = await getBoundingClientRect('#messageScrollList', 'messageList');
-  isScrollAtBottom = (scrollTop > height);
+  const { scrollTop } = await getScrollInfo(
+    '#messageScrollList',
+    'messageList'
+  );
+  const { height } = await getBoundingClientRect(
+    '#messageScrollList',
+    'messageList'
+  );
+  isScrollAtBottom = scrollTop > height;
   if (messageContainer.scrollTop < 40 && !isCompleted.value) {
     handleGetHistoryMessageList();
   }
@@ -83,69 +104,74 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .message-list-container-wx {
-  background-color: var(--message-list-color-h5);
-  height: 100%;
   width: 100%;
+  height: 100%;
   overflow: scroll;
+  background-color: var(--message-list-color-h5);
+
   &::-webkit-scrollbar {
     display: none;
   }
+
   .message-top {
     display: flex;
     justify-content: center;
   }
+
   .message-list {
-    overflow-y: scroll;
     height: 100%;
-  .message-item {
-    padding: 0 20px;
-    word-break: break-all;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    &:last-of-type {
-      margin-bottom: 0;
-    }
-    &.is-me {
-      align-items: flex-end;
+    overflow-y: scroll;
+
+    .message-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 0 20px;
+      word-break: break-all;
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+
+      &.is-me {
+        align-items: flex-end;
+
+        .message-body {
+          display: inline-block;
+          min-width: 24px;
+          padding: 7px;
+          font-size: 14px;
+          font-weight: 400;
+          color: #fff;
+          background-color: #4791ff;
+          border-radius: 8px;
+        }
+      }
+
+      .message-header {
+        max-width: 180px;
+        overflow: hidden;
+        font-family: 'PingFang SC';
+        font-size: 10px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 14px;
+        color: #ff7200;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
       .message-body {
-        background-color: #4791FF;
-        min-width: 24px;
-        border-radius: 8px;
         display: inline-block;
         padding: 7px;
-        font-weight: 400;
+        margin-top: 10px;
         font-size: 14px;
-        color: #FFFFFF;
+        font-weight: 400;
+        color: #fff;
+        background-color: #817e7e;
+        border-radius: 8px;
       }
     }
-    .message-header {
-      max-width: 180px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      font-family: 'PingFang SC';
-      font-style: normal;
-      font-weight: 500;
-      font-size: 10px;
-      color: #ff7200;
-      line-height: 14px;
-      max-width: 180px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-    .message-body {
-      background-color: #817e7e;
-      display: inline-block;
-      padding: 7px;
-      font-weight: 400;
-      font-size: 14px;
-      color: #FFFFFF;
-      border-radius: 8px;
-      margin-top: 10px
-    }
   }
-}
 }
 </style>

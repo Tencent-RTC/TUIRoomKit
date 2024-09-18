@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import defaultAvatar from "../../assets/imgs/avatar.png";
+import { ref, computed } from 'vue';
+import defaultAvatar from '../../assets/imgs/avatar.png';
 
 interface Props {
   imgSrc?: string | undefined;
@@ -29,13 +29,14 @@ function handleError() {
   position: relative;
   width: 100%;
   height: 100%;
+
   .avatar {
     position: absolute;
     top: 0;
     left: 0;
-    border-radius: 50%;
     width: 100%;
     height: 100%;
+    border-radius: 50%;
   }
 }
 </style>

@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="screenShareConfig.visible"
-    class="screen-share-control-container"
-  >
+  <div v-if="screenShareConfig.visible" class="screen-share-control-container">
     <icon-button
       ref="btnStopRef"
       :is-active="isSharing"
@@ -11,8 +8,8 @@
       :is-not-support="!isScreenShareSupported"
       @click-icon="toggleScreenShare"
     >
-      <stop-screen-share-icon v-if="isSharing"></stop-screen-share-icon>
-      <screen-share-icon v-else></screen-share-icon>
+      <stop-screen-share-icon v-if="isSharing" />
+      <screen-share-icon v-else />
     </icon-button>
     <Dialog
       v-model="isShowFraudDialog"
@@ -24,14 +21,22 @@
       <span>
         {{
           t(
-            'Sharing screens may lead to the leakage of private information such as SMS verification codes and passwords, resulting in financial losses. Please be vigilant against various forms of fraud.',
+            'Sharing screens may lead to the leakage of private information such as SMS verification codes and passwords, resulting in financial losses. Please be vigilant against various forms of fraud.'
           )
         }}
       </span>
       <template #footer>
         <span>
-          <tui-button size="default" @click="startScreenShare">{{ t('Continue sharing') }}</tui-button>
-          <tui-button class="button" type="primary" size="default" @click="isShowFraudDialog = false">{{ t('Cancel') }}</tui-button>
+          <tui-button size="default" @click="startScreenShare">{{
+            t('Continue sharing')
+          }}</tui-button>
+          <tui-button
+            class="button"
+            type="primary"
+            size="default"
+            @click="isShowFraudDialog = false"
+            >{{ t('Cancel') }}
+          </tui-button>
         </span>
       </template>
     </Dialog>
@@ -44,11 +49,24 @@
       :append-to-room-container="true"
     >
       <span>
-        {{ t('Others will no longer see your screen after you stop sharing. Are you sure you want to stop?') }}</span>
+        {{
+          t(
+            'Others will no longer see your screen after you stop sharing. Are you sure you want to stop?'
+          )
+        }}
+      </span>
       <template #footer>
         <span>
-          <tui-button size="default" @click="stopScreenShare">{{ t('End sharing') }}</tui-button>
-          <tui-button class="button" type="primary" size="default" @click="cancelStop">{{ t('Cancel') }}</tui-button>
+          <tui-button size="default" @click="stopScreenShare">{{
+            t('End sharing')
+          }}</tui-button>
+          <tui-button
+            class="button"
+            type="primary"
+            size="default"
+            @click="cancelStop"
+            >{{ t('Cancel') }}
+          </tui-button>
         </span>
       </template>
     </Dialog>
@@ -83,7 +101,13 @@ const screenShareConfig = roomService.getComponentConfig('ScreenShare');
 
 const roomStore = useRoomStore();
 const basicStore = useBasicStore();
-const { isAnchor, isAudience, hasOtherScreenShare, isGeneralUser, isScreenShareDisableForAllUser } = storeToRefs(roomStore);
+const {
+  isAnchor,
+  isAudience,
+  hasOtherScreenShare,
+  isGeneralUser,
+  isScreenShareDisableForAllUser,
+} = storeToRefs(roomStore);
 const { isShowScreenShareAntiFraud } = storeToRefs(basicStore);
 const { t } = useI18n();
 
@@ -94,7 +118,9 @@ const isShowFraudDialog: Ref<boolean> = ref(false);
 
 // Users in the audience cannot share screens
 const screenShareDisabled = computed(() => isAudience.value);
-const title = computed(() => (isSharing.value ? t('End sharing') : t('Share screen')));
+const title = computed(() =>
+  isSharing.value ? t('End sharing') : t('Share screen')
+);
 
 watch(isAnchor, (val: any, oldVal: any) => {
   if (!oldVal && val && isSharing.value) {
@@ -111,7 +137,9 @@ async function toggleScreenShare() {
   if (isAudience.value) {
     TUIMessage({
       type: 'warning',
-      message: t('You currently do not have sharing permission, please raise your hand to apply for sharing permission first'),
+      message: t(
+        'You currently do not have sharing permission, please raise your hand to apply for sharing permission first'
+      ),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
@@ -120,7 +148,9 @@ async function toggleScreenShare() {
   if (hasOtherScreenShare.value) {
     TUIMessage({
       type: 'warning',
-      message: t('Another user is currently sharing the screen, screen sharing is not possible.'),
+      message: t(
+        'Another user is currently sharing the screen, screen sharing is not possible.'
+      ),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
@@ -137,7 +167,9 @@ async function toggleScreenShare() {
   if (isGeneralUser.value && isScreenShareDisableForAllUser.value) {
     TUIMessage({
       type: 'warning',
-      message: t('Failed to initiate screen sharing, currently only host/admin can share screen.'),
+      message: t(
+        'Failed to initiate screen sharing, currently only host/admin can share screen.'
+      ),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
@@ -150,7 +182,6 @@ async function toggleScreenShare() {
   isShowFraudDialog.value = true;
 }
 
-
 function cancelStop() {
   dialogVisible.value = false;
 }
@@ -161,18 +192,25 @@ async function startScreenShare() {
     await roomEngine.instance?.startScreenSharing();
     isSharing.value = true;
   } catch (error: any) {
-    logger.error(`${logPrefix}startScreenShare error:`, error.name, error.message, error.code);
+    logger.error(
+      `${logPrefix}startScreenShare error:`,
+      error.name,
+      error.message,
+      error.code
+    );
     let message = '';
     // When the screen sharing stream fails to initialize, remind the user and stop the subsequent room entry publishing process.
     switch (error.name) {
       case 'NotReadableError':
         // Remind users to ensure that the system allows the current browser to access screen content
-        message = 'The system prohibits the current browser from obtaining screen content';
+        message =
+          'The system prohibits the current browser from obtaining screen content';
         break;
       case 'NotAllowedError':
         if (error.message.includes('Permission denied by system')) {
           // Remind users to ensure that the system allows the current browser to access screen content
-          message = 'The system prohibits the current browser from obtaining screen content';
+          message =
+            'The system prohibits the current browser from obtaining screen content';
         } else {
           // User rejects/cancels screen sharing
           message = 'User rejects/cancels screen sharing';
@@ -211,12 +249,18 @@ function screenCaptureStopped() {
 eventBus.on('ScreenShare:stopScreenShare', stopScreenShare);
 
 TUIRoomEngine.once('ready', () => {
-  roomEngine.instance?.on(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
+  roomEngine.instance?.on(
+    TUIRoomEvents.onUserScreenCaptureStopped,
+    screenCaptureStopped
+  );
 });
 
 onUnmounted(() => {
   eventBus.off('ScreenShare:stopScreenShare', stopScreenShare);
-  roomEngine.instance?.off(TUIRoomEvents.onUserScreenCaptureStopped, screenCaptureStopped);
+  roomEngine.instance?.off(
+    TUIRoomEvents.onUserScreenCaptureStopped,
+    screenCaptureStopped
+  );
 });
 </script>
 
@@ -224,27 +268,30 @@ onUnmounted(() => {
 .screen-share-control-container {
   position: relative;
 }
+
 .stop-share-region {
-  width: 131px;
-  height: 48px;
-  background: var(--stop-share-region-bg-color);
-  border-radius: 4px;
   position: absolute;
   top: -58px;
   left: 50%;
-  transform: translateX(-50%);
   display: flex;
-  justify-content: center;
   align-items: center;
-  cursor: pointer;
+  justify-content: center;
+  width: 131px;
+  height: 48px;
   font-size: 14px;
   color: var(--color-font);
+  cursor: pointer;
+  background: var(--stop-share-region-bg-color);
+  border-radius: 4px;
+  transform: translateX(-50%);
 }
+
 .stop-share-icon {
   width: 24px;
   height: 24px;
   margin-right: 10px;
 }
+
 .button {
   margin-left: 12px;
 }

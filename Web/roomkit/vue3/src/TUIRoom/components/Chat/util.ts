@@ -9,7 +9,8 @@
  * https://cloud.tencent.com/document/product/269/59590
  */
 
-export const emojiBaseUrl = 'https://web.sdk.qcloud.com/im/assets/emoji-plugin/';
+export const emojiBaseUrl =
+  'https://web.sdk.qcloud.com/im/assets/emoji-plugin/';
 const deprecatedEmojiBaseUrl = 'https://web.sdk.qcloud.com/im/assets/emoji/';
 export const emojiMap: Record<string, string> = {
   '[期待]': 'emoji_0@2x.png',
@@ -350,7 +351,7 @@ const deprecatedEmojiMap: Record<string, string> = {
 export const emojiList = Object.keys(emojiMap);
 
 export function decodeMessageText(payload: string) {
-  const renderDom: { name: string; text?: string; src?: string; }[] = [];
+  const renderDom: { name: string; text?: string; src?: string }[] = [];
   function pushTextNode(text: string) {
     renderDom.push({
       name: 'text',
@@ -368,7 +369,7 @@ export function decodeMessageText(payload: string) {
   /**
    * Text Message
    *
-  **/
+   **/
   let temp = payload;
   let left = -1;
   let right = -1;
@@ -413,7 +414,7 @@ export function decodeSendTextMsg(payload: string) {
   /**
    * Text Message
    *
-  **/
+   **/
   let temp = payload;
   let left = -1;
   let right = -1;

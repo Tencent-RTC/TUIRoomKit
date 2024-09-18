@@ -14,24 +14,66 @@ export default function useRoomInfo() {
   const basicStore = useBasicStore();
   const roomStore = useRoomStore();
   const { roomId, isRoomLinkVisible } = storeToRefs(basicStore);
-  const { masterUserId, roomName } = storeToRefs(roomStore);
+  const { masterUserId, roomName, password } = storeToRefs(roomStore);
   const { t } = useI18n();
   const isShowRoomInfo = ref(false);
-  const roomType = computed(() => (roomStore.isFreeSpeakMode ? t('Free Speech Room') : t('On-stage Speaking Room')));
+  const roomType = computed(() =>
+    roomStore.isFreeSpeakMode
+      ? t('Free Speech Room')
+      : t('On-stage Speaking Room')
+  );
   const arrowDirection = ref(false);
   const roomLinkConfig = roomService.getComponentConfig('RoomLink');
 
-  const masterUserName = computed(() => roomStore.getUserName(masterUserId.value) || masterUserId.value);
+  const masterUserName = computed(
+    () => roomStore.getUserName(masterUserId.value) || masterUserId.value
+  );
 
   const isShowRoomInfoTitle = computed(() => masterUserName.value);
 
   const conferenceTitle = computed(() => `${roomName.value}`);
 
   const roomInfoTabList = computed(() => [
-    { id: 1, title: 'Host', content: masterUserName.value, copyLink: '', isShowCopyIcon: false, visible: true },
-    { id: 2, title: 'Room Type', content: roomType.value, copyLink: '', isShowCopyIcon: false, visible: true },
-    { id: 3, title: 'Room ID', content: roomId.value, copyLink: roomId.value, isShowCopyIcon: true, visible: true },
-    { id: 4, title: 'Room Link', content: inviteLink.value, copyLink: inviteLink.value, isShowCopyIcon: true, visible: isRoomLinkVisible.value && roomLinkConfig.visible },
+    {
+      id: 1,
+      title: 'Host',
+      content: masterUserName.value,
+      copyLink: '',
+      isShowCopyIcon: false,
+      visible: true,
+    },
+    {
+      id: 2,
+      title: 'Room Type',
+      content: roomType.value,
+      copyLink: '',
+      isShowCopyIcon: false,
+      visible: true,
+    },
+    {
+      id: 3,
+      title: 'Room ID',
+      content: roomId.value,
+      copyLink: roomId.value,
+      isShowCopyIcon: true,
+      visible: true,
+    },
+    {
+      id: 4,
+      title: 'Room Password',
+      content: password.value,
+      copyLink: password.value,
+      isShowCopyIcon: true,
+      visible: password.value,
+    },
+    {
+      id: 5,
+      title: 'Room Link',
+      content: inviteLink.value,
+      copyLink: inviteLink.value,
+      isShowCopyIcon: true,
+      visible: isRoomLinkVisible.value && roomLinkConfig.visible,
+    },
   ]);
 
   function toggleShowRoomInfoStatus() {

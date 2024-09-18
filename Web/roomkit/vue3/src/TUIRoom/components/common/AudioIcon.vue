@@ -1,5 +1,5 @@
 <template>
-  <div :class="['audio-icon-container', `${size == 'small' && 'small' }`]">
+  <div :class="['audio-icon-container', `${size == 'small' && 'small'}`]">
     <div class="audio-level-container">
       <div class="audio-level" :style="audioLevelStyle"></div>
     </div>
@@ -17,11 +17,11 @@ import MicOnIcon from './icons/MicOnIcon.vue';
 import MicOffIcon from './icons/MicOffIcon.vue';
 
 interface Props {
-  userId?: string,
-  audioVolume?: number,
-  isMuted?: boolean,
-  size?: string,
-  isDisabled?: boolean,
+  userId?: string;
+  audioVolume?: number;
+  isMuted?: boolean;
+  size?: string;
+  isDisabled?: boolean;
 }
 
 const roomStore = useRoomStore();
@@ -47,7 +47,6 @@ const audioLevelStyle = computed(() => {
   }
   return `height: ${currentAudioVolume.value * 4}%`;
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -55,21 +54,23 @@ const audioLevelStyle = computed(() => {
   position: relative;
   width: 24px;
   height: 24px;
+
   &.small {
     transform: scale(0.8);
   }
+
   .audio-level-container {
     position: absolute;
     top: 2px;
     left: 7px;
+    display: flex;
+    flex-flow: column-reverse wrap;
+    justify-content: space-between;
     width: 10px;
     height: 14px;
-    display: flex;
-    flex-wrap: wrap;
-    border-radius: 4px;
     overflow: hidden;
-    flex-direction: column-reverse;
-    justify-content: space-between;
+    border-radius: 4px;
+
     .audio-level {
       width: 100%;
       background-color: var(--green-color);
@@ -83,5 +84,4 @@ const audioLevelStyle = computed(() => {
     left: 0;
   }
 }
-
 </style>

@@ -8,7 +8,10 @@
 -->
 <template>
   <div>
-    <div v-click-outside="handleHideAudioSettingTab" class="audio-control-container">
+    <div
+      v-click-outside="handleHideAudioSettingTab"
+      class="audio-control-container"
+    >
       <icon-button
         :title="t('Mic')"
         :has-more="hasMore"
@@ -21,14 +24,14 @@
           :audio-volume="audioVolume"
           :is-muted="isMuted"
           :is-disabled="isDisabled"
-        ></audio-icon>
+        />
       </icon-button>
       <audio-setting-tab
         v-show="showAudioSettingTab"
         theme="white"
         class="audio-tab"
         :audio-volume="audioVolume"
-      ></audio-setting-tab>
+      />
     </div>
   </div>
 </template>
@@ -41,13 +44,16 @@ import AudioSettingTab from '../common/AudioSettingTab.vue';
 import AudioIcon from '../common/AudioIcon.vue';
 import { useI18n } from '../../locales';
 import vClickOutside from '../../directives/vClickOutside';
-import { isGetUserMediaSupported, isEnumerateDevicesSupported } from '../../utils/mediaAbility';
+import {
+  isGetUserMediaSupported,
+  isEnumerateDevicesSupported,
+} from '../../utils/mediaAbility';
 
 interface Props {
-  hasMore?: boolean,
-  isMuted: boolean,
-  isDisabled?: boolean,
-  audioVolume: number,
+  hasMore?: boolean;
+  isMuted: boolean;
+  isDisabled?: boolean;
+  audioVolume: number;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -58,7 +64,8 @@ withDefaults(defineProps<Props>(), {
 const emits = defineEmits(['click']);
 
 const showAudioSettingTab: Ref<boolean> = ref(false);
-const isSupportAudioMedia = isGetUserMediaSupported && isEnumerateDevicesSupported;
+const isSupportAudioMedia =
+  isGetUserMediaSupported && isEnumerateDevicesSupported;
 const { t } = useI18n();
 
 async function handleClickIcon() {
@@ -83,38 +90,37 @@ function handleHideAudioSettingTab() {
     showAudioSettingTab.value = false;
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
-
 $audioTabWidth: 305px;
 
 .audio-control-container {
   position: relative;
+
   .audio-tab {
     position: absolute;
     bottom: calc(100% + 12px);
     left: -5px;
     width: $audioTabWidth;
+    padding: 20px 20px 24px;
     background: var(--background-color-1);
-    padding: 20px 20px 24px 20px;
     border-radius: 8px;
     box-shadow:
-      0px 2px 4px -3px rgba(32, 77, 141, 0.03),
-      0px 6px 10px 1px rgba(32, 77, 141, 0.06),
-      0px 3px 14px 2px rgba(32, 77, 141, 0.05);
+      0 2px 4px -3px rgba(32, 77, 141, 0.03),
+      0 6px 10px 1px rgba(32, 77, 141, 0.06),
+      0 3px 14px 2px rgba(32, 77, 141, 0.05);
+
     &::before {
-      content: '';
       position: absolute;
-      left: 28px;
       bottom: -10px;
+      left: 28px;
+      content: '';
       border-top: 5px solid var(--background-color-1);
-      border-left: 5px solid transparent;
       border-right: 5px solid transparent;
       border-bottom: 5px solid transparent;
+      border-left: 5px solid transparent;
     }
   }
 }
-
 </style>

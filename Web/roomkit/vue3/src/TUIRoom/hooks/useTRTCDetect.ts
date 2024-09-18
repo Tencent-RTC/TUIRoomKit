@@ -1,7 +1,10 @@
 import { useI18n } from '../locales';
 import TUIMessageBox from '../components/common/base/MessageBox/index';
 import { onBeforeMount, ref } from 'vue';
-import { isGetUserMediaSupported, isEnumerateDevicesSupported } from '../utils/mediaAbility';
+import {
+  isGetUserMediaSupported,
+  isEnumerateDevicesSupported,
+} from '../utils/mediaAbility';
 import RTCDetect from 'rtc-detect';
 
 const isSupportTRTC = ref(true);
@@ -17,7 +20,9 @@ export default function () {
     if (!isGetUserMediaSupported) {
       TUIMessageBox({
         title: t('Note'),
-        message: t('The current browser does not support capturing audio and video'),
+        message: t(
+          'The current browser does not support capturing audio and video'
+        ),
         confirmButtonText: t('Sure'),
       });
       return;
@@ -25,7 +30,9 @@ export default function () {
     if (!isEnumerateDevicesSupported) {
       TUIMessageBox({
         title: t('Note'),
-        message: t('The current browser does not support getting microphone and camera list'),
+        message: t(
+          'The current browser does not support getting microphone and camera list'
+        ),
         confirmButtonText: t('Sure'),
       });
       return;
@@ -33,7 +40,9 @@ export default function () {
     if (!isSupportTRTC.value) {
       TUIMessageBox({
         title: t('Note'),
-        message: t('The current browser does not support audio and video communication capabilities'),
+        message: t(
+          'The current browser does not support audio and video communication capabilities'
+        ),
         confirmButtonText: t('Sure'),
       });
     }

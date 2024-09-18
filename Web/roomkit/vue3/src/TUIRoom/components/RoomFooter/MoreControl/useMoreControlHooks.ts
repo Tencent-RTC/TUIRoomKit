@@ -10,7 +10,9 @@ export default function useControl() {
   const basicStore = useBasicStore();
   const { sidebarName } = storeToRefs(basicStore);
 
-  const iconName = computed(() => (sidebarName.value === 'more' ? ICON_NAME.MoreActive : ICON_NAME.More));
+  const iconName = computed(() =>
+    sidebarName.value === 'more' ? ICON_NAME.MoreActive : ICON_NAME.More
+  );
 
   return {
     t,

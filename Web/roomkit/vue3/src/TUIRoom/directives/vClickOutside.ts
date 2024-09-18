@@ -1,4 +1,3 @@
-
 const nodeMap = new Map();
 
 const vClickOutside = {

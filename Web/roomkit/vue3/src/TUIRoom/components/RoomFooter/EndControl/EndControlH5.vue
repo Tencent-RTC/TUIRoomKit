@@ -7,20 +7,37 @@
       </div>
     </div>
     <div v-if="visible" class="end-main-content">
-      <div :class="isShowLeaveRoomDialog ? 'end-dialog-leave' : 'end-dialog-dismiss'">
+      <div
+        :class="
+          isShowLeaveRoomDialog ? 'end-dialog-leave' : 'end-dialog-dismiss'
+        "
+      >
         <div v-if="currentDialogType === DialogType.BasicDialog">
           <div v-if="roomStore.isMaster" class="end-dialog-header">
             <span v-if="roomStore.isMaster" class="end-dialog-text">
               <!-- eslint-disable-next-line max-len -->
-              {{ t('If you do not want to end the meeting, please designate a new host before leaving the meeting.') }}
+              {{
+                t(
+                  'If you do not want to end the meeting, please designate a new host before leaving the meeting.'
+                )
+              }}
             </span>
-            <span v-else>{{ t('Are you sure you want to leave this room?') }}</span>
+            <span v-else>{{
+              t('Are you sure you want to leave this room?')
+            }}</span>
           </div>
         </div>
-        <div v-if="currentDialogType === DialogType.BasicDialog" class="dialog-middle-content">
+        <div
+          v-if="currentDialogType === DialogType.BasicDialog"
+          class="dialog-middle-content"
+        >
           <span
             v-if="roomStore.isMaster"
-            :class="isShowLeaveRoomDialog ? 'end-button-dismiss' : 'end-button-dismiss-single'"
+            :class="
+              isShowLeaveRoomDialog
+                ? 'end-button-dismiss'
+                : 'end-button-dismiss-single'
+            "
             @click.stop="dismissRoom"
           >
             {{ t('Dismiss') }}
@@ -28,24 +45,36 @@
           <span
             v-if="isShowLeaveRoomDialog"
             v-tap="handleEndLeaveClick"
-            :class="roomStore.isMaster ? 'end-button-leave' : 'end-button-leave-single'"
+            :class="
+              roomStore.isMaster
+                ? 'end-button-leave'
+                : 'end-button-leave-single'
+            "
           >
             {{ t('Leave') }}
           </span>
-          <span class="end-button-cancel" @click.stop="cancel">{{ t('Cancel') }}</span>
+          <span class="end-button-cancel" @click.stop="cancel">{{
+            t('Cancel')
+          }}</span>
         </div>
         <div v-if="currentDialogType === DialogType.TransferDialog">
-          <span class="end-button-cancel" @click.stop="cancel">{{ t('Cancel') }}</span>
+          <span class="end-button-cancel" @click.stop="cancel">{{
+            t('Cancel')
+          }}</span>
         </div>
       </div>
     </div>
-    <popup v-show="showSideBar" :title="t('Appoint a new host')" class="transfer-container">
+    <popup
+      v-show="showSideBar"
+      :title="t('Appoint a new host')"
+      class="transfer-container"
+    >
       <template #sidebarContent>
         <div style="height: 100%">
           <div class="transfer-list-container">
             <div class="transfer-header">
               <div class="search-container">
-                <svg-icon :icon="SearchIcon"></svg-icon>
+                <svg-icon :icon="SearchIcon" />
                 <input
                   v-model="searchName"
                   type="text"
@@ -63,12 +92,20 @@
                 @click="handleShowMemberControl(user.userId)"
               >
                 <div class="member-basic-info">
-                  <Avatar class="avatar-url" :img-src="user.avatarUrl"></Avatar>
-                  <div class="user-name">{{ roomService.getDisplayName(user) }}</div>
-                  <svg-icon v-if="selectedUser === user.userId" :icon="CorrectIcon" class="correct"> </svg-icon>
+                  <Avatar class="avatar-url" :img-src="user.avatarUrl" />
+                  <div class="user-name">
+                    {{ roomService.getDisplayName(user) }}
+                  </div>
+                  <svg-icon
+                    v-if="selectedUser === user.userId"
+                    :icon="CorrectIcon"
+                    class="correct"
+                  />
                 </div>
               </div>
-              <div v-if="hasNoData" class="member-hasNoData">{{ t('No relevant user found.') }}</div>
+              <div v-if="hasNoData" class="member-has-no-data">
+                {{ t('No relevant user found.') }}
+              </div>
             </div>
           </div>
         </div>
@@ -114,7 +151,7 @@ const {
   filteredList,
   selectedUser,
   showSideBar,
-  remoteUserList,
+  remoteEnteredUserList,
   isMasterWithOneRemoteUser,
   isMasterWithRemoteUser,
 } = useEndControl();
@@ -128,7 +165,7 @@ function handleEndLeaveClick() {
     return;
   }
   if (isMasterWithRemoteUser.value) {
-    selectedUser.value = remoteUserList.value[0].userId;
+    selectedUser.value = remoteEnteredUserList.value[0].userId;
     if (isMasterWithOneRemoteUser.value) {
       transferAndLeave();
       return;
@@ -172,7 +209,10 @@ async function transferAndLeave() {
   }
   try {
     const userId = selectedUser.value;
-    const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({ userId, userRole: TUIRole.kRoomOwner });
+    const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({
+      userId,
+      userRole: TUIRole.kRoomOwner,
+    });
     logger.log(`${logPrefix}transferAndLeave:`, changeUserRoleResponse);
     resetState();
     await roomService.leaveRoom();
@@ -180,243 +220,273 @@ async function transferAndLeave() {
     logger.error(`${logPrefix}transferAndLeave error:`, error);
   }
 }
-
 </script>
 <style lang="scss" scoped>
 .end-control-container {
   .end-button {
-    font-weight: 400;
+    display: flex;
     font-size: 12px;
+    font-weight: 400;
+    line-height: 21px;
     color: #ff2e2e;
+    text-align: center;
     letter-spacing: 0;
     cursor: pointer;
-    text-align: center;
-    line-height: 21px;
-    display: flex;
+
     .end-button-title {
       margin-left: 3px;
+      white-space: nowrap;
     }
   }
 }
+
 .dialog-middle-content {
-  width: 100%;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
+
 .end-main-content {
   position: fixed;
-  left: 0;
   top: 0;
   bottom: 0;
+  left: 0;
+  box-sizing: border-box;
   width: 100vw;
   height: auto;
-  box-sizing: border-box;
   background-color: var(--log-out-mobile);
   backdrop-filter: blur(10px);
+
   .end-dialog-leave,
   .end-dialog-dismiss {
-    width: 90%;
-    border-radius: 14px;
     position: fixed;
     right: 0;
-    left: 0;
     bottom: 10vh;
+    left: 0;
     z-index: 9;
+    width: 90%;
     margin: auto;
+    border-radius: 14px;
+
     .manage-transfer {
       position: absolute;
       top: 0;
     }
+
     .end-dialog-header {
-      background: #cacacb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 56px;
+      margin: 0 auto;
       font-family: 'PingFang SC';
+      font-size: 14px;
       font-style: normal;
       font-weight: 500;
-      font-size: 14px;
       line-height: 17px;
-      text-align: center;
       color: #6a6c74;
-      height: 56px;
-      width: 100%;
-      margin: 0 auto;
+      text-align: center;
+      background: #cacacb;
+      border-bottom: 0.5px solid #4f4e4e;
       border-top-left-radius: 14px;
       border-top-right-radius: 14px;
-      border-bottom: 0.5px solid #4f4e4e;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+
       .end-dialog-text {
         width: 230px;
       }
     }
+
     .end-button-dismiss,
     .end-button-leave,
     .end-button-cancel,
     .end-button-dismiss-single,
     .end-button-leave-single {
       width: 100%;
+      padding: 20px 0;
       font-family: 'PingFang SC';
+      font-size: 20px;
       font-style: normal;
       font-weight: 400;
-      font-size: 20px;
       line-height: 24px;
-      text-align: center;
       color: #ff2e2e;
-      border-style: none;
+      text-align: center;
       background: #cacacb;
-      padding: 20px 0;
+      border-style: none;
     }
+
     .end-button-leave {
       color: #007aff;
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 14px;
       border-top: 0.5px solid #8f8e8e;
+      border-bottom-right-radius: 14px;
+      border-bottom-left-radius: 14px;
     }
+
     .end-button-leave-single {
       position: absolute;
       bottom: 1vh;
-      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: 14px;
     }
+
     .end-button-cancel {
       position: absolute;
       bottom: -9vh;
       left: 0;
-      background-color: #ffffff;
-      border-radius: 14px;
-      color: #007aff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      color: #007aff;
+      background-color: #fff;
+      border-radius: 14px;
     }
+
     .end-button-dismiss-single {
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
+      border-bottom-right-radius: 14px;
+      border-bottom-left-radius: 14px;
     }
   }
+
   .end-dialog-dismiss {
     bottom: 12vh;
+
     .end-button-cancel {
       bottom: -9vh;
     }
   }
 }
+
 .transfer-container {
   position: fixed;
-  left: 0;
   top: 0;
-  height: 100vh;
+  left: 0;
   z-index: 102;
+  height: 100vh;
+
   .transfer-list-container {
     position: relative;
-    height: 100%;
     display: flex;
     flex-direction: column;
+    height: 100%;
   }
+
   .transfer-header {
     display: flex;
     justify-content: center;
     padding: 0 16px;
+
     .search-container {
-      height: 34px;
-      border-radius: 8px;
-      background-color: var(--transfer-input-color-h5);
       display: flex;
+      flex: 1;
+      align-items: center;
+      height: 34px;
       padding: 0 16px;
       color: #676c80;
       caret-color: var(--caret-color);
-      flex: 1;
-      align-items: center;
+      background-color: var(--transfer-input-color-h5);
+      border-radius: 8px;
+
       .searching-input {
-        outline: none;
-        border: none;
-        background: none;
         width: 100%;
+        background: none;
+        border: none;
+        outline: none;
+
         ::placeholder {
           font-size: 16px;
           line-height: 18px;
           color: #676c80;
         }
+
         &:focus-visible {
           outline: none;
         }
       }
     }
   }
+
   .transfer-body {
-    overflow-y: scroll;
-    flex: 1;
     display: flex;
+    flex: 1;
     flex-direction: column;
     min-height: 0;
     margin-top: 20px;
+    overflow-y: scroll;
+
     .transfer-list-content {
       padding-bottom: 5px;
+
       .transfer-item-container {
         display: flex;
         flex-direction: row;
         align-items: center;
-        height: 69px;
         justify-content: space-between;
+        height: 69px;
         padding: 0 32px;
       }
+
       .member-basic-info {
-        display: flex;
         position: relative;
-        width: 100%;
+        display: flex;
         flex-direction: row;
         align-items: center;
+        width: 100%;
         padding: 24px 20px 0 24px;
+
         .avatar-url {
           width: 40px !important;
           height: 40px !important;
           border-radius: 50%;
         }
+
         .user-name {
-          margin-left: 9px;
-          color: var(--input-font-color);
+          display: flex;
           max-width: 70% !important;
-          white-space: nowrap;
-          text-overflow: ellipsis;
+          margin-left: 9px;
           overflow: hidden;
           font-family: 'PingFang SC';
+          font-size: 16px !important;
           font-style: normal;
           font-weight: 500;
-          font-size: 16px !important;
           line-height: 22px;
+          color: var(--input-font-color);
+          text-overflow: ellipsis;
           letter-spacing: -0.24px;
-          display: flex;
+          white-space: nowrap;
         }
+
         .correct {
-          width: 24px;
-          height: 16px;
           position: absolute;
           right: 5vw;
+          width: 24px;
+          height: 16px;
           background-size: cover;
         }
       }
     }
-    .member-hasNoData {
+
+    .member-has-no-data {
       position: fixed;
       top: 30%;
       left: 30%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 40vw;
       height: 5vh;
       color: var(--input-font-color);
-      border-radius: 4px;
       background-color: var(--message-list-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      border-radius: 4px;
     }
   }
 }
+
 .transfer-leave {
   position: fixed;
   bottom: 2vh;
@@ -424,22 +494,23 @@ async function transferAndLeave() {
   display: flex;
   align-items: center;
   justify-content: center;
+
   .transfer-button {
-    width: 86vw;
-    height: 5vh;
-    background: linear-gradient(315deg, #006eff 0%, #0c59f2 98.81%);
-    border-radius: 8px;
-    font-family: 'PingFang SC';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 86vw;
+    height: 5vh;
+    font-family: 'PingFang SC';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 22px;
+    color: #fff;
     text-align: center;
-    color: #ffffff;
+    background: linear-gradient(315deg, #006eff 0%, #0c59f2 98.81%);
     border-style: none;
+    border-radius: 8px;
   }
 }
 </style>

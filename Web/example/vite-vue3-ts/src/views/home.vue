@@ -11,11 +11,13 @@
 </template>
 
 <script setup lang="ts">
-import { PreConferenceView, conference } from '@tencentcloud/roomkit-web-vue3';
+import { PreConferenceView, conference, RoomEvent, LanguageOption, ThemeOption } from '@tencentcloud/roomkit-web-vue3';
 import { getBasicInfo } from '@/config/basic-info-config';
 import router from '@/router';
 import { useRoute } from 'vue-router';
-import { Ref, ref, reactive } from 'vue';
+import { Ref, ref, reactive, onMounted, onUnmounted } from 'vue';
+import i18n from '../locales/index';
+import { getLanguage, getTheme } from  '../utils/utils';
 
 const route = useRoute();
 const { roomId } = route.query;
@@ -108,6 +110,8 @@ async function handleLogOut() {
 async function handleInit() {
   sessionStorage.removeItem('tuiRoom-roomInfo');
   sessionStorage.removeItem('tuiRoom-userInfo');
+  conference.setLanguage(getLanguage() as LanguageOption);
+  conference.setTheme(getTheme() as ThemeOption);
   let currentUserInfo = null;
   if (sessionStorage.getItem('tuiRoom-userInfo')) {
     currentUserInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo') as string);
@@ -121,6 +125,23 @@ async function handleInit() {
   const { userId, sdkAppId, userSig } = currentUserInfo;
   await conference.login({ sdkAppId, userId, userSig });
 }
+
+const changeLanguage = (language: LanguageOption) => {
+  i18n.global.locale.value = language;
+  localStorage.setItem('tuiRoom-language', language);
+};
+const changeTheme = (theme: ThemeOption) => {
+  localStorage.setItem('tuiRoom-currentTheme', theme);
+};
+onMounted(() => {
+  conference.on(RoomEvent.LANGUAGE_CHANGED, changeLanguage);
+  conference.on(RoomEvent.THEME_CHANGED, changeTheme);
+});
+
+onUnmounted(() => {
+  conference.off(RoomEvent.LANGUAGE_CHANGED, changeLanguage);
+  conference.off(RoomEvent.THEME_CHANGED, changeTheme);
+});
 
 handleInit();
 

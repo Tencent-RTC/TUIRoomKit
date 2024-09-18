@@ -1,8 +1,11 @@
-const { requestAnimationFrame, cancelAnimationFrame } =  window;
+const { requestAnimationFrame, cancelAnimationFrame } = window;
 const canvasWidth = 1280;
 const canvasHeight = 720;
 
-type CanvasImageSource = HTMLImageElement | HTMLVideoElement | HTMLCanvasElement;
+type CanvasImageSource =
+  | HTMLImageElement
+  | HTMLVideoElement
+  | HTMLCanvasElement;
 
 export default class ToCanvas {
   private sourceElement!: CanvasImageSource;

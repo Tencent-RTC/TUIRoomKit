@@ -5,8 +5,7 @@
     :layout="IconButtonLayout.HORIZONTAL"
     :icon="LanguageIcon"
     @click-icon="handleChange"
-  >
-  </icon-button>
+  />
 </template>
 
 <script setup lang="ts">
@@ -20,25 +19,16 @@ import { roomService } from '../../services';
 
 const basicStore = useBasicStore();
 
-const title = computed(() => (basicStore.lang === 'en-US' ? 'English' : '中文'));
+const title = computed(() =>
+  basicStore.lang === 'en-US' ? 'English' : '中文'
+);
 const languageConfig = roomService.getComponentConfig('Language');
 
-const handleChange = (): void => {
-  switch (i18n.global.locale.value) {
-    case 'en-US':
-      i18n.global.locale.value = 'zh-CN';
-      basicStore.setLang('zh-CN');
-      localStorage.setItem('tuiRoom-language', 'zh-CN');
-      break;
-    case 'zh-CN':
-      i18n.global.locale.value = 'en-US';
-      basicStore.setLang('en-US');
-      localStorage.setItem('tuiRoom-language', 'en-US');
-      break;
-  }
+const handleChange = () => {
+  roomService.setLanguage(
+    i18n.global.locale.value === 'en-US' ? 'zh-CN' : 'en-US'
+  );
 };
-
 </script>
 
-<style>
-</style>
+<style></style>

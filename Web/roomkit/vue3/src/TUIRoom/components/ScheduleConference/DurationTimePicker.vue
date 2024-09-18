@@ -1,21 +1,29 @@
 <template>
   <div class="container">
     <TuiSelect
-      v-model="selectedTime" theme="white" class="timepicker-select" :teleported="false"
+      v-model="selectedTime"
+      theme="white"
+      :teleported="false"
       :custom-select-content-style="{ 'font-weight': 400 }"
+      :value="selectedTime"
+      @input="selectedTime = $event"
     >
       <TuiOption
-        v-for="time in timeOptions" :key="time.value" theme="white" :value="time.value" :label="time.label"
+        v-for="time in timeOptions"
+        :key="time.value"
+        theme="white"
+        :value="time.value"
+        :label="time.label"
         :custom-option-content-style="{ 'font-weight': 400 }"
-      ></TuiOption>
+      />
     </TuiSelect>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, defineProps, defineEmits, watch } from 'vue';
-import TuiSelect from '../common/base/Select.vue';
-import TuiOption from '../common/base/Option.vue';
+import TuiSelect from '../common/base/Select';
+import TuiOption from '../common/base/Option';
 import { useI18n } from '../../locales';
 
 const { t } = useI18n();
@@ -43,12 +51,20 @@ const updateTime = () => {
   emit('input', selectedTime.value);
 };
 
-watch(selectedTime, () => {
-  updateTime();
-}, {
-  immediate: true,
-});
-watch(() => props.modelValue, (newValue) => {
-  selectedTime.value = newValue;
-}, { immediate: true });
+watch(
+  selectedTime,
+  () => {
+    updateTime();
+  },
+  {
+    immediate: true,
+  }
+);
+watch(
+  () => props.modelValue,
+  newValue => {
+    selectedTime.value = newValue;
+  },
+  { immediate: true }
+);
 </script>

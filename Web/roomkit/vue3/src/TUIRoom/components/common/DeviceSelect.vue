@@ -25,20 +25,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, watch } from 'vue';
+import { ref, Ref, watch, defineProps } from 'vue';
 import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
-import TuiSelect from './base/Select.vue';
-import TuiOption from './base/Option.vue';
+import TuiSelect from './base/Select';
+import TuiOption from './base/Option';
 
-import { TRTCDeviceInfo, TUIDeviceInfo, TUIMediaDeviceType } from '@tencentcloud/tuiroom-engine-js';
+import {
+  TRTCDeviceInfo,
+  TUIDeviceInfo,
+  TUIMediaDeviceType,
+} from '@tencentcloud/tuiroom-engine-js';
 import useDeviceManager from '../../hooks/useDeviceManager';
 const { deviceManager } = useDeviceManager();
 
 interface Props {
-  deviceType: string,
-  onChange?: (id: string) => void,
-  disabled?: boolean
+  deviceType: string;
+  onChange?: (id: string) => void;
+  disabled?: boolean;
 }
 // eslint-disable-next-line vue/no-setup-props-destructure
 const { deviceType, onChange, disabled = false } = defineProps<Props>();
@@ -53,7 +57,6 @@ const {
   currentSpeakerId,
 } = storeToRefs(roomStore);
 
-// @ts-ignore
 const deviceList: Ref<TRTCDeviceInfo[]> = ref(getDeviceList());
 const currentDeviceId = ref(getInitDeviceId());
 
@@ -71,27 +74,39 @@ function getInitDeviceId() {
 }
 
 if (deviceType === 'camera') {
-  watch(currentCameraId, (val) => {
-    if (currentDeviceId.value !== val) {
-      currentDeviceId.value = val;
-    }
-  }, { immediate: true });
+  watch(
+    currentCameraId,
+    val => {
+      if (currentDeviceId.value !== val) {
+        currentDeviceId.value = val;
+      }
+    },
+    { immediate: true }
+  );
 }
 
 if (deviceType === 'microphone') {
-  watch(currentMicrophoneId, (val) => {
-    if (currentDeviceId.value !== val) {
-      currentDeviceId.value = val;
-    }
-  }, { immediate: true });
+  watch(
+    currentMicrophoneId,
+    val => {
+      if (currentDeviceId.value !== val) {
+        currentDeviceId.value = val;
+      }
+    },
+    { immediate: true }
+  );
 }
 
 if (deviceType === 'speaker') {
-  watch(currentSpeakerId, (val) => {
-    if (currentDeviceId.value !== val) {
-      currentDeviceId.value = val;
-    }
-  }, { immediate: true });
+  watch(
+    currentSpeakerId,
+    val => {
+      if (currentDeviceId.value !== val) {
+        currentDeviceId.value = val;
+      }
+    },
+    { immediate: true }
+  );
 }
 
 function getDeviceList() {
@@ -118,7 +133,11 @@ async function handleChange(deviceId: string) {
         });
         roomStore.setCurrentCameraId(deviceId);
       } catch (error) {
-        if (cameraList.value.map((item: TUIDeviceInfo) => item.deviceId).includes(currentCameraId.value)) {
+        if (
+          cameraList.value
+            .map((item: TUIDeviceInfo) => item.deviceId)
+            .includes(currentCameraId.value)
+        ) {
           currentDeviceId.value = currentCameraId.value;
         }
       }
@@ -131,7 +150,11 @@ async function handleChange(deviceId: string) {
         });
         roomStore.setCurrentMicrophoneId(deviceId);
       } catch (error) {
-        if (microphoneList.value.map((item: TUIDeviceInfo) => item.deviceId).includes(currentMicrophoneId.value)) {
+        if (
+          microphoneList.value
+            .map((item: TUIDeviceInfo) => item.deviceId)
+            .includes(currentMicrophoneId.value)
+        ) {
           currentDeviceId.value = currentMicrophoneId.value;
         }
       }
@@ -144,7 +167,11 @@ async function handleChange(deviceId: string) {
         });
         roomStore.setCurrentSpeakerId(deviceId);
       } catch (error) {
-        if (speakerList.value.map((item: TUIDeviceInfo) => item.deviceId).includes(currentSpeakerId.value)) {
+        if (
+          speakerList.value
+            .map((item: TUIDeviceInfo) => item.deviceId)
+            .includes(currentSpeakerId.value)
+        ) {
           currentDeviceId.value = currentSpeakerId.value;
         }
       }

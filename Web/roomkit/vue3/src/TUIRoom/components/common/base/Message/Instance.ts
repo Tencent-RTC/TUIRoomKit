@@ -3,21 +3,23 @@ import Message from './Message.vue';
 import indexManager from '../../../../hooks/useZIndex';
 
 export type MessageProps = {
-    type: 'success' | 'error' | 'warning' | 'info'
-    message: string
-    duration?: number
-    zIndex?: number
-}
+  type: 'success' | 'error' | 'warning' | 'info';
+  message: string;
+  duration?: number;
+  zIndex?: number;
+};
 const activeMessages = [] as any;
 
 const createInstance = ({ type, message, duration = 3000 }: MessageProps) => {
   const container = document.createElement('div');
   container.setAttribute('class', 't-message-container');
-  const fullscreenElement = document.fullscreenElement
-  || document.getElementById('roomContainer') ||  document.getElementById('pre-conference-container') || document.body;
+  const fullscreenElement =
+    document.fullscreenElement ||
+    document.getElementById('roomContainer') ||
+    document.getElementById('pre-conference-container') ||
+    document.body;
   fullscreenElement.appendChild(container);
   const uniqueKey = `message-${Date.now()}-${Math.random()}`;
-
 
   const updateTopValues = () => {
     activeMessages.forEach((msg: any, index: number) => {
