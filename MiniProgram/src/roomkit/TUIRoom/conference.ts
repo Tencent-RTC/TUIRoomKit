@@ -1,7 +1,15 @@
 import { ChatSDK } from '@tencentcloud/chat';
-import { roomService, StartParams, JoinParams, LanguageOption, ThemeOption, EventType } from './services';
+import {
+  roomService,
+  StartParams,
+  JoinParams,
+  LanguageOption,
+  Theme,
+  EventType,
+} from './services';
 import { TUIRoomEngine } from './index';
 import logger from './utils/common/logger';
+import { toTargetTheme } from './utils/common';
 
 export enum RoomEvent {
   ROOM_START = 'RoomStart',
@@ -13,6 +21,8 @@ export enum RoomEvent {
   KICKED_OFFLINE = 'KickedOffline',
   USER_SIG_EXPIRED = 'UserSigExpired',
   USER_LOGOUT = 'UserLogout',
+  LANGUAGE_CHANGED = 'LanguageChanged',
+  THEME_CHANGED = 'ThemeChanged',
 }
 export enum FeatureButton {
   SwitchTheme = 'SwitchTheme',
@@ -21,12 +31,20 @@ export enum FeatureButton {
   FullScreen = 'FullScreen',
   Invitation = 'InviteControl',
 }
+export type ThemeOption = 'LIGHT' | 'DARK';
+
 interface IConference {
   getRoomEngine(): TUIRoomEngine | null;
 
-  on: (eventType: RoomEvent, callback: () => void) => void;
+  on: (
+    eventType: RoomEvent,
+    callback: (data?: LanguageOption | ThemeOption | any) => void
+  ) => void;
 
-  off: (eventType: RoomEvent, callback: () => void) => void;
+  off: (
+    eventType: RoomEvent,
+    callback: (data?: LanguageOption | ThemeOption | any) => void
+  ) => void;
 
   login: (params: {
     sdkAppId: number;
@@ -88,11 +106,17 @@ class Conference implements IConference {
     return roomService.roomEngine.instance;
   }
 
-  public on(eventType: RoomEvent, callback: () => any) {
+  public on(
+    eventType: RoomEvent,
+    callback: (data?: LanguageOption | ThemeOption | any) => void
+  ) {
     roomService.on(eventType as unknown as EventType, callback);
   }
 
-  public off(eventType: RoomEvent, callback: () => void) {
+  public off(
+    eventType: RoomEvent,
+    callback: (data?: LanguageOption | ThemeOption | any) => void
+  ) {
     roomService.off(eventType as unknown as EventType, callback);
   }
 
@@ -112,10 +136,7 @@ class Conference implements IConference {
     return await roomService.dismissRoom();
   }
 
-  public setSelfInfo(options: {
-    userName: string;
-    avatarUrl: string;
-  }) {
+  public setSelfInfo(options: { userName: string; avatarUrl: string }) {
     return roomService.setSelfInfo(options);
   }
 
@@ -123,8 +144,8 @@ class Conference implements IConference {
     return roomService.setLanguage(language);
   }
 
-  public setTheme(theme: 'LIGHT' | 'DARK') {
-    return roomService.setTheme(theme);
+  public setTheme(theme: ThemeOption) {
+    return roomService.setTheme(toTargetTheme(theme) as Theme);
   }
 
   public disableTextMessaging() {

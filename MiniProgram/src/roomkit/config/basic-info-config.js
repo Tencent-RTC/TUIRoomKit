@@ -59,11 +59,12 @@ export const EXPIRETIME = 604800;
  *
  * 设置推流端用户信息
  */
+const userId = `user_${Math.ceil(Math.random() * 30)}`;
 export const userInfo = {
   // 用户Id
-  userId: `user_${Math.ceil(Math.random() * 100000)}`,
+  userId,
   // 用户昵称
-  userName: 'myName',
+  userName: userId,
   // 用户头像
   avatarUrl: '',
 };
@@ -73,7 +74,11 @@ export function getBasicInfo() {
     alert('Please configure your SDKAPPID in config/basic-info-config.js');
     return;
   }
-  const generator = new LibGenerateTestUserSig(SDKAPPID, SDKSECRETKEY, EXPIRETIME);
+  const generator = new LibGenerateTestUserSig(
+    SDKAPPID,
+    SDKSECRETKEY,
+    EXPIRETIME
+  );
   const userSig = generator.genTestUserSig(userInfo.userId);
   const { userId, userName, avatarUrl } = userInfo;
   return {
@@ -83,4 +88,4 @@ export function getBasicInfo() {
     userName,
     avatarUrl,
   };
-};
+}

@@ -1,8 +1,14 @@
 <template>
   <!-- User base information -->
   <div :class="[isMobile ? 'member-info-mobile' : 'member-info']">
-    <div :class="!showStateIcon && isTargetUserAdmin ? 'member-basic-info-admin' : 'member-basic-info'">
-      <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
+    <div
+      :class="
+        !showStateIcon && isTargetUserAdmin
+          ? 'member-basic-info-admin'
+          : 'member-basic-info'
+      "
+    >
+      <Avatar class="avatar-url" :img-src="userInfo.avatarUrl" />
       <div class="user-name">{{ roomService.getDisplayName(userInfo) }}</div>
       <div class="role-info">
         <svg-icon
@@ -12,7 +18,11 @@
           :color="isTargetUserAdmin ? '#F06C4B' : '#4791FF'"
           :class="isTargetUserAdmin ? 'admin-icon' : 'master-icon'"
         />
-        <div :class="`user-extra-info ${isTargetUserAdmin ? 'user-extra-info-admin' : ''}`">{{ extraInfo }}</div>
+        <div
+          :class="`user-extra-info ${isTargetUserAdmin ? 'user-extra-info-admin' : ''}`"
+        >
+          {{ extraInfo }}
+        </div>
       </div>
     </div>
     <!-- User audio and video status information -->
@@ -50,8 +60,8 @@ import { roomService } from '../../../services';
 const { t } = useI18n();
 
 interface Props {
-  userInfo: UserInfo,
-  showStateIcon: Boolean,
+  userInfo: UserInfo;
+  showStateIcon: boolean;
 }
 
 const props = defineProps<Props>();
@@ -61,8 +71,12 @@ const { isMaster, isSpeakAfterTakingSeatMode } = storeToRefs(roomStore);
 
 const isMe = computed(() => basicStore.userId === props.userInfo.userId);
 
-const isTargetUserRoomOwner = computed(() => props.userInfo.userRole === TUIRole.kRoomOwner);
-const isTargetUserAdmin = computed(() => props.userInfo.userRole === TUIRole.kAdministrator);
+const isTargetUserRoomOwner = computed(
+  () => props.userInfo.userRole === TUIRole.kRoomOwner
+);
+const isTargetUserAdmin = computed(
+  () => props.userInfo.userRole === TUIRole.kAdministrator
+);
 
 const extraInfo = computed(() => {
   if (isMaster.value && isMe.value) {
@@ -83,7 +97,9 @@ const extraInfo = computed(() => {
   return '';
 });
 
-const isAudienceRole = computed(() => isSpeakAfterTakingSeatMode.value && !props.userInfo.onSeat);
+const isAudienceRole = computed(
+  () => isSpeakAfterTakingSeatMode.value && !props.userInfo.onSeat
+);
 
 const iconList = computed(() => {
   const list = [];
@@ -91,8 +107,12 @@ const iconList = computed(() => {
     list.push({ icon: ScreenOpenIcon });
   }
   if (!isAudienceRole.value) {
-    list.push({ icon: props.userInfo.hasAudioStream ? AudioOpenIcon : AudioCloseIcon });
-    list.push({ icon: props.userInfo.hasVideoStream ? VideoOpenIcon : VideoCloseIcon });
+    list.push({
+      icon: props.userInfo.hasAudioStream ? AudioOpenIcon : AudioCloseIcon,
+    });
+    list.push({
+      icon: props.userInfo.hasVideoStream ? VideoOpenIcon : VideoCloseIcon,
+    });
   }
   if (isAudienceRole.value && !props.userInfo.isUserApplyingToAnchor) {
     list.push({ icon: AudioCloseIcon, disable: true });
@@ -106,67 +126,75 @@ const iconList = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-
 .tui-theme-black .member-av-state {
-  --icon-color: #A3AEC7;
+  --icon-color: #a3aec7;
 }
 
 .tui-theme-white .member-av-state {
-  --icon-color: #B2BBD1;
+  --icon-color: #b2bbd1;
 }
+
 .member-info,
 .member-info-mobile {
   display: flex;
+  justify-content: space-between;
   width: 100%;
   height: 100%;
-  justify-content: space-between;
-  .member-basic-info
-  ,.member-basic-info-admin {
+
+  .member-basic-info,
+  .member-basic-info-admin {
     display: flex;
     flex-direction: row;
     align-items: center;
+
     .avatar-url {
+      display: flex;
+      align-items: center;
       width: 32px;
       height: 32px;
-      display: flex;
       border-radius: 50%;
-      align-items: center;
     }
+
     .user-name {
+      max-width: 100px;
       margin-left: 12px;
+      overflow: hidden;
       font-size: 14px;
       font-weight: 400;
-      color: var(--font-color-1);
       line-height: 22px;
-      max-width: 100px;
-      white-space: nowrap;
+      color: var(--font-color-1);
       text-overflow: ellipsis;
-      overflow: hidden;
+      white-space: nowrap;
     }
+
     .role-info {
       display: flex;
+
       .master-icon,
       .admin-icon {
-        color: var(--active-color-2);
-        margin-left: 8px;
         display: flex;
+        margin-left: 8px;
+        color: var(--active-color-2);
       }
+
       .admin-icon {
         color: var(--orange-color);
       }
+
       .user-extra-info,
       .user-extra-info-admin {
-        line-height: 20px;
+        padding: 2px;
+        padding: 0 6px;
+        margin-left: 4px;
         font-size: 14px;
         font-weight: 400;
-        margin-left: 4px;
-        padding: 2px;
+        line-height: 20px;
         color: var(--active-color-2);
-        padding: 0 6px;
       }
+
       .user-extra-info-admin {
-        transition: none;
         color: var(--orange-color);
+        transition: none;
       }
     }
   }
@@ -178,13 +206,15 @@ const iconList = computed(() => {
   }
 
   .member-av-state {
-    height: 100%;
     display: flex;
     align-items: center;
+    height: 100%;
     color: var(--icon-color);
+
     .state-icon {
       margin-left: 16px;
     }
+
     .disable-icon {
       opacity: 0.4;
     }

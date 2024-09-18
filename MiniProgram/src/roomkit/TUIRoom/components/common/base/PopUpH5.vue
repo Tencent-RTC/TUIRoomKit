@@ -2,15 +2,15 @@
   <div class="popup-container">
     <div class="popup-main-header">
       <span @tap="handleClose" class="icon-container">
-        <svg-icon style="display: flex" class="close-icon" :icon="ArrowStrokeBackIcon"></svg-icon>
+        <svg-icon style="display: flex" class="close-icon" :icon="ArrowStrokeBackIcon" />
       </span>
       <span class="sidebar-title">{{ title }}</span>
     </div>
     <div class="popup-main-content">
-      <slot name="sidebarContent" />
+      <slot name="sidebarContent"></slot>
     </div>
     <div class="popup-main-footer">
-      <slot name="sidebarFooter" />
+      <slot name="sidebarFooter"></slot>
     </div>
   </div>
 </template>
@@ -20,7 +20,7 @@ import { useBasicStore } from '../../../stores/basic';
 import ArrowStrokeBackIcon from '../../../assets/icons/ArrowStrokeBackIcon.svg';
 
 interface Props {
-  title: string,
+  title: string;
 }
 defineProps<Props>();
 
@@ -30,56 +30,61 @@ function handleClose() {
   basicStore.setSidebarOpenStatus(false);
   basicStore.setSidebarName('');
 }
-
 </script>
 <style lang="scss" scoped>
 .popup-container {
+  position: static;
+  flex: 1;
   width: 100vw;
   height: 100%;
   background: var(--room-detail-background);
-  position: static;
-  flex: 1;
+
   .popup-main-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .icon-container{
-      padding: 20px 25px;
+
+    .icon-container {
       position: absolute;
-      left: 0;
       top: 0;
+      left: 0;
+      box-sizing: content-box;
       width: 10px;
       height: 18px;
+      padding: 20px 25px;
       background-size: cover;
-      box-sizing: content-box;
     }
+
     .sidebar-title {
       font-family: 'PingFang SC';
+      font-size: 16px;
       font-style: normal;
       font-weight: 500;
-      font-size: 16px;
       line-height: 22px;
-      text-align: center;
       color: var(--input-font-color);
+      text-align: center;
     }
-    .close-icon{
+
+    .close-icon {
       width: 10px;
       height: 18px;
       background-size: cover;
-      }
+    }
   }
+
   .popup-main-content {
     width: 100%;
     height: calc(100% - 130px);
     overflow: hidden;
   }
+
   .popup-main-footer {
-    width: 100%;
-    height: auto;
     position: sticky;
     bottom: 0;
+    width: 100%;
+    height: auto;
     padding-top: 10px;
   }
 }

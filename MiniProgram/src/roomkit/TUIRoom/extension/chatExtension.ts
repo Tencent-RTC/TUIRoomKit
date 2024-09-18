@@ -1,4 +1,9 @@
-import { ExtensionInfo, TUIConstants, TUICore, TUILogin } from '@tencentcloud/tui-core';
+import {
+  ExtensionInfo,
+  TUIConstants,
+  TUICore,
+  TUILogin,
+} from '@tencentcloud/tui-core';
 import {
   TUIRoomEngine,
   TUIErrorCode,
@@ -6,64 +11,72 @@ import {
   TUIRoomEvents,
   TUIUserInfo,
 } from '@tencentcloud/tuiroom-engine-wx';
-import { EventType, roomEngine, RoomParam, roomService, RoomService } from '../services';
+import {
+  EventType,
+  roomEngine,
+  RoomParam,
+  roomService,
+  RoomService,
+} from '../services';
 import { setDragAndResize } from './utils/interact';
 import { Conversation, Message, Profile } from '@tencentcloud/chat';
 import { isMobile } from '../utils/environment';
 import { setLanguage } from './utils/setLanguage';
 import { VueVersion } from './utils/common';
 import { parseMessageData } from './utils/judgeRoomMessage';
-const defaultAvatarUrl = 'https://qcloudimg.tencent-cloud.cn/raw/6a075bead54faca9ca378f4d89c62fae.png';
+const defaultAvatarUrl =
+  'https://qcloudimg.tencent-cloud.cn/raw/6a075bead54faca9ca378f4d89c62fae.png';
 
 export interface MessageData {
-  ID?: string
-  isInnerRoom: boolean
-  isRoomMessage: boolean
-  isRoomCreateByMe: boolean
-  isMessageFromMe: boolean
-  roomId: string
-  roomState: RoomState
-  userList: Array<{ faceUrl: string; nickName: string; userId: string }>
-  myProfile: Profile
-  ownerName: string
-  owner: string
-}
-const getRoomOptions = () => ({
-  roomId: String(Math.ceil(Math.random() * 1000000)),
-  roomMode: 'FreeToSpeak',
-  roomParam: {
-    isOpenCamera: true,
-    isOpenMicrophone: true,
-  },
-} as {
+  ID?: string;
+  isInnerRoom: boolean;
+  isRoomMessage: boolean;
+  isRoomCreateByMe: boolean;
+  isMessageFromMe: boolean;
   roomId: string;
-  roomName?: string;
-  roomMode: 'FreeToSpeak' | 'SpeakAfterTakingSeat';
-  roomParam?: RoomParam;
-});
+  roomState: RoomState;
+  userList: Array<{ faceUrl: string; nickName: string; userId: string }>;
+  myProfile: Profile;
+  ownerName: string;
+  owner: string;
+}
+const getRoomOptions = () =>
+  ({
+    roomId: String(Math.ceil(Math.random() * 1000000)),
+    roomMode: 'FreeToSpeak',
+    roomParam: {
+      isOpenCamera: true,
+      isOpenMicrophone: true,
+    },
+  }) as {
+    roomId: string;
+    roomName?: string;
+    roomMode: 'FreeToSpeak' | 'SpeakAfterTakingSeat';
+    roomParam?: RoomParam;
+  };
 export interface CustomMessagePayload {
-  version: number
-  businessID: string // Fixed value, used to distinguish the type of custom message on IM.
-  groupId: string // When inviting group members to join, groupId is needed to get the list of group members.
-  messageId: string // Used to find and update a specific message after the audience becomes the host.
-  roomId: string // The id of the room, a required parameter for enterRoom.
-  owner: string // The userId of the room owner.
-  ownerName: string // The userName of the room owner.
-  roomState: RoomState // The current room state, there are four states: creating/created/destroying/destroyed.
-  memberCount: 1 // The number of people in the current room, it needs to be displayed on the UI how many people are in the meeting.
-  userList: Array<{ faceUrl: string; nickName: string; userId: string }> // The list of invited users including the room owner, display up to 5 to prevent the message length from exceeding the limit.
+  version: number;
+  businessID: string; // Fixed value, used to distinguish the type of custom message on IM.
+  groupId: string; // When inviting group members to join, groupId is needed to get the list of group members.
+  messageId: string; // Used to find and update a specific message after the audience becomes the host.
+  roomId: string; // The id of the room, a required parameter for enterRoom.
+  owner: string; // The userId of the room owner.
+  ownerName: string; // The userName of the room owner.
+  roomState: RoomState; // The current room state, there are four states: creating/created/destroying/destroyed.
+  memberCount: 1; // The number of people in the current room, it needs to be displayed on the UI how many people are in the meeting.
+  userList: Array<{ faceUrl: string; nickName: string; userId: string }>; // The list of invited users including the room owner, display up to 5 to prevent the message length from exceeding the limit.
 }
 export enum RoomState {
   CREATING = 'creating',
   CREATED = 'created',
   DESTROYING = 'destroying',
-  DESTROYED = 'destroyed'
+  DESTROYED = 'destroyed',
 }
 export enum ChatType {
   C2C = 'C2C',
   GROUP = 'GROUP',
   CUSTOM_SERVICE = 'customerService',
-  ROOM = 'room'
+  ROOM = 'room',
 }
 // The editing of messages is left to the homeowner, so you need to get each message and compare it with the userid and assign it to the message if it is the same.
 export class ChatExtension {
@@ -76,16 +89,13 @@ export class ChatExtension {
     userID: string;
     userSig: string;
   } = {
-      chat: {},
-      SDKAppID: 0,
-      userID: '',
-      userSig: '',
-    };
+    chat: {},
+    SDKAppID: 0,
+    userID: '',
+    userSig: '',
+  };
   public myProfile = {} as Profile;
-  private customMessages: Record<
-    string,
-    MessageData
-  > = {};
+  private customMessages: Record<string, MessageData> = {};
   private chatExtensionSetting: Record<ChatType, boolean> = {
     [ChatType.C2C]: true,
     [ChatType.GROUP]: true,
@@ -100,7 +110,10 @@ export class ChatExtension {
     this.initEventCtx();
   }
 
-  public setActiveMeetingMessage(message: Message, messagePayload: CustomMessagePayload) {
+  public setActiveMeetingMessage(
+    message: Message,
+    messagePayload: CustomMessagePayload
+  ) {
     this.message = message;
     this.messagePayload = messagePayload;
   }
@@ -124,36 +137,45 @@ export class ChatExtension {
   }
 
   public init() {
-    TUICore.registerExtension(TUIConstants.TUIChat.EXTENSION.INPUT_MORE.EXT_ID, this);
+    TUICore.registerExtension(
+      TUIConstants.TUIChat.EXTENSION.INPUT_MORE.EXT_ID,
+      this
+    );
     TUICore.registerEvent(
       TUIConstants.TUILogin.EVENT.LOGIN_STATE_CHANGED,
       TUIConstants.TUILogin.EVENT_SUB_KEY.USER_LOGIN_SUCCESS,
-      this,
+      this
     );
     TUICore.registerEvent(
       TUIConstants.TUITranslate.EVENT.LANGUAGE_CHANGED,
       TUIConstants.TUITranslate.EVENT_SUB_KEY.CHANGE_SUCCESS,
-      this,
+      this
     );
   }
 
   public reset() {
-    TUICore.unregisterExtension(TUIConstants.TUIChat.EXTENSION.INPUT_MORE.EXT_ID, this);
+    TUICore.unregisterExtension(
+      TUIConstants.TUIChat.EXTENSION.INPUT_MORE.EXT_ID,
+      this
+    );
     TUICore.unregisterEvent(
       TUIConstants.TUILogin.EVENT.LOGIN_STATE_CHANGED,
       TUIConstants.TUILogin.EVENT_SUB_KEY.USER_LOGIN_SUCCESS,
-      this,
+      this
     );
     TUICore.unregisterEvent(
       TUIConstants.TUITranslate.EVENT.LANGUAGE_CHANGED,
       TUIConstants.TUITranslate.EVENT_SUB_KEY.CHANGE_SUCCESS,
-      this,
+      this
     );
     this.unBindRoomServiceEvent();
     this.unBindRoomEngineEvent();
   }
 
-  public setHistoryMeetingMessageList(type: 'add' | 'delete', customMessage: {ID: string, messageData: MessageData}) {
+  public setHistoryMeetingMessageList(
+    type: 'add' | 'delete',
+    customMessage: { ID: string; messageData: MessageData }
+  ) {
     const { ID, messageData } = customMessage;
     if (messageData.roomState === RoomState.DESTROYED) return;
     if (type === 'add') {
@@ -176,19 +198,42 @@ export class ChatExtension {
     this.service?.on(EventType.ROOM_DISMISS, this.onRoomDestroy);
   }
   private bindRoomEngineEvent() {
-    roomEngine.instance?.on(TUIRoomEvents.onRemoteUserEnterRoom, this.onRemoteUserEnterRoom);
-    roomEngine.instance?.on(TUIRoomEvents.onRemoteUserLeaveRoom, this.onRemoteUserLeaveRoom);
-    roomEngine.instance?.on(TUIRoomEvents.onUserRoleChanged, this.onUserRoleChanged);
+    roomEngine.instance?.on(
+      TUIRoomEvents.onRemoteUserEnterRoom,
+      this.onRemoteUserEnterRoom
+    );
+    roomEngine.instance?.on(
+      TUIRoomEvents.onRemoteUserLeaveRoom,
+      this.onRemoteUserLeaveRoom
+    );
+    roomEngine.instance?.on(
+      TUIRoomEvents.onUserRoleChanged,
+      this.onUserRoleChanged
+    );
   }
   private unBindRoomServiceEvent() {
     this.service?.off(EventType.ROOM_DISMISS, this.onRoomDestroy);
   }
   private unBindRoomEngineEvent() {
-    roomEngine.instance?.off(TUIRoomEvents.onRemoteUserEnterRoom, this.onRemoteUserEnterRoom);
-    roomEngine.instance?.off(TUIRoomEvents.onRemoteUserLeaveRoom, this.onRemoteUserLeaveRoom);
-    roomEngine.instance?.off(TUIRoomEvents.onUserRoleChanged, this.onUserRoleChanged);
+    roomEngine.instance?.off(
+      TUIRoomEvents.onRemoteUserEnterRoom,
+      this.onRemoteUserEnterRoom
+    );
+    roomEngine.instance?.off(
+      TUIRoomEvents.onRemoteUserLeaveRoom,
+      this.onRemoteUserLeaveRoom
+    );
+    roomEngine.instance?.off(
+      TUIRoomEvents.onUserRoleChanged,
+      this.onUserRoleChanged
+    );
   }
-  private onRemoteUserEnterRoom({ userInfo }: { roomId: string; userInfo: TUIUserInfo }) {
+  private onRemoteUserEnterRoom({
+    userInfo,
+  }: {
+    roomId: string;
+    userInfo: TUIUserInfo;
+  }) {
     const { userID } = this.chatContext;
     if (this.messagePayload?.owner !== userID) return;
     const { userList } = this.messagePayload;
@@ -205,17 +250,30 @@ export class ChatExtension {
       memberCount: newUserList.length,
     });
   }
-  private onRemoteUserLeaveRoom({ userInfo }: { roomId: string; userInfo: TUIUserInfo }) {
+  private onRemoteUserLeaveRoom({
+    userInfo,
+  }: {
+    roomId: string;
+    userInfo: TUIUserInfo;
+  }) {
     const { userID } = this.chatContext;
     if (this.messagePayload.owner !== userID) return;
     const { userList } = this.messagePayload;
-    const newUserList = userList.filter(item => item.userId !== userInfo.userId);
+    const newUserList = userList.filter(
+      item => item.userId !== userInfo.userId
+    );
     this.modifyMessage(this.message?.ID, {
       userList: newUserList,
       memberCount: newUserList.length,
     });
   }
-  private async onUserRoleChanged({ userId, userRole }: { userId: string; userRole: TUIRole }) {
+  private async onUserRoleChanged({
+    userId,
+    userRole,
+  }: {
+    userId: string;
+    userRole: TUIRole;
+  }) {
     const { userID } = this.chatContext;
     if (userRole === TUIRole.kRoomOwner && userId === userID) {
       const profileResult = await this.getUserProfile([userId]);
@@ -251,21 +309,32 @@ export class ChatExtension {
   }
 
   private setAnotherMessageRoomState(state: RoomState) {
-    Object.keys(this.customMessages).forEach((key) => {
-      const { roomState, isRoomCreateByMe, isInnerRoom } = this.customMessages[key];
-      if (roomState !== RoomState.DESTROYED && isRoomCreateByMe && !isInnerRoom) {
+    Object.keys(this.customMessages).forEach(key => {
+      const { roomState, isRoomCreateByMe, isInnerRoom } =
+        this.customMessages[key];
+      if (
+        roomState !== RoomState.DESTROYED &&
+        isRoomCreateByMe &&
+        !isInnerRoom
+      ) {
         this.modifyMessage(key, { roomState: state });
       }
       if (roomState === RoomState.DESTROYED) {
-        this.setHistoryMeetingMessageList('delete', { ID: key, messageData: this.customMessages[key] });
-      }1;
+        this.setHistoryMeetingMessageList('delete', {
+          ID: key,
+          messageData: this.customMessages[key],
+        });
+      }
+      1;
     });
   }
   private async quickRoom(data: Conversation) {
     if (this.getIsMeetingInProgress()) {
       this.service?.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
         code: -1,
-        message: this.service?.t('Currently in a meeting, please exit the current meeting before proceeding.'),
+        message: this.service?.t(
+          'Currently in a meeting, please exit the current meeting before proceeding.'
+        ),
       });
       return;
     }
@@ -289,7 +358,10 @@ export class ChatExtension {
       this.message = message;
       this.messagePayload = this.parseMessageData(message);
       await this.sendMessage(message);
-      await this.modifyMessage(message.ID, { messageId: message.ID, roomState: RoomState.CREATED });
+      await this.modifyMessage(message.ID, {
+        messageId: message.ID,
+        roomState: RoomState.CREATED,
+      });
     } catch (error) {
       this.service?.emit(EventType.ROOM_NOTICE_MESSAGE, {
         code: -1,
@@ -300,20 +372,28 @@ export class ChatExtension {
     }
   }
   private async destroyRoom() {
-    await this.modifyMessage(this.message.ID, { roomState: RoomState.DESTROYED });
+    await this.modifyMessage(this.message.ID, {
+      roomState: RoomState.DESTROYED,
+    });
   }
-  public async onNotifyEvent(eventName: string, subKey: string, params?: Record<string, any>) {
+  public async onNotifyEvent(
+    eventName: string,
+    subKey: string,
+    params?: Record<string, any>
+  ) {
     if (eventName === TUIConstants.TUILogin.EVENT.LOGIN_STATE_CHANGED) {
       if (subKey === TUIConstants.TUILogin.EVENT_SUB_KEY.USER_LOGIN_SUCCESS) {
         // Execute your own business logic processing when receiving successful login
         !isMobile && setDragAndResize('#roomContainer');
-        TUIRoomEngine?.callExperimentalAPI(JSON.stringify({
-          api: 'setFramework',
-          params: {
-            component: 'TIMRoomKit',
-            language: `vue${VueVersion}`,
-          },
-        }));
+        TUIRoomEngine?.callExperimentalAPI(
+          JSON.stringify({
+            api: 'setFramework',
+            params: {
+              component: 'TIMRoomKit',
+              language: `vue${VueVersion}`,
+            },
+          })
+        );
         this.bindRoomEngineEvent();
         this.bindRoomServiceEvent();
         roomService.basicStore.setScene('chat');
@@ -325,7 +405,7 @@ export class ChatExtension {
           UserInfo: { visible: false },
         });
         this.chatContext = TUILogin.getContext();
-        this.myProfile =  await this.getMyProfile();
+        this.myProfile = await this.getMyProfile();
         this.roomInit(true);
       }
     }
@@ -343,28 +423,31 @@ export class ChatExtension {
     this.service?.initMediaDeviceList();
     const { SDKAppID, userID, userSig } = this.chatContext;
     const { nick = '', avatar = defaultAvatarUrl } = this.myProfile;
-    this.service && this.service[deep ? 'initRoomKit' : 'storeInit']({
-      // To get sdkAppId, please refer to Step One
-      sdkAppId: SDKAppID,
-      // The unique Id of the user in your business
-      userId: userID,
-      // For local development and debugging, you can quickly generate userSig on the page https://console.cloud.tencent.com/trtc/usersigtool. Note that userSig and userId have a one-to-one correspondence
-      userSig,
-      // The nickname used by the user in your business
-      userName: nick,
-      // The avatar link used by the user in your business
-      avatarUrl: avatar,
-      // The skin theme color needed by the user in your business and whether to support switching skin themes
-      theme: {
-        isSupportSwitchTheme: false,
-      },
-    });
+    this.service &&
+      this.service[deep ? 'initRoomKit' : 'storeInit']({
+        // To get sdkAppId, please refer to Step One
+        sdkAppId: SDKAppID,
+        // The unique Id of the user in your business
+        userId: userID,
+        // For local development and debugging, you can quickly generate userSig on the page https://console.cloud.tencent.com/trtc/usersigtool. Note that userSig and userId have a one-to-one correspondence
+        userSig,
+        // The nickname used by the user in your business
+        userName: nick,
+        // The avatar link used by the user in your business
+        avatarUrl: avatar,
+        // The skin theme color needed by the user in your business and whether to support switching skin themes
+        theme: {
+          isSupportSwitchTheme: false,
+        },
+      });
   }
   public async enterRoom(roomId: string, message: Message) {
     if (this.getIsMeetingInProgress()) {
       this.service?.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
         code: -1,
-        message: this.service?.t('Currently in a meeting, please exit the current meeting before proceeding.'),
+        message: this.service?.t(
+          'Currently in a meeting, please exit the current meeting before proceeding.'
+        ),
       });
       return;
     }
@@ -385,7 +468,14 @@ export class ChatExtension {
     this.setAnotherMessageRoomState(RoomState.DESTROYED);
   }
   private createCustomMessage(params: Record<string, any>): Message {
-    const { chat, userID, conversationID, conversationType, roomState, roomId } = params;
+    const {
+      chat,
+      userID,
+      conversationID,
+      conversationType,
+      roomState,
+      roomId,
+    } = params;
     const message = chat.createCustomMessage({
       to: conversationID.slice(conversationType.length),
       conversationType,
@@ -423,10 +513,10 @@ export class ChatExtension {
     return await chat.modifyMessage(message);
   }
   private generatePayloadForMessage(params: {
-    roomId: string
-    userID: string
-    conversationID: string
-    roomState: RoomState
+    roomId: string;
+    userID: string;
+    conversationID: string;
+    roomState: RoomState;
   }) {
     const { roomId, userID, conversationID, roomState } = params;
     const { nick = '', avatar = '' } = this.myProfile;
@@ -479,4 +569,3 @@ export class ChatExtension {
 }
 
 export const chatExtension = ChatExtension.getInstance();
-

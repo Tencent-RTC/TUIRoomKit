@@ -1,9 +1,15 @@
 <template>
   <div class="member-control-container">
     <div class="member-title">
-      <Avatar class="avatar-url" :img-src="userInfo.avatarUrl"></Avatar>
-      <div class="member-title-content">{{ roomService.getDisplayName(userInfo) }}</div>
-      <span v-if="isWeChat" @tap.stop="handleCloseControl" class="tab-cancel">{{ t('Cancel') }}</span>
+      <Avatar class="avatar-url" :img-src="userInfo.avatarUrl" />
+      <div class="member-title-content">
+        {{ roomService.getDisplayName(userInfo) }}
+      </div>
+      <span
+        v-if="isWeChat"
+        @tap.stop="handleCloseControl"
+        class="tab-cancel"
+        >{{ t('Cancel') }}</span>
     </div>
     <div
       v-for="item in controlList"
@@ -11,7 +17,7 @@
       @tap="() => item.func(userInfo)"
       class="user-operate-item"
     >
-      <svg-icon style="display: flex" :icon="item.icon" class="icon-svg"></svg-icon>
+      <svg-icon style="display: flex" :icon="item.icon" class="icon-svg" />
       <div class="control-title">{{ item.title }}</div>
     </div>
     <Dialog
@@ -27,20 +33,26 @@
     >
       <span>{{ dialogData.content }}</span>
     </Dialog>
-    <div class="input-content-container" ref="editorInputEleContainer" @tap.stop="handleCloseInput" v-show="isShowInput">
-      <div class="input-content" >
+    <div
+      class="input-content-container"
+      ref="editorInputEleContainer"
+      @tap.stop="handleCloseInput"
+      v-show="isShowInput"
+    >
+      <div class="input-content">
         <div class="input">
-          <tui-input ref="editorInputEle"
+          <tui-input
+            ref="editorInputEle"
             :theme="roomService.basicStore.defaultTheme"
             :model-value="tempUserName"
             type="text"
             enterkeyhint="done"
             @input="tempUserName = $event"
-            @done="handleAction(props.userInfo)">
-          </tui-input>
+            @done="handleAction(props.userInfo)"
+          />
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -56,8 +68,8 @@ import { roomService } from '../../../services';
 import TuiInput from '../../common/base/Input/index.vue';
 
 interface Props {
-  userInfo: UserInfo,
-  showMemberControl: boolean,
+  userInfo: UserInfo;
+  showMemberControl: boolean;
 }
 
 const props = defineProps<Props>();
@@ -83,7 +95,7 @@ function handleCloseControl() {
 }
 
 function handleCloseInput(event: any) {
-  if(isWeChat) {
+  if (isWeChat) {
     isShowInput.value = false;
   } else if (event.target !== event.currentTarget) {
     return;
@@ -95,119 +107,134 @@ function handleCloseInput(event: any) {
 
 <style lang="scss" scoped>
 .member-control-container {
-  width: 100%;
   position: fixed;
   bottom: 0;
   left: 0;
   z-index: 2;
-  padding: 22px 16px;
-  background: var(--member-control-background-color-h5);
-  border-radius: 15px 15px 0px 0px;
   display: flex;
   flex-direction: column !important;
-  animation-duration: 200ms;
+  width: 100%;
+  padding: 22px 16px;
+  background: var(--member-control-background-color-h5);
+  border-radius: 15px 15px 0 0;
   animation-name: popup;
+  animation-duration: 200ms;
+
   @keyframes popup {
-  from {
-    transform-origin: bottom;
-    transform: scaleY(0);
+    from {
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+
+    to {
+      transform: scaleY(1);
+      transform-origin: bottom;
+    }
   }
-  to {
-    transform-origin: bottom;
-    transform: scaleY(1);
-  }
-}
-  .member-title{
+
+  .member-title {
     display: flex;
     flex-direction: row;
+    align-items: center;
     width: 100%;
     margin-bottom: 10px;
-    align-items: center;
-    .avatar-url{
+
+    .avatar-url {
       width: 30px;
       height: 30px;
       border-radius: 50%;
     }
-    .member-title-content{
-      font-weight: 500;
+
+    .member-title-content {
+      margin-left: 10px;
       font-size: 16px;
+      font-weight: 500;
       line-height: 22px;
       color: var(--member-title-content-h5);
-      margin-left: 10px;
     }
   }
+
   .user-operate-item {
-    width: 100%;
     display: flex;
-    padding-top: 10px;
     align-items: center;
+    width: 100%;
+    padding-top: 10px;
+
     .control-title {
       margin-left: 10px;
     }
   }
 }
-.agree-button, .cancel-button{
-  padding: 12px;
-  width: 50%;
+
+.agree-button,
+.cancel-button {
   display: flex;
   align-items: center;
+  width: 50%;
+  padding: 12px;
 }
+
 .agree-button {
   color: var(--active-color-1);
 }
-.tab-cancel{
+
+.tab-cancel {
   flex: 1;
+  padding-right: 30px;
   text-align: end;
-  padding-right: 30px
 }
-.input-content-container{
+
+.input-content-container {
   position: fixed;
-  left: 0;
   top: 0;
   bottom: 0;
+  left: 0;
+  z-index: 9999;
+  box-sizing: border-box;
   width: 100vw;
   height: auto;
-  box-sizing: border-box;
   background-color: var(--log-out-mobile);
-  z-index: 9999;
+
   .input-content {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    color: #676c80;
-    background: var(--background-color-1);
-    border: none;
-    box-sizing: border-box;
-    font-family: "PingFang SC";
-    font-style: normal;
-    font-weight: 450;
-    font-size: 16px;
-    line-height: 4vh;
-    resize: none;
-    padding: 10px;
     position: absolute;
     bottom: 0;
-  }
-  .input{
-    width: 100%;
-  }
-  .content-bottom-input {
-    color: #676c80;
-    width: 100%;
-    height: 35px;
-    border: none;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
     font-family: 'PingFang SC';
+    font-size: 16px;
     font-style: normal;
     font-weight: 450;
-    font-size: 16px;
     line-height: 4vh;
-    background-color: var(--chat-editor-input-color-h5);
-    caret-color: var(--caret-color);
-    border-radius: 45px;
+    color: #676c80;
     resize: none;
+    background: var(--background-color-1);
+    border: none;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  .content-bottom-input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 35px;
     padding-left: 12px;
+    font-family: 'PingFang SC';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 450;
+    line-height: 4vh;
+    color: #676c80;
+    caret-color: var(--caret-color);
+    resize: none;
+    background-color: var(--chat-editor-input-color-h5);
+    border: none;
+    border-radius: 45px;
   }
 }
 </style>

@@ -60,16 +60,45 @@ export class LifeCycleManager implements ILifeCycleManager {
       return callback.bind(this, reason);
     };
 
-    const eventReasonMap: { [key: string]: { reason: LifeCycleChangeReason, type: LifeCycleEvent } } = {
-      [RoomEventType.ROOM_START]: { reason: LifeCycleChangeReason.RoomStart, type: 'mount' },
-      [RoomEventType.ROOM_JOIN]: { reason: LifeCycleChangeReason.RoomJoin, type: 'mount' },
-      [RoomEventType.USER_LOGOUT]: { reason: LifeCycleChangeReason.RoomLogout, type: 'unmount' },
-      [RoomEventType.ROOM_LEAVE]: { reason: LifeCycleChangeReason.RoomLeave, type: 'unmount' },
-      [RoomEventType.ROOM_DISMISS]: { reason: LifeCycleChangeReason.RoomDestroy, type: 'unmount' },
-      [RoomEventType.KICKED_OFFLINE]: { reason: LifeCycleChangeReason.RoomKickedOffline, type: 'unmount' },
-      [RoomEventType.KICKED_OUT]: { reason: LifeCycleChangeReason.RoomKickedOut, type: 'unmount' },
-      [RoomEventType.USER_SIG_EXPIRED]: { reason: LifeCycleChangeReason.RoomUserSigExpired, type: 'unmount' },
-      [RoomEventType.ROOM_ERROR]: { reason: LifeCycleChangeReason.RoomError, type: 'unmount' },
+    const eventReasonMap: {
+      [key: string]: { reason: LifeCycleChangeReason; type: LifeCycleEvent };
+    } = {
+      [RoomEventType.ROOM_START]: {
+        reason: LifeCycleChangeReason.RoomStart,
+        type: 'mount',
+      },
+      [RoomEventType.ROOM_JOIN]: {
+        reason: LifeCycleChangeReason.RoomJoin,
+        type: 'mount',
+      },
+      [RoomEventType.USER_LOGOUT]: {
+        reason: LifeCycleChangeReason.RoomLogout,
+        type: 'unmount',
+      },
+      [RoomEventType.ROOM_LEAVE]: {
+        reason: LifeCycleChangeReason.RoomLeave,
+        type: 'unmount',
+      },
+      [RoomEventType.ROOM_DISMISS]: {
+        reason: LifeCycleChangeReason.RoomDestroy,
+        type: 'unmount',
+      },
+      [RoomEventType.KICKED_OFFLINE]: {
+        reason: LifeCycleChangeReason.RoomKickedOffline,
+        type: 'unmount',
+      },
+      [RoomEventType.KICKED_OUT]: {
+        reason: LifeCycleChangeReason.RoomKickedOut,
+        type: 'unmount',
+      },
+      [RoomEventType.USER_SIG_EXPIRED]: {
+        reason: LifeCycleChangeReason.RoomUserSigExpired,
+        type: 'unmount',
+      },
+      [RoomEventType.ROOM_ERROR]: {
+        reason: LifeCycleChangeReason.RoomError,
+        type: 'unmount',
+      },
     };
 
     Object.entries(eventReasonMap).forEach(([event, { reason, type }]) => {

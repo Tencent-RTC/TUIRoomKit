@@ -33,7 +33,11 @@ const content = computed(() => {
   return props.value;
 });
 
-const badgeClass = computed(() => ['tui-badge', `tui-badge-${props.type}`, props.isDot ? 'tui-badge-isDot' : '']);
+const badgeClass = computed(() => [
+  'tui-badge',
+  `tui-badge-${props.type}`,
+  props.isDot ? 'tui-badge-isDot' : '',
+]);
 </script>
 
 <style lang="scss" scoped>
@@ -48,10 +52,10 @@ const badgeClass = computed(() => ['tui-badge', `tui-badge-${props.type}`, props
     display: inline-block;
     padding: 1px 6px;
     font-size: 12px;
-    color: var(--white-color);
-    transform: translateY(-50%) translateX(100%);
     font-weight: bold;
+    color: var(--white-color);
     border-radius: 10px;
+    transform: translateY(-50%) translateX(100%);
   }
 }
 
@@ -70,8 +74,8 @@ const badgeClass = computed(() => ['tui-badge', `tui-badge-${props.type}`, props
 .tui-badge-isDot {
   .tui-badge-count {
     top: 0;
-    height: 8px;
     width: 8px;
+    height: 8px;
     padding: 0;
     border-radius: 50%;
   }

@@ -1,6 +1,13 @@
 // Raise hands to speak logic
 import { onBeforeUnmount, computed, watch } from 'vue';
-import { TUIRoomEngine, TUIRoomEvents, TUIRequestAction, TUIRequest, TUIRequestCallbackType, TUIErrorCode } from '@tencentcloud/tuiroom-engine-wx';
+import {
+  TUIRoomEngine,
+  TUIRoomEvents,
+  TUIRequestAction,
+  TUIRequest,
+  TUIRequestCallbackType,
+  TUIErrorCode,
+} from '@tencentcloud/tuiroom-engine-wx';
 import useGetRoomEngine from './useRoomEngine';
 import TUIMessage from '../components/common/base/Message/index';
 import { MESSAGE_DURATION } from '../constants/message';
@@ -21,7 +28,9 @@ export default function () {
   const { showApplyUserList } = storeToRefs(basicStore);
   const { t } = useI18n();
   let notification: { close: Function } | null;
-  const applyToAnchorUserIdList = computed(() => applyToAnchorList.value.map(item => item.userId));
+  const applyToAnchorUserIdList = computed(() =>
+    applyToAnchorList.value.map(item => item.userId)
+  );
   const applyToAnchorUserCount = computed(() => applyToAnchorList.value.length);
 
   // ------ The following handles common user operations ---------
@@ -31,18 +40,25 @@ export default function () {
     const { requestAction, requestId, userId, timestamp } = eventInfo.request;
     if (requestAction === TUIRequestAction.kRequestToTakeSeat) {
       // User application for stage
-      userId && roomStore.addApplyToAnchorUser({ userId, requestId, timestamp });
+      userId &&
+        roomStore.addApplyToAnchorUser({ userId, requestId, timestamp });
     }
   }
 
   // The remote user cancels the application to connect to the stage
-  function onRequestCancelled(eventInfo: { requestId: string, userId: string }) {
+  function onRequestCancelled(eventInfo: {
+    requestId: string;
+    userId: string;
+  }) {
     const { requestId } = eventInfo;
     roomStore.removeApplyToAnchorUser(requestId);
   }
 
   // The remote user's request is handled by other administrators/hosts.
-  function onRequestProcessed(eventInfo: { requestId: string, userId: string }) {
+  function onRequestProcessed(eventInfo: {
+    requestId: string;
+    userId: string;
+  }) {
     const { requestId } = eventInfo;
     roomStore.removeApplyToAnchorUser(requestId);
   }
@@ -51,7 +67,7 @@ export default function () {
   async function handleUserApply(applyUserId: string, agree: boolean) {
     try {
       // TUIRoomCore.replySpeechApplication(applyUserId, agree);
-      const userInfo = roomStore.remoteUserObj[applyUserId];
+      const userInfo = roomStore.userInfoObj[applyUserId];
       const requestId = userInfo.applyToAnchorRequestId;
       if (requestId) {
         await roomEngine.instance?.responseRemoteRequest({
@@ -60,7 +76,10 @@ export default function () {
         });
         roomStore.removeApplyToAnchorUser(requestId);
       } else {
-        logger.warn('Failed to process the stage application. The data is abnormal. Please try again！', userInfo);
+        logger.warn(
+          'Failed to process the stage application. The data is abnormal. Please try again！',
+          userInfo
+        );
       }
     } catch (error: any) {
       if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
@@ -76,10 +95,16 @@ export default function () {
     try {
       const requestId = userInfo.applyToAnchorRequestId;
       if (requestId) {
-        await roomEngine.instance?.responseRemoteRequest({ requestId, agree: true });
+        await roomEngine.instance?.responseRemoteRequest({
+          requestId,
+          agree: true,
+        });
         roomStore.removeApplyToAnchorUser(requestId);
       } else {
-        logger.warn('Failed to process the stage application. The data is abnormal. Please try again！', userInfo);
+        logger.warn(
+          'Failed to process the stage application. The data is abnormal. Please try again！',
+          userInfo
+        );
       }
     } catch (error: any) {
       if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
@@ -100,7 +125,10 @@ export default function () {
       });
       roomStore.removeApplyToAnchorUser(requestId);
     } else {
-      logger.warn('Failed to process the stage application. The data is abnormal. Please try again！', userInfo);
+      logger.warn(
+        'Failed to process the stage application. The data is abnormal. Please try again！',
+        userInfo
+      );
     }
   }
 
@@ -139,14 +167,29 @@ export default function () {
 
   TUIRoomEngine.once('ready', () => {
     roomEngine.instance?.on(TUIRoomEvents.onRequestReceived, onRequestReceived);
-    roomEngine.instance?.on(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
-    roomEngine.instance?.on(TUIRoomEvents.onRequestProcessed, onRequestProcessed);
+    roomEngine.instance?.on(
+      TUIRoomEvents.onRequestCancelled,
+      onRequestCancelled
+    );
+    roomEngine.instance?.on(
+      TUIRoomEvents.onRequestProcessed,
+      onRequestProcessed
+    );
   });
 
   onBeforeUnmount(() => {
-    roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
-    roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
-    roomEngine.instance?.off(TUIRoomEvents.onRequestProcessed, onRequestProcessed);
+    roomEngine.instance?.off(
+      TUIRoomEvents.onRequestReceived,
+      onRequestReceived
+    );
+    roomEngine.instance?.off(
+      TUIRoomEvents.onRequestCancelled,
+      onRequestCancelled
+    );
+    roomEngine.instance?.off(
+      TUIRoomEvents.onRequestProcessed,
+      onRequestProcessed
+    );
   });
 
   // --------- The following handles the moderator’s active operations ----------
@@ -159,7 +202,9 @@ export default function () {
       userId,
       timeout: 60,
       requestCallback: (callbackInfo: {
-        requestCallbackType: TUIRequestCallbackType, userId: string, code: TUIErrorCode
+        requestCallbackType: TUIRequestCallbackType;
+        userId: string;
+        code: TUIErrorCode;
       }) => {
         const { requestCallbackType, userId, code } = callbackInfo;
         const userName = roomStore.getUserName(userId);
@@ -182,7 +227,9 @@ export default function () {
           case TUIRequestCallbackType.kRequestTimeout:
             TUIMessage({
               type: 'warning',
-              message: t('The invitation to sb to go on stage has timed out', { name: userName || userId }),
+              message: t('The invitation to sb to go on stage has timed out', {
+                name: userName || userId,
+              }),
               duration: MESSAGE_DURATION.NORMAL,
             });
             break;
@@ -190,7 +237,9 @@ export default function () {
             if (code === TUIErrorCode.ERR_REQUEST_ID_REPEAT) {
               TUIMessage({
                 type: 'warning',
-                message: t('This member has already received the same request, please try again later'),
+                message: t(
+                  'This member has already received the same request, please try again later'
+                ),
                 duration: MESSAGE_DURATION.NORMAL,
               });
             }
@@ -210,7 +259,9 @@ export default function () {
     const { userId, inviteToAnchorRequestId } = userInfo;
     roomStore.removeInviteToAnchorUser(userId);
     if (inviteToAnchorRequestId) {
-      roomEngine.instance?.cancelRequest({ requestId: inviteToAnchorRequestId });
+      roomEngine.instance?.cancelRequest({
+        requestId: inviteToAnchorRequestId,
+      });
     }
   }
 
@@ -222,7 +273,10 @@ export default function () {
     });
   }
 
-  const handleConfirm = async (onlyOneUserTakeStage: boolean, userId: string) => {
+  const handleConfirm = async (
+    onlyOneUserTakeStage: boolean,
+    userId: string
+  ) => {
     if (isMobile) {
       basicStore.setSidebarOpenStatus(true);
       basicStore.setSidebarName('apply');
@@ -235,7 +289,10 @@ export default function () {
     }
   };
 
-  const handleCancel = async (onlyOneUserTakeStage: boolean, userId: string) => {
+  const handleCancel = async (
+    onlyOneUserTakeStage: boolean,
+    userId: string
+  ) => {
     if (!isMobile && onlyOneUserTakeStage) {
       handleUserApply(userId, false);
     }
@@ -258,15 +315,34 @@ export default function () {
       const onlyOneUserTakeStage = newVal.length === 1;
       const firstUser = applyToAnchorList.value[0];
       const lastIndex = applyToAnchorList.value.length - 1;
-      const userName = applyToAnchorList.value[lastIndex]?.nameCard || applyToAnchorList.value[lastIndex]?.userName || applyToAnchorList.value[lastIndex]?.userId;
+      const userName =
+        applyToAnchorList.value[lastIndex]?.nameCard ||
+        applyToAnchorList.value[lastIndex]?.userName ||
+        applyToAnchorList.value[lastIndex]?.userId;
       const message = onlyOneUserTakeStage
         ? `${userName} ${t('Applying for the stage')}`
         : `${userName} ${t('and so on number people applying to stage', { number: applyToAnchorList.value.length })}`;
-      const confirmButtonText = isMobile ? t('Check') : (onlyOneUserTakeStage ? t('Agree to the stage') : t('Check'));
-      const cancelButtonText = isMobile ? undefined : (onlyOneUserTakeStage ? t('Reject') : t('Neglect'));
-      const confirm = () => handleConfirm(onlyOneUserTakeStage, firstUser?.userId);
-      const cancel = () => handleCancel(onlyOneUserTakeStage, firstUser?.userId);
-      notification = TUINotification({ message, confirmButtonText, cancelButtonText, confirm, cancel });
+      const confirmButtonText = isMobile
+        ? t('Check')
+        : onlyOneUserTakeStage
+          ? t('Agree to the stage')
+          : t('Check');
+      const cancelButtonText = isMobile
+        ? undefined
+        : onlyOneUserTakeStage
+          ? t('Reject')
+          : t('Neglect');
+      const confirm = () =>
+        handleConfirm(onlyOneUserTakeStage, firstUser?.userId);
+      const cancel = () =>
+        handleCancel(onlyOneUserTakeStage, firstUser?.userId);
+      notification = TUINotification({
+        message,
+        confirmButtonText,
+        cancelButtonText,
+        confirm,
+        cancel,
+      });
     });
   }
 

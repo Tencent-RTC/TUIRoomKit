@@ -1,6 +1,19 @@
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg
+  width="20"
+  height="20"
+  viewBox="0 0 20 20"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
   <g id="Group 8007">
-    <circle id="Ellipse 269" cx="10" cy="10" r="7.65" stroke="currentColor" stroke-width="1.7" />
+    <circle
+      id="Ellipse 269"
+      cx="10"
+      cy="10"
+      r="7.65"
+      stroke="currentColor"
+      stroke-width="1.7"
+    />
     <path
       id="Intersect"
       fill-rule="evenodd"
@@ -9,6 +22,12 @@
       fill="currentColor"
     />
     <circle id="Ellipse 273" cx="7.1" cy="8.1" r="1.1" fill="currentColor" />
-    <circle id="Ellipse 274" cx="12.8998" cy="8.1" r="1.1" fill="currentColor" />
+    <circle
+      id="Ellipse 274"
+      cx="12.8998"
+      cy="8.1"
+      r="1.1"
+      fill="currentColor"
+    />
   </g>
 </svg>

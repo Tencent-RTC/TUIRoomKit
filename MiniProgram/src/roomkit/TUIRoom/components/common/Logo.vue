@@ -3,28 +3,28 @@
   <div class="logo-container">
     <!-- Logo under Chinese black theme on PC -->
     <div v-if="!isMobile && isZH && isBlackTheme">
-      <svg-icon style="display: flex" :icon="LogoOfPCInChineseBlackIcon"></svg-icon>
+      <svg-icon style="display: flex" :icon="LogoOfPCInChineseBlackIcon" />
     </div>
     <!-- Logo under Chinese white theme on PC -->
     <div v-if="!isMobile && isZH && isWhiteTheme">
-      <svg-icon style="display: flex" :icon="LogoOfPCInChineseWhiteIcon"></svg-icon>
+      <svg-icon style="display: flex" :icon="LogoOfPCInChineseWhiteIcon" />
     </div>
     <!-- Mobile Chinese black and white theme logo -->
     <div v-if="isMobile && isZH" class="mobile-zh-logo">
       <span class="logo" :class="isWhiteTheme ? 'white' : 'black'">
-        <svg-icon style="display: flex" :icon="LogoOfMobileInChinese"></svg-icon>
+        <svg-icon style="display: flex" :icon="LogoOfMobileInChinese" />
       </span>
       <span class="title">
-        <svg-icon style="display: flex" :icon="LogoTitleOfMobileInChinese"></svg-icon>
+        <svg-icon style="display: flex" :icon="LogoTitleOfMobileInChinese" />
       </span>
     </div>
     <!-- English black and white theme logo -->
-    <div v-if="isEN" :class="['pc-en-logo', { 'mobile': isMobile }]">
+    <div v-if="isEN" :class="['pc-en-logo', { mobile: isMobile }]">
       <span class="logo">
-        <svg-icon style="display: flex" :icon="LogoInEnglish"></svg-icon>
+        <svg-icon style="display: flex" :icon="LogoInEnglish" />
       </span>
       <span class="title" :class="isWhiteTheme ? 'white' : 'black'">
-        <svg-icon style="display: flex" :icon="LogoTitleInEnglish"></svg-icon>
+        <svg-icon style="display: flex" :icon="LogoTitleInEnglish" />
       </span>
     </div>
   </div>
@@ -52,7 +52,6 @@ const isEN = computed(() => i18n.global.locale.value === 'en-US');
 const isZH = computed(() => i18n.global.locale.value === 'zh-CN');
 const isBlackTheme = computed(() => defaultTheme.value === 'black');
 const isWhiteTheme = computed(() => defaultTheme.value === 'white');
-
 </script>
 
 <style lang="scss" scoped>
@@ -60,30 +59,38 @@ const isWhiteTheme = computed(() => defaultTheme.value === 'white');
   display: flex;
   align-items: center;
   transform: scale(0.9);
+
   .title {
     margin-left: 10px;
   }
+
   .white {
-    color: #202C40;
+    color: #202c40;
   }
+
   .black {
-    color: #D5E0F2;
+    color: #d5e0f2;
   }
+
   &.mobile {
     transform: scale(0.6);
   }
 }
+
 .mobile-zh-logo {
   display: flex;
   flex-direction: column;
+
   .logo {
     margin-bottom: 7px;
   }
+
   .white {
-    color: #000000;
+    color: #000;
   }
+
   .black {
-    color: #FFFFFF;
+    color: #fff;
   }
 }
 </style>

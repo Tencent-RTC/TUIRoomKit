@@ -1,14 +1,14 @@
 <template>
-  <div class="tui-checkbox">
-    <input v-model="checked" type="checkbox" @change="handleValueChange" />
-    <span class="tui-checkbox-slot-container" @click="handleCheckBoxClick">
+  <div class="tui-checkbox" @click="handleCheckBoxClick">
+    <checkbox :checked="checked" />
+    <span class="tui-checkbox-slot-container">
       <slot></slot>
     </span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, watch } from 'vue';
+import { ref, Ref, watch, withDefaults, defineProps, defineEmits } from 'vue';
 interface Props {
   modelValue: boolean;
 }
@@ -20,21 +20,16 @@ const props = withDefaults(defineProps<Props>(), {
 const checked: Ref<boolean> = ref(props.modelValue);
 const emit = defineEmits(['input']);
 
-
-watch(() => props.modelValue, (value) => {
-  checked.value = value;
-});
-
+watch(
+  () => props.modelValue,
+  value => {
+    checked.value = value;
+  }
+);
 
 function handleCheckBoxClick() {
   checked.value = !checked.value;
   emit('input', checked.value);
-}
-
-
-function handleValueChange(event: any) {
-  checked.value = event.target.checked;
-  emit('input', event.target.checked);
 }
 </script>
 
@@ -43,7 +38,9 @@ function handleValueChange(event: any) {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
   cursor: pointer;
+
   .tui-checkbox-slot-container {
     flex: 1;
     overflow: auto;
@@ -52,9 +49,9 @@ function handleValueChange(event: any) {
 
 input {
   color: var(--title-color);
+  cursor: pointer;
   border: 1px solid var(--stroke-color);
   border-radius: 4px;
-  cursor: pointer;
 }
 
 input:focus {

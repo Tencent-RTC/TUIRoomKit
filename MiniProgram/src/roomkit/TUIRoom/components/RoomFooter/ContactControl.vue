@@ -7,7 +7,7 @@
       @click-icon="toggleContactSidebar"
     />
     <div v-if="isShowContactTab" class="contact-container">
-      <room-contact ref="contactRef" @on-close-contact="handleOnCloseContact"></room-contact>
+      <room-contact ref="contactRef" @on-close-contact="handleOnCloseContact" />
     </div>
   </div>
 </template>
@@ -19,7 +19,7 @@ import { useBasicStore } from '../../stores/basic';
 import MoreIcon from '../../assets/icons/MoreIcon.svg';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
-import { isMobile }  from '../../utils/environment';
+import { isMobile } from '../../utils/environment';
 import roomContact from '../RoomMore/index.vue';
 
 const basicStore = useBasicStore();
@@ -50,20 +50,18 @@ function toggleContactSidebar() {
 function handleOnCloseContact() {
   isShowContactTab.value = false;
 }
-
 </script>
 
 <style lang="scss" scoped>
 .contact-container {
   position: fixed;
-  left: 0;
   top: 0;
   bottom: 0;
+  left: 0;
+  z-index: 11;
+  box-sizing: border-box;
   width: 100vw;
   height: auto;
-  box-sizing: border-box;
   background-color: var(--log-out-mobile);
-  z-index: 11;
 }
 </style>
-

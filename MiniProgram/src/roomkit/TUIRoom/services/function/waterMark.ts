@@ -2,7 +2,7 @@ import { EventType, IRoomService } from '../types';
 
 interface IWaterMark {
   toggleWatermark(enabled: boolean): void;
-  dispose() : void;
+  dispose(): void;
 }
 export class WaterMark implements IWaterMark {
   private service: IRoomService;
@@ -95,8 +95,16 @@ export class WaterMark implements IWaterMark {
       const maxWidth = 200;
       const watermarkSpacing = maxWidth + 25;
 
-      for (let y = -watermarkSpacing; y < watermarkContainer.offsetHeight + watermarkSpacing; y += watermarkSpacing) {
-        for (let x = -watermarkSpacing; x < watermarkContainer.offsetWidth + watermarkSpacing; x += watermarkSpacing) {
+      for (
+        let y = -watermarkSpacing;
+        y < watermarkContainer.offsetHeight + watermarkSpacing;
+        y += watermarkSpacing
+      ) {
+        for (
+          let x = -watermarkSpacing;
+          x < watermarkContainer.offsetWidth + watermarkSpacing;
+          x += watermarkSpacing
+        ) {
           const watermarkElement = document?.createElement('div');
           watermarkElement.classList.add('watermark');
           watermarkElement.textContent = watermarkText;
@@ -112,10 +120,16 @@ export class WaterMark implements IWaterMark {
     const resizeObserver = new ResizeObserver(addWatermarkElements);
     resizeObserver.observe(watermarkContainer);
 
-    const observerCallback = (mutations: MutationRecord[], observer: MutationObserver) => {
-      mutations.forEach((mutation) => {
+    const observerCallback = (
+      mutations: MutationRecord[],
+      observer: MutationObserver
+    ) => {
+      mutations.forEach(mutation => {
         if (mutation.removedNodes.length > 0) {
-          const removedWatermark = Array.from(mutation.removedNodes).some(node => (node as HTMLElement).classList?.contains('watermark-container'));
+          const removedWatermark = Array.from(mutation.removedNodes).some(
+            node =>
+              (node as HTMLElement).classList?.contains('watermark-container')
+          );
           if (removedWatermark) {
             watermarkContainer = document?.createElement('div');
             watermarkContainer.classList.add('watermark-container');
@@ -125,7 +139,10 @@ export class WaterMark implements IWaterMark {
             observeChanges();
           }
         }
-        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'style'
+        ) {
           watermarkContainer.style.display = '';
         }
       });
@@ -134,7 +151,10 @@ export class WaterMark implements IWaterMark {
     const observeChanges = () => {
       const observer = new MutationObserver(observerCallback);
       observer.observe(targetElement, { childList: true });
-      observer.observe(watermarkContainer, { attributes: true, attributeFilter: ['style'] });
+      observer.observe(watermarkContainer, {
+        attributes: true,
+        attributeFilter: ['style'],
+      });
     };
 
     observeChanges();
