@@ -8,13 +8,14 @@ class UseRoomExtension {
     '<ConferenceMainView',
     '/message-room/message-room.vue',
     '/message-room/message-room-default.vue',
-    'import { createPinia } from \'pinia\';', 'app.use(createPinia());',
+    "import { createPinia } from 'pinia';",
+    'app.use(createPinia());',
   ];
   init() {
     this.changeLine(path.join(this.projectPath, './src'));
   }
   changeLine(dirPath) {
-    processDirectory(dirPath, (filePath) => {
+    processDirectory(dirPath, filePath => {
       changeLine(filePath, filePath, this.matchStrings);
     });
   }
@@ -34,12 +35,15 @@ function changeLine(inputFile, outputFile, matchStrings) {
     console: false,
   });
 
-  readInterface.on('line', (line) => {
+  readInterface.on('line', line => {
     const needReplace = matchStrings.some(ms => line.includes(ms));
     if (needReplace) {
       line = line.replace(/\/\/\s*/, '');
       line = line.replace(/<!--\s*/, '').replace(/\s*-->/, '');
-      line = line.replace(/import MessageRoom from '.\/message-room\/message-room-default.vue';/, '// import MessageRoom from \'./message-room/message-room-default.vue\';');
+      line = line.replace(
+        /import MessageRoom from '.\/message-room\/message-room-default.vue';/,
+        "// import MessageRoom from './message-room/message-room-default.vue';"
+      );
       foundMatch = true;
     }
     readInterface.output.write(`${line}\n`);
@@ -47,7 +51,7 @@ function changeLine(inputFile, outputFile, matchStrings) {
 
   readInterface.on('close', () => {
     if (foundMatch) {
-      fs.rename(tempFile, outputFile, (err) => {
+      fs.rename(tempFile, outputFile, err => {
         if (err) {
           console.error(`Unable to rename temporary file:${err.message}`);
           return;
@@ -55,7 +59,7 @@ function changeLine(inputFile, outputFile, matchStrings) {
         console.log(`Introduce room for file ${inputFile}`);
       });
     } else {
-      fs.unlink(tempFile, (err) => {
+      fs.unlink(tempFile, err => {
         if (err) {
           console.error(`Unable to delete temporary files:${err.message}`);
           return;
@@ -71,7 +75,7 @@ function processDirectory(directoryPath, callback) {
       return;
     }
 
-    files.forEach((file) => {
+    files.forEach(file => {
       const filePath = path.join(directoryPath, file);
       fs.stat(filePath, (err, stats) => {
         if (err) {

@@ -1,4 +1,3 @@
-
 import TuiDialog from './Dialog';
 import TuiMessage from './Message/index';
 import TuiMessageBox from './MessageBox';
@@ -8,11 +7,12 @@ import TuiButton from './Button.vue';
 import TuiDrawer from './Drawer.vue';
 import IconButton from './IconButton.vue';
 import TuiInput from './Input';
-import TuiOption from './Option.vue';
+import TuiOption from './Option';
 import TuiPopUpH5 from './PopUpH5.vue';
-import TuiSelect from './Select.vue';
+import TuiSelect from './Select';
 import SvgIcon from './SvgIcon.vue';
 import TuiSwitch from './TuiSwitch.vue';
+import TuiCheckbox from './Checkbox';
 
 export {
   TuiDialog,

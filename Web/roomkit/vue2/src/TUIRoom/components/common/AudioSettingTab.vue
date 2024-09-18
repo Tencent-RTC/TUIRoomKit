@@ -10,10 +10,7 @@
     <div class="item-setting">
       <span class="title">{{ t('Mic') }}</span>
       <div class="flex">
-        <device-select
-          class="select"
-          device-type="microphone"
-        ></device-select>
+        <device-select class="select" device-type="microphone" />
         <tui-button
           v-if="isDetailMode"
           class="button"
@@ -30,19 +27,21 @@
         <div
           v-for="(item, index) in new Array(volumeTotalNum).fill('')"
           :key="index"
-          :class="['mic-bar', `${showVolume && volumeNum > index ? 'active' : ''}`]"
-        >
-        </div>
+          :class="[
+            'mic-bar',
+            `${showVolume && volumeNum > index ? 'active' : ''}`,
+          ]"
+        ></div>
       </div>
     </div>
-    <div v-if="(speakerList.length > 0)" class="item-setting">
+    <div v-if="speakerList.length > 0" class="item-setting">
       <span class="title">{{ t('Speaker') }}</span>
       <div class="flex">
         <device-select
           class="select"
           device-type="speaker"
           :disabled="mode === SettingMode.DETAIL"
-        ></device-select>
+        />
         <tui-button
           v-if="isDetailMode"
           class="button"
@@ -57,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeUnmount } from 'vue';
+import { ref, computed, onBeforeUnmount, defineProps } from 'vue';
 import DeviceSelect from './DeviceSelect.vue';
 import { useRoomStore } from '../../stores/room';
 import { SettingMode } from '../../constants/render';
@@ -68,11 +67,10 @@ import { isElectron } from '../../utils/environment';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import TuiButton from '../common/base/Button.vue';
 
-
 interface Props {
-  mode?: SettingMode,
-  audioVolume?: number,
-  theme?: string,
+  mode?: SettingMode;
+  audioVolume?: number;
+  theme?: string;
 }
 const props = defineProps<Props>();
 const settingMode = props.mode || SettingMode.SIMPLE;
@@ -86,35 +84,41 @@ const { speakerList, userVolumeObj, currentSpeakerId } = storeToRefs(roomStore);
 const roomEngine = useGetRoomEngine();
 const trtcCloud = roomEngine.instance?.getTRTCCloud();
 
-const themeClass = computed(() => (props.theme ? `tui-theme-${props.theme}` : ''));
+const themeClass = computed(() =>
+  props.theme ? `tui-theme-${props.theme}` : ''
+);
 
 const volumeTotalNum = computed(() => (isDetailMode.value ? 36 : 28));
 
 const volumeNum = computed(() => {
   const volume = props.audioVolume || userVolumeObj.value[userId.value] || 0;
-  return volume * volumeTotalNum.value / 100;
+  return (volume * volumeTotalNum.value) / 100;
 });
 
-const showVolume = computed(() => isSampleMode.value || (isDetailMode.value && isTestingMicrophone.value));
+const showVolume = computed(
+  () => isSampleMode.value || (isDetailMode.value && isTestingMicrophone.value)
+);
 
 const isTestingMicrophone = ref(false);
 
 /**
  * Click on the microphone [Test] button
-**/
+ **/
 function handleMicrophoneTest() {
   isTestingMicrophone.value = !isTestingMicrophone.value;
 }
 
 const isTestingSpeaker = ref(false);
 const audioPlayer = document?.createElement('audio');
+audioPlayer.loop = true;
 const { t } = useI18n();
 
 /**
  * Click on the speaker [Test] button
-**/
+ **/
 async function handleSpeakerTest() {
-  const SPEAKER_TEST_URL = 'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';
+  const SPEAKER_TEST_URL =
+    'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';
   isTestingSpeaker.value = !isTestingSpeaker.value;
   const isStartSpeakerTest = isTestingSpeaker.value;
   if (isElectron) {
@@ -130,7 +134,6 @@ async function handleSpeakerTest() {
     return;
   }
   if (isStartSpeakerTest) {
-    // @ts-ignore
     await audioPlayer?.setSinkId(currentSpeakerId.value);
     audioPlayer.src = SPEAKER_TEST_URL;
     audioPlayer.play();
@@ -147,57 +150,67 @@ onBeforeUnmount(() => {
   }
   audioPlayer && audioPlayer.pause();
 });
-
 </script>
 
 <style lang="scss" scoped>
 .audio-setting-tab {
-  border-radius: 4px;
-  font-size: 14px;
   width: 100%;
+  font-size: 14px;
+  border-radius: 4px;
+
   .item-setting {
     width: 100%;
+
     &:not(:last-child) {
       margin-bottom: 20px;
     }
   }
+
   .flex {
-    width: 100%;
     display: flex;
+    width: 100%;
   }
+
   .select {
     flex: 1;
   }
+
   .button {
-    margin-left: 10px;
-    padding: 5px 23px;
     width: 74px;
+    padding: 5px 23px;
+    margin-left: 10px;
   }
+
   .title {
     display: inline-block;
-    margin-bottom: 8px;
     width: 100%;
-    color: #4f586b;
+    margin-bottom: 8px;
     font-size: 14px;
     font-weight: 400;
     line-height: 22px;
+    color: #4f586b;
   }
+
   .mic-bar-container {
     display: flex;
     justify-content: space-between;
+
     .mic-bar {
       width: 3px;
       height: 6px;
       background-color: var(--background-color-4);
+
       &.active {
         background-color: var(--green-color);
       }
     }
   }
+
   .audio-level-container {
+    display: flex;
     width: 100%;
     height: 20px;
-    display: flex;
+
     .slider {
       height: 20px;
       margin-left: 10px;

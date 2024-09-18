@@ -1,14 +1,24 @@
 <template>
-  <div v-show="props.isShowScheduledConference && !isMobile" id="scheduleRoomContainer" class="schedule-room">
+  <div
+    v-show="props.isShowScheduledConference"
+    id="scheduleRoomContainer"
+    :class="[
+      'schedule-room',
+      !isMobile ? 'schedule-room-pc' : 'schedule-room-h5',
+    ]"
+  >
     <div class="schedule-loading" v-if="isShowLoading">
-      <svg-icon :icon="LoadingScheduleIcon" class="loading"></svg-icon>
+      <svg-icon :icon="LoadingScheduleIcon" class="loading" />
       <span class="text">{{ t('Schedule room loading') }}</span>
     </div>
-    <div v-else>
+    <template v-else>
       <div v-if="scheduleRoomList.length > 0" class="schedule-room-container">
-        <div v-for="(item, index) in scheduleContentList" :key="index">
-          <div v-show="item.showTimestamp" class="schedule-room-date">
-            <svg-icon class="date" :icon="CalendarIcon"></svg-icon>
+        <div
+          v-for="item in scheduleContentList"
+          :key="item.basicRoomInfo.roomId"
+        >
+          <div v-if="item.showTimestamp" class="schedule-room-date">
+            <svg-icon class="date" :icon="CalendarIcon" />
             <span>{{ getScheduleDate(item.scheduleStartTime) }}</span>
           </div>
           <ScheduleRoomControl
@@ -18,67 +28,104 @@
             :schedule-start-time="getScheduleTime(item.scheduleStartTime)"
             :schedule-end-time="getScheduleTime(item.scheduleEndTime)"
             @join-conference="joinConference"
-            @show-more="(data) => handleShowMore(data, index)"
+            @show-more="handleShowMore"
           />
         </div>
       </div>
       <div v-else class="schedule-no-body">
-        <svg-icon :icon="ApplyStageLabelIcon"></svg-icon>
+        <svg-icon :icon="ApplyStageLabelIcon" />
         <span class="text">{{ t('No room available for booking') }}</span>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import {
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  defineEmits,
+  defineProps,
+  withDefaults,
+} from 'vue';
 import { EventType, roomService } from '../../services';
-import SvgIcon from '../../components/common/base/SvgIcon.vue';
-import CalendarIcon from '../../components/common/icons/CalendarIcon.vue';
-import ApplyStageLabelIcon from '../../components/common/icons/ApplyStageLabelIcon.vue';
+import SvgIcon from '../common/base/SvgIcon.vue';
+import CalendarIcon from '../common/icons/CalendarIcon.vue';
+import ApplyStageLabelIcon from '../common/icons/ApplyStageLabelIcon.vue';
 import ScheduleRoomControl from './ScheduleRoomControl.vue';
 import LoadingScheduleIcon from '../common/icons/LoadingScheduleIcon.vue';
 import { useI18n } from '../../locales';
-import { TUIConferenceInfo, TUIConferenceListManagerEvents, TUIConferenceModifyInfo, TUIConferenceStatus } from '@tencentcloud/tuiroom-engine-js';
+import {
+  TUIConferenceInfo,
+  TUIConferenceListManagerEvents,
+  TUIConferenceModifyInfo,
+  TUIConferenceStatus,
+} from '@tencentcloud/tuiroom-engine-js';
 import { isMobile } from '../../utils/environment';
 import { objectMerge } from '../../utils/utils.ts';
 
 const { t } = useI18n();
 const scheduleRoomList = ref<TUIConferenceInfo[]>([]);
-const emit = defineEmits(['join-conference']);
-const isShowLoading = ref(true);
 
-const joinConference = (options: any) => {
+interface JoinParams {
+  roomId: string;
+  roomParam?: {
+    isOpenCamera?: boolean;
+    isOpenMicrophone?: boolean;
+  };
+}
+
+const emit = defineEmits<{
+  (e: 'join-conference', options: JoinParams): void;
+}>();
+const isShowLoading = ref(true);
+const joinConference = (options: JoinParams) => {
   emit('join-conference', options);
 };
 
-const props = withDefaults(defineProps<{
-  isShowScheduledConference?: boolean,
-}>(), {
-  isShowScheduledConference: true,
-});
+const props = withDefaults(
+  defineProps<{
+    isShowScheduledConference?: boolean;
+  }>(),
+  {
+    isShowScheduledConference: true,
+  }
+);
 
-const sortedScheduleRoomList = computed(() => scheduleRoomList.value.sort((a, b) => a.scheduleStartTime - b.scheduleStartTime));
+function sortScheduleRoomList() {
+  return scheduleRoomList.value.sort(
+    (a, b) => a.scheduleStartTime - b.scheduleStartTime
+  );
+}
+const sortedScheduleRoomList = computed(() => sortScheduleRoomList());
 
 const fetchScheduledData = async (cursor = '', result: any[] = []) => {
-  const res = await roomService.scheduleConferenceManager.
-    fetchScheduledConferenceList({
+  const res =
+    await roomService.scheduleConferenceManager.fetchScheduledConferenceList({
       cursor,
       count: 20,
     });
-  res?.conferenceList && result.push(...res?.conferenceList);
+  res?.conferenceList && result.push(...(res?.conferenceList || []));
   if (res.cursor !== '') {
     await fetchScheduledData(res.cursor, result);
   }
   return result;
 };
 
-const scheduleContentList = computed(() => sortedScheduleRoomList.value.map((item, index, arr) => {
-  if (index === 0 || getScheduleDate(item.scheduleStartTime) !== getScheduleDate(arr[index - 1].scheduleStartTime)) {
-    return { ...item, showTimestamp: true };
-  }
-  return { ...item, showTimestamp: false };
-}));
+const scheduleContentList = computed(() =>
+  sortedScheduleRoomList.value.map((item, index, arr) => {
+    if (
+      index === 0 ||
+      getScheduleDate(item.scheduleStartTime) !==
+        getScheduleDate(arr[index - 1].scheduleStartTime)
+    ) {
+      return { ...item, showTimestamp: true };
+    }
+    return { ...item, showTimestamp: false };
+  })
+);
 
 function getScheduleDate(timestamp: number) {
   const date = new Date(timestamp * 1000);
@@ -95,20 +142,32 @@ function getScheduleTime(timestamp: number) {
   return `${hours}:${minutes}`;
 }
 
-const fetchAttendeeList = async (roomId: string, cursor = '', result: any[] = []) => {
-  const res = await roomService.scheduleConferenceManager.
-    fetchAttendeeList({ roomId, cursor, count: 20 });
+const fetchAttendeeList = async (
+  roomId: string,
+  cursor = '',
+  result: any[] = []
+) => {
+  const res = await roomService.scheduleConferenceManager.fetchAttendeeList({
+    roomId,
+    cursor,
+    count: 20,
+  });
   if (!res?.attendeeList) return [];
-  result.push(...res?.attendeeList);
+  result.push(...(res?.attendeeList || []));
   if (res.cursor !== '') {
     await fetchAttendeeList(roomId, res.cursor, result);
   }
   return result;
 };
 
-const handleShowMore = async (data: { roomId: string }, index: number) => {
+const handleShowMore = async (data: { roomId: string }) => {
   const attendeeList = await fetchAttendeeList(data.roomId);
-  scheduleRoomList.value[index].scheduleAttendees = attendeeList;
+  const scheduleRoom = scheduleRoomList.value.find(
+    item => item.basicRoomInfo.roomId === data.roomId
+  );
+  if (scheduleRoom) {
+    scheduleRoom.scheduleAttendees = attendeeList;
+  }
 };
 
 const fetchData = async () => {
@@ -116,12 +175,18 @@ const fetchData = async () => {
   isShowLoading.value = false;
 };
 
-const updateAttendees = (originList: any[] = [], changeData: { joinedUsers: any[], leftUsers: any[] }) => {
+const updateAttendees = (
+  originList: any[] = [],
+  changeData: { joinedUsers: any[]; leftUsers: any[] }
+) => {
   const { joinedUsers, leftUsers } = changeData;
   // Add joined users to the attendees array
   let resultList = [...originList, ...joinedUsers];
   // Remove left users from the attendees array
-  resultList = resultList.filter((attendee: any) => !leftUsers.some(leftUser => leftUser.userId === attendee.userId));
+  resultList = resultList.filter(
+    (attendee: any) =>
+      !leftUsers.some(leftUser => leftUser.userId === attendee.userId)
+  );
   return resultList;
 };
 const onConferenceScheduled = async (data: { conferenceInfo: any }) => {
@@ -129,22 +194,34 @@ const onConferenceScheduled = async (data: { conferenceInfo: any }) => {
   scheduleRoomList.value.push(conferenceInfo);
 };
 const onConferenceCancelled = async (data: any) => {
-  scheduleRoomList.value = scheduleRoomList.value.filter(item => item.basicRoomInfo.roomId !== data.roomId);
+  scheduleRoomList.value = scheduleRoomList.value.filter(
+    item => item.basicRoomInfo.roomId !== data.roomId
+  );
 };
-const onConferenceInfoChanged = async (data: { conferenceModifyInfo: TUIConferenceModifyInfo }) => {
-  const aimConferenceIndex = scheduleRoomList.value
-    .findIndex(item => item.basicRoomInfo.roomId === data.conferenceModifyInfo.basicRoomInfo.roomId);
+const onConferenceInfoChanged = async (data: {
+  conferenceModifyInfo: TUIConferenceModifyInfo;
+}) => {
+  const aimConferenceIndex = scheduleRoomList.value.findIndex(
+    item =>
+      item.basicRoomInfo.roomId ===
+      data.conferenceModifyInfo.basicRoomInfo.roomId
+  );
   if (aimConferenceIndex !== -1) {
     scheduleRoomList.value[aimConferenceIndex] = objectMerge(
       scheduleRoomList.value[aimConferenceIndex],
-      data.conferenceModifyInfo,
+      data.conferenceModifyInfo
     );
   }
 };
 const onScheduleAttendeesChanged = async (data: any) => {
-  const aimConference = scheduleRoomList.value.find(item => item.basicRoomInfo.roomId === data.roomId);
+  const aimConference = scheduleRoomList.value.find(
+    item => item.basicRoomInfo.roomId === data.roomId
+  );
   if (aimConference) {
-    aimConference.scheduleAttendees = updateAttendees(aimConference.scheduleAttendees, data);
+    aimConference.scheduleAttendees = updateAttendees(
+      aimConference.scheduleAttendees,
+      data
+    );
   }
 };
 
@@ -152,7 +229,9 @@ const onConferenceStatusChanged = (data: {
   roomId: string;
   status: TUIConferenceStatus;
 }) => {
-  const aimConference = scheduleRoomList.value.find(item => item.basicRoomInfo.roomId === data.roomId);
+  const aimConference = scheduleRoomList.value.find(
+    item => item.basicRoomInfo.roomId === data.roomId
+  );
   if (aimConference) {
     aimConference.status = data.status;
   }
@@ -160,136 +239,164 @@ const onConferenceStatusChanged = (data: {
 
 onMounted(() => {
   roomService.on(EventType.ROOM_LOGIN, fetchData);
-  roomService.scheduleConferenceManager.on(TUIConferenceListManagerEvents.onConferenceScheduled, onConferenceScheduled);
-  roomService.scheduleConferenceManager.on(TUIConferenceListManagerEvents.onConferenceCancelled, onConferenceCancelled);
+  roomService.scheduleConferenceManager.on(
+    TUIConferenceListManagerEvents.onConferenceScheduled,
+    onConferenceScheduled
+  );
+  roomService.scheduleConferenceManager.on(
+    TUIConferenceListManagerEvents.onConferenceCancelled,
+    onConferenceCancelled
+  );
   roomService.scheduleConferenceManager.on(
     TUIConferenceListManagerEvents.onConferenceInfoChanged,
-    onConferenceInfoChanged,
+    onConferenceInfoChanged
   );
   roomService.scheduleConferenceManager.on(
     TUIConferenceListManagerEvents.onScheduleAttendeesChanged,
-    onScheduleAttendeesChanged,
+    onScheduleAttendeesChanged
   );
   roomService.scheduleConferenceManager.on(
     TUIConferenceListManagerEvents.onConferenceStatusChanged,
-    onConferenceStatusChanged,
+    onConferenceStatusChanged
   );
 });
 onUnmounted(() => {
   roomService.off(EventType.ROOM_LOGIN, fetchData);
   roomService.scheduleConferenceManager.off(
     TUIConferenceListManagerEvents.onConferenceScheduled,
-    onConferenceScheduled,
+    onConferenceScheduled
   );
   roomService.scheduleConferenceManager.off(
     TUIConferenceListManagerEvents.onConferenceCancelled,
-    onConferenceCancelled,
+    onConferenceCancelled
   );
   roomService.scheduleConferenceManager.off(
     TUIConferenceListManagerEvents.onConferenceInfoChanged,
-    onConferenceInfoChanged,
+    onConferenceInfoChanged
   );
   roomService.scheduleConferenceManager.off(
     TUIConferenceListManagerEvents.onScheduleAttendeesChanged,
-    onScheduleAttendeesChanged,
+    onScheduleAttendeesChanged
   );
   roomService.scheduleConferenceManager.off(
     TUIConferenceListManagerEvents.onConferenceStatusChanged,
-    onConferenceStatusChanged,
+    onConferenceStatusChanged
   );
 });
 </script>
 
 <style lang="scss" scoped>
-
 @keyframes loading-rotate {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
 }
 
+.schedule-room.schedule-room-pc {
+  min-width: 470px;
+  padding: 20px 0;
+  margin-left: 20px;
+  user-select: none;
+  background-color: var(--white-color);
+  border-radius: 24px;
+  box-shadow: rgba(197, 210, 229, 0.3);
+}
+
 .schedule-room {
-    width: 100%;
-    min-width: 470px;
-    background-color: var(--white-color);
-    margin-left: 20px;
-    border-radius: 24px;
-    box-shadow: rgba(197, 210, 229, 0.3);
-    position: relative;
-    padding: 20px 0;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    .schedule-room-history {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        color: var(--active-color-1);
-        cursor: pointer;
-        display: flex;
-        font-size: 14px;
-        font-weight: 500;
-        .arrow {
-            margin-left: 4px;
-        }
+  position: relative;
+  width: 100%;
+
+  .schedule-room-history {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--active-color-1);
+    cursor: pointer;
+
+    .arrow {
+      margin-left: 4px;
     }
-    .schedule-loading {
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        color: #8f9ab2;
-        font-size: 14px;
-        font-weight: 400;
-        .loading {
-          margin-bottom: 10px;
-          animation: loading-rotate 1.5s linear infinite;
-        }
+  }
+
+  .schedule-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 14px;
+    font-weight: 400;
+    color: #8f9ab2;
+
+    .loading {
+      margin-bottom: 10px;
+      animation: loading-rotate 1.5s linear infinite;
     }
-    .schedule-room-container{
-      overflow-y: scroll;
-      padding: 0 2px 0 10px;
-      height: 504px;
-      margin-right: 2px;
-        .schedule-room-date {
-          display: flex;
-          font-size: 14px;
-          font-weight: 400;
-          color: var(--font-color-9);
-          padding: 10px;
-          .date {
-              margin-right: 2px;
-          }
-       }
+  }
+
+  .schedule-room-container {
+    height: 504px;
+    padding: 0 2px 0 10px;
+    margin-right: 2px;
+    overflow-y: scroll;
+
+    .schedule-room-date {
+      display: flex;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--font-color-9);
+
+      .date {
+        margin-right: 2px;
+      }
     }
-    .schedule-no-body {
-        height: 504px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        .text {
-          color: #8f9ab2;
-          font-size: 14px;
-          font-style: normal;
-          font-weight: 400;
-          margin-top: 10px;
-        }
+  }
+
+  .schedule-no-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 504px;
+
+    .text {
+      margin-top: 10px;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      color: #8f9ab2;
     }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background-color: #E0E2E9;
-      border-radius: 10px;
-    }
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #e0e2e9;
+    border-radius: 10px;
+  }
+}
+
+.schedule-room.schedule-room-h5 {
+  height: 100%;
+  padding: 10px 0;
+
+  .schedule-room-container {
+    height: 100%;
+    overflow: auto;
+  }
 }
 </style>

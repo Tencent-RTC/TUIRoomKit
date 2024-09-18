@@ -1,43 +1,45 @@
 import { isWeChat } from './environment';
 declare let uni: any;
-export const clipBoard = (data: any): Promise<{
-  code: number,
-  data?: any,
-  err?: any
-}> => new Promise(async (resolve, reject) => {
-  if (!isWeChat) {
-    const textString = data.toString();
-    try {
-      await navigator.clipboard.writeText(`${data}`);
-      resolve({ code: 0, data });
-    } catch (err) {
+export const clipBoard = (
+  data: any
+): Promise<{
+  code: number;
+  data?: any;
+  err?: any;
+}> =>
+  new Promise(async (resolve, reject) => {
+    if (!isWeChat) {
+      const textString = data.toString();
       try {
-        copyTextByDocumentExecCommand(textString);
+        await navigator.clipboard.writeText(`${data}`);
         resolve({ code: 0, data });
       } catch (err) {
-        reject({ code: -1, err });
-      }
-    }
-    return;
-  }
-  uni.setClipboardData({
-    data,
-    success() {
-      uni.getClipboardData({
-        success(data: any) {
+        try {
+          copyTextByDocumentExecCommand(textString);
           resolve({ code: 0, data });
-        },
-        fail(err: any) {
+        } catch (err) {
           reject({ code: -1, err });
-        },
-      });
-    },
-    fail(err: any) {
-      reject({ code: -1, err });
-    },
+        }
+      }
+      return;
+    }
+    uni.setClipboardData({
+      data,
+      success() {
+        uni.getClipboardData({
+          success(data: any) {
+            resolve({ code: 0, data });
+          },
+          fail(err: any) {
+            reject({ code: -1, err });
+          },
+        });
+      },
+      fail(err: any) {
+        reject({ code: -1, err });
+      },
+    });
   });
-});
-
 
 function copyTextByDocumentExecCommand(textString: string) {
   try {
@@ -54,14 +56,13 @@ function copyTextByDocumentExecCommand(textString: string) {
       document.execCommand('copy');
     }
     input.blur();
-  } catch (err) {
-  }
+  } catch (err) {}
 }
 
 function selectText(
   textbox: HTMLInputElement,
   startIndex: number,
-  stopIndex: number,
+  stopIndex: number
 ) {
   if ((textbox as any).createTextRange) {
     const range = (textbox as any).createTextRange();

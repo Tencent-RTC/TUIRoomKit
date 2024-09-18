@@ -36,7 +36,10 @@ export class VirtualBackground implements IVirtualBackground {
   }
 
   public async initVirtualBackground(): Promise<void> {
-    if (!this.virtualBackgroundPluginReady && this.trtcCloud?.useVirtualBackground) {
+    if (
+      !this.virtualBackgroundPluginReady &&
+      this.trtcCloud?.useVirtualBackground
+    ) {
       await this.trtcCloud.useVirtualBackground();
       this.virtualBackgroundPluginReady = true;
     }
@@ -45,24 +48,28 @@ export class VirtualBackground implements IVirtualBackground {
   public async toggleVirtualBackground(enabled: boolean): Promise<void> {
     await this.initVirtualBackground();
     const { sdkAppId, userId, userSig } = this.service.basicStore;
-    const params =  {
+    const params = {
       sdkAppId,
       userId,
       userSig,
       enable: enabled,
     };
-    await this.trtcCloud.callExperimentalAPI(JSON.stringify({ api: 'enableVirtualBackground', params }));
+    await this.trtcCloud.callExperimentalAPI(
+      JSON.stringify({ api: 'enableVirtualBackground', params })
+    );
   }
 
   public async toggleTestVirtualBackground(enabled: boolean): Promise<void> {
     await this.initVirtualBackground();
     const { sdkAppId, userId, userSig } = this.service.basicStore;
-    const params =  {
+    const params = {
       sdkAppId,
       userId,
       userSig,
       enable: enabled,
     };
-    await this.trtcCloud.callExperimentalAPI(JSON.stringify({ api: 'enableTestVirtualBackground', params }));
+    await this.trtcCloud.callExperimentalAPI(
+      JSON.stringify({ api: 'enableTestVirtualBackground', params })
+    );
   }
 }

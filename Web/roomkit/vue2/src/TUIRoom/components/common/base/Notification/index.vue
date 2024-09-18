@@ -1,23 +1,37 @@
 <template>
-  <div
-    v-show="visible"
-    class="tui-notification"
-  >
-    <div v-if="isMobile" class="tui-notification-container-mobile" :style="overlayContainerStyle">
-      <svg-icon :icon="ApplyTipsIcon" class="tui-notification-mobile-icon"></svg-icon>
+  <div v-show="visible" class="tui-notification">
+    <div
+      v-if="isMobile"
+      class="tui-notification-container-mobile"
+      :style="overlayContainerStyle"
+    >
+      <svg-icon :icon="ApplyTipsIcon" class="tui-notification-mobile-icon" />
       <span class="tui-notification-mobile-content">{{ message }}</span>
-      <div class="tui-notification-mobile-check" @click="handleAgree">{{ confirmButtonText }}</div>
+      <div class="tui-notification-mobile-check" @click="handleAgree">
+        {{ confirmButtonText }}
+      </div>
     </div>
-    <div v-else class="tui-notification-container" :style="overlayContainerStyle">
+    <div
+      v-else
+      class="tui-notification-container"
+      :style="overlayContainerStyle"
+    >
       <div class="tui-notification-header">
         <div class="tui-notification-title">{{ message }}</div>
         <div class="close">
-          <svg-icon :size="16" :icon="CloseIcon" @click="handleClose"></svg-icon>
+          <svg-icon :size="16" :icon="CloseIcon" @click="handleClose" />
         </div>
       </div>
       <div class="tui-notification-footer">
-        <tui-button size="default" @click="handleAgree">{{ confirmButtonText }}</tui-button>
-        <tui-button size="default" type="primary" class="button" @click="handleReject">
+        <tui-button size="default" @click="handleAgree">{{
+          confirmButtonText
+        }}</tui-button>
+        <tui-button
+          size="default"
+          type="primary"
+          class="button"
+          @click="handleReject"
+        >
           {{ cancelButtonText }}
         </tui-button>
       </div>
@@ -58,7 +72,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['close']);
 
-watch(visible, (val) => {
+watch(visible, val => {
   if (val) {
     overlayContainerStyle.value = { zIndex: nextZIndex() };
   }
@@ -97,81 +111,90 @@ onMounted(async () => {
   .tui-notification-container-mobile {
     position: fixed;
     top: 8%;
+    display: flex;
     width: 95%;
-    margin: 0 10px;
     height: 44px;
+    margin: 0 10px;
+    text-align: center;
     background-color: #fff;
     border-radius: 10px;
-    display: flex;
-    text-align: center;
+
     .tui-notification-mobile-icon {
-      color: #000000;
       padding: 0 10px;
       margin-left: 4px;
+      color: #000;
     }
+
     .tui-notification-mobile-content {
-      font-weight: 400;
+      margin: 0 auto 0 4px;
       font-size: 15px;
+      font-weight: 400;
       line-height: 44px;
       color: #181820;
-      margin: 0 auto 0 4px;
     }
+
     .tui-notification-mobile-check {
-      background-color: #1C66E5;
-      color: #FFFFFF;
-      border-radius: 10px;
-      margin: 6px 10px 6px 0;
       padding: 0 12px;
+      margin: 6px 10px 6px 0;
       line-height: 34px;
+      color: #fff;
+      background-color: #1c66e5;
+      border-radius: 10px;
     }
   }
+
   .tui-notification-container {
-    width: 400px;
-    background-color: var(--white-color);
     position: fixed;
     top: 7%;
     right: 1%;
     display: flex;
     flex-direction: column;
+    width: 400px;
+    background-color: var(--white-color);
+    filter: drop-shadow(0 0 1px rgba(5, 5, 5, 0.1))
+      drop-shadow(0 3px 8px rgba(233, 240, 251, 0.5));
     border-radius: 20px;
-    filter: drop-shadow(0px 0px 1px rgba(5, 5, 5, 0.1)) drop-shadow(0px 3px 8px rgba(233, 240, 251, 0.5));
+
     .tui-notification-header {
-      height: 64px;
       position: relative;
       display: flex;
-      padding: 0 24px;
-      color: var(--title-color);
-      font-weight: 500;
       align-items: center;
+      height: 64px;
+      padding: 0 24px;
+      font-weight: 500;
+      color: var(--title-color);
+
       .tui-notification-title {
         max-width: 300px;
         overflow: hidden;
-        white-space: nowrap;
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
+
       .close {
-        width: 32px;
-        height: 32px;
         position: absolute;
         top: 50%;
-        transform: translateY(-50%);
         right: 20px;
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
         color: #4f586b;
         cursor: pointer;
+        transform: translateY(-50%);
       }
     }
   }
+
   .tui-notification-footer {
-    padding: 20px 30px;
     display: flex;
     justify-content: flex-end;
+    padding: 20px 30px;
+
     .button {
       margin-left: 12px;
     }
   }
 }
-
 </style>

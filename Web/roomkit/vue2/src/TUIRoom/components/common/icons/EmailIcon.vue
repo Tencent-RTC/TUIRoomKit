@@ -1,5 +1,11 @@
 <template>
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <g id="Frame">
       <path
         id="Vector"
@@ -8,7 +14,13 @@
         stroke-width="1.2"
         stroke-linejoin="round"
       />
-      <path id="Vector_2" d="M14.6667 11.333H10" stroke="#4F586B" stroke-width="1.2" stroke-linejoin="round" />
+      <path
+        id="Vector_2"
+        d="M14.6667 11.333H10"
+        stroke="#4F586B"
+        stroke-width="1.2"
+        stroke-linejoin="round"
+      />
       <path
         id="Vector_3"
         d="M13 9.66699L14.6667 11.3337L13 13.0003"

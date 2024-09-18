@@ -11,7 +11,7 @@
       icon-name="info"
       size="medium"
       @click.stop="handleClickInfoIcon"
-    ></svg-icon>
+    />
     <div ref="infoRef"></div>
   </div>
 </template>
@@ -21,7 +21,7 @@ import { ref, Ref } from 'vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 
 const showInfoTab = ref(false);
-const infoRef:Ref<Node | undefined> = ref(undefined);
+const infoRef: Ref<Node | undefined> = ref(undefined);
 
 function handleClickInfoIcon() {
   if (!showInfoTab.value) {
@@ -34,12 +34,15 @@ function handleClickInfoIcon() {
 }
 
 function handleDocumentClick(event: MouseEvent) {
-  if (showInfoTab.value && infoRef.value && !infoRef.value.contains(event.target as Node)) {
+  if (
+    showInfoTab.value &&
+    infoRef.value &&
+    !infoRef.value.contains(event.target as Node)
+  ) {
     document.removeEventListener('click', handleDocumentClick);
     showInfoTab.value = false;
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
@@ -47,69 +50,79 @@ function handleDocumentClick(event: MouseEvent) {
   position: relative;
   width: 20px;
   height: 20px;
+
   .layout-icon {
     cursor: pointer;
   }
+
   .layout-list {
     position: absolute;
     top: 47px;
     right: 0;
-    background-color: $toolBarBackgroundColor;
-    box-shadow: 0 1px 10px 0 rgba(0,0,0,0.30);
-    border-radius: 4px;
-    padding: 20px;
     display: flex;
+    padding: 20px;
+    background-color: $toolBarBackgroundColor;
+    border-radius: 4px;
+    box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.3);
+
     .layout-item {
+      position: relative;
       width: 180px;
       height: 133px;
       padding: 20px 30px 39px;
-      background-color: $primaryColor;
-      border-radius: 2px;
-      border: 1px solid transparent;
       cursor: pointer;
-      position: relative;
+      background-color: $primaryColor;
+      border: 1px solid transparent;
+      border-radius: 2px;
+
       &:not(:first-child) {
         margin-left: 20px;
       }
+
       &:hover {
         border: 1px solid $primaryHighLightColor;
         border-radius: 2px;
       }
+
       &.checked {
         border: 1px solid $primaryHighLightColor;
         border-radius: 2px;
-        &:after {
-          content: '';
-          display: block;
-          width: 20px;
-          height: 20px;
-          background-image: url('../../assets/imgs/checked.png');
-          background-size: 100% 100%;
+
+        &::after {
           position: absolute;
           top: 0;
           right: 0;
+          display: block;
+          width: 20px;
+          height: 20px;
+          content: '';
+          background-image: url('../../assets/imgs/checked.png');
+          background-size: 100% 100%;
         }
       }
+
       .layout-block-container {
         width: 120px;
         height: 74px;
       }
+
       .layout-title {
+        display: inline-block;
+        width: 100%;
+        margin-top: 10px;
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;
-        display: inline-block;
-        margin-top: 10px;
-        width: 100%;
         text-align: center;
       }
     }
+
     .layout1 {
       .layout-block-container {
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
-        align-content: space-between;
+        place-content: space-between space-between;
+
         .layout-block {
           width: 38px;
           height: 22px;
@@ -117,22 +130,25 @@ function handleDocumentClick(event: MouseEvent) {
         }
       }
     }
+
     .layout2 {
       .layout-block-container {
         display: flex;
         justify-content: space-between;
+
         .left-container {
           width: 90px;
           height: 74px;
           background-color: $layoutBlockColor;
         }
+
         .right-container {
-          width: 27px;
-          height: 74px;
           display: flex;
           flex-wrap: wrap;
-          justify-content: space-between;
-          align-content: space-between;
+          place-content: space-between space-between;
+          width: 27px;
+          height: 74px;
+
           > div {
             width: 27px;
             height: 16px;
@@ -141,24 +157,27 @@ function handleDocumentClick(event: MouseEvent) {
         }
       }
     }
+
     .layout3 {
       .layout-block-container {
         display: flex;
         flex-wrap: wrap;
         align-content: space-between;
+
         .top-container {
-          width: 120px;
-          height: 16px;
           display: flex;
           flex-wrap: wrap;
-          justify-content: space-between;
-          align-content: space-between;
+          place-content: space-between space-between;
+          width: 120px;
+          height: 16px;
+
           > div {
             width: 28px;
             height: 16px;
             background-color: $layoutBlockColor;
           }
         }
+
         .bottom-container {
           width: 120px;
           height: 55px;

@@ -1,4 +1,3 @@
-
 import { computed, ref } from 'vue';
 
 const zIndex = ref(0);
@@ -16,4 +15,4 @@ export default function () {
     currentZIndex: currentZIndex.value,
     nextZIndex,
   };
-};
+}

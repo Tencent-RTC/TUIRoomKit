@@ -5,7 +5,14 @@ import { isUndefined } from '../utils/utils';
 import { isWeChat, isElectron, isMobile } from '../utils/environment';
 import { TUINetwork } from '@tencentcloud/tuiroom-engine-js';
 
-type SideBarType = 'chat' | 'invite' | 'manage-member' | 'more' | 'transfer-leave' | 'apply' | '';
+type SideBarType =
+  | 'chat'
+  | 'invite'
+  | 'manage-member'
+  | 'more'
+  | 'transfer-leave'
+  | 'apply'
+  | '';
 type SceneType = 'chat' | 'default';
 
 function getDefaultLayout() {
@@ -16,53 +23,56 @@ function getDefaultLayout() {
 }
 
 interface BasicState {
-  sdkAppId: number,
-  userId: string,
-  userSig: string,
-  userName: string,
-  avatarUrl?: string,
-  useStringRoomId: boolean,
-  roomId: string,
-  roomMode: 'FreeSpeech' | 'ApplySpeech',
-  isSidebarOpen: boolean,
-  showSettingDialog: boolean,
-  showApplyUserList: boolean,
-  activeSettingTab: string,
-  layout: LAYOUT,
-  isLocalStreamMirror: boolean,
-  isFrontCamera: boolean,
-  sidebarName: SideBarType,
-  masterUserId: string,
-  localQuality: number,
-  networkInfo: TUINetwork,
-  lang: string,
-  defaultTheme: string,
-  isSupportSwitchTheme: boolean,
-  showHeaderTool: boolean,
-  shareLink: string,
-  isRoomLinkVisible: boolean,
-  isSchemeLinkVisible: boolean,
-  isShowScreenShareAntiFraud: boolean,
-  isOpenMic: boolean,
-  scene: SceneType,
+  sdkAppId: number;
+  userId: string;
+  userSig: string;
+  userName: string;
+  avatarUrl?: string;
+  useStringRoomId: boolean;
+  roomId: string;
+  roomMode: 'FreeSpeech' | 'ApplySpeech';
+  isSidebarOpen: boolean;
+  showSettingDialog: boolean;
+  showApplyUserList: boolean;
+  activeSettingTab: string;
+  layout: LAYOUT;
+  isLocalStreamMirror: boolean;
+  isFrontCamera: boolean;
+  sidebarName: SideBarType;
+  masterUserId: string;
+  localQuality: number;
+  networkInfo: TUINetwork;
+  lang: string;
+  defaultTheme: string;
+  isSupportSwitchTheme: boolean;
+  showHeaderTool: boolean;
+  shareLink: string;
+  isRoomLinkVisible: boolean;
+  isSchemeLinkVisible: boolean;
+  isShowScreenShareAntiFraud: boolean;
+  isOpenMic: boolean;
+  scene: SceneType;
+  isSharing: boolean;
+  isWhiteboardVisiable: boolean;
+  isSharingScreen: boolean;
   componentConfig: {
-    'InviteControl': {
-      visible?: boolean,
-      [key: string]: any,
-    },
-    'SwitchTheme': {
-      visible?: boolean,
-      [key: string]: any,
-    },
-    'RoomLink': {
-      visible?: boolean,
-      [key: string]: any,
-    },
+    InviteControl: {
+      visible?: boolean;
+      [key: string]: any;
+    };
+    SwitchTheme: {
+      visible?: boolean;
+      [key: string]: any;
+    };
+    RoomLink: {
+      visible?: boolean;
+      [key: string]: any;
+    };
     [key: string]: {
-      visible?: boolean,
-      [key: string]: any,
-    }
-  }
+      visible?: boolean;
+      [key: string]: any;
+    };
+  };
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -103,19 +113,21 @@ export const useBasicStore = defineStore('basic', {
     isOpenMic: false,
     componentConfig: {
       SwitchTheme: {
-        visible: true
+        visible: true,
       },
       InviteControl: {
-        visible: true
+        visible: true,
       },
       RoomLink: {
-        visible: true
+        visible: true,
       },
     },
     scene: 'default',
+    isSharing: false,
+    isWhiteboardVisiable: false,
+    isSharingScreen: false,
   }),
-  getters: {
-  },
+  getters: {},
   actions: {
     setSdkAppId(sdkAppId: number) {
       this.sdkAppId = sdkAppId;
@@ -185,22 +197,37 @@ export const useBasicStore = defineStore('basic', {
       if (!infoObj) {
         return;
       }
-      const { sdkAppId, userId, userSig, userName, avatarUrl, roomId, theme, showHeaderTool } = infoObj;
+      const {
+        sdkAppId,
+        userId,
+        userSig,
+        userName,
+        avatarUrl,
+        roomId,
+        theme,
+        showHeaderTool,
+      } = infoObj;
       sdkAppId && this.setSdkAppId(sdkAppId);
       userId && this.setUserId(userId);
       userSig && this.setUserSig(userSig);
       userName && this.setUserName(userName);
       avatarUrl && this.setAvatarUrl(avatarUrl);
       roomId && this.setRoomId(roomId);
-      theme && !isUndefined(theme.defaultTheme) && this.setDefaultTheme(theme.defaultTheme);
-      theme && !isUndefined(theme.isSupportSwitchTheme) && this.setIsSupportSwitchTheme(theme.isSupportSwitchTheme);
+      theme &&
+        !isUndefined(theme.defaultTheme) &&
+        this.setDefaultTheme(theme.defaultTheme);
+      theme &&
+        !isUndefined(theme.isSupportSwitchTheme) &&
+        this.setIsSupportSwitchTheme(theme.isSupportSwitchTheme);
       !isUndefined(showHeaderTool) && this.setShowHeaderTool(showHeaderTool);
     },
     setMasterUserId(userId: string) {
       this.masterUserId = userId;
     },
     setLocalQuality(userNetworkList: any[]) {
-      const localUser = userNetworkList.find(item => item.userId === this.userId);
+      const localUser = userNetworkList.find(
+        item => item.userId === this.userId
+      );
       this.localQuality = localUser.quality;
     },
     setNetworkInfo(networkInfo: TUINetwork) {
@@ -216,6 +243,15 @@ export const useBasicStore = defineStore('basic', {
     },
     setScene(scene: SceneType) {
       this.scene = scene;
+    },
+    setIsSharing(isSharing: boolean) {
+      this.isSharing = isSharing;
+    },
+    setWhiteboardVisiable(visible: boolean) {
+      this.isWhiteboardVisiable = visible;
+    },
+    setIsSharingScreen(isSharingScreen: boolean) {
+      this.isSharingScreen = isSharingScreen;
     },
     reset() {
       this.isSidebarOpen = false;
@@ -234,6 +270,9 @@ export const useBasicStore = defineStore('basic', {
       this.showHeaderTool = true;
       this.shareLink = '';
       this.isOpenMic = false;
+      this.isSharing = false;
+      this.isWhiteboardVisiable = false;
+      this.isSharingScreen = false;
     },
   },
 });

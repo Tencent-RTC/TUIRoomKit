@@ -7,17 +7,17 @@ export default function useUserInfo() {
   const showUserControl = ref(false);
 
   /**
-     * Whether to display the user information operation box
-     *
-    **/
+   * Whether to display the user information operation box
+   *
+   **/
   function handleUserControl() {
     showUserControl.value = !showUserControl.value;
   }
 
   /**
-     * Hide the user information action box
-     *
-    **/
+   * Hide the user information action box
+   *
+   **/
   function hideUserControl(event: Event) {
     if (!userInfoRef.value?.contains(event.target)) {
       showUserControl.value = false;

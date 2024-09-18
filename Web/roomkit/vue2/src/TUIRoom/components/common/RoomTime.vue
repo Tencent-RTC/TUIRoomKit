@@ -31,9 +31,9 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .timing {
-  text-align: center;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
+  text-align: center;
 }
 </style>
