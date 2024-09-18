@@ -1,5 +1,9 @@
-
-import TUIRoomEngine, { TUIRoomDeviceManager, TUIRoomDeviceMangerEvents, TUIMediaDeviceType, TUIMediaDeviceState } from '@tencentcloud/tuiroom-engine-js';
+import TUIRoomEngine, {
+  TUIRoomDeviceManager,
+  TUIRoomDeviceMangerEvents,
+  TUIMediaDeviceType,
+  TUIMediaDeviceState,
+} from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from './useRoomEngine';
 import { useRoomStore } from '../stores/room';
 import logger from '../utils/common/logger';
@@ -82,22 +86,32 @@ export default function (options?: { listenForDeviceChange: boolean }) {
 
   /**
    * Device changes: device switching, device plugging and unplugging events
-  **/
-  async function onDeviceChanged(eventInfo: {deviceId: string, type: TUIMediaDeviceType, state: TUIMediaDeviceState}) {
+   **/
+  async function onDeviceChanged(eventInfo: {
+    deviceId: string;
+    type: TUIMediaDeviceType;
+    state: TUIMediaDeviceState;
+  }) {
     if (!deviceManager.instance) {
       return;
     }
     const stateList = ['add', 'remove', 'active'];
     const deviceTypeList = ['mic', 'speaker', 'camera'];
     const { deviceId, type, state } = eventInfo;
-    logger.log(`onDeviceChanged: deviceId: ${deviceId}, type: ${deviceTypeList[type]}, state: ${stateList[state]}`);
+    logger.log(
+      `onDeviceChanged: deviceId: ${deviceId}, type: ${deviceTypeList[type]}, state: ${stateList[state]}`
+    );
 
     const deviceList = await deviceManager.instance?.getDevicesList({ type });
     deviceList && roomStore.setDeviceList(type, deviceList);
     if (state === TUIMediaDeviceState.kMediaDeviceStateActive) {
       roomStore.setCurrentDeviceId(type, deviceId);
     }
-    if (isElectron && state === TUIMediaDeviceState.kMediaDeviceStateRemove && type === TUIMediaDeviceType.kMediaDeviceTypeVideoCamera) {
+    if (
+      isElectron &&
+      state === TUIMediaDeviceState.kMediaDeviceStateRemove &&
+      type === TUIMediaDeviceType.kMediaDeviceTypeVideoCamera
+    ) {
       const currentCameraInfo = deviceManager.instance?.getCurrentDevice({
         type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
       });
@@ -110,13 +124,19 @@ export default function (options?: { listenForDeviceChange: boolean }) {
   TUIRoomEngine.once('ready', () => {
     if (options && options.listenForDeviceChange) {
       initMediaDeviceList();
-      deviceManager.instance?.on(TUIRoomDeviceMangerEvents.onDeviceChanged, onDeviceChanged);
+      deviceManager.instance?.on(
+        TUIRoomDeviceMangerEvents.onDeviceChanged,
+        onDeviceChanged
+      );
     }
   });
 
   onUnmounted(() => {
     if (options && options.listenForDeviceChange) {
-      deviceManager.instance?.off(TUIRoomDeviceMangerEvents.onDeviceChanged, onDeviceChanged);
+      deviceManager.instance?.off(
+        TUIRoomDeviceMangerEvents.onDeviceChanged,
+        onDeviceChanged
+      );
     }
   });
 

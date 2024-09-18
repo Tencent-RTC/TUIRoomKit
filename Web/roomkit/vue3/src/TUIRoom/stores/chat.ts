@@ -29,8 +29,7 @@ export const useChatStore = defineStore('chat', {
     isCompleted: false,
     nextReqMessageId: '',
   }),
-  getters: {
-  },
+  getters: {},
   actions: {
     updateMessageList(message: MessageItem) {
       const messageIds = this.messageList.map(message => message.ID);
@@ -38,7 +37,11 @@ export const useChatStore = defineStore('chat', {
         this.messageList = this.messageList.concat([message]);
       }
     },
-    setMessageListInfo(messageList:MessageItem[], isCompleted: boolean, nextReqMessageId: string) {
+    setMessageListInfo(
+      messageList: MessageItem[],
+      isCompleted: boolean,
+      nextReqMessageId: string
+    ) {
       this.messageList = messageList;
       this.isCompleted = isCompleted;
       this.nextReqMessageId = nextReqMessageId;
@@ -48,8 +51,15 @@ export const useChatStore = defineStore('chat', {
     },
     addHistoryMessages(messageList: MessageItem[]) {
       const messageIds = this.messageList.map(message => message.ID);
-      const filteredMessageList = messageList.filter(message => messageIds.indexOf(message.ID) === -1);
-      this.messageList = filteredMessageList.concat(this.messageList).sort((messageA: MessageItem, messageB: MessageItem) => messageA.sequence - messageB.sequence);
+      const filteredMessageList = messageList.filter(
+        message => messageIds.indexOf(message.ID) === -1
+      );
+      this.messageList = filteredMessageList
+        .concat(this.messageList)
+        .sort(
+          (messageA: MessageItem, messageB: MessageItem) =>
+            messageA.sequence - messageB.sequence
+        );
     },
     setSendMessageDisableChanged(isDisable: boolean) {
       this.isMessageDisabled = isDisable;

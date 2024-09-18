@@ -1,48 +1,51 @@
 <template>
   <div
-    v-if="playRegionDomId !== enlargeDomId && props.stream.userId"
+    v-if="playRegionDomId !== enlargeDomId && props.streamInfo.userId"
     ref="streamRegionRef"
     class="user-stream-container"
     :class="[showVoiceBorder ? 'border' : '']"
   >
     <trtc-pusher
-      v-if="basicStore.userId === props.stream.userId"
+      v-if="basicStore.userId === props.streamInfo.userId"
       :id="playRegionDomId"
       ref="pusher"
-    >
-    </trtc-pusher>
+    />
     <trtc-player
-      v-if="basicStore.userId !== props.stream.userId"
+      v-if="basicStore.userId !== props.streamInfo.userId"
       :id="playRegionDomId"
       ref="player"
       :stream-id="playRegionDomId"
-    ></trtc-player>
-    <div
-      v-if="!stream.hasVideoStream && !stream.hasScreenStream"
-      class="center-user-info-container"
-    >
-      <Avatar class="avatar-region" :img-src="stream.avatarUrl"></Avatar>
+    />
+    <div v-if="!streamInfo.hasVideoStream" class="center-user-info-container">
+      <Avatar class="avatar-region" :img-src="userInfo.avatarUrl" />
     </div>
     <div class="corner-user-info-container">
-      <div v-if="showIcon" :class="showMasterIcon ? 'master-icon' : 'admin-icon' ">
-        <svg-icon :icon="UserIcon"></svg-icon>
+      <div
+        v-if="showIcon"
+        :class="showMasterIcon ? 'master-icon' : 'admin-icon'"
+      >
+        <svg-icon :icon="UserIcon" />
       </div>
       <audio-icon
         v-if="!isScreenStream"
         class="audio-icon"
-        :user-id="stream.userId"
-        :is-muted="!stream.hasAudioStream"
+        :user-id="streamInfo.userId"
+        :is-muted="!streamInfo.hasAudioStream"
         size="small"
-      ></audio-icon>
-      <svg-icon v-if="isScreenStream" :icon="ScreenOpenIcon" class="screen-icon"></svg-icon>
-      <span class="user-name" :title="userInfo">{{ userInfo }}</span>
+      />
+      <svg-icon
+        v-if="isScreenStream"
+        :icon="ScreenOpenIcon"
+        class="screen-icon"
+      />
+      <span class="user-name" :title="displayName">{{ displayName }}</span>
       <span v-if="isScreenStream"> {{ t('is sharing their screen') }} </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, computed, onMounted } from 'vue';
+import { ref, watch, nextTick, computed, onMounted, defineProps } from 'vue';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
 import Avatar from '../../common/Avatar.vue';
 import { useBasicStore } from '../../../stores/basic';
@@ -75,50 +78,67 @@ const player = ref();
 const { t } = useI18n();
 
 interface Props {
-  stream: StreamInfo;
+  streamInfo: StreamInfo;
   enlargeDomId?: string;
 }
 
 const props = defineProps<Props>();
 
 const streamRegionRef = ref();
-const showVoiceBorder = computed(() => (
-  props.stream.hasAudioStream && userVolumeObj.value[props.stream.userId] !== 0
-));
-const playRegionDomId = computed(() => `${props.stream.userId}_${props.stream.streamType}`);
+const showVoiceBorder = computed(
+  () =>
+    props.streamInfo.hasAudioStream &&
+    userVolumeObj.value[props.streamInfo.userId] !== 0
+);
+const playRegionDomId = computed(
+  () => `${props.streamInfo.userId}_${props.streamInfo.streamType}`
+);
 
 const showMasterIcon = computed(() => {
-  const { userId, streamType } = props.stream;
-  return userId === roomStore.masterUserId && streamType === TUIVideoStreamType.kCameraStream;
+  const { userId, streamType } = props.streamInfo;
+  return (
+    userId === roomStore.masterUserId &&
+    streamType === TUIVideoStreamType.kCameraStream
+  );
 });
 
 const showAdminIcon = computed(() => {
-  const { userId, streamType } = props.stream;
-  return roomStore.getUserRole(userId) === TUIRole.kAdministrator
-    && streamType === TUIVideoStreamType.kCameraStream;
+  const { userId, streamType } = props.streamInfo;
+  return (
+    roomStore.getUserRole(userId) === TUIRole.kAdministrator &&
+    streamType === TUIVideoStreamType.kCameraStream
+  );
 });
 
 const showIcon = computed(() => showMasterIcon.value || showAdminIcon.value);
 
-const isScreenStream = computed(() => props.stream.streamType === TUIVideoStreamType.kScreenStream);
+const isScreenStream = computed(
+  () => props.streamInfo.streamType === TUIVideoStreamType.kScreenStream
+);
 
-const userInfo = computed(() => {
+const userInfo = computed(() => roomStore.userInfoObj[props.streamInfo.userId]);
+const displayName = computed(() => {
+  const user = roomStore.userInfoObj[props.streamInfo.userId];
   if (isInnerScene) {
-    return `${props.stream.nameCard || props.stream.userName} | ${props.stream.userId}`;
+    return `${user.nameCard || user.userName} | ${user.userId}`;
   }
-  return props.stream.nameCard || props.stream.userName || props.stream.userId;
+  return user.nameCard || user.userName || user.userId;
 });
 
 onMounted(() => {
   watch(
-    () => props.stream.hasVideoStream,
-    async (val) => {
+    () => props.streamInfo.hasVideoStream,
+    async val => {
       if (val) {
         await nextTick();
         if (player.value) {
-          logger.debug(`${logPrefix}watch isVideoStreamAvailable:`, props.stream.userId, player.value);
-          if (basicStore.userId === props.stream.userId) {
-            if (props.stream.hasVideoStream) {
+          logger.debug(
+            `${logPrefix}watch isVideoStreamAvailable:`,
+            props.streamInfo.userId,
+            player.value
+          );
+          if (basicStore.userId === props.streamInfo.userId) {
+            if (props.streamInfo.hasVideoStream) {
               await roomEngine.instance?.setLocalVideoView({
                 view: `${playRegionDomId.value}`,
               });
@@ -126,79 +146,61 @@ onMounted(() => {
           } else {
             await player.value.setTRTCStreamId(playRegionDomId.value);
             roomEngine.instance?.setRemoteVideoView({
-              userId: props.stream.userId,
-              streamType: props.stream.streamType,
+              userId: props.streamInfo.userId,
+              streamType: props.streamInfo.streamType,
               view: `${playRegionDomId.value}`,
             });
             await roomEngine.instance?.startPlayRemoteVideo({
-              userId: props.stream.userId,
-              streamType: props.stream.streamType,
+              userId: props.streamInfo.userId,
+              streamType: props.streamInfo.streamType,
             });
             const trtcCloud = roomEngine.instance?.getTRTCCloud();
-            await trtcCloud?.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeBig, {
-              mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-              rotation: TRTCVideoRotation.TRTCVideoRotation0,
-              fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
-            });
+            await trtcCloud?.setRemoteRenderParams(
+              props.streamInfo.userId,
+              props.streamInfo.streamType === TUIVideoStreamType.kScreenStream
+                ? TRTCVideoStreamType.TRTCVideoStreamTypeSub
+                : TRTCVideoStreamType.TRTCVideoStreamTypeBig,
+              {
+                mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+                rotation: TRTCVideoRotation.TRTCVideoRotation0,
+                fillMode:
+                  props.streamInfo.streamType ===
+                  TUIVideoStreamType.kScreenStream
+                    ? TRTCVideoFillMode.TRTCVideoFillMode_Fit
+                    : TRTCVideoFillMode.TRTCVideoFillMode_Fill,
+              }
+            );
           }
         }
       } else {
-        if (basicStore.userId === props.stream.userId && props.stream.streamType === TUIVideoStreamType.kCameraStream) {
+        if (
+          basicStore.userId === props.streamInfo.userId &&
+          props.streamInfo.streamType === TUIVideoStreamType.kCameraStream
+        ) {
           await roomEngine.instance?.setLocalVideoView({
             view: null,
           });
         }
       }
     },
-    { immediate: true },
-  );
-});
-
-onMounted(() => {
-  watch(
-    () => props.stream.hasScreenStream,
-    async (val) => {
-      if (val) {
-        await nextTick();
-        if (player.value) {
-          logger.debug(`${logPrefix}watch isScreenStreamAvailable:`, props.stream.userId);
-          await player.value.setTRTCStreamId(playRegionDomId.value);
-          roomEngine.instance?.setRemoteVideoView({
-            userId: props.stream.userId,
-            streamType: props.stream.streamType,
-            view: `${playRegionDomId.value}`,
-          });
-          await roomEngine.instance?.startPlayRemoteVideo({
-            userId: props.stream.userId,
-            streamType: props.stream.streamType,
-          });
-          const trtcCloud = roomEngine.instance?.getTRTCCloud();
-          await trtcCloud?.setRemoteRenderParams(props.stream.userId, TRTCVideoStreamType.TRTCVideoStreamTypeSub, {
-            mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-            rotation: TRTCVideoRotation.TRTCVideoRotation0,
-            fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fit,
-          });
-        }
-      }
-    },
-    { immediate: true },
+    { immediate: true }
   );
 });
 
 /**
  * enlargeUserId The switch requires that both the small window
  * corresponding to the previously played stream and the stream that needs to be newly played be replayed.
-**/
+ **/
 onMounted(() => {
   watch(
     () => props.enlargeDomId,
     async (val, oldVal) => {
       if (playRegionDomId.value === oldVal || playRegionDomId.value === val) {
-        if (basicStore.userId === props.stream.userId) {
+        if (basicStore.userId === props.streamInfo.userId) {
           /**
            * Replay local video streams only when they are open
-          **/
-          if (props.stream.hasVideoStream) {
+           **/
+          if (props.streamInfo.hasVideoStream) {
             await roomEngine.instance?.setLocalVideoView({
               view: `${playRegionDomId.value}`,
             });
@@ -207,20 +209,19 @@ onMounted(() => {
           await nextTick();
           await player.value.setTRTCStreamId(playRegionDomId.value);
           roomEngine.instance?.setRemoteVideoView({
-            userId: props.stream.userId,
-            streamType: props.stream.streamType,
+            userId: props.streamInfo.userId,
+            streamType: props.streamInfo.streamType,
             view: `${playRegionDomId.value}`,
           });
           await roomEngine.instance?.startPlayRemoteVideo({
-            userId: props.stream.userId,
-            streamType: props.stream.streamType,
+            userId: props.streamInfo.userId,
+            streamType: props.streamInfo.streamType,
           });
-        };
+        }
       }
-    },
+    }
   );
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -230,54 +231,30 @@ onMounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  border: 2px solid transparent;
   overflow: hidden;
+  border: 2px solid transparent;
   border-radius: 10px;
   transform: rotate(0deg);
-  -webkit-transform: rotate(0deg);
+
   &.border {
-    border: 2px solid #37E858;
+    border: 2px solid #37e858;
   }
 
   .center-user-info-container {
     position: absolute;
     top: 0;
     left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background-color: var(--center-user-info-container-bg-color);
+
     .avatar-region {
       width: 130px;
       height: 130px;
       border-radius: 50%;
-    }
-    .user-info {
-      width: 130px;
-      text-align: center;
-      .avatar-region {
-        width: 130px;
-        height: 130px;
-        border-radius: 50%;
-      }
-      .user-gender-name {
-        svg {
-          vertical-align: bottom;
-        }
-        .user-name {
-          display: inline-block;
-          margin-left: 6px;
-          font-size: 14px;
-          font-weight: 400;
-          max-width: 100px;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          vertical-align: bottom;
-        }
-      }
     }
   }
 
@@ -285,42 +262,47 @@ onMounted(() => {
     position: absolute;
     bottom: 4px;
     left: 0;
+    display: flex;
+    align-content: center;
+    align-items: center;
     min-width: 118px;
     max-width: 100%;
-    overflow: hidden;
     height: 30px;
-    display: flex;
-    background: rgba(0,0,0,0.60);
-    color: #FFFFFF;
-    align-items: center;
-    align-content: center;
+    overflow: hidden;
     font-size: 14px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.6);
+
     .user-name {
-      margin-left: 8px;
       max-width: 60px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
       padding-right: 5px;
+      margin-left: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
+
     .master-icon,
     .admin-icon {
-      margin-left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 32px;
       height: 32px;
+      margin-left: 0;
       background-color: var(--active-color-1);
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
+
     .admin-icon {
       background-color: var(--orange-color);
     }
+
     .screen-icon {
-      transform: scale(0.8);
       background-size: cover;
+      transform: scale(0.8);
     }
-    .audio-icon{
+
+    .audio-icon {
       max-width: 26px;
       max-height: 35px;
     }

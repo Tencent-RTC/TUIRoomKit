@@ -7,8 +7,8 @@ export const getIsRoomCardMessage = (message: Message) => {
 export const getIsRoomSignalingMessage = (message: Message) => {
   const data = parseMessageData(message);
   return (
-    data?.data?.businessID === 'ROOM_INVITE_ACTION'
-    || data?.data?.businessID === 'tuikit_engine_room'
+    data?.data?.businessID === 'ROOM_INVITE_ACTION' ||
+    data?.data?.businessID === 'tuikit_engine_room'
   );
 };
 export const parseMessageData = (message: Message) => {

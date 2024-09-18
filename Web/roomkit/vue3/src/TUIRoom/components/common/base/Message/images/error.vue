@@ -1,6 +1,14 @@
 <template>
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g id="&#229;&#133;&#179;&#233;&#151;&#173; &#233;&#148;&#153;&#232;&#175;&#175;">
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g
+      id="&#229;&#133;&#179;&#233;&#151;&#173; &#233;&#148;&#153;&#232;&#175;&#175;"
+    >
       <path
         id="Vector"
         fill-rule="evenodd"

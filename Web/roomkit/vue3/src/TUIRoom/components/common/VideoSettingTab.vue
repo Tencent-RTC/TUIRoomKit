@@ -10,7 +10,7 @@
   <div :class="['video-tab', themeClass]">
     <div class="item-setting">
       <span class="title">{{ t('Camera') }}</span>
-      <device-select device-type="camera"></device-select>
+      <device-select device-type="camera" />
     </div>
     <div v-if="withPreview" class="item-setting">
       <span class="title">{{ t('Preview') }}</span>
@@ -20,14 +20,16 @@
     </div>
     <div class="item-setting">
       <span class="title">{{ t('Resolution') }}</span>
-      <video-profile></video-profile>
+      <video-profile />
     </div>
     <div class="mirror-container">
       <span>{{ t('Mirror') }}</span>
-      <tui-switch v-model="isLocalStreamMirror"></tui-switch>
+      <tui-switch v-model="isLocalStreamMirror" />
     </div>
     <div v-if="withMore" class="item-setting">
-      <div class="item" @click="handleMoreCameraSetting">{{ t('More Camera Settings') }}</div>
+      <div class="item" @click="handleMoreCameraSetting">
+        {{ t('More Camera Settings') }}
+      </div>
     </div>
   </div>
 </template>
@@ -41,30 +43,37 @@ import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
 
 import useGetRoomEngine from '../../hooks/useRoomEngine';
-import { TRTCVideoMirrorType, TRTCVideoRotation, TRTCVideoFillMode } from '@tencentcloud/tuiroom-engine-js';
-import { isElectron, isMobile }  from '../../utils/environment';
+import {
+  TRTCVideoMirrorType,
+  TRTCVideoRotation,
+  TRTCVideoFillMode,
+} from '@tencentcloud/tuiroom-engine-js';
+import { isElectron, isMobile } from '../../utils/environment';
 import { storeToRefs } from 'pinia';
 const roomEngine = useGetRoomEngine();
 
 interface Props {
-  withPreview?: boolean,
-  withMore?: boolean,
-  withMirror?: boolean,
-  theme?: 'white' | 'black',
+  withPreview?: boolean;
+  withMore?: boolean;
+  withMirror?: boolean;
+  theme?: 'white' | 'black';
 }
 const props = defineProps<Props>();
 
 const basicStore = useBasicStore();
 const { isLocalStreamMirror } = storeToRefs(basicStore);
 
-const themeClass = computed(() => (props.theme ? `tui-theme-${props.theme}` : ''));
+const themeClass = computed(() =>
+  props.theme ? `tui-theme-${props.theme}` : ''
+);
 
 watch(isLocalStreamMirror, async (val: boolean) => {
   const trtcCloud = roomEngine.instance?.getTRTCCloud();
   if (!isMobile) {
     await trtcCloud?.setLocalRenderParams({
       mirrorType: val
-        ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+        ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable
+        : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
       rotation: TRTCVideoRotation.TRTCVideoRotation0,
       fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
     });
@@ -75,7 +84,7 @@ const { t } = useI18n();
 
 /**
  * Click [More Camera Settings].
-**/
+ **/
 function handleMoreCameraSetting() {
   basicStore.setShowSettingDialog(true);
   basicStore.setActiveSettingTab('video');
@@ -89,7 +98,8 @@ if (props.withPreview) {
       const trtcCloud = roomEngine.instance?.getTRTCCloud();
       await trtcCloud?.setLocalRenderParams({
         mirrorType: isLocalStreamMirror.value
-          ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+          ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable
+          : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
         rotation: TRTCVideoRotation.TRTCVideoRotation0,
         fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
       });
@@ -100,35 +110,38 @@ if (props.withPreview) {
     roomEngine.instance?.stopCameraDeviceTest();
   });
 }
-
 </script>
 
 <style lang="scss" scoped>
 .video-tab {
-  border-radius: 8px;
   font-size: 14px;
+  border-radius: 8px;
+
   .item-setting {
     &:not(:last-child) {
       margin-bottom: 20px;
     }
   }
+
   .title {
     display: inline-block;
-    margin-bottom: 8px;
     width: 100%;
-    color: var(--font-color-4);
+    margin-bottom: 8px;
     font-size: 14px;
     font-weight: 400;
     line-height: 22px;
+    color: var(--font-color-4);
   }
+
   .video-preview-container {
     position: relative;
     width: 100%;
     height: 0;
     padding-top: calc(100% * 9 / 16);
-    background-color: #000000;
-    border-radius: 8px;
     overflow: hidden;
+    background-color: #000;
+    border-radius: 8px;
+
     .video-preview {
       position: absolute;
       top: 0;
@@ -137,22 +150,24 @@ if (props.withPreview) {
       height: 100%;
     }
   }
+
   .mirror-container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    color: var(--font-color-4);
+    justify-content: space-between;
+    padding-right: 2px;
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
-    padding-right: 2px;
+    color: var(--font-color-4);
   }
+
   .item {
     width: 100%;
     height: 20px;
-    cursor: pointer;
     color: var(--font-color-3);
+    cursor: pointer;
   }
 }
 </style>

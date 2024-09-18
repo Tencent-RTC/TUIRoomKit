@@ -4,11 +4,13 @@
       <icon-button
         :title="iconTitle"
         :icon="iconName"
-        @click-icon="toggleApplySpeech"
+        @click-icon="toggleApplySpeechDebounce"
       />
       <div v-if="showMemberApplyAttention" class="attention member-attention">
-        <span :class="isMobile ? 'mobile-info' : 'info'">{{ t('Please raise your hand to apply') }}</span>
-        <svg-icon :icon="CloseIcon" class="close" @click="hideApplyAttention"></svg-icon>
+        <span :class="isMobile ? 'mobile-info' : 'info'">{{
+          t('Please raise your hand to apply')
+        }}</span>
+        <svg-icon :icon="CloseIcon" class="close" @click="hideApplyAttention" />
       </div>
     </div>
     <Dialog
@@ -29,7 +31,12 @@
         <tui-button size="default" @click="currentDialogInfo.handleConfirm">
           {{ currentDialogInfo.confirmButtonText }}
         </tui-button>
-        <tui-button class="cancel-button" size="default" type="primary" @click="currentDialogInfo.handleCancel">
+        <tui-button
+          class="cancel-button"
+          size="default"
+          type="primary"
+          @click="currentDialogInfo.handleCancel"
+        >
           {{ currentDialogInfo.cancelButtonText }}
         </tui-button>
       </template>
@@ -55,8 +62,16 @@ import { useI18n } from '../../../locales';
 import { storeToRefs } from 'pinia';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import logger from '../../../utils/common/logger';
-import TUIRoomEngine, { TUIRoomEvents, TUIRequest, TUIRequestAction, TUIRequestCallbackType, TUIRole, TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
+import TUIRoomEngine, {
+  TUIRoomEvents,
+  TUIRequest,
+  TUIRequestAction,
+  TUIRequestCallbackType,
+  TUIRole,
+  TUIErrorCode,
+} from '@tencentcloud/tuiroom-engine-js';
 import TuiButton from '../../common/base/Button.vue';
+import { debounce } from '../../../utils/utils';
 
 const roomEngine = useGetRoomEngine();
 const { t } = useI18n();
@@ -66,7 +81,7 @@ const roomStore = useRoomStore();
 const { lang } = storeToRefs(basicStore);
 const { localUser, isGeneralUser, isAdmin } = storeToRefs(roomStore);
 
-const isApplyingOnSeat: Ref<Boolean> = ref(false);
+const isApplyingOnSeat: Ref<boolean> = ref(false);
 const showMemberApplyAttention: Ref<boolean> = ref(true);
 const iconName = ref();
 const iconTitle: Ref<string> = ref('');
@@ -78,21 +93,27 @@ const currentConfirmButton: Ref<string> = ref('');
 type DialogType = 'inviteDialog' | 'leaveSeatDialog';
 const currentDialogType: Ref<DialogType> = ref('inviteDialog');
 
-watch([localUser, isApplyingOnSeat, lang], ([localUser, isApplyingOnSeat]) => {
-  if (localUser.onSeat) {
-    iconName.value = StepDownIcon;
-    iconTitle.value = t('Step down');
-    hideApplyAttention();
-  } else {
-    if (isApplyingOnSeat) {
-      iconName.value = CancelStageIcon;
-      iconTitle.value = t('Cancel Apply');
+watch(
+  [localUser, isApplyingOnSeat, lang],
+  ([localUser, isApplyingOnSeat]) => {
+    if (localUser.onSeat) {
+      iconName.value = StepDownIcon;
+      iconTitle.value = t('Step down');
+      hideApplyAttention();
     } else {
-      iconName.value = ApplyStageIcon;
-      iconTitle.value = t('Apply for the stage');
+      if (isApplyingOnSeat) {
+        iconName.value = CancelStageIcon;
+        iconTitle.value = t('Cancel Apply');
+      } else {
+        iconName.value = ApplyStageIcon;
+        iconTitle.value = t('Apply for the stage');
+      }
     }
-  }
-}, { immediate: true, deep: true });
+  },
+  { immediate: true, deep: true }
+);
+
+const toggleApplySpeechDebounce = debounce(toggleApplySpeech, 300);
 
 async function toggleApplySpeech() {
   hideApplyAttention();
@@ -101,7 +122,7 @@ async function toggleApplySpeech() {
   } else {
     isApplyingOnSeat.value ? cancelSeatApplication() : sendSeatApplication();
   }
-};
+}
 
 const inviteDialogInfo = {
   content: t('You can turn on the microphone and camera once you are on stage'),
@@ -112,20 +133,27 @@ const inviteDialogInfo = {
 };
 
 const leaveSeatDialogInfo = computed(() => ({
-  content: (localUser.value.userRole === TUIRole.kAdministrator ? t('To go on stage again, a new application needs to be initiated') : t('To go on stage again, you need to reapply and wait for the roomOwner/administrator to approve')),
+  content:
+    localUser.value.userRole === TUIRole.kAdministrator
+      ? t('To go on stage again, a new application needs to be initiated')
+      : t(
+          'To go on stage again, you need to reapply and wait for the roomOwner/administrator to approve'
+        ),
   confirmButtonText: t('Step down'),
   cancelButtonText: t('Cancel'),
   handleConfirm: () => leaveSeat(),
   handleCancel: () => handleStepDownDialogVisible(),
 }));
 
-const currentDialogInfo = computed(() => (currentDialogType.value === 'inviteDialog'
-  ? inviteDialogInfo
-  : leaveSeatDialogInfo.value));
+const currentDialogInfo = computed(() =>
+  currentDialogType.value === 'inviteDialog'
+    ? inviteDialogInfo
+    : leaveSeatDialogInfo.value
+);
 
 /**
  * Send a request to be on the stage
-**/
+ **/
 async function sendSeatApplication() {
   if (isAdmin.value) {
     await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
@@ -142,7 +170,9 @@ async function sendSeatApplication() {
   const request = await roomEngine.instance?.takeSeat({
     seatIndex: -1,
     timeout: 60,
-    requestCallback: (callbackInfo: { requestCallbackType: TUIRequestCallbackType }) => {
+    requestCallback: (callbackInfo: {
+      requestCallbackType: TUIRequestCallbackType;
+    }) => {
       isApplyingOnSeat.value = false;
       const { requestCallbackType } = callbackInfo;
       switch (requestCallbackType) {
@@ -150,10 +180,16 @@ async function sendSeatApplication() {
           TUIMessage({ type: 'success', message: t('Succeed on stage') });
           break;
         case TUIRequestCallbackType.kRequestRejected:
-          TUIMessage({ type: 'warning', message: t('Application to go on stage was rejected') });
+          TUIMessage({
+            type: 'warning',
+            message: t('Application to go on stage was rejected'),
+          });
           break;
         case TUIRequestCallbackType.kRequestTimeout:
-          TUIMessage({ type: 'warning', message: t('The request to go on stage has timed out') });
+          TUIMessage({
+            type: 'warning',
+            message: t('The request to go on stage has timed out'),
+          });
           break;
       }
     },
@@ -166,7 +202,7 @@ async function sendSeatApplication() {
 
 /**
  * Cancellation of application stage
-**/
+ **/
 async function cancelSeatApplication() {
   TUIMessage({
     type: 'info',
@@ -174,7 +210,9 @@ async function cancelSeatApplication() {
     duration: MESSAGE_DURATION.NORMAL,
   });
   try {
-    await roomEngine.instance?.cancelRequest({ requestId: applyToAnchorRequestId.value });
+    await roomEngine.instance?.cancelRequest({
+      requestId: applyToAnchorRequestId.value,
+    });
     isApplyingOnSeat.value = false;
   } catch (error) {
     logger.log('member cancelSpeechApplication', error);
@@ -183,7 +221,7 @@ async function cancelSeatApplication() {
 
 /**
  * User Down stage
-**/
+ **/
 function handleStepDownDialogVisible() {
   showDialog.value = !showDialog.value;
   currentDialogType.value = 'leaveSeatDialog';
@@ -199,6 +237,7 @@ async function leaveSeat() {
   if (roomStore.isMicrophoneDisableForAllUser && isGeneralUser.value) {
     roomStore.setCanControlSelfAudio(false);
   }
+  basicStore.setIsOpenMic(false);
 }
 
 function hideApplyAttention() {
@@ -207,13 +246,20 @@ function hideApplyAttention() {
 
 /**
  * Handling host or administrator invitation to on-stage signalling
-**/
+ **/
 async function onRequestReceived(eventInfo: { request: TUIRequest }) {
-  const { request: { userId, requestId, requestAction } } = eventInfo;
+  const {
+    request: { userId, requestId, requestAction },
+  } = eventInfo;
   if (requestAction === TUIRequestAction.kRequestRemoteUserOnSeat) {
     inviteToAnchorRequestId.value = requestId;
-    const userRole = roomStore.getUserRole(userId as string) === TUIRole.kRoomOwner ? t('RoomOwner') : t('Admin');
-    currentDialogTitle.value = t('Sb invites you to speak on stage', { role: userRole });
+    const userRole =
+      roomStore.getUserRole(userId as string) === TUIRole.kRoomOwner
+        ? t('RoomOwner')
+        : t('Admin');
+    currentDialogTitle.value = t('Sb invites you to speak on stage', {
+      role: userRole,
+    });
     currentConfirmButton.value = t('Agree to the stage');
     showDialog.value = true;
     currentDialogType.value = 'inviteDialog';
@@ -221,8 +267,8 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
 }
 
 /**
-   * The host canceled the invitation to the stage
-  **/
+ * The host canceled the invitation to the stage
+ **/
 function onRequestCancelled(eventInfo: { requestId: string; userId: string }) {
   const { requestId } = eventInfo;
   if (inviteToAnchorRequestId.value === requestId) {
@@ -233,7 +279,7 @@ function onRequestCancelled(eventInfo: { requestId: string; userId: string }) {
 
 /**
  * User accepts/rejects the presenter's invitation
-**/
+ **/
 async function handleInvite(agree: boolean) {
   try {
     await roomEngine.instance?.responseRemoteRequest({
@@ -242,9 +288,15 @@ async function handleInvite(agree: boolean) {
     });
   } catch (error: any) {
     if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
-      TUIMessage({ type: 'warning', message: t('The stage is full, please contact the host') });
+      TUIMessage({
+        type: 'warning',
+        message: t('The stage is full, please contact the host'),
+      });
     } else {
-      logger.error('Failure of a user to accept/reject a roomOwner invitation', error);
+      logger.error(
+        'Failure of a user to accept/reject a roomOwner invitation',
+        error
+      );
     }
   } finally {
     showDialog.value = false;
@@ -257,7 +309,9 @@ async function handleInvite(agree: boolean) {
 async function onKickedOffSeat() {
   TUIMessage({
     type: 'warning',
-    message: t('You have been invited by the host to step down, please raise your hand if you need to speak'),
+    message: t(
+      'You have been invited by the host to step down, please raise your hand if you need to speak'
+    ),
     duration: MESSAGE_DURATION.NORMAL,
   });
 }
@@ -270,7 +324,10 @@ TUIRoomEngine.once('ready', () => {
 
 onBeforeUnmount(() => {
   roomEngine.instance?.off(TUIRoomEvents.onRequestReceived, onRequestReceived);
-  roomEngine.instance?.off(TUIRoomEvents.onRequestCancelled, onRequestCancelled);
+  roomEngine.instance?.off(
+    TUIRoomEvents.onRequestCancelled,
+    onRequestCancelled
+  );
   roomEngine.instance?.off(TUIRoomEvents.onKickedOffSeat, onKickedOffSeat);
 });
 </script>
@@ -278,60 +335,70 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .apply-control-container {
   position: relative;
+
   .attention {
-    background: var(--active-color-1);
-    box-shadow: 0 4px 16px 0 rgba(47, 48, 164, 0.1);
     position: absolute;
-    border-radius: 8px;
+    bottom: 70px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    bottom: 70px;
+    background: var(--active-color-1);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px 0 rgba(47, 48, 164, 0.1);
+
     &::after {
-      content: '';
-      display: block;
-      border: 5px solid transparent;
-      border-top-color: var(--active-color-1);
       position: absolute;
       top: 100%;
       left: 10%;
+      display: block;
+      content: '';
+      border: 5px solid transparent;
+      border-top-color: var(--active-color-1);
       transform: translateX(-50%);
     }
   }
+
   .member-attention {
     padding: 12px;
-    .info, .mobile-info {
+
+    .info,
+    .mobile-info {
       height: 20px;
-      font-weight: 500;
       font-size: 14px;
-      color: #ffffff;
+      font-weight: 500;
       line-height: 20px;
+      color: #fff;
       white-space: nowrap;
     }
+
     .mobile-info {
       min-width: 50vw;
     }
+
     .close {
-      cursor: pointer;
-      color: #ffffff;
       padding-left: 12px;
+      color: #fff;
+      cursor: pointer;
     }
   }
 }
+
 .agree,
 .cancel {
-  padding: 14px;
-  width: 50%;
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 50%;
+  padding: 14px;
   font-size: 16px;
   font-weight: 500;
-  justify-content: center;
   color: var(--active-color-1);
 }
+
 .cancel {
   color: var(--font-color-4);
 }
+
 .cancel-button {
   margin-left: 20px;
 }

@@ -1,16 +1,39 @@
 <template>
-  <div ref="tuiInputRef" :class="['tui-input', themeClass]">
+  <div
+    ref="tuiInputRef"
+    :class="['tui-input', themeClass, !border && 'no-border']"
+  >
     <input
-      ref="inputRef" :value="modelValue" :placeholder="placeholder" :disabled="disabled" :maxlength="props.maxlength"
-      :type="type" :enterkeyhint="enterkeyhint" :readonly="readonly" :style="{ paddingRight: hasSuffixIcon ? '40px' : '16px' }" @focus="focus"
-      @blur="blur" @keyup.enter="done" @input="handleInput" @change="handleInput"
+      ref="inputRef"
+      :value="modelValue"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :maxlength="props.maxlength"
+      :type="type"
+      :enterkeyhint="enterkeyhint"
+      :readonly="readonly"
+      :style="{ paddingRight: hasSuffixIcon ? '40px' : '16px' }"
+      @focus="focus"
+      @blur="blur"
+      @keyup.enter="done"
+      @input="handleInput"
+      @change="handleInput"
+      autocomplete="off"
     />
-    <div v-if="hasSuffixIcon" class="suffix-icon" @mousedown.prevent @click="handleSuffixIconClick">
+    <div
+      v-if="hasSuffixIcon"
+      class="suffix-icon"
+      @mousedown.prevent
+      @click="handleSuffixIconClick"
+    >
       <slot name="suffixIcon"></slot>
     </div>
     <div v-if="showResults" class="results tui-theme-white">
       <div
-        v-for="(item, index) in searchResult" :key="index" class="results-item" @mousedown.prevent
+        v-for="(item, index) in searchResult"
+        :key="index"
+        class="results-item"
+        @mousedown.prevent
         @click="handleResultItemClick(item)"
       >
         {{ item.label || item.value }}
@@ -21,7 +44,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, useSlots, onMounted, onUnmounted } from 'vue';
+import {
+  ref,
+  computed,
+  useSlots,
+  onMounted,
+  onUnmounted,
+  withDefaults,
+  defineProps,
+  defineEmits,
+} from 'vue';
 
 const slots = useSlots();
 
@@ -32,10 +64,11 @@ interface Props {
   disabled?: boolean;
   type?: string;
   readonly?: boolean;
-  enterkeyhint?: string
+  enterkeyhint?: string;
   search?: (data: string) => any;
   select?: (data: any) => any;
   maxlength?: string;
+  border?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,12 +80,20 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   enterkeyhint: '',
   maxlength: '80',
+  border: true,
 });
 
-const themeClass = computed(() => (props.theme ? `tui-theme-${props.theme}` : ''));
+const themeClass = computed(() =>
+  props.theme ? `tui-theme-${props.theme}` : ''
+);
 
-
-const emit = defineEmits(['update:modelValue', 'input', 'focus', 'blur', 'done']);
+const emit = defineEmits([
+  'update:modelValue',
+  'input',
+  'focus',
+  'blur',
+  'done',
+]);
 
 const tuiInputRef = ref<HTMLInputElement | null>(null);
 const inputRef = ref<HTMLInputElement | null>(null);
@@ -117,7 +158,9 @@ function handleInput(event: any) {
     searchResult.value = props.search(event.target.value);
   }
 }
-const showResults = computed(() => searchResult.value && searchResult.value?.length !== 0 && show.value);
+const showResults = computed(
+  () => searchResult.value && searchResult.value?.length !== 0 && show.value
+);
 
 const hasSuffixIcon = computed(() => !!slots.suffixIcon);
 </script>
@@ -126,20 +169,20 @@ const hasSuffixIcon = computed(() => !!slots.suffixIcon);
 .tui-input {
   position: relative;
   display: inline-block;
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 input {
+  box-sizing: border-box;
   width: 100%;
   height: 100%;
-  padding: 10px 0px 10px 16px;
+  padding: 10px 0 10px 16px;
   font-size: 14px;
-  border-radius: 8px;
-  box-sizing: border-box;
-  border: 1px solid var(--border-color);
-  background-color: var(--background-color-7);
   color: var(--font-color-3);
+  background-color: var(--background-color-7);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
 }
 
 input:focus {
@@ -151,37 +194,43 @@ input:disabled {
   background-color: var(--background-color-9);
 }
 
+.tui-input.no-border input {
+  padding: 0;
+  background-color: transparent;
+  border: none;
+}
+
 .suffix-icon {
   position: absolute;
-  right: 12px;
   top: 50%;
-  transform: translateY(-50%);
+  right: 12px;
   display: flex;
   align-items: center;
+  transform: translateY(-50%);
 }
 
 .results {
   position: absolute;
+  z-index: 2;
   width: 100%;
   max-height: 254px;
-  padding: 7px 0px;
+  padding: 7px 0;
+  overflow: auto;
   background-color: var(--background-color-7);
   border: 1px solid var(--border-color);
-  z-index: 2;
   border-radius: 4px;
-  overflow: auto;
 
   &-item {
-    padding: 6px 15px;
-    cursor: pointer;
-    white-space: nowrap;
     display: flex;
     align-items: center;
+    padding: 6px 15px;
+    white-space: nowrap;
+    cursor: pointer;
   }
 
   &-item:hover {
-    background-color: var(--hover-background-color-1);
     color: var(--active-color-2);
+    background-color: var(--hover-background-color-1);
   }
 }
 </style>

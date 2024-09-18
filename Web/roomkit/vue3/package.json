@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-web-vue3",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
@@ -24,7 +24,7 @@
   "dependencies": {
     "@tencentcloud/chat": "latest",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-js": "^2.5.0",
+    "@tencentcloud/tuiroom-engine-js": "^2.6.0",
     "@tencentcloud/universal-api": "^2.0.9",
     "interactjs": "^1.10.26",
     "mitt": "^3.0.0",
@@ -36,8 +36,9 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
+    "pinia": "^2.2.1",
     "sass": "^1.72.0",
-    "typescript": "^5.2.2",
+    "typescript": "^5.5.4",
     "vite": "^5.2.0",
     "vite-plugin-css-injected-by-js": "^3.5.0",
     "vite-plugin-dts": "^3.7.3",

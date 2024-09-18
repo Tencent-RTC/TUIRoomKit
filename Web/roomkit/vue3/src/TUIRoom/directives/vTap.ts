@@ -1,4 +1,3 @@
-
 const eventMap = new Map();
 
 const TIME_OUT = 300;
