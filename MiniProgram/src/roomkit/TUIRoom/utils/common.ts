@@ -1,18 +1,28 @@
 import { getUrlParam } from './utils';
 
+const THEME = {
+  LIGHT: 'white',
+  DARK: 'black',
+};
+
+type ThemeOption = 'LIGHT' | 'DARK';
+
 /**
  * Get Language
  * @returns language
  */
 export function getLanguage() {
-  let language = getUrlParam('lang') || uni.getStorageSync('tuiRoom-language') || navigator?.language || 'zh';
-  language = language.replace(/_/, '-').toLowerCase();
+  const isWxMiniProgram = typeof wx !== 'undefined' && wx.getSystemInfoSync;
 
-  if (language === 'zh-cn' || language === 'zh') {
-    language = 'zh-CN';
-  } else if (language === 'en' || language === 'en-us' || language === 'en-GB') {
-    language = 'en-US';
-  }
+  let language =
+    getUrlParam('lang') ||
+    uni.getStorageSync('tuiRoom-language') ||
+    navigator?.language ||
+    (isWxMiniProgram ? 'zh-CN' : 'en-US');
+  language = language.replace(/_/, '-').toLowerCase();
+  const isZh = language.startsWith('zh');
+  language = isZh ? 'zh-CN' : 'en-US';
+
   return language;
 }
 
@@ -23,4 +33,9 @@ export function getLanguage() {
 export function checkNumber(roomId: string) {
   const reg = /^\d+$/;
   return reg.test(roomId);
+}
+
+export function toTargetTheme(themeOption: ThemeOption) {
+  const theme = themeOption === 'DARK' ? THEME.DARK : THEME.LIGHT;
+  return theme;
 }

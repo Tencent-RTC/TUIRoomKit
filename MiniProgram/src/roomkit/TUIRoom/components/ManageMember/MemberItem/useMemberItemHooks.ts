@@ -14,15 +14,22 @@ export default function useMemberItem(userInfo: UserInfo) {
     const isTargetUserRoomOwner = userInfo.userRole === TUIRole.kRoomOwner;
     const isTargetUserGeneral = userInfo.userRole === TUIRole.kGeneralUser;
     const isTargetUserMySelf = userInfo.userId === roomStore.localUser.userId;
-    return (isMaster.value && !isTargetUserRoomOwner) || (isAdmin.value && isTargetUserGeneral) || isTargetUserMySelf;
+    return (
+      (isMaster.value && !isTargetUserRoomOwner) ||
+      (isAdmin.value && isTargetUserGeneral) ||
+      isTargetUserMySelf
+    );
   });
 
   const isCanOperateMySelf = computed(() => {
     return userInfo.userId === roomStore.localUser.userId;
-  })
-  const isMemberControlAccessible = computed(() => (
-    userInfo.userId === showUserId.value) && (isCanOperateMySelf.value || isCanOperateCurrentMember.value));
-  
+  });
+  const isMemberControlAccessible = computed(
+    () =>
+      userInfo.userId === showUserId.value &&
+      (isCanOperateMySelf.value || isCanOperateCurrentMember.value)
+  );
+
   function openMemberControl() {
     showUserId.value = userInfo.userId;
   }
@@ -38,5 +45,3 @@ export default function useMemberItem(userInfo: UserInfo) {
     isCanOperateMySelf,
   };
 }
-
-

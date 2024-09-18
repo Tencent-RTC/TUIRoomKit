@@ -1,12 +1,17 @@
-function TUIMessageBox(params ?: {
-  message?: string,
-  title?: string,
+function TUIMessageBox(params?: {
+  message?: string;
+  title?: string;
+  duration?: number;
   confirmButtonText?: string;
   cancelButtonText?: string;
-  appendToRoomContainer?: boolean
+  appendToRoomContainer?: boolean;
   callback?: any;
 }) {
-  const { confirmButtonText = '确定', cancelButtonText = '取消', callback } = params || {};
+  const {
+    confirmButtonText = '确定',
+    cancelButtonText = '取消',
+    callback,
+  } = params || {};
   uni.showModal({
     title: params?.title,
     content: params?.message,

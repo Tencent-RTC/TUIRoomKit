@@ -12,8 +12,14 @@ import { EventType, IRoomService } from '../types';
 import mitt from 'mitt';
 export * from '@tencentcloud/tuiroom-engine-wx';
 interface IScheduleConferenceManager {
-  on(eventType: TUIConferenceListManagerEvents, callback: (data?: any) => any): void;
-  off(eventType: TUIConferenceListManagerEvents, callback: (data?: any) => void): void;
+  on(
+    eventType: TUIConferenceListManagerEvents,
+    callback: (data?: any) => any
+  ): void;
+  off(
+    eventType: TUIConferenceListManagerEvents,
+    callback: (data?: any) => void
+  ): void;
   dispose(): void;
   scheduleConference(conferenceInfo: IScheduleConferenceOptions): Promise<void>;
   cancelConference(options: { roomId: string }): Promise<void>;
@@ -43,11 +49,13 @@ interface IScheduleConferenceManager {
   }): Promise<void>;
 
   fetchFriendList(): Promise<void>;
-  replaceFriendList(userList: Array<{
-    userID: string,
-    avatar: string,
-    nick: string,
-  }>): void;
+  replaceFriendList(
+    userList: Array<{
+      userID: string;
+      avatar: string;
+      nick: string;
+    }>
+  ): void;
 }
 
 export interface IScheduleConferenceOptions {
@@ -87,14 +95,14 @@ export class ScheduleConferenceManager implements IScheduleConferenceManager {
 
   public on(
     eventType: TUIConferenceListManagerEvents,
-    callback: (data?: any) => any,
+    callback: (data?: any) => any
   ) {
     this.emitter.on(eventType, callback);
   }
 
   public off(
     eventType: TUIConferenceListManagerEvents,
-    callback: (data?: any) => void,
+    callback: (data?: any) => void
   ) {
     this.emitter.off(eventType, callback);
   }
@@ -108,39 +116,66 @@ export class ScheduleConferenceManager implements IScheduleConferenceManager {
     this.onConferenceWillStart = this.onConferenceWillStart.bind(this);
     this.onConferenceCancelled = this.onConferenceCancelled.bind(this);
     this.onConferenceInfoChanged = this.onConferenceInfoChanged.bind(this);
-    this.onScheduleAttendeesChanged = this.onScheduleAttendeesChanged.bind(this);
+    this.onScheduleAttendeesChanged =
+      this.onScheduleAttendeesChanged.bind(this);
     this.onConferenceStatusChanged = this.onConferenceStatusChanged.bind(this);
   }
 
   private bindEvent() {
-    const conferenceListManager = this.service.roomEngine?.instance.getConferenceListManager();
-    conferenceListManager.on(TUIConferenceListManagerEvents.onConferenceScheduled, this.onConferenceScheduled);
-    conferenceListManager.on(TUIConferenceListManagerEvents.onConferenceWillStart, this.onConferenceWillStart);
-    conferenceListManager.on(TUIConferenceListManagerEvents.onConferenceCancelled, this.onConferenceCancelled);
-    conferenceListManager.on(TUIConferenceListManagerEvents.onConferenceInfoChanged, this.onConferenceInfoChanged);
+    const conferenceListManager =
+      this.service.roomEngine?.instance.getConferenceListManager();
+    conferenceListManager.on(
+      TUIConferenceListManagerEvents.onConferenceScheduled,
+      this.onConferenceScheduled
+    );
+    conferenceListManager.on(
+      TUIConferenceListManagerEvents.onConferenceWillStart,
+      this.onConferenceWillStart
+    );
+    conferenceListManager.on(
+      TUIConferenceListManagerEvents.onConferenceCancelled,
+      this.onConferenceCancelled
+    );
+    conferenceListManager.on(
+      TUIConferenceListManagerEvents.onConferenceInfoChanged,
+      this.onConferenceInfoChanged
+    );
     conferenceListManager.on(
       TUIConferenceListManagerEvents.onScheduleAttendeesChanged,
-      this.onScheduleAttendeesChanged,
+      this.onScheduleAttendeesChanged
     );
     conferenceListManager.on(
       TUIConferenceListManagerEvents.onConferenceStatusChanged,
-      this.onConferenceStatusChanged,
+      this.onConferenceStatusChanged
     );
   }
 
   private unbindEvent() {
-    const conferenceListManager = this.service.roomEngine?.instance.getConferenceListManager();
-    conferenceListManager.off(TUIConferenceListManagerEvents.onConferenceScheduled, this.onConferenceScheduled);
-    conferenceListManager.off(TUIConferenceListManagerEvents.onConferenceWillStart, this.onConferenceWillStart);
-    conferenceListManager.off(TUIConferenceListManagerEvents.onConferenceCancelled, this.onConferenceCancelled);
-    conferenceListManager.off(TUIConferenceListManagerEvents.onConferenceInfoChanged, this.onConferenceInfoChanged);
+    const conferenceListManager =
+      this.service.roomEngine?.instance.getConferenceListManager();
+    conferenceListManager.off(
+      TUIConferenceListManagerEvents.onConferenceScheduled,
+      this.onConferenceScheduled
+    );
+    conferenceListManager.off(
+      TUIConferenceListManagerEvents.onConferenceWillStart,
+      this.onConferenceWillStart
+    );
+    conferenceListManager.off(
+      TUIConferenceListManagerEvents.onConferenceCancelled,
+      this.onConferenceCancelled
+    );
+    conferenceListManager.off(
+      TUIConferenceListManagerEvents.onConferenceInfoChanged,
+      this.onConferenceInfoChanged
+    );
     conferenceListManager.off(
       TUIConferenceListManagerEvents.onScheduleAttendeesChanged,
-      this.onScheduleAttendeesChanged,
+      this.onScheduleAttendeesChanged
     );
     conferenceListManager.off(
       TUIConferenceListManagerEvents.onConferenceStatusChanged,
-      this.onConferenceStatusChanged,
+      this.onConferenceStatusChanged
     );
   }
 
@@ -160,14 +195,18 @@ export class ScheduleConferenceManager implements IScheduleConferenceManager {
     this.emit(TUIConferenceListManagerEvents.onConferenceCancelled, data);
   }
 
-  private onConferenceInfoChanged(data: { conferenceModifyInfo: TUIConferenceModifyInfo }) {
+  private onConferenceInfoChanged(data: {
+    conferenceModifyInfo: TUIConferenceModifyInfo;
+  }) {
     this.emit(TUIConferenceListManagerEvents.onConferenceInfoChanged, data);
     const { roomId, roomName } = data.conferenceModifyInfo.basicRoomInfo;
     const isCurrentRoom = this.service.basicStore.roomId === roomId;
     if (!isCurrentRoom) return;
-    (roomName !== undefined && roomName !== null) && this.service.roomStore.setRoomInfo({
-      roomName,
-    });
+    roomName !== undefined &&
+      roomName !== null &&
+      this.service.roomStore.setRoomInfo({
+        roomName,
+      });
   }
 
   private onScheduleAttendeesChanged(data: {
@@ -192,11 +231,13 @@ export class ScheduleConferenceManager implements IScheduleConferenceManager {
     return data;
   }
 
-  replaceFriendList(userList: Array<{
-    userID: string,
-    avatar: string,
-    nick: string,
-  }>) {
+  replaceFriendList(
+    userList: Array<{
+      userID: string;
+      avatar: string;
+      nick: string;
+    }>
+  ) {
     this.customFriendList = userList;
   }
 
@@ -243,10 +284,7 @@ export class ScheduleConferenceManager implements IScheduleConferenceManager {
       .fetchAttendeeList(options);
   }
 
-  async addAttendeesByAdmin(options: {
-    roomId: string;
-    userIdList: string[];
-  }) {
+  async addAttendeesByAdmin(options: { roomId: string; userIdList: string[] }) {
     return await this.service.roomEngine.instance
       ?.getConferenceListManager()
       .addAttendeesByAdmin(options);

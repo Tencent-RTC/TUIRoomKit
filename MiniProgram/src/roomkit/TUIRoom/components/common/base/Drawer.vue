@@ -50,14 +50,14 @@ type DoneFn = () => void;
 type BeforeCloseFn = (done: DoneFn) => void;
 
 interface Props {
-  title?: string,
-  modelValue: boolean,
-  modal?: boolean,
-  size?: string | number,
+  title?: string;
+  modelValue: boolean;
+  modal?: boolean;
+  size?: string | number;
   beforeClose?: BeforeCloseFn | undefined;
-  appendToBody?: boolean,
+  appendToBody?: boolean;
   appendToRoomContainer?: false;
-  closeOnClickModal?: boolean,
+  closeOnClickModal?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -77,11 +77,14 @@ const drawerRef = ref();
 const visible = ref(false);
 const drawerContainerStyle = computed(() => `width: ${addSuffix(props.size)}`);
 
-watch(() => props.modelValue, (val) => {
-  visible.value = val;
-});
+watch(
+  () => props.modelValue,
+  val => {
+    visible.value = val;
+  }
+);
 
-watch(visible, (val) => {
+watch(visible, val => {
   if (val) {
     if (props.appendToBody) {
       document?.body.appendChild(drawerRef.value);
@@ -101,8 +104,8 @@ function handleClose() {
     props.beforeClose(doClose);
   } else {
     doClose();
-  };
-};
+  }
+}
 
 let mouseDownInCurrentTarget = false;
 let mouseUpInCurrentTarget = false;
@@ -125,27 +128,26 @@ function handleOverlayClick() {
     mouseUpInCurrentTarget = false;
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
 .overlay-container {
   position: absolute;
   top: 0;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
   z-index: 2007;
+
   &.overlay {
-    background-color: rgba(15, 16, 20, 0.60);
+    background-color: rgba(15, 16, 20, 0.6);
   }
 }
 
 .tui-theme-white .drawer-container {
   --background-color: var(--background-color-1);
   --box-shadow: 0px 2px 4px rgba(32, 77, 141, 0.03),
-    0px 6px 10px rgba(32, 77, 141, 0.06),
-    0px 3px 14px rgba(32, 77, 141, 0.05);
+    0px 6px 10px rgba(32, 77, 141, 0.06), 0px 3px 14px rgba(32, 77, 141, 0.05);
 }
 
 .tui-theme-black .drawer-container {
@@ -154,42 +156,46 @@ function handleOverlayClick() {
 }
 
 .drawer-container {
-  background-color: var(--background-color);
   position: absolute;
   right: 0;
-  height: 100%;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  background-color: var(--background-color);
+  border-radius: 8px 0 0 8px;
   box-shadow: var(--box-shadow);
-  border-radius: 8px 0px 0px 8px;
+
   .drawer-header {
-    height: 64px;
-    box-shadow: 0px 1px 0px var(--stroke-color);
     position: relative;
     display: flex;
-    padding: 0 20px;
     align-items: center;
+    height: 64px;
+    padding: 0 20px;
+    box-shadow: 0 1px 0 var(--stroke-color);
+
     .drawer-header-title {
-      color: var(--font-color-1);
       font-size: 16px;
       font-style: normal;
       font-weight: 600;
       line-height: 24px;
+      color: var(--font-color-1);
     }
+
     .close {
-      width: 32px;
-      height: 32px;
       position: absolute;
       top: 50%;
-      transform: translateY(-50%);
       right: 20px;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
       color: var(--font-color-1);
       cursor: pointer;
+      transform: translateY(-50%);
     }
   }
+
   .drawer-content {
     flex: 1;
     overflow: auto;

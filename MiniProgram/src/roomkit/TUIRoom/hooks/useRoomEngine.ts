@@ -9,11 +9,13 @@ export default function useGetRoomEngine() {
 
 TUIRoomEngine.once('ready', () => {
   roomEngine.instance = new TUIRoomEngine();
-  TUIRoomEngine.callExperimentalAPI(JSON.stringify({
-    api: 'setFramework',
-    params: {
-      component: 'TUIRoomKit',
-      language: vueVersion,
-    },
-  }));
+  TUIRoomEngine.callExperimentalAPI(
+    JSON.stringify({
+      api: 'setFramework',
+      params: {
+        component: 'TUIRoomKit',
+        language: vueVersion,
+      },
+    })
+  );
 });

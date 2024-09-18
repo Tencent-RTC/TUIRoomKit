@@ -3,27 +3,27 @@
     <audio-control
       v-if="!isAudience || isAdmin"
       @tap="() => handleControlClick('audioControl')"
-    ></audio-control>
+    />
     <video-control
       v-if="!isAudience || isAdmin"
       @tap="() => handleControlClick('videoControl')"
-    ></video-control>
+    />
     <chat-control
       v-if="!roomStore.isSpeakAfterTakingSeatMode"
       @tap="() => handleControlClick('chatControl')"
-    ></chat-control>
+    />
     <master-apply-control
       v-if="roomStore.isSpeakAfterTakingSeatMode && (isMaster || isAdmin)"
       @tap="() => handleControlClick('MasterApplyControl')"
-    ></master-apply-control>
+    />
     <member-apply-control
       v-if="roomStore.isSpeakAfterTakingSeatMode && !isMaster"
       @tap="() => handleControlClick('MemberApplyControl')"
-    ></member-apply-control>
+    />
     <manage-member-control
       @tap="() => handleControlClick('manageMemberControl')"
-    ></manage-member-control>
-    <more-control @tap="() => handleControlClick('moreControl')"></more-control>
+    />
+    <more-control @tap="() => handleControlClick('moreControl')" />
   </div>
 </template>
 <script setup lang="ts">
@@ -38,13 +38,7 @@ import bus from '../../../hooks/useMitt';
 
 import useRoomFooter from './useRoomFooterHooks';
 
-const {
-  roomStore,
-  isMaster,
-  isAdmin,
-  isAudience,
-} = useRoomFooter();
-
+const { roomStore, isMaster, isAdmin, isAudience } = useRoomFooter();
 
 function handleControlClick(name: string) {
   bus.emit('experience-communication', name);
@@ -52,17 +46,16 @@ function handleControlClick(name: string) {
 </script>
 
 <style scoped>
-.footer-container{
+.footer-container {
   position: absolute;
   bottom: 0;
-  width: 100%;
   display: flex;
-  justify-content: space-between;
+  flex-flow: row wrap;
   align-items: center;
-  flex-wrap: wrap;
-  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
   padding: 0.7rem;
   background-color: var(--background-color-2);
-  box-shadow: 0px -8px 30px var(--footer-shadow-color);
+  box-shadow: 0 -8px 30px var(--footer-shadow-color);
 }
 </style>

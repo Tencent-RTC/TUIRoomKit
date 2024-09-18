@@ -13,11 +13,14 @@ export default function useSideBar() {
 
   const chatStore = useChatStore();
   const basicStore = useBasicStore();
-  const { sdkAppId, isSidebarOpen, sidebarName, roomId } = storeToRefs(basicStore);
+  const { sdkAppId, isSidebarOpen, sidebarName, roomId } =
+    storeToRefs(basicStore);
   const roomStore = useRoomStore();
   const { userNumber } = storeToRefs(roomStore);
 
-  const showSideBar = computed(() => isSidebarOpen.value && sidebarName.value !== 'transfer-leave');
+  const showSideBar = computed(
+    () => isSidebarOpen.value && sidebarName.value !== 'transfer-leave'
+  );
   const title = computed((): string => {
     let sidebarTitle = '';
     switch (sidebarName.value) {
@@ -53,9 +56,12 @@ export default function useSideBar() {
     if (!options || !options.data) {
       return;
     }
-    const currentConversationId = `GROUP${roomId.value}`
+    const currentConversationId = `GROUP${roomId.value}`;
     options.data.forEach((message: any) => {
-      if (message.conversationID === currentConversationId && message.type === TencentCloudChat.TYPES.MSG_TEXT) {
+      if (
+        message.conversationID === currentConversationId &&
+        message.type === TencentCloudChat.TYPES.MSG_TEXT
+      ) {
         if (!basicStore.isSidebarOpen || basicStore.sidebarName !== 'chat') {
           // eslint-disable-next-line no-plusplus
           chatStore.updateUnReadCount(++chatStore.unReadCount);
@@ -66,7 +72,6 @@ export default function useSideBar() {
 
   let tim = roomEngine.instance?.getTIM();
   tim?.on(TencentCloudChat.EVENT.MESSAGE_RECEIVED, onReceiveMessage);
-
 
   watch(sdkAppId, () => {
     if (!tim && sdkAppId.value) {
@@ -86,7 +91,5 @@ export default function useSideBar() {
     sidebarName,
     handleClose,
     showSideBar,
-  }
-  ;
+  };
 }
-

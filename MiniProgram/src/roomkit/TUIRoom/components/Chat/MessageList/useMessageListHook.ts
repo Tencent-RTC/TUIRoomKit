@@ -3,7 +3,10 @@ import { storeToRefs } from 'pinia';
 import { useChatStore } from '../../../stores/chat';
 import { useBasicStore } from '../../../stores/basic';
 import { useI18n } from '../../../locales';
-import { TUIRoomEngine, TencentCloudChat } from '@tencentcloud/tuiroom-engine-wx';
+import {
+  TUIRoomEngine,
+  TencentCloudChat,
+} from '@tencentcloud/tuiroom-engine-wx';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 
 export default function useMessageList() {
@@ -14,10 +17,13 @@ export default function useMessageList() {
   const { roomId } = storeToRefs(basicStore);
   const { messageList, isCompleted, nextReqMessageId } = storeToRefs(chatStore);
 
-  watch(isCompleted, (value) => {
-    isCompleted.value = value;
-  }, { immediate: true, deep: true });
-
+  watch(
+    isCompleted,
+    value => {
+      isCompleted.value = value;
+    },
+    { immediate: true, deep: true }
+  );
 
   async function handleGetHistoryMessageList() {
     const tim = roomEngine.instance?.getTIM();
@@ -25,22 +31,32 @@ export default function useMessageList() {
       conversationID: `GROUP${roomId.value}`,
       nextReqMessageID: nextReqMessageId.value,
     });
-    const { nextReqMessageID: middleReqMessageId, messageList: historyMessageList, isCompleted } = imResponse.data;
+    const {
+      nextReqMessageID: middleReqMessageId,
+      messageList: historyMessageList,
+      isCompleted,
+    } = imResponse.data;
     messageList.value.splice(0, 0, ...historyMessageList);
-    const currentMessageList = messageList.value.filter(item => item.type === 'TIMTextElem');
-    chatStore.setMessageListInfo(currentMessageList, isCompleted, middleReqMessageId);
+    const currentMessageList = messageList.value.filter(
+      item => item.type === 'TIMTextElem'
+    );
+    chatStore.setMessageListInfo(
+      currentMessageList,
+      isCompleted,
+      middleReqMessageId
+    );
   }
 
   async function getMessageList(): Promise<{
     currentMessageList: any[];
-    isCompleted: boolean,
-    nextReqMessageId: string,
+    isCompleted: boolean;
+    nextReqMessageId: string;
   }> {
     let count = 0;
     const result: {
-      currentMessageList: any[],
-      isCompleted: boolean,
-      nextReqMessageId: string,
+      currentMessageList: any[];
+      isCompleted: boolean;
+      nextReqMessageId: string;
     } = {
       currentMessageList: [],
       isCompleted: false,
@@ -49,7 +65,7 @@ export default function useMessageList() {
     const tim: any = roomEngine.instance?.getTIM();
     const getIMMessageList = async () => {
       const conversationData: {
-        conversationID: string,
+        conversationID: string;
         nextReqMessageID?: string | undefined;
       } = {
         conversationID: `GROUP${roomId.value}`,
@@ -74,18 +90,26 @@ export default function useMessageList() {
     await getIMMessageList();
 
     return result;
-  };
+  }
 
   const onReceiveMessage = (options: { data: any }) => {
     if (!options || !options.data) {
       return;
     }
-    const currentConversationId = `GROUP${roomId.value}`
+    const currentConversationId = `GROUP${roomId.value}`;
     options.data.forEach((message: any) => {
-      if (message.conversationID !== currentConversationId || message.type !== TencentCloudChat.TYPES.MSG_TEXT) {
+      if (
+        message.conversationID !== currentConversationId ||
+        message.type !== TencentCloudChat.TYPES.MSG_TEXT
+      ) {
         return;
       }
-      const { ID, payload: { text }, nick: userName, from: userId } = message;
+      const {
+        ID,
+        payload: { text },
+        nick: userName,
+        from: userId,
+      } = message;
       chatStore.updateMessageList({
         ID,
         type: 'TIMTextElem',
@@ -101,9 +125,16 @@ export default function useMessageList() {
   };
 
   async function setMessageListInfo() {
-    const { currentMessageList, isCompleted, nextReqMessageId } = await getMessageList();
-    const filterCurrentMessageList = currentMessageList.filter((item: any) => item.type === 'TIMTextElem');
-    chatStore.setMessageListInfo(filterCurrentMessageList, isCompleted, nextReqMessageId);
+    const { currentMessageList, isCompleted, nextReqMessageId } =
+      await getMessageList();
+    const filterCurrentMessageList = currentMessageList.filter(
+      (item: any) => item.type === 'TIMTextElem'
+    );
+    chatStore.setMessageListInfo(
+      filterCurrentMessageList,
+      isCompleted,
+      nextReqMessageId
+    );
   }
 
   function getDisplaySenderName(index: number) {

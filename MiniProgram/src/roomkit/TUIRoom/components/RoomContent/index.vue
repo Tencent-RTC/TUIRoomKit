@@ -1,6 +1,6 @@
 <template>
   <div class="content-container">
-    <stream-container :show-room-tool="showRoomTool"></stream-container>
+    <stream-container :show-room-tool="showRoomTool" />
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 import StreamContainer from './StreamContainer/index.vue';
 
 defineProps<{
-  showRoomTool: boolean,
+  showRoomTool: boolean;
 }>();
 </script>
 
@@ -18,5 +18,4 @@ defineProps<{
   height: 100%;
   overflow: hidden;
 }
-
 </style>

@@ -22,7 +22,7 @@ export default function useChatEditor() {
   const editorInputEle = ref();
   const sendMsg = ref('');
   const isEmojiToolbarVisible = ref(false);
-  watch(isMessageDisabled, (value) => {
+  watch(isMessageDisabled, value => {
     if (value) {
       sendMsg.value = '';
     }
@@ -53,15 +53,18 @@ export default function useChatEditor() {
         payload: {
           text: result,
         },
-        nick: roomStore.localUser.nameCard || roomStore.localUser.userName || roomStore.localUser.userId,
+        nick:
+          roomStore.localUser.nameCard ||
+          roomStore.localUser.userName ||
+          roomStore.localUser.userId,
         from: roomStore.localUser.userId,
         flow: 'out',
         sequence: Math.random(),
       });
     } catch (e) {
-    /**
-     * Message delivery failure
-    **/
+      /**
+       * Message delivery failure
+       **/
       TUIMessage({ type: 'error', message: t('Failed to send the message') });
     }
   };

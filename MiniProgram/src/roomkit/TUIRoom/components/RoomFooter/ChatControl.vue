@@ -1,12 +1,16 @@
 <template>
   <div v-if="chatControlConfig.visible" class="chat-control-container">
-    <tui-badge :hidden="chatStore.unReadCount === 0" :value="chatStore.unReadCount" :max="10">
+    <tui-badge
+      :hidden="chatStore.unReadCount === 0"
+      :value="chatStore.unReadCount"
+      :max="10"
+    >
       <icon-button
         :title="t('Chat')"
         :icon="ChatIcon"
         :is-active="sidebarName === 'chat'"
         @click-icon="toggleChatSidebar"
-      ></icon-button>
+      />
     </tui-badge>
   </div>
 </template>

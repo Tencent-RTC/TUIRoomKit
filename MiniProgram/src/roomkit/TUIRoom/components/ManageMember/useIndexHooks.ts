@@ -1,4 +1,4 @@
-import { Ref, computed, nextTick, ref, onMounted } from 'vue';
+import { Ref, computed, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { UserInfo, useRoomStore } from '../../stores/room';
@@ -10,6 +10,8 @@ import { MESSAGE_DURATION } from '../../constants/message';
 import { isMobile } from '../../utils/environment';
 import AllMembersShareScreenIcon from '../../assets/icons/AllMembersShareScreenIcon.svg';
 import HostShareScreenIcon from '../../assets/icons/HostShareScreenIcon.svg';
+import { roomService } from '../../services';
+import { USERS_STATUS } from '../../constants/room';
 
 export default function useIndex() {
   const roomEngine = useGetRoomEngine();
@@ -24,6 +26,7 @@ export default function useIndex() {
     applyToAnchorList,
     isOnStateTabActive,
     generalUserScreenStreamList,
+    remoteNotEnteredUserList,
   } = storeToRefs(roomStore);
 
   enum ManageControlType {
@@ -32,12 +35,23 @@ export default function useIndex() {
     SCREEN = 'screen',
   }
 
-  const audienceUserList = computed(() => userList.value.filter(user => !anchorUserList.value.includes(user)));
+  const currentActiveTabName = ref(USERS_STATUS.Entered);
+
+  const audienceUserList = computed(() =>
+    userList.value.filter(
+      user => !anchorUserList.value.includes(user) && user.isInRoom
+    )
+  );
+
+  const enterUserList = computed(() =>
+    userList.value.filter(user => user.isInRoom)
+  );
 
   const searchText = ref('');
   const showMoreControl = ref(false);
 
-  function handleToggleStaged() {
+  function handleToggleStaged(item: any) {
+    currentActiveTabName.value = item.status;
     isOnStateTabActive.value = !isOnStateTabActive.value;
     roomStore.setOnStageTabStatus(isOnStateTabActive.value);
   }
@@ -45,43 +59,125 @@ export default function useIndex() {
   const filteredUserList = computed(() => {
     let list: UserInfo[] = [];
     if (roomStore.isFreeSpeakMode) {
-      list = userList.value;
+      list = enterUserList.value;
     } else if (roomStore.isSpeakAfterTakingSeatMode) {
-      list = isOnStateTabActive.value ? anchorUserList.value : audienceUserList.value;
+      list = isOnStateTabActive.value
+        ? anchorUserList.value
+        : audienceUserList.value;
     }
     if (!searchText.value) {
       return list;
     }
-    return list.filter((item: UserInfo) => item.nameCard?.includes(searchText.value) || item.userName?.includes(searchText.value) || item.userId.includes(searchText.value));
+    return list.filter(
+      (item: UserInfo) =>
+        item.nameCard?.includes(searchText.value) ||
+        item.userName?.includes(searchText.value) ||
+        item.userId.includes(searchText.value)
+    );
   });
-  const alreadyStaged = computed(() => `${t('Already on stage')} (${(anchorUserList.value.length)})`);
-  const notStaged = computed(() => `${t('Not on stage')} (${(audienceUserList.value.length)})`);
 
-  function handleInvite() {
-    basicStore.setSidebarName('invite');
-  }
+  const filteredUserStatusList = computed(() => {
+    let list: any = [];
 
-  const audioManageInfo = computed(() => (roomStore.isMicrophoneDisableForAllUser ? t('Lift all mute') : t('All mute')));
-  const videoManageInfo = computed(() => (roomStore.isCameraDisableForAllUser ? t('Lift stop all video') : t('All stop video')));
+    if (roomStore.isFreeSpeakMode) {
+      list =
+        currentActiveTabName.value === USERS_STATUS.Entered
+          ? enterUserList.value
+          : remoteNotEnteredUserList.value;
+    } else {
+      switch (currentActiveTabName.value) {
+        case USERS_STATUS.ON_STAGE:
+          list = anchorUserList.value;
+          break;
+        case USERS_STATUS.NOT_ON_STAGE:
+          list = audienceUserList.value;
+          break;
+        default:
+          list = remoteNotEnteredUserList.value;
+      }
+    }
 
-  const moreControlList = computed(() => ([
+    if (!searchText.value) {
+      return list;
+    }
+
+    const searchFilter = (item: any) =>
+      item.nameCard?.includes(searchText.value) ||
+      item.userName?.includes(searchText.value) ||
+      item.userId.includes(searchText.value);
+
+    return list.filter(searchFilter);
+  });
+
+  const alreadyStaged = computed(
+    () => `${t('On stage')} (${anchorUserList.value.length})`
+  );
+  const notStaged = computed(
+    () => `${t('Not on stage')} (${audienceUserList.value.length})`
+  );
+
+  const audioManageInfo = computed(() =>
+    roomStore.isMicrophoneDisableForAllUser ? t('Lift all mute') : t('All mute')
+  );
+  const videoManageInfo = computed(() =>
+    roomStore.isCameraDisableForAllUser
+      ? t('Lift stop all video')
+      : t('All stop video')
+  );
+
+  const userStatusList = computed(() => {
+    if (roomStore.isFreeSpeakMode) {
+      return [
+        {
+          status: USERS_STATUS.Entered,
+          title: `${t('Entered')} (${enterUserList.value.length})`,
+        },
+        {
+          status: USERS_STATUS.NOT_ENTER,
+          title: `${t('Not Entered')} (${remoteNotEnteredUserList.value.length})`,
+        },
+      ];
+    }
+    return [
+      {
+        status: USERS_STATUS.ON_STAGE,
+        title: `${t('On stage')} (${anchorUserList.value.length})`,
+      },
+      {
+        status: USERS_STATUS.NOT_ON_STAGE,
+        title: `${t('Not on stage')} (${audienceUserList.value.length})`,
+      },
+      {
+        status: USERS_STATUS.NOT_ENTER,
+        title: `${t('Not Entered')} (${remoteNotEnteredUserList.value.length})`,
+      },
+    ];
+  });
+
+  const moreControlList = computed(() => [
     {
-      title: roomStore.isScreenShareDisableForAllUser ?  t('All members can share screen') :  t('Screen sharing for host/admin only'),
-      icon: roomStore.isScreenShareDisableForAllUser ? AllMembersShareScreenIcon : HostShareScreenIcon,
+      title: roomStore.isScreenShareDisableForAllUser
+        ? t('All members can share screen')
+        : t('Screen sharing for host/admin only'),
+      icon: roomStore.isScreenShareDisableForAllUser
+        ? AllMembersShareScreenIcon
+        : HostShareScreenIcon,
       func: toggleManageAllMember,
       type: ManageControlType.SCREEN,
     },
-  ]));
+  ]);
 
   const showManageAllUserDialog: Ref<boolean> = ref(false);
   const dialogContent: Ref<string> = ref('');
   const dialogTitle: Ref<string> = ref('');
   const dialogActionInfo: Ref<string> = ref('');
-  let stateForAllAudio: boolean = false;
-  let stateForAllVideo: boolean = false;
-  let stateForScreenShare: boolean = false;
+  let stateForAllAudio = false;
+  let stateForAllVideo = false;
+  let stateForScreenShare = false;
 
-  const currentControlType: Ref<ManageControlType> = ref(ManageControlType.AUDIO);
+  const currentControlType: Ref<ManageControlType> = ref(
+    ManageControlType.AUDIO
+  );
 
   async function toggleManageAllMember(type: ManageControlType) {
     currentControlType.value = type;
@@ -89,11 +185,12 @@ export default function useIndex() {
       case ManageControlType.AUDIO:
         showManageAllUserDialog.value = true;
         dialogTitle.value = roomStore.isMicrophoneDisableForAllUser
-          ? t('Enable all audios') : t('All current and new members will be muted');
+          ? t('Enable all audios')
+          : t('All current and new members will be muted');
         dialogContent.value = roomStore.isMicrophoneDisableForAllUser
           ? t('After unlocking, users can freely turn on the microphone')
           : t('Members will not be able to open the microphone');
-        stateForAllAudio =  !roomStore.isMicrophoneDisableForAllUser;
+        stateForAllAudio = !roomStore.isMicrophoneDisableForAllUser;
         // Mini program update view
         await nextTick();
         dialogActionInfo.value = audioManageInfo.value;
@@ -101,7 +198,8 @@ export default function useIndex() {
       case ManageControlType.VIDEO:
         showManageAllUserDialog.value = true;
         dialogTitle.value = roomStore.isCameraDisableForAllUser
-          ? t('Enable all videos') : t('All and new members will be banned from the camera');
+          ? t('Enable all videos')
+          : t('All and new members will be banned from the camera');
         dialogContent.value = roomStore.isCameraDisableForAllUser
           ? t('After unlocking, users can freely turn on the camera')
           : t('Members will not be able to open the camera');
@@ -117,8 +215,12 @@ export default function useIndex() {
           break;
         }
         showManageAllUserDialog.value = true;
-        dialogTitle.value = t('Is it turned on that only the host/admin can share the screen?');
-        dialogContent.value = t("Other member is sharing the screen is now, the member's sharing will be terminated after you turning on");
+        dialogTitle.value = t(
+          'Is it turned on that only the host/admin can share the screen?'
+        );
+        dialogContent.value = t(
+          "Other member is sharing the screen is now, the member's sharing will be terminated after you turning on"
+        );
         break;
       default:
         break;
@@ -164,7 +266,9 @@ export default function useIndex() {
 
   async function toggleAllAudio() {
     if (roomStore.isMicrophoneDisableForAllUser === stateForAllAudio) {
-      const tipMessage = stateForAllAudio ? t('All audios disabled') : t('All audios enabled');
+      const tipMessage = stateForAllAudio
+        ? t('All audios disabled')
+        : t('All audios enabled');
       TUIMessage({
         type: 'success',
         message: tipMessage,
@@ -181,7 +285,9 @@ export default function useIndex() {
 
   async function toggleAllVideo() {
     if (roomStore.isCameraDisableForAllUser === stateForAllVideo) {
-      const tipMessage = stateForAllVideo ? t('All videos disabled') : t('All videos enabled');
+      const tipMessage = stateForAllVideo
+        ? t('All videos disabled')
+        : t('All videos enabled');
       TUIMessage({
         type: 'success',
         message: tipMessage,
@@ -198,7 +304,10 @@ export default function useIndex() {
 
   const applyToAnchorUserContent = computed(() => {
     const lastIndex = applyToAnchorList.value.length - 1;
-    const userName = applyToAnchorList.value[lastIndex]?.nameCard || applyToAnchorList.value[lastIndex]?.userName || applyToAnchorList.value[lastIndex]?.userId;
+    const userName =
+      applyToAnchorList.value[lastIndex]?.nameCard ||
+      applyToAnchorList.value[lastIndex]?.userName ||
+      applyToAnchorList.value[lastIndex]?.userId;
     if (applyToAnchorList.value.length === 1) {
       return `${userName} ${t('Applying for the stage')}`;
     }
@@ -209,10 +318,21 @@ export default function useIndex() {
     showMoreControl.value = !showMoreControl.value;
   }
 
+  const handleCallAllInvitee = () => {
+    const userIdList = remoteNotEnteredUserList.value.map(
+      (item: UserInfo) => item.userId
+    );
+    roomService.conferenceInvitationManager.inviteUsers({ userIdList });
+    TUIMessage({
+      type: 'success',
+      message: t('Invitation sent, waiting for members to join.'),
+      duration: MESSAGE_DURATION.NORMAL,
+    });
+  };
+
   return {
     showApplyUserList,
     searchText,
-    handleInvite,
     t,
     toggleManageAllMember,
     doToggleManageAllMember,
@@ -232,5 +352,9 @@ export default function useIndex() {
     toggleClickMoreBtn,
     showMoreControl,
     moreControlList,
+    userStatusList,
+    currentActiveTabName,
+    filteredUserStatusList,
+    handleCallAllInvitee,
   };
 }

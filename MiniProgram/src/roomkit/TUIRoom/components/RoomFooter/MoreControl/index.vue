@@ -13,9 +13,9 @@
         <chat-control
           v-if="roomStore.isSpeakAfterTakingSeatMode"
           @click="handleControlClick('chatControl')"
-        ></chat-control>
-        <contact-control @click="handleControlClick('contactControl')"></contact-control>
-        <invite-control @click="handleControlClick('inviteControl')"></invite-control>
+        />
+        <contact-control @click="handleControlClick('contactControl')" />
+        <invite-control @click="handleControlClick('inviteControl')" />
       </div>
       <div @tap="handleCancelControl" class="close">{{ t('Cancel') }}</div>
     </div>
@@ -37,10 +37,7 @@ const moreControlConfig = roomService.getComponentConfig('MoreControl');
 const showMoreContent = ref(false);
 const moreContentRef = ref();
 
-const {
-  t,
-  sidebarName,
-} = userMoreControl();
+const { t, sidebarName } = userMoreControl();
 const roomStore = useRoomStore();
 
 function showMore() {
@@ -69,44 +66,48 @@ onUnmounted(() => {
 });
 </script>
 <style lang="scss" scoped>
-.show-more-content{
-    position: absolute;
-    left: 5%;
-    bottom: 15px;
-    width: 90%;
-    height: 17vh;
-    background: var(--log-out-cancel);
-    border-radius: 13px;
-    padding: 10px;
-    animation-duration: 200ms;
-    animation-name: popup;
+.show-more-content {
+  position: absolute;
+  bottom: 15px;
+  left: 5%;
+  width: 90%;
+  height: 17vh;
+  padding: 10px;
+  background: var(--log-out-cancel);
+  border-radius: 13px;
+  animation-name: popup;
+  animation-duration: 200ms;
 }
-@keyframes popup{
+
+@keyframes popup {
   from {
-    bottom: 0px;
+    bottom: 0;
   }
-  to{
+
+  to {
     bottom: 15px;
   }
 }
-.control-compent{
-    display: flex;
+
+.control-compent {
+  display: flex;
 }
+
 .close {
-    position: relative;
-    background: var(--close-cancel-h5);
-    border-radius: 8px;
-    border: 1px solid var(--close-cancel-h5);
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-    color: var(--mute-button-color-h5);
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
-    text-align: center;
-    top: 10%;
+  position: relative;
+  top: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--mute-button-color-h5);
+  text-align: center;
+  background: var(--close-cancel-h5);
+  border: 1px solid var(--close-cancel-h5);
+  border-radius: 8px;
 }
 </style>
