@@ -22,6 +22,7 @@ public class ConferenceDefine {
         public boolean isCameraDisableForAllUser     = false;
 
         public boolean isSeatEnabled = false;
+        public String  password      = "";
         public String  name          = "";
 
         public StartConferenceParams(String roomId) {
@@ -39,6 +40,7 @@ public class ConferenceDefine {
             builder.append("; isMicrophoneDisableForAllUser=").append(isMicrophoneDisableForAllUser);
             builder.append("; isCameraDisableForAllUser=").append(isCameraDisableForAllUser);
             builder.append("; isSeatEnabled=").append(isSeatEnabled);
+            builder.append("; password=").append(password);
             builder.append("; name=").append(name);
             return builder.toString();
         }
@@ -72,7 +74,7 @@ public class ConferenceDefine {
 
         public void onConferenceJoined(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message) {}
 
-        public  void onConferenceExisted(TUIRoomDefine.RoomInfo roomInfo, ConferenceExitedReason reason) {}
+        public void onConferenceExisted(TUIRoomDefine.RoomInfo roomInfo, ConferenceExitedReason reason) {}
 
         public void onConferenceFinished(TUIRoomDefine.RoomInfo roomInfo, ConferenceFinishedReason reason) {}
     }

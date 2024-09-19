@@ -53,6 +53,7 @@ public class ConferenceMainViewModel implements ConferenceEventCenter.RoomEngine
         roomInfo.isCameraDisableForAllUser = params.isCameraDisableForAllUser;
         roomInfo.isSeatEnabled = params.isSeatEnabled;
         roomInfo.seatMode = TUIRoomDefine.SeatMode.APPLY_TO_TAKE;
+        roomInfo.password = params.password;
         roomInfo.name = params.name;
 
         ConferenceController controller = ConferenceController.sharedInstance();
