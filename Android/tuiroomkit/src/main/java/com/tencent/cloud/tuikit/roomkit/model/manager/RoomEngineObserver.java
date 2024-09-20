@@ -234,6 +234,7 @@ public class RoomEngineObserver extends TUIRoomObserver {
 
     @Override
     public void onUserVoiceVolumeChanged(Map<String, Integer> volumeMap) {
+        Map<String, Integer> volumes = mMediaState.volumeInfos.get();
         for (Map.Entry<String, Integer> entry : volumeMap.entrySet()) {
             String userId = entry.getKey();
             if (TextUtils.isEmpty(userId)) {
@@ -242,12 +243,15 @@ public class RoomEngineObserver extends TUIRoomObserver {
             if (TextUtils.equals(userId, mConferenceState.userModel.userId) && !mConferenceState.audioModel.isHasAudioStream()) {
                 continue;
             }
+            volumes.put(entry.getKey(), entry.getValue());
             int volume = entry.getValue();
             mConferenceState.updateUserAudioVolume(userId, volume);
             UserState.UserVolumeInfo userVolumeInfo = mUserState.userVolumeInfo.get();
             userVolumeInfo.update(userId, volume);
             mUserState.userVolumeInfo.set(userVolumeInfo);
         }
+        mMediaState.volumeInfos.set(volumes);
+        volumes.clear();
         Map<String, Object> map = new HashMap<>();
         map.put(ConferenceEventConstant.KEY_VOLUME_MAP, volumeMap);
         ConferenceEventCenter.getInstance().notifyEngineEvent(ConferenceEventCenter.RoomEngineEvent.USER_VOICE_VOLUME_CHANGED, map);
