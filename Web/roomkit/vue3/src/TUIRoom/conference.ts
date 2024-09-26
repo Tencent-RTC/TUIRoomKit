@@ -30,6 +30,7 @@ export enum FeatureButton {
   SwitchLanguage = 'Language',
   FullScreen = 'FullScreen',
   Invitation = 'InviteControl',
+  BasicBeauty = 'BasicBeauty',
 }
 export type ThemeOption = 'LIGHT' | 'DARK';
 
@@ -79,6 +80,8 @@ interface IConference {
   enableWatermark: () => void;
 
   enableVirtualBackground: () => void;
+
+  enableBasicBeauty: () => void;
 
   hideFeatureButton: (name: FeatureButton) => void;
 
@@ -162,6 +165,10 @@ class Conference implements IConference {
 
   public enableVirtualBackground() {
     roomService.setComponentConfig({ VirtualBackground: { visible: true } });
+  }
+
+  public enableBasicBeauty() {
+    roomService.setComponentConfig({ BasicBeauty: { visible: true } });
   }
 
   public hideFeatureButton(name: FeatureButton) {
