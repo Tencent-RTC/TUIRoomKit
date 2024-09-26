@@ -189,9 +189,18 @@ const updateAttendees = (
   );
   return resultList;
 };
-const onConferenceScheduled = async (data: { conferenceInfo: any }) => {
+const onConferenceScheduled = async (data: {
+  conferenceInfo: TUIConferenceInfo;
+}) => {
   const { conferenceInfo } = data;
-  scheduleRoomList.value.push(conferenceInfo);
+  const index = scheduleRoomList.value.findIndex(
+    item => item.basicRoomInfo.roomId === conferenceInfo.basicRoomInfo.roomId
+  );
+  if (index >= 0) {
+    scheduleRoomList.value.splice(index, 1, conferenceInfo);
+  } else {
+    scheduleRoomList.value.push(conferenceInfo);
+  }
 };
 const onConferenceCancelled = async (data: any) => {
   scheduleRoomList.value = scheduleRoomList.value.filter(

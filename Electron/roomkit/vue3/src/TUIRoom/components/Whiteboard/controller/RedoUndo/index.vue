@@ -24,7 +24,6 @@ const historyList = ref<any>([]);
 
 function renderCanvas(data: any) {
   if (!canvas?.value) return;
-  canvas.value.clearCanvas();
   canvas.value.loadFromJSON(data, () => {
     canvas.value.renderAll();
   });

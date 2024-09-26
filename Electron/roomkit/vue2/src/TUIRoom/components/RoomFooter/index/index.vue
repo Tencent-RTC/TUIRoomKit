@@ -52,11 +52,17 @@
         class="center-container-item"
         @click="handleControlClick('moreControl')"
       />
+      <AIControl
+        class="center-container-item"
+        @click="handleControlClick('AIControl')"
+        @show-overlay="handleShowOverlay"
+      />
       <setting-control
         class="center-container-item"
         @click="handleControlClick('settingControl')"
       />
       <virtual-background class="center-container-item" />
+      <basic-beauty v-if="!isElectron" class="center-container-item" />
     </div>
     <div class="right-container">
       <end-control />
@@ -65,6 +71,7 @@
 </template>
 
 <script setup lang="ts">
+import { defineEmits } from 'vue';
 import AudioControl from '../AudioControl.vue';
 import ScreenShareControl from '../ScreenShareControl/Index.vue';
 import FullScreenControl from '../FullScreenControl.vue';
@@ -79,14 +86,19 @@ import EndControl from '../EndControl/index.vue';
 import SettingControl from '../SettingControl.vue';
 import WhiteboardControl from '../WhiteboardControl.vue';
 import VirtualBackground from '../VirtualBackground.vue';
+import AIControl from '../AIControl.vue';
+import BasicBeauty from '../BasicBeauty.vue';
 import bus from '../../../hooks/useMitt';
 
 import useRoomFooter from './useRoomFooterHooks';
 import { isElectron } from '../../../utils/environment';
 const { roomStore, isMaster, isAdmin, isAudience } = useRoomFooter();
-
+const emit = defineEmits(['show-overlay']);
 function handleControlClick(name: string) {
   bus.emit('experience-communication', name);
+}
+function handleShowOverlay(data: { name: string; visible: boolean }) {
+  emit('show-overlay', data);
 }
 </script>
 

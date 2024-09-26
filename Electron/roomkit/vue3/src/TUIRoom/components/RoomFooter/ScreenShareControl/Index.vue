@@ -104,18 +104,19 @@ import eventBus from '../../../hooks/useMitt';
 import Dialog from '../../common/base/Dialog/index.vue';
 import TuiButton from '../../common/base/Button.vue';
 import logger from '../../../utils/common/logger';
-import { useBasicStore } from '../../../stores/basic';
 
 const { t } = useI18n();
 
 const roomStore = useRoomStore();
-const basicStore = useBasicStore();
 
 const {
   isAudience,
   hasOtherScreenShare,
   isGeneralUser,
   isScreenShareDisableForAllUser,
+  isWhiteboardVisiable,
+  isSharingScreen,
+  isLocalUserSharing,
 } = storeToRefs(roomStore);
 const roomEngine = useGetRoomEngine();
 
@@ -127,7 +128,7 @@ const showPermissionVisible: Ref<boolean> = ref(false);
 const showStopShareRegion: Ref<boolean> = ref(false);
 
 const screenShareDisabled = computed(
-  () => isAudience.value || basicStore.isWhiteboardVisiable
+  () => isAudience.value || isWhiteboardVisiable.value
 );
 const title = computed(() =>
   isSharing.value ? t('End sharing') : t('Share screen')
@@ -165,10 +166,10 @@ async function toggleScreenShare() {
     return;
   }
 
-  if (basicStore.isWhiteboardVisiable) {
+  if (isWhiteboardVisiable.value) {
     TUIMessage({
       type: 'warning',
-      message: t('You are sharing the screen, please stop sharing first'),
+      message: t('You are sharing the whiteboard, please stop sharing first'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
@@ -228,18 +229,18 @@ async function onConfirmScreenShare(screenInfo: TRTCScreenCaptureSourceInfo) {
     targetId: screenInfo.sourceId,
   });
   isSharing.value = true;
-  basicStore.setIsSharing(true);
+  isLocalUserSharing.value = true;
   selectDialogVisible.value = false;
   if (screenInfo.type === 1) {
     const { x } = screenInfo;
     const { y } = screenInfo;
-    basicStore.setIsSharingScreen(true);
+    isSharingScreen.value = true;
     notifyScreenShareStarted({
       x,
       y,
     });
   } else {
-    basicStore.setIsSharingScreen(false);
+    isSharingScreen.value = false;
   }
 }
 
@@ -249,7 +250,7 @@ async function stopScreenShare() {
       await roomEngine.instance?.stopScreenSharingElectron();
       showStopShareRegion.value = false;
       isSharing.value = false;
-      basicStore.setIsSharing(false);
+      isLocalUserSharing.value = false;
     } catch (error) {
       logger.error(`${logPrefix}stopScreenShare error:`, error);
     }
@@ -260,7 +261,7 @@ async function stopScreenShare() {
  * (user clicked the ‘’End Sharing‘’ button that comes with the browser or was kicked off the stage by the moderator in speak on stage mode)*/
 function screenCaptureStopped() {
   isSharing.value = false;
-  basicStore.setIsSharing(false);
+  isLocalUserSharing.value = false;
   notifyScreenShareStopped();
 }
 
@@ -269,7 +270,10 @@ function notifyScreenShareStarted(param: any) {
 }
 
 function notifyScreenShareStopped() {
-  ipcRenderer.send('annotation:screen-share-stopped');
+  if (isSharingScreen.value) {
+    ipcRenderer.send('annotation:screen-share-stopped');
+    isSharingScreen.value = false;
+  }
 }
 
 eventBus.on('ScreenShare:stopScreenShare', stopScreenShare);

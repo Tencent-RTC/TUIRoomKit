@@ -74,6 +74,7 @@ const visible = ref(false);
 const overlayContentStyle = ref({});
 const { nextZIndex } = useZIndex();
 let timer: number | null = null;
+
 type BeforeCloseFn = (action?: Action) => void;
 
 interface Props {
@@ -128,15 +129,15 @@ function handleOverlayClick(event: any) {
   handleClose('close');
 }
 
-function onOpen() {
-  visible.value = true;
-}
-
 function duration() {
   if (props.duration === Infinity) return;
   timer = setTimeout(() => {
     handleClose('close');
   }, props.duration);
+}
+
+function onOpen() {
+  visible.value = true;
 }
 onMounted(async () => {
   onOpen();
