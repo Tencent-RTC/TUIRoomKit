@@ -7,7 +7,7 @@ import i18n from './locales';
 Vue.use(PiniaVuePlugin);
 const pinia = createPinia();
 
-Vue.use(i18n);
+Vue.use(i18n as any);
 
 Vue.config.productionTip = false;
 
