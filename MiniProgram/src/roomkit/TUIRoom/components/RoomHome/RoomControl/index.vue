@@ -49,7 +49,7 @@
           <div v-if="isJoinRoom || hasGivenRoomId" class="room-detail-info-box">
             <span class="room-detail-title"> {{ t('Room ID') }}</span>
             <input
-              v-model="currentRoomId"
+              v-model="roomId"
               class="roomid-input"
               type="number"
               :placeholder="t('Enter room ID')"
@@ -193,6 +193,7 @@ const roomType = computed(() =>
 const isMicOn = ref(true);
 const isCamerOn = ref(true);
 const mode = ref('FreeToSpeak');
+const roomId = ref('');
 const tuiRoomParam = {
   isOpenCamera: true,
   isOpenMicrophone: true,
@@ -213,11 +214,18 @@ defineExpose({
 const currentUserName = ref(
   props.userName || `user_${Math.ceil(Math.random() * 10)}`
 );
-
-const currentRoomId = ref(props.givenRoomId);
-
 const hasGivenRoomId = computed(
-  () => typeof currentRoomId.value === 'string' && currentRoomId.value !== ''
+  () => typeof props.givenRoomId === 'string' && props.givenRoomId !== ''
+);
+
+watch(
+  () => props.givenRoomId,
+  val => {
+    if (val) {
+      roomId.value = val;
+    }
+  },
+  { immediate: true }
 );
 
 function createRoom() {
@@ -242,7 +250,6 @@ function handleConfirm() {
   showMoreType.value = !showMoreType.value;
 }
 function handleClose() {
-  currentRoomId.value = '';
   showRoomDetail.value = false;
   showMoreType.value = false;
 }
@@ -268,7 +275,7 @@ function getRoomParam() {
 }
 
 function handleInput(e: any) {
-  currentRoomId.value = e.target.value;
+  roomId.value = e.target.value;
 }
 
 function handleInputName(e: any) {
@@ -295,7 +302,7 @@ function handleRoomOption(
   const roomParam = getRoomParam();
   switch (type) {
     case 'Join':
-      if (!currentRoomId.value && !params?.roomId) {
+      if (!roomId.value && !params?.roomId) {
         TUIMessage({
           type: 'error',
           message: t('Please enter the room number'),
@@ -305,7 +312,7 @@ function handleRoomOption(
       emit(
         'enter-room',
         params || {
-          roomId: String(currentRoomId.value),
+          roomId: String(roomId.value),
           roomParam,
         }
       );

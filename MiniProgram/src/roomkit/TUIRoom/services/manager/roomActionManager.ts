@@ -31,6 +31,7 @@ export interface DeviceParams {
 export interface StartParams extends DeviceParams {
   roomName?: string;
   isSeatEnabled?: boolean;
+  password?: string;
 }
 
 export interface JoinParams extends DeviceParams {
@@ -58,6 +59,7 @@ export class RoomActionManager {
       defaultCameraId,
       defaultMicrophoneId,
       defaultSpeakerId,
+      password,
     } = params;
     const roomMode = isSeatEnabled ? 'SpeakAfterTakingSeat' : 'FreeToSpeak';
     await this.createRoom({
@@ -70,6 +72,7 @@ export class RoomActionManager {
         defaultCameraId,
         defaultMicrophoneId,
         defaultSpeakerId,
+        password,
       },
     });
     await this.enterRoom({
@@ -80,9 +83,10 @@ export class RoomActionManager {
         defaultCameraId,
         defaultMicrophoneId,
         defaultSpeakerId,
+        password,
       },
     });
-    this.service.emit(EventType.ROOM_START);
+    this.service.emit(EventType.ROOM_START, { roomId });
   }
 
   public async join(roomId: string, params: JoinParams = {}) {
@@ -105,7 +109,7 @@ export class RoomActionManager {
         password,
       },
     });
-    this.service.emit(EventType.ROOM_JOIN);
+    this.service.emit(EventType.ROOM_JOIN, { roomId });
   }
 
   public async leaveRoom() {
@@ -136,10 +140,10 @@ export class RoomActionManager {
     roomId: string;
     roomName?: string;
     roomMode?: 'FreeToSpeak' | 'SpeakAfterTakingSeat';
-    roomParam?: DeviceParams;
+    roomParam?: StartParams;
   }) {
     try {
-      const { roomId, roomName, roomMode } = options;
+      const { roomId, roomName, roomMode, roomParam } = options;
 
       const roomParams = {
         roomId,
@@ -150,6 +154,7 @@ export class RoomActionManager {
           roomMode === 'SpeakAfterTakingSeat'
             ? TUISeatMode.kApplyToTake
             : undefined,
+        password: roomParam?.password || '',
       };
 
       await this.handleRoomCreation(roomParams, options);

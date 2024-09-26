@@ -139,6 +139,10 @@ interface RoomState {
   roomName: string;
   hasOtherScreenShare: boolean;
   isOnStateTabActive: boolean;
+  isLocalUserSharing: boolean;
+  isWhiteboardVisiable: boolean;
+  isSharingScreen: boolean;
+  isAnnotationVisiable: boolean;
 }
 
 export const useRoomStore = defineStore('room', {
@@ -170,6 +174,10 @@ export const useRoomStore = defineStore('room', {
     // Visual area user flow list
     hasOtherScreenShare: false,
     isOnStateTabActive: true,
+    isLocalUserSharing: false,
+    isWhiteboardVisiable: false,
+    isSharingScreen: false,
+    isAnnotationVisiable: false,
   }),
   getters: {
     localUser(state: RoomState): UserInfo {
@@ -681,6 +689,10 @@ export const useRoomStore = defineStore('room', {
       this.maxSeatCount = 20;
       this.password = '';
       this.roomName = '';
+      this.isLocalUserSharing = false;
+      this.isWhiteboardVisiable = false;
+      this.isSharingScreen = false;
+      this.isAnnotationVisiable = false;
     },
   },
 });

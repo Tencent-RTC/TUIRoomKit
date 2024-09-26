@@ -65,6 +65,11 @@ export default {
   Admin: '管理员',
   RoomOwner: '主持人',
   More: '更多',
+  'AI Assistant': 'AI 助手',
+  'AI real-time conference content': 'AI 实时会议内容',
+  'Turn on AI real-time subtitles': '开启AI实时字幕',
+  'Turn off AI real-time subtitles': '关闭AI实时字幕',
+  'Enable AI real-time meeting recording': '开启AI实时会议记录',
   'Raise hand': '举手',
   Agree: '同意',
   Chat: '聊天',
@@ -484,4 +489,18 @@ export default {
   'Close whiteboard': '关闭白板',
   'Start annotating': '开始批注',
   'End annotating': '结束批注',
+  'You are sharing the whiteboard, please stop sharing first':
+    '您正在共享白板，请先停止共享',
+  // Beauty
+  Beauty: '美颜',
+  'Beauty Effects': '美颜特效',
+  Smoother: '磨皮',
+  Whitening: '美白',
+  Ruddy: '红润',
+  Compare: '对比',
+  Reset: '重置',
+  Degree: '程度',
+  'Sure you want to reset the beauty effect?': '确定要重置美颜效果吗?',
+  'All beauty parameters will revert to default after reset':
+    '重置后所有美颜参数将恢复至默认',
 };
