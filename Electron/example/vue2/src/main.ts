@@ -18,6 +18,7 @@ Vue.use(PiniaVuePlugin);
 const pinia = createPinia();
 
 Vue.config.productionTip = false;
+// @ts-ignore
 Vue.use(i18n);
 
 new Vue({

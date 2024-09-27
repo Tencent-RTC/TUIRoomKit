@@ -15,6 +15,9 @@
           <CloseController />
         </div>
       </div>
+      <div class="image-controller" v-show="isImageControllerVisiable">
+        <ImageController />
+      </div>
       <!-- <div class="zoom-controller-box">
         <ZoomController />
       </div> -->
@@ -32,6 +35,7 @@ import RedoUndo from './controller/RedoUndo/index.vue';
 import CloseController from './controller/CloseController/index.vue';
 import { getUrlParam } from '../../utils/utils';
 import SaveController from './controller/SaveController/index.vue';
+import ImageController from './controller/ImageController/index.vue';
 
 const isAnnotationWin: Ref<boolean> = ref(false);
 const isAnnotationStarted: Ref<boolean> = ref(false);
@@ -45,7 +49,7 @@ const isControllerVisiable = computed(
 );
 
 const isSaveControllerVisiable = computed(() => !isAnnotationWin.value);
-
+const isImageControllerVisiable = computed(() => !isAnnotationWin.value);
 function init() {
   const fabricCanvas = new FabricCanvas('canvas');
   canvas.value = fabricCanvas;
@@ -138,6 +142,14 @@ ipcRenderer.on('annotation:clear', () => {
   position: absolute;
   top: 18px;
   right: 18px;
+  z-index: 3;
+  display: flex;
+}
+
+.image-controller {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
   z-index: 3;
   display: flex;
 }

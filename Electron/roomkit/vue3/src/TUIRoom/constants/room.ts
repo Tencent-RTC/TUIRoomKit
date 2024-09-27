@@ -29,4 +29,10 @@ export enum USERS_STATUS {
   NOT_ON_STAGE = 2,
   NOT_ENTER = 3,
 }
+
 export const PASSWORD_MAX_LENGTH_LIMIT = 6;
+
+export enum TRTCBeautyStyle {
+  TRTCBeautyStyleSmooth = 0,
+  TRTCBeautyStyleNature = 1,
+}

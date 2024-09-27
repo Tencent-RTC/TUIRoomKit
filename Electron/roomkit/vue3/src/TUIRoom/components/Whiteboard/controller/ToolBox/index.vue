@@ -21,7 +21,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { inject, ref, Ref } from 'vue';
+import { inject, onMounted, onUnmounted, ref, Ref } from 'vue';
 import FabricCanvas, { DrawingTool } from './../../core';
 import selector from './image/selector.svg';
 import selectorActive from './image/selector-active.svg';
@@ -121,6 +121,18 @@ function clickClear() {
   // eslint-disable-next-line no-undef
   eventBus.emit('undo-clear-canvas');
 }
+
+function changeToSelect() {
+  currentShapType.value = 'select';
+}
+
+onMounted(() => {
+  eventBus.on('insert-images', changeToSelect);
+});
+
+onUnmounted(() => {
+  eventBus.off('insert-images', changeToSelect);
+});
 </script>
 <style lang="scss" scoped>
 .tool-mid-box {

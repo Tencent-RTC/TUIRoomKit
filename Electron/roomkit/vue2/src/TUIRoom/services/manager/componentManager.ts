@@ -1,4 +1,4 @@
-import { IRoomService } from '..';
+import { IRoomService } from '../';
 import logger from '../../utils/common/logger';
 
 interface IComponentManager {
@@ -20,6 +20,8 @@ const componentNames = [
   'ChatControl',
   'MoreControl',
   'VirtualBackground',
+  'BasicBeauty',
+  'AIControl',
 ] as const;
 
 export type ComponentName = (typeof componentNames)[number];
@@ -49,6 +51,8 @@ const defaultConfig = {
   ChatControl: { visible: true },
   MoreControl: { visible: true },
   VirtualBackground: { visible: false },
+  AIControl: { visible: false },
+  BasicBeauty: { visible: true },
 };
 
 export class ComponentManager implements IComponentManager {

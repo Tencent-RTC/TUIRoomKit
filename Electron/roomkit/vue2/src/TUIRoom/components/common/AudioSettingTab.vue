@@ -110,7 +110,9 @@ function handleMicrophoneTest() {
 
 const isTestingSpeaker = ref(false);
 const audioPlayer = document?.createElement('audio');
-audioPlayer.loop = true;
+if (audioPlayer && typeof audioPlayer.loop !== 'undefined') {
+  audioPlayer.loop = true;
+}
 const { t } = useI18n();
 
 /**

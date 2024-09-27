@@ -16,6 +16,8 @@ import {
   RoomParam,
   roomService,
   RoomService,
+  JoinParams,
+  StartParams,
 } from '../services';
 import { setDragAndResize } from './utils/interact';
 import { Conversation, Message, Profile } from '@tencentcloud/chat';
@@ -95,6 +97,7 @@ export class ChatExtension {
   };
   public myProfile = {} as Profile;
   private customMessages: Record<string, MessageData> = {};
+  private isInit = false;
   private chatExtensionSetting: Record<ChatType, boolean> = {
     [ChatType.C2C]: true,
     [ChatType.GROUP]: true,
@@ -169,6 +172,7 @@ export class ChatExtension {
     );
     this.unBindRoomServiceEvent();
     this.unBindRoomEngineEvent();
+    this.isInit = false;
   }
 
   public setHistoryMeetingMessageList(
@@ -303,8 +307,39 @@ export class ChatExtension {
       },
     };
     if (!chatType) return extension; // Old version chatType === undefined ignores configuration and returns directly
-    if (!this.chatExtensionSetting[chatType]) return;
+    if (!this.chatExtensionSetting[chatType]) return [];
+    this.mixinInit(chatType);
     return extension;
+  }
+
+  private async mixinInit(chatType: ChatType) {
+    if (this.isInit) return;
+    if (chatType !== TUIConstants.TUIChat.TYPE.ROOM) {
+      !isMobile && setDragAndResize('#roomContainer');
+      TUIRoomEngine?.callExperimentalAPI(
+        JSON.stringify({
+          api: 'setFramework',
+          params: {
+            component: 'TIMRoomKit',
+            language: `vue${VueVersion}`,
+          },
+        })
+      );
+      this.bindRoomEngineEvent();
+      this.bindRoomServiceEvent();
+      roomService.basicStore.setScene('chat');
+      roomService.componentManager.setComponentConfig({
+        SwitchTheme: { visible: false },
+        Language: { visible: false },
+        InviteControl: { visible: false },
+        RoomLink: { visible: false },
+        UserInfo: { visible: false },
+      });
+      this.chatContext = TUILogin.getContext();
+      this.myProfile = await this.getMyProfile();
+      this.roomInit(true);
+      this.isInit = true;
+    }
   }
 
   private setAnotherMessageRoomState(state: RoomState) {
@@ -352,8 +387,9 @@ export class ChatExtension {
         roomState: RoomState.CREATING,
       });
       this.updateMessageList(message);
-      await this.service?.createRoom(roomOptions);
-      await this.service?.enterRoom(roomOptions);
+      await this.service?.start(roomOptions.roomId, {
+        roomOptions,
+      } as StartParams);
       this.message = message;
       this.messagePayload = this.parseMessageData(message);
       await this.sendMessage(message);
@@ -380,34 +416,6 @@ export class ChatExtension {
     subKey: string,
     params?: Record<string, any>
   ) {
-    if (eventName === TUIConstants.TUILogin.EVENT.LOGIN_STATE_CHANGED) {
-      if (subKey === TUIConstants.TUILogin.EVENT_SUB_KEY.USER_LOGIN_SUCCESS) {
-        // Execute your own business logic processing when receiving successful login
-        !isMobile && setDragAndResize('#roomContainer');
-        TUIRoomEngine?.callExperimentalAPI(
-          JSON.stringify({
-            api: 'setFramework',
-            params: {
-              component: 'TIMRoomKit',
-              language: `vue${VueVersion}`,
-            },
-          })
-        );
-        this.bindRoomEngineEvent();
-        this.bindRoomServiceEvent();
-        roomService.basicStore.setScene('chat');
-        roomService.componentManager.setComponentConfig({
-          SwitchTheme: { visible: false },
-          Language: { visible: false },
-          InviteControl: { visible: false },
-          RoomLink: { visible: false },
-          UserInfo: { visible: false },
-        });
-        this.chatContext = TUILogin.getContext();
-        this.myProfile = await this.getMyProfile();
-        this.roomInit(true);
-      }
-    }
     if (eventName === TUIConstants.TUITranslate.EVENT.LANGUAGE_CHANGED) {
       if (subKey === TUIConstants.TUITranslate.EVENT_SUB_KEY.CHANGE_SUCCESS) {
         const language = params?.language;
@@ -458,7 +466,7 @@ export class ChatExtension {
     };
     this.roomInit();
     try {
-      await this.service?.enterRoom({ roomId, roomParam });
+      await this.service?.join(roomId, { roomParam } as JoinParams);
     } catch (err: any) {
       if (err.code === TUIErrorCode.ERR_ROOM_ID_NOT_EXIST) {
         this.modifyMessage(this.message.ID, { roomState: RoomState.DESTROYED });

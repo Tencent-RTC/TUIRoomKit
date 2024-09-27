@@ -11,6 +11,7 @@
 <script setup lang="ts">
 import { inject, Ref } from 'vue';
 import FabricCanvas from './../../core';
+import { ipcRenderer } from 'electron';
 
 const canvas = inject<Ref<FabricCanvas>>('canvas');
 
@@ -44,6 +45,7 @@ function downloadCanvas() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  ipcRenderer.send('whiteboard:save-from-whiteboard-window');
 }
 </script>
 

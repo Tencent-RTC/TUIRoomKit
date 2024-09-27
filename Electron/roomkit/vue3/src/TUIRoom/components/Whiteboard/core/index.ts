@@ -156,6 +156,15 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     this.canvas.setActiveObject(object);
   }
 
+  public resetActiveObject(): void {
+    const allObjects = this.canvas.getObjects();
+    const activeSelection = new fabric.ActiveSelection(allObjects, {
+      canvas: this.canvas,
+    });
+    this.canvas.setActiveObject(activeSelection);
+    this.canvas.discardActiveObject();
+  }
+
   public setWidth(value: number | string): void {
     this.canvas.setWidth(value);
   }
@@ -171,6 +180,26 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     }
   }
 
+  public setObjectsSelectable(objectsSelectable: boolean) {
+    this.canvas.getObjects().forEach((obj: any) => {
+      obj.selectable = objectsSelectable;
+      obj.evented = objectsSelectable;
+    });
+    this.canvas.perPixelTargetFind = !objectsSelectable;
+    this.canvas.selection = objectsSelectable;
+
+    if (!objectsSelectable) {
+      this.canvas.renderAll();
+    }
+  }
+
+  public setEvented() {
+    this.canvas.getObjects().forEach((obj: any) => {
+      obj.evented = true;
+    });
+    this.canvas.renderAll();
+  }
+
   public reloadCanvas() {
     this.clearCanvas();
     this.canvas.renderAll();
@@ -181,26 +210,23 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
 
   public setDrawingTool(tool: DrawingTool) {
     if (this.drawingTool === tool) return;
-
     this.canvas.isDrawingMode = false;
-    this.canvas.selection = false;
-    this.canvas.perPixelTargetFind = true;
     this.drawingTool = tool;
-
     this.canvas.discardActiveObject();
-    this.canvas.requestRenderAll();
+    this.setObjectsSelectable(false);
 
     switch (tool) {
       case 'pencil':
         this.drawFreeDraw();
         break;
       case 'eraser':
+        this.setEvented();
         this.setEraser();
         break;
       case 'select':
-        this.canvas.selection = true;
-        this.canvas.perPixelTargetFind = false;
-        this.canvas.defaultCursor = 'auto';
+        this.setObjectsSelectable(true);
+        this.resetActiveObject();
+        this.canvas.defaultCursor = 'move';
         break;
       case 'rectangle':
       case 'triangle':
@@ -224,28 +250,48 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
   }
 
   public drawRect(options: IRectOptions): void {
-    const rect = new fabric.Rect({ ...this.options, ...options });
+    const rect = new fabric.Rect({
+      ...this.options,
+      selectable: false,
+      evented: false,
+      ...options,
+    });
     this.canvas.add(rect);
     this.currentShape = rect;
     this.canvas.defaultCursor = 'crosshair';
   }
 
   public drawTriangle(options: ITriangleOptions): void {
-    const triangle = new fabric.Triangle({ ...this.options, ...options });
+    const triangle = new fabric.Triangle({
+      ...this.options,
+      selectable: false,
+      evented: false,
+      ...options,
+    });
     this.canvas.add(triangle);
     this.currentShape = triangle;
     this.canvas.defaultCursor = 'crosshair';
   }
 
   public drawCircle(options: ICircleOptions): void {
-    const circle = new fabric.Circle({ ...this.options, ...options });
+    const circle = new fabric.Circle({
+      ...this.options,
+      selectable: false,
+      evented: false,
+      ...options,
+    });
     this.canvas.add(circle);
     this.currentShape = circle;
     this.canvas.defaultCursor = 'crosshair';
   }
 
   public drawEllipse(options: IEllipseOptions): void {
-    const ellipse = new fabric.Ellipse({ ...this.options, ...options });
+    const ellipse = new fabric.Ellipse({
+      ...this.options,
+      selectable: false,
+      evented: false,
+      ...options,
+    });
     this.canvas.add(ellipse);
     this.currentShape = ellipse;
     this.canvas.defaultCursor = 'crosshair';
@@ -261,6 +307,8 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     const line = new fabric.Line([x1, y1, x2, y2], {
       ...this.options,
       ...options,
+      selectable: false,
+      evented: false,
     });
     this.canvas.add(line);
     this.currentShape = line;
@@ -274,7 +322,12 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     y2: number,
     options?: ILineOptions
   ): void {
-    const arrow = new Arrow([x1, y1, x2, y2], { ...this.options, ...options });
+    const arrow = new Arrow([x1, y1, x2, y2], {
+      ...this.options,
+      selectable: false,
+      evented: false,
+      ...options,
+    });
     this.canvas.add(arrow);
     this.currentShape = arrow;
     this.canvas.defaultCursor = 'crosshair';
@@ -305,6 +358,8 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
       editingBorderColor: '#999999',
       cursorColor: '#999999',
       padding: 5,
+      selectable: false,
+      evented: false,
       ...options,
     });
     this.canvas.add(textObj);
@@ -331,11 +386,30 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
         const canvasHeight = this.canvas.getHeight();
         const imageWidth = (img.width as number) * (img.scaleX as number);
         const imageHeight = (img.height as number) * (img.scaleY as number);
-        const left = (canvasWidth - imageWidth) / 2;
-        const top = (canvasHeight - imageHeight) / 2;
+        const aspectRatio = imageWidth / imageHeight;
+        const halfCanvasWidth = canvasWidth / 2;
+        const halfCanvasHeight = canvasHeight / 2;
+        let scaledWidth;
+        let scaledHeight;
+        if (aspectRatio > 1) {
+          scaledWidth = halfCanvasWidth;
+          scaledHeight = scaledWidth / aspectRatio;
+        } else {
+          scaledHeight = halfCanvasHeight;
+          scaledWidth = scaledHeight * aspectRatio;
+        }
+        const scale = scaledWidth / imageWidth;
+        img.scale(scale);
+        const left = (canvasWidth - scaledWidth) / 2;
+        const top = (canvasHeight - scaledHeight) / 2;
         img.set({ left, top });
       }
       this.canvas.add(img);
+      eventBus.emit('insert-images');
+      this.setDrawingTool('select');
+      this.emit('push-canvas-to-stack', null);
+      this.setActiveObject(img);
+      this.canvas.requestRenderAll();
     });
   }
 
@@ -353,7 +427,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
 
   public setEraser(options?: any): void {
     this.canvas.freeDrawingBrush = new fabric.EraserBrush(this.canvas, options);
-    this.canvas.freeDrawingCursor = 'auto';
+    this.canvas.freeDrawingCursor = 'pointer';
     this.canvas.renderAll();
   }
 
@@ -363,6 +437,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     this.canvas.on('mouse:up', this.onMouseUp.bind(this));
     this.canvas.on('object:moving', this.onObjectMoving.bind(this));
     this.canvas.on('object:scaling', this.onObjectScaling.bind(this));
+    this.canvas.on('object:rotating', this.onObjectRotating.bind(this));
     eventBus.on('exitTextEditing', this.exitTextEditing.bind(this));
   }
 
@@ -531,6 +606,9 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     this.isValidSelection = true;
   }
 
+  private onObjectRotating(event: IEvent) {
+    this.isValidSelection = true;
+  }
   private isNeedPushToStack() {
     if (
       this.drawingTool === 'text' ||
@@ -564,6 +642,10 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
 
   public renderAll(): ICanvas {
     return this.canvas.renderAll();
+  }
+
+  public requestRenderAll() {
+    return this.canvas.requestRenderAll();
   }
 
   public zoom(ratio = 1) {
