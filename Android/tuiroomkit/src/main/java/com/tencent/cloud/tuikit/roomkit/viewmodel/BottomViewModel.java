@@ -22,18 +22,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.common.utils.DrawOverlaysPermissionUtil;
+import com.tencent.cloud.tuikit.roomkit.common.utils.IntentUtils;
+import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.ConferenceSessionImpl;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceState;
 import com.tencent.cloud.tuikit.roomkit.model.entity.BottomItemData;
 import com.tencent.cloud.tuikit.roomkit.model.entity.BottomSelectItemData;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserEntity;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
-import com.tencent.cloud.tuikit.roomkit.common.utils.DrawOverlaysPermissionUtil;
-import com.tencent.cloud.tuikit.roomkit.common.utils.IntentUtils;
-import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.BottomNavigationBar.BottomView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.Chat.ChatActivity;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.AIAssistantDialog;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.interfaces.ITUIService;
@@ -134,6 +136,7 @@ public class BottomViewModel implements ConferenceEventCenter.RoomEngineEventRes
         addChatItemIfNeeded(itemDataList);
         addInviteItemIfNeeded(itemDataList);
         addFloatItemIfNeeded(itemDataList);
+        addAIItemIfNeeded(itemDataList);
         addSettingsItemIfNeeded(itemDataList);
         return itemDataList;
     }
@@ -196,6 +199,13 @@ public class BottomViewModel implements ConferenceEventCenter.RoomEngineEventRes
 
     private void addFloatItemIfNeeded(List<BottomItemData> itemDataList) {
         itemDataList.add(createFloatItem());
+    }
+
+    private void addAIItemIfNeeded(List<BottomItemData> itemDataList) {
+        if (!ConferenceSessionImpl.sharedInstance().isShowAISpeechToTextButton) {
+            return;
+        }
+        itemDataList.add(createAIItem());
     }
 
     private void addSettingsItemIfNeeded(List<BottomItemData> itemDataList) {
@@ -773,6 +783,24 @@ public class BottomViewModel implements ConferenceEventCenter.RoomEngineEventRes
             }
         });
         return recordItemData;
+    }
+
+    private BottomItemData createAIItem() {
+        BottomItemData aiItemData = new BottomItemData();
+        aiItemData.setType(BottomItemData.Type.AI);
+        aiItemData.setEnable(true);
+        aiItemData.setIconId(R.drawable.tuiroomkit_ic_ai);
+        aiItemData.setBackground(R.drawable.tuiroomkit_bg_bottom_item_black);
+        aiItemData.setName(mContext.getString(R.string.tuiroomkit_ai_tool));
+        aiItemData.setOnItemClickListener(new BottomItemData.OnItemClickListener() {
+            @Override
+            public void onItemClick() {
+                ConferenceEventCenter.getInstance().notifyUIEvent(BAR_SHOW_TIME_RECOUNT, null);
+                AIAssistantDialog dialog = new AIAssistantDialog(mContext);
+                dialog.show();
+            }
+        });
+        return aiItemData;
     }
 
     private BottomItemData createSettingItem() {

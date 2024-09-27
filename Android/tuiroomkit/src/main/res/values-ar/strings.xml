@@ -121,6 +121,11 @@
     <string name="tuiroomkit_manager_remove">إزالة المسؤول</string>
     <string name="tuiroomkit_mute_user">تعطيل الدردشة</string>
     <string name="tuiroomkit_kick_out_of_room">يزيل</string>
+    <string name="tuiroomkit_ai_tool">الذكاء الاصطناعي</string>
+    <string name="tuiroomkit_ai_speech_to_text_record">تسجيل الاجتماعات في الوقت الفعلي باستخدام الذكاء الاصطناعي</string>
+    <string name="tuiroomkit_ai_open_live_subtitle">فتح ترجمات الذكاء الاصطناعي في الوقت الفعلي</string>
+    <string name="tuiroomkit_ai_close_live_subtitle">إغلاق ترجمات الذكاء الاصطناعي في الوقت الفعلي</string>
+    <string name="tuiroomkit_ai_cat_live_record">عرض تسجيلات الاجتماعات المباشرة باستخدام الذكاء الاصطناعي</string>
     <string name="tuiroomkit_settings">الإعدادات</string>
     <string name="tuiroomkit_advanced_settings">إعدادات متقدمة</string>
     <string name="tuiroomkit_beauty">الجمال</string>

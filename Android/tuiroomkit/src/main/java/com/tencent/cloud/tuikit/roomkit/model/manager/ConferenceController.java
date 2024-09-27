@@ -53,6 +53,7 @@ import com.tencent.cloud.tuikit.roomkit.model.controller.MediaController;
 import com.tencent.cloud.tuikit.roomkit.model.controller.RoomController;
 import com.tencent.cloud.tuikit.roomkit.model.controller.UserController;
 import com.tencent.cloud.tuikit.roomkit.model.controller.ViewController;
+import com.tencent.cloud.tuikit.roomkit.model.data.ASRState;
 import com.tencent.cloud.tuikit.roomkit.model.data.InvitationState;
 import com.tencent.cloud.tuikit.roomkit.model.data.MediaState;
 import com.tencent.cloud.tuikit.roomkit.model.data.RoomState;
@@ -157,6 +158,10 @@ public class ConferenceController {
 
     public InvitationState getInvitationState() {
         return mConferenceState.invitationState;
+    }
+
+    public ASRState getASRState() {
+        return mConferenceState.asrState;
     }
 
     public void responseRemoteRequest(TUIRoomDefine.RequestAction requestAction, String requestId, boolean agree,

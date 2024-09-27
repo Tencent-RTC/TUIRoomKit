@@ -54,6 +54,7 @@ import com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel.R
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.SelectScheduleParticipant.ConferenceParticipants;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.SelectScheduleParticipant.ParticipantSelector;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.SelectScheduleParticipant.User;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.SpeechToText.SpeechToTextSubtitleView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.TopNavigationBar.TopView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.TransferOwnerControlPanel.TransferMasterPanel;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.UserControlPanel.UserListPanel;
@@ -74,19 +75,21 @@ public class ConferenceMainView extends RelativeLayout {
     private static final int ROOM_BARS_FIRST_SHOW_TIME_MS        = 6 * 1000;
     private static final int CONFIRM_DIALOG_AUTO_DISMISS_SECONDS = 5;
 
-    private Context           mContext;
-    private View              mFloatingWindow;
-    private TUIVideoSeatView  mVideoSeatView;
-    private FloatChatView     mFloatChatView;
-    private Button            mBtnStopScreenShare;
-    private FrameLayout       mLayoutTopView;
-    private FrameLayout       mLayoutVideoSeat;
-    private FrameLayout       mLayoutLocalAudio;
-    private FrameLayout       mLayoutFloatChatView;
-    private View              mLayoutScreenCaptureGroup;
-    private FrameLayout       mLayoutBottomView;
-    private BottomLayout      mBottomLayout;
-    private RoomMainViewModel mViewModel;
+    private Context                  mContext;
+    private View                     mFloatingWindow;
+    private TUIVideoSeatView         mVideoSeatView;
+    private FloatChatView            mFloatChatView;
+    private SpeechToTextSubtitleView mSpeechToTextSubtitleView;
+    private Button                   mBtnStopScreenShare;
+    private FrameLayout              mLayoutTopView;
+    private FrameLayout              mLayoutVideoSeat;
+    private FrameLayout              mLayoutLocalAudio;
+    private FrameLayout              mLayoutFloatChatView;
+    private FrameLayout              mLayoutSpeechToTextSubtitle;
+    private View                     mLayoutScreenCaptureGroup;
+    private FrameLayout              mLayoutBottomView;
+    private BottomLayout             mBottomLayout;
+    private RoomMainViewModel        mViewModel;
 
     private final ParticipantSelector mParticipantSelector = new ParticipantSelector();
 
@@ -101,7 +104,8 @@ public class ConferenceMainView extends RelativeLayout {
     private float           mTouchDownPointX;
     private float           mTouchDownPointY;
 
-    private final Observer<String> mRoomIdObserver = this::updateRoomId;
+    private final Observer<String>  mRoomIdObserver     = this::updateRoomId;
+    private final Observer<Boolean> mAISubtitleObserver = this::updateSubtitleView;
 
     public ConferenceMainView(Context context) {
         this(context, null);
@@ -243,6 +247,7 @@ public class ConferenceMainView extends RelativeLayout {
         mContext = context;
         mViewModel = new RoomMainViewModel(mContext, this);
         mVideoSeatView = new TUIVideoSeatView(mContext);
+        mSpeechToTextSubtitleView = new SpeechToTextSubtitleView(mContext);
         mVideoSeatView.setViewClickListener(this::onClick);
         initView();
     }
@@ -267,8 +272,10 @@ public class ConferenceMainView extends RelativeLayout {
             textWaterMarkView.setText(mViewModel.getWaterMakText());
             mLayoutVideoSeat.addView(textWaterMarkView);
         }
+        mLayoutFloatChatView = findViewById(R.id.tuiroomkit_float_chat_view_container);
         initScreenCaptureView();
         initFloatChatView();
+        initSpeechToTextSubtitleView();
 
         mBottomLayout = new BottomLayout(mContext);
         mBottomLayout.setExpandStateListener(this::onExpandStateChanged);
@@ -286,6 +293,7 @@ public class ConferenceMainView extends RelativeLayout {
         if (ConferenceController.sharedInstance().getConferenceState().videoModel.isScreenSharing()) {
             onScreenShareStarted();
         }
+        updateSubtitleView(ConferenceController.sharedInstance().getViewState().isSpeechToTextSubTitleShowing.get());
         showRoomBars();
         if (mIsBottomViewExpanded) {
             mBottomLayout.expandView();
@@ -475,6 +483,7 @@ public class ConferenceMainView extends RelativeLayout {
         Configuration curConfig = mContext.getResources().getConfiguration();
         ConferenceController.sharedInstance().getViewController().updateScreenOrientation(curConfig);
         ConferenceController.sharedInstance().getRoomState().roomId.observe(mRoomIdObserver);
+        ConferenceController.sharedInstance().getViewState().isSpeechToTextSubTitleShowing.observe(mAISubtitleObserver);
     }
 
     @Override
@@ -489,6 +498,7 @@ public class ConferenceMainView extends RelativeLayout {
             mFloatChatView.destroy();
         }
         ConferenceController.sharedInstance().getRoomState().roomId.removeObserver(mRoomIdObserver);
+        ConferenceController.sharedInstance().getViewState().isSpeechToTextSubTitleShowing.removeObserver(mAISubtitleObserver);
     }
 
     private void updateRoomId(String roomId) {
@@ -500,17 +510,30 @@ public class ConferenceMainView extends RelativeLayout {
         initFloatChatView();
     }
 
+    private void updateSubtitleView(boolean isShowSubtitle) {
+        mLayoutFloatChatView.setVisibility(isShowSubtitle ? INVISIBLE : VISIBLE);
+        mLayoutSpeechToTextSubtitle.setVisibility(isShowSubtitle ? VISIBLE : INVISIBLE);
+    }
+
     private void initFloatChatView() {
         if (mFloatChatView == null) {
             return;
         }
-        mLayoutFloatChatView = findViewById(R.id.tuiroomkit_float_chat_view_container);
         ViewParent floatChatViewParent = mFloatChatView.getParent();
         if (floatChatViewParent instanceof ViewGroup) {
             ((ViewGroup) floatChatViewParent).removeView(mFloatChatView);
         }
         mFloatChatView.isShow(mViewModel.isFloatChatEnable());
         mLayoutFloatChatView.addView(mFloatChatView);
+    }
+
+    private void initSpeechToTextSubtitleView() {
+        mLayoutSpeechToTextSubtitle = findViewById(R.id.tuiroomkit_speech_to_text_subtitle_container);
+        ViewParent parent = mSpeechToTextSubtitleView.getParent();
+        if (parent instanceof ViewGroup) {
+            ((ViewGroup) parent).removeView(mSpeechToTextSubtitleView);
+        }
+        mLayoutSpeechToTextSubtitle.addView(mSpeechToTextSubtitleView);
     }
 
     public void onScreenShareStarted() {

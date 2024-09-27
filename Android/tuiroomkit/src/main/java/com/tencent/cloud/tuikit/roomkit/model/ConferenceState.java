@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+import com.tencent.cloud.tuikit.roomkit.model.data.ASRState;
 import com.tencent.cloud.tuikit.roomkit.model.data.MediaState;
 import com.tencent.cloud.tuikit.roomkit.model.data.InvitationState;
 import com.tencent.cloud.tuikit.roomkit.model.data.RoomState;
@@ -40,6 +41,7 @@ public class ConferenceState {
     public UserState       userState       = new UserState();
     public MediaState      mediaState      = new MediaState();
     public InvitationState invitationState = new InvitationState();
+    public ASRState        asrState        = new ASRState();
 
     public TUIRoomDefine.RoomInfo roomInfo;
     public UserModel              userModel;
