@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import Chat from '../Chat/index.vue';
+import Chat from '../Chat/index';
 import MasterApply from '../RoomFooter/ApplyControl/MasterApplyControl/index';
 import ManageMember from '../ManageMember/index';
 import popup from '../common/base/PopUpH5.vue';

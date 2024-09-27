@@ -8,3 +8,5 @@ export * from './manager/userManager';
 export * from './manager/lifeCycleManager';
 export * from './manager/roomActionManager';
 export * from './manager/scheduleConferenceManager';
+export * from './manager/chatManager';
+export * from './function/aiTask';
