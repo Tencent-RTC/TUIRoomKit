@@ -15,7 +15,7 @@
       <tui-button
         size="default"
         class="toggle-annotating-button"
-        v-if="isAnnotationWindowVisiable"
+        v-if="isSharingScreen"
         @click="toggleAnnotationWindow"
       >
         {{ annotationSwitchLabel }}
@@ -59,7 +59,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, computed, onMounted, Ref } from 'vue';
+import { ref, defineProps, computed, onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 import { ipcRenderer } from 'electron';
 import SvgIcon from '../../../common/base/SvgIcon.vue';
 import ScreenSharingIcon from '../../../common/icons/ScreenSharingIcon.vue';
@@ -67,17 +68,20 @@ import TuiButton from '../../../common/base/Button.vue';
 import Dialog from '../../../common/base/Dialog/index.vue';
 import eventBus from '../../../../hooks/useMitt';
 import { useI18n } from '../../../../locales';
-import { useBasicStore } from '../../../../stores/basic';
+import { useRoomStore } from '../../../../stores/room';
+import {
+  DataReportManager,
+  MetricsKey,
+} from '../../../../services/manager/dataReportManager';
 
+const roomStore = useRoomStore();
 const { t } = useI18n();
-const basicStore = useBasicStore();
 const showStopShareRegion = ref(false);
 
-const isAnnotatingStarted: Ref<boolean> = ref(false);
-const isAnnotationWindowVisiable = computed(() => basicStore.isSharingScreen);
+const { isAnnotationVisiable, isSharingScreen } = storeToRefs(roomStore);
 
 const annotationSwitchLabel = computed(() => {
-  return isAnnotatingStarted.value
+  return isAnnotationVisiable.value
     ? t('End annotating')
     : t('Start annotating');
 });
@@ -88,7 +92,7 @@ interface Props {
 defineProps<Props>();
 
 onMounted(() => {
-  isAnnotatingStarted.value = false;
+  isAnnotationVisiable.value = false;
 });
 
 function openStopConfirmDialog() {
@@ -101,17 +105,20 @@ function stopScreenSharing() {
 }
 
 function toggleAnnotationWindow() {
-  if (isAnnotatingStarted.value) {
+  if (isAnnotationVisiable.value) {
     ipcRenderer?.send('annotation:stop-annotating');
-    isAnnotatingStarted.value = false;
+    isAnnotationVisiable.value = false;
+    DataReportManager.reportCount(MetricsKey.stopAnnotating);
   } else {
     ipcRenderer?.send('annotation:start-annotating');
-    isAnnotatingStarted.value = true;
+    isAnnotationVisiable.value = true;
+    DataReportManager.reportCount(MetricsKey.startAnnotating);
   }
 }
 
 ipcRenderer?.on('annotation:stop-from-annotation-window', () => {
-  isAnnotatingStarted.value = false;
+  isAnnotationVisiable.value = false;
+  DataReportManager.reportCount(MetricsKey.stopAnnotating);
 });
 </script>
 

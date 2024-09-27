@@ -1,12 +1,12 @@
 <template>
   <div class="whiteboard-control-container">
     <icon-button
-      :is-active="basicStore.isWhiteboardVisiable"
+      :is-active="isWhiteboardVisiable"
       :title="title"
       :disabled="whiteboardDisabled"
       @click-icon="handleWhiteboardDialog"
     >
-      <stop-screen-share-icon v-if="basicStore.isWhiteboardVisiable" />
+      <stop-screen-share-icon v-if="isWhiteboardVisiable" />
       <screen-share-icon v-else />
     </icon-button>
   </div>
@@ -25,28 +25,36 @@ import ScreenShareIcon from '../common/icons/ScreenShareIcon.vue';
 import StopScreenShareIcon from '../common/icons/StopScreenShareIcon.vue';
 import TUIMessage from '../common/base/Message';
 import { useRoomStore } from '../../stores/room';
-import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
 import eventBus from '../../hooks/useMitt';
 import { EventType, roomEngine } from '../../services';
 import { MESSAGE_DURATION } from '../../constants/message';
 import { roomService } from '../../services/index';
+import {
+  DataReportManager,
+  MetricsKey,
+} from '../../services/manager/dataReportManager';
 
 const { t } = useI18n();
 const roomStore = useRoomStore();
-const basicStore = useBasicStore();
 
-const { isAudience, hasOtherScreenShare } = storeToRefs(roomStore);
+const {
+  isAudience,
+  hasOtherScreenShare,
+  isLocalUserSharing,
+  isWhiteboardVisiable,
+  isAnnotationVisiable,
+} = storeToRefs(roomStore);
 
 const whiteboardDisabled = computed(
-  () => isAudience.value || basicStore.isSharing
+  () => isAudience.value || isLocalUserSharing.value
 );
 const title = computed(() =>
-  basicStore.isWhiteboardVisiable ? t('Close whiteboard') : t('Open whiteboard')
+  isWhiteboardVisiable.value ? t('Close whiteboard') : t('Open whiteboard')
 );
 
 function handleWhiteboardDialog() {
-  if (basicStore.isWhiteboardVisiable) {
+  if (isWhiteboardVisiable.value) {
     stopShareWhiteboard();
   } else {
     startShareWhiteboard();
@@ -54,7 +62,7 @@ function handleWhiteboardDialog() {
 }
 
 async function startShareWhiteboard() {
-  if (basicStore.isWhiteboardVisiable) {
+  if (isWhiteboardVisiable.value) {
     return;
   }
 
@@ -96,12 +104,18 @@ async function startShareWhiteboard() {
       });
     }
   });
-  basicStore.setWhiteboardVisiable(true);
 }
 
 function stopShareWhiteboard() {
   roomEngine.instance?.stopScreenSharing();
-  basicStore.setWhiteboardVisiable(false);
+  if (isWhiteboardVisiable.value) {
+    DataReportManager.reportCount(MetricsKey.stopSharingWhiteboard);
+  }
+  if (isAnnotationVisiable.value) {
+    DataReportManager.reportCount(MetricsKey.stopAnnotating);
+  }
+  isWhiteboardVisiable.value = false;
+  isAnnotationVisiable.value = false;
   hideAllWhiteboardWindow();
 }
 
@@ -111,7 +125,9 @@ function hideAllWhiteboardWindow() {
 }
 
 function showWhiteboardWindow() {
+  isWhiteboardVisiable.value = true;
   ipcRenderer.send('whiteboard:show-window');
+  DataReportManager.reportCount(MetricsKey.startSharingWhiteboard);
 }
 
 ipcRenderer.on('whiteboard:window-closed', () => {
@@ -122,9 +138,12 @@ ipcRenderer.on('whiteboard:stop-from-whiteboard-window', () => {
   stopShareWhiteboard();
 });
 
-eventBus.on('ScreenShare:stopScreenShare', stopShareWhiteboard);
+ipcRenderer.on('whiteboard:save-from-whiteboard-window', () => {
+  DataReportManager.reportCount(MetricsKey.saveWhiteboard);
+});
 
 onMounted(() => {
+  eventBus.on('ScreenShare:stopScreenShare', stopShareWhiteboard);
   roomService.on(EventType.KICKED_OUT, stopShareWhiteboard);
   roomService.on(EventType.USER_SIG_EXPIRED, stopShareWhiteboard);
   roomService.on(EventType.KICKED_OFFLINE, stopShareWhiteboard);
@@ -133,6 +152,7 @@ onMounted(() => {
   roomService.on(EventType.USER_LOGOUT, stopShareWhiteboard);
 });
 onUnmounted(() => {
+  eventBus.off('ScreenShare:stopScreenShare', stopShareWhiteboard);
   roomService.off(EventType.KICKED_OUT, stopShareWhiteboard);
   roomService.off(EventType.USER_SIG_EXPIRED, stopShareWhiteboard);
   roomService.off(EventType.KICKED_OFFLINE, stopShareWhiteboard);

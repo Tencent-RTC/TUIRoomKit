@@ -88,6 +88,12 @@ function monitoringWhiteboardWindowEvents() {
     }
   });
 
+  ipcMain.on('whiteboard:save-from-whiteboard-window', () => {
+    if (mainWin) {
+      mainWin.webContents.send('whiteboard:save-from-whiteboard-window');
+    }
+  });
+
   whiteboardWin?.webContents.on('did-finish-load', () => {
     whiteboardWin?.setTitle('Whiteboard window');
   });

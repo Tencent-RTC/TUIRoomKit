@@ -16,9 +16,14 @@
       :show-room-tool="showRoomTool"
       class="content"
     />
-    <room-footer v-show="showRoomTool" class="footer" />
+    <room-footer
+      v-show="showRoomTool"
+      class="footer"
+      @show-overlay="handleShowOverlay"
+    />
     <room-sidebar />
     <room-setting />
+    <AISubtitlesOverlay v-if="overlayMap.AISubtitlesOverlay.visible" />
     <loading-overlay v-if="isShowLoading" />
     <password-dialog
       :visible="isShowPasswordContainer"
@@ -47,6 +52,7 @@ import RoomContent from './components/RoomContent/index.vue';
 import RoomSetting from './components/RoomSetting/index.vue';
 import LoadingOverlay from './components/PreRoom/LoadingOverlay.vue';
 import PasswordDialog from './components/PreRoom/PasswordDialog.vue';
+import AISubtitlesOverlay from './components/AITools/AISubtitles.vue';
 import { debounce, throttle } from './utils/utils';
 import { useBasicStore } from './stores/basic';
 import { isMobile, isWeChat } from './utils/environment';
@@ -78,6 +84,13 @@ const props = withDefaults(
     displayMode: 'permanent',
   }
 );
+
+const overlayMap = ref<{
+  AISubtitlesOverlay: { visible: boolean };
+  [key: string]: { visible: boolean };
+}>({
+  AISubtitlesOverlay: { visible: false },
+});
 
 const conferenceShow = computed(
   () => props.displayMode === 'permanent' || !!basicStore.roomId
@@ -146,6 +159,12 @@ const showMessage = (data: {
     message,
     duration,
   });
+};
+
+const handleShowOverlay = (data: { name: string; visible: boolean }) => {
+  if (overlayMap.value[data.name]) {
+    overlayMap.value[data.name].visible = data.visible;
+  }
 };
 
 onMounted(() => {
