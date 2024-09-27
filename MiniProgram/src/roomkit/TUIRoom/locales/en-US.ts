@@ -71,6 +71,12 @@ export default {
   Me: 'Me',
   me: 'me',
   More: 'More',
+  'AI Assistant': 'AI Assistant',
+  'AI real-time conference content': 'AI real-time conference content',
+  'Turn on AI real-time subtitles': 'Turn on AI real-time subtitles',
+  'Turn off AI real-time subtitles': 'Turn off AI real-time subtitles',
+  'Enable AI real-time meeting recording':
+    'Enable AI real-time meeting recording',
   'Raise hand': 'Raise hand',
   Agree: 'Agree',
   Chat: 'Chat',
@@ -505,4 +511,19 @@ export default {
   'Close whiteboard': 'Close whiteboard',
   'Start annotating': 'Start annotating',
   'End annotating': 'End annotating',
+  'You are sharing the whiteboard, please stop sharing first':
+    'You are sharing the whiteboard, please stop sharing first',
+  // Beauty
+  Beauty: 'Beauty',
+  'Beauty Effects': 'Beauty Effects',
+  Smoother: 'Smoother',
+  Whitening: 'Whitening',
+  Ruddy: 'ruddy',
+  Compare: 'Compare',
+  Reset: 'Reset',
+  Degree: 'Degree',
+  'Sure you want to reset the beauty effect?':
+    'Sure you want to reset the beauty effect?',
+  'All beauty parameters will revert to default after reset':
+    'All beauty parameters will revert to default after reset',
 };
