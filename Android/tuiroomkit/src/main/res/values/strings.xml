@@ -121,6 +121,11 @@
     <string name="tuiroomkit_manager_remove">Remove administrator</string>
     <string name="tuiroomkit_mute_user">Disable chat</string>
     <string name="tuiroomkit_kick_out_of_room">Remove</string>
+    <string name="tuiroomkit_ai_tool">AI</string>
+    <string name="tuiroomkit_ai_speech_to_text_record">AI real-time meeting recording</string>
+    <string name="tuiroomkit_ai_open_live_subtitle">Open AI real-time subtitles</string>
+    <string name="tuiroomkit_ai_close_live_subtitle">Close AI real-time subtitles</string>
+    <string name="tuiroomkit_ai_cat_live_record">View AI Live Meeting Recording</string>
     <string name="tuiroomkit_settings">Settings</string>
     <string name="tuiroomkit_advanced_settings">AdvancedSettings</string>
     <string name="tuiroomkit_beauty">Beauty</string>

@@ -16,7 +16,8 @@ public class ViewState {
     public LiveData<RoomProcess> roomProcess           = new LiveData<>(RoomProcess.NONE);
     public LiveData<Long>        enterRoomTimeFromBoot = new LiveData<>(0L);
 
-    public LiveData<Boolean> isInvitationPending = new LiveData<>(false);
+    public LiveData<Boolean> isInvitationPending           = new LiveData<>(false);
+    public LiveData<Boolean> isSpeechToTextSubTitleShowing = new LiveData<>(false);
 
     public void addPendingTakeSeatRequest(String requestId) {
         pendingTakeSeatRequests.add(requestId);

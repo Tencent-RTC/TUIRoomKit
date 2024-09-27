@@ -121,6 +121,11 @@
     <string name="tuiroomkit_manager_remove">撤销管理员</string>
     <string name="tuiroomkit_mute_user">禁言</string>
     <string name="tuiroomkit_kick_out_of_room">踢出房间</string>
+    <string name="tuiroomkit_ai_tool">AI 助手</string>
+    <string name="tuiroomkit_ai_speech_to_text_record">AI 实时会议记录</string>
+    <string name="tuiroomkit_ai_open_live_subtitle">开启 AI 实时字幕</string>
+    <string name="tuiroomkit_ai_close_live_subtitle">关闭 AI 实时字幕</string>
+    <string name="tuiroomkit_ai_cat_live_record">查看 AI 实时会议记录</string>
     <string name="tuiroomkit_settings">设置</string>
     <string name="tuiroomkit_advanced_settings">高级设置</string>
     <string name="tuiroomkit_beauty">美颜</string>
