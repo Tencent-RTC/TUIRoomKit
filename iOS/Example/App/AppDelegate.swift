@@ -12,9 +12,9 @@ import TUIRoomKit
 import TIMPush
 
 #if DEBUG
-let businessID: Int32 = 0
+let offlinePushBusinessID: Int32 = 0
 #else
-let businessID: Int32 = 0
+let offlinePushBusinessID: Int32 = 0
 #endif
 
 @main
@@ -60,7 +60,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate: TIMPushDelegate {
     func offlinePushCertificateID() -> Int32 {
-        return businessID
+        return offlinePushBusinessID
     }
     
     func onRemoteNotificationReceived(_ notice: String?) -> Bool {

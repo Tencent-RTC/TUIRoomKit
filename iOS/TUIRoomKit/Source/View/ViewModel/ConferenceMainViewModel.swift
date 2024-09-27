@@ -494,6 +494,9 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
     func makeFloatChatButton() -> FloatChatButton {
         let floatchatButton = FloatChatButton()
         floatchatButton.isHidden = !store.shouldShowFloatChatView
+        if store.isEnteredRoom {
+            floatchatButton.updateRoomId(roomId: store.roomInfo.roomId)
+        }
         return floatchatButton
     }
     

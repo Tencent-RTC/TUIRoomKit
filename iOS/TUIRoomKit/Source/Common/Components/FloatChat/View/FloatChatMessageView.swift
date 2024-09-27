@@ -77,7 +77,8 @@ class FloatChatMessageView: UIView {
      }
      
      private func getAttributedText(from message: FloatChatMessage) -> NSMutableAttributedString {
-         let userName = message.user.userName + ": "
+         var userName = message.user.userName.isEmpty ? message.user.userId : message.user.userName
+         userName = userName + ": "
          let userNameAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: 12),
                                                                   .foregroundColor: UIColor.tui_color(withHex: "B2BBD1")]
          let userNameAttributedText = NSMutableAttributedString(string: userName,
