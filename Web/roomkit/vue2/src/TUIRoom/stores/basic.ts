@@ -12,6 +12,7 @@ type SideBarType =
   | 'more'
   | 'transfer-leave'
   | 'apply'
+  | 'aiTranscription'
   | '';
 type SceneType = 'chat' | 'default';
 
@@ -52,9 +53,6 @@ interface BasicState {
   isShowScreenShareAntiFraud: boolean;
   isOpenMic: boolean;
   scene: SceneType;
-  isSharing: boolean;
-  isWhiteboardVisiable: boolean;
-  isSharingScreen: boolean;
   componentConfig: {
     InviteControl: {
       visible?: boolean;
@@ -123,9 +121,6 @@ export const useBasicStore = defineStore('basic', {
       },
     },
     scene: 'default',
-    isSharing: false,
-    isWhiteboardVisiable: false,
-    isSharingScreen: false,
   }),
   getters: {},
   actions: {
@@ -244,15 +239,6 @@ export const useBasicStore = defineStore('basic', {
     setScene(scene: SceneType) {
       this.scene = scene;
     },
-    setIsSharing(isSharing: boolean) {
-      this.isSharing = isSharing;
-    },
-    setWhiteboardVisiable(visible: boolean) {
-      this.isWhiteboardVisiable = visible;
-    },
-    setIsSharingScreen(isSharingScreen: boolean) {
-      this.isSharingScreen = isSharingScreen;
-    },
     reset() {
       this.isSidebarOpen = false;
       this.layout = getDefaultLayout();
@@ -270,9 +256,6 @@ export const useBasicStore = defineStore('basic', {
       this.showHeaderTool = true;
       this.shareLink = '';
       this.isOpenMic = false;
-      this.isSharing = false;
-      this.isWhiteboardVisiable = false;
-      this.isSharingScreen = false;
     },
   },
 });

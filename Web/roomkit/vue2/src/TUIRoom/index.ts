@@ -9,6 +9,7 @@ import {
   ThemeOption,
 } from './conference';
 import RoomMessageCard from './extension/RoomMessageCard/RoomMessageCard.vue';
+import { chatExtension } from './extension';
 import { roomService } from './services';
 export * from './components/common/base/index';
 export * from './services/manager/scheduleConferenceManager';
@@ -23,6 +24,7 @@ export {
   FeatureButton,
   RoomMessageCard,
   WhiteboardView,
+  chatExtension,
 };
 export type { ThemeOption };
 
