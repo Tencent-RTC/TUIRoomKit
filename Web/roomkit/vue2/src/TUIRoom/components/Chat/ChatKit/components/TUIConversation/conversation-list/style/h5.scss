@@ -1,0 +1,43 @@
+.tui-conversation-list-h5 {
+  .tui-conversation-content {
+    .dialog {
+      left: auto;
+      right: 18px;
+      padding: 0;
+
+      .conversation-options {
+        padding: 12px;
+        font-size: 16px;
+      }
+
+      &-item-up {
+        top: -70px;
+      }
+    }
+
+    .tui-conversation-item {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+
+      .content {
+        .name {
+          font-size: 16px;
+        }
+
+        .middle-box {
+          p {
+            font-size: 14px;
+          }
+        }
+      }
+
+      .time {
+        font-size: 14px;
+      }
+    }
+  }
+}

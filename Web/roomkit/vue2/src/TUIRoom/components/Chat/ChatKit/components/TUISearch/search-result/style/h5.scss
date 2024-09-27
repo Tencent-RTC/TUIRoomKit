@@ -1,0 +1,67 @@
+.tui-search-result-h5 {
+  background-color: #f4f4f4;
+
+  .tui-search-result-main {
+    background-color: #f4f4f4;
+
+    .tui-search-result-list {
+      .tui-search-result-list-item {
+        background-color: #fff;
+        padding: 0 10px 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+    }
+  }
+
+  .tui-search-result-detail {
+    background-color: #f4f4f4;
+    border: none;
+
+    .list-item {
+      margin: 0 10px;
+      width: calc(100% - 20px);
+    }
+
+    .list-group-date {
+      padding: 10px;
+    }
+
+    .list-group-image {
+      .list-group-item {
+        .search-result-list-item-h5 {
+          padding: 0;
+        }
+      }
+    }
+
+    .list-group-file {
+      .list-group-item {
+        background-color: #fff;
+        padding: 0 10px;
+        border-bottom: 1px solid #f4f4f4;
+
+        .search-result-list-item-h5 {
+          padding: 0 0 10px;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
+
+.search-result-loading,
+.search-result-default {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &-h5 {
+    background-color: #f4f4f4;
+  }
+}

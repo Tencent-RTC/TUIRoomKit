@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-web-vue2.7",
-  "version": "2.6.0",
+  "version": "2.6.3",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
@@ -22,6 +22,7 @@
     "build": "vite build"
   },
   "devDependencies": {
+    "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@vitejs/plugin-vue2": "^2.3.1",
     "typescript": "^5.2.2",
     "vite": "^5.2.0",
@@ -36,9 +37,21 @@
   },
   "dependencies": {
     "@tencentcloud/chat": "latest",
+    "@tencentcloud/chat-uikit-engine": "2.2.7",
+    "@tencentcloud/chat-uikit-vue": "2.2.7",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-js": "^2.6.0",
+    "@tencentcloud/tuiroom-engine-js": "^2.6.3",
     "@tencentcloud/universal-api": "^2.0.9",
+    "@tiptap/core": "^2.6.6",
+    "@tiptap/extension-document": "^2.6.6",
+    "@tiptap/extension-image": "^2.6.6",
+    "@tiptap/extension-mention": "^2.6.6",
+    "@tiptap/extension-paragraph": "^2.6.6",
+    "@tiptap/extension-placeholder": "^2.6.6",
+    "@tiptap/extension-text": "^2.6.6",
+    "@tiptap/pm": "^2.6.6",
+    "@tiptap/suggestion": "^2.6.6",
+    "dayjs": "^1.11.13",
     "interactjs": "^1.10.26",
     "mitt": "^3.0.0",
     "rtc-detect": "^1.0.3"
