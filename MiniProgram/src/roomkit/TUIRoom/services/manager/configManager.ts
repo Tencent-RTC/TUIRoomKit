@@ -34,7 +34,6 @@ export class ConfigManager implements IConfigManager {
   }
 
   public setLanguage(language: LanguageOption) {
-    if (language === i18n.global.locale.value) return;
     i18n.global.locale.value = language;
     this.service.basicStore.setLang(language);
     this.service.emit(EventType.LANGUAGE_CHANGED, language);
