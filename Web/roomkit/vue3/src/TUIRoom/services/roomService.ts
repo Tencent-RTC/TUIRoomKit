@@ -34,9 +34,13 @@ import {
 } from './manager/roomActionManager';
 import { WaterMark } from './function/waterMark';
 import { VirtualBackground } from './function/virtualBackground';
+import { BasicBeauty } from './function/basicBeauty';
 import { ScheduleConferenceManager } from './manager/scheduleConferenceManager';
 import { ConferenceInvitationManager } from './manager/conferenceInvitationManager';
 import { ErrorHandler } from './function/errorHandler';
+import { ChatManager } from './manager/chatManager';
+import { TUILogin } from '@tencentcloud/tui-core';
+import { AITask } from './function/aiTask';
 
 const { t } = i18n.global;
 
@@ -54,11 +58,14 @@ export class RoomService implements IRoomService {
   public roomActionManager: RoomActionManager = new RoomActionManager(this);
   public waterMark = new WaterMark(this);
   public virtualBackground = new VirtualBackground(this);
+  public basicBeauty = new BasicBeauty(this);
   public scheduleConferenceManager: ScheduleConferenceManager =
     new ScheduleConferenceManager(this);
   public conferenceInvitationManager: ConferenceInvitationManager =
     new ConferenceInvitationManager(this);
   public errorHandler: ErrorHandler = new ErrorHandler(this);
+  public chatManager: ChatManager = new ChatManager(this);
+  public aiTask: AITask = new AITask(this);
 
   public roomEngine = roomEngine;
   public t = t;
@@ -118,9 +125,11 @@ export class RoomService implements IRoomService {
     RoomService.instance.unBindRoomEngineEvents();
     RoomService.instance.waterMark.dispose();
     RoomService.instance.virtualBackground.dispose();
+    RoomService.instance.basicBeauty.dispose();
     RoomService.instance.scheduleConferenceManager.dispose();
     RoomService.instance.conferenceInvitationManager.dispose();
     RoomService.instance.mediaManager.dispose();
+    RoomService.instance.chatManager.dispose();
     RoomService.instance = undefined;
   }
 
@@ -450,7 +459,14 @@ export class RoomService implements IRoomService {
       userName = userId,
       avatarUrl = '',
     } = option;
-    await TUIRoomEngine.login({ sdkAppId, userId, userSig });
+    TUILogin.login({
+      SDKAppID: sdkAppId,
+      userID: userId,
+      userSig,
+      useUploadPlugin: true,
+    });
+    const { chat } = TUILogin.getContext();
+    await TUIRoomEngine.login({ sdkAppId, userId, userSig, tim: chat });
     await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
     this.emit(EventType.ROOM_LOGIN);
   }
