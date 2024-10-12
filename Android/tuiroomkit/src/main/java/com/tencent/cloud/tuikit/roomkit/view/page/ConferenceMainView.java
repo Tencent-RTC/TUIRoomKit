@@ -485,6 +485,9 @@ public class ConferenceMainView extends RelativeLayout {
         if (mVideoSeatView != null) {
             mVideoSeatView.destroy();
         }
+        if (mFloatChatView != null) {
+            mFloatChatView.destroy();
+        }
         ConferenceController.sharedInstance().getRoomState().roomId.removeObserver(mRoomIdObserver);
     }
 
