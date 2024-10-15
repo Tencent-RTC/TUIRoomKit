@@ -216,7 +216,7 @@ _简体中文 | [English](README.md)_
 ## 快速访问
 
 - 如果你遇到了困难，可以先参阅 [常见问题](https://cloud.tencent.com/document/product/1690/90103)，这里整理开发者最常出现的问题，覆盖各个平台，希望可以帮助您快速解决问题
-- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](../../Web/)、[Android](../../Android/)、[iOS](../../iOS/)、[Electron](../../Electron/)、[Qt](../../Qt/)
+- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](../../Web/)、[Android](../../Android/)、[iOS](../../iOS/)、[Electron](../../Electron/)
 - 如果您想了解我们最新的一些产品特性，可以查看 [更新日志](https://cloud.tencent.com/document/product/1690/89361)，这里有 TUIRoomKit 最新的功能特性，以及历史版本功能迭代
 - 完整的 API 文档见 [多人音视频 SDK API 示例](https://cloud.tencent.com/document/product/1690/94557)：包含TUIRoomKit（含 UI）、TUIRoomEngine（无 UI）、以及事件回调等介绍。
 - 如果你想了解更多腾讯云音视频团队维护的项目，可以查看我们的 [产品官网](https://cloud.tencent.com/product/rtcube)、[Github Organizations](https://github.com/Tencent-RTC) 等

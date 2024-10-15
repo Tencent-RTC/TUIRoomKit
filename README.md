@@ -8,7 +8,7 @@
 English | [简体中文](README.zh.md)
 # Tencent Cloud UIKit for Video Conference
 
-<img src="Preview/logo.png" align="left" width=120 height=120>  TUIRoomKit is Tencent Cloud launched a positioning enterprise meeting, online class, network salon and other scenes of the UI component, through the integration of the component, you only need to write a few lines of code can add similar video conference functions for your App, and support screen sharing, member management, ban the ban painting, chat and other functions. TUIRoomKit supports Android, iOS, Flutter, Web, Electron, Qt and other development platforms.
+<img src="Preview/logo.png" align="left" width=120 height=120>  TUIRoomKit is Tencent Cloud launched a positioning enterprise meeting, online class, network salon and other scenes of the UI component, through the integration of the component, you only need to write a few lines of code can add similar video conference functions for your App, and support screen sharing, member management, ban the ban painting, chat and other functions. TUIRoomKit supports Android, iOS, Flutter, Web, Electron and other development platforms.
 
 <a href="https://apps.apple.com/cn/app/%E8%85%BE%E8%AE%AF%E4%BA%91%E9%9F%B3%E8%A7%86%E9%A2%91/id1400663224"><img src="Preview/app-store.svg" height=40></a> <a href="https://dldir1.qq.com/hudongzhibo/liteav/TRTCDemo.apk"><img src="Preview/play-store.svg" height=40></a> <a href="https://web.sdk.qcloud.com/trtc/webrtc/demo/api-sample/login.html"><img src="Preview/web-app.svg" height=40></a>
 
