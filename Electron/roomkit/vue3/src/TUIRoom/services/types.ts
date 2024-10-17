@@ -8,6 +8,7 @@ import { RoomActionManager } from './manager/roomActionManager';
 import { ErrorHandler } from './function/errorHandler';
 import { AITask } from './function/aiTask';
 import { ConferenceInvitationManager } from './manager/conferenceInvitationManager';
+import { DataReportManager } from './manager/dataReportManager';
 export interface IRoomService {
   t: any;
   roomEngine: Record<string, any>;
@@ -18,6 +19,7 @@ export interface IRoomService {
   roomActionManager?: RoomActionManager;
   scheduleConferenceManager: ScheduleConferenceManager;
   conferenceInvitationManager: ConferenceInvitationManager;
+  dataReportManager: DataReportManager;
   errorHandler: ErrorHandler;
   aiTask: AITask;
   on: (eventType: EventType, callback: (data?: any) => any) => void;
