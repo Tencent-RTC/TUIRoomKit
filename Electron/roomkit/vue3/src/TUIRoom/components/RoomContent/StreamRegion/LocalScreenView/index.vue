@@ -69,10 +69,8 @@ import Dialog from '../../../common/base/Dialog/index.vue';
 import eventBus from '../../../../hooks/useMitt';
 import { useI18n } from '../../../../locales';
 import { useRoomStore } from '../../../../stores/room';
-import {
-  DataReportManager,
-  MetricsKey,
-} from '../../../../services/manager/dataReportManager';
+import { MetricsKey } from '../../../../services/manager/dataReportManager';
+import { roomService } from '../../../../services';
 
 const roomStore = useRoomStore();
 const { t } = useI18n();
@@ -108,17 +106,17 @@ function toggleAnnotationWindow() {
   if (isAnnotationVisiable.value) {
     ipcRenderer?.send('annotation:stop-annotating');
     isAnnotationVisiable.value = false;
-    DataReportManager.reportCount(MetricsKey.stopAnnotating);
+    roomService.dataReportManager.reportCount(MetricsKey.stopAnnotating);
   } else {
     ipcRenderer?.send('annotation:start-annotating');
     isAnnotationVisiable.value = true;
-    DataReportManager.reportCount(MetricsKey.startAnnotating);
+    roomService.dataReportManager.reportCount(MetricsKey.startAnnotating);
   }
 }
 
 ipcRenderer?.on('annotation:stop-from-annotation-window', () => {
   isAnnotationVisiable.value = false;
-  DataReportManager.reportCount(MetricsKey.stopAnnotating);
+  roomService.dataReportManager.reportCount(MetricsKey.stopAnnotating);
 });
 </script>
 
