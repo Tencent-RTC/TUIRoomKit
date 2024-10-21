@@ -30,10 +30,7 @@ import eventBus from '../../hooks/useMitt';
 import { EventType, roomEngine } from '../../services';
 import { MESSAGE_DURATION } from '../../constants/message';
 import { roomService } from '../../services/index';
-import {
-  DataReportManager,
-  MetricsKey,
-} from '../../services/manager/dataReportManager';
+import { MetricsKey } from '../../services/manager/dataReportManager';
 
 const { t } = useI18n();
 const roomStore = useRoomStore();
@@ -109,10 +106,10 @@ async function startShareWhiteboard() {
 function stopShareWhiteboard() {
   roomEngine.instance?.stopScreenSharing();
   if (isWhiteboardVisiable.value) {
-    DataReportManager.reportCount(MetricsKey.stopSharingWhiteboard);
+    roomService.dataReportManager.reportCount(MetricsKey.stopSharingWhiteboard);
   }
   if (isAnnotationVisiable.value) {
-    DataReportManager.reportCount(MetricsKey.stopAnnotating);
+    roomService.dataReportManager.reportCount(MetricsKey.stopAnnotating);
   }
   isWhiteboardVisiable.value = false;
   isAnnotationVisiable.value = false;
@@ -127,7 +124,7 @@ function hideAllWhiteboardWindow() {
 function showWhiteboardWindow() {
   isWhiteboardVisiable.value = true;
   ipcRenderer.send('whiteboard:show-window');
-  DataReportManager.reportCount(MetricsKey.startSharingWhiteboard);
+  roomService.dataReportManager.reportCount(MetricsKey.startSharingWhiteboard);
 }
 
 ipcRenderer.on('whiteboard:window-closed', () => {
@@ -139,7 +136,7 @@ ipcRenderer.on('whiteboard:stop-from-whiteboard-window', () => {
 });
 
 ipcRenderer.on('whiteboard:save-from-whiteboard-window', () => {
-  DataReportManager.reportCount(MetricsKey.saveWhiteboard);
+  roomService.dataReportManager.reportCount(MetricsKey.saveWhiteboard);
 });
 
 onMounted(() => {
