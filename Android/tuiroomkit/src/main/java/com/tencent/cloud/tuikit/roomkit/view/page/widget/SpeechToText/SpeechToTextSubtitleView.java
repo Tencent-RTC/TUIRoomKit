@@ -43,7 +43,7 @@ public class SpeechToTextSubtitleView extends ScrollView {
     private final LiveListObserver<ASRState.SpeechToText> mTextObserver = new LiveListObserver<ASRState.SpeechToText>() {
         @Override
         public void onItemChanged(int position, ASRState.SpeechToText item) {
-            if (TextUtils.equals(ASR_TYPE_TRANSCRIPTION, item.type)) {
+            if (item.isSpeechEnd) {
                 addMessage(item);
             }
         }
