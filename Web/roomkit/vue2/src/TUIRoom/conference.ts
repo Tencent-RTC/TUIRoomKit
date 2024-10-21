@@ -6,6 +6,7 @@ import {
   LanguageOption,
   Theme,
   EventType,
+  MetricsKey,
 } from './services';
 import { TUIRoomEngine } from './index';
 import logger from './utils/common/logger';
@@ -144,26 +145,34 @@ class Conference implements IConference {
   }
 
   public setLanguage(language: LanguageOption) {
+    roomService.dataReportManager.reportCount(MetricsKey.setLanguage);
     return roomService.setLanguage(language);
   }
 
   public setTheme(theme: ThemeOption) {
+    roomService.dataReportManager.reportCount(MetricsKey.setTheme);
     return roomService.setTheme(toTargetTheme(theme) as Theme);
   }
 
   public disableTextMessaging() {
+    roomService.dataReportManager.reportCount(MetricsKey.disableTextMessaging);
     roomService.setComponentConfig({ ChatControl: { visible: false } });
   }
 
   public disableScreenSharing() {
+    roomService.dataReportManager.reportCount(MetricsKey.disableScreenSharing);
     roomService.setComponentConfig({ ScreenShare: { visible: false } });
   }
 
   public enableWatermark() {
+    roomService.dataReportManager.reportCount(MetricsKey.enableWatermark);
     roomService.waterMark.toggleWatermark(true);
   }
 
   public enableVirtualBackground() {
+    roomService.dataReportManager.reportCount(
+      MetricsKey.enableVirtualBackground
+    );
     roomService.setComponentConfig({ VirtualBackground: { visible: true } });
   }
 
@@ -172,6 +181,7 @@ class Conference implements IConference {
   }
 
   public hideFeatureButton(name: FeatureButton) {
+    roomService.dataReportManager.reportCount(MetricsKey.hideFeatureButton);
     roomService.setComponentConfig({ [name]: { visible: false } });
   }
 
