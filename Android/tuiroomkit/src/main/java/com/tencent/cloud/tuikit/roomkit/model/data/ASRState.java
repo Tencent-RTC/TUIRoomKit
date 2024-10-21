@@ -10,14 +10,14 @@ public class ASRState {
     public LiveListData<SpeechToText> speechToTexts = new LiveListData<>();
 
     public static class SpeechToText {
-        public String roundId     = "";
-        public String userId      = "";
-        public String userName    = "";
-        public String avatarUrl   = "";
-        public String text        = "";
-        public long   startTimeMs = 0L;
-        public long   endTimeMs   = 0L;
-        public String type        = ASR_TYPE_SUBTITLE;
+        public String  roundId     = "";
+        public String  userId      = "";
+        public String  userName    = "";
+        public String  avatarUrl   = "";
+        public String  text        = "";
+        public long    startTimeMs = 0L;
+        public long    endTimeMs   = 0L;
+        public boolean isSpeechEnd = false;
 
         @Override
         public boolean equals(@Nullable Object obj) {
