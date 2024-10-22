@@ -38,6 +38,7 @@ import { VirtualBackground } from './function/virtualBackground';
 import { BasicBeauty } from './function/basicBeauty';
 import { ScheduleConferenceManager } from './manager/scheduleConferenceManager';
 import { ConferenceInvitationManager } from './manager/conferenceInvitationManager';
+import { DataReportManager } from './manager/dataReportManager';
 import { ErrorHandler } from './function/errorHandler';
 import { ChatManager } from './manager/chatManager';
 import { TUILogin } from '@tencentcloud/tui-core';
@@ -64,6 +65,7 @@ export class RoomService implements IRoomService {
     new ScheduleConferenceManager(this);
   public conferenceInvitationManager: ConferenceInvitationManager =
     new ConferenceInvitationManager(this);
+  public dataReportManager: DataReportManager = new DataReportManager();
   public errorHandler: ErrorHandler = new ErrorHandler(this);
   public chatManager: ChatManager = new ChatManager(this);
   public aiTask: AITask = new AITask(this);

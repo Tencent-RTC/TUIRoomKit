@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="mask" v-show="show && showMask" @click.stop="toggleShow"></div>
+    <div class="mask" v-show="show && showMask" @tap="toggleShow"></div>
     <div class="container" v-show="show" :style="{ height: props.height }">
-      <div class="container-close" @click="toggleShow" v-if="showClose">
+      <div class="container-close" @tap="toggleShow" v-if="showClose">
         <svg-icon style="display: flex" :icon="ArrowDown" />
       </div>
       <div v-if="title" class="container-header">{{ title }}</div>
@@ -36,7 +36,7 @@ const props = defineProps({
     default: '',
   },
 });
-const emit = defineEmits(['input']);
+const emit = defineEmits(['input', 'close']);
 const show = ref(false);
 
 watch(
@@ -44,9 +44,20 @@ watch(
   val => (show.value = val),
   { immediate: true }
 );
-watch(show, val => emit('input', val), { immediate: true });
+watch(
+  show,
+  val => {
+    emit('input', val);
+  },
+  { immediate: true }
+);
 
-const toggleShow = () => (show.value = !show.value);
+const toggleShow = () => {
+  show.value = !show.value;
+  if (!show.value) {
+    emit('close');
+  }
+};
 </script>
 <style scoped lang="scss">
 .mask {

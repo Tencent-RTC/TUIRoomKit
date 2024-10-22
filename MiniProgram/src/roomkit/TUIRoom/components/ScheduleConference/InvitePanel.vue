@@ -37,13 +37,13 @@ const props = defineProps<{
   }[];
   shareLinkData?: {
     roomId: string;
+    password?: string;
     [key: string]: unknown;
   };
 }>();
 const { onCopy } = useRoomInfo();
-
 const scheduleInviteList = computed(() => {
-  const roomId = props?.shareLinkData?.roomId;
+  const { roomId, password } = props?.shareLinkData || {};
   if (!roomId) return props.scheduleInviteList;
   return [
     {
@@ -51,6 +51,12 @@ const scheduleInviteList = computed(() => {
       content: roomId,
       isShowCopyIcon: true,
       isVisible: true,
+    },
+    {
+      title: `${t('Room Password')}`,
+      content: password,
+      isShowCopyIcon: true,
+      isVisible: !!password,
     },
     {
       title: `${t('Room Link')}`,

@@ -81,7 +81,7 @@ const handleEdit = () => emit('edit');
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 1001;
   display: flex;
   flex-direction: column;
   width: 100%;

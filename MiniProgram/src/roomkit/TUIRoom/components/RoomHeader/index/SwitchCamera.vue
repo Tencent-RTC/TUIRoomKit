@@ -1,6 +1,10 @@
 <template>
   <div class="camera-icon">
-    <svg-icon style="display: flex" @tap="handleSwitchCamera" :icon="CameraSwitchIcon" />
+    <svg-icon
+      style="display: flex"
+      @tap="handleSwitchCamera"
+      :icon="CameraSwitchIcon"
+    />
   </div>
 </template>
 <script setup lang="ts">

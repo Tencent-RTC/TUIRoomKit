@@ -278,8 +278,7 @@ export default {
     'Camera not detected on current device',
   'Camera And Microphone not detected on current device':
     'Camera And Microphone not detected on current device',
-  'Another user is currently sharing the screen, screen sharing is not possible.':
-    'Another user is currently sharing the screen, screen sharing is not possible.',
+  'Another user is sharing the screen.': 'Another user is sharing the screen.',
   'Screen sharing is currently active, cannot start the whiteboard.':
     'Screen sharing is currently active, cannot start the whiteboard.',
   'This action causes the room to be disbanded, does it continue?':
@@ -500,13 +499,14 @@ export default {
   // room password
   'Entering the room now...': 'Entering the room now...',
   'The room is encrypted': 'The room is encrypted',
-  'Please enter your room password': 'Please enter your room password',
+  'Please enter the password': 'Please enter the password',
   'Your room password format is incorrect, please check it':
     'Your room password format is incorrect, please check it',
   Security: 'Security',
   'Room Password': 'Room Password',
   'Enter 6-digit password': 'Enter 6-digit password',
-  'Wrong password, please re-enter': 'Wrong password, please re-enter',
+  'Wrong password': 'Wrong password',
+  Encryption: 'Encryption',
   'Open whiteboard': 'Open whiteboard',
   'Close whiteboard': 'Close whiteboard',
   'Start annotating': 'Start annotating',

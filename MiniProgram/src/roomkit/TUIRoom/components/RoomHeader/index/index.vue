@@ -4,6 +4,7 @@
       <div class="icon-box">
         <switch-camera />
         <switch-mirror />
+        <switch-audio-route v-if="isWeChat" />
       </div>
       <room-info class="room-info" />
       <end-control />
@@ -15,8 +16,10 @@
 import EndControl from '../../RoomFooter/EndControl/index.vue';
 import SwitchCamera from './SwitchCamera.vue';
 import SwitchMirror from './SwitchMirror.vue';
+import SwitchAudioRoute from './SwitchAudioRoute.vue';
 import RoomInfo from '../RoomInfo/index.vue';
 import SwitchTheme from '../../common/SwitchTheme.vue';
+import { isWeChat } from '../../../utils/environment';
 </script>
 <style scoped>
 .header {
@@ -33,9 +36,8 @@ import SwitchTheme from '../../common/SwitchTheme.vue';
 
 .icon-box {
   display: flex;
+  gap: 10px;
   align-items: center;
-  justify-content: space-between;
-  min-width: 50px;
 }
 
 .room-info {
