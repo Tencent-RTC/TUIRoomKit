@@ -9,10 +9,10 @@
       :placeholder="placeholder"
       :disabled="disabled"
       :maxlength="props.maxlength"
-      :type="type"
+      :type="props.type"
       :enterkeyhint="enterkeyhint"
       :readonly="readonly"
-      :style="{ paddingRight: hasSuffixIcon ? '40px' : '16px' }"
+      :style="inputStyle"
       @focus="focus"
       @blur="blur"
       @keyup.enter="done"
@@ -69,6 +69,14 @@ interface Props {
   select?: (data: any) => any;
   maxlength?: string;
   border?: boolean;
+  align?:
+    | 'center'
+    | 'end'
+    | 'justify'
+    | 'left'
+    | 'match-parent'
+    | 'right'
+    | 'start';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -81,6 +89,7 @@ const props = withDefaults(defineProps<Props>(), {
   enterkeyhint: '',
   maxlength: '80',
   border: true,
+  align: 'left',
 });
 
 const themeClass = computed(() =>
@@ -163,6 +172,20 @@ const showResults = computed(
 );
 
 const hasSuffixIcon = computed(() => !!slots.suffixIcon);
+
+const inputStyle = computed(() => {
+  let paddingRight = '16px';
+  if (hasSuffixIcon.value) {
+    paddingRight = '40px';
+  } else if (props.align === 'right') {
+    paddingRight = '0';
+  }
+
+  return {
+    paddingRight,
+    textAlign: props.align,
+  };
+});
 </script>
 
 <style lang="scss" scoped>
