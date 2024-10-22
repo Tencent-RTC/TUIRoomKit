@@ -64,7 +64,6 @@ import {
   TUIRoomInfo,
 } from '@tencentcloud/tuiroom-engine-js';
 import { roomService } from '../../services/index';
-import { isMobile } from '../../utils/environment';
 const invitationInfo = ref({
   userId: '',
   userName: '',
@@ -122,9 +121,6 @@ const onInvitationTimeout = () => {
 };
 
 const setInvitationDisplay = (options: boolean) => {
-  if (isMobile) {
-    return;
-  }
   showInvitation.value = options;
 };
 
@@ -157,6 +153,7 @@ onUnmounted(() => {
   padding: 20px 30px 10px 20px;
   background-color: var(--white-color);
   border-radius: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 
   .invitation-notification-inviter {
     display: flex;
@@ -226,6 +223,8 @@ onUnmounted(() => {
   .icon {
     width: 16px;
     height: 16px;
+    display: flex;
+    align-items: center;
   }
 
   .invitation-notification-room-name {

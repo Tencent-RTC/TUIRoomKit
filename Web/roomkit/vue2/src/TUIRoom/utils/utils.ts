@@ -208,16 +208,6 @@ export function convertSecondsToHMS(seconds: number) {
   };
 }
 
-/**
- * Determine if the input string contains only numbers
- * @param str data of any string
- * @returns It returns true if it contains only numbers, otherwise it returns false.
- */
-export function isDigitsOnly(str: string) {
-  const regex = /^\d+$/;
-  return regex.test(str);
-}
-
 export function getNanoId(size = 21) {
   const urlAlphabet =
     'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict';

@@ -34,10 +34,15 @@
         :size="item.size"
       />
     </div>
+    <member-invite
+      class="member-invite"
+      v-show="!props.userInfo.isInRoom"
+      :user-info="props.userInfo"
+    />
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, defineProps } from 'vue';
 import Avatar from '../../common/Avatar.vue';
 import { useBasicStore } from '../../../stores/basic';
 import { UserInfo, useRoomStore } from '../../../stores/room';
@@ -49,6 +54,7 @@ import AudioOpenIcon from '../../common/icons/AudioOpenIcon.vue';
 import AudioCloseIcon from '../../common/icons/AudioCloseIcon.vue';
 import ScreenOpenIcon from '../../common/icons/ScreenOpenIcon.vue';
 import ApplyActiveIcon from '../../common/icons/ApplyActiveIcon.vue';
+import MemberInvite from '../MemberInvite/MemberInvite.vue';
 import { useI18n } from '../../../locales';
 import { isMobile } from '../../../utils/environment';
 import UserIcon from '../../common/icons/UserIcon.vue';
@@ -209,7 +215,7 @@ const iconList = computed(() => {
     height: 100%;
     color: var(--icon-color);
 
-    .state-icon {
+    .state-icon .member-invite {
       margin-left: 16px;
     }
 

@@ -190,12 +190,12 @@ const openBeautySettingPanel = async () => {
   await roomService.roomEngine.instance?.startCameraDeviceTest({
     view: 'test-preview',
   });
-  await onBeautyPropertyClick(appliedBasicBeautyItem.value);
   isLoading.value = false;
 };
 
 const closeBeautySettingPanel = async () => {
   isDialogVisible.value = false;
+  await onBeautyPropertyClick(appliedBasicBeautyItem.value);
   roomService.roomEngine.instance?.stopCameraDeviceTest();
   selectBasicBeautyItem.value = appliedBasicBeautyItem.value;
 };

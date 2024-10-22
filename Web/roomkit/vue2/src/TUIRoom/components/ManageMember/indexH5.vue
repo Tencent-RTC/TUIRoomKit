@@ -1,25 +1,22 @@
 <template>
   <div class="manage-member-container">
     <div class="manage-member-header">
-      <div
-        v-if="roomStore.isSpeakAfterTakingSeatMode"
-        class="apply-count"
-        @click="handleToggleStaged"
-      >
-        <span
-          :class="[
-            'apply-staged',
-            { 'apply-count-active': isOnStateTabActive },
-          ]"
-          >{{ alreadyStaged }}
-        </span>
-        <span
-          :class="[
-            'apply-not-stage',
-            { 'apply-count-active': !isOnStateTabActive },
-          ]"
-          >{{ notStaged }}
-        </span>
+      <div class="apply-count">
+        <div class="user-status">
+          <div
+            :class="[
+              'user-status-container',
+              {
+                'apply-count-active': item.status === currentActiveTabName,
+              },
+            ]"
+            v-for="(item, index) in userStatusList"
+            :key="index"
+            @click="handleToggleStaged(item)"
+          >
+            <span class="apply-staged">{{ item.title }} </span>
+          </div>
+        </div>
       </div>
       <div
         v-if="applyToAnchorList.length > 0 && !isGeneralUser"
@@ -33,19 +30,18 @@
       </div>
     </div>
     <div class="member-list-container">
-      <div class="member-list-header">
-        {{ t('Member List') }}
-        <span class="member-count">({{ userNumber }}{{ t('members') }})</span>
-      </div>
       <div class="member-list-container">
         <member-item
-          v-for="userInfo in filteredUserList"
+          v-for="userInfo in filteredUserStatusList"
           :key="userInfo.userId"
           :user-info="userInfo"
         />
       </div>
     </div>
-    <div v-if="!isGeneralUser" class="manage-member-bottom">
+    <div
+      v-if="!isGeneralUser && currentActiveTabName !== USERS_STATUS.NOT_ENTER"
+      class="manage-member-bottom"
+    >
       <div
         class="manage-member-button"
         :class="isMicrophoneDisableForAllUser ? 'lift-all' : ''"
@@ -77,6 +73,18 @@
         </div>
       </div>
     </div>
+    <div
+      v-if="currentActiveTabName === USERS_STATUS.NOT_ENTER"
+      class="global-setting"
+    >
+      <div
+        v-if="filteredUserStatusList.length > 0"
+        class="button-bottom"
+        @click="handleCallAllInvitee"
+      >
+        {{ t('Call all') }}
+      </div>
+    </div>
     <Dialog
       v-model="showManageAllUserDialog"
       :title="dialogTitle"
@@ -103,9 +111,10 @@ import { storeToRefs } from 'pinia';
 import { useRoomStore } from '../../stores/room';
 import SvgIcon from '../common/base/SvgIcon.vue';
 import ApplyTipsIcon from '../common/icons/ApplyTipsIcon.vue';
+import { USERS_STATUS } from '../../constants/room';
+
 const roomStore = useRoomStore();
 const {
-  userNumber,
   applyToAnchorList,
   isMicrophoneDisableForAllUser,
   isCameraDisableForAllUser,
@@ -122,16 +131,16 @@ const {
   toggleManageAllMember,
   doToggleManageAllMember,
   t,
-  alreadyStaged,
-  notStaged,
-  filteredUserList,
-  isOnStateTabActive,
   handleToggleStaged,
   applyToAnchorUserContent,
   showApplyUserList,
   showMoreControl,
   moreControlList,
   toggleClickMoreBtn,
+  userStatusList,
+  currentActiveTabName,
+  filteredUserStatusList,
+  handleCallAllInvitee,
 } = useIndex();
 </script>
 
@@ -149,46 +158,6 @@ const {
   height: 100%;
 
   .manage-member-header {
-    .apply-count {
-      position: relative;
-      display: flex;
-      height: 36px;
-      margin: 16px 16px 8px;
-      background-color: var(--background-color-11);
-      border-radius: 10px;
-
-      .apply-staged,
-      .apply-not-stage {
-        position: absolute;
-        top: 3px;
-        left: 0;
-        display: flex;
-        flex-wrap: wrap;
-        place-content: center center;
-        width: 49%;
-        height: 80%;
-        font-size: 14px;
-        font-weight: 400;
-        color: var(--font-color-1);
-        filter: drop-shadow(0 2px 4px rgba(32, 77, 141, 0.03))
-          drop-shadow(0 6px 10px rgba(32, 77, 141, 0.06))
-          drop-shadow(0 3px 14px rgba(32, 77, 141, 0.05));
-        border-radius: 10px;
-        transform: translateX(4px);
-      }
-
-      .apply-not-stage {
-        top: 50%;
-        left: 50%;
-        height: 30px;
-        transform: translateY(-50%);
-      }
-
-      .apply-count-active {
-        background-color: var(--background-color-12);
-      }
-    }
-
     .apply-on-stage-info {
       display: flex;
       align-items: center;
@@ -232,6 +201,79 @@ const {
       border: 1px solid #fff;
       border-radius: 2px;
     }
+  }
+
+  .apply-count {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    margin: 16px 20px 0;
+    cursor: pointer;
+    background-color: var(--background-color-11);
+    border-radius: 20px;
+
+    .user-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 80%;
+      padding: 0 5px;
+    }
+
+    .user-status-container {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      border-radius: 20px;
+    }
+
+    .apply-staged,
+    .apply-not-stage {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--font-color-1);
+      filter: drop-shadow(0 2px 4px rgba(32, 77, 141, 0.03))
+        drop-shadow(0 6px 10px rgba(32, 77, 141, 0.06))
+        drop-shadow(0 3px 14px rgba(32, 77, 141, 0.05));
+      border-radius: 20px;
+      transform: translateX(4px);
+    }
+
+    .apply-not-stage {
+      top: 50%;
+      left: 50%;
+      width: 176px;
+      height: 30px;
+      transform: translateY(-50%);
+    }
+
+    .apply-count-active {
+      background-color: var(--background-color-12);
+    }
+  }
+
+  .global-setting {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .button-bottom {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    padding: 13px 24px;
+    font-weight: 400;
+    color: var(--mute-button-color-h5);
+    background-color: var(--manage-member-button-h5);
+    border-radius: 10px;
   }
 
   .member-list-container {
