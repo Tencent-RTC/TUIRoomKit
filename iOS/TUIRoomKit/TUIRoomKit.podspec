@@ -19,7 +19,7 @@ Pod::Spec.new do |spec|
   spec.dependency 'SnapKit'
   spec.dependency 'TUICore'
   spec.dependency 'TIMCommon'
-  spec.dependency 'Factory'
+  spec.dependency 'Factory', '~> 2.3.0'
   
   spec.default_subspec = 'TRTC'
   
