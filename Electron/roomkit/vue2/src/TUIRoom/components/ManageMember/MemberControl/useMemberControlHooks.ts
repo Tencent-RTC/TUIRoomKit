@@ -45,7 +45,7 @@ export default function useMemberControl(props?: any) {
   const isShowInput: Ref<boolean> = ref(false);
   const editorInputEle = ref();
   const editorInputEleContainer = ref();
-  const tempUserName = ref(props.userInfo.nameCard || props.userInfo.userName);
+  const tempUserName = ref('');
   const dialogData: Ref<{
     title: string;
     content: string;
@@ -59,6 +59,7 @@ export default function useMemberControl(props?: any) {
     actionType: '' as ActionType,
     showInput: false,
   });
+
   const kickOffDialogContent = computed(() =>
     t('whether to kick sb off the room', {
       name: roomService.getDisplayName(props.userInfo),
@@ -511,6 +512,7 @@ export default function useMemberControl(props?: any) {
         };
         break;
       case 'changeUserNameCard':
+        tempUserName.value = props.userInfo.nameCard || props.userInfo.userName;
         if (isMobile) {
           isShowInput.value = true;
           document?.body?.appendChild(editorInputEleContainer.value);

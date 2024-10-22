@@ -158,9 +158,7 @@ async function toggleScreenShare() {
   if (hasOtherScreenShare.value) {
     TUIMessage({
       type: 'warning',
-      message: t(
-        'Another user is currently sharing the screen, screen sharing is not possible.'
-      ),
+      message: t('Another user is sharing the screen.'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;

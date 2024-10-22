@@ -15,9 +15,10 @@
     <TuiInput
       :model-value="inputPassword"
       @input="inputPassword = $event"
-      :placeholder="t('Please enter your room password')"
+      :placeholder="t('Please enter the password')"
       type="password"
-      maxlength="6"
+      maxlength="32"
+      theme="white"
     >
       <template #suffixIcon>
         <svg-icon
@@ -51,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, watch, defineProps } from 'vue';
+import { ref, Ref, watch, defineProps, nextTick } from 'vue';
 import { storeToRefs } from 'pinia';
 import { EventType, roomService } from '../../services';
 import { useI18n } from '../../locales';
@@ -59,12 +60,9 @@ import TuiDialog from '../common/base/Dialog/index.vue';
 import TuiButton from '../common/base/Button.vue';
 import TuiInput from '../common/base/Input/index.vue';
 import CloseInputIcon from '../common/icons/CloseInputIcon.vue';
-import { isDigitsOnly } from '../../utils/utils';
-import TuiMessage from '../common/base/Message';
-import { MESSAGE_DURATION } from '../../constants/message';
 import { useBasicStore } from '../../stores/basic';
-import { PASSWORD_MAX_LENGTH_LIMIT } from '../../constants/room';
 import svgIcon from '../common/base/SvgIcon.vue';
+import { invalidPasswordRegex } from '../../utils/common';
 
 const basicStore = useBasicStore();
 const { roomId } = storeToRefs(basicStore);
@@ -89,17 +87,6 @@ watch(
 );
 
 async function joinRoom() {
-  if (
-    !isDigitsOnly(inputPassword.value) ||
-    inputPassword.value.length < PASSWORD_MAX_LENGTH_LIMIT
-  ) {
-    TuiMessage({
-      type: 'warning',
-      message: t('Your room password format is incorrect, please check it'),
-      duration: MESSAGE_DURATION.NORMAL,
-    });
-    return;
-  }
   await roomService.join(roomId.value, {
     isOpenCamera: false,
     isOpenMicrophone: true,
@@ -112,6 +99,16 @@ function cancelInputPassword() {
   inputPassword.value = '';
   roomService.emit(EventType.ROOM_ERROR);
 }
+
+watch(
+  () => inputPassword.value,
+  async (newValue, oldValue) => {
+    if (newValue && invalidPasswordRegex.test(newValue)) {
+      await nextTick();
+      inputPassword.value = newValue.replace(invalidPasswordRegex, '');
+    }
+  }
+);
 </script>
 
 <style lang="scss" scoped>

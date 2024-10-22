@@ -266,8 +266,7 @@ export default {
   'Camera not detected on current device': '当前设备未检测到摄像头',
   'Camera And Microphone not detected on current device':
     '当前设备未检测到摄像头和麦克风',
-  'Another user is currently sharing the screen, screen sharing is not possible.':
-    '当前有其他用户正在屏幕共享，无法进行屏幕共享',
+  'Another user is sharing the screen.': '其他成员正在屏幕共享',
   'Screen sharing is currently active, cannot start the whiteboard.':
     '当前正在屏幕共享，无法开启白板',
   'This action causes the room to be exited, does it continue?':
@@ -478,13 +477,14 @@ export default {
   // room password
   'Entering the room now...': '正在进入房间...',
   'The room is encrypted': '房间已加密',
-  'Please enter your room password': '请输入入会密码',
+  'Please enter the password': '请输入入会密码',
   'Your room password format is incorrect, please check it':
     '房间密码格式不正确，请检查',
   Security: '安全设置',
   'Room Password': '进房密码',
   'Enter 6-digit password': '请输入6位进房密码',
-  'Wrong password, please re-enter': '密码错误，请重新输入',
+  'Wrong password': '密码错误',
+  Encryption: '房间加密',
   'Open whiteboard': '开启白板',
   'Close whiteboard': '关闭白板',
   'Start annotating': '开始批注',
