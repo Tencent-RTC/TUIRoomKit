@@ -117,6 +117,7 @@ const isScreenStream = computed(
   height: 100%;
   border: $border-width solid transparent;
   border-radius: 12px;
+  pointer-events: none;
 
   &.border {
     border: $border-width solid #37e858;

@@ -5,17 +5,27 @@
     class="user-stream-container"
     :class="[showVoiceBorder ? 'border' : '']"
   >
-    <trtc-pusher
-      v-if="basicStore.userId === props.streamInfo.userId"
-      :id="playRegionDomId"
-      ref="pusher"
-    />
-    <trtc-player
-      v-if="basicStore.userId !== props.streamInfo.userId"
-      :id="playRegionDomId"
-      ref="player"
-      :stream-id="playRegionDomId"
-    />
+    <movable-area>
+      <movable-view
+        :scale="props.supportTouchScale"
+        direction="all"
+        :disabled="!props.supportTouchScale"
+        scale-min="1"
+        @scale="handleScaleChange"
+      >
+        <trtc-pusher
+          v-if="basicStore.userId === props.streamInfo.userId"
+          :id="playRegionDomId"
+          ref="pusher"
+        />
+        <trtc-player
+          v-if="basicStore.userId !== props.streamInfo.userId"
+          :id="playRegionDomId"
+          ref="player"
+          :stream-id="playRegionDomId"
+        />
+      </movable-view>
+    </movable-area>
     <div v-if="!streamInfo.hasVideoStream" class="center-user-info-container">
       <Avatar class="avatar-region" :img-src="userInfo.avatarUrl" />
     </div>
@@ -40,13 +50,23 @@
         class="screen-icon"
       />
       <span class="user-name" :title="displayName">{{ displayName }}</span>
-      <span v-if="isScreenStream"> {{ t('is sharing their screen') }} </span>
+      <span v-if="isScreenStream">
+        {{ t('is sharing their screen') }}
+      </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, computed, onMounted, defineProps } from 'vue';
+import {
+  ref,
+  watch,
+  nextTick,
+  computed,
+  onMounted,
+  defineProps,
+  defineEmits,
+} from 'vue';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
 import Avatar from '../../common/Avatar.vue';
 import { useBasicStore } from '../../../stores/basic';
@@ -81,9 +101,11 @@ const { t } = useI18n();
 interface Props {
   streamInfo: StreamInfo;
   enlargeDomId?: string;
+  supportTouchScale?: boolean;
 }
 
 const props = defineProps<Props>();
+const emits = defineEmits(['scale-changed']);
 
 const streamRegionRef = ref();
 const showVoiceBorder = computed(
@@ -223,6 +245,12 @@ onMounted(() => {
     }
   );
 });
+
+function handleScaleChange(event: {
+  detail: { x: number; y: number; scale: number };
+}) {
+  emits('scale-changed', { scale: event.detail.scale });
+}
 </script>
 
 <style lang="scss" scoped>
@@ -239,6 +267,12 @@ onMounted(() => {
 
   &.border {
     border: 2px solid #37e858;
+  }
+
+  movable-area,
+  movable-view {
+    width: 100%;
+    height: 100%;
   }
 
   .center-user-info-container {

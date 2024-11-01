@@ -7,29 +7,26 @@
       :icon="InviteIcon"
       @click-icon="toggleInviteSidebar"
     />
-    <room-invite
-      ref="inviteRef"
-      v-if="isShowInviteTab"
-      @on-close-invite="handleCloseInvite"
-    />
+    <room-invite ref="inviteRef" v-if="!isMobile && isShowInviteTab" />
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { defineEmits, ref } from 'vue';
 import IconButton from '../common/base/IconButton.vue';
 import InviteIcon from '../../assets/icons/InviteIcon.svg';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
-import { isMobile } from '../../utils/environment';
-import roomInvite from '../RoomInvite/index.vue';
 import { roomService } from '../../services';
+import roomInvite from '../RoomInvite/index.vue';
+import { isMobile } from '../../utils/environment';
 
+const isShowInviteTab = ref(false);
+const inviteRef = ref();
 const basicStore = useBasicStore();
 const { sidebarName } = storeToRefs(basicStore);
 const { t } = useI18n();
-const isShowInviteTab = ref(false);
-const inviteRef = ref();
+const emit = defineEmits(['show-overlay']);
 const inviteControlConfig = roomService.getComponentConfig('InviteControl');
 function toggleInviteSidebar() {
   isShowInviteTab.value = !isShowInviteTab.value;
@@ -39,11 +36,11 @@ function toggleInviteSidebar() {
       return;
     }
     basicStore.setSidebarName('invite');
+    emit('show-overlay', {
+      name: 'RoomInviteOverlay',
+      visible: isShowInviteTab.value,
+    });
   }
-}
-
-function handleCloseInvite() {
-  isShowInviteTab.value = false;
 }
 
 function handleClickOutSide() {

@@ -278,8 +278,7 @@ export default {
     'Camera not detected on current device',
   'Camera And Microphone not detected on current device':
     'Camera And Microphone not detected on current device',
-  'Another user is currently sharing the screen, screen sharing is not possible.':
-    'Another user is currently sharing the screen, screen sharing is not possible.',
+  'Another user is sharing the screen.': 'Another user is sharing the screen.',
   'Screen sharing is currently active, cannot start the whiteboard.':
     'Screen sharing is currently active, cannot start the whiteboard.',
   'This action causes the room to be disbanded, does it continue?':
@@ -398,6 +397,11 @@ export default {
     'Your screen sharing has been stopped',
   'Your screen sharing has been stopped, Now only the host/admin can share the screen':
     'Your screen sharing has been stopped, Now only the host/admin can share the screen',
+  'The system prohibits the current browser from accessing the screen content, please enable the screen sharing privilege.':
+    'The system prohibits the current browser from accessing the screen content, please enable the screen sharing privilege.',
+  'User canceled screen sharing': 'User canceled screen sharing',
+  'An unknown error occurred while screen sharing, please try again.':
+    'An unknown error occurred while screen sharing, please try again.',
   'I got it': 'I got it',
   Attention: 'Attention',
   'Audio playback failed. Click the "Confirm" to resume playback':
@@ -500,19 +504,30 @@ export default {
   // room password
   'Entering the room now...': 'Entering the room now...',
   'The room is encrypted': 'The room is encrypted',
-  'Please enter your room password': 'Please enter your room password',
+  'Please enter the password': 'Please enter the password',
   'Your room password format is incorrect, please check it':
     'Your room password format is incorrect, please check it',
   Security: 'Security',
   'Room Password': 'Room Password',
   'Enter 6-digit password': 'Enter 6-digit password',
-  'Wrong password, please re-enter': 'Wrong password, please re-enter',
+  'Wrong password': 'Wrong password',
+  Encryption: 'Encryption',
   'Open whiteboard': 'Open whiteboard',
   'Close whiteboard': 'Close whiteboard',
   'Start annotating': 'Start annotating',
   'End annotating': 'End annotating',
   'You are sharing the whiteboard, please stop sharing first':
     'You are sharing the whiteboard, please stop sharing first',
+  'Line Size': 'Line Size',
+  'Line Color': 'Line Color',
+  'Arrow Size': 'Arrow Size',
+  'Arrow Color': 'Arrow Color',
+  'Text Size': 'Text Size',
+  'Text Color': 'Text Color',
+  'Shape Type': 'Shape Type',
+  'Shape Style': 'Shape Style',
+  'Shape Color': 'Shape Color',
+  'Shape Size': 'Shape Size',
   // Beauty
   Beauty: 'Beauty',
   'Beauty Effects': 'Beauty Effects',

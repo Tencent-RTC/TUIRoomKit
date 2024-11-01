@@ -56,26 +56,6 @@ export default function useIndex() {
     roomStore.setOnStageTabStatus(isOnStateTabActive.value);
   }
 
-  const filteredUserList = computed(() => {
-    let list: UserInfo[] = [];
-    if (roomStore.isFreeSpeakMode) {
-      list = enterUserList.value;
-    } else if (roomStore.isSpeakAfterTakingSeatMode) {
-      list = isOnStateTabActive.value
-        ? anchorUserList.value
-        : audienceUserList.value;
-    }
-    if (!searchText.value) {
-      return list;
-    }
-    return list.filter(
-      (item: UserInfo) =>
-        item.nameCard?.includes(searchText.value) ||
-        item.userName?.includes(searchText.value) ||
-        item.userId.includes(searchText.value)
-    );
-  });
-
   const filteredUserStatusList = computed(() => {
     let list: any = [];
 
@@ -345,7 +325,6 @@ export default function useIndex() {
     ManageControlType,
     alreadyStaged,
     notStaged,
-    filteredUserList,
     isOnStateTabActive,
     handleToggleStaged,
     applyToAnchorUserContent,

@@ -60,7 +60,7 @@
         <TuiButton
           class="button"
           :disabled="!isAllowed"
-          @click="confirmBeautySetting"
+          @click="saveBeautySetting"
         >
           {{ t('Save') }}
         </TuiButton>
@@ -127,6 +127,7 @@ import {
   TRTCVideoRotation,
   TRTCVideoFillMode,
 } from '@tencentcloud/tuiroom-engine-wx';
+import { throttle } from '../../utils/utils';
 
 const roomEngine = useGetRoomEngine();
 const basicStore = useBasicStore();
@@ -165,7 +166,12 @@ const isShowResetDialog = ref(false);
 const isLoading = ref(false);
 const sliderValue = ref(0);
 const beautyLevels = reactive({
-  close: 0,
+  smoother: 0,
+  whitening: 0,
+  ruddy: 0,
+});
+
+const savedBeautyLevels = reactive({
   smoother: 0,
   whitening: 0,
   ruddy: 0,
@@ -190,17 +196,18 @@ const openBeautySettingPanel = async () => {
   await roomService.roomEngine.instance?.startCameraDeviceTest({
     view: 'test-preview',
   });
-  await onBeautyPropertyClick(appliedBasicBeautyItem.value);
   isLoading.value = false;
 };
 
 const closeBeautySettingPanel = async () => {
   isDialogVisible.value = false;
+  Object.assign(beautyLevels, savedBeautyLevels);
+  await onBeautyPropertyClick(appliedBasicBeautyItem.value);
   roomService.roomEngine.instance?.stopCameraDeviceTest();
   selectBasicBeautyItem.value = appliedBasicBeautyItem.value;
 };
 
-const confirmBeautySetting = async () => {
+const saveBeautySetting = async () => {
   if (!isAllowed.value) return;
   appliedBasicBeautyItem.value = selectBasicBeautyItem.value;
   if (selectBasicBeautyItem.value === 'close') {
@@ -218,6 +225,7 @@ const confirmBeautySetting = async () => {
       Math.floor((beautyLevels.ruddy / 100) * 9)
     );
   }
+  Object.assign(savedBeautyLevels, beautyLevels);
   closeBeautySettingPanel();
 };
 
@@ -244,6 +252,8 @@ const closeBeautyTest = async () => {
   );
 };
 
+const throttleStartBeautyTest = throttle(startBeautyTest, 300);
+
 watch(sliderValue, async newValue => {
   if (selectBasicBeautyItem.value === 'smoother') {
     beautyLevels.smoother = newValue;
@@ -254,7 +264,7 @@ watch(sliderValue, async newValue => {
   if (selectBasicBeautyItem.value === 'ruddy') {
     beautyLevels.ruddy = newValue;
   }
-  await startBeautyTest();
+  await throttleStartBeautyTest();
 });
 
 const onBeautyPropertyClick = async (
@@ -320,16 +330,16 @@ const handleMouseUp = async () => {
   border-radius: 8px;
 
   &-header {
-    width: 100%;
-    color: var(--active-color-1);
-    background-color: var(--background-color-13);
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
     line-height: 44px;
+    color: var(--active-color-1);
+    background-color: var(--background-color-13);
     border-bottom: 1px solid var(--border-color-2);
   }
 
@@ -343,13 +353,13 @@ const handleMouseUp = async () => {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    margin-right: 20px;
     font-size: 12px;
     color: var(--font-color-4);
     text-align: center;
     cursor: pointer;
     border: 1px solid transparent;
     border-radius: 8px;
-    margin-right: 20px;
 
     &-icon {
       display: flex;
@@ -373,18 +383,19 @@ const handleMouseUp = async () => {
 .reset,
 .compare,
 .degree {
-  z-index: 4;
   position: absolute;
   bottom: 8px;
-  height: 30px;
-  background-color: rgba(0, 0, 0, 0.4);
-  color: #fff;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  height: 30px;
   padding: 4px 12px;
+  color: #fff;
   cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+
   .text {
     margin-left: 4px;
   }
@@ -392,22 +403,27 @@ const handleMouseUp = async () => {
 
 .degree {
   left: 50%;
-  transform: translateX(-50%);
   cursor: default;
+  transform: translateX(-50%);
+
   .slider {
     margin-left: 12px;
   }
+
   .text-value {
     width: 20px;
     margin-left: 10px;
   }
 }
+
 .reset {
   left: 8px;
 }
+
 .compare {
   right: 8px;
 }
+
 .spinner {
   position: absolute;
   top: 50%;
@@ -458,11 +474,13 @@ const handleMouseUp = async () => {
     position: absolute;
     left: 24px;
     display: flex;
+
     .mirror-text {
       margin-left: 4px;
     }
   }
 }
+
 .cancel {
   margin-left: 12px;
 }

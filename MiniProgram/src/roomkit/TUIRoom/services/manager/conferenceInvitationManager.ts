@@ -189,6 +189,7 @@ export class ConferenceInvitationManager
     roomInfo: TUIRoomInfo;
     accepted: boolean;
   }) {
+    this.isBeingInvited = false;
     this.emit(
       TUIConferenceInvitationManagerEvents.onInvitationHandledByOtherDevice,
       data

@@ -16,7 +16,6 @@ export function getLanguage() {
 
   let language =
     getUrlParam('lang') ||
-    uni.getStorageSync('tuiRoom-language') ||
     navigator?.language ||
     (isWxMiniProgram ? 'zh-CN' : 'en-US');
   language = language.replace(/_/, '-').toLowerCase();
@@ -39,3 +38,9 @@ export function toTargetTheme(themeOption: ThemeOption) {
   const theme = themeOption === 'DARK' ? THEME.DARK : THEME.LIGHT;
   return theme;
 }
+
+// RoomKit schedule conference passwords restricted to digital checksums
+export const invalidDigitalPasswordRegex = /[^\d]+/g;
+// RoomKit enter room Password legitimacy verification
+export const invalidPasswordRegex =
+  /[^A-Za-z0-9!@#$%^&*()_+{}|:"<>?`~';[\]\\/.,-=]+/g;
