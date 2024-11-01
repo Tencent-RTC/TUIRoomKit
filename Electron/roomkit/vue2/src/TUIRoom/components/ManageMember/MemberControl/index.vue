@@ -47,7 +47,8 @@
         <span>{{ dialogData.content }}</span>
         <tui-input
           v-if="dialogData.showInput"
-          v-model="tempUserName"
+          :model-value="tempUserName"
+          @input="tempUserName = $event"
           class="dialog-input"
           :placeholder="t('Please input user name')"
         />
@@ -56,7 +57,7 @@
         <tui-button
           size="default"
           @click="handleAction(props.userInfo)"
-          :disabled="tempUserName.length === 0"
+          :disabled="dialogData.isConfirmButtonDisable"
         >
           {{ dialogData.confirmText }}
         </tui-button>
@@ -74,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, nextTick } from 'vue';
+import { ref, watch, computed, nextTick, defineProps } from 'vue';
 import { useI18n } from '../../../locales';
 import TuiButton from '../../common/base/Button.vue';
 import Dialog from '../../common/base/Dialog/index.vue';
@@ -132,6 +133,7 @@ async function toggleClickMoreBtn() {
 }
 
 async function handleDropDownPosition() {
+  // eslint-disable-next-line no-unsafe-optional-chaining
   const { top, bottom } = moreBtnRef.value?.getBoundingClientRect();
   const { top: containerTop, bottom: containerBottom } = document
     .getElementById('memberListContainer')

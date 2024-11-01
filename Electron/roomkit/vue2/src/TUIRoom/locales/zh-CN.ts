@@ -266,8 +266,7 @@ export default {
   'Camera not detected on current device': '当前设备未检测到摄像头',
   'Camera And Microphone not detected on current device':
     '当前设备未检测到摄像头和麦克风',
-  'Another user is currently sharing the screen, screen sharing is not possible.':
-    '当前有其他用户正在屏幕共享，无法进行屏幕共享',
+  'Another user is sharing the screen.': '其他成员正在屏幕共享',
   'Screen sharing is currently active, cannot start the whiteboard.':
     '当前正在屏幕共享，无法开启白板',
   'This action causes the room to be exited, does it continue?':
@@ -375,6 +374,11 @@ export default {
   'Your screen sharing has been stopped': '共享屏幕停止',
   'Your screen sharing has been stopped, Now only the host/admin can share the screen':
     '已停止您的共享，当前仅房主/管理员可以共享屏幕',
+  'The system prohibits the current browser from accessing the screen content, please enable the screen sharing privilege.':
+    '系统禁止当前浏览器获取屏幕内容, 请开启屏幕分享权限。',
+  'User canceled screen sharing': '用户取消屏幕分享',
+  'An unknown error occurred while screen sharing, please try again.':
+    '屏幕分享发生了未知错误，请重试',
   'I got it': '我知道了',
   Attention: '注意',
   'Audio playback failed. Click the "Confirm" to resume playback':
@@ -478,19 +482,30 @@ export default {
   // room password
   'Entering the room now...': '正在进入房间...',
   'The room is encrypted': '房间已加密',
-  'Please enter your room password': '请输入入会密码',
+  'Please enter the password': '请输入入会密码',
   'Your room password format is incorrect, please check it':
     '房间密码格式不正确，请检查',
   Security: '安全设置',
   'Room Password': '进房密码',
   'Enter 6-digit password': '请输入6位进房密码',
-  'Wrong password, please re-enter': '密码错误，请重新输入',
+  'Wrong password': '密码错误',
+  Encryption: '房间加密',
   'Open whiteboard': '开启白板',
   'Close whiteboard': '关闭白板',
   'Start annotating': '开始批注',
   'End annotating': '结束批注',
   'You are sharing the whiteboard, please stop sharing first':
     '您正在共享白板，请先停止共享',
+  'Line Size': '线条粗细',
+  'Line Color': '线条颜色',
+  'Arrow Size': '箭头大小',
+  'Arrow Color': '箭头颜色',
+  'Text Size': '文字大小',
+  'Text Color': '文字颜色',
+  'Shape Type': '图形类型',
+  'Shape Style': '形状样式',
+  'Shape Color': '图形颜色',
+  'Shape Size': '图形大小',
   // Beauty
   Beauty: '美颜',
   'Beauty Effects': '美颜特效',

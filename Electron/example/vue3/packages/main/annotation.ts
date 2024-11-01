@@ -17,13 +17,14 @@ export function initAnnotationWindow(win: BrowserWindow) {
 
 function createAnnotationWindow() {
   annotationWin = new BrowserWindow({
-    title: 'note window',
+    title: 'Annotation window',
     transparent: true,
     show: false,
     frame: false,
     skipTaskbar: true,
     alwaysOnTop: true,
     minimizable: false,
+    resizable: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.cjs'),
       nodeIntegration: true,

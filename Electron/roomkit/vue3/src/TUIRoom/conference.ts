@@ -82,8 +82,6 @@ interface IConference {
 
   enableVirtualBackground: () => void;
 
-  enableBasicBeauty: () => void;
-
   hideFeatureButton: (name: FeatureButton) => void;
 
   replaceFriendList: (userList: Array<any>) => void;
@@ -174,10 +172,6 @@ class Conference implements IConference {
       MetricsKey.enableVirtualBackground
     );
     roomService.setComponentConfig({ VirtualBackground: { visible: true } });
-  }
-
-  public enableBasicBeauty() {
-    roomService.setComponentConfig({ BasicBeauty: { visible: true } });
   }
 
   public hideFeatureButton(name: FeatureButton) {

@@ -46,7 +46,10 @@ import AudioIcon from '../../../common/AudioIcon.vue';
 import SvgIcon from '../../../common/base/SvgIcon.vue';
 import UserIcon from '../../../common/icons/UserIcon.vue';
 import { useI18n } from '../../../../locales';
-import { TUIRole, TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-electron';
+import {
+  TUIRole,
+  TUIVideoStreamType,
+} from '@tencentcloud/tuiroom-engine-electron';
 import { isInnerScene } from '../../../../utils/constants';
 import ScreenOpenIcon from '../../../common/icons/ScreenOpenIcon.vue';
 import { isPC, isMobile } from '../../../../utils/environment';
@@ -116,6 +119,7 @@ const isScreenStream = computed(
   height: 100%;
   border: $border-width solid transparent;
   border-radius: 12px;
+  pointer-events: none;
 
   &.border {
     border: $border-width solid #37e858;

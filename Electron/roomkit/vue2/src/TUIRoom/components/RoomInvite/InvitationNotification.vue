@@ -64,7 +64,6 @@ import {
   TUIRoomInfo,
 } from '@tencentcloud/tuiroom-engine-electron';
 import { roomService } from '../../services/index';
-import { isMobile } from '../../utils/environment';
 const invitationInfo = ref({
   userId: '',
   userName: '',
@@ -121,10 +120,11 @@ const onInvitationTimeout = () => {
   setInvitationDisplay(false);
 };
 
+const onInvitationHandledByOtherDevice = () => {
+  setInvitationDisplay(false);
+};
+
 const setInvitationDisplay = (options: boolean) => {
-  if (isMobile) {
-    return;
-  }
   showInvitation.value = options;
 };
 
@@ -137,6 +137,10 @@ onMounted(() => {
     TUIConferenceInvitationManagerEvents.onInvitationTimeout,
     onInvitationTimeout
   );
+  roomService.conferenceInvitationManager.on(
+    TUIConferenceInvitationManagerEvents.onInvitationHandledByOtherDevice,
+    onInvitationHandledByOtherDevice
+  );
 });
 onUnmounted(() => {
   roomService.conferenceInvitationManager.off(
@@ -147,6 +151,10 @@ onUnmounted(() => {
     TUIConferenceInvitationManagerEvents.onInvitationTimeout,
     onInvitationTimeout
   );
+  roomService.conferenceInvitationManager.off(
+    TUIConferenceInvitationManagerEvents.onInvitationHandledByOtherDevice,
+    onInvitationHandledByOtherDevice
+  );
 });
 </script>
 <style scoped lang="scss">
@@ -156,6 +164,7 @@ onUnmounted(() => {
   right: 20px;
   padding: 20px 30px 10px 20px;
   background-color: var(--white-color);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 15px;
 
   .invitation-notification-inviter {
@@ -224,6 +233,8 @@ onUnmounted(() => {
   }
 
   .icon {
+    display: flex;
+    align-items: center;
     width: 16px;
     height: 16px;
   }

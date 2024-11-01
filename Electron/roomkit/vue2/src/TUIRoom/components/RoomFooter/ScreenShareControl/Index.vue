@@ -24,7 +24,8 @@
           t(
             'Others will no longer see your screen after you stop sharing. Are you sure you want to stop?'
           )
-        }}</span>
+        }}
+      </span>
       <template #footer>
         <span>
           <tui-button size="default" @click="stopScreenShare">{{
@@ -35,7 +36,8 @@
             type="primary"
             size="default"
             @click="showStopShareRegion = false"
-            >{{ t('Cancel') }}</tui-button>
+            >{{ t('Cancel') }}
+          </tui-button>
         </span>
       </template>
     </Dialog>
@@ -81,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, computed, onUnmounted, watch } from 'vue';
+import { ref, Ref, computed, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../../locales';
 import IconButton from '../../common/base/IconButton.vue';
@@ -149,9 +151,7 @@ async function toggleScreenShare() {
   if (hasOtherScreenShare.value) {
     TUIMessage({
       type: 'warning',
-      message: t(
-        'Another user is currently sharing the screen, screen sharing is not possible.'
-      ),
+      message: t('Another user is sharing the screen.'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;

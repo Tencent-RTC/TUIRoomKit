@@ -13,6 +13,7 @@
       width="600px"
       :modal="true"
       :append-to-room-container="true"
+      :close-on-click-modal="false"
       @close="closeSettingPanel"
     >
       <div id="stream-preview" class="stream-preview">
@@ -94,12 +95,12 @@ const openSettingPanel = async () => {
   await roomService.roomEngine.instance?.startCameraDeviceTest({
     view: 'stream-preview',
   });
-  await applyVirtualBackground(appliedBackground.value);
   isLoading.value = false;
 };
 
 const closeSettingPanel = async () => {
   isDialogVisible.value = false;
+  await applyVirtualBackground(appliedBackground.value);
   roomService.roomEngine.instance?.stopCameraDeviceTest();
   selectedBackground.value = appliedBackground.value;
 };
