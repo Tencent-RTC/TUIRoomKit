@@ -1,4 +1,3 @@
-
 /**
  * Get the value of the specified key from window.location.href
  * @param {*} key key to get
@@ -44,4 +43,19 @@ export function getTheme() {
   }
 
   return storedTheme;
+}
+
+export function setItemInSessionStorage(key: string, value: object) {
+  sessionStorage.setItem(key, JSON.stringify(value));
+}
+
+
+export function generateTempUserID(userId: string) {
+  const timestamp = String(Date.now()).slice(-4);
+  return `${userId}_${timestamp}`;
+}
+
+export function isValidTestUserId(userId: string) {
+  const regex = /_([0-9]{4})$/;
+  return regex.test(userId);
 }

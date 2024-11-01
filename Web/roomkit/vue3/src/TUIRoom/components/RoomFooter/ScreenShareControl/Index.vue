@@ -148,9 +148,7 @@ async function toggleScreenShare() {
   if (hasOtherScreenShare.value) {
     TUIMessage({
       type: 'warning',
-      message: t(
-        'Another user is currently sharing the screen, screen sharing is not possible.'
-      ),
+      message: t('Another user is sharing the screen.'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
@@ -203,22 +201,26 @@ async function startScreenShare() {
     switch (error.name) {
       case 'NotReadableError':
         // Remind users to ensure that the system allows the current browser to access screen content
-        message =
-          'The system prohibits the current browser from obtaining screen content';
+        message = t(
+          'The system prohibits the current browser from accessing the screen content, please enable the screen sharing privilege.'
+        );
         break;
       case 'NotAllowedError':
         if (error.message.includes('Permission denied by system')) {
           // Remind users to ensure that the system allows the current browser to access screen content
-          message =
-            'The system prohibits the current browser from obtaining screen content';
+          message = t(
+            'The system prohibits the current browser from accessing the screen content, please enable the screen sharing privilege.'
+          );
         } else {
           // User rejects/cancels screen sharing
-          message = 'User rejects/cancels screen sharing';
+          message = t('User canceled screen sharing');
         }
         break;
       default:
         // An unknown error was encountered while initializing the screen sharing stream. The user is reminded to try again.
-        message = 'Screen sharing encountered an unknown error';
+        message = t(
+          'An unknown error occurred while screen sharing, please try again.'
+        );
         break;
     }
     TUIMessage({

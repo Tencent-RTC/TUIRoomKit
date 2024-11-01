@@ -15,6 +15,8 @@
           v-if="enlargeStream"
           :key="`${enlargeStream.userId}_${enlargeStream.streamType}`"
           :streamInfo="enlargeStream"
+          :support-touch-scale="isEnlargeScreenStream"
+          @scaleChanged="handleScaleChanged"
         />
       </div>
       <div
@@ -124,6 +126,15 @@ const enlargeDomId = computed(() =>
     ? `${enlargeStream.value.userId}_${enlargeStream.value.streamType}`
     : ''
 );
+const isEnlargeScreenStream = computed(
+  () => enlargeStream.value?.streamType === TUIVideoStreamType.kScreenStream
+);
+
+let enlargeScale = 1;
+function handleScaleChanged(event: { scale: number }) {
+  enlargeScale = event.scale;
+}
+
 const startX = ref();
 const startY = ref();
 
@@ -286,6 +297,9 @@ function handleTouchStart(event: any) {
 }
 
 function handleTouchEnd(event: any) {
+  if (enlargeScale > 1) {
+    return;
+  }
   const moveDirectionX = event?.changedTouches[0].pageX - startX.value;
   const moveDirectionY = event?.changedTouches[0].pageY - startY.value;
   if (

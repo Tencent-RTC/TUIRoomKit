@@ -17,6 +17,7 @@
       />
       <template v-else>
         <StreamPlay
+          v-touch-scale="props.supportTouchScale"
           :streamInfo="streamInfo"
           :isEnlarge="isEnlarge"
           :isNeedPlayStream="isNeedPlayStream"
@@ -46,6 +47,7 @@ import LocalScreenView from './LocalScreenView/index.vue';
 import { StreamInfo } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
 import vDblTouch from '../../../directives/vDblTouch';
+import vTouchScale from '../../../directives/vTouchScale';
 
 interface Props {
   streamInfo: StreamInfo;
@@ -53,6 +55,7 @@ interface Props {
   aspectRatio?: string;
   isNeedPlayStream?: boolean;
   observerViewInVisible?: boolean;
+  supportTouchScale?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

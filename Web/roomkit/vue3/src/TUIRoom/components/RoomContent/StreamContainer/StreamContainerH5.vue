@@ -11,6 +11,7 @@
             :streamInfo="enlargeStream"
             :isEnlarge="true"
             :isNeedPlayStream="showPageIndexList.includes(0)"
+            :support-touch-scale="isEnlargeScreenStream"
           />
           <StreamRegion
             class="top-right-stream"
@@ -125,6 +126,10 @@ const enlargeStream = computed(() => {
   }
   return localStream.value;
 });
+
+const isEnlargeScreenStream = computed(
+  () => enlargeStream.value.streamType === TUIVideoStreamType.kScreenStream
+);
 
 const horizontalCount = ref(1);
 const verticalCount = ref(1);

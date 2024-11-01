@@ -1,4 +1,4 @@
-import { computed, Ref, ref } from 'vue';
+import { computed, Ref, ref, Reactive, reactive } from 'vue';
 import { useI18n } from '../../../locales';
 import { UserInfo, useRoomStore } from '../../../stores/room';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
@@ -45,20 +45,23 @@ export default function useMemberControl(props?: any) {
   const isShowInput: Ref<boolean> = ref(false);
   const editorInputEle = ref();
   const editorInputEleContainer = ref();
-  const tempUserName = ref(props.userInfo.nameCard || props.userInfo.userName);
-  const dialogData: Ref<{
+  const tempUserName = ref('');
+  const dialogData: Reactive<{
     title: string;
     content: string;
     confirmText: string;
     actionType: ActionType;
     showInput: boolean;
-  }> = ref({
+    isConfirmButtonDisable: boolean;
+  }> = reactive({
     title: '',
     content: '',
     confirmText: '',
     actionType: '' as ActionType,
     showInput: false,
+    isConfirmButtonDisable: false,
   });
+
   const kickOffDialogContent = computed(() =>
     t('whether to kick sb off the room', {
       name: roomService.getDisplayName(props.userInfo),
@@ -424,7 +427,7 @@ export default function useMemberControl(props?: any) {
     await roomEngine.instance?.kickRemoteUserOutOfRoom({
       userId: userInfo.userId,
     });
-    roomStore.removeRemoteUser(userInfo.userId);
+    roomStore.removeUserInfo(userInfo.userId);
   }
 
   /**
@@ -490,17 +493,18 @@ export default function useMemberControl(props?: any) {
     switch (action) {
       case 'kickUser':
         isDialogVisible.value = true;
-        dialogData.value = {
+        Object.assign(dialogData, {
           title: t('Note'),
           content: kickOffDialogContent.value,
           confirmText: t('Confirm'),
           actionType: action,
           showInput: false,
-        };
+          isConfirmButtonDisable: false,
+        });
         break;
       case 'transferOwner':
         isDialogVisible.value = true;
-        dialogData.value = {
+        Object.assign(dialogData, {
           title: transferOwnerTitle.value,
           content: t(
             'After transfer the room owner, you will become a general user'
@@ -508,22 +512,25 @@ export default function useMemberControl(props?: any) {
           confirmText: t('Confirm transfer'),
           actionType: action,
           showInput: false,
-        };
+          isConfirmButtonDisable: false,
+        });
         break;
       case 'changeUserNameCard':
+        tempUserName.value = props.userInfo.nameCard || props.userInfo.userName;
         if (isMobile) {
           isShowInput.value = true;
           document?.body?.appendChild(editorInputEleContainer.value);
         } else {
           isDialogVisible.value = true;
         }
-        dialogData.value = {
+        Object.assign(dialogData, {
           title: t('change name'),
           content: '',
           confirmText: t('Confirm'),
           actionType: action,
           showInput: true,
-        };
+          isConfirmButtonDisable: computed(() => tempUserName.value === ''),
+        });
         break;
     }
   }
@@ -564,7 +571,7 @@ export default function useMemberControl(props?: any) {
   }
 
   function handleAction(userInfo: UserInfo) {
-    switch (dialogData.value.actionType) {
+    switch (dialogData.actionType) {
       case 'kickUser':
         kickOffUser(userInfo);
         break;
