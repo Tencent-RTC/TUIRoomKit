@@ -76,7 +76,12 @@ const swiperStyle = computed(() => {
   return { transform: `translateX(${translateX.value}px)` };
 });
 
+let isInOnceTouch = false;
 function handleTouchStart(event: TouchEvent) {
+  if (event.touches.length > 1 || isInOnceTouch) {
+    return;
+  }
+  isInOnceTouch = true;
   touchData.x = event.changedTouches[0].pageX;
   touchData.y = event.changedTouches[0].pageY;
 }
@@ -84,12 +89,22 @@ function handleTouchStart(event: TouchEvent) {
 const handleTouchMoveThrottle = throttle(handleTouchMove, 200);
 
 function handleTouchMove(event: TouchEvent) {
+  if (event.touches.length > 1 || !isInOnceTouch) {
+    isInOnceTouch = false;
+    translateX.value =
+      0 - swiperRef.value.offsetWidth * activeSwiperIndex.value;
+    return;
+  }
   const offsetX = event.changedTouches[0].pageX - touchData.x;
   translateX.value =
     0 - swiperRef.value.offsetWidth * activeSwiperIndex.value + offsetX;
 }
 
 function handleTouchEnd(event: TouchEvent) {
+  if (!isInOnceTouch) {
+    return;
+  }
+  isInOnceTouch = false;
   const offsetX = event.changedTouches[0].pageX - touchData.x;
   if (
     Math.abs(event.changedTouches[0].pageX - touchData.x) >

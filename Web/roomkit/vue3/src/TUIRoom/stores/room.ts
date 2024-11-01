@@ -530,6 +530,9 @@ export const useRoomStore = defineStore('room', {
     updateVideoQuality(quality: TUIVideoQuality) {
       this.localVideoQuality = quality;
     },
+    setLocalUser(obj: Record<string, any>) {
+      Object.assign(this.localUser, obj);
+    },
     setDeviceList(
       type: TUIMediaDeviceType,
       deviceList: { deviceId: string; deviceName: string }[]

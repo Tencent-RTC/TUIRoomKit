@@ -123,8 +123,9 @@ async function handleEqualPointsLayout() {
   if (number <= 0 || !streamListContainerRef.value) {
     return;
   }
-  const containerWidth = streamListContainerRef.value?.offsetWidth;
-  const containerHeight = streamListContainerRef.value?.offsetHeight;
+  const containerRect = streamListContainerRef.value.getBoundingClientRect();
+  const containerWidth = Math.floor(containerRect.width);
+  const containerHeight = Math.floor(containerRect.height);
   // The actual width and height of the container is offsetWidth/offsetHeight minus the size of padding
   const horizontalStreamNumber = props.horizontalCount;
   const verticalStreamNumber = props.verticalCount;
@@ -157,13 +158,39 @@ async function handleEqualPointsLayout() {
   streamListStyle.value.height = `${verticalStreamNumber * (height + singleStreamMargin)}px`;
 }
 
+function getContentSize(element: HTMLElement) {
+  const computedStyle = getComputedStyle(element);
+
+  const paddingTop = Number(computedStyle.paddingTop.replace('px', ''));
+  const paddingBottom = Number(computedStyle.paddingBottom.replace('px', ''));
+  const borderTop = Number(computedStyle.borderTopWidth.replace('px', ''));
+  const borderBottom = Number(
+    computedStyle.borderBottomWidth.replace('px', '')
+  );
+
+  const paddingLeft = Number(computedStyle.paddingLeft.replace('px', ''));
+  const paddingRight = Number(computedStyle.paddingRight.replace('px', ''));
+  const borderLeft = Number(computedStyle.borderLeftWidth.replace('px', ''));
+  const borderRight = Number(computedStyle.borderRightWidth.replace('px', ''));
+
+  const contentWidth =
+    element.offsetWidth - paddingLeft - paddingRight - borderLeft - borderRight;
+  const contentHeight =
+    element.offsetHeight -
+    paddingTop -
+    paddingBottom -
+    borderTop -
+    borderBottom;
+
+  return { width: contentWidth, height: contentHeight };
+}
+
 // Handles an unlimited number of streams horizontally
 function handleHorizontalInfinityLayout() {
   streamListStyle.value = {};
-  const containerHeight = streamListRef.value!.offsetHeight;
-  const contentHeight = containerHeight;
-  const contentWidth = (containerHeight * 16) / 9;
 
+  const contentHeight = getContentSize(streamListContainerRef.value).height;
+  const contentWidth = (contentHeight * 16) / 9;
   streamStyle.value.width = `${contentWidth}px`;
   streamStyle.value.height = `${contentHeight}px`;
 }
@@ -171,10 +198,9 @@ function handleHorizontalInfinityLayout() {
 // Handles an infinite number of streams in the vertical direction
 function handleVerticalInfinityLayout() {
   streamListStyle.value = {};
-  const containerWidth = streamListRef.value!.offsetWidth;
-  const contentWidth = containerWidth;
-  const contentHeight = (containerWidth * 9) / 16;
 
+  const contentWidth = getContentSize(streamListContainerRef.value).width;
+  const contentHeight = (contentWidth * 9) / 16;
   streamStyle.value.width = `${contentWidth}px`;
   streamStyle.value.height = `${contentHeight}px`;
 }
