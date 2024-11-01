@@ -17,7 +17,7 @@
       @confirm="contactsConfirm"
     />
     <Dialog
-      v-model="showRoomInvite"
+      v-model="isShowRoomShareForm"
       :title="
         t('sb invites you to join the conference', { name: userName || userId })
       "
@@ -30,7 +30,7 @@
     >
       <div class="invite-member">
         <div
-          v-for="item in conferenceInviteList"
+          v-for="item in inviteInfoList"
           :key="item.title"
           v-show="item.isVisible"
         >
@@ -77,10 +77,10 @@ const {
   contactsConfirm,
   contacts,
   remoteEnteredUserList,
-  showRoomInvite,
+  isShowRoomShareForm,
   userId,
   userName,
-  conferenceInviteList,
+  inviteInfoList,
   onCopy,
   copyRoomIdAndRoomLink,
 } = useRoomInviteControl();

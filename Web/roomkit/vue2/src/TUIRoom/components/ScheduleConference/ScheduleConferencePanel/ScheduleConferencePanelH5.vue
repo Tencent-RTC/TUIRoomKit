@@ -133,6 +133,27 @@
         </div>
         <div v-if="!isEditMode" class="form-items-container">
           <div class="form-item">
+            <span class="form-label">{{ t('Encryption') }}</span>
+            <div class="form-value flex-end">
+              <TuiSwitch theme="white" v-model="isShowPasswordInput" />
+            </div>
+          </div>
+          <div v-if="isShowPasswordInput" class="form-item">
+            <span class="form-label">{{ t('Room Password') }}</span>
+            <TuiInput
+              :model-value="form.password"
+              @input="form.password = $event"
+              theme="white"
+              class="form-value"
+              :placeholder="t('Enter 6-digit password')"
+              maxlength="6"
+              :border="false"
+              align="right"
+            />
+          </div>
+        </div>
+        <div v-if="!isEditMode" class="form-items-container">
+          <div class="form-item">
             <span class="form-label">{{ t('Disable all audios') }}</span>
             <div class="form-value flex-end">
               <TuiSwitch
@@ -218,6 +239,7 @@ import CloseIcon from '../../common/icons/CloseIcon.vue';
 import InvitePanel from '../InvitePanel.vue';
 import ActionSheep from '../../common/base/ActionSheep.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
+import { PASSWORD_MAX_LENGTH_LIMIT } from '../../../constants/room';
 
 import { EventType, roomService } from '../../../services';
 import {
@@ -227,6 +249,7 @@ import {
   TUIConferenceStatus,
 } from '@tencentcloud/tuiroom-engine-js';
 import { deepClone, calculateByteLength } from '../../../utils/utils';
+import { invalidDigitalPasswordRegex } from '../../../utils/common';
 import { isWeChat } from '../../../utils/environment';
 import {
   getDateAndTime,
@@ -247,6 +270,7 @@ const emit = defineEmits(['input']);
 const isDialogVisible = ref(false);
 const contactsVisible = ref(false);
 const showRoomInvite = ref(false);
+const isShowPasswordInput = ref(false);
 const needCheck = ref(false);
 const isEditMode = computed(() => !!props.conferenceInfo);
 const roomId = ref('');
@@ -268,6 +292,7 @@ const defaultFormData = ref({
   isMicrophoneDisableForAllUser: false,
   isScreenShareDisableForAllUser: false,
   isCameraDisableForAllUser: false,
+  password: '',
 });
 const form = ref(deepClone(defaultFormData.value));
 
@@ -300,6 +325,7 @@ const updateDialogVisible = (val: boolean) => {
   needCheck.value = val;
   emit('input', val);
   if (!val) {
+    isShowPasswordInput.value = false;
     resetData();
   }
 };
@@ -325,6 +351,7 @@ const editParams = computed(() => {
     isMicrophoneDisableForAllUser,
     isScreenShareDisableForAllUser,
     isCameraDisableForAllUser,
+    password,
   } = basicRoomInfo;
   return {
     roomName,
@@ -340,6 +367,7 @@ const editParams = computed(() => {
     isMicrophoneDisableForAllUser,
     isScreenShareDisableForAllUser,
     isCameraDisableForAllUser,
+    password,
   };
 });
 
@@ -362,6 +390,7 @@ const scheduleParams = computed(() => {
     isMicrophoneDisableForAllUser: form.value.isMicrophoneDisableForAllUser,
     isScreenShareDisableForAllUser: form.value.isScreenShareDisableForAllUser,
     isCameraDisableForAllUser: form.value.isCameraDisableForAllUser,
+    password: form.value.password,
   };
 });
 
@@ -415,6 +444,22 @@ const roomStatusCheck = () => {
   return isNotStarted;
 };
 
+const roomPasswordCheck = () => {
+  if (!isShowPasswordInput.value) {
+    form.value.password = '';
+    return true;
+  }
+  const { password } = form.value;
+  if (calculateByteLength(password) !== PASSWORD_MAX_LENGTH_LIMIT) {
+    roomService.emit(EventType.ROOM_NOTICE_MESSAGE, {
+      type: 'warning',
+      message: t('Your room password format is incorrect, please check it'),
+    });
+    return false;
+  }
+  return true;
+};
+
 watch(
   () => form.value.startTime,
   async (newValue, oldValue) => {
@@ -445,6 +490,25 @@ watch(
     const { date, laterTime } = getDateAndTime(currentDate);
     form.value.startDate = date;
     form.value.startTime = laterTime;
+  }
+);
+
+watch(
+  () => isShowPasswordInput.value,
+  val => {
+    if (val) {
+      form.value.password = `${Math.floor(Math.random() * 900000) + 100000}`;
+    }
+  }
+);
+
+watch(
+  () => form.value.password,
+  async val => {
+    if (val && invalidDigitalPasswordRegex.test(val)) {
+      await nextTick();
+      form.value.password = val.replace(invalidDigitalPasswordRegex, '');
+    }
   }
 );
 
@@ -490,6 +554,7 @@ const contactsConfirm = (contacts: TUIUserInfo[]) => {
 const scheduleConference = async () => {
   if (!timeCheck()) return;
   if (!roomNameCheck()) return;
+  if (!roomPasswordCheck()) return;
   roomId.value = String(Math.ceil(Math.random() * 1000000));
   try {
     await roomService.scheduleConferenceManager.scheduleConference({

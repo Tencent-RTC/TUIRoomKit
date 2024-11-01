@@ -23,17 +23,21 @@
     <manage-member-control
       v-tap="() => handleControlClick('manageMemberControl')"
     />
-    <more-control v-tap="() => handleControlClick('moreControl')" />
+    <more-control
+      v-tap="() => handleControlClick('moreControl')"
+      @show-overlay="handleShowOverlay"
+    />
   </div>
 </template>
 <script setup lang="ts">
+import { defineEmits } from 'vue';
 import AudioControl from '../AudioControl.vue';
 import VideoControl from '../VideoControl.vue';
 import ManageMemberControl from '../ManageMemberControl.vue';
 import ChatControl from '../ChatControl.vue';
 import MasterApplyControl from '../ManageStageControl.vue';
 import MemberApplyControl from '../ApplyControl/MemberApplyControl.vue';
-import MoreControl from '../MoreControl';
+import MoreControl from '../MoreControl/index';
 import bus from '../../../hooks/useMitt';
 import '../../../directives/vTap';
 
@@ -41,8 +45,14 @@ import useRoomFooter from './useRoomFooterHooks';
 
 const { roomStore, isMaster, isAdmin, isAudience } = useRoomFooter();
 
+const emit = defineEmits(['show-overlay']);
+
 function handleControlClick(name: string) {
   bus.emit('experience-communication', name);
+}
+
+function handleShowOverlay(data: { name: string; visible: boolean }) {
+  emit('show-overlay', data);
 }
 </script>
 

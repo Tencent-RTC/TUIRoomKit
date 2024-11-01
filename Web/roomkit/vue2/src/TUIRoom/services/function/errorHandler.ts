@@ -30,7 +30,7 @@ export class ErrorHandler {
     if (error.code === TUIErrorCode.ERR_WRONG_PASSWORD) {
       this.service.emit(EventType.ROOM_NOTICE_MESSAGE, {
         type: 'error',
-        message: this.service.t('Wrong password, please re-enter'),
+        message: this.service.t('Wrong password'),
       });
       return;
     }
