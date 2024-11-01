@@ -236,10 +236,10 @@ onUnmounted(() => {
 }
 
 .tui-theme-black.pre-conference-container {
-  background: var(--background-color-1);
+  --background: var(--background-color-1);
 }
 
 .tui-theme-white.pre-conference-container {
-  background: var(--background-color-1);
+  --background: var(--background-color-1);
 }
 </style>

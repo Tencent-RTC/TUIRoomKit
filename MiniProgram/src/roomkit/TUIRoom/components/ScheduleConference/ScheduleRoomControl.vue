@@ -674,6 +674,9 @@ onMounted(async () => {
       .schedule-content-time {
         min-width: 94px;
         max-width: 94px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
         .segregation-level {
           display: inline-block;

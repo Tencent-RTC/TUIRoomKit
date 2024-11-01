@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { useRoomStore } from '../../stores/room';
 import TUIMessage from '../common/base/Message/index';
@@ -25,14 +25,14 @@ export default function useRoomInvite() {
     isSchemeLinkVisible,
     userId,
     userName,
+    sidebarName,
   } = storeToRefs(basicStore);
 
   const { origin, pathname } = location || {};
-  const isShowLink = ref(true);
 
   const showContacts = ref(false);
 
-  const showRoomInvite = ref(false);
+  const isShowRoomShareForm = ref(false);
 
   const inviteLink = computed(() => {
     if (shareLink.value) {
@@ -59,7 +59,7 @@ export default function useRoomInvite() {
 
   const invitationFeatureDetails = ref([
     {
-      icon: InviteIcon,
+      icon: shallowRef(InviteIcon),
       text: 'addMember',
       function: async () => {
         contacts.value =
@@ -68,10 +68,10 @@ export default function useRoomInvite() {
       },
     },
     {
-      icon: ShareIcon,
+      icon: shallowRef(ShareIcon),
       text: 'shareRoom',
       function: () => {
-        showRoomInvite.value = true;
+        isShowRoomShareForm.value = true;
       },
     },
   ]);
@@ -93,38 +93,7 @@ export default function useRoomInvite() {
     }
   }
 
-  const inviteContentList = computed(() => [
-    {
-      id: 1,
-      mobileTitle: 'Room ID',
-      pcTitle: 'Invite by room number',
-      content: roomId.value,
-      copyLink: roomId.value,
-      visible: isShowLink.value,
-    },
-    {
-      id: 2,
-      mobileTitle: 'Room Link',
-      pcTitle: 'Invite via room link',
-      content: inviteLink.value,
-      copyLink: inviteLink.value,
-      visible: isRoomLinkVisible.value,
-    },
-    {
-      id: 3,
-      mobileTitle: 'scheme',
-      pcTitle: 'Invite via client scheme',
-      content: schemeLink.value,
-      copyLink: schemeLink.value,
-      visible: isSchemeLinkVisible.value,
-    },
-  ]);
-
-  const visibleInviteContentList = computed(() =>
-    inviteContentList.value.filter(item => item.visible)
-  );
-
-  const conferenceInviteList = computed(() => [
+  const inviteInfoList = computed(() => [
     {
       title: 'Room Name',
       content: roomName.value,
@@ -155,7 +124,17 @@ export default function useRoomInvite() {
       isShowCopyIcon: true,
       isVisible: isRoomLinkVisible.value && roomLinkConfig.visible,
     },
+    {
+      title: 'Scheme',
+      content: schemeLink.value,
+      isShowCopyIcon: true,
+      isVisible: isSchemeLinkVisible.value,
+    },
   ]);
+
+  const displayedInviteInfoList = computed(() =>
+    inviteInfoList.value.filter(item => item.isVisible)
+  );
 
   function getSeatModeDisplay(isSeatEnabled: boolean) {
     return isSeatEnabled ? 'On-stage Speaking Room' : 'Free Speech Room';
@@ -175,9 +154,12 @@ export default function useRoomInvite() {
         `${t('Room Link')}: ${getUrlWithRoomId(roomId.value)}`
       );
     }
+    if (isSchemeLinkVisible.value) {
+      invitationList.push(`${t('Scheme')}: ${schemeLink.value}`);
+    }
     const invitation = invitationList.join('\n');
     onCopy(invitation);
-    showRoomInvite.value = false;
+    isShowRoomShareForm.value = false;
   }
 
   const contactsConfirm = async (contacts: TUIUserInfo[]) => {
@@ -201,16 +183,17 @@ export default function useRoomInvite() {
     schemeLink,
     inviteBarTitle,
     onCopy,
-    visibleInviteContentList,
+    displayedInviteInfoList,
     invitationFeatureDetails,
     showContacts,
     contactsConfirm,
     contacts,
     remoteEnteredUserList,
-    showRoomInvite,
+    isShowRoomShareForm,
     userId,
     userName,
-    conferenceInviteList,
+    inviteInfoList,
     copyRoomIdAndRoomLink,
+    sidebarName,
   };
 }

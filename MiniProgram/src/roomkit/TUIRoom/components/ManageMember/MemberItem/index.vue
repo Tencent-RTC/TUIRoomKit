@@ -4,9 +4,12 @@
     @tap="handleOpenMemberControl"
     class="member-item-container"
   >
-    <member-info :show-state-icon="true" :user-info="props.userInfo" />
+    <member-info
+      :show-state-icon="props.userInfo.isInRoom"
+      :user-info="props.userInfo"
+    />
     <member-control
-      v-show="showMemberControl"
+      v-show="showMemberControl && props.userInfo.isInRoom"
       :show-member-control="showMemberControl"
       :user-info="props.userInfo"
       @on-close-control="handleDocumentTouchend"
@@ -15,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch, defineProps } from 'vue';
 import MemberInfo from '../MemberItemCommon/MemberInfo.vue';
 import MemberControl from '../MemberControl/index.vue';
 import { UserInfo } from '../../../stores/room';

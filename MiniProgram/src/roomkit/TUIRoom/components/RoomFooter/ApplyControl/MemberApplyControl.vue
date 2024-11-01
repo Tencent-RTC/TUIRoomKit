@@ -130,13 +130,13 @@ async function toggleApplySpeech() {
   }
 }
 
-const inviteDialogInfo = {
+const inviteDialogInfo = computed(() => ({
   content: t('You can turn on the microphone and camera once you are on stage'),
   confirmButtonText: t('Agree to the stage'),
   cancelButtonText: t('Reject'),
   handleConfirm: () => handleInvite(true),
   handleCancel: () => handleInvite(false),
-};
+}));
 
 const leaveSeatDialogInfo = computed(() => ({
   content:
@@ -153,7 +153,7 @@ const leaveSeatDialogInfo = computed(() => ({
 
 const currentDialogInfo = computed(() =>
   currentDialogType.value === 'inviteDialog'
-    ? inviteDialogInfo
+    ? inviteDialogInfo.value
     : leaveSeatDialogInfo.value
 );
 
@@ -243,7 +243,6 @@ async function leaveSeat() {
   if (roomStore.isMicrophoneDisableForAllUser && isGeneralUser.value) {
     roomStore.setCanControlSelfAudio(false);
   }
-  basicStore.setIsOpenMic(false);
 }
 
 function hideApplyAttention() {

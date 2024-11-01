@@ -15,20 +15,23 @@
           @click="handleControlClick('chatControl')"
         />
         <contact-control @click="handleControlClick('contactControl')" />
-        <invite-control @click="handleControlClick('inviteControl')" />
+        <invite-control
+          @show-overlay="handleShowOverlay"
+          @click="handleControlClick('inviteControl')"
+        />
       </div>
       <div @tap="handleCancelControl" class="close">{{ t('Cancel') }}</div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted, defineEmits } from 'vue';
 import IconButton from '../../common/base/IconButton.vue';
 import userMoreControl from './useMoreControlHooks';
 import ChatControl from '../ChatControl.vue';
 import InviteControl from '../InviteControl.vue';
 import ContactControl from '../ContactControl.vue';
 import { useRoomStore } from '../../../stores/room';
-import { ref, onMounted, onUnmounted } from 'vue';
 import ExtensionIcon from '../../../assets/icons/ExtensionIcon.svg';
 import bus from '../../../hooks/useMitt';
 import { roomService } from '../../../services';
@@ -39,7 +42,7 @@ const moreContentRef = ref();
 
 const { t, sidebarName } = userMoreControl();
 const roomStore = useRoomStore();
-
+const emit = defineEmits(['show-overlay']);
 function showMore() {
   showMoreContent.value = true;
 }
@@ -49,6 +52,11 @@ function handleCancelControl() {
 }
 function handleControlClick(name: string) {
   bus.emit('experience-communication', name);
+}
+
+function handleShowOverlay(data: { name: string; visible: boolean }) {
+  showMoreContent.value = false;
+  emit('show-overlay', data);
 }
 
 function handleDocumentClick(event: MouseEvent) {
