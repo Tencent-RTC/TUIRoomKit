@@ -50,6 +50,8 @@ const logPrefix = '[RoomService]';
 export const roomEngine = useGetRoomEngine();
 export class RoomService implements IRoomService {
   static instance?: RoomService;
+  public roomEngine = roomEngine;
+  public t = t;
   private emitter = mitt();
   public componentManager = new ComponentManager(this);
   public configManager = new ConfigManager(this);
@@ -68,9 +70,6 @@ export class RoomService implements IRoomService {
   public errorHandler: ErrorHandler = new ErrorHandler(this);
   public chatManager: ChatManager = new ChatManager(this);
   public aiTask: AITask = new AITask(this);
-
-  public roomEngine = roomEngine;
-  public t = t;
 
   get basicStore() {
     return useBasicStore();

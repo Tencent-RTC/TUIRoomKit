@@ -4,7 +4,11 @@
   * Use <network-info /> in template
 -->
 <template>
-  <div v-click-outside="handleClickOutSide" class="network-info-container">
+  <div
+    v-click-outside="handleClickOutSide"
+    class="network-info-container"
+    v-if="isShowNetworkContainer"
+  >
     <icon-button
       :layout="IconButtonLayout.HORIZONTAL"
       :icon="state.networkIcon"
@@ -66,6 +70,7 @@ const basicStore = useBasicStore();
 const { networkInfo } = storeToRefs(basicStore);
 const networkBoard = ref();
 const showNetworkInfo: Ref<boolean> = ref(false);
+const isShowNetworkContainer: Ref<boolean> = ref(false);
 
 type TitleType = 'success' | 'warning' | 'danger' | 'info' | undefined;
 
@@ -113,6 +118,7 @@ const qualityMap: {
 watchEffect(() => {
   const quality = qualityMap[networkInfo.value.quality];
   if (quality) {
+    isShowNetworkContainer.value = true;
     state.title = quality.title;
     state.titleType = quality.titleType;
     state.networkIcon = quality.icon;

@@ -255,11 +255,8 @@ import {
   TUISeatMode,
   TUIConferenceStatus,
 } from '@tencentcloud/tuiroom-engine-electron';
-import {
-  deepClone,
-  calculateByteLength,
-  isDigitsOnly,
-} from '../../../utils/utils';
+import { deepClone, calculateByteLength } from '../../../utils/utils';
+import { invalidDigitalPasswordRegex } from '../../../utils/common';
 import {
   getDateAndTime,
   convertToTimestamp,
@@ -300,7 +297,7 @@ const defaultFormData = ref({
   isMicrophoneDisableForAllUser: false,
   isScreenShareDisableForAllUser: false,
   isCameraDisableForAllUser: false,
-  password: `${Math.floor(Math.random() * 900000) + 100000}`,
+  password: '',
 });
 const form = ref(deepClone(defaultFormData.value));
 
@@ -411,12 +408,7 @@ const roomPasswordCheck = () => {
     return true;
   }
   const { password } = form.value;
-  if (
-    !props.visible ||
-    password === '' ||
-    !isDigitsOnly(password) ||
-    calculateByteLength(password) < PASSWORD_MAX_LENGTH_LIMIT
-  ) {
+  if (calculateByteLength(password) !== PASSWORD_MAX_LENGTH_LIMIT) {
     roomService.emit(EventType.ROOM_NOTICE_MESSAGE, {
       type: 'warning',
       message: t('Your room password format is incorrect, please check it'),
@@ -491,6 +483,25 @@ watch(
     if (!timeCheck()) {
       await nextTick();
       form.value.startDate = oldValue;
+    }
+  }
+);
+
+watch(
+  () => form.value.password,
+  async val => {
+    if (val && invalidDigitalPasswordRegex.test(val)) {
+      await nextTick();
+      form.value.password = val.replace(invalidDigitalPasswordRegex, '');
+    }
+  }
+);
+
+watch(
+  () => passwordChecked.value,
+  val => {
+    if (val) {
+      form.value.password = `${Math.floor(Math.random() * 900000) + 100000}`;
     }
   }
 );

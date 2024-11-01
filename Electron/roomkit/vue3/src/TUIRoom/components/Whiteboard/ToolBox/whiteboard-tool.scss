@@ -1,0 +1,52 @@
+.whiteboard-tool-setting {
+  position: absolute;
+  top: 5px;
+  left: 50px;
+  width: 148px;
+  padding: 8px 12px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow:
+    0 5px 20px rgba(21, 29, 52, 0.1),
+    0 0 6px rgba(21, 29, 52, 0.1);
+
+  .setting-title {
+    height: 16px;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+    color: #8f93a1;
+  }
+
+  .setting-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 6px 0;
+  }
+
+  .setting-option-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background-color: transparent;
+    border: 2px solid #fff;
+    transition: background-color 0.3s ease;
+
+    img {
+      object-fit: contain;
+    }
+  }
+
+  .button-active {
+    background: rgba(61, 126, 253, 0.1);
+    border: 2px solid #3d7efd;
+    border-color: #3d7efd;
+    border-radius: 4px;
+  }
+}

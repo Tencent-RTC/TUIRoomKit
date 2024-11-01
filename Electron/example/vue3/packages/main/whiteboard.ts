@@ -18,21 +18,16 @@ export function initWhiteboardWindow(win: BrowserWindow) {
 
 function createWhiteboardWindow() {
   whiteboardWin = new BrowserWindow({
-    transparent: false,
     width: WHITEBOARD_WINDOW_WIDTH,
     height: WHITEBOARD_WINDOW_HEIGHT,
     show: false,
-    frame: false,
-    minWidth: WHITEBOARD_WINDOW_WIDTH,
-    minHeight: WHITEBOARD_WINDOW_HEIGHT,
-    maxWidth: WHITEBOARD_WINDOW_WIDTH,
-    maxHeight: WHITEBOARD_WINDOW_HEIGHT,
     webPreferences: {
       preload: join(__dirname, '../preload/index.cjs'),
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
+  whiteboardWin.setMenuBarVisibility(false);
 }
 
 function loadWhiteboardFile() {

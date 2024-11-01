@@ -5,19 +5,12 @@
     @mouseleave="closeMemberControl"
   >
     <member-info
-      v-show="props.userCurrentStatus !== USERS_STATUS.NOT_ENTER"
       :user-info="props.userInfo"
-      :show-state-icon="!showMemberControl"
+      :show-state-icon="props.userInfo.isInRoom && !showMemberControl"
     />
     <member-control
-      v-show="
-        showMemberControl && props.userCurrentStatus !== USERS_STATUS.NOT_ENTER
-      "
+      v-show="showMemberControl && props.userInfo.isInRoom"
       :show-member-control="showMemberControl"
-      :user-info="props.userInfo"
-    />
-    <member-invite
-      v-show="props.userCurrentStatus === USERS_STATUS.NOT_ENTER"
       :user-info="props.userInfo"
     />
   </div>
@@ -27,14 +20,11 @@
 import { ref, watch, defineProps } from 'vue';
 import MemberInfo from '../MemberItemCommon/MemberInfo.vue';
 import MemberControl from '../MemberControl/index.vue';
-import MemberInvite from '../MemberInvite/MemberInvite.vue';
 import { UserInfo } from '../../../stores/room';
 import useMemberItem from './useMemberItemHooks';
-import { USERS_STATUS } from '../../../constants/room';
 
 interface Props {
   userInfo: UserInfo;
-  userCurrentStatus: USERS_STATUS;
 }
 
 const props = defineProps<Props>();

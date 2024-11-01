@@ -6,29 +6,69 @@
   >
     <div class="user-info-content" @click="handleUserControl">
       <Avatar class="avatar" :img-src="avatarUrl" />
-      <div class="name">{{ userName || userId }}</div>
+      <div class="name">{{ props.userName || props.userId }}</div>
       <svg-icon
         :class="[showUserControl ? 'up-icon' : 'down-icon']"
         :icon="ArrowStrokeSelectDownIcon"
       />
     </div>
     <div v-if="showUserControl" class="user-control-container">
+      <div v-show="props.isShowEditName">
+        <div class="user-control-item-head" @click="showEditUserNameDialog">
+          {{ t('Edit profile') }}
+        </div>
+      </div>
       <div class="user-control-item-foot" @click="$emit('log-out')">
         {{ t('Log out') }}
       </div>
     </div>
+    <Dialog
+      v-model="isUserNameEditorVisible"
+      :title="t('Edit profile')"
+      :modal="true"
+      width="480px"
+      :close-on-click-modal="true"
+      :append-to-body="true"
+    >
+      <div class="edit-content">
+        <span>{{ t('User Name') }}</span>
+        <tui-input
+          :model-value="tempUserName"
+          @input="tempUserName = $event"
+          class="edit-name-input"
+          maxlength="16"
+          :placeholder="t('Please input user name')"
+        />
+      </div>
+      <template #footer>
+        <tui-button class="button" size="default" @click="closeUserNameEditor">
+          {{ t('Cancel') }}
+        </tui-button>
+        <tui-button
+          class="button"
+          size="default"
+          type="primary"
+          @click="saveUserName(tempUserName)"
+        >
+          {{ t('Save') }}
+        </tui-button>
+      </template>
+    </Dialog>
   </div>
 </template>
 <script setup lang="ts">
+import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
+import { defineProps, defineEmits } from 'vue';
+import Dialog from '../../common/base/Dialog/index.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
+import TuiButton from '../../common/base/Button.vue';
+import TuiInput from '../../common/base/Input/index.vue';
 import ArrowStrokeSelectDownIcon from '../../common/icons/ArrowStrokeSelectDownIcon.vue';
 import useUserInfo from './useUserInfoHooks';
 import Avatar from '../../common/Avatar.vue';
-import { isInnerScene } from '../../../utils/constants';
 import { roomService } from '../../../services';
 import TUIMessage from '../../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
-import TUIRoomEngine from '@tencentcloud/tuiroom-engine-electron';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 
@@ -42,39 +82,43 @@ const roomStore = useRoomStore();
 const {
   t,
   showUserControl,
+  isUserNameEditorVisible,
   userInfoRef,
+  tempUserName,
   handleUserControl,
-  closeEditUserNameDialog,
+  showEditUserNameDialog,
+  closeUserNameEditor,
 } = useUserInfo();
 
-const props = withDefaults(
-  defineProps<{
-    userId: string;
-    userName: string;
-    avatarUrl?: string;
-  }>(),
-  {}
-);
+const props = defineProps<{
+  userId: string;
+  userName: string;
+  avatarUrl?: string;
+  isShowEditName?: boolean;
+}>();
 
-// /**
-//  * Save the new userName
-//  *
-// **/
-// async function handleSaveUserName(userName: string) {
-//   if (userName.length === 0) {
-//     TUIMessage({
-//       type: 'warning',
-//       message: t('Username length should be greater than 0'),
-//       duration: MESSAGE_DURATION.NORMAL,
-//     });
-//     return;
-//   }
-//   emits('update-user-name', userName);
-//   basicStore.setUserName(userName);
-//   TUIRoomEngine.setSelfInfo({ userName, avatarUrl: roomStore.localUser.avatarUrl || '' });
-//   roomStore.setLocalUser({ userName });
-//   closeEditUserNameDialog();
-// }
+/**
+ * Save the new userName
+ *
+ **/
+async function saveUserName(userName: string) {
+  if (userName.length === 0) {
+    TUIMessage({
+      type: 'warning',
+      message: t('Username length should be greater than 0'),
+      duration: MESSAGE_DURATION.NORMAL,
+    });
+    return;
+  }
+  await TUIRoomEngine.setSelfInfo({
+    userName,
+    avatarUrl: roomStore.localUser.avatarUrl || '',
+  });
+  basicStore.setUserName(userName);
+  roomStore.setLocalUser({ userName });
+  emits('update-user-name', userName);
+  closeUserNameEditor();
+}
 </script>
 <style lang="scss" scoped>
 .tui-theme-white .user-control-container {
@@ -172,6 +216,7 @@ const props = withDefaults(
 
   .edit-name-input {
     flex-grow: 1;
+    width: auto;
     margin-left: 16px;
   }
 }

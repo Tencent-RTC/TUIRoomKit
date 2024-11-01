@@ -45,3 +45,7 @@ export function getTheme() {
 
   return storedTheme;
 }
+
+export function setItemInSessionStorage(key: string, value: object) {
+  sessionStorage.setItem(key, JSON.stringify(value));
+}

@@ -40,7 +40,6 @@
         v-for="userInfo in filteredUserStatusList"
         :key="userInfo.userId"
         :user-info="userInfo"
-        :user-current-status="currentActiveTabName"
       />
     </div>
     <div

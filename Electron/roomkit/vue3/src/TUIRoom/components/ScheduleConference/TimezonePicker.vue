@@ -32,7 +32,6 @@ import {
 } from 'vue';
 import TuiSelect from '../common/base/Select/index.vue';
 import TuiOption from '../common/base/Option/index.vue';
-import { getLanguage } from '../../utils/common';
 import { roomService, EventType, LanguageOption } from '../../services';
 
 interface Props {
@@ -41,7 +40,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(['input']);
 const selectedTime = ref(props.modelValue);
-const currentLanguage = ref(getLanguage());
+const currentLanguage = ref(roomService.basicStore.lang);
 const timeOptions = computed(() => {
   switch (currentLanguage.value) {
     case 'zh-CN':

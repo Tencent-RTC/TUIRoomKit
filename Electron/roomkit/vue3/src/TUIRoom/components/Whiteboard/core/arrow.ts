@@ -10,6 +10,8 @@ fabric.Arrow = fabric.util.createClass(fabric.Line, {
     }
     options = options || {};
     this.callSuper('initialize', points, options);
+    this.arrowWidth = 7;
+    this.arrowHeight = 7;
   },
   _render(ctx: any) {
     this.callSuper('_render', ctx);
@@ -21,9 +23,9 @@ fabric.Arrow = fabric.util.createClass(fabric.Line, {
     ctx.rotate(angle);
     ctx.beginPath();
     // Move 5px in front of line to start the arrow so it does not have the square line end showing in front (0,0)
-    ctx.moveTo(5, 0);
-    ctx.lineTo(-5, 5);
-    ctx.lineTo(-5, -5);
+    ctx.moveTo(this.arrowWidth, 0);
+    ctx.lineTo(-this.arrowWidth, this.arrowHeight);
+    ctx.lineTo(-this.arrowWidth, -this.arrowHeight);
     ctx.closePath();
     ctx.fillStyle = this.stroke;
     ctx.fill();
@@ -33,7 +35,10 @@ fabric.Arrow = fabric.util.createClass(fabric.Line, {
 
 fabric.Arrow.fromObject = (options: any, callback: any) => {
   const { x1, x2, y1, y2 } = options;
-  return callback(new fabric.Arrow([x1, y1, x2, y2], options));
+  const arrow = new fabric.Arrow([x1, y1, x2, y2], {
+    ...options,
+  });
+  callback(arrow);
 };
 
 export default fabric.Arrow;

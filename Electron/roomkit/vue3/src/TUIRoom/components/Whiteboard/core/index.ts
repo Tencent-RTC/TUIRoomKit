@@ -18,12 +18,11 @@ import {
 } from 'fabric/fabric-impl';
 import EventEmitter from './../emitter';
 import Arrow from './arrow';
-import initHotKeys from './initHotKeys';
+// import initHotKeys from './initHotKeys';
 import initControls from './initControls';
 import initControlsRotate from './initControlsRotate';
 import eventBus from '../../../hooks/useMitt';
-import logger from '../../../utils/common/logger';
-
+import { DrawingTool, ShapeOptions, ToolSettings } from './../type';
 interface FabricEvents {
   'object:added': IEvent;
   'object:modified': IEvent;
@@ -36,39 +35,20 @@ interface FabricEvents {
   [key: string | symbol]: IEvent | any | undefined;
 }
 
-export type DrawingTool =
-  | 'rectangle'
-  | 'triangle'
-  | 'circle'
-  | 'ellipse'
-  | 'line'
-  | 'arrow'
-  | 'text'
-  | 'pencil'
-  | 'select'
-  | 'eraser'
-  | '';
-
-interface ShapeOptions {
-  stroke?: string;
-  strokeWidth?: number;
-  fill?: string;
-  opacity?: number;
-}
-
 class FabricCanvas extends EventEmitter<FabricEvents> {
   private canvas: ICanvas;
   private currentShape: IObject | null = null;
-  private drawingTool: DrawingTool = '';
+  private drawingTool: DrawingTool = DrawingTool.None;
   private isDrawing = false;
   private startX = 0;
   private startY = 0;
   private endX = 0;
   private endY = 0;
   private options: ShapeOptions = {
-    stroke: '#ff0000',
     strokeWidth: 5,
+    stroke: '#22262E',
     fill: 'transparent',
+    lineDash: [],
     opacity: 1,
   };
   private images: string[] = [];
@@ -85,7 +65,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
       includeDefaultValues: false,
       perPixelTargetFind: true,
     });
-    this.setDrawingTool('pencil');
+    this.setDrawingTool(DrawingTool.Pencil);
     // initHotKeys(this.canvas, this);
     initControls(this.canvas);
     initControlsRotate(this.canvas);
@@ -96,8 +76,10 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     return this.canvas;
   }
 
-  public clearCanvas() {
-    this.canvas.clear();
+  public renderCanvas(data: any) {
+    this.loadFromJSON(data, () => {
+      this.renderAll();
+    });
   }
 
   public setBackgroundColor(color: string): void {
@@ -200,11 +182,15 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     this.canvas.renderAll();
   }
 
+  public clearCanvas() {
+    this.canvas.clear();
+  }
+
   public reloadCanvas() {
     this.clearCanvas();
     this.canvas.renderAll();
     eventBus.emit('reload-canvas');
-    this.setDrawingTool('pencil');
+    this.setDrawingTool(DrawingTool.Pencil);
     this.currentShape = null;
   }
 
@@ -216,27 +202,22 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     this.setObjectsSelectable(false);
 
     switch (tool) {
-      case 'pencil':
+      case DrawingTool.Pencil:
         this.drawFreeDraw();
         break;
-      case 'eraser':
+      case DrawingTool.Eraser:
         this.setEvented();
         this.setEraser();
         break;
-      case 'select':
+      case DrawingTool.Select:
         this.setObjectsSelectable(true);
         this.resetActiveObject();
         this.canvas.defaultCursor = 'move';
         break;
-      case 'rectangle':
-      case 'triangle':
-      case 'circle':
-      case 'ellipse':
-      case 'line':
-      case 'arrow':
+      case DrawingTool.Arrow:
         this.canvas.defaultCursor = 'crosshair';
         break;
-      case 'text':
+      case DrawingTool.Text:
         this.canvas.defaultCursor = 'text';
         break;
       default:
@@ -245,8 +226,29 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     }
   }
 
-  public setOptions(options: ShapeOptions) {
-    this.options = { ...this.options, ...options };
+  public setOptions(toolSetting: ToolSettings) {
+    this.options = toolSetting.shapeOptions!;
+    this.setPencilBrushOptions();
+  }
+
+  public setTextOptions(): ITextOptions {
+    const options = {
+      fontSize: this.options.strokeWidth,
+      fill: this.options.stroke,
+      padding: 5,
+      selectable: false,
+      evented: false,
+    };
+    return options;
+  }
+
+  public setPencilBrushOptions(): void {
+    this.canvas.freeDrawingBrush.color = this.options.stroke;
+    this.canvas.freeDrawingBrush.width = this.options.strokeWidth;
+  }
+
+  public discardActiveObject() {
+    this.canvas.discardActiveObject();
   }
 
   public drawRect(options: IRectOptions): void {
@@ -254,6 +256,9 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
       ...this.options,
       selectable: false,
       evented: false,
+      strokeUniform: true,
+      noScaleCache: false,
+      strokeDashArray: this.options.lineDash,
       ...options,
     });
     this.canvas.add(rect);
@@ -266,6 +271,9 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
       ...this.options,
       selectable: false,
       evented: false,
+      strokeUniform: true,
+      noScaleCache: false,
+      strokeDashArray: this.options.lineDash,
       ...options,
     });
     this.canvas.add(triangle);
@@ -278,6 +286,9 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
       ...this.options,
       selectable: false,
       evented: false,
+      strokeUniform: true,
+      noScaleCache: false,
+      strokeDashArray: this.options.lineDash,
       ...options,
     });
     this.canvas.add(circle);
@@ -290,6 +301,9 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
       ...this.options,
       selectable: false,
       evented: false,
+      strokeUniform: true,
+      noScaleCache: false,
+      strokeDashArray: this.options.lineDash,
       ...options,
     });
     this.canvas.add(ellipse);
@@ -308,7 +322,10 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
       ...this.options,
       ...options,
       selectable: false,
+      strokeDashArray: this.options.lineDash,
       evented: false,
+      strokeUniform: true,
+      noScaleCache: false,
     });
     this.canvas.add(line);
     this.currentShape = line;
@@ -322,11 +339,18 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     y2: number,
     options?: ILineOptions
   ): void {
+    const customOptions = {
+      ...options,
+      arrowWidth: options?.arrowWidth ?? this.options.strokeWidth,
+      arrowHeight: options?.arrowHeight ?? this.options.strokeWidth,
+    };
     const arrow = new Arrow([x1, y1, x2, y2], {
       ...this.options,
+      ...customOptions,
       selectable: false,
       evented: false,
-      ...options,
+      strokeUniform: true,
+      noScaleCache: false,
     });
     this.canvas.add(arrow);
     this.currentShape = arrow;
@@ -335,8 +359,8 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
 
   public drawFreeDraw() {
     this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas);
-    this.canvas.freeDrawingBrush.color = '#ff0000';
-    this.canvas.freeDrawingBrush.width = 5;
+    this.canvas.freeDrawingBrush.color = this.options.stroke;
+    this.canvas.freeDrawingBrush.width = this.options.strokeWidth;
     this.canvas.freeDrawingCursor = 'default';
     this.canvas.isDrawingMode = true;
     this.currentShape = null;
@@ -345,6 +369,11 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
       if (path) {
         path.set({
           perPixelTargetFind: true,
+          objectCaching: false,
+          statefullCache: true,
+          strokeUniform: true,
+          noScaleCache: false,
+          subdivisionScale: 100,
         });
         this.canvas.renderAll();
       }
@@ -353,10 +382,8 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
 
   public drawText(text: string, options?: ITextOptions): void {
     const textObj = new fabric.IText(text, {
-      fontSize: 18,
-      fill: '#ff0000',
-      editingBorderColor: '#999999',
-      cursorColor: '#999999',
+      fontSize: this.options.strokeWidth,
+      fill: this.options.stroke,
       padding: 5,
       selectable: false,
       evented: false,
@@ -405,11 +432,11 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
         img.set({ left, top });
       }
       this.canvas.add(img);
-      eventBus.emit('insert-images');
-      this.setDrawingTool('select');
-      this.emit('push-canvas-to-stack', null);
+      this.setDrawingTool(DrawingTool.Select);
       this.setActiveObject(img);
+      this.emit('push-canvas-to-stack', null);
       this.canvas.requestRenderAll();
+      this.emit('insert-images', null);
     });
   }
 
@@ -425,9 +452,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     this.emit('current:image', index);
   }
 
-  public setEraser(options?: any): void {
-    this.canvas.freeDrawingBrush = new fabric.EraserBrush(this.canvas, options);
-    this.canvas.freeDrawingCursor = 'pointer';
+  public setEraser(): void {
     this.canvas.renderAll();
   }
 
@@ -442,7 +467,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
   }
 
   private onMouseDown(event: IEvent) {
-    if (this.drawingTool === 'eraser') {
+    if (this.drawingTool === DrawingTool.Eraser) {
       this.isDrawing = true;
       const target = this.canvas.findTarget(event.e, false);
       if (target) {
@@ -463,7 +488,10 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     this.endY = this.startY;
 
     switch (this.drawingTool) {
-      case 'rectangle':
+      case DrawingTool.Pencil:
+        this.setPencilBrushOptions();
+        break;
+      case DrawingTool.Rectangle:
         this.drawRect({
           left: x,
           top: y,
@@ -471,7 +499,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
           height: 0,
         });
         break;
-      case 'triangle':
+      case DrawingTool.Triangle:
         this.drawTriangle({
           left: x,
           top: y,
@@ -479,14 +507,14 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
           height: 0,
         });
         break;
-      case 'circle':
+      case DrawingTool.Circle:
         this.drawCircle({
           left: x,
           top: y,
           radius: 0,
         });
         break;
-      case 'ellipse':
+      case DrawingTool.Ellipse:
         this.drawEllipse({
           left: x,
           top: y,
@@ -494,14 +522,17 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
           ry: 0,
         });
         break;
-      case 'line':
+      case DrawingTool.Line:
         this.drawLine(x, y, x, y);
         break;
-      case 'arrow':
-        this.drawArrow(x, y, x, y);
+      case DrawingTool.Arrow:
+        this.drawArrow(x, y, x, y, {
+          arrowWidth: this.options.strokeWidth,
+          arrowHeight: this.options.strokeWidth,
+        });
         break;
-      case 'text':
-        this.drawText('', { left: x, top: y });
+      case DrawingTool.Text:
+        this.drawText('', { options: this.setTextOptions(), left: x, top: y });
         break;
       default:
         break;
@@ -516,7 +547,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     this.endX = x;
     this.endY = y;
 
-    if (this.drawingTool === 'eraser' && this.isDrawing) {
+    if (this.drawingTool === DrawingTool.Eraser && this.isDrawing) {
       const target = this.canvas.findTarget(event.e, false);
       if (target) {
         target.group?.removeWithUpdate(target) || this.canvas.remove(target);
@@ -535,7 +566,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
     const top = Math.min(this.startY, y);
 
     switch (this.drawingTool) {
-      case 'rectangle':
+      case DrawingTool.Rectangle:
         this.currentShape.set({
           left,
           top,
@@ -543,7 +574,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
           height,
         });
         break;
-      case 'triangle':
+      case DrawingTool.Triangle:
         this.currentShape.set({
           left,
           top,
@@ -551,7 +582,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
           height,
         });
         break;
-      case 'circle':
+      case DrawingTool.Circle:
         {
           const radius = Math.sqrt(width * width + height * height) / 2;
           (this.currentShape as Circle).set({
@@ -561,7 +592,7 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
           });
         }
         break;
-      case 'ellipse':
+      case DrawingTool.Ellipse:
         (this.currentShape as Ellipse).set({
           left,
           top,
@@ -569,13 +600,13 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
           ry: height / 2,
         });
         break;
-      case 'line':
+      case DrawingTool.Line:
         (this.currentShape as Line).set({
           x2: x,
           y2: y,
         });
         break;
-      case 'arrow':
+      case DrawingTool.Arrow:
         (this.currentShape as Arrow).set({
           x2: x,
           y2: y,
@@ -599,21 +630,28 @@ class FabricCanvas extends EventEmitter<FabricEvents> {
   }
 
   private onObjectMoving(event: IEvent) {
+    this.canvas.renderAll();
     this.isValidSelection = true;
   }
 
   private onObjectScaling(event: IEvent) {
+    this.canvas.renderAll();
     this.isValidSelection = true;
   }
 
   private onObjectRotating(event: IEvent) {
+    this.canvas.renderAll();
     this.isValidSelection = true;
   }
   private isNeedPushToStack() {
     if (
-      this.drawingTool === 'text' ||
-      (this.isValidEraser === false && this.drawingTool === 'eraser') ||
-      (this.isValidSelection === false && this.drawingTool === 'select')
+      this.drawingTool === DrawingTool.Text ||
+      (this.isValidEraser === false &&
+        this.drawingTool === DrawingTool.Eraser) ||
+      (this.isValidSelection === false &&
+        this.drawingTool === DrawingTool.Pointer) ||
+      (this.isValidSelection === false &&
+        this.drawingTool === DrawingTool.Laser)
     ) {
       return false;
     }

@@ -88,7 +88,6 @@ export class AITask {
   }
 
   private handleMount() {
-    // todo trtccloud adds custom-message event
     if (
       typeof this.service.roomEngine.instance?.getTRTCCloud === 'undefined' ||
       typeof this.service.roomEngine.instance?.getTRTCCloud()?._trtc ===

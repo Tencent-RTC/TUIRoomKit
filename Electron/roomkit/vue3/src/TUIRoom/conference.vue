@@ -24,6 +24,7 @@
     <room-sidebar />
     <room-setting />
     <AISubtitlesOverlay v-if="overlayMap.AISubtitlesOverlay.visible" />
+    <RoomInviteOverlay v-if="overlayMap.RoomInviteOverlay.visible" />
     <loading-overlay v-if="isShowLoading" />
     <password-dialog
       :visible="isShowPasswordContainer"
@@ -53,6 +54,7 @@ import RoomSetting from './components/RoomSetting/index.vue';
 import LoadingOverlay from './components/PreRoom/LoadingOverlay.vue';
 import PasswordDialog from './components/PreRoom/PasswordDialog.vue';
 import AISubtitlesOverlay from './components/AITools/AISubtitles.vue';
+import RoomInviteOverlay from './components/RoomInvite/index.vue';
 import { debounce, throttle } from './utils/utils';
 import { useBasicStore } from './stores/basic';
 import { isMobile, isWeChat } from './utils/environment';
@@ -87,9 +89,11 @@ const props = withDefaults(
 
 const overlayMap = ref<{
   AISubtitlesOverlay: { visible: boolean };
+  RoomInviteOverlay: { visible: boolean };
   [key: string]: { visible: boolean };
 }>({
   AISubtitlesOverlay: { visible: false },
+  RoomInviteOverlay: { visible: false },
 });
 
 const conferenceShow = computed(
