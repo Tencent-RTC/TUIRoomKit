@@ -33,6 +33,7 @@ const basicStore = useBasicStore();
 
 const defaultHideFeaturesButtons = [
   'InputFace',
+  'InputStickers',
   'InputVoice',
   'InputEvaluation',
   'InputQuickReplies',

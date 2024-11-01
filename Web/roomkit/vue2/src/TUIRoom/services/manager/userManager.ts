@@ -110,9 +110,11 @@ export class UserManager implements IUserManager {
     });
     leftList?.forEach(seat => {
       const { userId } = seat;
+      if (userId === this.service.roomStore.localUser.userId) {
+        this.service.basicStore.setIsOpenMic(false);
+      }
       const user = this.service.roomStore.userInfoObj[userId];
       if (user) {
-        Object.assign(user, { onSeat: false });
         this.service.roomStore.updateUserInfo({ userId, onSeat: false });
       }
       this.service.roomStore.removeStreamInfo(
