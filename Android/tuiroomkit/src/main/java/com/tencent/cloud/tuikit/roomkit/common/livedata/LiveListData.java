@@ -117,6 +117,17 @@ public class LiveListData<T> {
         }
     }
 
+    public void change(T item, String flag) {
+        int index = mList.indexOf(item);
+        if (index == -1) {
+            return;
+        }
+        mList.set(index, item);
+        for (int i = 0; i < mObservers.size(); i++) {
+            mObservers.get(i).onItemChanged(index, item, flag);
+        }
+    }
+
     public void move(T item, Comparator<T> comparator) {
         int fromPosition = mList.indexOf(item);
         if (fromPosition == -1) {

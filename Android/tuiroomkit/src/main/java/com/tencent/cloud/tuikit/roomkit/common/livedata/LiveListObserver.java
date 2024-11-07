@@ -9,6 +9,9 @@ public abstract class LiveListObserver<T> {
     public void onItemChanged(int position, T item) {
     }
 
+    public void onItemChanged(int position, T item, String modifyFlag) {
+    }
+
     public void onItemInserted(int position, T item) {
     }
 

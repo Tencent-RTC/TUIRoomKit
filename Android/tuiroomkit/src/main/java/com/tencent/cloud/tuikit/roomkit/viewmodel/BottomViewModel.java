@@ -16,6 +16,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -33,6 +35,7 @@ import com.tencent.cloud.tuikit.roomkit.model.entity.BottomSelectItemData;
 import com.tencent.cloud.tuikit.roomkit.model.entity.UserEntity;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
+import com.tencent.cloud.tuikit.roomkit.view.component.TipToast;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.BottomNavigationBar.BottomView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.Chat.ChatActivity;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.Dialog.AIAssistantDialog;
@@ -282,7 +285,13 @@ public class BottomViewModel implements ConferenceEventCenter.RoomEngineEventRes
 
     private void startScreenShare() {
         if (ConferenceController.sharedInstance().getConferenceState().hasScreenSharingInRoom()) {
-            RoomToast.toastShortMessageCenter(mContext.getString(R.string.tuiroomkit_other_user_in_screen_sharing));
+            TipToast.build().setDuration(Toast.LENGTH_SHORT).setMessage(
+                    mContext.getString(R.string.tuiroomkit_other_user_in_screen_sharing)).setGravity(Gravity.CENTER_VERTICAL).show(mContext);
+            return;
+        }
+        if (mConferenceState.roomState.isDisableScreen.get() && mConferenceState.userModel.getRole() == TUIRoomDefine.Role.GENERAL_USER) {
+            TipToast.build().setDuration(Toast.LENGTH_SHORT).setMessage(
+                    mContext.getString(R.string.tuiroomkit_share_fail_cause_of_admin_disable)).setGravity(Gravity.CENTER_VERTICAL).show(mContext);
             return;
         }
         if (!DrawOverlaysPermissionUtil.isGrantedDrawOverlays()) {

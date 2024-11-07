@@ -51,6 +51,21 @@ public class SeatState {
         takeSeatRequests.remove(position);
     }
 
+    public void updateTakeSeatRequestUserName(String userId, String userName) {
+        List<Request> takeSeatRequestList = takeSeatRequests.getList();
+        int position = USER_NOT_FOUND;
+        for (int i = 0; i < takeSeatRequestList.size(); i++) {
+            if (TextUtils.equals(userId, takeSeatRequestList.get(i).userId)) {
+                position = i;
+                break;
+            }
+        }
+        if (position == USER_NOT_FOUND) {
+            return;
+        }
+        takeSeatRequests.get(position).userName = userName;
+    }
+
     public void clearTakeSeatRequests() {
         takeSeatRequests.clear();
     }

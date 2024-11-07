@@ -22,6 +22,11 @@ public class UserState {
     public LiveData<String>         screenStreamUser = new LiveData<>("");
     public LiveData<UserVolumeInfo> userVolumeInfo   = new LiveData<>(new UserVolumeInfo("", 0));
 
+    public static class ModifyFlag {
+        public static final String ROLE      = "USER_ROLE";
+        public static final String NAME_CARD = "USER_NAME_CARD";
+    }
+
     public void remoteUserEnterRoom(TUIRoomDefine.UserInfo userInfo) {
         UserInfo user = new UserInfo(userInfo);
         if (allUsers.contains(user)) {
@@ -44,14 +49,25 @@ public class UserState {
         disableMessageUsers.remove(userInfo.userId);
     }
 
+    public void updateUserNameCard(TUIRoomDefine.UserInfo userInfo, String flag) {
+        UserInfo user = allUsers.find(new UserInfo(userInfo.userId));
+        if (user != null) {
+            user.userName = userInfo.nameCard;
+            allUsers.change(user, flag);
+        }
+    }
+
     public void handleUserRoleChanged(TUIRoomDefine.UserInfo userInfo) {
         UserInfo self = selfInfo.get();
         if (TextUtils.equals(userInfo.userId, self.userId)) {
             self.updateUserInfo(userInfo);
             selfInfo.set(self);
         }
-        UserInfo user = new UserInfo(userInfo);
-        allUsers.change(user);
+        UserInfo user = allUsers.find(new UserInfo(userInfo.userId));
+        if (user != null) {
+            user.role.set(userInfo.userRole);
+            allUsers.change(user, ModifyFlag.ROLE);
+        }
     }
 
     public void updateUserAudioState(String userId, boolean hasAudioStream) {
@@ -112,7 +128,7 @@ public class UserState {
 
         public void updateUserInfo(TUIRoomDefine.UserInfo userInfo) {
             this.userId = userInfo.userId;
-            this.userName = userInfo.userName;
+            this.userName = TextUtils.isEmpty(userInfo.nameCard) ? userInfo.userName : userInfo.nameCard;
             this.avatarUrl = userInfo.avatarUrl;
             this.role.set(userInfo.userRole);
         }

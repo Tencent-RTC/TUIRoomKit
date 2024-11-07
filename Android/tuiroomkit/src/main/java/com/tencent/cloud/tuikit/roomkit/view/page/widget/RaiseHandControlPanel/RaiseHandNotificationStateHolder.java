@@ -3,8 +3,10 @@ package com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel;
 import static com.tencent.cloud.tuikit.roomkit.model.ConferenceConstant.DURATION_FOREVER;
 
 import android.os.SystemClock;
+import android.text.TextUtils;
 
 import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListObserver;
+import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
 import com.tencent.cloud.tuikit.roomkit.model.entity.Request;
 import com.tencent.cloud.tuikit.roomkit.view.StateHolder;
 import com.trtc.tuikit.common.livedata.LiveData;
@@ -22,17 +24,26 @@ public class RaiseHandNotificationStateHolder extends StateHolder {
     private LiveListObserver<String> mPendingObserver = new LiveListObserver<String>() {
         @Override
         public void onDataChanged(List<String> list) {
-            updateNotification();
+            updateNotification(null);
         }
 
         @Override
         public void onItemInserted(int position, String requestId) {
-            updateNotification();
+            updateNotification(null);
         }
 
         @Override
         public void onItemRemoved(int position, String requestId) {
-            updateNotification();
+            updateNotification(null);
+        }
+    };
+
+    private LiveListObserver<UserState.UserInfo> mAllUserObserver = new LiveListObserver<UserState.UserInfo>() {
+        @Override
+        public void onItemChanged(int position, UserState.UserInfo item, String flag) {
+            if (TextUtils.equals(flag, UserState.ModifyFlag.NAME_CARD)) {
+                updateNotification(item.userId);
+            }
         }
     };
 
@@ -43,14 +54,16 @@ public class RaiseHandNotificationStateHolder extends StateHolder {
     public void observe(Observer<RaiseHandNotificationUiState> observer) {
         mRaiseHandNotificationUiState.observe(observer);
         mViewState.pendingTakeSeatRequests.observe(mPendingObserver);
+        mUserState.allUsers.observe(mAllUserObserver);
     }
 
     public void removeObserver(Observer<RaiseHandNotificationUiState> observer) {
         mRaiseHandNotificationUiState.removeObserver(observer);
         mViewState.pendingTakeSeatRequests.removeObserver(mPendingObserver);
+        mUserState.allUsers.removeObserver(mAllUserObserver);
     }
 
-    private void updateNotification() {
+    private void updateNotification(String userId) {
         RaiseHandNotificationUiState uiState = new RaiseHandNotificationUiState();
         uiState.duration = mDuration;
         if (mPendingRequests.isEmpty()) {
@@ -61,6 +74,9 @@ public class RaiseHandNotificationStateHolder extends StateHolder {
         String latestRequestId = mPendingRequests.get(mPendingRequests.size() - 1);
         Request takeSeatRequest = mSeatState.findTakeSeatRequestByRequestId(latestRequestId);
         if (takeSeatRequest == null) {
+            return;
+        }
+        if (!TextUtils.isEmpty(userId) && !TextUtils.equals(userId, takeSeatRequest.userId)) {
             return;
         }
         boolean isShow = (mDuration == DURATION_FOREVER) || (SystemClock.elapsedRealtime() - takeSeatRequest.timestamp
