@@ -23,6 +23,11 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!isTaskRoot() && getIntent() != null && getIntent().hasCategory(Intent.CATEGORY_LAUNCHER)
+                && Intent.ACTION_MAIN.equals(getIntent().getAction())) {
+            finish();
+            return;
+        }
         navigation();
     }
 

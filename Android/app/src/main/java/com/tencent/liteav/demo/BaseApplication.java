@@ -33,13 +33,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class BaseApplication extends MultiDexApplication implements ConferenceEventCenter.RoomKitUIEventResponder {
-    private static String TAG = "BaseApplication";
+    private static final String TAG = "BaseApplication";
 
-    private List<Activity> mActivityList = new LinkedList<>();
+    private static final String CONFERENCE_WILL_START = "conference_will_start";
+
+    private LinkedList<Activity> mActivityList = new LinkedList<>();
 
     @Override
     public void onCreate() {
@@ -52,30 +53,54 @@ public class BaseApplication extends MultiDexApplication implements ConferenceEv
         closeAndroidPDialog();
         ConferenceEventCenter.getInstance().subscribeUIEvent(START_LOGIN, this);
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
-        registerConferenceReminderEvent();
+        registerConferenceNotificationEvent();
     }
 
-    private void registerConferenceReminderEvent() {
+    private void registerConferenceNotificationEvent() {
         TUICore.registerEvent(TUIConstants.TIMPush.EVENT_NOTIFY, TUIConstants.TIMPush.EVENT_NOTIFY_NOTIFICATION, new ITUINotification() {
             @Override
             public void onNotifyEvent(String key, String subKey, Map<String, Object> param) {
                 Log.d(TAG, "onNotifyEvent key = " + key + "subKey = " + subKey);
                 if (TUIConstants.TIMPush.EVENT_NOTIFY.equals(key) && TUIConstants.TIMPush.EVENT_NOTIFY_NOTIFICATION.equals(subKey) && param != null) {
-                    String extString = (String) param.get(TUIConstants.TIMPush.NOTIFICATION_EXT_KEY);
-                    try {
-                        JSONObject roomObject = new JSONObject(extString);
-                        String roomId = roomObject.getString("RoomId");
-                        if (!TextUtils.isEmpty(roomId)) {
-                            loginAndEnterRoom(roomId);
+                    login(new TUICallback() {
+                        @Override
+                        public void onSuccess() {
+                            String extString = (String) param.get(TUIConstants.TIMPush.NOTIFICATION_EXT_KEY);
+                            try {
+                                JSONObject roomObject = new JSONObject(extString);
+                                String notificationType = roomObject.getString("NotificationType");
+                                if (CONFERENCE_WILL_START.equals(notificationType)) {
+                                    String roomId = roomObject.getString("RoomId");
+                                    enterRoom(roomId);
+                                } else {
+                                    Intent intent = new Intent(getApplicationContext(), mActivityList.isEmpty() ? SplashActivity.class : mActivityList.getLast().getClass());
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    getApplicationContext().startActivity(intent);
+                                }
+                            } catch (Exception e) {
+                                Log.d(TAG, "onNotifyEvent json exception: " + e.getMessage());
+                            }
                         }
-                    } catch (Exception e) {
-                    }
+
+                        @Override
+                        public void onError(int errorCode, String errorMessage) {
+
+                        }
+                    });
                 }
             }
         });
     }
 
-    private void loginAndEnterRoom(String roomId) {
+    private void enterRoom(String roomId) {
+        ConferenceDefine.JoinConferenceParams params = new ConferenceDefine.JoinConferenceParams(roomId);
+        Intent intent = new Intent(getApplicationContext(), ConferenceMainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(KEY_JOIN_CONFERENCE_PARAMS, params);
+        getApplicationContext().startActivity(intent);
+    }
+
+    private void login(TUICallback callback) {
         final UserModel userModel = UserModelManager.getInstance().getUserModel();
         int sdkAppId = GenerateTestUserSig.SDKAppID;
         String userId = userModel.userId;
@@ -85,16 +110,17 @@ public class BaseApplication extends MultiDexApplication implements ConferenceEv
             @Override
             public void onSuccess() {
                 Log.d(TAG, "TUILogin.login onSuccess");
-                ConferenceDefine.JoinConferenceParams params = new ConferenceDefine.JoinConferenceParams(roomId);
-                Intent intent = new Intent(getApplicationContext(), ConferenceMainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(KEY_JOIN_CONFERENCE_PARAMS, params);
-                getApplicationContext().startActivity(intent);
+                if (callback != null) {
+                    callback.onSuccess();
+                }
             }
 
             @Override
             public void onError(int errorCode, String errorMessage) {
                 Log.d(TAG, "TUILogin.login onError errorCode=" + errorCode + " errorMessage=" + errorMessage);
+                if (callback != null) {
+                    callback.onError(errorCode, errorMessage);
+                }
                 UserModelManager.getInstance().clearUserModel();
             }
         });

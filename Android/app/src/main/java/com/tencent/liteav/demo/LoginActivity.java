@@ -12,10 +12,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.common.utils.UserModel;
 import com.tencent.cloud.tuikit.roomkit.common.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     private void login() {
         String userId = mEditUserId.getText().toString().trim();
         if (TextUtils.isEmpty(userId)) {
-            Toast.makeText(this, getString(R.string.app_user_id_empty_toast), Toast.LENGTH_SHORT).show();
+            RoomToast.toastShortMessage(getString(R.string.app_user_id_empty_toast));
             return;
         }
         final UserModel userModel = new UserModel();
@@ -84,12 +84,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public class UserIdInputFilter implements InputFilter {
-        private static final String ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+        private static final String regex = "^[a-zA-Z0-9\\-_]*$";
 
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
             for (int i = start; i < end; i++) {
-                if (!ALLOWED_CHARACTERS.contains(String.valueOf(source.charAt(i)))) {
+                if (!String.valueOf(source.charAt(i)).matches(regex)) {
                     return "";
                 }
             }

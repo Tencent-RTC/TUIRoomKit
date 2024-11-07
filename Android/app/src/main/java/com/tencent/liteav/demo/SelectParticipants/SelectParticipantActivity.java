@@ -65,7 +65,7 @@ public class SelectParticipantActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_activity_select_participant);
         mContext = this;
-        setFriendListAndInitView(false);
+        setFriendListAndInitView(true);
     }
 
     public void setFriendListAndInitView(boolean isUseImData) {

@@ -36,7 +36,7 @@ public class TUIVideoSeatView extends RelativeLayout {
     private static final String TAG = "TUIVideoSeatView";
 
     private static final int CLICK_ACTION_MAX_MOVE_DISTANCE = 10;
-    private static final int SMALL_VIDEO_UPDATE_INTERVAL = 5 * 1000;
+    private static final int SMALL_VIDEO_UPDATE_INTERVAL    = 5 * 1000;
 
     private Context mContext;
 
@@ -64,7 +64,7 @@ public class TUIVideoSeatView extends RelativeLayout {
     private float           mTouchDownPointX;
     private float           mTouchDownPointY;
 
-    private VisibleRange mVisibleRange = new VisibleRange();
+    private VisibleRange                         mVisibleRange    = new VisibleRange();
 
     public TUIVideoSeatView(Context context) {
         super(context);
@@ -391,7 +391,6 @@ public class TUIVideoSeatView extends RelativeLayout {
         }
         if (entity.isSelf()) {
             mViewModel.setLocalVideoView(entity);
-            notifyItemVideoVisibilityStageChanged(entity);
             return;
         }
         if (!entity.isVideoAvailable()) {
@@ -406,6 +405,7 @@ public class TUIVideoSeatView extends RelativeLayout {
             return;
         }
         if (entity.isSelf()) {
+            mViewModel.setLocalVideoView(entity);
             return;
         }
         if (mViewModel != null) {
@@ -441,9 +441,7 @@ public class TUIVideoSeatView extends RelativeLayout {
             return;
         }
         UserEntity entity = mMemberEntityList.get(position);
-        if (entity.isSelf()) {
-            notifyItemVideoVisibilityStageChanged(entity);
-        } else if (entity.isCameraAvailable()) {
+        if (entity.isCameraAvailable()) {
             startVideoPlay(entity);
         } else {
             stopVideoPlay(entity);

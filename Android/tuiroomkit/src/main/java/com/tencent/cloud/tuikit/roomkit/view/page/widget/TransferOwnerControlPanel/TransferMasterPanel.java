@@ -20,7 +20,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
+import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListObserver;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
+import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.TransferMasterViewModel;
@@ -35,6 +37,17 @@ public class TransferMasterPanel extends BaseBottomDialog implements View.OnClic
     private RecyclerView            mRecyclerUserList;
     private TransferOwnerAdapter    mAdapter;
     private TransferMasterViewModel mViewModel;
+
+    private LiveListObserver<UserState.UserInfo> mAllUserObserver = new LiveListObserver<UserState.UserInfo>() {
+        @Override
+        public void onItemChanged(int position, UserState.UserInfo item, String flag) {
+            if (TextUtils.equals(flag, UserState.ModifyFlag.NAME_CARD)) {
+                if (mAdapter != null) {
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+        }
+    };
 
     public TransferMasterPanel(Context context) {
         super(context);
@@ -105,6 +118,13 @@ public class TransferMasterPanel extends BaseBottomDialog implements View.OnClic
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
+        ConferenceController.sharedInstance().getUserState().allUsers.observe(mAllUserObserver);
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        ConferenceController.sharedInstance().getUserState().allUsers.removeObserver(mAllUserObserver);
     }
 
     public void onNotifyUserEnter(int position) {

@@ -9,6 +9,7 @@ import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListObserver;
 import com.tencent.cloud.tuikit.roomkit.model.controller.ScheduleController;
 import com.tencent.cloud.tuikit.roomkit.model.data.ConferenceListState;
 import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
+import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.ConferenceList.ScheduledConferenceItem;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.trtc.tuikit.common.livedata.LiveData;
 import com.trtc.tuikit.common.livedata.Observer;
@@ -19,6 +20,7 @@ import java.util.Locale;
 
 public class ScheduledConferenceDetailStateHolder {
     private              String                                     mCurrentConferenceId  = "";
+    public               LiveData<Boolean>                          mConferenceCanceled   = new LiveData<>(false);
     private final        LiveData<ScheduledConferenceDetailUiState> mConferenceDetailData = new LiveData<>(new ScheduledConferenceDetailUiState());
     public               LiveListData<UserState.UserInfo>           hadScheduledAttendees = new LiveListData<>();
     public               LiveListObserver<UserState.UserInfo>       mAttendeesObserver    = new LiveListObserver<UserState.UserInfo>() {
@@ -49,6 +51,14 @@ public class ScheduledConferenceDetailStateHolder {
                 return;
             }
             updateView(item);
+        }
+
+        @Override
+        public void onItemRemoved(int position, ConferenceListState.ConferenceInfo item) {
+            if (!TextUtils.equals(mCurrentConferenceId, item.basicRoomInfo.roomId)) {
+                return;
+            }
+            mConferenceCanceled.set(true);
         }
     };
 

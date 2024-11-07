@@ -58,7 +58,7 @@ public class UserRecyclerViewStateHolder extends StateHolder {
         }
 
         @Override
-        public void onItemChanged(int position, UserState.UserInfo item) {
+        public void onItemChanged(int position, UserState.UserInfo item, String flag) {
             notifyUserChanged(item);
         }
 
