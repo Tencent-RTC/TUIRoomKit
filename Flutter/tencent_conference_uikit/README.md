@@ -246,7 +246,7 @@ Please refer to the official documentation at [Integration (TUIRoomKit)](https:/
 ## Quick link
 
 - If you encounter difficulties, you can refer to [FAQs](https://trtc.io/document/57598), here are the most frequently encountered problems of developers, covering various platforms, I hope it can Help you solve problems quickly.
-- If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](../../Web/), [Android](../../Android/), [iOS](../../iOS/), [Electron](../../Electron/), [Qt](../../Qt/).
+- If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](../../Web/), [Android](../../Android/), [iOS](../../iOS/), [Electron](../../Electron/).
 
 - If you would like to see some of our latest product features, you can check the [Update Log](https://pub.dev/packages/tencent_conference_uikit/changelog), here are the latest features of tencent_conference_uikit, as well as the historical version features iterate
 - For complete API documentation, see [API reference](https://trtc.io/document/57512): including TUIRoomKit (with UIKit), TUIRoomEngine (without UIKit), and events Callbacks, etc.

@@ -80,8 +80,8 @@ class RoomEngineManager {
       RoomStore.to.roomInfo = result.data!;
       RoomStore.to.isEnteredRoom = true;
       RoomStore.to.timeStampOnEnterRoom = DateTime.now().millisecondsSinceEpoch;
-      await _getUserList();
       await RoomStore.to.initialCurrentUser();
+      await _getUserList();
       bool isTakeSeatSuccess = await _autoTakeSeatForOwner();
       if (!isTakeSeatSuccess) {
         result.code = TUIError.errUserNotInSeat;
@@ -123,7 +123,12 @@ class RoomEngineManager {
           },
           onError: (String requestId, String userId, TUIError error,
               String message) {
-            takeSeatCompleter.complete(false);
+            bool result = false;
+            if (error == TUIError.errAlreadyInSeat) {
+              RoomStore.to.currentUser.isOnSeat.value = true;
+              result = true;
+            }
+            takeSeatCompleter.complete(result);
           },
         ));
     return takeSeatCompleter.future;
@@ -136,12 +141,14 @@ class RoomEngineManager {
   }
 
   Future<TUIActionCallback> openLocalCamera() async {
-    var cameraPermission = await Permission.camera.request();
-
-    if (!cameraPermission.isGranted) {
-      return TUIActionCallback(
-          code: TUIError.errPermissionDenied,
-          message: "camera permission denied");
+    var isGranted = await Permission.camera.isGranted;
+    if (!isGranted) {
+      var cameraPermission = await Permission.camera.request();
+      if (!cameraPermission.isGranted) {
+        return TUIActionCallback(
+            code: TUIError.errPermissionDenied,
+            message: "camera permission denied");
+      }
     }
 
     var result = await _roomEngine.openLocalCamera(
@@ -154,14 +161,16 @@ class RoomEngineManager {
   }
 
   Future<TUIActionCallback> openLocalMicrophone() async {
-    var microphone = await Permission.microphone.request();
+    var isGranted = await Permission.microphone.isGranted;
 
-    if (!microphone.isGranted) {
-      return TUIActionCallback(
-          code: TUIError.errPermissionDenied,
-          message: "camera permission denied");
+    if (!isGranted) {
+      var microphone = await Permission.microphone.request();
+      if (!microphone.isGranted) {
+        return TUIActionCallback(
+            code: TUIError.errPermissionDenied,
+            message: "camera permission denied");
+      }
     }
-
     var result = await _roomEngine
         .openLocalMicrophone(TUIAudioQuality.audioProfileDefault);
     if (result.code == TUIError.success) {

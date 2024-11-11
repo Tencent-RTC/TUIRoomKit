@@ -1,3 +1,14 @@
+## Changelog
+
+### 2.7.0(2024-11-07)
+- Support flutter 3.24.
+- Fixed the bug that camera and microphone permissions cannot be applied in some cases.
+
+### 2.6.6(2024-10-17)
+
+- Resolved the issue of not being able to run under Flutter 3.24.
+- Upgraded rtc_room_engine dependencies.
+
 ### 2.6.0(2024-09-14)
 
 - Upgraded rtc_room_engine dependencies.
