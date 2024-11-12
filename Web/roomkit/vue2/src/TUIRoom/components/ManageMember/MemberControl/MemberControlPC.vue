@@ -1,10 +1,10 @@
 <template>
   <div class="member-control-container">
     <tui-button
+      v-if="singleControl"
       class="button"
       size="default"
       @click="singleControl.func(props.userInfo)"
-      v-if="!isCanOperateMySelf"
     >
       {{ singleControl?.title }}
     </tui-button>
@@ -105,9 +105,14 @@ const {
 
 const { isCanOperateMySelf } = useMemberItemHooks(props.userInfo);
 
-const singleControl = computed(() => controlList.value[0]);
+const singleControl = computed(() => {
+  return isCanOperateMySelf.value ? null : controlList.value[0];
+});
+
 const moreControlList = computed(() => {
-  return isCanOperateMySelf ? controlList.value : controlList.value.slice(1);
+  return isCanOperateMySelf.value
+    ? controlList.value
+    : controlList.value.slice(1);
 });
 const dropdownClass = ref('down');
 const moreBtnRef = ref();

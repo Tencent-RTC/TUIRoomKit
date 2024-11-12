@@ -108,7 +108,7 @@ import IconButton from '../common/base/IconButton.vue';
 import SvgIcon from '../common/base/SvgIcon.vue';
 import BasicBeautyIcon from '../common/icons/BasicBeautyIcon.vue';
 import { useI18n } from '../../locales';
-import { roomService } from '../../services';
+import { roomService, MetricsKey } from '../../services';
 import Dialog from '../common/base/Dialog';
 import TuiButton from '../common/base/Button.vue';
 import Slider from '../common/base/Slider.vue';
@@ -197,6 +197,7 @@ const openBeautySettingPanel = async () => {
     view: 'test-preview',
   });
   isLoading.value = false;
+  roomService.dataReportManager.reportCount(MetricsKey.setBasicBeauty);
 };
 
 const closeBeautySettingPanel = async () => {
