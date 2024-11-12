@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-electron-vue3",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
@@ -24,7 +24,7 @@
   "dependencies": {
     "@tencentcloud/chat": "latest",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-electron": "^2.7.0",
+    "@tencentcloud/tuiroom-engine-electron": "^2.7.1",
     "@tencentcloud/chat-uikit-engine": "2.2.7",
     "@tencentcloud/chat-uikit-vue": "2.2.7",
     "@tencentcloud/universal-api": "^2.0.9",
