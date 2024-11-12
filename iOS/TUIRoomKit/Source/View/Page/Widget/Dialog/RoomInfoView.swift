@@ -11,7 +11,7 @@ import Foundation
 class RoomInfoView: UIView {
     let viewModel: RoomInfoViewModel
     private var isViewReady: Bool = false
-    var viewArray: [UIView] = []
+    var viewArray: [ListCellItemView] = []
     
     let headView: UIView = {
         let view = UIView()
@@ -155,7 +155,12 @@ class RoomInfoView: UIView {
 }
 
 extension RoomInfoView: RoomInfoResponder {
-    func updateNameLabel(_ text: String) {
+    func updateHostName(_ text: String) {
+        guard let view = viewArray.first(where: { $0.itemData.type == .hostNameType }) else { return }
+        view.messageLabel.text = text
+    }
+    
+    func updateConferenceNameLabel(_ text: String) {
         nameLabel.text = text
     }
     

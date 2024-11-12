@@ -10,6 +10,7 @@ import Foundation
 import TUICore
 import RTCRoomEngine
 import Factory
+import Combine
 
 protocol ConferenceMainViewResponder: AnyObject {
     func makeToast(text: String)
@@ -23,6 +24,7 @@ protocol ConferenceMainViewResponder: AnyObject {
     func showPasswordView(roomId: String)
     func hidePasswordView()
     func showRepeatJoinRoomAlert()
+    func updateWaterMarkLayer(text: String)
 }
 
 class ConferenceMainViewModel: NSObject {
@@ -47,7 +49,10 @@ class ConferenceMainViewModel: NSObject {
     private var selfRole: TUIRole?
     var joinConferenceParams: JoinConferenceParams?
     var startConferenceParams: StartConferenceParams?
-    var isShownWaterMark: Bool = ConferenceSession.sharedInstance.implementation.isEnableWaterMark;
+    var isShownWaterMark: Bool = ConferenceSession.sharedInstance.implementation.isEnableWaterMark
+    lazy var isSelfDisableMessage: Bool = {
+       return conferenceStore.selectCurrent(UserSelectors.getDisableMessageUsers).contains(currentUser.userId)
+    }()
     
     override init() {
         super.init()
@@ -73,6 +78,8 @@ class ConferenceMainViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onStartedRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onJoinedRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onGetUserListFinished, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserInfoChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserVideoStateChanged, observer: self)
     }
     
     private func subLogoutNotification() {
@@ -102,6 +109,8 @@ class ConferenceMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onStartedRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onJoinedRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onGetUserListFinished, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserInfoChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserVideoStateChanged, observer: self)
     }
     
     func hideLocalAudioView() {
@@ -206,7 +215,7 @@ class ConferenceMainViewModel: NSObject {
     }
     
     func handleWrongPasswordFault(roomId: String) {
-        handleOperateConferenceFailedResult(roomId: roomId, event: .onJoinedRoom, error: .wrongPassword, message: "password is wrong")
+        handleOperateConferenceFailedResult(roomId: roomId, event: .onJoinedRoom, error: .wrongPassword, message: "")
     }
     
     private func handleOperateConferenceFailedResult(roomId: String, event: EngineEventCenter.RoomEngineEvent, error: TUIError, message: String) {
@@ -252,21 +261,37 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
         case .onStartedRoom:
             guard let roomInfo = param?["roomInfo"] as? TUIRoomInfo else { return }
             guard let error = param?["error"] as? TUIError else { return }
-            if error == .success {
-                handleStartRoom(roomInfo: roomInfo)
-                conferenceStore.dispatch(action: RoomActions.updateRoomState(payload: RoomInfo(with: roomInfo)))
-            }
+            guard error == .success else { return }
+            handleStartRoom(roomInfo: roomInfo)
+            var roomState = RoomInfo(with: roomInfo)
+            roomState.isEnteredRoom = true
+            conferenceStore.dispatch(action: RoomActions.updateRoomState(payload: roomState))
+            viewResponder?.updateWaterMarkLayer(text: getWaterMarkText())
         case .onJoinedRoom:
             guard let roomInfo = param?["roomInfo"] as? TUIRoomInfo else { return }
             guard let error = param?["error"] as? TUIError else { return }
-            if error == .success {
-                handleJoinRoom(roomInfo: roomInfo)
-                conferenceStore.dispatch(action: RoomActions.updateRoomState(payload: RoomInfo(with: roomInfo)))
-            }
+            guard error == .success else { return }
+            handleJoinRoom(roomInfo: roomInfo)
+            var roomState = RoomInfo(with: roomInfo)
+            roomState.isEnteredRoom = true
+            conferenceStore.dispatch(action: RoomActions.updateRoomState(payload: roomState))
+            viewResponder?.updateWaterMarkLayer(text: getWaterMarkText())
         case .onGetUserListFinished:
             let allUsers = self.store.attendeeList.map{ UserInfo(userEntity: $0) }
             conferenceStore.dispatch(action: UserActions.updateAllUsers(payload: allUsers))
             conferenceStore.dispatch(action: ConferenceInvitationActions.getInvitationList(payload: (store.roomInfo.roomId, "", [])))
+        case .onUserInfoChanged:
+            guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
+            guard let modifyFlag = param?["modifyFlag"] as? TUIUserInfoModifyFlag else { return }
+            guard modifyFlag.contains(.nameCard) else { return }
+            guard userInfo.userId == currentUser.userId else { return }
+            viewResponder?.updateWaterMarkLayer(text: getWaterMarkText())
+        case .onUserVideoStateChanged:
+            guard let userId = param?["userId"] as? String else { return }
+            guard let streamType = param?["streamType"] as? TUIVideoStreamType else { return }
+            guard let hasVideo = param?["hasVideo"] as? Bool else { return }
+            guard let reason = param?["reason"] as? TUIChangeReason else { return }
+            handleUserVideoStateChanged(userId: userId, streamType: streamType, hasVideo: hasVideo, reason: reason)
         default: break
         }
     }
@@ -294,6 +319,7 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
         viewResponder?.showAlertWithAutoConfirm(title: .kickOffTitleText, message: nil, sureTitle: .alertOkText, declineTitle: nil , sureBlock: {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
         }, declineBlock: nil, autoConfirmSeconds: 5)
+        conferenceStore.dispatch(action: RoomResponseActions.onExitSuccess())
     }
     
     private func handleAllUserMicrophoneDisableChanged(isDisable: Bool) {
@@ -425,6 +451,7 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
         viewResponder?.showAlertWithAutoConfirm(title: .kieckedOffLineText, message: nil, sureTitle: .alertOkText, declineTitle: nil, sureBlock: {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
         }, declineBlock: nil, autoConfirmSeconds: 5)
+        conferenceStore.dispatch(action: RoomResponseActions.onExitSuccess())
     }
     
     private func handleStartRoom(roomInfo: TUIRoomInfo) {
@@ -436,6 +463,12 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
             viewResponder?.showRaiseHandNoticeView()
         }
         viewResponder?.updateRoomInfo(roomInfo: roomInfo)
+    }
+    
+    private func handleUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool, reason: TUIChangeReason) {
+        guard streamType == .screenStream, !hasVideo, reason == .byAdmin else { return }
+        guard roomInfo.isScreenShareDisableForAllUser else { return }
+        RoomRouter.presentAlert(title: .screenSharingHasStoppedAlertTitle, message: .screenSharingHasStoppedAlertMessage, sureTitle: .iSee, declineTitle: nil, sureBlock: nil, declineBlock: nil)
     }
 }
 
@@ -503,6 +536,7 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
     func makeFloatChatDisplayView() -> FloatChatDisplayView {
         let view = FloatChatDisplayView()
         view.isHidden = !store.shouldShowFloatChatView
+        view.delegate = self
         return view
     }
     
@@ -517,10 +551,11 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
         if !customizeText.isEmpty {
             return customizeText
         }
-        
-        let userId = TUILogin.getUserID() ?? currentUser.userId
-        let userName = TUILogin.getNickName() ?? currentUser.userName
-        var defaultText = userId
+        if !store.isEnteredRoom {
+            return ""
+        }
+        var defaultText = currentUser.userId
+        let userName = engineManager.getSelfInfo().userName
         if !userName.isEmpty {
             defaultText = defaultText + "(\(userName))"
         }
@@ -564,6 +599,12 @@ extension ConferenceMainViewModel: RoomKitUIEventResponder {
         default: break
         }
         selfRole = userRole
+    }
+}
+
+extension ConferenceMainViewModel: FloatChatDisplayViewDelegate {
+    func getTheLatestUserName(userId: String) -> String {
+        return store.attendeeList.first(where: { $0.userId == userId })?.userName ?? ""
     }
 }
 
@@ -649,5 +690,8 @@ private extension String {
     static var logoutText: String {
         localized("You are logged out")
     }
-    static let wrongPasswordText = localized("Wrong password, please re-enter")
+    static let wrongPasswordText = localized("Wrong password")
+    static let iSee = localized("I see")
+    static let screenSharingHasStoppedAlertTitle = localized("Your screen sharing has stopped")
+    static let screenSharingHasStoppedAlertMessage = localized("Your screen sharing has stopped, Now only the host/admin can share the screen")
 }

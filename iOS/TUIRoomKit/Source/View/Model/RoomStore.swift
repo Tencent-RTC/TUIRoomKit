@@ -32,6 +32,8 @@ class RoomStore: NSObject {
     private let shownRaiseHandNoticeKey = "isShownRaiseHandNotice"
     weak var conferenceObserver: ConferenceObserver?
     
+    @Injected(\.conferenceStore) private var operation
+    
     var isOpenMicrophone: Bool {
         didSet {
             UserDefaults.standard.set(isOpenMicrophone, forKey: openMicrophoneKey)
@@ -87,6 +89,7 @@ class RoomStore: NSObject {
             guard let userInfo = userInfo else { return }
             self.currentUser.update(userInfo: userInfo)
             EngineEventCenter.shared.notifyEngineEvent(event: .onInitialSelfUserInfo, param: [:])
+            self.operation.dispatch(action: UserActions.updateSelfInfo(payload: UserInfo(userInfo: userInfo)))
         } onError: { code, message in
             debugPrint("getUserInfo,code:\(code),message:\(message)")
         }
@@ -118,6 +121,14 @@ class RoomStore: NSObject {
     }
     
     func updateUserDisableSendingMessage(userId: String, isDisable: Bool) {
+        var disableMessageUsers = operation.selectCurrent(UserSelectors.getDisableMessageUsers)
+        if isDisable {
+            disableMessageUsers.insert(userId)
+        } else {
+            disableMessageUsers.remove(userId)
+        }
+        operation.dispatch(action: UserActions.updateDisableMessageUsers(payload: disableMessageUsers))
+        
         if userId == currentUser.userId {
             currentUser.disableSendingMessage = isDisable
         }
@@ -224,6 +235,25 @@ class RoomStore: NSObject {
     func updateFloatChatShowState(shouldShow: Bool) {
         shouldShowFloatChatView = shouldShow
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ShowFloatChatView, param: ["shouldShow": shouldShow])
+    }
+    
+    func changeUserName(userId: String, userName: String) {
+        if currentUser.userId == userId {
+            currentUser.userName = userName
+        }
+        if let userItem = getUserItem(userId) {
+            userItem.userName = userName
+        }
+        if let seatItem = seatList.first(where: { $0.userId == userId }) {
+            seatItem.userName = userName
+        } else if let offseatItem = offSeatList.first(where: { $0.userId == userId }) {
+            offseatItem.userName = userName
+        }
+        if let inviteSeatItem = inviteSeatList.first(where: { $0.userId == userId }) {
+            inviteSeatItem.userName = userName
+        }
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
+        EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
     }
     
     deinit {

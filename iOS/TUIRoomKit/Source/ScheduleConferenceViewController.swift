@@ -11,11 +11,8 @@ import RTCRoomEngine
 import Combine
 import TUICore
 
-public typealias MemberSelectionFactory = ([User]) -> ContactViewProtocol
-
 @objcMembers public class ScheduleConferenceViewController: UIViewController {
     private var cancellableSet = Set<AnyCancellable>()
-    let memberSelectionFactory: MemberSelectionFactory?
     private let durationTime = 1800
     private let reminderSecondsBeforeStart = 600
     lazy var rootView: ScheduleConferenceTableView = {
@@ -28,18 +25,6 @@ public typealias MemberSelectionFactory = ([User]) -> ContactViewProtocol
     
     public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .portrait
-    }
-    
-    public init(memberSelectFactory: MemberSelectionFactory?) {
-        self.memberSelectionFactory = memberSelectFactory
-        super.init(nibName: nil, bundle: nil)
-        if let factory = memberSelectFactory {
-            route.dispatch(action: ConferenceNavigationAction.setMemberSelectionFactory(payload: factory))
-        }
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     public override func loadView() {

@@ -47,6 +47,29 @@
         }
       }
     },
+    "A member is currently sharing the screen, the member's sharing will be terminated after turning on" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يقوم أحد الأعضاء حاليًا بمشاركة الشاشة، وسيتم إنهاء مشاركة العضو بعد تشغيلها"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A member is currently sharing the screen, the member's sharing will be terminated after turning on"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前有成员正在共享屏幕，开启后该成员的共享将会被终止"
+          }
+        }
+      }
+    },
     "Add to" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -484,6 +507,29 @@
         }
       }
     },
+    "All participants can share screen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يمكن لجميع المشاركين مشاركة الشاشة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All participants can share screen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全体成员可共享屏幕"
+          }
+        }
+      }
+    },
     "All videos disabled" : {
       "extractionState" : "migrated",
       "localizations" : {
@@ -599,25 +645,25 @@
         }
       }
     },
-    "An existing member is sharing. Please try again later" : {
-      "extractionState" : "migrated",
+    "Another user is sharing the screen." : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "توجد حاليًا مشاركة للأعضاء، يرجى المحاولة مرة أخرى لاحقًا."
+            "value" : "مستخدم آخر يشارك الشاشة."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "An existing member is sharing. Please try again later"
+            "value" : "Another user is sharing the screen."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "当前已有成员正在进行共享，请稍后再操作"
+            "value" : "其他成员正在屏幕共享"
           }
         }
       }
@@ -2295,6 +2341,29 @@
         }
       }
     },
+    "Failed to initiate share, currently only host/admin can share" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشل في بدء المشاركة، حاليًا يمكن فقط للمضيف/المسؤول المشاركة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to initiate share, currently only host/admin can share"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发起共享失败，当前仅房主/管理员可以共享"
+          }
+        }
+      }
+    },
     "Failed to mute." : {
       "extractionState" : "migrated",
       "localizations" : {
@@ -2883,6 +2952,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "邀请你进入会议"
+          }
+        }
+      }
+    },
+    "Is it turned on that only the host/admin can share the screen?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تم تشغيله بحيث يتمكن المضيف/المسؤول فقط من مشاركة الشاشة؟"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Is it turned on that only the host/admin can share the screen?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "是否开启仅房主/管理员可共享屏幕"
           }
         }
       }
@@ -3531,6 +3623,29 @@
         }
       }
     },
+    "Modify the name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعديل الاسم"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modify the name"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修改名称"
+          }
+        }
+      }
+    },
     "More" : {
       "extractionState" : "migrated",
       "localizations" : {
@@ -3549,7 +3664,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "展开"
+            "value" : "更多"
           }
         }
       }
@@ -3619,6 +3734,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "禁言"
+          }
+        }
+      }
+    },
+    "Name change failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشل تغيير الاسم"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name change failed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称修改失败"
+          }
+        }
+      }
+    },
+    "Name changed successfully" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم تغيير الاسم بنجاح"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name changed successfully"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称修改成功"
           }
         }
       }
@@ -4008,6 +4169,52 @@
         }
       }
     },
+    "Only the host/admin can share screen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يمكن فقط للمضيف/المسؤول مشاركة الشاشة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only the host/admin can share screen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅房主/管理员可共享屏幕"
+          }
+        }
+      }
+    },
+    "Open" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يفتح"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开启"
+          }
+        }
+      }
+    },
     "Other Settings" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4238,19 +4445,19 @@
         }
       }
     },
-    "Please enter your room password" : {
+    "Please enter the password" : {
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الرجاء إدخال كلمة المرور الخاصة بغرفتك"
+            "value" : "الرجاء إدخال كلمة المرور"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please enter your room password"
+            "value" : "Please enter the password"
           }
         },
         "zh-Hans" : {
@@ -6224,25 +6431,25 @@
         }
       }
     },
-    "Wrong password, please re-enter" : {
+    "Wrong password" : {
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "كلمة المرور خاطئة، يرجى إعادة إدخالها"
+            "value" : "كلمة المرور خاطئة"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wrong password, please re-enter"
+            "value" : "Wrong password"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "密码错误，请重新输入"
+            "value" : "密码错误"
           }
         }
       }
@@ -6450,6 +6657,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "xx/300人"
+          }
+        }
+      }
+    },
+    "You are allowed to text chat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مسموح لك بالدردشة النصية"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are allowed to text chat"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您已被允许文字聊天"
           }
         }
       }
@@ -6684,6 +6914,52 @@
         }
       }
     },
+    "You have been banned from text chat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لقد تم حظرك من الدردشة النصية"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have been banned from text chat"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您已被禁止文字聊天"
+          }
+        }
+      }
+    },
+    "You have been removed from the conference participants" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لقد تم إزالتك من المشاركين في المؤتمر"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have been removed from the conference participants"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您已被房主/管理员移出参会成员列表"
+          }
+        }
+      }
+    },
     "You were muted by the host." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6841,6 +7117,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "房间密码格式不正确，请检查"
+          }
+        }
+      }
+    },
+    "Your screen sharing has stopped" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لقد توقفت مشاركة الشاشة الخاصة بك"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your screen sharing has stopped"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共享屏幕停止"
+          }
+        }
+      }
+    },
+    "Your screen sharing has stopped, Now only the host/admin can share the screen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لقد توقفت مشاركة الشاشة لديك، والآن يمكن للمضيف/المسؤول فقط مشاركة الشاشة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your screen sharing has stopped, Now only the host/admin can share the screen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已停止您的共享，当前仅房主/管理员可以共享屏幕"
           }
         }
       }

@@ -34,13 +34,8 @@ class TransferMasterViewModel: NSObject {
         guard userId != "" else { return }
         engineManager.changeUserRole(userId: userId, role: .roomOwner) { [weak self] in
             guard let self = self else { return }
-            self.engineManager.exitRoom {
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
-            } onError: { [weak self] code, message in
-                guard let self = self else { return }
-                self.viewResponder?.makeToast(message: message)
-                EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
-            }
+            self.engineManager.exitRoom()
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.viewResponder?.makeToast(message: message)

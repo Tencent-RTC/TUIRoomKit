@@ -67,8 +67,16 @@ extension AppDelegate: TIMPushDelegate {
         guard let notice = notice else { return false }
         guard let dict = notice.convertToDic() else { return false }
         guard let roomId = dict["RoomId"] as? String else { return false }
+        guard let notificationType = dict["NotificationType"] as? String else { return false }
         if V2TIMManager.sharedInstance().getLoginStatus() == .STATUS_LOGINED {
-            AppUtils.shared.showConferenceMainViewController(roomId: roomId)
+            switch notificationType {
+            case "conference_will_start":
+                AppUtils.shared.showConferenceMainViewController(roomId: roomId)
+            case "conference_invitation":
+                InvitationObserverService.shared.show(extString: notice)
+            default:
+                break
+            }
         }
         return true
     }

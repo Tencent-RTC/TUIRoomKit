@@ -8,8 +8,9 @@
 import Foundation
 
 class RoomUserStatusView: UIView {
-    private var isOwner: Bool = false
+    private var isShownUserRoleFlag = false
     private var isViewReady: Bool = false
+    private var isShownMuteFlag = true
     private let homeOwnerImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "room_homeowner", in: tuiRoomKitBundle(), compatibleWith: nil))
         imageView.layer.cornerRadius = 12
@@ -69,7 +70,7 @@ class RoomUserStatusView: UIView {
             make.leading.equalToSuperview()
             make.height.equalTo(24)
             make.top.bottom.equalToSuperview()
-            make.width.equalTo(isOwner ? 24 : 0)
+            make.width.equalTo(isShownUserRoleFlag ? 24 : 0)
         }
     }
 }
@@ -81,17 +82,26 @@ extension RoomUserStatusView {
         } else {
             userNameLabel.text = userModel.userId
         }
-        isOwner = userModel.userId == EngineManager.shared.store.roomInfo.ownerId
+        if userModel.userRole == .roomOwner {
+            homeOwnerImageView.image = UIImage(named: "room_homeowner", in: tuiRoomKitBundle(), compatibleWith: nil)
+        } else if userModel.userRole == .administrator {
+            homeOwnerImageView.image = UIImage(named: "room_administrator", in: tuiRoomKitBundle(), compatibleWith: nil)
+        }
+        isShownUserRoleFlag = userModel.userRole != .generalUser
         updateViewConstraints()
-        updateUserVolume(hasAudio: userModel.hasAudioStream, volume: userModel.userVoiceVolume)
+        updateUserAudio(userModel.hasAudioStream)
+        updateUserVolume(volume: userModel.userVoiceVolume)
+    }
+    
+    func updateUserAudio(_ hasAudio: Bool) {
+        let volumeImageName = hasAudio ? "room_voice_volume1" : "room_mute_audio"
+        voiceVolumeImageView.image = UIImage(named: volumeImageName, in: tuiRoomKitBundle(), compatibleWith: nil)?.checkOverturn()
+        isShownMuteFlag = !hasAudio
     }
 
-    func updateUserVolume(hasAudio: Bool, volume: Int) {
-        if !hasAudio {
-            voiceVolumeImageView.image = UIImage(named: "room_mute_audio", in: tuiRoomKitBundle(), compatibleWith: nil)?.checkOverturn()
-        } else {
-            let volumeImageName = volume <= 0 ? "room_voice_volume1" : "room_voice_volume2"
-            voiceVolumeImageView.image = UIImage(named: volumeImageName, in: tuiRoomKitBundle(), compatibleWith: nil)
-        }
+    func updateUserVolume(volume: Int) {
+        guard !isShownMuteFlag else { return }
+        let volumeImageName = volume <= 0 ? "room_voice_volume1" : "room_voice_volume2"
+        voiceVolumeImageView.image = UIImage(named: volumeImageName, in: tuiRoomKitBundle(), compatibleWith: nil)
     }
 }

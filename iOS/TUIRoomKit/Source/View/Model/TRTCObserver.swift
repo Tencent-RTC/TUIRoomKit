@@ -13,12 +13,13 @@ import Foundation
 #endif
 
 class TRTCObserver: NSObject, TRTCCloudDelegate {
-    var roomId: String {
-        EngineManager.shared.store.roomInfo.roomId
-    }
     func onExitRoom(_ reason: Int) {
         guard reason == 2 else { return }
-        EngineEventCenter.shared.notifyEngineEvent(event: .onRoomDismissed, param: ["roomId": roomId])
+        let param: [String : Any] = [
+            "roomInfo" : EngineManager.shared.store.roomInfo,
+            "reason" : ConferenceFinishedReason.finishedByServer
+        ]
+        EngineEventCenter.shared.notifyEngineEvent(event: .onRoomDismissed, param: param)
     }
     
     func onStatistics(_ statistics: TRTCStatistics) {

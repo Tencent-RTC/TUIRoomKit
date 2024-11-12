@@ -66,10 +66,7 @@ class ConferenceOptionsView: UIView {
     
     init(viewController: ConferenceOptionsViewController) {
         rootViewController = viewController
-        listView = ConferenceListView(viewController: viewController, memberSelectFactory: { selectedList in
-            let participants = ConferenceParticipants(selectedList: selectedList)
-            return SelectMemberViewController(participants: participants)
-        })
+        listView = ConferenceListView(viewController: viewController)
         super.init(frame: .zero)
     }
     

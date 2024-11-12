@@ -11,7 +11,7 @@ import Factory
 
 enum ConferenceRoute {
     case none
-    case schedule(memberSelectFactory: MemberSelectionFactory?)
+    case schedule
     case main(conferenceParams: ConferenceParamType)
     case selectMember(memberSelectParams: MemberSelectParams?)
     case selectedMember(showDeleteButton: Bool, selectedMembers: [UserInfo])
@@ -20,7 +20,7 @@ enum ConferenceRoute {
     case modifySchedule(conferenceInfo: ConferenceInfo)
     case popup(view: UIView)
     case alert(state: AlertState)
-    case invitation(roomInfo: TUIRoomInfo, invitation: TUIInvitation)
+    case invitation(roomInfo: RoomInfo, invitation: TUIInvitation)
     
     func hideNavigationBar() -> Bool {
         switch self {
@@ -43,11 +43,7 @@ enum ConferenceRoute {
                     self = .none
                 }
             case is ScheduleConferenceViewController:
-                guard let vc = viewController as? ScheduleConferenceViewController else {
-                    self = .none
-                    break
-                }
-                self = .schedule(memberSelectFactory: vc.memberSelectionFactory)
+                self = .schedule
             case _ as ContactViewProtocol:
                 self = .selectMember(memberSelectParams: nil)
             case is SelectedMembersViewController:
@@ -65,7 +61,7 @@ enum ConferenceRoute {
                 self = .modifySchedule(conferenceInfo: vc?.conferenceInfo ?? ConferenceInfo())
             case is ConferenceInvitationViewController:
                 let vc = viewController as? ConferenceInvitationViewController
-                self = .invitation(roomInfo: vc?.roomInfo ?? TUIRoomInfo(), invitation: vc?.invitation ?? TUIInvitation())
+                self = .invitation(roomInfo: vc?.roomInfo ?? RoomInfo(), invitation: vc?.invitation ?? TUIInvitation())
             case is PopupViewController:
                 let vc = viewController as? PopupViewController
                 self = .popup(view: vc?.contentView ?? viewController.view)
@@ -90,8 +86,8 @@ extension ConferenceRoute {
                     vc.setJoinConferenceParams(params: joinConferenceParams)
                 }
                 return vc
-            case .schedule(memberSelectFactory: let factory):
-                return ScheduleConferenceViewController(memberSelectFactory: factory)
+            case .schedule:
+                return ScheduleConferenceViewController()
             case .selectMember(memberSelectParams: let memberSelectParams):
                 guard let params = memberSelectParams else {
                     return UIViewController()

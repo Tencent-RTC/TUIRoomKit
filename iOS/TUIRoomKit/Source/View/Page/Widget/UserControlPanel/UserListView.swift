@@ -416,7 +416,8 @@ class UserListView: UIView {
     }
     
     @objc func moreFunctionAction(sender: UIButton) {
-        RoomRouter.shared.presentPopUpViewController(viewType: .inviteViewType, height: 158.scale375Height())
+        let view = MoreUserManagerView()
+        view.show(rootView: self)
     }
     
     @objc func hideSearchControl(sender: UIView) {

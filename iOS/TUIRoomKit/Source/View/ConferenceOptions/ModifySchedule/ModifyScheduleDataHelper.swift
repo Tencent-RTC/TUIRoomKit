@@ -27,7 +27,9 @@ class ModifyScheduleDataHelper: ScheduleConferenceDataHelper {
         array.append(getModifyStartTimeItem(route: route, store: store))
         array.append(getModifyDurationTimeItem(route: route, store: store))
         array.append(getTimeZoneItem(route: route, store: store))
-        array.append(getParticipatingMembersItem(route: route, store: store, viewController: viewController))
+        if let participatingMembersItem = getParticipatingMembersItem(route: route, store: store, viewController: viewController) {
+            array.append(participatingMembersItem)
+        }
         return array
     }
     

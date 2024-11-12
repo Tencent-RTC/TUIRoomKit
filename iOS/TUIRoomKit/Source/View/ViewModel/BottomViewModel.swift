@@ -1,6 +1,5 @@
 //
 //  BottomViewModel.swift
-//  Alamofire
 //
 //  Created by aby on 2022/12/22.
 //  Copyright © 2022 Tencent. All rights reserved.
@@ -380,14 +379,18 @@ class BottomViewModel: NSObject {
             guard let item = viewItems.first(where: { $0.buttonType == .shareScreenItemType })
             else { return }
             if !item.isSelect {
+                //If you are in a room where you are raising your hand to speak, and you are not on the mic, you cannot share your screen.
+                guard !(roomInfo.isSeatEnabled && !currentUser.isOnSeat) else {
+                    viewResponder?.makeToast(text: .muteSeatReasonText)
+                    return
+                }
                 //If someone else is screen sharing, you can no longer screen share yourself
                 guard engineManager.store.attendeeList.first(where: {$0.hasScreenStream}) == nil else {
                     viewResponder?.makeToast(text: .othersScreenSharingText)
                     return
                 }
-                //If you are in a room where you are raising your hand to speak, and you are not on the mic, you cannot share your screen.
-                guard !(roomInfo.isSeatEnabled && !currentUser.isOnSeat) else {
-                    viewResponder?.makeToast(text: .muteSeatReasonText)
+                guard !(currentUser.userRole == .generalUser && roomInfo.isScreenShareDisableForAllUser) else {
+                    viewResponder?.makeToast(text: .failedShareOnlyHostOrAdminCanShare)
                     return
                 }
                 if TUICore.callService(TUICore_PrivacyService,
@@ -768,7 +771,7 @@ private extension String {
         localized("Succeed on stage")
     }
     static var othersScreenSharingText: String {
-        localized("An existing member is sharing. Please try again later")
+        localized("Another user is sharing the screen.")
     }
     static var toastTitleText: String {
         localized("Share Screen")
@@ -803,4 +806,5 @@ private extension String {
     static var inviteEnterRoomSuccesstext: String {
         localized("Invitation has been sent, waiting for users to join")
     }
+    static let failedShareOnlyHostOrAdminCanShare = localized("Failed to initiate share, currently only host/admin can share")
 }

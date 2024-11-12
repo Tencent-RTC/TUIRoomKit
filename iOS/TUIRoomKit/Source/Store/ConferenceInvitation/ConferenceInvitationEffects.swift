@@ -128,7 +128,7 @@ class ConferenceInvitationEffects: Effects {
                 } else if isNotBeingInviting == false {
                     environment.store?.dispatch(action: ConferenceInvitationActions.reject(payload: (roomInfo.roomId, .rejectToEnter)))
                 } else {
-                    InvitationObserverService.shared.showInvitationWindow(roomInfo: roomInfo, invitation: invitation)
+                    InvitationObserverService.shared.showInvitationWindow(roomInfo: RoomInfo(with: roomInfo), invitation: invitation)
                 }
             }
     }

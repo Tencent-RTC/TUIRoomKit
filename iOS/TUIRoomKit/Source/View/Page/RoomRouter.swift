@@ -301,11 +301,7 @@ extension RoomRouter {
     }
     
     func present(viewController: UIViewController, animated: Bool = true) {
-        if #available(iOS 13.0, *) {
-            viewController.modalPresentationStyle = .automatic
-        } else {
-            viewController.modalPresentationStyle = .overFullScreen
-        }
+        viewController.modalPresentationStyle = .overFullScreen
         if let navController = navController {
             navController.present(viewController, animated: animated)
         } else if let vc = context.rootViewController {

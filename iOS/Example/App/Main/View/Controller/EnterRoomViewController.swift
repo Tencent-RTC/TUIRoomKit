@@ -74,6 +74,7 @@ class EnterRoomViewController: UIViewController {
     }
     
     deinit {
+        ConferenceSession.sharedInstance.removeObserver(observer: self)
         debugPrint("deinit \(self)")
     }
 }
@@ -161,19 +162,19 @@ extension EnterRoomViewController {
 
 extension EnterRoomViewController: ConferenceObserver {
     func onConferenceJoined(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
-        if error != .success {
-            let errorText = "Error: " + String(describing: error) + ", Message: " + message
-           SceneDelegate.getCurrentWindow()?.makeToast(errorText, duration: 1, position:TUICSToastPositionCenter)
-           navigationController?.popViewController(animated: true)
-        }
+        guard error != .success else { return }
+        navigationController?.popViewController(animated: true)
+        let toastText = error == .roomIdNotExist ? .roomDoesNotExit : message
+        guard !toastText.isEmpty else { return }
+        SceneDelegate.getCurrentWindow()?.makeToast(toastText, duration: 1, position:TUICSToastPositionCenter)
     }
     
-    func onConferenceFinished(conferenceId: String) {
-        debugPrint("onConferenceFinished,conferenceId:\(conferenceId)")
+    func onConferenceFinished(roomInfo: TUIRoomInfo, reason: ConferenceFinishedReason) {
+        debugPrint("onConferenceFinished")
     }
     
-    func onConferenceExited(conferenceId: String) {
-        debugPrint("onConferenceExited,conferenceId:\(conferenceId)")
+    func onConferenceExited(roomInfo: TUIRoomInfo, reason: ConferenceExitedReason) {
+        debugPrint("onConferenceExited")
     }
 }
 
@@ -199,4 +200,5 @@ private extension String {
     static var openSpeakerText: String {
         RoomDemoLocalize("Speaker")
     }
+    static let roomDoesNotExit = RoomDemoLocalize("The room does not exit, please confirm the room number or create a room!")
 }

@@ -18,6 +18,7 @@ protocol UserListManagerViewEventResponder: AnyObject {
     func updateStackView(items:[ButtonItemData])
     func addStackView(item: ButtonItemData, index: Int?)
     func removeStackView(itemType: ButtonItemData.ButtonType)
+    func showUserNameInputView(userName: String?)
 }
 
 class UserListManagerViewModel: NSObject {
@@ -84,6 +85,9 @@ class UserListManagerViewModel: NSObject {
         }
         if checkSetAdministratorItemShownState() {
             userListManagerItems.append(setAdministratorItem)
+        }
+        if checkModifyTheNameItemShownState() {
+            userListManagerItems.append(modifyTheNameItem)
         }
         if checkMuteMessageItemShownState() {
             userListManagerItems.append(muteMessageItem)
@@ -201,38 +205,56 @@ class UserListManagerViewModel: NSObject {
         return item
     }()
     
+    private lazy var modifyTheNameItem: ButtonItemData = {
+        let item = ButtonItemData()
+        item.normalTitle = .modifyTheName
+        item.normalIcon = "room_modify_name"
+        item.resourceBundle = tuiRoomKitBundle()
+        item.hasLineView = true
+        item.action = { [weak self] sender in
+            guard let self = self, let button = sender as? UIButton else { return }
+            self.modifyTheNameAction(sender: button)
+        }
+        return item
+    }()
+    
     func backBlockAction(sender: UIView) {
         sender.isHidden = true
     }
     
     private func checkMediaShownState() -> Bool {
-        guard let selectUserInfo = selectUserInfo else { return false }
+        guard selectUserId != currentUser.userId else { return false }
         if !roomInfo.isSeatEnabled {
             return true
-        } else if selectUserInfo.isOnSeat {
+        } else if let selectUserInfo = selectUserInfo, selectUserInfo.isOnSeat {
             return true
+        } else {
+            return false
         }
-        return false
     }
     
     private func checkInviteSeatItemShownState() -> Bool {
-        return roomInfo.isSeatEnabled
+        return roomInfo.isSeatEnabled && selectUserId != currentUser.userId
     }
     
     private func checkChangeHostItemShownState() -> Bool {
-        return currentUser.userRole == .roomOwner
+        return currentUser.userRole == .roomOwner && selectUserId != currentUser.userId
     }
     
     private func checkMuteMessageItemShownState() -> Bool {
-        return true
+        return selectUserId != currentUser.userId
     }
     
     private func checkKickOutItemShownState() -> Bool {
-        return currentUser.userRole == .roomOwner
+        return currentUser.userRole == .roomOwner && selectUserId != currentUser.userId
     }
     
     private func checkSetAdministratorItemShownState() -> Bool {
-        return currentUser.userRole == .roomOwner
+        return currentUser.userRole == .roomOwner && selectUserId != currentUser.userId
+    }
+    
+    private func checkModifyTheNameItemShownState() -> Bool {
+        return true
     }
 }
 
@@ -373,6 +395,9 @@ extension UserListManagerViewModel {
         let title = localizedReplace(.transferHostTitle, replace: userInfo.userName)
         viewResponder?.showAlert(title: title, message: .transferHostMessage, sureTitle: .transferHostsureText, declineTitle: .cancelText, sureBlock: { [weak self] in
             guard let self = self else { return }
+            if self.roomInfo.isScreenShareDisableForAllUser, self.currentUser.hasScreenStream {
+                self.engineManager.stopScreenCapture()
+            }
             self.engineManager.changeUserRole(userId: self.selectUserId, role: .roomOwner) { [weak self] in
                 guard let self = self else { return }
                 let text = localizedReplace(.haveTransferredMasterText, replace: userInfo.userName)
@@ -409,12 +434,19 @@ extension UserListManagerViewModel {
             let removeAdministratorText = localizedReplace(.removedAdministratorText, replace: userInfo.userName)
             let text: String = role == .administrator ? setAdministratorText : removeAdministratorText
             self.viewResponder?.makeToast(text: text)
+            if role == .generalUser, self.roomInfo.isScreenShareDisableForAllUser, userInfo.hasScreenStream {
+                self.engineManager.closeRemoteDeviceByAdmin(userId: userInfo.userId, device: .screenSharing)
+            }
             self.viewResponder?.dismissView()
         } onError: { [weak self] code, message in
             guard let self = self else { return }
             self.viewResponder?.dismissView()
             debugPrint("changeUserRole,code:\(code),message:\(message)")
         }
+    }
+    
+    private func modifyTheNameAction(sender: UIButton) {
+        viewResponder?.showUserNameInputView(userName: selectUserInfo?.userName)
     }
 }
 
@@ -471,6 +503,22 @@ extension UserListManagerViewModel: RoomEngineEventResponder {
             }
         default: break
         }
+    }
+}
+
+extension UserListManagerViewModel: UserNameInputViewResponder {
+    func changeUserName(name: String) {
+        engineManager.changeUserNameCard(userid: selectUserId, nameCard: name) { [weak self] in
+            guard let self = self else { return }
+            self.viewResponder?.makeToast(text: .nameChangedSuccessfully)
+        } onError: { [weak self] _, _ in
+            guard let self = self else { return }
+            self.viewResponder?.makeToast(text: .nameChangeFailed)
+        }
+    }
+    
+    func onEndEditing() {
+        viewResponder?.dismissView()
     }
 }
 
@@ -580,4 +628,7 @@ private extension String {
     static var theStageIsFullText: String {
         localized("The stage is full")
     }
+    static let modifyTheName = localized("Modify the name")
+    static let nameChangedSuccessfully = localized("Name changed successfully")
+    static let nameChangeFailed = localized("Name change failed")
 }

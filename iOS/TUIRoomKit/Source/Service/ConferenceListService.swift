@@ -149,6 +149,7 @@ extension ConferenceListService: TUIConferenceListManagerObserver {
         let currentList = store.selectCurrent(ConferenceListSelectors.getConferenceList).map { $0.basicInfo.roomId }
         if currentList.contains(roomId) {
             store.dispatch(action: ConferenceListActions.removeConference(payload: roomId))
+            store.dispatch(action: ScheduleResponseActions.onConferenceRemoved(payload: roomId))
         }
     }
     

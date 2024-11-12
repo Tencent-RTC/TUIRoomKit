@@ -11,8 +11,9 @@ import RTCRoomEngine
 
 class ConferencePasswordView: UIView {
     var roomId: String?
-    private let maxNumber = 6
+    private let maxNumber = 32
     weak var viewModel: ConferenceMainViewModel?
+    private let passwordPattern = "^[A-Za-z0-9~`!@#$%^&*()\\-_=+{}\\[\\]\\\\|;:'\",<.>\\/?]+$"
     
     let shieldingView: UIView = {
         let view = UIView()
@@ -44,7 +45,7 @@ class ConferencePasswordView: UIView {
         view.textColor = UIColor(0x2B2E38)
         view.tintColor = UIColor(0x2B2E38).withAlphaComponent(0.7)
         view.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        view.keyboardType = .numberPad
+        view.keyboardType = .asciiCapable
         view.textAlignment = isRTL ? .right : .left
         view.layer.cornerRadius = 10
         view.layer.borderWidth = 1
@@ -59,6 +60,7 @@ class ConferencePasswordView: UIView {
         deleteButton.addTarget(self, action: #selector(deleteAction(sender:)), for: .touchUpInside)
         view.rightView = deleteButton
         view.rightViewMode = .whileEditing
+        view.isSecureTextEntry = true
         return view
     }()
     
@@ -189,19 +191,19 @@ class ConferencePasswordView: UIView {
 }
 
 extension ConferencePasswordView: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        textField.isSecureTextEntry = true
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        textField.isSecureTextEntry = false
-    }
-    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let text = textField.text else { return true }
         let newText = NSString(string: text).replacingCharacters(in: range, with: string)
-        sureButton.isEnabled = newText.count > 0
-        return newText.count <= maxNumber
+        let isPasswordValid = newText.isEmpty || checkPasswordIsValid(newText)
+        let isPasswordNumberFit = newText.count <= maxNumber
+        guard isPasswordValid, isPasswordNumberFit else { return false }
+        sureButton.isEnabled = !newText.isEmpty
+        return true
+    }
+    
+    private func checkPasswordIsValid(_ password: String) -> Bool {
+        let regex = NSPredicate(format:"SELF MATCHES %@", passwordPattern)
+        return regex.evaluate(with: password)
     }
 }
 
@@ -209,5 +211,5 @@ private extension String {
     static let conferencePassword = localized("Conference password")
     static let join = localized("Join")
     static let cancel = localized("Cancel")
-    static let pleaseEnterTheConferencePassword = localized("Please enter your room password")
+    static let pleaseEnterTheConferencePassword = localized("Please enter the password")
 }

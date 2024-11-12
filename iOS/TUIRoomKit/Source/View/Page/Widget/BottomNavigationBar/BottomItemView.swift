@@ -1,6 +1,5 @@
 //
 //  BottomItemView.swift
-//  Alamofire
 //
 //  Created by aby on 2022/12/23.
 //  Copyright © 2023 Tencent. All rights reserved.
@@ -41,6 +40,7 @@ class BottomItemView: UIView {
         view.layer.borderWidth = 3
         view.layer.borderColor = UIColor(0x2A2D38).cgColor
         view.layer.cornerRadius = 12
+        view.isUserInteractionEnabled = false
         view.clipsToBounds = true
         return view
     }()

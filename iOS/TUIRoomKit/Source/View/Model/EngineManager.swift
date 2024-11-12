@@ -8,6 +8,7 @@
 
 import Foundation
 import TUICore
+import Factory
 import RTCRoomEngine
 #if canImport(TXLiteAVSDK_TRTC)
     import TXLiteAVSDK_TRTC
@@ -17,6 +18,7 @@ import RTCRoomEngine
 
 class EngineManager: NSObject {
     static private(set) var shared = EngineManager()
+    @WeakLazyInjected(\.conferenceStore) private var operation
 
     private(set) lazy var store: RoomStore = {
         let store = RoomStore()
@@ -65,6 +67,10 @@ class EngineManager: NSObject {
         }
     }
     
+    func getSelfInfo() -> TUILoginUserInfo {
+        return TUIRoomEngine.getSelfInfo()
+    }
+    
     func createRoom(roomInfo: TUIRoomInfo, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         roomInfo.name = transferConferenceName(conferenceName: roomInfo.name)
         if !isLoginEngine {
@@ -100,16 +106,15 @@ class EngineManager: NSObject {
         }
     }
     
-    func exitRoom(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
-        roomEngine.exitRoom(syncWaiting: false) { [weak self] in
+    func exitRoom(syncWaiting: Bool = true, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
+        roomEngine.exitRoom(syncWaiting: syncWaiting) { [weak self] in
             guard let self = self else { return }
-            self.handleExitRoomResult()
+            self.operation?.dispatch(action: RoomResponseActions.onExitSuccess())
             onSuccess?()
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            self.handleExitRoomResult()
+        } onError: { code, message in
             onError?(code, message)
         }
+        handleExitRoomResult()
     }
     
     func destroyRoom(onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
@@ -220,6 +225,20 @@ class EngineManager: NSObject {
             onSuccess()
         } onError: { code, message in
             onError(code, message)
+        }
+    }
+    
+    func muteAllShareScreenAction(isMute: Bool, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
+        roomEngine.disableDeviceForAllUserByAdmin(device: .screenSharing, isDisable: isMute) { [weak self] in
+            guard let self = self else { return }
+            self.store.roomInfo.isScreenShareDisableForAllUser = isMute
+            if var roomState = self.operation?.selectCurrent(RoomSelectors.getRoomState) {
+                roomState.isScreenShareDisableForAllUser = isMute
+                self.operation?.dispatch(action: RoomActions.updateRoomState(payload: roomState))
+            }
+            onSuccess?()
+        } onError: { code, message in
+            onError?(code, message)
         }
     }
     
@@ -402,8 +421,12 @@ class EngineManager: NSObject {
         }
     }
     
-    func closeRemoteDeviceByAdmin(userId: String, device: TUIMediaDevice, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
-        roomEngine.closeRemoteDeviceByAdmin(userId: userId, device: device, onSuccess: onSuccess, onError: onError)
+    func closeRemoteDeviceByAdmin(userId: String, device: TUIMediaDevice, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
+        roomEngine.closeRemoteDeviceByAdmin(userId: userId, device: device) {
+            onSuccess?()
+        } onError: { code, message in
+            onError?(code, message)
+        }
     }
     
     func openRemoteDeviceByAdmin(userId: String, device: TUIMediaDevice,
@@ -461,6 +484,8 @@ class EngineManager: NSObject {
             } else {
                 onSuccess?()
             }
+            self.updateScreenStreamUsers()
+            self.updateDisableMessageUsers()
         } onError: { code, message in
             onError?(code, message)
         }
@@ -492,6 +517,14 @@ class EngineManager: NSObject {
             self.store.setInviteSeatList(list: list)
         } onError: { code, message in
             debugPrint("getSeatApplicationList,code:\(code),message:\(message)")
+        }
+    }
+    
+    func changeUserNameCard(userid: String, nameCard: String, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
+        roomEngine.changeUserNameCard(userId: userid, nameCard: nameCard) {
+            onSuccess?()
+        } onError: { code, message in
+            onError?(code, message)
         }
     }
 }
@@ -713,6 +746,20 @@ extension EngineManager {
         }
     }
     
+    private func updateScreenStreamUsers() {
+        let hasScreenStreamUsers = store.attendeeList.filter({ $0.hasScreenStream })
+        let hasScreenStreamUserIdArray: [String] = hasScreenStreamUsers.map { $0.userId }
+        let hasScreenStreamUserIdSet: Set<String> = Set(hasScreenStreamUserIdArray)
+        operation?.dispatch(action: UserActions.updateHasScreenStreamUsers(payload: hasScreenStreamUserIdSet))
+    }
+    
+    private func updateDisableMessageUsers() {
+        let disableMessageUsers = store.attendeeList.filter({ $0.disableSendingMessage })
+        let disableMessageUserIdArray: [String] = disableMessageUsers.map { $0.userId }
+        let disableMessageUserIdSet: Set<String> = Set(disableMessageUserIdArray)
+        operation?.dispatch(action: UserActions.updateDisableMessageUsers(payload: disableMessageUserIdSet))
+    }
+    
     private func getSeatList(onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         roomEngine.getSeatList { [weak self] seatList in
             guard let self = self else { return }
@@ -751,13 +798,21 @@ extension EngineManager {
     }
     
     private func handleDestroyRoomResult() {
+        let param: [String : Any] = [
+            "roomInfo" : store.roomInfo,
+            "reason" : ConferenceFinishedReason.finishedByOwner
+        ]
         destroyEngineManager()
-        EngineEventCenter.shared.notifyEngineEvent(event: .onDestroyedRoom, param: [ "roomId" : store.roomInfo.roomId ])
+        EngineEventCenter.shared.notifyEngineEvent(event: .onDestroyedRoom, param: param)
     }
     
     private func handleExitRoomResult() {
+        let param: [String : Any] = [
+            "roomInfo" : store.roomInfo,
+            "reason" : ConferenceExitedReason.exitedBySelf
+        ]
         destroyEngineManager()
-        EngineEventCenter.shared.notifyEngineEvent(event: .onExitedRoom, param: [ "roomId" : store.roomInfo.roomId ])
+        EngineEventCenter.shared.notifyEngineEvent(event: .onExitedRoom, param: param)
     }
     
 }

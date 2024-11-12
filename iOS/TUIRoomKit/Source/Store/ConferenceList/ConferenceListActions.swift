@@ -45,4 +45,5 @@ enum ScheduleResponseActions {
     static let onScheduleSuccess = ActionTemplate(id: key.appending("onScheduleSuccess"), payloadType: TUIConferenceInfo.self)
     static let onCancelSuccess = ActionTemplate(id: key.appending("onScheduleSuccess"))
     static let onUpdateInfoSuccess = ActionTemplate(id: key.appending("onUpdateInfoSuccess"))
+    static let onConferenceRemoved = ActionTemplate(id: key.appending("onConferenceRemoved"), payloadType: String.self)
 }

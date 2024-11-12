@@ -12,6 +12,7 @@ class ConferenceStoreProvider {
     let errorSubject = PassthroughSubject<RoomError, Never>()
     let toastSubject = PassthroughSubject<ToastInfo, Never>()
     let scheduleActionSubject = PassthroughSubject<any IdentifiableAction, Never>()
+    let roomActionSubject = PassthroughSubject<any IdentifiableAction, Never>()
     
     private(set) lazy var operation: Store<OperationState, ServiceCenter> = {
         return Store(initialState: OperationState(), environment: ServiceCenter())
@@ -93,7 +94,9 @@ extension ConferenceStoreProvider: ConferenceStore {
         if action.id.hasPrefix(ScheduleResponseActions.key) {
             scheduleActionSubject.send(action)
         }
-        
+        if action.id.hasPrefix(RoomResponseActions.key) {
+            roomActionSubject.send(action)
+        }
         if action.id.hasPrefix(ViewActions.toastActionKey) {
             handleToast(action: action)
         } else if action.id.hasPrefix(ViewActions.key) {
