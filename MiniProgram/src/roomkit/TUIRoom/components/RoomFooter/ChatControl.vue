@@ -23,7 +23,7 @@ import { useChatStore } from '../../stores/chat';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
 import TuiBadge from '../common/base/Badge.vue';
-import { roomService } from '../../services';
+import { roomService, MetricsKey } from '../../services';
 const { t } = useI18n();
 const chatControlConfig = roomService.getComponentConfig('ChatControl');
 const basicStore = useBasicStore();
@@ -39,5 +39,6 @@ async function toggleChatSidebar() {
   basicStore.setSidebarOpenStatus(true);
   basicStore.setSidebarName('chat');
   chatStore.updateUnReadCount(0);
+  roomService.dataReportManager.reportCount(MetricsKey.openChat);
 }
 </script>
