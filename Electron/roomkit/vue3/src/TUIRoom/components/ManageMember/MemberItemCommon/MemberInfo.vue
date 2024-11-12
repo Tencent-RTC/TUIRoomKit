@@ -221,7 +221,7 @@ const iconList = computed(() => {
     height: 100%;
     color: var(--icon-color);
 
-    .state-icon .member-invite {
+    .state-icon {
       margin-left: 16px;
     }
 

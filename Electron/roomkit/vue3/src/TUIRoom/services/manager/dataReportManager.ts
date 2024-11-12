@@ -16,6 +16,9 @@ export enum MetricsKey {
   enableWatermark = 106054,
   enableVirtualBackground = 106055,
   hideFeatureButton = 106056,
+  openChat = 106057,
+  setBasicBeauty = 106058,
+  aiTask = 106059,
 }
 
 type Task = () => void;

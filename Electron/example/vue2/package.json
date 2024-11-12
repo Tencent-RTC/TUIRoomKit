@@ -1,6 +1,6 @@
 {
   "name": "room-uikit-electron-vue2",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "private": true,
   "main": "main.electron.js",
   "license": "MIT",
@@ -61,9 +61,9 @@
   },
   "dependencies": {
     "@tencentcloud/chat": "latest",
-    "@tencentcloud/roomkit-electron-vue2.7": "^2.7.0",
+    "@tencentcloud/roomkit-electron-vue2.7": "^2.7.1",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-electron": "^2.7.0",
+    "@tencentcloud/tuiroom-engine-electron": "^2.7.1",
     "@tencentcloud/universal-api": "^2.0.9",
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
