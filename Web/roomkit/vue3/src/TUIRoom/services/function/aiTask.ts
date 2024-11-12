@@ -1,12 +1,16 @@
 import { IRoomService } from '../';
 import mitt from 'mitt';
 import { isElectron, isMobile } from '../../utils/environment';
+import { findLastIndex } from '../../utils/utils';
 
-interface SubtitleMessage {
-  userid: string;
+export interface SubtitleMessage {
+  sender: string;
   text: string;
-  translation_text: string;
+  translationText: string;
+  end?: boolean;
+  startMsTs: number;
 }
+
 interface DataPayload {
   end: boolean;
   text: string;
@@ -34,22 +38,23 @@ export enum AI_TASK {
 
 export interface AITaskEvent {
   [AI_TASK.TRANSCRIPTION_TASK]: {
-    subtitleMsg: SubtitleMessage[];
-    subtitleText: { value: string };
-    transcriptionText: { value: string };
+    subtitleMessages: { [key: string]: SubtitleMessage };
+    transcribedMessageList: SubtitleMessage[];
   };
   [key: string]: unknown;
   [key: symbol]: unknown;
 }
 
+const ASR_EVENT_CODE = 10000;
+
 export class AITask {
   private emitter = mitt<AITaskEvent>();
-
   private trtc: any;
   private service: IRoomService;
-  public subtitleMsg: SubtitleMessage[] = [];
-  public subtitleText: { value: string } = { value: '' };
-  public transcriptionText: { value: string } = { value: '' };
+  public subtitleMessages: { [key: string]: SubtitleMessage } = {};
+  public transcribedMessageList: SubtitleMessage[] = [];
+  private subtitleTimeout: { [key: string]: ReturnType<typeof setTimeout> } =
+    {};
 
   constructor(service: IRoomService) {
     this.service = service;
@@ -95,14 +100,13 @@ export class AITask {
     ) {
       return;
     }
-    const trtc = this.service.roomEngine.instance?.getTRTCCloud()._trtc;
-    this.trtc = trtc;
-    trtc.on('custom-message', this.handleAIMessage);
+    this.trtc = this.service.roomEngine.instance?.getTRTCCloud()._trtc;
+    this.trtc.on('custom-message', this.handleAIMessage);
   }
+
   private handleUnmount() {
-    this.subtitleMsg = [];
-    this.subtitleText.value = '';
-    this.transcriptionText.value = '';
+    this.subtitleMessages = {};
+    this.transcribedMessageList = [];
     this.trtc?.off('custom-message', this.handleAIMessage);
   }
 
@@ -111,122 +115,84 @@ export class AITask {
     this.service.lifeCycleManager.on('unmount', this.handleUnmount);
   }
 
-  // todo trtc defines this type as any
+  private resetSubtitleTimeout(id: string, fn: () => void) {
+    if (this.subtitleTimeout[id]) {
+      clearTimeout(this.subtitleTimeout[id]);
+    }
+    this.subtitleTimeout[id] = setTimeout(fn, 3000);
+  }
+
   private handleAIMessage(event: any) {
     if (event.cmdId !== 1) return;
     const data = new TextDecoder().decode(event.data);
     const jsonData = JSON.parse(data);
     this.handleMessage(jsonData);
     this.emit(AI_TASK.TRANSCRIPTION_TASK, {
-      subtitleText: this.subtitleText,
-      transcriptionText: this.transcriptionText,
-      subtitleMsg: this.subtitleMsg,
+      subtitleMessages: this.subtitleMessages,
+      transcribedMessageList: this.transcribedMessageList,
     });
   }
 
   private handleMessage(data: MessageData): void {
-    const refreshSubtitle = (): void => {
-      let displayText = '';
-      for (let i = 0; i < this.subtitleMsg.length; i++) {
-        displayText += `${this.service.roomStore.getDisplayName(this.subtitleMsg[i].userid)}: ${this.subtitleMsg[i].text}\n`;
-        if (this.subtitleMsg[i].translation_text !== '') {
-          displayText += `${this.service.roomStore.getDisplayName(this.subtitleMsg[i].userid)}: ${this.subtitleMsg[i].translation_text}\n`;
-        }
-      }
-      this.subtitleText.value = displayText;
+    if (data.type !== ASR_EVENT_CODE) return;
+    const { sender, payload } = data;
+    const { end } = payload;
+
+    const createSubtitleMsg = () => {
+      return {
+        sender,
+        text: payload.text,
+        translationText: payload.translation_text,
+        startMsTs: data.start_ms_ts,
+        end,
+      };
     };
 
-    if (data.type === 10000 && data.payload.end === false) {
-      // Real-time subtitles
-      let exist = false;
-      for (let i = 0; i < this.subtitleMsg.length; i++) {
-        if (data.sender === this.subtitleMsg[i].userid) {
-          this.subtitleMsg[i].text = data.payload.text;
-          this.subtitleMsg[i].translation_text = data.payload.translation_text;
-          exist = true;
-          break;
-        }
-      }
-      if (!exist) {
-        this.subtitleMsg.push({
-          userid: data.sender,
-          text: data.payload.text,
-          translation_text: data.payload.translation_text,
-        });
-      }
+    const updateMsg = (msg: SubtitleMessage) => {
+      msg.text = payload.text;
+      msg.translationText = payload.translation_text;
+      msg.end = end;
+    };
 
-      refreshSubtitle();
-    } else if (data.type === 10000 && data.payload.end === true) {
-      // One sentence recognition completed
-      let index = 0;
-      for (let i = 0; i < this.subtitleMsg.length; i++) {
-        if (data.sender === this.subtitleMsg[i].userid) {
-          this.subtitleMsg[i].text = data.payload.text;
-          this.subtitleMsg[i].translation_text = data.payload.translation_text;
-          index = i;
-          break;
-        }
+    const appendMsg = <T extends SubtitleMessage>(
+      msg: T,
+      target: T[] | Record<string, T>
+    ) => {
+      if (Array.isArray(target)) {
+        target.push(msg);
+      } else if (typeof target === 'object') {
+        const recordTarget = target as Record<string, T>;
+        recordTarget[msg.sender] = msg;
+      } else {
+        throw new Error('Invalid target type');
       }
-      refreshSubtitle();
-      // todo start_ms_ts end_ms_ts
+    };
 
-      let content = `${data.payload.start_time}->${data.payload.end_time}  ${data.sender}: ${data.payload.text}\n`;
-      if (data.payload.translation_text !== '') {
-        content += `${data.payload.start_time}->${data.payload.end_time}  ${data.sender}: ${data.payload.translation_text}\n`;
-      }
-      this.transcriptionText.value += content;
+    const existingSubtitle = this.subtitleMessages[sender];
+    if (existingSubtitle) {
+      updateMsg(existingSubtitle);
+    } else {
+      appendMsg(createSubtitleMsg(), this.subtitleMessages);
     }
 
-    // subtitle and transcription  is deprecated
-    if (data.type === 'subtitle') {
-      let exist = false;
-      for (let i = 0; i < this.subtitleMsg.length; i++) {
-        if (data.userid === this.subtitleMsg[i].userid) {
-          this.subtitleMsg[i].text = data.text;
-          this.subtitleMsg[i].translation_text = data.translation_text;
-          exist = true;
-          break;
-        }
-      }
-      if (!exist) {
-        this.subtitleMsg.push({
-          userid: data.userid,
-          text: data.text,
-          translation_text: data.translation_text,
-        });
-      }
+    const transcriptionIndex = findLastIndex(
+      this.transcribedMessageList,
+      msg => msg.sender === sender && !msg.end
+    );
 
-      refreshSubtitle();
-    } else if (data.type === 'transcription') {
-      let index = 0;
-      for (let i = 0; i < this.subtitleMsg.length; i++) {
-        if (data.userid === this.subtitleMsg[i].userid) {
-          this.subtitleMsg[i].text = data.text;
-          this.subtitleMsg[i].translation_text = data.translation_text;
-          index = i;
-          break;
-        }
-      }
-      refreshSubtitle();
-
-      let content = `${formatTimestampToTime(data.start_ms_ts)}->${formatTimestampToTime(data.end_ms_ts)}  ${this.service.roomStore.getDisplayName(data.userid)}: ${data.text}\n`;
-      if (data.translation_text !== '') {
-        content += `${formatTimestampToTime(data.start_ms_ts)}->${formatTimestampToTime(data.end_ms_ts)}  ${this.service.roomStore.getDisplayName(data.userid)}: ${data.translation_text}\n`;
-      }
-      this.transcriptionText.value += content;
+    if (transcriptionIndex !== -1) {
+      updateMsg(this.transcribedMessageList[transcriptionIndex]);
+    } else {
+      appendMsg(createSubtitleMsg(), this.transcribedMessageList);
     }
-  }
 
-  public StartAITranscription(): void {
-    // Implementation for starting AI transcription
+    this.resetSubtitleTimeout(sender, () => {
+      if (!end) return;
+      delete this.subtitleMessages[sender];
+      this.emit(AI_TASK.TRANSCRIPTION_TASK, {
+        subtitleMessages: this.subtitleMessages,
+        transcribedMessageList: this.transcribedMessageList,
+      });
+    });
   }
-}
-
-// utils
-function formatTimestampToTime(timestamp: number): string {
-  const date = new Date(timestamp);
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const seconds = date.getSeconds().toString().padStart(2, '0');
-  return `${hours}:${minutes}:${seconds}`;
 }
