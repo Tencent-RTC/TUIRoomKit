@@ -31,7 +31,9 @@ class ScheduleDetailsDataHelper: ScheduleConferenceDataHelper {
             array.append(passwordItem)
         }
         array.append(getRoomHostItem(route: route, store: store))
-        array.append(getDetailsParticipatingMembersItem(route: route, store: store))
+        if let detailsParticipatingMembersItem = getDetailsParticipatingMembersItem(route: route, store: store) {
+            array.append(detailsParticipatingMembersItem)
+        }
         return array
     }
     
@@ -77,6 +79,17 @@ class ScheduleDetailsDataHelper: ScheduleConferenceDataHelper {
         var startTimeItem = getStartTimeItem(route: route, store: store)
         startTimeItem.selectClosure = nil
         startTimeItem.showButton = false
+        startTimeItem.bindStateClosure = { cell, cancellableSet in
+            let selector = Selector(keyPath: \ConferenceInfo.scheduleStartTime)
+            store.select(selector)
+                .receive(on: RunLoop.main)
+                .sink { [weak cell] startTime in
+                    if let cell = cell as? ScheduleTabCell {
+                        cell.messageLabel.text = getTimeIntervalString(TimeInterval(startTime), timeZone: .current)
+                    }
+                }
+                .store(in: &cancellableSet)
+        }
         return startTimeItem
     }
     
@@ -93,20 +106,19 @@ class ScheduleDetailsDataHelper: ScheduleConferenceDataHelper {
         return hostItem
     }
     
-    private class func getDetailsParticipatingMembersItem(route: Route, store: ScheduleConferenceStore) -> ListItem {
+    private class func getDetailsParticipatingMembersItem(route: Route, store: ScheduleConferenceStore) -> ListItem? {
         var item = getParticipatingMembersItem(route: route, store: store)
-        item.buttonIcon = "room_down_arrow1"
-        item.selectClosure = {
+        item?.buttonIcon = "room_down_arrow1"
+        item?.selectClosure = {
             if store.conferenceInfo.attendeeListResult.attendeeList.count > 0 {
                 route.present(route: .selectedMember(showDeleteButton: false, selectedMembers: store.conferenceInfo.attendeeListResult.attendeeList))
             }
         }
-        item.bindStateClosure = {  cell, cancellableSet in
+        item?.bindStateClosure = {  cell, cancellableSet in
             let selector = Selector(keyPath: \ConferenceInfo.attendeeListResult.attendeeList)
             store.select(selector)
                 .receive(on: RunLoop.main)
-                .removeDuplicates()
-                .sink { list in
+                .sink { [weak cell] list in
                     if let cell = cell as? ScheduleTabCell {
                         var iconList: [String] = []
                         for i in 0...2 {

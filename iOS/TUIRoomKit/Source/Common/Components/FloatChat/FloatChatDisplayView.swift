@@ -15,12 +15,17 @@ import Combine
 #endif
 import Factory
 
+protocol FloatChatDisplayViewDelegate: AnyObject {
+    func getTheLatestUserName(userId: String) -> String
+}
+
 class FloatChatDisplayView: UIView {
     @Injected(\.floatChatService) private var store: FloatChatStoreProvider
     private lazy var messagePublisher = self.store.select(FloatChatSelectors.getLatestMessage)
     private var messages: [FloatChatMessageView] = []
     var cancellableSet = Set<AnyCancellable>()
     private let messageSpacing: CGFloat = 8
+    weak var delegate: FloatChatDisplayViewDelegate?
     
     private lazy var blurLayer: CALayer = {
         let layer = CAGradientLayer()
@@ -65,6 +70,10 @@ class FloatChatDisplayView: UIView {
     }
     
     private func addMessage(_ message: FloatChatMessage) {
+        var message = message
+        if let userName = delegate?.getTheLatestUserName(userId: message.user.userId), !userName.isEmpty {
+            message.user.userName = userName
+        }
         let messageView = FloatChatMessageView(floatMessage: message)
         if currentMessageHeight() + messageView.height + messageSpacing > bounds.height {
             removeOldestMessage()

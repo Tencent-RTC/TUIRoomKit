@@ -77,6 +77,12 @@ class UserListManagerView: UIView {
         return view
     }()
     
+    lazy var userNameInputView: UserNameInputView = {
+        let view = UserNameInputView()
+        view.viewResponder = self.viewModel
+        return view
+    }()
+    
     init(viewModel: UserListManagerViewModel) {
         self.viewModel = viewModel
         super.init(frame: .zero)
@@ -102,6 +108,7 @@ class UserListManagerView: UIView {
         guard currentLandscape != isLandscape else { return }
         setupViewOrientation(isLandscape: isLandscape)
         currentLandscape = isLandscape
+        userNameInputView.hideInputView()
     }
     
     private func constructViewHierarchy() {
@@ -114,6 +121,7 @@ class UserListManagerView: UIView {
         scrollView.addSubview(stackView)
         headView.addSubview(avatarImageView)
         headView.addSubview(userLabel)
+        addSubview(userNameInputView)
         setupStackView()
     }
     
@@ -140,6 +148,9 @@ class UserListManagerView: UIView {
             make.leading.trailing.equalToSuperview()
             make.bottom.equalToSuperview()
             make.width.equalToSuperview()
+        }
+        userNameInputView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
     
@@ -261,6 +272,10 @@ class UserListManagerView: UIView {
 }
 
 extension UserListManagerView: UserListManagerViewEventResponder {
+    func showUserNameInputView(userName: String?) {
+        userNameInputView.showInputView(userName: userName)
+    }
+    
     func showAlert(title: String?, message: String?, sureTitle: String?, declineTitle: String?, sureBlock: (() -> ())?, declineBlock: (() -> ())?) {
         RoomRouter.presentAlert(title: title, message: message, sureTitle: sureTitle, declineTitle: declineTitle, sureBlock: sureBlock, declineBlock: declineBlock)
     }

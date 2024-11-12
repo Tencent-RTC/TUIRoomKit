@@ -13,10 +13,10 @@ import Factory
 
 class ConferenceInvitationViewController: UIViewController {
     private var cancellableSet = Set<AnyCancellable>()
-    var roomInfo: TUIRoomInfo
+    var roomInfo: RoomInfo
     var invitation: TUIInvitation
     
-    init(roomInfo: TUIRoomInfo, invitation: TUIInvitation) {
+    init(roomInfo: RoomInfo, invitation: TUIInvitation) {
         self.roomInfo = roomInfo
         self.invitation = invitation
         super.init(nibName: nil, bundle: nil)

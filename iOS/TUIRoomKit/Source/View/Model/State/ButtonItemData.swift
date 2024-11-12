@@ -7,6 +7,9 @@
 //
 
 import Foundation
+import Combine
+
+typealias ButtonStateBinderClosure = (ButtonItemView ,inout Set<AnyCancellable>)->Void
 
 class ButtonItemData {
     enum ButtonType {
@@ -64,4 +67,5 @@ class ButtonItemData {
     var isEnabled: Bool = true
     var isHidden: Bool = false
     var alpha: CGFloat = 1
+    var bindStateClosure: ButtonStateBinderClosure?
 }

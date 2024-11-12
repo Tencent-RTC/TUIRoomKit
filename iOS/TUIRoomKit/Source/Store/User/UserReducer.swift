@@ -21,5 +21,11 @@ let userReducer = Reducer<UserState>(
     }),
     ReduceOn(UserActions.updateAllUsers, reduce: { state, action in
         state.allUsers = action.payload
+    }),
+    ReduceOn(UserActions.updateHasScreenStreamUsers, reduce: { state, action in
+        state.hasScreenStreamUsers = action.payload
+    }),
+    ReduceOn(UserActions.updateDisableMessageUsers, reduce: { state, action in
+        state.disableMessageUsers = action.payload
     })
 )

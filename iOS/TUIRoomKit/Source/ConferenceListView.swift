@@ -18,13 +18,10 @@ struct ConferenceSection {
 
 @objcMembers public class ConferenceListView: UIView {
     // MARK: - Intailizer
-    public init(viewController: UIViewController, memberSelectFactory: MemberSelectionFactory?) {
+    public init(viewController: UIViewController) {
         super.init(frame: .zero)
         let viewRoute = ConferenceRoute.init(viewController: viewController)
         navigation.initializeRoute(viewController: viewController, rootRoute: viewRoute)
-        if let factory = memberSelectFactory {
-            navigation.dispatch(action: ConferenceNavigationAction.setMemberSelectionFactory(payload: factory))
-        }
     }
     
     @available(*, unavailable, message: "Use init(viewController:) instead")
@@ -160,6 +157,7 @@ struct ConferenceSection {
     private func bindInteraction() {
         subscribeToast()
         subscribeScheduleSubject()
+        subscribeRoomSubject()
         store.dispatch(action: ConferenceListActions.fetchConferenceList(payload: (fetchListCursor, conferencesPerFetch)))
         conferenceListPublisher
             .receive(on: DispatchQueue.global(qos: .default))
@@ -345,6 +343,18 @@ extension ConferenceListView {
             }
             .store(in: &cancellableSet)
     }
+    
+    private func subscribeRoomSubject() {
+        store.roomActionSubject
+            .receive(on: RunLoop.main)
+            .filter { $0.id == RoomResponseActions.onExitSuccess.id }
+            .sink { [weak self] action in
+                guard let self = self else { return }
+                self.store.dispatch(action: ScheduleViewActions.refreshConferenceList())
+            }
+            .store(in: &cancellableSet)
+    }
+    
 }
 
 private extension String {

@@ -7,6 +7,7 @@
 
 import Foundation
 import RTCRoomEngine
+import Factory
 
 class ScheduleConferenceDataHelper {
     open class func generateScheduleConferenceData(route: Route,
@@ -32,7 +33,9 @@ extension ScheduleConferenceDataHelper {
         array.append(getStartTimeItem(route: route, store: store))
         array.append(getDurationTimeItem(route: route, store: store))
         array.append(getTimeZoneItem(route: route, store: store))
-        array.append(getParticipatingMembersItem(route: route, store: store, viewController: viewController))
+        if let participatingMembersItem = getParticipatingMembersItem(route: route, store: store, viewController: viewController) {
+            array.append(participatingMembersItem)
+        }
         return array
     }
     
@@ -144,7 +147,7 @@ extension ScheduleConferenceDataHelper {
             let selector = Selector(keyPath: \ConferenceInfo.durationTime)
             store.select(selector)
                 .receive(on: RunLoop.main)
-                .sink { durationTime in
+                .sink { [weak cell] durationTime in
                     if let cell = cell as? ScheduleTabCell {
                         cell.messageLabel.text = getDurationTimeString(durationTime)
                     }
@@ -165,7 +168,7 @@ extension ScheduleConferenceDataHelper {
             let selector = Selector(keyPath: \ConferenceInfo.timeZone)
             store.select(selector)
                 .receive(on: RunLoop.main)
-                .sink { timeZone in
+                .sink { [weak cell] timeZone in
                     if let cell = cell as? ScheduleTabCell {
                         cell.messageLabel.text = timeZone.getTimeZoneName()
                     }
@@ -175,7 +178,10 @@ extension ScheduleConferenceDataHelper {
         return timeZoneItem
     }
     
-    class func getParticipatingMembersItem(route: Route, store: ScheduleConferenceStore, viewController: ContactViewSelectDelegate? = nil) -> ListItem {
+    class func getParticipatingMembersItem(route: Route, store: ScheduleConferenceStore, viewController: ContactViewSelectDelegate? = nil) -> ListItem? {
+#if !DEBUG
+        guard Container.shared.contactViewController(ConferenceParticipants()) as? (ContactViewProtocol & UIViewController) != nil else { return nil }
+#endif
         var participatingMembersItem = ListItem(title: .participatingMembersText)
         participatingMembersItem.showButton = true
         participatingMembersItem.buttonIcon = "room_right_arrow1"
@@ -189,7 +195,7 @@ extension ScheduleConferenceDataHelper {
             let selector = Selector(keyPath: \ConferenceInfo.attendeeListResult.attendeeList)
             store.select(selector)
                 .receive(on: RunLoop.main)
-                .sink { list in
+                .sink { [weak cell] list in
                     if let cell = cell as? ScheduleTabCell {
                         var iconList: [String] = []
                         for i in 0...2 {
@@ -244,7 +250,7 @@ extension ScheduleConferenceDataHelper {
             let selector = Selector(keyPath: \ConferenceInfo.basicInfo.isMicrophoneDisableForAllUser)
             store.select(selector)
                 .receive(on: RunLoop.main)
-                .sink { isMicrophoneDisableForAllUser in
+                .sink { [weak cell] isMicrophoneDisableForAllUser in
                     if let cell = cell as? SwitchCell {
                         cell.rightSwitch.isOn = isMicrophoneDisableForAllUser
                     }
@@ -266,7 +272,7 @@ extension ScheduleConferenceDataHelper {
             let selector = Selector(keyPath: \ConferenceInfo.basicInfo.isCameraDisableForAllUser)
             store.select(selector)
                 .receive(on: RunLoop.main)
-                .sink { isCameraDisableForAllUser in
+                .sink { [weak cell] isCameraDisableForAllUser in
                     if let cell = cell as? SwitchCell {
                         cell.rightSwitch.isOn = isCameraDisableForAllUser
                     }

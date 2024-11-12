@@ -19,7 +19,6 @@ class ScheduleConferenceStoreProvider {
     static let updateConferenceInfo = ActionTemplate(id: "updateConferenceInfo", payloadType: ConferenceInfo.self)
     static let fetchAttendeeList = ActionTemplate(id: "fetchAttendeeList", payloadType: (String, String, Int).self)
     static let updateAttendeeList = ActionTemplate(id: "updateAttendeeList", payloadType: ([UserInfo], String, UInt).self)
-    static let updateBasicInfo = ActionTemplate(id: "updateBasicInfo", payloadType: RoomInfo.self)
     static let fetchRoomInfo = ActionTemplate(id: ".fetchRoomInfo", payloadType: String.self)
     static let attendeesPerFetch = 20
     
@@ -38,9 +37,6 @@ class ScheduleConferenceStoreProvider {
             state.attendeeListResult.attendeeList.append(contentsOf: action.payload.0)
             state.attendeeListResult.fetchCursor = action.payload.1
             state.attendeeListResult.totalCount = action.payload.2
-        }),
-        ReduceOn(updateBasicInfo, reduce: { state, action in
-            state.basicInfo = action.payload
         })
     )
     
@@ -97,7 +93,7 @@ class scheduleConferenceEffects: Effects {
             .flatMap { action in
                 environment.conferenceListService.fetchConferenceInfo(roomId: action.payload)
                     .map { conferenceInfo in
-                        ScheduleConferenceStoreProvider.updateBasicInfo(payload: conferenceInfo.basicInfo)
+                        ScheduleConferenceStoreProvider.updateConferenceInfo(payload: conferenceInfo)
                     }
                     .catch { error -> Just<Action> in
                         Just(ErrorActions.throwError(payload: error))

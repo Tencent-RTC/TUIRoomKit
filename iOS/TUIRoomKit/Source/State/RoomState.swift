@@ -16,11 +16,13 @@ struct RoomInfo {
     var ownerAvatarUrl = ""
     var isSeatEnabled = false
     var password = ""
-    var isMicrophoneDisableForAllUser = true
-    var isCameraDisableForAllUser = true
+    var isMicrophoneDisableForAllUser = false
+    var isCameraDisableForAllUser = false
+    var isScreenShareDisableForAllUser = false
     var createTime: UInt = 0
     var isPasswordEnabled: Bool = false
     var isEnteredRoom = false
+    var memberCount = 0
     
     init() {}
     init(with roomInfo: TUIRoomInfo) {
@@ -35,6 +37,8 @@ struct RoomInfo {
         self.isCameraDisableForAllUser = roomInfo.isCameraDisableForAllUser
         self.createTime = roomInfo.createTime
         self.isPasswordEnabled = roomInfo.password.count > 0
+        self.memberCount = roomInfo.memberCount
+        self.isScreenShareDisableForAllUser = roomInfo.isScreenShareDisableForAllUser
     }
 }
 
@@ -48,5 +52,6 @@ extension TUIRoomInfo {
         self.isMicrophoneDisableForAllUser = roomInfo.isMicrophoneDisableForAllUser
         self.isCameraDisableForAllUser = roomInfo.isCameraDisableForAllUser
         self.seatMode = .applyToTake
+        self.isScreenShareDisableForAllUser = roomInfo.isScreenShareDisableForAllUser
     }
 }

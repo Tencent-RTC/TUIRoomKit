@@ -62,11 +62,19 @@ class ConferenceSessionImp: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onJoinedRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRoomDismissed, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOutOfRoom, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onKickedOffLine, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserSigExpired, observer: self)
     }
     
     private func unsubscribeEngine() {
         EngineEventCenter.shared.unsubscribeEngine(event: .onExitedRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onDestroyedRoom, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onStartedRoom, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onJoinedRoom, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onRoomDismissed, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOutOfRoom, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOffLine, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserSigExpired, observer: self)
     }
 }
 
@@ -85,11 +93,9 @@ extension ConferenceSessionImp: RoomEngineEventResponder {
                 guard let message = param?["mesasge"] as? String else { return }
                 handleRoomJoined(roomInfo: roomInfo, error: error, message: message)
             case .onDestroyedRoom, .onRoomDismissed:
-                guard let roomId = param?["roomId"] as? String else { return }
-                handleRoomFinished(roomId: roomId)
-            case .onExitedRoom, .onKickedOutOfRoom:
-                guard let roomId = param?["roomId"] as? String else { return }
-                handleRoomExited(roomId: roomId)
+                handleRoomFinished(param: param)
+            case .onExitedRoom, .onKickedOutOfRoom, .onKickedOffLine, .onUserSigExpired:
+                handleRoomExited(param: param)
             default: break
         }
     }
@@ -107,15 +113,19 @@ extension ConferenceSessionImp: RoomEngineEventResponder {
         }
     }
     
-    private func handleRoomFinished(roomId: String) {
+    private func handleRoomFinished(param: [String : Any]?) {
+        guard let roomInfo = param?["roomInfo"] as? TUIRoomInfo else { return }
+        guard let reason = param?["reason"] as? ConferenceFinishedReason else { return }
         for observer in observers.allObjects {
-            observer.onConferenceFinished?(roomId: roomId)
+            observer.onConferenceFinished?(roomInfo: roomInfo, reason: reason)
         }
     }
     
-    private func handleRoomExited(roomId: String) {
+    private func handleRoomExited(param: [String : Any]?) {
+        guard let roomInfo = param?["roomInfo"] as? TUIRoomInfo else { return }
+        guard let reason = param?["reason"] as? ConferenceExitedReason else { return }
         for observer in observers.allObjects {
-            observer.onConferenceExited?(roomId: roomId)
+            observer.onConferenceExited?(roomInfo: roomInfo, reason: reason)
         }
     }
 }

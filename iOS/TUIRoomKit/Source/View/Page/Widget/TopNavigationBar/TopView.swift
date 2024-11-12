@@ -144,6 +144,7 @@ class TopView: UIView {
         stackView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16.scale375())
             make.top.bottom.equalToSuperview()
+            make.trailing.lessThanOrEqualTo(meetingNameLabel.snp.leading).offset(-2)
         }
         meetingNameLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()

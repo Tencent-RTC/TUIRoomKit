@@ -20,7 +20,6 @@ protocol Route: ActionDispatcher {
 }
 
 private let currentRouteActionSelector = Selector(keyPath: \ConferenceRouteState.currentRouteAction)
-private let memberSelectFactorySelector = Selector(keyPath: \ConferenceRouteState.memberSelectionFactory)
 
 class ConferenceRouter: NSObject {
     override init() {
@@ -116,8 +115,7 @@ extension ConferenceRouter: Route {
     }
     
     func showContactView(delegate: ContactViewSelectDelegate, participants: ConferenceParticipants) {
-        guard let factory = store.selectCurrent(memberSelectFactorySelector) else { return }
-        let selectParams = MemberSelectParams(participants: participants, delegate: delegate, factory: factory)
+        let selectParams = MemberSelectParams(participants: participants, delegate: delegate)
         store.dispatch(action: ConferenceNavigationAction.navigate(payload: .push(route: .selectMember(memberSelectParams: selectParams))))
     }
     

@@ -16,6 +16,7 @@ protocol ConferenceStore: ActionDispatcher {
     var errorSubject: PassthroughSubject<RoomError, Never> { get }
     var toastSubject: PassthroughSubject<ToastInfo, Never> { get }
     var scheduleActionSubject: PassthroughSubject<IdentifiableAction, Never> { get }
+    var roomActionSubject: PassthroughSubject<IdentifiableAction, Never> { get }
     
     func select<Value:Equatable>(_ selector: Selector<OperationState, Value>) -> AnyPublisher<Value, Never>
     

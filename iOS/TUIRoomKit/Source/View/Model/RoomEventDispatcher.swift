@@ -7,6 +7,7 @@
 
 import Foundation
 import RTCRoomEngine
+import Factory
 
 class RoomEventDispatcher: NSObject {
     var engineManager: EngineManager {
@@ -25,6 +26,9 @@ class RoomEventDispatcher: NSObject {
     deinit {
         debugPrint("deinit")
     }
+    
+    // MARK: - private property.
+    @Injected(\.conferenceStore) private var operation
 }
 
 extension RoomEventDispatcher: TUIRoomObserver {
@@ -52,18 +56,31 @@ extension RoomEventDispatcher: TUIRoomObserver {
     }
     
     func onRoomDismissed(roomId: String) {
-        EngineEventCenter.shared.notifyEngineEvent(event: .onRoomDismissed, param: ["roomId" : roomId,])
+        let param: [String : Any] = [
+            "roomInfo" : roomInfo,
+            "reason" : ConferenceFinishedReason.finishedByOwner,
+        ]
+        EngineEventCenter.shared.notifyEngineEvent(event: .onRoomDismissed, param: param)
     }
     
     func onKickedOutOfRoom(roomId: String, reason: TUIKickedOutOfRoomReason, message: String) {
-        let param = [
-            "roomId" : roomId,
-            "reason" : reason,
-            "message" : message,
-        ] as [String : Any]
+        let kickedReason: ConferenceExitedReason = switch reason {
+            case .byAdmin:
+                .exitedByAdminKickOut
+            case .byLoggedOnOtherDevice:
+                .exitedByJoinedOnOtherDevice
+            case .byServer:
+                .exitedByServerKickOut
+            default:
+                .exitedByAdminKickOut
+        }
+        let param: [String : Any] = [
+            "roomInfo" : roomInfo,
+            "reason" : kickedReason,
+        ]
         EngineEventCenter.shared.notifyEngineEvent(event: .onKickedOutOfRoom, param: param)
     }
-    
+
     func onRoomNameChanged(roomId: String, roomName: String) {
         roomInfo.name = roomName
     }
@@ -170,10 +187,37 @@ extension RoomEventDispatcher: TUIRoomObserver {
     
     func onKickedOffLine(message: String) {
         kickedOffLine()
-        let param = [
-            "message": message,
-        ] as [String : Any]
+        let param: [String : Any] = [
+            "roomInfo" : roomInfo,
+            "reason" : ConferenceExitedReason.exitedByKickedOutOfLine,
+        ]
         EngineEventCenter.shared.notifyEngineEvent(event: .onKickedOffLine, param: param)
+    }
+
+    func onUserSigExpired() {
+        let param: [String : Any] = [
+            "roomInfo" : roomInfo,
+            "reason" : ConferenceExitedReason.exitedByUserSigExpired,
+        ]
+        EngineEventCenter.shared.notifyEngineEvent(event: .onUserSigExpired, param: param)
+    }
+    
+    func onUserInfoChanged(userInfo: TUIUserInfo, modifyFlag: TUIUserInfoModifyFlag) {
+        if modifyFlag.contains(.nameCard) {
+            store.changeUserName(userId: userInfo.userId, userName: userInfo.nameCard)
+        }
+        let param = [
+            "userInfo": userInfo,
+            "modifyFlag": modifyFlag,
+        ] as [String : Any]
+        EngineEventCenter.shared.notifyEngineEvent(event: .onUserInfoChanged, param: param)
+    }
+    
+    func onScreenShareForAllUserDisableChanged(roomId: String, isDisable: Bool) {
+        roomInfo.isScreenShareDisableForAllUser = isDisable
+        var roomState = operation.selectCurrent(RoomSelectors.getRoomState)
+        roomState.isScreenShareDisableForAllUser = isDisable
+        operation.dispatch(action: RoomActions.updateRoomState(payload: roomState))
     }
 }
 
@@ -199,9 +243,17 @@ extension RoomEventDispatcher {
             if userId == currentUser.userId {
                 currentUser.hasScreenStream = hasVideo
             }
-            guard let userModel = store.attendeeList.first(where: { $0.userId == userId }) else { return }
-            userModel.hasScreenStream = hasVideo
+            if let userModel = store.attendeeList.first(where: { $0.userId == userId }) {
+                userModel.hasScreenStream = hasVideo
+            }
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: ["userId": userId, "hasVideo": hasVideo])
+            var hasScreenStreamUsers = operation.selectCurrent(UserSelectors.getHasScreenStreamUsers)
+            if hasVideo {
+                hasScreenStreamUsers.insert(userId)
+            } else {
+                hasScreenStreamUsers.remove(userId)
+            }
+            operation.dispatch(action: UserActions.updateHasScreenStreamUsers(payload: hasScreenStreamUsers))
         case .cameraStream:
             if userId == currentUser.userId {
                 EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_CurrentUserHasVideoStream,
@@ -226,6 +278,9 @@ extension RoomEventDispatcher {
         if isSelfRoleChanged {
             store.currentUser.userRole = userRole
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, param: ["userRole": userRole])
+            var selfInfo = operation.selectCurrent(UserSelectors.getSelfInfo)
+            selfInfo.userRole = userRole
+            operation.dispatch(action: UserActions.updateSelfInfo(payload: selfInfo))
         }
         if isRoomOwnerChanged {
             EngineManager.shared.fetchRoomInfo(roomId: roomInfo.roomId) { _ in
@@ -274,6 +329,8 @@ extension RoomEventDispatcher {
         currentUser.hasScreenStream = false
         guard let userModel = store.attendeeList.first(where: { $0.userId == currentUser.userId }) else { return }
         userModel.hasScreenStream = false
+        var hasScreenStreamUsers = operation.selectCurrent(UserSelectors.getHasScreenStreamUsers)
+        hasScreenStreamUsers.remove(currentUser.userId)
     }
     
     private func kickedOffLine() {

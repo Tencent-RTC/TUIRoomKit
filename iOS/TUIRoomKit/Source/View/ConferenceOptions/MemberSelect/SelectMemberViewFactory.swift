@@ -11,7 +11,6 @@ import RTCRoomEngine
 struct MemberSelectParams {
     let participants: ConferenceParticipants
     let delegate: ContactViewSelectDelegate
-    let factory: MemberSelectionFactory
 }
 
 @objc public protocol ContactViewProtocol: AnyObject {

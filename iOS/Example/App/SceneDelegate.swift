@@ -29,7 +29,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let extString = pushNotification["ext"] as? String else { return }
         guard let dict = extString.convertToDic() else { return }
         guard let roomId = dict["RoomId"] as? String else { return }
+        guard let notificationType = dict["NotificationType"] as? String else { return }
         AppUtils.shared.roomId = roomId
+        AppUtils.shared.notificationType = notificationType
+        AppUtils.shared.extString = extString
     }
 
     static func getCurrentWindow() -> UIWindow? {

@@ -76,6 +76,7 @@ class CreateRoomViewController: UIViewController {
     }
     
     deinit {
+        ConferenceSession.sharedInstance.removeObserver(observer: self)
         debugPrint("deinit \(self)")
     }
 }
@@ -216,12 +217,12 @@ extension CreateRoomViewController: ConferenceObserver {
         }
     }
     
-    func onConferenceFinished(conferenceId: String) {
-        debugPrint("onConferenceFinished,conferenceId:\(conferenceId)")
+    func onConferenceFinished(roomInfo: TUIRoomInfo, reason: ConferenceFinishedReason) {
+        debugPrint("onConferenceFinished")
     }
     
-    func onConferenceExited(conferenceId: String) {
-        debugPrint("onConferenceExited,conferenceId:\(conferenceId)")
+    func onConferenceExited(roomInfo: TUIRoomInfo, reason: ConferenceExitedReason) {
+        debugPrint("onConferenceExited")
     }
 }
 

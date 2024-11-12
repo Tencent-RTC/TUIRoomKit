@@ -20,6 +20,7 @@ import RTCRoomEngine
     
     public var isSeatEnabled = false
     public var name: String?
+    public var password: String?
     
     public init(roomId: String,
                 isOpenMicrophone: Bool = true,
@@ -28,7 +29,8 @@ import RTCRoomEngine
                 isMicrophoneDisableForAllUser: Bool = false,
                 isCameraDisableForAllUser: Bool = false,
                 isSeatEnabled: Bool = false,
-                name: String? = nil) {
+                name: String? = nil,
+                password: String? = nil) {
         self.roomId = roomId
         self.isOpenMicrophone = isOpenMicrophone
         self.isOpenCamera = isOpenCamera
@@ -37,6 +39,7 @@ import RTCRoomEngine
         self.isCameraDisableForAllUser = isCameraDisableForAllUser
         self.isSeatEnabled = isSeatEnabled
         self.name = name
+        self.password = password
         super.init()
     }
 }
@@ -65,6 +68,22 @@ import RTCRoomEngine
 @objc public protocol ConferenceObserver {
     @objc optional func onConferenceStarted(roomInfo: TUIRoomInfo, error: TUIError, message: String)
     @objc optional func onConferenceJoined(roomInfo: TUIRoomInfo, error: TUIError, message: String)
-    @objc optional func onConferenceFinished(roomId: String)
-    @objc optional func onConferenceExited(roomId: String)
+    @objc optional func onConferenceFinished(roomInfo: TUIRoomInfo, reason: ConferenceFinishedReason)
+    @objc optional func onConferenceExited(roomInfo: TUIRoomInfo, reason: ConferenceExitedReason)
+}
+
+@objc
+public enum ConferenceFinishedReason: Int {
+    case finishedByOwner
+    case finishedByServer
+}
+
+@objc
+public enum ConferenceExitedReason: Int {
+    case exitedBySelf
+    case exitedByAdminKickOut
+    case exitedByServerKickOut
+    case exitedByJoinedOnOtherDevice
+    case exitedByKickedOutOfLine
+    case exitedByUserSigExpired
 }

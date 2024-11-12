@@ -12,4 +12,5 @@ enum RoomSelectors {
     
     static let getRoomId = Selector.with(getRoomState, keyPath:\RoomInfo.roomId)
     static let getIsEnteredRoom = Selector.with(getRoomState, keyPath:\RoomInfo.isEnteredRoom)
+    static let getIsScreenShareDisableForAllUser = Selector.with(getRoomState, keyPath: \RoomInfo.isScreenShareDisableForAllUser)
 }

@@ -53,6 +53,13 @@ class WaterMarkLayer: CALayer {
         ctx.draw(image, in: CGRect(origin: CGPoint(x: -offset, y: -offset), size: waterMarkFullSize))
     }
     
+    func updateWaterMarkImage(text: String) {
+        landscapeImage = nil
+        portraitImage = nil
+        self.text = text
+        setNeedsDisplay()
+    }
+    
     private func getWaterMarkImage(isLandScape: Bool, andFullSize fsize: CGSize) -> UIImage? {
         var image: UIImage?
         if isLandscape {

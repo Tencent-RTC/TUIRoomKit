@@ -167,11 +167,14 @@ class UserListViewModel: NSObject {
     
     private func checkShowManagerView() -> Bool {
         guard let userInfo = engineManager.store.attendeeList.first(where: { $0.userId == userId }) else { return false }
-        if currentUser.userRole == .roomOwner, userId != currentUser.userId {
+        switch currentUser.userRole {
+        case .roomOwner:
             return true
-        } else if currentUser.userRole == .administrator, userId != currentUser.userId, userInfo.userRole == .generalUser {
-            return true
-        } else {
+        case .administrator:
+            return userInfo.userRole == .generalUser || currentUser.userId == userId
+        case .generalUser:
+            return currentUser.userId == userId
+        @unknown default:
             return false
         }
     }

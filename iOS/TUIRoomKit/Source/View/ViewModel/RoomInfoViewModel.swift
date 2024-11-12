@@ -17,7 +17,8 @@ enum CopyType {
 
 protocol RoomInfoResponder : NSObjectProtocol {
     func showCopyToast(copyType: CopyType?)
-    func updateNameLabel(_ text: String)
+    func updateConferenceNameLabel(_ text: String)
+    func updateHostName(_ text: String)
 }
 
 class RoomInfoViewModel: NSObject {
@@ -53,10 +54,12 @@ class RoomInfoViewModel: NSObject {
     
     private func subscribeEngine() {
         EngineEventCenter.shared.subscribeEngine(event: .onConferenceInfoChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserInfoChanged, observer: self)
     }
     
     private func unsubscribeUIEvent() {
         EngineEventCenter.shared.unsubscribeEngine(event: .onConferenceInfoChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserInfoChanged, observer: self)
     }
     
     func createListCellItemData(titleText: String, messageText: String,
@@ -89,7 +92,8 @@ class RoomInfoViewModel: NSObject {
         if let userModel = store.attendeeList.first(where: { $0.userId == roomInfo.ownerId}) {
             userName = userModel.userName
         }
-        let roomHostItem = createListCellItemData(titleText: .roomHostText, messageText: userName, hasButton: false, copyType: nil)
+        var roomHostItem = createListCellItemData(titleText: .roomHostText, messageText: userName, hasButton: false, copyType: nil)
+        roomHostItem.type = .hostNameType
         messageItems.append(roomHostItem)
         let roomTypeItem = createListCellItemData(titleText: .roomTypeText, messageText: roomInfo.isSeatEnabled ?  .raiseHandSpeakText: .freedomSpeakText, hasButton: false, copyType: nil)
         messageItems.append(roomTypeItem)
@@ -131,7 +135,13 @@ extension RoomInfoViewModel: RoomEngineEventResponder {
             guard let conferenceInfo = param?["conferenceInfo"] as? TUIConferenceInfo else { return }
             guard let modifyFlag = param?["modifyFlag"] as? TUIConferenceModifyFlag else { return }
             guard modifyFlag.contains(.roomName) else { return }
-            viewResponder?.updateNameLabel(conferenceInfo.basicRoomInfo.name)
+            viewResponder?.updateConferenceNameLabel(conferenceInfo.basicRoomInfo.name)
+        case .onUserInfoChanged:
+            guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
+            guard let modifyFlag = param?["modifyFlag"] as? TUIUserInfoModifyFlag else { return }
+            guard userInfo.userId == roomInfo.ownerId else { return }
+            guard modifyFlag.contains(.nameCard) else { return }
+            viewResponder?.updateHostName(userInfo.nameCard)
         default: break
         }
     }

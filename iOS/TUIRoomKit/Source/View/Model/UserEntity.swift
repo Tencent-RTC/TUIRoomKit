@@ -23,7 +23,7 @@ class UserEntity {
     var hasScreenStream: Bool = false
     func update(userInfo: TUIUserInfo) {
         userId = userInfo.userId
-        userName = userInfo.userName
+        userName = userInfo.nameCard.isEmpty ? userInfo.userName : userInfo.nameCard
         avatarUrl = userInfo.avatarUrl
         userRole = userInfo.userRole
         hasAudioStream = userInfo.hasAudioStream

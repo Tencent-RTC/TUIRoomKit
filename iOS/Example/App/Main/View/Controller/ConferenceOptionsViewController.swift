@@ -1,6 +1,5 @@
 //
 //  ConferenceOptionsViewController.swift
-//  Alamofire
 //
 //  Created by aby on 2022/12/26.
 //  Copyright © 2022 Tencent. All rights reserved.
@@ -86,10 +85,7 @@ extension ConferenceOptionsViewController {
     }
     
     func scheduleRoom() {
-        let scheduleViewController = ScheduleConferenceViewController { selectedList in
-            let participants = ConferenceParticipants(selectedList: selectedList)
-            return SelectMemberViewController(participants: participants)
-        }
+        let scheduleViewController = ScheduleConferenceViewController()
         navigationController?.pushViewController(scheduleViewController, animated: true)
     }
 }

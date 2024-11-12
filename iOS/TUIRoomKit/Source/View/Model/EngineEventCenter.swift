@@ -74,6 +74,8 @@ class EngineEventCenter: NSObject {
         case onInitialSelfUserInfo
         case onInitialRoomInfo
         case onGetUserListFinished
+        case onUserSigExpired
+        case onUserInfoChanged
     }
     
     enum RoomUIEvent: String {

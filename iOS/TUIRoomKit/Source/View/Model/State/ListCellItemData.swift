@@ -12,6 +12,7 @@ class ListCellItemData {
     enum ListCellType {
         case resolutionType
         case frameRateType
+        case hostNameType
         case normal
     }
     var type: ListCellType = .normal

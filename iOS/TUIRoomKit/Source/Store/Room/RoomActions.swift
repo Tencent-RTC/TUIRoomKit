@@ -17,3 +17,8 @@ enum RoomActions {
     static let clearRoomState = ActionTemplate(id: key.appending(".clearRoomState"))
     static let onJoinSuccess = ActionTemplate(id: key.appending(".onJoinSuccess"))
 }
+
+enum RoomResponseActions {
+    static let key = "action.room.response"
+    static let onExitSuccess = ActionTemplate(id: key.appending("onExitSuccess"))
+}

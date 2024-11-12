@@ -64,11 +64,12 @@ class ConferenceOptions {
     private static func createRoomInfo(startConferenceParams: StartConferenceParams) -> TUIRoomInfo {
         let roomInfo = TUIRoomInfo()
         roomInfo.roomId = startConferenceParams.roomId
-        roomInfo.isMicrophoneDisableForAllUser = !startConferenceParams.isOpenMicrophone
-        roomInfo.isCameraDisableForAllUser = !startConferenceParams.isOpenCamera
+        roomInfo.isMicrophoneDisableForAllUser = startConferenceParams.isMicrophoneDisableForAllUser
+        roomInfo.isCameraDisableForAllUser = startConferenceParams.isCameraDisableForAllUser
         roomInfo.isSeatEnabled = startConferenceParams.isSeatEnabled
         roomInfo.name = startConferenceParams.name ?? ""
         roomInfo.seatMode = .applyToTake
+        roomInfo.password = startConferenceParams.password ?? ""
         return roomInfo
     }
     

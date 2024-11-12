@@ -18,13 +18,11 @@ typealias ConferenceNavigation = NavigationAction<ConferenceRoute>
 struct ConferenceRouteState {
     var currentRouteAction: ConferenceNavigation = .presented(route: .none)
     var currentRoute: ConferenceRoute = .none
-    var memberSelectionFactory: MemberSelectionFactory?
 }
 
 enum ConferenceNavigationAction {
     static let key = "conference.navigation.action"
     static let navigate = ActionTemplate(id: key.appending("navigate"), payloadType: ConferenceNavigation.self)
-    static let setMemberSelectionFactory = ActionTemplate(id: key.appending(".setMemberSelectionFactory"), payloadType: MemberSelectionFactory.self)
 }
 
 let routeReducer = Reducer<ConferenceRouteState>(
@@ -36,8 +34,5 @@ let routeReducer = Reducer<ConferenceRouteState>(
             default:
                 break
         }
-    }),
-    ReduceOn(ConferenceNavigationAction.setMemberSelectionFactory, reduce: { state, action in
-        state.memberSelectionFactory = action.payload
     })
 )

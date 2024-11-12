@@ -10,6 +10,7 @@
 import Foundation
 import RTCRoomEngine
 import Factory
+import Combine
 
 protocol ConferenceMainViewFactory {
     func makeBottomView() -> BottomView
@@ -37,7 +38,6 @@ class ConferenceMainView: UIView {
     let viewModel: ConferenceMainViewModel
     let viewFactory: ConferenceMainViewFactory
     let layout: ConferenceMainViewLayout = ConferenceMainViewLayout()
-    @Injected(\.navigation) private var route
     init(viewModel: ConferenceMainViewModel,
          viewFactory: ConferenceMainViewFactory) {
         self.viewModel = viewModel
@@ -49,7 +49,10 @@ class ConferenceMainView: UIView {
     private var currentLandscape: Bool = isLandscape
     private let firstDelayDisappearanceTime = 6.0
     private let delayDisappearanceTime = 3.0
-
+    private lazy var disableMessageUsersPublisher = {
+        operation.select(UserSelectors.getDisableMessageUsers)
+    }()
+    private var cancellableSet = Set<AnyCancellable>()
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -75,7 +78,7 @@ class ConferenceMainView: UIView {
         return viewFactory.makeLocalAudioView()
     }()
     
-    lazy var waterMarkLayer: CALayer = {
+    lazy var waterMarkLayer: WaterMarkLayer = {
         return viewFactory.makeWaterMarkLayer()
     }()
     
@@ -167,6 +170,7 @@ class ConferenceMainView: UIView {
     
     private func bindInteraction() {
         perform(#selector(hideToolBar),with: nil,afterDelay: firstDelayDisappearanceTime)
+        subscribeSubject()
     }
     
     func setupRootViewOrientation(isLandscape: Bool) {
@@ -226,9 +230,17 @@ class ConferenceMainView: UIView {
         unsubscribeEvent()
         debugPrint("deinit \(self)")
     }
+    
+    // MARK: - private property.
+    @Injected(\.conferenceStore) private var operation
+    @Injected(\.navigation) private var route
 }
 
 extension ConferenceMainView: ConferenceMainViewResponder {
+    func updateWaterMarkLayer(text: String) {
+        waterMarkLayer.updateWaterMarkImage(text: text)
+    }
+    
     func hidePasswordView() {
         conferencePasswordView.hide()
     }
@@ -314,8 +326,26 @@ extension ConferenceMainView: RoomKitUIEventResponder {
     }
 }
 
+extension ConferenceMainView {
+    private func subscribeSubject() {
+        disableMessageUsersPublisher
+            .receive(on: DispatchQueue.mainQueue)
+            .sink(receiveValue: { [weak self] users in
+                guard let self = self else { return }
+                let isSelfDisableMessage = users.contains(self.viewModel.currentUser.userId)
+                guard isSelfDisableMessage != self.viewModel.isSelfDisableMessage else { return }
+                let text: String = isSelfDisableMessage ? .beenBannedFromTextChat : .allowedToTextChat
+                self.operation.dispatch(action: ViewActions.showToast(payload: ToastInfo(message: text)))
+                self.viewModel.isSelfDisableMessage = isSelfDisableMessage
+            })
+            .store(in: &cancellableSet)
+    }
+}
+
 private extension String {
     static let repeatJoinRoomTitle = localized("Currently in the room")
     static let repeatJoinRoomMessage = localized("Please exit before joining a new room")
     static let repeatJoinRoomSureText = localized("I see")
+    static let beenBannedFromTextChat = localized("You have been banned from text chat")
+    static let allowedToTextChat = localized("You are allowed to text chat")
 }

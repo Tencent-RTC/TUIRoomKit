@@ -167,10 +167,23 @@ extension ScheduleDetailsViewController {
                 self.route.pop()
             }
             .store(in: &cancellableSet)
+        
+        operation.scheduleActionSubject
+            .receive(on: RunLoop.main)
+            .filter { $0.id == ScheduleResponseActions.onConferenceRemoved.id }
+            .sink { [weak self] action in
+                guard let self = self else { return }
+                guard let action = action as? AnonymousAction<String> else { return }
+                guard action.payload == self.conferenceInfo.basicInfo.roomId else { return }
+                self.route.pop()
+                operation.dispatch(action: ViewActions.showToast(payload: ToastInfo(message: .removedFromTheConferenceParticipants)))
+            }
+            .store(in: &cancellableSet)
     }
 }
 
 private extension String {
     static let roomDetailsText = localized("Room Details")
     static let reviseText = localized("Revise")
+    static let removedFromTheConferenceParticipants = localized("You have been removed from the conference participants")
 }

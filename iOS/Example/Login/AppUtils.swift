@@ -20,6 +20,8 @@ import RTCRoomEngine
 
 class AppUtils: NSObject {
     var roomId: String?
+    var notificationType: String?
+    var extString: String?
     weak var navigationController: UINavigationController?
     @objc static let shared = AppUtils()
     private override init() {
@@ -57,8 +59,18 @@ class AppUtils: NSObject {
         navigationController = nav
         navigationController?.pushViewController(prepareViewController, animated: false)
         guard let roomId = roomId else { return }
-        showConferenceMainViewController(roomId: roomId)
+        switch notificationType {
+            case "conference_will_start":
+                showConferenceMainViewController(roomId: roomId)
+            case "conference_invitation":
+                guard let extString = extString else { return }
+                InvitationObserverService.shared.show(extString: extString)
+            default:
+                break
+        }
         self.roomId = nil
+        self.notificationType = nil
+        self.extString = nil
     }
 }
 
