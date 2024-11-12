@@ -5,6 +5,6 @@ import {
   FeatureButton,
   ThemeOption,
 } from './conference';
-import { roomService } from './services';
-export type { ThemeOption };
+import { roomService, LanguageOption } from './services';
+export type { ThemeOption, LanguageOption };
 export { TUIRoomEngine, roomService, conference, RoomEvent, FeatureButton };

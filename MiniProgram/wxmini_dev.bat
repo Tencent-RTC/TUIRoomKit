@@ -8,4 +8,4 @@ if exist "dist\dev\mp-weixin" (
   exit /b 1
 )
 
-npm init -y && npm i @tencentcloud/trtc-component-wx && cd roomkit && npm init -y && npm i @tencentcloud/tuiroom-engine-wx@2.7.0
+npm init -y && npm i @tencentcloud/trtc-component-wx && cd roomkit && npm init -y && npm i @tencentcloud/tuiroom-engine-wx@2.7.1

@@ -221,3 +221,50 @@ export function getNanoId(size = 21) {
   }
   return id;
 }
+
+export function findLastIndex<T>(
+  array: T[],
+  predicate: (value: T, index: number, obj: T[]) => boolean,
+  thisArg?: any
+): number {
+  const len = array.length >>> 0;
+
+  let k = len - 1;
+  while (k >= 0) {
+    const kValue = array[k];
+    if (predicate.call(thisArg, kValue, k, array)) {
+      return k;
+    }
+    k = k - 1;
+  }
+  return -1;
+}
+
+export function formatTimestampToTime(
+  timestamp: number,
+  format = 'MM-DD HH:mm'
+): string {
+  const date = new Date(timestamp);
+  const padStart = (value: number, length = 2) =>
+    value.toString().padStart(length, '0');
+
+  const replacements: { [key: string]: string } = {
+    YYYY: date.getFullYear().toString(),
+    YY: (date.getFullYear() % 100).toString().padStart(2, '0'),
+    MM: padStart(date.getMonth() + 1),
+    DD: padStart(date.getDate()),
+    HH: padStart(date.getHours()),
+    hh: padStart(date.getHours() % 12),
+    mm: padStart(date.getMinutes()),
+    ss: padStart(date.getSeconds()),
+    A: date.getHours() >= 12 ? 'PM' : 'AM',
+  };
+
+  // console.log(formatTimestampToTime(Date.now())); // "10-24 16:20"
+  // console.log(formatTimestampToTime(Date.now(), 'YYYY-MM-DD HH:mm:ss')); // "2024-10-24 16:20:30"
+  // console.log(formatTimestampToTime(Date.now(), 'MM-DD hh:mm A')); // "10-24 04:20 PM"
+  return format.replace(
+    /YYYY|YY|MM|DD|HH|hh|mm|ss|A/g,
+    match => replacements[match]
+  );
+}

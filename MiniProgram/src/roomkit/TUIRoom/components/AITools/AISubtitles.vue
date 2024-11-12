@@ -1,37 +1,40 @@
 <template>
   <div v-if="subtitleLines.length" class="ai-subtitles">
-    <div v-for="(line, index) in subtitleLines" :key="index">{{ line }}</div>
+    <div v-for="line in subtitleLines" :key="line.sender">
+      {{
+        `${roomService.roomStore.getDisplayName(line.sender)}: ${line?.text}`
+      }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue';
-import { roomService, AI_TASK, AITaskEvent } from '../../services';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import {
+  AI_TASK,
+  AITaskEvent,
+  MetricsKey,
+  roomService,
+  SubtitleMessage,
+} from '../../services';
 
-const rawSubtitleText = ref('');
-const subtitleLines = computed(() =>
-  rawSubtitleText.value.split('\n').filter(item => item)
-);
-
-let subtitleTimeout: ReturnType<typeof setTimeout> | null = null;
-
-const resetSubtitleTimeout = () => {
-  if (subtitleTimeout) {
-    clearTimeout(subtitleTimeout);
-  }
-
-  subtitleTimeout = setTimeout(() => {
-    rawSubtitleText.value = '';
-  }, 3000);
-};
+const subtitleMessages = ref<Record<string, SubtitleMessage>>({});
+const subtitleLines = computed(() => {
+  const arr = Object.keys(subtitleMessages.value).map(userId => {
+    return subtitleMessages.value[userId];
+  });
+  return arr.sort((a, b) => a.startMsTs - b.startMsTs);
+});
 
 const handleAISubtitles = (data?: AITaskEvent[AI_TASK.TRANSCRIPTION_TASK]) => {
   if (!data) return;
-  rawSubtitleText.value = data.subtitleText.value;
-  resetSubtitleTimeout();
+  subtitleMessages.value = Object.assign({}, data.subtitleMessages);
 };
 
-roomService.aiTask.on(AI_TASK.TRANSCRIPTION_TASK, handleAISubtitles);
+onMounted(() => {
+  roomService.dataReportManager.reportCount(MetricsKey.AITask);
+  roomService.aiTask.on(AI_TASK.TRANSCRIPTION_TASK, handleAISubtitles);
+});
 
 onUnmounted(() => {
   roomService.aiTask.off(AI_TASK.TRANSCRIPTION_TASK, handleAISubtitles);
