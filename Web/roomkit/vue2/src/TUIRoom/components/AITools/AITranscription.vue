@@ -1,141 +1,138 @@
 <template>
-  <div class="conversation" ref="conversationContainer">
+  <div
+    class="conversation"
+    ref="conversationContainerRef"
+    @scroll="handleScroll"
+  >
     <div
-      v-for="(item, index) in conversations"
-      :key="index"
-      class="conversation-item"
+      v-for="group in transcribedMessageList"
+      :key="group.startMsTs"
+      class="conversation-group"
     >
       <div class="title">
-        <span class="speaker">{{ item.speaker }}</span>
-        <span class="timestamp">{{ item.timestamp }}</span>
+        <span class="speaker">{{
+          roomService.roomStore.getDisplayName(group.sender)
+        }}</span>
+        <span class="timestamp">
+          {{ formatTimestampToTime(group.startMsTs) }}
+        </span>
       </div>
-      <div class="content">
-        <div v-for="(msg, msgIndex) in item.messages" :key="msgIndex">
-          {{ msg }}
-        </div>
+      <div
+        v-for="(message, messageIndex) in group.messages"
+        :key="messageIndex"
+        class="content"
+      >
+        {{ message.text }}
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue';
-import { roomService, AI_TASK } from '../../services';
+import { ref, onMounted, computed, nextTick, watch, onUnmounted } from 'vue';
+import {
+  roomService,
+  AI_TASK,
+  SubtitleMessage,
+  MetricsKey,
+} from '../../services';
+import { formatTimestampToTime } from '../../utils/utils.ts';
 
-const conversationContainer = ref<HTMLElement | null>(null);
+const conversationContainerRef = ref<HTMLElement>();
+const isUserScrolling = ref(false);
+const timeInterval = 60 * 1000;
+const rawTranscribedMessageList = ref<SubtitleMessage[]>(
+  roomService.aiTask.transcribedMessageList
+);
 
-onMounted(() => scrollToBottom());
-
-const processedConversations = ref<
-  {
-    timestamp: string;
-    speaker: string;
-    content: string;
-  }[]
->(processConversation(roomService.aiTask.transcriptionText.value));
+onMounted(() => {
+  scrollToBottom();
+});
 
 const scrollToBottom = async () => {
-  if (conversationContainer.value) {
+  if (conversationContainerRef.value && !isUserScrolling.value) {
     await nextTick();
-    conversationContainer.value.scrollIntoView({ block: 'end' });
+    conversationContainerRef.value.scrollTop =
+      conversationContainerRef.value.scrollHeight;
   }
 };
 
-const conversations = computed(() => {
-  const result = [];
-  let currentSpeaker: string | null = null;
-  let currentTimestamp: string | null = null;
-  let currentMessages: string[] = [];
-
-  processedConversations.value.forEach(item => {
-    const [start, end] = item.timestamp.split('->');
-    const timestampMinute = start.slice(0, 5); // Take the "HH:MM" part
-
-    if (
-      item.speaker === currentSpeaker &&
-      timestampMinute === currentTimestamp
-    ) {
-      // Aggregate messages from the same speaker and within the same minute
-      currentMessages.push(item.content);
+const handleScroll = () => {
+  if (conversationContainerRef.value) {
+    const isAtBottom =
+      conversationContainerRef.value.scrollTop +
+        conversationContainerRef.value.clientHeight >=
+      conversationContainerRef.value.scrollHeight - 5;
+    if (isAtBottom) {
+      isUserScrolling.value = false;
+      scrollToBottom();
     } else {
-      // New speakers or different minutes, save previous aggregation results
-      if (currentSpeaker !== null) {
-        result.push({
-          timestamp: currentTimestamp,
-          speaker: currentSpeaker,
-          messages: currentMessages,
-        });
-      }
-      // Update active speaker, timestamp, and message
-      currentSpeaker = item.speaker;
-      currentTimestamp = timestampMinute;
-      currentMessages = [item.content];
+      isUserScrolling.value = true;
     }
-  });
+  }
+};
 
-  // Save the last set of aggregation results
-  if (currentSpeaker !== null) {
-    result.push({
-      timestamp: currentTimestamp,
-      speaker: currentSpeaker,
-      messages: currentMessages,
-    });
+const transcribedMessageList = computed(() => {
+  const aggregatedMessageList: {
+    sender: string;
+    startMsTs: number;
+    messages: SubtitleMessage[];
+  }[] = [];
+  let currentAggregatedMessage: {
+    sender: string;
+    startMsTs: number;
+    messages: SubtitleMessage[];
+  } | null = null;
+
+  for (const message of rawTranscribedMessageList.value) {
+    if (
+      !currentAggregatedMessage ||
+      message.sender !== currentAggregatedMessage.sender ||
+      message.startMsTs - currentAggregatedMessage.startMsTs > timeInterval
+    ) {
+      currentAggregatedMessage = {
+        messages: [message],
+        sender: message.sender,
+        startMsTs: message.startMsTs,
+      };
+      aggregatedMessageList.push(currentAggregatedMessage);
+    } else {
+      currentAggregatedMessage.messages.push(message);
+    }
   }
 
-  return result;
+  return aggregatedMessageList;
 });
 
-roomService.aiTask.on(AI_TASK.TRANSCRIPTION_TASK, data => {
+watch(rawTranscribedMessageList, () => {
+  scrollToBottom();
+});
+
+const handleAITranscriptionTask = async (data?: {
+  subtitleMessages: { [key: string]: SubtitleMessage };
+  transcribedMessageList: SubtitleMessage[];
+}) => {
   if (!data) return;
-  processedConversations.value = processConversation(
-    data.transcriptionText.value
-  );
+  rawTranscribedMessageList.value = [...data.transcribedMessageList];
+};
+onMounted(() => {
+  roomService.dataReportManager.reportCount(MetricsKey.AITask);
+  roomService.aiTask.on(AI_TASK.TRANSCRIPTION_TASK, handleAITranscriptionTask);
 });
-
-function processConversation(data: string) {
-  const pattern =
-    /(\d{2}:\d{2}:\d{2}->\d{2}:\d{2}:\d{2})\s+([\u4e00-\u9fa5\w]+):\s*(.*)/;
-
-  const conversations: {
-    timestamp: string;
-    speaker: string;
-    content: string;
-  }[] = [];
-
-  const lines = data.split('\n');
-
-  lines.forEach(line => {
-    const match = pattern.exec(line);
-    if (match) {
-      const timestamp = match[1];
-      const speaker = match[2];
-      const content = match[3];
-      conversations.push({
-        timestamp,
-        speaker,
-        content,
-      });
-    }
-  });
-
-  conversations.sort((a, b) => {
-    const timeA = a.timestamp.split('->')[0];
-    const timeB = b.timestamp.split('->')[0];
-    return timeA.localeCompare(timeB);
-  });
-
-  return conversations;
-}
+onUnmounted(() => {
+  roomService.aiTask.off(AI_TASK.TRANSCRIPTION_TASK, handleAITranscriptionTask);
+});
 </script>
 
 <style scoped lang="scss">
 .conversation {
+  height: 100%;
   padding: 20px;
   overflow-y: auto;
 }
 
-.conversation-item {
-  margin-bottom: 10px;
+.conversation-group {
+  margin-bottom: 20px;
 }
 
 .title {
@@ -147,10 +144,18 @@ function processConversation(data: string) {
   line-height: 22px;
   color: var(--font-color-4);
   text-align: left;
+
+  .speaker {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .content {
   padding: 8px;
+  margin-top: 5px;
   font-size: 14px;
   font-weight: 400;
   line-height: 22px;
