@@ -28,7 +28,7 @@ class RoomEventDispatcher: NSObject {
     }
     
     // MARK: - private property.
-    @Injected(\.conferenceStore) private var operation
+    @WeakLazyInjected(\.conferenceStore) private var operation
 }
 
 extension RoomEventDispatcher: TUIRoomObserver {
@@ -215,6 +215,7 @@ extension RoomEventDispatcher: TUIRoomObserver {
     
     func onScreenShareForAllUserDisableChanged(roomId: String, isDisable: Bool) {
         roomInfo.isScreenShareDisableForAllUser = isDisable
+        guard let operation = operation else { return }
         var roomState = operation.selectCurrent(RoomSelectors.getRoomState)
         roomState.isScreenShareDisableForAllUser = isDisable
         operation.dispatch(action: RoomActions.updateRoomState(payload: roomState))
@@ -247,6 +248,7 @@ extension RoomEventDispatcher {
                 userModel.hasScreenStream = hasVideo
             }
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_SomeoneSharing, param: ["userId": userId, "hasVideo": hasVideo])
+            guard let operation = operation else { return }
             var hasScreenStreamUsers = operation.selectCurrent(UserSelectors.getHasScreenStreamUsers)
             if hasVideo {
                 hasScreenStreamUsers.insert(userId)
@@ -278,6 +280,7 @@ extension RoomEventDispatcher {
         if isSelfRoleChanged {
             store.currentUser.userRole = userRole
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, param: ["userRole": userRole])
+            guard let operation = operation else { return }
             var selfInfo = operation.selectCurrent(UserSelectors.getSelfInfo)
             selfInfo.userRole = userRole
             operation.dispatch(action: UserActions.updateSelfInfo(payload: selfInfo))
@@ -329,8 +332,10 @@ extension RoomEventDispatcher {
         currentUser.hasScreenStream = false
         guard let userModel = store.attendeeList.first(where: { $0.userId == currentUser.userId }) else { return }
         userModel.hasScreenStream = false
+        guard let operation = operation else { return }
         var hasScreenStreamUsers = operation.selectCurrent(UserSelectors.getHasScreenStreamUsers)
         hasScreenStreamUsers.remove(currentUser.userId)
+        operation.dispatch(action: UserActions.updateHasScreenStreamUsers(payload: hasScreenStreamUsers))
     }
     
     private func kickedOffLine() {
