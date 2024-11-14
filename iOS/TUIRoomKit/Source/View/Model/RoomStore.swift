@@ -32,7 +32,7 @@ class RoomStore: NSObject {
     private let shownRaiseHandNoticeKey = "isShownRaiseHandNotice"
     weak var conferenceObserver: ConferenceObserver?
     
-    @Injected(\.conferenceStore) private var operation
+    @WeakLazyInjected(\.conferenceStore) private var operation
     
     var isOpenMicrophone: Bool {
         didSet {
@@ -89,7 +89,7 @@ class RoomStore: NSObject {
             guard let userInfo = userInfo else { return }
             self.currentUser.update(userInfo: userInfo)
             EngineEventCenter.shared.notifyEngineEvent(event: .onInitialSelfUserInfo, param: [:])
-            self.operation.dispatch(action: UserActions.updateSelfInfo(payload: UserInfo(userInfo: userInfo)))
+            self.operation?.dispatch(action: UserActions.updateSelfInfo(payload: UserInfo(userInfo: userInfo)))
         } onError: { code, message in
             debugPrint("getUserInfo,code:\(code),message:\(message)")
         }
@@ -121,6 +121,12 @@ class RoomStore: NSObject {
     }
     
     func updateUserDisableSendingMessage(userId: String, isDisable: Bool) {
+        if userId == currentUser.userId {
+            currentUser.disableSendingMessage = isDisable
+        }
+        guard let userItem = getUserItem(userId) else { return }
+        userItem.disableSendingMessage = isDisable
+        guard let operation = operation else { return }
         var disableMessageUsers = operation.selectCurrent(UserSelectors.getDisableMessageUsers)
         if isDisable {
             disableMessageUsers.insert(userId)
@@ -128,12 +134,6 @@ class RoomStore: NSObject {
             disableMessageUsers.remove(userId)
         }
         operation.dispatch(action: UserActions.updateDisableMessageUsers(payload: disableMessageUsers))
-        
-        if userId == currentUser.userId {
-            currentUser.disableSendingMessage = isDisable
-        }
-        guard let userItem = getUserItem(userId) else { return }
-        userItem.disableSendingMessage = isDisable
     }
     
     func deleteTakeSeatRequest(requestId: String) {
