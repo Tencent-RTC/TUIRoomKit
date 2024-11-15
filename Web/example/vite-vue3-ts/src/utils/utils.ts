@@ -49,7 +49,6 @@ export function setItemInSessionStorage(key: string, value: object) {
   sessionStorage.setItem(key, JSON.stringify(value));
 }
 
-
 export function generateTempUserID(userId: string) {
   const timestamp = String(Date.now()).slice(-4);
   return `${userId}_${timestamp}`;
