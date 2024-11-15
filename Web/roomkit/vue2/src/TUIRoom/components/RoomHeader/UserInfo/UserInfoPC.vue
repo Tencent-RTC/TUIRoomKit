@@ -97,11 +97,8 @@ const props = defineProps<{
   isShowEditName?: boolean;
 }>();
 
-/**
- * Save the new userName
- *
- **/
 async function saveUserName(userName: string) {
+  const { userId } = props;
   if (userName.length === 0) {
     TUIMessage({
       type: 'warning',
@@ -115,7 +112,7 @@ async function saveUserName(userName: string) {
     avatarUrl: roomStore.localUser.avatarUrl || '',
   });
   basicStore.setUserName(userName);
-  roomStore.setLocalUser({ userName });
+  roomStore.updateUserInfo({ userId, userName });
   emits('update-user-name', userName);
   closeUserNameEditor();
 }
