@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/tui-roomkit-uniapp",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "bin": {
     "configureProject": "./configureProject_bin.js"
   },
@@ -60,7 +60,7 @@
     "@tencentcloud/chat": "latest",
     "@tencentcloud/trtc-component-wx": "^1.0.2",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-wx": "^2.7.1",
+    "@tencentcloud/tuiroom-engine-wx": "^2.7.2",
     "@tencentcloud/universal-api": "^2.0.9",
     "axios": "^0.27.2",
     "inquirer": "^9.2.11",

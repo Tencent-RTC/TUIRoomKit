@@ -32,7 +32,7 @@ const handleAISubtitles = (data?: AITaskEvent[AI_TASK.TRANSCRIPTION_TASK]) => {
 };
 
 onMounted(() => {
-  roomService.dataReportManager.reportCount(MetricsKey.AITask);
+  roomService.dataReportManager.reportCount(MetricsKey.aiTask);
   roomService.aiTask.on(AI_TASK.TRANSCRIPTION_TASK, handleAISubtitles);
 });
 
