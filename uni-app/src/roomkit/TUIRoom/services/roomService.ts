@@ -1,7 +1,7 @@
 import mitt from 'mitt';
 import useGetRoomEngine from '../hooks/useRoomEngine';
 import { EventType, RoomInitData, RoomParam } from './types';
-import  {
+import {
   TUIRoomEngine,
   TRTCVideoEncParam,
   TRTCVideoFillMode,
@@ -11,7 +11,6 @@ import  {
   TUIKickedOutOfRoomReason,
   TUIRole,
   TUIRoomEvents,
-  TUIRoomInfo,
   TUIRoomType,
   TUISeatMode,
 } from '@tencentcloud/tuiroom-engine-uniapp-app';
@@ -24,6 +23,7 @@ import { isMobile, isWeChat, isApp } from '../utils/environment';
 import TUIRoomAegis from '../utils/aegis';
 import i18n from '../locales';
 import { MESSAGE_DURATION } from '../constants/message';
+import TencentCloudChat, { ChatSDK } from '@tencentcloud/chat';
 const { t } = i18n.global;
 
 const logPrefix = '[RoomService]';
@@ -36,6 +36,7 @@ smallParam.videoBitrate = 550;
 export class RoomService {
   static instance?: RoomService;
   private emitter = mitt();
+  public tim: ChatSDK;
   get basicStore() {
     return useBasicStore();
   }
@@ -71,6 +72,7 @@ export class RoomService {
     this.onAllUserCameraDisableChanged = this.onAllUserCameraDisableChanged.bind(this);
     this.onAllUserMicrophoneDisableChanged = this.onAllUserMicrophoneDisableChanged.bind(this);
     this.onSendMessageForAllUserDisableChanged = this.onSendMessageForAllUserDisableChanged.bind(this);
+    this.onReceiveMessage = this.onReceiveMessage.bind(this);
   }
 
   static getInstance(): RoomService {
@@ -117,6 +119,10 @@ export class RoomService {
     useDeviceManager({ listenForDeviceChange: true });
   }
 
+  public bindChatEvents() {
+    this.tim.on(TencentCloudChat.EVENT.MESSAGE_RECEIVED, this.onReceiveMessage);
+  }
+
   public bindRoomEngineEvents() {
     roomEngine.instance?.on(TUIRoomEvents.onError, this.onError);
     roomEngine.instance?.on(TUIRoomEvents.onUserVoiceVolumeChanged, this.onUserVoiceVolumeChanged);
@@ -150,6 +156,7 @@ export class RoomService {
       TUIRoomEvents.onSendMessageForAllUserDisableChanged,
       this.onSendMessageForAllUserDisableChanged,
     );
+    this.tim.off(TencentCloudChat.EVENT.MESSAGE_RECEIVED, this.onReceiveMessage);
   }
 
   private onError(error: any) {
@@ -163,6 +170,19 @@ export class RoomService {
         },
       });
     }
+  }
+
+  private onReceiveMessage(options: { data: any }) {
+    if (!options || !options.data) {
+      return;
+    }
+    options.data.forEach((message: any) => {
+      if (message.type === TencentCloudChat.TYPES.MSG_TEXT) {
+        if (!this.basicStore?.isSidebarOpen || this.basicStore?.sidebarName !== 'chat') {
+          this.chatStore?.updateUnReadCount((this.chatStore?.unReadCount || 0) + 1);
+        }
+      }
+    });
   }
 
   private onUserVoiceVolumeChanged(eventInfo: { userVolumeList: [] }) {
@@ -343,9 +363,11 @@ export class RoomService {
     const { sdkAppId, userId, userSig, userName, avatarUrl } = option;
     await TUIRoomEngine.login({ sdkAppId, userId, userSig });
     await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
+    this.tim = TUIRoomEngine.getTIM();
+    this.bindChatEvents();
   }
 
-  private async doEnterRoom(options: { roomId: string; roomType: TUIRoomType}) {
+  private async doEnterRoom(options: { roomId: string; roomType: TUIRoomType }) {
     const { roomId, roomType } = options;
     if (!isApp) {
       const isH5 = isMobile && !isWeChat;

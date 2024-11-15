@@ -1,12 +1,14 @@
 <template>
   <div :class="badgeClass">
-    <slot></slot>
-    <sup v-if="showBadge" class="tui-badge-count">{{ content }}</sup>
+    <slot style="position: relative;"></slot>
+    <div v-if="showBadge" class="tui-badge-count">
+      <text style="font-size: 12px;font-weight: 500;">{{ content }}</text>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, defineProps } from 'vue';
 
 interface Props {
   type?: 'primary' | 'danger';
@@ -42,16 +44,11 @@ const badgeClass = computed(() => ['tui-badge', `tui-badge-${props.type}`, props
   display: inline-block;
 
   .tui-badge-count {
-    position: absolute;
-    top: 0;
-    right: 15px;
-    display: inline-block;
-    padding: 1px 6px;
-    font-size: 12px;
-    color: #FFFFFF;
-    transform: translateY(-50%) translateX(100%);
-    font-weight: bold;
-    border-radius: 10px;
+	  padding: 1px 3px;
+	  position: absolute;
+	  top: 0;
+	  right: 3px;
+	  border-radius: 10px;
   }
 }
 

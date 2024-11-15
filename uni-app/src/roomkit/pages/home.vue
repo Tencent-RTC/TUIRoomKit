@@ -28,28 +28,20 @@
 import UserInfo from '../TUIRoom/components/RoomHeader/UserInfo/index.vue';
 import RoomControl from '../TUIRoom/components/RoomHome/RoomControl/index.vue';
 import SwitchTheme from '../TUIRoom/components/common/SwitchTheme.vue';
-import { checkNumber } from '../TUIRoom/utils/common';
-import router from '@/router';
-import { useRoute } from '@/router/wxRouter';
+import router from '../../router';
 import { Ref, ref } from 'vue';
 import { getBasicInfo } from '../config/basic-info-config';
 import { useBasicStore } from '../TUIRoom/stores/basic';
 import { TUIRoomEngine } from '@tencentcloud/tuiroom-engine-uniapp-app';
-import useGetRoomEngine from '../TUIRoom/hooks/useRoomEngine';
-import logger from '../TUIRoom/utils/common/logger';
 import { storeToRefs } from 'pinia';
 
 
-const route = useRoute();
 const userName: Ref<string> = ref('');
 const avatarUrl: Ref<string> = ref('');
 const userId: Ref<string> = ref('');
-const roomEngine = useGetRoomEngine();
 const basicStore = useBasicStore();
 const { defaultTheme } = storeToRefs(basicStore);
 const roomControlRef = ref();
-
-const roomId = checkNumber((route.query?.roomId) as string) ? route.query?.roomId : '';
 
 
 function setTUIRoomData(action: string, mode?: string) {
@@ -60,18 +52,6 @@ function setTUIRoomData(action: string, mode?: string) {
     roomParam,
   };
   uni.setStorageSync('tuiRoom-roomInfo', JSON.stringify(roomData));
-}
-
-async function checkRoomExistWhenCreateRoom(roomId: string) {
-  let isRoomExist = false;
-  const tim = roomEngine.instance?.getTIM();
-  try {
-    await tim?.searchGroupByID(roomId);
-    isRoomExist = true;
-  } catch (error: any) {
-    // 房间不存在
-  }
-  return isRoomExist;
 }
 
 /**
