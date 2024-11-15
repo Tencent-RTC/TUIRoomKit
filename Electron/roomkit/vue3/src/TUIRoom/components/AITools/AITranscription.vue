@@ -116,7 +116,7 @@ const handleAITranscriptionTask = async (data?: {
   rawTranscribedMessageList.value = [...data.transcribedMessageList];
 };
 onMounted(() => {
-  roomService.dataReportManager.reportCount(MetricsKey.AITask);
+  roomService.dataReportManager.reportCount(MetricsKey.aiTask);
   roomService.aiTask.on(AI_TASK.TRANSCRIPTION_TASK, handleAITranscriptionTask);
 });
 onUnmounted(() => {
