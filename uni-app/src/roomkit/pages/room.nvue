@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import Room from '../TUIRoom/index.vue';
-import router from '@/router';
+import router from '../../router';
 import { checkNumber } from '../TUIRoom/utils/common';
 import { useI18n } from '../TUIRoom/locales';
 import TUIMessageBox from '../TUIRoom/components/common/base/MessageBox/index';

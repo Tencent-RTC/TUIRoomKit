@@ -26,14 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, Ref, watch, computed, provide } from 'vue';
+import { ref, onMounted, onUnmounted, Ref, watch, provide } from 'vue';
 import RoomHeader from './components/RoomHeader/index/index.vue';
 import RoomFooter from './components/RoomFooter/index/index.vue';
 import RoomSidebar from './components/RoomSidebar/index.vue';
 import RoomContent from './components/RoomContent/index.vue';
 import RoomSetting from './components/RoomSetting/index.vue';
 import { debounce, throttle } from './utils/utils';
-import { useBasicStore } from './stores/basic';
 import { isMobile, isWeChat } from './utils/environment';
 import { TUIKickedOutOfRoomReason }  from '@tencentcloud/tuiroom-engine-uniapp-app';
 
@@ -42,7 +41,7 @@ import { MESSAGE_DURATION } from './constants/message';
 
 import TUIMessageBox from './components/common/base/MessageBox/index';
 import TUIMessage from './components/common/base/Message/index';
-import { roomService, EventType, RoomParam, RoomInitData } from './services/index';
+import { roomService, EventType, RoomParam, RoomInitData, RoomService } from './services/index';
 import useDeviceManager from './hooks/useDeviceManager';
 useDeviceManager({ listenForDeviceChange: true });
 
@@ -133,9 +132,10 @@ onUnmounted(() => {
   roomService.off(EventType.ROOM_KICKED_OUT, onKickedOutOfRoom);
   roomService.off(EventType.ROOM_USER_SIG_EXPIRED, onUserSigExpired);
   roomService.off(EventType.ROOM_KICKED_OFFLINE, onKickedOffLine);
+  RoomService.destroyInstance();
 });
 
-const { sdkAppId, showHeaderTool } = roomService.basicStore;
+const { sdkAppId } = roomService.basicStore;
 watch(
   () => sdkAppId,
   (val: number) => {
@@ -148,8 +148,6 @@ watch(
     }
   },
 );
-
-const tuiRoomClass = ref('white');
 
 // const tuiRoomClass = computed(() => (isMobile ? ['tui-room', `tui-theme-${roomService.basicStore.defaultTheme}`, 'tui-room-h5'] : ['tui-room', `tui-theme-${roomService.basicStore.defaultTheme}`]));
 /**

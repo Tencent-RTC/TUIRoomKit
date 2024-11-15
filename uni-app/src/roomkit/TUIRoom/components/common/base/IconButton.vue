@@ -24,7 +24,7 @@
     >
       <slot></slot>
       <svg-icon style="display: flex" v-if="icon" size="24" :icon="icon"></svg-icon>
-      <span class="title">{{ title }}</span>
+      <text class="title">{{ title }}</text>
     </div>
     <div
       v-else
@@ -127,7 +127,7 @@ const handleClickEvent = () => {
     .title {
       font-size: 14px;
       line-height: 26px;
-      font-weight: 500;
+      font-weight: 600;
       margin-left: 4px;
     }
   }
@@ -143,7 +143,7 @@ const handleClickEvent = () => {
     .title {
       font-size: 12px;
       line-height: 20px;
-      font-weight: 400;
+      font-weight: 500;
       margin-top: 4px;
     }
   }

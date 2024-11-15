@@ -10,10 +10,10 @@
     </div>
     <div v-if="showMoreContent" ref="moreContentRef" class="show-more-content">
       <div class="control-compent">
-        <!-- <chat-control
+        <chat-control
           v-if="roomStore.isSpeakAfterTakingSeatMode"
           @click="handleControlClick('chatControl')"
-        ></chat-control> -->
+        ></chat-control>
         <contact-control @click="handleControlClick('contactControl')"></contact-control>
         <invite-control @click="handleControlClick('inviteControl')"></invite-control>
       </div>
@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import IconButton from '../../common/base/IconButton.vue';
 import userMoreControl from './useMoreControlHooks';
-// import ChatControl from '../ChatControl.vue';
+import ChatControl from '../ChatControl.vue';
 import InviteControl from '../InviteControl.vue';
 import ContactControl from '../ContactControl.vue';
 import { useRoomStore } from '../../../stores/room';
