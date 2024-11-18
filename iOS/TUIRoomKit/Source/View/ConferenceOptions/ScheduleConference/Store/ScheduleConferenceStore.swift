@@ -8,9 +8,9 @@
 import Combine
 
 protocol ScheduleConferenceStore {
-    func fetchAttendees(cursor: String)
     func update(conference info: ConferenceInfo)
-    func fetchRoomInfo(roomId: String)
+    func fetchAttendees(cursor: String)
+    func fetchRoomPassword(roomId: String)
     func select<Value:Equatable>(_ selector: Selector<ConferenceInfo, Value>) -> AnyPublisher<Value, Never>
     var conferenceInfo: ConferenceInfo { get }
 }
@@ -19,7 +19,8 @@ class ScheduleConferenceStoreProvider {
     static let updateConferenceInfo = ActionTemplate(id: "updateConferenceInfo", payloadType: ConferenceInfo.self)
     static let fetchAttendeeList = ActionTemplate(id: "fetchAttendeeList", payloadType: (String, String, Int).self)
     static let updateAttendeeList = ActionTemplate(id: "updateAttendeeList", payloadType: ([UserInfo], String, UInt).self)
-    static let fetchRoomInfo = ActionTemplate(id: ".fetchRoomInfo", payloadType: String.self)
+    static let fetchRoomPassword = ActionTemplate(id: ".fetchRoomPassword", payloadType: String.self)
+    static let updateRoomPassword = ActionTemplate(id: "updateRoomPassword", payloadType: String.self)
     static let attendeesPerFetch = 20
     
     // MARK: - private property.
@@ -37,6 +38,10 @@ class ScheduleConferenceStoreProvider {
             state.attendeeListResult.attendeeList.append(contentsOf: action.payload.0)
             state.attendeeListResult.fetchCursor = action.payload.1
             state.attendeeListResult.totalCount = action.payload.2
+        }),
+        ReduceOn(updateRoomPassword, reduce: { state, action in
+            state.basicInfo.password = action.payload
+            state.basicInfo.isPasswordEnabled = !action.payload.isEmpty
         })
     )
     
@@ -47,17 +52,17 @@ class ScheduleConferenceStoreProvider {
 }
 
 extension ScheduleConferenceStoreProvider: ScheduleConferenceStore {
+    func update(conference info: ConferenceInfo) {
+        store.dispatch(action: ScheduleConferenceStoreProvider.updateConferenceInfo(payload: info))
+    }
+    
     func fetchAttendees(cursor: String) {
         let conferenceId = conferenceInfo.basicInfo.roomId
         store.dispatch(action: ScheduleConferenceStoreProvider.fetchAttendeeList(payload: (conferenceId, cursor, ScheduleConferenceStoreProvider.attendeesPerFetch)))
     }
     
-    func update(conference info: ConferenceInfo) {
-        store.dispatch(action: ScheduleConferenceStoreProvider.updateConferenceInfo(payload: info))
-    }
-    
-    func fetchRoomInfo(roomId: String) {
-        store.dispatch(action: ScheduleConferenceStoreProvider.fetchRoomInfo(payload: roomId))
+    func fetchRoomPassword(roomId: String) {
+        store.dispatch(action: ScheduleConferenceStoreProvider.fetchRoomPassword(payload: roomId))
     }
     
     func select<Value>(_ selector: Selector<ConferenceInfo, Value>) -> AnyPublisher<Value, Never> where Value : Equatable {
@@ -88,12 +93,12 @@ class scheduleConferenceEffects: Effects {
             .eraseToAnyPublisher()
     }
     
-    let fetchRoomInfo = Effect<Environment>.dispatchingOne { actions, environment in
-        actions.wasCreated(from: ScheduleConferenceStoreProvider.fetchRoomInfo)
+    let fetchRoomPassword = Effect<Environment>.dispatchingOne { actions, environment in
+        actions.wasCreated(from: ScheduleConferenceStoreProvider.fetchRoomPassword)
             .flatMap { action in
                 environment.conferenceListService.fetchConferenceInfo(roomId: action.payload)
                     .map { conferenceInfo in
-                        ScheduleConferenceStoreProvider.updateConferenceInfo(payload: conferenceInfo)
+                        ScheduleConferenceStoreProvider.updateRoomPassword(payload: conferenceInfo.basicInfo.password)
                     }
                     .catch { error -> Just<Action> in
                         Just(ErrorActions.throwError(payload: error))

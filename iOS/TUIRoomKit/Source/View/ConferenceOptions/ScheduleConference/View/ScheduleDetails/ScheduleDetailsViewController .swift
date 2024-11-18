@@ -114,7 +114,7 @@ class ScheduleDetailsViewController: UIViewController {
                 self.rootView.tableView.reloadData()
             }
             .store(in: &cancellableSet)
-        store.fetchRoomInfo(roomId: conferenceInfo.basicInfo.roomId)
+        store.fetchRoomPassword(roomId: conferenceInfo.basicInfo.roomId)
     }
     
     private func initState() {
