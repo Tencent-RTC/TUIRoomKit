@@ -61,7 +61,7 @@
     "mitt": "^3.0.0",
     "pinia": "2.0.24",
     "sass": "^1.56.1",
-    
+    "trtc-electron-sdk": "12.1.607",
     "vue-i18n": "^9.12.1",
     "vue-router": "^4.0.14",
     "yuv-buffer": "^1.0.0",
