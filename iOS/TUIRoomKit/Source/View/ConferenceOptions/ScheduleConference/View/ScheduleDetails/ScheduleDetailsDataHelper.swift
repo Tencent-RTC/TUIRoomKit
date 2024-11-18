@@ -117,6 +117,7 @@ class ScheduleDetailsDataHelper: ScheduleConferenceDataHelper {
         item?.bindStateClosure = {  cell, cancellableSet in
             let selector = Selector(keyPath: \ConferenceInfo.attendeeListResult.attendeeList)
             store.select(selector)
+                .removeDuplicates()
                 .receive(on: RunLoop.main)
                 .sink { [weak cell] list in
                     if let cell = cell as? ScheduleTabCell {
