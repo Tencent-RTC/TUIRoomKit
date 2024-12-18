@@ -111,7 +111,7 @@ const roomStore = useRoomStore();
 
 const {
   isAudience,
-  hasOtherScreenShare,
+  remoteScreenStream,
   isGeneralUser,
   isScreenShareDisableForAllUser,
   isWhiteboardVisiable,
@@ -155,7 +155,7 @@ async function toggleScreenShare() {
     return;
   }
 
-  if (hasOtherScreenShare.value) {
+  if (remoteScreenStream.value) {
     TUIMessage({
       type: 'warning',
       message: t('Another user is sharing the screen.'),
@@ -213,7 +213,7 @@ async function onPermissionScreenShare() {
 }
 
 async function onConfirmScreenShare(screenInfo: TRTCScreenCaptureSourceInfo) {
-  if (hasOtherScreenShare.value) {
+  if (remoteScreenStream.value) {
     TUIMessage({
       type: 'warning',
       message: t(

@@ -11,3 +11,4 @@ export * from './manager/scheduleConferenceManager';
 export * from './manager/chatManager';
 export * from './manager/dataReportManager';
 export * from './function/aiTask';
+export * from './manager/trackingManager';

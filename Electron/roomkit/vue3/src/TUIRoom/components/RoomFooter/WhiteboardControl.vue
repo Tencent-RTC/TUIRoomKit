@@ -37,7 +37,7 @@ const roomStore = useRoomStore();
 
 const {
   isAudience,
-  hasOtherScreenShare,
+  remoteScreenStream,
   isLocalUserSharing,
   isWhiteboardVisiable,
   isAnnotationVisiable,
@@ -63,6 +63,17 @@ async function startShareWhiteboard() {
     return;
   }
 
+  if (isAudience.value) {
+    TUIMessage({
+      type: 'warning',
+      message: t(
+        'You currently do not have whiteboard permission, please raise your hand to apply for whiteboard permission first'
+      ),
+      duration: MESSAGE_DURATION.LONG,
+    });
+    return;
+  }
+
   if (whiteboardDisabled.value) {
     TUIMessage({
       type: 'warning',
@@ -74,7 +85,7 @@ async function startShareWhiteboard() {
     return;
   }
 
-  if (hasOtherScreenShare.value) {
+  if (remoteScreenStream.value) {
     TUIMessage({
       type: 'warning',
       message: t(

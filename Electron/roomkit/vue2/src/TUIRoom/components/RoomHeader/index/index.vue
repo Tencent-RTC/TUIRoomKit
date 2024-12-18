@@ -10,36 +10,19 @@
     </div>
     <div class="right-container">
       <language v-show="showHeaderInfo" class="header-item" />
-      <user-info
-        v-show="showHeaderInfo"
-        class="header-item"
-        :user-id="userId"
-        :user-name="userName"
-        :avatar-url="avatarUrl"
-        @log-out="$emit('log-out')"
-      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { inject } from 'vue';
-import UserInfo from '../UserInfo/index.vue';
 import Language from '../../common/Language.vue';
 import SwitchTheme from '../../common/SwitchTheme.vue';
 import RoomInfo from '../RoomInfo/index.vue';
 import LayoutControl from './LayoutControl.vue';
 import NetworkInfo from './NetworkInfo.vue';
-import { useBasicStore } from '../../../stores/basic';
-import { storeToRefs } from 'pinia';
-
-const basicStore = useBasicStore();
-
-const { userId, userName, avatarUrl } = storeToRefs(basicStore);
 
 const showHeaderInfo = inject('showHeaderInfo', true);
-
-defineEmits(['log-out']);
 </script>
 
 <style lang="scss" scoped>

@@ -35,24 +35,26 @@ export default {
       isMobile,
     };
   },
-  async mounted() {
+  async beforeMount() {
     sessionStorage.removeItem('tuiRoom-roomInfo');
     sessionStorage.removeItem('tuiRoom-userInfo');
+
+    this.givenRoomId = this.$route.query.roomId || '';
+    this.userInfo = getBasicInfo();
+    if (!this.userInfo) {
+      return;
+    }
+    sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(this.userInfo));
+
+    const { sdkAppId, userId, userSig, userName, avatarUrl } = this.userInfo;
+    await conference.login({ sdkAppId, userId, userSig });
+    await conference.setSelfInfo({ userName, avatarUrl });
+  },
+  mounted() {
     conference.setLanguage(getLanguage());
     conference.setTheme(getTheme());
     conference.on(RoomEvent.LANGUAGE_CHANGED, this.changeLanguage);
     conference.on(RoomEvent.THEME_CHANGED, this.changeTheme);
-    this.givenRoomId = this.$route.query.roomId || '';
-
-    if (sessionStorage.getItem('tuiRoom-userInfo')) {
-      this.userInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo'));
-    } else {
-      this.userInfo = await getBasicInfo();
-      this.userInfo && sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(this.userInfo));
-    }
-    const { sdkAppId, userId, userSig } = this.userInfo;
-    // Login TUIRoomEngine
-    await conference.login({ sdkAppId, userId, userSig });
   },
   destroyed() {
     conference.off(RoomEvent.LANGUAGE_CHANGED,  this.changeLanguage);

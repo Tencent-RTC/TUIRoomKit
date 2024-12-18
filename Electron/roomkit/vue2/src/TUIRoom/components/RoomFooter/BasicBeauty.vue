@@ -139,7 +139,7 @@ const isBeautyStarted = ref(false);
 const componentConfig =
   roomService.componentManager.getComponentConfig('BasicBeauty');
 const isAllowed = computed(
-  () => roomService.roomStore.localStream.hasVideoStream
+  () => roomService.roomStore.localStream?.hasVideoStream
 );
 
 watch(isLocalStreamMirror, async (val: boolean) => {

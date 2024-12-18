@@ -252,3 +252,30 @@ export function getFields(
 
   return Promise.reject(new Error('getFields() occur error'));
 }
+
+export function getContentSize(element: HTMLElement) {
+  const computedStyle = getComputedStyle(element);
+
+  const paddingTop = Number(computedStyle.paddingTop.replace('px', ''));
+  const paddingBottom = Number(computedStyle.paddingBottom.replace('px', ''));
+  const borderTop = Number(computedStyle.borderTopWidth.replace('px', ''));
+  const borderBottom = Number(
+    computedStyle.borderBottomWidth.replace('px', '')
+  );
+
+  const paddingLeft = Number(computedStyle.paddingLeft.replace('px', ''));
+  const paddingRight = Number(computedStyle.paddingRight.replace('px', ''));
+  const borderLeft = Number(computedStyle.borderLeftWidth.replace('px', ''));
+  const borderRight = Number(computedStyle.borderRightWidth.replace('px', ''));
+
+  const contentWidth =
+    element.offsetWidth - paddingLeft - paddingRight - borderLeft - borderRight;
+  const contentHeight =
+    element.offsetHeight -
+    paddingTop -
+    paddingBottom -
+    borderTop -
+    borderBottom;
+
+  return { width: contentWidth, height: contentHeight };
+}

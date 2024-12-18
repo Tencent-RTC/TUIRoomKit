@@ -25,7 +25,7 @@ export default {
   Room: 'Room',
   Join: 'Join',
   Sure: 'Sure',
-  'Switch Theme': 'Switch Theme',
+  'Switch Theme': 'Theme',
   Layout: 'Layout',
   'New Room': 'New Room',
   'Room Type': 'Room Type',
@@ -65,6 +65,8 @@ export default {
     'Others will no longer see your screen after you stop sharing.',
   'You currently do not have sharing permission, please raise your hand to apply for sharing permission first':
     'You currently do not have sharing permission, please raise your hand to apply for sharing permission first',
+  'You currently do not have whiteboard permission, please raise your hand to apply for whiteboard permission first':
+    'You currently do not have whiteboard permission, please raise your hand to apply for whiteboard permission first',
   Host: 'Host',
   Admin: 'Admin',
   RoomOwner: 'RoomOwner',
@@ -252,8 +254,7 @@ export default {
   'You have been banned from text chat': 'You have been banned from text chat',
   'You are allowed to text chat': 'You are allowed to text chat',
   'kicked out of the room by the host': 'kicked out of the room by the host',
-  'kicked out of the room by other device':
-    'kicked out of the room by other device',
+  'kicked out of the room': 'kicked out of the room',
   'kicked out of the room by serve': 'kicked out of the room by serve',
   'Reject sb on stage failed, please retry': ({ named }: any) =>
     `Reject ${named('name')} on Stage failed, please retry`,

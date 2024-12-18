@@ -59,6 +59,8 @@ export default {
     '停止后所有人将无法继续观看屏幕内容',
   'You currently do not have sharing permission, please raise your hand to apply for sharing permission first':
     '您当前没有共享权限，请先举手申请上台获取共享权限',
+  'You currently do not have whiteboard permission, please raise your hand to apply for whiteboard permission first':
+    '您当前没有白板权限，请先举手申请上台获取白板权限',
   Host: '房主',
   Me: '我',
   me: '我',
@@ -243,7 +245,7 @@ export default {
   'You have been banned from text chat': '您被禁止文字聊天',
   'You are allowed to text chat': '您被允许文字聊天',
   'kicked out of the room by the host': '被主持人踢出房间',
-  'kicked out of the room by other device': '相同账号在其他客户端进入房间',
+  'kicked out of the room': '被踢出房间',
   'kicked out of the room by serve': '被服务端踢出房间',
   'Reject sb on stage failed, please retry': ({ named }: any) =>
     `拒绝 ${named('name')} 上台失败, 请重试`,

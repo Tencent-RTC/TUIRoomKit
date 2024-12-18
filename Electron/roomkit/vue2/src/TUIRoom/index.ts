@@ -14,6 +14,8 @@ import { roomService } from './services';
 export * from './components/common/base/index';
 export * from './services/manager/scheduleConferenceManager';
 export * from './services/manager/configManager';
+export { createComparator, combineComparators } from './utils/utils';
+
 export {
   ConferenceMainView,
   PreConferenceView,
@@ -28,7 +30,7 @@ export {
 };
 export type { ThemeOption };
 
-ConferenceMainView.install = app => {
+(ConferenceMainView as any).install = (app: any) => {
   app.component('ConferenceView', ConferenceMainView);
 };
 
