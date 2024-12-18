@@ -14,15 +14,14 @@
       @wheel="handleWheel"
     >
       <StreamRegion
-        v-for="streamInfo in streamInfoList"
+        v-for="streamInfo in validStreamInfoList"
         class="stream-list-item"
         :key="`${streamInfo.userId}_${streamInfo.streamType}`"
-        @room-dblclick="$emit('room-dblclick', streamInfo)"
         :streamInfo="streamInfo"
         :style="streamStyle"
-        :isNeedPlayStream="isNeedPlayStream"
-        :observerViewInVisible="observerViewInVisible"
-        :isEnlarge="false"
+        :streamPlayMode="streamPlayMode"
+        :streamPlayQuality="streamPlayQuality"
+        @stream-view-dblclick="handleStreamDblClick"
       />
     </div>
   </div>
@@ -30,7 +29,6 @@
 
 <script setup lang="ts">
 import {
-  withDefaults,
   defineProps,
   ref,
   watch,
@@ -38,56 +36,73 @@ import {
   onMounted,
   onBeforeUnmount,
   defineEmits,
+  nextTick,
 } from 'vue';
 import type { Ref, ComputedRef } from 'vue';
 import StreamRegion from '../StreamRegion';
-import { StreamInfo } from '../../../stores/room';
-import { isPC } from '../../../utils/environment';
+import { StreamInfo } from '../../../../stores/room';
+import { isPC } from '../../../../utils/environment';
+import {
+  StreamPlayMode,
+  StreamPlayQuality,
+} from '../../../../services/manager/mediaManager';
+import { getContentSize } from '../../../../utils/domOperation';
+import { isUndefined } from '../../../../utils/utils';
 
-defineEmits(['room-dblclick']);
+const emits = defineEmits(['stream-view-dblclick']);
+const singleStreamMargin = isPC ? 8 : 4;
 
 interface Props {
-  streamInfoList: StreamInfo[];
+  streamInfoList?: StreamInfo[];
+  column: number;
+  row: number;
+  fillMode?: 'fill' | 'contain';
   aspectRatio?: string;
-  horizontalCount: number;
-  verticalCount: number;
-  isNeedPlayStream?: boolean;
-  observerViewInVisible?: boolean;
+  streamPlayQuality?: StreamPlayQuality;
+  streamPlayMode?: StreamPlayMode;
 }
-const props = withDefaults(defineProps<Props>(), {
-  isNeedPlayStream: true,
-});
 
+const props = defineProps<Props>();
 const streamListContainerRef = ref();
 const streamListRef = ref();
 
-const currentPageIndex = ref(0);
-const maxCountEveryPage = computed(
-  () => props.horizontalCount * props.verticalCount
+const isEqualPointsLayout = computed(
+  () => props.column !== Infinity && props.row !== Infinity
 );
-const isGridLayout = computed(
-  () => props.horizontalCount !== Infinity && props.verticalCount !== Infinity
-);
+const isHorizontalInfinityLayout = computed(() => props.column === Infinity);
+const isVerticalInfinityLayout = computed(() => props.row === Infinity);
 
 watch(
-  () => props.streamInfoList.length,
-  (val, oldVal) => {
-    if (oldVal === 0) {
-      handleLayout();
-    }
-    if (
-      isGridLayout.value &&
-      currentPageIndex.value > Math.ceil(val / maxCountEveryPage.value) - 1
-    ) {
-      currentPageIndex.value = Math.ceil(val / maxCountEveryPage.value) - 1;
-      handleEqualPointsLayout();
-    }
-  }
+  () => [props.column, props.row],
+  async () => {
+    await nextTick();
+    handleLayout();
+  },
+  { immediate: true }
 );
 
-// Single video stream window margin size
-const singleStreamMargin = isPC ? 8 : 4;
+const validStreamInfoList = computed(() => {
+  return props.streamInfoList?.filter(
+    item => item && item.userId && !isUndefined(item.streamType)
+  );
+});
 
+function handleLayout() {
+  if (isHorizontalInfinityLayout.value) {
+    handleHorizontalInfinityLayout();
+    return;
+  }
+  if (isVerticalInfinityLayout.value) {
+    handleVerticalInfinityLayout();
+    return;
+  }
+  if (isEqualPointsLayout.value) {
+    handleEqualPointsLayout();
+    return;
+  }
+}
+
+// Single video stream window margin size
 const streamListStyle: Ref<Record<string, any>> = ref({
   width: '0',
   height: '0',
@@ -110,35 +125,24 @@ const heightRatio: ComputedRef<number> = computed(() => {
   }
   return Number(props.aspectRatio.split(':')[1]);
 });
-
 /**
  * Handle nine-pattern layout
  **/
 async function handleEqualPointsLayout() {
-  // The number of stream windows on the current page
-  const number =
-    currentPageIndex.value > 0
-      ? maxCountEveryPage.value
-      : props.streamInfoList.slice(0, maxCountEveryPage.value).length;
-  if (number <= 0 || !streamListContainerRef.value) {
+  if (!props.streamInfoList || !streamListContainerRef.value) {
     return;
   }
   const containerRect = streamListContainerRef.value.getBoundingClientRect();
   const containerWidth = Math.floor(containerRect.width);
   const containerHeight = Math.floor(containerRect.height);
-  // The actual width and height of the container is offsetWidth/offsetHeight minus the size of padding
-  const horizontalStreamNumber = props.horizontalCount;
-  const verticalStreamNumber = props.verticalCount;
   // Subtract the margin size of a single video stream to ensure that the ratio of width and height is 16:9
   const contentWidth =
-    (containerWidth - horizontalStreamNumber * singleStreamMargin) /
-    horizontalStreamNumber;
+    (containerWidth - props.column * singleStreamMargin) / props.column;
   const contentHeight =
-    (containerHeight - verticalStreamNumber * singleStreamMargin) /
-    verticalStreamNumber;
+    (containerHeight - props.row * singleStreamMargin) / props.row;
 
-  let width = containerWidth;
-  let height = containerWidth;
+  let width = contentWidth;
+  let height = contentHeight;
   if (widthRatio.value && heightRatio.value) {
     const scaleWidth = contentWidth / widthRatio.value;
     const scaleHeight = contentHeight / heightRatio.value;
@@ -154,35 +158,8 @@ async function handleEqualPointsLayout() {
   streamStyle.value.width = `${width}px`;
   streamStyle.value.height = `${height}px`;
 
-  streamListStyle.value.width = `${horizontalStreamNumber * (width + singleStreamMargin)}px`;
-  streamListStyle.value.height = `${verticalStreamNumber * (height + singleStreamMargin)}px`;
-}
-
-function getContentSize(element: HTMLElement) {
-  const computedStyle = getComputedStyle(element);
-
-  const paddingTop = Number(computedStyle.paddingTop.replace('px', ''));
-  const paddingBottom = Number(computedStyle.paddingBottom.replace('px', ''));
-  const borderTop = Number(computedStyle.borderTopWidth.replace('px', ''));
-  const borderBottom = Number(
-    computedStyle.borderBottomWidth.replace('px', '')
-  );
-
-  const paddingLeft = Number(computedStyle.paddingLeft.replace('px', ''));
-  const paddingRight = Number(computedStyle.paddingRight.replace('px', ''));
-  const borderLeft = Number(computedStyle.borderLeftWidth.replace('px', ''));
-  const borderRight = Number(computedStyle.borderRightWidth.replace('px', ''));
-
-  const contentWidth =
-    element.offsetWidth - paddingLeft - paddingRight - borderLeft - borderRight;
-  const contentHeight =
-    element.offsetHeight -
-    paddingTop -
-    paddingBottom -
-    borderTop -
-    borderBottom;
-
-  return { width: contentWidth, height: contentHeight };
+  streamListStyle.value.width = `${props.column * (width + singleStreamMargin)}px`;
+  streamListStyle.value.height = `${props.row * (height + singleStreamMargin)}px`;
 }
 
 // Handles an unlimited number of streams horizontally
@@ -190,7 +167,7 @@ function handleHorizontalInfinityLayout() {
   streamListStyle.value = {};
 
   const contentHeight = getContentSize(streamListContainerRef.value).height;
-  const contentWidth = (contentHeight * 16) / 9;
+  const contentWidth = (contentHeight * widthRatio.value) / heightRatio.value;
   streamStyle.value.width = `${contentWidth}px`;
   streamStyle.value.height = `${contentHeight}px`;
 }
@@ -200,51 +177,14 @@ function handleVerticalInfinityLayout() {
   streamListStyle.value = {};
 
   const contentWidth = getContentSize(streamListContainerRef.value).width;
-  const contentHeight = (contentWidth * 9) / 16;
+  const contentHeight = (contentWidth * heightRatio.value) / widthRatio.value;
   streamStyle.value.width = `${contentWidth}px`;
   streamStyle.value.height = `${contentHeight}px`;
 }
 
-const isHorizontalInfinityLayout = computed(
-  () => props.horizontalCount === Infinity
-);
-const isVerticalInfinityLayout = computed(
-  () => props.verticalCount === Infinity
-);
-const isEqualPointsLayout = computed(
-  () => props.horizontalCount !== Infinity && props.verticalCount !== Infinity
-);
-
-function handleLayout() {
-  if (isHorizontalInfinityLayout.value) {
-    handleHorizontalInfinityLayout();
-    return;
-  }
-  if (isVerticalInfinityLayout.value) {
-    handleVerticalInfinityLayout();
-    return;
-  }
-  if (isEqualPointsLayout.value) {
-    handleEqualPointsLayout();
-    return;
-  }
+function handleStreamDblClick(streamInfo: StreamInfo) {
+  emits('stream-view-dblclick', streamInfo);
 }
-
-onMounted(() => {
-  handleLayout();
-});
-
-watch(
-  () => [
-    props.horizontalCount,
-    props.verticalCount,
-    props.streamInfoList.length,
-  ],
-  () => {
-    handleLayout();
-  },
-  { immediate: true }
-);
 
 const resizeObserver = new ResizeObserver(() => {
   handleLayout();
@@ -284,6 +224,11 @@ function handleWheel(event: WheelEvent) {
 }
 
 .horizontal-infinity-layout {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+
   .stream-list {
     display: flex;
     max-width: 100%;
@@ -305,6 +250,11 @@ function handleWheel(event: WheelEvent) {
 }
 
 .vertical-infinity-layout {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
   .stream-list {
     max-width: 100%;
     max-height: 100%;

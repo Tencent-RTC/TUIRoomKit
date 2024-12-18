@@ -46,6 +46,7 @@ function toggleInviteSidebar() {
       visible: isShowInviteTab.value,
     });
   }
+  roomService.trackingManager.sendMessage('experience-invite');
 }
 
 function handleClickOutSide() {

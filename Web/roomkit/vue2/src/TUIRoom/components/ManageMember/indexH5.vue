@@ -320,7 +320,7 @@ const {
     }
 
     .lift-all {
-      color: var(--mute-all-h5);
+      color: var(--red-color);
     }
   }
 

@@ -7,15 +7,10 @@
       </div>
     </div>
     <div v-if="visible" class="end-main-content">
-      <div
-        :class="
-          isShowLeaveRoomDialog ? 'end-dialog-leave' : 'end-dialog-dismiss'
-        "
-      >
+      <div class="end-dialog-dismiss">
         <div v-if="currentDialogType === DialogType.BasicDialog">
           <div v-if="roomStore.isMaster" class="end-dialog-header">
             <span v-if="roomStore.isMaster" class="end-dialog-text">
-              <!-- eslint-disable-next-line max-len -->
               {{
                 t(
                   'If you do not want to end the meeting, please designate a new host before leaving the meeting.'
@@ -33,17 +28,12 @@
         >
           <span
             v-if="roomStore.isMaster"
-            :class="
-              isShowLeaveRoomDialog
-                ? 'end-button-dismiss'
-                : 'end-button-dismiss-single'
-            "
+            class="end-button-dismiss"
             @click.stop="dismissRoom"
           >
             {{ t('Dismiss') }}
           </span>
           <span
-            v-if="isShowLeaveRoomDialog"
             v-tap="handleEndLeaveClick"
             :class="
               roomStore.isMaster
@@ -134,7 +124,6 @@ import { roomService } from '../../../services';
 
 const {
   t,
-  isShowLeaveRoomDialog,
   roomStore,
   roomEngine,
   stopMeeting,
@@ -160,7 +149,10 @@ function handleEndBtnClick() {
   stopMeeting();
 }
 function handleEndLeaveClick() {
-  if (!roomStore.isMaster) {
+  if (
+    !roomStore.isMaster ||
+    (roomStore.isMaster && remoteEnteredUserList.value.length === 0)
+  ) {
     leaveRoom();
     return;
   }
@@ -300,7 +292,6 @@ async function transferAndLeave() {
     .end-button-dismiss,
     .end-button-leave,
     .end-button-cancel,
-    .end-button-dismiss-single,
     .end-button-leave-single {
       width: 100%;
       padding: 20px 0;
@@ -342,14 +333,6 @@ async function transferAndLeave() {
       color: #007aff;
       background-color: #fff;
       border-radius: 14px;
-    }
-
-    .end-button-dismiss-single {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-bottom-right-radius: 14px;
-      border-bottom-left-radius: 14px;
     }
   }
 
