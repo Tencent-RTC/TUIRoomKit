@@ -268,3 +268,64 @@ export function formatTimestampToTime(
     match => replacements[match]
   );
 }
+
+export type Comparator<T> = (a: T, b: T) => -1 | 0 | 1;
+/**
+ * Creates a new combined {@link Comparator<T>} which sorts items by the given comparators.
+ * The comparators are applied in the order they are given (left -> right).
+ *
+ * @param comparators the comparators to use for sorting.
+ * @returns a combined {@link Comparator<T>}.
+ */
+export const combineComparators = <T>(
+  ...comparators: Comparator<T>[]
+): Comparator<T> => {
+  return (a, b) => {
+    for (const comparator of comparators) {
+      const result = comparator(a, b);
+      if (result !== 0) return result;
+    }
+    return 0;
+  };
+};
+
+export const createComparator = <T>(
+  compareRules: (data1: T, data2: T) => boolean
+) => {
+  return (a: T, b: T) => {
+    if (compareRules(a, b) && compareRules(b, a)) {
+      return 0;
+    }
+    if (compareRules(a, b)) {
+      return -1;
+    }
+    if (compareRules(b, a)) {
+      return 1;
+    }
+    return 0;
+  };
+};
+
+export function arrayIsEqual<T>(arr1: T[], arr2: T[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+  for (let i = 0; i < arr1.length; i++) {
+    if (
+      typeof arr1[i] === 'object' &&
+      typeof arr2[i] === 'object' &&
+      arr1[i] !== null &&
+      arr2[i] !== null
+    ) {
+      if (!arrayIsEqual(arr1[i] as any, arr2[i] as any)) {
+        return false;
+      }
+    } else {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}

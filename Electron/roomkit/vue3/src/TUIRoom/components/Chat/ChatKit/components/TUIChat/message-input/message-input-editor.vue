@@ -29,7 +29,7 @@ import {
   StoreName,
   IMessageModel,
 } from '@tencentcloud/chat-uikit-engine';
-import { Editor, JSONContent } from '@tiptap/core';
+import { Editor, JSONContent, Extension } from '@tiptap/core';
 import Document from '@tiptap/extension-document';
 import Paragraph from '@tiptap/extension-paragraph';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -39,6 +39,7 @@ import CustomImage from './message-input-file';
 import { ITipTapEditorContent } from '../../../interface';
 import MessageInputAtSuggestion from './message-input-at/index';
 import { parseTextToRenderArray } from '../emoji-config';
+import riseInput from '../../../utils/riseInput';
 import { isH5, isPC } from '../../../utils/env';
 import DraftManager from '../utils/conversationDraft';
 
@@ -87,6 +88,13 @@ const currentQuoteMessage = ref<{ message: IMessageModel; type: string }>();
 const editorDom = ref();
 let editor: Editor | null = null;
 const fileMap = new Map<string, any>();
+const DisableDefaultEnter = Extension.create({
+  addKeyboardShortcuts() {
+    return {
+      Enter: () => true,
+    };
+  },
+});
 
 function onCurrentConversationIDUpdated(conversationID: string) {
   if (currentConversationID.value !== conversationID) {
@@ -118,6 +126,7 @@ onMounted(() => {
         Document,
         Paragraph,
         Text,
+        DisableDefaultEnter,
         Placeholder.configure({
           emptyEditorClass: 'is-editor-empty',
           placeholder: placeholder.value,
@@ -177,6 +186,11 @@ onMounted(() => {
       },
     })
     : null;
+
+  if (isH5) {
+    const targetBottomDom = document.querySelector('.message-input-toolbar') as HTMLElement || editorDom.value;
+    riseInput(editorDom.value, targetBottomDom);
+  }
 
   TUIStore.watch(StoreName.CONV, {
     currentConversationID: onCurrentConversationIDUpdated,

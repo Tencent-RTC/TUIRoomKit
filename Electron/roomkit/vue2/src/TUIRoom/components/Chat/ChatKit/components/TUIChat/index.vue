@@ -17,8 +17,10 @@
             !isPC && 'tui-chat-H5-header',
             isUniFrameWork && 'tui-chat-uniapp-header',
           ]"
+          :isGroup="isGroup"
           :headerExtensionList="headerExtensionList"
           @closeChat="closeChat"
+          @openGroupManagement="handleGroup"
         />
         <Forward @toggleMultipleSelectMode="toggleMultipleSelectMode" />
         <MessageList
@@ -79,7 +81,7 @@
       </div>
       <!-- Group Management -->
       <div
-        v-if="!isNotInGroup && isUniFrameWork && isGroup && headerExtensionList.length > 0"
+        v-if="!isNotInGroup && !isApp && isUniFrameWork && isGroup && headerExtensionList.length > 0"
         class="group-profile"
         @click="handleGroup"
       >
@@ -105,7 +107,7 @@ import MessageInput from './message-input/index.vue';
 import MultipleSelectPanel from './mulitple-select-panel/index.vue';
 import Forward from './forward/index.vue';
 import MessageInputToolbar from './message-input-toolbar/index.vue';
-import { isPC, isWeChat, isUniFrameWork, isMobile } from '../../utils/env';
+import { isPC, isWeChat, isUniFrameWork, isMobile, isApp } from '../../utils/env';
 import { ToolbarDisplayType } from '../../interface';
 import TUIChatConfig from './config';
 
@@ -125,14 +127,12 @@ const featureConfig = TUIChatConfig.getFeatureConfig();
 
 onMounted(() => {
   TUIStore.watch(StoreName.CONV, {
-    currentConversationID: onCurrentConversationIDUpdate,
     currentConversation: onCurrentConversationUpdate,
   });
 });
 
 onUnmounted(() => {
   TUIStore.unwatch(StoreName.CONV, {
-    currentConversationID: onCurrentConversationIDUpdate,
     currentConversation: onCurrentConversationUpdate,
   });
   reset();
@@ -220,7 +220,7 @@ function oneByOneForwardMessage() {
   messageListRef.value?.oneByOneForwardMessage();
 }
 
-function onCurrentConversationUpdate(conversation: IConversationModel) {
+function updateUIUserNotInGroup(conversation: IConversationModel) {
   if (conversation?.operationType > 0) {
     headerExtensionList.value = [];
     isNotInGroup.value = true;
@@ -236,13 +236,20 @@ function onCurrentConversationUpdate(conversation: IConversationModel) {
   }
 }
 
-function onCurrentConversationIDUpdate(conversationID: string) {
-  if (currentConversationID.value === conversationID) {
+function onCurrentConversationUpdate(conversation: IConversationModel) {
+  updateUIUserNotInGroup(conversation);
+  // return when currentConversation is null
+  if (!conversation) {
+    return;
+  }
+  // return when currentConversationID.value is the same as conversation.conversationID.
+  if (currentConversationID.value === conversation?.conversationID) {
     return;
   }
 
   isGroup.value = false;
   let conversationType = TUIChatEngine.TYPES.CONV_C2C;
+  const conversationID = conversation.conversationID;
   if (conversationID.startsWith(TUIChatEngine.TYPES.CONV_GROUP)) {
     conversationType = TUIChatEngine.TYPES.CONV_GROUP;
     isGroup.value = true;
@@ -250,7 +257,6 @@ function onCurrentConversationIDUpdate(conversationID: string) {
   }
 
   headerExtensionList.value = [];
-  currentConversationID.value = conversationID;
   isMultipleSelectMode.value = false;
   // Initialize chatType
   TUIChatConfig.setChatType(conversationType);
@@ -262,10 +268,20 @@ function onCurrentConversationIDUpdate(conversationID: string) {
     method: TUIConstants.TUICustomerServicePlugin.SERVICE.METHOD.ACTIVE_CONVERSATION,
     params: { conversationID: conversationID },
   });
+  // When open chat in room, close main chat ui and reset theme.
+  if (TUIChatConfig.getChatType() === TUIConstants.TUIChat.TYPE.ROOM) {
+    if (TUIChatConfig.getFeatureConfig(TUIConstants.TUIChat.FEATURE.InputVoice) === true) {
+      TUIChatConfig.setTheme('light');
+      currentConversationID.value = '';
+      return;
+    }
+  }
   // Get chat header extensions
   if (TUIChatConfig.getChatType() === TUIConstants.TUIChat.TYPE.GROUP) {
     headerExtensionList.value = TUICore.getExtensionList(TUIConstants.TUIChat.EXTENSION.CHAT_HEADER.EXT_ID);
   }
+  TUIStore.update(StoreName.CUSTOM, 'activeConversation', conversationID);
+  currentConversationID.value = conversationID;
 }
 </script>
 

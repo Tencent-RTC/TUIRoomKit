@@ -21,7 +21,7 @@ import useSideBar from './useSideBarHooks';
 import ManageMember from '../ManageMember/index.vue';
 import RoomMore from '../RoomMore/index.vue';
 import Chat from '../Chat/index/index.vue';
-import AITranscription from '../AITools/AITranscription.vue';
+import AITranscription from '../common/widgets/AITools/AITranscription.vue';
 const { isSidebarOpen, title, handleClose, sidebarName } = useSideBar();
 </script>
 

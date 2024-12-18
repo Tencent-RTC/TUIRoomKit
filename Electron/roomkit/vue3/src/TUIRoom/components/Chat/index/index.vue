@@ -1,27 +1,16 @@
 <template>
   <div class="chat-container">
-    <TUIChat v-if="basicStore.scene !== 'chat'" />
-    <div v-else class="chat-container-chat-scene">
-      <message-list />
-      <chat-editor />
-    </div>
+    <TUIChat />
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  StoreName,
-  TUIConversationService,
-  TUIStore,
-} from '@tencentcloud/chat-uikit-engine';
+import { TUIConversationService } from '@tencentcloud/chat-uikit-engine';
 
 import Server from '../ChatKit/server';
 import { roomService, Theme, LanguageOption } from '../../../services';
 import { hideTUIChatFeatures } from '../ChatKit/components/TUIChat/config';
 import TUIChatServer from '../ChatKit/components/TUIChat/server';
-// todo Remove this logic when chat is released
-import MessageList from '../MessageList/index.vue';
-import ChatEditor from '../ChatEditor/index.vue';
 
 import { useBasicStore } from '../../../stores/basic';
 import TUIChat from '../ChatKit/components/TUIChat/index.vue';
@@ -55,13 +44,6 @@ TUIConversationService.switchConversation(currentRoomId);
 hideTUIChatFeatures(defaultHideFeaturesButtons);
 roomService.setTheme(basicStore.defaultTheme as Theme);
 roomService.setLanguage(basicStore.lang as LanguageOption);
-TUIStore.watch(StoreName.CONV, {
-  currentConversationID: onCurrentConversationIDUpdate,
-});
-
-function onCurrentConversationIDUpdate(currentConversationID: string) {
-  roomService.chatManager.setChatType(currentConversationID === currentRoomId);
-}
 </script>
 
 <style lang="scss" scoped>

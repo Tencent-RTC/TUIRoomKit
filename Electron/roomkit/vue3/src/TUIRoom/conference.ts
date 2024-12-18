@@ -11,6 +11,8 @@ import {
 import { TUIRoomEngine } from './index';
 import logger from './utils/common/logger';
 import { toTargetTheme } from './utils/common';
+import { StreamInfo, UserInfo } from './stores/room';
+import { Comparator } from './utils/utils';
 
 export enum RoomEvent {
   ROOM_START = 'RoomStart',
@@ -85,6 +87,10 @@ interface IConference {
   hideFeatureButton: (name: FeatureButton) => void;
 
   replaceFriendList: (userList: Array<any>) => void;
+
+  setUserListSortComparator: (comparator: Comparator<UserInfo>) => void;
+
+  setStreamListSortComparator: (comparator: Comparator<StreamInfo>) => void;
 }
 class Conference implements IConference {
   public login(params: {
@@ -181,6 +187,14 @@ class Conference implements IConference {
 
   public replaceFriendList(userList: Array<any>) {
     return roomService.scheduleConferenceManager.replaceFriendList(userList);
+  }
+
+  public setUserListSortComparator(comparator: Comparator<UserInfo>) {
+    roomService.userManager.setUserListSortComparator(comparator);
+  }
+
+  public setStreamListSortComparator(comparator: Comparator<StreamInfo>) {
+    roomService.userManager.setStreamListSortComparator(comparator);
   }
 }
 

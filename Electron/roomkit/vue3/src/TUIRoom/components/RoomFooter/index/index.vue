@@ -55,7 +55,6 @@
       <AIControl
         class="center-container-item"
         @click="handleControlClick('AIControl')"
-        @show-overlay="handleShowOverlay"
       />
       <setting-control
         class="center-container-item"
@@ -71,7 +70,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits } from 'vue';
 import AudioControl from '../AudioControl.vue';
 import ScreenShareControl from '../ScreenShareControl/Index.vue';
 import FullScreenControl from '../FullScreenControl.vue';
@@ -93,12 +91,8 @@ import bus from '../../../hooks/useMitt';
 import useRoomFooter from './useRoomFooterHooks';
 import { isElectron } from '../../../utils/environment';
 const { roomStore, isMaster, isAdmin, isAudience } = useRoomFooter();
-const emit = defineEmits(['show-overlay']);
 function handleControlClick(name: string) {
   bus.emit('experience-communication', name);
-}
-function handleShowOverlay(data: { name: string; visible: boolean }) {
-  emit('show-overlay', data);
 }
 </script>
 

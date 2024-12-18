@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, defineEmits } from 'vue';
+import { computed, ref, watch } from 'vue';
 import IconButton from '../common/base/IconButton.vue';
 import AIIcon from '../common/icons/AIIcon.vue';
 import AITranscription from '../common/icons/AITranscription.vue';
@@ -31,9 +31,13 @@ import AISubtitlesIcon from '../common/icons/AISubtitles.vue';
 import { roomService } from '../../services';
 import { useI18n } from '../../locales';
 import SvgIcon from '../common/base/SvgIcon.vue';
+import {
+  useRoomOverlayHooks,
+  OverlayMap,
+} from '../RoomOverlay/useRoomOverlayHooks.ts';
 
+const { toggleOverlayVisibility } = useRoomOverlayHooks();
 const { t } = useI18n();
-const emit = defineEmits(['show-overlay']);
 const AIControlConfig = roomService.getComponentConfig('AIControl');
 const { basicStore } = roomService;
 
@@ -67,10 +71,7 @@ const toggleAITranscription = () => {
 const openAISubtitles = () => {
   showSubtitles.value = !showSubtitles.value;
   showToolBox.value = false;
-  emit('show-overlay', {
-    name: 'AISubtitlesOverlay',
-    visible: showSubtitles.value,
-  });
+  toggleOverlayVisibility(OverlayMap.AISubtitlesOverlay, showSubtitles.value);
 };
 </script>
 <style lang="scss" scoped>

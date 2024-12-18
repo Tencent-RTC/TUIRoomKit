@@ -4,7 +4,7 @@ const TUIChat = {
   '表情': '[Face]',
   '查看更多': 'View more',
   '撤回': 'Recall',
-  '撤回了一条消息': 'recalled a message',
+  '撤回了一条消息': ' recalled a message',
   '打开': 'Open',
   '单击下载': 'Click download',
   '点此投诉': 'Complain',
@@ -134,9 +134,11 @@ const TUIChat = {
   '[语音]': '[Voice]',
   '[视频]': '[Video]',
   '[文件]': '[File]',
+  '[位置]': '[Location]',
   '[地理位置]': '[Location]',
   '[动画表情]': '[Animated Sticker]',
   '[群提示]': '[Group Tip]',
+  '[群提示消息]': '[Group Notification]',
   '[聊天记录]': '[Chat History]',
   '引用内容已撤回': 'The quoted message has been withdrawn',
   '群聊的聊天记录': 'Chat history for Group Chat',
@@ -146,6 +148,7 @@ const TUIChat = {
   '该群聊已被解散': 'The group has been dismissed',
   '您已被管理员移出群聊': 'You have been removed from the group by the admin.',
   '您已退出该群聊': 'You have left the group.',
+  '您已被禁止聊天': 'you have been forbidden to speak',
 };
 
 export default TUIChat;

@@ -175,12 +175,10 @@ const { deviceManager, initMediaDeviceList } = useDeviceManager({
 const props = withDefaults(
   defineProps<{
     userName?: string;
-    showLogo?: boolean;
     givenRoomId: string | null;
     enableScheduledConference?: boolean;
   }>(),
   {
-    showLogo: true,
     userName: '',
     enableScheduledConference: true,
   }
