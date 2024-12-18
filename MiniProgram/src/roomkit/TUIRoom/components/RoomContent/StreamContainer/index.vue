@@ -36,9 +36,8 @@
         >
           <stream-region
             v-show="showPusher"
-            :streamInfo="localStream"
+            :streamInfo="localStream || defaultLocalStream"
             :enlarge-dom-id="enlargeDomId"
-            :show-room-tool="showRoomTool"
             :class="[
               onlyVideoStreamList.length > 1 ? 'multi-stream' : 'single-stream',
             ]"
@@ -50,7 +49,6 @@
             <stream-region
               v-if="basicStore.userId !== stream.userId"
               :streamInfo="stream"
-              :show-room-tool="showRoomTool"
               :class="[
                 onlyVideoStreamList.length > 1
                   ? 'multi-stream'
@@ -81,13 +79,16 @@ import {
   watch,
   computed,
   nextTick,
-  defineProps,
 } from 'vue';
 import { storeToRefs } from 'pinia';
-import { StreamInfo, useRoomStore } from '../../../stores/room';
+import {
+  getNewStreamInfo,
+  StreamInfo,
+  useRoomStore,
+} from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
 import { LAYOUT } from '../../../constants/render';
-import StreamRegion from '../StreamRegion/index.vue';
+import StreamRegion from '../../Stream/common/StreamRegion/index.vue';
 import logger from '../../../utils/common/logger';
 
 import {
@@ -97,22 +98,21 @@ import {
   TUIVideoStreamType,
 } from '@tencentcloud/tuiroom-engine-wx';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
-import useStreamContainer from './useStreamContainerHooks';
 
 const logPrefix = '[StreamContainer]';
 
 const roomEngine = useGetRoomEngine();
-const { currentSpeakerUserId, onUserVoiceVolumeChanged } = useStreamContainer();
-
-defineProps<{
-  showRoomTool: boolean;
-}>();
-
 const streamContainerRef = ref(null);
 
 const roomStore = useRoomStore();
-const { streamList, localStream, streamInfoObj } = storeToRefs(roomStore);
+const { streamList, localStream, streamInfoObj, currentSpeakerInfo } =
+  storeToRefs(roomStore);
 const basicStore = useBasicStore();
+
+const defaultLocalStream = getNewStreamInfo(
+  basicStore.userId,
+  TUIVideoStreamType.kCameraStream
+);
 
 const setLayout = async (layout: LAYOUT) => {
   await nextTick();
@@ -148,9 +148,11 @@ const currentPageIndex = ref(0);
 
 const showPusher = computed(
   () =>
-    (layout.value === LAYOUT.SIX_EQUAL_POINTS && isFirstPageInSixPointLayout) ||
-    (layout.value === LAYOUT.LARGE_SMALL_WINDOW &&
-      currentSpeakerUserId.value === localStream.value.userId)
+    localStream.value &&
+    ((layout.value === LAYOUT.SIX_EQUAL_POINTS &&
+      isFirstPageInSixPointLayout) ||
+      (layout.value === LAYOUT.LARGE_SMALL_WINDOW &&
+        currentSpeakerInfo.value.speakerUserId === localStream.value?.userId))
 );
 
 const paginatedArray = computed(() => {
@@ -207,14 +209,12 @@ const showStreamList: ComputedRef<StreamInfo[]> = computed(() => {
   }
   if (layout.value === LAYOUT.LARGE_SMALL_WINDOW) {
     const userId = enlargeStream.value?.userId;
-    if (currentSpeakerUserId.value) {
-      return currentSpeakerUserId.value === localStream.value.userId
-        ? [localStream.value]
-        : [
-            streamInfoObj.value[
-              `${currentSpeakerUserId.value}_${TUIVideoStreamType.kCameraStream}`
-            ],
-          ];
+    if (currentSpeakerInfo.value.speakerUserId) {
+      return [
+        streamInfoObj.value[
+          `${currentSpeakerInfo.value.speakerUserId}_${TUIVideoStreamType.kCameraStream}`
+        ],
+      ];
     }
     return [
       streamInfoObj.value[`${userId}_${TUIVideoStreamType.kCameraStream}`],
@@ -377,20 +377,12 @@ TUIRoomEngine.once('ready', () => {
     TUIRoomEvents.onUserVideoStateChanged,
     onUserVideoStateChanged
   );
-  roomEngine.instance?.on(
-    TUIRoomEvents.onUserVoiceVolumeChanged,
-    onUserVoiceVolumeChanged
-  );
 });
 
 onUnmounted(() => {
   roomEngine.instance?.off(
     TUIRoomEvents.onUserVideoStateChanged,
     onUserVideoStateChanged
-  );
-  roomEngine.instance?.off(
-    TUIRoomEvents.onUserVoiceVolumeChanged,
-    onUserVoiceVolumeChanged
   );
 });
 </script>

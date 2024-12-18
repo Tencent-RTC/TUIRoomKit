@@ -20,6 +20,10 @@ import {
 import { TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-wx';
 import { StreamInfo, useRoomStore } from '../../../../stores/room';
 import { roomService } from '../../../../services/roomService';
+import {
+  StreamPlayMode,
+  StreamPlayQuality,
+} from '../../../../services/manager/mediaManager';
 import { useBasicStore } from '../../../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { getNanoId } from '../../../../utils/utils';
@@ -32,18 +36,23 @@ const { defaultStreamType, streamInfoObj } = storeToRefs(roomStore);
 
 interface Props {
   streamInfo: StreamInfo;
-  isEnlarge: boolean;
-  isNeedPlayStream?: boolean;
-  observerViewInVisible?: boolean;
+  streamPlayQuality?: StreamPlayQuality;
+  streamPlayMode?: StreamPlayMode;
 }
 const props = withDefaults(defineProps<Props>(), {
-  isNeedPlayStream: true,
+  streamPlayQuality: StreamPlayQuality.Default,
+  streamPlayMode: StreamPlayMode.PLAY,
 });
 
 const playRegionDomRef = ref();
 const nanoId = getNanoId(5);
 const playRegionDomId = computed(
   () => `${props.streamInfo.userId}_${props.streamInfo.streamType}_${nanoId}`
+);
+const isNeedPlayStream = computed(
+  () =>
+    props.streamPlayMode !== StreamPlayMode.STOP &&
+    props.streamInfo.hasVideoStream
 );
 
 // The stream type to be pulled from the remote user
@@ -53,8 +62,14 @@ const streamTypeToFetch = computed(() => {
   if (streamType === TUIVideoStreamType.kScreenStream) {
     return TUIVideoStreamType.kScreenStream;
   }
-  if (props.isEnlarge || userId === localUserId) {
+  if (
+    props.streamPlayQuality === StreamPlayQuality.HIGH ||
+    userId === localUserId
+  ) {
     return TUIVideoStreamType.kCameraStream;
+  }
+  if (props.streamPlayQuality === StreamPlayQuality.LOW) {
+    return TUIVideoStreamType.kCameraStreamLow;
   }
   return defaultStreamType.value;
 });
@@ -69,12 +84,13 @@ async function startPlayVideo() {
     return;
   }
   await nextTick();
-  if (props.isNeedPlayStream && props.streamInfo.hasVideoStream) {
+  if (isNeedPlayStream.value) {
     await mediaManager.startPlayVideo({
       userId: props.streamInfo.userId,
       streamType: streamTypeToFetch.value,
       view: playRegionDomRef.value,
-      observerViewInVisible: props.observerViewInVisible,
+      observerViewInVisible:
+        props.streamPlayMode === StreamPlayMode.PLAY_IN_VISIBLE,
     });
   }
 }
@@ -91,8 +107,7 @@ watch(
   () => [
     props.streamInfo.userId,
     props.streamInfo.streamType,
-    props.streamInfo.hasVideoStream,
-    props.isNeedPlayStream,
+    isNeedPlayStream.value,
   ],
   async (val, oldVal) => {
     const [oldUserId, oldStreamType] = oldVal;
@@ -107,7 +122,7 @@ watch(
         view: playRegionDomRef.value,
       });
     }
-    if (props.isNeedPlayStream && props.streamInfo.hasVideoStream) {
+    if (isNeedPlayStream.value) {
       await startPlayVideo();
     } else {
       await stopPlayVideo();
@@ -118,20 +133,20 @@ watch(
 watch(
   () => streamTypeToFetch,
   async () => {
-    if (props.isNeedPlayStream && props.streamInfo.hasVideoStream) {
+    if (isNeedPlayStream.value) {
       await startPlayVideo();
     }
   }
 );
 
 onMounted(async () => {
-  if (props.isNeedPlayStream && props.streamInfo.hasVideoStream) {
+  if (isNeedPlayStream.value) {
     await startPlayVideo();
   }
 });
 
 onBeforeUnmount(async () => {
-  if (props.isNeedPlayStream && props.streamInfo.hasVideoStream) {
+  if (isNeedPlayStream.value) {
     await stopPlayVideo();
   }
 });

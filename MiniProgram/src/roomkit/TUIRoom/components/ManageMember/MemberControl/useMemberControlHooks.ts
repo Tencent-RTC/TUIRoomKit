@@ -1,4 +1,4 @@
-import { computed, Ref, ref, Reactive, reactive } from 'vue';
+import { computed, Ref, ref, reactive } from 'vue';
 import { useI18n } from '../../../locales';
 import { UserInfo, useRoomStore } from '../../../stores/room';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
@@ -46,14 +46,14 @@ export default function useMemberControl(props?: any) {
   const editorInputEle = ref();
   const editorInputEleContainer = ref();
   const tempUserName = ref('');
-  const dialogData: Reactive<{
+  const dialogData = reactive<{
     title: string;
     content: string;
     confirmText: string;
     actionType: ActionType;
     showInput: boolean;
     isConfirmButtonDisable: boolean;
-  }> = reactive({
+  }>({
     title: '',
     content: '',
     confirmText: '',
@@ -437,7 +437,10 @@ export default function useMemberControl(props?: any) {
     const roomInfo = await roomEngine.instance?.fetchRoomInfo();
     if (roomInfo?.roomOwner === roomStore.localUser.userId) {
       try {
-        if (roomStore.localUser.hasScreenStream) {
+        if (
+          roomStore.localUser.hasScreenStream &&
+          roomStore.isScreenShareDisableForAllUser
+        ) {
           eventBus.emit('ScreenShare:stopScreenShare');
         }
         await roomEngine.instance?.changeUserRole({

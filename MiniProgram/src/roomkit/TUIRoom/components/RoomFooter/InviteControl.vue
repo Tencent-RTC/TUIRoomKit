@@ -1,5 +1,8 @@
 <template>
-  <div v-if="inviteControlConfig.visible" class="invite-control-container">
+  <div
+    v-if="inviteControlConfig.visible"
+    class="invite-control-container"
+  >
     <icon-button
       class="invite"
       :is-active="sidebarName === 'invite'"
@@ -41,6 +44,7 @@ function toggleInviteSidebar() {
       visible: isShowInviteTab.value,
     });
   }
+  roomService.trackingManager.sendMessage('experience-invite');
 }
 
 function handleClickOutSide() {

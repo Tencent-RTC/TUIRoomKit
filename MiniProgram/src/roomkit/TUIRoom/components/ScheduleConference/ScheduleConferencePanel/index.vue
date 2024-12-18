@@ -275,7 +275,7 @@ const isShowPasswordInput = ref(false);
 const needCheck = ref(false);
 const isEditMode = computed(() => !!props.conferenceInfo);
 const roomId = ref('');
-let contacts: any = [];
+const contacts = ref([]);
 const { date: startDate, laterTime: startTime } = getDateAndTime(new Date());
 const defaultFormData = ref({
   roomName: t('sb temporary room', {
@@ -313,7 +313,8 @@ watch(
       const { date, laterTime } = getDateAndTime(new Date());
       form.value.startDate = date;
       form.value.startTime = laterTime;
-      contacts = await roomService.scheduleConferenceManager.fetchFriendList();
+      contacts.value =
+        await roomService.scheduleConferenceManager.fetchFriendList();
       isEditMode.value &&
         (form.value = Object.assign({}, deepClone(editParams.value)));
     }
@@ -523,7 +524,7 @@ const selectScheduleAttends = () => {
 };
 const searchScheduleAttend = (v: string) => {
   if (!v) return [];
-  return contacts.filter(
+  return contacts.value.filter(
     (user: any) => user?.profile.nick.includes(v) || user?.userID.includes(v)
   );
 };
@@ -552,12 +553,15 @@ const contactsConfirm = (contacts: TUIUserInfo[]) => {
   form.value.scheduleAttendees = contacts;
 };
 
+let scheduleConferenceInProgress = false;
 const scheduleConference = async () => {
+  if (scheduleConferenceInProgress) return;
   if (!timeCheck()) return;
   if (!roomNameCheck()) return;
   if (!roomPasswordCheck()) return;
-  roomId.value = String(Math.ceil(Math.random() * 1000000));
+  scheduleConferenceInProgress = true;
   try {
+    roomId.value = await roomService.scheduleConferenceManager.generateRoomId();
     await roomService.scheduleConferenceManager.scheduleConference({
       ...scheduleParams.value,
       roomId: roomId.value,
@@ -580,6 +584,7 @@ const scheduleConference = async () => {
       message: err.message,
     });
   }
+  scheduleConferenceInProgress = false;
 };
 const compareArrays = (oldArray: any[], newArray: any[], key: string) => {
   const added: any[] = [];

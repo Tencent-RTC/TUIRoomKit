@@ -271,9 +271,9 @@ const {
   }
 
   .button-bottom {
-    width: 80%;
     display: flex;
     justify-content: center;
+    width: 80%;
     padding: 13px 24px;
     font-weight: 400;
     color: var(--mute-button-color-h5);
@@ -324,7 +324,7 @@ const {
     }
 
     .lift-all {
-      color: var(--mute-all-h5);
+      color: var(--red-color);
     }
   }
 

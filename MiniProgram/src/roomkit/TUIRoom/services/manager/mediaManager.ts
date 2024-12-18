@@ -19,6 +19,18 @@ interface ObserverData {
   isIntersection?: boolean;
 }
 
+export enum StreamPlayMode {
+  PLAY = 'play',
+  STOP = 'stop',
+  PLAY_IN_VISIBLE = 'playInVisible',
+}
+
+export enum StreamPlayQuality {
+  HIGH = 'high',
+  LOW = 'low',
+  Default = 'default',
+}
+
 export class MediaManager {
   private service: IRoomService;
 
@@ -31,62 +43,6 @@ export class MediaManager {
   constructor(service: IRoomService) {
     this.service = service;
     this.bindRoomEngineEvents();
-  }
-
-  private getRecordStreamType(streamType: TUIVideoStreamType | undefined) {
-    if (streamType === TUIVideoStreamType.kCameraStreamLow) {
-      return TUIVideoStreamType.kCameraStream;
-    }
-    return streamType;
-  }
-
-  private intersectionObserverCallback(entries: IntersectionObserverEntry[]) {
-    entries.forEach((entry: IntersectionObserverEntry) => {
-      const { isIntersecting, target } = entry;
-      const observerData = this.observerDataMap.get(target as HTMLElement);
-      if (!observerData) {
-        return;
-      }
-      const { userId, streamType } = observerData;
-      const streamInfo = this.service.roomStore.getStreamInfo(
-        userId,
-        streamType
-      );
-      if (!streamInfo) {
-        return;
-      }
-      const { playDomList } = streamInfo;
-      if (isIntersecting && playDomList?.length) {
-        observerData.isIntersection = true;
-        this.doStartPlayVideo({ userId, streamType, view: playDomList });
-      } else {
-        observerData.isIntersection = false;
-        const isContinuePlay = streamInfo?.playDomList?.find(
-          item => this.observerDataMap.get(item)?.isIntersection
-        );
-        if (!isContinuePlay) {
-          this.doStopPlayVideo({ userId, streamType });
-        }
-      }
-    });
-  }
-
-  private initIntersectionObserver() {
-    if (
-      !this.intersectionObserver ||
-      document?.getElementById('roomContainer') !== this.observerRoot
-    ) {
-      const observerRoot = document?.getElementById('roomContainer');
-      this.intersectionObserver = new IntersectionObserver(
-        this.intersectionObserverCallback.bind(this),
-        {
-          root: observerRoot,
-          rootMargin: '0px',
-        }
-      );
-      this.observerDataMap = new Map();
-      this.observerRoot = observerRoot;
-    }
   }
 
   public async startPlayVideo(options: {
@@ -107,42 +63,14 @@ export class MediaManager {
     if (!streamInfo) {
       return;
     }
-    let newPlayDomList = streamInfo!.playDomList?.slice(0) || [];
-    newPlayDomList.push(view);
-    newPlayDomList = [...new Set(newPlayDomList)];
+    streamInfo!.playDomMap?.set(view, streamType);
 
     if (!observerViewInVisible) {
-      this.service.roomStore.updateStreamInfo({
-        userId,
-        streamType,
-        playDomList: newPlayDomList,
-      });
-      await this.doStartPlayVideo({ userId, streamType, view: newPlayDomList });
+      await this.doStartPlayVideo({ userId, streamType });
       return;
     }
 
     this.initIntersectionObserver();
-
-    // If the dom playing A stream is no longer playing, cancel the listen and update the playlist.
-    streamInfo?.playDomList?.forEach(playDom => {
-      if (!newPlayDomList.includes(playDom)) {
-        if (
-          this.observerDataMap.get(playDom)?.userId === userId &&
-          this.getRecordStreamType(
-            this.observerDataMap.get(playDom)?.streamType
-          ) === this.getRecordStreamType(streamType)
-        ) {
-          this.observerDataMap.delete(playDom);
-          this.intersectionObserver?.unobserve(playDom);
-        }
-      }
-    });
-    this.service.roomStore.updateStreamInfo({
-      userId,
-      streamType,
-      playDomList: newPlayDomList,
-    });
-
     this.observerDataMap.set(
       view,
       Object.assign(this.observerDataMap.get(view) || {}, {
@@ -156,22 +84,126 @@ export class MediaManager {
     // At this point, the dom already exists and will no longer trigger the intersection event,
     // so when you realize it's already visible, you should play it immediately.
     if (this.observerDataMap.get(view)?.isIntersection) {
-      await this.doStartPlayVideo({ userId, streamType, view: newPlayDomList });
+      await this.doStartPlayVideo({ userId, streamType });
     }
   }
 
-  public async doStartPlayVideo(options: {
+  // If only one view wants to stop playing, update the viewList, but don't stop the stream.
+  // If no view is passed in, the stream is stopped.
+  public async stopPlayVideo(options: {
     userId: string;
     streamType: TUIVideoStreamType;
-    view: (HTMLElement | string | null)[];
+    view: HTMLElement;
   }) {
     const { userId, streamType, view } = options;
-    const viewIdList = view.map(item => {
+    logger.info('MediaManager.stopPlayVideo', userId, streamType, view);
+    const streamInfo = this.service.roomStore.getStreamInfo(userId, streamType);
+    if (!streamInfo?.playDomMap || streamInfo?.playDomMap.size === 0) {
+      return;
+    }
+
+    if (this.observerDataMap.get(view)) {
+      this.observerDataMap.delete(view);
+      this.intersectionObserver?.unobserve(view);
+    }
+
+    streamInfo?.playDomMap.delete(view);
+    if (streamInfo?.playDomMap.size > 0) {
+      await this.doStartPlayVideo({
+        userId,
+        streamType,
+      });
+    } else {
+      await this.doStopPlayVideo(options);
+    }
+  }
+
+  private initIntersectionObserver() {
+    if (
+      !this.intersectionObserver ||
+      document?.getElementById('roomContainer') !== this.observerRoot
+    ) {
+      const observerRoot = document?.getElementById('roomContainer');
+      this.intersectionObserver = new IntersectionObserver(
+        this.intersectionObserverCallback.bind(this),
+        {
+          root: observerRoot,
+          rootMargin: '0px',
+        }
+      );
+      this.observerDataMap = new Map();
+      this.observerRoot = observerRoot;
+    }
+  }
+
+  private intersectionObserverCallback(entries: IntersectionObserverEntry[]) {
+    entries.forEach((entry: IntersectionObserverEntry) => {
+      const { isIntersecting, target } = entry;
+      const observerData = this.observerDataMap.get(target as HTMLElement);
+      if (!observerData) {
+        return;
+      }
+      const { userId, streamType } = observerData;
+      const streamInfo = this.service.roomStore.getStreamInfo(
+        userId,
+        streamType
+      );
+      if (!streamInfo) {
+        return;
+      }
+      if (isIntersecting) {
+        observerData.isIntersection = true;
+        if (streamInfo?.playDomMap && streamInfo?.playDomMap.size > 0) {
+          this.doStartPlayVideo({ userId, streamType });
+        }
+      } else {
+        observerData.isIntersection = false;
+        const isContinuePlay = Array.from(
+          streamInfo?.playDomMap?.keys() || []
+        ).find(
+          item =>
+            !this.observerDataMap.get(item) ||
+            this.observerDataMap.get(item)?.isIntersection
+        );
+        if (!isContinuePlay) {
+          this.doStopPlayVideo({ userId, streamType });
+        }
+      }
+    });
+  }
+
+  private getPlayStreamType(userId: string, streamType: TUIVideoStreamType) {
+    if (streamType === TUIVideoStreamType.kScreenStream) {
+      return streamType;
+    }
+    const streamInfo = this.service.roomStore.getStreamInfo(userId, streamType);
+    if (streamInfo?.playDomMap && streamInfo?.playDomMap.size > 0) {
+      const playStreamTypeList = Array.from(streamInfo?.playDomMap?.values());
+      if (playStreamTypeList.includes(TUIVideoStreamType.kCameraStream)) {
+        return TUIVideoStreamType.kCameraStream;
+      }
+      return TUIVideoStreamType.kCameraStreamLow;
+    }
+    return streamType;
+  }
+
+  private async doStartPlayVideo(options: {
+    userId: string;
+    streamType: TUIVideoStreamType;
+  }) {
+    const { userId, streamType } = options;
+    const streamInfo = this.service.roomStore.getStreamInfo(userId, streamType);
+    if (!streamInfo) {
+      return;
+    }
+    const playStreamType = this.getPlayStreamType(userId, streamType);
+    const viewIdList = Array.from(streamInfo!.playDomMap!.keys()).map(item => {
       if (item instanceof HTMLElement) {
         return item?.id;
       }
       return item;
     });
+
     this.service.roomStore.updateStreamInfo({
       userId,
       streamType,
@@ -185,13 +217,13 @@ export class MediaManager {
     } else {
       this.service.roomEngine.instance?.setRemoteVideoView({
         userId,
-        streamType,
+        streamType: playStreamType,
         view: viewIdList,
       });
       await this.setVideoRenderParams({ userId, streamType });
       await this.service.roomEngine.instance?.startPlayRemoteVideo({
         userId,
-        streamType,
+        streamType: playStreamType,
       });
     }
     this.service.roomStore.updateStreamInfo({
@@ -224,50 +256,7 @@ export class MediaManager {
     }
   }
 
-  // If only one view wants to stop playing, update the viewList, but don't stop the stream.
-  // If no view is passed in, the stream is stopped.
-  public async stopPlayVideo(options: {
-    userId: string;
-    streamType: TUIVideoStreamType;
-    view: HTMLElement;
-  }) {
-    const { userId, streamType, view } = options;
-    logger.info('MediaManager.stopPlayVideo', userId, streamType, view);
-    const streamInfo = this.service.roomStore.getStreamInfo(userId, streamType);
-    if (!streamInfo?.playDomList || streamInfo?.playDomList.length === 0) {
-      return;
-    }
-
-    if (this.observerDataMap.get(view)) {
-      this.observerDataMap.delete(view);
-      this.intersectionObserver?.unobserve(view);
-    }
-
-    const newPlayDomList = streamInfo?.playDomList
-      .slice(0)
-      .filter(item => item !== view);
-    if (newPlayDomList.length > 0) {
-      this.service.roomStore.updateStreamInfo({
-        userId,
-        streamType,
-        playDomList: newPlayDomList,
-      });
-      await this.doStartPlayVideo({
-        userId,
-        streamType,
-        view: newPlayDomList,
-      });
-    } else {
-      this.service.roomStore.updateStreamInfo({
-        userId,
-        streamType,
-        playDomList: [],
-      });
-      await this.doStopPlayVideo(options);
-    }
-  }
-
-  public async doStopPlayVideo(options: {
+  private async doStopPlayVideo(options: {
     userId: string;
     streamType: TUIVideoStreamType;
   }) {

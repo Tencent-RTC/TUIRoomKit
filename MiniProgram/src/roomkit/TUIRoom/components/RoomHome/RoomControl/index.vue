@@ -71,14 +71,7 @@
           </div>
           <div class="room-detail-info-box">
             <span class="room-detail-title">{{ t('Your Name') }}</span>
-            <input
-              v-model="currentUserName"
-              class="roomid-input"
-              enterkeyhint="complete"
-              maxlength="16"
-              minlength="1"
-              @keyup="handleInputName"
-            />
+            <span class="roomid-input"> {{ currentUserName }} </span>
           </div>
         </div>
         <div class="room-detail-setting">
@@ -211,21 +204,18 @@ const props = defineProps<Props>();
 defineExpose({
   getRoomParam,
 });
-const currentUserName = ref(
-  props.userName || `user_${Math.ceil(Math.random() * 10)}`
-);
-const hasGivenRoomId = computed(
-  () => typeof props.givenRoomId === 'string' && props.givenRoomId !== ''
-);
+const currentUserName = ref();
 
 watch(
-  () => props.givenRoomId,
+  () => props.userName,
   val => {
-    if (val) {
-      roomId.value = val;
-    }
+    currentUserName.value = val ? val : `user_${Math.ceil(Math.random() * 10)}`;
   },
   { immediate: true }
+);
+
+const hasGivenRoomId = computed(
+  () => typeof props.givenRoomId === 'string' && props.givenRoomId !== ''
 );
 
 function createRoom() {
@@ -278,10 +268,6 @@ function handleInput(e: any) {
   roomId.value = e.target.value;
 }
 
-function handleInputName(e: any) {
-  currentUserName.value = e.target.value;
-}
-
 function handleDocumentClick(event: MouseEvent) {
   if (showMoreType.value && !moreTypeRef.value.contains(event.target)) {
     showMoreType.value = false;
@@ -298,7 +284,6 @@ function handleRoomOption(
     };
   }
 ) {
-  emit('update-user-name', currentUserName.value);
   const roomParam = getRoomParam();
   switch (type) {
     case 'Join':
@@ -659,7 +644,10 @@ onUnmounted(() => {
   justify-content: center;
   width: 100%;
   padding: 12px;
+  overflow: hidden;
   color: var(--room-detail-title);
+  text-overflow: ellipsis;
+  white-space: nowrap;
   background: var(--choose-type);
 }
 
