@@ -11,7 +11,8 @@ try {
   }
 
   // Synchronize files
-  const excludePattern = "{'node_modules','package.json','excluded-list.txt'}";
+  const excludePattern =
+    "{'node_modules','package.json','excluded-list.txt','debug'}";
   const command = `rsync -av --delete --exclude=${excludePattern} ./node_modules/@tencentcloud/chat-uikit-vue/ ${directoryPath}`;
   execSync(command, { stdio: 'inherit' });
 

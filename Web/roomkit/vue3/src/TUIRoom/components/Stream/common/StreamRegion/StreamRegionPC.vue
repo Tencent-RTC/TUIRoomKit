@@ -2,26 +2,17 @@
   <div class="stream-region-container" ref="streamRegionContainerRef">
     <div
       class="stream-region"
-      @dblclick="$emit('room-dblclick')"
-      v-dbl-touch="
-        () => {
-          $emit('room-dblclick');
-        }
-      "
+      @stream-view-dblclick="handleStreamDblClick"
+      v-dbl-touch="handleStreamDblClick"
       :style="streamStyle"
     >
-      <LocalScreenView
-        v-if="isLocalScreen"
-        :streamInfo="streamInfo"
-        :isMiniRegion="!isEnlarge"
-      />
+      <LocalScreenView v-if="isLocalScreen" :streamInfo="streamInfo" />
       <template v-else>
         <StreamPlay
           v-touch-scale="props.supportTouchScale"
           :streamInfo="streamInfo"
-          :isEnlarge="isEnlarge"
-          :isNeedPlayStream="isNeedPlayStream"
-          :observerViewInVisible="observerViewInVisible"
+          :stream-play-mode="streamPlayMode"
+          :stream-play-quality="streamPlayQuality"
         />
         <StreamCover :streamInfo="streamInfo" />
       </template>
@@ -35,34 +26,34 @@ import {
   defineProps,
   computed,
   defineEmits,
-  withDefaults,
   onMounted,
   onBeforeUnmount,
 } from 'vue';
 import type { ComputedRef } from 'vue';
 import { TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-js';
-import StreamPlay from './StreamPlay/index.vue';
-import StreamCover from './StreamCover/index.vue';
-import LocalScreenView from './LocalScreenView/index.vue';
-import { StreamInfo } from '../../../stores/room';
-import { useBasicStore } from '../../../stores/basic';
-import vDblTouch from '../../../directives/vDblTouch';
-import vTouchScale from '../../../directives/vTouchScale';
+import StreamPlay from '../StreamPlay/index.vue';
+import StreamCover from '../StreamCover/index.vue';
+import LocalScreenView from '../LocalScreenView/index.vue';
+import { StreamInfo } from '../../../../stores/room';
+import { useBasicStore } from '../../../../stores/basic';
+import vDblTouch from '../../../../directives/vDblTouch';
+import vTouchScale from '../../../../directives/vTouchScale';
+import {
+  StreamPlayMode,
+  StreamPlayQuality,
+} from '../../../../services/manager/mediaManager';
+import { getContentSize } from '../../../../utils/domOperation';
 
 interface Props {
   streamInfo: StreamInfo;
-  isEnlarge?: boolean;
+  streamPlayQuality?: StreamPlayQuality;
+  streamPlayMode?: StreamPlayMode;
   aspectRatio?: string;
-  isNeedPlayStream?: boolean;
-  observerViewInVisible?: boolean;
   supportTouchScale?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  isEnlarge: false,
-  isNeedPlayStream: true,
-});
-defineEmits(['room-dblclick']);
+const props = defineProps<Props>();
+const emits = defineEmits(['stream-view-dblclick']);
 
 const basicStore = useBasicStore();
 
@@ -93,8 +84,8 @@ function handleStreamRegionSize() {
   if (!streamRegionContainerRef.value) {
     return;
   }
-  const containerWidth = streamRegionContainerRef.value.offsetWidth;
-  const containerHeight = streamRegionContainerRef.value.offsetHeight;
+  const containerWidth = getContentSize(streamRegionContainerRef.value).width;
+  const containerHeight = getContentSize(streamRegionContainerRef.value).height;
   let width = containerWidth;
   let height = containerHeight;
   if (widthRatio.value && heightRatio.value) {
@@ -111,6 +102,10 @@ function handleStreamRegionSize() {
   }
   streamStyle.value.width = `${width}px`;
   streamStyle.value.height = `${height}px`;
+}
+
+function handleStreamDblClick() {
+  emits('stream-view-dblclick', props.streamInfo);
 }
 
 const ro = new ResizeObserver(() => {

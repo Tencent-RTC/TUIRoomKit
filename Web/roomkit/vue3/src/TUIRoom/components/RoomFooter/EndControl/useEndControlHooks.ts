@@ -36,11 +36,6 @@ export default function useEndControl() {
       ? t('Leave room?')
       : t('Select a new host')
   );
-  const isShowLeaveRoomDialog = computed(
-    () =>
-      (roomStore.isMaster && remoteEnteredUserList.value.length > 0) ||
-      !roomStore.isMaster
-  );
   const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
   const showSideBar = computed(
     () => isSidebarOpen.value && sidebarName.value === 'transfer-leave'
@@ -154,13 +149,13 @@ export default function useEndControl() {
         if (isLocal) {
           if (
             roomStore?.isMicrophoneDisableForAllUser &&
-            !roomStore.localStream.hasAudioStream
+            !roomStore.localStream?.hasAudioStream
           ) {
             roomStore.setCanControlSelfAudio(false);
           }
           if (
             roomStore?.isCameraDisableForAllUser &&
-            !roomStore.localStream.hasVideoStream
+            !roomStore.localStream?.hasVideoStream
           ) {
             roomStore.setCanControlSelfVideo(false);
           }
@@ -170,10 +165,10 @@ export default function useEndControl() {
               message: t('Your administrator status has been revoked'),
             });
           }
-          if (roomStore.localStream.hasAudioStream) {
+          if (roomStore.localStream?.hasAudioStream) {
             roomStore.setCanControlSelfAudio(true);
           }
-          if (roomStore.localStream.hasVideoStream) {
+          if (roomStore.localStream?.hasVideoStream) {
             roomStore.setCanControlSelfVideo(true);
           }
         }
@@ -242,7 +237,6 @@ export default function useEndControl() {
   return {
     t,
     basicStore,
-    isShowLeaveRoomDialog,
     roomStore,
     roomEngine,
     localUser,

@@ -33,7 +33,7 @@
         <tui-button
           class="button"
           size="default"
-          :disabled="inputPassword.length === 0"
+          :disabled="isJoinButtonDisable"
           @click="joinRoom"
         >
           {{ t('Join') }}
@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, watch, defineProps, nextTick } from 'vue';
+import { ref, Ref, watch, defineProps, nextTick, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { EventType, roomService } from '../../services';
 import { useI18n } from '../../locales';
@@ -75,6 +75,11 @@ const { t } = useI18n();
 const inputPassword: Ref<string> = ref('');
 const props = defineProps<Props>();
 const isShowPasswordContainer = ref(false);
+const isJoiningRoom = ref(false);
+
+const isJoinButtonDisable = computed(
+  () => inputPassword.value.length === 0 || isJoiningRoom.value
+);
 
 watch(
   () => props.visible,
@@ -87,12 +92,17 @@ watch(
 );
 
 async function joinRoom() {
-  await roomService.join(roomId.value, {
-    isOpenCamera: false,
-    isOpenMicrophone: true,
-    password: inputPassword.value,
-  });
-  roomService.emit(EventType.ROOM_JOIN);
+  try {
+    isJoiningRoom.value = true;
+    await roomService.join(roomId.value, {
+      isOpenCamera: false,
+      isOpenMicrophone: true,
+      password: inputPassword.value,
+    });
+    roomService.emit(EventType.ROOM_JOIN);
+  } catch (error) {
+    isJoiningRoom.value = false;
+  }
 }
 
 function cancelInputPassword() {
@@ -102,10 +112,10 @@ function cancelInputPassword() {
 
 watch(
   () => inputPassword.value,
-  async (newValue, oldValue) => {
-    if (newValue && invalidPasswordRegex.test(newValue)) {
+  async val => {
+    if (val && invalidPasswordRegex.test(val)) {
       await nextTick();
-      inputPassword.value = newValue.replace(invalidPasswordRegex, '');
+      inputPassword.value = val.replace(invalidPasswordRegex, '');
     }
   }
 );

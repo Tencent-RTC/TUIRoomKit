@@ -64,15 +64,15 @@ import {
   defineProps,
   defineEmits,
 } from 'vue';
-import { StreamInfo, useRoomStore } from '../../../stores/room';
-import Avatar from '../../common/Avatar.vue';
-import { useBasicStore } from '../../../stores/basic';
-import logger from '../../../utils/common/logger';
-import AudioIcon from '../../common/AudioIcon.vue';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import UserIcon from '../../common/icons/UserIcon.vue';
-import ScreenOpenIcon from '../../common/icons/ScreenOpenIcon.vue';
-import { useI18n } from '../../../locales';
+import { StreamInfo, useRoomStore } from '../../../../stores/room';
+import Avatar from '../../../common/Avatar.vue';
+import { useBasicStore } from '../../../../stores/basic';
+import logger from '../../../../utils/common/logger';
+import AudioIcon from '../../../common/AudioIcon.vue';
+import SvgIcon from '../../../common/base/SvgIcon.vue';
+import UserIcon from '../../../../assets/icons/UserIcon.svg';
+import ScreenOpenIcon from '../../../../assets/icons/ScreenOpenIcon.svg';
+import { useI18n } from '../../../../locales';
 import {
   TUIVideoStreamType,
   TRTCVideoStreamType,
@@ -81,8 +81,8 @@ import {
   TRTCVideoRotation,
   TUIRole,
 } from '@tencentcloud/tuiroom-engine-js';
-import useGetRoomEngine from '../../../hooks/useRoomEngine';
-import { isInnerScene } from '../../../utils/constants';
+import useGetRoomEngine from '../../../../hooks/useRoomEngine';
+import { isInnerScene } from '../../../../utils/constants';
 import { storeToRefs } from 'pinia';
 const roomEngine = useGetRoomEngine();
 

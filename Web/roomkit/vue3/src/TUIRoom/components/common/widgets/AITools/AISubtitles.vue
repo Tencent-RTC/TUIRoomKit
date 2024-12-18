@@ -16,7 +16,7 @@ import {
   MetricsKey,
   roomService,
   SubtitleMessage,
-} from '../../services';
+} from '../../../../services/index.ts';
 
 const subtitleMessages = ref<Record<string, SubtitleMessage>>({});
 const subtitleLines = computed(() => {
