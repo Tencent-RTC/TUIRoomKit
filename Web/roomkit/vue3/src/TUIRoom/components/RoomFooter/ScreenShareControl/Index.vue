@@ -104,7 +104,7 @@ const basicStore = useBasicStore();
 const {
   isAnchor,
   isAudience,
-  hasOtherScreenShare,
+  remoteScreenStream,
   isGeneralUser,
   isScreenShareDisableForAllUser,
 } = storeToRefs(roomStore);
@@ -145,7 +145,7 @@ async function toggleScreenShare() {
     return;
   }
 
-  if (hasOtherScreenShare.value) {
+  if (remoteScreenStream.value) {
     TUIMessage({
       type: 'warning',
       message: t('Another user is sharing the screen.'),
@@ -178,6 +178,7 @@ async function toggleScreenShare() {
     return;
   }
   isShowFraudDialog.value = true;
+  roomService.trackingManager.sendMessage('experience-screen-share');
 }
 
 function cancelStop() {

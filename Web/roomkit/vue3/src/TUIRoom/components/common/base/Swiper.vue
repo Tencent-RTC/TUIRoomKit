@@ -7,7 +7,7 @@
       @touchmove="handleTouchMoveThrottle"
       @touchend="handleTouchEnd"
     >
-      <slot></slot>
+      <slot v-if="swiperMounted"></slot>
     </div>
     <div v-if="swiperItemNumber > 1" class="swiper-dot-container">
       <div
@@ -21,7 +21,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, provide, computed, defineProps, defineEmits, watch } from 'vue';
+import {
+  ref,
+  provide,
+  computed,
+  defineProps,
+  defineEmits,
+  watch,
+  onMounted,
+  onUnmounted,
+} from 'vue';
 import { throttle } from '../../../utils/utils';
 
 const props = defineProps<{
@@ -46,6 +55,14 @@ watch(
 
 watch(activeSwiperIndex, () => {
   emits('change', activeSwiperIndex.value);
+});
+
+const swiperMounted = ref(false);
+onMounted(() => {
+  swiperMounted.value = true;
+});
+onUnmounted(() => {
+  swiperMounted.value = false;
 });
 
 provide('swiper', {
@@ -106,10 +123,7 @@ function handleTouchEnd(event: TouchEvent) {
   }
   isInOnceTouch = false;
   const offsetX = event.changedTouches[0].pageX - touchData.x;
-  if (
-    Math.abs(event.changedTouches[0].pageX - touchData.x) >
-    swiperRef.value.offsetWidth / 5
-  ) {
+  if (Math.abs(offsetX) > swiperRef.value.offsetWidth / 5) {
     if (offsetX < 0 && activeSwiperIndex.value < swiperItemNumber.value - 1) {
       activeSwiperIndex.value = activeSwiperIndex.value + 1;
     }

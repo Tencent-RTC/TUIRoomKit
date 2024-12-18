@@ -7,7 +7,7 @@ const message = {
     "踢出群组": "was kicked out of the group",
     "成为管理员": "was set as an admin",
     "被撤销管理员": "was revoked",
-    "被禁言": " was unmuted",
+    "被禁言": " was muted",
     "被取消禁言": "cancel the prohibition",
     "群提示消息": "group prompt message",
     "管理员": "The admin",
@@ -53,7 +53,7 @@ const message = {
     "对方忙线中": "Line busy",
     "忙线未接听": "	Line busy. Call not received.",
     "对方无应答": "Call wasn't answered",
-    "超时无应答": "Call canceled by caller",
+    "超时无应答": "Call not answered",
     "对本次服务评价": "Rate this service",
     "查看详情>>": "View details >>"
   }

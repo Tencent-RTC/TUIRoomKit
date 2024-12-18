@@ -112,18 +112,17 @@ async function handleInit() {
   sessionStorage.removeItem('tuiRoom-userInfo');
   conference.setLanguage(getLanguage() as LanguageOption);
   conference.setTheme(getTheme() as ThemeOption);
-  let currentUserInfo = null;
-  if (sessionStorage.getItem('tuiRoom-userInfo')) {
-    currentUserInfo = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo') as string);
-  } else {
-    currentUserInfo = await getBasicInfo();
-    currentUserInfo && sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(currentUserInfo));
+  const currentUserInfo = getBasicInfo();
+  if (!currentUserInfo) {
+    return;
   }
-  userInfo.userId = currentUserInfo?.userId;
-  userInfo.userName = currentUserInfo?.userName;
-  userInfo.avatarUrl = currentUserInfo?.avatarUrl;
-  const { userId, sdkAppId, userSig } = currentUserInfo;
+  sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(currentUserInfo));
+  userInfo.userId = currentUserInfo.userId;
+  userInfo.userName = currentUserInfo.userName;
+  userInfo.avatarUrl = currentUserInfo.avatarUrl;
+  const { userId, sdkAppId, userSig, userName, avatarUrl } = currentUserInfo;
   await conference.login({ sdkAppId, userId, userSig });
+  await conference.setSelfInfo({ userName, avatarUrl });
 }
 
 const changeLanguage = (language: LanguageOption) => {
