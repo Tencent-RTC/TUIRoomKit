@@ -1,5 +1,5 @@
 <template>
-  <div class="local-screen-container">
+  <div class="local-screen-container" ref="localScreenContainerRef">
     <div :class="['local-screen-control-container', { mini: isMiniRegion }]">
       <div class="local-screen-info">
         <svg-icon :icon="ScreenSharingIcon" />
@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import SvgIcon from '../../../common/base/SvgIcon.vue';
 import ScreenSharingIcon from '../../../common/icons/ScreenSharingIcon.vue';
 import TuiButton from '../../../common/base/Button.vue';
@@ -60,12 +60,8 @@ import eventBus from '../../../../hooks/useMitt';
 import { useI18n } from '../../../../locales';
 const { t } = useI18n();
 const showStopShareRegion = ref(false);
-
-interface Props {
-  isMiniRegion: boolean;
-}
-
-defineProps<Props>();
+const localScreenContainerRef = ref();
+const isMiniRegion = ref(false);
 
 function openStopConfirmDialog() {
   showStopShareRegion.value = true;
@@ -75,6 +71,15 @@ function stopScreenSharing() {
   showStopShareRegion.value = false;
   eventBus.emit('ScreenShare:stopScreenShare');
 }
+const resizeObserver = new ResizeObserver(() => {
+  isMiniRegion.value = localScreenContainerRef.value?.offsetHeight <= 200;
+});
+onMounted(() => {
+  resizeObserver.observe(localScreenContainerRef.value);
+});
+onBeforeUnmount(() => {
+  resizeObserver.unobserve(localScreenContainerRef.value);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -131,9 +136,11 @@ function stopScreenSharing() {
 
 .tui-theme-white .local-screen-container {
   --local-screen-stream-bg-color: rgba(228, 232, 238, 0.4);
+  --screen-font-color: #8f9ab2;
 }
 
 .tui-theme-black .local-screen-container {
+  --screen-font-color: #b2bbd1;
   --local-screen-stream-bg-color: rgba(34, 38, 46, 0.5);
 }
 

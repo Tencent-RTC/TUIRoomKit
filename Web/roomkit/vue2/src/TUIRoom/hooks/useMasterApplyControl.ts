@@ -17,6 +17,7 @@ import logger from '../utils/common/logger';
 import { useBasicStore } from '../stores/basic';
 import TUINotification from '../components/common/base/Notification';
 import { isMobile } from '../utils/environment';
+import { arrayIsEqual } from '../utils/utils';
 
 const roomEngine = useGetRoomEngine();
 
@@ -303,7 +304,7 @@ export default function () {
 
   function handleShowNotification() {
     watch(applyToAnchorUserIdList, (newVal, oldVal) => {
-      if (newVal.length === oldVal.length && newVal === oldVal) {
+      if (arrayIsEqual(newVal, oldVal)) {
         return;
       }
       if (newVal.length === 0) {

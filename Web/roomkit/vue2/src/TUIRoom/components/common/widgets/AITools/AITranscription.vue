@@ -35,8 +35,8 @@ import {
   AI_TASK,
   SubtitleMessage,
   MetricsKey,
-} from '../../services';
-import { formatTimestampToTime } from '../../utils/utils.ts';
+} from '../../../../services/index.ts';
+import { formatTimestampToTime } from '../../../../utils/utils.ts';
 
 const conversationContainerRef = ref<HTMLElement>();
 const isUserScrolling = ref(false);

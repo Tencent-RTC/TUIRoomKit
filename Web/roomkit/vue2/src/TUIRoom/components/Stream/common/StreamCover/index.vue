@@ -269,13 +269,11 @@ const isScreenStream = computed(
 }
 
 .tui-theme-white .stream-cover-container {
-  --screen-font-color: #8f9ab2;
   --user-has-no-camera-bg-color: rgba(228, 232, 238, 0.4);
   --user-info-container-bg-color: rgba(18, 23, 35, 0.8);
 }
 
 .tui-theme-black .stream-cover-container {
-  --screen-font-color: #b2bbd1;
   --user-has-no-camera-bg-color: rgba(34, 38, 46, 0.5);
   --user-info-container-bg-color: rgba(34, 38, 46, 0.8);
 }

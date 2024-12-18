@@ -45,7 +45,6 @@
             {{ t('Dismiss') }}
           </tui-button>
           <tui-button
-            v-if="isShowLeaveRoomDialog"
             class="button"
             size="default"
             @click="handleEndLeaveClick"
@@ -91,7 +90,6 @@ import { roomService } from '../../../services';
 
 const {
   t,
-  isShowLeaveRoomDialog,
   roomStore,
   roomEngine,
   stopMeeting,
@@ -114,7 +112,10 @@ function handleEndBtnClick() {
   stopMeeting();
 }
 function handleEndLeaveClick() {
-  if (!roomStore.isMaster) {
+  if (
+    !roomStore.isMaster ||
+    (roomStore.isMaster && remoteEnteredUserList.value.length === 0)
+  ) {
     leaveRoom();
     return;
   }
