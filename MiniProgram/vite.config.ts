@@ -13,11 +13,13 @@ export default defineConfig(({ mode }) => {
 
   const commonConfig = {
     optimizeDeps: {
-      include: ['@tencentcloud/tuiroom-engine-wx'],
+      include: [
+        '@tencentcloud/tuiroom-engine-wx',
+        '@tencentcloud/chat',
+        '@tencentcloud/tui-core',
+      ],
     },
-    plugins: [
-      uni(),
-    ],
+    plugins: [uni()],
     resolve: {
       alias: {
         '@': resolve('src'),
@@ -26,7 +28,11 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       rollupOptions: {
-        external: ['@tencentcloud/tuiroom-engine-wx'],
+        external: [
+          '@tencentcloud/tuiroom-engine-wx',
+          '@tencentcloud/chat',
+          '@tencentcloud/tui-core',
+        ],
       },
     },
   };

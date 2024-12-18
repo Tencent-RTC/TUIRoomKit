@@ -889,6 +889,7 @@ onMounted(async () => {
 }
 
 .hidden {
+  pointer-events: none;
   opacity: 0;
 }
 </style>

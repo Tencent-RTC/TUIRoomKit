@@ -40,5 +40,6 @@ async function toggleChatSidebar() {
   basicStore.setSidebarName('chat');
   chatStore.updateUnReadCount(0);
   roomService.dataReportManager.reportCount(MetricsKey.openChat);
+  roomService.trackingManager.sendMessage('experience-chat');
 }
 </script>

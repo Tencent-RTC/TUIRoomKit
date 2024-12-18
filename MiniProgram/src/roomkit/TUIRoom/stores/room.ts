@@ -11,20 +11,25 @@ import {
 import { useBasicStore } from './basic';
 import { set, del } from '../utils/vue';
 import { isMobile } from '../utils/environment';
+import { roomService } from '../services';
 
-function getNewStreamInfo(userId: string, streamType?: TUIVideoStreamType) {
+export function getNewStreamInfo(
+  userId: string,
+  streamType?: TUIVideoStreamType
+) {
   const newStreamInfo = {
     userId,
     hasAudioStream: false,
     hasVideoStream: false,
     streamType: streamType || TUIVideoStreamType.kCameraStream,
     isLoading: false,
-    playDomList: [],
+    playDomMap: new Map(),
+    timestamp: Date.now(),
   };
   return newStreamInfo;
 }
 
-function getNewUserInfo(userId: string) {
+export function getNewUserInfo(userId: string) {
   const newUserInfo = {
     userId,
     userName: '',
@@ -40,6 +45,7 @@ function getNewUserInfo(userId: string) {
     isInvitingUserToAnchor: false,
     isInRoom: false,
     status: TUIInvitationStatus.kNone,
+    timestamp: Date.now(),
   };
   return newUserInfo;
 }
@@ -51,32 +57,14 @@ function getRecordStreamType(streamType: TUIVideoStreamType) {
   return streamType;
 }
 
-function sortStreamList(streamList: StreamInfo[]) {
-  const basicStore = useBasicStore();
-  return streamList.sort((item1: StreamInfo, item2: StreamInfo) => {
-    if (item1.userId === basicStore.userId) {
-      return -1;
-    }
-    if (item2.userId === basicStore.userId) {
-      return 1;
-    }
-    if (item1.streamType === TUIVideoStreamType.kScreenStream) {
-      return -1;
-    }
-    if (item2.streamType === TUIVideoStreamType.kScreenStream) {
-      return 1;
-    }
-    return 0;
-  });
-}
-
 export type StreamInfo = {
   userId: string;
   streamType: TUIVideoStreamType;
   hasAudioStream?: boolean;
   hasVideoStream?: boolean;
   isLoading?: boolean;
-  playDomList?: HTMLElement[];
+  playDomMap?: Map<HTMLElement, TUIVideoStreamType>;
+  timestamp?: number;
 };
 
 export type UserInfo = {
@@ -111,12 +99,14 @@ export type UserInfo = {
   inviteToAnchorRequestId?: string;
   isInRoom?: boolean;
   status?: TUIInvitationStatus;
+  timestamp?: number;
 };
 
 interface RoomState {
   userInfoObj: Record<string, UserInfo>;
   streamInfoObj: Record<string, StreamInfo>;
   userVolumeObj: Record<string, number>;
+  currentSpeakerInfo: Record<string, string>;
   // Moderators can unmute audio/video by themselves when they have all users unmuted, but when they unmute a user individually.
   canControlSelfAudio: boolean;
   canControlSelfVideo: boolean;
@@ -137,7 +127,6 @@ interface RoomState {
   maxSeatCount: number;
   password: string;
   roomName: string;
-  hasOtherScreenShare: boolean;
   isOnStateTabActive: boolean;
   isLocalUserSharing: boolean;
   isWhiteboardVisiable: boolean;
@@ -150,6 +139,10 @@ export const useRoomStore = defineStore('room', {
     userInfoObj: {},
     streamInfoObj: {},
     userVolumeObj: {},
+    currentSpeakerInfo: {
+      speakerUserId: '',
+      remoteSpeakerUserId: '',
+    },
     canControlSelfAudio: true,
     canControlSelfVideo: true,
     localVideoQuality: isMobile
@@ -171,8 +164,6 @@ export const useRoomStore = defineStore('room', {
     maxSeatCount: 20,
     password: '',
     roomName: '',
-    // Visual area user flow list
-    hasOtherScreenShare: false,
     isOnStateTabActive: true,
     isLocalUserSharing: false,
     isWhiteboardVisiable: false,
@@ -187,16 +178,18 @@ export const useRoomStore = defineStore('room', {
         getNewUserInfo(basicStore.userId)
       );
     },
-    localStream(state: RoomState): StreamInfo {
+    localStream(state: RoomState): StreamInfo | undefined {
       const basicStore = useBasicStore();
-      return (
-        state.streamInfoObj[
-          `${basicStore.userId}_${TUIVideoStreamType.kCameraStream}`
-        ] ||
-        getNewStreamInfo(basicStore.userId, TUIVideoStreamType.kCameraStream)
-      );
+      if (this.isFreeSpeakMode || this.localUser.onSeat) {
+        return (
+          state.streamInfoObj[
+            `${basicStore.userId}_${TUIVideoStreamType.kCameraStream}`
+          ] ||
+          getNewStreamInfo(basicStore.userId, TUIVideoStreamType.kCameraStream)
+        );
+      }
     },
-    localScreenStream(state: RoomState): StreamInfo {
+    localScreenStream(state: RoomState): StreamInfo | undefined {
       const basicStore = useBasicStore();
       return state.streamInfoObj[
         `${basicStore.userId}_${TUIVideoStreamType.kScreenStream}`
@@ -257,7 +250,9 @@ export const useRoomStore = defineStore('room', {
           return this.userInfoObj[item.userId].onSeat;
         });
       }
-      return sortStreamList(streamList);
+      return streamList.sort(
+        roomService.userManager.getStreamListSortComparator()
+      );
     },
     remoteStreamList(): Array<StreamInfo> {
       const basicStore = useBasicStore();
@@ -268,32 +263,20 @@ export const useRoomStore = defineStore('room', {
         stream => stream.streamType === TUIVideoStreamType.kCameraStream
       );
     },
+    remoteScreenStream(): StreamInfo | undefined {
+      return this.remoteStreamList.find(
+        stream =>
+          stream.streamType === TUIVideoStreamType.kScreenStream &&
+          stream.hasVideoStream
+      );
+    },
     streamNumber(): number {
       return this.streamList.length;
     },
     userList(): Array<UserInfo> {
-      const basicStore = useBasicStore();
-      return [...Object.values(this.userInfoObj)].sort((item1, item2) => {
-        if (item1.userId === basicStore.userId) {
-          return -1;
-        }
-        if (item2.userId === basicStore.userId) {
-          return 1;
-        }
-        if (item1.userRole === TUIRole.kRoomOwner) {
-          return -1;
-        }
-        if (item2.userRole === TUIRole.kRoomOwner) {
-          return 1;
-        }
-        if (item1.userRole === TUIRole.kAdministrator) {
-          return -1;
-        }
-        if (item2.userRole === TUIRole.kAdministrator) {
-          return 1;
-        }
-        return 0;
-      });
+      return [...Object.values(this.userInfoObj)].sort(
+        roomService.userManager.getUserListSortComparator()
+      );
     },
     userNumber(): number {
       return this.userList.filter(item => item.isInRoom).length;
@@ -453,6 +436,9 @@ export const useRoomStore = defineStore('room', {
         set(this.userVolumeObj, userId, volume);
       });
     },
+    setCurrentSpeakerInfo(speakerInfo: Record<string, string>) {
+      Object.assign(this.currentSpeakerInfo, speakerInfo);
+    },
     setCurrentDeviceId(type: TUIMediaDeviceType, deviceId: string) {
       switch (type) {
         case TUIMediaDeviceType.kMediaDeviceTypeVideoCamera:
@@ -477,7 +463,7 @@ export const useRoomStore = defineStore('room', {
     setCurrentSpeakerId(deviceId: string) {
       this.currentSpeakerId = deviceId;
     },
-    setRoomInfo(roomInfo: TUIRoomInfo) {
+    setRoomInfo(roomInfo: Partial<TUIRoomInfo>) {
       if (!roomInfo) return;
 
       const {
@@ -647,9 +633,6 @@ export const useRoomStore = defineStore('room', {
         remoteUserInfo.inviteToAnchorRequestId = '';
       }
     },
-    setHasOtherScreenShare(hasScreenShare: boolean) {
-      this.hasOtherScreenShare = hasScreenShare;
-    },
     setOnStageTabStatus(isOnStateTabActive: boolean) {
       this.isOnStateTabActive = isOnStateTabActive;
     },
@@ -666,25 +649,26 @@ export const useRoomStore = defineStore('room', {
     reset() {
       const basicStore = useBasicStore();
       basicStore.setIsOpenMic(false);
+      this.resetRoomData();
+      this.resetDeviceData();
+    },
+    resetRoomData() {
       this.streamInfoObj = {};
       this.userInfoObj = {};
       this.userVolumeObj = {};
+      this.currentSpeakerInfo = {
+        speakerUserId: '',
+        remoteSpeakerUserId: '',
+      };
       this.canControlSelfAudio = true;
       this.canControlSelfVideo = true;
       this.localVideoQuality = TUIVideoQuality.kVideoQuality_720p;
-      this.currentCameraId = '';
-      this.currentMicrophoneId = '';
-      this.currentSpeakerId = '';
-      this.cameraList = [];
-      this.microphoneList = [];
-      this.speakerList = [];
       this.masterUserId = '';
       this.isMicrophoneDisableForAllUser = false;
       this.isCameraDisableForAllUser = false;
       this.isScreenShareDisableForAllUser = false;
       this.isSeatEnabled = undefined;
       this.seatMode = TUISeatMode.kFreeToTake;
-      this.hasOtherScreenShare = false;
       this.isOnStateTabActive = true;
       this.maxSeatCount = 20;
       this.password = '';
@@ -693,6 +677,14 @@ export const useRoomStore = defineStore('room', {
       this.isWhiteboardVisiable = false;
       this.isSharingScreen = false;
       this.isAnnotationVisiable = false;
+    },
+    resetDeviceData() {
+      this.currentCameraId = '';
+      this.currentMicrophoneId = '';
+      this.currentSpeakerId = '';
+      this.cameraList = [];
+      this.microphoneList = [];
+      this.speakerList = [];
     },
   },
 });

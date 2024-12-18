@@ -98,6 +98,7 @@ const scheduleInviteList = computed(() => {
 
     .copy {
       width: 20px;
+      min-width: 20px;
       height: 20px;
       margin-left: 8px;
       color: var(--active-color-1);

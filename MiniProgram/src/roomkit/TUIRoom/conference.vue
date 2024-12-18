@@ -5,11 +5,7 @@
     ref="roomRef"
     :class="tuiRoomClass"
   >
-    <room-header
-      v-show="showRoomTool && showHeaderTool"
-      class="header"
-      @log-out="logOut"
-    />
+    <room-header v-show="showRoomTool && showHeaderTool" class="header" />
     <room-content
       ref="roomContentRef"
       @tap="handleRoomContentTap"
@@ -23,7 +19,7 @@
     />
     <room-sidebar />
     <room-setting />
-    <AISubtitlesOverlay v-if="overlayMap.AISubtitlesOverlay.visible" />
+    <room-overlay />
     <RoomInviteOverlay v-if="overlayMap.RoomInviteOverlay.visible" />
     <loading-overlay v-if="isShowLoading" />
     <password-dialog
@@ -51,9 +47,9 @@ import RoomFooter from './components/RoomFooter/index/index.vue';
 import RoomSidebar from './components/RoomSidebar/index.vue';
 import RoomContent from './components/RoomContent/index.vue';
 import RoomSetting from './components/RoomSetting/index.vue';
+import RoomOverlay from './components/RoomOverlay/RoomOverlay.vue';
 import LoadingOverlay from './components/PreRoom/LoadingOverlay.vue';
 import PasswordDialog from './components/PreRoom/PasswordDialog.vue';
-import AISubtitlesOverlay from './components/AITools/AISubtitles.vue';
 import RoomInviteOverlay from './components/RoomInvite/index.vue';
 import { debounce, throttle } from './utils/utils';
 import { useBasicStore } from './stores/basic';
@@ -74,6 +70,7 @@ import {
   RoomInitData,
 } from './services/index';
 import useDeviceManager from './hooks/useDeviceManager';
+import { storeToRefs } from 'pinia';
 
 const isShowPasswordContainer = ref(false);
 const isShowLoading = ref(true);
@@ -180,7 +177,6 @@ onMounted(() => {
   roomService.on(EventType.ROOM_JOIN, onJoinRoom);
   roomService.on(EventType.ROOM_LEAVE, onLeaveRoom);
   roomService.on(EventType.ROOM_DISMISS, onDismissRoom);
-  roomService.on(EventType.USER_LOGOUT, onLogout);
   roomService.on(EventType.ROOM_NEED_PASSWORD, onRoomNeedPassword);
 });
 onUnmounted(() => {
@@ -193,7 +189,6 @@ onUnmounted(() => {
   roomService.off(EventType.ROOM_JOIN, onJoinRoom);
   roomService.off(EventType.ROOM_LEAVE, onLeaveRoom);
   roomService.off(EventType.ROOM_DISMISS, onDismissRoom);
-  roomService.off(EventType.USER_LOGOUT, onLogout);
   roomService.off(EventType.ROOM_NEED_PASSWORD, onRoomNeedPassword);
   roomService.resetStore();
 });
@@ -218,10 +213,10 @@ const tuiRoomClass = computed(() => {
  *
  **/
 const roomContentRef = ref<InstanceType<typeof RoomContent>>();
-const showRoomTool: Ref<boolean> = ref(true);
 const roomRef: Ref<Node | undefined> = ref();
+const { showRoomTool } = storeToRefs(basicStore);
 function handleHideRoomTool() {
-  showRoomTool.value = false;
+  basicStore.setShowRoomTool(false);
 }
 
 watch(
@@ -240,11 +235,11 @@ watch(
 const handleHideRoomToolDebounce = debounce(handleHideRoomTool, 5000);
 const handleHideRoomToolThrottle = throttle(handleHideRoomToolDebounce, 1000);
 const showTool = () => {
-  showRoomTool.value = true;
+  basicStore.setShowRoomTool(true);
   handleHideRoomToolDebounce();
 };
 const showToolThrottle = () => {
-  showRoomTool.value = true;
+  basicStore.setShowRoomTool(true);
   handleHideRoomToolThrottle();
 };
 const hideTool = () => {
@@ -264,7 +259,7 @@ const removeRoomContainerEvent = (container: Node) => {
 };
 
 function handleRoomContentTap() {
-  showRoomTool.value = !showRoomTool.value;
+  basicStore.setShowRoomTool(!showRoomTool.value);
   if (showRoomTool.value) {
     handleHideRoomToolDebounce();
   }
@@ -311,10 +306,6 @@ function resetStore() {
   roomService.resetStore();
 }
 
-const logOut = () => {
-  roomService.logOut();
-};
-
 const onStartRoom = () => {
   isShowLoading.value = false;
   emit('on-create-room', { code: 0, message: 'create room' });
@@ -332,10 +323,6 @@ const onLeaveRoom = () => {
 
 const onDismissRoom = () => {
   emit('on-destroy-room', { code: 0, message: 'destroy room' });
-};
-
-const onLogout = () => {
-  emit('on-log-out', { code: 0, message: 'user logout' });
 };
 
 const onKickedOutOfRoom = async (eventInfo: {

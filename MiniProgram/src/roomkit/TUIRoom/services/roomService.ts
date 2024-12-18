@@ -26,7 +26,8 @@ import {
 import { ConfigManager, LanguageOption, Theme } from './manager/configManager';
 import { SelfInfoOptions, UserManager } from './manager/userManager';
 import { LifeCycleManager } from './manager/lifeCycleManager';
-import { MediaManager } from './manager/MediaManager';
+import { MediaManager } from './manager/mediaManager';
+import { TrackingManager } from './manager/trackingManager';
 import {
   JoinParams,
   RoomActionManager,
@@ -71,6 +72,7 @@ export class RoomService implements IRoomService {
   public errorHandler: ErrorHandler = new ErrorHandler(this);
   public chatManager: ChatManager = new ChatManager(this);
   public aiTask: AITask = new AITask(this);
+  public trackingManager: TrackingManager = new TrackingManager();
 
   get basicStore() {
     return useBasicStore();
@@ -97,7 +99,6 @@ export class RoomService implements IRoomService {
   private initEventCtx() {
     this.onError = this.onError.bind(this);
     this.onRoomDismissed = this.onRoomDismissed.bind(this);
-    this.onUserVoiceVolumeChanged = this.onUserVoiceVolumeChanged.bind(this);
     this.onUserNetworkQualityChanged =
       this.onUserNetworkQualityChanged.bind(this);
     this.onKickedOutOfRoom = this.onKickedOutOfRoom.bind(this);
@@ -159,10 +160,6 @@ export class RoomService implements IRoomService {
       this.onRoomDismissed
     );
     roomEngine.instance?.on(
-      TUIRoomEvents.onUserVoiceVolumeChanged,
-      this.onUserVoiceVolumeChanged
-    );
-    roomEngine.instance?.on(
       TUIRoomEvents.onUserNetworkQualityChanged,
       this.onUserNetworkQualityChanged
     );
@@ -205,10 +202,6 @@ export class RoomService implements IRoomService {
     roomEngine.instance?.off(
       TUIRoomEvents.onRoomDismissed,
       this.onRoomDismissed
-    );
-    roomEngine.instance?.off(
-      TUIRoomEvents.onUserVoiceVolumeChanged,
-      this.onUserVoiceVolumeChanged
     );
     roomEngine.instance?.off(
       TUIRoomEvents.onUserNetworkQualityChanged,
@@ -268,11 +261,6 @@ export class RoomService implements IRoomService {
     });
   }
 
-  private onUserVoiceVolumeChanged(eventInfo: { userVolumeList: [] }) {
-    const { userVolumeList } = eventInfo;
-    this.roomStore.setAudioVolume(userVolumeList);
-  }
-
   private onUserNetworkQualityChanged(eventInfo: { userNetworkList: [] }) {
     this.basicStore.setLocalQuality(eventInfo.userNetworkList);
   }
@@ -290,7 +278,7 @@ export class RoomService implements IRoomService {
           notice = t('kicked out of the room by the host');
           break;
         case TUIKickedOutOfRoomReason.kKickedByLoggedOnOtherDevice:
-          notice = t('kicked out of the room by other device');
+          notice = t('kicked out of the room');
           break;
         case TUIKickedOutOfRoomReason.kKickedByServer:
           notice = t('kicked out of the room by serve');
@@ -454,13 +442,7 @@ export class RoomService implements IRoomService {
 
   public async initRoomKit(option: RoomInitData) {
     this.storeInit(option);
-    const {
-      sdkAppId,
-      userId,
-      userSig,
-      userName = userId,
-      avatarUrl = '',
-    } = option;
+    const { sdkAppId, userId, userSig } = option;
     TUILogin.login({
       SDKAppID: sdkAppId,
       userID: userId,
@@ -469,7 +451,6 @@ export class RoomService implements IRoomService {
     });
     const { chat } = TUILogin.getContext();
     await TUIRoomEngine.login({ sdkAppId, userId, userSig, tim: chat });
-    await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
     this.emit(EventType.ROOM_LOGIN);
   }
 

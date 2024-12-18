@@ -81,7 +81,7 @@ const { t } = useI18n();
 const componentConfig =
   roomService.componentManager.getComponentConfig('VirtualBackground');
 const isAllowed = computed(
-  () => roomService.roomStore.localStream.hasVideoStream
+  () => roomService.roomStore.localStream?.hasVideoStream
 );
 const appliedBackground = ref<'close' | 'blur'>('close');
 const selectedBackground = ref<'close' | 'blur'>('close');

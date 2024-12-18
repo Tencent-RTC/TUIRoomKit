@@ -3,7 +3,7 @@
     id="pre-conference-container"
     :class="['pre-conference-container', tuiRoomThemeClass]"
   >
-    <div class="header">
+    <div class="header" v-show="props.isShowHeaderInfo">
       <div class="left-header">
         <switch-theme class="header-item" />
       </div>
@@ -27,7 +27,6 @@
       :user-name="props.userInfo.userName"
       @create-room="handleCreateRoom"
       @enter-room="handleEnterRoom"
-      @update-user-name="handleUpdateUserName"
     />
     <div class="pre-home-control" v-else>
       <Logo v-show="props.isShowLogo" class="logo" />
@@ -85,6 +84,7 @@ const props = withDefaults(
     roomId: string;
     enableScheduledConference: boolean;
     isShowLogo?: boolean;
+    isShowHeaderInfo?: boolean;
   }>(),
   {
     userInfo: () => ({
@@ -96,6 +96,7 @@ const props = withDefaults(
     roomId: '',
     enableScheduledConference: true,
     isShowLogo: true,
+    isShowHeaderInfo: true,
   }
 );
 

@@ -71,6 +71,7 @@ interface BasicState {
       [key: string]: any;
     };
   };
+  showRoomTool: boolean;
 }
 
 export const useBasicStore = defineStore('basic', {
@@ -121,6 +122,7 @@ export const useBasicStore = defineStore('basic', {
       },
     },
     scene: 'default',
+    showRoomTool: true,
   }),
   getters: {},
   actions: {
@@ -239,6 +241,9 @@ export const useBasicStore = defineStore('basic', {
     setScene(scene: SceneType) {
       this.scene = scene;
     },
+    setShowRoomTool(isShow: boolean) {
+      this.showRoomTool = isShow;
+    },
     reset() {
       this.isSidebarOpen = false;
       this.layout = getDefaultLayout();
@@ -256,6 +261,7 @@ export const useBasicStore = defineStore('basic', {
       this.showHeaderTool = true;
       this.shareLink = '';
       this.isOpenMic = false;
+      this.showRoomTool = false;
     },
   },
 });

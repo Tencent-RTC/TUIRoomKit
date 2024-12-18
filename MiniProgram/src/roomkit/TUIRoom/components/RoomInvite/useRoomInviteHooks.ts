@@ -102,7 +102,7 @@ export default function useRoomInvite() {
     },
     {
       title: 'Room Type',
-      content: `${t(getSeatModeDisplay(isSeatEnabled.value))}`,
+      content: `${t(getSeatModeDisplay(!!isSeatEnabled.value))}`,
       isShowCopyIcon: false,
       isVisible: true,
     },
@@ -143,7 +143,7 @@ export default function useRoomInvite() {
   function copyRoomIdAndRoomLink() {
     const invitationList = [
       roomName.value,
-      `${t('Room Type')}: ${t(getSeatModeDisplay(isSeatEnabled.value))}`,
+      `${t('Room Type')}: ${t(getSeatModeDisplay(!!isSeatEnabled.value))}`,
       `${t('Room ID')}: ${roomId.value}`,
     ];
     if (isShowPassword.value) {
