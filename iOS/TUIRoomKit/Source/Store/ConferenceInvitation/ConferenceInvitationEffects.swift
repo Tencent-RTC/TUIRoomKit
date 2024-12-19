@@ -36,6 +36,7 @@ class ConferenceInvitationEffects: Effects {
                     }
                     .catch { error -> Just<Action> in
                         environment.store?.dispatch(action: InvitationViewActions.dismissInvitationView())
+                        environment.store?.dispatch(action: InvitationObserverActions.stopCallingBellAndVibration())
                         return Just(ErrorActions.throwError(payload: error))
                     }
             }
@@ -112,6 +113,7 @@ class ConferenceInvitationEffects: Effects {
                     RoomRouter.shared.push(viewController: vc)
                 }
                 environment.store?.dispatch(action: InvitationViewActions.dismissInvitationView())
+                environment.store?.dispatch(action: InvitationObserverActions.stopCallingBellAndVibration())
             }
     }
     
@@ -129,6 +131,7 @@ class ConferenceInvitationEffects: Effects {
                     environment.store?.dispatch(action: ConferenceInvitationActions.reject(payload: (roomInfo.roomId, .rejectToEnter)))
                 } else {
                     InvitationObserverService.shared.showInvitationWindow(roomInfo: RoomInfo(with: roomInfo), invitation: invitation)
+                    environment.store?.dispatch(action: InvitationObserverActions.playCallingBellAndVibration())
                 }
             }
     }

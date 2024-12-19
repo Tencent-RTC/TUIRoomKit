@@ -60,7 +60,7 @@ class FloatChatDisplayView: UIView {
     
     func bindInteraction() {
         messagePublisher
-            .filter{ !$0.content.isEmpty }
+            .filter{ !($0.content.isEmpty && $0.type == .text) }
             .receive(on: DispatchQueue.mainQueue)
             .sink { [weak self] floatMessage in
                 guard let self = self else { return }

@@ -2295,29 +2295,6 @@
         }
       }
     },
-    "Failed to disable video." : {
-      "extractionState" : "migrated",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "فشل الحظر"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to disable video."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "禁画失败"
-          }
-        }
-      }
-    },
     "Failed to go on stage, invitation has timed out" : {
       "extractionState" : "migrated",
       "localizations" : {
@@ -2360,29 +2337,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "发起共享失败，当前仅房主/管理员可以共享"
-          }
-        }
-      }
-    },
-    "Failed to mute." : {
-      "extractionState" : "migrated",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "فشل حظر القمح"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to mute."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "禁麦失败"
           }
         }
       }
@@ -4583,52 +4537,6 @@
         }
       }
     },
-    "rejected to the camera access request." : {
-      "extractionState" : "migrated",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رفض طلب تشغيل الكاميرا"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "rejected to the camera access request."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "拒绝了摄像头开启请求"
-          }
-        }
-      }
-    },
-    "rejected to the microphone access request." : {
-      "extractionState" : "migrated",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رفض طلب الميكروفون"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "rejected to the microphone access request."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "拒绝了麦克风开启请求"
-          }
-        }
-      }
-    },
     "Remove" : {
       "extractionState" : "migrated",
       "localizations" : {
@@ -5125,6 +5033,75 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "发送"
+          }
+        }
+      }
+    },
+    "Sent a picture" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أرسلت صورة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent a picture"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送了一张图片"
+          }
+        }
+      }
+    },
+    "Sent a video" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أرسل مقطع فيديو"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent a video"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送了一个视频"
+          }
+        }
+      }
+    },
+    "Sent xx" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم الإرسال xx"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent xx"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送了 xx"
           }
         }
       }
@@ -5819,52 +5796,6 @@
         }
       }
     },
-    "The invitation to start the audio has timed out" : {
-      "extractionState" : "migrated",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "انتهت مهلة الدعوة لتمكين الصوت"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The invitation to start the audio has timed out"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开启音频的邀请已经超时"
-          }
-        }
-      }
-    },
-    "The invitation to start the video has timed out" : {
-      "extractionState" : "migrated",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "انتهت مهلة الدعوة لبدء الفيديو"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The invitation to start the video has timed out"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开启视频的邀请已经超时"
-          }
-        }
-      }
-    },
     "The invitation to xx to go on stage has timed out" : {
       "extractionState" : "migrated",
       "localizations" : {
@@ -5907,6 +5838,121 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "上台请求已超时"
+          }
+        }
+      }
+    },
+    "The room does not exist, please confirm the room ID or create a room!" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الغرفة غير موجودة، يرجى تأكيد معرف الغرفة أو إنشاء غرفة!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The room does not exist, please confirm the room ID or create a room!"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "房间不存在，请确认房间号或创建房间！"
+          }
+        }
+      }
+    },
+    "The room ID is occupied, please select another room ID." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم الغرفة مشغول، الرجاء تحديد رقم غرفة آخر."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The room ID is occupied, please select another room ID."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "房间号已被占用，请选择其他房间号。"
+          }
+        }
+      }
+    },
+    "The room is full and you cannot enter the room temporarily." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الغرفة ممتلئة ولا يمكنك الدخول إلى الغرفة مؤقتًا."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The room is full and you cannot enter the room temporarily."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "房间成员已满，暂时无法进入房间。"
+          }
+        }
+      }
+    },
+    "The room name is invalid. It cannot exceed 30 bytes. If it contains Chinese characters, the character encoding must be UTF-8." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اسم الغرفة غير صالح. لا يمكن أن يتجاوز 30 بايت. إذا كان يحتوي على أحرف صينية، فيجب أن يكون ترميز الأحرف UTF-8."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The room name is invalid. It cannot exceed 30 bytes. If it contains Chinese characters, the character encoding must be UTF-8."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "房间名称无效，最长30字节，如果包含中文，字符编码必须是 UTF-8。"
+          }
+        }
+      }
+    },
+    "The room number is invalid. It must be printable ASCII characters and cannot exceed 48 bytes." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم الغرفة غير صالح. يجب أن يكون عبارة عن أحرف ASCII قابلة للطباعة ولا يمكن أن يتجاوز 48 بايت."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The room number is invalid. It must be printable ASCII characters and cannot exceed 48 bytes."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "房间号无效，必须为可打印 ASCII 字符，最长48个字节。"
           }
         }
       }
@@ -5999,6 +6045,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "该成员已收到相同请求，请稍后再试"
+          }
+        }
+      }
+    },
+    "This operation is not supported in the current room type." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يتم دعم هذه العملية في نوع الغرفة الحالي."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This operation is not supported in the current room type."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前房间类型下不支持该操作。"
           }
         }
       }
@@ -6707,6 +6776,29 @@
         }
       }
     },
+    "You are already in another room and need to leave the room before joining a new room." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أنت موجود بالفعل في غرفة أخرى وتحتاج إلى مغادرة الغرفة قبل الانضمام إلى غرفة جديدة."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are already in another room and need to leave the room before joining a new room."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您已经在其他房间内，需要先退房才能加入新的房间。"
+          }
+        }
+      }
+    },
     "You are already logged in elsewhere" : {
       "extractionState" : "migrated",
       "localizations" : {
@@ -6891,29 +6983,6 @@
         }
       }
     },
-    "You have been asked to leave stage" : {
-      "extractionState" : "migrated",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لقد طلب منك مغادرة المسرح"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You have been asked to leave stage"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "您已被请下台"
-          }
-        }
-      }
-    },
     "You have been banned from text chat" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6937,6 +7006,29 @@
         }
       }
     },
+    "You have been invited by the host to step down, please raise your hand if you need to speak" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لقد تمت دعوتك من قبل المضيف للتنحي، يرجى رفع يدك إذا كنت بحاجة إلى التحدث"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have been invited by the host to step down, please raise your hand if you need to speak"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您已被主持人邀请下台，需要发言请先举手"
+          }
+        }
+      }
+    },
     "You have been removed from the conference participants" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6956,6 +7048,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您已被房主/管理员移出参会成员列表"
+          }
+        }
+      }
+    },
+    "You need to enter the room to use this function." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يجب عليك الدخول إلى الغرفة لاستخدام هذه الوظيفة."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You need to enter the room to use this function."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要进入房间后才可以使用此功能。"
           }
         }
       }

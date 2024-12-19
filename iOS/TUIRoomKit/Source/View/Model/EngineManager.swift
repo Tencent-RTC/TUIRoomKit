@@ -132,7 +132,8 @@ class EngineManager: NSObject {
     func destroyEngineManager() {
         removeEngineObserver()
         unsubLogoutNotification()
-        store = RoomStore()
+        isLoginEngine = false
+        store.reset()
     }
     
     func muteLocalAudio() {

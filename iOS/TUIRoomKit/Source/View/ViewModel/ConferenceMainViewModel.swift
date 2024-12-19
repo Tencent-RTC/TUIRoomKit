@@ -215,17 +215,20 @@ class ConferenceMainViewModel: NSObject {
     }
     
     func handleWrongPasswordFault(roomId: String) {
-        handleOperateConferenceFailedResult(roomId: roomId, event: .onJoinedRoom, error: .wrongPassword, message: "")
+        handleOperateConferenceFailedResult(roomId: roomId, event: .onJoinedRoom, error: .failed, message: "")
     }
     
     private func handleOperateConferenceFailedResult(roomId: String, event: EngineEventCenter.RoomEngineEvent, error: TUIError, message: String) {
-        if viewStore.isInternalCreation {
-            roomRouter.pop()
-            let errorText = "Error: " + String(describing: error) + ", Message: " + message
-            conferenceStore.dispatch(action: ViewActions.showToast(payload: ToastInfo(message: errorText)))
-        } else {
+        let errorMessage = error.description ?? message
+        if !viewStore.isInternalCreation {
             notifyError(roomId: roomId, event: event, error: error, message: message)
+        } else {
+            EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, param: [:])
+            if error.isCommon, !errorMessage.isEmpty {
+                conferenceStore.dispatch(action: ViewActions.showToast(payload: ToastInfo(message: errorMessage)))
+            }
         }
+        debugPrint("TUIRoomKit error: \(event) error, \(errorMessage)")
     }
     
     deinit {
@@ -467,7 +470,6 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
     
     private func handleUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool, reason: TUIChangeReason) {
         guard streamType == .screenStream, !hasVideo, reason == .byAdmin else { return }
-        guard roomInfo.isScreenShareDisableForAllUser else { return }
         RoomRouter.presentAlert(title: .screenSharingHasStoppedAlertTitle, message: .screenSharingHasStoppedAlertMessage, sureTitle: .iSee, declineTitle: nil, sureBlock: nil, declineBlock: nil)
     }
 }
@@ -494,8 +496,7 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
     }
     
     func makeVideoSeatView() -> UIView {
-        let viewModel = TUIVideoSeatViewModel()
-        let videoSeatView = TUIVideoSeatView(viewModel: viewModel)
+        let videoSeatView = ConferenceStreamContainer()
         videoSeatView.backgroundColor = UIColor(0x0F1014)
         return videoSeatView
     }
@@ -667,7 +668,7 @@ private extension String {
         localized("All videos enabled")
     }
     static var kickedOffSeat: String {
-        localized("You have been asked to leave stage")
+        localized("You have been invited by the host to step down, please raise your hand if you need to speak")
     }
     static var hostText: String {
         localized("Host")

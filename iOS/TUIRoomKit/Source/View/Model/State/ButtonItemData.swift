@@ -21,6 +21,7 @@ class ButtonItemData {
         case moreItemType
         case switchCamaraItemType
         case raiseHandApplyItemType
+        case reportItemType
         case normal
     }
     enum Orientation {

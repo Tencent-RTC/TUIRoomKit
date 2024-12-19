@@ -80,41 +80,11 @@ class ModifyScheduleDataHelper: ScheduleConferenceDataHelper {
                 route.pop()
                 return
             }
-            updateConferenceInfoIfNeeded(store: store, operation: operation, modifyStore: modifyStore)
-            updateAttendsIfNeeded(store: store, operation: operation, modifyStore: modifyStore)
+            operation.dispatch(action: ConferenceListActions.modifyConferenceInfo(payload: (store.conferenceInfo, modifyStore.conferenceInfo)))
             store.update(conference: modifyStore.conferenceInfo)
             route.pop()
         }
         return item
-    }
-    
-    private class func updateConferenceInfoIfNeeded(store: ScheduleConferenceStore, operation: ConferenceStore, modifyStore: ScheduleConferenceStore) {
-        var modifyFlag: TUIConferenceModifyFlag = []
-        if modifyStore.conferenceInfo.basicInfo.name != store.conferenceInfo.basicInfo.name {
-            modifyFlag = modifyFlag.union(.roomName)
-        }
-        if modifyStore.conferenceInfo.scheduleStartTime != store.conferenceInfo.scheduleStartTime ||
-            modifyStore.conferenceInfo.durationTime != store.conferenceInfo.durationTime {
-            modifyFlag = modifyFlag.union([.scheduleStartTime, .scheduleEndTime])
-        }
-        if !modifyFlag.isEmpty {
-            let info = TUIConferenceInfo(conferenceInfo: modifyStore.conferenceInfo)
-            operation.dispatch(action: ConferenceListActions.updateConferenceInfo(payload: (info, modifyFlag)))
-        }
-    }
-    
-    private class func updateAttendsIfNeeded(store: ScheduleConferenceStore, operation: ConferenceStore, modifyStore: ScheduleConferenceStore){
-        let conferenceId = store.conferenceInfo.basicInfo.roomId
-        let newAttendeeSet = Set(modifyStore.conferenceInfo.attendeeListResult.attendeeList)
-        let oldAttendeeSet = Set(store.conferenceInfo.attendeeListResult.attendeeList)
-        let addList = newAttendeeSet.subtracting(oldAttendeeSet).map { $0.userId }
-        let removeList = oldAttendeeSet.subtracting(newAttendeeSet).map { $0.userId }
-        if !addList.isEmpty {
-            operation.dispatch(action: ConferenceListActions.addAttendeesByAdmin(payload: (conferenceId, addList)))
-        }
-        if !removeList.isEmpty {
-            operation.dispatch(action: ConferenceListActions.removeAttendeesByAdmin(payload: (conferenceId, removeList)))
-        }
     }
 }
 
