@@ -4,9 +4,7 @@ import android.text.TextUtils;
 
 import com.tencent.cloud.tuikit.engine.extension.TUIConferenceInvitationManager;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListData;
-import com.trtc.tuikit.common.livedata.LiveData;
-
+import com.trtc.tuikit.common.livedata.LiveListData;
 
 public class InvitationState {
     public LiveListData<Invitation> invitationList = new LiveListData<>();
@@ -18,22 +16,21 @@ public class InvitationState {
     }
 
     public static class Invitation {
-        public TUIConferenceInvitationManager.InvitationStatus invitationStatus;
+        public TUIConferenceInvitationManager.InvitationStatus invitationStatus = TUIConferenceInvitationManager.InvitationStatus.NONE;
         public UserState.UserInfo                              inviter;
         public UserState.UserInfo                              invitee;
 
         public Invitation() {
-            this.invitationStatus = TUIConferenceInvitationManager.InvitationStatus.NONE;
+        }
+
+        public Invitation(String inviteeUserId) {
+            this.invitee = new UserState.UserInfo(inviteeUserId);
         }
 
         public Invitation(TUIConferenceInvitationManager.Invitation invitation) {
             this.invitationStatus = invitation.status;
             this.inviter = new UserState.UserInfo(invitation.inviter);
             this.invitee = new UserState.UserInfo(invitation.invitee);
-        }
-
-        public void updateStatus(TUIConferenceInvitationManager.InvitationStatus status) {
-            this.invitationStatus = status;
         }
 
         @Override

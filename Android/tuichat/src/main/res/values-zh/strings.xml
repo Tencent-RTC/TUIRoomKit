@@ -293,4 +293,5 @@
     <string name="chat_quote_origin_message_revoked">引用内容已撤回</string>
     <string name="chat_reply_origin_message_revoked">回复内容已撤回</string>
 
+    <string name="ugc_plugin_not_purchased">您当前未购买高级视频录制能力套餐，请前往 IM 控制台开通免费体验或加购正式版</string>
 </resources>

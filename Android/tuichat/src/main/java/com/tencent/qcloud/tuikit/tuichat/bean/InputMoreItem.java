@@ -2,7 +2,7 @@ package com.tencent.qcloud.tuikit.tuichat.bean;
 
 import android.view.View;
 
-public class InputMoreActionUnit {
+public class InputMoreItem {
     private ChatInfo chatInfo;
 
     private int iconResId;

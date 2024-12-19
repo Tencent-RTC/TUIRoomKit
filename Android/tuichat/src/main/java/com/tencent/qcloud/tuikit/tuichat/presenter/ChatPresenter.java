@@ -1,15 +1,17 @@
 package com.tencent.qcloud.tuikit.tuichat.presenter;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+import android.webkit.MimeTypeMap;
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.tencent.imsdk.BaseConstants;
+import com.tencent.imsdk.v2.V2TIMMessage;
 import com.tencent.qcloud.tuicore.TUIConfig;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
@@ -22,6 +24,7 @@ import com.tencent.qcloud.tuikit.timcommon.bean.UserBean;
 import com.tencent.qcloud.tuikit.timcommon.component.face.FaceManager;
 import com.tencent.qcloud.tuikit.timcommon.component.highlight.HighlightPresenter;
 import com.tencent.qcloud.tuikit.timcommon.component.interfaces.IUIKitCallback;
+import com.tencent.qcloud.tuikit.timcommon.util.FileUtil;
 import com.tencent.qcloud.tuikit.timcommon.util.ThreadUtils;
 import com.tencent.qcloud.tuikit.tuichat.R;
 import com.tencent.qcloud.tuikit.tuichat.TUIChatConstants;
@@ -43,6 +46,7 @@ import com.tencent.qcloud.tuikit.tuichat.bean.message.SoundMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.TextMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.VideoMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.component.progress.ProgressPresenter;
+import com.tencent.qcloud.tuikit.tuichat.config.GeneralConfig;
 import com.tencent.qcloud.tuikit.tuichat.config.TUIChatConfigs;
 import com.tencent.qcloud.tuikit.tuichat.interfaces.IBaseMessageSender;
 import com.tencent.qcloud.tuikit.tuichat.interfaces.IMessageAdapter;
@@ -63,6 +67,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 public abstract class ChatPresenter {
@@ -79,6 +84,10 @@ public abstract class ChatPresenter {
     private static final int READ_REPORT_INTERVAL = 1000;
 
     protected static final int MSG_PAGE_COUNT = 20;
+
+    private static final int SHOW_SENDING_PROGRESS_DELAY = 1000;
+
+    private static final int START_PROGRESS = 30;
 
     protected final ChatProvider provider;
     protected List<TUIMessageBean> loadedMessageInfoList = new ArrayList<>();
@@ -114,6 +123,9 @@ public abstract class ChatPresenter {
     protected boolean isNeedShowBottom = true;
 
     private final Handler loadApplyHandler = new Handler();
+    private final Handler showSendProgressHandler = new Handler();
+
+    private Map<Uri, TUIMessageBean> processingMessages = new ConcurrentHashMap<>();
 
     public ChatPresenter() {
         TUIChatLog.i(TAG, "ChatPresenter Init");
@@ -305,10 +317,6 @@ public abstract class ChatPresenter {
         this.mCacheNewMessage = null;
     }
 
-    public RecyclerView getMessageRecyclerView() {
-        return (RecyclerView) this.messageRecyclerView;
-    }
-
     private void loadToWayMessageAsync(
         String chatId, boolean isGroup, int getType, int loadCount, TUIMessageBean locateMessageInfo, IUIKitCallback<List<TUIMessageBean>> callback) {
         List<TUIMessageBean> firstLoadedData = new ArrayList<>();
@@ -432,6 +440,11 @@ public abstract class ChatPresenter {
     protected void onMessageLoadCompleted(List<TUIMessageBean> data, int getType) {}
 
     protected void processLoadedMessage(List<TUIMessageBean> data, int type) {
+        for (TUIMessageBean messageBean : data) {
+            if (messageBean.getStatus() == TUIMessageBean.MSG_STATUS_SENDING) {
+                messageBean.setSending(true);
+            }
+        }
         onLoadedMessageUpdate(data, type);
         processMessageAsync(data);
     }
@@ -561,8 +574,14 @@ public abstract class ChatPresenter {
                 findMessage(msgIdList, new IUIKitCallback<List<TUIMessageBean>>() {
                     @Override
                     public void onSuccess(List<TUIMessageBean> originData) {
+                        List<TUIMessageBean> presentData = new ArrayList<>();
+                        for (TUIMessageBean messageBean : originData) {
+                            if (messageBean != null && messageBean.getV2TIMMessage().getStatus() != V2TIMMessage.V2TIM_MSG_STATUS_HAS_DELETED) {
+                                presentData.add(messageBean);
+                            }
+                        }
                         setQuoteMessageAbstractEnable();
-                        originMessageBeans.addAll(originData);
+                        originMessageBeans.addAll(presentData);
                         setOriginMessageBean();
                         latch.countDown();
                     }
@@ -660,7 +679,7 @@ public abstract class ChatPresenter {
         ThreadUtils.execute(mergeRunnable);
     }
 
-    protected void addMessageInfo(TUIMessageBean messageInfo) {
+    protected void addMessageToUI(TUIMessageBean messageInfo, boolean scrollToEnd) {
         ThreadUtils.runOnUiThread(() -> {
             if (messageInfo == null) {
                 return;
@@ -668,9 +687,18 @@ public abstract class ChatPresenter {
             if (checkExist(messageInfo)) {
                 return;
             }
+            if (scrollToEnd) {
+                scrollToEnd();
+            }
             loadedMessageInfoList.add(messageInfo);
             updateAdapter(IMessageRecyclerView.DATA_CHANGE_NEW_MESSAGE, 1);
         });
+    }
+
+    private void scrollToEnd() {
+        if (messageRecyclerView != null) {
+            messageRecyclerView.scrollToEnd();
+        }
     }
 
     protected void onRecvNewMessage(TUIMessageBean msg) {
@@ -705,7 +733,7 @@ public abstract class ChatPresenter {
                 return;
             }
 
-            addMessageInfo(messageInfo);
+            addMessageToUI(messageInfo, false);
 
             if (isChatFragmentShow()) {
                 if (messageRecyclerView != null && messageRecyclerView.isDisplayJumpMessageLayout()) {
@@ -787,6 +815,114 @@ public abstract class ChatPresenter {
         }
     }
 
+    public void sendPhotoVideoMessages(Uri originalUri, Uri transcodeUri) {
+        TUIMessageBean messageBean;
+        if (transcodeUri == null) {
+            messageBean = buildImageVideoMessage(originalUri);
+        } else {
+            messageBean = buildImageVideoMessage(transcodeUri);
+            if (messageBean == null) {
+                messageBean = buildImageVideoMessage(originalUri);
+            }
+        }
+        if (messageBean == null) {
+            TUIChatLog.e(TAG, "sendPhotoVideoMessages failed, originalUri " + originalUri + " transcodeUri " + transcodeUri);
+            processingMessages.remove(originalUri);
+            return;
+        }
+
+        TUIMessageBean finalMessageBean = messageBean;
+        ThreadUtils.runOnUiThread(() -> {
+            TUIMessageBean placeholderMessageBean = processingMessages.remove(originalUri);
+            if (placeholderMessageBean != null) {
+                replaceUIMessage(placeholderMessageBean, finalMessageBean);
+            }
+            sendMessage(finalMessageBean, false, false, null);
+        });
+    }
+
+    private void replaceUIMessage(TUIMessageBean originalMessage, TUIMessageBean replaceMessage) {
+        int index = loadedMessageInfoList.indexOf(originalMessage);
+        if (index != -1) {
+            loadedMessageInfoList.set(index, replaceMessage);
+            updateAdapter(IMessageRecyclerView.DATA_CHANGE_TYPE_UPDATE, replaceMessage);
+        }
+    }
+
+    private TUIMessageBean buildImageVideoMessage(Uri uri) {
+        Context context = TUIChatService.getAppContext();
+        String fileName = FileUtil.getFileName(context, uri);
+        String fileExtension = FileUtil.getFileExtensionFromUrl(fileName);
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+        if (TextUtils.isEmpty(mimeType)) {
+            TUIChatLog.e(TAG, "mimeType is empty.");
+            return null;
+        }
+        boolean isVideo = false;
+        if (mimeType.contains("video")) {
+            if (FileUtil.isFileSizeExceedsLimit(uri, GeneralConfig.VIDEO_MAX_SIZE)) {
+                ToastUtil.toastShortMessage(context.getResources().getString(com.tencent.qcloud.tuicore.R.string.TUIKitErrorFileTooLarge));
+                return null;
+            }
+            isVideo = true;
+        } else if (mimeType.contains("image")) {
+            if (TextUtils.equals(mimeType, "image/gif")) {
+                if (FileUtil.isFileSizeExceedsLimit(uri, GeneralConfig.GIF_IMAGE_MAX_SIZE)) {
+                    ToastUtil.toastShortMessage(context.getResources().getString(com.tencent.qcloud.tuicore.R.string.TUIKitErrorFileTooLarge));
+                    return null;
+                }
+            } else {
+                if (FileUtil.isFileSizeExceedsLimit(uri, GeneralConfig.IMAGE_MAX_SIZE)) {
+                    ToastUtil.toastShortMessage(context.getResources().getString(com.tencent.qcloud.tuicore.R.string.TUIKitErrorFileTooLarge));
+                    return null;
+                }
+            }
+        }
+        String filePath = FileUtil.getPathFromUri(uri);
+        TUIMessageBean messageBean;
+        if (isVideo) {
+            messageBean = ChatMessageBuilder.buildVideoMessage(filePath);
+        } else {
+            messageBean = ChatMessageBuilder.buildImageMessage(filePath);
+        }
+        return messageBean;
+    }
+
+    public void addPlaceholderMessage(Uri uri) {
+        if (uri == null || TextUtils.isEmpty(uri.toString())) {
+            TUIChatLog.e(TAG, "data is empty");
+            return;
+        }
+        Context context = TUIChatService.getAppContext();
+        String fileName = FileUtil.getFileName(context, uri);
+        String fileExtension = FileUtil.getFileExtensionFromUrl(fileName);
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+        if (TextUtils.isEmpty(mimeType)) {
+            TUIChatLog.e(TAG, "mimeType is empty.");
+            return;
+        }
+        TUIMessageBean msg;
+        if (mimeType.contains("video")) {
+            msg = ChatMessageBuilder.buildPlaceholderVideoMessage(uri);
+        } else if (mimeType.contains("image")) {
+            msg = ChatMessageBuilder.buildPlaceholderImageMessage(uri);
+        } else {
+            TUIChatLog.e(TAG, "Send photo or video failed , invalid mimeType : " + mimeType);
+            return;
+        }
+        processingMessages.put(uri, msg);
+        addMessageToUI(msg, true);
+    }
+
+    public void updateMessageProgress(Uri originalUri, int progress) {
+        TUIMessageBean messageBean = processingMessages.get(originalUri);
+        if (messageBean == null) {
+            return;
+        }
+        int modifiedProgress = Math.round(progress * 0.3f);
+        ProgressPresenter.updateProgress(messageBean.getId(), modifiedProgress);
+    }
+
     public void resetCurrentChatUnreadCount() {
         this.currentChatUnreadCount = 0;
         this.mCacheNewMessage = null;
@@ -833,10 +969,6 @@ public abstract class ChatPresenter {
         assembleGroupMessage(message);
         notifyConversationInfo(getChatInfo());
 
-        if (messageRecyclerView != null) {
-            messageRecyclerView.scrollToEnd();
-        }
-
         String msgId = provider.sendMessage(message, getChatInfo(), onlineUserOnly, new IUIKitCallback<TUIMessageBean>() {
             @Override
             public void onSuccess(TUIMessageBean data) {
@@ -846,7 +978,9 @@ public abstract class ChatPresenter {
                     TUIChatLog.w(TAG, "sendMessage unSafetyCall");
                     return;
                 }
+
                 message.setStatus(TUIMessageBean.MSG_STATUS_SEND_SUCCESS);
+                message.setSending(false);
                 TUIChatUtils.callbackOnSuccess(callBack, data);
                 updateMessageInfo(message, IMessageRecyclerView.DATA_CHANGE_TYPE_UPDATE);
                 Map<String, Object> param = new HashMap<>();
@@ -867,13 +1001,15 @@ public abstract class ChatPresenter {
                     || errCode == TUIChatConstants.ERR_LOCAL_COMM_SENSITIVE_TEXT) {
                     message.setHasRiskContent(true);
                 }
+
                 message.setStatus(TUIMessageBean.MSG_STATUS_SEND_FAIL);
+                message.setSending(false);
                 updateMessageInfo(message, IMessageRecyclerView.DATA_CHANGE_TYPE_UPDATE);
             }
 
             @Override
             public void onProgress(Object data) {
-                ProgressPresenter.updateProgress(message.getId(), (Integer) data);
+                ProgressPresenter.updateProgress(message.getId(), (int) (START_PROGRESS + ((Integer) data * 0.7)));
                 TUIChatUtils.callbackOnProgress(callBack, data);
             }
         });
@@ -882,13 +1018,23 @@ public abstract class ChatPresenter {
         TUIChatLog.i(TAG, "sendMessage msgID:" + msgId);
         message.setId(msgId);
         message.setStatus(TUIMessageBean.MSG_STATUS_SENDING);
+        updateMessageSendingStatus(message);
         if (retry) {
             resendMessageInfo(message);
         } else {
-            addMessageInfo(message);
+            addMessageToUI(message, true);
         }
-
         return msgId;
+    }
+
+    private void updateMessageSendingStatus(TUIMessageBean message) {
+        showSendProgressHandler.postDelayed(() -> {
+            if (message.getStatus() == TUIMessageBean.MSG_STATUS_SEND_FAIL || message.getStatus() == TUIMessageBean.MSG_STATUS_SEND_SUCCESS) {
+                return;
+            }
+            message.setSending(true);
+            updateMessageInfo(message, IMessageRecyclerView.DATA_CHANGE_TYPE_UPDATE);
+        }, SHOW_SENDING_PROGRESS_DELAY);
     }
 
     private void notifyConversationInfo(ChatInfo chatInfo) {
@@ -926,7 +1072,7 @@ public abstract class ChatPresenter {
 
     private void resendMessageInfo(TUIMessageBean messageInfo) {
         onMessageDeleted(messageInfo);
-        addMessageInfo(messageInfo);
+        addMessageToUI(messageInfo, true);
     }
 
     public void deleteMessage(TUIMessageBean messageInfo) {
@@ -1045,7 +1191,6 @@ public abstract class ChatPresenter {
         }
         return true;
     }
-
 
     public void markMessageAsRead(ChatInfo chatInfo) {
         markMessageAsRead(chatInfo, true);
@@ -1444,6 +1589,7 @@ public abstract class ChatPresenter {
 
                 TUIChatUtils.callbackOnSuccess(callBack, data);
                 message.setStatus(TUIMessageBean.MSG_STATUS_SEND_SUCCESS);
+                message.setSending(false);
                 updateMessageInfo(message, IMessageRecyclerView.DATA_CHANGE_TYPE_UPDATE);
                 Map<String, Object> param = new HashMap<>();
                 param.put(TUIChatConstants.MESSAGE_BEAN, data);
@@ -1465,6 +1611,7 @@ public abstract class ChatPresenter {
                     message.setHasRiskContent(true);
                 }
                 message.setStatus(TUIMessageBean.MSG_STATUS_SEND_FAIL);
+                message.setSending(false);
                 updateMessageInfo(message, IMessageRecyclerView.DATA_CHANGE_TYPE_UPDATE);
                 Map<String, Object> param = new HashMap<>();
                 param.put(TUIChatConstants.MESSAGE_BEAN, message);
@@ -1473,7 +1620,7 @@ public abstract class ChatPresenter {
 
             @Override
             public void onProgress(Object data) {
-                ProgressPresenter.updateProgress(message.getId(), (Integer) data);
+                ProgressPresenter.updateProgress(message.getId(), (int) (START_PROGRESS + (Integer) data * 0.7));
             }
         });
 
@@ -1481,8 +1628,8 @@ public abstract class ChatPresenter {
         TUIChatLog.i(TAG, "sendMessage msgID:" + msgId);
         message.setId(msgId);
         message.setStatus(TUIMessageBean.MSG_STATUS_SENDING);
+        updateMessageSendingStatus(message);
     }
-
 
     class LoadApplyListRunnable implements Runnable {
         private static final int TRY_DELAY = 500;
@@ -1544,7 +1691,7 @@ public abstract class ChatPresenter {
         }
         List<String> msgList = new ArrayList<>();
         msgList.add(msgId);
-        provider.findMessage(msgList, new IUIKitCallback<List<TUIMessageBean>>() {
+        provider.findPresentMessages(msgList, new IUIKitCallback<List<TUIMessageBean>>() {
             @Override
             public void onSuccess(List<TUIMessageBean> data) {
                 if (data != null && !data.isEmpty()) {
@@ -1562,7 +1709,7 @@ public abstract class ChatPresenter {
     }
 
     public void findMessage(List<String> msgList, IUIKitCallback<List<TUIMessageBean>> callback) {
-        provider.findMessage(msgList, new IUIKitCallback<List<TUIMessageBean>>() {
+        provider.findPresentMessages(msgList, new IUIKitCallback<List<TUIMessageBean>>() {
             @Override
             public void onSuccess(List<TUIMessageBean> data) {
                 if (data != null && !data.isEmpty()) {

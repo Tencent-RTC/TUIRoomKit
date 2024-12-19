@@ -20,12 +20,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListObserver;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.TransferMasterViewModel;
+import com.trtc.tuikit.common.livedata.LiveListObserver;
 
 public class TransferMasterPanel extends BaseBottomDialog implements View.OnClickListener {
     private static final float PORTRAIT_HEIGHT_OF_SCREEN = 0.9f;
@@ -40,12 +40,10 @@ public class TransferMasterPanel extends BaseBottomDialog implements View.OnClic
 
     private LiveListObserver<UserState.UserInfo> mAllUserObserver = new LiveListObserver<UserState.UserInfo>() {
         @Override
-        public void onItemChanged(int position, UserState.UserInfo item, String flag) {
-            if (TextUtils.equals(flag, UserState.ModifyFlag.NAME_CARD)) {
+        public void onItemChanged(int position, UserState.UserInfo item) {
                 if (mAdapter != null) {
                     mAdapter.notifyDataSetChanged();
                 }
-            }
         }
     };
 

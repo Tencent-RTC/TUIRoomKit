@@ -29,11 +29,6 @@ public class C2CChatPresenter extends ChatPresenter {
 
     private TypingListener typingListener;
 
-    public C2CChatPresenter() {
-        super();
-        TUIChatLog.i(TAG, "C2CChatPresenter Init");
-    }
-
     public void initListener() {
         chatEventListener = new C2CChatEventListener() {
             @Override
@@ -88,7 +83,7 @@ public class C2CChatPresenter extends ChatPresenter {
             @Override
             public void addMessage(TUIMessageBean messageBean, String chatId) {
                 if (TextUtils.equals(chatId, c2CChatInfo.getId())) {
-                    addMessageInfo(messageBean);
+                    addMessageToUI(messageBean, true);
                 }
             }
 

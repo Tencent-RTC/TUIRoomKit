@@ -1,12 +1,9 @@
 package com.tencent.cloud.tuikit.roomkit.view.page.widget.SpeechToText;
 
-import static com.tencent.cloud.tuikit.roomkit.model.data.ASRState.ASR_TYPE_TRANSCRIPTION;
-
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,9 +17,9 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListObserver;
 import com.tencent.cloud.tuikit.roomkit.model.data.ASRState;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
+import com.trtc.tuikit.common.livedata.LiveListObserver;
 
 import java.util.LinkedList;
 

@@ -1,4 +1,4 @@
-package com.tencent.qcloud.tuikit.tuichat.classicui.component;
+package com.tencent.qcloud.tuikit.timcommon.component;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -11,32 +11,31 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.tencent.qcloud.tuikit.timcommon.R;
 import com.tencent.qcloud.tuikit.timcommon.util.ScreenUtil;
-import com.tencent.qcloud.tuikit.tuichat.R;
 
 import java.util.ArrayList;
 
-public class EmojiIndicatorView extends LinearLayout {
+public class IndicatorView extends LinearLayout {
     private Context mContext;
     private ArrayList<ImageView> mImageViews;
     private Bitmap bmpSelect;
-    private Bitmap bmpNomal;
+    private Bitmap bmpNormal;
     private int mHeight = 16;
     private int mMaxHeight;
-    private AnimatorSet mPlayToAnimatorSet;
     private AnimatorSet mPlayByInAnimatorSet;
     private AnimatorSet mPlayByOutAnimatorSet;
 
-    public EmojiIndicatorView(Context context, AttributeSet attrs) {
+    public IndicatorView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.mContext = context;
         this.setOrientation(HORIZONTAL);
         mMaxHeight = ScreenUtil.dip2px(mHeight);
         bmpSelect = BitmapFactory.decodeResource(getResources(), R.drawable.indicator_point_select);
-        bmpNomal = BitmapFactory.decodeResource(getResources(), R.drawable.indicator_point_nomal);
+        bmpNormal = BitmapFactory.decodeResource(getResources(), R.drawable.indicator_point_nomal);
     }
 
-    public EmojiIndicatorView(Context context) {
+    public IndicatorView(Context context) {
         this(context, null);
     }
 
@@ -54,7 +53,7 @@ public class EmojiIndicatorView extends LinearLayout {
                 imageView.setImageBitmap(bmpSelect);
                 rl.addView(imageView, layoutParams);
             } else {
-                imageView.setImageBitmap(bmpNomal);
+                imageView.setImageBitmap(bmpNormal);
                 rl.addView(imageView, layoutParams);
             }
             this.addView(rl, params);
@@ -110,7 +109,7 @@ public class EmojiIndicatorView extends LinearLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                imageViewStrat.setImageBitmap(bmpNomal);
+                imageViewStrat.setImageBitmap(bmpNormal);
                 ObjectAnimator animFil1l = ObjectAnimator.ofFloat(imageViewStrat, "scaleX", 1.0f);
                 ObjectAnimator animFill2 = ObjectAnimator.ofFloat(imageViewStrat, "scaleY", 1.0f);
                 AnimatorSet mFillAnimatorSet = new AnimatorSet();

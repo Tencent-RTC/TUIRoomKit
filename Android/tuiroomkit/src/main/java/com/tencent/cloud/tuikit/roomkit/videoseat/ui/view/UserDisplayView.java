@@ -19,12 +19,12 @@ import androidx.constraintlayout.utils.widget.ImageFilterView;
 import com.tencent.cloud.tuikit.engine.common.TUIVideoView;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListObserver;
 import com.tencent.cloud.tuikit.roomkit.common.utils.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
 import com.tencent.cloud.tuikit.roomkit.videoseat.viewmodel.UserEntity;
 import com.tencent.qcloud.tuicore.util.ScreenUtil;
+import com.trtc.tuikit.common.livedata.LiveListObserver;
 
 public class UserDisplayView extends FrameLayout {
     public static final int MARGIN_PX = ScreenUtil.dip2px(5);
@@ -56,10 +56,8 @@ public class UserDisplayView extends FrameLayout {
 
     private LiveListObserver<UserState.UserInfo> mAllUserObserver = new LiveListObserver<UserState.UserInfo>() {
         @Override
-        public void onItemChanged(int position, UserState.UserInfo item, String flag) {
-            if (TextUtils.equals(flag, UserState.ModifyFlag.NAME_CARD)) {
-                onUserNameCardChanged(item.userId, item.userName);
-            }
+        public void onItemChanged(int position, UserState.UserInfo item) {
+            onUserNameCardChanged(item.userId, item.userName);
         }
     };
 

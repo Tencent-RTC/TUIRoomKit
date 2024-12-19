@@ -5,11 +5,11 @@ import static com.tencent.cloud.tuikit.roomkit.model.ConferenceConstant.DURATION
 import android.os.SystemClock;
 import android.text.TextUtils;
 
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListObserver;
 import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
 import com.tencent.cloud.tuikit.roomkit.model.entity.Request;
 import com.tencent.cloud.tuikit.roomkit.view.StateHolder;
 import com.trtc.tuikit.common.livedata.LiveData;
+import com.trtc.tuikit.common.livedata.LiveListObserver;
 import com.trtc.tuikit.common.livedata.Observer;
 
 import java.util.List;
@@ -40,10 +40,8 @@ public class RaiseHandNotificationStateHolder extends StateHolder {
 
     private LiveListObserver<UserState.UserInfo> mAllUserObserver = new LiveListObserver<UserState.UserInfo>() {
         @Override
-        public void onItemChanged(int position, UserState.UserInfo item, String flag) {
-            if (TextUtils.equals(flag, UserState.ModifyFlag.NAME_CARD)) {
-                updateNotification(item.userId);
-            }
+        public void onItemChanged(int position, UserState.UserInfo item) {
+            updateNotification(item.userId);
         }
     };
 

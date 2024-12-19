@@ -1,6 +1,7 @@
 package com.tencent.qcloud.tuikit.tuichat.classicui.widget.message.viewholder;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -15,6 +16,7 @@ import com.tencent.qcloud.tuikit.timcommon.component.face.FaceManager;
 import com.tencent.qcloud.tuikit.timcommon.component.impl.GlideEngine;
 import com.tencent.qcloud.tuikit.timcommon.util.FileUtil;
 import com.tencent.qcloud.tuikit.timcommon.util.ScreenUtil;
+import com.tencent.qcloud.tuikit.timcommon.util.TextUtil;
 import com.tencent.qcloud.tuikit.tuichat.R;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.ImageMessageBean;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.QuoteMessageBean;
@@ -106,14 +108,6 @@ public class QuoteMessageHolder extends TextMessageHolder {
             quoteContentFrameLayout.setVisibility(View.GONE);
         }
 
-        msgArea.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                selectableTextHelper.selectAll();
-                return true;
-            }
-        });
-
         quoteContentFrameLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -122,11 +116,30 @@ public class QuoteMessageHolder extends TextMessageHolder {
                 }
             }
         });
+
         setThemeColor(msg);
+        TextUtil.linkifyUrls(msgBodyText);
+        msgBodyText.setActivated(true);
+
         if (isForwardMode || isReplyDetailMode) {
             return;
         }
-        setSelectableTextHelper(msg, msgBodyText, position);
+        msgArea.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                selectionHelper.selectAll();
+                return true;
+            }
+        });
+        msgBodyText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onMessageClick(v, msg);
+                }
+            }
+        });
+        setSelectionHelper(msg, msgBodyText, position);
     }
 
     private void setThemeColor(TUIMessageBean messageBean) {
