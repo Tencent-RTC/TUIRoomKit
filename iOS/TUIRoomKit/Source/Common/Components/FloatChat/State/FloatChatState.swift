@@ -15,10 +15,19 @@ struct FloatChatState: Codable {
     var latestMessage = FloatChatMessage()
 }
 
+enum FloatChatMessageType: Codable, Equatable {
+    case text
+    case image
+    case video
+    case file
+}
+
 struct FloatChatMessage: Codable, Equatable {
     var id = UUID()
     var user = FloatChatUser()
+    var type: FloatChatMessageType = .text
     var content: String = ""
+    var fileName: String = ""
     var extInfo: [String: AnyCodable] = [:]
     
     init() {}
@@ -26,6 +35,23 @@ struct FloatChatMessage: Codable, Equatable {
     init(user: FloatChatUser, content: String) {
         self.user = user
         self.content = content
+    }
+    
+    init(msg: V2TIMMessage) {
+        self.user = FloatChatUser(userId: msg.sender ?? "", userName: msg.nickName ?? "", avatarUrl: msg.faceURL ?? "")
+        switch msg.elemType {
+        case .ELEM_TYPE_TEXT:
+            self.type = .text
+            self.content = msg.textElem.text
+        case .ELEM_TYPE_IMAGE:
+            self.type = .image
+        case .ELEM_TYPE_VIDEO:
+            self.type = .video
+        case .ELEM_TYPE_FILE:
+            self.type = .file
+            self.fileName = msg.fileElem.filename
+        default: break
+        }
     }
 }
 

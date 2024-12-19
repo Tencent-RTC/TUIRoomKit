@@ -13,6 +13,7 @@ protocol TopViewModelResponder: AnyObject {
     func updateTimerLabel(text: String)
     func updateStackView(item: ButtonItemData)
     func updateMeetingNameLabel(_ text: String)
+    func addStackSubview(item: ButtonItemData)
 #if RTCube_APPSTORE
     func showReportView()
 #endif
@@ -86,6 +87,8 @@ class TopViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onStartedRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onJoinedRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onInitialRoomInfo, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onInitialSelfUserInfo, observer: self)
     }
     
     private func unsubscribeUIEvent() {
@@ -94,6 +97,8 @@ class TopViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onStartedRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onJoinedRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onInitialRoomInfo, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onInitialSelfUserInfo, observer: self)
     }
     
     private func switchMicItemAction(sender: UIButton) {
@@ -182,6 +187,18 @@ extension TopViewModel: RoomEngineEventResponder {
         case .onInitialRoomInfo:
             guard let roomInfo = param?["roomInfo"] as? TUIRoomInfo else { return }
             viewResponder?.updateMeetingNameLabel(roomInfo.name)
+        case .onUserRoleChanged:
+#if RTCube_APPSTORE
+            guard let userId = param?["userId"] as? String else { return }
+            guard let userRole = param?["userRole"] as? TUIRole else { return }
+            handleUserRoleChanged(userId: userId, userRole: userRole)
+#endif
+            break
+        case .onInitialSelfUserInfo:
+            #if RTCube_APPSTORE
+            handleUserRoleChanged(userId: currentUser.userId, userRole: currentUser.userRole)
+            #endif
+            break
         default: break
         }
     }
@@ -190,22 +207,37 @@ extension TopViewModel: RoomEngineEventResponder {
 #if RTCube_APPSTORE
 extension TopViewModel {
     private func injectReport() {
-        if currentUser.userId == roomInfo.roomId {
-           return
-        }
+        guard store.isEnteredRoom, currentUser.userRole == .generalUser else { return }
+        viewItems.append(createReportItem())
+    }
+    
+    private func createReportItem() -> ButtonItemData {
         let reportItem = ButtonItemData()
         reportItem.normalIcon = "room_report"
+        reportItem.buttonType = .reportItemType
         reportItem.backgroundColor = UIColor(0xA3AEC7)
         reportItem.resourceBundle = tuiRoomKitBundle()
         reportItem.action = { [weak self] sender in
             guard let self = self, let button = sender as? UIButton else { return }
             self.reportItemAction(sender: button)
         }
-        viewItems.append(reportItem)
+        return reportItem
     }
     
     private func reportItemAction(sender: UIButton) {
         viewResponder?.showReportView()
+    }
+    
+    private func handleUserRoleChanged(userId: String, userRole: TUIRole) {
+        guard userId == currentUser.userId else { return }
+        if let item = viewItems.first(where: { $0.buttonType == .reportItemType }) {
+            item.isHidden = userRole != .generalUser
+            viewResponder?.updateStackView(item: item)
+        } else if userRole == .generalUser {
+            let reportItem = createReportItem()
+            viewItems.append(reportItem)
+            viewResponder?.addStackSubview(item: reportItem)
+        }
     }
 }
 #endif

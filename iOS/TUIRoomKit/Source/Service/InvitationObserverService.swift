@@ -9,12 +9,15 @@ import Foundation
 import RTCRoomEngine
 import Factory
 import TUICore
+import Combine
 
 public class InvitationObserverService: NSObject {
     @objc public static let shared = InvitationObserverService()
     private var invitationWindow: UIWindow?
     private var getInvitationListCursor: String = ""
     private let singleFetchCount: Int = 20
+    private let bellFeature = BellFeature()
+    private let vibrationFeature = VibrationFeature()
     
     private override init() {
     }
@@ -56,22 +59,34 @@ public class InvitationObserverService: NSObject {
         }
     }
     
+    func playCallingBellAndVibration() {
+        bellFeature.playBell()
+        vibrationFeature.playVibrate()
+    }
+    
+    func stopCallingBellAndVibration() {
+        bellFeature.stopBell()
+        vibrationFeature.stopVibrate()
+    }
+    
     private func getInvitationList(roomInfo: RoomInfo) {
         let invitationManager = TUIRoomEngine.sharedInstance().getExtension(extensionType: .conferenceInvitationManager) as? TUIConferenceInvitationManager
         let selfUserId = TUILogin.getUserID()
         invitationManager?.getInvitationList(roomInfo.roomId, cursor: getInvitationListCursor, count: singleFetchCount) { [weak self] invitations, cursor in
+            guard let self = self else { return }
             for invitation in invitations {
                 if invitation.invitee.userId != selfUserId {
                     continue
                 }
                 if invitation.status == .pending {
-                    self?.showInvitationWindow(roomInfo: roomInfo, invitation: invitation)
+                    self.showInvitationWindow(roomInfo: roomInfo, invitation: invitation)
+                    self.playCallingBellAndVibration()
                     return
                 }
             }
-            self?.getInvitationListCursor = cursor
+            self.getInvitationListCursor = cursor
             if !cursor.isEmpty {
-                self?.getInvitationList(roomInfo: roomInfo)
+                self.getInvitationList(roomInfo: roomInfo)
             }
         } onError: { error, message in
         }

@@ -98,6 +98,7 @@ class RoomVideoFloatViewModel: NSObject {
     
     @objc private func dismissFloatViewForLogout() {
         RoomVideoFloatView.dismiss()
+        RoomRouter.makeToastInWindow(toast: .logoutText, duration: 0.5)
     }
     
     deinit {
@@ -257,8 +258,7 @@ extension RoomVideoFloatViewModel: RoomEngineEventResponder {
             guard let volumeMap = param as? [String : NSNumber] else { return }
             handleUserVoiceVolumeChanged(volumeMap: volumeMap)
         case .onKickedOffLine:
-            RoomVideoFloatView.dismiss()
-            operation.dispatch(action: RoomResponseActions.onExitSuccess())
+            handleKickedOffLine()
         case .onRemoteUserLeaveRoom :
             guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
             handleRemoteUserLeaveRoom(useInfo: userInfo)
@@ -278,12 +278,14 @@ extension RoomVideoFloatViewModel: RoomEngineEventResponder {
     private func handleRoomDismissed() {
         engineManager.destroyEngineManager()
         RoomVideoFloatView.dismiss()
+        RoomRouter.makeToastInWindow(toast: .roomDismissedText, duration: 0.5)
     }
     
     private func handleKickedOutOfRoom() {
         engineManager.destroyEngineManager()
         RoomVideoFloatView.dismiss()
         operation.dispatch(action: RoomResponseActions.onExitSuccess())
+        RoomRouter.makeToastInWindow(toast: .kickedOutOfRoomText, duration: 0.5)
     }
     
     private func handleUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool) {
@@ -320,6 +322,12 @@ extension RoomVideoFloatViewModel: RoomEngineEventResponder {
         viewResponder?.updateUserVolume(volume: userVolume)
     }
     
+    private func handleKickedOffLine() {
+        RoomVideoFloatView.dismiss()
+        operation.dispatch(action: RoomResponseActions.onExitSuccess())
+        RoomRouter.makeToastInWindow(toast: .kickedOffLineText, duration: 0.5)
+    }
+    
     private func handleRemoteUserLeaveRoom(useInfo: TUIUserInfo) {
         guard displayUserId == useInfo.userId else { return }
         if getRoomOwnerUser() != nil {
@@ -336,5 +344,12 @@ extension RoomVideoFloatViewModel: RoomEngineEventResponder {
         guard let userItem = getUserEntity(userId: displayUserId) else { return }
         viewResponder?.updateUserStatus(user: userItem)
     }
+}
+
+private extension String {
+    static let logoutText =  localized("You are logged out")
+    static let roomDismissedText = localized("The conference was closed.")
+    static let kickedOutOfRoomText = localized("You were removed by the host.")
+    static let kickedOffLineText = localized("You are already logged in elsewhere")
 }
 

@@ -34,5 +34,16 @@ import Foundation
     @objc public func setContactsViewProvider(_ provider: @escaping (ConferenceParticipants) -> ContactViewProtocol) {
         implementation.setContactsViewProvider(provider)
     }
+    
+    @objc public func setCallingBell(filePath: String){
+        implementation.setCallingBell(filePath: filePath)
+    }
         
+    @objc public func enableMuteMode(enable: Bool) {
+        implementation.enableMuteMode(enable: enable)
+    }
+    
+    @objc public func enableVibrationMode(enable: Bool) {
+        implementation.enableVibrationMode(enable: enable)
+    }
 }

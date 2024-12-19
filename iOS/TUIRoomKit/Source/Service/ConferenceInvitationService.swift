@@ -84,6 +84,7 @@ extension ConferenceInvitationService: TUIConferenceInvitationObserver {
     func onInvitationHandledByOtherDevice(roomInfo: TUIRoomInfo, accepted: Bool) {
         guard let store = self.store else { return }
         store.dispatch(action: InvitationViewActions.dismissInvitationView())
+        store.dispatch(action: InvitationObserverActions.stopCallingBellAndVibration())
     }
     
     func onInvitationCancelled(roomInfo: TUIRoomInfo, invitation: TUIInvitation) {
@@ -101,6 +102,7 @@ extension ConferenceInvitationService: TUIConferenceInvitationObserver {
     func onInvitationTimeout(roomInfo: TUIRoomInfo, invitation: TUIInvitation) {
         guard let store = self.store else { return }
         store.dispatch(action: InvitationViewActions.dismissInvitationView())
+        store.dispatch(action: InvitationObserverActions.stopCallingBellAndVibration())
     }
     
     func onInvitationRevokedByAdmin(roomInfo: TUIRoomInfo, invitation: TUIInvitation, admin: TUIUserInfo) {

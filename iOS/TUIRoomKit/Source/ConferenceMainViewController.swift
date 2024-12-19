@@ -29,12 +29,7 @@ import TUICore
         super.viewDidLoad()
         RoomRouter.shared.initializeNavigationController(rootViewController: self)
         RoomVideoFloatView.dismiss()
-#if RTCube_APPSTORE
-        let selector = NSSelectorFromString("showAlertUserLiveTips")
-        if responds(to: selector) {
-            perform(selector)
-        }
-#endif
+
         viewModel.onViewDidLoadAction()
         subscribeToast()
     }

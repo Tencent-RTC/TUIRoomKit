@@ -83,8 +83,6 @@ class TopView: UIView {
         return label
     }()
     
-    var menuButtons: [UIView] = []
-    
     // MARK: - initialized function
     init(viewModel: TopViewModel) {
         self.viewModel = viewModel
@@ -119,15 +117,7 @@ class TopView: UIView {
         exitView.addSubview(exitImage)
         exitView.addSubview(exitLabel)
         for item in viewModel.viewItems {
-            let view = TopItemView(itemData: item)
-            menuButtons.append(view)
-            stackView.addArrangedSubview(view)
-            viewArray.append(view)
-            let size = item.size ?? CGSize(width: 35.scale375(), height: 40.scale375Height())
-            view.snp.makeConstraints { make in
-                make.height.equalTo(size.height)
-                make.width.equalTo(size.width)
-            }
+            addStackArrangedSubview(item: item)
         }
     }
     
@@ -232,6 +222,17 @@ class TopView: UIView {
         viewModel.exitAction(sender: sender)
     }
     
+    private func addStackArrangedSubview(item: ButtonItemData) {
+        let view = TopItemView(itemData: item)
+        stackView.addArrangedSubview(view)
+        viewArray.append(view)
+        let size = item.size ?? CGSize(width: 35.scale375(), height: 40.scale375Height())
+        view.snp.makeConstraints { make in
+            make.height.equalTo(size.height)
+            make.width.equalTo(size.width)
+        }
+    }
+    
     deinit {
         debugPrint("deinit \(self)")
     }
@@ -256,6 +257,10 @@ extension TopView: TopViewModelResponder {
     
     func updateTimerLabel(text: String) {
         self.timeLabel.text = text
+    }
+    
+    func addStackSubview(item: ButtonItemData) {
+        addStackArrangedSubview(item: item)
     }
     
 #if RTCube_APPSTORE

@@ -10,6 +10,13 @@ import Foundation
 import RTCRoomEngine
 import Factory
 
+enum UserListType {
+    case allUsers
+    case onStageUsers
+    case offStageUsers
+    case notInRoomUsers
+}
+
 protocol UserListViewResponder: NSObject {
     func updateBottomControlView(isHidden: Bool)
     func reloadUserListView()
