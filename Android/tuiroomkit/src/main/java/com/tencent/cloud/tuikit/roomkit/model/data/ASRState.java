@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListData;
+import com.trtc.tuikit.common.livedata.LiveListData;
 
 public class ASRState {
     public LiveListData<SpeechToText> speechToTexts = new LiveListData<>();

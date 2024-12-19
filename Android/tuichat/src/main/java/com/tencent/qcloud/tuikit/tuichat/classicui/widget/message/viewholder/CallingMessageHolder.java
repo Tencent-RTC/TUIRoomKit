@@ -63,8 +63,8 @@ public class CallingMessageHolder extends TextMessageHolder {
             msgArea.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    if (selectableTextHelper != null) {
-                        selectableTextHelper.selectAll();
+                    if (selectionHelper != null) {
+                        selectionHelper.selectAll();
                     }
                     return true;
                 }
@@ -79,14 +79,12 @@ public class CallingMessageHolder extends TextMessageHolder {
                 }
             };
 
-            msgArea.setOnClickListener(onRecallClickListener);
-            mCallingLayout.setOnClickListener(onRecallClickListener);
-
             if (isForwardMode || isReplyDetailMode) {
                 return;
             }
-            setSelectableTextHelper(msg, msgBodyText, position);
-            msgBodyText.setOnClickListener(onRecallClickListener);
+            msgArea.setOnClickListener(onRecallClickListener);
+            mCallingLayout.setOnClickListener(onRecallClickListener);
+            setTextClickListener(onRecallClickListener);
         }
     }
 }

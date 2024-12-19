@@ -100,6 +100,8 @@ public class ConferenceController {
     private TRTCCloud    mTRTCCloud;
     private TRTCObserver mTRTCObserver;
 
+    private TUILoginStateObserver mTUILoginStateObserver;
+
     private RoomWindowManager mRoomFloatWindowManager;
 
     public static ConferenceController sharedInstance() {
@@ -478,6 +480,9 @@ public class ConferenceController {
         mTRTCCloud = TUIRoomEngine.sharedInstance().getTRTCCloud();
         mTRTCObserver = new TRTCObserver();
         mTRTCCloud.addListener(mTRTCObserver);
+
+        mTUILoginStateObserver = new TUILoginStateObserver(mConferenceState);
+        mTUILoginStateObserver.registerObserver();
 
         mViewController = new ViewController(mConferenceState, mRoomEngine);
         mUserController = new UserController(mConferenceState, mRoomEngine);
@@ -1024,7 +1029,7 @@ public class ConferenceController {
         mConferenceListManager.removeObserver(mConferenceListObserver);
         mRoomEngine.removeObserver(mObserver);
         mTRTCCloud.removeListener(mTRTCObserver);
-        mConferenceState.roomInfo = null;
+        mTUILoginStateObserver.unregisterObserver();
         BusinessSceneUtil.clearJoinRoomFlag();
         if (mConferenceState.audioModel.isMicOpen()) {
             closeLocalMicrophone();
@@ -1179,8 +1184,8 @@ public class ConferenceController {
         if (!TextUtils.isEmpty(conferenceName)) {
             return conferenceName;
         }
-        TUIRoomDefine.LoginUserInfo selfInfo = TUIRoomEngine.getSelfInfo();
-        String name = TextUtils.isEmpty(selfInfo.userName) ? selfInfo.userId : selfInfo.userName;
+        String nickName = TUILogin.getNickName();
+        String name = TextUtils.isEmpty(nickName) ? TUILogin.getUserId() : nickName;
         return mContext.getString(R.string.tuiroomkit_meeting_title, name);
     }
 }

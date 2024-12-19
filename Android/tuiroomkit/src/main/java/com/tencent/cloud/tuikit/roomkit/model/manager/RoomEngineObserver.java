@@ -215,7 +215,7 @@ public class RoomEngineObserver extends TUIRoomObserver {
             mSeatState.updateTakeSeatRequestUserName(userInfo.userId, userInfo.nameCard);
             mConferenceState.setUserNameCard(userInfo.userId, userInfo.nameCard);
             mConferenceState.updateTakeSeatRequestUserName(userInfo.userId, userInfo.nameCard);
-            mUserState.updateUserNameCard(userInfo, UserState.ModifyFlag.NAME_CARD);
+            mUserState.userNameCardChanged(userInfo);
             if (userInfo.userRole == TUIRoomDefine.Role.ROOM_OWNER) {
                 mRoomState.ownerName.set(userInfo.nameCard);
             }

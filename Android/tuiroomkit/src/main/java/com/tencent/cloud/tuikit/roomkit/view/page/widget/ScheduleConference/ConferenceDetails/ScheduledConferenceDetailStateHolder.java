@@ -4,14 +4,13 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListData;
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListObserver;
 import com.tencent.cloud.tuikit.roomkit.model.controller.ScheduleController;
 import com.tencent.cloud.tuikit.roomkit.model.data.ConferenceListState;
 import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
-import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.ConferenceList.ScheduledConferenceItem;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.trtc.tuikit.common.livedata.LiveData;
+import com.trtc.tuikit.common.livedata.LiveListData;
+import com.trtc.tuikit.common.livedata.LiveListObserver;
 import com.trtc.tuikit.common.livedata.Observer;
 
 import java.util.Calendar;
@@ -19,11 +18,11 @@ import java.util.List;
 import java.util.Locale;
 
 public class ScheduledConferenceDetailStateHolder {
-    private              String                                     mCurrentConferenceId  = "";
-    public               LiveData<Boolean>                          mConferenceCanceled   = new LiveData<>(false);
-    private final        LiveData<ScheduledConferenceDetailUiState> mConferenceDetailData = new LiveData<>(new ScheduledConferenceDetailUiState());
-    public               LiveListData<UserState.UserInfo>           hadScheduledAttendees = new LiveListData<>();
-    public               LiveListObserver<UserState.UserInfo>       mAttendeesObserver    = new LiveListObserver<UserState.UserInfo>() {
+    private       String                                     mCurrentConferenceId  = "";
+    public        LiveData<Boolean>                          mConferenceCanceled   = new LiveData<>(false);
+    private final LiveData<ScheduledConferenceDetailUiState> mConferenceDetailData = new LiveData<>(new ScheduledConferenceDetailUiState());
+    public        LiveListData<UserState.UserInfo>     hadScheduledAttendees = new LiveListData<>();
+    public        LiveListObserver<UserState.UserInfo> mAttendeesObserver    = new LiveListObserver<UserState.UserInfo>() {
         public void onDataChanged(List<UserState.UserInfo> list) {
             ScheduledConferenceDetailUiState uiState = mConferenceDetailData.get();
             uiState.attendees.clear();

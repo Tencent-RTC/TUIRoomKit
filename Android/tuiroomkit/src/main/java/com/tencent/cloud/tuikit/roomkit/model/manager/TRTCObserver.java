@@ -9,7 +9,6 @@ import static com.tencent.cloud.tuikit.roomkit.model.data.ASRState.ASR_TYPE_TRAN
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListData;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventConstant;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceState;
@@ -18,6 +17,7 @@ import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.trtc.TRTCCloudListener;
 import com.tencent.trtc.TRTCStatistics;
+import com.trtc.tuikit.common.livedata.LiveListData;
 
 import org.json.JSONException;
 import org.json.JSONObject;

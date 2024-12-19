@@ -1,24 +1,40 @@
 package com.tencent.qcloud.tuikit.tuichat.classicui.widget.message.viewholder;
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+
 import com.tencent.qcloud.tuicore.TUIThemeManager;
 import com.tencent.qcloud.tuikit.timcommon.bean.TUIMessageBean;
 import com.tencent.qcloud.tuikit.timcommon.classicui.widget.message.MessageContentHolder;
 import com.tencent.qcloud.tuikit.timcommon.component.face.FaceManager;
+import com.tencent.qcloud.tuikit.timcommon.util.TextUtil;
 import com.tencent.qcloud.tuikit.tuichat.R;
 import com.tencent.qcloud.tuikit.tuichat.TUIChatService;
 import com.tencent.qcloud.tuikit.tuichat.bean.message.TextMessageBean;
+import com.tencent.qcloud.tuikit.tuichat.config.classicui.TUIChatConfigClassic;
 
 public class TextMessageHolder extends MessageContentHolder {
+
     protected TextView msgBodyText;
+    private View.OnClickListener onTextClickListener;
+    private final GestureDetector gestureDetector;
 
     public TextMessageHolder(View itemView) {
         super(itemView);
         msgBodyText = itemView.findViewById(R.id.msg_body_tv);
-        msgBodyText.setTextIsSelectable(true);
-        msgBodyText.setHighlightColor(itemView.getResources().getColor(com.tencent.qcloud.tuikit.timcommon.R.color.timcommon_text_highlight_color));
+        gestureDetector = new GestureDetector(itemView.getContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                if (onTextClickListener != null) {
+                    onTextClickListener.onClick(msgBodyText);
+                }
+                return super.onSingleTapUp(e);
+            }
+        });
     }
 
     @Override
@@ -26,6 +42,7 @@ public class TextMessageHolder extends MessageContentHolder {
         return R.layout.message_adapter_content_text;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void layoutVariableViews(TUIMessageBean msg, int position) {
         if (!(msg instanceof TextMessageBean)) {
@@ -48,28 +65,17 @@ public class TextMessageHolder extends MessageContentHolder {
 
         msgBodyText.setVisibility(View.VISIBLE);
 
-        if (properties.getChatContextFontSize() != 0) {
-            msgBodyText.setTextSize(properties.getChatContextFontSize());
-        }
-        if (textMessageBean.isSelf()) {
-            if (properties.getRightChatContentFontColor() != 0) {
-                msgBodyText.setTextColor(properties.getRightChatContentFontColor());
-            }
-        } else {
-            if (properties.getLeftChatContentFontColor() != 0) {
-                msgBodyText.setTextColor(properties.getLeftChatContentFontColor());
-            }
-        }
-
         msgArea.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (selectableTextHelper != null) {
-                    selectableTextHelper.selectAll();
+                if (selectionHelper != null) {
+                    selectionHelper.selectAll();
                 }
                 return true;
             }
         });
+        applyCustomConfig();
+
         if (textMessageBean.getText() != null) {
             FaceManager.handlerEmojiText(msgBodyText, textMessageBean.getText(), false);
         } else if (!TextUtils.isEmpty(textMessageBean.getExtra())) {
@@ -77,18 +83,51 @@ public class TextMessageHolder extends MessageContentHolder {
         } else {
             FaceManager.handlerEmojiText(msgBodyText, TUIChatService.getAppContext().getString(R.string.no_support_msg), false);
         }
+        TextUtil.linkifyUrls(msgBodyText);
+        msgBodyText.setActivated(true);
         if (isForwardMode || isReplyDetailMode) {
             return;
         }
-        setSelectableTextHelper(msg, msgBodyText, position);
+        setSelectionHelper(msg, msgBodyText, position);
 
-        msgBodyText.setOnClickListener(new View.OnClickListener() {
+        msgBodyText.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                if (onItemClickListener != null) {
-                    onItemClickListener.onMessageClick(v, textMessageBean);
-                }
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
+
+        setTextClickListener((v) -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.onMessageClick(v, msg);
             }
         });
     }
+
+    protected void setTextClickListener(View.OnClickListener listener) {
+        this.onTextClickListener = listener;
+    }
+
+    protected void applyCustomConfig() {
+        if (isLayoutOnStart) {
+            int receiveTextMessageColor = TUIChatConfigClassic.getReceiveTextMessageColor();
+            if (receiveTextMessageColor != TUIChatConfigClassic.UNDEFINED) {
+                msgBodyText.setTextColor(receiveTextMessageColor);
+            }
+            int receiveTextMessageFontSize = TUIChatConfigClassic.getReceiveTextMessageFontSize();
+            if (receiveTextMessageFontSize != TUIChatConfigClassic.UNDEFINED) {
+                msgBodyText.setTextSize(receiveTextMessageFontSize);
+            }
+        } else {
+            int sendTextMessageColor = TUIChatConfigClassic.getSendTextMessageColor();
+            if (sendTextMessageColor != TUIChatConfigClassic.UNDEFINED) {
+                msgBodyText.setTextColor(sendTextMessageColor);
+            }
+            int sendTextMessageFontSize = TUIChatConfigClassic.getSendTextMessageFontSize();
+            if (sendTextMessageFontSize != TUIChatConfigClassic.UNDEFINED) {
+                msgBodyText.setTextSize(sendTextMessageFontSize);
+            }
+        }
+    }
+
 }

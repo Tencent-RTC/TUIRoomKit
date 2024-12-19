@@ -109,6 +109,8 @@ public class ConferenceEventCenter {
         public static final String SCHEDULED_CONFERENCE_SUCCESS = "SCHEDULED_CONFERENCE_SUCCESS";
 
         public static final String DESTROY_INVITATION_RECEIVED_ACTIVITY = "DESTROY_INVITATION_RECEIVED_ACTIVITY";
+        public static final String ENTER_PIP_MODE                       = "ENTER_PIP_MODE";
+        public static final String EXIT_PIP_MODE                        = "EXIT_PIP_MODE";
     }
 
     public interface RoomEngineEventResponder {

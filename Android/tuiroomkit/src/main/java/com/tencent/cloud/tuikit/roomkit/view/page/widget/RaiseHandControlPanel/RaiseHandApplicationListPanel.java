@@ -3,7 +3,6 @@ package com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel;
 import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomKitUIEvent.DISMISS_APPLY_LIST;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,12 +11,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListObserver;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
 import com.tencent.cloud.tuikit.roomkit.model.manager.ConferenceController;
 import com.tencent.cloud.tuikit.roomkit.view.component.BaseBottomDialog;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.RaiseHandApplicationListViewModel;
+import com.trtc.tuikit.common.livedata.LiveListObserver;
 import com.trtc.tuikit.common.livedata.Observer;
 
 public class RaiseHandApplicationListPanel extends BaseBottomDialog implements View.OnClickListener {
@@ -36,10 +35,8 @@ public class RaiseHandApplicationListPanel extends BaseBottomDialog implements V
 
     private LiveListObserver<UserState.UserInfo> mAllUserObserver = new LiveListObserver<UserState.UserInfo>() {
         @Override
-        public void onItemChanged(int position, UserState.UserInfo item, String flag) {
-            if (TextUtils.equals(flag, UserState.ModifyFlag.NAME_CARD)) {
-                updateRequestUserName(item);
-            }
+        public void onItemChanged(int position, UserState.UserInfo item) {
+            updateRequestUserName(item);
         }
     };
 

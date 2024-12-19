@@ -17,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.common.livedata.LiveListObserver;
 import com.tencent.cloud.tuikit.roomkit.common.utils.ImageLoader;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.model.data.UserState;
@@ -28,6 +27,7 @@ import com.tencent.cloud.tuikit.roomkit.view.component.BaseDialogFragment;
 import com.tencent.cloud.tuikit.roomkit.view.component.ConfirmDialog;
 import com.tencent.cloud.tuikit.roomkit.view.component.TipToast;
 import com.tencent.cloud.tuikit.roomkit.viewmodel.UserManagementViewModel;
+import com.trtc.tuikit.common.livedata.LiveListObserver;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -54,10 +54,8 @@ public class UserManagementPanel extends BaseBottomDialog {
 
     private LiveListObserver<UserState.UserInfo> mAllUserObserver = new LiveListObserver<UserState.UserInfo>() {
         @Override
-        public void onItemChanged(int position, UserState.UserInfo item, String flag) {
-            if (TextUtils.equals(flag, UserState.ModifyFlag.NAME_CARD)) {
-                onUserNameCardChanged(item.userId, item.userName);
-            }
+        public void onItemChanged(int position, UserState.UserInfo item) {
+            onUserNameCardChanged(item.userId, item.userName);
         }
     };
 

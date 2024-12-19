@@ -19,8 +19,8 @@ import com.tencent.cloud.tuikit.engine.extension.TUIConferenceInvitationManager;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.imaccess.model.manager.RoomMsgManager;
 import com.tencent.cloud.tuikit.roomkit.common.utils.BusinessSceneUtil;
+import com.tencent.cloud.tuikit.roomkit.imaccess.model.manager.RoomMsgManager;
 import com.tencent.cloud.tuikit.roomkit.imaccess.view.InvitedToJoinRoomActivity;
 import com.tencent.cloud.tuikit.roomkit.imaccess.view.RoomClickListener;
 import com.tencent.cloud.tuikit.roomkit.imaccess.view.RoomMessageBean;
@@ -38,6 +38,7 @@ import com.tencent.qcloud.tuicore.interfaces.ITUINotification;
 import com.tencent.qcloud.tuicore.interfaces.TUIExtensionInfo;
 import com.tencent.qcloud.tuikit.timcommon.component.LineControllerView;
 import com.tencent.qcloud.tuikit.timcommon.interfaces.ChatInputMoreListener;
+import com.trtc.tuikit.common.system.ContextProvider;
 
 import org.json.JSONObject;
 
@@ -60,6 +61,7 @@ public class ConferenceServiceInitializer extends ServiceInitializer implements 
 
     @Override
     public void init(Context context) {
+        ContextProvider.setApplicationContext(context);
         initExtension();
         initRoomMessage();
         initSignalingListener();
