@@ -17,8 +17,14 @@ enum ConferenceListActions {
                                                    payloadType: TUIConferenceInfo.self)
     static let cancelConference = ActionTemplate(id: key.appending(".cancelConference"), 
                                                  payloadType: String.self)
+    static let modifyConferenceInfo = ActionTemplate(id: key.appending(".modifyConferenceInfo"),
+                                                payloadType: (ConferenceInfo, ConferenceInfo).self)
     static let updateConferenceInfo = ActionTemplate(id: key.appending(".updateConferenceInfo"),
-                                                     payloadType: (TUIConferenceInfo, TUIConferenceModifyFlag).self)
+                                                payloadType: (TUIConferenceInfo, TUIConferenceModifyFlag).self)
+    static let updateAttendees = ActionTemplate(id: key.appending(".updateAttendees"),
+                                                payloadType: (String, [String], [String]).self)
+    static let updateConferenceInfoAndAttendees = ActionTemplate(id: key.appending(".updateConferenceInfoAndAttendees"),
+                                                payloadType: (TUIConferenceInfo, TUIConferenceModifyFlag, [String], [String]).self)
     static let addAttendeesByAdmin = ActionTemplate(id: key.appending(".addAttendeesByAdmin"),
                                                     payloadType: (String, [String]).self)
     static let removeAttendeesByAdmin = ActionTemplate(id: key.appending(".removeAttendeesByAdmin"),

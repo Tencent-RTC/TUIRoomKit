@@ -27,7 +27,7 @@ class FloatChatService: NSObject {
     
     override init() {
         super.init()
-        imManager?.addSimpleMsgListener(listener: self)
+        imManager?.addAdvancedMsgListener(listener: self)
     }
     
     func sendGroupMessage(_ message: String) -> AnyPublisher<String, Never> {
@@ -45,13 +45,10 @@ class FloatChatService: NSObject {
     }
 }
 
-extension FloatChatService: V2TIMSimpleMsgListener {
-    func onRecvGroupTextMessage(_ msgID: String!, groupID: String!, sender info: V2TIMGroupMemberInfo!, text: String!) {
-        guard groupID == roomId else {
-            return
-        }
-        let user = FloatChatUser(memberInfo: info)
-        let floatMessage = FloatChatMessage(user: user, content: text)
+extension FloatChatService: V2TIMAdvancedMsgListener {
+    func onRecvNewMessage(_ msg: V2TIMMessage!) {
+        guard msg.groupID == roomId, let msg = msg else { return }
+        let floatMessage = FloatChatMessage(msg: msg)
         store?.dispatch(action: FloatChatActions.onMessageReceived(payload: floatMessage))
     }
 }

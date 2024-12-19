@@ -13,6 +13,8 @@ protocol VideoSeatLayoutDelegate: AnyObject {
 
 class VideoSeatLayout: UICollectionViewFlowLayout {
     private var prePageCount: NSInteger = 1
+    private let largeCellIndex = 0
+    private let smallCellIndex = 1
 
     private var collectionViewHeight: CGFloat {
         return collectionView?.bounds.height ?? UIScreen.main.bounds.height
@@ -99,11 +101,13 @@ extension VideoSeatLayout {
             let cell = getFullScreenAttributes(indexPath: indexPath)
             layoutAttributeArray.append(cell)
         } else if viewModel.videoSeatViewType == .largeSmallWindowType {
-            let largeIndexPath = IndexPath(item: 0, section: section)
+            let largeIndexPath = IndexPath(item: largeCellIndex, section: section)
             let largeCell = getFullScreenAttributes(indexPath: largeIndexPath)
+            largeCell.zIndex = largeCellIndex
             layoutAttributeArray.append(largeCell)
-            let smallIndexPath = IndexPath(item: 1, section: section)
+            let smallIndexPath = IndexPath(item: smallCellIndex, section: section)
             let smallCell = getSmallAttributes(indexPath: smallIndexPath)
+            smallCell.zIndex = smallCellIndex
             layoutAttributeArray.append(smallCell)
         } else if viewModel.videoSeatViewType == .pureAudioType || viewModel.videoSeatViewType == .equallyDividedType {
             guard let itemCount = collectionView?.numberOfItems(inSection: section) else { return }

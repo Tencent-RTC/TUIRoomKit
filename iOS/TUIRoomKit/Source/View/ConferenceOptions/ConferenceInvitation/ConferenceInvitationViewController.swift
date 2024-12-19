@@ -257,6 +257,7 @@ class ConferenceInvitationViewController: UIViewController {
     
     @objc func rejectAction() {
         operation.dispatch(action: InvitationViewActions.dismissInvitationView())
+        operation.dispatch(action: InvitationObserverActions.stopCallingBellAndVibration())
         operation.dispatch(action: ConferenceInvitationActions.reject(payload: (roomInfo.roomId, .rejectToEnter)))
     }
     

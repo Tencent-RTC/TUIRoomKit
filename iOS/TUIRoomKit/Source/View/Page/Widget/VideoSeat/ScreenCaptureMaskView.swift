@@ -18,6 +18,10 @@ class ScreenCaptureMaskView: UIView {
     weak var responder: TUIVideoSeatViewResponder?
     let frameType: ScreenCaptureMaskViewFrameType
     
+    var engineManager: EngineManager {
+        EngineManager.shared
+    }
+    
     let contentView: UIView = {
         let view = UIView()
         return view
@@ -125,6 +129,7 @@ class ScreenCaptureMaskView: UIView {
         RoomRouter.presentAlert(title: .toastTitleText, message: .toastMessageText, sureTitle: .toastStopText, declineTitle: .toastCancelText, sureBlock: { [weak self] in
             guard let self = self else { return }
             self.responder?.stopScreenCapture()
+            engineManager.stopScreenCapture()
         }, declineBlock: nil)
     }
     

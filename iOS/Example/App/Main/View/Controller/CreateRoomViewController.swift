@@ -210,11 +210,10 @@ extension CreateRoomViewController {
 
 extension CreateRoomViewController: ConferenceObserver {
     func onConferenceStarted(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
-        if error != .success {
-            let errorText = "Error: " + String(describing: error) + ", Message: " + message
-            SceneDelegate.getCurrentWindow()?.makeToast(errorText, duration: 1, position:TUICSToastPositionCenter)
-            navigationController?.popViewController(animated: true)
-        }
+        guard error != .success else { return }
+        navigationController?.popViewController(animated: true)
+        guard !message.isEmpty else { return }
+        SceneDelegate.getCurrentWindow()?.makeToast(message, duration: 1, position:TUICSToastPositionCenter)
     }
     
     func onConferenceFinished(roomInfo: TUIRoomInfo, reason: ConferenceFinishedReason) {

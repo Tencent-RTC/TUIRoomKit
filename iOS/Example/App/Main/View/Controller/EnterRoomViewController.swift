@@ -164,9 +164,8 @@ extension EnterRoomViewController: ConferenceObserver {
     func onConferenceJoined(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
         guard error != .success else { return }
         navigationController?.popViewController(animated: true)
-        let toastText = error == .roomIdNotExist ? .roomDoesNotExit : message
-        guard !toastText.isEmpty else { return }
-        SceneDelegate.getCurrentWindow()?.makeToast(toastText, duration: 1, position:TUICSToastPositionCenter)
+        guard !message.isEmpty else { return }
+        SceneDelegate.getCurrentWindow()?.makeToast(message, duration: 1, position:TUICSToastPositionCenter)
     }
     
     func onConferenceFinished(roomInfo: TUIRoomInfo, reason: ConferenceFinishedReason) {
@@ -200,5 +199,4 @@ private extension String {
     static var openSpeakerText: String {
         RoomDemoLocalize("Speaker")
     }
-    static let roomDoesNotExit = RoomDemoLocalize("The room does not exit, please confirm the room number or create a room!")
 }
