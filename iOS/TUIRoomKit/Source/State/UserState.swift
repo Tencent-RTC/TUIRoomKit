@@ -23,6 +23,19 @@ struct UserInfo: Codable {
     var userName: String = ""
     var avatarUrl: String = ""
     var userRole: TUIRole? = .generalUser
+    var userVoiceVolume: Int = 0
+    var hasAudioStream: Bool = false
+    var hasVideoStream: Bool = false
+    var videoStreamType: TUIVideoStreamType = .cameraStream
+    var isOnSeat: Bool = false
+    var disableSendingMessage: Bool = false
+    var hasScreenStream: Bool = false
+    
+    enum CodingKeys: String, CodingKey {
+        case userId
+        case userName
+        case avatarUrl
+    }
     
     init() {}
     
@@ -34,9 +47,13 @@ struct UserInfo: Codable {
     
     init(userInfo: TUIUserInfo) {
         self.userId = userInfo.userId
-        self.userName = userInfo.userName
+        let userName = userInfo.nameCard.isEmpty ? userInfo.userName : userInfo.nameCard
+        self.userName = userName.isEmpty ? userInfo.userId: userName
         self.avatarUrl = userInfo.avatarUrl
         self.userRole = userInfo.userRole
+        self.hasAudioStream = userInfo.hasAudioStream
+        self.hasVideoStream = userInfo.hasVideoStream
+        self.hasScreenStream = userInfo.hasScreenStream
     }
     
     init(userEntity: UserEntity) {
@@ -44,19 +61,32 @@ struct UserInfo: Codable {
         self.userName = userEntity.userName
         self.avatarUrl = userEntity.avatarUrl
         self.userRole = userEntity.userRole
+        self.hasAudioStream = userEntity.hasAudioStream
+        self.hasVideoStream = userEntity.hasVideoStream
+        self.videoStreamType = userEntity.videoStreamType
+        self.isOnSeat = userEntity.isOnSeat
+        self.hasScreenStream = userEntity.hasScreenStream
     }
-}
-
-enum UserListType {
-    case allUsers
-    case onStageUsers
-    case offStageUsers
-    case notInRoomUsers
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.userId = try container.decode(String.self, forKey: .userId)
+        self.userName = try container.decode(String.self, forKey: .userName)
+        self.avatarUrl = try container.decode(String.self, forKey: .avatarUrl)
+    }
 }
 
 extension UserInfo: Hashable {
     static func == (lhs: UserInfo, rhs: UserInfo) -> Bool {
-        return  lhs.userId == rhs.userId && lhs.userName == rhs.userName && lhs.avatarUrl == rhs.avatarUrl
+        return lhs.userId == rhs.userId &&
+               lhs.userName == rhs.userName &&
+               lhs.avatarUrl == rhs.avatarUrl &&
+               lhs.userRole == rhs.userRole &&
+               lhs.hasAudioStream == rhs.hasAudioStream &&
+               lhs.hasVideoStream == rhs.hasVideoStream &&
+               lhs.videoStreamType == rhs.videoStreamType &&
+               lhs.isOnSeat == rhs.isOnSeat &&
+               lhs.hasScreenStream == rhs.hasScreenStream
     }
     
     func hash(into hasher: inout Hasher) {
@@ -64,12 +94,11 @@ extension UserInfo: Hashable {
         hasher.combine(userName)
         hasher.combine(avatarUrl)
         hasher.combine(userRole)
-    }
-}
-
-extension UserInfo {
-    func convertToUser() -> User {
-        return User(self)
+        hasher.combine(hasAudioStream)
+        hasher.combine(hasVideoStream)
+        hasher.combine(videoStreamType)
+        hasher.combine(isOnSeat)
+        hasher.combine(hasScreenStream)
     }
 }
 
@@ -83,6 +112,25 @@ extension TUIRole: Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
+    }
+}
+
+extension TUIVideoStreamType: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(UInt.self)
+        self = TUIVideoStreamType(rawValue: rawValue) ?? .cameraStream
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
+}
+
+extension UserInfo {
+    func convertToUser() -> User {
+        return User(self)
     }
 }
 

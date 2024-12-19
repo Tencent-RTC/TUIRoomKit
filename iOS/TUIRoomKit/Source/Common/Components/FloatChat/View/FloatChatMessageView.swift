@@ -83,16 +83,36 @@ class FloatChatMessageView: UIView {
                                                                   .foregroundColor: UIColor.tui_color(withHex: "B2BBD1")]
          let userNameAttributedText = NSMutableAttributedString(string: userName,
                                                                 attributes: userNameAttributes)
-
-         let contentAttributedText: NSMutableAttributedString = getFullContentAttributedText(content: message.content)
+         
+         let content = getDisplayedContent(message: message)
+         let contentAttributedText: NSMutableAttributedString = getFullContentAttributedText(content: content)
          userNameAttributedText.append(contentAttributedText)
          return userNameAttributedText
      }
+    
+    private func getDisplayedContent(message: FloatChatMessage) -> String {
+        switch message.type {
+        case .text:
+            return message.content
+        case .image:
+            return .sentPicture
+        case .video:
+            return .sentVideo
+        case .file:
+            return localizedReplace(.sent, replace: message.fileName)
+        }
+    }
     
     private func getFullContentAttributedText(content: String) -> NSMutableAttributedString {
         return EmotionHelper.shared.obtainImagesAttributedString(byText: content,
                                                                    font: UIFont(name: "PingFangSC-Regular", size: 12) ??
                                                                    UIFont.systemFont(ofSize: 12))
     }
+}
+
+private extension String {
+    static let sentPicture = localized("Sent a picture")
+    static let sentVideo = localized("Sent a video")
+    static let sent = localized("Sent xx")
 }
 

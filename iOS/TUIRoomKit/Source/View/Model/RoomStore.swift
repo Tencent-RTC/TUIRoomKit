@@ -18,8 +18,8 @@ class RoomStore: NSObject {
     var roomInfo: TUIRoomInfo = TUIRoomInfo()
     var videoSetting: VideoModel = VideoModel()
     var audioSetting: AudioModel = AudioModel()
-    var attendeeList: [UserEntity] = []        // User list
-    var seatList: [UserEntity] = []            // List of users who have taken the stage
+    @Published var attendeeList: [UserEntity] = []        // User list
+    @Published var seatList: [UserEntity] = []            // List of users who have taken the stage
     var offSeatList: [UserEntity] = []         // List of users who not on stage
     var inviteSeatList: [RequestEntity] = []   // List of users who apply to be on stage
     var isEnteredRoom: Bool = false
@@ -33,6 +33,7 @@ class RoomStore: NSObject {
     weak var conferenceObserver: ConferenceObserver?
     
     @WeakLazyInjected(\.conferenceStore) private var operation
+    
     
     var isOpenMicrophone: Bool {
         didSet {
@@ -254,6 +255,23 @@ class RoomStore: NSObject {
         }
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewUserList, param: [:])
         EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_RenewSeatList, param: [:])
+    }
+    
+    func reset() {
+        currentUser = UserEntity()
+        roomInfo = TUIRoomInfo()
+        videoSetting = VideoModel()
+        audioSetting = AudioModel()
+        attendeeList = []
+        seatList = []
+        offSeatList = []
+        inviteSeatList = []
+        isEnteredRoom = false
+        timeStampOnEnterRoom = 0
+        isImAccess = false
+        selfTakeSeatRequestId = nil
+        shouldShowFloatChatView = true
+        conferenceObserver = nil
     }
     
     deinit {

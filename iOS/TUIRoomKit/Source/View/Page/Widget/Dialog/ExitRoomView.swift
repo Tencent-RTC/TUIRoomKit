@@ -38,7 +38,7 @@ class ExitRoomView: UIView {
         label.textAlignment = .center
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
-        label.text = viewModel.isShownDestroyRoomButton() && viewModel.isShownLeaveRoomButton() ? .appointOwnerText : .leaveRoomTipText
+        label.text = viewModel.isAbleToTransferTheOwner() ? .appointOwnerText : .leaveRoomTipText
         return label
     }()
     

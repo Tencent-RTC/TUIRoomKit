@@ -38,8 +38,6 @@ class UserListManagerViewModel: NSObject {
     var attendeeList: [UserEntity] {
         engineManager.store.attendeeList
     }
-    private var hasOpenCameraInvite = false
-    private var hasOpenMicrophoneInvite = false
     var selectUserInfo: UserEntity? {
         attendeeList.first(where: { $0.userId == selectUserId } )
     }
@@ -281,81 +279,22 @@ extension UserListManagerViewModel {
     
     private func muteAudioAction(sender: UIButton) {
         guard let userInfo = attendeeList.first(where: { $0.userId == selectUserId }) else { return }
-        let mute = userInfo.hasAudioStream
-        if mute {
-            engineManager.closeRemoteDeviceByAdmin(userId: selectUserId, device: .microphone) {
-                sender.isSelected = !sender.isSelected
-            } onError: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.viewResponder?.makeToast(text: localizedReplace(.muteAudioErrorToastText, replace: userInfo.userName))
-            }
+        if userInfo.hasAudioStream {
+            engineManager.closeRemoteDeviceByAdmin(userId: selectUserId, device: .microphone)
         } else {
+            engineManager.openRemoteDeviceByAdmin(userId: selectUserId, device: .microphone)
             viewResponder?.makeToast(text: .invitedOpenAudioText)
-            guard !hasOpenMicrophoneInvite else {
-                viewResponder?.dismissView()
-                return
-            }
-            engineManager.openRemoteDeviceByAdmin(userId: selectUserId, device: .microphone, onAccepted: { [weak self] _, _ in
-                guard let self = self else { return }
-                sender.isSelected = !sender.isSelected
-                self.hasOpenMicrophoneInvite = false
-            }, onRejected: { [weak self] _, _, _ in
-                guard let self = self else { return }
-                self.hasOpenMicrophoneInvite = false
-                self.viewResponder?.makeToast(text: userInfo.userName + localizedReplace(.muteAudioRejectToastText, replace: userInfo.userName))
-            }, onCancelled: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.hasOpenMicrophoneInvite = false
-            }, onTimeout: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.hasOpenMicrophoneInvite = false
-                self.viewResponder?.makeToast(text: .openAudioInvitationTimeoutText)
-            }) { [weak self] _, _, _, _ in
-                guard let self = self else { return }
-                self.hasOpenMicrophoneInvite = false
-            }
-            hasOpenMicrophoneInvite = true
         }
         viewResponder?.dismissView()
     }
     
     private func muteVideoAction(sender: UIButton) {
         guard let userInfo = selectUserInfo else { return }
-        let mute = userInfo.hasVideoStream
-        if mute {
-            engineManager.closeRemoteDeviceByAdmin(userId: selectUserId, device: .camera) { [weak self] in
-                guard let _ = self else { return }
-                sender.isSelected = !sender.isSelected
-            } onError: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.viewResponder?.makeToast(text: localizedReplace(.muteVideoErrorToastText, replace: userInfo.userName))
-            }
+        if userInfo.hasVideoStream {
+            engineManager.closeRemoteDeviceByAdmin(userId: selectUserId, device: .camera)
         } else {
+            engineManager.openRemoteDeviceByAdmin(userId: selectUserId, device: .camera)
             viewResponder?.makeToast(text: .invitedOpenVideoText)
-            guard !hasOpenCameraInvite else {
-                viewResponder?.dismissView()
-                return
-            }
-            engineManager.openRemoteDeviceByAdmin(userId: selectUserId, device: .camera, onAccepted: { [weak self] _, _ in
-                guard let self = self else { return }
-                sender.isSelected = !sender.isSelected
-                self.hasOpenCameraInvite = false
-            }, onRejected: { [weak self] _, _, _ in
-                guard let self = self else { return }
-                self.hasOpenCameraInvite = false
-                self.viewResponder?.makeToast(text: userInfo.userName + localizedReplace(.muteVideoRejectToastText, replace: userInfo.userName))
-            }, onCancelled: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.hasOpenCameraInvite = false
-            }, onTimeout: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.hasOpenCameraInvite = false
-                self.viewResponder?.makeToast(text: .openVideoInvitationTimeoutText)
-            }) { [weak self] _, _, _, _ in
-                guard let self = self else { return }
-                self.hasOpenCameraInvite = false
-            }
-            hasOpenCameraInvite = true
         }
         viewResponder?.dismissView()
     }
@@ -487,7 +426,6 @@ extension UserListManagerViewModel: RoomEngineEventResponder {
             }
         case .onUserRoleChanged:
             guard let userId = param?["userId"] as? String else { return }
-            guard let userRole = param?["userRole"] as? TUIRole else { return }
             guard userId == currentUser.userId || userId == selectUserId else { return }
             guard currentUser.userId != selectUserId else { return }
             guard let selectUserInfo = selectUserInfo else { return }
@@ -523,18 +461,6 @@ extension UserListManagerViewModel: UserNameInputViewResponder {
 }
 
 private extension String {
-    static var muteAudioErrorToastText: String {
-        localized("Failed to mute.")
-    }
-    static var muteAudioRejectToastText: String {
-        localized(" rejected to the microphone access request.")
-    }
-    static var muteVideoErrorToastText: String {
-        localized("Failed to disable video.")
-    }
-    static var muteVideoRejectToastText: String {
-        localized(" rejected to the camera access request.")
-    }
     static var muteText: String {
         localized("Mute")
     }
@@ -573,12 +499,6 @@ private extension String {
     }
     static var takeSeatInvitationTimeoutText: String {
         localized("The invitation to xx to go on stage has timed out")
-    }
-    static var openVideoInvitationTimeoutText: String {
-        localized("The invitation to start the video has timed out")
-    }
-    static var openAudioInvitationTimeoutText: String {
-        localized("The invitation to start the audio has timed out")
     }
     static var invitedOpenAudioText: String {
         localized("The audience has been invited to open the audio")

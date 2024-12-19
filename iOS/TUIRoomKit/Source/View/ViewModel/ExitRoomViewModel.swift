@@ -23,15 +23,15 @@ class ExitRoomViewModel {
     weak var viewResponder: ExitRoomViewModelResponder?
     
     func isShownLeaveRoomButton() -> Bool {
-        if isRoomOwner {
-            return getFilterRoomOwnerNumber() > 0
-        } else {
-            return true
-        }
+        return true
     }
     
     func isShownDestroyRoomButton() -> Bool {
         return isRoomOwner
+    }
+    
+    func isAbleToTransferTheOwner() -> Bool {
+        return isRoomOwner && getFilterRoomOwnerNumber() > 0
     }
     
     func leaveRoomAction() {
@@ -42,7 +42,7 @@ class ExitRoomViewModel {
                 viewResponder?.dismissView()
                 RoomRouter.shared.presentPopUpViewController(viewType: .transferMasterViewType, height: 720.scale375Height())
             } else {
-                destroyRoom()
+                exitRoom()
             }
         } else {
             exitRoom()

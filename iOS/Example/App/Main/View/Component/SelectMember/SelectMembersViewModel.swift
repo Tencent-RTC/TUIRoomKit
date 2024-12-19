@@ -92,7 +92,7 @@ class SelectMembersViewModel {
     }
     
     func loadMembers() {
-        let dataProvider = DataProviderFactory.getDataProvider(.localData)
+        let dataProvider = DataProviderFactory.getDataProvider(.IMData)
         dataProvider.getUsers(page: nil, pageSize: nil) { [weak self] result in
             guard let self = self else { return }
             switch result {
