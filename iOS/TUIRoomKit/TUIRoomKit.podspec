@@ -27,7 +27,7 @@ Pod::Spec.new do |spec|
     professional.dependency 'RTCRoomEngine/Professional'
     professional.source_files = 'Source/*.swift', 'Source/Presenter/*.swift', 'Source/**/*.swift', 'Source/**/*.h', 'Source/**/*.m', 'RoomExtension/**/*.swift', 'RoomExtension/**/*.h', 'RoomExtension/**/*.m'
     professional.resource_bundles = {
-      'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/*.xcstrings']
+      'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/*.xcstrings', 'Resources/**/*.mp3']
     }
     professional.resource = ['Resources/*.bundle']
     professional.pod_target_xcconfig = {'OTHER_SWIFT_FLAGS' => '-D TXLiteAVSDK_Professional', 'GCC_PREPROCESSOR_DEFINITIONS' => 'TXLiteAVSDK_Professional=1'}
@@ -37,7 +37,7 @@ Pod::Spec.new do |spec|
     trtc.dependency 'RTCRoomEngine/TRTC'
     trtc.source_files = 'Source/*.swift', 'Source/Presenter/*.swift', 'Source/**/*.swift', 'Source/**/*.h', 'Source/**/*.m', 'RoomExtension/**/*.swift', 'RoomExtension/**/*.h', 'RoomExtension/**/*.m'
     trtc.resource_bundles = {
-      'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/*.xcstrings']
+      'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/*.xcstrings', 'Resources/**/*.mp3']
     }
     trtc.resource = ['Resources/*.bundle']
     trtc.pod_target_xcconfig = {'OTHER_SWIFT_FLAGS' => '-D TXLiteAVSDK_TRTC', 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) COCOAPODS=1 TXLiteAVSDK_TRTC=1'}
