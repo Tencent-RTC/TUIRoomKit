@@ -1,31 +1,32 @@
 {
-    "name": "tui-room-app",
-    "appid": "__UNI__2D9CC9B",
-    "description": "",
-    "versionName": "1.0.0",
-    "versionCode": "100",
-    "transformPx": false,
+    "name" : "tui-room-app",
+    "appid" : "__UNI__2D9CC9B",
+    "description" : "",
+    "versionName" : "1.0.0",
+    "versionCode" : "100",
+    "transformPx" : false,
     /* 5+App特有相关 */
-    "app-plus": {
-        "usingComponents": true,
-        "nvueStyleCompiler": "uni-app",
-        "compilerVersion": 3,
-        "splashscreen": {
-            "alwaysShowBeforeRender": true,
-            "waiting": true,
-            "autoclose": true,
-            "delay": 0
+    "app-plus" : {
+        "usingComponents" : true,
+        "nvueStyleCompiler" : "uni-app",
+        "compilerVersion" : 3,
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : true,
+            "waiting" : true,
+            "autoclose" : true,
+            "delay" : 0
         },
         /* 模块配置 */
-        "modules": {
-            "Camera": {},
-            "Record": {}
+        "modules" : {
+            "Camera" : {},
+            "Record" : {},
+            "VideoPlayer" : {}
         },
         /* 应用发布信息 */
-        "distribute": {
+        "distribute" : {
             /* android打包配置 */
-            "android": {
-                "permissions": [
+            "android" : {
+                "permissions" : [
                     "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
                     "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
@@ -44,35 +45,35 @@
                 ]
             },
             /* ios打包配置 */
-            "ios": {
-                "dSYMs": false
+            "ios" : {
+                "dSYMs" : false
             },
             /* SDK配置 */
-            "sdkConfigs": {}
+            "sdkConfigs" : {}
         },
-        "nativePlugins": {}
+        "nativePlugins" : {}
     },
     /* 快应用特有相关 */
-    "quickapp": {},
+    "quickapp" : {},
     /* 小程序特有相关 */
-    "mp-weixin": {
-        "appid": "",
-        "setting": {
-            "urlCheck": false
+    "mp-weixin" : {
+        "appid" : "",
+        "setting" : {
+            "urlCheck" : false
         },
-        "usingComponents": true
+        "usingComponents" : true
     },
-    "mp-alipay": {
-        "usingComponents": true
+    "mp-alipay" : {
+        "usingComponents" : true
     },
-    "mp-baidu": {
-        "usingComponents": true
+    "mp-baidu" : {
+        "usingComponents" : true
     },
-    "mp-toutiao": {
-        "usingComponents": true
+    "mp-toutiao" : {
+        "usingComponents" : true
     },
-    "uniStatistics": {
-        "enable": false
+    "uniStatistics" : {
+        "enable" : false
     },
-    "vueVersion": "3"
+    "vueVersion" : "3"
 }

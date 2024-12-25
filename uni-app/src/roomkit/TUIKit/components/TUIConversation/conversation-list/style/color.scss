@@ -1,0 +1,77 @@
+.tui-conversation {
+  &-item {
+    &-pinned {
+      background: #eef0f3;
+    }
+
+    &-selected,
+    &-toggled {
+      background: rgba(0, 110, 255, 0.1);
+    }
+
+    .left {
+      .num {
+        background: red;
+        color: #fff;
+
+        &-notify {
+          background: red;
+          color: #fff;
+        }
+      }
+    }
+
+    .content-header {
+      &-label {
+        color: #000;
+      }
+
+      .name {
+        font-weight: 400;
+        letter-spacing: 0;
+        color: #000;
+      }
+    }
+
+    .middle-box {
+      &-at, &-draft {
+        color: #fb5059 !important;
+        font-family: PingFangSC-Regular;
+        font-weight: 400;
+      }
+
+      &-content {
+        font-weight: 400;
+        color: #999;
+        letter-spacing: 0;
+      }
+    }
+
+    .content-footer {
+      color: #999;
+
+      .time {
+        color: #bbb;
+      }
+    }
+  }
+
+  &-content {
+    .dialog {
+      background: #fff;
+
+      &-item {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 -4px 12px 0 rgba(0, 0, 0, 0.06);
+      }
+
+      .conversation-options {
+        font-family: PingFangSC-Regular;
+        font-weight: 400;
+        color: #4f4f4f;
+        letter-spacing: 0;
+      }
+    }
+  }
+}
