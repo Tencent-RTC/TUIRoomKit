@@ -2,7 +2,7 @@
   <div :class="badgeClass">
     <slot style="position: relative;"></slot>
     <div v-if="showBadge" class="tui-badge-count">
-      <text style="font-size: 12px;font-weight: 500;">{{ content }}</text>
+      <text style="font-size: 12px;font-weight: 500; color: #fff;">{{ content }}</text>
     </div>
   </div>
 </template>

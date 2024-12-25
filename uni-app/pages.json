@@ -22,10 +22,22 @@
           "path": "roomkit/pages/room",
           "style": {
             "navigationBarTitleText": "room",
-						"navigationStyle": "custom",
-						"app-plus": {
-							"titleView": false
-						}
+            "navigationStyle": "custom",
+            "app-plus": {
+              "titleView": false
+            }
+          }
+        },
+        {
+          "path": "roomkit/TUIKit/components/TUIChat/index",
+          "style": {
+            "navigationBarTitleText": "聊天"
+          }
+        },
+        {
+          "path": "roomkit/TUIKit/components/TUIChat/video-play",
+          "style": {
+            "navigationBarTitleText": "腾讯云 IM"
           }
         }
       ]
@@ -36,8 +48,8 @@
     "navigationBarTitleText": "uni-app",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8",
-		"app-plus": {
-			"titleView": false
-		}
+    "app-plus": {
+      "titleView": false
+    }
   }
 }

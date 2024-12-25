@@ -19,6 +19,7 @@ interface ChatState {
   // 是否已经拉完所有消息列表
   // Is the list of all messages pulled
   nextReqMessageId: string;
+  route: string;
 }
 
 export const useChatStore = defineStore('chat', {
@@ -28,6 +29,7 @@ export const useChatStore = defineStore('chat', {
     unReadCount: 0,
     isCompleted: false,
     nextReqMessageId: '',
+    route: '',
   }),
   getters: {
   },
@@ -54,11 +56,14 @@ export const useChatStore = defineStore('chat', {
     setSendMessageDisableChanged(isDisable: boolean) {
       this.isMessageDisableByAdmin = isDisable;
     },
-
+    setCurrentsPage(route: string) {
+      this.route = route;
+    },
     reset() {
       this.messageList = [];
       this.unReadCount = 0;
       this.isMessageDisableByAdmin = false;
+      this.route = '';
     },
   },
 });

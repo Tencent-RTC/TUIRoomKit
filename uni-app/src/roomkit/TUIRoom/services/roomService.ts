@@ -173,14 +173,25 @@ export class RoomService {
   }
 
   private onReceiveMessage(options: { data: any }) {
+    const messageTypeList = [
+      TencentCloudChat.TYPES.MSG_TEXT,
+      TencentCloudChat.TYPES.MSG_IMAGE,
+      TencentCloudChat.TYPES.MSG_FILE,
+      TencentCloudChat.TYPES.MSG_FACE,
+      TencentCloudChat.TYPES.MSG_VIDEO,
+    ];
+
     if (!options || !options.data) {
       return;
     }
     options.data.forEach((message: any) => {
-      if (message.type === TencentCloudChat.TYPES.MSG_TEXT) {
-        if (!this.basicStore?.isSidebarOpen || this.basicStore?.sidebarName !== 'chat') {
-          this.chatStore?.updateUnReadCount((this.chatStore?.unReadCount || 0) + 1);
-        }
+      // eslint-disable-next-line no-undef
+      const currentPageRoute = getCurrentPages()?.slice(-1)[0]?.route;
+      const isChatPage = currentPageRoute === this.chatStore.route;
+      const shouldUpdateUnreadCount = messageTypeList.includes(message.type) && !isChatPage;
+
+      if (shouldUpdateUnreadCount) {
+        this.chatStore?.updateUnReadCount((this.chatStore?.unReadCount || 0) + 1);
       }
     });
   }
@@ -361,9 +372,13 @@ export class RoomService {
   public async initRoomKit(option: RoomInitData) {
     this.storeInit(option);
     const { sdkAppId, userId, userSig, userName, avatarUrl } = option;
-    await TUIRoomEngine.login({ sdkAppId, userId, userSig });
-    await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
+    const loginParams = { sdkAppId, userId, userSig };
+    if (uni.$tim) {
+      loginParams.tim = uni.$tim;
+    }
+    await TUIRoomEngine.login(loginParams);
     this.tim = TUIRoomEngine.getTIM();
+    await TUIRoomEngine.setSelfInfo({ userName, avatarUrl });
     this.bindChatEvents();
   }
 

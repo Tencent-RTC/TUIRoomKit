@@ -1,3 +1,4 @@
+import { ChatSDK } from '@tencentcloud/chat';
 export interface RoomInitData {
   sdkAppId: number;
   userId: string;
@@ -5,8 +6,9 @@ export interface RoomInitData {
   userName: string;
   avatarUrl: string;
   showHeaderTool?: boolean;
+  tim?: ChatSDK;
   theme?: {
-    defaultTheme?: "black" | "white";
+    defaultTheme?: 'black' | 'white';
     isSupportSwitchTheme: boolean;
   };
 }
@@ -20,9 +22,9 @@ export interface RoomParam {
 }
 
 export enum EventType {
-  VISIBLE_CHANGE = "RoomVisibleChange",
-  ROOM_DESTROY = "RoomDestroy",
-  ROOM_CONTAINER_RESIZE = "RoomContainerResize",
+  VISIBLE_CHANGE = 'RoomVisibleChange',
+  ROOM_DESTROY = 'RoomDestroy',
+  ROOM_CONTAINER_RESIZE = 'RoomContainerResize',
   ROOM_ERROR = 'RoomError',
   ROOM_NOTICE_MESSAGE = 'RoomNoticeMessage',
   ROOM_NOTICE_MESSAGE_BOX = 'RoomNoticeMessageBox',
