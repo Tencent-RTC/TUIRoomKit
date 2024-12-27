@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/room-uikit-vue",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "scripts": {
     "dev": "vite --force",
     "build": "vue-tsc --noEmit --skipLibCheck && vite build",
@@ -8,8 +8,8 @@
     "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "@tencentcloud/roomkit-web-vue3": "^2.8.1",
-    "@tencentcloud/tuiroom-engine-js": "^2.8.1",
+    "@tencentcloud/roomkit-web-vue3": "^2.8.2",
+    "@tencentcloud/tuiroom-engine-js": "^2.8.2",
     "axios": "^0.27.2",
     "js-cookie": "^3.0.1",
     "mitt": "^3.0.0",
