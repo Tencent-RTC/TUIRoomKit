@@ -91,6 +91,14 @@ interface IConference {
   setUserListSortComparator: (comparator: Comparator<UserInfo>) => void;
 
   setStreamListSortComparator: (comparator: Comparator<StreamInfo>) => void;
+
+  setParticipants: (
+    participants: Array<{
+      userName: string;
+      userId: string;
+      avatarUrl: string;
+    }>
+  ) => void;
 }
 class Conference implements IConference {
   public login(params: {
@@ -195,6 +203,23 @@ class Conference implements IConference {
 
   public setStreamListSortComparator(comparator: Comparator<StreamInfo>) {
     roomService.userManager.setStreamListSortComparator(comparator);
+  }
+
+  public setParticipants(
+    participants: Array<{
+      userName: string;
+      userId: string;
+      avatarUrl: string;
+    }>
+  ) {
+    const list = participants.map(item => {
+      const { userId, userName, avatarUrl } = item;
+      return {
+        userID: userId,
+        profile: { userID: userId, nick: userName, avatar: avatarUrl },
+      };
+    });
+    roomService.scheduleConferenceManager.replaceFriendList(list);
   }
 }
 

@@ -53,8 +53,7 @@ interface IScheduleConferenceManager {
   replaceFriendList(
     userList: Array<{
       userID: string;
-      avatar: string;
-      nick: string;
+      profile: { userID: string; nick: string; avatar: string };
     }>
   ): void;
 }
@@ -235,8 +234,7 @@ export class ScheduleConferenceManager implements IScheduleConferenceManager {
   replaceFriendList(
     userList: Array<{
       userID: string;
-      avatar: string;
-      nick: string;
+      profile: { userID: string; nick: string; avatar: string };
     }>
   ) {
     this.customFriendList = userList;
