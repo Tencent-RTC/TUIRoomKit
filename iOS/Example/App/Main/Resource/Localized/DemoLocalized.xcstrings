@@ -1,40 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "`s quick meeting" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "`s quick meeting"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "的快速会议"
-          }
-        }
-      }
-    },
-    "All members" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "所有成员"
-          }
-        }
-      }
-    },
     "Conference Type" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -116,23 +82,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "请输入正确房间号"
-          }
-        }
-      }
-    },
-    "Enter userID or username" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter userID or username"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "输入用户ID或用户名"
           }
         }
       }
@@ -320,23 +269,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "预定房间"
-          }
-        }
-      }
-    },
-    "Select Members" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select Members"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择成员"
           }
         }
       }

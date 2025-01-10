@@ -10,17 +10,16 @@ import UIKit
 import Combine
 import RTCRoomEngine
 import Factory
-import TUIRoomKit
 
 class SelectMemberViewController: UIViewController, ContactViewProtocol {
+    @Injected(\.selectMemberStore) var selectMemberStore: SelectMemberStore
     weak var delegate: ContactViewSelectDelegate?
-    private var viewModel = SelectMembersViewModel()
     private var cancellableSet = Set<AnyCancellable>()
     
     init(participants: ConferenceParticipants) {
         super.init(nibName: nil, bundle: nil)
-        viewModel.selectMembers(participants.selectedList)
-        viewModel.setDisabledMembers(participants.unSelectableList)
+        selectMemberStore.setSelectedMembers(participants.selectedList)
+        selectMemberStore.setLockSelectionMembers(participants.unSelectableList)
     }
     
     required init?(coder: NSCoder) {
@@ -57,23 +56,22 @@ class SelectMemberViewController: UIViewController, ContactViewProtocol {
         guard let selectMembersView = view as? SelectMemberView else {
             return
         }
- 
         selectMembersView.tableView.delegate = self
         selectMembersView.tableView.dataSource = self
         
         selectMembersView.selectedUserView.delegate = self
         selectMembersView.selectedUserView.dataSource = self
         
-        viewModel.$selectedMembers
+        selectMemberStore.subscribe(Selector(keyPath: \SelectMemberState.selectedMembers))
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selectedMembers in
                 self?.updateSelectedView(with: selectedMembers)
             }
             .store(in: &cancellableSet)
         
-        viewModel.$filteredMembers
+        selectMemberStore.subscribe(Selector(keyPath: \SelectMemberState.members))
             .receive(on:  DispatchQueue.main)
-            .sink { [selectMembersView] _ in
+            .sink { _ in
                 selectMembersView.tableView.reloadData()
             }
             .store(in: &cancellableSet)
@@ -100,7 +98,8 @@ extension SelectMemberViewController: UITableViewDelegate {
         let headerLabel = UILabel()
         headerLabel.font = UIFont(name: "PingFangSC-Regular", size: 14)
         headerLabel.textColor = UIColor.tui_color(withHex: "#22262E")
-        headerLabel.text = .allMemberText + "(" + "\(viewModel.members.count)" + ")"
+        let count = selectMemberStore.getAllMembersCount()
+        headerLabel.text = .allMemberText + "(" + "\(count)" + ")"
         headerView.addSubview(headerLabel)
         
         headerLabel.snp.makeConstraints { make in
@@ -115,14 +114,11 @@ extension SelectMemberViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let member = viewModel.filteredMembers[indexPath.row]
-        if viewModel.disabledMembers.contains(where: { $0.userId == member.userId}) {
-            return
-        }
-        if viewModel.selectedMembers.contains(where: { $0.userId == member.userId }) {
-            viewModel.deSelectMember(member)
+        let member = selectMemberStore.selectMemberState.members[indexPath.row]
+        if selectMemberStore.selectMemberState.selectedMembers.contains(where: { $0.userId == member.userId }) {
+            selectMemberStore.deleteSelectedMember(member.userId)
         } else {
-            viewModel.selectMember(member)
+            selectMemberStore.addSelectedMember(member)
         }
         tableView.reloadRows(at: [indexPath], with: .none)
     }
@@ -130,7 +126,7 @@ extension SelectMemberViewController: UITableViewDelegate {
 
 extension SelectMemberViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.filteredMembers.count
+        return selectMemberStore.selectMemberState.members.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -138,26 +134,28 @@ extension SelectMemberViewController: UITableViewDataSource {
                 as? ContactCell else {
             return UITableViewCell()
         }
-        let member = viewModel.filteredMembers[indexPath.row]
-        let isSelected = viewModel.selectedMembers.contains(where: { $0.userId == member.userId})
-        let isDisabled = viewModel.disabledMembers.contains(where: { $0.userId == member.userId})
+        let member = selectMemberStore.selectMemberState.members[indexPath.row]
+        let isSelected = selectMemberStore.selectMemberState.selectedMembers.contains(where: { $0.userId == member.userId})
+        let isDisabled = selectMemberStore.isLockSelection(userId: member.userId)
         cell.setupViewState(with: member, isSelected: isSelected, isDisaled: isDisabled)
+        cell.isUserInteractionEnabled = !isDisabled
         return cell
     }
 }
 
 extension SelectMemberViewController: SelectMemberViewDelegate {
     func selectView(_ selectView: SelectMemberView, didSearchWith searchText: String) {
-        viewModel.filterMember(with: searchText)
+        selectMemberStore.filterMembers(with: searchText)
     }
 
     func didExpandButtonClicked(in selectView: SelectMemberView) {
         let listView = SelectedMembersViewController()
-        listView.selectedMember = viewModel.selectedMembers
+        listView.selectedMember = selectMemberStore.selectMemberState.selectedMembers.map{ $0.userInfo }
         listView.didDeselectMember = { [weak self] member in
             guard let self = self else {return}
-            self.viewModel.deSelectMember(member)
-            if let index = self.viewModel.index(from: member) {
+            self.selectMemberStore.deleteSelectedMember(member.userId)
+            let members = self.selectMemberStore.selectMemberState.members
+            if let index = members.firstIndex(where: { $0.userId == member.userId }) {
                 let indexPath = IndexPath(row: index, section: 0)
                 selectView.tableView.reloadRows(at: [indexPath], with: .none)
             }
@@ -167,7 +165,7 @@ extension SelectMemberViewController: SelectMemberViewDelegate {
     }
     
     func didConfirmButtonClicked(in selectView: SelectMemberView) {
-        delegate?.onMemberSelected(self, invitees: viewModel.selectedMembers)
+        delegate?.onMemberSelected(self, invitees: selectMemberStore.selectMemberState.selectedMembers)
     }
     
     func didBackButtonClicked(in selectView: SelectMemberView) {
@@ -181,7 +179,7 @@ extension SelectMemberViewController: UICollectionViewDelegate {
 
 extension SelectMemberViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.selectedMembers.count
+        return selectMemberStore.selectMemberState.selectedMembers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -189,7 +187,7 @@ extension SelectMemberViewController: UICollectionViewDataSource {
                 as? AvatarCell else {
             return UICollectionViewCell()
         }
-        let member = viewModel.selectedMembers[indexPath.item]
+        let member = selectMemberStore.selectMemberState.selectedMembers[indexPath.item]
         cell.setupViewState(with: member)
         
         return cell
@@ -197,7 +195,5 @@ extension SelectMemberViewController: UICollectionViewDataSource {
 }
 
 private extension String {
-    static var allMemberText: String {
-        RoomDemoLocalize("All members")
-    }
+    static let allMemberText = localized("All members")
 }
