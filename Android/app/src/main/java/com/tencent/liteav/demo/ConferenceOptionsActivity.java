@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tencent.cloud.tuikit.roomkit.ConferenceSession;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.view.component.PrepareView;
-import com.tencent.liteav.demo.SelectParticipants.SelectParticipantActivity;
 
 public class ConferenceOptionsActivity extends AppCompatActivity {
     public static final String INTENT_ENABLE_PREVIEW = "enablePreview";
@@ -26,6 +25,5 @@ public class ConferenceOptionsActivity extends AppCompatActivity {
 
     private void configureConferenceUI() {
         ConferenceSession.sharedInstance().enableWaterMark();
-        ConferenceSession.sharedInstance().setContactsViewProvider(SelectParticipantActivity.class);
     }
 }

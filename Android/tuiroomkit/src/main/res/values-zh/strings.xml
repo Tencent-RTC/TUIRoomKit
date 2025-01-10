@@ -363,4 +363,11 @@
     <string name="tuiroomkit_use_function_need_enter_room">需要进入房间后才可以使用此功能</string>
     <string name="tuiroomkit_is_not_supported_in_room_type">当前房间类型下不支持该操作</string>
     <string name="tuiroomkit_already_in_another_room">您已经在其他房间内，需要先退房才能加入新的房间</string>
+    <string name="tuiroomkit_format_select_participant">%s (%d)</string>
+    <string name="tuiroomkit_all_participant">全部成员(%d)</string>
+    <string name="tuiroomkit_participant_name_and_id">%s(%s)</string>
+    <string name="tuiroomkit_selected_participant_size">已选择：%d人</string>
+    <string name="tuiroomkit_confirm_select_participant">确定(%d)</string>
+    <string name="tuiroomkit_select_schedule_participant">选择成员</string>
+    <string name="tuiroomkit_hint_search_member_id_or_name">输入用户ID或名称</string>
 </resources>

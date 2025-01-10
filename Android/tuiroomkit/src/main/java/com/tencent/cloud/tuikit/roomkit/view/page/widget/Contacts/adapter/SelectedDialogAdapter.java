@@ -1,4 +1,4 @@
-package com.tencent.liteav.demo.SelectParticipants;
+package com.tencent.cloud.tuikit.roomkit.view.page.widget.Contacts.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,35 +11,42 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.utils.widget.ImageFilterView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.tencent.liteav.demo.R;
+import com.tencent.cloud.tuikit.roomkit.ConferenceDefine;
+import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.common.utils.ImageLoader;
-import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.SelectScheduleParticipant.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MoreParticipantsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private       List<User> mSelectedParticipants;
-    private final Context    mContext;
-    private final LayoutInflater            mLayoutInflater;
-    private       deleteParticipantCallback mCallback;
+public class SelectedDialogAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private final Context             mContext;
 
-    public MoreParticipantsAdapter(Context context, List<User> list) {
+    private List<ConferenceDefine.User> mSelectedParticipants;
+    private DeleteParticipantCallback   mCallback;
+
+    public interface DeleteParticipantCallback {
+        void onParticipantDeleted(ConferenceDefine.User participant);
+    }
+
+    public SelectedDialogAdapter(Context context, List<ConferenceDefine.User> list) {
         this.mContext = context;
-        this.mLayoutInflater = LayoutInflater.from(mContext);
         mSelectedParticipants = new ArrayList<>(list);
+    }
+
+    public void setParticipantDeletedCallback(DeleteParticipantCallback callback) {
+        mCallback = callback;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View contentView = mLayoutInflater.inflate(R.layout.app_item_more_participants, parent, false);
+        View contentView = LayoutInflater.from(mContext).inflate(R.layout.tuiroomkit_item_selected_participants, parent, false);
         return new ViewHolderAttendee(contentView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        User user = mSelectedParticipants.get(position);
+        ConferenceDefine.User user = mSelectedParticipants.get(position);
         if (holder instanceof ViewHolderAttendee) {
             ((ViewHolderAttendee) holder).bind(user);
         }
@@ -66,9 +73,9 @@ public class MoreParticipantsAdapter extends RecyclerView.Adapter<RecyclerView.V
             mUserName = itemView.findViewById(R.id.tv_participant_name);
         }
 
-        public void bind(User user) {
-            ImageLoader.loadImage(mContext, mImgAvatar, user.avatarUrl, R.drawable.app_ic_avatar);
-            mUserName.setText(user.userName);
+        public void bind(ConferenceDefine.User user) {
+            ImageLoader.loadImage(mContext, mImgAvatar, user.avatarUrl, R.drawable.tuiroomkit_ic_avatar);
+            mUserName.setText(user.name);
             mFlDeleteParticipant.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -78,18 +85,10 @@ public class MoreParticipantsAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    public void setParticipantDeletedCallback(deleteParticipantCallback callback) {
-        mCallback = callback;
-    }
-
-    public interface deleteParticipantCallback {
-        void onParticipantDeleted(User participant);
-    }
-
-    public void removeParticipantItem(User participant) {
-        if (mSelectedParticipants.contains(participant)) {
-            int index = mSelectedParticipants.indexOf(participant);
-            mSelectedParticipants.remove(participant);
+    public void removeParticipantItem(ConferenceDefine.User user) {
+        if (mSelectedParticipants.contains(user)) {
+            int index = mSelectedParticipants.indexOf(user);
+            mSelectedParticipants.remove(user);
             notifyItemRemoved(index);
         }
     }
