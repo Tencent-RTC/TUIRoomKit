@@ -101,7 +101,6 @@ $audioTabWidth: 305px;
   position: relative;
   .audio-tab {
     position: absolute;
-    bottom: calc(100% + 12px);
     left: -5px;
     width: $audioTabWidth;
     background: #FFFFFF;
@@ -112,7 +111,6 @@ $audioTabWidth: 305px;
       0px 6px 10px 1px rgba(32, 77, 141, 0.06),
       0px 3px 14px 2px rgba(32, 77, 141, 0.05);
     &::before {
-      content: '';
       position: absolute;
       left: 28px;
       bottom: -10px;

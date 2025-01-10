@@ -59,23 +59,18 @@ const buttonClassList = computed(() => [
 //   --shadow-color: rgba(28, 102, 229, 0.20);
 // }
 .tui-button {
-  display: inline-flex;
   justify-content: center;
   align-items: center;
   text-align: center;
-  cursor: pointer;
   transition: background-color 0.2s ease-in-out;
   border: 1px solid #1C66E5;
   font-weight: 400;
   line-height: 22px;
-  white-space: nowrap;
   background-color: #1C66E5;
-  outline: none;
   color: #FFFFFF;
   &:hover {
     background: #144FB6;
     border: 1px solid #144FB6;
-    outline: none;
   }
 }
 .tui-button-primary {
@@ -103,8 +98,6 @@ const buttonClassList = computed(() => [
 }
 
 .tui-button-disabled {
-  cursor: not-allowed;
-  pointer-events: none;
   opacity: 0.4;
 }
 
@@ -121,9 +114,6 @@ const buttonClassList = computed(() => [
     border: 0 solid transparent;
     background-color: transparent;
     color: #4F586B;
-  }
-  &::after {
-    border: none;
   }
 }
 </style>

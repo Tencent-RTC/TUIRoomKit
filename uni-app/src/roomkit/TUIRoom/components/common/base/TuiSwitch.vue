@@ -22,12 +22,10 @@ function toggleSwitch() {
 .switch-container,
 .switch-container-active {
   position: relative;
-  display: inline-block;
   width: 40px;
   height: 20px;
   background-color: #1C66E5;
   border-radius: 20px;
-  cursor: pointer;
   transition: background-color 0.3s;
   .switch-core {
     position: absolute;

@@ -127,10 +127,8 @@ function handleOverlayClick(event: any) {
       justify-content: center;
       align-items: center;
       color: #4f586b;
-      cursor: pointer;
     }
     .setting-title {
-      display: inline-block;
       font-weight: 500;
       line-height: 24px;
       color: #000;
@@ -159,7 +157,6 @@ function handleOverlayClick(event: any) {
         color: #4f586b;
         line-height: 36px;
         position: relative;
-        cursor: pointer;
         &.active {
           background-color: #1c66e5;
           color: #fff;
@@ -173,7 +170,6 @@ function handleOverlayClick(event: any) {
       background: #dcdcdc;
     }
     .setting-content {
-      flex-grow: 1;
       padding: 16px 30px;
       .setting-tab {
         width: 100%;

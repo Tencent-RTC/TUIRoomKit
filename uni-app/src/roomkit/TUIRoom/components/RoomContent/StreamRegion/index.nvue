@@ -113,7 +113,6 @@ const userInfo = computed(() => {
   border: 2px solid transparent;
   overflow: hidden;
   border-radius: 10px;
-  -webkit-transform: rotate(0deg);
   display: flex;
 
   &.border {
@@ -144,19 +143,12 @@ const userInfo = computed(() => {
         border-radius: 50%;
       }
       .user-gender-name {
-        svg {
-          vertical-align: bottom;
-        }
         .user-name {
-          display: inline-block;
           margin-left: 6px;
           font-size: 14px;
           font-weight: 400;
-          max-width: 100px;
-          white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
-          vertical-align: bottom;
         }
       }
     }
@@ -166,8 +158,6 @@ const userInfo = computed(() => {
     position: absolute;
     bottom: 4px;
     left: 0;
-    min-width: 118px;
-    // max-width: 100%;
     flex: 1;
     overflow: hidden;
     height: 30px;
@@ -175,13 +165,11 @@ const userInfo = computed(() => {
     background: rgba(0,0,0,0.60);
     color: #FFFFFF;
     align-items: center;
-    align-content: center;
     font-size: 14px;
     flex-direction: row;
     .user-name {
       margin-left: 8px;
       width: 60px;
-      white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
       lines: 1;
@@ -204,10 +192,6 @@ const userInfo = computed(() => {
     }
     .admin-icon {
       background-color: #F06C4B;
-    }
-    .audio-icon{
-      max-width: 26px;
-      max-height: 35px;
     }
   }
 }

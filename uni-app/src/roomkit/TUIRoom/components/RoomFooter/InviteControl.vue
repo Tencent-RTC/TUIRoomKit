@@ -61,8 +61,6 @@ function handleCloseInvite() {
   top: 0;
   bottom: 0;
   width: 750rpx;
-  height: auto;
-  box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0.7);
   z-index: 1;
 }

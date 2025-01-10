@@ -29,7 +29,7 @@ export default function useEndControl() {
   const title = computed(() => (currentDialogType.value === DialogType.BasicDialog ? t('Leave room?') : t('Select a new host')));
   const isShowLeaveRoomDialog = computed(() => (
     roomStore.isMaster && remoteUserList.value.length > 0)
-  || !roomStore.isMaster);
+    || !roomStore.isMaster);
   const { isSidebarOpen, sidebarName } = storeToRefs(basicStore);
   const showSideBar = computed(() => isSidebarOpen.value && sidebarName.value === 'transfer-leave');
   const selectedUser: Ref<string> = ref('');
@@ -87,8 +87,8 @@ export default function useEndControl() {
     }
   }
 
-  const onUserRoleChanged = async (eventInfo: { userId: string, userRole: TUIRole }) => {
-    const { userId, userRole } = eventInfo;
+  const onUserInfoChanged = async (eventInfo) => {
+    const { userId, userRole } = eventInfo.userInfo;
     const isLocal = roomStore.localUser.userId === userId;
     const oldUserRole = roomStore.getUserRole(userId);
     if (isLocal) {
@@ -146,11 +146,11 @@ export default function useEndControl() {
   };
 
   TUIRoomEngine.once('ready', () => {
-    roomEngine.instance?.on(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
+    roomEngine.instance?.on(TUIRoomEvents.onUserInfoChanged, onUserInfoChanged);
   });
 
   onUnmounted(() => {
-    roomEngine.instance?.off(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
+    roomEngine.instance?.off(TUIRoomEvents.onUserInfoChanged, onUserInfoChanged);
   });
   return {
     t,

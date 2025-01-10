@@ -290,8 +290,6 @@ onBeforeUnmount(() => {
     left: 10px;
     bottom: 90px;
     &::after {
-      content: '';
-      display: block;
       border: 5px solid transparent;
       border-top-color: #1C66E5;
       position: absolute;
@@ -310,14 +308,9 @@ onBeforeUnmount(() => {
       font-size: 14px;
       color: #ffffff;
       line-height: 20px;
-      white-space: nowrap;
     }
-    .mobile-info {
-      min-width: 50vw;
-      white-space: normal;
-    }
+
     .close {
-      cursor: pointer;
       color: #ffffff;
       padding-left: 12px;
     }

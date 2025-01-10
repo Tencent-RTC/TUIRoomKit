@@ -77,16 +77,6 @@ onUnmounted(() => {
     background-color: #FFFFFF;
     border-radius: 13px;
     padding: 10px;
-    animation-duration: 200ms;
-    animation-name: popup;
-}
-@keyframes popup{
-  from {
-    bottom: 0px;
-  }
-  to{
-    bottom: 15px;
-  }
 }
 .control-compent{
     display: flex;

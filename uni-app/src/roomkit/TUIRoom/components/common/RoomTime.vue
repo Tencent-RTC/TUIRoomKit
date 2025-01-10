@@ -35,6 +35,5 @@ onUnmounted(() => {
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
-  letter-spacing: -0.24px;
 }
 </style>

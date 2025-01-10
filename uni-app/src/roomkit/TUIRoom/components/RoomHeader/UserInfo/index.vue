@@ -42,17 +42,14 @@ defineEmits(['log-out']);
   .user-info-content {
     display: flex;
     align-items: center;
-    cursor: pointer;
     .avatar {
       width: 28px;
       height: 28px;
       border-radius: 50%;
     }
     .name {
-      max-width: 100px;
       margin-left: 20px;
       font-size: 16px;
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       color: #000000;
@@ -74,7 +71,6 @@ defineEmits(['log-out']);
       width: 104px;
       text-align: center;
       font-size: 14px;
-      cursor: pointer;
       height: 20px;
     }
   }
@@ -84,8 +80,6 @@ defineEmits(['log-out']);
       top: 0;
       bottom: 0;
       width: 100vw;
-      height: auto;
-      box-sizing: border-box;
       z-index: 9;
       background:  rgba(0, 0, 0, 0.7);
       &-main{
@@ -116,7 +110,6 @@ defineEmits(['log-out']);
     }
     .close {
       width: 90%;
-      backdrop-filter: blur(27.1828px);
       border-radius: 14px;
       padding: 1em 0;
       display: flex;

@@ -149,7 +149,6 @@ function handleClickOutside() {
 .select-container {
   position: relative;
   .select-content {
-    box-sizing: border-box;
     position: relative;
     border: 1px solid #E4E8EE;
     background-color: #F9FAFC;
@@ -157,12 +156,10 @@ function handleClickOutside() {
     border-radius: 8px;
     height: 42px;
     padding: 10px 16px;
-    cursor: pointer;
     display: flex;
     &.disabled {
       background-color: rgba(255, 255, 255, 0.50);
       color: #8F9AB2;
-      cursor: not-allowed;
     }
     .select-text {
       width: 0;
@@ -171,7 +168,6 @@ function handleClickOutside() {
       font-weight: 500;
       line-height: 22px;
       flex: 1;
-      white-space: nowrap;
       overflow: hidden;
     }
     .arrow-icon {
@@ -185,21 +181,16 @@ function handleClickOutside() {
   }
 
   .select-dropdown-container {
-    min-width: 100%;
-    max-height: 254px;
     padding: 7px 0px;
     position: absolute;
     background-color: #F9FAFC;
     border: 1px solid #E4E8EE;
     border-radius: 8px;
-    overflow: auto;
     &.down {
-      top: calc(100% + 6px);
       left: 0;
       transform-origin: 50% 0;
     }
     &.up {
-      bottom: calc(100% + 6px);
       left: 0;
       transform-origin: 50% 100%;
     }
@@ -210,13 +201,11 @@ function handleClickOutside() {
 .select-fade-leave-to {
   transform: scaleY(0);
   opacity: 0;
-  transition: all 0.2s ease;
 }
 
 .select-fade-enter-to,
 .select-fade-leave-from {
   transform: scaleY(1);
   opacity: 1;
-  transition: all 0.2s ease;
 }
 </style>

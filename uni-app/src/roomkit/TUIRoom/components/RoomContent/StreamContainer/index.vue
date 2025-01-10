@@ -526,7 +526,6 @@ onUnmounted(() => {
   }
   &.multi-stream-container {
     align-items: center;
-    align-content: center;
   }
   .stream-list {
     display: flex;
@@ -540,7 +539,6 @@ onUnmounted(() => {
 .icon-control {
   background-color: #FFFFFF;
   position: absolute;
-  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -56,13 +56,6 @@ function stopScreenSharing() {
 
 <style lang="scss" scoped>
 
-.tui-theme-white .local-screen-container {
-  --local-screen-stream-bg-color: rgba(228, 232, 238, 0.40);
-}
-
-// .tui-theme-black .local-screen-container {
-//   --local-screen-stream-bg-color: rgba(34, 38, 46, 0.50);
-// }
 
 .local-screen-container {
   display: flex;
@@ -79,7 +72,6 @@ function stopScreenSharing() {
         font-style: normal;
         font-weight: 400;
         line-height: 24px;
-        white-space: nowrap;
         color: #B2BBD1;
       }
     .stop-button {

@@ -46,19 +46,7 @@ function handleCloseInvite() {
   bottom: 0;
   display: flex;
   flex-direction: column;
-  animation-duration: 200ms;
-  animation-name: popup;
   padding-bottom: 20px;
-  @keyframes popup {
-  from {
-    transform-origin: bottom;
-    transform: scaleY(0);
-  }
-  to {
-    transform-origin: bottom;
-    transform: scaleY(1);
-  }
-}
   .invite-header{
     font-family: 'PingFang SC';
     font-style: normal;
@@ -92,7 +80,6 @@ function handleCloseInvite() {
     font-style: normal;
     font-size: 14px;
     color: #141313;
-    white-space: nowrap;
     width: 23%;
   }
   .invite-content {
@@ -100,7 +87,6 @@ function handleCloseInvite() {
     color: #636060;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
     width: 64%;
     font-size: 14px;
   }
@@ -124,7 +110,6 @@ function handleCloseInvite() {
 .cancel{
 	position: absolute;
 	right: 30px;
-  text-align: end;
   font-weight: 400;
   font-size: 16px;
   font-family: "PingFang SC";

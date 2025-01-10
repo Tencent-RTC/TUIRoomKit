@@ -99,7 +99,6 @@ $videoTabWidth: 305px;
   position: relative;
   .video-tab {
     position: absolute;
-    bottom: calc(100% + 12px);
     left: -5px;
     width: $videoTabWidth;
     background: #FFFFFF;
@@ -110,7 +109,6 @@ $videoTabWidth: 305px;
       0px 6px 10px 1px rgba(32, 77, 141, 0.06),
       0px 3px 14px 2px rgba(32, 77, 141, 0.05);
     &::before {
-      content: '';
       position: absolute;
       left: 30px;
       bottom: -10px;

@@ -103,6 +103,7 @@ import popup from '../../common/base/PopUpH5.vue';
 import SvgIcon from '../../common/base/SvgIcon.vue';
 import Avatar from '../../common/Avatar.vue';
 import TUIMessageBox from '../../common/base/MessageBox/index';
+import { roomService } from '../../../services';
 
 const {
   t,
@@ -116,7 +117,6 @@ const {
   logPrefix,
   currentDialogType,
   visible,
-  closeMediaBeforeLeave,
   resetState,
   toggleMangeMemberSidebar,
   searchName,
@@ -160,10 +160,8 @@ function handleEndLeaveClick() {
 async function dismissRoom() {
   try {
     logger.log(`${logPrefix}dismissRoom: enter`);
-    closeMediaBeforeLeave();
-    await roomEngine.instance?.destroyRoom();
     resetState();
-    emit('on-destroy-room', { code: 0, message: '' });
+    await roomService.dismissRoom();
   } catch (error) {
     logger.error(`${logPrefix}dismissRoom error:`, error);
   }
@@ -177,11 +175,8 @@ async function dismissRoom() {
 async function leaveRoom() {
   // eslint-disable-line
   try {
-    closeMediaBeforeLeave();
-    const response = await roomEngine.instance?.exitRoom();
-    logger.log(`${logPrefix}leaveRoom:`, response);
     resetState();
-    emit('on-exit-room', { code: 0, message: '' });
+    await roomService.leaveRoom();
   } catch (error) {
     logger.error(`${logPrefix}leaveRoom error:`, error);
   }
@@ -195,9 +190,7 @@ async function transferAndLeave() {
     const userId = selectedUser.value;
     const changeUserRoleResponse = await roomEngine.instance?.changeUserRole({ userId, userRole: TUIRole.kRoomOwner });
     logger.log(`${logPrefix}transferAndLeave:`, changeUserRoleResponse);
-    closeMediaBeforeLeave();
-    const exitRoomResponse = await roomEngine.instance?.exitRoom();
-    logger.log(`${logPrefix}exitRoom:`, exitRoomResponse);
+    await roomService.leaveRoom();
     basicStore.setSidebarOpenStatus(false);
     basicStore.setSidebarName('');
     resetState();
@@ -251,8 +244,6 @@ onUnmounted(() => {
       line-height: 21px;
       font-size: 12px;
       color: #ff2e2e;
-      letter-spacing: 0;
-      cursor: pointer;
       margin-left: 3px;
     }
   }
@@ -268,10 +259,7 @@ onUnmounted(() => {
   top: 0;
   bottom: 0;
   width: 750rpx;
-  height: auto;
-  box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
   .end-dialog-leave,
   .end-dialog-dismiss {
     border-radius: 14px;
@@ -280,7 +268,6 @@ onUnmounted(() => {
     left: 0;
     bottom: 144rpx;
     z-index: 9;
-    margin: auto;
     .manage-transfer {
       position: absolute;
       top: 0;
@@ -289,7 +276,6 @@ onUnmounted(() => {
       background: #cacacb;
       height: 56px;
       width: 750rpx;
-      margin: 0 auto;
       border-top-left-radius: 14px;
       border-top-right-radius: 14px;
       border-bottom: 0.5px solid #4f4e4e;
@@ -320,7 +306,6 @@ onUnmounted(() => {
       line-height: 24px;
       text-align: center;
       color: #ff2e2e;
-      border-style: none;
       background: #cacacb;
       padding: 20px 0;
     }
@@ -383,37 +368,23 @@ onUnmounted(() => {
 			flex-direction: row;
       padding: 0 16px;
       color: #676c80;
-      caret-color: #000000;
       flex: 1;
       align-items: center;
       .searching-input {
-        outline: none;
-        border: none;
-        background: none;
         flex: 1;
-        ::placeholder {
-          font-size: 16px;
-          line-height: 18px;
-          color: #676c80;
-        }
-        &:focus-visible {
-          outline: none;
-        }
       }
     }
   }
   .transfer-body {
-    overflow-y: scroll;
     flex: 1;
     display: flex;
-    min-height: 0;
     margin-top: 20px;
-    flex-direction: colume;
+    flex-direction: column;
     align-items: stretch;
     .scroll-view {
       display: flex;
       flex: 1;
-      flex-direction: colume;
+      flex-direction: column;
       align-items: stretch;
     }
     .transfer-list-content {
@@ -441,7 +412,6 @@ onUnmounted(() => {
           flex: 1;
           margin-left: 9px;
           color: #000000;
-          white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
           font-family: 'PingFang SC';
@@ -449,7 +419,6 @@ onUnmounted(() => {
           font-weight: 500;
           font-size: 16px !important;
           line-height: 22px;
-          letter-spacing: -0.24px;
           lines: 1;
         }
       }
@@ -488,7 +457,6 @@ onUnmounted(() => {
     height: 40px;
     background: #006eff;
     border-radius: 8px;
-    border-style: none;
     display: flex;
     flex-direction: row;
     justify-content: center;

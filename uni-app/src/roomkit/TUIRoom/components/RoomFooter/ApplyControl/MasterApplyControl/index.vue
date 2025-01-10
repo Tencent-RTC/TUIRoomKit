@@ -1,5 +1,5 @@
 <template>
-  <div v-if="sidebarName === 'apply'" class="apply-control-container" >
+  <div v-if="sidebarName === 'apply'" class="apply-control-container">
     <div v-if="applyToAnchorUserCount" class="apply-list-mobile">
       <div v-for="item in applyToAnchorList" :key="item.userId" class="apply-item">
         <div class="user-info">
@@ -62,12 +62,8 @@ const {
   display: flex;
   flex-direction: column;
   .apply-list-mobile {
-    overflow: scroll;
     padding: 0 16px;
     margin-top: 4px;
-    &::-webkit-scrollbar {
-      display: none;
-    }
     .apply-item {
       display: flex;
       align-items: center;
@@ -94,8 +90,6 @@ const {
             font-weight: 500;
             font-size: 16px;
             color: #4F586B;
-            max-width: 180px;
-            white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
           }
@@ -134,7 +128,6 @@ const {
         }
       }
       &::after {
-        content: '';
         position: absolute;
         left: 14%;
         bottom: 0;
@@ -167,17 +160,12 @@ const {
       color: #4F586B;
       text-align: center;
       border-radius: 8px;
-      cursor: pointer;
       padding: 10px 0;
     }
     .action-button.agree {
       margin-left: 10px;
       background-color: #1C66E5;
       color: #FFFFFF;
-    }
-    .action-button.disabled {
-      cursor: not-allowed;
-      pointer-events: none;
     }
   }
 }

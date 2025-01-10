@@ -200,12 +200,10 @@ function handleOverlayClick() {
       justify-content: center;
       align-items: center;
       color: #4F586B;
-      cursor: pointer;
     }
   }
   .drawer-content {
     flex: 1;
-    overflow: auto;
   }
 }
 </style>

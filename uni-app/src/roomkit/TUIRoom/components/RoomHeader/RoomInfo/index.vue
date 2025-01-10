@@ -67,7 +67,6 @@ const {
   .arrow-icon {
     display: flex;
     margin-left: 5px;
-    background-size: cover;
     align-items: center;
     transform: rotate(180deg);
   }
@@ -79,9 +78,7 @@ const {
 .text {
   font-size: 14px;
   font-weight: 500;
-  line-height: normal;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
   color: #000000;
 }
@@ -101,8 +98,6 @@ const {
   top: 0;
   bottom: 0;
   width: 750rpx;
-  height: auto;
-  box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0.7);
   .roomInfo-container-main {
     width: 750rpx;
@@ -112,29 +107,15 @@ const {
     bottom: 0;
     display: flex;
     flex-direction: column;
-    animation-duration: 200ms;
-    animation-name: popup;
     padding-bottom: 20px;
-    gap: 5px;
-    @keyframes popup {
-      from {
-        transform-origin: bottom;
-        transform: scaleY(0);
-      }
-      to {
-        transform-origin: bottom;
-        transform: scaleY(1);
-      }
-    }
+
     .roomInfo-conference-title {
       display: flex;
       flex-direction: row;
       align-items: center;
       padding: 0 0 0 25px;
       .master-header {
-        max-width: 300px;
         overflow: hidden;
-        white-space: nowrap;
         text-overflow: ellipsis;
         padding: 20px 0;
         font-family: 'PingFang SC';
@@ -166,25 +147,19 @@ const {
         width: 225rpx;
         font-size: 14px;
         font-weight: 400;
-        line-height: normal;
-        letter-spacing: -0.24px;
         color: #141313;
       }
       .roomInfo-item {
         width: 375rpx;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
         font-size: 14px;
         font-weight: 400;
-        line-height: normal;
-        letter-spacing: -0.24px;
         color: #141313;
       }
       .copy-container {
 				position: absolute;
 				right: 40rpx;
-        cursor: pointer;
         .copy {
           width: 20px;
           height: 20px;

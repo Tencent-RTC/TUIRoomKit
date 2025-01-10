@@ -198,16 +198,24 @@ function handleDocumentClick(event: MouseEvent) {
 
 
 function handleRoomOption(type: string) {
+  const roomParam = getRoomParam();
   switch (type) {
     case 'Join':
       if (!roomId.value) {
         TUIMessage({ type: 'error', message: t('Please enter the room number') });
         return;
       }
-      emit('enter-room', String(roomId.value));
+      emit('enter-room', {
+        roomId: String(roomId.value),
+        roomParam,
+      });
       break;
     case 'New':
-      emit('create-room', mode.value);
+      emit('create-room', {
+        roomMode: mode.value,
+        roomParam,
+        isSeatEnabled: Boolean(mode.value === 'SpeakAfterTakingSeat'),
+      });
       break;
     default:
       break;
@@ -226,7 +234,6 @@ onUnmounted(() => {
 </script>
 <style lang="scss" scoped>
 .control-container {
-  box-sizing: border-box;
   width: 100vw;
   height: 100%;
   display: flex;
@@ -270,7 +277,6 @@ onUnmounted(() => {
 .add-icon {
   width: 22px;
   height: 22px;
-  background-size: cover;
 }
 
 .join-room {
@@ -287,7 +293,6 @@ onUnmounted(() => {
 .enter-icon {
   width: 22px;
   height: 22px;
-  background-size: cover;
 }
 
 .title {
@@ -302,14 +307,11 @@ onUnmounted(() => {
   top: 0;
   bottom: 0;
   width: 100vw;
-  height: auto;
-  box-sizing: border-box;
   z-index: 9;
   background: #F5F5F5;
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-y: scroll;
 }
 
 .room-detail-header {
@@ -332,7 +334,6 @@ onUnmounted(() => {
   left: 22px;
   width: 10px;
   height: 18px;
-  background-size: cover;
 }
 
 .room-detail-middle {
@@ -352,7 +353,6 @@ onUnmounted(() => {
 }
 
 .room-detail-title {
-  min-width: 64px;
   color: black;
 }
 
@@ -372,16 +372,13 @@ onUnmounted(() => {
   color: black;
   flex: 1;
   padding-left: 56px;
-  max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .roomid-input {
   width: 100%;
   border: 0px;
-  outline: none;
   flex: 1;
   padding-left: 56px;
   background: white;
@@ -452,8 +449,6 @@ onUnmounted(() => {
   top: 0;
   bottom: 0;
   width: 100vw;
-  height: auto;
-  box-sizing: border-box;
   z-index: 9;
   background: rgba(0, 0, 0, 0.7);
 }
@@ -520,7 +515,6 @@ onUnmounted(() => {
   }
 
   &-block {
-    display: inline-block;
     width: 16px;
     height: 16px;
     border-radius: 8px;

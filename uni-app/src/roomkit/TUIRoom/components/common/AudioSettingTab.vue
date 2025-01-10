@@ -167,9 +167,6 @@ onBeforeUnmount(() => {
   width: 100%;
   .item-setting {
     width: 100%;
-    &:not(:last-child) {
-      margin-bottom: 20px;
-    }
   }
   .flex {
     width: 100%;
@@ -184,7 +181,6 @@ onBeforeUnmount(() => {
     width: 74px;
   }
   .title {
-    display: inline-block;
     margin-bottom: 8px;
     width: 100%;
     color: #4f586b;

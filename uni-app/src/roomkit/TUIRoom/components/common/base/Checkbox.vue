@@ -43,10 +43,8 @@ function handleValueChange(event: any) {
   position: relative;
   display: flex;
   align-items: center;
-  cursor: pointer;
   .tui-checkbox-slot-container {
     flex: 1;
-    overflow: auto;
   }
 }
 
@@ -54,7 +52,6 @@ input {
   color: var(--title-color);
   border: 1px solid var(--stroke-color);
   border-radius: 4px;
-  cursor: pointer;
 }
 
 input:focus {

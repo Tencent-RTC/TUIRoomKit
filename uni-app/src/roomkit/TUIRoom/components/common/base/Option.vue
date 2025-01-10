@@ -63,8 +63,6 @@ function handleChooseOption() {
 
 .option-container {
   padding: 6px 15px;
-  cursor: pointer;
-  white-space: nowrap;
   overflow: hidden;
   color: #000;
   &.active {

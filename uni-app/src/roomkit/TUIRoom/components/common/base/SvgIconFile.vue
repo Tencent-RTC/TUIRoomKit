@@ -115,7 +115,6 @@ function handleClick(event: Event) {
 <style lang="scss" scoped>
 .svg-icon {
   overflow: hidden;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
 }

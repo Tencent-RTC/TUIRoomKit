@@ -106,11 +106,9 @@ const handleClickEvent = () => {
   display: flex;
   align-items: center;
   color: #4F586B;
-  cursor: pointer;
   .icon-content {
     &.disabled {
       opacity: 0.4;
-      cursor: not-allowed;
     }
     &:hover {
       background: rgba(79, 88, 107, 0.05);
@@ -138,7 +136,6 @@ const handleClickEvent = () => {
     align-items: center;
     border-radius: 6px;
     height: 56px;
-    min-width: 56px;
     padding: 5px;
     .title {
       font-size: 12px;
