@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
+import com.tencent.cloud.tuikit.roomkit.ConferenceDefine;
 import com.tencent.cloud.tuikit.roomkit.R;
 import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
@@ -56,7 +57,6 @@ import com.tencent.cloud.tuikit.roomkit.view.page.widget.MediaSettings.MediaSett
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.RaiseHandControlPanel.RaiseHandApplicationListPanel;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.SelectScheduleParticipant.ConferenceParticipants;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.SelectScheduleParticipant.ParticipantSelector;
-import com.tencent.cloud.tuikit.roomkit.view.page.widget.ScheduleConference.SelectScheduleParticipant.User;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.SpeechToText.SpeechToTextSubtitleView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.TopNavigationBar.TopView;
 import com.tencent.cloud.tuikit.roomkit.view.page.widget.TransferOwnerControlPanel.TransferMasterPanel;
@@ -412,9 +412,9 @@ public class ConferenceMainView extends RelativeLayout implements IFindNameCardS
     private ConferenceParticipants getParticipants() {
         ConferenceParticipants participants = new ConferenceParticipants();
         for (UserState.UserInfo userInfo : ConferenceController.sharedInstance().getUserState().allUsers.getList()) {
-            User user = new User();
-            user.userId = userInfo.userId;
-            user.userName = userInfo.userName;
+            ConferenceDefine.User user = new ConferenceDefine.User();
+            user.id = userInfo.userId;
+            user.name = userInfo.userName;
             user.avatarUrl = userInfo.avatarUrl;
             participants.unSelectableList.add(user);
         }

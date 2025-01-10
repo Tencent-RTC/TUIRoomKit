@@ -363,4 +363,11 @@
     <string name="tuiroomkit_use_function_need_enter_room">تحتاج إلى دخول الغرفة لاستخدام هذه الوظيفة</string>
     <string name="tuiroomkit_is_not_supported_in_room_type">هذه العملية غير مدعومة ضمن نوع الغرفة الحالي</string>
     <string name="tuiroomkit_already_in_another_room">أنت بالفعل في غرفة أخرى وتحتاج إلى تسجيل المغادرة قبل الانضمام إلى غرفة جديدة</string>
+    <string name="tuiroomkit_format_select_participant">%s (%d)</string>
+    <string name="tuiroomkit_all_participant">مجموع الأعضاء(%d)</string>
+    <string name="tuiroomkit_participant_name_and_id">%s(%s)</string>
+    <string name="tuiroomkit_selected_participant_size">اختير:%d</string>
+    <string name="tuiroomkit_confirm_select_participant">مؤكد(%d)</string>
+    <string name="tuiroomkit_select_schedule_participant">اختر الأعضاء</string>
+    <string name="tuiroomkit_hint_search_member_id_or_name">أدخلIDالمستخدم أو الاسم</string>
 </resources>

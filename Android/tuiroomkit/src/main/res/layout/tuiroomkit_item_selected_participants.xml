@@ -39,7 +39,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_gravity="center"
-            android:src="@drawable/app_ic_delete_participant"/>
+            android:src="@drawable/tuiroomkit_icon_delete_participant"/>
 
     </FrameLayout>
 

@@ -10,7 +10,7 @@
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_marginStart="16dp"
-        android:background="@drawable/app_bg_attendee_unselected"
+        android:background="@drawable/tuiroomkit_bg_attendee_unselected"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -55,7 +55,7 @@
             android:layout_gravity="center"
             android:layout_width="16dp"
             android:layout_height="16dp"
-            android:src="@drawable/app_ic_delete_participant"/>
+            android:src="@drawable/tuiroomkit_icon_delete_participant"/>
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

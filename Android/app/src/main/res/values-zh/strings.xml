@@ -50,14 +50,8 @@
 
     <string name="app_user_id_empty_toast">用户ID不能为空!</string>
 
-    <string name="app_selected_text">已选择</string>
     <string name="app_dialog_ok">确定</string>
-    <string name="app_hint_search_member_id_or_name">输入用户ID或名称</string>
-    <string name="app_select_schedule_participant">选择成员</string>
-    <string name="app_selected_participant_size">已选择：%d人</string>
-    <string name="app_confirm_select_participant">确定(%d)</string>
-    <string name="app_all_participant">全部成员(%d)</string>
-    <string name="app_participant_name_and_id">%s(%s)</string>
-    <string name="app_format_select_participant">%s (%d)</string>
+    <string name="tuiroomkit_hint_search_member_id_or_name">输入用户ID或名称</string>
+    <string name="tuiroomkit_select_schedule_participant">选择成员</string>
 
 </resources>

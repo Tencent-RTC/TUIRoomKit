@@ -9,7 +9,7 @@
     </item>
     <item>
         <bitmap
-            android:src="@drawable/app_ic_confirm_participant"
+            android:src="@drawable/tuiroomkit_ic_confirm_participant"
             android:gravity="fill" />
     </item>
 </layer-list>
