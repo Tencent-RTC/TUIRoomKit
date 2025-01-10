@@ -28,10 +28,8 @@
 		7D916A1D2B26B9740044D38E /* RoomNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D916A1C2B26B9740044D38E /* RoomNavigationController.swift */; };
 		7D93C8522A80C9780062B2CC /* RoomTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C8512A80C9780062B2CC /* RoomTypeView.swift */; };
 		7D93C85D2A80CB3D0062B2CC /* ListCellItemData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C85C2A80CB3D0062B2CC /* ListCellItemData.swift */; };
-		7D93C85F2A80CBB30062B2CC /* PrePareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C85E2A80CBB30062B2CC /* PrePareView.swift */; };
 		7D93C8612A80CBDB0062B2CC /* CreateRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C8602A80CBDB0062B2CC /* CreateRoomView.swift */; };
 		7D93C8632A80CC010062B2CC /* EnterRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C8622A80CC010062B2CC /* EnterRoomView.swift */; };
-		7D93C8672A80CC4D0062B2CC /* RoomPrePareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C8662A80CC4D0062B2CC /* RoomPrePareViewController.swift */; };
 		7D93C86B2A80D0E50062B2CC /* CreateRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C86A2A80D0E50062B2CC /* CreateRoomViewController.swift */; };
 		7D93C86D2A80D0F80062B2CC /* EnterRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C86C2A80D0F80062B2CC /* EnterRoomViewController.swift */; };
 		7D93C86F2A80D3B40062B2CC /* ListCellItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D93C86E2A80D3B40062B2CC /* ListCellItemView.swift */; };
@@ -60,14 +58,9 @@
 		C659799B2680895E00CCAA4C /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = C65979992680895E00CCAA4C /* LaunchScreen.strings */; };
 		C659799F2680897900CCAA4C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C659799D2680897900CCAA4C /* LaunchScreen.storyboard */; };
 		C685C0F726A67931007A7A6F /* DemoLocalized.swift in Sources */ = {isa = PBXBuildFile; fileRef = C685C0F126A67931007A7A6F /* DemoLocalized.swift */; };
-		FAA1193D2C3696B5007F8E4B /* members.json in Resources */ = {isa = PBXBuildFile; fileRef = FAA1193C2C3696B5007F8E4B /* members.json */; };
 		FAEADAE42C5121A100C48332 /* ConferenceOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAE32C5121A100C48332 /* ConferenceOptionsView.swift */; };
 		FAEADAE52C5121A100C48332 /* ConferenceOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAE22C5121A100C48332 /* ConferenceOptionsViewController.swift */; };
 		FAEADAE62C5121A100C48332 /* ConferenceOptionsDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAE12C5121A100C48332 /* ConferenceOptionsDataHelper.swift */; };
-		FAEADAEC2C58D0E300C48332 /* SelectMembersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAEB2C58D0E300C48332 /* SelectMembersViewModel.swift */; };
-		FAEADAED2C58D0E300C48332 /* SelectMemberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAE92C58D0E200C48332 /* SelectMemberView.swift */; };
-		FAEADAEE2C58D0E300C48332 /* SelectMemberViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAEA2C58D0E300C48332 /* SelectMemberViewController.swift */; };
-		FAEADAF12C59E2A900C48332 /* SelectedMembersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEADAF02C59E2A900C48332 /* SelectedMembersViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,10 +109,8 @@
 		7D916A1C2B26B9740044D38E /* RoomNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomNavigationController.swift; sourceTree = "<group>"; };
 		7D93C8512A80C9780062B2CC /* RoomTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomTypeView.swift; sourceTree = "<group>"; };
 		7D93C85C2A80CB3D0062B2CC /* ListCellItemData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCellItemData.swift; sourceTree = "<group>"; };
-		7D93C85E2A80CBB30062B2CC /* PrePareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrePareView.swift; sourceTree = "<group>"; };
 		7D93C8602A80CBDB0062B2CC /* CreateRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRoomView.swift; sourceTree = "<group>"; };
 		7D93C8622A80CC010062B2CC /* EnterRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterRoomView.swift; sourceTree = "<group>"; };
-		7D93C8662A80CC4D0062B2CC /* RoomPrePareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPrePareViewController.swift; sourceTree = "<group>"; };
 		7D93C86A2A80D0E50062B2CC /* CreateRoomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRoomViewController.swift; sourceTree = "<group>"; };
 		7D93C86C2A80D0F80062B2CC /* EnterRoomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterRoomViewController.swift; sourceTree = "<group>"; };
 		7D93C86E2A80D3B40062B2CC /* ListCellItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCellItemView.swift; sourceTree = "<group>"; };
@@ -162,14 +153,9 @@
 		C685C0F126A67931007A7A6F /* DemoLocalized.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoLocalized.swift; sourceTree = "<group>"; };
 		E4CD7F588EA29064C4C9474A /* Pods_DemoApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DemoApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED97CCC2BE129BEB1AA71C9F /* Pods-TXReplayKit_Screen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TXReplayKit_Screen.release.xcconfig"; path = "Target Support Files/Pods-TXReplayKit_Screen/Pods-TXReplayKit_Screen.release.xcconfig"; sourceTree = "<group>"; };
-		FAA1193C2C3696B5007F8E4B /* members.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = members.json; sourceTree = "<group>"; };
 		FAEADAE12C5121A100C48332 /* ConferenceOptionsDataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceOptionsDataHelper.swift; sourceTree = "<group>"; };
 		FAEADAE22C5121A100C48332 /* ConferenceOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceOptionsViewController.swift; sourceTree = "<group>"; };
 		FAEADAE32C5121A100C48332 /* ConferenceOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceOptionsView.swift; sourceTree = "<group>"; };
-		FAEADAE92C58D0E200C48332 /* SelectMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMemberView.swift; sourceTree = "<group>"; };
-		FAEADAEA2C58D0E300C48332 /* SelectMemberViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMemberViewController.swift; sourceTree = "<group>"; };
-		FAEADAEB2C58D0E300C48332 /* SelectMembersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMembersViewModel.swift; sourceTree = "<group>"; };
-		FAEADAF02C59E2A900C48332 /* SelectedMembersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectedMembersViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -252,7 +238,6 @@
 			isa = PBXGroup;
 			children = (
 				FAEADAE32C5121A100C48332 /* ConferenceOptionsView.swift */,
-				7D93C85E2A80CBB30062B2CC /* PrePareView.swift */,
 				7D93C8602A80CBDB0062B2CC /* CreateRoomView.swift */,
 				7D93C8622A80CC010062B2CC /* EnterRoomView.swift */,
 			);
@@ -262,7 +247,6 @@
 		7D93C84F2A80C68D0062B2CC /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				7D93C8662A80CC4D0062B2CC /* RoomPrePareViewController.swift */,
 				7D93C86A2A80D0E50062B2CC /* CreateRoomViewController.swift */,
 				7D93C86C2A80D0F80062B2CC /* EnterRoomViewController.swift */,
 				FAEADAE12C5121A100C48332 /* ConferenceOptionsDataHelper.swift */,
@@ -274,7 +258,6 @@
 		7D93C8502A80C9500062B2CC /* Component */ = {
 			isa = PBXGroup;
 			children = (
-				FAEADAEF2C59C60F00C48332 /* SelectMember */,
 				7D916A1C2B26B9740044D38E /* RoomNavigationController.swift */,
 				7D93C8512A80C9780062B2CC /* RoomTypeView.swift */,
 				7D93C86E2A80D3B40062B2CC /* ListCellItemView.swift */,
@@ -394,7 +377,6 @@
 		C685C0EC26A67931007A7A6F /* Resource */ = {
 			isa = PBXGroup;
 			children = (
-				FAA1193C2C3696B5007F8E4B /* members.json */,
 				C685C0ED26A67931007A7A6F /* Localized */,
 			);
 			path = Resource;
@@ -426,17 +408,6 @@
 				B4E0A458AE66DD08397D7122 /* Pods_TXReplayKit_Screen.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		FAEADAEF2C59C60F00C48332 /* SelectMember */ = {
-			isa = PBXGroup;
-			children = (
-				FAEADAEA2C58D0E300C48332 /* SelectMemberViewController.swift */,
-				FAEADAEB2C58D0E300C48332 /* SelectMembersViewModel.swift */,
-				FAEADAE92C58D0E200C48332 /* SelectMemberView.swift */,
-				FAEADAF02C59E2A900C48332 /* SelectedMembersViewController.swift */,
-			);
-			path = SelectMember;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -537,7 +508,6 @@
 				C6597943268079C500CCAA4C /* LaunchImage@3x.png in Resources */,
 				C659799B2680895E00CCAA4C /* LaunchScreen.strings in Resources */,
 				1402D0232BF75E8400396825 /* DemoLocalized.xcstrings in Resources */,
-				FAA1193D2C3696B5007F8E4B /* members.json in Resources */,
 				C6597946268079C500CCAA4C /* LaunchImage_en@3x.png in Resources */,
 				C6597942268079C500CCAA4C /* LaunchImage@2x.png in Resources */,
 				C6597995268088B400CCAA4C /* LaunchScreen_en.storyboard in Resources */,
@@ -625,11 +595,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D5B0CA42A3AB75600CC1585 /* UserAgreementViewController.swift in Sources */,
-				7D93C85F2A80CBB30062B2CC /* PrePareView.swift in Sources */,
-				FAEADAF12C59E2A900C48332 /* SelectedMembersViewController.swift in Sources */,
 				7D93C8612A80CBDB0062B2CC /* CreateRoomView.swift in Sources */,
-				7D93C8672A80CC4D0062B2CC /* RoomPrePareViewController.swift in Sources */,
-				FAEADAEE2C58D0E300C48332 /* SelectMemberViewController.swift in Sources */,
 				C6597949268079C500CCAA4C /* AppDelegate.swift in Sources */,
 				C659794F268079CD00CCAA4C /* GenerateTestUserSig.swift in Sources */,
 				7D93C86F2A80D3B40062B2CC /* ListCellItemView.swift in Sources */,
@@ -640,7 +606,6 @@
 				7D5B0CA52A3AB75600CC1585 /* LayoutDefine.swift in Sources */,
 				7D5B0C9D2A3AB75600CC1585 /* UserAgreementViewController+UI.swift in Sources */,
 				7D93C85D2A80CB3D0062B2CC /* ListCellItemData.swift in Sources */,
-				FAEADAED2C58D0E300C48332 /* SelectMemberView.swift in Sources */,
 				7D916A1D2B26B9740044D38E /* RoomNavigationController.swift in Sources */,
 				7D5B0C9B2A3AB75600CC1585 /* TRTCRegisterRootView.swift in Sources */,
 				7D93C86B2A80D0E50062B2CC /* CreateRoomViewController.swift in Sources */,
@@ -653,7 +618,6 @@
 				7D93C8632A80CC010062B2CC /* EnterRoomView.swift in Sources */,
 				7D5B0CA12A3AB75600CC1585 /* ProfileManager_Mock.swift in Sources */,
 				C659794B268079C500CCAA4C /* SceneDelegate.swift in Sources */,
-				FAEADAEC2C58D0E300C48332 /* SelectMembersViewModel.swift in Sources */,
 				7D5B0CA32A3AB75600CC1585 /* TRTCRegisterViewController.swift in Sources */,
 				7D5B0C9C2A3AB75600CC1585 /* TRTCLoginRootView.swift in Sources */,
 				FAEADAE42C5121A100C48332 /* ConferenceOptionsView.swift in Sources */,

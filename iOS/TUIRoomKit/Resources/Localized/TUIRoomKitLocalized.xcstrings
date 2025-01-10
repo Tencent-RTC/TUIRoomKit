@@ -2241,6 +2241,12 @@
             "value" : "أدخل معرف المستخدم أو اسم المستخدم"
           }
         },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter userID or username"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4958,6 +4964,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حدد الأعضاء"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Members"
           }
         },
         "zh-Hans" : {

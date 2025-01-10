@@ -91,17 +91,10 @@ class InviteView: UIView {
             self.conferenceStore.dispatch(action: InvitationViewActions.showInvitationPopupView())
             RoomRouter.shared.dismissPopupViewController()
         }
-#if !DEBUG
-        addUserView.isHidden = !isDisplayAddUserView()
-#endif
+        addUserView.isHidden = false
         inviteToJoinView.itemData.action = { sender in
             RoomRouter.shared.presentPopUpViewController(viewType: .inviteMemberViewType, height: 290.scale375Height())
         }
-    }
-    
-    private func isDisplayAddUserView() -> Bool {
-        let vc = Container.shared.contactViewController(ConferenceParticipants()) as? (ContactViewProtocol & UIViewController)
-        return vc != nil
     }
     
     @Injected(\.navigation) private var route

@@ -46,9 +46,6 @@ class ConferenceOptionsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        ConferenceSession.sharedInstance.setContactsViewProvider { participants in
-            return SelectMemberViewController(participants: participants)
-        }
         ConferenceSession.sharedInstance.enableWaterMark()
     }
     

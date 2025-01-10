@@ -446,11 +446,15 @@ class BottomViewModel: NSObject {
         let inRoomUsers = attendeeList.map{ UserInfo(userEntity: $0).convertToUser() }
         // TODO: @jeremiawang Use ConferenceRouter to push ContactVC
         let participants = ConferenceParticipants(unSelectableList: inRoomUsers)
-        guard let vc = Container.shared.contactViewController(participants) as? (ContactViewProtocol & UIViewController) else {
-            return
+        var contactViewController: (ContactViewProtocol & UIViewController)?
+        if ConferenceSession.sharedInstance.implementation.hasCustomContacts {
+            contactViewController = Container.shared.contactViewController.resolve(participants) as? (ContactViewProtocol & UIViewController)
+        } else {
+            contactViewController = SelectMemberViewController(participants: participants)
         }
-        vc.delegate = self
-        RoomRouter.shared.push(viewController: vc)
+        guard let contactViewController = contactViewController else { return }
+        contactViewController.delegate = self
+        RoomRouter.shared.push(viewController: contactViewController)
     }
     
     @objc func onUserScreenCaptureStarted(notification:Notification)

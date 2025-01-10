@@ -127,10 +127,11 @@ extension ConferenceRoute {
     }
     
     func getSelectMemberViewController(participants: ConferenceParticipants) -> (ContactViewProtocol & UIViewController)? {
-        guard let vc = Container.shared.contactViewController(participants) as? (ContactViewProtocol & UIViewController) else {
-            return nil
+        if ConferenceSession.sharedInstance.implementation.hasCustomContacts {
+            return Container.shared.contactViewController.resolve(participants) as? (ContactViewProtocol & UIViewController)
+        } else {
+            return SelectMemberViewController(participants: participants)
         }
-        return vc
     }
 }
 

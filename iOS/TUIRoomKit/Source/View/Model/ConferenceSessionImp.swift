@@ -17,6 +17,7 @@ let TUI_ROOM_ENABLE_VIBRATION_MODE_KEY = "RoomEnableVibrationMode"
 class ConferenceSessionImp: NSObject {
     private(set) var isEnableWaterMark = false;
     private(set) var waterMarkText     = "";
+    private(set) var hasCustomContacts = false
     
     private(set) lazy var bellPath: String? = {
         return UserDefaults.standard.object(forKey: TUI_ROOM_CALLING_BELL_KEY) as? String
@@ -27,6 +28,10 @@ class ConferenceSessionImp: NSObject {
     
     private(set) lazy var enableVibrationMode: Bool = {
         return UserDefaults.standard.object(forKey: TUI_ROOM_ENABLE_VIBRATION_MODE_KEY) as? Bool ?? true
+    }()
+    
+    private(set) lazy var participants: [User] = {
+        return []
     }()
     
     private var observers = NSHashTable<ConferenceObserver>.weakObjects()
@@ -61,6 +66,7 @@ class ConferenceSessionImp: NSObject {
     }
     
     func setContactsViewProvider(_ provider: @escaping (ConferenceParticipants) -> ContactViewProtocol) {
+        hasCustomContacts = true
         Container.shared.contactViewController.register { participants in
             provider(participants)
         }
@@ -79,6 +85,10 @@ class ConferenceSessionImp: NSObject {
     func enableVibrationMode(enable: Bool) {
         UserDefaults.standard.set(enable, forKey: TUI_ROOM_ENABLE_VIBRATION_MODE_KEY)
         UserDefaults.standard.synchronize()
+    }
+    
+    func setParticipants(_ participants: [User]) {
+        self.participants = participants
     }
     
     deinit {

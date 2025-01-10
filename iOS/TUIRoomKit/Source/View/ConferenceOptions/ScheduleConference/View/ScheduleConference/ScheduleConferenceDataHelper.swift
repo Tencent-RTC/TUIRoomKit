@@ -179,9 +179,6 @@ extension ScheduleConferenceDataHelper {
     }
     
     class func getParticipatingMembersItem(route: Route, store: ScheduleConferenceStore, viewController: ContactViewSelectDelegate? = nil) -> ListItem? {
-#if !DEBUG
-        guard Container.shared.contactViewController(ConferenceParticipants()) as? (ContactViewProtocol & UIViewController) != nil else { return nil }
-#endif
         var participatingMembersItem = ListItem(title: .participatingMembersText)
         participatingMembersItem.showButton = true
         participatingMembersItem.buttonIcon = "room_right_arrow1"

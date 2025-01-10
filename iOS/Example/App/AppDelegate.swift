@@ -59,7 +59,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension AppDelegate: TIMPushDelegate {
-    func offlinePushCertificateID() -> Int32 {
+    func businessID() -> Int32 {
         return offlinePushBusinessID
     }
     

@@ -46,4 +46,8 @@ import Foundation
     @objc public func enableVibrationMode(enable: Bool) {
         implementation.enableVibrationMode(enable: enable)
     }
+    
+    @objc public func setParticipants(_ participants: [User]) {
+        implementation.setParticipants(participants)
+    }
 }

@@ -7,7 +7,6 @@
 
 import UIKit
 import RTCRoomEngine
-import TUIRoomKit
 
 protocol SelectMemberViewDelegate: AnyObject {
     func selectView(_ selectView: SelectMemberView, didSearchWith searchText:String)
@@ -421,16 +420,8 @@ class AvatarCell: UICollectionViewCell {
 }
 
 private extension String {
-    static var selectMemberText: String {
-        RoomDemoLocalize("Select Members")
-    }
-    static var enterUserIdText: String {
-        RoomDemoLocalize("Enter userID or username")
-    }
-    static var confirmText: String {
-        RoomDemoLocalize("OK")
-    }
-    static var selectedText: String {
-        RoomDemoLocalize("Selected")
-    }
+    static let selectMemberText = localized("Select Members")
+    static let enterUserIdText = localized("Enter userID or username")
+    static let confirmText = localized("OK")
+    static let selectedText = localized("Selected")
 }
