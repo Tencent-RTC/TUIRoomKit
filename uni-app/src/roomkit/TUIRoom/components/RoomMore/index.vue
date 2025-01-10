@@ -36,12 +36,6 @@ function handleCloseContact() {
 </script>
 
 <style lang="scss" scoped>
-span{
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 17px;
-  padding-right: 5px;
-}
 .contact-container-main {
   width: 750rpx;
   background: #d4d4d4;
@@ -50,19 +44,7 @@ span{
   bottom: 0;
   display: flex;
   flex-direction: column;
-  animation-duration: 200ms;
-  animation-name: popup;
   padding-bottom: 20px;
-  @keyframes popup {
-  from {
-    transform-origin: bottom;
-    transform: scaleY(0);
-  }
-  to {
-    transform-origin: bottom;
-    transform: scaleY(1);
-  }
-}
   .contact-title-main {
     display: flex;
     flex-direction: row;
@@ -98,8 +80,6 @@ span{
     width: 210rpx;
     font-size: 14px;
     font-weight: 400;
-    line-height: normal;
-    letter-spacing: -0.24px;
     color: #141313;
   }
   .contact-content {
@@ -107,13 +87,11 @@ span{
     color: #636060;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
     font-size: 14px;
   }
   .copy-container {
     position: absolute;
     right: 40rpx;
-    cursor: pointer;
     .copy {
       width: 20px;
       height: 20px;

@@ -116,13 +116,7 @@ if (props.withPreview) {
 .video-tab {
   border-radius: 8px;
   font-size: 14px;
-  .item-setting {
-    &:not(:last-child) {
-      margin-bottom: 20px;
-    }
-  }
   .title {
-    display: inline-block;
     margin-bottom: 8px;
     width: 100%;
     color: #4F586B;
@@ -160,7 +154,6 @@ if (props.withPreview) {
   .item {
     width: 100%;
     height: 20px;
-    cursor: pointer;
     color: #000000;
   }
 }

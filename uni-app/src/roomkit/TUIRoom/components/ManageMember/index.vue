@@ -116,8 +116,6 @@ const {
       .apply-staged,
       .apply-not-stage {
         flex: 1;
-        filter: drop-shadow(0px 2px 4px rgba(32, 77, 141, 0.03)) drop-shadow(0px 6px 10px rgba(32, 77, 141, 0.06))
-          drop-shadow(0px 3px 14px rgba(32, 77, 141, 0.05));
         border-radius: 10px;
         display: flex;
         justify-content: center;
@@ -161,7 +159,6 @@ const {
         font-weight: 400;
         font-size: 14px;
         color: #1C66E5;
-        cursor: pointer;
       }
     }
     .apply-info {
@@ -180,14 +177,12 @@ const {
       font-weight: 400;
       font-size: 14px;
       color: #FFFFFF;
-      cursor: pointer;
     }
   }
   .member-list-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 0;
     .member-list{
       font-weight: 500;
       font-size: 14px;
@@ -203,9 +198,6 @@ const {
       flex-direction: row;
       margin-left: 5px;
     }
-    &::-webkit-scrollbar {
-      display: none;
-    }
     .member-list-header {
       padding: 0 32px;
       margin-bottom: 8px;
@@ -215,7 +207,6 @@ const {
     .member-list-content {
       display: flex;
       flex-direction: row;
-      overflow-y: scroll;
       flex: 1;
       .scroll-view {
         flex: 1;
@@ -250,7 +241,6 @@ const {
     position: absolute;
     bottom: 46vh;
     left: 18vw;
-    white-space: nowrap;
     .popup-dialog-audio-title {
       font-family: 'PingFang SC';
       font-style: normal;
@@ -259,12 +249,10 @@ const {
       line-height: 22px;
       text-align: center;
       color: #2B2E38;
-      white-space: normal;
       padding: 20px;
     }
     .popup-button{
       display: flex;
-      justify-content: space-evenly;
       padding: 10px;
       .popup-button-cancel{
         padding: 4px 16px;

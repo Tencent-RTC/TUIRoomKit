@@ -74,6 +74,5 @@ export default {
   font-family: uniicons;
   text-decoration: none;
   text-align: center;
-  -webkit-text-size-adjust: none;
 }
 </style>

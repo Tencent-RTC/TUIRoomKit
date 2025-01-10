@@ -78,17 +78,6 @@ function handleCloseControl() {
   border-radius: 15px 15px 0px 0px;
   display: flex;
   flex-direction: column !important;
-  animation-duration: 200ms;
-  animation-name: popup;
-  @keyframes popup {
-  from {
-    transform-origin: bottom;
-    transform: scaleY(0);
-  }
-  to {
-    transform-origin: bottom;
-    transform: scaleY(1);
-  }
 }
   .member-title{
     display: flex;
@@ -124,7 +113,6 @@ function handleCloseControl() {
       margin-left: 10px;
     }
   }
-}
 .agree-button, .cancel-button{
   padding: 12px;
   width: 50%;

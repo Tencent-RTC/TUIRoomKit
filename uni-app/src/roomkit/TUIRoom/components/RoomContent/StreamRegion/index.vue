@@ -231,7 +231,6 @@ onMounted(() => {
   overflow: hidden;
   border-radius: 10px;
   transform: rotate(0deg);
-  -webkit-transform: rotate(0deg);
   &.border {
     border: 2px solid #37E858;
   }
@@ -258,19 +257,12 @@ onMounted(() => {
         border-radius: 50%;
       }
       .user-gender-name {
-        svg {
-          vertical-align: bottom;
-        }
         .user-name {
-          display: inline-block;
           margin-left: 6px;
           font-size: 14px;
           font-weight: 400;
-          max-width: 100px;
-          white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
-          vertical-align: bottom;
         }
       }
     }
@@ -280,20 +272,15 @@ onMounted(() => {
     position: absolute;
     bottom: 4px;
     left: 0;
-    min-width: 118px;
-    max-width: 100%;
     overflow: hidden;
     height: 30px;
     display: flex;
     background: rgba(0,0,0,0.60);
     color: #FFFFFF;
     align-items: center;
-    align-content: center;
     font-size: 14px;
     .user-name {
       margin-left: 8px;
-      max-width: 60px;
-      white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
       padding-right: 5px;
@@ -313,12 +300,8 @@ onMounted(() => {
     }
     .screen-icon {
       transform: scale(0.8);
-      background-size: cover;
     }
-    .audio-icon{
-      max-width: 26px;
-      max-height: 35px;
-    }
+
   }
 }
 </style>

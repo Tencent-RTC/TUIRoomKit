@@ -24,6 +24,5 @@ const { isFrontCamera } = storeToRefs(basicStore);
 <style scoped>
  .camera-icon{
     display: flex;
-    background-size: cover;
  }
 </style>

@@ -53,12 +53,9 @@ function handleClickArrow() {
       top: 50%;
       left: 0px;
       transform: translateY(-50%);
-      cursor: pointer;
       &::before {
-        content: '';
         width: 20px;
         height: 100%;
-        box-sizing: border-box;
         position: absolute;
         top: 0;
         right: -15px;
@@ -81,9 +78,7 @@ function handleClickArrow() {
         border-bottom: 1px solid #E4EAF7;
         border-top-left-radius: 4px;
         border-bottom-left-radius: 4px;
-        cursor: pointer;
         &::before {
-          content: '';
           width: 20px;
           height: 100%;
           position: absolute;
@@ -94,7 +89,6 @@ function handleClickArrow() {
         }
       }
       &::before {
-        content: '';
         width: 2px;
         height: calc((100% - 60px) / 2);
         position: absolute;
@@ -105,7 +99,6 @@ function handleClickArrow() {
         border-bottom-right-radius: 4px;
       }
       &::after {
-        content: '';
         width: 2px;
         height: calc((100% - 60px) / 2);
         position: absolute;
@@ -122,7 +115,6 @@ function handleClickArrow() {
     top: 50%;
     left: 6px;
     transform: translateY(-50%);
-    cursor: pointer;
     color: #D5E0F2;
     transition: color 0s;
     svg {
@@ -147,13 +139,10 @@ function handleClickArrow() {
       left: 50%;
       bottom: 0px;
       transform: translateX(-50%);
-      cursor: pointer;
       &::before {
-        content: '';
         width: 100%;
         height: 20px;
         position: absolute;
-        box-sizing: border-box;
         bottom: 0;
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
@@ -174,12 +163,10 @@ function handleClickArrow() {
         border-right: 1px solid #E4EAF7;
         border-bottom-left-radius: 4px;
         border-bottom-right-radius: 4px;
-        cursor: pointer;
         .arrow {
           color: #A4BBDB;
         }
         &::before {
-          content: '';
           width: 100%;
           height: 20px;
           position: absolute;
@@ -189,7 +176,6 @@ function handleClickArrow() {
         }
       }
       &::before {
-        content: '';
         width: calc((100% - 60px) / 2);
         height: 2px;
         position: absolute;
@@ -200,7 +186,6 @@ function handleClickArrow() {
         border-top-right-radius: 4px;
       }
       &::after {
-        content: '';
         width: calc((100% - 60px) / 2);
         height: 2px;
         position: absolute;
@@ -217,7 +202,6 @@ function handleClickArrow() {
       left: 50%;
       bottom: 4px;
       transform: translateX(-50%);
-      cursor: pointer;
       color: #D5E0F2;
       transition: color 0s;
       svg {

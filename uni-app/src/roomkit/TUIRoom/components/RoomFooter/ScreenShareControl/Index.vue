@@ -166,9 +166,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
   font-size: 14px;
-  // color: var(--color-font);
 }
 .stop-share-icon {
   width: 24px;

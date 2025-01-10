@@ -37,7 +37,6 @@ watch(() => mailAddress.value, (val) => {
     background-image:none;
     border-radius:8px;
     border:1px solid #292D38;
-    box-sizing:border-box;
     color: #B3B8C8;
     display:inline-block;
     font-size:inherit;
@@ -53,7 +52,6 @@ watch(() => mailAddress.value, (val) => {
     background-color:rgba(207, 213, 230, 0.2);
     background-image:none;
     border-radius:8px;
-    box-sizing:border-box;
     color: #B3B8C8;
     display:inline-block;
     font-size:inherit;

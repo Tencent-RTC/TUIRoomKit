@@ -41,7 +41,6 @@ const badgeClass = computed(() => ['tui-badge', `tui-badge-${props.type}`, props
 <style lang="scss" scoped>
 .tui-badge {
   position: relative;
-  display: inline-block;
 
   .tui-badge-count {
 	  padding: 1px 3px;

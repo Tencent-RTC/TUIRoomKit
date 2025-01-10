@@ -63,7 +63,7 @@ const onExitRoom = (info: { code: number; message: string }) => {
   justify-content: space-between;
 }
 .icon-box{
-  min-width: 50px;
+  width: 50px;
   display: flex;
   flex-direction: row;
   align-items: center;

@@ -145,8 +145,6 @@ const iconList = computed(() => {
       font-weight: 400;
       color: #4F586B;
       line-height: 22px;
-      max-width: 100px;
-      white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
     }
@@ -166,15 +164,8 @@ const iconList = computed(() => {
         padding: 0 6px;
       }
       .user-extra-info-admin {
-        transition: none;
         color: #F06C4B;
       }
-    }
-  }
-
-  .member-basic-info-admin {
-    .user-name {
-      max-width: 40px;
     }
   }
 

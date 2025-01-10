@@ -115,13 +115,11 @@ function handleOverlayClick(event: any) {
     font-style: normal;
     color: #000000;
     .dialog-title {
-      display: inline-block;
       font-size: 16px;
       text-align: center;
       font-weight: 500;
       padding-top: 14px;
       padding: 24px 24px 12px 24px;
-      box-sizing: border-box;
     }
     .dialog-content {
       display: flex;
@@ -148,7 +146,6 @@ function handleOverlayClick(event: any) {
         text-align: center;
         font-size: 16px;
         font-weight: 400;
-        line-height: normal;
         padding: 14px;
         display: flex;
         align-items: center;

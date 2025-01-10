@@ -60,7 +60,6 @@ function handleClose() {
 			display: flex;
 			justify-content: center;
 			align-items: center;
-      box-sizing: content-box;
     }
     .sidebar-title {
       font-family: 'PingFang SC';
@@ -74,17 +73,14 @@ function handleClose() {
     .close-icon{
       width: 10px;
       height: 18px;
-      background-size: cover;
       }
   }
   .popup-main-content {
     width: 750rpx;
-    height: calc(1440rpx - 130px);
     overflow: hidden;
   }
   .popup-main-footer {
     width: 750rpx;
-    height: auto;
     position: sticky;
     bottom: 0;
     padding-top: 10px;
