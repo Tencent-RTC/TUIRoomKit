@@ -186,6 +186,16 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
       ),
       BottomButtonItemWidget(
         image: Image.asset(
+          AssetsImages.roomFloat,
+          package: 'tencent_conference_uikit',
+        ),
+        onPressed: () {
+          controller.enableFloatWindow();
+        },
+        text: 'float'.roomTr,
+      ),
+      BottomButtonItemWidget(
+        image: Image.asset(
           AssetsImages.roomSetting,
           package: 'tencent_conference_uikit',
         ),

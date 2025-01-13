@@ -24,6 +24,7 @@ class GenerateTestUserSig {
   /// Note: this method is for testing only. Before commercial launch, please migrate the UserSig calculation code and key to your backend server to prevent key disclosure and traffic stealing.
   /// Reference: https://trtc.io/document/35166
   static String sdkSecretKey = '';
+
   static genTestSig(String userId) {
     int currTime = _getCurrentTime();
     String sig = '';

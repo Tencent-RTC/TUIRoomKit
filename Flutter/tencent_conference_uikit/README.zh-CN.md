@@ -27,7 +27,27 @@ _简体中文 | [English](README.md)_
 | iOS     |iOS 12.0 及更高。|
 
 ### 开通服务
-请参考官网文档中 [快速接入](https://cloud.tencent.com/document/product/1690/94555) 中获取自己的`SDKAppID`和`SDKSecretKey`。
+
+在使用 `tencent_conference_uikit` 创建房间前，您需要开通 `tencent_conference_uikit` 专属的多人音视频互动服务，详细步骤如下：
+
+1. 登录 [实时音视频 TRTC 控制台](https://console.cloud.tencent.com/trtc)，单击左侧应用管理页面，找到需要开通 TUIRoomKit 的应用（SDKAppID），点击详情按钮，进入应用概览界面。
+
+   ![](https://qcloudimg.tencent-cloud.cn/raw/491d2a01203ba3642dedd0967183cbaa.png)
+
+2. 在应用概览页面找到 **含 UI 低代码集成接入 **卡片，选择**多人音视频（TUIRoomKit）**，点击领取体验按钮，领取7天体验版 TUIRoomKit 进行接入测试。
+   
+
+> **注意：**
+> 
+>   - 领取体验版后仅开通 TUIRoomKit 7天的体验资格，测试过程中所产生的音视频时长等资源消耗，仍会按照实时音视频 TRTC 标准计费规则计费；
+>   - 新账号首次可前往 [试用中心](https://cloud.tencent.com/act/pro/video_freetrial?from=19654) 免费领取10000分钟音视频时长；
+>   - 如果所选 SDKAppID 体验版领取次数已达上限，需要购买 TUIRoomKit 包月套餐才能开通服务，请点击**场景套餐订阅**按钮或前往 [购买页](https://buy.cloud.tencent.com/trtc) 购买；
+
+   ![](https://qcloudimg.tencent-cloud.cn/raw/2b9660e8f29f0ae307241fe003ec234d.png)
+
+3. 领取完成后，可以看到体验版的基本信息，包括服务状态、版本信息和功能详情、到期时间。这里的 `SDKAppID`、`SDKSecretKey` 会在后续步骤中使用到。
+
+   ![](https://qcloudimg.tencent-cloud.cn/raw/f262b385451c2c89dd710f578dc9c4e5.png)
 
 ### 接入使用
 - 步骤一：安装 `tencent_conference_uikit` 依赖
@@ -216,7 +236,7 @@ _简体中文 | [English](README.md)_
 ## 快速访问
 
 - 如果你遇到了困难，可以先参阅 [常见问题](https://cloud.tencent.com/document/product/1690/90103)，这里整理开发者最常出现的问题，覆盖各个平台，希望可以帮助您快速解决问题
-- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](../../Web/)、[Android](../../Android/)、[iOS](../../iOS/)、[Electron](../../Electron/)
+- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](../../Web/)、[Android](../../Android/)、[iOS](../../iOS/)、[Electron](../../Electron/)、[Qt](../../Qt/)
 - 如果您想了解我们最新的一些产品特性，可以查看 [更新日志](https://cloud.tencent.com/document/product/1690/89361)，这里有 TUIRoomKit 最新的功能特性，以及历史版本功能迭代
 - 完整的 API 文档见 [多人音视频 SDK API 示例](https://cloud.tencent.com/document/product/1690/94557)：包含TUIRoomKit（含 UI）、TUIRoomEngine（无 UI）、以及事件回调等介绍。
 - 如果你想了解更多腾讯云音视频团队维护的项目，可以查看我们的 [产品官网](https://cloud.tencent.com/product/rtcube)、[Github Organizations](https://github.com/Tencent-RTC) 等

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="rtc_conference_uikit_video_float_view_width">100dp</dimen>
+    <dimen name="rtc_conference_uikit_video_float_view_height">180dp</dimen>
+</resources>
