@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="UserVolumePromptView">
+        <attr name="backgroundStateOpen" format="reference" />
+        <attr name="backgroundStateClose" format="reference" />
+        <attr name="boardLineWidth" format="dimension" />
+    </declare-styleable>
+</resources>

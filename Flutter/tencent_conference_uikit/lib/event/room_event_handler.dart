@@ -110,6 +110,34 @@ class RoomEventHandler extends TUIRoomObserver {
 
       if (userInfo.userId == _store.currentUser.userId.value) {
         _store.updateSelfRole(userInfo.userRole);
+        switch (userInfo.userRole) {
+          case TUIRole.roomOwner:
+            if (RoomStore.to.currentUser.userRole.value ==
+                TUIRole.generalUser) {
+              RoomEngineManager().getSeatApplicationList();
+            }
+            makeToast(msg: 'haveBecomeOwner'.roomTr);
+            break;
+          case TUIRole.administrator:
+            if (RoomStore.to.currentUser.userRole.value ==
+                TUIRole.generalUser) {
+              RoomEngineManager().getSeatApplicationList();
+            }
+            makeToast(msg: 'haveBecomeAdministrator'.roomTr);
+            break;
+          case TUIRole.generalUser:
+            if (RoomStore.to.currentUser.userRole.value ==
+                TUIRole.administrator) {
+              makeToast(msg: 'revokedYourAdministrator'.roomTr);
+            }
+            RoomStore.to.inviteSeatList.clear();
+            RoomStore.to.inviteSeatMap.clear();
+            break;
+          default:
+            break;
+        }
+        RoomStore.to.currentUser.userRole.value = userInfo.userRole;
+        RoomStore.to.updateItemTouchableState();
       }
     };
 
