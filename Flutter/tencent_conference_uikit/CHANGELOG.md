@@ -1,5 +1,15 @@
 ## Changelog
 
+### 2.8.3(2025-01-08)
+- Fixed the issue that when users mute local audio in the free speech mode in the room, it still occupies the audio uplink quota.
+- Upgraded rtc_room_engine dependencies.
+
+### 2.8.0(2024-12-23)
+- Support floating windows outside Android platform applications.
+
+### 2.7.2(2024-11-19)
+- Support in-app floating window function
+
 ### 2.7.0(2024-11-07)
 - Support flutter 3.24.
 - Fixed the bug that camera and microphone permissions cannot be applied in some cases.

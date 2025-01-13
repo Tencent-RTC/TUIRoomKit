@@ -11,7 +11,7 @@ class ExitWidget extends GetView<ExitController> {
   Widget _buildView() {
     return BottomSheetWidget(
       width: Get.width,
-      height: controller.isNeedTransferOwner()
+      height: controller.isRoomOwner()
           ? 219.0.scale375()
           : 169.0.scale375(),
       padding: const EdgeInsets.only(
@@ -34,7 +34,6 @@ class ExitWidget extends GetView<ExitController> {
               thickness: 1.0.scale375(),
               height: 0,
               color: RoomColors.dividerGrey),
-          if (!controller.isRoomOwner() || controller.isNeedTransferOwner())
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
@@ -49,7 +48,6 @@ class ExitWidget extends GetView<ExitController> {
                 ),
               ),
             ),
-          if (controller.isNeedTransferOwner())
             Divider(
                 thickness: 1.0.scale375(),
                 height: 0,

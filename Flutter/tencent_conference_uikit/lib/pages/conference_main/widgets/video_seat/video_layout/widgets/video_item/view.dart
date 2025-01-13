@@ -11,6 +11,7 @@ class VideoItemWidget extends StatefulWidget {
   final double? width;
   final double? height;
   final bool isScreenStream;
+  final double radius;
 
   const VideoItemWidget({
     Key? key,
@@ -18,6 +19,7 @@ class VideoItemWidget extends StatefulWidget {
     this.width,
     this.height,
     this.isScreenStream = false,
+    this.radius = 16,
   }) : super(key: key);
 
   @override
@@ -45,9 +47,8 @@ class _VideoItemState extends State<VideoItemWidget> {
       child: Container(
         width: widget.width,
         height: widget.height,
-        padding: const EdgeInsets.all(2.0),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(widget.radius),
           child: Stack(
             alignment: Alignment.center,
             fit: StackFit.expand,
@@ -59,7 +60,7 @@ class _VideoItemState extends State<VideoItemWidget> {
                       widget.userModel.userId.value, _nativeViewPtr,
                       isScreenStream: widget.isScreenStream);
                 },
-                borderRadius: 16,
+                borderRadius: widget.radius.toInt(),
               ),
               Obx(
                 () {

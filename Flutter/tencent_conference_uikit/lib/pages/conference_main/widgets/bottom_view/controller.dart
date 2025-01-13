@@ -6,6 +6,9 @@ import 'package:tencent_conference_uikit/common/index.dart';
 import 'package:tencent_conference_uikit/manager/rtc_engine_manager.dart';
 import 'package:tencent_conference_uikit/pages/conference_main/index.dart';
 import 'package:rtc_room_engine/api/room/tui_room_define.dart';
+import 'package:tencent_conference_uikit/pages/conference_main/widgets/float_window/index.dart';
+
+import '../../../../common/store/float_window_store.dart';
 
 class BottomViewController extends GetxController {
   BottomViewController();
@@ -230,6 +233,14 @@ class BottomViewController extends GetxController {
       conferenceMainController.cancelHideTimer();
     } else {
       conferenceMainController.resetHideTimer();
+    }
+  }
+
+  Future<void> enableFloatWindow() async {
+    Get.put<FloatWindowStore>(FloatWindowStore(), permanent: true);
+    bool success = await FloatWindowStore.to.showFloatWindow();
+    if (success) {
+      Get.back();
     }
   }
 }
