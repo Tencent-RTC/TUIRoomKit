@@ -1,4 +1,5 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:tencent_conference_uikit/common/index.dart';
 
 import 'rtc_conference_tuikit_method_channel.dart';
 
@@ -8,7 +9,8 @@ abstract class RtcConferenceTuikitPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static RtcConferenceTuikitPlatform _instance = MethodChannelRtcConferenceTuikit();
+  static RtcConferenceTuikitPlatform _instance =
+      MethodChannelRtcConferenceTuikit();
 
   /// The default instance of [RtcConferenceTuikitPlatform] to use.
   ///
@@ -29,5 +31,13 @@ abstract class RtcConferenceTuikitPlatform extends PlatformInterface {
 
   Future<void> stopForegroundService() async {
     await instance.stopForegroundService();
+  }
+
+  Future<int> enableFloatWindow(bool enable) async {
+    return await instance.enableFloatWindow(enable);
+  }
+
+  Future<void> updateFloatWindowUserModel(UserModel userModel) async {
+    await instance.updateFloatWindowUserModel(userModel);
   }
 }

@@ -14,24 +14,28 @@ class ExitController extends GetxController {
   final conferenceMainController = Get.find<ConferenceMainController>();
 
   void exitRoomAction() async {
-    if (isRoomOwner()) {
-      if (RoomStore.to.userInfoList.length > 2) {
-        showConferenceBottomSheet(const TransferHostWidget());
-      } else if (RoomStore.to.userInfoList.length == 2) {
-        var nextOwnerId = RoomStore.to.userInfoList
-            .firstWhere((element) =>
-                element.userId.value != RoomStore.to.currentUser.userId.value)
-            .userId
-            .value;
-        var result =
-            await _engineManager.changeUserRole(nextOwnerId, TUIRole.roomOwner);
-        if (result.code == TUIError.success) {
-          _exitRoom();
-        }
-      } else {
-        destroyRoomAction();
-      }
+    if (!isRoomOwner()) {
+      _exitRoom();
       return;
+    }
+
+    if(RoomStore.to.userInfoList.length > 2){
+      showConferenceBottomSheet(const TransferHostWidget());
+      return;
+    }
+
+   if (RoomStore.to.userInfoList.length == 2) {
+      var nextOwnerId = RoomStore.to.userInfoList
+          .firstWhere((element) =>
+              element.userId.value != RoomStore.to.currentUser.userId.value)
+          .userId
+          .value;
+      var result =
+          await _engineManager.changeUserRole(nextOwnerId, TUIRole.roomOwner);
+      if (result.code == TUIError.success) {
+        _exitRoom();
+        return;
+      }
     }
     _exitRoom();
   }
@@ -52,9 +56,5 @@ class ExitController extends GetxController {
 
   bool isRoomOwner() {
     return RoomStore.to.currentUser.userRole.value == TUIRole.roomOwner;
-  }
-
-  bool isNeedTransferOwner() {
-    return isRoomOwner() && RoomStore.to.userInfoList.length > 1;
   }
 }

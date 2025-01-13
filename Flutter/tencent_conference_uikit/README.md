@@ -49,8 +49,30 @@ _English | [简体中文](README.zh-CN.md)_
 </tr>
 </table>
 
-###  Activate the service
-Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/57508) to obtain your own `SDKAppID` and `SDKSecretKey`.
+## Active the service
+
+You can follow the steps below to activate the TRTC Conference product service and receive a free 14-day trial version.
+
+> **Note：**
+> 
+> If you wish to purchase the paid version, please refer to [TRTC Conference Monthly Packages](https://trtc.io/document/59409), follow the [Purchasing Guide](https://trtc.io/document/54634) to complete the purchase.
+> 
+
+1. Visit [TRTC Console > Applications](https://console.trtc.io/), select **Create application**.
+
+   ![](https://qcloudimg.tencent-cloud.cn/raw/b3210cf77e12641226cb1bccc78df1d3.png)
+
+2. In the Create application pop-up, select **Conference** and enter the application name, click **Create**.
+
+   ![](https://qcloudimg.tencent-cloud.cn/raw/a0b8f00ed1c7b03d84a2ba3120dd73ab.png)
+
+3. After completing the application creation, you will default entry to the application details page, select the **Free Trail** in the floating window, and click to** Get started for free**.
+
+   ![](https://qcloudimg.tencent-cloud.cn/raw/9e5c3ec74c3e77e8057f7850504a622c.png)
+
+4. After the activation is completed, you can view the edition information on the current page. The `SDKAppID` and `SDKSecretKey` here will be used in the integration guide.
+
+    ![](https://qcloudimg.tencent-cloud.cn/raw/0f6c1af2be80b2a6afebc4ac3e960ea6.png)
 
 ### Access and use
 
@@ -246,7 +268,7 @@ Please refer to the official documentation at [Integration (TUIRoomKit)](https:/
 ## Quick link
 
 - If you encounter difficulties, you can refer to [FAQs](https://trtc.io/document/57598), here are the most frequently encountered problems of developers, covering various platforms, I hope it can Help you solve problems quickly.
-- If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](../../Web/), [Android](../../Android/), [iOS](../../iOS/), [Electron](../../Electron/).
+- If you would like to see more official examples, you can refer to the example Demo of each platform: [Web](../../Web/), [Android](../../Android/), [iOS](../../iOS/), [Electron](../../Electron/), [Qt](../../Qt/).
 
 - If you would like to see some of our latest product features, you can check the [Update Log](https://pub.dev/packages/tencent_conference_uikit/changelog), here are the latest features of tencent_conference_uikit, as well as the historical version features iterate
 - For complete API documentation, see [API reference](https://trtc.io/document/57512): including TUIRoomKit (with UIKit), TUIRoomEngine (without UIKit), and events Callbacks, etc.

@@ -35,8 +35,30 @@ This document describes how to quickly run the TUIRoomKit demo project to make a
 
 ## Running the Demo
 
-### Step 1. Activate the service
- Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/57508) to obtain your own SDKAppID and SDKSecretKey.
+### Step 1. Active the service
+
+You can follow the steps below to activate the TRTC Conference product service and receive a free 14-day trial version.
+
+> **Note：**
+> 
+> If you wish to purchase the paid version, please refer to [TRTC Conference Monthly Packages](https://trtc.io/document/59409), follow the [Purchasing Guide](https://trtc.io/document/54634) to complete the purchase.
+> 
+
+1. Visit [TRTC Console > Applications](https://console.trtc.io/), select **Create application**.
+
+   ![](https://qcloudimg.tencent-cloud.cn/raw/b3210cf77e12641226cb1bccc78df1d3.png)
+
+2. In the Create application pop-up, select **Conference** and enter the application name, click **Create**.
+
+   ![](https://qcloudimg.tencent-cloud.cn/raw/a0b8f00ed1c7b03d84a2ba3120dd73ab.png)
+
+3. After completing the application creation, you will default entry to the application details page, select the **Free Trail** in the floating window, and click to **Get started for free**.
+
+   ![](https://qcloudimg.tencent-cloud.cn/raw/9e5c3ec74c3e77e8057f7850504a622c.png)
+
+4. After the activation is completed, you can view the edition information on the current page. The `SDKAppID` and `SDKSecretKey` here will be used in the integration guide.
+
+   ![](https://qcloudimg.tencent-cloud.cn/raw/0f6c1af2be80b2a6afebc4ac3e960ea6.png)
 
 ### Step 2. Configure the project
 
@@ -45,7 +67,7 @@ This document describes how to quickly run the TUIRoomKit demo project to make a
 <ul style="margin:0"><li/>SDKAPPID: `0` by default. Set it to the actual `SDKAppID`.
 <li/>SDKSECRETKEY: Left empty by default. Set it to the actual key.</ul
 
-![](../../Preview/test-user-sig-flutter.png)
+![](https://qcloudimg.tencent-cloud.cn/raw/db5b13a64c315bf933c69109355ec872.png)
 
 ### Step 3. Compile and run the application
 
