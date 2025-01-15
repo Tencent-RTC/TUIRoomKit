@@ -17,7 +17,7 @@ class ExitRoomViewModel {
         EngineManager.shared
     }
     var isRoomOwner: Bool {
-        engineManager.store.currentUser.userId == engineManager.store.roomInfo.ownerId
+        return engineManager.store.currentUser.userRole == .roomOwner
     }
     
     weak var viewResponder: ExitRoomViewModelResponder?
@@ -31,14 +31,15 @@ class ExitRoomViewModel {
     }
     
     func isAbleToTransferTheOwner() -> Bool {
-        return isRoomOwner && getFilterRoomOwnerNumber() > 0
+        return isRoomOwner && getFilterOwnerUserList().count > 0
     }
     
     func leaveRoomAction() {
         if isRoomOwner {
-            if getFilterRoomOwnerNumber() == 1, let userInfo = getNextRoomOwner() {
+            let filterOwnerList = getFilterOwnerUserList()
+            if filterOwnerList.count == 1, let userInfo = filterOwnerList.first {
                 appointMasterAndExitRoom(userId: userInfo.userId)
-            } else if getFilterRoomOwnerNumber() > 1 {
+            } else if filterOwnerList.count > 1 {
                 viewResponder?.dismissView()
                 RoomRouter.shared.presentPopUpViewController(viewType: .transferMasterViewType, height: 720.scale375Height())
             } else {
@@ -67,14 +68,8 @@ class ExitRoomViewModel {
         }
     }
     
-    private func getNextRoomOwner() -> UserEntity? {
-        let userInfoArray = engineManager.store.attendeeList.filter({ $0.userId != engineManager.store.roomInfo.ownerId })
-        return userInfoArray.first
-    }
-    
-    private func getFilterRoomOwnerNumber() -> Int {
-        let array = engineManager.store.attendeeList.filter({ $0.userId != engineManager.store.roomInfo.ownerId })
-        return array.count
+    private func getFilterOwnerUserList() -> [UserEntity] {
+        return engineManager.store.attendeeList.filter({ $0.userRole != .roomOwner })
     }
     
     private func appointMasterAndExitRoom(userId: String) {

@@ -26,7 +26,7 @@ class SelectMemberView: UIView {
     
     let backButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "room_back_black"), for: .normal)
+        button.setImage(UIImage(named: "room_back_black", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
         button.backgroundColor = .clear
         return button
     }()
@@ -85,6 +85,7 @@ class SelectMemberView: UIView {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.register(AvatarCell.self, forCellWithReuseIdentifier: AvatarCell.reuseIdentifier)
+        collectionView.backgroundColor = .clear
         return collectionView
     }()
     
@@ -93,7 +94,7 @@ class SelectMemberView: UIView {
         button.titleLabel?.font = UIFont(name: "PingFangSC-Regular", size: 14)
         button.setTitleColor(UIColor.tui_color(withHex: "#22262E"), for: .normal)
         button.setTitle(.selectedText, for: .normal)
-        let normalIcon = UIImage(named: "room_up_black_arrow")
+        let normalIcon = UIImage(named: "room_up_black_arrow", in:  tuiRoomKitBundle(), compatibleWith: nil)
         button.setImage(normalIcon, for: .normal)
         button.sizeToFit()
         button.isHidden = true
@@ -296,8 +297,8 @@ class ContactCell: UITableViewCell {
     static let reuseIdentifier = "ContactCell"
     let checkBox: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "room_check_mark_unselect"), for: .normal)
-        button.setImage(UIImage(named: "room_check_mark"), for: .selected)
+        button.setImage(UIImage(named: "room_check_mark_unselect", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
+        button.setImage(UIImage(named: "room_check_mark", in: tuiRoomKitBundle(), compatibleWith: nil), for: .selected)
         button.isUserInteractionEnabled = false
         return button
     }()
@@ -355,7 +356,7 @@ class ContactCell: UITableViewCell {
     }
     
     func setupViewState(with info: User, isSelected: Bool, isDisaled: Bool) {
-        let placeholder = UIImage(named: "room_default_avatar_rect")
+        let placeholder = UIImage(named: "room_default_avatar_rect", in: tuiRoomKitBundle(), compatibleWith: nil)
         if let url = URL(string: info.avatarUrl) {
             avatarImageView.sd_setImage(with: url, placeholderImage: placeholder)
         } else {
@@ -410,7 +411,7 @@ class AvatarCell: UICollectionViewCell {
     }
     
     func setupViewState(with info: User) {
-        let placeholder = UIImage(named: "room_default_avatar_rect")
+        let placeholder = UIImage(named: "room_default_avatar_rect", in: tuiRoomKitBundle(), compatibleWith: nil)
         if let url = URL(string: info.avatarUrl) {
             imageView.sd_setImage(with: url, placeholderImage: placeholder)
         } else {

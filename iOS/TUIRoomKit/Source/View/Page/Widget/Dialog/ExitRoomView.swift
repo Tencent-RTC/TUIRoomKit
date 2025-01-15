@@ -105,7 +105,7 @@ class ExitRoomView: UIView {
     func activateConstraints() {
         let titleLabelHeight = 67.scale375Height()
         let leaveRoomButtonHeight = viewModel.isShownLeaveRoomButton() ? 57.scale375Height() : 0
-        let destroyRoomButtonHeight = currentUser.userId == roomInfo.ownerId ? 57.scale375Height() : 0
+        let destroyRoomButtonHeight = viewModel.isShownDestroyRoomButton() ? 57.scale375Height() : 0
         let space = 20.scale375Height()
         let contentViewHeight = titleLabelHeight + leaveRoomButtonHeight + destroyRoomButtonHeight + space
         panelControl.snp.makeConstraints { make in
