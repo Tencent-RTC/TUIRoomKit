@@ -53,7 +53,7 @@ class SelectMemberProvider: NSObject {
         V2TIMManager.sharedInstance()?.getFriendList { [weak self] list in
             guard let self = self else { return }
             let users = list?.map({ info in
-                return User(userId: info.userID, userName: info.userFullInfo.nickName, avatarUrl: info.userFullInfo.faceURL ?? "")
+                return User(userId: info.userID ?? "", userName: info.userFullInfo.nickName ?? "", avatarUrl: info.userFullInfo.faceURL ?? "")
             })
             self.setMembers(users ?? [])
         } fail: { _, _ in
