@@ -35,24 +35,30 @@ class PageIndicatorWidget extends StatelessWidget {
       alignment: align == IndicatorAlign.top
           ? Alignment.topCenter
           : Alignment.bottomCenter,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(pageCount, (index) {
-          return Container(
-            width: indicatorSize,
-            height: indicatorSize,
-            margin: indicatorPadding,
-            decoration: BoxDecoration(
-              shape: shape == IndicatorShape.circle
-                  ? BoxShape.circle
-                  : BoxShape.rectangle,
-              borderRadius: shape == IndicatorShape.roundedRectangle
-                  ? BorderRadius.circular(4)
-                  : null,
-              color: index == currentIndex ? activeColor : color,
-            ),
-          );
-        }).toList(),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            pageCount,
+            (index) {
+              return Container(
+                width: indicatorSize,
+                height: indicatorSize,
+                margin: indicatorPadding,
+                decoration: BoxDecoration(
+                  shape: shape == IndicatorShape.circle
+                      ? BoxShape.circle
+                      : BoxShape.rectangle,
+                  borderRadius: shape == IndicatorShape.roundedRectangle
+                      ? BorderRadius.circular(4)
+                      : null,
+                  color: index == currentIndex ? activeColor : color,
+                ),
+              );
+            },
+          ).toList(),
+        ),
       ),
     );
   }

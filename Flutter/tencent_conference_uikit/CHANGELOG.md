@@ -1,5 +1,9 @@
 ## Changelog
 
+### 2.8.4(2025-01-16)
+- Fixed the issue where the member count is displayed abnormally when there are a large number of user in the conference.
+- Fixed the issue that when there are a large number of user in the conference, the user on the seat cannot be seen after entering the room.
+
 ### 2.8.3(2025-01-08)
 - Fixed the issue that when users mute local audio in the free speech mode in the room, it still occupies the audio uplink quota.
 - Upgraded rtc_room_engine dependencies.

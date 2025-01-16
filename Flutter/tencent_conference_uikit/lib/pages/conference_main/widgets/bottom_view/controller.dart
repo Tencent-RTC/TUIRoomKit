@@ -21,9 +21,12 @@ class BottomViewController extends GetxController {
   final isRequestingTakeSeat = false.obs;
   final isRoomNeedTakeSeat = false.obs;
 
+  final raiseHandApplicationCount = ''.obs;
+
   late RoomEngineManager _engineManager;
   late RoomStore _store;
   late String _takeSeatRequestId;
+  late Worker _worker;
 
   final conferenceMainController = Get.find<ConferenceMainController>();
 
@@ -35,6 +38,20 @@ class BottomViewController extends GetxController {
     _takeSeatRequestId = '';
     isRoomNeedTakeSeat.value = _store.roomInfo.isSeatEnabled == true &&
         _store.roomInfo.seatMode == TUISeatMode.applyToTake;
+    _worker = ever(RoomStore.to.inviteSeatList, (_) {
+      if (RoomStore.to.inviteSeatList.isEmpty) {
+        raiseHandApplicationCount.value = '';
+        return;
+      }
+      raiseHandApplicationCount.value =
+          RoomStore.to.inviteSeatList.length.toString();
+    });
+  }
+
+  @override
+  void onClose() {
+    _worker.dispose();
+    super.onClose();
   }
 
   void muteAudioAction() {

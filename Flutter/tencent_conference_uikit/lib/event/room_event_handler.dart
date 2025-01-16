@@ -195,5 +195,8 @@ class RoomEventHandler extends TUIRoomObserver {
     super.onKickedOffSeat = (int seatIndex, TUIUserInfo operateUser) {
       makeToast(msg: 'kickedOffSeat'.roomTr);
     };
+    super.onRoomUserCountChanged = (String roomId, int userCount) {
+      _store.roomUserCount.value = userCount;
+    };
   }
 }
