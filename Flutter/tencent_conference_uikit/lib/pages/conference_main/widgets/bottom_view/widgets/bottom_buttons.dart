@@ -46,7 +46,7 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
           onPressed: () {
             showConferenceBottomSheet(const UserListWidget());
           },
-          text: '${'member'.roomTr}(${RoomStore.to.userInfoList.length})',
+          text: '${'member'.roomTr}(${RoomStore.to.roomUserCount.value})',
         ),
       ),
       Obx(
@@ -141,6 +141,7 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
               showConferenceBottomSheet(const RaiseHandListWidget());
             },
             text: 'stageManagement'.roomTr,
+            topRightPromptWidget: _buildRaiseHandsApplicationCount(),
           ),
         ),
       ),
@@ -250,5 +251,35 @@ class BottomButtonsWidget extends GetView<BottomViewController> {
         .sublist(5)
         .expand((widget) => [widget, SizedBox(width: 10.0.scale375())])
         .toList();
+  }
+
+  Widget _buildRaiseHandsApplicationCount() {
+    return Obx(
+      () => Visibility(
+        visible: controller.raiseHandApplicationCount.value.isNotEmpty,
+        child: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+          decoration: BoxDecoration(
+            color: RoomColors.btnRed,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          constraints: const BoxConstraints(
+            minWidth: 20,
+            minHeight: 20,
+          ),
+          child: Obx(() {
+            return Text(
+              controller.raiseHandApplicationCount.value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          }),
+        ),
+      ),
+    );
   }
 }

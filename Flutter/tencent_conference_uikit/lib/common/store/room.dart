@@ -17,6 +17,7 @@ class RoomStore {
   AudioModel audioSetting = AudioModel();
   int timeStampOnEnterRoom = 0;
   bool isEnteredRoom = false;
+  final roomUserCount = 0.obs;
 
   static const _seatIndex = -1;
   static const _reqTimeout = 0;
@@ -39,6 +40,7 @@ class RoomStore {
     isEnteredRoom = false;
     isMicItemTouchable = true.obs;
     isCameraItemTouchable = true.obs;
+    roomUserCount.value = 0;
   }
 
   UserModel get screenShareUser => _screenShareUser;

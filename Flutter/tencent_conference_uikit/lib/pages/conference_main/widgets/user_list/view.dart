@@ -25,7 +25,7 @@ class UserListWidget extends GetView<UserListController> {
               height: 24.0.scale375Height(),
               width: Get.width - 32.0.scale375(),
               child: Text(
-                  '${'member'.roomTr}（${RoomStore.to.userInfoList.length}）',
+                  '${'member'.roomTr}（${RoomStore.to.roomUserCount.value}）',
                   textAlign: TextAlign.left,
                   style: RoomTheme.defaultTheme.textTheme.bodyLarge),
             ),

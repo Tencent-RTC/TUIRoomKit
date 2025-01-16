@@ -16,9 +16,11 @@ class UserInfoWidget extends StatelessWidget {
         children: [
           SizedBox(
             height: 40.0.scale375(),
+            width: 40.0.scale375(),
             child: ClipOval(
               child: Image.network(
                 userModel.userAvatarURL.value,
+                fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Image.asset(
                     AssetsImages.roomDefaultAvatar,
@@ -45,6 +47,8 @@ class UserInfoWidget extends StatelessWidget {
                             : userModel.userName.value,
                     style: RoomTheme.defaultTheme.textTheme.bodyLarge,
                     textAlign: TextAlign.left,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   if (userModel.userRole.value == TUIRole.roomOwner) ...[
                     SizedBox(height: 2.0.scale375()),

@@ -15,6 +15,7 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
   final double width;
   final double height;
   final double opacity;
+  final Widget? topRightPromptWidget;
 
   const BottomButtonItemWidget({
     Key? key,
@@ -28,6 +29,7 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
     this.width = 52,
     this.height = 52,
     this.opacity = 1,
+    this.topRightPromptWidget,
   }) : super(key: key);
 
   @override
@@ -49,29 +51,41 @@ class BottomButtonItemWidget extends GetView<BottomViewController> {
           ),
           width: width.scale375(),
           height: height.scale375(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              SizedBox(
-                height: 24,
-                width: 24,
-                child: Obx(() => isButtonSelected.value
-                    ? selectedImage ?? selectedWidget ?? image
-                    : image),
-              ),
-              const SizedBox(height: 5),
-              if (text.isNotEmpty)
-                SizedBox(
-                  child: Obx(
-                    () => Text(
-                      isButtonSelected.value ? selectedText ?? text : text,
-                      textAlign: TextAlign.center,
-                      style: RoomTheme.defaultTheme.textTheme.labelSmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: Obx(() => isButtonSelected.value
+                        ? selectedImage ?? selectedWidget ?? image
+                        : image),
                   ),
-                ),
+                  const SizedBox(height: 5),
+                  if (text.isNotEmpty)
+                    SizedBox(
+                      child: Obx(
+                        () => Text(
+                          isButtonSelected.value ? selectedText ?? text : text,
+                          textAlign: TextAlign.center,
+                          style: RoomTheme.defaultTheme.textTheme.labelSmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              topRightPromptWidget != null
+                  ? Positioned(
+                      right: 2,
+                      top: 2,
+                      child: topRightPromptWidget!,
+                    )
+                  : const SizedBox(),
             ],
           ),
         ),

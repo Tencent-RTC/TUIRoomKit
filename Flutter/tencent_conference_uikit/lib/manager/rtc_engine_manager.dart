@@ -48,23 +48,34 @@ class RoomEngineManager {
       if (result.data?.nextSequence != 0) {
         _nextSequence = result.data!.nextSequence;
         _getUserList();
-      } else if (_isApplySpeakRoom()) {
-        await _getSeatedUserList();
       }
     }
   }
 
   Future<void> _getSeatedUserList() async {
+    if (!_isApplySpeakRoom()) {
+      return;
+    }
     var getSeatResult = await _roomEngine.getSeatList();
     if (getSeatResult.code != TUIError.success) {
       return;
     }
     for (var element in getSeatResult.data!) {
-      RoomStore.to.updateUserSeatedState(element.userId, true);
+      if (element.userId.isEmpty) {
+        continue;
+      }
+      TUIUserInfo userInfo = TUIUserInfo(
+          userId: element.userId,
+          userName: element.userName ?? '',
+          avatarUrl: element.avatarUrl ?? '',
+          userRole: TUIRole.generalUser);
       var getUserResult = await _roomEngine.getUserInfo(element.userId);
       if (getUserResult.code == TUIError.success) {
+        userInfo = getUserResult.data ?? userInfo;
         RoomStore.to.addUser(getUserResult.data!, RoomStore.to.seatedUserList);
       }
+      RoomStore.to.addUser(userInfo, RoomStore.to.userInfoList);
+      RoomStore.to.updateUserSeatedState(element.userId, true);
     }
   }
 
@@ -80,8 +91,10 @@ class RoomEngineManager {
       RoomStore.to.roomInfo = result.data!;
       RoomStore.to.isEnteredRoom = true;
       RoomStore.to.timeStampOnEnterRoom = DateTime.now().millisecondsSinceEpoch;
+      RoomStore.to.roomUserCount.value = result.data!.memberCount;
       await RoomStore.to.initialCurrentUser();
       await _getUserList();
+      await _getSeatedUserList();
       bool isTakeSeatSuccess = await _autoTakeSeatForOwner();
       if (!isTakeSeatSuccess) {
         result.code = TUIError.errUserNotInSeat;
