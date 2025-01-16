@@ -14,7 +14,7 @@ class InviteToJoinRoomManager {
         let inviteJoinModel = InviteJoinModel(message: message, inviter: inviter)
         pushSelectGroupMemberViewController(groupId: message.groupId) { responseData in
             guard let modelList =
-                    responseData[TUICore_TUIGroupObjectFactory_SelectGroupMemberVC_ResultUserList] as? [TUIUserModel]
+                    responseData[TUICore_TUIContactObjectFactory_SelectGroupMemberVC_ResultUserList] as? [TUIUserModel]
             else { return }
             var invitedList: [String] = []
             for userModel in modelList {
@@ -25,15 +25,15 @@ class InviteToJoinRoomManager {
     }
     
     class func pushSelectGroupMemberViewController(groupId: String, callback: @escaping TUIValueResultCallback) {
-        let param = [TUICore_TUIGroupObjectFactory_SelectGroupMemberVC_GroupID: groupId]
+        let param = [TUICore_TUIContactObjectFactory_SelectGroupMemberVC_GroupID: groupId]
         if let navigateController = RoomMessageManager.shared.navigateController {
-            navigateController.push(TUICore_TUIGroupObjectFactory_SelectGroupMemberVC_Classic, param: param) { responseData in
+            navigateController.push(TUICore_TUIContactObjectFactory_SelectGroupMemberVC_Classic, param: param) { responseData in
                 callback(responseData)
             }
         } else {
             let nav = UINavigationController()
             let currentViewController = getCurrentWindowViewController()
-            currentViewController?.present(TUICore_TUIGroupObjectFactory_SelectGroupMemberVC_Classic,
+            currentViewController?.present(TUICore_TUIContactObjectFactory_SelectGroupMemberVC_Classic,
                                            param: param, embbedIn: nav,
                                            forResult: { responseData in
                 callback(responseData)
