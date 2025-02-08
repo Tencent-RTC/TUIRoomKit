@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/tui-roomkit-app",
-  "version": "2.8.2",
+  "version": "2.8.3",
   "description": "",
   "main": "uni.promisify.adaptor.js",
   "scripts": {

@@ -225,7 +225,7 @@ export class RoomActionManager {
 
   private async getUserList() {
     const { roomEngine } = this.service;
-    let nextSequence = 0;
+    let nextSequence = '';
     try {
       do {
         const result = (await roomEngine.instance?.getUserList({
@@ -233,7 +233,7 @@ export class RoomActionManager {
         })) as any;
         this.service.roomStore.updateUserList(result.userInfoList);
         nextSequence = result.nextSequence;
-      } while (nextSequence !== 0);
+      } while (nextSequence !== '0');
     } catch (error: any) {
       logger.error('TUIRoomEngine.getUserList', error.code, error.message);
     }
