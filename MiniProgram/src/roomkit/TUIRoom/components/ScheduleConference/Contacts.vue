@@ -309,25 +309,25 @@ watch(
         min-width: 10px;
         margin-right: 10px;
         margin-left: auto;
-        color: #6b758a;
+        color: var(--uikit-color-gray-5);
         cursor: pointer;
       }
     }
 
     &-item:hover {
-      background-color: #ecf5ff;
+      background-color: var(--list-color-hover);
     }
   }
 
   .contact {
     width: 50%;
     padding-right: 1rem;
-    border-right: 1px solid #e5e5e5;
+    border-right: 1px solid var(--stroke-color-module);
 
     .contact-search {
       &-input.focus {
         .search-icon {
-          color: var(--active-color-1);
+          color: var(--text-color-link);
         }
       }
     }
@@ -343,6 +343,17 @@ watch(
         font-size: 12px;
         text-align: center;
       }
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      background-color: var(--stroke-color-secondary);
     }
   }
 
@@ -397,7 +408,7 @@ watch(
       &-item {
         height: 46px;
         line-height: 46px;
-        border-bottom: 1px solid rgba(221, 226, 235, 0.3);
+        border-bottom: 1px solid var(--stroke-color-primary);
       }
     }
   }
@@ -413,7 +424,7 @@ watch(
   .chosen-member {
     font-size: 14px;
     font-weight: 400;
-    color: #22262e;
+    color: var(--text-color-secondary);
   }
 
   .form-attendees:hover {

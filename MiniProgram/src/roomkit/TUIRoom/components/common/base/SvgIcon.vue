@@ -108,8 +108,8 @@ onMounted(() => {
 });
 
 const themeColorMap: Record<string, any> = {
-  white: { baseColor: '#4F586B', activeColor: '#1C66E5' },
-  black: { baseColor: '#D5E0F2', activeColor: '#4791FF' },
+  light: { baseColor: '#4F586B', activeColor: '#1C66E5' },
+  dark: { baseColor: '#D5E0F2', activeColor: '#4791FF' },
 };
 
 watch(

@@ -86,7 +86,7 @@ const handleEdit = () => emit('edit');
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background-color: #f8f9fb;
+  background-color: var(--bg-color-topbar);
 
   .container-header {
     display: flex;
@@ -95,9 +95,9 @@ const handleEdit = () => emit('edit');
     padding: 5%;
     font-size: 16px;
     font-weight: 500;
-    color: #2b2e38;
     text-align: center;
-    background-color: #fff;
+    color: var(--text-color-primary);
+    background-color: var(--bg-color-topbar);
 
     .container-header-back {
       flex: 1;
@@ -112,8 +112,8 @@ const handleEdit = () => emit('edit');
 
     .container-header-edit {
       flex: 1;
-      color: #1c66e5;
       text-align: right;
+      color: var(--text-color-link);
     }
   }
 

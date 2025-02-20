@@ -143,7 +143,7 @@ watch(
   user-select: none;
 
   .invite-member-title {
-    color: #4f586b;
+    color: var(--text-color-primary);
   }
 
   .invite-member-item {
@@ -151,10 +151,10 @@ watch(
     justify-content: space-between;
     padding: 10px 16px;
     margin-top: 8px;
-    color: #0f1014;
-    background: #f9fafc;
-    border: 1px solid #e4e8ee;
     border-radius: 8px;
+    background-color: var(--bg-color-input);
+    color: var(--text-color-primary);
+    border: 1px solid var(--stroke-color-module);
 
     .invite-member-content {
       max-width: 400px;
@@ -167,6 +167,7 @@ watch(
       width: 20px;
       height: 20px;
       cursor: pointer;
+      color: var(--text-color-link);
     }
   }
 }

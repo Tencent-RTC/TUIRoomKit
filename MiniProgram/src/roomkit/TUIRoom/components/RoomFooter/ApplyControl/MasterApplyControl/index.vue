@@ -116,15 +116,15 @@ const {
             overflow: hidden;
             font-size: 16px;
             font-weight: 500;
-            color: var(--font-color-1);
             text-overflow: ellipsis;
             white-space: nowrap;
+            color: var(--text-color-primary);
           }
 
           .apply-tip {
             font-size: 14px;
             font-weight: 400;
-            color: var(--font-color-8);
+            color: var(--text-color-secondary);
           }
         }
       }
@@ -140,15 +140,15 @@ const {
           width: 48px;
           height: 28px;
           font-weight: 400;
-          color: var(--font-color-1);
-          background-color: var(--background-color-3);
           border-radius: 6px;
+          background-color: var(--button-color-secondary-default);
+          color: var(--text-color-primary);
         }
 
         .agree-button {
           margin-left: 8px;
-          color: var(--white-color);
-          background-color: var(--active-color-1);
+          background-color: var(--button-color-primary-default);
+          color: var(--text-color-button);
         }
       }
 
@@ -159,7 +159,7 @@ const {
         width: 85%;
         height: 1px;
         content: '';
-        background-color: var(--stroke-color-2);
+        background-color: var(--stroke-color-module);
       }
     }
   }
@@ -185,16 +185,16 @@ const {
       justify-content: center;
       width: 167px;
       height: 40px;
-      color: var(--font-color-1);
       cursor: pointer;
-      background-color: var(--background-color-3);
       border-radius: 8px;
+      background-color: var(--button-color-secondary-default);
+      color: var(--text-color-primary);
     }
 
     .action-button.agree {
       margin-left: 10px;
-      color: var(--white-color);
-      background-color: var(--active-color-1);
+      background-color: var(--button-color-primary-default);
+      color: var(--text-color-button);
     }
 
     .action-button.disabled {

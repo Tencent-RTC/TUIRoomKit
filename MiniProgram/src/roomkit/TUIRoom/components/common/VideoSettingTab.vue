@@ -7,7 +7,7 @@
   *
 -->
 <template>
-  <div :class="['video-tab', themeClass]">
+  <div class="video-tab">
     <div class="item-setting">
       <span class="title">{{ t('Camera') }}</span>
       <device-select device-type="camera" />
@@ -56,16 +56,12 @@ interface Props {
   withPreview?: boolean;
   withMore?: boolean;
   withMirror?: boolean;
-  theme?: 'white' | 'black';
+  theme?: 'light' | 'dark';
 }
 const props = defineProps<Props>();
 
 const basicStore = useBasicStore();
 const { isLocalStreamMirror } = storeToRefs(basicStore);
-
-const themeClass = computed(() =>
-  props.theme ? `tui-theme-${props.theme}` : ''
-);
 
 watch(isLocalStreamMirror, async (val: boolean) => {
   const trtcCloud = roomEngine.instance?.getTRTCCloud();
@@ -130,7 +126,7 @@ if (props.withPreview) {
     font-size: 14px;
     font-weight: 400;
     line-height: 22px;
-    color: var(--font-color-4);
+    color: var(--text-color-secondary);
   }
 
   .video-preview-container {
@@ -139,7 +135,7 @@ if (props.withPreview) {
     height: 0;
     padding-top: calc(100% * 9 / 16);
     overflow: hidden;
-    background-color: #000;
+    background-color: var(--uikit-color-black-1);
     border-radius: 8px;
 
     .video-preview {
@@ -160,14 +156,14 @@ if (props.withPreview) {
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
-    color: var(--font-color-4);
+    color: var(--text-color-secondary);
   }
 
   .item {
     width: 100%;
     height: 20px;
-    color: var(--font-color-3);
     cursor: pointer;
+    color: var(--text-color-secondary);
   }
 }
 </style>

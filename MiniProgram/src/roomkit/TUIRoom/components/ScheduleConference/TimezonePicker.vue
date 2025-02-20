@@ -2,7 +2,6 @@
   <div class="container">
     <TuiSelect
       v-model="selectedTime"
-      theme="white"
       :teleported="false"
       :custom-select-content-style="{ 'font-weight': 400 }"
       :value="selectedTime"
@@ -11,7 +10,6 @@
       <TuiOption
         v-for="time in timeOptions"
         :key="time.value"
-        theme="white"
         :value="time.value"
         :label="time.label"
         :custom-option-content-style="{ 'font-weight': 400 }"

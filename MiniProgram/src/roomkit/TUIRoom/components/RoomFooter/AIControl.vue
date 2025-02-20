@@ -54,6 +54,11 @@ function toggleToolBox() {
   showToolBox.value = !showToolBox.value;
 }
 
+function handleExperienceAsr() {
+  basicStore.setIsExperiencedAI(true);
+  roomService.trackingManager.sendMessage('experience-room-ai');
+}
+
 const toggleAITranscription = () => {
   if (
     basicStore.setSidebarOpenStatus &&
@@ -63,6 +68,7 @@ const toggleAITranscription = () => {
     basicStore.setSidebarName('');
     return;
   }
+  handleExperienceAsr();
   basicStore.setSidebarOpenStatus(true);
   basicStore.setSidebarName('aiTranscription');
   showToolBox.value = false;
@@ -71,6 +77,7 @@ const toggleAITranscription = () => {
 const openAISubtitles = () => {
   showSubtitles.value = !showSubtitles.value;
   showToolBox.value = false;
+  handleExperienceAsr();
   toggleOverlayVisibility(OverlayMap.AISubtitlesOverlay, showSubtitles.value);
 };
 </script>
@@ -84,9 +91,9 @@ const openAISubtitles = () => {
   align-items: center;
   justify-content: center;
   padding: 5px 0;
-  background-color: var(--background-color-2);
   border-radius: 15px;
-  box-shadow: 0 -8px 30px var(--footer-shadow-color);
+  background-color: var(--bg-color-dialog);
+  box-shadow: 0 -8px 30p var(--uikit-color-black-8);
 
   .tool-box-item {
     display: flex;
@@ -104,15 +111,8 @@ const openAISubtitles = () => {
   }
 
   .tool-box-item:hover {
-    background: var(--tool-box-hover);
+    border-radius: 8px;
+    background-color: var(--list-color-hover);
   }
-}
-
-.tui-theme-black .tool-box {
-  --tool-box-hover: rgba(46, 50, 61, 0.7);
-}
-
-.tui-theme-white .tool-box {
-  --tool-box-hover: rgba(79, 88, 107, 0.05);
 }
 </style>

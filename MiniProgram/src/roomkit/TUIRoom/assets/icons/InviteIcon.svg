@@ -14,6 +14,6 @@
     fill-rule="evenodd"
     clip-rule="evenodd"
     d="M18.65 10.15V7.5H20.35V10.15H23V11.85H20.35V14.5H18.65V11.85H16V10.15H18.65Z"
-    style="fill: var(--active-color-2); fill-opacity: 1"
+    fill="currentColor"
   />
 </svg>
