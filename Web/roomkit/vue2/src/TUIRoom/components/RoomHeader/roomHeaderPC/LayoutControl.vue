@@ -135,19 +135,6 @@ function handleClickOutSide() {
 </script>
 
 <style lang="scss" scoped>
-.tui-theme-black .layout-container {
-  --background-color: var(--background-color-2);
-  --box-shadow: 0px 0px 40px rgba(23, 25, 31, 0.6),
-    0px 0px 12px rgba(23, 25, 31, 0.4);
-  --block-background-color: var(--background-color-3);
-}
-
-.tui-theme-white .layout-container {
-  --background-color: var(--background-color-1);
-  --box-shadow: 0px 3px 8px #e9f0fb;
-  --block-background-color: #e4eaf7;
-}
-
 .layout-container {
   position: relative;
 
@@ -157,9 +144,11 @@ function handleClickOutSide() {
     left: 0;
     display: flex;
     padding: 16px 16px 6px;
-    background-color: var(--background-color);
     border-radius: 8px;
-    box-shadow: var(--box-shadow);
+    background-color: var(--bg-color-dialog);
+    box-shadow:
+      0 2px 6px var(--uikit-color-black-8),
+      0 8px 18px var(--uikit-color-black-8);
 
     .layout-item {
       position: relative;
@@ -180,7 +169,7 @@ function handleClickOutSide() {
       &:hover,
       &.checked {
         .layout-block-container {
-          border: 2px solid var(--active-color-1);
+          border: 2px solid var(--text-color-link);
         }
       }
 
@@ -191,14 +180,14 @@ function handleClickOutSide() {
         font-size: 12px;
         font-weight: 400;
         line-height: 24px;
-        color: var(--font-color-1);
         text-align: center;
+        color: var(--text-color-primary);
       }
 
       &.checked {
         .layout-title {
           font-weight: 500;
-          color: var(--active-color-1);
+          color: var(--text-color-link);
         }
       }
     }
@@ -212,7 +201,7 @@ function handleClickOutSide() {
         .layout-block {
           width: 38px;
           height: 24px;
-          background-color: var(--block-background-color);
+          background-color: var(--tab-color-option);
 
           &:nth-child(1) {
             border-top-left-radius: 4px;
@@ -241,9 +230,9 @@ function handleClickOutSide() {
         .left-container {
           width: 78px;
           height: 100%;
-          background-color: var(--block-background-color);
           border-top-left-radius: 4px;
           border-bottom-left-radius: 4px;
+          background-color: var(--tab-color-option);
         }
 
         .right-container {
@@ -256,7 +245,7 @@ function handleClickOutSide() {
           > div {
             width: 38px;
             height: 24px;
-            background-color: var(--block-background-color);
+            background-color: var(--tab-color-option);
 
             &:nth-child(1) {
               border-top-right-radius: 4px;
@@ -286,7 +275,7 @@ function handleClickOutSide() {
           > div {
             width: 38px;
             height: 24px;
-            background-color: var(--block-background-color);
+            background-color: var(--tab-color-option);
 
             &:nth-child(1) {
               border-top-left-radius: 4px;
@@ -301,9 +290,9 @@ function handleClickOutSide() {
         .bottom-container {
           width: 118px;
           height: 50px;
-          background-color: var(--block-background-color);
           border-bottom-right-radius: 4px;
           border-bottom-left-radius: 4px;
+          background-color: var(--tab-color-option);
         }
       }
     }

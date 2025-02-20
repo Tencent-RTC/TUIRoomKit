@@ -82,10 +82,10 @@ onUnmounted(() => {
   width: 90%;
   height: 17vh;
   padding: 10px;
-  background: var(--log-out-cancel);
   border-radius: 13px;
   animation-name: popup;
   animation-duration: 200ms;
+  background-color: var(--bg-color-operate);
 }
 
 @keyframes popup {
@@ -113,10 +113,9 @@ onUnmounted(() => {
   font-style: normal;
   font-weight: 400;
   line-height: 24px;
-  color: var(--mute-button-color-h5);
   text-align: center;
-  background: var(--close-cancel-h5);
-  border: 1px solid var(--close-cancel-h5);
   border-radius: 8px;
+  color: var(--text-color-primary);
+  background-color: var(--button-color-secondary-default);
 }
 </style>

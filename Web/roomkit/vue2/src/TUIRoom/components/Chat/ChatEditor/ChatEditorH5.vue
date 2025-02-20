@@ -51,12 +51,11 @@ const {
     font-style: normal;
     font-weight: 450;
     line-height: 4vh;
-    color: #676c80;
-    caret-color: var(--caret-color);
     resize: none;
-    background: var(--chat-editor-input-color-h5);
     border: none;
     border-radius: 8px;
+    background-color: var(--bg-color-input);
+    color: var(--text-color-secondary);
 
     .chat-emoji {
       display: flex;
@@ -74,12 +73,11 @@ const {
       font-style: normal;
       font-weight: 450;
       line-height: 4vh;
-      color: #676c80;
-      caret-color: var(--caret-color);
       resize: none;
-      background: var(--chat-editor-input-color-h5);
       border: none;
       border-radius: 8px;
+      background-color: var(--bg-color-input);
+      color: var(--text-color-secondary);
 
       ::placeholder {
         font-family: 'PingFang SC';
@@ -87,7 +85,7 @@ const {
         font-style: normal;
         font-weight: 400;
         line-height: 18px;
-        color: #676c80;
+        color: var(--text-color-secondary);
       }
 
       &:focus-visible {

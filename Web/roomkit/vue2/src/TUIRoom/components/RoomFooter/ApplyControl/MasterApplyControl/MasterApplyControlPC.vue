@@ -98,14 +98,6 @@ const {
 
 .cancel-button {
   margin-left: 10px;
-  color: #4f586b;
-  background-color: #f0f3fa;
-  border: 1px solid #f0f3fa;
-
-  &:hover {
-    background-color: #f0f3fa;
-    border: 1px solid #f0f3fa;
-  }
 }
 
 .apply-list {
@@ -121,7 +113,7 @@ const {
     display: flex;
     justify-content: space-between;
     padding-bottom: 10px;
-    border-bottom: 1px solid #f0f3fa;
+    border-bottom: 1px solid var(--stroke-color-module);
 
     .apply-list-name,
     .apply-list-operate {
@@ -130,7 +122,7 @@ const {
       font-style: normal;
       font-weight: 500;
       line-height: 22px;
-      color: #4f586b;
+      color: var(--text-color-secondary);
     }
   }
 
@@ -140,7 +132,7 @@ const {
     justify-content: space-between;
     height: 48px;
     margin-top: 8px;
-    border-bottom: 1px solid #f0f3fa;
+    border-bottom: 1px solid var(--stroke-color-module);
 
     .user-info {
       display: flex;
@@ -161,9 +153,9 @@ const {
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
-        color: #4f586b;
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: var(--text-color-secondary);
       }
     }
 
@@ -178,9 +170,9 @@ const {
 
       .reject {
         margin-left: 8px;
-        color: #4f586b;
-        background-color: #f0f3fa;
-        border: 1px solid #f0f3fa;
+        color: var(--text-color-secondary);
+        border: 1px solid var(--button-color-secondary-default);
+        background: var(--button-color-secondary-default);
       }
     }
   }
@@ -199,7 +191,7 @@ const {
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
-    color: #8f9ab2;
+    color: var(--uikit-color-gray-light-5);
   }
 }
 </style>

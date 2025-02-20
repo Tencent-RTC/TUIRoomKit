@@ -6,12 +6,15 @@
 import { ConferenceMainView, conference, RoomEvent } from '@tencentcloud/roomkit-web-vue2.7';
 import i18n from '../locales/index';
 import { getLanguage, getTheme } from  '../utils/utils';
+import { useUIKit } from '@tencentcloud/uikit-base-component-vue2';
+
 let isExpectedJump = false;
 
 export default {
   name: 'Room',
   components: { ConferenceMainView },
   beforeRouteLeave(to, from, next) {
+    this.theme = useUIKit();
     if (!isExpectedJump) {
       const message = this.isMaster
         ? this.$t('This action causes the room to be disbanded, does it continue?')
@@ -35,15 +38,16 @@ export default {
     return {
       roomInfo: null,
       userInfo: null,
+      theme: '',
       roomId: 0,
       isMaster: false,
     };
   },
   async mounted() {
+    conference.setLanguage(getLanguage());
+    !this.theme.value && conference.setTheme(getTheme());
     this.roomInfo = sessionStorage.getItem('tuiRoom-roomInfo');
     this.userInfo = sessionStorage.getItem('tuiRoom-userInfo');
-    conference.setLanguage(getLanguage());
-    conference.setTheme(getTheme());
     this.roomId = this.$route.query.roomId;
 
     if (!this.roomId) {

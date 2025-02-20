@@ -56,83 +56,75 @@ const buttonClassList = computed(() => [
 </script>
 
 <style lang="scss" scoped>
-.tui-theme-white .button-primary {
-  --shadow-color: rgba(213, 224, 242, 0.6);
-}
-
-.tui-theme-black .button-primary {
-  --shadow-color: rgba(28, 102, 229, 0.2);
-}
-
 .tui-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 400;
   line-height: 22px;
-  color: var(--font-color-7);
   text-align: center;
   white-space: nowrap;
   cursor: pointer;
-  background-color: var(--active-color-1);
-  border: 1px solid var(--active-color-1);
+  background-color: var(--button-color-primary-default);
+  border: 1px solid var(--button-color-primary-default);
+  color: var(--text-color-button);
   outline: none;
   transition: background-color 0.2s ease-in-out;
 
   &:hover {
-    background: #144fb6;
-    border: 1px solid #144fb6;
+    border-color: var(--text-color-link);
+    border: 1px solid var(--text-color-link);
     outline: none;
   }
 }
 
 .tui-button-plain.tui-button-primary {
-  color: #0961f7;
-  background: #ecf5ff;
-  border-color: #b3d8ff;
+  background: var(--uikit-color-white-2);
+  border-color: var(--text-color-link);
+  color: var(--text-color-link);
 }
 
 .tui-button-plain.tui-button-primary:hover {
-  color: #fff;
-  background: #409eff;
-  border-color: #409eff;
+  color: var(--uikit-color-white-1);
+  background: var(--uikit-color-theme-5);
+  border-color: var(--uikit-color-theme-5);
 }
 
 .tui-button-plain.tui-button-info {
-  color: #909399;
-  background: #f4f4f5;
-  border-color: #d3d4d6;
+  color: var(--uikit-color-gray-7);
+  background: var(--uikit-color-white-1);
+  border-color: var(--uikit-color-white-2);
 }
 
 .tui-button-plain.tui-button-info:hover {
-  color: #fff;
-  background: #909399;
-  border-color: #909399;
+  color: var(--uikit-color-white-1);
+  background: var(--uikit-color-gray-7);
+  border-color: var(--uikit-color-gray-7);
 }
 
 .tui-button-plain.tui-button-danger {
   font-weight: 500;
-  color: #f56c6c;
-  background: #fef0f0;
-  border-color: #fbc4c4;
+  color: var(--uikit-color-red-6);
+  background: var(--uikit-color-white-1);
+  border-color: var(--uikit-color-red-6);
 }
 
 .tui-button-plain.tui-button-danger:hover {
-  color: #fff;
-  background: #f56c6c;
-  border-color: #f56c6c;
+  color: var(--uikit-color-white-1);
+  background: var(--uikit-color-red-6);
+  border-color: var(--uikit-color-red-6);
 }
 
 .tui-button-primary {
   font-size: 14px;
   font-weight: 500;
   line-height: 22px;
-  color: var(--active-color-2);
   background-color: transparent;
-  border: 1px solid var(--active-color-2);
+  border: 1px solid var(--text-color-link);
+  color: var(--text-color-link);
 
   &:hover {
-    background-color: var(--shadow-color);
+    background-color: var(--uikit-color-black-8);
   }
 }
 
@@ -159,21 +151,5 @@ const buttonClassList = computed(() => [
 .tui-button-icon {
   display: flex;
   margin-right: 5px;
-}
-
-.tui-button-text {
-  color: var(--font-color-4);
-  background-color: transparent;
-  border: 0 solid transparent;
-
-  &:hover {
-    color: var(--font-color-4);
-    background-color: transparent;
-    border: 0 solid transparent;
-  }
-
-  &::after {
-    border: none;
-  }
 }
 </style>

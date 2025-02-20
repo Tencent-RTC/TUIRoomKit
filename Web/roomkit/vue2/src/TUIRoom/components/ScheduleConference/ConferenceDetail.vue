@@ -88,12 +88,12 @@ const getStatusTextAndClass = (status?: TUIConferenceStatus | null) => {
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
-  color: #4f586b;
+  color: var(--text-color-secondary);
 
   .detail-title {
     width: 84px;
     margin-right: 12px;
-    color: #2b2e38;
+    color: var(--text-color-primary);
   }
 
   .detail-info {
@@ -117,8 +117,8 @@ const getStatusTextAndClass = (status?: TUIConferenceStatus | null) => {
   .copy-container {
     display: flex;
     margin-left: 6px;
-    color: var(--active-color-2);
     cursor: pointer;
+    color: var(--text-color-link);
 
     .copy {
       width: 20px;
@@ -141,7 +141,7 @@ const getStatusTextAndClass = (status?: TUIConferenceStatus | null) => {
 
   .detail-info {
     justify-content: flex-end;
-    color: rgba(43, 46, 56, 0.7);
+    color: var(--text-color-primary);
   }
 
   .detail-item {
@@ -150,14 +150,14 @@ const getStatusTextAndClass = (status?: TUIConferenceStatus | null) => {
 }
 
 .status-not-start {
-  color: var(--font-color-10);
+  color: var(--text-color-button-disable);
 }
 
 .status-running {
-  color: var(--active-color-1);
+  color: var(--text-color-link);
 }
 
 .status-finished {
-  color: #b2bbd1;
+  color: var(--uikit-color-gray-7);
 }
 </style>

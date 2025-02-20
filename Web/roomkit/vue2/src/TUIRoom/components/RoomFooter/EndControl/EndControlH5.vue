@@ -220,10 +220,10 @@ async function transferAndLeave() {
     font-size: 12px;
     font-weight: 400;
     line-height: 21px;
-    color: #ff2e2e;
     text-align: center;
     letter-spacing: 0;
     cursor: pointer;
+    color: var(--text-color-error);
 
     .end-button-title {
       margin-left: 3px;
@@ -246,8 +246,7 @@ async function transferAndLeave() {
   box-sizing: border-box;
   width: 100vw;
   height: auto;
-  background-color: var(--log-out-mobile);
-  backdrop-filter: blur(10px);
+  background-color: var(--uikit-color-black-3);
 
   .end-dialog-leave,
   .end-dialog-dismiss {
@@ -277,12 +276,12 @@ async function transferAndLeave() {
       font-style: normal;
       font-weight: 500;
       line-height: 17px;
-      color: #6a6c74;
       text-align: center;
-      background: #cacacb;
-      border-bottom: 0.5px solid #4f4e4e;
       border-top-left-radius: 14px;
       border-top-right-radius: 14px;
+      background-color: var(--bg-color-operate);
+      color: var(--text-color-secondary);
+      border-bottom: 0.5px solid var(--stroke-color-primary);
 
       .end-dialog-text {
         width: 230px;
@@ -300,17 +299,17 @@ async function transferAndLeave() {
       font-style: normal;
       font-weight: 400;
       line-height: 24px;
-      color: #ff2e2e;
       text-align: center;
-      background: #cacacb;
       border-style: none;
+      background-color: var(--bg-color-operate);
+      color: var(--text-color-error);
     }
 
     .end-button-leave {
-      color: #007aff;
-      border-top: 0.5px solid #8f8e8e;
       border-bottom-right-radius: 14px;
       border-bottom-left-radius: 14px;
+      border-top: 0.5px solid var(--stroke-color-module);
+      color: var(--text-color-link);
     }
 
     .end-button-leave-single {
@@ -330,9 +329,8 @@ async function transferAndLeave() {
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      color: #007aff;
-      background-color: #fff;
       border-radius: 14px;
+      color: var(--text-color-link);
     }
   }
 
@@ -370,10 +368,9 @@ async function transferAndLeave() {
       align-items: center;
       height: 34px;
       padding: 0 16px;
-      color: #676c80;
-      caret-color: var(--caret-color);
-      background-color: var(--transfer-input-color-h5);
       border-radius: 8px;
+      background-color: var(--bg-color-input);
+      color: var(--text-color-secondary);
 
       .searching-input {
         width: 100%;
@@ -384,7 +381,7 @@ async function transferAndLeave() {
         ::placeholder {
           font-size: 16px;
           line-height: 18px;
-          color: #676c80;
+          color: var(--uikit-color-gray-7);
         }
 
         &:focus-visible {
@@ -436,12 +433,11 @@ async function transferAndLeave() {
           font-family: 'PingFang SC';
           font-size: 16px !important;
           font-style: normal;
-          font-weight: 500;
           line-height: 22px;
-          color: var(--input-font-color);
           text-overflow: ellipsis;
           letter-spacing: -0.24px;
           white-space: nowrap;
+          color: var(--text-color-primary);
         }
 
         .correct {
@@ -463,9 +459,8 @@ async function transferAndLeave() {
       justify-content: center;
       width: 40vw;
       height: 5vh;
-      color: var(--input-font-color);
-      background-color: var(--message-list-color);
       border-radius: 4px;
+      color: var(--text-color-secondary);
     }
   }
 }
@@ -484,16 +479,15 @@ async function transferAndLeave() {
     justify-content: center;
     width: 86vw;
     height: 5vh;
-    font-family: 'PingFang SC';
     font-size: 16px;
     font-style: normal;
     font-weight: 500;
     line-height: 22px;
-    color: #fff;
     text-align: center;
-    background: linear-gradient(315deg, #006eff 0%, #0c59f2 98.81%);
     border-style: none;
     border-radius: 8px;
+    background-color: var(--button-color-primary-default);
+    color: var(--text-color-primary);
   }
 }
 </style>

@@ -19,11 +19,6 @@
       mask="url(#path-1-inside-1_3678_51153)"
     />
     <circle cx="12" cy="12" r="3.65" stroke="currentColor" stroke-width="1.7" />
-    <circle
-      cx="12"
-      cy="12"
-      r="1.5"
-      style="fill: var(--active-color-2); fill-opacity: 1"
-    />
+    <circle cx="12" cy="12" r="1.5" fill="currentColor" />
   </svg>
 </template>

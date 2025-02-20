@@ -102,9 +102,9 @@ const {
   font-size: 14px;
   font-weight: 500;
   line-height: normal;
-  color: var(--input-font-color);
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--text-color-primary);
 }
 
 .master-header {
@@ -136,7 +136,7 @@ const {
   box-sizing: border-box;
   width: 100vw;
   height: auto;
-  background-color: var(--log-out-mobile);
+  background-color: var(--uikit-color-black-3);
 
   .room-info-container-main {
     position: fixed;
@@ -146,10 +146,10 @@ const {
     gap: 5px;
     width: 100%;
     padding-bottom: 4vh;
-    background: var(--popup-background-color-h5);
     border-radius: 15px 15px 0 0;
     animation-name: popup;
     animation-duration: 200ms;
+    background-color: var(--bg-color-operate);
 
     @keyframes popup {
       from {
@@ -174,7 +174,7 @@ const {
       font-style: normal;
       font-weight: 500;
       line-height: 24px;
-      color: var(--popup-title-color-h5);
+      color: var(--text-color-primary);
     }
 
     .room-info-content {
@@ -184,28 +184,28 @@ const {
       font-size: 14px;
       font-weight: 400;
       line-height: normal;
-      color: var(--popup-title-color-h5);
       letter-spacing: -0.24px;
+      color: var(--text-color-primary);
 
       .room-info-title {
         flex-basis: 30%;
-        color: var(--title-font-color);
+        color: var(--text-color-secondary);
       }
 
       .room-info-item {
         flex-basis: 50%;
         max-width: 300px;
         overflow: hidden;
-        color: var(--item-font-color);
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: var(--text-color-primary);
       }
 
       .copy-container {
         display: flex;
         margin-left: auto;
-        color: var(--active-color-2);
         cursor: pointer;
+        color: var(--text-color-link);
 
         .copy {
           width: 20px;
@@ -221,8 +221,8 @@ const {
       font-style: normal;
       font-weight: 400;
       line-height: 17px;
-      color: var(--popup-title-color-h5);
       text-align: center;
+      color: var(--text-color-primary);
     }
   }
 }
