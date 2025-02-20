@@ -28,16 +28,6 @@ const {
 </script>
 
 <style lang="scss" scoped>
-.tui-theme-white textarea {
-  --input-border-color: var(--background-color-10);
-  --chat-editor-color: var(--background-color-8);
-}
-
-.tui-theme-black textarea {
-  --input-border-color: rgba(213, 224, 242, 0.2);
-  --chat-editor-color: var(--background-color-2);
-}
-
 .chat-editor {
   position: relative;
   box-sizing: border-box;
@@ -47,7 +37,7 @@ const {
   height: 150px;
   padding: 12px 16px;
   margin-top: 20px;
-  border: 1px solid var(--input-border-color);
+  border: 1px solid var(--stroke-color-module);
   border-radius: 8px;
 
   .chat-emoji {
@@ -63,10 +53,9 @@ const {
     font-size: 14px;
     font-weight: 400;
     line-height: 22px;
-    color: var(--textarea-color);
-    caret-color: var(--caret-color);
+    color: var(--text-color-primary);
     resize: none;
-    background: var(--chat-editor-color);
+    background: var(--bg-color-input);
     border: none;
 
     &:focus-visible {
@@ -77,7 +66,7 @@ const {
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;
-      color: rgba(143, 154, 178, 0.7);
+      color: var(--uikit-color-gray-5);
     }
 
     &::-webkit-scrollbar {
@@ -86,16 +75,16 @@ const {
   }
 
   &.disable {
-    background-color: var(--disable-color);
+    background-color: var(--text-color-button-disable);
 
     .chat-emoji {
-      color: #8f9ab2;
+      color: var(--uikit-color-gray-7);
       pointer-events: none;
     }
 
     .content-bottom-input {
       &:disabled {
-        background-color: var(--disable-color);
+        background-color: var(--text-color-button-disable);
       }
     }
   }

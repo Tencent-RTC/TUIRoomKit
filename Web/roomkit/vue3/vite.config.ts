@@ -4,6 +4,7 @@ import dts from 'vite-plugin-dts';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
 import { dependencies, peerDependencies } from './package.json';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -56,6 +57,11 @@ export default defineConfig({
       outDir: ['lib/', 'es/'],
     }),
   ],
+  resolve: {
+    alias: {
+      '@tencentcloud': path.resolve(__dirname, 'node_modules/@tencentcloud'),
+    },
+  },
   optimizeDeps: {
     include: ['dayjs'],
   },

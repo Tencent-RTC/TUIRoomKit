@@ -93,7 +93,7 @@ const aspectRatio: ComputedRef<string> = computed(() => {
   display: flex;
   width: 100%;
   height: 100%;
-  background-color: var(--stream-container-flatten-bg-color);
+  background-color: var(--bg-color-topbar);
 }
 
 .page-stream-container {

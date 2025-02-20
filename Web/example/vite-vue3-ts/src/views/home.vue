@@ -132,14 +132,25 @@ const changeLanguage = (language: LanguageOption) => {
 const changeTheme = (theme: ThemeOption) => {
   localStorage.setItem('tuiRoom-currentTheme', theme);
 };
+const handleAcceptedInvitation = async (roomId: string) => {
+  await handleEnterRoom({
+    roomId,
+    roomParam: {
+      isOpenCamera: false,
+      isOpenMicrophone: true,
+    },
+  });
+};
 onMounted(() => {
   conference.on(RoomEvent.LANGUAGE_CHANGED, changeLanguage);
   conference.on(RoomEvent.THEME_CHANGED, changeTheme);
+  conference.on(RoomEvent.CONFERENCE_INVITATION_ACCEPTED, handleAcceptedInvitation);
 });
 
 onUnmounted(() => {
   conference.off(RoomEvent.LANGUAGE_CHANGED, changeLanguage);
   conference.off(RoomEvent.THEME_CHANGED, changeTheme);
+  conference.off(RoomEvent.CONFERENCE_INVITATION_ACCEPTED, handleAcceptedInvitation);
 });
 
 handleInit();

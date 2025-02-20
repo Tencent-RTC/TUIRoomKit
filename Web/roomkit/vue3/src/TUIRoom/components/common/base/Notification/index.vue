@@ -40,7 +40,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue';
+import {
+  ref,
+  watch,
+  onMounted,
+  withDefaults,
+  defineProps,
+  defineEmits,
+} from 'vue';
 import TuiButton from '../Button.vue';
 import SvgIcon from '../SvgIcon.vue';
 import CloseIcon from '../../icons/CloseIcon.vue';
@@ -116,13 +123,14 @@ onMounted(async () => {
     height: 44px;
     margin: 0 10px;
     text-align: center;
-    background-color: #fff;
     border-radius: 10px;
+    background-color: var(--bg-color-dialog);
+    box-shadow: 0 3px 8px var(--uikit-color-black-8);
 
     .tui-notification-mobile-icon {
       padding: 0 10px;
       margin-left: 4px;
-      color: #000;
+      color: var(--text-color-primary);
     }
 
     .tui-notification-mobile-content {
@@ -130,16 +138,16 @@ onMounted(async () => {
       font-size: 15px;
       font-weight: 400;
       line-height: 44px;
-      color: #181820;
+      color: var(--text-color-secondary);
     }
 
     .tui-notification-mobile-check {
       padding: 0 12px;
       margin: 6px 10px 6px 0;
       line-height: 34px;
-      color: #fff;
-      background-color: #1c66e5;
       border-radius: 10px;
+      color: var(--text-color-primary);
+      background-color: var(--text-color-link);
     }
   }
 
@@ -150,10 +158,9 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     width: 400px;
-    background-color: var(--white-color);
-    filter: drop-shadow(0 0 1px rgba(5, 5, 5, 0.1))
-      drop-shadow(0 3px 8px rgba(233, 240, 251, 0.5));
     border-radius: 20px;
+    background-color: var(--bg-color-dialog);
+    box-shadow: 0 3px 8px var(--uikit-color-black-8);
 
     .tui-notification-header {
       position: relative;
@@ -162,7 +169,7 @@ onMounted(async () => {
       height: 64px;
       padding: 0 24px;
       font-weight: 500;
-      color: var(--title-color);
+      color: var(--text-color-primary);
 
       .tui-notification-title {
         max-width: 300px;
@@ -180,9 +187,9 @@ onMounted(async () => {
         justify-content: center;
         width: 32px;
         height: 32px;
-        color: #4f586b;
         cursor: pointer;
         transform: translateY(-50%);
+        color: var(--text-color-primary);
       }
     }
   }
