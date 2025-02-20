@@ -140,19 +140,8 @@ function handleOverlayClick() {
   z-index: 2007;
 
   &.overlay {
-    background-color: rgba(15, 16, 20, 0.6);
+    background-color: var(--uikit-color-black-4);
   }
-}
-
-.tui-theme-white .drawer-container {
-  --background-color: var(--background-color-1);
-  --box-shadow: 0px 2px 4px rgba(32, 77, 141, 0.03),
-    0px 6px 10px rgba(32, 77, 141, 0.06), 0px 3px 14px rgba(32, 77, 141, 0.05);
-}
-
-.tui-theme-black .drawer-container {
-  --background-color: var(--background-color-2);
-  --box-shadow: 0px -8px 30px rgba(15, 16, 20, 0.5);
 }
 
 .drawer-container {
@@ -161,9 +150,11 @@ function handleOverlayClick() {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--background-color);
   border-radius: 8px 0 0 8px;
-  box-shadow: var(--box-shadow);
+  background-color: var(--bg-color-operate);
+  box-shadow:
+    0px 12px 26px var(--uikit-color-black-8),
+    0px 8px 12px var(--uikit-color-black-8);
 
   .drawer-header {
     position: relative;
@@ -171,14 +162,14 @@ function handleOverlayClick() {
     align-items: center;
     height: 64px;
     padding: 0 20px;
-    box-shadow: 0 1px 0 var(--stroke-color);
+    box-shadow: 0px 1px 0 var(--stroke-color-primary);
 
     .drawer-header-title {
       font-size: 16px;
       font-style: normal;
       font-weight: 600;
       line-height: 24px;
-      color: var(--font-color-1);
+      color: var(--text-color-primary);
     }
 
     .close {
@@ -190,9 +181,9 @@ function handleOverlayClick() {
       justify-content: center;
       width: 32px;
       height: 32px;
-      color: var(--font-color-1);
       cursor: pointer;
       transform: translateY(-50%);
+      color: var(--text-color-primary);
     }
   }
 

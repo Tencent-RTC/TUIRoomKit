@@ -18,6 +18,7 @@ import { getBasicInfo } from '@/config/basic-info-config';
 import { isMobile } from '@tencentcloud/roomkit-electron-vue2.7/es/utils/environment';
 import i18n from '../locales/index';
 import { getLanguage, getTheme } from  '../utils/utils';
+import { useUIKit } from '@tencentcloud/uikit-base-component-vue2';
 
 export default {
   name: 'Home',
@@ -41,6 +42,7 @@ export default {
 
     this.givenRoomId = this.$route.query.roomId || '';
     this.userInfo = getBasicInfo();
+    this.theme = useUIKit();
     if (!this.userInfo) {
       return;
     }
@@ -52,13 +54,15 @@ export default {
   },
   mounted() {
     conference.setLanguage(getLanguage());
-    conference.setTheme(getTheme());
+    !this.theme.value && conference.setTheme(getTheme());
     conference.on(RoomEvent.LANGUAGE_CHANGED, this.changeLanguage);
     conference.on(RoomEvent.THEME_CHANGED, this.changeTheme);
+    conference.on(RoomEvent.CONFERENCE_INVITATION_ACCEPTED, this.handleAcceptedInvitation);
   },
   destroyed() {
     conference.off(RoomEvent.LANGUAGE_CHANGED,  this.changeLanguage);
     conference.off(RoomEvent.THEME_CHANGED,  this.changeTheme);
+    conference.off(RoomEvent.CONFERENCE_INVITATION_ACCEPTED, this.handleAcceptedInvitation);
   },
   methods: {
     setTUIRoomData(action, roomOption) {
@@ -124,6 +128,15 @@ export default {
     changeLanguage(language) {
       i18n.global.locale.value = language;
       localStorage.setItem('tuiRoom-language', language);
+    },
+    async handleAcceptedInvitation(roomId) {
+      await this.handleEnterRoom({
+        roomId,
+        roomParam: {
+          isOpenCamera: false,
+          isOpenMicrophone: true,
+        },
+      });
     },
   },
 };

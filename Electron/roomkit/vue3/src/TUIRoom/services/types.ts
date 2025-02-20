@@ -9,6 +9,7 @@ import { ErrorHandler } from './function/errorHandler';
 import { AITask } from './function/aiTask';
 import { ConferenceInvitationManager } from './manager/conferenceInvitationManager';
 import { DataReportManager } from './manager/dataReportManager';
+import { WidgetsManager } from './manager/widgetsManager';
 export interface IRoomService {
   t: any;
   roomEngine: Record<string, any>;
@@ -20,6 +21,7 @@ export interface IRoomService {
   scheduleConferenceManager: ScheduleConferenceManager;
   conferenceInvitationManager: ConferenceInvitationManager;
   dataReportManager: DataReportManager;
+  widgetsManager: WidgetsManager;
   errorHandler: ErrorHandler;
   aiTask: AITask;
   on: (eventType: EventType, callback: (data?: any) => any) => void;
@@ -37,7 +39,7 @@ export interface RoomInitData {
   showHeaderTool?: boolean;
   tim?: ChatSDK;
   theme?: {
-    defaultTheme?: 'black' | 'white';
+    defaultTheme?: 'dark' | 'light';
     isSupportSwitchTheme: boolean;
   };
 }
@@ -69,4 +71,5 @@ export enum EventType {
   USER_LOGOUT = 'UserLogout',
   LANGUAGE_CHANGED = 'LanguageChanged',
   THEME_CHANGED = 'ThemeChanged',
+  CONFERENCE_INVITATION_ACCEPTED = 'ConferenceInvitationAccepted',
 }

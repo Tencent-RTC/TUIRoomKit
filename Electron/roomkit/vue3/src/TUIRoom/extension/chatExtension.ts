@@ -195,7 +195,7 @@ export class ChatExtension {
     this.onRoomDestroy = this.onRoomDestroy.bind(this);
     this.onRemoteUserEnterRoom = this.onRemoteUserEnterRoom.bind(this);
     this.onRemoteUserLeaveRoom = this.onRemoteUserLeaveRoom.bind(this);
-    this.onUserRoleChanged = this.onUserRoleChanged.bind(this);
+    this.onUserInfoChanged = this.onUserInfoChanged.bind(this);
   }
   private bindRoomServiceEvent() {
     this.service?.on(EventType.ROOM_DISMISS, this.onRoomDestroy);
@@ -210,8 +210,8 @@ export class ChatExtension {
       this.onRemoteUserLeaveRoom
     );
     roomEngine.instance?.on(
-      TUIRoomEvents.onUserRoleChanged,
-      this.onUserRoleChanged
+      TUIRoomEvents.onUserInfoChanged,
+      this.onUserInfoChanged
     );
   }
   private unBindRoomServiceEvent() {
@@ -227,8 +227,8 @@ export class ChatExtension {
       this.onRemoteUserLeaveRoom
     );
     roomEngine.instance?.off(
-      TUIRoomEvents.onUserRoleChanged,
-      this.onUserRoleChanged
+      TUIRoomEvents.onUserInfoChanged,
+      this.onUserInfoChanged
     );
   }
   private onRemoteUserEnterRoom({
@@ -270,13 +270,8 @@ export class ChatExtension {
       memberCount: newUserList.length,
     });
   }
-  private async onUserRoleChanged({
-    userId,
-    userRole,
-  }: {
-    userId: string;
-    userRole: TUIRole;
-  }) {
+  private async onUserInfoChanged({ userInfo }: { userInfo: TUIUserInfo }) {
+    const { userRole, userId } = userInfo;
     const { userID } = this.chatContext;
     if (userRole === TUIRole.kRoomOwner && userId === userID) {
       const profileResult = await this.getUserProfile([userId]);

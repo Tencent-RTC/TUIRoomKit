@@ -6,7 +6,7 @@
   * Use <video-tab></video-tab> in the template
 -->
 <template>
-  <div :class="['audio-setting-tab', themeClass]">
+  <div class="audio-setting-tab">
     <div class="item-setting">
       <span class="title">{{ t('Mic') }}</span>
       <div class="flex">
@@ -83,11 +83,6 @@ const roomStore = useRoomStore();
 const { speakerList, userVolumeObj, currentSpeakerId } = storeToRefs(roomStore);
 const roomEngine = useGetRoomEngine();
 const trtcCloud = roomEngine.instance?.getTRTCCloud();
-
-const themeClass = computed(() =>
-  props.theme ? `tui-theme-${props.theme}` : ''
-);
-
 const volumeTotalNum = computed(() => (isDetailMode.value ? 36 : 28));
 
 const volumeNum = computed(() => {
@@ -190,7 +185,7 @@ onBeforeUnmount(() => {
     font-size: 14px;
     font-weight: 400;
     line-height: 22px;
-    color: #4f586b;
+    color: var(--text-color-secondary);
   }
 
   .mic-bar-container {
@@ -200,10 +195,10 @@ onBeforeUnmount(() => {
     .mic-bar {
       width: 3px;
       height: 6px;
-      background-color: var(--background-color-4);
+      background-color: var(--text-color-secondary);
 
       &.active {
-        background-color: var(--green-color);
+        background-color: var(--text-color-link);
       }
     }
   }

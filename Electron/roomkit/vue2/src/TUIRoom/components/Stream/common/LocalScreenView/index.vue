@@ -89,13 +89,13 @@ onBeforeUnmount(() => {
   justify-content: center;
   width: 100%;
   height: 100%;
-  background-color: var(--background-color-1);
+  background-color: var(--bg-color-bubble-reciprocal);
 
   &::before {
     width: 100%;
     height: 100%;
     content: '';
-    background-color: var(--local-screen-stream-bg-color);
+    background-color: var(--bg-color-bubble-reciprocal);
   }
 
   .local-screen-control-container {
@@ -105,8 +105,8 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: var(--screen-font-color);
     transform: translate(-50%, -50%);
+    color: var(--text-color-tertiary);
 
     &.mini {
       transform: translate(-50%, -50%) scale(0.7);
@@ -128,20 +128,10 @@ onBeforeUnmount(() => {
 
     .stop-button {
       margin-top: 30px;
-      background-color: var(--red-color-3);
-      border: 1.5px solid var(--red-color-3);
+      background-color: var(--text-color-error);
+      border: 1.5px solid var(--text-color-error);
     }
   }
-}
-
-.tui-theme-white .local-screen-container {
-  --local-screen-stream-bg-color: rgba(228, 232, 238, 0.4);
-  --screen-font-color: #8f9ab2;
-}
-
-.tui-theme-black .local-screen-container {
-  --screen-font-color: #b2bbd1;
-  --local-screen-stream-bg-color: rgba(34, 38, 46, 0.5);
 }
 
 .dialog-button {

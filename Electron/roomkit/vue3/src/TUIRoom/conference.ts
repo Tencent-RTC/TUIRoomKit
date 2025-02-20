@@ -26,6 +26,7 @@ export enum RoomEvent {
   USER_LOGOUT = 'UserLogout',
   LANGUAGE_CHANGED = 'LanguageChanged',
   THEME_CHANGED = 'ThemeChanged',
+  CONFERENCE_INVITATION_ACCEPTED = 'ConferenceInvitationAccepted',
 }
 export enum FeatureButton {
   SwitchTheme = 'SwitchTheme',

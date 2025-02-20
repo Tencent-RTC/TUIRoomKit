@@ -520,4 +520,6 @@ export default {
   'Sure you want to reset the beauty effect?': '确定要重置美颜效果吗?',
   'All beauty parameters will revert to default after reset':
     '重置后所有美颜参数将恢复至默认',
+  'Theme Colours': '主题色',
+  'Custom Themes': '自定义主题',
 };

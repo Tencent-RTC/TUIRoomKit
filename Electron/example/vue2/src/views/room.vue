@@ -4,6 +4,7 @@
 
 <script>
 import { ConferenceMainView, conference, RoomEvent } from '@tencentcloud/roomkit-electron-vue2.7';
+import { useUIKit } from '@tencentcloud/uikit-base-component-vue2';
 import i18n from '../locales/index';
 import { getLanguage, getTheme } from  '../utils/utils';
 let isExpectedJump = false;
@@ -36,14 +37,16 @@ export default {
       roomInfo: null,
       userInfo: null,
       roomId: 0,
+      theme: '',
       isMaster: false,
     };
   },
   async mounted() {
+    this.theme = useUIKit();
+    conference.setLanguage(getLanguage());
+    !this.theme.value && conference.setTheme(getTheme());
     this.roomInfo = sessionStorage.getItem('tuiRoom-roomInfo');
     this.userInfo = sessionStorage.getItem('tuiRoom-userInfo');
-    conference.setLanguage(getLanguage());
-    conference.setTheme(getTheme());
     this.roomId = this.$route.query.roomId;
 
     if (!this.roomId) {
