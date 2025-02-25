@@ -121,14 +121,13 @@ function handleTurnPageRight() {
     justify-content: center;
     width: 32px;
     height: 60px;
-    color: var(--turn-page-arrow-color);
+    color: var(--uikit-color-white-1);
     cursor: pointer;
-    background: var(--turn-page-background-color);
-    backdrop-filter: blur(2.25px);
     border-radius: 32px;
+    background-color: var(--bg-color-tag-mask);
 
     &:hover {
-      background: var(--turn-page-hover-background-color);
+      background-color: var(--button-color-secondary-hover);
     }
   }
 
@@ -145,17 +144,5 @@ function handleTurnPageRight() {
   .turn-page-right {
     transform: rotateY(180deg);
   }
-}
-
-.tui-theme-black .turn-page-container {
-  --turn-page-background-color: rgba(114, 122, 138, 0.4);
-  --turn-page-hover-background-color: rgba(114, 122, 138, 0.7);
-  --turn-page-arrow-color: #d5e0f2;
-}
-
-.tui-theme-white .turn-page-container {
-  --turn-page-background-color: rgba(114, 122, 138, 0.4);
-  --turn-page-hover-background-color: rgba(114, 122, 138, 0.7);
-  --turn-page-arrow-color: white;
 }
 </style>

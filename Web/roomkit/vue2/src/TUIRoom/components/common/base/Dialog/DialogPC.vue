@@ -160,7 +160,7 @@ onBeforeUnmount(() => {
   left: 0;
 
   &.overlay {
-    background-color: rgba(15, 16, 20, 0.6);
+    background-color: var(--uikit-color-black-4);
   }
 }
 
@@ -173,10 +173,9 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   width: var(--tui-dialog-width, 50%);
-  background-color: #fff;
   border-radius: 20px;
-  box-shadow: 0 3px 1px #e9f0fb;
   transform: translate(-50%, -50%);
+  background-color: var(--bg-color-dialog);
 
   .tui-dialog-header {
     position: relative;
@@ -184,14 +183,14 @@ onBeforeUnmount(() => {
     align-items: center;
     height: 64px;
     padding: 0 24px;
-    box-shadow: 0 1px 0 rgba(230, 236, 245, 0.8);
+    border-bottom: 1px solid var(--stroke-color-primary);
 
     .tui-dialog-header-title {
       font-size: 16px;
       font-style: normal;
       font-weight: 600;
       line-height: 24px;
-      color: #0f1014;
+      color: var(--text-color-primary);
     }
 
     .close {
@@ -203,9 +202,9 @@ onBeforeUnmount(() => {
       justify-content: center;
       width: 32px;
       height: 32px;
-      color: #4f586b;
       cursor: pointer;
       transform: translateY(-50%);
+      color: var(--text-color-primary);
     }
   }
 
@@ -216,7 +215,7 @@ onBeforeUnmount(() => {
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
-    color: #4f586b;
+    color: var(--text-color-primary);
   }
 
   .tui-dialog-footer {

@@ -66,7 +66,7 @@ watch(props.userInfo, val => {
     padding-right: 10px;
     font-size: 14px;
     font-weight: 400;
-    color: var(--font-color-1);
+    color: var(--text-color-primary);
   }
 
   .member-invite-calling {
@@ -75,7 +75,7 @@ watch(props.userInfo, val => {
     padding-right: 10px;
     font-size: 14px;
     font-weight: 400;
-    color: var(--font-color-1);
+    color: var(--text-color-primary);
   }
 
   .button {

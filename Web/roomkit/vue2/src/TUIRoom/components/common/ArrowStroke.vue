@@ -65,8 +65,8 @@ function handleClickArrow() {
         width: 20px;
         height: 100%;
         content: '';
-        background-color: rgba(15, 16, 20, 0.3);
-        border: 1px solid rgba(143, 154, 178, 0.1);
+        background-color: var(--uikit-color-black-6);
+        border: 1px solid var(--uikit-color-gray-5);
         border-top-left-radius: 10px;
         border-bottom-left-radius: 10px;
       }
@@ -80,12 +80,12 @@ function handleClickArrow() {
         width: 5px;
         height: 60px;
         cursor: pointer;
-        border-top: 1px solid var(--stroke-color);
-        border-bottom: 1px solid var(--stroke-color);
-        border-left: 1px solid var(--stroke-color);
         border-top-left-radius: 4px;
         border-bottom-left-radius: 4px;
         transform: translateY(-50%);
+        border-top: 1px solid var(--stroke-color-primary);
+        border-bottom: 1px solid var(--stroke-color-primary);
+        border-left: 1px solid var(--stroke-color-primary);
 
         &::before {
           position: absolute;
@@ -106,9 +106,9 @@ function handleClickArrow() {
         width: 2px;
         height: calc((100% - 60px) / 2);
         content: '';
-        border-right: 1px solid var(--stroke-color);
-        border-bottom: 1px solid var(--stroke-color);
         border-bottom-right-radius: 4px;
+        border-bottom: 1px solid var(--stroke-color-primary);
+        border-right: 1px solid var(--stroke-color-primary);
       }
 
       &::after {
@@ -118,9 +118,9 @@ function handleClickArrow() {
         width: 2px;
         height: calc((100% - 60px) / 2);
         content: '';
-        border-top: 1px solid var(--stroke-color);
-        border-right: 1px solid var(--stroke-color);
         border-top-right-radius: 4px;
+        border-top: 1px solid var(--stroke-color-primary);
+        border-right: 1px solid var(--stroke-color-primary);
       }
     }
   }
@@ -129,7 +129,7 @@ function handleClickArrow() {
     position: absolute;
     top: 50%;
     left: 6px;
-    color: #d5e0f2;
+    color: var(--uikit-color-gray-4);
     cursor: pointer;
     transition: color 0s;
     transform: translateY(-50%);
@@ -167,8 +167,8 @@ function handleClickArrow() {
         width: 100%;
         height: 20px;
         content: '';
-        background-color: rgba(15, 16, 20, 0.3);
-        border: 1px solid rgba(143, 154, 178, 0.1);
+        background-color: var(--uikit-color-black-6);
+        border: 1px solid var(--uikit-color-gray-5);
         border-bottom-right-radius: 10px;
         border-bottom-left-radius: 10px;
       }
@@ -182,15 +182,14 @@ function handleClickArrow() {
         width: 60px;
         height: 5px;
         cursor: pointer;
-        border-right: 1px solid var(--stroke-color);
-        border-bottom: 1px solid var(--stroke-color);
-        border-left: 1px solid var(--stroke-color);
         border-bottom-right-radius: 4px;
         border-bottom-left-radius: 4px;
         transform: translateX(-50%);
+        border-bottom: 1px solid var(--stroke-color-primary);
+        border-left: 1px solid var(--stroke-color-primary);
 
         .arrow {
-          color: #a4bbdb;
+          color: var(--uikit-color-gray-4);
         }
 
         &::before {
@@ -211,9 +210,9 @@ function handleClickArrow() {
         width: calc((100% - 60px) / 2);
         height: 2px;
         content: '';
-        border-top: 1px solid var(--stroke-color);
-        border-right: 1px solid var(--stroke-color);
         border-top-right-radius: 4px;
+        border-top: 1px solid var(--stroke-color-primary);
+        border-right: 1px solid var(--stroke-color-primary);
       }
 
       &::after {
@@ -223,9 +222,9 @@ function handleClickArrow() {
         width: calc((100% - 60px) / 2);
         height: 2px;
         content: '';
-        border-top: 1px solid var(--stroke-color);
-        border-left: 1px solid var(--stroke-color);
         border-top-left-radius: 4px;
+        border-top: 1px solid var(--stroke-color-primary);
+        border-left: 1px solid var(--stroke-color-primary);
       }
     }
   }
@@ -234,7 +233,7 @@ function handleClickArrow() {
     position: absolute;
     bottom: 4px;
     left: 50%;
-    color: #d5e0f2;
+    color: var(--uikit-color-gray-4);
     cursor: pointer;
     transition: color 0s;
     transform: translateX(-50%);

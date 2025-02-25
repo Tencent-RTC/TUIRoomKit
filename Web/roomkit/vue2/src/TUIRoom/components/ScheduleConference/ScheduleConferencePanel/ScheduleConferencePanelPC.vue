@@ -11,7 +11,6 @@
           <TuiInput
             :model-value="form.roomName"
             @input="form.roomName = $event"
-            theme="white"
             class="form-value"
             :placeholder="t('please enter the room name')"
             maxlength=""
@@ -22,7 +21,6 @@
           <div class="form-value">
             <tui-select
               v-model="form.roomMode"
-              theme="white"
               class="select"
               :teleported="false"
               :popper-append-to-body="false"
@@ -31,7 +29,6 @@
               <tui-option
                 v-for="item in roomTypeList"
                 :key="item.value"
-                theme="white"
                 :value="item.value"
                 :label="t(item.label)"
                 :custom-option-content-style="{ 'font-weight': 400 }"
@@ -148,7 +145,6 @@
               v-if="passwordChecked"
               :model-value="form.password"
               @input="form.password = $event"
-              theme="white"
               class="form-value"
               style="margin-top: 8px"
               :placeholder="t('Enter 6-digit password')"
@@ -681,7 +677,7 @@ const cancel = () => {
       min-width: 100px;
       font-size: 14px;
       font-weight: 400;
-      color: #4f586b;
+      color: var(--text-color-secondary);
     }
 
     .form-value {
@@ -692,7 +688,7 @@ const cancel = () => {
       font-size: 14px;
       font-weight: 400;
       line-height: 42px;
-      color: #0f1014;
+      color: var(--text-color-secondary);
 
       .search-user {
         height: 42px;
@@ -711,7 +707,7 @@ const cancel = () => {
         }
 
         &-item:hover {
-          color: #409eff;
+          color: var(--uikit-color-theme-5);
         }
       }
 
@@ -732,7 +728,7 @@ const cancel = () => {
       }
 
       .select-attendees:hover {
-        color: var(--active-color-1);
+        color: var(--text-color-link);
       }
 
       .select-search-result-item {
@@ -762,7 +758,7 @@ const cancel = () => {
           padding: 2px 8px;
           overflow: hidden;
           line-height: normal;
-          background-color: #e3f0fd;
+          background-color: var(--bg-color-bubble-own);
           border-radius: 4px;
 
           &-avatar {
@@ -784,7 +780,7 @@ const cancel = () => {
 
           &-remove {
             margin-left: auto;
-            color: #b3acac;
+            color: var(--uikit-color-gray-7);
             cursor: pointer;
           }
         }
@@ -820,7 +816,7 @@ const cancel = () => {
       width: 100%;
 
       .form-title {
-        color: #0f1014;
+        color: var(--text-color-secondary);
       }
     }
   }
@@ -845,7 +841,7 @@ const cancel = () => {
   gap: 20px;
 
   .invite-member-title {
-    color: #4f586b;
+    color: var(--text-color-secondary);
   }
 
   .invite-member-item {
@@ -853,9 +849,9 @@ const cancel = () => {
     justify-content: space-between;
     padding: 10px 16px;
     margin-top: 8px;
-    color: #0f1014;
-    background: #f9fafc;
-    border: 1px solid #e4e8ee;
+    color: var(--text-color-primary);
+    background: var(--uikit-color-white-2);
+    border: 1px solid var(--uikit-color-white-2);
     border-radius: 8px;
 
     .copy {

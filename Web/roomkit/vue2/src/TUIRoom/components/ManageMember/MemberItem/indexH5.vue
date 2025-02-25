@@ -75,7 +75,7 @@ onUnmounted(() => {
   padding: 0 32px;
 
   &:hover {
-    background: var(--member-item-container-hover-bg-color);
+    background-color: var(--list-color-hover);
   }
 }
 </style>

@@ -14,6 +14,10 @@ import { hideTUIChatFeatures } from '../ChatKit/components/TUIChat/config';
 import TUIChatServer from '../ChatKit/components/TUIChat/server';
 
 import { useBasicStore } from '../../../stores/basic';
+import { useUIKit } from '@tencentcloud/uikit-base-component-vue2';
+
+const { theme, setTheme } = useUIKit();
+
 const TUIChat = defineAsyncComponent(
   () => import('../ChatKit/components/TUIChat/index.vue')
 );
@@ -45,8 +49,14 @@ new TUIChatServer();
 
 TUIConversationService.switchConversation(currentRoomId);
 hideTUIChatFeatures(defaultHideFeaturesButtons);
-roomService.setTheme(basicStore.defaultTheme as Theme);
 roomService.setLanguage(basicStore.lang as LanguageOption);
+
+if (!theme.value) {
+  roomService.setTheme(basicStore.defaultTheme as Theme);
+} else {
+  setTheme(theme.value);
+  roomService.setTheme(theme.value as Theme);
+}
 </script>
 
 <style lang="scss" scoped>
