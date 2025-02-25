@@ -18,7 +18,6 @@
       :placeholder="t('Please enter the password')"
       type="password"
       maxlength="32"
-      theme="white"
     >
       <template #suffixIcon>
         <svg-icon

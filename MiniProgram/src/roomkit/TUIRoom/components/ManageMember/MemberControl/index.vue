@@ -115,10 +115,10 @@ function handleCloseInput(event: any) {
   flex-direction: column !important;
   width: 100%;
   padding: 22px 16px;
-  background: var(--member-control-background-color-h5);
   border-radius: 15px 15px 0 0;
   animation-name: popup;
   animation-duration: 200ms;
+  background-color: var(--bg-color-operate);
 
   @keyframes popup {
     from {
@@ -150,7 +150,7 @@ function handleCloseInput(event: any) {
       font-size: 16px;
       font-weight: 500;
       line-height: 22px;
-      color: var(--member-title-content-h5);
+      color: var(--text-color-primary);
     }
   }
 
@@ -166,16 +166,11 @@ function handleCloseInput(event: any) {
   }
 }
 
-.agree-button,
 .cancel-button {
   display: flex;
   align-items: center;
   width: 50%;
   padding: 12px;
-}
-
-.agree-button {
-  color: var(--active-color-1);
 }
 
 .tab-cancel {
@@ -193,7 +188,7 @@ function handleCloseInput(event: any) {
   box-sizing: border-box;
   width: 100vw;
   height: auto;
-  background-color: var(--log-out-mobile);
+  background-color: var(--uikit-color-black-3);
 
   .input-content {
     position: absolute;
@@ -209,32 +204,14 @@ function handleCloseInput(event: any) {
     font-style: normal;
     font-weight: 450;
     line-height: 4vh;
-    color: #676c80;
     resize: none;
-    background: var(--background-color-1);
     border: none;
+    background-color: var(--bg-color-topbar);
+    color: var(--text-color-secondary);
   }
 
   .input {
     width: 100%;
-  }
-
-  .content-bottom-input {
-    box-sizing: border-box;
-    width: 100%;
-    height: 35px;
-    padding-left: 12px;
-    font-family: 'PingFang SC';
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 450;
-    line-height: 4vh;
-    color: #676c80;
-    caret-color: var(--caret-color);
-    resize: none;
-    background-color: var(--chat-editor-input-color-h5);
-    border: none;
-    border-radius: 45px;
   }
 }
 </style>

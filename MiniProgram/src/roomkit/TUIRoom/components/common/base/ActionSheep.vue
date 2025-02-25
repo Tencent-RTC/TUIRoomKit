@@ -67,7 +67,7 @@ const toggleShow = () => {
   z-index: 1000;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--uikit-color-black-3);
 }
 
 .container {
@@ -78,8 +78,8 @@ const toggleShow = () => {
   width: 100%;
   min-height: 120px;
   padding: 20px 12px 36px;
-  background-color: #fff;
   border-radius: 18px 18px 0 0;
+  background-color: var(--bg-color-operate);
 
   .container-close {
     display: flex;
@@ -92,7 +92,7 @@ const toggleShow = () => {
     margin-bottom: 12px;
     font-size: 18px;
     font-weight: 500;
-    color: #4f586b;
+    color: var(--text-color-primary);
   }
 }
 </style>

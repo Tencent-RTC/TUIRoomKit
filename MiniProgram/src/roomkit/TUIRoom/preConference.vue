@@ -53,12 +53,12 @@
 <script setup lang="ts">
 import {
   ref,
-  computed,
   onMounted,
   onUnmounted,
   withDefaults,
   defineProps,
   defineEmits,
+  computed,
 } from 'vue';
 import UserInfo from './components/RoomHeader/UserInfo/index.vue';
 import RoomHomeControl from './components/RoomHome/RoomControl/index.vue';
@@ -71,7 +71,9 @@ import TUIMessage from './components/common/base/Message/index';
 import { MESSAGE_DURATION } from './constants/message';
 import { isMobile } from './utils/environment';
 import InvitationNotification from './components/RoomInvite/InvitationNotification.vue';
+import { useUIKit } from '@tencentcloud/uikit-base-component-uni';
 
+const { theme } = useUIKit();
 const roomControlRef = ref();
 const props = withDefaults(
   defineProps<{
@@ -107,8 +109,8 @@ const emits = defineEmits([
   'on-logout',
 ]);
 
-const tuiRoomThemeClass = computed(
-  () => `tui-theme-${roomService.basicStore.defaultTheme}`
+const tuiRoomThemeClass = computed(() =>
+  theme.value ? '' : `tui-theme-${roomService.basicStore.defaultTheme}`
 );
 
 async function handleCreateRoom(roomOption: Record<string, any>) {
@@ -176,13 +178,10 @@ onUnmounted(() => {
 });
 </script>
 
-<style>
-@import './assets/style/global.scss';
-@import './assets/style/black-theme.scss';
-@import './assets/style/white-theme.scss';
-</style>
-
 <style lang="scss" scoped>
+@import './assets/style/global.scss';
+@import '@tencentcloud/uikit-base-component-uni/dist/styles/index.css';
+
 .pre-conference-container {
   display: flex;
   align-items: center;
@@ -190,9 +189,9 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   font-family: 'PingFang SC';
-  color: var(--font-color-1);
-  background: var(--background);
   background-size: cover;
+  background-color: var(--bg-color-topbar);
+  color: var(--text-color-primary);
 
   .header {
     position: absolute;
@@ -234,13 +233,5 @@ onUnmounted(() => {
       display: flex;
     }
   }
-}
-
-.tui-theme-black.pre-conference-container {
-  --background: var(--background-color-1);
-}
-
-.tui-theme-white.pre-conference-container {
-  --background: var(--background-color-1);
 }
 </style>

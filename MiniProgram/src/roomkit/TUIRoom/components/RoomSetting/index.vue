@@ -34,13 +34,11 @@
             v-if="activeSettingTab === 'audio'"
             class="setting-tab"
             :mode="SettingMode.DETAIL"
-            theme="white"
           />
           <video-setting-tab
             v-else-if="activeSettingTab === 'video'"
             class="setting-tab"
             :with-preview="true"
-            theme="white"
           />
         </div>
       </div>
@@ -97,7 +95,7 @@ function handleOverlayClick(event: any) {
   z-index: 2007;
 
   &.overlay {
-    background-color: rgba(15, 16, 20, 0.6);
+    background-color: var(--uikit-color-black-3);
   }
 }
 
@@ -109,9 +107,9 @@ function handleOverlayClick(event: any) {
   flex-direction: column;
   width: 610px;
   height: 590px;
-  background-color: #fff;
   border-radius: 20px;
   transform: translate(-50%, -50%);
+  background-color: var(--bg-color-dialog);
 
   .setting-header {
     position: relative;
@@ -119,8 +117,7 @@ function handleOverlayClick(event: any) {
     flex-direction: row;
     justify-content: space-between;
     height: 64px;
-    border-bottom: 1px solid rgba(235, 240, 247, 1);
-    box-shadow: 0 7px 10px -5px rgba(230, 236, 245, 0.8);
+    border-bottom: 1px solid var(--stroke-color-primary);
 
     .close-icon {
       position: absolute;
@@ -131,9 +128,9 @@ function handleOverlayClick(event: any) {
       justify-content: center;
       width: 32px;
       height: 32px;
-      color: #4f586b;
       cursor: pointer;
       transform: translateY(-50%);
+      color: var(--text-color-primary);
     }
 
     .setting-title {
@@ -143,7 +140,7 @@ function handleOverlayClick(event: any) {
       font-style: normal;
       font-weight: 600;
       line-height: 24px;
-      color: #000;
+      color: var(--text-color-primary);
     }
   }
 
@@ -154,8 +151,8 @@ function handleOverlayClick(event: any) {
     .setting-tabs {
       width: 170px;
       padding-top: 7px;
-      background-color: #f0f3fa;
       border-bottom-left-radius: 10px;
+      background-color: var(--bg-color-default);
 
       .tabs-title {
         position: relative;
@@ -165,13 +162,13 @@ function handleOverlayClick(event: any) {
         font-size: 14px;
         font-weight: 400;
         line-height: 36px;
-        color: #4f586b;
         cursor: pointer;
+        color: var(--text-color-secondary);
 
         &.active {
           font-weight: 400;
-          color: #fff;
-          background-color: #1c66e5;
+          color: var(--uikit-color-white-1);
+          background-color: var(--uikit-color-theme-5);
         }
       }
     }
@@ -179,7 +176,7 @@ function handleOverlayClick(event: any) {
     .divide-line {
       width: 1px;
       height: 100%;
-      background: var(--divide-line-color-setting);
+      background: var(--stroke-color-primary);
     }
 
     .setting-content {

@@ -7,10 +7,10 @@ interface IConfigManager {
 }
 
 export type LanguageOption = 'zh-CN' | 'en-US';
-export type Theme = 'white' | 'black';
+export type Theme = 'light' | 'dark';
 const THEME = {
-  LIGHT: 'white',
-  DARK: 'black',
+  LIGHT: 'light',
+  DARK: 'dark',
 };
 
 export class ConfigManager implements IConfigManager {

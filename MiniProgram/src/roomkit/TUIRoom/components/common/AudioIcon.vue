@@ -73,7 +73,7 @@ const audioLevelStyle = computed(() => {
 
     .audio-level {
       width: 100%;
-      background-color: var(--green-color);
+      background-color: var(--text-color-success);
       transition: height 0.2s;
     }
   }

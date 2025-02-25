@@ -5,11 +5,7 @@
     @click="toggleDrawer"
   >
     <span class="label"> {{ selectedLabel || props.value }}</span>
-    <svg-icon
-      style="display: flex"
-      class="icon-arrow"
-      :icon="ArrowStrokeSelectDownIcon"
-    />
+    <svg-icon style="display: flex" class="icon-arrow" :icon="ArrowStrokeSelectDownIcon" />
   </div>
 
   <ActionSheep :visible="drawerShow" @input="drawerShow = $event">

@@ -24,6 +24,6 @@
     fill-rule="evenodd"
     clip-rule="evenodd"
     d="M15.5718 10.3704L12.5716 7.64965L12.0006 7.13184L11.4296 7.64967L8.42969 10.3702L9.57172 11.6295L11.1507 10.1975V13.4999H12.8507V10.1977L14.4298 11.6297L15.5718 10.3704Z"
-    style="fill: var(--active-color-2); fill-opacity: 1"
+    fill="currentColor"
   />
 </svg>

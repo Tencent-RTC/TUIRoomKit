@@ -402,7 +402,6 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--stream-container-flatten-bg-color);
 
   .stream-list-container {
     position: relative;
@@ -457,7 +456,6 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--stream-container-flatten-bg-color);
 
   .enlarged-stream-container {
     width: 100%;
@@ -501,7 +499,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background-color: var(--layout-item);
 }
 
 .swipe {
@@ -517,7 +514,7 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   margin: 5px;
-  background: #fff;
+  background: var(--uikit-color-white-1);
   border-radius: 20px;
   opacity: 0.6;
 }
@@ -526,7 +523,7 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   margin: 5px;
-  background: #fff;
+  background: var(--uikit-color-white-1);
   border-radius: 20px;
   opacity: 1;
 }

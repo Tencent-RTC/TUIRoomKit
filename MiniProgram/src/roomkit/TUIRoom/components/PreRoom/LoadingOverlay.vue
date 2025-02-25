@@ -1,10 +1,6 @@
 <template>
   <div class="loading-overlay">
-    <svg-icon
-      style="display: flex"
-      :icon="LoadingScheduleIcon"
-      class="loading"
-    />
+    <svg-icon style="display: flex" :icon="LoadingScheduleIcon" class="loading" />
     <span class="loading-text">{{ t('Entering the room now...') }}</span>
   </div>
 </template>
@@ -27,7 +23,7 @@ const { t } = useI18n();
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: var(--background-color-1);
+  background-color: var(--bg-color-topbar);
 }
 
 .loading {
@@ -40,7 +36,7 @@ const { t } = useI18n();
   font-style: normal;
   font-weight: 500;
   line-height: 24px;
-  color: var(--font-color-1);
+  color: var(--text-color-primary);
 }
 
 @keyframes loading-rotate {

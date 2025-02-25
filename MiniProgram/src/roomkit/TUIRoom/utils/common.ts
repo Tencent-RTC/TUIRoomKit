@@ -1,8 +1,8 @@
 import { getUrlParam } from './utils';
 
 const THEME = {
-  LIGHT: 'white',
-  DARK: 'black',
+  LIGHT: 'light',
+  DARK: 'dark',
 };
 
 type ThemeOption = 'LIGHT' | 'DARK';

@@ -13,13 +13,13 @@
         cx="16"
         cy="16"
         r="12.8667"
-        stroke="#4F586B"
+        stroke="currentColor"
         stroke-width="2"
       />
       <path
         id="Vector 186"
         d="M25.6001 6.40002L6.40015 25.6"
-        stroke="#4F586B"
+        stroke="currentColor"
         stroke-width="2"
       />
     </g>

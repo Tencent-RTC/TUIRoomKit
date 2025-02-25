@@ -1,10 +1,6 @@
 <template>
   <div class="audio-route-icon">
-    <svg-icon
-      style="display: flex"
-      @tap="handleSwitchAudioRoute"
-      :icon="icon"
-    />
+    <svg-icon style="display: flex" @tap="handleSwitchAudioRoute" :icon="icon" />
   </div>
 </template>
 <script setup lang="ts">

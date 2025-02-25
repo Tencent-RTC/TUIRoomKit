@@ -107,7 +107,7 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   overflow: scroll;
-  background-color: var(--message-list-color-h5);
+  background-color: var(--bg-color-operate);
 
   &::-webkit-scrollbar {
     display: none;
@@ -142,9 +142,9 @@ onMounted(async () => {
           padding: 7px;
           font-size: 14px;
           font-weight: 400;
-          color: #fff;
-          background-color: #4791ff;
           border-radius: 8px;
+          background-color: var(--bg-color-bubble-own);
+          color: var(--text-color-primary);
         }
       }
 
@@ -156,9 +156,9 @@ onMounted(async () => {
         font-style: normal;
         font-weight: 500;
         line-height: 14px;
-        color: #ff7200;
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: var(--text-color-warning);
       }
 
       .message-body {
@@ -167,9 +167,9 @@ onMounted(async () => {
         margin-top: 10px;
         font-size: 14px;
         font-weight: 400;
-        color: #fff;
-        background-color: #817e7e;
         border-radius: 8px;
+        background-color: var(--bg-color-bubble-reciprocal);
+        color: var(--text-color-primary);
       }
     }
   }
