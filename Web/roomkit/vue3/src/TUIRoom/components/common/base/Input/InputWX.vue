@@ -1,8 +1,5 @@
 <template>
-  <div
-    ref="tuiInputRef"
-    :class="['tui-input', themeClass, !border && 'no-border']"
-  >
+  <div ref="tuiInputRef" :class="['tui-input', !border && 'no-border']">
     <input
       @click.stop
       ref="inputRef"
@@ -30,7 +27,7 @@
     >
       <slot name="suffixIcon"></slot>
     </div>
-    <div v-if="showResults" class="results tui-theme-white">
+    <div v-if="showResults" class="results">
       <div
         v-for="(item, index) in searchResult"
         :key="index"
@@ -60,7 +57,6 @@ import {
 const slots = useSlots();
 
 interface Props {
-  theme?: 'white' | 'black';
   modelValue: string;
   placeholder?: string;
   disabled?: boolean;
@@ -83,7 +79,6 @@ interface Props {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = withDefaults(defineProps<Props>(), {
-  theme: 'white',
   modelValue: '',
   placeholder: '',
   disabled: false,
@@ -93,10 +88,6 @@ const props = withDefaults(defineProps<Props>(), {
   border: true,
   align: 'left',
 });
-
-const themeClass = computed(() =>
-  props.theme ? `tui-theme-${props.theme}` : ''
-);
 
 const emit = defineEmits([
   'update:modelValue',
@@ -204,19 +195,19 @@ input {
   height: 100%;
   padding: 10px 0 10px 16px;
   font-size: 14px;
-  color: var(--font-color-3);
-  background-color: var(--background-color-7);
-  border: 1px solid var(--border-color);
   border-radius: 8px;
+  background-color: var(--bg-color-input);
+  color: var(--text-color-primary);
+  border: 1px solid var(--stroke-color-module);
 }
 
 input:focus {
-  border-color: var(--active-color-1);
   outline: 0;
+  border-color: var(--text-color-link);
 }
 
 input:disabled {
-  background-color: var(--background-color-9);
+  background-color: var(--button-color-primary-disable);
 }
 
 .tui-input.no-border input {
@@ -241,9 +232,9 @@ input:disabled {
   max-height: 254px;
   padding: 7px 0;
   overflow: auto;
-  background-color: var(--background-color-7);
-  border: 1px solid var(--border-color);
   border-radius: 4px;
+  background-color: var(--bg-color-input);
+  border: 1px solid var(--stroke-color-module);
 
   &-item {
     display: flex;
@@ -254,18 +245,8 @@ input:disabled {
   }
 
   &-item:hover {
-    color: var(--active-color-2);
-    background-color: var(--hover-background-color-1);
+    background-color: var(--uikit-color-gray-7);
+    color: var(--text-color-link);
   }
-}
-
-.tui-theme-white input {
-  background-color: #f9fafc;
-  border: 1px solid #e4e8ee;
-}
-
-.tui-theme-white .results {
-  background-color: #f9fafc;
-  border: 1px solid #e4e8ee;
 }
 </style>

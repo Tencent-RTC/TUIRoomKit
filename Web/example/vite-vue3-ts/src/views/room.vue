@@ -9,14 +9,16 @@ import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import router from '@/router';
 import i18n, { useI18n } from '../locales/index';
 import { getLanguage, getTheme } from  '../utils/utils';
+import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 const { t } = useI18n();
+const { theme } = useUIKit();
 
 const route = useRoute();
 const roomInfo = sessionStorage.getItem('tuiRoom-roomInfo');
 const userInfo = sessionStorage.getItem('tuiRoom-userInfo');
 const roomId = String(route.query.roomId);
 conference.setLanguage(getLanguage() as LanguageOption);
-conference.setTheme(getTheme() as ThemeOption);
+!theme.value && conference.setTheme(getTheme() as ThemeOption);
 let isMaster = false;
 let isExpectedJump = false;
 

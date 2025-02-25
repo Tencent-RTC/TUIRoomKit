@@ -96,18 +96,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.tui-theme-white .message-body {
-  --user-chat-color: rgba(213, 224, 242, 0.4);
-  --user-font-color: var(--black-color);
-  --host-font-color: var(--white-color);
-}
-
-.tui-theme-black .message-body {
-  --user-chat-color: rgba(213, 224, 242, 0.1);
-  --user-font-color: var(--background-color-4);
-  --host-font-color: var(--background-color-4);
-}
-
 .message-list-container {
   flex: 1;
   height: 100%;
@@ -144,8 +132,8 @@ onUnmounted(() => {
       .message-body {
         min-width: 24px;
         padding: 10px;
-        color: var(--host-font-color);
-        background-color: var(--active-color-1);
+        background-color: var(--bg-color-bubble-own);
+        color: var(--text-color-primary);
         border-radius: 8px;
       }
     }
@@ -157,7 +145,7 @@ onUnmounted(() => {
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;
-      color: var(--font-color-8);
+      color: var(--text-color-warning);
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -167,8 +155,8 @@ onUnmounted(() => {
       padding: 10px;
       font-size: 14px;
       font-weight: 400;
-      color: var(--user-font-color);
-      background-color: var(--user-chat-color);
+      background-color: var(--bg-color-bubble-reciprocal);
+      color: var(--text-color-primary);
       border-radius: 8px;
     }
   }
@@ -178,7 +166,7 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   padding: 10px 23px 10px 32px;
-  background-color: var(--message-list-color-h5);
+  background-color: var(--bg-color-operate);
 
   .message-list {
     height: 100%;
@@ -217,9 +205,9 @@ onUnmounted(() => {
           padding: 7px;
           font-size: 14px;
           font-weight: 400;
-          color: #fff;
-          background-color: #4791ff;
           border-radius: 8px;
+          background-color: var(--bg-color-bubble-own);
+          color: var(--text-color-primary);
         }
       }
 
@@ -231,9 +219,9 @@ onUnmounted(() => {
         font-style: normal;
         font-weight: 500;
         line-height: 14px;
-        color: #ff7200;
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: var(--text-color-warning);
       }
 
       .message-body {
@@ -241,9 +229,9 @@ onUnmounted(() => {
         padding: 7px;
         font-size: 14px;
         font-weight: 400;
-        color: #fff;
-        background-color: var(--message-body-h5);
         border-radius: 8px;
+        background-color: var(--bg-color-bubble-reciprocal);
+        color: var(--text-color-primary);
       }
     }
   }

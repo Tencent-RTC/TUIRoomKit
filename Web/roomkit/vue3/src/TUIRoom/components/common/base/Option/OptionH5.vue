@@ -61,7 +61,6 @@ const handleOptionClick = () => {
 
 .custom-option.active {
   font-weight: 700;
-  color: #409eff;
-  background-color: #f5f7fa;
+  color: var(--text-color-link);
 }
 </style>

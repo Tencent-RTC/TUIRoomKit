@@ -111,7 +111,7 @@ function handleOverlayClick(event: any) {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(15, 16, 20, 0.6);
+  background-color: var(--uikit-color-black-3);
 
   .dialog-container {
     position: fixed;
@@ -121,10 +121,10 @@ function handleOverlayClick(event: any) {
     flex-direction: column;
     min-width: 80vw;
     font-style: normal;
-    color: var(--black-color);
-    background-color: #fff;
     border-radius: 8px;
     transform: translate(-50%, -50%);
+    background-color: var(--bg-color-dialog);
+    color: var(--text-color-primary);
 
     .dialog-title {
       box-sizing: border-box;
@@ -140,8 +140,8 @@ function handleOverlayClick(event: any) {
       padding: 0 24px 20px;
       font-size: 14px;
       font-weight: 400;
-      color: var(--font-color-4);
       text-align: center;
+      color: var(--text-color-secondary);
     }
 
     .dialog-content-notitle {
@@ -152,7 +152,7 @@ function handleOverlayClick(event: any) {
 
     .dialog-footer {
       display: flex;
-      border-top: 1px solid #d5e0f2;
+      border-top: 1px solid var(--stroke-color-module);
 
       .confirm-button,
       .cancel-button {
@@ -164,13 +164,13 @@ function handleOverlayClick(event: any) {
         font-size: 16px;
         font-weight: 400;
         line-height: normal;
-        color: var(--font-color-4);
         text-align: center;
+        color: var(--text-color-primary);
       }
 
       .confirm-button {
-        color: var(--active-color-1);
-        border-left: 1px solid #d5e0f2;
+        color: var(--text-color-link);
+        border-left: 1px solid var(--stroke-color-module);
       }
     }
   }

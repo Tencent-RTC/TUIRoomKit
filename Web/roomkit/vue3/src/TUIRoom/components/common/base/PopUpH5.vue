@@ -15,6 +15,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { defineProps } from 'vue';
 import SvgIcon from './SvgIcon.vue';
 import { useBasicStore } from '../../../stores/basic';
 import ArrowStrokeBackIcon from '../icons/ArrowStrokeBackIcon.vue';
@@ -38,7 +39,7 @@ function handleClose() {
   flex: 1;
   width: 100vw;
   height: 100%;
-  background: var(--room-detail-background);
+  background-color: var(--bg-color-topbar);
 
   .popup-main-header {
     display: flex;
@@ -64,8 +65,8 @@ function handleClose() {
       font-style: normal;
       font-weight: 500;
       line-height: 22px;
-      color: var(--input-font-color);
       text-align: center;
+      color: var(--text-color-primary);
     }
 
     .close-icon {

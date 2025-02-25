@@ -26,19 +26,19 @@
     />
     <path
       d="M16 7.14014V16.7283"
-      stroke="#4791FF"
+      stroke="currentColor"
       stroke-width="2"
       stroke-linejoin="bevel"
     />
     <path
       d="M7 16.729C7 15.9108 10.2727 7.729 10.2727 7.729C10.2727 7.729 13.5455 15.9108 13.5455 16.729"
-      stroke="#4791FF"
+      stroke="currentColor"
       stroke-width="2"
       stroke-linejoin="bevel"
     />
     <path
       d="M8.5 14H12"
-      stroke="#4791FF "
+      stroke="currentColor"
       stroke-width="2"
       stroke-linejoin="bevel"
     />

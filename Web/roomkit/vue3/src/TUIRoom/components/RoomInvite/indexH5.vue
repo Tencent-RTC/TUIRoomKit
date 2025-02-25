@@ -131,24 +131,24 @@ span {
     font-style: normal;
     font-weight: 400;
     line-height: 20px;
-    color: var(--popup-title-color-h5);
     white-space: nowrap;
+    color: var(--text-color-secondary);
   }
 
   .invite-content {
     width: 64%;
     overflow: hidden;
     font-size: 14px;
-    color: var(--popup-content-color-h5);
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: var(--text-color-primary);
   }
 
   .copy {
     width: 20px;
     height: 20px;
     margin-left: 30px;
-    color: var(--active-color-1);
+    color: var(--text-color-link);
   }
 }
 
@@ -166,9 +166,9 @@ span {
   font-style: normal;
   font-weight: 400;
   line-height: 17px;
-  color: var(--mute-button-color-h5);
   text-align: center;
-  background-color: var(--manage-member-button-h5);
   border-radius: 10px;
+  background-color: var(--button-color-primary-default);
+  color: var(--text-color-primary);
 }
 </style>

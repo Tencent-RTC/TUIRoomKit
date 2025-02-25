@@ -47,8 +47,8 @@ onUnmounted(() => {
   bottom: 80px;
   left: 50%;
   padding: 10px 12px;
-  color: #fff;
-  background-color: rgba(79, 88, 107, 0.7);
+  color: var(--uikit-color-white-1);
+  background-color: var(--uikit-color-black-3);
   border-radius: 8px;
   transform: translateX(-50%);
 }

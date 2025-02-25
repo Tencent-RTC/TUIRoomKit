@@ -36,9 +36,9 @@ export function getLanguage() {
 export function getTheme() {
   let storedTheme = localStorage.getItem('tuiRoom-currentTheme') || 'LIGHT';
 
-  if (storedTheme === 'white') {
+  if (storedTheme === 'light') {
     storedTheme = 'LIGHT';
-  } else if (storedTheme === 'black') {
+  } else if (storedTheme === 'dark') {
     storedTheme = 'DARK';
   }
 
