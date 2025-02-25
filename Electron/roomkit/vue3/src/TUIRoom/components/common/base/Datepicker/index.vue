@@ -229,10 +229,10 @@ const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   min-width: 222px;
   padding: 5px;
   font-size: 12px;
-  color: #000;
-  background-color: #fff;
-  border: 1px solid var(--stroke-color);
   border-radius: 4px;
+  background-color: var(--bg-color-dialog);
+  color: var(--text-color-primary);
+  border: 1px solid var(--stroke-color-module);
 }
 
 .picker-header {
@@ -246,7 +246,7 @@ const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   .current-time {
     width: 80%;
     font-weight: bold;
-    color: black;
+    color: var(--text-color-primary);
   }
 }
 
@@ -256,10 +256,11 @@ const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   cursor: pointer;
   background-color: transparent;
   border: none;
+  color: var(--text-color-primary);
 }
 
 .arrow:hover {
-  color: #409eff;
+  color: var(--text-color-link);
 }
 
 .picker-weekdays {
@@ -271,7 +272,6 @@ const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   padding: 5px;
   line-height: initial;
   text-align: center;
-  background-color: #fff;
 }
 
 .picker-body {
@@ -285,16 +285,15 @@ const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   line-height: initial;
   text-align: center;
   cursor: pointer;
-  background-color: #fff;
 }
 
 .day:hover {
-  background-color: #ecf5ff;
+  background-color: var(--uikit-color-white-2);
 }
 
 .day.selected {
-  color: white;
-  background-color: #409eff;
+  color: var(--uikit-color-white-1);
+  background-color: var(--text-color-link);
 }
 
 .day.today .today-dot {
@@ -304,13 +303,13 @@ const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   display: inline-block;
   width: 5px;
   height: 5px;
-  background-color: #409eff;
   border-radius: 50%;
   transform: translateX(-50%);
+  background-color: var(--text-color-link);
 }
 
 .day.past {
-  color: #ccc;
+  color: var(--uikit-color-gray-7);
   pointer-events: none;
 }
 </style>

@@ -61,9 +61,9 @@ function handleDocumentClick(event: MouseEvent) {
     right: 0;
     display: flex;
     padding: 20px;
-    background-color: $toolBarBackgroundColor;
+    background-color: var(--bg-color-topbar);
     border-radius: 4px;
-    box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 10px 0 var(--uikit-color-black-5);
 
     .layout-item {
       position: relative;
@@ -71,7 +71,7 @@ function handleDocumentClick(event: MouseEvent) {
       height: 133px;
       padding: 20px 30px 39px;
       cursor: pointer;
-      background-color: $primaryColor;
+      background-color: var(--bg-color-operate);
       border: 1px solid transparent;
       border-radius: 2px;
 
@@ -80,12 +80,12 @@ function handleDocumentClick(event: MouseEvent) {
       }
 
       &:hover {
-        border: 1px solid $primaryHighLightColor;
+        border: 1px solid var(--stroke-color-primary);
         border-radius: 2px;
       }
 
       &.checked {
-        border: 1px solid $primaryHighLightColor;
+        border: 1px solid var(--stroke-color-primary);
         border-radius: 2px;
 
         &::after {
@@ -126,7 +126,7 @@ function handleDocumentClick(event: MouseEvent) {
         .layout-block {
           width: 38px;
           height: 22px;
-          background-color: $layoutBlockColor;
+          background-color: var(--bg-color-operate);
         }
       }
     }
@@ -139,7 +139,7 @@ function handleDocumentClick(event: MouseEvent) {
         .left-container {
           width: 90px;
           height: 74px;
-          background-color: $layoutBlockColor;
+          background-color: var(--bg-color-operate);
         }
 
         .right-container {
@@ -152,7 +152,7 @@ function handleDocumentClick(event: MouseEvent) {
           > div {
             width: 27px;
             height: 16px;
-            background-color: $layoutBlockColor;
+            background-color: var(--bg-color-operate);
           }
         }
       }
@@ -174,14 +174,14 @@ function handleDocumentClick(event: MouseEvent) {
           > div {
             width: 28px;
             height: 16px;
-            background-color: $layoutBlockColor;
+            background-color: var(--bg-color-operate);
           }
         }
 
         .bottom-container {
           width: 120px;
           height: 55px;
-          background-color: $layoutBlockColor;
+          background-color: var(--bg-color-operate);
         }
       }
     }

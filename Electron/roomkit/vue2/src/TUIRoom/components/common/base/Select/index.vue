@@ -2,7 +2,7 @@
   <div
     ref="selectContainerRef"
     v-click-outside="handleClickOutside"
-    :class="['select-container', themeClass]"
+    class="select-container"
   >
     <div
       :class="['select-content', { disabled: disabled }]"
@@ -33,7 +33,6 @@
 import {
   ref,
   provide,
-  computed,
   reactive,
   watch,
   StyleValue,
@@ -72,9 +71,6 @@ const selectedValue = ref(props.value);
 const selectContainerRef = ref();
 const selectDropDownRef = ref();
 const dropDirection = ref('down');
-const themeClass = computed(() =>
-  props.theme ? `tui-theme-${props.theme}` : ''
-);
 
 watch(
   () => props.value,
@@ -182,16 +178,16 @@ function handleClickOutside() {
     align-items: center;
     height: 42px;
     padding: 0 16px;
-    color: var(--font-color-3);
     cursor: pointer;
-    background-color: var(--background-color-7);
-    border: 1px solid var(--border-color);
     border-radius: 8px;
+    background-color: var(--bg-color-input);
+    color: var(--text-color-primary);
+    border: 1px solid var(--stroke-color-module);
 
     &.disabled {
-      color: #8f9ab2;
       cursor: not-allowed;
       background-color: rgba(255, 255, 255, 0.5);
+      color: var(--text-color-disable);
     }
 
     .select-text {
@@ -222,9 +218,10 @@ function handleClickOutside() {
     max-height: 254px;
     padding: 7px 0;
     overflow: auto;
-    background-color: var(--background-color-7);
-    border: 1px solid var(--border-color);
     border-radius: 8px;
+    background-color: var(--bg-color-input);
+    color: var(--text-color-primary);
+    border: 1px solid var(--stroke-color-primary);
 
     &.down {
       top: calc(100% + 6px);

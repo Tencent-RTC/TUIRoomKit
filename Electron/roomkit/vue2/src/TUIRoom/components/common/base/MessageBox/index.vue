@@ -156,7 +156,7 @@ onMounted(async () => {
   height: 100%;
 
   &.overlay {
-    background-color: rgba(15, 16, 20, 0.6);
+    background-color: var(--uikit-color-black-4);
   }
 }
 
@@ -167,9 +167,9 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   width: 480px;
-  background-color: var(--white-color);
   border-radius: 20px;
   transform: translate(-50%, -50%);
+  background-color: var(--bg-color-dialog);
 
   .tui-message-box-header {
     position: relative;
@@ -177,15 +177,15 @@ onMounted(async () => {
     align-items: center;
     height: 64px;
     padding: 0 24px;
-    color: var(--title-color);
-    box-shadow: 0 7px 10px -5px rgba(230, 236, 245, 0.8);
+    color: var(--text-color-primary);
+    border-bottom: 1px solid var(--stroke-color-primary);
 
     .tui-dialog-header-title {
       font-size: 16px;
       font-style: normal;
       font-weight: 600;
       line-height: 24px;
-      color: #0f1014;
+      color: var(--text-color-primary);
     }
 
     .close {
@@ -197,9 +197,9 @@ onMounted(async () => {
       justify-content: center;
       width: 32px;
       height: 32px;
-      color: #4f586b;
       cursor: pointer;
       transform: translateY(-50%);
+      color: var(--text-color-primary);
     }
   }
 
@@ -210,7 +210,7 @@ onMounted(async () => {
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
-    color: #4f586b;
+    color: var(--text-color-primary);
   }
 
   .tui-message-box-footer {
@@ -233,10 +233,10 @@ onMounted(async () => {
   min-width: 80vw;
   max-width: 80vw;
   font-style: normal;
-  color: var(--black-color);
-  background-color: #fff;
   border-radius: 8px;
   transform: translate(-50%, -50%);
+  background-color: var(--bg-color-dialog);
+  color: var(--text-color-primary);
 
   .tui-message-box-header {
     box-sizing: border-box;
@@ -256,15 +256,15 @@ onMounted(async () => {
     padding: 0 24px 20px;
     font-size: 14px;
     font-weight: 400;
-    color: var(--font-color-4);
     text-align: center;
+    color: var(--text-color-secondary);
   }
 
   .tui-message-box-footer {
     display: flex;
     justify-content: space-around;
     width: 100%;
-    border-top: 1px solid #d5e0f2;
+    border-top: 1px solid var(--stroke-color-module);
 
     .button-container {
       display: flex;
@@ -273,7 +273,7 @@ onMounted(async () => {
       padding: 11px 0;
 
       &:not(:first-child) {
-        border-left: 1px solid #d5e0f2;
+        border-left: 1px solid var(--stroke-color-module);
       }
     }
 
@@ -283,10 +283,10 @@ onMounted(async () => {
     }
 
     .confirm-button {
-      color: var(--active-color-1);
       text-align: center;
-      background-color: #fff;
       border: none;
+      color: var(--text-color-link);
+      background-color: var(--bg-color-dialog);
     }
   }
 }

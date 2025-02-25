@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, watch, computed } from 'vue';
+import { ref, Ref, watch, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { StreamInfo, useRoomStore } from '../../../stores/room';
 import { useBasicStore } from '../../../stores/basic';
@@ -34,6 +34,8 @@ import MultiStreamView from '../../Stream/MultiStreamView/index.vue';
 import ArrowStroke from '../../common/ArrowStroke.vue';
 import useStreamContainerHooks from './useStreamContainerHooks';
 import { TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-electron';
+import { roomEngine } from '../../../services';
+import { on } from 'events';
 
 const roomStore = useRoomStore();
 const {
@@ -160,6 +162,19 @@ watch(
   },
   { immediate: true }
 );
+
+onMounted(() => {
+  roomEngine.instance?.getTRTCCloud().callExperimentalAPI(
+    JSON.stringify({
+      api: 'setPrivateConfig',
+      params: {
+        key: 'Liteav.Audio.common.ans.version',
+        value: '4',
+        default: '0',
+      },
+    })
+  );
+});
 
 const showSideList = ref(true);
 const arrowDirection = computed(() => {

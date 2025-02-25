@@ -4,11 +4,6 @@ import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-elect
 import { UserInfo } from '../../stores/room';
 import defaultAvatar from '../../assets/imgs/avatar.png';
 
-const THEME = {
-  LIGHT: 'LIGHT',
-  DARK: 'DARK',
-};
-
 export class ChatManager {
   static instance?: ChatManager;
   private service: IRoomService;
@@ -84,16 +79,17 @@ export class ChatManager {
   }
 
   private onThemeChanged(theme: string) {
-    const currentTheme = theme === 'black' ? THEME.DARK : THEME.LIGHT;
     TUICore.notifyEvent(
       TUIConstants.TUITheme.EVENT.THEME_CHANGED,
       TUIConstants.TUITheme.EVENT_SUB_KEY.CHANGE_SUCCESS,
-      { theme: currentTheme }
+      { theme }
     );
   }
 
   private onUserNameCardChanged(eventInfo: { userInfo: UserInfo }) {
     const { userId, nameCard } = eventInfo.userInfo;
+    const oldNameCard = this.service.roomStore.userInfoObj[userId]?.nameCard;
+    if (oldNameCard === nameCard) return;
     const result = { [userId]: { nameCard } };
 
     TUICore.callService({

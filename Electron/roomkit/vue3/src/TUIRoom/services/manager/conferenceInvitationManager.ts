@@ -4,9 +4,9 @@ import {
   TUIInvitationRejectedReason,
   TUIRoomInfo,
 } from '@tencentcloud/tuiroom-engine-electron';
+import { isWeChat } from '../../utils/environment';
 import { EventType, IRoomService } from '../types';
 import mitt from 'mitt';
-export * from '@tencentcloud/tuiroom-engine-electron';
 interface IConferenceInvitationManager {
   on(
     eventType: TUIConferenceInvitationManagerEvents,
@@ -181,7 +181,42 @@ export class ConferenceInvitationManager
       this.reject({ roomId: data.roomInfo.roomId, reason });
     } else {
       this.isBeingInvited = true;
-      this.emit(TUIConferenceInvitationManagerEvents.onReceiveInvitation, data);
+      if (isWeChat) {
+        this.emit(
+          TUIConferenceInvitationManagerEvents.onReceiveInvitation,
+          data
+        );
+        return;
+      }
+      const { roomInfo, invitation } = data;
+      const { roomName, roomMemberCount, roomOwner, roomId } = roomInfo || {};
+      const { userId, userName, avatarUrl } = invitation?.inviter || {};
+
+      const invitationInfo = {
+        userId,
+        userName,
+        avatarUrl,
+        roomName,
+        roomMemberCount,
+        roomOwner,
+        roomId,
+      };
+      this.service.widgetsManager.notification?.openInviteNotification({
+        appendTo: 'pre-conference-container',
+        message: invitationInfo,
+        confirmButtonText: this.service.t('Enter Now'),
+        cancelButtonText: this.service.t('Not joining for now'),
+        onConfirm: () =>
+          this.accept({
+            roomId: roomInfo.roomId,
+          }),
+        onCancel: () =>
+          this.reject({
+            roomId: roomInfo.roomId,
+            reason: TUIInvitationRejectedReason.kRejectToEnter,
+          }),
+        duration: 60000,
+      });
     }
   }
 
@@ -288,6 +323,8 @@ export class ConferenceInvitationManager
 
   async accept(options: { roomId: string }) {
     this.isBeingInvited = false;
+    this.service.emit(EventType.CONFERENCE_INVITATION_ACCEPTED, options.roomId);
+
     return await this.service.roomEngine.instance
       ?.getConferenceInvitationManager()
       .accept(options);

@@ -57,21 +57,6 @@ const {
 </script>
 
 <style lang="scss" scoped>
-.tui-theme-white .roomInfo-container {
-  --title-font-color: var(--font-color-1);
-  --item-font-color: var(--font-color-6);
-  --filter-color: drop-shadow(0px 0px 4px rgba(32, 77, 141, 0.03))
-    drop-shadow(0px 4px 10px rgba(32, 77, 141, 0.06))
-    drop-shadow(0px 1px 14px rgba(32, 77, 141, 0.05));
-}
-
-.tui-theme-black .roomInfo-container {
-  --title-font-color: #8f9ab2;
-  --item-font-color: var(--font-color-1);
-  --filter-color: drop-shadow(0px 8px 40px rgba(23, 25, 31, 0.6))
-    drop-shadow(0px 4px 12px rgba(23, 25, 31, 0.4));
-}
-
 .conference-container {
   position: relative;
   min-width: 140px;
@@ -115,8 +100,10 @@ const {
   flex-direction: column;
   gap: 16px;
   padding: 20px;
-  background-color: var(--background-color-2);
-  filter: var(--filter-color);
+  background-color: var(--bg-color-dialog);
+  box-shadow:
+    0 2px 6px var(--uikit-color-black-8),
+    0 8px 18px var(--uikit-color-black-8);
   border-radius: 16px;
   transform: translateX(-50%);
 
@@ -131,23 +118,23 @@ const {
 
     .roomInfo-title {
       flex-basis: 30%;
-      color: var(--title-font-color);
+      color: var(--text-color-secondary);
     }
 
     .roomInfo-item {
       flex-basis: 50%;
       max-width: 300px;
       overflow: hidden;
-      color: var(--item-font-color);
       text-overflow: ellipsis;
       white-space: nowrap;
+      color: var(--text-color-primary);
     }
 
     .copy-container {
       display: flex;
       margin-left: auto;
-      color: var(--active-color-2);
       cursor: pointer;
+      color: var(--text-color-link);
 
       .copy {
         width: 20px;

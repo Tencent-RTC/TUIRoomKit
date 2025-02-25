@@ -50,15 +50,7 @@ watch(isMemberControlAccessible, (accessible: boolean) => {
 
   &:hover {
     cursor: pointer;
-    background: var(--hover-bg-color);
+    background-color: var(--list-color-hover);
   }
-}
-
-.tui-theme-black .member-item-container {
-  --hover-bg-color: rgba(79, 88, 107, 0.2);
-}
-
-.tui-theme-white .member-item-container {
-  --hover-bg-color: rgba(213, 224, 242, 0.3);
 }
 </style>

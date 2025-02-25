@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 interface Props {
   value: boolean;
 }
@@ -30,9 +30,9 @@ function toggleSwitch() {
   width: 40px;
   height: 20px;
   cursor: pointer;
-  background-color: var(--active-color-1);
   border-radius: 20px;
   transition: background-color 0.3s;
+  background-color: var(--switch-color-on);
 
   .switch-core {
     position: absolute;
@@ -40,17 +40,15 @@ function toggleSwitch() {
     left: 2px;
     width: 40%;
     height: 80%;
-    background-color: #fff;
     border-radius: 50%;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s !important;
     transform: translateX(20px);
+    background-color: var(--switch-color-button);
   }
 }
 
 .switch-container-active {
-  background-color: var(--background-color-6);
-
   .switch-core {
     transform: translateX(0);
   }

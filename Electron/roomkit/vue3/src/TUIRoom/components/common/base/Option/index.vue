@@ -84,16 +84,16 @@ function handleChooseOption() {
 .option-container {
   padding: 6px 15px;
   overflow: hidden;
-  color: #000;
+  color: var(--text-color-primary);
   white-space: nowrap;
   cursor: pointer;
 
   &.active {
-    color: var(--active-color-2);
+    color: var(--text-color-link);
   }
 
   &:hover {
-    background-color: var(--hover-background-color);
+    background-color: var(--dropdown-color-hover);
   }
 
   .option-content {
@@ -101,13 +101,5 @@ function handleChooseOption() {
     font-weight: 500;
     line-height: 22px;
   }
-}
-
-.tui-theme-white .option-container {
-  --hover-background-color: rgba(213, 224, 242, 0.5);
-}
-
-.tui-theme-black .option-container {
-  --hover-background-color: rgba(213, 224, 242, 0.5);
 }
 </style>

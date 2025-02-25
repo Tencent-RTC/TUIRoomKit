@@ -134,7 +134,7 @@ onBeforeUnmount(() => {
   .stream-region {
     position: relative;
     overflow: hidden;
-    background-color: #000;
+    background-color: var(--uikit-color-black-1);
     border-radius: 12px;
   }
 }

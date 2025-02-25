@@ -130,14 +130,6 @@ const iconList = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-.tui-theme-black .member-av-state {
-  --icon-color: #a3aec7;
-}
-
-.tui-theme-white .member-av-state {
-  --icon-color: #b2bbd1;
-}
-
 .member-info,
 .member-info-mobile {
   display: flex;
@@ -166,9 +158,9 @@ const iconList = computed(() => {
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;
-      color: var(--font-color-1);
       text-overflow: ellipsis;
       white-space: nowrap;
+      color: var(--text-color-secondary);
     }
 
     .role-info {
@@ -178,11 +170,11 @@ const iconList = computed(() => {
       .admin-icon {
         display: flex;
         margin-left: 8px;
-        color: var(--active-color-2);
+        color: var(--text-color-link);
       }
 
       .admin-icon {
-        color: var(--orange-color);
+        color: var(--text-color-warning);
       }
 
       .user-extra-info,
@@ -193,12 +185,12 @@ const iconList = computed(() => {
         font-size: 14px;
         font-weight: 400;
         line-height: 20px;
-        color: var(--active-color-2);
+        color: var(--text-color-link);
       }
 
       .user-extra-info-admin {
-        color: var(--orange-color);
         transition: none;
+        color: var(--text-color-warning);
       }
     }
   }
@@ -219,7 +211,7 @@ const iconList = computed(() => {
     display: flex;
     align-items: center;
     height: 100%;
-    color: var(--icon-color);
+    color: var(--uikit-color-gray-7);
 
     .state-icon {
       margin-left: 16px;
