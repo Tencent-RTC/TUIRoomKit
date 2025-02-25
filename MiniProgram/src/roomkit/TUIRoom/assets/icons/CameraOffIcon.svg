@@ -25,7 +25,7 @@
   />
   <path
     d="M5 9H8.5"
-    style="stroke: var(--active-color-2); stroke-opacity: 1"
+    style="stroke: var(--uikit-color-theme-5); stroke-opacity: 1"
     stroke-width="1.7"
   />
 </svg>

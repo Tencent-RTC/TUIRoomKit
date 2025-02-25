@@ -142,8 +142,8 @@ onUnmounted(() => {
   font-size: 14px;
   font-weight: 400;
   line-height: 22px;
-  color: var(--font-color-4);
   text-align: left;
+  color: var(--text-color-secondary);
 
   .speaker {
     max-width: 150px;
@@ -160,7 +160,7 @@ onUnmounted(() => {
   font-weight: 400;
   line-height: 22px;
   text-align: left;
-  background-color: var(--background-color-7);
   border-radius: 8px;
+  background-color: var(--bg-color-bubble-reciprocal);
 }
 </style>

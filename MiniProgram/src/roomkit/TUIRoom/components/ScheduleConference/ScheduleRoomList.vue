@@ -8,11 +8,7 @@
     ]"
   >
     <div class="schedule-loading" v-if="isShowLoading">
-      <svg-icon
-        style="display: flex"
-        :icon="LoadingScheduleIcon"
-        class="loading"
-      />
+      <svg-icon style="display: flex" :icon="LoadingScheduleIcon" class="loading" />
       <span class="text">{{ t('Schedule room loading') }}</span>
     </div>
     <template v-else>
@@ -314,9 +310,11 @@ onUnmounted(() => {
   padding: 20px 0;
   margin-left: 20px;
   user-select: none;
-  background-color: var(--white-color);
   border-radius: 24px;
-  box-shadow: rgba(197, 210, 229, 0.3);
+  box-shadow:
+    0 2px 6px var(--uikit-color-black-8),
+    0 8px 18px var(--uikit-color-black-8);
+  background-color: var(--bg-color-operate);
 }
 
 .schedule-room {
@@ -330,7 +328,6 @@ onUnmounted(() => {
     display: flex;
     font-size: 14px;
     font-weight: 500;
-    color: var(--active-color-1);
     cursor: pointer;
 
     .arrow {
@@ -346,7 +343,7 @@ onUnmounted(() => {
     height: 100%;
     font-size: 14px;
     font-weight: 400;
-    color: #8f9ab2;
+    color: var(--text-color-secondary);
 
     .loading {
       margin-bottom: 10px;
@@ -365,7 +362,7 @@ onUnmounted(() => {
       padding: 10px;
       font-size: 14px;
       font-weight: 400;
-      color: var(--font-color-9);
+      color: var(--text-color-secondary);
 
       .date {
         margin-right: 2px;
@@ -385,7 +382,7 @@ onUnmounted(() => {
       font-size: 14px;
       font-style: normal;
       font-weight: 400;
-      color: #8f9ab2;
+      color: var(--text-color-secondary);
     }
   }
 
@@ -396,10 +393,9 @@ onUnmounted(() => {
   ::-webkit-scrollbar {
     width: 6px;
   }
-
   ::-webkit-scrollbar-thumb {
-    background-color: #e0e2e9;
     border-radius: 10px;
+    background-color: var(--stroke-color-secondary);
   }
 }
 

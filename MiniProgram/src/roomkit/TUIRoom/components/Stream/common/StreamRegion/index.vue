@@ -264,7 +264,7 @@ function handleScaleChange(event: {
   transform: rotate(0deg);
 
   &.border {
-    border: 2px solid #37e858;
+    border: 2px solid var(--uikit-color-green-5);
   }
 
   movable-area,
@@ -282,7 +282,7 @@ function handleScaleChange(event: {
     justify-content: center;
     width: 100%;
     height: 100%;
-    background-color: var(--center-user-info-container-bg-color);
+    background-color: var(--bg-color-bubble-reciprocal);
 
     .avatar-region {
       width: 130px;
@@ -303,8 +303,8 @@ function handleScaleChange(event: {
     height: 30px;
     overflow: hidden;
     font-size: 14px;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.6);
+    color: var(--uikit-color-white-1);
+    background: var(--uikit-color-black-4);
 
     .user-name {
       max-width: 60px;
@@ -323,11 +323,11 @@ function handleScaleChange(event: {
       width: 32px;
       height: 32px;
       margin-left: 0;
-      background-color: var(--active-color-1);
+      background-color: var(--text-color-link);
     }
 
     .admin-icon {
-      background-color: var(--orange-color);
+      background-color: var(--text-color-warning);
     }
 
     .screen-icon {

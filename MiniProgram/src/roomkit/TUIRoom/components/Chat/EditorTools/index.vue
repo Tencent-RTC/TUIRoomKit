@@ -29,7 +29,8 @@ const chooseEmoji = (itemName: string) => {
   width: 100%;
   height: 200px;
   overflow-y: auto;
-  background: var(--background-color-8);
+  background-color: var(--bg-color-function);
+  box-shadow: var(--uikit-color-black-8);
 }
 
 .emoji-item {

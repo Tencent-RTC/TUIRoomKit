@@ -81,11 +81,11 @@ const scheduleInviteList = computed(() => {
     font-size: 14px;
     font-weight: 400;
     line-height: 20px;
-    color: #4f586b;
 
     .invite-member-title {
       min-width: 80px;
       margin-right: 10px;
+      color: var(--text-color-primary);
     }
 
     .invite-member-content {
@@ -94,6 +94,7 @@ const scheduleInviteList = computed(() => {
       font-weight: 500;
       text-overflow: ellipsis;
       white-space: nowrap;
+      color: var(--text-color-secondary);
     }
 
     .copy {
@@ -101,8 +102,8 @@ const scheduleInviteList = computed(() => {
       min-width: 20px;
       height: 20px;
       margin-left: 8px;
-      color: var(--active-color-1);
       cursor: pointer;
+      color: var(--text-color-link);
     }
   }
 }
@@ -111,7 +112,7 @@ const scheduleInviteList = computed(() => {
   .invite-member-title {
     font-size: 14px;
     font-weight: 400;
-    color: #8f9ab2;
+    color: var(--text-color-secondary);
   }
 
   .invite-member-container {

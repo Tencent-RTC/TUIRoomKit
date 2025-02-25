@@ -9,6 +9,7 @@ import {
   TUIRoomEngine,
   TUIRole,
   TUIRoomEvents,
+  TUIUserInfo,
 } from '@tencentcloud/tuiroom-engine-wx';
 import logger from '../../../utils/common/logger';
 import TUIMessage from '../../common/base/Message/index';
@@ -137,13 +138,11 @@ export default function useEndControl() {
     }
   }
 
-  const onUserRoleChanged = async (eventInfo: {
-    userId: string;
-    userRole: TUIRole;
-  }) => {
-    const { userId, userRole } = eventInfo;
+  const onUserInfoChanged = async ({ userInfo }: { userInfo: TUIUserInfo }) => {
+    const { userId, userRole } = userInfo;
     const isLocal = roomStore.localUser.userId === userId;
     const oldUserRole = roomStore.getUserRole(userId);
+    if (oldUserRole === userRole) return;
     roomStore.updateUserInfo({ userId, userRole });
     switch (userRole) {
       case TUIRole.kGeneralUser:
@@ -216,7 +215,7 @@ export default function useEndControl() {
   };
 
   TUIRoomEngine.once('ready', () => {
-    roomEngine.instance?.on(TUIRoomEvents.onUserRoleChanged, onUserRoleChanged);
+    roomEngine.instance?.on(TUIRoomEvents.onUserInfoChanged, onUserInfoChanged);
   });
   const handleMount = () => {
     const { userRole } = roomService.roomStore.localUser;
@@ -230,8 +229,8 @@ export default function useEndControl() {
   roomService.lifeCycleManager.on('mount', handleMount);
   onUnmounted(() => {
     roomEngine.instance?.off(
-      TUIRoomEvents.onUserRoleChanged,
-      onUserRoleChanged
+      TUIRoomEvents.onUserInfoChanged,
+      onUserInfoChanged
     );
     roomService.lifeCycleManager.off('mount', handleMount);
   });

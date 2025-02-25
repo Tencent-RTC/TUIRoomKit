@@ -71,6 +71,9 @@ import {
 } from './services/index';
 import useDeviceManager from './hooks/useDeviceManager';
 import { storeToRefs } from 'pinia';
+import { useUIKit } from '@tencentcloud/uikit-base-component-uni';
+
+const { theme } = useUIKit();
 
 const isShowPasswordContainer = ref(false);
 const isShowLoading = ref(true);
@@ -197,7 +200,7 @@ const { showHeaderTool } = roomService.basicStore;
 const tuiRoomClass = computed(() => {
   const roomClassList = [
     'tui-room',
-    `tui-theme-${roomService.basicStore.defaultTheme}`,
+    theme.value ? '' : `tui-theme-${roomService.basicStore.defaultTheme}`,
   ];
   if (isMobile) {
     roomClassList.push('tui-room-h5');
@@ -346,8 +349,7 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
 
 <style lang="scss">
 @import './assets/style/global.scss';
-@import './assets/style/black-theme.scss';
-@import './assets/style/white-theme.scss';
+@import '@tencentcloud/uikit-base-component-uni/dist/styles/index.css';
 
 .tui-room :not([class|='el']) {
   transition:
@@ -366,19 +368,20 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
   min-width: 850px;
   height: 100%;
   min-height: 400px;
-  color: var(--font-color-1);
   text-align: left;
-  background-color: var(--background-color-1);
+  background-color: var(--bg-color-topbar);
+  color: var(--text-color-primary);
 
   .header {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 100;
+    z-index: 1;
     width: 100%;
     height: 64px;
-    background-color: var(--background-color-2);
-    box-shadow: 0 1px 0 var(--header-shadow-color);
+    background-color: var(--bg-color-topbar);
+    box-shadow: 0 1px 0 var(--uikit-color-black-8);
+    border-bottom: 1px solid var(--stroke-color-primary);
   }
 
   .content {
@@ -386,7 +389,7 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--background-color-1);
+    background-color: var(--bg-color-topbar);
   }
 
   &.tui-room-h5 {
@@ -416,25 +419,5 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
     width: 100%;
     height: 100%;
   }
-}
-
-.tui-theme-white .tui-room {
-  --header-shadow-color: #e3eaf7;
-  --footer-shadow-color: rgba(197, 210, 229, 0.2);
-}
-
-.tui-theme-black .tui-room {
-  --header-shadow-color: rgba(34, 38, 46, 0.3);
-  --footer-shadow-color: rgba(34, 38, 46, 0.3);
-}
-
-.tui-theme-white.tui-room {
-  --header-shadow-color: #e3eaf7;
-  --footer-shadow-color: rgba(197, 210, 229, 0.2);
-}
-
-.tui-theme-black.tui-room {
-  --header-shadow-color: rgba(34, 38, 46, 0.3);
-  --footer-shadow-color: rgba(34, 38, 46, 0.3);
 }
 </style>

@@ -120,7 +120,7 @@ const isScreenStream = computed(
   pointer-events: none;
 
   &.border {
-    border: $border-width solid #37e858;
+    border: $border-width solid var(--uikit-color-green-5);
   }
 
   @keyframes loading-rotate {
@@ -157,9 +157,9 @@ const isScreenStream = computed(
     padding: 0 10px 0 0;
     overflow: hidden;
     font-size: 14px;
-    color: #fff;
-    background: var(--user-info-container-bg-color);
+    color: var(--uikit-color-white-1);
     border-radius: 16px;
+    background-color: var(--uikit-color-black-5);
 
     .user-name {
       margin-left: 8px;
@@ -186,12 +186,12 @@ const isScreenStream = computed(
       width: 32px;
       height: 32px;
       margin-left: 0;
-      background-color: var(--active-color-1);
       border-radius: 50%;
+      background-color: var(--button-color-primary-default);
     }
 
     .admin-icon {
-      background-color: var(--orange-color);
+      background-color: var(--text-color-warning);
     }
 
     .audio-icon {
@@ -216,7 +216,7 @@ const isScreenStream = computed(
     left: 0 - $border-width;
     width: calc(100% + $border-width * 2);
     height: calc(100% + $border-width * 2);
-    background-color: var(--background-color-1);
+    background-color: var(--bg-color-bubble-reciprocal);
 
     &::before {
       position: absolute;
@@ -225,7 +225,7 @@ const isScreenStream = computed(
       width: 100%;
       height: 100%;
       content: '';
-      background-color: var(--user-has-no-camera-bg-color);
+      background-color: var(--bg-color-bubble-reciprocal);
     }
 
     .avatar-region {
@@ -263,19 +263,10 @@ const isScreenStream = computed(
           text-overflow: ellipsis;
           white-space: nowrap;
           vertical-align: bottom;
+          color: var(--uikit-color-white-1);
         }
       }
     }
   }
-}
-
-.tui-theme-white .stream-cover-container {
-  --user-has-no-camera-bg-color: rgba(228, 232, 238, 0.4);
-  --user-info-container-bg-color: rgba(18, 23, 35, 0.8);
-}
-
-.tui-theme-black .stream-cover-container {
-  --user-has-no-camera-bg-color: rgba(34, 38, 46, 0.5);
-  --user-info-container-bg-color: rgba(34, 38, 46, 0.8);
 }
 </style>

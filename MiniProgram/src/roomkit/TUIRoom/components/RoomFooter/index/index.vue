@@ -55,7 +55,7 @@ function handleShowOverlay(data: { name: string; visible: boolean }) {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .footer-container {
   position: absolute;
   bottom: 0;
@@ -65,7 +65,7 @@ function handleShowOverlay(data: { name: string; visible: boolean }) {
   justify-content: space-between;
   width: 100%;
   padding: 0.7rem;
-  background-color: var(--background-color-2);
-  box-shadow: 0 -8px 30px var(--footer-shadow-color);
+  background-color: var(--bg-color-topbar);
+  box-shadow: 0 -8px 30px var(--uikit-color-black-8);
 }
 </style>

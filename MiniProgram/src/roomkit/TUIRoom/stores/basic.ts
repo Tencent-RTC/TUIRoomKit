@@ -51,6 +51,7 @@ interface BasicState {
   isRoomLinkVisible: boolean;
   isSchemeLinkVisible: boolean;
   isShowScreenShareAntiFraud: boolean;
+  isExperiencedAI: boolean;
   isOpenMic: boolean;
   scene: SceneType;
   componentConfig: {
@@ -102,13 +103,14 @@ export const useBasicStore = defineStore('basic', {
       delay: 0,
     },
     lang: getLanguage(),
-    defaultTheme: 'black',
+    defaultTheme: 'dark',
     isSupportSwitchTheme: true,
     showHeaderTool: true,
     shareLink: '',
     isRoomLinkVisible: !isElectron && !isWeChat,
     isSchemeLinkVisible: !isMobile,
     isShowScreenShareAntiFraud: false,
+    isExperiencedAI: false,
     isOpenMic: false,
     componentConfig: {
       SwitchTheme: {
@@ -190,6 +192,9 @@ export const useBasicStore = defineStore('basic', {
     setIsShowScreenShareAntiFraud(isShowScreenShareAntiFraud: boolean) {
       this.isShowScreenShareAntiFraud = isShowScreenShareAntiFraud;
     },
+    setIsExperiencedAI(isExperiencedAI: boolean) {
+      this.isExperiencedAI = isExperiencedAI;
+    },
     setBasicInfo(infoObj: any) {
       if (!infoObj) {
         return;
@@ -262,6 +267,7 @@ export const useBasicStore = defineStore('basic', {
       this.shareLink = '';
       this.isOpenMic = false;
       this.showRoomTool = false;
+      this.isExperiencedAI = false;
     },
   },
 });

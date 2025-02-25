@@ -318,8 +318,8 @@ const handleMouseUp = async () => {
   justify-content: center;
   min-height: 310px;
   overflow: hidden;
-  background-color: var(--black-color);
   border-radius: 8px;
+  background-color: var(--uikit-color-black-1);
 }
 
 .setting {
@@ -327,8 +327,8 @@ const handleMouseUp = async () => {
   flex-direction: column;
   align-items: center;
   margin-top: 10px;
-  border: 1px solid var(--border-color-2);
   border-radius: 8px;
+  border: 1px solid var(--stroke-color-primary);
 
   &-header {
     display: flex;
@@ -339,9 +339,9 @@ const handleMouseUp = async () => {
     font-style: normal;
     font-weight: 500;
     line-height: 44px;
-    color: var(--active-color-1);
-    background-color: var(--background-color-13);
-    border-bottom: 1px solid var(--border-color-2);
+    color: var(--text-color-link);
+    background-color: var(--bg-color-dialog-module);
+    border-bottom: 1px solid var(--stroke-color-primary);
   }
 
   &-container {
@@ -356,11 +356,11 @@ const handleMouseUp = async () => {
     justify-content: center;
     margin-right: 20px;
     font-size: 12px;
-    color: var(--font-color-4);
     text-align: center;
     cursor: pointer;
     border: 1px solid transparent;
     border-radius: 8px;
+    color: var(--text-color-secondary);
 
     &-icon {
       display: flex;
@@ -369,15 +369,15 @@ const handleMouseUp = async () => {
       width: 54px;
       height: 54px;
       overflow: hidden;
-      background-color: #f0f3fa;
       border-radius: 8px;
+      background-color: var(--bg-color-dialog);
+      border: 1px solid var(--stroke-color-primary);
     }
   }
 
   &-item.active {
-    color: #fff;
-    background-color: var(--active-color-1);
-    border: 1px solid var(--active-color-1);
+    background-color: var(--button-color-primary-default);
+    border: 1px solid var(--button-color-primary-default);
   }
 }
 
@@ -392,10 +392,10 @@ const handleMouseUp = async () => {
   justify-content: center;
   height: 30px;
   padding: 4px 12px;
-  color: #fff;
   cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.4);
   border-radius: 6px;
+  color: var(--uikit-color-white-1);
+  background-color: var(--uikit-color-black-5);
 
   .text {
     margin-left: 4px;
@@ -432,11 +432,11 @@ const handleMouseUp = async () => {
   z-index: 3;
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid var(--active-color-1);
+  border: 4px solid var(--uikit-color-white-2);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   animation: spin 1s linear infinite;
+  border-top: 4px solid var(--text-color-link);
 }
 
 .mask {
@@ -444,7 +444,7 @@ const handleMouseUp = async () => {
   z-index: 2;
   width: 100%;
   height: 100%;
-  background-color: var(--black-color);
+  background-color: var(--uikit-color-black-1);
 }
 
 @keyframes spin {
