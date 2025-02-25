@@ -542,4 +542,6 @@ export default {
     'Sure you want to reset the beauty effect?',
   'All beauty parameters will revert to default after reset':
     'All beauty parameters will revert to default after reset',
+  'Theme Colours': 'Theme Colours',
+  'Custom Themes': 'Custom Themes',
 };

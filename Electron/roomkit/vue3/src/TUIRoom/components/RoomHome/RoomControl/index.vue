@@ -368,16 +368,18 @@ onBeforeUnmount(async () => {
   width: 760px;
   height: 544px;
   padding: 20px 20px 32px;
-  background-color: var(--background-color);
   border-radius: 24px;
-  box-shadow: var(--box-shadow);
+  background-color: var(--bg-color-operate);
+  box-shadow:
+    0px 2px 6px var(--uikit-color-black-8),
+    0px 8px 18px var(--uikit-color-black-8);
 
   .stream-preview-container {
     position: relative;
     width: 100%;
     height: 400px;
     overflow: hidden;
-    background-color: #000;
+    background-color: var(--uikit-color-black-1);
     border-radius: 8px;
 
     .stream-preview {
@@ -402,7 +404,7 @@ onBeforeUnmount(async () => {
         font-size: 22px;
         font-weight: 400;
         line-height: 34px;
-        color: #4f586b;
+        color: var(--uikit-color-gray-7);
       }
 
       .loading {
@@ -475,19 +477,19 @@ onBeforeUnmount(async () => {
           bottom: calc(100% + 8px);
           left: 50%;
           cursor: pointer;
-          background-color: #fff;
           border-radius: 10px;
           box-shadow:
-            0 2px 4px rgba(32, 77, 141, 0.03),
-            0 6px 10px rgba(32, 77, 141, 0.06),
-            0 3px 14px rgba(32, 77, 141, 0.05);
+            0 2px 4px var(--uikit-color-black-8),
+            0 6px 10px var(--uikit-color-black-8),
+            0 3px 14px var(--uikit-color-black-8);
           transform: translateX(-50%);
+          background-color: var(--dropdown-color-default);
 
           .create-room-item {
             display: flex;
             justify-content: space-between;
             padding: 19px 32px;
-            color: #4f586b;
+            color: var(--text-color-primary);
             transition:
               background-color 0s,
               color 0s;
@@ -509,7 +511,9 @@ onBeforeUnmount(async () => {
             }
 
             &:hover {
-              color: var(--active-color-1);
+              border-radius: 10px;
+              background-color: var(--dropdown-color-hover);
+              color: var(--text-color-link);
 
               .create-room-option {
                 font-weight: 500;
@@ -532,26 +536,23 @@ onBeforeUnmount(async () => {
           height: 60px;
           padding: 0 14px;
           line-height: 60px;
-          background-color: var(--background-color);
-          border: 2px solid var(--active-color-1);
           border-radius: 30px;
-
+          background-color: var(--bg-color-operate);
+          border: 2px solid var(--button-color-primary-default);
           .input {
             max-width: 140px;
             padding: 0;
             font-size: 20px;
             font-weight: 500;
             line-height: 28px;
-            color: var(--font-color-1);
             background-color: transparent;
             border: 0;
             outline: none;
-
-            --input-placeholder-color: rgba(143, 154, 178, 0.7);
+            color: var(--text-color-secondary);
 
             &::placeholder {
               // https://developer.mozilla.org/en-US/docs/Web/CSS/::placeholder
-              color: var(--input-placeholder-color);
+              color: var(--uikit-color-gray-7);
             }
           }
 
@@ -564,12 +565,12 @@ onBeforeUnmount(async () => {
             justify-content: center;
             width: 40px;
             height: 40px;
-            background-color: #90b3f0;
             border-radius: 26px;
+            background-color: var(--button-color-primary-disable);
 
             &.active {
               cursor: pointer;
-              background-color: var(--active-color-1);
+              background-color: var(--button-color-primary-active);
             }
           }
         }
@@ -580,18 +581,6 @@ onBeforeUnmount(async () => {
       }
     }
   }
-}
-
-.tui-theme-white .control-container {
-  --background-color: #fff;
-  --box-shadow: 0px 8px 30px 0px rgba(197, 210, 229, 0.3),
-    0px 2px 3px 0px rgba(197, 210, 229, 0.3);
-}
-
-.tui-theme-black .control-container {
-  --background-color: rgba(79, 88, 107, 0.3);
-  --box-shadow: 0px 4px 30px 0px rgba(34, 38, 46, 0.3),
-    0px 0px 3px 0px rgba(34, 38, 46, 0.3);
 }
 
 @keyframes loading-rotate {

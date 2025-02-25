@@ -125,7 +125,7 @@ onUnmounted(() => {
 .slider-track {
   position: absolute;
   height: 100%;
-  background-color: var(--active-color-1);
+  background-color: var(--text-color-link);
 }
 
 .slider-thumb {

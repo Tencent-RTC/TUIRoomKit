@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, withDefaults, defineProps } from 'vue';
 
 interface Props {
   type?: 'primary' | 'danger';
@@ -53,21 +53,21 @@ const badgeClass = computed(() => [
     padding: 1px 6px;
     font-size: 12px;
     font-weight: bold;
-    color: var(--white-color);
     border-radius: 10px;
     transform: translateY(-50%) translateX(100%);
+    color: var(--uikit-color-white-1);
   }
 }
 
 .tui-badge-primary {
   .tui-badge-count {
-    background-color: var(--active-color-1);
+    background-color: var(--text-color-link);
   }
 }
 
 .tui-badge-danger {
   .tui-badge-count {
-    background-color: var(--red-color-2);
+    background-color: var(--text-color-error);
   }
 }
 

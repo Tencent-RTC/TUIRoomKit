@@ -62,6 +62,6 @@ function handleOnCloseContact() {
   box-sizing: border-box;
   width: 100vw;
   height: auto;
-  background-color: var(--log-out-mobile);
+  background-color: var(--uikit-color-black-8);
 }
 </style>

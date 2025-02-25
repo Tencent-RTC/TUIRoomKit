@@ -108,8 +108,8 @@ function handleControlClick(name: string) {
   padding: 0.7rem 0;
   padding-right: 24px;
   padding-left: 9px;
-  background-color: var(--background-color-2);
-  box-shadow: 0 -8px 30px var(--footer-shadow-color);
+  background-color: var(--bg-color-topbar);
+  box-shadow: 0 -8px 30px var(--uikit-color-black-8);
 
   .left-container {
     display: flex;

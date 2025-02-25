@@ -209,7 +209,6 @@ class MediaDeviceErrorHandler {
   }
 
   private goToPermissionSettings(deviceType: MediaDeviceType) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { shell } = require('electron');
     const privacyTypeObj = {
       camera: 'Privacy_Camera',

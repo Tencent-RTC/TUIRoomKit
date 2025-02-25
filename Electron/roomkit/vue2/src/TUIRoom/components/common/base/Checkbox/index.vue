@@ -60,19 +60,19 @@ function handleValueChange(event: any) {
 }
 
 input {
-  color: var(--title-color);
   cursor: pointer;
-  border: 1px solid var(--stroke-color);
   border-radius: 4px;
+  color: var(--bg-color-secondary);
+  border: 1px solid var(--stroke-color-module);
 }
 
 input:focus {
-  border-color: var(--active-color-1);
   outline: 0;
+  border-color: var(--text-color-link);
 }
 
 input:disabled {
   cursor: not-allowed;
-  background-color: var(--background-color-9);
+  background-color: var(--bg-color-function);
 }
 </style>

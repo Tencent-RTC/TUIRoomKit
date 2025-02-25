@@ -38,7 +38,7 @@ const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
     display: flex;
 
     .email-icon {
-      color: #7c85a6;
+      color: var(--uikit-color-gray-7);
     }
 
     .more-notice {
@@ -48,7 +48,7 @@ const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;
-      color: var(--font-color-5);
+      color: var(--text-color-primary);
     }
   }
 
@@ -66,7 +66,7 @@ const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
         font-size: 14px;
         font-weight: 400;
         line-height: 22px;
-        color: var(--font-color-5);
+        color: var(--text-color-primary);
       }
 
       .join-button {
@@ -85,14 +85,14 @@ const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
         font-size: 14px;
         font-weight: 500;
         line-height: 22px;
-        color: var(--font-color-6);
         text-overflow: ellipsis;
         white-space: nowrap;
-        background-color: var(--background-color-7);
-        border: 1px solid var(--border-color);
         border-radius: 8px;
         outline: none;
         transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        color: var(--text-color-primary);
+        background-color: var(--bg-color-input);
+        border: 1px solid var(--stroke-color-module);
       }
 
       .copy-icon {
@@ -105,6 +105,7 @@ const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
         width: 32px;
         height: 32px;
         cursor: pointer;
+        color: var(--text-color-link);
       }
     }
   }
