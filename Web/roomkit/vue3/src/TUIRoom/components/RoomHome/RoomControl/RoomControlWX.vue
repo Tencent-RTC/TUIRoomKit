@@ -323,7 +323,7 @@ onUnmounted(() => {
     display: flex;
     gap: 20px;
     padding: 18px 26px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--stroke-color-primary);
 
     .button-item {
       display: flex;
@@ -334,10 +334,11 @@ onUnmounted(() => {
       width: 90px;
       height: 80px;
       font-size: 14px;
-      color: #fff;
-      text-align: center;
-      background-color: #006eff;
+      color: var(--uikit-color-white-1);
       border-radius: 8px;
+      text-align: center;
+      color: var(--text-color-button);
+      background-color: var(--button-color-primary-default);
 
       .button-icon {
         width: 22px;
@@ -361,7 +362,7 @@ onUnmounted(() => {
       height: 100%;
       margin-top: 36%;
       font-size: 14px;
-      color: #8f9ab2;
+      color: var(--uikit-color-gray-7);
       text-align: center;
     }
   }
@@ -394,9 +395,13 @@ onUnmounted(() => {
   justify-content: center;
   padding: 6%;
   margin-top: 5%;
-  background-image: linear-gradient(-45deg, #006eff 0%, #0c59f2 100%);
+  background-image: linear-gradient(
+    -45deg,
+    var(--uikit-color-theme-5) 0%,
+    var(--uikit-color-theme-7) 100%
+  );
   border-radius: 8px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px 0 var(--uikit-color-black-7);
 }
 
 .add-icon {
@@ -411,9 +416,13 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 6%;
-  background-image: linear-gradient(-45deg, #006eff 0%, #0c59f2 100%);
+  background-image: linear-gradient(
+    -45deg,
+    var(--uikit-color-theme-5) 0%,
+    var(--uikit-color-theme-7) 100%
+  );
   border-radius: 8px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px 0 var(--uikit-color-black-7);
 }
 
 .enter-icon {
@@ -425,7 +434,7 @@ onUnmounted(() => {
 .title {
   padding-left: 10px;
   line-height: 34px;
-  color: #fff;
+  color: var(--uikit-color-white-1);
 }
 
 .room-detail {
@@ -441,7 +450,7 @@ onUnmounted(() => {
   width: 100vw;
   height: auto;
   overflow-y: scroll;
-  background: var(--room-detail);
+  background-color: var(--bg-color-topbar);
 }
 
 .room-detail-header {
@@ -449,12 +458,12 @@ onUnmounted(() => {
   align-items: center;
   width: 100%;
   padding: 5%;
-  background: var(--room-detail-background);
+  background-color: var(--bg-color-operate);
 
   &-title {
     flex: 1;
-    color: var(--room-detail-title);
     text-align: center;
+    color: var(--text-color-primary);
   }
 }
 
@@ -472,8 +481,8 @@ onUnmounted(() => {
 
 .room-detail-info {
   margin-top: 20px;
-  background: var(--room-detail-background);
   border-radius: 6px;
+  background-color: var(--bg-color-operate);
 }
 
 .room-detail-info-box {
@@ -484,7 +493,7 @@ onUnmounted(() => {
 
 .room-detail-title {
   min-width: 64px;
-  color: var(--room-detail-title);
+  color: var(--text-color-primary);
 }
 
 .chevron-down-icon {
@@ -496,10 +505,7 @@ onUnmounted(() => {
 .room-show-title {
   flex: 1;
   padding-left: 26px;
-  overflow: hidden;
-  color: var(--room-detail-title);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--text-color-primary);
 }
 
 .room-show-name {
@@ -507,9 +513,9 @@ onUnmounted(() => {
   max-width: 180px;
   padding-left: 56px;
   overflow: hidden;
-  color: var(--room-detail-title);
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--text-color-secondary);
 }
 
 .roomid-input {
@@ -517,16 +523,16 @@ onUnmounted(() => {
   width: 100%;
   padding-left: 56px;
   font-size: 16px;
-  color: #676c80;
-  background: var(--room-detail-background);
   border: 0;
   outline: none;
+  color: var(--text-color-primary);
+  background-color: var(--bg-color-operate);
 }
 
 .room-detail-setting {
   margin-top: 20px;
-  background: var(--room-detail-background);
   border-radius: 6px;
+  background-color: var(--bg-color-operate);
 }
 
 .room-detail-setting-list {
@@ -534,7 +540,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 15px 12px;
-  color: var(--room-detail-title);
+  color: var(--text-color-primary);
 }
 
 .room-detail-bottom {
@@ -545,13 +551,17 @@ onUnmounted(() => {
   justify-content: center;
   width: 90%;
   padding: 10px;
-  background-image: linear-gradient(-45deg, #006eff 0%, #0c59f2 100%);
+  background-image: linear-gradient(
+    -45deg,
+    var(--uikit-color-theme-5) 0%,
+    var(--uikit-color-theme-7) 100%
+  );
   border-radius: 8px;
 }
 
 .button {
   padding: 0 5.75rem;
-  color: white;
+  color: var(--uikit-color-white-1);
 }
 
 .room-type-container {
@@ -561,10 +571,10 @@ onUnmounted(() => {
   z-index: 11;
   width: 100vw;
   padding-bottom: 25px;
-  background: var(--log-out-cancel);
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   transition: all 0.25s linear;
+  background-color: var(--bg-color-operate);
 }
 
 .close-room-type-container {
@@ -574,10 +584,10 @@ onUnmounted(() => {
   z-index: 11;
   width: 100vw;
   height: 0;
-  background: var(--log-out-cancel);
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   transition: all 0.25s linear;
+  background-color: var(--bg-color-operate);
 }
 
 .room-choose-mobile {
@@ -589,7 +599,7 @@ onUnmounted(() => {
   box-sizing: border-box;
   width: 100vw;
   height: auto;
-  background: var(--log-out-mobile);
+  background: var(--uikit-color-black-3);
 }
 
 .room-choose-button {
@@ -602,13 +612,13 @@ onUnmounted(() => {
 .choose-cancel {
   z-index: 11;
   padding: 20px;
-  color: var(--room-detail-title);
+  color: var(--text-color-primary);
 }
 
 .choose-confirm {
   z-index: 11;
   padding: 20px;
-  color: #146efa;
+  color: var(--uikit-color-theme-5);
 }
 
 .room-type-hidden {
@@ -616,7 +626,6 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--log-out-cancel);
   border-radius: 13px;
 }
 
@@ -634,8 +643,7 @@ onUnmounted(() => {
   justify-content: center;
   width: 100%;
   padding: 12px;
-  color: var(--room-detail-title);
-  background: var(--choose-type);
+  color: var(--text-color-link);
 }
 
 .slider {
@@ -644,13 +652,13 @@ onUnmounted(() => {
     align-items: center;
     width: 44px;
     height: 24px;
-    background: #e1e1e3;
+    background: var(--uikit-color-white-2);
     border-radius: 15px;
   }
 
   &-open {
     justify-content: flex-end;
-    background: #006eff !important;
+    background: var(--uikit-color-theme-5) !important;
   }
 
   &-block {
@@ -658,10 +666,10 @@ onUnmounted(() => {
     width: 16px;
     height: 16px;
     margin: 0 2px;
-    background: #fff;
-    border: 0 solid rgba(0, 0, 0, 0.85);
+    background: var(--uikit-color-white-1);
+    border: 0 solid var(--uikit-color-black-2);
     border-radius: 8px;
-    box-shadow: 0 2px 4px 0 #d1d1d1;
+    box-shadow: 0 2px 4px 0 var(--uikit-color-white-2);
   }
 }
 </style>

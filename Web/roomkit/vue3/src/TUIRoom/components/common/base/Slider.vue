@@ -118,14 +118,14 @@ onUnmounted(() => {
   position: relative;
   width: 160px;
   height: 3px;
-  background-color: #ddd;
+  background-color: var(--uikit-color-white-2);
   cursor: pointer;
 }
 
 .slider-track {
   position: absolute;
   height: 100%;
-  background-color: var(--active-color-1);
+  background-color: var(--text-color-link);
 }
 
 .slider-thumb {
@@ -134,19 +134,18 @@ onUnmounted(() => {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transform: translate(-50%, -50%);
   transition: box-shadow 0.2s;
   cursor: pointer;
+  background-color: var(--uikit-color-white-1);
 }
 
 .slider-thumb-active {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 8px var(--uikit-color-black-5);
 }
 
 .slider-thumb-disabled {
-  background-color: #ccc;
+  background-color: var(--uikit-color-gray-light-5);
   cursor: not-allowed;
 }
 </style>

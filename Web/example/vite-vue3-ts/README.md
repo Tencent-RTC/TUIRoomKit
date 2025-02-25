@@ -54,7 +54,12 @@ This document describes how to quickly run the TUIRoomKit demo project to try ou
 
 ### Step 3: Run the example
 
-1. install dependencies
+1. Make sure the node environment is v18
+  ```bash
+  node -v
+  ```
+
+2. Install dependencies
 
    ```bash
    cd TUIRoomKit/Web/example/vite-vue3-ts
@@ -62,7 +67,7 @@ This document describes how to quickly run the TUIRoomKit demo project to try ou
    npm install
    ```
 
-2. Run the sample project in the development environment
+3. Run the sample project in the development environment
 
    ```bash
    npm run dev

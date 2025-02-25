@@ -8,51 +8,49 @@
   * Use <icon-button :icon="chatIcon"><icon-button> in template
 -->
 <template>
-  <div :class="[themeClass]">
-    <div class="icon-button-container">
-      <div
-        v-if="isMobile"
-        v-tap="handleClickEvent"
-        :class="['icon-content', iconContentClass, `${disabled && 'disabled'}`]"
-      >
-        <slot></slot>
-        <svg-icon v-if="icon" :icon="icon" />
-        <span class="title">{{ title }}</span>
-      </div>
-      <div
-        v-else
-        :class="['icon-content', iconContentClass, `${disabled && 'disabled'}`]"
-        @click="handleClickEvent"
-      >
-        <slot></slot>
-        <svg-icon v-if="icon" :icon="icon" />
-        <svg-icon
-          v-if="isNotSupport"
-          class="unsupport-icon"
-          :icon="UnSupportIcon"
-        />
-        <span class="title">
-          {{ title }}
-          <slot name="title"></slot>
-        </span>
-      </div>
-      <div
-        v-if="hasMore"
-        ref="moreSpanRef"
-        class="icon-arrow"
-        @click="$emit('click-more')"
-      >
-        <svg-icon :icon="ArrowUp" />
-      </div>
+  <div class="icon-button-container">
+    <div
+      v-if="isMobile"
+      v-tap="handleClickEvent"
+      :class="['icon-content', iconContentClass, `${disabled && 'disabled'}`]"
+    >
+      <slot></slot>
+      <svg-icon v-if="icon" :icon="icon" />
+      <span class="title">{{ title }}</span>
+    </div>
+    <div
+      v-else
+      :class="['icon-content', iconContentClass, `${disabled && 'disabled'}`]"
+      @click="handleClickEvent"
+    >
+      <slot></slot>
+      <svg-icon v-if="icon" :icon="icon" />
+      <svg-icon
+        v-if="isNotSupport"
+        class="unsupport-icon"
+        :icon="UnSupportIcon"
+      />
+      <span class="title">
+        {{ title }}
+        <slot name="title"></slot>
+      </span>
+    </div>
+    <div
+      v-if="hasMore"
+      ref="moreSpanRef"
+      class="icon-arrow"
+      @click="$emit('click-more')"
+    >
+      <svg-icon :icon="ArrowUp" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { withDefaults, computed, defineProps, defineEmits } from 'vue';
 import SvgIcon from './SvgIcon.vue';
 import ArrowUp from '../icons/ArrowUpIcon.vue';
 import { IconButtonLayout } from '../../../constants/room';
-import { computed } from 'vue';
 import { isMobile } from '../../../utils/environment';
 import UnSupportIcon from '../icons/UnSupportIcon.vue';
 import vTap from '../../../directives/vTap';
@@ -67,7 +65,6 @@ interface Props {
   layout?: IconButtonLayout;
   icon?: Component | null;
   isNotSupport?: boolean;
-  theme?: 'white' | 'black';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -79,13 +76,8 @@ const props = withDefaults(defineProps<Props>(), {
   isActive: false,
   layout: IconButtonLayout.VERTICAl,
   isNotSupport: false,
-  theme: undefined,
 });
 const emit = defineEmits(['click-icon', 'click-more']);
-
-const themeClass = computed(() =>
-  props.theme ? `tui-theme-${props.theme}` : ''
-);
 
 const iconContentClass = computed(() => {
   if (props.layout === IconButtonLayout.HORIZONTAL) {
@@ -100,29 +92,20 @@ const handleClickEvent = () => {
 </script>
 
 <style lang="scss" scoped>
-.tui-theme-black .icon-button-container {
-  --icon-button-hover: rgba(46, 50, 61, 0.7);
-}
-
-.tui-theme-white .icon-button-container {
-  --icon-button-hover: rgba(79, 88, 107, 0.05);
-}
-
 .icon-button-container {
   position: relative;
   display: flex;
   align-items: center;
-  color: var(--font-color-1);
   cursor: pointer;
+  color: var(--text-color-primary);
 
   .icon-content {
     &.disabled {
       cursor: not-allowed;
       opacity: 0.4;
     }
-
     &:hover {
-      background: var(--icon-button-hover);
+      background: var(--button-color-secondary-hover);
     }
   }
 
@@ -171,7 +154,7 @@ const handleClickEvent = () => {
     border-radius: 6px;
 
     &:hover {
-      background: var(--icon-button-hover);
+      background: var(--bg-color-input);
     }
   }
 }

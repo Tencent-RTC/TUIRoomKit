@@ -18,7 +18,9 @@ import { useRoute } from 'vue-router';
 import { Ref, ref, reactive, onMounted, onUnmounted } from 'vue';
 import i18n from '../locales/index';
 import { getLanguage, getTheme } from  '../utils/utils';
+import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 
+const { theme } = useUIKit();
 const route = useRoute();
 const { roomId } = route.query;
 const givenRoomId: Ref<string> = ref((roomId) as string);
@@ -111,7 +113,7 @@ async function handleInit() {
   sessionStorage.removeItem('tuiRoom-roomInfo');
   sessionStorage.removeItem('tuiRoom-userInfo');
   conference.setLanguage(getLanguage() as LanguageOption);
-  conference.setTheme(getTheme() as ThemeOption);
+  !theme.value && conference.setTheme(getTheme() as ThemeOption);
   const currentUserInfo = getBasicInfo();
   if (!currentUserInfo) {
     return;
@@ -132,14 +134,25 @@ const changeLanguage = (language: LanguageOption) => {
 const changeTheme = (theme: ThemeOption) => {
   localStorage.setItem('tuiRoom-currentTheme', theme);
 };
+const handleAcceptedInvitation = async (roomId: string) => {
+  await handleEnterRoom({
+    roomId,
+    roomParam: {
+      isOpenCamera: false,
+      isOpenMicrophone: true,
+    },
+  });
+};
 onMounted(() => {
   conference.on(RoomEvent.LANGUAGE_CHANGED, changeLanguage);
   conference.on(RoomEvent.THEME_CHANGED, changeTheme);
+  conference.on(RoomEvent.CONFERENCE_INVITATION_ACCEPTED, handleAcceptedInvitation);
 });
 
 onUnmounted(() => {
   conference.off(RoomEvent.LANGUAGE_CHANGED, changeLanguage);
   conference.off(RoomEvent.THEME_CHANGED, changeTheme);
+  conference.off(RoomEvent.CONFERENCE_INVITATION_ACCEPTED, handleAcceptedInvitation);
 });
 
 handleInit();

@@ -92,8 +92,6 @@
       <div class="room-detail h5" v-if="isMobile">
         <div class="detail-footer">
           <tui-button
-            type="primary"
-            :round="false"
             plain
             class="footer-button"
             :custom-style="{ width: '100%', padding: '10px', fontSize: '16px' }"
@@ -101,8 +99,6 @@
             >{{ t('Join Room') }}
           </tui-button>
           <tui-button
-            type="primary"
-            :round="false"
             plain
             class="footer-button"
             :custom-style="{ width: '100%', padding: '10px', fontSize: '16px' }"
@@ -111,7 +107,6 @@
           </tui-button>
           <tui-button
             type="danger"
-            :round="false"
             plain
             class="footer-button"
             :custom-style="{ width: '100%', padding: '10px', fontSize: '16px' }"
@@ -522,6 +517,7 @@ async function toggleClickMoreBtn() {
   if (!showMoreControl.value) {
     await handleDropDownPosition();
   }
+  handleFetchRoomInfo();
   showMoreControl.value = !showMoreControl.value;
 }
 
@@ -573,6 +569,7 @@ const toggleInvitePanelShow = () => {
 };
 const showDetail = () => {
   if (!isMobile) return;
+  handleFetchRoomInfo();
   emit('show-more', { roomId: props.item.basicRoomInfo.roomId });
   viewDetails.value.func();
 };
@@ -580,6 +577,7 @@ function toggleInviteRoom() {
   if (showRoomDetail.value) {
     showRoomDetail.value = false;
   }
+  handleFetchRoomInfo();
   showRoomInvite.value = !showRoomInvite.value;
 }
 
@@ -609,7 +607,10 @@ async function handleCancelSchedule() {
   showRoomDetail.value = false;
 }
 
-onMounted(async () => {
+async function handleFetchRoomInfo() {
+  if (roomInfo.value) {
+    return;
+  }
   try {
     const roomInfoParams = {
       roomId: props.item.basicRoomInfo.roomId,
@@ -619,19 +620,10 @@ onMounted(async () => {
   } catch (error) {
     logger.error('fetch roomInfo failed:', error);
   }
-});
+}
 </script>
 
 <style scoped lang="scss">
-.tui-theme-black .operate-list {
-  --operation-box-shadow: 0px 3px 8px rgba(34, 38, 46, 0.3),
-    0px 6px 40px rgba(34, 38, 46, 0.3);
-}
-
-.tui-theme-white .operate-list {
-  --operation-box-shadow: 0px 3px 8px #e9f0fb, 0px 6px 40px rgba(0, 0, 0, 0.1);
-}
-
 .schedule-room-control {
   display: flex;
   flex-wrap: nowrap;
@@ -649,7 +641,7 @@ onMounted(async () => {
       max-width: 220px;
       font-size: 16px;
       font-weight: 500;
-      color: var(--font-color-4);
+      color: var(--text-color-primary);
 
       .schedule-title-text {
         overflow: hidden;
@@ -667,7 +659,7 @@ onMounted(async () => {
       margin-top: 6px;
       font-size: 14px;
       font-weight: 400;
-      color: var(--font-color-4);
+      color: var(--text-color-primary);
 
       .schedule-content-time {
         min-width: 94px;
@@ -681,7 +673,7 @@ onMounted(async () => {
           width: 10px;
           height: 1px;
           margin: 0 4px 4px;
-          background-color: var(--font-color-4);
+          background-color: var(--text-color-primary);
         }
       }
 
@@ -697,21 +689,21 @@ onMounted(async () => {
         width: 1px;
         height: 10px;
         margin: 5px 10px 0 5px;
-        background-color: #969eb4;
+        background-color: var(--text-color-primary);
       }
     }
   }
 
   &:hover {
     cursor: pointer;
-    background-color: rgba(150, 158, 180, 0.1);
+    background-color: var(--list-color-hover);
     border-radius: 8px;
   }
 }
 
 .room-detail-content {
-  background-color: #fff;
   border-radius: 8px;
+  background-color: var(--bg-color-dialog);
 }
 
 .room-detail.h5 {
@@ -736,8 +728,8 @@ onMounted(async () => {
   z-index: 1000;
   width: 100%;
   padding: 20px 12px 36px;
-  background-color: #fff;
   border-radius: 18px 18px 0 0;
+  background-color: var(--bg-color-operate);
 
   .invite-member-close {
     display: flex;
@@ -750,7 +742,7 @@ onMounted(async () => {
     margin-bottom: 12px;
     font-size: 18px;
     font-weight: 500;
-    color: #4f586b;
+    color: var(--text-color-primary);
   }
 }
 
@@ -765,10 +757,10 @@ onMounted(async () => {
     width: 30px;
     height: 30px;
     margin-right: 6px;
-    color: var(--active-color-1);
+    color: var(--text-color-link);
 
     &:hover {
-      background: rgba(150, 158, 180, 0.1);
+      background: var(--bg-color-function);
       border-radius: 4px;
     }
   }
@@ -780,9 +772,12 @@ onMounted(async () => {
     flex-direction: column;
     min-width: 96px;
     padding: 20px;
-    background: #fff;
     border-radius: 8px;
-    box-shadow: var(--operation-box-shadow);
+    background: var(--dropdown-color-default);
+    box-shadow:
+      0 12px 26px var(--uikit-color-black-8),
+      0 8px 12px var(--uikit-color-black-8),
+      0 1px 5px var(--uikit-color-black-8);
 
     &::before {
       position: absolute;
@@ -790,15 +785,15 @@ onMounted(async () => {
       content: '';
       border-top: 10px solid transparent;
       border-right: 10px solid transparent;
-      border-bottom: 10px solid #fff;
       border-left: 10px solid transparent;
+      border-bottom: 10px solid var(--dropdown-color-default);
     }
 
     .operate-item {
       display: flex;
       justify-content: center;
       height: 20px;
-      color: #6b758a;
+      color: var(--text-color-primary);
       cursor: pointer;
 
       .operate-text {
@@ -811,15 +806,15 @@ onMounted(async () => {
       }
 
       &:hover {
-        color: var(--active-color-1);
+        color: var(--text-color-link-hover);
       }
     }
 
     .cancel-text {
-      color: var(--red-color-2);
+      color: var(--text-color-error);
 
       &:hover {
-        color: var(--red-color-2);
+        color: var(--text-color-error);
       }
     }
   }
@@ -857,23 +852,19 @@ onMounted(async () => {
 }
 
 .schedule-detail-closed {
-  color: #4f586b;
+  color: var(--text-color-secondary);
 }
 
 .button {
   margin-left: 10px;
 }
 
-.status-not-start {
-  color: var(--font-color-10);
-}
-
 .status-running {
-  color: var(--active-color-1);
+  color: var(--text-color-success);
 }
 
 .status-finished {
-  color: #b2bbd1;
+  color: var(--uikit-color-gray-7);
 }
 
 .mask {
@@ -883,7 +874,7 @@ onMounted(async () => {
   z-index: 1000;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--uikit-color-black-4);
 }
 
 .hidden {

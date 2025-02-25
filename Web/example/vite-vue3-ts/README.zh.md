@@ -59,7 +59,12 @@
 
 ### 第三步：运行示例
 
-1. 安装依赖
+1. 确认 node 环境为 v18 版本
+   ```bash
+   node -v
+   ```
+
+2. 安装依赖
 
    ```bash
    cd TUIRoomKit/Web/example/vite-vue3-ts
@@ -70,7 +75,7 @@
    > 注意<br>
    > 若在安装过程中遇到报错，请执行 `npm get registry` 检查 npm 源是否为 `https://registry.npmjs.org/`。若不是，请使用 `npm config set registry https://registry.npmjs.org/` 命令将 npm 源还原为默认设置，然后重新执行 `npm install`。
 
-2. 开发环境运行示例工程
+3. 开发环境运行示例工程
 
    ```bash
    npm run dev

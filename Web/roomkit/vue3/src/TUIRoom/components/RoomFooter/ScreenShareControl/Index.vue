@@ -282,11 +282,11 @@ onUnmounted(() => {
   width: 131px;
   height: 48px;
   font-size: 14px;
-  color: var(--color-font);
   cursor: pointer;
-  background: var(--stop-share-region-bg-color);
   border-radius: 4px;
   transform: translateX(-50%);
+  color: var(--text-color-primary);
+  background-color: var(--bg-color-operate);
 }
 
 .stop-share-icon {

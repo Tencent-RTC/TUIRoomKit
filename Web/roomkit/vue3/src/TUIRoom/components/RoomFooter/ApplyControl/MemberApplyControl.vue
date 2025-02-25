@@ -341,9 +341,9 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: var(--active-color-1);
     border-radius: 8px;
-    box-shadow: 0 4px 16px 0 rgba(47, 48, 164, 0.1);
+    background-color: var(--text-color-link);
+    box-shadow: 0 4px 16px 0 var(--uikit-color-black-8);
 
     &::after {
       position: absolute;
@@ -352,8 +352,8 @@ onBeforeUnmount(() => {
       display: block;
       content: '';
       border: 5px solid transparent;
-      border-top-color: var(--active-color-1);
       transform: translateX(-50%);
+      border-top-color: var(--text-color-link);
     }
   }
 
@@ -366,7 +366,7 @@ onBeforeUnmount(() => {
       font-size: 14px;
       font-weight: 500;
       line-height: 20px;
-      color: #fff;
+      color: var(--uikit-color-white-1);
       white-space: nowrap;
     }
 
@@ -376,7 +376,7 @@ onBeforeUnmount(() => {
 
     .close {
       padding-left: 12px;
-      color: #fff;
+      color: var(--uikit-color-white-1);
       cursor: pointer;
     }
   }
@@ -391,11 +391,11 @@ onBeforeUnmount(() => {
   padding: 14px;
   font-size: 16px;
   font-weight: 500;
-  color: var(--active-color-1);
+  color: var(--text-color-link);
 }
 
 .cancel {
-  color: var(--font-color-4);
+  color: var(--text-color-secondary);
 }
 
 .cancel-button {
