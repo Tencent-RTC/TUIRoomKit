@@ -148,7 +148,7 @@ const {
 .apply-info {
   font-size: 14px;
   font-weight: 400;
-  color: #fff;
+  color: var(--uikit-color-white-1);
 }
 
 .manage-member-container {
@@ -167,7 +167,7 @@ const {
       padding: 0 20px 0 26px;
 
       .apply-icon {
-        color: var(--font-color-2);
+        color: var(--text-color-secondary);
       }
 
       .apply-info {
@@ -175,16 +175,16 @@ const {
         padding-left: 4px;
         font-size: 14px;
         font-weight: 400;
-        color: var(--font-color-8);
+        color: var(--text-color-secondary);
       }
 
       .apply-check {
         font-size: 14px;
         font-weight: 400;
         line-height: 32px;
-        color: var(--active-color-2);
         text-align: center;
         cursor: pointer;
+        color: var(--text-color-link);
       }
     }
 
@@ -194,11 +194,11 @@ const {
       font-size: 14px;
       font-weight: 400;
       line-height: 32px;
-      color: #fff;
+      color: var(--uikit-color-white-1);
       text-align: center;
       cursor: pointer;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid #fff;
+      background: var(--uikit-color-black-7);
+      border: 1px solid var(--uikit-color-white-1);
       border-radius: 2px;
     }
   }
@@ -211,9 +211,9 @@ const {
     height: 36px;
     margin: 16px 20px 0;
     cursor: pointer;
-    background-color: var(--background-color-11);
     border-radius: 20px;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: var(--uikit-color-transparent);
+    background-color: var(--bg-color-input);
 
     .user-status {
       display: flex;
@@ -240,12 +240,12 @@ const {
     .apply-not-stage {
       font-size: 14px;
       font-weight: 400;
-      color: var(--font-color-1);
-      filter: drop-shadow(0 2px 4px rgba(32, 77, 141, 0.03))
-        drop-shadow(0 6px 10px rgba(32, 77, 141, 0.06))
-        drop-shadow(0 3px 14px rgba(32, 77, 141, 0.05));
+      filter: drop-shadow(0 2px 4px var(--uikit-color-black-8))
+        drop-shadow(0 6px 10px var(--uikit-color-black-8))
+        drop-shadow(0 3px 14px var(--uikit-color-black-8));
       border-radius: 20px;
       transform: translateX(4px);
+      color: var(--text-color-secondary);
     }
 
     .apply-not-stage {
@@ -257,7 +257,7 @@ const {
     }
 
     .apply-count-active {
-      background-color: var(--background-color-12);
+      background-color: var(--bg-color-operate);
     }
   }
 
@@ -272,9 +272,9 @@ const {
     justify-content: center;
     padding: 13px 24px;
     font-weight: 400;
-    color: var(--mute-button-color-h5);
-    background-color: var(--manage-member-button-h5);
     border-radius: 10px;
+    background-color: var(--bg-color-operate);
+    color: var(--text-color-secondary);
   }
 
   .member-list-container {
@@ -296,7 +296,7 @@ const {
       font-size: 14px;
       font-weight: 500;
       line-height: 24px;
-      color: var(--input-font-color);
+      color: var(--text-color-secondary);
     }
 
     .member-list-content {
@@ -314,76 +314,15 @@ const {
     .manage-member-button {
       padding: 13px 24px;
       font-weight: 400;
-      color: var(--mute-button-color-h5);
-      background-color: var(--manage-member-button-h5);
       border-radius: 10px;
+      background-color: var(--bg-color-function);
+      color: var(--text-color-primary);
     }
 
     .lift-all {
-      color: var(--red-color);
+      color: var(--text-color-error);
     }
   }
-
-  .popup-dialog-audio,
-  .popup-dialog-video {
-    position: absolute;
-    bottom: 46vh;
-    left: 18vw;
-    width: 64vw;
-    white-space: nowrap;
-    background: var(--popup-mute-background-color-h5);
-    border-radius: 8px;
-
-    .popup-dialog-audio-title {
-      padding: 20px;
-      font-family: 'PingFang SC';
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 22px;
-      color: #2b2e38;
-      text-align: center;
-      white-space: normal;
-    }
-
-    .popup-button {
-      display: flex;
-      justify-content: space-evenly;
-      padding: 10px;
-
-      .popup-button-cancel {
-        padding: 4px 16px;
-        color: #646366;
-        background-color: #fff;
-        border: 1px solid #dcdfe6;
-        border-radius: 4px;
-      }
-
-      .popup-button-mute {
-        padding: 4px 16px;
-        color: #fff;
-        background-color: #006eff;
-        border: 1px solid #dcdfe6;
-        border-radius: 4px;
-      }
-    }
-  }
-}
-
-.agree,
-.cancel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 50%;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--active-color-1);
-}
-
-.cancel {
-  color: var(--font-color-4);
 }
 
 .more-control-container {
@@ -394,7 +333,7 @@ const {
   box-sizing: border-box;
   width: 100vw;
   height: auto;
-  background-color: var(--log-out-mobile);
+  background-color: var(--uikit-color-black-8);
 
   .more-control-container-main {
     position: fixed;
@@ -405,10 +344,10 @@ const {
     width: 100%;
     padding: 50px 25px;
     padding-bottom: 4vh;
-    background: var(--background-color-1);
     border-radius: 15px 15px 0 0;
     animation-name: popup;
     animation-duration: 200ms;
+    background-color: var(--bg-color-operate);
 
     @keyframes popup {
       from {
@@ -427,8 +366,8 @@ const {
     display: flex;
     align-items: center;
     height: 20px;
-    color: var(--popup-title-color-h5);
     cursor: pointer;
+    color: var(--text-color-primary);
 
     .operate-text {
       margin-left: 8px;

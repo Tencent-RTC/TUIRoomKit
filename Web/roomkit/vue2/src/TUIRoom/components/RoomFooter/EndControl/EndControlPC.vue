@@ -22,14 +22,12 @@
             v-model="selectedUser"
             :teleported="false"
             :popper-append-to-body="false"
-            theme="white"
           >
             <tui-option
               v-for="user in remoteEnteredUserList"
               :key="user.userId"
               :value="user.userId"
               :label="user.nameCard || user.userName"
-              theme="white"
             />
           </tui-select>
         </div>
@@ -178,14 +176,14 @@ async function transferAndLeave() {
   .end-button {
     padding: 9px 20px;
     font-size: 14px;
-    color: var(--red-color-2);
-    border: 1.5px solid var(--red-color-2);
     border-radius: 20px;
+    color: var(--text-color-error);
+    border: 1.5px solid var(--text-color-error);
 
     &:hover {
-      color: var(--font-color-7);
-      background: var(--red-color-2);
-      border: 1px solid var(--red-color-2);
+      color: var(--uikit-color-white-1);
+      background: var(--text-color-error);
+      border: 1.5px solid var(--text-color-error);
     }
   }
 }

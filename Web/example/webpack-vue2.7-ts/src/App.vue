@@ -1,8 +1,14 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <UIKitProvider theme="dark">
+    <div id="app">
+      <router-view />
+    </div>
+  </UIKitProvider>
 </template>
+
+<script setup lang="ts">
+import { UIKitProvider } from '@tencentcloud/uikit-base-component-vue2';
+</script>
 
 <style>
 html, body {

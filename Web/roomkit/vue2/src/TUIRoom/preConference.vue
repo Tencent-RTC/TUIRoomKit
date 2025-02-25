@@ -46,19 +46,18 @@
         />
       </div>
     </div>
-    <InvitationNotification @join-conference="handleEnterRoom" />
   </div>
 </template>
 
 <script setup lang="ts">
 import {
   ref,
-  computed,
   onMounted,
   onUnmounted,
   withDefaults,
   defineProps,
   defineEmits,
+  computed,
 } from 'vue';
 import UserInfo from './components/RoomHeader/UserInfo';
 import RoomHomeControl from './components/RoomHome/RoomControl';
@@ -71,7 +70,6 @@ import TUIMessageBox from './components/common/base/MessageBox/index';
 import TUIMessage from './components/common/base/Message/index';
 import { MESSAGE_DURATION } from './constants/message';
 import { isMobile } from './utils/environment';
-import InvitationNotification from './components/RoomInvite/InvitationNotification.vue';
 
 const roomControlRef = ref();
 const props = withDefaults(
@@ -108,8 +106,10 @@ const emits = defineEmits([
   'on-logout',
 ]);
 
-const tuiRoomThemeClass = computed(
-  () => `tui-theme-${roomService.basicStore.defaultTheme}`
+const hasThemeMode = document.documentElement.hasAttribute('tui-theme-mode');
+
+const tuiRoomThemeClass = computed(() =>
+  hasThemeMode ? '' : `tui-theme-${roomService.basicStore.defaultTheme}`
 );
 
 async function handleCreateRoom(roomOption: Record<string, any>) {
@@ -177,13 +177,17 @@ onUnmounted(() => {
 });
 </script>
 
-<style>
+<style lang="scss">
 @import './assets/style/global.scss';
-@import './assets/style/black-theme.scss';
-@import './assets/style/white-theme.scss';
-</style>
+@import '@tencentcloud/uikit-base-component-vue2/dist/styles/index.css';
 
-<style lang="scss" scoped>
+:root[tui-theme-mode='light'] {
+  --preconference-background: url('./assets/imgs/background-white.png');
+}
+
+:root[tui-theme-mode='dark'] {
+  --preconference-background: var(--bg-color-topbar);
+}
 .pre-conference-container {
   display: flex;
   align-items: center;
@@ -191,9 +195,9 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   font-family: 'PingFang SC';
-  color: var(--font-color-1);
-  background: var(--background);
   background-size: cover;
+  background: var(--preconference-background);
+  color: var(--text-color-primary);
 
   .header {
     position: absolute;
@@ -237,11 +241,11 @@ onUnmounted(() => {
   }
 }
 
-.tui-theme-black.pre-conference-container {
-  --background: var(--background-color-1);
+.tui-theme-light.pre-conference-container {
+  background: url('./assets/imgs/background-white.png');
 }
 
-.tui-theme-white.pre-conference-container {
-  --background: url('./assets/imgs/background-white.png');
+.tui-theme-dark.pre-conference-container {
+  background-color: var(--bg-color-topbar);
 }
 </style>

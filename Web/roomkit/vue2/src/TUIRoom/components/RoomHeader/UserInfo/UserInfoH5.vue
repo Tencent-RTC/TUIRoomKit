@@ -60,9 +60,9 @@ defineEmits(['log-out']);
       margin-left: 20px;
       overflow: hidden;
       font-size: 16px;
-      color: var(--font-color);
       text-overflow: ellipsis;
       white-space: nowrap;
+      color: var(--text-color-primary);
     }
 
     .down-icon {
@@ -75,10 +75,10 @@ defineEmits(['log-out']);
     top: calc(100% + 14px);
     right: 0;
     padding: 10px 0;
-    color: var(--font-color);
-    background: var(--user-control-container-color-bg);
+    color: var(--text-color-primary);
+    background: var(--bg-color-operate);
     border-radius: 4px;
-    box-shadow: var(--user-control-container-shadow);
+    box-shadow: var(--uikit-color-black-8);
 
     .user-control-item-foot,
     .user-control-item-head {
@@ -99,7 +99,7 @@ defineEmits(['log-out']);
     box-sizing: border-box;
     width: 100vw;
     height: auto;
-    background: var(--log-out-mobile);
+    background: var(--uikit-color-black-3);
 
     &-main {
       position: absolute;
@@ -116,8 +116,8 @@ defineEmits(['log-out']);
       justify-content: center;
       width: 90%;
       padding: 1rem 0;
-      background: var(--log-out);
       border-radius: 14px;
+      background-color: var(--bg-color-operate);
 
       i {
         font-family: 'PingFang SC';
@@ -125,7 +125,7 @@ defineEmits(['log-out']);
         font-style: normal;
         font-weight: 400;
         line-height: 24px;
-        color: #ff2e2e;
+        color: var(--uikit-color-red-6);
         text-align: center;
       }
     }
@@ -137,9 +137,9 @@ defineEmits(['log-out']);
       width: 90%;
       padding: 1em 0;
       margin-top: 0.625rem;
-      background: var(--log-out-cancel);
       backdrop-filter: blur(27.1828px);
       border-radius: 14px;
+      background-color: var(--bg-color-operate);
 
       i {
         font-family: 'PingFang SC';
@@ -147,7 +147,7 @@ defineEmits(['log-out']);
         font-style: normal;
         font-weight: 400;
         line-height: 24px;
-        color: #007aff;
+        color: var(--uikit-color-theme-5);
         text-align: center;
       }
     }

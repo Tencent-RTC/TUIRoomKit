@@ -57,10 +57,10 @@ span {
   flex-direction: column;
   width: 100%;
   padding-bottom: 4vh;
-  background: var(--popup-background-color-h5);
   border-radius: 15px 15px 0 0;
   animation-name: popup;
   animation-duration: 200ms;
+  background-color: var(--bg-color-operate);
 
   @keyframes popup {
     from {
@@ -84,7 +84,7 @@ span {
     font-style: normal;
     font-weight: 500;
     line-height: 24px;
-    color: var(--popup-title-color-h5);
+    color: var(--text-color-primary);
   }
 
   .contact-content-main {
@@ -105,17 +105,17 @@ span {
     font-style: normal;
     font-weight: 400;
     line-height: 20px;
-    color: var(--popup-title-color-h5);
     white-space: nowrap;
+    color: var(--text-color-primary);
   }
 
   .contact-content {
     width: 62%;
     overflow: hidden;
     font-size: 14px;
-    color: var(--popup-content-color-h5);
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: var(--text-color-secondary);
   }
 
   .contact-bottom {
@@ -126,15 +126,15 @@ span {
     font-style: normal;
     font-weight: 400;
     line-height: 17px;
-    color: var(--popup-title-color-h5);
     text-align: center;
+    color: var(--text-color-secondary);
   }
 
   .copy {
     width: 20px;
     height: 20px;
     margin-left: 30px;
-    color: var(--active-color-1);
+    color: var(--text-color-link);
   }
 }
 
