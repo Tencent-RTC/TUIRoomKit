@@ -46,29 +46,36 @@
       v-if="!isGeneralUser && currentActiveTabName !== USERS_STATUS.NOT_ENTER"
       class="global-setting"
     >
-      <tui-button
-        class="button"
-        size="default"
+      <TUIButton
+        type="primary"
+        color="gray"
         @click="toggleManageAllMember(ManageControlType.AUDIO)"
+        style="min-width: 118px"
       >
         {{ audioManageInfo }}
-      </tui-button>
-      <tui-button
-        class="button"
-        size="default"
+      </TUIButton>
+      <TUIButton
+        type="primary"
+        color="gray"
         @click="toggleManageAllMember(ManageControlType.VIDEO)"
+        style="min-width: 118px"
       >
         {{ videoManageInfo }}
-      </tui-button>
+      </TUIButton>
       <div class="more-container" v-click-outside="handleShowMoreControl">
-        <tui-button class="button" size="default" @click="toggleClickMoreBtn">
+        <TUIButton
+          @click="toggleClickMoreBtn"
+          color="gray"
+          type="primary"
+          style="min-width: 108px"
+        >
           {{ t('More') }}
           <svg-icon
             size="12"
             :class="['more-arrow', showMoreControl ? 'up' : 'down']"
             :icon="ArrowUpIcon"
           />
-        </tui-button>
+        </TUIButton>
         <div v-show="showMoreControl" class="drop-down">
           <div
             v-for="item in moreControlList"
@@ -86,14 +93,14 @@
       v-if="currentActiveTabName === USERS_STATUS.NOT_ENTER"
       class="global-setting"
     >
-      <tui-button
+      <TUIButton
         v-if="filteredUserStatusList.length > 0"
-        class="button-bottom"
-        size="default"
+        type="primary"
         @click="handleCallAllInvitee"
+        :style="{ minWidth: '80%' }"
       >
         {{ t('Call all') }}
-      </tui-button>
+      </TUIButton>
     </div>
     <Dialog
       v-model="showManageAllUserDialog"
@@ -106,17 +113,18 @@
         {{ dialogContent }}
       </span>
       <template #footer>
-        <tui-button size="default" @click="doToggleManageAllMember">{{
-          t('Confirm')
-        }}</tui-button>
-        <tui-button
-          class="cancel-button"
-          size="default"
+        <TUIButton
+          @click="doToggleManageAllMember"
           type="primary"
+          style="min-width: 88px"
+          >{{ t('Confirm') }}
+        </TUIButton>
+        <TUIButton
           @click="showManageAllUserDialog = false"
+          style="min-width: 88px"
         >
           {{ t('Cancel') }}
-        </tui-button>
+        </TUIButton>
       </template>
     </Dialog>
   </div>
@@ -131,7 +139,7 @@ import ApplyTipsIcon from '../common/icons/ApplyTipsIcon.vue';
 import Dialog from '../common/base/Dialog';
 import { useRoomStore } from '../../stores/room';
 import useIndex from './useIndexHooks';
-import TuiButton from '../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import ArrowUpIcon from '../common/icons/ArrowUpIcon.vue';
 import vClickOutside from '../../directives/vClickOutside';
 import { USERS_STATUS } from '../../constants/room';
@@ -174,6 +182,7 @@ const handleShowMoreControl = () => {
 .more-container {
   position: relative;
   display: flex;
+  margin-left: 16px;
 
   .more-arrow {
     margin-left: 2px;
@@ -353,13 +362,5 @@ const handleShowMoreControl = () => {
     margin: 20px 0;
     cursor: pointer;
   }
-
-  .button-bottom {
-    width: 80%;
-  }
-}
-
-.cancel-button {
-  margin-left: 12px;
 }
 </style>

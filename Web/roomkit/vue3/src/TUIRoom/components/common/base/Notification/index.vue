@@ -23,17 +23,16 @@
         </div>
       </div>
       <div class="tui-notification-footer">
-        <tui-button size="default" @click="handleAgree">{{
-          confirmButtonText
-        }}</tui-button>
-        <tui-button
-          size="default"
+        <TUIButton
+          @click="handleAgree"
           type="primary"
-          class="button"
-          @click="handleReject"
-        >
+          style="min-width: 88px"
+          >
+          {{ confirmButtonText }}
+        </TUIButton>
+        <TUIButton @click="handleReject" style="min-width: 88px">
           {{ cancelButtonText }}
-        </tui-button>
+        </TUIButton>
       </div>
     </div>
   </div>
@@ -48,7 +47,7 @@ import {
   defineProps,
   defineEmits,
 } from 'vue';
-import TuiButton from '../Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import SvgIcon from '../SvgIcon.vue';
 import CloseIcon from '../../icons/CloseIcon.vue';
 import useZIndex from '../../../../hooks/useZIndex';
@@ -198,10 +197,6 @@ onMounted(async () => {
     display: flex;
     justify-content: flex-end;
     padding: 20px 30px;
-
-    .button {
-      margin-left: 12px;
-    }
   }
 }
 </style>

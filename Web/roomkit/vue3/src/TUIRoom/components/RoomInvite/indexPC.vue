@@ -50,12 +50,13 @@
       </div>
       <template #footer>
         <span>
-          <tui-button
-            class="dialog-button"
-            size="default"
+          <TUIButton
             @click="copyRoomIdAndRoomLink()"
-            >{{ t('Copy the conference number and link') }}
-          </tui-button>
+            type="primary"
+            style="min-width: 88px"
+          >
+            {{ t('Copy the conference number and link') }}
+          </TUIButton>
         </span>
       </template>
     </Dialog>
@@ -65,7 +66,7 @@
 <script setup lang="ts">
 import useRoomInviteControl from './useRoomInviteHooks';
 import SvgIcon from '../common/base/SvgIcon.vue';
-import TuiButton from '../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import Contacts from '../ScheduleConference/Contacts.vue';
 import SuccessIcon from '../common/icons/SuccessIcon.vue';
 import copyIcon from '../common/icons/CopyIcon.vue';

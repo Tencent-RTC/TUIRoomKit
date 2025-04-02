@@ -57,20 +57,20 @@
           <input type="checkbox" v-model="isLocalStreamMirror" />
           <span class="mirror-text">{{ t('Mirror') }}</span>
         </div>
-        <TuiButton
-          class="button"
+        <TUIButton
           :disabled="!isAllowed"
           @click="saveBeautySetting"
+          type="primary"
+          style="min-width: 88px"
         >
           {{ t('Save') }}
-        </TuiButton>
-        <TuiButton
-          class="button"
-          type="primary"
+        </TUIButton>
+        <TUIButton
           @click="closeBeautySettingPanel"
+          style="min-width: 88px"
         >
           {{ t('Cancel') }}
-        </TuiButton>
+        </TUIButton>
       </div>
     </Dialog>
     <Dialog
@@ -85,17 +85,19 @@
         t('All beauty parameters will revert to default after reset')
       }}</span>
       <template #footer>
-        <tui-button size="default" @click="resetBeautyProperties">
-          {{ t('Reset') }}
-        </tui-button>
-        <tui-button
-          class="cancel"
-          size="default"
+        <TUIButton
+          @click="resetBeautyProperties"
           type="primary"
+          style="min-width: 88px"
+        >
+          {{ t('Reset') }}
+        </TUIButton>
+        <TUIButton
           @click="isShowResetDialog = false"
+          style="min-width: 88px"
         >
           {{ t('Cancel') }}
-        </tui-button>
+        </TUIButton>
       </template>
     </Dialog>
   </div>
@@ -110,7 +112,7 @@ import BasicBeautyIcon from '../common/icons/BasicBeautyIcon.vue';
 import { useI18n } from '../../locales';
 import { roomService, MetricsKey } from '../../services';
 import Dialog from '../common/base/Dialog';
-import TuiButton from '../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import Slider from '../common/base/Slider.vue';
 import CloseBeautyIcon from '../common/icons/CloseBeautyIcon.vue';
 import SmootherBeautyIcon from '../common/icons/SmootherBeautyIcon.vue';
@@ -466,11 +468,6 @@ const handleMouseUp = async () => {
   margin-top: 10px;
   border-radius: 8px;
 
-  .button {
-    width: 84px;
-    height: 32px;
-  }
-
   .mirror-container {
     position: absolute;
     left: 24px;
@@ -480,9 +477,5 @@ const handleMouseUp = async () => {
       margin-left: 4px;
     }
   }
-}
-
-.cancel {
-  margin-left: 12px;
 }
 </style>

@@ -52,7 +52,6 @@ interface BasicState {
   isSchemeLinkVisible: boolean;
   isShowScreenShareAntiFraud: boolean;
   isExperiencedAI: boolean;
-  isOpenMic: boolean;
   scene: SceneType;
   componentConfig: {
     InviteControl: {
@@ -111,7 +110,6 @@ export const useBasicStore = defineStore('basic', {
     isSchemeLinkVisible: !isMobile,
     isShowScreenShareAntiFraud: false,
     isExperiencedAI: false,
-    isOpenMic: false,
     componentConfig: {
       SwitchTheme: {
         visible: true,
@@ -240,9 +238,6 @@ export const useBasicStore = defineStore('basic', {
     setLang(lang: string) {
       this.lang = lang;
     },
-    setIsOpenMic(isOpen: boolean) {
-      this.isOpenMic = isOpen;
-    },
     setScene(scene: SceneType) {
       this.scene = scene;
     },
@@ -265,7 +260,6 @@ export const useBasicStore = defineStore('basic', {
       this.isFrontCamera = true;
       this.showHeaderTool = true;
       this.shareLink = '';
-      this.isOpenMic = false;
       this.showRoomTool = false;
       this.isExperiencedAI = false;
     },

@@ -93,16 +93,14 @@
           </div>
         </div>
         <div class="chosen-footer">
-          <TuiButton
-            class="chosen-footer-button"
+          <TUIButton @click="cancel" style="min-width: 88px">{{ t('Cancel') }}</TUIButton>
+          <TUIButton
+            @click="confirm"
             type="primary"
-            @click="cancel"
+            style="min-width: 88px"
           >
-            {{ t('Cancel') }}
-          </TuiButton>
-          <TuiButton class="chosen-footer-button" @click="confirm">{{
-            t('Confirm')
-          }}</TuiButton>
+            {{ t('Confirm') }}
+          </TUIButton>
         </div>
       </div>
     </div>
@@ -114,9 +112,14 @@
             {{ t('x people selected', { number: selectedContacts.length }) }}
           </span>
         </div>
-        <TuiButton :disabled="!selectedContacts.length" @click="confirm">
+        <TUIButton
+          :disabled="!selectedContacts.length"
+          @click="confirm"
+          type="primary"
+          style="min-width: 88px"
+        >
           {{ t('Confirm') + `(${selectedContacts.length})` }}
-        </TuiButton>
+        </TUIButton>
       </div>
     </template>
   </PanelContainer>
@@ -131,9 +134,9 @@ import {
   computed,
   withDefaults,
 } from 'vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import TuiInput from '../common/base/Input';
 import TuiCheckbox from '../common/base/Checkbox';
-import TuiButton from '../common/base/Button.vue';
 import TuiAvatar from '../common/Avatar.vue';
 import SearchIcon from '../common/icons/SearchIcon.vue';
 import CloseIcon from '../common/icons/CloseIcon.vue';
@@ -371,11 +374,6 @@ watch(
       display: flex;
       gap: 10px;
       justify-content: center;
-
-      .chosen-footer-button {
-        width: 76px;
-        height: 26px;
-      }
     }
   }
 }
@@ -429,10 +427,6 @@ watch(
 
   .form-attendees:hover {
     overflow: auto;
-  }
-
-  button {
-    padding: 6px 30px;
   }
 }
 </style>

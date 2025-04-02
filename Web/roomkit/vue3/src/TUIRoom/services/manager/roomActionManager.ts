@@ -4,7 +4,6 @@ import {
   TUIRoomInfo,
   TUIRoomType,
   TUISeatMode,
-  TUIMediaDeviceType,
   TUISeatInfo,
   TUIVideoStreamType,
   TUIUserInfo,
@@ -12,6 +11,10 @@ import {
 import { EventType, IRoomService, RoomParam } from '../types';
 import { isMobile, isWeChat } from '../../utils/environment';
 import logger from '../../utils/common/logger';
+import { useAudioDeviceState, useVideoDeviceState } from '../../core';
+
+const { microphone, speaker } = useAudioDeviceState();
+const { camera } = useVideoDeviceState();
 
 const logPrefix = '[RoomService:roomActionManager]';
 
@@ -20,9 +23,6 @@ smallParam.videoResolution = TRTCVideoResolution.TRTCVideoResolution_640_360;
 smallParam.videoFps = 10;
 smallParam.videoBitrate = 550;
 
-export enum FetchRoomInfoErrorCode {
-  ROOM_NOT_EXIST = -2100,
-}
 export interface DeviceParams {
   isOpenCamera?: boolean;
   isOpenMicrophone?: boolean;
@@ -222,22 +222,13 @@ export class RoomActionManager {
       defaultSpeakerId,
     } = roomParam;
     if (defaultCameraId) {
-      this.service.roomStore.setCurrentCameraId(defaultCameraId);
-      this.service.roomEngine.instance?.setCurrentCameraDevice({
-        deviceId: defaultCameraId,
-      });
+      camera.setCurrentDevice({ deviceId: defaultCameraId });
     }
     if (defaultMicrophoneId) {
-      this.service.roomStore.setCurrentMicrophoneId(defaultMicrophoneId);
-      this.service.roomEngine.instance?.setCurrentMicDevice({
-        deviceId: defaultMicrophoneId,
-      });
+      microphone.setCurrentDevice({ deviceId: defaultMicrophoneId });
     }
     if (defaultSpeakerId) {
-      this.service.roomStore.setCurrentSpeakerId(defaultSpeakerId);
-      this.service.roomEngine.instance?.setCurrentSpeakerDevice({
-        deviceId: defaultSpeakerId,
-      });
+      speaker.setCurrentDevice({ deviceId: defaultSpeakerId });
     }
 
     const {
@@ -246,42 +237,14 @@ export class RoomActionManager {
       isCameraDisableForAllUser,
       isFreeSpeakMode,
     } = this.service.roomStore;
-    // 是否可以自动打开麦克风
     const isCanOpenMicrophone =
       isMaster || (!isMicrophoneDisableForAllUser && isFreeSpeakMode);
     if (isCanOpenMicrophone) {
       if (isOpenMicrophone) {
-        await this.service.roomEngine.instance?.unmuteLocalAudio();
-        if (!this.service.basicStore.isOpenMic) {
-          this.service.roomEngine.instance?.openLocalMicrophone();
-          this.service.basicStore.setIsOpenMic(true);
-        }
-        if (!isWeChat && !isMobile) {
-          const microphoneList =
-            await this.service.roomEngine.instance?.getMicDevicesList();
-          const speakerList =
-            await this.service.roomEngine.instance?.getSpeakerDevicesList();
-          if (microphoneList?.length === 0 || speakerList?.length === 0) return;
-          if (
-            !this.service.roomStore.currentMicrophoneId &&
-            microphoneList.length > 0
-          ) {
-            this.service.roomStore.setCurrentMicrophoneId(
-              microphoneList[0].deviceId
-            );
-          }
-          if (
-            !this.service.roomStore.currentSpeakerId &&
-            speakerList.length > 0
-          ) {
-            this.service.roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
-          }
-          await this.service.roomEngine.instance?.setCurrentMicDevice({
-            deviceId: this.service.roomStore.currentMicrophoneId,
-          });
-        }
+        await microphone.openLocalMicrophone();
+        await microphone.unmuteLocalAudio();
       } else {
-        await this.service.roomEngine.instance?.muteLocalAudio();
+        await microphone.muteLocalAudio();
       }
     }
 
@@ -289,31 +252,7 @@ export class RoomActionManager {
     const isCanOpenCamera =
       isMaster || (!isCameraDisableForAllUser && isFreeSpeakMode);
     if (isCanOpenCamera && isOpenCamera) {
-      if (isMobile) {
-        await this.service.roomEngine.instance?.openLocalCamera({
-          isFrontCamera: this.service.basicStore.isFrontCamera,
-        });
-        return;
-      }
-      const deviceManager =
-        this.service.roomEngine.instance?.getMediaDeviceManager();
-      if (!this.service.roomStore.currentCameraId) {
-        const cameraList = await deviceManager.getDevicesList({
-          type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
-        });
-        if (cameraList && cameraList.length > 0) {
-          this.service.roomStore.setCurrentCameraId(cameraList[0].deviceId);
-        }
-      }
-      await deviceManager.setCurrentDevice({
-        type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
-        deviceId: this.service.roomStore.currentCameraId,
-      });
-      /**
-       * Turn on the local camera
-       *
-       **/
-      await this.service.roomEngine.instance?.openLocalCamera();
+      camera.openLocalCamera();
     }
   }
 
@@ -340,11 +279,10 @@ export class RoomActionManager {
 
     // roomEngine enabled small stream by default in enterRoom api
     trtcCloud?.enableSmallVideoStream(!isH5, smallParam);
-    roomEngine.instance?.muteLocalAudio();
+    microphone.muteLocalAudio();
 
     if (!roomInfo.isSeatEnabled) {
-      roomEngine.instance?.openLocalMicrophone();
-      this.service.basicStore.setIsOpenMic(true);
+      microphone.openLocalMicrophone();
     }
 
     return roomInfo;

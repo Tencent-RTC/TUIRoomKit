@@ -146,29 +146,11 @@ export default function useEndControl() {
     switch (userRole) {
       case TUIRole.kGeneralUser:
         if (isLocal) {
-          if (
-            roomStore?.isMicrophoneDisableForAllUser &&
-            !roomStore.localStream?.hasAudioStream
-          ) {
-            roomStore.setCanControlSelfAudio(false);
-          }
-          if (
-            roomStore?.isCameraDisableForAllUser &&
-            !roomStore.localStream?.hasVideoStream
-          ) {
-            roomStore.setCanControlSelfVideo(false);
-          }
           if (oldUserRole === TUIRole.kAdministrator) {
             TUIMessage({
               type: 'warning',
               message: t('Your administrator status has been revoked'),
             });
-          }
-          if (roomStore.localStream?.hasAudioStream) {
-            roomStore.setCanControlSelfAudio(true);
-          }
-          if (roomStore.localStream?.hasVideoStream) {
-            roomStore.setCanControlSelfVideo(true);
           }
         }
         break;
@@ -178,8 +160,6 @@ export default function useEndControl() {
             type: 'success',
             message: t('You have become a administrator'),
           });
-          roomStore.setCanControlSelfAudio(true);
-          roomStore.setCanControlSelfVideo(true);
           if (roomStore.isSpeakAfterTakingSeatMode) {
             handleUpdateSeatApplicationList();
           }

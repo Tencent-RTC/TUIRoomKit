@@ -70,9 +70,9 @@
           :icon="LinkIcon"
           @click="toggleInviteRoom"
         />
-        <tui-button size="default" @click="joinConference">
+        <TUIButton @click="joinConference" type="primary">
           {{ t('Join') }}
-        </tui-button>
+        </TUIButton>
       </div>
     </div>
     <PanelContainer
@@ -91,29 +91,32 @@
       </div>
       <div class="room-detail h5" v-if="isMobile">
         <div class="detail-footer">
-          <tui-button
+          <TUIButton
             plain
-            class="footer-button"
             :custom-style="{ width: '100%', padding: '10px', fontSize: '16px' }"
             @click.stop="joinConference"
-            >{{ t('Join Room') }}
-          </tui-button>
-          <tui-button
+            type="primary"
+          >
+            {{ t('Join Room') }}
+          </TUIButton>
+          <TUIButton
             plain
-            class="footer-button"
             :custom-style="{ width: '100%', padding: '10px', fontSize: '16px' }"
             @click.stop="toggleInvitePanelShow"
-            >{{ t('Invited members') }}
-          </tui-button>
-          <tui-button
-            type="danger"
+            type="primary"
+          >
+            {{ t('Invited members') }}
+          </TUIButton>
+          <TUIButton
+            color="red"
             plain
-            class="footer-button"
             :custom-style="{ width: '100%', padding: '10px', fontSize: '16px' }"
             v-if="cancelRoom.visible"
             @click.stop="cancelRoom.func"
-            >{{ t('cancel room') }}
-          </tui-button>
+            type="primary"
+          >
+            {{ t('cancel room') }}
+          </TUIButton>
         </div>
         <div
           class="mask"
@@ -131,29 +134,24 @@
         </div>
       </div>
       <template v-if="!isMobile" #footer>
-        <tui-button
+        <TUIButton
           v-if="item.status === TUIConferenceStatus.kConferenceStatusNone"
-          class="dialog-button"
-          size="default"
           disabled
+          type="primary"
+          style="min-width: 88px"
         >
           {{ t('The room is closed') }}
-        </tui-button>
+        </TUIButton>
         <span v-else>
-          <tui-button
-            class="dialog-button"
-            size="default"
+          <TUIButton
             @click="joinConference"
+            type="primary"
+            style="min-width: 88px"
           >
             {{ t('Enter Now') }}
-          </tui-button>
-          <tui-button
-            type="primary"
-            size="default"
-            class="button"
-            @click="toggleInviteRoom"
-            >{{ t('Invited members') }}
-          </tui-button>
+          </TUIButton>
+          <TUIButton @click="toggleInviteRoom" style="min-width: 88px">{{ t('Invited members') }}
+          </TUIButton>
         </span>
       </template>
     </PanelContainer>
@@ -181,19 +179,18 @@
       }}</span>
       <template #footer>
         <span>
-          <tui-button
-            class="dialog-button"
-            size="default"
+          <TUIButton
             @click="handleCancelSchedule"
-            >{{ t('cancel room') }}
-          </tui-button>
-          <tui-button
             type="primary"
-            size="default"
-            class="button"
+            style="min-width: 88px"
+            >{{ t('cancel room') }}
+          </TUIButton>
+          <TUIButton
             @click="showRoomCancel = false"
-            >{{ t('No cancellation') }}
-          </tui-button>
+            style="min-width: 88px"
+          >
+            {{ t('No cancellation') }}
+          </TUIButton>
         </span>
       </template>
     </Dialog>
@@ -214,12 +211,8 @@
       <InvitePanel :scheduleInviteList="scheduleInviteList" />
       <template #footer>
         <span>
-          <tui-button
-            class="dialog-button"
-            size="default"
-            @click="copyRoomIdAndRoomLink()"
-            >{{ t('Copy the conference number and link') }}
-          </tui-button>
+          <TUIButton @click="copyRoomIdAndRoomLink()" type="primary">{{ t('Copy the conference number and link') }}
+          </TUIButton>
         </span>
       </template>
     </Dialog>
@@ -246,7 +239,7 @@ import ArrowDown from '../common/icons/ArrowDown.vue';
 import LinkIcon from '../common/icons/LinkIcon.vue';
 import SuccessIcon from '../common/icons/SuccessIcon.vue';
 import WarningIcon from '../common/icons/WarningIcon.vue';
-import TuiButton from '../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import { useI18n } from '../../locales';
 import vClickOutside from '../../directives/vClickOutside';
 import ScheduleConferencePanel from './ScheduleConferencePanel';
@@ -712,12 +705,6 @@ async function handleFetchRoomInfo() {
     flex-direction: column;
     gap: 10px;
     margin-top: 16px;
-
-    .footer-button {
-      font-size: 16px;
-      font-weight: 500;
-      border-radius: 6px;
-    }
   }
 }
 
@@ -853,10 +840,6 @@ async function handleFetchRoomInfo() {
 
 .schedule-detail-closed {
   color: var(--text-color-secondary);
-}
-
-.button {
-  margin-left: 10px;
 }
 
 .status-running {

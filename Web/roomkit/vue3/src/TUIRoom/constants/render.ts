@@ -7,8 +7,3 @@ export enum LAYOUT {
   LARGE_SMALL_WINDOW = 'large_small_window',
   GRID_VIEW = 'grid_view',
 }
-
-export enum SettingMode {
-  SIMPLE = 'simple',
-  DETAIL = 'detail',
-}

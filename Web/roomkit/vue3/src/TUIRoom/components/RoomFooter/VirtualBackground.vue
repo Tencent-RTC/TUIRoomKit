@@ -51,16 +51,17 @@
         </div>
       </div>
       <div class="footer">
-        <TuiButton
-          class="button"
+        <TUIButton
           :disabled="!isAllowed"
           @click="confirmVirtualBackground"
+          type="primary"
+          style="min-width: 88px"
         >
           {{ t('Save') }}
-        </TuiButton>
-        <TuiButton class="button" type="primary" @click="closeSettingPanel">{{
+        </TUIButton>
+        <TUIButton @click="closeSettingPanel" style="min-width: 88px">{{
           t('Cancel')
-        }}</TuiButton>
+        }}</TUIButton>
       </div>
     </Dialog>
   </div>
@@ -68,6 +69,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import IconButton from '../common/base/IconButton.vue';
 import VirtualBackgroundIcon from '../common/icons/VirtualBackgroundIcon.vue';
 import { useI18n } from '../../locales';
@@ -75,7 +77,6 @@ import { roomService } from '../../services';
 import Dialog from '../common/base/Dialog';
 import CloseVirtualBackground from '../../assets/imgs/close-virtual-background.png';
 import BlurredBackground from '../../assets/imgs/blurred-background.png';
-import TuiButton from '../common/base/Button.vue';
 
 const { t } = useI18n();
 const componentConfig =
@@ -223,10 +224,5 @@ const applyVirtualBackground = async (type: 'close' | 'blur') => {
   padding: 1rem;
   margin-top: 10px;
   border-radius: 8px;
-
-  .button {
-    width: 84px;
-    height: 32px;
-  }
 }
 </style>

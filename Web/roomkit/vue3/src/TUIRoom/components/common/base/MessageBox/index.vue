@@ -23,32 +23,26 @@
             class="button-container"
             @click="handleClose('cancel')"
           >
-            <tui-button type="text" size="default" class="button">{{
-              cancelButtonText
-            }}</tui-button>
+            <TUIButton type="primary" style="min-width: 88px">{{ cancelButtonText }}</TUIButton>
           </div>
           <div class="button-container" @click="handleClose('confirm')">
-            <tui-button
-              type="text"
-              size="default"
-              class="button confirm-button"
-            >
-              {{ confirmButtonText }}
-            </tui-button>
+            <TUIButton type="primary" style="min-width: 88px">{{ confirmButtonText }}</TUIButton>
           </div>
         </div>
         <div v-else class="tui-message-box-footer">
-          <tui-button size="default" @click="handleClose('confirm')">{{
-            confirmButtonText
-          }}</tui-button>
-          <tui-button
-            v-if="cancelButtonText"
+          <TUIButton
+            @click="handleClose('confirm')"
             type="primary"
-            size="default"
+            style="min-width: 88px"
+            >{{ confirmButtonText }}
+          </TUIButton>
+          <TUIButton
+            v-if="cancelButtonText"
             @click="handleClose('cancel')"
+            style="min-width: 88px"
           >
             {{ cancelButtonText }}
-          </tui-button>
+          </TUIButton>
         </div>
       </div>
     </div>
@@ -64,11 +58,11 @@ import {
   defineProps,
   defineEmits,
 } from 'vue';
-import TuiButton from '../Button.vue';
 import SvgIcon from '../SvgIcon.vue';
 import CloseIcon from '../../icons/CloseIcon.vue';
 import { isMobile } from '../../../../utils/environment';
 import useZIndex from '../../../../hooks/useZIndex';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 
 const visible = ref(false);
 const overlayContentStyle = ref({});
@@ -276,18 +270,6 @@ onMounted(async () => {
       &:not(:first-child) {
         border-left: 1px solid var(--stroke-color-module);
       }
-    }
-
-    .button {
-      font-size: 16px;
-      font-weight: 500;
-    }
-
-    .confirm-button {
-      text-align: center;
-      border: none;
-      color: var(--text-color-link);
-      background-color: var(--bg-color-dialog);
     }
   }
 }

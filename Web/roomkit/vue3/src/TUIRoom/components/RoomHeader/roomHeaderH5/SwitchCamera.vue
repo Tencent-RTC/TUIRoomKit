@@ -4,21 +4,15 @@
   </div>
 </template>
 <script setup lang="ts">
-import useDeviceManager from '../../../hooks/useDeviceManager';
 import SvgIcon from '../../common/base/SvgIcon.vue';
-import { storeToRefs } from 'pinia';
 import CameraSwitchIcon from '../../common/icons/CameraSwitchIcon.vue';
-import { useBasicStore } from '../../../stores/basic';
 import vTap from '../../../directives/vTap';
-const basicStore = useBasicStore();
-const { isFrontCamera } = storeToRefs(basicStore);
-const { deviceManager } = useDeviceManager();
+import { useVideoDeviceState } from '../../../core';
+
+const { isFrontCamera, camera } = useVideoDeviceState();
 
 async function handleSwitchCamera() {
-  await deviceManager.instance?.switchCamera({
-    isFrontCamera: !isFrontCamera.value,
-  });
-  basicStore.setIsFrontCamera(!isFrontCamera.value);
+  camera.switchCamera({ isFrontCamera: !isFrontCamera.value });
 }
 </script>
 <style scoped>

@@ -29,15 +29,15 @@
         </div>
         <div class="divide-line"></div>
         <div class="setting-content">
-          <audio-setting-tab
+          <audio-setting
             v-if="activeSettingTab === 'audio'"
+            :display-mode="MediaSettingDisplayMode.Panel"
             class="setting-tab"
-            :mode="SettingMode.DETAIL"
           />
-          <video-setting-tab
+          <video-setting
             v-else-if="activeSettingTab === 'video'"
+            :display-mode="MediaSettingDisplayMode.Panel"
             class="setting-tab"
-            :with-preview="true"
           />
         </div>
       </div>
@@ -46,13 +46,14 @@
 </template>
 
 <script setup lang="ts">
-// import { ref } from 'vue';
 import SvgIcon from '../common/base/SvgIcon.vue';
-import AudioSettingTab from '../common/AudioSettingTab.vue';
-import VideoSettingTab from '../common/VideoSettingTab.vue';
+import {
+  AudioSetting,
+  VideoSetting,
+  MediaSettingDisplayMode,
+} from '../../core';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
-import { SettingMode } from '../../constants/render';
 import { useI18n } from '../../locales';
 import { computed } from 'vue';
 import CloseIcon from '../common/icons/CloseIcon.vue';

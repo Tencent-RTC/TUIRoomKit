@@ -71,7 +71,6 @@ import {
   RoomParam,
   RoomInitData,
 } from './services/index';
-import useDeviceManager from './hooks/useDeviceManager';
 import useCustomizedAutoPlayDialog from './hooks/useCustomizedAutoPlayDialog';
 import { storeToRefs } from 'pinia';
 import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
@@ -104,7 +103,6 @@ const conferenceShow = computed(
 
 useCustomizedAutoPlayDialog();
 useTRTCDetect();
-useDeviceManager({ listenForDeviceChange: true });
 
 const { t } = roomService;
 defineExpose({

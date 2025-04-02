@@ -422,7 +422,6 @@ export class ChatExtension {
 
   private async roomInit(deep?: boolean) {
     this.service?.roomStore.reset();
-    this.service?.initMediaDeviceList();
     const { SDKAppID, userID, userSig } = this.chatContext;
     const { nick = '', avatar = defaultAvatarUrl } = this.myProfile;
     this.service &&

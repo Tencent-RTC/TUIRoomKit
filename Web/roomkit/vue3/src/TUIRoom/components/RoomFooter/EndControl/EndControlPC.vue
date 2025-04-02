@@ -1,8 +1,8 @@
 <template>
   <div class="end-control-container">
-    <tui-button type="primary" class="end-button" @click="handleEndBtnClick">
+    <TUIButton color="red" size="large" @click="handleEndBtnClick">
       {{ showEndButtonContent }}
-    </tui-button>
+    </TUIButton>
     <Dialog
       v-model="visible"
       :title="title"
@@ -34,42 +34,36 @@
       </div>
       <template #footer>
         <div v-if="currentDialogType === DialogType.BasicDialog">
-          <tui-button
+          <TUIButton
             v-if="roomStore.isMaster"
-            class="button"
-            size="default"
             @click="dismissRoom"
+            type="primary"
+            style="min-width: 88px"
           >
             {{ t('Dismiss') }}
-          </tui-button>
-          <tui-button
-            class="button"
-            size="default"
+          </TUIButton>
+          <TUIButton
             @click="handleEndLeaveClick"
+            type="primary"
+            style="min-width: 88px"
           >
             {{ t('Leave') }}
-          </tui-button>
-          <tui-button
-            class="button"
-            type="primary"
-            size="default"
-            @click="cancel"
-          >
+          </TUIButton>
+          <TUIButton @click="cancel" style="min-width: 88px">
             {{ t('Cancel') }}
-          </tui-button>
+          </TUIButton>
         </div>
         <div v-if="currentDialogType === DialogType.TransferDialog">
-          <tui-button class="button" size="default" @click="transferAndLeave">
-            {{ t('Transfer and leave') }}
-          </tui-button>
-          <tui-button
-            class="button"
-            size="default"
+          <TUIButton
+            @click="transferAndLeave"
             type="primary"
-            @click="cancel"
+            style="min-width: 88px"
           >
+            {{ t('Transfer and leave') }}
+          </TUIButton>
+          <TUIButton @click="cancel" style="min-width: 88px">
             {{ t('Cancel') }}
-          </tui-button>
+          </TUIButton>
         </div>
       </template>
     </Dialog>
@@ -77,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import TuiButton from '../../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import TuiSelect from '../../common/base/Select';
 import TuiOption from '../../common/base/Option';
 import Dialog from '../../common/base/Dialog';
@@ -171,24 +165,3 @@ async function transferAndLeave() {
   }
 }
 </script>
-<style lang="scss" scoped>
-.end-control-container {
-  .end-button {
-    padding: 9px 20px;
-    font-size: 14px;
-    border-radius: 20px;
-    color: var(--text-color-error);
-    border: 1.5px solid var(--text-color-error);
-
-    &:hover {
-      color: var(--uikit-color-white-1);
-      background: var(--text-color-error);
-      border: 1.5px solid var(--text-color-error);
-    }
-  }
-}
-
-.button {
-  margin-left: 20px;
-}
-</style>

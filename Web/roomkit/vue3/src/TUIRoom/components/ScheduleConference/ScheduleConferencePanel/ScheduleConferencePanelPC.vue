@@ -192,19 +192,23 @@
       </div>
       <template #footer>
         <div class="schedule-conference-footer">
-          <TuiButton class="footer-button" type="primary" @click="cancel">{{
-            t('Cancel')
-          }}</TuiButton>
-          <TuiButton
+          <TUIButton @click="cancel" style="min-width: 88px">{{ t('Cancel') }}</TUIButton>
+          <TUIButton
             v-if="!isEditMode"
-            class="footer-button"
             @click="scheduleConference"
+            type="primary"
+            style="min-width: 88px"
           >
             {{ t('Schedule') }}
-          </TuiButton>
-          <TuiButton v-else class="footer-button" @click="updateConferenceInfo">
+          </TUIButton>
+          <TUIButton
+            v-else
+            @click="updateConferenceInfo"
+            type="primary"
+            style="min-width: 88px"
+          >
             {{ t('Save') }}
-          </TuiButton>
+          </TUIButton>
         </div>
       </template>
     </PanelContainer>
@@ -230,7 +234,7 @@ import TuiInput from '../../common/base/Input';
 import TuiSelect from '../../common/base/Select';
 import TuiOption from '../../common/base/Option';
 import TuiCheckbox from '../../common/base/Checkbox';
-import TuiButton from '../../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import TuiAvatar from '../../common/Avatar.vue';
 import TuiDatepicker from '../../common/base/Datepicker';
 import TuiTimepicker from '../../common/base/Timepicker';
@@ -828,11 +832,6 @@ const cancel = () => {
   align-items: center;
   justify-content: center;
   width: 100%;
-
-  .footer-button {
-    width: 116px;
-    height: 32px;
-  }
 }
 
 .invite-member {

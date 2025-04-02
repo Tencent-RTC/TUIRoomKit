@@ -3,47 +3,31 @@
     <div class="room-control-main">
       <div class="control-container">
         <!-- Video preview area -->
-        <div class="stream-preview-container">
-          <div id="stream-preview" class="stream-preview"></div>
-          <div class="attention-info">
-            <span v-if="isCameraMuted" class="off-camera-info">{{
-              t('Off Camera')
-            }}</span>
-            <svg-icon
-              v-if="isCameraLoading"
-              :icon="LoadingIcon"
-              class="loading"
-            />
-          </div>
-        </div>
+        <video-preview class="video-preview" />
         <div class="control-region">
           <!-- Microphone, Camera operating area -->
           <div class="media-control-region">
-            <audio-media-control
+            <audio-setting
+              :display-mode="MediaSettingDisplayMode.IconWithPanel"
               class="media-control-item"
-              :has-more="true"
-              :is-muted="isMicMuted"
-              :audio-volume="audioVolume"
-              @click="toggleMuteAudio"
             />
-            <video-media-control
+            <video-setting
+              :display-mode="MediaSettingDisplayMode.IconWithPanel"
+              :support-video-preview="false"
               class="media-control-item"
-              :has-more="true"
-              :is-muted="isCameraMuted"
-              @click="toggleMuteVideo"
             />
           </div>
           <div class="room-control-region">
             <!-- Create room logic -->
             <div class="create-room-region">
-              <tui-button
-                class="button-item"
-                style="width: 170px"
+              <TUIButton
                 @click.stop="handleCreateRoom"
+                size="large"
+                type="primary"
               >
                 <svg-icon :icon="CreateRoomIcon" />
                 <span class="button-text">{{ t('New Room') }}</span>
-              </tui-button>
+              </TUIButton>
               <div
                 v-if="showCreateRoomItems"
                 v-click-outside="handleClickOutsideCreateRoomItems"
@@ -75,15 +59,15 @@
             </div>
             <!-- Enter room logic -->
             <div class="enter-room-region">
-              <tui-button
+              <TUIButton
                 v-if="!showEnterRoomAction"
-                class="button-item"
-                style="width: 170px"
                 @click="handleEnterRoom"
+                size="large"
+                type="primary"
               >
                 <svg-icon :icon="EnterRoomIcon" />
                 <span class="button-text">{{ t('Join Room') }}</span>
-              </tui-button>
+              </TUIButton>
               <div v-if="showEnterRoomAction" class="enter-room-action">
                 <input
                   v-model="roomId"
@@ -107,14 +91,14 @@
               class="schedule-room-region"
               v-if="props.enableScheduledConference"
             >
-              <tui-button
-                class="button-item"
-                style="width: 170px"
+              <TUIButton
                 @click="scheduleConference"
+                size="large"
+                type="primary"
               >
                 <svg-icon :icon="ScheduleRoomIcon" />
                 <span class="button-text">{{ t('Schedule') }}</span>
-              </tui-button>
+              </TUIButton>
             </div>
           </div>
         </div>
@@ -132,45 +116,40 @@
 import {
   ref,
   watch,
-  onBeforeUnmount,
   withDefaults,
   defineProps,
   defineExpose,
   defineEmits,
+  onMounted,
+  onUnmounted,
 } from 'vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import SvgIcon from '../../common/base/SvgIcon.vue';
-import LoadingIcon from '../../common/icons/LoadingIcon.vue';
 import NextIcon from '../../common/icons/NextIcon.vue';
-import TuiButton from '../../common/base/Button.vue';
 import useRoomControl from './useRoomControlHooks';
 import CreateRoomIcon from '../../common/icons/CreateRoomIcon.vue';
 import EnterRoomIcon from '../../common/icons/EnterRoomIcon.vue';
 import ScheduleRoomIcon from '../../common/icons/ScheduleRoomIcon.vue';
-import useGetRoomEngine from '../../../hooks/useRoomEngine';
-import { useBasicStore } from '../../../stores/basic';
-import { useRoomStore } from '../../../stores/room';
-import AudioMediaControl from '../../common/AudioMediaControl.vue';
-import VideoMediaControl from '../../common/VideoMediaControl.vue';
 import ScheduleConferencePanel from '../../ScheduleConference/ScheduleConferencePanel';
-import TUIRoomEngine, {
-  TRTCVideoMirrorType,
-  TRTCVideoRotation,
-  TRTCVideoFillMode,
-  TUIRoomDeviceMangerEvents,
-} from '@tencentcloud/tuiroom-engine-js';
 import vClickOutside from '../../../directives/vClickOutside';
 import {
-  isEnumerateDevicesSupported,
-  isGetUserMediaSupported,
-} from '../../../utils/mediaAbility';
-import useDeviceManager from '../../../hooks/useDeviceManager';
+  AudioSetting,
+  VideoSetting,
+  VideoPreview,
+  useAudioDeviceState,
+  useVideoDeviceState,
+  MediaSettingDisplayMode,
+} from '../../../core';
+import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 
-const roomStore = useRoomStore();
-const basicStore = useBasicStore();
 const { t } = useRoomControl();
-const { deviceManager, initMediaDeviceList } = useDeviceManager({
-  listenForDeviceChange: true,
-});
+const {
+  isMicrophoneTesting,
+  microphone,
+  currentMicrophoneId,
+  currentSpeakerId,
+} = useAudioDeviceState();
+const { currentCameraId, isCameraTesting } = useVideoDeviceState();
 
 const props = withDefaults(
   defineProps<{
@@ -185,15 +164,7 @@ const props = withDefaults(
 );
 defineExpose({
   getRoomParam,
-  startStreamPreview,
 });
-
-const roomEngine = useGetRoomEngine();
-const isCameraLoading = ref(false);
-
-const audioVolume = ref(0);
-const isMicMuted = ref(false);
-const isCameraMuted = ref(false);
 
 const showCreateRoomItems = ref(false);
 const showEnterRoomAction = ref(Boolean(props.givenRoomId));
@@ -212,86 +183,13 @@ const tuiRoomParam = {
   defaultSpeakerId: '',
 };
 
-async function openCamera() {
-  const trtcCloud = roomEngine.instance?.getTRTCCloud();
-  await trtcCloud?.setLocalRenderParams({
-    mirrorType: basicStore.isLocalStreamMirror
-      ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable
-      : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-    rotation: TRTCVideoRotation.TRTCVideoRotation0,
-    fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
-  });
-  await roomEngine.instance?.startCameraDeviceTest({
-    view: 'stream-preview',
-  });
-}
-
-async function closeCamera() {
-  await roomEngine.instance?.stopCameraDeviceTest();
-}
-
-async function openAudio() {
-  await roomEngine.instance?.startMicDeviceTest({ interval: 200 });
-}
-
-async function closeAudio() {
-  await roomEngine.instance?.stopMicDeviceTest();
-}
-
-async function toggleMuteAudio() {
-  isMicMuted.value = !isMicMuted.value;
-  tuiRoomParam.isOpenMicrophone = !isMicMuted.value;
-  if (isMicMuted.value) {
-    await closeAudio();
-    audioVolume.value = 0;
-  } else {
-    await openAudio();
-  }
-}
-
-async function toggleMuteVideo() {
-  isCameraMuted.value = !isCameraMuted.value;
-  tuiRoomParam.isOpenCamera = !isCameraMuted.value;
-  if (isCameraMuted.value) {
-    await closeCamera();
-    isCameraLoading.value = false;
-  } else {
-    isCameraLoading.value = true;
-    await openCamera();
-    isCameraLoading.value = false;
-  }
-}
-
 function getRoomParam() {
-  tuiRoomParam.defaultCameraId = roomStore.currentCameraId;
-  tuiRoomParam.defaultMicrophoneId = roomStore.currentMicrophoneId;
-  tuiRoomParam.defaultSpeakerId = roomStore.currentSpeakerId;
+  tuiRoomParam.defaultCameraId = currentCameraId.value;
+  tuiRoomParam.defaultMicrophoneId = currentMicrophoneId.value;
+  tuiRoomParam.defaultSpeakerId = currentSpeakerId.value;
+  tuiRoomParam.isOpenMicrophone = isMicrophoneTesting.value;
+  tuiRoomParam.isOpenCamera = isCameraTesting.value;
   return tuiRoomParam;
-}
-
-const onUserVoiceVolume = (options: { volume: number }) => {
-  audioVolume.value = options.volume;
-};
-
-async function startStreamPreview() {
-  if (!isEnumerateDevicesSupported) {
-    return;
-  }
-  isCameraLoading.value = true;
-
-  await initMediaDeviceList();
-
-  if (!isGetUserMediaSupported) {
-    isCameraLoading.value = false;
-    return;
-  }
-  if (roomStore.microphoneList && roomStore.microphoneList.length > 0) {
-    openAudio();
-  }
-  if (roomStore.cameraList && roomStore.cameraList.length > 0) {
-    await openCamera();
-  }
-  isCameraLoading.value = false;
 }
 
 const roomId = ref(props.givenRoomId);
@@ -341,21 +239,14 @@ function enterRoom() {
   });
 }
 
-TUIRoomEngine.once('ready', () => {
-  startStreamPreview();
-  deviceManager.instance?.on(
-    TUIRoomDeviceMangerEvents.onTestMicVolume,
-    onUserVoiceVolume
-  );
+onMounted(() => {
+  TUIRoomEngine.once('ready', () => {
+    microphone.startMicDeviceTest({ interval: 200 });
+  });
 });
 
-onBeforeUnmount(async () => {
-  await closeAudio();
-  await closeCamera();
-  deviceManager.instance?.off(
-    TUIRoomDeviceMangerEvents.onTestMicVolume,
-    onUserVoiceVolume
-  );
+onUnmounted(() => {
+  microphone.stopMicDeviceTest();
 });
 </script>
 
@@ -374,48 +265,17 @@ onBeforeUnmount(async () => {
     0px 2px 6px var(--uikit-color-black-8),
     0px 8px 18px var(--uikit-color-black-8);
 
-  .stream-preview-container {
-    position: relative;
+  .video-preview {
     width: 100%;
     height: 400px;
-    overflow: hidden;
     background-color: var(--uikit-color-black-1);
     border-radius: 8px;
-
-    .stream-preview {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .attention-info {
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-
-      .off-camera-info {
-        font-size: 22px;
-        font-weight: 400;
-        line-height: 34px;
-        color: var(--uikit-color-gray-7);
-      }
-
-      .loading {
-        animation: loading-rotate 2s linear infinite;
-      }
-    }
   }
 
   .control-region {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
     height: 60px;
 
@@ -456,17 +316,11 @@ onBeforeUnmount(async () => {
     .room-control-region {
       display: flex;
 
-      .button-item {
-        width: 206px;
-        height: 60px;
-
-        .button-text {
-          margin-left: 6px;
-          font-size: 20px;
-          font-style: normal;
-          font-weight: 600;
-          line-height: 22px;
-        }
+      .button-text {
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
       }
 
       .create-room-region {
@@ -531,18 +385,19 @@ onBeforeUnmount(async () => {
         margin-left: 20px;
 
         .enter-room-action {
+          display: flex;
           position: relative;
-          width: 170px;
-          height: 60px;
+          width: 156px;
+          height: 48px;
           padding: 0 14px;
-          line-height: 60px;
+          line-height: 50px;
           border-radius: 30px;
           background-color: var(--bg-color-operate);
           border: 2px solid var(--button-color-primary-default);
           .input {
-            max-width: 140px;
+            max-width: 88px;
             padding: 0;
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 500;
             line-height: 28px;
             background-color: transparent;
@@ -558,15 +413,15 @@ onBeforeUnmount(async () => {
 
           .enter-button {
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 2px;
+            right: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 40px;
             height: 40px;
             border-radius: 26px;
-            background-color: var(--button-color-primary-disable);
+            background-color: var(--button-color-primary-disabled);
 
             &.active {
               cursor: pointer;

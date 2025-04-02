@@ -39,24 +39,24 @@
         @click="handleRejectInvitation"
         >{{ t('Not joining for now') }}
       </span>
-      <tui-button
-        class="button-item"
-        style="width: 110px"
+      <TUIButton
         @click="handleEnterRoom"
+        type="primary"
+        style="min-width: 88px"
       >
         <svg-icon class="icon" :icon="EnterRoomIcon" />
         <span class="button-text">{{ t('Enter Now') }}</span>
-      </tui-button>
+      </TUIButton>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, defineEmits } from 'vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import Avatar from '../common/Avatar.vue';
 import { useI18n } from '../../locales';
 import EnterRoomIcon from '../common/icons/EnterRoomIcon.vue';
 import SvgIcon from '../common/base/SvgIcon.vue';
-import TuiButton from '../common/base/Button.vue';
 import {
   TUIConferenceInvitationManagerEvents,
   TUIInvitation,
