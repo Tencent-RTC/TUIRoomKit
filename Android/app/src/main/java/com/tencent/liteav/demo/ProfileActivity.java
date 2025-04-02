@@ -17,13 +17,14 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tencent.cloud.tuikit.engine.common.TUICommonDefine;
+import com.tencent.cloud.tuikit.engine.room.TUIRoomDefine;
 import com.tencent.cloud.tuikit.engine.room.TUIRoomEngine;
 import com.tencent.cloud.tuikit.roomkit.common.utils.ImageLoader;
-import com.tencent.cloud.tuikit.roomkit.common.utils.RoomToast;
+import com.tencent.cloud.tuikit.roomkit.view.basic.RoomToast;
 import com.tencent.cloud.tuikit.roomkit.common.utils.UserModel;
 import com.tencent.cloud.tuikit.roomkit.common.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
-import com.tencent.qcloud.tuicore.TUIConfig;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.TUILogin;
 import com.tencent.qcloud.tuicore.interfaces.TUICallback;
@@ -150,11 +151,19 @@ public class ProfileActivity extends AppCompatActivity {
             public void onSuccess() {
                 Log.d(TAG, "TUILogin.login onSuccess");
                 String userName = TextUtils.isEmpty(userModel.userName) ? userModel.userId : userModel.userName;
-                TUIRoomEngine.setSelfInfo(userName, userModel.userAvatar, null);
-                TUIConfig.setSelfNickName(userName);
-                TUIConfig.setSelfFaceUrl(userModel.userAvatar);
-                TUICore.startActivity("ConferenceOptionsActivity", null);
-                finish();
+                TUIRoomEngine.setSelfInfo(userName, userModel.userAvatar, new TUIRoomDefine.ActionCallback() {
+                    @Override
+                    public void onSuccess() {
+                        TUICore.startActivity("ConferenceOptionsActivity", null);
+                        finish();
+                    }
+
+                    @Override
+                    public void onError(TUICommonDefine.Error error, String message) {
+                        Log.d(TAG, "setSelfInfo onError error=" + error + " message=" + message);
+                        UserModelManager.getInstance().clearUserModel();
+                    }
+                });
             }
 
             @Override
