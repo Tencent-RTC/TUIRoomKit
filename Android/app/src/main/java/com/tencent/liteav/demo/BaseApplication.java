@@ -1,7 +1,7 @@
 package com.tencent.liteav.demo;
 
 import static com.tencent.cloud.tuikit.roomkit.ConferenceDefine.KEY_JOIN_CONFERENCE_PARAMS;
-import static com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter.RoomKitUIEvent.START_LOGIN;
+import static com.tencent.cloud.tuikit.roomkit.manager.eventcenter.ConferenceEventCenter.RoomKitUIEvent.START_LOGIN;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,7 +18,7 @@ import androidx.multidex.MultiDexApplication;
 import com.tencent.cloud.tuikit.roomkit.ConferenceDefine;
 import com.tencent.cloud.tuikit.roomkit.ConferenceMainActivity;
 import com.tencent.cloud.tuikit.roomkit.common.utils.UserModel;
-import com.tencent.cloud.tuikit.roomkit.model.ConferenceEventCenter;
+import com.tencent.cloud.tuikit.roomkit.manager.eventcenter.ConferenceEventCenter;
 import com.tencent.cloud.tuikit.roomkit.common.utils.UserModelManager;
 import com.tencent.liteav.debug.GenerateTestUserSig;
 import com.tencent.qcloud.tuicore.TUIConstants;

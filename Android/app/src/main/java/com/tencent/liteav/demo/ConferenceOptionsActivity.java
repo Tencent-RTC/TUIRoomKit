@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.tencent.cloud.tuikit.roomkit.ConferenceSession;
 import com.tencent.cloud.tuikit.roomkit.R;
-import com.tencent.cloud.tuikit.roomkit.view.component.PrepareView;
+import com.tencent.cloud.tuikit.roomkit.view.basic.PrepareView;
 
 public class ConferenceOptionsActivity extends AppCompatActivity {
     public static final String INTENT_ENABLE_PREVIEW = "enablePreview";
