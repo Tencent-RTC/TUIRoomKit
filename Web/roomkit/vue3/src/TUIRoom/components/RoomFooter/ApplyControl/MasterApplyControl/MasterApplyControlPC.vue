@@ -27,20 +27,20 @@
             }}</span>
           </div>
           <div class="control-container">
-            <tui-button
-              size="default"
-              class="agree"
+            <TUIButton
               @click="handleUserApply(item.userId, true)"
+              type="primary"
+              style="min-width: 88px"
             >
               {{ t('Agree to the stage') }}
-            </tui-button>
-            <tui-button
-              size="default"
-              class="reject"
+            </TUIButton>
+            <TUIButton
               @click="handleUserApply(item.userId, false)"
+              type="primary"
+              style="min-width: 88px"
             >
               {{ t('Reject') }}
-            </tui-button>
+            </TUIButton>
           </div>
         </div>
       </div>
@@ -51,21 +51,22 @@
         }}</span>
       </div>
       <template #footer>
-        <tui-button
-          size="default"
+        <TUIButton
           :disabled="applyToAnchorUserCount === 0"
           @click="handleAllUserApply(true)"
+          type="primary"
+          style="min-width: 88px"
         >
           {{ t('Agree All') }}
-        </tui-button>
-        <tui-button
-          class="cancel-button"
-          size="default"
+        </TUIButton>
+        <TUIButton
           :disabled="applyToAnchorUserCount === 0"
           @click="handleAllUserApply(false)"
+          type="primary"
+          style="min-width: 88px"
         >
           {{ t('Reject All') }}
-        </tui-button>
+        </TUIButton>
       </template>
     </Dialog>
   </div>
@@ -77,7 +78,7 @@ import useMasterApplyControl from '../../../../hooks/useMasterApplyControl';
 import Avatar from '../../../common/Avatar.vue';
 import Dialog from '../../../common/base/Dialog';
 import SvgIcon from '../../../common/base/SvgIcon.vue';
-import TuiButton from '../../../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import { roomService } from '../../../../services';
 
 const {
@@ -162,18 +163,6 @@ const {
     .control-container {
       display: flex;
       justify-content: space-between;
-
-      .agree,
-      .reject {
-        padding: 2px 12px;
-      }
-
-      .reject {
-        margin-left: 8px;
-        color: var(--text-color-secondary);
-        border: 1px solid var(--button-color-secondary-default);
-        background: var(--button-color-secondary-default);
-      }
     }
   }
 }

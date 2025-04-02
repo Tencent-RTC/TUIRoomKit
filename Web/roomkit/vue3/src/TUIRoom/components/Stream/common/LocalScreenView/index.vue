@@ -5,13 +5,9 @@
         <svg-icon :icon="ScreenSharingIcon" />
         <span class="text">{{ t('You are sharing the screen...') }}</span>
       </div>
-      <tui-button
-        size="default"
-        class="stop-button"
-        @click="openStopConfirmDialog"
-      >
+      <TUIButton color="red" @click="openStopConfirmDialog" type="primary">
         {{ t('End sharing') }}
-      </tui-button>
+      </TUIButton>
       <Dialog
         v-model="showStopShareRegion"
         width="420px"
@@ -29,20 +25,19 @@
         </span>
         <template #footer>
           <span>
-            <tui-button
-              class="dialog-button"
-              size="default"
+            <TUIButton
               @click="stopScreenSharing"
+              type="primary"
+              style="min-width: 88px"
             >
               {{ t('End sharing') }}
-            </tui-button>
-            <tui-button
-              type="primary"
-              size="default"
+            </TUIButton>
+            <TUIButton
               @click="showStopShareRegion = false"
+              style="min-width: 88px"
             >
               {{ t('Cancel') }}
-            </tui-button>
+            </TUIButton>
           </span>
         </template>
       </Dialog>
@@ -54,7 +49,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import SvgIcon from '../../../common/base/SvgIcon.vue';
 import ScreenSharingIcon from '../../../common/icons/ScreenSharingIcon.vue';
-import TuiButton from '../../../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import Dialog from '../../../common/base/Dialog';
 import eventBus from '../../../../hooks/useMitt';
 import { useI18n } from '../../../../locales';
@@ -125,16 +120,6 @@ onBeforeUnmount(() => {
         white-space: nowrap;
       }
     }
-
-    .stop-button {
-      margin-top: 30px;
-      background-color: var(--text-color-error);
-      border: 1.5px solid var(--text-color-error);
-    }
   }
-}
-
-.dialog-button {
-  margin-right: 12px;
 }
 </style>

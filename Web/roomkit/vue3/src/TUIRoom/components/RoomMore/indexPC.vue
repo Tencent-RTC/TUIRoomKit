@@ -8,9 +8,7 @@
     </div>
     <div v-if="isZH" class="more-item">
       <div class="item-title">{{ t('Join our product discussion group') }}</div>
-      <tui-button class="join-button" type="primary" @click="handleClick">
-        {{ t('Join now') }}
-      </tui-button>
+      <TUIButton @click="handleClick">{{ t('Join now') }}</TUIButton>
     </div>
     <div class="more-item">
       <div class="item-title">{{ t('Our email address') }}</div>
@@ -21,11 +19,11 @@
 </template>
 
 <script setup lang="ts">
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import useRoomMoreControl from './useRoomMoreHooks';
 import SvgIcon from '../common/base/SvgIcon.vue';
 import CopyIcon from '../common/icons/CopyIcon.vue';
 import EmailIcon from '../common/icons/EmailIcon.vue';
-import TuiButton from '../common/base/Button.vue';
 
 const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
 </script>
@@ -67,11 +65,6 @@ const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
         font-weight: 400;
         line-height: 22px;
         color: var(--text-color-primary);
-      }
-
-      .join-button {
-        height: 42px;
-        font-weight: 600;
       }
 
       .more-content {

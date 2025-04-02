@@ -1,11 +1,13 @@
 <template>
   <div class="footer-container">
-    <audio-control
+    <audio-setting
       v-if="!isAudience || isAdmin"
+      :display-mode="MediaSettingDisplayMode.Icon"
       v-tap="() => handleControlClick('audioControl')"
     />
-    <video-control
+    <video-setting
       v-if="!isAudience || isAdmin"
+      :display-mode="MediaSettingDisplayMode.Icon"
       v-tap="() => handleControlClick('videoControl')"
     />
     <chat-control
@@ -31,8 +33,11 @@
 </template>
 <script setup lang="ts">
 import { defineEmits } from 'vue';
-import AudioControl from '../AudioControl.vue';
-import VideoControl from '../VideoControl.vue';
+import {
+  AudioSetting,
+  VideoSetting,
+  MediaSettingDisplayMode,
+} from '../../../core';
 import ManageMemberControl from '../ManageMemberControl.vue';
 import ChatControl from '../ChatControl.vue';
 import MasterApplyControl from '../ManageStageControl.vue';

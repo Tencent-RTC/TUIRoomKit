@@ -9,16 +9,16 @@
     >
       {{ t('Calling...') }}
     </span>
-    <tui-button v-else class="button" size="default" @click="handleInvite">
+    <TUIButton v-else @click="handleInvite" type="primary">
       {{ t('Call') }}
-    </tui-button>
+    </TUIButton>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, defineProps } from 'vue';
 import { UserInfo } from '../../../stores/room';
-import TuiButton from '../../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import { useI18n } from '../../../locales';
 import { roomService, TUIInvitationStatus } from '../../../services';
 import TUIMessage from '../../common/base/Message/index';
@@ -76,10 +76,6 @@ watch(props.userInfo, val => {
     font-size: 14px;
     font-weight: 400;
     color: var(--text-color-primary);
-  }
-
-  .button {
-    width: 68px;
   }
 }
 </style>

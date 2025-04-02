@@ -294,13 +294,6 @@ export class MediaManager {
         message: this.service.t('Your microphone has been turned off'),
         duration: MESSAGE_DURATION.NORMAL,
       });
-      /**
-       * When the host turns on a full ban, the microphone of a single person is turned on
-       * and off separately, and the microphone status of the corresponding user is inoperable at this time
-       **/
-      this.service.roomStore.setCanControlSelfAudio(
-        !this.service.roomStore.isMicrophoneDisableForAllUser
-      );
     }
   }
 
@@ -325,12 +318,6 @@ export class MediaManager {
           message: this.service.t('Your camera has been turned off'),
           duration: MESSAGE_DURATION.NORMAL,
         });
-        // When the moderator opens the whole staff forbidden to draw,
-        // open and then close the single person's camera alone, at this time
-        // the corresponding user's camera status for inoperable
-        this.service.roomStore.setCanControlSelfVideo(
-          !this.service.roomStore.isCameraDisableForAllUser
-        );
       }
       // Host turns off screen sharing
       if (streamType === TUIVideoStreamType.kScreenStream) {

@@ -40,14 +40,10 @@
         <span class="invitation-notification-bottom" @click="handleCancel">
           {{ cancelButtonText }}
         </span>
-        <tui-button
-          class="button-item"
-          style="width: 110px"
-          @click="handleConfirm"
-        >
+        <TUIButton type="primary" @click="handleConfirm">
           <svg-icon class="icon" :icon="EnterRoomIcon" />
           <span class="button-text">{{ confirmButtonText }}</span>
-        </tui-button>
+        </TUIButton>
       </div>
     </div>
   </div>
@@ -55,7 +51,7 @@
 
 <script lang="ts" setup>
 import { ref, watch, onMounted, withDefaults, defineProps } from 'vue';
-import TuiButton from '../../../base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import SvgIcon from '../../../base/SvgIcon.vue';
 import useZIndex from '../../../../../hooks/useZIndex';
 import EnterRoomIcon from '../../../../common/icons/EnterRoomIcon.vue';

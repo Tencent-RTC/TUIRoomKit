@@ -3,7 +3,7 @@ import { isVue3 } from '../utils/constants';
 
 const roomEngine: Record<string, TUIRoomEngine | null> = { instance: null };
 const vueVersion = isVue3 ? 'vue3' : 'vue2';
-export default function useGetRoomEngine() {
+export default function useRoomEngine() {
   return roomEngine;
 }
 

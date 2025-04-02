@@ -41,17 +41,19 @@
         />
       </div>
       <template #footer>
-        <tui-button class="button" size="default" @click="closeUserNameEditor">
-          {{ t('Cancel') }}
-        </tui-button>
-        <tui-button
-          class="button"
-          size="default"
+        <TUIButton
+          @click="closeUserNameEditor"
           type="primary"
+          style="min-width: 88px"
+        >
+          {{ t('Cancel') }}
+        </TUIButton>
+        <TUIButton
           @click="saveUserName(tempUserName)"
+          style="min-width: 88px"
         >
           {{ t('Save') }}
-        </tui-button>
+        </TUIButton>
       </template>
     </Dialog>
   </div>
@@ -61,7 +63,7 @@ import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import { defineProps, defineEmits } from 'vue';
 import Dialog from '../../common/base/Dialog';
 import SvgIcon from '../../common/base/SvgIcon.vue';
-import TuiButton from '../../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import TuiInput from '../../common/base/Input';
 import ArrowStrokeSelectDownIcon from '../../common/icons/ArrowStrokeSelectDownIcon.vue';
 import useUserInfo from './useUserInfoHooks';
@@ -207,9 +209,5 @@ async function saveUserName(userName: string) {
     width: auto;
     margin-left: 16px;
   }
-}
-
-.button {
-  margin-left: 12px;
 }
 </style>

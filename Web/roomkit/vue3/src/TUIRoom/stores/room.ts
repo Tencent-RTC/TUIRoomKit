@@ -3,14 +3,11 @@ import {
   TUIRole,
   TUIRoomInfo,
   TUISeatMode,
-  TUIVideoQuality,
   TUIVideoStreamType,
-  TUIMediaDeviceType,
   TUIInvitationStatus,
 } from '@tencentcloud/tuiroom-engine-js';
 import { useBasicStore } from './basic';
 import { set, del } from '../utils/vue';
-import { isMobile } from '../utils/environment';
 import { roomService } from '../services';
 
 export function getNewStreamInfo(
@@ -107,16 +104,6 @@ interface RoomState {
   streamInfoObj: Record<string, StreamInfo>;
   userVolumeObj: Record<string, number>;
   currentSpeakerInfo: Record<string, string>;
-  // Moderators can unmute audio/video by themselves when they have all users unmuted, but when they unmute a user individually.
-  canControlSelfAudio: boolean;
-  canControlSelfVideo: boolean;
-  localVideoQuality: TUIVideoQuality;
-  currentCameraId: string;
-  currentMicrophoneId: string;
-  currentSpeakerId: string;
-  cameraList: object[];
-  microphoneList: object[];
-  speakerList: object[];
   masterUserId: string;
   isMicrophoneDisableForAllUser: boolean;
   isCameraDisableForAllUser: boolean;
@@ -143,17 +130,6 @@ export const useRoomStore = defineStore('room', {
       speakerUserId: '',
       remoteSpeakerUserId: '',
     },
-    canControlSelfAudio: true,
-    canControlSelfVideo: true,
-    localVideoQuality: isMobile
-      ? TUIVideoQuality.kVideoQuality_360p
-      : TUIVideoQuality.kVideoQuality_720p,
-    currentCameraId: '',
-    currentMicrophoneId: '',
-    currentSpeakerId: '',
-    cameraList: [],
-    microphoneList: [],
-    speakerList: [],
     masterUserId: '',
     isMicrophoneDisableForAllUser: false,
     isCameraDisableForAllUser: false,
@@ -230,16 +206,6 @@ export const useRoomStore = defineStore('room', {
       if (this.isSpeakAfterTakingSeatMode) {
         return !this.localUser.onSeat;
       }
-    },
-    isLocalAudioIconDisable(): boolean {
-      // All mute status
-      const micForbidden = this.isGeneralUser && !this.canControlSelfAudio;
-      return (micForbidden as any) || this.isAudience;
-    },
-    isLocalVideoIconDisable(): boolean {
-      // All stop video status
-      const cameraForbidden = this.isGeneralUser && !this.canControlSelfVideo;
-      return (cameraForbidden as any) || this.isAudience;
     },
     streamList(): Array<StreamInfo> {
       let streamList = [];
@@ -439,30 +405,6 @@ export const useRoomStore = defineStore('room', {
     setCurrentSpeakerInfo(speakerInfo: Record<string, string>) {
       Object.assign(this.currentSpeakerInfo, speakerInfo);
     },
-    setCurrentDeviceId(type: TUIMediaDeviceType, deviceId: string) {
-      switch (type) {
-        case TUIMediaDeviceType.kMediaDeviceTypeVideoCamera:
-          this.setCurrentCameraId(deviceId);
-          break;
-        case TUIMediaDeviceType.kMediaDeviceTypeAudioInput:
-          this.setCurrentMicrophoneId(deviceId);
-          break;
-        case TUIMediaDeviceType.kMediaDeviceTypeAudioOutput:
-          this.setCurrentSpeakerId(deviceId);
-          break;
-        default:
-          break;
-      }
-    },
-    setCurrentCameraId(deviceId: string) {
-      this.currentCameraId = deviceId;
-    },
-    setCurrentMicrophoneId(deviceId: string) {
-      this.currentMicrophoneId = deviceId;
-    },
-    setCurrentSpeakerId(deviceId: string) {
-      this.currentSpeakerId = deviceId;
-    },
     setRoomInfo(roomInfo: Partial<TUIRoomInfo>) {
       if (!roomInfo) return;
 
@@ -491,9 +433,6 @@ export const useRoomStore = defineStore('room', {
       this.maxSeatCount = maxSeatCount;
       this.password = password;
       this.roomName = roomName;
-
-      this.canControlSelfAudio = !this.isMicrophoneDisableForAllUser;
-      this.canControlSelfVideo = !this.isCameraDisableForAllUser;
     },
     setDisableMicrophoneForAllUserByAdmin(isDisable: boolean) {
       this.isMicrophoneDisableForAllUser = isDisable;
@@ -506,51 +445,6 @@ export const useRoomStore = defineStore('room', {
     },
     setMasterUserId(userId: string) {
       this.masterUserId = userId;
-    },
-    setCanControlSelfAudio(capability: boolean) {
-      this.canControlSelfAudio = capability;
-    },
-    setCanControlSelfVideo(capability: boolean) {
-      this.canControlSelfVideo = capability;
-    },
-    updateVideoQuality(quality: TUIVideoQuality) {
-      this.localVideoQuality = quality;
-    },
-    setDeviceList(
-      type: TUIMediaDeviceType,
-      deviceList: { deviceId: string; deviceName: string }[]
-    ) {
-      switch (type) {
-        case TUIMediaDeviceType.kMediaDeviceTypeVideoCamera:
-          this.setCameraList(deviceList);
-          break;
-        case TUIMediaDeviceType.kMediaDeviceTypeAudioInput:
-          this.setMicrophoneList(deviceList);
-          break;
-        case TUIMediaDeviceType.kMediaDeviceTypeAudioOutput:
-          this.setSpeakerList(deviceList);
-          break;
-        default:
-          break;
-      }
-    },
-    setCameraList(deviceList: { deviceId: string; deviceName: string }[]) {
-      this.cameraList = deviceList;
-      if (!this.currentCameraId && deviceList.length > 0) {
-        this.setCurrentCameraId(deviceList[0].deviceId);
-      }
-    },
-    setMicrophoneList(deviceList: { deviceId: string; deviceName: string }[]) {
-      this.microphoneList = deviceList;
-      if (!this.currentMicrophoneId && deviceList.length > 0) {
-        this.setCurrentMicrophoneId(deviceList[0].deviceId);
-      }
-    },
-    setSpeakerList(deviceList: { deviceId: string; deviceName: string }[]) {
-      this.speakerList = deviceList;
-      if (!this.currentSpeakerId && deviceList.length > 0) {
-        this.setCurrentSpeakerId(deviceList[0].deviceId);
-      }
     },
     // Moderator individually modifies the mute status of a user's outgoing text messages
     setMuteUserChat(userId: string, muted: boolean) {
@@ -647,10 +541,7 @@ export const useRoomStore = defineStore('room', {
       });
     },
     reset() {
-      const basicStore = useBasicStore();
-      basicStore.setIsOpenMic(false);
       this.resetRoomData();
-      this.resetDeviceData();
     },
     resetRoomData() {
       this.streamInfoObj = {};
@@ -660,9 +551,6 @@ export const useRoomStore = defineStore('room', {
         speakerUserId: '',
         remoteSpeakerUserId: '',
       };
-      this.canControlSelfAudio = true;
-      this.canControlSelfVideo = true;
-      this.localVideoQuality = TUIVideoQuality.kVideoQuality_720p;
       this.masterUserId = '';
       this.isMicrophoneDisableForAllUser = false;
       this.isCameraDisableForAllUser = false;
@@ -677,14 +565,6 @@ export const useRoomStore = defineStore('room', {
       this.isWhiteboardVisiable = false;
       this.isSharingScreen = false;
       this.isAnnotationVisiable = false;
-    },
-    resetDeviceData() {
-      this.currentCameraId = '';
-      this.currentMicrophoneId = '';
-      this.currentSpeakerId = '';
-      this.cameraList = [];
-      this.microphoneList = [];
-      this.speakerList = [];
     },
   },
 });

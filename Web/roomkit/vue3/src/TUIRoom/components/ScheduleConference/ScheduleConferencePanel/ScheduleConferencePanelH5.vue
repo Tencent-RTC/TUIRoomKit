@@ -166,9 +166,8 @@
         </div>
       </div>
       <div class="schedule-conference-footer">
-        <TuiButton
+        <TUIButton
           v-if="!isEditMode"
-          class="footer-button"
           :custom-style="{
             width: '100%',
             padding: '10px',
@@ -176,12 +175,13 @@
             borderRadius: '6px',
           }"
           @click="scheduleConference"
+          type="primary"
         >
           {{ t('Schedule') }}
-        </TuiButton>
-        <TuiButton
+        </TUIButton>
+        <TUIButton
           v-else
-          class="footer-button"
+          type="primary"
           @click="updateConferenceInfo"
           :custom-style="{
             width: '100%',
@@ -190,7 +190,7 @@
             borderRadius: '6px',
           }"
           >{{ t('Save') }}
-        </TuiButton>
+        </TUIButton>
       </div>
     </PanelContainer>
     <Contacts
@@ -217,7 +217,7 @@ import { useI18n } from '../../../locales';
 import TuiInput from '../../common/base/Input';
 import TuiSelect from '../../common/base/Select';
 import TuiOption from '../../common/base/Option';
-import TuiButton from '../../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import TuiAvatar from '../../common/Avatar.vue';
 import TuiDatepicker from '../../common/base/Datepicker';
 import TuiTimepicker from '../../common/base/Timepicker';
@@ -818,12 +818,6 @@ const updateConferenceInfo = async () => {
   align-items: center;
   justify-content: center;
   width: 100%;
-
-  .footer-button {
-    width: 100%;
-    margin-top: 10px;
-    border-radius: 6px;
-  }
 }
 
 .invite-member {

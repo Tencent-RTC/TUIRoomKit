@@ -29,22 +29,17 @@
     </TuiInput>
     <template #footer>
       <span>
-        <tui-button
-          class="button"
-          size="default"
+        <TUIButton
           :disabled="isJoinButtonDisable"
           @click="joinRoom"
+          type="primary"
+          style="min-width: 88px"
         >
           {{ t('Join') }}
-        </tui-button>
-        <tui-button
-          class="button"
-          size="default"
-          type="primary"
-          @click="cancelInputPassword"
-        >
+        </TUIButton>
+        <TUIButton @click="cancelInputPassword" style="min-width: 88px">
           {{ t('Cancel') }}
-        </tui-button>
+        </TUIButton>
       </span>
     </template>
   </TuiDialog>
@@ -56,7 +51,7 @@ import { storeToRefs } from 'pinia';
 import { EventType, roomService } from '../../services';
 import { useI18n } from '../../locales';
 import TuiDialog from '../common/base/Dialog';
-import TuiButton from '../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import TuiInput from '../common/base/Input';
 import CloseInputIcon from '../common/icons/CloseInputIcon.vue';
 import { useBasicStore } from '../../stores/basic';
@@ -123,9 +118,5 @@ watch(
 <style lang="scss" scoped>
 .svg-icon {
   cursor: pointer;
-}
-
-.button {
-  margin-left: 12px;
 }
 </style>

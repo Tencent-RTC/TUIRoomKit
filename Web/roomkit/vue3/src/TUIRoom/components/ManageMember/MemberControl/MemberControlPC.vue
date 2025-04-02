@@ -1,22 +1,21 @@
 <template>
   <div class="member-control-container">
-    <tui-button
+    <TUIButton
       v-if="singleControl"
-      class="button"
-      size="default"
+      type="primary"
       @click="singleControl.func(props.userInfo)"
     >
       {{ singleControl?.title }}
-    </tui-button>
+    </TUIButton>
     <div ref="moreBtnRef" class="more-container">
-      <tui-button class="button" type="primary" @click="toggleClickMoreBtn">
+      <TUIButton @click="toggleClickMoreBtn">
         {{ t('More') }}
         <svg-icon
           size="12"
           :class="['more-arrow', showMoreControl ? 'up' : 'down']"
           :icon="ArrowUpIcon"
         />
-      </tui-button>
+      </TUIButton>
       <div
         v-show="showMoreControl"
         id="operate-list"
@@ -54,21 +53,17 @@
         />
       </div>
       <template #footer>
-        <tui-button
-          size="default"
+        <TUIButton
           @click="handleAction(props.userInfo)"
           :disabled="dialogData.isConfirmButtonDisable"
+          type="primary"
+          style="min-width: 88px"
         >
           {{ dialogData.confirmText }}
-        </tui-button>
-        <tui-button
-          class="cancel"
-          size="default"
-          type="primary"
-          @click="handleCancelDialog"
-        >
+        </TUIButton>
+        <TUIButton @click="handleCancelDialog" style="min-width: 88px">
           {{ t('Cancel') }}
-        </tui-button>
+        </TUIButton>
       </template>
     </Dialog>
   </div>
@@ -77,7 +72,7 @@
 <script setup lang="ts">
 import { ref, watch, computed, nextTick, defineProps } from 'vue';
 import { useI18n } from '../../../locales';
-import TuiButton from '../../common/base/Button.vue';
+import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import Dialog from '../../common/base/Dialog';
 import TuiInput from '../../common/base/Input';
 import SvgIcon from '../../common/base/SvgIcon.vue';
@@ -172,22 +167,17 @@ async function handleDropDownPosition() {
   display: flex;
   flex-direction: row;
 
-  .button {
-    height: 32px;
-    padding: 0 10px;
-    margin-left: 10px;
+  .more-arrow {
+    margin-left: 2px;
 
-    .more-arrow {
-      margin-left: 2px;
-
-      &.down {
-        transform: rotate(180deg);
-      }
+    &.down {
+      transform: rotate(180deg);
     }
   }
 
   .more-container {
     position: relative;
+    margin-left: 10px;
 
     .user-operate-list {
       position: absolute;
@@ -277,9 +267,5 @@ async function handleDropDownPosition() {
   .dialog-input {
     flex-grow: 1;
   }
-}
-
-.cancel {
-  margin-left: 12px;
 }
 </style>

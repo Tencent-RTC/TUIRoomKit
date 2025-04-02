@@ -13,7 +13,6 @@ import TUIRoomEngine, {
 import { useBasicStore } from '../stores/basic';
 import { UserInfo, useRoomStore } from '../stores/room';
 import { useChatStore } from '../stores/chat';
-import useDeviceManager from '../hooks/useDeviceManager';
 import logger from '../utils/common/logger';
 import { isMobile } from '../utils/environment';
 import i18n from '../locales';
@@ -150,10 +149,6 @@ export class RoomService implements IRoomService {
       document.getElementById('roomContainer') ||
       document.body
     );
-  }
-
-  public initMediaDeviceList() {
-    useDeviceManager({ listenForDeviceChange: true });
   }
 
   public bindRoomEngineEvents() {
@@ -352,12 +347,6 @@ export class RoomService implements IRoomService {
     isDisable: boolean;
   }) {
     const { isDisable } = eventInfo;
-    if (
-      isDisable !== this.roomStore.isCameraDisableForAllUser &&
-      this.roomStore.localUser.userRole === TUIRole.kGeneralUser
-    ) {
-      this.roomStore.setCanControlSelfVideo(!isDisable);
-    }
     this.handleVideoStateChange(isDisable);
     this.roomStore.setDisableCameraForAllUserByAdmin(isDisable);
   }
@@ -396,12 +385,6 @@ export class RoomService implements IRoomService {
     isDisable: boolean;
   }) {
     const { isDisable } = eventInfo;
-    if (
-      isDisable !== this.roomStore.isMicrophoneDisableForAllUser &&
-      this.roomStore.localUser.userRole === TUIRole.kGeneralUser
-    ) {
-      this.roomStore.setCanControlSelfAudio(!isDisable);
-    }
     this.handleAudioStateChange(isDisable);
     this.roomStore.setDisableMicrophoneForAllUserByAdmin(isDisable);
   }
