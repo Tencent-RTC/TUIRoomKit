@@ -75,7 +75,7 @@
 2. 开发环境运行示例工程
 
    ```bash
-   npm run dev
+   npm run serve
    ```
 
 ### 第四步：示例体验
