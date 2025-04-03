@@ -1,6 +1,6 @@
 {
   "name": "room-uikit-electron-vue2",
-  "version": "2.9.1",
+  "version": "3.0.0",
   "private": true,
   "main": "main.electron.js",
   "license": "MIT",
@@ -10,6 +10,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "electron": "electron . --trtc_env=development",
+    "dev": "concurrently \"npm run serve\" \"npm run electron \"",
     "start": "concurrently \"npm run serve\" \"npm run electron \"",
     "build:mac": "vue-cli-service build --trtc_env=production --target_platform=darwin",
     "build:win": "vue-cli-service build --trtc_env=production --target_platform=win32",
@@ -60,12 +61,12 @@
     ]
   },
   "dependencies": {
-    "@tencentcloud/chat": "latest",
-    "@tencentcloud/roomkit-electron-vue2.7": "2.9.1",
+    "@tencentcloud/chat": "^3.5.2",
+    "@tencentcloud/roomkit-electron-vue2.7": "~3.0.0",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-electron": "2.9.1",
+    "@tencentcloud/tuiroom-engine-electron": "~3.0.0",
+    "@tencentcloud/uikit-base-component-vue2": "0.3.2",
     "@tencentcloud/universal-api": "^2.0.9",
-    "@tencentcloud/uikit-base-component-vue2": "0.3.1",
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
     "interactjs": "^1.10.26",

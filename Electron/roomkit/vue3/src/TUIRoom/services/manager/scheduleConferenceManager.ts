@@ -7,10 +7,10 @@ import {
   TUIUserInfo,
   TUIConferenceStatus,
   TUIConferenceModifyInfo,
+  TUIErrorCode,
 } from '@tencentcloud/tuiroom-engine-electron';
 import { EventType, IRoomService } from '../types';
 import mitt from 'mitt';
-import { FetchRoomInfoErrorCode } from './roomActionManager.ts';
 export * from '@tencentcloud/tuiroom-engine-electron';
 interface IScheduleConferenceManager {
   on(
@@ -255,7 +255,7 @@ export class ScheduleConferenceManager implements IScheduleConferenceManager {
       });
       return await this.generateRoomId(attempt + 1);
     } catch (err: any) {
-      if (err?.code === FetchRoomInfoErrorCode.ROOM_NOT_EXIST) {
+      if (err?.code === TUIErrorCode.ERR_ROOM_ID_NOT_EXIST) {
         return roomId;
       }
       throw err;
