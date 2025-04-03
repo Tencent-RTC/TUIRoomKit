@@ -45,20 +45,24 @@ class InitProject {
   init(answers) {
     const { creationMethod } = answers;
     this.answers = answers;
-    this.srcPath = creationMethod === 'CLI'
-      ? path.join(this.destBase, './src')
-      : this.destBase;
+    this.srcPath =
+      creationMethod === 'CLI'
+        ? path.join(this.destBase, './src')
+        : this.destBase;
   }
 
   async run() {
-    const { setManifestJSON, setPagesJSON } = await this.askForProjectCreationMethod(); // CLI or HBuilderX
+    const { setManifestJSON, setPagesJSON } =
+      await this.askForProjectCreationMethod(); // CLI or HBuilderX
     this.copyFile();
     setManifestJSON && this.setManifest();
     setPagesJSON && this.setPages();
     this.addStyleToApp();
   }
   async askForProjectCreationMethod() {
-    console.log('配置相关说明，请参考：https://cloud.tencent.com/document/product/647/97754#2.2-.E9.A1.B9.E7.9B.AE.E9.85.8D.E7.BD.AE.E6.9B.B4.E6.94.B9');
+    console.log(
+      '配置相关说明，请参考：https://cloud.tencent.com/document/product/647/97754#2.2-.E9.A1.B9.E7.9B.AE.E9.85.8D.E7.BD.AE.E6.9B.B4.E6.94.B9'
+    );
     const questions = [
       {
         type: 'list',
@@ -107,18 +111,18 @@ class InitProject {
     const { creationMethod, createViteConfig, createTsConfig } = this.answers;
 
     // Copy roomkit and locales directories
-    ['roomkit', 'locales', 'router'].forEach((dir) => {
+    ['roomkit', 'locales', 'router'].forEach(dir => {
       copyDir(
         path.join(this.sourceBase, './src', dir),
-        path.join(this.srcPath, dir),
+        path.join(this.srcPath, dir)
       );
     });
 
     // Copy wxmini_dev.sh and wxmini_prod.sh files
-    ['wxmini_dev.sh', 'wxmini_prod.sh'].forEach((file) => {
+    ['wxmini_dev.sh', 'wxmini_prod.sh'].forEach(file => {
       fs.copyFileSync(
         path.join(this.sourceBase, file),
-        path.join(this.destBase, file),
+        path.join(this.destBase, file)
       );
     });
 
@@ -127,12 +131,12 @@ class InitProject {
     createDirIfNotExist(path.dirname(wasmDest));
     fs.copyFileSync(
       './node_modules/@tencentcloud/tuiroom-engine-wx/RTCRoomEngine.wasm.br',
-      path.join(this.srcPath, wasmDest),
+      path.join(this.srcPath, wasmDest)
     );
 
     fs.copyFileSync(
       path.join(this.sourceBase, 'src/pages/index.vue'),
-      path.join(this.srcPath, 'pages/roomkitTest.vue'),
+      path.join(this.srcPath, 'pages/roomkitTest.vue')
     );
 
     if (createViteConfig) {
@@ -141,9 +145,9 @@ class InitProject {
           this.sourceBase,
           creationMethod === 'CLI'
             ? './vite.config.ts'
-            : 'vite.config_HBuliderX.ts',
+            : 'vite.config_HBuliderX.ts'
         ),
-        path.join(this.destBase, 'vite.config.ts'),
+        path.join(this.destBase, 'vite.config.ts')
       );
     }
 
@@ -151,9 +155,9 @@ class InitProject {
       fs.copyFileSync(
         path.join(
           this.sourceBase,
-          creationMethod === 'CLI' ? 'tsconfig.json' : 'tsconfig_HBuliderX.json',
+          creationMethod === 'CLI' ? 'tsconfig.json' : 'tsconfig_HBuliderX.json'
         ),
-        path.join(this.destBase, 'tsconfig.json'),
+        path.join(this.destBase, 'tsconfig.json')
       );
     }
   }
@@ -173,21 +177,21 @@ class InitProject {
         packNpmManually: true,
         packNpmRelationList: [
           ...(oldConfig?.setting?.packNpmRelationList || []),
-          ...(oldConfig?.setting?.packNpmRelationList
-          && oldConfig?.setting?.packNpmRelationList[
+          ...(oldConfig?.setting?.packNpmRelationList &&
+          oldConfig?.setting?.packNpmRelationList[
             oldConfig?.setting?.packNpmRelationList.length - 1
           ]?.packageJsonPath === './roomkit/package.json'
             ? []
             : [
-              {
-                packageJsonPath: './package.json',
-                miniprogramNpmDistDir: './',
-              },
-              {
-                packageJsonPath: './roomkit/package.json',
-                miniprogramNpmDistDir: './roomkit',
-              },
-            ]),
+                {
+                  packageJsonPath: './package.json',
+                  miniprogramNpmDistDir: './',
+                },
+                {
+                  packageJsonPath: './roomkit/package.json',
+                  miniprogramNpmDistDir: './roomkit',
+                },
+              ]),
         ],
       },
       usingComponents: true,
@@ -204,7 +208,7 @@ class InitProject {
       manifestContent,
       ['mp-weixin'],
       manifest['mp-weixin'],
-      { formattingOptions: { insertSpaces: true, tabSize: 2 } },
+      { formattingOptions: { insertSpaces: true, tabSize: 2 } }
     );
     const newContent = jsoncParser.applyEdits(manifestContent, edits);
 
@@ -225,17 +229,17 @@ class InitProject {
       pages: [
         pages?.pages[0]?.path !== 'pages/roomkitTest'
           ? {
-            path: 'pages/roomkitTest',
-            style: {
-              navigationBarTitleText: '',
-            },
-          }
+              path: 'pages/roomkitTest',
+              style: {
+                navigationBarTitleText: '',
+              },
+            }
           : null,
         ...(pages?.pages || []),
       ].filter(Boolean),
       subpackages: [
-        ...((pages?.subpackages && pages.subpackages[0]?.root !== 'roomkit')
-          || []),
+        ...((pages?.subpackages && pages.subpackages[0]?.root !== 'roomkit') ||
+          []),
         {
           root: 'roomkit',
           pages: [
