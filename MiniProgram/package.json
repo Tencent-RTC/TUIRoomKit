@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/tui-roomkit-uniapp",
-  "version": "2.9.1",
+  "version": "3.0.0",
   "bin": {
     "configureProject": "./configureProject_bin.js"
   },
@@ -57,12 +57,12 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-alpha-3070720230316001",
     "@dcloudio/uni-quickapp-webview": "3.0.0-alpha-3070720230316001",
     "@dcloudio/vue-cli-plugin-uni-optimize": "2.0.2-3080720230703001",
-    "@tencentcloud/chat": "latest",
+    "@tencentcloud/chat": "^3.5.2",
     "@tencentcloud/trtc-component-wx": "^1.0.2",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-wx": "2.9.1",
+    "@tencentcloud/tuiroom-engine-wx": "~3.0.0",
+    "@tencentcloud/uikit-base-component-uni": "0.3.2",
     "@tencentcloud/universal-api": "^2.0.9",
-    "@tencentcloud/uikit-base-component-uni": "^0.3.1",
     "axios": "^0.27.2",
     "inquirer": "^9.2.11",
     "interactjs": "^1.10.26",
