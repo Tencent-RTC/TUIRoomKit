@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-electron-vue3",
-  "version": "2.9.1",
+  "version": "3.0.0",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
@@ -22,13 +22,13 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@tencentcloud/chat": "latest",
+    "@tencentcloud/chat": "^3.5.2",
+    "@tencentcloud/chat-uikit-engine": "~2.3.3",
+    "@tencentcloud/chat-uikit-vue": "~2.3.3",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-electron": "2.9.1",
-    "@tencentcloud/chat-uikit-engine": "2.3.3",
-    "@tencentcloud/chat-uikit-vue": "2.3.3",
+    "@tencentcloud/tuiroom-engine-electron": "~3.0.0",
+    "@tencentcloud/uikit-base-component-vue3": "0.3.2",
     "@tencentcloud/universal-api": "^2.0.9",
-    "@tencentcloud/uikit-base-component-vue3": "^0.3.1",
     "@tiptap/core": "^2.6.6",
     "@tiptap/extension-document": "^2.6.6",
     "@tiptap/extension-image": "^2.6.6",
@@ -39,15 +39,15 @@
     "@tiptap/pm": "^2.6.6",
     "@tiptap/suggestion": "^2.6.6",
     "dayjs": "^1.11.13",
-    "interactjs": "^1.10.26",
-    "mitt": "^3.0.0",
     "fabric": "^5.3.0",
-    "hotkeys-js": "^3.10.1"
+    "hotkeys-js": "^3.10.1",
+    "interactjs": "^1.10.26",
+    "mitt": "^3.0.0"
   },
   "peerDependencies": {
+    "electron": ">=4.0.0",
     "pinia": "2.0.24",
-    "vue": "~3.3.13",
-    "electron": ">=4.0.0"
+    "vue": "~3.3.13"
   },
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",
