@@ -51,6 +51,7 @@ class FloatChatDisplayView: UIView {
         guard !isViewReady else { return }
         constructViewHierarchy()
         bindInteraction()
+        reportViewShow()
         isViewReady = true
     }
 
@@ -67,6 +68,10 @@ class FloatChatDisplayView: UIView {
                 self.addMessage(floatMessage)
             }
             .store(in: &cancellableSet)
+    }
+    
+    private func reportViewShow() {
+        store.dispatch(action: FloatChatActions.reportData(payload: .metricsBarragePanelShow))
     }
     
     private func addMessage(_ message: FloatChatMessage) {

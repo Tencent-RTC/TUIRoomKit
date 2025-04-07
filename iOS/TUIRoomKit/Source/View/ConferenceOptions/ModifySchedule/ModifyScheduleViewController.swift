@@ -41,6 +41,7 @@ class ModifyScheduleViewController: UIViewController {
         navigationItem.title = .modifyRoomText
         subscribeScheduleSubject()
         subscribeToast()
+        reportModifyPanelShow()
     }
     
     deinit {
@@ -80,6 +81,10 @@ extension ModifyScheduleViewController {
                 self.view.makeToast(toast.message, duration: toast.duration, position: position)
             }
             .store(in: &cancellableSet)
+    }
+    
+    private func reportModifyPanelShow() {
+        modifyStore.reportViewShow(dataReport: .metricsConferenceModifyPanelShow)
     }
 }
 

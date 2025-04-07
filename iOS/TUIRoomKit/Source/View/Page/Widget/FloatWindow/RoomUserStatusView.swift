@@ -28,8 +28,8 @@ class RoomUserStatusView: UIView {
         return user
     }()
 
-    private let voiceVolumeImageView: UIImageView = {
-        let imageView = UIImageView()
+    private let voiceVolumeImageView: VolumeView = {
+        let imageView = VolumeView()
         return imageView
     }()
     
@@ -94,14 +94,12 @@ extension RoomUserStatusView {
     }
     
     func updateUserAudio(_ hasAudio: Bool) {
-        let volumeImageName = hasAudio ? "room_voice_volume1" : "room_mute_audio"
-        voiceVolumeImageView.image = UIImage(named: volumeImageName, in: tuiRoomKitBundle(), compatibleWith: nil)?.checkOverturn()
+        voiceVolumeImageView.updateAudio(hasAudio)
         isShownMuteFlag = !hasAudio
     }
 
     func updateUserVolume(volume: Int) {
         guard !isShownMuteFlag else { return }
-        let volumeImageName = volume <= 0 ? "room_voice_volume1" : "room_voice_volume2"
-        voiceVolumeImageView.image = UIImage(named: volumeImageName, in: tuiRoomKitBundle(), compatibleWith: nil)
+        voiceVolumeImageView.updateVolume(CGFloat(volume))
     }
 }

@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |spec|
   spec.name                  = 'TUIRoomKit'
-  spec.version               = '2.8.4'
+  spec.version               = '3.0.0'
   spec.platform              = :ios
   spec.ios.deployment_target = '13.0'
   spec.license               = { :type => 'MIT', :file => 'LICENSE' }

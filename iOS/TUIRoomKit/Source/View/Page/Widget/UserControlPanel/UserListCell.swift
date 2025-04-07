@@ -59,6 +59,13 @@ class UserListCell: UITableViewCell {
         return button
     }()
     
+    private lazy var screenSharingIcon: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "room_unmute_share_screen", in: tuiRoomKitBundle(), compatibleWith: nil)
+        imageView.isHidden = true
+        return imageView
+    }()
+    
     let inviteStageButton: UIButton = {
         let button = UIButton(type: .custom)
         button.backgroundColor = UIColor(0x0565FA)
@@ -140,6 +147,7 @@ class UserListCell: UITableViewCell {
         contentView.addSubview(callButton)
         contentView.addSubview(callingLabel)
         contentView.addSubview(notJoiningLabel)
+        contentView.addSubview(screenSharingIcon)
     }
     
     func activateConstraints() {
@@ -156,6 +164,11 @@ class UserListCell: UITableViewCell {
         muteAudioButton.snp.makeConstraints { make in
             make.width.height.equalTo(20.scale375())
             make.trailing.equalTo(self.muteVideoButton.snp.leading).offset(-20.scale375())
+            make.centerY.equalTo(self.avatarImageView)
+        }
+        screenSharingIcon.snp.makeConstraints { make in
+            make.width.height.equalTo(20.scale375())
+            make.trailing.equalTo(self.muteAudioButton.snp.leading).offset(-20.scale375())
             make.centerY.equalTo(self.avatarImageView)
         }
         inviteStageButton.snp.makeConstraints { make in
@@ -245,6 +258,7 @@ class UserListCell: UITableViewCell {
         roleLabel.isHidden = item.userRole == .generalUser
         muteAudioButton.isSelected = !item.hasAudioStream
         muteVideoButton.isSelected = !item.hasVideoStream
+        screenSharingIcon.isHidden = !item.hasScreenStream
         if viewModel.roomInfo.isSeatEnabled {
             muteAudioButton.isHidden = !attendeeModel.isOnSeat
             muteVideoButton.isHidden = !attendeeModel.isOnSeat

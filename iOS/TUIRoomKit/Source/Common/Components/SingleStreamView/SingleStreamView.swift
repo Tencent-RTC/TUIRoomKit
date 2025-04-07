@@ -26,6 +26,8 @@ class SingleStreamView: UIView {
     weak var delegate: SingleStreamViewDelegate?
     private(set) var videoItem: UserInfo?
     private var isDraggable: Bool = false
+    private var isBorderHighlighted = false
+    private var lastVolumeUpdateTime: TimeInterval = 0
     var cancellableSet = Set<AnyCancellable>()
     private(set) var originalX: CGFloat = 0
     var isSupportedAmplification: Bool {
@@ -205,7 +207,6 @@ class SingleStreamView: UIView {
         guard let item = userInfo else { return }
         if !self.isHidden && self.alpha > 0 {
             if item.hasVideoStream || item.videoStreamType == .screenStream {
-                self.setRemoteRenderParams(userId: item.userId, streamType: item.videoStreamType)
                 self.startPlayVideoStream(item: item)
             } else {
                 self.stopPlayVideoStream(item: item)
@@ -230,12 +231,6 @@ class SingleStreamView: UIView {
         }
     }
     
-    @objc private func resetVolumeView() {
-        guard let videoItem = videoItem else { return }
-        userInfoView.updateUserVolume(hasAudio: videoItem.hasAudioStream, volume: 0)
-        scrollRenderView.layer.borderColor = UIColor.clear.cgColor
-    }
-    
     private func bindInteraction() {
         if isDraggable {
             addGesture()
@@ -245,6 +240,7 @@ class SingleStreamView: UIView {
     func reset() {
         scrollRenderView.zoomScale = 1.0
         cancellableSet.removeAll()
+        resetBorderColor()
     }
     
     func updateSize(size: CGSize) {
@@ -267,26 +263,18 @@ extension SingleStreamView: UIScrollViewDelegate {
 }
 
 extension SingleStreamView {
-    private func setRemoteRenderParams(userId: String, streamType: TUIVideoStreamType) {
-        let renderParams = TRTCRenderParams()
-        renderParams.fillMode = (streamType == .screenStream) ? .fit : .fill
-        let trtcStreamType: TRTCVideoStreamType = (streamType == .screenStream) ? .sub : .big
-        engineManager.setRemoteRenderParams(userId: userId, streamType: trtcStreamType, params: renderParams)
-    }
-    
     private func startPlayVideoStream(item: UserInfo) {
         if item.userId != currentUserId {
-            setRemoteRenderParams(userId: item.userId, streamType: item.videoStreamType)
             engineManager.setRemoteVideoView(userId: item.userId, streamType: item.videoStreamType, view: renderView)
             engineManager.startPlayRemoteVideo(userId: item.userId, streamType: item.videoStreamType)
         } else if item.videoStreamType == .cameraStream || item.videoStreamType == .cameraStreamLow {
-            engineManager.setLocalVideoView(streamType: item.videoStreamType, view: renderView)
+            engineManager.setLocalVideoView(renderView)
         }
     }
     
     private func stopPlayVideoStream(item: UserInfo) {
         if item.userId == currentUserId {
-            engineManager.setLocalVideoView(streamType: item.videoStreamType, view: nil)
+            engineManager.setLocalVideoView(nil)
         } else if item.videoStreamType == .cameraStream || item.videoStreamType == .cameraStreamLow {
             engineManager.setRemoteVideoView(userId: item.userId, streamType: item.videoStreamType, view: nil)
             engineManager.stopPlayRemoteVideo(userId: item.userId, streamType: item.videoStreamType)
@@ -305,7 +293,7 @@ extension SingleStreamView {
         avatarImageView.isHidden = item.videoStreamType == .screenStream ? true : item.hasVideoStream
         backgroundMaskView.isHidden = item.videoStreamType == .screenStream ? true : item.hasVideoStream
         userInfoView.updateUserStatus(item)
-        resetVolumeView()
+        scrollRenderView.layer.borderColor = UIColor.clear.cgColor
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             guard let self = self else { return }
             let width = min(self.mm_w / 2, 72)
@@ -322,19 +310,35 @@ extension SingleStreamView {
         guard videoItem?.userId == item.userId else { return }
         videoItem?.hasAudioStream = item.hasAudioStream
         userInfoView.updateUserVolume(hasAudio: item.hasAudioStream, volume: item.userVoiceVolume)
+        
+        lastVolumeUpdateTime = Date().timeIntervalSince1970
+        
         if item.userVoiceVolume > 0 && item.hasAudioStream {
             if item.videoStreamType != .screenStream {
-                scrollRenderView.layer.borderColor = UIColor(0xA5FE33).cgColor
+                if !isBorderHighlighted {
+                    scrollRenderView.layer.borderColor = UIColor(0xA5FE33).cgColor
+                    isBorderHighlighted = true
+                }
+                scheduleBorderReset()
             }
         } else {
-            scrollRenderView.layer.borderColor = UIColor.clear.cgColor
+            resetBorderColor()
         }
-        resetVolume()
     }
     
-    func resetVolume() {
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(resetVolumeView), object: nil)
-        perform(#selector(resetVolumeView), with: nil, afterDelay: 1)
+    private func scheduleBorderReset() {
+         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+             guard let self = self else { return }
+             let now = Date().timeIntervalSince1970
+             if now - self.lastVolumeUpdateTime >= 2 {
+                 self.resetBorderColor()
+             }
+         }
+     }
+
+    private func resetBorderColor() {
+        scrollRenderView.layer.borderColor = UIColor.clear.cgColor
+        isBorderHighlighted = false
     }
 }
 

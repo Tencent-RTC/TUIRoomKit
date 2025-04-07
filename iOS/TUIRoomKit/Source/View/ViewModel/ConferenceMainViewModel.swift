@@ -45,7 +45,6 @@ class ConferenceMainViewModel: NSObject {
     private var isShownOpenCameraInviteAlert = false
     private var isShownOpenMicrophoneInviteAlert = false
     private var isShownTakeSeatInviteAlert = false
-    private weak var localAudioViewModel: LocalAudioViewModel?
     private var selfRole: TUIRole?
     var joinConferenceParams: JoinConferenceParams?
     var startConferenceParams: StartConferenceParams?
@@ -111,14 +110,6 @@ class ConferenceMainViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onGetUserListFinished, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserInfoChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserVideoStateChanged, observer: self)
-    }
-    
-    func hideLocalAudioView() {
-        localAudioViewModel?.hideLocalAudioView()
-    }
-    
-    func showLocalAudioView() {
-        localAudioViewModel?.showLocalAudioView()
     }
     
     func onViewDidLoadAction() {
@@ -229,6 +220,12 @@ class ConferenceMainViewModel: NSObject {
             }
         }
         debugPrint("TUIRoomKit error: \(event) error, \(errorMessage)")
+    }
+    
+    func setVideoResolutionMode(isLandscape: Bool) {
+        let resolutionMode: TUIResolutionMode = isLandscape ? .landscape : .portrait
+        engineManager.setVideoResolutionMode(streamType: .cameraStream, resolutionMode: resolutionMode)
+        engineManager.setVideoResolutionMode(streamType: .cameraStreamLow, resolutionMode: resolutionMode)
     }
     
     deinit {
@@ -373,7 +370,7 @@ extension ConferenceMainViewModel: RoomEngineEventResponder {
     }
     
     private func agreeOpenLocalCamera(request: TUIRequest) {
-        engineManager.setLocalVideoView(streamType: .cameraStream, view: nil)
+        engineManager.setLocalVideoView(nil)
         if RoomCommon.checkAuthorCamaraStatusIsDenied() {
             engineManager.responseRemoteRequest(request.requestId, agree: true)
         } else {
@@ -507,12 +504,8 @@ extension ConferenceMainViewModel: ConferenceMainViewFactory {
         return raiseHandNoticeView
     }
     
-    func makeLocalAudioView() -> UIView {
-        let localAudioViewModel  = LocalAudioViewModel()
-        localAudioViewModel.hideLocalAudioView()
-        let view = LocalAudioView(viewModel: localAudioViewModel)
-        self.localAudioViewModel = localAudioViewModel
-        return view
+    func makeLocalAudioView() -> LocalAudioView {
+        return LocalAudioView()
     }
     
     func makeWaterMarkLayer() -> WaterMarkLayer {

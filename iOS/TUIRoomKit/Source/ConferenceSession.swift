@@ -47,6 +47,10 @@ import Foundation
         implementation.enableVibrationMode(enable: enable)
     }
     
+    @objc public func setAppGroup(_ appGroup: String) {
+        implementation.setAppGroup(appGroup)
+    }
+    
     @objc public func setParticipants(_ participants: [User]) {
         implementation.setParticipants(participants)
     }

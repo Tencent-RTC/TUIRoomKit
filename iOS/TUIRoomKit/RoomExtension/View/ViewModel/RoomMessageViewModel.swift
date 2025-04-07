@@ -66,7 +66,15 @@ class RoomMessageViewModel: NSObject {
     
     private func enterRoom() {
         if !engineManager.store.isEnteredRoom {
-            roomManager.enterRoom(roomId: message.roomId)
+            roomManager.enterRoom(roomId: message.roomId) {_ in
+                let vc = ConferenceMainViewController()
+                RoomRouter.shared.push(viewController: vc)
+            } onError: { [weak self] code, errorMessage in
+                if let self = self, code == .roomIdNotExist {
+                    self.messageManager.resendRoomMessage(message: self.message, dic: ["roomState": RoomMessageModel.RoomState.destroyed.rawValue])
+                }
+                RoomRouter.makeToast(toast: code.description ?? errorMessage)
+            }
         } else {
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_ShowRoomMainView, param: [:])
         }

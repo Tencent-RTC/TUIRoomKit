@@ -173,7 +173,7 @@ class RoomMessageView: UIView {
     }
     
     func setupViewState() {
-        roomNameLabel.text = (viewModel.message.ownerName ) + .quickMeetingText
+        roomNameLabel.text = localizedReplace(.quickMeetingText, replace: viewModel.message.ownerName)
         if viewModel.message.owner != viewModel.userId {
             inviteUserButton.isHidden = true
         } else {
@@ -322,7 +322,5 @@ private extension String {
     static var meetingEnded: String {
         localized("Meeting ended")
     }
-    static var quickMeetingText: String {
-        localized("Quick meeting")
-    }
+    static let quickMeetingText = localized("xx's quick conference")
 }

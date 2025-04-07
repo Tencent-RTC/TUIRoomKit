@@ -85,6 +85,7 @@ class RoomRouter: NSObject {
             context.chatWindow?.isHidden = false
             context.chatWindow?.makeKeyAndVisible()
         }
+        RoomKitReport.reportData(.metricsChatPanelShow)
     }
     
     func makeChatController(user: UserEntity, roomInfo: TUIRoomInfo) -> UIViewController? {

@@ -38,6 +38,7 @@ class MediaSettingView: UIView {
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
+        reportViewShow()
     }
     
     private func constructViewHierarchy() {
@@ -54,6 +55,10 @@ class MediaSettingView: UIView {
     
     private func bindInteraction() {
         viewModel.viewResponder = self
+    }
+    
+    private func reportViewShow() {
+        viewModel.reportSettingsPanelShow()
     }
     
     deinit {

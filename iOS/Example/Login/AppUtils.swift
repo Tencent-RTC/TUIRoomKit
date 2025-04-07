@@ -42,6 +42,7 @@ class AppUtils: NSObject {
     }
     
     func showConferenceMainViewController(roomId: String) {
+        guard !(navigationController?.viewControllers.last is ConferenceMainViewController) else { return }
         let conferenceViewController = ConferenceMainViewController()
         let params = JoinConferenceParams(roomId: roomId)
         params.isOpenMicrophone = true

@@ -317,7 +317,7 @@ class BottomViewModel: NSObject {
             viewResponder?.makeToast(text: .muteSeatReasonText)
             return
         }
-        engineManager.setLocalVideoView(streamType: .cameraStream, view: nil)
+        engineManager.setLocalVideoView(nil)
         engineManager.openLocalCamera()
     }
     
@@ -766,7 +766,7 @@ private extension String {
         localized("Settings")
     }
     static var dropText: String {
-        localized("Drop")
+        localized("Close")
     }
     static var rejectedTakeSeatText: String {
         localized("Application to go on stage was rejected")

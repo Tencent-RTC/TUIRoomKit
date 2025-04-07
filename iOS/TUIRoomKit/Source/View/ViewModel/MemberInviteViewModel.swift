@@ -88,6 +88,10 @@ class MemberInviteViewModel {
         UIPasteboard.general.string = conferenceInfoDetails
     }
     
+    func reportMemberInvitePanelShow() {
+        RoomKitReport.reportData(.metricsShareRoomInfoPanelShow)
+    }
+    
     deinit {
         debugPrint("deinit \(self)")
     }

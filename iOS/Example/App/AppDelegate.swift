@@ -32,7 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             window = UIWindow(frame: UIScreen.main.bounds)
             window?.backgroundColor = UIColor.white
-
+            
             let loginVC = TRTCLoginViewController()
             let nav = RoomNavigationController(rootViewController: loginVC)
             window?.rootViewController = nav

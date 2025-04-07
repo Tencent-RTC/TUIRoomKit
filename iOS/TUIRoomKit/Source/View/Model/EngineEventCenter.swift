@@ -59,7 +59,6 @@ class EngineEventCenter: NSObject {
         case onSendMessageForUserDisableChanged
         case onRemoteUserEnterRoom
         case onRemoteUserLeaveRoom
-        case onUserRoleChanged
         case onSeatListChanged
         case onAllUserCameraDisableChanged
         case onAllUserMicrophoneDisableChanged

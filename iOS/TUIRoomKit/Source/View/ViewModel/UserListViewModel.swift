@@ -77,6 +77,9 @@ class UserListViewModel: NSObject {
     var invitationUserList: [TUIInvitation] {
         return conferenceStore.selectCurrent(ConferenceInvitationSelectors.getInvitationList)
     }
+    lazy var userSorter: UserListSorter = {
+        return UserListSorter(currentUserId: currentUser.userId)
+    }()
     
     @Injected(\.conferenceStore) var conferenceStore
     
@@ -86,6 +89,7 @@ class UserListViewModel: NSObject {
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
+        EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_SomeoneSharing, responder: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_RoomOwnerChanged, responder: self)
         EngineEventCenter.shared.subscribeEngine(event: .onAllUserMicrophoneDisableChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onAllUserCameraDisableChanged, observer: self)
@@ -96,6 +100,7 @@ class UserListViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewUserList, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RenewSeatList, responder: self)
+        EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_SomeoneSharing, responder: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_RoomOwnerChanged, responder: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onAllUserMicrophoneDisableChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onAllUserCameraDisableChanged, observer: self)
@@ -107,11 +112,11 @@ class UserListViewModel: NSObject {
         var userList: [UserEntity] = []
         switch userListType {
         case .allUsers:
-            userList = store.attendeeList
+            userList = userSorter.sortUsers(store.attendeeList)
         case .onStageUsers:
-            userList = store.seatList
+            userList = userSorter.sortUsers(store.seatList)
         case .offStageUsers:
-            userList = store.offSeatList
+            userList = userSorter.sortUsers(store.offSeatList)
         case .notInRoomUsers:
             userList = invitationList.map{ UserEntity(invitation: $0) }
         }
@@ -249,12 +254,20 @@ class UserListViewModel: NSObject {
         }
         return (added, removed, changed)
     }
+    
+    func reportUserListPanelShow() {
+        RoomKitReport.reportData(.metricsUserListPanelShow)
+    }
+    
+    func reportUserListSearch() {
+        RoomKitReport.reportData(.metricsUserListSearch)
+    }
 }
 
 extension UserListViewModel: RoomKitUIEventResponder {
     func onNotifyUIEvent(key: EngineEventCenter.RoomUIEvent, Object: Any?, info: [AnyHashable : Any]?) {
         switch key {
-        case .TUIRoomKitService_RenewUserList, .TUIRoomKitService_RenewSeatList:
+        case .TUIRoomKitService_RenewUserList, .TUIRoomKitService_RenewSeatList, .TUIRoomKitService_SomeoneSharing:
             viewResponder?.updateMemberLabel(count: allUserCount)
             updateAttendeeList()
             viewResponder?.reloadUserListView()
@@ -292,6 +305,87 @@ extension UserListViewModel: RaiseHandApplicationNotificationViewListener {
     func onHidden() {
         isShownNotificationView = false
         viewResponder?.updateUserListTableView()
+    }
+}
+
+class UserListSorter {
+    private let currentUserId: String
+    
+    init(currentUserId: String) {
+        self.currentUserId = currentUserId
+    }
+    
+    func sortUsers(_ users: [UserEntity]) -> [UserEntity] {
+        guard needSorting(users) else { return users }
+        
+        return users.sorted { first, second in
+            getUserPriority(for: first) < getUserPriority(for: second)
+        }
+    }
+    
+    private func needSorting(_ users: [UserEntity]) -> Bool {
+        guard users.count > 1 else { return false }
+        
+        for i in 0..<(users.count - 1) {
+            let currentPriority = getUserPriority(for: users[i])
+            let nextPriority = getUserPriority(for: users[i + 1])
+            
+            if currentPriority > nextPriority {
+                return true
+            }
+        }
+        
+        return false
+    }
+    
+    private func getUserPriority(for user: UserEntity) -> UserPriority {
+        if user.userId == currentUserId {
+            return .currentUser
+        }
+        if user.userRole == .roomOwner {
+            return .roomOwner
+        }
+        if user.userRole == .administrator {
+            return .administrator
+        }
+        if user.hasScreenStream {
+            return .screenSharing
+        }
+        
+        switch (user.hasAudioStream, user.hasVideoStream) {
+        case (true, true): return .videoAndAudio
+        case (false, true): return .videoOnly
+        case (true, false): return .audioOnly
+        case (false, false): return .none
+        }
+    }
+}
+
+enum UserPriority: Comparable {
+    case currentUser
+    case roomOwner
+    case administrator
+    case screenSharing
+    case videoAndAudio
+    case videoOnly
+    case audioOnly
+    case none
+    
+    var priority: Int {
+        switch self {
+        case .currentUser: return 0
+        case .roomOwner: return 1
+        case .administrator: return 2
+        case .screenSharing: return 3
+        case .videoAndAudio: return 4
+        case .videoOnly: return 5
+        case .audioOnly: return 6
+        case .none: return 7
+        }
+    }
+    
+    static func < (lhs: UserPriority, rhs: UserPriority) -> Bool {
+        return lhs.priority < rhs.priority
     }
 }
 

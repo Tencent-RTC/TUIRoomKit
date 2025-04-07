@@ -19,7 +19,11 @@ import Combine
 struct DataChanges {
     let deletions: [IndexPath]
     let insertions: [IndexPath]
-    let sequenceChanged: Bool
+    let moves: [(from: IndexPath, to: IndexPath)]
+    
+    var hasChanges: Bool {
+        return !deletions.isEmpty || !insertions.isEmpty || !moves.isEmpty
+    }
 }
 
 protocol MultiStreamViewDelegate: AnyObject {
@@ -76,6 +80,10 @@ class MultiStreamView: UIView {
         return attendeeCollectionView.contentOffset
     }
     
+    var streamSorter: MultiStreamsSorter {
+        return MultiStreamsSorter(currentUserId: roomStore.currentUser.userId)
+    }
+    
     func setExcludeVideoItems(items: [UserInfo]) {
         self.excludeVideoItems = items
     }
@@ -110,7 +118,7 @@ class MultiStreamView: UIView {
         )
         .map { [weak self] videoItems, excludeInfos, speechItem -> [UserInfo] in
             guard let self = self else { return videoItems }
-            let sortedItems = self.sortItems(videoItems)
+            let sortedItems = streamSorter.sortStreams(videoItems)
             var items = sortedItems.filter { item in
                 let excluded = excludeInfos.contains(where: { $0.userId == item.userId })
                 let notSpeechItem = speechItem.map { speech in
@@ -136,20 +144,17 @@ class MultiStreamView: UIView {
     
     private func handleDataChanged(_ newItems: [UserInfo]) {
         let changes = calculateChanges(old: dataSource, new: newItems)
+    
+        guard changes.hasChanges else {return}
         
-        if changes.sequenceChanged {
-            self.dataSource = newItems
-            reloadData()
-            return
-        }
-        
-        if !changes.deletions.isEmpty || !changes.insertions.isEmpty {
-            freshCollectionView { [ weak self] in
-                guard let self = self else { return }
-                self.attendeeCollectionView.performBatchUpdates {
-                    self.dataSource = newItems
-                    self.attendeeCollectionView.deleteItems(at: changes.deletions)
-                    self.attendeeCollectionView.insertItems(at: changes.insertions)
+        freshCollectionView { [ weak self] in
+            guard let self = self else { return }
+            self.attendeeCollectionView.performBatchUpdates {
+                self.dataSource = newItems
+                self.attendeeCollectionView.deleteItems(at: changes.deletions)
+                self.attendeeCollectionView.insertItems(at: changes.insertions)
+                changes.moves.forEach { move in
+                    self.attendeeCollectionView.moveItem(at: move.from, to: move.to)
                 }
             }
         }
@@ -319,6 +324,7 @@ extension MultiStreamView {
     private func calculateChanges(old: [UserInfo], new: [UserInfo]) -> DataChanges {
         var deletions: [IndexPath] = []
         var insertions: [IndexPath] = []
+        var moves: [(from: IndexPath, to: IndexPath)] = []
         
         let oldKeys = old.map { "\($0.userId)_\($0.videoStreamType.rawValue)" }
         let newKeys = new.map { "\($0.userId)_\($0.videoStreamType.rawValue)" }
@@ -328,50 +334,33 @@ extension MultiStreamView {
         
         let deletedKeys = Set(oldKeys).subtracting(newKeys)
         let insertedKeys = Set(newKeys).subtracting(oldKeys)
+        let retainedKeys = Set(oldKeys).intersection(newKeys)
         
-        deletions = deletedKeys.compactMap { oldKeyToIndex[$0] }.map { IndexPath(item: $0, section: 0) }
-        insertions = insertedKeys.compactMap { newKeyToIndex[$0] }.map { IndexPath(item: $0, section: 0) }
+        deletions = deletedKeys.compactMap { oldKeyToIndex[$0] }.map { IndexPath(item: $0, section: 0) }.sorted { $0.item > $1.item }
+        insertions = insertedKeys.compactMap { newKeyToIndex[$0] }.map { IndexPath(item: $0, section: 0) }.sorted { $0.item < $1.item }
    
-        let sequenceChanged = oldKeys != newKeys && deletedKeys.isEmpty && insertedKeys.isEmpty
+        var processedIndices = Set<String>()
+        for key in retainedKeys {
+            guard let oldIndex = oldKeyToIndex[key],
+                  let newIndex = newKeyToIndex[key],
+                  oldIndex != newIndex,
+                  !processedIndices.contains(key) else {
+                continue
+            }
+            let fromPath = IndexPath(item: oldIndex, section: 0)
+            let toPath = IndexPath(item: newIndex, section: 0)
+            if !deletions.contains(fromPath) && !insertions.contains(toPath) {
+                moves.append((from: fromPath, to: toPath))
+                processedIndices.insert(key)
+            }
+        }
+        moves.sort { $0.from.item < $1.from.item }
         
         return DataChanges(
             deletions: deletions,
             insertions: insertions,
-            sequenceChanged: sequenceChanged
+            moves: moves
         )
-    }
-    
-    private func sortItems(_ items: [UserInfo]) -> [UserInfo] {
-        var sortedItems = items
-        guard checkNeededSort(sortedItems) else { return sortedItems }
-        if let currentIndex = sortedItems.firstIndex(where: { $0.userId == currentUserId }) {
-            let currentItem = sortedItems.remove(at: currentIndex)
-            sortedItems.insert(currentItem, at: 0)
-        }
-        
-        if let ownerIndex = sortedItems.firstIndex(where: { $0.userRole == .roomOwner }) {
-            let ownerItem = sortedItems.remove(at: ownerIndex)
-            sortedItems.insert(ownerItem, at: 0)
-        }
-        
-        return sortedItems
-    }
-
-    private func checkNeededSort(_ items: [UserInfo]) -> Bool {
-        var isSort = false
-        if let ownerIndex = items.firstIndex(where: { $0.userRole == .roomOwner }) {
-            isSort = ownerIndex != 0
-        }
-        let currentUserId = currentUserId
-        if let currentIndex = items.firstIndex(where: { $0.userId == currentUserId }) {
-            if currentUserId == roomStore.roomInfo.ownerId {
-                isSort = isSort || (currentIndex != 0)
-            } else {
-                isSort = isSort || (currentIndex != 1)
-            }
-        }
-        
-        return isSort
     }
     
     private func freshCollectionView(block: () -> Void) {
@@ -469,6 +458,7 @@ extension MultiStreamView: UICollectionViewDataSource {
         
         videoItemPublisher
             .receive(on: RunLoop.main)
+            .dropFirst()
             .removeDuplicates { oldItem, newItem in
                 oldItem.hasAudioStream == newItem.hasAudioStream &&
                 oldItem.userVoiceVolume == newItem.userVoiceVolume
@@ -490,7 +480,6 @@ extension MultiStreamView: UICollectionViewDataSource {
             guard let self = self else { return }
             if isCellVisible(cell) {
                 if item.hasVideoStream || item.videoStreamType == .screenStream {
-                    self.setRemoteRenderParams(userId: item.userId, streamType: item.videoStreamType)
                     self.startPlayVideoStream(item: item, renderView: cell.renderView)
                 } else {
                     self.stopPlayVideoStream(item: item)
@@ -545,13 +534,6 @@ extension MultiStreamView: UICollectionViewDataSource {
 
 // MARK: - UICollectionViewDataSource
 extension MultiStreamView {
-    private func setRemoteRenderParams(userId: String, streamType: TUIVideoStreamType) {
-        let renderParams = TRTCRenderParams()
-        renderParams.fillMode = (streamType == .screenStream) ? .fit : .fill
-        let trtcStreamType: TRTCVideoStreamType = (streamType == .screenStream) ? .sub : .big
-        engineManager.setRemoteRenderParams(userId: userId, streamType: trtcStreamType, params: renderParams)
-    }
-    
     func startPlayVideoStream(item: UserInfo, renderView: UIView?) {
         guard let renderView = renderView else { return }
         var item = item
@@ -560,13 +542,13 @@ extension MultiStreamView {
             engineManager.setRemoteVideoView(userId: item.userId, streamType: item.videoStreamType, view: renderView)
             engineManager.startPlayRemoteVideo(userId: item.userId, streamType: item.videoStreamType)
         } else if item.hasVideoStream {
-            engineManager.setLocalVideoView(streamType: itemStreamType, view: renderView)
+            engineManager.setLocalVideoView(renderView)
         }
     }
     
     func stopPlayVideoStream(item: UserInfo) {
         if item.userId == currentUserId {
-            engineManager.setLocalVideoView(streamType: item.videoStreamType, view: nil)
+            engineManager.setLocalVideoView(nil)
         } else {
             engineManager.setRemoteVideoView(userId: item.userId, streamType: item.videoStreamType, view: nil)
             if item.videoStreamType == .screenStream {

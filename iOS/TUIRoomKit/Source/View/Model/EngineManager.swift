@@ -42,11 +42,15 @@ class EngineManager: NSObject {
         guard let listManager = roomEngine.getExtension(extensionType: .conferenceListManager) as? TUIConferenceListManager else { return nil }
         return listManager
     }()
+    private lazy var trtcCloudShared: TRTCCloud = {
+        TRTCCloud.sharedInstance()
+    }()
     private let takeSeatTimeOutNumber: Double = 60
     private let openRemoteDeviceTimeOutNumber: Double = 15
     private let rootRouter: RoomRouter = RoomRouter.shared
     private var isLoginEngine: Bool = false
-    private let appGroupString: String = "com.tencent.TUIRoomTXReplayKit-Screen"
+    private let appGroupString: String = ConferenceSession.sharedInstance.implementation.appGroup
+    private let volumeCallbackInterval: UInt = 300
     
     override private init() {
         super.init()
@@ -202,13 +206,6 @@ class EngineManager: NSObject {
         roomEngine.getMediaDeviceManager().switchCamera(store.videoSetting.isFrontCamera)
     }
     
-    func switchMirror() {
-        store.videoSetting.isMirror = !store.videoSetting.isMirror
-        let params = TRTCRenderParams()
-        params.mirrorType = store.videoSetting.isMirror ? .enable : .disable
-        setLocalRenderParams(params: params)
-    }
-    
     func muteAllAudioAction(isMute: Bool, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
         store.roomInfo.isMicrophoneDisableForAllUser = isMute
         roomEngine.disableDeviceForAllUserByAdmin(device: .microphone, isDisable:
@@ -318,16 +315,8 @@ class EngineManager: NSObject {
         }
     }
     
-    func setLocalRenderParams(params: TRTCRenderParams) {
-        roomEngine.getTRTCCloud().setLocalRenderParams(params)
-    }
-    
-    func setGSensorMode(mode: TRTCGSensorMode) {
-        roomEngine.getTRTCCloud().setGSensorMode(mode)
-    }
-    
-    func setLocalVideoView(streamType: TUIVideoStreamType, view: UIView?) {
-        roomEngine.setLocalVideoView(streamType: streamType, view: view)
+    func setLocalVideoView(_ view: UIView?) {
+        roomEngine.setLocalVideoView(view: view)
     }
     
     func changeUserRole(userId: String, role: TUIRole, onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
@@ -405,21 +394,19 @@ class EngineManager: NSObject {
     
     func setAudioCaptureVolume(_ captureVolume: Int) {
         store.audioSetting.captureVolume = captureVolume
-        roomEngine.getTRTCCloud().setAudioCaptureVolume(captureVolume)
+        trtcCloudShared.setAudioCaptureVolume(captureVolume)
     }
     
     func setAudioPlayoutVolume(_ playVolume: Int) {
         store.audioSetting.playVolume = playVolume
-        roomEngine.getTRTCCloud().setAudioPlayoutVolume(playVolume)
+        trtcCloudShared.setAudioPlayoutVolume(playVolume)
     }
     
     func enableAudioVolumeEvaluation(isVolumePrompt: Bool) {
         store.audioSetting.volumePrompt = isVolumePrompt
-        if isVolumePrompt {
-            roomEngine.getTRTCCloud().enableAudioVolumeEvaluation(300, enable_vad: true)
-        } else {
-            roomEngine.getTRTCCloud().enableAudioVolumeEvaluation(0, enable_vad: false)
-        }
+        let volumeEvaluateParams = TRTCAudioVolumeEvaluateParams()
+        volumeEvaluateParams.interval = isVolumePrompt ? volumeCallbackInterval : 0
+        trtcCloudShared.enableAudioVolumeEvaluation(isVolumePrompt, with: volumeEvaluateParams)
     }
     
     func closeRemoteDeviceByAdmin(userId: String, device: TUIMediaDevice, onSuccess: TUISuccessBlock? = nil, onError: TUIErrorBlock? = nil) {
@@ -508,10 +495,6 @@ class EngineManager: NSObject {
         store.isShownRaiseHandNotice = isShown
     }
     
-    func setRemoteRenderParams(userId: String, streamType: TRTCVideoStreamType, params: TRTCRenderParams) {
-        roomEngine.getTRTCCloud().setRemoteRenderParams(userId, streamType: streamType, params: params)
-    }
-    
     func updateSeatApplicationList() {
         roomEngine.getSeatApplicationList { [weak self] list in
             guard let self = self else { return }
@@ -570,7 +553,7 @@ extension EngineManager {
         }
         let selfInfo = TUIRoomEngine.getSelfInfo()
         let name: String = selfInfo.userName.isEmpty ? selfInfo.userId : selfInfo.userName
-        return name + .quickConferenceText
+        return localizedReplace(.quickConferenceText, replace: name)
     }
     
     private func enterEngineRoom(roomId: String, options: TUIEnterRoomOptions? = nil, enableAudio: Bool, onSuccess: @escaping TUIRoomInfoBlock, onError: @escaping TUIErrorBlock) {
@@ -685,7 +668,7 @@ extension EngineManager {
     private func operateLocalCamera() {
         let openLocalCameraActionBlock = { [weak self] in
             guard let self = self else { return }
-            setLocalVideoView(streamType: .cameraStream, view: nil)
+            setLocalVideoView(nil)
             openLocalCamera()
         }
         if store.videoSetting.isCameraOpened && !store.roomInfo.isCameraDisableForAllUser {
@@ -704,18 +687,14 @@ extension EngineManager {
     private func initLocalVideoState() {
         setVideoParam()
         enableGravitySensor(enable: true)
-        setGSensorMode(mode: .uiFixLayout)
         let resolutionMode: TUIResolutionMode = isLandscape ? .landscape : .portrait
         setVideoResolutionMode(streamType: .cameraStream, resolutionMode: resolutionMode)
+        setVideoResolutionMode(streamType: .cameraStreamLow, resolutionMode: resolutionMode)
     }
     
     private func setVideoParam() {
         setVideoEncoder(videoQuality: store.videoSetting.videoQuality, bitrate: store.videoSetting.videoBitrate, 
                         fps: store.videoSetting.videoFps)
-        let params = TRTCRenderParams()
-        params.fillMode = .fill
-        params.rotation = ._0
-        setLocalRenderParams(params: params)
     }
     
     private func getUserList(nextSequence: Int, localUserList: [UserEntity], onSuccess: @escaping TUISuccessBlock, onError: @escaping TUIErrorBlock) {
@@ -775,13 +754,13 @@ extension EngineManager {
     
     private func addEngineObserver() {
         roomEngine.addObserver(eventDispatcher)
-        roomEngine.getTRTCCloud().addDelegate(observer)
+        trtcCloudShared.addDelegate(observer)
         conferenceListManager?.addObserver(conferenceListObserver)
     }
     
     private func removeEngineObserver() {
         roomEngine.removeObserver(eventDispatcher)
-        roomEngine.getTRTCCloud().removeDelegate(observer)
+        trtcCloudShared.removeDelegate(observer)
         conferenceListManager?.removeObserver(conferenceListObserver)
     }
     
@@ -820,12 +799,12 @@ extension EngineManager {
 // MARK: - TUIExtensionProtocol
 
 extension EngineManager: TUIExtensionProtocol {
-    func getExtensionInfo(_ key: String, param: [AnyHashable: Any]?) -> [AnyHashable: Any] {
+    func onGetExtensionInfo(_ key: String, param: [AnyHashable: Any]?) -> [AnyHashable: Any]? {
         guard let param = param else {
             return [:]
         }
         
-        guard let roomId: String = param["roomId"] as? String else {
+        guard param["roomId"] as? String != nil else {
             return [:]
         }
         
@@ -869,6 +848,6 @@ private extension String {
         localized("You are already in another conference")
     }
     static var quickConferenceText: String {
-        localized("'s quick meeting")
+        localized("xx's quick conference")
     }
 }

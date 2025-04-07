@@ -17,7 +17,7 @@ protocol ConferenceMainViewFactory {
     func makeTopView() -> TopView
     func makeVideoSeatView() -> UIView
     func makeRaiseHandNoticeView() -> UIView
-    func makeLocalAudioView() -> UIView
+    func makeLocalAudioView() -> LocalAudioView
     func makeWaterMarkLayer() -> WaterMarkLayer
     func makeFloatChatButton() -> FloatChatButton
     func makeFloatChatDisplayView() -> FloatChatDisplayView
@@ -74,7 +74,7 @@ class ConferenceMainView: UIView {
         return viewFactory.makeRaiseHandNoticeView()
     }()
     
-    lazy var localAudioView: UIView = {
+    lazy var localAudioView: LocalAudioView = {
         return viewFactory.makeLocalAudioView()
     }()
     
@@ -115,6 +115,7 @@ class ConferenceMainView: UIView {
         super.layoutSubviews()
         guard currentLandscape != isLandscape else { return }
         setupRootViewOrientation(isLandscape: isLandscape)
+        viewModel.setVideoResolutionMode(isLandscape: isLandscape)
         currentLandscape = isLandscape
     }
     
@@ -279,15 +280,16 @@ extension ConferenceMainView: ConferenceMainViewResponder {
         bottomView.alpha = 1
         topView.isHidden = false
         bottomView.isHidden = false
-        viewModel.hideLocalAudioView()
+        localAudioView.hide()
     }
+    
     
     @objc private func hideToolBar() {
         topView.alpha = 0
         bottomView.alpha = 0
         topView.isHidden = true
         bottomView.isHidden = true
-        viewModel.showLocalAudioView()
+        localAudioView.show()
     }
     
     func changeToolBarHiddenState() {

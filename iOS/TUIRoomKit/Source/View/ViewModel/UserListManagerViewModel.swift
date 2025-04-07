@@ -59,7 +59,7 @@ class UserListManagerViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onUserAudioStateChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onSeatListChanged, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserInfoChanged, observer: self)
     }
     
     private func unsubscribeEngine() {
@@ -67,7 +67,7 @@ class UserListManagerViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserAudioStateChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onSendMessageForUserDisableChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onSeatListChanged, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserInfoChanged, observer: self)
     }
     
     private func createManagerItems() {
@@ -424,9 +424,10 @@ extension UserListManagerViewModel: RoomEngineEventResponder {
                 removeViewItem(buttonType: .muteAudioItemType)
                 removeViewItem(buttonType: .muteVideoItemType)
             }
-        case .onUserRoleChanged:
-            guard let userId = param?["userId"] as? String else { return }
-            guard userId == currentUser.userId || userId == selectUserId else { return }
+        case .onUserInfoChanged:
+            guard let modifyFlag = param?["modifyFlag"] as? TUIUserInfoModifyFlag, modifyFlag.contains(.userRole)  else { return }
+            guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
+            guard userInfo.userId == currentUser.userId || userInfo.userId == selectUserId else { return }
             guard currentUser.userId != selectUserId else { return }
             guard let selectUserInfo = selectUserInfo else { return }
             userListManagerItems.removeAll()

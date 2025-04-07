@@ -11,6 +11,7 @@ protocol ScheduleConferenceStore {
     func update(conference info: ConferenceInfo)
     func fetchAttendees(cursor: String)
     func fetchRoomPassword(roomId: String)
+    func reportViewShow(dataReport: DataReport)
     func select<Value:Equatable>(_ selector: Selector<ConferenceInfo, Value>) -> AnyPublisher<Value, Never>
     var conferenceInfo: ConferenceInfo { get }
 }
@@ -52,6 +53,10 @@ class ScheduleConferenceStoreProvider {
 }
 
 extension ScheduleConferenceStoreProvider: ScheduleConferenceStore {
+    func reportViewShow(dataReport: DataReport) {
+        RoomKitReport.reportData(dataReport)
+    }
+    
     func update(conference info: ConferenceInfo) {
         store.dispatch(action: ScheduleConferenceStoreProvider.updateConferenceInfo(payload: info))
     }

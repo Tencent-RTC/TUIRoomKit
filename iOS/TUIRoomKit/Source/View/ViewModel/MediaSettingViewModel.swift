@@ -239,6 +239,10 @@ class MediaSettingViewModel {
         return bitrate
     }
     
+    func reportSettingsPanelShow() {
+        RoomKitReport.reportData(.metricsSettingsPanelShow)
+    }
+    
     deinit {
         debugPrint("deinit \(self)")
     }
