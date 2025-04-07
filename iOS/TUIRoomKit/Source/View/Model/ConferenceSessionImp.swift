@@ -17,6 +17,7 @@ let TUI_ROOM_ENABLE_VIBRATION_MODE_KEY = "RoomEnableVibrationMode"
 class ConferenceSessionImp: NSObject {
     private(set) var isEnableWaterMark = false;
     private(set) var waterMarkText     = "";
+    private(set) var appGroup          = "com.tencent.TUIRoomTXReplayKit-Screen"
     private(set) var hasCustomContacts = false
     
     private(set) lazy var bellPath: String? = {
@@ -59,10 +60,12 @@ class ConferenceSessionImp: NSObject {
 
     func enableWaterMark() {
         self.isEnableWaterMark = true
+        RoomKitReport.reportData(.metricsWaterMarkEnable)
     }
 
     func setWaterMarkText(waterMarkText: String) {
         self.waterMarkText = waterMarkText
+        RoomKitReport.reportData(.metricsWaterMarkCustomText)
     }
     
     func setContactsViewProvider(_ provider: @escaping (ConferenceParticipants) -> ContactViewProtocol) {
@@ -85,6 +88,10 @@ class ConferenceSessionImp: NSObject {
     func enableVibrationMode(enable: Bool) {
         UserDefaults.standard.set(enable, forKey: TUI_ROOM_ENABLE_VIBRATION_MODE_KEY)
         UserDefaults.standard.synchronize()
+    }
+    
+    func setAppGroup(_ appGroup: String) {
+        self.appGroup = appGroup
     }
     
     func setParticipants(_ participants: [User]) {

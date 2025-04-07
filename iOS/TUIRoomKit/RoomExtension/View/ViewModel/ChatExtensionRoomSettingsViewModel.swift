@@ -39,9 +39,9 @@ class ChatExtensionRoomSettingsViewModel {
 }
 private extension String {
     static var cameraSetText: String {
-        localized("Join the meeting and start the camera")
+        localized("Enable video when joining a meeting")
     }
     static var micSeatText: String {
-        localized("Join the conference and turn on the mic")
+        localized("Enable audio when joining a meeting")
     }
 }

@@ -18,5 +18,6 @@ class ServiceCenter: NSObject {
     let conferenceListService = ConferenceListService()
     let roomService = RoomService()
     let conferenceInvitationService = ConferenceInvitationService()
+    let audioService = AudioService()
 }
 

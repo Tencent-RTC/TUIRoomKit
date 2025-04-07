@@ -36,6 +36,7 @@ import TUICore
         initializeView()
         initializeRoute()
         initializeData()
+        reportSchedulePanelShow()
         
         subscribeScheduleSubject()
         subscribeToast()
@@ -108,6 +109,10 @@ import TUICore
         let maxNumber = Int(truncating: NSDecimalNumber(decimal: pow(10, numberOfDigits))) - 1
         let randomNumber = arc4random_uniform(UInt32(maxNumber - minNumber)) + UInt32(minNumber)
         return String(randomNumber)
+    }
+    
+    private func reportSchedulePanelShow() {
+        store.reportViewShow(dataReport: .metricsConferenceSchedulePanelShow)
     }
     
     deinit {

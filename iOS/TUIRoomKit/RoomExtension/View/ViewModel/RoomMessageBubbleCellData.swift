@@ -33,7 +33,7 @@ class RoomMessageBubbleCellData: TUIBubbleMessageCellData {
         if businessID == BussinessID_GroupRoomMessage {
             let dict = TUITool.jsonData2Dictionary(message.customElem.data) as? [String: Any]
             let userName = dict?["ownerName"] as? String ?? ""
-            return userName + .quickMeetingText
+            return localizedReplace(.quickMeetingText, replace: userName)
         } else {
             return super.getDisplayString(message)
         }
@@ -54,6 +54,6 @@ class RoomMessageBubbleCellData: TUIBubbleMessageCellData {
 
 private extension String {
     static var quickMeetingText: String {
-        localized("'s quick meeting")
+        localized("xx's quick conference")
     }
 }

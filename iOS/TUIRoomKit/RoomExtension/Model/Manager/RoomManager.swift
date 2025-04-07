@@ -38,24 +38,22 @@ class RoomManager {
         engineManager.createRoom(roomInfo: roomInfo) { [weak self] in
             guard let self = self else { return }
             self.roomObserver.createdRoom()
-            self.enterRoom(roomId: roomInfo.roomId, isShownConferenceViewController: false)
+            self.enterRoom(roomId: roomInfo.roomId)
         } onError: { _, message in
             RoomRouter.makeToast(toast: message)
         }
     }
     
-    func enterRoom(roomId: String, isShownConferenceViewController: Bool = true) {
+    func enterRoom(roomId: String, onSuccess: TUIRoomInfoBlock? = nil, onError: TUIErrorBlock? = nil) {
         roomObserver.registerObserver()
         engineManager.store.isImAccess = true
         self.roomId = roomId
         engineManager.enterRoom(roomId: roomId, enableAudio: engineManager.store.isOpenMicrophone, enableVideo: engineManager.store.isOpenCamera, isSoundOnSpeaker: true) { [weak self]  roomInfo in
             guard let self = self else { return }
             self.roomObserver.enteredRoom()
-            guard isShownConferenceViewController else { return }
-            let vc = ConferenceMainViewController()
-            RoomRouter.shared.push(viewController: vc)
-        } onError: { _, message in
-            RoomRouter.makeToast(toast: message)
+            onSuccess?(roomInfo)
+        } onError: { code, message in
+            onError?(code, message)
         }
     }
     

@@ -55,7 +55,7 @@ extension RoomEventDispatcher: TUIRoomObserver {
         roomInfo.isMessageDisableForAllUser = isDisable
     }
     
-    func onRoomDismissed(roomId: String) {
+    func onRoomDismissed(roomId: String, reason: TUIRoomDismissedReason) {
         let param: [String : Any] = [
             "roomInfo" : roomInfo,
             "reason" : ConferenceFinishedReason.finishedByOwner,
@@ -102,15 +102,6 @@ extension RoomEventDispatcher: TUIRoomObserver {
             "userInfo" : userInfo,
         ] as [String : Any]
         EngineEventCenter.shared.notifyEngineEvent(event: .onRemoteUserLeaveRoom, param: param)
-    }
-    
-    func onUserRoleChanged(userId: String, userRole: TUIRole) {
-        userRoleChanged(userId: userId, userRole: userRole)
-        let param = [
-            "userId" : userId,
-            "userRole" : userRole,
-        ] as [String : Any]
-        EngineEventCenter.shared.notifyEngineEvent(event: .onUserRoleChanged, param: param)
     }
     
     func onUserVideoStateChanged(userId: String, streamType: TUIVideoStreamType, hasVideo: Bool, reason: TUIChangeReason) {
@@ -170,17 +161,17 @@ extension RoomEventDispatcher: TUIRoomObserver {
         EngineEventCenter.shared.notifyEngineEvent(event: .onRequestReceived, param: ["request": request,])
     }
     
-    func onRequestCancelled(requestId: String, userId: String) {
-        store.deleteTakeSeatRequest(requestId: requestId)
+    func onRequestCancelled(request: TUIRequest, operateUser: TUIUserInfo) {
+        store.deleteTakeSeatRequest(requestId: request.requestId)
     }
     
-    func onRequestProcessed(requestId: String, userId: String) {
-        store.deleteTakeSeatRequest(requestId: requestId)
+    func onRequestProcessed(request: TUIRequest, operateUser: TUIUserInfo) {
+        store.deleteTakeSeatRequest(requestId: request.requestId)
     }
     
-    func onKickedOffSeat(userId: String) {
+    func onKickedOffSeat(seatIndex: Int, operateUser: TUIUserInfo) {
         let param = [
-            "userId": userId,
+            "userId": operateUser.userId,
         ] as [String : Any]
         EngineEventCenter.shared.notifyEngineEvent(event: .onKickedOffSeat, param: param)
     }
@@ -205,6 +196,8 @@ extension RoomEventDispatcher: TUIRoomObserver {
     func onUserInfoChanged(userInfo: TUIUserInfo, modifyFlag: TUIUserInfoModifyFlag) {
         if modifyFlag.contains(.nameCard) {
             store.changeUserName(userId: userInfo.userId, userName: userInfo.nameCard)
+        } else if modifyFlag.contains(.userRole) {
+            userRoleChanged(userId: userInfo.userId, userRole: userInfo.userRole)
         }
         let param = [
             "userInfo": userInfo,
@@ -271,6 +264,8 @@ extension RoomEventDispatcher {
     }
     
     private func userRoleChanged(userId: String, userRole: TUIRole) {
+        RoomKitLog.info("\(#file)","\(#line)","userRoleChanged, userId: \(userId), userRole: \(userRole)")
+        RoomKitLog.info("\(#file)","\(#line)","current uerInfo, userId: \(currentUser.userId), onSeat: \(currentUser.isOnSeat)")
         let isSelfRoleChanged = userId == currentUser.userId
         let isRoomOwnerChanged = userRole == .roomOwner
         if let userInfo = store.attendeeList.first(where: { $0.userId == userId }) {
@@ -280,10 +275,13 @@ extension RoomEventDispatcher {
         if isSelfRoleChanged {
             store.currentUser.userRole = userRole
             EngineEventCenter.shared.notifyUIEvent(key: .TUIRoomKitService_CurrentUserRoleChanged, param: ["userRole": userRole])
-            guard let operation = operation else { return }
-            var selfInfo = operation.selectCurrent(UserSelectors.getSelfInfo)
-            selfInfo.userRole = userRole
-            operation.dispatch(action: UserActions.updateSelfInfo(payload: selfInfo))
+            if let operation = operation {
+                var selfInfo = operation.selectCurrent(UserSelectors.getSelfInfo)
+                selfInfo.userRole = userRole
+                operation.dispatch(action: UserActions.updateSelfInfo(payload: selfInfo))
+            } else {
+                RoomKitLog.error("\(#file)","\(#line)","conference store resolve error!")
+            }
         }
         if isRoomOwnerChanged {
             EngineManager.shared.fetchRoomInfo(roomId: roomInfo.roomId) { _ in

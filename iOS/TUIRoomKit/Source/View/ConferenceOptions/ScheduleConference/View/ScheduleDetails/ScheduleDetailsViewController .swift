@@ -57,6 +57,7 @@ class ScheduleDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         initState()
+        reportDetailsPanelShow()
         subscribeToast()
         subscribeScheduleSubject()
         navigationItem.title = .roomDetailsText
@@ -115,6 +116,10 @@ class ScheduleDetailsViewController: UIViewController {
             }
             .store(in: &cancellableSet)
         store.fetchRoomPassword(roomId: conferenceInfo.basicInfo.roomId)
+    }
+    
+    private func reportDetailsPanelShow() {
+        store.reportViewShow(dataReport: .metricsConferenceInfoPanelShow)
     }
     
     private func initState() {

@@ -117,6 +117,7 @@ extension ConferenceRouter: Route {
     func showContactView(delegate: ContactViewSelectDelegate, participants: ConferenceParticipants) {
         let selectParams = MemberSelectParams(participants: participants, delegate: delegate)
         store.dispatch(action: ConferenceNavigationAction.navigate(payload: .push(route: .selectMember(memberSelectParams: selectParams))))
+        RoomKitReport.reportData(.metricsConferenceAttendee)
     }
     
     func dispatch(action: Action) {

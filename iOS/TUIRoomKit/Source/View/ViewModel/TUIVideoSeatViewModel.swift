@@ -115,7 +115,6 @@ class TUIVideoSeatViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRemoteUserEnterRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onSeatListChanged, observer: self)
         EngineEventCenter.shared.subscribeUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, responder: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserInfoChanged, observer: self)
@@ -129,7 +128,6 @@ class TUIVideoSeatViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserScreenCaptureStopped, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onRemoteUserEnterRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onSeatListChanged, observer: self)
         EngineEventCenter.shared.unsubscribeUIEvent(key: .TUIRoomKitService_DismissConferenceViewController, responder: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserInfoChanged, observer: self)
@@ -158,7 +156,7 @@ extension TUIVideoSeatViewModel {
             engineManager.setRemoteVideoView(userId: item.userId, streamType: item.videoStreamType, view: renderView)
             engineManager.startPlayRemoteVideo(userId: item.userId, streamType: item.videoStreamType)
         } else if item.hasVideoStream {
-            engineManager.setLocalVideoView(streamType: itemStreamType, view: renderView)
+            engineManager.setLocalVideoView(renderView)
         }
         guard let seatCell = viewResponder?.getVideoVisibleCell(item) else { return }
         seatCell.updateUI(item: item)
@@ -166,7 +164,7 @@ extension TUIVideoSeatViewModel {
     
     private func stopPlayVideo(item: VideoSeatItem) {
         if item.userId == currentUserId {
-            engineManager.setLocalVideoView(streamType: item.videoStreamType, view: nil)
+            engineManager.setLocalVideoView(nil)
         } else {
             engineManager.setRemoteVideoView(userId: item.userId, streamType: item.videoStreamType, view: nil)
             engineManager.stopPlayRemoteVideo(userId: item.userId, streamType: item.videoStreamType)
@@ -440,13 +438,6 @@ extension TUIVideoSeatViewModel: RoomEngineEventResponder {
         case .onRemoteUserLeaveRoom:
             guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
             removeSeatItem(userInfo.userId)
-        case .onUserRoleChanged:
-            guard let userId = param?["userId"] as? String else { return }
-            guard let userRole = param?["userRole"] as? TUIRole else { return }
-            engineManager.fetchRoomInfo(roomId: roomInfo.roomId) { [weak self] _ in
-                guard let self = self else { return }
-                self.changeUserRole(userId: userId, userRole: userRole)
-            }
         case .onSeatListChanged:
             guard let left = param?["left"] as? [TUISeatInfo] else { return }
             guard let seated = param?["seated"] as? [TUISeatInfo] else { return }
@@ -454,8 +445,14 @@ extension TUIVideoSeatViewModel: RoomEngineEventResponder {
         case .onUserInfoChanged:
             guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
             guard let modifyFlag = param?["modifyFlag"] as? TUIUserInfoModifyFlag else { return }
-            guard modifyFlag.contains(.nameCard) else { return }
-            changeUserName(userId: userInfo.userId, name: userInfo.nameCard)
+            if modifyFlag.contains(.nameCard) {
+                changeUserName(userId: userInfo.userId, name: userInfo.nameCard)
+            } else if modifyFlag.contains(.userRole) {
+                engineManager.fetchRoomInfo(roomId: roomInfo.roomId) { [weak self] _ in
+                    guard let self = self else { return }
+                    self.changeUserRole(userId: userInfo.userId, userRole: userInfo.userRole)
+                }
+            }
         default: break
         }
     }
@@ -493,7 +490,6 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
         if streamType == .cameraStream || streamType == .cameraStreamLow {
             seatItem.hasVideoStream = hasVideo
             if hasVideo {
-                setRemoteRenderParams(userId: userId, streamType: streamType)
                 startPlayVideo(item: seatItem, renderView: viewResponder?.getVideoVisibleCell(seatItem)?.renderView)
             } else {
                 stopPlayVideo(item: seatItem)
@@ -522,13 +518,6 @@ extension TUIVideoSeatViewModel: TUIRoomObserver {
         }
         speakerItem = nil
         viewResponder?.updateMiniscreen(nil)
-    }
-    
-    private func setRemoteRenderParams(userId: String, streamType: TUIVideoStreamType) {
-        let renderParams = TRTCRenderParams()
-        renderParams.fillMode = (streamType == .screenStream) ? .fit : .fill
-        let trtcStreamType: TRTCVideoStreamType = (streamType == .screenStream) ? .sub : .big
-        engineManager.setRemoteRenderParams(userId: userId, streamType: trtcStreamType, params: renderParams)
     }
     
     private func seatListChanged(seated: [TUISeatInfo], left: [TUISeatInfo]) {

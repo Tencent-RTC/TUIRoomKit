@@ -14,6 +14,7 @@ enum FloatChatActions {
     static let onMessageSended = ActionTemplate(id: key.appending(".messageSended"), payloadType: String.self)
     static let onMessageReceived = ActionTemplate(id: key.appending(".messageReceived"), payloadType: FloatChatMessage.self)
     static let setRoomId = ActionTemplate(id: key.appending(".setRoomId"), payloadType: String.self)
+    static let reportData = ActionTemplate(id: key.appending(".reportData"), payloadType: DataReport.self)
 }
 
 enum FloatViewActions {

@@ -170,6 +170,7 @@ class FloatChatInputController: UIViewController {
             operation.dispatch(action: ViewActions.showToast(payload: ToastInfo(message: .inputCannotBeEmpty, position: .center)))
         } else {
             store.dispatch(action: FloatChatActions.sendMessage(payload: inputTextView.normalText))
+            store.dispatch(action: FloatChatActions.reportData(payload: .metricsBarrageSendMessage))
         }
         hideInputView()
     }

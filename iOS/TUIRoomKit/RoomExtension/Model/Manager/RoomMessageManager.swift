@@ -59,7 +59,7 @@ class RoomMessageManager: NSObject {
                 let messageModel = RoomMessageModel()
                 messageModel.groupId = self.groupId
                 messageModel.roomId = roomId
-                messageModel.ownerName = TUILogin.getNickName() ?? ""
+                messageModel.ownerName = TUILogin.getNickName() ?? self.userId
                 messageModel.owner = self.userId
                 let messageDic = messageModel.getDictFromMessageModel()
                 guard let jsonString = messageDic.convertToString() else { return }

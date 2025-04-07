@@ -24,29 +24,6 @@
         }
       }
     },
-    "'s quick meeting" : {
-      "extractionState" : "migrated",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مؤتمر سريع"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "'s quick conference"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "的快速会议"
-          }
-        }
-      }
-    },
     "A member is currently sharing the screen, the member's sharing will be terminated after turning on" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1427,6 +1404,29 @@
         }
       }
     },
+    "Close" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يغلق"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "收起"
+          }
+        }
+      }
+    },
     "Conference has already started, and it cannot be modified!" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1956,29 +1956,6 @@
         }
       }
     },
-    "Drop" : {
-      "extractionState" : "migrated",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "وضع بعيدا"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drop"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收起"
-          }
-        }
-      }
-    },
     "Enable all video" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2002,6 +1979,29 @@
         }
       }
     },
+    "Enable audio when joining a meeting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تمكين الصوت عند الانضمام إلى اجتماع"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable audio when joining a meeting"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "入会开启音频"
+          }
+        }
+      }
+    },
     "Enable chat" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2021,6 +2021,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "解除禁言"
+          }
+        }
+      }
+    },
+    "Enable video when joining a meeting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تمكين الفيديو عند الانضمام إلى اجتماع"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable video when joining a meeting"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "入会开启视频"
           }
         }
       }
@@ -4451,19 +4474,19 @@
         }
       }
     },
-    "Quick meeting" : {
-      "extractionState" : "migrated",
+    "Quick conference" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "اجتماع سريع"
+            "value" : "مؤتمر سريع"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quick meeting"
+            "value" : "Quick conference"
           }
         },
         "zh-Hans" : {
@@ -6692,6 +6715,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "xx拒绝上台"
+          }
+        }
+      }
+    },
+    "xx's quick conference" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مؤتمر سريع لـxx"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "xx's quick conference"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "xx的快速会议"
           }
         }
       }

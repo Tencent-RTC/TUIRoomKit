@@ -61,6 +61,7 @@ class RoomVideoFloatView: UIView {
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
+        reportViewShow()
         isViewReady = true
     }
     
@@ -111,6 +112,10 @@ class RoomVideoFloatView: UIView {
         addGestureRecognizer(tap)
         viewModel.viewResponder = self
         viewModel.showFloatWindowViewVideo()
+    }
+    
+    private func reportViewShow() {
+        viewModel.reportFloatWindowShow()
     }
     
     @objc func didTap(sender: UIView) {

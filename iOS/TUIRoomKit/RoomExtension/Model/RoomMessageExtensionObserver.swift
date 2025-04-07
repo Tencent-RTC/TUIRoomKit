@@ -76,7 +76,7 @@ extension RoomMessageExtensionObserver: TUIExtensionProtocol {
 
 private extension String {
     static var meetingText: String {
-        localized("Quick meeting")
+        localized("Quick conference")
     }
     static var roomDeviceSetText: String {
         localized("Meeting Settings")

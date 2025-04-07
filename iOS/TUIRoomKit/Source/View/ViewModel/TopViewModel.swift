@@ -87,7 +87,7 @@ class TopViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onStartedRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onJoinedRoom, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onInitialRoomInfo, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.subscribeEngine(event: .onUserInfoChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onInitialSelfUserInfo, observer: self)
     }
     
@@ -97,7 +97,7 @@ class TopViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onStartedRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onJoinedRoom, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onInitialRoomInfo, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
+        EngineEventCenter.shared.unsubscribeEngine(event: .onUserInfoChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onInitialSelfUserInfo, observer: self)
     }
     
@@ -187,11 +187,11 @@ extension TopViewModel: RoomEngineEventResponder {
         case .onInitialRoomInfo:
             guard let roomInfo = param?["roomInfo"] as? TUIRoomInfo else { return }
             viewResponder?.updateMeetingNameLabel(roomInfo.name)
-        case .onUserRoleChanged:
+        case .onUserInfoChanged:
 #if RTCube_APPSTORE
-            guard let userId = param?["userId"] as? String else { return }
-            guard let userRole = param?["userRole"] as? TUIRole else { return }
-            handleUserRoleChanged(userId: userId, userRole: userRole)
+            guard let modifyFlag = param?["modifyFlag"] as? TUIUserInfoModifyFlag, modifyFlag.contains(.userRole) else { return }
+            guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
+            handleUserRoleChanged(userId: userInfo.userId, userRole: userInfo.userRole)
 #endif
             break
         case .onInitialSelfUserInfo:

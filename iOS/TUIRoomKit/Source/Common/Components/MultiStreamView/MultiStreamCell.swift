@@ -16,6 +16,8 @@ class MultiStreamCell: UICollectionViewCell {
     var isSupportedAmplification: Bool {
         return videoItem?.videoStreamType == .screenStream
     }
+    private var isBorderHighlighted = false
+    private var lastVolumeUpdateTime: TimeInterval = 0
     
     private lazy var scrollRenderView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -99,15 +101,10 @@ class MultiStreamCell: UICollectionViewCell {
         }
     }
     
-    @objc private func resetVolumeView() {
-        guard let videoItem = videoItem else { return }
-        userInfoView.updateUserVolume(hasAudio: videoItem.hasAudioStream, volume: 0)
-        scrollRenderView.layer.borderColor = UIColor.clear.cgColor
-    }
-    
     func reset() {
         videoItem = nil
         cancellableSet.removeAll()
+        resetBorderColor()
     }
     
     override func prepareForReuse() {
@@ -138,7 +135,7 @@ extension MultiStreamCell {
         avatarImageView.isHidden = item.videoStreamType == .screenStream ? true : item.hasVideoStream
         backgroundMaskView.isHidden = item.videoStreamType == .screenStream ? true : item.hasVideoStream
         userInfoView.updateUserStatus(item)
-        resetVolumeView()
+        scrollRenderView.layer.borderColor = UIColor.clear.cgColor
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             guard let self = self else { return }
             let width = min(self.mm_w / 2, 72)
@@ -155,19 +152,35 @@ extension MultiStreamCell {
         guard videoItem?.userId == item.userId else { return }
         videoItem?.hasAudioStream = item.hasAudioStream
         userInfoView.updateUserVolume(hasAudio: item.hasAudioStream, volume: item.userVoiceVolume)
+        
+        lastVolumeUpdateTime = Date().timeIntervalSince1970
+        
         if item.userVoiceVolume > 0 && item.hasAudioStream {
             if item.videoStreamType != .screenStream {
-                scrollRenderView.layer.borderColor = UIColor(0xA5FE33).cgColor
+                if !isBorderHighlighted {
+                    scrollRenderView.layer.borderColor = UIColor(0xA5FE33).cgColor
+                    isBorderHighlighted = true
+                }
+                scheduleBorderReset()
             }
         } else {
-            scrollRenderView.layer.borderColor = UIColor.clear.cgColor
+            resetBorderColor()
         }
-        resetVolume()
     }
     
-    func resetVolume() {
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(resetVolumeView), object: nil)
-        perform(#selector(resetVolumeView), with: nil, afterDelay: 1)
+    private func scheduleBorderReset() {
+         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+             guard let self = self else { return }
+             let now = Date().timeIntervalSince1970
+             if now - self.lastVolumeUpdateTime >= 2 {
+                 self.resetBorderColor()
+             }
+         }
+     }
+
+    private func resetBorderColor() {
+        scrollRenderView.layer.borderColor = UIColor.clear.cgColor
+        isBorderHighlighted = false
     }
 }
 
@@ -210,8 +223,8 @@ class VideoUserStatusView: UIView {
         return user
     }()
 
-    private let voiceVolumeImageView: UIImageView = {
-        let imageView = UIImageView()
+    private let voiceVolumeImageView: VolumeView = {
+        let imageView = VolumeView()
         return imageView
     }()
 
@@ -260,12 +273,8 @@ extension VideoUserStatusView {
     }
 
     func updateUserVolume(hasAudio: Bool, volume: Int) {
-        if hasAudio {
-            let volumeImageName = volume <= 0 ? "room_voice_volume1" : "room_voice_volume2"
-            voiceVolumeImageView.image = UIImage(named: volumeImageName, in: tuiRoomKitBundle(), compatibleWith: nil)
-        } else {
-            voiceVolumeImageView.image = UIImage(named: "room_mute_audio", in: tuiRoomKitBundle(), compatibleWith: nil)?.checkOverturn()
-        }
+        voiceVolumeImageView.updateVolume(CGFloat(volume))
+        voiceVolumeImageView.updateAudio(hasAudio)
     }
 }
 

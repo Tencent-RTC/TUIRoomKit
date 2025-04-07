@@ -11,7 +11,7 @@ import zlib
 
 /**
  * Tencent Cloud SDKAppID. Set it to the SDKAppID of your account.
- * You can view your `SDKAppID` after creating an application in the [IM console](https://console.cloud.tencent.com/avc).
+ * You can view your `SDKAppID` after creating an application in the [TRTC console](https://console.trtc.io/).
  * SDKAppID uniquely identifies a Tencent Cloud account.
  */
 let SDKAppID: Int = 0
@@ -25,12 +25,12 @@ let EXPIRETIME: Int = 604_800
 
 /**
  * Follow the steps below to obtain the key required for UserSig calculation.
- * Step 1. Log in to the [IM console](https://console.cloud.tencent.com/avc). If you don't have an application yet, create one.
+ * Step 1. Log in to the [TRTC console](https://console.trtc.io/). If you don't have an application yet, create one.
  * Step 2. Click your application and find “Basic Information”.
  * Step 3. Click “Display Key” to view the key used for UserSig calculation. Copy and paste the key to the variable below.
  * Note: This method is for testing only. Before commercial launch,
  * please migrate the UserSig calculation code and key to your backend server to prevent key disclosure and traffic stealing.
- * Documentation: https://cloud.tencent.com/document/product/269/32688#Server
+ * Documentation: https://trtc.io/document/35166
  */
 let SDKSecretKey = ""
 

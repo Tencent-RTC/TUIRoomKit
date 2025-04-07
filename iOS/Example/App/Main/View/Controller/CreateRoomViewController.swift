@@ -247,9 +247,6 @@ private extension String {
     static var raiseHandSpeakText: String {
         RoomDemoLocalize("On-stage Speech Conference")
     }
-    static var videoConferenceText: String {
-        RoomDemoLocalize("`s quick meeting")
-    }
     static var generatingRoomIdText: String {
         RoomDemoLocalize("Generating room number, please try again later")
     }

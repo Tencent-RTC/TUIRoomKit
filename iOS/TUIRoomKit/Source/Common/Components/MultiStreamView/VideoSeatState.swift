@@ -172,16 +172,40 @@ extension VideoStoreProvider: TUIRoomObserver {
         }
     }
     
-    func onUserRoleChanged(userInfo: TUIUserInfo) {
+    func onUserInfoChanged(userInfo: TUIUserInfo, modifyFlag: TUIUserInfoModifyFlag) {
+        if modifyFlag.contains(.nameCard) {
+            onUserNameCardChanged(userInfo: userInfo)
+        } else if modifyFlag.contains(.userRole) {
+            onUserRoleChanged(userInfo: userInfo)
+        }
+    }
+    
+    private func onUserRoleChanged(userInfo: TUIUserInfo) {
         if var item = videoState.videoSeatItems.first(where: { $0.userId == userInfo.userId }) {
             item.userRole = userInfo.userRole
             updateVideoItem(item: item)
+        }
+        if var offSeatItem = videoState.offSeatItems.first(where: { $0.userId == userInfo.userId }) {
+            offSeatItem.userRole = userInfo.userRole
+            store.dispatch(action: VideoActions.updateOffseatItem(payload: offSeatItem))
         }
         if var shareItem = videoState.shareItem, shareItem.userId == userInfo.userId {
             shareItem.userRole = userInfo.userRole
             updateShareItem(item: shareItem)
         }
     }
+    
+    private func onUserNameCardChanged(userInfo: TUIUserInfo) {
+        guard var item = videoState.videoSeatItems.first(where: { $0.userId == userInfo.userId }) else { return }
+        item.userName = userInfo.nameCard
+        updateVideoItem(item: item)
+        
+        if var shareItem = videoState.shareItem, shareItem.userId == userInfo.userId {
+            shareItem.userName = userInfo.nameCard
+            updateShareItem(item: shareItem)
+        }
+    }
+    
     
     func onSeatListChanged(seatList: [TUISeatInfo], seated seatedList: [TUISeatInfo], left leftList: [TUISeatInfo]) {
         updateLeftSeatList(leftList: leftList)
@@ -218,18 +242,6 @@ extension VideoStoreProvider: TUIRoomObserver {
                 addVideoItem(item: item)
             }
             removeOffSeatUser(userId: userId)
-        }
-    }
-    
-    func onUserInfoChanged(userInfo: TUIUserInfo, modifyFlag: TUIUserInfoModifyFlag) {
-        guard modifyFlag.contains(.nameCard) else { return }
-        guard var item = videoState.videoSeatItems.first(where: { $0.userId == userInfo.userId }) else { return }
-        item.userName = userInfo.nameCard
-        updateVideoItem(item: item)
-        
-        if var shareItem = videoState.shareItem, shareItem.userId == userInfo.userId {
-            shareItem.userName = userInfo.nameCard
-            updateShareItem(item: shareItem)
         }
     }
 }
@@ -320,6 +332,7 @@ enum VideoActions {
     static let removeOffSeatUser = ActionTemplate(id: key.appending(".removeOffSeatUser"), payloadType: String.self)
     
     static let updateVideoItem = ActionTemplate(id: key.appending(".updateVideoItem"), payloadType: UserInfo.self)
+    static let updateOffseatItem = ActionTemplate(id: key.appending(".updateOffseatItem"), payloadType: UserInfo.self)
     static let updateShareItem = ActionTemplate(id: key.appending(".updateShareItem"), payloadType: UserInfo?.self)
     static let updateSpeakerItem = ActionTemplate(id: key.appending(".updateSpeakerItem"), payloadType: UserInfo?.self)
     static let updateIsSelfScreenSharing = ActionTemplate(id: key.appending(".updateIsSelfScreenSharing"), payloadType: Bool.self)
@@ -358,6 +371,12 @@ let VideoStateUpdater = Reducer<VideoSeatState> (
         let item = action.payload
         if let index = state.videoSeatItems.firstIndex(where: { $0.userId == item.userId }) {
             state.videoSeatItems[index] = item
+        }
+    }),
+    ReduceOn(VideoActions.updateOffseatItem, reduce: { state, action in
+        let item = action.payload
+        if let index = state.offSeatItems.firstIndex(where: { $0.userId == item.userId }) {
+            state.offSeatItems[index] = item
         }
     }),
     ReduceOn(VideoActions.updateShareItem, reduce: { state, action in

@@ -27,6 +27,8 @@ class WaterMarkLayer: CALayer {
     private var textMinOffset: CGFloat {
         return lineStyle == .multiLine ? 2 : 4
     }
+    private var portraitImageSize: CGSize = .zero
+    private var landscapeImageSize: CGSize = .zero
     
     override init() {
         super.init()
@@ -48,7 +50,7 @@ class WaterMarkLayer: CALayer {
         ctx.scaleBy(x: 1.0, y: -1.0)
         ctx.translateBy(x: -rect.origin.x, y: -rect.origin.y)
         let waterMarkFullSize = CGSize(width: CGFloat(ctx.width) + offset * 2, height: CGFloat(ctx.height) + offset * 2)
-        guard let image = getWaterMarkImage(isLandScape: isLandscape, andFullSize: waterMarkFullSize)?.cgImage
+        guard let image = getWaterMarkImage(isLandscape: isLandscape, andFullSize: waterMarkFullSize)?.cgImage
         else { return }
         ctx.draw(image, in: CGRect(origin: CGPoint(x: -offset, y: -offset), size: waterMarkFullSize))
     }
@@ -60,14 +62,18 @@ class WaterMarkLayer: CALayer {
         setNeedsDisplay()
     }
     
-    private func getWaterMarkImage(isLandScape: Bool, andFullSize fsize: CGSize) -> UIImage? {
+    private func getWaterMarkImage(isLandscape: Bool, andFullSize fsize: CGSize) -> UIImage? {
         var image: UIImage?
         if isLandscape {
-            image = landscapeImage != nil ? landscapeImage : createWatermarkImage(Text: text, andFullSize: fsize)
+            let isCreatedLandscapeImage = landscapeImage == nil || landscapeImageSize != fsize
+            image = isCreatedLandscapeImage ? createWatermarkImage(Text: text, andFullSize: fsize) : landscapeImage
             landscapeImage = image
+            landscapeImageSize = fsize
         } else {
-            image = portraitImage != nil ? portraitImage : createWatermarkImage(Text: text, andFullSize: fsize)
+            let isCreatedPortraitImage = portraitImage == nil || portraitImageSize != fsize
+            image = isCreatedPortraitImage ? createWatermarkImage(Text: text, andFullSize: fsize) : portraitImage
             portraitImage = image
+            portraitImageSize = fsize
         }
         return image
     }

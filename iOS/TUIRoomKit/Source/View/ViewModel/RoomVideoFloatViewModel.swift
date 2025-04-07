@@ -50,7 +50,6 @@ class RoomVideoFloatViewModel: NSObject {
         EngineEventCenter.shared.subscribeEngine(event: .onUserVoiceVolumeChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onKickedOffLine, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
-        EngineEventCenter.shared.subscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.subscribeEngine(event: .onUserInfoChanged, observer: self)
     }
     
@@ -62,7 +61,6 @@ class RoomVideoFloatViewModel: NSObject {
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserVoiceVolumeChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onKickedOffLine, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onRemoteUserLeaveRoom, observer: self)
-        EngineEventCenter.shared.unsubscribeEngine(event: .onUserRoleChanged, observer: self)
         EngineEventCenter.shared.unsubscribeEngine(event: .onUserInfoChanged, observer: self)
     }
     
@@ -99,6 +97,10 @@ class RoomVideoFloatViewModel: NSObject {
     @objc private func dismissFloatViewForLogout() {
         RoomVideoFloatView.dismiss()
         RoomRouter.makeToastInWindow(toast: .logoutText, duration: 0.5)
+    }
+    
+    func reportFloatWindowShow() {
+        RoomKitReport.reportData(.metricsFloatWindowShow)
     }
     
     deinit {
@@ -210,7 +212,7 @@ extension RoomVideoFloatViewModel {
     
     private func startPlayVideo(userId: String, streamType: TUIVideoStreamType) {
         if userId == currentUser.userId {
-            engineManager.setLocalVideoView(streamType: streamType, view: viewResponder?.getRenderView())
+            engineManager.setLocalVideoView(viewResponder?.getRenderView())
         } else {
             engineManager.setRemoteVideoView(userId: userId, streamType: streamType, view: viewResponder?.getRenderView())
             engineManager.startPlayRemoteVideo(userId: userId, streamType: streamType)
@@ -220,7 +222,7 @@ extension RoomVideoFloatViewModel {
     
     private func stopPlayVideo(userId: String, streamType: TUIVideoStreamType) {
         if userId == currentUser.userId {
-            engineManager.setLocalVideoView(streamType: streamType, view: nil)
+            engineManager.setLocalVideoView(nil)
             return
         }
         engineManager.setRemoteVideoView(userId: userId, streamType: streamType, view: nil)
@@ -262,15 +264,16 @@ extension RoomVideoFloatViewModel: RoomEngineEventResponder {
         case .onRemoteUserLeaveRoom :
             guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
             handleRemoteUserLeaveRoom(useInfo: userInfo)
-        case .onUserRoleChanged:
-            guard let userId = param?["userId"] as? String else { return }
-            guard let userRole = param?["userRole"] as? TUIRole else { return }
-            handleUserRoleChanged(userId: userId, userRole: userRole)
         case .onUserInfoChanged:
-            guard let userInfo = param?["userInfo"] as? TUIUserInfo, userInfo.userId == displayUserId else { return }
-            guard let modifyFlag = param?["modifyFlag"] as? TUIUserInfoModifyFlag, modifyFlag.contains(.nameCard) else { return }
-            guard let userItem = getUserEntity(userId: displayUserId) else { return }
-            viewResponder?.updateUserStatus(user: userItem)
+            guard let userInfo = param?["userInfo"] as? TUIUserInfo else { return }
+            guard let modifyFlag = param?["modifyFlag"] as? TUIUserInfoModifyFlag else { return }
+            if modifyFlag.contains(.nameCard) {
+                guard userInfo.userId == displayUserId else { return }
+                guard let userItem = getUserEntity(userId: displayUserId) else { return }
+                viewResponder?.updateUserStatus(user: userItem)
+            } else if modifyFlag.contains(.userRole) {
+                handleUserRoleChanged(userId: userInfo.userId, userRole: userInfo.userRole)
+            }
         default: break
         }
     }

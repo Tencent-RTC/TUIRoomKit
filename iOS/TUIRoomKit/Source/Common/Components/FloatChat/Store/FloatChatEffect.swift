@@ -18,4 +18,12 @@ class FloatChatEffect: Effects {
             }
             .eraseToAnyPublisher()
     }
+    
+    let reportData = Effect<Environment>.nonDispatching { actions, environment in
+        actions
+            .wasCreated(from: FloatChatActions.reportData)
+            .sink { action in
+                RoomKitReport.reportData(action.payload)
+            }
+    }
 }

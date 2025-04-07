@@ -208,6 +208,7 @@ class UserListView: UIView {
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
+        reportViewShow()
     }
     
     func constructViewHierarchy() {
@@ -296,6 +297,10 @@ class UserListView: UIView {
         searchControl.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    private func reportViewShow() {
+        viewModel.reportUserListPanelShow()
     }
     
     private func setupUserListTableView() {
@@ -519,6 +524,11 @@ extension UserListView: UISearchBarDelegate {
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
         searchControl.isHidden = false
+        return true
+    }
+    
+    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
+        viewModel.reportUserListSearch()
         return true
     }
 }

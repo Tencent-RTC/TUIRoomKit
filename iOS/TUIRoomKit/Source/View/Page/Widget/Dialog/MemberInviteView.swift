@@ -63,6 +63,7 @@ class MemberInviteView: UIView {
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
+        reportViewShow()
         isViewReady = true
     }
     
@@ -118,6 +119,10 @@ class MemberInviteView: UIView {
         backgroundColor = UIColor(0x1B1E26)
         viewModel.viewResponder = self
         copyButton.addTarget(self, action: #selector(copyAction(sender:)), for: .touchUpInside)
+    }
+    
+    private func reportViewShow() {
+        viewModel.reportMemberInvitePanelShow()
     }
     
     @objc func copyAction(sender: UIButton) {

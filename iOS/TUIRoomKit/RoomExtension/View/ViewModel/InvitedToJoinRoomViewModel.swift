@@ -60,7 +60,12 @@ class InvitedToJoinRoomViewModel: NSObject, AVAudioPlayerDelegate {
     }
     
     private func enterRoom() {
-        roomManager.enterRoom(roomId: roomId)
+        roomManager.enterRoom(roomId: roomId) {_ in
+            let vc = ConferenceMainViewController()
+            RoomRouter.shared.push(viewController: vc)
+        } onError: { code, message in
+            RoomRouter.makeToast(toast: code.description ?? message)
+        }
         closeInvitedToJoinRoomView()
     }
     

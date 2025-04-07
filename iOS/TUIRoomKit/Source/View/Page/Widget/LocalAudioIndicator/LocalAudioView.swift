@@ -6,31 +6,37 @@
 //
 
 import Foundation
+import Factory
+import Combine
 
 class LocalAudioView: UIView {
-    let viewModel: LocalAudioViewModel
-    lazy var muteAudioButton : UIButton = {
+    @Injected(\.localAudioStore) var localAudioStore: LocalAudioStore
+    private var cancellables = Set<AnyCancellable>()
+    let muteAudioButton : UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "room_mic_on", in: tuiRoomKitBundle(), compatibleWith: nil), for: .normal)
-        button.setImage(UIImage(named: "room_mic_off", in: tuiRoomKitBundle(), compatibleWith: nil), for: .selected)
-        button.isSelected = viewModel.checkMuteAudioSelectedState()
         button.backgroundColor = UIColor(0x2A2D38)
         button.layer.cornerRadius = 12
         return button
     }()
     
-    init(viewModel: LocalAudioViewModel) {
-        self.viewModel = viewModel
+    let volumeView : VolumeView = {
+        let volumeView = VolumeView()
+        volumeView.micTopImageLayer.borderWidth = 1.7
+        volumeView.micTopImageLayer.borderColor = UIColor(0xD5E0F2).cgColor
+        volumeView.micTopImageLayer.backgroundColor = UIColor.clear.cgColor
+        volumeView.micTopImageLayer.cornerRadius = 5
+        volumeView.muteImageLayer.contents = UIImage(named: "room_mute_audio1", in: tuiRoomKitBundle(), compatibleWith: nil)?.cgImage
+        volumeView.isUserInteractionEnabled = false
+        return volumeView
+    }()
+    
+    init() {
         super.init(frame: .zero)
         self.transform = CGAffineTransform(translationX: 0, y: kScreenHeight)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        debugPrint("deinit:\(self)")
     }
     
     // MARK: - view layout
@@ -46,21 +52,58 @@ class LocalAudioView: UIView {
     
     private func constructViewHierarchy() {
         addSubview(muteAudioButton)
+        muteAudioButton.addSubview(volumeView)
     }
     
     private func activateConstraints() {
         muteAudioButton.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        volumeView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.height.equalTo(24)
+        }
     }
     
     private func bindInteraction() {
-        viewModel.viewResponder = self
         muteAudioButton.addTarget(self, action: #selector(muteAudioAction(sender:)), for: .touchUpInside)
+        subscribeSubject()
+    }
+    
+    private func subscribeSubject() {
+        localAudioStore.subscribe(Selector(keyPath: \LocalAudioState.volume))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] volume in
+                guard let self = self else { return }
+                self.volumeView.updateVolume(CGFloat(volume))
+            }
+            .store(in: &cancellables)
+        localAudioStore.subscribe(Selector(keyPath: \LocalAudioState.hasAudio))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] hasAudio in
+                guard let self = self else { return }
+                self.muteAudioButton.isSelected = !hasAudio
+                self.volumeView.updateAudio(hasAudio)
+            }
+            .store(in: &cancellables)
+        localAudioStore.subscribe(Selector(keyPath: \LocalAudioState.isHidden))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isHidden in
+                guard let self = self else { return }
+                self.isHidden = isHidden
+            }
+            .store(in: &cancellables)
     }
     
     @objc func muteAudioAction(sender: UIButton) {
-        viewModel.muteAudioAction()
+        if localAudioStore.localAudioState.hasAudio {
+            localAudioStore.muteLocalAudio()
+        } else {
+            localAudioStore.unmuteLocalAudio()
+        }
     }
     
     func show() {
@@ -74,13 +117,8 @@ class LocalAudioView: UIView {
     func hide() {
         self.transform = CGAffineTransform(translationX: 0, y: kScreenHeight)
     }
-}
-
-extension LocalAudioView: LocalAudioViewModelResponder {
-    func updateMuteAudioButton(isSelected: Bool) {
-        muteAudioButton.isSelected = isSelected
-    }
-    func makeToast(text: String) {
-        RoomRouter.makeToastInCenter(toast: text, duration: 1)
+    
+    deinit {
+        debugPrint("deinit:\(self)")
     }
 }

@@ -22,8 +22,8 @@ enum ConferenceInvitationActions {
     // MARK: callback
     static let updateInvitationList = ActionTemplate(id: key.appending(".setInvitationList"), payloadType: [TUIInvitation].self)
     static let addInvitation = ActionTemplate(id: key.appending(".addInvitation"), payloadType: TUIInvitation.self)
-    static let removeInvitation = ActionTemplate(id: key.appending(".addInvitation"), payloadType: String.self)
-    static let changeInvitationStatus = ActionTemplate(id: key.appending(".addInvitation"), payloadType: TUIInvitation.self)
+    static let removeInvitation = ActionTemplate(id: key.appending(".removeInvitation"), payloadType: String.self)
+    static let changeInvitationStatus = ActionTemplate(id: key.appending(".changeInvitationStatus"), payloadType: TUIInvitation.self)
     static let onInviteSuccess = ActionTemplate(id: key.appending("onInviteSuccess"))
     static let onAcceptSuccess = ActionTemplate(id: key.appending("onAcceptSuccess"), payloadType: String.self)
     static let onRejectSuccess = ActionTemplate(id: key.appending("onRejectSuccess"))
