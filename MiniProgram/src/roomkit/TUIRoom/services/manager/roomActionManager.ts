@@ -20,6 +20,9 @@ smallParam.videoResolution = TRTCVideoResolution.TRTCVideoResolution_640_360;
 smallParam.videoFps = 10;
 smallParam.videoBitrate = 550;
 
+export enum FetchRoomInfoErrorCode {
+  ROOM_NOT_EXIST = -2100,
+}
 export interface DeviceParams {
   isOpenCamera?: boolean;
   isOpenMicrophone?: boolean;
