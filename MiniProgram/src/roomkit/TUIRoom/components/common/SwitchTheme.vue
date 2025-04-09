@@ -21,11 +21,11 @@
         <span>{{ t('Theme Colours') }}</span>
         <div class="color-blocks two-blocks">
           <div
-            :class="['color-block black', { active: currentTheme === 'dark' }]"
+            class="color-block black"
             @click="toggleCustomTheme('dark')"
           ></div>
           <div
-            :class="['color-block white', { active: currentTheme === 'light' }]"
+            class="color-block white"
             @click="toggleCustomTheme('light')"
           ></div>
         </div>
@@ -34,31 +34,16 @@
         <span>{{ t('Custom Themes') }}</span>
         <div class="color-blocks four-blocks">
           <div
-            :class="[
-              'color-block theme',
-              { active: currentCustomTheme === 'theme' },
-            ]"
+            class="color-block theme"
             @click="toggleCustomTheme('theme')"
           ></div>
           <div
-            :class="[
-              'color-block green',
-              { active: currentCustomTheme === 'green' },
-            ]"
+            class="color-block green"
             @click="toggleCustomTheme('green')"
           ></div>
+          <div class="color-block red" @click="toggleCustomTheme('red')"></div>
           <div
-            :class="[
-              'color-block red',
-              { active: currentCustomTheme === 'red' },
-            ]"
-            @click="toggleCustomTheme('red')"
-          ></div>
-          <div
-            :class="[
-              'color-block orange',
-              { active: currentCustomTheme === 'orange' },
-            ]"
+            class="color-block orange"
             @click="toggleCustomTheme('orange')"
           ></div>
         </div>
@@ -68,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { withDefaults, defineProps, ref, computed } from 'vue';
+import { withDefaults, defineProps, ref } from 'vue';
 import IconButton from './base/IconButton.vue';
 import SwitchThemeIcon from '../../assets/icons/SwitchThemeIcon.svg';
 import { IconButtonLayout } from '../../constants/room';
@@ -84,8 +69,6 @@ const basicStore = useBasicStore();
 const { theme, setTheme } = useUIKit();
 const isShowThemeColorContainer = ref(false);
 const switchThemeConfig = roomService.getComponentConfig('SwitchTheme');
-const currentCustomTheme = ref('theme');
-const currentTheme = computed(() => theme.value || basicStore.defaultTheme);
 
 interface Props {
   visible?: boolean;
@@ -100,8 +83,14 @@ function handleSwitchTheme() {
     isShowThemeColorContainer.value = !isShowThemeColorContainer.value;
     return;
   }
-  const newTheme = currentTheme.value === 'light' ? 'dark' : 'light';
-  theme.value ? setTheme(newTheme) : roomService.setTheme(newTheme);
+  const currentTheme = theme.value || basicStore.defaultTheme;
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+  if (theme.value) {
+    setTheme(newTheme);
+  } else {
+    roomService.setTheme(newTheme);
+  }
 }
 
 function toggleCustomTheme(newTheme: string) {
@@ -115,10 +104,6 @@ function toggleCustomTheme(newTheme: string) {
     ? newTheme
     : { themeStyle: theme.value, primaryColor: newTheme };
   setTheme(themeConfig);
-
-  if (!isBaseTheme) {
-    currentCustomTheme.value = newTheme;
-  }
 }
 
 function handleClickOutSide() {
@@ -167,44 +152,23 @@ function handleClickOutSide() {
       .color-block {
         cursor: pointer;
         border-radius: 6px;
-        &.active {
-          outline-offset: 2px;
-        }
         &.black {
           background-color: var(--uikit-color-black-1);
-          &.active {
-            outline: 1px solid var(--uikit-color-theme-6);
-          }
         }
         &.white {
           background-color: var(--uikit-color-white-1);
-          &.active {
-            outline: 1px solid var(--uikit-color-theme-6);
-          }
         }
         &.red {
           background-color: var(--uikit-color-red-6);
-          &.active {
-            outline: 1px solid var(--uikit-color-red-6);
-          }
         }
         &.green {
           background-color: var(--uikit-color-green-6);
-          &.active {
-            outline: 1px solid var(--uikit-color-green-6);
-          }
         }
         &.orange {
           background-color: var(--uikit-color-orange-6);
-          &.active {
-            outline: 1px solid var(--uikit-color-orange-6);
-          }
         }
         &.theme {
           background-color: var(--uikit-color-theme-6);
-          &.active {
-            outline: 1px solid var(--uikit-color-theme-6);
-          }
         }
       }
     }
