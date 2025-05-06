@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tencent_conference_uikit/common/index.dart';
 import 'package:tencent_conference_uikit/common/store/float_window_store.dart';
 import 'package:tencent_conference_uikit/common/store/index.dart';
 import 'package:tencent_conference_uikit/common/style/colors.dart';
@@ -50,8 +51,10 @@ class FloatWindowWidget extends GetView<FloatWindowController> {
                   child: Obx(
                     () => VideoItemWidget(
                       radius: 0,
-                      userModel:
-                          FloatWindowStore.to.currentFloatWindowUserModel.value,
+                      userModel: Get.isRegistered<FloatWindowStore>()
+                          ? FloatWindowStore
+                              .to.currentFloatWindowUserModel.value
+                          : UserModel(),
                       isScreenStream: RoomStore.to.isSharing.value &&
                           !controller.isCurrentUser(),
                     ),
@@ -68,6 +71,7 @@ class FloatWindowWidget extends GetView<FloatWindowController> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<FloatWindowController>(
+      autoRemove: false,
       init: FloatWindowController(left, top, onFloatWindowTap),
       builder: (_) {
         return _buildFloatWidget();

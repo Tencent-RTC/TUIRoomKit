@@ -1,5 +1,11 @@
 ## Changelog
 
+### 3.0.0(2025-04-15)
+
+- Fixed the issue of error when using rtc_room_engine version 2.9 or above.
+- Fixed the issue of abnormal status in the room when entering the room.
+- Upgraded rtc_room_engine dependencies.
+
 ### 2.8.4(2025-01-16)
 - Fixed the issue where the member count is displayed abnormally when there are a large number of user in the conference.
 - Fixed the issue that when there are a large number of user in the conference, the user on the seat cannot be seen after entering the room.

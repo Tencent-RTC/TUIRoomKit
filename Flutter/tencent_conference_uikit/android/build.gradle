@@ -1,5 +1,6 @@
 group 'com.tencent.cloud.tuikit.flutter.rtcconferencetuikit'
 version '1.0'
+import org.gradle.util.VersionNumber
 
 //获取local.properties配置文件
 def localProperties = new Properties()
@@ -23,7 +24,14 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
+        VersionNumber currentGradleVersion = VersionNumber.parse(gradle.gradleVersion)
+        if (currentGradleVersion.major >= 8) {
+            classpath 'com.android.tools.build:gradle:8.0.2'
+            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0"
+        } else {
+            classpath 'com.android.tools.build:gradle:4.2.1'
+            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
+        }
     }
 }
 

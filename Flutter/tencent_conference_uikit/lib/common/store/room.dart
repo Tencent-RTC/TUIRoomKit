@@ -198,11 +198,16 @@ class RoomStore {
     }
   }
 
-  void updateUserSeatedState(String userId, bool isOnSeat) {
+  void updateUserSeatedState(String userId, bool isOnSeat,
+      {TUIUserInfo? fallbackUserInfo}) {
     var index = getUserIndex(userId, userInfoList);
+
     if (index == -1) {
-      return;
+      if (fallbackUserInfo == null) return;
+      addUser(fallbackUserInfo, userInfoList);
+      index = getUserIndex(userId, userInfoList);
     }
+
     userInfoList[index].isOnSeat.value = isOnSeat;
 
     if (userId == currentUser.userId.value) {

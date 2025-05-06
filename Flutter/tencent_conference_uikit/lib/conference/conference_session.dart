@@ -132,17 +132,17 @@ class ConferenceSession {
 
   Future<void> _quickStartInternal(TUIRoomInfo roomInfo, bool openAudio,
       bool openVideo, bool isSoundOnSpeaker) async {
-    var createRoomResult = await RoomEngineManager().createRoom(roomInfo);
+    var engineManger = RoomEngineManager();
+    if (RoomStore.to.isEnteredRoom &&
+        RoomStore.to.roomInfo.roomId != roomInfo.roomId) {
+      _onActionError?.call(ConferenceError.errFailed,
+          "You are currently in a conference,exit before joining a new one");
+      return;
+    }
+    var createRoomResult = await engineManger.createRoom(roomInfo);
     if (createRoomResult.code == TUIError.success) {
-      var enterRoomResult = await RoomEngineManager()
-          .enterRoom(roomInfo.roomId, openAudio, openVideo, isSoundOnSpeaker);
-      if (enterRoomResult.code == TUIError.success) {
-        _onActionSuccess?.call();
-      } else {
-        _onActionError?.call(
-            ConferenceErrorExt.fromValue(enterRoomResult.code.value()),
-            enterRoomResult.message ?? "");
-      }
+      await _joinInternal(
+          roomInfo.roomId, openAudio, openVideo, isSoundOnSpeaker);
     } else {
       _onActionError?.call(
           ConferenceErrorExt.fromValue(createRoomResult.code.value()),
@@ -152,8 +152,17 @@ class ConferenceSession {
 
   Future<void> _joinInternal(String roomId, bool openAudio, bool openVideo,
       bool isSoundOnSpeaker) async {
-    var result = await RoomEngineManager()
-        .enterRoom(roomId, openAudio, openVideo, isSoundOnSpeaker);
+    var engineManger = RoomEngineManager();
+    if (RoomStore.to.isEnteredRoom) {
+      if (RoomStore.to.roomInfo.roomId == roomId) {
+        _onActionSuccess?.call();
+      } else {
+        _onActionError?.call(ConferenceError.errFailed,
+            "You are currently in a conference,exit before joining a new one");
+      }
+    }
+    var result = await engineManger.enterRoom(
+        roomId, openAudio, openVideo, isSoundOnSpeaker);
     if (result.code == TUIError.success) {
       _onActionSuccess?.call();
     } else {
