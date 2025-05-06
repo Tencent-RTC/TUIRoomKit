@@ -5,6 +5,7 @@ import 'package:rtc_room_engine/rtc_room_engine.dart';
 class RoomEventHandler extends TUIRoomObserver {
   final int volumeCanHeardMinLimit = 10;
   final _store = RoomStore.to;
+
   RoomEventHandler() {
     super.onAllUserMicrophoneDisableChanged = (roomId, isDisable) {
       _store.roomInfo.isMicrophoneDisableForAllUser = isDisable;
@@ -148,12 +149,13 @@ class RoomEventHandler extends TUIRoomObserver {
 
     super.onSeatListChanged = (seatList, seatedList, leftList) async {
       for (var element in seatedList) {
-        _store.updateUserSeatedState(element.userId, true);
         var result = await RoomEngineManager()
             .getRoomEngine()
             .getUserInfo(element.userId);
         if (result.code == TUIError.success) {
           _store.addUser(result.data!, RoomStore.to.seatedUserList);
+          _store.updateUserSeatedState(element.userId, true,
+              fallbackUserInfo: result.data!);
         }
       }
       for (var element in leftList) {

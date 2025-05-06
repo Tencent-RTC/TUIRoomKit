@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import com.tencent.cloud.tuikit.engine.room.internal.utils.JObjectHelper;
+import com.tencent.cloud.tuikit.engine.impl.utils.JObjectHelper;
 import com.tencent.cloud.tuikit.flutter.rtcconferencetuikit.R;
 import com.tencent.qcloud.tuicore.permission.PermissionRequester;
 import com.tencent.qcloud.tuicore.util.ScreenUtil;

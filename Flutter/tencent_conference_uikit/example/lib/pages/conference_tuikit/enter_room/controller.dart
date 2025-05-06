@@ -4,7 +4,7 @@ import 'package:room_flutter_example/common/store/user.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message.dart';
 import 'package:tencent_conference_uikit/common/widgets/toast.dart';
 import 'package:tencent_conference_uikit/tencent_conference_uikit.dart';
-import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_message_options.dart';
+import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_message_options.dart';
 
 class EnterRoomController extends GetxController {
   EnterRoomController();

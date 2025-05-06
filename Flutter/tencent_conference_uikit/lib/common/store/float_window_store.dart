@@ -39,11 +39,12 @@ class FloatWindowStore extends GetxController {
 
   @override
   void onClose() {
-    super.onClose();
     RoomEngineManager().removeObserver(_observer);
     _maxVolumeUserIdChangedWorker.dispose();
     _isSharingWorker.dispose();
     _floatUserInfoChangedWorker.dispose();
+    dismissFloatWindow();
+    super.onClose();
   }
 
   Future<bool> showFloatWindow() async {
@@ -71,13 +72,14 @@ class FloatWindowStore extends GetxController {
       RtcConferenceTuikitPlatform.instance.enableFloatWindow(false);
     } else if (Platform.isIOS) {
       overlayEntry?.remove();
+      overlayEntry?.dispose();
       overlayEntry = null;
     }
     onFloatWindowClose();
   }
 
   onFloatWindowClose() {
-    Get.delete<FloatWindowStore>();
+    Get.delete<FloatWindowStore>(force: true);
   }
 
   void _initWorker() {
@@ -117,9 +119,6 @@ class FloatWindowStore extends GetxController {
       if (RoomStore.to.userInfoList[i].userRole.value == TUIRole.roomOwner) {
         ownerIndex = i;
       }
-    }
-    if (ownerIndex == -1) {
-      return;
     }
     currentFloatWindowUserModel.value = fistTalkingUserIndex == -1
         ? RoomStore.to.userInfoList[ownerIndex]

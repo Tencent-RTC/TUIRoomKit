@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_conference_uikit/common/index.dart';
+import 'package:tencent_conference_uikit/common/store/float_window_store.dart';
 import 'package:tencent_conference_uikit/conference/conference_error.dart';
 import 'package:tencent_conference_uikit/conference/conference_observer.dart';
 import 'package:tencent_conference_uikit/conference/conference_params.dart';
@@ -109,6 +110,9 @@ class ConferenceMainController extends GetxController {
     if (isEnteredRoom.value) {
       resetHideTimer();
       _hideDuration = 3;
+    }
+    if (Get.isRegistered<FloatWindowStore>()) {
+      FloatWindowStore.to.dismissFloatWindow();
     }
     super.onReady();
   }

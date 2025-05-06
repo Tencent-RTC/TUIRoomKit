@@ -102,7 +102,8 @@ class UserListController extends GetxController {
     if (value.isNotEmpty) {
       List<UserModel> results = RoomStore.to.userInfoList
           .where((user) =>
-              user.userName.toLowerCase().contains(value.toLowerCase()))
+      user.userName.toLowerCase().contains(value.toLowerCase()) ||
+          user.userId.value.toLowerCase().contains(value.toLowerCase()))
           .toList();
       searchResults.assignAll(results);
       isSearchBarEmpty.value = false;
