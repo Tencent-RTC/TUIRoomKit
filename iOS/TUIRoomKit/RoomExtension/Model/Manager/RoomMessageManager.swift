@@ -64,7 +64,7 @@ class RoomMessageManager: NSObject {
                 let messageDic = messageModel.getDictFromMessageModel()
                 guard let jsonString = messageDic.convertToString() else { return }
                 let jsonData = jsonString.data(using: String.Encoding.utf8)
-                let message = V2TIMManager.sharedInstance().createCustomMessage(jsonData)
+                let message = V2TIMManager.sharedInstance().createCustomMessage(data: jsonData)
                 message?.supportMessageExtension = true
                 let param = [TUICore_TUIChatService_SendMessageMethod_MsgKey: message]
                 TUICore.callService(TUICore_TUIChatService, method: TUICore_TUIChatService_SendMessageMethod, param: param as [AnyHashable : Any])
@@ -78,7 +78,7 @@ class RoomMessageManager: NSObject {
             self.modifyMessage(message: message, dic: dic)
             return
         }
-        V2TIMManager.sharedInstance().findMessages([message.messageId]) { [weak self] messageArray in
+        V2TIMManager.sharedInstance().findMessages(messageIDList: [message.messageId]) { [weak self] messageArray in
             guard let self = self else { return }
             guard let array = messageArray else { return }
             for previousMessage in array where previousMessage.msgID == message.messageId {
@@ -92,14 +92,14 @@ class RoomMessageManager: NSObject {
     
     private func modifyMessage(message: RoomMessageModel, dic:[String: Any]) {
         guard let message = message.getMessage() else { return }
-        guard var customElemDic = TUITool.jsonData2Dictionary(message.customElem.data) as? [String: Any] else { return }
+        guard var customElemDic = TUITool.jsonData2Dictionary(message.customElem?.data) as? [String: Any] else { return }
         for (key, value) in dic {
             customElemDic[key] = value
         }
         guard let jsonString = customElemDic.convertToString() else { return }
         let jsonData = jsonString.data(using: String.Encoding.utf8)
-        message.customElem.data = jsonData
-        V2TIMManager.sharedInstance().modifyMessage(message) { code, desc, msg in
+        message.customElem?.data = jsonData
+        V2TIMManager.sharedInstance().modifyMessage(msg: message) { code, desc, msg in
             if code == 0 {
                 debugPrint("modifyMessage,success")
             } else {

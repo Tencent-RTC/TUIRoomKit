@@ -62,7 +62,7 @@ class RoomMessageModel {
     private func setMessageCustomElemData(dict: [String: Any], message: V2TIMMessage) {
         guard let jsonString = dict.convertToString() else { return }
         let jsonData = jsonString.data(using: String.Encoding.utf8)
-        message.customElem.data = jsonData
+        message.customElem?.data = jsonData
     }
     
     func getDictFromMessageModel() -> [String: Any] {

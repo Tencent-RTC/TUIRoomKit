@@ -33,7 +33,7 @@ class TUIRoomImAccessService: NSObject, TUIServiceProtocol  {
 }
 
 extension TUIRoomImAccessService: V2TIMSignalingListener {
-    func onReceiveNewInvitation(_ inviteID: String, inviter: String, groupID: String, inviteeList: [String], data: String?) {
+    func onReceiveNewInvitation(inviteID: String, inviter: String?, groupID: String?, inviteeList: [String], data: String?) {
         guard let data = data else { return }
         let dict = data.convertToDic()
         guard let businessID = dict?["businessID"] as? String else { return }

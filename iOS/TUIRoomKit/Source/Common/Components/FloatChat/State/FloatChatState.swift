@@ -42,14 +42,14 @@ struct FloatChatMessage: Codable, Equatable {
         switch msg.elemType {
         case .ELEM_TYPE_TEXT:
             self.type = .text
-            self.content = msg.textElem.text
+            self.content = msg.textElem?.text ?? ""
         case .ELEM_TYPE_IMAGE:
             self.type = .image
         case .ELEM_TYPE_VIDEO:
             self.type = .video
         case .ELEM_TYPE_FILE:
             self.type = .file
-            self.fileName = msg.fileElem.filename
+            self.fileName = msg.fileElem?.filename ?? ""
         default: break
         }
     }

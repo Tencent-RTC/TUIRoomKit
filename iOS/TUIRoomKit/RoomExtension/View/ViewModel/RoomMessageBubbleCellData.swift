@@ -31,7 +31,7 @@ class RoomMessageBubbleCellData: TUIBubbleMessageCellData {
     override class func getDisplayString(_ message: V2TIMMessage) -> String {
         let businessID = parseBusinessID(message: message)
         if businessID == BussinessID_GroupRoomMessage {
-            let dict = TUITool.jsonData2Dictionary(message.customElem.data) as? [String: Any]
+            let dict = TUITool.jsonData2Dictionary(message.customElem?.data) as? [String: Any]
             let userName = dict?["ownerName"] as? String ?? ""
             return localizedReplace(.quickMeetingText, replace: userName)
         } else {
@@ -41,7 +41,7 @@ class RoomMessageBubbleCellData: TUIBubbleMessageCellData {
     
     private class func parseBusinessID(message: V2TIMMessage?) -> String {
         guard let message = message else { return "" }
-        let customData = message.customElem.data
+        let customData = message.customElem?.data
         let dict = TUITool.jsonData2Dictionary(customData)
         guard let businessID = dict?["businessID"] as? String else { return ""}
         return businessID
