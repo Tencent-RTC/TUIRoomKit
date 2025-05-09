@@ -47,7 +47,7 @@ class InviteToJoinRoomManager {
         guard let dataString = dataDict.convertToString() else { return }
         let pushInfo = V2TIMOfflinePushInfo()
         invitedList.forEach { userId in
-            V2TIMManager.sharedInstance().invite(userId,
+            V2TIMManager.sharedInstance().invite(invitee: userId,
                                                  data: dataString,
                                                  onlineUserOnly: true,
                                                  offlinePushInfo: pushInfo,

@@ -33,7 +33,7 @@ class FloatChatService: NSObject {
     func sendGroupMessage(_ message: String) -> AnyPublisher<String, Never> {
         return Future<String, Never> { [weak self] promise in
             guard let self = self else { return }
-            self.imManager?.sendGroupTextMessage(message, to: self.roomId, priority: .PRIORITY_NORMAL, succ: {
+            self.imManager?.sendGroupTextMessage(text: message, to: self.roomId, priority: .PRIORITY_NORMAL, succ: {
                 promise(.success((message)))
             }, fail: { code, message in
                 let errorMsg = TUITool.convertIMError(Int(code), msg: message)
@@ -46,7 +46,7 @@ class FloatChatService: NSObject {
 }
 
 extension FloatChatService: V2TIMAdvancedMsgListener {
-    func onRecvNewMessage(_ msg: V2TIMMessage!) {
+    func onRecvNewMessage(msg: V2TIMMessage!) {
         guard msg.groupID == roomId, let msg = msg else { return }
         let floatMessage = FloatChatMessage(msg: msg)
         store?.dispatch(action: FloatChatActions.onMessageReceived(payload: floatMessage))

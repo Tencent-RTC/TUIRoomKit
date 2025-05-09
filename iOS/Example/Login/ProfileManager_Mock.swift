@@ -89,7 +89,7 @@ import TUIRoomKit
         let userInfo = V2TIMUserFullInfo()
         userInfo.nickName = name
         curUserModel?.name = name
-        V2TIMManager.sharedInstance()?.setSelfInfo(userInfo, succ: {
+        V2TIMManager.sharedInstance()?.setSelfInfo(info: userInfo, succ: {
             success()
             debugPrint("set profile success")
         }, fail: { (code, desc) in
@@ -150,7 +150,7 @@ import TUIRoomKit
         let userInfo = V2TIMUserFullInfo()
         userInfo.nickName = userModel.name
         userInfo.faceURL = userModel.avatar
-        V2TIMManager.sharedInstance()?.setSelfInfo(userInfo, succ: {
+        V2TIMManager.sharedInstance()?.setSelfInfo(info: userInfo, succ: {
             debugPrint("set profile success")
         }, fail: { (code, desc) in
             debugPrint("set profile failed.")
