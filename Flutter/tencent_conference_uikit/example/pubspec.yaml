@@ -41,7 +41,7 @@ dependencies:
   crypto: ^3.0.3
   shared_preferences: ^2.2.1
   open_file: ^3.3.2
-  tencent_cloud_chat_message: ^3.2.1
+  tencent_cloud_chat_message: ^3.2.1+1
   tencent_cloud_chat_sticker: ^3.2.1
 
 dev_dependencies:

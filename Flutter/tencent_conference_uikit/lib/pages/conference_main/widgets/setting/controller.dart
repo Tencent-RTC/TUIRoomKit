@@ -48,7 +48,7 @@ class SettingController extends GetxController {
   }
 
   void enableAudioVolumeEvaluation(bool enable) {
-    _engineManager.enableAudioVolumeEvaluation(enable);
+    _engineManager.enableVolumePrompt(enable);
   }
 
   void enableFloatingChat(bool value) {

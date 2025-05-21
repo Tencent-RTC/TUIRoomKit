@@ -38,6 +38,10 @@ class BottomViewController extends GetxController {
     _takeSeatRequestId = '';
     isRoomNeedTakeSeat.value = _store.roomInfo.isSeatEnabled == true &&
         _store.roomInfo.seatMode == TUISeatMode.applyToTake;
+    if (RoomStore.to.inviteSeatList.isNotEmpty) {
+      raiseHandApplicationCount.value =
+          RoomStore.to.inviteSeatList.length.toString();
+    }
     _worker = ever(RoomStore.to.inviteSeatList, (_) {
       if (RoomStore.to.inviteSeatList.isEmpty) {
         raiseHandApplicationCount.value = '';
