@@ -45,6 +45,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    namespace "com.tencent.cloud.tuikit.flutter.rtcconferencetuikit"
     compileSdk 31
 
     compileOptions {

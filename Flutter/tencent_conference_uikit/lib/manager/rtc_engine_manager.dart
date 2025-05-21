@@ -88,6 +88,7 @@ class RoomEngineManager {
     _setFramework();
     TUIValueCallBack<TUIRoomInfo> result = await _roomEngine.enterRoom(roomId);
     if (result.code == TUIError.success) {
+      _enableAudioVolumeEvaluation(true);
       RoomStore.to.roomInfo = result.data!;
       RoomStore.to.isEnteredRoom = true;
       RoomStore.to.timeStampOnEnterRoom = DateTime.now().millisecondsSinceEpoch;
@@ -318,10 +319,9 @@ class RoomEngineManager {
     );
   }
 
-  void enableAudioVolumeEvaluation(bool enable) async {
+  void enableVolumePrompt(bool enable) async {
     RoomStore.to.audioSetting.volumePrompt = enable;
-    var trtcCloud = (await TRTCCloud.sharedInstance())!;
-    trtcCloud.enableAudioVolumeEvaluation(enable ? 300 : 0);
+    _enableAudioVolumeEvaluation(enable);
   }
 
   void startScreenSharing({String appGroup = ''}) {
@@ -442,5 +442,10 @@ class RoomEngineManager {
   bool _isApplySpeakRoom() {
     return RoomStore.to.roomInfo.seatMode == TUISeatMode.applyToTake &&
         RoomStore.to.roomInfo.isSeatEnabled;
+  }
+
+  void _enableAudioVolumeEvaluation(bool enable) async {
+    var trtcCloud = (await TRTCCloud.sharedInstance())!;
+    trtcCloud.enableAudioVolumeEvaluation(enable ? 500 : 0);
   }
 }

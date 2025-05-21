@@ -165,11 +165,6 @@ class RoomEventHandler extends TUIRoomObserver {
     };
 
     super.onRequestReceived = (request) {
-      if (request.userId == RoomStore.to.currentUser.userId.value) {
-        RoomEngineManager()
-            .getRoomEngine()
-            .responseRemoteRequest(request.requestId, true);
-      }
       switch (request.requestAction) {
         case TUIRequestAction.requestToTakeSeat:
           if (_store.roomInfo.isSeatEnabled == true &&
